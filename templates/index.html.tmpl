@@ -68,9 +68,11 @@
   body, button, textarea { font-family: 'Inter', sans-serif; }
   .itil-display { font-family: 'Fraunces', serif; }
   textarea:focus, button:focus { outline: 2px solid #C97B94; outline-offset: 1px; }
-  button { transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, transform 0.1s ease, opacity 0.15s ease; cursor: pointer; }
+  button { transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, transform 0.1s ease, opacity 0.15s ease, box-shadow 0.1s ease; cursor: pointer; }
+  button:not(.btn-flat) { box-shadow: 0 2px 5px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.06), inset 0 -1px 0 rgba(0,0,0,0.12); }
+  button:not(.btn-flat):active { box-shadow: inset 0 2px 4px rgba(0,0,0,0.35); }
   button:active { transform: scale(0.97); }
-  button:disabled { cursor: default; }
+  button:disabled { cursor: default; box-shadow: none; }
   button:disabled:active { transform: none; }
   * { -webkit-tap-highlight-color: transparent; }
 
@@ -81,6 +83,7 @@
   .flex { display: flex; }
   .flex-1 { flex: 1 1 0%; }
   .flex-col { flex-direction: column; }
+  .flex-wrap { flex-wrap: wrap; }
   .items-center { align-items: center; }
   .items-start { align-items: flex-start; }
   .justify-between { justify-content: space-between; }

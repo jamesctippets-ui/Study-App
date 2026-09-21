@@ -2,7 +2,7 @@
 
 function ExamIntro({ track, config, onStart }) {
   return (
-    <div style={{ background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderRadius: '18px', padding: '22px' }}>
+    <div style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderRadius: '18px', padding: '22px' }}>
       <div className="itil-display" style={{ fontSize: '19px', fontWeight: 600, marginBottom: '12px' }}>{track.label} Final Exam</div>
       <div style={{ fontSize: '13px', color: COLOR.text, marginBottom: '4px' }}>{config.length} questions</div>
       <div style={{ fontSize: '13px', color: COLOR.text, marginBottom: '4px' }}>{config.minutes}-minute time limit</div>
@@ -23,7 +23,7 @@ function ExamIntro({ track, config, onStart }) {
 function ExamQuestionView({ q, selectedIdx, onSelect }) {
   if (!q) return null;
   return (
-    <div style={{ background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderRadius: '18px', padding: '20px' }}>
+    <div style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderRadius: '18px', padding: '20px' }}>
       <div style={{ fontSize: '16px', lineHeight: 1.4, fontWeight: 500, marginBottom: '16px' }}>{q.question}</div>
       {q.type === 'mc' && (
         <div className="flex flex-col gap-2">
@@ -106,7 +106,7 @@ function ExamResults({ result, config, track, categories, onRestart }) {
   const onTarget = pct >= config.passPct;
   return (
     <div>
-      <div style={{ background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderRadius: '18px', padding: '26px', textAlign: 'center' }}>
+      <div style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderRadius: '18px', padding: '26px', textAlign: 'center' }}>
         <div className="itil-display" style={{ fontSize: '30px', fontWeight: 600, color: onTarget ? COLOR.teal : COLOR.red }}>{result.correct} / {result.total}</div>
         <div style={{ fontSize: '13px', color: COLOR.muted, marginTop: '4px' }}>{pct}% correct</div>
         {isItil ? (
@@ -125,7 +125,7 @@ function ExamResults({ result, config, track, categories, onRestart }) {
           <div style={{ fontSize: '12px', color: COLOR.muted, marginBottom: '8px' }}>Review these:</div>
           <div className="flex flex-col gap-2">
             {missed.map((m, i) => (
-              <div key={i} style={{ background: COLOR.surfaceRaised, borderRadius: '10px', padding: '10px 12px', fontSize: '13px' }}>
+              <div key={i} style={{ boxShadow: SHADOW.card, background: COLOR.surfaceRaised, borderRadius: '10px', padding: '10px 12px', fontSize: '13px' }}>
                 <div style={{ fontSize: '10px', color: COLOR.muted, marginBottom: '2px' }}>
                   {categories.find((c) => c.key === m.cat)?.label}{!m.answered ? ' — left blank' : ''}
                 </div>

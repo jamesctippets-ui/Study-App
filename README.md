@@ -12,7 +12,11 @@ AZ-900/AZ-104 a full mini-course per topic: reading with tappable key terms,
 an SVG diagram, a portal mockup, a worked scenario, common exam traps, and a
 3–4 question quiz), and Match (a term-matching game — tap a term chip, then
 its definition; respects the current category filter, tracks mistakes, and
-deals a fresh random round each time). Quiz is a rotating question engine
+deals a fresh random round each time). A lesson's reading is itself split
+into pages when it runs long — moving past the first page takes either a
+one-question quick check or a 3-pair mini match round, alternating between
+the two, so the material isn't just a wall of text to skim past. Quiz is a
+rotating question engine
 (multiple choice, true/false, multi-select — matching the question formats
 the real proctored exams actually use; there's no free-response short-answer
 type since none of these exams have one) with a missed-question review

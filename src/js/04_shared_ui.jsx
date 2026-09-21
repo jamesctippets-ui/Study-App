@@ -54,7 +54,7 @@ function FlashcardView({ card, flipped, setFlipped, onRate, index, total, catego
         {!flipped ? (
           <div className="itil-display" style={{ fontSize: '21px', fontWeight: 500, lineHeight: 1.35 }}>{card.front}</div>
         ) : (
-          <div style={{ fontSize: '15px', lineHeight: 1.55 }}>{card.back}</div>
+          <div style={{ fontSize: '16px', lineHeight: 1.6 }}>{card.back}</div>
         )}
       </div>
       <div style={{ fontSize: '11px', color: COLOR.muted, textAlign: 'center', marginTop: '8px' }}>
@@ -82,11 +82,11 @@ function FlashcardView({ card, flipped, setFlipped, onRate, index, total, catego
 
 function StudyEntry({ item }) {
   return (
-    <div style={{ background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderRadius: '14px', padding: '14px 16px' }}>
+    <div style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderRadius: '14px', padding: '14px 16px' }}>
       <div className="itil-display" style={{ fontSize: '16px', fontWeight: 600, marginBottom: '4px' }}>{item.front}</div>
-      <div style={{ fontSize: '13px', lineHeight: 1.5, color: COLOR.text, marginBottom: item.detail ? '8px' : 0 }}>{item.back}</div>
+      <div style={{ fontSize: '14px', lineHeight: 1.55, color: COLOR.text, marginBottom: item.detail ? '8px' : 0 }}>{item.back}</div>
       {item.detail && (
-        <div style={{ fontSize: '12px', lineHeight: 1.5, color: COLOR.muted, borderLeft: `2px solid ${COLOR.teal}`, paddingLeft: '10px' }}>
+        <div style={{ fontSize: '13px', lineHeight: 1.55, color: COLOR.muted, borderLeft: `2px solid ${COLOR.teal}`, paddingLeft: '10px' }}>
           {item.detail}
         </div>
       )}
@@ -121,8 +121,8 @@ function StudyView({ activeCat, categories, flashcards }) {
   );
 }
 
-function MatchGame({ flashcards }) {
-  const ROUND_SIZE = 6;
+function MatchGame({ flashcards, roundSize, onContinue }) {
+  const ROUND_SIZE = roundSize || 6;
 
   const buildRound = useCallback(() => {
     const picked = shuffleArray(flashcards).slice(0, Math.min(ROUND_SIZE, flashcards.length));
@@ -185,12 +185,22 @@ function MatchGame({ flashcards }) {
         <div style={{ fontSize: '13px', color: COLOR.muted, marginBottom: '20px' }}>
           {round.picked.length} pairs matched · {mistakes} mistake{mistakes === 1 ? '' : 's'}
         </div>
-        <button
-          onClick={newRound}
-          style={{ background: COLOR.teal, color: '#2B1620', borderRadius: '10px', padding: '10px 20px', fontSize: '13px', fontWeight: 600 }}
-        >
-          New round
-        </button>
+        <div className="flex gap-2" style={{ justifyContent: 'center' }}>
+          <button
+            onClick={newRound}
+            style={{ background: COLOR.surfaceRaised, border: `1px solid ${COLOR.border}`, color: COLOR.text, borderRadius: '10px', padding: '10px 20px', fontSize: '13px', fontWeight: 600 }}
+          >
+            New round
+          </button>
+          {onContinue && (
+            <button
+              onClick={onContinue}
+              style={{ background: COLOR.teal, color: '#2B1620', borderRadius: '10px', padding: '10px 20px', fontSize: '13px', fontWeight: 600 }}
+            >
+              Continue reading →
+            </button>
+          )}
+        </div>
       </div>
     );
   }
@@ -221,7 +231,7 @@ function MatchGame({ flashcards }) {
         <span style={{ fontSize: '11px', color: COLOR.muted }}>
           {matched.length} / {round.picked.length} matched{mistakes > 0 ? ` · ${mistakes} mistake${mistakes === 1 ? '' : 's'}` : ''}
         </span>
-        <button onClick={newRound} style={{ fontSize: '11px', color: COLOR.teal, fontWeight: 600, padding: '4px 8px' }}>
+        <button onClick={newRound} className="btn-flat" style={{ fontSize: '11px', color: COLOR.teal, fontWeight: 600, padding: '4px 8px' }}>
           New round
         </button>
       </div>
@@ -302,48 +312,191 @@ function LessonCard({ lesson, mastery, onOpen }) {
   );
 }
 
-function LessonDetail({ lesson, flashcardsData, onBack, onQuiz, speakingId, onSpeak, speechSupported }) {
+function ReadingCheckGate({ question, onPassed }) {
+  const [q] = useState(() => prepareQuestion(question));
+  const [selected, setSelected] = useState(null);
+  const [msPending, setMsPending] = useState([]);
+  const [wasCorrect, setWasCorrect] = useState(null);
+  const [attempts, setAttempts] = useState(0);
+
+  const evalCorrect = (answer) => {
+    if (q.type === 'mc') return answer === q.correct;
+    if (q.type === 'tf') return (answer === 0) === q.answer;
+    if (q.type === 'ms') {
+      const picked = [...answer].sort();
+      const correct = [...q.correct].sort();
+      return picked.length === correct.length && picked.every((v, i) => v === correct[i]);
+    }
+    return false;
+  };
+
+  const onChoose = (idx) => {
+    if (selected !== null) return;
+    setSelected(idx);
+    setWasCorrect(evalCorrect(idx));
+  };
+  const onToggleMs = (idx) => {
+    if (selected !== null) return;
+    setMsPending((prev) => (prev.includes(idx) ? prev.filter((i) => i !== idx) : [...prev, idx]));
+  };
+  const onSubmitMs = () => {
+    if (selected !== null || msPending.length === 0) return;
+    setSelected(msPending);
+    setWasCorrect(evalCorrect(msPending));
+  };
+  const onNext = () => {
+    if (wasCorrect) { onPassed(); return; }
+    setAttempts((a) => a + 1);
+    setSelected(null);
+    setMsPending([]);
+    setWasCorrect(null);
+  };
+
+  return (
+    <div>
+      <div style={{ fontSize: '11px', color: COLOR.gold, fontWeight: 600, marginBottom: '8px' }}>Quick check</div>
+      <QuestionView
+        q={q}
+        selected={selected}
+        onChoose={onChoose}
+        onNext={onNext}
+        index={0}
+        total={1}
+        hideMeta
+        msPending={msPending}
+        onToggleMs={onToggleMs}
+        onSubmitMs={onSubmitMs}
+        nextLabel={selected === null ? null : wasCorrect ? 'Continue reading →' : 'Try again'}
+      />
+      {attempts > 0 && selected === null && (
+        <div style={{ fontSize: '11px', color: COLOR.muted, marginTop: '6px', textAlign: 'center' }}>
+          Not quite — give it another shot.
+        </div>
+      )}
+    </div>
+  );
+}
+
+function LessonDetail({ lesson, flashcardsData, questionsData, onBack, onQuiz, speakingId, onSpeak, speechSupported }) {
   const [showFundamentals, setShowFundamentals] = useState(false);
   const [activeTerm, setActiveTerm] = useState(null);
+  const [readingPage, setReadingPage] = useState(0);
+  const [unlockedPages, setUnlockedPages] = useState(1);
   const vocabItems = lesson.vocabIds.map((id) => flashcardsData.find((f) => f.id === id)).filter(Boolean);
   const DiagramComp = lesson.diagram ? LESSON_DIAGRAMS[lesson.diagram] : null;
   const MockupComp = lesson.portalMockup ? PORTAL_MOCKUPS[lesson.portalMockup] : null;
+
+  const paragraphs = lesson.reading.split('\n\n');
+  const readingPages = [];
+  for (let i = 0; i < paragraphs.length; i += 2) readingPages.push(paragraphs.slice(i, i + 2));
+  const isLastReadingPage = readingPage === readingPages.length - 1;
+  const needsGate = !isLastReadingPage && readingPage === unlockedPages - 1;
+
+  const gateQuestions = (questionsData || [])
+    .filter((q) => lesson.quizIds.includes(q.id) && (q.type === 'mc' || q.type === 'tf'));
+  const gateVocabPool = useMemo(() => {
+    return vocabItems.length >= 2 ? shuffleArray(vocabItems).slice(0, 3) : [];
+    // eslint-disable-next-line
+  }, [lesson.id, readingPage]);
+  const useMatchGateHere = readingPage % 2 === 1 || gateQuestions.length === 0;
+  const gateQuestion = !useMatchGateHere && gateQuestions.length
+    ? gateQuestions[readingPage % gateQuestions.length]
+    : null;
+  const advancePastGate = () => { setUnlockedPages((n) => n + 1); setReadingPage((p) => p + 1); };
+
   return (
     <div>
-      <button onClick={onBack} style={{ fontSize: '12px', color: COLOR.teal, background: 'transparent', marginBottom: '12px', padding: 0 }}>
+      <button onClick={onBack} className="btn-flat" style={{ fontSize: '12px', color: COLOR.teal, background: 'transparent', marginBottom: '12px', padding: 0 }}>
         ‹ All lessons
       </button>
       <div className="itil-display" style={{ fontSize: '19px', fontWeight: 600, marginBottom: '4px' }}>{lesson.title}</div>
       <div style={{ fontSize: '12px', color: COLOR.muted, marginBottom: '16px' }}>{lesson.summary}</div>
 
       {DiagramComp && (
-        <div style={{ background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderRadius: '14px', padding: '14px', marginBottom: '16px' }}>
+        <div style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderRadius: '14px', padding: '14px', marginBottom: '16px' }}>
           <DiagramComp />
         </div>
       )}
 
       <div style={{ marginBottom: activeTerm ? '10px' : '16px' }}>
         <div className="flex justify-between items-center" style={{ marginBottom: '8px' }}>
-          <div style={{ fontSize: '13px', fontWeight: 600, color: COLOR.gold }}>Reading</div>
-          {speechSupported && <SpeakButton id={'read-' + lesson.id} text={lesson.reading.replace(/\n+/g, ' ')} speakingId={speakingId} onSpeak={onSpeak} />}
+          <div style={{ fontSize: '13px', fontWeight: 600, color: COLOR.gold }}>
+            Reading{readingPages.length > 1 ? ` · page ${readingPage + 1} of ${readingPages.length}` : ''}
+          </div>
+          {speechSupported && (
+            <SpeakButton
+              id={'read-' + lesson.id + '-' + readingPage}
+              text={readingPages[readingPage].join(' ')}
+              speakingId={speakingId}
+              onSpeak={onSpeak}
+            />
+          )}
         </div>
         <div style={{ fontSize: '11px', color: COLOR.muted, marginBottom: '8px' }}>Tap a highlighted term for its definition.</div>
-        {lesson.reading.split('\n\n').map((p, i) => (
-          <p key={i} style={{ fontSize: '13px', lineHeight: 1.6, color: COLOR.text, marginBottom: '10px' }}>
+        {readingPages[readingPage].map((p, i) => (
+          <p key={i} style={{ fontSize: '14px', lineHeight: 1.65, color: COLOR.text, marginBottom: '10px' }}>
             {highlightTerms(p, lesson.keyTerms, flashcardsData, setActiveTerm)}
           </p>
         ))}
+
+        {readingPage > 0 && (
+          <button
+            onClick={() => setReadingPage((p) => p - 1)}
+            className="btn-flat"
+            style={{ fontSize: '12px', color: COLOR.muted, padding: '4px 0', marginBottom: '10px' }}
+          >
+            ‹ Previous page
+          </button>
+        )}
+
+        {!isLastReadingPage && readingPage < unlockedPages - 1 && (
+          <button
+            onClick={() => setReadingPage((p) => p + 1)}
+            style={{ width: '100%', padding: '12px', borderRadius: '12px', background: COLOR.surfaceRaised, border: `1px solid ${COLOR.border}`, color: COLOR.text, fontSize: '13px', fontWeight: 600 }}
+          >
+            Next page →
+          </button>
+        )}
+
+        {needsGate && (
+          <div style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderRadius: '14px', padding: '16px' }}>
+            <div style={{ fontSize: '12px', color: COLOR.muted, marginBottom: '10px', textAlign: 'center' }}>
+              {useMatchGateHere ? 'Match a few terms to unlock the next page.' : 'Answer this to unlock the next page.'}
+            </div>
+            {useMatchGateHere ? (
+              gateVocabPool.length >= 2 ? (
+                <MatchGame flashcards={gateVocabPool} roundSize={3} onContinue={advancePastGate} />
+              ) : (
+                <button
+                  onClick={advancePastGate}
+                  style={{ width: '100%', padding: '12px', borderRadius: '12px', background: COLOR.teal, color: '#2B1620', fontSize: '14px', fontWeight: 600 }}
+                >
+                  Continue reading →
+                </button>
+              )
+            ) : gateQuestion ? (
+              <ReadingCheckGate question={gateQuestion} onPassed={advancePastGate} />
+            ) : (
+              <button
+                onClick={advancePastGate}
+                style={{ width: '100%', padding: '12px', borderRadius: '12px', background: COLOR.teal, color: '#2B1620', fontSize: '14px', fontWeight: 600 }}
+              >
+                Continue reading →
+              </button>
+            )}
+          </div>
+        )}
       </div>
 
       {activeTerm && (
-        <div style={{ background: COLOR.surfaceRaised, border: `1px solid ${COLOR.teal}`, borderRadius: '12px', padding: '12px 14px', marginBottom: '16px' }}>
+        <div style={{ boxShadow: SHADOW.card, background: COLOR.surfaceRaised, border: `1px solid ${COLOR.teal}`, borderRadius: '12px', padding: '12px 14px', marginBottom: '16px' }}>
           <div className="flex justify-between items-start" style={{ marginBottom: '4px' }}>
             <div className="itil-display" style={{ fontSize: '14px', fontWeight: 600, color: COLOR.teal }}>{activeTerm.front}</div>
-            <button onClick={() => setActiveTerm(null)} style={{ background: 'transparent', color: COLOR.muted, padding: '0 0 0 8px', fontSize: '13px' }}>✕</button>
+            <button onClick={() => setActiveTerm(null)} className="btn-flat" style={{ background: 'transparent', color: COLOR.muted, padding: '0 0 0 8px', fontSize: '13px' }}>✕</button>
           </div>
-          <div style={{ fontSize: '13px', lineHeight: 1.5, color: COLOR.text }}>{activeTerm.back}</div>
+          <div style={{ fontSize: '14px', lineHeight: 1.55, color: COLOR.text }}>{activeTerm.back}</div>
           {activeTerm.detail && (
-            <div style={{ fontSize: '11.5px', lineHeight: 1.5, color: COLOR.muted, marginTop: '6px', borderLeft: `2px solid ${COLOR.teal}`, paddingLeft: '8px' }}>
+            <div style={{ fontSize: '12.5px', lineHeight: 1.55, color: COLOR.muted, marginTop: '6px', borderLeft: `2px solid ${COLOR.teal}`, paddingLeft: '8px' }}>
               {activeTerm.detail}
             </div>
           )}
@@ -356,7 +509,7 @@ function LessonDetail({ lesson, flashcardsData, onBack, onQuiz, speakingId, onSp
           <div style={{ fontSize: '10.5px', color: COLOR.muted, marginBottom: '8px', lineHeight: 1.4 }}>
             An illustration of the layout, not an exact screenshot — the real portal may look slightly different.
           </div>
-          <div style={{ background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderRadius: '14px', padding: '14px' }}>
+          <div style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderRadius: '14px', padding: '14px' }}>
             <MockupComp />
           </div>
         </div>
@@ -365,8 +518,8 @@ function LessonDetail({ lesson, flashcardsData, onBack, onQuiz, speakingId, onSp
       {lesson.scenario && (
         <div style={{ marginBottom: '16px' }}>
           <div style={{ fontSize: '13px', fontWeight: 600, color: COLOR.gold, marginBottom: '8px' }}>Worked scenario</div>
-          <div style={{ background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderLeft: `3px solid ${COLOR.teal}`, borderRadius: '10px', padding: '12px 14px' }}>
-            <p style={{ fontSize: '13px', lineHeight: 1.6, color: COLOR.text }}>{lesson.scenario}</p>
+          <div style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderLeft: `3px solid ${COLOR.teal}`, borderRadius: '10px', padding: '12px 14px' }}>
+            <p style={{ fontSize: '14px', lineHeight: 1.65, color: COLOR.text }}>{lesson.scenario}</p>
           </div>
         </div>
       )}
@@ -378,7 +531,7 @@ function LessonDetail({ lesson, flashcardsData, onBack, onQuiz, speakingId, onSp
             {lesson.commonTraps.map((t, i) => (
               <div
                 key={i}
-                style={{ background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderLeft: `3px solid ${COLOR.red}`, borderRadius: '10px', padding: '10px 12px', fontSize: '12.5px', lineHeight: 1.5, color: COLOR.text }}
+                style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderLeft: `3px solid ${COLOR.red}`, borderRadius: '10px', padding: '10px 12px', fontSize: '13.5px', lineHeight: 1.55, color: COLOR.text }}
               >
                 {t}
               </div>
@@ -394,7 +547,7 @@ function LessonDetail({ lesson, flashcardsData, onBack, onQuiz, speakingId, onSp
         {showFundamentals ? '▾ ' : '▸ '}{lesson.fundamentalsLabel}
       </button>
       {showFundamentals && (
-        <div style={{ background: COLOR.surfaceRaised, borderRadius: '0 0 12px 12px', padding: '14px', marginBottom: '16px', borderLeft: `1px solid ${COLOR.border}`, borderRight: `1px solid ${COLOR.border}`, borderBottom: `1px solid ${COLOR.border}` }}>
+        <div style={{ boxShadow: SHADOW.card, background: COLOR.surfaceRaised, borderRadius: '0 0 12px 12px', padding: '14px', marginBottom: '16px', borderLeft: `1px solid ${COLOR.border}`, borderRight: `1px solid ${COLOR.border}`, borderBottom: `1px solid ${COLOR.border}` }}>
           {speechSupported && (
             <div className="flex justify-end" style={{ marginBottom: '8px' }}>
               <SpeakButton id={'fund-' + lesson.id} text={lesson.fundamentals.replace(/\n+/g, ' ')} speakingId={speakingId} onSpeak={onSpeak} />
@@ -423,7 +576,7 @@ function LessonDetail({ lesson, flashcardsData, onBack, onQuiz, speakingId, onSp
   );
 }
 
-function CourseView({ lessons, flashcardsData, onQuiz, speakingId, onSpeak, speechSupported, masteryFn }) {
+function CourseView({ lessons, flashcardsData, questionsData, onQuiz, speakingId, onSpeak, speechSupported, masteryFn }) {
   const [lessonId, setLessonId] = useState(null);
   const lesson = lessons.find((l) => l.id === lessonId);
   if (lesson) {
@@ -431,6 +584,7 @@ function CourseView({ lessons, flashcardsData, onQuiz, speakingId, onSpeak, spee
       <LessonDetail
         lesson={lesson}
         flashcardsData={flashcardsData}
+        questionsData={questionsData}
         onBack={() => setLessonId(null)}
         onQuiz={onQuiz}
         speakingId={speakingId}
@@ -443,7 +597,7 @@ function CourseView({ lessons, flashcardsData, onQuiz, speakingId, onSpeak, spee
   const avgMastery = lessons.length ? lessons.reduce((sum, l) => sum + masteryFn(l), 0) / lessons.length : 0;
   return (
     <div>
-      <div style={{ background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderRadius: '14px', padding: '14px 16px', marginBottom: '14px' }}>
+      <div style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderRadius: '14px', padding: '14px 16px', marginBottom: '14px' }}>
         <div className="flex justify-between items-center" style={{ marginBottom: '8px' }}>
           <div style={{ fontSize: '12px', color: COLOR.muted }}>Course progress</div>
           <div style={{ fontSize: '12px', fontWeight: 600, color: masteredCount === lessons.length ? COLOR.teal : COLOR.text }}>
@@ -518,17 +672,19 @@ function QuizSetup({ length, setLength, types, toggleType, onReroll, poolSize, m
   );
 }
 
-function QuestionView({ q, selected, onChoose, onNext, index, total, categoryLabel, badgeLabel, msPending, onToggleMs, onSubmitMs }) {
+function QuestionView({ q, selected, onChoose, onNext, index, total, categoryLabel, badgeLabel, msPending, onToggleMs, onSubmitMs, nextLabel, hideMeta }) {
   if (!q) return null;
   const isLast = index + 1 >= total;
   return (
     <div>
-      <div className="flex justify-between items-center mb-2" style={{ fontSize: '11px', color: COLOR.muted }}>
-        <span>{badgeLabel ? badgeLabel + ' · ' : ''}{categoryLabel}</span>
-        <span>{index + 1} / {total}</span>
-      </div>
-      <div style={{ background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderRadius: '18px', padding: '20px' }}>
-        <div style={{ fontSize: '16px', lineHeight: 1.4, fontWeight: 500, marginBottom: '16px' }}>{q.question}</div>
+      {!hideMeta && (
+        <div className="flex justify-between items-center mb-2" style={{ fontSize: '11px', color: COLOR.muted }}>
+          <span>{badgeLabel ? badgeLabel + ' · ' : ''}{categoryLabel}</span>
+          <span>{index + 1} / {total}</span>
+        </div>
+      )}
+      <div style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderRadius: '18px', padding: '20px' }}>
+        <div style={{ fontSize: '17px', lineHeight: 1.45, fontWeight: 500, marginBottom: '16px' }}>{q.question}</div>
 
         {q.type === 'mc' && (
           <div className="flex flex-col gap-2">
@@ -547,7 +703,7 @@ function QuestionView({ q, selected, onChoose, onNext, index, total, categoryLab
                   onClick={() => onChoose(i)}
                   style={{
                     textAlign: 'left', padding: '12px 14px', borderRadius: '12px',
-                    border: `1px solid ${border}`, background: bg, color, fontSize: '14px', lineHeight: 1.4,
+                    border: `1px solid ${border}`, background: bg, color, fontSize: '15px', lineHeight: 1.45,
                     display: 'flex', alignItems: 'center', justifyContent: 'space-between',
                     cursor: selected !== null ? 'default' : 'pointer',
                   }}
@@ -577,7 +733,7 @@ function QuestionView({ q, selected, onChoose, onNext, index, total, categoryLab
                   disabled={selected !== null}
                   onClick={() => onChoose(i)}
                   className="flex-1"
-                  style={{ padding: '16px', borderRadius: '12px', border: `1px solid ${border}`, background: bg, color, fontSize: '15px', fontWeight: 600, cursor: selected !== null ? 'default' : 'pointer' }}
+                  style={{ padding: '16px', borderRadius: '12px', border: `1px solid ${border}`, background: bg, color, fontSize: '16px', fontWeight: 600, cursor: selected !== null ? 'default' : 'pointer' }}
                 >
                   {label}
                 </button>
@@ -608,7 +764,7 @@ function QuestionView({ q, selected, onChoose, onNext, index, total, categoryLab
                     onClick={() => onToggleMs(i)}
                     style={{
                       textAlign: 'left', padding: '12px 14px', borderRadius: '12px',
-                      border: `1px solid ${border}`, background: bg, color, fontSize: '14px', lineHeight: 1.4,
+                      border: `1px solid ${border}`, background: bg, color, fontSize: '15px', lineHeight: 1.45,
                       display: 'flex', alignItems: 'center', justifyContent: 'space-between',
                       cursor: selected !== null ? 'default' : 'pointer',
                     }}
@@ -635,7 +791,7 @@ function QuestionView({ q, selected, onChoose, onNext, index, total, categoryLab
         )}
 
         {selected !== null && q.explanation && (
-          <div style={{ marginTop: '14px', padding: '12px', borderRadius: '10px', background: COLOR.surfaceRaised, fontSize: '13px', lineHeight: 1.5, color: COLOR.muted }}>
+          <div style={{ boxShadow: SHADOW.card, marginTop: '14px', padding: '12px', borderRadius: '10px', background: COLOR.surfaceRaised, fontSize: '14px', lineHeight: 1.55, color: COLOR.muted }}>
             {q.explanation}
           </div>
         )}
@@ -646,7 +802,7 @@ function QuestionView({ q, selected, onChoose, onNext, index, total, categoryLab
           onClick={onNext}
           style={{ width: '100%', marginTop: '12px', padding: '12px', borderRadius: '12px', background: COLOR.teal, color: '#2B1620', fontSize: '14px', fontWeight: 600 }}
         >
-          {isLast ? 'See results' : 'Next question'}
+          {nextLabel || (isLast ? 'See results' : 'Next question')}
         </button>
       )}
     </div>
@@ -657,7 +813,7 @@ function QuizSummary({ score, answers, categories, onRestart }) {
   const missed = answers.filter((a) => !a.correct);
   return (
     <div>
-      <div style={{ background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderRadius: '18px', padding: '24px', textAlign: 'center' }}>
+      <div style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderRadius: '18px', padding: '24px', textAlign: 'center' }}>
         <div className="itil-display" style={{ fontSize: '28px', fontWeight: 600, color: COLOR.teal }}>{score.correct} / {score.total}</div>
         <div style={{ fontSize: '13px', color: COLOR.muted, marginTop: '4px' }}>correct this round</div>
       </div>
@@ -666,7 +822,7 @@ function QuizSummary({ score, answers, categories, onRestart }) {
           <div style={{ fontSize: '12px', color: COLOR.muted, marginBottom: '8px' }}>Worth another look:</div>
           <div className="flex flex-col gap-2">
             {missed.map((m, i) => (
-              <div key={i} style={{ background: COLOR.surfaceRaised, borderRadius: '10px', padding: '10px 12px', fontSize: '13px' }}>
+              <div key={i} style={{ boxShadow: SHADOW.card, background: COLOR.surfaceRaised, borderRadius: '10px', padding: '10px 12px', fontSize: '13px' }}>
                 <div style={{ fontSize: '10px', color: COLOR.muted, marginBottom: '2px' }}>{categories.find((c) => c.key === m.cat)?.label}</div>
                 <div>{m.prompt}</div>
               </div>

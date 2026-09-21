@@ -147,6 +147,7 @@ function highlightTerms(text, terms, vocabPool, onTermClick) {
     return (
       <button
         key={i}
+        className="btn-flat"
         onClick={() => onTermClick(card)}
         style={{
           color: COLOR.gold, fontWeight: 700, background: 'transparent', padding: 0,

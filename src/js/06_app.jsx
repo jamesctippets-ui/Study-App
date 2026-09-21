@@ -440,7 +440,7 @@ function CertStudyApp() {
         )}
 
         {confirmReset && (
-          <div style={{ background: COLOR.surface, border: `1px solid ${COLOR.red}`, borderRadius: '12px', padding: '12px', marginBottom: '16px' }}>
+          <div style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `1px solid ${COLOR.red}`, borderRadius: '12px', padding: '12px', marginBottom: '16px' }}>
             <div style={{ fontSize: '13px', marginBottom: '8px' }}>Clear saved progress for {track.label}?</div>
             <div className="flex gap-2">
               <button onClick={doReset} style={{ flex: 1, background: COLOR.red, color: '#fff', borderRadius: '8px', padding: '8px', fontSize: '13px', fontWeight: 600 }}>Clear it</button>
@@ -449,7 +449,7 @@ function CertStudyApp() {
           </div>
         )}
 
-        <div className="flex gap-1 mb-4" style={{ background: COLOR.surface, padding: '4px', borderRadius: '12px', border: `1px solid ${COLOR.border}` }}>
+        <div className="flex gap-1 mb-4" style={{ boxShadow: SHADOW.card, background: COLOR.surface, padding: '4px', borderRadius: '12px', border: `1px solid ${COLOR.border}` }}>
           <button
             onClick={() => setMode('learn')}
             className="flex-1"
@@ -566,6 +566,7 @@ function CertStudyApp() {
             <CourseView
               lessons={DATA[activeTrack].lessons}
               flashcardsData={flashcardsData}
+              questionsData={questionsData}
               onQuiz={startLessonQuiz}
               speakingId={speakingId}
               onSpeak={speak}
@@ -632,6 +633,7 @@ function CertStudyApp() {
               </div>
               <button
                 onClick={() => setExamPhase('complete')}
+                className="btn-flat"
                 style={{ width: '100%', marginTop: '8px', padding: '6px', fontSize: '11px', color: COLOR.muted, background: 'transparent' }}
               >
                 Submit early

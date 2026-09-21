@@ -11,3 +11,7 @@ const COLOR = {
   gold: '#D3A465',
   red: '#B5574A',
 };
+
+const SHADOW = {
+  card: '0 3px 10px rgba(0,0,0,0.32), inset 0 1px 0 rgba(255,255,255,0.04)',
+};
