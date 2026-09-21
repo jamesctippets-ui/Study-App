@@ -2,7 +2,8 @@
 
 function CertStudyApp() {
   const [activeTrack, setActiveTrack] = useState('az900');
-  const [mode, setMode] = useState('flashcards');
+  const [mode, setMode] = useState('learn');
+  const [learnView, setLearnView] = useState('cards');
   const [activeCat, setActiveCat] = useState('all');
   const [results, setResults] = useState(emptyTrackMap);
   const [seenLog, setSeenLog] = useState(emptyTrackMap);
@@ -160,7 +161,7 @@ function CertStudyApp() {
     return seededShuffle(list, 7);
   }, [activeCat, flashcardsData]);
 
-  useEffect(() => { setFIndex(0); setFlipped(false); }, [activeCat, mode, activeTrack]);
+  useEffect(() => { setFIndex(0); setFlipped(false); }, [activeCat, mode, learnView, activeTrack]);
   useEffect(() => { setActiveCat('all'); }, [activeTrack]);
 
   const availableQuestions = useMemo(() => {
@@ -450,11 +451,11 @@ function CertStudyApp() {
 
         <div className="flex gap-1 mb-4" style={{ background: COLOR.surface, padding: '4px', borderRadius: '12px', border: `1px solid ${COLOR.border}` }}>
           <button
-            onClick={() => setMode('flashcards')}
+            onClick={() => setMode('learn')}
             className="flex-1"
-            style={{ padding: '8px 2px', borderRadius: '9px', fontSize: '11px', fontWeight: 600, background: mode === 'flashcards' ? COLOR.teal : 'transparent', color: mode === 'flashcards' ? '#0E1210' : COLOR.muted }}
+            style={{ padding: '8px 2px', borderRadius: '9px', fontSize: '11px', fontWeight: 600, background: mode === 'learn' ? COLOR.teal : 'transparent', color: mode === 'learn' ? '#0E1210' : COLOR.muted }}
           >
-            Cards
+            Learn
           </button>
           <button
             onClick={() => setMode('quiz')}
@@ -462,20 +463,6 @@ function CertStudyApp() {
             style={{ padding: '8px 2px', borderRadius: '9px', fontSize: '11px', fontWeight: 600, background: mode === 'quiz' ? COLOR.teal : 'transparent', color: mode === 'quiz' ? '#0E1210' : COLOR.muted }}
           >
             Quiz
-          </button>
-          <button
-            onClick={() => setMode('study')}
-            className="flex-1"
-            style={{ padding: '8px 2px', borderRadius: '9px', fontSize: '11px', fontWeight: 600, background: mode === 'study' ? COLOR.teal : 'transparent', color: mode === 'study' ? '#0E1210' : COLOR.muted }}
-          >
-            Study
-          </button>
-          <button
-            onClick={() => setMode('match')}
-            className="flex-1"
-            style={{ padding: '8px 2px', borderRadius: '9px', fontSize: '11px', fontWeight: 600, background: mode === 'match' ? COLOR.teal : 'transparent', color: mode === 'match' ? '#0E1210' : COLOR.muted }}
-          >
-            Match
           </button>
           <button
             onClick={() => setMode('exam')}
@@ -486,7 +473,33 @@ function CertStudyApp() {
           </button>
         </div>
 
-        {mode !== 'exam' && !(mode === 'study' && DATA[activeTrack].lessons) && (
+        {mode === 'learn' && (
+          <div className="flex gap-1 mb-4" style={{ background: COLOR.bg, padding: '3px', borderRadius: '10px', border: `1px solid ${COLOR.border}` }}>
+            <button
+              onClick={() => setLearnView('cards')}
+              className="flex-1"
+              style={{ padding: '6px 2px', borderRadius: '8px', fontSize: '10.5px', fontWeight: 600, background: learnView === 'cards' ? COLOR.surfaceRaised : 'transparent', color: learnView === 'cards' ? COLOR.text : COLOR.muted }}
+            >
+              Cards
+            </button>
+            <button
+              onClick={() => setLearnView('study')}
+              className="flex-1"
+              style={{ padding: '6px 2px', borderRadius: '8px', fontSize: '10.5px', fontWeight: 600, background: learnView === 'study' ? COLOR.surfaceRaised : 'transparent', color: learnView === 'study' ? COLOR.text : COLOR.muted }}
+            >
+              Study
+            </button>
+            <button
+              onClick={() => setLearnView('match')}
+              className="flex-1"
+              style={{ padding: '6px 2px', borderRadius: '8px', fontSize: '10.5px', fontWeight: 600, background: learnView === 'match' ? COLOR.surfaceRaised : 'transparent', color: learnView === 'match' ? COLOR.text : COLOR.muted }}
+            >
+              Match
+            </button>
+          </div>
+        )}
+
+        {(mode === 'quiz' || (mode === 'learn' && (learnView !== 'study' || !DATA[activeTrack].lessons))) && (
           <div className="flex gap-2 mb-5" style={{ overflowX: 'auto', paddingBottom: '4px' }}>
             <CategoryChip label="All" active={activeCat === 'all'} mastery={overallMastery / 100} onClick={() => setActiveCat('all')} />
             {categories.map((c) => (
@@ -495,7 +508,7 @@ function CertStudyApp() {
           </div>
         )}
 
-        {mode === 'flashcards' && (
+        {mode === 'learn' && learnView === 'cards' && (
           <FlashcardView
             card={currentCard}
             flipped={flipped}
@@ -546,9 +559,9 @@ function CertStudyApp() {
           </React.Fragment>
         )}
 
-        {mode === 'match' && <MatchGame flashcards={filteredFlashcards} />}
+        {mode === 'learn' && learnView === 'match' && <MatchGame flashcards={filteredFlashcards} />}
 
-        {mode === 'study' && (
+        {mode === 'learn' && learnView === 'study' && (
           DATA[activeTrack].lessons ? (
             <CourseView
               lessons={DATA[activeTrack].lessons}

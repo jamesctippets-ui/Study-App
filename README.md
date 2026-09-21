@@ -6,16 +6,18 @@ proper Python source tree instead of one giant file.
 
 ## What's inside
 
-Flashcards, a rotating quiz engine (multiple choice, true/false, multi-select —
-matching the question formats the real proctored exams actually use; there's no
-free-response short-answer type since none of these exams have one), a timed
-Final Exam mode matching each real exam's length/pass mark, a missed-question
-review queue, a term-matching game (tap a term chip, then its definition —
-respects the current category filter, tracks mistakes, and deals a fresh
-random round each time), and — for AZ-900 and AZ-104 — a full mini-course per
-topic (reading with tappable key terms, an SVG diagram, a portal mockup, a
-worked scenario, common exam traps, and a 3–4 question quiz), plus
-text-to-speech on the readings and flashcards.
+Three top-level tabs: **Learn**, **Quiz**, **Exam**. Learn holds three
+sub-views — Cards (flashcards), Study (a flashcard-list per category, or for
+AZ-900/AZ-104 a full mini-course per topic: reading with tappable key terms,
+an SVG diagram, a portal mockup, a worked scenario, common exam traps, and a
+3–4 question quiz), and Match (a term-matching game — tap a term chip, then
+its definition; respects the current category filter, tracks mistakes, and
+deals a fresh random round each time). Quiz is a rotating question engine
+(multiple choice, true/false, multi-select — matching the question formats
+the real proctored exams actually use; there's no free-response short-answer
+type since none of these exams have one) with a missed-question review
+queue. Exam is a timed Final Exam mode matching each real exam's
+length/pass mark. Text-to-speech is available on readings and flashcards.
 
 Key terms in a lesson's reading aren't just highlighted — tapping one pulls up
 its definition inline (front/back/detail, sourced from that track's flashcards)
