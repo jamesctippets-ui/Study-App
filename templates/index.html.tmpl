@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<!-- GENERATED FILE — do not edit directly. Run `python3 build.py`.
+     Source: data/*.py (content) and src/js/* (React/JSX), assembled via
+     templates/index.html.tmpl. -->
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Cert Study Hub</title>
+<link rel="manifest" href="manifest.json" />
+<meta name="theme-color" content="#1B1D21" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="Cert Study" />
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
+<link rel="icon" href="icons/icon-192.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="preconnect" href="https://cdnjs.cloudflare.com" />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600;700&display=swap" />
+<style>
+  /* Tailwind's Preflight base reset (https://tailwindcss.com/docs/preflight),
+     copied verbatim minus its theme() lookups resolved to their default
+     values. This app used to get it for free from the Tailwind CDN script;
+     kept standalone so buttons/headings/etc. still render unstyled-by-the-
+     browser without loading Tailwind's full runtime JIT compiler for what
+     ended up being ~20 utility classes (see below). */
+  *, ::before, ::after { box-sizing: border-box; border-width: 0; border-style: solid; border-color: #e5e7eb; }
+  html { line-height: 1.5; -webkit-text-size-adjust: 100%; tab-size: 4; font-family: ui-sans-serif, system-ui, sans-serif; }
+  body { margin: 0; line-height: inherit; }
+  hr { height: 0; color: inherit; border-top-width: 1px; }
+  abbr:where([title]) { text-decoration: underline dotted; }
+  h1, h2, h3, h4, h5, h6 { font-size: inherit; font-weight: inherit; }
+  a { color: inherit; text-decoration: inherit; }
+  b, strong { font-weight: bolder; }
+  code, kbd, samp, pre { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: 1em; }
+  small { font-size: 80%; }
+  sub, sup { font-size: 75%; line-height: 0; position: relative; vertical-align: baseline; }
+  sub { bottom: -0.25em; }
+  sup { top: -0.5em; }
+  table { text-indent: 0; border-color: inherit; border-collapse: collapse; }
+  button, input, optgroup, select, textarea { font-family: inherit; font-size: 100%; font-weight: inherit; line-height: inherit; color: inherit; margin: 0; padding: 0; }
+  button, select { text-transform: none; }
+  button, input[type='button'], input[type='reset'], input[type='submit'] { -webkit-appearance: button; background-color: transparent; background-image: none; }
+  :-moz-focusring { outline: auto; }
+  progress { vertical-align: baseline; }
+  ::-webkit-inner-spin-button, ::-webkit-outer-spin-button { height: auto; }
+  [type='search'] { -webkit-appearance: textfield; outline-offset: -2px; }
+  ::-webkit-search-decoration { -webkit-appearance: none; }
+  summary { display: list-item; }
+  blockquote, dl, dd, h1, h2, h3, h4, h5, h6, hr, figure, p, pre { margin: 0; }
+  fieldset { margin: 0; padding: 0; }
+  legend { padding: 0; }
+  ol, ul, menu { list-style: none; margin: 0; padding: 0; }
+  textarea { resize: vertical; }
+  input::placeholder, textarea::placeholder { opacity: 1; color: #9ca3af; }
+  button, [role='button'] { cursor: pointer; }
+  :disabled { cursor: default; }
+  img, svg, video, canvas, audio, iframe, embed, object { display: block; vertical-align: middle; }
+  img, video { max-width: 100%; height: auto; }
+  [hidden] { display: none; }
+
+  :root { color-scheme: dark; }
+  html { scroll-behavior: smooth; }
+  html, body { margin: 0; padding: 0; background: #1B1D21; }
+  * { box-sizing: border-box; }
+  body, button, textarea { font-family: 'Inter', sans-serif; }
+  .itil-display { font-family: 'Fraunces', serif; }
+  textarea:focus, button:focus { outline: 2px solid #3FA796; outline-offset: 1px; }
+  button { transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, transform 0.1s ease, opacity 0.15s ease; cursor: pointer; }
+  button:active { transform: scale(0.97); }
+  button:disabled { cursor: default; }
+  button:disabled:active { transform: none; }
+  * { -webkit-tap-highlight-color: transparent; }
+
+  /* Static replacements for the ~20 Tailwind utility classes this app actually
+     uses, so the page doesn't have to load and run Tailwind's full runtime
+     JIT compiler (which also re-scans the DOM on every re-render) for a
+     fixed, known set of classes. */
+  .flex { display: flex; }
+  .flex-1 { flex: 1 1 0%; }
+  .flex-col { flex-direction: column; }
+  .items-center { align-items: center; }
+  .items-start { align-items: flex-start; }
+  .justify-between { justify-content: space-between; }
+  .justify-end { justify-content: flex-end; }
+  .gap-1 { gap: 0.25rem; }
+  .gap-2 { gap: 0.5rem; }
+  .gap-3 { gap: 0.75rem; }
+  .gap-5 { gap: 1.25rem; }
+  .mb-2 { margin-bottom: 0.5rem; }
+  .mb-4 { margin-bottom: 1rem; }
+  .mb-5 { margin-bottom: 1.25rem; }
+  .mt-3 { margin-top: 0.75rem; }
+  .mt-4 { margin-top: 1rem; }
+  .mt-6 { margin-top: 1.5rem; }
+  .mx-auto { margin-left: auto; margin-right: auto; }
+  .px-4 { padding-left: 1rem; padding-right: 1rem; }
+  .py-5 { padding-top: 1.25rem; padding-bottom: 1.25rem; }
+  .max-w-md { max-width: 28rem; }
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.28.4/babel.min.js"></script>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel" data-presets="react">
+__APP_SCRIPT__
+</script>
+</body>
+</html>
