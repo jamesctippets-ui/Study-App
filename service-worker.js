@@ -1,4 +1,4 @@
-const CACHE_NAME = 'cert-study-hub-v1';
+const CACHE_NAME = 'cert-study-hub-v2';
 
 const CORE_ASSETS = [
   './',
@@ -7,7 +7,6 @@ const CORE_ASSETS = [
   './icons/icon-192.png',
   './icons/icon-512.png',
   './icons/icon-maskable-512.png',
-  'https://cdn.tailwindcss.com',
   'https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js',
   'https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js',
   'https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.28.4/babel.min.js',

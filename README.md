@@ -27,10 +27,15 @@ its `hidden: true`.
 
 ## Running it
 
-No build step, no `npm install` — it's plain HTML with React, Babel Standalone,
-and Tailwind's CDN script all loaded from `<script>` tags, transpiling JSX in the
-browser at load time. You need internet access once, on first load, to fetch those
-CDN scripts (and Google Fonts); nothing else talks to the network after that.
+No build step, no `npm install` — it's plain HTML with React and Babel Standalone
+loaded from `<script>` tags, transpiling JSX in the browser at load time. Styling
+is a small hand-written CSS reset plus the ~20 utility classes the app actually
+uses (previously Tailwind's CDN script, which shipped its whole runtime JIT
+compiler and re-scanned the DOM on every re-render just to serve that fixed,
+known set of classes — see "Where things stand" below). You need internet access
+once, on first load, to fetch React/Babel and Google Fonts; nothing else talks to
+the network after that, and a service worker caches all of it for offline use
+after the first visit.
 
 **Easiest:** just double-click `index.html` to open it in a browser.
 
@@ -57,6 +62,15 @@ stay wherever you're running it.
 
 ## Where things stand / ideas for Claude Code
 
+- **In-browser Babel is the remaining load-time cost.** Every page load re-transpiles
+  the whole ~2,500-line script with Babel Standalone before React can render anything.
+  Tailwind's CDN script (a much bigger cost — a full runtime JIT compiler plus a
+  MutationObserver re-scanning the DOM on every re-render) has already been swapped
+  for a small static stylesheet, since the app only ever used a fixed ~20 utility
+  classes. Removing Babel too means precompiling the JSX ahead of time, which needs
+  an actual build step (Babel CLI or a bundler) — a bigger call since it trades away
+  the "just edit index.html, no build step" workflow this project is built around.
+  Worth doing if load time on a phone still feels slow; hold off otherwise.
 - **Everything currently lives in one ~2,500-line file.** It's organized with clear
   `/* ---- section ---- */` comments (data per track, shared UI components, the exam
   engine, diagrams, etc.), so it's readable, but splitting it into real modules
