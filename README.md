@@ -13,17 +13,15 @@ per topic (reading with highlighted key terms, an SVG diagram, a portal mockup, 
 worked scenario, common exam traps, and a 3–4 question quiz), plus text-to-speech
 on the readings and flashcards.
 
-**Three tracks exist in the data:**
-- **AZ-900** (Azure Fundamentals) — the only one currently visible in the track
-  switcher. Full course content, 95 questions.
-- **AZ-104** (Azure Administrator) — full question bank (56 questions) *and* now has
-  the same course treatment as AZ-900 (7 lessons, diagrams, mockups). Currently
-  hidden.
+**Three tracks, all visible in the track switcher:**
+- **AZ-900** (Azure Fundamentals) — full course content, 95 questions.
+- **AZ-104** (Azure Administrator) — full question bank (56 questions) and the
+  same course treatment as AZ-900 (7 lessons, diagrams, mockups).
 - **ITIL Foundation** (Version 5) — full question bank (80 questions), classic
-  flashcard-list study mode (no course yet). Currently hidden.
+  flashcard-list study mode (no course yet).
 
-To unhide a track, open `data/tracks.py` and delete that track's `'hidden': True`,
-then rebuild (see below).
+To hide a track again (e.g. while it's a work in progress), open `data/tracks.py`
+and add `'hidden': True` to that track's entry, then rebuild (see below).
 
 ## Source layout
 
@@ -99,8 +97,37 @@ then open the printed `localhost` URL.
 
 **On your phone:** `localhost` only works on the same device. To install this on
 a phone, it needs to be served over `https://` from somewhere your phone can
-reach — GitHub Pages on this repo is the simplest free option. Once it's live,
-open the URL on your phone and use "Add to Home Screen" to install it.
+reach — GitHub Pages on this repo is the simplest free option (see "Sharing it"
+below). Once it's live, open the URL on your phone and use "Add to Home Screen"
+to install it.
+
+## Sharing it
+
+There are no accounts and no login. Anyone with the link gets the full app —
+all three tracks, flashcards, quizzes, exams — and their progress saves to
+*their own* browser's local storage, same as it does for you. It's private to
+them, isn't visible to you, and doesn't sync between their own devices either
+(each browser/device is its own independent copy). That's the trade-off for
+staying a fully static site with no server: simple to share, but progress
+doesn't follow a person across devices or accounts.
+
+**To publish it (GitHub Pages, free):**
+1. On GitHub, go to this repo's **Settings → Pages**.
+2. Under "Build and deployment", set **Source** to "Deploy from a branch".
+3. Pick the branch this app lives on (currently
+   `claude/certification-study-app-n6bst5`) and folder **/ (root)**, then Save.
+4. GitHub gives you a URL like `https://<your-username>.github.io/Study-App/`
+   after a minute or two — that's the link to share.
+
+A `.nojekyll` file is already committed at the repo root. GitHub Pages runs
+sites through Jekyll by default, and Jekyll's `{{ ... }}` templating syntax
+would otherwise collide with the React JSX in `index.html` (e.g.
+`style={{ padding: '10px' }}`) and corrupt the page. `.nojekyll` tells Pages to
+skip that and serve the files as-is — without it, the published site would
+likely come up blank or broken.
+
+If you'd rather publish from a permanent `main` branch instead of this
+session's branch name, that's a quick change whenever you want it.
 
 ## How progress is saved
 
