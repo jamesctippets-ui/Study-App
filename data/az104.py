@@ -523,9 +523,9 @@ QUESTIONS = [
         'cat': 'networking',
         'type': 'mc',
         'question': 'Two NSG rules apply to the same NIC: one at priority 100 allowing inbound port 443, another at priority 200 denying all inbound traffic. What happens to inbound HTTPS traffic?',
-        'options': ["It's allowed, since the lower priority number is processed first", "It's denied, since deny rules always win", "It's allowed only half the time", 'NSG rules cannot conflict like this'],
+        'options': ["It's allowed, since the lower priority number is processed first", "It's denied, since a Deny rule always overrides an Allow rule regardless of priority", "It's denied, since the highest priority number processed last always wins", 'Both rules apply, and the NIC merges them into a partial allow'],
         'correct': 0,
-        'explanation': 'Lower priority numbers are evaluated first and win — priority 100 (allow) is processed before priority 200 (deny).',
+        'explanation': "Lower priority numbers are evaluated first and win — priority 100 (allow) is processed before priority 200 (deny), so the traffic is allowed. Deny doesn't have some inherent precedence over Allow, and NSG rules aren't merged or blended — whichever rule is evaluated first, by priority number, decides the outcome outright.",
     },
     {
         'id': 'q25',
