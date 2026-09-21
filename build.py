@@ -17,9 +17,9 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent
 sys.path.insert(0, str(ROOT))
 
-from data import tracks, itil, az900, az104
+from data import tracks, itil, az900, az104, cloudplus
 
-TRACK_MODULES = {"itil": itil, "az900": az900, "az104": az104}
+TRACK_MODULES = {"itil": itil, "az900": az900, "az104": az104, "cloudplus": cloudplus}
 
 
 def validate():

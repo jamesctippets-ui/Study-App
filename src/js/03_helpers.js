@@ -60,15 +60,30 @@ function saveLocal(payload) {
   }
 }
 
+function emptyTrackMap() {
+  const map = {};
+  TRACKS.forEach((t) => { map[t.key] = {}; });
+  return map;
+}
+
 function normalizeResults(raw) {
-  if (!raw) return { itil: {}, az900: {}, az104: {} };
-  if (raw.itil || raw.az900 || raw.az104) return { itil: raw.itil || {}, az900: raw.az900 || {}, az104: raw.az104 || {} };
+  if (!raw) return emptyTrackMap();
+  const isPerTrackShape = TRACKS.some((t) => raw[t.key]);
+  if (isPerTrackShape) {
+    const map = emptyTrackMap();
+    TRACKS.forEach((t) => { map[t.key] = raw[t.key] || {}; });
+    return map;
+  }
   // legacy flat shape from before multi-track support existed — treat it as ITIL progress
-  return { itil: raw, az900: {}, az104: {} };
+  const map = emptyTrackMap();
+  map.itil = raw;
+  return map;
 }
 
 function normalizeSeenLog(raw) {
-  if (!raw) return { itil: {}, az900: {}, az104: {} };
-  return { itil: raw.itil || {}, az900: raw.az900 || {}, az104: raw.az104 || {} };
+  if (!raw) return emptyTrackMap();
+  const map = emptyTrackMap();
+  TRACKS.forEach((t) => { map[t.key] = raw[t.key] || {}; });
+  return map;
 }
 

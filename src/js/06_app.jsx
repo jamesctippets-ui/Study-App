@@ -4,8 +4,8 @@ function CertStudyApp() {
   const [activeTrack, setActiveTrack] = useState('az900');
   const [mode, setMode] = useState('flashcards');
   const [activeCat, setActiveCat] = useState('all');
-  const [results, setResults] = useState({ itil: {}, az900: {}, az104: {} });
-  const [seenLog, setSeenLog] = useState({ itil: {}, az900: {}, az104: {} });
+  const [results, setResults] = useState(emptyTrackMap);
+  const [seenLog, setSeenLog] = useState(emptyTrackMap);
   const [flipped, setFlipped] = useState(false);
   const [fIndex, setFIndex] = useState(0);
   const [confirmReset, setConfirmReset] = useState(false);
@@ -53,7 +53,11 @@ function CertStudyApp() {
       if (cancelled) return;
       const local = loadLocal();
       if (local) {
-        if (local.results) setResults(normalizeResults(local.results));
+        // A pre-multi-track save has no `.results` wrapper at all — the
+        // whole object IS the flat results map. normalizeResults() already
+        // knows how to detect and migrate that shape, but only if it
+        // actually gets passed the raw object instead of `undefined`.
+        setResults(normalizeResults(local.results || local));
         if (local.seenLog) setSeenLog(normalizeSeenLog(local.seenLog));
       }
       setSyncMode('local');

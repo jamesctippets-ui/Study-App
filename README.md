@@ -13,12 +13,14 @@ per topic (reading with highlighted key terms, an SVG diagram, a portal mockup, 
 worked scenario, common exam traps, and a 3–4 question quiz), plus text-to-speech
 on the readings and flashcards.
 
-**Three tracks, all visible in the track switcher:**
+**Four tracks, all visible in the track switcher:**
 - **AZ-900** (Azure Fundamentals) — full course content, 95 questions.
 - **AZ-104** (Azure Administrator) — full question bank (56 questions) and the
   same course treatment as AZ-900 (7 lessons, diagrams, mockups).
 - **ITIL Foundation** (Version 5) — full question bank (80 questions), classic
   flashcard-list study mode (no course yet).
+- **CompTIA Cloud+** (CV0-004) — full question bank (58 questions) across all
+  five exam domains, classic flashcard-list study mode (no course yet).
 
 To hide a track again (e.g. while it's a work in progress), open `data/tracks.py`
 and add `'hidden': True` to that track's entry, then rebuild (see below).
@@ -31,10 +33,11 @@ don't edit it directly, it'll be overwritten. The real source is:
 
 ```
 data/
-  tracks.py   — TRACKS (which certs exist / are visible) and EXAM_CONFIG
-  itil.py     — ITIL categories, flashcards, questions
-  az900.py    — AZ-900 categories, flashcards, questions, course lessons
-  az104.py    — AZ-104 categories, flashcards, questions, course lessons
+  tracks.py     — TRACKS (which certs exist / are visible) and EXAM_CONFIG
+  itil.py       — ITIL categories, flashcards, questions
+  az900.py      — AZ-900 categories, flashcards, questions, course lessons
+  az104.py      — AZ-104 categories, flashcards, questions, course lessons
+  cloudplus.py  — CompTIA Cloud+ categories, flashcards, questions
 src/js/
   00_preamble.js        — React hook imports, the COLOR palette
   01_diagrams.jsx        — SVG lesson diagrams
@@ -151,7 +154,11 @@ stay wherever you're running it.
 - **AZ-104 and ITIL are feature-complete on data, but AZ-104's course still only has
   5 of 7 lessons with a diagram and 3 of 7 with a portal mockup** (Identities & Access
   and App Hosting & IaC have neither) — same gap pattern AZ-900 started with.
-- **ITIL has no course/lesson mode at all yet** — same format as AZ-900 and AZ-104
-  would extend cleanly, reusing the existing `DBox`/`DLine`/`PortalFrame` diagram
-  helpers.
+- **ITIL and Cloud+ have no course/lesson mode at all yet** — same format as AZ-900
+  and AZ-104 would extend cleanly, reusing the existing `DBox`/`DLine`/`PortalFrame`
+  diagram helpers.
 - Re-enabling a hidden track is one line each in `data/tracks.py`.
+- **Adding a track no longer means touching `src/js/`.** The JS side used to hardcode
+  `{ itil, az900, az104 }` in a few places (initial state, storage migration) — those
+  now derive the set of tracks from `TRACKS` itself, so adding one is just a new
+  `data/<name>.py` module plus a `build.py` import/registration.
