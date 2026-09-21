@@ -471,6 +471,13 @@ function CertStudyApp() {
             Study
           </button>
           <button
+            onClick={() => setMode('match')}
+            className="flex-1"
+            style={{ padding: '8px 2px', borderRadius: '9px', fontSize: '11px', fontWeight: 600, background: mode === 'match' ? COLOR.teal : 'transparent', color: mode === 'match' ? '#0E1210' : COLOR.muted }}
+          >
+            Match
+          </button>
+          <button
             onClick={() => setMode('exam')}
             className="flex-1"
             style={{ padding: '8px 2px', borderRadius: '9px', fontSize: '11px', fontWeight: 600, background: mode === 'exam' ? COLOR.gold : 'transparent', color: mode === 'exam' ? '#241C08' : COLOR.muted }}
@@ -538,6 +545,8 @@ function CertStudyApp() {
             )}
           </React.Fragment>
         )}
+
+        {mode === 'match' && <MatchGame flashcards={filteredFlashcards} />}
 
         {mode === 'study' && (
           DATA[activeTrack].lessons ? (

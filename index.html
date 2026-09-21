@@ -729,6 +729,155 @@ function StudyView({ activeCat, categories, flashcards }) {
   );
 }
 
+function MatchGame({ flashcards }) {
+  const ROUND_SIZE = 6;
+
+  const buildRound = useCallback(() => {
+    const picked = shuffleArray(flashcards).slice(0, Math.min(ROUND_SIZE, flashcards.length));
+    return { picked, termOrder: shuffleArray(picked), defOrder: shuffleArray(picked) };
+  }, [flashcards]);
+
+  const [round, setRound] = useState(buildRound);
+  const [selected, setSelected] = useState(null);
+  const [matched, setMatched] = useState([]);
+  const [wrongPair, setWrongPair] = useState(null);
+  const [mistakes, setMistakes] = useState(0);
+
+  useEffect(() => {
+    setRound(buildRound());
+    setSelected(null);
+    setMatched([]);
+    setWrongPair(null);
+    setMistakes(0);
+    // eslint-disable-next-line
+  }, [flashcards]);
+
+  if (flashcards.length < 2) {
+    return (
+      <div style={{ textAlign: 'center', color: COLOR.muted, fontSize: '13px', padding: '30px 10px' }}>
+        Not enough cards in this category for a matching round — try "All" or a different category.
+      </div>
+    );
+  }
+
+  const newRound = () => {
+    setRound(buildRound());
+    setSelected(null);
+    setMatched([]);
+    setWrongPair(null);
+    setMistakes(0);
+  };
+
+  const isDone = matched.length === round.picked.length;
+
+  const tap = (type, id) => {
+    if (matched.includes(id) || wrongPair) return;
+    if (!selected) { setSelected({ type, id }); return; }
+    if (selected.type === type) { setSelected({ type, id }); return; }
+    const termId = type === 'term' ? id : selected.id;
+    const defId = type === 'def' ? id : selected.id;
+    if (termId === defId) {
+      setMatched((m) => [...m, termId]);
+      setSelected(null);
+    } else {
+      setWrongPair({ termId, defId });
+      setMistakes((m) => m + 1);
+      setTimeout(() => { setWrongPair(null); setSelected(null); }, 500);
+    }
+  };
+
+  if (isDone) {
+    return (
+      <div style={{ textAlign: 'center', padding: '40px 10px' }}>
+        <div style={{ fontSize: '15px', fontWeight: 600, marginBottom: '6px' }}>Round complete!</div>
+        <div style={{ fontSize: '13px', color: COLOR.muted, marginBottom: '20px' }}>
+          {round.picked.length} pairs matched · {mistakes} mistake{mistakes === 1 ? '' : 's'}
+        </div>
+        <button
+          onClick={newRound}
+          style={{ background: COLOR.teal, color: '#0E1210', borderRadius: '10px', padding: '10px 20px', fontSize: '13px', fontWeight: 600 }}
+        >
+          New round
+        </button>
+      </div>
+    );
+  }
+
+  const termState = (id) => {
+    if (matched.includes(id)) return 'matched';
+    if (wrongPair && wrongPair.termId === id) return 'wrong';
+    if (selected && selected.type === 'term' && selected.id === id) return 'selected';
+    return 'idle';
+  };
+  const defState = (id) => {
+    if (matched.includes(id)) return 'matched';
+    if (wrongPair && wrongPair.defId === id) return 'wrong';
+    if (selected && selected.type === 'def' && selected.id === id) return 'selected';
+    return 'idle';
+  };
+
+  const stateStyle = (state) => {
+    if (state === 'matched') return { background: 'rgba(63,167,150,0.12)', border: `1px solid ${COLOR.teal}`, color: COLOR.muted, opacity: 0.55 };
+    if (state === 'wrong') return { background: 'rgba(193,85,74,0.16)', border: `1px solid ${COLOR.red}`, color: COLOR.text };
+    if (state === 'selected') return { background: 'rgba(227,178,60,0.14)', border: `1px solid ${COLOR.gold}`, color: COLOR.text };
+    return { background: COLOR.surface, border: `1px solid ${COLOR.border}`, color: COLOR.text };
+  };
+
+  return (
+    <div>
+      <div className="flex justify-between items-center mb-3">
+        <span style={{ fontSize: '11px', color: COLOR.muted }}>
+          {matched.length} / {round.picked.length} matched{mistakes > 0 ? ` · ${mistakes} mistake${mistakes === 1 ? '' : 's'}` : ''}
+        </span>
+        <button onClick={newRound} style={{ fontSize: '11px', color: COLOR.teal, fontWeight: 600, padding: '4px 8px' }}>
+          New round
+        </button>
+      </div>
+
+      <div className="flex flex-wrap gap-2 mb-4">
+        {round.termOrder.map((card) => {
+          const state = termState(card.id);
+          return (
+            <button
+              key={card.id}
+              onClick={() => tap('term', card.id)}
+              disabled={state === 'matched'}
+              style={{
+                ...stateStyle(state),
+                borderRadius: '10px', padding: '8px 12px', fontSize: '12.5px', fontWeight: 600,
+                lineHeight: 1.3, textAlign: 'center', maxWidth: '150px',
+                transition: 'background 0.15s, border-color 0.15s',
+              }}
+            >
+              {card.front}
+            </button>
+          );
+        })}
+      </div>
+
+      <div className="flex flex-col gap-2">
+        {round.defOrder.map((card) => {
+          const state = defState(card.id);
+          return (
+            <button
+              key={card.id}
+              onClick={() => tap('def', card.id)}
+              disabled={state === 'matched'}
+              style={{
+                ...stateStyle(state),
+                borderRadius: '10px', padding: '10px 12px', fontSize: '12.5px', lineHeight: 1.4, textAlign: 'left',
+                transition: 'background 0.15s, border-color 0.15s',
+              }}
+            >
+              {card.back}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 function SpeakButton({ id, text, speakingId, onSpeak }) {
   const isSpeaking = speakingId === id;
   return (
@@ -1765,6 +1914,13 @@ function CertStudyApp() {
             Study
           </button>
           <button
+            onClick={() => setMode('match')}
+            className="flex-1"
+            style={{ padding: '8px 2px', borderRadius: '9px', fontSize: '11px', fontWeight: 600, background: mode === 'match' ? COLOR.teal : 'transparent', color: mode === 'match' ? '#0E1210' : COLOR.muted }}
+          >
+            Match
+          </button>
+          <button
             onClick={() => setMode('exam')}
             className="flex-1"
             style={{ padding: '8px 2px', borderRadius: '9px', fontSize: '11px', fontWeight: 600, background: mode === 'exam' ? COLOR.gold : 'transparent', color: mode === 'exam' ? '#241C08' : COLOR.muted }}
@@ -1832,6 +1988,8 @@ function CertStudyApp() {
             )}
           </React.Fragment>
         )}
+
+        {mode === 'match' && <MatchGame flashcards={filteredFlashcards} />}
 
         {mode === 'study' && (
           DATA[activeTrack].lessons ? (
