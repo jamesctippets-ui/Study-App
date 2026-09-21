@@ -228,7 +228,7 @@ function CertStudyApp() {
   const toggleType = (key) => {
     setQuizTypes((t) => {
       const next = { ...t, [key]: !t[key] };
-      const anyOn = next.mc || next.tf || next.sa;
+      const anyOn = next.mc || next.tf || next.sa || next.ms;
       return anyOn ? next : t;
     });
   };
@@ -373,7 +373,10 @@ function CertStudyApp() {
   }, [examPhase]);
 
   const examCurrentQ = examSession[examIndex];
-  const examAnsweredCount = Object.keys(examAnswers).length;
+  const examAnsweredCount = examSession.filter((q) => {
+    const sel = examAnswers[q.id];
+    return q.type === 'ms' ? Array.isArray(sel) && sel.length > 0 : sel !== undefined;
+  }).length;
 
   return (
     <div style={{ background: COLOR.bg, color: COLOR.text, minHeight: '100vh' }}>

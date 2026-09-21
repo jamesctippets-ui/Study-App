@@ -8,7 +8,7 @@ function ExamIntro({ track, config, onStart }) {
       <div style={{ fontSize: '13px', color: COLOR.text, marginBottom: '4px' }}>{config.minutes}-minute time limit</div>
       <div style={{ fontSize: '12px', color: COLOR.muted, marginBottom: '16px', lineHeight: 1.5 }}>{config.passLabel}</div>
       <div style={{ fontSize: '12px', color: COLOR.muted, lineHeight: 1.6, marginBottom: '18px' }}>
-        Multiple choice and true/false only, pulled from every category regardless of the current filter. No feedback until you submit, just like the real thing. Questions and order change each attempt.
+        Multiple choice, true/false, and multi-select only, pulled from every category regardless of the current filter. No feedback until you submit, just like the real thing. Questions and order change each attempt.
       </div>
       <button
         onClick={onStart}
