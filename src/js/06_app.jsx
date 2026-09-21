@@ -20,6 +20,7 @@ function CertStudyApp() {
   const [sessionScore, setSessionScore] = useState({ correct: 0, total: 0 });
   const [selected, setSelected] = useState(null);
   const [isMissedSession, setIsMissedSession] = useState(false);
+  const [isLessonSession, setIsLessonSession] = useState(false);
   const [msPending, setMsPending] = useState([]);
   const [speakingId, setSpeakingId] = useState(null);
   const speechSupported = typeof window !== 'undefined' && 'speechSynthesis' in window;
@@ -35,6 +36,7 @@ function CertStudyApp() {
   const docRef = useRef(null);
   const writeChain = useRef(Promise.resolve());
   const utterRef = useRef(null);
+  const skipNextAutoStart = useRef(false);
 
   const track = TRACKS.find((t) => t.key === activeTrack);
   const visibleTracks = TRACKS.filter((t) => !t.hidden);
@@ -186,12 +188,15 @@ function CertStudyApp() {
     setSessionScore({ correct: 0, total: 0 });
     setQuizPhase('active');
     setIsMissedSession(false);
+    setIsLessonSession(false);
     markSeen(prepared.map((q) => q.id));
     // eslint-disable-next-line
   }, [availableQuestions, quizLength, seenLog, activeTrack]);
 
   useEffect(() => {
-    if (mode === 'quiz') startNewSession();
+    if (mode !== 'quiz') return;
+    if (skipNextAutoStart.current) { skipNextAutoStart.current = false; return; }
+    startNewSession();
     // eslint-disable-next-line
   }, [mode, activeCat, quizLength, typesKey, activeTrack]);
 
@@ -206,6 +211,7 @@ function CertStudyApp() {
     setSessionScore({ correct: 0, total: 0 });
     setQuizPhase('active');
     setIsMissedSession(true);
+    setIsLessonSession(false);
     markSeen(prepared.map((q) => q.id));
   };
 
@@ -226,6 +232,8 @@ function CertStudyApp() {
     setSessionScore({ correct: 0, total: 0 });
     setQuizPhase('active');
     setIsMissedSession(false);
+    setIsLessonSession(true);
+    skipNextAutoStart.current = true;
     setMode('quiz');
     markSeen(prepared.map((q) => q.id));
   };
@@ -522,7 +530,7 @@ function CertStudyApp() {
                 index={sessionIndex}
                 total={quizSession.length}
                 categoryLabel={categories.find((c) => c.key === currentQ?.cat)?.label}
-                missedBadge={isMissedSession}
+                badgeLabel={isMissedSession ? 'Missed review' : isLessonSession ? 'Lesson quiz' : null}
                 msPending={msPending}
                 onToggleMs={toggleMs}
                 onSubmitMs={submitMsAnswer}

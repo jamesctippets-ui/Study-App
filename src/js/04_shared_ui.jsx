@@ -369,13 +369,13 @@ function QuizSetup({ length, setLength, types, toggleType, onReroll, poolSize, m
   );
 }
 
-function QuestionView({ q, selected, onChoose, onNext, index, total, categoryLabel, missedBadge, msPending, onToggleMs, onSubmitMs }) {
+function QuestionView({ q, selected, onChoose, onNext, index, total, categoryLabel, badgeLabel, msPending, onToggleMs, onSubmitMs }) {
   if (!q) return null;
   const isLast = index + 1 >= total;
   return (
     <div>
       <div className="flex justify-between items-center mb-2" style={{ fontSize: '11px', color: COLOR.muted }}>
-        <span>{missedBadge ? 'Missed review · ' : ''}{categoryLabel}</span>
+        <span>{badgeLabel ? badgeLabel + ' · ' : ''}{categoryLabel}</span>
         <span>{index + 1} / {total}</span>
       </div>
       <div style={{ background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderRadius: '18px', padding: '20px' }}>
