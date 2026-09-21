@@ -111,18 +111,50 @@ const PORTAL_MOCKUPS = {
   roleAssignment: MockupRoleAssignment,
 };
 
-function highlightTerms(text, terms) {
+function escapeRegExp(s) {
+  return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+// Finds the flashcard that best explains a key term: an exact front match,
+// then the term appearing as a whole word in a card's front (catches
+// comparison cards like "CapEx vs. OpEx" for the term "CapEx"), then the
+// same check against the card's back/detail text.
+function findTermCard(term, vocabPool) {
+  const lower = term.toLowerCase();
+  let hit = vocabPool.find((v) => v.front.toLowerCase() === lower);
+  if (hit) return hit;
+  const wordRe = new RegExp('\\b' + escapeRegExp(lower) + '\\b', 'i');
+  hit = vocabPool.find((v) => wordRe.test(v.front));
+  if (hit) return hit;
+  hit = vocabPool.find((v) => wordRe.test(v.back));
+  if (hit) return hit;
+  return vocabPool.find((v) => v.detail && wordRe.test(v.detail)) || null;
+}
+
+function highlightTerms(text, terms, vocabPool, onTermClick) {
   if (!terms || !terms.length) return text;
   const sorted = [...terms].sort((a, b) => b.length - a.length);
-  const escaped = sorted.map((t) => t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+  const escaped = sorted.map(escapeRegExp);
   const re = new RegExp('(' + escaped.join('|') + ')', 'g');
   const parts = text.split(re);
   return parts.map((part, i) => {
     const isTerm = sorted.some((t) => t === part);
-    return isTerm ? (
-      <span key={i} style={{ color: COLOR.gold, fontWeight: 700 }}>{part}</span>
-    ) : (
-      <React.Fragment key={i}>{part}</React.Fragment>
+    if (!isTerm) return <React.Fragment key={i}>{part}</React.Fragment>;
+    const card = vocabPool ? findTermCard(part, vocabPool) : null;
+    if (!card || !onTermClick) {
+      return <span key={i} style={{ color: COLOR.gold, fontWeight: 700 }}>{part}</span>;
+    }
+    return (
+      <button
+        key={i}
+        onClick={() => onTermClick(card)}
+        style={{
+          color: COLOR.gold, fontWeight: 700, background: 'transparent', padding: 0,
+          borderBottom: `1px dotted ${COLOR.gold}`, cursor: 'pointer', font: 'inherit',
+        }}
+      >
+        {part}
+      </button>
     );
   });
 }

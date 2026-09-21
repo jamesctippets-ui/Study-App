@@ -11,9 +11,15 @@ matching the question formats the real proctored exams actually use; there's no
 free-response short-answer type since none of these exams have one), a timed
 Final Exam mode matching each real exam's length/pass mark, a missed-question
 review queue, and — for AZ-900 and AZ-104 — a full mini-course per topic (reading
-with highlighted key terms, an SVG diagram, a portal mockup, a worked scenario,
+with tappable key terms, an SVG diagram, a portal mockup, a worked scenario,
 common exam traps, and a 3–4 question quiz), plus text-to-speech on the readings
 and flashcards.
+
+Key terms in a lesson's reading aren't just highlighted — tapping one pulls up
+its definition inline (front/back/detail, sourced from that track's flashcards)
+without leaving the reading. Coverage depends on whether a matching flashcard
+exists for that exact term; where one doesn't, the term stays highlighted but
+plain, rather than showing a broken or empty popover.
 
 **Four tracks, all visible in the track switcher:**
 - **AZ-900** (Azure Fundamentals) — full course content, 83 questions.

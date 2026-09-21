@@ -155,6 +155,7 @@ function LessonCard({ lesson, mastery, onOpen }) {
 
 function LessonDetail({ lesson, flashcardsData, onBack, onQuiz, speakingId, onSpeak, speechSupported }) {
   const [showFundamentals, setShowFundamentals] = useState(false);
+  const [activeTerm, setActiveTerm] = useState(null);
   const vocabItems = lesson.vocabIds.map((id) => flashcardsData.find((f) => f.id === id)).filter(Boolean);
   const DiagramComp = lesson.diagram ? LESSON_DIAGRAMS[lesson.diagram] : null;
   const MockupComp = lesson.portalMockup ? PORTAL_MOCKUPS[lesson.portalMockup] : null;
@@ -172,15 +173,33 @@ function LessonDetail({ lesson, flashcardsData, onBack, onQuiz, speakingId, onSp
         </div>
       )}
 
-      <div style={{ marginBottom: '16px' }}>
+      <div style={{ marginBottom: activeTerm ? '10px' : '16px' }}>
         <div className="flex justify-between items-center" style={{ marginBottom: '8px' }}>
           <div style={{ fontSize: '13px', fontWeight: 600, color: COLOR.gold }}>Reading</div>
           {speechSupported && <SpeakButton id={'read-' + lesson.id} text={lesson.reading.replace(/\n+/g, ' ')} speakingId={speakingId} onSpeak={onSpeak} />}
         </div>
+        <div style={{ fontSize: '11px', color: COLOR.muted, marginBottom: '8px' }}>Tap a highlighted term for its definition.</div>
         {lesson.reading.split('\n\n').map((p, i) => (
-          <p key={i} style={{ fontSize: '13px', lineHeight: 1.6, color: COLOR.text, marginBottom: '10px' }}>{highlightTerms(p, lesson.keyTerms)}</p>
+          <p key={i} style={{ fontSize: '13px', lineHeight: 1.6, color: COLOR.text, marginBottom: '10px' }}>
+            {highlightTerms(p, lesson.keyTerms, flashcardsData, setActiveTerm)}
+          </p>
         ))}
       </div>
+
+      {activeTerm && (
+        <div style={{ background: COLOR.surfaceRaised, border: `1px solid ${COLOR.teal}`, borderRadius: '12px', padding: '12px 14px', marginBottom: '16px' }}>
+          <div className="flex justify-between items-start" style={{ marginBottom: '4px' }}>
+            <div className="itil-display" style={{ fontSize: '14px', fontWeight: 600, color: COLOR.teal }}>{activeTerm.front}</div>
+            <button onClick={() => setActiveTerm(null)} style={{ background: 'transparent', color: COLOR.muted, padding: '0 0 0 8px', fontSize: '13px' }}>✕</button>
+          </div>
+          <div style={{ fontSize: '13px', lineHeight: 1.5, color: COLOR.text }}>{activeTerm.back}</div>
+          {activeTerm.detail && (
+            <div style={{ fontSize: '11.5px', lineHeight: 1.5, color: COLOR.muted, marginTop: '6px', borderLeft: `2px solid ${COLOR.teal}`, paddingLeft: '8px' }}>
+              {activeTerm.detail}
+            </div>
+          )}
+        </div>
+      )}
 
       {MockupComp && (
         <div style={{ marginBottom: '16px' }}>
