@@ -1,7 +1,7 @@
 {
   "name": "Cert Study Hub",
   "short_name": "Cert Study",
-  "description": "Flashcards, quizzes, and timed exams for Microsoft certification prep.",
+  "description": "Flashcards, quizzes, and timed exams for ITIL, Azure, and CompTIA Cloud+ certification prep.",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",

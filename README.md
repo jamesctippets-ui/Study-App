@@ -1,6 +1,6 @@
 # Cert Study Hub
 
-A self-contained study app for Microsoft certification prep — built iteratively in
+A self-contained study app for certification prep — built iteratively in
 Claude.ai as a published artifact, exported to run locally, and now built from a
 proper Python source tree instead of one giant file.
 
@@ -30,12 +30,12 @@ exists for that exact term; where one doesn't, the term stays highlighted but
 plain, rather than showing a broken or empty popover.
 
 **Four tracks, all visible in the track switcher:**
-- **AZ-900** (Azure Fundamentals) — full course content, 83 questions.
-- **AZ-104** (Azure Administrator) — full question bank (48 questions) and the
+- **AZ-900** (Azure Fundamentals) — full course content, 96 questions.
+- **AZ-104** (Azure Administrator) — full question bank (62 questions) and the
   same course treatment as AZ-900 (7 lessons, diagrams, mockups).
-- **ITIL Foundation** (Version 5) — full question bank (65 questions), classic
+- **ITIL Foundation** (Version 5) — full question bank (75 questions), classic
   flashcard-list study mode (no course yet).
-- **CompTIA Cloud+** (CV0-004) — full question bank (50 questions) across all
+- **CompTIA Cloud+** (CV0-004) — full question bank (62 questions) across all
   five exam domains, classic flashcard-list study mode (no course yet).
 
 To hide a track again (e.g. while it's a work in progress), open `data/tracks.py`
@@ -71,9 +71,12 @@ build.py                  — reads data/ + src/js/, validates it, fills in the
 
 `build.py` is plain-stdlib Python (no pip installs needed). It also **validates the
 data** before building — every flashcard/question's `cat` must exist in that
-track's category list, every id must be unique within a track, and every lesson's
-`vocabIds`/`quizIds` must point at real flashcard/question ids. A bad edit fails
-the build with a specific error instead of shipping a broken lesson silently.
+track's category list, every id must be unique within a track, every lesson's
+`vocabIds`/`quizIds` must point at real flashcard/question ids, and every
+question's answer key is structurally sound (`correct` indices in range,
+`mc`/`ms` options non-empty and non-duplicated, `tf` has a boolean `answer`,
+every question has an explanation). A bad edit fails the build with a specific
+error instead of shipping a broken lesson or an unanswerable question silently.
 
 **After editing anything in `data/` or `src/js/`, rebuild:**
 
@@ -123,7 +126,7 @@ to install it.
 ## Sharing it
 
 There are no accounts and no login. Anyone with the link gets the full app —
-all three tracks, flashcards, quizzes, exams — and their progress saves to
+all four tracks, flashcards, quizzes, exams — and their progress saves to
 *their own* browser's local storage, same as it does for you. It's private to
 them, isn't visible to you, and doesn't sync between their own devices either
 (each browser/device is its own independent copy). That's the trade-off for

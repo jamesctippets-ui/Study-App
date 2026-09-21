@@ -20,7 +20,7 @@ function DCaption({ x, y, text }) {
 
 function DiagramServiceModels() {
   const cols = ['On-prem', 'IaaS', 'PaaS', 'SaaS'];
-  const rows = ['Apps & data', 'Runtime & OS', 'Virtualization', 'Physical infra'];
+  const rows = ['Applications', 'Runtime & OS', 'Virtualization', 'Physical infra'];
   const grid = [[1, 1, 1, 0], [1, 1, 0, 0], [1, 0, 0, 0], [1, 0, 0, 0]];
   const colW = 62, rowH = 42, labelW = 84, top = 28;
   const width = labelW + cols.length * colW + 6;

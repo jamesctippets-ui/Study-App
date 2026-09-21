@@ -197,6 +197,11 @@ function CertStudyApp() {
   useEffect(() => {
     if (mode !== 'quiz') return;
     if (skipNextAutoStart.current) { skipNextAutoStart.current = false; return; }
+    // A lesson quiz or missed-review session is a deliberately curated set of
+    // questions — a stray category-chip tap (the weighted mastery bar at the
+    // bottom of every screen sets activeCat too) must not silently discard it
+    // and replace it with a freshly rolled generic session.
+    if (isLessonSession || isMissedSession) return;
     startNewSession();
     // eslint-disable-next-line
   }, [mode, activeCat, quizLength, typesKey, activeTrack]);
@@ -525,17 +530,19 @@ function CertStudyApp() {
 
         {mode === 'quiz' && (
           <React.Fragment>
-            <QuizSetup
-              length={quizLength}
-              setLength={setQuizLength}
-              types={quizTypes}
-              toggleType={toggleType}
-              onReroll={startNewSession}
-              poolSize={availableQuestions.length}
-              missedCount={missedCount}
-              onReviewMissed={startMissedSession}
-            />
-            {availableQuestions.length === 0 ? (
+            {!isLessonSession && !isMissedSession && quizPhase !== 'complete' && (
+              <QuizSetup
+                length={quizLength}
+                setLength={setQuizLength}
+                types={quizTypes}
+                toggleType={toggleType}
+                onReroll={startNewSession}
+                poolSize={availableQuestions.length}
+                missedCount={missedCount}
+                onReviewMissed={startMissedSession}
+              />
+            )}
+            {!isLessonSession && !isMissedSession && availableQuestions.length === 0 ? (
               <div style={{ textAlign: 'center', color: COLOR.muted, fontSize: '13px', padding: '30px 10px' }}>
                 No questions match this filter — try enabling another question type.
               </div>

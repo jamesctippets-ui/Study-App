@@ -13,5 +13,5 @@ EXAM_CONFIG = {
     'itil': {'length': 40, 'minutes': 60, 'passPct': 65, 'passLabel': 'Real pass mark: 26/40 (65%)'},
     'az900': {'length': 50, 'minutes': 45, 'passPct': 75, 'passLabel': 'Microsoft scores this 0-1000 with 700 to pass, not a flat percentage. Treat 75%+ here as a safe buffer, not an exact predictor.'},
     'az104': {'length': 50, 'minutes': 100, 'passPct': 75, 'passLabel': 'Microsoft scores this 0-1000 with 700 to pass, not a flat percentage. Treat 75%+ here as a safe buffer, not an exact predictor.'},
-    'cloudplus': {'length': 45, 'minutes': 90, 'passPct': 83, 'passLabel': 'CompTIA scores this 100-900 with 750 to pass, not a flat percentage. Treat 83%+ here as a safe buffer, not an exact predictor.'},
+    'cloudplus': {'length': 90, 'minutes': 90, 'passPct': 83, 'passLabel': "CompTIA scores this 100-900 with 750 to pass, not a flat percentage. Treat 83%+ here as a safe buffer, not an exact predictor. The real exam allows up to 90 questions in 90 minutes — this mode uses every question in the bank once the pool is that large."},
 }

@@ -36,6 +36,8 @@ def validate():
     for key, mod in TRACK_MODULES.items():
         cat_keys = {c["key"] for c in mod.CATEGORIES}
         item_ids = set()
+        seen_flashcard_fronts = {}
+        seen_question_text = {}
 
         for kind, items in (("flashcard", mod.FLASHCARDS), ("question", mod.QUESTIONS)):
             for item in items:
@@ -44,6 +46,58 @@ def validate():
                 item_ids.add(item["id"])
                 if item["cat"] not in cat_keys:
                     errors.append(f"[{key}] {kind} '{item['id']}' references unknown category '{item['cat']}'")
+
+        for f in mod.FLASHCARDS:
+            fid = f["id"]
+            if not f.get("front", "").strip() or not f.get("back", "").strip():
+                errors.append(f"[{key}] flashcard '{fid}' has an empty front or back")
+            front_key = f["front"].strip().lower()
+            if front_key in seen_flashcard_fronts:
+                errors.append(f"[{key}] flashcards '{seen_flashcard_fronts[front_key]}' and '{fid}' have the same front text")
+            else:
+                seen_flashcard_fronts[front_key] = fid
+
+        for q in mod.QUESTIONS:
+            qid = q["id"]
+            qtype = q.get("type")
+            question_key = q.get("question", "").strip().lower()
+            if question_key in seen_question_text:
+                errors.append(f"[{key}] questions '{seen_question_text[question_key]}' and '{qid}' have identical question text")
+            else:
+                seen_question_text[question_key] = qid
+
+            if qtype == "mc":
+                options = q.get("options")
+                if not isinstance(options, list) or len(options) < 2:
+                    errors.append(f"[{key}] mc question '{qid}' needs an options list with at least 2 entries")
+                    continue
+                if len(options) != len(set(o.strip().lower() for o in options)):
+                    errors.append(f"[{key}] mc question '{qid}' has duplicate option text")
+                correct = q.get("correct")
+                if not isinstance(correct, int) or not (0 <= correct < len(options)):
+                    errors.append(f"[{key}] mc question '{qid}' has out-of-range or missing 'correct' index: {correct!r}")
+            elif qtype == "tf":
+                if not isinstance(q.get("answer"), bool):
+                    errors.append(f"[{key}] tf question '{qid}' is missing a boolean 'answer' field")
+            elif qtype == "ms":
+                options = q.get("options")
+                if not isinstance(options, list) or len(options) < 2:
+                    errors.append(f"[{key}] ms question '{qid}' needs an options list with at least 2 entries")
+                    continue
+                correct = q.get("correct")
+                if not isinstance(correct, list) or not correct:
+                    errors.append(f"[{key}] ms question '{qid}' needs a non-empty 'correct' list")
+                elif len(correct) != len(set(correct)):
+                    errors.append(f"[{key}] ms question '{qid}' has duplicate indices in 'correct'")
+                elif any(not isinstance(i, int) or not (0 <= i < len(options)) for i in correct):
+                    errors.append(f"[{key}] ms question '{qid}' has an out-of-range index in 'correct': {correct!r}")
+                elif len(correct) >= len(options):
+                    errors.append(f"[{key}] ms question '{qid}' marks all options correct — needs at least one wrong option")
+            else:
+                errors.append(f"[{key}] question '{qid}' has unknown type '{qtype}'")
+
+            if not q.get("explanation", "").strip():
+                errors.append(f"[{key}] question '{qid}' is missing an explanation")
 
         lessons = getattr(mod, "LESSONS", [])
         lesson_ids_seen = set()

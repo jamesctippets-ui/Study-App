@@ -22,8 +22,13 @@ function shuffleArray(arr) {
 
 function prepareQuestion(q) {
   if (q.type === 'mc') {
-    const order = shuffleArray([0, 1, 2, 3]);
+    const order = shuffleArray(q.options.map((_, i) => i));
     return { ...q, options: order.map((i) => q.options[i]), correct: order.indexOf(q.correct) };
+  }
+  if (q.type === 'ms') {
+    const order = shuffleArray(q.options.map((_, i) => i));
+    const correct = q.correct.map((i) => order.indexOf(i)).sort((a, b) => a - b);
+    return { ...q, options: order.map((i) => q.options[i]), correct };
   }
   return q;
 }
