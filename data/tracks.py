@@ -3,9 +3,9 @@
 STORAGE_KEY = 'cert-study-progress'
 
 TRACKS = [
-    {'key': 'itil', 'label': 'ITIL', 'subtitle': 'Foundation, Version 5', 'hidden': True},
+    {'key': 'itil', 'label': 'ITIL', 'subtitle': 'Foundation, Version 5'},
     {'key': 'az900', 'label': 'AZ-900', 'subtitle': 'Azure Fundamentals'},
-    {'key': 'az104', 'label': 'AZ-104', 'subtitle': 'Azure Administrator', 'hidden': True},
+    {'key': 'az104', 'label': 'AZ-104', 'subtitle': 'Azure Administrator'},
 ]
 
 EXAM_CONFIG = {
