@@ -1313,6 +1313,7 @@ function CertStudyApp() {
 
   const docRef = useRef(null);
   const writeChain = useRef(Promise.resolve());
+  const utterRef = useRef(null);
 
   const track = TRACKS.find((t) => t.key === activeTrack);
   const visibleTracks = TRACKS.filter((t) => !t.hidden);
@@ -1410,8 +1411,16 @@ function CertStudyApp() {
     utter.rate = 0.95;
     utter.onend = () => setSpeakingId(null);
     utter.onerror = () => setSpeakingId(null);
+    // Keep a reference so the utterance isn't garbage-collected mid-speech
+    // (a well-known cross-browser bug that cuts playback short or silently
+    // no-ops). Also, speak() has to run in a fresh tick after cancel() —
+    // calling it in the same tick is a documented Safari/iOS bug where the
+    // new utterance is silently dropped.
+    utterRef.current = utter;
     setSpeakingId(id);
-    window.speechSynthesis.speak(utter);
+    setTimeout(() => {
+      if (utterRef.current === utter) window.speechSynthesis.speak(utter);
+    }, 60);
   };
 
   useEffect(() => {
