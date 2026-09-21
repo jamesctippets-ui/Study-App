@@ -423,7 +423,7 @@ function CertStudyApp() {
                 style={{
                   padding: '10px 4px', borderRadius: '12px', fontSize: '12px', fontWeight: 600,
                   border: `1px solid ${activeTrack === t.key ? COLOR.gold : COLOR.border}`,
-                  background: activeTrack === t.key ? 'rgba(227,178,60,0.14)' : COLOR.surface,
+                  background: activeTrack === t.key ? 'rgba(211,164,101,0.14)' : COLOR.surface,
                   color: activeTrack === t.key ? COLOR.gold : COLOR.muted,
                 }}
               >
@@ -453,21 +453,21 @@ function CertStudyApp() {
           <button
             onClick={() => setMode('learn')}
             className="flex-1"
-            style={{ padding: '8px 2px', borderRadius: '9px', fontSize: '11px', fontWeight: 600, background: mode === 'learn' ? COLOR.teal : 'transparent', color: mode === 'learn' ? '#0E1210' : COLOR.muted }}
+            style={{ padding: '8px 2px', borderRadius: '9px', fontSize: '11px', fontWeight: 600, background: mode === 'learn' ? COLOR.teal : 'transparent', color: mode === 'learn' ? '#2B1620' : COLOR.muted }}
           >
             Learn
           </button>
           <button
             onClick={() => setMode('quiz')}
             className="flex-1"
-            style={{ padding: '8px 2px', borderRadius: '9px', fontSize: '11px', fontWeight: 600, background: mode === 'quiz' ? COLOR.teal : 'transparent', color: mode === 'quiz' ? '#0E1210' : COLOR.muted }}
+            style={{ padding: '8px 2px', borderRadius: '9px', fontSize: '11px', fontWeight: 600, background: mode === 'quiz' ? COLOR.teal : 'transparent', color: mode === 'quiz' ? '#2B1620' : COLOR.muted }}
           >
             Quiz
           </button>
           <button
             onClick={() => setMode('exam')}
             className="flex-1"
-            style={{ padding: '8px 2px', borderRadius: '9px', fontSize: '11px', fontWeight: 600, background: mode === 'exam' ? COLOR.gold : 'transparent', color: mode === 'exam' ? '#241C08' : COLOR.muted }}
+            style={{ padding: '8px 2px', borderRadius: '9px', fontSize: '11px', fontWeight: 600, background: mode === 'exam' ? COLOR.gold : 'transparent', color: mode === 'exam' ? '#2E1F0C' : COLOR.muted }}
           >
             Exam
           </button>
@@ -616,7 +616,7 @@ function CertStudyApp() {
                   <button
                     onClick={() => setExamIndex((i) => i + 1)}
                     className="flex-1"
-                    style={{ padding: '12px', borderRadius: '12px', background: COLOR.teal, color: '#0E1210', fontSize: '14px', fontWeight: 600 }}
+                    style={{ padding: '12px', borderRadius: '12px', background: COLOR.teal, color: '#2B1620', fontSize: '14px', fontWeight: 600 }}
                   >
                     Next
                   </button>
@@ -624,7 +624,7 @@ function CertStudyApp() {
                   <button
                     onClick={() => setExamPhase('complete')}
                     className="flex-1"
-                    style={{ padding: '12px', borderRadius: '12px', background: COLOR.gold, color: '#241C08', fontSize: '14px', fontWeight: 700 }}
+                    style={{ padding: '12px', borderRadius: '12px', background: COLOR.gold, color: '#2E1F0C', fontSize: '14px', fontWeight: 700 }}
                   >
                     Submit Exam
                   </button>

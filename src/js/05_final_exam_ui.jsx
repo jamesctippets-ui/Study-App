@@ -12,7 +12,7 @@ function ExamIntro({ track, config, onStart }) {
       </div>
       <button
         onClick={onStart}
-        style={{ width: '100%', padding: '13px', borderRadius: '12px', background: COLOR.gold, color: '#241C08', fontSize: '14px', fontWeight: 700 }}
+        style={{ width: '100%', padding: '13px', borderRadius: '12px', background: COLOR.gold, color: '#2E1F0C', fontSize: '14px', fontWeight: 700 }}
       >
         Start Exam
       </button>
@@ -36,7 +36,7 @@ function ExamQuestionView({ q, selectedIdx, onSelect }) {
                 style={{
                   textAlign: 'left', padding: '12px 14px', borderRadius: '12px',
                   border: `1px solid ${isSelected ? COLOR.teal : COLOR.border}`,
-                  background: isSelected ? 'rgba(63,167,150,0.14)' : COLOR.surfaceRaised,
+                  background: isSelected ? 'rgba(201,123,148,0.14)' : COLOR.surfaceRaised,
                   color: isSelected ? COLOR.teal : COLOR.text, fontSize: '14px', lineHeight: 1.4,
                 }}
               >
@@ -58,7 +58,7 @@ function ExamQuestionView({ q, selectedIdx, onSelect }) {
                 style={{
                   padding: '16px', borderRadius: '12px',
                   border: `1px solid ${isSelected ? COLOR.teal : COLOR.border}`,
-                  background: isSelected ? 'rgba(63,167,150,0.14)' : COLOR.surfaceRaised,
+                  background: isSelected ? 'rgba(201,123,148,0.14)' : COLOR.surfaceRaised,
                   color: isSelected ? COLOR.teal : COLOR.text, fontSize: '15px', fontWeight: 600,
                 }}
               >
@@ -82,7 +82,7 @@ function ExamQuestionView({ q, selectedIdx, onSelect }) {
                   style={{
                     textAlign: 'left', padding: '12px 14px', borderRadius: '12px',
                     border: `1px solid ${isSelected ? COLOR.teal : COLOR.border}`,
-                    background: isSelected ? 'rgba(63,167,150,0.14)' : COLOR.surfaceRaised,
+                    background: isSelected ? 'rgba(201,123,148,0.14)' : COLOR.surfaceRaised,
                     color: isSelected ? COLOR.teal : COLOR.text, fontSize: '14px', lineHeight: 1.4,
                     display: 'flex', alignItems: 'center', justifyContent: 'space-between',
                   }}
@@ -137,7 +137,7 @@ function ExamResults({ result, config, track, categories, onRestart }) {
       )}
       <button
         onClick={onRestart}
-        style={{ width: '100%', marginTop: '16px', padding: '12px', borderRadius: '12px', background: COLOR.teal, color: '#0E1210', fontSize: '14px', fontWeight: 600 }}
+        style={{ width: '100%', marginTop: '16px', padding: '12px', borderRadius: '12px', background: COLOR.teal, color: '#2B1620', fontSize: '14px', fontWeight: 600 }}
       >
         Take another exam
       </button>

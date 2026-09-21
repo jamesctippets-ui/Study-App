@@ -13,7 +13,7 @@ function CategoryChip({ label, active, mastery, onClick }) {
         fontWeight: 500,
         whiteSpace: 'nowrap',
         border: `1px solid ${active ? COLOR.teal : COLOR.border}`,
-        background: active ? 'rgba(63,167,150,0.14)' : COLOR.surface,
+        background: active ? 'rgba(201,123,148,0.14)' : COLOR.surface,
         color: active ? COLOR.teal : COLOR.muted,
       }}
       title={label === 'All' ? undefined : `${tint}% mastered`}
@@ -71,7 +71,7 @@ function FlashcardView({ card, flipped, setFlipped, onRate, index, total, catego
         <button
           onClick={() => onRate('correct')}
           className="flex-1"
-          style={{ padding: '12px', borderRadius: '12px', background: COLOR.teal, color: '#0E1210', fontSize: '14px', fontWeight: 600 }}
+          style={{ padding: '12px', borderRadius: '12px', background: COLOR.teal, color: '#2B1620', fontSize: '14px', fontWeight: 600 }}
         >
           ✓ Got it
         </button>
@@ -187,7 +187,7 @@ function MatchGame({ flashcards }) {
         </div>
         <button
           onClick={newRound}
-          style={{ background: COLOR.teal, color: '#0E1210', borderRadius: '10px', padding: '10px 20px', fontSize: '13px', fontWeight: 600 }}
+          style={{ background: COLOR.teal, color: '#2B1620', borderRadius: '10px', padding: '10px 20px', fontSize: '13px', fontWeight: 600 }}
         >
           New round
         </button>
@@ -209,9 +209,9 @@ function MatchGame({ flashcards }) {
   };
 
   const stateStyle = (state) => {
-    if (state === 'matched') return { background: 'rgba(63,167,150,0.12)', border: `1px solid ${COLOR.teal}`, color: COLOR.muted, opacity: 0.55 };
-    if (state === 'wrong') return { background: 'rgba(193,85,74,0.16)', border: `1px solid ${COLOR.red}`, color: COLOR.text };
-    if (state === 'selected') return { background: 'rgba(227,178,60,0.14)', border: `1px solid ${COLOR.gold}`, color: COLOR.text };
+    if (state === 'matched') return { background: 'rgba(201,123,148,0.12)', border: `1px solid ${COLOR.teal}`, color: COLOR.muted, opacity: 0.55 };
+    if (state === 'wrong') return { background: 'rgba(181,87,74,0.16)', border: `1px solid ${COLOR.red}`, color: COLOR.text };
+    if (state === 'selected') return { background: 'rgba(211,164,101,0.14)', border: `1px solid ${COLOR.gold}`, color: COLOR.text };
     return { background: COLOR.surface, border: `1px solid ${COLOR.border}`, color: COLOR.text };
   };
 
@@ -278,7 +278,7 @@ function SpeakButton({ id, text, speakingId, onSpeak }) {
       style={{
         fontSize: '11px', padding: '5px 10px', borderRadius: '8px',
         border: `1px solid ${isSpeaking ? COLOR.teal : COLOR.border}`,
-        background: isSpeaking ? 'rgba(63,167,150,0.14)' : 'transparent',
+        background: isSpeaking ? 'rgba(201,123,148,0.14)' : 'transparent',
         color: isSpeaking ? COLOR.teal : COLOR.muted, fontWeight: 600,
       }}
     >
@@ -415,7 +415,7 @@ function LessonDetail({ lesson, flashcardsData, onBack, onQuiz, speakingId, onSp
 
       <button
         onClick={() => onQuiz(lesson.quizIds)}
-        style={{ width: '100%', padding: '13px', borderRadius: '12px', background: COLOR.teal, color: '#0E1210', fontSize: '14px', fontWeight: 600 }}
+        style={{ width: '100%', padding: '13px', borderRadius: '12px', background: COLOR.teal, color: '#2B1620', fontSize: '14px', fontWeight: 600 }}
       >
         Take the {lesson.quizIds.length}-question quiz
       </button>
@@ -468,7 +468,7 @@ function QuizSetup({ length, setLength, types, toggleType, onReroll, poolSize, m
       {missedCount > 0 && (
         <button
           onClick={onReviewMissed}
-          style={{ width: '100%', marginBottom: '10px', padding: '10px', borderRadius: '12px', border: `1px solid ${COLOR.red}`, background: 'rgba(193,85,74,0.1)', color: COLOR.red, fontSize: '13px', fontWeight: 600 }}
+          style={{ width: '100%', marginBottom: '10px', padding: '10px', borderRadius: '12px', border: `1px solid ${COLOR.red}`, background: 'rgba(181,87,74,0.1)', color: COLOR.red, fontSize: '13px', fontWeight: 600 }}
         >
           Review {missedCount} missed question{missedCount === 1 ? '' : 's'}
         </button>
@@ -490,7 +490,7 @@ function QuizSetup({ length, setLength, types, toggleType, onReroll, poolSize, m
             style={{
               flexShrink: 0, padding: '6px 12px', borderRadius: '999px', fontSize: '12px', fontWeight: 500,
               border: `1px solid ${length === n ? COLOR.teal : COLOR.border}`,
-              background: length === n ? 'rgba(63,167,150,0.14)' : COLOR.surface,
+              background: length === n ? 'rgba(201,123,148,0.14)' : COLOR.surface,
               color: length === n ? COLOR.teal : COLOR.muted,
             }}
           >
@@ -506,7 +506,7 @@ function QuizSetup({ length, setLength, types, toggleType, onReroll, poolSize, m
             style={{
               flexShrink: 0, padding: '6px 12px', borderRadius: '999px', fontSize: '12px', fontWeight: 500,
               border: `1px solid ${types[key] ? COLOR.gold : COLOR.border}`,
-              background: types[key] ? 'rgba(227,178,60,0.14)' : COLOR.surface,
+              background: types[key] ? 'rgba(211,164,101,0.14)' : COLOR.surface,
               color: types[key] ? COLOR.gold : COLOR.muted,
             }}
           >
@@ -537,8 +537,8 @@ function QuestionView({ q, selected, onChoose, onNext, index, total, categoryLab
               const isSelected = i === selected;
               let bg = COLOR.surfaceRaised, border = COLOR.border, color = COLOR.text;
               if (selected !== null) {
-                if (isCorrect) { bg = 'rgba(63,167,150,0.15)'; border = COLOR.teal; color = COLOR.teal; }
-                else if (isSelected) { bg = 'rgba(193,85,74,0.15)'; border = COLOR.red; color = COLOR.red; }
+                if (isCorrect) { bg = 'rgba(201,123,148,0.15)'; border = COLOR.teal; color = COLOR.teal; }
+                else if (isSelected) { bg = 'rgba(181,87,74,0.15)'; border = COLOR.red; color = COLOR.red; }
               }
               return (
                 <button
@@ -568,8 +568,8 @@ function QuestionView({ q, selected, onChoose, onNext, index, total, categoryLab
               const isSelected = i === selected;
               let bg = COLOR.surfaceRaised, border = COLOR.border, color = COLOR.text;
               if (selected !== null) {
-                if (isRight) { bg = 'rgba(63,167,150,0.15)'; border = COLOR.teal; color = COLOR.teal; }
-                else if (isSelected) { bg = 'rgba(193,85,74,0.15)'; border = COLOR.red; color = COLOR.red; }
+                if (isRight) { bg = 'rgba(201,123,148,0.15)'; border = COLOR.teal; color = COLOR.teal; }
+                else if (isSelected) { bg = 'rgba(181,87,74,0.15)'; border = COLOR.red; color = COLOR.red; }
               }
               return (
                 <button
@@ -595,11 +595,11 @@ function QuestionView({ q, selected, onChoose, onNext, index, total, categoryLab
                 const wasSelected = selected !== null ? selected.includes(i) : msPending.includes(i);
                 let bg = COLOR.surfaceRaised, border = COLOR.border, color = COLOR.text;
                 if (selected !== null) {
-                  if (isCorrectOpt && wasSelected) { bg = 'rgba(63,167,150,0.15)'; border = COLOR.teal; color = COLOR.teal; }
+                  if (isCorrectOpt && wasSelected) { bg = 'rgba(201,123,148,0.15)'; border = COLOR.teal; color = COLOR.teal; }
                   else if (isCorrectOpt && !wasSelected) { border = COLOR.teal; color = COLOR.teal; }
-                  else if (!isCorrectOpt && wasSelected) { bg = 'rgba(193,85,74,0.15)'; border = COLOR.red; color = COLOR.red; }
+                  else if (!isCorrectOpt && wasSelected) { bg = 'rgba(181,87,74,0.15)'; border = COLOR.red; color = COLOR.red; }
                 } else if (wasSelected) {
-                  bg = 'rgba(63,167,150,0.10)'; border = COLOR.teal; color = COLOR.teal;
+                  bg = 'rgba(201,123,148,0.10)'; border = COLOR.teal; color = COLOR.teal;
                 }
                 return (
                   <button
@@ -626,7 +626,7 @@ function QuestionView({ q, selected, onChoose, onNext, index, total, categoryLab
               <button
                 onClick={onSubmitMs}
                 disabled={msPending.length === 0}
-                style={{ width: '100%', marginTop: '10px', padding: '11px', borderRadius: '12px', background: msPending.length ? COLOR.teal : COLOR.surfaceRaised, color: msPending.length ? '#0E1210' : COLOR.muted, fontSize: '14px', fontWeight: 600 }}
+                style={{ width: '100%', marginTop: '10px', padding: '11px', borderRadius: '12px', background: msPending.length ? COLOR.teal : COLOR.surfaceRaised, color: msPending.length ? '#2B1620' : COLOR.muted, fontSize: '14px', fontWeight: 600 }}
               >
                 Submit answer
               </button>
@@ -644,7 +644,7 @@ function QuestionView({ q, selected, onChoose, onNext, index, total, categoryLab
       {selected !== null && (
         <button
           onClick={onNext}
-          style={{ width: '100%', marginTop: '12px', padding: '12px', borderRadius: '12px', background: COLOR.teal, color: '#0E1210', fontSize: '14px', fontWeight: 600 }}
+          style={{ width: '100%', marginTop: '12px', padding: '12px', borderRadius: '12px', background: COLOR.teal, color: '#2B1620', fontSize: '14px', fontWeight: 600 }}
         >
           {isLast ? 'See results' : 'Next question'}
         </button>
@@ -676,7 +676,7 @@ function QuizSummary({ score, answers, categories, onRestart }) {
       )}
       <button
         onClick={onRestart}
-        style={{ width: '100%', marginTop: '16px', padding: '12px', borderRadius: '12px', background: COLOR.teal, color: '#0E1210', fontSize: '14px', fontWeight: 600 }}
+        style={{ width: '100%', marginTop: '16px', padding: '12px', borderRadius: '12px', background: COLOR.teal, color: '#2B1620', fontSize: '14px', fontWeight: 600 }}
       >
         New quiz
       </button>
