@@ -1656,7 +1656,17 @@ function CertStudyApp() {
   }).length;
 
   return (
-    <div style={{ background: COLOR.bg, color: COLOR.text, minHeight: '100vh' }}>
+    <div
+      style={{
+        background: COLOR.bg,
+        color: COLOR.text,
+        minHeight: '100vh',
+        paddingTop: 'env(safe-area-inset-top)',
+        paddingBottom: 'env(safe-area-inset-bottom)',
+        paddingLeft: 'env(safe-area-inset-left)',
+        paddingRight: 'env(safe-area-inset-right)',
+      }}
+    >
       <div className="max-w-md mx-auto px-4 py-5">
         <div className="flex justify-between items-start mb-4">
           <div>
