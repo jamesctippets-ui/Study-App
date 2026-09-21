@@ -731,62 +731,6 @@ QUESTIONS = [
         'answer': True,
         'explanation': 'Bastion provides secure access through the portal without the VM itself needing a public IP.',
     },
-    {
-        'id': 'sa1',
-        'cat': 'identityGov',
-        'type': 'sa',
-        'question': 'Explain the difference between the built-in Contributor role and the built-in Owner role.',
-        'modelAnswer': 'Both can fully manage resources, but only Owner can also assign roles to other users. Contributor cannot grant or change access permissions for others.',
-    },
-    {
-        'id': 'sa2',
-        'cat': 'identityGov',
-        'type': 'sa',
-        'question': "What's the difference between a security group and a dynamic group in Entra ID?",
-        'modelAnswer': 'A security group has manually managed membership. A dynamic group automatically adds or removes members based on rules matching user or device attributes, like department or job title.',
-    },
-    {
-        'id': 'sa3',
-        'cat': 'storage',
-        'type': 'sa',
-        'question': 'Explain the difference between a storage account access key and a Shared Access Signature (SAS).',
-        'modelAnswer': 'An access key grants full, unrestricted access to the entire storage account. A SAS grants limited, time-boxed access to specific resources or operations, without exposing the account key itself.',
-    },
-    {
-        'id': 'sa4',
-        'cat': 'storage',
-        'type': 'sa',
-        'question': 'Describe what a lifecycle management policy does for a storage account.',
-        'modelAnswer': 'It automatically moves blobs between access tiers, like Hot to Cool to Archive, or deletes them after a set period, based on rules like age or last access time, without manual intervention.',
-    },
-    {
-        'id': 'sa5',
-        'cat': 'compute',
-        'type': 'sa',
-        'question': 'Explain the difference between an availability set and an availability zone.',
-        'modelAnswer': 'An availability set distributes VMs across fault and update domains within a single datacenter. An availability zone spreads VMs across physically separate datacenters within a region, offering stronger protection against a full datacenter failure.',
-    },
-    {
-        'id': 'sa6',
-        'cat': 'compute',
-        'type': 'sa',
-        'question': 'What are deployment slots used for in Azure App Service?',
-        'modelAnswer': 'They provide separate, swappable environments, like staging, where a new version of an app can be validated before being swapped into production, minimizing downtime and risk.',
-    },
-    {
-        'id': 'sa7',
-        'cat': 'networking',
-        'type': 'sa',
-        'question': 'Explain the difference between Azure Load Balancer and Application Gateway.',
-        'modelAnswer': 'Load Balancer operates at layer 4, distributing TCP/UDP traffic by IP and port with no awareness of content. Application Gateway operates at layer 7, and can route HTTP/HTTPS traffic based on URL path and terminate SSL.',
-    },
-    {
-        'id': 'sa8',
-        'cat': 'monitoring',
-        'type': 'sa',
-        'question': 'Explain the difference between Azure Backup and Azure Site Recovery.',
-        'modelAnswer': 'Backup protects against data loss, letting you restore a VM or file to an earlier point in time. Site Recovery protects against a broader outage, like a full region going down, by replicating and failing over an entire workload to a secondary region.',
-    },
 ]
 
 LESSONS = [

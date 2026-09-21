@@ -997,90 +997,6 @@ QUESTIONS = [
         'explanation': 'Tags are commonly used to break down and filter cost data by department, environment, or project.',
     },
     {
-        'id': 'sa1',
-        'cat': 'cloudConcepts',
-        'type': 'sa',
-        'question': 'A company is deciding between IaaS and PaaS for a new internal app. Describe one advantage and one disadvantage of each.',
-        'modelAnswer': "IaaS gives full control over the OS and environment, useful for custom requirements, but the team must patch and manage the OS themselves. PaaS removes that management burden and speeds up development, but limits control and can create vendor lock-in around the platform's specific features.",
-    },
-    {
-        'id': 'sa2',
-        'cat': 'cloudConcepts',
-        'type': 'sa',
-        'question': "Explain why an organization's total Azure bill could increase even after adopting a consumption-based pricing model.",
-        'modelAnswer': "Consumption-based pricing charges for actual usage, so if usage grows — more VMs, more storage, more traffic — the bill grows too. It removes a large fixed upfront cost but doesn't cap spending, so poor resource management or unexpected demand can still drive costs up.",
-    },
-    {
-        'id': 'sa3',
-        'cat': 'cloudConcepts',
-        'type': 'sa',
-        'question': 'A company needs to keep certain regulated data on-premises but wants cloud flexibility for everything else. Which cloud model fits, and why?',
-        'modelAnswer': 'Hybrid cloud, because it combines on-premises infrastructure for the regulated data with public cloud resources for everything else, meeting compliance requirements while still gaining cloud flexibility elsewhere.',
-    },
-    {
-        'id': 'sa4',
-        'cat': 'architecture',
-        'type': 'sa',
-        'question': 'A company has Dev, Test, and Prod subscriptions and wants consistent tagging and region policies enforced across all of them without repeating configuration. Describe the resource that solves this and why.',
-        'modelAnswer': 'A management group containing all three subscriptions. Policies and RBAC assigned at the management group level flow down to every subscription beneath it, so the rule only needs to be configured once instead of three times.',
-    },
-    {
-        'id': 'sa5',
-        'cat': 'architecture',
-        'type': 'sa',
-        'question': "Explain the difference between Azure Migrate and Azure Data Box, and when you'd use each.",
-        'modelAnswer': 'Azure Migrate helps assess and migrate on-premises servers and workloads into Azure, typically over the network. Azure Data Box is a physical device used to transfer very large amounts of data into Azure when the internet connection would be too slow or costly.',
-    },
-    {
-        'id': 'sa6',
-        'cat': 'architecture',
-        'type': 'sa',
-        'question': 'A scenario describes an attacker who breaches the network perimeter but still cannot access sensitive data without passing device and identity checks. Which security concept does this illustrate, and why?',
-        'modelAnswer': 'Zero Trust — because it never assumes trust just because a request originated inside the network perimeter; every access attempt is verified independently based on identity, device, and context, regardless of network location.',
-    },
-    {
-        'id': 'sa7',
-        'cat': 'architecture',
-        'type': 'sa',
-        'question': 'Describe the difference between Azure RBAC and Azure Policy, using an example of each.',
-        'modelAnswer': 'RBAC controls who can do what — for example, granting a user permission to create VMs in a resource group. Azure Policy controls how resources must be configured — for example, requiring every VM to be deployed only in a specific region, regardless of who creates it.',
-    },
-    {
-        'id': 'sa8',
-        'cat': 'architecture',
-        'type': 'sa',
-        'question': 'Explain why a company might choose ExpressRoute over a VPN Gateway, and one trade-off of that choice.',
-        'modelAnswer': "ExpressRoute provides a private, dedicated connection with more predictable performance and lower latency than a VPN Gateway, which travels over the public internet. The trade-off is that ExpressRoute is more expensive and slower to provision, and its traffic isn't encrypted by default.",
-    },
-    {
-        'id': 'sa9',
-        'cat': 'management',
-        'type': 'sa',
-        'question': "A company applied a Delete lock to a production database, but a developer still can't update its firewall rules. Explain why, and what's more likely blocking them.",
-        'modelAnswer': "A Delete lock only blocks deletion, not modification — so it shouldn't be blocking a firewall rule update on its own. The more likely cause is a Read-only lock, which blocks both deletion and modification, or an RBAC permission issue.",
-    },
-    {
-        'id': 'sa10',
-        'cat': 'management',
-        'type': 'sa',
-        'question': 'Explain the difference between Azure Advisor and Microsoft Defender for Cloud.',
-        'modelAnswer': 'Azure Advisor gives broad recommendations across cost, security, reliability, and performance for the whole environment. Microsoft Defender for Cloud is focused specifically on security posture and threat protection — narrower but deeper on the security side.',
-    },
-    {
-        'id': 'sa11',
-        'cat': 'management',
-        'type': 'sa',
-        'question': "Describe an Infrastructure as Code approach that guarantees a team's Dev, Test, and Prod environments stay identical, with a record of exactly what was deployed.",
-        'modelAnswer': 'Define the infrastructure in an ARM template, store it in source control, and deploy that same template to each environment. This guarantees consistency across environments and keeps a version history of exactly what was deployed and when.',
-    },
-    {
-        'id': 'sa12',
-        'cat': 'management',
-        'type': 'sa',
-        'question': 'Explain what Azure Service Health tells you that Azure Monitor does not.',
-        'modelAnswer': 'Azure Service Health reports on the health and any ongoing incidents of the Azure platform itself, like an outage affecting a whole region. Azure Monitor instead reports on the health and telemetry of your own specific resources.',
-    },
-    {
         'id': 'msq1',
         'cat': 'cloudConcepts',
         'type': 'ms',
@@ -1277,7 +1193,7 @@ LESSONS = [
         'summary': 'Service models, pricing, and the core benefits of cloud computing.',
         'diagram': 'serviceModels',
         'vocabIds': ['f1', 'f2', 'f3', 'f4', 'f5', 'f6', 'f7', 'f8', 'f9', 'f10', 'f11'],
-        'quizIds': ['q1', 'q5', 'sa2', 'msq11'],
+        'quizIds': ['q1', 'q5', 'q4', 'msq11'],
         'reading': """Cloud computing means renting computing power, storage, and services from a provider like Microsoft, instead of buying and running your own servers. You pay for what you use, which shifts spending from a big upfront purchase (CapEx) to an ongoing operating cost (OpEx) — similar to leasing equipment instead of buying it outright.
 
 The three main service models — IaaS, PaaS, and SaaS — differ in how much you manage yourself versus how much Microsoft manages for you. IaaS is the closest to running your own servers: you get virtual machines and networking, but you're still responsible for the operating system and everything above it. PaaS removes that OS burden — you just deploy your code and Microsoft handles the runtime. SaaS is a finished product, like Microsoft 365, where you're just a user.
@@ -1301,7 +1217,7 @@ The service models follow a similar idea: IaaS is like leasing an empty apartmen
         'summary': 'Management groups, subscriptions, resource groups, and how policy flows through them.',
         'diagram': 'hierarchy',
         'vocabIds': ['f12', 'f13', 'f14', 'f15', 'f16', 'f17', 'f18'],
-        'quizIds': ['q12', 'sa4', 'q18', 'msq12'],
+        'quizIds': ['q12', 'tf9', 'q18', 'msq12'],
         'reading': """Azure organizes everything you deploy into a hierarchy: management groups sit at the top, containing one or more subscriptions. Each subscription contains resource groups, and each resource group holds the actual resources — VMs, databases, storage accounts, and so on.
 
 This hierarchy exists so you can manage things at scale instead of one resource at a time. A policy or access assignment applied at a management group automatically applies to every subscription, resource group, and resource beneath it. That's how a large company can enforce one security rule — like "only deploy to US regions" — across dozens of subscriptions without configuring it separately in each one.
@@ -1391,7 +1307,7 @@ Redundancy options protect that data against hardware and datacenter failure. Lo
         'summary': 'Entra ID, RBAC, Conditional Access, and the Zero Trust mindset.',
         'diagram': 'identity',
         'vocabIds': ['f29', 'f30', 'f31', 'f32', 'f33', 'f34', 'f35', 'f36', 'f49'],
-        'quizIds': ['q20', 'q21', 'sa6', 'msq16'],
+        'quizIds': ['q20', 'q21', 'q22', 'msq16'],
         'reading': """Microsoft Entra ID, formerly Azure Active Directory, is Azure's identity service — it manages users, groups, and what they're allowed to access. Two related but different tools control that access: Azure RBAC decides what an identity can do, like "this user can restart VMs," assigned at a scope such as a subscription or resource group. Conditional Access decides under what conditions someone is allowed to sign in at all — for example, requiring MFA only when someone signs in from an unfamiliar location or an unmanaged device.
 
 Zero Trust is the security philosophy underlying a lot of this: never assume trust just because a request came from inside the network. Every request gets verified independently, based on identity, device, and context, regardless of where it's coming from. Defense-in-depth complements this with layered protection — physical, identity, network, and data layers — so that a single breach doesn't expose everything.""",

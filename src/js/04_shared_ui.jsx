@@ -331,7 +331,7 @@ function QuizSetup({ length, setLength, types, toggleType, onReroll, poolSize, m
         ))}
       </div>
       <div className="flex gap-2" style={{ overflowX: 'auto', paddingBottom: '2px' }}>
-        {[['mc', 'Multiple choice'], ['ms', 'Multi-select'], ['tf', 'True / False'], ['sa', 'Short answer']].map(([key, label]) => (
+        {[['mc', 'Multiple choice'], ['ms', 'Multi-select'], ['tf', 'True / False']].map(([key, label]) => (
           <button
             key={key}
             onClick={() => toggleType(key)}
@@ -350,7 +350,7 @@ function QuizSetup({ length, setLength, types, toggleType, onReroll, poolSize, m
   );
 }
 
-function QuestionView({ q, selected, onChoose, saInput, setSaInput, saRevealed, onRevealSA, onRateSA, onNext, index, total, categoryLabel, missedBadge, msPending, onToggleMs, onSubmitMs }) {
+function QuestionView({ q, selected, onChoose, onNext, index, total, categoryLabel, missedBadge, msPending, onToggleMs, onSubmitMs }) {
   if (!q) return null;
   const isLast = index + 1 >= total;
   return (
@@ -466,63 +466,14 @@ function QuestionView({ q, selected, onChoose, saInput, setSaInput, saRevealed, 
           </div>
         )}
 
-        {q.type === 'sa' && (
-          <div>
-            {!saRevealed ? (
-              <React.Fragment>
-                <textarea
-                  value={saInput}
-                  onChange={(e) => setSaInput(e.target.value)}
-                  placeholder="Type your answer, or just think it through, then reveal"
-                  rows={3}
-                  style={{ width: '100%', background: COLOR.surfaceRaised, border: `1px solid ${COLOR.border}`, borderRadius: '10px', padding: '10px', fontSize: '14px', color: COLOR.text, resize: 'vertical' }}
-                />
-                <button
-                  onClick={onRevealSA}
-                  style={{ width: '100%', marginTop: '10px', padding: '11px', borderRadius: '12px', background: COLOR.teal, color: '#0E1210', fontSize: '14px', fontWeight: 600 }}
-                >
-                  Show model answer
-                </button>
-              </React.Fragment>
-            ) : (
-              <div>
-                {saInput && (
-                  <div style={{ fontSize: '12px', color: COLOR.muted, marginBottom: '10px' }}>
-                    Your answer: <span style={{ color: COLOR.text }}>{saInput}</span>
-                  </div>
-                )}
-                <div style={{ background: COLOR.surfaceRaised, borderRadius: '10px', padding: '12px', fontSize: '13px', lineHeight: 1.55, color: COLOR.text, marginBottom: '12px' }}>
-                  {q.modelAnswer}
-                </div>
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => onRateSA('incorrect')}
-                    className="flex-1"
-                    style={{ padding: '12px', borderRadius: '12px', border: `1px solid ${COLOR.red}`, color: COLOR.red, fontSize: '14px', fontWeight: 600, background: 'transparent' }}
-                  >
-                    ✕ Still learning
-                  </button>
-                  <button
-                    onClick={() => onRateSA('correct')}
-                    className="flex-1"
-                    style={{ padding: '12px', borderRadius: '12px', background: COLOR.teal, color: '#0E1210', fontSize: '14px', fontWeight: 600 }}
-                  >
-                    ✓ Got it
-                  </button>
-                </div>
-              </div>
-            )}
-          </div>
-        )}
-
-        {(q.type === 'mc' || q.type === 'tf' || q.type === 'ms') && selected !== null && q.explanation && (
+        {selected !== null && q.explanation && (
           <div style={{ marginTop: '14px', padding: '12px', borderRadius: '10px', background: COLOR.surfaceRaised, fontSize: '13px', lineHeight: 1.5, color: COLOR.muted }}>
             {q.explanation}
           </div>
         )}
       </div>
 
-      {(q.type === 'mc' || q.type === 'tf' || q.type === 'ms') && selected !== null && (
+      {selected !== null && (
         <button
           onClick={onNext}
           style={{ width: '100%', marginTop: '12px', padding: '12px', borderRadius: '12px', background: COLOR.teal, color: '#0E1210', fontSize: '14px', fontWeight: 600 }}

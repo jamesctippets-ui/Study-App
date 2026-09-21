@@ -12,15 +12,13 @@ function CertStudyApp() {
   const [syncMode, setSyncMode] = useState('loading');
 
   const [quizLength, setQuizLength] = useState(10);
-  const [quizTypes, setQuizTypes] = useState({ mc: true, tf: true, sa: true, ms: true });
+  const [quizTypes, setQuizTypes] = useState({ mc: true, tf: true, ms: true });
   const [quizSession, setQuizSession] = useState([]);
   const [sessionIndex, setSessionIndex] = useState(0);
   const [quizPhase, setQuizPhase] = useState('active');
   const [sessionAnswers, setSessionAnswers] = useState([]);
   const [sessionScore, setSessionScore] = useState({ correct: 0, total: 0 });
   const [selected, setSelected] = useState(null);
-  const [saInput, setSaInput] = useState('');
-  const [saRevealed, setSaRevealed] = useState(false);
   const [isMissedSession, setIsMissedSession] = useState(false);
   const [msPending, setMsPending] = useState([]);
   const [speakingId, setSpeakingId] = useState(null);
@@ -174,7 +172,7 @@ function CertStudyApp() {
   );
   const missedCount = missedIds.length;
 
-  const typesKey = quizTypes.mc + '-' + quizTypes.tf + '-' + quizTypes.sa + '-' + quizTypes.ms;
+  const typesKey = quizTypes.mc + '-' + quizTypes.tf + '-' + quizTypes.ms;
 
   const startNewSession = useCallback(() => {
     const len = Math.min(quizLength, availableQuestions.length);
@@ -183,8 +181,6 @@ function CertStudyApp() {
     setQuizSession(prepared);
     setSessionIndex(0);
     setSelected(null);
-    setSaInput('');
-    setSaRevealed(false);
     setMsPending([]);
     setSessionAnswers([]);
     setSessionScore({ correct: 0, total: 0 });
@@ -205,8 +201,6 @@ function CertStudyApp() {
     setQuizSession(prepared);
     setSessionIndex(0);
     setSelected(null);
-    setSaInput('');
-    setSaRevealed(false);
     setMsPending([]);
     setSessionAnswers([]);
     setSessionScore({ correct: 0, total: 0 });
@@ -227,8 +221,6 @@ function CertStudyApp() {
     setQuizSession(prepared);
     setSessionIndex(0);
     setSelected(null);
-    setSaInput('');
-    setSaRevealed(false);
     setMsPending([]);
     setSessionAnswers([]);
     setSessionScore({ correct: 0, total: 0 });
@@ -241,7 +233,7 @@ function CertStudyApp() {
   const toggleType = (key) => {
     setQuizTypes((t) => {
       const next = { ...t, [key]: !t[key] };
-      const anyOn = next.mc || next.tf || next.sa || next.ms;
+      const anyOn = next.mc || next.tf || next.ms;
       return anyOn ? next : t;
     });
   };
@@ -276,8 +268,6 @@ function CertStudyApp() {
 
   const advance = () => {
     setSelected(null);
-    setSaInput('');
-    setSaRevealed(false);
     setMsPending([]);
     if (sessionIndex + 1 >= quizSession.length) setQuizPhase('complete');
     else setSessionIndex((i) => i + 1);
@@ -310,15 +300,6 @@ function CertStudyApp() {
     recordResult(currentQ.id, isCorrect ? 'correct' : 'incorrect');
     setSessionScore((s) => ({ correct: s.correct + (isCorrect ? 1 : 0), total: s.total + 1 }));
     setSessionAnswers((a) => [...a, { id: currentQ.id, cat: currentQ.cat, prompt: currentQ.question, correct: isCorrect }]);
-  };
-
-  const rateSA = (outcome) => {
-    if (!currentQ) return;
-    const isCorrect = outcome === 'correct';
-    recordResult(currentQ.id, outcome);
-    setSessionScore((s) => ({ correct: s.correct + (isCorrect ? 1 : 0), total: s.total + 1 }));
-    setSessionAnswers((a) => [...a, { id: currentQ.id, cat: currentQ.cat, prompt: currentQ.question, correct: isCorrect }]);
-    advance();
   };
 
   const doReset = () => {
@@ -537,11 +518,6 @@ function CertStudyApp() {
                 q={currentQ}
                 selected={selected}
                 onChoose={chooseAnswer}
-                saInput={saInput}
-                setSaInput={setSaInput}
-                saRevealed={saRevealed}
-                onRevealSA={() => setSaRevealed(true)}
-                onRateSA={rateSA}
                 onNext={advance}
                 index={sessionIndex}
                 total={quizSession.length}

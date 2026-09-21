@@ -6,20 +6,22 @@ proper Python source tree instead of one giant file.
 
 ## What's inside
 
-Flashcards, a rotating quiz engine (multiple choice, true/false, multi-select,
-short-answer), a timed Final Exam mode matching each real exam's length/pass mark,
-a missed-question review queue, and — for AZ-900 and AZ-104 — a full mini-course
-per topic (reading with highlighted key terms, an SVG diagram, a portal mockup, a
-worked scenario, common exam traps, and a 3–4 question quiz), plus text-to-speech
-on the readings and flashcards.
+Flashcards, a rotating quiz engine (multiple choice, true/false, multi-select —
+matching the question formats the real proctored exams actually use; there's no
+free-response short-answer type since none of these exams have one), a timed
+Final Exam mode matching each real exam's length/pass mark, a missed-question
+review queue, and — for AZ-900 and AZ-104 — a full mini-course per topic (reading
+with highlighted key terms, an SVG diagram, a portal mockup, a worked scenario,
+common exam traps, and a 3–4 question quiz), plus text-to-speech on the readings
+and flashcards.
 
 **Four tracks, all visible in the track switcher:**
-- **AZ-900** (Azure Fundamentals) — full course content, 95 questions.
-- **AZ-104** (Azure Administrator) — full question bank (56 questions) and the
+- **AZ-900** (Azure Fundamentals) — full course content, 83 questions.
+- **AZ-104** (Azure Administrator) — full question bank (48 questions) and the
   same course treatment as AZ-900 (7 lessons, diagrams, mockups).
-- **ITIL Foundation** (Version 5) — full question bank (80 questions), classic
+- **ITIL Foundation** (Version 5) — full question bank (65 questions), classic
   flashcard-list study mode (no course yet).
-- **CompTIA Cloud+** (CV0-004) — full question bank (58 questions) across all
+- **CompTIA Cloud+** (CV0-004) — full question bank (50 questions) across all
   five exam domains, classic flashcard-list study mode (no course yet).
 
 To hide a track again (e.g. while it's a work in progress), open `data/tracks.py`
