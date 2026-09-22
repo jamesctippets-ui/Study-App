@@ -43,15 +43,15 @@ function DiagramServiceModels() {
                 width={colW - 6}
                 height={rowH - 6}
                 rx="6"
-                fill={managed ? 'rgba(201,123,148,0.16)' : 'rgba(211,164,101,0.13)'}
-                stroke={managed ? COLOR.teal : COLOR.gold}
+                fill={managed ? 'rgba(167,139,250,0.16)' : 'rgba(211,164,101,0.13)'}
+                stroke={managed ? COLOR.primary : COLOR.gold}
                 strokeWidth="1.2"
               />
             );
           })}
         </React.Fragment>
       ))}
-      <rect x={labelW} y={height - 20} width="10" height="10" fill="rgba(201,123,148,0.16)" stroke={COLOR.teal} strokeWidth="1" />
+      <rect x={labelW} y={height - 20} width="10" height="10" fill="rgba(167,139,250,0.16)" stroke={COLOR.primary} strokeWidth="1" />
       <text x={labelW + 15} y={height - 11} fill={COLOR.muted} fontSize="8.5">You manage</text>
       <rect x={labelW + 90} y={height - 20} width="10" height="10" fill="rgba(211,164,101,0.13)" stroke={COLOR.gold} strokeWidth="1" />
       <text x={labelW + 105} y={height - 11} fill={COLOR.muted} fontSize="8.5">Microsoft manages</text>
@@ -112,8 +112,8 @@ function DiagramStorage() {
       <DBox x={166} y={30} w={60} h={30} label="Queue" />
       <DBox x={239} y={30} w={60} h={30} label="Table" />
       <DCaption x={160} y={90} text="Access tiers: cost vs. speed trade-off" />
-      <rect x={20} y={98} width={70} height={22} fill="rgba(201,123,148,0.28)" stroke={COLOR.teal} strokeWidth="1" />
-      <rect x={90} y={98} width={70} height={22} fill="rgba(201,123,148,0.14)" stroke={COLOR.teal} strokeWidth="1" />
+      <rect x={20} y={98} width={70} height={22} fill="rgba(167,139,250,0.28)" stroke={COLOR.primary} strokeWidth="1" />
+      <rect x={90} y={98} width={70} height={22} fill="rgba(167,139,250,0.14)" stroke={COLOR.primary} strokeWidth="1" />
       <rect x={160} y={98} width={70} height={22} fill="rgba(211,164,101,0.14)" stroke={COLOR.gold} strokeWidth="1" />
       <rect x={230} y={98} width={70} height={22} fill="rgba(211,164,101,0.28)" stroke={COLOR.gold} strokeWidth="1" />
       <text x={55} y={136} textAnchor="middle" fill={COLOR.muted} fontSize="8.5">Hot</text>
@@ -159,8 +159,8 @@ function DiagramDiskTiers() {
       <DCaption x={160} y={14} text="Managed disk tiers: cost vs. performance" />
       <rect x={15} y={22} width={70} height={26} fill="rgba(211,164,101,0.28)" stroke={COLOR.gold} strokeWidth="1" />
       <rect x={90} y={22} width={70} height={26} fill="rgba(211,164,101,0.14)" stroke={COLOR.gold} strokeWidth="1" />
-      <rect x={165} y={22} width={70} height={26} fill="rgba(201,123,148,0.14)" stroke={COLOR.teal} strokeWidth="1" />
-      <rect x={240} y={22} width={70} height={26} fill="rgba(201,123,148,0.28)" stroke={COLOR.teal} strokeWidth="1" />
+      <rect x={165} y={22} width={70} height={26} fill="rgba(167,139,250,0.14)" stroke={COLOR.primary} strokeWidth="1" />
+      <rect x={240} y={22} width={70} height={26} fill="rgba(167,139,250,0.28)" stroke={COLOR.primary} strokeWidth="1" />
       <text x={50} y={64} textAnchor="middle" fill={COLOR.muted} fontSize="8">Standard HDD</text>
       <text x={125} y={64} textAnchor="middle" fill={COLOR.muted} fontSize="8">Standard SSD</text>
       <text x={200} y={64} textAnchor="middle" fill={COLOR.muted} fontSize="8">Premium SSD</text>
@@ -177,8 +177,8 @@ function DiagramDeploymentSlots() {
       <DCaption x={150} y={16} text="Swap" />
       <DBox x={15} y={28} w={110} h={50} label="Staging slot" sub="test the new version" />
       <DBox x={175} y={28} w={110} h={50} label="Production slot" sub="live traffic" />
-      <line x1={128} y1={43} x2={172} y2={43} stroke={COLOR.teal} strokeWidth="1.5" />
-      <line x1={172} y1={63} x2={128} y2={63} stroke={COLOR.teal} strokeWidth="1.5" />
+      <line x1={128} y1={43} x2={172} y2={43} stroke={COLOR.primary} strokeWidth="1.5" />
+      <line x1={172} y1={63} x2={128} y2={63} stroke={COLOR.primary} strokeWidth="1.5" />
       <DCaption x={150} y={100} text="A swap exchanges the two almost instantly" />
     </svg>
   );

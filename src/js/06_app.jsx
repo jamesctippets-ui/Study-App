@@ -473,71 +473,65 @@ function CertStudyApp() {
       )}
       <div className="max-w-md mx-auto px-4 py-5">
         <div className="flex justify-between items-start mb-4">
-          <div>
-            <div className="itil-display" style={{ fontSize: '22px', fontWeight: 600, lineHeight: 1.1 }}>{track.label}</div>
+          <div style={{ flex: 1, minWidth: 0, position: 'relative', paddingRight: '10px' }}>
+            {visibleTracks.length > 1 ? (
+              <select
+                value={activeTrack}
+                onChange={(e) => setActiveTrack(e.target.value)}
+                className="itil-display"
+                style={{
+                  display: 'block', width: '100%', fontSize: '21px', fontWeight: 600, lineHeight: 1.2,
+                  color: trackAccent(activeTrack), background: 'transparent', border: 'none', padding: 0,
+                  WebkitAppearance: 'none', MozAppearance: 'none', appearance: 'none',
+                }}
+              >
+                {visibleTracks.map((t) => (
+                  <option key={t.key} value={t.key} style={{ background: COLOR.surface, color: COLOR.text }}>
+                    {t.label}
+                  </option>
+                ))}
+              </select>
+            ) : null}
+            {visibleTracks.length > 1 && (
+              <span style={{ position: 'absolute', top: '3px', right: '-4px', fontSize: '12px', color: trackAccent(activeTrack), pointerEvents: 'none' }}>▾</span>
+            )}
+            {visibleTracks.length <= 1 && (
+              <div className="itil-display" style={{ fontSize: '21px', fontWeight: 600, lineHeight: 1.2 }}>{track.label}</div>
+            )}
             <div style={{ fontSize: '12px', color: COLOR.muted, marginTop: '2px' }}>{track.subtitle}</div>
           </div>
-          <div className="flex items-start gap-2">
-            <div style={{ textAlign: 'right' }}>
-              <div style={{ fontSize: '20px', fontWeight: 700, color: COLOR.teal }}>{overallMastery}%</div>
-              <div style={{ fontSize: '10px', color: COLOR.muted }}>mastered</div>
+          <div className="flex items-start gap-1" style={{ flexShrink: 0 }}>
+            <div style={{ textAlign: 'right', marginRight: '2px' }}>
+              <div style={{ fontSize: '18px', fontWeight: 700, color: COLOR.success }}>{overallMastery}%</div>
             </div>
+            {PATHS.length > 0 && (
+              <button
+                onClick={() => setShowPaths(true)}
+                title="Recommended study path"
+                style={{ padding: '6px 8px', borderRadius: '8px', border: `1px solid ${COLOR.border}`, background: 'transparent', color: COLOR.primary, fontSize: '13px' }}
+              >
+                🗺️
+              </button>
+            )}
             <button
               onClick={() => setShowAchievements(true)}
               title="Achievements"
-              style={{ padding: '6px 10px', borderRadius: '8px', border: `1px solid ${COLOR.gold}`, background: 'transparent', color: COLOR.gold, fontSize: '11px' }}
+              style={{ padding: '6px 8px', borderRadius: '8px', border: `1px solid ${COLOR.gold}`, background: 'transparent', color: COLOR.gold, fontSize: '11px', fontWeight: 600 }}
             >
               🏆 {stats.unlocked.length}
             </button>
             <button
               onClick={() => setConfirmReset(true)}
-              style={{ padding: '6px 10px', borderRadius: '8px', border: `1px solid ${COLOR.border}`, background: 'transparent', color: COLOR.muted, fontSize: '11px' }}
+              title="Reset progress"
+              style={{ padding: '6px 8px', borderRadius: '8px', border: `1px solid ${COLOR.border}`, background: 'transparent', color: COLOR.muted, fontSize: '13px' }}
             >
-              Reset
+              ⟲
             </button>
           </div>
         </div>
 
-        {visibleTracks.length > 1 && (
-          <div className="mb-4" style={{ position: 'relative' }}>
-            <select
-              value={activeTrack}
-              onChange={(e) => setActiveTrack(e.target.value)}
-              style={{
-                width: '100%', padding: '12px 36px 12px 14px', borderRadius: '12px', fontSize: '13.5px', fontWeight: 600,
-                border: `1px solid ${COLOR.gold}`, background: COLOR.surface, color: COLOR.gold,
-                boxShadow: SHADOW.card, WebkitAppearance: 'none', MozAppearance: 'none', appearance: 'none',
-              }}
-            >
-              {visibleTracks.map((t) => (
-                <option key={t.key} value={t.key} style={{ background: COLOR.surface, color: COLOR.text }}>
-                  {t.label} — {t.subtitle}
-                </option>
-              ))}
-            </select>
-            <div
-              style={{
-                position: 'absolute', top: '50%', right: '14px', transform: 'translateY(-50%)',
-                pointerEvents: 'none', color: COLOR.gold, fontSize: '11px',
-              }}
-            >
-              ▾
-            </div>
-          </div>
-        )}
-
-        {PATHS.length > 0 && (
-          <button
-            onClick={() => setShowPaths(true)}
-            className="btn-flat"
-            style={{ display: 'block', width: '100%', textAlign: 'left', padding: '0', marginBottom: '14px', color: COLOR.teal, fontSize: '11.5px', fontWeight: 600 }}
-          >
-            🗺️ Recommended study path
-          </button>
-        )}
-
         {syncMode === 'local' && (
-          <div style={{ fontSize: '11px', color: COLOR.muted, marginBottom: '14px' }}>
+          <div style={{ fontSize: '10.5px', color: COLOR.muted, marginBottom: '12px' }}>
             Saving progress to this browser. Open from your Claude account to sync across devices.
           </div>
         )}
@@ -556,14 +550,14 @@ function CertStudyApp() {
           <button
             onClick={() => setMode('learn')}
             className="flex-1"
-            style={{ padding: '8px 2px', borderRadius: '9px', fontSize: '11px', fontWeight: 600, background: mode === 'learn' ? COLOR.teal : 'transparent', color: mode === 'learn' ? '#2B1620' : COLOR.muted }}
+            style={{ padding: '8px 2px', borderRadius: '9px', fontSize: '11px', fontWeight: 600, background: mode === 'learn' ? COLOR.primary : 'transparent', color: mode === 'learn' ? '#2B1620' : COLOR.muted }}
           >
             Learn
           </button>
           <button
             onClick={() => setMode('quiz')}
             className="flex-1"
-            style={{ padding: '8px 2px', borderRadius: '9px', fontSize: '11px', fontWeight: 600, background: mode === 'quiz' ? COLOR.teal : 'transparent', color: mode === 'quiz' ? '#2B1620' : COLOR.muted }}
+            style={{ padding: '8px 2px', borderRadius: '9px', fontSize: '11px', fontWeight: 600, background: mode === 'quiz' ? COLOR.primary : 'transparent', color: mode === 'quiz' ? '#2B1620' : COLOR.muted }}
           >
             Quiz
           </button>
@@ -727,7 +721,7 @@ function CertStudyApp() {
                   <button
                     onClick={() => setExamIndex((i) => i + 1)}
                     className="flex-1"
-                    style={{ padding: '12px', borderRadius: '12px', background: COLOR.teal, color: '#2B1620', fontSize: '14px', fontWeight: 600 }}
+                    style={{ padding: '12px', borderRadius: '12px', background: COLOR.primary, color: '#2B1620', fontSize: '14px', fontWeight: 600 }}
                   >
                     Next
                   </button>
@@ -778,7 +772,7 @@ function CertStudyApp() {
                   style={{
                     position: 'absolute', inset: 0,
                     width: `${Math.round((masteryByCategory[c.key] || 0) * 100)}%`,
-                    background: (masteryByCategory[c.key] || 0) > 0.7 ? COLOR.teal : COLOR.gold,
+                    background: (masteryByCategory[c.key] || 0) > 0.7 ? COLOR.success : COLOR.gold,
                   }}
                 />
               </div>

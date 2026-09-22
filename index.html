@@ -8,7 +8,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <title>Cert Study Hub</title>
 <link rel="manifest" href="manifest.json" />
-<meta name="theme-color" content="#211C26" />
+<meta name="theme-color" content="#1E1828" />
 <meta name="mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
@@ -63,11 +63,11 @@
 
   :root { color-scheme: dark; }
   html { scroll-behavior: smooth; }
-  html, body { margin: 0; padding: 0; background: #211C26; }
+  html, body { margin: 0; padding: 0; background: #1E1828; }
   * { box-sizing: border-box; }
   body, button, textarea { font-family: 'Inter', sans-serif; }
   .itil-display { font-family: 'Fraunces', serif; }
-  textarea:focus, button:focus { outline: 2px solid #C97B94; outline-offset: 1px; }
+  textarea:focus, button:focus { outline: 2px solid #A78BFA; outline-offset: 1px; }
   button { transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, transform 0.1s ease, opacity 0.15s ease, box-shadow 0.1s ease; cursor: pointer; }
   button:not(.btn-flat) { box-shadow: 0 2px 5px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.06), inset 0 -1px 0 rgba(0,0,0,0.12); }
   button:not(.btn-flat):active { box-shadow: inset 0 2px 4px rgba(0,0,0,0.35); }
@@ -120,16 +120,44 @@ const DATA = {"itil": {"categories": [{"key": "terms", "label": "Key Terms", "ma
 const { useState, useEffect, useMemo, useCallback, useRef } = React;
 
 const COLOR = {
-  bg: '#211C26',
-  surface: '#2B2530',
-  surfaceRaised: '#352E3C',
-  border: '#473F4E',
+  bg: '#1E1828',
+  surface: '#282032',
+  surfaceRaised: '#332A3D',
+  border: '#4A3F56',
   text: '#EDE4DC',
-  muted: '#9C8B94',
-  teal: '#C97B94',
-  gold: '#D3A465',
-  red: '#B5574A',
+  muted: '#A296AC',
+  // Primary: the app's main interactive accent (active tabs, links, buttons,
+  // "you selected this" highlighting) — deliberately NOT used for "this
+  // answer is correct," so the two meanings never collide.
+  primary: '#A78BFA',
+  // Success: the ONLY color that means "correct" anywhere in the app —
+  // used nowhere else, so it stays an unambiguous signal.
+  success: '#34D399',
+  red: '#F87171',
+  gold: '#E3B274',
+  // A genuine teal, used sparingly for secondary accents/variety.
+  teal: '#2DD4BF',
 };
+
+// One distinct accent color per track, for quick visual recognition in the
+// track switcher and learning-path panel — not used for correctness.
+const TRACK_ACCENTS = {
+  itil: '#60A5FA',
+  az900: '#38BDF8',
+  az104: '#22D3EE',
+  dp900: '#818CF8',
+  dp300: '#A78BFA',
+  az305: '#C084FC',
+  az802: '#E879F9',
+  sc300: '#F472B6',
+  sc500: '#FB923C',
+  cloudplus: '#FACC15',
+  ehrintegration: '#2DD4BF',
+};
+
+function trackAccent(key) {
+  return TRACK_ACCENTS[key] || COLOR.primary;
+}
 
 const SHADOW = {
   card: '0 3px 10px rgba(0,0,0,0.32), inset 0 1px 0 rgba(255,255,255,0.04)',
@@ -180,15 +208,15 @@ function DiagramServiceModels() {
                 width={colW - 6}
                 height={rowH - 6}
                 rx="6"
-                fill={managed ? 'rgba(201,123,148,0.16)' : 'rgba(211,164,101,0.13)'}
-                stroke={managed ? COLOR.teal : COLOR.gold}
+                fill={managed ? 'rgba(167,139,250,0.16)' : 'rgba(211,164,101,0.13)'}
+                stroke={managed ? COLOR.primary : COLOR.gold}
                 strokeWidth="1.2"
               />
             );
           })}
         </React.Fragment>
       ))}
-      <rect x={labelW} y={height - 20} width="10" height="10" fill="rgba(201,123,148,0.16)" stroke={COLOR.teal} strokeWidth="1" />
+      <rect x={labelW} y={height - 20} width="10" height="10" fill="rgba(167,139,250,0.16)" stroke={COLOR.primary} strokeWidth="1" />
       <text x={labelW + 15} y={height - 11} fill={COLOR.muted} fontSize="8.5">You manage</text>
       <rect x={labelW + 90} y={height - 20} width="10" height="10" fill="rgba(211,164,101,0.13)" stroke={COLOR.gold} strokeWidth="1" />
       <text x={labelW + 105} y={height - 11} fill={COLOR.muted} fontSize="8.5">Microsoft manages</text>
@@ -249,8 +277,8 @@ function DiagramStorage() {
       <DBox x={166} y={30} w={60} h={30} label="Queue" />
       <DBox x={239} y={30} w={60} h={30} label="Table" />
       <DCaption x={160} y={90} text="Access tiers: cost vs. speed trade-off" />
-      <rect x={20} y={98} width={70} height={22} fill="rgba(201,123,148,0.28)" stroke={COLOR.teal} strokeWidth="1" />
-      <rect x={90} y={98} width={70} height={22} fill="rgba(201,123,148,0.14)" stroke={COLOR.teal} strokeWidth="1" />
+      <rect x={20} y={98} width={70} height={22} fill="rgba(167,139,250,0.28)" stroke={COLOR.primary} strokeWidth="1" />
+      <rect x={90} y={98} width={70} height={22} fill="rgba(167,139,250,0.14)" stroke={COLOR.primary} strokeWidth="1" />
       <rect x={160} y={98} width={70} height={22} fill="rgba(211,164,101,0.14)" stroke={COLOR.gold} strokeWidth="1" />
       <rect x={230} y={98} width={70} height={22} fill="rgba(211,164,101,0.28)" stroke={COLOR.gold} strokeWidth="1" />
       <text x={55} y={136} textAnchor="middle" fill={COLOR.muted} fontSize="8.5">Hot</text>
@@ -296,8 +324,8 @@ function DiagramDiskTiers() {
       <DCaption x={160} y={14} text="Managed disk tiers: cost vs. performance" />
       <rect x={15} y={22} width={70} height={26} fill="rgba(211,164,101,0.28)" stroke={COLOR.gold} strokeWidth="1" />
       <rect x={90} y={22} width={70} height={26} fill="rgba(211,164,101,0.14)" stroke={COLOR.gold} strokeWidth="1" />
-      <rect x={165} y={22} width={70} height={26} fill="rgba(201,123,148,0.14)" stroke={COLOR.teal} strokeWidth="1" />
-      <rect x={240} y={22} width={70} height={26} fill="rgba(201,123,148,0.28)" stroke={COLOR.teal} strokeWidth="1" />
+      <rect x={165} y={22} width={70} height={26} fill="rgba(167,139,250,0.14)" stroke={COLOR.primary} strokeWidth="1" />
+      <rect x={240} y={22} width={70} height={26} fill="rgba(167,139,250,0.28)" stroke={COLOR.primary} strokeWidth="1" />
       <text x={50} y={64} textAnchor="middle" fill={COLOR.muted} fontSize="8">Standard HDD</text>
       <text x={125} y={64} textAnchor="middle" fill={COLOR.muted} fontSize="8">Standard SSD</text>
       <text x={200} y={64} textAnchor="middle" fill={COLOR.muted} fontSize="8">Premium SSD</text>
@@ -314,8 +342,8 @@ function DiagramDeploymentSlots() {
       <DCaption x={150} y={16} text="Swap" />
       <DBox x={15} y={28} w={110} h={50} label="Staging slot" sub="test the new version" />
       <DBox x={175} y={28} w={110} h={50} label="Production slot" sub="live traffic" />
-      <line x1={128} y1={43} x2={172} y2={43} stroke={COLOR.teal} strokeWidth="1.5" />
-      <line x1={172} y1={63} x2={128} y2={63} stroke={COLOR.teal} strokeWidth="1.5" />
+      <line x1={128} y1={43} x2={172} y2={43} stroke={COLOR.primary} strokeWidth="1.5" />
+      <line x1={172} y1={63} x2={128} y2={63} stroke={COLOR.primary} strokeWidth="1.5" />
       <DCaption x={150} y={100} text="A swap exchanges the two almost instantly" />
     </svg>
   );
@@ -372,7 +400,7 @@ function PortalFrame({ children, height }) {
       <rect x="0" y="0" width="320" height="24" rx="8" fill={COLOR.bg} />
       <circle cx="12" cy="12" r="3" fill={COLOR.red} opacity="0.6" />
       <circle cx="22" cy="12" r="3" fill={COLOR.gold} opacity="0.6" />
-      <circle cx="32" cy="12" r="3" fill={COLOR.teal} opacity="0.6" />
+      <circle cx="32" cy="12" r="3" fill={COLOR.primary} opacity="0.6" />
       <rect x="60" y="6" width="200" height="12" rx="6" fill={COLOR.surface} />
       <text x="160" y="15" textAnchor="middle" fill={COLOR.muted} fontSize="7">portal.azure.com</text>
       {children}
@@ -384,8 +412,8 @@ function MockField({ x, y, w, h, label, value, highlight }) {
   return (
     <g>
       <text x={x} y={y - 3} fill={COLOR.muted} fontSize="7">{label}</text>
-      <rect x={x} y={y} width={w} height={h} rx="4" fill={highlight ? 'rgba(201,123,148,0.14)' : COLOR.surface} stroke={highlight ? COLOR.teal : COLOR.border} strokeWidth="1" />
-      {value && <text x={x + 6} y={y + h / 2 + 3} fill={highlight ? COLOR.teal : COLOR.text} fontSize="8">{value}</text>}
+      <rect x={x} y={y} width={w} height={h} rx="4" fill={highlight ? 'rgba(167,139,250,0.14)' : COLOR.surface} stroke={highlight ? COLOR.primary : COLOR.border} strokeWidth="1" />
+      {value && <text x={x + 6} y={y + h / 2 + 3} fill={highlight ? COLOR.primary : COLOR.text} fontSize="8">{value}</text>}
     </g>
   );
 }
@@ -396,7 +424,7 @@ function MockupResourceGroup() {
       <text x={12} y={40} fill={COLOR.text} fontSize="9" fontWeight="700">Create a resource group</text>
       <MockField x={12} y={54} w={296} h={20} label="Resource group name" value="rg-production" />
       <MockField x={12} y={90} w={296} h={20} label="Region" value="(US) East US" />
-      <rect x={230} y={124} width="78" height="18" rx="4" fill={COLOR.teal} />
+      <rect x={230} y={124} width="78" height="18" rx="4" fill={COLOR.primary} />
       <text x={269} y={136} textAnchor="middle" fill="#2B1620" fontSize="8" fontWeight="700">Review + create</text>
     </PortalFrame>
   );
@@ -408,8 +436,8 @@ function MockupStorageAccount() {
       <text x={12} y={40} fill={COLOR.text} fontSize="9" fontWeight="700">Create a storage account</text>
       <MockField x={12} y={52} w={296} h={18} label="Storage account name" value="stmyappdata001" />
       <text x={12} y={86} fill={COLOR.muted} fontSize="7">Performance</text>
-      <rect x={12} y={90} width="90" height="18" rx="4" fill="rgba(201,123,148,0.14)" stroke={COLOR.teal} strokeWidth="1" />
-      <text x={57} y={102} textAnchor="middle" fill={COLOR.teal} fontSize="7.5">● Standard</text>
+      <rect x={12} y={90} width="90" height="18" rx="4" fill="rgba(167,139,250,0.14)" stroke={COLOR.primary} strokeWidth="1" />
+      <text x={57} y={102} textAnchor="middle" fill={COLOR.primary} fontSize="7.5">● Standard</text>
       <rect x={110} y={90} width="90" height="18" rx="4" fill={COLOR.surface} stroke={COLOR.border} strokeWidth="1" />
       <text x={155} y={102} textAnchor="middle" fill={COLOR.muted} fontSize="7.5">○ Premium</text>
       <MockField x={12} y={124} w={296} h={18} label="Redundancy" value="Geo-redundant storage (GRS)" />
@@ -424,10 +452,10 @@ function MockupVmSize() {
       <text x={18} y={54} fill={COLOR.muted} fontSize="7">Size</text>
       <text x={200} y={54} fill={COLOR.muted} fontSize="7">vCPUs</text>
       <text x={250} y={54} fill={COLOR.muted} fontSize="7">RAM</text>
-      <rect x={12} y={60} width="296" height="20" rx="4" fill="rgba(201,123,148,0.14)" stroke={COLOR.teal} strokeWidth="1" />
-      <text x={18} y={73} fill={COLOR.teal} fontSize="7.5">Standard_D2s_v5</text>
-      <text x={205} y={73} fill={COLOR.teal} fontSize="7.5">2</text>
-      <text x={252} y={73} fill={COLOR.teal} fontSize="7.5">8 GiB</text>
+      <rect x={12} y={60} width="296" height="20" rx="4" fill="rgba(167,139,250,0.14)" stroke={COLOR.primary} strokeWidth="1" />
+      <text x={18} y={73} fill={COLOR.primary} fontSize="7.5">Standard_D2s_v5</text>
+      <text x={205} y={73} fill={COLOR.primary} fontSize="7.5">2</text>
+      <text x={252} y={73} fill={COLOR.primary} fontSize="7.5">8 GiB</text>
       <rect x={12} y={84} width="296" height="20" rx="4" fill={COLOR.surface} stroke={COLOR.border} strokeWidth="1" />
       <text x={18} y={97} fill={COLOR.muted} fontSize="7.5">Standard_B2s</text>
       <text x={205} y={97} fill={COLOR.muted} fontSize="7.5">2</text>
@@ -447,8 +475,8 @@ function MockupRoleAssignment() {
       <MockField x={12} y={52} w={296} h={18} label="Role" value="Contributor" highlight />
       <MockField x={12} y={86} w={296} h={18} label="Scope" value="Subscription  >  rg-production" />
       <text x={12} y={122} fill={COLOR.muted} fontSize="7">Assign access to</text>
-      <rect x={12} y={126} width="140" height="18" rx="4" fill="rgba(201,123,148,0.14)" stroke={COLOR.teal} strokeWidth="1" />
-      <text x={82} y={138} textAnchor="middle" fill={COLOR.teal} fontSize="7.5">● User, group</text>
+      <rect x={12} y={126} width="140" height="18" rx="4" fill="rgba(167,139,250,0.14)" stroke={COLOR.primary} strokeWidth="1" />
+      <text x={82} y={138} textAnchor="middle" fill={COLOR.primary} fontSize="7.5">● User, group</text>
       <rect x={160} y={126} width="148" height="18" rx="4" fill={COLOR.surface} stroke={COLOR.border} strokeWidth="1" />
       <text x={234} y={138} textAnchor="middle" fill={COLOR.muted} fontSize="7.5">○ Managed identity</text>
     </PortalFrame>
@@ -462,7 +490,7 @@ function MockupVirtualNetwork() {
       <MockField x={12} y={52} w={296} h={18} label="Name" value="vnet-prod" />
       <MockField x={12} y={86} w={140} h={18} label="Address space" value="10.0.0.0/16" />
       <MockField x={160} y={86} w={148} h={18} label="Subnet" value="10.0.1.0/24" />
-      <rect x={230} y={116} width="78" height="18" rx="4" fill={COLOR.teal} />
+      <rect x={230} y={116} width="78" height="18" rx="4" fill={COLOR.primary} />
       <text x={269} y={128} textAnchor="middle" fill="#2B1620" fontSize="8" fontWeight="700">Review + create</text>
     </PortalFrame>
   );
@@ -811,7 +839,7 @@ function AchievementsPanel({ achievements, streak, onClose }) {
                   </div>
                 )}
               </div>
-              {a.unlocked && <div style={{ fontSize: '13px', color: COLOR.teal, fontWeight: 700, flexShrink: 0 }}>✓</div>}
+              {a.unlocked && <div style={{ fontSize: '13px', color: COLOR.success, fontWeight: 700, flexShrink: 0 }}>✓</div>}
             </div>
           ))}
         </div>
@@ -849,22 +877,31 @@ function PathPanel({ paths, results, activeTrack, onSelectTrack, onClose }) {
                 {steps.map((s, i) => {
                   const pct = trackMastery(s.key, results);
                   const isActive = s.key === activeTrack;
+                  const accent = trackAccent(s.key);
                   return (
                     <button
                       key={s.key}
                       onClick={() => onSelectTrack(s.key)}
                       style={{
                         textAlign: 'left', display: 'flex', alignItems: 'center', gap: '12px', padding: '10px 12px', borderRadius: '12px',
-                        background: isActive ? 'rgba(211,164,101,0.12)' : COLOR.surface,
-                        border: `1px solid ${isActive ? COLOR.gold : COLOR.border}`,
+                        background: isActive ? `${accent}1F` : COLOR.surface,
+                        border: `1px solid ${isActive ? accent : COLOR.border}`,
                       }}
                     >
-                      <div style={{ fontSize: '11px', color: COLOR.muted, flexShrink: 0, width: '16px', textAlign: 'center' }}>{i + 1}</div>
+                      <div
+                        style={{
+                          flexShrink: 0, width: '22px', height: '22px', borderRadius: '999px', fontSize: '10.5px', fontWeight: 700,
+                          display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          background: `${accent}26`, color: accent,
+                        }}
+                      >
+                        {i + 1}
+                      </div>
                       <div style={{ flex: 1, minWidth: 0 }}>
-                        <div style={{ fontSize: '13px', fontWeight: 600, color: isActive ? COLOR.gold : COLOR.text }}>{s.track.label}</div>
+                        <div style={{ fontSize: '13px', fontWeight: 600, color: accent }}>{s.track.label}</div>
                         <div style={{ fontSize: '11px', color: COLOR.muted, marginTop: '2px', lineHeight: 1.4 }}>{s.why}</div>
                       </div>
-                      <div style={{ fontSize: '12px', fontWeight: 700, color: pct >= 70 ? COLOR.teal : COLOR.muted, flexShrink: 0 }}>{pct}%</div>
+                      <div style={{ fontSize: '12px', fontWeight: 700, color: pct >= 70 ? COLOR.success : COLOR.muted, flexShrink: 0 }}>{pct}%</div>
                     </button>
                   );
                 })}
@@ -889,9 +926,9 @@ function CategoryChip({ label, active, mastery, onClick }) {
         fontSize: '12px',
         fontWeight: 500,
         whiteSpace: 'nowrap',
-        border: `1px solid ${active ? COLOR.teal : COLOR.border}`,
-        background: active ? 'rgba(201,123,148,0.14)' : COLOR.surface,
-        color: active ? COLOR.teal : COLOR.muted,
+        border: `1px solid ${active ? COLOR.primary : COLOR.border}`,
+        background: active ? 'rgba(167,139,250,0.14)' : COLOR.surface,
+        color: active ? COLOR.primary : COLOR.muted,
       }}
       title={label === 'All' ? undefined : `${tint}% mastered`}
     >
@@ -948,7 +985,7 @@ function FlashcardView({ card, flipped, setFlipped, onRate, index, total, catego
         <button
           onClick={() => onRate('correct')}
           className="flex-1"
-          style={{ padding: '12px', borderRadius: '12px', background: COLOR.teal, color: '#2B1620', fontSize: '14px', fontWeight: 600 }}
+          style={{ padding: '12px', borderRadius: '12px', background: COLOR.success, color: '#2B1620', fontSize: '14px', fontWeight: 600 }}
         >
           ✓ Got it
         </button>
@@ -963,7 +1000,7 @@ function StudyEntry({ item }) {
       <div className="itil-display" style={{ fontSize: '16px', fontWeight: 600, marginBottom: '4px' }}>{item.front}</div>
       <div style={{ fontSize: '14px', lineHeight: 1.55, color: COLOR.text, marginBottom: item.detail ? '8px' : 0 }}>{item.back}</div>
       {item.detail && (
-        <div style={{ fontSize: '13px', lineHeight: 1.55, color: COLOR.muted, borderLeft: `2px solid ${COLOR.teal}`, paddingLeft: '10px' }}>
+        <div style={{ fontSize: '13px', lineHeight: 1.55, color: COLOR.muted, borderLeft: `2px solid ${COLOR.primary}`, paddingLeft: '10px' }}>
           {item.detail}
         </div>
       )}
@@ -1077,7 +1114,7 @@ function MatchGame({ flashcards, roundSize, onContinue, onRoundComplete }) {
           {onContinue && (
             <button
               onClick={onContinue}
-              style={{ background: COLOR.teal, color: '#2B1620', borderRadius: '10px', padding: '10px 20px', fontSize: '13px', fontWeight: 600 }}
+              style={{ background: COLOR.primary, color: '#2B1620', borderRadius: '10px', padding: '10px 20px', fontSize: '13px', fontWeight: 600 }}
             >
               Continue reading →
             </button>
@@ -1101,7 +1138,7 @@ function MatchGame({ flashcards, roundSize, onContinue, onRoundComplete }) {
   };
 
   const stateStyle = (state) => {
-    if (state === 'matched') return { background: 'rgba(201,123,148,0.12)', border: `1px solid ${COLOR.teal}`, color: COLOR.muted, opacity: 0.55 };
+    if (state === 'matched') return { background: 'rgba(52,211,153,0.12)', border: `1px solid ${COLOR.success}`, color: COLOR.muted, opacity: 0.55 };
     if (state === 'wrong') return { background: 'rgba(181,87,74,0.16)', border: `1px solid ${COLOR.red}`, color: COLOR.text };
     if (state === 'selected') return { background: 'rgba(211,164,101,0.14)', border: `1px solid ${COLOR.gold}`, color: COLOR.text };
     return { background: COLOR.surface, border: `1px solid ${COLOR.border}`, color: COLOR.text };
@@ -1113,7 +1150,7 @@ function MatchGame({ flashcards, roundSize, onContinue, onRoundComplete }) {
         <span style={{ fontSize: '11px', color: COLOR.muted }}>
           {matched.length} / {round.picked.length} matched{mistakes > 0 ? ` · ${mistakes} mistake${mistakes === 1 ? '' : 's'}` : ''}
         </span>
-        <button onClick={newRound} className="btn-flat" style={{ fontSize: '11px', color: COLOR.teal, fontWeight: 600, padding: '4px 8px' }}>
+        <button onClick={newRound} className="btn-flat" style={{ fontSize: '11px', color: COLOR.primary, fontWeight: 600, padding: '4px 8px' }}>
           New round
         </button>
       </div>
@@ -1169,9 +1206,9 @@ function SpeakButton({ id, text, speakingId, onSpeak }) {
       onClick={() => onSpeak(id, text)}
       style={{
         fontSize: '11px', padding: '5px 10px', borderRadius: '8px',
-        border: `1px solid ${isSpeaking ? COLOR.teal : COLOR.border}`,
-        background: isSpeaking ? 'rgba(201,123,148,0.14)' : 'transparent',
-        color: isSpeaking ? COLOR.teal : COLOR.muted, fontWeight: 600,
+        border: `1px solid ${isSpeaking ? COLOR.primary : COLOR.border}`,
+        background: isSpeaking ? 'rgba(167,139,250,0.14)' : 'transparent',
+        color: isSpeaking ? COLOR.primary : COLOR.muted, fontWeight: 600,
       }}
     >
       {isSpeaking ? '⏸ Stop' : '🔊 Listen'}
@@ -1187,7 +1224,7 @@ function LessonCard({ lesson, mastery, onOpen }) {
     >
       <div className="flex justify-between items-start">
         <div className="itil-display" style={{ fontSize: '15px', fontWeight: 600 }}>{lesson.title}</div>
-        <div style={{ fontSize: '11px', color: mastery >= 0.7 ? COLOR.teal : mastery > 0 ? COLOR.gold : COLOR.muted, fontWeight: 600 }}>{Math.round(mastery * 100)}%</div>
+        <div style={{ fontSize: '11px', color: mastery >= 0.7 ? COLOR.success : mastery > 0 ? COLOR.gold : COLOR.muted, fontWeight: 600 }}>{Math.round(mastery * 100)}%</div>
       </div>
       <div style={{ fontSize: '12px', color: COLOR.muted, marginTop: '4px', lineHeight: 1.4 }}>{lesson.summary}</div>
     </button>
@@ -1288,7 +1325,7 @@ function LessonDetail({ lesson, flashcardsData, questionsData, onBack, onQuiz, s
 
   return (
     <div>
-      <button onClick={onBack} className="btn-flat" style={{ fontSize: '12px', color: COLOR.teal, background: 'transparent', marginBottom: '12px', padding: 0 }}>
+      <button onClick={onBack} className="btn-flat" style={{ fontSize: '12px', color: COLOR.primary, background: 'transparent', marginBottom: '12px', padding: 0 }}>
         ‹ All lessons
       </button>
       <div className="itil-display" style={{ fontSize: '19px', fontWeight: 600, marginBottom: '4px' }}>{lesson.title}</div>
@@ -1351,7 +1388,7 @@ function LessonDetail({ lesson, flashcardsData, questionsData, onBack, onQuiz, s
               ) : (
                 <button
                   onClick={advancePastGate}
-                  style={{ width: '100%', padding: '12px', borderRadius: '12px', background: COLOR.teal, color: '#2B1620', fontSize: '14px', fontWeight: 600 }}
+                  style={{ width: '100%', padding: '12px', borderRadius: '12px', background: COLOR.primary, color: '#2B1620', fontSize: '14px', fontWeight: 600 }}
                 >
                   Continue reading →
                 </button>
@@ -1361,7 +1398,7 @@ function LessonDetail({ lesson, flashcardsData, questionsData, onBack, onQuiz, s
             ) : (
               <button
                 onClick={advancePastGate}
-                style={{ width: '100%', padding: '12px', borderRadius: '12px', background: COLOR.teal, color: '#2B1620', fontSize: '14px', fontWeight: 600 }}
+                style={{ width: '100%', padding: '12px', borderRadius: '12px', background: COLOR.primary, color: '#2B1620', fontSize: '14px', fontWeight: 600 }}
               >
                 Continue reading →
               </button>
@@ -1371,14 +1408,14 @@ function LessonDetail({ lesson, flashcardsData, questionsData, onBack, onQuiz, s
       </div>
 
       {activeTerm && (
-        <div style={{ boxShadow: SHADOW.card, background: COLOR.surfaceRaised, border: `1px solid ${COLOR.teal}`, borderRadius: '12px', padding: '12px 14px', marginBottom: '16px' }}>
+        <div style={{ boxShadow: SHADOW.card, background: COLOR.surfaceRaised, border: `1px solid ${COLOR.primary}`, borderRadius: '12px', padding: '12px 14px', marginBottom: '16px' }}>
           <div className="flex justify-between items-start" style={{ marginBottom: '4px' }}>
-            <div className="itil-display" style={{ fontSize: '14px', fontWeight: 600, color: COLOR.teal }}>{activeTerm.front}</div>
+            <div className="itil-display" style={{ fontSize: '14px', fontWeight: 600, color: COLOR.primary }}>{activeTerm.front}</div>
             <button onClick={() => setActiveTerm(null)} className="btn-flat" style={{ background: 'transparent', color: COLOR.muted, padding: '0 0 0 8px', fontSize: '13px' }}>✕</button>
           </div>
           <div style={{ fontSize: '14px', lineHeight: 1.55, color: COLOR.text }}>{activeTerm.back}</div>
           {activeTerm.detail && (
-            <div style={{ fontSize: '12.5px', lineHeight: 1.55, color: COLOR.muted, marginTop: '6px', borderLeft: `2px solid ${COLOR.teal}`, paddingLeft: '8px' }}>
+            <div style={{ fontSize: '12.5px', lineHeight: 1.55, color: COLOR.muted, marginTop: '6px', borderLeft: `2px solid ${COLOR.primary}`, paddingLeft: '8px' }}>
               {activeTerm.detail}
             </div>
           )}
@@ -1400,7 +1437,7 @@ function LessonDetail({ lesson, flashcardsData, questionsData, onBack, onQuiz, s
       {lesson.scenario && (
         <div style={{ marginBottom: '16px' }}>
           <div style={{ fontSize: '13px', fontWeight: 600, color: COLOR.gold, marginBottom: '8px' }}>Worked scenario</div>
-          <div style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderLeft: `3px solid ${COLOR.teal}`, borderRadius: '10px', padding: '12px 14px' }}>
+          <div style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderLeft: `3px solid ${COLOR.primary}`, borderRadius: '10px', padding: '12px 14px' }}>
             <p style={{ fontSize: '14px', lineHeight: 1.65, color: COLOR.text }}>{lesson.scenario}</p>
           </div>
         </div>
@@ -1424,7 +1461,7 @@ function LessonDetail({ lesson, flashcardsData, questionsData, onBack, onQuiz, s
 
       <button
         onClick={() => setShowFundamentals((s) => !s)}
-        style={{ width: '100%', textAlign: 'left', background: COLOR.surfaceRaised, border: `1px solid ${COLOR.border}`, borderRadius: '12px', padding: '12px', marginBottom: showFundamentals ? '0' : '16px', fontSize: '12px', color: COLOR.teal, fontWeight: 600 }}
+        style={{ width: '100%', textAlign: 'left', background: COLOR.surfaceRaised, border: `1px solid ${COLOR.border}`, borderRadius: '12px', padding: '12px', marginBottom: showFundamentals ? '0' : '16px', fontSize: '12px', color: COLOR.primary, fontWeight: 600 }}
       >
         {showFundamentals ? '▾ ' : '▸ '}{lesson.fundamentalsLabel}
       </button>
@@ -1450,7 +1487,7 @@ function LessonDetail({ lesson, flashcardsData, questionsData, onBack, onQuiz, s
 
       <button
         onClick={() => onQuiz(lesson.quizIds)}
-        style={{ width: '100%', padding: '13px', borderRadius: '12px', background: COLOR.teal, color: '#2B1620', fontSize: '14px', fontWeight: 600 }}
+        style={{ width: '100%', padding: '13px', borderRadius: '12px', background: COLOR.primary, color: '#2B1620', fontSize: '14px', fontWeight: 600 }}
       >
         Take the {lesson.quizIds.length}-question quiz
       </button>
@@ -1482,12 +1519,12 @@ function CourseView({ lessons, flashcardsData, questionsData, onQuiz, speakingId
       <div style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderRadius: '14px', padding: '14px 16px', marginBottom: '14px' }}>
         <div className="flex justify-between items-center" style={{ marginBottom: '8px' }}>
           <div style={{ fontSize: '12px', color: COLOR.muted }}>Course progress</div>
-          <div style={{ fontSize: '12px', fontWeight: 600, color: masteredCount === lessons.length ? COLOR.teal : COLOR.text }}>
+          <div style={{ fontSize: '12px', fontWeight: 600, color: masteredCount === lessons.length ? COLOR.success : COLOR.text }}>
             {masteredCount} of {lessons.length} lessons strong
           </div>
         </div>
         <div style={{ height: '6px', borderRadius: '3px', background: COLOR.surfaceRaised, overflow: 'hidden' }}>
-          <div style={{ height: '100%', width: `${Math.round(avgMastery * 100)}%`, background: COLOR.teal, borderRadius: '3px' }} />
+          <div style={{ height: '100%', width: `${Math.round(avgMastery * 100)}%`, background: COLOR.success, borderRadius: '3px' }} />
         </div>
       </div>
       {lessons.map((l) => (
@@ -1513,7 +1550,7 @@ function QuizSetup({ length, setLength, types, toggleType, onReroll, poolSize, m
         <div style={{ fontSize: '11px', color: COLOR.muted }}>{poolSize} questions match this filter</div>
         <button
           onClick={onReroll}
-          style={{ fontSize: '11px', color: COLOR.teal, background: 'transparent', padding: '4px 8px', borderRadius: '8px', border: `1px solid ${COLOR.teal}` }}
+          style={{ fontSize: '11px', color: COLOR.primary, background: 'transparent', padding: '4px 8px', borderRadius: '8px', border: `1px solid ${COLOR.primary}` }}
         >
           New quiz
         </button>
@@ -1525,9 +1562,9 @@ function QuizSetup({ length, setLength, types, toggleType, onReroll, poolSize, m
             onClick={() => setLength(n)}
             style={{
               flexShrink: 0, padding: '6px 12px', borderRadius: '999px', fontSize: '12px', fontWeight: 500,
-              border: `1px solid ${length === n ? COLOR.teal : COLOR.border}`,
-              background: length === n ? 'rgba(201,123,148,0.14)' : COLOR.surface,
-              color: length === n ? COLOR.teal : COLOR.muted,
+              border: `1px solid ${length === n ? COLOR.primary : COLOR.border}`,
+              background: length === n ? 'rgba(167,139,250,0.14)' : COLOR.surface,
+              color: length === n ? COLOR.primary : COLOR.muted,
             }}
           >
             {n} questions
@@ -1575,7 +1612,7 @@ function QuestionView({ q, selected, onChoose, onNext, index, total, categoryLab
               const isSelected = i === selected;
               let bg = COLOR.surfaceRaised, border = COLOR.border, color = COLOR.text;
               if (selected !== null) {
-                if (isCorrect) { bg = 'rgba(201,123,148,0.15)'; border = COLOR.teal; color = COLOR.teal; }
+                if (isCorrect) { bg = 'rgba(52,211,153,0.15)'; border = COLOR.success; color = COLOR.success; }
                 else if (isSelected) { bg = 'rgba(181,87,74,0.15)'; border = COLOR.red; color = COLOR.red; }
               }
               return (
@@ -1606,7 +1643,7 @@ function QuestionView({ q, selected, onChoose, onNext, index, total, categoryLab
               const isSelected = i === selected;
               let bg = COLOR.surfaceRaised, border = COLOR.border, color = COLOR.text;
               if (selected !== null) {
-                if (isRight) { bg = 'rgba(201,123,148,0.15)'; border = COLOR.teal; color = COLOR.teal; }
+                if (isRight) { bg = 'rgba(52,211,153,0.15)'; border = COLOR.success; color = COLOR.success; }
                 else if (isSelected) { bg = 'rgba(181,87,74,0.15)'; border = COLOR.red; color = COLOR.red; }
               }
               return (
@@ -1633,11 +1670,11 @@ function QuestionView({ q, selected, onChoose, onNext, index, total, categoryLab
                 const wasSelected = selected !== null ? selected.includes(i) : msPending.includes(i);
                 let bg = COLOR.surfaceRaised, border = COLOR.border, color = COLOR.text;
                 if (selected !== null) {
-                  if (isCorrectOpt && wasSelected) { bg = 'rgba(201,123,148,0.15)'; border = COLOR.teal; color = COLOR.teal; }
-                  else if (isCorrectOpt && !wasSelected) { border = COLOR.teal; color = COLOR.teal; }
+                  if (isCorrectOpt && wasSelected) { bg = 'rgba(52,211,153,0.15)'; border = COLOR.success; color = COLOR.success; }
+                  else if (isCorrectOpt && !wasSelected) { border = COLOR.success; color = COLOR.success; }
                   else if (!isCorrectOpt && wasSelected) { bg = 'rgba(181,87,74,0.15)'; border = COLOR.red; color = COLOR.red; }
                 } else if (wasSelected) {
-                  bg = 'rgba(201,123,148,0.10)'; border = COLOR.teal; color = COLOR.teal;
+                  bg = 'rgba(167,139,250,0.10)'; border = COLOR.primary; color = COLOR.primary;
                 }
                 return (
                   <button
@@ -1664,7 +1701,7 @@ function QuestionView({ q, selected, onChoose, onNext, index, total, categoryLab
               <button
                 onClick={onSubmitMs}
                 disabled={msPending.length === 0}
-                style={{ width: '100%', marginTop: '10px', padding: '11px', borderRadius: '12px', background: msPending.length ? COLOR.teal : COLOR.surfaceRaised, color: msPending.length ? '#2B1620' : COLOR.muted, fontSize: '14px', fontWeight: 600 }}
+                style={{ width: '100%', marginTop: '10px', padding: '11px', borderRadius: '12px', background: msPending.length ? COLOR.primary : COLOR.surfaceRaised, color: msPending.length ? '#2B1620' : COLOR.muted, fontSize: '14px', fontWeight: 600 }}
               >
                 Submit answer
               </button>
@@ -1682,7 +1719,7 @@ function QuestionView({ q, selected, onChoose, onNext, index, total, categoryLab
       {selected !== null && (
         <button
           onClick={onNext}
-          style={{ width: '100%', marginTop: '12px', padding: '12px', borderRadius: '12px', background: COLOR.teal, color: '#2B1620', fontSize: '14px', fontWeight: 600 }}
+          style={{ width: '100%', marginTop: '12px', padding: '12px', borderRadius: '12px', background: COLOR.primary, color: '#2B1620', fontSize: '14px', fontWeight: 600 }}
         >
           {nextLabel || (isLast ? 'See results' : 'Next question')}
         </button>
@@ -1696,7 +1733,7 @@ function QuizSummary({ score, answers, categories, onRestart }) {
   return (
     <div>
       <div style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderRadius: '18px', padding: '24px', textAlign: 'center' }}>
-        <div className="itil-display" style={{ fontSize: '28px', fontWeight: 600, color: COLOR.teal }}>{score.correct} / {score.total}</div>
+        <div className="itil-display" style={{ fontSize: '28px', fontWeight: 600, color: COLOR.success }}>{score.correct} / {score.total}</div>
         <div style={{ fontSize: '13px', color: COLOR.muted, marginTop: '4px' }}>correct this round</div>
       </div>
       {missed.length > 0 && (
@@ -1714,7 +1751,7 @@ function QuizSummary({ score, answers, categories, onRestart }) {
       )}
       <button
         onClick={onRestart}
-        style={{ width: '100%', marginTop: '16px', padding: '12px', borderRadius: '12px', background: COLOR.teal, color: '#2B1620', fontSize: '14px', fontWeight: 600 }}
+        style={{ width: '100%', marginTop: '16px', padding: '12px', borderRadius: '12px', background: COLOR.primary, color: '#2B1620', fontSize: '14px', fontWeight: 600 }}
       >
         New quiz
       </button>
@@ -1760,9 +1797,9 @@ function ExamQuestionView({ q, selectedIdx, onSelect }) {
                 onClick={() => onSelect(i)}
                 style={{
                   textAlign: 'left', padding: '12px 14px', borderRadius: '12px',
-                  border: `1px solid ${isSelected ? COLOR.teal : COLOR.border}`,
-                  background: isSelected ? 'rgba(201,123,148,0.14)' : COLOR.surfaceRaised,
-                  color: isSelected ? COLOR.teal : COLOR.text, fontSize: '14px', lineHeight: 1.4,
+                  border: `1px solid ${isSelected ? COLOR.primary : COLOR.border}`,
+                  background: isSelected ? 'rgba(167,139,250,0.14)' : COLOR.surfaceRaised,
+                  color: isSelected ? COLOR.primary : COLOR.text, fontSize: '14px', lineHeight: 1.4,
                 }}
               >
                 {opt}
@@ -1782,9 +1819,9 @@ function ExamQuestionView({ q, selectedIdx, onSelect }) {
                 className="flex-1"
                 style={{
                   padding: '16px', borderRadius: '12px',
-                  border: `1px solid ${isSelected ? COLOR.teal : COLOR.border}`,
-                  background: isSelected ? 'rgba(201,123,148,0.14)' : COLOR.surfaceRaised,
-                  color: isSelected ? COLOR.teal : COLOR.text, fontSize: '15px', fontWeight: 600,
+                  border: `1px solid ${isSelected ? COLOR.primary : COLOR.border}`,
+                  background: isSelected ? 'rgba(167,139,250,0.14)' : COLOR.surfaceRaised,
+                  color: isSelected ? COLOR.primary : COLOR.text, fontSize: '15px', fontWeight: 600,
                 }}
               >
                 {label}
@@ -1806,9 +1843,9 @@ function ExamQuestionView({ q, selectedIdx, onSelect }) {
                   onClick={() => onSelect(i)}
                   style={{
                     textAlign: 'left', padding: '12px 14px', borderRadius: '12px',
-                    border: `1px solid ${isSelected ? COLOR.teal : COLOR.border}`,
-                    background: isSelected ? 'rgba(201,123,148,0.14)' : COLOR.surfaceRaised,
-                    color: isSelected ? COLOR.teal : COLOR.text, fontSize: '14px', lineHeight: 1.4,
+                    border: `1px solid ${isSelected ? COLOR.primary : COLOR.border}`,
+                    background: isSelected ? 'rgba(167,139,250,0.14)' : COLOR.surfaceRaised,
+                    color: isSelected ? COLOR.primary : COLOR.text, fontSize: '14px', lineHeight: 1.4,
                     display: 'flex', alignItems: 'center', justifyContent: 'space-between',
                   }}
                 >
@@ -1832,14 +1869,14 @@ function ExamResults({ result, config, track, categories, onRestart }) {
   return (
     <div>
       <div style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderRadius: '18px', padding: '26px', textAlign: 'center' }}>
-        <div className="itil-display" style={{ fontSize: '30px', fontWeight: 600, color: onTarget ? COLOR.teal : COLOR.red }}>{result.correct} / {result.total}</div>
+        <div className="itil-display" style={{ fontSize: '30px', fontWeight: 600, color: onTarget ? COLOR.success : COLOR.red }}>{result.correct} / {result.total}</div>
         <div style={{ fontSize: '13px', color: COLOR.muted, marginTop: '4px' }}>{pct}% correct</div>
         {isItil ? (
-          <div style={{ marginTop: '10px', fontSize: '15px', fontWeight: 700, color: onTarget ? COLOR.teal : COLOR.red }}>
+          <div style={{ marginTop: '10px', fontSize: '15px', fontWeight: 700, color: onTarget ? COLOR.success : COLOR.red }}>
             {onTarget ? 'PASS' : 'Below the pass mark'}
           </div>
         ) : (
-          <div style={{ marginTop: '10px', fontSize: '13px', fontWeight: 600, color: onTarget ? COLOR.teal : COLOR.gold }}>
+          <div style={{ marginTop: '10px', fontSize: '13px', fontWeight: 600, color: onTarget ? COLOR.success : COLOR.gold }}>
             {onTarget ? 'On track, comfortably above the buffer' : 'Below the safety buffer'}
           </div>
         )}
@@ -1862,7 +1899,7 @@ function ExamResults({ result, config, track, categories, onRestart }) {
       )}
       <button
         onClick={onRestart}
-        style={{ width: '100%', marginTop: '16px', padding: '12px', borderRadius: '12px', background: COLOR.teal, color: '#2B1620', fontSize: '14px', fontWeight: 600 }}
+        style={{ width: '100%', marginTop: '16px', padding: '12px', borderRadius: '12px', background: COLOR.primary, color: '#2B1620', fontSize: '14px', fontWeight: 600 }}
       >
         Take another exam
       </button>
@@ -2346,71 +2383,65 @@ function CertStudyApp() {
       )}
       <div className="max-w-md mx-auto px-4 py-5">
         <div className="flex justify-between items-start mb-4">
-          <div>
-            <div className="itil-display" style={{ fontSize: '22px', fontWeight: 600, lineHeight: 1.1 }}>{track.label}</div>
+          <div style={{ flex: 1, minWidth: 0, position: 'relative', paddingRight: '10px' }}>
+            {visibleTracks.length > 1 ? (
+              <select
+                value={activeTrack}
+                onChange={(e) => setActiveTrack(e.target.value)}
+                className="itil-display"
+                style={{
+                  display: 'block', width: '100%', fontSize: '21px', fontWeight: 600, lineHeight: 1.2,
+                  color: trackAccent(activeTrack), background: 'transparent', border: 'none', padding: 0,
+                  WebkitAppearance: 'none', MozAppearance: 'none', appearance: 'none',
+                }}
+              >
+                {visibleTracks.map((t) => (
+                  <option key={t.key} value={t.key} style={{ background: COLOR.surface, color: COLOR.text }}>
+                    {t.label}
+                  </option>
+                ))}
+              </select>
+            ) : null}
+            {visibleTracks.length > 1 && (
+              <span style={{ position: 'absolute', top: '3px', right: '-4px', fontSize: '12px', color: trackAccent(activeTrack), pointerEvents: 'none' }}>▾</span>
+            )}
+            {visibleTracks.length <= 1 && (
+              <div className="itil-display" style={{ fontSize: '21px', fontWeight: 600, lineHeight: 1.2 }}>{track.label}</div>
+            )}
             <div style={{ fontSize: '12px', color: COLOR.muted, marginTop: '2px' }}>{track.subtitle}</div>
           </div>
-          <div className="flex items-start gap-2">
-            <div style={{ textAlign: 'right' }}>
-              <div style={{ fontSize: '20px', fontWeight: 700, color: COLOR.teal }}>{overallMastery}%</div>
-              <div style={{ fontSize: '10px', color: COLOR.muted }}>mastered</div>
+          <div className="flex items-start gap-1" style={{ flexShrink: 0 }}>
+            <div style={{ textAlign: 'right', marginRight: '2px' }}>
+              <div style={{ fontSize: '18px', fontWeight: 700, color: COLOR.success }}>{overallMastery}%</div>
             </div>
+            {PATHS.length > 0 && (
+              <button
+                onClick={() => setShowPaths(true)}
+                title="Recommended study path"
+                style={{ padding: '6px 8px', borderRadius: '8px', border: `1px solid ${COLOR.border}`, background: 'transparent', color: COLOR.primary, fontSize: '13px' }}
+              >
+                🗺️
+              </button>
+            )}
             <button
               onClick={() => setShowAchievements(true)}
               title="Achievements"
-              style={{ padding: '6px 10px', borderRadius: '8px', border: `1px solid ${COLOR.gold}`, background: 'transparent', color: COLOR.gold, fontSize: '11px' }}
+              style={{ padding: '6px 8px', borderRadius: '8px', border: `1px solid ${COLOR.gold}`, background: 'transparent', color: COLOR.gold, fontSize: '11px', fontWeight: 600 }}
             >
               🏆 {stats.unlocked.length}
             </button>
             <button
               onClick={() => setConfirmReset(true)}
-              style={{ padding: '6px 10px', borderRadius: '8px', border: `1px solid ${COLOR.border}`, background: 'transparent', color: COLOR.muted, fontSize: '11px' }}
+              title="Reset progress"
+              style={{ padding: '6px 8px', borderRadius: '8px', border: `1px solid ${COLOR.border}`, background: 'transparent', color: COLOR.muted, fontSize: '13px' }}
             >
-              Reset
+              ⟲
             </button>
           </div>
         </div>
 
-        {visibleTracks.length > 1 && (
-          <div className="mb-4" style={{ position: 'relative' }}>
-            <select
-              value={activeTrack}
-              onChange={(e) => setActiveTrack(e.target.value)}
-              style={{
-                width: '100%', padding: '12px 36px 12px 14px', borderRadius: '12px', fontSize: '13.5px', fontWeight: 600,
-                border: `1px solid ${COLOR.gold}`, background: COLOR.surface, color: COLOR.gold,
-                boxShadow: SHADOW.card, WebkitAppearance: 'none', MozAppearance: 'none', appearance: 'none',
-              }}
-            >
-              {visibleTracks.map((t) => (
-                <option key={t.key} value={t.key} style={{ background: COLOR.surface, color: COLOR.text }}>
-                  {t.label} — {t.subtitle}
-                </option>
-              ))}
-            </select>
-            <div
-              style={{
-                position: 'absolute', top: '50%', right: '14px', transform: 'translateY(-50%)',
-                pointerEvents: 'none', color: COLOR.gold, fontSize: '11px',
-              }}
-            >
-              ▾
-            </div>
-          </div>
-        )}
-
-        {PATHS.length > 0 && (
-          <button
-            onClick={() => setShowPaths(true)}
-            className="btn-flat"
-            style={{ display: 'block', width: '100%', textAlign: 'left', padding: '0', marginBottom: '14px', color: COLOR.teal, fontSize: '11.5px', fontWeight: 600 }}
-          >
-            🗺️ Recommended study path
-          </button>
-        )}
-
         {syncMode === 'local' && (
-          <div style={{ fontSize: '11px', color: COLOR.muted, marginBottom: '14px' }}>
+          <div style={{ fontSize: '10.5px', color: COLOR.muted, marginBottom: '12px' }}>
             Saving progress to this browser. Open from your Claude account to sync across devices.
           </div>
         )}
@@ -2429,14 +2460,14 @@ function CertStudyApp() {
           <button
             onClick={() => setMode('learn')}
             className="flex-1"
-            style={{ padding: '8px 2px', borderRadius: '9px', fontSize: '11px', fontWeight: 600, background: mode === 'learn' ? COLOR.teal : 'transparent', color: mode === 'learn' ? '#2B1620' : COLOR.muted }}
+            style={{ padding: '8px 2px', borderRadius: '9px', fontSize: '11px', fontWeight: 600, background: mode === 'learn' ? COLOR.primary : 'transparent', color: mode === 'learn' ? '#2B1620' : COLOR.muted }}
           >
             Learn
           </button>
           <button
             onClick={() => setMode('quiz')}
             className="flex-1"
-            style={{ padding: '8px 2px', borderRadius: '9px', fontSize: '11px', fontWeight: 600, background: mode === 'quiz' ? COLOR.teal : 'transparent', color: mode === 'quiz' ? '#2B1620' : COLOR.muted }}
+            style={{ padding: '8px 2px', borderRadius: '9px', fontSize: '11px', fontWeight: 600, background: mode === 'quiz' ? COLOR.primary : 'transparent', color: mode === 'quiz' ? '#2B1620' : COLOR.muted }}
           >
             Quiz
           </button>
@@ -2600,7 +2631,7 @@ function CertStudyApp() {
                   <button
                     onClick={() => setExamIndex((i) => i + 1)}
                     className="flex-1"
-                    style={{ padding: '12px', borderRadius: '12px', background: COLOR.teal, color: '#2B1620', fontSize: '14px', fontWeight: 600 }}
+                    style={{ padding: '12px', borderRadius: '12px', background: COLOR.primary, color: '#2B1620', fontSize: '14px', fontWeight: 600 }}
                   >
                     Next
                   </button>
@@ -2651,7 +2682,7 @@ function CertStudyApp() {
                   style={{
                     position: 'absolute', inset: 0,
                     width: `${Math.round((masteryByCategory[c.key] || 0) * 100)}%`,
-                    background: (masteryByCategory[c.key] || 0) > 0.7 ? COLOR.teal : COLOR.gold,
+                    background: (masteryByCategory[c.key] || 0) > 0.7 ? COLOR.success : COLOR.gold,
                   }}
                 />
               </div>

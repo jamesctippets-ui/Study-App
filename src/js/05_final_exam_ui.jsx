@@ -35,9 +35,9 @@ function ExamQuestionView({ q, selectedIdx, onSelect }) {
                 onClick={() => onSelect(i)}
                 style={{
                   textAlign: 'left', padding: '12px 14px', borderRadius: '12px',
-                  border: `1px solid ${isSelected ? COLOR.teal : COLOR.border}`,
-                  background: isSelected ? 'rgba(201,123,148,0.14)' : COLOR.surfaceRaised,
-                  color: isSelected ? COLOR.teal : COLOR.text, fontSize: '14px', lineHeight: 1.4,
+                  border: `1px solid ${isSelected ? COLOR.primary : COLOR.border}`,
+                  background: isSelected ? 'rgba(167,139,250,0.14)' : COLOR.surfaceRaised,
+                  color: isSelected ? COLOR.primary : COLOR.text, fontSize: '14px', lineHeight: 1.4,
                 }}
               >
                 {opt}
@@ -57,9 +57,9 @@ function ExamQuestionView({ q, selectedIdx, onSelect }) {
                 className="flex-1"
                 style={{
                   padding: '16px', borderRadius: '12px',
-                  border: `1px solid ${isSelected ? COLOR.teal : COLOR.border}`,
-                  background: isSelected ? 'rgba(201,123,148,0.14)' : COLOR.surfaceRaised,
-                  color: isSelected ? COLOR.teal : COLOR.text, fontSize: '15px', fontWeight: 600,
+                  border: `1px solid ${isSelected ? COLOR.primary : COLOR.border}`,
+                  background: isSelected ? 'rgba(167,139,250,0.14)' : COLOR.surfaceRaised,
+                  color: isSelected ? COLOR.primary : COLOR.text, fontSize: '15px', fontWeight: 600,
                 }}
               >
                 {label}
@@ -81,9 +81,9 @@ function ExamQuestionView({ q, selectedIdx, onSelect }) {
                   onClick={() => onSelect(i)}
                   style={{
                     textAlign: 'left', padding: '12px 14px', borderRadius: '12px',
-                    border: `1px solid ${isSelected ? COLOR.teal : COLOR.border}`,
-                    background: isSelected ? 'rgba(201,123,148,0.14)' : COLOR.surfaceRaised,
-                    color: isSelected ? COLOR.teal : COLOR.text, fontSize: '14px', lineHeight: 1.4,
+                    border: `1px solid ${isSelected ? COLOR.primary : COLOR.border}`,
+                    background: isSelected ? 'rgba(167,139,250,0.14)' : COLOR.surfaceRaised,
+                    color: isSelected ? COLOR.primary : COLOR.text, fontSize: '14px', lineHeight: 1.4,
                     display: 'flex', alignItems: 'center', justifyContent: 'space-between',
                   }}
                 >
@@ -107,14 +107,14 @@ function ExamResults({ result, config, track, categories, onRestart }) {
   return (
     <div>
       <div style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderRadius: '18px', padding: '26px', textAlign: 'center' }}>
-        <div className="itil-display" style={{ fontSize: '30px', fontWeight: 600, color: onTarget ? COLOR.teal : COLOR.red }}>{result.correct} / {result.total}</div>
+        <div className="itil-display" style={{ fontSize: '30px', fontWeight: 600, color: onTarget ? COLOR.success : COLOR.red }}>{result.correct} / {result.total}</div>
         <div style={{ fontSize: '13px', color: COLOR.muted, marginTop: '4px' }}>{pct}% correct</div>
         {isItil ? (
-          <div style={{ marginTop: '10px', fontSize: '15px', fontWeight: 700, color: onTarget ? COLOR.teal : COLOR.red }}>
+          <div style={{ marginTop: '10px', fontSize: '15px', fontWeight: 700, color: onTarget ? COLOR.success : COLOR.red }}>
             {onTarget ? 'PASS' : 'Below the pass mark'}
           </div>
         ) : (
-          <div style={{ marginTop: '10px', fontSize: '13px', fontWeight: 600, color: onTarget ? COLOR.teal : COLOR.gold }}>
+          <div style={{ marginTop: '10px', fontSize: '13px', fontWeight: 600, color: onTarget ? COLOR.success : COLOR.gold }}>
             {onTarget ? 'On track, comfortably above the buffer' : 'Below the safety buffer'}
           </div>
         )}
@@ -137,7 +137,7 @@ function ExamResults({ result, config, track, categories, onRestart }) {
       )}
       <button
         onClick={onRestart}
-        style={{ width: '100%', marginTop: '16px', padding: '12px', borderRadius: '12px', background: COLOR.teal, color: '#2B1620', fontSize: '14px', fontWeight: 600 }}
+        style={{ width: '100%', marginTop: '16px', padding: '12px', borderRadius: '12px', background: COLOR.primary, color: '#2B1620', fontSize: '14px', fontWeight: 600 }}
       >
         Take another exam
       </button>
