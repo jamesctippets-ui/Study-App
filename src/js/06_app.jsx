@@ -508,7 +508,11 @@ function CertStudyApp() {
               <button
                 onClick={() => setShowPaths(true)}
                 title="Recommended study path"
-                style={{ padding: '6px 8px', borderRadius: '8px', border: `1px solid ${COLOR.border}`, background: 'transparent', color: COLOR.primary, fontSize: '13px' }}
+                style={{
+                  minWidth: '40px', minHeight: '40px', padding: '6px 10px', borderRadius: '10px',
+                  border: `1px solid ${COLOR.border}`, background: 'transparent', color: COLOR.primary, fontSize: '15px',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                }}
               >
                 🗺️
               </button>
@@ -516,14 +520,22 @@ function CertStudyApp() {
             <button
               onClick={() => setShowAchievements(true)}
               title="Achievements"
-              style={{ padding: '6px 8px', borderRadius: '8px', border: `1px solid ${COLOR.gold}`, background: 'transparent', color: COLOR.gold, fontSize: '11px', fontWeight: 600 }}
+              style={{
+                minWidth: '40px', minHeight: '40px', padding: '6px 10px', borderRadius: '10px',
+                border: `1px solid ${COLOR.gold}`, background: 'transparent', color: COLOR.gold, fontSize: '12px', fontWeight: 600,
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '3px',
+              }}
             >
               🏆 {stats.unlocked.length}
             </button>
             <button
               onClick={() => setConfirmReset(true)}
               title="Reset progress"
-              style={{ padding: '6px 8px', borderRadius: '8px', border: `1px solid ${COLOR.border}`, background: 'transparent', color: COLOR.muted, fontSize: '13px' }}
+              style={{
+                minWidth: '40px', minHeight: '40px', padding: '6px 10px', borderRadius: '10px',
+                border: `1px solid ${COLOR.border}`, background: 'transparent', color: COLOR.muted, fontSize: '15px',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+              }}
             >
               ⟲
             </button>
@@ -597,11 +609,19 @@ function CertStudyApp() {
         )}
 
         {(mode === 'quiz' || (mode === 'learn' && (learnView !== 'study' || !DATA[activeTrack].lessons))) && (
-          <div className="flex gap-2 mb-5" style={{ overflowX: 'auto', paddingBottom: '4px' }}>
-            <CategoryChip label="All" active={activeCat === 'all'} mastery={overallMastery / 100} onClick={() => setActiveCat('all')} />
-            {categories.map((c) => (
-              <CategoryChip key={c.key} label={c.label} active={activeCat === c.key} mastery={masteryByCategory[c.key]} onClick={() => setActiveCat(c.key)} />
-            ))}
+          <div className="mb-5" style={{ position: 'relative' }}>
+            <div className="flex gap-2" style={{ overflowX: 'auto', paddingBottom: '4px' }}>
+              <CategoryChip label="All" active={activeCat === 'all'} mastery={overallMastery / 100} onClick={() => setActiveCat('all')} />
+              {categories.map((c) => (
+                <CategoryChip key={c.key} label={c.label} active={activeCat === c.key} mastery={masteryByCategory[c.key]} onClick={() => setActiveCat(c.key)} />
+              ))}
+            </div>
+            <div
+              style={{
+                position: 'absolute', top: 0, right: 0, bottom: '4px', width: '28px', pointerEvents: 'none',
+                background: `linear-gradient(to right, transparent, ${COLOR.bg})`,
+              }}
+            />
           </div>
         )}
 
