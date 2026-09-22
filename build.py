@@ -143,11 +143,10 @@ def validate():
             if not q.get("explanation", "").strip():
                 errors.append(f"[{key}] question '{qid}' is missing an explanation")
 
-        # TODO: once every track has a CHEAT_SHEET, make this a hard
-        # requirement like EXAM_CONFIG's `resources` above (13 of 15 tracks
-        # are still getting theirs written — see ROADMAP.md item 5).
         cheat_sheet = getattr(mod, "CHEAT_SHEET", [])
-        if cheat_sheet:
+        if not cheat_sheet:
+            errors.append(f"[{key}] is missing a CHEAT_SHEET")
+        else:
             seen_headings = set()
             for section in cheat_sheet:
                 heading = section.get("heading", "").strip()

@@ -1036,3 +1036,70 @@ QUESTIONS = [
         'explanation': "The Remote Desktop web client provides browser-based access with no app installed, and Teams media optimization offloads audio and video processing to the local client device. Teams media optimization has no dependency on MSIX app attach, and Microsoft provides Remote Desktop clients for macOS, iOS, and Android in addition to Windows, not just Windows.",
     },
 ]
+
+CHEAT_SHEET = [
+    {
+        'heading': 'Host pool types: personal vs. pooled',
+        'points': [
+            'Personal host pool = 1:1 static user-to-VM assignment (assigned or automatic); user state persists on that same VM between sessions.',
+            "Pooled host pool = many users share a pool of session hosts; pair it with FSLogix so a user's profile and settings roam regardless of which host they land on.",
+            'Pooled load balancing: Breadth-first spreads new sessions across all available hosts first; Depth-first fills one host to its max session limit before moving to the next.',
+            'Validation environment host pools receive AVD service updates first — use them to test changes before rolling out to production pools.',
+            'Direct assignment (personal) means manually assigning a user to a specific VM; automatic assignment lets AVD assign the first user who connects.',
+        ],
+    },
+    {
+        'heading': 'FSLogix profile containers',
+        'points': [
+            'Profile Container redirects the entire user profile into a VHD/VHDX on file storage (Azure Files or Azure NetApp Files, typically) so it roams between session hosts.',
+            "Office Container isolates just the Outlook/OneDrive cache data — used when you don't want the full profile roamed, or alongside Profile Container for large mailbox caches.",
+            'Concurrent multi-user pooled scenarios need storage with enough IOPS — Azure Files Premium or Azure NetApp Files are common choices over a Standard file share.',
+            "Only one user session can mount a given VHD(X) at a time — a locked profile from a crashed or disconnected session is the classic 'stuck on temp profile' troubleshooting scenario.",
+            "Cloud Cache is FSLogix's option for replicating profile data across multiple storage locations for redundancy or multi-region scenarios.",
+        ],
+    },
+    {
+        'heading': 'Session host sizing & scaling',
+        'points': [
+            'Native autoscale on a host pool can start/stop or scale hosts in/out on a schedule — it superseded the older, separate scaling-plan preview tooling.',
+            'Personal host pools can only start/stop existing VMs on autoscale; they cannot scale out new VMs or deallocate-and-remove the way pooled pools can.',
+            'Sizing is driven by user profile — light/medium/heavy workers need progressively more vCPU/RAM per user, which lowers users-per-host density as workload gets heavier.',
+            'An autoscale schedule has four phases — ramp-up, peak, ramp-down, off-peak — each with its own load-balancing algorithm and capacity thresholds.',
+        ],
+    },
+    {
+        'heading': 'Networking (RDP Shortpath & Multipath)',
+        'points': [
+            'RDP Shortpath opens a direct UDP transport between client and session host, bypassing the TCP-based reverse connect path for lower latency.',
+            'Shortpath for managed networks needs a direct/private path (VPN or ExpressRoute) between client and host; Shortpath for public networks works over the open internet.',
+            "If a direct path can't be established, AVD automatically falls back to the standard reverse connect transport over TCP 443 — the session still connects, just less optimally.",
+            'RDP Multipath/multi-transport is about session resilience — automatically reconnecting after a brief network blip — not raw throughput.',
+        ],
+    },
+    {
+        'heading': 'Identity & security for AVD',
+        'points': [
+            'AVD supports pure Microsoft Entra ID-joined session hosts as well as hybrid Entra-joined (Entra ID + on-prem AD) hosts — pure Entra ID-join removes the need for domain-controller line of sight for many scenarios.',
+            'Entra ID-joined session hosts run Windows 10/11 Enterprise multi-session or single-session and support single sign-on so users are not prompted twice.',
+            'Conditional Access applies to AVD like any other app — enforce MFA or a compliant-device requirement against the Azure Virtual Desktop cloud app.',
+            "RBAC roles like Desktop Virtualization User (assign to end users) and Desktop Virtualization Contributor (assign to admins) control who can use vs. manage a host pool — don't confuse resource-level Azure RBAC with in-session app permissions.",
+        ],
+    },
+    {
+        'heading': 'Monitoring (Azure Monitor for AVD / Insights)',
+        'points': [
+            'Azure Monitor for AVD (AVD Insights) combines host pool health, session host performance counters, and user connection diagnostics in one dashboard.',
+            "Diagnostics data lands in a Log Analytics workspace — you must enable and configure Insights, it doesn't capture detailed data by default.",
+            'Connection diagnostics trace a specific failed or slow connection through each stage: client, gateway, broker, session host.',
+        ],
+    },
+    {
+        'heading': 'Exam-day reminders',
+        'points': [
+            'AZ-140 is a Specialty-level certification and, like other Microsoft role-based/specialty certs, requires annual renewal via a free online assessment.',
+            "'Each user needs their own persistent desktop with locally customized apps' points to a personal host pool; 'many users share stateless desktops' points to pooled + FSLogix.",
+            "'Lowest latency over the managed corporate network' points to Shortpath for managed networks; 'connecting over the internet without a VPN' points to Shortpath for public networks or the reverse connect fallback.",
+            "Don't confuse MSIX app attach (dynamically attaching a virtualized app at sign-in without installing it on the image) with an app fully installed in the golden image.",
+        ],
+    },
+]

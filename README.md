@@ -16,7 +16,9 @@ topic: reading with tappable key terms, an SVG diagram, a portal mockup, a
 worked scenario, common exam traps, and a 3–4 question quiz), and Match (a
 term-matching game — tap a term chip, then its definition; respects the
 current category filter, tracks mistakes, and deals a fresh random round
-each time). A lesson's reading is itself split
+each time), and Sheet (a one-page, printable cheat sheet per track — every
+track's must-know facts condensed into a few dense sections, with a
+Print/save-as-PDF button). A lesson's reading is itself split
 into pages when it runs long — moving past the first page takes either a
 one-question quick check or a 3-pair mini match round, alternating between
 the two, so the material isn't just a wall of text to skim past. Quiz is a

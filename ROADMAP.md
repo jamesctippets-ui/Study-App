@@ -62,15 +62,14 @@ come up.
   lessons still lack a diagram, 4 lack a portal mockup — see README).
 - [ ] Add course/diagram content to ITIL and Cloud+, which currently have
   none at all.
-- [~] A one-page **cheat sheet** per track — the single highest-praised
+- [x] A one-page **cheat sheet** per track — the single highest-praised
   feature from the platforms surveyed (Tutorials Dojo) — a printable/
   shareable visual summary of the exam's must-know facts, not just prose.
   Shipped: schema (`CHEAT_SHEET` in data/&lt;track&gt;.py), the "Sheet" tab under
-  Learn (`CheatSheetView` in 04_shared_ui.jsx), and print-to-PDF styling
-  (`@media print` in templates/index.html.tmpl). Content: az900 and itil are
-  done; the other 13 tracks are in progress — build.py's validator will make
-  CHEAT_SHEET a hard requirement (matching EXAM_CONFIG's `resources`) once
-  all 15 are filled in.
+  Learn (`CheatSheetView` in 04_shared_ui.jsx), print-to-PDF styling
+  (`@media print` in templates/index.html.tmpl), and real content for all 15
+  tracks. build.py's validator now hard-requires every track to have one,
+  matching EXAM_CONFIG's `resources`.
 
 ## 6. A more robust UI: menus and separate pages (user's idea)
 

@@ -1271,3 +1271,75 @@ QUESTIONS = [
         'explanation': "Governance rules assign ownership and an SLA/due date to a recommendation and can escalate or report on assignments that go overdue, driving remediation accountability across the organization. They do not themselves automatically fix the underlying issue -- an owner still has to remediate manually or through separate automation -- and they are not limited to any single resource type such as Key Vault.",
     },
 ]
+
+CHEAT_SHEET = [
+    {
+        'heading': 'Domain weights & exam framing',
+        'points': [
+            'Four domains: Identity/access/governance ~20-25%, Storage/databases/networking ~25-30%, Secure compute (incl. AI) ~20-25%, Security posture & monitoring ~20-25%.',
+            'SC-500 is the successor to AZ-500 but adds an entirely new AI-workload-security scope with no AZ-500 equivalent.',
+            'Microsoft scores this exam 0-1000 with 700 to pass, same convention as other Microsoft associate-level exams.',
+        ],
+    },
+    {
+        'heading': 'Identity, access & governance',
+        'points': [
+            'Microsoft Entra ID is the current name for the identity service formerly branded Azure Active Directory (Azure AD) — same tenant model and APIs.',
+            'Conditional Access decides IF access is allowed under given conditions; RBAC decides WHAT an already-authenticated principal can do.',
+            'Privileged Identity Management (PIM) grants just-in-time, time-bound elevation for privileged roles, not a standing/permanent assignment.',
+            "Entitlement management and access reviews are ongoing governance of who still needs access, not one-time provisioning steps.",
+        ],
+    },
+    {
+        'heading': 'Data security with Microsoft Purview',
+        'points': [
+            'Sensitivity labels classify and can cryptographically protect content; DLP policies act on labeled or pattern-matched content to block or warn on exfiltration.',
+            'DSPM (Data Security Posture Management) surfaces oversharing and data risk; DSPM for AI extends this specifically to Copilot and agent data interactions.',
+            'Insider Risk Management focuses on risky user behavior patterns — a different signal from DLP\'s content-based rules.',
+            'Priority cleanup and on-demand classification help reduce oversharing risk (e.g., stale or overexposed SharePoint content) before it reaches Copilot.',
+        ],
+    },
+    {
+        'heading': 'Defender for Cloud: CSPM vs. CWPP',
+        'points': [
+            'CSPM (posture management) = continuous assessment, Secure Score, and recommendations that find misconfigurations before they are exploited.',
+            'CWPP (workload protection) = the Defender plans (Defender for Servers, Storage, Containers, Key Vault, etc.) that detect active threats at runtime.',
+            "Governance rules assign an owner and an SLA to a recommendation but don't remediate anything automatically by themselves.",
+            'The regulatory compliance dashboard maps the same posture data to specific standards (e.g., NIST, ISO, PCI DSS).',
+        ],
+    },
+    {
+        'heading': 'Securing AI workloads (new, high-yield content)',
+        'points': [
+            'Microsoft Foundry (formerly Azure AI Foundry/Azure AI Studio) is where AI models and agents are hosted and orchestrated.',
+            'Microsoft Entra Agent ID gives AI agents their own governable identity, so agents can be covered by Conditional Access and PIM-style controls like any other identity.',
+            'Prompt Shields defend against both direct jailbreak prompts and indirect prompt injection hidden in third-party grounding content.',
+            'Defender for AI Service adds runtime threat detection for deployed AI workloads and agents, distinct from Foundry\'s own per-agent guardrails.',
+            'Purview DLP and Copilot Studio together govern what data a Copilot or agent can surface, not just what a user directly queries.',
+        ],
+    },
+    {
+        'heading': 'Network & infrastructure security',
+        'points': [
+            'NSGs/ASGs filter at layer 4; Azure Firewall and WAF add layer 7, application-aware filtering.',
+            'Private Link/Private Endpoint keeps PaaS traffic off the public internet without requiring a full VPN or ExpressRoute connection.',
+            'Azure Key Vault centralizes secrets, keys, and certificates — access should flow through RBAC, not shared/hardcoded secrets.',
+        ],
+    },
+    {
+        'heading': 'Security posture & monitoring',
+        'points': [
+            'Microsoft Sentinel is the SIEM/SOAR layer this exam expects you to integrate both posture and workload signals into.',
+            'Secure Score is a percentage of implemented recommendations — it is a posture indicator, not a pass/fail compliance certification.',
+            "Attack surface reduction rules and exploit protection are endpoint-level hardening controls, distinct from Defender for Cloud's resource-level posture checks.",
+        ],
+    },
+    {
+        'heading': 'Exam-day reminders',
+        'points': [
+            'A scenario about a misconfiguration found "before an attack" points to CSPM; one about an "active threat during an attack" points to CWPP.',
+            "Anything about governing the identity of an AI agent points to Entra Agent ID, not a generic service principal or managed identity.",
+            'When several controls technically work, pick the one requiring the least new infrastructure or the narrowest scope change.',
+        ],
+    },
+]

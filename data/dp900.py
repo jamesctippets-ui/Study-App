@@ -790,3 +790,69 @@ QUESTIONS = [
         'explanation': "Microsoft Fabric unifies OneLake as its single shared data lake, Power BI for reporting, and Data Factory-style pipelines for data integration, all in one SaaS platform. Windows Admin Center is an unrelated on-premises Windows Server management tool with no connection to Microsoft Fabric.",
     },
 ]
+
+CHEAT_SHEET = [
+    {
+        'heading': 'Relational vs. non-relational',
+        'points': [
+            "Relational = fixed schema, tables with rows/columns, relationships enforced by foreign keys, queried with SQL, strong for structured data and ACID transactions.",
+            "Non-relational (NoSQL) trades a fixed schema for flexibility and horizontal scale — it comes in four flavors: document, key-value, column-family, and graph.",
+            "Document store (JSON-like documents, e.g. Cosmos DB NoSQL/MongoDB APIs) vs. key-value (fast lookup by key, e.g. Table Storage/Redis) vs. column-family (wide, sparse columns, e.g. Cassandra API) vs. graph (nodes + edges for relationships, e.g. Gremlin API).",
+            "Normalization (splitting data across related tables to reduce redundancy) is a relational concept; NoSQL stores often intentionally denormalize for read speed.",
+        ],
+    },
+    {
+        'heading': 'OLTP vs. OLAP',
+        'points': [
+            "OLTP = many short, frequent read/write transactions (e.g. order entry) — normalized schema, optimized for speed and consistency.",
+            "OLAP = complex analytical queries over large historical volumes — typically denormalized into a star schema, optimized for aggregation and reporting.",
+            "Star schema = a central fact table (numeric measures) surrounded by dimension tables (descriptive attributes like date, product, customer).",
+            "Azure SQL Database is a classic OLTP engine; Azure Synapse Analytics dedicated SQL pools are built for OLAP-style analytics.",
+        ],
+    },
+    {
+        'heading': 'Core Azure relational services',
+        'points': [
+            "Azure SQL Database = fully managed PaaS, single/pooled databases, least management overhead, least SQL Server surface-area compatibility of the three.",
+            "Azure SQL Managed Instance = near-100% SQL Server engine compatibility with PaaS management — the middle ground for lift-and-shift with minimal code changes.",
+            "SQL Server on Azure VM = IaaS, full control and full compatibility, but you patch/manage the OS and SQL Server yourself.",
+            "Azure Database for PostgreSQL/MySQL = managed open-source relational engines for non-SQL Server workloads.",
+        ],
+    },
+    {
+        'heading': 'Core Azure non-relational & analytics services',
+        'points': [
+            "Cosmos DB = globally distributed, multi-model (via APIs), single-digit-millisecond latency, with five tunable consistency levels from Strong to Eventual.",
+            "Azure Data Lake Storage Gen2 = hierarchical namespace on top of Blob storage, built for large-scale big-data analytics, not a database engine itself.",
+            "Azure Synapse Analytics unifies data warehousing (dedicated SQL pools) and big-data processing (serverless SQL pools, Spark pools) in one service.",
+            "Azure Data Factory orchestrates ETL/ELT pipelines to move and transform data — it does not store data itself.",
+            "Azure Databricks = an Apache Spark-based analytics platform for big-data processing and machine learning, notebook-driven.",
+            "Microsoft Fabric unifies OneLake (one shared data lake), Power BI, and Data Factory-style pipelines into a single SaaS analytics platform.",
+        ],
+    },
+    {
+        'heading': 'Batch vs. streaming, and data shapes',
+        'points': [
+            "Batch processing = large volumes processed on a schedule (e.g. nightly ETL); streaming = near real-time processing as data arrives (e.g. Azure Stream Analytics, Event Hubs).",
+            "Structured data = strict tabular schema (rows/columns). Semi-structured = flexible but self-describing (JSON, XML). Unstructured = no inherent schema (images, video, free text).",
+            "A data warehouse stores curated, structured/modeled data for reporting; a data lake stores raw data of any shape at scale, structure applied later (schema-on-read).",
+        ],
+    },
+    {
+        'heading': 'Data professional roles',
+        'points': [
+            "Database Administrator (DBA) — designs, secures, monitors, and maintains database systems day to day.",
+            "Data Engineer — builds and manages the pipelines and infrastructure that move and transform data for analytics.",
+            "Data Analyst — explores data and builds reports/dashboards to drive business decisions, commonly using Power BI.",
+        ],
+    },
+    {
+        'heading': 'Exam-day reminders',
+        'points': [
+            "DP-900 is knowledge-level and vendor-neutral in spots — expect \"which service is best suited for X\" questions rather than deep hands-on configuration.",
+            "When a question mentions relationships between entities that matter as much as the entities themselves, that's pointing at a graph database, not a document store.",
+            "\"All access tiers share the same minimum retention period\" is a common false-answer trap — Cool/Cold/Archive carry longer minimum retention than Hot.",
+            "If the scenario says \"structure isn't known until read time,\" that's schema-on-read (data lake), not schema-on-write (relational database).",
+        ],
+    },
+]

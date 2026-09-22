@@ -1015,3 +1015,72 @@ QUESTIONS = [
         'explanation': "Zone-redundant configuration spreads a database's replicas across multiple availability zones within one region and is offered on the Business Critical and Premium tiers. It does not replace automated backups, which remain a separate, necessary protection, and it protects only against a zone-level failure, not a full regional outage on its own.",
     },
 ]
+
+CHEAT_SHEET = [
+    {
+        'heading': 'HADR options',
+        'points': [
+            "Zone-redundant configuration (Business Critical/Premium tiers) spreads replicas across Availability Zones in ONE region — protects against a zone failure, not a full regional outage.",
+            "Active geo-replication / auto-failover groups replicate a database to a different region; a failover group adds an app-transparent listener endpoint so connection strings don't need to change after failover.",
+            "Business Critical tier includes a built-in Always On-based availability group with extra secondary replicas, giving both high availability and free read-scale-out.",
+            "SQL Server on an Azure VM has no built-in PaaS HA — you configure and manage your own Always On Availability Groups or Failover Cluster Instance (FCI).",
+            "RTO (max acceptable downtime) and RPO (max acceptable data loss) drive which HADR option is right — don't pick a feature before defining these two numbers from requirements.",
+        ],
+    },
+    {
+        'heading': 'Backup & restore strategy',
+        'points': [
+            "Automated backups happen on every tier; point-in-time restore (PITR) creates a NEW database from a chosen moment, it never overwrites the original.",
+            "Long-term retention (LTR) stores weekly/monthly/yearly backups for up to 10 years, completely independent of the PITR retention window.",
+            "Geo-restore rebuilds a database in another region from geo-redundant backups if the primary region has an outage — a DR mechanism, not a fast, low-RPO failover.",
+            "PITR retention is configurable per database (from 1 up to 35 days depending on tier) — don't confuse it with LTR's much longer, backup-type-based schedule.",
+        ],
+    },
+    {
+        'heading': 'Purchasing models & performance tuning',
+        'points': [
+            "DTU model bundles compute + storage + I/O into one simple unit (Basic/Standard/Premium) — easy to size but less granular control.",
+            "vCore model prices compute and storage separately, lets you pick hardware generation, and is the ONLY model eligible for Azure Hybrid Benefit on SQL Server licensing.",
+            "Serverless compute tier (vCore) auto-scales and can auto-pause during inactivity, billing per second of usage — ideal for intermittent/unpredictable workloads.",
+            "Query Store captures historical query plans and runtime stats, which is what you use to catch a regressed execution plan after a deployment.",
+            "Automatic tuning can auto-apply FORCE_LAST_GOOD_PLAN to revert a regressed plan, and can auto-create/drop indexes based on observed usage.",
+            "Elastic pools share compute resources across many databases with unpredictable, non-overlapping usage spikes — cheaper than provisioning each database at peak size individually.",
+        ],
+    },
+    {
+        'heading': 'Security features (don\'t mix these up)',
+        'points': [
+            "Transparent Data Encryption (TDE) encrypts data AT REST and is transparent to the application; it's on by default for Azure SQL Database.",
+            "Always Encrypted encrypts specific sensitive COLUMNS end-to-end, and the encryption keys are never revealed to the database engine — it protects data even from a DBA with full access.",
+            "Dynamic Data Masking obscures sensitive data in QUERY RESULTS for non-privileged users, without encrypting or changing the underlying stored data.",
+            "Row-Level Security restricts which ROWS a user can see, enforced through a predicate function, independent of column-level protections.",
+            "Auditing logs activity to a storage account, Log Analytics workspace, or Event Hub, and can be enabled once at the server level to cover every database on it.",
+        ],
+    },
+    {
+        'heading': 'Automation & monitoring tools',
+        'points': [
+            "Elastic Jobs run the same T-SQL script across many databases or an entire elastic pool on a schedule — built specifically for fleet-wide database management.",
+            "Azure Automation runbooks handle broader, general-purpose automation beyond just T-SQL execution.",
+            "Maintenance windows let you choose a predictable time slot for planned platform maintenance instead of it happening at an arbitrary time.",
+            "Query Performance Insight, Dynamic Management Views (DMVs), and Extended Events are the go-to tools for diagnosing a specific slow query or blocking chain.",
+        ],
+    },
+    {
+        'heading': 'Migration essentials',
+        'points': [
+            "Data Migration Assistant (DMA) ASSESSES compatibility issues and recommends fixes before you migrate — it doesn't move any data itself.",
+            "Azure Database Migration Service (DMS) performs the actual migration, supporting both offline (downtime during cutover) and online (minimal-downtime, continuous sync) modes.",
+            "The Azure SQL Migration extension in Azure Data Studio is the simplified, guided path specifically for migrating to Azure SQL Managed Instance or SQL Database.",
+        ],
+    },
+    {
+        'heading': 'Exam-day reminders',
+        'points': [
+            "DP-300 assumes hands-on T-SQL and Azure portal/CLI familiarity — expect \"what would you run/configure\" questions, not just terminology.",
+            "\"Protects sensitive columns even from DBAs\" always means Always Encrypted, never TDE or Dynamic Data Masking.",
+            "\"Restores to a specific point in time as a new database\" is PITR; \"restores in another region after an outage\" is geo-restore — don't swap these.",
+            "If the scenario stresses a hard 10-year retention requirement, that's Long-Term Retention (LTR), not standard PITR backups.",
+        ],
+    },
+]

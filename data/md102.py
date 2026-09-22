@@ -965,3 +965,69 @@ QUESTIONS = [
         "explanation": "A proactive remediation only runs its remediation script when the paired detection script reports a problem, and both scripts run under the SYSTEM account by default. A custom compliance detection script only reports status for evaluation and never remediates anything itself, and it can report structured data beyond a simple pass/fail.",
     },
 ]
+
+CHEAT_SHEET = [
+    {
+        "heading": "Intune enrollment & Windows Autopilot",
+        "points": [
+            "Autopilot user-driven mode = end user self-enrolls out-of-box, associating the device with their identity; self-deploying mode = zero-touch, no user interaction, used for kiosks/shared devices and needs TPM 2.0 attestation.",
+            "Autopilot pre-provisioning (White Glove) lets IT/a partner complete the slow steps before handing the device to the end user, who then only completes a short OOBE.",
+            "The Enrollment Status Page (ESP) blocks the user from reaching the desktop until required apps/profiles finish installing — configure the technician phase (white glove) and user phase separately.",
+            "Autopilot device groups are typically dynamic Entra ID groups based on a device attribute like Group Tag, so new hardware auto-joins the right deployment profile.",
+        ],
+    },
+    {
+        "heading": "Co-management with Configuration Manager",
+        "points": [
+            "Co-management lets a device be managed by both Configuration Manager (on-prem) and Intune at once — each of the 7 workloads is individually switched to ConfigMgr-managed or Intune-managed, not all-or-nothing.",
+            "Workloads include Compliance policies, Device configuration, Windows Update policies, Endpoint Protection, Client apps, Office Click-to-Run apps, and Resource access policies — move them to Intune incrementally.",
+            "Both the Configuration Manager client and Intune enrollment must succeed for a device to be truly co-managed.",
+            "Tenant attach lets you see and run some actions on ConfigMgr-managed devices from the Intune admin center without full co-management workload switching.",
+        ],
+    },
+    {
+        "heading": "Compliance policies vs. configuration profiles",
+        "points": [
+            "Compliance policies define pass/fail health criteria (minimum OS version, encryption required, no jailbreak/root) — they report status and can feed Conditional Access but don't change any device setting by themselves.",
+            "Configuration profiles actually push and enforce settings (Wi-Fi, VPN, restrictions, certificates) onto the device — they configure, they don't just check.",
+            "A device can report compliant with zero configuration profiles applied, and non-compliant even with every configuration profile deployed successfully — the two systems are independent.",
+            "Conditional Access's 'require device to be marked as compliant' control reads the compliance policy result, not configuration profile deployment status.",
+        ],
+    },
+    {
+        "heading": "App deployment types & app protection",
+        "points": [
+            "App assignment intents: Required (installs automatically), Available (shows in Company Portal for self-install), and Uninstall.",
+            "Win32 (.intunewin) apps support detection rules, requirement rules, and install/uninstall command lines — the most flexible app type, and the most setup work.",
+            "App Protection Policies (MAM) can protect corporate data inside an app — like blocking copy/paste into personal apps — even on a device that is NOT enrolled in Intune at all.",
+            "Microsoft Store apps, LOB apps (.msi/.appx you upload), and Win32 apps are distinct types with different levels of support for detection, dependencies, and supersedence.",
+        ],
+    },
+    {
+        "heading": "Windows Update rings",
+        "points": [
+            "Update rings for Windows 10/11 control feature and quality update deferral (in days), deadlines, and active hours for a targeted group of devices.",
+            "Feature update deployment profiles pin devices to a specific target Windows version, separate from the quality-update cadence set by rings.",
+            "Driver update profiles and expedited quality update policies exist for faster or urgent rollout outside the normal ring cadence.",
+            "Deferral days delay when an update becomes available to the ring; deadline settings force install and restart after that many days regardless of user snoozing.",
+        ],
+    },
+    {
+        "heading": "Security baselines & Defender for Endpoint",
+        "points": [
+            "Security baselines are pre-configured groups of Microsoft-recommended settings (Windows, Defender for Endpoint, Edge) that you can customize — a starting template, not a fixed mandatory policy.",
+            "Onboarding a device to Microsoft Defender for Endpoint can be done via an Intune configuration profile, and needs an MDE license plus the right Intune role.",
+            "Endpoint security policies (Antivirus, Disk encryption, Firewall, Attack surface reduction) are a narrower, more targeted alternative to a full security baseline.",
+            "BitLocker can be required and its recovery keys automatically escrowed to Entra ID via an Intune disk encryption policy — no separate AD DS needed for cloud-only devices.",
+        ],
+    },
+    {
+        "heading": "Exam-day reminders",
+        "points": [
+            "MD-102 expects hands-on familiarity with the Intune admin center — expect scenario questions about which policy type or assignment fits a described requirement.",
+            "'The device must have X setting applied' points to a configuration profile; 'the device must report as meeting X criteria for Conditional Access' points to a compliance policy.",
+            "'Protect corporate data without enrolling the personal device' always points to App Protection Policies (MAM), never a compliance or configuration profile.",
+            "Co-management workloads move individually — a scenario describing only Windows Update policy moving to Intune does not mean the whole device is now Intune-managed.",
+        ],
+    },
+]

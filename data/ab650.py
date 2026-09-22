@@ -939,3 +939,68 @@ QUESTIONS = [
         'explanation': "DSPM for AI gives visibility into AI app usage and recommends or helps apply tailored DLP and labeling policies for that usage. It is not a licensing prerequisite for assigning Copilot, and it is not limited to Security Copilot alone — it covers AI usage more broadly, including Microsoft 365 Copilot.",
     },
 ]
+
+CHEAT_SHEET = [
+    {
+        'heading': 'Domain weighting (know where the points are)',
+        'points': [
+            "Govern & Secure Tenants and Workloads is the heaviest domain (~42%) — expect most questions on Conditional Access, DLP, retention, and compliance tooling.",
+            "Manage & Secure AI Services is next (~36%) — Copilot licensing, Semantic Index, DSPM for AI, and Entra Agent ID all live here.",
+            "Configure & Manage Tenants and Workloads is the lightest (~22%) — domains, licensing, groups, update channels, network connectivity.",
+        ],
+    },
+    {
+        'heading': 'Licensing gotchas',
+        'points': [
+            "Microsoft 365 Copilot is always an add-on layered on an eligible base subscription (E3/E5, Business Standard/Premium) — the base alone never includes Copilot.",
+            "Group-based licensing auto-covers current AND future group members; direct (per-user) licensing must be repeated for every person.",
+            "Disabling a single service plan (e.g. Yammer) inside a SKU keeps the rest of the bundle active — don't remove the whole license to block one workload.",
+            "GDAP (time-bound, least-privilege partner roles) has replaced classic DAP (permanent, all-or-nothing Admin Agent access).",
+        ],
+    },
+    {
+        'heading': 'Identity & access basics',
+        'points': [
+            "Security defaults and Conditional Access are mutually exclusive — enabling Conditional Access requires disabling security defaults first.",
+            "Password hash sync (hash synced to the cloud) vs. pass-through authentication (validated on-prem via agents, no hash stored in the cloud) vs. federation (delegated to AD FS/external IdP); Microsoft recommends PHS as the default hybrid method.",
+            "Conditional Access grant controls decide IF access is allowed (require MFA/compliant device); session controls restrict an ALREADY-granted session (block downloads, limit sign-in frequency).",
+        ],
+    },
+    {
+        'heading': 'Compliance & data governance',
+        'points': [
+            "Retention policy = one rule for a whole location (mailbox/site/channel). Retention label = per-item rule that can differ within that same location.",
+            "Conflicting retention rules resolve toward preservation: the longer retention period wins, and \"retain\" beats \"delete.\"",
+            "Sensitivity label protects the content itself (encryption, watermark, permissions) and travels with the file; retention label only governs lifecycle/deletion — the two are independent and stackable.",
+            "eDiscovery (Standard) = search + export. eDiscovery (Premium) adds custodian management, hold notices, and analytics (near-duplicate detection, email threading).",
+            "Audit (Standard) retains ~180 days by default; Audit (Premium) extends retention (1 year+) and adds forensic events like MailItemsAccessed.",
+        ],
+    },
+    {
+        'heading': 'Copilot & AI administration',
+        'points': [
+            "Copilot never grants new access — it only surfaces content the requesting user already has permission to view; pre-existing oversharing is the real risk, not Copilot itself.",
+            "Semantic Index is the encrypted, Graph-based index Copilot uses for grounding/context — it is not an access-granting mechanism.",
+            "Restricted SharePoint Search hides a site from search/Copilot without touching underlying permissions — a fast mitigation, not a permissions fix.",
+            "DSPM for AI (Purview) gives visibility into AI usage and can recommend/apply DLP + sensitivity-label policies tailored to AI — it is not a Copilot licensing prerequisite.",
+            "Microsoft Entra Agent ID gives AI agents first-class identity objects (like service principals) so they can be governed, reviewed, and monitored.",
+            "Microsoft Security Copilot is a separate product from Microsoft 365 Copilot, billed via Security Compute Units (SCUs, consumption-based) instead of per-user licenses.",
+        ],
+    },
+    {
+        'heading': 'Mail & collaboration objects',
+        'points': [
+            "Shared mailbox = one mailbox, multiple delegates, no license needed under the size limit. Distribution group = mail fan-out only, stores nothing itself. Microsoft 365 group = membership object that provisions a mailbox, SharePoint site, Planner, and more.",
+            "SharePoint external sharing: the org-wide setting is a ceiling — a site can never be MORE permissive than the tenant-wide level, only equal or tighter.",
+            "Information barriers actively block communication/discovery between defined segments (conflict-of-interest scenarios) — a stronger control than Conditional Access, which only governs sign-in conditions.",
+        ],
+    },
+    {
+        'heading': 'Exam-day reminders',
+        'points': [
+            "A scenario naming a specific forensic event (e.g. \"MailItemsAccessed\") is a direct pointer to Audit (Premium), not Standard.",
+            "When a question says \"without changing existing permissions,\" think Restricted SharePoint Search, not a permissions or access-removal answer.",
+            "Purview compliance role groups are a separate permission layer from Microsoft Entra directory roles — a user can fully manage DLP with zero Entra admin roles assigned.",
+        ],
+    },
+]

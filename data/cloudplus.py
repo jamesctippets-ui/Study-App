@@ -1070,3 +1070,72 @@ QUESTIONS = [
         'explanation': 'Elevated disk queue length/I/O wait and latency spiking above baseline are direct, storage-specific performance indicators that point at the storage subsystem itself. Steady CPU utilization actually argues against CPU being the bottleneck rather than confirming a storage issue, and DNS query volume has no bearing on storage performance at all.',
     },
 ]
+
+CHEAT_SHEET = [
+    {
+        'heading': 'Exam format & domain weights',
+        'points': [
+            'Up to 90 questions in 90 minutes, scored on a 100-900 scale with 750 required to pass.',
+            'Six domains: Cloud Architecture 23%, Deployment 19%, Security 19%, Operations 17%, Troubleshooting 12%, DevOps Fundamentals 10%.',
+            'CV0-004 added the DevOps Fundamentals domain that the prior CV0-003 version did not have.',
+        ],
+    },
+    {
+        'heading': 'Service & deployment models (vendor-neutral)',
+        'points': [
+            "IaaS/PaaS/SaaS follow the same responsibility gradient as any vendor's version, but Cloud+ expects you to reason about it independent of any one brand.",
+            'Community cloud = shared by several organizations with common concerns (e.g., compliance) — distinct from public (open to anyone) and private (single org).',
+            "Multi-cloud = using more than one public cloud provider; hybrid cloud = mixing cloud with on-premises. Don't conflate the two terms.",
+        ],
+    },
+    {
+        'heading': 'High availability & scaling',
+        'points': [
+            'Vertical scaling ("scale up") = a bigger instance; horizontal scaling ("scale out") = more instances — horizontal generally scales further with less downtime.',
+            'Active-active = all nodes serve traffic simultaneously; active-passive = a standby node takes over only after a failure.',
+            'N+1 redundancy = one spare unit beyond what is needed; N+2 adds two — higher N raises resilience and cost together.',
+            'RTO (Recovery Time Objective) = how long you can tolerate being down; RPO (Recovery Point Objective) = how much data loss, measured in time, is acceptable.',
+        ],
+    },
+    {
+        'heading': 'Security domain essentials',
+        'points': [
+            'Encryption in transit (TLS) and encryption at rest (disk/storage-level) are normally both required, not an either/or choice.',
+            'Least privilege and role-based access apply the same cloud-agnostic way regardless of which vendor\'s IAM implements them.',
+            'Segmentation (VLANs, subnets, security groups) limits the blast radius of a single compromised host.',
+            'Compliance frameworks (HIPAA, PCI DSS, GDPR) drive specific technical controls, not just policy paperwork.',
+        ],
+    },
+    {
+        'heading': 'Deployment concepts',
+        'points': [
+            'Blue-green deployment = two full environments with traffic cut over all at once; canary = a gradual rollout to a subset of users first.',
+            'Infrastructure as Code (IaC) makes deployments repeatable and version-controlled versus manual, click-ops provisioning.',
+            'Functional, regression, performance/load, and usability testing each answer a different question — know which one a scenario is describing.',
+        ],
+    },
+    {
+        'heading': 'Operations & troubleshooting methodology',
+        'points': [
+            "CompTIA's troubleshooting methodology, in order: identify the problem, establish a theory, test the theory, establish a plan of action, implement the plan, verify full system functionality, document the incident.",
+            "Baseline metrics must be captured BEFORE an incident — without one you can't prove current behavior is actually abnormal.",
+            'Logging records events, monitoring observes trends over time, and alerting notifies when a threshold is crossed — three distinct layers, not synonyms.',
+        ],
+    },
+    {
+        'heading': 'DevOps fundamentals (the new domain)',
+        'points': [
+            'CI (continuous integration: merge/build/test frequently) feeds CD (continuous delivery/deployment: automated release).',
+            'Containers package an app with its dependencies for portability; orchestration manages many containers\' lifecycle and scaling.',
+            'Version control and automated testing are treated as core DevOps practices on this exam, not optional extras.',
+        ],
+    },
+    {
+        'heading': 'Exam-day reminders',
+        'points': [
+            "Cloud+ is vendor-neutral — don't answer with a specific AWS/Azure/GCP service name unless the question itself names that provider.",
+            'On "which metric confirms the bottleneck" questions, pick the metric that directly measures that resource, not a plausible-sounding but unrelated one.',
+            'Real scenarios often touch multiple domains at once (e.g., a control that is both security and HA) — answer based on what the question emphasizes.',
+        ],
+    },
+]

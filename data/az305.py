@@ -1040,3 +1040,73 @@ QUESTIONS = [
         'explanation': "Bastion provides browser-based RDP/SSH access over TLS through the Azure portal without exposing a public IP on the target VM, and it must be deployed into a specifically named AzureBastionSubnet within the VNet. It needs no VPN client, since it works entirely through the browser and the portal, and it doesn't eliminate the value of NSG rules protecting the VMs — layered defense is still recommended alongside it.",
     },
 ]
+
+CHEAT_SHEET = [
+    {
+        'heading': 'Well-Architected Framework pillars',
+        'points': [
+            "The five pillars are Reliability, Security, Cost Optimization, Operational Excellence, and Performance Efficiency — every design decision on this exam should trace back to a tradeoff among these.",
+            "Reliability = a workload keeps running and recovers from failure; it directly drives RTO/RPO decisions, redundancy, and DR design.",
+            "Cost Optimization doesn't mean cheapest — it means the right spend for the value delivered, which is why \"most cost-effective\" answers still have to meet the stated requirements.",
+            "Performance Efficiency is about a workload scaling to meet demand efficiently, not just raw speed — think autoscaling and right-sizing, not just \"the fastest SKU.\"",
+        ],
+    },
+    {
+        'heading': 'Identity & governance architecture',
+        'points': [
+            "Hierarchy is Management Groups → Subscriptions → Resource Groups → Resources; Azure Policy and RBAC assignments both inherit downward through this hierarchy.",
+            "Azure Policy enforces compliance on resource CONFIGURATION (effects like Deny, Audit, Append, Modify, DeployIfNotExists); RBAC controls WHO can perform WHICH actions — a design needs both, not one instead of the other.",
+            "Landing zones (per the Cloud Adoption Framework) separate platform landing zones (shared identity, connectivity, management) from application landing zones (workload-specific resources) — design shared services once, reuse across workloads.",
+            "Prefer management-group-level policy assignments over repeating the same policy in every subscription when a rule must apply organization-wide.",
+        ],
+    },
+    {
+        'heading': 'Compute design tradeoffs',
+        'points': [
+            "Control vs. management overhead spectrum: VMs/VMSS (most control, most overhead) → AKS (full orchestration control, real ops burden) → Container Apps (serverless containers, less to manage) → App Service (PaaS web apps, least infrastructure to manage) → Functions (event-driven serverless, pay-per-execution).",
+            "Choose AKS when you need deep Kubernetes-level control (custom schedulers, service mesh, multi-container pods); choose Container Apps or App Service when you just need to run containers/web apps without managing a cluster.",
+            "Azure Functions Consumption plan scales to zero and bills per execution; Premium/Dedicated plans trade some of that elasticity for pre-warmed instances and VNet integration.",
+        ],
+    },
+    {
+        'heading': 'Storage design tradeoffs',
+        'points': [
+            "Redundancy choice should be driven by required durability and DR scope: LRS/ZRS protect within a region (datacenter vs. zone failure); GRS/RA-GRS/GZRS/RA-GZRS add protection against a full regional outage, with the RA- variants also allowing reads from the secondary.",
+            "Blob access tiers (Hot/Cool/Cold/Archive) are a cost-vs-access-latency design lever, not just an operational setting — Archive needs rehydration before it can be read, so it's wrong for anything needing fast recovery.",
+            "Premium SSD or Ultra Disk for latency-sensitive, high-IOPS workloads (databases); Standard tiers for dev/test or infrequently accessed data.",
+        ],
+    },
+    {
+        'heading': 'Networking design tradeoffs',
+        'points': [
+            "Hub-and-spoke topology centralizes shared services (firewall, VPN/ExpressRoute gateway, DNS) in a hub VNet, with workload VNets as spokes peered to it — spokes don't automatically talk to each other through the hub without explicit routing (peering is non-transitive).",
+            "Azure Virtual WAN automates hub-and-spoke connectivity at large/global scale, replacing manually-managed hubs when you have many regions/sites.",
+            "Front Door = global Layer 7 load balancing with WAF + CDN (best for global-scale web apps). Traffic Manager = global DNS-based routing, protocol-agnostic (works for non-HTTP too). Application Gateway = regional Layer 7 with WAF. Load Balancer = regional/zonal Layer 4 — pick based on required scope AND protocol, not just \"global vs. regional.\"",
+        ],
+    },
+    {
+        'heading': 'Business continuity & DR design',
+        'points': [
+            "Always define RTO (max acceptable downtime) and RPO (max acceptable data loss) FIRST from business requirements — they determine which redundancy/DR service is actually correct, not the other way around.",
+            "Availability Zones protect against a datacenter-level failure within one region; only a multi-region design protects against a full regional outage.",
+            "Azure Backup handles point-in-time data recovery; Azure Site Recovery handles full workload/region failover — a DR design combining both often needs Backup for granular recovery and Site Recovery for the region-level failover story.",
+            "Paired regions get sequential platform update rollout and are the default target for geo-redundant storage replication — factor that into region-pair selection for compliance/data-residency requirements too.",
+        ],
+    },
+    {
+        'heading': 'Migration strategy basics',
+        'points': [
+            "The migration strategies (the \"R's\"): Rehost (lift-and-shift, fastest, least change), Refactor/Re-platform (small optimizations, e.g. move to a managed database), Rearchitect (redesign for cloud-native scale), Rebuild (start over cloud-native), Retire (decommission what's no longer needed).",
+            "Azure Migrate is the central hub for discovery, assessment, and migration of servers, databases, and web apps at scale — start there before picking point tools.",
+            "Azure Database Migration Service (DMS) performs the actual database migration (offline or online/minimal-downtime); Data Migration Assistant only assesses compatibility beforehand.",
+        ],
+    },
+    {
+        'heading': 'Exam-day reminders',
+        'points': [
+            "AZ-305 is a design exam — there is often more than one technically valid answer; pick the one that best satisfies ALL stated requirements (cost, compliance, RTO/RPO), not just the most impressive-sounding service.",
+            "Case-study-style questions expect you to reference stated constraints (budget, existing on-prem AD, compliance region) rather than a generic best practice that ignores them.",
+            "When a requirement says \"minimize operational overhead,\" that pulls toward PaaS/serverless options over IaaS, unless another hard requirement rules that out.",
+        ],
+    },
+]

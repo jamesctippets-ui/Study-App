@@ -887,3 +887,64 @@ QUESTIONS = [
         "explanation": "Audit logging of access to protected health information is a standard, expected control -- it supports security investigations after a suspected breach and is routinely reviewed as part of HIPAA compliance audits. A system that could not show who accessed or changed a given record would leave a significant gap in both accountability and breach investigation.",
     },
 ]
+
+CHEAT_SHEET = [
+    {
+        "heading": "What this module is (and isn't)",
+        "points": [
+            "This is a self-study concepts reference for healthcare interoperability, not tied to any vendor certification or proctored exam.",
+            "The goal is recognizing the difference between HL7v2 and FHIR and understanding integration-engine mechanics well enough for real interface work or interviews.",
+            "Content here maps loosely to real-world interface analyst and health IT integration work, not to a specific test blueprint.",
+        ],
+    },
+    {
+        "heading": "HL7 v2 message structure",
+        "points": [
+            "Messages are pipe-delimited; segments are lines starting with a three-letter ID (MSH, PID, PV1, OBX...); MSH is always first and defines the message's own delimiter characters.",
+            "Fields within a segment are separated by pipes, components within a field by carets, repetitions by tildes, and subcomponents by ampersands.",
+            "There is no strictly enforced schema -- two vendors' HL7v2 feeds for the same message type are often not byte-compatible without a translation/mapping layer.",
+        ],
+    },
+    {
+        "heading": "Key HL7 v2 message types",
+        "points": [
+            "ADT (Admit/Discharge/Transfer) carries patient demographic and encounter-status events -- e.g. A01 admit, A02 transfer, A03 discharge.",
+            "ORM = an order request from an ordering system to a filler system (lab, pharmacy, radiology).",
+            "ORU = an observation result sent back from the filler system, carrying OBX segments tied to the original order via OBR.",
+            "SIU = scheduling events -- new appointment, reschedule, cancellation.",
+            "ACK/NAK responses use AA (accepted), AE (application error), or AR (rejected) -- AA only confirms structural acceptance, not that downstream processing succeeded.",
+        ],
+    },
+    {
+        "heading": "FHIR fundamentals",
+        "points": [
+            "FHIR (Fast Healthcare Interoperability Resources) models data as small, discrete, RESTful resources -- Patient, Observation, Encounter, MedicationRequest, Condition -- instead of one large message.",
+            "Resources reference each other (e.g. an Observation references its Patient and Encounter), forming a connected graph rather than a flat message.",
+            "FHIR uses standard HTTP verbs (GET/POST/PUT/DELETE) against resource endpoints -- a fundamentally different interaction model from HL7v2's message-push pattern.",
+        ],
+    },
+    {
+        "heading": "HL7v2 vs. FHIR -- the core contrast",
+        "points": [
+            "HL7v2 = message-based, push-oriented, loosely and vendor-specifically structured, dominant for decades of legacy hospital interfaces.",
+            "FHIR = resource-based, REST/API-oriented, strictly structured, designed for modern app-to-app and mobile access.",
+            "FHIR is increasingly layered on top of existing HL7v2 feeds rather than replacing them outright, because the installed base and switching costs are enormous.",
+        ],
+    },
+    {
+        "heading": "Integration / interface engines",
+        "points": [
+            "An integration engine's core job is routing messages by content/type and translating format/protocol between systems that don't natively speak the same dialect.",
+            "It is middleware, not the system of record -- the EHR remains the legal medical record even though messages pass through the engine.",
+            "Interface changes still require testing -- a new field mapping or trigger event can silently break a downstream consumer -- an engine doesn't remove that need.",
+        ],
+    },
+    {
+        "heading": "Healthcare data governance basics",
+        "points": [
+            "PHI (Protected Health Information) is any individually identifiable health data; access to it must be logged and auditable.",
+            "A Business Associate Agreement (BAA) is required under HIPAA before any third-party vendor processes or stores PHI on a covered entity's behalf -- an SLA or plain NDA does not satisfy this.",
+            "Audit logging of who accessed or modified a record, and when, is a standard, expected control, not an optional nicety.",
+        ],
+    },
+]

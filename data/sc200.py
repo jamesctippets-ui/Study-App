@@ -1099,3 +1099,70 @@ QUESTIONS = [
         'explanation': "extend computes and adds (or overwrites) a column while leaving the row count unchanged, and project-away drops only the named columns from the output while keeping the rest. where can be used multiple times in a single pipeline to progressively filter, and summarize generally reduces the row count to one row per group, so it does not preserve the same row count as the input except in the edge case where every row happens to form its own group.",
     },
 ]
+
+CHEAT_SHEET = [
+    {
+        'heading': 'Defender XDR components — who covers what',
+        'points': [
+            'Defender for Endpoint = EDR/anti-tampering for Windows, macOS, Linux, and mobile devices.',
+            "Defender for Identity = monitors on-prem AD signals (via sensors) for identity-based attacks, not just cloud Entra ID sign-ins.",
+            'Defender for Office 365 = protects email, Teams, SharePoint, and OneDrive from phishing, malware, and business email compromise.',
+            'Defender for Cloud Apps = the CASB — discovers shadow IT and governs SaaS/OAuth app risk.',
+            'Defender for Cloud = posture management (CSPM) plus workload protection for Azure/multi-cloud resources, a separate pillar from the four device/user-facing products above.',
+        ],
+    },
+    {
+        'heading': 'Incident vs. alert',
+        'points': [
+            'Alert = one detected suspicious event/signal from a single product.',
+            'Incident = Defender XDR automatically correlating related alerts, often across multiple products, into one case to investigate.',
+            'Closing an incident closes every alert inside it; alerts can also be manually merged into or split out of incidents.',
+            'With "Connect incidents & alerts" enabled, Sentinel and Defender XDR keep incident status, comments, and tags in sync in both directions.',
+        ],
+    },
+    {
+        'heading': 'Microsoft Sentinel core concepts',
+        'points': [
+            'Analytics rule types: Scheduled (custom KQL on a timer), Near-real-time/NRT (faster but more limited), Microsoft Security (auto-imports alerts from Defender products), Fusion (ML-based multi-signal correlation).',
+            'Workbooks visualize data on a dashboard — they never generate alerts or incidents by themselves.',
+            'Playbooks are Logic Apps-based automations triggered by an analytics rule or run manually — this is the SOAR piece.',
+            'Watchlists are reusable lookup lists (VIP users, known-bad IPs) referenced from queries and rules.',
+            'UEBA baselines normal user/entity behavior so it can flag anomalies against that baseline.',
+        ],
+    },
+    {
+        'heading': 'KQL essentials to memorize',
+        'points': [
+            'Queries pipe top-to-bottom with | — each operator transforms the table handed to it.',
+            'where filters rows; project selects/renames columns; extend adds a computed column without changing the row count.',
+            'summarize aggregates and collapses rows per group, so it generally reduces row count (unlike extend).',
+            'ago() and bin() are the standard tools for time filtering and time-bucketing.',
+            'project-away drops only the named columns and keeps everything else, the inverse of project.',
+        ],
+    },
+    {
+        'heading': 'Threat hunting workflow',
+        'points': [
+            'Hunting is hypothesis-driven and proactive; incident response is reactive to alerts that already fired.',
+            'Hunting queries can be run ad hoc, or saved and scheduled so they generate alerts going forward.',
+            'Bookmarking a suspicious query result preserves it for later correlation, even before it becomes an incident.',
+            "Livestream lets you test a new detection idea against real-time data before promoting it to a full analytics rule.",
+        ],
+    },
+    {
+        'heading': 'Data connectors & ingestion',
+        'points': [
+            "Nothing is investigable in Sentinel until its log source is connected and ingested into the workspace (Log Analytics) — a data connector is the prerequisite for everything else.",
+            'Diagnostic settings route Azure resource logs into the Sentinel/Log Analytics workspace.',
+            'CEF (Common Event Format) and Syslog connectors are the standard path for on-prem or third-party security appliances.',
+        ],
+    },
+    {
+        'heading': 'Exam domain weights & reminders',
+        'points': [
+            'Manage a security operations environment ~40-45%, Respond to security incidents ~35-40%, Perform threat hunting ~20-25%.',
+            'Microsoft scores this exam 0-1000 with 700 to pass.',
+            'On "least effort" or "most efficient" scenario questions, match the tool actually built for that job — e.g., a playbook for repeatable automated remediation, not a manual step.',
+        ],
+    },
+]

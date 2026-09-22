@@ -1209,3 +1209,71 @@ For disaster protection, the distinction that matters most is scope: Azure Backu
         'scenario': "A company's production database VM gets corrupted by a bad script at 2pm. They restore it from that morning's backup in the Recovery Services vault, losing a few hours of data but recovering quickly. Separately, that same company has Site Recovery configured for their whole application tier, so if their primary region ever goes down entirely, the application can fail over and keep serving customers from a secondary region within minutes.",
     },
 ]
+
+CHEAT_SHEET = [
+    {
+        'heading': 'Identity & RBAC',
+        'points': [
+            "Owner = full access plus can assign roles to others. Contributor = full access but cannot assign roles. Reader = view only. User Access Administrator = can manage user access without touching the resources themselves.",
+            "RBAC scope inherits downward: Management Group → Subscription → Resource Group → Resource; a role assigned higher up applies to everything below it.",
+            "RBAC permissions are additive across assignments, but an explicit deny assignment always overrides any allow.",
+            "Azure Policy controls WHAT configurations are allowed/compliant (an effect like deny/audit); RBAC controls WHO can perform WHICH actions — they answer different questions and are not substitutes for each other.",
+        ],
+    },
+    {
+        'heading': 'Storage accounts & redundancy',
+        'points': [
+            "LRS = 3 sync copies in one datacenter (cheapest, least durable). ZRS = sync copies across zones in one region. GRS = async copy to a paired region (not readable). RA-GRS = same as GRS but the secondary is readable.",
+            "GZRS/RA-GZRS combine zone redundancy in the primary region with geo-replication to the paired region — the highest-durability options.",
+            "Blob access tiers (Hot/Cool/Cold/Archive) trade storage cost against access cost and retrieval latency; Archive requires rehydration before a blob can be read.",
+            "Only general-purpose v2 (StorageV2) accounts support the full feature set (all access tiers, lifecycle management); legacy v1 accounts don't.",
+        ],
+    },
+    {
+        'heading': 'Compute essentials',
+        'points': [
+            "Availability Set = protects against a single hardware/rack failure inside ONE datacenter (fault domains + update domains) — no protection if that datacenter goes down.",
+            "Availability Zone = physically separate datacenters within a region, each with independent power/cooling/network — protects against a datacenter-level outage.",
+            "A VM scale set can span multiple availability zones and automatically scales identical VM instances in/out based on load or a schedule.",
+            "Managed disks: Standard HDD/SSD for dev/test or infrequent access, Premium SSD for production workloads needing consistent low latency, Ultra Disk for the highest IOPS/throughput, latency-sensitive workloads (e.g. SAP HANA, SQL).",
+            "Azure Hybrid Benefit lets you apply existing on-premises Windows Server or SQL Server licenses to Azure VMs to cut compute cost.",
+        ],
+    },
+    {
+        'heading': 'Networking basics',
+        'points': [
+            "NSG rules are evaluated by priority number, lowest first, and processing stops at the first match — default rules can be overridden by a higher-priority custom rule but never deleted.",
+            "An NSG can be attached to a subnet, a NIC, or both; if both are in play, traffic must be allowed by BOTH to get through.",
+            "VNet peering is non-transitive: if VNet A peers with B, and B peers with C, A cannot reach C through B without its own direct peering (or a hub with routing).",
+            "Private Endpoint = a private IP address for a PaaS service inside your VNet (traffic never leaves the Microsoft backbone). Service Endpoint = an optimized route to the service over the Azure backbone, but the service still has a public IP.",
+            "Load Balancer = regional Layer 4 (TCP/UDP). Application Gateway = regional Layer 7 (HTTP, URL routing, WAF). Traffic Manager = global DNS-based routing (protocol-agnostic). Front Door = global Layer 7 with WAF + CDN.",
+        ],
+    },
+    {
+        'heading': 'Monitoring & backup/DR',
+        'points': [
+            "Azure Monitor Metrics = lightweight numerical time-series data. Azure Monitor Logs = detailed queryable records in a Log Analytics workspace, searched with KQL.",
+            "An alert rule defines the trigger condition; a separate action group defines the response (email, SMS, webhook, runbook).",
+            "Azure Backup (Recovery Services vault) restores a VM/file to an earlier point in time. Azure Site Recovery replicates and fails over a whole workload to a secondary region — different scope, don't mix them up.",
+            "A backup policy sets the schedule and retention; changing retention doesn't retroactively delete or extend already-taken recovery points outside the new window automatically without a cleanup job.",
+        ],
+    },
+    {
+        'heading': 'Governance (locks, policy, tags)',
+        'points': [
+            "Resource lock CanNotDelete allows read/modify but blocks deletion. ReadOnly blocks modify AND delete (locks down the resource entirely, which can break scaling or extensions unexpectedly).",
+            "Locks apply to everything below their scope in the hierarchy and can only be removed by someone with the right permission (Microsoft.Authorization/locks/delete), even an Owner needs that explicit permission.",
+            "Azure Policy initiatives group multiple related policy definitions together; policy effects include Deny, Audit, Append, Modify, and DeployIfNotExists.",
+            "Tags are not automatically inherited by child resources — a policy with the Modify or Append effect is needed to enforce/propagate tags automatically.",
+        ],
+    },
+    {
+        'heading': 'Exam-day reminders',
+        'points': [
+            "This exam is heavy on hands-on labs — expect scenario/portal-sequence questions, not just recall.",
+            "Watch for wording like \"least administrative effort\" or \"most cost-effective\" — pick the best fit among several technically-correct-sounding options.",
+            "If a question says the connection \"doesn't use the public internet,\" that's ExpressRoute, not a VPN Gateway.",
+            "\"Protect from a single datacenter failure\" points to Availability Zones; \"protect from a single rack/host failure\" points to Availability Sets.",
+        ],
+    },
+]

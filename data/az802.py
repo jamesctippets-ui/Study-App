@@ -1140,3 +1140,72 @@ QUESTIONS = [
         'explanation': "Shadow copies expose a self-service Previous Versions tab so users can recover an earlier file version without an administrator restoring from backup, and VSS is efficient because each shadow copy stores only the changed blocks since the previous one rather than a full volume duplicate. Shadow copies are a convenient point-in-time recovery aid, not a replacement for a real backup solution, and they live on the same volume/server by default rather than a different physical server, which is also why they don't protect against the loss of that server's hardware.",
     },
 ]
+
+CHEAT_SHEET = [
+    {
+        'heading': 'AD DS & hybrid identity essentials',
+        'points': [
+            'Five FSMO roles total: Schema Master and Domain Naming Master are forest-wide (one each per forest); RID Master, PDC Emulator, and Infrastructure Master are domain-wide (one each per domain).',
+            "Microsoft Entra Connect sync methods: Password Hash Sync (PHS) is simplest and most resilient, Pass-through Authentication (PTA) needs on-prem agents to stay online for every sign-in, and Federation (AD FS) is the most complex, rarely the right answer unless a specific requirement forces it.",
+            'The Infrastructure Master only matters in a multi-domain forest where the Global Catalog is not on every DC — otherwise it does nothing.',
+            "AD Recycle Bin needs forest functional level Windows Server 2008 R2 or higher and must be manually enabled — it isn't on by default.",
+            "A Read-Only Domain Controller (RODC) doesn't cache any account's password unless that account is explicitly added to its Password Replication Policy allow list.",
+        ],
+    },
+    {
+        'heading': 'Hyper-V & Storage Spaces Direct',
+        'points': [
+            'Generation 2 VMs support UEFI, Secure Boot, and larger boot volumes; Generation 1 exists mainly for older or 32-bit guest OSes.',
+            'Production checkpoints use VSS/file-system consistency and are safe for production workloads; Standard checkpoints also save memory/device state but are dev/test only.',
+            'Storage Spaces Direct needs a minimum of 2 nodes (a 2-node cluster needs a witness) and scales up to 16 nodes.',
+            'Two-way mirror behaves like RAID-1 and survives one node/drive failure; three-way mirror needs 3+ nodes and survives two failures; parity trades resiliency overhead for better usable capacity but costs more CPU.',
+            'Storage Replica synchronous mode gives zero data loss but needs low latency between sites; asynchronous mode tolerates higher latency but can lose in-flight data on failover.',
+        ],
+    },
+    {
+        'heading': 'Windows Server networking (DNS/DHCP/VPN)',
+        'points': [
+            "A conditional forwarder sends queries for a specific namespace to specific DNS servers; a stub zone stores only that zone's NS/SOA/glue records and refreshes them automatically.",
+            'AD-integrated zones replicate via AD (multi-master); standard Primary/Secondary zones use one-way zone transfers from the primary to each secondary.',
+            'DHCP failover has two modes: Hot standby (one server active, one passive backup) and Load balance (both serve requests, split by percentage).',
+            "Always On VPN is Microsoft's modern replacement for DirectAccess, which is being phased out.",
+            'Site-to-site VPN keeps two networks continuously connected; point-to-site VPN connects a single client machine to a network on demand.',
+        ],
+    },
+    {
+        'heading': 'Azure Arc-enabled server management',
+        'points': [
+            'Arc-enabled servers projects a non-Azure (on-prem or other-cloud) machine into Azure Resource Manager as a resource — it does NOT migrate or move the server itself.',
+            'Onboarding installs the Connected Machine agent (azcmagent), which needs outbound connectivity to specific Azure endpoints or Azure Private Link.',
+            'Once Arc-enabled, a server can receive Azure Policy, Azure Monitor, Microsoft Defender for Cloud, and Update Manager coverage just like a native Azure VM.',
+            'Arc-enabled servers get a resource ID and resource group like any Azure resource, enabling the same RBAC and tagging as cloud-native VMs.',
+        ],
+    },
+    {
+        'heading': 'Windows Admin Center basics',
+        'points': [
+            'Windows Admin Center is the modern, browser-based successor to many MMC snap-ins (Server Manager, Failover Cluster Manager, Disk Management), not a replacement for Active Directory Administrative Center.',
+            'It can run in gateway mode on a server managing many machines, or desktop mode on a Windows 10/11 client managing itself plus others it connects to.',
+            'WAC needs no Azure connection to manage local servers, but can optionally register with Azure for hybrid features like Azure Monitor and Azure Backup integration.',
+            'Extensions add functionality — for example Storage Migration Service or Azure Arc registration — beyond the built-in tools.',
+        ],
+    },
+    {
+        'heading': 'Security & patching',
+        'points': [
+            "Microsoft Defender for Cloud's free tier gives Secure Score and basic recommendations; paid Defender plans (e.g. Defender for Servers) add features like just-in-time VM access and file integrity monitoring.",
+            'Azure Update Manager (successor to Azure Update Management) can patch both Azure VMs and Arc-enabled on-prem/multi-cloud servers from one place.',
+            "WSUS is still the traditional on-prem patch approval/distribution tool — Update Manager doesn't replace an existing WSUS deployment, it can work alongside or independently of it.",
+            'BitLocker requires a TPM (or a USB startup key as a workaround), and recovery keys should be backed up to AD DS or Entra ID, not left only on the local machine.',
+        ],
+    },
+    {
+        'heading': 'Exam-day reminders',
+        'points': [
+            'AZ-802 assumes AZ-800-level knowledge — it now covers what used to be split across AZ-800 (core admin) and AZ-801 (advanced security), after those two exams were retired and consolidated.',
+            'Microsoft certification exams are typically scored 0–1000 with 700 required to pass, not a flat percentage.',
+            "Scenario questions often hinge on whether Entra ID/Azure is in scope at all — the 'right' tool depends on hybrid vs. on-prem-only requirements.",
+            'When two options both technically work, pick the one requiring the least new infrastructure/agents unless the scenario specifically asks for a security-hardening trade-off.',
+        ],
+    },
+]

@@ -1088,3 +1088,70 @@ QUESTIONS = [
         'explanation': "Sign-in frequency forces reauthentication at a defined interval rather than letting the token ride out its full lifetime, and disabling the persistent browser session control prevents the browser from staying signed in after it is closed. Session controls act on a session that has already been allowed to start, applied after grant controls are evaluated rather than deciding whether it starts, and they are not restricted to sign-ins that specifically used a device compliance grant control.",
     },
 ]
+
+CHEAT_SHEET = [
+    {
+        'heading': 'Entra ID core objects',
+        'points': [
+            'A group can be Security (access control) or Microsoft 365 (collaboration, includes a mailbox/Teams/SharePoint site) — both support assignment or dynamic membership, but only device groups can query device attributes.',
+            "Dynamic group membership rules auto-add and auto-remove members based on attribute queries — you can't mix users and devices dynamically in the same group.",
+            "Administrative Units scope where a role assignment applies — for example a Helpdesk Admin restricted to just one region's users — instead of tenant-wide.",
+            'A device object has a trust type: Entra ID joined, Entra ID registered (BYOD), or hybrid Entra ID joined (synced from on-prem AD) — this affects which Conditional Access device-state checks apply.',
+        ],
+    },
+    {
+        'heading': 'Conditional Access policy components',
+        'points': [
+            'A CA policy has Assignments (users/groups, cloud apps, conditions like location or sign-in risk) and Access controls (grant, e.g. require MFA or a compliant device; or session, e.g. sign-in frequency).',
+            'Grant controls decide whether access is allowed at all; session controls limit what happens after access has already been granted — they never block sign-in.',
+            'Multiple grant controls on one policy can be set to require ALL of them or require ANY ONE of them — you choose that combination explicitly.',
+            'Named locations are a condition you build separately and then reference inside CA policies — they are not a stand-alone security control on their own.',
+            "The 'What If' tool simulates which policies would apply to a given sign-in without enforcing anything, useful for troubleshooting policy design.",
+        ],
+    },
+    {
+        'heading': 'Authentication methods & MFA',
+        'points': [
+            'Passwordless methods — FIDO2 security keys, Microsoft Authenticator passwordless, Windows Hello for Business — remove the password entirely; that is not the same as ordinary MFA with a password plus a second factor.',
+            'Temporary Access Pass (TAP) is a time-limited passwordless credential used for onboarding or account recovery, not an everyday sign-in method.',
+            'Combined registration lets users register authentication methods for both SSPR and MFA in a single experience.',
+            "Security defaults (a free, one-size-fits-all baseline requiring MFA) and Conditional Access policies are mutually exclusive on a tenant — you generally can't run both at once.",
+        ],
+    },
+    {
+        'heading': 'PIM vs. standard RBAC',
+        'points': [
+            'Standard Azure RBAC / Entra role assignment means the permissions are active the moment the role is assigned.',
+            'PIM (Privileged Identity Management) makes a role assignment eligible rather than active — the user must activate it, often with MFA, justification, and/or approval, for a time-boxed duration before it takes effect.',
+            'PIM protects both Entra ID directory roles (like Global Administrator) and Azure resource roles (like Owner on a subscription) — same product, two different scopes.',
+            'PIM access reviews are a recurring governance process to recertify that eligible or active assignments are still needed, not a one-time setup step.',
+        ],
+    },
+    {
+        'heading': 'External identities: B2B & B2C',
+        'points': [
+            'B2B collaboration invites an external partner or vendor into your tenant as a guest, authenticating with their own home identity provider.',
+            'B2C is a separate, customer-facing identity solution for your own customer-facing apps, built on a different underlying tenant type than B2B.',
+            "Cross-tenant access settings control inbound (their users into your tenant) and outbound (your users into theirs) B2B trust, including whether to trust the other tenant's MFA/device compliance claims.",
+            'Guest users have more restricted directory object visibility than members by default, unless external collaboration settings are changed.',
+        ],
+    },
+    {
+        'heading': 'App registrations & enterprise apps',
+        'points': [
+            "An App Registration is the global definition of an application; its Enterprise Application (service principal) is the local, tenant-specific instance that actually gets permissions and user assignments in a given tenant.",
+            "Every app registration gets a service principal in its home tenant automatically; when users in another tenant consent to it, a service principal is created there too.",
+            'API permissions come in two types: Delegated (the app acts as the signed-in user, limited to what that user could do) vs. Application (the app acts as itself, often needing admin consent, with no signed-in user context).',
+            'Admin consent is required for higher-privilege or Application-type permissions; user consent, if the tenant allows it, can cover many lower-risk Delegated permissions.',
+        ],
+    },
+    {
+        'heading': 'Exam-day reminders',
+        'points': [
+            "SC-300 leans on scenarios — read carefully for whether the requirement is about a person's identity, an app's identity, or a device's identity, since each maps to a different tool (CA conditions, PIM, app permissions, device compliance).",
+            'Time-limited or just-in-time elevated access almost always means PIM, not a standing RBAC assignment.',
+            "An external partner needing occasional access without a licensed account in your tenant is a B2B guest scenario, not B2C and not a regular member account.",
+            'Blocking or limiting behavior after sign-in — forcing reauthentication, restricting downloads in a browser — is a Conditional Access session control, not a grant control.',
+        ],
+    },
+]
