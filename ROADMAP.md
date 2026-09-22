@@ -10,9 +10,12 @@ come up.
 
 ## 1. Multi-cert learning paths (user's idea)
 
-- [ ] A **Path** mode that sequences multiple tracks in a recommended order
-  for a stated goal — e.g. "Hospital Microsoft Engineer": AZ-900 → AZ-104 →
-  AZ-802 → SC-500 → AZ-305 — instead of the user picking tracks independently.
+- [x] A **Path** mode that sequences multiple tracks in a recommended order
+  for a stated goal, instead of the user picking tracks independently. Shipped
+  as the "Hospital Microsoft Engineer" path (AZ-900 → AZ-104 → DP-900 →
+  DP-300 → AZ-802 → SC-300 → SC-500 → AZ-305 → EHR Integration), opened from
+  the "🗺️ Recommended study path" button — each step shows why it's there and
+  live per-track mastery. data/paths.py can hold more than one named path.
 - [ ] Prerequisite awareness: flag when a track assumes knowledge from an
   earlier one in the path (AZ-104-level hands-on knowledge is a stated
   prerequisite mindset for AZ-305, for example).
@@ -89,10 +92,13 @@ come up.
 
 ## 8. Light gamification (from research)
 
-- [ ] A daily streak counter (no accounts needed — this is exactly the kind
+- [x] A daily streak counter (no accounts needed — this is exactly the kind
   of thing that fits the app's local-storage-only, no-login model).
-- [ ] Milestone badges (finished a course, 100 questions answered, a 7-day
-  streak) surfaced somewhere lightweight, not a whole new UI section.
+- [x] Milestone badges — 15 achievements (mastery, streaks, quiz/exam/match
+  counts, course completion) opened from a 🏆 header button, with a toast
+  on unlock. Once earned, an achievement stays shown as earned even if the
+  live condition later goes false (e.g. a new track diluting an all-tracks
+  mastery check) — see src/js/03_helpers.js's evaluateAchievements().
 - No leaderboards or social features — those need accounts/a backend, which
   is a deliberate trade-off this app has made for staying fully static.
 

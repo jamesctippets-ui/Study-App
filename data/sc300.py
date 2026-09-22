@@ -75,8 +75,8 @@ FLASHCARDS = [
         'id': 'f10',
         'cat': 'authAccessMgmt',
         'front': 'Multifactor authentication methods',
-        'back': "Microsoft Entra supports several MFA methods, including the Microsoft Authenticator app (push notification or passwordless), OATH hardware or software tokens, and voice call/SMS -- though voice and SMS are considered weaker and are being phased out in favor of stronger methods.",
-        'detail': "A scenario emphasizing the strongest available MFA method should point toward the Microsoft Authenticator app or a FIDO2 security key, not SMS, which is the weakest option still commonly offered.",
+        'back': "Microsoft Entra supports several MFA methods, including the Microsoft Authenticator app (push notification or passwordless), OATH hardware or software tokens, FIDO2 security keys, and voice call/SMS -- though voice and SMS are considered weaker and are being phased out in favor of stronger methods.",
+        'detail': "\"Strongest\" and \"phishing-resistant\" are not the same thing: standard Authenticator push notifications are stronger than SMS but can still be defeated by MFA-fatigue or consent-phishing attacks, while only methods like FIDO2 security keys, Windows Hello for Business, and certificate-based authentication are phishing-resistant (see the Conditional Access authentication strengths flashcard).",
     },
     {
         'id': 'f11',
@@ -401,7 +401,7 @@ QUESTIONS = [
             'Security questions configured during onboarding',
         ],
         'correct': 0,
-        'explanation': "The Microsoft Authenticator app and FIDO2 security keys are considered among the strongest, most phishing-resistant methods currently offered, while SMS and voice call are weaker methods being phased out, and security questions are not a supported MFA method at all in Microsoft Entra ID.",
+        'explanation': "The Microsoft Authenticator app and FIDO2 security keys are considered the strongest methods among these options, though only FIDO2 (along with Windows Hello for Business and certificate-based authentication) is truly phishing-resistant -- standard Authenticator push notifications are still stronger than SMS or voice call, but remain vulnerable to MFA-fatigue and consent-phishing attacks. SMS and voice call are weaker methods being phased out, and security questions are not a supported MFA method at all in Microsoft Entra ID.",
     },
     {
         'id': 'q10',

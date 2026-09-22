@@ -9,7 +9,7 @@ TRACKS = [
     {'key': 'dp900', 'label': 'DP-900', 'subtitle': 'Azure Data Fundamentals'},
     {'key': 'dp300', 'label': 'DP-300', 'subtitle': 'Azure Database Administrator'},
     {'key': 'az305', 'label': 'AZ-305', 'subtitle': 'Azure Solutions Architect Expert'},
-    {'key': 'az802', 'label': 'AZ-802', 'subtitle': 'Windows Server Hybrid Administrator'},
+    {'key': 'az802', 'label': 'AZ-802', 'subtitle': 'Windows Server Administrator'},
     {'key': 'sc300', 'label': 'SC-300', 'subtitle': 'Identity & Access Administrator'},
     {'key': 'sc500', 'label': 'SC-500', 'subtitle': 'Cloud & AI Security Engineer'},
     {'key': 'cloudplus', 'label': 'Cloud+', 'subtitle': 'CompTIA Cloud+ (CV0-004)'},

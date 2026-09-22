@@ -126,7 +126,7 @@ FLASHCARDS = [
         'id': 'f17',
         'cat': 'monitor',
         'front': "sys.dm_db_resource_stats and DTU/vCore utilization",
-        'back': "sys.dm_db_resource_stats returns recent (roughly 14 days at one-minute granularity) CPU, data I/O, log I/O, and memory consumption as a percentage of the database's provisioned limit, making it the fastest way to see whether a database is approaching its DTU or vCore ceiling.",
+        'back': "sys.dm_db_resource_stats returns recent (roughly the last hour, at 15-second granularity) CPU, data I/O, log I/O, and memory consumption as a percentage of the database's provisioned limit, making it the fastest way to see whether a database is approaching its DTU or vCore ceiling right now.",
         'detail': "Because it reports percentages of the current service objective's limits, the same query's numbers change meaning after a scale-up or scale-down — always confirm the current tier before interpreting a resource_stats reading.",
     },
     {
@@ -479,7 +479,7 @@ QUESTIONS = [
         'id': 'q16',
         'cat': 'monitor',
         'type': 'mc',
-        'question': "A DBA wants a quick way to check whether a database is approaching its provisioned CPU and I/O limits over the past two weeks at a fine time granularity. Which DMV should they query?",
+        'question': "A DBA wants a quick way to check whether a database is approaching its provisioned CPU and I/O limits right now, at a fine (15-second) time granularity. Which DMV should they query?",
         'options': [
             'sys.dm_db_missing_index_details',
             'sys.dm_db_resource_stats',
@@ -487,7 +487,7 @@ QUESTIONS = [
             'sys.dm_os_wait_stats',
         ],
         'correct': 1,
-        'explanation': "sys.dm_db_resource_stats reports recent CPU, data I/O, log I/O, and memory consumption as a percentage of the database's current provisioned limits at roughly one-minute granularity, which is exactly the resource-utilization check described. The other DMVs address missing indexes, query-level statistics, and wait statistics respectively, not overall resource ceiling utilization.",
+        'explanation': "sys.dm_db_resource_stats reports recent (roughly the last hour) CPU, data I/O, log I/O, and memory consumption as a percentage of the database's current provisioned limits at 15-second granularity, which is exactly the resource-utilization check described. For a longer, coarser view (about 14 days at 5-minute granularity), the master database's sys.resource_stats is the right DMV instead. The other options here address missing indexes, query-level statistics, and wait statistics respectively, not overall resource ceiling utilization.",
     },
     {
         'id': 'q17',

@@ -307,11 +307,7 @@ function CertStudyApp() {
     return map;
   }, [trackResults, categories, flashcardsData, questionsData]);
 
-  const overallMastery = useMemo(() => {
-    const allIds = [...flashcardsData.map((f) => f.id), ...questionsData.map((q) => q.id)];
-    const correct = allIds.filter((id) => trackResults[id] === 'correct').length;
-    return allIds.length ? Math.round((correct / allIds.length) * 100) : 0;
-  }, [trackResults, flashcardsData, questionsData]);
+  const overallMastery = useMemo(() => trackMastery(activeTrack, results), [activeTrack, results]);
 
   const currentCard = filteredFlashcards[fIndex];
   const currentQ = quizSession[sessionIndex];

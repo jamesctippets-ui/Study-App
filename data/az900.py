@@ -368,7 +368,7 @@ FLASHCARDS = [
         'id': 'f52',
         'cat': 'management',
         'front': 'Azure support plans',
-        'back': 'Basic support is free and included with every subscription, covering billing and subscription questions. Paid tiers — Developer, Standard, and Professional Direct/Premier — add technical support with progressively faster guaranteed response times for production issues.',
+        'back': 'Basic support is free and included with every subscription, covering billing and subscription questions. Paid tiers — Developer, Standard, and Professional Direct — add technical support with progressively faster guaranteed response times for production issues. Microsoft Unified support (the current name for what was once called Premier) sits above these as a broader, account-managed enterprise offering rather than just another response-time tier.',
         'detail': 'Basic support alone has no response-time commitment for a production-down technical issue — that requires a paid tier.',
     },
     {
@@ -1289,12 +1289,12 @@ QUESTIONS = [
         'question': 'A startup on the free Basic Azure support plan needs a guaranteed fast response time from Microsoft when a production system goes down. What should they do?',
         'options': [
             'Nothing — Basic support already includes a guaranteed response time for production-down issues',
-            'Purchase a Reserved Instance, which automatically upgrades support to Premier',
+            'Purchase a Reserved Instance, which automatically upgrades support to Unified',
             'Ask Azure Advisor to escalate the issue on their behalf',
-            'Upgrade to a paid support plan, such as Standard or Premier, which add committed response-time SLAs',
+            'Upgrade to a paid support plan, such as Standard or Unified, which add committed response-time SLAs',
         ],
         'correct': 3,
-        'explanation': "Basic support is free and covers billing/subscription questions, but carries no response-time commitment for a production-down technical issue — that requires moving to a paid plan (Developer, Standard, Professional Direct, or Premier), where response-time commitments get faster at higher tiers. A Reserved Instance is a compute pricing commitment unrelated to support tier, and Advisor gives configuration recommendations, not support-ticket escalation.",
+        'explanation': "Basic support is free and covers billing/subscription questions, but carries no response-time commitment for a production-down technical issue — that requires moving to a paid plan (Developer, Standard, Professional Direct, or Unified, the current name for what was formerly called Premier), where response-time commitments get faster at higher tiers. A Reserved Instance is a compute pricing commitment unrelated to support tier, and Advisor gives configuration recommendations, not support-ticket escalation.",
     },
     {
         'id': 'q49',

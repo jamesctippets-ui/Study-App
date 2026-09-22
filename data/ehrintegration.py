@@ -201,7 +201,7 @@ FLASHCARDS = [
         "id": "f28",
         "cat": "dataGovernance",
         "front": "HIPAA considerations for data in transit vs. at rest",
-        "back": "Data in transit (moving across an interface between systems) should be encrypted using protocols like TLS, while data at rest (stored in a database or file system) should be encrypted at the storage layer -- HIPAA's Security Rule expects appropriate safeguards for both states, not just one.",
+        "back": "Data in transit (moving across an interface between systems) should be encrypted using protocols like TLS. Data at rest (stored in a database or file system) should also be encrypted at the storage layer, though HIPAA's Security Rule technically lists at-rest encryption as an \"addressable\" implementation specification rather than a flat mandate -- in practice, nearly every hospital treats it as required and documents a specific reason on the rare occasion it is not used.",
         "detail": "An interface that encrypts a connection but then writes unencrypted log files full of patient data has only addressed the in-transit half of the requirement.",
     },
     {

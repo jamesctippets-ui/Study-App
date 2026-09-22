@@ -381,7 +381,7 @@ QUESTIONS = [
             'A resource group scoped to Sales',
         ],
         'correct': 0,
-        'explanation': 'Dynamic groups automatically add or remove members based on rules matching attributes like department.',
+        'explanation': "A dynamic group with a rule on the department attribute keeps membership current automatically as people join, leave, or change departments. A security group with manual membership requires someone to add and remove people by hand, a Microsoft 365 group with no rules is just as manual, and a resource group organizes Azure resources, not user accounts, so it plays no role here at all.",
     },
     {
         'id': 'q2',
@@ -390,7 +390,7 @@ QUESTIONS = [
         'question': "A company wants new employees to automatically receive a Microsoft 365 E3 license the moment they're added to the 'All Employees' group.",
         'options': ['A dynamic group with no license attached', 'Group-based licensing', 'Self-service password reset', 'An RBAC role assignment'],
         'correct': 1,
-        'explanation': 'Group-based licensing assigns a license to a group so every member automatically receives it.',
+        'explanation': "Group-based licensing assigns a license to a group so every current and future member automatically receives it, with no per-user action needed. A dynamic group with no license attached only handles membership, not licensing, itself -- it still needs group-based licensing layered on top. SSPR handles password resets, and an RBAC role assignment grants permissions over Azure resources, neither of which touches Microsoft 365 licensing.",
     },
     {
         'id': 'q3',
@@ -399,7 +399,7 @@ QUESTIONS = [
         'question': 'A contractor from a partner company needs temporary access to one SharePoint site, without your organization creating them a full internal account.',
         'options': ['Create them a standard internal user account', 'Invite them as a B2B external/guest user', 'Assign them the Owner role at the subscription', 'Add them to a dynamic group'],
         'correct': 1,
-        'explanation': 'External/guest users authenticate with their own existing identity rather than needing a new internal account.',
+        'explanation': "A B2B guest invite lets the contractor sign in with their own existing identity, scoped to just the resources they're invited to, without your organization ever creating or managing a full internal account for them. Creating a standard internal account works but means provisioning and later deprovisioning a real identity for someone who isn't an employee. Assigning Owner at the subscription is wildly over-scoped for access to one SharePoint site, and a dynamic group only manages membership rules -- it doesn't grant an outside person any identity to be a member with in the first place.",
     },
     {
         'id': 'q4',
@@ -408,7 +408,7 @@ QUESTIONS = [
         'question': 'A user forgot their password at 2am and needs to get back into their account without contacting the help desk.',
         'options': ['A dynamic group', 'Self-service password reset (SSPR)', 'Conditional Access', 'An RBAC role assignment'],
         'correct': 1,
-        'explanation': 'SSPR lets users reset their own password using pre-registered authentication methods, no help desk required.',
+        'explanation': "SSPR lets a user verify their identity with pre-registered authentication methods (like a phone or authenticator app) and reset their own password without any help desk involvement, at 2am or any other time. A dynamic group and an RBAC role assignment are unrelated to password resets, and Conditional Access controls when/how sign-ins are allowed, but does not itself provide a self-service reset mechanism.",
     },
     {
         'id': 'q5',
@@ -426,7 +426,7 @@ QUESTIONS = [
         'question': 'Which built-in role lets someone manage who has access to resources, without letting them manage the resources themselves?',
         'options': ['Owner', 'Contributor', 'User Access Administrator', 'Reader'],
         'correct': 2,
-        'explanation': 'User Access Administrator is specifically scoped to managing access, not the resources themselves.',
+        'explanation': "User Access Administrator can grant and revoke role assignments (who has access) but has no permissions over the resources themselves. Owner and Contributor both include full or near-full management of the resources, not just access, and Reader can view resources but cannot manage access or resources at all -- none of the other three isolate access management the way this scenario asks for.",
     },
     {
         'id': 'q7',
@@ -453,7 +453,7 @@ QUESTIONS = [
         'question': 'A company needs to grant a third-party app 24-hour, read-only access to a single blob container, without sharing the storage account key.',
         'options': ['A Conditional Access policy', 'The storage account access key', 'A Shared Access Signature (SAS)', 'A Read-only resource lock'],
         'correct': 2,
-        'explanation': "A SAS grants limited, time-boxed, scoped access without exposing the account's full access key.",
+        'explanation': "A SAS grants limited, time-boxed, scoped access (read-only, one container, 24 hours) without exposing the account's full access key. Handing over the storage account key would give the app full, unrestricted, non-expiring access to the whole account, far more than needed. A Conditional Access policy governs sign-ins to Microsoft Entra-integrated apps, not access to storage data itself, and a read-only resource lock only prevents accidental deletion/modification of the storage account resource -- it doesn't grant a third party access in the first place.",
     },
     {
         'id': 'q10',
@@ -462,7 +462,7 @@ QUESTIONS = [
         'question': 'A storage account should automatically move blobs to Cool tier after 30 days of no access, then delete them after 365 days.',
         'options': ['A SAS token', 'A lifecycle management policy', 'A resource lock', 'Blob versioning'],
         'correct': 1,
-        'explanation': 'Lifecycle management policies automate tier transitions and deletion based on rules like age or last access.',
+        'explanation': "A lifecycle management policy can define exactly this: automatically move blobs to Cool tier after 30 days of no access, then delete them after 365 days, all rule-driven with no manual intervention. A SAS token only grants time-boxed access, it doesn't move or delete data on a schedule. A resource lock prevents deletion or modification of the storage account resource itself, working against what this scenario wants. Blob versioning keeps historical versions of a blob when it changes, which is unrelated to tiering or age-based cleanup.",
     },
     {
         'id': 'q11',
@@ -489,7 +489,7 @@ QUESTIONS = [
         'question': 'A team wants to mount a shared drive from Azure that multiple VMs can read and write to simultaneously over SMB.',
         'options': ['Queue storage', 'Table storage', 'Azure Files', 'Blob storage'],
         'correct': 2,
-        'explanation': 'Azure Files provides SMB/NFS file shares that can be mounted like a network drive across multiple machines.',
+        'explanation': "Azure Files provides SMB (and NFS) file shares that multiple VMs can mount simultaneously and both read and write to, exactly like a traditional network drive. Queue storage holds messages for asynchronous processing, table storage is a NoSQL key-value store, and blob storage, while it can hold large amounts of unstructured data, is not natively mountable as a concurrent SMB file share the way Azure Files is.",
     },
     {
         'id': 'q14',
@@ -521,7 +521,7 @@ QUESTIONS = [
         'question': 'A company wants a group of identical VMs that automatically add or remove instances based on CPU load.',
         'options': ['An availability set', 'Azure Virtual Desktop', 'A single large VM', 'A VM Scale Set'],
         'correct': 3,
-        'explanation': 'VM Scale Sets automatically adjust instance count based on demand or a schedule.',
+        'explanation': "A VM Scale Set manages a group of identical, load-balanced VMs and can automatically add or remove instances based on autoscale rules like CPU load. An availability set only spreads a fixed set of VMs across fault/update domains for resiliency, it does not add or remove instances. Azure Virtual Desktop is a virtual desktop service, unrelated to general-purpose autoscaling. A single large VM has no ability to scale out into multiple instances at all -- it can only scale up.",
     },
     {
         'id': 'q17',
@@ -530,7 +530,7 @@ QUESTIONS = [
         'question': "An administrator needs to run a one-time configuration script on a VM immediately after it's provisioned, without manually logging in.",
         'options': ['A managed disk', 'The Custom Script Extension', 'An App Service plan', 'An availability set'],
         'correct': 1,
-        'explanation': 'VM extensions like the Custom Script Extension run configuration tasks automatically right after deployment.',
+        'explanation': "The Custom Script Extension runs a specified script on the VM automatically as part of provisioning, with no manual login required. A managed disk is just storage for the VM's OS/data, it runs nothing. An App Service plan is compute for web apps, not a mechanism for running a script on an existing VM. An availability set only affects fault/update-domain placement for resiliency and has no role in running configuration scripts.",
     },
     {
         'id': 'q18',
@@ -539,7 +539,7 @@ QUESTIONS = [
         'question': 'A team wants to test a new version of a web app in production-like conditions before it goes live, then switch traffic to it with minimal downtime.',
         'options': ['Deployment slots', 'A VM Scale Set', 'A new App Service plan for every version', 'A resource lock'],
         'correct': 0,
-        'explanation': 'Deployment slots provide a separate environment to validate a new version before swapping it into production.',
+        'explanation': "A deployment slot is a live, separately-addressable environment within the same App Service plan, letting the team fully test the new version under production-like conditions, then perform a slot swap to cut over with minimal downtime and an easy rollback if needed. A VM Scale Set manages VM instance count, not app-version staging. Standing up a whole new App Service plan per version is far more overhead than slots and still needs its own cutover mechanism. A resource lock only prevents accidental deletion/modification, it has nothing to do with staging or swapping versions.",
     },
     {
         'id': 'q19',

@@ -189,9 +189,15 @@ function buildAchievementContext(results, stats) {
   };
 }
 
+// Once earned, an achievement stays earned — `stats.unlocked` is the
+// permanent record. a.check(ctx) alone is a live, re-evaluated condition
+// (e.g. "mastery >= 50% in every track"), which can go false later for
+// reasons that have nothing to do with the user losing progress, like a new
+// track being added at 0% mastery. Union the two so a past achievement
+// never appears to un-earn itself.
 function evaluateAchievements(results, stats) {
   const ctx = buildAchievementContext(results, stats);
-  return ACHIEVEMENTS.map((a) => ({ ...a, unlocked: a.check(ctx), progress: a.target(ctx) }));
+  return ACHIEVEMENTS.map((a) => ({ ...a, unlocked: a.check(ctx) || stats.unlocked.includes(a.id), progress: a.target(ctx) }));
 }
 
 /* ---------------- learning paths ---------------- */

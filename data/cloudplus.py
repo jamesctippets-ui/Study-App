@@ -131,9 +131,9 @@ FLASHCARDS = [
     {
         'id': 'f18',
         'cat': 'deployment',
-        'front': 'P2V, V2V, and V2C migrations',
-        'back': 'P2V converts a physical server into a virtual machine. V2V moves a VM from one hypervisor/platform to another. V2C (or P2C) moves a physical or virtual workload into the cloud.',
-        'detail': "A 'lift and shift' cloud migration is usually a V2C or P2C migration — moving the workload largely as-is, versus refactoring it to use cloud-native PaaS services instead.",
+        'front': 'P2V, V2V, P2C, and V2C migrations',
+        'back': 'P2V converts a physical server into a virtual machine. V2V moves a VM from one hypervisor/platform to another. P2C moves a still-physical on-premises workload straight into the cloud. V2C moves a workload that is already virtualized on-premises into the cloud — the distinction is what state the source was in before the move, not just where it ends up.',
+        'detail': "A 'lift and shift' cloud migration is usually a P2C or V2C migration — moving the workload largely as-is, versus refactoring it to use cloud-native PaaS services instead.",
     },
     {
         'id': 'f19',

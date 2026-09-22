@@ -45,10 +45,19 @@ def validate():
     if missing_exam_config:
         errors.append(f"EXAM_CONFIG is missing entries for: {missing_exam_config}")
 
+    seen_path_keys = set()
     for path in paths.PATHS:
+        if path["key"] in seen_path_keys:
+            errors.append(f"duplicate path key '{path['key']}'")
+        seen_path_keys.add(path["key"])
+
+        seen_step_keys = set()
         for step in path["tracks"]:
             if step["key"] not in track_keys:
                 errors.append(f"path '{path['key']}' references unknown track '{step['key']}'")
+            if step["key"] in seen_step_keys:
+                errors.append(f"path '{path['key']}' lists track '{step['key']}' more than once")
+            seen_step_keys.add(step["key"])
 
     for key, mod in TRACK_MODULES.items():
         cat_keys = {c["key"] for c in mod.CATEGORIES}
