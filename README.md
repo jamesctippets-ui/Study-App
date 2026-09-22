@@ -11,9 +11,11 @@ sub-views — Cards (flashcards, ordered by a simplified SM-2 spaced-repetition
 schedule — "Still learning" resurfaces a card sooner, "Got it" pushes its
 next appearance out by a growing interval; the order is computed fresh each
 time you enter a category/track rather than reshuffling mid-session), Study
-(a flashcard-list per category, or for AZ-900/AZ-104 a full mini-course per
-topic: reading with tappable key terms, an SVG diagram, a portal mockup, a
-worked scenario, common exam traps, and a 3–4 question quiz), and Match (a
+(for tracks without a course, a flashcard list paginated one category/section
+at a time — Previous/Next section controls instead of one long scroll; for
+AZ-900/AZ-104, a full mini-course per topic: reading with tappable key terms,
+an SVG diagram, a portal mockup, a worked scenario, common exam traps, and a
+3–4 question quiz), and Match (a
 term-matching game — tap a term chip, then its definition; respects the
 current category filter, tracks mistakes, and deals a fresh random round
 each time), and Sheet (a one-page, printable cheat sheet per track — every
@@ -31,11 +33,13 @@ length/pass mark. Text-to-speech is available on readings and flashcards.
 
 Key terms aren't just highlighted in lesson readings — every track gets this
 now, in quiz explanations and flashcard backs too. Tapping a highlighted term
-pulls up its definition inline (front/back/detail, sourced from that track's
-own flashcards) without navigating away. Curated tracks (AZ-900, AZ-104) use
-a hand-picked term list; every other track auto-detects terms by matching
-flashcard fronts against the surrounding text, so coverage scales to new
-content with no per-question authoring needed.
+opens a small flyout anchored directly under that word (front/back/detail,
+sourced from that track's own flashcards), not a block appended below the
+whole paragraph or card — it closes on a second tap, on Escape, or on tapping
+anywhere else. Curated tracks (AZ-900, AZ-104) use a hand-picked term list;
+every other track auto-detects terms by matching flashcard fronts against
+the surrounding text, so coverage scales to new content with no
+per-question authoring needed.
 
 The Exam tab for each track links out to real official study resources —
 Microsoft Learn study guides and certification pages for the Microsoft

@@ -54,6 +54,22 @@ function useEscapeToClose(onClose) {
   }, [onClose]);
 }
 
+// Closes an inline flyout (a term-definition popup anchored to the word
+// that was clicked, not a full-screen overlay) when the user taps/clicks
+// anywhere outside it — including on a different term, which this treats
+// as "outside" too so the caller's own toggle logic decides what opens
+// next instead of this hook fighting it. Only listens while `active`.
+function useClickOutsideToClose(active, onClose) {
+  useEffect(() => {
+    if (!active) return;
+    const handler = (e) => {
+      if (!e.target.closest('.term-flyout, .term-trigger')) onClose();
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, [active, onClose]);
+}
+
 const SHADOW = {
   card: '0 3px 10px rgba(0,0,0,0.32), inset 0 1px 0 rgba(255,255,255,0.04)',
 };

@@ -131,7 +131,34 @@ function findTermCard(term, vocabPool) {
   return vocabPool.find((v) => v.detail && wordRe.test(v.detail)) || null;
 }
 
-function highlightTerms(text, terms, vocabPool, onTermClick) {
+// Renders one highlighted term: a clickable word plus, when it's the
+// active one, a flyout anchored directly under it (not appended after the
+// whole paragraph/card) — the wrapping span's `position: relative` is what
+// makes the flyout's `position: absolute` land right under this specific
+// word instead of the block's bottom edge.
+function TermTrigger({ text, card, isActive, onToggle }) {
+  return (
+    <span style={{ position: 'relative', display: 'inline-block' }}>
+      <button
+        className="btn-flat term-trigger"
+        onClick={(e) => { e.stopPropagation(); onToggle(); }}
+        style={{
+          color: COLOR.gold, fontWeight: 700, background: 'transparent', padding: 0,
+          borderBottom: `1px dotted ${COLOR.gold}`, cursor: 'pointer', font: 'inherit',
+        }}
+      >
+        {text}
+      </button>
+      {isActive && <TermFlyout term={card} onClose={onToggle} />}
+    </span>
+  );
+}
+
+// `activeKey`/`onToggle` let the caller track which single occurrence (if
+// any) has its flyout open — `blockId` disambiguates occurrence indices
+// across multiple calls in the same component (e.g. one call per paragraph)
+// so two different paragraphs' "3rd highlighted word" don't collide.
+function highlightTerms(text, terms, vocabPool, activeKey, onToggle, blockId) {
   if (!terms || !terms.length) return text;
   const sorted = [...terms].sort((a, b) => b.length - a.length);
   const escaped = sorted.map(escapeRegExp);
@@ -141,21 +168,18 @@ function highlightTerms(text, terms, vocabPool, onTermClick) {
     const isTerm = sorted.some((t) => t === part);
     if (!isTerm) return <React.Fragment key={i}>{part}</React.Fragment>;
     const card = vocabPool ? findTermCard(part, vocabPool) : null;
-    if (!card || !onTermClick) {
+    if (!card || !onToggle) {
       return <span key={i} style={{ color: COLOR.gold, fontWeight: 700 }}>{part}</span>;
     }
+    const key = (blockId || '') + ':' + i;
     return (
-      <button
+      <TermTrigger
         key={i}
-        className="btn-flat"
-        onClick={(e) => { e.stopPropagation(); onTermClick(card); }}
-        style={{
-          color: COLOR.gold, fontWeight: 700, background: 'transparent', padding: 0,
-          borderBottom: `1px dotted ${COLOR.gold}`, cursor: 'pointer', font: 'inherit',
-        }}
-      >
-        {part}
-      </button>
+        text={part}
+        card={card}
+        isActive={key === activeKey}
+        onToggle={() => onToggle(key === activeKey ? null : key)}
+      />
     );
   });
 }
@@ -165,9 +189,9 @@ function highlightTerms(text, terms, vocabPool, onTermClick) {
 // and makes those clickable, so every track gets term popouts for free
 // (no per-question authoring needed). Capped at `maxTerms` distinct terms
 // per call so a dense explanation doesn't turn into a wall of gold links.
-function autoHighlightTerms(text, vocabPool, onTermClick, maxTerms) {
+function autoHighlightTerms(text, vocabPool, activeKey, onToggle, maxTerms, blockId) {
   const cap = maxTerms || 3;
-  if (!text || !vocabPool || !vocabPool.length || !onTermClick) return text;
+  if (!text || !vocabPool || !vocabPool.length || !onToggle) return text;
   const candidates = vocabPool.filter((v) => v.front && v.front.length >= 4);
   if (!candidates.length) return text;
   const sorted = [...candidates].sort((a, b) => b.front.length - a.front.length);
@@ -178,21 +202,18 @@ function autoHighlightTerms(text, vocabPool, onTermClick, maxTerms) {
   return parts.map((part, i) => {
     const match = sorted.find((v) => v.front.toLowerCase() === (part || '').toLowerCase());
     if (!match) return <React.Fragment key={i}>{part}</React.Fragment>;
-    const key = match.front.toLowerCase();
-    if (!shown.has(key) && shown.size >= cap) return <React.Fragment key={i}>{part}</React.Fragment>;
-    shown.add(key);
+    const dedupeKey = match.front.toLowerCase();
+    if (!shown.has(dedupeKey) && shown.size >= cap) return <React.Fragment key={i}>{part}</React.Fragment>;
+    shown.add(dedupeKey);
+    const key = (blockId || '') + ':' + i;
     return (
-      <button
+      <TermTrigger
         key={i}
-        className="btn-flat"
-        onClick={(e) => { e.stopPropagation(); onTermClick(match); }}
-        style={{
-          color: COLOR.gold, fontWeight: 700, background: 'transparent', padding: 0,
-          borderBottom: `1px dotted ${COLOR.gold}`, cursor: 'pointer', font: 'inherit',
-        }}
-      >
-        {part}
-      </button>
+        text={part}
+        card={match}
+        isActive={key === activeKey}
+        onToggle={() => onToggle(key === activeKey ? null : key)}
+      />
     );
   });
 }

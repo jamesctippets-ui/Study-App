@@ -304,21 +304,44 @@ function HomeDashboard({ tracks, results, stats, achievementsCount, achievements
   );
 }
 
-function TermPopover({ term, onClose }) {
+// A small flyout anchored directly under the term that was clicked (see
+// TermTrigger in 02_portal_mockups.jsx, which renders this as the absolute-
+// positioned child of the specific word's own relatively-positioned
+// wrapper) — not a block appended below the whole paragraph/card. The
+// `term-flyout` class is what useClickOutsideToClose looks for to know a
+// click landed inside it rather than outside.
+function TermFlyout({ term, onClose }) {
   if (!term) return null;
   return (
-    <div style={{ boxShadow: SHADOW.card, background: COLOR.surfaceRaised, border: `1px solid ${COLOR.primary}`, borderRadius: '12px', padding: '12px 14px', marginTop: '10px', marginBottom: '4px' }}>
-      <div className="flex justify-between items-start" style={{ marginBottom: '4px' }}>
-        <div className="itil-display" style={{ fontSize: '14px', fontWeight: 600, color: COLOR.primary }}>{term.front}</div>
-        <button onClick={onClose} className="btn-flat" style={{ background: 'transparent', color: COLOR.muted, padding: '0 0 0 8px', fontSize: '13px' }}>✕</button>
-      </div>
-      <div style={{ fontSize: '14px', lineHeight: 1.55, color: COLOR.text }}>{term.back}</div>
+    <span
+      className="term-flyout"
+      onClick={(e) => e.stopPropagation()}
+      style={{
+        position: 'absolute', top: 'calc(100% + 8px)', left: 0, zIndex: 30,
+        display: 'block', width: 'max-content', maxWidth: 'min(280px, 78vw)',
+        background: COLOR.surfaceRaised, border: `1px solid ${COLOR.primary}`, borderRadius: '12px',
+        padding: '10px 12px', boxShadow: SHADOW.card, textAlign: 'left', whiteSpace: 'normal',
+        fontWeight: 400, fontStyle: 'normal',
+      }}
+    >
+      <span
+        style={{
+          position: 'absolute', top: '-5px', left: '14px', width: '9px', height: '9px',
+          background: COLOR.surfaceRaised, borderLeft: `1px solid ${COLOR.primary}`, borderTop: `1px solid ${COLOR.primary}`,
+          transform: 'rotate(45deg)',
+        }}
+      />
+      <span className="flex justify-between items-start" style={{ display: 'flex', marginBottom: '4px', position: 'relative' }}>
+        <span className="itil-display" style={{ fontSize: '13px', fontWeight: 600, color: COLOR.primary }}>{term.front}</span>
+        <button onClick={onClose} className="btn-flat" style={{ background: 'transparent', color: COLOR.muted, padding: '0 0 0 8px', fontSize: '12px' }}>✕</button>
+      </span>
+      <span style={{ display: 'block', fontSize: '12.5px', lineHeight: 1.5, color: COLOR.text, position: 'relative' }}>{term.back}</span>
       {term.detail && (
-        <div style={{ fontSize: '12.5px', lineHeight: 1.55, color: COLOR.muted, marginTop: '6px', borderLeft: `2px solid ${COLOR.primary}`, paddingLeft: '8px' }}>
+        <span style={{ display: 'block', fontSize: '11.5px', lineHeight: 1.5, color: COLOR.muted, marginTop: '6px', borderLeft: `2px solid ${COLOR.primary}`, paddingLeft: '8px', position: 'relative' }}>
           {term.detail}
-        </div>
+        </span>
       )}
-    </div>
+    </span>
   );
 }
 
@@ -346,8 +369,10 @@ function CategoryChip({ label, active, mastery, onClick }) {
 }
 
 function FlashcardView({ card, flipped, setFlipped, onRate, index, total, categoryLabel, speakingId, onSpeak, speechSupported, flashcardsData }) {
-  const [activeTerm, setActiveTerm] = useState(null);
-  useEffect(() => { setActiveTerm(null); }, [card && card.id]);
+  const [activeTermKey, setActiveTermKey] = useState(null);
+  useEffect(() => { setActiveTermKey(null); }, [card && card.id]);
+  useEscapeToClose(() => setActiveTermKey(null));
+  useClickOutsideToClose(!!activeTermKey, () => setActiveTermKey(null));
   if (!card) return null;
   const otherCards = flashcardsData && flashcardsData.filter((c) => c.id !== card.id);
   return (
@@ -379,10 +404,9 @@ function FlashcardView({ card, flipped, setFlipped, onRate, index, total, catego
         {!flipped ? (
           <div className="itil-display" style={{ fontSize: '21px', fontWeight: 500, lineHeight: 1.35 }}>{card.front}</div>
         ) : (
-          <div style={{ fontSize: '16px', lineHeight: 1.6 }}>{autoHighlightTerms(card.back, otherCards, setActiveTerm, 2)}</div>
+          <div style={{ fontSize: '16px', lineHeight: 1.6 }}>{autoHighlightTerms(card.back, otherCards, activeTermKey, setActiveTermKey, 2)}</div>
         )}
       </div>
-      {activeTerm && <TermPopover term={activeTerm} onClose={() => setActiveTerm(null)} />}
       <div style={{ fontSize: '11px', color: COLOR.muted, textAlign: 'center', marginTop: '8px' }}>
         {flipped ? 'Tap to see the term again' : 'Tap the card to reveal the definition'}
       </div>
@@ -407,25 +431,34 @@ function FlashcardView({ card, flipped, setFlipped, onRate, index, total, catego
 }
 
 function StudyEntry({ item, allFlashcards }) {
-  const [activeTerm, setActiveTerm] = useState(null);
+  const [activeTermKey, setActiveTermKey] = useState(null);
+  useEscapeToClose(() => setActiveTermKey(null));
+  useClickOutsideToClose(!!activeTermKey, () => setActiveTermKey(null));
   const otherCards = allFlashcards && allFlashcards.filter((c) => c.id !== item.id);
   return (
     <div style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderRadius: '14px', padding: '14px 16px' }}>
       <div className="itil-display" style={{ fontSize: '16px', fontWeight: 600, marginBottom: '4px' }}>{item.front}</div>
       <div style={{ fontSize: '14px', lineHeight: 1.55, color: COLOR.text, marginBottom: item.detail ? '8px' : 0 }}>
-        {autoHighlightTerms(item.back, otherCards, setActiveTerm, 2)}
+        {autoHighlightTerms(item.back, otherCards, activeTermKey, setActiveTermKey, 2)}
       </div>
       {item.detail && (
         <div style={{ fontSize: '13px', lineHeight: 1.55, color: COLOR.muted, borderLeft: `2px solid ${COLOR.primary}`, paddingLeft: '10px' }}>
           {item.detail}
         </div>
       )}
-      {activeTerm && <TermPopover term={activeTerm} onClose={() => setActiveTerm(null)} />}
     </div>
   );
 }
 
+// When a specific category is picked (via the chips above), that's already
+// a single section, shown in full. When "All" is selected, sections used to
+// all stack into one long scroll — now they page one section at a time,
+// with Next/Previous section controls, so the material reads like a short
+// study booklet instead of one endless page.
 function StudyView({ activeCat, categories, flashcards }) {
+  const [sectionPage, setSectionPage] = useState(0);
+  useEffect(() => { setSectionPage(0); }, [activeCat, flashcards]);
+
   if (activeCat !== 'all') {
     const items = flashcards.filter((i) => i.cat === activeCat);
     return (
@@ -434,20 +467,50 @@ function StudyView({ activeCat, categories, flashcards }) {
       </div>
     );
   }
+
+  const sections = categories
+    .map((c) => ({ cat: c, items: flashcards.filter((i) => i.cat === c.key) }))
+    .filter((s) => s.items.length > 0);
+  if (!sections.length) return null;
+  const page = Math.min(sectionPage, sections.length - 1);
+  const section = sections[page];
+  const isFirst = page === 0;
+  const isLast = page === sections.length - 1;
+
   return (
-    <div className="flex flex-col gap-5">
-      {categories.map((c) => {
-        const catItems = flashcards.filter((i) => i.cat === c.key);
-        if (!catItems.length) return null;
-        return (
-          <div key={c.key}>
-            <div style={{ fontSize: '13px', fontWeight: 600, color: COLOR.gold, marginBottom: '8px' }}>{c.label}</div>
-            <div className="flex flex-col gap-3">
-              {catItems.map((item) => <StudyEntry key={item.id} item={item} allFlashcards={flashcards} />)}
-            </div>
-          </div>
-        );
-      })}
+    <div>
+      <div className="flex justify-between items-center mb-3">
+        <div className="itil-display" style={{ fontSize: '15px', fontWeight: 600, color: COLOR.gold }}>{section.cat.label}</div>
+        <div style={{ fontSize: '11px', color: COLOR.muted }}>Section {page + 1} of {sections.length}</div>
+      </div>
+      <div className="flex flex-col gap-3" style={{ marginBottom: '18px' }}>
+        {section.items.map((item) => <StudyEntry key={item.id} item={item} allFlashcards={flashcards} />)}
+      </div>
+      <div className="flex gap-2">
+        <button
+          onClick={() => setSectionPage((p) => Math.max(0, p - 1))}
+          disabled={isFirst}
+          className="flex-1"
+          style={{
+            padding: '12px', borderRadius: '12px', border: `1px solid ${COLOR.border}`, background: 'transparent',
+            color: isFirst ? COLOR.muted : COLOR.text, fontSize: '13px', fontWeight: 600, opacity: isFirst ? 0.5 : 1,
+          }}
+        >
+          ‹ Previous section
+        </button>
+        <button
+          onClick={() => setSectionPage((p) => Math.min(sections.length - 1, p + 1))}
+          disabled={isLast}
+          className="flex-1"
+          style={{
+            padding: '12px', borderRadius: '12px',
+            background: isLast ? COLOR.surfaceRaised : COLOR.primary, color: isLast ? COLOR.muted : '#2B1620',
+            fontSize: '13px', fontWeight: 600,
+          }}
+        >
+          Next section ›
+        </button>
+      </div>
     </div>
   );
 }
@@ -766,7 +829,9 @@ function ReadingCheckGate({ question, onPassed }) {
 
 function LessonDetail({ lesson, flashcardsData, questionsData, onBack, onQuiz, speakingId, onSpeak, speechSupported }) {
   const [showFundamentals, setShowFundamentals] = useState(false);
-  const [activeTerm, setActiveTerm] = useState(null);
+  const [activeTermKey, setActiveTermKey] = useState(null);
+  useEscapeToClose(() => setActiveTermKey(null));
+  useClickOutsideToClose(!!activeTermKey, () => setActiveTermKey(null));
   const [readingPage, setReadingPage] = useState(0);
   const [unlockedPages, setUnlockedPages] = useState(1);
   const vocabItems = lesson.vocabIds.map((id) => flashcardsData.find((f) => f.id === id)).filter(Boolean);
@@ -791,6 +856,8 @@ function LessonDetail({ lesson, flashcardsData, questionsData, onBack, onQuiz, s
     : null;
   const advancePastGate = () => { setUnlockedPages((n) => n + 1); setReadingPage((p) => p + 1); };
 
+  useEffect(() => { setActiveTermKey(null); }, [readingPage]);
+
   return (
     <div>
       <button onClick={onBack} className="btn-flat" style={{ fontSize: '12px', color: COLOR.primary, background: 'transparent', marginBottom: '12px', padding: 0 }}>
@@ -805,7 +872,7 @@ function LessonDetail({ lesson, flashcardsData, questionsData, onBack, onQuiz, s
         </div>
       )}
 
-      <div style={{ marginBottom: activeTerm ? '10px' : '16px' }}>
+      <div style={{ marginBottom: '16px' }}>
         <div className="flex justify-between items-center" style={{ marginBottom: '8px' }}>
           <div style={{ fontSize: '13px', fontWeight: 600, color: COLOR.gold }}>
             Reading{readingPages.length > 1 ? ` · page ${readingPage + 1} of ${readingPages.length}` : ''}
@@ -822,7 +889,7 @@ function LessonDetail({ lesson, flashcardsData, questionsData, onBack, onQuiz, s
         <div style={{ fontSize: '11px', color: COLOR.muted, marginBottom: '8px' }}>Tap a highlighted term for its definition.</div>
         {readingPages[readingPage].map((p, i) => (
           <p key={i} style={{ fontSize: '14px', lineHeight: 1.65, color: COLOR.text, marginBottom: '10px' }}>
-            {highlightTerms(p, lesson.keyTerms, flashcardsData, setActiveTerm)}
+            {highlightTerms(p, lesson.keyTerms, flashcardsData, activeTermKey, setActiveTermKey, 'p' + i)}
           </p>
         ))}
 
@@ -874,12 +941,6 @@ function LessonDetail({ lesson, flashcardsData, questionsData, onBack, onQuiz, s
           </div>
         )}
       </div>
-
-      {activeTerm && (
-        <div style={{ marginBottom: '16px' }}>
-          <TermPopover term={activeTerm} onClose={() => setActiveTerm(null)} />
-        </div>
-      )}
 
       {MockupComp && (
         <div style={{ marginBottom: '16px' }}>
@@ -1051,8 +1112,10 @@ function QuizSetup({ length, setLength, types, toggleType, onReroll, poolSize, m
 }
 
 function QuestionView({ q, selected, onChoose, onNext, index, total, categoryLabel, badgeLabel, msPending, onToggleMs, onSubmitMs, nextLabel, hideMeta, flashcardsData }) {
-  const [activeTerm, setActiveTerm] = useState(null);
-  useEffect(() => { setActiveTerm(null); }, [q && q.id]);
+  const [activeTermKey, setActiveTermKey] = useState(null);
+  useEffect(() => { setActiveTermKey(null); }, [q && q.id]);
+  useEscapeToClose(() => setActiveTermKey(null));
+  useClickOutsideToClose(!!activeTermKey, () => setActiveTermKey(null));
   if (!q) return null;
   const isLast = index + 1 >= total;
   return (
@@ -1172,10 +1235,9 @@ function QuestionView({ q, selected, onChoose, onNext, index, total, categoryLab
 
         {selected !== null && q.explanation && (
           <div style={{ boxShadow: SHADOW.card, marginTop: '14px', padding: '12px', borderRadius: '10px', background: COLOR.surfaceRaised, fontSize: '14px', lineHeight: 1.55, color: COLOR.muted }}>
-            {autoHighlightTerms(q.explanation, flashcardsData, setActiveTerm)}
+            {autoHighlightTerms(q.explanation, flashcardsData, activeTermKey, setActiveTermKey)}
           </div>
         )}
-        {activeTerm && <TermPopover term={activeTerm} onClose={() => setActiveTerm(null)} />}
       </div>
 
       {selected !== null && (
