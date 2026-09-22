@@ -545,6 +545,56 @@ const PORTAL_MOCKUPS = {
   roleAssignment: MockupRoleAssignment,
 };
 
+// Real Azure Portal screenshots, pulled directly from Microsoft's own public
+// documentation source (the MicrosoftDocs/azure-docs and
+// MicrosoftDocs/azure-compute-docs GitHub repos), which publish their
+// content — including these images — under a Creative Commons Attribution
+// 4.0 International license. Not every PORTAL_MOCKUPS key has a match here;
+// this only covers the ones where a clean, on-topic, non-sensitive real
+// screenshot was actually found (no VNet-creation match was found, for
+// instance, so that key is simply absent).
+const REAL_PORTAL_SCREENSHOTS = {
+  resourceGroup: {
+    src: 'images/portal/resource-group.png',
+    alt: 'Real Azure Portal screenshot of the Create a resource group form',
+    sourceLabel: 'Microsoft Learn: Manage resource groups',
+    sourceUrl: 'https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/manage-resource-groups-portal',
+  },
+  storageAccount: {
+    src: 'images/portal/storage-account.png',
+    alt: 'Real Azure Portal screenshot of the storage account creation tabs',
+    sourceLabel: 'Microsoft Learn: Create a storage account',
+    sourceUrl: 'https://learn.microsoft.com/en-us/azure/storage/common/storage-account-create',
+  },
+  vmSize: {
+    src: 'images/portal/vm-size.png',
+    alt: 'Real Azure Portal screenshot of the VM Instance details section',
+    sourceLabel: 'Microsoft Learn: Create a Windows VM in the Azure portal',
+    sourceUrl: 'https://learn.microsoft.com/en-us/azure/virtual-machines/windows/quick-create-portal',
+  },
+  roleAssignment: {
+    src: 'images/portal/role-assignment.png',
+    alt: 'Real Azure Portal screenshot of the Access control (IAM) role assignments list',
+    sourceLabel: 'Microsoft Learn: Assign a role in the Azure portal',
+    sourceUrl: 'https://learn.microsoft.com/en-us/azure/role-based-access-control/quickstart-assign-role-user-portal',
+  },
+};
+
+function RealPortalScreenshot({ shot }) {
+  if (!shot) return null;
+  return (
+    <div style={{ boxShadow: SHADOW.card, background: '#fff', border: `1px solid ${COLOR.border}`, borderRadius: '14px', padding: '8px', marginTop: '10px' }}>
+      <img src={shot.src} alt={shot.alt} style={{ width: '100%', height: 'auto', display: 'block', borderRadius: '8px' }} />
+      <div style={{ fontSize: '10px', color: COLOR.muted, marginTop: '8px', lineHeight: 1.4, padding: '0 4px' }}>
+        Real Azure Portal screenshot — © Microsoft, licensed{' '}
+        <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener noreferrer" style={{ color: COLOR.primary }}>CC BY 4.0</a>
+        {' '}via{' '}
+        <a href={shot.sourceUrl} target="_blank" rel="noopener noreferrer" style={{ color: COLOR.primary }}>{shot.sourceLabel}</a>.
+      </div>
+    </div>
+  );
+}
+
 function escapeRegExp(s) {
   return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
@@ -1409,15 +1459,46 @@ function StudyEntry({ item, allFlashcards }) {
 // all stack into one long scroll — now they page one section at a time,
 // with Next/Previous section controls, so the material reads like a short
 // study booklet instead of one endless page.
+// A compact row of "learn more" links for a category/section — used
+// wherever a category's content is shown (Study section pages, a lesson's
+// Vocabulary block, the cheat sheet) so a reader can jump straight to the
+// specific official doc for that topic instead of only the whole-track
+// links on the Exam tab.
+function ResourceLinksRow({ resources, label }) {
+  if (!resources || !resources.length) return null;
+  return (
+    <div style={{ marginBottom: '10px' }}>
+      {label && <div style={{ fontSize: '10.5px', color: COLOR.muted, marginBottom: '3px' }}>{label}</div>}
+      <div className="flex flex-col gap-1">
+        {resources.map((r, i) => (
+          <a
+            key={i}
+            href={r.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ fontSize: '11.5px', color: COLOR.primary, textDecoration: 'none', borderBottom: `1px dotted ${COLOR.primary}`, width: 'fit-content' }}
+          >
+            {r.label} ↗
+          </a>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function StudyView({ activeCat, categories, flashcards }) {
   const [sectionPage, setSectionPage] = useState(0);
   useEffect(() => { setSectionPage(0); }, [activeCat, flashcards]);
 
   if (activeCat !== 'all') {
     const items = flashcards.filter((i) => i.cat === activeCat);
+    const activeCatObj = categories.find((c) => c.key === activeCat);
     return (
-      <div className="flex flex-col gap-3">
-        {items.map((item) => <StudyEntry key={item.id} item={item} allFlashcards={flashcards} />)}
+      <div>
+        <ResourceLinksRow resources={activeCatObj && activeCatObj.resources} label="Learn more" />
+        <div className="flex flex-col gap-3">
+          {items.map((item) => <StudyEntry key={item.id} item={item} allFlashcards={flashcards} />)}
+        </div>
       </div>
     );
   }
@@ -1433,10 +1514,11 @@ function StudyView({ activeCat, categories, flashcards }) {
 
   return (
     <div>
-      <div className="flex justify-between items-center mb-3">
+      <div className="flex justify-between items-center mb-2">
         <div className="itil-display" style={{ fontSize: '15px', fontWeight: 600, color: COLOR.gold }}>{section.cat.label}</div>
         <div style={{ fontSize: '11px', color: COLOR.muted }}>Section {page + 1} of {sections.length}</div>
       </div>
+      <ResourceLinksRow resources={section.cat.resources} label="Learn more" />
       <div className="flex flex-col gap-3" style={{ marginBottom: '18px' }}>
         {section.items.map((item) => <StudyEntry key={item.id} item={item} allFlashcards={flashcards} />)}
       </div>
@@ -1469,7 +1551,7 @@ function StudyView({ activeCat, categories, flashcards }) {
   );
 }
 
-function CheatSheetView({ trackLabel, sections }) {
+function CheatSheetView({ trackLabel, sections, resources }) {
   if (!sections.length) {
     return (
       <div style={{ textAlign: 'center', color: COLOR.muted, fontSize: '13px', padding: '30px 10px' }}>
@@ -1485,6 +1567,7 @@ function CheatSheetView({ trackLabel, sections }) {
           flashcards/quiz, just a fast pre-exam refresher.
         </div>
       </div>
+      <ResourceLinksRow resources={resources} label="Official resources for this track" />
       <button
         onClick={() => window.print()}
         className="cheat-sheet-print-btn"
@@ -1781,7 +1864,7 @@ function ReadingCheckGate({ question, onPassed }) {
   );
 }
 
-function LessonDetail({ lesson, flashcardsData, questionsData, onBack, onQuiz, speakingId, onSpeak, speechSupported }) {
+function LessonDetail({ lesson, flashcardsData, questionsData, categories, onBack, onQuiz, speakingId, onSpeak, speechSupported }) {
   const [showFundamentals, setShowFundamentals] = useState(false);
   const [activeTermKey, setActiveTermKey] = useState(null);
   useEscapeToClose(() => setActiveTermKey(null));
@@ -1789,8 +1872,12 @@ function LessonDetail({ lesson, flashcardsData, questionsData, onBack, onQuiz, s
   const [readingPage, setReadingPage] = useState(0);
   const [unlockedPages, setUnlockedPages] = useState(1);
   const vocabItems = lesson.vocabIds.map((id) => flashcardsData.find((f) => f.id === id)).filter(Boolean);
+  const vocabResources = (categories || [])
+    .filter((c) => vocabItems.some((v) => v.cat === c.key) && c.resources && c.resources.length)
+    .flatMap((c) => c.resources);
   const DiagramComp = lesson.diagram ? LESSON_DIAGRAMS[lesson.diagram] : null;
   const MockupComp = lesson.portalMockup ? PORTAL_MOCKUPS[lesson.portalMockup] : null;
+  const realShot = lesson.portalMockup ? REAL_PORTAL_SCREENSHOTS[lesson.portalMockup] : null;
 
   const paragraphs = lesson.reading.split('\n\n');
   const readingPages = [];
@@ -1905,6 +1992,14 @@ function LessonDetail({ lesson, flashcardsData, questionsData, onBack, onQuiz, s
           <div style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderRadius: '14px', padding: '14px' }}>
             <MockupComp />
           </div>
+          {realShot && (
+            <>
+              <div style={{ fontSize: '10.5px', color: COLOR.muted, marginTop: '12px', marginBottom: '2px' }}>
+                See the real thing:
+              </div>
+              <RealPortalScreenshot shot={realShot} />
+            </>
+          )}
         </div>
       )}
 
@@ -1954,6 +2049,7 @@ function LessonDetail({ lesson, flashcardsData, questionsData, onBack, onQuiz, s
 
       <div style={{ marginBottom: '16px' }}>
         <div style={{ fontSize: '13px', fontWeight: 600, color: COLOR.gold, marginBottom: '8px' }}>Vocabulary</div>
+        <ResourceLinksRow resources={vocabResources} label="Learn more" />
         <div className="flex flex-col gap-2">
           {vocabItems.map((item) => <StudyEntry key={item.id} item={item} />)}
         </div>
@@ -1969,7 +2065,7 @@ function LessonDetail({ lesson, flashcardsData, questionsData, onBack, onQuiz, s
   );
 }
 
-function CourseView({ lessons, flashcardsData, questionsData, onQuiz, speakingId, onSpeak, speechSupported, masteryFn }) {
+function CourseView({ lessons, flashcardsData, questionsData, categories, onQuiz, speakingId, onSpeak, speechSupported, masteryFn }) {
   const [lessonId, setLessonId] = useState(null);
   const lesson = lessons.find((l) => l.id === lessonId);
   if (lesson) {
@@ -1978,6 +2074,7 @@ function CourseView({ lessons, flashcardsData, questionsData, onQuiz, speakingId
         lesson={lesson}
         flashcardsData={flashcardsData}
         questionsData={questionsData}
+        categories={categories}
         onBack={() => setLessonId(null)}
         onQuiz={onQuiz}
         speakingId={speakingId}
@@ -2796,6 +2893,16 @@ function CertStudyApp() {
 
   const overallMastery = useMemo(() => trackMastery(activeTrack, results), [activeTrack, results]);
 
+  // Cheat sheet's "Official resources" block: the track-level links already
+  // shown on the Exam tab, plus every category's own links, deduped by URL
+  // so a link that's relevant at both levels isn't listed twice.
+  const cheatSheetResources = useMemo(() => {
+    const all = [...(EXAM_CONFIG[activeTrack].resources || [])];
+    categories.forEach((c) => { if (c.resources) all.push(...c.resources); });
+    const seen = new Set();
+    return all.filter((r) => (seen.has(r.url) ? false : (seen.add(r.url), true)));
+  }, [activeTrack, categories]);
+
   const currentCard = filteredFlashcards[fIndex];
   const currentQ = quizSession[sessionIndex];
 
@@ -3252,6 +3359,7 @@ function CertStudyApp() {
               lessons={DATA[activeTrack].lessons}
               flashcardsData={flashcardsData}
               questionsData={questionsData}
+              categories={categories}
               onQuiz={startLessonQuiz}
               speakingId={speakingId}
               onSpeak={speak}
@@ -3264,7 +3372,7 @@ function CertStudyApp() {
         )}
 
         {mode === 'learn' && learnView === 'sheet' && (
-          <CheatSheetView trackLabel={track.label} sections={DATA[activeTrack].cheatSheet || []} />
+          <CheatSheetView trackLabel={track.label} sections={DATA[activeTrack].cheatSheet || []} resources={cheatSheetResources} />
         )}
 
         {mode === 'exam' && (

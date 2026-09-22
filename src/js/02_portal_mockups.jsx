@@ -111,6 +111,56 @@ const PORTAL_MOCKUPS = {
   roleAssignment: MockupRoleAssignment,
 };
 
+// Real Azure Portal screenshots, pulled directly from Microsoft's own public
+// documentation source (the MicrosoftDocs/azure-docs and
+// MicrosoftDocs/azure-compute-docs GitHub repos), which publish their
+// content — including these images — under a Creative Commons Attribution
+// 4.0 International license. Not every PORTAL_MOCKUPS key has a match here;
+// this only covers the ones where a clean, on-topic, non-sensitive real
+// screenshot was actually found (no VNet-creation match was found, for
+// instance, so that key is simply absent).
+const REAL_PORTAL_SCREENSHOTS = {
+  resourceGroup: {
+    src: 'images/portal/resource-group.png',
+    alt: 'Real Azure Portal screenshot of the Create a resource group form',
+    sourceLabel: 'Microsoft Learn: Manage resource groups',
+    sourceUrl: 'https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/manage-resource-groups-portal',
+  },
+  storageAccount: {
+    src: 'images/portal/storage-account.png',
+    alt: 'Real Azure Portal screenshot of the storage account creation tabs',
+    sourceLabel: 'Microsoft Learn: Create a storage account',
+    sourceUrl: 'https://learn.microsoft.com/en-us/azure/storage/common/storage-account-create',
+  },
+  vmSize: {
+    src: 'images/portal/vm-size.png',
+    alt: 'Real Azure Portal screenshot of the VM Instance details section',
+    sourceLabel: 'Microsoft Learn: Create a Windows VM in the Azure portal',
+    sourceUrl: 'https://learn.microsoft.com/en-us/azure/virtual-machines/windows/quick-create-portal',
+  },
+  roleAssignment: {
+    src: 'images/portal/role-assignment.png',
+    alt: 'Real Azure Portal screenshot of the Access control (IAM) role assignments list',
+    sourceLabel: 'Microsoft Learn: Assign a role in the Azure portal',
+    sourceUrl: 'https://learn.microsoft.com/en-us/azure/role-based-access-control/quickstart-assign-role-user-portal',
+  },
+};
+
+function RealPortalScreenshot({ shot }) {
+  if (!shot) return null;
+  return (
+    <div style={{ boxShadow: SHADOW.card, background: '#fff', border: `1px solid ${COLOR.border}`, borderRadius: '14px', padding: '8px', marginTop: '10px' }}>
+      <img src={shot.src} alt={shot.alt} style={{ width: '100%', height: 'auto', display: 'block', borderRadius: '8px' }} />
+      <div style={{ fontSize: '10px', color: COLOR.muted, marginTop: '8px', lineHeight: 1.4, padding: '0 4px' }}>
+        Real Azure Portal screenshot — © Microsoft, licensed{' '}
+        <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener noreferrer" style={{ color: COLOR.primary }}>CC BY 4.0</a>
+        {' '}via{' '}
+        <a href={shot.sourceUrl} target="_blank" rel="noopener noreferrer" style={{ color: COLOR.primary }}>{shot.sourceLabel}</a>.
+      </div>
+    </div>
+  );
+}
+
 function escapeRegExp(s) {
   return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }

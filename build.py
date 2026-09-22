@@ -79,6 +79,14 @@ def validate():
         marks_sum = sum(c["marks"] for c in mod.CATEGORIES)
         if marks_sum != 100:
             errors.append(f"[{key}] CATEGORIES marks sum to {marks_sum}, not 100")
+        for cat in mod.CATEGORIES:
+            resources = cat.get("resources")
+            if resources:
+                for r in resources:
+                    if not r.get("label") or not r.get("url"):
+                        errors.append(f"[{key}] category '{cat['key']}' has a resources entry missing a 'label' or 'url'")
+                    elif not r["url"].startswith("http"):
+                        errors.append(f"[{key}] category '{cat['key']}' resource '{r['label']}' has a non-http url: {r['url']!r}")
         item_ids = set()
         seen_flashcard_fronts = {}
         seen_question_text = {}

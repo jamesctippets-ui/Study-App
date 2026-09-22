@@ -378,6 +378,16 @@ function CertStudyApp() {
 
   const overallMastery = useMemo(() => trackMastery(activeTrack, results), [activeTrack, results]);
 
+  // Cheat sheet's "Official resources" block: the track-level links already
+  // shown on the Exam tab, plus every category's own links, deduped by URL
+  // so a link that's relevant at both levels isn't listed twice.
+  const cheatSheetResources = useMemo(() => {
+    const all = [...(EXAM_CONFIG[activeTrack].resources || [])];
+    categories.forEach((c) => { if (c.resources) all.push(...c.resources); });
+    const seen = new Set();
+    return all.filter((r) => (seen.has(r.url) ? false : (seen.add(r.url), true)));
+  }, [activeTrack, categories]);
+
   const currentCard = filteredFlashcards[fIndex];
   const currentQ = quizSession[sessionIndex];
 
@@ -834,6 +844,7 @@ function CertStudyApp() {
               lessons={DATA[activeTrack].lessons}
               flashcardsData={flashcardsData}
               questionsData={questionsData}
+              categories={categories}
               onQuiz={startLessonQuiz}
               speakingId={speakingId}
               onSpeak={speak}
@@ -846,7 +857,7 @@ function CertStudyApp() {
         )}
 
         {mode === 'learn' && learnView === 'sheet' && (
-          <CheatSheetView trackLabel={track.label} sections={DATA[activeTrack].cheatSheet || []} />
+          <CheatSheetView trackLabel={track.label} sections={DATA[activeTrack].cheatSheet || []} resources={cheatSheetResources} />
         )}
 
         {mode === 'exam' && (

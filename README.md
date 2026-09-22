@@ -44,7 +44,19 @@ per-question authoring needed.
 The Exam tab for each track links out to real official study resources —
 Microsoft Learn study guides and certification pages for the Microsoft
 tracks, PeopleCert for ITIL, CompTIA for Cloud+, and HL7 International's
-FHIR/V2 specs for the EHR Integration module.
+FHIR/V2 specs for the EHR Integration module. Individual categories get
+their own more specific "Learn more" links too (see `resources` on each
+track's `CATEGORIES` in data/&lt;track&gt;.py) — shown on Study section pages, a
+lesson's Vocabulary block, and the cheat sheet.
+
+AZ-900/AZ-104 lessons that have a portal mockup also show a real Azure
+Portal screenshot underneath it ("See the real thing:") for the topics
+where one was available — pulled directly from Microsoft's own
+CC BY 4.0-licensed documentation source (the MicrosoftDocs GitHub repos),
+saved locally under `images/portal/` and captioned with attribution and a
+link back to the source page. The hand-drawn mockup stays as the primary
+illustration (dark-theme consistent, and covers every topic); the real
+screenshot is a supplementary, secondary reference where one exists.
 
 A 🏆 header button opens **Achievements** — 15 milestone badges (mastery,
 streaks, quiz/exam/match counts, course completion) plus a daily streak
