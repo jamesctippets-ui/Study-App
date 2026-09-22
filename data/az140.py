@@ -1,10 +1,18 @@
 """Categories, flashcards, and quiz questions for Microsoft AZ-140: Configuring and Operating Microsoft Azure Virtual Desktop."""
 
 CATEGORIES = [
-    {'key': 'planInfra', 'label': 'Plan and Implement an Azure Virtual Desktop Infrastructure', 'marks': 42},
-    {'key': 'identitySecurity', 'label': 'Plan and Implement Identity and Security', 'marks': 18},
-    {'key': 'userEnvApps', 'label': 'Plan and Implement User Environments and Apps', 'marks': 25},
-    {'key': 'monitorMaintain', 'label': 'Monitor and Maintain an Azure Virtual Desktop Infrastructure', 'marks': 15},
+    {'key': 'planInfra', 'label': 'Plan and Implement an Azure Virtual Desktop Infrastructure', 'marks': 42, 'resources': [
+        {'label': 'Microsoft Learn: Implement an Azure Virtual Desktop infrastructure', 'url': 'https://learn.microsoft.com/en-us/training/paths/implement-azure-virtual-infrastructure'},
+    ]},
+    {'key': 'identitySecurity', 'label': 'Plan and Implement Identity and Security', 'marks': 18, 'resources': [
+        {'label': 'Microsoft Learn: Preparing for AZ-140 - Plan and implement identity and security', 'url': 'https://learn.microsoft.com/en-us/shows/exam-readiness-zone/preparing-for-az-140-plan-and-implement-identity-and-security'},
+    ]},
+    {'key': 'userEnvApps', 'label': 'Plan and Implement User Environments and Apps', 'marks': 25, 'resources': [
+        {'label': 'Microsoft Learn: Manage user environments and apps for Azure Virtual Desktop', 'url': 'https://learn.microsoft.com/en-us/training/paths/manage-user-environments-apps/'},
+    ]},
+    {'key': 'monitorMaintain', 'label': 'Monitor and Maintain an Azure Virtual Desktop Infrastructure', 'marks': 15, 'resources': [
+        {'label': 'Microsoft Learn: Monitor and maintain an Azure Virtual Desktop infrastructure', 'url': 'https://learn.microsoft.com/en-us/training/paths/monitor-maintain-azure-virtual-desktop-infrastructure/'},
+    ]},
 ]
 
 FLASHCARDS = [

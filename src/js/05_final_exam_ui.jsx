@@ -44,7 +44,12 @@ function ExamQuestionView({ q, selectedIdx, onSelect }) {
   if (!q) return null;
   return (
     <div style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderRadius: '18px', padding: '20px' }}>
-      <div style={{ fontSize: '16px', lineHeight: 1.4, fontWeight: 500, marginBottom: '16px' }}>{q.question}</div>
+      <div style={{ fontSize: '16px', lineHeight: 1.4, fontWeight: 500, marginBottom: q.image ? '10px' : '16px' }}>{q.question}</div>
+      {q.image && REAL_PORTAL_SCREENSHOTS[q.image] && (
+        <div style={{ marginBottom: '16px' }}>
+          <RealPortalScreenshot shot={REAL_PORTAL_SCREENSHOTS[q.image]} hideDescription />
+        </div>
+      )}
       {q.type === 'mc' && (
         <div className="flex flex-col gap-2">
           {q.options.map((opt, i) => {

@@ -1,9 +1,15 @@
 """Categories, flashcards, and quiz questions for Microsoft AB-650: Administering Microsoft 365 and AI Services."""
 
 CATEGORIES = [
-    {'key': 'tenantConfig', 'label': 'Configure & Manage Tenants and Workloads', 'marks': 22},
-    {'key': 'governSecure', 'label': 'Govern & Secure Tenants and Workloads', 'marks': 42},
-    {'key': 'aiServices', 'label': 'Manage & Secure AI Services', 'marks': 36},
+    {'key': 'tenantConfig', 'label': 'Configure & Manage Tenants and Workloads', 'marks': 22, 'resources': [
+        {'label': 'Microsoft Learn: Configure and manage Microsoft 365 tenants and workloads', 'url': 'https://learn.microsoft.com/en-us/training/paths/configure-manage-microsoft-365-tenants-workloads/'},
+    ]},
+    {'key': 'governSecure', 'label': 'Govern & Secure Tenants and Workloads', 'marks': 42, 'resources': [
+        {'label': 'Microsoft Learn: Govern and secure Microsoft 365 tenants and workloads', 'url': 'https://learn.microsoft.com/en-us/training/paths/govern-secure-microsoft-365-tenants-workloads/'},
+    ]},
+    {'key': 'aiServices', 'label': 'Manage & Secure AI Services', 'marks': 36, 'resources': [
+        {'label': 'Microsoft Learn: Manage and secure Microsoft 365 AI services', 'url': 'https://learn.microsoft.com/en-us/training/paths/manage-secure-microsoft-365-ai-services/'},
+    ]},
 ]
 
 FLASHCARDS = [

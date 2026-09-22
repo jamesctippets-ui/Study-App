@@ -1,11 +1,21 @@
 """Categories, flashcards, quiz questions and course lessons for AZ-104 Azure Administrator."""
 
 CATEGORIES = [
-    {'key': 'identityGov', 'label': 'Identity & Governance', 'marks': 24},
-    {'key': 'storage', 'label': 'Storage', 'marks': 19},
-    {'key': 'compute', 'label': 'Compute', 'marks': 24},
-    {'key': 'networking', 'label': 'Networking', 'marks': 19},
-    {'key': 'monitoring', 'label': 'Monitor & Maintain', 'marks': 14},
+    {'key': 'identityGov', 'label': 'Identity & Governance', 'marks': 24, 'resources': [
+        {'label': 'Microsoft Learn: Manage identities and governance in Azure', 'url': 'https://learn.microsoft.com/en-us/training/paths/az-104-manage-identities-governance/'},
+    ]},
+    {'key': 'storage', 'label': 'Storage', 'marks': 19, 'resources': [
+        {'label': 'Microsoft Learn: Implement and manage storage in Azure', 'url': 'https://learn.microsoft.com/en-us/training/paths/az-104-manage-storage/'},
+    ]},
+    {'key': 'compute', 'label': 'Compute', 'marks': 24, 'resources': [
+        {'label': 'Microsoft Learn: Deploy and manage Azure compute resources', 'url': 'https://learn.microsoft.com/en-us/training/paths/az-104-manage-compute-resources/'},
+    ]},
+    {'key': 'networking', 'label': 'Networking', 'marks': 19, 'resources': [
+        {'label': 'Microsoft Learn: Configure and manage virtual networks for Azure administrators', 'url': 'https://learn.microsoft.com/en-us/training/paths/az-104-manage-virtual-networks/'},
+    ]},
+    {'key': 'monitoring', 'label': 'Monitor & Maintain', 'marks': 14, 'resources': [
+        {'label': 'Microsoft Learn: Monitor and back up Azure resources', 'url': 'https://learn.microsoft.com/en-us/training/paths/az-104-monitor-backup-resources/'},
+    ]},
 ]
 
 FLASHCARDS = [
@@ -1035,6 +1045,46 @@ QUESTIONS = [
         'options': ['It requires ExpressRoute to function', 'It routes traffic using DNS, directing clients to an endpoint rather than proxying traffic itself', 'It operates at Layer 7 and inspects HTTP headers on every request', 'It can route users to the closest healthy regional endpoint'],
         'correct': [1, 3],
         'explanation': 'Traffic Manager works purely at the DNS level: it resolves a domain name to the IP of the best available endpoint, for example the closest healthy region, and steps out of the path entirely, rather than proxying every request the way a Layer 7 service would. It does not inspect HTTP traffic itself since it never sits in the data path, and it has no dependency on ExpressRoute at all.',
+    },
+    {
+        'id': 'q53',
+        'cat': 'identityGov',
+        'type': 'mc',
+        'question': "This real Access control (IAM) role assignments list shows several assignments scoped as 'Subscription (Inherited)'. What does that scope label mean?",
+        'options': [
+            'The role was assigned directly on this resource group and cannot be changed',
+            'The role was assigned at the subscription level and applies down to this resource group automatically',
+            'The role only applies to resources created before this resource group existed',
+            'The role is a deprecated legacy assignment that Azure will remove automatically',
+        ],
+        'correct': 1,
+        'explanation': "Azure RBAC is inherited down the hierarchy — a role assigned at the subscription scope automatically applies to every resource group and resource beneath it. The Scope column shows exactly where in that hierarchy each assignment was actually made, which matters because removing an inherited assignment here requires going up to where it was actually granted, not editing it at this resource group.",
+        'image': 'roleAssignment',
+    },
+    {
+        'id': 'q54',
+        'cat': 'storage',
+        'type': 'mc',
+        'question': "You're partway through Create a storage account and see this real tab row: Basics, Advanced, Networking, Data protection, Security, Encryption, Tags. Which tab would you use to restrict the account to a specific virtual network?",
+        'options': ['Advanced', 'Networking', 'Security', 'Data protection'],
+        'correct': 1,
+        'explanation': "Networking is where you configure things like virtual network integration, private endpoints, and firewall rules — restricting access to specific VNets is a networking concern, separate from the account-level defaults on Advanced or the threat-protection settings on Security.",
+        'image': 'storageAccount',
+    },
+    {
+        'id': 'q55',
+        'cat': 'compute',
+        'type': 'mc',
+        'question': "In this real Instance details section for a new VM, Availability options is set to 'No infrastructure redundancy required.' What's the practical effect of that choice?",
+        'options': [
+            "The VM won't be protected against a single hardware failure or planned maintenance taking down its host",
+            'The VM will automatically be placed in an Availability Zone',
+            'Azure will refuse to create the VM until a redundancy option is selected',
+            'The VM will be replicated to a secondary region automatically',
+        ],
+        'correct': 0,
+        'explanation': "\"No infrastructure redundancy required\" is a valid, selectable option — Azure won't block VM creation over it — but it means skipping Availability Zones or an Availability Set, so a single host failure or planned maintenance event on that host can take the VM down with no built-in protection.",
+        'image': 'vmSize',
     },
 ]
 

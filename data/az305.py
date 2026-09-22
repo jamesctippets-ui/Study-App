@@ -1,10 +1,18 @@
 """Categories, flashcards, and quiz questions for Microsoft AZ-305: Designing Microsoft Azure Infrastructure Solutions."""
 
 CATEGORIES = [
-    {'key': 'identityGovernance', 'label': 'Identity, Governance & Monitoring', 'marks': 26},
-    {'key': 'dataStorage', 'label': 'Data Storage Solutions', 'marks': 24},
-    {'key': 'businessContinuity', 'label': 'Business Continuity', 'marks': 17},
-    {'key': 'infrastructure', 'label': 'Infrastructure Solutions', 'marks': 33},
+    {'key': 'identityGovernance', 'label': 'Identity, Governance & Monitoring', 'marks': 26, 'resources': [
+        {'label': 'Microsoft Learn: Design identity, governance, and monitor solutions', 'url': 'https://learn.microsoft.com/en-us/training/paths/design-identity-governance-monitor-solutions'},
+    ]},
+    {'key': 'dataStorage', 'label': 'Data Storage Solutions', 'marks': 24, 'resources': [
+        {'label': 'Microsoft Learn: Design data storage solutions', 'url': 'https://learn.microsoft.com/en-us/training/paths/design-data-storage-solutions'},
+    ]},
+    {'key': 'businessContinuity', 'label': 'Business Continuity', 'marks': 17, 'resources': [
+        {'label': 'Microsoft Learn: Design business continuity solutions', 'url': 'https://learn.microsoft.com/en-us/training/paths/design-business-continuity-solutions'},
+    ]},
+    {'key': 'infrastructure', 'label': 'Infrastructure Solutions', 'marks': 33, 'resources': [
+        {'label': 'Microsoft Learn: Design infrastructure solutions', 'url': 'https://learn.microsoft.com/en-us/training/paths/design-infranstructure-solutions'},
+    ]},
 ]
 
 FLASHCARDS = [

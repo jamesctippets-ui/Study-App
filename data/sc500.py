@@ -1,10 +1,22 @@
 """Categories, flashcards, and quiz questions for Microsoft SC-500: Implementing End-to-End Security Controls for Cloud and AI Workloads."""
 
 CATEGORIES = [
-    {'key': 'identityAccessGovernance', 'label': 'Identity, Access & Governance', 'marks': 23},
-    {'key': 'dataNetworkSecurity', 'label': 'Storage, Databases & Networking', 'marks': 27},
-    {'key': 'aiComputeSecurity', 'label': 'Compute & AI Workload Security', 'marks': 25},
-    {'key': 'securityPostureOps', 'label': 'Security Posture & Monitoring', 'marks': 25},
+    {'key': 'identityAccessGovernance', 'label': 'Identity, Access & Governance', 'marks': 23, 'resources': [
+        {'label': 'Microsoft Learn: Secure access to resources by using Microsoft Entra', 'url': 'https://learn.microsoft.com/en-us/training/paths/secure-access-resources-entra/'},
+        {'label': 'Microsoft Learn: Configure and govern entitlement with Microsoft Entra ID (SC-5008)', 'url': 'https://learn.microsoft.com/en-us/training/paths/configure-manage-entitlement-microsoft-entra-id/'},
+    ]},
+    {'key': 'dataNetworkSecurity', 'label': 'Storage, Databases & Networking', 'marks': 27, 'resources': [
+        {'label': 'Microsoft Learn: Implement security for Azure SQL databases for the Cloud and AI Security Engineer', 'url': 'https://learn.microsoft.com/en-us/training/paths/implement-azure-sql-database-security/'},
+        {'label': 'Microsoft Learn: Protect network infrastructure in Azure', 'url': 'https://learn.microsoft.com/en-us/training/paths/secure-networking/'},
+    ]},
+    {'key': 'aiComputeSecurity', 'label': 'Compute & AI Workload Security', 'marks': 25, 'resources': [
+        {'label': 'Microsoft Learn: Implement security for AI', 'url': 'https://learn.microsoft.com/en-us/training/paths/implement-ai-security/'},
+        {'label': 'Microsoft Learn: Secure AI identity infrastructure with Microsoft Entra', 'url': 'https://learn.microsoft.com/en-us/training/paths/entra-ai-secure-workloads/'},
+    ]},
+    {'key': 'securityPostureOps', 'label': 'Security Posture & Monitoring', 'marks': 25, 'resources': [
+        {'label': 'Microsoft Learn: Configure SIEM security operations using Microsoft Sentinel (SC-5001)', 'url': 'https://learn.microsoft.com/en-us/training/paths/configure-security-information-event-management-operations-using-microsoft-sentinel/'},
+        {'label': 'Microsoft Learn: Secure Azure services and workloads with Microsoft Defender for Cloud regulatory compliance controls (SC-5002)', 'url': 'https://learn.microsoft.com/en-us/training/paths/secure-azure-services-workloads-defender-cloud/'},
+    ]},
 ]
 
 FLASHCARDS = [

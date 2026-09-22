@@ -1,9 +1,15 @@
 """Categories, flashcards, and quiz questions for Microsoft SC-200: Microsoft Security Operations Analyst."""
 
 CATEGORIES = [
-    {'key': 'manageSecOps', 'label': 'Manage a Security Operations Environment', 'marks': 42},
-    {'key': 'respondIncidents', 'label': 'Respond to Security Incidents', 'marks': 38},
-    {'key': 'threatHunting', 'label': 'Perform Threat Hunting', 'marks': 20},
+    {'key': 'manageSecOps', 'label': 'Manage a Security Operations Environment', 'marks': 42, 'resources': [
+        {'label': 'Microsoft Learn: Exam readiness - Preparing for SC-200: Manage a security operations environment', 'url': 'https://learn.microsoft.com/en-us/shows/exam-readiness-zone/preparing-for-sc-200-manage-a-security-operations-environment'},
+    ]},
+    {'key': 'respondIncidents', 'label': 'Respond to Security Incidents', 'marks': 38, 'resources': [
+        {'label': 'Microsoft Learn: Exam readiness - Preparing for SC-200: Manage incident response', 'url': 'https://learn.microsoft.com/en-us/shows/exam-readiness-zone/preparing-for-sc-200-manage-incident-response'},
+    ]},
+    {'key': 'threatHunting', 'label': 'Perform Threat Hunting', 'marks': 20, 'resources': [
+        {'label': 'Microsoft Learn: SC-200 - Perform threat hunting in Microsoft Sentinel', 'url': 'https://learn.microsoft.com/en-us/training/paths/sc-200-perform-threat-hunting-azure-sentinel/'},
+    ]},
 ]
 
 FLASHCARDS = [

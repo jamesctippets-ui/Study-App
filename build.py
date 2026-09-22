@@ -81,7 +81,9 @@ def validate():
             errors.append(f"[{key}] CATEGORIES marks sum to {marks_sum}, not 100")
         for cat in mod.CATEGORIES:
             resources = cat.get("resources")
-            if resources:
+            if not resources:
+                errors.append(f"[{key}] category '{cat['key']}' is missing a non-empty 'resources' list")
+            else:
                 for r in resources:
                     if not r.get("label") or not r.get("url"):
                         errors.append(f"[{key}] category '{cat['key']}' has a resources entry missing a 'label' or 'url'")
@@ -150,6 +152,9 @@ def validate():
 
             if not q.get("explanation", "").strip():
                 errors.append(f"[{key}] question '{qid}' is missing an explanation")
+
+            if "image" in q and not q["image"].strip():
+                errors.append(f"[{key}] question '{qid}' has an empty 'image' field")
 
         cheat_sheet = getattr(mod, "CHEAT_SHEET", [])
         if not cheat_sheet:

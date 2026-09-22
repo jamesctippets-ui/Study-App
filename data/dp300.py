@@ -1,12 +1,26 @@
 """Categories, flashcards, and quiz questions for Microsoft DP-300: Administering Microsoft Azure SQL Solutions."""
 
 CATEGORIES = [
-    {'key': 'platform', 'label': 'Plan & Implement Data Platform Resources', 'marks': 20},
-    {'key': 'security', 'label': 'Implement a Secure Environment', 'marks': 20},
-    {'key': 'monitor', 'label': 'Monitor & Optimize Operational Resources', 'marks': 15},
-    {'key': 'queryPerf', 'label': 'Optimize Query Performance', 'marks': 10},
-    {'key': 'automation', 'label': 'Perform Automation of Tasks', 'marks': 10},
-    {'key': 'hadr', 'label': 'Plan & Implement HA/DR', 'marks': 25},
+    {'key': 'platform', 'label': 'Plan & Implement Data Platform Resources', 'marks': 20, 'resources': [
+        {'label': 'Microsoft Learn: Preparing for DP-300 - Plan and implement data platform resources', 'url': 'https://learn.microsoft.com/en-us/shows/exam-readiness-zone/preparing-for-dp-300-01-fy25'},
+    ]},
+    {'key': 'security', 'label': 'Implement a Secure Environment', 'marks': 20, 'resources': [
+        {'label': 'Microsoft Learn: Preparing for DP-300 - Implement a secure environment', 'url': 'https://learn.microsoft.com/en-us/shows/exam-readiness-zone/preparing-for-dp-300-02-fy25'},
+    ]},
+    {'key': 'monitor', 'label': 'Monitor & Optimize Operational Resources', 'marks': 15, 'resources': [
+        {'label': 'Microsoft Learn: Preparing for DP-300 - Monitor, configure, and optimize database resources', 'url': 'https://learn.microsoft.com/en-us/shows/exam-readiness-zone/preparing-for-dp-300-03-fy25'},
+    ]},
+    {'key': 'queryPerf', 'label': 'Optimize Query Performance', 'marks': 10, 'resources': [
+        {'label': 'Microsoft Learn: Optimize query performance in Azure SQL', 'url': 'https://learn.microsoft.com/en-us/training/paths/optimize-query-performance-sql-server/'},
+    ]},
+    {'key': 'automation', 'label': 'Perform Automation of Tasks', 'marks': 10, 'resources': [
+        {'label': 'Microsoft Learn: Preparing for DP-300 - Configure and manage automation of tasks', 'url': 'https://learn.microsoft.com/en-us/shows/exam-readiness-zone/preparing-for-dp-300-04-fy25'},
+        {'label': 'Microsoft Learn: Automation in Azure SQL overview', 'url': 'https://learn.microsoft.com/en-us/azure/azure-sql/database/job-automation-overview?view=azuresql'},
+    ]},
+    {'key': 'hadr', 'label': 'Plan & Implement HA/DR', 'marks': 25, 'resources': [
+        {'label': 'Microsoft Learn: Preparing for DP-300 - Plan and configure a high availability and disaster recovery environment', 'url': 'https://learn.microsoft.com/en-us/shows/exam-readiness-zone/preparing-for-dp-300-05-fy25'},
+        {'label': 'Microsoft Learn: Business continuity, high availability, and disaster recovery for Azure SQL Database', 'url': 'https://learn.microsoft.com/en-us/azure/azure-sql/database/business-continuity-high-availability-disaster-recover-hadr-overview?view=azuresql'},
+    ]},
 ]
 
 FLASHCARDS = [

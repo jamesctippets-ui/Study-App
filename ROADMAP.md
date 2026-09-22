@@ -131,6 +131,28 @@ come up.
 - [x] **Explanations on missed-question review.** QuizSummary and ExamResults
   used to show only the missed prompt; both now show the explanation too,
   matching what's already shown live during the quiz/exam itself.
+- [x] **Per-category "Learn more" resource links.** Beyond the whole-track
+  links on the Exam tab, every category across all 15 tracks now has its own
+  1-2 more specific official links (`resources` on each track's
+  `CATEGORIES`), shown on Study section pages, a lesson's Vocabulary block,
+  and a consolidated block on the cheat sheet. All ~90 URLs were
+  WebSearch-verified, not guessed.
+- [x] **Real Azure Portal screenshots.** Four genuine screenshots (resource
+  group creation, storage account tabs, VM instance details, IAM role
+  assignments), sourced from Microsoft's own CC BY 4.0-licensed
+  MicrosoftDocs GitHub repos and saved locally under `images/portal/`,
+  shown alongside (not replacing) the existing SVG portal mockups in
+  AZ-900/AZ-104 lessons, each with a plain-language description of what's
+  shown, a source link, and attribution. No real screenshot was added for
+  the VNet-creation mockup — no clean, on-topic match was found.
+- [x] **Quiz/exam questions built around the real screenshots.** 7 new
+  questions (4 in AZ-900, 3 in AZ-104 — `'image': 'resourceGroup'` etc. on
+  the question dict) show one of the four real screenshots above the
+  question itself and ask about what's actually on screen, in both Quiz
+  and Final Exam mode (`REAL_PORTAL_SCREENSHOTS` lookup in
+  `QuestionView`/`ExamQuestionView`). The descriptive caption is
+  deliberately suppressed in this context (`hideDescription`) since it
+  would otherwise spell out the answer.
 
 ## 10. Future-proofing for a standalone web/iOS/Android app (user's idea — lowest priority, not being worked on)
 

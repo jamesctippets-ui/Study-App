@@ -1,13 +1,29 @@
 """Categories, flashcards, quiz questions for ITIL Foundation."""
 
 CATEGORIES = [
-    {'key': 'terms', 'label': 'Key Terms', 'marks': 30},
-    {'key': 'valueSystem', 'label': 'Value System', 'marks': 40},
-    {'key': 'dimensions', 'label': 'Four Dimensions', 'marks': 10},
-    {'key': 'lifecycle', 'label': 'Lifecycle', 'marks': 10},
-    {'key': 'streams', 'label': 'Value Streams', 'marks': 5},
-    {'key': 'ai', 'label': 'AI', 'marks': 3},
-    {'key': 'frameworks', 'label': 'Other Frameworks', 'marks': 2},
+    {'key': 'terms', 'label': 'Key Terms', 'marks': 30, 'resources': [
+        {'label': 'AXELOS: ITIL 4 - Connecting the Key Concepts (Part 1)', 'url': 'https://www.axelos.com/resource-hub/blog/itil-4-connecting-key-concepts-part-1'},
+        {'label': 'PeopleCert: ITIL Foundation (Version 5)', 'url': 'https://www.peoplecert.org/browse-certifications/it-governance-and-service-management/ITIL-1/itil-5-foundation-version-50-4154'},
+    ]},
+    {'key': 'valueSystem', 'label': 'Value System', 'marks': 40, 'resources': [
+        {'label': 'AXELOS: ITIL 4 - A Clear Definition of Value', 'url': 'https://www.axelos.com/resource-hub/blog/itil-4-a-clear-definition-of-value'},
+    ]},
+    {'key': 'dimensions', 'label': 'Four Dimensions', 'marks': 10, 'resources': [
+        {'label': 'AXELOS: The Four Dimensions of Axle Car Hire', 'url': 'https://www.axelos.com/resource-hub/blog/four-dimensions-of-axle-car-hire'},
+    ]},
+    {'key': 'lifecycle', 'label': 'Lifecycle', 'marks': 10, 'resources': [
+        {'label': 'PeopleCert: ITIL Foundation (Version 5)', 'url': 'https://www.peoplecert.org/browse-certifications/it-governance-and-service-management/ITIL-1/itil-5-foundation-version-50-4154'},
+    ]},
+    {'key': 'streams', 'label': 'Value Streams', 'marks': 5, 'resources': [
+        {'label': 'AXELOS: ITIL 4 Value Streams - Doing the Right Things for Customers', 'url': 'https://www.axelos.com/resource-hub/blog/itil-4-value-streams-doing-right-things-for-customers'},
+        {'label': 'AXELOS: Value Streams and ITIL 4 CDS', 'url': 'https://www.axelos.com/resource-hub/blog/value-streams-and-itil-4-cds'},
+    ]},
+    {'key': 'ai', 'label': 'AI', 'marks': 3, 'resources': [
+        {'label': 'AXELOS: ITIL 4 and Artificial Intelligence (White Paper)', 'url': 'https://www.axelos.com/resource-hub/white-paper/itil-4-and-artificial-intelligence'},
+    ]},
+    {'key': 'frameworks', 'label': 'Other Frameworks', 'marks': 2, 'resources': [
+        {'label': 'AXELOS: Modern Service Management, ITIL 4 and Multiple Methods', 'url': 'https://www.axelos.com/resource-hub/blog/modern_service_management_itil4_multiple_methods'},
+    ]},
 ]
 
 FLASHCARDS = [

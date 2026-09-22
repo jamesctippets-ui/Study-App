@@ -53,10 +53,20 @@ AZ-900/AZ-104 lessons that have a portal mockup also show a real Azure
 Portal screenshot underneath it ("See the real thing:") for the topics
 where one was available — pulled directly from Microsoft's own
 CC BY 4.0-licensed documentation source (the MicrosoftDocs GitHub repos),
-saved locally under `images/portal/` and captioned with attribution and a
-link back to the source page. The hand-drawn mockup stays as the primary
-illustration (dark-theme consistent, and covers every topic); the real
-screenshot is a supplementary, secondary reference where one exists.
+saved locally under `images/portal/` and captioned with a plain-language
+description of what's on screen plus attribution and a link back to the
+source page. The hand-drawn mockup stays as the primary illustration
+(dark-theme consistent, and covers every topic); the real screenshot is a
+supplementary, secondary reference where one exists.
+
+A handful of AZ-900/AZ-104 quiz and exam questions go a step further and
+put one of those same real screenshots directly in the question itself
+("Looking at this real Access control (IAM) role assignments list,
+which action would..."), testing whether you can actually read the
+portal rather than just recall a definition. These render in both Quiz
+and Final Exam mode (they share the same question bank) with the
+descriptive caption deliberately hidden — showing it there would just
+hand over the answer.
 
 A 🏆 header button opens **Achievements** — 15 milestone badges (mastery,
 streaks, quiz/exam/match counts, course completion) plus a daily streak

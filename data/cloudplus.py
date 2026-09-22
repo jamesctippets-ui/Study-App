@@ -1,11 +1,22 @@
 """Categories, flashcards, and quiz questions for CompTIA Cloud+ (CV0-004)."""
 
 CATEGORIES = [
-    {'key': 'archDesign', 'label': 'Cloud Architecture & Design', 'marks': 23},
-    {'key': 'security', 'label': 'Security', 'marks': 20},
-    {'key': 'deployment', 'label': 'Deployment', 'marks': 17},
-    {'key': 'opsSupport', 'label': 'Operations & Support', 'marks': 22},
-    {'key': 'troubleshooting', 'label': 'Troubleshooting', 'marks': 18},
+    {'key': 'archDesign', 'label': 'Cloud Architecture & Design', 'marks': 23, 'resources': [
+        {'label': 'CompTIA: Cloud+ CV0-004 exam objectives (Domain 1.0 Cloud Architecture)', 'url': 'https://comptiacdn.azureedge.net/webcontent/docs/default-source/exam-objectives/comptia-cloud-cv0-004-exam-objectives-(2-0).pdf'},
+    ]},
+    {'key': 'security', 'label': 'Security', 'marks': 20, 'resources': [
+        {'label': 'CompTIA Blog: My CompTIA Cloud+ Favorites - Cloud Security', 'url': 'https://www.comptia.org/en-us/blog/comptia-cloud-cloud-security/'},
+        {'label': 'CompTIA: Cloud+ CV0-004 exam objectives (Domain 2.0 Security)', 'url': 'https://comptiacdn.azureedge.net/webcontent/docs/default-source/exam-objectives/comptia-cloud-cv0-004-exam-objectives-(2-0).pdf'},
+    ]},
+    {'key': 'deployment', 'label': 'Deployment', 'marks': 17, 'resources': [
+        {'label': 'CompTIA: Cloud+ CV0-004 exam objectives (Domain 3.0 Deployment)', 'url': 'https://comptiacdn.azureedge.net/webcontent/docs/default-source/exam-objectives/comptia-cloud-cv0-004-exam-objectives-(2-0).pdf'},
+    ]},
+    {'key': 'opsSupport', 'label': 'Operations & Support', 'marks': 22, 'resources': [
+        {'label': 'CompTIA: Cloud+ CV0-004 exam objectives (Domain 4.0 Operations)', 'url': 'https://comptiacdn.azureedge.net/webcontent/docs/default-source/exam-objectives/comptia-cloud-cv0-004-exam-objectives-(2-0).pdf'},
+    ]},
+    {'key': 'troubleshooting', 'label': 'Troubleshooting', 'marks': 18, 'resources': [
+        {'label': 'CompTIA: Cloud+ CV0-004 exam objectives (Domain 5.0 Troubleshooting)', 'url': 'https://comptiacdn.azureedge.net/webcontent/docs/default-source/exam-objectives/comptia-cloud-cv0-004-exam-objectives-(2-0).pdf'},
+    ]},
 ]
 
 FLASHCARDS = [

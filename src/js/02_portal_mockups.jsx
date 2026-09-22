@@ -123,34 +123,48 @@ const REAL_PORTAL_SCREENSHOTS = {
   resourceGroup: {
     src: 'images/portal/resource-group.png',
     alt: 'Real Azure Portal screenshot of the Create a resource group form',
+    description: "The Basics tab of the \"Create a resource group\" wizard — this is the whole form for that step: pick the subscription that will own the group, name the resource group itself, and choose the Azure region it's created in. Tags and final validation happen on their own separate tabs, not shown here.",
     sourceLabel: 'Microsoft Learn: Manage resource groups',
     sourceUrl: 'https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/manage-resource-groups-portal',
   },
   storageAccount: {
     src: 'images/portal/storage-account.png',
     alt: 'Real Azure Portal screenshot of the storage account creation tabs',
+    description: 'The full tab row across the top of "Create a storage account": Basics, Advanced, Networking, Data protection, Security, Encryption, Tags, and Review + create — each tab configures one specific aspect of the account before it exists, rather than one long form.',
     sourceLabel: 'Microsoft Learn: Create a storage account',
     sourceUrl: 'https://learn.microsoft.com/en-us/azure/storage/common/storage-account-create',
   },
   vmSize: {
     src: 'images/portal/vm-size.png',
     alt: 'Real Azure Portal screenshot of the VM Instance details section',
+    description: 'The Instance details section of "Create a virtual machine" — name, region, availability options, and security type at the top, then the OS image and CPU architecture (Arm64 vs. x64) at the bottom. This is where the VM\'s size/image choice actually happens, before you ever reach networking or disks.',
     sourceLabel: 'Microsoft Learn: Create a Windows VM in the Azure portal',
     sourceUrl: 'https://learn.microsoft.com/en-us/azure/virtual-machines/windows/quick-create-portal',
   },
   roleAssignment: {
     src: 'images/portal/role-assignment.png',
     alt: 'Real Azure Portal screenshot of the Access control (IAM) role assignments list',
+    description: 'The Role assignments tab of a resource group\'s Access control (IAM) blade — every user, group, service principal, and managed identity that currently holds a role (Billing Reader, Contributor, etc.) at this scope, plus the Add/Remove/Download controls above the list.',
     sourceLabel: 'Microsoft Learn: Assign a role in the Azure portal',
     sourceUrl: 'https://learn.microsoft.com/en-us/azure/role-based-access-control/quickstart-assign-role-user-portal',
   },
 };
 
-function RealPortalScreenshot({ shot }) {
+// `hideDescription` is set by quiz/exam question views — the description
+// spells out exactly what's in the image (tab names, field names), which
+// would hand over the answer to a question asking about that same image.
+// The lesson/study context wants the description shown; a question about
+// the same screenshot doesn't.
+function RealPortalScreenshot({ shot, hideDescription }) {
   if (!shot) return null;
   return (
     <div style={{ boxShadow: SHADOW.card, background: '#fff', border: `1px solid ${COLOR.border}`, borderRadius: '14px', padding: '8px', marginTop: '10px' }}>
       <img src={shot.src} alt={shot.alt} style={{ width: '100%', height: 'auto', display: 'block', borderRadius: '8px' }} />
+      {shot.description && !hideDescription && (
+        <div style={{ fontSize: '11.5px', color: '#3A3140', marginTop: '8px', lineHeight: 1.5, padding: '0 4px' }}>
+          {shot.description}
+        </div>
+      )}
       <div style={{ fontSize: '10px', color: COLOR.muted, marginTop: '8px', lineHeight: 1.4, padding: '0 4px' }}>
         Real Azure Portal screenshot — © Microsoft, licensed{' '}
         <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener noreferrer" style={{ color: COLOR.primary }}>CC BY 4.0</a>

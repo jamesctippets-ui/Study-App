@@ -1,9 +1,15 @@
 """Categories, flashcards, quiz questions and course lessons for AZ-900 Azure Fundamentals."""
 
 CATEGORIES = [
-    {'key': 'cloudConcepts', 'label': 'Cloud Concepts', 'marks': 28},
-    {'key': 'architecture', 'label': 'Architecture & Services', 'marks': 38},
-    {'key': 'management', 'label': 'Management & Governance', 'marks': 34},
+    {'key': 'cloudConcepts', 'label': 'Cloud Concepts', 'marks': 28, 'resources': [
+        {'label': 'Microsoft Learn: Describe cloud concepts', 'url': 'https://learn.microsoft.com/en-us/training/paths/microsoft-azure-fundamentals-describe-cloud-concepts/'},
+    ]},
+    {'key': 'architecture', 'label': 'Architecture & Services', 'marks': 38, 'resources': [
+        {'label': 'Microsoft Learn: Describe Azure architecture and services', 'url': 'https://learn.microsoft.com/en-us/training/paths/azure-fundamentals-describe-azure-architecture-services/'},
+    ]},
+    {'key': 'management', 'label': 'Management & Governance', 'marks': 34, 'resources': [
+        {'label': 'Microsoft Learn: Describe Azure management and governance', 'url': 'https://learn.microsoft.com/en-us/training/paths/describe-azure-management-governance/'},
+    ]},
 ]
 
 FLASHCARDS = [
@@ -1511,6 +1517,46 @@ QUESTIONS = [
         'options': ['The Azure region it is deployed to', "The resource's display name", 'Its usage or consumption level', "The subscription owner's job title"],
         'correct': [0, 2],
         'explanation': "Region and usage or consumption level are both genuine, direct cost factors — pricing varies by datacenter location, and cost scales with how much of a resource is actually consumed. A resource's display name and the subscription owner's job title are purely organizational or cosmetic details with no bearing on the price Azure charges.",
+    },
+    {
+        'id': 'q61',
+        'cat': 'management',
+        'type': 'mc',
+        'question': 'Looking at this real Create a resource group screen, which of these is NOT one of the fields you fill in on this Basics tab?',
+        'options': ['Subscription', 'Resource group name', 'Region', 'Tags'],
+        'correct': 3,
+        'explanation': "This screenshot shows only the Basics tab of the wizard — Subscription, Resource group name, and Region are all set there. Tags are applied on their own separate tab later in the same wizard, not on this screen.",
+        'image': 'resourceGroup',
+    },
+    {
+        'id': 'q62',
+        'cat': 'architecture',
+        'type': 'mc',
+        'question': 'Based on this real tab row from Create a storage account, which tab would you open to configure encryption at rest?',
+        'options': ['Networking', 'Data protection', 'Encryption', 'Tags'],
+        'correct': 2,
+        'explanation': "The wizard splits concerns across separate tabs — Data protection covers things like soft delete and blob versioning, while encryption-at-rest settings (like customer-managed keys) live on their own dedicated Encryption tab.",
+        'image': 'storageAccount',
+    },
+    {
+        'id': 'q63',
+        'cat': 'architecture',
+        'type': 'mc',
+        'question': 'On this real Instance details section for Create a virtual machine, which setting determines whether the VM can run on Arm-based hardware?',
+        'options': ['Security type', 'Availability options', 'VM architecture', 'Region'],
+        'correct': 2,
+        'explanation': "VM architecture is the Arm64/x64 toggle. In this screenshot it's grayed out on Arm64 because the selected image, Windows Server 2022 Datacenter, doesn't support it — the portal only allows architecture choices the selected image actually supports.",
+        'image': 'vmSize',
+    },
+    {
+        'id': 'q64',
+        'cat': 'management',
+        'type': 'mc',
+        'question': 'Looking at this real Access control (IAM) role assignments list, which action would let you grant a new user a role at this same scope?',
+        'options': ['Download role assignments', 'Edit columns', 'Add > Add role assignment', 'Check access'],
+        'correct': 2,
+        'explanation': "Add > Add role assignment is the action that actually grants a new role assignment. Check access only looks up what a specific user already has — it doesn't grant anything, and Download role assignments/Edit columns just affect how the existing list is exported or displayed.",
+        'image': 'roleAssignment',
     },
 ]
 

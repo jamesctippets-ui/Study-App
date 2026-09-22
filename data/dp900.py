@@ -1,10 +1,18 @@
 """Categories, flashcards, and quiz questions for DP-900 Microsoft Azure Data Fundamentals."""
 
 CATEGORIES = [
-    {'key': 'coreData', 'label': 'Core Data Concepts', 'marks': 28},
-    {'key': 'relational', 'label': 'Relational Data on Azure', 'marks': 23},
-    {'key': 'nonRelational', 'label': 'Non-Relational Data on Azure', 'marks': 18},
-    {'key': 'analytics', 'label': 'Analytics Workloads on Azure', 'marks': 31},
+    {'key': 'coreData', 'label': 'Core Data Concepts', 'marks': 28, 'resources': [
+        {'label': 'Microsoft Learn: Explore core data concepts', 'url': 'https://learn.microsoft.com/en-us/training/paths/azure-data-fundamentals-explore-core-data-concepts/'},
+    ]},
+    {'key': 'relational', 'label': 'Relational Data on Azure', 'marks': 23, 'resources': [
+        {'label': 'Microsoft Learn: Explore relational data in Azure', 'url': 'https://learn.microsoft.com/en-us/training/paths/azure-data-fundamentals-explore-relational-data/'},
+    ]},
+    {'key': 'nonRelational', 'label': 'Non-Relational Data on Azure', 'marks': 18, 'resources': [
+        {'label': 'Microsoft Learn: Explore non-relational data in Azure', 'url': 'https://learn.microsoft.com/en-us/training/paths/azure-data-fundamentals-explore-non-relational-data/'},
+    ]},
+    {'key': 'analytics', 'label': 'Analytics Workloads on Azure', 'marks': 31, 'resources': [
+        {'label': 'Microsoft Learn: Explore data analytics in Azure', 'url': 'https://learn.microsoft.com/en-us/training/paths/azure-data-fundamentals-explore-data-warehouse-analytics/'},
+    ]},
 ]
 
 FLASHCARDS = [

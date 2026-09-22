@@ -1,10 +1,19 @@
 """Categories, flashcards, and quiz questions for Microsoft SC-300: Microsoft Identity and Access Administrator."""
 
 CATEGORIES = [
-    {'key': 'userIdentities', 'label': 'Implement and Manage User Identities', 'marks': 22},
-    {'key': 'authAccessMgmt', 'label': 'Implement Authentication and Access Management', 'marks': 28},
-    {'key': 'workloadIdentities', 'label': 'Plan and Implement Workload Identities', 'marks': 25},
-    {'key': 'identityGovernance', 'label': 'Plan and Implement Identity Governance', 'marks': 25},
+    {'key': 'userIdentities', 'label': 'Implement and Manage User Identities', 'marks': 22, 'resources': [
+        {'label': 'Microsoft Learn: Implement an identity management solution using Microsoft Entra ID', 'url': 'https://learn.microsoft.com/en-us/training/paths/implement-identity-management-solution/'},
+    ]},
+    {'key': 'authAccessMgmt', 'label': 'Implement Authentication and Access Management', 'marks': 28, 'resources': [
+        {'label': 'Microsoft Learn: SC-300 - Implement an Authentication and Access Management solution', 'url': 'https://learn.microsoft.com/en-us/training/paths/implement-authentication-access-management-solution/'},
+    ]},
+    {'key': 'workloadIdentities', 'label': 'Plan and Implement Workload Identities', 'marks': 25, 'resources': [
+        {'label': 'Microsoft Learn: Workload identities overview (Microsoft Entra Workload ID)', 'url': 'https://learn.microsoft.com/en-us/entra/workload-id/workload-identities-overview'},
+        {'label': 'Microsoft Learn: Exam readiness - Preparing for SC-300: Plan and implement workload identities', 'url': 'https://learn.microsoft.com/en-us/shows/exam-readiness-zone/preparing-for-sc-300-plan-and-implement-workload-identities'},
+    ]},
+    {'key': 'identityGovernance', 'label': 'Plan and Implement Identity Governance', 'marks': 25, 'resources': [
+        {'label': 'Microsoft Learn: SC-300 - Plan and implement an identity governance strategy', 'url': 'https://learn.microsoft.com/en-us/training/paths/plan-implement-identity-governance-strategy'},
+    ]},
 ]
 
 FLASHCARDS = [

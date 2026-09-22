@@ -1,13 +1,31 @@
 """Categories, flashcards, and quiz questions for Microsoft AZ-802: Administering Windows Server Hybrid Core Infrastructure (the consolidated exam replacing AZ-800 and AZ-801)."""
 
 CATEGORIES = [
-    {'key': 'adDs', 'label': 'Deploy and Manage AD DS', 'marks': 21},
-    {'key': 'hybridWorkloads', 'label': 'Manage Windows Server Hybrid Workloads', 'marks': 12},
-    {'key': 'vmContainers', 'label': 'Manage Virtual Machines & Containers', 'marks': 12},
-    {'key': 'networking', 'label': 'Implement On-Premises & Hybrid Networking', 'marks': 12},
-    {'key': 'storage', 'label': 'Manage Storage & File Services', 'marks': 16},
-    {'key': 'security', 'label': 'Secure Windows Server Hybrid Infrastructure', 'marks': 11},
-    {'key': 'monitoring', 'label': 'Monitor & Troubleshoot Windows Server', 'marks': 16},
+    {'key': 'adDs', 'label': 'Deploy and Manage AD DS', 'marks': 21, 'resources': [
+        {'label': 'Microsoft Learn: Deploy and Manage Active Directory Domain Services', 'url': 'https://learn.microsoft.com/en-us/training/paths/deploy-manage-active-directory-domain-services/'},
+    ]},
+    {'key': 'hybridWorkloads', 'label': 'Manage Windows Server Hybrid Workloads', 'marks': 12, 'resources': [
+        {'label': 'Microsoft Learn: Manage Windows Servers and workloads in a hybrid environment', 'url': 'https://learn.microsoft.com/en-us/training/paths/manage-windows-servers-workloads-hybrid-environment/'},
+        {'label': 'Microsoft Learn: Manage hybrid workloads with Azure Arc', 'url': 'https://learn.microsoft.com/en-us/training/modules/manage-hybrid-workloads-azure-arc/'},
+    ]},
+    {'key': 'vmContainers', 'label': 'Manage Virtual Machines & Containers', 'marks': 12, 'resources': [
+        {'label': 'Microsoft Learn: Configure and manage Hyper-V virtual machines', 'url': 'https://learn.microsoft.com/en-us/training/modules/configure-manage-hyper-v-virtual-machines'},
+        {'label': 'Microsoft Learn: Run containers on Windows Server', 'url': 'https://learn.microsoft.com/en-us/training/modules/run-containers-windows-server'},
+    ]},
+    {'key': 'networking', 'label': 'Implement On-Premises & Hybrid Networking', 'marks': 12, 'resources': [
+        {'label': 'Microsoft Learn: Implement and operate an on-premises and hybrid networking infrastructure', 'url': 'https://learn.microsoft.com/en-us/training/paths/implement-operate-premises-hybrid'},
+    ]},
+    {'key': 'storage', 'label': 'Manage Storage & File Services', 'marks': 16, 'resources': [
+        {'label': 'Microsoft Learn: Manage Storage and File Services', 'url': 'https://learn.microsoft.com/en-us/training/paths/manage-storage-file-services/'},
+        {'label': 'Microsoft Learn: Implement Storage Spaces and Storage Spaces Direct', 'url': 'https://learn.microsoft.com/en-us/training/modules/implement-storage-spaces-storage-spaces-direct'},
+    ]},
+    {'key': 'security', 'label': 'Secure Windows Server Hybrid Infrastructure', 'marks': 11, 'resources': [
+        {'label': 'Microsoft Learn: Secure Windows Server on-premises and hybrid infrastructures', 'url': 'https://learn.microsoft.com/en-us/training/paths/secure-windows-server-premises-hybrid-infrastructures/'},
+    ]},
+    {'key': 'monitoring', 'label': 'Monitor & Troubleshoot Windows Server', 'marks': 16, 'resources': [
+        {'label': 'Microsoft Learn: Monitor and troubleshoot Windows Server environments', 'url': 'https://learn.microsoft.com/en-us/training/paths/monitor-troubleshoot-windows-server-environments/'},
+        {'label': 'Microsoft Learn: Monitor Windows Server performance', 'url': 'https://learn.microsoft.com/en-us/training/modules/monitor-windows-server-performance/'},
+    ]},
 ]
 
 FLASHCARDS = [

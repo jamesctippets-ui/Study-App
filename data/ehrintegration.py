@@ -1,10 +1,20 @@
 """General-knowledge reference module on healthcare EHR (electronic health record) systems integration -- HL7 v2, FHIR, integration engines, and data governance. This is a self-study concepts module, not a certification track."""
 
 CATEGORIES = [
-    {"key": "hl7v2Messaging", "label": "HL7 v2 Messaging", "marks": 25},
-    {"key": "fhirModernApis", "label": "FHIR & Modern APIs", "marks": 30},
-    {"key": "integrationEngines", "label": "Integration Engines & Architecture", "marks": 25},
-    {"key": "dataGovernance", "label": "Healthcare Data Governance & Real-World Practice", "marks": 20},
+    {"key": "hl7v2Messaging", "label": "HL7 v2 Messaging", "marks": 25, "resources": [
+        {"label": "HL7 International: HL7 Messaging Standard Version 2.8 product brief", "url": "https://www.hl7.org/implement/standards/product_brief.cfm?product_id=356"},
+    ]},
+    {"key": "fhirModernApis", "label": "FHIR & Modern APIs", "marks": 30, "resources": [
+        {"label": "HL7 FHIR: Overview (FHIR v5.0.0 specification)", "url": "https://hl7.org/fhir/overview.html"},
+        {"label": "HL7 FHIR: HTTP / RESTful API (FHIR v5.0.0 specification)", "url": "https://www.hl7.org/fhir/http.html"},
+    ]},
+    {"key": "integrationEngines", "label": "Integration Engines & Architecture", "marks": 25, "resources": [
+        {"label": "HL7 v2: Implementation Guides (conformance methodology)", "url": "https://v2.hl7.org/conformance/HL7v2_Conformance_Methodology_R1_O1_Ballot_Revised_D9_-_September_2019_HL7_v2_Implementation_Guides.html"},
+    ]},
+    {"key": "dataGovernance", "label": "Healthcare Data Governance & Real-World Practice", "marks": 20, "resources": [
+        {"label": "ONC / HealthIT.gov: HL7 FHIR national interoperability standard", "url": "https://www.healthit.gov/topic/standards-technology/standards/fhir"},
+        {"label": "ONC Interoperability Standards Platform: United States Core Data for Interoperability (USCDI)", "url": "https://isp.healthit.gov/united-states-core-data-interoperability-uscdi"},
+    ]},
 ]
 
 FLASHCARDS = [

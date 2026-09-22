@@ -1,11 +1,21 @@
 """Categories, flashcards, and quiz questions for Microsoft MD-102: Endpoint Administrator."""
 
 CATEGORIES = [
-    {"key": "manageDevices", "label": "Manage and Maintain Devices", "marks": 28},
-    {"key": "prepareInfra", "label": "Prepare Infrastructure for Devices", "marks": 22},
-    {"key": "protectDevices", "label": "Protect Devices", "marks": 18},
-    {"key": "manageApps", "label": "Manage and Secure Applications", "marks": 17},
-    {"key": "optimizeOps", "label": "Optimize Endpoint Operations with Automation, Monitoring, and Reporting", "marks": 15},
+    {"key": "manageDevices", "label": "Manage and Maintain Devices", "marks": 28, "resources": [
+        {"label": "Microsoft Learn: Manage and maintain devices using Microsoft Intune", "url": "https://learn.microsoft.com/en-us/training/paths/manage-maintain-devices-intune/"},
+    ]},
+    {"key": "prepareInfra", "label": "Prepare Infrastructure for Devices", "marks": 22, "resources": [
+        {"label": "Microsoft Learn: Prepare infrastructure for devices using Microsoft Intune and Microsoft Entra ID", "url": "https://learn.microsoft.com/en-us/training/paths/prepare-infrastructure-devices-intune-microsoft-entra-id/"},
+    ]},
+    {"key": "protectDevices", "label": "Protect Devices", "marks": 18, "resources": [
+        {"label": "Microsoft Learn: Protect Devices Using Microsoft Intune", "url": "https://learn.microsoft.com/en-us/training/paths/protect-devices-intune/"},
+    ]},
+    {"key": "manageApps", "label": "Manage and Secure Applications", "marks": 17, "resources": [
+        {"label": "Microsoft Learn: Manage Applications Using Microsoft Intune", "url": "https://learn.microsoft.com/en-us/training/paths/examine-application-management/"},
+    ]},
+    {"key": "optimizeOps", "label": "Optimize Endpoint Operations with Automation, Monitoring, and Reporting", "marks": 15, "resources": [
+        {"label": "Microsoft Learn: Monitor and maintain devices using Microsoft Intune", "url": "https://learn.microsoft.com/en-us/training/modules/monitor-maintain-devices-intune/"},
+    ]},
 ]
 
 FLASHCARDS = [
