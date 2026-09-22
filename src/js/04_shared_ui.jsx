@@ -235,6 +235,75 @@ function DataPanel({ trackLabel, onExport, onImportFile, importMessage, onReset,
   );
 }
 
+const MODE_LABELS = { learn: 'Learn', quiz: 'Quiz', exam: 'Exam' };
+
+function HomeDashboard({ tracks, results, stats, achievementsCount, achievementsTotal, onResume, onSelectTrack, onOpenAchievements, onOpenPaths, onOpenData }) {
+  const masteries = tracks.map((t) => ({ track: t, pct: trackMastery(t.key, results) }));
+  const overallAvg = masteries.length ? Math.round(masteries.reduce((s, m) => s + m.pct, 0) / masteries.length) : 0;
+  const lastVisited = stats.lastVisited;
+  const resumeTrack = lastVisited ? tracks.find((t) => t.key === lastVisited.track) : null;
+  const iconBtn = { minWidth: '40px', minHeight: '40px', padding: '6px 10px', borderRadius: '10px', border: `1px solid ${COLOR.border}`, background: 'transparent', color: COLOR.muted, fontSize: '15px', display: 'flex', alignItems: 'center', justifyContent: 'center' };
+
+  return (
+    <div>
+      <div className="flex justify-between items-start mb-4">
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div className="itil-display" style={{ fontSize: '22px', fontWeight: 600 }}>Cert Study Hub</div>
+          <div style={{ fontSize: '12px', color: COLOR.muted, marginTop: '3px', lineHeight: 1.4 }}>
+            {stats.streak.current > 0 ? `🔥 ${stats.streak.current}-day streak · ` : ''}{overallAvg}% average mastery across {tracks.length} tracks
+          </div>
+        </div>
+        <div className="flex items-start gap-1" style={{ flexShrink: 0 }}>
+          <button onClick={onOpenPaths} title="Recommended study path" style={{ ...iconBtn, color: COLOR.primary }}>🗺️</button>
+          <button onClick={onOpenAchievements} title="Achievements" style={{ ...iconBtn, border: `1px solid ${COLOR.gold}`, color: COLOR.gold, fontSize: '12px', fontWeight: 600, gap: '3px' }}>
+            🏆 {achievementsCount}
+          </button>
+          <button onClick={onOpenData} title="Data & progress" style={iconBtn}>⚙</button>
+        </div>
+      </div>
+
+      {resumeTrack && (
+        <button
+          onClick={onResume}
+          style={{
+            width: '100%', textAlign: 'left', marginBottom: '18px', padding: '14px 16px', borderRadius: '14px',
+            background: `${trackAccent(resumeTrack.key)}1F`, border: `1px solid ${trackAccent(resumeTrack.key)}`,
+            boxShadow: SHADOW.card,
+          }}
+        >
+          <div style={{ fontSize: '11px', color: COLOR.muted, marginBottom: '2px' }}>Continue where you left off</div>
+          <div style={{ fontSize: '15px', fontWeight: 600, color: trackAccent(resumeTrack.key) }}>
+            {resumeTrack.label} · {MODE_LABELS[lastVisited.mode] || 'Learn'}
+          </div>
+        </button>
+      )}
+
+      <div style={{ fontSize: '12px', color: COLOR.muted, marginBottom: '8px' }}>Your tracks</div>
+      <div className="flex flex-col gap-2">
+        {masteries.map(({ track: t, pct }) => {
+          const accent = trackAccent(t.key);
+          return (
+            <button
+              key={t.key}
+              onClick={() => onSelectTrack(t.key)}
+              style={{
+                textAlign: 'left', display: 'flex', alignItems: 'center', gap: '12px', padding: '12px 14px', borderRadius: '12px',
+                background: COLOR.surface, border: `1px solid ${COLOR.border}`, boxShadow: SHADOW.card,
+              }}
+            >
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontSize: '13.5px', fontWeight: 600, color: accent }}>{t.label}</div>
+                <div style={{ fontSize: '11px', color: COLOR.muted, marginTop: '2px' }}>{t.subtitle}</div>
+              </div>
+              <div style={{ fontSize: '13px', fontWeight: 700, color: pct >= 70 ? COLOR.success : COLOR.muted, flexShrink: 0 }}>{pct}%</div>
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 function TermPopover({ term, onClose }) {
   if (!term) return null;
   return (

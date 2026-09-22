@@ -71,9 +71,11 @@ come up.
 - [ ] Real client-side routing instead of pure in-memory tab state, so the
   browser back button, refresh, and deep links to a specific track/mode/
   lesson all work as a user would expect from a "real" multi-page app.
-- [ ] A proper **home/dashboard** page — overall progress across every track,
+- [x] A proper **home/dashboard** page — overall progress across every track,
   streak, and a "pick up where you left off" action — instead of always
-  landing straight into one track's Cards view.
+  landing straight into one track's Cards view. Shipped as the app's new
+  landing screen (src/js/06_app.jsx's `view` state), with a 🏠 button in the
+  track header to return to it.
 - [ ] A side/hamburger menu for track + mode navigation once the track list
   and mode list have both grown past what a button row or dropdown handles
   gracefully together.
@@ -110,6 +112,17 @@ come up.
 - [ ] An optional harder "stretch" question pool per track for confidence-
   building beyond real exam difficulty (Tutorials Dojo's approach), kept
   clearly labeled as harder-than-real so it doesn't skew mastery stats.
+
+## 10.5. Data portability & review quality (not originally listed — added as they shipped)
+
+- [x] **Progress export/import.** The app has no accounts, so a cleared browser
+  or a new device previously meant losing everything. The ⚙ Data & progress
+  panel now downloads all progress (results, seenLog, stats) as a JSON file
+  and can restore from one, with validation against malformed/unrelated
+  files. See `downloadJSON`/`parseImportedProgress` in src/js/03_helpers.js.
+- [x] **Explanations on missed-question review.** QuizSummary and ExamResults
+  used to show only the missed prompt; both now show the explanation too,
+  matching what's already shown live during the quiz/exam itself.
 
 ## 10. Future-proofing for a standalone web/iOS/Android app (user's idea — lowest priority, not being worked on)
 

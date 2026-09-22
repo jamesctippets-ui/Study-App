@@ -41,7 +41,17 @@ streaks, quiz/exam/match counts, course completion) plus a daily streak
 counter, all computed from progress already being tracked, no new data
 entry required. A **🗺️ Recommended study path** button opens a panel with
 two named paths toward different goals (see `data/paths.py`), each step
-showing why it's there and live per-track mastery.
+showing why it's there and live per-track mastery. A **⚙ Data & progress**
+button opens export/import (download all progress as a JSON file, or restore
+from one — the only backup/device-migration option, since the app has no
+accounts) alongside the existing per-track reset.
+
+Opening the app lands on a **home dashboard** first — average mastery across
+every track, the daily streak, a "continue where you left off" card
+remembering the last track+mode you were in, and a tappable list of every
+track with its live mastery %. A 🏠 button in any track's header returns to
+it. Quiz and Exam missed-question review lists now show each question's
+explanation alongside the prompt, not just what you got wrong.
 
 **Fifteen tracks, all visible in the track switcher:**
 - **AZ-900** (Azure Fundamentals) — full course content, 106 questions.

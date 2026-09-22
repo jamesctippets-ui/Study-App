@@ -1,6 +1,7 @@
 /* ---------------- main app ---------------- */
 
 function CertStudyApp() {
+  const [view, setView] = useState('home');
   const [activeTrack, setActiveTrack] = useState('az900');
   const [mode, setMode] = useState('learn');
   const [learnView, setLearnView] = useState('cards');
@@ -44,12 +45,31 @@ function CertStudyApp() {
   const utterRef = useRef(null);
   const skipNextAutoStart = useRef(false);
 
+  // Mirror results/seenLog/stats so persistPayload can always read the
+  // latest value of the two fields a given save*() call isn't itself
+  // updating. Plain state closures go stale within a single effects-flush
+  // (e.g. selecting a track fires both the quiz-session-start effect and
+  // the last-visited-tracking effect in the same tick) — updating these
+  // refs synchronously, right alongside every setResults/setSeenLog/
+  // setStats call, means the second effect to run always sees the first
+  // one's write instead of overwriting it with a stale copy.
+  const resultsRef = useRef(results);
+  const seenLogRef = useRef(seenLog);
+  const statsRef = useRef(stats);
+
   const track = TRACKS.find((t) => t.key === activeTrack);
   const visibleTracks = TRACKS.filter((t) => !t.hidden);
   const categories = DATA[activeTrack].categories;
   const flashcardsData = DATA[activeTrack].flashcards;
   const questionsData = DATA[activeTrack].questions;
   const trackResults = results[activeTrack] || {};
+
+  // Applies a freshly-loaded (not user-edited) value to both the React
+  // state and its mirror ref, without triggering a persistPayload write —
+  // used wherever data is loaded FROM storage rather than saved TO it.
+  const applyResults = (v) => { resultsRef.current = v; setResults(v); };
+  const applySeenLog = (v) => { seenLogRef.current = v; setSeenLog(v); };
+  const applyStats = (v) => { statsRef.current = v; setStats(v); };
 
   useEffect(() => {
     let cancelled = false;
@@ -63,9 +83,9 @@ function CertStudyApp() {
         // whole object IS the flat results map. normalizeResults() already
         // knows how to detect and migrate that shape, but only if it
         // actually gets passed the raw object instead of `undefined`.
-        setResults(normalizeResults(local.results || local));
-        if (local.seenLog) setSeenLog(normalizeSeenLog(local.seenLog));
-        if (local.stats) setStats(normalizeStats(local.stats));
+        applyResults(normalizeResults(local.results || local));
+        if (local.seenLog) applySeenLog(normalizeSeenLog(local.seenLog));
+        if (local.stats) applyStats(normalizeStats(local.stats));
       }
       setSyncMode('local');
     }
@@ -85,9 +105,9 @@ function CertStudyApp() {
                   if (cancelled) return;
                   if (snap.exists) {
                     const data = snap.data();
-                    if (data && data.results) setResults(normalizeResults(data.results));
-                    if (data && data.seenLog) setSeenLog(normalizeSeenLog(data.seenLog));
-                    if (data && data.stats) setStats(normalizeStats(data.stats));
+                    if (data && data.results) applyResults(normalizeResults(data.results));
+                    if (data && data.seenLog) applySeenLog(normalizeSeenLog(data.seenLog));
+                    if (data && data.stats) applyStats(normalizeStats(data.stats));
                   }
                   setSyncMode('cloud');
                 },
@@ -117,18 +137,21 @@ function CertStudyApp() {
   };
 
   const saveResults = (nextResults) => {
+    resultsRef.current = nextResults;
     setResults(nextResults);
-    persistPayload({ results: nextResults, seenLog, stats, updatedAt: Date.now() });
+    persistPayload({ results: nextResults, seenLog: seenLogRef.current, stats: statsRef.current, updatedAt: Date.now() });
   };
 
   const saveSeen = (nextSeenLog) => {
+    seenLogRef.current = nextSeenLog;
     setSeenLog(nextSeenLog);
-    persistPayload({ results, seenLog: nextSeenLog, stats, updatedAt: Date.now() });
+    persistPayload({ results: resultsRef.current, seenLog: nextSeenLog, stats: statsRef.current, updatedAt: Date.now() });
   };
 
   const saveStats = (nextStats) => {
+    statsRef.current = nextStats;
     setStats(nextStats);
-    persistPayload({ results, seenLog, stats: nextStats, updatedAt: Date.now() });
+    persistPayload({ results: resultsRef.current, seenLog: seenLogRef.current, stats: nextStats, updatedAt: Date.now() });
   };
 
   const markSeen = (ids) => {
@@ -248,6 +271,23 @@ function CertStudyApp() {
     startNewSession();
     // eslint-disable-next-line
   }, [mode, activeCat, quizLength, typesKey, activeTrack]);
+
+  // Tracks the last track+mode actually visited (not the home dashboard
+  // itself) so the dashboard's "continue where you left off" button has
+  // somewhere real to send you. Skipped until the initial cloud/local sync
+  // finishes, so it can't stomp a freshly-loaded lastVisited with the
+  // component's default state. Declared after the quiz-session-start effect
+  // above (also keyed on activeTrack/mode) so that when both fire in the
+  // same commit, this one's persistPayload call — which folds its update
+  // onto the same `stats` closure — runs last and its write isn't the one
+  // that gets overwritten.
+  useEffect(() => {
+    if (syncMode === 'loading' || view !== 'track') return;
+    const current = stats.lastVisited;
+    if (current && current.track === activeTrack && current.mode === mode) return;
+    saveStats({ ...stats, lastVisited: { track: activeTrack, mode } });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [view, activeTrack, mode, syncMode]);
 
   const startMissedSession = () => {
     const pool = questionsData.filter((q) => trackResults[q.id] === 'incorrect');
@@ -391,9 +431,9 @@ function CertStudyApp() {
         setImportMessage({ ok: false, text: "That doesn't look like a Cert Study Hub progress export." });
         return;
       }
-      setResults(normalized.results);
-      setSeenLog(normalized.seenLog);
-      setStats(normalized.stats);
+      applyResults(normalized.results);
+      applySeenLog(normalized.seenLog);
+      applyStats(normalized.stats);
       persistPayload({ results: normalized.results, seenLog: normalized.seenLog, stats: normalized.stats, updatedAt: Date.now() });
       setImportMessage({ ok: true, text: 'Progress restored.' });
     };
@@ -460,9 +500,11 @@ function CertStudyApp() {
     const pct = examSession.length ? Math.round((correct / examSession.length) * 100) : 0;
     const passed = pct >= EXAM_CONFIG[trackKey].passPct;
     const nextStats = passed ? { ...stats, counts: { ...stats.counts, examsPassed: stats.counts.examsPassed + 1 } } : stats;
+    resultsRef.current = nextResults;
+    statsRef.current = nextStats;
     setResults(nextResults);
     setStats(nextStats);
-    persistPayload({ results: nextResults, seenLog, stats: nextStats, updatedAt: Date.now() });
+    persistPayload({ results: nextResults, seenLog: seenLogRef.current, stats: nextStats, updatedAt: Date.now() });
     // eslint-disable-next-line
   }, [examPhase]);
 
@@ -512,8 +554,37 @@ function CertStudyApp() {
         />
       )}
       <div className="max-w-md mx-auto px-4 py-5">
+        {view === 'home' ? (
+          <HomeDashboard
+            tracks={visibleTracks}
+            results={results}
+            stats={stats}
+            achievementsCount={stats.unlocked.length}
+            achievementsTotal={achievements.length}
+            onResume={() => {
+              if (stats.lastVisited) { setActiveTrack(stats.lastVisited.track); setMode(stats.lastVisited.mode); }
+              setView('track');
+            }}
+            onSelectTrack={(key) => { setActiveTrack(key); setView('track'); }}
+            onOpenAchievements={() => setShowAchievements(true)}
+            onOpenPaths={() => setShowPaths(true)}
+            onOpenData={() => { setImportMessage(null); setShowData(true); }}
+          />
+        ) : (
+        <React.Fragment>
         <div className="flex justify-between items-start mb-4">
           <div style={{ flex: 1, minWidth: 0, position: 'relative', paddingRight: '10px' }}>
+            <button
+              onClick={() => setView('home')}
+              title="Home"
+              style={{
+                display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: '26px', height: '26px',
+                borderRadius: '8px', border: 'none', background: 'transparent', color: COLOR.muted, fontSize: '15px',
+                marginBottom: '2px', padding: 0,
+              }}
+            >
+              🏠
+            </button>
             {visibleTracks.length > 1 ? (
               <select
                 value={activeTrack}
@@ -831,6 +902,8 @@ function CertStudyApp() {
             ))}
           </div>
         </div>
+        </React.Fragment>
+        )}
       </div>
     </div>
   );

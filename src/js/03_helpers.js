@@ -144,16 +144,19 @@ function emptyStats() {
     streak: { current: 0, longest: 0, lastActiveDate: null },
     counts: { quizzesCompleted: 0, examsPassed: 0, matchRoundsCompleted: 0, perfectQuizzes: 0 },
     unlocked: [],
+    lastVisited: null,
   };
 }
 
 function normalizeStats(raw) {
   const base = emptyStats();
   if (!raw || typeof raw !== 'object') return base;
+  const lastVisited = raw.lastVisited && raw.lastVisited.track ? raw.lastVisited : null;
   return {
     streak: { ...base.streak, ...(raw.streak || {}) },
     counts: { ...base.counts, ...(raw.counts || {}) },
     unlocked: Array.isArray(raw.unlocked) ? raw.unlocked : [],
+    lastVisited,
   };
 }
 
