@@ -36,7 +36,7 @@ entry required. A **🗺️ Recommended study path** button opens a panel
 sequencing several tracks toward a stated goal (see `data/paths.py`), each
 step showing why it's there and live per-track mastery.
 
-**Eleven tracks, all visible in the track switcher:**
+**Thirteen tracks, all visible in the track switcher:**
 - **AZ-900** (Azure Fundamentals) — full course content, 96 questions.
 - **AZ-104** (Azure Administrator) — full question bank (62 questions) and the
   same course treatment as AZ-900 (7 lessons, diagrams, mockups).
@@ -46,7 +46,12 @@ step showing why it's there and live per-track mastery.
 - **AZ-802** (Windows Server Administrator) — full question bank (62 questions);
   consolidates what used to be separate AZ-800/AZ-801 tracks, matching
   Microsoft's real exam consolidation (AZ-800/801 retire Sept 30, 2026).
+- **AZ-140** (Azure Virtual Desktop Specialty) — full question bank (50 questions);
+  host pools, FSLogix, MSIX app attach, AVD identity/security, and monitoring.
 - **SC-300** (Identity & Access Administrator) — full question bank (54 questions).
+- **SC-200** (Security Operations Analyst) — full question bank (54 questions);
+  Defender XDR/Sentinel operations, incident response, and real KQL-based
+  threat hunting.
 - **SC-500** (Cloud & AI Security Engineer) — full question bank (70 questions),
   including current AI-security content (Copilot, Microsoft Foundry agents,
   Entra Agent ID).
@@ -150,7 +155,7 @@ to install it.
 ## Sharing it
 
 There are no accounts and no login. Anyone with the link gets the full app —
-all eleven tracks, flashcards, quizzes, exams, achievements — and their progress saves to
+all thirteen tracks, flashcards, quizzes, exams, achievements — and their progress saves to
 *their own* browser's local storage, same as it does for you. It's private to
 them, isn't visible to you, and doesn't sync between their own devices either
 (each browser/device is its own independent copy). That's the trade-off for
