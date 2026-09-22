@@ -7,12 +7,16 @@ proper Python source tree instead of one giant file.
 ## What's inside
 
 Three top-level tabs: **Learn**, **Quiz**, **Exam**. Learn holds three
-sub-views — Cards (flashcards), Study (a flashcard-list per category, or for
-AZ-900/AZ-104 a full mini-course per topic: reading with tappable key terms,
-an SVG diagram, a portal mockup, a worked scenario, common exam traps, and a
-3–4 question quiz), and Match (a term-matching game — tap a term chip, then
-its definition; respects the current category filter, tracks mistakes, and
-deals a fresh random round each time). A lesson's reading is itself split
+sub-views — Cards (flashcards, ordered by a simplified SM-2 spaced-repetition
+schedule — "Still learning" resurfaces a card sooner, "Got it" pushes its
+next appearance out by a growing interval; the order is computed fresh each
+time you enter a category/track rather than reshuffling mid-session), Study
+(a flashcard-list per category, or for AZ-900/AZ-104 a full mini-course per
+topic: reading with tappable key terms, an SVG diagram, a portal mockup, a
+worked scenario, common exam traps, and a 3–4 question quiz), and Match (a
+term-matching game — tap a term chip, then its definition; respects the
+current category filter, tracks mistakes, and deals a fresh random round
+each time). A lesson's reading is itself split
 into pages when it runs long — moving past the first page takes either a
 one-question quick check or a 3-pair mini match round, alternating between
 the two, so the material isn't just a wall of text to skim past. Quiz is a

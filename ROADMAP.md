@@ -82,9 +82,12 @@ come up.
 
 ## 7. Spaced repetition & study-science features (from research)
 
-- [ ] Real spaced-repetition scheduling for flashcards (a simplified SM-2 or
-  similar), so a card you get wrong resurfaces sooner and one you know well
-  resurfaces later — today's "mastery %" is a lifetime ratio, not a schedule.
+- [x] Real spaced-repetition scheduling for flashcards (a simplified SM-2),
+  so a card you get wrong resurfaces sooner and one you know well resurfaces
+  later. New persisted `srs` map (per-track, per-card `{interval, ease,
+  reps, due}`) in src/js/03_helpers.js's `nextSrsEntry`/`orderBySrs`, applied
+  to Cards-mode ordering only — "mastery %" itself is still a lifetime ratio,
+  unchanged; this only changes review order, not how mastery is scored.
 - [ ] Confidence-based review (rate 1–5 instead of binary correct/incorrect),
   the mechanic Brainscape is built around, as an alternative to the current
   flashcard rating.

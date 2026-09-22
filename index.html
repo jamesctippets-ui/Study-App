@@ -700,6 +700,51 @@ function normalizeSeenLog(raw) {
   return map;
 }
 
+/* ---------------- spaced repetition (flashcards) ---------------- */
+
+// Simplified SM-2. `prev` is this card's current schedule
+// ({interval, ease, reps, due}), or undefined for a never-rated card.
+// Returns the next schedule after rating it 'correct' or 'incorrect'. A
+// miss resets the interval to 1 day but only dents the ease factor rather
+// than losing all history, so a card that's usually easy recovers its
+// longer interval faster than one that's chronically shaky.
+function nextSrsEntry(prev, outcome, now) {
+  const t = now || Date.now();
+  const DAY = 86400000;
+  const p = prev || { interval: 0, ease: 2.5, reps: 0, due: t };
+  if (outcome === 'correct') {
+    const reps = p.reps + 1;
+    const ease = Math.min(2.8, p.ease + 0.1);
+    const interval = reps === 1 ? 1 : reps === 2 ? 3 : Math.max(1, Math.round(p.interval * ease));
+    return { interval, ease, reps, due: t + interval * DAY };
+  }
+  const ease = Math.max(1.3, p.ease - 0.2);
+  return { interval: 1, ease, reps: 0, due: t };
+}
+
+function normalizeSrs(raw) {
+  if (!raw) return emptyTrackMap();
+  const map = emptyTrackMap();
+  TRACKS.forEach((t) => { map[t.key] = raw[t.key] || {}; });
+  return map;
+}
+
+// Orders a track's flashcards for Cards-mode review: cards that are due (or
+// have never been rated at all) sort first, most-overdue first; cards not
+// yet due follow, soonest-due first. A seeded shuffle breaks ties so cards
+// with the same due-ness don't always land in the same relative order.
+function orderBySrs(list, srsForTrack, now) {
+  const t = now || Date.now();
+  const NEVER_RATED = Number.MIN_SAFE_INTEGER;
+  const shuffled = seededShuffle(list, 7);
+  const withDue = shuffled.map((card, i) => {
+    const entry = srsForTrack && srsForTrack[card.id];
+    return { card, due: entry ? entry.due : NEVER_RATED, i };
+  });
+  withDue.sort((a, b) => (a.due - b.due) || (a.i - b.i));
+  return withDue.map((x) => x.card);
+}
+
 // Triggers a browser download of `data` as a formatted JSON file. Returns
 // false instead of throwing if the browser blocks it (e.g. sandboxed iframe).
 function downloadJSON(filename, data) {
@@ -729,6 +774,7 @@ function parseImportedProgress(raw) {
     results: normalizeResults(raw.results),
     seenLog: normalizeSeenLog(raw.seenLog),
     stats: normalizeStats(raw.stats),
+    srs: normalizeSrs(raw.srs),
   };
 }
 
@@ -2220,6 +2266,7 @@ function CertStudyApp() {
   const [activeCat, setActiveCat] = useState('all');
   const [results, setResults] = useState(emptyTrackMap);
   const [seenLog, setSeenLog] = useState(emptyTrackMap);
+  const [srs, setSrs] = useState(emptyTrackMap);
   const [flipped, setFlipped] = useState(false);
   const [fIndex, setFIndex] = useState(0);
   const [syncMode, setSyncMode] = useState('loading');
@@ -2268,6 +2315,7 @@ function CertStudyApp() {
   const resultsRef = useRef(results);
   const seenLogRef = useRef(seenLog);
   const statsRef = useRef(stats);
+  const srsRef = useRef(srs);
 
   const track = TRACKS.find((t) => t.key === activeTrack);
   const visibleTracks = TRACKS.filter((t) => !t.hidden);
@@ -2282,6 +2330,7 @@ function CertStudyApp() {
   const applyResults = (v) => { resultsRef.current = v; setResults(v); };
   const applySeenLog = (v) => { seenLogRef.current = v; setSeenLog(v); };
   const applyStats = (v) => { statsRef.current = v; setStats(v); };
+  const applySrs = (v) => { srsRef.current = v; setSrs(v); };
 
   useEffect(() => {
     let cancelled = false;
@@ -2298,6 +2347,7 @@ function CertStudyApp() {
         applyResults(normalizeResults(local.results || local));
         if (local.seenLog) applySeenLog(normalizeSeenLog(local.seenLog));
         if (local.stats) applyStats(normalizeStats(local.stats));
+        if (local.srs) applySrs(normalizeSrs(local.srs));
       }
       setSyncMode('local');
     }
@@ -2320,6 +2370,7 @@ function CertStudyApp() {
                     if (data && data.results) applyResults(normalizeResults(data.results));
                     if (data && data.seenLog) applySeenLog(normalizeSeenLog(data.seenLog));
                     if (data && data.stats) applyStats(normalizeStats(data.stats));
+                    if (data && data.srs) applySrs(normalizeSrs(data.srs));
                   }
                   setSyncMode('cloud');
                 },
@@ -2351,19 +2402,25 @@ function CertStudyApp() {
   const saveResults = (nextResults) => {
     resultsRef.current = nextResults;
     setResults(nextResults);
-    persistPayload({ results: nextResults, seenLog: seenLogRef.current, stats: statsRef.current, updatedAt: Date.now() });
+    persistPayload({ results: nextResults, seenLog: seenLogRef.current, stats: statsRef.current, srs: srsRef.current, updatedAt: Date.now() });
   };
 
   const saveSeen = (nextSeenLog) => {
     seenLogRef.current = nextSeenLog;
     setSeenLog(nextSeenLog);
-    persistPayload({ results: resultsRef.current, seenLog: nextSeenLog, stats: statsRef.current, updatedAt: Date.now() });
+    persistPayload({ results: resultsRef.current, seenLog: nextSeenLog, stats: statsRef.current, srs: srsRef.current, updatedAt: Date.now() });
   };
 
   const saveStats = (nextStats) => {
     statsRef.current = nextStats;
     setStats(nextStats);
-    persistPayload({ results: resultsRef.current, seenLog: seenLogRef.current, stats: nextStats, updatedAt: Date.now() });
+    persistPayload({ results: resultsRef.current, seenLog: seenLogRef.current, stats: nextStats, srs: srsRef.current, updatedAt: Date.now() });
+  };
+
+  const saveSrs = (nextSrs) => {
+    srsRef.current = nextSrs;
+    setSrs(nextSrs);
+    persistPayload({ results: resultsRef.current, seenLog: seenLogRef.current, stats: statsRef.current, srs: nextSrs, updatedAt: Date.now() });
   };
 
   const markSeen = (ids) => {
@@ -2376,6 +2433,12 @@ function CertStudyApp() {
 
   const recordResult = (id, outcome) => {
     saveResults({ ...results, [activeTrack]: { ...trackResults, [id]: outcome } });
+  };
+
+  const recordSrs = (id, outcome) => {
+    const trackSrs = srs[activeTrack] || {};
+    const nextEntry = nextSrsEntry(trackSrs[id], outcome);
+    saveSrs({ ...srs, [activeTrack]: { ...trackSrs, [id]: nextEntry } });
   };
 
   const speak = (id, text) => {
@@ -2434,10 +2497,21 @@ function CertStudyApp() {
     return () => clearTimeout(t);
   }, [toastAchievement]);
 
+  // Ordered by spaced-repetition due-ness (most overdue or never-rated
+  // first) as of the moment you enter this category/track — deliberately
+  // NOT re-sorted on every rating (srs isn't a dependency here), so the
+  // order stays stable for the rest of this browsing session instead of
+  // reshuffling underneath you card-by-card. It re-evaluates next time you
+  // switch category, switch track, or reload.
   const filteredFlashcards = useMemo(() => {
     const list = activeCat === 'all' ? flashcardsData : flashcardsData.filter((c) => c.cat === activeCat);
-    return seededShuffle(list, 7);
-  }, [activeCat, flashcardsData]);
+    return orderBySrs(list, srsRef.current[activeTrack] || {});
+    // syncMode is included so this recomputes once when the initial
+    // cloud/local load finishes (loading -> local/cloud is a one-time
+    // transition), picking up real srs data instead of the empty default —
+    // not so it re-sorts on every subsequent change.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeCat, flashcardsData, syncMode]);
 
   useEffect(() => { setFIndex(0); setFlipped(false); }, [activeCat, mode, learnView, activeTrack]);
   useEffect(() => { setActiveCat('all'); }, [activeTrack]);
@@ -2566,7 +2640,10 @@ function CertStudyApp() {
   const currentQ = quizSession[sessionIndex];
 
   const nextCard = (outcome) => {
-    if (currentCard) recordResult(currentCard.id, outcome);
+    if (currentCard) {
+      recordResult(currentCard.id, outcome);
+      recordSrs(currentCard.id, outcome);
+    }
     setFlipped(false);
     setFIndex((i) => (i + 1) % Math.max(filteredFlashcards.length, 1));
   };
@@ -2621,10 +2698,11 @@ function CertStudyApp() {
 
   const doReset = () => {
     saveResults({ ...results, [activeTrack]: {} });
+    saveSrs({ ...srs, [activeTrack]: {} });
   };
 
   const doExport = () => {
-    const ok = downloadJSON(`cert-study-hub-progress-${todayString()}.json`, { results, seenLog, stats, exportedAt: Date.now() });
+    const ok = downloadJSON(`cert-study-hub-progress-${todayString()}.json`, { results, seenLog, stats, srs, exportedAt: Date.now() });
     setImportMessage(ok ? { ok: true, text: 'Downloaded.' } : { ok: false, text: "Couldn't start the download — try again." });
   };
 
@@ -2646,7 +2724,8 @@ function CertStudyApp() {
       applyResults(normalized.results);
       applySeenLog(normalized.seenLog);
       applyStats(normalized.stats);
-      persistPayload({ results: normalized.results, seenLog: normalized.seenLog, stats: normalized.stats, updatedAt: Date.now() });
+      applySrs(normalized.srs);
+      persistPayload({ results: normalized.results, seenLog: normalized.seenLog, stats: normalized.stats, srs: normalized.srs, updatedAt: Date.now() });
       setImportMessage({ ok: true, text: 'Progress restored.' });
     };
     reader.onerror = () => setImportMessage({ ok: false, text: "Couldn't read that file." });
@@ -2716,7 +2795,7 @@ function CertStudyApp() {
     statsRef.current = nextStats;
     setResults(nextResults);
     setStats(nextStats);
-    persistPayload({ results: nextResults, seenLog: seenLogRef.current, stats: nextStats, updatedAt: Date.now() });
+    persistPayload({ results: nextResults, seenLog: seenLogRef.current, stats: nextStats, srs: srsRef.current, updatedAt: Date.now() });
     // eslint-disable-next-line
   }, [examPhase]);
 

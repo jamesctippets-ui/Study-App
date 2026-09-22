@@ -8,6 +8,7 @@ function CertStudyApp() {
   const [activeCat, setActiveCat] = useState('all');
   const [results, setResults] = useState(emptyTrackMap);
   const [seenLog, setSeenLog] = useState(emptyTrackMap);
+  const [srs, setSrs] = useState(emptyTrackMap);
   const [flipped, setFlipped] = useState(false);
   const [fIndex, setFIndex] = useState(0);
   const [syncMode, setSyncMode] = useState('loading');
@@ -56,6 +57,7 @@ function CertStudyApp() {
   const resultsRef = useRef(results);
   const seenLogRef = useRef(seenLog);
   const statsRef = useRef(stats);
+  const srsRef = useRef(srs);
 
   const track = TRACKS.find((t) => t.key === activeTrack);
   const visibleTracks = TRACKS.filter((t) => !t.hidden);
@@ -70,6 +72,7 @@ function CertStudyApp() {
   const applyResults = (v) => { resultsRef.current = v; setResults(v); };
   const applySeenLog = (v) => { seenLogRef.current = v; setSeenLog(v); };
   const applyStats = (v) => { statsRef.current = v; setStats(v); };
+  const applySrs = (v) => { srsRef.current = v; setSrs(v); };
 
   useEffect(() => {
     let cancelled = false;
@@ -86,6 +89,7 @@ function CertStudyApp() {
         applyResults(normalizeResults(local.results || local));
         if (local.seenLog) applySeenLog(normalizeSeenLog(local.seenLog));
         if (local.stats) applyStats(normalizeStats(local.stats));
+        if (local.srs) applySrs(normalizeSrs(local.srs));
       }
       setSyncMode('local');
     }
@@ -108,6 +112,7 @@ function CertStudyApp() {
                     if (data && data.results) applyResults(normalizeResults(data.results));
                     if (data && data.seenLog) applySeenLog(normalizeSeenLog(data.seenLog));
                     if (data && data.stats) applyStats(normalizeStats(data.stats));
+                    if (data && data.srs) applySrs(normalizeSrs(data.srs));
                   }
                   setSyncMode('cloud');
                 },
@@ -139,19 +144,25 @@ function CertStudyApp() {
   const saveResults = (nextResults) => {
     resultsRef.current = nextResults;
     setResults(nextResults);
-    persistPayload({ results: nextResults, seenLog: seenLogRef.current, stats: statsRef.current, updatedAt: Date.now() });
+    persistPayload({ results: nextResults, seenLog: seenLogRef.current, stats: statsRef.current, srs: srsRef.current, updatedAt: Date.now() });
   };
 
   const saveSeen = (nextSeenLog) => {
     seenLogRef.current = nextSeenLog;
     setSeenLog(nextSeenLog);
-    persistPayload({ results: resultsRef.current, seenLog: nextSeenLog, stats: statsRef.current, updatedAt: Date.now() });
+    persistPayload({ results: resultsRef.current, seenLog: nextSeenLog, stats: statsRef.current, srs: srsRef.current, updatedAt: Date.now() });
   };
 
   const saveStats = (nextStats) => {
     statsRef.current = nextStats;
     setStats(nextStats);
-    persistPayload({ results: resultsRef.current, seenLog: seenLogRef.current, stats: nextStats, updatedAt: Date.now() });
+    persistPayload({ results: resultsRef.current, seenLog: seenLogRef.current, stats: nextStats, srs: srsRef.current, updatedAt: Date.now() });
+  };
+
+  const saveSrs = (nextSrs) => {
+    srsRef.current = nextSrs;
+    setSrs(nextSrs);
+    persistPayload({ results: resultsRef.current, seenLog: seenLogRef.current, stats: statsRef.current, srs: nextSrs, updatedAt: Date.now() });
   };
 
   const markSeen = (ids) => {
@@ -164,6 +175,12 @@ function CertStudyApp() {
 
   const recordResult = (id, outcome) => {
     saveResults({ ...results, [activeTrack]: { ...trackResults, [id]: outcome } });
+  };
+
+  const recordSrs = (id, outcome) => {
+    const trackSrs = srs[activeTrack] || {};
+    const nextEntry = nextSrsEntry(trackSrs[id], outcome);
+    saveSrs({ ...srs, [activeTrack]: { ...trackSrs, [id]: nextEntry } });
   };
 
   const speak = (id, text) => {
@@ -222,10 +239,21 @@ function CertStudyApp() {
     return () => clearTimeout(t);
   }, [toastAchievement]);
 
+  // Ordered by spaced-repetition due-ness (most overdue or never-rated
+  // first) as of the moment you enter this category/track — deliberately
+  // NOT re-sorted on every rating (srs isn't a dependency here), so the
+  // order stays stable for the rest of this browsing session instead of
+  // reshuffling underneath you card-by-card. It re-evaluates next time you
+  // switch category, switch track, or reload.
   const filteredFlashcards = useMemo(() => {
     const list = activeCat === 'all' ? flashcardsData : flashcardsData.filter((c) => c.cat === activeCat);
-    return seededShuffle(list, 7);
-  }, [activeCat, flashcardsData]);
+    return orderBySrs(list, srsRef.current[activeTrack] || {});
+    // syncMode is included so this recomputes once when the initial
+    // cloud/local load finishes (loading -> local/cloud is a one-time
+    // transition), picking up real srs data instead of the empty default —
+    // not so it re-sorts on every subsequent change.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeCat, flashcardsData, syncMode]);
 
   useEffect(() => { setFIndex(0); setFlipped(false); }, [activeCat, mode, learnView, activeTrack]);
   useEffect(() => { setActiveCat('all'); }, [activeTrack]);
@@ -354,7 +382,10 @@ function CertStudyApp() {
   const currentQ = quizSession[sessionIndex];
 
   const nextCard = (outcome) => {
-    if (currentCard) recordResult(currentCard.id, outcome);
+    if (currentCard) {
+      recordResult(currentCard.id, outcome);
+      recordSrs(currentCard.id, outcome);
+    }
     setFlipped(false);
     setFIndex((i) => (i + 1) % Math.max(filteredFlashcards.length, 1));
   };
@@ -409,10 +440,11 @@ function CertStudyApp() {
 
   const doReset = () => {
     saveResults({ ...results, [activeTrack]: {} });
+    saveSrs({ ...srs, [activeTrack]: {} });
   };
 
   const doExport = () => {
-    const ok = downloadJSON(`cert-study-hub-progress-${todayString()}.json`, { results, seenLog, stats, exportedAt: Date.now() });
+    const ok = downloadJSON(`cert-study-hub-progress-${todayString()}.json`, { results, seenLog, stats, srs, exportedAt: Date.now() });
     setImportMessage(ok ? { ok: true, text: 'Downloaded.' } : { ok: false, text: "Couldn't start the download — try again." });
   };
 
@@ -434,7 +466,8 @@ function CertStudyApp() {
       applyResults(normalized.results);
       applySeenLog(normalized.seenLog);
       applyStats(normalized.stats);
-      persistPayload({ results: normalized.results, seenLog: normalized.seenLog, stats: normalized.stats, updatedAt: Date.now() });
+      applySrs(normalized.srs);
+      persistPayload({ results: normalized.results, seenLog: normalized.seenLog, stats: normalized.stats, srs: normalized.srs, updatedAt: Date.now() });
       setImportMessage({ ok: true, text: 'Progress restored.' });
     };
     reader.onerror = () => setImportMessage({ ok: false, text: "Couldn't read that file." });
@@ -504,7 +537,7 @@ function CertStudyApp() {
     statsRef.current = nextStats;
     setResults(nextResults);
     setStats(nextStats);
-    persistPayload({ results: nextResults, seenLog: seenLogRef.current, stats: nextStats, updatedAt: Date.now() });
+    persistPayload({ results: nextResults, seenLog: seenLogRef.current, stats: nextStats, srs: srsRef.current, updatedAt: Date.now() });
     // eslint-disable-next-line
   }, [examPhase]);
 

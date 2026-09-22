@@ -92,6 +92,51 @@ function normalizeSeenLog(raw) {
   return map;
 }
 
+/* ---------------- spaced repetition (flashcards) ---------------- */
+
+// Simplified SM-2. `prev` is this card's current schedule
+// ({interval, ease, reps, due}), or undefined for a never-rated card.
+// Returns the next schedule after rating it 'correct' or 'incorrect'. A
+// miss resets the interval to 1 day but only dents the ease factor rather
+// than losing all history, so a card that's usually easy recovers its
+// longer interval faster than one that's chronically shaky.
+function nextSrsEntry(prev, outcome, now) {
+  const t = now || Date.now();
+  const DAY = 86400000;
+  const p = prev || { interval: 0, ease: 2.5, reps: 0, due: t };
+  if (outcome === 'correct') {
+    const reps = p.reps + 1;
+    const ease = Math.min(2.8, p.ease + 0.1);
+    const interval = reps === 1 ? 1 : reps === 2 ? 3 : Math.max(1, Math.round(p.interval * ease));
+    return { interval, ease, reps, due: t + interval * DAY };
+  }
+  const ease = Math.max(1.3, p.ease - 0.2);
+  return { interval: 1, ease, reps: 0, due: t };
+}
+
+function normalizeSrs(raw) {
+  if (!raw) return emptyTrackMap();
+  const map = emptyTrackMap();
+  TRACKS.forEach((t) => { map[t.key] = raw[t.key] || {}; });
+  return map;
+}
+
+// Orders a track's flashcards for Cards-mode review: cards that are due (or
+// have never been rated at all) sort first, most-overdue first; cards not
+// yet due follow, soonest-due first. A seeded shuffle breaks ties so cards
+// with the same due-ness don't always land in the same relative order.
+function orderBySrs(list, srsForTrack, now) {
+  const t = now || Date.now();
+  const NEVER_RATED = Number.MIN_SAFE_INTEGER;
+  const shuffled = seededShuffle(list, 7);
+  const withDue = shuffled.map((card, i) => {
+    const entry = srsForTrack && srsForTrack[card.id];
+    return { card, due: entry ? entry.due : NEVER_RATED, i };
+  });
+  withDue.sort((a, b) => (a.due - b.due) || (a.i - b.i));
+  return withDue.map((x) => x.card);
+}
+
 // Triggers a browser download of `data` as a formatted JSON file. Returns
 // false instead of throwing if the browser blocks it (e.g. sandboxed iframe).
 function downloadJSON(filename, data) {
@@ -121,6 +166,7 @@ function parseImportedProgress(raw) {
     results: normalizeResults(raw.results),
     seenLog: normalizeSeenLog(raw.seenLog),
     stats: normalizeStats(raw.stats),
+    srs: normalizeSrs(raw.srs),
   };
 }
 
