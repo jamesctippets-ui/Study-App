@@ -9,12 +9,13 @@ function CertStudyApp() {
   const [seenLog, setSeenLog] = useState(emptyTrackMap);
   const [flipped, setFlipped] = useState(false);
   const [fIndex, setFIndex] = useState(0);
-  const [confirmReset, setConfirmReset] = useState(false);
   const [syncMode, setSyncMode] = useState('loading');
   const [stats, setStats] = useState(emptyStats);
   const [showAchievements, setShowAchievements] = useState(false);
   const [toastAchievement, setToastAchievement] = useState(null);
   const [showPaths, setShowPaths] = useState(false);
+  const [showData, setShowData] = useState(false);
+  const [importMessage, setImportMessage] = useState(null);
 
   const [quizLength, setQuizLength] = useState(10);
   const [quizTypes, setQuizTypes] = useState({ mc: true, tf: true, ms: true });
@@ -347,7 +348,7 @@ function CertStudyApp() {
     else return;
     recordResult(currentQ.id, isCorrect ? 'correct' : 'incorrect');
     setSessionScore((s) => ({ correct: s.correct + (isCorrect ? 1 : 0), total: s.total + 1 }));
-    setSessionAnswers((a) => [...a, { id: currentQ.id, cat: currentQ.cat, prompt: currentQ.question, correct: isCorrect }]);
+    setSessionAnswers((a) => [...a, { id: currentQ.id, cat: currentQ.cat, prompt: currentQ.question, correct: isCorrect, explanation: currentQ.explanation }]);
   };
 
   const toggleMs = (idx) => {
@@ -363,12 +364,41 @@ function CertStudyApp() {
     setSelected(picked);
     recordResult(currentQ.id, isCorrect ? 'correct' : 'incorrect');
     setSessionScore((s) => ({ correct: s.correct + (isCorrect ? 1 : 0), total: s.total + 1 }));
-    setSessionAnswers((a) => [...a, { id: currentQ.id, cat: currentQ.cat, prompt: currentQ.question, correct: isCorrect }]);
+    setSessionAnswers((a) => [...a, { id: currentQ.id, cat: currentQ.cat, prompt: currentQ.question, correct: isCorrect, explanation: currentQ.explanation }]);
   };
 
   const doReset = () => {
     saveResults({ ...results, [activeTrack]: {} });
-    setConfirmReset(false);
+  };
+
+  const doExport = () => {
+    const ok = downloadJSON(`cert-study-hub-progress-${todayString()}.json`, { results, seenLog, stats, exportedAt: Date.now() });
+    setImportMessage(ok ? { ok: true, text: 'Downloaded.' } : { ok: false, text: "Couldn't start the download — try again." });
+  };
+
+  const doImportFile = (file) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      let parsed;
+      try {
+        parsed = JSON.parse(String(reader.result));
+      } catch (e) {
+        setImportMessage({ ok: false, text: "That file isn't valid JSON." });
+        return;
+      }
+      const normalized = parseImportedProgress(parsed);
+      if (!normalized) {
+        setImportMessage({ ok: false, text: "That doesn't look like a Cert Study Hub progress export." });
+        return;
+      }
+      setResults(normalized.results);
+      setSeenLog(normalized.seenLog);
+      setStats(normalized.stats);
+      persistPayload({ results: normalized.results, seenLog: normalized.seenLog, stats: normalized.stats, updatedAt: Date.now() });
+      setImportMessage({ ok: true, text: 'Progress restored.' });
+    };
+    reader.onerror = () => setImportMessage({ ok: false, text: "Couldn't read that file." });
+    reader.readAsText(file);
   };
 
   /* ---- final exam logic ---- */
@@ -420,7 +450,7 @@ function CertStudyApp() {
         }
       }
       if (isCorrect) correct++;
-      return { id: q.id, cat: q.cat, prompt: q.question, correct: isCorrect, answered };
+      return { id: q.id, cat: q.cat, prompt: q.question, correct: isCorrect, answered, explanation: q.explanation };
     });
     setExamResult({ correct, total: examSession.length, items });
     const trackKey = examTrack || activeTrack;
@@ -469,6 +499,16 @@ function CertStudyApp() {
           activeTrack={activeTrack}
           onSelectTrack={(key) => { setActiveTrack(key); setShowPaths(false); }}
           onClose={() => setShowPaths(false)}
+        />
+      )}
+      {showData && (
+        <DataPanel
+          trackLabel={track.label}
+          onExport={doExport}
+          onImportFile={doImportFile}
+          importMessage={importMessage}
+          onReset={doReset}
+          onClose={() => setShowData(false)}
         />
       )}
       <div className="max-w-md mx-auto px-4 py-5">
@@ -529,15 +569,15 @@ function CertStudyApp() {
               🏆 {stats.unlocked.length}
             </button>
             <button
-              onClick={() => setConfirmReset(true)}
-              title="Reset progress"
+              onClick={() => { setImportMessage(null); setShowData(true); }}
+              title="Data & progress"
               style={{
                 minWidth: '40px', minHeight: '40px', padding: '6px 10px', borderRadius: '10px',
                 border: `1px solid ${COLOR.border}`, background: 'transparent', color: COLOR.muted, fontSize: '15px',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
               }}
             >
-              ⟲
+              ⚙
             </button>
           </div>
         </div>
@@ -545,16 +585,6 @@ function CertStudyApp() {
         {syncMode === 'local' && (
           <div style={{ fontSize: '10.5px', color: COLOR.muted, marginBottom: '12px' }}>
             Saving progress to this browser. Open from your Claude account to sync across devices.
-          </div>
-        )}
-
-        {confirmReset && (
-          <div style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `1px solid ${COLOR.red}`, borderRadius: '12px', padding: '12px', marginBottom: '16px' }}>
-            <div style={{ fontSize: '13px', marginBottom: '8px' }}>Clear saved progress for {track.label}?</div>
-            <div className="flex gap-2">
-              <button onClick={doReset} style={{ flex: 1, background: COLOR.red, color: '#fff', borderRadius: '8px', padding: '8px', fontSize: '13px', fontWeight: 600 }}>Clear it</button>
-              <button onClick={() => setConfirmReset(false)} style={{ flex: 1, background: 'transparent', border: `1px solid ${COLOR.border}`, color: COLOR.text, borderRadius: '8px', padding: '8px', fontSize: '13px' }}>Cancel</button>
-            </div>
           </div>
         )}
 

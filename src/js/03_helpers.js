@@ -92,6 +92,38 @@ function normalizeSeenLog(raw) {
   return map;
 }
 
+// Triggers a browser download of `data` as a formatted JSON file. Returns
+// false instead of throwing if the browser blocks it (e.g. sandboxed iframe).
+function downloadJSON(filename, data) {
+  try {
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+
+// Validates and normalizes a parsed JSON object from a previously-exported
+// progress file. Returns null if it doesn't look like one of ours at all,
+// so the caller can show an error instead of silently wiping progress.
+function parseImportedProgress(raw) {
+  if (!raw || typeof raw !== 'object') return null;
+  if (!raw.results && !raw.seenLog && !raw.stats) return null;
+  return {
+    results: normalizeResults(raw.results),
+    seenLog: normalizeSeenLog(raw.seenLog),
+    stats: normalizeStats(raw.stats),
+  };
+}
+
 /* ---------------- stats & achievements ---------------- */
 
 function todayString() {

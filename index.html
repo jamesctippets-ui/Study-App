@@ -700,6 +700,38 @@ function normalizeSeenLog(raw) {
   return map;
 }
 
+// Triggers a browser download of `data` as a formatted JSON file. Returns
+// false instead of throwing if the browser blocks it (e.g. sandboxed iframe).
+function downloadJSON(filename, data) {
+  try {
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+
+// Validates and normalizes a parsed JSON object from a previously-exported
+// progress file. Returns null if it doesn't look like one of ours at all,
+// so the caller can show an error instead of silently wiping progress.
+function parseImportedProgress(raw) {
+  if (!raw || typeof raw !== 'object') return null;
+  if (!raw.results && !raw.seenLog && !raw.stats) return null;
+  return {
+    results: normalizeResults(raw.results),
+    seenLog: normalizeSeenLog(raw.seenLog),
+    stats: normalizeStats(raw.stats),
+  };
+}
+
 /* ---------------- stats & achievements ---------------- */
 
 function todayString() {
@@ -963,6 +995,99 @@ function PathPanel({ paths, results, activeTrack, onSelectTrack, onClose }) {
             </div>
           );
         })}
+      </div>
+    </div>
+  );
+}
+
+function DataPanel({ trackLabel, onExport, onImportFile, importMessage, onReset, onClose }) {
+  useEscapeToClose(onClose);
+  const [confirmingReset, setConfirmingReset] = useState(false);
+  const fileInputRef = useRef(null);
+  return (
+    <div
+      onClick={onClose}
+      style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', zIndex: 50, display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        style={{
+          background: COLOR.bg, borderTop: `1px solid ${COLOR.border}`, borderRadius: '20px 20px 0 0',
+          maxWidth: '28rem', width: '100%', maxHeight: '82vh', overflowY: 'auto', padding: '18px 18px 28px',
+          boxShadow: SHADOW.card,
+        }}
+      >
+        <div className="flex justify-between items-center mb-2">
+          <div className="itil-display" style={{ fontSize: '18px', fontWeight: 600 }}>Data & Progress</div>
+          <button onClick={onClose} className="btn-flat" style={{ color: COLOR.muted, fontSize: '15px', padding: '4px' }}>✕</button>
+        </div>
+
+        <div style={{ marginTop: '14px', padding: '14px', borderRadius: '14px', background: COLOR.surface, border: `1px solid ${COLOR.border}` }}>
+          <div style={{ fontSize: '13.5px', fontWeight: 600, marginBottom: '4px' }}>Export progress</div>
+          <div style={{ fontSize: '11.5px', color: COLOR.muted, marginBottom: '10px', lineHeight: 1.4 }}>
+            Download every track's quiz/exam history, flashcard mastery, streak, and achievements as a JSON file — a backup, or a way to move progress to a new device.
+          </div>
+          <button
+            onClick={onExport}
+            style={{ width: '100%', padding: '10px', borderRadius: '10px', background: COLOR.primary, color: '#2B1620', fontSize: '13px', fontWeight: 600 }}
+          >
+            ⬇ Export progress
+          </button>
+        </div>
+
+        <div style={{ marginTop: '12px', padding: '14px', borderRadius: '14px', background: COLOR.surface, border: `1px solid ${COLOR.border}` }}>
+          <div style={{ fontSize: '13.5px', fontWeight: 600, marginBottom: '4px' }}>Import progress</div>
+          <div style={{ fontSize: '11.5px', color: COLOR.muted, marginBottom: '10px', lineHeight: 1.4 }}>
+            Restore from a previously exported file. This replaces all progress currently saved in this browser.
+          </div>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="application/json"
+            style={{ display: 'none' }}
+            onChange={(e) => {
+              const file = e.target.files && e.target.files[0];
+              if (file) onImportFile(file);
+              e.target.value = '';
+            }}
+          />
+          <button
+            onClick={() => fileInputRef.current && fileInputRef.current.click()}
+            style={{ width: '100%', padding: '10px', borderRadius: '10px', background: 'transparent', border: `1px solid ${COLOR.primary}`, color: COLOR.primary, fontSize: '13px', fontWeight: 600 }}
+          >
+            ⬆ Import progress
+          </button>
+          {importMessage && (
+            <div style={{ marginTop: '8px', fontSize: '11.5px', color: importMessage.ok ? COLOR.success : COLOR.red, lineHeight: 1.4 }}>
+              {importMessage.text}
+            </div>
+          )}
+        </div>
+
+        <div style={{ marginTop: '12px', padding: '14px', borderRadius: '14px', background: COLOR.surface, border: `1px solid ${COLOR.border}` }}>
+          <div style={{ fontSize: '13.5px', fontWeight: 600, marginBottom: '4px' }}>Reset progress</div>
+          {!confirmingReset ? (
+            <>
+              <div style={{ fontSize: '11.5px', color: COLOR.muted, marginBottom: '10px', lineHeight: 1.4 }}>
+                Clear saved progress for {trackLabel} only. Other tracks are unaffected.
+              </div>
+              <button
+                onClick={() => setConfirmingReset(true)}
+                style={{ width: '100%', padding: '10px', borderRadius: '10px', background: 'transparent', border: `1px solid ${COLOR.red}`, color: COLOR.red, fontSize: '13px', fontWeight: 600 }}
+              >
+                Clear progress for {trackLabel}
+              </button>
+            </>
+          ) : (
+            <div>
+              <div style={{ fontSize: '12.5px', marginBottom: '8px' }}>Clear saved progress for {trackLabel}? Export a backup first if you're not sure.</div>
+              <div className="flex gap-2">
+                <button onClick={() => { onReset(); setConfirmingReset(false); }} style={{ flex: 1, background: COLOR.red, color: '#fff', borderRadius: '8px', padding: '8px', fontSize: '13px', fontWeight: 600 }}>Clear it</button>
+                <button onClick={() => setConfirmingReset(false)} style={{ flex: 1, background: 'transparent', border: `1px solid ${COLOR.border}`, color: COLOR.text, borderRadius: '8px', padding: '8px', fontSize: '13px' }}>Cancel</button>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
@@ -1819,6 +1944,11 @@ function QuizSummary({ score, answers, categories, onRestart }) {
               <div key={i} style={{ boxShadow: SHADOW.card, background: COLOR.surfaceRaised, borderRadius: '10px', padding: '10px 12px', fontSize: '13px' }}>
                 <div style={{ fontSize: '10px', color: COLOR.muted, marginBottom: '2px' }}>{categories.find((c) => c.key === m.cat)?.label}</div>
                 <div>{m.prompt}</div>
+                {m.explanation && (
+                  <div style={{ marginTop: '6px', paddingTop: '6px', borderTop: `1px solid ${COLOR.border}`, fontSize: '12px', color: COLOR.muted, lineHeight: 1.5 }}>
+                    {m.explanation}
+                  </div>
+                )}
               </div>
             ))}
           </div>
@@ -1987,6 +2117,11 @@ function ExamResults({ result, config, track, categories, onRestart }) {
                   {categories.find((c) => c.key === m.cat)?.label}{!m.answered ? ' — left blank' : ''}
                 </div>
                 <div>{m.prompt}</div>
+                {m.explanation && (
+                  <div style={{ marginTop: '6px', paddingTop: '6px', borderTop: `1px solid ${COLOR.border}`, fontSize: '12px', color: COLOR.muted, lineHeight: 1.5 }}>
+                    {m.explanation}
+                  </div>
+                )}
               </div>
             ))}
           </div>
@@ -2014,12 +2149,13 @@ function CertStudyApp() {
   const [seenLog, setSeenLog] = useState(emptyTrackMap);
   const [flipped, setFlipped] = useState(false);
   const [fIndex, setFIndex] = useState(0);
-  const [confirmReset, setConfirmReset] = useState(false);
   const [syncMode, setSyncMode] = useState('loading');
   const [stats, setStats] = useState(emptyStats);
   const [showAchievements, setShowAchievements] = useState(false);
   const [toastAchievement, setToastAchievement] = useState(null);
   const [showPaths, setShowPaths] = useState(false);
+  const [showData, setShowData] = useState(false);
+  const [importMessage, setImportMessage] = useState(null);
 
   const [quizLength, setQuizLength] = useState(10);
   const [quizTypes, setQuizTypes] = useState({ mc: true, tf: true, ms: true });
@@ -2352,7 +2488,7 @@ function CertStudyApp() {
     else return;
     recordResult(currentQ.id, isCorrect ? 'correct' : 'incorrect');
     setSessionScore((s) => ({ correct: s.correct + (isCorrect ? 1 : 0), total: s.total + 1 }));
-    setSessionAnswers((a) => [...a, { id: currentQ.id, cat: currentQ.cat, prompt: currentQ.question, correct: isCorrect }]);
+    setSessionAnswers((a) => [...a, { id: currentQ.id, cat: currentQ.cat, prompt: currentQ.question, correct: isCorrect, explanation: currentQ.explanation }]);
   };
 
   const toggleMs = (idx) => {
@@ -2368,12 +2504,41 @@ function CertStudyApp() {
     setSelected(picked);
     recordResult(currentQ.id, isCorrect ? 'correct' : 'incorrect');
     setSessionScore((s) => ({ correct: s.correct + (isCorrect ? 1 : 0), total: s.total + 1 }));
-    setSessionAnswers((a) => [...a, { id: currentQ.id, cat: currentQ.cat, prompt: currentQ.question, correct: isCorrect }]);
+    setSessionAnswers((a) => [...a, { id: currentQ.id, cat: currentQ.cat, prompt: currentQ.question, correct: isCorrect, explanation: currentQ.explanation }]);
   };
 
   const doReset = () => {
     saveResults({ ...results, [activeTrack]: {} });
-    setConfirmReset(false);
+  };
+
+  const doExport = () => {
+    const ok = downloadJSON(`cert-study-hub-progress-${todayString()}.json`, { results, seenLog, stats, exportedAt: Date.now() });
+    setImportMessage(ok ? { ok: true, text: 'Downloaded.' } : { ok: false, text: "Couldn't start the download — try again." });
+  };
+
+  const doImportFile = (file) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      let parsed;
+      try {
+        parsed = JSON.parse(String(reader.result));
+      } catch (e) {
+        setImportMessage({ ok: false, text: "That file isn't valid JSON." });
+        return;
+      }
+      const normalized = parseImportedProgress(parsed);
+      if (!normalized) {
+        setImportMessage({ ok: false, text: "That doesn't look like a Cert Study Hub progress export." });
+        return;
+      }
+      setResults(normalized.results);
+      setSeenLog(normalized.seenLog);
+      setStats(normalized.stats);
+      persistPayload({ results: normalized.results, seenLog: normalized.seenLog, stats: normalized.stats, updatedAt: Date.now() });
+      setImportMessage({ ok: true, text: 'Progress restored.' });
+    };
+    reader.onerror = () => setImportMessage({ ok: false, text: "Couldn't read that file." });
+    reader.readAsText(file);
   };
 
   /* ---- final exam logic ---- */
@@ -2425,7 +2590,7 @@ function CertStudyApp() {
         }
       }
       if (isCorrect) correct++;
-      return { id: q.id, cat: q.cat, prompt: q.question, correct: isCorrect, answered };
+      return { id: q.id, cat: q.cat, prompt: q.question, correct: isCorrect, answered, explanation: q.explanation };
     });
     setExamResult({ correct, total: examSession.length, items });
     const trackKey = examTrack || activeTrack;
@@ -2474,6 +2639,16 @@ function CertStudyApp() {
           activeTrack={activeTrack}
           onSelectTrack={(key) => { setActiveTrack(key); setShowPaths(false); }}
           onClose={() => setShowPaths(false)}
+        />
+      )}
+      {showData && (
+        <DataPanel
+          trackLabel={track.label}
+          onExport={doExport}
+          onImportFile={doImportFile}
+          importMessage={importMessage}
+          onReset={doReset}
+          onClose={() => setShowData(false)}
         />
       )}
       <div className="max-w-md mx-auto px-4 py-5">
@@ -2534,15 +2709,15 @@ function CertStudyApp() {
               🏆 {stats.unlocked.length}
             </button>
             <button
-              onClick={() => setConfirmReset(true)}
-              title="Reset progress"
+              onClick={() => { setImportMessage(null); setShowData(true); }}
+              title="Data & progress"
               style={{
                 minWidth: '40px', minHeight: '40px', padding: '6px 10px', borderRadius: '10px',
                 border: `1px solid ${COLOR.border}`, background: 'transparent', color: COLOR.muted, fontSize: '15px',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
               }}
             >
-              ⟲
+              ⚙
             </button>
           </div>
         </div>
@@ -2550,16 +2725,6 @@ function CertStudyApp() {
         {syncMode === 'local' && (
           <div style={{ fontSize: '10.5px', color: COLOR.muted, marginBottom: '12px' }}>
             Saving progress to this browser. Open from your Claude account to sync across devices.
-          </div>
-        )}
-
-        {confirmReset && (
-          <div style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `1px solid ${COLOR.red}`, borderRadius: '12px', padding: '12px', marginBottom: '16px' }}>
-            <div style={{ fontSize: '13px', marginBottom: '8px' }}>Clear saved progress for {track.label}?</div>
-            <div className="flex gap-2">
-              <button onClick={doReset} style={{ flex: 1, background: COLOR.red, color: '#fff', borderRadius: '8px', padding: '8px', fontSize: '13px', fontWeight: 600 }}>Clear it</button>
-              <button onClick={() => setConfirmReset(false)} style={{ flex: 1, background: 'transparent', border: `1px solid ${COLOR.border}`, color: COLOR.text, borderRadius: '8px', padding: '8px', fontSize: '13px' }}>Cancel</button>
-            </div>
           </div>
         )}
 

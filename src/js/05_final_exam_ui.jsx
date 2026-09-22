@@ -150,6 +150,11 @@ function ExamResults({ result, config, track, categories, onRestart }) {
                   {categories.find((c) => c.key === m.cat)?.label}{!m.answered ? ' — left blank' : ''}
                 </div>
                 <div>{m.prompt}</div>
+                {m.explanation && (
+                  <div style={{ marginTop: '6px', paddingTop: '6px', borderTop: `1px solid ${COLOR.border}`, fontSize: '12px', color: COLOR.muted, lineHeight: 1.5 }}>
+                    {m.explanation}
+                  </div>
+                )}
               </div>
             ))}
           </div>
