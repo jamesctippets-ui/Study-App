@@ -637,6 +637,7 @@ function CertStudyApp() {
             speakingId={speakingId}
             onSpeak={speak}
             speechSupported={speechSupported}
+            flashcardsData={flashcardsData}
           />
         )}
 
@@ -673,6 +674,7 @@ function CertStudyApp() {
                 msPending={msPending}
                 onToggleMs={toggleMs}
                 onSubmitMs={submitMsAnswer}
+                flashcardsData={flashcardsData}
               />
             )}
           </React.Fragment>

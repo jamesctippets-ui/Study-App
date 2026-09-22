@@ -148,7 +148,44 @@ function highlightTerms(text, terms, vocabPool, onTermClick) {
       <button
         key={i}
         className="btn-flat"
-        onClick={() => onTermClick(card)}
+        onClick={(e) => { e.stopPropagation(); onTermClick(card); }}
+        style={{
+          color: COLOR.gold, fontWeight: 700, background: 'transparent', padding: 0,
+          borderBottom: `1px dotted ${COLOR.gold}`, cursor: 'pointer', font: 'inherit',
+        }}
+      >
+        {part}
+      </button>
+    );
+  });
+}
+
+// Like highlightTerms, but with no curated `keyTerms` list to work from —
+// it scans a track's own flashcard fronts for ones that appear in `text`
+// and makes those clickable, so every track gets term popouts for free
+// (no per-question authoring needed). Capped at `maxTerms` distinct terms
+// per call so a dense explanation doesn't turn into a wall of gold links.
+function autoHighlightTerms(text, vocabPool, onTermClick, maxTerms) {
+  const cap = maxTerms || 3;
+  if (!text || !vocabPool || !vocabPool.length || !onTermClick) return text;
+  const candidates = vocabPool.filter((v) => v.front && v.front.length >= 4);
+  if (!candidates.length) return text;
+  const sorted = [...candidates].sort((a, b) => b.front.length - a.front.length);
+  const escaped = sorted.map((v) => escapeRegExp(v.front));
+  const re = new RegExp('\\b(' + escaped.join('|') + ')\\b', 'gi');
+  const parts = text.split(re);
+  const shown = new Set();
+  return parts.map((part, i) => {
+    const match = sorted.find((v) => v.front.toLowerCase() === (part || '').toLowerCase());
+    if (!match) return <React.Fragment key={i}>{part}</React.Fragment>;
+    const key = match.front.toLowerCase();
+    if (!shown.has(key) && shown.size >= cap) return <React.Fragment key={i}>{part}</React.Fragment>;
+    shown.add(key);
+    return (
+      <button
+        key={i}
+        className="btn-flat"
+        onClick={(e) => { e.stopPropagation(); onTermClick(match); }}
         style={{
           color: COLOR.gold, fontWeight: 700, background: 'transparent', padding: 0,
           borderBottom: `1px dotted ${COLOR.gold}`, cursor: 'pointer', font: 'inherit',
