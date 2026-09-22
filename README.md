@@ -23,11 +23,18 @@ type since none of these exams have one) with a missed-question review
 queue. Exam is a timed Final Exam mode matching each real exam's
 length/pass mark. Text-to-speech is available on readings and flashcards.
 
-Key terms in a lesson's reading aren't just highlighted — tapping one pulls up
-its definition inline (front/back/detail, sourced from that track's flashcards)
-without leaving the reading. Coverage depends on whether a matching flashcard
-exists for that exact term; where one doesn't, the term stays highlighted but
-plain, rather than showing a broken or empty popover.
+Key terms aren't just highlighted in lesson readings — every track gets this
+now, in quiz explanations and flashcard backs too. Tapping a highlighted term
+pulls up its definition inline (front/back/detail, sourced from that track's
+own flashcards) without navigating away. Curated tracks (AZ-900, AZ-104) use
+a hand-picked term list; every other track auto-detects terms by matching
+flashcard fronts against the surrounding text, so coverage scales to new
+content with no per-question authoring needed.
+
+The Exam tab for each track links out to real official study resources —
+Microsoft Learn study guides and certification pages for the Microsoft
+tracks, PeopleCert for ITIL, CompTIA for Cloud+, and HL7 International's
+FHIR/V2 specs for the EHR Integration module.
 
 A 🏆 header button opens **Achievements** — 15 milestone badges (mastery,
 streaks, quiz/exam/match counts, course completion) plus a daily streak

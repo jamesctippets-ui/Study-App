@@ -49,6 +49,17 @@ def validate():
     if missing_exam_config:
         errors.append(f"EXAM_CONFIG is missing entries for: {missing_exam_config}")
 
+    for key, cfg in tracks.EXAM_CONFIG.items():
+        resources = cfg.get("resources")
+        if not resources:
+            errors.append(f"[{key}] EXAM_CONFIG is missing a non-empty 'resources' list")
+        else:
+            for r in resources:
+                if not r.get("label") or not r.get("url"):
+                    errors.append(f"[{key}] a resources entry is missing a 'label' or 'url'")
+                elif not r["url"].startswith("http"):
+                    errors.append(f"[{key}] resource '{r['label']}' has a non-http url: {r['url']!r}")
+
     seen_path_keys = set()
     for path in paths.PATHS:
         if path["key"] in seen_path_keys:

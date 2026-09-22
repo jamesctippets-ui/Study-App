@@ -10,6 +10,26 @@ function ExamIntro({ track, config, onStart }) {
       <div style={{ fontSize: '12px', color: COLOR.muted, lineHeight: 1.6, marginBottom: '18px' }}>
         Multiple choice, true/false, and multi-select only, pulled from every category regardless of the current filter. No feedback until you submit, just like the real thing. Questions and order change each attempt.
       </div>
+      {Array.isArray(config.resources) && config.resources.length > 0 && (
+        <div style={{ marginBottom: '18px', padding: '12px 14px', borderRadius: '12px', background: COLOR.surfaceRaised, border: `1px solid ${COLOR.border}` }}>
+          <div style={{ fontSize: '11px', color: COLOR.muted, fontWeight: 600, marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+            Official study resources
+          </div>
+          <div className="flex flex-col gap-1">
+            {config.resources.map((r, i) => (
+              <a
+                key={i}
+                href={r.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ fontSize: '13px', color: COLOR.primary, textDecoration: 'none', borderBottom: `1px dotted ${COLOR.primary}`, width: 'fit-content' }}
+              >
+                {r.label} ↗
+              </a>
+            ))}
+          </div>
+        </div>
+      )}
       <button
         onClick={onStart}
         style={{ width: '100%', padding: '13px', borderRadius: '12px', background: COLOR.gold, color: '#2E1F0C', fontSize: '14px', fontWeight: 700 }}
