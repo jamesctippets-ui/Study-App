@@ -2064,14 +2064,14 @@ function CertStudyApp() {
     utter.onerror = () => setSpeakingId(null);
     // Keep a reference so the utterance isn't garbage-collected mid-speech
     // (a well-known cross-browser bug that cuts playback short or silently
-    // no-ops). Also, speak() has to run in a fresh tick after cancel() —
-    // calling it in the same tick is a documented Safari/iOS bug where the
-    // new utterance is silently dropped.
+    // no-ops).
     utterRef.current = utter;
     setSpeakingId(id);
-    setTimeout(() => {
-      if (utterRef.current === utter) window.speechSynthesis.speak(utter);
-    }, 60);
+    // speak() MUST run synchronously within this same click-handler call
+    // stack — Safari (especially iOS) only allows speech synthesis inside
+    // a direct user-gesture chain, and a setTimeout/Promise tick in between
+    // breaks that chain, silently dropping the utterance. Do not defer this.
+    window.speechSynthesis.speak(utter);
   };
 
   useEffect(() => {
