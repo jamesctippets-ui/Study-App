@@ -452,6 +452,57 @@ function StudyView({ activeCat, categories, flashcards }) {
   );
 }
 
+function CheatSheetView({ trackLabel, sections }) {
+  if (!sections.length) {
+    return (
+      <div style={{ textAlign: 'center', color: COLOR.muted, fontSize: '13px', padding: '30px 10px' }}>
+        No cheat sheet for this track yet.
+      </div>
+    );
+  }
+  return (
+    <div>
+      <div className="flex justify-between items-center mb-3">
+        <div style={{ fontSize: '12px', color: COLOR.muted, lineHeight: 1.4 }}>
+          The must-know facts for {trackLabel}, condensed to one scrollable page — not a substitute for the
+          flashcards/quiz, just a fast pre-exam refresher.
+        </div>
+      </div>
+      <button
+        onClick={() => window.print()}
+        className="cheat-sheet-print-btn"
+        style={{
+          display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '16px', padding: '9px 14px',
+          borderRadius: '10px', border: `1px solid ${COLOR.primary}`, background: 'transparent', color: COLOR.primary,
+          fontSize: '13px', fontWeight: 600,
+        }}
+      >
+        🖨 Print / save as PDF
+      </button>
+      <div id="cheat-sheet-content" className="flex flex-col gap-4">
+        <div className="itil-display cheat-sheet-title" style={{ fontSize: '18px', fontWeight: 600, display: 'none' }}>
+          {trackLabel} — Cheat Sheet
+        </div>
+        {sections.map((section, i) => (
+          <div
+            key={i}
+            style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderRadius: '14px', padding: '14px 16px' }}
+          >
+            <div className="itil-display" style={{ fontSize: '14.5px', fontWeight: 600, color: COLOR.gold, marginBottom: '8px' }}>
+              {section.heading}
+            </div>
+            <ul style={{ margin: 0, paddingLeft: '18px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+              {section.points.map((p, j) => (
+                <li key={j} style={{ fontSize: '13.5px', lineHeight: 1.5, color: COLOR.text }}>{p}</li>
+              ))}
+            </ul>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function MatchGame({ flashcards, roundSize, onContinue, onRoundComplete }) {
   const ROUND_SIZE = roundSize || 6;
 

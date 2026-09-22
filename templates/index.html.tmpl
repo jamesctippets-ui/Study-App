@@ -104,6 +104,16 @@
   .px-4 { padding-left: 1rem; padding-right: 1rem; }
   .py-5 { padding-top: 1.25rem; padding-bottom: 1.25rem; }
   .max-w-md { max-width: 28rem; }
+
+  @media print {
+    body * { visibility: hidden; }
+    #cheat-sheet-content, #cheat-sheet-content * { visibility: visible; }
+    #cheat-sheet-content { position: absolute; left: 0; top: 0; width: 100%; }
+    #cheat-sheet-content .cheat-sheet-title { display: block !important; color: #000 !important; margin-bottom: 4px; }
+    #cheat-sheet-content > div { break-inside: avoid; border-color: #ccc !important; background: #fff !important; }
+    #cheat-sheet-content, #cheat-sheet-content li, #cheat-sheet-content div { color: #000 !important; }
+    .cheat-sheet-print-btn { display: none !important; }
+  }
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>

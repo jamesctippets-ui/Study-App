@@ -1276,3 +1276,62 @@ QUESTIONS = [
         'explanation': "They're meant to complement each other — DevOps practices like CI/CD can sit inside stages of the ITIL value system, not replace its guiding principles.",
     },
 ]
+
+CHEAT_SHEET = [
+    {
+        'heading': 'The 7 guiding principles',
+        'points': [
+            'Focus on value — everything traces back to value for stakeholders.',
+            'Start where you are — assess and reuse what already exists before building new.',
+            'Progress iteratively with feedback — don\'t try to do everything in one big pass.',
+            'Collaborate and promote visibility — work across boundaries, make work visible.',
+            'Think and work holistically — no service stands alone.',
+            'Keep it simple and practical — use the minimum steps needed.',
+            'Optimize and automate — human effort only where it adds real value.',
+        ],
+    },
+    {
+        'heading': 'The 4 dimensions of service management',
+        'points': [
+            'Organizations and people — roles, responsibilities, culture, staffing.',
+            'Information and technology — the tech and knowledge used to deliver services.',
+            'Partners and suppliers — relationships with other organizations involved.',
+            'Value streams and processes — the activities, workflows, controls, procedures.',
+        ],
+    },
+    {
+        'heading': 'Service Value Chain activities',
+        'points': [
+            'Plan → Improve → Engage → Design & transition → Obtain/build → Deliver & support.',
+            'Engage sits at the center-ish, connecting to stakeholders throughout, not just at the start.',
+            'These 6 activities combine into value streams for specific scenarios (e.g. "resolve an incident").',
+        ],
+    },
+    {
+        'heading': 'Key definitions to not mix up',
+        'points': [
+            'Service = a means of enabling value co-creation by facilitating outcomes customers want, without the customer managing costs/risks themselves.',
+            'Utility = what the service does (fitness for purpose). Warranty = how well it does it (fitness for use — availability, capacity, security, continuity).',
+            'Output = a tangible/intangible deliverable. Outcome = the actual result an output enables for a stakeholder.',
+            'Cost and Risk are what value is weighed against — value = (utility + warranty) balanced against cost and risk.',
+        ],
+    },
+    {
+        'heading': 'Practices you must be able to distinguish',
+        'points': [
+            'Incident = unplanned interruption/reduction in quality — restore service fast. Problem = the underlying cause of one or more incidents.',
+            'Known Error = a problem that has been analyzed but not yet resolved.',
+            'Change Enablement = ensures risks are properly assessed for changes (not "change management" in ITIL 4 terms).',
+            'Service Request = a formal request for something routine/pre-defined (not an incident — nothing is broken).',
+            'Service Level Management = ongoing activity of setting/monitoring/reviewing SLAs, not a one-time contract signing.',
+        ],
+    },
+    {
+        'heading': 'Exam-day reminders',
+        'points': [
+            'Real pass mark: 26/40 (65%), 40 questions, 60 minutes.',
+            'Questions often describe a scenario and ask "which practice/principle applies" — map the scenario to the definition, don\'t just pattern-match keywords.',
+            '"Least effort" / "start where you are" language usually points at Start where you are or Keep it simple and practical.',
+        ],
+    },
+]

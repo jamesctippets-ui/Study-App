@@ -739,10 +739,17 @@ function CertStudyApp() {
             >
               Match
             </button>
+            <button
+              onClick={() => setLearnView('sheet')}
+              className="flex-1"
+              style={{ padding: '6px 2px', borderRadius: '8px', fontSize: '10.5px', fontWeight: 600, background: learnView === 'sheet' ? COLOR.surfaceRaised : 'transparent', color: learnView === 'sheet' ? COLOR.text : COLOR.muted }}
+            >
+              Sheet
+            </button>
           </div>
         )}
 
-        {(mode === 'quiz' || (mode === 'learn' && (learnView !== 'study' || !DATA[activeTrack].lessons))) && (
+        {(mode === 'quiz' || (mode === 'learn' && learnView !== 'sheet' && (learnView !== 'study' || !DATA[activeTrack].lessons))) && (
           <div className="mb-5" style={{ position: 'relative' }}>
             <div className="flex gap-2" style={{ overflowX: 'auto', paddingBottom: '4px' }}>
               <CategoryChip label="All" active={activeCat === 'all'} mastery={overallMastery / 100} onClick={() => setActiveCat('all')} />
@@ -836,6 +843,10 @@ function CertStudyApp() {
           ) : (
             <StudyView activeCat={activeCat} categories={categories} flashcards={flashcardsData} />
           )
+        )}
+
+        {mode === 'learn' && learnView === 'sheet' && (
+          <CheatSheetView trackLabel={track.label} sections={DATA[activeTrack].cheatSheet || []} />
         )}
 
         {mode === 'exam' && (

@@ -143,6 +143,26 @@ def validate():
             if not q.get("explanation", "").strip():
                 errors.append(f"[{key}] question '{qid}' is missing an explanation")
 
+        # TODO: once every track has a CHEAT_SHEET, make this a hard
+        # requirement like EXAM_CONFIG's `resources` above (13 of 15 tracks
+        # are still getting theirs written — see ROADMAP.md item 5).
+        cheat_sheet = getattr(mod, "CHEAT_SHEET", [])
+        if cheat_sheet:
+            seen_headings = set()
+            for section in cheat_sheet:
+                heading = section.get("heading", "").strip()
+                if not heading:
+                    errors.append(f"[{key}] a CHEAT_SHEET section is missing a heading")
+                elif heading in seen_headings:
+                    errors.append(f"[{key}] CHEAT_SHEET has a duplicate section heading '{heading}'")
+                else:
+                    seen_headings.add(heading)
+                points = section.get("points")
+                if not isinstance(points, list) or len(points) < 2:
+                    errors.append(f"[{key}] CHEAT_SHEET section '{heading}' needs at least 2 points")
+                elif any(not isinstance(p, str) or not p.strip() for p in points):
+                    errors.append(f"[{key}] CHEAT_SHEET section '{heading}' has an empty point")
+
         lessons = getattr(mod, "LESSONS", [])
         lesson_ids_seen = set()
         for lesson in lessons:
@@ -170,6 +190,7 @@ def build_data_json():
             "flashcards": mod.FLASHCARDS,
             "questions": mod.QUESTIONS,
             **({"lessons": mod.LESSONS} if hasattr(mod, "LESSONS") else {}),
+            **({"cheatSheet": mod.CHEAT_SHEET} if hasattr(mod, "CHEAT_SHEET") else {}),
         }
         for key, mod in TRACK_MODULES.items()
     }

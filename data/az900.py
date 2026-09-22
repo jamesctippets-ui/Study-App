@@ -1675,3 +1675,70 @@ You can manage all of this through the Azure portal, Cloud Shell (a browser-base
         'scenario': "A finance team notices unexpected spend in one department's subscription. Because every resource there was tagged with a CostCenter value at creation, Cost Management can break the bill down by tag and pinpoint exactly which team is responsible — while Azure Advisor separately flags a handful of unused disks in that same subscription quietly adding to the bill.",
     },
 ]
+
+CHEAT_SHEET = [
+    {
+        'heading': 'Cloud service & deployment models',
+        'points': [
+            'IaaS = rent infrastructure, you manage OS/runtime/apps (most control, most responsibility).',
+            'PaaS = platform managed for you, you manage just your app/data (e.g. Azure App Service).',
+            'SaaS = fully managed application, you just use it (e.g. Microsoft 365).',
+            'Public cloud = shared infra owned by the provider. Private cloud = dedicated to one org. Hybrid = both, connected.',
+            'CapEx (upfront capital purchase) vs. OpEx (ongoing operating expense) — cloud shifts spend from CapEx to OpEx.',
+        ],
+    },
+    {
+        'heading': 'Shared responsibility model',
+        'points': [
+            "Physical security/hosts are always the provider's job, no matter which service model you use.",
+            'Moving IaaS → PaaS → SaaS shifts more responsibility to Microsoft and less to you.',
+            'Data classification and access management stay the customer\'s responsibility in every model.',
+        ],
+    },
+    {
+        'heading': 'Core architecture',
+        'points': [
+            'Region = a set of datacenters with low-latency networking. Region pair = two regions in the same geography for disaster recovery.',
+            'Availability Zone = physically separate datacenters within a region (power/cooling/networking independent).',
+            'Availability Set = protects VMs in the same datacenter from a single hardware/rack failure, not a datacenter-wide outage.',
+            'Resource group = the container for related resources\' lifecycle; a resource lives in exactly one resource group.',
+            'Management groups sit above subscriptions for organizing policy/access at scale.',
+        ],
+    },
+    {
+        'heading': 'Compute & networking essentials',
+        'points': [
+            'VMs = most control, most management overhead. Containers = lighter, portable. Azure Functions = serverless, pay-per-execution.',
+            'VNet = your private network in Azure; subnets segment it; NSGs filter traffic in/out at the subnet or NIC level.',
+            'ExpressRoute = private dedicated connection to Azure (doesn\'t use the public internet). VPN Gateway = encrypted tunnel over the public internet.',
+            'Load Balancer = distributes traffic at layer 4 (TCP/UDP). Application Gateway = layer 7, understands HTTP (URL routing, WAF).',
+        ],
+    },
+    {
+        'heading': 'Storage & identity',
+        'points': [
+            'Blob storage = unstructured data (files, media). Disk storage = VM disks. File storage = SMB file shares.',
+            'Storage redundancy: LRS (one datacenter) < ZRS (zone) < GRS (paired region, not readable) < RA-GRS (paired region, readable).',
+            'Microsoft Entra ID (formerly Azure AD) = identity service; RBAC = who can do what on which resource; Conditional Access = under what conditions access is allowed.',
+            'MFA = something you know + something you have/are — always the strongest single control for compromised passwords.',
+        ],
+    },
+    {
+        'heading': 'Cost & governance tools',
+        'points': [
+            'Azure Policy enforces rules (can block non-compliant deployments). Resource locks (Delete/Read-only) just prevent an accidental action.',
+            'Pricing calculator estimates cost of planned resources. TCO calculator compares on-premises vs. Azure cost.',
+            'Tags enable cost breakdown by department/project in Cost Management.',
+            'Azure Advisor = free personalized recommendations across cost, security, reliability, performance.',
+            'Azure Monitor = health of YOUR resources. Azure Service Health = health of the Azure platform itself.',
+        ],
+    },
+    {
+        'heading': 'Exam-day reminders',
+        'points': [
+            'Microsoft scores this 0–1000 with 700 to pass — not a flat percentage.',
+            'Watch for "most cost-effective," "most secure," and "least administrative effort" — pick the best fit, not just any correct-sounding option.',
+            'If a question describes something that "doesn\'t use the public internet," it means ExpressRoute, not VPN Gateway.',
+        ],
+    },
+]
