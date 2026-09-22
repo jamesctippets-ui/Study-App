@@ -8,7 +8,7 @@ function AchievementToast({ achievement }) {
         position: 'fixed', top: 'calc(env(safe-area-inset-top) + 12px)', left: '50%', transform: 'translateX(-50%)',
         zIndex: 60, background: COLOR.surfaceRaised, border: `1px solid ${COLOR.gold}`, borderRadius: '14px',
         padding: '12px 16px', boxShadow: SHADOW.card, display: 'flex', alignItems: 'center', gap: '10px',
-        maxWidth: '90vw', animation: 'achievementIn 0.25s ease',
+        maxWidth: '90vw', animation: 'achievementIn 0.25s ease', pointerEvents: 'none',
       }}
     >
       <div style={{ fontSize: '22px' }}>{achievement.icon}</div>
@@ -21,6 +21,7 @@ function AchievementToast({ achievement }) {
 }
 
 function AchievementsPanel({ achievements, streak, onClose }) {
+  useEscapeToClose(onClose);
   const unlockedCount = achievements.filter((a) => a.unlocked).length;
   return (
     <div
@@ -75,6 +76,7 @@ function AchievementsPanel({ achievements, streak, onClose }) {
 }
 
 function PathPanel({ paths, results, activeTrack, onSelectTrack, onClose }) {
+  useEscapeToClose(onClose);
   return (
     <div
       onClick={onClose}

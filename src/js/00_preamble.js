@@ -44,6 +44,16 @@ function trackAccent(key) {
   return TRACK_ACCENTS[key] || COLOR.primary;
 }
 
+// Closes a fixed-position overlay (panel, modal) on Escape, matching the
+// click-outside-to-close behavior these overlays already have.
+function useEscapeToClose(onClose) {
+  useEffect(() => {
+    const handler = (e) => { if (e.key === 'Escape') onClose(); };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [onClose]);
+}
+
 const SHADOW = {
   card: '0 3px 10px rgba(0,0,0,0.32), inset 0 1px 0 rgba(255,255,255,0.04)',
 };
