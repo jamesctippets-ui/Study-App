@@ -14,8 +14,8 @@ time you enter a category/track rather than reshuffling mid-session), Study
 (for tracks without a course, a flashcard list paginated one category/section
 at a time — Previous/Next section controls instead of one long scroll; for
 AZ-900/AZ-104, a full mini-course per topic: reading with tappable key terms,
-an SVG diagram, a portal mockup, a worked scenario, common exam traps, and a
-3–4 question quiz), and Match (a
+an SVG diagram, a portal mockup, a worked scenario, and common exam traps),
+and Match (a
 term-matching game — tap a term chip, then its definition; respects the
 current category filter, tracks mistakes, and deals a fresh random round
 each time), and Sheet (a one-page, printable cheat sheet per track — every
@@ -23,8 +23,19 @@ track's must-know facts condensed into a few dense sections, with a
 Print/save-as-PDF button). A lesson's reading is itself split
 into pages when it runs long — moving past the first page takes either a
 one-question quick check or a 3-pair mini match round, alternating between
-the two, so the material isn't just a wall of text to skim past. Quiz is a
-rotating question engine
+the two, so the material isn't just a wall of text to skim past.
+
+Every Study section — a lesson's category in AZ-900/AZ-104, or a
+category page anywhere else — ends with a **"Quiz this section"** button
+that tests every question tagged with that one category, not just a small
+curated sample, so you can drill a single topic (e.g. just "Governance &
+Resource Structure") in isolation before mixing it back into a full quiz
+or exam. A lesson's own Vocabulary list now sits in a collapsed-by-default
+expandable block underneath the reading — term flyouts already surface
+definitions inline as you read, so the full list stays out of the way
+until you actually want to scan it.
+
+Quiz is a rotating question engine
 (multiple choice, true/false, multi-select — matching the question formats
 the real proctored exams actually use; there's no free-response short-answer
 type since none of these exams have one) with a missed-question review

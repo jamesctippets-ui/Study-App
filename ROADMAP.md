@@ -153,6 +153,19 @@ come up.
   `QuestionView`/`ExamQuestionView`). The descriptive caption is
   deliberately suppressed in this context (`hideDescription`) since it
   would otherwise spell out the answer.
+- [x] **"Quiz this section" — test one category in isolation.** Every Study
+  section now ends with a button that starts a quiz using every question
+  tagged with that category (not the small curated set the in-reading gate
+  checks use) — `startCategoryQuiz` in 06_app.jsx for StudyView's per-category
+  pages, and a recomputed `finalQuizIds` in LessonDetail (every question
+  whose category matches that lesson's vocabulary) for course tracks. Reuses
+  the existing `startLessonQuiz` session-start plumbing rather than adding a
+  parallel one.
+- [x] **Lesson Vocabulary collapsed by default.** Now that term flyouts
+  surface most definitions inline while reading, the full Vocabulary list
+  at the bottom of a lesson is a collapsed, expandable block (same
+  show/hide pattern as the existing "fundamentals" toggle) instead of
+  always being fully expanded.
 
 ## 10. Future-proofing for a standalone web/iOS/Android app (user's idea — lowest priority, not being worked on)
 

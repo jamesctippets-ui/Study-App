@@ -482,19 +482,42 @@ function ResourceLinksRow({ resources, label }) {
   );
 }
 
-function StudyView({ activeCat, categories, flashcards }) {
+function QuizSectionButton({ label, count, onClick }) {
+  if (!count) return null;
+  return (
+    <button
+      onClick={onClick}
+      style={{
+        width: '100%', padding: '12px', borderRadius: '12px', background: COLOR.gold, color: '#2E1F0C',
+        fontSize: '13px', fontWeight: 600, marginBottom: '18px',
+      }}
+    >
+      Quiz this section: {label} ({count} question{count === 1 ? '' : 's'})
+    </button>
+  );
+}
+
+function StudyView({ activeCat, categories, flashcards, questionsData, onQuizCategory }) {
   const [sectionPage, setSectionPage] = useState(0);
   useEffect(() => { setSectionPage(0); }, [activeCat, flashcards]);
 
   if (activeCat !== 'all') {
     const items = flashcards.filter((i) => i.cat === activeCat);
     const activeCatObj = categories.find((c) => c.key === activeCat);
+    const count = questionsData ? questionsData.filter((q) => q.cat === activeCat).length : 0;
     return (
       <div>
         <ResourceLinksRow resources={activeCatObj && activeCatObj.resources} label="Learn more" />
-        <div className="flex flex-col gap-3">
+        <div className="flex flex-col gap-3" style={{ marginBottom: '16px' }}>
           {items.map((item) => <StudyEntry key={item.id} item={item} allFlashcards={flashcards} />)}
         </div>
+        {onQuizCategory && (
+          <QuizSectionButton
+            label={activeCatObj ? activeCatObj.label : activeCat}
+            count={count}
+            onClick={() => onQuizCategory(activeCat)}
+          />
+        )}
       </div>
     );
   }
@@ -507,6 +530,7 @@ function StudyView({ activeCat, categories, flashcards }) {
   const section = sections[page];
   const isFirst = page === 0;
   const isLast = page === sections.length - 1;
+  const sectionQuestionCount = questionsData ? questionsData.filter((q) => q.cat === section.cat.key).length : 0;
 
   return (
     <div>
@@ -518,6 +542,13 @@ function StudyView({ activeCat, categories, flashcards }) {
       <div className="flex flex-col gap-3" style={{ marginBottom: '18px' }}>
         {section.items.map((item) => <StudyEntry key={item.id} item={item} allFlashcards={flashcards} />)}
       </div>
+      {onQuizCategory && (
+        <QuizSectionButton
+          label={section.cat.label}
+          count={sectionQuestionCount}
+          onClick={() => onQuizCategory(section.cat.key)}
+        />
+      )}
       <div className="flex gap-2">
         <button
           onClick={() => setSectionPage((p) => Math.max(0, p - 1))}
@@ -862,12 +893,27 @@ function ReadingCheckGate({ question, onPassed }) {
 
 function LessonDetail({ lesson, flashcardsData, questionsData, categories, onBack, onQuiz, speakingId, onSpeak, speechSupported }) {
   const [showFundamentals, setShowFundamentals] = useState(false);
+  const [showVocabulary, setShowVocabulary] = useState(false);
   const [activeTermKey, setActiveTermKey] = useState(null);
   useEscapeToClose(() => setActiveTermKey(null));
   useClickOutsideToClose(!!activeTermKey, () => setActiveTermKey(null));
   const [readingPage, setReadingPage] = useState(0);
   const [unlockedPages, setUnlockedPages] = useState(1);
   const vocabItems = lesson.vocabIds.map((id) => flashcardsData.find((f) => f.id === id)).filter(Boolean);
+  const lessonCatKeys = [...new Set(vocabItems.map((v) => v.cat))];
+  // The lesson's own quizIds are a small, deliberately curated set used for
+  // the in-reading gate checks below — the final "quiz this section" button
+  // instead pulls every question tagged with the category/categories this
+  // lesson's vocabulary belongs to, so it's a real full-section test rather
+  // than a repeat of the same handful of gate questions. Falls back to
+  // quizIds only if a lesson somehow has no categorized vocabulary at all.
+  const sectionQuestions = (questionsData || []).filter((q) => lessonCatKeys.includes(q.cat));
+  const finalQuizIds = sectionQuestions.length ? sectionQuestions.map((q) => q.id) : lesson.quizIds;
+  const finalQuizLabel = lessonCatKeys
+    .map((k) => (categories || []).find((c) => c.key === k))
+    .filter(Boolean)
+    .map((c) => c.label)
+    .join(' & ') || lesson.title;
   const vocabResources = (categories || [])
     .filter((c) => vocabItems.some((v) => v.cat === c.key) && c.resources && c.resources.length)
     .flatMap((c) => c.resources);
@@ -1043,19 +1089,26 @@ function LessonDetail({ lesson, flashcardsData, questionsData, categories, onBac
         </div>
       )}
 
-      <div style={{ marginBottom: '16px' }}>
-        <div style={{ fontSize: '13px', fontWeight: 600, color: COLOR.gold, marginBottom: '8px' }}>Vocabulary</div>
-        <ResourceLinksRow resources={vocabResources} label="Learn more" />
-        <div className="flex flex-col gap-2">
-          {vocabItems.map((item) => <StudyEntry key={item.id} item={item} />)}
+      <button
+        onClick={() => setShowVocabulary((s) => !s)}
+        style={{ width: '100%', textAlign: 'left', background: COLOR.surfaceRaised, border: `1px solid ${COLOR.border}`, borderRadius: '12px', padding: '12px', marginBottom: showVocabulary ? '0' : '16px', fontSize: '12px', color: COLOR.primary, fontWeight: 600 }}
+      >
+        {showVocabulary ? '▾ ' : '▸ '}Vocabulary ({vocabItems.length} term{vocabItems.length === 1 ? '' : 's'})
+      </button>
+      {showVocabulary && (
+        <div style={{ boxShadow: SHADOW.card, background: COLOR.surfaceRaised, borderRadius: '0 0 12px 12px', padding: '14px', marginBottom: '16px', borderLeft: `1px solid ${COLOR.border}`, borderRight: `1px solid ${COLOR.border}`, borderBottom: `1px solid ${COLOR.border}` }}>
+          <ResourceLinksRow resources={vocabResources} label="Learn more" />
+          <div className="flex flex-col gap-2">
+            {vocabItems.map((item) => <StudyEntry key={item.id} item={item} />)}
+          </div>
         </div>
-      </div>
+      )}
 
       <button
-        onClick={() => onQuiz(lesson.quizIds)}
+        onClick={() => onQuiz(finalQuizIds)}
         style={{ width: '100%', padding: '13px', borderRadius: '12px', background: COLOR.primary, color: '#2B1620', fontSize: '14px', fontWeight: 600 }}
       >
-        Take the {lesson.quizIds.length}-question quiz
+        Quiz this section: {finalQuizLabel} ({finalQuizIds.length} question{finalQuizIds.length === 1 ? '' : 's'})
       </button>
     </div>
   );

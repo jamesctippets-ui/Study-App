@@ -355,6 +355,10 @@ function CertStudyApp() {
     markSeen(prepared.map((q) => q.id));
   };
 
+  const startCategoryQuiz = (catKey) => {
+    startLessonQuiz(questionsData.filter((q) => q.cat === catKey).map((q) => q.id));
+  };
+
   const toggleType = (key) => {
     setQuizTypes((t) => {
       const next = { ...t, [key]: !t[key] };
@@ -852,7 +856,7 @@ function CertStudyApp() {
               masteryFn={lessonMastery}
             />
           ) : (
-            <StudyView activeCat={activeCat} categories={categories} flashcards={flashcardsData} />
+            <StudyView activeCat={activeCat} categories={categories} flashcards={flashcardsData} questionsData={questionsData} onQuizCategory={startCategoryQuiz} />
           )
         )}
 
