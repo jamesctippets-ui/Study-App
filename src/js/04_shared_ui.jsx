@@ -74,6 +74,63 @@ function AchievementsPanel({ achievements, streak, onClose }) {
   );
 }
 
+function PathPanel({ paths, results, activeTrack, onSelectTrack, onClose }) {
+  return (
+    <div
+      onClick={onClose}
+      style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', zIndex: 50, display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        style={{
+          background: COLOR.bg, borderTop: `1px solid ${COLOR.border}`, borderRadius: '20px 20px 0 0',
+          maxWidth: '28rem', width: '100%', maxHeight: '82vh', overflowY: 'auto', padding: '18px 18px 28px',
+          boxShadow: SHADOW.card,
+        }}
+      >
+        <div className="flex justify-between items-center mb-2">
+          <div className="itil-display" style={{ fontSize: '18px', fontWeight: 600 }}>Learning Paths</div>
+          <button onClick={onClose} className="btn-flat" style={{ color: COLOR.muted, fontSize: '15px', padding: '4px' }}>✕</button>
+        </div>
+        {paths.map((path) => {
+          const steps = path.tracks.map((s) => ({ ...s, track: TRACKS.find((t) => t.key === s.key) })).filter((s) => s.track);
+          if (!steps.length) return null;
+          return (
+            <div key={path.key} style={{ marginBottom: '18px' }}>
+              <div style={{ fontSize: '14.5px', fontWeight: 600, marginBottom: '4px' }}>{path.label}</div>
+              <div style={{ fontSize: '11.5px', color: COLOR.muted, marginBottom: '12px', lineHeight: 1.4 }}>{path.description}</div>
+              <div className="flex flex-col gap-2">
+                {steps.map((s, i) => {
+                  const pct = trackMastery(s.key, results);
+                  const isActive = s.key === activeTrack;
+                  return (
+                    <button
+                      key={s.key}
+                      onClick={() => onSelectTrack(s.key)}
+                      style={{
+                        textAlign: 'left', display: 'flex', alignItems: 'center', gap: '12px', padding: '10px 12px', borderRadius: '12px',
+                        background: isActive ? 'rgba(211,164,101,0.12)' : COLOR.surface,
+                        border: `1px solid ${isActive ? COLOR.gold : COLOR.border}`,
+                      }}
+                    >
+                      <div style={{ fontSize: '11px', color: COLOR.muted, flexShrink: 0, width: '16px', textAlign: 'center' }}>{i + 1}</div>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ fontSize: '13px', fontWeight: 600, color: isActive ? COLOR.gold : COLOR.text }}>{s.track.label}</div>
+                        <div style={{ fontSize: '11px', color: COLOR.muted, marginTop: '2px', lineHeight: 1.4 }}>{s.why}</div>
+                      </div>
+                      <div style={{ fontSize: '12px', fontWeight: 700, color: pct >= 70 ? COLOR.teal : COLOR.muted, flexShrink: 0 }}>{pct}%</div>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 function CategoryChip({ label, active, mastery, onClick }) {
   const tint = Math.round((mastery || 0) * 100);
   return (

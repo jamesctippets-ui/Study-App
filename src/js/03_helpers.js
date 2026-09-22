@@ -194,3 +194,18 @@ function evaluateAchievements(results, stats) {
   return ACHIEVEMENTS.map((a) => ({ ...a, unlocked: a.check(ctx), progress: a.target(ctx) }));
 }
 
+/* ---------------- learning paths ---------------- */
+
+// Overall mastery % for a track that may not be the active one — the same
+// calculation as CertStudyApp's own overallMastery, but callable for any key
+// (used by the Path panel to show progress across every step at once).
+function trackMastery(trackKey, results) {
+  const mod = DATA[trackKey];
+  if (!mod) return 0;
+  const trackResults = results[trackKey] || {};
+  const ids = [...mod.flashcards.map((f) => f.id), ...mod.questions.map((q) => q.id)];
+  if (!ids.length) return 0;
+  const correct = ids.filter((id) => trackResults[id] === 'correct').length;
+  return Math.round((correct / ids.length) * 100);
+}
+
