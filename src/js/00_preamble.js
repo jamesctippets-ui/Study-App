@@ -31,11 +31,13 @@ const TRACK_ACCENTS = {
   az305: '#A78BFA',
   az802: '#C084FC',
   az140: '#E879F9',
+  md102: '#D946EF',
   sc300: '#F472B6',
   sc200: '#FB7185',
   sc500: '#FB923C',
   cloudplus: '#FACC15',
   ehrintegration: '#94A3B8',
+  ab650: '#F59E0B',
 };
 
 function trackAccent(key) {
