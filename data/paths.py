@@ -61,4 +61,45 @@ PATHS = [
             },
         ],
     },
+    {
+        'key': 'systems-engineer-m365',
+        'label': 'Systems Engineer — Microsoft 365 Focus',
+        'description': (
+            "A path for a Systems Engineer role centered on Microsoft 365 — "
+            "tenant administration, endpoint/device management, identity, and "
+            "security — rather than Azure infrastructure or database work. "
+            "Builds from cloud fundamentals straight into the M365 tenant and "
+            "the devices/identities that connect to it."
+        ),
+        'tracks': [
+            {
+                'key': 'az900',
+                'why': 'Cloud fundamentals and vocabulary — the concepts every later track assumes.',
+            },
+            {
+                'key': 'ab650',
+                'why': "Microsoft 365 tenant administration, governance, and AI-services (Copilot) management — the core of the role. Replaces the retiring MS-102 as Microsoft's current M365 admin exam.",
+            },
+            {
+                'key': 'md102',
+                'why': 'Endpoint administration — Intune, Autopilot, and device compliance, managing the devices that connect to the M365 tenant day to day.',
+            },
+            {
+                'key': 'sc300',
+                'why': 'Identity and SSO administration — Entra ID, Conditional Access, and app single sign-on, the identity layer every M365 workload depends on.',
+            },
+            {
+                'key': 'az104',
+                'why': 'Hands-on Azure administration — most M365-focused systems engineers also touch the Azure side (storage, networking, VMs) at least occasionally.',
+            },
+            {
+                'key': 'sc200',
+                'why': 'Security operations — day-to-day SOC work (Defender XDR, Sentinel, KQL threat hunting) for when something in the tenant needs investigating.',
+            },
+            {
+                'key': 'az802',
+                'why': 'Hybrid Windows Server administration — many organizations still run on-premises AD alongside Microsoft 365, and hybrid identity depends on it.',
+            },
+        ],
+    },
 ]

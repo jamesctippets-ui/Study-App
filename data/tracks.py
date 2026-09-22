@@ -5,6 +5,7 @@ STORAGE_KEY = 'cert-study-progress'
 TRACKS = [
     {'key': 'itil', 'label': 'ITIL', 'subtitle': 'Foundation, Version 5'},
     {'key': 'az900', 'label': 'AZ-900', 'subtitle': 'Azure Fundamentals'},
+    {'key': 'ab650', 'label': 'AB-650', 'subtitle': 'M365 & AI Services Administrator'},
     {'key': 'az104', 'label': 'AZ-104', 'subtitle': 'Azure Administrator'},
     {'key': 'dp900', 'label': 'DP-900', 'subtitle': 'Azure Data Fundamentals'},
     {'key': 'dp300', 'label': 'DP-300', 'subtitle': 'Azure Database Administrator'},
@@ -22,6 +23,7 @@ TRACKS = [
 EXAM_CONFIG = {
     'itil': {'length': 40, 'minutes': 60, 'passPct': 65, 'passLabel': 'Real pass mark: 26/40 (65%)'},
     'az900': {'length': 50, 'minutes': 45, 'passPct': 75, 'passLabel': 'Microsoft scores this 0-1000 with 700 to pass, not a flat percentage. Treat 75%+ here as a safe buffer, not an exact predictor.'},
+    'ab650': {'length': 52, 'minutes': 100, 'passPct': 70, 'passLabel': 'Microsoft scores this 0-1000 with 700 to pass, not a flat percentage. Treat 70%+ here as a safe buffer, not an exact predictor. This is a beta exam as of late 2026, expected to reach general availability in October 2026.'},
     'az104': {'length': 50, 'minutes': 100, 'passPct': 75, 'passLabel': 'Microsoft scores this 0-1000 with 700 to pass, not a flat percentage. Treat 75%+ here as a safe buffer, not an exact predictor.'},
     'dp900': {'length': 50, 'minutes': 45, 'passPct': 75, 'passLabel': 'Microsoft scores this 0-1000 with 700 to pass, not a flat percentage. Treat 75%+ here as a safe buffer, not an exact predictor.'},
     'dp300': {'length': 52, 'minutes': 120, 'passPct': 70, 'passLabel': 'Microsoft scores this 0-1000 with 700 to pass, not a flat percentage. Treat 70%+ here as a safe buffer, not an exact predictor.'},

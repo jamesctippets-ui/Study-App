@@ -17,11 +17,12 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent
 sys.path.insert(0, str(ROOT))
 
-from data import tracks, paths, itil, az900, az104, dp900, dp300, az305, az802, az140, md102, sc300, sc200, sc500, cloudplus, ehrintegration
+from data import tracks, paths, itil, az900, ab650, az104, dp900, dp300, az305, az802, az140, md102, sc300, sc200, sc500, cloudplus, ehrintegration
 
 TRACK_MODULES = {
     "itil": itil,
     "az900": az900,
+    "ab650": ab650,
     "az104": az104,
     "dp900": dp900,
     "dp300": dp300,
