@@ -36,12 +36,20 @@ PATHS = [
                 'why': 'Hybrid Windows Server administration — most hospitals still run substantial on-premises AD/Windows Server infrastructure alongside Azure.',
             },
             {
+                'key': 'sc300',
+                'why': 'Identity and SSO administration — Entra ID, Conditional Access, and app single sign-on, the identity layer every other system in the hospital plugs into.',
+            },
+            {
                 'key': 'sc500',
-                'why': "Security. Healthcare IT carries HIPAA-level stakes, and this covers Microsoft's current security, identity, and AI-security tooling.",
+                'why': "Broader security operations. Healthcare IT carries HIPAA-level stakes, and this covers Microsoft's current security and AI-security tooling beyond identity alone.",
             },
             {
                 'key': 'az305',
                 'why': 'Solutions architecture — the capstone for designing infrastructure, not just operating it.',
+            },
+            {
+                'key': 'ehrintegration',
+                'why': "Applies the whole stack to the job itself: how hospital systems like Epic actually exchange data (HL7v2, FHIR, interface engines) — not a certification, just the on-the-job knowledge that ties everything above to healthcare IT specifically.",
             },
         ],
     },

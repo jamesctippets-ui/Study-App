@@ -17,16 +17,20 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent
 sys.path.insert(0, str(ROOT))
 
-from data import tracks, itil, az900, az104, az305, az802, sc500, cloudplus
+from data import tracks, paths, itil, az900, az104, dp900, dp300, az305, az802, sc300, sc500, cloudplus, ehrintegration
 
 TRACK_MODULES = {
     "itil": itil,
     "az900": az900,
     "az104": az104,
+    "dp900": dp900,
+    "dp300": dp300,
     "az305": az305,
     "az802": az802,
+    "sc300": sc300,
     "sc500": sc500,
     "cloudplus": cloudplus,
+    "ehrintegration": ehrintegration,
 }
 
 
@@ -40,6 +44,11 @@ def validate():
     missing_exam_config = track_keys - set(tracks.EXAM_CONFIG)
     if missing_exam_config:
         errors.append(f"EXAM_CONFIG is missing entries for: {missing_exam_config}")
+
+    for path in paths.PATHS:
+        for step in path["tracks"]:
+            if step["key"] not in track_keys:
+                errors.append(f"path '{path['key']}' references unknown track '{step['key']}'")
 
     for key, mod in TRACK_MODULES.items():
         cat_keys = {c["key"] for c in mod.CATEGORIES}
@@ -142,6 +151,7 @@ def build_data_json():
             f"const STORAGE_KEY = {json.dumps(tracks.STORAGE_KEY)};",
             f"const TRACKS = {json.dumps(tracks.TRACKS)};",
             f"const EXAM_CONFIG = {json.dumps(tracks.EXAM_CONFIG)};",
+            f"const PATHS = {json.dumps(paths.PATHS)};",
             f"const DATA = {json.dumps(data)};",
         ]
     )

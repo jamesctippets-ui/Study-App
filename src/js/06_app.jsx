@@ -14,6 +14,7 @@ function CertStudyApp() {
   const [stats, setStats] = useState(emptyStats);
   const [showAchievements, setShowAchievements] = useState(false);
   const [toastAchievement, setToastAchievement] = useState(null);
+  const [showPaths, setShowPaths] = useState(false);
 
   const [quizLength, setQuizLength] = useState(10);
   const [quizTypes, setQuizTypes] = useState({ mc: true, tf: true, ms: true });
@@ -465,6 +466,15 @@ function CertStudyApp() {
           onClose={() => setShowAchievements(false)}
         />
       )}
+      {showPaths && (
+        <PathPanel
+          paths={PATHS}
+          results={results}
+          activeTrack={activeTrack}
+          onSelectTrack={(key) => { setActiveTrack(key); setShowPaths(false); }}
+          onClose={() => setShowPaths(false)}
+        />
+      )}
       <div className="max-w-md mx-auto px-4 py-5">
         <div className="flex justify-between items-start mb-4">
           <div>
@@ -518,6 +528,16 @@ function CertStudyApp() {
               ▾
             </div>
           </div>
+        )}
+
+        {PATHS.length > 0 && (
+          <button
+            onClick={() => setShowPaths(true)}
+            className="btn-flat"
+            style={{ display: 'block', width: '100%', textAlign: 'left', padding: '0', marginBottom: '14px', color: COLOR.teal, fontSize: '11.5px', fontWeight: 600 }}
+          >
+            🗺️ Recommended study path
+          </button>
         )}
 
         {syncMode === 'local' && (
