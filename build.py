@@ -63,6 +63,9 @@ def validate():
 
     for key, mod in TRACK_MODULES.items():
         cat_keys = {c["key"] for c in mod.CATEGORIES}
+        marks_sum = sum(c["marks"] for c in mod.CATEGORIES)
+        if marks_sum != 100:
+            errors.append(f"[{key}] CATEGORIES marks sum to {marks_sum}, not 100")
         item_ids = set()
         seen_flashcard_fronts = {}
         seen_question_text = {}
