@@ -1,5 +1,79 @@
 /* ---------------- shared UI ---------------- */
 
+function AchievementToast({ achievement }) {
+  if (!achievement) return null;
+  return (
+    <div
+      style={{
+        position: 'fixed', top: 'calc(env(safe-area-inset-top) + 12px)', left: '50%', transform: 'translateX(-50%)',
+        zIndex: 60, background: COLOR.surfaceRaised, border: `1px solid ${COLOR.gold}`, borderRadius: '14px',
+        padding: '12px 16px', boxShadow: SHADOW.card, display: 'flex', alignItems: 'center', gap: '10px',
+        maxWidth: '90vw', animation: 'achievementIn 0.25s ease',
+      }}
+    >
+      <div style={{ fontSize: '22px' }}>{achievement.icon}</div>
+      <div>
+        <div style={{ fontSize: '10.5px', color: COLOR.gold, fontWeight: 700, letterSpacing: '0.02em' }}>ACHIEVEMENT UNLOCKED</div>
+        <div style={{ fontSize: '13.5px', fontWeight: 600, color: COLOR.text }}>{achievement.title}</div>
+      </div>
+    </div>
+  );
+}
+
+function AchievementsPanel({ achievements, streak, onClose }) {
+  const unlockedCount = achievements.filter((a) => a.unlocked).length;
+  return (
+    <div
+      onClick={onClose}
+      style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', zIndex: 50, display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        style={{
+          background: COLOR.bg, borderTop: `1px solid ${COLOR.border}`, borderRadius: '20px 20px 0 0',
+          maxWidth: '28rem', width: '100%', maxHeight: '82vh', overflowY: 'auto', padding: '18px 18px 28px',
+          boxShadow: SHADOW.card,
+        }}
+      >
+        <div className="flex justify-between items-center mb-2">
+          <div className="itil-display" style={{ fontSize: '18px', fontWeight: 600 }}>Achievements</div>
+          <button onClick={onClose} className="btn-flat" style={{ color: COLOR.muted, fontSize: '15px', padding: '4px' }}>✕</button>
+        </div>
+        <div style={{ fontSize: '12px', color: COLOR.muted, marginBottom: '14px' }}>
+          {unlockedCount} / {achievements.length} unlocked
+          {streak.current > 0 ? ` · 🔥 ${streak.current}-day streak` : ''}
+          {streak.current > 0 && streak.longest > streak.current ? ` (best ${streak.longest})` : ''}
+        </div>
+        <div className="flex flex-col gap-2">
+          {achievements.map((a) => (
+            <div
+              key={a.id}
+              style={{
+                display: 'flex', alignItems: 'center', gap: '12px', padding: '12px', borderRadius: '12px',
+                background: a.unlocked ? 'rgba(211,164,101,0.12)' : COLOR.surface,
+                border: `1px solid ${a.unlocked ? COLOR.gold : COLOR.border}`,
+                opacity: a.unlocked ? 1 : 0.75,
+              }}
+            >
+              <div style={{ fontSize: '22px', filter: a.unlocked ? 'none' : 'grayscale(1)', flexShrink: 0 }}>{a.icon}</div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontSize: '13px', fontWeight: 600, color: a.unlocked ? COLOR.gold : COLOR.text }}>{a.title}</div>
+                <div style={{ fontSize: '11.5px', color: COLOR.muted, marginTop: '2px', lineHeight: 1.4 }}>{a.description}</div>
+                {!a.unlocked && a.progress[1] > 1 && (
+                  <div style={{ height: '4px', borderRadius: '2px', background: COLOR.surfaceRaised, marginTop: '7px', overflow: 'hidden' }}>
+                    <div style={{ height: '100%', width: `${Math.round((a.progress[0] / a.progress[1]) * 100)}%`, background: COLOR.muted, borderRadius: '2px' }} />
+                  </div>
+                )}
+              </div>
+              {a.unlocked && <div style={{ fontSize: '13px', color: COLOR.teal, fontWeight: 700, flexShrink: 0 }}>✓</div>}
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function CategoryChip({ label, active, mastery, onClick }) {
   const tint = Math.round((mastery || 0) * 100);
   return (
@@ -121,7 +195,7 @@ function StudyView({ activeCat, categories, flashcards }) {
   );
 }
 
-function MatchGame({ flashcards, roundSize, onContinue }) {
+function MatchGame({ flashcards, roundSize, onContinue, onRoundComplete }) {
   const ROUND_SIZE = roundSize || 6;
 
   const buildRound = useCallback(() => {
@@ -161,6 +235,11 @@ function MatchGame({ flashcards, roundSize, onContinue }) {
   };
 
   const isDone = matched.length === round.picked.length;
+
+  useEffect(() => {
+    if (isDone && onRoundComplete) onRoundComplete();
+    // eslint-disable-next-line
+  }, [isDone]);
 
   const tap = (type, id) => {
     if (matched.includes(id) || wrongPair) return;

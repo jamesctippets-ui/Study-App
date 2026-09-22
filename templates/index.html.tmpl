@@ -75,6 +75,7 @@
   button:disabled { cursor: default; box-shadow: none; }
   button:disabled:active { transform: none; }
   * { -webkit-tap-highlight-color: transparent; }
+  @keyframes achievementIn { from { opacity: 0; transform: translate(-50%, -10px); } to { opacity: 1; transform: translate(-50%, 0); } }
 
   /* Static replacements for the ~20 Tailwind utility classes this app actually
      uses, so the page doesn't have to load and run Tailwind's full runtime

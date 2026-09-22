@@ -11,6 +11,9 @@ function CertStudyApp() {
   const [fIndex, setFIndex] = useState(0);
   const [confirmReset, setConfirmReset] = useState(false);
   const [syncMode, setSyncMode] = useState('loading');
+  const [stats, setStats] = useState(emptyStats);
+  const [showAchievements, setShowAchievements] = useState(false);
+  const [toastAchievement, setToastAchievement] = useState(null);
 
   const [quizLength, setQuizLength] = useState(10);
   const [quizTypes, setQuizTypes] = useState({ mc: true, tf: true, ms: true });
@@ -60,6 +63,7 @@ function CertStudyApp() {
         // actually gets passed the raw object instead of `undefined`.
         setResults(normalizeResults(local.results || local));
         if (local.seenLog) setSeenLog(normalizeSeenLog(local.seenLog));
+        if (local.stats) setStats(normalizeStats(local.stats));
       }
       setSyncMode('local');
     }
@@ -81,6 +85,7 @@ function CertStudyApp() {
                     const data = snap.data();
                     if (data && data.results) setResults(normalizeResults(data.results));
                     if (data && data.seenLog) setSeenLog(normalizeSeenLog(data.seenLog));
+                    if (data && data.stats) setStats(normalizeStats(data.stats));
                   }
                   setSyncMode('cloud');
                 },
@@ -111,12 +116,17 @@ function CertStudyApp() {
 
   const saveResults = (nextResults) => {
     setResults(nextResults);
-    persistPayload({ results: nextResults, seenLog, updatedAt: Date.now() });
+    persistPayload({ results: nextResults, seenLog, stats, updatedAt: Date.now() });
   };
 
   const saveSeen = (nextSeenLog) => {
     setSeenLog(nextSeenLog);
-    persistPayload({ results, seenLog: nextSeenLog, updatedAt: Date.now() });
+    persistPayload({ results, seenLog: nextSeenLog, stats, updatedAt: Date.now() });
+  };
+
+  const saveStats = (nextStats) => {
+    setStats(nextStats);
+    persistPayload({ results, seenLog, stats: nextStats, updatedAt: Date.now() });
   };
 
   const markSeen = (ids) => {
@@ -155,6 +165,37 @@ function CertStudyApp() {
     return () => { if (speechSupported) window.speechSynthesis.cancel(); };
     // eslint-disable-next-line
   }, []);
+
+  const achievements = useMemo(() => evaluateAchievements(results, stats), [results, stats]);
+
+  // Advance the daily streak once per load, after real data (local or cloud)
+  // has replaced the empty initial state — never while still `loading`.
+  const streakAdvancedRef = useRef(false);
+  useEffect(() => {
+    if (syncMode === 'loading' || streakAdvancedRef.current) return;
+    streakAdvancedRef.current = true;
+    const advanced = advanceStreak(stats.streak);
+    if (advanced !== stats.streak) saveStats({ ...stats, streak: advanced });
+    // eslint-disable-next-line
+  }, [syncMode]);
+
+  // Unlock (and toast) one newly-earned achievement at a time — persisting
+  // just that id re-triggers this effect for the next one, if any.
+  useEffect(() => {
+    if (syncMode === 'loading') return;
+    const newlyUnlocked = achievements.find((a) => a.unlocked && !stats.unlocked.includes(a.id));
+    if (newlyUnlocked) {
+      setToastAchievement(newlyUnlocked);
+      saveStats({ ...stats, unlocked: [...stats.unlocked, newlyUnlocked.id] });
+    }
+    // eslint-disable-next-line
+  }, [achievements, syncMode]);
+
+  useEffect(() => {
+    if (!toastAchievement) return;
+    const t = setTimeout(() => setToastAchievement(null), 4000);
+    return () => clearTimeout(t);
+  }, [toastAchievement]);
 
   const filteredFlashcards = useMemo(() => {
     const list = activeCat === 'all' ? flashcardsData : flashcardsData.filter((c) => c.cat === activeCat);
@@ -283,8 +324,20 @@ function CertStudyApp() {
   const advance = () => {
     setSelected(null);
     setMsPending([]);
-    if (sessionIndex + 1 >= quizSession.length) setQuizPhase('complete');
-    else setSessionIndex((i) => i + 1);
+    if (sessionIndex + 1 >= quizSession.length) {
+      setQuizPhase('complete');
+      const perfect = sessionScore.total >= 10 && sessionScore.correct === sessionScore.total;
+      saveStats({
+        ...stats,
+        counts: {
+          ...stats.counts,
+          quizzesCompleted: stats.counts.quizzesCompleted + 1,
+          perfectQuizzes: stats.counts.perfectQuizzes + (perfect ? 1 : 0),
+        },
+      });
+    } else {
+      setSessionIndex((i) => i + 1);
+    }
   };
 
   const chooseAnswer = (idx) => {
@@ -376,7 +429,13 @@ function CertStudyApp() {
     const trackKey = examTrack || activeTrack;
     const updated = { ...(results[trackKey] || {}) };
     items.forEach((it) => { updated[it.id] = it.correct ? 'correct' : 'incorrect'; });
-    saveResults({ ...results, [trackKey]: updated });
+    const nextResults = { ...results, [trackKey]: updated };
+    const pct = examSession.length ? Math.round((correct / examSession.length) * 100) : 0;
+    const passed = pct >= EXAM_CONFIG[trackKey].passPct;
+    const nextStats = passed ? { ...stats, counts: { ...stats.counts, examsPassed: stats.counts.examsPassed + 1 } } : stats;
+    setResults(nextResults);
+    setStats(nextStats);
+    persistPayload({ results: nextResults, seenLog, stats: nextStats, updatedAt: Date.now() });
     // eslint-disable-next-line
   }, [examPhase]);
 
@@ -398,6 +457,14 @@ function CertStudyApp() {
         paddingRight: 'env(safe-area-inset-right)',
       }}
     >
+      {toastAchievement && <AchievementToast achievement={toastAchievement} />}
+      {showAchievements && (
+        <AchievementsPanel
+          achievements={achievements}
+          streak={stats.streak}
+          onClose={() => setShowAchievements(false)}
+        />
+      )}
       <div className="max-w-md mx-auto px-4 py-5">
         <div className="flex justify-between items-start mb-4">
           <div>
@@ -409,6 +476,13 @@ function CertStudyApp() {
               <div style={{ fontSize: '20px', fontWeight: 700, color: COLOR.teal }}>{overallMastery}%</div>
               <div style={{ fontSize: '10px', color: COLOR.muted }}>mastered</div>
             </div>
+            <button
+              onClick={() => setShowAchievements(true)}
+              title="Achievements"
+              style={{ padding: '6px 10px', borderRadius: '8px', border: `1px solid ${COLOR.gold}`, background: 'transparent', color: COLOR.gold, fontSize: '11px' }}
+            >
+              🏆 {stats.unlocked.length}
+            </button>
             <button
               onClick={() => setConfirmReset(true)}
               style={{ padding: '6px 10px', borderRadius: '8px', border: `1px solid ${COLOR.border}`, background: 'transparent', color: COLOR.muted, fontSize: '11px' }}
@@ -574,7 +648,12 @@ function CertStudyApp() {
           </React.Fragment>
         )}
 
-        {mode === 'learn' && learnView === 'match' && <MatchGame flashcards={filteredFlashcards} />}
+        {mode === 'learn' && learnView === 'match' && (
+          <MatchGame
+            flashcards={filteredFlashcards}
+            onRoundComplete={() => saveStats({ ...stats, counts: { ...stats.counts, matchRoundsCompleted: stats.counts.matchRoundsCompleted + 1 } })}
+          />
+        )}
 
         {mode === 'learn' && learnView === 'study' && (
           DATA[activeTrack].lessons ? (
