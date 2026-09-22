@@ -105,6 +105,38 @@ come up.
   building beyond real exam difficulty (Tutorials Dojo's approach), kept
   clearly labeled as harder-than-real so it doesn't skew mastery stats.
 
+## 10. Future-proofing for a standalone web/iOS/Android app (user's idea — lowest priority, not being worked on)
+
+The user wants the option to eventually turn this into a real multi-platform
+product (own web deployment, iOS app, Android app), separate from its current
+life as a single generated HTML file synced via the Claude runtime. Nothing
+here should be built now — it's a set of architectural decisions to keep in
+mind so today's choices don't quietly foreclose that option later:
+
+- [ ] **The Claude-runtime cloud sync is the one non-portable piece.**
+  `window.claude.use('db')` (see src/js/06_app.jsx's persistence effect) only
+  exists inside a Claude artifact. A standalone app of any kind needs its own
+  backend for account-based sync — localStorage-only fallback already works
+  today and would keep working unmodified as the offline/no-account tier.
+- [ ] **Separate pure logic from rendering.** Achievement evaluation, streak
+  math, spaced-repetition scheduling, and scoring (currently in
+  src/js/03_helpers.js) are already plain JS functions with no DOM/React
+  dependency — that's the reusable "core" a React Native iOS/Android app
+  would want to share with the web app, so keep new logic in that same
+  dependency-free style rather than reaching into React state directly.
+- [ ] **Content as data, not baked-in JSON.** data/*.py currently gets
+  inlined into one HTML file at build time. A multi-client future wants that
+  content served from a fetchable endpoint (even a static JSON file per
+  track behind a CDN) so web/iOS/Android all read one source of truth instead
+  of each embedding a copy.
+- [ ] **A real package/module boundary.** The filename-concatenation build
+  (build.py sorting src/js/*.jsx) is fine for one static page; a shared
+  "core" package would need real npm module boundaries (even just ES
+  modules) once more than one client consumes it.
+- No action item here is worth taking today at the cost of the current
+  static-site simplicity — this section exists so a future rewrite reuses
+  the content and logic instead of starting over.
+
 ---
 
 Not in scope / deliberately not doing: crowd-sourced/disputed answer voting
