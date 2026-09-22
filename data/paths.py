@@ -36,8 +36,16 @@ PATHS = [
                 'why': 'Hybrid Windows Server administration — most hospitals still run substantial on-premises AD/Windows Server infrastructure alongside Azure.',
             },
             {
+                'key': 'az140',
+                'why': 'Azure Virtual Desktop — hospitals commonly deploy shared, clinical-workstation-style virtual desktops so staff can reach the EHR and other systems from any device.',
+            },
+            {
                 'key': 'sc300',
                 'why': 'Identity and SSO administration — Entra ID, Conditional Access, and app single sign-on, the identity layer every other system in the hospital plugs into.',
+            },
+            {
+                'key': 'sc200',
+                'why': 'Security operations — day-to-day SOC work (Defender XDR, Sentinel, KQL threat hunting), the hands-on incident-response counterpart to identity administration.',
             },
             {
                 'key': 'sc500',

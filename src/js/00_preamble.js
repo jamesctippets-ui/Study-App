@@ -26,14 +26,16 @@ const TRACK_ACCENTS = {
   itil: '#60A5FA',
   az900: '#38BDF8',
   az104: '#22D3EE',
-  dp900: '#818CF8',
-  dp300: '#A78BFA',
-  az305: '#C084FC',
-  az802: '#E879F9',
+  dp900: '#2DD4BF',
+  dp300: '#818CF8',
+  az305: '#A78BFA',
+  az802: '#C084FC',
+  az140: '#E879F9',
   sc300: '#F472B6',
+  sc200: '#FB7185',
   sc500: '#FB923C',
   cloudplus: '#FACC15',
-  ehrintegration: '#2DD4BF',
+  ehrintegration: '#94A3B8',
 };
 
 function trackAccent(key) {
