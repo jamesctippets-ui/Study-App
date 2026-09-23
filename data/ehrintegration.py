@@ -242,6 +242,20 @@ FLASHCARDS = [
         "back": "Interface engineering teams typically carry on-call rotations because a broken interface, such as a failed results feed, can directly affect patient care within hours, so alerting, clear escalation paths, and runbooks for common failure modes are standard parts of the role.",
         "detail": "A results interface going down silently overnight is a classic on-call scenario -- clinicians may not immediately notice missing results, which is why proactive monitoring and alerting matter as much as having someone on call to respond.",
     },
+    {
+        "id": "f33",
+        "cat": "hl7v2Messaging",
+        "front": "DFT message type",
+        "back": "A Detailed Financial Transaction message, carrying billing-relevant charge or credit events (like a procedure charge) from a clinical or ancillary system into the billing/financial system, rather than clinical results or orders.",
+        "detail": "Alongside the ADT message type, ORM message type, and ORU message type, DFT rounds out the small set of message types that account for most day-to-day interface traffic in a hospital.",
+    },
+    {
+        "id": "f34",
+        "cat": "fhirModernApis",
+        "front": "Continuity of Care Document (CCD/CCDA)",
+        "back": "A structured XML document standard (part of the C-CDA family) summarizing a patient's health information — problems, medications, allergies, results — exchanged as a complete document rather than queried resource-by-resource the way FHIR RESTful access pattern works.",
+        "detail": "CCDA and FHIR solve overlapping problems differently: CCDA hands over a whole summary document at a point in time, while FHIR lets a consumer query for just the specific resources it actually needs.",
+    },
 ]
 
 QUESTIONS = [

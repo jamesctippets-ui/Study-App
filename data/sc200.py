@@ -228,7 +228,7 @@ FLASHCARDS = [
         'cat': 'threatHunting',
         'front': "KQL query pipeline basics",
         'back': "A KQL query starts from a table, then pipes (|) through operators applied left to right -- where to filter rows, project or extend to shape columns, and summarize to aggregate -- with each operator narrowing or reshaping the result of the one before it.",
-        'detail': "Operator order matters for both correctness and performance: filtering early with where before an expensive summarize or join reduces the volume every later operator has to process.",
+        'detail': "Operator order matters for both correctness and performance: filtering early with where before an expensive summarize or join reduces the volume every later operator has to process. Every one of these queries ultimately runs against a Log Analytics workspace.",
     },
     {
         'id': 'f32',
@@ -278,6 +278,27 @@ FLASHCARDS = [
         'front': "Hunting across Microsoft Entra ID and Microsoft Purview data",
         'back': "Sentinel and Defender XDR advanced hunting can also query Microsoft Entra ID sign-in and audit logs (SigninLogs, AuditLogs) and Microsoft Purview audit data once those sources are connected, letting a hunt correlate an endpoint or email finding with identity sign-in patterns or a sensitive data-access/exfiltration event.",
         'detail': "Correlating a suspicious mailbox rule change in Purview audit data with an unusual sign-in in SigninLogs for the same account is a classic hunt for confirming business email compromise, since either signal alone might otherwise be dismissed as routine.",
+    },
+    {
+        'id': 'f39',
+        'cat': 'manageSecOps',
+        'front': "Log Analytics workspace",
+        'back': "The underlying Azure Monitor data store that Microsoft Sentinel is built on top of — every ingested log, custom table, and Data Collection Rule ultimately lands in a Log Analytics workspace, which is what KQL queries actually run against.",
+        'detail': "Enabling Sentinel doesn't create a separate data store — it activates Sentinel's analytics and case-management layer on top of a Log Analytics workspace you choose (or create).",
+    },
+    {
+        'id': 'f40',
+        'cat': 'manageSecOps',
+        'front': "Sentinel data connectors",
+        'back': "The mechanism for ingesting log sources — Microsoft services, third-party products, or custom sources via the Log Analytics agent, Data Collection Rules, or an API — into a Sentinel workspace so its analytics rules and hunting queries have data to run against.",
+        'detail': "An analytics rule or hunting query referencing a table with no matching connector enabled will simply return no results, which is a common early troubleshooting step.",
+    },
+    {
+        'id': 'f41',
+        'cat': 'threatHunting',
+        'front': "Cyber kill chain",
+        'back': "A model describing the sequential stages of an attack — reconnaissance, initial access, execution, persistence, lateral movement, and exfiltration/impact — used to reason about how far an intrusion has progressed and what to look for at each stage.",
+        'detail': "MITRE ATT&CK coverage in Sentinel maps specific attacker techniques onto roughly this same progression, giving each analytics rule a stage in the chain it's meant to detect.",
     },
 ]
 

@@ -254,6 +254,20 @@ FLASHCARDS = [
         'back': "Import mode copies data into Power BI's own fast in-memory model for the best query performance, refreshed periodically on a schedule. DirectQuery leaves the data in its source system and queries it live on each interaction, trading some performance for always-current data.",
         'detail': "DirectQuery is the right choice when data must always reflect the live source; Import mode is the right choice when speed matters most and slightly stale data is acceptable.",
     },
+    {
+        'id': 'f35',
+        'cat': 'relational',
+        'front': 'Indexes',
+        'back': 'A separate data structure that lets a database find rows matching a query without scanning every row in a table, at the cost of extra storage and slightly slower writes since the index itself must also be updated.',
+        'detail': 'A primary key vs. foreign key column is commonly indexed automatically, since it’s exactly the kind of column queries filter and join on most often.',
+    },
+    {
+        'id': 'f36',
+        'cat': 'analytics',
+        'front': 'Data lakehouse',
+        'back': 'An architecture combining a data lake’s low-cost, flexible storage for any file type with a data warehouse’s structured, query-optimized layer on top — one platform for both raw and curated data instead of maintaining two separate systems.',
+        'detail': 'Microsoft Fabric is built around exactly this lakehouse pattern, unifying what used to be separate lake and warehouse services described under database vs. data warehouse vs. data lake into one workspace.',
+    },
 ]
 
 QUESTIONS = [

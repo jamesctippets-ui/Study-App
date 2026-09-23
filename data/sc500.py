@@ -307,6 +307,20 @@ FLASHCARDS = [
         'back': 'Defender for Cloud can extend coverage beyond Azure using Azure Arc (for on-premises/other-cloud servers) and native multicloud connectors for AWS and GCP, bringing their workloads under the same recommendations, secure score, and Defender plans.',
         'detail': 'Without Arc onboarding first, an on-premises or AWS/GCP VM has no Azure resource identity for Defender for Cloud to evaluate at all — the connector/Arc step is what makes it visible to Defender for Cloud in the first place.',
     },
+    {
+        'id': 'f48',
+        'cat': 'identityAccessGovernance',
+        'front': 'Managed identity: system-assigned vs. user-assigned',
+        'back': 'A system-assigned managed identity is tied to one resource’s lifecycle, created and deleted with it. A user-assigned managed identity is a standalone resource that can be attached to multiple resources at once and outlives any single one of them.',
+        'detail': 'App Service security using managed identity to reach Key Vault or SQL without a stored secret is the classic case this exists to solve — the credential simply isn’t something a developer ever sees or manages.',
+    },
+    {
+        'id': 'f49',
+        'cat': 'securityPostureOps',
+        'front': 'Zero Trust principles',
+        'back': 'Verify explicitly, use least-privilege access, and assume breach — treating every request as coming from an untrusted network regardless of where it originates, rather than trusting anything just because it’s "inside the perimeter."',
+        'detail': 'Continuous Access Evaluation (CAE) vs. static token lifetimes and Just-in-time (JIT) VM access are both concrete implementations of "assume breach" and "least privilege" in practice, not abstract ideas on their own.',
+    },
 ]
 
 QUESTIONS = [

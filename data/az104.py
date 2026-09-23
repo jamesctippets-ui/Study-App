@@ -220,7 +220,7 @@ FLASHCARDS = [
         'cat': 'networking',
         'front': 'Network Security Groups (NSGs)',
         'back': 'Filter inbound and outbound traffic to subnets or network interfaces using security rules with a priority, source, destination, port, and protocol. Lower priority number wins and is evaluated first.',
-        'detail': 'A lower-numbered rule that allows traffic can still be overridden by an even-lower-numbered rule that denies it.',
+        'detail': 'A lower-numbered rule that allows traffic can still be overridden by an even-lower-numbered rule that denies it. Azure Firewall works at a broader, whole-VNet scope for the same general goal.',
     },
     {
         'id': 'f30',
@@ -241,14 +241,14 @@ FLASHCARDS = [
         'cat': 'networking',
         'front': 'Public vs. internal Load Balancer',
         'back': 'A public Load Balancer distributes internet traffic to backend resources. An internal (private) Load Balancer only distributes traffic within a VNet, never from the public internet.',
-        'detail': 'An internal Load Balancer is the answer when a scenario needs load balancing purely between internal tiers, like web servers talking to app servers.',
+        'detail': 'An internal Load Balancer is the answer when a scenario needs load balancing purely between internal tiers, like web servers talking to app servers. A NAT Gateway solves the opposite problem — stable outbound-only internet access, not inbound distribution.',
     },
     {
         'id': 'f33',
         'cat': 'networking',
         'front': 'Azure DNS and private DNS zones',
         'back': 'Azure DNS hosts public DNS zones, resolvable from the internet. Private DNS zones provide name resolution within one or more VNets, without exposing those records publicly.',
-        'detail': "Private DNS zones are the answer whenever internal name resolution shouldn't be visible outside the VNet.",
+        'detail': "Private DNS zones are the answer whenever internal name resolution shouldn't be visible outside the VNet — including resolving the normal hostname of a resource reached through a Private Endpoint.",
     },
     {
         'id': 'f34',
@@ -375,6 +375,41 @@ FLASHCARDS = [
         'front': 'Azure Update Manager',
         'back': 'A unified service for assessing OS patch compliance and scheduling recurring update installation windows across Windows and Linux VMs, including on-premises and multi-cloud machines connected via Arc.',
         'detail': 'This replaced the older, separate Update Management solution built on Log Analytics and Automation.',
+    },
+    {
+        'id': 'f52',
+        'cat': 'identityGov',
+        'front': 'Management group hierarchy',
+        'back': 'Management groups sit above subscriptions in the scope hierarchy, letting you apply Azure Policy and RBAC assignments to many subscriptions at once instead of repeating them per subscription.',
+        'detail': 'Combined with RBAC scope and inheritance, an assignment at a management group flows down to every subscription and resource group underneath it.',
+    },
+    {
+        'id': 'f53',
+        'cat': 'networking',
+        'front': 'Azure Firewall',
+        'back': 'A managed, stateful network firewall for an entire VNet, filtering traffic by rules, FQDN tags, and threat intelligence feeds — broader in scope than a per-subnet NSG.',
+        'detail': 'Where Network Security Groups (NSGs) filter traffic to a specific subnet or NIC, Azure Firewall centralizes filtering and logging for a whole hub VNet in a hub-and-spoke design.',
+    },
+    {
+        'id': 'f54',
+        'cat': 'networking',
+        'front': 'Private Endpoint',
+        'back': 'Gives a PaaS resource (like a storage account or SQL database) a private IP address inside your VNet, so traffic to it never traverses the public internet.',
+        'detail': 'Resolving that private IP correctly for the resource’s normal hostname is exactly what Azure DNS and private DNS zones are for.',
+    },
+    {
+        'id': 'f55',
+        'cat': 'networking',
+        'front': 'NAT Gateway',
+        'back': 'Provides a stable, shared public IP for outbound-only internet connections from resources in a subnet, without exposing them to inbound internet traffic.',
+        'detail': 'Unlike a public Load Balancer, which handles inbound traffic to backend resources, a NAT Gateway only handles the outbound direction.',
+    },
+    {
+        'id': 'f56',
+        'cat': 'compute',
+        'front': 'Custom RBAC roles',
+        'back': 'A JSON-defined role built from a specific set of allowed and denied actions, for when the built-in roles are either too broad or too narrow for what a team actually needs to do.',
+        'detail': 'This builds on RBAC scope and inheritance — a custom role still gets assigned at a scope exactly the same way a built-in role does.',
     },
 ]
 
@@ -1199,6 +1234,7 @@ Day-to-day operations include extensions, small agents that run post-deployment 
         'title': 'App Hosting & Infrastructure as Code',
         'summary': 'App Service plans, deployment slots, container options, and ARM/Bicep.',
         'diagram': 'deploymentSlots',
+        'portalMockup': 'deploymentSlot',
         'vocabIds': ['f23', 'f24', 'f25', 'f26'],
         'quizIds': ['q18', 'q19', 'q20', 'q21', 'tf8', 'tf9'],
         'reading': """An App Service plan defines the compute tier and region for one or more web apps — scaling up changes the plan's size, scaling out adds more instances of it. Deployment slots give you a separate, swappable environment, like staging, to validate a new version before swapping it into production with minimal downtime.

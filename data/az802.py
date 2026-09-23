@@ -344,6 +344,20 @@ FLASHCARDS = [
         'back': "Reliability Monitor plots a rolling stability index over time and correlates it with specific events (installs, crashes, updates), making it easy to spot when a problem started. Event Viewer provides the full, detailed event logs (System, Application, Security, and role-specific logs) needed to diagnose exactly what happened at that point.",
         'detail': "Reliability Monitor is a good first stop for figuring out when something started going wrong, after which Event Viewer's more detailed, filterable logs are what actually confirm the root cause.",
     },
+    {
+        'id': 'f46',
+        'cat': 'adDs',
+        'front': "Fine-Grained Password Policies (PSOs)",
+        'back': "Password Settings Objects let different password and lockout rules apply to specific users or groups within one domain, instead of the single domain-wide default policy applying to everyone equally.",
+        'detail': "A requirement for service accounts to follow a stricter, separate password policy than regular users — without splitting them into another domain — is exactly the scenario PSOs solve, often paired with Group Managed Service Accounts (gMSA) for the accounts themselves.",
+    },
+    {
+        'id': 'f47',
+        'cat': 'hybridWorkloads',
+        'front': "Server Core installation option",
+        'back': "A minimal Windows Server install with no desktop shell or most GUI tools, managed remotely via PowerShell, Windows Admin Center, or Server Manager — reducing the attack surface, patching footprint, and resource use compared to Desktop Experience.",
+        'detail': "Server Core is commonly managed day-to-day through Windows Admin Center (WAC) precisely because there's no local desktop shell to open management consoles from directly.",
+    },
 ]
 
 QUESTIONS = [

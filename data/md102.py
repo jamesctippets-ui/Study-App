@@ -24,7 +24,7 @@ FLASHCARDS = [
         "cat": "manageDevices",
         "front": "Windows Autopilot deployment profile types",
         "back": "A user-driven profile lets an end user unbox a device, sign in with their own Microsoft Entra ID account, and finish provisioning themselves. A self-deploying profile needs no user interaction at all and authenticates the device itself, commonly for kiosks or shared devices. A pre-provisioned (white glove) profile lets a partner or IT do the time-consuming steps in advance, so the end user only completes a short final phase.",
-        "detail": "Self-deploying profiles require a TPM 2.0 device that can authenticate on its own, since there is no user present to sign in and prove identity.",
+        "detail": "Self-deploying profiles require a TPM 2.0 device that can authenticate on its own, since there is no user present to sign in and prove identity. Whichever profile is used, the Enrollment Status Page (ESP) is what actually blocks the desktop until provisioning finishes.",
     },
     {
         "id": "f2",
@@ -284,6 +284,27 @@ FLASHCARDS = [
         "front": "Security Copilot agents in Intune",
         "back": "Microsoft Security Copilot integrates with Intune through purpose-built agents that use natural-language prompts and generative AI to help an administrator investigate policy conflicts, summarize device or app issues, and get guided remediation suggestions, directly within the Intune admin center workflow.",
         "detail": "These agents are meant to accelerate diagnosis and reduce time spent manually correlating logs and settings across many devices; they surface AI-assisted recommendations, but an administrator still reviews and approves any resulting configuration change.",
+    },
+    {
+        "id": "f39",
+        "cat": "manageDevices",
+        "front": "Enrollment Status Page (ESP)",
+        "back": "Shows provisioning progress during Windows Autopilot and blocks a user from reaching the desktop until required apps and configuration profiles finish installing, so the device is fully ready on first login instead of continuing to configure itself in the background.",
+        "detail": "ESP settings can be scoped separately for the out-of-box experience and for every subsequent sign-in, which matters for the different Windows Autopilot deployment profile types.",
+    },
+    {
+        "id": "f40",
+        "cat": "manageApps",
+        "front": "Company Portal app",
+        "back": "The end-user-facing app (Windows, iOS/iPadOS, Android, macOS) where someone enrolls their own device, installs company-published apps, and checks their device's compliance status without contacting IT.",
+        "detail": "This is the client-side counterpart to compliance policy settings and actions for noncompliance — it's where a user actually sees why their device is flagged and what to fix.",
+    },
+    {
+        "id": "f41",
+        "cat": "prepareInfra",
+        "front": "Microsoft Tunnel",
+        "back": "A VPN gateway solution managed through Intune that gives managed iOS/iPadOS and Android devices per-app or full-device access to on-premises resources, without a separate third-party VPN client or infrastructure.",
+        "detail": "Microsoft Tunnel is typically paired with app protection policies (MAM) vs mobile device management scenarios where a device may be unmanaged but a specific app still needs a secure tunnel.",
     },
 ]
 

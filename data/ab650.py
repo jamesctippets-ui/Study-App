@@ -279,6 +279,20 @@ FLASHCARDS = [
         'back': "Governing AI agents responsibly in a Microsoft 365 tenant means applying the same admin discipline used elsewhere: inventorying which agents exist, reviewing their data access and permissions, monitoring their usage and behavior, and being able to disable or remove an agent that behaves unexpectedly or accesses data it should not.",
         'detail': "Treating agent oversight as an ongoing lifecycle process (discover, review, monitor, remediate) rather than a one-time approval at creation is the responsible-AI framing the exam expects, mirroring how app governance already treats third-party applications.",
     },
+    {
+        'id': 'f39',
+        'cat': 'tenantConfig',
+        'front': 'Message trace',
+        'back': 'An Exchange Online tool that follows a specific email through the mail flow pipeline, showing exactly when it was received, what rules or policies acted on it, and where it ended up — delivered, quarantined, or dropped.',
+        'detail': "This is the first stop for 'did my email actually send/arrive' tickets, before escalating further into Defender for Office 365's Threat Explorer for anything security-related.",
+    },
+    {
+        'id': 'f40',
+        'cat': 'governSecure',
+        'front': 'Content explorer',
+        'back': 'A Microsoft Purview tool showing exactly which items across the tenant currently carry a given sensitivity label or match specific sensitive information types, letting an admin see the real scope of sensitive content before or after rolling out a policy.',
+        'detail': "This is where you'd confirm a Data loss prevention (DLP) policy anatomy actually targets the content you think it does, rather than assuming from the policy definition alone.",
+    },
 ]
 
 QUESTIONS = [

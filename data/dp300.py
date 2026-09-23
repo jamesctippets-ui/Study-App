@@ -276,6 +276,20 @@ FLASHCARDS = [
         'back': "A zone-redundant Azure SQL Database or Managed Instance (Business Critical or Premium tiers) spreads its replicas across multiple Azure availability zones within the same region, protecting against a datacenter-level failure without needing a separate region or a failover group.",
         'detail': "Zone redundancy protects against losing one availability zone within a region; it does nothing for a full regional outage, which is exactly the gap that a cross-region auto-failover group or geo-replication is meant to cover instead.",
     },
+    {
+        'id': 'f37',
+        'cat': 'platform',
+        'front': "Azure Data Studio",
+        'back': "A lightweight, cross-platform (Windows, macOS, Linux) query and administration tool for SQL Server and Azure SQL, built around notebooks and extensions, distinct from the older, Windows-only SQL Server Management Studio.",
+        'detail': "A DBA working from macOS or Linux, or wanting notebook-style documentation alongside queries, reaches for Azure Data Studio; SSMS still has deeper GUI tooling for some administrative tasks on Windows.",
+    },
+    {
+        'id': 'f38',
+        'cat': 'security',
+        'front': "Database scoped credential",
+        'back': "Stores the authentication secret a database needs to reach an external resource — like a storage account for PolyBase/external tables or a backup destination — separately from the actual external data source definition, so that credential can be reused and rotated in one place.",
+        'detail': "This works alongside Microsoft Entra ID (Azure AD) authentication for Azure SQL — the scoped credential is specifically for the database reaching *out* to another resource, not for a user or app authenticating *into* the database.",
+    },
 ]
 
 QUESTIONS = [

@@ -268,6 +268,20 @@ FLASHCARDS = [
         'back': "Session hosts can be patched like any Azure VM, using Azure Update Manager, Microsoft Configuration Manager, or WSUS; a common pattern is to combine drain mode with scheduled patching windows, or to replace hosts entirely with a newly patched golden image rather than patching in place.",
         'detail': "Image-based replacement (deploy new session hosts from an updated Azure Compute Gallery image version, then remove the old hosts) avoids ever having user sessions running on a host mid-patch, at the cost of needing enough spare capacity to roll hosts in and out.",
     },
+    {
+        'id': 'f37',
+        'cat': 'planInfra',
+        'front': "Multimedia redirection (MMR)",
+        'back': "Redirects video/audio playback processing from certain supported websites to the local client device instead of decoding it on the session host, cutting session host CPU load and improving playback smoothness for the user.",
+        'detail': "This is a targeted fix for a specific bottleneck — media decoding load — distinct from the general connection-quality goal that RDP Shortpath addresses.",
+    },
+    {
+        'id': 'f38',
+        'cat': 'userEnvApps',
+        'front': "Teams media optimization for AVD",
+        'back': "Offloads Microsoft Teams call/meeting audio, video, and screen sharing to run directly on the client device (via the Teams AVD media optimization WebRTC redirector), instead of processing that media load on the shared session host.",
+        'detail': "Without this optimization enabled, every Teams call on a multi-session host competes for the same shared session host security baselines and CPU/network resources, which degrades quickly as concurrent user count grows.",
+    },
 ]
 
 QUESTIONS = [

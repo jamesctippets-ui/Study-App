@@ -335,6 +335,27 @@ FLASHCARDS = [
         'back': 'A service offering describes what is offered, goods, resource access, and service actions, for a target consumer group. A service relationship is the ongoing cooperation between provider and consumer once that offering is taken up.',
         'detail': "The offering is the menu; the relationship is what happens after the customer orders from it: provision, consumption, and relationship management activities.",
     },
+    {
+        'id': 'f45',
+        'cat': 'valueSystem',
+        'front': 'Incident vs. problem vs. known error',
+        'back': 'An incident is an unplanned interruption or reduction in quality of a service, resolved to restore service as fast as possible. A problem is the underlying cause of one or more incidents, investigated to prevent recurrence. A known error is a problem that has been analyzed but not yet permanently fixed, often with a documented workaround.',
+        'detail': 'Restoring service fast (incident management) and finding the root cause (problem management) are deliberately separate practices — you can resolve an incident today with a workaround while the known error behind it stays open for a permanent fix later.',
+    },
+    {
+        'id': 'f46',
+        'cat': 'valueSystem',
+        'front': 'Change enablement: standard, normal, and emergency changes',
+        'back': 'A standard change is pre-authorized, low-risk, and well-understood, needing no case-by-case approval. A normal change goes through assessment and authorization before implementation. An emergency change is fast-tracked through an expedited approval process because it must happen immediately, such as a fix for a live incident.',
+        'detail': "Recognizing which of the three a scenario describes is really about risk and urgency: routine and low-risk is standard, needs review is normal, and can't wait for the normal process is emergency.",
+    },
+    {
+        'id': 'f47',
+        'cat': 'valueSystem',
+        'front': 'Service desk',
+        'back': "The practice that acts as the single, agreed point of contact for users to report incidents, request services, and get status updates — the entry point into the value stream, even when it doesn't resolve every issue itself.",
+        'detail': "The service desk's real value is coordination and communication, not necessarily deep technical resolution — many issues it logs are escalated to specialist teams for problem vs. known error follow-up.",
+    },
 ]
 
 QUESTIONS = [

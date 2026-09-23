@@ -426,6 +426,20 @@ FLASHCARDS = [
         'back': 'Azure CDN caches static content at edge points-of-presence close to users to cut latency. Azure Front Door adds global HTTP(S) load balancing, path-based routing, and an optional Web Application Firewall on top of an edge network, for full web-application delivery, not just static caching.',
         'detail': "If a scenario needs only 'serve images/video faster worldwide,' that's CDN. If it also needs routing logic or a WAF at the edge, that's Front Door.",
     },
+    {
+        'id': 'f60',
+        'cat': 'management',
+        'front': 'Azure Cost Management + Billing',
+        'back': "The set of tools for analyzing spend (Cost Analysis), setting spending alerts (budgets), and viewing and paying invoices, across one or more subscriptions.",
+        'detail': "This is the actual portal experience behind factors affecting Azure costs — it's where those factors show up as real, analyzable numbers, and where the pricing calculator vs. TCO calculator's estimates get checked against reality.",
+    },
+    {
+        'id': 'f61',
+        'cat': 'management',
+        'front': 'Landing zone',
+        'back': 'A pre-configured environment — subscriptions, management groups, policy, and a network baseline already in place — that a new workload lands into, instead of starting from a blank subscription every time.',
+        'detail': "A landing zone bakes governance into the resource hierarchy up front, so a new workload inherits compliant Azure Policy and Azure RBAC instead of every project reinventing it.",
+    },
 ]
 
 QUESTIONS = [

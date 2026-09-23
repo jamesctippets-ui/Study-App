@@ -148,17 +148,18 @@ come up.
   `CATEGORIES`), shown on Study section pages, a lesson's Vocabulary block,
   and a consolidated block on the cheat sheet. All ~90 URLs were
   WebSearch-verified, not guessed.
-- [x] **Real Azure Portal screenshots.** Four genuine screenshots (resource
+- [x] **Real Azure Portal screenshots.** Five genuine screenshots (resource
   group creation, storage account tabs, VM instance details, IAM role
-  assignments), sourced from Microsoft's own CC BY 4.0-licensed
-  MicrosoftDocs GitHub repos and saved locally under `images/portal/`,
-  shown alongside (not replacing) the existing SVG portal mockups in
-  AZ-900/AZ-104 lessons, each with a plain-language description of what's
-  shown, a source link, and attribution. No real screenshot was added for
-  the VNet-creation mockup — no clean, on-topic match was found.
+  assignments, App Service deployment slots), sourced from Microsoft's own
+  CC BY 4.0-licensed MicrosoftDocs GitHub repos and saved locally under
+  `images/portal/`, shown alongside (not replacing) the existing SVG
+  portal mockups in AZ-900/AZ-104 lessons, each with a plain-language
+  description of what's shown, a source link, and attribution. No real
+  screenshot was added for the VNet-creation mockup — no clean, on-topic
+  match was found.
 - [x] **Quiz/exam questions built around the real screenshots.** 7 new
   questions (4 in AZ-900, 3 in AZ-104 — `'image': 'resourceGroup'` etc. on
-  the question dict) show one of the four real screenshots above the
+  the question dict) show one of the real screenshots above the
   question itself and ask about what's actually on screen, in both Quiz
   and Final Exam mode (`REAL_PORTAL_SCREENSHOTS` lookup in
   `QuestionView`/`ExamQuestionView`). The descriptive caption is
@@ -217,6 +218,27 @@ come up.
   enough on its own — a 280px-wide flyout on a ~390px phone screen can
   overflow the *other* edge if the word sits mid-screen — so this shifts
   by exactly the overflow amount instead of just flipping sides.
+- [x] **More key terms, and real cross-referencing so flyouts actually
+  fire, across all 15 tracks.** Audited why term flyouts felt sparse
+  outside AZ-900/AZ-104: the mechanism (`autoHighlightTerms` in
+  02_portal_mockups.jsx) was always working correctly, but most tracks'
+  flashcard definitions almost never mentioned each other's terms by
+  name, so there was nothing to highlight — a measured baseline found
+  several tracks (AZ-104, AZ-305, MD-102, SC-200, SC-500, Cloud+) sitting
+  at literally 0% of cards triggering even one flyout. Added 39 new
+  flashcards across all 15 `data/*.py` modules (646 total, up from 607),
+  each written to name at least one sibling term verbatim so it actually
+  cross-references, plus light-touch edits to several existing cards'
+  `detail` field adding the same kind of cross-reference without
+  rewriting their core definitions. Moved every zero-coverage track well
+  above 0%, and the healthiest tracks (AZ-900, DP-900, DP-300, AZ-140,
+  ITIL) now sit around 20% of cards triggering a flyout, up from
+  single digits. This is real, meaningful progress, not full coverage —
+  most cards still don't cross-reference another term, since a natural,
+  accurate definition doesn't always have one to reference. Continuing
+  this in further batches (more new terms, more `detail`-field
+  cross-references on existing cards) is legitimate ongoing work, not a
+  one-time fix.
 
 ## 10. Future-proofing for a standalone web/iOS/Android app (user's idea — lowest priority, not being worked on)
 
@@ -277,18 +299,36 @@ mind so today's choices don't quietly foreclose that option later:
 
 ## 12. More official screenshots (user's idea)
 
-- [ ] Extend the real-screenshot treatment (4 shipped so far: Resource Group
-  creation, Storage Account tabs, VM instance details, IAM role assignments —
-  see `images/portal/` and `REAL_PORTAL_SCREENSHOTS`) to more AZ-900/AZ-104
-  lessons that currently only have the hand-drawn SVG mockup.
+- [x] ~~Extend the real-screenshot treatment to more AZ-900/AZ-104 lessons
+  that currently only have the hand-drawn SVG mockup~~ In progress: added
+  a 5th real screenshot (App Service "Add Slot" panel, CC BY 4.0 from
+  `MicrosoftDocs/azure-docs`) for AZ-104's "App Hosting & Infrastructure
+  as Code" lesson, which previously had neither a real shot nor even a
+  hand-drawn one — added both together (`MockupDeploymentSlot` in
+  02_portal_mockups.jsx). Remaining gap: AZ-104's "Identities & Access,"
+  "Networking," and "Monitoring & Recovery" lessons still have no
+  `portalMockup` at all (see README's "ideas for Claude Code" for the
+  fuller list of diagram/mockup gaps).
+- [ ] **Licensing note learned the hard way:** not every `MicrosoftDocs/*`
+  GitHub repo uses the same license as `azure-docs` (CC BY 4.0 for content
+  + MIT for code samples, in separate `LICENSE`/`LICENSE-CODE` files).
+  `entra-docs`, for example, has a single plain MIT `LICENSE` for the
+  whole repo — a real, non-obvious difference, not an oversight — so its
+  images weren't used here despite finding an on-topic candidate. Check
+  each repo's actual license file before reusing an image from it; don't
+  assume the azure-docs pattern holds elsewhere in the MicrosoftDocs org.
 - [ ] Bring the same treatment to other tracks that have a real admin-console
   UI worth showing: DP-300 (Azure SQL/Cosmos DB portal blades), AZ-305
   (Azure landing zone / architecture-center diagrams), SC-300 (Entra ID
-  admin center), MD-102 (Intune admin center), SC-200 (Defender/Sentinel
-  portal). Same sourcing rule as before: only Microsoft's own CC BY
-  4.0-licensed MicrosoftDocs GitHub repos (`raw.githubusercontent.com` is
-  reachable even when `learn.microsoft.com` itself isn't) — never a generic
-  "free stock photo," since no such thing exists for a specific product UI.
+  admin center — pending the licensing check above), MD-102 (Intune admin
+  center), SC-200 (Defender/Sentinel portal). Same sourcing rule as
+  before: only a verified CC-licensed source (`raw.githubusercontent.com`
+  is reachable even when `learn.microsoft.com` itself isn't) — never a
+  generic "free stock photo," since no such thing exists for a specific
+  product UI. Structural note: today's screenshot mechanism only exists
+  for course tracks (lessons with a `portalMockup` key) — extending it to
+  the 13 flat-StudyView tracks needs a new slot in `StudyView`/
+  `StudyEntry`, not just new data.
 - [ ] More quiz/exam questions built around each new screenshot, matching
   the existing pattern (`'image': '<key>'` on the question dict,
   `hideDescription` so the caption doesn't give away the answer).

@@ -103,12 +103,28 @@ function MockupVirtualNetwork() {
   );
 }
 
+function MockupDeploymentSlot() {
+  return (
+    <PortalFrame height={150}>
+      <text x={12} y={40} fill={COLOR.text} fontSize="9" fontWeight="700">Add Slot</text>
+      <MockField x={12} y={52} w={296} h={18} label="Name" value="staging" highlight />
+      <text x={12} y={80} fill={COLOR.muted} fontSize="6.5">my-demo-app-staging.azurewebsites.net</text>
+      <MockField x={12} y={90} w={296} h={18} label="Clone settings from" value="Do not clone settings" />
+      <rect x={12} y={120} width="60" height="18" rx="4" fill={COLOR.primary} />
+      <text x={42} y={132} textAnchor="middle" fill="#2B1620" fontSize="8" fontWeight="700">Add</text>
+      <rect x={80} y={120} width="60" height="18" rx="4" fill={COLOR.surface} stroke={COLOR.border} strokeWidth="1" />
+      <text x={110} y={132} textAnchor="middle" fill={COLOR.muted} fontSize="8">Close</text>
+    </PortalFrame>
+  );
+}
+
 const PORTAL_MOCKUPS = {
   resourceGroup: MockupResourceGroup,
   virtualNetwork: MockupVirtualNetwork,
   storageAccount: MockupStorageAccount,
   vmSize: MockupVmSize,
   roleAssignment: MockupRoleAssignment,
+  deploymentSlot: MockupDeploymentSlot,
 };
 
 // Real Azure Portal screenshots, pulled directly from Microsoft's own public
@@ -147,6 +163,13 @@ const REAL_PORTAL_SCREENSHOTS = {
     description: 'The Role assignments tab of a resource group\'s Access control (IAM) blade — every user, group, service principal, and managed identity that currently holds a role (Billing Reader, Contributor, etc.) at this scope, plus the Add/Remove/Download controls above the list.',
     sourceLabel: 'Microsoft Learn: Assign a role in the Azure portal',
     sourceUrl: 'https://learn.microsoft.com/en-us/azure/role-based-access-control/quickstart-assign-role-user-portal',
+  },
+  deploymentSlot: {
+    src: 'images/portal/deployment-slots.png',
+    alt: 'Real Azure Portal screenshot of the Add Slot panel for App Service deployment slots',
+    description: 'The "Add Slot" panel opened from an App Service\'s Deployment slots blade — naming the new slot ("staging"), the auto-generated URL that slot gets, and the "Clone settings from" option for copying configuration from an existing slot instead of starting blank.',
+    sourceLabel: 'Microsoft Learn: Set up staging environments for App Service',
+    sourceUrl: 'https://learn.microsoft.com/en-us/azure/app-service/deploy-staging-slots',
   },
 };
 

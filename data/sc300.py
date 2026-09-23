@@ -283,6 +283,20 @@ FLASHCARDS = [
         'back': "A connected organization is an external Microsoft Entra tenant (or a non-Entra domain) registered in entitlement management so that its users can be targeted as eligible requestors for an access package, without each external user needing to already exist as a guest in your tenant beforehand.",
         'detail': "Adding a connected organization does not itself grant access to anyone -- it only makes that organization's users visible as candidates who can then request an access package, which still runs through its own approval workflow.",
     },
+    {
+        'id': 'f39',
+        'cat': 'authAccessMgmt',
+        'front': 'Conditional Access report-only mode',
+        'back': "Runs a Conditional Access policy against real sign-ins and logs what it would have done — grant, block, or require an extra control — without actually enforcing anything, so its impact can be reviewed before it's turned on for real.",
+        'detail': "This is the recommended way to test any new or modified policy in Conditional Access policy structure: assignments and access controls before flipping it to On, since it catches an overly broad policy before it locks anyone out.",
+    },
+    {
+        'id': 'f40',
+        'cat': 'identityGovernance',
+        'front': 'Break-glass emergency access accounts',
+        'back': "One or more cloud-only accounts, excluded from Conditional Access and normal MFA/PIM requirements, with credentials stored securely offline, kept purely so admins can still sign in if every other authentication method is broken or unavailable.",
+        'detail': "These accounts should be monitored closely and explicitly excluded from Conditional Access named locations restrictions and risk policies — the whole point is that they still work when everything else has failed.",
+    },
 ]
 
 QUESTIONS = [

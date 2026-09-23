@@ -249,7 +249,7 @@ FLASHCARDS = [
         'cat': 'troubleshooting',
         'front': 'Latency vs. bandwidth problems',
         'back': "Latency is the delay before data begins to transfer (how long a single round trip takes). Bandwidth is the total volume of data that can transfer per unit of time once it's flowing. A connection can have plenty of bandwidth and still feel slow due to high latency.",
-        'detail': "A common trap: adding more bandwidth to a connection does nothing to fix a latency problem — they're independent characteristics with different causes and different fixes.",
+        'detail': "A common trap: adding more bandwidth to a connection does nothing to fix a latency problem — they're independent characteristics with different causes and different fixes. A Content Delivery Network (CDN) is a latency fix specifically, not a bandwidth one.",
     },
     {
         'id': 'f34',
@@ -320,6 +320,27 @@ FLASHCARDS = [
         'front': 'Common RAID levels',
         'back': 'RAID 0 stripes data across disks for performance with no redundancy (one disk failure loses everything). RAID 1 mirrors data for redundancy with no capacity gain. RAID 5 stripes data plus distributed parity, tolerating one disk failure. RAID 10 combines mirroring and striping for both redundancy and performance, at the cost of half the raw capacity.',
         'detail': 'RAID 0 is sometimes mistaken for a resilience feature because it "spreads" data across disks — it actually has zero fault tolerance and is only about speed.',
+    },
+    {
+        'id': 'f44',
+        'cat': 'archDesign',
+        'front': 'Content Delivery Network (CDN)',
+        'back': 'A geographically distributed set of edge servers that cache content closer to end users, reducing the round-trip distance data has to travel and offloading traffic from the origin server.',
+        'detail': 'A CDN mainly helps with latency and origin load, not raw available bandwidth — recognizing which one a scenario is actually describing (see latency vs. bandwidth problems) decides whether a CDN is really the fix.',
+    },
+    {
+        'id': 'f45',
+        'cat': 'opsSupport',
+        'front': 'Change management process',
+        'back': 'A formal, documented process for proposing, reviewing, approving, and recording a change to production systems, including a rollback plan, before the change is actually made.',
+        'detail': "A configuration management database (CMDB) is what change management updates once a change is approved and completed — the CMDB should always reflect the environment's true current state.",
+    },
+    {
+        'id': 'f46',
+        'cat': 'opsSupport',
+        'front': 'Runbook',
+        'back': 'A documented, step-by-step procedure for a specific operational task or incident response, written so it can be followed consistently by different people (or triggered automatically) with the same result each time.',
+        'detail': 'A runbook is what automation vs. orchestration tooling actually executes — the runbook is the procedure; automation/orchestration is what carries it out without a human doing each step by hand.',
     },
 ]
 

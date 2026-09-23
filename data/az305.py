@@ -167,7 +167,7 @@ FLASHCARDS = [
         'id': 'f22',
         'cat': 'businessContinuity',
         'front': "Recovery Services vault",
-        'back': "The container that stores Azure Backup data and Azure Site Recovery replication configuration and metadata. A single vault can hold both backup and Site Recovery items, and the vault's own redundancy setting (LRS, GRS, or ZRS) determines whether it survives a regional loss.",
+        'back': "The container that stores Azure Backup data and Azure Site Recovery replication configuration and metadata. A single vault can hold both backup and Site Recovery items, and the vault's own redundancy setting — LRS, GRS, or Zone-redundant storage (ZRS) — determines whether it survives a regional loss.",
         'detail': "It's easy to assume backups automatically survive a regional outage — that depends entirely on the vault's own storage redundancy setting, which is worth checking explicitly.",
     },
     {
@@ -189,7 +189,7 @@ FLASHCARDS = [
         'cat': 'infrastructure',
         'front': "Hub-and-spoke network topology",
         'back': "A central hub VNet hosts shared services — firewall, VPN or ExpressRoute gateway, DNS — while spoke VNets (one per workload or team) peer only to the hub, not to each other, centralizing connectivity, inspection, and cost.",
-        'detail': "By default, peering to a shared hub does not let two spokes talk to each other directly — that isolation is often the whole point of the design.",
+        'detail': "By default, peering to a shared hub does not let two spokes talk to each other directly — that isolation is often the whole point of the design. An Azure landing zone typically ships this topology already built for new workloads to land into.",
     },
     {
         'id': 'f26',
@@ -253,6 +253,34 @@ FLASHCARDS = [
         'front': "Scale up vs. scale out for App Service",
         'back': "Scaling up changes the App Service plan's pricing tier or size to a bigger instance. Scaling out adds more instances of the same tier, often automated through autoscale rules based on metrics or a schedule.",
         'detail': "Autoscale rules configure scaling out (more instances); changing to a larger tier is always a manual or scripted scale-up decision, not something autoscale rules do on their own.",
+    },
+    {
+        'id': 'f35',
+        'cat': 'identityGovernance',
+        'front': 'Azure landing zone',
+        'back': 'A pre-provisioned environment — subscriptions, management groups, policy, networking, and identity baseline already in place — that new workloads land into, instead of every project starting infrastructure from a blank subscription.',
+        'detail': 'A well-designed landing zone bakes in governance up front, so individual project teams inherit compliant Azure Policy and RBAC scope and inheritance rather than reinventing it per workload.',
+    },
+    {
+        'id': 'f36',
+        'cat': 'identityGovernance',
+        'front': 'Azure Well-Architected Framework',
+        'back': "Microsoft's set of five pillars — reliability, security, cost optimization, operational excellence, and performance efficiency — used to evaluate architectural trade-offs against each other rather than optimizing any one in isolation.",
+        'detail': 'AZ-305 exam scenarios are frequently a trade-off between two of these pillars — recognizing which one the scenario is actually prioritizing is often the real question being asked.',
+    },
+    {
+        'id': 'f37',
+        'cat': 'dataStorage',
+        'front': 'Zone-redundant storage (ZRS)',
+        'back': 'Synchronously replicates data across three availability zones within one region, protecting against a datacenter-level failure without the latency or cost of replicating to a second region entirely.',
+        'detail': "This sits between locally-redundant storage (protects against a single rack/disk failure only) and the cross-region options covered under availability zones vs. paired (secondary) regions.",
+    },
+    {
+        'id': 'f38',
+        'cat': 'infrastructure',
+        'front': 'Infrastructure as Code (IaC)',
+        'back': 'Defining infrastructure in declarative template files (ARM, Bicep, or Terraform) that can be version-controlled, reviewed, and deployed repeatably, instead of manually clicking through the Azure portal.',
+        'detail': 'A design requirement for consistent, repeatable, auditable deployments across multiple environments is a strong signal that IaC belongs in the answer, not manual provisioning.',
     },
 ]
 
