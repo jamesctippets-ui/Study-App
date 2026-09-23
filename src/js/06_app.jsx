@@ -44,6 +44,7 @@ function CertStudyApp() {
   const writeChain = useRef(Promise.resolve());
   const utterRef = useRef(null);
   const skipNextAutoStart = useRef(false);
+  const didRestoreLastVisitedRef = useRef(false);
 
   // Mirror results/seenLog/stats so persistPayload can always read the
   // latest value of the two fields a given save*() call isn't itself
@@ -299,15 +300,32 @@ function CertStudyApp() {
     // eslint-disable-next-line
   }, [mode, activeCat, quizLength, typesKey, activeTrack]);
 
-  // Tracks the last track+mode actually visited so the track menu's
-  // "continue where you left off" button has somewhere real to send you.
-  // Skipped until the initial cloud/local sync finishes, so it can't stomp
-  // a freshly-loaded lastVisited with the component's default state.
-  // Declared after the quiz-session-start effect above (also keyed on
-  // activeTrack/mode) so that when both fire in the same commit, this
-  // one's persistPayload call — which folds its update onto the same
-  // `stats` closure — runs last and its write isn't the one that gets
-  // overwritten.
+  // Once the initial cloud/local sync finishes, jump straight to the last
+  // track+mode actually visited (if any) instead of always opening on
+  // AZ-900/Learn — so a refresh picks up where you left off rather than
+  // resetting every time. Runs exactly once (the ref guard), since after
+  // that the "tracks the last visited" effect below takes over and this
+  // one's job is done. A brand-new visitor with no lastVisited yet just
+  // keeps the AZ-900/Learn/Study default state.
+  useEffect(() => {
+    if (syncMode === 'loading' || didRestoreLastVisitedRef.current) return;
+    didRestoreLastVisitedRef.current = true;
+    const lv = stats.lastVisited;
+    if (lv && DATA[lv.track]) {
+      setActiveTrack(lv.track);
+      setMode(lv.mode || 'learn');
+    }
+  }, [syncMode]);
+
+  // Tracks the last track+mode actually visited so the restore effect above
+  // (on a future reload) and the track menu's "continue where you left off"
+  // button both have somewhere real to point to. Skipped until the initial
+  // cloud/local sync finishes, so it can't stomp a freshly-loaded
+  // lastVisited with the component's default state. Declared after the
+  // quiz-session-start effect above (also keyed on activeTrack/mode) so
+  // that when both fire in the same commit, this one's persistPayload
+  // call — which folds its update onto the same `stats` closure — runs
+  // last and its write isn't the one that gets overwritten.
   useEffect(() => {
     if (syncMode === 'loading') return;
     const current = stats.lastVisited;

@@ -73,10 +73,13 @@ come up.
   lesson all work as a user would expect from a "real" multi-page app.
 - [x] ~~A proper **home/dashboard** page as the default landing screen~~
   Shipped, then reworked: refreshing into a separate dashboard page felt
-  clunky for a static site with no real routing, so the app now defaults
-  straight into AZ-900 → Learn → Study on every load (no more `view` state
-  in `06_app.jsx`). Overall progress, streak, and "continue where you left
-  off" moved into the new hamburger menu (below) instead of a full page.
+  clunky for a static site with no real routing, so the app now restores
+  the last track+mode you were actually using on every load (a first-time
+  visitor with no history yet gets AZ-900 → Learn → Study) — no more
+  `view` state in `06_app.jsx`. Overall progress, streak, and a "continue
+  where you left off" shortcut (for jumping back after browsing other
+  tracks in the menu) moved into the new hamburger menu instead of a full
+  page.
 - [x] A side/hamburger **menu** for track navigation (☰, `IconMenu` in
   src/js/00_preamble.js) — opens `TrackMenuPanel` (04_shared_ui.jsx),
   which shows overall average mastery + streak, an optional "continue

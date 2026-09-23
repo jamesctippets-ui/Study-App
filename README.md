@@ -88,17 +88,19 @@ backup/device-migration option, since the app has no accounts) alongside
 the existing per-track reset. Both use small wireframe (line-art) icons
 rather than emoji, matching the hamburger menu below.
 
-Opening the app always lands straight on **AZ-900 → Learn → Study** — no
-separate home/dashboard page to land on first, so a refresh never feels
-like it "lost your place" the way a full landing screen did. A ☰ hamburger
-button in the header opens the **track menu** (`TrackMenuPanel` in
-`04_shared_ui.jsx`): overall average mastery across every track, the daily
-streak, an optional "continue where you left off" shortcut remembering the
-last track+mode you were in, and a flat list of all 15 tracks — each shown
-exactly once with its description and live mastery % (no path-grouping;
-the earlier Learning Paths feature was removed in favor of this simpler
-list). Quiz and Exam missed-question review lists show each question's
-explanation alongside the prompt, not just what you got wrong.
+Opening the app lands you right back on the last track+mode you were
+using — no separate home/dashboard page in between, so a refresh never
+feels like it "lost your place" the way a full landing screen did. A
+first-time visitor with no history yet lands on **AZ-900 → Learn → Study**.
+A ☰ hamburger button in the header opens the **track menu** (`TrackMenuPanel`
+in `04_shared_ui.jsx`): overall average mastery across every track, the
+daily streak, an optional "continue where you left off" shortcut (for
+jumping back after browsing other tracks in the menu), and a flat list of
+all 15 tracks — each shown exactly once with its description and live
+mastery % (no path-grouping; the earlier Learning Paths feature was removed
+in favor of this simpler list). Quiz and Exam missed-question review lists
+show each question's explanation alongside the prompt, not just what you
+got wrong.
 
 **Fifteen tracks, all visible in the track switcher:**
 - **AZ-900** (Azure Fundamentals) — full course content, 106 questions.
