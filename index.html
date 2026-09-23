@@ -1955,7 +1955,8 @@ function LessonDetail({ lesson, flashcardsData, questionsData, categories, onBac
         ‹ All lessons
       </button>
       <div className="itil-display" style={{ fontSize: '19px', fontWeight: 600, marginBottom: '4px' }}>{lesson.title}</div>
-      <div style={{ fontSize: '12px', color: COLOR.muted, marginBottom: '16px' }}>{lesson.summary}</div>
+      <div style={{ fontSize: '12px', color: COLOR.muted, marginBottom: '12px' }}>{lesson.summary}</div>
+      <ResourceLinksRow resources={vocabResources} label="Learn more" />
 
       {DiagramComp && (
         <div style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderRadius: '14px', padding: '14px', marginBottom: '16px' }}>
@@ -2105,19 +2106,13 @@ function LessonDetail({ lesson, flashcardsData, questionsData, categories, onBac
       </button>
       {showVocabulary && (
         <div style={{ boxShadow: SHADOW.card, background: COLOR.surfaceRaised, borderRadius: '0 0 12px 12px', padding: '14px', marginBottom: '16px', borderLeft: `1px solid ${COLOR.border}`, borderRight: `1px solid ${COLOR.border}`, borderBottom: `1px solid ${COLOR.border}` }}>
-          <ResourceLinksRow resources={vocabResources} label="Learn more" />
           <div className="flex flex-col gap-2">
             {vocabItems.map((item) => <StudyEntry key={item.id} item={item} />)}
           </div>
         </div>
       )}
 
-      <button
-        onClick={() => onQuiz(finalQuizIds)}
-        style={{ width: '100%', padding: '13px', borderRadius: '12px', background: COLOR.primary, color: '#2B1620', fontSize: '14px', fontWeight: 600 }}
-      >
-        Quiz this section: {finalQuizLabel} ({finalQuizIds.length} question{finalQuizIds.length === 1 ? '' : 's'})
-      </button>
+      <QuizSectionButton label={finalQuizLabel} count={finalQuizIds.length} onClick={() => onQuiz(finalQuizIds)} />
     </div>
   );
 }

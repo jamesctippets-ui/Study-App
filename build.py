@@ -10,7 +10,9 @@ produce index.html.
 
 Usage: python3 build.py
 """
+import hashlib
 import json
+import re
 import sys
 from pathlib import Path
 
@@ -220,6 +222,29 @@ def build_app_script():
     return build_data_json() + "\n\n" + "\n".join(chunks) + bootstrap
 
 
+def sync_service_worker_cache_name(html):
+    """Keeps service-worker.js's CACHE_NAME in lockstep with index.html's
+    actual content, so a content change always invalidates the cache-first
+    fetch handler's stale copy. This used to be a manual version-string
+    bump on service-worker.js — twice now, a commit changed index.html
+    without remembering that bump, leaving returning visitors stuck on an
+    old snapshot until someone noticed something "looked old" and traced
+    it back. Deriving the version from a hash of the built output removes
+    the human step (and the failure mode) entirely.
+    """
+    sw_path = ROOT / "service-worker.js"
+    sw_text = sw_path.read_text()
+    content_hash = hashlib.sha256(html.encode()).hexdigest()[:10]
+    new_line = f"const CACHE_NAME = 'cert-study-hub-{content_hash}';"
+    updated, count = re.subn(r"^const CACHE_NAME = '.*';$", new_line, sw_text, count=1, flags=re.MULTILINE)
+    if count != 1:
+        raise SystemExit("service-worker.js is missing the expected CACHE_NAME line")
+    if updated != sw_text:
+        sw_path.write_text(updated)
+        return True
+    return False
+
+
 def main():
     validate()
     app_script = build_app_script()
@@ -229,11 +254,14 @@ def main():
     output = template.replace("__APP_SCRIPT__", app_script)
     out_path = ROOT / "index.html"
     out_path.write_text(output)
+    sw_updated = sync_service_worker_cache_name(output)
 
     total_flashcards = sum(len(mod.FLASHCARDS) for mod in TRACK_MODULES.values())
     total_questions = sum(len(mod.QUESTIONS) for mod in TRACK_MODULES.values())
     print(f"Built {out_path} ({len(output):,} bytes)")
     print(f"  {len(tracks.TRACKS)} tracks, {total_flashcards} flashcards, {total_questions} questions")
+    if sw_updated:
+        print("  service-worker.js CACHE_NAME updated (content changed) — commit it alongside index.html")
 
 
 if __name__ == "__main__":

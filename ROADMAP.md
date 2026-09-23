@@ -174,12 +174,15 @@ come up.
   line-art icons (`IconMenu`/`IconTrophy`/`IconSettings`/`IconPrinter` in
   src/js/00_preamble.js) instead of emoji. Achievement badge icons and the
   inline streak 🔥 are left as emoji — those are content, not menu chrome.
-- [x] **Service worker cache-busting discipline.** A stale cached
-  `index.html` on a returning visitor's device made a real content update
-  (Cloud+ was actually fine) look like a missing/regressed track. Bumped
-  `CACHE_NAME` in `service-worker.js`, and any future commit that changes
-  `index.html` needs the same bump so the cache-first fetch handler
-  doesn't keep serving an old snapshot indefinitely.
+- [x] **Service worker cache-busting, now automatic.** A stale cached
+  `index.html` on a returning visitor's device made two separate real
+  content updates (Cloud+ being "missing," then AZ-900's Study page
+  "looking old") look like regressions, because the manual `CACHE_NAME`
+  bump in `service-worker.js` got forgotten both times. `build.py` now
+  derives `CACHE_NAME` from a hash of the built `index.html` itself
+  (`sync_service_worker_cache_name()`) and rewrites `service-worker.js`
+  automatically whenever the content actually changes — the human step,
+  and the failure mode, are both gone for good.
 
 ## 10. Future-proofing for a standalone web/iOS/Android app (user's idea — lowest priority, not being worked on)
 
