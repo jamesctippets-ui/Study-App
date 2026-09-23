@@ -299,6 +299,91 @@ mind so today's choices don't quietly foreclose that option later:
   once the core step-ordering game above exists and its data model has
   proven out, rather than designing both at once.
 
+## 14. UX & learning-science feedback (user asked for an honest review)
+
+A candid pass on what's working, what's rough, and where study-science
+research points next — requested directly, not just inferred. Grouped by
+theme; the concrete, buildable ones are checkboxes like everywhere else,
+but a few are genuinely open design questions rather than tasks, and are
+called out as such.
+
+**What's actually working well, worth knowing so it doesn't get diluted
+later:** immediate explanations right after answering a question (not just
+at the end of a session) is a real testing-effect win — most cheap
+quiz apps only show correctness, not the reasoning, and delay it. Real
+spaced repetition (not a gimmick — an uncapped, genuinely growing interval
+via `nextSrsEntry` in 03_helpers.js) plus a timed Exam mode plus per-
+category resource links plus real portal screenshots is a level of depth
+most indie study apps don't bother with. That combination is the app's
+actual competitive edge — worth protecting as new features get added, not
+trading away for shinier but shallower ones.
+
+- [ ] **A daily goal ring.** A small, self-set "study N cards/questions
+  today" target with a simple progress ring — the single highest-leverage
+  Duolingo mechanic and one this app doesn't have yet, despite already
+  having the streak infrastructure to hang it off of. Cheap to build
+  (a number + a count against today's activity, both already tracked)
+  and directly answers "why open this again today."
+- [ ] **A cross-track "Today's Mix" review session.** Now that Learning
+  Paths (track-ordering) is gone, there's no session that pulls from more
+  than one track at once — real value for someone actively juggling
+  several certs (the user's own AZ-900/AZ-104/MD-102/SC-300-style stack):
+  a single session mixing each active track's SRS-due cards and missed
+  questions. Not a revival of Learning Paths — no ordering/sequencing
+  claim, just a review mixer across whatever's actually due.
+- [ ] **An "exam readiness" signal per track.** A single blended indicator
+  (recent quiz/exam accuracy + mastery % + how stale that mastery is)
+  instead of a flat mastery percentage alone — Tutorials Dojo and
+  Whizlabs both lean on this and it's a more honest answer to "am I
+  actually ready" than a lifetime-ratio percentage that never decays.
+  Ties into the missing "trend over time" item already in section 7.
+- [ ] **Confidence-based self-rating for flashcards** (already listed in
+  section 7, resurfaced here because it's the most direct fix for a real
+  risk: streaks/badges can quietly reward speed-clicking through cards
+  over actually retaining them). Rating 1–5 instead of binary correct/
+  incorrect is more honest self-assessment and plugs straight into the
+  existing SM-2-style interval math.
+- [ ] **Retrieval-practice "blurting."** Before flipping a flashcard, ask
+  the user to mentally (or literally, in a text box) recall the answer
+  first — self-graded, no backend/grading needed, but the extra effortful
+  step before reveal is a well-evidenced retention booster over passive
+  flip-and-read.
+- [ ] **A "teach it back" mode.** Free-text: explain a concept in your own
+  words before seeing the official explanation (the protégé effect) —
+  self-graded like blurting above, no AI grading required. Pairs well
+  with the "on the job" real-world callouts already in section 2.
+- [ ] **An explicit interleaved/mixed-category quiz option**, distinct
+  from today's per-category or per-track quiz — pulling randomly across
+  categories (or tracks, via Today's Mix above) on purpose. Blocked
+  practice (all-one-topic-in-a-row, which is what "Quiz this section"
+  gives you) feels more fluent while studying but interleaving is the
+  more evidence-backed technique for actual exam-day transfer; worth
+  offering both rather than only the easier-feeling one.
+- [ ] **Surface the SRS ordering, don't hide it.** Cards mode silently
+  reorders by due-date; a first-time user has no way to know why. A small
+  "reviewing overdue cards first" indicator would turn an invisible
+  mechanic into a visible, trust-building one — cheap, and pairs
+  naturally with the onboarding tour already in LAUNCH_CHECKLIST.md.
+- [ ] **Open design question, not a ticket yet: header density on small
+  phones.** The header currently stacks a hamburger, track name/subtitle,
+  mastery %, achievements, and settings into one row above the mode tabs.
+  It held together in this session's testing, but it's worth a real
+  on-device look (see LAUNCH_CHECKLIST.md's cross-device QA item) — if it
+  feels cramped, moving the primary Learn/Quiz/Exam switch to a bottom
+  tab bar (more thumb-reachable on a large phone) is worth considering
+  before it's a launch-day scramble.
+
+## 15. Content ideas beyond quiz questions
+
+- [ ] **A personal mnemonic bank.** Let a user attach their own short
+  note/mnemonic to any term (stored locally like everything else), which
+  then resurfaces alongside that term's flashcard/flyout — a low-effort
+  personalization layer that plain flashcards can't offer.
+- [ ] **Milestone "boss battle" sessions.** Once a track crosses a mastery
+  threshold, unlock a themed, harder mixed-mode session as a checkpoint —
+  distinct from routine quizzes, gamifying the mastery threshold itself
+  rather than just badge-collecting.
+
 ---
 
 Not in scope / deliberately not doing: crowd-sourced/disputed answer voting
