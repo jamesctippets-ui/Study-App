@@ -210,6 +210,92 @@ mind so today's choices don't quietly foreclose that option later:
   static-site simplicity — this section exists so a future rewrite reuses
   the content and logic instead of starting over.
 
+## 11. More certification tracks (user's idea)
+
+- [ ] Candidate next tracks, roughly in order of fit with the user's stated
+  goal (Microsoft systems engineer, M365 focus, hospital IT background):
+  - **AZ-500** (Azure Security Engineer) — natural pairing with AZ-104/AZ-305,
+    and security is already a recurring theme (SC-200/300/500 are covered).
+  - **AZ-400** (DevOps Engineer Expert) — rounds out the Azure admin/architect
+    cluster (AZ-104/305/802) with CI/CD and release-management content.
+  - **MS-700** (Managing Microsoft Teams) — squarely M365-admin territory,
+    complements AB-650/MD-102 without much overlap.
+  - **PL-300** (Power BI Data Analyst) — adjacent to the DP-900/DP-300 data
+    cluster, useful if reporting/analytics work comes up.
+  - **CompTIA Security+** — pairs with the existing Cloud+ track the same
+    way AZ-900 pairs with AZ-104, and is a common next step after Cloud+.
+  - A **second healthcare-interoperability track** (e.g. content aligned with
+    HL7v2/FHIR implementation specifics, or a vendor-specific analyst
+    credential such as Epic/Cerner) as a deeper follow-on to the existing
+    EHR Integration track, if that's still the career-relevant direction.
+  - Final track selection is the user's call — this list is a starting menu,
+    not a commitment. Whichever is picked follows the same production
+    pattern as the existing 15: `data/<track>.py` module (categories,
+    flashcards, questions, cheat sheet, lessons if it gets full course
+    treatment), registered in `build.py`'s `TRACK_MODULES`/`TRACKS`/
+    `EXAM_CONFIG`, and passing `validate()`.
+
+## 12. More official screenshots (user's idea)
+
+- [ ] Extend the real-screenshot treatment (4 shipped so far: Resource Group
+  creation, Storage Account tabs, VM instance details, IAM role assignments —
+  see `images/portal/` and `REAL_PORTAL_SCREENSHOTS`) to more AZ-900/AZ-104
+  lessons that currently only have the hand-drawn SVG mockup.
+- [ ] Bring the same treatment to other tracks that have a real admin-console
+  UI worth showing: DP-300 (Azure SQL/Cosmos DB portal blades), AZ-305
+  (Azure landing zone / architecture-center diagrams), SC-300 (Entra ID
+  admin center), MD-102 (Intune admin center), SC-200 (Defender/Sentinel
+  portal). Same sourcing rule as before: only Microsoft's own CC BY
+  4.0-licensed MicrosoftDocs GitHub repos (`raw.githubusercontent.com` is
+  reachable even when `learn.microsoft.com` itself isn't) — never a generic
+  "free stock photo," since no such thing exists for a specific product UI.
+- [ ] More quiz/exam questions built around each new screenshot, matching
+  the existing pattern (`'image': '<key>'` on the question dict,
+  `hideDescription` so the caption doesn't give away the answer).
+
+## 13. Interactive learning games (user's idea)
+
+- [ ] **Draw-a-line matching.** The current Match game (`MatchGame` —
+  tap a term, then tap its definition) becomes a drag-a-line interaction:
+  terms in a left column, definitions in a right column, the user drags
+  from one to the other and an SVG line tracks the connection live. Needs
+  pointer/touch drag handling and a line-overlay layer; keep the existing
+  tap-to-select mode available too (as a simpler/more accessible fallback
+  for anyone on a small screen or without fine pointer control) rather than
+  replacing it outright.
+- [ ] **"Choose the more correct answer."** A comparative-judgment mode:
+  given a scenario, show two plausible-but-imperfect answers and ask which
+  is *better*, with an explanation of what makes the runner-up fall short.
+  This targets the "best answer, not just a correct one" reasoning real
+  Microsoft/CompTIA exams lean on, which today's single-best-answer
+  multiple choice doesn't quite exercise. Needs a new question shape
+  (e.g. `{"type": "compare", "scenario": ..., "optionA": ..., "optionB": ...,
+  "betterKey": "A", "why": ...}`) and its own view alongside the existing
+  `QuestionView`.
+- [ ] **Scenario Mad Libs.** A short real-world scenario paragraph with a
+  few blanks, each filled from a small set of term choices — reinforces
+  vocabulary in context instead of as an isolated flashcard front/back.
+  New per-track data (e.g. `MADLIBS`: a list of `{scenario, blanks: [{key,
+  options, correct}]}`), scored the same way everything else feeds into
+  `results`/mastery.
+- [ ] **Step-ordering / sequencing challenges.** Shuffle the steps for a
+  stated goal — "stand up a compliant Azure VM," "triage a P1 incident per
+  ITIL," "onboard a new user with proper Conditional Access" — and have the
+  user arrange them into the right order. This is a strong fit for
+  AZ-104/AZ-305/ITIL/AZ-802, where procedure order is genuinely tested, not
+  just terminology. New data (e.g. `SEQUENCES`: `{prompt, steps: [...],
+  correctOrder}`); start with simple up/down move buttons for the UI (works
+  everywhere, no drag-and-drop dependency) and treat true drag-to-reorder
+  as a later enhancement, not a blocker.
+- [ ] **Stretch, lower priority — build-your-own-scenario.** Instead of only
+  solving developer-authored sequences, let the user assemble their own
+  scenario from a bank of steps as a self-test/review tool. Since the app
+  has no accounts or backend, an authored scenario would need to persist
+  through the same localStorage/cloud-sync path as everything else
+  (extending the `results`/`stats` shape) — worth scoping in more detail
+  once the core step-ordering game above exists and its data model has
+  proven out, rather than designing both at once.
+
 ---
 
 Not in scope / deliberately not doing: crowd-sourced/disputed answer voting
