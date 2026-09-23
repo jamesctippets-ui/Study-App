@@ -75,73 +75,6 @@ function AchievementsPanel({ achievements, streak, onClose }) {
   );
 }
 
-function PathPanel({ paths, results, activeTrack, onSelectTrack, onClose }) {
-  useEscapeToClose(onClose);
-  return (
-    <div
-      onClick={onClose}
-      style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', zIndex: 50, display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}
-    >
-      <div
-        onClick={(e) => e.stopPropagation()}
-        style={{
-          background: COLOR.bg, borderTop: `1px solid ${COLOR.border}`, borderRadius: '20px 20px 0 0',
-          maxWidth: '28rem', width: '100%', maxHeight: '82vh', overflowY: 'auto', padding: '18px 18px 28px',
-          boxShadow: SHADOW.card,
-        }}
-      >
-        <div className="flex justify-between items-center mb-2">
-          <div className="itil-display" style={{ fontSize: '18px', fontWeight: 600 }}>Learning Paths</div>
-          <button onClick={onClose} className="btn-flat" style={{ color: COLOR.muted, fontSize: '15px', padding: '4px' }}>✕</button>
-        </div>
-        {paths.map((path) => {
-          const steps = path.tracks.map((s) => ({ ...s, track: TRACKS.find((t) => t.key === s.key) })).filter((s) => s.track);
-          if (!steps.length) return null;
-          return (
-            <div key={path.key} style={{ marginBottom: '18px' }}>
-              <div style={{ fontSize: '14.5px', fontWeight: 600, marginBottom: '4px' }}>{path.label}</div>
-              <div style={{ fontSize: '11.5px', color: COLOR.muted, marginBottom: '12px', lineHeight: 1.4 }}>{path.description}</div>
-              <div className="flex flex-col gap-2">
-                {steps.map((s, i) => {
-                  const pct = trackMastery(s.key, results);
-                  const isActive = s.key === activeTrack;
-                  const accent = trackAccent(s.key);
-                  return (
-                    <button
-                      key={s.key}
-                      onClick={() => onSelectTrack(s.key)}
-                      style={{
-                        textAlign: 'left', display: 'flex', alignItems: 'center', gap: '12px', padding: '10px 12px', borderRadius: '12px',
-                        background: isActive ? `${accent}1F` : COLOR.surface,
-                        border: `1px solid ${isActive ? accent : COLOR.border}`,
-                      }}
-                    >
-                      <div
-                        style={{
-                          flexShrink: 0, width: '22px', height: '22px', borderRadius: '999px', fontSize: '10.5px', fontWeight: 700,
-                          display: 'flex', alignItems: 'center', justifyContent: 'center',
-                          background: `${accent}26`, color: accent,
-                        }}
-                      >
-                        {i + 1}
-                      </div>
-                      <div style={{ flex: 1, minWidth: 0 }}>
-                        <div style={{ fontSize: '13px', fontWeight: 600, color: accent }}>{s.track.label}</div>
-                        <div style={{ fontSize: '11px', color: COLOR.muted, marginTop: '2px', lineHeight: 1.4 }}>{s.why}</div>
-                      </div>
-                      <div style={{ fontSize: '12px', fontWeight: 700, color: pct >= 70 ? COLOR.success : COLOR.muted, flexShrink: 0 }}>{pct}%</div>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-          );
-        })}
-      </div>
-    </div>
-  );
-}
-
 function DataPanel({ trackLabel, onExport, onImportFile, importMessage, onReset, onClose }) {
   useEscapeToClose(onClose);
   const [confirmingReset, setConfirmingReset] = useState(false);
@@ -237,68 +170,81 @@ function DataPanel({ trackLabel, onExport, onImportFile, importMessage, onReset,
 
 const MODE_LABELS = { learn: 'Learn', quiz: 'Quiz', exam: 'Exam' };
 
-function HomeDashboard({ tracks, results, stats, achievementsCount, achievementsTotal, onResume, onSelectTrack, onOpenAchievements, onOpenPaths, onOpenData }) {
+// The single track-navigation surface: replaces the old full-page Home
+// Dashboard and the separate Learning Paths panel with one bottom-sheet
+// menu, opened from the header's hamburger button. Every track is listed
+// exactly once (label + subtitle + live mastery %) with no path-grouping,
+// plus a "continue where you left off" shortcut reusing the existing
+// stats.lastVisited tracking — the app itself no longer auto-navigates
+// there on load, this is just a quick-resume option inside the menu.
+function TrackMenuPanel({ tracks, results, stats, activeTrack, onResume, onSelectTrack, onClose }) {
+  useEscapeToClose(onClose);
   const masteries = tracks.map((t) => ({ track: t, pct: trackMastery(t.key, results) }));
   const overallAvg = masteries.length ? Math.round(masteries.reduce((s, m) => s + m.pct, 0) / masteries.length) : 0;
   const lastVisited = stats.lastVisited;
-  const resumeTrack = lastVisited ? tracks.find((t) => t.key === lastVisited.track) : null;
-  const iconBtn = { minWidth: '40px', minHeight: '40px', padding: '6px 10px', borderRadius: '10px', border: `1px solid ${COLOR.border}`, background: 'transparent', color: COLOR.muted, fontSize: '15px', display: 'flex', alignItems: 'center', justifyContent: 'center' };
+  const resumeTrack = lastVisited && lastVisited.track !== activeTrack ? tracks.find((t) => t.key === lastVisited.track) : null;
 
   return (
-    <div>
-      <div className="flex justify-between items-start mb-4">
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <div className="itil-display" style={{ fontSize: '22px', fontWeight: 600 }}>Cert Study Hub</div>
-          <div style={{ fontSize: '12px', color: COLOR.muted, marginTop: '3px', lineHeight: 1.4 }}>
-            {stats.streak.current > 0 ? `🔥 ${stats.streak.current}-day streak · ` : ''}{overallAvg}% average mastery across {tracks.length} tracks
-          </div>
+    <div
+      onClick={onClose}
+      style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', zIndex: 50, display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        style={{
+          background: COLOR.bg, borderTop: `1px solid ${COLOR.border}`, borderRadius: '20px 20px 0 0',
+          maxWidth: '28rem', width: '100%', maxHeight: '82vh', overflowY: 'auto', padding: '18px 18px 28px',
+          boxShadow: SHADOW.card,
+        }}
+      >
+        <div className="flex justify-between items-center mb-2">
+          <div className="itil-display" style={{ fontSize: '18px', fontWeight: 600 }}>Cert Study Hub</div>
+          <button onClick={onClose} className="btn-flat" style={{ color: COLOR.muted, fontSize: '15px', padding: '4px' }}>✕</button>
         </div>
-        <div className="flex items-start gap-1" style={{ flexShrink: 0 }}>
-          <button onClick={onOpenPaths} title="Recommended study path" style={{ ...iconBtn, color: COLOR.primary }}>🗺️</button>
-          <button onClick={onOpenAchievements} title="Achievements" style={{ ...iconBtn, border: `1px solid ${COLOR.gold}`, color: COLOR.gold, fontSize: '12px', fontWeight: 600, gap: '3px' }}>
-            🏆 {achievementsCount}
+        <div style={{ fontSize: '12px', color: COLOR.muted, marginBottom: '14px' }}>
+          {stats.streak.current > 0 ? `🔥 ${stats.streak.current}-day streak · ` : ''}{overallAvg}% average mastery across {tracks.length} tracks
+        </div>
+
+        {resumeTrack && (
+          <button
+            onClick={onResume}
+            style={{
+              width: '100%', textAlign: 'left', marginBottom: '14px', padding: '14px 16px', borderRadius: '14px',
+              background: `${trackAccent(resumeTrack.key)}1F`, border: `1px solid ${trackAccent(resumeTrack.key)}`,
+              boxShadow: SHADOW.card,
+            }}
+          >
+            <div style={{ fontSize: '11px', color: COLOR.muted, marginBottom: '2px' }}>Continue where you left off</div>
+            <div style={{ fontSize: '15px', fontWeight: 600, color: trackAccent(resumeTrack.key) }}>
+              {resumeTrack.label} · {MODE_LABELS[lastVisited.mode] || 'Learn'}
+            </div>
           </button>
-          <button onClick={onOpenData} title="Data & progress" style={iconBtn}>⚙</button>
+        )}
+
+        <div style={{ fontSize: '12px', color: COLOR.muted, marginBottom: '8px' }}>All tracks</div>
+        <div className="flex flex-col gap-2">
+          {masteries.map(({ track: t, pct }) => {
+            const accent = trackAccent(t.key);
+            const isActive = t.key === activeTrack;
+            return (
+              <button
+                key={t.key}
+                onClick={() => onSelectTrack(t.key)}
+                style={{
+                  textAlign: 'left', display: 'flex', alignItems: 'center', gap: '12px', padding: '12px 14px', borderRadius: '12px',
+                  background: isActive ? `${accent}1F` : COLOR.surface,
+                  border: `1px solid ${isActive ? accent : COLOR.border}`, boxShadow: SHADOW.card,
+                }}
+              >
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontSize: '13.5px', fontWeight: 600, color: accent }}>{t.label}</div>
+                  <div style={{ fontSize: '11px', color: COLOR.muted, marginTop: '2px' }}>{t.subtitle}</div>
+                </div>
+                <div style={{ fontSize: '13px', fontWeight: 700, color: pct >= 70 ? COLOR.success : COLOR.muted, flexShrink: 0 }}>{pct}%</div>
+              </button>
+            );
+          })}
         </div>
-      </div>
-
-      {resumeTrack && (
-        <button
-          onClick={onResume}
-          style={{
-            width: '100%', textAlign: 'left', marginBottom: '18px', padding: '14px 16px', borderRadius: '14px',
-            background: `${trackAccent(resumeTrack.key)}1F`, border: `1px solid ${trackAccent(resumeTrack.key)}`,
-            boxShadow: SHADOW.card,
-          }}
-        >
-          <div style={{ fontSize: '11px', color: COLOR.muted, marginBottom: '2px' }}>Continue where you left off</div>
-          <div style={{ fontSize: '15px', fontWeight: 600, color: trackAccent(resumeTrack.key) }}>
-            {resumeTrack.label} · {MODE_LABELS[lastVisited.mode] || 'Learn'}
-          </div>
-        </button>
-      )}
-
-      <div style={{ fontSize: '12px', color: COLOR.muted, marginBottom: '8px' }}>Your tracks</div>
-      <div className="flex flex-col gap-2">
-        {masteries.map(({ track: t, pct }) => {
-          const accent = trackAccent(t.key);
-          return (
-            <button
-              key={t.key}
-              onClick={() => onSelectTrack(t.key)}
-              style={{
-                textAlign: 'left', display: 'flex', alignItems: 'center', gap: '12px', padding: '12px 14px', borderRadius: '12px',
-                background: COLOR.surface, border: `1px solid ${COLOR.border}`, boxShadow: SHADOW.card,
-              }}
-            >
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontSize: '13.5px', fontWeight: 600, color: accent }}>{t.label}</div>
-                <div style={{ fontSize: '11px', color: COLOR.muted, marginTop: '2px' }}>{t.subtitle}</div>
-              </div>
-              <div style={{ fontSize: '13px', fontWeight: 700, color: pct >= 70 ? COLOR.success : COLOR.muted, flexShrink: 0 }}>{pct}%</div>
-            </button>
-          );
-        })}
       </div>
     </div>
   );
@@ -604,7 +550,7 @@ function CheatSheetView({ trackLabel, sections, resources }) {
           fontSize: '13px', fontWeight: 600,
         }}
       >
-        🖨 Print / save as PDF
+<IconPrinter /> Print / save as PDF
       </button>
       <div id="cheat-sheet-content" className="flex flex-col gap-4">
         <div className="itil-display cheat-sheet-title" style={{ fontSize: '18px', fontWeight: 600, display: 'none' }}>

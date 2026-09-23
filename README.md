@@ -79,21 +79,25 @@ and Final Exam mode (they share the same question bank) with the
 descriptive caption deliberately hidden — showing it there would just
 hand over the answer.
 
-A 🏆 header button opens **Achievements** — 15 milestone badges (mastery,
+A trophy header button opens **Achievements** — 15 milestone badges (mastery,
 streaks, quiz/exam/match counts, course completion) plus a daily streak
 counter, all computed from progress already being tracked, no new data
-entry required. A **🗺️ Recommended study path** button opens a panel with
-two named paths toward different goals (see `data/paths.py`), each step
-showing why it's there and live per-track mastery. A **⚙ Data & progress**
-button opens export/import (download all progress as a JSON file, or restore
-from one — the only backup/device-migration option, since the app has no
-accounts) alongside the existing per-track reset.
+entry required. A gear **Data & progress** button opens export/import
+(download all progress as a JSON file, or restore from one — the only
+backup/device-migration option, since the app has no accounts) alongside
+the existing per-track reset. Both use small wireframe (line-art) icons
+rather than emoji, matching the hamburger menu below.
 
-Opening the app lands on a **home dashboard** first — average mastery across
-every track, the daily streak, a "continue where you left off" card
-remembering the last track+mode you were in, and a tappable list of every
-track with its live mastery %. A 🏠 button in any track's header returns to
-it. Quiz and Exam missed-question review lists now show each question's
+Opening the app always lands straight on **AZ-900 → Learn → Study** — no
+separate home/dashboard page to land on first, so a refresh never feels
+like it "lost your place" the way a full landing screen did. A ☰ hamburger
+button in the header opens the **track menu** (`TrackMenuPanel` in
+`04_shared_ui.jsx`): overall average mastery across every track, the daily
+streak, an optional "continue where you left off" shortcut remembering the
+last track+mode you were in, and a flat list of all 15 tracks — each shown
+exactly once with its description and live mastery % (no path-grouping;
+the earlier Learning Paths feature was removed in favor of this simpler
+list). Quiz and Exam missed-question review lists show each question's
 explanation alongside the prompt, not just what you got wrong.
 
 **Fifteen tracks, all visible in the track switcher:**

@@ -8,20 +8,15 @@ yet — this is the list to work through, roughly ordered by impact vs. effort
 within each section. Check items off as they land, and add new ones as they
 come up.
 
-## 1. Multi-cert learning paths (user's idea)
+## 1. Multi-cert learning paths (user's idea — removed)
 
-- [x] A **Path** mode that sequences multiple tracks in a recommended order
-  for a stated goal, instead of the user picking tracks independently. Shipped
-  as the "Hospital Microsoft Engineer" path (AZ-900 → AZ-104 → DP-900 →
-  DP-300 → AZ-802 → SC-300 → SC-500 → AZ-305 → EHR Integration), opened from
-  the "🗺️ Recommended study path" button — each step shows why it's there and
-  live per-track mastery. data/paths.py can hold more than one named path.
-- [ ] Prerequisite awareness: flag when a track assumes knowledge from an
-  earlier one in the path (AZ-104-level hands-on knowledge is a stated
-  prerequisite mindset for AZ-305, for example).
-- [ ] A combined progress view across an entire path, not just per-track.
-- [ ] Support more than one named path (e.g. a security-focused path vs. an
-  architecture-focused path) since different goals want different orders.
+- [x] ~~A **Path** mode that sequences multiple tracks in a recommended
+  order for a stated goal~~ Shipped, then **removed**: the user found
+  path-grouping got in the way of just picking a cert directly, and asked
+  for a flat list of every track (shown once, with its description) instead
+  of any path-based navigation. `data/paths.py`, `PathPanel`, and the
+  `PATHS`/`showPaths` wiring are gone; `TrackMenuPanel` in
+  `04_shared_ui.jsx` is the replacement track picker (see section 6).
 
 ## 2. Content beyond the direct exam scope (user's idea)
 
@@ -76,14 +71,19 @@ come up.
 - [ ] Real client-side routing instead of pure in-memory tab state, so the
   browser back button, refresh, and deep links to a specific track/mode/
   lesson all work as a user would expect from a "real" multi-page app.
-- [x] A proper **home/dashboard** page — overall progress across every track,
-  streak, and a "pick up where you left off" action — instead of always
-  landing straight into one track's Cards view. Shipped as the app's new
-  landing screen (src/js/06_app.jsx's `view` state), with a 🏠 button in the
-  track header to return to it.
-- [ ] A side/hamburger menu for track + mode navigation once the track list
-  and mode list have both grown past what a button row or dropdown handles
-  gracefully together.
+- [x] ~~A proper **home/dashboard** page as the default landing screen~~
+  Shipped, then reworked: refreshing into a separate dashboard page felt
+  clunky for a static site with no real routing, so the app now defaults
+  straight into AZ-900 → Learn → Study on every load (no more `view` state
+  in `06_app.jsx`). Overall progress, streak, and "continue where you left
+  off" moved into the new hamburger menu (below) instead of a full page.
+- [x] A side/hamburger **menu** for track navigation (☰, `IconMenu` in
+  src/js/00_preamble.js) — opens `TrackMenuPanel` (04_shared_ui.jsx),
+  which shows overall average mastery + streak, an optional "continue
+  where you left off" shortcut, and a flat list of all 15 tracks (each
+  once, with its description and live mastery %) — no path-grouping, no
+  separate dropdown. Achievements and Data & Progress stay as their own
+  quick-access header buttons alongside the hamburger.
 
 ## 7. Spaced repetition & study-science features (from research)
 
@@ -166,6 +166,17 @@ come up.
   at the bottom of a lesson is a collapsed, expandable block (same
   show/hide pattern as the existing "fundamentals" toggle) instead of
   always being fully expanded.
+- [x] **Wireframe icons for menu chrome.** The hamburger, achievements,
+  settings, and cheat-sheet print buttons now use small inline-SVG
+  line-art icons (`IconMenu`/`IconTrophy`/`IconSettings`/`IconPrinter` in
+  src/js/00_preamble.js) instead of emoji. Achievement badge icons and the
+  inline streak 🔥 are left as emoji — those are content, not menu chrome.
+- [x] **Service worker cache-busting discipline.** A stale cached
+  `index.html` on a returning visitor's device made a real content update
+  (Cloud+ was actually fine) look like a missing/regressed track. Bumped
+  `CACHE_NAME` in `service-worker.js`, and any future commit that changes
+  `index.html` needs the same bump so the cache-first fetch handler
+  doesn't keep serving an old snapshot indefinitely.
 
 ## 10. Future-proofing for a standalone web/iOS/Android app (user's idea — lowest priority, not being worked on)
 

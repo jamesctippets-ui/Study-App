@@ -17,7 +17,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent
 sys.path.insert(0, str(ROOT))
 
-from data import tracks, paths, itil, az900, ab650, az104, dp900, dp300, az305, az802, az140, md102, sc300, sc200, sc500, cloudplus, ehrintegration
+from data import tracks, itil, az900, ab650, az104, dp900, dp300, az305, az802, az140, md102, sc300, sc200, sc500, cloudplus, ehrintegration
 
 TRACK_MODULES = {
     "itil": itil,
@@ -59,20 +59,6 @@ def validate():
                     errors.append(f"[{key}] a resources entry is missing a 'label' or 'url'")
                 elif not r["url"].startswith("http"):
                     errors.append(f"[{key}] resource '{r['label']}' has a non-http url: {r['url']!r}")
-
-    seen_path_keys = set()
-    for path in paths.PATHS:
-        if path["key"] in seen_path_keys:
-            errors.append(f"duplicate path key '{path['key']}'")
-        seen_path_keys.add(path["key"])
-
-        seen_step_keys = set()
-        for step in path["tracks"]:
-            if step["key"] not in track_keys:
-                errors.append(f"path '{path['key']}' references unknown track '{step['key']}'")
-            if step["key"] in seen_step_keys:
-                errors.append(f"path '{path['key']}' lists track '{step['key']}' more than once")
-            seen_step_keys.add(step["key"])
 
     for key, mod in TRACK_MODULES.items():
         cat_keys = {c["key"] for c in mod.CATEGORIES}
@@ -211,7 +197,6 @@ def build_data_json():
             f"const STORAGE_KEY = {json.dumps(tracks.STORAGE_KEY)};",
             f"const TRACKS = {json.dumps(tracks.TRACKS)};",
             f"const EXAM_CONFIG = {json.dumps(tracks.EXAM_CONFIG)};",
-            f"const PATHS = {json.dumps(paths.PATHS)};",
             f"const DATA = {json.dumps(data)};",
         ]
     )

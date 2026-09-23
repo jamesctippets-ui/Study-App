@@ -1,10 +1,9 @@
 /* ---------------- main app ---------------- */
 
 function CertStudyApp() {
-  const [view, setView] = useState('home');
   const [activeTrack, setActiveTrack] = useState('az900');
   const [mode, setMode] = useState('learn');
-  const [learnView, setLearnView] = useState('cards');
+  const [learnView, setLearnView] = useState('study');
   const [activeCat, setActiveCat] = useState('all');
   const [results, setResults] = useState(emptyTrackMap);
   const [seenLog, setSeenLog] = useState(emptyTrackMap);
@@ -15,7 +14,7 @@ function CertStudyApp() {
   const [stats, setStats] = useState(emptyStats);
   const [showAchievements, setShowAchievements] = useState(false);
   const [toastAchievement, setToastAchievement] = useState(null);
-  const [showPaths, setShowPaths] = useState(false);
+  const [showMenu, setShowMenu] = useState(false);
   const [showData, setShowData] = useState(false);
   const [importMessage, setImportMessage] = useState(null);
 
@@ -300,22 +299,22 @@ function CertStudyApp() {
     // eslint-disable-next-line
   }, [mode, activeCat, quizLength, typesKey, activeTrack]);
 
-  // Tracks the last track+mode actually visited (not the home dashboard
-  // itself) so the dashboard's "continue where you left off" button has
-  // somewhere real to send you. Skipped until the initial cloud/local sync
-  // finishes, so it can't stomp a freshly-loaded lastVisited with the
-  // component's default state. Declared after the quiz-session-start effect
-  // above (also keyed on activeTrack/mode) so that when both fire in the
-  // same commit, this one's persistPayload call — which folds its update
-  // onto the same `stats` closure — runs last and its write isn't the one
-  // that gets overwritten.
+  // Tracks the last track+mode actually visited so the track menu's
+  // "continue where you left off" button has somewhere real to send you.
+  // Skipped until the initial cloud/local sync finishes, so it can't stomp
+  // a freshly-loaded lastVisited with the component's default state.
+  // Declared after the quiz-session-start effect above (also keyed on
+  // activeTrack/mode) so that when both fire in the same commit, this
+  // one's persistPayload call — which folds its update onto the same
+  // `stats` closure — runs last and its write isn't the one that gets
+  // overwritten.
   useEffect(() => {
-    if (syncMode === 'loading' || view !== 'track') return;
+    if (syncMode === 'loading') return;
     const current = stats.lastVisited;
     if (current && current.track === activeTrack && current.mode === mode) return;
     saveStats({ ...stats, lastVisited: { track: activeTrack, mode } });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [view, activeTrack, mode, syncMode]);
+  }, [activeTrack, mode, syncMode]);
 
   const startMissedSession = () => {
     const pool = questionsData.filter((q) => trackResults[q.id] === 'incorrect');
@@ -581,13 +580,18 @@ function CertStudyApp() {
           onClose={() => setShowAchievements(false)}
         />
       )}
-      {showPaths && (
-        <PathPanel
-          paths={PATHS}
+      {showMenu && (
+        <TrackMenuPanel
+          tracks={visibleTracks}
           results={results}
+          stats={stats}
           activeTrack={activeTrack}
-          onSelectTrack={(key) => { setActiveTrack(key); setShowPaths(false); }}
-          onClose={() => setShowPaths(false)}
+          onResume={() => {
+            if (stats.lastVisited) { setActiveTrack(stats.lastVisited.track); setMode(stats.lastVisited.mode); }
+            setShowMenu(false);
+          }}
+          onSelectTrack={(key) => { setActiveTrack(key); setShowMenu(false); }}
+          onClose={() => setShowMenu(false)}
         />
       )}
       {showData && (
@@ -601,101 +605,47 @@ function CertStudyApp() {
         />
       )}
       <div className="max-w-md mx-auto px-4 py-5">
-        {view === 'home' ? (
-          <HomeDashboard
-            tracks={visibleTracks}
-            results={results}
-            stats={stats}
-            achievementsCount={stats.unlocked.length}
-            achievementsTotal={achievements.length}
-            onResume={() => {
-              if (stats.lastVisited) { setActiveTrack(stats.lastVisited.track); setMode(stats.lastVisited.mode); }
-              setView('track');
-            }}
-            onSelectTrack={(key) => { setActiveTrack(key); setView('track'); }}
-            onOpenAchievements={() => setShowAchievements(true)}
-            onOpenPaths={() => setShowPaths(true)}
-            onOpenData={() => { setImportMessage(null); setShowData(true); }}
-          />
-        ) : (
-        <React.Fragment>
         <div className="flex justify-between items-start mb-4">
           <div style={{ flex: 1, minWidth: 0, position: 'relative', paddingRight: '10px' }}>
             <button
-              onClick={() => setView('home')}
-              title="Home"
+              onClick={() => setShowMenu(true)}
+              title="Menu"
               style={{
                 display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: '26px', height: '26px',
-                borderRadius: '8px', border: 'none', background: 'transparent', color: COLOR.muted, fontSize: '15px',
+                borderRadius: '8px', border: 'none', background: 'transparent', color: COLOR.muted,
                 marginBottom: '2px', padding: 0,
               }}
             >
-              🏠
+              <IconMenu />
             </button>
-            {visibleTracks.length > 1 ? (
-              <select
-                value={activeTrack}
-                onChange={(e) => setActiveTrack(e.target.value)}
-                className="itil-display"
-                style={{
-                  display: 'block', width: '100%', fontSize: '21px', fontWeight: 600, lineHeight: 1.2,
-                  color: trackAccent(activeTrack), background: 'transparent', border: 'none', padding: 0,
-                  WebkitAppearance: 'none', MozAppearance: 'none', appearance: 'none',
-                }}
-              >
-                {visibleTracks.map((t) => (
-                  <option key={t.key} value={t.key} style={{ background: COLOR.surface, color: COLOR.text }}>
-                    {t.label}
-                  </option>
-                ))}
-              </select>
-            ) : null}
-            {visibleTracks.length > 1 && (
-              <span style={{ position: 'absolute', top: '3px', right: '-4px', fontSize: '12px', color: trackAccent(activeTrack), pointerEvents: 'none' }}>▾</span>
-            )}
-            {visibleTracks.length <= 1 && (
-              <div className="itil-display" style={{ fontSize: '21px', fontWeight: 600, lineHeight: 1.2 }}>{track.label}</div>
-            )}
+            <div className="itil-display" style={{ fontSize: '21px', fontWeight: 600, lineHeight: 1.2, color: trackAccent(activeTrack) }}>{track.label}</div>
             <div style={{ fontSize: '12px', color: COLOR.muted, marginTop: '2px' }}>{track.subtitle}</div>
           </div>
           <div className="flex items-start gap-1" style={{ flexShrink: 0 }}>
             <div style={{ textAlign: 'right', marginRight: '2px' }}>
               <div style={{ fontSize: '18px', fontWeight: 700, color: COLOR.success }}>{overallMastery}%</div>
             </div>
-            {PATHS.length > 0 && (
-              <button
-                onClick={() => setShowPaths(true)}
-                title="Recommended study path"
-                style={{
-                  minWidth: '40px', minHeight: '40px', padding: '6px 10px', borderRadius: '10px',
-                  border: `1px solid ${COLOR.border}`, background: 'transparent', color: COLOR.primary, fontSize: '15px',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                }}
-              >
-                🗺️
-              </button>
-            )}
             <button
               onClick={() => setShowAchievements(true)}
               title="Achievements"
               style={{
                 minWidth: '40px', minHeight: '40px', padding: '6px 10px', borderRadius: '10px',
                 border: `1px solid ${COLOR.gold}`, background: 'transparent', color: COLOR.gold, fontSize: '12px', fontWeight: 600,
-                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '3px',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px',
               }}
             >
-              🏆 {stats.unlocked.length}
+              <IconTrophy /> {stats.unlocked.length}
             </button>
             <button
               onClick={() => { setImportMessage(null); setShowData(true); }}
               title="Data & progress"
               style={{
                 minWidth: '40px', minHeight: '40px', padding: '6px 10px', borderRadius: '10px',
-                border: `1px solid ${COLOR.border}`, background: 'transparent', color: COLOR.muted, fontSize: '15px',
+                border: `1px solid ${COLOR.border}`, background: 'transparent', color: COLOR.muted,
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
               }}
             >
-              ⚙
+              <IconSettings />
             </button>
           </div>
         </div>
@@ -961,8 +911,6 @@ function CertStudyApp() {
             ))}
           </div>
         </div>
-        </React.Fragment>
-        )}
       </div>
     </div>
   );
