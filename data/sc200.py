@@ -300,6 +300,20 @@ FLASHCARDS = [
         'back': "A model describing the sequential stages of an attack — reconnaissance, initial access, execution, persistence, lateral movement, and exfiltration/impact — used to reason about how far an intrusion has progressed and what to look for at each stage.",
         'detail': "MITRE ATT&CK coverage in Sentinel maps specific attacker techniques onto roughly this same progression, giving each analytics rule a stage in the chain it's meant to detect.",
     },
+    {
+        'id': 'f42',
+        'cat': 'respondIncidents',
+        'front': "Incident severity vs. entity risk score",
+        'back': "An incident's severity (Informational through High) reflects how serious the underlying detection is. A separate entity risk score, driven by UEBA, reflects how anomalous a specific user or device's behavior has been over time — a High-severity incident can involve a normally low-risk user, and vice versa.",
+        'detail': "Sentinel incident management: status, severity, and assignment covers triage workflow; entity risk score is one extra signal that helps decide how urgently to act on a given incident.",
+    },
+    {
+        'id': 'f43',
+        'cat': 'manageSecOps',
+        'front': "Microsoft Defender portal (security.microsoft.com)",
+        'back': "The unified console where Defender XDR's correlated incidents, Sentinel (once onboarded to the unified experience), and each individual Defender product's own settings are all managed from one place, instead of separate per-product portals.",
+        'detail': "The bidirectional sync between Sentinel and Defender XDR incidents is what keeps an incident consistent whether it's worked from this unified portal or Sentinel's own dedicated blade in Azure.",
+    },
 ]
 
 QUESTIONS = [

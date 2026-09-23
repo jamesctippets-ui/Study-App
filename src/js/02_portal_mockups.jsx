@@ -118,6 +118,56 @@ function MockupDeploymentSlot() {
   );
 }
 
+function MockupNsgRule() {
+  return (
+    <PortalFrame height={175}>
+      <text x={12} y={40} fill={COLOR.text} fontSize="9" fontWeight="700">Add inbound security rule</text>
+      <MockField x={12} y={52} w={140} h={18} label="Source" value="Any" />
+      <MockField x={160} y={52} w={148} h={18} label="Destination port ranges" value="8080" highlight />
+      <text x={12} y={86} fill={COLOR.muted} fontSize="7">Action</text>
+      <rect x={12} y={90} width="70" height="18" rx="4" fill="rgba(52,211,153,0.14)" stroke={COLOR.success} strokeWidth="1" />
+      <text x={47} y={102} textAnchor="middle" fill={COLOR.success} fontSize="7.5">● Allow</text>
+      <rect x={90} y={90} width="70" height="18" rx="4" fill={COLOR.surface} stroke={COLOR.border} strokeWidth="1" />
+      <text x={125} y={102} textAnchor="middle" fill={COLOR.muted} fontSize="7.5">○ Deny</text>
+      <MockField x={12} y={122} w={140} h={18} label="Priority" value="100" highlight />
+      <MockField x={160} y={122} w={148} h={18} label="Name" value="AllowCustom8080" />
+    </PortalFrame>
+  );
+}
+
+function MockupPolicyCompliance() {
+  return (
+    <PortalFrame height={150}>
+      <text x={12} y={40} fill={COLOR.text} fontSize="9" fontWeight="700">Get Secure — initiative compliance</text>
+      <text x={12} y={58} fill={COLOR.muted} fontSize="7">Overall resource compliance</text>
+      <text x={12} y={78} fill={COLOR.success} fontSize="16" fontWeight="700">100%</text>
+      <rect x={12} y={86} width="150" height="4" rx="2" fill={COLOR.success} />
+      <text x={180} y={58} fill={COLOR.muted} fontSize="7">Non-compliant policies</text>
+      <text x={180} y={78} fill={COLOR.text} fontSize="16" fontWeight="700">0</text>
+      <text x={12} y={112} fill={COLOR.muted} fontSize="7">Policies</text>
+      <rect x={12} y={118} width="296" height="18" rx="4" fill={COLOR.surface} stroke={COLOR.border} strokeWidth="1" />
+      <text x={18} y={130} fill={COLOR.text} fontSize="7.5">Allowed locations</text>
+      <text x={260} y={130} fill={COLOR.success} fontSize="7.5">✓ Compliant</text>
+    </PortalFrame>
+  );
+}
+
+function MockupBackupVault() {
+  return (
+    <PortalFrame height={150}>
+      <text x={12} y={40} fill={COLOR.text} fontSize="9" fontWeight="700">Backup Configuration</text>
+      <text x={12} y={58} fill={COLOR.muted} fontSize="7">Storage replication type</text>
+      <rect x={12} y={64} width="140" height="18" rx="4" fill={COLOR.surface} stroke={COLOR.border} strokeWidth="1" />
+      <text x={82} y={76} textAnchor="middle" fill={COLOR.muted} fontSize="7.5">○ Locally-redundant</text>
+      <rect x={160} y={64} width="148" height="18" rx="4" fill="rgba(167,139,250,0.14)" stroke={COLOR.primary} strokeWidth="1" />
+      <text x={234} y={76} textAnchor="middle" fill={COLOR.primary} fontSize="7.5">● Geo-redundant</text>
+      <MockField x={12} y={98} w={296} h={18} label="Cross Region Restore" value="Disabled" />
+      <rect x={230} y={126} width="78" height="18" rx="4" fill={COLOR.primary} />
+      <text x={269} y={138} textAnchor="middle" fill="#2B1620" fontSize="8" fontWeight="700">Apply</text>
+    </PortalFrame>
+  );
+}
+
 const PORTAL_MOCKUPS = {
   resourceGroup: MockupResourceGroup,
   virtualNetwork: MockupVirtualNetwork,
@@ -125,6 +175,9 @@ const PORTAL_MOCKUPS = {
   vmSize: MockupVmSize,
   roleAssignment: MockupRoleAssignment,
   deploymentSlot: MockupDeploymentSlot,
+  nsgRule: MockupNsgRule,
+  policyCompliance: MockupPolicyCompliance,
+  backupVault: MockupBackupVault,
 };
 
 // Real Azure Portal screenshots, pulled directly from Microsoft's own public
@@ -170,6 +223,27 @@ const REAL_PORTAL_SCREENSHOTS = {
     description: 'The "Add Slot" panel opened from an App Service\'s Deployment slots blade — naming the new slot ("staging"), the auto-generated URL that slot gets, and the "Clone settings from" option for copying configuration from an existing slot instead of starting blank.',
     sourceLabel: 'Microsoft Learn: Set up staging environments for App Service',
     sourceUrl: 'https://learn.microsoft.com/en-us/azure/app-service/deploy-staging-slots',
+  },
+  nsgRule: {
+    src: 'images/portal/nsg-rule.png',
+    alt: 'Real Azure Portal screenshot of the Add inbound security rule panel for a network security group',
+    description: 'The "Add inbound security rule" panel for a network security group — source, destination port range, the Allow/Deny action toggle, and the Priority field that decides which rule wins when two rules could both apply to the same traffic.',
+    sourceLabel: 'Microsoft Learn: Manage network security groups',
+    sourceUrl: 'https://learn.microsoft.com/en-us/azure/virtual-network/manage-network-security-group',
+  },
+  policyCompliance: {
+    src: 'images/portal/policy-compliance.png',
+    alt: 'Real Azure Portal screenshot of an Azure Policy initiative compliance dashboard',
+    description: 'An Azure Policy initiative\'s compliance dashboard — overall resource compliance at a glance (100% here), a count of non-compliant policies, and the per-policy breakdown below showing each individual policy\'s current compliance state.',
+    sourceLabel: 'Microsoft Learn: Create and manage policies to enforce compliance',
+    sourceUrl: 'https://learn.microsoft.com/en-us/azure/governance/policy/tutorials/create-and-manage',
+  },
+  backupVault: {
+    src: 'images/portal/backup-vault.png',
+    alt: 'Real Azure Portal screenshot of a Recovery Services vault\'s Backup Configuration panel',
+    description: 'A Recovery Services vault\'s Backup Configuration panel — the storage replication type choice (locally-redundant vs. geo-redundant) that decides whether backup data itself would survive a full regional outage, plus the Cross Region Restore toggle.',
+    sourceLabel: 'Microsoft Learn: Create and configure a Recovery Services vault',
+    sourceUrl: 'https://learn.microsoft.com/en-us/azure/backup/backup-create-recovery-services-vault',
   },
 };
 

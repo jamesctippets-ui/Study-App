@@ -271,9 +271,9 @@ stay wherever you're running it.
   currently pure Python. Worth doing if load time on a phone still feels slow; hold
   off otherwise.
 - **AZ-104 and ITIL are feature-complete on data, but AZ-104's course still only has
-  5 of 7 lessons with a diagram and 4 of 7 with a portal mockup** (Identities & Access,
-  Networking, and Monitoring & Recovery still have neither — App Hosting & IaC just
-  got both, including a 5th real screenshot) — same gap pattern AZ-900 started with.
+  5 of 7 lessons with a diagram and 6 of 7 with a portal mockup** (only Identities &
+  Access has neither — Networking, Monitoring & Recovery, and App Hosting & IaC all
+  got a mockup plus a real screenshot recently) — same gap pattern AZ-900 started with.
 - **ITIL and Cloud+ have no course/lesson mode at all yet** — same format as AZ-900
   and AZ-104 would extend cleanly, reusing the existing `DBox`/`DLine`/`PortalFrame`
   diagram helpers.

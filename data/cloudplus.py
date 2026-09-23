@@ -342,6 +342,27 @@ FLASHCARDS = [
         'back': 'A documented, step-by-step procedure for a specific operational task or incident response, written so it can be followed consistently by different people (or triggered automatically) with the same result each time.',
         'detail': 'A runbook is what automation vs. orchestration tooling actually executes — the runbook is the procedure; automation/orchestration is what carries it out without a human doing each step by hand.',
     },
+    {
+        'id': 'f47',
+        'cat': 'archDesign',
+        'front': 'Load balancer health checks',
+        'back': "A periodic probe the load balancer sends to each backend instance to confirm it's actually able to serve traffic — an instance that fails enough consecutive checks is automatically taken out of rotation until it passes again.",
+        'detail': "This is what makes load balancing algorithms actually resilient to a failed instance — the algorithm only ever picks among instances the health check currently considers healthy.",
+    },
+    {
+        'id': 'f48',
+        'cat': 'security',
+        'front': 'Firewall as a Service (FWaaS)',
+        'back': 'A cloud-delivered, centrally managed firewall service applied across an environment without deploying and maintaining physical or virtual firewall appliances at every location.',
+        'detail': 'FWaaS commonly layers both stateful vs. stateless packet filtering and IDS vs. IPS-style inspection into one managed service rather than stitching those together from separate appliances.',
+    },
+    {
+        'id': 'f49',
+        'cat': 'archDesign',
+        'front': 'Service mesh',
+        'back': "A dedicated infrastructure layer (typically sidecar proxies alongside each service) that handles service-to-service traffic concerns — routing, retries, encryption, observability — without every microservice implementing that logic itself.",
+        'detail': "In a Kubernetes: pod, node, and cluster environment, a service mesh's sidecar proxies are commonly injected into each pod, working alongside the containers rather than replacing them.",
+    },
 ]
 
 QUESTIONS = [

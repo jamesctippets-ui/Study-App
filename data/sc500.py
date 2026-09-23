@@ -321,6 +321,20 @@ FLASHCARDS = [
         'back': 'Verify explicitly, use least-privilege access, and assume breach — treating every request as coming from an untrusted network regardless of where it originates, rather than trusting anything just because it’s "inside the perimeter."',
         'detail': 'Continuous Access Evaluation (CAE) vs. static token lifetimes and Just-in-time (JIT) VM access are both concrete implementations of "assume breach" and "least privilege" in practice, not abstract ideas on their own.',
     },
+    {
+        'id': 'f50',
+        'cat': 'dataNetworkSecurity',
+        'front': 'Customer-managed keys (CMK) vs. Microsoft-managed keys',
+        'back': "By default, Azure encrypts data at rest with Microsoft-managed keys, with no setup required. Customer-managed keys let an organization supply and control its own key, stored in Azure Key Vault access model: RBAC permission model vs. vault access policies, for scenarios needing direct control over key rotation and revocation.",
+        'detail': "Revoking or deleting a customer-managed key immediately makes the encrypted data inaccessible — a powerful compliance control, but also a real operational risk if the key is lost without a proper backup.",
+    },
+    {
+        'id': 'f51',
+        'cat': 'aiComputeSecurity',
+        'front': 'Confidential computing',
+        'back': 'Encrypts data while it is actively in use in memory, inside a hardware-backed trusted execution environment, protecting it even from a privileged administrator or the cloud provider’s own infrastructure — not just data at rest or in transit.',
+        'detail': "This closes the one gap that server-side encryption (SSE) vs. Azure Disk Encryption (ADE) vs. encryption at host don't: none of those protect data while it's actually being processed in memory.",
+    },
 ]
 
 QUESTIONS = [

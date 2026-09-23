@@ -293,6 +293,27 @@ FLASHCARDS = [
         'back': 'A Microsoft Purview tool showing exactly which items across the tenant currently carry a given sensitivity label or match specific sensitive information types, letting an admin see the real scope of sensitive content before or after rolling out a policy.',
         'detail': "This is where you'd confirm a Data loss prevention (DLP) policy anatomy actually targets the content you think it does, rather than assuming from the policy definition alone.",
     },
+    {
+        'id': 'f41',
+        'cat': 'tenantConfig',
+        'front': 'Mail flow rules (transport rules)',
+        'back': 'Exchange Online rules that inspect messages in transit and take an action — add a disclaimer, redirect, block, or apply encryption — based on conditions like sender, recipient, or message content.',
+        'detail': 'A Message trace shows what actually happened to one message after the fact; a mail flow rule is what decides what happens to messages matching a condition going forward.',
+    },
+    {
+        'id': 'f42',
+        'cat': 'governSecure',
+        'front': 'Activity explorer',
+        'back': 'A Microsoft Purview tool showing what actually happened to labeled or sensitive content over time — copied, printed, shared externally — as opposed to Content explorer’s snapshot of where that content currently sits.',
+        'detail': 'Content explorer answers "where is this sensitive content right now"; Activity explorer answers "what has been done with it" — both draw on the same underlying classification.',
+    },
+    {
+        'id': 'f43',
+        'cat': 'governSecure',
+        'front': 'Litigation hold vs. retention policy',
+        'back': "A litigation hold is applied to an individual mailbox to preserve all its content indefinitely (or for a set period) for legal reasons, independent of any organization-wide policy. A retention policy vs. retention label instead applies a consistent retain/delete rule across a broader set of content.",
+        'detail': 'A litigation hold on one mailbox can keep content longer than what an organization-wide retention policy would otherwise delete — the more restrictive (longer-retaining) rule always wins when both apply.',
+    },
 ]
 
 QUESTIONS = [

@@ -257,9 +257,9 @@ FLASHCARDS = [
     {
         'id': 'f35',
         'cat': 'identityGovernance',
-        'front': 'Azure landing zone',
-        'back': 'A pre-provisioned environment — subscriptions, management groups, policy, networking, and identity baseline already in place — that new workloads land into, instead of every project starting infrastructure from a blank subscription.',
-        'detail': 'A well-designed landing zone bakes in governance up front, so individual project teams inherit compliant Azure Policy and RBAC scope and inheritance rather than reinventing it per workload.',
+        'front': 'Cloud Adoption Framework (CAF)',
+        'back': "Microsoft's end-to-end guidance for an organization's cloud journey — strategy, planning, readiness, adoption, governance, and management — that Azure landing zones are the concrete, deployable implementation of.",
+        'detail': 'CAF is the "why and how to think about it" methodology; a landing zone is the actual environment you get by following it.',
     },
     {
         'id': 'f36',
@@ -281,6 +281,20 @@ FLASHCARDS = [
         'front': 'Infrastructure as Code (IaC)',
         'back': 'Defining infrastructure in declarative template files (ARM, Bicep, or Terraform) that can be version-controlled, reviewed, and deployed repeatably, instead of manually clicking through the Azure portal.',
         'detail': 'A design requirement for consistent, repeatable, auditable deployments across multiple environments is a strong signal that IaC belongs in the answer, not manual provisioning.',
+    },
+    {
+        'id': 'f39',
+        'cat': 'dataStorage',
+        'front': 'Geo-zone-redundant storage (GZRS)',
+        'back': 'Combines zone-redundant storage (ZRS) synchronous replication within the primary region with asynchronous replication to a second, paired region — protecting against both a zone failure and a full regional outage in one redundancy setting.',
+        'detail': "This is the strongest option among storage redundancy: LRS, ZRS, GRS, and GZRS for a design that must survive a regional outage without sacrificing the zone-level durability ZRS already provides day to day.",
+    },
+    {
+        'id': 'f40',
+        'cat': 'identityGovernance',
+        'front': 'Diagnostic settings',
+        'back': "The configuration on an Azure resource that routes its platform logs and metrics to a destination — a Log Analytics workspace, storage account, or Event Hub — since resource logs aren't collected anywhere by default until a diagnostic setting sends them there.",
+        'detail': "This is the piece a design is missing if Azure Monitor Metrics vs. Logs mentions a log type that never seems to show up anywhere — the resource-level diagnostic setting to actually emit it hasn't been configured.",
     },
 ]
 

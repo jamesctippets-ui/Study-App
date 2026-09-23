@@ -1715,6 +1715,7 @@ Zero Trust is the security philosophy underlying a lot of this: never assume tru
         'title': 'Cost, Policy & Monitoring',
         'summary': 'Keeping an environment compliant, affordable, and healthy day to day.',
         'diagram': None,
+        'portalMockup': 'policyCompliance',
         'vocabIds': ['f37', 'f38', 'f39', 'f40', 'f41', 'f42', 'f43', 'f44', 'f45', 'f46', 'f47', 'f48'],
         'quizIds': ['q27', 'q28', 'q33', 'q29', 'q31', 'msq17'],
         'reading': """Managing an Azure environment day to day means keeping an eye on cost, compliance, and health. Azure Policy enforces configuration rules, like requiring a specific region, and can even block a deployment outright if it doesn't comply. Resource locks add a separate layer of protection on individual resources, preventing accidental deletion or changes regardless of a user's normal permissions.

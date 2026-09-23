@@ -306,6 +306,20 @@ FLASHCARDS = [
         "back": "A VPN gateway solution managed through Intune that gives managed iOS/iPadOS and Android devices per-app or full-device access to on-premises resources, without a separate third-party VPN client or infrastructure.",
         "detail": "Microsoft Tunnel is typically paired with app protection policies (MAM) vs mobile device management scenarios where a device may be unmanaged but a specific app still needs a secure tunnel.",
     },
+    {
+        "id": "f42",
+        "cat": "manageDevices",
+        "front": "Autopilot Reset",
+        "back": "Wipes a Windows device back to a business-ready state — reapplying Autopilot provisioning and Intune policies — while keeping the device's Entra ID/Intune enrollment, so it doesn't need to go through Windows Autopilot device preparation vs classic Autopilot from scratch.",
+        "detail": "This is the fast option for reissuing a device to a new employee or recovering a misconfigured one, since it skips the enrollment step entirely rather than repeating it.",
+    },
+    {
+        "id": "f43",
+        "cat": "optimizeOps",
+        "front": "Update rollback (uninstalling a quality update)",
+        "back": "Removing a specific installed quality update from a device that regressed after it, distinct from Safeguard holds on feature updates, which instead prevent a device from ever receiving that update in the first place.",
+        "detail": "A safeguard hold is proactive prevention before an update lands; a rollback is reactive cleanup after it already did and caused a problem.",
+    },
 ]
 
 QUESTIONS = [

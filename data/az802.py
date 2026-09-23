@@ -216,7 +216,7 @@ FLASHCARDS = [
         'cat': 'storage',
         'front': 'DFS Namespaces vs. DFS Replication',
         'back': "DFS Namespaces (DFS-N) presents a single logical folder path (like \\\\contoso\\shares) that transparently points to shared folders on one or more servers. DFS Replication (DFS-R) keeps the actual folder contents synchronized between multiple servers so any of them can serve current data.",
-        'detail': "They're commonly used together — DFS-R keeps the copies in sync, while DFS-N gives users one path that resolves to whichever in-sync copy is closest or available — but each can be deployed independently of the other.",
+        'detail': "They're commonly used together — DFS-R keeps the copies in sync, while DFS-N gives users one path that resolves to whichever in-sync copy is closest or available — but each can be deployed independently of the other. Storage Replica solves a related but block-level replication problem, not a file-share one.",
     },
     {
         'id': 'f26',
@@ -230,7 +230,7 @@ FLASHCARDS = [
         'cat': 'storage',
         'front': 'Storage Spaces Direct (S2D)',
         'back': "S2D pools local, direct-attached storage (typically SATA/NVMe/SAS disks) across the nodes of a failover cluster into a single software-defined storage pool, enabling hyperconverged infrastructure without a separate SAN.",
-        'detail': "S2D requires a functioning failover cluster underneath it — it's a storage feature built on top of clustering, not a replacement for it.",
+        'detail': "S2D requires a functioning failover cluster underneath it — it's a storage feature built on top of clustering, not a replacement for it, so failover cluster quorum models and witness types still apply to it.",
     },
     {
         'id': 'f28',
@@ -357,6 +357,27 @@ FLASHCARDS = [
         'front': "Server Core installation option",
         'back': "A minimal Windows Server install with no desktop shell or most GUI tools, managed remotely via PowerShell, Windows Admin Center, or Server Manager — reducing the attack surface, patching footprint, and resource use compared to Desktop Experience.",
         'detail': "Server Core is commonly managed day-to-day through Windows Admin Center (WAC) precisely because there's no local desktop shell to open management consoles from directly.",
+    },
+    {
+        'id': 'f48',
+        'cat': 'adDs',
+        'front': 'Domain and forest functional levels',
+        'back': "A setting that gates which AD DS features are available, based on the oldest domain controller OS version the domain (or forest) must still support — raising the level unlocks newer features but permanently rules out adding an older-OS domain controller afterward.",
+        'detail': "This is why a domain controller upgrade project often plans to retire the oldest DCs first — the functional level can't go up while an old one is still present, and it can't come back down once raised.",
+    },
+    {
+        'id': 'f49',
+        'cat': 'storage',
+        'front': 'iSCSI Target Server',
+        'back': "A Windows Server role that presents block-level storage over the network as an iSCSI target, letting a client (physical or virtual) connect to it as if it were a local disk — a software-defined alternative to a dedicated SAN.",
+        'detail': "This is a different sharing model than DFS Namespaces vs. DFS Replication, which share file-level folders — iSCSI instead hands over a raw block device the client formats and manages itself.",
+    },
+    {
+        'id': 'f50',
+        'cat': 'adDs',
+        'front': 'Group Policy Preferences vs. Group Policy settings',
+        'back': "Group Policy settings are enforced and grayed out for the end user, reapplied continuously. Group Policy Preferences configure an initial value (like a mapped drive or a desktop shortcut) that the user can subsequently change, and aren't strictly re-enforced the same way.",
+        'detail': "This distinction — enforced vs. merely pre-configured — is a common exam trap, since both live in the same Group Policy Management Console and both flow through Group Policy processing order and precedence.",
     },
 ]
 

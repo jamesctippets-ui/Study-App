@@ -1257,6 +1257,7 @@ For repeatable deployments, ARM templates are Azure's native JSON Infrastructure
         'title': 'Networking',
         'summary': 'NSG rule priority, VNet peering, load balancing, and secure access.',
         'diagram': 'nsgPriority',
+        'portalMockup': 'nsgRule',
         'vocabIds': ['f28', 'f29', 'f30', 'f31', 'f32', 'f33', 'f34', 'f35', 'f36'],
         'quizIds': ['q24', 'q25', 'q26', 'q29', 'q27', 'tf10', 'tf11', 'tf12'],
         'reading': """As an administrator, you size VNets and subnets with real CIDR math in mind — Azure reserves 5 addresses in every subnet regardless of its size. Network Security Groups filter traffic with rules that have a priority; the lowest priority number is evaluated first and wins if rules conflict.
@@ -1279,6 +1280,7 @@ For secure remote access, Azure Bastion provides RDP or SSH through the portal w
         'title': 'Monitoring & Recovery',
         'summary': 'Metrics vs. logs, alerts and action groups, backup, and Site Recovery.',
         'diagram': 'backupRecovery',
+        'portalMockup': 'backupVault',
         'vocabIds': ['f37', 'f38', 'f39', 'f40', 'f41', 'f42'],
         'quizIds': ['q33', 'q34', 'q35', 'q36'],
         'reading': """Azure Monitor is the umbrella for keeping an eye on your own resources: metrics are lightweight numerical time-series data, like CPU percentage, while logs are detailed, queryable records stored in a Log Analytics workspace and searched with KQL. An alert rule defines the trigger condition, and a separate action group defines what happens next, like an email or an automated runbook.
