@@ -281,3 +281,12 @@ stay wherever you're running it.
   `{ itil, az900, az104 }` in a few places (initial state, storage migration) — those
   now derive the set of tracks from `TRACKS` itself, so adding one is just a new
   `data/<name>.py` module plus a `build.py` import/registration.
+
+## Other project docs
+
+- **`ROADMAP.md`** — the feature backlog: what's shipped, what's next, and
+  ideas not yet started (more certs, more real screenshots, new interactive
+  study games, etc.).
+- **`LAUNCH_CHECKLIST.md`** — what's needed before moving this off of a
+  Claude artifact and onto a real domain (legal docs, hosting/deployment
+  setup, onboarding, trademark/branding due diligence).
