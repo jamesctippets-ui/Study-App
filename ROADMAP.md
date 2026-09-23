@@ -87,6 +87,14 @@ come up.
   once, with its description and live mastery %) — no path-grouping, no
   separate dropdown. Achievements and Data & Progress stay as their own
   quick-access header buttons alongside the hamburger.
+- [x] **An "About & Legal" panel**, reached from a footer link inside the
+  hamburger menu rather than new header chrome (`AboutLegalPanel` in
+  04_shared_ui.jsx) — About/contact, a manually-curated "what's new"
+  changelog, and first-draft Terms/Privacy/Disclaimer text as collapsible
+  sections in one bottom-sheet, matching every other panel's visual
+  pattern instead of introducing a new one. See LAUNCH_CHECKLIST.md
+  section 1 for what's covered and what's still open (an accessibility
+  statement, a persistent footer once this has its own domain).
 
 ## 7. Spaced repetition & study-science features (from research)
 
@@ -362,11 +370,11 @@ trading away for shinier but shallower ones.
   gives you) feels more fluent while studying but interleaving is the
   more evidence-backed technique for actual exam-day transfer; worth
   offering both rather than only the easier-feeling one.
-- [ ] **Surface the SRS ordering, don't hide it.** Cards mode silently
-  reorders by due-date; a first-time user has no way to know why. A small
-  "reviewing overdue cards first" indicator would turn an invisible
-  mechanic into a visible, trust-building one — cheap, and pairs
-  naturally with the onboarding tour already in LAUNCH_CHECKLIST.md.
+- [x] **Surface the SRS ordering, don't hide it.** Cards mode silently
+  reordered by due-date with no explanation. Shipped a small "Cards you're
+  overdue to review come first" caption above Cards mode, shown only once
+  there's actual SRS history for that track (so a brand-new deck doesn't
+  show a meaningless caption on cards that have never been rated).
 - [ ] **Open design question, not a ticket yet: header density on small
   phones.** The header currently stacks a hamburger, track name/subtitle,
   mastery %, achievements, and settings into one row above the mode tabs.

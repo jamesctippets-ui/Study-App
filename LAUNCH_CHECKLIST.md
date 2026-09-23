@@ -19,35 +19,39 @@ start simple and honest rather than needing dense boilerplate. Say what's
 actually true; expand later only if the data footprint actually grows
 (see item 2's note on cloud sync).
 
-- [ ] **Terms of Service / Terms of Use.** Who this is for, that it's an
-  independent study aid (not an official prep course), acceptable use,
-  no warranty that using it guarantees passing any exam, liability limits.
-- [ ] **Privacy Policy.** What's collected (today: nothing server-side;
-  progress lives in the browser's `localStorage`, or in the user's own
-  Claude account if opened as a Claude artifact), what isn't (no email,
-  no accounts, no ad tracking, no analytics unless/until you add one —
-  see item 2), and how someone clears their own data (the existing Data &
-  Progress panel's reset/export already covers this well).
-- [ ] **Cookie / local-storage disclosure.** The app doesn't use cookies
-  today, only `localStorage` for progress — under most cookie-law
-  frameworks, "strictly necessary, no tracking" local storage doesn't need
-  a consent banner, but it should still be disclosed plainly (can likely
-  live inside the Privacy Policy rather than as a separate banner, unless
-  you add analytics — then revisit).
-- [ ] **Disclaimer.** Not affiliated with, endorsed by, or sponsored by
-  Microsoft, CompTIA, or AXELOS/ITIL — those are their respective owners'
-  trademarks, used here only to describe which exam each track studies
-  for. All questions/explanations are original content, not reproduced
-  real exam questions ("no braindump" statement).
-- [ ] **Accessibility statement.** A short, honest note on current state
-  (keyboard/screen-reader support, contrast, etc.) plus a contact path for
-  reporting accessibility issues.
-- [ ] **Copyright/trademark footer notice** on every page (© year, the
-  trademark disclaimer above, and attribution for the licensed Azure
-  Portal screenshots — see item 4).
-- [ ] **A content-correction / feedback contact path.** Somewhere to
-  report a wrong or outdated question — an email alias or a lightweight
-  form beats no path at all once real users start relying on this.
+- [x] **Terms of Service / Terms of Use.** First draft shipped in-app: an
+  "About & Legal" panel reached from the hamburger menu (`AboutLegalPanel`
+  in `src/js/04_shared_ui.jsx`), covering that this is an independent
+  study aid (not an official prep course or a guarantee of passing),
+  acceptable use, original content, and liability limits. Written to
+  match today's actual data footprint, not boilerplate — worth a real
+  legal review before wider release, as the panel itself says.
+- [x] **Privacy Policy.** Shipped in the same panel: no accounts, what's
+  collected (nothing server-side; progress is `localStorage` or, inside a
+  Claude artifact, the user's own Claude account), no cookies/analytics/ad
+  tracking today, and a pointer to the existing Data & Progress export/
+  reset for clearing your own data. Explicitly commits to rewriting this
+  the moment that data footprint changes (e.g. a real backend gets added).
+- [x] **Cookie / local-storage disclosure.** Folded into the Privacy
+  Policy section above rather than a separate banner, since there's
+  nothing here that actually needs consent yet (no tracking cookies) —
+  revisit as its own item only once analytics or accounts are added.
+- [x] **Disclaimer.** Shipped as its own "Disclaimer & trademarks"
+  section: not affiliated with/endorsed by Microsoft, CompTIA, or
+  AXELOS/ITIL, all content is original (not reproduced real exam
+  questions), and screenshot attribution is called out explicitly.
+- [ ] **Accessibility statement.** Not written yet — still needed: a
+  short, honest note on current state (keyboard/screen-reader support,
+  contrast, etc.) plus a contact path for reporting accessibility issues.
+  Could be its own section in the same About & Legal panel.
+- [ ] **Copyright/trademark footer notice on every page.** The Disclaimer
+  section above covers the substance, but it's one tap into a menu, not
+  visible by default the way a persistent footer would be — worth
+  revisiting once this is on its own domain (a static site can afford a
+  real footer; this single-page app currently can't without adding
+  visual clutter the user specifically asked to avoid).
+- [x] **A content-correction / feedback contact path.** A `mailto:` link
+  in the About & Legal panel's "About Cert Study Hub" section.
 
 ## 2. Hosting & deployment technical readiness
 
@@ -100,13 +104,12 @@ actually true; expand later only if the data footprint actually grows
   print button. Persist a `hasSeenTour` flag alongside the existing
   stats/localStorage; skip it automatically for anyone who already has
   results (a returning user doesn't need the tour replayed).
-- [ ] **An About/Contact surface.** Who built this, how to send feedback
-  or report a wrong question (ties into item 1's feedback path) — likely
-  a footer link or a row inside the hamburger menu.
-- [ ] **A visible "what's new" / changelog.** So a returning user notices
-  something changed, rather than silently getting a new build — this
-  also gives the existing service-worker cache-bump discipline something
-  user-facing to point at.
+- [x] **An About/Contact surface.** Shipped as a row inside the hamburger
+  menu ("About & Legal"), exactly as scoped here.
+- [x] **A visible "what's new" / changelog.** Shipped as a section in the
+  same About & Legal panel — currently a short, manually-curated list;
+  worth revisiting to auto-generate from commit messages once real
+  releases are versioned, but manual is fine at this scale.
 - [ ] **Real cross-device/cross-browser QA.** iOS Safari, Android Chrome,
   desktop Firefox/Edge, on actual hardware — the Playwright emulation
   used throughout this project's development is a good first pass but

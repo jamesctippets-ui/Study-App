@@ -1239,7 +1239,7 @@ const MODE_LABELS = { learn: 'Learn', quiz: 'Quiz', exam: 'Exam' };
 // plus a "continue where you left off" shortcut reusing the existing
 // stats.lastVisited tracking — the app itself no longer auto-navigates
 // there on load, this is just a quick-resume option inside the menu.
-function TrackMenuPanel({ tracks, results, stats, activeTrack, onResume, onSelectTrack, onClose }) {
+function TrackMenuPanel({ tracks, results, stats, activeTrack, onResume, onSelectTrack, onOpenAbout, onClose }) {
   useEscapeToClose(onClose);
   const masteries = tracks.map((t) => ({ track: t, pct: trackMastery(t.key, results) }));
   const overallAvg = masteries.length ? Math.round(masteries.reduce((s, m) => s + m.pct, 0) / masteries.length) : 0;
@@ -1306,6 +1306,121 @@ function TrackMenuPanel({ tracks, results, stats, activeTrack, onResume, onSelec
               </button>
             );
           })}
+        </div>
+
+        <button
+          onClick={onOpenAbout}
+          className="btn-flat"
+          style={{ width: '100%', textAlign: 'center', marginTop: '18px', padding: '8px', fontSize: '11.5px', color: COLOR.muted, background: 'transparent' }}
+        >
+          About & Legal
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// A single bottom-sheet, same visual pattern as every other panel, holding
+// everything that isn't study content but still needs to live somewhere:
+// what the app is, what's changed recently, and the legal basics (Terms,
+// Privacy, disclaimer). Kept as one panel with collapsible sections rather
+// than separate screens/routes — this is a single static HTML file with no
+// real routing, and folding it into the existing hamburger menu (as an
+// "About & Legal" link) means zero new header chrome. Content here
+// reflects today's actual data footprint (no accounts, no PII, no cookies)
+// and should be revisited if that ever changes — see LAUNCH_CHECKLIST.md.
+function AboutSection({ title, defaultOpen, children }) {
+  const [open, setOpen] = useState(!!defaultOpen);
+  return (
+    <div style={{ marginBottom: '10px' }}>
+      <button
+        onClick={() => setOpen((o) => !o)}
+        style={{ width: '100%', textAlign: 'left', background: COLOR.surfaceRaised, border: `1px solid ${COLOR.border}`, borderRadius: '12px', padding: '12px', fontSize: '13px', color: COLOR.text, fontWeight: 600 }}
+      >
+        {open ? '▾ ' : '▸ '}{title}
+      </button>
+      {open && (
+        <div style={{ background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderTop: 'none', borderRadius: '0 0 12px 12px', padding: '14px', fontSize: '12.5px', lineHeight: 1.6, color: COLOR.muted }}>
+          {children}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function AboutLegalPanel({ onClose }) {
+  useEscapeToClose(onClose);
+  return (
+    <div
+      onClick={onClose}
+      style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', zIndex: 50, display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        style={{
+          background: COLOR.bg, borderTop: `1px solid ${COLOR.border}`, borderRadius: '20px 20px 0 0',
+          maxWidth: '28rem', width: '100%', maxHeight: '82vh', overflowY: 'auto', padding: '18px 18px 28px',
+          boxShadow: SHADOW.card,
+        }}
+      >
+        <div className="flex justify-between items-center mb-2">
+          <div className="itil-display" style={{ fontSize: '18px', fontWeight: 600 }}>About & Legal</div>
+          <button onClick={onClose} className="btn-flat" style={{ color: COLOR.muted, fontSize: '15px', padding: '4px' }}>✕</button>
+        </div>
+
+        <AboutSection title="About Cert Study Hub" defaultOpen>
+          <p style={{ margin: '0 0 8px' }}>
+            An independent study tool for IT certification exam prep — flashcards, timed quizzes, full mock
+            exams, and printable cheat sheets across Microsoft Azure/M365, CompTIA, ITIL, and a healthcare
+            interoperability track.
+          </p>
+          <p style={{ margin: 0 }}>
+            Found a wrong or outdated question, or have feedback? Reach out at{' '}
+            <a href="mailto:james.c.tippets@gmail.com" style={{ color: COLOR.primary }}>james.c.tippets@gmail.com</a>.
+          </p>
+        </AboutSection>
+
+        <AboutSection title="What's new">
+          <ul style={{ margin: 0, paddingLeft: '18px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+            <li>New: an "About & Legal" panel (this one) with Terms, Privacy, and a disclaimer.</li>
+            <li>A hamburger menu replaced the old home dashboard — the app now opens straight into your last track and mode, and every cert is listed once with its own description.</li>
+            <li>Real spaced repetition for flashcards, so cards you're shaky on resurface sooner.</li>
+            <li>Per-category "Learn more" resource links, real Azure Portal screenshots, and printable one-page cheat sheets for every track.</li>
+            <li>"Quiz this section" — test a single topic in isolation, from the reading or a lesson.</li>
+            <li>Progress export/import, a daily streak, and 15 milestone achievements.</li>
+          </ul>
+        </AboutSection>
+
+        <AboutSection title="Terms of Use">
+          <ul style={{ margin: 0, paddingLeft: '18px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            <li>This is an independent study aid, not an official course, and using it is not a guarantee of passing any exam.</li>
+            <li>Content is provided "as is," reviewed for accuracy at the time it was written, but certification exam objectives change over time — always cross-check against the vendor's current official objectives before your exam.</li>
+            <li>No account or sign-up is required. You're responsible for how you use the app; please don't attempt to disrupt, scrape at scale, or misrepresent the service.</li>
+            <li>All questions, explanations, and study content are original writing, not reproductions of real exam questions.</li>
+            <li>To the fullest extent permitted by law, the app is provided without warranty of any kind, and liability for its use is limited accordingly.</li>
+          </ul>
+        </AboutSection>
+
+        <AboutSection title="Privacy Policy">
+          <ul style={{ margin: 0, paddingLeft: '18px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            <li>No accounts, no sign-up, and no personal information is collected by this app.</li>
+            <li>Your progress (flashcard/quiz/exam results, streak, achievements) is stored either in this browser's local storage, on this device only, or — if you opened this inside a Claude artifact — synced through your own Claude account. It is never sent to a separate server run by this app.</li>
+            <li>No cookies, no third-party analytics, and no ad tracking are used today. If that ever changes, this policy will be updated first, before it happens.</li>
+            <li>You can download a full copy of your progress, or clear it, anytime from the ⚙ Data & Progress panel.</li>
+            <li>If this app ever adds its own accounts or its own cloud sync, this policy will be rewritten to describe exactly what's collected, how long it's kept, and how to delete it.</li>
+          </ul>
+        </AboutSection>
+
+        <AboutSection title="Disclaimer & trademarks">
+          <ul style={{ margin: 0, paddingLeft: '18px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            <li>Microsoft, Azure, Microsoft 365, Entra ID, CompTIA, Cloud+, ITIL, and AXELOS are trademarks of their respective owners. This app is not affiliated with, endorsed by, or sponsored by any of them — those names are used only to describe which exam each track prepares you for.</li>
+            <li>Real Azure Portal screenshots shown in some lessons are sourced from Microsoft's own CC BY 4.0-licensed documentation, with attribution shown alongside each one.</li>
+            <li>Passing a real certification exam depends on many factors beyond any single study tool. Nothing here is a guarantee of exam results.</li>
+          </ul>
+        </AboutSection>
+
+        <div style={{ fontSize: '10.5px', color: COLOR.muted, textAlign: 'center', marginTop: '6px' }}>
+          This is a first draft written for a small independent project, not legal advice — worth a proper review before wider release.
         </div>
       </div>
     </div>
@@ -2592,6 +2707,7 @@ function CertStudyApp() {
   const [showAchievements, setShowAchievements] = useState(false);
   const [toastAchievement, setToastAchievement] = useState(null);
   const [showMenu, setShowMenu] = useState(false);
+  const [showAbout, setShowAbout] = useState(false);
   const [showData, setShowData] = useState(false);
   const [importMessage, setImportMessage] = useState(null);
 
@@ -3186,9 +3302,11 @@ function CertStudyApp() {
             setShowMenu(false);
           }}
           onSelectTrack={(key) => { setActiveTrack(key); setShowMenu(false); }}
+          onOpenAbout={() => { setShowMenu(false); setShowAbout(true); }}
           onClose={() => setShowMenu(false)}
         />
       )}
+      {showAbout && <AboutLegalPanel onClose={() => setShowAbout(false)} />}
       {showData && (
         <DataPanel
           trackLabel={track.label}
@@ -3325,6 +3443,11 @@ function CertStudyApp() {
           </div>
         )}
 
+        {mode === 'learn' && learnView === 'cards' && Object.keys(srs[activeTrack] || {}).length > 0 && (
+          <div style={{ fontSize: '10.5px', color: COLOR.muted, marginBottom: '8px', textAlign: 'center' }}>
+            Cards you're overdue to review come first.
+          </div>
+        )}
         {mode === 'learn' && learnView === 'cards' && (
           <FlashcardView
             card={currentCard}

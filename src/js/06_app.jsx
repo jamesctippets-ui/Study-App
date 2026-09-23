@@ -15,6 +15,7 @@ function CertStudyApp() {
   const [showAchievements, setShowAchievements] = useState(false);
   const [toastAchievement, setToastAchievement] = useState(null);
   const [showMenu, setShowMenu] = useState(false);
+  const [showAbout, setShowAbout] = useState(false);
   const [showData, setShowData] = useState(false);
   const [importMessage, setImportMessage] = useState(null);
 
@@ -609,9 +610,11 @@ function CertStudyApp() {
             setShowMenu(false);
           }}
           onSelectTrack={(key) => { setActiveTrack(key); setShowMenu(false); }}
+          onOpenAbout={() => { setShowMenu(false); setShowAbout(true); }}
           onClose={() => setShowMenu(false)}
         />
       )}
+      {showAbout && <AboutLegalPanel onClose={() => setShowAbout(false)} />}
       {showData && (
         <DataPanel
           trackLabel={track.label}
@@ -748,6 +751,11 @@ function CertStudyApp() {
           </div>
         )}
 
+        {mode === 'learn' && learnView === 'cards' && Object.keys(srs[activeTrack] || {}).length > 0 && (
+          <div style={{ fontSize: '10.5px', color: COLOR.muted, marginBottom: '8px', textAlign: 'center' }}>
+            Cards you're overdue to review come first.
+          </div>
+        )}
         {mode === 'learn' && learnView === 'cards' && (
           <FlashcardView
             card={currentCard}
