@@ -371,14 +371,16 @@ function AboutLegalPanel({ onClose }) {
 // wrapper) — not a block appended below the whole paragraph/card. The
 // `term-flyout` class is what useClickOutsideToClose looks for to know a
 // click landed inside it rather than outside.
-function TermFlyout({ term, onClose }) {
+function TermFlyout({ term, onClose, shift, arrowLeft }) {
   if (!term) return null;
+  const s = shift || 0;
   return (
     <span
       className="term-flyout"
       onClick={(e) => e.stopPropagation()}
       style={{
         position: 'absolute', top: 'calc(100% + 8px)', left: 0, zIndex: 30,
+        transform: s ? `translateX(${s}px)` : undefined,
         display: 'block', width: 'max-content', maxWidth: 'min(280px, 78vw)',
         background: COLOR.surfaceRaised, border: `1px solid ${COLOR.primary}`, borderRadius: '12px',
         padding: '10px 12px', boxShadow: SHADOW.card, textAlign: 'left', whiteSpace: 'normal',
@@ -387,7 +389,7 @@ function TermFlyout({ term, onClose }) {
     >
       <span
         style={{
-          position: 'absolute', top: '-5px', left: '14px', width: '9px', height: '9px',
+          position: 'absolute', top: '-5px', left: `${arrowLeft != null ? arrowLeft : 14}px`, width: '9px', height: '9px',
           background: COLOR.surfaceRaised, borderLeft: `1px solid ${COLOR.primary}`, borderTop: `1px solid ${COLOR.primary}`,
           transform: 'rotate(45deg)',
         }}
@@ -952,7 +954,7 @@ function ReadingCheckGate({ question, onPassed }) {
   );
 }
 
-function LessonDetail({ lesson, flashcardsData, questionsData, categories, onBack, onQuiz, speakingId, onSpeak, speechSupported }) {
+function LessonDetail({ lesson, flashcardsData, questionsData, categories, onBack, onQuiz, speakingId, onSpeak, speechSupported, isFirstLesson, isLastLesson, onPrevLesson, onNextLesson }) {
   const [showFundamentals, setShowFundamentals] = useState(false);
   const [showVocabulary, setShowVocabulary] = useState(false);
   const [activeTermKey, setActiveTermKey] = useState(null);
@@ -1166,16 +1168,53 @@ function LessonDetail({ lesson, flashcardsData, questionsData, categories, onBac
       )}
 
       <QuizSectionButton label={finalQuizLabel} count={finalQuizIds.length} onClick={() => onQuiz(finalQuizIds)} />
+
+      {(onPrevLesson || onNextLesson) && (
+        <div className="flex gap-2">
+          <button
+            onClick={onPrevLesson}
+            disabled={isFirstLesson}
+            className="flex-1"
+            style={{
+              padding: '12px', borderRadius: '12px', border: `1px solid ${COLOR.border}`, background: 'transparent',
+              color: isFirstLesson ? COLOR.muted : COLOR.text, fontSize: '13px', fontWeight: 600, opacity: isFirstLesson ? 0.5 : 1,
+            }}
+          >
+            ‹ Previous lesson
+          </button>
+          <button
+            onClick={onNextLesson}
+            disabled={isLastLesson}
+            className="flex-1"
+            style={{
+              padding: '12px', borderRadius: '12px',
+              background: isLastLesson ? COLOR.surfaceRaised : COLOR.primary, color: isLastLesson ? COLOR.muted : '#2B1620',
+              fontSize: '13px', fontWeight: 600,
+            }}
+          >
+            Next lesson ›
+          </button>
+        </div>
+      )}
     </div>
   );
 }
 
+// Opens directly into the first lesson's content (not a list you must tap
+// into first) so Study behaves like StudyView's section-at-a-time reading
+// flow — a course track used to force an extra click through a full lesson
+// list before showing any actual content. Previous/Next lesson buttons let
+// you move straight through the course; the lesson list ("‹ All lessons")
+// is still there for jumping to a specific lesson out of order, it's just
+// no longer the mandatory starting point.
 function CourseView({ lessons, flashcardsData, questionsData, categories, onQuiz, speakingId, onSpeak, speechSupported, masteryFn }) {
-  const [lessonId, setLessonId] = useState(null);
-  const lesson = lessons.find((l) => l.id === lessonId);
+  const [lessonId, setLessonId] = useState(lessons.length ? lessons[0].id : null);
+  const lessonIndex = lessons.findIndex((l) => l.id === lessonId);
+  const lesson = lessons[lessonIndex];
   if (lesson) {
     return (
       <LessonDetail
+        key={lesson.id}
         lesson={lesson}
         flashcardsData={flashcardsData}
         questionsData={questionsData}
@@ -1185,6 +1224,10 @@ function CourseView({ lessons, flashcardsData, questionsData, categories, onQuiz
         speakingId={speakingId}
         onSpeak={onSpeak}
         speechSupported={speechSupported}
+        isFirstLesson={lessonIndex === 0}
+        isLastLesson={lessonIndex === lessons.length - 1}
+        onPrevLesson={() => setLessonId(lessons[Math.max(0, lessonIndex - 1)].id)}
+        onNextLesson={() => setLessonId(lessons[Math.min(lessons.length - 1, lessonIndex + 1)].id)}
       />
     );
   }

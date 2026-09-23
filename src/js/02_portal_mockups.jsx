@@ -201,8 +201,38 @@ function findTermCard(term, vocabPool) {
 // makes the flyout's `position: absolute` land right under this specific
 // word instead of the block's bottom edge.
 function TermTrigger({ text, card, isActive, onToggle }) {
+  const wrapperRef = useRef(null);
+  // Anchored under the trigger word via `left: 0` by default (see
+  // TermFlyout), which overflows off the right edge of the screen for any
+  // term close enough to the right margin — forcing a horizontal scroll to
+  // read the rest of it. A simple left/right flip isn't enough on a narrow
+  // phone screen, where a 280px-wide flyout can overflow the *other* edge
+  // instead if the word sits mid-screen — so this measures the flyout's
+  // actual rendered position and nudges it (via transform, not by
+  // re-anchoring) by just enough to stay fully on screen, then moves the
+  // little arrow the opposite amount so it still points at the real word
+  // instead of drifting with the shifted box. Runs in useLayoutEffect
+  // (before paint, not after) so the shift is never visible as a flash of
+  // the wrong position first.
+  const [pos, setPos] = useState({ shift: 0, arrowLeft: 14 });
+  useLayoutEffect(() => {
+    if (!isActive || !wrapperRef.current) return;
+    const flyoutEl = wrapperRef.current.querySelector('.term-flyout');
+    if (!flyoutEl) return;
+    const MARGIN = 10;
+    const rect = flyoutEl.getBoundingClientRect();
+    let shift = 0;
+    if (rect.right > window.innerWidth - MARGIN) {
+      shift = (window.innerWidth - MARGIN) - rect.right;
+    } else if (rect.left < MARGIN) {
+      shift = MARGIN - rect.left;
+    }
+    const arrowLeft = Math.max(8, Math.min(14 - shift, rect.width - 18));
+    setPos({ shift, arrowLeft });
+  }, [isActive]);
+
   return (
-    <span style={{ position: 'relative', display: 'inline-block' }}>
+    <span ref={wrapperRef} style={{ position: 'relative', display: 'inline-block' }}>
       <button
         className="btn-flat term-trigger"
         onClick={(e) => { e.stopPropagation(); onToggle(); }}
@@ -213,7 +243,7 @@ function TermTrigger({ text, card, isActive, onToggle }) {
       >
         {text}
       </button>
-      {isActive && <TermFlyout term={card} onClose={onToggle} />}
+      {isActive && <TermFlyout term={card} onClose={onToggle} shift={pos.shift} arrowLeft={pos.arrowLeft} />}
     </span>
   );
 }

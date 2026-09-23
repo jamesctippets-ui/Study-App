@@ -1,4 +1,4 @@
-const { useState, useEffect, useMemo, useCallback, useRef } = React;
+const { useState, useEffect, useLayoutEffect, useMemo, useCallback, useRef } = React;
 
 const COLOR = {
   bg: '#1E1828',

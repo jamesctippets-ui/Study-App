@@ -821,6 +821,7 @@ function CertStudyApp() {
         {mode === 'learn' && learnView === 'study' && (
           DATA[activeTrack].lessons ? (
             <CourseView
+              key={activeTrack}
               lessons={DATA[activeTrack].lessons}
               flashcardsData={flashcardsData}
               questionsData={questionsData}

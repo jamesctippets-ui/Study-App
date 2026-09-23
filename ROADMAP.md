@@ -191,6 +191,32 @@ come up.
   (`sync_service_worker_cache_name()`) and rewrites `service-worker.js`
   automatically whenever the content actually changes — the human step,
   and the failure mode, are both gone for good.
+- [x] **Course tracks (AZ-900/AZ-104) now open straight into lesson 1,
+  not a lesson-list page.** `CourseView` used to force a click through a
+  full "Course progress" list before showing any actual content, even
+  though non-course tracks (ITIL, etc.) already opened straight into
+  their first section. It now defaults to the first lesson directly, with
+  "‹ Previous lesson" / "Next lesson ›" buttons (matching StudyView's
+  section navigation) to move straight through the course. The full
+  lesson list is still reachable via "‹ All lessons" for jumping to a
+  specific one out of order. Fixed two related state bugs along the way:
+  `LessonDetail` needed `key={lesson.id}` so switching lessons actually
+  resets its reading-page/gating state instead of carrying it over, and
+  `CourseView` needed `key={activeTrack}` so switching tracks resets which
+  lesson is showing instead of carrying over a lesson id that doesn't
+  exist in the new track.
+- [x] **Term flyouts no longer overflow off-screen near the right edge.**
+  A flyout anchored purely `left: 0` under its trigger word would run off
+  the right edge of the screen (forcing a horizontal scroll to read the
+  rest of it) for any term close enough to the margin. `TermTrigger`
+  (02_portal_mockups.jsx) now measures the flyout's actual rendered
+  position in a `useLayoutEffect` (before paint, so there's no flash of
+  the wrong position) and nudges it back on screen with a `transform`
+  shift, moving the little pointer arrow the opposite amount so it still
+  visually points at the real word. A simple left/right flip wasn't
+  enough on its own — a 280px-wide flyout on a ~390px phone screen can
+  overflow the *other* edge if the word sits mid-screen — so this shifts
+  by exactly the overflow amount instead of just flipping sides.
 
 ## 10. Future-proofing for a standalone web/iOS/Android app (user's idea — lowest priority, not being worked on)
 
