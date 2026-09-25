@@ -247,6 +247,21 @@ function CertStudyApp() {
     saveSrs({ ...srs, [activeTrack]: { ...trackSrs, [id]: nextEntry } });
   };
 
+  // Reads/writes through statsRef (not the `stats` state closure) for the
+  // same reason markSeenFor/recordResultFor do — a rating and its
+  // resulting daily-goal bump can land in the same tick as other stats
+  // writes, and a stale closure here would silently drop progress toward
+  // today's goal.
+  const bumpDailyGoal = (n = 1) => {
+    const current = statsRef.current;
+    saveStats({ ...current, dailyGoal: recordDailyActivity(current.dailyGoal, n) });
+  };
+
+  const setDailyGoalTarget = (target) => {
+    const current = statsRef.current;
+    saveStats({ ...current, dailyGoal: { ...current.dailyGoal, target } });
+  };
+
   const speak = (id, text) => {
     if (!speechSupported) return;
     window.speechSynthesis.cancel();
@@ -530,6 +545,7 @@ function CertStudyApp() {
     if (currentCard) {
       recordResult(currentCard.id, outcome);
       recordSrs(currentCard.id, outcome);
+      bumpDailyGoal(1);
     }
     setFlipped(false);
     setFIndex((i) => (i + 1) % Math.max(filteredFlashcards.length, 1));
@@ -564,6 +580,7 @@ function CertStudyApp() {
     else return;
     const qTrack = currentQ.__track || activeTrack;
     recordResultFor(qTrack, currentQ.id, isCorrect ? 'correct' : 'incorrect');
+    bumpDailyGoal(1);
     setSessionScore((s) => ({ correct: s.correct + (isCorrect ? 1 : 0), total: s.total + 1 }));
     setSessionAnswers((a) => [...a, { id: currentQ.id, cat: currentQ.cat, prompt: currentQ.question, correct: isCorrect, explanation: currentQ.explanation, track: qTrack }]);
   };
@@ -581,6 +598,7 @@ function CertStudyApp() {
     setSelected(picked);
     const qTrack = currentQ.__track || activeTrack;
     recordResultFor(qTrack, currentQ.id, isCorrect ? 'correct' : 'incorrect');
+    bumpDailyGoal(1);
     setSessionScore((s) => ({ correct: s.correct + (isCorrect ? 1 : 0), total: s.total + 1 }));
     setSessionAnswers((a) => [...a, { id: currentQ.id, cat: currentQ.cat, prompt: currentQ.question, correct: isCorrect, explanation: currentQ.explanation, track: qTrack }]);
   };
@@ -680,7 +698,9 @@ function CertStudyApp() {
     const nextResults = { ...results, [trackKey]: updated };
     const pct = examSession.length ? Math.round((correct / examSession.length) * 100) : 0;
     const passed = pct >= EXAM_CONFIG[trackKey].passPct;
-    const nextStats = passed ? { ...stats, counts: { ...stats.counts, examsPassed: stats.counts.examsPassed + 1 } } : stats;
+    const answeredCount = items.filter((it) => it.answered).length;
+    const statsWithExam = passed ? { ...stats, counts: { ...stats.counts, examsPassed: stats.counts.examsPassed + 1 } } : stats;
+    const nextStats = { ...statsWithExam, dailyGoal: recordDailyActivity(statsWithExam.dailyGoal, answeredCount) };
     resultsRef.current = nextResults;
     statsRef.current = nextStats;
     setResults(nextResults);
@@ -729,6 +749,7 @@ function CertStudyApp() {
           onSelectTrack={(key) => { setActiveTrack(key); setShowMenu(false); }}
           onOpenAbout={() => { setShowMenu(false); setShowAbout(true); }}
           onOpenCertPath={() => { setShowMenu(false); setShowCertPath(true); }}
+          onSetGoalTarget={setDailyGoalTarget}
           onClose={() => setShowMenu(false)}
         />
       )}

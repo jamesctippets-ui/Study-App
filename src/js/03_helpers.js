@@ -329,6 +329,7 @@ function emptyStats() {
     counts: { quizzesCompleted: 0, examsPassed: 0, matchRoundsCompleted: 0, perfectQuizzes: 0 },
     unlocked: [],
     lastVisited: null,
+    dailyGoal: { target: 20, date: null, count: 0 },
   };
 }
 
@@ -336,12 +337,25 @@ function normalizeStats(raw) {
   const base = emptyStats();
   if (!raw || typeof raw !== 'object') return base;
   const lastVisited = raw.lastVisited && raw.lastVisited.track ? raw.lastVisited : null;
+  const rawGoal = raw.dailyGoal && typeof raw.dailyGoal === 'object' ? raw.dailyGoal : {};
+  const target = Number.isFinite(rawGoal.target) && rawGoal.target > 0 ? rawGoal.target : base.dailyGoal.target;
+  const count = Number.isFinite(rawGoal.count) && rawGoal.count >= 0 ? rawGoal.count : 0;
   return {
     streak: { ...base.streak, ...(raw.streak || {}) },
     counts: { ...base.counts, ...(raw.counts || {}) },
     unlocked: Array.isArray(raw.unlocked) ? raw.unlocked : [],
     lastVisited,
+    dailyGoal: { target, date: rawGoal.date || null, count },
   };
+}
+
+// Bumps today's study-activity count toward the daily goal ring. Rolls
+// over to a fresh count (keeping the user's chosen target) the first time
+// this fires on a new calendar day, rather than accumulating forever.
+function recordDailyActivity(dailyGoal, n = 1) {
+  const today = todayString();
+  if (dailyGoal.date !== today) return { target: dailyGoal.target, date: today, count: n };
+  return { ...dailyGoal, count: dailyGoal.count + n };
 }
 
 // Advances the streak at most once per calendar day. Consecutive days

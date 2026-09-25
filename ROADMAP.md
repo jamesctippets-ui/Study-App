@@ -572,12 +572,21 @@ most indie study apps don't bother with. That combination is the app's
 actual competitive edge — worth protecting as new features get added, not
 trading away for shinier but shallower ones.
 
-- [ ] **A daily goal ring.** A small, self-set "study N cards/questions
+- [x] **A daily goal ring.** A small, self-set "study N cards/questions
   today" target with a simple progress ring — the single highest-leverage
   Duolingo mechanic and one this app doesn't have yet, despite already
   having the streak infrastructure to hang it off of. Cheap to build
   (a number + a count against today's activity, both already tracked)
-  and directly answers "why open this again today."
+  and directly answers "why open this again today." Shipped as
+  `stats.dailyGoal` (`{ target, date, count }` in 03_helpers.js, rolled
+  over — not accumulated forever — the first time `recordDailyActivity`
+  sees a new calendar day) and a small circular-progress ring in the
+  hamburger menu's Cert Study Hub panel: it bumps on every flashcard
+  rating, quiz/exam question answered (Today's Mix questions count too,
+  since the bump doesn't care which track a question came from), turns
+  solid green with a checkmark once the target is hit, and a tap on the
+  ring opens a small +/- 5 stepper to change the target. Travels with the
+  rest of synced progress, same as everything else in `stats`.
 - [x] **A cross-track "Today's Mix" review session.** Shipped as an
   extension of My Cert Path rather than a standalone feature: a "Start
   Today's Mix" button appears in the Cert Path panel once 2+ active

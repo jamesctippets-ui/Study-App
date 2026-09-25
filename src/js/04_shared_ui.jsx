@@ -170,6 +170,76 @@ function DataPanel({ trackLabel, onExport, onImportFile, importMessage, onReset,
 
 const MODE_LABELS = { learn: 'Learn', quiz: 'Quiz', exam: 'Exam' };
 
+// A small self-set "study N cards/questions today" ring — cheap to build
+// since it just tallies activity already recorded elsewhere (flashcard
+// ratings, quiz/exam questions answered) via stats.dailyGoal, rather than
+// tracking anything new per-item. Tapping the ring opens a small +/-
+// stepper to change the target; the ring itself never resets the count —
+// that only happens the next time recordDailyActivity sees a new day.
+function DailyGoalRing({ dailyGoal, onSetTarget }) {
+  const [editing, setEditing] = useState(false);
+  const target = dailyGoal.target;
+  const count = dailyGoal.date === todayString() ? dailyGoal.count : 0;
+  const pct = target > 0 ? Math.min(1, count / target) : 0;
+  const met = count >= target;
+  const size = 40, stroke = 4, r = (size - stroke) / 2, circumference = 2 * Math.PI * r;
+
+  return (
+    <div style={{
+      display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '10px',
+      padding: '10px 12px', borderRadius: '14px', background: COLOR.surface,
+      border: `1px solid ${COLOR.border}`, boxShadow: SHADOW.card,
+    }}>
+      <button
+        onClick={() => setEditing((e) => !e)}
+        title="Tap to adjust your daily goal"
+        style={{ position: 'relative', width: size, height: size, flexShrink: 0, background: 'transparent', border: 'none', padding: 0, cursor: 'pointer' }}
+      >
+        <svg width={size} height={size} style={{ transform: 'rotate(-90deg)' }}>
+          <circle cx={size / 2} cy={size / 2} r={r} stroke={COLOR.border} strokeWidth={stroke} fill="none" />
+          <circle
+            cx={size / 2} cy={size / 2} r={r}
+            stroke={met ? COLOR.success : COLOR.primary}
+            strokeWidth={stroke} fill="none" strokeLinecap="round"
+            strokeDasharray={circumference}
+            strokeDashoffset={circumference * (1 - pct)}
+            style={{ transition: 'stroke-dashoffset 0.3s ease' }}
+          />
+        </svg>
+        <div style={{
+          position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center',
+          fontSize: met ? '15px' : '11px', fontWeight: 700, color: met ? COLOR.success : COLOR.text,
+        }}>
+          {met ? '✓' : count}
+        </div>
+      </button>
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{ fontSize: '12.5px', fontWeight: 600, color: COLOR.text }}>
+          {count} / {target} today
+        </div>
+        <div style={{ fontSize: '10.5px', color: COLOR.muted }}>Daily goal · tap the ring to change it</div>
+      </div>
+      {editing && (
+        <div style={{ display: 'flex', alignItems: 'center', gap: '4px', flexShrink: 0 }}>
+          <button
+            onClick={() => onSetTarget(Math.max(5, target - 5))}
+            style={{ width: '26px', height: '26px', borderRadius: '8px', border: `1px solid ${COLOR.border}`, background: COLOR.surfaceRaised, color: COLOR.text, fontSize: '15px', lineHeight: 1 }}
+          >
+            −
+          </button>
+          <span style={{ fontSize: '12px', color: COLOR.muted, minWidth: '18px', textAlign: 'center' }}>{target}</span>
+          <button
+            onClick={() => onSetTarget(target + 5)}
+            style={{ width: '26px', height: '26px', borderRadius: '8px', border: `1px solid ${COLOR.border}`, background: COLOR.surfaceRaised, color: COLOR.text, fontSize: '15px', lineHeight: 1 }}
+          >
+            +
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
 // The single track-navigation surface: replaces the old full-page Home
 // Dashboard and the separate Learning Paths panel with one bottom-sheet
 // menu, opened from the header's hamburger button. Every track is listed
@@ -177,7 +247,7 @@ const MODE_LABELS = { learn: 'Learn', quiz: 'Quiz', exam: 'Exam' };
 // plus a "continue where you left off" shortcut reusing the existing
 // stats.lastVisited tracking — the app itself no longer auto-navigates
 // there on load, this is just a quick-resume option inside the menu.
-function TrackMenuPanel({ tracks, results, stats, certPlan, activeTrack, onResume, onSelectTrack, onOpenAbout, onOpenCertPath, onClose }) {
+function TrackMenuPanel({ tracks, results, stats, certPlan, activeTrack, onResume, onSelectTrack, onOpenAbout, onOpenCertPath, onSetGoalTarget, onClose }) {
   useEscapeToClose(onClose);
   const masteries = tracks.map((t) => ({ track: t, pct: trackMastery(t.key, results) }));
   const overallAvg = masteries.length ? Math.round(masteries.reduce((s, m) => s + m.pct, 0) / masteries.length) : 0;
@@ -206,6 +276,8 @@ function TrackMenuPanel({ tracks, results, stats, certPlan, activeTrack, onResum
         <div style={{ fontSize: '12px', color: COLOR.muted, marginBottom: '14px' }}>
           {stats.streak.current > 0 ? `🔥 ${stats.streak.current}-day streak · ` : ''}{overallAvg}% average mastery across {tracks.length} tracks
         </div>
+
+        <DailyGoalRing dailyGoal={stats.dailyGoal} onSetTarget={onSetGoalTarget} />
 
         <button
           onClick={onOpenCertPath}

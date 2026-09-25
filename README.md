@@ -165,11 +165,16 @@ feels like it "lost your place" the way a full landing screen did. A
 first-time visitor with no history yet lands on **AZ-900 → Learn → Study**.
 A ☰ hamburger button in the header opens the **track menu** (`TrackMenuPanel`
 in `04_shared_ui.jsx`): overall average mastery across every track, the
-daily streak, an optional "continue where you left off" shortcut (for
-jumping back after browsing other tracks in the menu), and a flat list of
-all 15 tracks — each shown exactly once with its description and live
-mastery % (no path-grouping; the earlier Learning Paths feature was removed
-in favor of this simpler list). Quiz and Exam missed-question review lists
+daily streak, a **daily goal ring** — a small self-set "study N cards/
+questions today" target (`stats.dailyGoal`) with a circular progress
+indicator that fills as you rate flashcards and answer quiz/exam
+questions (across every track, Today's Mix included), turns solid green
+once you hit it, and can be adjusted with a tap-to-reveal +/- 5 stepper
+— an optional "continue where you left off" shortcut (for jumping back
+after browsing other tracks in the menu), and a flat list of all 15
+tracks — each shown exactly once with its description and live mastery %
+(no path-grouping; the earlier Learning Paths feature was removed in
+favor of this simpler list). Quiz and Exam missed-question review lists
 show each question's explanation alongside the prompt, not just what you
 got wrong.
 
