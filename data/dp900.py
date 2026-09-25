@@ -268,6 +268,27 @@ FLASHCARDS = [
         'back': 'An architecture combining a data lake’s low-cost, flexible storage for any file type with a data warehouse’s structured, query-optimized layer on top — one platform for both raw and curated data instead of maintaining two separate systems.',
         'detail': 'Microsoft Fabric is built around exactly this lakehouse pattern, unifying what used to be separate lake and warehouse services described under database vs. data warehouse vs. data lake into one workspace.',
     },
+    {
+        'id': 'f37',
+        'cat': 'analytics',
+        'front': 'Fact table vs. dimension table',
+        'back': "A fact table stores the numeric, measurable events at the center of a star schema — like a sales amount or a quantity sold. Dimension tables store the descriptive context around those facts — product, customer, date — used to filter and group them.",
+        'detail': "This is exactly the split inside Data warehouse and star schema — the fact table is what you aggregate; the dimension tables are what you slice and filter by.",
+    },
+    {
+        'id': 'f38',
+        'cat': 'analytics',
+        'front': 'Serverless SQL pool vs. dedicated SQL pool',
+        'back': "A serverless SQL pool in Azure Synapse Analytics bills per query based on data processed, with no infrastructure to provision ahead of time. A dedicated SQL pool provisions and bills for continuously-running compute, sized in advance for predictable, heavy workloads.",
+        'detail': "Ad hoc, unpredictable exploration favors serverless (pay only when you actually query); a large, steady reporting workload favors dedicated, since its provisioned compute is cheaper per-query at real scale.",
+    },
+    {
+        'id': 'f39',
+        'cat': 'coreData',
+        'front': 'Data governance',
+        'back': "The overall practice of managing data quality, access, ownership, and compliance across an organization — deciding who can see what data, ensuring it stays accurate, and tracking where it came from.",
+        'detail': "Data professional roles like a data steward or data owner exist specifically to carry out data governance responsibilities day to day, rather than governance being an abstract policy with no one actually responsible for it.",
+    },
 ]
 
 QUESTIONS = [

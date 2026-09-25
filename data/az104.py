@@ -411,6 +411,34 @@ FLASHCARDS = [
         'back': 'A JSON-defined role built from a specific set of allowed and denied actions, for when the built-in roles are either too broad or too narrow for what a team actually needs to do.',
         'detail': 'This builds on RBAC scope and inheritance — a custom role still gets assigned at a scope exactly the same way a built-in role does.',
     },
+    {
+        'id': 'f57',
+        'cat': 'compute',
+        'front': 'Boot diagnostics',
+        'back': "Captures a VM's console output and a screenshot of its current screen state, letting an admin diagnose a VM that fails to boot or hangs during startup without needing an existing remote connection into it.",
+        'detail': "This is the first troubleshooting step for a VM that seems unreachable — it works even when RDP/SSH themselves are the thing that's broken, since it doesn't depend on the guest OS's network stack at all.",
+    },
+    {
+        'id': 'f58',
+        'cat': 'identityGov',
+        'front': 'Conditional Access',
+        'back': "A policy engine that evaluates signals at sign-in time — user, device, location, and risk — and applies a control in response, such as requiring MFA or blocking access outright, rather than every user getting the same static access rules.",
+        'detail': "This is layered on top of, not instead of, RBAC scope and inheritance — Conditional Access decides whether a sign-in is allowed to happen at all; RBAC decides what that signed-in identity can then do.",
+    },
+    {
+        'id': 'f59',
+        'cat': 'compute',
+        'front': 'ARM deployment modes: complete vs. incremental',
+        'back': "Incremental mode (the default) adds or updates resources in the template without touching anything else in the resource group. Complete mode deletes any resource in the resource group that isn't defined in the template being deployed.",
+        'detail': "Complete mode is the one that can silently delete resources someone else created by hand — a classic case for why ARM templates vs. Bicep deployments deserve a careful review, not a routine one.",
+    },
+    {
+        'id': 'f60',
+        'cat': 'storage',
+        'front': 'Disk snapshots',
+        'back': "A point-in-time, read-only copy of a managed disk, usable to create a new disk or VM from that captured state — separate from Blob versioning vs. soft delete vs. snapshots, which protects blob container data, not disks.",
+        'detail': "Managed disks and disk types get protected by disk snapshots (or Recovery Services vault and backup policies for a fuller backup solution); blob snapshots are a completely separate mechanism for a completely separate storage type.",
+    },
 ]
 
 QUESTIONS = [

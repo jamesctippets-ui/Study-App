@@ -148,15 +148,18 @@ come up.
   `CATEGORIES`), shown on Study section pages, a lesson's Vocabulary block,
   and a consolidated block on the cheat sheet. All ~90 URLs were
   WebSearch-verified, not guessed.
-- [x] **Real Azure Portal screenshots.** Eight genuine screenshots (resource
+- [x] **Real Azure Portal screenshots.** Ten genuine screenshots (resource
   group creation, storage account tabs, VM instance details, IAM role
   assignments, App Service deployment slots, an NSG inbound security
   rule, an Azure Policy compliance dashboard, a Recovery Services vault's
-  backup configuration), sourced from Microsoft's own CC BY 4.0-licensed
-  MicrosoftDocs GitHub repos and saved locally under `images/portal/`,
-  shown alongside (not replacing) the existing SVG portal mockups in
-  AZ-900/AZ-104 lessons, each with a plain-language description of what's
-  shown, a source link, and attribution. No real screenshot was added for
+  backup configuration, an Invite external user panel, and the public
+  Azure pricing calculator website), sourced from Microsoft's own CC BY
+  4.0-licensed MicrosoftDocs GitHub repos and saved locally under
+  `images/portal/`, shown alongside (not replacing) the existing SVG
+  portal mockups in AZ-900/AZ-104 lessons, each with a plain-language
+  description of what's shown, a source link, and attribution. Both
+  AZ-900 and AZ-104 now have a real screenshot on every single lesson —
+  no gaps left in either course. No real screenshot was added for
   the VNet-creation mockup — no clean, on-topic match was found.
 - [x] **Quiz/exam questions built around the real screenshots.** 7 new
   questions (4 in AZ-900, 3 in AZ-104 — `'image': 'resourceGroup'` etc. on
@@ -220,7 +223,7 @@ come up.
   overflow the *other* edge if the word sits mid-screen — so this shifts
   by exactly the overflow amount instead of just flipping sides.
 - [x] **More key terms, and real cross-referencing so flyouts actually
-  fire, across all 15 tracks (two batches so far).** Audited why term
+  fire, across all 15 tracks (three batches so far).** Audited why term
   flyouts felt sparse outside AZ-900/AZ-104: the mechanism
   (`autoHighlightTerms` in 02_portal_mockups.jsx) was always working
   correctly, but most tracks' flashcard definitions almost never
@@ -228,15 +231,18 @@ come up.
   highlight — a measured baseline found several tracks at literally 0%
   of cards triggering even one flyout. Batch 1 added 39 new flashcards
   (607 → 646) targeting the zero-coverage tracks first. Batch 2 added 17
-  more (646 → 663), pushing the remaining weakest tracks (SC-500, AZ-305,
-  AZ-802, Cloud+, SC-300 — all sitting at 9-10% after batch 1) up to
-  9-12%, plus more `detail`-field cross-references on existing cards.
-  Overall: 14% of all 663 cards now trigger a flyout, up from roughly 5%
-  at the start. Caught and fixed one real mistake while doing this:
-  batch 1 accidentally added an "Azure landing zone" card to AZ-305 that
-  nearly duplicated an existing "Azure landing zones" card — replaced it
-  with a genuinely distinct term (Cloud Adoption Framework) instead of
-  leaving a near-duplicate in the deck. This is real, meaningful
+  more (646 → 663), pushing the remaining weakest tracks up to 9-12%.
+  Batch 3, at the user's request, focused specifically on AZ-900,
+  Cloud+, AZ-104, and DP-900: added 4-5 new flashcards to each (663 →
+  681 total), moving them from 21/10/11/22% to 24/13/15/28%
+  respectively. Overall coverage keeps climbing batch over batch. Caught
+  and fixed two real mistakes along the way: batch 1 accidentally added
+  an "Azure landing zone" card to AZ-305 that nearly duplicated an
+  existing "Azure landing zones" card (replaced with a genuinely
+  distinct term, Cloud Adoption Framework); batch 3 caught its own
+  SC-500 addition citing a card front that doesn't actually exist in
+  that track (belonged to a different track) before it shipped, and
+  rewrote it to reference something real. This is real, meaningful
   progress, not full coverage — most cards still don't cross-reference
   another term, since a natural, accurate definition doesn't always have
   one to reference. Continuing this in further batches is legitimate
@@ -302,18 +308,22 @@ mind so today's choices don't quietly foreclose that option later:
 ## 12. More official screenshots (user's idea)
 
 - [x] **Extend the real-screenshot treatment to more AZ-900/AZ-104 lessons
-  that currently only have the hand-drawn SVG mockup.** Went from 5 to 8
-  real screenshots total, all CC BY 4.0 from `MicrosoftDocs/azure-docs`:
-  App Service "Add Slot" panel (AZ-104 App Hosting & IaC), an NSG "Add
-  inbound security rule" panel (AZ-104 Networking), an Azure Policy
-  initiative compliance dashboard (AZ-900 Cost, Policy & Monitoring —
-  previously had neither a diagram nor a mockup at all), and a Recovery
-  Services vault Backup Configuration panel (AZ-104 Monitoring &
-  Recovery). Each shipped with its own new hand-drawn `PORTAL_MOCKUPS`
-  component too, since the real-screenshot slot only renders alongside
-  one. Remaining gap: AZ-104's "Identities & Access" lesson still has
-  neither a diagram nor a portal mockup (see README's "ideas for Claude
-  Code" for the fuller list).
+  that currently only have the hand-drawn SVG mockup — now complete for
+  both courses.** Went from 5 to 10 real screenshots total, all CC BY 4.0
+  from `MicrosoftDocs/azure-docs`: App Service "Add Slot" panel (AZ-104
+  App Hosting & IaC), an NSG "Add inbound security rule" panel (AZ-104
+  Networking), an Azure Policy initiative compliance dashboard (AZ-900
+  Cost, Policy & Monitoring — previously had neither a diagram nor a
+  mockup at all), a Recovery Services vault Backup Configuration panel
+  (AZ-104 Monitoring & Recovery), an "Invite external user" panel (AZ-104
+  Identities & Access — its last remaining gap), and the public Azure
+  pricing calculator website (AZ-900 Cloud Fundamentals). Each shipped
+  with its own new hand-drawn `PORTAL_MOCKUPS` component too, since the
+  real-screenshot slot only renders alongside one. Every lesson in both
+  AZ-900 and AZ-104 now has a real screenshot — no remaining gaps in
+  either course (see README's "ideas for Claude Code," which still notes
+  the separate, smaller diagram gap: 2 AZ-104 lessons lack a hand-drawn
+  diagram, independent of the screenshot work).
 - [ ] **Licensing note learned the hard way:** not every `MicrosoftDocs/*`
   GitHub repo uses the same license as `azure-docs` (CC BY 4.0 for content
   + MIT for code samples, in separate `LICENSE`/`LICENSE-CODE` files).
@@ -333,7 +343,12 @@ mind so today's choices don't quietly foreclose that option later:
   product UI. Structural note: today's screenshot mechanism only exists
   for course tracks (lessons with a `portalMockup` key) — extending it to
   the 13 flat-StudyView tracks needs a new slot in `StudyView`/
-  `StudyEntry`, not just new data.
+  `StudyEntry`, not just new data. This directly affects two of the
+  tracks the user asked to focus on: Cloud+ has no real portal to
+  screenshot anyway (it's vendor-neutral by design — see README/ROADMAP
+  "not in scope" notes on not naming a specific cloud vendor), but DP-900
+  covers plenty of real Azure data-service UIs (Cosmos DB, Synapse,
+  Power BI) that would benefit once this structural gap is closed.
 - [ ] More quiz/exam questions built around each new screenshot, matching
   the existing pattern (`'image': '<key>'` on the question dict,
   `hideDescription` so the caption doesn't give away the answer).

@@ -440,6 +440,20 @@ FLASHCARDS = [
         'back': 'A pre-configured environment — subscriptions, management groups, policy, and a network baseline already in place — that a new workload lands into, instead of starting from a blank subscription every time.',
         'detail': "A landing zone bakes governance into the resource hierarchy up front, so a new workload inherits compliant Azure Policy and Azure RBAC instead of every project reinventing it.",
     },
+    {
+        'id': 'f62',
+        'cat': 'management',
+        'front': 'Azure Well-Architected Framework',
+        'back': "Microsoft's guidance for evaluating a workload against five pillars — reliability, security, cost optimization, operational excellence, and performance efficiency — used to weigh trade-offs against each other rather than optimizing just one in isolation.",
+        'detail': "Azure Advisor's recommendations are essentially this framework applied automatically to your actual resources, flagging where a workload falls short on one of these same pillars.",
+    },
+    {
+        'id': 'f63',
+        'cat': 'management',
+        'front': 'Azure Lighthouse',
+        'back': "Lets a service provider or central IT team manage resources across multiple Azure tenants from within their own tenant, without switching directories or needing a separate guest account in each customer's tenant.",
+        'detail': "This is specifically for cross-tenant management at scale — an MSP managing dozens of customer tenants is the classic scenario, distinct from Azure RBAC, which governs access within a single tenant.",
+    },
 ]
 
 QUESTIONS = [

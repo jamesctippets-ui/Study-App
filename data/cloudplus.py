@@ -363,6 +363,34 @@ FLASHCARDS = [
         'back': "A dedicated infrastructure layer (typically sidecar proxies alongside each service) that handles service-to-service traffic concerns — routing, retries, encryption, observability — without every microservice implementing that logic itself.",
         'detail': "In a Kubernetes: pod, node, and cluster environment, a service mesh's sidecar proxies are commonly injected into each pod, working alongside the containers rather than replacing them.",
     },
+    {
+        'id': 'f50',
+        'cat': 'archDesign',
+        'front': 'Type 1 (bare-metal) vs. Type 2 (hosted) hypervisor',
+        'back': "A Type 1 hypervisor runs directly on the physical hardware with no host OS underneath it — the standard for production datacenters and cloud providers. A Type 2 hypervisor runs as an application on top of a regular host OS, more common for a desktop/test environment.",
+        'detail': "Removing the host OS layer is exactly why Type 1 has less overhead and better performance — there's one less layer between the VM and the physical hardware than in a P2V, V2V, P2C, and V2C migrations scenario running Type 2.",
+    },
+    {
+        'id': 'f51',
+        'cat': 'security',
+        'front': 'Single sign-on (SSO)',
+        'back': "Lets a user authenticate once and gain access to multiple independent systems without signing in separately to each one, using a shared trust relationship between the identity provider and each application.",
+        'detail': "SSO is squarely about the authentication piece of authentication vs. authorization vs. accounting (AAA) — it doesn't decide what a user can do once signed in, only that they don't have to prove who they are over and over.",
+    },
+    {
+        'id': 'f52',
+        'cat': 'opsSupport',
+        'front': 'Immutable infrastructure',
+        'back': "A deployment approach where servers or containers are never modified after being provisioned — a change means replacing the instance entirely with a newly built one, rather than patching a live system in place.",
+        'detail': "This pairs naturally with Infrastructure as Code (IaC): if the whole environment is defined in code, replacing an instance instead of patching it becomes cheap and repeatable rather than risky.",
+    },
+    {
+        'id': 'f53',
+        'cat': 'archDesign',
+        'front': 'Chaos engineering',
+        'back': "Deliberately injecting failures into a production or production-like system (killing an instance, adding latency, cutting a dependency) to verify that resilience mechanisms actually work as designed, instead of only assuming they do.",
+        'detail': "This is how a team actually validates the high availability vs. fault tolerance vs. disaster recovery claims made about a system, rather than discovering the gaps for the first time during a real outage.",
+    },
 ]
 
 QUESTIONS = [

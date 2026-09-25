@@ -270,10 +270,10 @@ stay wherever you're running it.
   runs — a bigger call since it adds a non-Python dependency to a build that's
   currently pure Python. Worth doing if load time on a phone still feels slow; hold
   off otherwise.
-- **AZ-104 and ITIL are feature-complete on data, but AZ-104's course still only has
-  5 of 7 lessons with a diagram and 6 of 7 with a portal mockup** (only Identities &
-  Access has neither — Networking, Monitoring & Recovery, and App Hosting & IaC all
-  got a mockup plus a real screenshot recently) — same gap pattern AZ-900 started with.
+- **AZ-104's course still only has 5 of 7 lessons with a diagram, but now has a
+  portal mockup (and a real screenshot) on all 7** — Identities & Access, Networking,
+  Monitoring & Recovery, and App Hosting & IaC all got one recently. AZ-900 is fully
+  complete on both diagram and portal mockup coverage across all 7 lessons.
 - **ITIL and Cloud+ have no course/lesson mode at all yet** — same format as AZ-900
   and AZ-104 would extend cleanly, reusing the existing `DBox`/`DLine`/`PortalFrame`
   diagram helpers.
