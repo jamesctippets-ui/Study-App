@@ -1608,6 +1608,37 @@ function trackMastery(trackKey, results) {
   return Math.round((correct / ids.length) * 100);
 }
 
+// A blended "exam readiness" signal, distinct from the flat lifetime
+// mastery % above: mastery decayed by how stale it is, using each
+// attempted item's last-seen timestamp (already tracked in seenLog for
+// spaced repetition) as a recency proxy. A 90%-mastery track you haven't
+// touched in two months reads as less exam-ready than the same 90% you
+// built this week — freshness decays from 1.0 (studied today) down to a
+// 0.6 floor by 30 days out, so staleness discounts the score without
+// crushing it to zero. No new persisted fields — purely derived from
+// results + seenLog already recorded elsewhere.
+function examReadiness(trackKey, results, seenLog) {
+  const mastery = trackMastery(trackKey, results);
+  const trackResults = results[trackKey] || {};
+  const trackSeen = seenLog[trackKey] || {};
+  const attemptedIds = Object.keys(trackResults);
+  if (!attemptedIds.length) return { score: 0, mastery: 0, freshness: 1, label: 'Not started' };
+  const now = Date.now();
+  const ages = attemptedIds
+    .map((id) => trackSeen[id])
+    .filter((t) => typeof t === 'number')
+    .map((t) => Math.max(0, (now - t) / 86400000));
+  const avgAgeDays = ages.length ? ages.reduce((a, b) => a + b, 0) / ages.length : 0;
+  const freshness = Math.max(0.6, 1 - (avgAgeDays / 30) * 0.4);
+  const score = Math.round(mastery * freshness);
+  let label;
+  if (score >= 80) label = 'Exam ready';
+  else if (score >= 60) label = 'Getting there';
+  else if (score >= 30) label = 'Building';
+  else label = 'Just starting';
+  return { score, mastery, freshness, label };
+}
+
 
 /* ---------------- shared UI ---------------- */
 
@@ -3616,10 +3647,34 @@ function QuizSummary({ score, answers, categories, onRestart }) {
 
 /* ---------------- final exam UI ---------------- */
 
-function ExamIntro({ track, config, onStart }) {
+const READINESS_COLOR = {
+  'Exam ready': COLOR.success,
+  'Getting there': COLOR.gold,
+  'Building': COLOR.gold,
+  'Just starting': COLOR.muted,
+  'Not started': COLOR.muted,
+};
+
+function ExamIntro({ track, config, readiness, onStart }) {
+  const readinessColor = READINESS_COLOR[readiness.label] || COLOR.muted;
   return (
     <div style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderRadius: '18px', padding: '22px' }}>
       <div className="itil-display" style={{ fontSize: '19px', fontWeight: 600, marginBottom: '12px' }}>{track.label} Final Exam</div>
+      {readiness.label !== 'Not started' && (
+        <div style={{
+          marginBottom: '16px', padding: '12px 14px', borderRadius: '12px',
+          background: `${readinessColor}1F`, border: `1px solid ${readinessColor}`,
+        }}>
+          <div className="flex justify-between items-center" style={{ marginBottom: '2px' }}>
+            <span style={{ fontSize: '11px', color: COLOR.muted, textTransform: 'uppercase', letterSpacing: '0.04em' }}>Exam readiness</span>
+            <span style={{ fontSize: '15px', fontWeight: 700, color: readinessColor }}>{readiness.score}%</span>
+          </div>
+          <div style={{ fontSize: '13px', fontWeight: 600, color: readinessColor }}>{readiness.label}</div>
+          <div style={{ fontSize: '10.5px', color: COLOR.muted, marginTop: '4px', lineHeight: 1.4 }}>
+            {readiness.mastery}% lifetime mastery{readiness.freshness < 0.99 ? ', discounted for how long it\'s been since you last practiced' : ''} — not just a flat percentage that never decays.
+          </div>
+        </div>
+      )}
       <div style={{ fontSize: '13px', color: COLOR.text, marginBottom: '4px' }}>{config.length} questions</div>
       <div style={{ fontSize: '13px', color: COLOR.text, marginBottom: '4px' }}>{config.minutes}-minute time limit</div>
       <div style={{ fontSize: '12px', color: COLOR.muted, marginBottom: '16px', lineHeight: 1.5 }}>{config.passLabel}</div>
@@ -4816,7 +4871,7 @@ function CertStudyApp() {
 
         {mode === 'exam' && (
           examPhase === 'intro' ? (
-            <ExamIntro track={track} config={EXAM_CONFIG[activeTrack]} onStart={startExam} />
+            <ExamIntro track={track} config={EXAM_CONFIG[activeTrack]} readiness={examReadiness(activeTrack, results, seenLog)} onStart={startExam} />
           ) : examPhase === 'active' ? (
             <div>
               <div className="flex justify-between items-center mb-2">

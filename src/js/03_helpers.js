@@ -448,3 +448,34 @@ function trackMastery(trackKey, results) {
   return Math.round((correct / ids.length) * 100);
 }
 
+// A blended "exam readiness" signal, distinct from the flat lifetime
+// mastery % above: mastery decayed by how stale it is, using each
+// attempted item's last-seen timestamp (already tracked in seenLog for
+// spaced repetition) as a recency proxy. A 90%-mastery track you haven't
+// touched in two months reads as less exam-ready than the same 90% you
+// built this week — freshness decays from 1.0 (studied today) down to a
+// 0.6 floor by 30 days out, so staleness discounts the score without
+// crushing it to zero. No new persisted fields — purely derived from
+// results + seenLog already recorded elsewhere.
+function examReadiness(trackKey, results, seenLog) {
+  const mastery = trackMastery(trackKey, results);
+  const trackResults = results[trackKey] || {};
+  const trackSeen = seenLog[trackKey] || {};
+  const attemptedIds = Object.keys(trackResults);
+  if (!attemptedIds.length) return { score: 0, mastery: 0, freshness: 1, label: 'Not started' };
+  const now = Date.now();
+  const ages = attemptedIds
+    .map((id) => trackSeen[id])
+    .filter((t) => typeof t === 'number')
+    .map((t) => Math.max(0, (now - t) / 86400000));
+  const avgAgeDays = ages.length ? ages.reduce((a, b) => a + b, 0) / ages.length : 0;
+  const freshness = Math.max(0.6, 1 - (avgAgeDays / 30) * 0.4);
+  const score = Math.round(mastery * freshness);
+  let label;
+  if (score >= 80) label = 'Exam ready';
+  else if (score >= 60) label = 'Getting there';
+  else if (score >= 30) label = 'Building';
+  else label = 'Just starting';
+  return { score, mastery, freshness, label };
+}
+

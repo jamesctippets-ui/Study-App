@@ -1022,7 +1022,7 @@ function CertStudyApp() {
 
         {mode === 'exam' && (
           examPhase === 'intro' ? (
-            <ExamIntro track={track} config={EXAM_CONFIG[activeTrack]} onStart={startExam} />
+            <ExamIntro track={track} config={EXAM_CONFIG[activeTrack]} readiness={examReadiness(activeTrack, results, seenLog)} onStart={startExam} />
           ) : examPhase === 'active' ? (
             <div>
               <div className="flex justify-between items-center mb-2">

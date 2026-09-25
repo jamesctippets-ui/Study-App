@@ -62,7 +62,19 @@ interleaving across topics is the more evidence-backed technique for
 actual exam-day transfer than always drilling one category in a row. A
 short caption under the quiz setup calls this out so it reads as an
 intentional mode. Exam is a timed Final Exam mode matching each real exam's
-length/pass mark. Text-to-speech is available on readings and flashcards.
+length/pass mark. Once you've attempted anything in a track, its Exam tab
+also shows a blended **exam readiness** signal (`examReadiness` in
+`03_helpers.js`) above the "Start Exam" button — labeled "Just starting,"
+"Building," "Getting there," or "Exam ready" — instead of just the flat
+lifetime mastery % shown elsewhere. It's the same mastery number, but
+discounted by how stale it is: each attempted item's last-seen timestamp
+(already tracked for spaced repetition) feeds a freshness factor that
+decays from full credit the day you studied down to a 0.6 floor by 30
+days out, so a 90%-mastery track you haven't touched in two months reads
+as less exam-ready than the same 90% built this week. It's a more honest
+answer to "am I actually ready" than a percentage that never decays, and
+it needed no new data — just a different read on results/seenLog that are
+already recorded. Text-to-speech is available on readings and flashcards.
 
 A sliding switch in the top nav bar toggles between a dark-grey and an
 off-white theme — see "Light/dark theming" under Source layout for how it's

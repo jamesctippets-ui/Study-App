@@ -603,12 +603,25 @@ trading away for shinier but shallower ones.
   look" summary all show which cert each question came from. Not a
   revival of Learning Paths — no fixed ordering/sequencing claim, just a
   weighted mixer across the certs you're actively juggling.
-- [ ] **An "exam readiness" signal per track.** A single blended indicator
+- [x] **An "exam readiness" signal per track.** A single blended indicator
   (recent quiz/exam accuracy + mastery % + how stale that mastery is)
   instead of a flat mastery percentage alone — Tutorials Dojo and
   Whizlabs both lean on this and it's a more honest answer to "am I
   actually ready" than a lifetime-ratio percentage that never decays.
-  Ties into the missing "trend over time" item already in section 7.
+  Shipped as `examReadiness` in 03_helpers.js, purely derived from data
+  already recorded elsewhere (no new persisted fields): starts from the
+  existing lifetime mastery %, then discounts it by a freshness factor
+  computed from each attempted item's last-seen timestamp (already
+  tracked in `seenLog` for spaced repetition) — 1.0 if you studied today,
+  decaying to a 0.6 floor by 30 days out, so a 90%-mastery track you
+  haven't touched in two months reads as less ready than the same 90%
+  built this week. Surfaces as a labeled card ("Just starting" /
+  "Building" / "Getting there" / "Exam ready") on the Exam tab's intro
+  screen — the moment you're actually deciding whether to sit the exam —
+  rather than replacing the mastery % shown elsewhere, since those serve
+  a broader "browse progress" purpose. Ties into the missing "trend over
+  time" item already in section 7, which would need real per-attempt
+  history rather than this timestamp-based proxy.
 - [ ] **Confidence-based self-rating for flashcards** (already listed in
   section 7, resurfaced here because it's the most direct fix for a real
   risk: streaks/badges can quietly reward speed-clicking through cards

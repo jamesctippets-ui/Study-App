@@ -1,9 +1,33 @@
 /* ---------------- final exam UI ---------------- */
 
-function ExamIntro({ track, config, onStart }) {
+const READINESS_COLOR = {
+  'Exam ready': COLOR.success,
+  'Getting there': COLOR.gold,
+  'Building': COLOR.gold,
+  'Just starting': COLOR.muted,
+  'Not started': COLOR.muted,
+};
+
+function ExamIntro({ track, config, readiness, onStart }) {
+  const readinessColor = READINESS_COLOR[readiness.label] || COLOR.muted;
   return (
     <div style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderRadius: '18px', padding: '22px' }}>
       <div className="itil-display" style={{ fontSize: '19px', fontWeight: 600, marginBottom: '12px' }}>{track.label} Final Exam</div>
+      {readiness.label !== 'Not started' && (
+        <div style={{
+          marginBottom: '16px', padding: '12px 14px', borderRadius: '12px',
+          background: `${readinessColor}1F`, border: `1px solid ${readinessColor}`,
+        }}>
+          <div className="flex justify-between items-center" style={{ marginBottom: '2px' }}>
+            <span style={{ fontSize: '11px', color: COLOR.muted, textTransform: 'uppercase', letterSpacing: '0.04em' }}>Exam readiness</span>
+            <span style={{ fontSize: '15px', fontWeight: 700, color: readinessColor }}>{readiness.score}%</span>
+          </div>
+          <div style={{ fontSize: '13px', fontWeight: 600, color: readinessColor }}>{readiness.label}</div>
+          <div style={{ fontSize: '10.5px', color: COLOR.muted, marginTop: '4px', lineHeight: 1.4 }}>
+            {readiness.mastery}% lifetime mastery{readiness.freshness < 0.99 ? ', discounted for how long it\'s been since you last practiced' : ''} — not just a flat percentage that never decays.
+          </div>
+        </div>
+      )}
       <div style={{ fontSize: '13px', color: COLOR.text, marginBottom: '4px' }}>{config.length} questions</div>
       <div style={{ fontSize: '13px', color: COLOR.text, marginBottom: '4px' }}>{config.minutes}-minute time limit</div>
       <div style={{ fontSize: '12px', color: COLOR.muted, marginBottom: '16px', lineHeight: 1.5 }}>{config.passLabel}</div>
