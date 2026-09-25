@@ -492,17 +492,34 @@ mind so today's choices don't quietly foreclose that option later:
     yet, though tapping still supports both orders. Worth adding if this
     turns out to matter to how people actually play.
   - **Auto-scroll while dragging.** A round can run taller than one
-    screen (up to `ROUND_SIZE`, 6 by default, full-sentence definitions
-    stacked), and the drag captures the pointer instead of allowing a
-    normal touch-scroll — so without help, a term near the top literally
-    can't be dragged onto a definition below the fold. Holding near the
-    top/bottom edge now auto-scrolls the page (faster the closer to the
-    edge), verified end-to-end with a short-viewport test that drags to
-    the edge, holds, watches the page scroll, then re-measures the
-    target's new position before completing the drop — a naive test (or
-    a naive implementation) that computes the drop point once, before any
-    scrolling, breaks the moment the auto-scroll it's supposed to be
-    testing actually moves the target.
+    screen (up to `ROUND_SIZE` full-sentence definitions stacked), and the
+    drag captures the pointer instead of allowing a normal touch-scroll —
+    so without help, a term near the top literally can't be dragged onto
+    a definition below the fold. Holding near the top/bottom edge now
+    auto-scrolls the page (faster the closer to the edge), verified
+    end-to-end with a short-viewport test that drags to the edge, holds,
+    watches the page scroll, then re-measures the target's new position
+    before completing the drop — a naive test (or a naive implementation)
+    that computes the drop point once, before any scrolling, breaks the
+    moment the auto-scroll it's supposed to be testing actually moves the
+    target.
+- [x] **Match redesign for legibility** (user feedback: the first version
+  didn't read as an obvious matching exercise, and the text was cramped).
+  `ROUND_SIZE` dropped from 6 to 4 pairs by default (the in-lesson mini
+  round, `roundSize={3}`, is unaffected) — less on screen at once, and a
+  round is far more likely to fit in one view without needing the
+  auto-scroll above at all. Every term chip now carries a small numbered
+  badge (1, 2, 3…) and every definition an inline lettered prefix (A.,
+  B., C.…), the standard worksheet convention for "these two lists are
+  meant to be connected" — that framing was previously invisible; the
+  player just saw two unlabeled walls of text with no visual cue they
+  were a matching pair at all. Base font sizes went up across the board
+  (definitions 12.5px → 14.5px; terms 12.5px → 15.5px for short ones),
+  with a new `termFontSize()` helper that steps a long compound term
+  (e.g. "AzCopy vs. Storage Explorer vs. Azure File Sync") down to a
+  smaller size instead of overflowing or wrapping into a ransom note —
+  short terms get to be noticeably bigger rather than everything sharing
+  one compromise size.
 - [ ] **"Choose the more correct answer."** A comparative-judgment mode:
   given a scenario, show two plausible-but-imperfect answers and ask which
   is *better*, with an explanation of what makes the runner-up fall short.
