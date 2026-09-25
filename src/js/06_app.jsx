@@ -5,6 +5,7 @@ function CertStudyApp() {
   const [activeTrack, setActiveTrack] = useState('az900');
   const [mode, setMode] = useState('learn');
   const [learnView, setLearnView] = useState('study');
+  const [quizView, setQuizView] = useState('questions');
   const [activeCat, setActiveCat] = useState('all');
   const [results, setResults] = useState(emptyTrackMap);
   const [seenLog, setSeenLog] = useState(emptyTrackMap);
@@ -415,6 +416,7 @@ function CertStudyApp() {
     setIsLessonSession(true);
     skipNextAutoStart.current = true;
     setMode('quiz');
+    setQuizView('questions');
     markSeen(prepared.map((q) => q.id));
   };
 
@@ -783,18 +785,30 @@ function CertStudyApp() {
               Study
             </button>
             <button
-              onClick={() => setLearnView('match')}
-              className="flex-1"
-              style={{ padding: '6px 2px', borderRadius: '8px', fontSize: '10.5px', fontWeight: 600, background: learnView === 'match' ? COLOR.surfaceRaised : 'transparent', color: learnView === 'match' ? COLOR.text : COLOR.muted }}
-            >
-              Match
-            </button>
-            <button
               onClick={() => setLearnView('sheet')}
               className="flex-1"
               style={{ padding: '6px 2px', borderRadius: '8px', fontSize: '10.5px', fontWeight: 600, background: learnView === 'sheet' ? COLOR.surfaceRaised : 'transparent', color: learnView === 'sheet' ? COLOR.text : COLOR.muted }}
             >
               Sheet
+            </button>
+          </div>
+        )}
+
+        {mode === 'quiz' && (
+          <div className="flex gap-1 mb-4" style={{ background: COLOR.bg, padding: '3px', borderRadius: '10px', border: `1px solid ${COLOR.border}` }}>
+            <button
+              onClick={() => setQuizView('questions')}
+              className="flex-1"
+              style={{ padding: '6px 2px', borderRadius: '8px', fontSize: '10.5px', fontWeight: 600, background: quizView === 'questions' ? COLOR.surfaceRaised : 'transparent', color: quizView === 'questions' ? COLOR.text : COLOR.muted }}
+            >
+              Questions
+            </button>
+            <button
+              onClick={() => setQuizView('match')}
+              className="flex-1"
+              style={{ padding: '6px 2px', borderRadius: '8px', fontSize: '10.5px', fontWeight: 600, background: quizView === 'match' ? COLOR.surfaceRaised : 'transparent', color: quizView === 'match' ? COLOR.text : COLOR.muted }}
+            >
+              Match
             </button>
           </div>
         )}
@@ -837,7 +851,7 @@ function CertStudyApp() {
           />
         )}
 
-        {mode === 'quiz' && (
+        {mode === 'quiz' && quizView === 'questions' && (
           <React.Fragment>
             {!isLessonSession && !isMissedSession && quizPhase !== 'complete' && (
               <QuizSetup
@@ -876,7 +890,7 @@ function CertStudyApp() {
           </React.Fragment>
         )}
 
-        {mode === 'learn' && learnView === 'match' && (
+        {mode === 'quiz' && quizView === 'match' && (
           <MatchGame
             flashcards={filteredFlashcards}
             onRoundComplete={() => saveStats({ ...stats, counts: { ...stats.counts, matchRoundsCompleted: stats.counts.matchRoundsCompleted + 1 } })}

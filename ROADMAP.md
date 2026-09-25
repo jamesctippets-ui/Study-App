@@ -141,6 +141,20 @@ come up.
   state (`{order, scheduled, completed}`) rides the same sync/export-import
   path as `results`/`stats`/`srs` — it's study-planning data, not a display
   preference, so unlike the theme toggle it does travel with your account.
+- [x] **Moved Match under Quiz, not Learn** (user's idea). Match is a recall
+  self-test — you either know the pairing or you don't — which fits Quiz's
+  purpose (testing) far better than Learn's (reading/reference), so Learn's
+  sub-tabs are now just Cards/Study/Sheet and Quiz gained its own
+  Questions/Match sub-tab row, both in `06_app.jsx`. The category filter
+  chips above already applied to both Learn and Quiz, so Match kept
+  respecting the active category filter with no extra wiring; `MatchGame`
+  itself (04_shared_ui.jsx) didn't change at all. One real bug caught in
+  testing: `startLessonQuiz`/`startCategoryQuiz` ("Quiz this section," a
+  lesson's own quiz) only set `mode` to `'quiz'`, not the new `quizView`
+  sub-tab — so triggering one of those while Match happened to be the last
+  open Quiz sub-tab would silently land you on the matching game instead
+  of the quiz you asked for. Fixed by having those functions explicitly
+  set `quizView` back to `'questions'`.
 
 ## 7. Spaced repetition & study-science features (from research)
 

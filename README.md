@@ -6,24 +6,32 @@ proper Python source tree instead of one giant file.
 
 ## What's inside
 
-Three top-level tabs: **Learn**, **Quiz**, **Exam**. Learn holds three
+Three top-level tabs: **Learn**, **Quiz**, **Exam**. Learn holds two
 sub-views — Cards (flashcards, ordered by a simplified SM-2 spaced-repetition
 schedule — "Still learning" resurfaces a card sooner, "Got it" pushes its
 next appearance out by a growing interval; the order is computed fresh each
-time you enter a category/track rather than reshuffling mid-session), Study
+time you enter a category/track rather than reshuffling mid-session) and Study
 (for tracks without a course, a flashcard list paginated one category/section
 at a time — Previous/Next section controls instead of one long scroll; for
 AZ-900/AZ-104, a full mini-course per topic: reading with tappable key terms,
-an SVG diagram, a portal mockup, a worked scenario, and common exam traps),
-and Match (a
-term-matching game — tap a term chip, then its definition; respects the
-current category filter, tracks mistakes, and deals a fresh random round
-each time), and Sheet (a one-page, printable cheat sheet per track — every
+an SVG diagram, a portal mockup, a worked scenario, and common exam traps)
+— plus Sheet (a one-page, printable cheat sheet per track — every
 track's must-know facts condensed into a few dense sections, with a
 Print/save-as-PDF button). A lesson's reading is itself split
 into pages when it runs long — moving past the first page takes either a
 one-question quick check or a 3-pair mini match round, alternating between
 the two, so the material isn't just a wall of text to skim past.
+
+Quiz itself has two sub-views: **Questions** (the rotating multiple-choice/
+true-false/multi-select engine described below) and **Match** (a
+term-matching game — tap a term chip, then its definition; respects the
+current category filter, tracks mistakes, and deals a fresh random round
+each time). Match lives under Quiz rather than Learn since it's a recall
+self-test like the rest of Quiz, not a reading/reference view like Cards or
+Study. Starting a specific quiz programmatically — "Quiz this section," a
+lesson's own quiz, reviewing missed questions — always lands on Questions
+even if Match was the last sub-view open, so you never get dropped into the
+matching game instead of the quiz you actually asked for.
 
 Every Study section — a lesson's category in AZ-900/AZ-104, or a
 category page anywhere else — ends with a **"Quiz this section"** button
