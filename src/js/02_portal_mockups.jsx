@@ -294,6 +294,51 @@ const REAL_PORTAL_SCREENSHOTS = {
     sourceLabel: 'Microsoft: Azure pricing calculator documentation',
     sourceUrl: 'https://learn.microsoft.com/en-us/azure/cost-management-billing/costs/pricing-calculator',
   },
+  // Microsoft Intune admin center screenshots (MD-102) — sourced from the
+  // MicrosoftDocs/memdocs GitHub repo, which uses the same CC BY 4.0
+  // content license as azure-docs (see LICENSE/LICENSE-CODE there). These
+  // are a different admin console from the Azure Portal, so `product`
+  // overrides RealPortalScreenshot's default caption text accordingly.
+  intuneDeviceProfile: {
+    src: 'images/intune/create-device-profile.png',
+    alt: 'Real Microsoft Intune screenshot of the device configuration profile type picker',
+    description: 'The profile type picker when creating a Windows device configuration profile — Settings catalog (browse and pick individual settings directly), Templates (a pre-built group of related settings for a common scenario), or Properties catalog. Which one an admin picks changes how the profile is built, not just its name.',
+    sourceLabel: 'Microsoft Learn: Configure device configuration profiles in Microsoft Intune',
+    sourceUrl: 'https://learn.microsoft.com/en-us/intune/device-configuration/create-device-profile',
+    product: 'Microsoft Intune admin center',
+  },
+  intuneWin32Detection: {
+    src: 'images/intune/win32-detection-rule.png',
+    alt: 'Real Microsoft Intune screenshot of a Win32 app detection rule',
+    description: "A Win32 app's detection rule, configured to check for a specific registry key — this is how Intune decides an app is already installed and skips reinstalling it. A missing or wrong detection rule is a classic reason a Win32 app shows as failed or keeps reinstalling.",
+    sourceLabel: 'Microsoft Learn: Add and assign Win32 apps to Microsoft Intune',
+    sourceUrl: 'https://learn.microsoft.com/en-us/intune/app-management/deployment/add-win32',
+    product: 'Microsoft Intune admin center',
+  },
+  intuneAutoEnrollScope: {
+    src: 'images/intune/auto-enrollment-scope.png',
+    alt: 'Real Microsoft Intune screenshot of the MDM automatic enrollment scope setting',
+    description: 'The MDM user scope setting that turns on Windows automatic enrollment — None, Some (a specific group), or All. This is the single setting that decides whether a Microsoft Entra-joined Windows device automatically enrolls into Intune the moment a user signs in, with no separate manual enrollment step.',
+    sourceLabel: 'Microsoft Learn: Enable MDM automatic enrollment for Windows',
+    sourceUrl: 'https://learn.microsoft.com/en-us/intune/device-enrollment/windows/enable-automatic-mdm',
+    product: 'Microsoft Intune admin center',
+  },
+  intuneNoncomplianceActions: {
+    src: 'images/intune/noncompliance-notification.png',
+    alt: 'Real Microsoft Intune screenshot of the create-a-noncompliance-notification wizard',
+    description: "Step 2 of creating a noncompliance notification — one of several actions for noncompliance a compliance policy can trigger on a schedule (others include remotely locking the device or marking it noncompliant), rather than just silently recording that a device failed a check.",
+    sourceLabel: 'Microsoft Learn: Configure compliance policies with actions for noncompliance',
+    sourceUrl: 'https://learn.microsoft.com/en-us/intune/device-security/compliance/configure-noncompliance-actions',
+    product: 'Microsoft Intune admin center',
+  },
+  intuneMonitorDashboard: {
+    src: 'images/intune/monitor-dashboard-tiles.png',
+    alt: 'Real Microsoft Intune screenshot of the device enrollment, compliance, and configuration health tiles',
+    description: 'The at-a-glance health tiles from Intune\'s monitoring dashboard — device enrollment, device compliance, and device configuration each roll up to a single OK/warning state, with a count of anything needing attention (here, 4 configuration policies with an error or conflict) rather than requiring a click into each report to notice a problem.',
+    sourceLabel: 'Microsoft Learn: Microsoft Intune reports',
+    sourceUrl: 'https://learn.microsoft.com/en-us/intune/device-management/reports/overview',
+    product: 'Microsoft Intune admin center',
+  },
 };
 
 // `hideDescription` is set by quiz/exam question views — the description
@@ -312,7 +357,7 @@ function RealPortalScreenshot({ shot, hideDescription }) {
         </div>
       )}
       <div style={{ fontSize: '10px', color: COLOR.muted, marginTop: '8px', lineHeight: 1.4, padding: '0 4px' }}>
-        Real Azure Portal screenshot — © Microsoft, licensed{' '}
+        Real {shot.product || 'Azure Portal'} screenshot — © Microsoft, licensed{' '}
         <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener noreferrer" style={{ color: COLOR.primary }}>CC BY 4.0</a>
         {' '}via{' '}
         <a href={shot.sourceUrl} target="_blank" rel="noopener noreferrer" style={{ color: COLOR.primary }}>{shot.sourceLabel}</a>.

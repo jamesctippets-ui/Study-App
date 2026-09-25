@@ -375,7 +375,7 @@ mind so today's choices don't quietly foreclose that option later:
   either course (see README's "ideas for Claude Code," which still notes
   the separate, smaller diagram gap: 2 AZ-104 lessons lack a hand-drawn
   diagram, independent of the screenshot work).
-- [ ] **Licensing note learned the hard way:** not every `MicrosoftDocs/*`
+- [x] **Licensing note learned the hard way:** not every `MicrosoftDocs/*`
   GitHub repo uses the same license as `azure-docs` (CC BY 4.0 for content
   + MIT for code samples, in separate `LICENSE`/`LICENSE-CODE` files).
   `entra-docs`, for example, has a single plain MIT `LICENSE` for the
@@ -383,26 +383,54 @@ mind so today's choices don't quietly foreclose that option later:
   images weren't used here despite finding an on-topic candidate. Check
   each repo's actual license file before reusing an image from it; don't
   assume the azure-docs pattern holds elsewhere in the MicrosoftDocs org.
-- [ ] Bring the same treatment to other tracks that have a real admin-console
-  UI worth showing: DP-300 (Azure SQL/Cosmos DB portal blades), AZ-305
-  (Azure landing zone / architecture-center diagrams), SC-300 (Entra ID
-  admin center — pending the licensing check above), MD-102 (Intune admin
-  center), SC-200 (Defender/Sentinel portal). Same sourcing rule as
-  before: only a verified CC-licensed source (`raw.githubusercontent.com`
-  is reachable even when `learn.microsoft.com` itself isn't) — never a
-  generic "free stock photo," since no such thing exists for a specific
-  product UI. Structural note: today's screenshot mechanism only exists
-  for course tracks (lessons with a `portalMockup` key) — extending it to
-  the 13 flat-StudyView tracks needs a new slot in `StudyView`/
-  `StudyEntry`, not just new data. This directly affects two of the
-  tracks the user asked to focus on: Cloud+ has no real portal to
-  screenshot anyway (it's vendor-neutral by design — see README/ROADMAP
-  "not in scope" notes on not naming a specific cloud vendor), but DP-900
-  covers plenty of real Azure data-service UIs (Cosmos DB, Synapse,
-  Power BI) that would benefit once this structural gap is closed.
+  Re-confirmed on a second pass: `entra-docs`' `LICENSE` *and*
+  `LICENSE-CODE` are both plain MIT (no CC BY split at all), so SC-300
+  screenshots are still blocked on this. Also learned Microsoft has split
+  `azure-docs` into many product-specific repos over time — Azure SQL/
+  Cosmos DB content is no longer in `azure-docs` and its actual current
+  repo wasn't found; `azure-security-docs` (CC BY 4.0, confirmed) only
+  covers Key Vault/HSM/attestation, not Defender for Cloud or Sentinel,
+  so SC-200 sourcing is also still open. Don't assume a repo name from
+  the product name — verify it exists and check its license before use.
+- [x] **Structural gap closed: real screenshots now work on flat-StudyView
+  tracks, not just AZ-900/AZ-104's course lessons.** A category in any
+  track's `CATEGORIES` can carry an optional `screenshot` key into
+  `REAL_PORTAL_SCREENSHOTS`; a new `CategoryScreenshot` component renders
+  it in `StudyView` (both the single-category and paginated-"all" views),
+  right where `ResourceLinksRow` already sits. `RealPortalScreenshot`
+  itself needed no changes — it was already a fully self-contained card,
+  never actually dependent on being nested under a hand-drawn mockup the
+  way `LessonDetail` happened to use it. One real fix along the way: its
+  caption was hardcoded to "Real Azure Portal screenshot," which would
+  have mislabeled a screenshot from a different admin console — added an
+  optional `product` field on each shot (defaults to "Azure Portal" for
+  every existing entry, so nothing already shipped changed) so a caption
+  can correctly say "Real Microsoft Intune admin center screenshot"
+  instead.
+- [x] **MD-102 (Intune admin center) — first track shipped under the new
+  structural slot, all 5 categories covered.** Sourced from
+  `MicrosoftDocs/memdocs` (confirmed CC BY 4.0 + MIT split, same pattern
+  as azure-docs): the Settings catalog/Templates/Properties catalog
+  profile-type picker (Manage and Maintain Devices), the MDM automatic
+  enrollment scope setting (Prepare Infrastructure), a compliance policy's
+  noncompliance-notification wizard (Protect Devices), a Win32 app's
+  registry-based detection rule (Manage and Secure Applications), and the
+  enrollment/compliance/configuration health-tile dashboard (Optimize
+  Endpoint Operations) — `images/intune/*.png`, registered in
+  `REAL_PORTAL_SCREENSHOTS` with `product: 'Microsoft Intune admin
+  center'`.
+- [ ] DP-300 (Azure SQL/Cosmos DB), AZ-305 (architecture-center diagrams —
+  `MicrosoftDocs/architecture-center` is confirmed CC BY 4.0, just not
+  yet used), and SC-200 (Defender for Cloud/Sentinel) still need their
+  actual source repo found (SC-200) or content mined from a repo already
+  confirmed licensed (AZ-305). SC-300 stays blocked on `entra-docs`'
+  licensing per above unless a different, properly CC-BY-licensed source
+  turns up. Cloud+ has no real portal to screenshot anyway (vendor-neutral
+  by design).
 - [ ] More quiz/exam questions built around each new screenshot, matching
   the existing pattern (`'image': '<key>'` on the question dict,
-  `hideDescription` so the caption doesn't give away the answer).
+  `hideDescription` so the caption doesn't give away the answer) — MD-102
+  doesn't have any of these yet, only the Study-view placement above.
 
 ## 13. Interactive learning games (user's idea)
 

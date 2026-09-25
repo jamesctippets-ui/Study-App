@@ -87,6 +87,23 @@ source page. The hand-drawn mockup stays as the primary illustration
 (dark-theme consistent, and covers every topic); the real screenshot is a
 supplementary, secondary reference where one exists.
 
+The other 13 (non-course) tracks get the same real-screenshot treatment
+per category instead of per lesson — any category in `CATEGORIES` can
+carry a `screenshot` key into `REAL_PORTAL_SCREENSHOTS`
+(02_portal_mockups.jsx), shown under a "Portal screenshot" heading on that
+category's Study page. There's no hand-drawn mockup involved here since
+flat tracks never had one — the real screenshot renders as its own
+self-contained card. MD-102 is the first track to use this, sourced from
+`MicrosoftDocs/memdocs` (Intune's own CC BY 4.0-licensed docs repo) with
+one screenshot per category (`images/intune/`); more tracks are a
+straightforward data addition now that the slot exists — see ROADMAP.md
+section 12 for which ones are still blocked on finding a properly-licensed
+source. A screenshot's optional `product` field controls the attribution
+caption's wording ("Real Azure Portal screenshot" by default, "Real
+Microsoft Intune admin center screenshot" for MD-102's) so it's never
+mislabeled just because most of the existing screenshots happen to be
+Azure Portal.
+
 A handful of AZ-900/AZ-104 quiz and exam questions go a step further and
 put one of those same real screenshots directly in the question itself
 ("Looking at this real Access control (IAM) role assignments list,

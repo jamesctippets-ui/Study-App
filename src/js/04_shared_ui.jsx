@@ -739,6 +739,24 @@ function ResourceLinksRow({ resources, label }) {
   );
 }
 
+// The flat (non-course) tracks' equivalent of a lesson's "See the real
+// thing:" block — a category can optionally carry a `screenshot` key into
+// REAL_PORTAL_SCREENSHOTS (02_portal_mockups.jsx), shown once per section
+// in StudyView. Unlike the course-track version, there's no hand-drawn
+// mockup to nest it under here, since flat tracks never had one — the real
+// screenshot component already renders as a fully self-contained card on
+// its own, so it needs no wrapper.
+function CategoryScreenshot({ screenshotKey }) {
+  const shot = screenshotKey && REAL_PORTAL_SCREENSHOTS[screenshotKey];
+  if (!shot) return null;
+  return (
+    <div style={{ marginBottom: '14px' }}>
+      <div style={{ fontSize: '13px', fontWeight: 600, color: COLOR.gold, marginBottom: '6px' }}>Portal screenshot</div>
+      <RealPortalScreenshot shot={shot} />
+    </div>
+  );
+}
+
 function QuizSectionButton({ label, count, onClick }) {
   if (!count) return null;
   return (
@@ -765,6 +783,7 @@ function StudyView({ activeCat, categories, flashcards, questionsData, onQuizCat
     return (
       <div>
         <ResourceLinksRow resources={activeCatObj && activeCatObj.resources} label="Learn more" />
+        <CategoryScreenshot screenshotKey={activeCatObj && activeCatObj.screenshot} />
         <div className="flex flex-col gap-3" style={{ marginBottom: '16px' }}>
           {items.map((item) => <StudyEntry key={item.id} item={item} allFlashcards={flashcards} />)}
         </div>
@@ -796,6 +815,7 @@ function StudyView({ activeCat, categories, flashcards, questionsData, onQuizCat
         <div style={{ fontSize: '11px', color: COLOR.muted }}>Section {page + 1} of {sections.length}</div>
       </div>
       <ResourceLinksRow resources={section.cat.resources} label="Learn more" />
+      <CategoryScreenshot screenshotKey={section.cat.screenshot} />
       <div className="flex flex-col gap-3" style={{ marginBottom: '18px' }}>
         {section.items.map((item) => <StudyEntry key={item.id} item={item} allFlashcards={flashcards} />)}
       </div>
