@@ -261,6 +261,35 @@ function CertStudyApp() {
     saveStats({ ...current, dailyGoal: { ...current.dailyGoal, target } });
   };
 
+  // Merges a patch into today's dailyChallenge, discarding whichever half
+  // (question/vocab) belongs to a stale date instead of carrying it
+  // forward under today's date — otherwise answering today's question
+  // before ever revealing yesterday's vocab would make it look like
+  // today's vocab was already revealed too.
+  const withTodaysChallenge = (patch) => {
+    const current = statsRef.current.dailyChallenge;
+    const today = todayString();
+    const base = current && current.date === today ? current : { date: today, question: null, vocab: null };
+    return { ...base, ...patch, date: today };
+  };
+
+  const answerDailyQuestion = (trackKey, question, isCorrect, selected) => {
+    recordResultFor(trackKey, question.id, isCorrect ? 'correct' : 'incorrect');
+    bumpDailyGoal(1);
+    saveStats({
+      ...statsRef.current,
+      dailyChallenge: withTodaysChallenge({ question: { id: question.id, selected, correct: isCorrect } }),
+    });
+  };
+
+  const revealDailyVocab = (trackKey, card) => {
+    bumpDailyGoal(1);
+    saveStats({
+      ...statsRef.current,
+      dailyChallenge: withTodaysChallenge({ vocab: { id: card.id, revealed: true } }),
+    });
+  };
+
   const speak = (id, text) => {
     if (!speechSupported) return;
     window.speechSynthesis.cancel();
@@ -408,6 +437,25 @@ function CertStudyApp() {
     saveStats({ ...stats, lastVisited: { track: activeTrack, mode } });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeTrack, mode, syncMode]);
+
+  // Logs one readiness snapshot a day for Home's "current cert" — the
+  // only source readinessProjection has to extrapolate from. Only writes
+  // when today's score for that track has actually changed from what's
+  // already stored, so this doesn't spam a write on every render; it's
+  // gated to when Home is actually open since that's the only place the
+  // projection is shown.
+  useEffect(() => {
+    if (syncMode === 'loading' || mode !== 'home') return;
+    const trackKey = focusTrackKey(certPlan, stats.lastVisited);
+    const score = examReadiness(trackKey, results, seenLog).score;
+    const today = todayString();
+    const history = statsRef.current.readinessHistory || {};
+    const trackHistory = history[trackKey] || [];
+    const last = trackHistory[trackHistory.length - 1];
+    if (last && last.date === today && last.score === score) return;
+    saveStats({ ...statsRef.current, readinessHistory: recordReadinessSnapshot(history, trackKey, score) });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mode, syncMode, results, seenLog, certPlan, stats.lastVisited]);
 
   const startMissedSession = () => {
     const pool = questionsData.filter((q) => trackResults[q.id] === 'incorrect');
@@ -824,6 +872,7 @@ function CertStudyApp() {
           <HomeView
             tracks={visibleTracks}
             results={results}
+            seenLog={seenLog}
             stats={stats}
             certPlan={certPlan}
             onResume={() => {
@@ -833,6 +882,8 @@ function CertStudyApp() {
             onOpenAbout={() => setShowAbout(true)}
             onOpenCertPath={() => setShowCertPath(true)}
             onSetGoalTarget={setDailyGoalTarget}
+            onAnswerDailyQuestion={answerDailyQuestion}
+            onRevealDailyVocab={revealDailyVocab}
           />
         ) : (
         <React.Fragment>

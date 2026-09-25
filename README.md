@@ -173,22 +173,53 @@ rather than emoji, matching the hamburger menu below.
 
 Opening the app always lands on **Home** (`HomeView` in `04_shared_ui.jsx`)
 rather than resuming the last track+mode directly — a real dashboard to
-start from every time, not a mid-session drop-back-in. Home shows: overall
-average mastery across every track and the daily streak; a **daily goal
-ring** — a small self-set "study N cards/questions today" target
-(`stats.dailyGoal`) with a circular progress indicator that fills as you
-rate flashcards and answer quiz/exam questions (across every track,
-Today's Mix included), turns solid green once you hit it, and can be
-adjusted with a tap-to-reveal +/- 5 stepper; a **My Cert Path** shortcut
-showing your "Up next" cert; a **"Continue where you left off"** button
-once you've actually visited a track this browser (tracked separately
-from Home itself, so Home is never mistaken for "a place you left off
-at"); and a flat list of all 15 tracks — each shown exactly once with its
-description and live mastery % (no path-grouping; the earlier Learning
-Paths feature was removed in favor of this simpler list) — tapping one
-takes you straight into its Learn tab. From inside any track, a ☰ button
-in the header (titled "Home") takes you back to this same Home page at
-any time — it's a real navigation destination now, not a bottom-sheet
+start from every time, not a mid-session drop-back-in. Home shows, top to
+bottom:
+
+- Overall average mastery across every track and the daily streak.
+- A **daily goal ring** — a small self-set "study N cards/questions
+  today" target (`stats.dailyGoal`) with a circular progress indicator
+  that fills as you rate flashcards and answer quiz/exam questions
+  (across every track, Today's Mix and the daily question/vocab below
+  included), turns solid green once you hit it, and can be adjusted with
+  a tap-to-reveal +/- 5 stepper.
+- An **exam readiness** card for your "current cert" (see below) with a
+  lightweight readiness **prediction**: `stats.readinessHistory` logs one
+  score snapshot a day per track, and `readinessProjection` draws a
+  straight line through the oldest and newest snapshots to estimate how
+  many days of study, at that pace, would cross the 80% mark — e.g. "At
+  your current pace, AZ-900 could be exam-ready in about 12 days (around
+  Oct 7)." With fewer than two days of real history, a flat/declining
+  trend, or a projection over a year out, it says so plainly instead of
+  guessing a date it can't back up.
+- A **My Cert Path** card showing your "Up next" cert, with a **next
+  cert date** countdown badge (reusing `formatScheduledLabel`'s "in N
+  days"/"today"/"N days past" phrasing, colored red if overdue and gold
+  inside a week) whenever that cert has a scheduled test date set.
+- A **"Continue where you left off"** button once you've actually
+  visited a track this browser (tracked separately from Home itself, so
+  Home is never mistaken for "a place you left off at").
+- A **Question of the Day** and **Vocab of the Day** — one question and
+  one flashcard, deterministically picked each day (`seededIndex`, hashed
+  from the date so the pick is stable across reloads without needing to
+  store which item was chosen) from your "current cert": the Cert Path's
+  Up Next track if you've set one, else whichever track you last
+  actually visited, else AZ-900. Answering the question or revealing the
+  vocab counts toward the daily goal and updates that track's real
+  mastery/results data (`stats.dailyChallenge` just remembers you've
+  already done today's so revisiting Home later doesn't reset or
+  double-count it) — both lock in place with a "new one tomorrow" note
+  once done.
+- A collapsed-by-default **dropdown** for the full 15-track list — tap
+  "All tracks (N)" to expand the same rich rows (colored label, subtitle,
+  live mastery %/passed/scheduled badge) the earlier hamburger bottom-sheet
+  showed, collapsed by default now that several other widgets share the
+  page. No path-grouping — every track once, description and mastery %
+  intact — tapping one takes you straight into its Learn tab.
+
+From inside any track, a ☰ button in the header (titled "Home") takes you
+back to this same Home page at any time — it's a real navigation
+destination now, not a bottom-sheet
 overlay. Quiz and Exam missed-question review lists show each question's
 explanation alongside the prompt, not just what you got wrong.
 

@@ -103,6 +103,38 @@ come up.
   itself get recorded as "the place you left off" the next time you
   reload — it only tracks real learn/quiz/exam visits, which is what
   Home's own Continue button needs to stay meaningful.
+- [x] **Home dashboard expansion, by request: a track dropdown, daily
+  question/vocab, a next-cert-date countdown, and a readiness
+  prediction.** Four asks landed together:
+  - The always-expanded 15-track list became `TrackListDropdown` —
+    collapsed by default behind an "All tracks (N)" summary row,
+    expanding to the exact same rich rows the old hamburger bottom-sheet
+    showed, since Home's other widgets now compete for the same space.
+  - **Question of the Day** / **Vocab of the Day**: one question and one
+    flashcard, picked deterministically per day (`seededIndex` in
+    03_helpers.js — a stable string hash of the date, so the same pick
+    survives reloads without persisting which item was chosen) from a
+    shared "focus track" (`focusTrackKey`: the Cert Path's Up Next cert,
+    else the last-visited track, else AZ-900 — one shared notion of
+    "the cert you're currently working on" for every Home widget).
+    Answering/revealing bumps the daily goal and records real
+    mastery/results data, and locks for the day via a new
+    `stats.dailyChallenge` field (`DailyQuestionCard`/`DailyVocabCard` in
+    04_shared_ui.jsx) — revisiting Home later the same day shows the
+    already-answered/revealed state instead of resetting it.
+  - **Next cert date**: the My Cert Path card's plain "›" chevron becomes
+    a countdown badge (reusing `formatScheduledLabel`'s phrasing, colored
+    red overdue / gold inside a week) whenever the Up Next cert has a
+    scheduled date.
+  - **Readiness prediction**: `stats.readinessHistory` logs one score
+    snapshot per track per day (self-correcting — a same-day write
+    overwrites rather than duplicates); `readinessProjection` fits a
+    straight line through the oldest and newest snapshots to project
+    days-to-80%, falling back to an honest "keep practicing" message with
+    fewer than 2 days of history, a flat/declining trend, or a
+    >365-day projection, rather than a specific date it can't back up.
+    Shown on Home as part of the same readiness card already on the Exam
+    tab, for the focus track.
 - [x] A side/hamburger **menu** for track navigation (☰, `IconMenu` in
   src/js/00_preamble.js) — opens `TrackMenuPanel` (04_shared_ui.jsx),
   which shows overall average mastery + streak, an optional "continue

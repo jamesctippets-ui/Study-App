@@ -185,6 +185,35 @@ function nextInCertPath(certPlan) {
   return certPlan.order.find((k) => !certPlan.completed[k]) || null;
 }
 
+// A simple, stable string -> non-negative integer hash (not cryptographic,
+// just deterministic) used to pick "of the day" content — the day's
+// question/vocab card — from a date string, so the pick stays put across
+// reloads and re-renders on the same day without needing to persist which
+// item was chosen, only whether it's been answered/revealed yet.
+function hashString(str) {
+  let h = 0;
+  for (let i = 0; i < str.length; i++) { h = (h * 31 + str.charCodeAt(i)) >>> 0; }
+  return h;
+}
+
+function seededIndex(seedStr, len) {
+  return len > 0 ? hashString(seedStr) % len : 0;
+}
+
+// Which track Home's "current cert" widgets — Question of the Day, Vocab
+// of the Day, and the exam-readiness prediction — all focus on: the Cert
+// Path's Up Next cert if one is set (the same priority pick Today's Mix
+// weights around), else whichever track was last actually visited, else a
+// sane default. One shared notion of "the cert you're currently working
+// on" so these widgets agree with each other instead of each guessing
+// independently.
+function focusTrackKey(certPlan, lastVisited) {
+  const nextKey = nextInCertPath(certPlan);
+  if (nextKey && DATA[nextKey]) return nextKey;
+  if (lastVisited && DATA[lastVisited.track]) return lastVisited.track;
+  return 'az900';
+}
+
 // Reorders `key` one step toward the front/back of the plan, relative only
 // to the other still-active (not-completed) tracks — a completed track's
 // position in the underlying array is skipped over rather than swapped
@@ -330,6 +359,8 @@ function emptyStats() {
     unlocked: [],
     lastVisited: null,
     dailyGoal: { target: 20, date: null, count: 0 },
+    dailyChallenge: { date: null, question: null, vocab: null },
+    readinessHistory: {},
   };
 }
 
@@ -340,12 +371,19 @@ function normalizeStats(raw) {
   const rawGoal = raw.dailyGoal && typeof raw.dailyGoal === 'object' ? raw.dailyGoal : {};
   const target = Number.isFinite(rawGoal.target) && rawGoal.target > 0 ? rawGoal.target : base.dailyGoal.target;
   const count = Number.isFinite(rawGoal.count) && rawGoal.count >= 0 ? rawGoal.count : 0;
+  const rawChallenge = raw.dailyChallenge && typeof raw.dailyChallenge === 'object' ? raw.dailyChallenge : {};
   return {
     streak: { ...base.streak, ...(raw.streak || {}) },
     counts: { ...base.counts, ...(raw.counts || {}) },
     unlocked: Array.isArray(raw.unlocked) ? raw.unlocked : [],
     lastVisited,
     dailyGoal: { target, date: rawGoal.date || null, count },
+    dailyChallenge: {
+      date: rawChallenge.date || null,
+      question: rawChallenge.question && typeof rawChallenge.question === 'object' ? rawChallenge.question : null,
+      vocab: rawChallenge.vocab && typeof rawChallenge.vocab === 'object' ? rawChallenge.vocab : null,
+    },
+    readinessHistory: raw.readinessHistory && typeof raw.readinessHistory === 'object' ? raw.readinessHistory : {},
   };
 }
 
@@ -477,5 +515,51 @@ function examReadiness(trackKey, results, seenLog) {
   else if (score >= 30) label = 'Building';
   else label = 'Just starting';
   return { score, mastery, freshness, label };
+}
+
+// Appends (or, same-day, overwrites) today's readiness score for one
+// track, capped to the most recent 30 distinct days so this can't grow
+// unbounded over months of use. This is the only "over time" history the
+// app records — everything else is a lifetime tally — and it exists
+// purely to feed readinessProjection below.
+function recordReadinessSnapshot(history, trackKey, score) {
+  const today = todayString();
+  const trackHistory = history[trackKey] || [];
+  const last = trackHistory[trackHistory.length - 1];
+  const nextTrackHistory = last && last.date === today
+    ? [...trackHistory.slice(0, -1), { date: today, score }]
+    : [...trackHistory, { date: today, score }].slice(-30);
+  return { ...history, [trackKey]: nextTrackHistory };
+}
+
+function addDays(dateStr, days) {
+  const [y, m, d] = dateStr.split('-').map(Number);
+  const dt = new Date(y, m - 1, d);
+  dt.setDate(dt.getDate() + days);
+  return dt.getFullYear() + '-' + String(dt.getMonth() + 1).padStart(2, '0') + '-' + String(dt.getDate()).padStart(2, '0');
+}
+
+// A deliberately honest, low-confidence "when might I be ready" estimate:
+// draws a straight line through the oldest and newest daily readiness
+// snapshots recorded for a track and extrapolates how many days, at that
+// pace, it'd take to cross `target`. There's no real per-attempt time
+// series to fit a proper curve to — just day-level snapshots — so this
+// is explicit about when NOT to show a number: fewer than 2 distinct
+// days of history, a flat-or-declining trend, or a projection more than
+// a year out all fall back to a plain status instead of a specific (and
+// probably wrong) date.
+function readinessProjection(history, trackKey, target) {
+  const trackHistory = (history[trackKey] || []).filter((h) => Number.isFinite(h.score));
+  if (trackHistory.length < 2) return { status: 'insufficient' };
+  const first = trackHistory[0];
+  const last = trackHistory[trackHistory.length - 1];
+  if (last.score >= target) return { status: 'ready', score: last.score };
+  const days = daysBetween(first.date, last.date);
+  if (days <= 0) return { status: 'insufficient' };
+  const rate = (last.score - first.score) / days;
+  if (rate <= 0) return { status: 'flat', score: last.score };
+  const daysNeeded = Math.ceil((target - last.score) / rate);
+  if (daysNeeded > 365) return { status: 'flat', score: last.score };
+  return { status: 'projected', score: last.score, daysNeeded, projectedDate: addDays(todayString(), daysNeeded) };
 }
 

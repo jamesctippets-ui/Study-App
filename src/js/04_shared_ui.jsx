@@ -240,21 +240,203 @@ function DailyGoalRing({ dailyGoal, onSetTarget }) {
   );
 }
 
+// A collapsed-by-default disclosure for the full track list — same rich
+// rows (colored label, subtitle, mastery %/passed/scheduled badge) the
+// old hamburger bottom-sheet menu showed, just tucked behind a single
+// summary row instead of always taking up the whole page, since Home now
+// has several other widgets competing for the same space.
+function TrackListDropdown({ tracks, masteries, certPlan, onSelectTrack }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="mb-4">
+      <button
+        onClick={() => setOpen((o) => !o)}
+        style={{
+          width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+          padding: '12px 14px', borderRadius: '12px', background: COLOR.surface,
+          border: `1px solid ${COLOR.border}`, boxShadow: SHADOW.card,
+        }}
+      >
+        <span style={{ fontSize: '13px', fontWeight: 600, color: COLOR.text }}>All tracks ({tracks.length})</span>
+        <span style={{ fontSize: '11px', color: COLOR.muted, transform: open ? 'rotate(180deg)' : 'none', transition: 'transform 0.15s ease' }}>▾</span>
+      </button>
+      {open && (
+        <div className="flex flex-col gap-2" style={{ marginTop: '8px' }}>
+          {masteries.map(({ track: t, pct }) => {
+            const accent = trackAccent(t.key);
+            const isCompleted = !!certPlan.completed[t.key];
+            const scheduledDate = certPlan.scheduled[t.key];
+            return (
+              <button
+                key={t.key}
+                onClick={() => onSelectTrack(t.key)}
+                style={{
+                  textAlign: 'left', display: 'flex', alignItems: 'center', gap: '12px', padding: '12px 14px', borderRadius: '12px',
+                  background: COLOR.surface, border: `1px solid ${COLOR.border}`, boxShadow: SHADOW.card,
+                }}
+              >
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontSize: '13.5px', fontWeight: 600, color: accent }}>{t.label}</div>
+                  <div style={{ fontSize: '11px', color: COLOR.muted, marginTop: '2px' }}>{t.subtitle}</div>
+                </div>
+                {isCompleted ? (
+                  <div title="Passed" style={{ fontSize: '13px', fontWeight: 700, color: COLOR.success, flexShrink: 0 }}>✓ Passed</div>
+                ) : scheduledDate ? (
+                  <div title="Scheduled" style={{ fontSize: '10.5px', fontWeight: 600, color: COLOR.gold, flexShrink: 0, textAlign: 'right', whiteSpace: 'nowrap' }}>
+                    {formatDateShort(scheduledDate)}
+                  </div>
+                ) : (
+                  <div style={{ fontSize: '13px', fontWeight: 700, color: pct >= 70 ? COLOR.success : COLOR.muted, flexShrink: 0 }}>{pct}%</div>
+                )}
+              </button>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// A single standalone question, answered once and done — not part of any
+// quiz session, so it keeps its own local selection state rather than
+// touching the app's session/msPending state, and reuses QuestionView
+// (hideMeta + hideNext) for visual consistency with every other question
+// in the app instead of a bespoke look. `stored` is the persisted
+// {selected, correct} from stats.dailyChallenge if today's question was
+// already answered (e.g. on a revisit later the same day); otherwise the
+// question starts unanswered.
+function DailyQuestionCard({ q, trackLabel, stored, onAnswer }) {
+  const [selected, setSelected] = useState(stored ? stored.selected : null);
+  const [msPending, setMsPending] = useState([]);
+  useEffect(() => { setSelected(stored ? stored.selected : null); setMsPending([]); }, [q.id, stored]);
+
+  const choose = (idx) => {
+    if (selected !== null) return;
+    let isCorrect;
+    if (q.type === 'mc') isCorrect = idx === q.correct;
+    else if (q.type === 'tf') isCorrect = (idx === 0) === q.answer;
+    else return;
+    setSelected(idx);
+    onAnswer(isCorrect, idx);
+  };
+  const toggleMs = (idx) => {
+    if (selected !== null) return;
+    setMsPending((prev) => (prev.includes(idx) ? prev.filter((i) => i !== idx) : [...prev, idx]));
+  };
+  const submitMs = () => {
+    if (selected !== null || msPending.length === 0) return;
+    const picked = [...msPending].sort();
+    const correctSet = [...q.correct].sort();
+    const isCorrect = picked.length === correctSet.length && picked.every((v, i) => v === correctSet[i]);
+    setSelected(picked);
+    onAnswer(isCorrect, picked);
+  };
+
+  return (
+    <div className="mb-4">
+      <div style={{ fontSize: '11px', color: COLOR.gold, fontWeight: 700, marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+        Question of the day · {trackLabel}
+      </div>
+      <QuestionView
+        q={q}
+        selected={selected}
+        onChoose={choose}
+        onNext={() => {}}
+        index={0}
+        total={1}
+        hideMeta
+        hideNext
+        msPending={msPending}
+        onToggleMs={toggleMs}
+        onSubmitMs={submitMs}
+        flashcardsData={DATA[q.__homeTrack]?.flashcards}
+      />
+      {selected !== null && (
+        <div style={{ fontSize: '10.5px', color: COLOR.muted, textAlign: 'center', marginTop: '6px' }}>
+          New question tomorrow.
+        </div>
+      )}
+    </div>
+  );
+}
+
+// A single flashcard shown as a passive daily lookup rather than a rated
+// review — no "Got it/Still learning" here, since it's meant to be a
+// fast glance rather than another SRS-scored rep. Revealing it still
+// counts toward the daily goal ring (it's real study time), just not
+// toward mastery/SRS scheduling the way an actual rating would.
+function DailyVocabCard({ card, trackLabel, revealed, onReveal }) {
+  return (
+    <div className="mb-4">
+      <div style={{ fontSize: '11px', color: COLOR.primary, fontWeight: 700, marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+        Vocab of the day · {trackLabel}
+      </div>
+      <div
+        onClick={() => { if (!revealed) onReveal(); }}
+        style={{
+          boxShadow: SHADOW.card, background: revealed ? COLOR.surfaceRaised : COLOR.surface,
+          border: `1px solid ${COLOR.border}`, borderRadius: '18px', padding: '22px 20px', minHeight: '96px',
+          display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+          textAlign: 'center', cursor: revealed ? 'default' : 'pointer',
+        }}
+      >
+        <div className="itil-display" style={{ fontSize: '18px', fontWeight: 600, marginBottom: revealed ? '10px' : 0 }}>{card.front}</div>
+        {revealed && <div style={{ fontSize: '14px', lineHeight: 1.55, color: COLOR.muted }}>{card.back}</div>}
+      </div>
+      <div style={{ fontSize: '10.5px', color: COLOR.muted, textAlign: 'center', marginTop: '6px' }}>
+        {revealed ? 'New term tomorrow.' : 'Tap to reveal the definition'}
+      </div>
+    </div>
+  );
+}
+
+// Turns a readinessProjection() result into the one-line honest-effort
+// message shown under Home's readiness card — see 03_helpers.js for why
+// most branches deliberately avoid a specific date.
+function readinessProjectionMessage(projection, trackLabel) {
+  if (projection.status === 'ready') return `Tracking as exam-ready for ${trackLabel} right now.`;
+  if (projection.status === 'projected') {
+    return `At your current pace, ${trackLabel} could be exam-ready in about ${projection.daysNeeded} day${projection.daysNeeded === 1 ? '' : 's'} (around ${formatDateShort(projection.projectedDate)}).`;
+  }
+  if (projection.status === 'flat') return `Pace hasn't picked up yet — answer a few more ${trackLabel} questions to get a projection.`;
+  return `Keep practicing ${trackLabel} over a few more days to get a readiness projection.`;
+}
+
 // The app's landing screen — shown on every load instead of auto-resuming
 // the last track+mode, so there's always a real overview to start from
-// rather than dropping straight back into whatever you were doing. Every
-// track is listed exactly once (label + subtitle + live mastery %) with
-// no path-grouping, plus a "continue where you left off" shortcut for
-// getting back into a session in one tap via stats.lastVisited (tracked
-// separately, only while mode isn't 'home'). Reachable again from any
-// track's Learn/Quiz/Exam view via the header's Home button.
-function HomeView({ tracks, results, stats, certPlan, onResume, onSelectTrack, onOpenAbout, onOpenCertPath, onSetGoalTarget }) {
+// rather than dropping straight back into whatever you were doing. The
+// full track list lives in a collapsed-by-default dropdown (no
+// path-grouping — just every track once, mastery % included) rather than
+// always taking up the whole page, since Question of the Day/Daily Vocab/
+// readiness now share the space. Reachable again from any track's Learn/
+// Quiz/Exam view via the header's Home button.
+function HomeView({ tracks, results, seenLog, stats, certPlan, onResume, onSelectTrack, onOpenAbout, onOpenCertPath, onSetGoalTarget, onAnswerDailyQuestion, onRevealDailyVocab }) {
   const masteries = tracks.map((t) => ({ track: t, pct: trackMastery(t.key, results) }));
   const overallAvg = masteries.length ? Math.round(masteries.reduce((s, m) => s + m.pct, 0) / masteries.length) : 0;
   const lastVisited = stats.lastVisited;
   const resumeTrack = lastVisited ? tracks.find((t) => t.key === lastVisited.track) : null;
   const nextPathKey = nextInCertPath(certPlan);
   const nextPathTrack = nextPathKey ? tracks.find((t) => t.key === nextPathKey) : null;
+  const nextPathScheduled = nextPathTrack && certPlan.scheduled[nextPathTrack.key];
+  const nextPathDaysUntil = nextPathScheduled ? daysBetween(todayString(), nextPathScheduled) : null;
+
+  const focusKey = focusTrackKey(certPlan, lastVisited);
+  const focusTrack = tracks.find((t) => t.key === focusKey);
+  const focusLabel = focusTrack ? focusTrack.label : focusKey;
+  const today = todayString();
+  const challenge = stats.dailyChallenge && stats.dailyChallenge.date === today ? stats.dailyChallenge : null;
+
+  const qPool = DATA[focusKey].questions;
+  const dailyQuestion = qPool.length ? { ...qPool[seededIndex(`${today}:${focusKey}:q`, qPool.length)], __homeTrack: focusKey } : null;
+  const storedQuestion = challenge && challenge.question && dailyQuestion && challenge.question.id === dailyQuestion.id ? challenge.question : null;
+
+  const vPool = DATA[focusKey].flashcards;
+  const dailyVocab = vPool.length ? vPool[seededIndex(`${today}:${focusKey}:v`, vPool.length)] : null;
+  const vocabRevealed = !!(challenge && challenge.vocab && dailyVocab && challenge.vocab.id === dailyVocab.id && challenge.vocab.revealed);
+
+  const readiness = examReadiness(focusKey, results, seenLog);
+  const projection = readinessProjection(stats.readinessHistory || {}, focusKey, 80);
+  const readinessColor = READINESS_COLOR[readiness.label] || COLOR.muted;
 
   return (
     <div>
@@ -263,6 +445,22 @@ function HomeView({ tracks, results, stats, certPlan, onResume, onSelectTrack, o
       </div>
 
       <DailyGoalRing dailyGoal={stats.dailyGoal} onSetTarget={onSetGoalTarget} />
+
+      {readiness.label !== 'Not started' && (
+        <div style={{
+          marginBottom: '14px', padding: '12px 14px', borderRadius: '14px',
+          background: `${readinessColor}1F`, border: `1px solid ${readinessColor}`, boxShadow: SHADOW.card,
+        }}>
+          <div className="flex justify-between items-center" style={{ marginBottom: '2px' }}>
+            <span style={{ fontSize: '11px', color: COLOR.muted, textTransform: 'uppercase', letterSpacing: '0.04em' }}>{focusLabel} readiness</span>
+            <span style={{ fontSize: '15px', fontWeight: 700, color: readinessColor }}>{readiness.score}%</span>
+          </div>
+          <div style={{ fontSize: '13px', fontWeight: 600, color: readinessColor }}>{readiness.label}</div>
+          <div style={{ fontSize: '10.5px', color: COLOR.muted, marginTop: '4px', lineHeight: 1.4 }}>
+            {readinessProjectionMessage(projection, focusLabel)}
+          </div>
+        </div>
+      )}
 
       <button
         onClick={onOpenCertPath}
@@ -277,13 +475,21 @@ function HomeView({ tracks, results, stats, certPlan, onResume, onSelectTrack, o
           {nextPathTrack ? (
             <div style={{ fontSize: '14px', fontWeight: 600, color: trackAccent(nextPathTrack.key) }}>
               Up next: {nextPathTrack.label}
-              {certPlan.scheduled[nextPathTrack.key] ? ` · ${formatScheduledLabel(certPlan.scheduled[nextPathTrack.key])}` : ''}
             </div>
           ) : (
             <div style={{ fontSize: '13px', color: COLOR.text }}>Put your certs in the order you plan to take them</div>
           )}
         </div>
-        <div style={{ color: COLOR.muted, fontSize: '15px', flexShrink: 0 }}>›</div>
+        {nextPathScheduled ? (
+          <div style={{ flexShrink: 0, textAlign: 'right' }}>
+            <div style={{ fontSize: '15px', fontWeight: 700, color: nextPathDaysUntil < 0 ? COLOR.red : nextPathDaysUntil <= 7 ? COLOR.gold : COLOR.text }}>
+              {nextPathDaysUntil < 0 ? `${-nextPathDaysUntil}d over` : nextPathDaysUntil === 0 ? 'Today' : nextPathDaysUntil === 1 ? '1 day' : `${nextPathDaysUntil} days`}
+            </div>
+            <div style={{ fontSize: '9.5px', color: COLOR.muted }}>{formatDateShort(nextPathScheduled)}</div>
+          </div>
+        ) : (
+          <div style={{ color: COLOR.muted, fontSize: '15px', flexShrink: 0 }}>›</div>
+        )}
       </button>
 
       {resumeTrack && (
@@ -302,43 +508,30 @@ function HomeView({ tracks, results, stats, certPlan, onResume, onSelectTrack, o
         </button>
       )}
 
-      <div style={{ fontSize: '12px', color: COLOR.muted, marginBottom: '8px' }}>All tracks</div>
-      <div className="flex flex-col gap-2">
-        {masteries.map(({ track: t, pct }) => {
-          const accent = trackAccent(t.key);
-          const isCompleted = !!certPlan.completed[t.key];
-          const scheduledDate = certPlan.scheduled[t.key];
-          return (
-            <button
-              key={t.key}
-              onClick={() => onSelectTrack(t.key)}
-              style={{
-                textAlign: 'left', display: 'flex', alignItems: 'center', gap: '12px', padding: '12px 14px', borderRadius: '12px',
-                background: COLOR.surface, border: `1px solid ${COLOR.border}`, boxShadow: SHADOW.card,
-              }}
-            >
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontSize: '13.5px', fontWeight: 600, color: accent }}>{t.label}</div>
-                <div style={{ fontSize: '11px', color: COLOR.muted, marginTop: '2px' }}>{t.subtitle}</div>
-              </div>
-              {isCompleted ? (
-                <div title="Passed" style={{ fontSize: '13px', fontWeight: 700, color: COLOR.success, flexShrink: 0 }}>✓ Passed</div>
-              ) : scheduledDate ? (
-                <div title="Scheduled" style={{ fontSize: '10.5px', fontWeight: 600, color: COLOR.gold, flexShrink: 0, textAlign: 'right', whiteSpace: 'nowrap' }}>
-                  {formatDateShort(scheduledDate)}
-                </div>
-              ) : (
-                <div style={{ fontSize: '13px', fontWeight: 700, color: pct >= 70 ? COLOR.success : COLOR.muted, flexShrink: 0 }}>{pct}%</div>
-              )}
-            </button>
-          );
-        })}
-      </div>
+      {dailyQuestion && (
+        <DailyQuestionCard
+          q={dailyQuestion}
+          trackLabel={focusLabel}
+          stored={storedQuestion}
+          onAnswer={(isCorrect, selected) => onAnswerDailyQuestion(focusKey, dailyQuestion, isCorrect, selected)}
+        />
+      )}
+
+      {dailyVocab && (
+        <DailyVocabCard
+          card={dailyVocab}
+          trackLabel={focusLabel}
+          revealed={vocabRevealed}
+          onReveal={() => onRevealDailyVocab(focusKey, dailyVocab)}
+        />
+      )}
+
+      <TrackListDropdown tracks={tracks} masteries={masteries} certPlan={certPlan} onSelectTrack={onSelectTrack} />
 
       <button
         onClick={onOpenAbout}
         className="btn-flat"
-        style={{ width: '100%', textAlign: 'center', marginTop: '18px', padding: '8px', fontSize: '11.5px', color: COLOR.muted, background: 'transparent' }}
+        style={{ width: '100%', textAlign: 'center', marginTop: '10px', padding: '8px', fontSize: '11.5px', color: COLOR.muted, background: 'transparent' }}
       >
         About & Legal
       </button>
@@ -1786,7 +1979,7 @@ function QuizSetup({ length, setLength, types, toggleType, onReroll, poolSize, m
   );
 }
 
-function QuestionView({ q, selected, onChoose, onNext, index, total, categoryLabel, badgeLabel, msPending, onToggleMs, onSubmitMs, nextLabel, hideMeta, flashcardsData }) {
+function QuestionView({ q, selected, onChoose, onNext, index, total, categoryLabel, badgeLabel, msPending, onToggleMs, onSubmitMs, nextLabel, hideMeta, hideNext, flashcardsData }) {
   const [activeTermKey, setActiveTermKey] = useState(null);
   useEffect(() => { setActiveTermKey(null); }, [q && q.id]);
   useEscapeToClose(() => setActiveTermKey(null));
@@ -1920,7 +2113,7 @@ function QuestionView({ q, selected, onChoose, onNext, index, total, categoryLab
         )}
       </div>
 
-      {selected !== null && (
+      {selected !== null && !hideNext && (
         <button
           onClick={onNext}
           style={{ width: '100%', marginTop: '12px', padding: '12px', borderRadius: '12px', background: COLOR.primary, color: COLOR.onAccent, fontSize: '14px', fontWeight: 600 }}
