@@ -1129,6 +1129,7 @@ LESSONS = [
         'title': 'Identities & Access',
         'summary': 'Users, groups, licensing, external users, and self-service password reset.',
         'diagram': None,
+        'portalMockup': 'inviteGuestUser',
         'vocabIds': ['f1', 'f2', 'f3', 'f4'],
         'quizIds': ['q1', 'q2', 'q3', 'q4', 'tf1', 'tf2'],
         'reading': """As an administrator, you'll create and manage the users and groups that make up an organization's identity. Security groups hold manually-managed membership, while dynamic groups automatically add or remove members based on rules matching attributes like department or job title — useful for keeping large, frequently-changing teams in sync without manual upkeep.

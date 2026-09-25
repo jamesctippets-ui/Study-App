@@ -256,6 +256,27 @@ FLASHCARDS = [
         "back": "A structured XML document standard (part of the C-CDA family) summarizing a patient's health information — problems, medications, allergies, results — exchanged as a complete document rather than queried resource-by-resource the way FHIR RESTful access pattern works.",
         "detail": "CCDA and FHIR solve overlapping problems differently: CCDA hands over a whole summary document at a point in time, while FHIR lets a consumer query for just the specific resources it actually needs.",
     },
+    {
+        "id": "f35",
+        "cat": "hl7v2Messaging",
+        "front": "MLLP (Minimal Lower Layer Protocol)",
+        "back": "The lightweight TCP/IP transport wrapper most HL7 v2 interfaces actually travel over — start and end block characters framing the message so the receiving system knows exactly where one HL7 v2 message ends and the next begins on the same connection.",
+        "detail": "MLLP is just the envelope; it says nothing about the message's content — the ADT message type, ORM message type, and similar types still describe what's actually inside that envelope.",
+    },
+    {
+        "id": "f36",
+        "cat": "fhirModernApis",
+        "front": "FHIR Subscriptions",
+        "back": "A FHIR resource that lets a client register interest in a change (like a new lab result) and receive a notification when it happens, instead of repeatedly polling the FHIR RESTful access pattern to check for updates.",
+        "detail": "This is FHIR's answer to the same real-time-notification need that ACK and NAK: how HL7 v2 confirms delivery addresses for message-based interfaces, just adapted to a resource-and-webhook model instead of a persistent connection.",
+    },
+    {
+        "id": "f37",
+        "cat": "dataGovernance",
+        "front": "Health Information Exchange (HIE)",
+        "back": "A broader, often region- or state-level network that lets participating healthcare organizations share patient records with each other, regardless of which EHR vendor each one runs — a more vendor-neutral counterpart to a single vendor's own cross-organization exchange feature.",
+        "detail": "Care Everywhere, described generically as a health information exchange pattern is one vendor's version of this same underlying idea, built into its own ecosystem rather than acting as a neutral, vendor-agnostic network.",
+    },
 ]
 
 QUESTIONS = [

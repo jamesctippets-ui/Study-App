@@ -168,6 +168,19 @@ function MockupBackupVault() {
   );
 }
 
+function MockupInviteGuestUser() {
+  return (
+    <PortalFrame height={150}>
+      <text x={12} y={40} fill={COLOR.text} fontSize="9" fontWeight="700">Invite external user</text>
+      <text x={12} y={54} fill={COLOR.muted} fontSize="6.5">Invite a guest user to collaborate with your organization.</text>
+      <MockField x={12} y={62} w={296} h={18} label="Email" value="" highlight />
+      <MockField x={12} y={96} w={296} h={18} label="Display name" value="" />
+      <rect x={230} y={126} width="78" height="18" rx="4" fill={COLOR.primary} />
+      <text x={269} y={138} textAnchor="middle" fill="#2B1620" fontSize="7.5" fontWeight="700">Review + invite</text>
+    </PortalFrame>
+  );
+}
+
 const PORTAL_MOCKUPS = {
   resourceGroup: MockupResourceGroup,
   virtualNetwork: MockupVirtualNetwork,
@@ -178,6 +191,7 @@ const PORTAL_MOCKUPS = {
   nsgRule: MockupNsgRule,
   policyCompliance: MockupPolicyCompliance,
   backupVault: MockupBackupVault,
+  inviteGuestUser: MockupInviteGuestUser,
 };
 
 // Real Azure Portal screenshots, pulled directly from Microsoft's own public
@@ -244,6 +258,13 @@ const REAL_PORTAL_SCREENSHOTS = {
     description: 'A Recovery Services vault\'s Backup Configuration panel — the storage replication type choice (locally-redundant vs. geo-redundant) that decides whether backup data itself would survive a full regional outage, plus the Cross Region Restore toggle.',
     sourceLabel: 'Microsoft Learn: Create and configure a Recovery Services vault',
     sourceUrl: 'https://learn.microsoft.com/en-us/azure/backup/backup-create-recovery-services-vault',
+  },
+  inviteGuestUser: {
+    src: 'images/portal/invite-guest-user.png',
+    alt: 'Real Azure Portal screenshot of the Invite external user panel',
+    description: 'The "Invite external user" panel reached from Users — Basics tab collects the guest\'s email, display name, and an optional invitation message; the Properties, Assignments, and Review + invite tabs after this one finish the rest of the setup.',
+    sourceLabel: 'Microsoft Learn: Assign Azure roles to external guest users',
+    sourceUrl: 'https://learn.microsoft.com/en-us/azure/role-based-access-control/role-assignments-external-users',
   },
 };
 

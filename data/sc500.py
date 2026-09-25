@@ -335,6 +335,20 @@ FLASHCARDS = [
         'back': 'Encrypts data while it is actively in use in memory, inside a hardware-backed trusted execution environment, protecting it even from a privileged administrator or the cloud provider’s own infrastructure — not just data at rest or in transit.',
         'detail': "This closes the one gap that server-side encryption (SSE) vs. Azure Disk Encryption (ADE) vs. encryption at host don't: none of those protect data while it's actually being processed in memory.",
     },
+    {
+        'id': 'f52',
+        'cat': 'securityPostureOps',
+        'front': 'Workbooks in Microsoft Sentinel',
+        'back': "Interactive, customizable reports built from KQL queries against Sentinel data connectors, used for ongoing operational visibility (like tracking a specific threat category over time) rather than one-off investigation.",
+        'detail': "A workbook is a dashboard you keep coming back to; a Sentinel analytics rules: scheduled vs. near-real-time vs. Fusion detection is a one-time evaluation that fires an alert when its condition is met.",
+    },
+    {
+        'id': 'f53',
+        'cat': 'identityAccessGovernance',
+        'front': 'Entitlement management: access packages',
+        'back': "A bundle of resources — group membership, Teams, enterprise apps, SharePoint sites — that a user can request access to as one unit, going through an approval workflow, rather than an admin granting each resource separately.",
+        'detail': "This is the request-and-approval side of access; Privileged Identity Management (PIM) covers the separate, time-bound activation of privileged roles rather than standing access to resources like these.",
+    },
 ]
 
 QUESTIONS = [
