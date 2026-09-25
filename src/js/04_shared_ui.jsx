@@ -1468,21 +1468,19 @@ function QuizSetup({ length, setLength, types, toggleType, onReroll, poolSize, m
           New quiz
         </button>
       </div>
-      <div className="flex gap-2 mb-2" style={{ overflowX: 'auto', paddingBottom: '2px' }}>
-        {lengths.map((n) => (
-          <button
-            key={n}
-            onClick={() => setLength(n)}
-            style={{
-              flexShrink: 0, padding: '6px 12px', borderRadius: '999px', fontSize: '12px', fontWeight: 500,
-              border: `1px solid ${length === n ? COLOR.primary : COLOR.border}`,
-              background: length === n ? 'rgba(167,139,250,0.14)' : COLOR.surface,
-              color: length === n ? COLOR.primary : COLOR.muted,
-            }}
-          >
-            {n} questions
-          </button>
-        ))}
+      <div className="flex items-center gap-2 mb-2">
+        <label htmlFor="quiz-length-select" style={{ fontSize: '11px', color: COLOR.muted }}>Length</label>
+        <select
+          id="quiz-length-select"
+          value={length}
+          onChange={(e) => setLength(Number(e.target.value))}
+          style={{
+            padding: '6px 10px', borderRadius: '9px', fontSize: '12.5px', fontWeight: 600,
+            border: `1px solid ${COLOR.primary}`, background: 'rgba(167,139,250,0.14)', color: COLOR.primary,
+          }}
+        >
+          {lengths.map((n) => <option key={n} value={n}>{n} questions</option>)}
+        </select>
       </div>
       <div className="flex gap-2" style={{ overflowX: 'auto', paddingBottom: '2px' }}>
         {[['mc', 'Multiple choice'], ['ms', 'Multi-select'], ['tf', 'True / False']].map(([key, label]) => (
