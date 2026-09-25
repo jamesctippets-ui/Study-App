@@ -578,13 +578,22 @@ trading away for shinier but shallower ones.
   having the streak infrastructure to hang it off of. Cheap to build
   (a number + a count against today's activity, both already tracked)
   and directly answers "why open this again today."
-- [ ] **A cross-track "Today's Mix" review session.** Now that Learning
-  Paths (track-ordering) is gone, there's no session that pulls from more
-  than one track at once — real value for someone actively juggling
-  several certs (the user's own AZ-900/AZ-104/MD-102/SC-300-style stack):
-  a single session mixing each active track's SRS-due cards and missed
-  questions. Not a revival of Learning Paths — no ordering/sequencing
-  claim, just a review mixer across whatever's actually due.
+- [x] **A cross-track "Today's Mix" review session.** Shipped as an
+  extension of My Cert Path rather than a standalone feature: a "Start
+  Today's Mix" button appears in the Cert Path panel once 2+ active
+  (not-yet-passed) certs are in the path. It builds one quiz session
+  drawn from every active cert's own question pool, weighted by priority
+  order — the top ("Up next") cert gets a harmonic-weighted majority
+  share (`weightedTrackQuotas` in 03_helpers.js: 1, 1/2, 1/3... apportioned
+  by largest remainder so quotas always sum exactly to the session length
+  and every included cert gets at least one question), so the top cert
+  gets primary coverage and the rest supplement it rather than competing
+  equally. Each question is tagged with its source track so answering it
+  updates that track's own mastery/SRS data, not the currently open
+  track's — and the question card, category badge, and the "worth another
+  look" summary all show which cert each question came from. Not a
+  revival of Learning Paths — no fixed ordering/sequencing claim, just a
+  weighted mixer across the certs you're actively juggling.
 - [ ] **An "exam readiness" signal per track.** A single blended indicator
   (recent quiz/exam accuracy + mastery % + how stale that mastery is)
   instead of a flat mastery percentage alone — Tutorials Dojo and
@@ -606,13 +615,20 @@ trading away for shinier but shallower ones.
   words before seeing the official explanation (the protégé effect) —
   self-graded like blurting above, no AI grading required. Pairs well
   with the "on the job" real-world callouts already in section 2.
-- [ ] **An explicit interleaved/mixed-category quiz option**, distinct
+- [x] **An explicit interleaved/mixed-category quiz option**, distinct
   from today's per-category or per-track quiz — pulling randomly across
   categories (or tracks, via Today's Mix above) on purpose. Blocked
   practice (all-one-topic-in-a-row, which is what "Quiz this section"
   gives you) feels more fluent while studying but interleaving is the
   more evidence-backed technique for actual exam-day transfer; worth
-  offering both rather than only the easier-feeling one.
+  offering both rather than only the easier-feeling one. Shipped as
+  `pickInterleaved` in 03_helpers.js: choosing "All categories" in a
+  single track's Quiz now round-robins across every category on purpose
+  (still recency-biased within each category via the existing
+  seen-timestamp logic), instead of leaving diversity up to chance the
+  way a plain shuffle would. A short caption under Quiz's "All
+  categories" pool now says so explicitly, so it reads as a deliberate
+  mode rather than an unfiltered default.
 - [x] **Surface the SRS ordering, don't hide it.** Cards mode silently
   reordered by due-date with no explanation. Shipped a small "Cards you're
   overdue to review come first" caption above Cards mode, shown only once

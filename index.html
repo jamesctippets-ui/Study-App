@@ -1201,6 +1201,31 @@ function pickRotated(pool, count, seenMap) {
   return shuffleArray(picked);
 }
 
+// Like pickRotated (still biased toward least-recently-seen items within
+// each category), but round-robins across every category present in the
+// pool so the resulting set is genuinely spread across topics rather than
+// leaving that to chance — interleaved practice is more evidence-backed
+// for exam-day transfer than "blocked" (all one topic) practice, which is
+// what picking a single category already gives you. Used for the "All
+// categories" quiz pool specifically so it's a deliberate mixed-practice
+// mode, not just "no filter."
+function pickInterleaved(pool, count, seenMap) {
+  const byCat = {};
+  pool.forEach((q) => { (byCat[q.cat] = byCat[q.cat] || []).push(q); });
+  const cats = shuffleArray(Object.keys(byCat));
+  cats.forEach((c) => {
+    byCat[c] = shuffleArray(byCat[c]).sort((a, b) => ((seenMap && seenMap[a.id]) || 0) - ((seenMap && seenMap[b.id]) || 0));
+  });
+  const picked = [];
+  let i = 0;
+  while (picked.length < count && cats.some((c) => byCat[c].length)) {
+    const c = cats[i % cats.length];
+    if (byCat[c].length) picked.push(byCat[c].shift());
+    i++;
+  }
+  return shuffleArray(picked);
+}
+
 function formatTime(totalSeconds) {
   const m = Math.floor(totalSeconds / 60);
   const s = totalSeconds % 60;
@@ -1339,6 +1364,41 @@ function moveActiveTrack(order, completed, key, direction) {
   next[a] = next[b];
   next[b] = tmp;
   return next;
+}
+
+// Splits a `total`-question session across `trackKeys` (already in
+// priority order — index 0 is the highest-priority/"Up next" cert) using
+// harmonic weights (1, 1/2, 1/3, ...): the primary cert gets the largest
+// single share, and each subsequent cert contributes a smaller
+// supplemental share to reinforce it, rather than every active cert
+// competing for equal coverage. Uses largest-remainder apportionment so
+// the quotas always sum to exactly `total`. When there isn't even one
+// slot per track, the top-weighted tracks get one each and the rest get
+// none, rather than everyone rounding down to zero.
+function weightedTrackQuotas(trackKeys, total) {
+  const n = trackKeys.length;
+  const map = {};
+  if (!n || total <= 0) return map;
+  if (total < n) {
+    trackKeys.forEach((key, i) => { map[key] = i < total ? 1 : 0; });
+    return map;
+  }
+  const weights = trackKeys.map((_, i) => 1 / (i + 1));
+  const weightSum = weights.reduce((a, b) => a + b, 0);
+  // Every included track is guaranteed at least 1 slot (floor at 1 before
+  // scaling back down to `total`), so a long tail of supplemental certs
+  // never gets rounded away to zero coverage entirely.
+  const raw = weights.map((w) => Math.max(1, (w / weightSum) * total));
+  const rawSum = raw.reduce((a, b) => a + b, 0);
+  const scaled = raw.map((v) => (v / rawSum) * total);
+  const floors = scaled.map(Math.floor);
+  const remainder = total - floors.reduce((a, b) => a + b, 0);
+  const byFrac = scaled
+    .map((v, i) => ({ i, frac: v - floors[i] }))
+    .sort((a, b) => b.frac - a.frac);
+  for (let k = 0; k < remainder; k++) floors[byFrac[k % n].i] += 1;
+  trackKeys.forEach((key, i) => { map[key] = floors[i]; });
+  return map;
 }
 
 function formatDateShort(dateStr) {
@@ -1839,7 +1899,7 @@ function TrackMenuPanel({ tracks, results, stats, certPlan, activeTrack, onResum
 // complete" behavior the user asked for. The "Up next" card is just the
 // first non-completed entry, so finishing one automatically promotes the
 // next without any explicit re-ordering step.
-function CertPathPanel({ tracks, certPlan, onAddTrack, onRemoveTrack, onMove, onSetScheduled, onToggleCompleted, onGoToTrack, onClose }) {
+function CertPathPanel({ tracks, certPlan, onAddTrack, onRemoveTrack, onMove, onSetScheduled, onToggleCompleted, onGoToTrack, onStartMix, onClose }) {
   useEscapeToClose(onClose);
   const [addingKey, setAddingKey] = useState('');
   const [completedOpen, setCompletedOpen] = useState(false);
@@ -1890,6 +1950,24 @@ function CertPathPanel({ tracks, certPlan, onAddTrack, onRemoveTrack, onMove, on
               Go to {nextTrack.label} →
             </button>
           </div>
+        )}
+
+        {activeOrder.length >= 2 && (
+          <button
+            onClick={() => { onStartMix(); onClose(); }}
+            style={{
+              width: '100%', marginBottom: '16px', padding: '12px 14px', borderRadius: '12px',
+              background: COLOR.surfaceRaised, border: `1px solid ${COLOR.primary}`, textAlign: 'left',
+            }}
+          >
+            <div className="flex justify-between items-center">
+              <span style={{ fontSize: '13.5px', fontWeight: 600, color: COLOR.primary }}>Start Today's Mix</span>
+              <span style={{ fontSize: '13px', color: COLOR.primary }}>→</span>
+            </div>
+            <div style={{ fontSize: '11px', color: COLOR.muted, marginTop: '4px', lineHeight: 1.4 }}>
+              One quiz blending all {activeOrder.length} active certs, weighted so {nextTrack?.label || 'your top cert'} gets primary coverage and the rest supplement it.
+            </div>
+          </button>
         )}
 
         <div style={{ fontSize: '12px', color: COLOR.muted, marginBottom: '8px' }}>
@@ -3191,7 +3269,7 @@ function CourseView({ lessons, flashcardsData, questionsData, categories, onQuiz
   );
 }
 
-function QuizSetup({ length, setLength, types, toggleType, onReroll, poolSize, missedCount, onReviewMissed }) {
+function QuizSetup({ length, setLength, types, toggleType, onReroll, poolSize, missedCount, onReviewMissed, isMixed }) {
   const lengths = [5, 10, 15, 25];
   return (
     <div style={{ marginBottom: '14px' }}>
@@ -3202,6 +3280,11 @@ function QuizSetup({ length, setLength, types, toggleType, onReroll, poolSize, m
         >
           Review {missedCount} missed question{missedCount === 1 ? '' : 's'}
         </button>
+      )}
+      {isMixed && (
+        <div style={{ fontSize: '10.5px', color: COLOR.muted, marginBottom: '8px' }}>
+          Mixed practice — questions interleaved across every category on purpose, not just left unfiltered.
+        </div>
       )}
       <div className="flex justify-between items-center mb-2">
         <div style={{ fontSize: '11px', color: COLOR.muted }}>{poolSize} questions match this filter</div>
@@ -3394,6 +3477,22 @@ function QuestionView({ q, selected, onChoose, onNext, index, total, categoryLab
 
 function QuizSummary({ score, answers, categories, onRestart }) {
   const missed = answers.filter((a) => !a.correct);
+  // A Today's Mix session's missed answers can come from several tracks at
+  // once, each with its own category set — resolve each one's label against
+  // its own track's categories (falling back to the single-track `categories`
+  // prop) and prefix with the track name whenever more than one is present,
+  // so "Worth another look" stays legible instead of showing labels from the
+  // wrong track's category list.
+  const missedTrackCount = new Set(missed.map((m) => m.track).filter(Boolean)).size;
+  const categoryLabelFor = (m) => {
+    const trackCats = m.track && DATA[m.track] ? DATA[m.track].categories : categories;
+    const label = trackCats.find((c) => c.key === m.cat)?.label;
+    if (missedTrackCount > 1 && m.track) {
+      const trackLabel = TRACKS.find((t) => t.key === m.track)?.label;
+      return trackLabel ? `${trackLabel} · ${label || ''}` : label;
+    }
+    return label;
+  };
   return (
     <div>
       <div style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderRadius: '18px', padding: '24px', textAlign: 'center' }}>
@@ -3406,7 +3505,7 @@ function QuizSummary({ score, answers, categories, onRestart }) {
           <div className="flex flex-col gap-2">
             {missed.map((m, i) => (
               <div key={i} style={{ boxShadow: SHADOW.card, background: COLOR.surfaceRaised, borderRadius: '10px', padding: '10px 12px', fontSize: '13px' }}>
-                <div style={{ fontSize: '10px', color: COLOR.muted, marginBottom: '2px' }}>{categories.find((c) => c.key === m.cat)?.label}</div>
+                <div style={{ fontSize: '10px', color: COLOR.muted, marginBottom: '2px' }}>{categoryLabelFor(m)}</div>
                 <div>{m.prompt}</div>
                 {m.explanation && (
                   <div style={{ marginTop: '6px', paddingTop: '6px', borderTop: `1px solid ${COLOR.border}`, fontSize: '12px', color: COLOR.muted, lineHeight: 1.5 }}>
@@ -3642,6 +3741,11 @@ function CertStudyApp() {
   const [selected, setSelected] = useState(null);
   const [isMissedSession, setIsMissedSession] = useState(false);
   const [isLessonSession, setIsLessonSession] = useState(false);
+  // Today's Mix — a single quiz session pulling from every active track in
+  // the user's My Cert Path at once (see startTodaysMix below), each
+  // question tagged with its own source track (`__track`) since there's
+  // no single activeTrack for a session that spans several certs.
+  const [isMixSession, setIsMixSession] = useState(false);
   const [msPending, setMsPending] = useState([]);
   const [speakingId, setSpeakingId] = useState(null);
   const speechSupported = typeof window !== 'undefined' && 'speechSynthesis' in window;
@@ -3821,17 +3925,29 @@ function CertStudyApp() {
     setShowCertPath(false);
   };
 
-  const markSeen = (ids) => {
+  // Track-parameterized so Today's Mix (spanning several certs at once,
+  // with no single activeTrack) can record each question against its own
+  // source track — markSeen/recordResult are just these pinned to
+  // activeTrack, for every other session type that only ever touches one.
+  // Reads/writes through the refs (not the `seenLog`/`results` state
+  // closures) so back-to-back calls in the same tick — e.g. Today's Mix
+  // marking several tracks seen in one forEach — each see the previous
+  // call's write instead of racing on a stale closure and losing all but
+  // the last one.
+  const markSeenFor = (trackKey, ids) => {
     if (!ids.length) return;
     const now = Date.now();
-    const trackLog = { ...(seenLog[activeTrack] || {}) };
+    const trackLog = { ...(seenLogRef.current[trackKey] || {}) };
     ids.forEach((id, idx) => { trackLog[id] = now + idx; });
-    saveSeen({ ...seenLog, [activeTrack]: trackLog });
+    saveSeen({ ...seenLogRef.current, [trackKey]: trackLog });
   };
 
-  const recordResult = (id, outcome) => {
-    saveResults({ ...results, [activeTrack]: { ...trackResults, [id]: outcome } });
+  const recordResultFor = (trackKey, id, outcome) => {
+    saveResults({ ...resultsRef.current, [trackKey]: { ...(resultsRef.current[trackKey] || {}), [id]: outcome } });
   };
+
+  const markSeen = (ids) => markSeenFor(activeTrack, ids);
+  const recordResult = (id, outcome) => recordResultFor(activeTrack, id, outcome);
 
   const recordSrs = (id, outcome) => {
     const trackSrs = srs[activeTrack] || {};
@@ -3929,7 +4045,13 @@ function CertStudyApp() {
 
   const startNewSession = useCallback(() => {
     const len = Math.min(quizLength, availableQuestions.length);
-    const picked = pickRotated(availableQuestions, len, seenLog[activeTrack] || {});
+    // "All categories" is a deliberate mixed-practice mode — interleave
+    // across every category on purpose (pickInterleaved) rather than
+    // leaving the topic mix to chance (pickRotated), which is what a
+    // single category's blocked practice already gives you.
+    const picked = activeCat === 'all'
+      ? pickInterleaved(availableQuestions, len, seenLog[activeTrack] || {})
+      : pickRotated(availableQuestions, len, seenLog[activeTrack] || {});
     const prepared = picked.map(prepareQuestion);
     setQuizSession(prepared);
     setSessionIndex(0);
@@ -3940,18 +4062,19 @@ function CertStudyApp() {
     setQuizPhase('active');
     setIsMissedSession(false);
     setIsLessonSession(false);
+    setIsMixSession(false);
     markSeen(prepared.map((q) => q.id));
     // eslint-disable-next-line
-  }, [availableQuestions, quizLength, seenLog, activeTrack]);
+  }, [availableQuestions, quizLength, seenLog, activeTrack, activeCat]);
 
   useEffect(() => {
     if (mode !== 'quiz') return;
     if (skipNextAutoStart.current) { skipNextAutoStart.current = false; return; }
-    // A lesson quiz or missed-review session is a deliberately curated set of
-    // questions — a stray category-chip tap (the weighted mastery bar at the
-    // bottom of every screen sets activeCat too) must not silently discard it
-    // and replace it with a freshly rolled generic session.
-    if (isLessonSession || isMissedSession) return;
+    // A lesson quiz, missed-review, or Today's Mix session is a deliberately
+    // curated set of questions — a stray category-chip tap (the weighted
+    // mastery bar at the bottom of every screen sets activeCat too) must not
+    // silently discard it and replace it with a freshly rolled generic session.
+    if (isLessonSession || isMissedSession || isMixSession) return;
     startNewSession();
     // eslint-disable-next-line
   }, [mode, activeCat, quizLength, typesKey, activeTrack]);
@@ -4002,6 +4125,7 @@ function CertStudyApp() {
     setQuizPhase('active');
     setIsMissedSession(true);
     setIsLessonSession(false);
+    setIsMixSession(false);
     markSeen(prepared.map((q) => q.id));
   };
 
@@ -4023,6 +4147,7 @@ function CertStudyApp() {
     setQuizPhase('active');
     setIsMissedSession(false);
     setIsLessonSession(true);
+    setIsMixSession(false);
     skipNextAutoStart.current = true;
     setMode('quiz');
     setQuizView('questions');
@@ -4031,6 +4156,46 @@ function CertStudyApp() {
 
   const startCategoryQuiz = (catKey) => {
     startLessonQuiz(questionsData.filter((q) => q.cat === catKey).map((q) => q.id));
+  };
+
+  // Today's Mix: one quiz session drawn from every active (not-yet-passed)
+  // track in the user's My Cert Path, weighted by priority order so the
+  // top cert gets primary coverage and the rest supplement it, rather than
+  // every active cert competing for equal space. Each question carries its
+  // own `__track` since there's no single activeTrack for a session that
+  // spans several certs — chooseAnswer/submitMsAnswer already record
+  // against that per-question track instead of activeTrack.
+  const startTodaysMix = () => {
+    const activeTrackKeys = certPlan.order.filter((k) => !certPlan.completed[k] && DATA[k]);
+    if (!activeTrackKeys.length) return;
+    const quotas = weightedTrackQuotas(activeTrackKeys, quizLength);
+    let combined = [];
+    const seenByTrack = {};
+    activeTrackKeys.forEach((key) => {
+      const quota = quotas[key] || 0;
+      if (!quota) return;
+      const pool = DATA[key].questions.filter((q) => quizTypes[q.type]);
+      if (!pool.length) return;
+      const picked = pickRotated(pool, Math.min(quota, pool.length), seenLog[key] || {});
+      const prepared = picked.map((q) => ({ ...prepareQuestion(q), __track: key }));
+      combined = combined.concat(prepared);
+      seenByTrack[key] = prepared.map((q) => q.id);
+    });
+    combined = shuffleArray(combined);
+    setQuizSession(combined);
+    setSessionIndex(0);
+    setSelected(null);
+    setMsPending([]);
+    setSessionAnswers([]);
+    setSessionScore({ correct: 0, total: 0 });
+    setQuizPhase('active');
+    setIsMissedSession(false);
+    setIsLessonSession(false);
+    setIsMixSession(true);
+    skipNextAutoStart.current = true;
+    setMode('quiz');
+    setQuizView('questions');
+    Object.keys(seenByTrack).forEach((key) => markSeenFor(key, seenByTrack[key]));
   };
 
   const toggleType = (key) => {
@@ -4105,9 +4270,10 @@ function CertStudyApp() {
     if (currentQ.type === 'mc') isCorrect = idx === currentQ.correct;
     else if (currentQ.type === 'tf') isCorrect = (idx === 0) === currentQ.answer;
     else return;
-    recordResult(currentQ.id, isCorrect ? 'correct' : 'incorrect');
+    const qTrack = currentQ.__track || activeTrack;
+    recordResultFor(qTrack, currentQ.id, isCorrect ? 'correct' : 'incorrect');
     setSessionScore((s) => ({ correct: s.correct + (isCorrect ? 1 : 0), total: s.total + 1 }));
-    setSessionAnswers((a) => [...a, { id: currentQ.id, cat: currentQ.cat, prompt: currentQ.question, correct: isCorrect, explanation: currentQ.explanation }]);
+    setSessionAnswers((a) => [...a, { id: currentQ.id, cat: currentQ.cat, prompt: currentQ.question, correct: isCorrect, explanation: currentQ.explanation, track: qTrack }]);
   };
 
   const toggleMs = (idx) => {
@@ -4121,9 +4287,10 @@ function CertStudyApp() {
     const correct = [...currentQ.correct].sort();
     const isCorrect = picked.length === correct.length && picked.every((v, i) => v === correct[i]);
     setSelected(picked);
-    recordResult(currentQ.id, isCorrect ? 'correct' : 'incorrect');
+    const qTrack = currentQ.__track || activeTrack;
+    recordResultFor(qTrack, currentQ.id, isCorrect ? 'correct' : 'incorrect');
     setSessionScore((s) => ({ correct: s.correct + (isCorrect ? 1 : 0), total: s.total + 1 }));
-    setSessionAnswers((a) => [...a, { id: currentQ.id, cat: currentQ.cat, prompt: currentQ.question, correct: isCorrect, explanation: currentQ.explanation }]);
+    setSessionAnswers((a) => [...a, { id: currentQ.id, cat: currentQ.cat, prompt: currentQ.question, correct: isCorrect, explanation: currentQ.explanation, track: qTrack }]);
   };
 
   const doReset = () => {
@@ -4284,6 +4451,7 @@ function CertStudyApp() {
           onSetScheduled={setCertScheduled}
           onToggleCompleted={toggleCertCompleted}
           onGoToTrack={goToCertPathTrack}
+          onStartMix={startTodaysMix}
           onClose={() => setShowCertPath(false)}
         />
       )}
@@ -4454,7 +4622,7 @@ function CertStudyApp() {
 
         {mode === 'quiz' && quizView === 'questions' && (
           <React.Fragment>
-            {!isLessonSession && !isMissedSession && quizPhase !== 'complete' && (
+            {!isLessonSession && !isMissedSession && !isMixSession && quizPhase !== 'complete' && (
               <QuizSetup
                 length={quizLength}
                 setLength={setQuizLength}
@@ -4464,14 +4632,20 @@ function CertStudyApp() {
                 poolSize={availableQuestions.length}
                 missedCount={missedCount}
                 onReviewMissed={startMissedSession}
+                isMixed={activeCat === 'all'}
               />
             )}
-            {!isLessonSession && !isMissedSession && availableQuestions.length === 0 ? (
+            {!isLessonSession && !isMissedSession && !isMixSession && availableQuestions.length === 0 ? (
               <div style={{ textAlign: 'center', color: COLOR.muted, fontSize: '13px', padding: '30px 10px' }}>
                 No questions match this filter — try enabling another question type.
               </div>
             ) : quizPhase === 'complete' ? (
-              <QuizSummary score={sessionScore} answers={sessionAnswers} categories={categories} onRestart={startNewSession} />
+              <QuizSummary
+                score={sessionScore}
+                answers={sessionAnswers}
+                categories={categories}
+                onRestart={isMixSession ? startTodaysMix : startNewSession}
+              />
             ) : (
               <QuestionView
                 q={currentQ}
@@ -4480,8 +4654,20 @@ function CertStudyApp() {
                 onNext={advance}
                 index={sessionIndex}
                 total={quizSession.length}
-                categoryLabel={categories.find((c) => c.key === currentQ?.cat)?.label}
-                badgeLabel={isMissedSession ? 'Missed review' : isLessonSession ? 'Lesson quiz' : null}
+                categoryLabel={
+                  isMixSession && currentQ?.__track
+                    ? DATA[currentQ.__track].categories.find((c) => c.key === currentQ.cat)?.label
+                    : categories.find((c) => c.key === currentQ?.cat)?.label
+                }
+                badgeLabel={
+                  isMissedSession
+                    ? 'Missed review'
+                    : isLessonSession
+                    ? 'Lesson quiz'
+                    : isMixSession
+                    ? (TRACKS.find((t) => t.key === currentQ?.__track)?.label || "Today's Mix")
+                    : null
+                }
                 msPending={msPending}
                 onToggleMs={toggleMs}
                 onSubmitMs={submitMsAnswer}

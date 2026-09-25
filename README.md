@@ -54,7 +54,14 @@ Quiz is a rotating question engine
 (multiple choice, true/false, multi-select — matching the question formats
 the real proctored exams actually use; there's no free-response short-answer
 type since none of these exams have one) with a missed-question review
-queue. Exam is a timed Final Exam mode matching each real exam's
+queue. Choosing **All categories** as the filter is a deliberately
+interleaved mixed-practice mode, not just an unfiltered pool — it
+round-robins the session across every category on purpose (`pickInterleaved`
+in `03_helpers.js`, still recency-biased within each category), since
+interleaving across topics is the more evidence-backed technique for
+actual exam-day transfer than always drilling one category in a row. A
+short caption under the quiz setup calls this out so it reads as an
+intentional mode. Exam is a timed Final Exam mode matching each real exam's
 length/pass mark. Text-to-speech is available on readings and flashcards.
 
 A sliding switch in the top nav bar toggles between a dark-grey and an
@@ -73,6 +80,21 @@ line so un-marking it restores exactly where it was. This travels with the
 rest of your synced progress (unlike the theme setting) since it's study
 planning data, not a display preference — see `certPlan` in
 `03_helpers.js`/`06_app.jsx`.
+
+Once 2 or more active certs are in your path, the panel also offers a
+**"Start Today's Mix"** button — one quiz session that intermingles
+questions from every active cert instead of studying them one at a time,
+for cross-certification study when you're juggling more than one track at
+once. It isn't an equal-share shuffle: coverage is weighted by your path's
+priority order, so the "Up next" cert gets primary coverage and each
+subsequent cert contributes a progressively smaller supplemental share
+(a harmonic 1, 1/2, 1/3... split via `weightedTrackQuotas`, apportioned by
+largest remainder so quotas always add up to the full session length and
+every included cert gets at least one question). Every question is tagged
+with the cert it came from, so answering it updates *that* cert's own
+mastery and spaced-repetition data — not whichever track happens to be
+open — and the question card, its category badge, and the post-quiz
+"worth another look" list all show which cert each question belongs to.
 
 Key terms aren't just highlighted in lesson readings — every track gets this
 now, in quiz explanations and flashcard backs too. Tapping a highlighted term

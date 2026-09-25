@@ -41,6 +41,31 @@ function pickRotated(pool, count, seenMap) {
   return shuffleArray(picked);
 }
 
+// Like pickRotated (still biased toward least-recently-seen items within
+// each category), but round-robins across every category present in the
+// pool so the resulting set is genuinely spread across topics rather than
+// leaving that to chance — interleaved practice is more evidence-backed
+// for exam-day transfer than "blocked" (all one topic) practice, which is
+// what picking a single category already gives you. Used for the "All
+// categories" quiz pool specifically so it's a deliberate mixed-practice
+// mode, not just "no filter."
+function pickInterleaved(pool, count, seenMap) {
+  const byCat = {};
+  pool.forEach((q) => { (byCat[q.cat] = byCat[q.cat] || []).push(q); });
+  const cats = shuffleArray(Object.keys(byCat));
+  cats.forEach((c) => {
+    byCat[c] = shuffleArray(byCat[c]).sort((a, b) => ((seenMap && seenMap[a.id]) || 0) - ((seenMap && seenMap[b.id]) || 0));
+  });
+  const picked = [];
+  let i = 0;
+  while (picked.length < count && cats.some((c) => byCat[c].length)) {
+    const c = cats[i % cats.length];
+    if (byCat[c].length) picked.push(byCat[c].shift());
+    i++;
+  }
+  return shuffleArray(picked);
+}
+
 function formatTime(totalSeconds) {
   const m = Math.floor(totalSeconds / 60);
   const s = totalSeconds % 60;
@@ -179,6 +204,41 @@ function moveActiveTrack(order, completed, key, direction) {
   next[a] = next[b];
   next[b] = tmp;
   return next;
+}
+
+// Splits a `total`-question session across `trackKeys` (already in
+// priority order — index 0 is the highest-priority/"Up next" cert) using
+// harmonic weights (1, 1/2, 1/3, ...): the primary cert gets the largest
+// single share, and each subsequent cert contributes a smaller
+// supplemental share to reinforce it, rather than every active cert
+// competing for equal coverage. Uses largest-remainder apportionment so
+// the quotas always sum to exactly `total`. When there isn't even one
+// slot per track, the top-weighted tracks get one each and the rest get
+// none, rather than everyone rounding down to zero.
+function weightedTrackQuotas(trackKeys, total) {
+  const n = trackKeys.length;
+  const map = {};
+  if (!n || total <= 0) return map;
+  if (total < n) {
+    trackKeys.forEach((key, i) => { map[key] = i < total ? 1 : 0; });
+    return map;
+  }
+  const weights = trackKeys.map((_, i) => 1 / (i + 1));
+  const weightSum = weights.reduce((a, b) => a + b, 0);
+  // Every included track is guaranteed at least 1 slot (floor at 1 before
+  // scaling back down to `total`), so a long tail of supplemental certs
+  // never gets rounded away to zero coverage entirely.
+  const raw = weights.map((w) => Math.max(1, (w / weightSum) * total));
+  const rawSum = raw.reduce((a, b) => a + b, 0);
+  const scaled = raw.map((v) => (v / rawSum) * total);
+  const floors = scaled.map(Math.floor);
+  const remainder = total - floors.reduce((a, b) => a + b, 0);
+  const byFrac = scaled
+    .map((v, i) => ({ i, frac: v - floors[i] }))
+    .sort((a, b) => b.frac - a.frac);
+  for (let k = 0; k < remainder; k++) floors[byFrac[k % n].i] += 1;
+  trackKeys.forEach((key, i) => { map[key] = floors[i]; });
+  return map;
 }
 
 function formatDateShort(dateStr) {

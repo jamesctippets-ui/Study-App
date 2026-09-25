@@ -302,7 +302,7 @@ function TrackMenuPanel({ tracks, results, stats, certPlan, activeTrack, onResum
 // complete" behavior the user asked for. The "Up next" card is just the
 // first non-completed entry, so finishing one automatically promotes the
 // next without any explicit re-ordering step.
-function CertPathPanel({ tracks, certPlan, onAddTrack, onRemoveTrack, onMove, onSetScheduled, onToggleCompleted, onGoToTrack, onClose }) {
+function CertPathPanel({ tracks, certPlan, onAddTrack, onRemoveTrack, onMove, onSetScheduled, onToggleCompleted, onGoToTrack, onStartMix, onClose }) {
   useEscapeToClose(onClose);
   const [addingKey, setAddingKey] = useState('');
   const [completedOpen, setCompletedOpen] = useState(false);
@@ -353,6 +353,24 @@ function CertPathPanel({ tracks, certPlan, onAddTrack, onRemoveTrack, onMove, on
               Go to {nextTrack.label} →
             </button>
           </div>
+        )}
+
+        {activeOrder.length >= 2 && (
+          <button
+            onClick={() => { onStartMix(); onClose(); }}
+            style={{
+              width: '100%', marginBottom: '16px', padding: '12px 14px', borderRadius: '12px',
+              background: COLOR.surfaceRaised, border: `1px solid ${COLOR.primary}`, textAlign: 'left',
+            }}
+          >
+            <div className="flex justify-between items-center">
+              <span style={{ fontSize: '13.5px', fontWeight: 600, color: COLOR.primary }}>Start Today's Mix</span>
+              <span style={{ fontSize: '13px', color: COLOR.primary }}>→</span>
+            </div>
+            <div style={{ fontSize: '11px', color: COLOR.muted, marginTop: '4px', lineHeight: 1.4 }}>
+              One quiz blending all {activeOrder.length} active certs, weighted so {nextTrack?.label || 'your top cert'} gets primary coverage and the rest supplement it.
+            </div>
+          </button>
         )}
 
         <div style={{ fontSize: '12px', color: COLOR.muted, marginBottom: '8px' }}>
@@ -1654,7 +1672,7 @@ function CourseView({ lessons, flashcardsData, questionsData, categories, onQuiz
   );
 }
 
-function QuizSetup({ length, setLength, types, toggleType, onReroll, poolSize, missedCount, onReviewMissed }) {
+function QuizSetup({ length, setLength, types, toggleType, onReroll, poolSize, missedCount, onReviewMissed, isMixed }) {
   const lengths = [5, 10, 15, 25];
   return (
     <div style={{ marginBottom: '14px' }}>
@@ -1665,6 +1683,11 @@ function QuizSetup({ length, setLength, types, toggleType, onReroll, poolSize, m
         >
           Review {missedCount} missed question{missedCount === 1 ? '' : 's'}
         </button>
+      )}
+      {isMixed && (
+        <div style={{ fontSize: '10.5px', color: COLOR.muted, marginBottom: '8px' }}>
+          Mixed practice — questions interleaved across every category on purpose, not just left unfiltered.
+        </div>
       )}
       <div className="flex justify-between items-center mb-2">
         <div style={{ fontSize: '11px', color: COLOR.muted }}>{poolSize} questions match this filter</div>
@@ -1857,6 +1880,22 @@ function QuestionView({ q, selected, onChoose, onNext, index, total, categoryLab
 
 function QuizSummary({ score, answers, categories, onRestart }) {
   const missed = answers.filter((a) => !a.correct);
+  // A Today's Mix session's missed answers can come from several tracks at
+  // once, each with its own category set — resolve each one's label against
+  // its own track's categories (falling back to the single-track `categories`
+  // prop) and prefix with the track name whenever more than one is present,
+  // so "Worth another look" stays legible instead of showing labels from the
+  // wrong track's category list.
+  const missedTrackCount = new Set(missed.map((m) => m.track).filter(Boolean)).size;
+  const categoryLabelFor = (m) => {
+    const trackCats = m.track && DATA[m.track] ? DATA[m.track].categories : categories;
+    const label = trackCats.find((c) => c.key === m.cat)?.label;
+    if (missedTrackCount > 1 && m.track) {
+      const trackLabel = TRACKS.find((t) => t.key === m.track)?.label;
+      return trackLabel ? `${trackLabel} · ${label || ''}` : label;
+    }
+    return label;
+  };
   return (
     <div>
       <div style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderRadius: '18px', padding: '24px', textAlign: 'center' }}>
@@ -1869,7 +1908,7 @@ function QuizSummary({ score, answers, categories, onRestart }) {
           <div className="flex flex-col gap-2">
             {missed.map((m, i) => (
               <div key={i} style={{ boxShadow: SHADOW.card, background: COLOR.surfaceRaised, borderRadius: '10px', padding: '10px 12px', fontSize: '13px' }}>
-                <div style={{ fontSize: '10px', color: COLOR.muted, marginBottom: '2px' }}>{categories.find((c) => c.key === m.cat)?.label}</div>
+                <div style={{ fontSize: '10px', color: COLOR.muted, marginBottom: '2px' }}>{categoryLabelFor(m)}</div>
                 <div>{m.prompt}</div>
                 {m.explanation && (
                   <div style={{ marginTop: '6px', paddingTop: '6px', borderTop: `1px solid ${COLOR.border}`, fontSize: '12px', color: COLOR.muted, lineHeight: 1.5 }}>
