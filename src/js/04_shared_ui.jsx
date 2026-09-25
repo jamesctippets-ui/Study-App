@@ -240,126 +240,108 @@ function DailyGoalRing({ dailyGoal, onSetTarget }) {
   );
 }
 
-// The single track-navigation surface: replaces the old full-page Home
-// Dashboard and the separate Learning Paths panel with one bottom-sheet
-// menu, opened from the header's hamburger button. Every track is listed
-// exactly once (label + subtitle + live mastery %) with no path-grouping,
-// plus a "continue where you left off" shortcut reusing the existing
-// stats.lastVisited tracking — the app itself no longer auto-navigates
-// there on load, this is just a quick-resume option inside the menu.
-function TrackMenuPanel({ tracks, results, stats, certPlan, activeTrack, onResume, onSelectTrack, onOpenAbout, onOpenCertPath, onSetGoalTarget, onClose }) {
-  useEscapeToClose(onClose);
+// The app's landing screen — shown on every load instead of auto-resuming
+// the last track+mode, so there's always a real overview to start from
+// rather than dropping straight back into whatever you were doing. Every
+// track is listed exactly once (label + subtitle + live mastery %) with
+// no path-grouping, plus a "continue where you left off" shortcut for
+// getting back into a session in one tap via stats.lastVisited (tracked
+// separately, only while mode isn't 'home'). Reachable again from any
+// track's Learn/Quiz/Exam view via the header's Home button.
+function HomeView({ tracks, results, stats, certPlan, onResume, onSelectTrack, onOpenAbout, onOpenCertPath, onSetGoalTarget }) {
   const masteries = tracks.map((t) => ({ track: t, pct: trackMastery(t.key, results) }));
   const overallAvg = masteries.length ? Math.round(masteries.reduce((s, m) => s + m.pct, 0) / masteries.length) : 0;
   const lastVisited = stats.lastVisited;
-  const resumeTrack = lastVisited && lastVisited.track !== activeTrack ? tracks.find((t) => t.key === lastVisited.track) : null;
+  const resumeTrack = lastVisited ? tracks.find((t) => t.key === lastVisited.track) : null;
   const nextPathKey = nextInCertPath(certPlan);
   const nextPathTrack = nextPathKey ? tracks.find((t) => t.key === nextPathKey) : null;
 
   return (
-    <div
-      onClick={onClose}
-      style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', zIndex: 50, display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}
-    >
-      <div
-        onClick={(e) => e.stopPropagation()}
+    <div>
+      <div style={{ fontSize: '12px', color: COLOR.muted, marginBottom: '14px' }}>
+        {stats.streak.current > 0 ? `🔥 ${stats.streak.current}-day streak · ` : ''}{overallAvg}% average mastery across {tracks.length} tracks
+      </div>
+
+      <DailyGoalRing dailyGoal={stats.dailyGoal} onSetTarget={onSetGoalTarget} />
+
+      <button
+        onClick={onOpenCertPath}
         style={{
-          background: COLOR.bg, borderTop: `1px solid ${COLOR.border}`, borderRadius: '20px 20px 0 0',
-          maxWidth: '28rem', width: '100%', maxHeight: '82vh', overflowY: 'auto', padding: '18px 18px 28px',
-          boxShadow: SHADOW.card,
+          width: '100%', textAlign: 'left', marginBottom: '10px', padding: '12px 14px', borderRadius: '14px',
+          background: COLOR.surface, border: `1px solid ${COLOR.border}`, boxShadow: SHADOW.card,
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px',
         }}
       >
-        <div className="flex justify-between items-center mb-2">
-          <div className="itil-display" style={{ fontSize: '18px', fontWeight: 600 }}>Cert Study Hub</div>
-          <button onClick={onClose} className="btn-flat" style={{ color: COLOR.muted, fontSize: '15px', padding: '4px' }}>✕</button>
+        <div style={{ minWidth: 0 }}>
+          <div style={{ fontSize: '11px', color: COLOR.muted, marginBottom: '2px' }}>My Cert Path</div>
+          {nextPathTrack ? (
+            <div style={{ fontSize: '14px', fontWeight: 600, color: trackAccent(nextPathTrack.key) }}>
+              Up next: {nextPathTrack.label}
+              {certPlan.scheduled[nextPathTrack.key] ? ` · ${formatScheduledLabel(certPlan.scheduled[nextPathTrack.key])}` : ''}
+            </div>
+          ) : (
+            <div style={{ fontSize: '13px', color: COLOR.text }}>Put your certs in the order you plan to take them</div>
+          )}
         </div>
-        <div style={{ fontSize: '12px', color: COLOR.muted, marginBottom: '14px' }}>
-          {stats.streak.current > 0 ? `🔥 ${stats.streak.current}-day streak · ` : ''}{overallAvg}% average mastery across {tracks.length} tracks
-        </div>
+        <div style={{ color: COLOR.muted, fontSize: '15px', flexShrink: 0 }}>›</div>
+      </button>
 
-        <DailyGoalRing dailyGoal={stats.dailyGoal} onSetTarget={onSetGoalTarget} />
-
+      {resumeTrack && (
         <button
-          onClick={onOpenCertPath}
+          onClick={onResume}
           style={{
-            width: '100%', textAlign: 'left', marginBottom: '10px', padding: '12px 14px', borderRadius: '14px',
-            background: COLOR.surface, border: `1px solid ${COLOR.border}`, boxShadow: SHADOW.card,
-            display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px',
+            width: '100%', textAlign: 'left', marginBottom: '14px', padding: '14px 16px', borderRadius: '14px',
+            background: `${trackAccent(resumeTrack.key)}1F`, border: `1px solid ${trackAccent(resumeTrack.key)}`,
+            boxShadow: SHADOW.card,
           }}
         >
-          <div style={{ minWidth: 0 }}>
-            <div style={{ fontSize: '11px', color: COLOR.muted, marginBottom: '2px' }}>My Cert Path</div>
-            {nextPathTrack ? (
-              <div style={{ fontSize: '14px', fontWeight: 600, color: trackAccent(nextPathTrack.key) }}>
-                Up next: {nextPathTrack.label}
-                {certPlan.scheduled[nextPathTrack.key] ? ` · ${formatScheduledLabel(certPlan.scheduled[nextPathTrack.key])}` : ''}
-              </div>
-            ) : (
-              <div style={{ fontSize: '13px', color: COLOR.text }}>Put your certs in the order you plan to take them</div>
-            )}
+          <div style={{ fontSize: '11px', color: COLOR.muted, marginBottom: '2px' }}>Continue where you left off</div>
+          <div style={{ fontSize: '15px', fontWeight: 600, color: trackAccent(resumeTrack.key) }}>
+            {resumeTrack.label} · {MODE_LABELS[lastVisited.mode] || 'Learn'}
           </div>
-          <div style={{ color: COLOR.muted, fontSize: '15px', flexShrink: 0 }}>›</div>
         </button>
+      )}
 
-        {resumeTrack && (
-          <button
-            onClick={onResume}
-            style={{
-              width: '100%', textAlign: 'left', marginBottom: '14px', padding: '14px 16px', borderRadius: '14px',
-              background: `${trackAccent(resumeTrack.key)}1F`, border: `1px solid ${trackAccent(resumeTrack.key)}`,
-              boxShadow: SHADOW.card,
-            }}
-          >
-            <div style={{ fontSize: '11px', color: COLOR.muted, marginBottom: '2px' }}>Continue where you left off</div>
-            <div style={{ fontSize: '15px', fontWeight: 600, color: trackAccent(resumeTrack.key) }}>
-              {resumeTrack.label} · {MODE_LABELS[lastVisited.mode] || 'Learn'}
-            </div>
-          </button>
-        )}
-
-        <div style={{ fontSize: '12px', color: COLOR.muted, marginBottom: '8px' }}>All tracks</div>
-        <div className="flex flex-col gap-2">
-          {masteries.map(({ track: t, pct }) => {
-            const accent = trackAccent(t.key);
-            const isActive = t.key === activeTrack;
-            const isCompleted = !!certPlan.completed[t.key];
-            const scheduledDate = certPlan.scheduled[t.key];
-            return (
-              <button
-                key={t.key}
-                onClick={() => onSelectTrack(t.key)}
-                style={{
-                  textAlign: 'left', display: 'flex', alignItems: 'center', gap: '12px', padding: '12px 14px', borderRadius: '12px',
-                  background: isActive ? `${accent}1F` : COLOR.surface,
-                  border: `1px solid ${isActive ? accent : COLOR.border}`, boxShadow: SHADOW.card,
-                }}
-              >
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontSize: '13.5px', fontWeight: 600, color: accent }}>{t.label}</div>
-                  <div style={{ fontSize: '11px', color: COLOR.muted, marginTop: '2px' }}>{t.subtitle}</div>
+      <div style={{ fontSize: '12px', color: COLOR.muted, marginBottom: '8px' }}>All tracks</div>
+      <div className="flex flex-col gap-2">
+        {masteries.map(({ track: t, pct }) => {
+          const accent = trackAccent(t.key);
+          const isCompleted = !!certPlan.completed[t.key];
+          const scheduledDate = certPlan.scheduled[t.key];
+          return (
+            <button
+              key={t.key}
+              onClick={() => onSelectTrack(t.key)}
+              style={{
+                textAlign: 'left', display: 'flex', alignItems: 'center', gap: '12px', padding: '12px 14px', borderRadius: '12px',
+                background: COLOR.surface, border: `1px solid ${COLOR.border}`, boxShadow: SHADOW.card,
+              }}
+            >
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontSize: '13.5px', fontWeight: 600, color: accent }}>{t.label}</div>
+                <div style={{ fontSize: '11px', color: COLOR.muted, marginTop: '2px' }}>{t.subtitle}</div>
+              </div>
+              {isCompleted ? (
+                <div title="Passed" style={{ fontSize: '13px', fontWeight: 700, color: COLOR.success, flexShrink: 0 }}>✓ Passed</div>
+              ) : scheduledDate ? (
+                <div title="Scheduled" style={{ fontSize: '10.5px', fontWeight: 600, color: COLOR.gold, flexShrink: 0, textAlign: 'right', whiteSpace: 'nowrap' }}>
+                  {formatDateShort(scheduledDate)}
                 </div>
-                {isCompleted ? (
-                  <div title="Passed" style={{ fontSize: '13px', fontWeight: 700, color: COLOR.success, flexShrink: 0 }}>✓ Passed</div>
-                ) : scheduledDate ? (
-                  <div title="Scheduled" style={{ fontSize: '10.5px', fontWeight: 600, color: COLOR.gold, flexShrink: 0, textAlign: 'right', whiteSpace: 'nowrap' }}>
-                    {formatDateShort(scheduledDate)}
-                  </div>
-                ) : (
-                  <div style={{ fontSize: '13px', fontWeight: 700, color: pct >= 70 ? COLOR.success : COLOR.muted, flexShrink: 0 }}>{pct}%</div>
-                )}
-              </button>
-            );
-          })}
-        </div>
-
-        <button
-          onClick={onOpenAbout}
-          className="btn-flat"
-          style={{ width: '100%', textAlign: 'center', marginTop: '18px', padding: '8px', fontSize: '11.5px', color: COLOR.muted, background: 'transparent' }}
-        >
-          About & Legal
-        </button>
+              ) : (
+                <div style={{ fontSize: '13px', fontWeight: 700, color: pct >= 70 ? COLOR.success : COLOR.muted, flexShrink: 0 }}>{pct}%</div>
+              )}
+            </button>
+          );
+        })}
       </div>
+
+      <button
+        onClick={onOpenAbout}
+        className="btn-flat"
+        style={{ width: '100%', textAlign: 'center', marginTop: '18px', padding: '8px', fontSize: '11.5px', color: COLOR.muted, background: 'transparent' }}
+      >
+        About & Legal
+      </button>
     </div>
   );
 }

@@ -1882,126 +1882,108 @@ function DailyGoalRing({ dailyGoal, onSetTarget }) {
   );
 }
 
-// The single track-navigation surface: replaces the old full-page Home
-// Dashboard and the separate Learning Paths panel with one bottom-sheet
-// menu, opened from the header's hamburger button. Every track is listed
-// exactly once (label + subtitle + live mastery %) with no path-grouping,
-// plus a "continue where you left off" shortcut reusing the existing
-// stats.lastVisited tracking — the app itself no longer auto-navigates
-// there on load, this is just a quick-resume option inside the menu.
-function TrackMenuPanel({ tracks, results, stats, certPlan, activeTrack, onResume, onSelectTrack, onOpenAbout, onOpenCertPath, onSetGoalTarget, onClose }) {
-  useEscapeToClose(onClose);
+// The app's landing screen — shown on every load instead of auto-resuming
+// the last track+mode, so there's always a real overview to start from
+// rather than dropping straight back into whatever you were doing. Every
+// track is listed exactly once (label + subtitle + live mastery %) with
+// no path-grouping, plus a "continue where you left off" shortcut for
+// getting back into a session in one tap via stats.lastVisited (tracked
+// separately, only while mode isn't 'home'). Reachable again from any
+// track's Learn/Quiz/Exam view via the header's Home button.
+function HomeView({ tracks, results, stats, certPlan, onResume, onSelectTrack, onOpenAbout, onOpenCertPath, onSetGoalTarget }) {
   const masteries = tracks.map((t) => ({ track: t, pct: trackMastery(t.key, results) }));
   const overallAvg = masteries.length ? Math.round(masteries.reduce((s, m) => s + m.pct, 0) / masteries.length) : 0;
   const lastVisited = stats.lastVisited;
-  const resumeTrack = lastVisited && lastVisited.track !== activeTrack ? tracks.find((t) => t.key === lastVisited.track) : null;
+  const resumeTrack = lastVisited ? tracks.find((t) => t.key === lastVisited.track) : null;
   const nextPathKey = nextInCertPath(certPlan);
   const nextPathTrack = nextPathKey ? tracks.find((t) => t.key === nextPathKey) : null;
 
   return (
-    <div
-      onClick={onClose}
-      style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', zIndex: 50, display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}
-    >
-      <div
-        onClick={(e) => e.stopPropagation()}
+    <div>
+      <div style={{ fontSize: '12px', color: COLOR.muted, marginBottom: '14px' }}>
+        {stats.streak.current > 0 ? `🔥 ${stats.streak.current}-day streak · ` : ''}{overallAvg}% average mastery across {tracks.length} tracks
+      </div>
+
+      <DailyGoalRing dailyGoal={stats.dailyGoal} onSetTarget={onSetGoalTarget} />
+
+      <button
+        onClick={onOpenCertPath}
         style={{
-          background: COLOR.bg, borderTop: `1px solid ${COLOR.border}`, borderRadius: '20px 20px 0 0',
-          maxWidth: '28rem', width: '100%', maxHeight: '82vh', overflowY: 'auto', padding: '18px 18px 28px',
-          boxShadow: SHADOW.card,
+          width: '100%', textAlign: 'left', marginBottom: '10px', padding: '12px 14px', borderRadius: '14px',
+          background: COLOR.surface, border: `1px solid ${COLOR.border}`, boxShadow: SHADOW.card,
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px',
         }}
       >
-        <div className="flex justify-between items-center mb-2">
-          <div className="itil-display" style={{ fontSize: '18px', fontWeight: 600 }}>Cert Study Hub</div>
-          <button onClick={onClose} className="btn-flat" style={{ color: COLOR.muted, fontSize: '15px', padding: '4px' }}>✕</button>
+        <div style={{ minWidth: 0 }}>
+          <div style={{ fontSize: '11px', color: COLOR.muted, marginBottom: '2px' }}>My Cert Path</div>
+          {nextPathTrack ? (
+            <div style={{ fontSize: '14px', fontWeight: 600, color: trackAccent(nextPathTrack.key) }}>
+              Up next: {nextPathTrack.label}
+              {certPlan.scheduled[nextPathTrack.key] ? ` · ${formatScheduledLabel(certPlan.scheduled[nextPathTrack.key])}` : ''}
+            </div>
+          ) : (
+            <div style={{ fontSize: '13px', color: COLOR.text }}>Put your certs in the order you plan to take them</div>
+          )}
         </div>
-        <div style={{ fontSize: '12px', color: COLOR.muted, marginBottom: '14px' }}>
-          {stats.streak.current > 0 ? `🔥 ${stats.streak.current}-day streak · ` : ''}{overallAvg}% average mastery across {tracks.length} tracks
-        </div>
+        <div style={{ color: COLOR.muted, fontSize: '15px', flexShrink: 0 }}>›</div>
+      </button>
 
-        <DailyGoalRing dailyGoal={stats.dailyGoal} onSetTarget={onSetGoalTarget} />
-
+      {resumeTrack && (
         <button
-          onClick={onOpenCertPath}
+          onClick={onResume}
           style={{
-            width: '100%', textAlign: 'left', marginBottom: '10px', padding: '12px 14px', borderRadius: '14px',
-            background: COLOR.surface, border: `1px solid ${COLOR.border}`, boxShadow: SHADOW.card,
-            display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px',
+            width: '100%', textAlign: 'left', marginBottom: '14px', padding: '14px 16px', borderRadius: '14px',
+            background: `${trackAccent(resumeTrack.key)}1F`, border: `1px solid ${trackAccent(resumeTrack.key)}`,
+            boxShadow: SHADOW.card,
           }}
         >
-          <div style={{ minWidth: 0 }}>
-            <div style={{ fontSize: '11px', color: COLOR.muted, marginBottom: '2px' }}>My Cert Path</div>
-            {nextPathTrack ? (
-              <div style={{ fontSize: '14px', fontWeight: 600, color: trackAccent(nextPathTrack.key) }}>
-                Up next: {nextPathTrack.label}
-                {certPlan.scheduled[nextPathTrack.key] ? ` · ${formatScheduledLabel(certPlan.scheduled[nextPathTrack.key])}` : ''}
-              </div>
-            ) : (
-              <div style={{ fontSize: '13px', color: COLOR.text }}>Put your certs in the order you plan to take them</div>
-            )}
+          <div style={{ fontSize: '11px', color: COLOR.muted, marginBottom: '2px' }}>Continue where you left off</div>
+          <div style={{ fontSize: '15px', fontWeight: 600, color: trackAccent(resumeTrack.key) }}>
+            {resumeTrack.label} · {MODE_LABELS[lastVisited.mode] || 'Learn'}
           </div>
-          <div style={{ color: COLOR.muted, fontSize: '15px', flexShrink: 0 }}>›</div>
         </button>
+      )}
 
-        {resumeTrack && (
-          <button
-            onClick={onResume}
-            style={{
-              width: '100%', textAlign: 'left', marginBottom: '14px', padding: '14px 16px', borderRadius: '14px',
-              background: `${trackAccent(resumeTrack.key)}1F`, border: `1px solid ${trackAccent(resumeTrack.key)}`,
-              boxShadow: SHADOW.card,
-            }}
-          >
-            <div style={{ fontSize: '11px', color: COLOR.muted, marginBottom: '2px' }}>Continue where you left off</div>
-            <div style={{ fontSize: '15px', fontWeight: 600, color: trackAccent(resumeTrack.key) }}>
-              {resumeTrack.label} · {MODE_LABELS[lastVisited.mode] || 'Learn'}
-            </div>
-          </button>
-        )}
-
-        <div style={{ fontSize: '12px', color: COLOR.muted, marginBottom: '8px' }}>All tracks</div>
-        <div className="flex flex-col gap-2">
-          {masteries.map(({ track: t, pct }) => {
-            const accent = trackAccent(t.key);
-            const isActive = t.key === activeTrack;
-            const isCompleted = !!certPlan.completed[t.key];
-            const scheduledDate = certPlan.scheduled[t.key];
-            return (
-              <button
-                key={t.key}
-                onClick={() => onSelectTrack(t.key)}
-                style={{
-                  textAlign: 'left', display: 'flex', alignItems: 'center', gap: '12px', padding: '12px 14px', borderRadius: '12px',
-                  background: isActive ? `${accent}1F` : COLOR.surface,
-                  border: `1px solid ${isActive ? accent : COLOR.border}`, boxShadow: SHADOW.card,
-                }}
-              >
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontSize: '13.5px', fontWeight: 600, color: accent }}>{t.label}</div>
-                  <div style={{ fontSize: '11px', color: COLOR.muted, marginTop: '2px' }}>{t.subtitle}</div>
+      <div style={{ fontSize: '12px', color: COLOR.muted, marginBottom: '8px' }}>All tracks</div>
+      <div className="flex flex-col gap-2">
+        {masteries.map(({ track: t, pct }) => {
+          const accent = trackAccent(t.key);
+          const isCompleted = !!certPlan.completed[t.key];
+          const scheduledDate = certPlan.scheduled[t.key];
+          return (
+            <button
+              key={t.key}
+              onClick={() => onSelectTrack(t.key)}
+              style={{
+                textAlign: 'left', display: 'flex', alignItems: 'center', gap: '12px', padding: '12px 14px', borderRadius: '12px',
+                background: COLOR.surface, border: `1px solid ${COLOR.border}`, boxShadow: SHADOW.card,
+              }}
+            >
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontSize: '13.5px', fontWeight: 600, color: accent }}>{t.label}</div>
+                <div style={{ fontSize: '11px', color: COLOR.muted, marginTop: '2px' }}>{t.subtitle}</div>
+              </div>
+              {isCompleted ? (
+                <div title="Passed" style={{ fontSize: '13px', fontWeight: 700, color: COLOR.success, flexShrink: 0 }}>✓ Passed</div>
+              ) : scheduledDate ? (
+                <div title="Scheduled" style={{ fontSize: '10.5px', fontWeight: 600, color: COLOR.gold, flexShrink: 0, textAlign: 'right', whiteSpace: 'nowrap' }}>
+                  {formatDateShort(scheduledDate)}
                 </div>
-                {isCompleted ? (
-                  <div title="Passed" style={{ fontSize: '13px', fontWeight: 700, color: COLOR.success, flexShrink: 0 }}>✓ Passed</div>
-                ) : scheduledDate ? (
-                  <div title="Scheduled" style={{ fontSize: '10.5px', fontWeight: 600, color: COLOR.gold, flexShrink: 0, textAlign: 'right', whiteSpace: 'nowrap' }}>
-                    {formatDateShort(scheduledDate)}
-                  </div>
-                ) : (
-                  <div style={{ fontSize: '13px', fontWeight: 700, color: pct >= 70 ? COLOR.success : COLOR.muted, flexShrink: 0 }}>{pct}%</div>
-                )}
-              </button>
-            );
-          })}
-        </div>
-
-        <button
-          onClick={onOpenAbout}
-          className="btn-flat"
-          style={{ width: '100%', textAlign: 'center', marginTop: '18px', padding: '8px', fontSize: '11.5px', color: COLOR.muted, background: 'transparent' }}
-        >
-          About & Legal
-        </button>
+              ) : (
+                <div style={{ fontSize: '13px', fontWeight: 700, color: pct >= 70 ? COLOR.success : COLOR.muted, flexShrink: 0 }}>{pct}%</div>
+              )}
+            </button>
+          );
+        })}
       </div>
+
+      <button
+        onClick={onOpenAbout}
+        className="btn-flat"
+        style={{ width: '100%', textAlign: 'center', marginTop: '18px', padding: '8px', fontSize: '11.5px', color: COLOR.muted, background: 'transparent' }}
+      >
+        About & Legal
+      </button>
     </div>
   );
 }
@@ -3852,7 +3834,7 @@ function ExamResults({ result, config, track, categories, onRestart }) {
 function CertStudyApp() {
   const [theme, toggleTheme] = useTheme();
   const [activeTrack, setActiveTrack] = useState('az900');
-  const [mode, setMode] = useState('learn');
+  const [mode, setMode] = useState('home');
   const [learnView, setLearnView] = useState('study');
   const [quizView, setQuizView] = useState('questions');
   const [activeCat, setActiveCat] = useState('all');
@@ -3866,7 +3848,6 @@ function CertStudyApp() {
   const [stats, setStats] = useState(emptyStats);
   const [showAchievements, setShowAchievements] = useState(false);
   const [toastAchievement, setToastAchievement] = useState(null);
-  const [showMenu, setShowMenu] = useState(false);
   const [showAbout, setShowAbout] = useState(false);
   const [showData, setShowData] = useState(false);
   const [showCertPath, setShowCertPath] = useState(false);
@@ -3903,7 +3884,6 @@ function CertStudyApp() {
   const writeChain = useRef(Promise.resolve());
   const utterRef = useRef(null);
   const skipNextAutoStart = useRef(false);
-  const didRestoreLastVisitedRef = useRef(false);
 
   // Mirror results/seenLog/stats so persistPayload can always read the
   // latest value of the two fields a given save*() call isn't itself
@@ -4063,6 +4043,7 @@ function CertStudyApp() {
 
   const goToCertPathTrack = (key) => {
     setActiveTrack(key);
+    setMode((m) => (m === 'home' ? 'learn' : m));
     setShowCertPath(false);
   };
 
@@ -4235,34 +4216,24 @@ function CertStudyApp() {
     // eslint-disable-next-line
   }, [mode, activeCat, quizLength, typesKey, activeTrack]);
 
-  // Once the initial cloud/local sync finishes, jump straight to the last
-  // track+mode actually visited (if any) instead of always opening on
-  // AZ-900/Learn — so a refresh picks up where you left off rather than
-  // resetting every time. Runs exactly once (the ref guard), since after
-  // that the "tracks the last visited" effect below takes over and this
-  // one's job is done. A brand-new visitor with no lastVisited yet just
-  // keeps the AZ-900/Learn/Study default state.
-  useEffect(() => {
-    if (syncMode === 'loading' || didRestoreLastVisitedRef.current) return;
-    didRestoreLastVisitedRef.current = true;
-    const lv = stats.lastVisited;
-    if (lv && DATA[lv.track]) {
-      setActiveTrack(lv.track);
-      setMode(lv.mode || 'learn');
-    }
-  }, [syncMode]);
+  // The app always opens on Home (mode's initial state) rather than
+  // auto-jumping back into the last track+mode — Home is the landing
+  // screen by design, not a temporary detour on the way back to where you
+  // were. "Continue where you left off" on Home still gets you there in
+  // one tap, via stats.lastVisited tracked below.
 
-  // Tracks the last track+mode actually visited so the restore effect above
-  // (on a future reload) and the track menu's "continue where you left off"
-  // button both have somewhere real to point to. Skipped until the initial
-  // cloud/local sync finishes, so it can't stomp a freshly-loaded
-  // lastVisited with the component's default state. Declared after the
-  // quiz-session-start effect above (also keyed on activeTrack/mode) so
-  // that when both fire in the same commit, this one's persistPayload
-  // call — which folds its update onto the same `stats` closure — runs
-  // last and its write isn't the one that gets overwritten.
+  // Tracks the last track+mode actually visited (learn/quiz/exam only —
+  // Home itself isn't a "place" worth resuming into) so Home's "continue
+  // where you left off" button has somewhere real to point to. Skipped
+  // until the initial cloud/local sync finishes, so it can't stomp a
+  // freshly-loaded lastVisited with the component's default state.
+  // Declared after the quiz-session-start effect above (also keyed on
+  // activeTrack/mode) so that when both fire in the same commit, this
+  // one's persistPayload call — which folds its update onto the same
+  // `stats` closure — runs last and its write isn't the one that gets
+  // overwritten.
   useEffect(() => {
-    if (syncMode === 'loading') return;
+    if (syncMode === 'loading' || mode === 'home') return;
     const current = stats.lastVisited;
     if (current && current.track === activeTrack && current.mode === mode) return;
     saveStats({ ...stats, lastVisited: { track: activeTrack, mode } });
@@ -4584,24 +4555,6 @@ function CertStudyApp() {
           onClose={() => setShowAchievements(false)}
         />
       )}
-      {showMenu && (
-        <TrackMenuPanel
-          tracks={visibleTracks}
-          results={results}
-          stats={stats}
-          certPlan={certPlan}
-          activeTrack={activeTrack}
-          onResume={() => {
-            if (stats.lastVisited) { setActiveTrack(stats.lastVisited.track); setMode(stats.lastVisited.mode); }
-            setShowMenu(false);
-          }}
-          onSelectTrack={(key) => { setActiveTrack(key); setShowMenu(false); }}
-          onOpenAbout={() => { setShowMenu(false); setShowAbout(true); }}
-          onOpenCertPath={() => { setShowMenu(false); setShowCertPath(true); }}
-          onSetGoalTarget={setDailyGoalTarget}
-          onClose={() => setShowMenu(false)}
-        />
-      )}
       {showAbout && <AboutLegalPanel onClose={() => setShowAbout(false)} />}
       {showCertPath && (
         <CertPathPanel
@@ -4631,24 +4584,39 @@ function CertStudyApp() {
         <div className="max-w-md mx-auto px-4" style={{ paddingTop: '14px', paddingBottom: '14px' }}>
           <div className="flex justify-between items-start">
             <div style={{ flex: 1, minWidth: 0, position: 'relative', paddingRight: '10px' }}>
-              <button
-                onClick={() => setShowMenu(true)}
-                title="Menu"
-                style={{
-                  display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: '26px', height: '26px',
-                  borderRadius: '8px', border: 'none', background: 'transparent', color: COLOR.muted,
-                  marginBottom: '2px', padding: 0,
-                }}
-              >
-                <IconMenu />
-              </button>
-              <div className="itil-display" style={{ fontSize: '21px', fontWeight: 600, lineHeight: 1.2, color: trackAccent(activeTrack) }}>{track.label}</div>
-              <div style={{ fontSize: '12px', color: COLOR.muted, marginTop: '2px' }}>{track.subtitle}</div>
+              {mode !== 'home' && (
+                <button
+                  onClick={() => setMode('home')}
+                  title="Home"
+                  style={{
+                    display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: '26px', height: '26px',
+                    borderRadius: '8px', border: 'none', background: 'transparent', color: COLOR.muted,
+                    marginBottom: '2px', padding: 0,
+                  }}
+                >
+                  <IconMenu />
+                </button>
+              )}
+              {mode === 'home' ? (
+                <React.Fragment>
+                  <div className="itil-display" style={{ fontSize: '21px', fontWeight: 600, lineHeight: 1.2 }}>Cert Study Hub</div>
+                  <div style={{ fontSize: '12px', color: COLOR.muted, marginTop: '2px' }}>
+                    {stats.streak.current > 0 ? `🔥 ${stats.streak.current}-day streak` : 'Pick a track to get started'}
+                  </div>
+                </React.Fragment>
+              ) : (
+                <React.Fragment>
+                  <div className="itil-display" style={{ fontSize: '21px', fontWeight: 600, lineHeight: 1.2, color: trackAccent(activeTrack) }}>{track.label}</div>
+                  <div style={{ fontSize: '12px', color: COLOR.muted, marginTop: '2px' }}>{track.subtitle}</div>
+                </React.Fragment>
+              )}
             </div>
             <div className="flex items-start gap-1" style={{ flexShrink: 0 }}>
-              <div style={{ textAlign: 'right', marginRight: '2px' }}>
-                <div style={{ fontSize: '18px', fontWeight: 700, color: COLOR.success }}>{overallMastery}%</div>
-              </div>
+              {mode !== 'home' && (
+                <div style={{ textAlign: 'right', marginRight: '2px' }}>
+                  <div style={{ fontSize: '18px', fontWeight: 700, color: COLOR.success }}>{overallMastery}%</div>
+                </div>
+              )}
               <ThemeToggle theme={theme} onToggle={toggleTheme} />
               <button
                 onClick={() => setShowAchievements(true)}
@@ -4683,6 +4651,22 @@ function CertStudyApp() {
           </div>
         )}
 
+        {mode === 'home' ? (
+          <HomeView
+            tracks={visibleTracks}
+            results={results}
+            stats={stats}
+            certPlan={certPlan}
+            onResume={() => {
+              if (stats.lastVisited) { setActiveTrack(stats.lastVisited.track); setMode(stats.lastVisited.mode); }
+            }}
+            onSelectTrack={(key) => { setActiveTrack(key); setMode('learn'); }}
+            onOpenAbout={() => setShowAbout(true)}
+            onOpenCertPath={() => setShowCertPath(true)}
+            onSetGoalTarget={setDailyGoalTarget}
+          />
+        ) : (
+        <React.Fragment>
         <div className="flex gap-1 mb-4" style={{ boxShadow: SHADOW.card, background: COLOR.surface, padding: '4px', borderRadius: '12px', border: `1px solid ${COLOR.border}` }}>
           <button
             onClick={() => setMode('learn')}
@@ -4966,6 +4950,8 @@ function CertStudyApp() {
             ))}
           </div>
         </div>
+        </React.Fragment>
+        )}
       </div>
     </div>
   );

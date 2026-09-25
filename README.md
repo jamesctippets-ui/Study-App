@@ -171,24 +171,26 @@ backup/device-migration option, since the app has no accounts) alongside
 the existing per-track reset. Both use small wireframe (line-art) icons
 rather than emoji, matching the hamburger menu below.
 
-Opening the app lands you right back on the last track+mode you were
-using — no separate home/dashboard page in between, so a refresh never
-feels like it "lost your place" the way a full landing screen did. A
-first-time visitor with no history yet lands on **AZ-900 → Learn → Study**.
-A ☰ hamburger button in the header opens the **track menu** (`TrackMenuPanel`
-in `04_shared_ui.jsx`): overall average mastery across every track, the
-daily streak, a **daily goal ring** — a small self-set "study N cards/
-questions today" target (`stats.dailyGoal`) with a circular progress
-indicator that fills as you rate flashcards and answer quiz/exam
-questions (across every track, Today's Mix included), turns solid green
-once you hit it, and can be adjusted with a tap-to-reveal +/- 5 stepper
-— an optional "continue where you left off" shortcut (for jumping back
-after browsing other tracks in the menu), and a flat list of all 15
-tracks — each shown exactly once with its description and live mastery %
-(no path-grouping; the earlier Learning Paths feature was removed in
-favor of this simpler list). Quiz and Exam missed-question review lists
-show each question's explanation alongside the prompt, not just what you
-got wrong.
+Opening the app always lands on **Home** (`HomeView` in `04_shared_ui.jsx`)
+rather than resuming the last track+mode directly — a real dashboard to
+start from every time, not a mid-session drop-back-in. Home shows: overall
+average mastery across every track and the daily streak; a **daily goal
+ring** — a small self-set "study N cards/questions today" target
+(`stats.dailyGoal`) with a circular progress indicator that fills as you
+rate flashcards and answer quiz/exam questions (across every track,
+Today's Mix included), turns solid green once you hit it, and can be
+adjusted with a tap-to-reveal +/- 5 stepper; a **My Cert Path** shortcut
+showing your "Up next" cert; a **"Continue where you left off"** button
+once you've actually visited a track this browser (tracked separately
+from Home itself, so Home is never mistaken for "a place you left off
+at"); and a flat list of all 15 tracks — each shown exactly once with its
+description and live mastery % (no path-grouping; the earlier Learning
+Paths feature was removed in favor of this simpler list) — tapping one
+takes you straight into its Learn tab. From inside any track, a ☰ button
+in the header (titled "Home") takes you back to this same Home page at
+any time — it's a real navigation destination now, not a bottom-sheet
+overlay. Quiz and Exam missed-question review lists show each question's
+explanation alongside the prompt, not just what you got wrong.
 
 **Fifteen tracks, all visible in the track switcher:**
 - **AZ-900** (Azure Fundamentals) — full course content, 106 questions.

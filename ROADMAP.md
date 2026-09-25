@@ -82,20 +82,37 @@ come up.
   lesson all work as a user would expect from a "real" multi-page app.
 - [x] ~~A proper **home/dashboard** page as the default landing screen~~
   Shipped, then reworked: refreshing into a separate dashboard page felt
-  clunky for a static site with no real routing, so the app now restores
-  the last track+mode you were actually using on every load (a first-time
-  visitor with no history yet gets AZ-900 → Learn → Study) — no more
-  `view` state in `06_app.jsx`. Overall progress, streak, and a "continue
-  where you left off" shortcut (for jumping back after browsing other
-  tracks in the menu) moved into the new hamburger menu instead of a full
-  page.
+  clunky for a static site with no real routing, so the app briefly
+  restored the last track+mode you were actually using on every load
+  instead (a first-time visitor with no history yet got AZ-900 → Learn →
+  Study) — no more `view` state in `06_app.jsx`. Overall progress, streak,
+  and a "continue where you left off" shortcut (for jumping back after
+  browsing other tracks in the menu) moved into a hamburger menu instead
+  of a full page.
+- [x] **Reversed again, deliberately, by request: Home is back as the
+  default landing screen.** The hamburger's bottom-sheet menu content
+  (`TrackMenuPanel`) was promoted into a full inline page (`HomeView`,
+  rendered for a new `mode === 'home'`) that the app now always opens to,
+  instead of auto-resuming the last track+mode. The header's ☰ button —
+  no longer needed to open an overlay, since you're either already on
+  Home or one tap from it — was repointed to navigate straight back to
+  Home from inside any track (title="Home"), so it's still one recognizable
+  button doing "get me to the overview," just without the overlay. The
+  "continue where you left off" tracking (`stats.lastVisited`) is now
+  explicitly skipped while `mode === 'home'`, so landing on Home doesn't
+  itself get recorded as "the place you left off" the next time you
+  reload — it only tracks real learn/quiz/exam visits, which is what
+  Home's own Continue button needs to stay meaningful.
 - [x] A side/hamburger **menu** for track navigation (☰, `IconMenu` in
   src/js/00_preamble.js) — opens `TrackMenuPanel` (04_shared_ui.jsx),
   which shows overall average mastery + streak, an optional "continue
   where you left off" shortcut, and a flat list of all 15 tracks (each
   once, with its description and live mastery %) — no path-grouping, no
   separate dropdown. Achievements and Data & Progress stay as their own
-  quick-access header buttons alongside the hamburger.
+  quick-access header buttons alongside the hamburger. Superseded by the
+  Home-page reversal directly above: `TrackMenuPanel` itself was renamed
+  `HomeView` and its content now renders inline as the Home page rather
+  than in a bottom-sheet overlay.
 - [x] **An "About & Legal" panel**, reached from a footer link inside the
   hamburger menu rather than new header chrome (`AboutLegalPanel` in
   04_shared_ui.jsx) — About/contact, a manually-curated "what's new"
