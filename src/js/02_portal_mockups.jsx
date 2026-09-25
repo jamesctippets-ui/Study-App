@@ -181,6 +181,26 @@ function MockupInviteGuestUser() {
   );
 }
 
+function MockupPricingCalculator() {
+  return (
+    <PortalFrame height={150}>
+      <text x={12} y={40} fill={COLOR.text} fontSize="9" fontWeight="700">Pricing calculator</text>
+      <text x={12} y={54} fill={COLOR.muted} fontSize="6.5">Calculate your estimated hourly or monthly costs for using Azure.</text>
+      <rect x={12} y={62} width="296" height="18" rx="4" fill={COLOR.surface} stroke={COLOR.border} strokeWidth="1" />
+      <text x={18} y={74} fill={COLOR.muted} fontSize="7.5">🔍 Search products</text>
+      <rect x={12} y={88} width="94" height="30" rx="4" fill={COLOR.surfaceRaised} stroke={COLOR.border} strokeWidth="1" />
+      <text x={59} y={100} textAnchor="middle" fill={COLOR.text} fontSize="7">Virtual Machines</text>
+      <text x={59} y={110} textAnchor="middle" fill={COLOR.muted} fontSize="6">pay per second used</text>
+      <rect x={112} y={88} width="94" height="30" rx="4" fill={COLOR.surfaceRaised} stroke={COLOR.border} strokeWidth="1" />
+      <text x={159} y={100} textAnchor="middle" fill={COLOR.text} fontSize="7">Storage Accounts</text>
+      <text x={159} y={110} textAnchor="middle" fill={COLOR.muted} fontSize="6">pay per GB stored</text>
+      <rect x={212} y={88} width="96" height="30" rx="4" fill={COLOR.surfaceRaised} stroke={COLOR.border} strokeWidth="1" />
+      <text x={260} y={100} textAnchor="middle" fill={COLOR.text} fontSize="7">Azure SQL DB</text>
+      <text x={260} y={110} textAnchor="middle" fill={COLOR.muted} fontSize="6">pay per tier chosen</text>
+    </PortalFrame>
+  );
+}
+
 const PORTAL_MOCKUPS = {
   resourceGroup: MockupResourceGroup,
   virtualNetwork: MockupVirtualNetwork,
@@ -192,6 +212,7 @@ const PORTAL_MOCKUPS = {
   policyCompliance: MockupPolicyCompliance,
   backupVault: MockupBackupVault,
   inviteGuestUser: MockupInviteGuestUser,
+  pricingCalculator: MockupPricingCalculator,
 };
 
 // Real Azure Portal screenshots, pulled directly from Microsoft's own public
@@ -265,6 +286,13 @@ const REAL_PORTAL_SCREENSHOTS = {
     description: 'The "Invite external user" panel reached from Users — Basics tab collects the guest\'s email, display name, and an optional invitation message; the Properties, Assignments, and Review + invite tabs after this one finish the rest of the setup.',
     sourceLabel: 'Microsoft Learn: Assign Azure roles to external guest users',
     sourceUrl: 'https://learn.microsoft.com/en-us/azure/role-based-access-control/role-assignments-external-users',
+  },
+  pricingCalculator: {
+    src: 'images/portal/pricing-calculator.png',
+    alt: 'Real screenshot of the Azure pricing calculator website',
+    description: 'The Azure pricing calculator\'s product picker — search or browse for a service (Virtual Machines, Storage Accounts, Azure SQL Database, and more), add it to an estimate, and configure it to see a live cost projection before you ever deploy anything. This is the consumption-based model made concrete: you\'re pricing exactly what you\'d use, not a fixed bundle.',
+    sourceLabel: 'Microsoft: Azure pricing calculator documentation',
+    sourceUrl: 'https://learn.microsoft.com/en-us/azure/cost-management-billing/costs/pricing-calculator',
   },
 };
 

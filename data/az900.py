@@ -1580,6 +1580,7 @@ LESSONS = [
         'title': 'Cloud Fundamentals',
         'summary': 'Service models, pricing, and the core benefits of cloud computing.',
         'diagram': 'serviceModels',
+        'portalMockup': 'pricingCalculator',
         'vocabIds': ['f1', 'f2', 'f3', 'f4', 'f5', 'f6', 'f7', 'f8', 'f9', 'f10', 'f11'],
         'quizIds': ['q1', 'q5', 'q4', 'msq11'],
         'reading': """Cloud computing means renting computing power, storage, and services from a provider like Microsoft, instead of buying and running your own servers. You pay for what you use, which shifts spending from a big upfront purchase (CapEx) to an ongoing operating cost (OpEx) — similar to leasing equipment instead of buying it outright.

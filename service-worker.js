@@ -1,4 +1,4 @@
-const CACHE_NAME = 'cert-study-hub-4488373ea0';
+const CACHE_NAME = 'cert-study-hub-c0398c13f2';
 
 const CORE_ASSETS = [
   './',
@@ -16,6 +16,7 @@ const CORE_ASSETS = [
   './images/portal/policy-compliance.png',
   './images/portal/backup-vault.png',
   './images/portal/invite-guest-user.png',
+  './images/portal/pricing-calculator.png',
   'https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js',
   'https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js',
   'https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.28.4/babel.min.js',
