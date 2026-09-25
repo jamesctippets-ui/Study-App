@@ -602,26 +602,28 @@ function TermFlyout({ term, onClose, shift, arrowLeft }) {
   );
 }
 
-function CategoryChip({ label, active, mastery, onClick }) {
-  const tint = Math.round((mastery || 0) * 100);
+// The single category filter used above Cards, Study (flat tracks), and
+// both Quiz sub-views (Questions/Match) — a dropdown instead of a
+// horizontally-scrolling chip row, since a phone-width chip row for a
+// 5+ category track always needed a scroll-fade hint and a swipe just to
+// see what else was available. Each category's live mastery % rides along
+// in its option label instead of a hover-only tooltip, since a <select>'s
+// options have no hover state worth relying on.
+function CategoryFilterSelect({ categories, activeCat, onChange, masteryByCategory }) {
   return (
-    <button
-      onClick={onClick}
+    <select
+      value={activeCat}
+      onChange={(e) => onChange(e.target.value)}
       style={{
-        flexShrink: 0,
-        padding: '7px 12px',
-        borderRadius: '999px',
-        fontSize: '12px',
-        fontWeight: 500,
-        whiteSpace: 'nowrap',
-        border: `1px solid ${active ? COLOR.primary : COLOR.border}`,
-        background: active ? 'rgba(167,139,250,0.14)' : COLOR.surface,
-        color: active ? COLOR.primary : COLOR.muted,
+        width: '100%', marginBottom: '18px', padding: '10px 12px', borderRadius: '10px', fontSize: '13px', fontWeight: 600,
+        border: `1px solid ${COLOR.primary}`, background: 'rgba(167,139,250,0.14)', color: COLOR.primary,
       }}
-      title={label === 'All' ? undefined : `${tint}% mastered`}
     >
-      {label}
-    </button>
+      <option value="all">All categories</option>
+      {categories.map((c) => (
+        <option key={c.key} value={c.key}>{c.label} ({Math.round((masteryByCategory[c.key] || 0) * 100)}% mastered)</option>
+      ))}
+    </select>
   );
 }
 
@@ -930,6 +932,19 @@ function MatchGame({ flashcards, roundSize, onContinue, onRoundComplete }) {
     // eslint-disable-next-line
   }, [flashcards]);
 
+  // isDone/its effect must run on every render, before the "not enough
+  // cards" early return below — a hook called only on some renders (e.g.
+  // skipped whenever flashcards.length < 2, which is reachable now that a
+  // track switch can transiently leave Match's category filter matching
+  // nothing in the new track) throws "Rendered fewer hooks than expected"
+  // the next time the count crosses back over 2.
+  const isDone = round.picked.length > 0 && matched.length === round.picked.length;
+
+  useEffect(() => {
+    if (isDone && onRoundComplete) onRoundComplete();
+    // eslint-disable-next-line
+  }, [isDone]);
+
   if (flashcards.length < 2) {
     return (
       <div style={{ textAlign: 'center', color: COLOR.muted, fontSize: '13px', padding: '30px 10px' }}>
@@ -945,13 +960,6 @@ function MatchGame({ flashcards, roundSize, onContinue, onRoundComplete }) {
     setWrongPair(null);
     setMistakes(0);
   };
-
-  const isDone = matched.length === round.picked.length;
-
-  useEffect(() => {
-    if (isDone && onRoundComplete) onRoundComplete();
-    // eslint-disable-next-line
-  }, [isDone]);
 
   const tap = (type, id) => {
     if (matched.includes(id) || wrongPair) return;

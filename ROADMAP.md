@@ -155,6 +155,28 @@ come up.
   open Quiz sub-tab would silently land you on the matching game instead
   of the quiz you asked for. Fixed by having those functions explicitly
   set `quizView` back to `'questions'`.
+- [x] **Category filter chips → a dropdown**, on the same request as the
+  quiz-length control above. The horizontally-scrolling chip row above
+  Cards, flat-track Study, and both Quiz sub-views (Questions/Match) is now
+  one `CategoryFilterSelect` (04_shared_ui.jsx) — a `<select>` with each
+  category's live mastery % folded into its option label, since a
+  dropdown's options have no useful hover state to hold a tooltip the way
+  the old chips did. `CategoryChip` is gone; nothing else used it.
+  Converting this surfaced a real, previously-latent bug in `MatchGame`:
+  its `onRoundComplete` effect was declared *after* the component's "not
+  enough cards for a round" early return, an unconditional-hooks-order
+  violation React only throws once a render actually crosses that early
+  return after having skipped it (or vice versa) — reachable when
+  switching tracks while Match is the open Quiz sub-tab and a specific
+  category was selected, since the new track's card count for that same
+  category key can transiently drop below 2 for one render before the
+  existing `activeCat` reset effect fires. Fixed by moving `isDone` and
+  its effect above the early return (with an added `round.picked.length >
+  0` guard, since without it an empty round would immediately count as
+  "done" now that the effect runs on every render). This was a
+  pre-existing defect, not something this dropdown change introduced —
+  it's just what finally exercised the code path that had been dormant
+  while Match lived under Learn.
 
 ## 7. Spaced repetition & study-science features (from research)
 

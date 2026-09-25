@@ -814,20 +814,12 @@ function CertStudyApp() {
         )}
 
         {(mode === 'quiz' || (mode === 'learn' && learnView !== 'sheet' && (learnView !== 'study' || !DATA[activeTrack].lessons))) && (
-          <div className="mb-5" style={{ position: 'relative' }}>
-            <div className="flex gap-2" style={{ overflowX: 'auto', paddingBottom: '4px' }}>
-              <CategoryChip label="All" active={activeCat === 'all'} mastery={overallMastery / 100} onClick={() => setActiveCat('all')} />
-              {categories.map((c) => (
-                <CategoryChip key={c.key} label={c.label} active={activeCat === c.key} mastery={masteryByCategory[c.key]} onClick={() => setActiveCat(c.key)} />
-              ))}
-            </div>
-            <div
-              style={{
-                position: 'absolute', top: 0, right: 0, bottom: '4px', width: '28px', pointerEvents: 'none',
-                background: `linear-gradient(to right, transparent, ${COLOR.bg})`,
-              }}
-            />
-          </div>
+          <CategoryFilterSelect
+            categories={categories}
+            activeCat={activeCat}
+            onChange={setActiveCat}
+            masteryByCategory={masteryByCategory}
+          />
         )}
 
         {mode === 'learn' && learnView === 'cards' && Object.keys(srs[activeTrack] || {}).length > 0 && (
