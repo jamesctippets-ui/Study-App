@@ -24,7 +24,11 @@ the two, so the material isn't just a wall of text to skim past.
 
 Quiz itself has two sub-views: **Questions** (the rotating multiple-choice/
 true-false/multi-select engine described below) and **Match** (a
-term-matching game — tap a term chip, then its definition; respects the
+term-matching game — tap a term chip then its definition, *or* press a term
+and drag straight down onto its definition with a live line following your
+finger; a wrong drop flashes red, a correct one leaves a permanent dashed
+line joining the pair; dragging near the top/bottom edge auto-scrolls, since
+a full round of 6 pairs can easily run taller than one screen. Respects the
 current category filter, tracks mistakes, and deals a fresh random round
 each time). Match lives under Quiz rather than Learn since it's a recall
 self-test like the rest of Quiz, not a reading/reference view like Cards or

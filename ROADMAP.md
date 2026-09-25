@@ -470,14 +470,39 @@ mind so today's choices don't quietly foreclose that option later:
 
 ## 13. Interactive learning games (user's idea)
 
-- [ ] **Draw-a-line matching.** The current Match game (`MatchGame` —
-  tap a term, then tap its definition) becomes a drag-a-line interaction:
-  terms in a left column, definitions in a right column, the user drags
-  from one to the other and an SVG line tracks the connection live. Needs
-  pointer/touch drag handling and a line-overlay layer; keep the existing
-  tap-to-select mode available too (as a simpler/more accessible fallback
-  for anyone on a small screen or without fine pointer control) rather than
-  replacing it outright.
+- [x] **Draw-a-line matching**, added on top of (not replacing) the
+  existing tap-a-term-then-tap-a-definition flow in `MatchGame`
+  (04_shared_ui.jsx). Rather than the originally-sketched left-column-of-
+  terms/right-column-of-definitions layout — a poor fit for this app's
+  definitions, which are full sentences, not short glossary phrases, and
+  would force cramped multi-line cells at phone width — the existing
+  vertical layout (terms wrapped in a row, definitions stacked as full-
+  width cards below) was kept, with the drag going top-to-bottom instead
+  of left-to-right: press a term and drag down onto its definition, with a
+  live dashed SVG line following the pointer, a solid red line flashing
+  between the two on a wrong drop, and a permanent dashed green line
+  linking every matched pair. Both interaction styles share one
+  `evaluateMatch` function so they can never disagree about what counts as
+  correct, and tapping still works completely unchanged for keyboard users
+  or anyone who just taps instead of drags.
+  Two real, non-obvious things came out of building this rather than just
+  planning it:
+  - **Drag currently only starts from a term, not a definition** — the
+    reverse direction (drag a definition onto its term) isn't wired up
+    yet, though tapping still supports both orders. Worth adding if this
+    turns out to matter to how people actually play.
+  - **Auto-scroll while dragging.** A round can run taller than one
+    screen (up to `ROUND_SIZE`, 6 by default, full-sentence definitions
+    stacked), and the drag captures the pointer instead of allowing a
+    normal touch-scroll — so without help, a term near the top literally
+    can't be dragged onto a definition below the fold. Holding near the
+    top/bottom edge now auto-scrolls the page (faster the closer to the
+    edge), verified end-to-end with a short-viewport test that drags to
+    the edge, holds, watches the page scroll, then re-measures the
+    target's new position before completing the drop — a naive test (or
+    a naive implementation) that computes the drop point once, before any
+    scrolling, breaks the moment the auto-scroll it's supposed to be
+    testing actually moves the target.
 - [ ] **"Choose the more correct answer."** A comparative-judgment mode:
   given a scenario, show two plausible-but-imperfect answers and ask which
   is *better*, with an explanation of what makes the runner-up fall short.

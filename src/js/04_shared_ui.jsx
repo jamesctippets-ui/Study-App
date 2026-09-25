@@ -922,6 +922,23 @@ function MatchGame({ flashcards, roundSize, onContinue, onRoundComplete }) {
   const [matched, setMatched] = useState([]);
   const [wrongPair, setWrongPair] = useState(null);
   const [mistakes, setMistakes] = useState(0);
+  // Drag-a-line state: { termId, x, y, hoverDefId }, x/y in the container's
+  // own coordinate space (see getRelativePoint) so the live line tracks the
+  // pointer regardless of page scroll. This is purely additive on top of
+  // the original tap-a-term-then-tap-a-definition flow below — a plain tap
+  // (pointerdown+pointerup with no movement) still starts and immediately
+  // clears a "drag" that never had anywhere to go, then still fires the
+  // browser's own synthesized click, so tap-to-select keeps working
+  // unchanged for keyboard users and anyone who just taps instead of drags.
+  const [drag, setDrag] = useState(null);
+  const containerRef = useRef(null);
+  const termRefs = useRef({});
+  const defRefs = useRef({});
+  // Raw viewport-space pointer position, kept in a ref (not state) so the
+  // auto-scroll loop below always reads the latest value without itself
+  // being a dependency that would tear the loop down and rebuild it on
+  // every single pointermove.
+  const dragClientRef = useRef({ x: 0, y: 0 });
 
   useEffect(() => {
     setRound(buildRound());
@@ -929,21 +946,55 @@ function MatchGame({ flashcards, roundSize, onContinue, onRoundComplete }) {
     setMatched([]);
     setWrongPair(null);
     setMistakes(0);
+    setDrag(null);
     // eslint-disable-next-line
   }, [flashcards]);
 
-  // isDone/its effect must run on every render, before the "not enough
-  // cards" early return below — a hook called only on some renders (e.g.
-  // skipped whenever flashcards.length < 2, which is reachable now that a
-  // track switch can transiently leave Match's category filter matching
-  // nothing in the new track) throws "Rendered fewer hooks than expected"
-  // the next time the count crosses back over 2.
+  // isDone/its effect, and the auto-scroll effect below, must run on every
+  // render, before the "not enough cards" early return below — a hook
+  // called only on some renders (e.g. skipped whenever flashcards.length <
+  // 2, which is reachable now that a track switch can transiently leave
+  // Match's category filter matching nothing in the new track) throws
+  // "Rendered fewer hooks than expected" the next time the count crosses
+  // back over 2.
   const isDone = round.picked.length > 0 && matched.length === round.picked.length;
 
   useEffect(() => {
     if (isDone && onRoundComplete) onRoundComplete();
     // eslint-disable-next-line
   }, [isDone]);
+
+  // A round can easily run taller than one screen (up to ROUND_SIZE full
+  // definitions), so dragging to a term/definition below the fold needs
+  // the page to scroll itself — nothing else will, since the pointer is
+  // captured for the drag rather than performing a normal touch-scroll.
+  // Holding near the top/bottom edge auto-scrolls, faster the closer to
+  // the edge, exactly like dragging a file near a folder window's edge.
+  // Depends on the derived boolean (not `drag` itself, which gets a new
+  // object reference on every pointermove) so this effect starts once per
+  // drag instead of tearing down and restarting on every move.
+  const isDragging = !!drag;
+  useEffect(() => {
+    if (!isDragging) return undefined;
+    const EDGE = 70;
+    const MAX_SPEED = 26;
+    let rafId;
+    const step = () => {
+      const { x, y } = dragClientRef.current;
+      const vh = window.innerHeight;
+      let dy = 0;
+      if (y < EDGE) dy = -MAX_SPEED * (1 - Math.max(y, 0) / EDGE);
+      else if (y > vh - EDGE) dy = MAX_SPEED * (1 - Math.max(vh - y, 0) / EDGE);
+      if (dy) {
+        window.scrollBy(0, dy);
+        setDrag((d) => (d ? { ...d, ...computeDragUpdate(x, y) } : d));
+      }
+      rafId = requestAnimationFrame(step);
+    };
+    rafId = requestAnimationFrame(step);
+    return () => cancelAnimationFrame(rafId);
+    // eslint-disable-next-line
+  }, [isDragging]);
 
   if (flashcards.length < 2) {
     return (
@@ -959,14 +1010,12 @@ function MatchGame({ flashcards, roundSize, onContinue, onRoundComplete }) {
     setMatched([]);
     setWrongPair(null);
     setMistakes(0);
+    setDrag(null);
   };
 
-  const tap = (type, id) => {
-    if (matched.includes(id) || wrongPair) return;
-    if (!selected) { setSelected({ type, id }); return; }
-    if (selected.type === type) { setSelected({ type, id }); return; }
-    const termId = type === 'term' ? id : selected.id;
-    const defId = type === 'def' ? id : selected.id;
+  // Shared by both the tap flow and the drag-drop flow below, so the two
+  // interaction styles can never disagree about what counts as a match.
+  const evaluateMatch = (termId, defId) => {
     if (termId === defId) {
       setMatched((m) => [...m, termId]);
       setSelected(null);
@@ -975,6 +1024,68 @@ function MatchGame({ flashcards, roundSize, onContinue, onRoundComplete }) {
       setMistakes((m) => m + 1);
       setTimeout(() => { setWrongPair(null); setSelected(null); }, 500);
     }
+  };
+
+  const tap = (type, id) => {
+    if (matched.includes(id) || wrongPair) return;
+    if (!selected) { setSelected({ type, id }); return; }
+    if (selected.type === type) { setSelected({ type, id }); return; }
+    const termId = type === 'term' ? id : selected.id;
+    const defId = type === 'def' ? id : selected.id;
+    evaluateMatch(termId, defId);
+  };
+
+  // Coordinates relative to the container div (which the SVG overlay fills
+  // exactly), so lines stay correctly anchored regardless of where the
+  // game happens to sit on the page.
+  const getRelativePoint = (clientX, clientY) => {
+    const rect = containerRef.current.getBoundingClientRect();
+    return { x: clientX - rect.left, y: clientY - rect.top };
+  };
+
+  const anchorFor = (refsMap, id) => {
+    const el = refsMap.current[id];
+    if (!el || !containerRef.current) return null;
+    const r = el.getBoundingClientRect();
+    const cRect = containerRef.current.getBoundingClientRect();
+    return { x: r.left - cRect.left + r.width / 2, y: r.top - cRect.top + r.height / 2 };
+  };
+
+  // Shared by every place that needs to know "given this raw viewport
+  // point, where's the line's end and what's underneath it" — the initial
+  // pointerdown, every pointermove, and the auto-scroll loop below all
+  // funnel through this so they can never compute it inconsistently.
+  const computeDragUpdate = (clientX, clientY) => {
+    const p = getRelativePoint(clientX, clientY);
+    const el = document.elementFromPoint(clientX, clientY);
+    const defEl = el && el.closest && el.closest('[data-def-id]');
+    const hoverDefId = defEl ? defEl.getAttribute('data-def-id') : null;
+    return { x: p.x, y: p.y, hoverDefId };
+  };
+
+  const beginDrag = (e, termId) => {
+    if (matched.includes(termId) || wrongPair) return;
+    e.currentTarget.setPointerCapture(e.pointerId);
+    dragClientRef.current = { x: e.clientX, y: e.clientY };
+    setSelected({ type: 'term', id: termId });
+    setDrag({ termId, ...computeDragUpdate(e.clientX, e.clientY) });
+  };
+
+  // Attached to the container (not each definition) and hit-tests with
+  // elementFromPoint — the SVG overlay sits on top with pointer-events:
+  // none specifically so this always sees the real definition button
+  // underneath the live line, not the line itself.
+  const onContainerPointerMove = (e) => {
+    if (!drag) return;
+    dragClientRef.current = { x: e.clientX, y: e.clientY };
+    setDrag((d) => (d ? { ...d, ...computeDragUpdate(e.clientX, e.clientY) } : d));
+  };
+
+  const onContainerPointerUp = () => {
+    if (!drag) return;
+    const { termId, hoverDefId } = drag;
+    setDrag(null);
+    if (hoverDefId && !matched.includes(hoverDefId)) evaluateMatch(termId, hoverDefId);
   };
 
   if (isDone) {
@@ -1007,12 +1118,14 @@ function MatchGame({ flashcards, roundSize, onContinue, onRoundComplete }) {
   const termState = (id) => {
     if (matched.includes(id)) return 'matched';
     if (wrongPair && wrongPair.termId === id) return 'wrong';
+    if (drag && drag.termId === id) return 'selected';
     if (selected && selected.type === 'term' && selected.id === id) return 'selected';
     return 'idle';
   };
   const defState = (id) => {
     if (matched.includes(id)) return 'matched';
     if (wrongPair && wrongPair.defId === id) return 'wrong';
+    if (drag && drag.hoverDefId === id) return 'hover';
     if (selected && selected.type === 'def' && selected.id === id) return 'selected';
     return 'idle';
   };
@@ -1020,13 +1133,20 @@ function MatchGame({ flashcards, roundSize, onContinue, onRoundComplete }) {
   const stateStyle = (state) => {
     if (state === 'matched') return { background: 'rgba(52,211,153,0.12)', border: `1px solid ${COLOR.success}`, color: COLOR.muted, opacity: 0.55 };
     if (state === 'wrong') return { background: 'rgba(181,87,74,0.16)', border: `1px solid ${COLOR.red}`, color: COLOR.text };
+    if (state === 'hover') return { background: 'rgba(167,139,250,0.2)', border: `2px solid ${COLOR.primary}`, color: COLOR.text };
     if (state === 'selected') return { background: 'rgba(211,164,101,0.14)', border: `1px solid ${COLOR.gold}`, color: COLOR.text };
     return { background: COLOR.surface, border: `1px solid ${COLOR.border}`, color: COLOR.text };
   };
 
   return (
-    <div>
-      <div className="flex justify-between items-center mb-3">
+    <div
+      ref={containerRef}
+      onPointerMove={onContainerPointerMove}
+      onPointerUp={onContainerPointerUp}
+      onPointerCancel={onContainerPointerUp}
+      style={{ position: 'relative' }}
+    >
+      <div className="flex justify-between items-center mb-1">
         <span style={{ fontSize: '11px', color: COLOR.muted }}>
           {matched.length} / {round.picked.length} matched{mistakes > 0 ? ` · ${mistakes} mistake${mistakes === 1 ? '' : 's'}` : ''}
         </span>
@@ -1034,6 +1154,29 @@ function MatchGame({ flashcards, roundSize, onContinue, onRoundComplete }) {
           New round
         </button>
       </div>
+      <div style={{ fontSize: '10.5px', color: COLOR.muted, marginBottom: '10px', textAlign: 'center' }}>
+        Tap a term then its definition, or drag a term onto its match.
+      </div>
+
+      <svg style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', pointerEvents: 'none', zIndex: 5, overflow: 'visible' }}>
+        {matched.map((id) => {
+          const from = anchorFor(termRefs, id);
+          const to = anchorFor(defRefs, id);
+          if (!from || !to) return null;
+          return <line key={id} x1={from.x} y1={from.y} x2={to.x} y2={to.y} stroke={COLOR.success} strokeWidth="2" strokeDasharray="4 4" opacity="0.55" />;
+        })}
+        {wrongPair && (() => {
+          const from = anchorFor(termRefs, wrongPair.termId);
+          const to = anchorFor(defRefs, wrongPair.defId);
+          if (!from || !to) return null;
+          return <line x1={from.x} y1={from.y} x2={to.x} y2={to.y} stroke={COLOR.red} strokeWidth="2.5" />;
+        })()}
+        {drag && (() => {
+          const from = anchorFor(termRefs, drag.termId);
+          if (!from) return null;
+          return <line x1={from.x} y1={from.y} x2={drag.x} y2={drag.y} stroke={COLOR.primary} strokeWidth="2.5" strokeDasharray="6 4" strokeLinecap="round" />;
+        })()}
+      </svg>
 
       <div className="flex flex-wrap gap-2 mb-4">
         {round.termOrder.map((card) => {
@@ -1041,12 +1184,15 @@ function MatchGame({ flashcards, roundSize, onContinue, onRoundComplete }) {
           return (
             <button
               key={card.id}
+              ref={(el) => { termRefs.current[card.id] = el; }}
+              data-term-id={card.id}
               onClick={() => tap('term', card.id)}
+              onPointerDown={(e) => beginDrag(e, card.id)}
               disabled={state === 'matched'}
               style={{
                 ...stateStyle(state),
                 borderRadius: '10px', padding: '8px 12px', fontSize: '12.5px', fontWeight: 600,
-                lineHeight: 1.3, textAlign: 'center', maxWidth: '150px',
+                lineHeight: 1.3, textAlign: 'center', maxWidth: '150px', touchAction: 'none',
                 transition: 'background 0.15s, border-color 0.15s',
               }}
             >
@@ -1062,6 +1208,8 @@ function MatchGame({ flashcards, roundSize, onContinue, onRoundComplete }) {
           return (
             <button
               key={card.id}
+              ref={(el) => { defRefs.current[card.id] = el; }}
+              data-def-id={card.id}
               onClick={() => tap('def', card.id)}
               disabled={state === 'matched'}
               style={{
