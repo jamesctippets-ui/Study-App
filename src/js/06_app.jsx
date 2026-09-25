@@ -9,6 +9,7 @@ function CertStudyApp() {
   const [results, setResults] = useState(emptyTrackMap);
   const [seenLog, setSeenLog] = useState(emptyTrackMap);
   const [srs, setSrs] = useState(emptyTrackMap);
+  const [certPlan, setCertPlan] = useState(emptyCertPlan);
   const [flipped, setFlipped] = useState(false);
   const [fIndex, setFIndex] = useState(0);
   const [syncMode, setSyncMode] = useState('loading');
@@ -18,6 +19,7 @@ function CertStudyApp() {
   const [showMenu, setShowMenu] = useState(false);
   const [showAbout, setShowAbout] = useState(false);
   const [showData, setShowData] = useState(false);
+  const [showCertPath, setShowCertPath] = useState(false);
   const [importMessage, setImportMessage] = useState(null);
 
   const [quizLength, setQuizLength] = useState(10);
@@ -60,6 +62,7 @@ function CertStudyApp() {
   const seenLogRef = useRef(seenLog);
   const statsRef = useRef(stats);
   const srsRef = useRef(srs);
+  const certPlanRef = useRef(certPlan);
 
   const track = TRACKS.find((t) => t.key === activeTrack);
   const visibleTracks = TRACKS.filter((t) => !t.hidden);
@@ -75,6 +78,7 @@ function CertStudyApp() {
   const applySeenLog = (v) => { seenLogRef.current = v; setSeenLog(v); };
   const applyStats = (v) => { statsRef.current = v; setStats(v); };
   const applySrs = (v) => { srsRef.current = v; setSrs(v); };
+  const applyCertPlan = (v) => { certPlanRef.current = v; setCertPlan(v); };
 
   useEffect(() => {
     let cancelled = false;
@@ -92,6 +96,7 @@ function CertStudyApp() {
         if (local.seenLog) applySeenLog(normalizeSeenLog(local.seenLog));
         if (local.stats) applyStats(normalizeStats(local.stats));
         if (local.srs) applySrs(normalizeSrs(local.srs));
+        if (local.certPlan) applyCertPlan(normalizeCertPlan(local.certPlan));
       }
       setSyncMode('local');
     }
@@ -115,6 +120,7 @@ function CertStudyApp() {
                     if (data && data.seenLog) applySeenLog(normalizeSeenLog(data.seenLog));
                     if (data && data.stats) applyStats(normalizeStats(data.stats));
                     if (data && data.srs) applySrs(normalizeSrs(data.srs));
+                    if (data && data.certPlan) applyCertPlan(normalizeCertPlan(data.certPlan));
                   }
                   setSyncMode('cloud');
                 },
@@ -146,25 +152,63 @@ function CertStudyApp() {
   const saveResults = (nextResults) => {
     resultsRef.current = nextResults;
     setResults(nextResults);
-    persistPayload({ results: nextResults, seenLog: seenLogRef.current, stats: statsRef.current, srs: srsRef.current, updatedAt: Date.now() });
+    persistPayload({ results: nextResults, seenLog: seenLogRef.current, stats: statsRef.current, srs: srsRef.current, certPlan: certPlanRef.current, updatedAt: Date.now() });
   };
 
   const saveSeen = (nextSeenLog) => {
     seenLogRef.current = nextSeenLog;
     setSeenLog(nextSeenLog);
-    persistPayload({ results: resultsRef.current, seenLog: nextSeenLog, stats: statsRef.current, srs: srsRef.current, updatedAt: Date.now() });
+    persistPayload({ results: resultsRef.current, seenLog: nextSeenLog, stats: statsRef.current, srs: srsRef.current, certPlan: certPlanRef.current, updatedAt: Date.now() });
   };
 
   const saveStats = (nextStats) => {
     statsRef.current = nextStats;
     setStats(nextStats);
-    persistPayload({ results: resultsRef.current, seenLog: seenLogRef.current, stats: nextStats, srs: srsRef.current, updatedAt: Date.now() });
+    persistPayload({ results: resultsRef.current, seenLog: seenLogRef.current, stats: nextStats, srs: srsRef.current, certPlan: certPlanRef.current, updatedAt: Date.now() });
   };
 
   const saveSrs = (nextSrs) => {
     srsRef.current = nextSrs;
     setSrs(nextSrs);
-    persistPayload({ results: resultsRef.current, seenLog: seenLogRef.current, stats: statsRef.current, srs: nextSrs, updatedAt: Date.now() });
+    persistPayload({ results: resultsRef.current, seenLog: seenLogRef.current, stats: statsRef.current, srs: nextSrs, certPlan: certPlanRef.current, updatedAt: Date.now() });
+  };
+
+  const saveCertPlan = (nextCertPlan) => {
+    certPlanRef.current = nextCertPlan;
+    setCertPlan(nextCertPlan);
+    persistPayload({ results: resultsRef.current, seenLog: seenLogRef.current, stats: statsRef.current, srs: srsRef.current, certPlan: nextCertPlan, updatedAt: Date.now() });
+  };
+
+  const addToCertPath = (key) => {
+    if (certPlan.order.includes(key)) return;
+    saveCertPlan({ ...certPlan, order: [...certPlan.order, key] });
+  };
+
+  const removeFromCertPath = (key) => {
+    const scheduled = { ...certPlan.scheduled }; delete scheduled[key];
+    const completed = { ...certPlan.completed }; delete completed[key];
+    saveCertPlan({ order: certPlan.order.filter((k) => k !== key), scheduled, completed });
+  };
+
+  const moveCertPath = (key, direction) => {
+    saveCertPlan({ ...certPlan, order: moveActiveTrack(certPlan.order, certPlan.completed, key, direction) });
+  };
+
+  const setCertScheduled = (key, dateOrNull) => {
+    const scheduled = { ...certPlan.scheduled };
+    if (dateOrNull) scheduled[key] = dateOrNull; else delete scheduled[key];
+    saveCertPlan({ ...certPlan, scheduled });
+  };
+
+  const toggleCertCompleted = (key) => {
+    const completed = { ...certPlan.completed };
+    if (completed[key]) delete completed[key]; else completed[key] = todayString();
+    saveCertPlan({ ...certPlan, completed });
+  };
+
+  const goToCertPathTrack = (key) => {
+    setActiveTrack(key);
+    setShowCertPath(false);
   };
 
   const markSeen = (ids) => {
@@ -477,7 +521,7 @@ function CertStudyApp() {
   };
 
   const doExport = () => {
-    const ok = downloadJSON(`cert-study-hub-progress-${todayString()}.json`, { results, seenLog, stats, srs, exportedAt: Date.now() });
+    const ok = downloadJSON(`cert-study-hub-progress-${todayString()}.json`, { results, seenLog, stats, srs, certPlan, exportedAt: Date.now() });
     setImportMessage(ok ? { ok: true, text: 'Downloaded.' } : { ok: false, text: "Couldn't start the download — try again." });
   };
 
@@ -500,7 +544,8 @@ function CertStudyApp() {
       applySeenLog(normalized.seenLog);
       applyStats(normalized.stats);
       applySrs(normalized.srs);
-      persistPayload({ results: normalized.results, seenLog: normalized.seenLog, stats: normalized.stats, srs: normalized.srs, updatedAt: Date.now() });
+      applyCertPlan(normalized.certPlan);
+      persistPayload({ results: normalized.results, seenLog: normalized.seenLog, stats: normalized.stats, srs: normalized.srs, certPlan: normalized.certPlan, updatedAt: Date.now() });
       setImportMessage({ ok: true, text: 'Progress restored.' });
     };
     reader.onerror = () => setImportMessage({ ok: false, text: "Couldn't read that file." });
@@ -570,7 +615,7 @@ function CertStudyApp() {
     statsRef.current = nextStats;
     setResults(nextResults);
     setStats(nextStats);
-    persistPayload({ results: nextResults, seenLog: seenLogRef.current, stats: nextStats, srs: srsRef.current, updatedAt: Date.now() });
+    persistPayload({ results: nextResults, seenLog: seenLogRef.current, stats: nextStats, srs: srsRef.current, certPlan: certPlanRef.current, updatedAt: Date.now() });
     // eslint-disable-next-line
   }, [examPhase]);
 
@@ -605,6 +650,7 @@ function CertStudyApp() {
           tracks={visibleTracks}
           results={results}
           stats={stats}
+          certPlan={certPlan}
           activeTrack={activeTrack}
           onResume={() => {
             if (stats.lastVisited) { setActiveTrack(stats.lastVisited.track); setMode(stats.lastVisited.mode); }
@@ -612,10 +658,24 @@ function CertStudyApp() {
           }}
           onSelectTrack={(key) => { setActiveTrack(key); setShowMenu(false); }}
           onOpenAbout={() => { setShowMenu(false); setShowAbout(true); }}
+          onOpenCertPath={() => { setShowMenu(false); setShowCertPath(true); }}
           onClose={() => setShowMenu(false)}
         />
       )}
       {showAbout && <AboutLegalPanel onClose={() => setShowAbout(false)} />}
+      {showCertPath && (
+        <CertPathPanel
+          tracks={visibleTracks}
+          certPlan={certPlan}
+          onAddTrack={addToCertPath}
+          onRemoveTrack={removeFromCertPath}
+          onMove={moveCertPath}
+          onSetScheduled={setCertScheduled}
+          onToggleCompleted={toggleCertCompleted}
+          onGoToTrack={goToCertPathTrack}
+          onClose={() => setShowCertPath(false)}
+        />
+      )}
       {showData && (
         <DataPanel
           trackLabel={track.label}

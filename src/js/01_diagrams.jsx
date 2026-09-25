@@ -212,6 +212,35 @@ function DiagramBackupRecovery() {
   );
 }
 
+function DiagramGroupLicensing() {
+  return (
+    <svg viewBox="0 0 300 195" style={{ width: '100%', height: 'auto' }}>
+      <DBox x={90} y={8} w={120} h={30} label="New group member" />
+      <DLine x1={150} y1={38} x2={70} y2={88} />
+      <DLine x1={150} y1={38} x2={230} y2={88} />
+      <DBox x={10} y={88} w={120} h={40} label="Security group" sub="added manually" />
+      <DBox x={170} y={88} w={120} h={40} label="Dynamic group" sub="rule adds them automatically" />
+      <DLine x1={70} y1={128} x2={150} y2={152} />
+      <DLine x1={230} y1={128} x2={150} y2={152} />
+      <DBox x={90} y={152} w={120} h={30} label="License + access applied" />
+    </svg>
+  );
+}
+
+function DiagramStorageAccess() {
+  return (
+    <svg viewBox="0 0 300 165" style={{ width: '100%', height: 'auto' }}>
+      <DBox x={90} y={8} w={120} h={30} label="Storage account" />
+      <DLine x1={150} y1={38} x2={70} y2={72} />
+      <DLine x1={150} y1={38} x2={230} y2={72} />
+      <DBox x={10} y={72} w={120} h={40} label="Access key" sub="full account access" />
+      <DBox x={170} y={72} w={120} h={40} label="SAS token" sub="scoped + time-limited" />
+      <DCaption x={150} y={135} text="A storage firewall adds a network-level gate on top of either" />
+      <DCaption x={150} y={150} text="Prefer a SAS over an access key when sharing externally" />
+    </svg>
+  );
+}
+
 const LESSON_DIAGRAMS = {
   serviceModels: DiagramServiceModels,
   hierarchy: DiagramHierarchy,
@@ -223,5 +252,7 @@ const LESSON_DIAGRAMS = {
   deploymentSlots: DiagramDeploymentSlots,
   nsgPriority: DiagramNsgPriority,
   backupRecovery: DiagramBackupRecovery,
+  groupLicensing: DiagramGroupLicensing,
+  storageAccess: DiagramStorageAccess,
 };
 

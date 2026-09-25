@@ -1156,7 +1156,7 @@ LESSONS = [
         'id': 'identities-access',
         'title': 'Identities & Access',
         'summary': 'Users, groups, licensing, external users, and self-service password reset.',
-        'diagram': None,
+        'diagram': 'groupLicensing',
         'portalMockup': 'inviteGuestUser',
         'vocabIds': ['f1', 'f2', 'f3', 'f4'],
         'quizIds': ['q1', 'q2', 'q3', 'q4', 'tf1', 'tf2'],
@@ -1202,7 +1202,7 @@ Day to day, this ties back to cost: budgets with alert thresholds, and Cost Anal
         'id': 'storage-management',
         'title': 'Storage Management',
         'summary': 'Access keys and SAS, firewalls, lifecycle policies, and protecting blob data.',
-        'diagram': None,
+        'diagram': 'storageAccess',
         'vocabIds': ['f10', 'f11', 'f12', 'f13', 'f14', 'f15', 'f16', 'f17', 'f18'],
         'quizIds': ['q9', 'q10', 'q11', 'q12', 'q13', 'tf4', 'tf5', 'tf6'],
         'reading': """Managing storage at the administrator level means configuring the account itself, not just knowing what it holds. General-purpose v2 is the standard account type, with Standard (HDD-backed) and Premium (SSD-backed) performance tiers depending on how demanding the workload is.

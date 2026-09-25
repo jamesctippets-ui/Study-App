@@ -53,8 +53,17 @@ come up.
 
 ## 5. Diagrams (user's idea)
 
-- [ ] Close the existing diagram/portal-mockup gaps in AZ-104's course (2
-  lessons still lack a diagram, 4 lack a portal mockup — see README).
+- [x] Close the existing diagram/portal-mockup gaps in AZ-104's course.
+  The portal-mockup/screenshot side was already complete on all 7 lessons;
+  the remaining gap was 2 lessons with no diagram at all (Identities &
+  Access, Storage Management). Gave each its own new diagram —
+  `DiagramGroupLicensing` (security vs. dynamic group → license/access
+  applied) and `DiagramStorageAccess` (access key vs. SAS, plus a storage
+  firewall) in `01_diagrams.jsx` — rather than reusing AZ-900's generic
+  `identity`/`storage` diagrams, since those illustrate different concepts
+  (Entra ID/RBAC/Conditional Access; blob/file/queue/table + access tiers)
+  than what these two lessons actually teach. AZ-104 now matches AZ-900:
+  full diagram + portal-mockup + real-screenshot coverage on all 7 lessons.
 - [ ] Add course/diagram content to ITIL and Cloud+, which currently have
   none at all.
 - [x] A one-page **cheat sheet** per track — the single highest-praised
@@ -112,6 +121,26 @@ come up.
   colors) was left theme-unaware after visual review showed no contrast
   problem in either theme — worth a second look if a future track's
   color reads poorly on the light card background.
+- [x] **My Cert Path** (user's idea) — a personal, user-ordered sequence of
+  certs, distinct from the removed multi-cert Learning Paths in section 1
+  above (that was curated grouping; this is whichever certs the user adds,
+  in whichever order they place them). Reached from a teaser card at the
+  top of the hamburger menu ("Up next: <cert>") that opens `CertPathPanel`
+  (04_shared_ui.jsx). Each cert added to the path can carry an optional
+  scheduled test date and a "mark passed" flag; the "Up next" card is
+  always just the first not-yet-passed cert in the order, so passing one
+  automatically promotes the next with no manual re-ordering, and a passed
+  cert moves into a collapsed Completed section instead of cluttering the
+  active list — the "automatically moves you along and hides ones you
+  complete" behavior asked for. Reordering uses simple up/down buttons
+  (`moveActiveTrack` in 03_helpers.js), matching the no-drag-and-drop
+  convention already set in section 13. Every track also gets a compact
+  badge in the main "All tracks" list (a date chip if scheduled, a green
+  "✓ Passed" if completed) so the tracking is visible outside the panel
+  too, without adding controls that clutter that flat list. New `certPlan`
+  state (`{order, scheduled, completed}`) rides the same sync/export-import
+  path as `results`/`stats`/`srs` — it's study-planning data, not a display
+  preference, so unlike the theme toggle it does travel with your account.
 
 ## 7. Spaced repetition & study-science features (from research)
 

@@ -177,12 +177,14 @@ const MODE_LABELS = { learn: 'Learn', quiz: 'Quiz', exam: 'Exam' };
 // plus a "continue where you left off" shortcut reusing the existing
 // stats.lastVisited tracking — the app itself no longer auto-navigates
 // there on load, this is just a quick-resume option inside the menu.
-function TrackMenuPanel({ tracks, results, stats, activeTrack, onResume, onSelectTrack, onOpenAbout, onClose }) {
+function TrackMenuPanel({ tracks, results, stats, certPlan, activeTrack, onResume, onSelectTrack, onOpenAbout, onOpenCertPath, onClose }) {
   useEscapeToClose(onClose);
   const masteries = tracks.map((t) => ({ track: t, pct: trackMastery(t.key, results) }));
   const overallAvg = masteries.length ? Math.round(masteries.reduce((s, m) => s + m.pct, 0) / masteries.length) : 0;
   const lastVisited = stats.lastVisited;
   const resumeTrack = lastVisited && lastVisited.track !== activeTrack ? tracks.find((t) => t.key === lastVisited.track) : null;
+  const nextPathKey = nextInCertPath(certPlan);
+  const nextPathTrack = nextPathKey ? tracks.find((t) => t.key === nextPathKey) : null;
 
   return (
     <div
@@ -205,6 +207,28 @@ function TrackMenuPanel({ tracks, results, stats, activeTrack, onResume, onSelec
           {stats.streak.current > 0 ? `🔥 ${stats.streak.current}-day streak · ` : ''}{overallAvg}% average mastery across {tracks.length} tracks
         </div>
 
+        <button
+          onClick={onOpenCertPath}
+          style={{
+            width: '100%', textAlign: 'left', marginBottom: '10px', padding: '12px 14px', borderRadius: '14px',
+            background: COLOR.surface, border: `1px solid ${COLOR.border}`, boxShadow: SHADOW.card,
+            display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px',
+          }}
+        >
+          <div style={{ minWidth: 0 }}>
+            <div style={{ fontSize: '11px', color: COLOR.muted, marginBottom: '2px' }}>My Cert Path</div>
+            {nextPathTrack ? (
+              <div style={{ fontSize: '14px', fontWeight: 600, color: trackAccent(nextPathTrack.key) }}>
+                Up next: {nextPathTrack.label}
+                {certPlan.scheduled[nextPathTrack.key] ? ` · ${formatScheduledLabel(certPlan.scheduled[nextPathTrack.key])}` : ''}
+              </div>
+            ) : (
+              <div style={{ fontSize: '13px', color: COLOR.text }}>Put your certs in the order you plan to take them</div>
+            )}
+          </div>
+          <div style={{ color: COLOR.muted, fontSize: '15px', flexShrink: 0 }}>›</div>
+        </button>
+
         {resumeTrack && (
           <button
             onClick={onResume}
@@ -226,6 +250,8 @@ function TrackMenuPanel({ tracks, results, stats, activeTrack, onResume, onSelec
           {masteries.map(({ track: t, pct }) => {
             const accent = trackAccent(t.key);
             const isActive = t.key === activeTrack;
+            const isCompleted = !!certPlan.completed[t.key];
+            const scheduledDate = certPlan.scheduled[t.key];
             return (
               <button
                 key={t.key}
@@ -240,7 +266,15 @@ function TrackMenuPanel({ tracks, results, stats, activeTrack, onResume, onSelec
                   <div style={{ fontSize: '13.5px', fontWeight: 600, color: accent }}>{t.label}</div>
                   <div style={{ fontSize: '11px', color: COLOR.muted, marginTop: '2px' }}>{t.subtitle}</div>
                 </div>
-                <div style={{ fontSize: '13px', fontWeight: 700, color: pct >= 70 ? COLOR.success : COLOR.muted, flexShrink: 0 }}>{pct}%</div>
+                {isCompleted ? (
+                  <div title="Passed" style={{ fontSize: '13px', fontWeight: 700, color: COLOR.success, flexShrink: 0 }}>✓ Passed</div>
+                ) : scheduledDate ? (
+                  <div title="Scheduled" style={{ fontSize: '10.5px', fontWeight: 600, color: COLOR.gold, flexShrink: 0, textAlign: 'right', whiteSpace: 'nowrap' }}>
+                    {formatDateShort(scheduledDate)}
+                  </div>
+                ) : (
+                  <div style={{ fontSize: '13px', fontWeight: 700, color: pct >= 70 ? COLOR.success : COLOR.muted, flexShrink: 0 }}>{pct}%</div>
+                )}
               </button>
             );
           })}
@@ -253,6 +287,166 @@ function TrackMenuPanel({ tracks, results, stats, activeTrack, onResume, onSelec
         >
           About & Legal
         </button>
+      </div>
+    </div>
+  );
+}
+
+// A personal, user-ordered sequence of certs (distinct from the removed
+// "Learning Paths" feature, which was curated multi-track groupings — this
+// is whichever certs the user themselves adds, in whichever order they
+// place them). `certPlan.order` holds every track they've added; a
+// completed one stays in that array (so un-completing it restores its
+// spot) but is filtered out of the active list below and shown in the
+// collapsed Completed section instead — the "automatically hides ones you
+// complete" behavior the user asked for. The "Up next" card is just the
+// first non-completed entry, so finishing one automatically promotes the
+// next without any explicit re-ordering step.
+function CertPathPanel({ tracks, certPlan, onAddTrack, onRemoveTrack, onMove, onSetScheduled, onToggleCompleted, onGoToTrack, onClose }) {
+  useEscapeToClose(onClose);
+  const [addingKey, setAddingKey] = useState('');
+  const [completedOpen, setCompletedOpen] = useState(false);
+  const trackByKey = (key) => tracks.find((t) => t.key === key);
+  const activeOrder = certPlan.order.filter((k) => !certPlan.completed[k] && trackByKey(k));
+  const completedOrder = certPlan.order.filter((k) => certPlan.completed[k] && trackByKey(k));
+  const addable = tracks.filter((t) => !certPlan.order.includes(t.key));
+  const nextKey = activeOrder[0] || null;
+  const nextTrack = nextKey ? trackByKey(nextKey) : null;
+
+  return (
+    <div
+      onClick={onClose}
+      style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', zIndex: 50, display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        style={{
+          background: COLOR.bg, borderTop: `1px solid ${COLOR.border}`, borderRadius: '20px 20px 0 0',
+          maxWidth: '28rem', width: '100%', maxHeight: '82vh', overflowY: 'auto', padding: '18px 18px 28px',
+          boxShadow: SHADOW.card,
+        }}
+      >
+        <div className="flex justify-between items-center mb-2">
+          <div className="itil-display" style={{ fontSize: '18px', fontWeight: 600 }}>My Cert Path</div>
+          <button onClick={onClose} className="btn-flat" style={{ color: COLOR.muted, fontSize: '15px', padding: '4px' }}>✕</button>
+        </div>
+        <div style={{ fontSize: '11.5px', color: COLOR.muted, marginBottom: '14px', lineHeight: 1.4 }}>
+          Put your certs in the order you plan to take them. We'll always show which one's next, and mark one passed to move it out of the way.
+        </div>
+
+        {nextTrack && (
+          <div style={{
+            marginBottom: '16px', padding: '14px 16px', borderRadius: '14px',
+            background: `${trackAccent(nextTrack.key)}1F`, border: `1px solid ${trackAccent(nextTrack.key)}`, boxShadow: SHADOW.card,
+          }}>
+            <div style={{ fontSize: '11px', color: COLOR.muted, marginBottom: '2px' }}>Up next</div>
+            <div style={{ fontSize: '16px', fontWeight: 600, color: trackAccent(nextTrack.key) }}>
+              {nextTrack.label} <span style={{ fontWeight: 400, color: COLOR.muted, fontSize: '12px' }}>· {nextTrack.subtitle}</span>
+            </div>
+            {certPlan.scheduled[nextTrack.key] && (
+              <div style={{ fontSize: '11.5px', color: COLOR.muted, marginTop: '4px' }}>Scheduled {formatScheduledLabel(certPlan.scheduled[nextTrack.key])}</div>
+            )}
+            <button
+              onClick={() => onGoToTrack(nextTrack.key)}
+              style={{ marginTop: '10px', padding: '8px 14px', borderRadius: '9px', background: trackAccent(nextTrack.key), color: COLOR.onAccent, fontSize: '12.5px', fontWeight: 600 }}
+            >
+              Go to {nextTrack.label} →
+            </button>
+          </div>
+        )}
+
+        <div style={{ fontSize: '12px', color: COLOR.muted, marginBottom: '8px' }}>
+          Your path{activeOrder.length ? ` (${activeOrder.length})` : ''}
+        </div>
+        {activeOrder.length === 0 && (
+          <div style={{ fontSize: '12px', color: COLOR.muted, padding: '12px', border: `1px dashed ${COLOR.border}`, borderRadius: '12px', marginBottom: '12px' }}>
+            Add a cert below to start building your path.
+          </div>
+        )}
+        <div className="flex flex-col gap-2" style={{ marginBottom: '16px' }}>
+          {activeOrder.map((key, i) => {
+            const t = trackByKey(key);
+            const accent = trackAccent(key);
+            const scheduledDate = certPlan.scheduled[key];
+            return (
+              <div key={key} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 12px', borderRadius: '12px', background: COLOR.surface, border: `1px solid ${COLOR.border}` }}>
+                <div style={{ fontSize: '12px', color: COLOR.muted, width: '14px', flexShrink: 0, textAlign: 'center' }}>{i + 1}</div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontSize: '13px', fontWeight: 600, color: accent }}>{t.label}</div>
+                  <input
+                    type="date"
+                    value={scheduledDate || ''}
+                    onChange={(e) => onSetScheduled(key, e.target.value || null)}
+                    style={{ marginTop: '4px', fontSize: '11px', color: COLOR.muted, background: 'transparent', border: `1px solid ${COLOR.border}`, borderRadius: '6px', padding: '3px 5px', maxWidth: '130px' }}
+                  />
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', flexShrink: 0 }}>
+                  <button onClick={() => onMove(key, 'up')} disabled={i === 0} title="Move up" className="btn-flat" style={{ opacity: i === 0 ? 0.3 : 1, color: COLOR.muted, fontSize: '10px', padding: '2px 5px', lineHeight: 1 }}>▲</button>
+                  <button onClick={() => onMove(key, 'down')} disabled={i === activeOrder.length - 1} title="Move down" className="btn-flat" style={{ opacity: i === activeOrder.length - 1 ? 0.3 : 1, color: COLOR.muted, fontSize: '10px', padding: '2px 5px', lineHeight: 1 }}>▼</button>
+                </div>
+                <button
+                  onClick={() => onToggleCompleted(key)}
+                  title="Mark passed"
+                  style={{ flexShrink: 0, fontSize: '11px', fontWeight: 600, color: COLOR.success, background: 'transparent', border: `1px solid ${COLOR.success}`, borderRadius: '8px', padding: '6px 8px' }}
+                >
+                  Passed
+                </button>
+                <button onClick={() => onRemoveTrack(key)} title="Remove from path" className="btn-flat" style={{ color: COLOR.muted, fontSize: '13px', padding: '2px 4px', flexShrink: 0 }}>✕</button>
+              </div>
+            );
+          })}
+        </div>
+
+        {addable.length > 0 && (
+          <div style={{ marginBottom: '16px' }}>
+            <div style={{ fontSize: '12px', color: COLOR.muted, marginBottom: '6px' }}>Add a cert to your path</div>
+            <div className="flex gap-2">
+              <select
+                value={addingKey}
+                onChange={(e) => setAddingKey(e.target.value)}
+                style={{ flex: 1, minWidth: 0, padding: '9px', borderRadius: '9px', background: COLOR.surface, border: `1px solid ${COLOR.border}`, color: COLOR.text, fontSize: '13px' }}
+              >
+                <option value="">Choose a cert…</option>
+                {addable.map((t) => <option key={t.key} value={t.key}>{t.label} — {t.subtitle}</option>)}
+              </select>
+              <button
+                onClick={() => { if (addingKey) { onAddTrack(addingKey); setAddingKey(''); } }}
+                disabled={!addingKey}
+                style={{ padding: '9px 14px', borderRadius: '9px', background: addingKey ? COLOR.primary : COLOR.surfaceRaised, color: addingKey ? COLOR.onAccent : COLOR.muted, fontSize: '13px', fontWeight: 600, flexShrink: 0 }}
+              >
+                Add
+              </button>
+            </div>
+          </div>
+        )}
+
+        {completedOrder.length > 0 && (
+          <div>
+            <button
+              onClick={() => setCompletedOpen((o) => !o)}
+              style={{ width: '100%', textAlign: 'left', background: COLOR.surfaceRaised, border: `1px solid ${COLOR.border}`, borderRadius: '12px', padding: '10px 12px', fontSize: '12.5px', color: COLOR.text, fontWeight: 600 }}
+            >
+              {completedOpen ? '▾ ' : '▸ '}Completed ({completedOrder.length})
+            </button>
+            {completedOpen && (
+              <div className="flex flex-col gap-2" style={{ marginTop: '8px' }}>
+                {completedOrder.map((key) => {
+                  const t = trackByKey(key);
+                  return (
+                    <div key={key} style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '10px 12px', borderRadius: '12px', background: COLOR.surface, border: `1px solid ${COLOR.border}` }}>
+                      <div style={{ fontSize: '13px', color: COLOR.success, flexShrink: 0 }}>✓</div>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ fontSize: '13px', fontWeight: 600, color: COLOR.text }}>{t.label}</div>
+                        <div style={{ fontSize: '11px', color: COLOR.muted, marginTop: '2px' }}>Passed {formatDateShort(certPlan.completed[key])}</div>
+                      </div>
+                      <button onClick={() => onToggleCompleted(key)} className="btn-flat" style={{ color: COLOR.muted, fontSize: '11px', padding: '4px 6px', flexShrink: 0 }}>Undo</button>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

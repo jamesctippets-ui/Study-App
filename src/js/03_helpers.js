@@ -121,6 +121,83 @@ function normalizeSrs(raw) {
   return map;
 }
 
+/* ---------------- cert path (personal study-order plan) ---------------- */
+
+// `order` is the user's chosen sequence of track keys (not necessarily all
+// 15 — only the ones they've added to their plan). `scheduled`/`completed`
+// are keyed by track key: scheduled holds an optional 'YYYY-MM-DD' exam
+// date, completed holds the 'YYYY-MM-DD' date the user marked it passed
+// (its mere presence means "done"). A completed track stays in `order` —
+// it's just filtered out of the active/"up next" view — so un-completing it
+// restores its original position instead of losing its place in line.
+function emptyCertPlan() {
+  return { order: [], scheduled: {}, completed: {} };
+}
+
+function normalizeCertPlan(raw) {
+  const base = emptyCertPlan();
+  if (!raw || typeof raw !== 'object') return base;
+  const validKeys = new Set(TRACKS.map((t) => t.key));
+  const order = Array.isArray(raw.order) ? raw.order.filter((k) => validKeys.has(k)) : [];
+  const scheduled = {};
+  if (raw.scheduled && typeof raw.scheduled === 'object') {
+    Object.keys(raw.scheduled).forEach((k) => {
+      if (validKeys.has(k) && typeof raw.scheduled[k] === 'string') scheduled[k] = raw.scheduled[k];
+    });
+  }
+  const completed = {};
+  if (raw.completed && typeof raw.completed === 'object') {
+    Object.keys(raw.completed).forEach((k) => {
+      if (validKeys.has(k) && typeof raw.completed[k] === 'string') completed[k] = raw.completed[k];
+    });
+  }
+  return { order, scheduled, completed };
+}
+
+// The first track in the plan's order that hasn't been marked completed —
+// the single "what's next" recommendation the whole feature is built around.
+function nextInCertPath(certPlan) {
+  return certPlan.order.find((k) => !certPlan.completed[k]) || null;
+}
+
+// Reorders `key` one step toward the front/back of the plan, relative only
+// to the other still-active (not-completed) tracks — a completed track's
+// position in the underlying array is skipped over rather than swapped
+// with, since it's hidden from the view this button lives on and swapping
+// with it would look like a no-op to the user.
+function moveActiveTrack(order, completed, key, direction) {
+  const activeKeys = order.filter((k) => !completed[k]);
+  const idx = activeKeys.indexOf(key);
+  if (idx === -1) return order;
+  const swapWith = direction === 'up' ? idx - 1 : idx + 1;
+  if (swapWith < 0 || swapWith >= activeKeys.length) return order;
+  const otherKey = activeKeys[swapWith];
+  const a = order.indexOf(key);
+  const b = order.indexOf(otherKey);
+  const next = [...order];
+  const tmp = next[a];
+  next[a] = next[b];
+  next[b] = tmp;
+  return next;
+}
+
+function formatDateShort(dateStr) {
+  const [y, m, d] = dateStr.split('-').map(Number);
+  return new Date(y, m - 1, d).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+}
+
+// e.g. "Nov 15 · in 32 days" / "Nov 15 · today" / "Nov 15 · 3 days past" —
+// used on the scheduled-test badge in both the cert path panel and the
+// track menu's compact chip.
+function formatScheduledLabel(dateStr) {
+  const days = daysBetween(todayString(), dateStr);
+  const when = formatDateShort(dateStr);
+  if (days === 0) return `${when} · today`;
+  if (days > 0) return `${when} · in ${days} day${days === 1 ? '' : 's'}`;
+  const overdue = -days;
+  return `${when} · ${overdue} day${overdue === 1 ? '' : 's'} past`;
+}
+
 // Orders a track's flashcards for Cards-mode review: cards that are due (or
 // have never been rated at all) sort first, most-overdue first; cards not
 // yet due follow, soonest-due first. A seeded shuffle breaks ties so cards
@@ -167,6 +244,7 @@ function parseImportedProgress(raw) {
     seenLog: normalizeSeenLog(raw.seenLog),
     stats: normalizeStats(raw.stats),
     srs: normalizeSrs(raw.srs),
+    certPlan: normalizeCertPlan(raw.certPlan),
   };
 }
 

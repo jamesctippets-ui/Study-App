@@ -46,6 +46,19 @@ A sliding switch in the top nav bar toggles between a dark-grey and an
 off-white theme — see "Light/dark theming" under Source layout for how it's
 implemented and what it does/doesn't affect.
 
+The hamburger menu's **My Cert Path** panel lets you put whichever certs
+you're actually planning to take into your own order — not a curated
+sequence, your sequence. It always surfaces an "Up next" card for the
+first cert in that order you haven't marked passed yet, so finishing one
+automatically promotes the next without any manual re-ordering. Each cert
+in your path can carry an optional scheduled test date; marking one passed
+moves it into a collapsed "Completed" section (with the date you passed
+it) instead of cluttering the active list, though it keeps its place in
+line so un-marking it restores exactly where it was. This travels with the
+rest of your synced progress (unlike the theme setting) since it's study
+planning data, not a display preference — see `certPlan` in
+`03_helpers.js`/`06_app.jsx`.
+
 Key terms aren't just highlighted in lesson readings — every track gets this
 now, in quiz explanations and flashcard backs too. Tapping a highlighted term
 opens a small flyout anchored directly under that word (front/back/detail,
@@ -306,10 +319,13 @@ stay wherever you're running it.
   runs — a bigger call since it adds a non-Python dependency to a build that's
   currently pure Python. Worth doing if load time on a phone still feels slow; hold
   off otherwise.
-- **AZ-104's course still only has 5 of 7 lessons with a diagram, but now has a
-  portal mockup (and a real screenshot) on all 7** — Identities & Access, Networking,
-  Monitoring & Recovery, and App Hosting & IaC all got one recently. AZ-900 is fully
-  complete on both diagram and portal mockup coverage across all 7 lessons.
+- **AZ-104's course is now fully complete on both diagram and portal mockup/
+  screenshot coverage across all 7 lessons**, matching AZ-900. The last two
+  gaps — Identities & Access and Storage Management — got their own new
+  diagrams (`groupLicensing`, `storageAccess` in `01_diagrams.jsx`) rather
+  than reusing AZ-900's generic `identity`/`storage` diagrams, since those
+  lessons' actual content (dynamic-group licensing; access keys vs. SAS vs.
+  a storage firewall) didn't match what the generic ones illustrate.
 - **ITIL and Cloud+ have no course/lesson mode at all yet** — same format as AZ-900
   and AZ-104 would extend cleanly, reusing the existing `DBox`/`DLine`/`PortalFrame`
   diagram helpers.
