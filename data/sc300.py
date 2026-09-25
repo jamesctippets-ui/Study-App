@@ -297,6 +297,34 @@ FLASHCARDS = [
         'back': "One or more cloud-only accounts, excluded from Conditional Access and normal MFA/PIM requirements, with credentials stored securely offline, kept purely so admins can still sign in if every other authentication method is broken or unavailable.",
         'detail': "These accounts should be monitored closely and explicitly excluded from Conditional Access named locations restrictions and risk policies — the whole point is that they still work when everything else has failed.",
     },
+    {
+        'id': 'f41',
+        'cat': 'userIdentities',
+        'front': 'Custom security attributes',
+        'back': 'Custom security attributes are administrator-defined key-value pairs (e.g. Project = Falcon) attached to a user or other object, usable in dynamic group membership rules and in attribute-based access control conditions on Azure Storage — extending targeting beyond the built-in directory attributes.',
+        'detail': 'Reading or assigning a custom security attribute needs its own dedicated role (Attribute Assignment Administrator or Attribute Definition Administrator) — even a Global Administrator cannot manage them without being granted one of these first.',
+    },
+    {
+        'id': 'f42',
+        'cat': 'authAccessMgmt',
+        'front': 'Conditional Access policy templates',
+        'back': 'Microsoft-provided Conditional Access templates pre-fill common, recommended assignments and access controls, such as requiring MFA for all users or blocking legacy authentication, so an administrator starts from a vetted baseline instead of building every policy from scratch.',
+        'detail': 'Every Conditional Access policy, whether built from a template or from scratch, should explicitly exclude your break-glass emergency access accounts, so a misconfigured or unreachable policy can never lock every administrator out at once.',
+    },
+    {
+        'id': 'f43',
+        'cat': 'authAccessMgmt',
+        'front': 'Identity Secure Score',
+        'back': "Identity Secure Score is a percentage Microsoft Entra ID calculates from your tenant's actual security configuration, listing specific improvement actions — such as enabling multifactor authentication methods or blocking legacy authentication — each showing the points earned if implemented.",
+        'detail': "The score is directional, not a pass/fail target: two tenants with very different real-world MFA and SSPR coverage can land on similar scores if they've each implemented a different subset of the recommended actions.",
+    },
+    {
+        'id': 'f44',
+        'cat': 'userIdentities',
+        'front': 'Cross-tenant access settings',
+        'back': "Cross-tenant access settings control which external Microsoft Entra organizations your tenant trusts for inbound B2B collaboration, including whether to trust a partner's own multifactor authentication methods and device compliance claims instead of re-enforcing your own for their guest users.",
+        'detail': 'These settings apply per-organization and are separate from the B2B collaboration invitation itself — a partner org can be trusted for MFA claims by default, then have that trust explicitly overridden for one specific inbound organization.',
+    },
 ]
 
 QUESTIONS = [

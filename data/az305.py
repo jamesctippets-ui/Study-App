@@ -296,6 +296,34 @@ FLASHCARDS = [
         'back': "The configuration on an Azure resource that routes its platform logs and metrics to a destination — a Log Analytics workspace, storage account, or Event Hub — since resource logs aren't collected anywhere by default until a diagnostic setting sends them there.",
         'detail': "This is the piece a design is missing if Azure Monitor Metrics vs. Logs mentions a log type that never seems to show up anywhere — the resource-level diagnostic setting to actually emit it hasn't been configured.",
     },
+    {
+        'id': 'f41',
+        'cat': 'identityGovernance',
+        'front': 'Bicep and ARM templates for landing zone deployment',
+        'back': 'Enterprise-scale landing zones are deployed and updated as Infrastructure as Code (IaC) — Bicep or ARM templates, sometimes Terraform — rather than clicked together in the portal, so the same governed baseline (Azure landing zones) can be redeployed consistently across subscriptions and re-applied whenever the reference architecture changes.',
+        'detail': "Treating a landing zone's own definition as IaC means a change to policy or hub networking gets tested and versioned like any other code change, instead of being a one-off manual edit to a subscription that already exists.",
+    },
+    {
+        'id': 'f42',
+        'cat': 'identityGovernance',
+        'front': 'Azure Advisor',
+        'back': 'Azure Advisor analyzes your actual resource configuration and usage telemetry, then generates personalized recommendations organized by the same five pillars as the Azure Well-Architected Framework — reliability, security, cost, operational excellence, and performance.',
+        'detail': "Advisor's recommendations are specific to what's actually deployed and how it's being used, unlike the Azure Well-Architected Framework's pillars themselves, which are general design guidance applied before or during a build.",
+    },
+    {
+        'id': 'f43',
+        'cat': 'identityGovernance',
+        'front': 'Azure Resource Graph',
+        'back': 'Resource Graph queries resource metadata (type, location, tags, configuration) across many subscriptions at once using a Kusto-like query language, letting an architect audit governance and compliance for management groups, subscriptions, and resource groups without opening each one individually in the portal.',
+        'detail': 'This is read-only inventory and querying — Azure Policy is still the tool that actually enforces or remediates what Resource Graph merely reports on.',
+    },
+    {
+        'id': 'f44',
+        'cat': 'infrastructure',
+        'front': 'Network Watcher',
+        'back': 'Network Watcher provides network-level diagnostic tools — IP flow verify (is a specific rule allowing or blocking a flow), NSG flow logs (a record of every evaluated flow), and Connection Troubleshoot (an end-to-end reachability test) — for troubleshooting connectivity issues after a network is already built.',
+        'detail': 'These are diagnostic tools for an existing network, not design-time governance controls — Azure landing zones and Azure Policy govern how a network gets built and configured in the first place.',
+    },
 ]
 
 QUESTIONS = [

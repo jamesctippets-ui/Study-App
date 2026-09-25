@@ -314,6 +314,27 @@ FLASHCARDS = [
         'back': "The unified console where Defender XDR's correlated incidents, Sentinel (once onboarded to the unified experience), and each individual Defender product's own settings are all managed from one place, instead of separate per-product portals.",
         'detail': "The bidirectional sync between Sentinel and Defender XDR incidents is what keeps an incident consistent whether it's worked from this unified portal or Sentinel's own dedicated blade in Azure.",
     },
+    {
+        'id': 'f44',
+        'cat': 'respondIncidents',
+        'front': 'Incident tasks in Sentinel',
+        'back': 'Incident tasks are a checklist of investigation or containment steps — such as running Defender for Endpoint device isolation or notifying the user — attached directly to an incident, either added manually or auto-populated from a template, so every analyst follows the same triage steps regardless of who picks it up.',
+        'detail': "Tasks are tracked as part of the incident's own record, not a separate ticketing system — completing them updates the incident's audit trail directly.",
+    },
+    {
+        'id': 'f45',
+        'cat': 'manageSecOps',
+        'front': 'Advanced Security Information Model (ASIM)',
+        'back': "ASIM normalizes data from many different Sentinel data connectors, each with its own native schema, into a small set of common schemas (like a normalized network session), so one hunting query or analytics rule works across multiple products instead of needing a separate version per source.",
+        'detail': "Built-in analytics rules and hunting queries that already use ASIM-normalized fields automatically pick up any new data source once it's mapped to that same normalized schema, with no rule rewrite needed.",
+    },
+    {
+        'id': 'f46',
+        'cat': 'respondIncidents',
+        'front': 'Investigation graph in Sentinel',
+        'back': "The investigation graph is an interactive, visual map of an incident's related entities (users, hosts, IPs, files) and how they connect, letting an analyst pivot outward from one alert to see the full blast radius instead of reading a flat list of raw events.",
+        'detail': "Bookmarks in Sentinel hunting created during threat hunting can be pulled directly into an investigation graph, connecting ad-hoc hunting findings to a live incident's existing entity map.",
+    },
 ]
 
 QUESTIONS = [

@@ -281,7 +281,12 @@ come up.
   Batch 3, at the user's request, focused specifically on AZ-900,
   Cloud+, AZ-104, and DP-900: added 4-5 new flashcards to each (663 →
   681 total), moving them from 21/10/11/22% to 24/13/15/28%
-  respectively. Overall coverage keeps climbing batch over batch. Caught
+  respectively. Batch 4 targeted the (then) 5 lowest-coverage tracks —
+  SC-300, SC-500, AB-650, AZ-305, SC-200 — adding 4 new flashcards to
+  each (681 → 700 total), moving them from 10/11/12/12/12% to
+  20/18/17/20/17% respectively; new lowest are now AZ-802, MD-102, and
+  EHR Integration (14/14/16%), a natural target for a batch 5. Overall
+  coverage keeps climbing batch over batch. Caught
   and fixed two real mistakes along the way: batch 1 accidentally added
   an "Azure landing zone" card to AZ-305 that nearly duplicated an
   existing "Azure landing zones" card (replaced with a genuinely

@@ -314,6 +314,34 @@ FLASHCARDS = [
         'back': "A litigation hold is applied to an individual mailbox to preserve all its content indefinitely (or for a set period) for legal reasons, independent of any organization-wide policy. A retention policy vs. retention label instead applies a consistent retain/delete rule across a broader set of content.",
         'detail': 'A litigation hold on one mailbox can keep content longer than what an organization-wide retention policy would otherwise delete — the more restrictive (longer-retaining) rule always wins when both apply.',
     },
+    {
+        'id': 'f44',
+        'cat': 'governSecure',
+        'front': 'Priority accounts',
+        'back': 'Priority accounts flag specific mailboxes (executives, VIPs) for elevated monitoring and protection, tuning several Defender and Purview features to watch these mailboxes more closely by default rather than requiring an admin to configure each one individually.',
+        'detail': "Flagging an account as priority doesn't grant it any extra license or permission — it only raises the sensitivity and default scope of monitoring features like Insider Risk Management and Defender for Office 365 that already apply tenant-wide.",
+    },
+    {
+        'id': 'f45',
+        'cat': 'governSecure',
+        'front': 'Auto-labeling for sensitivity labels',
+        'back': 'Auto-labeling policies scan content in Exchange, SharePoint, and OneDrive for matching sensitive information types (like credit card numbers) and apply a sensitivity label automatically, or recommend one to the user, instead of relying on everyone to label content by hand.',
+        'detail': "Auto-labeling runs on a schedule and can take up to a day to apply retroactively across existing content; confirming which files actually picked up a label is a job for Content explorer, not the auto-labeling policy's own configuration screen.",
+    },
+    {
+        'id': 'f46',
+        'cat': 'governSecure',
+        'front': 'Customer Lockbox',
+        'back': 'Customer Lockbox requires a Microsoft support engineer to get explicit customer approval before accessing tenant content during a support request, rather than relying only on Microsoft\'s own internal access controls.',
+        'detail': 'It only applies to a narrow set of support scenarios where a human engineer would need direct access to customer data — most support and service operations never need this, and Lockbox never triggers for them.',
+    },
+    {
+        'id': 'f47',
+        'cat': 'governSecure',
+        'front': 'Attack simulation training',
+        'back': 'Attack simulation training in Defender for Office 365 lets an administrator launch realistic, safe phishing, credential-harvest, or malware-attachment campaigns against real users, then automatically enrolls anyone who falls for it into targeted training.',
+        'detail': 'Results here feed the same tenant risk picture as Microsoft Secure Score and Insider Risk Management — a user who repeatedly fails simulations is a real, measurable signal, not just a training-completion checkbox.',
+    },
 ]
 
 QUESTIONS = [

@@ -349,6 +349,34 @@ FLASHCARDS = [
         'back': "A bundle of resources — group membership, Teams, enterprise apps, SharePoint sites — that a user can request access to as one unit, going through an approval workflow, rather than an admin granting each resource separately.",
         'detail': "This is the request-and-approval side of access; Privileged Identity Management (PIM) covers the separate, time-bound activation of privileged roles rather than standing access to resources like these.",
     },
+    {
+        'id': 'f54',
+        'cat': 'identityAccessGovernance',
+        'front': 'PIM for Azure resource roles',
+        'back': 'PIM for Azure resource roles applies the same eligible-vs-active, time-bound activation model used for Entra directory roles to Azure RBAC roles like Owner or Contributor at a subscription or resource group scope, requiring justification (and optionally approval) before the role becomes active.',
+        'detail': 'This is a different control from just-in-time (JIT) VM access: PIM governs who can act with a management-plane role at all, while JIT VM access only narrows which source IPs and ports can reach a VM once someone already has network access.',
+    },
+    {
+        'id': 'f55',
+        'cat': 'securityPostureOps',
+        'front': 'Sentinel automation rules',
+        'back': 'Automation rules run centrally across one or more analytics rules before any playbook fires, letting an analyst auto-assign, tag, suppress, or close incidents based on simple conditions, then optionally hand off to one or more Sentinel playbooks (SOAR) for the actual remediation actions.',
+        'detail': 'Ordering matters: automation rules execute in a defined sequence, and a rule that closes an incident outright can prevent a later rule — or a playbook — further down that sequence from ever running against it.',
+    },
+    {
+        'id': 'f56',
+        'cat': 'securityPostureOps',
+        'front': 'Microsoft Defender for Cloud DevOps security',
+        'back': "Defender for Cloud's DevOps security connects source-control platforms (GitHub, Azure DevOps, GitLab) to scan for exposed secrets, misconfigured pipelines, and vulnerable dependencies before code ever reaches a running Azure resource.",
+        'detail': 'This extends Zero Trust principles upstream of runtime: instead of only assuming breach and verifying explicitly once a workload is already live, it catches a hardcoded credential or an insecure pipeline setting at the source before it can ever be exploited.',
+    },
+    {
+        'id': 'f57',
+        'cat': 'securityPostureOps',
+        'front': 'Microsoft Defender for Cloud attack path analysis',
+        'back': 'Attack path analysis uses the cloud security graph to identify exploitable chains — like an internet-facing VM with a vulnerability that has a role assignment reaching a storage account holding sensitive data — and ranks them by real exploitability, not just individual finding severity.',
+        'detail': 'This is what separates it from the regulatory compliance dashboard: that dashboard checks configuration against a named standard in isolation, while attack path analysis specifically models whether findings chain together into an actual reachable path to something valuable.',
+    },
 ]
 
 QUESTIONS = [
