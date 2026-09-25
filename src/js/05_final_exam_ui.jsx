@@ -32,7 +32,7 @@ function ExamIntro({ track, config, onStart }) {
       )}
       <button
         onClick={onStart}
-        style={{ width: '100%', padding: '13px', borderRadius: '12px', background: COLOR.gold, color: '#2E1F0C', fontSize: '14px', fontWeight: 700 }}
+        style={{ width: '100%', padding: '13px', borderRadius: '12px', background: COLOR.gold, color: COLOR.onAccent, fontSize: '14px', fontWeight: 700 }}
       >
         Start Exam
       </button>
@@ -167,7 +167,7 @@ function ExamResults({ result, config, track, categories, onRestart }) {
       )}
       <button
         onClick={onRestart}
-        style={{ width: '100%', marginTop: '16px', padding: '12px', borderRadius: '12px', background: COLOR.primary, color: '#2B1620', fontSize: '14px', fontWeight: 600 }}
+        style={{ width: '100%', marginTop: '16px', padding: '12px', borderRadius: '12px', background: COLOR.primary, color: COLOR.onAccent, fontSize: '14px', fontWeight: 600 }}
       >
         Take another exam
       </button>

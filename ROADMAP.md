@@ -95,6 +95,23 @@ come up.
   pattern instead of introducing a new one. See LAUNCH_CHECKLIST.md
   section 1 for what's covered and what's still open (an accessibility
   statement, a persistent footer once this has its own domain).
+- [x] A **light/dark theme toggle** (user's idea) — a sun/moon sliding
+  switch (`ThemeToggle`, `00_preamble.js`) in the header, dark mode a
+  neutral dark grey (not the previous purple-tinted dark), light mode
+  off-white. Implemented via CSS custom properties in
+  `templates/index.html.tmpl` (`--color-*` under `:root` /
+  `:root[data-theme="light"]`) rather than React state, so none of the
+  hundreds of existing `COLOR.xxx` call sites needed to change — see
+  README's "Light/dark theming" section for the full architecture,
+  including the `COLOR.onAccent` token that keeps accent-colored
+  buttons legible in both themes. Preference persists via `localStorage`
+  only (not synced progress — it's a display setting, not study data).
+  Also **color-blocked the top nav bar**: the header now sits in its own
+  full-width bar with a distinct background + drop shadow instead of
+  blending into the page body. `TRACK_ACCENTS` (hamburger menu track
+  colors) was left theme-unaware after visual review showed no contrast
+  problem in either theme — worth a second look if a future track's
+  color reads poorly on the light card background.
 
 ## 7. Spaced repetition & study-science features (from research)
 

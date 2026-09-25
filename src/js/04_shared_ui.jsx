@@ -104,7 +104,7 @@ function DataPanel({ trackLabel, onExport, onImportFile, importMessage, onReset,
           </div>
           <button
             onClick={onExport}
-            style={{ width: '100%', padding: '10px', borderRadius: '10px', background: COLOR.primary, color: '#2B1620', fontSize: '13px', fontWeight: 600 }}
+            style={{ width: '100%', padding: '10px', borderRadius: '10px', background: COLOR.primary, color: COLOR.onAccent, fontSize: '13px', fontWeight: 600 }}
           >
             ⬇ Export progress
           </button>
@@ -484,7 +484,7 @@ function FlashcardView({ card, flipped, setFlipped, onRate, index, total, catego
         <button
           onClick={() => onRate('correct')}
           className="flex-1"
-          style={{ padding: '12px', borderRadius: '12px', background: COLOR.success, color: '#2B1620', fontSize: '14px', fontWeight: 600 }}
+          style={{ padding: '12px', borderRadius: '12px', background: COLOR.success, color: COLOR.onAccent, fontSize: '14px', fontWeight: 600 }}
         >
           ✓ Got it
         </button>
@@ -551,7 +551,7 @@ function QuizSectionButton({ label, count, onClick }) {
     <button
       onClick={onClick}
       style={{
-        width: '100%', padding: '12px', borderRadius: '12px', background: COLOR.gold, color: '#2E1F0C',
+        width: '100%', padding: '12px', borderRadius: '12px', background: COLOR.gold, color: COLOR.onAccent,
         fontSize: '13px', fontWeight: 600, marginBottom: '18px',
       }}
     >
@@ -630,7 +630,7 @@ function StudyView({ activeCat, categories, flashcards, questionsData, onQuizCat
           className="flex-1"
           style={{
             padding: '12px', borderRadius: '12px',
-            background: isLast ? COLOR.surfaceRaised : COLOR.primary, color: isLast ? COLOR.muted : '#2B1620',
+            background: isLast ? COLOR.surfaceRaised : COLOR.primary, color: isLast ? COLOR.muted : COLOR.onAccent,
             fontSize: '13px', fontWeight: 600,
           }}
         >
@@ -772,7 +772,7 @@ function MatchGame({ flashcards, roundSize, onContinue, onRoundComplete }) {
           {onContinue && (
             <button
               onClick={onContinue}
-              style={{ background: COLOR.primary, color: '#2B1620', borderRadius: '10px', padding: '10px 20px', fontSize: '13px', fontWeight: 600 }}
+              style={{ background: COLOR.primary, color: COLOR.onAccent, borderRadius: '10px', padding: '10px 20px', fontSize: '13px', fontWeight: 600 }}
             >
               Continue reading →
             </button>
@@ -1070,7 +1070,7 @@ function LessonDetail({ lesson, flashcardsData, questionsData, categories, onBac
               ) : (
                 <button
                   onClick={advancePastGate}
-                  style={{ width: '100%', padding: '12px', borderRadius: '12px', background: COLOR.primary, color: '#2B1620', fontSize: '14px', fontWeight: 600 }}
+                  style={{ width: '100%', padding: '12px', borderRadius: '12px', background: COLOR.primary, color: COLOR.onAccent, fontSize: '14px', fontWeight: 600 }}
                 >
                   Continue reading →
                 </button>
@@ -1080,7 +1080,7 @@ function LessonDetail({ lesson, flashcardsData, questionsData, categories, onBac
             ) : (
               <button
                 onClick={advancePastGate}
-                style={{ width: '100%', padding: '12px', borderRadius: '12px', background: COLOR.primary, color: '#2B1620', fontSize: '14px', fontWeight: 600 }}
+                style={{ width: '100%', padding: '12px', borderRadius: '12px', background: COLOR.primary, color: COLOR.onAccent, fontSize: '14px', fontWeight: 600 }}
               >
                 Continue reading →
               </button>
@@ -1188,7 +1188,7 @@ function LessonDetail({ lesson, flashcardsData, questionsData, categories, onBac
             className="flex-1"
             style={{
               padding: '12px', borderRadius: '12px',
-              background: isLastLesson ? COLOR.surfaceRaised : COLOR.primary, color: isLastLesson ? COLOR.muted : '#2B1620',
+              background: isLastLesson ? COLOR.surfaceRaised : COLOR.primary, color: isLastLesson ? COLOR.muted : COLOR.onAccent,
               fontSize: '13px', fontWeight: 600,
             }}
           >
@@ -1429,7 +1429,7 @@ function QuestionView({ q, selected, onChoose, onNext, index, total, categoryLab
               <button
                 onClick={onSubmitMs}
                 disabled={msPending.length === 0}
-                style={{ width: '100%', marginTop: '10px', padding: '11px', borderRadius: '12px', background: msPending.length ? COLOR.primary : COLOR.surfaceRaised, color: msPending.length ? '#2B1620' : COLOR.muted, fontSize: '14px', fontWeight: 600 }}
+                style={{ width: '100%', marginTop: '10px', padding: '11px', borderRadius: '12px', background: msPending.length ? COLOR.primary : COLOR.surfaceRaised, color: msPending.length ? COLOR.onAccent : COLOR.muted, fontSize: '14px', fontWeight: 600 }}
               >
                 Submit answer
               </button>
@@ -1447,7 +1447,7 @@ function QuestionView({ q, selected, onChoose, onNext, index, total, categoryLab
       {selected !== null && (
         <button
           onClick={onNext}
-          style={{ width: '100%', marginTop: '12px', padding: '12px', borderRadius: '12px', background: COLOR.primary, color: '#2B1620', fontSize: '14px', fontWeight: 600 }}
+          style={{ width: '100%', marginTop: '12px', padding: '12px', borderRadius: '12px', background: COLOR.primary, color: COLOR.onAccent, fontSize: '14px', fontWeight: 600 }}
         >
           {nextLabel || (isLast ? 'See results' : 'Next question')}
         </button>
@@ -1484,7 +1484,7 @@ function QuizSummary({ score, answers, categories, onRestart }) {
       )}
       <button
         onClick={onRestart}
-        style={{ width: '100%', marginTop: '16px', padding: '12px', borderRadius: '12px', background: COLOR.primary, color: '#2B1620', fontSize: '14px', fontWeight: 600 }}
+        style={{ width: '100%', marginTop: '16px', padding: '12px', borderRadius: '12px', background: COLOR.primary, color: COLOR.onAccent, fontSize: '14px', fontWeight: 600 }}
       >
         New quiz
       </button>

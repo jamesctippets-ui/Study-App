@@ -1,6 +1,7 @@
 /* ---------------- main app ---------------- */
 
 function CertStudyApp() {
+  const [theme, toggleTheme] = useTheme();
   const [activeTrack, setActiveTrack] = useState('az900');
   const [mode, setMode] = useState('learn');
   const [learnView, setLearnView] = useState('study');
@@ -625,52 +626,56 @@ function CertStudyApp() {
           onClose={() => setShowData(false)}
         />
       )}
-      <div className="max-w-md mx-auto px-4 py-5">
-        <div className="flex justify-between items-start mb-4">
-          <div style={{ flex: 1, minWidth: 0, position: 'relative', paddingRight: '10px' }}>
-            <button
-              onClick={() => setShowMenu(true)}
-              title="Menu"
-              style={{
-                display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: '26px', height: '26px',
-                borderRadius: '8px', border: 'none', background: 'transparent', color: COLOR.muted,
-                marginBottom: '2px', padding: 0,
-              }}
-            >
-              <IconMenu />
-            </button>
-            <div className="itil-display" style={{ fontSize: '21px', fontWeight: 600, lineHeight: 1.2, color: trackAccent(activeTrack) }}>{track.label}</div>
-            <div style={{ fontSize: '12px', color: COLOR.muted, marginTop: '2px' }}>{track.subtitle}</div>
-          </div>
-          <div className="flex items-start gap-1" style={{ flexShrink: 0 }}>
-            <div style={{ textAlign: 'right', marginRight: '2px' }}>
-              <div style={{ fontSize: '18px', fontWeight: 700, color: COLOR.success }}>{overallMastery}%</div>
+      <div style={{ background: COLOR.navBar, borderBottom: `1px solid ${COLOR.border}`, boxShadow: '0 1px 4px rgba(0,0,0,0.12)', position: 'relative', zIndex: 1 }}>
+        <div className="max-w-md mx-auto px-4" style={{ paddingTop: '14px', paddingBottom: '14px' }}>
+          <div className="flex justify-between items-start">
+            <div style={{ flex: 1, minWidth: 0, position: 'relative', paddingRight: '10px' }}>
+              <button
+                onClick={() => setShowMenu(true)}
+                title="Menu"
+                style={{
+                  display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: '26px', height: '26px',
+                  borderRadius: '8px', border: 'none', background: 'transparent', color: COLOR.muted,
+                  marginBottom: '2px', padding: 0,
+                }}
+              >
+                <IconMenu />
+              </button>
+              <div className="itil-display" style={{ fontSize: '21px', fontWeight: 600, lineHeight: 1.2, color: trackAccent(activeTrack) }}>{track.label}</div>
+              <div style={{ fontSize: '12px', color: COLOR.muted, marginTop: '2px' }}>{track.subtitle}</div>
             </div>
-            <button
-              onClick={() => setShowAchievements(true)}
-              title="Achievements"
-              style={{
-                minWidth: '40px', minHeight: '40px', padding: '6px 10px', borderRadius: '10px',
-                border: `1px solid ${COLOR.gold}`, background: 'transparent', color: COLOR.gold, fontSize: '12px', fontWeight: 600,
-                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px',
-              }}
-            >
-              <IconTrophy /> {stats.unlocked.length}
-            </button>
-            <button
-              onClick={() => { setImportMessage(null); setShowData(true); }}
-              title="Data & progress"
-              style={{
-                minWidth: '40px', minHeight: '40px', padding: '6px 10px', borderRadius: '10px',
-                border: `1px solid ${COLOR.border}`, background: 'transparent', color: COLOR.muted,
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-              }}
-            >
-              <IconSettings />
-            </button>
+            <div className="flex items-start gap-1" style={{ flexShrink: 0 }}>
+              <div style={{ textAlign: 'right', marginRight: '2px' }}>
+                <div style={{ fontSize: '18px', fontWeight: 700, color: COLOR.success }}>{overallMastery}%</div>
+              </div>
+              <ThemeToggle theme={theme} onToggle={toggleTheme} />
+              <button
+                onClick={() => setShowAchievements(true)}
+                title="Achievements"
+                style={{
+                  minWidth: '40px', minHeight: '40px', padding: '6px 10px', borderRadius: '10px',
+                  border: `1px solid ${COLOR.gold}`, background: 'transparent', color: COLOR.gold, fontSize: '12px', fontWeight: 600,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px',
+                }}
+              >
+                <IconTrophy /> {stats.unlocked.length}
+              </button>
+              <button
+                onClick={() => { setImportMessage(null); setShowData(true); }}
+                title="Data & progress"
+                style={{
+                  minWidth: '40px', minHeight: '40px', padding: '6px 10px', borderRadius: '10px',
+                  border: `1px solid ${COLOR.border}`, background: 'transparent', color: COLOR.muted,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                }}
+              >
+                <IconSettings />
+              </button>
+            </div>
           </div>
         </div>
-
+      </div>
+      <div className="max-w-md mx-auto px-4 py-5">
         {syncMode === 'local' && (
           <div style={{ fontSize: '10.5px', color: COLOR.muted, marginBottom: '12px' }}>
             Saving progress to this browser. Open from your Claude account to sync across devices.
@@ -681,21 +686,21 @@ function CertStudyApp() {
           <button
             onClick={() => setMode('learn')}
             className="flex-1"
-            style={{ padding: '8px 2px', borderRadius: '9px', fontSize: '11px', fontWeight: 600, background: mode === 'learn' ? COLOR.primary : 'transparent', color: mode === 'learn' ? '#2B1620' : COLOR.muted }}
+            style={{ padding: '8px 2px', borderRadius: '9px', fontSize: '11px', fontWeight: 600, background: mode === 'learn' ? COLOR.primary : 'transparent', color: mode === 'learn' ? COLOR.onAccent : COLOR.muted }}
           >
             Learn
           </button>
           <button
             onClick={() => setMode('quiz')}
             className="flex-1"
-            style={{ padding: '8px 2px', borderRadius: '9px', fontSize: '11px', fontWeight: 600, background: mode === 'quiz' ? COLOR.primary : 'transparent', color: mode === 'quiz' ? '#2B1620' : COLOR.muted }}
+            style={{ padding: '8px 2px', borderRadius: '9px', fontSize: '11px', fontWeight: 600, background: mode === 'quiz' ? COLOR.primary : 'transparent', color: mode === 'quiz' ? COLOR.onAccent : COLOR.muted }}
           >
             Quiz
           </button>
           <button
             onClick={() => setMode('exam')}
             className="flex-1"
-            style={{ padding: '8px 2px', borderRadius: '9px', fontSize: '11px', fontWeight: 600, background: mode === 'exam' ? COLOR.gold : 'transparent', color: mode === 'exam' ? '#2E1F0C' : COLOR.muted }}
+            style={{ padding: '8px 2px', borderRadius: '9px', fontSize: '11px', fontWeight: 600, background: mode === 'exam' ? COLOR.gold : 'transparent', color: mode === 'exam' ? COLOR.onAccent : COLOR.muted }}
           >
             Exam
           </button>
@@ -880,7 +885,7 @@ function CertStudyApp() {
                   <button
                     onClick={() => setExamIndex((i) => i + 1)}
                     className="flex-1"
-                    style={{ padding: '12px', borderRadius: '12px', background: COLOR.primary, color: '#2B1620', fontSize: '14px', fontWeight: 600 }}
+                    style={{ padding: '12px', borderRadius: '12px', background: COLOR.primary, color: COLOR.onAccent, fontSize: '14px', fontWeight: 600 }}
                   >
                     Next
                   </button>
@@ -888,7 +893,7 @@ function CertStudyApp() {
                   <button
                     onClick={() => setExamPhase('complete')}
                     className="flex-1"
-                    style={{ padding: '12px', borderRadius: '12px', background: COLOR.gold, color: '#2E1F0C', fontSize: '14px', fontWeight: 700 }}
+                    style={{ padding: '12px', borderRadius: '12px', background: COLOR.gold, color: COLOR.onAccent, fontSize: '14px', fontWeight: 700 }}
                   >
                     Submit Exam
                   </button>

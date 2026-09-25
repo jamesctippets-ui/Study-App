@@ -1,23 +1,43 @@
 const { useState, useEffect, useLayoutEffect, useMemo, useCallback, useRef } = React;
 
+// Every value here is a CSS custom property reference, not a literal hex
+// color — the actual dark/light values live in templates/index.html.tmpl's
+// :root and :root[data-theme="light"] blocks. This means every one of the
+// hundreds of `COLOR.xxx` usages across every component file below is
+// already theme-aware for free: toggling the theme just flips the
+// documentElement's data-theme attribute (see ThemeToggle/useTheme), and
+// the browser re-resolves every var() reference in the already-rendered
+// DOM instantly, with no React re-render required anywhere.
 const COLOR = {
-  bg: '#1E1828',
-  surface: '#282032',
-  surfaceRaised: '#332A3D',
-  border: '#4A3F56',
-  text: '#EDE4DC',
-  muted: '#A296AC',
+  bg: 'var(--color-bg)',
+  surface: 'var(--color-surface)',
+  surfaceRaised: 'var(--color-surface-raised)',
+  // A distinct, slightly-elevated tone for the color-blocked top nav bar —
+  // intentionally its own token (not reused surfaceRaised) so the bar can
+  // be tuned independently of card surfaces if it ever needs to be.
+  navBar: 'var(--color-nav-bar)',
+  border: 'var(--color-border)',
+  text: 'var(--color-text)',
+  muted: 'var(--color-muted)',
   // Primary: the app's main interactive accent (active tabs, links, buttons,
   // "you selected this" highlighting) — deliberately NOT used for "this
   // answer is correct," so the two meanings never collide.
-  primary: '#A78BFA',
+  primary: 'var(--color-primary)',
   // Success: the ONLY color that means "correct" anywhere in the app —
   // used nowhere else, so it stays an unambiguous signal.
-  success: '#34D399',
-  red: '#F87171',
-  gold: '#E3B274',
+  success: 'var(--color-success)',
+  red: 'var(--color-red)',
+  gold: 'var(--color-gold)',
   // A genuine teal, used sparingly for secondary accents/variety.
-  teal: '#2DD4BF',
+  teal: 'var(--color-teal)',
+  // The text color to use ON TOP of a primary/gold/success/red background
+  // (buttons, badges) — dark in dark mode (since those accents stay light
+  // there) and light in light mode (since light mode darkens those same
+  // accents for on-page text/link contrast instead). Pairing every accent
+  // background with this instead of a hardcoded dark literal is what lets
+  // the accent hues themselves invert between themes without breaking any
+  // button that sits on top of one.
+  onAccent: 'var(--color-on-accent)',
 };
 
 // One distinct accent color per track, for quick visual recognition in the
@@ -116,5 +136,84 @@ function IconPrinter({ size = 16 }) {
       <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2" />
       <rect x="6" y="14" width="12" height="8" />
     </svg>
+  );
+}
+
+function IconSun({ size = 12 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="12" r="4" />
+      <line x1="12" y1="1" x2="12" y2="3" />
+      <line x1="12" y1="21" x2="12" y2="23" />
+      <line x1="4.2" y1="4.2" x2="5.6" y2="5.6" />
+      <line x1="18.4" y1="18.4" x2="19.8" y2="19.8" />
+      <line x1="1" y1="12" x2="3" y2="12" />
+      <line x1="21" y1="12" x2="23" y2="12" />
+      <line x1="4.2" y1="19.8" x2="5.6" y2="18.4" />
+      <line x1="18.4" y1="5.6" x2="19.8" y2="4.2" />
+    </svg>
+  );
+}
+
+function IconMoon({ size = 12 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+    </svg>
+  );
+}
+
+// Persists purely to localStorage, deliberately not through the app's
+// cloud/local progress sync — light vs. dark is a per-device display
+// preference (like an OS setting), not study progress, so it shouldn't
+// travel with the account the way results/streak/achievements do.
+const THEME_STORAGE_KEY = 'certStudyHub_theme';
+
+function useTheme() {
+  const [theme, setTheme] = useState(() => {
+    try {
+      const saved = localStorage.getItem(THEME_STORAGE_KEY);
+      if (saved === 'light' || saved === 'dark') return saved;
+    } catch (e) { /* localStorage unavailable — fall through to default */ }
+    return 'dark';
+  });
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+    const meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) meta.setAttribute('content', theme === 'light' ? '#FAF9F7' : '#1C1C1E');
+    try { localStorage.setItem(THEME_STORAGE_KEY, theme); } catch (e) { /* ignore */ }
+  }, [theme]);
+
+  const toggleTheme = () => setTheme((t) => (t === 'dark' ? 'light' : 'dark'));
+  return [theme, toggleTheme];
+}
+
+// A real sliding switch (not just an icon button) per the user's request —
+// track shows both a sun and a moon so the target state is visible even
+// before tapping, thumb slides to whichever side is currently active.
+function ThemeToggle({ theme, onToggle }) {
+  const isLight = theme === 'light';
+  return (
+    <button
+      onClick={onToggle}
+      title={isLight ? 'Switch to dark mode' : 'Switch to light mode'}
+      aria-label={isLight ? 'Switch to dark mode' : 'Switch to light mode'}
+      style={{
+        position: 'relative', width: '44px', height: '24px', borderRadius: '999px', flexShrink: 0,
+        background: COLOR.surface, border: `1px solid ${COLOR.border}`, padding: '2px',
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+      }}
+    >
+      <span style={{ color: isLight ? COLOR.gold : COLOR.muted, display: 'flex', marginLeft: '2px' }}><IconSun /></span>
+      <span style={{ color: isLight ? COLOR.muted : COLOR.primary, display: 'flex', marginRight: '2px' }}><IconMoon /></span>
+      <span
+        style={{
+          position: 'absolute', top: '2px', left: isLight ? '22px' : '2px', width: '18px', height: '18px',
+          borderRadius: '50%', background: isLight ? COLOR.gold : COLOR.primary,
+          transition: 'left 0.15s ease', boxShadow: '0 1px 3px rgba(0,0,0,0.4)',
+        }}
+      />
+    </button>
   );
 }

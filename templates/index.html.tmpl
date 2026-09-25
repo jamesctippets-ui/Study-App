@@ -61,13 +61,59 @@
   img, video { max-width: 100%; height: auto; }
   [hidden] { display: none; }
 
-  :root { color-scheme: dark; }
+  /* Theme tokens — dark (default) and light, switched by toggling
+     documentElement's [data-theme] attribute (see ThemeToggle in
+     00_preamble.js). Every color referenced anywhere in the app's JS
+     (the COLOR object in 00_preamble.js) resolves to one of these CSS
+     custom properties, so flipping this one attribute re-themes the
+     entire already-rendered page instantly — no React re-render needed,
+     and no other component file has to know theming exists at all.
+     Dark is a neutral grey (not the old purple-tinted dark), light is
+     an off-white, per the user's request. Accent hues (primary/gold/
+     success/red/teal) stay recognizable across both themes but get a
+     darker, higher-contrast variant in light mode specifically where
+     they're used as on-page text/link color; --color-on-accent is the
+     paired text color for the (unchanged, still-light) accent-as-button-
+     background pattern, which only needs to flip from dark text to
+     light text when accents themselves invert. */
+  :root {
+    color-scheme: dark;
+    --color-bg: #1C1C1E;
+    --color-surface: #252528;
+    --color-surface-raised: #303033;
+    --color-nav-bar: #2A2A2D;
+    --color-border: #434347;
+    --color-text: #EDEDED;
+    --color-muted: #9C9C9F;
+    --color-primary: #A78BFA;
+    --color-success: #34D399;
+    --color-red: #F87171;
+    --color-gold: #E3B274;
+    --color-teal: #2DD4BF;
+    --color-on-accent: #2B1620;
+  }
+  :root[data-theme="light"] {
+    color-scheme: light;
+    --color-bg: #FAF9F7;
+    --color-surface: #FFFFFF;
+    --color-surface-raised: #F1F0ED;
+    --color-nav-bar: #F1F0ED;
+    --color-border: #DDDAD5;
+    --color-text: #1E1E1E;
+    --color-muted: #67676A;
+    --color-primary: #7C3AED;
+    --color-success: #059669;
+    --color-red: #DC2626;
+    --color-gold: #B45309;
+    --color-teal: #0D9488;
+    --color-on-accent: #FFFFFF;
+  }
   html { scroll-behavior: smooth; }
-  html, body { margin: 0; padding: 0; background: #1E1828; }
+  html, body { margin: 0; padding: 0; background: var(--color-bg); transition: background-color 0.15s ease; }
   * { box-sizing: border-box; }
   body, button, textarea { font-family: 'Inter', sans-serif; }
   .itil-display { font-family: 'Fraunces', serif; }
-  textarea:focus-visible, button:focus-visible { outline: 2px solid #A78BFA; outline-offset: 1px; }
+  textarea:focus-visible, button:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 1px; }
   textarea:focus, button:focus { outline: none; }
   button { transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, transform 0.1s ease, opacity 0.15s ease, box-shadow 0.1s ease; cursor: pointer; }
   button:not(.btn-flat) { box-shadow: 0 2px 5px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.06), inset 0 -1px 0 rgba(0,0,0,0.12); }

@@ -42,6 +42,10 @@ type since none of these exams have one) with a missed-question review
 queue. Exam is a timed Final Exam mode matching each real exam's
 length/pass mark. Text-to-speech is available on readings and flashcards.
 
+A sliding switch in the top nav bar toggles between a dark-grey and an
+off-white theme — see "Light/dark theming" under Source layout for how it's
+implemented and what it does/doesn't affect.
+
 Key terms aren't just highlighted in lesson readings — every track gets this
 now, in quiz explanations and flashcard backs too. Tapping a highlighted term
 opens a small flyout anchored directly under that word (front/back/detail,
@@ -191,6 +195,38 @@ it doesn't run the Python build for you.
 The React/JSX code itself is still transpiled by Babel Standalone *in the
 browser* at load time (see "Where things stand" below for the trade-off there) —
 `build.py` only assembles source files and content, it doesn't compile JS.
+
+### Light/dark theming
+
+The dark-grey/off-white toggle is implemented with CSS custom properties, not
+React state/re-rendering. `templates/index.html.tmpl` defines every themed
+color as a `--color-*` variable under `:root` (dark, the default) and
+`:root[data-theme="light"]` (light); `00_preamble.js`'s `COLOR` object just
+holds `var(--color-*)` strings, so the hundreds of existing `COLOR.xxx`
+inline-style references across every component file didn't need to change at
+all. `useTheme()` (also in `00_preamble.js`) reads/writes `localStorage`
+(key `certStudyHub_theme`) and flips `document.documentElement`'s
+`data-theme` attribute; the browser re-resolves every `var()` in the
+already-rendered DOM instantly, with zero React re-render. `ThemeToggle` is
+the sun/moon sliding switch in the top nav bar.
+
+Theme preference is deliberately **not** part of the synced progress payload
+(`persistPayload`/`saveResults` in `06_app.jsx`) — it's a per-device display
+preference like an OS setting, not study data, so it stays in plain
+`localStorage` and doesn't travel between devices/accounts the way mastery
+and streaks do.
+
+The app's accent colors (primary/success/red/gold/teal) are theme-aware too —
+lighter/pastel in dark mode, darker/more saturated in light mode — so text
+set directly in an accent color stays readable against both backgrounds.
+Anywhere an accent is used as a *background* (buttons, badges) pairs it with
+`COLOR.onAccent`, a token that's dark in dark mode and light in light mode,
+instead of a hardcoded text color, so those stay legible under both themes
+too. `TRACK_ACCENTS` (the per-track color chips in the hamburger menu) is
+the one palette left theme-unaware — it's used as text on a light card
+background in both themes and hasn't shown a contrast problem in testing,
+but if a future track color reads poorly in light mode, that's the place to
+add a light-mode variant.
 
 ## Running it
 
