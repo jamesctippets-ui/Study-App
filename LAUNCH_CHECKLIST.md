@@ -99,13 +99,14 @@ actually true; expand later only if the data footprint actually grows
 ## 3. Product/UX readiness
 
 - [ ] **First-run onboarding tour.** A short, dismissible walkthrough for
-  brand-new visitors covering: the hamburger menu (switching tracks), the
-  Learn/Quiz/Exam tabs, the achievements button, and the cheat sheet's
-  print button. Persist a `hasSeenTour` flag alongside the existing
-  stats/localStorage; skip it automatically for anyone who already has
-  results (a returning user doesn't need the tour replayed).
-- [x] **An About/Contact surface.** Shipped as a row inside the hamburger
-  menu ("About & Legal"), exactly as scoped here.
+  brand-new visitors covering: Home's "All tracks" dropdown (switching
+  tracks), the Learn/Quiz/Exam tabs, the achievements button, and the
+  cheat sheet's print button. Persist a `hasSeenTour` flag alongside the
+  existing stats/localStorage; skip it automatically for anyone who
+  already has results (a returning user doesn't need the tour replayed).
+- [x] **An About/Contact surface.** Shipped as a row on the Home screen
+  ("About & Legal"), exactly as scoped here (moved there from the
+  now-retired hamburger menu once Home became the landing page).
 - [x] **A visible "what's new" / changelog.** Shipped as a section in the
   same About & Legal panel — currently a short, manually-curated list;
   worth revisiting to auto-generate from commit messages once real
