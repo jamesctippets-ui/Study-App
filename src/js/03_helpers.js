@@ -526,6 +526,30 @@ function trackMastery(trackKey, results) {
   return Math.round((correct / ids.length) * 100);
 }
 
+// Every flashcard across every visible track, collapsed into one
+// alphabetized cross-track glossary — a term explained once (e.g. "RBAC"
+// showing up in AZ-104, AZ-140, and SC-300 alike) surfaces as a single
+// entry tagged with every track that defines it, rather than requiring
+// you to already be in the right track to find it. Merges purely by
+// exact front-text match (case/whitespace-insensitive); tracks that
+// phrase the same term slightly differently still show up as separate
+// entries — that's a content-consistency problem, not one this lookup
+// tries to paper over.
+function buildGlossaryEntries() {
+  const byFront = new Map();
+  TRACKS.filter((t) => !t.hidden).forEach((t) => {
+    const mod = DATA[t.key];
+    if (!mod || !mod.flashcards) return;
+    mod.flashcards.forEach((f) => {
+      const key = f.front.trim().toLowerCase();
+      if (!byFront.has(key)) byFront.set(key, { front: f.front, back: f.back, tracks: [] });
+      const entry = byFront.get(key);
+      if (!entry.tracks.includes(t.key)) entry.tracks.push(t.key);
+    });
+  });
+  return Array.from(byFront.values()).sort((a, b) => a.front.localeCompare(b.front));
+}
+
 // A blended "exam readiness" signal, distinct from the flat lifetime
 // mastery % above: mastery decayed by how stale it is, using each
 // attempted item's last-seen timestamp (already tracked in seenLog for

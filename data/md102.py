@@ -1325,6 +1325,16 @@ QUESTIONS = [
 
 CHEAT_SHEET = [
     {
+        'heading': 'Exam-day strategy',
+        'points': [
+            'You have 120 minutes for 55 questions — about 2.2 minutes each on average. Budget more time for multi-part scenario questions and less for straight recall, rather than pacing every question identically.',
+            "Real scoring isn't a flat percentage of questions right (some count for more than others) — treat 70%+ as a safe buffer to aim for, not an exact threshold to just clear.",
+            "Flag anything you're unsure of and move on rather than stalling — a question later in the exam can sometimes jog a detail you needed earlier, and you get partial credit for nothing by running out of time on one question.",
+            "On multi-select ('choose N') questions, eliminate the options you're confident are wrong first; guessing among 2 plausible answers beats guessing among 4.",
+            'Your first read of a question is usually right — change an answer only when you find a specific detail you missed, not from general second-guessing.',
+        ],
+    },
+    {
         "heading": "Intune enrollment & Windows Autopilot",
         "points": [
             "Autopilot user-driven mode = end user self-enrolls out-of-box, associating the device with their identity; self-deploying mode = zero-touch, no user interaction, used for kiosks/shared devices and needs TPM 2.0 attestation.",

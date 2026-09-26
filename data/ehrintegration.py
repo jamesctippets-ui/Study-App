@@ -1242,6 +1242,15 @@ QUESTIONS = [
 
 CHEAT_SHEET = [
     {
+        'heading': "How to use this module's self-assessment",
+        'points': [
+            "There's no real proctored exam here — the 44-question, 60-minute timed mode is a self-assessment pace-check, not a credential.",
+            "Treat 80%+ as your target, but the real goal is noticing which categories you're actually weak in, not just clearing a number.",
+            "Use the timed mode sparingly, after you've already reviewed the material — its value is diagnostic (where are the gaps), not a first-pass study method.",
+            "On multi-select questions, eliminate the options you're confident are wrong first, rather than trying to spot the right ones directly.",
+        ],
+    },
+    {
         "heading": "What this module is (and isn't)",
         "points": [
             "This is a self-study concepts reference for healthcare interoperability, not tied to any vendor certification or proctored exam.",

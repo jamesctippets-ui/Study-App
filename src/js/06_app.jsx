@@ -19,6 +19,7 @@ function CertStudyApp() {
   const [showAchievements, setShowAchievements] = useState(false);
   const [toastAchievement, setToastAchievement] = useState(null);
   const [showAbout, setShowAbout] = useState(false);
+  const [showGlossary, setShowGlossary] = useState(false);
   const [showData, setShowData] = useState(false);
   const [showCertPath, setShowCertPath] = useState(false);
   const [importMessage, setImportMessage] = useState(null);
@@ -901,6 +902,7 @@ function CertStudyApp() {
         />
       )}
       {showAbout && <AboutLegalPanel onClose={() => setShowAbout(false)} />}
+      {showGlossary && <GlossaryPanel onClose={() => setShowGlossary(false)} />}
       {showCertPath && (
         <CertPathPanel
           tracks={visibleTracks}
@@ -1012,6 +1014,7 @@ function CertStudyApp() {
             }}
             onSelectTrack={(key) => { setActiveTrack(key); setMode('learn'); }}
             onOpenAbout={() => setShowAbout(true)}
+            onOpenGlossary={() => setShowGlossary(true)}
             onOpenCertPath={() => setShowCertPath(true)}
             onSetGoalTarget={setDailyGoalTarget}
             onAnswerDailyQuestion={answerDailyQuestion}

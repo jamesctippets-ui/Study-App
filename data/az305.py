@@ -1121,6 +1121,16 @@ QUESTIONS = [
 
 CHEAT_SHEET = [
     {
+        'heading': 'Exam-day strategy',
+        'points': [
+            'You have 120 minutes for 50 questions — about 2.4 minutes each on average. Budget more time for multi-part scenario questions and less for straight recall, rather than pacing every question identically.',
+            "Real scoring isn't a flat percentage of questions right (some count for more than others) — treat 75%+ as a safe buffer to aim for, not an exact threshold to just clear.",
+            "Flag anything you're unsure of and move on rather than stalling — a question later in the exam can sometimes jog a detail you needed earlier, and you get partial credit for nothing by running out of time on one question.",
+            "On multi-select ('choose N') questions, eliminate the options you're confident are wrong first; guessing among 2 plausible answers beats guessing among 4.",
+            'Your first read of a question is usually right — change an answer only when you find a specific detail you missed, not from general second-guessing.',
+        ],
+    },
+    {
         'heading': 'Well-Architected Framework pillars',
         'points': [
             "The five pillars are Reliability, Security, Cost Optimization, Operational Excellence, and Performance Efficiency — every design decision on this exam should trace back to a tradeoff among these.",

@@ -410,7 +410,7 @@ function readinessProjectionMessage(projection, trackLabel) {
 // always taking up the whole page, since Question of the Day/Daily Vocab/
 // readiness now share the space. Reachable again from any track's Learn/
 // Quiz/Exam view via the header's Home button.
-function HomeView({ tracks, results, seenLog, stats, certPlan, onResume, onSelectTrack, onOpenAbout, onOpenCertPath, onSetGoalTarget, onAnswerDailyQuestion, onRevealDailyVocab }) {
+function HomeView({ tracks, results, seenLog, stats, certPlan, onResume, onSelectTrack, onOpenAbout, onOpenGlossary, onOpenCertPath, onSetGoalTarget, onAnswerDailyQuestion, onRevealDailyVocab }) {
   const masteries = tracks.map((t) => ({ track: t, pct: trackMastery(t.key, results) }));
   const overallAvg = masteries.length ? Math.round(masteries.reduce((s, m) => s + m.pct, 0) / masteries.length) : 0;
   const lastVisited = stats.lastVisited;
@@ -527,6 +527,18 @@ function HomeView({ tracks, results, seenLog, stats, certPlan, onResume, onSelec
       )}
 
       <TrackListDropdown tracks={tracks} masteries={masteries} certPlan={certPlan} onSelectTrack={onSelectTrack} />
+
+      <button
+        onClick={onOpenGlossary}
+        style={{
+          width: '100%', textAlign: 'left', marginTop: '10px', padding: '12px 14px', borderRadius: '12px',
+          background: COLOR.surface, border: `1px solid ${COLOR.border}`, boxShadow: SHADOW.card,
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        }}
+      >
+        <div style={{ fontSize: '13px', fontWeight: 600, color: COLOR.text }}>Glossary</div>
+        <div style={{ color: COLOR.muted, fontSize: '15px' }}>›</div>
+      </button>
 
       <button
         onClick={onOpenAbout}
@@ -741,6 +753,102 @@ function AboutSection({ title, defaultOpen, children }) {
           {children}
         </div>
       )}
+    </div>
+  );
+}
+
+// A cross-track term lookup — every flashcard's front across every
+// visible track, deduplicated and alphabetized (buildGlossaryEntries in
+// 03_helpers.js), so a term you half-remember from a different cert
+// doesn't require guessing which track it lives in. Computed once per
+// panel open (flashcards don't change mid-session) rather than on every
+// keystroke; the search itself just filters that fixed list.
+function GlossaryPanel({ onClose }) {
+  useEscapeToClose(onClose);
+  const [query, setQuery] = useState('');
+  const [expandedKey, setExpandedKey] = useState(null);
+  const entries = useMemo(() => buildGlossaryEntries(), []);
+  const filtered = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (!q) return entries;
+    return entries.filter((e) => e.front.toLowerCase().includes(q) || e.back.toLowerCase().includes(q));
+  }, [entries, query]);
+  const shown = filtered.slice(0, 200);
+
+  return (
+    <div
+      onClick={onClose}
+      style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', zIndex: 50, display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        style={{
+          background: COLOR.bg, borderTop: `1px solid ${COLOR.border}`, borderRadius: '20px 20px 0 0',
+          maxWidth: '28rem', width: '100%', maxHeight: '82vh', overflowY: 'auto', padding: '18px 18px 28px',
+          boxShadow: SHADOW.card,
+        }}
+      >
+        <div className="flex justify-between items-center mb-2">
+          <div className="itil-display" style={{ fontSize: '18px', fontWeight: 600 }}>Glossary</div>
+          <button onClick={onClose} className="btn-flat" style={{ color: COLOR.muted, fontSize: '15px', padding: '4px' }}>✕</button>
+        </div>
+        <div style={{ fontSize: '11px', color: COLOR.muted, marginBottom: '10px', lineHeight: 1.4 }}>
+          Every term across all {TRACKS.filter((t) => !t.hidden).length} tracks, in one searchable list — a term
+          explained once here shows every track that uses it, not just whichever one you're currently in.
+        </div>
+        <input
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder="Search terms…"
+          style={{
+            width: '100%', padding: '10px 12px', borderRadius: '10px', border: `1px solid ${COLOR.border}`,
+            background: COLOR.surface, color: COLOR.text, fontSize: '13px', marginBottom: '10px',
+          }}
+        />
+        <div style={{ fontSize: '11px', color: COLOR.muted, marginBottom: '8px' }}>
+          {filtered.length} term{filtered.length === 1 ? '' : 's'}{filtered.length > shown.length ? ` (showing first ${shown.length})` : ''}
+        </div>
+        <div className="flex flex-col gap-2">
+          {shown.map((entry) => {
+            const key = entry.front.toLowerCase();
+            const open = expandedKey === key;
+            return (
+              <div key={key} style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderRadius: '12px', padding: '10px 12px' }}>
+                <button
+                  onClick={() => setExpandedKey(open ? null : key)}
+                  style={{ width: '100%', textAlign: 'left', background: 'transparent' }}
+                >
+                  <div style={{ fontSize: '14px', fontWeight: 600, color: COLOR.text }}>{entry.front}</div>
+                  <div className="flex gap-1" style={{ marginTop: '4px', flexWrap: 'wrap' }}>
+                    {entry.tracks.map((tk) => {
+                      const t = TRACKS.find((tt) => tt.key === tk);
+                      const accent = trackAccent(tk);
+                      return (
+                        <span
+                          key={tk}
+                          style={{ fontSize: '9px', fontWeight: 700, color: accent, border: `1px solid ${accent}`, borderRadius: '999px', padding: '1px 6px' }}
+                        >
+                          {t ? t.label : tk}
+                        </span>
+                      );
+                    })}
+                  </div>
+                </button>
+                {open && (
+                  <div style={{ marginTop: '8px', paddingTop: '8px', borderTop: `1px solid ${COLOR.border}`, fontSize: '13px', color: COLOR.muted, lineHeight: 1.5 }}>
+                    {entry.back}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+          {!shown.length && (
+            <div style={{ fontSize: '12px', color: COLOR.muted, textAlign: 'center', padding: '20px 0' }}>
+              No terms match "{query}".
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   );
 }
