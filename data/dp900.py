@@ -955,6 +955,125 @@ QUESTIONS = [
     },
 ]
 
+LESSONS = [
+    {
+        'id': 'core-data-concepts',
+        'title': 'Core Data Concepts',
+        'summary': "Structured vs. semi-structured vs. unstructured data, OLTP vs. OLAP, ACID, big data's four V's, and the roles that work with all of it.",
+        'diagram': None,
+        'vocabIds': ['f1', 'f2', 'f3', 'f4', 'f6', 'f7', 'f8', 'f9', 'f39'],
+        'quizIds': ['q1', 'q2', 'q6', 'q7', 'msq1'],
+        'reading': """Every dataset Azure works with falls into one of three basic shapes. Structured data fits a fixed schema of rows and columns, like a spreadsheet or a relational table — every record has exactly the same fields. Semi-structured data, like a JSON document, has some organization such as keys or tags, but no schema that every record must follow identically. Unstructured data has no predefined organization at all — a video file, an image, or a block of free-form text are the classic examples. Recognizing which of the three a described dataset falls into is one of the most frequently tested skills on this exam.
+
+Two very different kinds of workloads run on top of that data. OLTP (Online Transaction Processing) systems handle many short, fast read/write operations — inserting an order, updating a customer's address — the day-to-day engine of a running business. OLAP (Online Analytical Processing) systems instead run complex analytical queries over large volumes of historical data, aggregating years of transactions into a report rather than touching one record at a time. A single order lookup is OLTP; "total sales by region for the last five years" is OLAP.
+
+Relational databases store structured data in tables with a fixed schema, enforcing relationships between tables through keys, and are the classic home for OLTP workloads that need strong guarantees. Those guarantees come from ACID: Atomicity (a transaction fully completes or fully fails), Consistency (the database only ever moves between valid states), Isolation (concurrent transactions don't see each other's uncommitted changes), and Durability (a committed change survives a crash). Non-relational databases trade some of these guarantees, and the fixed schema itself, for flexibility and horizontal scale.
+
+Large, fast-arriving datasets are often described using four characteristics collectively known as big data: Volume (how much data), Velocity (how fast it arrives), Variety (how many different formats it comes in), and Veracity (how trustworthy it actually is). Working with all of this is usually split across a few distinct roles: a Database Administrator provisions, secures, and maintains the databases themselves; a Data Engineer builds the pipelines that move and transform data; and a Data Analyst turns that data into reports and dashboards. A wider practice called data governance ties all of it together — deciding who is allowed to see which data, keeping it accurate, and tracking where it came from.""",
+        'fundamentalsLabel': 'New to OLTP vs. OLAP? See the everyday analogy',
+        'fundamentals': "Think of OLTP like a cash register ringing up sales one at a time, all day long — fast, simple, one transaction after another. OLAP is like the end-of-year accountant going back through every receipt from the whole year to build a report on which products sold best each quarter. Both work with the same underlying sales data, but one is built for speed on tiny individual transactions, and the other is built for crunching a huge pile of history at once.",
+        'keyTerms': ['Structured data', 'Semi-structured data', 'Unstructured data', 'OLTP', 'OLAP', 'ACID', 'Database Administrator', 'Data Engineer', 'Data Analyst', 'data governance', 'big data'],
+        'commonTraps': [
+            "OLAP is not just 'a bigger OLTP' — OLAP workloads are typically read-heavy and denormalized for aggregation, not built for fast individual transactional writes.",
+            "ACID is closely tied to relational databases — many NoSQL databases intentionally relax one or more of these guarantees for scale.",
+            "The four V's describe big data characteristics, not database types — don't confuse Veracity (trustworthiness) with Variety (format diversity).",
+        ],
+        'scenario': "A hospital's admissions system inserts a new patient record every few seconds throughout the day — a textbook OLTP workload optimized for many fast, small transactions. Once a month, the finance team runs a report aggregating a full year of billing records by department and diagnosis code — a textbook OLAP workload built for exactly this kind of large-scale historical aggregation, which is why hospitals typically keep the two on separate systems rather than forcing one database to do both jobs well.",
+    },
+    {
+        'id': 'relational-data-on-azure',
+        'title': 'Relational Data on Azure',
+        'summary': 'Tables, keys, normalization, and the Azure SQL deployment and purchasing options.',
+        'diagram': 'serviceModels',
+        'vocabIds': ['f11', 'f12', 'f13', 'f14', 'f15', 'f16', 'f17', 'f18', 'f35'],
+        'quizIds': ['q10', 'q12', 'q14', 'q41', 'tf17'],
+        'reading': """A relational database organizes everything into tables, where each row is one record and each column is one attribute shared by every row in that table. A primary key uniquely identifies each row, while a foreign key in one table references the primary key of another, creating an enforced relationship between them — the mechanism behind referential integrity. Normalization is the process of splitting repeated information into separate related tables to reduce redundancy, and once data is organized this way, indexes let the database find matching rows quickly without scanning the whole table, at the cost of a little extra storage and slightly slower writes.
+
+Azure offers three deployment options for relational SQL workloads, differing mainly in compatibility and management overhead. Azure SQL Database is the simplest, fully managed platform-as-a-service (PaaS) option, built on the SQL Server engine, with automatic patching, backups, and built-in high availability. Azure SQL Managed Instance offers near-complete SQL Server compatibility — including instance-level features like cross-database queries and SQL Server Agent — while remaining PaaS-managed, making it the natural fit for a lift-and-shift migration that leans on those features. SQL Server on Azure Virtual Machines is the infrastructure-as-a-service (IaaS) option: full control over the operating system and SQL Server configuration, but the customer is responsible for patching it.
+
+For teams already standardized on an open-source engine, Azure Database for PostgreSQL and Azure Database for MySQL bring the same fully managed PaaS experience without requiring a switch away from the engine they already use.
+
+Azure SQL Database's cost is set through one of two purchasing models. The DTU model bundles compute, memory, and storage into one fixed performance tier, simple but opaque. The vCore model lets compute and storage scale independently, exposes the underlying hardware generation, and is the only model that supports Azure Hybrid Benefit, letting an existing SQL Server license offset the cost of the move.""",
+        'fundamentalsLabel': 'New to the SQL deployment options? See the everyday analogy',
+        'fundamentals': "Think of the three options like renting living space. Azure SQL Database is like renting a furnished studio apartment — everything's handled for you, but you get exactly the layout on offer. Azure SQL Managed Instance is like renting a full furnished house — much closer to owning it yourself, with more rooms and features available, while the landlord still handles the roof and plumbing. SQL Server on an Azure VM is like buying the house outright — total control over every wall and pipe, but you're the one calling the repair company when something breaks.",
+        'keyTerms': ['primary key', 'foreign key', 'Normalization', 'indexes', 'Azure SQL Database', 'Azure SQL Managed Instance', 'PostgreSQL', 'MySQL', 'DTU', 'vCore'],
+        'commonTraps': [
+            'Azure SQL Managed Instance, not Azure SQL Database, is the one that supports cross-database queries and SQL Server Agent.',
+            'Only the vCore purchasing model supports Azure Hybrid Benefit — the DTU model does not.',
+            'SQL Server on Azure VMs is IaaS: the customer still patches the OS, unlike the two PaaS options.',
+        ],
+        'scenario': "A company running an on-premises SQL Server estate that relies heavily on SQL Server Agent jobs and cross-database queries wants the least possible re-engineering while still moving off physical hardware. Azure SQL Managed Instance is the fit here — it preserves those instance-level features while still handing patching and backups to Microsoft, unlike Azure SQL Database, which doesn't support them, or SQL Server on an Azure VM, which would keep the OS-patching burden on the company.",
+    },
+    {
+        'id': 'non-relational-data-on-azure',
+        'title': 'Non-Relational Data on Azure',
+        'summary': 'Cosmos DB and its APIs, Table Storage, Blob Storage, Azure Files, and Data Lake Storage Gen2.',
+        'diagram': 'storage',
+        'vocabIds': ['f19', 'f20', 'f21', 'f22', 'f23', 'f24'],
+        'quizIds': ['q16', 'q17', 'q19', 'q21', 'msq4'],
+        'reading': """Azure Cosmos DB is Microsoft's flagship non-relational database: globally distributed, built for low-latency access at massive scale, with multiple tunable consistency levels. Rather than locking you into one data model, Cosmos DB exposes that same distributed engine through several APIs: the NoSQL (Core) API for JSON documents, the API for MongoDB for teams already using MongoDB drivers, the Gremlin API for graph data — nodes and the relationships between them — and the Table API for simple key-value data. Picking the right API is usually less about raw capability and more about what an application or team's existing skills already expect.
+
+Azure Table Storage is a simpler, cheaper key-value store for the same shape of data the Table API models, accessed by a partition key and a row key, without Cosmos DB's global distribution or guaranteed low-latency SLAs. Azure Blob Storage instead holds large amounts of unstructured data — images, video, log files, backups — organized into containers, with access tiers to balance storage cost against how quickly the data needs to come back. Azure Files rounds this out with fully managed file shares reachable over the standard SMB or NFS protocols, so it can be mounted like a traditional network drive rather than accessed through an application's storage API.
+
+Azure Data Lake Storage Gen2 builds on top of Blob Storage by adding a hierarchical namespace — real directories and folders instead of just a flat list of objects — plus fine-grained permissions on those folders, purpose-built for large-scale big data analytics rather than for general-purpose object storage alone.""",
+        'fundamentalsLabel': 'New to non-relational storage? See the everyday analogy',
+        'fundamentals': "Picture a warehouse with different storage systems for different kinds of stuff. Blob Storage is like a shelf of labeled boxes for big miscellaneous items — you know the box, you grab it, you don't care what's inside until you open it. Table Storage is like a card catalog: fast lookup by a specific reference number, good for lots of small structured entries. Azure Files is like a shared filing cabinet everyone in the office can open the same way they always have. Cosmos DB is like having copies of that whole warehouse in several cities at once, so whichever one is closest to you responds instantly.",
+        'keyTerms': ['Azure Cosmos DB', 'API for MongoDB', 'Gremlin API', 'Table API', 'Azure Table Storage', 'Azure Blob Storage', 'Azure Files', 'Azure Data Lake Storage Gen2', 'hierarchical namespace'],
+        'commonTraps': [
+            'Data Lake Storage Gen2 is Blob Storage plus a hierarchical namespace, not a separate storage product built from scratch.',
+            'The Gremlin API is for relationship-heavy graph data — a document or key-value API is the wrong choice whenever relationships between entities matter as much as the entities themselves.',
+            "Table Storage is not a smaller Cosmos DB — it lacks Cosmos DB's global distribution and tunable consistency guarantees entirely.",
+        ],
+        'scenario': "A gaming company needs to track which players are friends with which other players, and wants to efficiently query multi-hop relationships like 'friends of friends.' Modeling this in a document or key-value store would mean manually walking references one query at a time; Cosmos DB's Gremlin API instead treats players as graph nodes and friendships as edges, making that kind of relationship traversal a first-class, efficient query.",
+    },
+    {
+        'id': 'data-warehousing-and-pipelines',
+        'title': 'Data Warehousing & Pipelines',
+        'summary': 'Star schemas, ETL vs. ELT, batch vs. streaming, and the service that orchestrates it all.',
+        'diagram': None,
+        'vocabIds': ['f25', 'f26', 'f27', 'f29', 'f37'],
+        'quizIds': ['q22', 'q23', 'q24', 'tf11', 'tf12'],
+        'reading': """A data warehouse stores large volumes of structured, historical data organized specifically for reporting rather than day-to-day transactions. The classic way to organize that data is a star schema: a central fact table holding the numeric, measurable events — a sales amount, a quantity sold — surrounded by dimension tables holding the descriptive context used to filter and group those numbers, like product, customer, or date. The fact table is what you aggregate; the dimension tables are what you slice by.
+
+Getting raw data into that warehouse usually follows one of two patterns. ETL (Extract, Transform, Load) transforms the data before loading it into the destination, doing the heavy lifting in a separate processing step. ELT (Extract, Load, Transform) instead loads the raw data into the destination first and transforms it there afterward, taking advantage of the destination's own compute power — a pattern modern cloud-scale platforms increasingly favor because the destination usually has more processing muscle than a standalone transform step.
+
+How that data arrives matters too. Batch processing collects data and processes it in large groups on a schedule, like a nightly job crunching an entire day's transactions at once. Streaming, or real-time, processing instead processes each event continuously as it arrives, surfacing results within seconds — the right choice whenever a scenario needs to react to something happening right now rather than reviewing it the next morning. Azure Data Factory is the service that orchestrates and schedules the actual movement and transformation of data between systems, whichever pattern is chosen — think of it as the plumbing that feeds the warehouse or lake, not an analysis tool itself.""",
+        'fundamentalsLabel': 'New to data warehousing patterns? See the everyday analogy',
+        'fundamentals': "A star schema is like a receipt versus a customer file: the receipt (fact table) has just the numbers — what was bought, how much it cost — while a separate customer file (a dimension table) holds the descriptive details, like name and address, that the receipt just references by a customer number instead of repeating every time. Batch vs. streaming is the difference between reading a newspaper once a day and watching a live news ticker scroll by as things happen.",
+        'keyTerms': ['star schema', 'fact table', 'dimension tables', 'ETL', 'ELT', 'Batch processing', 'Streaming', 'Azure Data Factory'],
+        'commonTraps': [
+            'A fact table holds the numbers to aggregate; dimension tables hold the descriptive labels to filter by — this gets reversed constantly on the exam.',
+            "ELT loads first and transforms after, using the destination's own compute — that's the opposite order from ETL.",
+            'Azure Data Factory orchestrates and moves data; it does not analyze or visualize it itself.',
+        ],
+        'scenario': "A retailer wants a report showing total sales by region by quarter for the last five years. The nightly pipeline uses ELT: raw point-of-sale records land in the warehouse first, and a scheduled job then transforms and aggregates them into a star schema, with a fact table of individual sale amounts joined to dimension tables for Store, Product, and Date — exactly the shape a reporting tool like Power BI expects to query quickly.",
+    },
+    {
+        'id': 'modern-analytics-platforms-and-bi',
+        'title': 'Modern Analytics Platforms & BI',
+        'summary': 'Synapse, Databricks, Stream Analytics, Microsoft Fabric, and Power BI reporting modes.',
+        'diagram': None,
+        'vocabIds': ['f28', 'f30', 'f31', 'f32', 'f33', 'f34', 'f36', 'f38'],
+        'quizIds': ['q25', 'q28', 'q29', 'q30', 'tf15'],
+        'reading': """Azure Synapse Analytics is a unified analytics workspace spanning big data and data warehousing in one place. A serverless SQL pool bills per query based on the data it actually scans, with nothing to provision ahead of time — a good fit for ad hoc, unpredictable exploration. A dedicated SQL pool instead provisions and bills for continuously running compute sized in advance, which becomes the cheaper option once a workload is large and steady. Synapse also includes built-in Apache Spark pools for big-data processing, all inside the same workspace.
+
+Two more specialized engines round out Azure's analytics lineup. Azure Databricks is an Apache Spark-based platform aimed squarely at large-scale data engineering, data science, and machine learning, distinct from Synapse's broader warehouse-plus-everything scope. Azure Stream Analytics instead focuses specifically on real-time processing, running continuous SQL-like queries directly against a live stream of data, such as IoT telemetry, as it arrives.
+
+Microsoft Fabric pulls data engineering, data warehousing, data integration, data science, and Power BI together into a single software-as-a-service platform, all built on one shared data lake called OneLake — so a Spark notebook, a T-SQL query, and a Power BI report can all read the very same copy of the data instead of triplicating it across separate tools. This is the data lakehouse pattern in practice: a data lake's cheap, flexible raw storage combined with a data warehouse's structured, query-optimized layer on top, as one platform instead of two separate systems to keep in sync.
+
+Power BI sits on top of all of this to turn data into interactive reports and dashboards. It connects to a data source in one of two modes: Import mode copies data into Power BI's own fast in-memory model, refreshed on a schedule, favoring raw query speed. DirectQuery instead leaves the data in its source system and queries it live on every interaction, trading some performance for a report that always reflects the current data.""",
+        'fundamentalsLabel': 'New to the modern Azure analytics stack? See the everyday analogy',
+        'fundamentals': "Think of Fabric's OneLake like one shared kitchen pantry that every cook in the building draws ingredients from, instead of each cook keeping a separate, duplicated stash in their own room. Import mode in Power BI is like photographing the pantry's contents once and working from that photo until you take a new one; DirectQuery is like walking back into the pantry and looking at the actual shelf every single time you need an answer — slower, but you can never see stale contents.",
+        'keyTerms': ['Azure Synapse Analytics', 'serverless SQL pool', 'dedicated SQL pool', 'Azure Databricks', 'Azure Stream Analytics', 'Microsoft Fabric', 'OneLake', 'data lakehouse', 'Power BI', 'DirectQuery', 'Import mode'],
+        'commonTraps': [
+            'A serverless SQL pool is billed per query based on data scanned; a dedicated SQL pool bills for continuously provisioned compute regardless of how much you query it.',
+            "Fabric's OneLake is what lets Spark, T-SQL, and Power BI share one copy of data — it isn't just Synapse and Databricks with a new name.",
+            'DirectQuery always reflects the live source but is typically slower per query; Import mode is faster but only as fresh as its last scheduled refresh.',
+        ],
+        'scenario': "A retail analytics team runs unpredictable, occasional ad hoc queries against a small dataset most of the day, but needs to power a live executive dashboard from the same warehouse that must always reflect this second's sales figures. They'd reach for a serverless SQL pool for the ad hoc exploration, since it bills only for what's actually queried, and DirectQuery for the executive dashboard, accepting a small performance cost in exchange for always-current numbers rather than a stale, scheduled Import-mode refresh.",
+    },
+]
+
 CHEAT_SHEET = [
     {
         'heading': 'Exam-day strategy',
