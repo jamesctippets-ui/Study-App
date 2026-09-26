@@ -77,9 +77,26 @@ come up.
 
 ## 6. A more robust UI: menus and separate pages (user's idea)
 
-- [ ] Real client-side routing instead of pure in-memory tab state, so the
-  browser back button, refresh, and deep links to a specific track/mode/
-  lesson all work as a user would expect from a "real" multi-page app.
+- [x] **Real client-side routing.** Hash-based (`#/az900/quiz/questions`,
+  `#/home`), not path-based — a static site with no server has nowhere to
+  add the rewrite rule a path router needs for a hard refresh on a deep
+  link to resolve (GitHub Pages included), and a hash needs none, since
+  the fragment never reaches the server at all. `routeToHash`/`parseHash`
+  (03_helpers.js) are the pure translation in each direction; two effects
+  in `06_app.jsx` keep the URL and `mode`/`activeTrack`/`learnView`/
+  `quizView` state in sync without fighting each other, using an
+  always-current ref (not a stale mount-time closure) to tell a real
+  navigation apart from the harmless echo `hashchange` event a same-value
+  write generates a moment later. Browser back/forward now walk real app
+  history (confirmed via Playwright: picking a track, then Quiz, then a
+  sub-tab, then Exam creates four distinct back-stack entries, each one
+  restoring the exact prior view), and a link straight to
+  `#/itil/quiz/questions` lands there directly — deep links work, not
+  just the always-Home landing Home itself deliberately still is. An
+  unrecognized or hidden track in the hash falls back to Home rather than
+  erroring. Lesson-level deep links (which specific AZ-900/AZ-104 lesson)
+  aren't part of the route — `CourseView`'s lesson selection is local
+  component state, one level below what this pass scoped to.
 - [x] ~~A proper **home/dashboard** page as the default landing screen~~
   Shipped, then reworked: refreshing into a separate dashboard page felt
   clunky for a static site with no real routing, so the app briefly
@@ -410,10 +427,11 @@ product (own web deployment, iOS app, Android app), separate from its current
 life as a single generated HTML file synced via the Claude runtime. Originally
 scoped as "nothing here should be built now, just decisions to not foreclose
 it" — since revisited by explicit request to actually start on it, with one
-constraint carried over from that original framing: stay serverless. No new
-hosting, database, or accounts today; the items below are the ones that fit
-inside that constraint, plus the ones that explicitly don't (and why they're
-still waiting).
+constraint that turned out to be permanent rather than a stepping stone: stay
+serverless. No hosting, database, or accounts, not "not yet" but not ever —
+see the cloud-sync entry below for the actual decision. The items below are
+the ones that fit inside that constraint, plus the one that still explicitly
+doesn't (and why it's still waiting).
 
 - [x] **Separate pure logic from rendering.** Achievement evaluation, streak
   math, spaced-repetition scheduling, and scoring in src/js/03_helpers.js
@@ -450,12 +468,24 @@ still waiting).
   clearing automatically the next time one succeeds. This is the concrete
   reliability work that fits under "run smoothly" without standing up a
   server; the items below are what still needs one.
-- [ ] **The Claude-runtime cloud sync is the one non-portable piece, and
-  still is.** `window.claude.use('db')` (src/js/06_app.jsx's persistence
-  effect) only exists inside a Claude artifact. A standalone app of any
-  kind still needs its own backend for account-based sync — genuinely out
-  of scope for a serverless pass; the localStorage-only fallback keeps
-  working unmodified as the offline/no-account tier regardless.
+- [x] **Decided, not just deferred: no real backend, ever — this stays a
+  serverless, accountless static site.** Closing out what had been an
+  open architectural question. `window.claude.use('db')` (src/js/06_app.jsx's
+  persistence effect) only exists inside a Claude artifact and syncs
+  progress there; everywhere else the app already falls through to
+  plain `localStorage`, scoped per browser/device with no accounts and
+  no cross-device sync — and that's the permanent shape of it, not a
+  placeholder for a future account system. No server to run, host, pay
+  for, secure, or keep patched; no accounts, passwords, or user data to
+  be responsible for beyond what already lives in the visitor's own
+  browser; the entire deployment story stays "commit index.html, point
+  GitHub Pages at it." If cross-device sync is ever wanted, the answer is
+  each person's own existing cloud (export the JSON from Data & Progress,
+  drop it in their Drive/iCloud/Dropbox, import it on another device) —
+  not a service this project runs on their behalf. This is why the
+  "future-proofing for a standalone app" framing above no longer applies
+  to sync specifically: a standalone build still wouldn't grow a backend,
+  it would ship with the same local-only model this version already has.
 - [ ] **A real package/module boundary — still explicitly deferred.** The
   filename-concatenation build (build.py sorting src/js/*.jsx) is fine
   for one static page; real npm/ES module boundaries only pay for

@@ -386,6 +386,62 @@ function CertStudyApp() {
     window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
   }, [mode, activeTrack, learnView, quizView]);
 
+  // Real client-side routing: the URL hash always reflects where you are
+  // (#/home, #/az900/learn/study, #/az900/quiz/questions, #/az900/exam),
+  // so the browser back/forward buttons work and a link to a specific
+  // track+view is shareable/refreshable instead of always dropping back
+  // onto Home.
+  //
+  // routeStateRef always holds the latest mode/activeTrack/learnView/
+  // quizView, kept current every render (a plain assignment, not an
+  // effect — this needs to be readable synchronously from inside a
+  // mount-once event listener, which closes over its first render's
+  // values forever otherwise). applyHash reads it to tell a real
+  // navigation (the parsed hash actually differs from current state)
+  // apart from the harmless echo `location.hash = ...` itself generates
+  // a moment after every state-driven write below — without that check,
+  // the echo would still call the setters with values equal to current
+  // state, which is a same-value no-op that never re-renders and so
+  // never gets to reset a "just applied a hash" flag, permanently
+  // stalling every navigation after the first.
+  const routeStateRef = useRef({ mode, activeTrack, learnView, quizView });
+  routeStateRef.current = { mode, activeTrack, learnView, quizView };
+
+  useEffect(() => {
+    const validTrackKeys = new Set(visibleTracks.map((t) => t.key));
+    function applyHash() {
+      const parsed = parseHash(window.location.hash, validTrackKeys);
+      const cur = routeStateRef.current;
+      const same = parsed.mode === 'home'
+        ? cur.mode === 'home'
+        : parsed.trackKey === cur.activeTrack && parsed.mode === cur.mode
+          && (parsed.mode !== 'learn' || parsed.learnView === cur.learnView)
+          && (parsed.mode !== 'quiz' || parsed.quizView === cur.quizView);
+      if (same) return;
+      if (parsed.mode === 'home') {
+        setMode('home');
+        return;
+      }
+      setActiveTrack(parsed.trackKey);
+      setMode(parsed.mode);
+      if (parsed.mode === 'learn') setLearnView(parsed.learnView);
+      if (parsed.mode === 'quiz') setQuizView(parsed.quizView);
+    }
+    if (!window.location.hash || window.location.hash === '#') {
+      window.history.replaceState(null, '', '#/home');
+    } else {
+      applyHash();
+    }
+    window.addEventListener('hashchange', applyHash);
+    return () => window.removeEventListener('hashchange', applyHash);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    const hash = routeToHash(mode, activeTrack, learnView, quizView);
+    if (window.location.hash !== hash) window.location.hash = hash.replace(/^#/, '');
+  }, [mode, activeTrack, learnView, quizView]);
+
   const availableQuestions = useMemo(() => {
     const byCat = activeCat === 'all' ? questionsData : questionsData.filter((q) => q.cat === activeCat);
     return byCat.filter((q) => quizTypes[q.type]);

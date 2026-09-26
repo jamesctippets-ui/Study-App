@@ -170,6 +170,39 @@ function normalizeSrs(raw) {
   return map;
 }
 
+/* ---------------- client-side routing (hash-based) ---------------- */
+
+// Deliberately hash-based (`#/az900/quiz/questions`) rather than real
+// paths — a static site with no server has nowhere to add the rewrite
+// rule a path-based router needs for a hard refresh on a deep link to
+// resolve (GitHub Pages included), and a hash needs none: the fragment
+// never even reaches the server. `mode === 'home'` collapses to a bare
+// `#/home` since it has no track/sub-view of its own.
+function routeToHash(mode, trackKey, learnView, quizView) {
+  if (mode === 'learn') return `#/${trackKey}/learn/${learnView}`;
+  if (mode === 'quiz') return `#/${trackKey}/quiz/${quizView}`;
+  if (mode === 'exam') return `#/${trackKey}/exam`;
+  return '#/home';
+}
+
+// The inverse of routeToHash — turns whatever's currently in
+// `location.hash` (on load, or after a hashchange from the back/forward
+// buttons) back into the {mode, trackKey, learnView, quizView} state to
+// apply. Falls back to `{ mode: 'home' }` for anything empty, malformed,
+// or naming a track that doesn't exist (or is hidden) rather than
+// crashing on a hand-edited or stale URL.
+function parseHash(hash, validTrackKeys) {
+  const path = (hash || '').replace(/^#\/?/, '');
+  const parts = path.split('/').filter(Boolean);
+  if (!parts.length || parts[0] === 'home') return { mode: 'home' };
+  const [trackKey, mode, sub] = parts;
+  if (!validTrackKeys.has(trackKey)) return { mode: 'home' };
+  if (mode === 'learn') return { mode: 'learn', trackKey, learnView: ['cards', 'study', 'sheet'].includes(sub) ? sub : 'study' };
+  if (mode === 'quiz') return { mode: 'quiz', trackKey, quizView: ['questions', 'match'].includes(sub) ? sub : 'questions' };
+  if (mode === 'exam') return { mode: 'exam', trackKey };
+  return { mode: 'home' };
+}
+
 /* ---------------- cert path (personal study-order plan) ---------------- */
 
 // `order` is the user's chosen sequence of track keys (not necessarily all

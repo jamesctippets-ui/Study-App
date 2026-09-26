@@ -1330,6 +1330,39 @@ function normalizeSrs(raw) {
   return map;
 }
 
+/* ---------------- client-side routing (hash-based) ---------------- */
+
+// Deliberately hash-based (`#/az900/quiz/questions`) rather than real
+// paths — a static site with no server has nowhere to add the rewrite
+// rule a path-based router needs for a hard refresh on a deep link to
+// resolve (GitHub Pages included), and a hash needs none: the fragment
+// never even reaches the server. `mode === 'home'` collapses to a bare
+// `#/home` since it has no track/sub-view of its own.
+function routeToHash(mode, trackKey, learnView, quizView) {
+  if (mode === 'learn') return `#/${trackKey}/learn/${learnView}`;
+  if (mode === 'quiz') return `#/${trackKey}/quiz/${quizView}`;
+  if (mode === 'exam') return `#/${trackKey}/exam`;
+  return '#/home';
+}
+
+// The inverse of routeToHash — turns whatever's currently in
+// `location.hash` (on load, or after a hashchange from the back/forward
+// buttons) back into the {mode, trackKey, learnView, quizView} state to
+// apply. Falls back to `{ mode: 'home' }` for anything empty, malformed,
+// or naming a track that doesn't exist (or is hidden) rather than
+// crashing on a hand-edited or stale URL.
+function parseHash(hash, validTrackKeys) {
+  const path = (hash || '').replace(/^#\/?/, '');
+  const parts = path.split('/').filter(Boolean);
+  if (!parts.length || parts[0] === 'home') return { mode: 'home' };
+  const [trackKey, mode, sub] = parts;
+  if (!validTrackKeys.has(trackKey)) return { mode: 'home' };
+  if (mode === 'learn') return { mode: 'learn', trackKey, learnView: ['cards', 'study', 'sheet'].includes(sub) ? sub : 'study' };
+  if (mode === 'quiz') return { mode: 'quiz', trackKey, quizView: ['questions', 'match'].includes(sub) ? sub : 'questions' };
+  if (mode === 'exam') return { mode: 'exam', trackKey };
+  return { mode: 'home' };
+}
+
 /* ---------------- cert path (personal study-order plan) ---------------- */
 
 // `order` is the user's chosen sequence of track keys (not necessarily all
@@ -4550,6 +4583,62 @@ function CertStudyApp() {
     // anchor jumps elsewhere) would otherwise turn this reset into a
     // slow animated scroll instead of an instant one.
     window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+  }, [mode, activeTrack, learnView, quizView]);
+
+  // Real client-side routing: the URL hash always reflects where you are
+  // (#/home, #/az900/learn/study, #/az900/quiz/questions, #/az900/exam),
+  // so the browser back/forward buttons work and a link to a specific
+  // track+view is shareable/refreshable instead of always dropping back
+  // onto Home.
+  //
+  // routeStateRef always holds the latest mode/activeTrack/learnView/
+  // quizView, kept current every render (a plain assignment, not an
+  // effect — this needs to be readable synchronously from inside a
+  // mount-once event listener, which closes over its first render's
+  // values forever otherwise). applyHash reads it to tell a real
+  // navigation (the parsed hash actually differs from current state)
+  // apart from the harmless echo `location.hash = ...` itself generates
+  // a moment after every state-driven write below — without that check,
+  // the echo would still call the setters with values equal to current
+  // state, which is a same-value no-op that never re-renders and so
+  // never gets to reset a "just applied a hash" flag, permanently
+  // stalling every navigation after the first.
+  const routeStateRef = useRef({ mode, activeTrack, learnView, quizView });
+  routeStateRef.current = { mode, activeTrack, learnView, quizView };
+
+  useEffect(() => {
+    const validTrackKeys = new Set(visibleTracks.map((t) => t.key));
+    function applyHash() {
+      const parsed = parseHash(window.location.hash, validTrackKeys);
+      const cur = routeStateRef.current;
+      const same = parsed.mode === 'home'
+        ? cur.mode === 'home'
+        : parsed.trackKey === cur.activeTrack && parsed.mode === cur.mode
+          && (parsed.mode !== 'learn' || parsed.learnView === cur.learnView)
+          && (parsed.mode !== 'quiz' || parsed.quizView === cur.quizView);
+      if (same) return;
+      if (parsed.mode === 'home') {
+        setMode('home');
+        return;
+      }
+      setActiveTrack(parsed.trackKey);
+      setMode(parsed.mode);
+      if (parsed.mode === 'learn') setLearnView(parsed.learnView);
+      if (parsed.mode === 'quiz') setQuizView(parsed.quizView);
+    }
+    if (!window.location.hash || window.location.hash === '#') {
+      window.history.replaceState(null, '', '#/home');
+    } else {
+      applyHash();
+    }
+    window.addEventListener('hashchange', applyHash);
+    return () => window.removeEventListener('hashchange', applyHash);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    const hash = routeToHash(mode, activeTrack, learnView, quizView);
+    if (window.location.hash !== hash) window.location.hash = hash.replace(/^#/, '');
   }, [mode, activeTrack, learnView, quizView]);
 
   const availableQuestions = useMemo(() => {

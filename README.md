@@ -231,7 +231,15 @@ bottom:
 From inside any track, a ☰ button in the header (titled "Home") takes you
 back to this same Home page at any time — it's a real navigation
 destination now, not a bottom-sheet
-overlay. Quiz and Exam missed-question review lists show each question's
+overlay. Navigation is also real client-side routing, not just in-memory
+state: the URL hash always reflects where you are (`#/az900/quiz/questions`,
+`#/home`), so the browser's back/forward buttons walk through actual
+app history instead of doing nothing, and a link straight to a specific
+track+mode+sub-tab lands there directly on load — hash-based rather than
+real paths, deliberately, since a static site with no server has nowhere
+to add the rewrite rule a path router needs for a refreshed deep link to
+resolve, and a hash needs none (see `routeToHash`/`parseHash` in
+`03_helpers.js`). Quiz and Exam missed-question review lists show each question's
 explanation alongside the prompt, not just what you got wrong.
 
 **Fifteen tracks, all visible in the track switcher:**
@@ -400,13 +408,18 @@ to install it.
 
 ## Sharing it
 
-There are no accounts and no login. Anyone with the link gets the full app —
+There are no accounts and no login — and, per a deliberate decision (not just
+a "not yet"), never will be. Anyone with the link gets the full app —
 all fifteen tracks, flashcards, quizzes, exams, achievements — and their progress saves to
 *their own* browser's local storage, same as it does for you. It's private to
 them, isn't visible to you, and doesn't sync between their own devices either
 (each browser/device is its own independent copy). That's the trade-off for
-staying a fully static site with no server: simple to share, but progress
-doesn't follow a person across devices or accounts.
+staying a fully static site with no server: simple to share, no server to run
+or secure, no accounts or user data to be responsible for — but progress
+doesn't follow a person across devices or accounts. If cross-device sync ever
+matters, the path is each person's own existing cloud: export the JSON from
+Data & Progress, put it wherever they already keep files, import it on
+another device — not a service this project runs on their behalf.
 
 **To publish it (GitHub Pages, free):**
 1. On GitHub, go to this repo's **Settings → Pages**.
