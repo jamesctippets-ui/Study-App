@@ -386,6 +386,149 @@ function DiagramDmzZones() {
   );
 }
 
+function DiagramOltpVsOlap() {
+  const cols = ['OLTP', 'OLAP'];
+  const rowLabels = ['Operation', 'Workload', 'Analogy'];
+  const grid = [
+    ['Insert one order', 'Aggregate 5 years'],
+    ['Many fast writes', 'Few big reads'],
+    ['Cash register', 'Year-end audit'],
+  ];
+  const colW = 132, rowH = 44, labelW = 70, top = 26;
+  const width = labelW + cols.length * colW + 6;
+  const height = top + rowLabels.length * rowH + 30;
+  return (
+    <svg viewBox={`0 0 ${width} ${height}`} style={{ width: '100%', height: 'auto' }}>
+      {cols.map((c, ci) => (
+        <text key={c} x={labelW + ci * colW + colW / 2} y={16} textAnchor="middle" fill={COLOR.text} fontSize="11" fontWeight="700">{c}</text>
+      ))}
+      {rowLabels.map((r, ri) => (
+        <React.Fragment key={r}>
+          <text x={2} y={top + ri * rowH + rowH / 2 + 4} fill={COLOR.muted} fontSize="9">{r}</text>
+          {cols.map((c, ci) => (
+            <DBox key={c} x={labelW + ci * colW} y={top + ri * rowH} w={colW - 8} h={rowH - 10} label={grid[ri][ci]} />
+          ))}
+        </React.Fragment>
+      ))}
+      <DCaption x={width / 2} y={height - 12} text="Same underlying data, opposite jobs: fast small writes vs. big historical reads" />
+    </svg>
+  );
+}
+
+function DiagramStarSchema() {
+  return (
+    <svg viewBox="0 0 320 280" style={{ width: '100%', height: 'auto' }}>
+      <DBox x={10} y={10} w={100} h={40} label="Product" sub="dimension" />
+      <DBox x={210} y={10} w={100} h={40} label="Customer" sub="dimension" />
+      <DBox x={10} y={200} w={100} h={40} label="Date" sub="dimension" />
+      <DBox x={210} y={200} w={100} h={40} label="Store" sub="dimension" />
+      <DBox x={110} y={102} w={100} h={56} label="Sales Fact" sub="amount, qty sold" />
+      <DLine x1={60} y1={50} x2={140} y2={102} />
+      <DLine x1={260} y1={50} x2={180} y2={102} />
+      <DLine x1={60} y1={200} x2={140} y2={158} />
+      <DLine x1={260} y1={200} x2={180} y2={158} />
+      <DCaption x={160} y={250} text="Fact table: the numbers you aggregate" />
+      <DCaption x={160} y={266} text="Dimension tables: the labels you filter and group by" />
+    </svg>
+  );
+}
+
+function DiagramFabricOneLake() {
+  return (
+    <svg viewBox="0 0 320 190" style={{ width: '100%', height: 'auto' }}>
+      <DBox x={10} y={10} w={95} h={40} label="Spark notebooks" sub="Data Engineering" />
+      <DBox x={113} y={10} w={95} h={40} label="T-SQL Warehouse" sub="Data Warehouse" />
+      <DBox x={216} y={10} w={95} h={40} label="Power BI" sub="reports" />
+      <DLine x1={57} y1={50} x2={160} y2={120} />
+      <DLine x1={160} y1={50} x2={160} y2={120} />
+      <DLine x1={263} y1={50} x2={160} y2={120} />
+      <DBox x={95} y={120} w={130} h={44} label="OneLake" sub="one shared copy of the data" />
+      <DCaption x={160} y={180} text="No tool keeps its own duplicate — all three read the same lake" />
+    </svg>
+  );
+}
+
+function DiagramSqlDiagnosticsPipeline() {
+  return (
+    <svg viewBox="0 0 340 300" style={{ width: '100%', height: 'auto' }}>
+      <DBox x={110} y={8} w={120} h={32} label="Azure SQL DB" sub="resource logs & metrics" />
+      <DLine x1={170} y1={40} x2={170} y2={64} />
+      <DBox x={110} y={64} w={120} h={32} label="Diagnostic settings" />
+      <DLine x1={170} y1={96} x2={60} y2={124} />
+      <DLine x1={170} y1={96} x2={172} y2={124} />
+      <DLine x1={170} y1={96} x2={284} y2={124} />
+      <DBox x={8} y={124} w={104} h={36} label="Log Analytics" sub="workspace" />
+      <DBox x={120} y={124} w={104} h={36} label="Storage account" />
+      <DBox x={232} y={124} w={104} h={36} label="Event Hub" />
+      <DLine x1={60} y1={160} x2={170} y2={192} />
+      <DLine x1={172} y1={160} x2={170} y2={192} />
+      <DLine x1={284} y1={160} x2={170} y2={192} />
+      <DBox x={110} y={192} w={120} h={32} label="Alert rule" sub="metric or log query" />
+      <DLine x1={170} y1={224} x2={170} y2={248} />
+      <DBox x={110} y={248} w={120} h={32} label="Action group" />
+      <DCaption x={170} y={292} text="Email, SMS, webhook, or an automation runbook" />
+    </svg>
+  );
+}
+
+function DiagramElasticJobsArchitecture() {
+  return (
+    <svg viewBox="0 0 372 222" style={{ width: '100%', height: 'auto' }}>
+      <DBox x={90} y={8} w={140} h={36} label="Elastic Job Agent" sub="runs the jobs" />
+      <DBox x={250} y={8} w={110} h={36} label="Job Database" sub="defs, schedule, history" />
+      <DLine x1={230} y1={26} x2={250} y2={26} />
+      <DLine x1={160} y1={44} x2={160} y2={76} />
+      <DBox x={90} y={76} w={140} h={36} label="Target group" sub="pool, server, or DBs" />
+      <DLine x1={160} y1={112} x2={55} y2={150} />
+      <DLine x1={160} y1={112} x2={157} y2={150} />
+      <DLine x1={160} y1={112} x2={269} y2={150} />
+      <DBox x={10} y={150} w={90} h={36} label="Database A" />
+      <DBox x={112} y={150} w={90} h={36} label="Database B" />
+      <rect x={210} y={146} width={118} height={44} rx="8" fill="none" stroke={COLOR.gold} strokeWidth="1.2" strokeDasharray="4 3" />
+      <DBox x={214} y={150} w={110} h={36} label="New database" sub="added later" />
+      <DCaption x={186} y={204} text="A job targeting the pool or server automatically" />
+      <DCaption x={186} y={216} text="covers any database added to it afterward" />
+    </svg>
+  );
+}
+
+function DiagramMessagingCompare() {
+  return (
+    <svg viewBox="0 0 372 190" style={{ width: '100%', height: 'auto' }}>
+      <DCaption x={63} y={12} text="Service Bus" />
+      <DBox x={18} y={22} w={90} h={28} label="Producer" />
+      <DLine x1={63} y1={50} x2={63} y2={66} />
+      <DBox x={18} y={66} w={90} h={28} label="Queue / Topic" />
+      <DLine x1={63} y1={94} x2={63} y2={110} />
+      <DBox x={18} y={110} w={90} h={28} label="Consumer" />
+      <DCaption x={63} y={150} text="Ordered, guaranteed," />
+      <DCaption x={63} y={162} text="exactly once" />
+
+      <DCaption x={190} y={12} text="Event Grid" />
+      <DBox x={138} y={22} w={104} h={30} label="Event source" sub="e.g. blob created" />
+      <DLine x1={165} y1={52} x2={159} y2={82} />
+      <DLine x1={215} y1={52} x2={221} y2={82} />
+      <DBox x={138} y={82} w={42} h={26} label="Sub A" />
+      <DBox x={198} y={82} w={44} h={26} label="Sub B" />
+      <DCaption x={190} y={150} text="Push, discrete events," />
+      <DCaption x={190} y={162} text="fan-out to subscribers" />
+
+      <DCaption x={303} y={12} text="Event Hubs" />
+      <DBox x={252} y={20} w={30} h={22} label="P1" />
+      <DBox x={288} y={20} w={30} h={22} label="P2" />
+      <DBox x={324} y={20} w={30} h={22} label="P3" />
+      <DLine x1={267} y1={42} x2={303} y2={64} />
+      <DLine x1={303} y1={42} x2={303} y2={64} />
+      <DLine x1={339} y1={42} x2={303} y2={64} />
+      <DBox x={258} y={64} w={90} h={28} label="Event Hub" sub="stream buffer" />
+      <DLine x1={303} y1={92} x2={303} y2={110} />
+      <DBox x={258} y={110} w={90} h={28} label="Consumers" sub="high throughput" />
+      <DCaption x={303} y={150} text="High-throughput streaming" />
+      <DCaption x={303} y={162} text="ingestion at massive scale" />
+    </svg>
+  );
+}
+
 const LESSON_DIAGRAMS = {
   serviceModels: DiagramServiceModels,
   hierarchy: DiagramHierarchy,
@@ -405,5 +548,11 @@ const LESSON_DIAGRAMS = {
   deploymentModels: DiagramDeploymentModels,
   scalingApproaches: DiagramScalingApproaches,
   dmzZones: DiagramDmzZones,
+  oltpVsOlap: DiagramOltpVsOlap,
+  starSchema: DiagramStarSchema,
+  fabricOneLake: DiagramFabricOneLake,
+  sqlDiagnosticsPipeline: DiagramSqlDiagnosticsPipeline,
+  elasticJobsArchitecture: DiagramElasticJobsArchitecture,
+  messagingCompare: DiagramMessagingCompare,
 };
 

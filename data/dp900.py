@@ -960,7 +960,7 @@ LESSONS = [
         'id': 'core-data-concepts',
         'title': 'Core Data Concepts',
         'summary': "Structured vs. semi-structured vs. unstructured data, OLTP vs. OLAP, ACID, big data's four V's, and the roles that work with all of it.",
-        'diagram': None,
+        'diagram': 'oltpVsOlap',
         'vocabIds': ['f1', 'f2', 'f3', 'f4', 'f6', 'f7', 'f8', 'f9', 'f39'],
         'quizIds': ['q1', 'q2', 'q6', 'q7', 'msq1'],
         'reading': """Every dataset Azure works with falls into one of three basic shapes. Structured data fits a fixed schema of rows and columns, like a spreadsheet or a relational table — every record has exactly the same fields. Semi-structured data, like a JSON document, has some organization such as keys or tags, but no schema that every record must follow identically. Unstructured data has no predefined organization at all — a video file, an image, or a block of free-form text are the classic examples. Recognizing which of the three a described dataset falls into is one of the most frequently tested skills on this exam.
@@ -1030,7 +1030,7 @@ Azure Data Lake Storage Gen2 builds on top of Blob Storage by adding a hierarchi
         'id': 'data-warehousing-and-pipelines',
         'title': 'Data Warehousing & Pipelines',
         'summary': 'Star schemas, ETL vs. ELT, batch vs. streaming, and the service that orchestrates it all.',
-        'diagram': None,
+        'diagram': 'starSchema',
         'vocabIds': ['f25', 'f26', 'f27', 'f29', 'f37'],
         'quizIds': ['q22', 'q23', 'q24', 'tf11', 'tf12'],
         'reading': """A data warehouse stores large volumes of structured, historical data organized specifically for reporting rather than day-to-day transactions. The classic way to organize that data is a star schema: a central fact table holding the numeric, measurable events — a sales amount, a quantity sold — surrounded by dimension tables holding the descriptive context used to filter and group those numbers, like product, customer, or date. The fact table is what you aggregate; the dimension tables are what you slice by.
@@ -1052,7 +1052,7 @@ How that data arrives matters too. Batch processing collects data and processes 
         'id': 'modern-analytics-platforms-and-bi',
         'title': 'Modern Analytics Platforms & BI',
         'summary': 'Synapse, Databricks, Stream Analytics, Microsoft Fabric, and Power BI reporting modes.',
-        'diagram': None,
+        'diagram': 'fabricOneLake',
         'vocabIds': ['f28', 'f30', 'f31', 'f32', 'f33', 'f34', 'f36', 'f38'],
         'quizIds': ['q25', 'q28', 'q29', 'q30', 'tf15'],
         'reading': """Azure Synapse Analytics is a unified analytics workspace spanning big data and data warehousing in one place. A serverless SQL pool bills per query based on the data it actually scans, with nothing to provision ahead of time — a good fit for ad hoc, unpredictable exploration. A dedicated SQL pool instead provisions and bills for continuously running compute sized in advance, which becomes the cheaper option once a workload is large and steady. Synapse also includes built-in Apache Spark pools for big-data processing, all inside the same workspace.

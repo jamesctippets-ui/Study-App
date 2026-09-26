@@ -1239,7 +1239,7 @@
       "id": "core-data-concepts",
       "title": "Core Data Concepts",
       "summary": "Structured vs. semi-structured vs. unstructured data, OLTP vs. OLAP, ACID, big data's four V's, and the roles that work with all of it.",
-      "diagram": null,
+      "diagram": "oltpVsOlap",
       "vocabIds": [
         "f1",
         "f2",
@@ -1371,7 +1371,7 @@
       "id": "data-warehousing-and-pipelines",
       "title": "Data Warehousing & Pipelines",
       "summary": "Star schemas, ETL vs. ELT, batch vs. streaming, and the service that orchestrates it all.",
-      "diagram": null,
+      "diagram": "starSchema",
       "vocabIds": [
         "f25",
         "f26",
@@ -1410,7 +1410,7 @@
       "id": "modern-analytics-platforms-and-bi",
       "title": "Modern Analytics Platforms & BI",
       "summary": "Synapse, Databricks, Stream Analytics, Microsoft Fabric, and Power BI reporting modes.",
-      "diagram": null,
+      "diagram": "fabricOneLake",
       "vocabIds": [
         "f28",
         "f30",

@@ -9,7 +9,7 @@ CATEGORIES = [
     ]},
     {'key': 'monitor', 'label': 'Monitor & Optimize Operational Resources', 'marks': 15, 'resources': [
         {'label': 'Microsoft Learn: Preparing for DP-300 - Monitor, configure, and optimize database resources', 'url': 'https://learn.microsoft.com/en-us/shows/exam-readiness-zone/preparing-for-dp-300-03-fy25'},
-    ]},
+    ], 'screenshot': 'sqlComputeUtilization'},
     {'key': 'queryPerf', 'label': 'Optimize Query Performance', 'marks': 10, 'resources': [
         {'label': 'Microsoft Learn: Optimize query performance in Azure SQL', 'url': 'https://learn.microsoft.com/en-us/training/paths/optimize-query-performance-sql-server/'},
     ]},
@@ -1223,7 +1223,7 @@ Microsoft Defender for SQL bundles two complementary capabilities: Vulnerability
         'id': 'monitoring-and-diagnostics',
         'title': 'Monitor & Optimize Operational Resources',
         'summary': 'Query Store, Extended Events, resource utilization DMVs, Intelligent Insights, and Azure Monitor alerting.',
-        'diagram': None,
+        'diagram': 'sqlDiagnosticsPipeline',
         'vocabIds': ['f15', 'f16', 'f17', 'f18', 'f19'],
         'quizIds': ['q14', 'q15', 'q16', 'q17', 'q18'],
         'reading': """Query Store automatically captures a history of query execution plans and their runtime statistics — duration, CPU, I/O — directly inside the database. Because it persists that history across restarts and failovers, unlike the volatile plan cache, Query Store is the tool of choice for finding exactly when a query regressed after a deployment, days after the fact, and for forcing a previously good plan back into use without touching any application code.
@@ -1247,7 +1247,7 @@ Beyond what's happening inside the database, Azure Monitor ties everything toget
         'id': 'query-performance-and-automation',
         'title': 'Optimize Query Performance & Automate Tasks',
         'summary': 'Execution plans, parameter sniffing, Automatic Tuning, and scheduling routine DBA work with Elastic Jobs and Azure Automation.',
-        'diagram': None,
+        'diagram': 'elasticJobsArchitecture',
         'vocabIds': ['f20', 'f21', 'f22', 'f23', 'f24', 'f25', 'f26', 'f27'],
         'quizIds': ['q19', 'q21', 'q23', 'q24', 'q37'],
         'reading': """Diagnosing a slow query starts with its execution plan. An estimated execution plan shows what the optimizer intends to do based on statistics, without actually running the query; an actual execution plan runs it and adds real row counts and timing per operator, making it possible to see exactly where the estimate and reality diverge. A large gap there is one of the clearest signs of a problem. Separately, the missing index DMVs record indexes the optimizer noticed would have helped recent queries, along with an estimated benefit — though they only ever suggest single-index designs and still need a DBA's judgment before blindly creating everything they recommend.

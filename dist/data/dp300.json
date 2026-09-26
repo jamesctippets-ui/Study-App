@@ -31,7 +31,8 @@
           "label": "Microsoft Learn: Preparing for DP-300 - Monitor, configure, and optimize database resources",
           "url": "https://learn.microsoft.com/en-us/shows/exam-readiness-zone/preparing-for-dp-300-03-fy25"
         }
-      ]
+      ],
+      "screenshot": "sqlComputeUtilization"
     },
     {
       "key": "queryPerf",
@@ -1386,7 +1387,7 @@
       "id": "monitoring-and-diagnostics",
       "title": "Monitor & Optimize Operational Resources",
       "summary": "Query Store, Extended Events, resource utilization DMVs, Intelligent Insights, and Azure Monitor alerting.",
-      "diagram": null,
+      "diagram": "sqlDiagnosticsPipeline",
       "vocabIds": [
         "f15",
         "f16",
@@ -1425,7 +1426,7 @@
       "id": "query-performance-and-automation",
       "title": "Optimize Query Performance & Automate Tasks",
       "summary": "Execution plans, parameter sniffing, Automatic Tuning, and scheduling routine DBA work with Elastic Jobs and Azure Automation.",
-      "diagram": null,
+      "diagram": "elasticJobsArchitecture",
       "vocabIds": [
         "f20",
         "f21",
