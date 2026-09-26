@@ -1502,7 +1502,7 @@ LESSONS = [
         'id': 'host-pools-and-images',
         'title': 'Host Pools, Session Hosts & Images',
         'summary': 'Pooled vs. personal host pools, load balancing, assignment, workspaces, and managing session host images.',
-        'diagram': None,
+        'diagram': 'hostPoolFanOut',
         'vocabIds': ['f1', 'f2', 'f3', 'f4', 'f5', 'f6', 'f7', 'f14', 'f39', 'f42'],
         'quizIds': ['q1', 'q2', 'q3', 'q4', 'q8', 'q9', 'q10', 'q29', 'msq1', 'msq2'],
         'reading': """Azure Virtual Desktop's building blocks nest in a specific order: a host pool is a collection of session host VMs; an application group publishes either a full Desktop or specific RemoteApp programs from that host pool; and a workspace is the logical container that groups one or more application groups together so a user sees everything they're entitled to — across every host pool assigned to them — in one unified feed in the Remote Desktop client. A pooled host pool shares multi-session session hosts across many users, load-balanced by the pool itself, which is the standard, cost-efficient choice for stateless, similar-task workers. A personal host pool instead dedicates exactly one session host VM to each assigned user, either through automatic assignment (Azure Virtual Desktop assigns the first available host the first time a user connects) or direct assignment (an admin pre-assigns a specific host to a specific user ahead of their first sign-in) — and once assigned, a user always lands on that same session host on every future connection regardless of which method put them there.
@@ -1577,7 +1577,7 @@ Least-privilege thinking extends down to the session host's local accounts too. 
         'id': 'user-environments-profiles-and-apps',
         'title': 'User Environments, Profiles & Applications',
         'summary': 'FSLogix container types, MSIX app attach, Application Masking, and delivering apps and media to AVD users.',
-        'diagram': None,
+        'diagram': 'fslogixAttach',
         'vocabIds': ['f23', 'f24', 'f25', 'f26', 'f28', 'f29', 'f30', 'f38', 'f50', 'f51'],
         'quizIds': ['q18', 'q19', 'q20', 'q21', 'q22', 'q23', 'q34', 'msq7', 'msq8', 'msq10'],
         'reading': """FSLogix is configured through ADMX/ADML template files that add a dedicated node to Group Policy — or the same registry settings can be pushed through Intune configuration profiles for session hosts that aren't domain-joined to an on-premises AD — letting an admin set the VHD storage location, container size, and enabled state without editing the registry image by image. A Profile Container carries the entire user profile, while an Office Container can optionally carry just Outlook (OST/search data) and OneDrive data separately, useful when the main profile needs to stay small or when cached-mode Outlook data would otherwise dominate it. Redirections.xml lets an admin explicitly exclude or redirect specific folders, like a disposable browser cache, out of the profile container entirely, keeping it smaller and sign-in faster without uninstalling anything or disabling FSLogix.

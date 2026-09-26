@@ -543,6 +543,20 @@ const REAL_PORTAL_SCREENSHOTS = {
     sourceLabel: 'Microsoft Learn: Monitor and tune Azure SQL Database using metrics and alerts',
     sourceUrl: 'https://github.com/MicrosoftDocs/sql-docs/blob/live/azure-sql/database/monitoring-metrics-alerts.md',
   },
+  // AZ-802 Windows Admin Center / Failover Cluster Manager screenshot —
+  // sourced from the MicrosoftDocs/windowsserverdocs GitHub repo, which is
+  // also CC BY 4.0 licensed for its content (confirmed via its own LICENSE
+  // file, same pattern as azure-docs and memdocs above). This is a real
+  // Failover Cluster Manager console screenshot, not the Azure portal, so
+  // `product` labels it accordingly.
+  failoverClusterDrainRoles: {
+    src: 'images/windowsadmincenter/failover-cluster-manager-drain-roles.png',
+    alt: 'Real Failover Cluster Manager screenshot showing the Drain Roles action on a cluster node',
+    description: "Failover Cluster Manager's Nodes view, right-clicking a node and choosing Pause → Drain Roles — exactly the step Cluster-Aware Updating automates across every node in turn: draining a node's roles onto the other nodes before it's patched and rebooted, then moving on to the next node once it rejoins.",
+    sourceLabel: 'Microsoft Learn: Cluster operating system rolling upgrade',
+    sourceUrl: 'https://github.com/MicrosoftDocs/windowsserverdocs/blob/main/WindowsServerDocs/failover-clustering/Cluster-Operating-System-Rolling-Upgrade.md',
+    product: 'Failover Cluster Manager',
+  },
 };
 
 // `hideDescription` is set by quiz/exam question views — the description

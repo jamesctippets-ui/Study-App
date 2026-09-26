@@ -1572,7 +1572,7 @@
       "id": "host-pools-and-images",
       "title": "Host Pools, Session Hosts & Images",
       "summary": "Pooled vs. personal host pools, load balancing, assignment, workspaces, and managing session host images.",
-      "diagram": null,
+      "diagram": "hostPoolFanOut",
       "vocabIds": [
         "f1",
         "f2",
@@ -1734,7 +1734,7 @@
       "id": "user-environments-profiles-and-apps",
       "title": "User Environments, Profiles & Applications",
       "summary": "FSLogix container types, MSIX app attach, Application Masking, and delivering apps and media to AVD users.",
-      "diagram": null,
+      "diagram": "fslogixAttach",
       "vocabIds": [
         "f23",
         "f24",
