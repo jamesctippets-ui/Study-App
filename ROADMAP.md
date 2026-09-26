@@ -1050,6 +1050,61 @@ specifically (still open).
     category's real screenshot as a "Portal screenshot" block — so any
     future track that gains course mode while already having
     category-level screenshots stays covered without a data change.
+- [x] **Every lesson across those same 9 tracks now has its own diagram too**
+  — the 31 lessons that shipped with `diagram: None` (honest absence over a
+  misleading reuse) all got a genuine new SVG built from that lesson's
+  actual reading text: an HL7v2 message anatomy and ORM/ORU/ACK flow, a
+  FHIR REST interaction and SMART-on-FHIR launch flow, an integration-engine
+  hub-and-spoke with a dead-letter branch, a master-patient-index matching
+  diagram (EHR Integration); an OLTP-vs-OLAP table, a star schema, Fabric
+  OneLake, a SQL diagnostics pipeline, Elastic Jobs architecture
+  (DP-900/DP-300); a messaging-services comparison (AZ-305); GPO
+  precedence, a failover cluster, DFS namespace, Credential Guard
+  isolation, a monitoring pipeline (AZ-802); host-pool fan-out and an
+  FSLogix attach flow (AZ-140); an agent-identity/blast-radius diagram, a
+  Defender-for-Cloud/Sentinel pipeline, a Purview protection flow, Copilot
+  licensing/grounding, DSPM agent governance (SC-500/AB-650); an
+  auth-methods bootstrap ladder, a workload-identity landscape, a Sentinel
+  data flow, an XDR correlation fan-in, an endpoint response flow, a CASB
+  session-control flow, and a KQL join comparison (SC-300/SC-200). Five
+  parallel worktree agents did this, each also given a bounded,
+  best-effort shot at sourcing a *real* portal screenshot.
+  - `learn.microsoft.com` is blocked by this session's own egress policy
+    (confirmed via both `curl` and `WebFetch` — an explicit policy denial,
+    not a transient failure), so real screenshots had to come from the
+    public GitHub repos Microsoft authors its docs in instead
+    (`raw.githubusercontent.com`/`git clone` are both reachable). No GitHub
+    code-search API is available in this session (repo access is scoped to
+    attached repos only), so finding the *right* repo per product was
+    blind name-guessing — confirmed working: `MicrosoftDocs/azure-docs`,
+    `MicrosoftDocs/memdocs`, `MicrosoftDocs/entra-docs`,
+    `MicrosoftDocs/windowsserverdocs`, `MicrosoftDocs/microsoft-365-docs`
+    (branch `public`/`master`, not `main`), `MicrosoftDocs/sql-docs`
+    (branch `live`); confirmed nonexistent after real attempts: dedicated
+    repos for Cosmos DB, Azure Virtual Desktop, Sentinel, or
+    Defender-for-Cloud.
+  - Three real screenshots landed this way, each with a `sourceUrl`
+    pointing at the actual GitHub blob (not a guessed
+    `learn.microsoft.com` URL this session can't verify is still live):
+    DP-300's `sqlComputeUtilization` (an Azure SQL Database Overview
+    page's compute-utilization chart, from `MicrosoftDocs/sql-docs`),
+    AZ-802's `failoverClusterDrainRoles` (a real Failover Cluster Manager
+    "Pause → Drain Roles" screenshot, from
+    `MicrosoftDocs/windowsserverdocs`), and SC-300's `pimActivateRole` (a
+    real Microsoft Entra admin center PIM role-activation panel, from
+    `MicrosoftDocs/entra-docs`). Wired via the same category-screenshot
+    fallback above — no fabricated or placeholder images were added
+    anywhere; a track with no confirmed real repo (DP-900, AZ-140,
+    SC-200, SC-500, AB-650, EHR Integration) simply stayed diagram-only.
+  - AZ-802's real screenshot exposed a second, narrower bug in that same
+    fallback: its `hybrid-management-clustering-virtualization` lesson
+    pulls vocabulary from *two* categories (`hybridWorkloads` and
+    `vmContainers`), so the original "lesson maps to exactly one
+    category" check silently skipped it even though `hybridWorkloads`
+    carries a real screenshot. `LessonDetail`'s check now resolves
+    whenever exactly one of a lesson's categories carries a screenshot,
+    regardless of how many categories the lesson spans — still refusing
+    to guess when two categories both have one.
 
 ---
 

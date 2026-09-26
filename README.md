@@ -174,9 +174,16 @@ reference diagrams from `MicrosoftDocs/architecture-center` (also CC BY
 4.0) — hub-spoke networking, a VM landing-zone baseline, and decision
 trees for compute and load-balancing service choices plus a data-
 partitioning diagram (`images/az305-arch/`), each with its own pair of
-quiz/exam questions. More tracks are a straightforward data addition now
-that the slot exists — see ROADMAP.md section 12 for which ones are still
-blocked on finding a properly-licensed source. A screenshot's optional
+quiz/exam questions. DP-300 (`images/azuresql/`, from `MicrosoftDocs/sql-docs`),
+AZ-802 (`images/windowsadmincenter/`, from `MicrosoftDocs/windowsserverdocs`),
+and SC-300 (`images/entra/`, from `MicrosoftDocs/entra-docs`) each added one
+more this way. Note `learn.microsoft.com` itself is blocked by this
+project's dev-session network policy, so every `sourceUrl` here points at
+the GitHub blob in Microsoft's own public docs repo rather than the
+rendered page — the same content, just a verifiably-live link. More tracks
+are a straightforward data addition now that the slot exists — see
+ROADMAP.md section 12 for which ones are still blocked on finding a
+properly-licensed source. A screenshot's optional
 `product` field controls the attribution caption's wording ("Real Azure
 Portal screenshot" by default, "Real Microsoft Intune admin center
 screenshot" for MD-102's, "Azure Architecture Center reference diagram"
