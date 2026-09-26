@@ -569,9 +569,9 @@
       "question": "Users report poor audio and video quality on Teams calls. Investigation shows all Microsoft 365 network traffic, including Teams media, is being routed through an on-premises proxy. According to Microsoft 365 network connectivity guidance, what should change?",
       "options": [
         "Route Optimize category endpoints, including Teams media, directly to the internet instead of through the proxy",
-        "Increase the proxy server hardware specifications",
-        "Move the proxy server closer to the Teams media servers physically",
-        "Disable Teams media optimization tenant-wide"
+        "Increase the proxy server's hardware specifications so it can handle the added media load",
+        "Physically relocate the proxy server closer to the Teams media servers it forwards traffic to",
+        "Disable Teams media optimization tenant-wide until the network team investigates further"
       ],
       "correct": 0,
       "explanation": "Microsoft explicitly recommends that Optimize category endpoints, which include latency-sensitive Teams media traffic, bypass proxies and VPNs and take the most direct path to the internet. Upgrading or relocating the proxy does not remove the added latency that hairpinning through it causes."
@@ -739,10 +739,10 @@
         "Assign the user to an appropriate Purview compliance role group",
         "Assign the user the Global Administrator role",
         "Assign the user the User Administrator Microsoft Entra role",
-        "It cannot be done; Purview permissions always require an Entra directory role"
+        "Enable the Microsoft Purview compliance portal for the tenant, which grants edit rights to every existing admin automatically"
       ],
       "correct": 0,
-      "explanation": "Purview compliance permissions are managed through role groups, a separate permission layer purpose-built for compliance solutions like DLP, and do not require any Microsoft Entra directory role. Global Administrator or User Administrator would grant far broader access than is needed or requested."
+      "explanation": "Purview compliance permissions are managed through role groups, a separate permission layer purpose-built for compliance solutions like DLP, and do not require any Microsoft Entra directory role. Global Administrator or User Administrator would grant far broader access than is needed or requested, and simply enabling the compliance portal doesn't hand out any permissions by itself \u2014 role group membership still has to be assigned explicitly."
     },
     {
       "id": "q20",
@@ -834,10 +834,10 @@
       "type": "mc",
       "question": "A user holds a Microsoft 365 E3 subscription but has not been assigned the Microsoft 365 Copilot add-on license. What happens if they try to use Copilot in Word?",
       "options": [
-        "Copilot works normally, since E3 alone is sufficient",
-        "Copilot is unavailable to them, because the Copilot add-on license must be separately assigned on top of an eligible base subscription",
-        "Copilot works but with reduced functionality until the add-on is purchased",
-        "Copilot works only in Teams, not in Word, without the add-on"
+        "Copilot works normally in Word, since Microsoft 365 E3 already includes every Copilot capability without any add-on",
+        "Copilot is unavailable to them, because the add-on license must be separately assigned on top of an eligible base subscription",
+        "Copilot works in Word but with a reduced feature set and a lower monthly usage cap until the add-on is purchased",
+        "Copilot works only inside Teams meetings, not in Word or other apps, until the add-on license is assigned"
       ],
       "correct": 1,
       "explanation": "Microsoft 365 Copilot requires the add-on license assigned in addition to an eligible base subscription like Microsoft 365 E3; the base subscription alone does not include Copilot. Without the add-on assigned, Copilot capabilities are not available to that user at all."
@@ -848,10 +848,10 @@
       "type": "mc",
       "question": "What role does the Semantic Index play when Microsoft 365 Copilot generates a response grounded in organizational data?",
       "options": [
-        "It grants the requesting user temporary elevated access to additional content",
-        "It is an encrypted, Microsoft Graph-based index of content and relationships that Copilot uses to understand context and ground responses",
-        "It is a separate license required only for Copilot Studio agents",
-        "It replaces the need for Conditional Access on Copilot sign-in"
+        "It grants the requesting user temporary elevated access to content they didn't already have permission to see",
+        "It is an encrypted, Microsoft Graph-based index of content and relationships that Copilot uses to ground its responses in context",
+        "It is a separate add-on license required only when using Copilot Studio to build custom agents",
+        "It replaces the need for Conditional Access policies when a user signs in to any Copilot experience"
       ],
       "correct": 1,
       "explanation": "The Semantic Index is the encrypted, Graph-based index that lets Copilot understand relationships and context across organizational content to ground its answers. It does not grant any new access \u2014 it only helps Copilot use content the user already has permission to see."
@@ -862,10 +862,10 @@
       "type": "mc",
       "question": "A file has been shared tenant-wide with an \"Anyone in the organization\" link for years, and almost no one who has that access actually needs it. A user with that broad access asks Copilot to summarize the file and Copilot does so. What is the most accurate explanation of what happened?",
       "options": [
-        "Copilot granted the user new access to the file that they did not previously have",
-        "This is not possible; Copilot cannot summarize any file that has ever been broadly shared",
-        "Copilot surfaced content the user already had permission to see, exposing a pre-existing oversharing risk rather than creating a new one",
-        "Copilot bypassed SharePoint permissions because it uses its own separate access model"
+        "Copilot silently granted the user new access to the file that they did not previously have",
+        "This isn't possible \u2014 Copilot refuses to summarize any file that has ever had a tenant-wide sharing link",
+        "Copilot surfaced content the user already had permission to see, exposing an oversharing risk that already existed",
+        "Copilot bypassed SharePoint's permission model entirely because it authenticates using its own separate identity"
       ],
       "correct": 2,
       "explanation": "Copilot only surfaces content the requesting user already has permission to view, so this behavior reflects pre-existing oversharing rather than any new access Copilot created. It is exactly why oversharing review matters before a broad Copilot rollout."
@@ -891,9 +891,9 @@
       "question": "An admin wants visibility into how employees are actually using generative AI tools like Copilot, wants to surface oversharing and sensitive-data risks tied to those interactions, and wants recommended or auto-applied DLP and labeling policies tailored to AI usage. Which Microsoft Purview capability is designed for exactly this?",
       "options": [
         "Data Security Posture Management for AI (DSPM for AI)",
-        "eDiscovery (Premium)",
-        "Compliance Manager",
-        "Communication compliance"
+        "eDiscovery (Premium), for legal hold and case search",
+        "Compliance Manager, for tracking regulatory assessments",
+        "Communication compliance, for reviewing risky messages"
       ],
       "correct": 0,
       "explanation": "DSPM for AI is purpose-built to give visibility into AI app usage, surface oversharing and sensitive-data risk in AI interactions, and recommend or apply tailored DLP and labeling policies. eDiscovery, Compliance Manager, and communication compliance each serve different, narrower purposes."
@@ -904,10 +904,10 @@
       "type": "mc",
       "question": "A user has view access to a file containing a sensitivity label that marks it as highly confidential. The organization wants Copilot to never quote or summarize that file's sensitive content in a response, even though the user can still open the file directly. What should the admin configure?",
       "options": [
-        "Remove the user's access to the file entirely",
-        "A Purview DLP policy scoped to Microsoft 365 Copilot interactions that restricts sensitive labeled content from being included in Copilot responses",
-        "A retention label with a shorter deletion schedule on the file",
-        "Disable the Semantic Index tenant-wide"
+        "Remove the user's access to the file entirely, even though they still need it for their normal job",
+        "A Purview DLP policy scoped to Microsoft 365 Copilot interactions that restricts sensitive labeled content from appearing in responses",
+        "Apply a retention label with a shorter deletion schedule so the file is removed from the tenant sooner",
+        "Disable the Semantic Index tenant-wide so Copilot stops grounding answers in any organizational content"
       ],
       "correct": 1,
       "explanation": "DLP policies can be scoped specifically to Copilot interactions to prevent labeled sensitive content from being included in Copilot responses, while leaving the user's normal file access untouched. Removing file access entirely is broader than required, since the user should still be able to open the file directly."
@@ -960,9 +960,9 @@
       "type": "mc",
       "question": "An organization wants Copilot to be able to ground answers in content from a third-party wiki that lives outside Microsoft 365, while still respecting that wiki's own access control list. What should be configured?",
       "options": [
-        "Direct Global Administrator access to the wiki for Copilot",
-        "A sensitivity label applied to every wiki page",
-        "A retention policy scoped to the wiki",
+        "Direct Global Administrator access to the wiki so Copilot can read every page without restriction",
+        "A sensitivity label applied to every page of the wiki to mark its confidentiality level",
+        "A retention policy scoped to the wiki controlling how long its pages are kept",
         "A Microsoft Graph connector for the wiki, with permissions correctly mapped to the source system"
       ],
       "correct": 3,
@@ -974,10 +974,10 @@
       "type": "mc",
       "question": "Compliance wants to be able to search, export, and place a legal hold on the actual prompts and responses a specific user exchanged with Microsoft 365 Copilot last quarter. Is this possible, and if so, through what?",
       "options": [
-        "No, Copilot interactions are never logged or retained",
-        "Yes, Copilot prompts and responses are captured as audit events and are searchable/exportable/holdable through Microsoft Purview eDiscovery",
-        "Yes, but only through the Microsoft Security Copilot console, not Purview",
-        "No, only Copilot Studio agent interactions are logged, not Microsoft 365 Copilot itself"
+        "No, Copilot interactions are ephemeral by design and are never written to any searchable log",
+        "Yes, Copilot prompts and responses are captured as audit events, searchable and exportable through Microsoft Purview eDiscovery",
+        "Yes, but only by exporting chat transcripts manually from within the Copilot app itself",
+        "No, only Copilot Studio agent conversations are logged; Microsoft 365 Copilot chats are not recorded anywhere"
       ],
       "correct": 1,
       "explanation": "Microsoft 365 Copilot prompts and responses are captured as audit log events and are searchable, exportable, and placeable on legal hold through Purview eDiscovery, the same as other Microsoft 365 content. This makes Copilot interactions genuinely discoverable, not ephemeral or unlogged."
@@ -988,10 +988,10 @@
       "type": "mc",
       "question": "An admin is designing an ongoing governance process for AI agents in the tenant rather than a one-time approval step. Which sequence best reflects the responsible-AI oversight approach the exam expects?",
       "options": [
-        "Approve the agent once at creation and take no further action",
-        "Discover which agents exist, review their data access and permissions, monitor their usage and behavior, and remediate or disable agents that misbehave",
-        "Delete every agent quarterly and require recreation from scratch",
-        "Rely solely on the agent creator to self-report any issues"
+        "Approve each agent once at creation, and treat that approval as sufficient oversight going forward",
+        "Discover which agents exist, review their data access and permissions, monitor usage and behavior, and remediate or disable ones that misbehave",
+        "Delete every agent on a fixed quarterly schedule and require its creator to rebuild it from scratch",
+        "Rely on the agent's own creator to self-report any data access problems that come up later"
       ],
       "correct": 1,
       "explanation": "Responsible oversight of AI agents is framed as an ongoing lifecycle \u2014 discover, review, monitor, remediate \u2014 mirroring how app governance already treats third-party applications, rather than a single approval at creation time. A one-time approval or self-reporting alone leaves no ongoing visibility into agent behavior."
@@ -1212,10 +1212,10 @@
       "type": "mc",
       "question": "Two DLP policies both match the same document, but their configured actions conflict. What determines which policy's action actually takes effect on that document?",
       "options": [
-        "The policy with the higher (numerically larger) priority number always wins",
+        "The policy with the numerically larger priority number is evaluated first and applies its action",
         "The policy with higher priority (a lower priority number, evaluated first) applies its matching rule's action",
         "Both actions are applied simultaneously regardless of the conflict",
-        "The policy created most recently always overrides older policies"
+        "Whichever policy was created most recently overrides any older, conflicting policy"
       ],
       "correct": 1,
       "explanation": "DLP policies are evaluated in priority order, where a lower priority number is evaluated first and effectively wins when policies conflict; rules within a policy are then evaluated top-down. Creation date and a numerically higher priority number do not determine precedence \u2014 the priority ranking does."
@@ -1226,10 +1226,10 @@
       "type": "mc",
       "question": "Microsoft Entra ID Protection flags a sign-in attempt as high risk due to an impossible-travel pattern, while a separate, unrelated leaked-credential detection has marked the same user's account as high user risk. What is the key difference in how these two risk types are typically remediated?",
       "options": [
-        "Both risk types require exactly the same remediation and cannot be distinguished",
+        "Both risk types are treated identically, and Microsoft Entra ID Protection applies the same remediation to each",
         "Sign-in risk is often resolved by satisfying MFA for that session, while high user risk (like leaked credentials) typically requires a secure password change to clear",
-        "User risk can only be viewed, never remediated by policy",
-        "Sign-in risk requires a password change, while user risk only requires MFA"
+        "User risk is primarily a monitoring signal, with remediation usually handled through a separate manual investigation",
+        "Sign-in risk is typically resolved with a password change, while user risk is resolved by satisfying MFA"
       ],
       "correct": 1,
       "explanation": "Sign-in risk reflects a specific session's suspicious signal and can often be resolved by satisfying MFA in that session, while user risk reflects an ongoing likelihood the account itself is compromised (such as leaked credentials) and typically requires a password reset to actually clear. The two are evaluated and remediated differently, not interchangeably."
@@ -1254,13 +1254,13 @@
       "type": "mc",
       "question": "A user has been assigned the Global Administrator Microsoft Entra role but is unable to run searches in the Microsoft Purview unified audit log. What is the most likely reason?",
       "options": [
-        "Audit log search always requires a separate Purview role group or role assignment with audit rights, which is a distinct permission layer from Microsoft Entra directory roles",
-        "Global Administrator can never access compliance features under any circumstances",
-        "The unified audit log has been permanently disabled for the tenant and cannot be re-enabled",
+        "Audit log search requires a separate Purview role group or role assignment with audit rights, which is a distinct permission layer from Microsoft Entra directory roles",
+        "Global Administrator access to Purview compliance features was intentionally removed in a recent Microsoft security update",
+        "The unified audit log has been disabled by an Exchange Online configuration change and needs re-enabling",
         "Audit log search requires a Microsoft 365 Copilot license"
       ],
       "correct": 0,
-      "explanation": "Purview permissions, including audit log search, are managed through a separate role-group permission layer from Microsoft Entra directory roles, so a Global Administrator may still need explicit audit-related role group assignment in some configurations. Audit logging is on by default in modern tenants and has nothing to do with Copilot licensing."
+      "explanation": "Purview permissions, including audit log search, are managed through a separate role-group permission layer from Microsoft Entra directory roles, so a Global Administrator may still need explicit audit-related role group assignment in some configurations. There's no such removal of Global Administrator's compliance access, audit logging is on by default in modern tenants rather than something that needs re-enabling, and none of this has anything to do with Copilot licensing."
     },
     {
       "id": "q42",
@@ -1282,10 +1282,10 @@
       "type": "mc",
       "question": "A company has not purchased any Microsoft 365 Copilot add-on licenses, yet an employee reports using \"Copilot\" to ask general web-grounded questions from within a Microsoft 365 app. What is the most likely explanation?",
       "options": [
-        "The employee is using Microsoft 365 Copilot Chat, which is included at no extra cost with a Microsoft Entra work account and does not require the paid add-on",
-        "The company must already have Copilot licenses without realizing it",
-        "This is not possible without a Copilot add-on license",
-        "The employee is using Microsoft Security Copilot, which is free for all users"
+        "The employee is using Microsoft 365 Copilot Chat, included at no extra cost with a Microsoft Entra work account",
+        "The company must already have purchased Copilot add-on licenses previously without anyone realizing it",
+        "This isn't possible without a paid Copilot add-on license assigned to that specific user",
+        "The employee is actually using Microsoft Security Copilot, which is free for every licensed user"
       ],
       "correct": 0,
       "explanation": "Microsoft 365 Copilot Chat is included with any Microsoft Entra work account at no extra licensing cost and provides web-grounded chat, distinct from the licensed Microsoft 365 Copilot add-on that grounds answers in the organization's own Semantic Index. Security Copilot is a separate, SCU-billed product, not a free option for general use."
@@ -1296,10 +1296,10 @@
       "type": "mc",
       "question": "A custom Copilot Studio agent built by one department is consuming far more messages than its bundled included capacity allows. What happens once that included message allotment is exhausted, assuming no capacity add-on has been purchased?",
       "options": [
-        "The agent is deleted automatically",
+        "The agent is deleted automatically the moment its included message capacity runs out",
         "Additional usage is billed on a metered, pay-as-you-go basis, or the agent may stop responding if consumption billing isn't enabled",
-        "The agent's included capacity resets immediately and usage continues unaffected",
-        "Microsoft 365 Copilot licenses for the whole tenant are suspended"
+        "The agent's included capacity silently resets and usage continues with no billing impact",
+        "Microsoft 365 Copilot licenses for the entire tenant are automatically suspended until capacity is purchased"
       ],
       "correct": 1,
       "explanation": "Once included message capacity is exhausted, further Copilot Studio agent usage draws on metered pay-as-you-go billing if enabled, or the agent may stop responding until the next capacity period if it is not. Monitoring capacity consumption matters because usage does not simply reset immediately, and unrelated tenant-wide Copilot licenses are not suspended."
@@ -1378,6 +1378,132 @@
         2
       ],
       "explanation": "Admin-managed Integrated apps and agent management settings let admins allow, block, or scope plugins, connectors, and published agents to specific groups rather than leaving extensibility ungoverned. Publishing an agent does not automatically make it available tenant-wide \u2014 admin allow-listing is often what actually gates visibility and access."
+    },
+    {
+      "id": "q45",
+      "cat": "tenantConfig",
+      "type": "mc",
+      "question": "Which Microsoft 365 group type is created automatically for a Teams channel and provides a shared mailbox, calendar, and file storage for its members?",
+      "options": [
+        "Security group",
+        "Distribution group",
+        "Microsoft 365 group",
+        "Dynamic distribution group"
+      ],
+      "correct": 2,
+      "explanation": "A Microsoft 365 group is the collaboration container behind Teams, provisioning a shared mailbox, calendar, and SharePoint file storage together. Security and distribution groups only manage access and mail distribution respectively, with no shared mailbox or file storage of their own, and a dynamic distribution group is just a mail-enabled group with rule-based membership."
+    },
+    {
+      "id": "q46",
+      "cat": "tenantConfig",
+      "type": "mc",
+      "question": "A company creates a shared mailbox meant only to be accessed by several existing licensed users, with no one signing into it directly, and it stays under 50 GB. Does the shared mailbox itself need its own separate license assigned?",
+      "options": [
+        "No, a shared mailbox under 50 GB doesn't need its own license as long as no one signs into it directly",
+        "Yes, every mailbox object in the tenant requires a full license regardless of type",
+        "No, but only if Conditional Access is disabled for that mailbox",
+        "Yes, but only an Exchange Online Kiosk license is required, never a full suite license"
+      ],
+      "correct": 0,
+      "explanation": "A shared mailbox stays license-free as long as it remains under the size threshold and no one authenticates to it directly as its own identity \u2014 access instead flows through the licenses of the users delegated to it. Licensing has nothing to do with Conditional Access being enabled or disabled, and growing past the free threshold requires a license on the mailbox, not a specific Kiosk-only requirement."
+    },
+    {
+      "id": "q47",
+      "cat": "governSecure",
+      "type": "mc",
+      "question": "Which Microsoft Entra feature requires a user to re-prove their identity through a second factor, beyond just a password, before completing sign-in?",
+      "options": [
+        "Multifactor authentication (MFA)",
+        "Self-service password reset",
+        "Group-based licensing",
+        "Dynamic distribution groups"
+      ],
+      "correct": 0,
+      "explanation": "MFA requires a second verification factor beyond the password itself. Self-service password reset lets a user recover access to their own account without a second factor being the focus, and group-based licensing and dynamic distribution groups both manage group membership and license assignment, with no bearing on sign-in verification."
+    },
+    {
+      "id": "q48",
+      "cat": "governSecure",
+      "type": "mc",
+      "question": "A document needs to be encrypted and marked 'Confidential' so only authorized people can open it, while a separate requirement says the same document type must be kept for 7 years and then automatically deleted. Which combination of Purview features addresses both requirements?",
+      "options": [
+        "A sensitivity label for the encryption/marking requirement, and a retention label for the 7-year keep-then-delete requirement",
+        "A single retention label handles both the encryption and the 7-year deletion schedule",
+        "A single sensitivity label handles both the encryption and the 7-year deletion schedule",
+        "A DLP policy handles both requirements, since DLP can also encrypt content and set retention schedules"
+      ],
+      "correct": 0,
+      "explanation": "Sensitivity labels handle protection actions like encryption and visual marking; retention labels handle the lifecycle question of how long content is kept before deletion \u2014 two distinct label types applied together. A retention label doesn't encrypt content, a sensitivity label doesn't manage a keep-then-delete timeline, and DLP policies detect and act on content patterns rather than applying encryption or retention schedules themselves."
+    },
+    {
+      "id": "q49",
+      "cat": "governSecure",
+      "type": "mc",
+      "question": "An organization wants to detect when an employee who is about to resign downloads an unusually large volume of files shortly before their last day, correlated with their HR-flagged departure status. Separately, they want to review whether employees are sharing offensive language in Teams chats company-wide. Which two Purview solutions address these, respectively?",
+      "options": [
+        "Insider Risk Management for the departure-linked data exfiltration scenario, and Communication compliance for the offensive-language review",
+        "Communication compliance for the departure scenario, and Insider Risk Management for the language review",
+        "eDiscovery (Premium) handles both, since it can also flag risky user behavior",
+        "DSPM for AI handles both, since it monitors any unusual data access pattern"
+      ],
+      "correct": 0,
+      "explanation": "Insider Risk Management correlates HR signals like departure status with activity like unusual downloads to flag potential data exfiltration. Communication compliance reviews message content for policy violations like offensive language. The pairing is reversed in the second option, eDiscovery is a search/hold tool rather than a behavioral risk detector, and DSPM for AI is scoped to AI interaction risk, not general file-download or chat-content review."
+    },
+    {
+      "id": "q50",
+      "cat": "governSecure",
+      "type": "mc",
+      "question": "A tenant currently relies on Security Defaults for baseline protection. The security team wants a more advanced rule \u2014 block sign-in from a specific country except for two named traveling executives \u2014 while keeping simple baseline MFA enforced everywhere else with no ongoing manual policy upkeep for every new user. What should they do?",
+      "options": [
+        "Turn off Security Defaults and create custom Conditional Access policies covering the country-based block and the other baseline protections it was providing",
+        "Keep Security Defaults enabled and add a separate Conditional Access policy for the country-based block exception",
+        "Leave Security Defaults enabled, since it already supports per-country, per-user exceptions natively",
+        "Disable MFA entirely and rely only on the new country-based Conditional Access rule"
+      ],
+      "correct": 0,
+      "explanation": "Security Defaults and custom Conditional Access policies can't run side by side \u2014 enabling the granular, per-country exception this scenario needs requires turning off Security Defaults and rebuilding its baseline protections (like tenant-wide MFA) as explicit Conditional Access policies. Security Defaults itself is an all-or-nothing baseline with no per-country or per-user exception support, and dropping MFA entirely would remove the baseline protection the team wants to keep."
+    },
+    {
+      "id": "q51",
+      "cat": "aiServices",
+      "type": "mc",
+      "question": "Which of these is required before a user can access the full paid Microsoft 365 Copilot experience across Word, Excel, and Outlook?",
+      "options": [
+        "A qualifying Microsoft 365 base license plus the Copilot add-on license",
+        "Only the Copilot add-on license, with no base subscription required",
+        "Only a Microsoft Entra ID P2 license",
+        "A Copilot Studio message pack alone"
+      ],
+      "correct": 0,
+      "explanation": "The paid Microsoft 365 Copilot experience requires both an eligible base Microsoft 365 subscription and the separately assigned Copilot add-on license \u2014 neither alone is sufficient. Entra ID P2 governs identity protection and PIM, and a Copilot Studio message pack covers custom agent usage, not the in-app Word/Excel/Outlook experience."
+    },
+    {
+      "id": "q52",
+      "cat": "aiServices",
+      "type": "mc",
+      "question": "A department wants Copilot to also pull live data from a third-party ticketing system when answering support questions, beyond what's already grounded in Microsoft 365 content. What enables this?",
+      "options": [
+        "A Copilot Studio connector or plugin that integrates with the ticketing system's API",
+        "A higher-tier Microsoft 365 Copilot license that unlocks unlimited grounding sources",
+        "A sensitivity label applied to records in the ticketing system",
+        "Enabling the Semantic Index for the ticketing system automatically"
+      ],
+      "correct": 0,
+      "explanation": "Extending Copilot to a third-party system requires a connector or plugin built to talk to that system's API \u2014 that's the mechanism for pulling in live external data. There's no license tier that simply unlocks more grounding sources, sensitivity labels classify and protect content rather than connect Copilot to it, and the Semantic Index only covers content already ingested through Microsoft Graph, not an arbitrary external system automatically."
+    },
+    {
+      "id": "q53",
+      "cat": "aiServices",
+      "type": "mc",
+      "question": "DSPM for AI reports show many interactions where Copilot surfaced files with an \"Anyone in the organization\" link that contain sensitive financial terms. The security team wants to move from just seeing this in reports to actually blocking Copilot from including that sensitive content in future responses. What's the necessary next step, and why doesn't DSPM for AI alone accomplish it?",
+      "options": [
+        "Create or tune a Purview DLP policy targeting Copilot interactions, since DSPM for AI surfaces and reports on risk but doesn't itself enforce a blocking action",
+        "Nothing further is needed \u2014 DSPM for AI's reports automatically begin enforcing once a risk threshold is reached",
+        "Enable Insider Risk Management instead, since it is what actually blocks Copilot responses",
+        "Apply a sensitivity label to DSPM for AI itself, which extends its reporting into an enforcement policy"
+      ],
+      "correct": 0,
+      "explanation": "DSPM for AI is a discovery and reporting capability \u2014 it surfaces oversharing and sensitive-data risk in AI interactions, but a separate DLP policy scoped to Copilot interactions is what actually blocks sensitive content from appearing in responses. Its reports don't self-escalate into enforcement, Insider Risk Management addresses user behavior risk rather than content-level blocking, and a sensitivity label can't be applied to DSPM for AI itself \u2014 it's a reporting tool, not a document."
     }
   ],
   "cheatSheet": [
@@ -1452,6 +1578,92 @@
         "When a question says \"without changing existing permissions,\" think Restricted SharePoint Search, not a permissions or access-removal answer.",
         "Purview compliance role groups are a separate permission layer from Microsoft Entra directory roles \u2014 a user can fully manage DLP with zero Entra admin roles assigned."
       ]
+    }
+  ],
+  "madlibs": [
+    {
+      "id": "ml-ab650-1",
+      "cat": "tenantConfig",
+      "scenario": "An admin adding a custom domain to the tenant must first publish a {b1} record at the DNS host to prove domain ownership, before Microsoft 365 will mark the domain as verified. Once verified, they separately add a {b2} record so Outlook clients can automatically discover the right Exchange Online settings for that domain.",
+      "blanks": [
+        {
+          "key": "b1",
+          "options": [
+            "TXT",
+            "CNAME",
+            "MX",
+            "SPF"
+          ],
+          "correct": 0
+        },
+        {
+          "key": "b2",
+          "options": [
+            "TXT",
+            "CNAME",
+            "MX",
+            "SPF"
+          ],
+          "correct": 1
+        }
+      ],
+      "explanation": "Domain verification uses a unique TXT record value Microsoft 365 provides. Once verified, a CNAME pointing to autodiscover.outlook.com lets Outlook clients locate Exchange Online settings automatically \u2014 two different DNS records doing two different jobs, not interchangeable steps."
+    },
+    {
+      "id": "ml-ab650-2",
+      "cat": "governSecure",
+      "scenario": "Legal wants a document type to be automatically encrypted and visually marked 'Confidential' the moment it's created \u2014 that calls for a {b1}. Separately, records management wants that same document type kept for exactly 7 years and then deleted automatically, regardless of who still has access to it \u2014 that calls for a {b2}.",
+      "blanks": [
+        {
+          "key": "b1",
+          "options": [
+            "sensitivity label",
+            "retention label",
+            "DLP policy",
+            "Conditional Access policy"
+          ],
+          "correct": 0
+        },
+        {
+          "key": "b2",
+          "options": [
+            "sensitivity label",
+            "retention label",
+            "DLP policy",
+            "Conditional Access policy"
+          ],
+          "correct": 1
+        }
+      ],
+      "explanation": "Sensitivity labels apply protection actions like encryption and visual marking. Retention labels govern the lifecycle \u2014 how long content is kept and what happens, like automatic deletion, once that period ends. DLP policies detect and act on content patterns rather than applying encryption or a retention timeline, and Conditional Access governs sign-in, not document handling."
+    },
+    {
+      "id": "ml-ab650-3",
+      "cat": "aiServices",
+      "scenario": "A security team first wants a report showing which existing SharePoint oversharing risks are actually being surfaced to users through Copilot responses \u2014 that's {b1}. Once they identify a specific type of sensitive content that should never appear in a Copilot answer, they configure a {b2} scoped to Copilot interactions to actually block it going forward.",
+      "blanks": [
+        {
+          "key": "b1",
+          "options": [
+            "DSPM for AI",
+            "a DLP policy",
+            "Insider Risk Management",
+            "Communication compliance"
+          ],
+          "correct": 0
+        },
+        {
+          "key": "b2",
+          "options": [
+            "DSPM for AI",
+            "a DLP policy",
+            "Insider Risk Management",
+            "Communication compliance"
+          ],
+          "correct": 1
+        }
+      ],
+      "explanation": "DSPM for AI discovers and reports on oversharing and sensitive-data exposure risk in AI interactions, without itself blocking anything. A DLP policy scoped to Copilot interactions is the enforcement layer that actually restricts sensitive content from appearing in a response. Insider Risk Management and Communication compliance address different problems \u2014 user behavior risk and message-content review \u2014 not Copilot's own response content."
     }
   ]
 }
