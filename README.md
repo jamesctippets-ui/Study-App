@@ -302,8 +302,8 @@ This mode is deliberately self-contained — it doesn't feed mastery %,
 results, or exam readiness, so its score is tracked for the practice
 session only.
 
-Tracks with `MADLIBS` content (AZ-900, AZ-104, ITIL, and Cloud+ today)
-get a **Mad Libs** sub-tab: a short real-world scenario paragraph with a
+Every track now ships `MADLIBS` content (49 scenarios total, 3-4 per
+track) and gets a **Mad Libs** sub-tab: a short real-world scenario paragraph with a
 couple of inline dropdown blanks, each filled from a small set of term
 choices — reinforces vocabulary in context instead of as an isolated
 flashcard front/back. Unlike Verbal Quiz and Commands above, this one
@@ -319,34 +319,43 @@ back into the right order with simple up/down move buttons (no drag-
 and-drop needed). Also feeds mastery %/results the normal way, scored
 all-or-nothing per sequence.
 
+Every multiple-choice question across all 15 tracks has been through a
+wording-giveaway audit — checking that the correct answer isn't
+identifiable just from being longer, more specific, free of absolute
+language ("always"/"never"), or an echo of the question's own wording,
+independent of actually knowing the material — plus a real easy/medium/
+hard difficulty mix per track (not uniform difficulty), weighted across
+categories by their real exam marks. The question bank grew from 1126 to
+1263 in the same pass.
+
 **Fifteen tracks, all visible in the track switcher:**
-- **AZ-900** (Azure Fundamentals) — full course content, 106 questions.
-- **AB-650** (M365 & AI Services Administrator) — full question bank (52
+- **AZ-900** (Azure Fundamentals) — full course content, 119 questions.
+- **AB-650** (M365 & AI Services Administrator) — full question bank (77
   questions); tenant administration, governance/compliance, and Microsoft 365
   Copilot/AI-services management. Replaces the retiring MS-102.
-- **AZ-104** (Azure Administrator) — full question bank (75 questions) and the
+- **AZ-104** (Azure Administrator) — full question bank (87 questions) and the
   same course treatment as AZ-900 (7 lessons, diagrams, mockups).
-- **DP-900** (Azure Data Fundamentals) — full question bank (62 questions).
-- **DP-300** (Azure Database Administrator) — full question bank (64 questions).
-- **AZ-305** (Azure Solutions Architect Expert) — full question bank (62 questions).
-- **AZ-802** (Windows Server Administrator) — full question bank (72 questions);
+- **DP-900** (Azure Data Fundamentals) — full question bank (71 questions).
+- **DP-300** (Azure Database Administrator) — full question bank (73 questions).
+- **AZ-305** (Azure Solutions Architect Expert) — full question bank (81 questions).
+- **AZ-802** (Windows Server Administrator) — full question bank (81 questions);
   consolidates what used to be separate AZ-800/AZ-801 tracks, matching
   Microsoft's real exam consolidation (AZ-800/801 retire Sept 30, 2026).
-- **AZ-140** (Azure Virtual Desktop Specialty) — full question bank (62 questions);
+- **AZ-140** (Azure Virtual Desktop Specialty) — full question bank (87 questions);
   host pools, FSLogix, MSIX app attach, AVD identity/security, and monitoring.
-- **MD-102** (Endpoint Administrator) — full question bank (55 questions);
+- **MD-102** (Endpoint Administrator) — full question bank (80 questions);
   Intune, Windows Autopilot, device compliance/security, and app management.
-- **SC-300** (Identity & Access Administrator) — full question bank (66 questions).
-- **SC-200** (Security Operations Analyst) — full question bank (66 questions);
+- **SC-300** (Identity & Access Administrator) — full question bank (75 questions).
+- **SC-200** (Security Operations Analyst) — full question bank (75 questions);
   Defender XDR/Sentinel operations, incident response, and real KQL-based
   threat hunting.
-- **SC-500** (Cloud & AI Security Engineer) — full question bank (78 questions),
+- **SC-500** (Cloud & AI Security Engineer) — full question bank (87 questions),
   including current AI-security content (Copilot, Microsoft Foundry agents,
   Entra Agent ID).
-- **ITIL Foundation** (Version 5) — full question bank (97 questions) plus full
+- **ITIL Foundation** (Version 5) — full question bank (106 questions) plus full
   course mode (7 lessons covering the Value System, Guiding Principles, the Four
   Dimensions, the Continual Improvement Model, and the Product/Service Lifecycle).
-- **CompTIA Cloud+** (CV0-004) — full question bank (72 questions) across all
+- **CompTIA Cloud+** (CV0-004) — full question bank (82 questions) across all
   five exam domains, plus full course mode (6 lessons: deployment models &
   virtualization, scaling & resilience, security, deployment strategies,
   operations/governance, and troubleshooting).
@@ -355,7 +364,7 @@ all-or-nothing per sequence.
   content is proprietary, so there's no legitimate way to build real cert-prep
   for it. This track instead covers general, publicly-documented healthcare
   interoperability knowledge (HL7v2, FHIR, integration-engine architecture,
-  healthcare data governance) — 56 questions, clearly labeled as a self-study
+  healthcare data governance) — 82 questions, clearly labeled as a self-study
   concepts module rather than a real exam.
 
 To hide a track again (e.g. while it's a work in progress), open `data/tracks.py`

@@ -357,6 +357,28 @@ come up.
 
 ## 10.5. Data portability & review quality (not originally listed — added as they shipped)
 
+- [x] **Question-bank wording-giveaway audit (user's idea).** The user
+  found that some multiple-choice questions were answerable just from
+  how the options were worded, without knowing the material — a real
+  quality problem distinct from content accuracy. Ran a full pass across
+  every `mc` question in all 15 tracks (~275+ questions reviewed, over
+  100 fixed) looking for five specific tells: (1) the correct option
+  noticeably longer/more detailed than distractors, (2) distractors
+  using absolute language ("always," "never," "completely") while the
+  correct answer is measured, (3) the correct option echoing distinctive
+  stem vocabulary that distractors don't share, (4) distractors
+  obviously irrelevant to the domain rather than plausible near-misses,
+  (5) only the correct option grammatically completing the stem. Fixed
+  by rewriting distractors to be plausible, comparable in length/
+  register, and genuinely confusable — never by changing which answer
+  is correct. Not every long/absolute-sounding option is a violation
+  (e.g. a real product name like "RA-GZRS" is just longer than "LRS" —
+  that's the real term, not a tell), so this took actual per-question
+  judgment, not a mechanical find-and-replace. Same pass also brought
+  every track's question count up with a genuine easy/medium/hard mix
+  (roughly 30/40/30) rather than uniform difficulty, weighted across
+  each track's categories proportional to their exam-weight `marks` —
+  total question bank grew from 1126 to 1263 across all 15 tracks.
 - [x] **Progress export/import.** The app has no accounts, so a cleared browser
   or a new device previously meant losing everything. The ⚙ Data & progress
   panel now downloads all progress (results, seenLog, stats) as a JSON file
@@ -728,8 +750,10 @@ doesn't (and why it's still waiting).
   "betterKey": "A", "why": ...}`) and its own view alongside the existing
   `QuestionView`.
 - [x] **Scenario Mad Libs.** Shipped as a "Mad Libs" Quiz sub-tab (only
-  shown for tracks with `MADLIBS` content — AZ-900, AZ-104, ITIL, and
-  Cloud+ at launch, 3 scenarios each): a short real-world scenario
+  shown for tracks with `MADLIBS` content — now all 15 tracks, 3-4
+  scenarios each, 49 total; started with AZ-900/AZ-104/ITIL/Cloud+ and
+  later expanded to the remaining 11 in the same content-quality pass
+  as the question-bank audit below): a short real-world scenario
   paragraph with 2-3 inline dropdown blanks, each filled from a small
   set of term choices (`MadLibsView` in 04_shared_ui.jsx). Scored
   all-or-nothing per scenario — every blank right, or the whole scenario
@@ -747,9 +771,10 @@ doesn't (and why it's still waiting).
   unique-id/valid-category/non-empty-explanation checks — madlib ids
   share the same id namespace as flashcards/questions (validated against
   the same `item_ids` set) since they write into the same
-  `results[trackKey]` map. Broader per-track coverage (beyond the 4
-  tracks shipped) is open, same "started small, more can follow" pattern
-  as CLI_CHALLENGES above.
+  `results[trackKey]` map. CLI_CHALLENGES coverage (AZ-104/AZ-802 only)
+  stays the one deliberately narrower exception — that mode only makes
+  sense for tracks where real CLI/PowerShell syntax is actually core to
+  the job, unlike Mad Libs/Sequences which generalize to any track.
 - [x] **Step-ordering / sequencing challenges.** Shipped as a "Sequence"
   Quiz sub-tab (only shown for tracks with `SEQUENCES` content — AZ-104,
   AZ-305, ITIL, and AZ-802 at launch, 3 challenges each): shuffle the
