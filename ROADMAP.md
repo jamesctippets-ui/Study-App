@@ -25,16 +25,30 @@ come up.
   hospital IT department (HIPAA-adjacent handling of PHI access, ticketing/
   change-management realities, on-call patterns) without pretending they're
   examinable content.
-- [ ] A cross-track glossary/reference so a term explained once (e.g.
+- [x] A cross-track glossary/reference so a term explained once (e.g.
   Microsoft Entra ID) is consistently linked wherever it resurfaces in a
-  different track's reading.
+  different track's reading. Shipped as a "Glossary" panel off the Home
+  screen (`GlossaryPanel` in 04_shared_ui.jsx, `buildGlossaryEntries()` in
+  03_helpers.js): merges every visible track's flashcard fronts by
+  lowercased/trimmed text, so a term defined identically in two tracks
+  shows one entry with both tracks' badges, while a term with genuinely
+  different phrasing per track stays as separate entries (deliberately —
+  silently picking one track's wording over another's would be wrong).
+  Searchable, expand/collapse per entry, capped display at 200 matches.
+  746 unique entries from 764 flashcards at time of shipping.
 
 ## 3. Tips and tricks (user's idea)
 
-- [ ] A short "how to take this exam" strategy section per track: time
+- [x] A short "how to take this exam" strategy section per track: time
   management, flagging-for-review habits, process-of-elimination, and the
   specific wording patterns that Microsoft/CompTIA exams use (negative
-  questions, "choose two," "best" vs. "most secure" framing).
+  questions, "choose two," "best" vs. "most secure" framing). Shipped as a
+  new "Exam-day strategy" section, inserted first in every track's
+  `CHEAT_SHEET`, with a per-track time-budget line computed from that
+  track's real exam length/duration and pass-mark framing from its
+  `EXAM_CONFIG`. EHR Integration — not a real proctored exam — gets a
+  differently-worded "How to use this module's self-assessment" section
+  instead of exam-day framing that wouldn't apply to it.
 - [ ] Inline "why this is tested" notes on trickier questions, distinct from
   the existing answer explanation — the meta-level reason an exam likes this
   distinction, not just why the answer is correct.
@@ -64,8 +78,17 @@ come up.
   (Entra ID/RBAC/Conditional Access; blob/file/queue/table + access tiers)
   than what these two lessons actually teach. AZ-104 now matches AZ-900:
   full diagram + portal-mockup + real-screenshot coverage on all 7 lessons.
-- [ ] Add course/diagram content to ITIL and Cloud+, which currently have
-  none at all.
+- [x] Add course/diagram content to ITIL and Cloud+, which previously had
+  none at all. ITIL got 7 lessons covering all 7 categories (terms,
+  valueSystem, dimensions, lifecycle, streams/ai/frameworks) plus 3 new
+  diagrams (`fourDimensions`, `productServiceLifecycle`,
+  `continualImprovementModel`); Cloud+ got 6 lessons covering all 5
+  categories (archDesign split across two lessons since it has a clean
+  deployment/virtualization vs. scaling/resilience seam) plus 3 new
+  diagrams (`deploymentModels`, `scalingApproaches`, `dmzZones`). Both use
+  the same `LESSONS` schema and `CourseView` as AZ-900/AZ-104 — no
+  `portalMockup` field on either track's lessons, correctly, since neither
+  ITIL nor Cloud+ has a real vendor portal to mock up.
 - [x] A one-page **cheat sheet** per track — the single highest-praised
   feature from the platforms surveyed (Tutorials Dojo) — a printable/
   shareable visual summary of the exam's must-know facts, not just prose.
@@ -586,18 +609,29 @@ doesn't (and why it's still waiting).
   Endpoint Operations) — `images/intune/*.png`, registered in
   `REAL_PORTAL_SCREENSHOTS` with `product: 'Microsoft Intune admin
   center'`.
-- [ ] DP-300 (Azure SQL/Cosmos DB), AZ-305 (architecture-center diagrams —
-  `MicrosoftDocs/architecture-center` is confirmed CC BY 4.0, just not
-  yet used), and SC-200 (Defender for Cloud/Sentinel) still need their
-  actual source repo found (SC-200) or content mined from a repo already
-  confirmed licensed (AZ-305). SC-300 stays blocked on `entra-docs`'
-  licensing per above unless a different, properly CC-BY-licensed source
-  turns up. Cloud+ has no real portal to screenshot anyway (vendor-neutral
-  by design).
-- [ ] More quiz/exam questions built around each new screenshot, matching
-  the existing pattern (`'image': '<key>'` on the question dict,
-  `hideDescription` so the caption doesn't give away the answer) — MD-102
-  doesn't have any of these yet, only the Study-view placement above.
+- [x] **AZ-305 (architecture-center diagrams)** — shipped. 5 CC BY 4.0
+  diagrams from `MicrosoftDocs/architecture-center` (confirmed via that
+  repo's own `LICENSE`, distinct from its code-only `LICENSE-CODE`): a
+  hub-spoke virtual network topology, a VM landing-zone baseline
+  architecture, a compute-service decision tree, a load-balancing-service
+  decision tree, and a horizontal data-partitioning (sharding) diagram —
+  all genuinely embedded in live architecture-center articles, not
+  orphaned assets. Registered in `REAL_PORTAL_SCREENSHOTS` with
+  `product: 'Azure Architecture Center reference diagram'` (they're
+  reference diagrams, not portal screenshots, so get their own product
+  label rather than misleadingly saying "Azure Portal"). Images in
+  `images/az305-arch/`.
+- [ ] DP-300 (Azure SQL/Cosmos DB) and SC-200 (Defender for Cloud/Sentinel)
+  still need their actual source repo found. SC-300 stays blocked on
+  `entra-docs`' licensing per above unless a different, properly
+  CC-BY-licensed source turns up. Cloud+ has no real portal to screenshot
+  anyway (vendor-neutral by design).
+- [x] More quiz/exam questions built around each new screenshot, matching
+  the existing pattern (`'image': '<key>'` on the question dict) — done
+  for AZ-305: 10 new questions (2 per new diagram, `q38`–`q47`) spanning
+  the `infrastructure`, `identityGovernance`, and `dataStorage`
+  categories. MD-102 still doesn't have any of these yet, only the
+  Study-view placement.
 
 ## 13. Interactive learning games (user's idea)
 

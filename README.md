@@ -19,7 +19,11 @@ AZ-900/AZ-104, a full mini-course per topic: reading with tappable key terms,
 an SVG diagram, a portal mockup, a worked scenario, and common exam traps)
 — plus Sheet (a one-page, printable cheat sheet per track — every
 track's must-know facts condensed into a few dense sections, with a
-Print/save-as-PDF button). A lesson's reading is itself split
+Print/save-as-PDF button, opening with an "Exam-day strategy" section —
+time-per-question budget computed from that track's real exam length,
+pass-mark framing, and process-of-elimination/flagging advice; EHR
+Integration, not a real proctored exam, gets a differently-worded section
+instead). A lesson's reading is itself split
 into pages when it runs long — moving past the first page takes either a
 one-question quick check or a 3-pair mini match round, alternating between
 the two, so the material isn't just a wall of text to skim past.
@@ -153,16 +157,21 @@ carry a `screenshot` key into `REAL_PORTAL_SCREENSHOTS`
 (02_portal_mockups.jsx), shown under a "Portal screenshot" heading on that
 category's Study page. There's no hand-drawn mockup involved here since
 flat tracks never had one — the real screenshot renders as its own
-self-contained card. MD-102 is the first track to use this, sourced from
+self-contained card. MD-102 was the first track to use this, sourced from
 `MicrosoftDocs/memdocs` (Intune's own CC BY 4.0-licensed docs repo) with
-one screenshot per category (`images/intune/`); more tracks are a
-straightforward data addition now that the slot exists — see ROADMAP.md
-section 12 for which ones are still blocked on finding a properly-licensed
-source. A screenshot's optional `product` field controls the attribution
-caption's wording ("Real Azure Portal screenshot" by default, "Real
-Microsoft Intune admin center screenshot" for MD-102's) so it's never
-mislabeled just because most of the existing screenshots happen to be
-Azure Portal.
+one screenshot per category (`images/intune/`). AZ-305 followed with 5
+reference diagrams from `MicrosoftDocs/architecture-center` (also CC BY
+4.0) — hub-spoke networking, a VM landing-zone baseline, and decision
+trees for compute and load-balancing service choices plus a data-
+partitioning diagram (`images/az305-arch/`), each with its own pair of
+quiz/exam questions. More tracks are a straightforward data addition now
+that the slot exists — see ROADMAP.md section 12 for which ones are still
+blocked on finding a properly-licensed source. A screenshot's optional
+`product` field controls the attribution caption's wording ("Real Azure
+Portal screenshot" by default, "Real Microsoft Intune admin center
+screenshot" for MD-102's, "Azure Architecture Center reference diagram"
+for AZ-305's) so it's never mislabeled just because most of the existing
+screenshots happen to be Azure Portal.
 
 A handful of AZ-900/AZ-104 quiz and exam questions go a step further and
 put one of those same real screenshots directly in the question itself
@@ -172,6 +181,13 @@ portal rather than just recall a definition. These render in both Quiz
 and Final Exam mode (they share the same question bank) with the
 descriptive caption deliberately hidden — showing it there would just
 hand over the answer.
+
+A **Glossary** button on Home opens a cross-track term reference
+(`GlossaryPanel` in 04_shared_ui.jsx): every visible track's flashcard
+fronts merged by lowercased/trimmed text (so identical terms across
+tracks collapse into one entry with both tracks' badges, while genuinely
+different phrasing per track stays separate), searchable, with
+expand/collapse per entry.
 
 A trophy header button opens **Achievements** — 15 milestone badges (mastery,
 streaks, quiz/exam/match counts, course completion) plus a daily streak
@@ -266,10 +282,13 @@ explanation alongside the prompt, not just what you got wrong.
 - **SC-500** (Cloud & AI Security Engineer) — full question bank (78 questions),
   including current AI-security content (Copilot, Microsoft Foundry agents,
   Entra Agent ID).
-- **ITIL Foundation** (Version 5) — full question bank (97 questions), classic
-  flashcard-list study mode (no course yet).
+- **ITIL Foundation** (Version 5) — full question bank (97 questions) plus full
+  course mode (7 lessons covering the Value System, Guiding Principles, the Four
+  Dimensions, the Continual Improvement Model, and the Product/Service Lifecycle).
 - **CompTIA Cloud+** (CV0-004) — full question bank (72 questions) across all
-  five exam domains, classic flashcard-list study mode (no course yet).
+  five exam domains, plus full course mode (6 lessons: deployment models &
+  virtualization, scaling & resilience, security, deployment strategies,
+  operations/governance, and troubleshooting).
 - **EHR Integration** — *not a certification.* Epic (the dominant hospital EHR
   vendor) requires employer sponsorship to even take its exams, and its exam
   content is proprietary, so there's no legitimate way to build real cert-prep
@@ -290,10 +309,10 @@ don't edit it directly, it'll be overwritten. The real source is:
 ```
 data/
   tracks.py     — TRACKS (which certs exist / are visible) and EXAM_CONFIG
-  itil.py       — ITIL categories, flashcards, questions
+  itil.py       — ITIL categories, flashcards, questions, course lessons
   az900.py      — AZ-900 categories, flashcards, questions, course lessons
   az104.py      — AZ-104 categories, flashcards, questions, course lessons
-  cloudplus.py  — CompTIA Cloud+ categories, flashcards, questions
+  cloudplus.py  — CompTIA Cloud+ categories, flashcards, questions, course lessons
 src/js/
   00_preamble.js        — React hook imports, the COLOR palette
   01_diagrams.jsx        — SVG lesson diagrams
@@ -472,9 +491,10 @@ what you already have before troubleshooting further.
   than reusing AZ-900's generic `identity`/`storage` diagrams, since those
   lessons' actual content (dynamic-group licensing; access keys vs. SAS vs.
   a storage firewall) didn't match what the generic ones illustrate.
-- **ITIL and Cloud+ have no course/lesson mode at all yet** — same format as AZ-900
-  and AZ-104 would extend cleanly, reusing the existing `DBox`/`DLine`/`PortalFrame`
-  diagram helpers.
+- **ITIL and Cloud+ now have full course/lesson mode**, matching AZ-900/AZ-104's
+  format (ITIL: 7 lessons across all 7 categories; Cloud+: 6 lessons across all 5
+  categories), reusing the existing `DBox`/`DLine`/`DCaption` diagram helpers. Neither
+  carries a `portalMockup`, correctly, since neither has a real vendor portal.
 - Re-enabling a hidden track is one line each in `data/tracks.py`.
 - **Adding a track no longer means touching `src/js/`.** The JS side used to hardcode
   `{ itil, az900, az104 }` in a few places (initial state, storage migration) — those
