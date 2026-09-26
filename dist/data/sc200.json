@@ -1334,7 +1334,7 @@
       "id": "sentinel-analytics-automation",
       "title": "Sentinel Analytics, Automation & Tuning",
       "summary": "Analytics rule types, automation rules vs. playbooks, ingestion pipelines, and the tuning tools that keep detections accurate.",
-      "diagram": null,
+      "diagram": "sentinelDataFlow",
       "vocabIds": [
         "f3",
         "f4",
@@ -1383,7 +1383,7 @@
       "id": "xdr-copilot-threat-intel",
       "title": "SOC Visibility: XDR, Copilot & Threat Intelligence",
       "summary": "Defender XDR correlation and automation, Security Copilot, watchlists, UEBA, workbooks, and threat intelligence.",
-      "diagram": null,
+      "diagram": "xdrCorrelationFanIn",
       "vocabIds": [
         "f1",
         "f2",
@@ -1431,7 +1431,7 @@
       "id": "endpoint-identity-response",
       "title": "Endpoint & Identity Incident Response",
       "summary": "Isolating and investigating compromised devices, blocking known-bad indicators, and identity-based detections.",
-      "diagram": null,
+      "diagram": "endpointResponseFlow",
       "vocabIds": [
         "f17",
         "f18",
@@ -1474,7 +1474,7 @@
       "id": "email-cloudapps-incident-mgmt",
       "title": "Email, Cloud App Defense & Incident Management",
       "summary": "Investigating phishing and OAuth risk, enforcing in-session cloud app controls, and running Sentinel incidents through to closure.",
-      "diagram": null,
+      "diagram": "casbSessionControlFlow",
       "vocabIds": [
         "f21",
         "f22",
@@ -1522,7 +1522,7 @@
       "id": "kql-threat-hunting",
       "title": "Threat Hunting with KQL",
       "summary": "Writing and reusing KQL for proactive hunting, joins, cross-product correlation, and promoting a hunt into a real detection.",
-      "diagram": null,
+      "diagram": "kqlPipelineJoins",
       "vocabIds": [
         "f31",
         "f32",

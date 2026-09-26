@@ -46,7 +46,8 @@
           "label": "Microsoft Learn: SC-300 - Plan and implement an identity governance strategy",
           "url": "https://learn.microsoft.com/en-us/training/paths/plan-implement-identity-governance-strategy"
         }
-      ]
+      ],
+      "screenshot": "pimActivateRole"
     }
   ],
   "flashcards": [
@@ -1377,7 +1378,7 @@
       "id": "authentication-methods-selfservice",
       "title": "Authentication Methods & Self-Service Security",
       "summary": "MFA, passwordless sign-in, SSPR, Temporary Access Pass, and the modern authentication methods policy.",
-      "diagram": null,
+      "diagram": "authMethodsBootstrap",
       "vocabIds": [
         "f10",
         "f11",
@@ -1462,7 +1463,7 @@
       "id": "workload-identities-apps",
       "title": "Workload Identities & App Integrations",
       "summary": "App registrations, service principals, managed identities, API permissions, and SSO/proxy for enterprise apps.",
-      "diagram": null,
+      "diagram": "workloadIdentityLandscape",
       "vocabIds": [
         "f20",
         "f21",
