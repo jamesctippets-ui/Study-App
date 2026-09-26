@@ -1617,7 +1617,7 @@
       "id": "data-governance-compliance",
       "title": "Data Governance & Compliance",
       "summary": "DLP, retention, sensitivity labels, eDiscovery, audit, and the Purview tools that track and enforce them.",
-      "diagram": null,
+      "diagram": "purviewProtectionFlow",
       "vocabIds": [
         "f14",
         "f15",
@@ -1675,7 +1675,7 @@
       "id": "copilot-licensing-and-grounding",
       "title": "Copilot Licensing & Grounding",
       "summary": "Copilot licensing tiers, the Semantic Index, the no-new-access guarantee, and governing Copilot extensibility.",
-      "diagram": null,
+      "diagram": "copilotLicensingGrounding",
       "vocabIds": [
         "f25",
         "f26",
@@ -1724,7 +1724,7 @@
       "id": "securing-and-governing-ai-agents",
       "title": "Securing & Governing AI Agents",
       "summary": "DSPM for AI, DLP for Copilot, Entra Agent ID, Security Copilot, and auditing AI interactions.",
-      "diagram": null,
+      "diagram": "dspmAgentGovernance",
       "vocabIds": [
         "f29",
         "f30",

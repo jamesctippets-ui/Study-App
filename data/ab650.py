@@ -1496,7 +1496,7 @@ Privileged Identity Management (PIM) shrinks how many admin accounts sit permane
         'id': 'data-governance-compliance',
         'title': 'Data Governance & Compliance',
         'summary': 'DLP, retention, sensitivity labels, eDiscovery, audit, and the Purview tools that track and enforce them.',
-        'diagram': None,
+        'diagram': 'purviewProtectionFlow',
         'vocabIds': ['f14', 'f15', 'f16', 'f17', 'f18', 'f19', 'f20', 'f21', 'f22', 'f23', 'f52', 'f53', 'f55'],
         'quizIds': ['q13', 'q14', 'q16', 'q17', 'q18', 'q20', 'q21', 'q38', 'q40', 'msq6'],
         'reading': """A Microsoft Purview data loss prevention (DLP) policy defines where it looks (locations like Exchange, SharePoint, OneDrive, Teams chat, or endpoint devices), what it's looking for (conditions like a sensitive information type match, such as a credit card number), and what happens when it finds a match (block sharing, show a policy tip, or require an override justification). Before enforcing anything, a policy can run in test mode to surface likely matches and false positives, which is the recommended way to tune a policy before it starts blocking real business activity. When two DLP policies could both apply to the same content, priority decides the outcome: policies are evaluated in priority order, where a lower priority number goes first, and a rule whose action includes 'stop processing more rules' skips every lower-priority rule and policy after it — so a conflict between two overlapping policies is fixed by reordering priority, not by editing either policy's conditions.
@@ -1521,7 +1521,7 @@ Two dashboards help leadership see where all of this stands. Microsoft Secure Sc
         'id': 'copilot-licensing-and-grounding',
         'title': 'Copilot Licensing & Grounding',
         'summary': 'Copilot licensing tiers, the Semantic Index, the no-new-access guarantee, and governing Copilot extensibility.',
-        'diagram': None,
+        'diagram': 'copilotLicensingGrounding',
         'vocabIds': ['f25', 'f26', 'f27', 'f28', 'f32', 'f35', 'f60', 'f61'],
         'quizIds': ['q23', 'q24', 'q25', 'q26', 'q32', 'q43', 'tf8', 'tf9', 'tf10'],
         'reading': """Microsoft 365 Copilot is always an add-on, never a standalone product. It requires an eligible base subscription — Microsoft 365 E3 or E5, Business Standard or Premium, A3 or A5 — plus the Copilot add-on license assigned separately to each user; owning the base subscription, or even owning Copilot licenses somewhere in the tenant, never grants access on its own to a user who hasn't been individually assigned one. Because it's an add-on layered on top of an existing license, group-based licensing rolls it out to a pilot group or department the same clean way it rolls out any other add-on. It's worth knowing there's also a free tier: Microsoft 365 Copilot Chat, the evolution of Bing Chat Enterprise, comes included with any Microsoft Entra work account at no extra cost, offering web-grounded chat with some limited file-grounded help. That means an organization that has purchased zero paid Copilot add-on licenses can still have employees genuinely using 'Copilot' — governance and DLP planning need to account for this free tier, not just the paid one.
@@ -1544,7 +1544,7 @@ Copilot's reach can also extend beyond Microsoft 365 itself. A Microsoft Graph c
         'id': 'securing-and-governing-ai-agents',
         'title': 'Securing & Governing AI Agents',
         'summary': 'DSPM for AI, DLP for Copilot, Entra Agent ID, Security Copilot, and auditing AI interactions.',
-        'diagram': None,
+        'diagram': 'dspmAgentGovernance',
         'vocabIds': ['f29', 'f30', 'f31', 'f33', 'f34', 'f36', 'f37', 'f38', 'f59', 'f62', 'f63'],
         'quizIds': ['q27', 'q28', 'q30', 'q31', 'q33', 'q34', 'q42', 'q44', 'tf11', 'msq7', 'msq8'],
         'reading': """Data Security Posture Management for AI (DSPM for AI), in Microsoft Purview, exists specifically to close a visibility gap most tenants already have: an organization might already run DLP and sensitivity labeling, but have no idea how users are actually interacting with Copilot and other generative AI tools, or where those interactions expose sensitive data. DSPM for AI surfaces exactly that — how users are prompting AI apps, where oversharing risk shows up in their responses — and can recommend or auto-apply DLP and labeling policies tailored to AI usage specifically. What it does not do is enforce anything on its own: DSPM for AI is a discovery and reporting layer, not a blocking mechanism. Moving from 'we can see the risk' to 'we're actually stopping it' means configuring a Purview DLP policy scoped specifically to Copilot interactions, which can prevent a file's sensitive content from being quoted or summarized by Copilot even while the user keeps their normal ability to open that file directly — a narrower, more surgical control than removing file access outright.

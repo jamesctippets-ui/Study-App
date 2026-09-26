@@ -418,6 +418,34 @@ function DiagramHl7v2MessageAnatomy() {
   );
 }
 
+function DiagramAgentIdentityGovernance() {
+  return (
+    <svg viewBox="0 0 320 445" style={{ width: '100%', height: 'auto' }}>
+      <DBox x={90} y={8} w={140} h={30} label="Agent identity blueprint" sub="CA policy + scope template" />
+      <DLine x1={160} y1={38} x2={85} y2={72} />
+      <DLine x1={160} y1={38} x2={235} y2={72} />
+      <DBox x={20} y={72} w={130} h={40} label="Foundry agent A" sub="own Entra Agent ID" />
+      <DBox x={170} y={72} w={130} h={40} label="Foundry agent B" sub="own Entra Agent ID" />
+      <DCaption x={160} y={126} text="Blueprint permissions apply automatically to every agent" />
+      <DLine x1={85} y1={112} x2={160} y2={150} />
+      <DLine x1={235} y1={112} x2={160} y2={150} />
+      <DBox x={100} y={150} w={120} h={34} label="Conditional Access" sub="trusted network + app" />
+      <DLine x1={160} y1={184} x2={160} y2={206} />
+      <DBox x={90} y={206} w={140} h={34} label="AI Gateway (APIM)" sub="authN, rate limit, logging" />
+      <DLine x1={160} y1={240} x2={85} y2={276} />
+      <DLine x1={160} y1={240} x2={235} y2={276} />
+      <DBox x={20} y={276} w={130} h={34} label="Document index" sub="scoped resource" />
+      <DBox x={170} y={276} w={130} h={34} label="Pricing API" sub="scoped resource" />
+      <DCaption x={160} y={324} text="Least privilege: only the two resources it actually needs" />
+      <line x1={160} y1={310} x2={160} y2={344} stroke={COLOR.primary} strokeWidth="1.3" strokeDasharray="4 3" />
+      <DBox x={60} y={344} w={200} h={30} label="Defender XDR alert" sub="flags this agent as compromised" />
+      <DLine x1={160} y1={374} x2={160} y2={388} />
+      <DBox x={60} y={388} w={200} h={32} label="Blast radius analysis" sub="reach = only its scoped resources" />
+      <DCaption x={160} y={434} text="A contained breach, not a tenant-wide one" />
+    </svg>
+  );
+}
+
 function DiagramHl7v2MessageTypeFlow() {
   return (
     <svg viewBox="0 0 360 210" style={{ width: '100%', height: 'auto' }}>
@@ -444,6 +472,40 @@ function DiagramHl7v2MessageTypeFlow() {
   );
 }
 
+function DiagramDefenderSentinelPipeline() {
+  return (
+    <svg viewBox="0 0 340 340" style={{ width: '100%', height: 'auto' }}>
+      <DBox x={90} y={8} w={160} h={28} label="Monitored resources" sub="Azure + Arc + AWS/GCP" />
+      <DLine x1={170} y1={36} x2={85} y2={70} />
+      <DLine x1={170} y1={36} x2={255} y2={70} />
+      <rect x={10} y={54} width={150} height={166} rx="10" fill="none" stroke={COLOR.border} strokeDasharray="4 3" />
+      <DCaption x={85} y={48} text="Defender for Cloud — posture" />
+      <DBox x={20} y={70} w={130} h={28} label="Secure Score" sub="% general best practice" />
+      <DLine x1={85} y1={98} x2={85} y2={106} />
+      <DBox x={20} y={106} w={130} h={28} label="Compliance dashboard" sub="named standard pass/fail" />
+      <DLine x1={85} y1={134} x2={85} y2={142} />
+      <DBox x={20} y={142} w={130} h={30} label="JIT + app controls" sub="shrink attack surface" />
+      <DLine x1={85} y1={172} x2={85} y2={180} />
+      <DBox x={20} y={180} w={130} h={32} label="Attack path analysis" sub="chains findings by exploitability" />
+      <rect x={180} y={54} width={150} height={238} rx="10" fill="none" stroke={COLOR.border} strokeDasharray="4 3" />
+      <DCaption x={255} y={48} text="Sentinel — detect & respond" />
+      <DBox x={190} y={70} w={130} h={28} label="Data connectors" sub="ingest logs & events" />
+      <DLine x1={255} y1={98} x2={255} y2={106} />
+      <DBox x={190} y={106} w={130} h={28} label="Log Analytics workspace" sub="shared KQL store" />
+      <DLine x1={255} y1={134} x2={255} y2={142} />
+      <DBox x={190} y={142} w={130} h={34} label="Analytics rules + Fusion" sub="scheduled / near-real-time / ML" />
+      <DLine x1={255} y1={176} x2={255} y2={184} />
+      <DBox x={190} y={184} w={130} h={26} label="Incident" />
+      <DLine x1={255} y1={210} x2={255} y2={218} />
+      <DBox x={190} y={218} w={130} h={28} label="Automation rule" sub="assign, tag, or close" />
+      <DLine x1={255} y1={246} x2={255} y2={254} />
+      <DBox x={190} y={254} w={130} h={30} label="Playbook (Logic App)" sub="disable user, isolate VM" />
+      <DCaption x={170} y={306} text="Secure Score = best practice; the compliance dashboard = a named standard" />
+      <DCaption x={170} y={320} text="Sentinel has no store of its own — it queries that same workspace" />
+    </svg>
+  );
+}
+
 function DiagramFhirRestInteraction() {
   return (
     <svg viewBox="0 0 340 235" style={{ width: '100%', height: 'auto' }}>
@@ -465,6 +527,30 @@ function DiagramFhirRestInteraction() {
   );
 }
 
+function DiagramPurviewProtectionFlow() {
+  return (
+    <svg viewBox="0 0 350 400" style={{ width: '100%', height: 'auto' }}>
+      <DBox x={110} y={8} w={140} h={30} label="A document" />
+      <DLine x1={180} y1={38} x2={90} y2={74} />
+      <DLine x1={180} y1={38} x2={270} y2={74} />
+      <DBox x={20} y={74} w={140} h={44} label="Sensitivity label" sub="encrypts + marks the content" />
+      <DBox x={200} y={74} w={140} h={44} label="Retention label" sub="per-item keep/delete override" />
+      <DCaption x={180} y={132} text="Independent axes — both can apply to the same item" />
+      <DBox x={20} y={150} w={140} h={34} label="Retention policy" sub="one rule for the whole location" />
+      <DCaption x={90} y={198} text="vs. a label: location-wide, no" />
+      <DCaption x={90} y={210} text="per-item override" />
+      <DCaption x={180} y={230} text="Meanwhile — DLP decides what can leave a location" />
+      <DBox x={110} y={244} w={140} h={28} label="Monitored location" sub="Exchange / SharePoint / Teams" />
+      <DLine x1={180} y1={272} x2={180} y2={284} />
+      <DBox x={70} y={284} w={220} h={32} label="DLP policy — priority 0" sub="matches a sensitive info type" />
+      <DLine x1={180} y1={316} x2={180} y2={338} />
+      <DBox x={70} y={338} w={220} h={32} label="Action taken" sub="block / policy tip / override" />
+      <DCaption x={180} y={384} text="'Stop processing' skips every lower-priority rule after it" />
+      <DCaption x={180} y={396} text="Test mode surfaces matches before a policy enforces" />
+    </svg>
+  );
+}
+
 function DiagramSmartOnFhirLaunchFlow() {
   return (
     <svg viewBox="0 0 300 230" style={{ width: '100%', height: 'auto' }}>
@@ -477,6 +563,35 @@ function DiagramSmartOnFhirLaunchFlow() {
       <DBox x={70} y={152} w={160} h={36} label="Access token + scope" sub="e.g. patient/Observation.read" />
       <DLine x1={150} y1={188} x2={150} y2={200} />
       <DBox x={60} y={200} w={180} h={26} label="FHIR API — only what the scope allows" />
+    </svg>
+  );
+}
+
+function DiagramCopilotLicensingGrounding() {
+  return (
+    <svg viewBox="0 0 340 380" style={{ width: '100%', height: 'auto' }}>
+      <DBox x={15} y={8} w={145} h={42} label="Base + Copilot add-on" sub="both required, per user" />
+      <DBox x={180} y={8} w={145} h={42} label="Entra work account only" sub="no add-on purchased" />
+      <DLine x1={87} y1={50} x2={87} y2={72} />
+      <DLine x1={252} y1={50} x2={252} y2={72} />
+      <DBox x={15} y={72} w={145} h={32} label="Microsoft 365 Copilot" sub="paid, Semantic Index grounding" />
+      <DBox x={180} y={72} w={145} h={32} label="Copilot Chat" sub="free, web + limited grounding" />
+      <DCaption x={170} y={120} text="Real Copilot usage can exist with zero paid licenses" />
+      <DLine x1={87} y1={104} x2={210} y2={150} />
+      <DBox x={140} y={150} w={140} h={28} label="User asks Copilot" />
+      <DLine x1={210} y1={178} x2={210} y2={196} />
+      <DBox x={140} y={196} w={140} h={30} label="Permission check" sub="existing SharePoint/OneDrive ACLs" />
+      <DLine x1={210} y1={226} x2={210} y2={244} />
+      <DBox x={140} y={244} w={140} h={34} label="Semantic Index" sub="built only from what user can open" />
+      <DLine x1={210} y1={278} x2={210} y2={296} />
+      <DBox x={140} y={296} w={140} h={30} label="Grounded response" sub="no new access granted" />
+      <DBox x={10} y={196} w={120} h={30} label="Overshared site" sub="'Anyone in org' link" />
+      <DLine x1={130} y1={218} x2={140} y2={250} />
+      <DBox x={10} y={244} w={120} h={44} label="Restricted SharePoint Search" sub="excludes it — ACLs unchanged" />
+      <DLine x1={70} y1={226} x2={70} y2={244} />
+      <line x1={130} y1={262} x2={140} y2={260} stroke={COLOR.primary} strokeWidth="1.3" strokeDasharray="4 3" />
+      <DCaption x={170} y={344} text="No-new-access: Copilot can't surface anything the user" />
+      <DCaption x={170} y={356} text="couldn't already open — oversharing is the real risk" />
     </svg>
   );
 }
@@ -526,6 +641,34 @@ function DiagramMasterPatientIndexMatching() {
   );
 }
 
+function DiagramDspmAgentGovernance() {
+  return (
+    <svg viewBox="0 0 340 360" style={{ width: '100%', height: 'auto' }}>
+      <DBox x={20} y={8} w={140} h={38} label="DSPM for AI" sub="discovers oversharing & AI risk" />
+      <DBox x={180} y={8} w={140} h={38} label="Purview DLP for Copilot" sub="enforces: blocks the content" />
+      <line x1={160} y1={27} x2={180} y2={27} stroke={COLOR.primary} strokeWidth="1.3" strokeDasharray="4 3" />
+      <DCaption x={170} y={58} text="DSPM reports the risk; a DLP policy is what blocks it" />
+      <DBox x={10} y={90} w={75} h={34} label="Inventory" sub="agents" />
+      <DBox x={95} y={90} w={75} h={34} label="Review" sub="data access" />
+      <DBox x={180} y={90} w={75} h={34} label="Monitor" sub="behavior" />
+      <DBox x={265} y={90} w={75} h={34} label="Disable" sub="/ remediate" />
+      <DLine x1={85} y1={107} x2={95} y2={107} />
+      <DLine x1={170} y1={107} x2={180} y2={107} />
+      <DLine x1={255} y1={107} x2={265} y2={107} />
+      <polyline points="302,124 302,142 10,142 10,124" fill="none" stroke={COLOR.primary} strokeWidth="1.3" strokeDasharray="4 3" />
+      <DCaption x={170} y={158} text="An ongoing lifecycle, not a one-time approval at creation" />
+      <DBox x={90} y={180} w={160} h={30} label="Copilot prompts & responses" />
+      <DLine x1={170} y1={210} x2={170} y2={228} />
+      <DBox x={90} y={228} w={160} h={28} label="Audit log" />
+      <DLine x1={170} y1={256} x2={90} y2={286} />
+      <DLine x1={170} y1={256} x2={250} y2={286} />
+      <DBox x={20} y={286} w={140} h={34} label="eDiscovery" sub="search / legal hold" />
+      <DBox x={180} y={286} w={140} h={34} label="Insider Risk Mgmt" sub="weighs risky prompts" />
+      <DCaption x={170} y={344} text="A risky prompt can be caught before a file is ever touched" />
+    </svg>
+  );
+}
+
 const LESSON_DIAGRAMS = {
   serviceModels: DiagramServiceModels,
   hierarchy: DiagramHierarchy,
@@ -551,5 +694,10 @@ const LESSON_DIAGRAMS = {
   smartOnFhirLaunchFlow: DiagramSmartOnFhirLaunchFlow,
   integrationEngineHubSpoke: DiagramIntegrationEngineHubSpoke,
   masterPatientIndexMatching: DiagramMasterPatientIndexMatching,
+  agentIdentityGovernance: DiagramAgentIdentityGovernance,
+  defenderSentinelPipeline: DiagramDefenderSentinelPipeline,
+  purviewProtectionFlow: DiagramPurviewProtectionFlow,
+  copilotLicensingGrounding: DiagramCopilotLicensingGrounding,
+  dspmAgentGovernance: DiagramDspmAgentGovernance,
 };
 
