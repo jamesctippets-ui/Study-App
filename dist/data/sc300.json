@@ -466,7 +466,7 @@
       "options": [
         "The policy still applies because it targets the application, regardless of group membership",
         "The policy applies but grants access without requiring a compliant device",
-        "The sign-in is automatically blocked because the user is not in the assigned group",
+        "The sign-in is automatically blocked, since being outside the scoped group is treated as an automatic deny rather than a non-match",
         "The policy does not apply to this sign-in, since the user is outside the scoped assignment"
       ],
       "correct": 3,
@@ -520,9 +520,9 @@
       "type": "mc",
       "question": "Microsoft Entra ID Protection flags a user's credentials as leaked on the dark web, while a completely separate, unrelated sign-in from that same user is judged low risk. What is the correct interpretation?",
       "options": [
-        "Both the user risk and sign-in risk are automatically set to the same level, since they always match",
+        "Both the user risk and sign-in risk are automatically set to the same level, since one is derived directly from the other",
         "The low sign-in risk score overrides and clears the leaked-credential user risk detection",
-        "Leaked credentials only affect sign-in risk, never user risk",
+        "Leaked credentials are treated purely as a sign-in risk signal rather than an identity-level user risk signal",
         "The leaked credential raises user risk regardless of that sign-in's own risk level, since user risk and sign-in risk are evaluated independently"
       ],
       "correct": 3,
@@ -704,7 +704,7 @@
       "options": [
         "A PIM eligible assignment with activation requiring MFA, justification, and a maximum duration",
         "A permanent Entra ID directory role assignment",
-        "A dynamic security group combined with a Conditional Access MFA requirement",
+        "A dynamic security group combined with a Conditional Access policy requiring MFA, justification, and a maximum session duration",
         "An access package granting the role with a 90-day expiration"
       ],
       "correct": 0,
@@ -719,7 +719,7 @@
         "The role activates immediately once MFA and justification are supplied",
         "The request is routed to a designated approver, who must explicitly approve it before the role becomes active",
         "The request is automatically approved after 24 hours with no reviewer action",
-        "The role never activates once approval is required, regardless of any approver action"
+        "The activation request simply expires unfulfilled after 24 hours if no approver responds, with the role never becoming active from that request"
       ],
       "correct": 1,
       "explanation": "When a PIM role setting requires approval, MFA and justification alone are not sufficient -- the request is routed to a designated approver who must explicitly approve it before the role actually becomes active. It does not activate automatically, immediately, or after a timeout with no reviewer action."
@@ -1199,6 +1199,132 @@
         2
       ],
       "explanation": "Sign-in frequency forces reauthentication at a defined interval rather than letting the token ride out its full lifetime, and disabling the persistent browser session control prevents the browser from staying signed in after it is closed. Session controls act on a session that has already been allowed to start, applied after grant controls are evaluated rather than deciding whether it starts, and they are not restricted to sign-ins that specifically used a device compliance grant control."
+    },
+    {
+      "id": "q38",
+      "cat": "userIdentities",
+      "type": "mc",
+      "question": "Which Microsoft Entra ID feature lets an administrator create, update, or delete up to hundreds of user accounts at once from a single CSV file, rather than one at a time in the portal?",
+      "options": [
+        "Bulk operations (bulk create/update/delete)",
+        "Dynamic groups",
+        "Administrative units",
+        "Entitlement management"
+      ],
+      "correct": 0,
+      "explanation": "Bulk operations use a Microsoft-provided CSV template to create, update, or delete many user accounts in one pass, instead of one at a time in the portal. Dynamic groups automate group membership rather than account creation, administrative units scope role assignments, and entitlement management handles requestable access bundles -- none of these create user accounts in bulk."
+    },
+    {
+      "id": "q39",
+      "cat": "userIdentities",
+      "type": "mc",
+      "question": "Users at a company are creating self-service Microsoft 365 groups with inconsistent, sometimes inappropriate names, and IT wants every self-service group name to automatically get a department-based prefix and a list of blocked words enforced, without disabling self-service group creation entirely. What should be configured?",
+      "options": [
+        "A group naming policy with a prefix/suffix template and a custom blocked words list",
+        "A Conditional Access policy scoped to group creation",
+        "An access review scheduled for all groups",
+        "Disabling Microsoft 365 Groups tenant-wide"
+      ],
+      "correct": 0,
+      "explanation": "A group naming policy enforces a prefix/suffix template and a custom blocked words list automatically at creation time, letting self-service creation continue under those guardrails. Conditional Access doesn't govern group naming, an access review only reassesses existing membership rather than naming, and disabling Microsoft 365 Groups entirely removes the self-service capability the scenario wants to keep."
+    },
+    {
+      "id": "q40",
+      "cat": "authAccessMgmt",
+      "type": "mc",
+      "question": "A Conditional Access policy requires MFA for all sign-ins except from the corporate office's trusted named location. An employee works from the office one day and travels the next, connecting from a hotel network. What should the employee expect on each day respectively?",
+      "options": [
+        "No MFA prompt from the trusted office location; an MFA prompt from the untrusted hotel network",
+        "An MFA prompt in both cases, since named locations only affect Conditional Access reporting, not enforcement",
+        "No MFA prompt in either case, since the policy only evaluates device compliance",
+        "An MFA prompt only from the office, since named locations force MFA rather than exempt it"
+      ],
+      "correct": 0,
+      "explanation": "The policy excludes the trusted named location from its MFA requirement, so the office sign-in skips the prompt while the untrusted hotel network still falls under the requirement and gets prompted. Named locations do actively affect enforcement, not just reporting, this policy is location-based rather than device-compliance-based, and the exclusion works in the direction of exempting the trusted location, not forcing MFA there."
+    },
+    {
+      "id": "q41",
+      "cat": "authAccessMgmt",
+      "type": "mc",
+      "question": "A Conditional Access session control sets sign-in frequency to 4 hours and also disables persistent browser sessions, for sign-ins from unmanaged devices. A user signs in from a personal unmanaged laptop, closes the browser after 30 minutes, then reopens it an hour later. What happens?",
+      "options": [
+        "The user must reauthenticate, since disabling persistent browser sessions ends the session when the browser closes, regardless of how much of the 4-hour sign-in frequency window is still remaining",
+        "The user stays signed in without any prompt, since the 4-hour sign-in frequency window hasn't elapsed yet",
+        "The user is permanently signed out and must contact an administrator to regain access",
+        "The persistent browser session setting only affects mobile apps, not desktop browsers, so the user stays signed in"
+      ],
+      "correct": 0,
+      "explanation": "Disabling persistent browser sessions makes closing the browser itself end the session, independent of how much of the sign-in frequency window remains -- the two controls operate at different layers, and the stricter one applies here. The sign-in frequency window alone would have kept the user signed in, but that's overridden by the disabled persistent session setting; there's no permanent lockout, and the persistent browser session control does apply to desktop browser sessions."
+    },
+    {
+      "id": "q42",
+      "cat": "authAccessMgmt",
+      "type": "mc",
+      "question": "Two Conditional Access policies both apply to the same sign-in: Policy A requires a compliant device, and Policy B requires MFA. The user's device is compliant but they haven't completed MFA yet. What is the outcome?",
+      "options": [
+        "Access is blocked until the user satisfies both grant controls, since when multiple policies apply, all of their required grant controls must be satisfied together",
+        "Access is granted, since satisfying either policy's grant control alone is sufficient",
+        "Only the most recently created policy's grant control is enforced, and the other is ignored",
+        "Access is blocked outright with no way to satisfy Policy B, since MFA can't be combined with a device compliance requirement"
+      ],
+      "correct": 0,
+      "explanation": "When multiple Conditional Access policies apply to the same sign-in, all of their grant controls must be satisfied together -- an AND relationship across policies, not an OR -- so being compliant alone isn't enough if a separate policy also requires MFA. There's no 'most recently created policy wins' precedence, and nothing prevents a device-compliance and an MFA requirement from applying together; the user simply needs to complete MFA too."
+    },
+    {
+      "id": "q43",
+      "cat": "workloadIdentities",
+      "type": "mc",
+      "question": "A developer wants their app registration to accept sign-ins only from users inside their own organization's tenant, not from any other organization or personal Microsoft account. Which app registration setting controls this?",
+      "options": [
+        "Supported account types, set to single-tenant",
+        "The API permissions blade",
+        "The redirect URI configuration",
+        "The app's certificate and secrets configuration"
+      ],
+      "correct": 0,
+      "explanation": "Supported account types is the setting that scopes who can sign in to the app -- single-tenant restricts it to the home organization only, while other options allow multi-tenant or personal Microsoft accounts too. API permissions govern what the app can access after sign-in, redirect URIs govern where the auth response is sent, and certificates/secrets are credentials for the app itself, none of which control who is allowed to sign in."
+    },
+    {
+      "id": "q44",
+      "cat": "workloadIdentities",
+      "type": "mc",
+      "question": "A security team wants to restrict a specific service principal (a workload identity used by an automated pipeline) so it can only authenticate from a specific set of known IP ranges, blocking it if it attempts to authenticate from anywhere else. Which feature applies Conditional Access controls to a workload identity like this, rather than to a human user?",
+      "options": [
+        "A Conditional Access policy scoped to workload identities, targeting the specific service principal",
+        "A standard Conditional Access policy scoped to a group of users, since service principals automatically inherit user-targeted policies",
+        "An access package granting the service principal a location-restricted entitlement",
+        "A PIM eligible assignment scoped to the service principal's IP range"
+      ],
+      "correct": 0,
+      "explanation": "Conditional Access for workload identities is a distinct policy scope built specifically to apply controls like location conditions to service principals and managed identities, separate from user-targeted policies, which service principals do not automatically inherit. Access packages and PIM govern human-requestable access and role activation, not authentication-time conditions for a non-interactive workload identity."
+    },
+    {
+      "id": "q45",
+      "cat": "identityGovernance",
+      "type": "mc",
+      "question": "An access review is configured with a single named reviewer, who leaves the company mid-cycle and never completes their review before the review period ends. With no fallback reviewer configured, what happens to the access under review by default?",
+      "options": [
+        "The configured default decision (such as auto-approve, auto-deny, or no change) is applied automatically when the review period ends with no reviewer action",
+        "The review is automatically extended indefinitely until a new reviewer is manually assigned",
+        "The access is immediately revoked regardless of the review's configured settings",
+        "The review silently cancels itself with no effect on the access at all"
+      ],
+      "correct": 0,
+      "explanation": "An access review's configured default decision (auto-approve, auto-deny, or no change) is exactly what applies automatically when the review period elapses with no reviewer action, rather than the review extending indefinitely, revoking access unconditionally, or quietly doing nothing."
+    },
+    {
+      "id": "q46",
+      "cat": "identityGovernance",
+      "type": "mc",
+      "question": "An employee's last day is processed through a leaver lifecycle workflow that disables their account and removes their direct group memberships. That same employee also holds access granted through an entitlement management access package with its own separate expiration date still months away. What happens to that access-package-granted access?",
+      "options": [
+        "It remains technically still granted per the access package's own expiration, unless the leaver workflow (or a separate task) is specifically configured to also remove access-package assignments",
+        "It is automatically revoked the moment the account is disabled, since a disabled account can never hold any access package assignment",
+        "Access packages have no expiration concept, so this access was never time-limited in the first place",
+        "The leaver workflow always removes every access package assignment as a built-in, non-configurable step"
+      ],
+      "correct": 0,
+      "explanation": "Removing direct group memberships and disabling the account through a leaver workflow doesn't automatically also revoke a separately tracked access package assignment -- that needs its own explicit removal task (or the package's own expiration or access review) unless specifically configured as part of the workflow. Disabling an account doesn't itself auto-revoke every access package grant, access packages absolutely do support expiration, and the leaver workflow's built-in tasks are configurable rather than a fixed set that always includes access package removal."
     }
   ],
   "cheatSheet": [
@@ -1275,6 +1401,92 @@
         "An external partner needing occasional access without a licensed account in your tenant is a B2B guest scenario, not B2C and not a regular member account.",
         "Blocking or limiting behavior after sign-in \u2014 forcing reauthentication, restricting downloads in a browser \u2014 is a Conditional Access session control, not a grant control."
       ]
+    }
+  ],
+  "madlibs": [
+    {
+      "id": "ml-sc300-1",
+      "cat": "userIdentities",
+      "scenario": "A company wants passwords validated in real time against on-premises Active Directory during every cloud sign-in, with no password hash of any kind ever stored in Microsoft Entra ID \u2014 that calls for {b1}. A different team instead just wants a hash of the password hash synced to the cloud so sign-in keeps working even during a brief on-premises outage \u2014 that's {b2}.",
+      "blanks": [
+        {
+          "key": "b1",
+          "options": [
+            "Pass-through Authentication (PTA)",
+            "Password Hash Sync (PHS)",
+            "Federation with AD FS",
+            "Seamless single sign-on"
+          ],
+          "correct": 0
+        },
+        {
+          "key": "b2",
+          "options": [
+            "Pass-through Authentication (PTA)",
+            "Password Hash Sync (PHS)",
+            "Federation with AD FS",
+            "Password writeback"
+          ],
+          "correct": 1
+        }
+      ],
+      "explanation": "PTA validates each sign-in directly against on-premises AD via a lightweight agent, storing no password hash in the cloud at all. PHS instead syncs a hash of the password hash to Entra ID, letting sign-in succeed even if on-premises AD is briefly unreachable \u2014 the opposite resilience trade-off from PTA."
+    },
+    {
+      "id": "ml-sc300-2",
+      "cat": "authAccessMgmt",
+      "scenario": "Microsoft Entra ID Protection flags a user's credentials as leaked on the dark web, which raises their {b1} \u2014 a signal evaluated independently of any single sign-in attempt. A completely separate authentication attempt from an unfamiliar location and impossible travel pattern instead raises {b2}, judged purely on that one attempt's own signals.",
+      "blanks": [
+        {
+          "key": "b1",
+          "options": [
+            "user risk",
+            "sign-in risk",
+            "device compliance",
+            "application risk"
+          ],
+          "correct": 0
+        },
+        {
+          "key": "b2",
+          "options": [
+            "user risk",
+            "sign-in risk",
+            "device compliance",
+            "application risk"
+          ],
+          "correct": 1
+        }
+      ],
+      "explanation": "User risk reflects the likelihood a user's identity itself is compromised (such as from leaked credentials) and is tracked independently of any one sign-in. Sign-in risk instead judges the authenticity of one specific sign-in attempt, based on signals like impossible travel \u2014 the two are evaluated and remediated separately, not combined into one score."
+    },
+    {
+      "id": "ml-sc300-3",
+      "cat": "identityGovernance",
+      "scenario": "On-call engineers need the Exchange Administrator role only when needed, requiring MFA and justification, for a maximum of four hours \u2014 that calls for a PIM {b1} assignment rather than a {b2} one that would leave them holding the role at all times.",
+      "blanks": [
+        {
+          "key": "b1",
+          "options": [
+            "eligible",
+            "permanent",
+            "active",
+            "standing"
+          ],
+          "correct": 0
+        },
+        {
+          "key": "b2",
+          "options": [
+            "eligible",
+            "permanent",
+            "time-bound",
+            "just-in-time"
+          ],
+          "correct": 1
+        }
+      ],
+      "explanation": "An eligible assignment requires an explicit activation step, with MFA, justification, and a maximum duration, before the role becomes active \u2014 exactly the just-in-time model this scenario needs. A permanent (active, standing) assignment instead grants the role continuously with no activation step, which is precisely the always-on access the on-call team wants to avoid."
     }
   ]
 }
