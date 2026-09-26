@@ -195,8 +195,13 @@ counter, all computed from progress already being tracked, no new data
 entry required. A gear **Data & progress** button opens export/import
 (download all progress as a JSON file, or restore from one — the only
 backup/device-migration option, since the app has no accounts) alongside
-the existing per-track reset. Both use small wireframe (line-art) icons
-rather than emoji, matching the hamburger menu below.
+the existing per-track reset and a **Voice & speech** section — a rate
+slider and a voice picker (from `speechSynthesis.getVoices()`, English
+voices sorted first) for every 🔊 Listen button in the app, with a
+"Test voice" preview button. Both the theme and these speech settings are
+per-device localStorage preferences, not synced progress. Both use small
+wireframe (line-art) icons rather than emoji, matching the hamburger menu
+below.
 
 Opening the app always lands on **Home** (`HomeView` in `04_shared_ui.jsx`)
 rather than resuming the last track+mode directly — a real dashboard to

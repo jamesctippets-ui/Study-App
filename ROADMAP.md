@@ -860,22 +860,33 @@ trading away for shinier but shallower ones.
 
 ## 16. Text-to-speech revamp & a hands-free "Verbal Quiz" mode (user's idea)
 
-Today's TTS is minimal: a single per-item "Listen" button (readings,
-flashcard fronts/backs) that calls the browser's `SpeechSynthesisUtterance`
-API at a fixed 0.95 rate, no voice picker, no auto-advance — you tap it once
-per item and it reads that one thing (`speak()` in `06_app.jsx`). Two asks
-here: make that existing TTS more capable, and build an entirely new mode on
-top of it for studying hands-free — the driving use case specifically.
+TTS started minimal: a single per-item "Listen" button (readings, flashcard
+fronts/backs) that called the browser's `SpeechSynthesisUtterance` API at a
+fixed 0.95 rate, no voice picker, no auto-advance — you tap it once per item
+and it reads that one thing (`speak()` in `06_app.jsx`). Two asks here: make
+that existing TTS more capable (done — see below), and build an entirely new
+mode on top of it for studying hands-free — the driving use case
+specifically (still open).
 
-- [ ] **TTS revamp.** A rate control (browser voices tend to default a
-  little fast for actually absorbing new material) and a voice picker
-  (`speechSynthesis.getVoices()` already exposes the installed system/
-  browser voices — currently unused). Both are cheap, since the app
-  already funnels every utterance through one `speak()` function; a
-  chosen rate/voice would just need to persist alongside the theme
-  setting (a per-device preference, not synced progress, matching how
-  the theme toggle already works) and get threaded into every
-  `SpeechSynthesisUtterance` this function creates.
+- [x] **TTS revamp.** Shipped as a new "Voice & speech" section in the
+  Data & Progress panel (`DataPanel` in 04_shared_ui.jsx): a rate slider
+  (0.6×–1.4×, step 0.05) and a voice `<select>` populated from
+  `speechSynthesis.getVoices()` (English voices sorted first, since all
+  of this app's content is English, but every installed voice stays
+  selectable), plus a "Test voice" button that speaks a sample sentence
+  with the current settings so you can preview before committing. Both
+  persist via a new `useTtsPrefs()` hook (00_preamble.js) — same
+  per-device-only localStorage pattern as `useTheme`, keyed by
+  `voiceURI` rather than name/index since a browser's voice list can
+  reorder between sessions. `speak()` (06_app.jsx) now reads the saved
+  rate/voice on every call instead of a hardcoded 0.95, so the existing
+  per-item Listen button picks up the new settings everywhere it's used —
+  no changes needed to `SpeakButton` or any of its call sites (flashcards,
+  lesson vocab/fundamentals, etc.), since `speak()` is a single shared
+  function. Voice loading handles the well-known async-population quirk
+  (`getVoices()` often returns empty on the very first call in Chrome
+  until a `voiceschanged` event fires) by listening for that event as
+  well as calling it eagerly on mount.
 - [ ] **Verbal Quiz mode — hands-free, distraction-free studying (e.g.
   while driving).** A dedicated quiz flow with no screen interaction
   required once started: reads the question and its options aloud, then

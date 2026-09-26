@@ -189,6 +189,36 @@ function useTheme() {
   return [theme, toggleTheme];
 }
 
+// Same reasoning as THEME_STORAGE_KEY above: speech rate/voice is a
+// per-device audio preference, not study progress, so it stays in plain
+// localStorage rather than syncing through the app's cloud/local save
+// pipeline. voiceURI (not voice name/index) is what's stored since a
+// browser's voice list can reorder or vary between sessions — a saved
+// index would silently pick the wrong voice next time.
+const TTS_STORAGE_KEY = 'certStudyHub_ttsPrefs';
+const DEFAULT_TTS_RATE = 0.95;
+
+function useTtsPrefs() {
+  const [ttsRate, setTtsRateState] = useState(DEFAULT_TTS_RATE);
+  const [ttsVoiceURI, setTtsVoiceURIState] = useState('');
+
+  useEffect(() => {
+    try {
+      const saved = JSON.parse(localStorage.getItem(TTS_STORAGE_KEY) || '{}');
+      if (typeof saved.rate === 'number' && saved.rate >= 0.5 && saved.rate <= 2) setTtsRateState(saved.rate);
+      if (typeof saved.voiceURI === 'string') setTtsVoiceURIState(saved.voiceURI);
+    } catch (e) { /* localStorage unavailable or corrupt — keep defaults */ }
+  }, []);
+
+  const persist = (rate, voiceURI) => {
+    try { localStorage.setItem(TTS_STORAGE_KEY, JSON.stringify({ rate, voiceURI })); } catch (e) { /* ignore */ }
+  };
+  const setTtsRate = (rate) => { setTtsRateState(rate); persist(rate, ttsVoiceURI); };
+  const setTtsVoiceURI = (voiceURI) => { setTtsVoiceURIState(voiceURI); persist(ttsRate, voiceURI); };
+
+  return { ttsRate, ttsVoiceURI, setTtsRate, setTtsVoiceURI };
+}
+
 // A real sliding switch (not just an icon button) per the user's request —
 // track shows both a sun and a moon so the target state is visible even
 // before tapping, thumb slides to whichever side is currently active.

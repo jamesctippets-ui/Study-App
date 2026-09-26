@@ -42,6 +42,8 @@ function CertStudyApp() {
   const [msPending, setMsPending] = useState([]);
   const [speakingId, setSpeakingId] = useState(null);
   const speechSupported = typeof window !== 'undefined' && 'speechSynthesis' in window;
+  const { ttsRate, ttsVoiceURI, setTtsRate, setTtsVoiceURI } = useTtsPrefs();
+  const [ttsVoices, setTtsVoices] = useState([]);
 
   const [examTrack, setExamTrack] = useState(null);
   const [examSession, setExamSession] = useState([]);
@@ -305,7 +307,11 @@ function CertStudyApp() {
     window.speechSynthesis.cancel();
     if (speakingId === id) { setSpeakingId(null); return; }
     const utter = new SpeechSynthesisUtterance(text);
-    utter.rate = 0.95;
+    utter.rate = ttsRate;
+    if (ttsVoiceURI) {
+      const voice = ttsVoices.find((v) => v.voiceURI === ttsVoiceURI);
+      if (voice) utter.voice = voice;
+    }
     utter.onend = () => setSpeakingId(null);
     utter.onerror = () => setSpeakingId(null);
     // Keep a reference so the utterance isn't garbage-collected mid-speech
@@ -322,6 +328,19 @@ function CertStudyApp() {
 
   useEffect(() => {
     return () => { if (speechSupported) window.speechSynthesis.cancel(); };
+    // eslint-disable-next-line
+  }, []);
+
+  // Chrome (and others) populate the voice list asynchronously — it's
+  // often empty on the very first call, then fires 'voiceschanged' once
+  // real voices are ready. Reading it both ways covers browsers that never
+  // fire that event too (it's already populated by the time this runs).
+  useEffect(() => {
+    if (!speechSupported) return;
+    const loadVoices = () => setTtsVoices(window.speechSynthesis.getVoices());
+    loadVoices();
+    window.speechSynthesis.addEventListener('voiceschanged', loadVoices);
+    return () => window.speechSynthesis.removeEventListener('voiceschanged', loadVoices);
     // eslint-disable-next-line
   }, []);
 
@@ -925,6 +944,14 @@ function CertStudyApp() {
           importMessage={importMessage}
           onReset={doReset}
           onClose={() => setShowData(false)}
+          speechSupported={speechSupported}
+          ttsVoices={ttsVoices}
+          ttsRate={ttsRate}
+          ttsVoiceURI={ttsVoiceURI}
+          onSetTtsRate={setTtsRate}
+          onSetTtsVoiceURI={setTtsVoiceURI}
+          onTestVoice={() => speak('__tts_test__', 'This is how flashcards and questions will sound when read aloud.')}
+          isTestSpeaking={speakingId === '__tts_test__'}
         />
       )}
       <div style={{ background: COLOR.navBar, borderBottom: `1px solid ${COLOR.border}`, boxShadow: '0 1px 4px rgba(0,0,0,0.12)', position: 'relative', zIndex: 1 }}>

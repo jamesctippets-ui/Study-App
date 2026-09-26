@@ -75,10 +75,24 @@ function AchievementsPanel({ achievements, streak, onClose }) {
   );
 }
 
-function DataPanel({ trackLabel, onExport, onImportFile, importMessage, onReset, onClose }) {
+function DataPanel({
+  trackLabel, onExport, onImportFile, importMessage, onReset, onClose,
+  speechSupported, ttsVoices, ttsRate, ttsVoiceURI, onSetTtsRate, onSetTtsVoiceURI, onTestVoice, isTestSpeaking,
+}) {
   useEscapeToClose(onClose);
   const [confirmingReset, setConfirmingReset] = useState(false);
   const fileInputRef = useRef(null);
+  // English voices first (this app's own content is all English), but never
+  // hide the rest — a bilingual user may still want their OS's other voices.
+  const sortedVoices = useMemo(() => {
+    if (!ttsVoices || !ttsVoices.length) return [];
+    return [...ttsVoices].sort((a, b) => {
+      const aEn = a.lang.startsWith('en') ? 0 : 1;
+      const bEn = b.lang.startsWith('en') ? 0 : 1;
+      if (aEn !== bEn) return aEn - bEn;
+      return a.name.localeCompare(b.name);
+    });
+  }, [ttsVoices]);
   return (
     <div
       onClick={onClose}
@@ -96,6 +110,48 @@ function DataPanel({ trackLabel, onExport, onImportFile, importMessage, onReset,
           <div className="itil-display" style={{ fontSize: '18px', fontWeight: 600 }}>Data & Progress</div>
           <button onClick={onClose} className="btn-flat" style={{ color: COLOR.muted, fontSize: '15px', padding: '4px' }}>✕</button>
         </div>
+
+        {speechSupported && (
+          <div style={{ marginTop: '14px', padding: '14px', borderRadius: '14px', background: COLOR.surface, border: `1px solid ${COLOR.border}` }}>
+            <div style={{ fontSize: '13.5px', fontWeight: 600, marginBottom: '4px' }}>Voice &amp; speech</div>
+            <div style={{ fontSize: '11.5px', color: COLOR.muted, marginBottom: '10px', lineHeight: 1.4 }}>
+              Controls every 🔊 Listen button, plus Verbal Quiz mode. Saved on this device only.
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', marginBottom: '4px' }}>
+              <span>Speed</span>
+              <span style={{ color: COLOR.muted }}>{ttsRate.toFixed(2)}×</span>
+            </div>
+            <input
+              type="range"
+              min="0.6"
+              max="1.4"
+              step="0.05"
+              value={ttsRate}
+              onChange={(e) => onSetTtsRate(parseFloat(e.target.value))}
+              style={{ width: '100%', marginBottom: '10px' }}
+            />
+            <div style={{ fontSize: '12px', marginBottom: '4px' }}>Voice</div>
+            <select
+              value={ttsVoiceURI || ''}
+              onChange={(e) => onSetTtsVoiceURI(e.target.value)}
+              style={{
+                width: '100%', padding: '9px 10px', borderRadius: '10px', marginBottom: '10px',
+                background: COLOR.surfaceRaised, border: `1px solid ${COLOR.border}`, color: COLOR.text, fontSize: '13px',
+              }}
+            >
+              <option value="">Browser default</option>
+              {sortedVoices.map((v) => (
+                <option key={v.voiceURI} value={v.voiceURI}>{v.name} ({v.lang})</option>
+              ))}
+            </select>
+            <button
+              onClick={onTestVoice}
+              style={{ width: '100%', padding: '10px', borderRadius: '10px', background: 'transparent', border: `1px solid ${COLOR.primary}`, color: COLOR.primary, fontSize: '13px', fontWeight: 600 }}
+            >
+              {isTestSpeaking ? '⏸ Stop' : '▶ Test voice'}
+            </button>
+          </div>
+        )}
 
         <div style={{ marginTop: '14px', padding: '14px', borderRadius: '14px', background: COLOR.surface, border: `1px solid ${COLOR.border}` }}>
           <div style={{ fontSize: '13.5px', fontWeight: 600, marginBottom: '4px' }}>Export progress</div>
