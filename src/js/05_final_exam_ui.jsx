@@ -184,6 +184,12 @@ function ExamResults({ result, config, track, categories, onRestart }) {
                     {m.explanation}
                   </div>
                 )}
+                {m.whyTested && (
+                  <div style={{ marginTop: '6px', padding: '8px 10px', borderRadius: '8px', background: `${COLOR.teal}14`, border: `1px solid ${COLOR.teal}`, fontSize: '11.5px', lineHeight: 1.5, color: COLOR.text }}>
+                    <div style={{ fontSize: '9.5px', fontWeight: 700, color: COLOR.teal, textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: '3px' }}>Why this is tested</div>
+                    {m.whyTested}
+                  </div>
+                )}
               </div>
             ))}
           </div>

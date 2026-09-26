@@ -465,6 +465,7 @@ QUESTIONS = [
         'options': ['IaaS', 'PaaS', 'SaaS', 'A Reserved Instance commitment on a single VM family'],
         'correct': 0,
         'explanation': "IaaS resources like VMs are the most portable between providers, since they're closer to raw infrastructure. PaaS launches faster but leans on provider-specific platform features that make leaving harder — a real trade-off, and the question asks which priority wins. A Reserved Instance is a pricing commitment, not a service model, and doesn't address portability at all.",
+        'whyTested': "AZ-900 likes stacking two competing priorities (speed today vs. portability later) in one scenario to see if you'll default to the 'easiest'-sounding answer instead of the one the question actually asked for — real projects make this exact trade-off, so exams probe whether you noticed which priority was stated as the deciding one.",
     },
     {
         'id': 'q2',
@@ -1734,6 +1735,7 @@ The service models follow a similar idea: IaaS is like leasing an empty apartmen
             'Elasticity is automatic scaling specifically; plain scalability can also be manual.',
         ],
         'scenario': "A small business currently owns three aging physical servers that need replacing every few years. Moving their line-of-business app to an Azure VM (IaaS) removes the hardware purchase entirely, shifting that cost to a monthly bill. If they later decide they don't want to manage patching either, moving that same app to App Service (PaaS) removes that burden too — at the cost of some control over the underlying environment.",
+        'onTheJob': "In practice, the CapEx-to-OpEx pitch is what actually gets a cloud migration approved — finance teams often care more about moving a purchase off the balance sheet than about the technology itself. Expect \"which service model\" conversations to really be about who's on the hook when something breaks at 2am: IaaS means your team gets paged for OS patches and VM health, PaaS means Microsoft's SLA covers the runtime and your team only owns the app and its data.",
     },
     {
         'id': 'governance-structure',

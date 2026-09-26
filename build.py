@@ -144,6 +144,9 @@ def validate():
             if "image" in q and not q["image"].strip():
                 errors.append(f"[{key}] question '{qid}' has an empty 'image' field")
 
+            if "whyTested" in q and not q["whyTested"].strip():
+                errors.append(f"[{key}] question '{qid}' has an empty 'whyTested' field")
+
         cheat_sheet = getattr(mod, "CHEAT_SHEET", [])
         if not cheat_sheet:
             errors.append(f"[{key}] is missing a CHEAT_SHEET")
@@ -263,6 +266,8 @@ def validate():
                         errors.append(
                             f"[{key}] lesson '{lesson['id']}' {ref_field} references unknown id '{ref_id}'"
                         )
+            if "onTheJob" in lesson and not lesson["onTheJob"].strip():
+                errors.append(f"[{key}] lesson '{lesson['id']}' has an empty 'onTheJob' field")
 
     if errors:
         print("Data validation failed:", file=sys.stderr)

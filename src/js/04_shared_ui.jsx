@@ -2190,6 +2190,15 @@ function LessonDetail({ lesson, flashcardsData, questionsData, categories, onBac
         </div>
       )}
 
+      {lesson.onTheJob && (
+        <div style={{ marginBottom: '16px' }}>
+          <div style={{ fontSize: '13px', fontWeight: 600, color: COLOR.teal, marginBottom: '8px' }}>On the job</div>
+          <div style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderLeft: `3px solid ${COLOR.teal}`, borderRadius: '10px', padding: '12px 14px' }}>
+            <p style={{ fontSize: '13.5px', lineHeight: 1.6, color: COLOR.text }}>{lesson.onTheJob}</p>
+          </div>
+        </div>
+      )}
+
       <button
         onClick={() => setShowFundamentals((s) => !s)}
         style={{ width: '100%', textAlign: 'left', background: COLOR.surfaceRaised, border: `1px solid ${COLOR.border}`, borderRadius: '12px', padding: '12px', marginBottom: showFundamentals ? '0' : '16px', fontSize: '12px', color: COLOR.primary, fontWeight: 600 }}
@@ -2966,6 +2975,13 @@ function QuestionView({ q, selected, onChoose, onNext, index, total, categoryLab
             {autoHighlightTerms(q.explanation, flashcardsData, activeTermKey, setActiveTermKey)}
           </div>
         )}
+
+        {selected !== null && q.whyTested && (
+          <div style={{ marginTop: '10px', padding: '12px', borderRadius: '10px', background: `${COLOR.teal}14`, border: `1px solid ${COLOR.teal}`, fontSize: '12.5px', lineHeight: 1.5, color: COLOR.text }}>
+            <div style={{ fontSize: '10.5px', fontWeight: 700, color: COLOR.teal, textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: '4px' }}>Why this is tested</div>
+            {q.whyTested}
+          </div>
+        )}
       </div>
 
       {selected !== null && !hideNext && (
@@ -3015,6 +3031,12 @@ function QuizSummary({ score, answers, categories, onRestart }) {
                 {m.explanation && (
                   <div style={{ marginTop: '6px', paddingTop: '6px', borderTop: `1px solid ${COLOR.border}`, fontSize: '12px', color: COLOR.muted, lineHeight: 1.5 }}>
                     {m.explanation}
+                  </div>
+                )}
+                {m.whyTested && (
+                  <div style={{ marginTop: '6px', padding: '8px 10px', borderRadius: '8px', background: `${COLOR.teal}14`, border: `1px solid ${COLOR.teal}`, fontSize: '11.5px', lineHeight: 1.5, color: COLOR.text }}>
+                    <div style={{ fontSize: '9.5px', fontWeight: 700, color: COLOR.teal, textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: '3px' }}>Why this is tested</div>
+                    {m.whyTested}
                   </div>
                 )}
               </div>

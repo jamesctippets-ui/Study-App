@@ -1060,7 +1060,7 @@ function CertStudyApp() {
     recordResultFor(qTrack, currentQ.id, isCorrect ? 'correct' : 'incorrect');
     bumpDailyGoal(1);
     setSessionScore((s) => ({ correct: s.correct + (isCorrect ? 1 : 0), total: s.total + 1 }));
-    setSessionAnswers((a) => [...a, { id: currentQ.id, cat: currentQ.cat, prompt: currentQ.question, correct: isCorrect, explanation: currentQ.explanation, track: qTrack }]);
+    setSessionAnswers((a) => [...a, { id: currentQ.id, cat: currentQ.cat, prompt: currentQ.question, correct: isCorrect, explanation: currentQ.explanation, whyTested: currentQ.whyTested, track: qTrack }]);
   };
 
   const toggleMs = (idx) => {
@@ -1078,7 +1078,7 @@ function CertStudyApp() {
     recordResultFor(qTrack, currentQ.id, isCorrect ? 'correct' : 'incorrect');
     bumpDailyGoal(1);
     setSessionScore((s) => ({ correct: s.correct + (isCorrect ? 1 : 0), total: s.total + 1 }));
-    setSessionAnswers((a) => [...a, { id: currentQ.id, cat: currentQ.cat, prompt: currentQ.question, correct: isCorrect, explanation: currentQ.explanation, track: qTrack }]);
+    setSessionAnswers((a) => [...a, { id: currentQ.id, cat: currentQ.cat, prompt: currentQ.question, correct: isCorrect, explanation: currentQ.explanation, whyTested: currentQ.whyTested, track: qTrack }]);
   };
 
   const doReset = () => {
@@ -1190,7 +1190,7 @@ function CertStudyApp() {
         }
       }
       if (isCorrect) correct++;
-      return { id: q.id, cat: q.cat, prompt: q.question, correct: isCorrect, answered, explanation: q.explanation };
+      return { id: q.id, cat: q.cat, prompt: q.question, correct: isCorrect, answered, explanation: q.explanation, whyTested: q.whyTested };
     });
     setExamResult({ correct, total: examSession.length, items });
     const trackKey = examTrack || activeTrack;
