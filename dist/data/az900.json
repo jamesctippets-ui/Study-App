@@ -596,13 +596,13 @@
       "type": "mc",
       "question": "Why might an organization choose a hybrid cloud model even though it's more complex to manage than pure public cloud?",
       "options": [
-        "A public cloud region cannot be selected to match a specific country, so hybrid is the only compliant option",
-        "Hybrid cloud is always cheaper than public cloud once management overhead is included",
+        "Hybrid deployments typically cost less overall than pure public cloud once egress and support fees are added in",
+        "Moving fully to public cloud removes the need to manage identity for any on-premises systems that remain",
         "Regulatory or data residency requirements may require some data to stay on-premises",
-        "Hybrid cloud removes the need for any identity management, since on-premises systems handle it"
+        "Azure's regional footprint covers most countries, which usually removes data residency as a reason to go hybrid"
       ],
       "correct": 2,
-      "explanation": "Compliance and data residency needs are a common, legitimate reason to keep some workloads on-premises while using public cloud elsewhere. Hybrid isn't automatically cheaper once you account for running two environments, identity still has to be managed (often unified via Microsoft Entra ID across both), and Azure regions can in fact be chosen to satisfy most country-level residency needs on their own."
+      "explanation": "Compliance and data residency needs are a common, legitimate reason to keep some workloads on-premises while using public cloud elsewhere \u2014 some regulations specifically require certain data to stay off public cloud infrastructure entirely, not just within a given country's borders. Hybrid isn't reliably cheaper once you factor in running two environments, and identity still has to be managed for whatever on-premises systems remain, typically unified with something like Microsoft Entra ID rather than eliminated."
     },
     {
       "id": "q10",
@@ -625,12 +625,12 @@
       "question": "Which of the following is NOT typically considered a benefit of cloud computing?",
       "options": [
         "Complete elimination of the customer's security responsibilities",
-        "Reliability",
-        "Scalability",
-        "High availability"
+        "The ability to recover quickly and keep running after a failure",
+        "The ability to add or remove resources to match changing demand",
+        "Continued uptime for an application even if one component fails"
       ],
       "correct": 0,
-      "explanation": "Under the shared responsibility model, the customer always retains some security responsibility \u2014 at minimum, their own data and identities \u2014 no matter how much the provider manages. Scalability, high availability, and reliability are all genuine, well-documented cloud benefits."
+      "explanation": "Under the shared responsibility model, the customer always retains some security responsibility \u2014 at minimum, their own data and identities \u2014 no matter how much the provider manages. The other three options describe reliability, scalability, and high availability respectively, which are all genuine, well-documented cloud benefits."
     },
     {
       "id": "q41",
@@ -694,13 +694,13 @@
       "type": "mc",
       "question": "Which statement about VM Scale Sets versus availability sets is correct?",
       "options": [
-        "Scale Sets guarantee zero downtime during Azure platform maintenance, which availability sets cannot",
-        "Both automatically scale the number of VM instances up and down based on real-time demand",
-        "Scale Sets automatically adjust the number of VM instances based on demand or a schedule; availability sets are a fixed group of VMs distributed to reduce simultaneous failure",
-        "Availability sets automatically add and remove VMs based on load, while Scale Sets are a static grouping"
+        "Availability sets automatically resize themselves to add extra capacity during planned maintenance windows",
+        "Both features scale the number of VM instances automatically in response to real-time demand, differing mainly in billing",
+        "Scale Sets automatically adjust the number of VM instances based on demand or a schedule; availability sets are a fixed group of VMs spread across fault domains",
+        "Availability sets automatically add and remove VM instances based on load, while Scale Sets remain a fixed-size grouping used only for licensing purposes"
       ],
       "correct": 2,
-      "explanation": "Scale Sets handle automatic scaling of instance count; availability sets are a fixed-size group of existing VMs spread across fault/update domains to avoid simultaneous failure. The other two options swap which one does the scaling, or overpromise a maintenance guarantee neither one makes."
+      "explanation": "Scale Sets handle automatic scaling of instance count; availability sets are a fixed-size group of existing VMs spread across fault and update domains to avoid simultaneous failure. The other options either swap which feature does the scaling or invent a maintenance/licensing behavior that neither feature actually provides."
     },
     {
       "id": "q16",
@@ -1033,10 +1033,10 @@
         "Resource locks are configured through Azure RBAC role assignments",
         "Resource locks automatically expire after 90 days unless renewed",
         "A Read-only lock can prevent an otherwise-authorized user from modifying a resource's configuration",
-        "A resource can only have a Delete lock or a Read-only lock applied, never both at once"
+        "A resource can have only one lock type at a time, with a new Read-only lock silently replacing any existing Delete lock"
       ],
       "correct": 2,
-      "explanation": "A Read-only lock blocks both deletion and modification, overriding what RBAC would otherwise allow. Locks are a separate mechanism from RBAC (not configured through it), a resource can technically have both lock types applied simultaneously, and locks don't expire automatically at all."
+      "explanation": "A Read-only lock blocks both deletion and modification, overriding what RBAC would otherwise allow. Locks are a separate mechanism from RBAC (not configured through it), a resource can in fact have both a Delete lock and a Read-only lock applied at the same time rather than one replacing the other, and locks don't expire automatically at all."
     },
     {
       "id": "q38",
@@ -1100,13 +1100,13 @@
       "type": "mc",
       "question": "Which best distinguishes Azure Advisor's cost recommendations from Azure Cost Management?",
       "options": [
-        "Advisor replaces the need for setting budgets, since it already flags overspending",
-        "Both tools require Reserved Instances to be configured before they produce any output",
-        "Cost Management gives resizing recommendations, while Advisor tracks and budgets spend",
+        "Advisor replaces the need for setting budgets in Cost Management, since its recommendations already account for future overspending",
+        "Both tools require Reserved Instances to already be purchased before either one will surface any cost data at all",
+        "Cost Management is the one that gives specific resizing recommendations, while Advisor only tracks and budgets spend",
         "Advisor recommends specific actions to reduce cost, like resizing; Cost Management focuses on tracking, analyzing, and budgeting actual spend"
       ],
       "correct": 3,
-      "explanation": "Advisor gives actionable, specific recommendations (like resizing an underused VM); Cost Management is the analysis and budgeting tool for tracking spend over time. The second option just swaps the two tools' jobs, and neither tool requires Reserved Instances to function, nor does Advisor make budgets unnecessary \u2014 they serve different purposes."
+      "explanation": "Advisor gives actionable, specific recommendations (like resizing an underused VM); Cost Management is the analysis and budgeting tool for tracking spend over time. The third option just swaps the two tools' jobs, and neither tool requires Reserved Instances to function, nor does Advisor make budgeting unnecessary \u2014 they serve complementary, distinct purposes."
     },
     {
       "id": "tf1",
@@ -1571,13 +1571,13 @@
       "type": "mc",
       "question": "An Azure service's SLA guarantees 99.9% monthly uptime. Which statement correctly describes what that commitment actually means?",
       "options": [
-        "The SLA applies only during business hours in the customer's local time zone",
+        "The SLA applies only during the customer's local business hours, since that's when usage is highest",
         "Microsoft commits to that uptime target and issues service credits if it isn't met, but some downtime can still occur",
-        "The customer is entitled to a full refund of that month's bill if any downtime occurs at all",
-        "The service is guaranteed to never experience any downtime whatsoever"
+        "The customer is entitled to a full refund of that month's invoice the first time any downtime occurs",
+        "A 99.9% target is close enough to continuous uptime that Microsoft doesn't track or credit brief outages"
       ],
       "correct": 1,
-      "explanation": "An SLA is a measurable uptime commitment backed by service credits when missed \u2014 it is not a zero-downtime guarantee, and the remedy is a partial credit, not a full refund. SLAs also run continuously, not only during business hours."
+      "explanation": "An SLA is a measurable uptime commitment backed by service credits when missed \u2014 it is not a zero-downtime guarantee, and outages are tracked and credited according to the SLA terms regardless of how brief. The remedy is a partial, tiered credit rather than a full refund, and SLAs run continuously rather than only during business hours."
     },
     {
       "id": "q47",
@@ -1599,7 +1599,7 @@
       "type": "mc",
       "question": "A startup on the free Basic Azure support plan needs a guaranteed fast response time from Microsoft when a production system goes down. What should they do?",
       "options": [
-        "Nothing \u2014 Basic support already includes a guaranteed response time for production-down issues",
+        "Nothing \u2014 Basic support already includes a committed response time for production-down issues",
         "Purchase a Reserved Instance, which automatically upgrades support to Unified",
         "Ask Azure Advisor to escalate the issue on their behalf",
         "Upgrade to a paid support plan, such as Standard or Unified, which add committed response-time SLAs"
@@ -1627,13 +1627,13 @@
       "type": "mc",
       "question": "A company wants to allow inbound traffic only on port 443 to a subnet of web servers and block all other inbound ports, without deploying a separate firewall appliance. Which Azure feature fits?",
       "options": [
-        "VNet peering to a management subnet",
+        "VNet peering to a separate management subnet that already has the desired port rules",
         "A network security group (NSG) with allow/deny rules on the subnet",
-        "A Read-only resource lock on the subnet",
-        "Azure Policy with a Deny effect"
+        "A Read-only resource lock applied to the subnet to prevent configuration changes",
+        "Azure Policy with a Deny effect blocking noncompliant inbound rules"
       ],
       "correct": 1,
-      "explanation": "A network security group filters inbound and outbound traffic by port, protocol, and IP at the subnet or NIC level \u2014 exactly this scenario. A resource lock only blocks delete/modify of the resource's own configuration, not live network packets; Azure Policy governs configuration compliance, not traffic filtering; peering just connects two VNets and does nothing to filter ports."
+      "explanation": "A network security group filters inbound and outbound traffic by port, protocol, and IP at the subnet or NIC level \u2014 exactly this scenario. A resource lock only blocks delete/modify of the resource's own configuration, not live network packets; Azure Policy governs configuration compliance, not traffic filtering; and peering just connects two VNets without adding any port-level filtering of its own."
     },
     {
       "id": "q51",
@@ -1934,6 +1934,132 @@
       "correct": 2,
       "explanation": "Add > Add role assignment is the action that actually grants a new role assignment. Check access only looks up what a specific user already has \u2014 it doesn't grant anything, and Download role assignments/Edit columns just affect how the existing list is exported or displayed.",
       "image": "roleAssignment"
+    },
+    {
+      "id": "q65",
+      "cat": "cloudConcepts",
+      "type": "mc",
+      "question": "Which pricing model change does moving from owning on-premises servers to using Azure VMs most directly represent?",
+      "options": [
+        "A shift from OpEx to CapEx",
+        "A shift from CapEx to OpEx",
+        "A shift from PaaS to IaaS",
+        "A shift from public cloud to private cloud"
+      ],
+      "correct": 1,
+      "explanation": "Owning servers requires a large upfront capital purchase (CapEx); renting VMs in Azure is billed as an ongoing operating expense (OpEx) based on usage. The other two options describe unrelated shifts \u2014 service model and deployment model \u2014 not the cost classification this question asks about."
+    },
+    {
+      "id": "q66",
+      "cat": "cloudConcepts",
+      "type": "mc",
+      "question": "A media company's video transcoding workload runs only when a customer uploads a new file, with uploads arriving at unpredictable times throughout the day. Which combination of characteristics would let them avoid paying for idle compute between uploads?",
+      "options": [
+        "Elasticity combined with a consumption-based pricing model",
+        "High availability combined with a Reserved Instance commitment",
+        "Predictability combined with a fixed capacity reservation",
+        "Redundancy combined with a three-year Savings Plan"
+      ],
+      "correct": 0,
+      "explanation": "Elasticity lets compute scale down to nothing between uploads, and consumption-based pricing means they're billed only for compute actually used \u2014 together, no charge accrues while idle. A Reserved Instance or Savings Plan both commit to paying for capacity whether or not it's used, and neither high availability nor redundancy addresses idle-time cost at all."
+    },
+    {
+      "id": "q67",
+      "cat": "cloudConcepts",
+      "type": "mc",
+      "question": "A regulated financial firm wants to modernize an aging application. They need to keep full control over OS-level security patching schedules for audit reasons, but also want Microsoft to manage the underlying physical hardware and virtualization layer. Which service model best fits, and why don't PaaS or SaaS work here?",
+      "options": [
+        "IaaS, because PaaS and SaaS both hand OS patching to Microsoft, removing the firm's ability to control that schedule",
+        "PaaS, because it lets the firm choose its own patching schedule while Microsoft still manages hardware",
+        "SaaS, because it gives the firm the most granular control over the operating system",
+        "IaaS, because Microsoft delegates hardware management to the customer once they take on OS patching duties"
+      ],
+      "correct": 0,
+      "explanation": "IaaS leaves OS-level patching in the customer's hands while Microsoft still manages the physical hardware and virtualization layer beneath it \u2014 matching both stated requirements. PaaS abstracts away OS management (the firm couldn't control its own patch schedule), SaaS gives essentially no infrastructure control at all, and the last option has the IaaS division backwards: Microsoft keeps managing the physical hardware in IaaS regardless of who patches the OS."
+    },
+    {
+      "id": "q68",
+      "cat": "architecture",
+      "type": "mc",
+      "question": "Which best describes the relationship between an Azure region and an availability zone?",
+      "options": [
+        "A region is one of several physically separate datacenters located inside a single availability zone",
+        "An availability zone is one of several physically separate datacenters located inside a single region",
+        "Regions and availability zones are two names for the exact same thing",
+        "An availability zone can span multiple regions when configured for extra redundancy"
+      ],
+      "correct": 1,
+      "explanation": "A region is the broader geographic area; availability zones are the physically separate datacenters within that region, each with independent power and cooling. The first option reverses the containment relationship, they aren't interchangeable terms, and a zone stays within one region rather than spanning several."
+    },
+    {
+      "id": "q69",
+      "cat": "architecture",
+      "type": "mc",
+      "question": "A company organizes its Azure resources so that a single resource group contains both a production web app in East US and its paired database in West US, deployed together for a coordinated app release. Is this a valid resource group design?",
+      "options": [
+        "No, because a resource group can only contain resources from a single Azure region",
+        "Yes, because a resource group is a management and billing boundary, not a regional one",
+        "No, because paired regions must be managed in strictly separate resource groups for compliance reasons",
+        "Yes, but only if both resources are deployed using the same ARM template"
+      ],
+      "correct": 1,
+      "explanation": "A resource group is a logical container for managing and billing related resources together \u2014 it can hold resources from multiple regions, as this scenario does. It isn't restricted to one region, there's no rule requiring paired-region resources to sit in separate groups, and using a shared ARM template isn't a precondition for this being valid."
+    },
+    {
+      "id": "q70",
+      "cat": "architecture",
+      "type": "mc",
+      "question": "A hospital network needs a connection from its on-premises datacenter to Azure that avoids the public internet for a latency-sensitive imaging workload, but the hospital's budget and timeline don't allow for the weeks-long circuit provisioning that a dedicated private connection usually requires. Which option best fits both constraints?",
+      "options": [
+        "ExpressRoute, since it provides the most complete isolation from the public internet of any connectivity option",
+        "A site-to-site VPN Gateway, since it can be provisioned quickly and still encrypts traffic over the internet",
+        "Azure Bastion, since it provides secure remote access with very little provisioning delay",
+        "Azure Front Door, since it routes traffic through Microsoft's global network instead of the public internet"
+      ],
+      "correct": 1,
+      "explanation": "A VPN Gateway can be stood up in hours over the existing internet connection, trading ExpressRoute's stronger internet isolation for something that actually fits this budget and timeline \u2014 the imaging workload still gets an encrypted, private-feeling tunnel. ExpressRoute better matches the latency/isolation goal in isolation, but its multi-week circuit provisioning is exactly what the scenario rules out. Bastion is for secure administrative access to VMs, not site-to-site connectivity between networks, and Front Door is a web-application entry point, not a private network connection."
+    },
+    {
+      "id": "q71",
+      "cat": "management",
+      "type": "mc",
+      "question": "Which Azure feature would you use to attach a 'CostCenter: Marketing' label to a group of resources purely for reporting purposes, with no effect on how those resources function?",
+      "options": [
+        "A resource lock",
+        "Tags",
+        "Azure Policy",
+        "A management group"
+      ],
+      "correct": 1,
+      "explanation": "Tags are name/value pairs attached to a resource for organizing and reporting, like breaking down cost by department \u2014 they don't change how the resource behaves. Locks restrict deletion/modification, Policy enforces configuration rules, and management groups organize subscriptions \u2014 none of those is a resource-level label."
+    },
+    {
+      "id": "q72",
+      "cat": "management",
+      "type": "mc",
+      "question": "A team sets a monthly Azure budget of $5,000 in Cost Management and configures an alert at 80% of that budget. Partway through the month, actual spend reaches $4,200. What happens next?",
+      "options": [
+        "Azure automatically stops all resources in the subscription once 80% of the budget is reached",
+        "An alert notification is sent, but resources keep running and spending is not blocked",
+        "The subscription is automatically downgraded to a free tier for the rest of the month",
+        "Azure Policy denies any further resource creation until the next billing cycle"
+      ],
+      "correct": 1,
+      "explanation": "A Cost Management budget alert is purely a notification \u2014 it tells the team spend has crossed a threshold, but it doesn't stop resources, downgrade the subscription, or block new deployments on its own. Actually enforcing a spending cap would require a separate action, like an Azure Policy or an Automation runbook triggered off that alert."
+    },
+    {
+      "id": "q73",
+      "cat": "management",
+      "type": "mc",
+      "question": "A security review produces two different lists of suggestions. One tool recommends resizing an oversized VM to cut cost, and separately flags a missing MFA requirement under its security recommendations. The other tool recommends enabling just-in-time VM access and patching a vulnerable container image, with no cost recommendations at all. Which tool produced which list?",
+      "options": [
+        "The first list came from Azure Advisor; the second came from Microsoft Defender for Cloud",
+        "The first list came from Microsoft Defender for Cloud; the second came from Azure Advisor",
+        "Both lists came from Azure Advisor, which covers cost and security together in one place",
+        "Both lists came from Microsoft Defender for Cloud, which also gives cost-saving recommendations"
+      ],
+      "correct": 0,
+      "explanation": "Advisor spans cost, reliability, performance, and security together \u2014 resizing for cost savings and an MFA gap are exactly the kind of two different pillars Advisor mixes into one recommendation list. Defender for Cloud is security-specific and wouldn't surface a cost recommendation at all \u2014 its list (just-in-time access, image vulnerabilities) has no cost content, which is the tell. The other two options either merge two genuinely separate tools into one, or hand Defender for Cloud a cost-recommendation role it doesn't have."
     }
   ],
   "lessons": [
@@ -2390,6 +2516,34 @@
         }
       ],
       "explanation": "Management groups sit above subscriptions for org-wide governance; resource groups are the unit of lifecycle management within a subscription for related resources."
+    },
+    {
+      "id": "ml-az900-4",
+      "cat": "architecture",
+      "scenario": "A company stores nightly backups that must survive a single datacenter failure, but doesn't need protection if the entire region goes offline \u2014 {b1} storage, which replicates across availability zones within one region, meets that bar at a lower cost than something replicating further away. Separately, their disaster-recovery team wants to be able to read backup data from the paired region immediately, even before Microsoft declares a failover \u2014 that requires the {b2} option specifically, since plain GRS only becomes readable after a failover actually happens.",
+      "blanks": [
+        {
+          "key": "b1",
+          "options": [
+            "LRS",
+            "ZRS",
+            "GRS",
+            "RA-GRS"
+          ],
+          "correct": 1
+        },
+        {
+          "key": "b2",
+          "options": [
+            "GRS",
+            "RA-GRS",
+            "ZRS",
+            "LRS"
+          ],
+          "correct": 1
+        }
+      ],
+      "explanation": "ZRS spreads copies across availability zones in one region \u2014 enough for a datacenter-level failure, and cheaper than replicating all the way to another region. RA-GRS adds read access to the secondary region's copy even before a failover, which plain GRS does not provide; GRS replicates to the secondary region but keeps that copy unreadable until a failover is actually initiated."
     }
   ]
 }

@@ -509,7 +509,7 @@
         "A primary key",
         "A foreign key",
         "A partition key",
-        "An index alone"
+        "An index"
       ],
       "correct": 0,
       "explanation": "A primary key is the column, or set of columns, that uniquely identifies each row in a table. A foreign key instead references a primary key in another table, a partition key is a non-relational storage concept, and an index alone speeds up lookups but does not by itself guarantee uniqueness."
@@ -520,13 +520,13 @@
       "type": "mc",
       "question": "A Customers table and an Orders table are related so that every order must reference a valid, existing customer. Which concept enforces this rule?",
       "options": [
-        "Normalization",
+        "Normalization applied to both tables to remove any repeating groups",
         "A foreign key referencing the Customers table",
-        "A primary key on the Orders table",
-        "A data warehouse star schema"
+        "A primary key defined on the Orders table's own order ID column",
+        "A data warehouse star schema linking Orders to a Customer dimension"
       ],
       "correct": 1,
-      "explanation": "A foreign key in the Orders table that references the Customers table's primary key is exactly the mechanism that enforces every order pointing to a valid customer. Normalization is the broader design process, a primary key on Orders only identifies order rows themselves, and a star schema is a data warehouse modeling pattern, not a relational integrity rule."
+      "explanation": "A foreign key in the Orders table that references the Customers table's primary key is exactly the mechanism that enforces every order pointing to a valid customer. Normalization is the broader design process, a primary key on Orders only identifies order rows themselves without referencing another table, and a star schema is a data warehouse modeling pattern, not a relational integrity rule."
     },
     {
       "id": "q11",
@@ -695,13 +695,13 @@
       "type": "mc",
       "question": "A big data analytics workload needs an Azure Blob Storage account organized with real directories and folders, plus fine-grained permissions on those folders, for efficient large-scale analytics. Which capability enables this?",
       "options": [
-        "Archive access tier",
-        "Read-access geo-redundant storage",
+        "Setting the Archive access tier so infrequently touched analytics files cost less to store",
+        "Enabling read-access geo-redundant storage so a secondary region can also serve the data",
         "Azure Data Lake Storage Gen2 (hierarchical namespace)",
-        "Azure Table Storage"
+        "Switching to Azure Table Storage, which already organizes data into folder-like partitions"
       ],
       "correct": 2,
-      "explanation": "Azure Data Lake Storage Gen2 adds a hierarchical namespace of real directories and folders with fine-grained permissions on top of Blob Storage, purpose-built for large-scale analytics. The Archive tier and RA-GRS are cost and redundancy settings, not a namespace structure, and Table Storage is an entirely separate, non-hierarchical key-value store."
+      "explanation": "Azure Data Lake Storage Gen2 adds a hierarchical namespace of real directories and folders with fine-grained permissions on top of Blob Storage, purpose-built for large-scale analytics. The Archive tier and RA-GRS are cost and redundancy settings, not a namespace structure, and Table Storage organizes data by partition key and row key, not real folders \u2014 it's an entirely separate, non-hierarchical key-value store."
     },
     {
       "id": "q20",
@@ -998,12 +998,12 @@
       "question": "A company runs 50 small Azure SQL databases with unpredictable usage that rarely peaks for every database at the same time. Provisioning each database for its own worst case would be expensive. Which deployment option lets these databases share a pool of resources to reduce cost?",
       "options": [
         "An elastic pool sharing resources across many databases",
-        "SQL Server on an Azure Virtual Machine",
-        "A single database sized for its own peak load",
-        "Read scale-out replicas alone"
+        "SQL Server on an Azure Virtual Machine, managed as 50 separate instances",
+        "A single database sized for its own individual peak load, repeated for each of the 50",
+        "Read scale-out replicas added to each database individually"
       ],
       "correct": 0,
-      "explanation": "An elastic pool lets many databases with staggered, non-simultaneous usage share one billed pool of resources instead of each being sized for its own peak, matching this cost-saving scenario. SQL Server on a VM adds unrelated OS management overhead, sizing every database for its own peak is the expensive approach being avoided, and read scale-out only offloads read queries to a replica rather than pooling resources across many databases."
+      "explanation": "An elastic pool lets many databases with staggered, non-simultaneous usage share one billed pool of resources instead of each being sized for its own peak, matching this cost-saving scenario. SQL Server on a VM adds unrelated OS management overhead on top of the same per-database sizing problem, sizing every database for its own peak is the expensive approach being avoided, and read scale-out only offloads read queries to a replica rather than pooling compute across many databases."
     },
     {
       "id": "q35",
@@ -1106,6 +1106,132 @@
         3
       ],
       "explanation": "Microsoft Fabric unifies OneLake as its single shared data lake, Power BI for reporting, and Data Factory-style pipelines for data integration, all in one SaaS platform. Windows Admin Center is an unrelated on-premises Windows Server management tool with no connection to Microsoft Fabric."
+    },
+    {
+      "id": "q38",
+      "cat": "coreData",
+      "type": "mc",
+      "question": "Which term describes data that has no predefined schema or structure at all, such as raw video files or free-text documents?",
+      "options": [
+        "Structured data",
+        "Semi-structured data",
+        "Unstructured data",
+        "Relational data"
+      ],
+      "correct": 2,
+      "explanation": "Unstructured data has no inherent schema \u2014 video, images, and free text are the classic examples. Structured data fits a strict tabular schema, semi-structured data is flexible but still self-describing (like JSON), and relational data specifically means data organized into related tables."
+    },
+    {
+      "id": "q39",
+      "cat": "coreData",
+      "type": "mc",
+      "question": "A retail chain needs a system that can answer 'total sales by region by quarter for the last five years,' aggregating across millions of historical transactions, without slowing down the system processing today's in-store purchases. Which workload type fits the reporting need?",
+      "options": [
+        "OLTP, since it's optimized for high-volume writes",
+        "OLAP, since it's optimized for large-scale aggregation and historical analysis",
+        "A single unified OLTP/OLAP system with no separation needed",
+        "A relational database with no indexes, for maximum write speed"
+      ],
+      "correct": 1,
+      "explanation": "OLAP is built for exactly this kind of large-scale aggregation and historical analysis, separate from the OLTP system handling live transactions so heavy reporting queries don't compete with today's purchases. OLTP is optimized for many small, fast writes rather than sweeping aggregations, and removing indexes would only help writes at the expense of the very reporting queries this scenario needs."
+    },
+    {
+      "id": "q40",
+      "cat": "coreData",
+      "type": "mc",
+      "question": "Two bank transfer transactions run at the same time against the same account, and the database ensures neither transaction can see the other's uncommitted, in-progress changes. Which ACID property is this?",
+      "options": [
+        "Atomicity",
+        "Isolation",
+        "Durability",
+        "Consistency"
+      ],
+      "correct": 1,
+      "explanation": "Isolation is specifically about concurrent transactions not seeing each other's uncommitted changes. Atomicity means a transaction fully completes or fully rolls back, durability means a committed change survives a crash, and consistency means the database only moves between states that satisfy its rules (like a balance never going negative) \u2014 a related but distinct guarantee from concurrent visibility."
+    },
+    {
+      "id": "q41",
+      "cat": "relational",
+      "type": "mc",
+      "question": "A table's Employees.ManagerID column stores the EmployeeID of that employee's manager, who is also just another row in the same Employees table. What kind of relationship does this represent?",
+      "options": [
+        "A self-referencing (recursive) foreign key relationship",
+        "A many-to-many relationship requiring a junction table",
+        "A star schema fact-to-dimension relationship",
+        "A non-relational document reference"
+      ],
+      "correct": 0,
+      "explanation": "A foreign key column referencing the primary key of the very same table is a self-referencing, or recursive, relationship \u2014 common for modeling hierarchies like org charts. There's no separate junction table involved since each employee has just one manager, this isn't a data warehouse fact/dimension pattern, and it's a relational foreign key, not a non-relational document reference."
+    },
+    {
+      "id": "q42",
+      "cat": "relational",
+      "type": "mc",
+      "question": "An application's Azure SQL Database is approaching 4 TB and is expected to keep growing well past that, with an occasional need for near-instant storage scaling and fast database restores regardless of size. Which service tier fits best?",
+      "options": [
+        "The DTU-based Standard tier",
+        "The vCore-based General Purpose tier",
+        "The vCore-based Hyperscale tier",
+        "The Basic tier with manual sharding"
+      ],
+      "correct": 2,
+      "explanation": "Hyperscale supports databases up to 100 TB with rapid storage scaling and restore times that stay fast regardless of database size, matching both stated needs. Standard and General Purpose both have much lower practical size ceilings and restore times that grow with database size, and the Basic tier is meant for small, light workloads, not multi-terabyte growth."
+    },
+    {
+      "id": "q43",
+      "cat": "nonRelational",
+      "type": "mc",
+      "question": "Which Cosmos DB API would you choose to model and query highly connected data, like a social network's friend-of-a-friend relationships?",
+      "options": [
+        "The Gremlin API",
+        "The Table API",
+        "The API for MongoDB",
+        "The NoSQL (Core) API"
+      ],
+      "correct": 0,
+      "explanation": "The Gremlin API is Cosmos DB's graph engine, purpose-built for modeling entities and the relationships between them, like a social graph. The Table API handles simple key-value data, the API for MongoDB targets document workloads built on MongoDB drivers, and the NoSQL (Core) API is Cosmos DB's native document model \u2014 none of the other three is optimized for traversing relationships the way a graph database is."
+    },
+    {
+      "id": "q44",
+      "cat": "nonRelational",
+      "type": "mc",
+      "question": "An application currently uses Azure Table Storage for simple key-value data but now needs richer querying, automatic indexing of every property, and global distribution with low-latency reads close to users worldwide. Which service should it move to?",
+      "options": [
+        "Azure Blob Storage",
+        "Azure Cosmos DB (NoSQL API)",
+        "A larger Azure Table Storage account",
+        "Azure Files"
+      ],
+      "correct": 1,
+      "explanation": "Cosmos DB automatically indexes every property, supports rich querying, and offers global distribution with low-latency reads in each region \u2014 everything this scenario needs beyond what Table Storage offers. Blob Storage and Files are built for unstructured objects and file shares respectively rather than queryable records, and simply growing the existing Table Storage account doesn't add global distribution or automatic indexing."
+    },
+    {
+      "id": "q45",
+      "cat": "analytics",
+      "type": "mc",
+      "question": "A company wants dashboards that update within seconds of new sales events occurring, rather than refreshing once a day. Which combination of processing approach and Azure service fits?",
+      "options": [
+        "Streaming processing using Azure Stream Analytics",
+        "Batch processing using a nightly Azure Data Factory pipeline",
+        "OLTP processing using Azure SQL Database alone",
+        "Batch processing using a weekly Power BI dataset refresh"
+      ],
+      "correct": 0,
+      "explanation": "Streaming processing handles events continuously as they arrive, and Stream Analytics is built for exactly this near-real-time scenario. A nightly or weekly batch job, by definition, only refreshes on its schedule, not within seconds of an event, and OLTP alone processes transactions \u2014 it doesn't provide the aggregation or dashboard refresh mechanism this scenario needs."
+    },
+    {
+      "id": "q46",
+      "cat": "analytics",
+      "type": "mc",
+      "question": "A team needs one platform where data engineers build Spark notebooks for transformation, data warehouse analysts run T-SQL against that same underlying data with no separate copy, and business users build Power BI reports \u2014 all sharing one common storage layer without duplicating data between tools. Which is the best fit?",
+      "options": [
+        "Microsoft Fabric, since OneLake provides one shared storage layer across all of these experiences",
+        "Azure Data Factory alone, since pipelines can feed all three tools independently",
+        "Azure Databricks alone, since Spark notebooks can also produce Power BI reports directly",
+        "Three separate services, each keeping its own copy of the data, since no single platform covers all three"
+      ],
+      "correct": 0,
+      "explanation": "Microsoft Fabric's OneLake is a single shared data lake underneath Spark (Data Engineering), T-SQL (Data Warehouse), and Power BI experiences, so none of them needs its own duplicated copy \u2014 exactly what this scenario asks for. Data Factory alone only moves and orchestrates data, it doesn't provide Spark notebooks or a warehouse engine; Databricks doesn't natively provide a T-SQL warehouse engine or built-in Power BI reporting; and three separate services with separate copies is precisely the duplication this scenario wants to avoid."
     }
   ],
   "cheatSheet": [
@@ -1181,6 +1307,92 @@
         "\"All access tiers share the same minimum retention period\" is a common false-answer trap \u2014 Cool/Cold/Archive carry longer minimum retention than Hot.",
         "If the scenario says \"structure isn't known until read time,\" that's schema-on-read (data lake), not schema-on-write (relational database)."
       ]
+    }
+  ],
+  "madlibs": [
+    {
+      "id": "ml-dp900-1",
+      "cat": "coreData",
+      "scenario": "A hospital system needs to process an incoming patient-monitor reading the instant it arrives, so a nurse is alerted within seconds of an abnormal heart rate \u2014 that calls for {b1} processing. Separately, the hospital's finance team only needs a report of total billing activity from the previous month, generated once after everything for that month is in \u2014 that calls for {b2} processing instead.",
+      "blanks": [
+        {
+          "key": "b1",
+          "options": [
+            "streaming",
+            "batch",
+            "OLTP-only",
+            "archival"
+          ],
+          "correct": 0
+        },
+        {
+          "key": "b2",
+          "options": [
+            "streaming",
+            "batch",
+            "OLTP-only",
+            "archival"
+          ],
+          "correct": 1
+        }
+      ],
+      "explanation": "Streaming processing reacts to events continuously as they arrive, which is what a seconds-level alert needs. Batch processing runs on a schedule over an already-complete set of data, which fits a monthly report that only needs to run once the month is over."
+    },
+    {
+      "id": "ml-dp900-2",
+      "cat": "relational",
+      "scenario": "A retailer migrating its on-premises SQL Server database relies heavily on cross-database queries and SQL Server Agent jobs, and wants the least re-engineering effort \u2014 that points to {b1}. A different team just needs a single, fully managed database for one new application with no cross-database dependencies, and wants Microsoft to handle everything below the database itself \u2014 that points to {b2} instead.",
+      "blanks": [
+        {
+          "key": "b1",
+          "options": [
+            "Azure SQL Managed Instance",
+            "Azure SQL Database",
+            "Azure Cosmos DB",
+            "SQL Server on an Azure VM"
+          ],
+          "correct": 0
+        },
+        {
+          "key": "b2",
+          "options": [
+            "Azure SQL Managed Instance",
+            "Azure SQL Database",
+            "Azure Cosmos DB",
+            "SQL Server on an Azure VM"
+          ],
+          "correct": 1
+        }
+      ],
+      "explanation": "Azure SQL Managed Instance offers near-complete SQL Server compatibility, including cross-database queries and SQL Server Agent, making it the best lift-and-shift fit. Azure SQL Database is the simpler, fully-managed single-database PaaS option when there's no cross-database dependency to preserve."
+    },
+    {
+      "id": "ml-dp900-3",
+      "cat": "analytics",
+      "scenario": "A company wants engineers writing Spark notebooks, warehouse analysts running T-SQL, and business users building Power BI reports, all reading and writing the same underlying data with nothing duplicated between tools \u2014 that's the pitch behind {b1}, built on its single shared storage layer, {b2}.",
+      "blanks": [
+        {
+          "key": "b1",
+          "options": [
+            "Microsoft Fabric",
+            "Azure Data Factory",
+            "Azure Table Storage",
+            "Azure SQL Database"
+          ],
+          "correct": 0
+        },
+        {
+          "key": "b2",
+          "options": [
+            "OneLake",
+            "a data warehouse",
+            "a resource group",
+            "a storage account key"
+          ],
+          "correct": 0
+        }
+      ],
+      "explanation": "Microsoft Fabric unifies data engineering, data warehousing, and Power BI on top of OneLake, one shared data lake that every experience reads from and writes to, so nothing needs its own duplicated copy. Data Factory only orchestrates data movement, and Table Storage/SQL Database are individual data stores, not a unifying analytics platform."
     }
   ]
 }

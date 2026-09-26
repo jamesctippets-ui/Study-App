@@ -486,9 +486,9 @@
       "question": "An administrator wants a group's membership to automatically include every user whose department attribute is 'Sales,' without manually adding people.",
       "options": [
         "A dynamic group with a membership rule based on the department attribute",
-        "A security group with manual membership",
-        "A Microsoft 365 group with no rules",
-        "A resource group scoped to Sales"
+        "A security group with manual membership that an administrator updates by hand",
+        "A Microsoft 365 group created with no membership rules configured at all",
+        "A resource group named Sales containing that department's resources"
       ],
       "correct": 0,
       "explanation": "A dynamic group with a rule on the department attribute keeps membership current automatically as people join, leave, or change departments. A security group with manual membership requires someone to add and remove people by hand, a Microsoft 365 group with no rules is just as manual, and a resource group organizes Azure resources, not user accounts, so it plays no role here at all."
@@ -542,12 +542,12 @@
       "question": "A user is assigned Contributor at the subscription level and Owner at one specific resource group within it. What's their effective permission in that resource group?",
       "options": [
         "Contributor",
-        "Access is denied due to a role conflict",
+        "No access",
         "Reader",
         "Owner"
       ],
       "correct": 3,
-      "explanation": "RBAC assignments are additive across scopes, and the more permissive assignment applies \u2014 Owner at that resource group wins there."
+      "explanation": "RBAC assignments are additive across scopes, and the more permissive assignment applies \u2014 Owner at that resource group wins there. Conflicting scopes don't cancel each other out into no access; the broader Contributor assignment from the subscription simply gets overridden by the more permissive Owner role at the narrower scope."
     },
     {
       "id": "q6",
@@ -639,13 +639,13 @@
       "type": "mc",
       "question": "Which storage redundancy option allows an application to directly read from the secondary region during normal operation, not just after a failover?",
       "options": [
-        "LRS",
-        "ZRS",
-        "Plain GRS",
+        "LRS (Locally-Redundant Storage)",
+        "ZRS (Zone-Redundant Storage)",
+        "GRS (Geo-Redundant Storage)",
         "RA-GRS (Read-Access Geo-Redundant Storage)"
       ],
       "correct": 3,
-      "explanation": "Plain GRS replicates to a secondary region but doesn't allow reads there until failover \u2014 RA-GRS specifically adds read access to the secondary."
+      "explanation": "Plain GRS replicates to a secondary region but doesn't allow reads there until failover \u2014 RA-GRS specifically adds read access to the secondary. LRS and ZRS don't replicate to a second region at all, so neither offers secondary-region reads under any circumstances."
     },
     {
       "id": "q13",
@@ -667,13 +667,13 @@
       "type": "mc",
       "question": "A storage account should reject all traffic except from two specific corporate office IP ranges and one specific VNet.",
       "options": [
-        "A resource lock",
-        "Blob lifecycle management",
-        "A SAS token alone",
-        "A storage account firewall / network rule configuration"
+        "A resource lock applied to the storage account to prevent accidental deletion",
+        "Blob lifecycle management rules that move data between access tiers over time",
+        "A SAS token generated once and shared with both office networks",
+        "A storage account firewall / network rule configuration allowing only those sources"
       ],
       "correct": 3,
-      "explanation": "Storage account firewall and network rules restrict access to specific networks or IP ranges at the network level."
+      "explanation": "Storage account firewall and network rules restrict access to specific networks or IP ranges at the network level \u2014 exactly this scenario. A resource lock only blocks delete/modify actions, not network traffic; a SAS token grants scoped data access but does nothing to block requests from other networks; and lifecycle management only governs which access tier blobs sit in, not who can reach the account."
     },
     {
       "id": "q15",
@@ -781,11 +781,11 @@
       "options": [
         "Move the VM to a different subscription",
         "Deallocate (stop) the VM first, then resize",
-        "Nothing, resizing always works while running",
+        "Nothing further \u2014 Azure automatically relocates the VM to compatible hardware during the resize",
         "Delete and recreate the VM from scratch"
       ],
       "correct": 1,
-      "explanation": "A VM may need to be deallocated before resizing if the target size isn't available on its current hardware cluster."
+      "explanation": "A VM may need to be deallocated before resizing if the target size isn't available on its current hardware cluster \u2014 deallocating releases the hardware so Azure can place it on a cluster that supports the new size. Moving subscriptions doesn't change hardware compatibility, and a resize failure doesn't require deleting and rebuilding the VM."
     },
     {
       "id": "q23",
@@ -808,12 +808,12 @@
       "question": "Two NSG rules apply to the same NIC: one at priority 100 allowing inbound port 443, another at priority 200 denying all inbound traffic. What happens to inbound HTTPS traffic?",
       "options": [
         "Both rules apply, and the NIC merges them into a partial allow",
-        "It's denied, since a Deny rule always overrides an Allow rule regardless of priority",
+        "It's denied, since a Deny rule takes precedence over an Allow rule whenever both target the same traffic",
         "It's allowed, since the lower priority number is processed first",
-        "It's denied, since the highest priority number processed last always wins"
+        "It's denied, since NSG rules are evaluated from the highest priority number down to the lowest"
       ],
       "correct": 2,
-      "explanation": "Lower priority numbers are evaluated first and win \u2014 priority 100 (allow) is processed before priority 200 (deny), so the traffic is allowed. Deny doesn't have some inherent precedence over Allow, and NSG rules aren't merged or blended \u2014 whichever rule is evaluated first, by priority number, decides the outcome outright."
+      "explanation": "Lower priority numbers are evaluated first and win \u2014 priority 100 (allow) is processed before priority 200 (deny), so the traffic is allowed. Deny doesn't have some inherent precedence over Allow, evaluation order runs from the lowest priority number up (not the other way around), and NSG rules aren't merged or blended \u2014 whichever rule is evaluated first decides the outcome outright."
     },
     {
       "id": "q25",
@@ -824,10 +824,10 @@
         "Only if they're in the same region",
         "No, VNet peering is not transitive",
         "Only if a VPN Gateway is also configured",
-        "Yes, peering always extends transitively"
+        "Yes, connectivity extends automatically to anything peered with either VNet"
       ],
       "correct": 1,
-      "explanation": "Peering is not transitive \u2014 the first and third VNets would need their own direct peering to communicate."
+      "explanation": "Peering is not transitive \u2014 the first and third VNets would need their own direct peering to communicate. Region and a VPN Gateway are both irrelevant to this limitation; it applies regardless of region and has nothing to do with gateway configuration."
     },
     {
       "id": "q26",
@@ -1086,12 +1086,12 @@
       "question": "A Global Administrator in Microsoft Entra ID tries to edit a resource group in the Azure portal and gets an access-denied error, despite being a Global Administrator. What lets them manage Azure resources across every subscription in the tenant?",
       "options": [
         "Turning on the \"elevate access\" setting for Global Administrators in Microsoft Entra ID properties",
-        "Assigning themselves the Reader role manually",
-        "Waiting 24 hours for permissions to sync",
-        "Creating a new subscription under their own name"
+        "Assigning themselves the Reader role manually at the tenant root management group scope",
+        "Waiting 24 hours for the new Global Administrator role to finish synchronizing to Azure",
+        "Creating a brand new subscription under their own account and moving the resource group into it"
       ],
       "correct": 0,
-      "explanation": "Microsoft Entra roles like Global Administrator control the identity plane, not Azure resources, by default. The \"elevate access\" setting grants Global Administrators the Azure RBAC User Access Administrator role at the root management group scope, letting them manage resources tenant-wide."
+      "explanation": "Microsoft Entra roles like Global Administrator control the identity plane, not Azure resources, by default. The \"elevate access\" setting grants Global Administrators the Azure RBAC User Access Administrator role at the root management group scope, letting them manage resources tenant-wide. Self-assigning just Reader would only grant read access, not the ability to edit; nothing about this permission gap resolves on a timer; and creating a new subscription does nothing for access to resources in existing ones."
     },
     {
       "id": "q38",
@@ -1114,12 +1114,12 @@
       "question": "An application's managed identity needs to read and write blobs in a container, without ever handling a SAS token or the storage account key.",
       "options": [
         "Assign the managed identity the Storage Blob Data Contributor role on the container or storage account",
-        "Generate a long-lived SAS token for the managed identity",
-        "Share the storage account access key with the application",
-        "Add the application to a dynamic group"
+        "Generate a long-lived SAS token and embed it in the application's configuration for the managed identity to use",
+        "Share the storage account's access key with the application so it can authenticate directly",
+        "Add the application to a dynamic group whose membership rule grants storage access automatically"
       ],
       "correct": 0,
-      "explanation": "Data-plane RBAC roles like Storage Blob Data Contributor let an identity authenticate with Microsoft Entra ID and access blob data directly. The control-plane Contributor role manages the storage account itself but does not by itself grant blob data access once key-based access is restricted."
+      "explanation": "Data-plane RBAC roles like Storage Blob Data Contributor let an identity authenticate with Microsoft Entra ID and access blob data directly, with no key or token to manage at all. A SAS token or the account key both reintroduce exactly the credential-handling this scenario wants to avoid, and dynamic groups manage user/group membership rules, not resource-level data permissions."
     },
     {
       "id": "q40",
@@ -1142,12 +1142,12 @@
       "question": "An administrator wants one NSG rule that allows traffic to every VM tagged as 'WebTier,' regardless of each VM's individual IP address, which changes as instances are added or removed.",
       "options": [
         "Group the VMs\u2019 network interfaces into an Application Security Group and reference it in the rule",
-        "Write a separate NSG rule for every VM's current IP address",
-        "Use a public Load Balancer instead of an NSG",
-        "Move all the VMs into one subnet with no other traffic"
+        "Write a separate NSG rule for every VM's current IP address, updating it manually each time an instance changes",
+        "Replace the NSG with a public Load Balancer configured with the same allow rule",
+        "Move all the VMs into one dedicated subnet and apply the rule to that subnet as a whole"
       ],
       "correct": 0,
-      "explanation": "An Application Security Group (ASG) groups VM network interfaces logically, like 'WebTier,' so an NSG rule can reference the group as a source or destination instead of hardcoding IP addresses that change over time."
+      "explanation": "An Application Security Group (ASG) groups VM network interfaces logically, like 'WebTier,' so an NSG rule can reference the group as a source or destination instead of hardcoding IP addresses that change over time. Per-IP rules break the moment an instance is replaced, a Load Balancer distributes traffic but doesn't filter it the way an NSG rule does, and a subnet-wide rule would also catch any other VM later placed in that same subnet."
     },
     {
       "id": "q42",
@@ -1286,13 +1286,13 @@
       "type": "mc",
       "question": "An organization wants administrators to normally hold no standing Global Administrator access, activating that role with approval and only for a limited, time-boxed window when actually needed. Which feature enables this?",
       "options": [
-        "Self-service password reset",
-        "Azure Policy",
+        "Self-service password reset (SSPR) for standing admin accounts",
+        "Azure Policy with a Deny effect on privileged role assignments",
         "Microsoft Entra Privileged Identity Management (PIM)",
-        "A dynamic security group"
+        "A dynamic security group containing every Global Administrator"
       ],
       "correct": 2,
-      "explanation": "PIM enables just-in-time, time-boxed role activation, often requiring approval or justification, instead of granting standing or permanent access to a privileged role. SSPR only handles password resets, Azure Policy governs resource configuration compliance, and a dynamic group only manages group membership rules, so none of the three provide time-boxed privileged role activation."
+      "explanation": "PIM enables just-in-time, time-boxed role activation, often requiring approval or justification, instead of granting standing or permanent access to a privileged role. SSPR only handles password resets, a Deny-effect policy governs resource configuration compliance rather than role activation timing, and a dynamic group only manages who's a member, not how long they hold standing access \u2014 none of the three provide time-boxed privileged role activation."
     },
     {
       "id": "q47",
@@ -1473,13 +1473,139 @@
       "question": "In this real Instance details section for a new VM, Availability options is set to 'No infrastructure redundancy required.' What's the practical effect of that choice?",
       "options": [
         "The VM won't be protected against a single hardware failure or planned maintenance taking down its host",
-        "The VM will automatically be placed in an Availability Zone",
-        "Azure will refuse to create the VM until a redundancy option is selected",
-        "The VM will be replicated to a secondary region automatically"
+        "The VM will automatically be placed in an Availability Zone chosen by Azure at deployment time",
+        "Azure will refuse to create the VM until an explicit redundancy option is selected in this section",
+        "The VM will be replicated to a secondary paired region automatically at no extra cost"
       ],
       "correct": 0,
       "explanation": "\"No infrastructure redundancy required\" is a valid, selectable option \u2014 Azure won't block VM creation over it \u2014 but it means skipping Availability Zones or an Availability Set, so a single host failure or planned maintenance event on that host can take the VM down with no built-in protection.",
       "image": "vmSize"
+    },
+    {
+      "id": "q56",
+      "cat": "identityGov",
+      "type": "mc",
+      "question": "Which statement correctly distinguishes a Microsoft Entra role from an Azure RBAC role?",
+      "options": [
+        "Microsoft Entra roles govern directory-level tasks like resetting passwords; Azure RBAC roles govern access to Azure resources like VMs and storage accounts",
+        "Azure RBAC roles govern directory-level tasks; Microsoft Entra roles govern access to Azure resources",
+        "The two are simply two names for the same underlying role assignments",
+        "Microsoft Entra roles apply only to guest users, while Azure RBAC roles apply only to internal employees"
+      ],
+      "correct": 0,
+      "explanation": "Microsoft Entra roles (like Global Administrator or Helpdesk Administrator) manage the directory itself \u2014 users, groups, licenses. Azure RBAC roles (like Contributor or Reader) manage access to Azure resources at a management group, subscription, resource group, or resource scope. The other three swap that division, treat the two as identical, or invent a guest/internal restriction that neither role type actually has."
+    },
+    {
+      "id": "q57",
+      "cat": "identityGov",
+      "type": "mc",
+      "question": "An organization creates an emergency access ('break-glass') account that's excluded from every Conditional Access policy, in case a misconfigured policy locks out all admins at once. Which additional practice is recommended to keep that account secure?",
+      "options": [
+        "Give the account a long, complex credential that isn't stored with any one person, plus alerting on any sign-in",
+        "Enroll the account in the same Conditional Access policies it was created to bypass, for consistency",
+        "Assign the account the Reader role only, so it can never make changes even in a real emergency",
+        "Rotate the account's password automatically every 24 hours through a Conditional Access policy"
+      ],
+      "correct": 0,
+      "explanation": "A break-glass account needs to stay usable if Conditional Access itself is misconfigured, so it's deliberately excluded from those policies \u2014 but it still needs strong secrecy (a long, closely-held credential) and monitoring (alerting on any sign-in, since real use should be rare and noteworthy). Enrolling it back into Conditional Access defeats its purpose, Reader access wouldn't let it actually fix anything during an emergency, and Conditional Access has no role in password rotation."
+    },
+    {
+      "id": "q58",
+      "cat": "storage",
+      "type": "mc",
+      "question": "Which Azure Storage service is purpose-built for storing unstructured data like images, videos, and log files?",
+      "options": [
+        "Azure Files",
+        "Azure Blob Storage",
+        "Azure Table Storage",
+        "Azure Queue Storage"
+      ],
+      "correct": 1,
+      "explanation": "Blob Storage is designed for unstructured data such as images, video, and logs. Files provides managed SMB/NFS file shares, Table Storage holds structured NoSQL key-value data, and Queue Storage holds messages for asynchronous processing \u2014 none of the other three is built for general unstructured object data."
+    },
+    {
+      "id": "q59",
+      "cat": "storage",
+      "type": "mc",
+      "question": "A company needs its nightly database export files, currently written to Azure Blob Storage in the Hot tier, to automatically move to the Cool tier after 30 days of no access, and then to the Archive tier after 90 days, without anyone doing it manually. Which feature accomplishes this?",
+      "options": [
+        "A blob lifecycle management policy with time-based tier transition rules",
+        "Changing the storage account's default access tier to Cool",
+        "A SAS token scoped to expire after 90 days",
+        "Azure Backup configured with a 90-day retention policy"
+      ],
+      "correct": 0,
+      "explanation": "Lifecycle management policies automatically transition or delete blobs based on rules like 'no access for N days,' handling exactly this tiering without manual intervention. Changing the account's default tier only affects new blobs uploaded without an explicit tier, a SAS token controls access duration rather than storage tier, and Backup protects against data loss \u2014 it doesn't move blobs between access tiers."
+    },
+    {
+      "id": "q60",
+      "cat": "compute",
+      "type": "mc",
+      "question": "Which Azure compute option gives an administrator the most direct control over the guest operating system, including choosing exactly which patches to apply and when?",
+      "options": [
+        "Azure Functions",
+        "Azure App Service",
+        "Azure Virtual Machines",
+        "Azure Container Instances"
+      ],
+      "correct": 2,
+      "explanation": "VMs expose the full guest OS to the administrator, including manual control over patch timing. App Service and Functions both abstract the OS away as a managed platform, and Container Instances runs containers without exposing a guest OS to patch directly."
+    },
+    {
+      "id": "q61",
+      "cat": "compute",
+      "type": "mc",
+      "question": "A team runs a VM Scale Set where new instances need a configuration script to run automatically the moment they're provisioned, with no one logging in manually. They also want existing instances to keep running with their current configuration even after the script is updated later. Which approach fits both requirements?",
+      "options": [
+        "Add the Custom Script Extension to the Scale Set model, so it runs on every new instance created going forward, without re-running it against existing instances",
+        "Run the script manually on each new instance as it appears in the portal",
+        "Bake the script into a scheduled task that runs on all instances, new and existing, every time the Scale Set model is updated",
+        "Use Azure Automation State Configuration to reapply the script to every instance nightly"
+      ],
+      "correct": 0,
+      "explanation": "Adding the Custom Script Extension to the Scale Set model means it's part of every new instance's provisioning going forward, but updating the model doesn't retroactively re-run it against instances that already exist and are running fine \u2014 matching both stated requirements. Manual execution doesn't scale and reintroduces the human step this scenario wants removed, and the other two options both force the update onto existing instances, which is exactly what the team wants to avoid."
+    },
+    {
+      "id": "q62",
+      "cat": "networking",
+      "type": "mc",
+      "question": "A company's on-premises network connects to Azure over an ExpressRoute circuit. During a rare ExpressRoute outage, they want traffic to automatically fail over to a site-to-site VPN connection instead of losing connectivity entirely. What's required to enable this?",
+      "options": [
+        "Configuring both an ExpressRoute circuit and a VPN Gateway connection to the same virtual network, so routing can fail over between them",
+        "Nothing \u2014 Azure automatically creates a VPN fallback whenever an ExpressRoute circuit is provisioned",
+        "Replacing the ExpressRoute circuit with Azure Virtual WAN, which does not support VPN connections",
+        "Enabling zone redundancy on the ExpressRoute circuit itself"
+      ],
+      "correct": 0,
+      "explanation": "A coexisting VPN Gateway connection alongside the ExpressRoute circuit, both attached to the same virtual network, lets routing fail over to the VPN path if ExpressRoute becomes unavailable \u2014 this has to be deliberately configured, it isn't automatic. Virtual WAN actually supports both ExpressRoute and VPN connections side by side, and zone redundancy protects against a datacenter failure within a region, not a circuit-level ExpressRoute outage."
+    },
+    {
+      "id": "q63",
+      "cat": "networking",
+      "type": "mc",
+      "question": "A company already filters subnet traffic with NSGs but wants centralized, tenant-wide outbound filtering \u2014 for example, blocking outbound traffic to a specific list of known-malicious FQDNs \u2014 enforced consistently across many VNets from a single place to manage the rule set. Which is the better fit, and why doesn't relying on more NSGs solve this well?",
+      "options": [
+        "Azure Firewall, since it supports centralized FQDN-based filtering across multiple VNets from one managed instance",
+        "NSGs alone, since an NSG rule can already reference an FQDN directly as a destination",
+        "Azure Firewall, since NSGs are being fully retired and no longer supported on new subnets",
+        "NSGs alone, since adding one NSG per VNet is functionally identical to a centralized firewall"
+      ],
+      "correct": 0,
+      "explanation": "Azure Firewall supports FQDN-based filtering rules and is deployed once to centrally enforce policy across many VNets, matching the centralized, tenant-wide requirement here. NSGs filter by IP, port, and protocol \u2014 they don't support FQDN-based rules the way Azure Firewall does, and NSGs remain fully supported, not being retired. Reproducing the same rule set across many separate NSGs also isn't equivalent to one centrally managed policy \u2014 it means maintaining consistency across every one of them by hand."
+    },
+    {
+      "id": "q64",
+      "cat": "monitoring",
+      "type": "mc",
+      "question": "An administrator wants an email sent automatically whenever a VM's CPU usage stays above 90% for more than 10 minutes, without having to check the portal manually. Which Azure Monitor component should they configure?",
+      "options": [
+        "A metric alert rule with an action group that sends an email notification",
+        "Log Analytics, since it emails a daily summary of all metrics automatically",
+        "Azure Advisor, since it emails cost and performance recommendations weekly",
+        "Application Insights, configured to alert on high CPU for the application's App Service plan"
+      ],
+      "correct": 0,
+      "explanation": "A metric alert rule watches a specific metric like CPU percentage against a threshold and duration, and an action group defines what happens when it fires \u2014 including sending an email. Log Analytics stores and queries data but doesn't send scheduled summary emails on its own, Advisor gives periodic recommendations rather than real-time threshold alerts, and Application Insights is scoped to application-level telemetry, like an App Service plan's own metrics, not the CPU of an arbitrary VM."
     }
   ],
   "lessons": [
@@ -2106,6 +2232,34 @@
         }
       ],
       "explanation": "NSG rules process in ascending priority order (lowest number first); the first matching rule wins and evaluation stops there \u2014 a classic AZ-104 trap when a lower-priority-number deny rule shadows a higher-priority-number allow rule."
+    },
+    {
+      "id": "ml-az104-4",
+      "cat": "compute",
+      "scenario": "An administrator shuts down a VM from inside its own guest operating system, leaving it allocated in Azure. Because the hardware is still reserved for that VM, compute charges keep {b1}. To actually stop being billed for compute, they instead need to {b2} the VM, which releases the underlying hardware allocation entirely \u2014 storage costs continue regardless of which method was used.",
+      "blanks": [
+        {
+          "key": "b1",
+          "options": [
+            "accruing",
+            "refunding automatically",
+            "doubling",
+            "pausing"
+          ],
+          "correct": 0
+        },
+        {
+          "key": "b2",
+          "options": [
+            "restart",
+            "deallocate",
+            "resize",
+            "clone"
+          ],
+          "correct": 1
+        }
+      ],
+      "explanation": "Shutting down a VM from inside its own OS leaves it 'allocated' \u2014 Azure still reserves the hardware for it, so compute charges keep accruing even though nothing is running. Deallocating (the Stop button in the portal, or az vm deallocate) releases that hardware reservation, which is what actually stops compute billing."
     }
   ],
   "sequences": [
