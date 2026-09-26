@@ -382,7 +382,6 @@ function DiagramDmzZones() {
       <DBox x={362} y={40} w={36} h={36} label="LAN" sub="private" />
       <DCaption x={200} y={120} text="Each boundary firewall limits what can reach the next zone inward" />
       <DCaption x={200} y={134} text="Only the DMZ is directly exposed to the internet" />
->>>>>>> worktree-agent-af11618ecf5020e99
     </svg>
   );
 }
