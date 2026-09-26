@@ -263,6 +263,20 @@ resolve, and a hash needs none (see `routeToHash`/`parseHash` in
 `03_helpers.js`). Quiz and Exam missed-question review lists show each question's
 explanation alongside the prompt, not just what you got wrong.
 
+Quiz mode has a third **Verbal** sub-tab (alongside Questions and Match) —
+hands-free, audio-only studying for e.g. driving. Pick a length and a
+"thinking pause" duration, hit Start, and it reads each question aloud
+(and its options, for multiple-choice), pauses, then reads the correct
+answer and explanation before auto-advancing — no microphone, no answer
+capture, so it's a pure listen-and-recall aid rather than a scored
+session (mastery/SRS/daily goal don't move from it). Multi-select
+questions are skipped — there's nothing to "select" without a mic. A
+single Pause/Play plus Skip control covers the rare safe glance; a
+Screen Wake Lock keeps the phone from auto-locking mid-session
+(feature-detected, and the setup screen is upfront that a real hard lock
+or a backgrounded tab can still stop playback — that's outside any web
+app's control).
+
 **Fifteen tracks, all visible in the track switcher:**
 - **AZ-900** (Azure Fundamentals) — full course content, 106 questions.
 - **AB-650** (M365 & AI Services Administrator) — full question bank (52

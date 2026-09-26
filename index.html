@@ -1586,7 +1586,7 @@ function parseHash(hash, validTrackKeys) {
   const [trackKey, mode, sub] = parts;
   if (!validTrackKeys.has(trackKey)) return { mode: 'home' };
   if (mode === 'learn') return { mode: 'learn', trackKey, learnView: ['cards', 'study', 'sheet'].includes(sub) ? sub : 'study' };
-  if (mode === 'quiz') return { mode: 'quiz', trackKey, quizView: ['questions', 'match'].includes(sub) ? sub : 'questions' };
+  if (mode === 'quiz') return { mode: 'quiz', trackKey, quizView: ['questions', 'match', 'verbal'].includes(sub) ? sub : 'questions' };
   if (mode === 'exam') return { mode: 'exam', trackKey };
   return { mode: 'home' };
 }
@@ -4212,6 +4212,137 @@ function QuizSetup({ length, setLength, types, toggleType, onReroll, poolSize, m
   );
 }
 
+// Hands-free, audio-only quiz mode (ROADMAP.md section 16): reads a
+// question aloud, pauses for a fixed "thinking" interval, reads the
+// answer + explanation, then auto-advances — no tap-to-answer, so this
+// is deliberately a much sparer screen than QuestionView above (a rare
+// glance, not something read while driving).
+function VerbalQuizPanel({
+  speechSupported, phase, session, index, step, length, setLength, pauseSec, setPauseSec,
+  poolSize, categories, onStart, onTogglePause, onSkip, onRestart,
+}) {
+  if (!speechSupported) {
+    return (
+      <div style={{ textAlign: 'center', color: COLOR.muted, fontSize: '13px', padding: '30px 10px' }}>
+        Verbal Quiz needs text-to-speech, which this browser doesn't support.
+      </div>
+    );
+  }
+
+  if (phase === 'setup') {
+    const lengths = [5, 10, 15, 25];
+    return (
+      <div style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderRadius: '18px', padding: '20px' }}>
+        <div className="itil-display" style={{ fontSize: '16px', fontWeight: 600, marginBottom: '8px' }}>🔊 Verbal Quiz</div>
+        <div style={{ fontSize: '12.5px', color: COLOR.muted, lineHeight: 1.5, marginBottom: '16px' }}>
+          Hands-free, audio-only studying — reads each question aloud, pauses so you can think, then reads
+          the answer and explanation before moving on. No microphone, no answer capture: this is a
+          listen-and-recall study aid, not a scored quiz, so it won't move your mastery % or daily goal.
+          Multi-select questions are skipped — there's nothing to select without a mic.
+        </div>
+        <div className="flex items-center gap-2 mb-2">
+          <label htmlFor="verbal-length-select" style={{ fontSize: '11px', color: COLOR.muted, minWidth: '90px' }}>Length</label>
+          <select
+            id="verbal-length-select"
+            value={length}
+            onChange={(e) => setLength(Number(e.target.value))}
+            style={{ padding: '6px 10px', borderRadius: '9px', fontSize: '12.5px', fontWeight: 600, border: `1px solid ${COLOR.primary}`, background: 'rgba(167,139,250,0.14)', color: COLOR.primary }}
+          >
+            {lengths.map((n) => <option key={n} value={n}>{n} questions</option>)}
+          </select>
+        </div>
+        <div className="flex items-center gap-2 mb-3">
+          <label htmlFor="verbal-pause-select" style={{ fontSize: '11px', color: COLOR.muted, minWidth: '90px' }}>Thinking pause</label>
+          <select
+            id="verbal-pause-select"
+            value={pauseSec}
+            onChange={(e) => setPauseSec(Number(e.target.value))}
+            style={{ padding: '6px 10px', borderRadius: '9px', fontSize: '12.5px', fontWeight: 600, border: `1px solid ${COLOR.border}`, background: COLOR.surfaceRaised, color: COLOR.text }}
+          >
+            {[4, 6, 8, 10, 15].map((n) => <option key={n} value={n}>{n} seconds</option>)}
+          </select>
+        </div>
+        <div style={{ fontSize: '11px', color: COLOR.muted, marginBottom: '14px' }}>{poolSize} questions available with this filter.</div>
+        <div style={{ fontSize: '10.5px', color: COLOR.muted, marginBottom: '16px', lineHeight: 1.4 }}>
+          Keeps this screen awake while playing, so audio doesn't stop the moment your phone would
+          otherwise lock — leave the app open and in view. Backgrounding the tab or a hard screen-lock
+          can still pause playback; that's outside any web app's control.
+        </div>
+        <button
+          onClick={onStart}
+          disabled={poolSize === 0}
+          style={{ width: '100%', padding: '12px', borderRadius: '12px', background: poolSize === 0 ? COLOR.border : COLOR.primary, color: COLOR.onAccent, fontSize: '14px', fontWeight: 600 }}
+        >
+          ▶ Start Verbal Quiz
+        </button>
+      </div>
+    );
+  }
+
+  const q = session[index];
+  if (phase === 'complete' || !q) {
+    return (
+      <div style={{ textAlign: 'center', padding: '30px 10px' }}>
+        <div className="itil-display" style={{ fontSize: '16px', fontWeight: 600, marginBottom: '8px' }}>Session complete</div>
+        <div style={{ fontSize: '12.5px', color: COLOR.muted, marginBottom: '18px' }}>
+          Read through {session.length} question{session.length === 1 ? '' : 's'}. Nothing was scored —
+          start another round whenever you're ready.
+        </div>
+        <button onClick={onRestart} style={{ padding: '10px 20px', borderRadius: '12px', background: COLOR.primary, color: COLOR.onAccent, fontSize: '13px', fontWeight: 600 }}>
+          Back to setup
+        </button>
+      </div>
+    );
+  }
+
+  const stepLabels = { question: 'Question', options: 'Options', thinking: 'Thinking…', answer: 'Answer', explanation: 'Explanation' };
+  const categoryLabel = categories.find((c) => c.key === q.cat)?.label;
+  const showAnswer = step === 'answer' || step === 'explanation';
+
+  return (
+    <div>
+      <div className="flex justify-between items-center mb-2" style={{ fontSize: '11px', color: COLOR.muted }}>
+        <span>{categoryLabel}</span>
+        <span>{index + 1} / {session.length}</span>
+      </div>
+      <div style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderRadius: '18px', padding: '24px', textAlign: 'center' }}>
+        <div style={{
+          display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '4px 12px', borderRadius: '999px',
+          background: phase === 'paused' ? COLOR.surfaceRaised : 'rgba(167,139,250,0.14)',
+          color: phase === 'paused' ? COLOR.muted : COLOR.primary, fontSize: '11px', fontWeight: 600, marginBottom: '18px',
+        }}>
+          {phase === 'paused' ? '⏸ Paused' : `🔊 ${stepLabels[step] || ''}`}
+        </div>
+        <div style={{ fontSize: '16px', lineHeight: 1.5, fontWeight: 500, marginBottom: showAnswer ? '10px' : 0 }}>{q.question}</div>
+        {showAnswer && (
+          <div style={{ fontSize: '13.5px', color: COLOR.success, fontWeight: 600, marginBottom: '8px' }}>
+            {q.type === 'tf' ? (q.answer ? 'True' : 'False') : q.options[q.correct]}
+          </div>
+        )}
+        {step === 'explanation' && (
+          <div style={{ fontSize: '12px', color: COLOR.muted, lineHeight: 1.5, marginTop: '8px' }}>{q.explanation}</div>
+        )}
+      </div>
+      <div className="flex gap-3" style={{ marginTop: '18px' }}>
+        <button
+          onClick={onTogglePause}
+          className="flex-1"
+          style={{ padding: '16px', borderRadius: '14px', background: COLOR.primary, color: COLOR.onAccent, fontSize: '15px', fontWeight: 600 }}
+        >
+          {phase === 'paused' ? '▶ Play' : '⏸ Pause'}
+        </button>
+        <button
+          onClick={onSkip}
+          className="flex-1"
+          style={{ padding: '16px', borderRadius: '14px', border: `1px solid ${COLOR.border}`, background: 'transparent', color: COLOR.text, fontSize: '15px', fontWeight: 600 }}
+        >
+          Skip ⏭
+        </button>
+      </div>
+    </div>
+  );
+}
+
 function QuestionView({ q, selected, onChoose, onNext, index, total, categoryLabel, badgeLabel, msPending, onToggleMs, onSubmitMs, nextLabel, hideMeta, hideNext, flashcardsData }) {
   const [activeTermKey, setActiveTermKey] = useState(null);
   useEffect(() => { setActiveTermKey(null); }, [q && q.id]);
@@ -4660,6 +4791,22 @@ function CertStudyApp() {
   const { ttsRate, ttsVoiceURI, setTtsRate, setTtsVoiceURI } = useTtsPrefs();
   const [ttsVoices, setTtsVoices] = useState([]);
 
+  // Verbal Quiz — a hands-free, audio-only quiz flow (read question, pause
+  // to think, read the answer + explanation, auto-advance). Deliberately a
+  // separate state machine from the tap-to-answer quiz above: there's no
+  // captured answer here, so it can't share sessionScore/sessionAnswers,
+  // and its read-pause-reveal-advance sequencing needs a strict chained
+  // order (see the driver effect below) that the tap-driven flow has no
+  // use for.
+  const [verbalPhase, setVerbalPhase] = useState('setup'); // 'setup' | 'active' | 'paused' | 'complete'
+  const [verbalSession, setVerbalSession] = useState([]);
+  const [verbalIndex, setVerbalIndex] = useState(0);
+  const [verbalStep, setVerbalStep] = useState('question');
+  const [verbalLength, setVerbalLength] = useState(10);
+  const [verbalPauseSec, setVerbalPauseSec] = useState(6);
+  const verbalTimerRef = useRef(null);
+  const wakeLockRef = useRef(null);
+
   const [examTrack, setExamTrack] = useState(null);
   const [examSession, setExamSession] = useState([]);
   const [examAnswers, setExamAnswers] = useState({});
@@ -4942,7 +5089,10 @@ function CertStudyApp() {
   };
 
   useEffect(() => {
-    return () => { if (speechSupported) window.speechSynthesis.cancel(); };
+    return () => {
+      if (speechSupported) window.speechSynthesis.cancel();
+      if (wakeLockRef.current) wakeLockRef.current.release().catch(() => {});
+    };
     // eslint-disable-next-line
   }, []);
 
@@ -4958,6 +5108,124 @@ function CertStudyApp() {
     return () => window.speechSynthesis.removeEventListener('voiceschanged', loadVoices);
     // eslint-disable-next-line
   }, []);
+
+  // Verbal Quiz's read-pause-reveal-advance driver. Deliberately separate
+  // from speak()/speakingId above, which is a one-shot per-item toggle (tap
+  // to read one card, tap again to stop) — this needs a strict chained
+  // sequence per question (question -> [options] -> thinking pause ->
+  // answer -> explanation -> next question), driven by each utterance's
+  // onend. Runs only while verbalPhase is 'active'; the effect's own
+  // cleanup below cancels speech/clears the pause timer the instant
+  // verbalPhase changes away from 'active' (paused, or navigated off this
+  // tab entirely), and Resume simply re-runs the same step rather than
+  // trying to resume mid-sentence — far more reliable cross-browser than
+  // speechSynthesis.pause()/.resume(), which several mobile browsers
+  // implement inconsistently.
+  useEffect(() => {
+    if (verbalPhase !== 'active') return undefined;
+    const q = verbalSession[verbalIndex];
+    if (!q) { setVerbalPhase('complete'); return undefined; }
+    const steps = q.type === 'tf' ? ['question', 'thinking', 'answer', 'explanation'] : ['question', 'options', 'thinking', 'answer', 'explanation'];
+
+    const goNext = () => {
+      const i = steps.indexOf(verbalStep);
+      if (i === -1 || i + 1 >= steps.length) {
+        if (verbalIndex + 1 >= verbalSession.length) { setVerbalPhase('complete'); return; }
+        setVerbalIndex(verbalIndex + 1);
+        setVerbalStep('question');
+        return;
+      }
+      setVerbalStep(steps[i + 1]);
+    };
+
+    if (verbalStep === 'thinking') {
+      verbalTimerRef.current = setTimeout(goNext, verbalPauseSec * 1000);
+      return () => clearTimeout(verbalTimerRef.current);
+    }
+
+    const letter = (i) => String.fromCharCode(65 + i);
+    let text = '';
+    if (verbalStep === 'question') text = q.type === 'tf' ? `${q.question} True, or false?` : q.question;
+    else if (verbalStep === 'options') text = q.options.map((opt, i) => `Option ${letter(i)}: ${opt}.`).join(' ');
+    else if (verbalStep === 'answer') {
+      text = q.type === 'tf'
+        ? `The correct answer is ${q.answer ? 'True' : 'False'}.`
+        : `The correct answer is option ${letter(q.correct)}: ${q.options[q.correct]}.`;
+    } else if (verbalStep === 'explanation') text = q.explanation;
+
+    const utter = new SpeechSynthesisUtterance(text);
+    utter.rate = ttsRate;
+    if (ttsVoiceURI) {
+      const voice = ttsVoices.find((v) => v.voiceURI === ttsVoiceURI);
+      if (voice) utter.voice = voice;
+    }
+    utter.onend = goNext;
+    utter.onerror = goNext;
+    window.speechSynthesis.speak(utter);
+    return () => window.speechSynthesis.cancel();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [verbalPhase, verbalIndex, verbalStep]);
+
+  // Screen Wake Lock — keeps the screen from auto-locking while a Verbal
+  // Quiz session is actively playing, since speechSynthesis playback is
+  // commonly suspended the moment a mobile browser tab is backgrounded or
+  // the screen locks (a platform limitation no web app can override).
+  // Feature-detected: silently a no-op on browsers without support.
+  useEffect(() => {
+    if (verbalPhase !== 'active' || !('wakeLock' in navigator)) return undefined;
+    let cancelled = false;
+    navigator.wakeLock.request('screen').then((lock) => {
+      if (cancelled) { lock.release().catch(() => {}); return; }
+      wakeLockRef.current = lock;
+    }).catch(() => {});
+    return () => {
+      cancelled = true;
+      if (wakeLockRef.current) { wakeLockRef.current.release().catch(() => {}); wakeLockRef.current = null; }
+    };
+  }, [verbalPhase]);
+
+  // Leaving the Verbal Quiz tab (or switching tracks) mid-session should
+  // stop the audio rather than let it keep talking in the background —
+  // resets back to its own setup screen so returning to the tab starts
+  // fresh rather than resuming a stale session.
+  useEffect(() => {
+    if (mode === 'quiz' && quizView === 'verbal') return;
+    if (speechSupported) window.speechSynthesis.cancel();
+    setVerbalPhase((p) => (p === 'setup' ? p : 'setup'));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mode, quizView, activeTrack]);
+
+  const verbalPool = useMemo(() => {
+    const byCat = activeCat === 'all' ? questionsData : questionsData.filter((q) => q.cat === activeCat);
+    // Multi-select questions don't map to an audio-only pause/reveal flow
+    // — there's nothing to "select" without a mic — so they're excluded
+    // from this mode's pool entirely, per ROADMAP.md section 16.
+    return byCat.filter((q) => q.type !== 'ms');
+  }, [activeCat, questionsData]);
+
+  const startVerbalSession = () => {
+    const len = Math.min(verbalLength, verbalPool.length);
+    const picked = activeCat === 'all'
+      ? pickInterleaved(verbalPool, len, seenLog[activeTrack] || {})
+      : pickRotated(verbalPool, len, seenLog[activeTrack] || {});
+    const prepared = picked.map(prepareQuestion);
+    setVerbalSession(prepared);
+    setVerbalIndex(0);
+    setVerbalStep('question');
+    setVerbalPhase('active');
+    markSeen(prepared.map((q) => q.id));
+  };
+
+  const toggleVerbalPause = () => setVerbalPhase((p) => (p === 'paused' ? 'active' : 'paused'));
+
+  const skipVerbal = () => {
+    if (speechSupported) window.speechSynthesis.cancel();
+    clearTimeout(verbalTimerRef.current);
+    if (verbalIndex + 1 >= verbalSession.length) { setVerbalPhase('complete'); return; }
+    setVerbalIndex(verbalIndex + 1);
+    setVerbalStep('question');
+    setVerbalPhase('active');
+  };
 
   const achievements = useMemo(() => evaluateAchievements(results, stats), [results, stats]);
 
@@ -5730,6 +5998,13 @@ function CertStudyApp() {
             >
               Match
             </button>
+            <button
+              onClick={() => setQuizView('verbal')}
+              className="flex-1"
+              style={{ padding: '6px 2px', borderRadius: '8px', fontSize: '10.5px', fontWeight: 600, background: quizView === 'verbal' ? COLOR.surfaceRaised : 'transparent', color: quizView === 'verbal' ? COLOR.text : COLOR.muted }}
+            >
+              Verbal
+            </button>
           </div>
         )}
 
@@ -5824,6 +6099,26 @@ function CertStudyApp() {
           <MatchGame
             flashcards={filteredFlashcards}
             onRoundComplete={() => saveStats({ ...stats, counts: { ...stats.counts, matchRoundsCompleted: stats.counts.matchRoundsCompleted + 1 } })}
+          />
+        )}
+
+        {mode === 'quiz' && quizView === 'verbal' && (
+          <VerbalQuizPanel
+            speechSupported={speechSupported}
+            phase={verbalPhase}
+            session={verbalSession}
+            index={verbalIndex}
+            step={verbalStep}
+            length={verbalLength}
+            setLength={setVerbalLength}
+            pauseSec={verbalPauseSec}
+            setPauseSec={setVerbalPauseSec}
+            poolSize={verbalPool.length}
+            categories={categories}
+            onStart={startVerbalSession}
+            onTogglePause={toggleVerbalPause}
+            onSkip={skipVerbal}
+            onRestart={() => setVerbalPhase('setup')}
           />
         )}
 

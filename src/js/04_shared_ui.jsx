@@ -2157,6 +2157,137 @@ function QuizSetup({ length, setLength, types, toggleType, onReroll, poolSize, m
   );
 }
 
+// Hands-free, audio-only quiz mode (ROADMAP.md section 16): reads a
+// question aloud, pauses for a fixed "thinking" interval, reads the
+// answer + explanation, then auto-advances — no tap-to-answer, so this
+// is deliberately a much sparer screen than QuestionView above (a rare
+// glance, not something read while driving).
+function VerbalQuizPanel({
+  speechSupported, phase, session, index, step, length, setLength, pauseSec, setPauseSec,
+  poolSize, categories, onStart, onTogglePause, onSkip, onRestart,
+}) {
+  if (!speechSupported) {
+    return (
+      <div style={{ textAlign: 'center', color: COLOR.muted, fontSize: '13px', padding: '30px 10px' }}>
+        Verbal Quiz needs text-to-speech, which this browser doesn't support.
+      </div>
+    );
+  }
+
+  if (phase === 'setup') {
+    const lengths = [5, 10, 15, 25];
+    return (
+      <div style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderRadius: '18px', padding: '20px' }}>
+        <div className="itil-display" style={{ fontSize: '16px', fontWeight: 600, marginBottom: '8px' }}>🔊 Verbal Quiz</div>
+        <div style={{ fontSize: '12.5px', color: COLOR.muted, lineHeight: 1.5, marginBottom: '16px' }}>
+          Hands-free, audio-only studying — reads each question aloud, pauses so you can think, then reads
+          the answer and explanation before moving on. No microphone, no answer capture: this is a
+          listen-and-recall study aid, not a scored quiz, so it won't move your mastery % or daily goal.
+          Multi-select questions are skipped — there's nothing to select without a mic.
+        </div>
+        <div className="flex items-center gap-2 mb-2">
+          <label htmlFor="verbal-length-select" style={{ fontSize: '11px', color: COLOR.muted, minWidth: '90px' }}>Length</label>
+          <select
+            id="verbal-length-select"
+            value={length}
+            onChange={(e) => setLength(Number(e.target.value))}
+            style={{ padding: '6px 10px', borderRadius: '9px', fontSize: '12.5px', fontWeight: 600, border: `1px solid ${COLOR.primary}`, background: 'rgba(167,139,250,0.14)', color: COLOR.primary }}
+          >
+            {lengths.map((n) => <option key={n} value={n}>{n} questions</option>)}
+          </select>
+        </div>
+        <div className="flex items-center gap-2 mb-3">
+          <label htmlFor="verbal-pause-select" style={{ fontSize: '11px', color: COLOR.muted, minWidth: '90px' }}>Thinking pause</label>
+          <select
+            id="verbal-pause-select"
+            value={pauseSec}
+            onChange={(e) => setPauseSec(Number(e.target.value))}
+            style={{ padding: '6px 10px', borderRadius: '9px', fontSize: '12.5px', fontWeight: 600, border: `1px solid ${COLOR.border}`, background: COLOR.surfaceRaised, color: COLOR.text }}
+          >
+            {[4, 6, 8, 10, 15].map((n) => <option key={n} value={n}>{n} seconds</option>)}
+          </select>
+        </div>
+        <div style={{ fontSize: '11px', color: COLOR.muted, marginBottom: '14px' }}>{poolSize} questions available with this filter.</div>
+        <div style={{ fontSize: '10.5px', color: COLOR.muted, marginBottom: '16px', lineHeight: 1.4 }}>
+          Keeps this screen awake while playing, so audio doesn't stop the moment your phone would
+          otherwise lock — leave the app open and in view. Backgrounding the tab or a hard screen-lock
+          can still pause playback; that's outside any web app's control.
+        </div>
+        <button
+          onClick={onStart}
+          disabled={poolSize === 0}
+          style={{ width: '100%', padding: '12px', borderRadius: '12px', background: poolSize === 0 ? COLOR.border : COLOR.primary, color: COLOR.onAccent, fontSize: '14px', fontWeight: 600 }}
+        >
+          ▶ Start Verbal Quiz
+        </button>
+      </div>
+    );
+  }
+
+  const q = session[index];
+  if (phase === 'complete' || !q) {
+    return (
+      <div style={{ textAlign: 'center', padding: '30px 10px' }}>
+        <div className="itil-display" style={{ fontSize: '16px', fontWeight: 600, marginBottom: '8px' }}>Session complete</div>
+        <div style={{ fontSize: '12.5px', color: COLOR.muted, marginBottom: '18px' }}>
+          Read through {session.length} question{session.length === 1 ? '' : 's'}. Nothing was scored —
+          start another round whenever you're ready.
+        </div>
+        <button onClick={onRestart} style={{ padding: '10px 20px', borderRadius: '12px', background: COLOR.primary, color: COLOR.onAccent, fontSize: '13px', fontWeight: 600 }}>
+          Back to setup
+        </button>
+      </div>
+    );
+  }
+
+  const stepLabels = { question: 'Question', options: 'Options', thinking: 'Thinking…', answer: 'Answer', explanation: 'Explanation' };
+  const categoryLabel = categories.find((c) => c.key === q.cat)?.label;
+  const showAnswer = step === 'answer' || step === 'explanation';
+
+  return (
+    <div>
+      <div className="flex justify-between items-center mb-2" style={{ fontSize: '11px', color: COLOR.muted }}>
+        <span>{categoryLabel}</span>
+        <span>{index + 1} / {session.length}</span>
+      </div>
+      <div style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderRadius: '18px', padding: '24px', textAlign: 'center' }}>
+        <div style={{
+          display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '4px 12px', borderRadius: '999px',
+          background: phase === 'paused' ? COLOR.surfaceRaised : 'rgba(167,139,250,0.14)',
+          color: phase === 'paused' ? COLOR.muted : COLOR.primary, fontSize: '11px', fontWeight: 600, marginBottom: '18px',
+        }}>
+          {phase === 'paused' ? '⏸ Paused' : `🔊 ${stepLabels[step] || ''}`}
+        </div>
+        <div style={{ fontSize: '16px', lineHeight: 1.5, fontWeight: 500, marginBottom: showAnswer ? '10px' : 0 }}>{q.question}</div>
+        {showAnswer && (
+          <div style={{ fontSize: '13.5px', color: COLOR.success, fontWeight: 600, marginBottom: '8px' }}>
+            {q.type === 'tf' ? (q.answer ? 'True' : 'False') : q.options[q.correct]}
+          </div>
+        )}
+        {step === 'explanation' && (
+          <div style={{ fontSize: '12px', color: COLOR.muted, lineHeight: 1.5, marginTop: '8px' }}>{q.explanation}</div>
+        )}
+      </div>
+      <div className="flex gap-3" style={{ marginTop: '18px' }}>
+        <button
+          onClick={onTogglePause}
+          className="flex-1"
+          style={{ padding: '16px', borderRadius: '14px', background: COLOR.primary, color: COLOR.onAccent, fontSize: '15px', fontWeight: 600 }}
+        >
+          {phase === 'paused' ? '▶ Play' : '⏸ Pause'}
+        </button>
+        <button
+          onClick={onSkip}
+          className="flex-1"
+          style={{ padding: '16px', borderRadius: '14px', border: `1px solid ${COLOR.border}`, background: 'transparent', color: COLOR.text, fontSize: '15px', fontWeight: 600 }}
+        >
+          Skip ⏭
+        </button>
+      </div>
+    </div>
+  );
+}
+
 function QuestionView({ q, selected, onChoose, onNext, index, total, categoryLabel, badgeLabel, msPending, onToggleMs, onSubmitMs, nextLabel, hideMeta, hideNext, flashcardsData }) {
   const [activeTermKey, setActiveTermKey] = useState(null);
   useEffect(() => { setActiveTermKey(null); }, [q && q.id]);

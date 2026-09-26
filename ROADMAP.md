@@ -887,39 +887,38 @@ specifically (still open).
   (`getVoices()` often returns empty on the very first call in Chrome
   until a `voiceschanged` event fires) by listening for that event as
   well as calling it eagerly on mount.
-- [ ] **Verbal Quiz mode — hands-free, distraction-free studying (e.g.
-  while driving).** A dedicated quiz flow with no screen interaction
-  required once started: reads the question and its options aloud, then
-  pauses for a fixed "thinking" interval (no microphone, no speech
-  recognition, no answer capture — deliberately not trying to parse a
-  spoken response while someone's driving), then reads the correct
-  answer and a short version of the explanation, then automatically
-  advances to the next question. Effectively an audio-only variant of
-  the existing Quiz engine's question flow, reusing the same
-  question-selection logic (`pickRotated`/`pickInterleaved`, category
-  filters, Today's Mix) but replacing the tap-to-answer UI with a timed
-  read-pause-reveal-advance loop driven by `SpeechSynthesisUtterance`'s
-  `onend` callback chaining (queue: question → options → pause →
-  answer → explanation → next). Needs:
-  - A start screen (length, category/track scope, pause duration) before
-    committing to a session, since there's no way to adjust settings
-    mid-drive.
-  - A single large, thumb-forgiving Play/Pause and Skip control for the
-    rare moment a phone glance is safe, plus a screen-lock-friendly
-    "keep audio playing" behavior (media session API / a silent
-    keep-alive) so it doesn't stop the moment the phone screen sleeps.
-  - Since there's no captured answer, this mode can't update
-    mastery/SRS/results the way a normal quiz does — it's a pure
-    listen-and-recall study aid, not a scored session (should say so
-    plainly on the start screen so it's clear why the daily goal ring
-    and mastery % don't move from it, unless a later pass decides a
-    flat "session completed" activity credit toward the daily goal is
-    worth adding despite no per-question signal).
-  - Multi-select questions don't map cleanly to an audio-only pause/
-    reveal flow the way mc/tf do (there's nothing to "select" without a
-    mic) — likely exclude `ms` questions from this mode's pool, or read
-    them as a straight statement-and-reveal ("select all that apply:
-    ...") without expecting a spoken response either way.
+- [x] **Verbal Quiz mode — hands-free, distraction-free studying (e.g.
+  while driving).** Shipped as a third Quiz sub-tab ("Verbal", alongside
+  Questions/Match) with its own state machine, deliberately separate from
+  the tap-to-answer quiz's `sessionScore`/`sessionAnswers` since there's
+  no captured answer to track here. A dedicated driver `useEffect`
+  (06_app.jsx, keyed on `[verbalPhase, verbalIndex, verbalStep]`) chains
+  question → [options, mc only] → thinking pause → answer → explanation →
+  next question, via each utterance's `onend` (or a `setTimeout` for the
+  thinking pause), reusing the same `pickRotated`/`pickInterleaved`
+  selection logic and category filter as the regular quiz. A start screen
+  offers length (5/10/15/25) and thinking-pause duration (4/6/8/10/15s);
+  a single large Pause/Play + Skip control pair handles the rare
+  in-session glance. Pause/Resume deliberately re-reads the current line
+  from the top on resume rather than trying to resume
+  `speechSynthesis` mid-utterance (unreliable cross-browser) — the
+  effect's own cleanup cancels speech/clears the pause timer the instant
+  `verbalPhase` leaves `'active'`, and simply re-runs the same step when
+  it returns. No mastery/SRS/results update happens from this mode — the
+  setup screen says so plainly — and multi-select (`ms`) questions are
+  excluded from its pool entirely (there's nothing to "select" without a
+  mic), per the option below.
+  - **Screen Wake Lock** (`navigator.wakeLock`, feature-detected)
+    requested while a session is actively playing and released on
+    pause/complete/navigate-away/unmount — keeps the screen from
+    auto-locking mid-session, which is the actual mechanism available to
+    a web app here (there's no way to keep audio playing *through* a
+    real hard lock or a backgrounded tab, so the setup screen says so
+    plainly rather than overpromising background playback).
+  - Leaving the Verbal tab, switching mode, or switching tracks
+    mid-session stops the speech and resets back to its own setup screen
+    (a small effect keyed on `[mode, quizView, activeTrack]`) rather than
+    letting it keep talking in the background.
 
 ---
 

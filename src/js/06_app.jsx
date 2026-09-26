@@ -45,6 +45,22 @@ function CertStudyApp() {
   const { ttsRate, ttsVoiceURI, setTtsRate, setTtsVoiceURI } = useTtsPrefs();
   const [ttsVoices, setTtsVoices] = useState([]);
 
+  // Verbal Quiz — a hands-free, audio-only quiz flow (read question, pause
+  // to think, read the answer + explanation, auto-advance). Deliberately a
+  // separate state machine from the tap-to-answer quiz above: there's no
+  // captured answer here, so it can't share sessionScore/sessionAnswers,
+  // and its read-pause-reveal-advance sequencing needs a strict chained
+  // order (see the driver effect below) that the tap-driven flow has no
+  // use for.
+  const [verbalPhase, setVerbalPhase] = useState('setup'); // 'setup' | 'active' | 'paused' | 'complete'
+  const [verbalSession, setVerbalSession] = useState([]);
+  const [verbalIndex, setVerbalIndex] = useState(0);
+  const [verbalStep, setVerbalStep] = useState('question');
+  const [verbalLength, setVerbalLength] = useState(10);
+  const [verbalPauseSec, setVerbalPauseSec] = useState(6);
+  const verbalTimerRef = useRef(null);
+  const wakeLockRef = useRef(null);
+
   const [examTrack, setExamTrack] = useState(null);
   const [examSession, setExamSession] = useState([]);
   const [examAnswers, setExamAnswers] = useState({});
@@ -327,7 +343,10 @@ function CertStudyApp() {
   };
 
   useEffect(() => {
-    return () => { if (speechSupported) window.speechSynthesis.cancel(); };
+    return () => {
+      if (speechSupported) window.speechSynthesis.cancel();
+      if (wakeLockRef.current) wakeLockRef.current.release().catch(() => {});
+    };
     // eslint-disable-next-line
   }, []);
 
@@ -343,6 +362,124 @@ function CertStudyApp() {
     return () => window.speechSynthesis.removeEventListener('voiceschanged', loadVoices);
     // eslint-disable-next-line
   }, []);
+
+  // Verbal Quiz's read-pause-reveal-advance driver. Deliberately separate
+  // from speak()/speakingId above, which is a one-shot per-item toggle (tap
+  // to read one card, tap again to stop) — this needs a strict chained
+  // sequence per question (question -> [options] -> thinking pause ->
+  // answer -> explanation -> next question), driven by each utterance's
+  // onend. Runs only while verbalPhase is 'active'; the effect's own
+  // cleanup below cancels speech/clears the pause timer the instant
+  // verbalPhase changes away from 'active' (paused, or navigated off this
+  // tab entirely), and Resume simply re-runs the same step rather than
+  // trying to resume mid-sentence — far more reliable cross-browser than
+  // speechSynthesis.pause()/.resume(), which several mobile browsers
+  // implement inconsistently.
+  useEffect(() => {
+    if (verbalPhase !== 'active') return undefined;
+    const q = verbalSession[verbalIndex];
+    if (!q) { setVerbalPhase('complete'); return undefined; }
+    const steps = q.type === 'tf' ? ['question', 'thinking', 'answer', 'explanation'] : ['question', 'options', 'thinking', 'answer', 'explanation'];
+
+    const goNext = () => {
+      const i = steps.indexOf(verbalStep);
+      if (i === -1 || i + 1 >= steps.length) {
+        if (verbalIndex + 1 >= verbalSession.length) { setVerbalPhase('complete'); return; }
+        setVerbalIndex(verbalIndex + 1);
+        setVerbalStep('question');
+        return;
+      }
+      setVerbalStep(steps[i + 1]);
+    };
+
+    if (verbalStep === 'thinking') {
+      verbalTimerRef.current = setTimeout(goNext, verbalPauseSec * 1000);
+      return () => clearTimeout(verbalTimerRef.current);
+    }
+
+    const letter = (i) => String.fromCharCode(65 + i);
+    let text = '';
+    if (verbalStep === 'question') text = q.type === 'tf' ? `${q.question} True, or false?` : q.question;
+    else if (verbalStep === 'options') text = q.options.map((opt, i) => `Option ${letter(i)}: ${opt}.`).join(' ');
+    else if (verbalStep === 'answer') {
+      text = q.type === 'tf'
+        ? `The correct answer is ${q.answer ? 'True' : 'False'}.`
+        : `The correct answer is option ${letter(q.correct)}: ${q.options[q.correct]}.`;
+    } else if (verbalStep === 'explanation') text = q.explanation;
+
+    const utter = new SpeechSynthesisUtterance(text);
+    utter.rate = ttsRate;
+    if (ttsVoiceURI) {
+      const voice = ttsVoices.find((v) => v.voiceURI === ttsVoiceURI);
+      if (voice) utter.voice = voice;
+    }
+    utter.onend = goNext;
+    utter.onerror = goNext;
+    window.speechSynthesis.speak(utter);
+    return () => window.speechSynthesis.cancel();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [verbalPhase, verbalIndex, verbalStep]);
+
+  // Screen Wake Lock — keeps the screen from auto-locking while a Verbal
+  // Quiz session is actively playing, since speechSynthesis playback is
+  // commonly suspended the moment a mobile browser tab is backgrounded or
+  // the screen locks (a platform limitation no web app can override).
+  // Feature-detected: silently a no-op on browsers without support.
+  useEffect(() => {
+    if (verbalPhase !== 'active' || !('wakeLock' in navigator)) return undefined;
+    let cancelled = false;
+    navigator.wakeLock.request('screen').then((lock) => {
+      if (cancelled) { lock.release().catch(() => {}); return; }
+      wakeLockRef.current = lock;
+    }).catch(() => {});
+    return () => {
+      cancelled = true;
+      if (wakeLockRef.current) { wakeLockRef.current.release().catch(() => {}); wakeLockRef.current = null; }
+    };
+  }, [verbalPhase]);
+
+  // Leaving the Verbal Quiz tab (or switching tracks) mid-session should
+  // stop the audio rather than let it keep talking in the background —
+  // resets back to its own setup screen so returning to the tab starts
+  // fresh rather than resuming a stale session.
+  useEffect(() => {
+    if (mode === 'quiz' && quizView === 'verbal') return;
+    if (speechSupported) window.speechSynthesis.cancel();
+    setVerbalPhase((p) => (p === 'setup' ? p : 'setup'));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mode, quizView, activeTrack]);
+
+  const verbalPool = useMemo(() => {
+    const byCat = activeCat === 'all' ? questionsData : questionsData.filter((q) => q.cat === activeCat);
+    // Multi-select questions don't map to an audio-only pause/reveal flow
+    // — there's nothing to "select" without a mic — so they're excluded
+    // from this mode's pool entirely, per ROADMAP.md section 16.
+    return byCat.filter((q) => q.type !== 'ms');
+  }, [activeCat, questionsData]);
+
+  const startVerbalSession = () => {
+    const len = Math.min(verbalLength, verbalPool.length);
+    const picked = activeCat === 'all'
+      ? pickInterleaved(verbalPool, len, seenLog[activeTrack] || {})
+      : pickRotated(verbalPool, len, seenLog[activeTrack] || {});
+    const prepared = picked.map(prepareQuestion);
+    setVerbalSession(prepared);
+    setVerbalIndex(0);
+    setVerbalStep('question');
+    setVerbalPhase('active');
+    markSeen(prepared.map((q) => q.id));
+  };
+
+  const toggleVerbalPause = () => setVerbalPhase((p) => (p === 'paused' ? 'active' : 'paused'));
+
+  const skipVerbal = () => {
+    if (speechSupported) window.speechSynthesis.cancel();
+    clearTimeout(verbalTimerRef.current);
+    if (verbalIndex + 1 >= verbalSession.length) { setVerbalPhase('complete'); return; }
+    setVerbalIndex(verbalIndex + 1);
+    setVerbalStep('question');
+    setVerbalPhase('active');
+  };
 
   const achievements = useMemo(() => evaluateAchievements(results, stats), [results, stats]);
 
@@ -1115,6 +1252,13 @@ function CertStudyApp() {
             >
               Match
             </button>
+            <button
+              onClick={() => setQuizView('verbal')}
+              className="flex-1"
+              style={{ padding: '6px 2px', borderRadius: '8px', fontSize: '10.5px', fontWeight: 600, background: quizView === 'verbal' ? COLOR.surfaceRaised : 'transparent', color: quizView === 'verbal' ? COLOR.text : COLOR.muted }}
+            >
+              Verbal
+            </button>
           </div>
         )}
 
@@ -1209,6 +1353,26 @@ function CertStudyApp() {
           <MatchGame
             flashcards={filteredFlashcards}
             onRoundComplete={() => saveStats({ ...stats, counts: { ...stats.counts, matchRoundsCompleted: stats.counts.matchRoundsCompleted + 1 } })}
+          />
+        )}
+
+        {mode === 'quiz' && quizView === 'verbal' && (
+          <VerbalQuizPanel
+            speechSupported={speechSupported}
+            phase={verbalPhase}
+            session={verbalSession}
+            index={verbalIndex}
+            step={verbalStep}
+            length={verbalLength}
+            setLength={setVerbalLength}
+            pauseSec={verbalPauseSec}
+            setPauseSec={setVerbalPauseSec}
+            poolSize={verbalPool.length}
+            categories={categories}
+            onStart={startVerbalSession}
+            onTogglePause={toggleVerbalPause}
+            onSkip={skipVerbal}
+            onRestart={() => setVerbalPhase('setup')}
           />
         )}
 
