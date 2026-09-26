@@ -765,6 +765,25 @@ doesn't (and why it's still waiting).
   (extending the `results`/`stats` shape) — worth scoping in more detail
   once the core step-ordering game above exists and its data model has
   proven out, rather than designing both at once.
+- [x] **Vocabulary flyouts extended to Mad Libs and Sequence.** Both new
+  game modes' text (Mad Libs' scenario prose plus its post-submit
+  explanation; Sequence's prompt, each individual step, and its
+  explanation) now runs through the same `autoHighlightTerms` auto-detect
+  mechanism already used for flashcard backs and quiz explanations — tap
+  a bolded term for its flashcard's flyout definition, same as everywhere
+  else. No new mechanism needed, just new call sites in `MadLibsView`/
+  `SequenceView` (04_shared_ui.jsx) plus threading `flashcardsData`
+  through from `CertStudyApp`. Confirmed empirically (not just by
+  inspection) that real matches do fire — about 40% of the existing Mad
+  Libs scenarios contain at least one flashcard-front term verbatim in
+  their prose/explanation; the rest simply don't happen to reuse another
+  term's exact front string, which is expected given ~24% of all
+  flashcard fronts across the app are compound "X vs. Y" comparison
+  cards that rarely recur verbatim in unrelated sentences — a pre-
+  existing characteristic of the auto-detect mechanism itself (already
+  true everywhere else it's used), not something this change introduced
+  or could fix without a much bigger, separately-scoped change to how
+  comparison-style flashcards are authored.
 
 ## 14. UX & learning-science feedback (user asked for an honest review)
 

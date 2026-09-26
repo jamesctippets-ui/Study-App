@@ -1596,6 +1596,7 @@ function CertStudyApp() {
             onSubmit={submitMadlibAnswer}
             onNext={nextMadlibScenario}
             onRestart={startMadlibSession}
+            flashcardsData={flashcardsData}
           />
         )}
 
@@ -1611,6 +1612,7 @@ function CertStudyApp() {
             onSubmit={submitSequenceOrder}
             onNext={nextSequenceItem}
             onRestart={startSequenceSession}
+            flashcardsData={flashcardsData}
           />
         )}
 

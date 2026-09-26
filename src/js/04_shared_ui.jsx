@@ -2396,7 +2396,12 @@ function CommandPracticeView({ session, index, score, categories, input, setInpu
 // right, or it counts as a miss) and feeds into results/mastery the same
 // way flashcards and questions do (see trackMastery/masteryByCategory) —
 // unlike Verbal Quiz and CLI practice, which are deliberately unscored.
-function MadLibsView({ session, index, score, categories, answers, onSetBlank, submitted, onSubmit, onNext, onRestart }) {
+function MadLibsView({ session, index, score, categories, answers, onSetBlank, submitted, onSubmit, onNext, onRestart, flashcardsData }) {
+  const [activeTermKey, setActiveTermKey] = useState(null);
+  useEffect(() => { setActiveTermKey(null); }, [session[index] && session[index].id]);
+  useEscapeToClose(() => setActiveTermKey(null));
+  useClickOutsideToClose(!!activeTermKey, () => setActiveTermKey(null));
+
   if (!session.length) {
     return (
       <div style={{ textAlign: 'center', color: COLOR.muted, fontSize: '13px', padding: '30px 10px' }}>
@@ -2437,7 +2442,13 @@ function MadLibsView({ session, index, score, categories, answers, onSetBlank, s
       <div style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderRadius: '18px', padding: '20px' }}>
         <div style={{ fontSize: '15.5px', lineHeight: 2 }}>
           {parts.map((part, i) => {
-            if (i % 2 === 0) return <span key={i}>{part}</span>;
+            if (i % 2 === 0) {
+              return (
+                <span key={i}>
+                  {autoHighlightTerms(part, flashcardsData, activeTermKey, setActiveTermKey, 2, 'ml-' + item.id + '-' + i)}
+                </span>
+              );
+            }
             const blank = blanksByKey[part];
             if (!blank) return null;
             const selectedIdx = answers[part];
@@ -2468,7 +2479,9 @@ function MadLibsView({ session, index, score, categories, answers, onSetBlank, s
                 Correct answer{item.blanks.length > 1 ? 's' : ''}: {item.blanks.map((b) => b.options[b.correct]).join(', ')}
               </div>
             )}
-            <div style={{ fontSize: '12.5px', color: COLOR.muted, lineHeight: 1.5 }}>{item.explanation}</div>
+            <div style={{ fontSize: '12.5px', color: COLOR.muted, lineHeight: 1.5 }}>
+              {autoHighlightTerms(item.explanation, flashcardsData, activeTermKey, setActiveTermKey, 3, 'ml-exp-' + item.id)}
+            </div>
           </div>
         )}
       </div>
@@ -2498,7 +2511,12 @@ function MadLibsView({ session, index, score, categories, answers, onSetBlank, s
 // is a later enhancement, not a blocker, per the roadmap's own scoping).
 // Scored all-or-nothing per sequence and feeds into results/mastery the
 // same way Mad Libs does (see checkSequenceOrder in 03_helpers.js).
-function SequenceView({ session, index, score, categories, workingOrder, onMove, submitted, onSubmit, onNext, onRestart }) {
+function SequenceView({ session, index, score, categories, workingOrder, onMove, submitted, onSubmit, onNext, onRestart, flashcardsData }) {
+  const [activeTermKey, setActiveTermKey] = useState(null);
+  useEffect(() => { setActiveTermKey(null); }, [session[index] && session[index].id]);
+  useEscapeToClose(() => setActiveTermKey(null));
+  useClickOutsideToClose(!!activeTermKey, () => setActiveTermKey(null));
+
   if (!session.length) {
     return (
       <div style={{ textAlign: 'center', color: COLOR.muted, fontSize: '13px', padding: '30px 10px' }}>
@@ -2533,7 +2551,9 @@ function SequenceView({ session, index, score, categories, workingOrder, onMove,
         <span>{index + 1} / {total}</span>
       </div>
       <div style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderRadius: '18px', padding: '20px' }}>
-        <div style={{ fontSize: '15px', lineHeight: 1.5, fontWeight: 500, marginBottom: '16px' }}>{item.prompt}</div>
+        <div style={{ fontSize: '15px', lineHeight: 1.5, fontWeight: 500, marginBottom: '16px' }}>
+          {autoHighlightTerms(item.prompt, flashcardsData, activeTermKey, setActiveTermKey, 2, 'seq-prompt-' + item.id)}
+        </div>
         <div className="flex flex-col gap-2">
           {workingOrder.map((originalIdx, pos) => {
             const isRight = submitted && originalIdx === pos;
@@ -2547,7 +2567,9 @@ function SequenceView({ session, index, score, categories, workingOrder, onMove,
                 }}
               >
                 <span style={{ fontSize: '11px', fontWeight: 700, color: COLOR.muted, minWidth: '16px' }}>{pos + 1}.</span>
-                <span style={{ flex: 1, fontSize: '13.5px', color: COLOR.text, lineHeight: 1.4 }}>{item.steps[originalIdx]}</span>
+                <span style={{ flex: 1, fontSize: '13.5px', color: COLOR.text, lineHeight: 1.4 }}>
+                  {autoHighlightTerms(item.steps[originalIdx], flashcardsData, activeTermKey, setActiveTermKey, 1, 'seq-step-' + item.id + '-' + originalIdx)}
+                </span>
                 {!submitted && (
                   <div className="flex" style={{ gap: '2px', flexShrink: 0 }}>
                     <button
@@ -2577,7 +2599,9 @@ function SequenceView({ session, index, score, categories, workingOrder, onMove,
                 Correct order: {item.steps.map((s, i) => `${i + 1}. ${s}`).join('  ')}
               </div>
             )}
-            <div style={{ fontSize: '12.5px', color: COLOR.muted, lineHeight: 1.5 }}>{item.explanation}</div>
+            <div style={{ fontSize: '12.5px', color: COLOR.muted, lineHeight: 1.5 }}>
+              {autoHighlightTerms(item.explanation, flashcardsData, activeTermKey, setActiveTermKey, 3, 'seq-exp-' + item.id)}
+            </div>
           </div>
         )}
       </div>
