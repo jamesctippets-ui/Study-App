@@ -328,30 +328,33 @@ hard difficulty mix per track (not uniform difficulty), weighted across
 categories by their real exam marks. The question bank grew from 1126 to
 1263 in the same pass.
 
-**Fifteen tracks, all visible in the track switcher:**
-- **AZ-900** (Azure Fundamentals) — full course content, 119 questions.
+**Fifteen tracks, all visible in the track switcher, and all with full course/
+lesson mode** (not just a flat question bank — every track now has the same
+Learn-tab lesson-by-lesson course treatment: reading, key terms, diagrams
+where one genuinely fits, vocab/quiz call-outs, and common-traps notes):
+- **AZ-900** (Azure Fundamentals) — full course content, 119 questions, 7 lessons.
 - **AB-650** (M365 & AI Services Administrator) — full question bank (77
-  questions); tenant administration, governance/compliance, and Microsoft 365
-  Copilot/AI-services management. Replaces the retiring MS-102.
+  questions, 5 lessons); tenant administration, governance/compliance, and
+  Microsoft 365 Copilot/AI-services management. Replaces the retiring MS-102.
 - **AZ-104** (Azure Administrator) — full question bank (87 questions) and the
   same course treatment as AZ-900 (7 lessons, diagrams, mockups).
-- **DP-900** (Azure Data Fundamentals) — full question bank (71 questions).
-- **DP-300** (Azure Database Administrator) — full question bank (73 questions).
-- **AZ-305** (Azure Solutions Architect Expert) — full question bank (81 questions).
-- **AZ-802** (Windows Server Administrator) — full question bank (81 questions);
-  consolidates what used to be separate AZ-800/AZ-801 tracks, matching
-  Microsoft's real exam consolidation (AZ-800/801 retire Sept 30, 2026).
-- **AZ-140** (Azure Virtual Desktop Specialty) — full question bank (87 questions);
-  host pools, FSLogix, MSIX app attach, AVD identity/security, and monitoring.
-- **MD-102** (Endpoint Administrator) — full question bank (80 questions);
+- **DP-900** (Azure Data Fundamentals) — full question bank (71 questions, 5 lessons).
+- **DP-300** (Azure Database Administrator) — full question bank (73 questions, 5 lessons).
+- **AZ-305** (Azure Solutions Architect Expert) — full question bank (81 questions, 6 lessons).
+- **AZ-802** (Windows Server Administrator) — full question bank (81 questions,
+  6 lessons); consolidates what used to be separate AZ-800/AZ-801 tracks,
+  matching Microsoft's real exam consolidation (AZ-800/801 retire Sept 30, 2026).
+- **AZ-140** (Azure Virtual Desktop Specialty) — full question bank (87 questions,
+  5 lessons); host pools, FSLogix, MSIX app attach, AVD identity/security, and monitoring.
+- **MD-102** (Endpoint Administrator) — full question bank (80 questions, 5 lessons);
   Intune, Windows Autopilot, device compliance/security, and app management.
-- **SC-300** (Identity & Access Administrator) — full question bank (75 questions).
-- **SC-200** (Security Operations Analyst) — full question bank (75 questions);
-  Defender XDR/Sentinel operations, incident response, and real KQL-based
-  threat hunting.
-- **SC-500** (Cloud & AI Security Engineer) — full question bank (87 questions),
-  including current AI-security content (Copilot, Microsoft Foundry agents,
-  Entra Agent ID).
+- **SC-300** (Identity & Access Administrator) — full question bank (75 questions, 5 lessons).
+- **SC-200** (Security Operations Analyst) — full question bank (75 questions,
+  5 lessons); Defender XDR/Sentinel operations, incident response, and real
+  KQL-based threat hunting.
+- **SC-500** (Cloud & AI Security Engineer) — full question bank (87 questions,
+  5 lessons), including current AI-security content (Copilot, Microsoft Foundry
+  agents, Entra Agent ID).
 - **ITIL Foundation** (Version 5) — full question bank (106 questions) plus full
   course mode (7 lessons covering the Value System, Guiding Principles, the Four
   Dimensions, the Continual Improvement Model, and the Product/Service Lifecycle).
@@ -364,8 +367,8 @@ categories by their real exam marks. The question bank grew from 1126 to
   content is proprietary, so there's no legitimate way to build real cert-prep
   for it. This track instead covers general, publicly-documented healthcare
   interoperability knowledge (HL7v2, FHIR, integration-engine architecture,
-  healthcare data governance) — 82 questions, clearly labeled as a self-study
-  concepts module rather than a real exam.
+  healthcare data governance) — 82 questions, 6 lessons, clearly labeled as a
+  self-study concepts module rather than a real exam.
 
 To hide a track again (e.g. while it's a work in progress), open `data/tracks.py`
 and add `'hidden': True` to that track's entry, then rebuild (see below).
@@ -565,6 +568,19 @@ what you already have before troubleshooting further.
   format (ITIL: 7 lessons across all 7 categories; Cloud+: 6 lessons across all 5
   categories), reusing the existing `DBox`/`DLine`/`DCaption` diagram helpers. Neither
   carries a `portalMockup`, correctly, since neither has a real vendor portal.
+- **All remaining tracks now have full course/lesson mode too** — the previously
+  "thin" (flat question-bank-only) tracks (DP-900, DP-300, SC-300, SC-200, AZ-305,
+  AZ-802, AB-650, AZ-140, MD-102, SC-500, EHR Integration) each gained 5-6 lessons
+  covering every one of their categories. Diagram reuse stayed honest rather than
+  complete: several lessons ship with `diagram: None` where no existing
+  `LESSON_DIAGRAMS` entry actually fit the content (notably AZ-802's on-prem
+  Windows Server material and all of EHR Integration's HL7/FHIR material, where
+  reusing an Azure- or ITIL-branded diagram would have been misleading rather
+  than helpful). MD-102 gaining lessons also exposed a real regression — its
+  5 category-level real screenshots were only ever rendered by the flat
+  `StudyView`, and `CourseView` fully supersedes `StudyView` once a track has
+  `lessons` — fixed by having `LessonDetail` fall back to a lesson's own
+  category screenshot when it has no `portalMockup` of its own (see ROADMAP.md).
 - Re-enabling a hidden track is one line each in `data/tracks.py`.
 - **Adding a track no longer means touching `src/js/`.** The JS side used to hardcode
   `{ itil, az900, az104 }` in a few places (initial state, storage migration) — those

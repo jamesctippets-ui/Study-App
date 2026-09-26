@@ -1028,6 +1028,28 @@ specifically (still open).
     mid-session stops the speech and resets back to its own setup screen
     (a small effect keyed on `[mode, quizView, activeTrack]`) rather than
     letting it keep talking in the background.
+- [x] **All 15 tracks now have full course/LESSONS mode** (previously only
+  AZ-900, AZ-104, ITIL, and Cloud+ did). Six background agents added
+  `LESSONS` to the remaining 11 tracks in pairs (DP-900+DP-300,
+  SC-300+SC-200, AZ-305+AZ-802, AB-650+AZ-140, MD-102+SC-500) plus
+  EHR Integration solo — each track's lessons cover every one of its
+  categories (high-weight categories split across two lessons where it
+  made sense), reusing existing `LESSON_DIAGRAMS` keys only (many lessons
+  ended up `diagram: None` rather than force a misleading reuse —
+  honest absence over a wrong diagram, especially for AZ-802's on-prem
+  Windows Server content and EHR Integration's HL7/FHIR content, neither
+  of which has an Azure/ITIL-flavored diagram that actually fits).
+  - Along the way, MD-102 gaining `LESSONS` exposed a real regression:
+    its 5 category-level real portal screenshots (`CATEGORIES[].screenshot`
+    → `CategoryScreenshot`) were previously only rendered by the flat
+    `StudyView`, and `06_app.jsx` switches a track to `CourseView`
+    unconditionally once it has `lessons`, so those screenshots became
+    unreachable. Fixed generally in `LessonDetail` (`04_shared_ui.jsx`):
+    when a lesson maps to exactly one category, has no `portalMockup` of
+    its own, and that category has a `screenshot`, it now renders that
+    category's real screenshot as a "Portal screenshot" block — so any
+    future track that gains course mode while already having
+    category-level screenshots stays covered without a data change.
 
 ---
 
