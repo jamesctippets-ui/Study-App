@@ -418,6 +418,7 @@ QUESTIONS = [
         ],
         'correct': 2,
         'explanation': "Always Encrypted performs encryption and decryption entirely inside the client driver using keys the database engine never has access to, so the data stays encrypted in memory, in query plans, and even from an administrator with full server rights. TDE only protects data at rest on disk, and Dynamic Data Masking is a display-layer control that does not encrypt anything.",
+        'whyTested': "TDE and Always Encrypted are DP-300's single most heavily tested confusion, because both are legitimately described as 'encryption' yet solve completely different threat models — the exam builds scenarios that name a sysadmin with full server rights specifically to rule out TDE, since TDE's whole design still trusts anyone who can query the live database. Recognizing 'even from a DBA with full access' as the tell that only client-side, engine-blind encryption qualifies is exactly the skill being checked.",
     },
     {
         'id': 'q10',
@@ -516,6 +517,7 @@ QUESTIONS = [
         ],
         'correct': 1,
         'explanation': "sys.dm_db_resource_stats reports recent (roughly the last hour) CPU, data I/O, log I/O, and memory consumption as a percentage of the database's current provisioned limits at 15-second granularity, which is exactly the resource-utilization check described. For a longer, coarser view (about 14 days at 5-minute granularity), the master database's sys.resource_stats is the right DMV instead. The other options here address missing indexes, query-level statistics, and wait statistics respectively, not overall resource ceiling utilization.",
+        'whyTested': "DP-300 loves testing DMV names against each other because they sound similarly technical but answer completely different questions — resource ceiling utilization right now versus missing indexes versus query-level stats versus wait stats — so the exam leans on a specific, memorable detail, 15-second granularity, 'right now,' to force you to pick the DMV that actually matches the described need rather than just the most familiar-sounding name. It also tests whether you know the sibling DMV, sys.resource_stats in the master database, covers the longer historical view instead — a pairing worth memorizing together.",
     },
     {
         'id': 'q17',
@@ -558,6 +560,7 @@ QUESTIONS = [
         ],
         'correct': 1,
         'explanation': "A large divergence between estimated and actual row counts at an operator is a classic sign that statistics are stale or missing, or that a cached plan was compiled against unrepresentative parameter values (parameter sniffing) — both lead the optimizer to choose a plan suited to the wrong row count. It has no relationship to log space, DTU limits, or TDE.",
+        'whyTested': "A big estimated-vs-actual row count gap is one of DP-300's favorite 'diagnose from evidence' question shapes, because it forces you to reason backward from a symptom to its cause instead of just recalling a definition — and the wrong-answer options are deliberately plausible-sounding unrelated causes (log space, compute limits, TDE overhead) that a real production incident could also technically involve, just not this one. Being able to rule those out based on what the evidence actually shows, rather than what sounds serious, is the actual skill being tested.",
     },
     {
         'id': 'q20',
@@ -684,6 +687,7 @@ QUESTIONS = [
         ],
         'correct': 1,
         'explanation': "An auto-failover group provides a stable read-write and read-only listener endpoint for a group of databases, and can be configured to fail over automatically based on a grace period, with the application's connection string never needing to change. Active geo-replication supports only manual failover and operates one database at a time, not as a group with automatic failover.",
+        'whyTested': "Auto-failover groups and active geo-replication solve nearly the same problem, cross-region redundancy, with one crucial difference — a shared, connection-string-stable listener versus per-database manual failover — so DP-300 tests it by describing the specific operational requirement (group failover, unchanged connection string) rather than asking which feature exists, forcing you to match the requirement to the mechanism instead of just recognizing a feature name. This distinction maps directly onto a real DR runbook decision, which is exactly why it keeps showing up.",
     },
     {
         'id': 'q29',
@@ -1194,6 +1198,7 @@ Cost is set through one of two purchasing models: the DTU model bundles compute,
             'Auto-pause in the serverless tier stops compute billing but not storage billing, and introduces a cold-start delay on the next connection.',
         ],
         'scenario': "A SaaS company hosts 200 small customer databases with unpredictable, non-overlapping usage spikes; sizing each one for its own peak would be very expensive. Pooling them into an elastic pool lets the aggregate, non-overlapping demand share one billed pool of resources instead — while a separate, rarely-used internal reporting database for the finance team goes on the serverless compute tier with auto-pause enabled, since its idle time far outweighs its active use.",
+        'onTheJob': "In practice, the DTU-vs-vCore decision often gets settled by finance before it ever reaches engineering — the moment someone points out the company already owns SQL Server licenses that only Azure Hybrid Benefit (vCore-only) can reuse, the technical debate is mostly over. A real DBA's least favorite kind of incident is discovering an elastic pool was sized for last year's traffic pattern, because the whole pitch of pooling only holds if the databases inside it still genuinely peak at different times — a new tenant that happens to onboard right as an existing one runs its own batch job can quietly blow past the pool's shared ceiling. Serverless auto-pause looks free on a pricing slide, but the DBA who enables it on anything customer-facing usually hears about the cold-start delay exactly once, from a very unhappy support ticket, before restricting it to genuinely idle dev and test databases only.",
     },
     {
         'id': 'security-and-data-protection',
@@ -1218,6 +1223,7 @@ Microsoft Defender for SQL bundles two complementary capabilities: Vulnerability
             "Auditing only records activity for later review — it never blocks a statement from executing, no matter how suspicious.",
         ],
         'scenario': "A healthcare company already has TDE enabled and assumes patient data is fully protected. A new requirement says one 'DiagnosisCode' column must stay encrypted even from a DBA running ad hoc queries with full sysadmin rights. TDE alone can't satisfy this, since the engine decrypts everything in memory for any query — the column instead needs Always Encrypted, so the plaintext never reaches the engine, or the DBA, at all.",
+        'onTheJob': "A real production security incident almost never starts with 'the encryption failed' — it starts with someone with legitimate access, a contractor, a departed employee whose account was never disabled, a DBA running an unrelated ad hoc query, seeing something they shouldn't have, which is exactly the gap TDE was never designed to close. Rolling out Row-Level Security or Dynamic Data Masking in a live system is as much a stakeholder negotiation as a technical task, because support and analytics teams will push back hard the moment their existing dashboards and queries suddenly return masked or filtered data they used to see. And 'we're already encrypted, we're fine' is one of the most common false assumptions a DBA has to correct in an actual compliance review, since an auditor's specific question is almost always about a threat model TDE alone doesn't cover.",
     },
     {
         'id': 'monitoring-and-diagnostics',
@@ -1242,6 +1248,7 @@ Beyond what's happening inside the database, Azure Monitor ties everything toget
             "Intelligent Insights is diagnostic, not corrective, on its own — pairing it with Automatic Tuning is what actually fixes some of what it detects.",
         ],
         'scenario': "After a deployment, a report query slows down dramatically. A DBA who's used to SQL Server Profiler tries to connect it to the Azure SQL Database directly and finds it simply can't — Extended Events is the supported path there instead. Turning to Query Store, they find the query now has two different plans, with the newer one performing far worse, and force the earlier, better-performing plan back into use without touching the application at all.",
+        'onTheJob': "Real incident response for a production database usually starts with a vague complaint — 'the app feels slow' — and a good chunk of the actual job is narrowing that down to a specific query and a specific moment it started, which is exactly what Query Store's persisted history is for, since nobody remembers to start a trace before a regression happens. A DBA who cut their teeth on-premises has to consciously unlearn reaching for SQL Server Profiler on Azure SQL Database, since muscle memory alone will send them looking for a tool that simply isn't there. Setting up Azure Monitor alerts is one of those tasks that's easy to defer until after the first 2am incident that nobody caught in time, at which point 'why didn't anything page us' becomes the actual postmortem finding.",
     },
     {
         'id': 'query-performance-and-automation',
@@ -1266,6 +1273,7 @@ For automation that goes beyond running T-SQL, Azure Automation runbooks — wri
             'OPTION (RECOMPILE) fixes parameter sniffing but forces a fresh compile on every single execution — a poor choice for a query run thousands of times a minute.',
         ],
         'scenario': "A stored procedure runs fine almost always, but very rarely a wildly unusual parameter value causes its cached plan to perform terribly — and the procedure runs thousands of times a minute, so recompiling on every call is out of the question. Rather than OPTION (RECOMPILE), the DBA uses OPTIMIZE FOR to hint a representative value, and separately schedules an Elastic Database Job targeting the whole elastic pool to run an index-maintenance script across every database in it, including ones added after the job was created.",
+        'onTheJob': "The real tension every DBA lives with is performance tuning versus 'don't touch it, it's stable' — a production system that's been running fine for a year makes management nervous the moment someone proposes forcing a new plan or adding an index, even when the missing-index DMVs make a strong case for it, because the downside of a bad change is far more visible than the upside of a good one. Parameter sniffing in particular tends to get discovered the hard way, as an intermittent 'it's slow sometimes but I can't reproduce it' ticket that takes real digging to trace back to one unusual parameter value rather than a resourcing problem. Elastic Database Jobs and Azure Automation runbooks are what actually let a DBA stop babysitting the same maintenance script by hand across dozens of databases every week, which is less glamorous than tuning but is where a lot of a real DBA's time genuinely goes.",
     },
     {
         'id': 'high-availability-and-disaster-recovery',
@@ -1290,6 +1298,7 @@ Underneath all of this, Azure SQL automatically takes full, differential, and tr
             'A Failover Cluster Instance protects the whole instance via shared storage; an Availability Group protects only the databases added to it, with each replica keeping independent storage.',
         ],
         'scenario': "A company runs a Business Critical database and wants to survive losing an entire datacenter in its current region without standing up a second region — zone-redundant configuration covers exactly that. Separately, several related databases need to fail over together to a different region automatically, with the application's connection string staying the same throughout — that calls for an auto-failover group, not active geo-replication, since geo-replication has no shared listener and always needs a manual failover trigger.",
+        'onTheJob': "Backup and restore drills in a real environment almost never go exactly as planned — a DBA who's confident in their RTO number until the actual restore drags on because nobody accounted for how long it takes to reprovision compute at the target tier before the data can even start streaming back in. Choosing between an auto-failover group and active geo-replication is usually decided by whoever owns the application's connection strings, since a group's stable listener endpoint saves that team from a painful, error-prone mass reconfiguration effort during an actual regional outage. And the DR plan that looks great in a design document is only as good as the last time someone actually triggered a real failover instead of just reading through the runbook, which is why the teams that sleep best are the ones that treat a DR drill as a recurring calendar event, not a one-time checkbox.",
     },
 ]
 

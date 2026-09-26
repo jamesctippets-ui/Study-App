@@ -333,7 +333,8 @@
         "Relational data"
       ],
       "correct": 0,
-      "explanation": "JSON documents have some organization, like keys and nesting, but no fixed schema shared identically by every record, which is the definition of semi-structured data. Structured and relational data require a fixed schema of rows and columns, and unstructured data, like a plain video file, has no inherent organization at all."
+      "explanation": "JSON documents have some organization, like keys and nesting, but no fixed schema shared identically by every record, which is the definition of semi-structured data. Structured and relational data require a fixed schema of rows and columns, and unstructured data, like a plain video file, has no inherent organization at all.",
+      "whyTested": "DP-900 leans hard on this exact classification skill because 'has some structure but no fixed schema' is one of the hardest distinctions on the exam to apply quickly, especially when the option list includes a tempting 'structured' or 'relational' answer for data that merely looks organized. The question is really checking whether you can tell 'some organization' \u2014 keys, tags \u2014 apart from 'a schema every record must follow identically,' not whether you know what JSON is."
     },
     {
       "id": "q2",
@@ -554,7 +555,8 @@
         "Azure SQL Managed Instance"
       ],
       "correct": 3,
-      "explanation": "Azure SQL Managed Instance offers near-complete SQL Server compatibility, including cross-database queries and SQL Server Agent, making it the best fit for a lift-and-shift with minimal re-engineering. Azure SQL Database does not support cross-database queries or SQL Agent the same way, and Table Storage and Cosmos DB are non-relational services entirely."
+      "explanation": "Azure SQL Managed Instance offers near-complete SQL Server compatibility, including cross-database queries and SQL Server Agent, making it the best fit for a lift-and-shift with minimal re-engineering. Azure SQL Database does not support cross-database queries or SQL Agent the same way, and Table Storage and Cosmos DB are non-relational services entirely.",
+      "whyTested": "This is DP-900's favorite way to test the SQL Database vs. Managed Instance boundary \u2014 burying the deciding detail (cross-database queries and SQL Server Agent) inside a longer migration scenario rather than asking directly which service supports which features, so a rushed reader picks the 'simplest managed' answer instead of the one that actually preserves those dependencies. It mirrors a real migration conversation almost exactly, which is exactly why it keeps showing up."
     },
     {
       "id": "q13",
@@ -701,7 +703,8 @@
         "Switching to Azure Table Storage, which already organizes data into folder-like partitions"
       ],
       "correct": 2,
-      "explanation": "Azure Data Lake Storage Gen2 adds a hierarchical namespace of real directories and folders with fine-grained permissions on top of Blob Storage, purpose-built for large-scale analytics. The Archive tier and RA-GRS are cost and redundancy settings, not a namespace structure, and Table Storage organizes data by partition key and row key, not real folders \u2014 it's an entirely separate, non-hierarchical key-value store."
+      "explanation": "Azure Data Lake Storage Gen2 adds a hierarchical namespace of real directories and folders with fine-grained permissions on top of Blob Storage, purpose-built for large-scale analytics. The Archive tier and RA-GRS are cost and redundancy settings, not a namespace structure, and Table Storage organizes data by partition key and row key, not real folders \u2014 it's an entirely separate, non-hierarchical key-value store.",
+      "whyTested": "The distractors here are deliberately real, useful Azure Storage settings (the Archive tier, RA-GRS) rather than nonsense options, so the question tests whether you can tell 'a cost or redundancy setting' apart from 'a structural capability' when both sound like plausible fixes. It's a common exam shape because Data Lake Storage Gen2 is easy to remember as just 'Blob Storage for analytics' without registering that the hierarchical namespace, not a tier or redundancy option, is the specific feature enabling folder-level permissions."
     },
     {
       "id": "q20",
@@ -791,7 +794,8 @@
         "A star schema"
       ],
       "correct": 2,
-      "explanation": "ELT (Extract, Load, Transform) loads raw data into the destination first and transforms it there, taking advantage of the destination's own compute power \u2014 matching the pattern described. ETL transforms data before loading it, OLTP is a transactional workload type unrelated to pipeline ordering, and a star schema is a data modeling pattern, not a load-order pattern."
+      "explanation": "ELT (Extract, Load, Transform) loads raw data into the destination first and transforms it there, taking advantage of the destination's own compute power \u2014 matching the pattern described. ETL transforms data before loading it, OLTP is a transactional workload type unrelated to pipeline ordering, and a star schema is a data modeling pattern, not a load-order pattern.",
+      "whyTested": "ETL and ELT are near-mirror-image acronyms describing opposite orderings of the same three steps, which is exactly why exams test them by describing the pipeline's behavior rather than naming it, forcing you to reconstruct the order instead of pattern-matching a letter sequence. Getting this backwards is one of the most common self-inflicted DP-900 mistakes, since the natural instinct is to read 'Load' and 'Transform' as if the order didn't matter."
     },
     {
       "id": "q24",
@@ -1279,7 +1283,8 @@
         "ACID is closely tied to relational databases \u2014 many NoSQL databases intentionally relax one or more of these guarantees for scale.",
         "The four V's describe big data characteristics, not database types \u2014 don't confuse Veracity (trustworthiness) with Variety (format diversity)."
       ],
-      "scenario": "A hospital's admissions system inserts a new patient record every few seconds throughout the day \u2014 a textbook OLTP workload optimized for many fast, small transactions. Once a month, the finance team runs a report aggregating a full year of billing records by department and diagnosis code \u2014 a textbook OLAP workload built for exactly this kind of large-scale historical aggregation, which is why hospitals typically keep the two on separate systems rather than forcing one database to do both jobs well."
+      "scenario": "A hospital's admissions system inserts a new patient record every few seconds throughout the day \u2014 a textbook OLTP workload optimized for many fast, small transactions. Once a month, the finance team runs a report aggregating a full year of billing records by department and diagnosis code \u2014 a textbook OLAP workload built for exactly this kind of large-scale historical aggregation, which is why hospitals typically keep the two on separate systems rather than forcing one database to do both jobs well.",
+      "onTheJob": "In a real org, the SQL-vs-NoSQL choice usually gets decided less on data shape and more on who's already comfortable with what \u2014 a team of relational-minded developers will often force a schema onto data that would fit a document store more naturally, just to avoid learning a new query language under a deadline. 'Just use the data warehouse' is a request every data engineer has heard from a stakeholder who wants a live operational number turned into a chart, and part of the job is explaining, again, why a system built for batched historical aggregation isn't the right place to ask 'what's happening right now.' Data governance conversations rarely start as a technical initiative \u2014 they usually start because someone senior finally asked 'who actually has access to this' after a compliance scare, not because a data catalog seemed like a good idea on its own."
     },
     {
       "id": "relational-data-on-azure",
@@ -1324,7 +1329,8 @@
         "Only the vCore purchasing model supports Azure Hybrid Benefit \u2014 the DTU model does not.",
         "SQL Server on Azure VMs is IaaS: the customer still patches the OS, unlike the two PaaS options."
       ],
-      "scenario": "A company running an on-premises SQL Server estate that relies heavily on SQL Server Agent jobs and cross-database queries wants the least possible re-engineering while still moving off physical hardware. Azure SQL Managed Instance is the fit here \u2014 it preserves those instance-level features while still handing patching and backups to Microsoft, unlike Azure SQL Database, which doesn't support them, or SQL Server on an Azure VM, which would keep the OS-patching burden on the company."
+      "scenario": "A company running an on-premises SQL Server estate that relies heavily on SQL Server Agent jobs and cross-database queries wants the least possible re-engineering while still moving off physical hardware. Azure SQL Managed Instance is the fit here \u2014 it preserves those instance-level features while still handing patching and backups to Microsoft, unlike Azure SQL Database, which doesn't support them, or SQL Server on an Azure VM, which would keep the OS-patching burden on the company.",
+      "onTheJob": "In practice, the DTU-vs-vCore decision often isn't a technical debate at all \u2014 it's decided the moment someone in finance points out the company already owns a stack of SQL Server licenses, since only the vCore model can apply Azure Hybrid Benefit against them, and that alone frequently settles the argument. Picking between SQL Database, Managed Instance, and a VM in a real migration is really a conversation about which legacy features an old application secretly depends on, and it's common to discover a critical SQL Server Agent job nobody remembers writing only after the simpler option has already been provisioned and something quietly breaks. A DBA choosing PostgreSQL or MySQL over SQL Server on Azure is rarely making a technology judgment at all \u2014 it's almost always inherited from whatever the original application team already knew how to run."
     },
     {
       "id": "non-relational-data-on-azure",
@@ -1365,7 +1371,8 @@
         "The Gremlin API is for relationship-heavy graph data \u2014 a document or key-value API is the wrong choice whenever relationships between entities matter as much as the entities themselves.",
         "Table Storage is not a smaller Cosmos DB \u2014 it lacks Cosmos DB's global distribution and tunable consistency guarantees entirely."
       ],
-      "scenario": "A gaming company needs to track which players are friends with which other players, and wants to efficiently query multi-hop relationships like 'friends of friends.' Modeling this in a document or key-value store would mean manually walking references one query at a time; Cosmos DB's Gremlin API instead treats players as graph nodes and friendships as edges, making that kind of relationship traversal a first-class, efficient query."
+      "scenario": "A gaming company needs to track which players are friends with which other players, and wants to efficiently query multi-hop relationships like 'friends of friends.' Modeling this in a document or key-value store would mean manually walking references one query at a time; Cosmos DB's Gremlin API instead treats players as graph nodes and friendships as edges, making that kind of relationship traversal a first-class, efficient query.",
+      "onTheJob": "Cosmos DB's per-API choice matters to a real team mostly because of cost and consistency tradeoffs that only show up on the monthly bill \u2014 a team that reaches for the most flexible consistency level by default, without thinking about it, often discovers later that they paid a real latency and dollar cost for a stronger guarantee than their application actually needed. Blob Storage access tiers are a classic place where a well-intentioned cost-savings project backfires: moving rarely-touched data to Archive without checking how often it's actually retrieved can turn an occasional read into a multi-hour, and surprisingly expensive, rehydration wait. Whoever owns Data Lake Storage Gen2's folder permissions in practice ends up being the person who fields every 'why can't I see this dataset' ticket, since those permissions map to organizational access politics far more than to a technical decision."
     },
     {
       "id": "data-warehousing-and-pipelines",
@@ -1404,7 +1411,8 @@
         "ELT loads first and transforms after, using the destination's own compute \u2014 that's the opposite order from ETL.",
         "Azure Data Factory orchestrates and moves data; it does not analyze or visualize it itself."
       ],
-      "scenario": "A retailer wants a report showing total sales by region by quarter for the last five years. The nightly pipeline uses ELT: raw point-of-sale records land in the warehouse first, and a scheduled job then transforms and aggregates them into a star schema, with a fact table of individual sale amounts joined to dimension tables for Store, Product, and Date \u2014 exactly the shape a reporting tool like Power BI expects to query quickly."
+      "scenario": "A retailer wants a report showing total sales by region by quarter for the last five years. The nightly pipeline uses ELT: raw point-of-sale records land in the warehouse first, and a scheduled job then transforms and aggregates them into a star schema, with a fact table of individual sale amounts joined to dimension tables for Store, Product, and Date \u2014 exactly the shape a reporting tool like Power BI expects to query quickly.",
+      "onTheJob": "'Just use the data warehouse' is one of the most politically loaded requests a data engineer hears, because it usually means a stakeholder wants a fully modeled star schema built around their one report, without anyone stopping to ask whether the underlying data even has the volume or structure to justify that investment yet. A star schema that looked clean on the whiteboard tends to get messy fast in a real org, once two departments each want their own definition of 'region' as a dimension and someone has to decide whose definition the fact table actually joins against. ETL-vs-ELT is rarely chosen on pure architecture merit either \u2014 it usually comes down to whichever the team's existing Azure Data Factory pipelines already do, since rebuilding a working pipeline around the 'better' pattern is a hard sell without a concrete performance problem to justify it."
     },
     {
       "id": "modern-analytics-platforms-and-bi",
@@ -1449,7 +1457,8 @@
         "Fabric's OneLake is what lets Spark, T-SQL, and Power BI share one copy of data \u2014 it isn't just Synapse and Databricks with a new name.",
         "DirectQuery always reflects the live source but is typically slower per query; Import mode is faster but only as fresh as its last scheduled refresh."
       ],
-      "scenario": "A retail analytics team runs unpredictable, occasional ad hoc queries against a small dataset most of the day, but needs to power a live executive dashboard from the same warehouse that must always reflect this second's sales figures. They'd reach for a serverless SQL pool for the ad hoc exploration, since it bills only for what's actually queried, and DirectQuery for the executive dashboard, accepting a small performance cost in exchange for always-current numbers rather than a stale, scheduled Import-mode refresh."
+      "scenario": "A retail analytics team runs unpredictable, occasional ad hoc queries against a small dataset most of the day, but needs to power a live executive dashboard from the same warehouse that must always reflect this second's sales figures. They'd reach for a serverless SQL pool for the ad hoc exploration, since it bills only for what's actually queried, and DirectQuery for the executive dashboard, accepting a small performance cost in exchange for always-current numbers rather than a stale, scheduled Import-mode refresh.",
+      "onTheJob": "The pitch behind Microsoft Fabric's OneLake is genuinely compelling in a sales meeting, but in a real org, migrating years of separate Synapse, Databricks, and Power BI datasets onto one shared lake is a multi-quarter project with its own political friction, since it usually means someone's carefully tuned existing pipeline has to be rebuilt rather than just pointed at a new endpoint. Import mode vs. DirectQuery in Power BI is a decision a report author often only revisits after an executive complains a dashboard 'still shows yesterday's numbers,' at which point the tradeoff between refresh staleness and live query cost stops being theoretical. Choosing serverless vs. dedicated Synapse SQL pools is frequently less about workload shape and more about whichever cost line item is easier for a given team to get approved that quarter \u2014 a per-query bill from serverless usage is a much easier expense to explain upward than a large provisioned reservation."
     }
   ],
   "cheatSheet": [
