@@ -1383,6 +1383,277 @@
       "explanation": "Elevated disk queue length/I/O wait and latency spiking above baseline are direct, storage-specific performance indicators that point at the storage subsystem itself. Steady CPU utilization actually argues against CPU being the bottleneck rather than confirming a storage issue, and DNS query volume has no bearing on storage performance at all."
     }
   ],
+  "lessons": [
+    {
+      "id": "deployment-models-virtualization",
+      "title": "Cloud Deployment Models & Virtualization",
+      "summary": "Public, private, hybrid, and community deployment models, and the virtualization layer underneath them.",
+      "diagram": "deploymentModels",
+      "vocabIds": [
+        "f1",
+        "f36",
+        "f37",
+        "f50",
+        "f49"
+      ],
+      "quizIds": [
+        "q1",
+        "q58",
+        "q59",
+        "msq13",
+        "q7"
+      ],
+      "reading": "Cloud deployments come in four flavors, and Cloud+ expects you to reason about the trade-offs independent of any single vendor. Public cloud is infrastructure owned by a third-party provider and shared across many customers \u2014 cheapest to start with, since you're spreading the provider's hardware cost across everyone using it. Private cloud is dedicated to a single organization, on-premises or hosted, trading that lower cost for full control and isolation. Hybrid cloud connects both together \u2014 usually private infrastructure holding sensitive workloads alongside public cloud handling everything else, with the two coordinated rather than just coexisting. Community cloud is a fifth option that's easy to forget: infrastructure shared by several organizations with a common concern, like compliance, that none of them wants to build alone.\n\nUnderneath any of those deployment models, the same IaaS/PaaS/SaaS service-model spectrum still applies \u2014 how much of the stack you manage yourself versus how much the provider manages for you doesn't change based on which deployment model you picked. What does change is who owns the hardware and who else, if anyone, shares it with you.\n\nVirtualization is the layer that actually makes any of this possible. A Type 1 (bare-metal) hypervisor runs directly on physical hardware with no host operating system underneath it \u2014 this is what production datacenters and cloud providers run, because removing that extra OS layer cuts overhead and improves performance. A Type 2 (hosted) hypervisor runs as an application on top of a regular OS, which is fine for a desktop test environment but not for production at scale. Containers push virtualization a level higher: instead of virtualizing hardware, a container virtualizes at the OS level, sharing the host's kernel across many containers instead of each one carrying its own guest OS the way a VM does \u2014 which is exactly why containers start in seconds and have a far smaller footprint, at the cost of being less isolated from each other than separate VMs would be.\n\nAs container-based deployments grow past a handful of services, a service mesh often shows up to manage the traffic between them \u2014 a dedicated layer, typically sidecar proxies running alongside each service, handling routing, retries, encryption, and observability so individual microservices don't each have to implement that logic themselves.",
+      "fundamentalsLabel": "New to cloud deployment models? See the everyday analogy",
+      "fundamentals": "Think of the four deployment models the way you'd think about housing. Public cloud is an apartment building \u2014 you get your own unit, but the building, utilities, and staff are shared with every other tenant, and that shared cost is what makes rent affordable. Private cloud is owning a standalone house \u2014 nobody else's business happens under your roof, but you're the one paying for and maintaining everything. Hybrid cloud is owning that house while also renting a storage unit across town for the overflow you don't need close at hand, with both places genuinely part of the same plan. Community cloud is a condo association: several homeowners who all care about the same shared concerns \u2014 security, upkeep, dues \u2014 pooling resources to handle them together, without opening the building to the general public the way an apartment complex would.",
+      "keyTerms": [
+        "Public cloud",
+        "Private cloud",
+        "Hybrid cloud",
+        "Community cloud",
+        "IaaS",
+        "PaaS",
+        "SaaS",
+        "Type 1 hypervisor",
+        "Containers",
+        "Service mesh"
+      ],
+      "commonTraps": [
+        "Hybrid cloud means private and public environments connected and coordinated together \u2014 just running two unrelated clouds side by side for two different projects is multi-cloud, not hybrid.",
+        "A container is not just 'a smaller VM' \u2014 it shares the host's kernel instead of carrying its own guest OS, which is exactly why it starts faster but is less isolated than a VM.",
+        "Type 1 hypervisors run directly on hardware and are the production/cloud-provider standard; Type 2 hypervisors need a host OS underneath them and are typically reserved for desktop or test use."
+      ],
+      "scenario": "A university, a research lab, and a hospital network in the same city all need to store and process data under the same set of research-compliance rules, but none of them wants to build and maintain that compliant infrastructure alone. Pooling their funding into a shared community cloud, built and governed around exactly those shared requirements, gets all three the compliance posture they need without any one of them owning it outright \u2014 and without opening that environment to the general public the way a straightforward public cloud deployment would."
+    },
+    {
+      "id": "scaling-resilience-storage",
+      "title": "Scaling, Resilience & Storage Patterns",
+      "summary": "Vertical vs. horizontal scaling, HA/fault tolerance/DR, RTO/RPO, storage types, load balancing, and RAID.",
+      "diagram": "scalingApproaches",
+      "vocabIds": [
+        "f2",
+        "f3",
+        "f4",
+        "f5",
+        "f6",
+        "f7",
+        "f43",
+        "f44",
+        "f47",
+        "f53"
+      ],
+      "quizIds": [
+        "q2",
+        "q4",
+        "tf1",
+        "msq1",
+        "msq2",
+        "q61"
+      ],
+      "reading": "Scalability is the general ability to handle more (or less) load by adding or removing resources \u2014 and that can be a manual, planned process, like a scheduled capacity increase ahead of a known event. Elasticity is the specific, automatic version of that: resources scaling up and down dynamically in real time as demand actually changes, with no human approving each step. Within scalability, vertical scaling (\"scaling up\") means adding more CPU or RAM to an existing instance \u2014 simpler conceptually, but capped by the biggest instance size available and usually requiring a restart to apply. Horizontal scaling (\"scaling out\") means adding more instances running in parallel instead, which avoids that ceiling and that restart, but only works if the workload was actually built to run across multiple instances at once \u2014 stateless, and sitting behind a load balancer.\n\nResilience gets three related but distinct labels. High availability minimizes downtime through redundancy, but still tolerates a brief interruption during a failover. Fault tolerance goes further: the system keeps running through a failure with no interruption at all, usually at a higher cost, because there's no gap for a user to notice. Disaster recovery assumes downtime already happened and covers the plan for restoring service afterward \u2014 measured against two targets set by the business first: RTO (Recovery Time Objective), the maximum acceptable time to get back up, and RPO (Recovery Point Objective), the maximum acceptable data loss, measured as time since the last good backup or replication.\n\nThe building blocks that make scaling and resilience actually work include a few architecture staples: load balancers spread traffic across healthy instances using an algorithm like round robin or least connections, and only ever route to instances that pass their periodic health check \u2014 this same idea of a centralized, software-driven control plane deciding how traffic should flow, decoupled from the hardware that just forwards it, is what software-defined networking generalizes across an entire network, not just one load balancer. Choosing the right storage type matters too \u2014 block storage for low-latency, random-access workloads like a database's own disk, file storage for a shared, mountable filesystem, and object storage for massive-scale, metadata-rich data accessed over HTTP rather than a mounted drive. RAID adds another layer of resilience at the disk level: RAID 0 stripes for pure speed with zero redundancy, RAID 1 mirrors for redundancy with no capacity gain, RAID 5 adds distributed parity to tolerate one disk failure, and RAID 10 combines mirroring and striping for both redundancy and performance at the cost of half the raw capacity.\n\nNone of this is worth much if it's never actually tested. Chaos engineering deliberately injects failures \u2014 killing an instance, adding latency, cutting a dependency \u2014 into a production or production-like system specifically to confirm that these resilience mechanisms work as designed, instead of discovering the gaps for the first time during a real outage.",
+      "fundamentalsLabel": "New to scaling and resilience? See the everyday analogy",
+      "fundamentals": "Picture a coffee shop handling a morning rush. Vertical scaling is training your one barista to work faster and adding a second espresso machine at their station \u2014 more capacity, but you can only push one person and one station so far before you hit a ceiling. Horizontal scaling is opening a second register with its own barista entirely \u2014 no ceiling on how many registers you can add, as long as customers can be routed to whichever one is free, which is exactly the load balancer's job. High availability is having a backup barista who can step in within a minute if the first one has to step away; fault tolerance is having two baristas working the exact same register simultaneously so nobody ever notices a gap at all; and disaster recovery is the plan for what happens if the whole shop has to close for a day and reopen somewhere else.",
+      "keyTerms": [
+        "Vertical scaling",
+        "Horizontal scaling",
+        "Elasticity",
+        "High availability",
+        "Fault tolerance",
+        "Disaster recovery",
+        "RTO",
+        "RPO",
+        "Block storage",
+        "Object storage",
+        "Load balancing",
+        "RAID"
+      ],
+      "commonTraps": [
+        "Vertical scaling hits a hardware ceiling and typically needs a restart to apply; horizontal scaling avoids both, but only for workloads actually designed to run across multiple instances.",
+        "High availability can still involve a brief interruption during failover \u2014 a system with zero interruption at all is described as fault tolerant, a stricter and more expensive guarantee.",
+        "RAID 0 is sometimes mistaken for a resilience feature because it spreads data across disks \u2014 it actually has zero fault tolerance and is purely about performance.",
+        "RPO is about acceptable data loss, measured in time; RTO is about acceptable downtime. Mixing the two up is one of the most common exam traps in this domain."
+      ],
+      "scenario": "An online retailer expects a huge, short-lived traffic spike during a single flash sale. Rather than keeping enough servers running year-round to cover that peak, they configure horizontal autoscaling behind a load balancer, so instances get added automatically as real demand climbs and removed again once it falls \u2014 true elasticity, not just a fixed schedule. Separately, their order database replicates to object storage backups at a warm DR site sized to meet a 15-minute RPO and a 1-hour RTO, and every quarter the team runs a chaos engineering exercise that kills a production instance on purpose, specifically to confirm the failover actually works before a real outage ever forces the question."
+    },
+    {
+      "id": "security-fundamentals",
+      "title": "Security Fundamentals: Identity, Encryption & Network Defense",
+      "summary": "AAA, access control models, encryption states, Zero Trust, and the network security tools that enforce them.",
+      "diagram": "dmzZones",
+      "vocabIds": [
+        "f8",
+        "f9",
+        "f10",
+        "f11",
+        "f12",
+        "f13",
+        "f14",
+        "f38",
+        "f51"
+      ],
+      "quizIds": [
+        "q14",
+        "q15",
+        "q17",
+        "q41",
+        "q60",
+        "q62"
+      ],
+      "reading": "Every access decision on this exam ultimately traces back to AAA: authentication verifies who you are, authorization determines what you're allowed to do once verified, and accounting logs what was actually done, for audit purposes. A stolen-but-valid password is an authentication success and an authorization problem waiting to happen \u2014 the credential checks out, but it isn't really that person acting. Two access control models decide the authorization half differently: RBAC grants permissions based on a user's assigned role, simple to administer at scale, while ABAC evaluates a combination of attributes \u2014 department, resource tag, time of day, location \u2014 dynamically at request time, more flexible but harder to audit since the effective rule set isn't fixed in advance. Single sign-on sits entirely on the authentication side, letting a user log in once and reach multiple systems without proving their identity over and over.\n\nProtecting data means matching the right control to the state that data is actually in. Encryption at rest protects data sitting on disk; encryption in transit protects it moving across a network, like TLS; encryption in use protects data while it's actively being processed in memory, the hardest of the three and typically requiring specialized hardware. A password stolen in transit was never protected by strong at-rest encryption at all \u2014 the two controls don't substitute for each other. Tokenization takes a different approach for something like a stored card number: it substitutes the value with a randomly generated token that has no mathematical relationship to the original, with the real data held in a separate vault \u2014 unlike encryption, which is always reversible given the right key, a token can't be reversed at all, even with unlimited computing power. Multifactor authentication combines factors from different categories \u2014 something you know, something you have, something you are, and sometimes somewhere you are or something you do \u2014 and two factors from the same category, like two passwords, still isn't true MFA.\n\nZero Trust ties all of this together as a philosophy rather than a single tool: no request is trusted just because it came from inside the network perimeter, so a compromised VPN credential or a breached firewall alone still isn't enough to reach sensitive resources, because every subsequent request gets independently re-verified. Enforcing that in practice usually means layered network controls: an IDS monitors and alerts on suspicious traffic without blocking it, while an IPS sits inline and can actively block traffic it identifies as malicious \u2014 at the cost of a false positive potentially breaking legitimate traffic, a risk a passive IDS never carries. A stateful firewall tracks a connection's state and automatically allows its return traffic; a stateless filter evaluates every packet independently, with no memory of prior traffic, so it needs explicit rules for both directions of every connection. Segmenting a network into zones \u2014 a DMZ holding public-facing servers behind an edge firewall, with a second firewall protecting the internal network behind it \u2014 limits how far a breach in one zone can reach.",
+      "fundamentalsLabel": "New to security concepts? See the everyday analogy",
+      "fundamentals": "This maps closely to airport security. Showing your ID at the gate is authentication \u2014 proving who you are. Your boarding pass only getting you onto one specific flight, not any plane on the tarmac, is authorization \u2014 what you're allowed to do now that you're verified. The security camera footage of you walking through the terminal is accounting \u2014 a record of what actually happened, useful after the fact even if nothing went wrong at the time. Zero Trust is the airport not stopping at the outer perimeter fence: even after you're past the main checkpoint, you still get checked again at the gate, and again if you try to enter a restricted area \u2014 being inside one boundary never automatically grants you the next one.",
+      "keyTerms": [
+        "AAA",
+        "RBAC",
+        "ABAC",
+        "Zero Trust",
+        "IDS",
+        "IPS",
+        "MFA",
+        "Tokenization",
+        "SSO"
+      ],
+      "commonTraps": [
+        "Authentication succeeding \u2014 even with a stolen password \u2014 doesn't mean authorization or accounting are satisfied too; they're three separate checks.",
+        "An IDS only detects and alerts; only an IPS sits inline and actively blocks malicious traffic.",
+        "Encrypting data at rest does nothing to protect it once it starts moving across a network \u2014 that needs its own, separate in-transit encryption.",
+        "A token has no mathematical relationship to the original value at all, unlike encryption, which is always reversible given the right key."
+      ],
+      "scenario": "A company puts its public-facing web and mail servers in a DMZ, sitting behind an edge firewall facing the internet and a second, internal firewall separating that DMZ from the private LAN \u2014 so a compromise of the web server doesn't automatically reach internal systems. Administrators must pass MFA and a device-compliance check before reaching anything, consistent with a Zero Trust posture, and every action they take is logged for later audit. Separately, the payment team tokenizes stored card numbers rather than encrypting them, so that even a full database breach exposes only meaningless substitute values with no way to reverse them back to a real card number."
+    },
+    {
+      "id": "deployment-strategies",
+      "title": "Deployment Strategies & Migration",
+      "summary": "Release strategies, backup types, DR site tiers, migration paths, provisioning, and IaC/CI-CD.",
+      "diagram": null,
+      "vocabIds": [
+        "f15",
+        "f17",
+        "f18",
+        "f19",
+        "f20",
+        "f21",
+        "f42"
+      ],
+      "quizIds": [
+        "q27",
+        "q28",
+        "q29",
+        "q31",
+        "q42",
+        "q64"
+      ],
+      "reading": "Rolling out a new release safely usually comes down to choosing how much exposure a bad version gets before anyone notices. Blue-green deployment keeps two complete, identical production environments; the new version goes to the idle one, gets verified, and then all traffic switches over at once, with the old environment kept running briefly for an instant, all-or-nothing rollback. Canary releases take the opposite approach: the new version reaches a small subset of users or traffic first, with exposure increasing gradually as confidence grows \u2014 slower to fully roll out, but limiting the blast radius of anything that goes wrong. A rolling deployment sits in between, updating a few instances at a time behind a load balancer so the service stays available throughout, without the cost of a full duplicate environment.\n\nProtecting the data itself relies on choosing the right backup type. A full backup copies everything. An incremental backup copies only what changed since the last backup of any kind \u2014 fast to create, but a restore has to replay every incremental since the last full, in order, and a single corrupted link breaks the chain. A differential backup instead copies everything changed since the last full backup, so a restore only ever needs that full plus the single latest differential. Choosing a disaster recovery site follows the same RTO trade-off: a hot site stays in near real-time sync for near-instant failover at the highest cost, a warm site needs some setup or data sync first, and a cold site has only bare facilities and needs a full rebuild \u2014 the tighter the required RTO, the further up that scale you have to pay for.\n\nMoving a workload into the cloud in the first place means picking the migration path that matches where it's starting from: P2V converts a physical server into a VM, V2V moves a VM between hypervisors or platforms, P2C moves a still-physical on-premises workload straight into the cloud, and V2C moves a workload that was already virtualized on-premises into the cloud \u2014 a typical \"lift and shift\" is usually a P2C or V2C migration, moved largely as-is rather than refactored around cloud-native services. Provisioning the storage underneath it involves its own trade-off: thick provisioning reserves the full requested capacity immediately, while thin provisioning allocates space only as data is actually written, letting you over-commit total capacity across volumes \u2014 at the risk that if enough thin-provisioned volumes fill up at once, the underlying physical storage can run out even though each one still shows free space.\n\nOnce a release process is repeatable, teams typically formalize it with Infrastructure as Code, defining environments in version-controlled configuration instead of manual clicks, and a CI/CD pipeline: continuous integration merges and tests code frequently, continuous delivery keeps it release-ready but still gated by a human approval, and continuous deployment removes that gate entirely so anything that passes automated tests ships straight to production. A feature flag adds one more layer of control on top of any of these: new code can be deployed to production while hidden behind a switch, with actually exposing it to users treated as a separate, later decision.",
+      "fundamentalsLabel": "New to release strategies? See the everyday analogy",
+      "fundamentals": "Think of blue-green deployment like a theater that keeps two identical stages built, and simply swings a spotlight from one to the other when the new show is ready \u2014 instant, and easy to swing back if something's wrong. Canary is more like a restaurant testing a new dish on a handful of regulars before it goes on the full menu, watching for a bad reaction before serving everyone. A feature flag is like installing a new light fixture in your house but leaving it switched off at the breaker until you're actually ready to use it \u2014 the wiring is in place well before the light comes on.",
+      "keyTerms": [
+        "Blue-green deployment",
+        "Canary deployment",
+        "Differential backup",
+        "P2C migration",
+        "Thin provisioning",
+        "Infrastructure as Code",
+        "Continuous deployment"
+      ],
+      "commonTraps": [
+        "An incremental restore needs the full backup plus every incremental since, in order; a differential restore only ever needs the full plus the single latest differential.",
+        "Thin provisioning can let physical storage run out even though every individual volume still shows free space, if enough of them fill up close to their allocation at once.",
+        "Continuous delivery still keeps a human approval gate before release; continuous deployment removes that gate entirely.",
+        "Deploying code into production and releasing it to users aren't the same event \u2014 a feature flag is exactly what lets a team decouple the two."
+      ],
+      "scenario": "A team migrates an aging physical file server straight into a cloud VM \u2014 a P2C migration, moved largely as-is. Once it's running, they define its configuration as Infrastructure as Code so future environments can be rebuilt identically, and set a nightly full backup with hourly differentials sized to meet a tight RPO. New releases to the application in front of that data go out blue-green, with a fresh feature flag left off until support confirms the new version is stable, decoupling the moment the code ships from the moment users actually see it."
+    },
+    {
+      "id": "operations-governance",
+      "title": "Day-to-Day Operations & Governance",
+      "summary": "Automation, cost visibility, monitoring baselines, SLAs, change management, and keeping infrastructure documented.",
+      "diagram": null,
+      "vocabIds": [
+        "f22",
+        "f23",
+        "f25",
+        "f26",
+        "f27",
+        "f40",
+        "f41",
+        "f45",
+        "f46",
+        "f52"
+      ],
+      "quizIds": [
+        "q43",
+        "q44",
+        "q45",
+        "q46",
+        "q56",
+        "q65"
+      ],
+      "reading": "Two related terms describe how routine operational work actually gets done. Automation handles one well-defined task without a human doing it by hand, like auto-restarting a failed service. Orchestration coordinates multiple already-automated tasks into a larger workflow \u2014 provisioning a VM, then configuring it, then registering it with a load balancer, all as one sequence \u2014 and it can only exist on top of tasks that are individually automated already, not as a purely manual coordination process. A runbook is the documented procedure that automation or orchestration actually carries out: a step-by-step set of instructions for a specific task or incident, written so it produces the same result whether a person follows it or a script triggers it.\n\nNone of that operational work means much without first knowing what \"normal\" looks like. A baseline is the expected range of a metric under typical conditions, established by observing it over time; a threshold is the specific value that triggers an alert once crossed. Setting a threshold before establishing a baseline tends to produce either constant false alarms or missed real problems \u2014 baselining has to come first. Capacity planning builds directly on that same baseline, using historical trends to forecast future resource needs and provision ahead of demand rather than reacting once something's already exhausted. A Service Level Agreement formalizes uptime and response expectations into measurable commitments \u2014 like 99.9% monthly uptime, which still allows roughly 8.75 hours of downtime a year, not zero \u2014 backed by penalties or credits if they're missed.\n\nKeeping cost and configuration visible and accountable rounds out day-to-day operations. Chargeback actually bills each department for their share of cloud spend, moving real budget between them; showback reports the same usage and cost for visibility and accountability without that actual transfer, and is often adopted first as the lower-friction option. A configuration management database (CMDB) tracks an organization's IT assets and the relationships between them, so a change or incident process can answer \"what else does this affect\" instead of relying on institutional memory \u2014 which is exactly what a formal change management process is built to protect: proposing, reviewing, approving, and recording a change, including a rollback plan, before it's actually made, with patch management applying that same discipline specifically to software and OS updates inside an approved maintenance window. Immutable infrastructure takes change management a step further by design \u2014 servers or containers are never modified after being provisioned, so a change means replacing the instance entirely rather than patching a live system in place, which pairs naturally with Infrastructure as Code.",
+      "fundamentalsLabel": "New to day-to-day cloud operations? See the everyday analogy",
+      "fundamentals": "A runbook is like a recipe card for one specific dish; automation is the stand mixer doing that one step without you standing there turning a spoon; orchestration is the head chef who reads several recipe cards and coordinates the ovens, the mixer, and the staff so the whole meal comes out together, on time. Baselining is knowing your own resting heart rate before your doctor decides what heart rate should actually worry them \u2014 without that normal number first, any alarm threshold is just a guess.",
+      "keyTerms": [
+        "Automation",
+        "Orchestration",
+        "Baseline",
+        "Threshold",
+        "SLA",
+        "CMDB",
+        "Chargeback",
+        "Showback",
+        "Change management",
+        "Runbook",
+        "Immutable infrastructure"
+      ],
+      "commonTraps": [
+        "Orchestration can't exist without automated tasks underneath it to coordinate \u2014 it isn't a purely manual coordination process.",
+        "Setting an alert threshold before establishing a baseline tends to produce either constant false alarms or missed real problems.",
+        "Showback only reports usage and cost for visibility; chargeback is the one that actually moves budget between departments.",
+        "A 99.9% SLA still allows roughly 8.75 hours of downtime a year \u2014 an SLA is a measurable commitment with a financial remedy, not a zero-downtime guarantee."
+      ],
+      "scenario": "An operations team spends several weeks observing normal CPU and memory behavior across its fleet before setting any alert thresholds, avoiding the false-alarm problem a rushed threshold would have caused. They report departmental cloud spend through showback rather than chargeback, since the organization isn't ready to actually move budget between teams yet. Before a critical patch reaches production, it goes through a formal change management process \u2014 tested in staging, scheduled into an approved maintenance window \u2014 and because the fleet is treated as immutable infrastructure, that patch actually ships as a freshly built replacement instance rather than a live in-place update, with the CMDB updated the moment the change completes."
+    },
+    {
+      "id": "troubleshooting-methodology",
+      "title": "Troubleshooting Cloud Environments",
+      "summary": "The standard troubleshooting methodology and the most common categories of cloud failures.",
+      "diagram": null,
+      "vocabIds": [
+        "f29",
+        "f30",
+        "f31",
+        "f32",
+        "f33",
+        "f35"
+      ],
+      "quizIds": [
+        "q50",
+        "q51",
+        "q52",
+        "q53",
+        "q54",
+        "q66"
+      ],
+      "reading": "CompTIA's troubleshooting methodology is a fixed sequence, and the exam tests the order as much as the steps themselves: identify the problem, establish a theory of probable cause, test that theory, establish a plan of action and implement the solution, verify full system functionality, and document findings and outcomes. The step most often skipped under pressure is testing the theory \u2014 jumping straight from a plausible-sounding cause to a fix risks wasting a maintenance window, or making things worse, if that cause turns out to be wrong.\n\nTwo failure patterns show up specifically because cloud infrastructure is shared and elastic in ways on-premises hardware isn't. The \"noisy neighbor\" problem is one tenant's heavy resource usage degrading another tenant's performance on the same underlying physical hardware, even though the affected tenant's own configuration hasn't changed at all \u2014 the fix is usually resource governance or moving the noisy workload elsewhere, not something the affected side can fix on their own. Orphaned resources are disks, snapshots, public IPs, or load balancers left behind after the workload that created them was deleted, quietly still incurring cost \u2014 a classic explanation for a bill that's grown even though the deployed footprint clearly hasn't.\n\nTwo more failure categories are easy to misdiagnose because everything about the infrastructure itself looks fine. A DNS-related failure happens when the network path and destination service are both healthy but a hostname simply won't resolve correctly \u2014 if a service is unreachable by name but reachable by its raw IP, the problem is DNS, not the network path or the service itself. Latency and bandwidth are frequently confused: latency is the delay before data starts moving at all, bandwidth is how much can move once it's flowing, and a connection can have plenty of bandwidth while still feeling slow because of high latency \u2014 adding more bandwidth does nothing to fix a latency problem, since they're independent characteristics with different causes.\n\nA quick fix and a real fix aren't the same thing. A workaround, like restarting a hung service, restores service fast without necessarily addressing why it happened in the first place. Root cause analysis is what actually identifies and addresses the underlying reason, to prevent the same incident from quietly repeating \u2014 applying a workaround under time pressure isn't the mistake; stopping there and never following up with root cause analysis is.",
+      "fundamentalsLabel": "New to structured troubleshooting? See the everyday analogy",
+      "fundamentals": "This methodology maps almost exactly onto how a doctor works through an unfamiliar set of symptoms. They start by identifying the problem \u2014 what's actually wrong \u2014 then form a theory about the likely cause, and critically, run a test to confirm that theory before prescribing anything, rather than guessing and hoping. Only once the theory checks out do they treat it, then confirm the patient has actually recovered, and finally write it all down in the chart \u2014 so the next visit, whether it's the same doctor or someone else entirely, isn't starting from zero.",
+      "keyTerms": [
+        "Troubleshooting methodology",
+        "Noisy neighbor",
+        "Orphaned resources",
+        "DNS resolution",
+        "Latency",
+        "Bandwidth",
+        "Root cause analysis"
+      ],
+      "commonTraps": [
+        "Jumping straight to implementing a fix without testing the theory first risks wasting a maintenance window on a cause that turns out to be wrong.",
+        "More bandwidth does nothing to fix a high-latency problem \u2014 the two are independent characteristics with different causes.",
+        "A workaround restores service quickly but doesn't necessarily fix the underlying issue \u2014 root cause analysis still needs to happen afterward.",
+        "If a service is unreachable by hostname but reachable by its raw IP address, the problem is DNS, not the network path or the service itself."
+      ],
+      "scenario": "A support engineer gets a ticket that one VM feels sluggish. Rather than immediately resizing it, they follow the methodology: they identify the specific symptom, form a theory that another tenant on the same host is consuming excess CPU, and test that theory by checking hypervisor-level CPU ready time and the activity of neighboring VMs before touching anything \u2014 confirming a noisy-neighbor problem rather than a fault in the sluggish VM itself. In the same sprint, they trace an unexplained billing increase to a handful of orphaned disks left over from a deleted project, and separately restore a hung reporting service with a quick restart \u2014 a workaround they make sure to follow up with a proper root-cause investigation before closing the ticket, rather than treating the restart itself as the fix."
+    }
+  ],
   "cheatSheet": [
     {
       "heading": "Exam format & domain weights",

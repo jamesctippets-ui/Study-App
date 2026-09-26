@@ -241,6 +241,76 @@ function DiagramStorageAccess() {
   );
 }
 
+function DiagramDeploymentModels() {
+  const cols = ['Public', 'Private', 'Hybrid', 'Community'];
+  const rowLabels = ['Owned by', 'Open to', 'Chief driver'];
+  const grid = [
+    ['Provider', 'Your org', 'Both, linked', 'Member orgs'],
+    ['Anyone', 'Your org', 'Mixed', 'Peer orgs'],
+    ['Lowest cost', 'Max control', 'Compliance', 'Shared need'],
+  ];
+  const colW = 76, rowH = 40, labelW = 84, top = 26;
+  const width = labelW + cols.length * colW + 6;
+  const height = top + rowLabels.length * rowH + 40;
+  return (
+    <svg viewBox={`0 0 ${width} ${height}`} style={{ width: '100%', height: 'auto' }}>
+      {cols.map((c, ci) => (
+        <text key={c} x={labelW + ci * colW + colW / 2} y={16} textAnchor="middle" fill={COLOR.text} fontSize="10.5" fontWeight="600">{c}</text>
+      ))}
+      {rowLabels.map((r, ri) => (
+        <React.Fragment key={r}>
+          <text x={2} y={top + ri * rowH + rowH / 2 + 4} fill={COLOR.muted} fontSize="9">{r}</text>
+          {cols.map((c, ci) => (
+            <DBox key={c} x={labelW + ci * colW} y={top + ri * rowH} w={colW - 6} h={rowH - 8} label={grid[ri][ci]} />
+          ))}
+        </React.Fragment>
+      ))}
+      <DCaption x={width / 2} y={height - 24} text="Hybrid = private + public, connected together" />
+      <DCaption x={width / 2} y={height - 10} text="Multi-cloud = two+ public providers, a different thing" />
+    </svg>
+  );
+}
+
+function DiagramScalingApproaches() {
+  return (
+    <svg viewBox="0 0 320 145" style={{ width: '100%', height: 'auto' }}>
+      <DCaption x={82} y={12} text="Vertical (scale up)" />
+      <DBox x={20} y={26} w={50} h={30} label="Server" sub="small" />
+      <DLine x1={72} y1={41} x2={96} y2={41} />
+      <DBox x={98} y={14} w={60} h={62} label="Server" sub="bigger" />
+      <DCaption x={242} y={12} text="Horizontal (scale out)" />
+      <DBox x={182} y={26} w={50} h={30} label="Server" />
+      <DLine x1={234} y1={41} x2={258} y2={41} />
+      <DBox x={260} y={8} w={48} h={22} label="Server" />
+      <DBox x={260} y={34} w={48} h={22} label="Server" />
+      <DBox x={260} y={60} w={48} h={22} label="Server" />
+      <DCaption x={160} y={112} text="Vertical: bigger box, one restart, hits a size ceiling" />
+      <DCaption x={160} y={126} text="Horizontal: more boxes in parallel, needs a load balancer" />
+    </svg>
+  );
+}
+
+function DiagramDmzZones() {
+  return (
+    <svg viewBox="0 0 400 150" style={{ width: '100%', height: 'auto' }}>
+      <DBox x={6} y={44} w={46} h={28} label="Internet" />
+      <DLine x1={52} y1={58} x2={76} y2={58} />
+      <DBox x={76} y={36} w={40} h={44} label="Firewall" sub="edge" />
+      <DLine x1={116} y1={58} x2={140} y2={58} />
+      <rect x={140} y={26} width={140} height={64} rx="10" fill="none" stroke={COLOR.gold} strokeDasharray="4 3" />
+      <DCaption x={210} y={18} text="DMZ (public-facing)" />
+      <DBox x={150} y={42} w={58} h={32} label="Web server" />
+      <DBox x={212} y={42} w={58} h={32} label="Mail relay" />
+      <DLine x1={280} y1={58} x2={300} y2={58} />
+      <DBox x={300} y={36} w={40} h={44} label="Firewall" sub="internal" />
+      <DLine x1={340} y1={58} x2={362} y2={58} />
+      <DBox x={362} y={40} w={36} h={36} label="LAN" sub="private" />
+      <DCaption x={200} y={120} text="Each boundary firewall limits what can reach the next zone inward" />
+      <DCaption x={200} y={134} text="Only the DMZ is directly exposed to the internet" />
+    </svg>
+  );
+}
+
 const LESSON_DIAGRAMS = {
   serviceModels: DiagramServiceModels,
   hierarchy: DiagramHierarchy,
@@ -254,5 +324,8 @@ const LESSON_DIAGRAMS = {
   backupRecovery: DiagramBackupRecovery,
   groupLicensing: DiagramGroupLicensing,
   storageAccess: DiagramStorageAccess,
+  deploymentModels: DiagramDeploymentModels,
+  scalingApproaches: DiagramScalingApproaches,
+  dmzZones: DiagramDmzZones,
 };
 
