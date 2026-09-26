@@ -15,6 +15,7 @@
       "key": "hybridWorkloads",
       "label": "Manage Windows Server Hybrid Workloads",
       "marks": 12,
+      "screenshot": "failoverClusterDrainRoles",
       "resources": [
         {
           "label": "Microsoft Learn: Manage Windows Servers and workloads in a hybrid environment",
@@ -1518,7 +1519,7 @@
       "id": "active-directory-domain-services",
       "title": "Active Directory Domain Services",
       "summary": "FSMO roles and replication, trusts and functional levels, Group Policy precedence, and the recovery and hybrid-identity tools built around AD DS.",
-      "diagram": null,
+      "diagram": "gpoPrecedence",
       "vocabIds": [
         "f1",
         "f2",
@@ -1576,7 +1577,7 @@
       "id": "hybrid-management-clustering-virtualization",
       "title": "Hybrid Management, Clustering & Virtualization",
       "summary": "Bringing on-premises servers under Azure management with Arc, patching and protecting failover clusters, and the Hyper-V VM and container fundamentals underneath them.",
-      "diagram": null,
+      "diagram": "failoverCluster",
       "vocabIds": [
         "f10",
         "f11",
@@ -1684,7 +1685,7 @@
       "id": "storage-file-services",
       "title": "Storage & File Services",
       "summary": "Unifying and replicating file shares, pooling local disks with Storage Spaces and S2D, reclaiming space, and the file systems and block-storage options underneath.",
-      "diagram": null,
+      "diagram": "dfsNamespace",
       "vocabIds": [
         "f25",
         "f26",
@@ -1739,7 +1740,7 @@
       "id": "securing-windows-server",
       "title": "Securing Windows Server Hybrid Infrastructure",
       "summary": "Application control, protecting credentials in memory and at rest, restricting how privileged accounts can authenticate, and detecting attacks against on-premises identity.",
-      "diagram": null,
+      "diagram": "credentialGuardIsolation",
       "vocabIds": [
         "f32",
         "f33",
@@ -1781,7 +1782,7 @@
       "id": "monitoring-troubleshooting-windows-server",
       "title": "Monitoring & Troubleshooting Windows Server",
       "summary": "Local performance counters and event logs, unifying monitoring across a hybrid fleet with Azure Monitor, and patch compliance with Azure Update Manager.",
-      "diagram": null,
+      "diagram": "monitoringPipeline",
       "vocabIds": [
         "f37",
         "f38",

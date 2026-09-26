@@ -386,6 +386,143 @@ function DiagramDmzZones() {
   );
 }
 
+function DiagramGpoPrecedence() {
+  return (
+    <svg viewBox="0 0 340 236" style={{ width: '100%', height: 'auto' }}>
+      <DCaption x={95} y={14} text="Normal LSDOU precedence" />
+      <DBox x={20} y={22} w={150} h={26} label="Local" />
+      <DLine x1={95} y1={48} x2={95} y2={60} />
+      <DBox x={20} y={60} w={150} h={26} label="Site" />
+      <DLine x1={95} y1={86} x2={95} y2={98} />
+      <DBox x={20} y={98} w={150} h={26} label="Domain" />
+      <DLine x1={95} y1={124} x2={95} y2={136} />
+      <DBox x={20} y={136} w={150} h={26} label="OU" sub="closest to the object" />
+      <DCaption x={95} y={178} text="Plain conflict: last applied (OU) wins" />
+
+      <DCaption x={265} y={14} text="Enforced beats Block Inheritance" />
+      <DBox x={195} y={22} w={140} h={28} label="Domain GPO" sub="marked Enforced" />
+      <DLine x1={265} y1={50} x2={265} y2={150} />
+      <rect x={195} y={122} width={140} height={70} rx="8" fill="none" stroke={COLOR.gold} strokeWidth="1.3" strokeDasharray="4 3" />
+      <text x={265} y={136} textAnchor="middle" fill={COLOR.gold} fontSize="8.5" fontWeight="600">Block Inheritance set here</text>
+      <DBox x={205} y={146} w={120} h={38} label="OU" sub="Enforced GPO still applies" />
+      <DCaption x={265} y={212} text="Enforcement always wins, even against Block Inheritance" />
+    </svg>
+  );
+}
+
+function DiagramFailoverCluster() {
+  return (
+    <svg viewBox="0 0 320 232" style={{ width: '100%', height: 'auto' }}>
+      <DCaption x={160} y={14} text="Failover cluster: nodes share storage and a vote" />
+      <DBox x={10} y={26} w={90} h={30} label="Node 1" />
+      <DBox x={115} y={26} w={90} h={30} label="Node 2" />
+      <DBox x={220} y={26} w={90} h={30} label="Node 3" />
+      <DLine x1={55} y1={56} x2={55} y2={92} />
+      <DLine x1={160} y1={56} x2={160} y2={92} />
+      <DLine x1={265} y1={56} x2={265} y2={92} />
+      <DBox x={20} y={92} w={280} h={40} label="Shared / replicated storage" sub="cluster-wide pool (e.g. Storage Spaces Direct)" />
+      <DLine x1={55} y1={132} x2={55} y2={166} />
+      <DLine x1={160} y1={132} x2={160} y2={166} />
+      <DLine x1={265} y1={132} x2={265} y2={166} />
+      <DBox x={70} y={166} w={180} h={36} label="Quorum witness" sub="Cloud Witness / file share — the tie-breaking vote" />
+      <DCaption x={160} y={222} text="Cluster stays online only while a majority of votes (nodes + witness) are present" />
+    </svg>
+  );
+}
+
+function DiagramDfsNamespace() {
+  return (
+    <svg viewBox="0 0 320 208" style={{ width: '100%', height: 'auto' }}>
+      <DBox x={100} y={8} w={120} h={30} label="Client" sub="opens one path" />
+      <DLine x1={160} y1={38} x2={160} y2={58} />
+      <DBox x={70} y={58} w={180} h={34} label="DFS Namespace" sub={'\\\\contoso\\shares'} />
+      <DLine x1={130} y1={92} x2={70} y2={128} />
+      <DLine x1={190} y1={92} x2={250} y2={128} />
+      <DBox x={10} y={128} w={120} h={40} label="File Server A" />
+      <DBox x={190} y={128} w={120} h={40} label="File Server B" />
+      <DLine x1={130} y1={148} x2={190} y2={148} />
+      <DCaption x={160} y={182} text="DFS-R keeps both copies in sync" />
+      <DCaption x={160} y={196} text="DFS-N sends the client to whichever copy is available" />
+    </svg>
+  );
+}
+
+function DiagramCredentialGuardIsolation() {
+  return (
+    <svg viewBox="0 0 320 214" style={{ width: '100%', height: 'auto' }}>
+      <DCaption x={160} y={14} text="Credential Guard: isolating secrets from the host itself" />
+      <rect x={10} y={26} width={140} height={150} rx="10" fill="none" stroke={COLOR.border} strokeDasharray="4 3" />
+      <DCaption x={80} y={40} text="Host OS" />
+      <DBox x={22} y={54} w={116} h={40} label="Local Administrator" sub="or kernel-level malware" />
+      <DBox x={22} y={130} w={116} h={30} label="Mimikatz-style tool" sub="tries to read LSASS" />
+      <DLine x1={80} y1={94} x2={80} y2={130} />
+      <DLine x1={138} y1={145} x2={182} y2={105} />
+      <text x={160} y={128} textAnchor="middle" fill={COLOR.red} fontSize="16" fontWeight="700">&#10005;</text>
+      <rect x={170} y={26} width={140} height={150} rx="10" fill="none" stroke={COLOR.primary} strokeWidth="1.3" strokeDasharray="4 3" />
+      <DCaption x={240} y={40} text="Hypervisor-isolated container" />
+      <DBox x={182} y={80} w={116} h={50} label="LSASS secrets" sub="NTLM / Kerberos, VBS-protected" />
+      <DCaption x={160} y={196} text="Even a compromised local admin can't reach the isolated secrets" />
+    </svg>
+  );
+}
+
+function DiagramMonitoringPipeline() {
+  return (
+    <svg viewBox="0 0 500 220" style={{ width: '100%', height: 'auto' }}>
+      <DBox x={4} y={16} w={86} h={34} label="Session hosts" sub="Data Collector Set" />
+      <DLine x1={90} y1={33} x2={100} y2={33} />
+      <DBox x={100} y={16} w={100} h={34} label="Azure Monitor Agent" />
+      <DLine x1={200} y1={33} x2={210} y2={33} />
+      <DBox x={210} y={16} w={100} h={34} label="Data Collection Rule" sub="what + destination" />
+      <DLine x1={310} y1={33} x2={320} y2={33} />
+      <DBox x={320} y={16} w={136} h={34} label="Log Analytics workspace" />
+      <DLine x1={388} y1={50} x2={305} y2={110} />
+      <DLine x1={388} y1={50} x2={430} y2={110} />
+      <DBox x={250} y={110} w={110} h={34} label="Metric alert" sub="numeric threshold, scheduled" />
+      <DBox x={370} y={110} w={120} h={34} label="Log alert" sub="KQL query, scheduled" />
+      <DLine x1={305} y1={144} x2={330} y2={170} />
+      <DLine x1={430} y1={144} x2={410} y2={170} />
+      <DBox x={277} y={170} w={180} h={34} label="Action group" sub="email, SMS, webhook, runbook" />
+      <DCaption x={250} y={214} text="One action group is reused across many unrelated alert rules" />
+    </svg>
+  );
+}
+
+function DiagramHostPoolFanOut() {
+  return (
+    <svg viewBox="0 0 340 250" style={{ width: '100%', height: 'auto' }}>
+      <DBox x={90} y={8} w={160} h={28} label="Workspace" sub="unified feed" />
+      <DLine x1={170} y1={36} x2={170} y2={50} />
+      <DBox x={90} y={50} w={160} h={28} label="Application Group" sub="Desktop or RemoteApp" />
+      <DLine x1={170} y1={78} x2={170} y2={92} />
+      <DBox x={60} y={92} w={220} h={32} label="Host Pool" sub="pooled or personal" />
+      <DLine x1={170} y1={124} x2={60} y2={150} />
+      <DLine x1={170} y1={124} x2={170} y2={150} />
+      <DLine x1={170} y1={124} x2={280} y2={150} />
+      <DBox x={20} y={150} w={80} h={32} label="Session host" />
+      <DBox x={130} y={150} w={80} h={32} label="Session host" />
+      <DBox x={240} y={150} w={80} h={32} label="Session host" />
+      <DCaption x={170} y={204} text="Breadth-first spreads new sessions evenly across every host" />
+      <DCaption x={170} y={220} text="Depth-first fills one host first — pairs with autoscale" />
+    </svg>
+  );
+}
+
+function DiagramFslogixAttach() {
+  return (
+    <svg viewBox="0 0 340 208" style={{ width: '100%', height: 'auto' }}>
+      <DBox x={110} y={8} w={120} h={28} label="User signs in" />
+      <DLine x1={170} y1={36} x2={170} y2={50} />
+      <DBox x={100} y={50} w={140} h={32} label="FSLogix" sub="locates the user's VHDX" />
+      <DLine x1={170} y1={82} x2={170} y2={96} />
+      <DBox x={90} y={96} w={160} h={32} label="Profile container" sub="Azure Files / Azure NetApp Files" />
+      <DLine x1={170} y1={128} x2={170} y2={142} />
+      <DBox x={70} y={142} w={200} h={36} label="Session host" sub="container attached at sign-in, detached at sign-out" />
+      <DCaption x={170} y={196} text="Any session host in the pool looks the same once attached" />
+    </svg>
+  );
+}
+
 const LESSON_DIAGRAMS = {
   serviceModels: DiagramServiceModels,
   hierarchy: DiagramHierarchy,
@@ -405,5 +542,12 @@ const LESSON_DIAGRAMS = {
   deploymentModels: DiagramDeploymentModels,
   scalingApproaches: DiagramScalingApproaches,
   dmzZones: DiagramDmzZones,
+  gpoPrecedence: DiagramGpoPrecedence,
+  failoverCluster: DiagramFailoverCluster,
+  dfsNamespace: DiagramDfsNamespace,
+  credentialGuardIsolation: DiagramCredentialGuardIsolation,
+  monitoringPipeline: DiagramMonitoringPipeline,
+  hostPoolFanOut: DiagramHostPoolFanOut,
+  fslogixAttach: DiagramFslogixAttach,
 };
 

@@ -4,7 +4,7 @@ CATEGORIES = [
     {'key': 'adDs', 'label': 'Deploy and Manage AD DS', 'marks': 21, 'resources': [
         {'label': 'Microsoft Learn: Deploy and Manage Active Directory Domain Services', 'url': 'https://learn.microsoft.com/en-us/training/paths/deploy-manage-active-directory-domain-services/'},
     ]},
-    {'key': 'hybridWorkloads', 'label': 'Manage Windows Server Hybrid Workloads', 'marks': 12, 'resources': [
+    {'key': 'hybridWorkloads', 'label': 'Manage Windows Server Hybrid Workloads', 'marks': 12, 'screenshot': 'failoverClusterDrainRoles', 'resources': [
         {'label': 'Microsoft Learn: Manage Windows Servers and workloads in a hybrid environment', 'url': 'https://learn.microsoft.com/en-us/training/paths/manage-windows-servers-workloads-hybrid-environment/'},
         {'label': 'Microsoft Learn: Manage hybrid workloads with Azure Arc', 'url': 'https://learn.microsoft.com/en-us/training/modules/manage-hybrid-workloads-azure-arc/'},
     ]},
@@ -1325,7 +1325,7 @@ LESSONS = [
         'id': 'active-directory-domain-services',
         'title': 'Active Directory Domain Services',
         'summary': 'FSMO roles and replication, trusts and functional levels, Group Policy precedence, and the recovery and hybrid-identity tools built around AD DS.',
-        'diagram': None,
+        'diagram': 'gpoPrecedence',
         'vocabIds': ['f1', 'f2', 'f3', 'f4', 'f5', 'f6', 'f7', 'f8', 'f9', 'f46', 'f48', 'f50'],
         'quizIds': ['q1', 'q2', 'q3', 'q4', 'q5', 'q6', 'q7', 'tf1', 'tf3', 'msq1', 'tf17', 'q43'],
         'reading': """Active Directory relies on a handful of specialized domain controller roles and mechanisms rather than treating every DC as perfectly interchangeable. The five FSMO roles split into two scopes: forest-wide (one per forest) are the Schema Master and Domain Naming Master, while domain-wide (one per domain) are the RID Master, PDC Emulator, and Infrastructure Master. The PDC Emulator specifically handles time synchronization and urgent password-change processing across the domain, so its unrecoverable loss with no available backup calls for seizing the role onto a healthy DC rather than waiting for a transfer window that no longer exists. The Infrastructure Master fixes cross-domain group-membership references, and shouldn't sit on a Global Catalog server unless every DC in the domain is also a GC — a Global Catalog server holds a full, writable copy of its own domain plus a partial, read-only copy of every other domain in the forest, which is what makes forest-wide searches and universal group membership resolution possible during logon. Without a reachable GC, a user in a multi-domain forest signing in with a UPN, or one belonging to a universal group, can actually be blocked from completing logon, since only the GC can resolve universal group membership.
@@ -1350,7 +1350,7 @@ Group Policy objects apply in a defined order — Local, Site, Domain, OU (LSDOU
         'id': 'hybrid-management-clustering-virtualization',
         'title': 'Hybrid Management, Clustering & Virtualization',
         'summary': 'Bringing on-premises servers under Azure management with Arc, patching and protecting failover clusters, and the Hyper-V VM and container fundamentals underneath them.',
-        'diagram': None,
+        'diagram': 'failoverCluster',
         'vocabIds': ['f10', 'f11', 'f12', 'f13', 'f14', 'f44', 'f45', 'f47', 'f15', 'f16', 'f17', 'f18', 'f19'],
         'quizIds': ['q8', 'q9', 'q10', 'q11', 'q12', 'tf5', 'q35', 'q13', 'q14', 'q15', 'tf7', 'msq5', 'q38', 'q45'],
         'reading': """Bringing an on-premises server under Azure's management plane doesn't require moving it anywhere. Azure Arc-enabled servers projects a server — on-premises or in another cloud — into Azure Resource Manager via the Connected Machine agent, without migrating the actual workload at all; once projected, that server can have Azure Policy, Azure Monitor, Microsoft Defender for Cloud, and Update Manager applied to it exactly like a native Azure VM, even though the compute itself never leaves the datacenter. Day-to-day, Windows Admin Center (WAC) gives administrators a free, modern, browser-based portal for managing servers locally or remotely — including Server Core installations with no local desktop shell at all — installed as a gateway rather than a separate console application every admin needs on their own workstation, and it extends with feature extensions like Azure Arc integration to bridge into that same cloud management plane from the same interface.
@@ -1400,7 +1400,7 @@ Connecting a network to Azure, or authenticating access onto it, has its own two
         'id': 'storage-file-services',
         'title': 'Storage & File Services',
         'summary': 'Unifying and replicating file shares, pooling local disks with Storage Spaces and S2D, reclaiming space, and the file systems and block-storage options underneath.',
-        'diagram': None,
+        'diagram': 'dfsNamespace',
         'vocabIds': ['f25', 'f26', 'f27', 'f28', 'f29', 'f30', 'f31', 'f49'],
         'quizIds': ['q21', 'q22', 'q23', 'q24', 'q25', 'tf10', 'tf11', 'msq7', 'msq8', 'q47', 'q48', 'q39'],
         'reading': """Two related but distinct technologies solve the "many file servers, one experience" problem. DFS Namespaces (DFS-N) presents a single logical folder path, like \\\\contoso\\shares, that transparently points users to shared folders spread across one or more actual servers, regardless of which physical server actually holds a given folder. DFS Replication (DFS-R) is the piece that keeps the real folder contents synchronized between multiple servers, so any of them can serve current data — the two are commonly deployed together, DFS-R keeping the copies in sync while DFS-N gives users one consistent path that resolves to whichever in-sync copy is closest or available, but each can be deployed on its own, and neither is the same thing as Storage Replica's block-level replication.
@@ -1425,7 +1425,7 @@ For data that needs to leave the building, or be reached without a full file-sha
         'id': 'securing-windows-server',
         'title': 'Securing Windows Server Hybrid Infrastructure',
         'summary': 'Application control, protecting credentials in memory and at rest, restricting how privileged accounts can authenticate, and detecting attacks against on-premises identity.',
-        'diagram': None,
+        'diagram': 'credentialGuardIsolation',
         'vocabIds': ['f32', 'f33', 'f34', 'f35', 'f36'],
         'quizIds': ['q26', 'q27', 'q28', 'q29', 'tf12', 'tf13', 'msq9', 'tf18', 'q49'],
         'reading': """Stopping unapproved code from running at all starts with choosing between two allowlisting technologies that work at very different levels. Windows Defender Application Control (WDAC) enforces a code-integrity policy evaluated by the kernel itself and applied system-wide, determining what's allowed to run before it even starts — critically, that enforcement survives even if a local administrator account on the box is later compromised, since it isn't a user-mode control an elevated attacker could simply disable. AppLocker, by contrast, is a rule-based allowlisting feature running at the user-mode level, which can apply different rules per user or group, but is correspondingly easier to bypass than a kernel-enforced WDAC policy. A requirement for enforcement that survives a compromised local administrator account, applied before any unapproved binary can even start, points specifically to WDAC.
@@ -1450,7 +1450,7 @@ Some protections apply to specific high-value accounts directly. Adding an accou
         'id': 'monitoring-troubleshooting-windows-server',
         'title': 'Monitoring & Troubleshooting Windows Server',
         'summary': 'Local performance counters and event logs, unifying monitoring across a hybrid fleet with Azure Monitor, and patch compliance with Azure Update Manager.',
-        'diagram': None,
+        'diagram': 'monitoringPipeline',
         'vocabIds': ['f37', 'f38', 'f39', 'f40', 'f41', 'f42', 'f43'],
         'quizIds': ['q30', 'q31', 'q32', 'q33', 'q34', 'tf14', 'tf15', 'msq10', 'msq11', 'q44', 'q50', 'q41'],
         'reading': """Locally, Performance Monitor displays real-time or logged performance counters — CPU, memory, disk queue length, and so on — but capturing the same set of counters consistently over time, rather than reconfiguring the tool fresh every time an issue comes up, is what a Data Collector Set is for: it groups counters, trace data, and configuration into a single, reusable, schedulable collection job, and can even be configured to trigger an alert or run a task when a counter crosses a defined threshold, turning raw performance data into a proactive signal instead of a report someone has to remember to go read.
