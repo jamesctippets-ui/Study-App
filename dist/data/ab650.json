@@ -1506,6 +1506,275 @@
       "explanation": "DSPM for AI is a discovery and reporting capability \u2014 it surfaces oversharing and sensitive-data risk in AI interactions, but a separate DLP policy scoped to Copilot interactions is what actually blocks sensitive content from appearing in responses. Its reports don't self-escalate into enforcement, Insider Risk Management addresses user behavior risk rather than content-level blocking, and a sensitivity label can't be applied to DSPM for AI itself \u2014 it's a reporting tool, not a document."
     }
   ],
+  "lessons": [
+    {
+      "id": "tenant-configuration-management",
+      "title": "Tenant Configuration & Management",
+      "summary": "Domain verification, licensing models, mail and collaboration objects, and delegated administration for the Microsoft 365 tenant.",
+      "diagram": "groupLicensing",
+      "vocabIds": [
+        "f1",
+        "f2",
+        "f3",
+        "f4",
+        "f5",
+        "f6",
+        "f7",
+        "f8",
+        "f48",
+        "f49",
+        "f50",
+        "f51"
+      ],
+      "quizIds": [
+        "q1",
+        "q2",
+        "q4",
+        "q6",
+        "q7",
+        "msq2",
+        "q35",
+        "q36"
+      ],
+      "reading": "Every Microsoft 365 tenant starts with a default onmicrosoft.com domain, but production tenants add their own custom domain, like contoso.com. Adding it isn't enough on its own \u2014 the tenant has to prove ownership first, which it does by asking you to publish a unique TXT record at your DNS host. Once Microsoft 365 detects that record, the domain is verified, and only then do you add the MX record (routes mail to Exchange Online), the Autodiscover CNAME (lets Outlook clients find their mailbox settings automatically), and SPF (authorizes which servers may send mail as your domain). A custom domain can only be verified in one tenant at a time, which matters directly during a merger or tenant-to-tenant migration: the domain has to be removed from the source tenant's verified domains before the destination tenant can add and verify it, which is why domain cutover is normally the very last, tightly timed step of a migration, done only after mailbox content has already landed in the new tenant.\n\nLicensing follows a similar 'set it once, let it scale' philosophy. Assigning a license directly to each user works, but it means repeating that step for every hire and role change. Group-based licensing instead attaches the license to a Microsoft Entra security group, so every current and future member of that group picks it up automatically \u2014 nothing to remember when someone joins or leaves. Within a license SKU like Microsoft 365 E3, individual service plans (Exchange Online, SharePoint Online, Yammer, Stream, and dozens more) can also be disabled one at a time, so you can hand a user everything in the bundle except one workload you don't want them using, without buying and juggling a separate, narrower SKU. Microsoft 365 Apps update channels apply the same idea to how quickly change reaches users: Current Channel ships features as soon as they're ready, Monthly Enterprise Channel bundles them onto one predictable date a month, and Semi-Annual Enterprise Channel holds them back twice a year for organizations that need the longest validation runway.\n\nMail and collaboration objects look similar on the surface but behave very differently. A distribution group only fans mail out to its members' own inboxes \u2014 it never actually stores anything itself. A shared mailbox is a single mailbox that several people can send and receive from with delegated permissions, and it needs no license of its own as long as it stays under the size limit. A Microsoft 365 group goes further still, provisioning a shared mailbox, a SharePoint site, a Planner, and more all at once, as the membership object behind Teams. SharePoint's external sharing setting works on a similar layered principle: the organization-wide setting is a ceiling, and no individual site can be configured to be more permissive than that ceiling allows, only equal to it or tighter.\n\nDelegated administration and tenant health round out day-to-day tenant configuration. Granular Delegated Admin Privileges (GDAP) replaced the older, all-or-nothing classic DAP model, letting a partner be granted only specific, time-bound Microsoft Entra roles for a customer engagement instead of standing Admin Agent access across the whole tenant. The same least-privilege thinking applies internally: built-in roles like Helpdesk Administrator let front-line staff reset a regular user's password without ever being able to touch a Global Administrator's account or any tenant-wide setting. For hybrid identity, Microsoft Entra Connect is the traditional single-engine sync tool for one on-premises AD forest with complex custom rules, while Microsoft Entra Cloud Sync runs multiple lightweight agents in parallel, which is the simpler choice when several separate AD forests, such as after an acquisition, need to land in one tenant. And day to day, Service health reports real, active incidents, while Message center instead announces upcoming feature changes \u2014 so a user complaining that something 'looks different' is very often a Message center rollout, not an outage at all.",
+      "fundamentalsLabel": "New to Microsoft 365 tenant administration? See the everyday analogy",
+      "fundamentals": "Verifying a domain is like proving you own an address before the post office will deliver mail there \u2014 you post a one-time code at your 'address' (DNS), and only after that's confirmed do you set up the actual mail routes. Group-based licensing is like a company handing out badges by department instead of printing one individually for every new hire: join the department, get the badge automatically, no HR ticket required. And GDAP is like giving a contractor a keycard that only opens the two rooms they're working in, for the length of the job, instead of handing them a master key to the whole building indefinitely.",
+      "keyTerms": [
+        "TXT record",
+        "Group-based licensing",
+        "service plans",
+        "Semi-Annual Enterprise Channel",
+        "shared mailbox",
+        "distribution group",
+        "Microsoft 365 group",
+        "external sharing",
+        "GDAP",
+        "Helpdesk Administrator",
+        "Microsoft Entra Cloud Sync",
+        "Service health",
+        "Message center"
+      ],
+      "commonTraps": [
+        "A distribution group does not store mail at all \u2014 treating it like a mailbox is a common mix-up; only a shared mailbox or Microsoft 365 group actually holds content.",
+        "A custom domain cannot be verified in two tenants simultaneously \u2014 plan the domain cutover as the last step of a migration, not an early one.",
+        "SharePoint's org-wide external sharing setting is a ceiling: a site can never be configured more permissively than it, only equally or more restrictively.",
+        "GDAP is time-bound and scoped to specific roles \u2014 it replaced classic DAP precisely because DAP granted permanent, all-or-nothing Admin Agent access."
+      ],
+      "scenario": "A retailer is merging two Microsoft 365 tenants after an acquisition. Its 400 acquired employees need Microsoft 365 E3 with everything except Yammer, which corporate policy disables company-wide, and their new-hire pipeline should pick up that same license automatically without HR filing a ticket for the licensing team every time. The admin creates a security group, assigns group-based licensing to it with the Yammer service plan disabled, and adds the acquired employees to it \u2014 every current and future member is licensed and configured correctly the moment they join, with nothing to repeat by hand. Later, when it's time to cut the acquired company's domain over from the old tenant to the new one, that step is scheduled last, after mailbox content has already migrated, since the domain can only be verified in one tenant at a time."
+    },
+    {
+      "id": "identity-access-threat-protection",
+      "title": "Identity, Access & Threat Protection",
+      "summary": "Conditional Access, hybrid authentication, Privileged Identity Management, and Defender for Office 365 threat protection.",
+      "diagram": "identity",
+      "vocabIds": [
+        "f9",
+        "f10",
+        "f11",
+        "f12",
+        "f13",
+        "f47",
+        "f54",
+        "f58"
+      ],
+      "quizIds": [
+        "q8",
+        "q9",
+        "q10",
+        "q11",
+        "q12",
+        "msq3",
+        "q39",
+        "tf1",
+        "tf2"
+      ],
+      "reading": "Every tenant starts with a security baseline called security defaults \u2014 a free, one-size-fits-all set of protections that requires MFA registration for everyone and blocks legacy authentication, but can't be customized any further. Once an organization needs more nuance than that \u2014 different rules for different apps, locations, devices, or risk levels \u2014 it turns on Conditional Access, a licensed policy engine built on if-then rules. The two are mutually exclusive at the tenant level: turning on Conditional Access requires turning security defaults off first, since Conditional Access is meant to fully replace that baseline with tailored rules rather than layer on top of it. A Conditional Access policy separates two kinds of controls: grant controls decide whether access is allowed at all \u2014 require MFA, require a compliant device, or block outright \u2014 while session controls apply restrictions during a session that's already been granted, like restricting an unmanaged device to browser-only access with no downloads.\n\nFor hybrid organizations still running on-premises Active Directory, three methods bridge sign-in to the cloud. Password hash synchronization syncs a hash of the on-premises password hash to Microsoft Entra ID so sign-in is validated in the cloud \u2014 the method Microsoft recommends by default, since it's simplest to operate and still lets Entra ID evaluate sign-in risk. Pass-through authentication instead validates the password directly against on-premises Active Directory through lightweight agents, so no password hash \u2014 not even a hash \u2014 is ever stored in the cloud. Federation, through AD FS or a similar provider, delegates authentication entirely to that external identity provider. On top of whichever method is chosen, Microsoft Entra ID Protection layers two distinct risk signals into Conditional Access: sign-in risk is a real-time, session-specific signal like an impossible-travel pattern, while user risk is an ongoing, aggregate signal like a leaked-credential match. The two remediate differently \u2014 satisfying MFA clears a risky sign-in for that session, but clearing high user risk from leaked credentials typically needs an actual password change.\n\nPrivileged Identity Management (PIM) shrinks how many admin accounts sit permanently privileged. Instead of a standing role assignment, a user is made eligible for a role and must explicitly activate it \u2014 often satisfying MFA and supplying a business justification \u2014 for a limited window when they actually need it, with every activation, approval, and expiration logged in the audit log. On the threat protection side, Defender for Office 365's Safe Links rewrites every URL in email and Office documents so each click is re-checked against threat intelligence at the moment it happens, not just when the message first arrived \u2014 exactly what catches a link that was clean at delivery but was weaponized by the attacker hours later. Safe Attachments instead detonates attachments in an isolated sandbox before delivery, catching malware that static scanning alone would miss. Beyond individual controls, admins can also run Attack simulation training, launching realistic, safe phishing or credential-harvest campaigns against real users and automatically enrolling anyone who falls for one into targeted follow-up training.",
+      "fundamentalsLabel": "New to identity and access governance? See the everyday analogy",
+      "fundamentals": "Grant controls versus session controls is like a nightclub's door policy versus its house rules: the bouncer checking ID at the door (grant control) decides whether you get in at all, while 'no photos past this point' (session control) only applies once you're already inside. PIM is like a fire extinguisher behind glass rather than one sitting out on the counter \u2014 the capability is there when genuinely needed, but breaking the glass (activating the role) is a deliberate, logged act, not something that happens by accident. And Safe Links' time-of-click check is like a bouncer who re-checks your ID every time you step back in from outside, not just once at the very start of the night.",
+      "keyTerms": [
+        "security defaults",
+        "Conditional Access",
+        "grant controls",
+        "session controls",
+        "Password hash synchronization",
+        "Pass-through authentication",
+        "sign-in risk",
+        "user risk",
+        "Privileged Identity Management",
+        "Safe Links",
+        "Safe Attachments",
+        "Attack simulation training"
+      ],
+      "commonTraps": [
+        "Security defaults and Conditional Access cannot both be active \u2014 enabling Conditional Access requires disabling security defaults first, not layering the two together.",
+        "Grant controls decide whether access is allowed at all; blocking downloads or restricting to browser-only access on an already-granted session is a session control, not a grant control.",
+        "Satisfying MFA clears sign-in risk for that session, but it does not clear high user risk from leaked credentials \u2014 that typically needs an actual password change.",
+        "A PIM 'eligible' role assignment is not active until the user explicitly activates it \u2014 it is not the same as a standing, always-on role."
+      ],
+      "scenario": "A hospital's security team wants clinicians to satisfy MFA to reach any patient-record app, and wants any sign-in flagged as high sign-in risk (like an impossible-travel pattern) to require MFA again immediately, while an account flagged with high user risk from a leaked-credential match is forced into a secure password change before it can sign in at all. Because the hospital already needs this level of nuance, it first disables security defaults, then builds these as separate Conditional Access policies tied to Entra ID Protection's two distinct risk signals \u2014 one responding to the session-specific sign-in risk, the other to the account-level user risk, since satisfying MFA alone would not have cleared the leaked-credential risk."
+    },
+    {
+      "id": "data-governance-compliance",
+      "title": "Data Governance & Compliance",
+      "summary": "DLP, retention, sensitivity labels, eDiscovery, audit, and the Purview tools that track and enforce them.",
+      "diagram": null,
+      "vocabIds": [
+        "f14",
+        "f15",
+        "f16",
+        "f17",
+        "f18",
+        "f19",
+        "f20",
+        "f21",
+        "f22",
+        "f23",
+        "f52",
+        "f53",
+        "f55"
+      ],
+      "quizIds": [
+        "q13",
+        "q14",
+        "q16",
+        "q17",
+        "q18",
+        "q20",
+        "q21",
+        "q38",
+        "q40",
+        "msq6"
+      ],
+      "reading": "A Microsoft Purview data loss prevention (DLP) policy defines where it looks (locations like Exchange, SharePoint, OneDrive, Teams chat, or endpoint devices), what it's looking for (conditions like a sensitive information type match, such as a credit card number), and what happens when it finds a match (block sharing, show a policy tip, or require an override justification). Before enforcing anything, a policy can run in test mode to surface likely matches and false positives, which is the recommended way to tune a policy before it starts blocking real business activity. When two DLP policies could both apply to the same content, priority decides the outcome: policies are evaluated in priority order, where a lower priority number goes first, and a rule whose action includes 'stop processing more rules' skips every lower-priority rule and policy after it \u2014 so a conflict between two overlapping policies is fixed by reordering priority, not by editing either policy's conditions.\n\nRetention and sensitivity work on two separate axes that are easy to conflate. A retention policy applies one retain/delete rule uniformly across a whole location, like a mailbox or SharePoint site, with nothing for users to do. A retention label instead attaches to individual items, so different content in that same location can carry different retention behavior, whether applied by a user or automatically via a trainable classifier. When retention rules conflict, the resolution favors preservation: the longer retention period wins, and an explicit 'retain' instruction generally wins over a 'delete' instruction. A sensitivity label is an entirely different tool that protects the content itself \u2014 encryption, a watermark or header/footer, and permission restrictions that travel with the file \u2014 and a label can be scoped to Files & emails for document-level protection or to Groups & sites, which instead controls a Microsoft 365 Group or Team's own privacy and external-access settings. The two label types are independent and frequently stack: one label encrypting a document as Confidential while a separate retention label governs when it can eventually be deleted.\n\nFor legal and investigative needs, eDiscovery (Standard) covers basic case creation, cross-location search, and export, while eDiscovery Premium adds custodian management, legal hold notifications, and analytics like near-duplicate detection and email threading for complex litigation. Audit (Standard) retains most mailbox and admin events for 180 days by default; Audit (Premium) extends that retention and adds forensic event types like MailItemsAccessed, the specific event a scenario asking 'which items did the attacker actually read' is always pointing at. Insider Risk Management combines behavioral signals, like unusual downloads, with HR events, like a resignation, to score potentially risky activity, pseudonymizing identities in alerts by default until an investigator genuinely needs to reveal them. Communication compliance takes a related but distinct approach, scanning communications for policy violations like harassment or sensitive data sharing and routing flagged items to a human reviewer rather than blocking the message outright. Information barriers go further still, actively blocking two defined groups, such as investment banking and research teams, from communicating or discovering each other's content at all \u2014 a stronger control than Conditional Access, which only governs the conditions under which sign-in is allowed.\n\nTwo dashboards help leadership see where all of this stands. Microsoft Secure Score expresses overall security posture as a number, weighing completed actions against recommended ones across identity, devices, apps, and data. Compliance Manager instead tracks specific regulatory templates, like GDPR or ISO 27001, translating each one's requirements into improvement actions and a compliance score, while explicitly separating actions Microsoft has already fulfilled as the provider from actions the organization itself must implement and attest to \u2014 the shared responsibility model applied to compliance tracking. To keep any of this from becoming a fixed, manually maintained list, adaptive scopes let a DLP or retention policy include users, groups, or sites based on an attribute query, like department equals Finance, so coverage recalculates automatically as group membership or attributes change, rather than needing an admin to update a list by hand.",
+      "fundamentalsLabel": "New to data governance tooling? See the everyday analogy",
+      "fundamentals": "A retention policy is like a building-wide rule that every filing cabinet gets emptied after three years; a retention label is like a sticky note on one specific folder inside that cabinet saying 'keep this one for seven, no matter what.' A sensitivity label, by contrast, isn't about how long something is kept at all \u2014 it's like sealing an envelope and stamping it Confidential, something that travels with the document itself regardless of any filing-cabinet schedule. And DLP policy priority works like a bouncer's rulebook ordered from most to least specific: whichever rule is checked first and matches wins, so reshuffling the rulebook's order \u2014 not rewriting any one rule \u2014 is how you fix two rules that seem to contradict each other.",
+      "keyTerms": [
+        "data loss prevention",
+        "retention policy",
+        "retention label",
+        "sensitivity label",
+        "Groups & sites",
+        "eDiscovery Premium",
+        "MailItemsAccessed",
+        "Insider Risk Management",
+        "Communication compliance",
+        "Information barriers",
+        "Microsoft Secure Score",
+        "Compliance Manager",
+        "adaptive scopes"
+      ],
+      "commonTraps": [
+        "A retention policy sets one rule for a whole location; only a retention label lets individual items behave differently within that same location.",
+        "When retention rules conflict, the longer retention period and an explicit 'retain' instruction win \u2014 conflicts resolve toward keeping content, not deleting it.",
+        "DLP policy conflicts are resolved by priority order (lower number first), not by which policy was created most recently.",
+        "A sensitivity label scoped only to Files & emails never touches a Team's own privacy or guest-access settings \u2014 that requires the Groups & sites scope."
+      ],
+      "scenario": "A law firm needs a document type encrypted and marked Confidential the moment it's created, kept for exactly seven years, and then deleted automatically regardless of who still has access \u2014 and separately wants to know, before rolling out a new DLP rule blocking sensitive-content sharing, how many legitimate documents it would actually catch. The admin applies a sensitivity label for the encryption and marking, a separate retention label for the seven-year keep-then-delete schedule, and rolls the new DLP policy out in test mode first, reviewing matches in Content explorer before ever switching it to enforce."
+    },
+    {
+      "id": "copilot-licensing-and-grounding",
+      "title": "Copilot Licensing & Grounding",
+      "summary": "Copilot licensing tiers, the Semantic Index, the no-new-access guarantee, and governing Copilot extensibility.",
+      "diagram": null,
+      "vocabIds": [
+        "f25",
+        "f26",
+        "f27",
+        "f28",
+        "f32",
+        "f35",
+        "f60",
+        "f61"
+      ],
+      "quizIds": [
+        "q23",
+        "q24",
+        "q25",
+        "q26",
+        "q32",
+        "q43",
+        "tf8",
+        "tf9",
+        "tf10"
+      ],
+      "reading": "Microsoft 365 Copilot is always an add-on, never a standalone product. It requires an eligible base subscription \u2014 Microsoft 365 E3 or E5, Business Standard or Premium, A3 or A5 \u2014 plus the Copilot add-on license assigned separately to each user; owning the base subscription, or even owning Copilot licenses somewhere in the tenant, never grants access on its own to a user who hasn't been individually assigned one. Because it's an add-on layered on top of an existing license, group-based licensing rolls it out to a pilot group or department the same clean way it rolls out any other add-on. It's worth knowing there's also a free tier: Microsoft 365 Copilot Chat, the evolution of Bing Chat Enterprise, comes included with any Microsoft Entra work account at no extra cost, offering web-grounded chat with some limited file-grounded help. That means an organization that has purchased zero paid Copilot add-on licenses can still have employees genuinely using 'Copilot' \u2014 governance and DLP planning need to account for this free tier, not just the paid one.\n\nWhat makes the paid experience powerful is the Semantic Index: an encrypted, Microsoft Graph-based index of an organization's files, emails, chats, and meetings that Copilot uses to ground its answers in real organizational context, well beyond simple keyword search. Because the Semantic Index is built strictly from content the requesting user already has permission to access, it's a grounding mechanism, not an access-granting one \u2014 Copilot cannot surface anything the user couldn't already open on their own. That single guarantee reframes what the actual risk looks like: it isn't Copilot creating a new vulnerability, it's pre-existing oversharing, like files broadly shared with an 'Anyone in the organization' link, that Copilot's summarization now makes far easier to stumble across. While a full oversharing review is underway, Restricted SharePoint Search offers a fast, non-disruptive mitigation, letting an admin exclude specific sites from organization-wide search and Copilot results without touching a single user's existing permissions to that site.\n\nCopilot's reach can also extend beyond Microsoft 365 itself. A Microsoft Graph connector indexes external content, like a wiki or a ticketing system, into Microsoft Search and the Semantic Index, so Copilot can ground answers in that content too \u2014 provided the connector correctly maps its permissions to the source system's own access control list, since a misconfigured mapping is exactly how the no-new-access guarantee breaks down for external content. For lighter-weight customization, a Copilot agent can be built with little to no code in Copilot Studio, or created directly from a SharePoint site, in which case it's grounded only in that site's content and inherits its existing permissions automatically \u2014 a faster path than a full custom agent with its own connectors and topics. None of this extensibility is automatically open to everyone, though: admins govern which plugins, connectors, and published agents are available tenant-wide through Integrated apps and agent management settings, and publishing an agent in Copilot Studio doesn't by itself make it visible to other users \u2014 that admin allow-listing step is often what actually gates whether anyone else can find and use it.",
+      "fundamentalsLabel": "New to Copilot licensing and grounding? See the everyday analogy",
+      "fundamentals": "Think of the base subscription and the Copilot add-on like a gym membership and a personal trainer package: the gym membership alone gets you in the door, but the trainer sessions are a separate add-on you have to book on top of it, for each person who wants one. The Semantic Index is like a very well-organized personal assistant who can only ever tell you about documents you were already allowed to read yourself \u2014 the assistant doesn't hand you a master key, it just helps you find, faster, what was already yours to find.",
+      "keyTerms": [
+        "Copilot add-on",
+        "group-based licensing",
+        "Microsoft 365 Copilot Chat",
+        "Semantic Index",
+        "no-new-access",
+        "oversharing",
+        "Restricted SharePoint Search",
+        "Microsoft Graph connector",
+        "Copilot Studio",
+        "agent management"
+      ],
+      "commonTraps": [
+        "The base subscription (like Microsoft 365 E3) never includes Copilot on its own \u2014 the add-on license must be separately assigned to each user.",
+        "Copilot Chat is free with any Microsoft Entra work account \u2014 a tenant can have real Copilot usage to govern even with zero paid add-on licenses purchased.",
+        "The Semantic Index only grounds Copilot in content the user could already open \u2014 it never grants new access, so oversharing (not Copilot) is the real exposure.",
+        "Publishing a custom agent in Copilot Studio does not make it available tenant-wide by itself \u2014 admin allow-listing in agent management usually gates that."
+      ],
+      "scenario": "A firm rolls out Microsoft 365 Copilot to its finance department first, assigning the add-on via group-based licensing on top of everyone's existing Microsoft 365 E3. During the pilot, several finance users ask Copilot to summarize files, and it surfaces a spreadsheet that was shared tenant-wide with an 'Anyone in the organization' link years ago and almost never opened directly. Rather than treating this as a Copilot flaw, the security team recognizes the real issue as pre-existing oversharing, uses Restricted SharePoint Search to keep the site out of search and Copilot results while a full permissions review runs, and separately confirms that employees outside the pilot who have no add-on license are still using the free Microsoft 365 Copilot Chat tier day to day."
+    },
+    {
+      "id": "securing-and-governing-ai-agents",
+      "title": "Securing & Governing AI Agents",
+      "summary": "DSPM for AI, DLP for Copilot, Entra Agent ID, Security Copilot, and auditing AI interactions.",
+      "diagram": null,
+      "vocabIds": [
+        "f29",
+        "f30",
+        "f31",
+        "f33",
+        "f34",
+        "f36",
+        "f37",
+        "f38",
+        "f59",
+        "f62",
+        "f63"
+      ],
+      "quizIds": [
+        "q27",
+        "q28",
+        "q30",
+        "q31",
+        "q33",
+        "q34",
+        "q42",
+        "q44",
+        "tf11",
+        "msq7",
+        "msq8"
+      ],
+      "reading": "Data Security Posture Management for AI (DSPM for AI), in Microsoft Purview, exists specifically to close a visibility gap most tenants already have: an organization might already run DLP and sensitivity labeling, but have no idea how users are actually interacting with Copilot and other generative AI tools, or where those interactions expose sensitive data. DSPM for AI surfaces exactly that \u2014 how users are prompting AI apps, where oversharing risk shows up in their responses \u2014 and can recommend or auto-apply DLP and labeling policies tailored to AI usage specifically. What it does not do is enforce anything on its own: DSPM for AI is a discovery and reporting layer, not a blocking mechanism. Moving from 'we can see the risk' to 'we're actually stopping it' means configuring a Purview DLP policy scoped specifically to Copilot interactions, which can prevent a file's sensitive content from being quoted or summarized by Copilot even while the user keeps their normal ability to open that file directly \u2014 a narrower, more surgical control than removing file access outright.\n\nBecause AI agents themselves act on data and can be granted permissions, Microsoft Entra Agent ID gives them first-class identity objects in Microsoft Entra ID, the same way a service principal represents an application \u2014 letting agents be discovered, assigned permissions, reviewed, and monitored like any other identity in the tenant, instead of being an invisible governance blind spot. That governance discipline extends into how the tenant thinks about oversight generally: rather than a one-time approval when an agent is created, the responsible-AI approach the exam expects is an ongoing lifecycle \u2014 inventory which agents exist, review their data access, monitor their behavior, and disable or remediate one that starts accessing data it shouldn't, mirroring how app governance already treats third-party applications.\n\nDistinct from Microsoft 365 Copilot entirely, Microsoft Security Copilot is a standalone generative AI assistant purpose-built for security teams, integrating with Defender, Entra, and Purview to help summarize incidents, investigate threats, and generate scripts or reports. It bills on a consumption basis using Security Compute Units (SCUs) \u2014 provisioned capacity rather than a per-user license \u2014 so capacity can scale up or down independent of how many named users are assigned. Copilot Studio agents follow a related but distinct billing model of their own: usage draws first from included message capacity bundled with a Copilot license or standalone subscription, and once that's exhausted, further usage is billed pay-as-you-go if enabled, or the agent may simply stop responding until the next capacity period \u2014 which is exactly why a heavily used custom agent needs its own capacity monitoring rather than an assumption that a fixed license fee covers unlimited usage.\n\nEvery one of these AI interactions leaves a trail admins can actually use. Microsoft 365 Copilot prompts and responses are captured as audit log events, searchable, exportable, and placeable on legal hold through Microsoft Purview eDiscovery just like any other Microsoft 365 content \u2014 making a Copilot conversation a genuinely discoverable record in litigation or an internal investigation, not an ephemeral, unlogged exchange. Insider Risk Management extends the same way, now able to weigh risky or policy-violating prompts submitted to Copilot alongside traditional signals like file exfiltration, since a risky intent can show up in a prompt before any file is ever actually touched. And for organizations bound by data residency requirements, the EU Data Boundary lets in-scope EU/EFTA customers keep the storage and processing of their Microsoft 365 data \u2014 including Copilot prompts, grounding data, and generated responses \u2014 within the EU/EFTA region; it's a tenant-wide data-residency commitment, though, not a Copilot-only toggle, and coverage of specific Copilot experiences has expanded over time rather than being complete from day one.",
+      "fundamentalsLabel": "New to governing AI agents and interactions? See the everyday analogy",
+      "fundamentals": "DSPM for AI is like a smoke detector: it tells you exactly where the smoke is coming from, but it doesn't put out the fire itself \u2014 a DLP policy scoped to Copilot is the fire extinguisher that actually acts on what the detector found. Microsoft Entra Agent ID is like finally issuing every contractor on a job site their own visible ID badge instead of letting them wander around unbadged \u2014 once they're badged, security can actually track who they are, where they've been, and revoke their access individually if needed.",
+      "keyTerms": [
+        "DSPM for AI",
+        "Purview DLP policy",
+        "Microsoft Entra Agent ID",
+        "service principal",
+        "Microsoft Security Copilot",
+        "Security Compute Units",
+        "Copilot Studio",
+        "audit log",
+        "Insider Risk Management",
+        "EU Data Boundary"
+      ],
+      "commonTraps": [
+        "DSPM for AI reports on oversharing and AI usage risk \u2014 it does not itself block anything; enforcement still needs a DLP policy scoped to Copilot.",
+        "Microsoft Security Copilot is a separate product from Microsoft 365 Copilot, billed via consumption-based SCUs, not per-user licenses.",
+        "A Copilot Studio agent's usage isn't unlimited under a fixed license \u2014 once included message capacity is exhausted, it needs pay-as-you-go billing enabled or it may stop responding.",
+        "The EU Data Boundary is a tenant-wide data-residency commitment, not a narrow, Copilot-only setting \u2014 and its coverage of specific Copilot features has expanded gradually rather than being complete from the start."
+      ],
+      "scenario": "A European bank's compliance team runs DSPM for AI and discovers that Copilot responses are frequently surfacing account numbers from a widely shared risk-modeling spreadsheet. They configure a Purview DLP policy scoped to Copilot interactions to stop that specific content from appearing in responses going forward, and confirm through Insider Risk Management that no user's prompts show signs of deliberate exfiltration. Because the bank is bound by EU data residency requirements, it also verifies the EU Data Boundary is enabled and specifically covers Copilot prompt and response processing, rather than assuming a general Microsoft 365 data-residency commitment automatically extended to every Copilot feature."
+    }
+  ],
   "cheatSheet": [
     {
       "heading": "Exam-day strategy",
