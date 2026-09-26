@@ -1525,7 +1525,7 @@ Two more decisions round out this design space. Scaling an App Service plan up c
         'id': 'migration-integration-operations',
         'title': 'Migration, Messaging & Integration',
         'summary': 'Discovering and assessing workloads before a move, choosing the right messaging service, exposing and orchestrating APIs, and troubleshooting the network afterward.',
-        'diagram': None,
+        'diagram': 'messagingCompare',
         'vocabIds': ['f29', 'f30', 'f31', 'f32', 'f33', 'f44'],
         'quizIds': ['q27', 'q28', 'q29', 'q30', 'tf10', 'msq12', 'q54'],
         'reading': """Before any large migration begins, Azure Migrate serves as the hub for discovery and assessment — finding on-premises servers and workloads, right-sizing them, checking readiness, and estimating cost, all before a single workload actually moves. The real data migration itself is often handed off afterward to a more specialized tool, like Database Migration Service for a database, once Azure Migrate's assessment says a workload is actually ready to go.

@@ -533,6 +533,16 @@ const REAL_PORTAL_SCREENSHOTS = {
     sourceUrl: 'https://github.com/MicrosoftDocs/architecture-center/blob/main/docs/best-practices/data-partitioning-content.md',
     product: 'Azure Architecture Center reference diagram',
   },
+  // DP-300 Azure SQL portal screenshot — sourced from the MicrosoftDocs/sql-docs
+  // GitHub repo (its LICENSE file confirms the same CC BY 4.0 terms as
+  // azure-docs, memdocs, and architecture-center above).
+  sqlComputeUtilization: {
+    src: 'images/azuresql/compute-utilization-metrics.png',
+    alt: 'Real Azure Portal screenshot of an Azure SQL Database Overview page compute utilization metrics chart',
+    description: "The Compute utilization chart from an Azure SQL Database's Overview page — CPU percentage, SQL instance CPU percentage, Data IO, Log IO, and Workers percentage all plotted together over time, with each metric's current value listed below its legend entry. This is the same kind of resource-ceiling data sys.dm_db_resource_stats reports via T-SQL, surfaced instead as an Azure Monitor metrics chart.",
+    sourceLabel: 'Microsoft Learn: Monitor and tune Azure SQL Database using metrics and alerts',
+    sourceUrl: 'https://github.com/MicrosoftDocs/sql-docs/blob/live/azure-sql/database/monitoring-metrics-alerts.md',
+  },
 };
 
 // `hideDescription` is set by quiz/exam question views — the description

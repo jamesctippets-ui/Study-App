@@ -1715,7 +1715,7 @@
       "id": "migration-integration-operations",
       "title": "Migration, Messaging & Integration",
       "summary": "Discovering and assessing workloads before a move, choosing the right messaging service, exposing and orchestrating APIs, and troubleshooting the network afterward.",
-      "diagram": null,
+      "diagram": "messagingCompare",
       "vocabIds": [
         "f29",
         "f30",
