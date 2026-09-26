@@ -4910,11 +4910,18 @@ function LessonDetail({ lesson, flashcardsData, questionsData, categories, onBac
   // content. Once such a track gains LESSONS, CourseView replaces
   // StudyView entirely (see the mode==='learn' branch in 06_app.jsx), so
   // without this fallback those screenshots would become unreachable.
-  // Only kicks in when the lesson has no mockup/walkthrough of its own,
-  // so it never duplicates a real screenshot already shown above.
-  const categoryScreenshotKey = !walkthrough && !MockupComp && lessonCatKeys.length === 1
-    ? (categories || []).find((c) => c.key === lessonCatKeys[0])?.screenshot
-    : null;
+  // Only kicks in when the lesson has no mockup/walkthrough of its own.
+  // A lesson can span more than one category (e.g. AZ-802's clustering
+  // lesson pulls vocab from both hybridWorkloads and vmContainers) — this
+  // still resolves as long as exactly one of those categories carries a
+  // screenshot, so it never duplicates a real screenshot already shown
+  // above and never guesses between two competing candidates.
+  const lessonScreenshotCats = !walkthrough && !MockupComp
+    ? lessonCatKeys
+        .map((k) => (categories || []).find((c) => c.key === k))
+        .filter((c) => c && c.screenshot)
+    : [];
+  const categoryScreenshotKey = lessonScreenshotCats.length === 1 ? lessonScreenshotCats[0].screenshot : null;
   const categoryRealShot = categoryScreenshotKey ? REAL_PORTAL_SCREENSHOTS[categoryScreenshotKey] : null;
 
   const paragraphs = lesson.reading.split('\n\n');
