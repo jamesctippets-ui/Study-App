@@ -22,6 +22,7 @@ function CertStudyApp() {
   const [showGlossary, setShowGlossary] = useState(false);
   const [showData, setShowData] = useState(false);
   const [showCertPath, setShowCertPath] = useState(false);
+  const [showTrackSwitcher, setShowTrackSwitcher] = useState(false);
   const [importMessage, setImportMessage] = useState(null);
 
   const [quizLength, setQuizLength] = useState(10);
@@ -269,6 +270,18 @@ function CertStudyApp() {
     setActiveTrack(key);
     setMode((m) => (m === 'home' ? 'learn' : m));
     setShowCertPath(false);
+  };
+
+  // Jumping tracks from the header switcher — reachable from Learn/Quiz/
+  // Exam, not just Home — always lands on Learn for the newly-picked
+  // track rather than trying to preserve the current mode: Quiz/Exam
+  // session state (question index, score, etc.) isn't set up to survive
+  // an activeTrack swap mid-session, and Learn is always a safe, valid
+  // landing spot for any track.
+  const switchTrack = (key) => {
+    setActiveTrack(key);
+    setMode('learn');
+    setShowTrackSwitcher(false);
   };
 
   // Track-parameterized so Today's Mix (spanning several certs at once,
@@ -1239,6 +1252,16 @@ function CertStudyApp() {
           onClose={() => setShowCertPath(false)}
         />
       )}
+      {showTrackSwitcher && (
+        <TrackSwitcherSheet
+          tracks={visibleTracks}
+          results={results}
+          certPlan={certPlan}
+          activeTrack={activeTrack}
+          onSelect={switchTrack}
+          onClose={() => setShowTrackSwitcher(false)}
+        />
+      )}
       {showData && (
         <DataPanel
           trackLabel={track.label}
@@ -1282,10 +1305,17 @@ function CertStudyApp() {
                   </div>
                 </React.Fragment>
               ) : (
-                <React.Fragment>
-                  <div className="itil-display" style={{ fontSize: '21px', fontWeight: 600, lineHeight: 1.2, color: trackAccent(activeTrack) }}>{track.label}</div>
+                <button
+                  onClick={() => setShowTrackSwitcher(true)}
+                  title="Switch track"
+                  style={{ display: 'block', textAlign: 'left', background: 'transparent', border: 'none', padding: 0, width: '100%' }}
+                >
+                  <div className="flex items-center" style={{ gap: '4px' }}>
+                    <div className="itil-display" style={{ fontSize: '21px', fontWeight: 600, lineHeight: 1.2, color: trackAccent(activeTrack) }}>{track.label}</div>
+                    <span style={{ fontSize: '11px', color: COLOR.muted, marginTop: '2px' }}>▾</span>
+                  </div>
                   <div style={{ fontSize: '12px', color: COLOR.muted, marginTop: '2px' }}>{track.subtitle}</div>
-                </React.Fragment>
+                </button>
               )}
             </div>
             <div className="flex items-start gap-1" style={{ flexShrink: 0 }}>
@@ -1343,6 +1373,7 @@ function CertStudyApp() {
               if (stats.lastVisited) { setActiveTrack(stats.lastVisited.track); setMode(stats.lastVisited.mode); }
             }}
             onSelectTrack={(key) => { setActiveTrack(key); setMode('learn'); }}
+            onAddToPath={addToCertPath}
             onOpenAbout={() => setShowAbout(true)}
             onOpenGlossary={() => setShowGlossary(true)}
             onOpenCertPath={() => setShowCertPath(true)}

@@ -95,9 +95,10 @@ A sliding switch in the top nav bar toggles between a dark-grey and an
 off-white theme — see "Light/dark theming" under Source layout for how it's
 implemented and what it does/doesn't affect.
 
-The hamburger menu's **My Cert Path** panel lets you put whichever certs
-you're actually planning to take into your own order — not a curated
-sequence, your sequence. It always surfaces an "Up next" card for the
+**My Cert Path** — consolidated right on Home once you have one (see
+"Home" below) — lets you put whichever certs you're actually planning to
+take into your own order — not a curated sequence, your sequence. It
+always surfaces an "Up next" card for the
 first cert in that order you haven't marked passed yet, so finishing one
 automatically promotes the next without any manual re-ordering. Each cert
 in your path can carry an optional scheduled test date; marking one passed
@@ -232,21 +233,33 @@ bottom:
   (across every track, Today's Mix and the daily question/vocab below
   included), turns solid green once you hit it, and can be adjusted with
   a tap-to-reveal +/- 5 stepper.
-- An **exam readiness** card for your "current cert" (see below) with a
-  lightweight readiness **prediction**: `stats.readinessHistory` logs one
-  score snapshot a day per track, and `readinessProjection` draws a
+- **If you have an active cert path, Home leads with it** —
+  `CertPathHomeSection` in 04_shared_ui.jsx, not a card linking out to a
+  separate panel. The first not-yet-passed cert gets a full "up next"
+  hero: mastery, exam readiness (see below), a scheduled-date countdown
+  badge if you've set one (red if overdue, gold inside a week), and a
+  tap takes you straight into it. Every cert after it in your path is a
+  compact numbered row with the same tap-to-study action. A
+  "Manage path ›" link opens the same reorder/schedule/add/remove/mark-
+  passed panel this always had (still the only place you edit the path
+  itself) — Home is for seeing your path and jumping into it, not
+  editing it. The **readiness prediction** below (`stats.readinessHistory`
+  logs one score snapshot a day per track; `readinessProjection` draws a
   straight line through the oldest and newest snapshots to estimate how
   many days of study, at that pace, would cross the 80% mark — e.g. "At
   your current pace, AZ-900 could be exam-ready in about 12 days (around
-  Oct 7)." With fewer than two days of real history, a flat/declining
-  trend, or a projection over a year out, it says so plainly instead of
-  guessing a date it can't back up.
-- A **My Cert Path** card showing your "Up next" cert, with a **next
-  cert date** countdown badge (reusing `formatScheduledLabel`'s "in N
-  days"/"today"/"N days past" phrasing, colored red if overdue and gold
-  inside a week) whenever that cert has a scheduled test date set.
+  Oct 7)," or says so plainly with too little history or a flat/declining
+  trend) is folded straight into that hero rather than shown twice.
+- **If your path is empty**, Home instead leads with the full 15-track
+  browser itself, expanded (not the old collapsed dropdown) — the thing
+  a new user actually needs is right there, not buried below the daily
+  cards. Each row gets a small "+" to add it to your path without
+  leaving Home or opening the manage panel; tapping the row itself still
+  goes straight into studying it. The standalone readiness card only
+  shows here (an empty path has no hero to fold it into), for whichever
+  track you last visited, or AZ-900 by default.
 - A **"Continue where you left off"** button once you've actually
-  visited a track this browser (tracked separately from Home itself, so
+  visited a track this browser (tracked separately from the path, so
   Home is never mistaken for "a place you left off at").
 - A **Question of the Day** and **Vocab of the Day** — one question and
   one flashcard, deterministically picked each day (`seededIndex`, hashed
@@ -259,19 +272,26 @@ bottom:
   already done today's so revisiting Home later doesn't reset or
   double-count it) — both lock in place with a "new one tomorrow" note
   once done.
-- A collapsed-by-default **dropdown** for the full 15-track list — tap
-  "All tracks (N)" to expand the same rich rows (colored label, subtitle,
-  live mastery %/passed/scheduled badge) the earlier hamburger bottom-sheet
-  showed, collapsed by default now that several other widgets share the
-  page. No path-grouping — every track once, description and mastery %
-  intact — tapping one takes you straight into its Learn tab.
+- Once you have an active path, a collapsed **"Browse all tracks"**
+  dropdown sits below it for adding more certs or one-off studying
+  outside your path — the same rich rows (colored label, subtitle, live
+  mastery %/passed/scheduled badge, "+" to add to path) as the empty-path
+  browser above, just secondary once a path exists instead of the main
+  event.
 
-From inside any track, a ☰ button in the header (titled "Home") takes you
-back to this same Home page at any time — it's a real navigation
-destination now, not a bottom-sheet
-overlay. Navigation is also real client-side routing, not just in-memory
-state: the URL hash always reflects where you are (`#/az900/quiz/questions`,
-`#/home`), so the browser's back/forward buttons walk through actual
+From inside any track, the track name itself in the header is now a
+button — tapping it opens a **track switcher** (`TrackSwitcherSheet`)
+right there on Learn/Quiz/Exam, no trip back to Home required: your cert
+path listed first (numbered, same order as Home), every other track
+below it, current track highlighted. Picking one always lands you on
+Learn for that track — Quiz/Exam session state isn't built to survive an
+`activeTrack` swap mid-session, so this sidesteps that instead of risking
+it. The small ☰ button next to it (titled "Home") still takes you all the
+way back to the Home dashboard — a real navigation destination, not a
+bottom-sheet overlay. Navigation is also real client-side routing, not
+just in-memory state: the URL hash always reflects where you are
+(`#/az900/quiz/questions`, `#/home`), so the browser's back/forward
+buttons walk through actual
 app history instead of doing nothing, and a link straight to a specific
 track+mode+sub-tab lands there directly on load — hash-based rather than
 real paths, deliberately, since a static site with no server has nowhere

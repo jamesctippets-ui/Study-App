@@ -1106,6 +1106,55 @@ specifically (still open).
     regardless of how many categories the lesson spans — still refusing
     to guess when two categories both have one.
 
+- [x] **Navigation rework: header track switcher + Home as the consolidated
+  cert-path view.** User feedback: switching tracks felt clunky (the only
+  way was a tiny ☰ icon back to Home, then scroll past the daily-goal ring,
+  readiness card, and both daily-challenge cards to reach the track list —
+  four-plus taps), and "My Cert Path" was just a teaser card on Home that
+  opened a separate modal rather than actually living there.
+  - **Home now leads with the user's own cert path, not a link to it.**
+    `CertPathHomeSection` (04_shared_ui.jsx) replaces the old one-line
+    teaser: the first not-completed path entry gets the full "up next"
+    hero (mastery, readiness, scheduled date, tap to study), every entry
+    after it is a compact numbered row with the same tap-to-study action,
+    and a "Manage path ›" link opens the existing `CertPathPanel` for
+    reordering/scheduling/adding/removing — that editor wasn't rebuilt,
+    just relocated behind an explicit action instead of being the only
+    way to see your path at all. The old standalone readiness card is
+    only shown when there's no path (it'd otherwise repeat the hero's own
+    readiness line for the same focus track).
+  - **Empty path (new user) shows the full track browser immediately**,
+    expanded by default, right after the daily-goal ring — not buried
+    below Question/Vocab of the Day like the old collapsed dropdown was.
+    Each row gets a small "+" (`onAddToPath`, wired to the existing
+    `addToCertPath`) to add it to the path without leaving Home or
+    opening the manage panel; tapping the row itself still navigates
+    straight to studying it, unchanged. Once the path has at least one
+    entry, this same list becomes a collapsed "Browse all tracks" section
+    below the path (for adding more or one-off browsing), consistent
+    with the "path first, browsing second" hierarchy once one exists.
+  - **New header track switcher** (`TrackSwitcherSheet`): the track
+    name in the header (Learn/Quiz/Exam, not Home) is now a button —
+    tapping it opens a bottom sheet listing "Your cert path" (numbered,
+    matching Home's order) then "All other tracks" below, with the
+    current track highlighted. Picking one always lands on Learn for
+    that track (`switchTrack` in 06_app.jsx) rather than trying to
+    preserve Quiz/Exam mode across the swap — session state
+    (question index, score, etc.) isn't set up to survive an
+    `activeTrack` change mid-session, and Learn is a safe landing spot
+    for any track, so this sidesteps that risk entirely rather than
+    auditing every quiz/exam state path for it. Cuts a track switch
+    from "four-plus taps via Home" to two taps from anywhere.
+  - `activeCertOrder(tracks, certPlan)` (03_helpers.js) is the one shared
+    "user's active path, in order, as track objects" helper both the new
+    Home section and the switcher read from, so they can't disagree with
+    each other about what's on the path.
+  - `full_smoke.js` (the standing regression suite) updated: the "All
+    tracks" dropdown now defaults open when the path is empty, so the
+    smoke test's toggle-click would've closed it instead of opening it;
+    added an `ensureTrackListOpen` helper plus new sections covering the
+    header switcher and the inline path section.
+
 ---
 
 Not in scope / deliberately not doing: crowd-sourced/disputed answer voting

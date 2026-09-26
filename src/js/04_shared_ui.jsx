@@ -301,8 +301,8 @@ function DailyGoalRing({ dailyGoal, onSetTarget }) {
 // old hamburger bottom-sheet menu showed, just tucked behind a single
 // summary row instead of always taking up the whole page, since Home now
 // has several other widgets competing for the same space.
-function TrackListDropdown({ tracks, masteries, certPlan, onSelectTrack }) {
-  const [open, setOpen] = useState(false);
+function TrackListDropdown({ tracks, masteries, certPlan, onSelectTrack, onAddToPath, defaultOpen, label }) {
+  const [open, setOpen] = useState(!!defaultOpen);
   return (
     <div className="mb-4">
       <button
@@ -313,7 +313,7 @@ function TrackListDropdown({ tracks, masteries, certPlan, onSelectTrack }) {
           border: `1px solid ${COLOR.border}`, boxShadow: SHADOW.card,
         }}
       >
-        <span style={{ fontSize: '13px', fontWeight: 600, color: COLOR.text }}>All tracks ({tracks.length})</span>
+        <span style={{ fontSize: '13px', fontWeight: 600, color: COLOR.text }}>{label || `All tracks (${tracks.length})`}</span>
         <span style={{ fontSize: '11px', color: COLOR.muted, transform: open ? 'rotate(180deg)' : 'none', transition: 'transform 0.15s ease' }}>▾</span>
       </button>
       {open && (
@@ -322,12 +322,13 @@ function TrackListDropdown({ tracks, masteries, certPlan, onSelectTrack }) {
             const accent = trackAccent(t.key);
             const isCompleted = !!certPlan.completed[t.key];
             const scheduledDate = certPlan.scheduled[t.key];
+            const inPath = certPlan.order.includes(t.key);
             return (
               <button
                 key={t.key}
                 onClick={() => onSelectTrack(t.key)}
                 style={{
-                  textAlign: 'left', display: 'flex', alignItems: 'center', gap: '12px', padding: '12px 14px', borderRadius: '12px',
+                  textAlign: 'left', display: 'flex', alignItems: 'center', gap: '10px', padding: '12px 14px', borderRadius: '12px',
                   background: COLOR.surface, border: `1px solid ${COLOR.border}`, boxShadow: SHADOW.card,
                 }}
               >
@@ -343,6 +344,20 @@ function TrackListDropdown({ tracks, masteries, certPlan, onSelectTrack }) {
                   </div>
                 ) : (
                   <div style={{ fontSize: '13px', fontWeight: 700, color: pct >= 70 ? COLOR.success : COLOR.muted, flexShrink: 0 }}>{pct}%</div>
+                )}
+                {onAddToPath && !inPath && (
+                  <div
+                    role="button"
+                    title="Add to your cert path"
+                    onClick={(e) => { e.stopPropagation(); onAddToPath(t.key); }}
+                    style={{
+                      flexShrink: 0, width: '26px', height: '26px', borderRadius: '8px',
+                      border: `1px solid ${COLOR.primary}`, color: COLOR.primary, fontSize: '15px', fontWeight: 700,
+                      display: 'flex', alignItems: 'center', justifyContent: 'center', lineHeight: 1,
+                    }}
+                  >
+                    +
+                  </div>
                 )}
               </button>
             );
@@ -466,15 +481,98 @@ function readinessProjectionMessage(projection, trackLabel) {
 // always taking up the whole page, since Question of the Day/Daily Vocab/
 // readiness now share the space. Reachable again from any track's Learn/
 // Quiz/Exam view via the header's Home button.
-function HomeView({ tracks, results, seenLog, stats, certPlan, onResume, onSelectTrack, onOpenAbout, onOpenGlossary, onOpenCertPath, onSetGoalTarget, onAnswerDailyQuestion, onRevealDailyVocab }) {
+// The consolidated "your path" view on Home itself — replaces the old
+// single-line teaser card that just linked out to CertPathPanel. The first
+// (not-yet-completed) entry gets the full "up next" hero treatment
+// (mastery, readiness, scheduled date, a Study button); every entry after
+// it is a compact row with the same actions in less space. Reordering,
+// scheduling, adding, and marking complete all still live in
+// CertPathPanel (opened via "Manage path" here) rather than being
+// duplicated inline — this view is for seeing and jumping, not editing.
+function CertPathHomeSection({ pathOrder, results, seenLog, certPlan, onSelectTrack, onOpenCertPath }) {
+  const [next, ...rest] = pathOrder;
+  const nextAccent = trackAccent(next.key);
+  const nextScheduled = certPlan.scheduled[next.key];
+  const nextDaysUntil = nextScheduled ? daysBetween(todayString(), nextScheduled) : null;
+  const nextReadiness = examReadiness(next.key, results, seenLog);
+  const nextReadinessColor = READINESS_COLOR[nextReadiness.label] || COLOR.muted;
+
+  return (
+    <div className="mb-4">
+      <div className="flex justify-between items-center" style={{ marginBottom: '8px' }}>
+        <span style={{ fontSize: '12px', color: COLOR.muted, fontWeight: 600 }}>Your cert path ({pathOrder.length})</span>
+        <button onClick={onOpenCertPath} className="btn-flat" style={{ fontSize: '11.5px', color: COLOR.primary, background: 'transparent', padding: '2px 4px' }}>
+          Manage path ›
+        </button>
+      </div>
+
+      <button
+        onClick={() => onSelectTrack(next.key)}
+        style={{
+          width: '100%', textAlign: 'left', marginBottom: rest.length ? '8px' : 0, padding: '14px 16px', borderRadius: '14px',
+          background: `${nextAccent}1F`, border: `1px solid ${nextAccent}`, boxShadow: SHADOW.card,
+        }}
+      >
+        <div className="flex justify-between items-start" style={{ gap: '10px' }}>
+          <div style={{ minWidth: 0 }}>
+            <div style={{ fontSize: '11px', color: COLOR.muted, marginBottom: '2px' }}>Up next</div>
+            <div style={{ fontSize: '16px', fontWeight: 600, color: nextAccent }}>{next.label}</div>
+            <div style={{ fontSize: '11px', color: COLOR.muted, marginTop: '2px' }}>{next.subtitle}</div>
+          </div>
+          {nextScheduled && (
+            <div style={{ flexShrink: 0, textAlign: 'right' }}>
+              <div style={{ fontSize: '14px', fontWeight: 700, color: nextDaysUntil < 0 ? COLOR.red : nextDaysUntil <= 7 ? COLOR.gold : COLOR.text }}>
+                {nextDaysUntil < 0 ? `${-nextDaysUntil}d over` : nextDaysUntil === 0 ? 'Today' : nextDaysUntil === 1 ? '1 day' : `${nextDaysUntil} days`}
+              </div>
+              <div style={{ fontSize: '9.5px', color: COLOR.muted }}>{formatDateShort(nextScheduled)}</div>
+            </div>
+          )}
+        </div>
+        {nextReadiness.label !== 'Not started' && (
+          <div style={{ marginTop: '8px', fontSize: '11.5px', fontWeight: 600, color: nextReadinessColor }}>
+            {nextReadiness.label} · {nextReadiness.score}% readiness
+          </div>
+        )}
+      </button>
+
+      {rest.map((t, i) => {
+        const accent = trackAccent(t.key);
+        const scheduledDate = certPlan.scheduled[t.key];
+        const pct = trackMastery(t.key, results);
+        return (
+          <button
+            key={t.key}
+            onClick={() => onSelectTrack(t.key)}
+            style={{
+              width: '100%', textAlign: 'left', display: 'flex', alignItems: 'center', gap: '10px',
+              padding: '10px 14px', borderRadius: '12px', marginBottom: i === rest.length - 1 ? 0 : '6px',
+              background: COLOR.surface, border: `1px solid ${COLOR.border}`, boxShadow: SHADOW.card,
+            }}
+          >
+            <div style={{ fontSize: '11px', color: COLOR.muted, width: '14px', flexShrink: 0, textAlign: 'center' }}>{i + 2}</div>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ fontSize: '13px', fontWeight: 600, color: accent }}>{t.label}</div>
+              <div style={{ fontSize: '10.5px', color: COLOR.muted, marginTop: '1px' }}>{t.subtitle}</div>
+            </div>
+            {scheduledDate ? (
+              <div style={{ fontSize: '10px', fontWeight: 600, color: COLOR.gold, flexShrink: 0, textAlign: 'right', whiteSpace: 'nowrap' }}>
+                {formatDateShort(scheduledDate)}
+              </div>
+            ) : (
+              <div style={{ fontSize: '12px', fontWeight: 700, color: pct >= 70 ? COLOR.success : COLOR.muted, flexShrink: 0 }}>{pct}%</div>
+            )}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+function HomeView({ tracks, results, seenLog, stats, certPlan, onResume, onSelectTrack, onAddToPath, onOpenAbout, onOpenGlossary, onOpenCertPath, onSetGoalTarget, onAnswerDailyQuestion, onRevealDailyVocab }) {
   const masteries = tracks.map((t) => ({ track: t, pct: trackMastery(t.key, results) }));
   const overallAvg = masteries.length ? Math.round(masteries.reduce((s, m) => s + m.pct, 0) / masteries.length) : 0;
   const lastVisited = stats.lastVisited;
   const resumeTrack = lastVisited ? tracks.find((t) => t.key === lastVisited.track) : null;
-  const nextPathKey = nextInCertPath(certPlan);
-  const nextPathTrack = nextPathKey ? tracks.find((t) => t.key === nextPathKey) : null;
-  const nextPathScheduled = nextPathTrack && certPlan.scheduled[nextPathTrack.key];
-  const nextPathDaysUntil = nextPathScheduled ? daysBetween(todayString(), nextPathScheduled) : null;
 
   const focusKey = focusTrackKey(certPlan, lastVisited);
   const focusTrack = tracks.find((t) => t.key === focusKey);
@@ -493,6 +591,7 @@ function HomeView({ tracks, results, seenLog, stats, certPlan, onResume, onSelec
   const readiness = examReadiness(focusKey, results, seenLog);
   const projection = readinessProjection(stats.readinessHistory || {}, focusKey, 80);
   const readinessColor = READINESS_COLOR[readiness.label] || COLOR.muted;
+  const pathOrder = activeCertOrder(tracks, certPlan);
 
   return (
     <div>
@@ -502,7 +601,11 @@ function HomeView({ tracks, results, seenLog, stats, certPlan, onResume, onSelec
 
       <DailyGoalRing dailyGoal={stats.dailyGoal} onSetTarget={onSetGoalTarget} />
 
-      {readiness.label !== 'Not started' && (
+      {/* The path hero already shows the up-next track's own readiness, so
+          the standalone readiness card here would just repeat it — only
+          shown when there's no path (focus then falls back to lastVisited
+          or a default track instead of a path entry). */}
+      {pathOrder.length === 0 && readiness.label !== 'Not started' && (
         <div style={{
           marginBottom: '14px', padding: '12px 14px', borderRadius: '14px',
           background: `${readinessColor}1F`, border: `1px solid ${readinessColor}`, boxShadow: SHADOW.card,
@@ -518,35 +621,31 @@ function HomeView({ tracks, results, seenLog, stats, certPlan, onResume, onSelec
         </div>
       )}
 
-      <button
-        onClick={onOpenCertPath}
-        style={{
-          width: '100%', textAlign: 'left', marginBottom: '10px', padding: '12px 14px', borderRadius: '14px',
-          background: COLOR.surface, border: `1px solid ${COLOR.border}`, boxShadow: SHADOW.card,
-          display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px',
-        }}
-      >
-        <div style={{ minWidth: 0 }}>
-          <div style={{ fontSize: '11px', color: COLOR.muted, marginBottom: '2px' }}>My Cert Path</div>
-          {nextPathTrack ? (
-            <div style={{ fontSize: '14px', fontWeight: 600, color: trackAccent(nextPathTrack.key) }}>
-              Up next: {nextPathTrack.label}
-            </div>
-          ) : (
-            <div style={{ fontSize: '13px', color: COLOR.text }}>Put your certs in the order you plan to take them</div>
-          )}
-        </div>
-        {nextPathScheduled ? (
-          <div style={{ flexShrink: 0, textAlign: 'right' }}>
-            <div style={{ fontSize: '15px', fontWeight: 700, color: nextPathDaysUntil < 0 ? COLOR.red : nextPathDaysUntil <= 7 ? COLOR.gold : COLOR.text }}>
-              {nextPathDaysUntil < 0 ? `${-nextPathDaysUntil}d over` : nextPathDaysUntil === 0 ? 'Today' : nextPathDaysUntil === 1 ? '1 day' : `${nextPathDaysUntil} days`}
-            </div>
-            <div style={{ fontSize: '9.5px', color: COLOR.muted }}>{formatDateShort(nextPathScheduled)}</div>
+      {pathOrder.length > 0 ? (
+        <CertPathHomeSection
+          pathOrder={pathOrder}
+          results={results}
+          seenLog={seenLog}
+          certPlan={certPlan}
+          onSelectTrack={onSelectTrack}
+          onOpenCertPath={onOpenCertPath}
+        />
+      ) : (
+        <div className="mb-4">
+          <div style={{ fontSize: '11.5px', color: COLOR.muted, marginBottom: '8px', lineHeight: 1.4 }}>
+            Pick a cert to start studying, or add it to your path so we track its progress and readiness right here on Home.
           </div>
-        ) : (
-          <div style={{ color: COLOR.muted, fontSize: '15px', flexShrink: 0 }}>›</div>
-        )}
-      </button>
+          <TrackListDropdown
+            tracks={tracks}
+            masteries={masteries}
+            certPlan={certPlan}
+            onSelectTrack={onSelectTrack}
+            onAddToPath={onAddToPath}
+            defaultOpen
+            label={`All tracks (${tracks.length})`}
+          />
+        </div>
+      )}
 
       {resumeTrack && (
         <button
@@ -582,7 +681,16 @@ function HomeView({ tracks, results, seenLog, stats, certPlan, onResume, onSelec
         />
       )}
 
-      <TrackListDropdown tracks={tracks} masteries={masteries} certPlan={certPlan} onSelectTrack={onSelectTrack} />
+      {pathOrder.length > 0 && (
+        <TrackListDropdown
+          tracks={tracks}
+          masteries={masteries}
+          certPlan={certPlan}
+          onSelectTrack={onSelectTrack}
+          onAddToPath={onAddToPath}
+          label={`Browse all tracks (${tracks.length})`}
+        />
+      )}
 
       <button
         onClick={onOpenGlossary}
@@ -603,6 +711,82 @@ function HomeView({ tracks, results, seenLog, stats, certPlan, onResume, onSelec
       >
         About & Legal
       </button>
+    </div>
+  );
+}
+
+// A quick "jump to a different track" sheet reachable from the header on
+// any Learn/Quiz/Exam screen — not just Home — so switching tracks
+// mid-session doesn't require a trip back to Home first. Your cert path
+// (if you have one) is listed first, in order, since that's most likely
+// where you're jumping to/from; every other track follows below it.
+// Always lands the new track on Learn (see switchTrack in 06_app.jsx for
+// why), which keeps this simple: no per-mode session state to reconcile.
+function TrackSwitcherSheet({ tracks, results, certPlan, activeTrack, onSelect, onClose }) {
+  useEscapeToClose(onClose);
+  const pathOrder = activeCertOrder(tracks, certPlan);
+  const pathKeys = new Set(pathOrder.map((t) => t.key));
+  const otherTracks = tracks.filter((t) => !pathKeys.has(t.key));
+
+  const Row = ({ t, rank }) => {
+    const accent = trackAccent(t.key);
+    const pct = trackMastery(t.key, results);
+    const isActive = t.key === activeTrack;
+    return (
+      <button
+        key={t.key}
+        onClick={() => onSelect(t.key)}
+        style={{
+          width: '100%', textAlign: 'left', display: 'flex', alignItems: 'center', gap: '10px',
+          padding: '11px 14px', borderRadius: '12px', marginBottom: '6px',
+          background: isActive ? COLOR.surfaceRaised : COLOR.surface,
+          border: `1px solid ${isActive ? accent : COLOR.border}`,
+        }}
+      >
+        {rank && <div style={{ fontSize: '11px', color: COLOR.muted, width: '14px', flexShrink: 0, textAlign: 'center' }}>{rank}</div>}
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ fontSize: '13.5px', fontWeight: 600, color: accent }}>{t.label}{isActive && <span style={{ color: COLOR.muted, fontWeight: 400 }}> · current</span>}</div>
+          <div style={{ fontSize: '11px', color: COLOR.muted, marginTop: '2px' }}>{t.subtitle}</div>
+        </div>
+        <div style={{ fontSize: '12px', fontWeight: 700, color: pct >= 70 ? COLOR.success : COLOR.muted, flexShrink: 0 }}>{pct}%</div>
+      </button>
+    );
+  };
+
+  return (
+    <div
+      onClick={onClose}
+      style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', zIndex: 50, display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        style={{
+          background: COLOR.bg, borderTop: `1px solid ${COLOR.border}`, borderRadius: '20px 20px 0 0',
+          maxWidth: '28rem', width: '100%', maxHeight: '82vh', overflowY: 'auto', padding: '18px 18px 28px',
+          boxShadow: SHADOW.card,
+        }}
+      >
+        <div className="flex justify-between items-center mb-3">
+          <div className="itil-display" style={{ fontSize: '18px', fontWeight: 600 }}>Switch track</div>
+          <button onClick={onClose} className="btn-flat" style={{ color: COLOR.muted, fontSize: '15px', padding: '4px' }}>✕</button>
+        </div>
+
+        {pathOrder.length > 0 && (
+          <div style={{ marginBottom: '14px' }}>
+            <div style={{ fontSize: '11px', color: COLOR.muted, marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Your cert path</div>
+            {pathOrder.map((t, i) => <Row key={t.key} t={t} rank={i + 1} />)}
+          </div>
+        )}
+
+        {otherTracks.length > 0 && (
+          <div>
+            {pathOrder.length > 0 && (
+              <div style={{ fontSize: '11px', color: COLOR.muted, marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.04em' }}>All other tracks</div>
+            )}
+            {otherTracks.map((t) => <Row key={t.key} t={t} />)}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

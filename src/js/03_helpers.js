@@ -280,6 +280,18 @@ function nextInCertPath(certPlan) {
   return certPlan.order.find((k) => !certPlan.completed[k]) || null;
 }
 
+// The user's active (not completed, not since-hidden) cert path, in the
+// order they set it, each paired with its track record — the one shared
+// list Home's path view, the header's track switcher, and CertPathPanel's
+// editor all read from, so "your path" never means something different
+// in one place than another.
+function activeCertOrder(tracks, certPlan) {
+  return certPlan.order
+    .filter((k) => !certPlan.completed[k])
+    .map((k) => tracks.find((t) => t.key === k))
+    .filter(Boolean);
+}
+
 // A simple, stable string -> non-negative integer hash (not cryptographic,
 // just deterministic) used to pick "of the day" content — the day's
 // question/vocab card — from a date string, so the pick stays put across
