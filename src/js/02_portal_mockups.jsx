@@ -339,6 +339,52 @@ const REAL_PORTAL_SCREENSHOTS = {
     sourceUrl: 'https://learn.microsoft.com/en-us/intune/device-management/reports/overview',
     product: 'Microsoft Intune admin center',
   },
+  // AZ-305 architecture reference diagrams — sourced directly from the
+  // MicrosoftDocs/architecture-center GitHub repo (the Azure Architecture
+  // Center's source), which is also CC BY 4.0 licensed (confirmed via its
+  // own LICENSE file, same as azure-docs and memdocs above). These are
+  // real Microsoft reference-architecture diagrams, not portal
+  // screenshots, so `product` labels them accordingly.
+  hubSpokeTopology: {
+    src: 'images/az305-arch/hub-spoke-topology.svg',
+    alt: 'Real Azure Architecture Center diagram of the hub-spoke virtual network topology',
+    description: "A hub virtual network in the middle hosting shared services — Azure Bastion, Azure Firewall, and a VPN/ExpressRoute gateway — with production and nonproduction spoke virtual networks peered only to the hub, each spoke holding its own resource subnet of VMs. A cross-premises network on the left reaches the hub through the gateway, and Azure Monitor collects diagnostics from the hub services. Dotted lines mark which networks are connected or peered through the hub, rather than directly to each other.",
+    sourceLabel: 'Microsoft Learn Azure Architecture Center: Hub-spoke network topology in Azure',
+    sourceUrl: 'https://github.com/MicrosoftDocs/architecture-center/blob/main/docs/networking/architecture/hub-spoke-content.md',
+    product: 'Azure Architecture Center reference diagram',
+  },
+  vmLandingZoneBaseline: {
+    src: 'images/az305-arch/vm-landing-zone-baseline.png',
+    alt: 'Real Azure Architecture Center diagram of a VM-based workload deployed into an Azure landing zone',
+    description: "An application landing zone subscription (top) holding the workload's own zone-redundant Application Gateway, frontend/backend VM scale sets spread across three availability zones, Key Vault, networking, and monitoring — plus a separate 'subscription vending' block of platform-provisioned resources (management group placement, spoke VNet, user-defined routes, policy and role assignments). Below it, a platform landing zone subscription owns the hub virtual network — Azure Firewall, Bastion, VPN, and ExpressRoute — that the spoke peers into, making explicit which resources the workload team owns versus what the central platform team provides.",
+    sourceLabel: 'Microsoft Learn Azure Architecture Center: Azure landing zone baseline architecture for a VM workload',
+    sourceUrl: 'https://github.com/MicrosoftDocs/architecture-center/blob/main/docs/virtual-machines/baseline-landing-zone-content.md',
+    product: 'Azure Architecture Center reference diagram',
+  },
+  computeDecisionTree: {
+    src: 'images/az305-arch/compute-decision-tree.svg',
+    alt: 'Real Azure Architecture Center decision tree diagram for choosing an Azure compute service',
+    description: "A flowchart for picking a compute service: migrating a workload branches toward lift-and-shift VMs or, if it's already cloud-optimized or containerizable, toward App Service, Container Apps, AKS, or Red Hat OpenShift depending on how much orchestration control is needed; building new branches on whether full OS control, HPC, or event-driven short-lived processing is required before reaching the same container/PaaS/Functions choices. A separate box splits every option into container-exclusive versus container-compatible services.",
+    sourceLabel: 'Microsoft Learn Azure Architecture Center: Choose an Azure compute service',
+    sourceUrl: 'https://github.com/MicrosoftDocs/architecture-center/blob/main/docs/guide/technology-choices/compute-decision-tree.md',
+    product: 'Azure Architecture Center reference diagram',
+  },
+  loadBalancingDecisionTree: {
+    src: 'images/az305-arch/load-balancing-decision-tree.png',
+    alt: 'Real Azure Architecture Center decision tree diagram for choosing an Azure load-balancing service',
+    description: "A flowchart branching first on internal vs. internet clients, then on whether traffic is layer 7 (HTTP/HTTPS) and whether the deployment spans multiple regions — routing to Azure Load Balancer or Application Gateway for single-region traffic, and to Front Door (with its built-in CDN) or Traffic Manager paired with Application Gateway for global, multi-region deployments.",
+    sourceLabel: 'Microsoft Learn Azure Architecture Center: Load-balancing options in Azure',
+    sourceUrl: 'https://github.com/MicrosoftDocs/architecture-center/blob/main/docs/guide/technology-choices/load-balancing-overview.md',
+    product: 'Azure Architecture Center reference diagram',
+  },
+  dataPartitioningHorizontal: {
+    src: 'images/az305-arch/data-partitioning-horizontal.png',
+    alt: 'Real Azure Architecture Center diagram illustrating horizontal data partitioning (sharding) by a partition key',
+    description: "A single table of rows keyed A through Z gets split into two separate shards purely by key range — an 'A-G' shard holding the rows whose key starts A-G, and an 'H-Z' shard holding the rest — so each shard holds a distinct, non-overlapping slice of the same rows instead of one shard holding everything.",
+    sourceLabel: 'Microsoft Learn Azure Architecture Center: Data partitioning guidance',
+    sourceUrl: 'https://github.com/MicrosoftDocs/architecture-center/blob/main/docs/best-practices/data-partitioning-content.md',
+    product: 'Azure Architecture Center reference diagram',
+  },
 };
 
 // `hideDescription` is set by quiz/exam question views — the description
