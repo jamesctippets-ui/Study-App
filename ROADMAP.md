@@ -20,11 +20,21 @@ come up.
 
 ## 2. Content beyond the direct exam scope (user's idea)
 
-- [ ] "On the job" callouts inside lessons — real-world notes that go beyond
-  what's tested, specifically the kind of thing that matters at an actual
-  hospital IT department (HIPAA-adjacent handling of PHI access, ticketing/
-  change-management realities, on-call patterns) without pretending they're
-  examinable content.
+- [x] "On the job" callouts inside lessons — real-world notes that go beyond
+  what's tested. Shipped as a new optional `onTheJob` field per lesson,
+  rendered as a teal-accented "On the job" block in `LessonDetail`
+  (04_shared_ui.jsx) right after "Common exam traps" — visually distinct
+  from the gold "Worked scenario" and red "Common exam traps" blocks it
+  sits alongside. Every one of the app's 85 lessons across all 15 tracks
+  now has one (5 background agents wrote them, ~3 sentences each, grounded
+  in that lesson's own reading/commonTraps content and its track's real
+  practitioner domain — a hospital IT department's HIPAA-adjacent PHI
+  access/ticketing/on-call realities for EHR Integration specifically, per
+  this item's own original framing, and the equivalent domain reality for
+  every other track: a sysadmin's patch-Tuesday reality for AZ-802, a SOC
+  analyst's alert fatigue for SC-200, an architect's design-review politics
+  for AZ-305, and so on). `build.py` validates the field is non-empty
+  when present.
 - [x] A cross-track glossary/reference so a term explained once (e.g.
   Microsoft Entra ID) is consistently linked wherever it resurfaces in a
   different track's reading. Shipped as a "Glossary" panel off the Home
@@ -49,9 +59,21 @@ come up.
   `EXAM_CONFIG`. EHR Integration — not a real proctored exam — gets a
   differently-worded "How to use this module's self-assessment" section
   instead of exam-day framing that wouldn't apply to it.
-- [ ] Inline "why this is tested" notes on trickier questions, distinct from
-  the existing answer explanation — the meta-level reason an exam likes this
-  distinction, not just why the answer is correct.
+- [x] Inline "why this is tested" notes on trickier questions, distinct from
+  the existing answer explanation. Shipped as an optional `whyTested`
+  field per question, rendered as a small teal "Why this is tested" note
+  wherever the question's `explanation` already shows — the live
+  `QuestionView` (quiz, exam, and the Daily Question card, which reuses
+  it), `QuizSummary`'s "Worth another look" missed-question review, and
+  `ExamResults`' review list — always alongside the explanation, never
+  replacing it (06_app.jsx threads `whyTested` through the three places
+  session/exam review items get built, so it survives from the live
+  question into every results screen). Deliberately NOT on every
+  question — 66 of the 1263 were picked (4-6 per track, the genuinely
+  trickiest: multi-concept traps, scenario questions with subtly-wrong
+  distractors, commonly-confused distinctions), each explaining the
+  meta-level reason an exam probes that exact distinction rather than
+  restating why the correct answer is correct.
 
 ## 4. Simulations (user's idea)
 

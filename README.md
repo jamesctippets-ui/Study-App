@@ -304,7 +304,21 @@ real paths, deliberately, since a static site with no server has nowhere
 to add the rewrite rule a path router needs for a refreshed deep link to
 resolve, and a hash needs none (see `routeToHash`/`parseHash` in
 `03_helpers.js`). Quiz and Exam missed-question review lists show each question's
-explanation alongside the prompt, not just what you got wrong.
+explanation alongside the prompt, not just what you got wrong. A
+hand-picked 66 of the 1263 questions (the genuinely trickiest — multi-
+concept traps, scenario questions with subtly-wrong distractors) also
+carry a `whyTested` field: a small "Why this is tested" note shown right
+alongside the explanation, everywhere the explanation shows (live quiz,
+exam, both missed-question reviews) — the meta-level reason an exam
+probes that exact distinction, distinct from the explanation's own job
+of saying why the correct answer is correct.
+
+Every lesson (all 85, across all 15 tracks) also carries an `onTheJob`
+field: a short, teal-accented "On the job" callout shown after "Common
+exam traps" — real-world context that goes beyond exam scope entirely
+(what actually gets a cloud migration approved, what a SOC analyst's
+alert fatigue really looks like, HIPAA-adjacent PHI-access realities for
+EHR Integration) rather than pretending to be examinable content.
 
 Quiz mode has a third **Verbal** sub-tab (alongside Questions and Match) —
 hands-free, audio-only studying for e.g. driving. Pick a length and a
