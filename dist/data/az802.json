@@ -1464,5 +1464,169 @@
         "When two options both technically work, pick the one requiring the least new infrastructure/agents unless the scenario specifically asks for a security-hardening trade-off."
       ]
     }
+  ],
+  "cliChallenges": [
+    {
+      "id": "cli-ps-1",
+      "cat": "adDs",
+      "tool": "powershell",
+      "prompt": "Create a new Active Directory user named 'Jane Smith' with SamAccountName 'jsmith', and enable the account.",
+      "verb": "New-ADUser",
+      "command": "New-ADUser -Name \"Jane Smith\" -SamAccountName jsmith -Enabled $true",
+      "requiredFlags": [
+        "-Name",
+        "-SamAccountName",
+        "-Enabled"
+      ],
+      "explanation": "New-ADUser creates the account disabled by default unless -Enabled $true is passed \u2014 a common cause of \"why can't this new user log in\" scenarios."
+    },
+    {
+      "id": "cli-ps-2",
+      "cat": "adDs",
+      "tool": "powershell",
+      "prompt": "Create a new global security group named 'Finance-Team'.",
+      "verb": "New-ADGroup",
+      "command": "New-ADGroup -Name \"Finance-Team\" -GroupScope Global -GroupCategory Security",
+      "requiredFlags": [
+        "-Name",
+        "-GroupScope",
+        "-GroupCategory"
+      ],
+      "explanation": "-GroupScope (DomainLocal/Global/Universal) and -GroupCategory (Security/Distribution) are both required \u2014 AD won't infer either one."
+    },
+    {
+      "id": "cli-ps-3",
+      "cat": "adDs",
+      "tool": "powershell",
+      "prompt": "Add user 'jsmith' to the 'Finance-Team' group.",
+      "verb": "Add-ADGroupMember",
+      "command": "Add-ADGroupMember -Identity \"Finance-Team\" -Members jsmith",
+      "requiredFlags": [
+        "-Identity",
+        "-Members"
+      ],
+      "explanation": "-Identity takes the group, -Members takes one or more users/groups/computers to add to it \u2014 easy to mix up which side is which under exam pressure."
+    },
+    {
+      "id": "cli-ps-4",
+      "cat": "hybridWorkloads",
+      "tool": "powershell",
+      "prompt": "Install the DNS Server role on the local server, including its management tools.",
+      "verb": "Install-WindowsFeature",
+      "command": "Install-WindowsFeature -Name DNS -IncludeManagementTools",
+      "requiredFlags": [
+        "-Name",
+        "-IncludeManagementTools"
+      ],
+      "explanation": "-IncludeManagementTools is easy to forget \u2014 without it, the role installs but the matching MMC snap-in/PowerShell module doesn't come with it."
+    },
+    {
+      "id": "cli-ps-5",
+      "cat": "hybridWorkloads",
+      "tool": "powershell",
+      "prompt": "Restart the local server immediately, forcing any running applications to close.",
+      "verb": "Restart-Computer",
+      "command": "Restart-Computer -Force",
+      "requiredFlags": [
+        "-Force"
+      ],
+      "explanation": "Without -Force, Restart-Computer will prompt to confirm and won't force-close apps with unsaved state \u2014 an important distinction for scripted/unattended maintenance windows."
+    },
+    {
+      "id": "cli-ps-6",
+      "cat": "vmContainers",
+      "tool": "powershell",
+      "prompt": "Create a new Hyper-V virtual machine named 'VM-App02' with 4GB of memory, using generation 2.",
+      "verb": "New-VM",
+      "command": "New-VM -Name \"VM-App02\" -MemoryStartupBytes 4GB -Generation 2",
+      "requiredFlags": [
+        "-Name",
+        "-MemoryStartupBytes",
+        "-Generation"
+      ],
+      "explanation": "Generation 2 VMs support UEFI/Secure Boot and larger boot disks but need a compatible guest OS \u2014 Generation 1 is still required for some older OS images."
+    },
+    {
+      "id": "cli-ps-7",
+      "cat": "vmContainers",
+      "tool": "powershell",
+      "prompt": "Start the Hyper-V virtual machine named 'VM-App02'.",
+      "verb": "Start-VM",
+      "command": "Start-VM -Name \"VM-App02\"",
+      "requiredFlags": [
+        "-Name"
+      ],
+      "explanation": "Start-VM/Stop-VM are the Hyper-V host-level equivalents of powering a physical machine on/off \u2014 distinct from anything you'd run inside the guest OS itself."
+    },
+    {
+      "id": "cli-ps-8",
+      "cat": "networking",
+      "tool": "powershell",
+      "prompt": "Configure network adapter 'Ethernet' with a static IP address 192.168.1.50, prefix length 24, and default gateway 192.168.1.1.",
+      "verb": "New-NetIPAddress",
+      "command": "New-NetIPAddress -InterfaceAlias \"Ethernet\" -IPAddress 192.168.1.50 -PrefixLength 24 -DefaultGateway 192.168.1.1",
+      "requiredFlags": [
+        "-InterfaceAlias",
+        "-IPAddress",
+        "-PrefixLength",
+        "-DefaultGateway"
+      ],
+      "explanation": "-PrefixLength 24 is the modern equivalent of a 255.255.255.0 subnet mask \u2014 New-NetIPAddress is the PowerShell replacement for the older netsh interface commands."
+    },
+    {
+      "id": "cli-ps-9",
+      "cat": "networking",
+      "tool": "powershell",
+      "prompt": "Set the DNS server addresses for network adapter 'Ethernet' to 10.0.0.4 and 10.0.0.5.",
+      "verb": "Set-DnsClientServerAddress",
+      "command": "Set-DnsClientServerAddress -InterfaceAlias \"Ethernet\" -ServerAddresses 10.0.0.4,10.0.0.5",
+      "requiredFlags": [
+        "-InterfaceAlias",
+        "-ServerAddresses"
+      ],
+      "explanation": "-ServerAddresses takes a comma-separated list in priority order \u2014 the first address is queried first, with the rest as fallback."
+    },
+    {
+      "id": "cli-ps-10",
+      "cat": "storage",
+      "tool": "powershell",
+      "prompt": "Format volume D as NTFS with the label 'Data', without a confirmation prompt.",
+      "verb": "Format-Volume",
+      "command": "Format-Volume -DriveLetter D -FileSystem NTFS -NewFileSystemLabel \"Data\" -Confirm:$false",
+      "requiredFlags": [
+        "-DriveLetter",
+        "-FileSystem"
+      ],
+      "explanation": "-Confirm:$false suppresses the interactive prompt that a destructive command like this shows by default \u2014 needed for unattended/scripted provisioning."
+    },
+    {
+      "id": "cli-ps-11",
+      "cat": "security",
+      "tool": "powershell",
+      "prompt": "Create a new Windows Firewall rule named 'Allow-HTTPS' that allows inbound TCP traffic on port 443.",
+      "verb": "New-NetFirewallRule",
+      "command": "New-NetFirewallRule -DisplayName \"Allow-HTTPS\" -Direction Inbound -Protocol TCP -LocalPort 443 -Action Allow",
+      "requiredFlags": [
+        "-DisplayName",
+        "-Direction",
+        "-Protocol",
+        "-LocalPort",
+        "-Action"
+      ],
+      "explanation": "New-NetFirewallRule is the PowerShell equivalent of adding a rule in Windows Defender Firewall with Advanced Security \u2014 -Direction and -Action are both required or the rule is ambiguous."
+    },
+    {
+      "id": "cli-ps-12",
+      "cat": "monitoring",
+      "tool": "powershell",
+      "prompt": "Retrieve the 20 most recent entries from the System event log.",
+      "verb": "Get-WinEvent",
+      "command": "Get-WinEvent -LogName System -MaxEvents 20",
+      "requiredFlags": [
+        "-LogName",
+        "-MaxEvents"
+      ],
+      "explanation": "Get-WinEvent is the modern replacement for Get-EventLog and works with both classic and newer structured (ETW) event logs \u2014 -MaxEvents caps how many entries come back, newest first."
+    }
   ]
 }

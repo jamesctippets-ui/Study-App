@@ -277,6 +277,21 @@ Screen Wake Lock keeps the phone from auto-locking mid-session
 or a backgrounded tab can still stop playback — that's outside any web
 app's control).
 
+Tracks where real command-line syntax is core to the job (AZ-104's Azure
+CLI, AZ-802's PowerShell) get a fourth **Commands** sub-tab: type the
+command for a stated task and get checked against its expected syntax
+and flags, rather than picking from options. Checking is deliberately
+lenient about whitespace, casing, flag order, and flag values (a
+different resource-group name still counts) but strict about the right
+verb and every required flag being present — a byte-exact string match
+would fail plenty of genuinely-correct answers over formatting alone.
+Correct answers show as either "exactly right" (matched the canonical
+form) or "right idea — close enough" (structurally correct, different
+formatting), both revealing the canonical command and an explanation.
+This mode is deliberately self-contained — it doesn't feed mastery %,
+results, or exam readiness, so its score is tracked for the practice
+session only.
+
 **Fifteen tracks, all visible in the track switcher:**
 - **AZ-900** (Azure Fundamentals) — full course content, 106 questions.
 - **AB-650** (M365 & AI Services Administrator) — full question bank (52

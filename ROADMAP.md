@@ -58,9 +58,25 @@ come up.
 - [ ] Turn the existing static portal mockups into **step-by-step interactive
   walkthroughs** (click through creating a resource across several fake
   portal screens) instead of one static illustration per lesson.
-- [ ] A lightweight CLI/PowerShell **command-practice** mode: type the command
+- [x] A lightweight CLI/PowerShell **command-practice** mode: type the command
   for a stated task, get validated against expected syntax/flags, for tracks
-  where that's core to the job (AZ-104, AZ-802 especially).
+  where that's core to the job (AZ-104, AZ-802 especially). Shipped as a
+  new "Commands" Quiz sub-tab, only shown for tracks that carry a new
+  `CLI_CHALLENGES` list (`{prompt, tool, verb, command, requiredFlags,
+  explanation}` per data/&lt;track&gt;.py) — AZ-104 (12 real Azure CLI `az`
+  commands: resource groups, VMs, storage, networking, RBAC, locks) and
+  AZ-802 (12 real PowerShell cmdlets: AD users/groups, Windows features,
+  Hyper-V VMs, networking, storage, firewall, event logs) at launch.
+  `checkCliAnswer` (03_helpers.js) is deliberately lenient about
+  whitespace/casing/flag order/flag values — it checks the right verb and
+  every required flag are present (returns `'close'`), separately from a
+  byte-exact match against the canonical answer (`'exact'`) — a strict
+  string comparison would fail plenty of genuinely-correct answers over
+  formatting alone. Deliberately NOT wired into mastery/results/exam-
+  readiness: those systems' category weighting is calibrated to
+  flashcards+questions counts only, and this is meant to stay a
+  lightweight practice add-on, not a third scored item type woven through
+  the whole app — its running score is session-local only.
 - [ ] Longer term: scenario-based "mini case studies" that chain several
   related questions off one larger setup, mirroring how AZ-305's real exam
   works.

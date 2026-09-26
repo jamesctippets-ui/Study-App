@@ -66,6 +66,35 @@ function pickInterleaved(pool, count, seenMap) {
   return shuffleArray(picked);
 }
 
+function normalizeCliText(s) {
+  return (s || '').trim().replace(/\s+/g, ' ').toLowerCase();
+}
+
+// Checks a typed CLI/PowerShell command against a challenge's canonical
+// answer. Deliberately lenient about things that don't actually matter for
+// learning the command's shape (whitespace, casing, flag order, and the
+// exact values passed to a flag) while still requiring the right verb and
+// every required flag to be present — "validated against expected syntax/
+// flags" per ROADMAP.md section 4, not a byte-exact string match, which
+// would fail correct answers over trivial formatting differences.
+// Returns 'empty' | 'exact' | 'close' | 'incorrect'. 'close' means the verb
+// and all required flags are present but the full string didn't match one
+// of the canonical/alternate answers verbatim — still counted as correct
+// for mastery purposes (see recordResult call sites), same seam as
+// ratingToOutcome's 3+ threshold for flashcard ratings.
+function checkCliAnswer(challenge, input) {
+  const normInput = normalizeCliText(input);
+  if (!normInput) return 'empty';
+  const candidates = [challenge.command, ...(challenge.altCommands || [])].map(normalizeCliText);
+  if (candidates.includes(normInput)) return 'exact';
+  const verb = normalizeCliText(challenge.verb || challenge.command);
+  const startsRight = normInput === verb || normInput.startsWith(verb + ' ');
+  const requiredFlags = (challenge.requiredFlags || []).map(normalizeCliText);
+  const hasAllFlags = requiredFlags.every((f) => normInput.includes(f));
+  if (startsRight && hasAllFlags) return 'close';
+  return 'incorrect';
+}
+
 function formatTime(totalSeconds) {
   const m = Math.floor(totalSeconds / 60);
   const s = totalSeconds % 60;
@@ -198,7 +227,7 @@ function parseHash(hash, validTrackKeys) {
   const [trackKey, mode, sub] = parts;
   if (!validTrackKeys.has(trackKey)) return { mode: 'home' };
   if (mode === 'learn') return { mode: 'learn', trackKey, learnView: ['cards', 'study', 'sheet'].includes(sub) ? sub : 'study' };
-  if (mode === 'quiz') return { mode: 'quiz', trackKey, quizView: ['questions', 'match', 'verbal'].includes(sub) ? sub : 'questions' };
+  if (mode === 'quiz') return { mode: 'quiz', trackKey, quizView: ['questions', 'match', 'verbal', 'commands'].includes(sub) ? sub : 'questions' };
   if (mode === 'exam') return { mode: 'exam', trackKey };
   return { mode: 'home' };
 }

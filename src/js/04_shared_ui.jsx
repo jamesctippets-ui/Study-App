@@ -2288,6 +2288,105 @@ function VerbalQuizPanel({
   );
 }
 
+// CLI/PowerShell command-practice mode (ROADMAP.md section 4): type the
+// command for a stated task, get checked against expected syntax/flags
+// (checkCliAnswer in 03_helpers.js) rather than picking from options —
+// only shown for tracks that actually ship CLI_CHALLENGES content
+// (AZ-104, AZ-802 today). Deliberately self-contained and not wired into
+// mastery/results/exam-readiness — CATEGORIES' marks-to-100 weighting is
+// calibrated to flashcards+questions counts only, and folding a third
+// item kind into that math wasn't worth the risk for what's meant to be
+// a lightweight practice add-on; score is tracked for the session only.
+function CommandPracticeView({ session, index, score, categories, input, setInput, result, onSubmit, onNext, onRestart }) {
+  if (!session.length) {
+    return (
+      <div style={{ textAlign: 'center', color: COLOR.muted, fontSize: '13px', padding: '30px 10px' }}>
+        No command challenges match this filter.
+      </div>
+    );
+  }
+
+  const challenge = session[index];
+  if (!challenge) {
+    return (
+      <div style={{ textAlign: 'center', padding: '30px 10px' }}>
+        <div className="itil-display" style={{ fontSize: '16px', fontWeight: 600, marginBottom: '8px' }}>Set complete</div>
+        <div style={{ fontSize: '12.5px', color: COLOR.muted, marginBottom: '18px' }}>
+          {score.correct} / {score.total} correct (exact or structurally right — see each answer's canonical form for the precise syntax).
+        </div>
+        <button onClick={onRestart} style={{ padding: '10px 20px', borderRadius: '12px', background: COLOR.primary, color: COLOR.onAccent, fontSize: '13px', fontWeight: 600 }}>
+          New set
+        </button>
+      </div>
+    );
+  }
+
+  const categoryLabel = categories.find((c) => c.key === challenge.cat)?.label;
+  const total = session.length;
+  const submitted = result !== null;
+  return (
+    <div>
+      <div className="flex justify-between items-center mb-2" style={{ fontSize: '11px', color: COLOR.muted }}>
+        <span>{categoryLabel}</span>
+        <span>{index + 1} / {total}</span>
+      </div>
+      <div style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderRadius: '18px', padding: '20px' }}>
+        <div style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.04em', color: COLOR.gold, marginBottom: '8px', textTransform: 'uppercase' }}>
+          {challenge.tool === 'powershell' ? 'PowerShell' : 'Azure CLI'}
+        </div>
+        <div style={{ fontSize: '16px', lineHeight: 1.45, fontWeight: 500, marginBottom: '14px' }}>{challenge.prompt}</div>
+        <input
+          type="text"
+          spellCheck={false}
+          autoCapitalize="off"
+          autoCorrect="off"
+          value={input}
+          disabled={submitted}
+          onChange={(e) => setInput(e.target.value)}
+          onKeyDown={(e) => { if (e.key === 'Enter' && !submitted && input.trim()) onSubmit(); }}
+          placeholder="Type the command…"
+          style={{
+            width: '100%', padding: '12px 14px', borderRadius: '12px', fontFamily: 'monospace', fontSize: '13.5px',
+            border: `1px solid ${submitted ? (result === 'incorrect' ? COLOR.red : COLOR.success) : COLOR.border}`,
+            background: COLOR.surfaceRaised, color: COLOR.text,
+          }}
+        />
+        {!submitted ? (
+          <button
+            onClick={onSubmit}
+            disabled={!input.trim()}
+            style={{ width: '100%', marginTop: '12px', padding: '10px', borderRadius: '10px', background: input.trim() ? COLOR.primary : COLOR.border, color: COLOR.onAccent, fontSize: '13px', fontWeight: 600 }}
+          >
+            Check
+          </button>
+        ) : (
+          <div style={{ marginTop: '14px' }}>
+            <div style={{
+              fontSize: '13px', fontWeight: 600, marginBottom: '8px',
+              color: result === 'incorrect' ? COLOR.red : COLOR.success,
+            }}>
+              {result === 'exact' ? '✓ Exactly right' : result === 'close' ? '✓ Right idea — close enough' : '✕ Not quite'}
+            </div>
+            <div style={{ fontSize: '11px', color: COLOR.muted, marginBottom: '4px' }}>Canonical answer:</div>
+            <div style={{ fontFamily: 'monospace', fontSize: '12.5px', padding: '10px 12px', borderRadius: '10px', background: COLOR.surfaceRaised, color: COLOR.text, marginBottom: '12px', wordBreak: 'break-word' }}>
+              {challenge.command}
+            </div>
+            <div style={{ fontSize: '12.5px', color: COLOR.muted, lineHeight: 1.5 }}>{challenge.explanation}</div>
+          </div>
+        )}
+      </div>
+      {submitted && (
+        <button
+          onClick={onNext}
+          style={{ width: '100%', marginTop: '14px', padding: '12px', borderRadius: '12px', background: COLOR.primary, color: COLOR.onAccent, fontSize: '14px', fontWeight: 600 }}
+        >
+          {index + 1 >= total ? 'Finish' : 'Next'}
+        </button>
+      )}
+    </div>
+  );
+}
+
 function QuestionView({ q, selected, onChoose, onNext, index, total, categoryLabel, badgeLabel, msPending, onToggleMs, onSubmitMs, nextLabel, hideMeta, hideNext, flashcardsData }) {
   const [activeTermKey, setActiveTermKey] = useState(null);
   useEffect(() => { setActiveTermKey(null); }, [q && q.id]);

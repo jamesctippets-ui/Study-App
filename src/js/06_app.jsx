@@ -61,6 +61,14 @@ function CertStudyApp() {
   const verbalTimerRef = useRef(null);
   const wakeLockRef = useRef(null);
 
+  // CLI/PowerShell command-practice mode (ROADMAP.md section 4) — only
+  // meaningful for tracks that ship CLI_CHALLENGES (AZ-104, AZ-802 today).
+  const [cliSession, setCliSession] = useState([]);
+  const [cliIndex, setCliIndex] = useState(0);
+  const [cliInput, setCliInput] = useState('');
+  const [cliResult, setCliResult] = useState(null);
+  const [cliScore, setCliScore] = useState({ correct: 0, total: 0 });
+
   const [examTrack, setExamTrack] = useState(null);
   const [examSession, setExamSession] = useState([]);
   const [examAnswers, setExamAnswers] = useState({});
@@ -479,6 +487,45 @@ function CertStudyApp() {
     setVerbalIndex(verbalIndex + 1);
     setVerbalStep('question');
     setVerbalPhase('active');
+  };
+
+  // The Commands sub-tab only exists for tracks with CLI_CHALLENGES —
+  // switching to a track without any (from a track that has them, with
+  // that tab still selected) needs to fall back to Questions rather than
+  // render nothing.
+  useEffect(() => {
+    if (quizView === 'commands' && !DATA[activeTrack].cliChallenges) setQuizView('questions');
+  }, [activeTrack, quizView]);
+
+  const startCliPractice = () => {
+    const all = DATA[activeTrack].cliChallenges || [];
+    const pool = activeCat === 'all' ? all : all.filter((c) => c.cat === activeCat);
+    setCliSession(shuffleArray(pool));
+    setCliIndex(0);
+    setCliInput('');
+    setCliResult(null);
+    setCliScore({ correct: 0, total: 0 });
+  };
+
+  useEffect(() => {
+    if (mode !== 'quiz' || quizView !== 'commands') return;
+    startCliPractice();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mode, quizView, activeTrack, activeCat]);
+
+  const submitCliAnswer = () => {
+    const challenge = cliSession[cliIndex];
+    if (!challenge) return;
+    const result = checkCliAnswer(challenge, cliInput);
+    setCliResult(result);
+    const isCorrect = result === 'exact' || result === 'close';
+    setCliScore((s) => ({ correct: s.correct + (isCorrect ? 1 : 0), total: s.total + 1 }));
+  };
+
+  const nextCliChallenge = () => {
+    setCliIndex((i) => i + 1);
+    setCliInput('');
+    setCliResult(null);
   };
 
   const achievements = useMemo(() => evaluateAchievements(results, stats), [results, stats]);
@@ -1259,6 +1306,15 @@ function CertStudyApp() {
             >
               Verbal
             </button>
+            {DATA[activeTrack].cliChallenges && (
+              <button
+                onClick={() => setQuizView('commands')}
+                className="flex-1"
+                style={{ padding: '6px 2px', borderRadius: '8px', fontSize: '10.5px', fontWeight: 600, background: quizView === 'commands' ? COLOR.surfaceRaised : 'transparent', color: quizView === 'commands' ? COLOR.text : COLOR.muted }}
+              >
+                Commands
+              </button>
+            )}
           </div>
         )}
 
@@ -1373,6 +1429,21 @@ function CertStudyApp() {
             onTogglePause={toggleVerbalPause}
             onSkip={skipVerbal}
             onRestart={() => setVerbalPhase('setup')}
+          />
+        )}
+
+        {mode === 'quiz' && quizView === 'commands' && (
+          <CommandPracticeView
+            session={cliSession}
+            index={cliIndex}
+            score={cliScore}
+            categories={categories}
+            input={cliInput}
+            setInput={setCliInput}
+            result={cliResult}
+            onSubmit={submitCliAnswer}
+            onNext={nextCliChallenge}
+            onRestart={startCliPractice}
           />
         )}
 

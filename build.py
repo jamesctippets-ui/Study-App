@@ -163,6 +163,29 @@ def validate():
                 elif any(not isinstance(p, str) or not p.strip() for p in points):
                     errors.append(f"[{key}] CHEAT_SHEET section '{heading}' has an empty point")
 
+        cli_challenges = getattr(mod, "CLI_CHALLENGES", [])
+        cli_ids_seen = set()
+        for c in cli_challenges:
+            cid = c.get("id")
+            if not cid:
+                errors.append(f"[{key}] a CLI_CHALLENGES entry is missing an 'id'")
+            elif cid in cli_ids_seen:
+                errors.append(f"[{key}] duplicate CLI_CHALLENGES id '{cid}'")
+            else:
+                cli_ids_seen.add(cid)
+            if c.get("cat") not in cat_keys:
+                errors.append(f"[{key}] CLI_CHALLENGES '{cid}' references unknown category '{c.get('cat')}'")
+            if c.get("tool") not in ("az", "powershell"):
+                errors.append(f"[{key}] CLI_CHALLENGES '{cid}' has unknown 'tool' {c.get('tool')!r} (expected 'az' or 'powershell')")
+            for field in ("prompt", "verb", "command", "explanation"):
+                if not c.get(field, "").strip():
+                    errors.append(f"[{key}] CLI_CHALLENGES '{cid}' is missing a non-empty '{field}'")
+            if not c.get("command", "").startswith(c.get("verb", "\0")):
+                errors.append(f"[{key}] CLI_CHALLENGES '{cid}' has a 'command' that doesn't start with its own 'verb'")
+            required_flags = c.get("requiredFlags")
+            if not isinstance(required_flags, list) or not required_flags:
+                errors.append(f"[{key}] CLI_CHALLENGES '{cid}' needs a non-empty 'requiredFlags' list")
+
         lessons = getattr(mod, "LESSONS", [])
         lesson_ids_seen = set()
         for lesson in lessons:
@@ -196,6 +219,7 @@ def build_track_data():
             "questions": mod.QUESTIONS,
             **({"lessons": mod.LESSONS} if hasattr(mod, "LESSONS") else {}),
             **({"cheatSheet": mod.CHEAT_SHEET} if hasattr(mod, "CHEAT_SHEET") else {}),
+            **({"cliChallenges": mod.CLI_CHALLENGES} if hasattr(mod, "CLI_CHALLENGES") else {}),
         }
         for key, mod in TRACK_MODULES.items()
     }

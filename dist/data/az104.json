@@ -1859,5 +1859,171 @@
         "\"Protect from a single datacenter failure\" points to Availability Zones; \"protect from a single rack/host failure\" points to Availability Sets."
       ]
     }
+  ],
+  "cliChallenges": [
+    {
+      "id": "cli-az-1",
+      "cat": "compute",
+      "tool": "az",
+      "prompt": "Create a new resource group named 'rg-web-prod' in the 'eastus' region.",
+      "verb": "az group create",
+      "command": "az group create --name rg-web-prod --location eastus",
+      "requiredFlags": [
+        "--name",
+        "--location"
+      ],
+      "explanation": "az group create is the base command; --name and --location are both required \u2014 a resource group must live in a region even though it's just a management container."
+    },
+    {
+      "id": "cli-az-2",
+      "cat": "compute",
+      "tool": "az",
+      "prompt": "Create a new Linux VM named 'vm-app01' in resource group 'rg-web-prod', using the 'Ubuntu2204' image.",
+      "verb": "az vm create",
+      "command": "az vm create --resource-group rg-web-prod --name vm-app01 --image Ubuntu2204",
+      "requiredFlags": [
+        "--resource-group",
+        "--name",
+        "--image"
+      ],
+      "explanation": "az vm create needs --resource-group, --name, and --image at minimum \u2014 the CLI fills in a generated admin username/SSH key pair if you don't pass your own."
+    },
+    {
+      "id": "cli-az-3",
+      "cat": "compute",
+      "tool": "az",
+      "prompt": "Deallocate (stop and release compute charges for) the VM 'vm-app01' in resource group 'rg-web-prod'.",
+      "verb": "az vm deallocate",
+      "command": "az vm deallocate --resource-group rg-web-prod --name vm-app01",
+      "requiredFlags": [
+        "--resource-group",
+        "--name"
+      ],
+      "explanation": "az vm stop only stops the OS \u2014 you're still billed for the compute. az vm deallocate actually releases the underlying hardware allocation, which is what stops compute charges (storage charges continue either way)."
+    },
+    {
+      "id": "cli-az-4",
+      "cat": "compute",
+      "tool": "az",
+      "prompt": "Start the (previously stopped) VM 'vm-app01' in resource group 'rg-web-prod'.",
+      "verb": "az vm start",
+      "command": "az vm start --resource-group rg-web-prod --name vm-app01",
+      "requiredFlags": [
+        "--resource-group",
+        "--name"
+      ],
+      "explanation": "az vm start is the mirror of az vm deallocate \u2014 note a restarted VM can get a new public IP unless you've reserved a static one."
+    },
+    {
+      "id": "cli-az-5",
+      "cat": "compute",
+      "tool": "az",
+      "prompt": "Enable auto-shutdown at 7:00 PM (19:00) for VM 'vm-app01' in resource group 'rg-web-prod'.",
+      "verb": "az vm auto-shutdown",
+      "command": "az vm auto-shutdown --resource-group rg-web-prod --name vm-app01 --time 1900",
+      "requiredFlags": [
+        "--resource-group",
+        "--name",
+        "--time"
+      ],
+      "explanation": "az vm auto-shutdown --time takes 24-hour HHmm format (no colon). This is a common cost-control ask for dev/test VMs on the exam."
+    },
+    {
+      "id": "cli-az-6",
+      "cat": "storage",
+      "tool": "az",
+      "prompt": "Create a general-purpose v2 storage account named 'stprodwebdata01' in resource group 'rg-web-prod', region 'eastus', using the Standard_LRS SKU.",
+      "verb": "az storage account create",
+      "command": "az storage account create --name stprodwebdata01 --resource-group rg-web-prod --location eastus --sku Standard_LRS",
+      "requiredFlags": [
+        "--name",
+        "--resource-group",
+        "--sku"
+      ],
+      "explanation": "Storage account names must be globally unique, lowercase, and alphanumeric only (no hyphens) \u2014 --sku picks the replication tier (LRS/ZRS/GRS/RA-GRS)."
+    },
+    {
+      "id": "cli-az-7",
+      "cat": "storage",
+      "tool": "az",
+      "prompt": "Create a blob container named 'uploads' inside storage account 'stprodwebdata01'.",
+      "verb": "az storage container create",
+      "command": "az storage container create --name uploads --account-name stprodwebdata01",
+      "requiredFlags": [
+        "--name",
+        "--account-name"
+      ],
+      "explanation": "Containers are the top-level grouping inside Blob storage (comparable to a folder, though blob storage is technically flat) \u2014 --account-name says which storage account to create it in."
+    },
+    {
+      "id": "cli-az-8",
+      "cat": "storage",
+      "tool": "az",
+      "prompt": "Generate a read-only blob SAS token for storage account 'stprodwebdata01', valid until 2026-12-31, granting only read (r) permission.",
+      "verb": "az storage account generate-sas",
+      "command": "az storage account generate-sas --account-name stprodwebdata01 --permissions r --expiry 2026-12-31 --services b --resource-types sco",
+      "requiredFlags": [
+        "--account-name",
+        "--permissions",
+        "--expiry"
+      ],
+      "explanation": "A SAS token grants scoped, time-limited access without sharing the account's full access key \u2014 --permissions, --services, and --resource-types together define exactly what the token can touch."
+    },
+    {
+      "id": "cli-az-9",
+      "cat": "networking",
+      "tool": "az",
+      "prompt": "Create a virtual network named 'vnet-prod' in resource group 'rg-web-prod', address space 10.0.0.0/16, with a subnet named 'subnet-app' using 10.0.1.0/24.",
+      "verb": "az network vnet create",
+      "command": "az network vnet create --resource-group rg-web-prod --name vnet-prod --address-prefix 10.0.0.0/16 --subnet-name subnet-app --subnet-prefix 10.0.1.0/24",
+      "requiredFlags": [
+        "--name",
+        "--address-prefix",
+        "--subnet-name"
+      ],
+      "explanation": "az network vnet create can provision the VNet and its first subnet in one command \u2014 --address-prefix is the VNet's whole range, --subnet-prefix must be a range inside it."
+    },
+    {
+      "id": "cli-az-10",
+      "cat": "networking",
+      "tool": "az",
+      "prompt": "Add an inbound security rule named 'AllowHTTPS' to network security group 'nsg-web' in resource group 'rg-web-prod', allowing TCP port 443, with priority 100.",
+      "verb": "az network nsg rule create",
+      "command": "az network nsg rule create --resource-group rg-web-prod --nsg-name nsg-web --name AllowHTTPS --priority 100 --destination-port-ranges 443 --protocol Tcp --access Allow",
+      "requiredFlags": [
+        "--nsg-name",
+        "--name",
+        "--priority",
+        "--destination-port-ranges"
+      ],
+      "explanation": "Lower --priority numbers evaluate first (100 beats 200), and the first matching rule wins \u2014 a common exam trap is two rules that both match, where only the lower-priority number actually takes effect."
+    },
+    {
+      "id": "cli-az-11",
+      "cat": "identityGov",
+      "tool": "az",
+      "prompt": "Assign the built-in 'Reader' role to user 'jane@contoso.com' scoped to resource group 'rg-web-prod'.",
+      "verb": "az role assignment create",
+      "command": "az role assignment create --assignee jane@contoso.com --role Reader --resource-group rg-web-prod",
+      "requiredFlags": [
+        "--assignee",
+        "--role"
+      ],
+      "explanation": "Azure RBAC role assignments always have three parts \u2014 who (--assignee), what role, and what scope. Leaving off --resource-group here would scope it to the whole subscription instead, a much bigger blast radius."
+    },
+    {
+      "id": "cli-az-12",
+      "cat": "identityGov",
+      "tool": "az",
+      "prompt": "Apply a CanNotDelete management lock named 'lock-prod' to resource group 'rg-web-prod'.",
+      "verb": "az lock create",
+      "command": "az lock create --name lock-prod --resource-group rg-web-prod --lock-type CanNotDelete",
+      "requiredFlags": [
+        "--name",
+        "--resource-group",
+        "--lock-type"
+      ],
+      "explanation": "--lock-type CanNotDelete still allows reads/writes, just not deletion; ReadOnly is the stricter option and blocks modification too, which can unexpectedly break autoscaling or extensions."
+    }
   ]
 }
