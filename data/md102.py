@@ -560,6 +560,7 @@ QUESTIONS = [
         ],
         "correct": 1,
         "explanation": "A safeguard hold is applied automatically by Microsoft when a known compatibility issue is detected for a device or hardware/driver combination, blocking the specific feature update until Microsoft lifts it or an admin explicitly overrides the hold in Intune. It is unrelated to deferral misconfiguration or compliance policy status.",
+        "whyTested": "This is one of the exam's favorite 'don't blame your own configuration' traps: it's built so that admin misconfiguration is the intuitive first guess, testing whether you recognize a safeguard hold as something Microsoft deliberately triggers on purpose rather than jumping to 'something must be wrong with the ring.'",
     },
     {
         "id": "q10",
@@ -700,6 +701,7 @@ QUESTIONS = [
         ],
         "correct": 0,
         "explanation": "The require device to be marked as compliant grant control is evaluated against the specific device used for that sign-in, not the user's overall device fleet, so the compliant laptop passes while the noncompliant phone is blocked. It is explicitly device-bound rather than user-bound.",
+        "whyTested": "MD-102 repeatedly tests whether you track a Conditional Access grant control at the device level or the user level, because that single detail flips the right answer between 'blocked everywhere' and 'blocked only on this one device' — a distinction real admins get wrong constantly when troubleshooting an access ticket.",
     },
     {
         "id": "q20",
@@ -784,6 +786,7 @@ QUESTIONS = [
         ],
         "correct": 3,
         "explanation": "App protection policies enforce controls like PIN requirements and copy/paste restrictions at the application level and work even on devices that are not MDM-enrolled, which is exactly what this BYOD scenario needs. Compliance policies, configuration profiles, and security baselines all require or target MDM-managed devices.",
+        "whyTested": "Exams stack four plausible-sounding controls — compliance policy, configuration profile, security baseline, app protection policy — that all sound like they could enforce a PIN, specifically to test whether you know which single one operates below the MDM-enrollment line, since that's the detail that actually makes or breaks a BYOD deployment.",
     },
     {
         "id": "q26",
@@ -868,6 +871,7 @@ QUESTIONS = [
         ],
         "correct": 2,
         "explanation": "A custom compliance policy runs an administrator-supplied detection script and evaluates its reported data against rules in the policy, extending compliance checks beyond what built-in templates cover, including arbitrary registry values. Security baselines and app configuration policies do not provide this kind of custom, scriptable compliance check.",
+        "whyTested": "The exam likes offering several built-in-sounding constructs, like a security baseline or app configuration policy, as distractors for a genuinely custom capability, testing whether you remember that only a custom compliance policy runs your own arbitrary detection script instead of a fixed set of vendor-defined settings.",
     },
     {
         "id": "q32",
@@ -1597,6 +1601,7 @@ Not every update rollout is voluntary from the administrator's side, either. A s
             "A safeguard hold prevents an update from ever landing on an at-risk device; a rollback instead removes an update that already landed and caused a problem.",
         ],
         "scenario": "A distribution company orders 200 identical laptops for warehouse kiosks that must power on and provision themselves with zero staff interaction, plus 15 executive laptops that a white-glove partner should fully prepare before shipping to a courier. The kiosks get a self-deploying Autopilot profile, since a TPM-backed device can authenticate itself with nobody there to sign in, while the executive laptops go through a pre-provisioned profile so IT only finishes a short final phase once they land. Each hardware order is registered with a group tag matching its purpose, Kiosk or Executive, before shipping, so a dynamic Entra ID device group automatically routes each batch into the correct deployment profile the moment it is provisioned — and because the kiosks need to stay current without staff monitoring them, they are also enrolled in Windows Autopatch rather than a hand-tuned update ring.",
+        "onTheJob": "In practice, a mis-set group tag on a hardware order is one of the most common reasons a shipment of laptops shows up in the wrong deployment profile, and it usually surfaces as a flood of \"my new laptop won't finish setup\" tickets on day one rather than a config review catching it first. Update rings cause their own kind of chaos when the pilot ring is too small or quietly filled with IT's own machines instead of a real cross-section of the business, so a bad driver update gets discovered by finance the same week they're closing the books instead of by the pilot group first. Autopatch is often the thing a helpdesk team fights for internally just to stop hand-tuning rings for a fleet nobody has time to babysit.",
     },
     {
         "id": "prepare-identity-infrastructure",
@@ -1636,6 +1641,7 @@ Devices do not always fit neatly into a purely cloud-native model. For hybrid En
             "A scope tag limits which admins can manage an object; it does not change which end users or devices that object is assigned to.",
         ],
         "scenario": "A global retailer wants its regional helpdesk teams to see and manage only the devices and policies belonging to their own region, without limiting which devices those policies actually target. The retailer assigns each region's device configuration profiles the matching scope tag so a Tokyo helpdesk admin cannot even see Berlin's policies, while separately building an Entra ID dynamic group per region — based on a device attribute set during Autopilot registration — so newly provisioned hardware is automatically assigned the right regional policy the moment it enrolls, with no manual per-device work from either helpdesk team.",
+        "onTheJob": "A tenant with no MDM authority set, or an enrollment restriction blocking a whole platform, is a classic root cause behind a helpdesk suddenly drowning in enrollment-failure tickets from every user at once, which is exactly why it's the first thing an experienced admin checks before touching anything device-specific. Scope tags exist because regional helpdesk delegation is as much an org-politics problem as a technical one — a Tokyo technician accidentally able to see or touch Berlin's devices is the kind of access-scope mistake that gets escalated fast. And a missing or unhealthy Intune Connector for Active Directory is a near-guaranteed source of a hybrid-join deployment stalling out at the exact same domain-join step across dozens of devices, which is why it's usually the first thing checked when a whole batch fails identically.",
     },
     {
         "id": "protect-devices-and-access",
@@ -1672,6 +1678,7 @@ Encryption protects data at rest, but plenty of everyday risk lives in what a si
             "Windows LAPS gives every device its own randomized password, so one compromised machine's local admin credential does not work anywhere else in the fleet.",
         ],
         "scenario": "A security team wants a personal, unenrolled-feeling laptop scenario handled correctly: any device that fails its compliance policy should get a five-day grace period before losing access, but a device Defender for Endpoint flags as high risk should lose access immediately regardless of that grace period. They configure the compliance policy's standard noncompliance actions for ordinary failures, while separately feeding the device's Defender for Endpoint risk score into the same policy as its own compliance rule — so a device that becomes actively compromised fails compliance and gets blocked by the Conditional Access grant control right away, without waiting out a grace period meant for routine issues like a missed OS update.",
+        "onTheJob": "A too-strict compliance policy pushed tenant-wide during a rollout is a textbook way to accidentally lock out half the sales team the same afternoon they're trying to close a deal, which is why most orgs stage a new policy against a pilot group before enforcing it broadly. The BitLocker recovery key escrow to Entra ID is one of the highest-volume, most routine help desk interactions there is — a locked-out user who forgot their PIN calling in for a key lookup happens constantly, and that setting is exactly what makes it painless. And requiring a compliant device rather than just a compliant user is the setting that quietly decides whether an executive's personal phone can bypass Conditional Access just because their corporate laptop happens to be compliant — a gap real auditors specifically go looking for.",
     },
     {
         "id": "manage-secure-applications",
@@ -1709,6 +1716,7 @@ Issuing certificates for Wi-Fi, VPN, or app authentication used to mean standing
             "Requiring an approved client app is not the same as requiring an app protection policy — the second one also demands a compliant policy actually be applied.",
         ],
         "scenario": "A company wants field technicians on personal, unenrolled Android phones to read corporate email in Outlook, but wants to block a generic third-party mail app from ever reaching the same mailbox, and wants the ability to wipe just that corporate mail data if a phone is lost. They configure an app protection policy requiring a PIN and blocking copy-paste to personal apps, then set Conditional Access to require both an approved client app and a compliant app protection policy — so Outlook with the policy applied gets through, an unmanaged mail client is blocked outright, and a lost phone can have its Outlook data wiped remotely without touching a single personal photo.",
+        "onTheJob": "App protection policies exist because most employees will simply refuse to enroll a personal phone in full MDM, and that refusal is the actual, day-to-day political reality IT has to design around rather than fight — BYOD app protection is the compromise that lets IT protect corporate mail data without ever touching someone's personal photos. Getting the Conditional Access combination of approved client app plus app protection policy right is also what stands between \"the CEO can check email on their phone\" and a real data-leak incident, so it tends to get relitigated in postmortems, not just exams. And a missing Win32 app detection rule is one of the most common causes of a deployment that looks successful in the installer logs but shows up as permanently \"pending\" in Intune, generating a wave of confused tickets from users who can clearly see the app already working.",
     },
     {
         "id": "optimize-endpoint-operations",
@@ -1748,5 +1756,6 @@ Day-to-day lifecycle actions round out operations. Wipe resets a device to facto
             "Organizational reports are generated asynchronously and can take time to build, unlike the near real-time built-in operational reports.",
         ],
         "scenario": "A help desk keeps seeing the same background service silently stop on a subset of laptops, generating tickets only after users notice something is broken. The team builds a proactive remediation that detects the stopped service on a recurring schedule and restarts it automatically under the SYSTEM account the moment it is found down, closing the issue before a user ever has to file a ticket. Separately, leadership asks for a fleet-wide view of which devices are contributing the most to slow morning boot times; endpoint analytics' startup performance breakdown identifies one specific OEM driver as the common culprit across the affected machines, turning a vague complaint into a targeted driver update rather than a guessing game.",
+        "onTheJob": "Proactive remediation scripts usually get built only after a help desk team gets tired of the same three-line ticket (\"service X stopped again\") landing in their queue every week, at which point automating the fix under SYSTEM becomes the obvious answer instead of a technician restarting it by hand each time. Retire versus Wipe is one of those distinctions that matters far more in practice than on paper — accidentally wiping a BYOD employee's personal phone instead of retiring it is the kind of mistake that turns into an HR conversation, not just a support ticket. And endpoint analytics tends to get real budget approval specifically because it turns a vague, hard-to-prioritize \"the laptops feel slow\" complaint into one named driver update leadership can actually act on.",
     },
 ]
