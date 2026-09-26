@@ -4079,6 +4079,18 @@ function LessonDetail({ lesson, flashcardsData, questionsData, categories, onBac
   const walkthrough = lesson.portalMockup ? PORTAL_WALKTHROUGHS[lesson.portalMockup] : null;
   const MockupComp = !walkthrough && lesson.portalMockup ? PORTAL_MOCKUPS[lesson.portalMockup] : null;
   const realShot = lesson.portalMockup ? REAL_PORTAL_SCREENSHOTS[lesson.portalMockup] : null;
+  // Some flat (non-course) tracks carry a real screenshot on the CATEGORY
+  // itself (CategoryScreenshot in StudyView) rather than on a lesson's
+  // portalMockup — e.g. MD-102's Intune screenshots predate its course
+  // content. Once such a track gains LESSONS, CourseView replaces
+  // StudyView entirely (see the mode==='learn' branch in 06_app.jsx), so
+  // without this fallback those screenshots would become unreachable.
+  // Only kicks in when the lesson has no mockup/walkthrough of its own,
+  // so it never duplicates a real screenshot already shown above.
+  const categoryScreenshotKey = !walkthrough && !MockupComp && lessonCatKeys.length === 1
+    ? (categories || []).find((c) => c.key === lessonCatKeys[0])?.screenshot
+    : null;
+  const categoryRealShot = categoryScreenshotKey ? REAL_PORTAL_SCREENSHOTS[categoryScreenshotKey] : null;
 
   const paragraphs = lesson.reading.split('\n\n');
   const readingPages = [];
@@ -4206,6 +4218,13 @@ function LessonDetail({ lesson, flashcardsData, questionsData, categories, onBac
               <RealPortalScreenshot shot={realShot} />
             </>
           )}
+        </div>
+      )}
+
+      {categoryRealShot && (
+        <div style={{ marginBottom: '16px' }}>
+          <div style={{ fontSize: '13px', fontWeight: 600, color: COLOR.gold, marginBottom: '4px' }}>Portal screenshot</div>
+          <RealPortalScreenshot shot={categoryRealShot} />
         </div>
       )}
 
