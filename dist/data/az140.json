@@ -1567,6 +1567,273 @@
       "explanation": "A workspace is the publishing container that groups application groups together into one feed a user sees in the Remote Desktop client. A host pool is the underlying collection of session hosts, a scaling plan governs power state, and an image definition is about versioning VM images \u2014 none of these publish a unified feed to end users."
     }
   ],
+  "lessons": [
+    {
+      "id": "host-pools-and-images",
+      "title": "Host Pools, Session Hosts & Images",
+      "summary": "Pooled vs. personal host pools, load balancing, assignment, workspaces, and managing session host images.",
+      "diagram": null,
+      "vocabIds": [
+        "f1",
+        "f2",
+        "f3",
+        "f4",
+        "f5",
+        "f6",
+        "f7",
+        "f14",
+        "f39",
+        "f42"
+      ],
+      "quizIds": [
+        "q1",
+        "q2",
+        "q3",
+        "q4",
+        "q8",
+        "q9",
+        "q10",
+        "q29",
+        "msq1",
+        "msq2"
+      ],
+      "reading": "Azure Virtual Desktop's building blocks nest in a specific order: a host pool is a collection of session host VMs; an application group publishes either a full Desktop or specific RemoteApp programs from that host pool; and a workspace is the logical container that groups one or more application groups together so a user sees everything they're entitled to \u2014 across every host pool assigned to them \u2014 in one unified feed in the Remote Desktop client. A pooled host pool shares multi-session session hosts across many users, load-balanced by the pool itself, which is the standard, cost-efficient choice for stateless, similar-task workers. A personal host pool instead dedicates exactly one session host VM to each assigned user, either through automatic assignment (Azure Virtual Desktop assigns the first available host the first time a user connects) or direct assignment (an admin pre-assigns a specific host to a specific user ahead of their first sign-in) \u2014 and once assigned, a user always lands on that same session host on every future connection regardless of which method put them there.\n\nWithin a pooled host pool, the load-balancing algorithm decides how new sessions get distributed. Breadth-first spreads new sessions evenly across every available session host, favoring performance. Depth-first instead fills one session host up to its configured maximum session limit before moving on to the next, concentrating load onto fewer hosts and leaving others empty \u2014 which pairs naturally with autoscale, since an emptied host is safe to deallocate. Multi-session itself only works because of a special SKU, Windows 11 (or 10) Enterprise multi-session, licensed specifically for Azure Virtual Desktop, letting multiple users run concurrent, isolated sessions on one VM \u2014 something ordinary Windows client licensing doesn't permit outside AVD at all. Microsoft also specifically recommends against assigning the same users both a RemoteApp application group and a Desktop application group from the same host pool, since it causes duplicate icons and user confusion, even though a pooled host pool can technically host several RemoteApp groups at once. A personal host pool, by contrast, only ever supports a single Desktop application group.\n\nCustom session host images are managed through Azure Compute Gallery, which stores, versions, and replicates image definitions across subscriptions and regions \u2014 a controlled, repeatable lifecycle in place of hand-built managed image copies. A host pool flagged with the 'Validation environment' setting receives Azure Virtual Desktop's own service and agent updates before general availability, letting an organization catch update-related issues on a small, low-risk pool first \u2014 that's purely a rollout ring for the AVD service itself, and has nothing to do with testing your own custom image versions, which Compute Gallery handles separately.\n\nIt's worth being clear on what a customer is actually responsible for versus what Microsoft runs. The AVD control plane \u2014 Web Access, the Broker, Diagnostics, and the Gateway \u2014 is fully managed by Microsoft, runs in Microsoft's own subscription, and is never visible or manageable directly in the customer's portal. The data plane \u2014 session host VMs, the virtual network, and FSLogix storage \u2014 runs in the customer's own subscription, and that's the part the customer provisions, patches, and pays for. Licensing follows the same 'no extra AVD-specific tax' pattern: there's no separate per-user Azure Virtual Desktop access license at all \u2014 a qualifying Windows or Microsoft 365 license already grants a user entitlement to access AVD, on top of whatever Azure infrastructure the organization actually consumes. And when deciding between AVD and Windows 365 Cloud PC, the real distinction is pooling and control: AVD supports pooled, multi-session host pools with granular scaling and Azure consumption billing, while a Windows 365 Cloud PC is always a fixed, dedicated, single-user VM at predictable per-user monthly pricing, with no host pool or scaling plan of its own to manage.",
+      "fundamentalsLabel": "New to AVD host pool structure? See the everyday analogy",
+      "fundamentals": "Think of a workspace, application group, and host pool the way an apartment building's directory works: the host pool is the building itself (a set of units/session hosts), an application group is a specific listing for one of those units (a full apartment, or just one room in it as a RemoteApp), and a workspace is the master directory a resident checks to see every listing they're entitled to across every building they have access to, not just one. Depth-first load balancing is like filling up one elevator completely before calling the next one, so the other elevators stay empty and can be powered down; breadth-first is like spreading everyone across every elevator evenly instead.",
+      "keyTerms": [
+        "host pool",
+        "application group",
+        "workspace",
+        "pooled host pool",
+        "personal host pool",
+        "automatic assignment",
+        "direct assignment",
+        "Breadth-first",
+        "Depth-first",
+        "Azure Compute Gallery",
+        "Validation environment",
+        "control plane",
+        "data plane"
+      ],
+      "commonTraps": [
+        "Depth-first fills one host before moving to the next; breadth-first spreads sessions evenly \u2014 mixing these up flips which one pairs with autoscale for cost savings.",
+        "A personal host pool supports only a single Desktop application group \u2014 it does not support RemoteApp application groups the way a pooled host pool does.",
+        "A validation environment host pool only affects the AVD service/agent update rollout ring \u2014 it has nothing to do with testing your own custom Compute Gallery image versions.",
+        "There is no separate per-user Azure Virtual Desktop access license \u2014 a qualifying Windows or Microsoft 365 license already grants that entitlement."
+      ],
+      "scenario": "A call center wants 200 agents doing identical, non-persistent work to share a pool of Windows 11 Enterprise multi-session VMs as cheaply as possible, while a handful of developers need a persistent desktop with locally installed tools that survive between sessions. The admin builds a pooled host pool with depth-first load balancing for the call center agents, so autoscale can deallocate emptied hosts overnight, and a separate personal host pool with direct assignment for the developers, pre-assigning each one a dedicated VM before their first sign-in. Both host pools' application groups are published through one shared workspace, so every user \u2014 agent or developer \u2014 sees only what they're entitled to in a single feed."
+    },
+    {
+      "id": "networking-storage-capacity-planning",
+      "title": "Networking, Storage & Capacity Planning",
+      "summary": "FSLogix storage backends, RDP Shortpath, bandwidth planning, VM sizing, and cost optimization.",
+      "diagram": "networking",
+      "vocabIds": [
+        "f8",
+        "f9",
+        "f11",
+        "f12",
+        "f13",
+        "f15",
+        "f40",
+        "f43",
+        "f44",
+        "f45"
+      ],
+      "quizIds": [
+        "q5",
+        "q6",
+        "q7",
+        "q11",
+        "q12",
+        "q46",
+        "q47",
+        "tf3",
+        "tf4",
+        "msq4"
+      ],
+      "reading": "A pooled, stateless host pool only feels personal to the user because of FSLogix Profile Containers, which store a user's entire Windows profile inside a VHD/VHDX file on network storage, attached to the OS at sign-in \u2014 without it, landing on a different session host every time would mean a brand-new, empty profile each time. That storage has to live somewhere reachable by every session host in the pool. Azure Files, ideally the Premium tier, is the common, simpler choice for small-to-medium scale. Azure NetApp Files offers lower latency and higher IOPS/throughput and is the recommended choice at large scale or for performance-sensitive deployments \u2014 at the cost of extra setup, since it needs its own delegated subnet and capacity pool that a straightforward Azure Files share doesn't. For resilience beyond a single storage location, FSLogix Cloud Cache writes profile changes to a local cache first and asynchronously replicates them to one or more configured storage providers, so a user's profile survives even if one storage location becomes temporarily unreachable.\n\nNetwork transport and latency planning both come down to the path between the client and the session host. RDP Shortpath establishes a direct, UDP-based transport between the two, bypassing the usual TCP relay through the Remote Desktop Gateway to cut latency \u2014 Shortpath for managed networks needs direct line-of-sight connectivity, such as a VPN or ExpressRoute, while Shortpath for public networks instead uses STUN/TURN-based NAT traversal for clients anywhere on the open internet with no such direct path. Round-trip time (RTT) between the client and the Azure region hosting the session host is the dominant factor in how responsive an interactive session actually feels, regardless of raw bandwidth; Microsoft's Azure Virtual Desktop Experience Estimator tool helps assess expected experience for a given network path, and as a rule of thumb an RTT under roughly 150 ms gives a good interactive experience.\n\nSizing a session host starts from an expected user profile \u2014 light, medium, or heavy, based on the applications and multitasking typical for that group \u2014 which Microsoft's published sizing tables translate into a specific VM SKU and users-per-host density. The host pool's max session limit setting then caps how many concurrent sessions any single session host will accept, working together with the load-balancing algorithm to decide when a host is full; set it too high for the VM's real sizing and hosts overload under peak load even though the pool still shows spare 'slots,' set it too low and autoscale spins up more hosts than actually necessary. FSLogix containers have their own sizing consideration too: profile containers default to a maximum of 30 GB unless increased, and a container sized too small can silently put a user into a temporary or read-only profile with no obvious sign-in error \u2014 proactively monitoring container free space avoids a hard-to-diagnose 'why does this one user keep losing settings' ticket.\n\nOn the cost side, Azure Hybrid Benefit lets an organization apply an existing on-premises Windows Server license with Software Assurance toward session host compute cost, and Reserved Instances or Azure Savings Plans further discount predictable compute \u2014 but Windows 10/11 multi-session VM compute specifically is not eligible for that same per-core Hybrid Benefit discount that Windows Server workloads get. On a multi-session host pool, the realistic savings levers are autoscale, avoiding paying for capacity that sits idle overnight and on weekends, and Reserved Instances or Savings Plans on the compute itself, not Hybrid Benefit.",
+      "fundamentalsLabel": "New to AVD network and storage planning? See the everyday analogy",
+      "fundamentals": "Choosing Azure Files versus Azure NetApp Files for FSLogix is like choosing between a well-run public storage unit and a private, climate-controlled vault: the storage unit (Azure Files) is simpler to set up and fine for most needs, while the vault (Azure NetApp Files) is faster and more resilient at scale, but you have to build out dedicated access infrastructure for it first. RDP Shortpath is like taking a direct flight instead of connecting through a hub airport (the Gateway) \u2014 it only works if there's a direct route available, whether that's a private lane (a VPN, for Shortpath on managed networks) or a cleverly negotiated direct path over public roads (STUN/TURN, for Shortpath on public networks).",
+      "keyTerms": [
+        "FSLogix Profile Containers",
+        "Azure Files",
+        "Azure NetApp Files",
+        "Cloud Cache",
+        "RDP Shortpath",
+        "managed networks",
+        "public networks",
+        "Round-trip time",
+        "max session limit",
+        "Azure Hybrid Benefit",
+        "Reserved Instances"
+      ],
+      "commonTraps": [
+        "Azure NetApp Files needs its own delegated subnet and capacity pool \u2014 Azure Files Premium is the simpler default unless you're at large scale.",
+        "RDP Shortpath for managed networks needs direct line-of-sight connectivity like a VPN or ExpressRoute; Shortpath for public networks is the one built for clients with no such direct path.",
+        "The max session limit works with the load-balancing algorithm \u2014 setting it too high overloads hosts even though the pool shows spare capacity, and setting it too low wastes capacity and triggers unnecessary autoscale-outs.",
+        "Windows 10/11 multi-session VM compute is not eligible for Azure Hybrid Benefit's per-core discount \u2014 the real multi-session savings levers are autoscale and Reserved Instances/Savings Plans."
+      ],
+      "scenario": "A 3,000-user deployment needs the lowest possible FSLogix profile latency and is willing to manage a dedicated delegated subnet for it, so the team chooses Azure NetApp Files over a simpler Azure Files share. Branch staff connect over the corporate VPN with direct line-of-sight to the Azure virtual network, so RDP Shortpath for managed networks is enabled to avoid relaying every packet through the Gateway. Session hosts are sized for a 'medium' user profile based on Microsoft's published tables, with the max session limit tuned so hosts fill to a safe level before autoscale \u2014 running depth-first \u2014 brings another host online, and the whole multi-session fleet leans on autoscale and Reserved Instances rather than Azure Hybrid Benefit, which doesn't apply to multi-session compute anyway."
+    },
+    {
+      "id": "identity-and-security-for-avd",
+      "title": "Identity & Security for AVD",
+      "summary": "Entra join types, Conditional Access, RBAC roles, session hardening, and least-privilege access.",
+      "diagram": "identity",
+      "vocabIds": [
+        "f16",
+        "f17",
+        "f18",
+        "f19",
+        "f20",
+        "f21",
+        "f22",
+        "f46",
+        "f47",
+        "f48"
+      ],
+      "quizIds": [
+        "q13",
+        "q14",
+        "q15",
+        "q16",
+        "q17",
+        "q32",
+        "q33",
+        "msq5",
+        "msq6",
+        "msq11"
+      ],
+      "reading": "A session host's identity join type shapes a lot of what else is possible. A Microsoft Entra-joined host trusts only Entra ID, with no on-premises Active Directory involved at all \u2014 simplest to deploy, since it needs no domain controller line-of-sight, though it historically needed extra configuration, like Microsoft Entra Kerberos for Azure Files, to make FSLogix profiles on Azure Files work with no on-premises AD in the picture. A hybrid Entra-joined host is joined to an on-premises AD DS domain that's synced to Entra ID, and an AD DS-joined host is joined only to on-premises AD DS with no cloud identity at all. Whichever join type is used, session hosts should never be directly reachable for inbound RDP from the internet: all connections are brokered through the AVD Gateway over an outbound-only connection the session host itself initiates, so a network security group can safely deny all unsolicited inbound traffic while the service still works exactly as designed.\n\nConditional Access applies to AVD the same way it applies to any other app, but with one wrinkle: enforcing MFA or a compliant-device requirement consistently across every client means targeting both the Azure Virtual Desktop and Windows Cloud Login enterprise apps together, since the native Remote Desktop client's RDP connection performs its own separate authentication step against Windows Cloud Login, distinct from the Azure Virtual Desktop app the web client and feed discovery use. Targeting only one of the two apps leaves a real gap for whichever client uses the other. Built-in RBAC roles narrow admin access by function: Desktop Virtualization User only lets a user access their assigned application groups, Desktop Virtualization Contributor manages AVD objects like host pools and app groups but not the underlying VMs, Desktop Virtualization Virtual Machine Contributor manages those session host VMs themselves, and Desktop Virtualization Session Host Operator handles day-to-day session host operations like disabling new connections and sending messages, without the broader rights Contributor grants.\n\nFor sensitive on-screen content, two RDP properties work together rather than interchangeably: screen capture protection actively blocks a session's content from being captured by screenshot or recording tools running on the client, while session watermarking only overlays a visible, tiled watermark with identifying information as a deterrent and audit trail. Neither can reach out and stop someone from simply photographing the screen with an external camera \u2014 that gap is a known, accepted limitation of both controls, which is exactly why they're complementary rather than a complete technical guarantee. Applying Microsoft's published, AVD-specific security baseline through Group Policy or Intune settings catalog policies \u2014 covering redirection restrictions and RDP listener hardening \u2014 is the supported, scalable way to harden every session host consistently, rather than configuring each one by hand.\n\nLeast-privilege thinking extends down to the session host's local accounts too. End users should never be members of the local Administrators group on a shared session host, since one user with local admin rights on a pooled host risks affecting every other user sharing that same VM \u2014 day-to-day access should flow entirely through the Desktop Virtualization User role and app group assignment instead. Windows LAPS (Local Administrator Password Solution) then automatically randomizes and rotates each session host's local Administrator password on a schedule and stores it securely in Microsoft Entra ID, removing the risk of every host sharing one static, manually tracked password. And Customer Lockbox, a related but tenant-wide Microsoft 365 control, requires a Microsoft support engineer to get explicit customer approval before accessing tenant content during a support request \u2014 a narrow, specific scenario, not something that triggers for most routine support and service operations.",
+      "fundamentalsLabel": "New to identity and security hardening for AVD? See the everyday analogy",
+      "fundamentals": "Targeting both the Azure Virtual Desktop and Windows Cloud Login apps in Conditional Access is like locking both the front door and the side door of a building \u2014 a policy that only covers the front door leaves the side door, used by a different set of visitors, completely unguarded. Screen capture protection and watermarking are like a 'no photography' sign combined with a physical lens blocker on a security camera feed: one visibly discourages misuse and creates a trail if it happens anyway, the other actively blocks a specific kind of software capture, but neither one can stop someone holding up their own phone camera to the monitor.",
+      "keyTerms": [
+        "Microsoft Entra-joined",
+        "hybrid Entra-joined",
+        "Conditional Access",
+        "Windows Cloud Login",
+        "Desktop Virtualization User",
+        "Desktop Virtualization Contributor",
+        "Desktop Virtualization Session Host Operator",
+        "screen capture protection",
+        "session watermarking",
+        "security baseline",
+        "Windows LAPS",
+        "local Administrators group"
+      ],
+      "commonTraps": [
+        "A Conditional Access policy targeting only the Azure Virtual Desktop app leaves the native RDP client's own Windows Cloud Login authentication step unprotected \u2014 target both apps together.",
+        "Desktop Virtualization Contributor cannot manage the underlying session host VMs \u2014 that needs Desktop Virtualization Virtual Machine Contributor as well.",
+        "Watermarking only deters and creates an audit trail \u2014 it does not technically block a capture the way screen capture protection does, and neither stops an external camera photographing the screen.",
+        "Session hosts never need a public IP or an inbound internet-facing RDP rule \u2014 they only ever initiate an outbound connection to the AVD service."
+      ],
+      "scenario": "A hospital deploys Microsoft Entra-joined session hosts with no on-premises Active Directory at all, and configures Microsoft Entra Kerberos so FSLogix profiles still work against an Azure Files share. To meet a compliance mandate, it enables both screen capture protection (to actually block screenshot tools) and session watermarking (to deter and trace any photo taken of the screen) on the host pool, while acknowledging that a clinician using their own phone's camera can still defeat both. A Conditional Access policy requiring a compliant device is scoped to both the Azure Virtual Desktop and Windows Cloud Login apps, so the requirement holds whether a user connects through the web client or the native Windows client over RDP, and help-desk staff are limited to the Desktop Virtualization Session Host Operator role rather than full Contributor rights."
+    },
+    {
+      "id": "user-environments-profiles-and-apps",
+      "title": "User Environments, Profiles & Applications",
+      "summary": "FSLogix container types, MSIX app attach, Application Masking, and delivering apps and media to AVD users.",
+      "diagram": null,
+      "vocabIds": [
+        "f23",
+        "f24",
+        "f25",
+        "f26",
+        "f28",
+        "f29",
+        "f30",
+        "f38",
+        "f50",
+        "f51"
+      ],
+      "quizIds": [
+        "q18",
+        "q19",
+        "q20",
+        "q21",
+        "q22",
+        "q23",
+        "q34",
+        "msq7",
+        "msq8",
+        "msq10"
+      ],
+      "reading": "FSLogix is configured through ADMX/ADML template files that add a dedicated node to Group Policy \u2014 or the same registry settings can be pushed through Intune configuration profiles for session hosts that aren't domain-joined to an on-premises AD \u2014 letting an admin set the VHD storage location, container size, and enabled state without editing the registry image by image. A Profile Container carries the entire user profile, while an Office Container can optionally carry just Outlook (OST/search data) and OneDrive data separately, useful when the main profile needs to stay small or when cached-mode Outlook data would otherwise dominate it. Redirections.xml lets an admin explicitly exclude or redirect specific folders, like a disposable browser cache, out of the profile container entirely, keeping it smaller and sign-in faster without uninstalling anything or disabling FSLogix.\n\nMSIX app attach delivers an application packaged as MSIX from a network share, staging it as a virtual disk attached to the session host at sign-in and de-staging it at sign-out \u2014 the app shows up in the Start menu, but its files never actually touch the local disk or the golden image. That's exactly what makes updates lightweight: adding a new application version just means adding a new MSIX package, with no need to rebuild or redeploy the image at all. Not every application has this option, though \u2014 a legacy line-of-business installer with no MSIX package has no MSIX app attach path, leaving Intune Win32 deployment or baking it directly into the golden image as the only realistic delivery routes, and Win32 deployment fits an app every user of a host pool needs, while MSIX app attach fits one assignable to specific users or groups without ever touching the image.\n\nWhen an application is delivered to everyone on a shared image but should only be visible to some of them, FSLogix Application Masking hides specific applications, shortcuts, or file associations from unauthorized users or groups based on rule sets evaluated against group membership \u2014 the app stays physically installed for everyone, just invisible to those who shouldn't see it, letting one golden image serve multiple departments cleanly. Per-user Start menu and taskbar personalization roams right alongside this, through the same FSLogix profile container, so each user keeps their own pinned tiles and icons across whichever session host they land on, instead of everyone sharing one fixed, image-baked layout. Language packs and Features on Demand are the one clear exception to 'deliver it dynamically': they must be added to the master image itself, via DISM against a language pack ISO, before it's generalized and deployed \u2014 unlike an MSIX-attached app, they can't be added per-user after the fact.\n\nTwo more delivery concerns round out the user experience: Teams media optimization offloads Microsoft Teams call and meeting audio, video, and screen sharing to run directly on the client device instead of the shared session host, since without it every concurrent Teams call competes for the same limited CPU and network resources as user counts grow. And for graphics-intensive workloads like CAD or video editing, GPU-accelerated session hosts run on GPU-enabled VM sizes with either GPU passthrough (a dedicated hardware GPU) or GPU partitioning/vGPU (sharing one physical GPU across multiple hosts) \u2014 but on a pooled multi-session host, every concurrent session on that host still shares the same physical GPU's capacity, so GPU-bound capacity planning matters just as much as vCPU/RAM sizing for this kind of workload.",
+      "fundamentalsLabel": "New to FSLogix and application delivery? See the everyday analogy",
+      "fundamentals": "MSIX app attach is like a hotel room's furniture that's delivered and set up fresh for each guest's stay and cleared out after checkout \u2014 nothing about the room itself (the golden image) ever permanently changes. FSLogix Application Masking is like a shared office building where everyone has a keycard that opens the same floor, but only some badges actually light up the elevator button for the finance department's suite \u2014 the door's still there for everyone, only some people can actually see and use it.",
+      "keyTerms": [
+        "Profile Container",
+        "Office Container",
+        "Redirections.xml",
+        "MSIX app attach",
+        "Intune Win32",
+        "Application Masking",
+        "personalization",
+        "Language packs",
+        "Teams media optimization",
+        "GPU passthrough",
+        "GPU partitioning"
+      ],
+      "commonTraps": [
+        "Language packs must be baked into the golden image before deployment \u2014 they cannot be delivered per-user after sign-in the way an MSIX-attached app can.",
+        "MSIX app attach never installs files onto the local disk or the golden image \u2014 an app with no MSIX package has no MSIX app attach path at all.",
+        "Application Masking hides an app from unauthorized users without uninstalling it \u2014 the app is still physically present on the shared image.",
+        "A GPU-enabled multi-session host still shares one physical GPU across every concurrent session on it \u2014 GPU capacity planning matters as much as vCPU/RAM sizing."
+      ],
+      "scenario": "A hospital's shared nursing-station host pool needs a licensed imaging application visible only to the radiology department, Outlook and OneDrive data roaming fully with each clinician while the rest of the profile stays small, and Teams calls that don't degrade as more clinicians sign in during a shift change. The admin layers FSLogix Application Masking on top of the imaging app (already installed in the shared image) scoped to the radiology group, configures a separate Office Container for Outlook/OneDrive data alongside a deliberately trimmed Profile Container, and enables Teams media optimization so call audio and video process on each clinician's own device instead of competing for session host resources."
+    },
+    {
+      "id": "monitoring-maintenance-and-scaling",
+      "title": "Monitoring, Maintenance & Scaling",
+      "summary": "Azure Monitor for AVD, diagnostic categories, autoscale scaling plans, drain mode, and patching strategy.",
+      "diagram": "scalingApproaches",
+      "vocabIds": [
+        "f32",
+        "f33",
+        "f34",
+        "f35",
+        "f36",
+        "f53",
+        "f54"
+      ],
+      "quizIds": [
+        "q25",
+        "q26",
+        "q27",
+        "q28",
+        "q35",
+        "q52",
+        "msq9",
+        "tf13",
+        "tf16"
+      ],
+      "reading": "Azure Monitor for Azure Virtual Desktop is a purpose-built workbook surfacing host pool health, session host performance, and connection-level diagnostics \u2014 but it has nothing to show until diagnostic settings are actually enabled on the AVD objects (host pools, workspaces, app groups) sending data to a Log Analytics workspace; enabling the workbook and enabling the underlying data flow are two separate steps. Diagnostic categories break that data down by purpose: Connection is typically the first stop for troubleshooting failed or slow sign-ins, Error surfaces failures broadly, and categories like AgentHealthStatus, NetworkData, and SessionHostManagement cover narrower slices of host and agent health. For a deeper dive on one specific user's bad connection, the WVDConnections table records each session's connection lifecycle, duration, and round-trip time, while WVDCheckpoints records the timestamped stages a connection passed through \u2014 together letting an admin write a Kusto Query Language (KQL) query, filtered by UserName or CorrelationId, to pinpoint exactly which stage \u2014 client, gateway, broker, or session host \u2014 one specific connection stalled at, faster than scanning the prebuilt workbook for an issue affecting a single person.\n\nAutoscale scaling plans define schedules \u2014 ramp-up, peak, ramp-down, off-peak \u2014 that automatically start or deallocate session host VMs based on time of day and current session load, cutting compute cost outside business hours. A capacity threshold percentage decides when ramp-up should start an additional host, reacting once running hosts' combined session load crosses that percentage rather than waiting until they're completely full; MinimumNumberOfRDSH instead sets a floor on how many hosts stay running no matter how low demand drops, honored through every phase of the schedule, not only business hours. Scaling behaves differently by host pool type: on a pooled host pool, autoscale can genuinely add and remove session hosts to match load, while on a personal host pool a scaling plan can only start or deallocate the fixed set of already-existing dedicated VMs, since each one is permanently tied to one assigned user \u2014 'scaling' there really just means power-state management, not host count elasticity. For unpredictable, occasional personal-host-pool usage, Start VM on Connect automatically powers on a deallocated VM the moment its assigned user tries to connect, without a fixed schedule or manual admin intervention.\n\nBefore patching or other maintenance, drain mode marks a session host so it stops accepting any new sessions while letting its already-connected users keep working uninterrupted \u2014 it does not sign anyone out on its own, so an admin typically still messages and logs off remaining users, or simply waits for them to disconnect naturally, before the host is fully idle and safe to touch. From there, session hosts patch like any Azure VM, through Azure Update Manager, Microsoft Configuration Manager, or WSUS, or by replacing hosts entirely with a newly patched golden image and retiring the old ones \u2014 image-based replacement avoids ever running user sessions on a host mid-patch, at the cost of needing enough spare capacity to roll hosts in and out. Separately, the AVD agent and side-by-side stack update automatically by default, and scheduled agent updates simply define a maintenance window during which those specific agent updates are allowed to install, keeping unexpected agent restarts out of business hours \u2014 it has no effect on Windows OS patching or application updates, which still need to be managed through the tools above.",
+      "fundamentalsLabel": "New to monitoring and scaling AVD? See the everyday analogy",
+      "fundamentals": "Depth-first load balancing feeding autoscale is like filling one checkout lane completely before opening a second one, so the store can send the second cashier home the moment their lane empties out \u2014 the same vertical-vs-horizontal tradeoff behind any scaling decision, whether that's a bigger single register or simply opening and closing more of them as the crowd ebbs and flows. Drain mode is like putting up a 'this lane is closing soon, but you already in line will be served' sign \u2014 new customers get routed elsewhere, but nobody already checking out gets turned away mid-transaction.",
+      "keyTerms": [
+        "Azure Monitor for Azure Virtual Desktop",
+        "diagnostic settings",
+        "Log Analytics workspace",
+        "WVDConnections",
+        "WVDCheckpoints",
+        "Kusto Query Language",
+        "Autoscale scaling plans",
+        "capacity threshold",
+        "MinimumNumberOfRDSH",
+        "Start VM on Connect",
+        "drain mode",
+        "scheduled agent updates"
+      ],
+      "commonTraps": [
+        "Azure Monitor for AVD shows nothing until diagnostic settings are enabled and sending data to a Log Analytics workspace \u2014 the workbook itself doesn't create that data flow.",
+        "On a personal host pool, a scaling plan can only start/deallocate existing dedicated VMs \u2014 it cannot add or remove session hosts the way a pooled host pool's autoscale can.",
+        "Drain mode does not sign out already-connected users \u2014 it only blocks new sessions from landing on that host.",
+        "Scheduled agent updates control only the AVD agent/side-by-side stack timing \u2014 Windows OS patching still needs Azure Update Manager, WSUS, or Configuration Manager."
+      ],
+      "scenario": "An admin notices a spike in failed sign-ins and, after confirming diagnostic settings are already flowing into a Log Analytics workspace, filters the WVDConnections and WVDCheckpoints tables by CorrelationId to find that a specific batch of failures is stalling at the gateway stage rather than the session host. Before rolling out a fix that requires a reboot, they enable drain mode on the affected hosts so currently connected users can finish their work, wait for sessions to clear naturally, then patch through Azure Update Manager. Separately, the pooled host pool's autoscale plan is tuned with a lower capacity threshold so ramp-up reacts before hosts fill completely, while MinimumNumberOfRDSH keeps at least two hosts running around the clock as a floor."
+    }
+  ],
   "cheatSheet": [
     {
       "heading": "Exam-day strategy",
