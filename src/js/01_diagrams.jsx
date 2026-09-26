@@ -386,6 +386,146 @@ function DiagramDmzZones() {
   );
 }
 
+function DiagramHl7v2MessageAnatomy() {
+  const lines = [
+    { seg: 'MSH', text: 'MSH|^~\\&|LAB|HOSP|EHR|HOSP|202409261200||ORU^R01|MSG00001|P|2.5.1', ext: false },
+    { seg: 'PID', text: 'PID|1||10554^^^HOSP^MR||DOE^JANE^A', ext: false },
+    { seg: 'OBR', text: 'OBR|1|ORD9912|FIL4471|2345-7^BMP^LN', ext: false },
+    { seg: 'OBX', text: 'OBX|1|NM|2345-7^Glucose^LN||98|mg/dL|70-110|N', ext: false },
+    { seg: 'NTE', text: 'NTE|1||Patient fasting per protocol', ext: true },
+    { seg: 'ZPI', text: 'ZPI|1|LOCALCOSTCTR-4521', ext: true },
+  ];
+  const lineH = 20, top = 38, left = 14;
+  const width = 430, height = top + lines.length * lineH + 66;
+  return (
+    <svg viewBox={`0 0 ${width} ${height}`} style={{ width: '100%', height: 'auto' }}>
+      <DCaption x={width / 2} y={14} text="One HL7 v2 message: segments, pipe-delimited fields" />
+      {lines.map((l, i) => {
+        const y = top + i * lineH;
+        return (
+          <g key={l.seg}>
+            <rect x={left - 4} y={y - 13} width={width - 2 * (left - 4)} height={lineH - 4} rx="4"
+              fill={l.ext ? 'rgba(211,164,101,0.12)' : 'transparent'}
+              stroke={l.ext ? COLOR.gold : 'none'} strokeWidth="1" />
+            <text x={left} y={y} fontFamily="monospace" fontSize="10" fill={COLOR.text}>{l.text}</text>
+          </g>
+        );
+      })}
+      <DCaption x={width / 2} y={top + lines.length * lineH + 14} text="MSH is always first and declares its own delimiters: | fields, ^ components, ~ repeats, & subcomponents" />
+      <DCaption x={width / 2} y={top + lines.length * lineH + 30} text="NTE attaches a note to the segment above it; a Z-segment (like ZPI) is a site- or vendor-specific extension" />
+      <DCaption x={width / 2} y={top + lines.length * lineH + 46} text="On the wire, MLLP frames it: <VT> the message above <FS><CR> — a separate batch file format wraps many messages in BHS/BTS instead" />
+    </svg>
+  );
+}
+
+function DiagramHl7v2MessageTypeFlow() {
+  return (
+    <svg viewBox="0 0 360 210" style={{ width: '100%', height: 'auto' }}>
+      <DBox x={10} y={20} w={130} h={40} label="EHR" sub="ordering system" />
+      <DBox x={220} y={20} w={130} h={40} label="Lab / Pharmacy" sub="filler system" />
+      <DLine x1={140} y1={34} x2={220} y2={34} />
+      <text x={180} y={30} textAnchor="middle" fill={COLOR.text} fontSize="9">ORM (order)</text>
+      <DLine x1={220} y1={96} x2={140} y2={96} />
+      <text x={180} y={92} textAnchor="middle" fill={COLOR.text} fontSize="9">ORU (result: OBR + OBX)</text>
+      <text x={180} y={54} textAnchor="middle" fill={COLOR.muted} fontSize="8">ACK: AA / AE / AR</text>
+      <line x1={140} y1={48} x2={220} y2={48} stroke={COLOR.border} strokeWidth="1" strokeDasharray="3 3" />
+      <line x1={220} y1={82} x2={140} y2={82} stroke={COLOR.border} strokeWidth="1" strokeDasharray="3 3" />
+      <text x={180} y={78} textAnchor="middle" fill={COLOR.muted} fontSize="8">ACK: AA / AE / AR</text>
+      <rect x={10} y={124} width={340} height={62} rx="8" fill="none" stroke={COLOR.border} strokeDasharray="4 3" />
+      <DCaption x={180} y={140} text="Same type-code + trigger-event + ACK pattern, other everyday feeds" />
+      <text x={70} y={164} textAnchor="middle" fill={COLOR.text} fontSize="9">ADT^A01/A02/A03</text>
+      <text x={70} y={178} textAnchor="middle" fill={COLOR.muted} fontSize="8">admit/transfer/discharge</text>
+      <text x={180} y={164} textAnchor="middle" fill={COLOR.text} fontSize="9">SIU^S12/S15</text>
+      <text x={180} y={178} textAnchor="middle" fill={COLOR.muted} fontSize="8">new/cancelled appointment</text>
+      <text x={290} y={164} textAnchor="middle" fill={COLOR.text} fontSize="9">DFT</text>
+      <text x={290} y={178} textAnchor="middle" fill={COLOR.muted} fontSize="8">billing charge/credit</text>
+      <DCaption x={180} y={200} text="AA confirms structural receipt only, not that downstream processing succeeded" />
+    </svg>
+  );
+}
+
+function DiagramFhirRestInteraction() {
+  return (
+    <svg viewBox="0 0 340 235" style={{ width: '100%', height: 'auto' }}>
+      <DBox x={10} y={16} w={110} h={40} label="Client app" />
+      <DBox x={220} y={16} w={110} h={40} label="FHIR server" />
+      <DLine x1={120} y1={30} x2={220} y2={30} />
+      <text x={170} y={26} textAnchor="middle" fill={COLOR.text} fontSize="8">GET /Observation?subject=</text>
+      <text x={170} y={35} textAnchor="middle" fill={COLOR.text} fontSize="8">Patient/123&amp;_include=Patient</text>
+      <DLine x1={220} y1={50} x2={120} y2={50} />
+      <text x={170} y={62} textAnchor="middle" fill={COLOR.muted} fontSize="8">200 OK: Bundle (type=searchset)</text>
+      <rect x={60} y={92} width={220} height={100} rx="8" fill="none" stroke={COLOR.border} strokeDasharray="4 3" />
+      <DCaption x={170} y={106} text="Bundle contents" />
+      <DBox x={75} y={116} w={100} h={40} label="Observation" sub="subject: Patient/123" />
+      <DBox x={195} y={116} w={70} h={40} label="Patient" sub="id: 123" />
+      <DLine x1={175} y1={136} x2={195} y2={136} />
+      <DCaption x={170} y={176} text="_include resolves the reference inline — no second round trip" />
+      <DCaption x={170} y={210} text="Before integrating, check the server's CapabilityStatement for supported resources/params" />
+    </svg>
+  );
+}
+
+function DiagramSmartOnFhirLaunchFlow() {
+  return (
+    <svg viewBox="0 0 300 230" style={{ width: '100%', height: 'auto' }}>
+      <DBox x={10} y={8} w={120} h={36} label="EHR launch" sub="from inside EHR session" />
+      <DBox x={170} y={8} w={120} h={36} label="Standalone launch" sub="app starts cold" />
+      <DLine x1={70} y1={44} x2={150} y2={88} />
+      <DLine x1={230} y1={44} x2={150} y2={88} />
+      <DBox x={90} y={88} w={120} h={40} label="Authorization server" sub="OAuth2" />
+      <DLine x1={150} y1={128} x2={150} y2={152} />
+      <DBox x={70} y={152} w={160} h={36} label="Access token + scope" sub="e.g. patient/Observation.read" />
+      <DLine x1={150} y1={188} x2={150} y2={200} />
+      <DBox x={60} y={200} w={180} h={26} label="FHIR API — only what the scope allows" />
+    </svg>
+  );
+}
+
+function DiagramIntegrationEngineHubSpoke() {
+  return (
+    <svg viewBox="0 0 370 220" style={{ width: '100%', height: 'auto' }}>
+      <DBox x={4} y={10} w={100} h={30} label="Lab system" />
+      <DBox x={4} y={50} w={100} h={30} label="Pharmacy" />
+      <DBox x={4} y={90} w={100} h={30} label="Registration" />
+      <DBox x={134} y={50} w={102} h={70} label="Integration engine" sub="route + transform (mapping)" />
+      <DLine x1={104} y1={25} x2={134} y2={65} />
+      <DLine x1={104} y1={65} x2={134} y2={85} />
+      <DLine x1={104} y1={105} x2={134} y2={105} />
+      <DBox x={266} y={10} w={100} h={30} label="EHR" />
+      <DBox x={266} y={50} w={100} h={30} label="Billing system" />
+      <DBox x={266} y={90} w={100} h={30} label="Patient portal" />
+      <DLine x1={236} y1={65} x2={266} y2={25} />
+      <DLine x1={236} y1={85} x2={266} y2={65} />
+      <DLine x1={236} y1={105} x2={266} y2={105} />
+      <line x1={185} y1={120} x2={185} y2={162} stroke={COLOR.gold} strokeWidth="1.3" strokeDasharray="4 3" />
+      <DBox x={110} y={162} w={150} h={36} label="Dead-letter queue" sub="after retries exhausted" />
+      <DCaption x={185} y={16} text="Hub-and-spoke: each system connects once, to the engine" />
+      <DCaption x={185} y={212} text="Store-and-forward retries first; only exhausted retries land here" />
+    </svg>
+  );
+}
+
+function DiagramMasterPatientIndexMatching() {
+  return (
+    <svg viewBox="0 0 360 230" style={{ width: '100%', height: 'auto' }}>
+      <DBox x={4} y={10} w={100} h={36} label="System A" sub="MRN 4471" />
+      <DBox x={130} y={10} w={100} h={36} label="System B" sub="ID 88231" />
+      <DBox x={256} y={10} w={100} h={36} label="System C" sub="PT-002" />
+      <DCaption x={180} y={58} text="Same real patient: Jane Doe, DOB 3/12/1980" />
+      <DLine x1={54} y1={46} x2={160} y2={90} />
+      <DLine x1={180} y1={46} x2={180} y2={90} />
+      <DLine x1={306} y1={46} x2={200} y2={90} />
+      <DBox x={110} y={90} w={140} h={40} label="Master Patient Index" sub="matches name, DOB, sex, address, IDs" />
+      <DLine x1={180} y1={130} x2={180} y2={150} />
+      <DBox x={110} y={150} w={140} h={30} label="Unified patient identity" />
+      <rect x={4} y={196} width={168} height={30} rx="7" fill="none" stroke={COLOR.gold} strokeWidth="1.2" />
+      <text x={88} y={214} textAnchor="middle" fill={COLOR.text} fontSize="8.5">Fragmented history: split, unlinked</text>
+      <rect x={188} y={196} width={168} height={30} rx="7" fill="none" stroke={COLOR.red} strokeWidth="1.2" />
+      <text x={272} y={214} textAnchor="middle" fill={COLOR.text} fontSize="8.5">Overlay error: two patients merged</text>
+    </svg>
+  );
+}
+
 const LESSON_DIAGRAMS = {
   serviceModels: DiagramServiceModels,
   hierarchy: DiagramHierarchy,
@@ -405,5 +545,11 @@ const LESSON_DIAGRAMS = {
   deploymentModels: DiagramDeploymentModels,
   scalingApproaches: DiagramScalingApproaches,
   dmzZones: DiagramDmzZones,
+  hl7v2MessageAnatomy: DiagramHl7v2MessageAnatomy,
+  hl7v2MessageTypeFlow: DiagramHl7v2MessageTypeFlow,
+  fhirRestInteraction: DiagramFhirRestInteraction,
+  smartOnFhirLaunchFlow: DiagramSmartOnFhirLaunchFlow,
+  integrationEngineHubSpoke: DiagramIntegrationEngineHubSpoke,
+  masterPatientIndexMatching: DiagramMasterPatientIndexMatching,
 };
 

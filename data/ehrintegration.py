@@ -1480,7 +1480,7 @@ LESSONS = [
         "id": "hl7v2-message-anatomy",
         "title": "HL7 v2 Message Anatomy",
         "summary": "How an HL7 v2 message is actually built -- segments, delimiters, versions, and the extension points vendors reach for in practice.",
-        "diagram": None,
+        "diagram": "hl7v2MessageAnatomy",
         "vocabIds": ["f1", "f8", "f35", "f38", "f39", "f40", "f41"],
         "quizIds": ["q1", "q6", "tf1", "tf11", "tf14", "q34", "q35", "q44"],
         "reading": """An HL7 v2 message is nothing more exotic than a block of plain text, but it follows a strict internal grammar. The message is built from segments -- each one a single line beginning with a three-letter code like MSH, PID, PV1, or OBX -- and the MSH segment always comes first, because it is the segment that defines everything else about how to read the rest of the message. Inside a segment, fields are separated by a pipe character, and within a field, components are split further by a caret, repeating values by a tilde, and subcomponents by an ampersand. Because these delimiters are declared inside the MSH segment's own encoding characters rather than fixed once and for all by the specification itself, an HL7 v2 message is, in a real sense, self-describing -- you have to read a few characters of the message before you can correctly parse the rest of it.
@@ -1505,7 +1505,7 @@ Structure is only half the picture; a message also has to actually get from one 
         "id": "hl7v2-message-types-acks",
         "title": "Core HL7 v2 Message Types & Acknowledgments",
         "summary": "ADT, ORM, ORU, SIU, and DFT message types, and how acknowledgments confirm -- or don't confirm -- successful delivery.",
-        "diagram": None,
+        "diagram": "hl7v2MessageTypeFlow",
         "vocabIds": ["f2", "f3", "f4", "f5", "f6", "f7", "f33"],
         "quizIds": ["q2", "q3", "q4", "q5", "q7", "tf2", "tf3", "msq1"],
         "reading": """Rather than one universal message format, HL7 v2 splits traffic into distinct message types, each identified by a three-character code in the MSH segment, so a receiving system knows immediately what kind of event it's looking at before it even parses the rest. ADT (Admit/Discharge/Transfer) is the most common of all: it carries patient demographic and encounter-status events, with a trigger event code after a caret spelling out exactly what happened -- A01 for an admit, A02 for a transfer, A03 for a discharge. Because so many ancillary systems (pharmacy, radiology, monitoring) need to stay in sync with where a patient currently is and what their status is, ADT traffic tends to be the highest-volume, most relied-upon feed in a hospital's interface inventory.
@@ -1530,7 +1530,7 @@ Every one of these messages gets a reply. After receiving a message, a receiving
         "id": "fhir-resource-model",
         "title": "FHIR Resources & the RESTful API Model",
         "summary": "How FHIR represents healthcare data as discrete resources, and the REST conventions used to read, search, and bundle them.",
-        "diagram": None,
+        "diagram": "fhirRestInteraction",
         "vocabIds": ["f9", "f10", "f11", "f18", "f42", "f43", "f44", "f46"],
         "quizIds": ["q8", "q9", "q10", "q29", "q30", "tf4", "tf12", "msq3"],
         "reading": """Where HL7 v2 sends one large message containing many pieces of data bundled together, FHIR (Fast Healthcare Interoperability Resources) takes the opposite approach: it models healthcare data as small, discrete resources, each with its own defined structure, that can be fetched, created, or updated independently. Patient carries demographics, Encounter represents a single visit or stay, Observation holds a vital sign, lab value, or other measurement, MedicationRequest represents a prescription order, and Condition and AllergyIntolerance round out the everyday clinical picture. Instead of parsing one big message end to end to find the one field you need, a FHIR client asks for exactly the resource type it wants.
@@ -1555,7 +1555,7 @@ Multiple resources traveling together get wrapped in a Bundle, itself a FHIR res
         "id": "smart-on-fhir-and-interop-rules",
         "title": "SMART on FHIR, Patient Access & Interoperability Rules",
         "summary": "How third-party apps get authorized into FHIR data, and the federal rules and data classes that shaped why FHIR adoption took off.",
-        "diagram": None,
+        "diagram": "smartOnFhirLaunchFlow",
         "vocabIds": ["f12", "f13", "f14", "f15", "f16", "f17", "f34", "f36", "f45"],
         "quizIds": ["q11", "q12", "q13", "q14", "q15", "tf5", "tf6", "msq4"],
         "reading": """A FHIR API by itself only defines how to read and write resources -- it says nothing about how a third-party application gets permission to do so in the first place. SMART on FHIR fills that gap with a standard OAuth2-based launch sequence: an app can either launch from inside the EHR's own session (EHR launch), inheriting context like which patient and clinician are already active, or launch entirely on its own (standalone launch), starting its own authorization from scratch. That standardized launch is what lets an app written once actually be installed into many different EHR systems without custom, per-vendor integration work, as long as both the app and the EHR implement the same specification.
@@ -1580,7 +1580,7 @@ A few more pieces round out the modern FHIR picture. Bulk FHIR (the export opera
         "id": "integration-engines-architecture-and-operations",
         "title": "Integration Engines: Architecture & Day-to-Day Operations",
         "summary": "How an integration engine routes and transforms messages, the topology it enables, and the failure modes teams monitor for in production.",
-        "diagram": None,
+        "diagram": "integrationEngineHubSpoke",
         "vocabIds": ["f19", "f20", "f21", "f22", "f23", "f24", "f25", "f26", "f47", "f48", "f49", "f50"],
         "quizIds": ["q16", "q17", "q19", "q20", "q31", "q32", "q39", "q40", "msq6", "msq13"],
         "reading": """An integration engine (also called an interface engine) sits in the middle of a hospital's system landscape, handling the routing, transformation, and delivery of messages between clinical systems rather than leaving every pair of systems to build a custom connection directly with each other. In a hub-and-spoke topology, every system connects once to the central engine (the hub), which then routes and transforms messages to whichever other systems (the spokes) actually need them -- dramatically cutting the number of connections to build and maintain compared to a fully point-to-point mesh, at the cost of concentrating risk in that one central hub if it goes down. The same physical connection gets described from each side's own point of view: what one system calls an outbound interface sending data out, the receiving system calls an inbound interface bringing data in -- an order transmitted out from the EHR to a pharmacy system is outbound from the EHR's perspective and inbound from the pharmacy's.
@@ -1607,7 +1607,7 @@ Two design patterns exist specifically to survive these failure modes gracefully
         "id": "healthcare-data-governance",
         "title": "Healthcare Data Governance & Real-World Practice",
         "summary": "Patient matching, HIPAA safeguards, consent rules, and the change-control discipline that keeps live interfaces safe.",
-        "diagram": None,
+        "diagram": "masterPatientIndexMatching",
         "vocabIds": ["f27", "f28", "f29", "f30", "f31", "f32", "f37", "f51", "f52", "f53"],
         "quizIds": ["q22", "q23", "q24", "q25", "q33", "q41", "q42", "q51", "tf9", "tf10"],
         "reading": """Patient matching is one of the highest-stakes problems in healthcare data governance, because so much of interoperability assumes that everyone agrees on which patient a given record actually belongs to. A Master Patient Index maintains a single, deduplicated identity record per patient across multiple systems, using matching algorithms on demographics -- name, date of birth, sex, address, identifiers -- to link records that represent the same real person even though each system assigns its own internal patient ID. Poor matching produces two very different but equally dangerous outcomes: a fragmented history, where one patient's records get split across multiple unlinked IDs, and an overlay error, where records for two different patients get incorrectly merged into one -- both are direct patient safety risks, not just an administrative annoyance.

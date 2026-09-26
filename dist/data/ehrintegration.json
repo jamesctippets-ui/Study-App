@@ -1528,7 +1528,7 @@
       "id": "hl7v2-message-anatomy",
       "title": "HL7 v2 Message Anatomy",
       "summary": "How an HL7 v2 message is actually built -- segments, delimiters, versions, and the extension points vendors reach for in practice.",
-      "diagram": null,
+      "diagram": "hl7v2MessageAnatomy",
       "vocabIds": [
         "f1",
         "f8",
@@ -1574,7 +1574,7 @@
       "id": "hl7v2-message-types-acks",
       "title": "Core HL7 v2 Message Types & Acknowledgments",
       "summary": "ADT, ORM, ORU, SIU, and DFT message types, and how acknowledgments confirm -- or don't confirm -- successful delivery.",
-      "diagram": null,
+      "diagram": "hl7v2MessageTypeFlow",
       "vocabIds": [
         "f2",
         "f3",
@@ -1620,7 +1620,7 @@
       "id": "fhir-resource-model",
       "title": "FHIR Resources & the RESTful API Model",
       "summary": "How FHIR represents healthcare data as discrete resources, and the REST conventions used to read, search, and bundle them.",
-      "diagram": null,
+      "diagram": "fhirRestInteraction",
       "vocabIds": [
         "f9",
         "f10",
@@ -1666,7 +1666,7 @@
       "id": "smart-on-fhir-and-interop-rules",
       "title": "SMART on FHIR, Patient Access & Interoperability Rules",
       "summary": "How third-party apps get authorized into FHIR data, and the federal rules and data classes that shaped why FHIR adoption took off.",
-      "diagram": null,
+      "diagram": "smartOnFhirLaunchFlow",
       "vocabIds": [
         "f12",
         "f13",
@@ -1714,7 +1714,7 @@
       "id": "integration-engines-architecture-and-operations",
       "title": "Integration Engines: Architecture & Day-to-Day Operations",
       "summary": "How an integration engine routes and transforms messages, the topology it enables, and the failure modes teams monitor for in production.",
-      "diagram": null,
+      "diagram": "integrationEngineHubSpoke",
       "vocabIds": [
         "f19",
         "f20",
@@ -1770,7 +1770,7 @@
       "id": "healthcare-data-governance",
       "title": "Healthcare Data Governance & Real-World Practice",
       "summary": "Patient matching, HIPAA safeguards, consent rules, and the change-control discipline that keeps live interfaces safe.",
-      "diagram": null,
+      "diagram": "masterPatientIndexMatching",
       "vocabIds": [
         "f27",
         "f28",
