@@ -1579,3 +1579,49 @@ MADLIBS = [
         'explanation': "Partners & Suppliers covers relationships with other organizations involved in service design/delivery/support. Information & Technology covers the technologies and information/knowledge used.",
     },
 ]
+
+SEQUENCES = [
+    {
+        'id': 'seq-itil-1',
+        'cat': 'valueSystem',
+        'prompt': "Put these steps in order according to ITIL's Continual Improvement Model.",
+        'steps': [
+            'What is the vision?',
+            'Where are we now?',
+            'Where do we want to be?',
+            'How do we get there?',
+            'Take action',
+            'Did we get there?',
+            'How do we keep the momentum going?',
+        ],
+        'explanation': "The Continual Improvement Model always starts with the big-picture vision, then assesses the current and desired states before planning and acting — assessing results and sustaining momentum only make sense once action has actually been taken.",
+    },
+    {
+        'id': 'seq-itil-2',
+        'cat': 'valueSystem',
+        'prompt': "Put these steps in order for handling a P1 incident per ITIL practice.",
+        'steps': [
+            'Log the incident',
+            'Categorize and prioritize the incident',
+            'Diagnose and investigate',
+            'Escalate to the appropriate resolver group if needed',
+            'Resolve and recover the service',
+            'Close the incident once the user confirms resolution',
+        ],
+        'explanation': "An incident has to be logged before it can be categorized/prioritized at all, and escalation happens during diagnosis when the first-line team can't resolve it alone — closure is always last, and specifically requires the user's confirmation, not just the fix being technically applied.",
+    },
+    {
+        'id': 'seq-itil-3',
+        'cat': 'valueSystem',
+        'prompt': "Put these steps in order for a standard change going through ITIL change enablement.",
+        'steps': [
+            'Submit a change request describing what and why',
+            'Assess the risk and impact of the proposed change',
+            'Obtain authorization from the change authority',
+            'Schedule and communicate the change',
+            'Implement the change',
+            'Review the change afterward to confirm it achieved its objective',
+        ],
+        'explanation': "Risk/impact assessment has to happen before authorization can be meaningfully granted — an authority approving blind, unassessed risk defeats the point of change enablement. The post-implementation review is what actually closes the loop on whether the change worked.",
+    },
+]

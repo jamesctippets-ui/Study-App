@@ -77,6 +77,15 @@ function CertStudyApp() {
   const [madlibSubmitted, setMadlibSubmitted] = useState(false);
   const [madlibScore, setMadlibScore] = useState({ correct: 0, total: 0 });
 
+  // Step-ordering / sequencing challenges (ROADMAP.md section 13) — only
+  // meaningful for tracks that ship SEQUENCES (AZ-104, AZ-305, ITIL,
+  // AZ-802 today).
+  const [seqSession, setSeqSession] = useState([]);
+  const [seqIndex, setSeqIndex] = useState(0);
+  const [seqWorkingOrder, setSeqWorkingOrder] = useState([]);
+  const [seqSubmitted, setSeqSubmitted] = useState(false);
+  const [seqScore, setSeqScore] = useState({ correct: 0, total: 0 });
+
   const [examTrack, setExamTrack] = useState(null);
   const [examSession, setExamSession] = useState([]);
   const [examAnswers, setExamAnswers] = useState({});
@@ -110,6 +119,7 @@ function CertStudyApp() {
   const flashcardsData = DATA[activeTrack].flashcards;
   const questionsData = DATA[activeTrack].questions;
   const madlibsData = DATA[activeTrack].madlibs || [];
+  const sequencesData = DATA[activeTrack].sequences || [];
   const trackResults = results[activeTrack] || {};
 
   // Applies a freshly-loaded (not user-edited) value to both the React
@@ -579,6 +589,62 @@ function CertStudyApp() {
     setMadlibSubmitted(false);
   };
 
+  // The Sequence sub-tab only exists for tracks with SEQUENCES — same
+  // fallback reasoning as Commands/Mad Libs above.
+  useEffect(() => {
+    if (quizView === 'sequence' && !sequencesData.length) setQuizView('questions');
+  }, [activeTrack, quizView]);
+
+  const startSequenceSession = () => {
+    const pool = activeCat === 'all' ? sequencesData : sequencesData.filter((s) => s.cat === activeCat);
+    setSeqSession(shuffleArray(pool));
+    setSeqIndex(0);
+    setSeqScore({ correct: 0, total: 0 });
+  };
+
+  useEffect(() => {
+    if (mode !== 'quiz' || quizView !== 'sequence') return;
+    startSequenceSession();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mode, quizView, activeTrack, activeCat]);
+
+  // Shuffles a fresh working order (as original-step indices) whenever the
+  // session changes or the index advances to the next item — a simple up/
+  // down move-button UI per ROADMAP.md's own scoping (no drag-and-drop
+  // dependency needed). Guards against the rare case a shuffle of a short
+  // list happens to land already-sorted, which would make the challenge
+  // trivially "already correct."
+  useEffect(() => {
+    const item = seqSession[seqIndex];
+    if (!item) return;
+    let order = shuffleArray(item.steps.map((_, i) => i));
+    if (order.length > 1 && order.every((v, i) => v === i)) order = [...order].reverse();
+    setSeqWorkingOrder(order);
+    setSeqSubmitted(false);
+  }, [seqSession, seqIndex]);
+
+  const moveSequenceStep = (position, direction) => {
+    if (seqSubmitted) return;
+    setSeqWorkingOrder((order) => {
+      const target = position + direction;
+      if (target < 0 || target >= order.length) return order;
+      const next = [...order];
+      [next[position], next[target]] = [next[target], next[position]];
+      return next;
+    });
+  };
+
+  const submitSequenceOrder = () => {
+    const item = seqSession[seqIndex];
+    if (!item) return;
+    const correct = checkSequenceOrder(seqWorkingOrder);
+    setSeqSubmitted(true);
+    recordResult(item.id, correct ? 'correct' : 'incorrect');
+    setSeqScore((s) => ({ correct: s.correct + (correct ? 1 : 0), total: s.total + 1 }));
+  };
+
+  const nextSequenceItem = () => setSeqIndex((i) => i + 1);
+
   const achievements = useMemo(() => evaluateAchievements(results, stats), [results, stats]);
 
   // Advance the daily streak once per load, after real data (local or cloud)
@@ -889,12 +955,13 @@ function CertStudyApp() {
         ...flashcardsData.filter((f) => f.cat === c.key).map((f) => f.id),
         ...questionsData.filter((q) => q.cat === c.key).map((q) => q.id),
         ...madlibsData.filter((m) => m.cat === c.key).map((m) => m.id),
+        ...sequencesData.filter((s) => s.cat === c.key).map((s) => s.id),
       ];
       const correct = items.filter((id) => trackResults[id] === 'correct').length;
       map[c.key] = items.length ? correct / items.length : 0;
     });
     return map;
-  }, [trackResults, categories, flashcardsData, questionsData, madlibsData]);
+  }, [trackResults, categories, flashcardsData, questionsData, madlibsData, sequencesData]);
 
   // Logs one per-category mastery snapshot a day for whichever track is
   // actually open (not Home — there's no single "the" track there), so
@@ -1376,6 +1443,15 @@ function CertStudyApp() {
                 Mad Libs
               </button>
             )}
+            {sequencesData.length > 0 && (
+              <button
+                onClick={() => setQuizView('sequence')}
+                className="flex-1"
+                style={{ padding: '6px 2px', borderRadius: '8px', fontSize: '10.5px', fontWeight: 600, background: quizView === 'sequence' ? COLOR.surfaceRaised : 'transparent', color: quizView === 'sequence' ? COLOR.text : COLOR.muted }}
+              >
+                Sequence
+              </button>
+            )}
           </div>
         )}
 
@@ -1520,6 +1596,21 @@ function CertStudyApp() {
             onSubmit={submitMadlibAnswer}
             onNext={nextMadlibScenario}
             onRestart={startMadlibSession}
+          />
+        )}
+
+        {mode === 'quiz' && quizView === 'sequence' && (
+          <SequenceView
+            session={seqSession}
+            index={seqIndex}
+            score={seqScore}
+            categories={categories}
+            workingOrder={seqWorkingOrder}
+            onMove={moveSequenceStep}
+            submitted={seqSubmitted}
+            onSubmit={submitSequenceOrder}
+            onNext={nextSequenceItem}
+            onRestart={startSequenceSession}
           />
         )}
 

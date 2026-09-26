@@ -733,15 +733,30 @@ doesn't (and why it's still waiting).
   `results[trackKey]` map. Broader per-track coverage (beyond the 4
   tracks shipped) is open, same "started small, more can follow" pattern
   as CLI_CHALLENGES above.
-- [ ] **Step-ordering / sequencing challenges.** Shuffle the steps for a
-  stated goal — "stand up a compliant Azure VM," "triage a P1 incident per
-  ITIL," "onboard a new user with proper Conditional Access" — and have the
-  user arrange them into the right order. This is a strong fit for
-  AZ-104/AZ-305/ITIL/AZ-802, where procedure order is genuinely tested, not
-  just terminology. New data (e.g. `SEQUENCES`: `{prompt, steps: [...],
-  correctOrder}`); start with simple up/down move buttons for the UI (works
-  everywhere, no drag-and-drop dependency) and treat true drag-to-reorder
-  as a later enhancement, not a blocker.
+- [x] **Step-ordering / sequencing challenges.** Shipped as a "Sequence"
+  Quiz sub-tab (only shown for tracks with `SEQUENCES` content — AZ-104,
+  AZ-305, ITIL, and AZ-802 at launch, 3 challenges each): shuffle the
+  steps for a stated goal — deploying a VM behind a load balancer,
+  designing an isolated landing zone, the ITIL Continual Improvement
+  Model, promoting a domain controller — and arrange them back into the
+  right order with simple up/down move buttons per row (`SequenceView`
+  in 04_shared_ui.jsx) — no drag-and-drop dependency, exactly per this
+  item's own scoping; true drag-to-reorder stays a later enhancement,
+  not a blocker. Data shape ended up simpler than originally sketched:
+  `{id, cat, prompt, steps: [...], explanation}` with `steps` authored
+  already in correct order — the UI shuffles a working copy and tracks
+  it as an array of original indices, so checking correctness
+  (`checkSequenceOrder` in 03_helpers.js) is just "is this array already
+  [0,1,...,n-1]," with no separate `correctOrder` field needed. A
+  shuffle that happens to land already-sorted (rare, small lists) is
+  detected and reversed so the challenge is never trivially "already
+  correct." Scored all-or-nothing per sequence, same as Mad Libs, and
+  feeds into `results`/mastery the same way (`trackMastery`/
+  `masteryByCategory` fold in sequence ids too). `build.py` validates
+  unique ids (shared namespace with flashcards/questions/madlibs, since
+  they all write into the same `results[trackKey]` map), valid
+  categories, non-empty prompt/explanation, and a `steps` list of at
+  least 3 unique, non-empty entries.
 - [ ] **Stretch, lower priority — build-your-own-scenario.** Instead of only
   solving developer-authored sequences, let the user assemble their own
   scenario from a bank of steps as a self-test/review tool. Since the app

@@ -95,6 +95,15 @@ function checkCliAnswer(challenge, input) {
   return 'incorrect';
 }
 
+// Step-ordering challenges (ROADMAP.md section 13) store `steps` in their
+// correct order; the UI shuffles a working copy and tracks it as an array
+// of ORIGINAL indices (e.g. [2,0,1] means "3rd step first, 1st step
+// second, 2nd step last"). Correct iff that array is already [0,1,...,n-1]
+// — i.e. every step ended up back in its original position.
+function checkSequenceOrder(workingOrder) {
+  return workingOrder.every((originalIndex, position) => originalIndex === position);
+}
+
 function formatTime(totalSeconds) {
   const m = Math.floor(totalSeconds / 60);
   const s = totalSeconds % 60;
@@ -227,7 +236,7 @@ function parseHash(hash, validTrackKeys) {
   const [trackKey, mode, sub] = parts;
   if (!validTrackKeys.has(trackKey)) return { mode: 'home' };
   if (mode === 'learn') return { mode: 'learn', trackKey, learnView: ['cards', 'study', 'sheet'].includes(sub) ? sub : 'study' };
-  if (mode === 'quiz') return { mode: 'quiz', trackKey, quizView: ['questions', 'match', 'verbal', 'commands', 'madlibs'].includes(sub) ? sub : 'questions' };
+  if (mode === 'quiz') return { mode: 'quiz', trackKey, quizView: ['questions', 'match', 'verbal', 'commands', 'madlibs', 'sequence'].includes(sub) ? sub : 'questions' };
   if (mode === 'exam') return { mode: 'exam', trackKey };
   return { mode: 'home' };
 }
@@ -549,11 +558,16 @@ function trackMastery(trackKey, results) {
   const mod = DATA[trackKey];
   if (!mod) return 0;
   const trackResults = results[trackKey] || {};
-  // Mad Libs scenarios feed into mastery the same as flashcards/questions
-  // (each scored all-or-nothing — every blank right, or it counts as one
-  // miss — see submitMadlibAnswer in 06_app.jsx); CLI/PowerShell command
-  // practice deliberately does NOT (see ROADMAP.md section 4's reasoning).
-  const ids = [...mod.flashcards.map((f) => f.id), ...mod.questions.map((q) => q.id), ...(mod.madlibs || []).map((m) => m.id)];
+  // Mad Libs and step-ordering both feed into mastery the same as
+  // flashcards/questions (each scored all-or-nothing — see
+  // submitMadlibAnswer/submitSequenceOrder in 06_app.jsx); CLI/PowerShell
+  // command practice deliberately does NOT (see ROADMAP.md section 4).
+  const ids = [
+    ...mod.flashcards.map((f) => f.id),
+    ...mod.questions.map((q) => q.id),
+    ...(mod.madlibs || []).map((m) => m.id),
+    ...(mod.sequences || []).map((s) => s.id),
+  ];
   if (!ids.length) return 0;
   const correct = ids.filter((id) => trackResults[id] === 'correct').length;
   return Math.round((correct / ids.length) * 100);

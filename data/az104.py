@@ -1560,3 +1560,45 @@ MADLIBS = [
         'explanation': "NSG rules process in ascending priority order (lowest number first); the first matching rule wins and evaluation stops there — a classic AZ-104 trap when a lower-priority-number deny rule shadows a higher-priority-number allow rule.",
     },
 ]
+
+SEQUENCES = [
+    {
+        'id': 'seq-az104-1',
+        'cat': 'compute',
+        'prompt': "Put these steps in order for deploying a new Azure VM behind a load balancer for the first time.",
+        'steps': [
+            'Create a resource group',
+            'Create a virtual network and subnet',
+            'Create the load balancer and its backend pool',
+            "Create the VM and add its NIC to the backend pool",
+            'Configure health probes and load-balancing rules',
+        ],
+        'explanation': "The resource group and network have to exist before anything can be placed inside them; the load balancer and its backend pool need to exist before a VM's NIC can join that pool; health probes/rules come last since they depend on the backend pool already having members to check.",
+    },
+    {
+        'id': 'seq-az104-2',
+        'cat': 'identityGov',
+        'prompt': "Put these steps in order for granting a new employee access to a specific resource group using RBAC, following least privilege.",
+        'steps': [
+            "Confirm the user's identity exists in Microsoft Entra ID",
+            'Identify the least-privileged built-in role that covers the required tasks',
+            "Navigate to the target resource group's Access control (IAM)",
+            'Add a role assignment scoping the chosen role to that resource group',
+            "Verify access by having the user attempt the task",
+        ],
+        'explanation': "You can't assign a role to an identity that doesn't exist yet, and picking the role BEFORE going to IAM keeps the assignment intentional rather than picking whatever's convenient once you're already in the blade. Verifying afterward closes the loop instead of assuming the assignment worked.",
+    },
+    {
+        'id': 'seq-az104-3',
+        'cat': 'monitoring',
+        'prompt': "Put these steps in order for recovering a deleted Azure VM's data from a Recovery Services vault backup.",
+        'steps': [
+            'Open the Recovery Services vault containing the backup',
+            'Select the backup item for the deleted VM',
+            "Choose 'Restore VM' and pick the desired recovery point",
+            'Configure the restore configuration (create new VM or restore disks only)',
+            'Trigger the restore and monitor the job until it completes',
+        ],
+        'explanation': "You have to locate the vault and the specific backup item before you can pick a recovery point, and the restore configuration (new VM vs. disks-only) has to be chosen before the restore job can actually be kicked off.",
+    },
+]

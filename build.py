@@ -205,6 +205,29 @@ def validate():
                 if placeholder not in blank_keys_seen:
                     errors.append(f"[{key}] MADLIBS '{mlid}' scenario references placeholder '{{{placeholder}}}' with no matching blank")
 
+        sequences = getattr(mod, "SEQUENCES", [])
+        for sq in sequences:
+            sqid = sq.get("id")
+            if not sqid:
+                errors.append(f"[{key}] a SEQUENCES entry is missing an 'id'")
+            elif sqid in item_ids:
+                errors.append(f"[{key}] duplicate id '{sqid}' (sequence shares an id with a flashcard/question/madlib)")
+            else:
+                item_ids.add(sqid)
+            if sq.get("cat") not in cat_keys:
+                errors.append(f"[{key}] SEQUENCES '{sqid}' references unknown category '{sq.get('cat')}'")
+            if not sq.get("prompt", "").strip():
+                errors.append(f"[{key}] SEQUENCES '{sqid}' is missing a non-empty 'prompt'")
+            if not sq.get("explanation", "").strip():
+                errors.append(f"[{key}] SEQUENCES '{sqid}' is missing a non-empty 'explanation'")
+            steps = sq.get("steps")
+            if not isinstance(steps, list) or len(steps) < 3:
+                errors.append(f"[{key}] SEQUENCES '{sqid}' needs a 'steps' list with at least 3 entries")
+            elif any(not isinstance(s, str) or not s.strip() for s in steps):
+                errors.append(f"[{key}] SEQUENCES '{sqid}' has an empty step")
+            elif len(steps) != len(set(steps)):
+                errors.append(f"[{key}] SEQUENCES '{sqid}' has duplicate step text")
+
         cli_challenges = getattr(mod, "CLI_CHALLENGES", [])
         cli_ids_seen = set()
         for c in cli_challenges:
@@ -263,6 +286,7 @@ def build_track_data():
             **({"cheatSheet": mod.CHEAT_SHEET} if hasattr(mod, "CHEAT_SHEET") else {}),
             **({"cliChallenges": mod.CLI_CHALLENGES} if hasattr(mod, "CLI_CHALLENGES") else {}),
             **({"madlibs": mod.MADLIBS} if hasattr(mod, "MADLIBS") else {}),
+            **({"sequences": mod.SEQUENCES} if hasattr(mod, "SEQUENCES") else {}),
         }
         for key, mod in TRACK_MODULES.items()
     }

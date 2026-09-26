@@ -1628,5 +1628,47 @@
       ],
       "explanation": "Get-WinEvent is the modern replacement for Get-EventLog and works with both classic and newer structured (ETW) event logs \u2014 -MaxEvents caps how many entries come back, newest first."
     }
+  ],
+  "sequences": [
+    {
+      "id": "seq-az802-1",
+      "cat": "adDs",
+      "prompt": "Put these steps in order for promoting a new Windows Server to be an additional domain controller in an existing AD DS domain.",
+      "steps": [
+        "Install the Active Directory Domain Services role",
+        "Run the AD DS configuration wizard and choose 'Add a domain controller to an existing domain'",
+        "Specify the domain and supply credentials with sufficient privilege",
+        "Configure DNS and Global Catalog options",
+        "Complete the promotion and reboot the server"
+      ],
+      "explanation": "The role has to be installed before the configuration wizard exists to run at all \u2014 and the wizard needs the target domain and privileged credentials before it can present DNS/Global Catalog options, since those options depend on knowing which domain you're joining."
+    },
+    {
+      "id": "seq-az802-2",
+      "cat": "hybridWorkloads",
+      "prompt": "Put these steps in order for setting up hybrid identity sync between on-premises AD DS and Microsoft Entra ID.",
+      "steps": [
+        "Prepare on-premises AD DS (clean up duplicate/invalid attributes)",
+        "Install Microsoft Entra Connect on a member server",
+        "Configure sync rules and select which OUs to sync",
+        "Run the initial synchronization",
+        "Verify users and groups appear correctly in Microsoft Entra ID"
+      ],
+      "explanation": "Skipping AD cleanup is the single most common real-world cause of sync errors, so it has to happen first. Sync rules/OU scope must be configured before the initial sync runs, or the first sync pushes the wrong (or everything) up to Entra ID."
+    },
+    {
+      "id": "seq-az802-3",
+      "cat": "storage",
+      "prompt": "Put these steps in order for setting up a highly available file server using Windows Failover Clustering.",
+      "steps": [
+        "Install the Failover Clustering feature on each node",
+        "Validate the cluster configuration",
+        "Create the cluster",
+        "Add shared storage to the cluster",
+        "Configure the File Server role as a clustered role",
+        "Test failover between nodes"
+      ],
+      "explanation": "Cluster validation runs against nodes that already have the feature installed, and has to pass before creating the cluster is fully supported. The File Server role can't be configured as clustered until the cluster and its shared storage both already exist."
+    }
   ]
 }

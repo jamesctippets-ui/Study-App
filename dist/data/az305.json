@@ -1411,5 +1411,47 @@
         "When a requirement says \"minimize operational overhead,\" that pulls toward PaaS/serverless options over IaaS, unless another hard requirement rules that out."
       ]
     }
+  ],
+  "sequences": [
+    {
+      "id": "seq-az305-1",
+      "cat": "infrastructure",
+      "prompt": "Put these steps in order for designing a landing zone that keeps a new workload network-isolated from other workloads.",
+      "steps": [
+        "Define a hub-and-spoke network topology",
+        "Create the hub VNet with shared services (firewall, VPN/ExpressRoute gateway)",
+        "Create a dedicated spoke VNet for the new workload",
+        "Peer the spoke VNet to the hub (not to other spokes)",
+        "Apply NSGs and route tables to enforce the isolation boundary"
+      ],
+      "explanation": "The topology decision comes first since it shapes everything after it; the hub has to exist before a spoke can peer to it, and peering spoke-to-hub only (never spoke-to-spoke) is exactly what keeps workloads isolated from each other by default."
+    },
+    {
+      "id": "seq-az305-2",
+      "cat": "businessContinuity",
+      "prompt": "Put these steps in order for implementing a disaster recovery strategy for a business-critical app with strict RTO/RPO requirements.",
+      "steps": [
+        "Define the required RTO and RPO with the business",
+        "Choose a DR pattern that meets those targets (e.g. active-passive with Azure Site Recovery)",
+        "Replicate the workload to the secondary region",
+        "Test failover regularly without impacting production",
+        "Document and rehearse the actual failover/failback runbook"
+      ],
+      "explanation": "You can't choose a DR pattern until you know the actual RTO/RPO targets it needs to hit \u2014 designing the technical solution before agreeing the requirement is a common real-world (and exam) trap. Regular testing and a written runbook come last since they validate the solution already built."
+    },
+    {
+      "id": "seq-az305-3",
+      "cat": "dataStorage",
+      "prompt": "Put these steps in order for migrating an on-premises SQL Server database to Azure with minimal downtime.",
+      "steps": [
+        "Assess the source database using Data Migration Assistant",
+        "Choose the migration target (Azure SQL Database, Managed Instance, or SQL on a VM)",
+        "Set up Azure Database Migration Service",
+        "Perform an initial full data migration",
+        "Enable continuous sync to keep the target updated",
+        "Cut over during a scheduled maintenance window and redirect the application"
+      ],
+      "explanation": "Assessment has to happen before you can commit to a target (some compatibility issues rule out certain targets entirely). Continuous sync after the initial migration is what actually enables a low-downtime cutover \u2014 without it, cutover would require a long final full copy while the app is offline."
+    }
   ]
 }

@@ -2490,6 +2490,114 @@ function MadLibsView({ session, index, score, categories, answers, onSetBlank, s
   );
 }
 
+// Step-ordering / sequencing challenges (ROADMAP.md section 13): shuffle
+// the steps for a stated procedure and have the user arrange them back
+// into the right order with simple up/down move buttons (drag-to-reorder
+// is a later enhancement, not a blocker, per the roadmap's own scoping).
+// Scored all-or-nothing per sequence and feeds into results/mastery the
+// same way Mad Libs does (see checkSequenceOrder in 03_helpers.js).
+function SequenceView({ session, index, score, categories, workingOrder, onMove, submitted, onSubmit, onNext, onRestart }) {
+  if (!session.length) {
+    return (
+      <div style={{ textAlign: 'center', color: COLOR.muted, fontSize: '13px', padding: '30px 10px' }}>
+        No step-ordering challenges match this filter.
+      </div>
+    );
+  }
+
+  const item = session[index];
+  if (!item) {
+    return (
+      <div style={{ textAlign: 'center', padding: '30px 10px' }}>
+        <div className="itil-display" style={{ fontSize: '16px', fontWeight: 600, marginBottom: '8px' }}>Set complete</div>
+        <div style={{ fontSize: '12.5px', color: COLOR.muted, marginBottom: '18px' }}>
+          {score.correct} / {score.total} sequence{score.total === 1 ? '' : 's'} in the exact right order.
+        </div>
+        <button onClick={onRestart} style={{ padding: '10px 20px', borderRadius: '12px', background: COLOR.primary, color: COLOR.onAccent, fontSize: '13px', fontWeight: 600 }}>
+          New set
+        </button>
+      </div>
+    );
+  }
+
+  const categoryLabel = categories.find((c) => c.key === item.cat)?.label;
+  const total = session.length;
+  const anyWrong = submitted && workingOrder.some((originalIdx, pos) => originalIdx !== pos);
+
+  return (
+    <div>
+      <div className="flex justify-between items-center mb-2" style={{ fontSize: '11px', color: COLOR.muted }}>
+        <span>{categoryLabel}</span>
+        <span>{index + 1} / {total}</span>
+      </div>
+      <div style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderRadius: '18px', padding: '20px' }}>
+        <div style={{ fontSize: '15px', lineHeight: 1.5, fontWeight: 500, marginBottom: '16px' }}>{item.prompt}</div>
+        <div className="flex flex-col gap-2">
+          {workingOrder.map((originalIdx, pos) => {
+            const isRight = submitted && originalIdx === pos;
+            return (
+              <div
+                key={originalIdx}
+                style={{
+                  display: 'flex', alignItems: 'center', gap: '10px', padding: '10px 12px', borderRadius: '12px',
+                  border: `1px solid ${submitted ? (isRight ? COLOR.success : COLOR.red) : COLOR.border}`,
+                  background: submitted ? (isRight ? 'rgba(52,211,153,0.12)' : 'rgba(181,87,74,0.12)') : COLOR.surfaceRaised,
+                }}
+              >
+                <span style={{ fontSize: '11px', fontWeight: 700, color: COLOR.muted, minWidth: '16px' }}>{pos + 1}.</span>
+                <span style={{ flex: 1, fontSize: '13.5px', color: COLOR.text, lineHeight: 1.4 }}>{item.steps[originalIdx]}</span>
+                {!submitted && (
+                  <div className="flex" style={{ gap: '2px', flexShrink: 0 }}>
+                    <button
+                      onClick={() => onMove(pos, -1)}
+                      disabled={pos === 0}
+                      style={{ width: '30px', height: '30px', borderRadius: '8px', border: `1px solid ${COLOR.border}`, background: 'transparent', color: pos === 0 ? COLOR.border : COLOR.primary, fontSize: '13px' }}
+                    >
+                      ▲
+                    </button>
+                    <button
+                      onClick={() => onMove(pos, 1)}
+                      disabled={pos === workingOrder.length - 1}
+                      style={{ width: '30px', height: '30px', borderRadius: '8px', border: `1px solid ${COLOR.border}`, background: 'transparent', color: pos === workingOrder.length - 1 ? COLOR.border : COLOR.primary, fontSize: '13px' }}
+                    >
+                      ▼
+                    </button>
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+        {submitted && (
+          <div style={{ marginTop: '16px', paddingTop: '14px', borderTop: `1px solid ${COLOR.border}` }}>
+            {anyWrong && (
+              <div style={{ fontSize: '12px', color: COLOR.muted, marginBottom: '8px', lineHeight: 1.5 }}>
+                Correct order: {item.steps.map((s, i) => `${i + 1}. ${s}`).join('  ')}
+              </div>
+            )}
+            <div style={{ fontSize: '12.5px', color: COLOR.muted, lineHeight: 1.5 }}>{item.explanation}</div>
+          </div>
+        )}
+      </div>
+      {!submitted ? (
+        <button
+          onClick={onSubmit}
+          style={{ width: '100%', marginTop: '14px', padding: '12px', borderRadius: '12px', background: COLOR.primary, color: COLOR.onAccent, fontSize: '14px', fontWeight: 600 }}
+        >
+          Check
+        </button>
+      ) : (
+        <button
+          onClick={onNext}
+          style={{ width: '100%', marginTop: '14px', padding: '12px', borderRadius: '12px', background: COLOR.primary, color: COLOR.onAccent, fontSize: '14px', fontWeight: 600 }}
+        >
+          {index + 1 >= total ? 'Finish' : 'Next'}
+        </button>
+      )}
+    </div>
+  );
+}
+
 function QuestionView({ q, selected, onChoose, onNext, index, total, categoryLabel, badgeLabel, msPending, onToggleMs, onSubmitMs, nextLabel, hideMeta, hideNext, flashcardsData }) {
   const [activeTermKey, setActiveTermKey] = useState(null);
   useEffect(() => { setActiveTermKey(null); }, [q && q.id]);

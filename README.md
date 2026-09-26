@@ -301,6 +301,14 @@ flashcard front/back. Unlike Verbal Quiz and Commands above, this one
 per scenario — every blank right, or it counts as one miss, the same
 logic the app's multi-select questions already use).
 
+Tracks with `SEQUENCES` content (AZ-104, AZ-305, ITIL, and AZ-802 today)
+get a **Sequence** sub-tab: shuffle the steps for a stated real-world
+procedure — deploying a VM behind a load balancer, designing an isolated
+landing zone, the ITIL Continual Improvement Model — and arrange them
+back into the right order with simple up/down move buttons (no drag-
+and-drop needed). Also feeds mastery %/results the normal way, scored
+all-or-nothing per sequence.
+
 **Fifteen tracks, all visible in the track switcher:**
 - **AZ-900** (Azure Fundamentals) — full course content, 106 questions.
 - **AB-650** (M365 & AI Services Administrator) — full question bank (52
