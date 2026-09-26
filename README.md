@@ -240,10 +240,10 @@ bottom:
   badge if you've set one (red if overdue, gold inside a week), and a
   tap takes you straight into it. Every cert after it in your path is a
   compact numbered row with the same tap-to-study action. A
-  "Manage path ›" link opens the same reorder/schedule/add/remove/mark-
-  passed panel this always had (still the only place you edit the path
-  itself) — Home is for seeing your path and jumping into it, not
-  editing it. The **readiness prediction** below (`stats.readinessHistory`
+  the header's hamburger button (see below) opens the same reorder/
+  schedule/add/remove/mark-passed panel this always had (still the only
+  place you edit the path itself) — Home is for seeing your path and
+  jumping into it, not editing it. The **readiness prediction** below (`stats.readinessHistory`
   logs one score snapshot a day per track; `readinessProjection` draws a
   straight line through the oldest and newest snapshots to estimate how
   many days of study, at that pace, would cross the 80% mark — e.g. "At
@@ -286,9 +286,15 @@ path listed first (numbered, same order as Home), every other track
 below it, current track highlighted. Picking one always lands you on
 Learn for that track — Quiz/Exam session state isn't built to survive an
 `activeTrack` swap mid-session, so this sidesteps that instead of risking
-it. The small ☰ button next to it (titled "Home") still takes you all the
-way back to the Home dashboard — a real navigation destination, not a
-bottom-sheet overlay. Navigation is also real client-side routing, not
+it.
+
+The top-left corner of the header is now consistent everywhere: a ☰
+button (titled "Manage cert path") always opens `CertPathPanel` directly
+— in every mode, including Home itself, since editing your path is just
+as relevant there. Next to it, a house icon only appears once you've left
+Home, and does what ☰ used to do: takes you all the way back to the Home
+dashboard — a real navigation destination, not a bottom-sheet overlay.
+Navigation is also real client-side routing, not
 just in-memory state: the URL hash always reflects where you are
 (`#/az900/quiz/questions`, `#/home`), so the browser's back/forward
 buttons walk through actual

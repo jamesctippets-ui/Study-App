@@ -1154,6 +1154,21 @@ specifically (still open).
     smoke test's toggle-click would've closed it instead of opening it;
     added an `ensureTrackListOpen` helper plus new sections covering the
     header switcher and the inline path section.
+- [x] **Follow-up: header corner cleanup — hamburger opens Manage Path,
+  a dedicated Home icon sits next to it.** The ☰ icon used to just be a
+  "go to Home" shortcut (only shown once you'd left Home), and "Manage
+  path" only existed as a text link inside Home's `CertPathHomeSection`
+  — two different corners doing two different jobs. Now the corner is
+  consistent everywhere: ☰ (titled "Manage cert path") always opens
+  `CertPathPanel` directly, in every mode including Home itself, since
+  editing your path is just as relevant from Home as from a track; a new
+  house icon (`IconHome`, added alongside the other Feather-style icons
+  in 00_preamble.js) sits next to it and only shows when you're not
+  already on Home, doing exactly what ☰ used to do. `CertPathHomeSection`
+  no longer needs its own "Manage path ›" link or an `onOpenCertPath`
+  prop threaded through `HomeView` — removed both now that there's a
+  single, always-available entry point. `full_smoke.js` extended to
+  cover the hamburger opening the panel from both Learn and Home.
 
 ---
 

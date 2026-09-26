@@ -473,23 +473,16 @@ function readinessProjectionMessage(projection, trackLabel) {
   return `Keep practicing ${trackLabel} over a few more days to get a readiness projection.`;
 }
 
-// The app's landing screen — shown on every load instead of auto-resuming
-// the last track+mode, so there's always a real overview to start from
-// rather than dropping straight back into whatever you were doing. The
-// full track list lives in a collapsed-by-default dropdown (no
-// path-grouping — just every track once, mastery % included) rather than
-// always taking up the whole page, since Question of the Day/Daily Vocab/
-// readiness now share the space. Reachable again from any track's Learn/
-// Quiz/Exam view via the header's Home button.
 // The consolidated "your path" view on Home itself — replaces the old
 // single-line teaser card that just linked out to CertPathPanel. The first
 // (not-yet-completed) entry gets the full "up next" hero treatment
 // (mastery, readiness, scheduled date, a Study button); every entry after
 // it is a compact row with the same actions in less space. Reordering,
-// scheduling, adding, and marking complete all still live in
-// CertPathPanel (opened via "Manage path" here) rather than being
-// duplicated inline — this view is for seeing and jumping, not editing.
-function CertPathHomeSection({ pathOrder, results, seenLog, certPlan, onSelectTrack, onOpenCertPath }) {
+// scheduling, adding, and marking complete all still live in CertPathPanel
+// — opened from the header's hamburger button now (available from any
+// mode, not just Home) rather than duplicated inline here — this view is
+// for seeing and jumping, not editing.
+function CertPathHomeSection({ pathOrder, results, seenLog, certPlan, onSelectTrack }) {
   const [next, ...rest] = pathOrder;
   const nextAccent = trackAccent(next.key);
   const nextScheduled = certPlan.scheduled[next.key];
@@ -499,12 +492,7 @@ function CertPathHomeSection({ pathOrder, results, seenLog, certPlan, onSelectTr
 
   return (
     <div className="mb-4">
-      <div className="flex justify-between items-center" style={{ marginBottom: '8px' }}>
-        <span style={{ fontSize: '12px', color: COLOR.muted, fontWeight: 600 }}>Your cert path ({pathOrder.length})</span>
-        <button onClick={onOpenCertPath} className="btn-flat" style={{ fontSize: '11.5px', color: COLOR.primary, background: 'transparent', padding: '2px 4px' }}>
-          Manage path ›
-        </button>
-      </div>
+      <div style={{ fontSize: '12px', color: COLOR.muted, fontWeight: 600, marginBottom: '8px' }}>Your cert path ({pathOrder.length})</div>
 
       <button
         onClick={() => onSelectTrack(next.key)}
@@ -568,7 +556,15 @@ function CertPathHomeSection({ pathOrder, results, seenLog, certPlan, onSelectTr
   );
 }
 
-function HomeView({ tracks, results, seenLog, stats, certPlan, onResume, onSelectTrack, onAddToPath, onOpenAbout, onOpenGlossary, onOpenCertPath, onSetGoalTarget, onAnswerDailyQuestion, onRevealDailyVocab }) {
+// The app's landing screen — shown on every load instead of auto-resuming
+// the last track+mode, so there's always a real overview to start from
+// rather than dropping straight back into whatever you were doing. Leads
+// with the user's own cert path (CertPathHomeSection) once they have one,
+// or the full track browser if they don't yet — see each's own comment
+// for that split. Reachable again from any track's Learn/Quiz/Exam view
+// via the header's home icon; the header's hamburger (Manage cert path)
+// is reachable from every mode including this one.
+function HomeView({ tracks, results, seenLog, stats, certPlan, onResume, onSelectTrack, onAddToPath, onOpenAbout, onOpenGlossary, onSetGoalTarget, onAnswerDailyQuestion, onRevealDailyVocab }) {
   const masteries = tracks.map((t) => ({ track: t, pct: trackMastery(t.key, results) }));
   const overallAvg = masteries.length ? Math.round(masteries.reduce((s, m) => s + m.pct, 0) / masteries.length) : 0;
   const lastVisited = stats.lastVisited;
@@ -628,7 +624,6 @@ function HomeView({ tracks, results, seenLog, stats, certPlan, onResume, onSelec
           seenLog={seenLog}
           certPlan={certPlan}
           onSelectTrack={onSelectTrack}
-          onOpenCertPath={onOpenCertPath}
         />
       ) : (
         <div className="mb-4">

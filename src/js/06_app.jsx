@@ -1284,19 +1284,30 @@ function CertStudyApp() {
         <div className="max-w-md mx-auto px-4" style={{ paddingTop: '14px', paddingBottom: '14px' }}>
           <div className="flex justify-between items-start">
             <div style={{ flex: 1, minWidth: 0, position: 'relative', paddingRight: '10px' }}>
-              {mode !== 'home' && (
+              <div className="flex items-center" style={{ gap: '4px', marginBottom: '2px' }}>
                 <button
-                  onClick={() => setMode('home')}
-                  title="Home"
+                  onClick={() => setShowCertPath(true)}
+                  title="Manage cert path"
                   style={{
                     display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: '26px', height: '26px',
-                    borderRadius: '8px', border: 'none', background: 'transparent', color: COLOR.muted,
-                    marginBottom: '2px', padding: 0,
+                    borderRadius: '8px', border: 'none', background: 'transparent', color: COLOR.muted, padding: 0,
                   }}
                 >
                   <IconMenu />
                 </button>
-              )}
+                {mode !== 'home' && (
+                  <button
+                    onClick={() => setMode('home')}
+                    title="Home"
+                    style={{
+                      display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: '26px', height: '26px',
+                      borderRadius: '8px', border: 'none', background: 'transparent', color: COLOR.muted, padding: 0,
+                    }}
+                  >
+                    <IconHome />
+                  </button>
+                )}
+              </div>
               {mode === 'home' ? (
                 <React.Fragment>
                   <div className="itil-display" style={{ fontSize: '21px', fontWeight: 600, lineHeight: 1.2 }}>Cert Study Hub</div>
@@ -1376,7 +1387,6 @@ function CertStudyApp() {
             onAddToPath={addToCertPath}
             onOpenAbout={() => setShowAbout(true)}
             onOpenGlossary={() => setShowGlossary(true)}
-            onOpenCertPath={() => setShowCertPath(true)}
             onSetGoalTarget={setDailyGoalTarget}
             onAnswerDailyQuestion={answerDailyQuestion}
             onRevealDailyVocab={revealDailyVocab}
