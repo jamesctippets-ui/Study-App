@@ -1706,7 +1706,7 @@
       "id": "ai-workload-security",
       "title": "Compute & AI Workload Security",
       "summary": "VM and container encryption, AKS and App Service hardening, Microsoft Entra Agent ID, Foundry agent governance, and Copilot data protection.",
-      "diagram": null,
+      "diagram": "agentIdentityGovernance",
       "vocabIds": [
         "f23",
         "f24",
@@ -1766,7 +1766,7 @@
       "id": "security-posture-ops",
       "title": "Security Posture & Monitoring",
       "summary": "Defender for Cloud plans and posture tools, Sentinel data connectors and analytics, automation and playbooks, and hybrid/multicloud coverage.",
-      "diagram": null,
+      "diagram": "defenderSentinelPipeline",
       "vocabIds": [
         "f36",
         "f37",
