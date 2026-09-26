@@ -438,6 +438,7 @@ QUESTIONS = [
         ],
         'correct': 2,
         'explanation': "A pooled host pool can have multiple application groups, including a Desktop app group and one or more RemoteApp groups, but Microsoft specifically recommends against assigning the same users both a RemoteApp and a Desktop app group from the same host pool due to icon duplication and confusion. It is not technically blocked, just discouraged.",
+        'whyTested': "This tests whether you know the difference between 'technically unsupported' and 'technically possible but Microsoft recommends against it' — AVD exam questions frequently offer a hard technical-limitation answer as a distractor specifically to catch anyone who assumes every design mistake must be a hard platform block rather than a best-practice guideline.",
     },
     {
         'id': 'q4',
@@ -480,6 +481,7 @@ QUESTIONS = [
         ],
         'correct': 1,
         'explanation': "RDP Shortpath for managed networks establishes a direct UDP transport between client and session host when there is direct line-of-sight connectivity, such as over a VPN or ExpressRoute, bypassing the Gateway relay. RDP Shortpath for public networks is instead meant for clients with no such direct connectivity, using STUN/TURN-based NAT traversal.",
+        'whyTested': "Shortpath for managed networks and Shortpath for public networks solve the same latency problem through two different mechanisms, and AZ-140 likes testing whether you can identify which one applies from the network topology described in the scenario — VPN/ExpressRoute line-of-sight versus an open-internet client with no direct path — rather than just recognizing 'Shortpath' as the answer in isolation.",
     },
     {
         'id': 'q7',
@@ -522,6 +524,7 @@ QUESTIONS = [
         ],
         'correct': 0,
         'explanation': "A workspace is the logical container that groups multiple application groups together for publishing, giving users one unified feed across everything they are assigned. A Log Analytics workspace is an unrelated monitoring resource with a similar name, a common exam distractor.",
+        'whyTested': "This question is testing name-collision awareness as much as AVD architecture — 'workspace' means something completely different in the AVD publishing model than it does in Azure Monitor, and the exam plants a Log Analytics workspace as a distractor specifically to catch anyone pattern-matching on the word rather than the concept it actually refers to in this context.",
     },
     {
         'id': 'q10',
@@ -606,6 +609,7 @@ QUESTIONS = [
         ],
         'correct': 2,
         'explanation': "Both the Azure Virtual Desktop and Windows Cloud Login enterprise apps typically need to be targeted together for Conditional Access to be enforced consistently across the web client and the RDP protocol's own authentication step used by the native client. Targeting only one of the two can leave a gap for the other.",
+        'whyTested': "AZ-140 uses this question shape to test whether you know AVD has two separate authentication surfaces — the web/feed-discovery path and the native RDP client's own sign-in step — since a Conditional Access policy that looks complete after covering the obvious app can still leave a real, hard-to-notice gap for whichever client uses the other one.",
     },
     {
         'id': 'q16',
@@ -620,6 +624,7 @@ QUESTIONS = [
         ],
         'correct': 3,
         'explanation': "Screen capture protection actively blocks a session's content from being captured by screenshot or screen-recording tools on the client, which directly addresses the described concern. Watermarking only deters by visibly marking the session; it does not technically block a capture the way screen capture protection does.",
+        'whyTested': "Screen capture protection and watermarking sound like two flavors of the same control, so this question specifically tests whether you know one actively blocks a capture technically while the other only deters and creates an audit trail — a distinction that matters a lot once you notice the question asks for something that prevents capture, not something that just discourages it.",
     },
     {
         'id': 'q17',
@@ -1522,6 +1527,7 @@ It's worth being clear on what a customer is actually responsible for versus wha
             'There is no separate per-user Azure Virtual Desktop access license — a qualifying Windows or Microsoft 365 license already grants that entitlement.',
         ],
         'scenario': "A call center wants 200 agents doing identical, non-persistent work to share a pool of Windows 11 Enterprise multi-session VMs as cheaply as possible, while a handful of developers need a persistent desktop with locally installed tools that survive between sessions. The admin builds a pooled host pool with depth-first load balancing for the call center agents, so autoscale can deallocate emptied hosts overnight, and a separate personal host pool with direct assignment for the developers, pre-assigning each one a dedicated VM before their first sign-in. Both host pools' application groups are published through one shared workspace, so every user — agent or developer — sees only what they're entitled to in a single feed.",
+        'onTheJob': "Depth-first versus breadth-first sounds like a minor toggle in the portal, but getting it backwards is a classic cause of an autoscale bill that never drops overnight, since breadth-first spreads sessions across every host and leaves nothing actually empty to deallocate. The 'don't publish RemoteApp and Desktop from the same host pool to the same users' guidance exists because someone, somewhere, shipped duplicate Start menu icons to a whole call center and spent a week fielding confused help-desk tickets about it. Managing images through Azure Compute Gallery sounds like process overhead until the first time a bad image update needs to be rolled back fleet-wide, at which point having versioned images instead of one hand-built golden image is the difference between a five-minute fix and a weekend.",
     },
     {
         'id': 'networking-storage-capacity-planning',
@@ -1547,6 +1553,7 @@ On the cost side, Azure Hybrid Benefit lets an organization apply an existing on
             'Windows 10/11 multi-session VM compute is not eligible for Azure Hybrid Benefit\'s per-core discount — the real multi-session savings levers are autoscale and Reserved Instances/Savings Plans.',
         ],
         'scenario': "A 3,000-user deployment needs the lowest possible FSLogix profile latency and is willing to manage a dedicated delegated subnet for it, so the team chooses Azure NetApp Files over a simpler Azure Files share. Branch staff connect over the corporate VPN with direct line-of-sight to the Azure virtual network, so RDP Shortpath for managed networks is enabled to avoid relaying every packet through the Gateway. Session hosts are sized for a 'medium' user profile based on Microsoft's published tables, with the max session limit tuned so hosts fill to a safe level before autoscale — running depth-first — brings another host online, and the whole multi-session fleet leans on autoscale and Reserved Instances rather than Azure Hybrid Benefit, which doesn't apply to multi-session compute anyway.",
+        'onTheJob': "FSLogix profile corruption is one of the single most common AVD help-desk tickets in real deployments, and it almost always traces back to a container that hit its default 30 GB size limit and silently dropped the user into a temporary profile with no obvious error message. RDP Shortpath's dependence on real line-of-sight connectivity means it quietly fails to establish for a subset of remote users nobody budgeted time to test, and diagnosing that gap after the fact is a lot more work than validating the network path before rollout. Choosing Azure NetApp Files over a simpler Azure Files share often gets revisited after go-live once real login-storm latency numbers come in worse than the sizing tables predicted, which is when the extra delegated-subnet setup suddenly looks worth it.",
     },
     {
         'id': 'identity-and-security-for-avd',
@@ -1572,6 +1579,7 @@ Least-privilege thinking extends down to the session host's local accounts too. 
             'Session hosts never need a public IP or an inbound internet-facing RDP rule — they only ever initiate an outbound connection to the AVD service.',
         ],
         'scenario': "A hospital deploys Microsoft Entra-joined session hosts with no on-premises Active Directory at all, and configures Microsoft Entra Kerberos so FSLogix profiles still work against an Azure Files share. To meet a compliance mandate, it enables both screen capture protection (to actually block screenshot tools) and session watermarking (to deter and trace any photo taken of the screen) on the host pool, while acknowledging that a clinician using their own phone's camera can still defeat both. A Conditional Access policy requiring a compliant device is scoped to both the Azure Virtual Desktop and Windows Cloud Login apps, so the requirement holds whether a user connects through the web client or the native Windows client over RDP, and help-desk staff are limited to the Desktop Virtualization Session Host Operator role rather than full Contributor rights.",
+        'onTheJob': "Conditional Access policies scoped only to the Azure Virtual Desktop app are a genuinely common gap in real deployments, discovered when someone realizes the native RDP client's separate Windows Cloud Login authentication was never actually covered by the MFA requirement everyone assumed was enforced everywhere. Screen capture protection and watermarking get sold to compliance teams as a complete solution, but the honest conversation with a real client is that neither one stops someone photographing the screen with their own phone, and setting that expectation upfront avoids an awkward audit finding later. Windows LAPS adoption for session hosts is usually less about following best practice and more about a help-desk team that got tired of one shared local admin password across every pooled VM and wanted rotation without a manual tracking spreadsheet.",
     },
     {
         'id': 'user-environments-profiles-and-apps',
@@ -1597,6 +1605,7 @@ Two more delivery concerns round out the user experience: Teams media optimizati
             'A GPU-enabled multi-session host still shares one physical GPU across every concurrent session on it — GPU capacity planning matters as much as vCPU/RAM sizing.',
         ],
         'scenario': "A hospital's shared nursing-station host pool needs a licensed imaging application visible only to the radiology department, Outlook and OneDrive data roaming fully with each clinician while the rest of the profile stays small, and Teams calls that don't degrade as more clinicians sign in during a shift change. The admin layers FSLogix Application Masking on top of the imaging app (already installed in the shared image) scoped to the radiology group, configures a separate Office Container for Outlook/OneDrive data alongside a deliberately trimmed Profile Container, and enables Teams media optimization so call audio and video process on each clinician's own device instead of competing for session host resources.",
+        'onTheJob': "MSIX app attach gets pitched as the answer to every application delivery problem, until someone hits a legacy line-of-business installer with no MSIX package and realizes Win32 deployment or baking it into the golden image are the only real options left. Forgetting that language packs have to be baked into the image before generalization is a mistake that usually only surfaces after a whole new pool of session hosts goes live missing a language a department specifically asked for. GPU capacity planning for a shared multi-session host is easy to underestimate in practice, since teams size for vCPU and RAM carefully and then get blindsided when several concurrent graphics-heavy sessions on the same host all compete for one physical GPU.",
     },
     {
         'id': 'monitoring-maintenance-and-scaling',
@@ -1620,6 +1629,7 @@ Before patching or other maintenance, drain mode marks a session host so it stop
             'Scheduled agent updates control only the AVD agent/side-by-side stack timing — Windows OS patching still needs Azure Update Manager, WSUS, or Configuration Manager.',
         ],
         'scenario': "An admin notices a spike in failed sign-ins and, after confirming diagnostic settings are already flowing into a Log Analytics workspace, filters the WVDConnections and WVDCheckpoints tables by CorrelationId to find that a specific batch of failures is stalling at the gateway stage rather than the session host. Before rolling out a fix that requires a reboot, they enable drain mode on the affected hosts so currently connected users can finish their work, wait for sessions to clear naturally, then patch through Azure Update Manager. Separately, the pooled host pool's autoscale plan is tuned with a lower capacity threshold so ramp-up reacts before hosts fill completely, while MinimumNumberOfRDSH keeps at least two hosts running around the clock as a floor.",
+        'onTheJob': "Azure Monitor for AVD showing an empty workbook is a genuinely common first-week surprise, since enabling the dashboard and actually turning on the diagnostic settings feeding it are two separate steps that are easy to think are the same thing. Drain mode gets used as if it instantly clears a host for patching, but in practice an admin still has to actively message or wait out the already-connected users, and skipping that step is how a maintenance window turns into an unplanned outage for whoever was mid-session. Capacity threshold and MinimumNumberOfRDSH tuning is rarely right on the first attempt — most real autoscale plans get adjusted after a morning login storm outpaces ramp-up, or after finance flags a bill that never drops overnight because the floor was set too high.",
     },
 ]
 
