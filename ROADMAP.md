@@ -235,12 +235,31 @@ come up.
   reps, due}`) in src/js/03_helpers.js's `nextSrsEntry`/`orderBySrs`, applied
   to Cards-mode ordering only — "mastery %" itself is still a lifetime ratio,
   unchanged; this only changes review order, not how mastery is scored.
-- [ ] Confidence-based review (rate 1–5 instead of binary correct/incorrect),
+- [x] Confidence-based review (rate 1–5 instead of binary correct/incorrect),
   the mechanic Brainscape is built around, as an alternative to the current
-  flashcard rating.
-- [ ] Per-category trend-over-time (not just a current-snapshot mastery bar),
-  and a resurfaced "missed question history" beyond the current one-shot
-  missed-question queue.
+  flashcard rating. Shipped as a real change to `nextSrsEntry`, not just a
+  UI relabel: it's now the textbook SM-2 quality scale (1 = total blank,
+  5 = instant no-hesitation recall) rather than a bolted-on 1-5 skin over
+  binary correct/incorrect — a 3+ grows the interval by the standard ease
+  formula (a 5 nudges ease up more than a bare-pass 3), and anything under
+  3 resets it. Deliberately did NOT thread the 1-5 scale into mastery %,
+  achievements, or exam readiness — those are shared with quiz questions'
+  real right/wrong signal, and reworking that into a 1-5-aware average
+  everywhere would have been a much bigger, riskier change than the rating
+  UI itself needed. `ratingToOutcome` (03_helpers.js) is the one seam: a
+  3+ counts as "correct" for mastery purposes, same threshold as the SRS
+  growth branch, so the two systems agree on what "knew it" means.
+- [x] Per-category trend-over-time (not just a current-snapshot mastery
+  bar). Shipped as `stats.categoryMasteryHistory` — one self-correcting
+  daily snapshot per track per category (capped to 30 entries, same
+  pattern as the exam-readiness history above), recorded while a track's
+  Learn/Quiz/Exam view is open. The weighted-mastery breakdown at the
+  bottom of those views now shows each category's % *and* its change
+  since the oldest recorded snapshot (e.g. "+8% / 6d"), spelled out as
+  visible text rather than only a hover tooltip — tooltips don't fire on
+  touch at all, so that was the only way this was ever going to be usable
+  on a phone. A resurfaced "missed question history" beyond the one-shot
+  missed-question queue is still open.
 
 ## 8. Light gamification (from research)
 
@@ -384,37 +403,70 @@ come up.
   one to reference. Continuing this in further batches is legitimate
   ongoing work, not a one-time fix.
 
-## 10. Future-proofing for a standalone web/iOS/Android app (user's idea — lowest priority, not being worked on)
+## 10. Future-proofing for a standalone web/iOS/Android app (user's idea)
 
 The user wants the option to eventually turn this into a real multi-platform
 product (own web deployment, iOS app, Android app), separate from its current
-life as a single generated HTML file synced via the Claude runtime. Nothing
-here should be built now — it's a set of architectural decisions to keep in
-mind so today's choices don't quietly foreclose that option later:
+life as a single generated HTML file synced via the Claude runtime. Originally
+scoped as "nothing here should be built now, just decisions to not foreclose
+it" — since revisited by explicit request to actually start on it, with one
+constraint carried over from that original framing: stay serverless. No new
+hosting, database, or accounts today; the items below are the ones that fit
+inside that constraint, plus the ones that explicitly don't (and why they're
+still waiting).
 
-- [ ] **The Claude-runtime cloud sync is the one non-portable piece.**
-  `window.claude.use('db')` (see src/js/06_app.jsx's persistence effect) only
-  exists inside a Claude artifact. A standalone app of any kind needs its own
-  backend for account-based sync — localStorage-only fallback already works
-  today and would keep working unmodified as the offline/no-account tier.
-- [ ] **Separate pure logic from rendering.** Achievement evaluation, streak
-  math, spaced-repetition scheduling, and scoring (currently in
-  src/js/03_helpers.js) are already plain JS functions with no DOM/React
-  dependency — that's the reusable "core" a React Native iOS/Android app
-  would want to share with the web app, so keep new logic in that same
-  dependency-free style rather than reaching into React state directly.
-- [ ] **Content as data, not baked-in JSON.** data/*.py currently gets
-  inlined into one HTML file at build time. A multi-client future wants that
-  content served from a fetchable endpoint (even a static JSON file per
-  track behind a CDN) so web/iOS/Android all read one source of truth instead
-  of each embedding a copy.
-- [ ] **A real package/module boundary.** The filename-concatenation build
-  (build.py sorting src/js/*.jsx) is fine for one static page; a shared
-  "core" package would need real npm module boundaries (even just ES
-  modules) once more than one client consumes it.
-- No action item here is worth taking today at the cost of the current
-  static-site simplicity — this section exists so a future rewrite reuses
-  the content and logic instead of starting over.
+- [x] **Separate pure logic from rendering.** Achievement evaluation, streak
+  math, spaced-repetition scheduling, and scoring in src/js/03_helpers.js
+  were already plain JS functions with no DOM/React dependency — with one
+  exception found on closer audit: `downloadJSON` (the progress-export
+  button) reached into `document`/`Blob`/`URL`, browser APIs a React
+  Native core wouldn't have. Moved it into `06_app.jsx` next to its one
+  call site (`doExport`), so 03_helpers.js is now genuinely 100%
+  platform-agnostic — the reusable "core" a future iOS/Android client
+  would want to share with the web app, not just mostly one.
+- [x] **Content as data, not baked-in JSON — additive, not yet live.**
+  `build.py` now also writes `dist/data/<track>.json` (plus a
+  `dist/data/tracks.json` manifest of `TRACKS`/`EXAM_CONFIG`) from the
+  exact same `data/*.py` source the inline bundle uses
+  (`build_track_data()` feeds both, so they can't drift apart). This is
+  deliberately scoped to the safe half of the idea: it proves the content
+  has a real, fetchable, per-track source of truth a future second
+  client could read, without touching how *this* app loads data today —
+  `index.html` still inlines everything up front exactly as before,
+  zero behavior change, zero regression risk. Actually switching this
+  app's own runtime to fetch `dist/data/*.json` lazily per track (instead
+  of inlining all 15 tracks whether you use them or not) is real, valuable
+  follow-on work — it would cut the initial payload substantially — but it
+  touches nearly every `DATA[activeTrack]` call site in the app for a
+  loading-state guard, which is a much larger, riskier change than fit
+  alongside everything else moving this session. Left for its own pass.
+- [x] **Made today's persistence layer actually more robust ("the backend
+  running smoothly," within the stay-serverless choice).** `saveLocal`
+  (03_helpers.js) silently swallowed every write failure — a full
+  localStorage quota, a private-browsing restriction — meaning progress
+  could simply stop saving with zero signal to the user. It now reports
+  success/failure, and `persistPayload` (06_app.jsx) surfaces a real
+  banner ("Your last save didn't go through...") when a write fails,
+  clearing automatically the next time one succeeds. This is the concrete
+  reliability work that fits under "run smoothly" without standing up a
+  server; the items below are what still needs one.
+- [ ] **The Claude-runtime cloud sync is the one non-portable piece, and
+  still is.** `window.claude.use('db')` (src/js/06_app.jsx's persistence
+  effect) only exists inside a Claude artifact. A standalone app of any
+  kind still needs its own backend for account-based sync — genuinely out
+  of scope for a serverless pass; the localStorage-only fallback keeps
+  working unmodified as the offline/no-account tier regardless.
+- [ ] **A real package/module boundary — still explicitly deferred.** The
+  filename-concatenation build (build.py sorting src/js/*.jsx) is fine
+  for one static page; real npm/ES module boundaries only pay for
+  themselves "once more than one client consumes it," per this section's
+  original framing — and there still isn't a second client yet, just the
+  standalone JSON now sitting there for one. Forcing real modules today
+  would also mean adding a JS build toolchain (Babel CLI or esbuild) this
+  project doesn't currently have — README's "Where things stand" section
+  already flags that as "a bigger call" needing its own justification,
+  not something to bundle in as a side effect of an architecture cleanup
+  pass. Revisit when an actual second client shows up.
 
 ## 11. More certification tracks (user's idea)
 
@@ -671,12 +723,14 @@ trading away for shinier but shallower ones.
   a broader "browse progress" purpose. Ties into the missing "trend over
   time" item already in section 7, which would need real per-attempt
   history rather than this timestamp-based proxy.
-- [ ] **Confidence-based self-rating for flashcards** (already listed in
-  section 7, resurfaced here because it's the most direct fix for a real
+- [x] **Confidence-based self-rating for flashcards** (already listed in
+  section 7 — shipped there, see that entry for the implementation).
+  Resurfaced here originally because it's the most direct fix for a real
   risk: streaks/badges can quietly reward speed-clicking through cards
-  over actually retaining them). Rating 1–5 instead of binary correct/
-  incorrect is more honest self-assessment and plugs straight into the
-  existing SM-2-style interval math.
+  over actually retaining them. Rating 1–5 instead of binary correct/
+  incorrect is more honest self-assessment, and now genuinely does plug
+  into real SM-2 interval math rather than just relabeling two buttons
+  as five.
 - [ ] **Retrieval-practice "blurting."** Before flipping a flashcard, ask
   the user to mentally (or literally, in a text box) recall the answer
   first — self-graded, no backend/grading needed, but the extra effortful
@@ -705,14 +759,29 @@ trading away for shinier but shallower ones.
   overdue to review come first" caption above Cards mode, shown only once
   there's actual SRS history for that track (so a brand-new deck doesn't
   show a meaningless caption on cards that have never been rated).
-- [ ] **Open design question, not a ticket yet: header density on small
-  phones.** The header currently stacks a hamburger, track name/subtitle,
-  mastery %, achievements, and settings into one row above the mode tabs.
-  It held together in this session's testing, but it's worth a real
-  on-device look (see LAUNCH_CHECKLIST.md's cross-device QA item) — if it
-  feels cramped, moving the primary Learn/Quiz/Exam switch to a bottom
-  tab bar (more thumb-reachable on a large phone) is worth considering
-  before it's a launch-day scramble.
+- [x] **Header tested across phone sizes and desktop — no breakage found,
+  one real cosmetic rough edge confirmed.** Actually verified via
+  Playwright at 320/360/390/428/768/1024/1280/1920px (not just eyeballed):
+  no horizontal overflow, no clipped/overlapping icons, and the centered
+  `max-w-md` column scales correctly up through desktop widths. Along the
+  way, testing surfaced and fixed a real bug, not just a density question
+  — switching mode/track/sub-tab left scroll position wherever the
+  previous view had it, which on a phone-width screen could mean landing
+  fully below the header after navigating away from a deeply-scrolled
+  Home. Fixed with a scroll-to-top-on-navigation effect in `06_app.jsx`,
+  forced to `behavior: 'instant'` since the page's global
+  `scroll-behavior: smooth` would otherwise animate it slowly enough to
+  be visible. The one remaining rough edge: a long track subtitle (e.g.
+  AB-650's "M365 & AI Services Administrator") wraps to 2-3 lines on a
+  320-360px-wide phone instead of clipping — nothing breaks or overlaps,
+  it just makes the header taller on the narrowest real devices. Left
+  as-is rather than truncating with an ellipsis, since that would hide
+  real information (exam codes, full product names) the subtitle exists
+  to show — a call worth making deliberately, not as a side effect of a
+  test pass, so flagging it here rather than just fixing it. Moving the
+  Learn/Quiz/Exam switch to a bottom tab bar remains a bigger, separate
+  redesign if this ever does feel cramped on a real device (see
+  LAUNCH_CHECKLIST.md's cross-device QA item).
 
 ## 15. Content ideas beyond quiz questions
 

@@ -7,10 +7,12 @@ proper Python source tree instead of one giant file.
 ## What's inside
 
 Three top-level tabs: **Learn**, **Quiz**, **Exam**. Learn holds two
-sub-views — Cards (flashcards, ordered by a simplified SM-2 spaced-repetition
-schedule — "Still learning" resurfaces a card sooner, "Got it" pushes its
-next appearance out by a growing interval; the order is computed fresh each
-time you enter a category/track rather than reshuffling mid-session) and Study
+sub-views — Cards (flashcards, ordered by a real SM-2 spaced-repetition
+schedule and rated on the same 1-5 confidence scale SM-2 was originally
+designed around — 1 "Blank" through 5 "Easy" — rather than a binary
+right/wrong; a 3+ resurfaces the card later by a growing interval, under
+3 resets it sooner. The order is computed fresh each time you enter a
+category/track rather than reshuffling mid-session) and Study
 (for tracks without a course, a flashcard list paginated one category/section
 at a time — Previous/Next section controls instead of one long scroll; for
 AZ-900/AZ-104, a full mini-course per topic: reading with tappable key terms,
@@ -74,7 +76,16 @@ days out, so a 90%-mastery track you haven't touched in two months reads
 as less exam-ready than the same 90% built this week. It's a more honest
 answer to "am I actually ready" than a percentage that never decays, and
 it needed no new data — just a different read on results/seenLog that are
-already recorded. Text-to-speech is available on readings and flashcards.
+already recorded. Every Learn/Quiz/Exam view for a track ends with a
+weighted-mastery breakdown (segment width matches the real exam's category
+emphasis) that also tracks **trend over time**, not just today's snapshot:
+`stats.categoryMasteryHistory` logs one self-correcting daily score per
+category, and once there are 2+ days of history each category line shows
+its change since the oldest recorded one (e.g. "+8% / 6d"), spelled out as
+visible text below the bar rather than only a hover tooltip — tooltips
+don't fire on a touch screen at all, so that was the only way this was
+ever going to be usable on a phone. Text-to-speech is available on
+readings and flashcards.
 
 A sliding switch in the top nav bar toggles between a dark-grey and an
 off-white theme — see "Light/dark theming" under Source layout for how it's
@@ -288,7 +299,18 @@ templates/
                             the assembled script
 build.py                  — reads data/ + src/js/, validates it, fills in the
                             template, writes index.html
+dist/data/                 — generated per-track JSON (<track>.json plus a
+                            tracks.json manifest) — see below
 ```
+
+`build.py` also writes each track's content out as its own standalone
+`dist/data/<track>.json` (built from the exact same source as the inline
+bundle, so the two can never drift apart), plus a `dist/data/tracks.json`
+manifest of `TRACKS`/`EXAM_CONFIG`. This is content-as-fetchable-data
+groundwork for a possible future second client (a separate web deployment,
+an iOS/Android app) — additive only: `index.html` still inlines everything
+up front exactly as it always has, so this changes nothing about how this
+app itself loads or behaves today.
 
 `build.py` is plain-stdlib Python (no pip installs needed). It also **validates the
 data** before building — every flashcard/question's `cat` must exist in that
@@ -413,6 +435,13 @@ whichever origin you're viewing it from. That fallback was built in from the sta
 specifically for this local-hosting case, so no code changes were needed to make it
 work outside Claude.ai — progress just won't sync between devices anymore, it'll
 stay wherever you're running it.
+
+A failed write (a full `localStorage` quota, a private-browsing restriction) used to
+fail completely silently — progress would just stop saving with no indication anything
+was wrong. It's now surfaced: a red banner ("Your last save didn't go through...")
+appears above the content the next time a save fails, and clears automatically the
+next time one succeeds, pointing you at Data & Progress → Export as the way to back up
+what you already have before troubleshooting further.
 
 ## Where things stand / ideas for Claude Code
 

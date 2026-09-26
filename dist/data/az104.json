@@ -1,0 +1,1853 @@
+{
+  "categories": [
+    {
+      "key": "identityGov",
+      "label": "Identity & Governance",
+      "marks": 24,
+      "resources": [
+        {
+          "label": "Microsoft Learn: Manage identities and governance in Azure",
+          "url": "https://learn.microsoft.com/en-us/training/paths/az-104-manage-identities-governance/"
+        }
+      ]
+    },
+    {
+      "key": "storage",
+      "label": "Storage",
+      "marks": 19,
+      "resources": [
+        {
+          "label": "Microsoft Learn: Implement and manage storage in Azure",
+          "url": "https://learn.microsoft.com/en-us/training/paths/az-104-manage-storage/"
+        }
+      ]
+    },
+    {
+      "key": "compute",
+      "label": "Compute",
+      "marks": 24,
+      "resources": [
+        {
+          "label": "Microsoft Learn: Deploy and manage Azure compute resources",
+          "url": "https://learn.microsoft.com/en-us/training/paths/az-104-manage-compute-resources/"
+        }
+      ]
+    },
+    {
+      "key": "networking",
+      "label": "Networking",
+      "marks": 19,
+      "resources": [
+        {
+          "label": "Microsoft Learn: Configure and manage virtual networks for Azure administrators",
+          "url": "https://learn.microsoft.com/en-us/training/paths/az-104-manage-virtual-networks/"
+        }
+      ]
+    },
+    {
+      "key": "monitoring",
+      "label": "Monitor & Maintain",
+      "marks": 14,
+      "resources": [
+        {
+          "label": "Microsoft Learn: Monitor and back up Azure resources",
+          "url": "https://learn.microsoft.com/en-us/training/paths/az-104-monitor-backup-resources/"
+        }
+      ]
+    }
+  ],
+  "flashcards": [
+    {
+      "id": "f1",
+      "cat": "identityGov",
+      "front": "Entra ID users and groups",
+      "back": "Creating and managing users, security groups, and Microsoft 365 groups. Dynamic group membership rules automatically add or remove members based on user or device attributes.",
+      "detail": "A dynamic group for every user whose department is \"Sales\" updates itself automatically as people move in and out."
+    },
+    {
+      "id": "f2",
+      "cat": "identityGov",
+      "front": "Group-based licensing",
+      "back": "Assigning a license to a group instead of individual users, so every current and future member automatically receives (or loses) that license.",
+      "detail": "This is why new employees added to an \"All Staff\" group can get licensed automatically without a manual step."
+    },
+    {
+      "id": "f3",
+      "cat": "identityGov",
+      "front": "External users (B2B)",
+      "back": "Inviting people from outside your organization as guests, who authenticate with their own existing identity rather than a new account you create for them.",
+      "detail": "External collaboration settings control who can invite guests and what guests can see once invited."
+    },
+    {
+      "id": "f4",
+      "cat": "identityGov",
+      "front": "Self-service password reset (SSPR)",
+      "back": "Lets users reset their own forgotten password without contacting the help desk, after registering authentication methods like a phone number or authenticator app.",
+      "detail": "This is the direct answer whenever a scenario is about reducing help desk password-reset tickets."
+    },
+    {
+      "id": "f5",
+      "cat": "identityGov",
+      "front": "RBAC scope and inheritance",
+      "back": "A role is assigned to a security principal at a scope \u2014 management group, subscription, resource group, or resource. Assignments are additive, and the most permissive applicable assignment wins.",
+      "detail": "If someone has Reader at the subscription and Contributor at one resource group, they have Contributor there and Reader everywhere else in that subscription."
+    },
+    {
+      "id": "f6",
+      "cat": "identityGov",
+      "front": "Owner vs. Contributor vs. Reader vs. User Access Administrator",
+      "back": "Owner: full access, plus can assign roles to others. Contributor: full access to manage resources, but cannot assign roles. Reader: view-only. User Access Administrator: manage others' access without managing the resources themselves.",
+      "detail": "The Owner-vs-Contributor distinction (can they grant access to others?) is one of the most commonly tested RBAC facts."
+    },
+    {
+      "id": "f7",
+      "cat": "identityGov",
+      "front": "Policy vs. initiative",
+      "back": "A policy is a single rule, like requiring a specific region. An initiative groups multiple related policies together so they can be assigned as one bundle, useful for compliance standards.",
+      "detail": "Think of an initiative as a policy 'playlist' \u2014 several individual rules assigned together."
+    },
+    {
+      "id": "f8",
+      "cat": "identityGov",
+      "front": "Governance recap at admin depth",
+      "back": "As an administrator you directly create and move resources between resource groups, and troubleshoot conflicts between inherited policy and RBAC assignments from higher scopes.",
+      "detail": "AZ-104 expects you to reason about real conflicts, not just define the terms the way AZ-900 does."
+    },
+    {
+      "id": "f9",
+      "cat": "identityGov",
+      "front": "Cost Management and budgets",
+      "back": "Set spending budgets with alert thresholds, and use Cost Analysis to break down spend by resource, tag, or service over time.",
+      "detail": "A budget alert doesn't stop spending by itself \u2014 it just notifies; stopping spend requires a separate automated action."
+    },
+    {
+      "id": "f10",
+      "cat": "storage",
+      "front": "Storage account types and performance tiers",
+      "back": "General-purpose v2 is the standard account type for most scenarios. Performance tiers are Standard (HDD-backed, cost-effective) and Premium (SSD-backed, for high-throughput, low-latency needs like disks).",
+      "detail": "Premium is the answer whenever a scenario stresses low latency or high transaction rates."
+    },
+    {
+      "id": "f11",
+      "cat": "storage",
+      "front": "Access keys vs. Shared Access Signature (SAS)",
+      "back": "Access keys grant full, unrestricted access to the entire storage account. A SAS grants limited, time-boxed, scoped access to specific resources or operations, without exposing the account key.",
+      "detail": "Whenever a scenario wants to share limited, temporary access with a third party, the answer is SAS, not an access key."
+    },
+    {
+      "id": "f12",
+      "cat": "storage",
+      "front": "Storage firewalls and network rules",
+      "back": "Restrict a storage account to specific virtual networks or IP address ranges, or allow trusted Microsoft services to bypass the firewall.",
+      "detail": "This is a network-level control, separate from identity-based access like RBAC or a SAS token."
+    },
+    {
+      "id": "f13",
+      "cat": "storage",
+      "front": "Blob lifecycle management",
+      "back": "Rules that automatically transition blobs between access tiers, like Hot to Cool to Archive, or delete them after a set number of days, based on last-modified or last-accessed time.",
+      "detail": "This is the automation answer whenever a scenario wants aging data to move to cheaper storage without manual intervention."
+    },
+    {
+      "id": "f14",
+      "cat": "storage",
+      "front": "Blob versioning vs. soft delete vs. snapshots",
+      "back": "Versioning automatically keeps prior versions when a blob is overwritten. Soft delete lets you recover a deleted blob within a retention window. A snapshot is a manual, read-only copy taken at a specific point in time.",
+      "detail": "Recovering an accidentally overwritten blob's prior content specifically calls for versioning, not soft delete."
+    },
+    {
+      "id": "f15",
+      "cat": "storage",
+      "front": "Azure Files vs. Blob storage",
+      "back": "Azure Files provides SMB or NFS file shares that can be mounted like a network drive. Blob storage holds unstructured object data accessed through REST or an SDK, not mounted as a drive.",
+      "detail": "If a scenario needs multiple VMs to mount and share the same drive, that's Azure Files, not Blob storage."
+    },
+    {
+      "id": "f16",
+      "cat": "storage",
+      "front": "Redundancy at admin depth: RA-GRS",
+      "back": "GRS replicates to a secondary region, but that data isn't readable during normal operation. RA-GRS (and RA-GZRS) additionally allow read access to the secondary region even before a failover.",
+      "detail": "If a scenario needs to actually read from the secondary region during normal operation, plain GRS isn't enough \u2014 it needs the read-access variant."
+    },
+    {
+      "id": "f17",
+      "cat": "storage",
+      "front": "Static website hosting",
+      "back": "A storage account can serve static website content, like HTML/CSS/JS, directly from Blob storage using a special $web container, without a separate web server.",
+      "detail": "This is the low-cost, serverless answer for hosting a purely static site."
+    },
+    {
+      "id": "f18",
+      "cat": "storage",
+      "front": "Migration and transfer tools recap",
+      "back": "AzCopy, Azure Storage Explorer, and Azure Migrate/Data Box, first introduced at the AZ-900 level, remain the core tools an administrator configures and runs for moving data into storage accounts.",
+      "detail": "AZ-104 expects you to actually configure and troubleshoot these tools, not just recognize their names."
+    },
+    {
+      "id": "f19",
+      "cat": "compute",
+      "front": "VM sizing and series",
+      "back": "VM size determines CPU, memory, and disk throughput. Series (like B, D, F) are optimized for different workloads: B for burstable/low-cost, D for general purpose, F for compute-optimized.",
+      "detail": "A burstable B-series VM is cheap but throttles sustained high CPU use \u2014 the wrong choice for a constantly busy server."
+    },
+    {
+      "id": "f20",
+      "cat": "compute",
+      "front": "Managed disks and disk types",
+      "back": "Managed disks are Azure-managed storage for a VM's OS or data, offered as Standard HDD, Standard SSD, Premium SSD, and Ultra Disk, from lowest to highest performance.",
+      "detail": "Ultra Disk allows configuring throughput and IOPS independently of disk size, for the most demanding workloads."
+    },
+    {
+      "id": "f21",
+      "cat": "compute",
+      "front": "Availability sets vs. zones vs. Scale Sets",
+      "back": "Availability set: distributes VMs across fault and update domains within one datacenter. Availability zone: spreads VMs across physically separate datacenters in a region. Scale Set: automatically adds or removes VM instances based on demand.",
+      "detail": "Only availability zones protect against a whole-datacenter failure \u2014 availability sets only spread risk within one."
+    },
+    {
+      "id": "f22",
+      "cat": "compute",
+      "front": "VM extensions and Custom Script Extension",
+      "back": "Small agents installed on a VM to perform post-deployment configuration tasks, like the Custom Script Extension automatically running a script right after provisioning.",
+      "detail": "This is the answer whenever a scenario wants configuration to happen automatically without manually logging into the VM."
+    },
+    {
+      "id": "f23",
+      "cat": "compute",
+      "front": "App Service plans and scaling",
+      "back": "An App Service plan defines the compute tier and region for one or more web apps. Scaling up changes the plan's tier or size; scaling out adds more instances of the same tier.",
+      "detail": "Scale up = bigger box. Scale out = more boxes. Both are configured on the App Service plan, not the individual app."
+    },
+    {
+      "id": "f24",
+      "cat": "compute",
+      "front": "Deployment slots",
+      "back": "Separate, swappable environments, like staging, for an App Service app, letting you validate a new version before swapping it into production with minimal downtime.",
+      "detail": "A swap exchanges the URLs/configuration between slots almost instantly, rather than redeploying code."
+    },
+    {
+      "id": "f25",
+      "cat": "compute",
+      "front": "Container Instances vs. Container Apps vs. AKS",
+      "back": "Container Instances run a single container quickly with no orchestration. Container Apps add serverless scaling and microservices features without managing a cluster. AKS gives full Kubernetes control.",
+      "detail": "As of the 2026 exam update, Container Apps sits alongside Container Instances as tested content, not just AKS."
+    },
+    {
+      "id": "f26",
+      "cat": "compute",
+      "front": "ARM templates vs. Bicep",
+      "back": "ARM templates are Azure's native JSON Infrastructure as Code format. Bicep is a newer, more concise language that compiles down to ARM JSON \u2014 functionally equivalent, but easier to read and write.",
+      "detail": "The 2026 exam update put more emphasis on Bicep over raw ARM JSON, reflecting real-world administrator practice."
+    },
+    {
+      "id": "f27",
+      "cat": "compute",
+      "front": "Resizing and moving VMs",
+      "back": "Resizing a running VM to a size unavailable on its current hardware cluster typically requires deallocating (stopping) the VM first, then resizing.",
+      "detail": "This trips people up because 'stopped' in the portal isn't the same as 'deallocated' \u2014 only deallocated VMs release their hardware allocation."
+    },
+    {
+      "id": "f28",
+      "cat": "networking",
+      "front": "VNets and subnets at admin depth",
+      "back": "As an administrator you create and size VNets and subnets, considering IP address space (CIDR) and the fact that Azure reserves 5 addresses in every subnet regardless of its size.",
+      "detail": "That reserved-address detail is a specific number the exam likes to test directly."
+    },
+    {
+      "id": "f29",
+      "cat": "networking",
+      "front": "Network Security Groups (NSGs)",
+      "back": "Filter inbound and outbound traffic to subnets or network interfaces using security rules with a priority, source, destination, port, and protocol. Lower priority number wins and is evaluated first.",
+      "detail": "A lower-numbered rule that allows traffic can still be overridden by an even-lower-numbered rule that denies it. Azure Firewall works at a broader, whole-VNet scope for the same general goal."
+    },
+    {
+      "id": "f30",
+      "cat": "networking",
+      "front": "VNet peering",
+      "back": "Connects two VNets directly, even across regions, with traffic staying on the Microsoft backbone. Peering is not transitive \u2014 peered VNets don't automatically reach each other's other peers.",
+      "detail": "If A is peered to B, and B is peered to C, A and C still cannot talk to each other without their own direct peering."
+    },
+    {
+      "id": "f31",
+      "cat": "networking",
+      "front": "Load Balancer vs. Application Gateway",
+      "back": "Azure Load Balancer works at layer 4 (TCP/UDP), distributing traffic by IP and port only. Application Gateway works at layer 7 (HTTP/HTTPS), and can route by URL path and terminate SSL centrally.",
+      "detail": "If a scenario needs to route by URL path, like /images vs /api, that's Application Gateway, not Load Balancer."
+    },
+    {
+      "id": "f32",
+      "cat": "networking",
+      "front": "Public vs. internal Load Balancer",
+      "back": "A public Load Balancer distributes internet traffic to backend resources. An internal (private) Load Balancer only distributes traffic within a VNet, never from the public internet.",
+      "detail": "An internal Load Balancer is the answer when a scenario needs load balancing purely between internal tiers, like web servers talking to app servers. A NAT Gateway solves the opposite problem \u2014 stable outbound-only internet access, not inbound distribution."
+    },
+    {
+      "id": "f33",
+      "cat": "networking",
+      "front": "Azure DNS and private DNS zones",
+      "back": "Azure DNS hosts public DNS zones, resolvable from the internet. Private DNS zones provide name resolution within one or more VNets, without exposing those records publicly.",
+      "detail": "Private DNS zones are the answer whenever internal name resolution shouldn't be visible outside the VNet \u2014 including resolving the normal hostname of a resource reached through a Private Endpoint."
+    },
+    {
+      "id": "f34",
+      "cat": "networking",
+      "front": "Network Watcher",
+      "back": "A suite of tools for monitoring and diagnosing network issues in Azure, including packet capture, IP flow verify (is a rule blocking traffic?), and connection troubleshoot.",
+      "detail": "IP flow verify specifically tells you whether an NSG rule is allowing or denying a particular flow of traffic."
+    },
+    {
+      "id": "f35",
+      "cat": "networking",
+      "front": "Azure Bastion",
+      "back": "Provides secure RDP or SSH access to VMs directly through the Azure portal, without exposing the VM's public IP or needing a separate VPN connection.",
+      "detail": "This is the answer whenever a scenario wants secure remote access to a VM without giving that VM a public IP."
+    },
+    {
+      "id": "f36",
+      "cat": "networking",
+      "front": "VPN Gateway vs. ExpressRoute, admin depth",
+      "back": "VPN Gateway is encrypted and travels over the public internet. ExpressRoute is private but not encrypted by default. Administrators configure gateway SKUs and connection types, like site-to-site or point-to-site.",
+      "detail": "Point-to-site connects an individual device to a VNet; site-to-site connects two whole networks together."
+    },
+    {
+      "id": "f37",
+      "cat": "monitoring",
+      "front": "Azure Monitor metrics vs. logs",
+      "back": "Metrics are lightweight numerical time-series data, like CPU percentage. Logs are detailed, queryable event and record data stored in a Log Analytics workspace.",
+      "detail": "Metrics answer 'how much' over time. Logs answer 'exactly what happened' with detail you can query."
+    },
+    {
+      "id": "f38",
+      "cat": "monitoring",
+      "front": "Alerts and action groups",
+      "back": "An alert rule triggers when a metric or log condition is met. An action group defines what happens next, like sending an email, an SMS, or running an Azure Function.",
+      "detail": "The alert rule is the trigger condition; the action group is the response \u2014 they're configured separately and linked together."
+    },
+    {
+      "id": "f39",
+      "cat": "monitoring",
+      "front": "Recovery Services vault and backup policies",
+      "back": "A Recovery Services vault stores backup data and manages backup policies, which define how often backups run and how long they're retained.",
+      "detail": "One vault can hold backup policies for multiple resource types, like VMs and file shares."
+    },
+    {
+      "id": "f40",
+      "cat": "monitoring",
+      "front": "Azure Site Recovery",
+      "back": "Replicates VMs to a secondary region for disaster recovery, enabling a failover of an entire workload if the primary region becomes unavailable.",
+      "detail": "Backup restores a point-in-time copy. Site Recovery fails over a running workload to keep it operating elsewhere."
+    },
+    {
+      "id": "f41",
+      "cat": "monitoring",
+      "front": "Log Analytics workspace and KQL",
+      "back": "A Log Analytics workspace collects log data from multiple resources. Kusto Query Language (KQL) is used to query that data for troubleshooting and reporting.",
+      "detail": "KQL is the specific query language name the exam expects you to recognize, even without writing complex queries yourself."
+    },
+    {
+      "id": "f42",
+      "cat": "monitoring",
+      "front": "Backup vs. Site Recovery, when to use each",
+      "back": "Backup protects against data loss, restoring a VM or file to a point in time. Site Recovery protects against a broader outage, failing over a whole workload to a secondary region.",
+      "detail": "A corrupted disk calls for Backup. A whole region going dark calls for Site Recovery."
+    },
+    {
+      "id": "f43",
+      "cat": "identityGov",
+      "front": "Resource locks (CanNotDelete vs. ReadOnly)",
+      "back": "A CanNotDelete lock blocks deletion while still allowing reads and configuration changes. A ReadOnly lock blocks both deletion and any modification, treating authorized users like they only have Reader access.",
+      "detail": "Locks apply regardless of RBAC role \u2014 even an Owner cannot delete a CanNotDelete-locked resource until the lock is removed."
+    },
+    {
+      "id": "f44",
+      "cat": "identityGov",
+      "front": "Microsoft Entra roles vs. Azure RBAC roles",
+      "back": "Microsoft Entra roles (like Global Administrator) control the identity plane \u2014 users, groups, licenses, tenant settings. Azure RBAC roles (like Owner) control the resource plane \u2014 VMs, storage, networking. A Global Administrator has no Azure resource access by default.",
+      "detail": "The 'elevate access' setting in Microsoft Entra ID properties is what grants a Global Administrator the Azure RBAC User Access Administrator role at the root scope, if tenant-wide resource access is needed."
+    },
+    {
+      "id": "f45",
+      "cat": "storage",
+      "front": "Storage data-plane RBAC roles",
+      "back": "Roles like Storage Blob Data Contributor, Reader, and Owner grant a user or managed identity direct access to blob data via Microsoft Entra ID authentication, without ever using an account key or a SAS token.",
+      "detail": "This is distinct from the control-plane Contributor role, which manages the storage account itself but does not automatically grant data access once key-based access is restricted."
+    },
+    {
+      "id": "f46",
+      "cat": "storage",
+      "front": "Immutable blob storage (WORM policies)",
+      "back": "Time-based retention and legal hold policies make blobs write-once-read-many: they cannot be modified or deleted by anyone, including the storage account Owner, until the retention period expires or the legal hold is removed.",
+      "detail": "This is the compliance answer whenever a scenario needs to prove data was never altered, not just backed up."
+    },
+    {
+      "id": "f47",
+      "cat": "compute",
+      "front": "Premium SSD v2",
+      "back": "A managed disk tier that, like Ultra Disk, lets you configure capacity, IOPS, and throughput independently \u2014 but with broader region/VM availability and typically lower cost than Ultra Disk.",
+      "detail": "Standard SSD and the original Premium SSD scale performance only as a side effect of the size tier chosen; v2 and Ultra Disk break that link."
+    },
+    {
+      "id": "f48",
+      "cat": "compute",
+      "front": "Azure Spot Virtual Machines",
+      "back": "VMs that run on Azure's unused capacity at a steep discount, but can be evicted with little warning when that capacity is needed elsewhere.",
+      "detail": "The right fit for interruptible workloads like batch processing or dev/test \u2014 never for anything requiring guaranteed uptime."
+    },
+    {
+      "id": "f49",
+      "cat": "networking",
+      "front": "Application Security Groups (ASGs)",
+      "back": "Group VM network interfaces by application role, like \"WebTier,\" so an NSG rule can reference the group as a source or destination instead of hardcoded IP addresses that change over time.",
+      "detail": "This is the answer whenever a scenario wants an NSG rule to keep working automatically as VMs in a role are added or removed."
+    },
+    {
+      "id": "f50",
+      "cat": "monitoring",
+      "front": "Azure Monitor Agent (AMA)",
+      "back": "The current, supported agent for collecting metrics and logs from VMs into Azure Monitor, configured through data collection rules. It replaced the legacy Log Analytics agent (MMA/OMS), retired in August 2024.",
+      "detail": "Any scenario describing a new deployment should use AMA \u2014 the old agent should be recognized as outdated, not chosen."
+    },
+    {
+      "id": "f51",
+      "cat": "monitoring",
+      "front": "Azure Update Manager",
+      "back": "A unified service for assessing OS patch compliance and scheduling recurring update installation windows across Windows and Linux VMs, including on-premises and multi-cloud machines connected via Arc.",
+      "detail": "This replaced the older, separate Update Management solution built on Log Analytics and Automation."
+    },
+    {
+      "id": "f52",
+      "cat": "identityGov",
+      "front": "Management group hierarchy",
+      "back": "Management groups sit above subscriptions in the scope hierarchy, letting you apply Azure Policy and RBAC assignments to many subscriptions at once instead of repeating them per subscription.",
+      "detail": "Combined with RBAC scope and inheritance, an assignment at a management group flows down to every subscription and resource group underneath it."
+    },
+    {
+      "id": "f53",
+      "cat": "networking",
+      "front": "Azure Firewall",
+      "back": "A managed, stateful network firewall for an entire VNet, filtering traffic by rules, FQDN tags, and threat intelligence feeds \u2014 broader in scope than a per-subnet NSG.",
+      "detail": "Where Network Security Groups (NSGs) filter traffic to a specific subnet or NIC, Azure Firewall centralizes filtering and logging for a whole hub VNet in a hub-and-spoke design."
+    },
+    {
+      "id": "f54",
+      "cat": "networking",
+      "front": "Private Endpoint",
+      "back": "Gives a PaaS resource (like a storage account or SQL database) a private IP address inside your VNet, so traffic to it never traverses the public internet.",
+      "detail": "Resolving that private IP correctly for the resource\u2019s normal hostname is exactly what Azure DNS and private DNS zones are for."
+    },
+    {
+      "id": "f55",
+      "cat": "networking",
+      "front": "NAT Gateway",
+      "back": "Provides a stable, shared public IP for outbound-only internet connections from resources in a subnet, without exposing them to inbound internet traffic.",
+      "detail": "Unlike a public Load Balancer, which handles inbound traffic to backend resources, a NAT Gateway only handles the outbound direction."
+    },
+    {
+      "id": "f56",
+      "cat": "compute",
+      "front": "Custom RBAC roles",
+      "back": "A JSON-defined role built from a specific set of allowed and denied actions, for when the built-in roles are either too broad or too narrow for what a team actually needs to do.",
+      "detail": "This builds on RBAC scope and inheritance \u2014 a custom role still gets assigned at a scope exactly the same way a built-in role does."
+    },
+    {
+      "id": "f57",
+      "cat": "compute",
+      "front": "Boot diagnostics",
+      "back": "Captures a VM's console output and a screenshot of its current screen state, letting an admin diagnose a VM that fails to boot or hangs during startup without needing an existing remote connection into it.",
+      "detail": "This is the first troubleshooting step for a VM that seems unreachable \u2014 it works even when RDP/SSH themselves are the thing that's broken, since it doesn't depend on the guest OS's network stack at all."
+    },
+    {
+      "id": "f58",
+      "cat": "identityGov",
+      "front": "Conditional Access",
+      "back": "A policy engine that evaluates signals at sign-in time \u2014 user, device, location, and risk \u2014 and applies a control in response, such as requiring MFA or blocking access outright, rather than every user getting the same static access rules.",
+      "detail": "This is layered on top of, not instead of, RBAC scope and inheritance \u2014 Conditional Access decides whether a sign-in is allowed to happen at all; RBAC decides what that signed-in identity can then do."
+    },
+    {
+      "id": "f59",
+      "cat": "compute",
+      "front": "ARM deployment modes: complete vs. incremental",
+      "back": "Incremental mode (the default) adds or updates resources in the template without touching anything else in the resource group. Complete mode deletes any resource in the resource group that isn't defined in the template being deployed.",
+      "detail": "Complete mode is the one that can silently delete resources someone else created by hand \u2014 a classic case for why ARM templates vs. Bicep deployments deserve a careful review, not a routine one."
+    },
+    {
+      "id": "f60",
+      "cat": "storage",
+      "front": "Disk snapshots",
+      "back": "A point-in-time, read-only copy of a managed disk, usable to create a new disk or VM from that captured state \u2014 separate from Blob versioning vs. soft delete vs. snapshots, which protects blob container data, not disks.",
+      "detail": "Managed disks and disk types get protected by disk snapshots (or Recovery Services vault and backup policies for a fuller backup solution); blob snapshots are a completely separate mechanism for a completely separate storage type."
+    }
+  ],
+  "questions": [
+    {
+      "id": "q1",
+      "cat": "identityGov",
+      "type": "mc",
+      "question": "An administrator wants a group's membership to automatically include every user whose department attribute is 'Sales,' without manually adding people.",
+      "options": [
+        "A dynamic group with a membership rule based on the department attribute",
+        "A security group with manual membership",
+        "A Microsoft 365 group with no rules",
+        "A resource group scoped to Sales"
+      ],
+      "correct": 0,
+      "explanation": "A dynamic group with a rule on the department attribute keeps membership current automatically as people join, leave, or change departments. A security group with manual membership requires someone to add and remove people by hand, a Microsoft 365 group with no rules is just as manual, and a resource group organizes Azure resources, not user accounts, so it plays no role here at all."
+    },
+    {
+      "id": "q2",
+      "cat": "identityGov",
+      "type": "mc",
+      "question": "A company wants new employees to automatically receive a Microsoft 365 E3 license the moment they're added to the 'All Employees' group.",
+      "options": [
+        "A dynamic group with no license attached",
+        "Group-based licensing",
+        "Self-service password reset",
+        "An RBAC role assignment"
+      ],
+      "correct": 1,
+      "explanation": "Group-based licensing assigns a license to a group so every current and future member automatically receives it, with no per-user action needed. A dynamic group with no license attached only handles membership, not licensing, itself -- it still needs group-based licensing layered on top. SSPR handles password resets, and an RBAC role assignment grants permissions over Azure resources, neither of which touches Microsoft 365 licensing."
+    },
+    {
+      "id": "q3",
+      "cat": "identityGov",
+      "type": "mc",
+      "question": "A contractor from a partner company needs temporary access to one SharePoint site, without your organization creating them a full internal account.",
+      "options": [
+        "Create them a standard internal user account",
+        "Invite them as a B2B external/guest user",
+        "Assign them the Owner role at the subscription",
+        "Add them to a dynamic group"
+      ],
+      "correct": 1,
+      "explanation": "A B2B guest invite lets the contractor sign in with their own existing identity, scoped to just the resources they're invited to, without your organization ever creating or managing a full internal account for them. Creating a standard internal account works but means provisioning and later deprovisioning a real identity for someone who isn't an employee. Assigning Owner at the subscription is wildly over-scoped for access to one SharePoint site, and a dynamic group only manages membership rules -- it doesn't grant an outside person any identity to be a member with in the first place."
+    },
+    {
+      "id": "q4",
+      "cat": "identityGov",
+      "type": "mc",
+      "question": "A user forgot their password at 2am and needs to get back into their account without contacting the help desk.",
+      "options": [
+        "A dynamic group",
+        "Self-service password reset (SSPR)",
+        "Conditional Access",
+        "An RBAC role assignment"
+      ],
+      "correct": 1,
+      "explanation": "SSPR lets a user verify their identity with pre-registered authentication methods (like a phone or authenticator app) and reset their own password without any help desk involvement, at 2am or any other time. A dynamic group and an RBAC role assignment are unrelated to password resets, and Conditional Access controls when/how sign-ins are allowed, but does not itself provide a self-service reset mechanism."
+    },
+    {
+      "id": "q5",
+      "cat": "identityGov",
+      "type": "mc",
+      "question": "A user is assigned Contributor at the subscription level and Owner at one specific resource group within it. What's their effective permission in that resource group?",
+      "options": [
+        "Contributor",
+        "Access is denied due to a role conflict",
+        "Reader",
+        "Owner"
+      ],
+      "correct": 3,
+      "explanation": "RBAC assignments are additive across scopes, and the more permissive assignment applies \u2014 Owner at that resource group wins there."
+    },
+    {
+      "id": "q6",
+      "cat": "identityGov",
+      "type": "mc",
+      "question": "Which built-in role lets someone manage who has access to resources, without letting them manage the resources themselves?",
+      "options": [
+        "Owner",
+        "Contributor",
+        "User Access Administrator",
+        "Reader"
+      ],
+      "correct": 2,
+      "explanation": "User Access Administrator can grant and revoke role assignments (who has access) but has no permissions over the resources themselves. Owner and Contributor both include full or near-full management of the resources, not just access, and Reader can view resources but cannot manage access or resources at all -- none of the other three isolate access management the way this scenario asks for."
+    },
+    {
+      "id": "q7",
+      "cat": "identityGov",
+      "type": "mc",
+      "question": "A company wants to enforce a tagging standard requiring both a CostCenter tag and an Environment tag, assigned together as a single bundle.",
+      "options": [
+        "An RBAC custom role",
+        "A single Azure Policy definition",
+        "An Azure Policy initiative",
+        "A management group with no policies"
+      ],
+      "correct": 2,
+      "explanation": "An initiative groups multiple related policy definitions so they can be assigned together as one bundle."
+    },
+    {
+      "id": "q8",
+      "cat": "identityGov",
+      "type": "mc",
+      "question": "An administrator assigns Reader at a management group and Contributor at a specific subscription beneath it. What's the effective access in that subscription?",
+      "options": [
+        "Owner",
+        "Contributor",
+        "Reader",
+        "No access"
+      ],
+      "correct": 1,
+      "explanation": "The more specific, more permissive assignment at the subscription level applies there, on top of the inherited Reader."
+    },
+    {
+      "id": "q9",
+      "cat": "storage",
+      "type": "mc",
+      "question": "A company needs to grant a third-party app 24-hour, read-only access to a single blob container, without sharing the storage account key.",
+      "options": [
+        "A Conditional Access policy",
+        "The storage account access key",
+        "A Shared Access Signature (SAS)",
+        "A Read-only resource lock"
+      ],
+      "correct": 2,
+      "explanation": "A SAS grants limited, time-boxed, scoped access (read-only, one container, 24 hours) without exposing the account's full access key. Handing over the storage account key would give the app full, unrestricted, non-expiring access to the whole account, far more than needed. A Conditional Access policy governs sign-ins to Microsoft Entra-integrated apps, not access to storage data itself, and a read-only resource lock only prevents accidental deletion/modification of the storage account resource -- it doesn't grant a third party access in the first place."
+    },
+    {
+      "id": "q10",
+      "cat": "storage",
+      "type": "mc",
+      "question": "A storage account should automatically move blobs to Cool tier after 30 days of no access, then delete them after 365 days.",
+      "options": [
+        "A SAS token",
+        "A lifecycle management policy",
+        "A resource lock",
+        "Blob versioning"
+      ],
+      "correct": 1,
+      "explanation": "A lifecycle management policy can define exactly this: automatically move blobs to Cool tier after 30 days of no access, then delete them after 365 days, all rule-driven with no manual intervention. A SAS token only grants time-boxed access, it doesn't move or delete data on a schedule. A resource lock prevents deletion or modification of the storage account resource itself, working against what this scenario wants. Blob versioning keeps historical versions of a blob when it changes, which is unrelated to tiering or age-based cleanup."
+    },
+    {
+      "id": "q11",
+      "cat": "storage",
+      "type": "mc",
+      "question": "A team accidentally overwrote a blob and needs to recover its previous content, without having taken a manual backup beforehand.",
+      "options": [
+        "Blob versioning, if it was enabled",
+        "Static website hosting",
+        "A storage account access key",
+        "A resource lock"
+      ],
+      "correct": 0,
+      "explanation": "Versioning automatically retains prior versions of a blob on overwrite, letting you recover earlier content."
+    },
+    {
+      "id": "q12",
+      "cat": "storage",
+      "type": "mc",
+      "question": "Which storage redundancy option allows an application to directly read from the secondary region during normal operation, not just after a failover?",
+      "options": [
+        "LRS",
+        "ZRS",
+        "Plain GRS",
+        "RA-GRS (Read-Access Geo-Redundant Storage)"
+      ],
+      "correct": 3,
+      "explanation": "Plain GRS replicates to a secondary region but doesn't allow reads there until failover \u2014 RA-GRS specifically adds read access to the secondary."
+    },
+    {
+      "id": "q13",
+      "cat": "storage",
+      "type": "mc",
+      "question": "A team wants to mount a shared drive from Azure that multiple VMs can read and write to simultaneously over SMB.",
+      "options": [
+        "Queue storage",
+        "Table storage",
+        "Azure Files",
+        "Blob storage"
+      ],
+      "correct": 2,
+      "explanation": "Azure Files provides SMB (and NFS) file shares that multiple VMs can mount simultaneously and both read and write to, exactly like a traditional network drive. Queue storage holds messages for asynchronous processing, table storage is a NoSQL key-value store, and blob storage, while it can hold large amounts of unstructured data, is not natively mountable as a concurrent SMB file share the way Azure Files is."
+    },
+    {
+      "id": "q14",
+      "cat": "storage",
+      "type": "mc",
+      "question": "A storage account should reject all traffic except from two specific corporate office IP ranges and one specific VNet.",
+      "options": [
+        "A resource lock",
+        "Blob lifecycle management",
+        "A SAS token alone",
+        "A storage account firewall / network rule configuration"
+      ],
+      "correct": 3,
+      "explanation": "Storage account firewall and network rules restrict access to specific networks or IP ranges at the network level."
+    },
+    {
+      "id": "q15",
+      "cat": "compute",
+      "type": "mc",
+      "question": "An administrator wants to change a running VM's managed disk from Standard HDD to Premium SSD to improve performance. What has to happen first?",
+      "options": [
+        "The VM must be deallocated before the disk tier can be changed",
+        "Nothing \u2014 the tier can be changed while the VM keeps running",
+        "The disk must be deleted and recreated from a snapshot",
+        "The VM must be moved to a different region"
+      ],
+      "correct": 0,
+      "explanation": "Changing a managed disk's performance tier requires the VM to be stopped (deallocated) first \u2014 it isn't a live, no-downtime operation. Deleting and recreating the disk, or moving regions, are unnecessary and far more disruptive than the actual requirement."
+    },
+    {
+      "id": "q16",
+      "cat": "compute",
+      "type": "mc",
+      "question": "A company wants a group of identical VMs that automatically add or remove instances based on CPU load.",
+      "options": [
+        "An availability set",
+        "Azure Virtual Desktop",
+        "A single large VM",
+        "A VM Scale Set"
+      ],
+      "correct": 3,
+      "explanation": "A VM Scale Set manages a group of identical, load-balanced VMs and can automatically add or remove instances based on autoscale rules like CPU load. An availability set only spreads a fixed set of VMs across fault/update domains for resiliency, it does not add or remove instances. Azure Virtual Desktop is a virtual desktop service, unrelated to general-purpose autoscaling. A single large VM has no ability to scale out into multiple instances at all -- it can only scale up."
+    },
+    {
+      "id": "q17",
+      "cat": "compute",
+      "type": "mc",
+      "question": "An administrator needs to run a one-time configuration script on a VM immediately after it's provisioned, without manually logging in.",
+      "options": [
+        "A managed disk",
+        "The Custom Script Extension",
+        "An App Service plan",
+        "An availability set"
+      ],
+      "correct": 1,
+      "explanation": "The Custom Script Extension runs a specified script on the VM automatically as part of provisioning, with no manual login required. A managed disk is just storage for the VM's OS/data, it runs nothing. An App Service plan is compute for web apps, not a mechanism for running a script on an existing VM. An availability set only affects fault/update-domain placement for resiliency and has no role in running configuration scripts."
+    },
+    {
+      "id": "q18",
+      "cat": "compute",
+      "type": "mc",
+      "question": "A team wants to test a new version of a web app in production-like conditions before it goes live, then switch traffic to it with minimal downtime.",
+      "options": [
+        "Deployment slots",
+        "A VM Scale Set",
+        "A new App Service plan for every version",
+        "A resource lock"
+      ],
+      "correct": 0,
+      "explanation": "A deployment slot is a live, separately-addressable environment within the same App Service plan, letting the team fully test the new version under production-like conditions, then perform a slot swap to cut over with minimal downtime and an easy rollback if needed. A VM Scale Set manages VM instance count, not app-version staging. Standing up a whole new App Service plan per version is far more overhead than slots and still needs its own cutover mechanism. A resource lock only prevents accidental deletion/modification, it has nothing to do with staging or swapping versions."
+    },
+    {
+      "id": "q19",
+      "cat": "compute",
+      "type": "mc",
+      "question": "Which compute option requires the least management overhead for running a single container with no orchestration needs?",
+      "options": [
+        "Azure Kubernetes Service (AKS)",
+        "Azure Container Instances",
+        "A virtual machine running Docker manually",
+        "A VM Scale Set"
+      ],
+      "correct": 1,
+      "explanation": "Container Instances run a single container quickly with no cluster or orchestration to manage."
+    },
+    {
+      "id": "q20",
+      "cat": "compute",
+      "type": "mc",
+      "question": "A company wants microservices-style container scaling with built-in HTTP-based autoscaling, without managing a Kubernetes cluster directly.",
+      "options": [
+        "Azure Container Apps",
+        "An App Service plan alone",
+        "Azure Container Instances",
+        "Azure Kubernetes Service (AKS)"
+      ],
+      "correct": 0,
+      "explanation": "Container Apps adds serverless scaling and microservices features on top of containers, without exposing the underlying cluster."
+    },
+    {
+      "id": "q21",
+      "cat": "compute",
+      "type": "mc",
+      "question": "An administrator wants to redeploy the exact same infrastructure to three environments, using a more concise, readable syntax than raw ARM JSON.",
+      "options": [
+        "Bicep",
+        "The Azure portal, repeated manually",
+        "A PowerShell script with no template",
+        "A resource lock"
+      ],
+      "correct": 0,
+      "explanation": "Bicep compiles down to ARM JSON but is written in a more concise, readable syntax."
+    },
+    {
+      "id": "q22",
+      "cat": "compute",
+      "type": "mc",
+      "question": "An administrator tries to resize a running VM to a size unavailable on its current hardware cluster. What's the most likely required step?",
+      "options": [
+        "Move the VM to a different subscription",
+        "Deallocate (stop) the VM first, then resize",
+        "Nothing, resizing always works while running",
+        "Delete and recreate the VM from scratch"
+      ],
+      "correct": 1,
+      "explanation": "A VM may need to be deallocated before resizing if the target size isn't available on its current hardware cluster."
+    },
+    {
+      "id": "q23",
+      "cat": "compute",
+      "type": "mc",
+      "question": "Which disk tier offers the highest, most consistent IOPS and throughput, configurable independently of the disk's size?",
+      "options": [
+        "Standard SSD",
+        "Standard HDD",
+        "Ultra Disk",
+        "Cool tier storage"
+      ],
+      "correct": 2,
+      "explanation": "Ultra Disk allows configuring performance (IOPS and throughput) independently of the disk size, for the most demanding workloads."
+    },
+    {
+      "id": "q24",
+      "cat": "networking",
+      "type": "mc",
+      "question": "Two NSG rules apply to the same NIC: one at priority 100 allowing inbound port 443, another at priority 200 denying all inbound traffic. What happens to inbound HTTPS traffic?",
+      "options": [
+        "Both rules apply, and the NIC merges them into a partial allow",
+        "It's denied, since a Deny rule always overrides an Allow rule regardless of priority",
+        "It's allowed, since the lower priority number is processed first",
+        "It's denied, since the highest priority number processed last always wins"
+      ],
+      "correct": 2,
+      "explanation": "Lower priority numbers are evaluated first and win \u2014 priority 100 (allow) is processed before priority 200 (deny), so the traffic is allowed. Deny doesn't have some inherent precedence over Allow, and NSG rules aren't merged or blended \u2014 whichever rule is evaluated first, by priority number, decides the outcome outright."
+    },
+    {
+      "id": "q25",
+      "cat": "networking",
+      "type": "mc",
+      "question": "Two VNets are peered, and one of those VNets is also peered to a third VNet. Can the first and third VNets communicate directly?",
+      "options": [
+        "Only if they're in the same region",
+        "No, VNet peering is not transitive",
+        "Only if a VPN Gateway is also configured",
+        "Yes, peering always extends transitively"
+      ],
+      "correct": 1,
+      "explanation": "Peering is not transitive \u2014 the first and third VNets would need their own direct peering to communicate."
+    },
+    {
+      "id": "q26",
+      "cat": "networking",
+      "type": "mc",
+      "question": "A company needs to distribute HTTPS traffic based on URL path (/images to one backend, /api to another) and terminate SSL centrally.",
+      "options": [
+        "VNet peering",
+        "Azure Load Balancer",
+        "Network Watcher",
+        "Application Gateway"
+      ],
+      "correct": 3,
+      "explanation": "Application Gateway operates at layer 7 and can route by URL path while terminating SSL centrally \u2014 Load Balancer cannot."
+    },
+    {
+      "id": "q27",
+      "cat": "networking",
+      "type": "mc",
+      "question": "A company needs to load-balance raw TCP traffic to backend VMs based on IP and port only, with no awareness of HTTP content.",
+      "options": [
+        "Azure Load Balancer",
+        "Azure DNS",
+        "Application Gateway",
+        "Azure Bastion"
+      ],
+      "correct": 0,
+      "explanation": "Load Balancer works at layer 4, distributing TCP/UDP traffic by IP and port with no content awareness."
+    },
+    {
+      "id": "q28",
+      "cat": "networking",
+      "type": "mc",
+      "question": "An application inside a VNet needs to resolve a custom domain name to an internal resource, without that name being resolvable from the public internet.",
+      "options": [
+        "Azure public DNS",
+        "A public Load Balancer",
+        "Azure Bastion",
+        "An Azure private DNS zone"
+      ],
+      "correct": 3,
+      "explanation": "Private DNS zones provide name resolution within a VNet without exposing those records publicly."
+    },
+    {
+      "id": "q29",
+      "cat": "networking",
+      "type": "mc",
+      "question": "An administrator needs to securely RDP into a VM from the portal without exposing a public IP on that VM or setting up a VPN.",
+      "options": [
+        "A public Load Balancer",
+        "VPN Gateway",
+        "ExpressRoute",
+        "Azure Bastion"
+      ],
+      "correct": 3,
+      "explanation": "Azure Bastion provides secure RDP/SSH through the portal without a public IP on the VM or a separate VPN."
+    },
+    {
+      "id": "q30",
+      "cat": "networking",
+      "type": "mc",
+      "question": "A connectivity issue between two VMs needs diagnosing \u2014 specifically, whether an NSG rule is blocking the traffic path.",
+      "options": [
+        "A resource lock",
+        "Network Watcher's IP flow verify",
+        "Azure Policy",
+        "Azure Advisor"
+      ],
+      "correct": 1,
+      "explanation": "Network Watcher's IP flow verify tool specifically checks whether an NSG rule allows or denies a given traffic flow."
+    },
+    {
+      "id": "q31",
+      "cat": "networking",
+      "type": "mc",
+      "question": "How many IP addresses does Azure reserve in every subnet, regardless of its size?",
+      "options": [
+        "2",
+        "0",
+        "5",
+        "10"
+      ],
+      "correct": 2,
+      "explanation": "Azure reserves 5 addresses in every subnet for internal use, regardless of the subnet's overall size."
+    },
+    {
+      "id": "q32",
+      "cat": "networking",
+      "type": "mc",
+      "question": "A company wants load balancing purely between internal application tiers, with no exposure to the public internet at all.",
+      "options": [
+        "Application Gateway with a public IP",
+        "Azure Front Door",
+        "A public Load Balancer",
+        "An internal (private) Load Balancer"
+      ],
+      "correct": 3,
+      "explanation": "An internal Load Balancer only distributes traffic within a VNet, never from the public internet."
+    },
+    {
+      "id": "q33",
+      "cat": "monitoring",
+      "type": "mc",
+      "question": "An administrator wants to be notified by email and automatically trigger a runbook when a VM's CPU exceeds 90% for 10 minutes.",
+      "options": [
+        "Network Watcher",
+        "An alert rule paired with an action group",
+        "Azure Advisor alone",
+        "A resource lock"
+      ],
+      "correct": 1,
+      "explanation": "The alert rule defines the trigger condition; the action group defines the response, like sending an email or running automation."
+    },
+    {
+      "id": "q34",
+      "cat": "monitoring",
+      "type": "mc",
+      "question": "Which Azure Monitor data type would you query with KQL to investigate a detailed sequence of application errors over the last week?",
+      "options": [
+        "Logs, via Log Analytics",
+        "Metrics",
+        "Azure Service Health",
+        "Azure Advisor recommendations"
+      ],
+      "correct": 0,
+      "explanation": "Logs hold detailed, queryable event data; metrics are lightweight numerical time-series data, not detailed event sequences."
+    },
+    {
+      "id": "q35",
+      "cat": "monitoring",
+      "type": "mc",
+      "question": "A company wants to be able to fail over an entire application's VMs to a secondary region if the primary region goes down entirely.",
+      "options": [
+        "A resource lock",
+        "Azure Advisor",
+        "Azure Backup alone",
+        "Azure Site Recovery"
+      ],
+      "correct": 3,
+      "explanation": "Site Recovery replicates and fails over whole workloads to a secondary region, unlike Backup, which restores point-in-time copies."
+    },
+    {
+      "id": "q36",
+      "cat": "monitoring",
+      "type": "mc",
+      "question": "A VM's disk was corrupted by a bad update yesterday. Which service would restore it to a point before the update?",
+      "options": [
+        "Azure Advisor",
+        "Network Watcher",
+        "Azure Backup, via a Recovery Services vault",
+        "Azure Site Recovery"
+      ],
+      "correct": 2,
+      "explanation": "Backup restores a resource to an earlier point-in-time state \u2014 Site Recovery is for regional failover, not point-in-time restores."
+    },
+    {
+      "id": "tf1",
+      "cat": "identityGov",
+      "type": "tf",
+      "question": "RBAC role assignments are inherited from a higher scope down to lower scopes.",
+      "answer": true,
+      "explanation": "A role assigned at, say, a subscription applies to every resource group and resource beneath it, unless a more specific assignment changes things."
+    },
+    {
+      "id": "tf2",
+      "cat": "identityGov",
+      "type": "tf",
+      "question": "A user can have RBAC permissions assigned directly at a single resource, even with no role assigned at the subscription level.",
+      "answer": true,
+      "explanation": "RBAC can be assigned at any scope independently \u2014 a resource-level assignment doesn't require a subscription-level one first."
+    },
+    {
+      "id": "tf3",
+      "cat": "identityGov",
+      "type": "tf",
+      "question": "An Azure Policy initiative is just a single, standalone policy definition.",
+      "answer": false,
+      "explanation": "An initiative is a group of related policy definitions assigned together, not a single standalone policy."
+    },
+    {
+      "id": "tf4",
+      "cat": "storage",
+      "type": "tf",
+      "question": "Read-access geo-redundant storage (RA-GRS) allows reading data from the secondary region even when the primary is fully available.",
+      "answer": true,
+      "explanation": "That's exactly what distinguishes RA-GRS from plain GRS, which only makes the secondary readable after a failover."
+    },
+    {
+      "id": "tf5",
+      "cat": "storage",
+      "type": "tf",
+      "question": "Soft delete alone guarantees recovery of a blob's exact content after it has been overwritten by a new upload.",
+      "answer": false,
+      "explanation": "Soft delete protects against deletion. Recovering prior content after an overwrite specifically requires blob versioning."
+    },
+    {
+      "id": "tf6",
+      "cat": "storage",
+      "type": "tf",
+      "question": "A Shared Access Signature (SAS) can grant access without ever sharing the storage account's access keys.",
+      "answer": true,
+      "explanation": "A SAS is a separate, scoped, time-limited credential that doesn't expose the underlying account key."
+    },
+    {
+      "id": "tf7",
+      "cat": "compute",
+      "type": "tf",
+      "question": "An Azure VM Scale Set can only scale based on a fixed schedule, not real-time metrics like CPU.",
+      "answer": false,
+      "explanation": "Scale Sets can autoscale based on both real-time metrics, like CPU, and fixed schedules."
+    },
+    {
+      "id": "tf8",
+      "cat": "compute",
+      "type": "tf",
+      "question": "Bicep files compile down to ARM JSON templates before deployment.",
+      "answer": true,
+      "explanation": "Bicep is a more concise authoring language that compiles to the same underlying ARM JSON format."
+    },
+    {
+      "id": "tf9",
+      "cat": "compute",
+      "type": "tf",
+      "question": "Azure Container Instances provide built-in Kubernetes-style orchestration across multiple containers.",
+      "answer": false,
+      "explanation": "That's AKS. Container Instances run standalone containers with no orchestration layer."
+    },
+    {
+      "id": "tf10",
+      "cat": "networking",
+      "type": "tf",
+      "question": "VNet peering allows transitive routing between all peered VNets automatically.",
+      "answer": false,
+      "explanation": "Peering is not transitive \u2014 each pair of VNets that needs to communicate must be peered directly."
+    },
+    {
+      "id": "tf11",
+      "cat": "networking",
+      "type": "tf",
+      "question": "An internal (private) Load Balancer can distribute traffic originating from the public internet.",
+      "answer": false,
+      "explanation": "An internal Load Balancer only distributes traffic within a VNet, never from the public internet."
+    },
+    {
+      "id": "tf12",
+      "cat": "networking",
+      "type": "tf",
+      "question": "Azure Bastion eliminates the need to expose a VM's public IP for RDP or SSH access.",
+      "answer": true,
+      "explanation": "Bastion provides secure access through the portal without the VM itself needing a public IP."
+    },
+    {
+      "id": "q37",
+      "cat": "identityGov",
+      "type": "mc",
+      "question": "A Global Administrator in Microsoft Entra ID tries to edit a resource group in the Azure portal and gets an access-denied error, despite being a Global Administrator. What lets them manage Azure resources across every subscription in the tenant?",
+      "options": [
+        "Turning on the \"elevate access\" setting for Global Administrators in Microsoft Entra ID properties",
+        "Assigning themselves the Reader role manually",
+        "Waiting 24 hours for permissions to sync",
+        "Creating a new subscription under their own name"
+      ],
+      "correct": 0,
+      "explanation": "Microsoft Entra roles like Global Administrator control the identity plane, not Azure resources, by default. The \"elevate access\" setting grants Global Administrators the Azure RBAC User Access Administrator role at the root management group scope, letting them manage resources tenant-wide."
+    },
+    {
+      "id": "q38",
+      "cat": "identityGov",
+      "type": "mc",
+      "question": "A finance team's storage account keeps getting accidentally deleted by administrators who legitimately have Contributor access. Which safeguard specifically blocks deletion while still letting their authorized configuration changes continue?",
+      "options": [
+        "A CanNotDelete resource lock",
+        "A ReadOnly resource lock",
+        "Revoking Contributor from the whole team",
+        "An audit-effect Azure Policy"
+      ],
+      "correct": 0,
+      "explanation": "A CanNotDelete lock blocks deletion but still allows reads and writes. A ReadOnly lock would also block the configuration changes the team needs; removing Contributor access would block those too, and an audit-only policy effect just flags noncompliance without preventing the delete."
+    },
+    {
+      "id": "q39",
+      "cat": "storage",
+      "type": "mc",
+      "question": "An application's managed identity needs to read and write blobs in a container, without ever handling a SAS token or the storage account key.",
+      "options": [
+        "Assign the managed identity the Storage Blob Data Contributor role on the container or storage account",
+        "Generate a long-lived SAS token for the managed identity",
+        "Share the storage account access key with the application",
+        "Add the application to a dynamic group"
+      ],
+      "correct": 0,
+      "explanation": "Data-plane RBAC roles like Storage Blob Data Contributor let an identity authenticate with Microsoft Entra ID and access blob data directly. The control-plane Contributor role manages the storage account itself but does not by itself grant blob data access once key-based access is restricted."
+    },
+    {
+      "id": "q40",
+      "cat": "compute",
+      "type": "mc",
+      "question": "A batch rendering job can tolerate being interrupted and restarted, and the team wants to run it on Azure VMs at a steep discount versus pay-as-you-go pricing.",
+      "options": [
+        "Azure Spot Virtual Machines",
+        "Reserved Instances",
+        "A VM Scale Set with manual scaling",
+        "Azure Dedicated Host"
+      ],
+      "correct": 0,
+      "explanation": "Spot VMs use Azure's unused capacity at a steep discount but can be evicted with little notice when that capacity is needed back \u2014 a good fit for interruptible workloads. Reserved Instances are a billing commitment for guaranteed capacity, not an eviction-prone discount."
+    },
+    {
+      "id": "q41",
+      "cat": "networking",
+      "type": "mc",
+      "question": "An administrator wants one NSG rule that allows traffic to every VM tagged as 'WebTier,' regardless of each VM's individual IP address, which changes as instances are added or removed.",
+      "options": [
+        "Group the VMs\u2019 network interfaces into an Application Security Group and reference it in the rule",
+        "Write a separate NSG rule for every VM's current IP address",
+        "Use a public Load Balancer instead of an NSG",
+        "Move all the VMs into one subnet with no other traffic"
+      ],
+      "correct": 0,
+      "explanation": "An Application Security Group (ASG) groups VM network interfaces logically, like 'WebTier,' so an NSG rule can reference the group as a source or destination instead of hardcoding IP addresses that change over time."
+    },
+    {
+      "id": "q42",
+      "cat": "monitoring",
+      "type": "mc",
+      "question": "An administrator is deploying monitoring to a fleet of new VMs and wants Microsoft's current, supported agent for collecting metrics and logs into Azure Monitor.",
+      "options": [
+        "The Azure Monitor Agent (AMA)",
+        "The legacy Log Analytics agent (MMA)",
+        "The Diagnostics extension only",
+        "No agent \u2014 Azure Monitor needs nothing installed on the VM"
+      ],
+      "correct": 0,
+      "explanation": "The Azure Monitor Agent (AMA), configured through data collection rules, is the current agent. The legacy Log Analytics agent (MMA) was retired in August 2024 and should not be used for new deployments."
+    },
+    {
+      "id": "q43",
+      "cat": "monitoring",
+      "type": "mc",
+      "question": "A company needs a VM's resource logs both queryable right away in Log Analytics and archived cheaply for 7 years to satisfy a compliance requirement.",
+      "options": [
+        "One diagnostic setting sending logs to both a Log Analytics workspace and a storage account",
+        "Two separate resources, since a diagnostic setting supports only one destination",
+        "Azure Backup, configured to capture logs",
+        "A resource lock with a 7-year expiration"
+      ],
+      "correct": 0,
+      "explanation": "A single diagnostic setting can send the same logs to multiple destinations at once, including a Log Analytics workspace for querying and a storage account for long-term archival \u2014 no need for separate configurations per destination."
+    },
+    {
+      "id": "q44",
+      "cat": "monitoring",
+      "type": "mc",
+      "question": "An administrator needs to schedule recurring patch installation windows across dozens of Windows and Linux Azure VMs, and track patch compliance centrally.",
+      "options": [
+        "Azure Update Manager",
+        "Azure Advisor",
+        "Azure Policy alone",
+        "Azure Site Recovery"
+      ],
+      "correct": 0,
+      "explanation": "Azure Update Manager is the current unified service for assessing and scheduling OS patch compliance and installation across VMs at scale, replacing the older Update Management solution."
+    },
+    {
+      "id": "tf13",
+      "cat": "storage",
+      "type": "tf",
+      "question": "An immutable blob storage policy with a legal hold in effect can be bypassed by the storage account's Owner role to delete data early if needed.",
+      "answer": false,
+      "explanation": "Immutability policies, including legal holds, block deletion and modification for everyone, including the account owner, until the hold is removed or the retention period expires \u2014 that is what makes them valid for regulatory retention requirements."
+    },
+    {
+      "id": "tf14",
+      "cat": "networking",
+      "type": "tf",
+      "question": "NSG flow logs, viewed through Traffic Analytics, can show which allowed and denied flows are hitting a network interface without manually correlating raw log files.",
+      "answer": true,
+      "explanation": "Network Watcher's NSG flow logs record allowed and denied traffic per rule, and Traffic Analytics processes those logs in a Log Analytics workspace into visual, queryable insights instead of raw JSON."
+    },
+    {
+      "id": "tf15",
+      "cat": "monitoring",
+      "type": "tf",
+      "question": "Soft delete for Azure Backup keeps deleted backup data recoverable for a retention window, even if someone deletes the backup item or disables backup entirely.",
+      "answer": true,
+      "explanation": "This protection is distinct from blob soft delete and is designed to guard against accidental or malicious deletion of backup data itself, such as during a ransomware attack that disables backups."
+    },
+    {
+      "id": "msq1",
+      "cat": "identityGov",
+      "type": "ms",
+      "question": "Which two built-in Azure roles let someone grant other users access to resources, not just manage the resources themselves? (Choose two.)",
+      "options": [
+        "Owner",
+        "User Access Administrator",
+        "Contributor",
+        "Reader"
+      ],
+      "correct": [
+        0,
+        1
+      ],
+      "explanation": "Owner can manage resources and assign roles to others. User Access Administrator can assign roles without managing the resources themselves. Contributor can manage resources but cannot grant access, and Reader can do neither."
+    },
+    {
+      "id": "msq2",
+      "cat": "compute",
+      "type": "ms",
+      "question": "Which two Azure managed disk types let you configure IOPS and throughput independently of the disk's provisioned size? (Choose two.)",
+      "options": [
+        "Ultra Disk",
+        "Premium SSD v2",
+        "Standard SSD",
+        "Premium SSD"
+      ],
+      "correct": [
+        0,
+        1
+      ],
+      "explanation": "Ultra Disk and the newer Premium SSD v2 both allow tuning IOPS and throughput separately from capacity. Standard SSD and the original Premium SSD scale their performance according to the size tier provisioned."
+    },
+    {
+      "id": "msq3",
+      "cat": "monitoring",
+      "type": "ms",
+      "question": "Which two of the following are valid actions an Azure Monitor action group can trigger when an alert fires? (Choose two.)",
+      "options": [
+        "A webhook",
+        "An Automation runbook",
+        "A resource lock",
+        "A management group"
+      ],
+      "correct": [
+        0,
+        1
+      ],
+      "explanation": "Action groups can call webhooks, Automation runbooks, Azure Functions, Logic Apps, and more, plus notify people by email, SMS, or voice. Resource locks and management groups are governance constructs, not things an alert can trigger."
+    },
+    {
+      "id": "q45",
+      "cat": "identityGov",
+      "type": "mc",
+      "question": "A security team wants to block all sign-ins using legacy authentication protocols, which do not support MFA, across the whole tenant, while still allowing modern authentication sign-ins as normal. Which feature should they configure?",
+      "options": [
+        "A Conditional Access policy",
+        "An Azure Policy assignment",
+        "A custom RBAC role",
+        "A resource lock"
+      ],
+      "correct": 0,
+      "explanation": "Conditional Access can target legacy authentication specifically as a condition and block it tenant-wide, while leaving modern authentication sign-ins unaffected. Azure Policy governs resource configuration, not sign-in behavior; a custom RBAC role only changes what an already-authenticated identity can do to resources; and a resource lock only prevents deletion or modification of a resource's own configuration, so none of the other three touch sign-in enforcement at all."
+    },
+    {
+      "id": "q46",
+      "cat": "identityGov",
+      "type": "mc",
+      "question": "An organization wants administrators to normally hold no standing Global Administrator access, activating that role with approval and only for a limited, time-boxed window when actually needed. Which feature enables this?",
+      "options": [
+        "Self-service password reset",
+        "Azure Policy",
+        "Microsoft Entra Privileged Identity Management (PIM)",
+        "A dynamic security group"
+      ],
+      "correct": 2,
+      "explanation": "PIM enables just-in-time, time-boxed role activation, often requiring approval or justification, instead of granting standing or permanent access to a privileged role. SSPR only handles password resets, Azure Policy governs resource configuration compliance, and a dynamic group only manages group membership rules, so none of the three provide time-boxed privileged role activation."
+    },
+    {
+      "id": "q47",
+      "cat": "storage",
+      "type": "mc",
+      "question": "A storage account should be reachable from resources inside a specific subnet using the subnet's private IP address space, with traffic never traversing the public internet, and the storage account itself getting an address inside that VNet. Which feature specifically provides this?",
+      "options": [
+        "A Shared Access Signature",
+        "A service endpoint",
+        "A storage account firewall IP rule alone",
+        "A private endpoint"
+      ],
+      "correct": 3,
+      "explanation": "A private endpoint gives the storage account an actual private IP address inside the VNet, so traffic from the subnet stays fully off the public internet. A service endpoint instead extends the subnet's identity over the Microsoft backbone to reach the storage account's still-public endpoint, optimizing the route without the storage account ever getting an address inside the VNet. A SAS only grants a scoped credential, and a firewall IP rule alone still means the storage account is reachable at its public endpoint from allowed IPs, not an address inside your VNet."
+    },
+    {
+      "id": "q48",
+      "cat": "compute",
+      "type": "mc",
+      "question": "An administrator deploys three VMs into the same availability zone within a region for a critical app. What risk does this configuration still leave unaddressed, compared to spreading them across three separate zones?",
+      "options": [
+        "A failure affecting that one physical datacenter",
+        "A single VM crashing due to an application bug",
+        "A DDoS attack against the application",
+        "An expired SSL certificate on the app"
+      ],
+      "correct": 0,
+      "explanation": "Placing all three VMs in the same availability zone means they all still depend on that one physical datacenter \u2014 a power or cooling failure there could take out all three simultaneously, which is exactly the risk spreading them across zones addresses. The other three risks, an application bug, a DDoS attack, and an expired certificate, are not related to physical datacenter placement at all, so zone distribution would not change any of them."
+    },
+    {
+      "id": "q49",
+      "cat": "compute",
+      "type": "mc",
+      "question": "An organization wants to build one standardized, versioned custom VM image and make it available for deployment across multiple subscriptions and regions in their tenant. Which service fits?",
+      "options": [
+        "A managed disk snapshot",
+        "The Custom Script Extension",
+        "An availability set",
+        "Azure Compute Gallery (Shared Image Gallery)"
+      ],
+      "correct": 3,
+      "explanation": "Azure Compute Gallery is built specifically for publishing, versioning, and replicating custom VM images for reuse across subscriptions and regions. A snapshot is a point-in-time copy of a single disk, without the versioning or multi-region replication a shared image catalog provides. The Custom Script Extension configures a VM after it is already running, and an availability set is a resiliency grouping unrelated to image management."
+    },
+    {
+      "id": "q50",
+      "cat": "networking",
+      "type": "mc",
+      "question": "An administrator wants traffic from a subnet destined for the internet to be forced through a network virtual appliance for inspection first, instead of going directly out. Which feature enables this custom routing?",
+      "options": [
+        "A network security group rule",
+        "A user-defined route (UDR) in a route table",
+        "VNet peering",
+        "A service endpoint"
+      ],
+      "correct": 1,
+      "explanation": "A user-defined route in a route table overrides Azure default system routes, letting traffic be forced through a specific next hop, like a network virtual appliance, instead of the default path. An NSG rule only allows or denies traffic, it does not redirect it, and peering or a service endpoint both establish connectivity or an optimized path but do not force traffic through a custom inspection point."
+    },
+    {
+      "id": "q51",
+      "cat": "networking",
+      "type": "mc",
+      "question": "A subnet with several VMs needs reliable outbound-only internet connectivity that does not consume a public IP on each individual VM, and avoids SNAT port exhaustion under heavy outbound load. Which service fits best?",
+      "options": [
+        "A public Load Balancer",
+        "Azure Bastion",
+        "A NAT gateway",
+        "A private endpoint"
+      ],
+      "correct": 2,
+      "explanation": "A NAT gateway provides scalable, outbound-only internet connectivity for an entire subnet through a small pool of shared public IPs, specifically designed to avoid the SNAT port exhaustion a Load Balancer's outbound rules can run into under heavy load. Azure Bastion is for inbound RDP or SSH management access, not outbound internet traffic, and a private endpoint is for inbound access to a specific PaaS resource, not outbound internet connectivity at all."
+    },
+    {
+      "id": "q52",
+      "cat": "monitoring",
+      "type": "mc",
+      "question": "A team wants to track end-to-end response times, failure rates, and dependency calls for a live web application, down to individual requests, not just VM-level metrics. Which Azure Monitor feature fits?",
+      "options": [
+        "Azure Service Health",
+        "Application Insights",
+        "Azure Advisor",
+        "Network Watcher"
+      ],
+      "correct": 1,
+      "explanation": "Application Insights is the Azure Monitor feature purpose-built for application performance monitoring \u2014 request rates, response times, failure rates, and dependency tracking down to individual requests. Service Health reports on Azure platform outages, Advisor gives configuration recommendations, and Network Watcher diagnoses network connectivity, none of which provide application-level performance telemetry."
+    },
+    {
+      "id": "tf16",
+      "cat": "identityGov",
+      "type": "tf",
+      "question": "A custom Azure RBAC role can be defined with a narrower set of permissions than any single built-in role, such as allowing only VM restarts and nothing else.",
+      "answer": true,
+      "explanation": "Custom roles are built from individual allowed, and optionally excluded, actions, so they can be scoped far more narrowly than any built-in role, including down to a single action like restarting VMs. This is exactly why custom roles exist, to implement least-privilege access that the built-in roles do not precisely match."
+    },
+    {
+      "id": "tf17",
+      "cat": "compute",
+      "type": "tf",
+      "question": "Applying Azure Hybrid Benefit to a Windows Server VM eliminates the compute charge for that VM entirely, leaving only a licensing fee.",
+      "answer": false,
+      "explanation": "Azure Hybrid Benefit only offsets the licensing portion of the cost by letting you reuse an eligible on-premises license \u2014 it does not eliminate the underlying compute charge for the VM's CPU, memory, and disk, which is billed separately regardless of licensing."
+    },
+    {
+      "id": "tf18",
+      "cat": "monitoring",
+      "type": "tf",
+      "question": "Azure Backup's cross-region restore feature lets an administrator restore a VM into the paired secondary region, even while the primary region is fully available, provided the vault uses geo-redundant storage.",
+      "answer": true,
+      "explanation": "Cross-region restore is specifically designed to let you restore into the secondary paired region on demand, for testing or migration purposes, not only during an actual regional outage, as long as the Recovery Services vault's storage redundancy is geo-redundant (GRS or RA-GRS) or geo-zone-redundant."
+    },
+    {
+      "id": "msq4",
+      "cat": "storage",
+      "type": "ms",
+      "question": "Which two of the following are true about Azure Storage private endpoints? (Choose two.)",
+      "options": [
+        "They assign the storage account a private IP address inside a VNet",
+        "They are the same thing as a service endpoint",
+        "Traffic to a private endpoint can be kept off the public internet entirely",
+        "They eliminate the need for any RBAC or SAS-based authorization"
+      ],
+      "correct": [
+        0,
+        2
+      ],
+      "explanation": "A private endpoint places a private IP for the storage account directly inside the VNet, keeping that traffic off the public internet entirely. It is not the same as a service endpoint: a service endpoint routes over the Microsoft backbone but the target resource keeps a public endpoint, while a private endpoint gives it a VNet-local address. And a private endpoint only controls network reachability, it does not replace identity-based authorization like RBAC or a SAS, which are still enforced independently."
+    },
+    {
+      "id": "msq5",
+      "cat": "networking",
+      "type": "ms",
+      "question": "Which two of the following are true about Azure Traffic Manager? (Choose two.)",
+      "options": [
+        "It requires ExpressRoute to function",
+        "It routes traffic using DNS, directing clients to an endpoint rather than proxying traffic itself",
+        "It operates at Layer 7 and inspects HTTP headers on every request",
+        "It can route users to the closest healthy regional endpoint"
+      ],
+      "correct": [
+        1,
+        3
+      ],
+      "explanation": "Traffic Manager works purely at the DNS level: it resolves a domain name to the IP of the best available endpoint, for example the closest healthy region, and steps out of the path entirely, rather than proxying every request the way a Layer 7 service would. It does not inspect HTTP traffic itself since it never sits in the data path, and it has no dependency on ExpressRoute at all."
+    },
+    {
+      "id": "q53",
+      "cat": "identityGov",
+      "type": "mc",
+      "question": "This real Access control (IAM) role assignments list shows several assignments scoped as 'Subscription (Inherited)'. What does that scope label mean?",
+      "options": [
+        "The role was assigned directly on this resource group and cannot be changed",
+        "The role was assigned at the subscription level and applies down to this resource group automatically",
+        "The role only applies to resources created before this resource group existed",
+        "The role is a deprecated legacy assignment that Azure will remove automatically"
+      ],
+      "correct": 1,
+      "explanation": "Azure RBAC is inherited down the hierarchy \u2014 a role assigned at the subscription scope automatically applies to every resource group and resource beneath it. The Scope column shows exactly where in that hierarchy each assignment was actually made, which matters because removing an inherited assignment here requires going up to where it was actually granted, not editing it at this resource group.",
+      "image": "roleAssignment"
+    },
+    {
+      "id": "q54",
+      "cat": "storage",
+      "type": "mc",
+      "question": "You're partway through Create a storage account and see this real tab row: Basics, Advanced, Networking, Data protection, Security, Encryption, Tags. Which tab would you use to restrict the account to a specific virtual network?",
+      "options": [
+        "Advanced",
+        "Networking",
+        "Security",
+        "Data protection"
+      ],
+      "correct": 1,
+      "explanation": "Networking is where you configure things like virtual network integration, private endpoints, and firewall rules \u2014 restricting access to specific VNets is a networking concern, separate from the account-level defaults on Advanced or the threat-protection settings on Security.",
+      "image": "storageAccount"
+    },
+    {
+      "id": "q55",
+      "cat": "compute",
+      "type": "mc",
+      "question": "In this real Instance details section for a new VM, Availability options is set to 'No infrastructure redundancy required.' What's the practical effect of that choice?",
+      "options": [
+        "The VM won't be protected against a single hardware failure or planned maintenance taking down its host",
+        "The VM will automatically be placed in an Availability Zone",
+        "Azure will refuse to create the VM until a redundancy option is selected",
+        "The VM will be replicated to a secondary region automatically"
+      ],
+      "correct": 0,
+      "explanation": "\"No infrastructure redundancy required\" is a valid, selectable option \u2014 Azure won't block VM creation over it \u2014 but it means skipping Availability Zones or an Availability Set, so a single host failure or planned maintenance event on that host can take the VM down with no built-in protection.",
+      "image": "vmSize"
+    }
+  ],
+  "lessons": [
+    {
+      "id": "identities-access",
+      "title": "Identities & Access",
+      "summary": "Users, groups, licensing, external users, and self-service password reset.",
+      "diagram": "groupLicensing",
+      "portalMockup": "inviteGuestUser",
+      "vocabIds": [
+        "f1",
+        "f2",
+        "f3",
+        "f4"
+      ],
+      "quizIds": [
+        "q1",
+        "q2",
+        "q3",
+        "q4",
+        "tf1",
+        "tf2"
+      ],
+      "reading": "As an administrator, you'll create and manage the users and groups that make up an organization's identity. Security groups hold manually-managed membership, while dynamic groups automatically add or remove members based on rules matching attributes like department or job title \u2014 useful for keeping large, frequently-changing teams in sync without manual upkeep.\n\nLicensing follows the same logic: rather than assigning a Microsoft 365 license to each person individually, group-based licensing lets you assign it once to a group, and every current and future member picks it up automatically.\n\nFor people outside your organization, like contractors or partners, external B2B users let them sign in with their own existing identity rather than you creating them a new internal account. And for your own users, self-service password reset removes the help desk from the equation entirely for the most common request there is.",
+      "fundamentalsLabel": "New to identity administration? See the everyday analogy",
+      "fundamentals": "A dynamic group is like an email distribution list that updates itself based on someone's job title, instead of someone manually adding and removing names every time staff changes. Group-based licensing is like a company handing out badges by department rather than issuing one individually to every new hire \u2014 join the department, get the badge automatically.",
+      "keyTerms": [
+        "Security groups",
+        "dynamic groups",
+        "group-based licensing",
+        "B2B",
+        "self-service password reset"
+      ],
+      "commonTraps": [
+        "A dynamic group updates its membership automatically \u2014 a security group requires manual changes.",
+        "Group-based licensing still requires someone to be a group member; adding the license alone doesn't add them.",
+        "External B2B users authenticate with their own identity \u2014 you don't create them a normal internal account."
+      ],
+      "scenario": "A hospital's radiology department grows from 8 to 30 staff over a year. Rather than manually adding each new hire to a group and assigning a license individually, an administrator sets up a dynamic group based on department, with a license attached to that group \u2014 every new radiology hire is automatically added and licensed the moment their account is created, with zero manual steps."
+    },
+    {
+      "id": "governance-cost",
+      "title": "Governance & Cost",
+      "summary": "RBAC scope and roles, Azure Policy initiatives, and cost management.",
+      "diagram": "rbacScope",
+      "vocabIds": [
+        "f5",
+        "f6",
+        "f7",
+        "f8",
+        "f9"
+      ],
+      "quizIds": [
+        "q5",
+        "q6",
+        "q7",
+        "q8",
+        "tf3"
+      ],
+      "reading": "As an administrator, RBAC role assignments are additive across scopes \u2014 if someone has Reader at a subscription and Contributor at one resource group within it, they effectively have Contributor there and Reader everywhere else in that subscription. The built-in roles worth knowing well: Owner can manage resources and grant access to others; Contributor can manage resources but cannot grant access; Reader is view-only; and User Access Administrator can manage who has access without touching the resources themselves.\n\nAzure Policy enforces configuration rules, and when several related policies need to be assigned together, like a full tagging standard, they can be bundled into a single initiative rather than assigned one by one.\n\nDay to day, this ties back to cost: budgets with alert thresholds, and Cost Analysis, let you see where spending is actually going, broken down by resource, tag, or service.",
+      "fundamentalsLabel": "New to RBAC in practice? See the everyday analogy",
+      "fundamentals": "Think of RBAC assignments like keys handed out at different levels of a building. A master key at the building level, plus an extra key to one specific supply closet, means you effectively have full access to that closet even if your master key alone wouldn't normally reach it \u2014 the more specific, more permissive key wins in that one room.",
+      "keyTerms": [
+        "RBAC",
+        "Owner",
+        "Contributor",
+        "Reader",
+        "User Access Administrator",
+        "Azure Policy",
+        "initiative",
+        "budgets"
+      ],
+      "commonTraps": [
+        "Contributor can manage all resources but CANNOT assign roles to others \u2014 only Owner and User Access Administrator can.",
+        "RBAC is additive: the most permissive assignment across all applicable scopes wins, not the most restrictive.",
+        "An initiative is a bundle of policies assigned together \u2014 it isn't a single rule by itself."
+      ],
+      "portalMockup": "roleAssignment",
+      "scenario": "A company wants a lead engineer to manage all resources in a specific resource group AND decide which teammates can access it, without giving them company-wide Owner rights. Assigning Owner at just that one resource group achieves this \u2014 Owner both manages resources and grants access, but scoped to that resource group alone, leaving the rest of the subscription untouched."
+    },
+    {
+      "id": "storage-management",
+      "title": "Storage Management",
+      "summary": "Access keys and SAS, firewalls, lifecycle policies, and protecting blob data.",
+      "diagram": "storageAccess",
+      "vocabIds": [
+        "f10",
+        "f11",
+        "f12",
+        "f13",
+        "f14",
+        "f15",
+        "f16",
+        "f17",
+        "f18"
+      ],
+      "quizIds": [
+        "q9",
+        "q10",
+        "q11",
+        "q12",
+        "q13",
+        "tf4",
+        "tf5",
+        "tf6"
+      ],
+      "reading": "Managing storage at the administrator level means configuring the account itself, not just knowing what it holds. General-purpose v2 is the standard account type, with Standard (HDD-backed) and Premium (SSD-backed) performance tiers depending on how demanding the workload is.\n\nFor access, a storage account access key grants full, unrestricted control over the whole account \u2014 risky to hand out. A Shared Access Signature (SAS) instead grants limited, time-boxed access to specific resources, without ever exposing that key. A storage firewall adds a network-level layer on top, restricting access to specific VNets or IP ranges regardless of what credentials someone has.\n\nOngoing management includes lifecycle policies, which automatically move aging blobs to cheaper tiers or delete them outright, and choosing the right protection for accidental changes: blob versioning keeps every prior version automatically, while soft delete recovers something that was deleted outright.",
+      "fundamentalsLabel": "New to storage account administration? See the everyday analogy",
+      "fundamentals": "An access key is like a master key to an entire building \u2014 powerful, and dangerous to hand out casually. A SAS is like a visitor badge that only opens one door, only works for a limited window of time, and can be revoked without changing the master key at all.",
+      "keyTerms": [
+        "General-purpose v2",
+        "Standard",
+        "Premium",
+        "access key",
+        "Shared Access Signature",
+        "SAS",
+        "storage firewall",
+        "lifecycle",
+        "versioning",
+        "soft delete"
+      ],
+      "commonTraps": [
+        "An access key grants full account access \u2014 always prefer a scoped, time-limited SAS when sharing access externally.",
+        "Soft delete protects against deletion; recovering a blob's content after an overwrite specifically needs versioning.",
+        "A storage firewall is a network-level control \u2014 separate from, and in addition to, who has valid credentials."
+      ],
+      "portalMockup": "storageAccount",
+      "scenario": "A marketing agency needs to let an external contractor upload files to one specific container for 48 hours, then lose access automatically. Issuing a SAS scoped to that container, valid for 48 hours, does exactly this \u2014 no account key changes hands, and access expires on its own without anyone having to remember to revoke it."
+    },
+    {
+      "id": "vms-compute",
+      "title": "Virtual Machines & Compute",
+      "summary": "VM sizing, managed disks, availability options, extensions, and resizing.",
+      "diagram": "diskTiers",
+      "vocabIds": [
+        "f19",
+        "f20",
+        "f21",
+        "f22",
+        "f27"
+      ],
+      "quizIds": [
+        "q16",
+        "q17",
+        "q22",
+        "q23",
+        "tf7"
+      ],
+      "reading": "Choosing a VM means balancing size against workload: the size determines CPU, memory, and disk throughput, while the series, B, D, F, and others, is tuned for different needs \u2014 B-series is cheap and burstable, D-series is general purpose, F-series is compute-optimized. Underneath, managed disks come in four performance tiers, Standard HDD, Standard SSD, Premium SSD, and Ultra Disk, from cheapest to fastest.\n\nFor resilience, availability sets spread VMs across separate hardware within one datacenter, availability zones go further by using physically separate datacenters within a region, and VM Scale Sets automatically add or remove instances based on demand or a schedule.\n\nDay-to-day operations include extensions, small agents that run post-deployment tasks like the Custom Script Extension, and resizing, which may require deallocating a running VM first if the target size isn't available on its current hardware.",
+      "fundamentalsLabel": "New to VM sizing and resilience? See the everyday analogy",
+      "fundamentals": "Choosing a VM series is like choosing a vehicle for a job: a compact car (B-series) is cheap and fine for occasional errands, a pickup truck (D-series) handles general hauling, and a race car (F-series) is built for one specific kind of performance. Availability sets and zones are about not parking every vehicle in the same garage \u2014 spreading them out so one disaster doesn't take out the whole fleet at once.",
+      "keyTerms": [
+        "size",
+        "series",
+        "managed disks",
+        "Standard HDD",
+        "Standard SSD",
+        "Premium SSD",
+        "Ultra Disk",
+        "availability sets",
+        "availability zones",
+        "VM Scale Sets",
+        "extensions",
+        "Custom Script Extension",
+        "deallocating"
+      ],
+      "commonTraps": [
+        "A B-series VM is burstable and cheap, but throttles under sustained heavy CPU load \u2014 the wrong pick for a constantly busy server.",
+        "Resizing a running VM may require deallocating it first if the new size isn't available on its current hardware.",
+        "Ultra Disk lets you configure performance independently of size \u2014 the highest, most consistent tier available."
+      ],
+      "portalMockup": "vmSize",
+      "scenario": "A team runs a database VM that needs consistent, high IOPS around the clock, plus a batch of short-lived web front-ends that spike unpredictably during business hours. The database gets a larger D-series or F-series VM with a Premium SSD or Ultra Disk. The front-ends go into a VM Scale Set, which adds instances automatically during the spikes and scales back down overnight, rather than running a fixed, oversized fleet all day."
+    },
+    {
+      "id": "app-hosting-iac",
+      "title": "App Hosting & Infrastructure as Code",
+      "summary": "App Service plans, deployment slots, container options, and ARM/Bicep.",
+      "diagram": "deploymentSlots",
+      "portalMockup": "deploymentSlot",
+      "vocabIds": [
+        "f23",
+        "f24",
+        "f25",
+        "f26"
+      ],
+      "quizIds": [
+        "q18",
+        "q19",
+        "q20",
+        "q21",
+        "tf8",
+        "tf9"
+      ],
+      "reading": "An App Service plan defines the compute tier and region for one or more web apps \u2014 scaling up changes the plan's size, scaling out adds more instances of it. Deployment slots give you a separate, swappable environment, like staging, to validate a new version before swapping it into production with minimal downtime.\n\nFor containers, the right choice depends on how much orchestration you need: Container Instances run a single container with none, Container Apps add serverless, HTTP-based autoscaling without managing a cluster, and AKS gives full Kubernetes control when you need it.\n\nFor repeatable deployments, ARM templates are Azure's native JSON Infrastructure as Code format, and Bicep is a newer, more concise language that compiles down to the same ARM JSON \u2014 functionally identical, just easier to write and read.",
+      "fundamentalsLabel": "New to app hosting and IaC? See the everyday analogy",
+      "fundamentals": "A deployment slot is like a dress rehearsal before opening night \u2014 you run the full show in a separate space first, then swap it into the real venue once it's ready, instead of testing changes directly in front of the audience. Infrastructure as Code is like a recipe instead of a memory of how you cooked something once: written down, repeatable, and shareable, rather than trusting yourself to click through the same steps identically every time.",
+      "keyTerms": [
+        "App Service plan",
+        "Deployment slots",
+        "Container Instances",
+        "Container Apps",
+        "AKS",
+        "ARM templates",
+        "Bicep"
+      ],
+      "commonTraps": [
+        "Scaling up changes the App Service plan's tier or size; scaling out adds more instances of the same tier.",
+        "Container Instances run a single container with no orchestration \u2014 that's what AKS is for.",
+        "Bicep is not a different deployment mechanism \u2014 it compiles down to the same ARM JSON underneath."
+      ],
+      "scenario": "A team wants to test a major update to their web app without any risk to the live site, then cut over quickly once it checks out. They deploy the new version to a staging slot, run their validation there against production-like settings, and swap it into the production slot in seconds once satisfied \u2014 with the previous version now sitting in the staging slot in case a fast rollback is ever needed."
+    },
+    {
+      "id": "az104-networking",
+      "title": "Networking",
+      "summary": "NSG rule priority, VNet peering, load balancing, and secure access.",
+      "diagram": "nsgPriority",
+      "portalMockup": "nsgRule",
+      "vocabIds": [
+        "f28",
+        "f29",
+        "f30",
+        "f31",
+        "f32",
+        "f33",
+        "f34",
+        "f35",
+        "f36"
+      ],
+      "quizIds": [
+        "q24",
+        "q25",
+        "q26",
+        "q29",
+        "q27",
+        "tf10",
+        "tf11",
+        "tf12"
+      ],
+      "reading": "As an administrator, you size VNets and subnets with real CIDR math in mind \u2014 Azure reserves 5 addresses in every subnet regardless of its size. Network Security Groups filter traffic with rules that have a priority; the lowest priority number is evaluated first and wins if rules conflict.\n\nVNet peering connects two VNets directly, even across regions, but it isn't transitive \u2014 peering A to B and B to C doesn't let A and C talk without their own direct peering. For distributing traffic, Azure Load Balancer works at layer 4 by IP and port alone, while Application Gateway works at layer 7 and can route by URL path and terminate SSL.\n\nFor secure remote access, Azure Bastion provides RDP or SSH through the portal without exposing a VM's public IP, and Network Watcher's tools, like IP flow verify, help diagnose exactly where a connectivity problem is coming from.",
+      "fundamentalsLabel": "New to network administration? See the everyday analogy",
+      "fundamentals": "An NSG rule priority works like a bouncer checking a list in order \u2014 the first matching rule they hit decides the outcome, and they stop checking after that, even if a later rule on the list would have said something different. VNet peering not being transitive is like two people each having a direct phone line to a shared friend, but no line to each other \u2014 being friends with the same person doesn't connect you to each other automatically.",
+      "keyTerms": [
+        "CIDR",
+        "Network Security Groups",
+        "priority",
+        "VNet peering",
+        "Azure Load Balancer",
+        "Application Gateway",
+        "Azure Bastion",
+        "Network Watcher"
+      ],
+      "commonTraps": [
+        "A lower NSG rule priority number wins \u2014 100 is evaluated before 200, regardless of allow or deny.",
+        "VNet peering is not transitive: A-B and B-C peered does not mean A and C can talk.",
+        "Application Gateway can route by URL path; Azure Load Balancer only sees IP and port, not HTTP content."
+      ],
+      "scenario": "An administrator needs to block a specific IP range from reaching a subnet while still allowing normal traffic through. They add a Deny rule at a lower priority number than the general Allow rule, so it's evaluated first \u2014 since NSGs stop at the first matching rule, that blocked range never reaches the broader allow rule beneath it."
+    },
+    {
+      "id": "monitoring-recovery",
+      "title": "Monitoring & Recovery",
+      "summary": "Metrics vs. logs, alerts and action groups, backup, and Site Recovery.",
+      "diagram": "backupRecovery",
+      "portalMockup": "backupVault",
+      "vocabIds": [
+        "f37",
+        "f38",
+        "f39",
+        "f40",
+        "f41",
+        "f42"
+      ],
+      "quizIds": [
+        "q33",
+        "q34",
+        "q35",
+        "q36"
+      ],
+      "reading": "Azure Monitor is the umbrella for keeping an eye on your own resources: metrics are lightweight numerical time-series data, like CPU percentage, while logs are detailed, queryable records stored in a Log Analytics workspace and searched with KQL. An alert rule defines the trigger condition, and a separate action group defines what happens next, like an email or an automated runbook.\n\nFor disaster protection, the distinction that matters most is scope: Azure Backup, through a Recovery Services vault, restores a VM or file to an earlier point in time, protecting against data loss or corruption. Azure Site Recovery goes further, replicating an entire workload to a secondary region so it can fail over and keep running if the primary region goes down entirely.",
+      "fundamentalsLabel": "New to monitoring and disaster recovery? See the everyday analogy",
+      "fundamentals": "Backup is like keeping dated copies of an important document, so you can go back to yesterday's version if today's got corrupted. Site Recovery is more like having a fully-equipped second office ready to open immediately if your main building becomes unusable \u2014 not just a copy of your files, but a whole working replacement environment standing by.",
+      "keyTerms": [
+        "Azure Monitor",
+        "metrics",
+        "logs",
+        "Log Analytics",
+        "KQL",
+        "alert rule",
+        "action group",
+        "Azure Backup",
+        "Recovery Services vault",
+        "Azure Site Recovery"
+      ],
+      "commonTraps": [
+        "Metrics are lightweight numerical data; use Logs and KQL for detailed, queryable event investigation.",
+        "An alert rule is the trigger condition \u2014 the action group is the separate response it sets off.",
+        "Backup restores a point-in-time copy; Site Recovery fails over a whole workload to another region."
+      ],
+      "scenario": "A company's production database VM gets corrupted by a bad script at 2pm. They restore it from that morning's backup in the Recovery Services vault, losing a few hours of data but recovering quickly. Separately, that same company has Site Recovery configured for their whole application tier, so if their primary region ever goes down entirely, the application can fail over and keep serving customers from a secondary region within minutes."
+    }
+  ],
+  "cheatSheet": [
+    {
+      "heading": "Identity & RBAC",
+      "points": [
+        "Owner = full access plus can assign roles to others. Contributor = full access but cannot assign roles. Reader = view only. User Access Administrator = can manage user access without touching the resources themselves.",
+        "RBAC scope inherits downward: Management Group \u2192 Subscription \u2192 Resource Group \u2192 Resource; a role assigned higher up applies to everything below it.",
+        "RBAC permissions are additive across assignments, but an explicit deny assignment always overrides any allow.",
+        "Azure Policy controls WHAT configurations are allowed/compliant (an effect like deny/audit); RBAC controls WHO can perform WHICH actions \u2014 they answer different questions and are not substitutes for each other."
+      ]
+    },
+    {
+      "heading": "Storage accounts & redundancy",
+      "points": [
+        "LRS = 3 sync copies in one datacenter (cheapest, least durable). ZRS = sync copies across zones in one region. GRS = async copy to a paired region (not readable). RA-GRS = same as GRS but the secondary is readable.",
+        "GZRS/RA-GZRS combine zone redundancy in the primary region with geo-replication to the paired region \u2014 the highest-durability options.",
+        "Blob access tiers (Hot/Cool/Cold/Archive) trade storage cost against access cost and retrieval latency; Archive requires rehydration before a blob can be read.",
+        "Only general-purpose v2 (StorageV2) accounts support the full feature set (all access tiers, lifecycle management); legacy v1 accounts don't."
+      ]
+    },
+    {
+      "heading": "Compute essentials",
+      "points": [
+        "Availability Set = protects against a single hardware/rack failure inside ONE datacenter (fault domains + update domains) \u2014 no protection if that datacenter goes down.",
+        "Availability Zone = physically separate datacenters within a region, each with independent power/cooling/network \u2014 protects against a datacenter-level outage.",
+        "A VM scale set can span multiple availability zones and automatically scales identical VM instances in/out based on load or a schedule.",
+        "Managed disks: Standard HDD/SSD for dev/test or infrequent access, Premium SSD for production workloads needing consistent low latency, Ultra Disk for the highest IOPS/throughput, latency-sensitive workloads (e.g. SAP HANA, SQL).",
+        "Azure Hybrid Benefit lets you apply existing on-premises Windows Server or SQL Server licenses to Azure VMs to cut compute cost."
+      ]
+    },
+    {
+      "heading": "Networking basics",
+      "points": [
+        "NSG rules are evaluated by priority number, lowest first, and processing stops at the first match \u2014 default rules can be overridden by a higher-priority custom rule but never deleted.",
+        "An NSG can be attached to a subnet, a NIC, or both; if both are in play, traffic must be allowed by BOTH to get through.",
+        "VNet peering is non-transitive: if VNet A peers with B, and B peers with C, A cannot reach C through B without its own direct peering (or a hub with routing).",
+        "Private Endpoint = a private IP address for a PaaS service inside your VNet (traffic never leaves the Microsoft backbone). Service Endpoint = an optimized route to the service over the Azure backbone, but the service still has a public IP.",
+        "Load Balancer = regional Layer 4 (TCP/UDP). Application Gateway = regional Layer 7 (HTTP, URL routing, WAF). Traffic Manager = global DNS-based routing (protocol-agnostic). Front Door = global Layer 7 with WAF + CDN."
+      ]
+    },
+    {
+      "heading": "Monitoring & backup/DR",
+      "points": [
+        "Azure Monitor Metrics = lightweight numerical time-series data. Azure Monitor Logs = detailed queryable records in a Log Analytics workspace, searched with KQL.",
+        "An alert rule defines the trigger condition; a separate action group defines the response (email, SMS, webhook, runbook).",
+        "Azure Backup (Recovery Services vault) restores a VM/file to an earlier point in time. Azure Site Recovery replicates and fails over a whole workload to a secondary region \u2014 different scope, don't mix them up.",
+        "A backup policy sets the schedule and retention; changing retention doesn't retroactively delete or extend already-taken recovery points outside the new window automatically without a cleanup job."
+      ]
+    },
+    {
+      "heading": "Governance (locks, policy, tags)",
+      "points": [
+        "Resource lock CanNotDelete allows read/modify but blocks deletion. ReadOnly blocks modify AND delete (locks down the resource entirely, which can break scaling or extensions unexpectedly).",
+        "Locks apply to everything below their scope in the hierarchy and can only be removed by someone with the right permission (Microsoft.Authorization/locks/delete), even an Owner needs that explicit permission.",
+        "Azure Policy initiatives group multiple related policy definitions together; policy effects include Deny, Audit, Append, Modify, and DeployIfNotExists.",
+        "Tags are not automatically inherited by child resources \u2014 a policy with the Modify or Append effect is needed to enforce/propagate tags automatically."
+      ]
+    },
+    {
+      "heading": "Exam-day reminders",
+      "points": [
+        "This exam is heavy on hands-on labs \u2014 expect scenario/portal-sequence questions, not just recall.",
+        "Watch for wording like \"least administrative effort\" or \"most cost-effective\" \u2014 pick the best fit among several technically-correct-sounding options.",
+        "If a question says the connection \"doesn't use the public internet,\" that's ExpressRoute, not a VPN Gateway.",
+        "\"Protect from a single datacenter failure\" points to Availability Zones; \"protect from a single rack/host failure\" points to Availability Sets."
+      ]
+    }
+  ]
+}

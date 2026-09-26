@@ -892,6 +892,17 @@ function CategoryFilterSelect({ categories, activeCat, onChange, masteryByCatego
   );
 }
 
+// The SM-2 quality scale flashcards are rated on — 1 (total blank) through
+// 5 (instant, no hesitation). A 3+ counts as a pass for both SRS growth and
+// the app's binary mastery signal (see ratingToOutcome in 03_helpers.js).
+const RATING_SCALE = [
+  { n: 1, label: 'Blank', color: COLOR.red },
+  { n: 2, label: 'Hard', color: COLOR.red },
+  { n: 3, label: 'OK', color: COLOR.gold },
+  { n: 4, label: 'Good', color: COLOR.success },
+  { n: 5, label: 'Easy', color: COLOR.success },
+];
+
 function FlashcardView({ card, flipped, setFlipped, onRate, index, total, categoryLabel, speakingId, onSpeak, speechSupported, flashcardsData }) {
   const [activeTermKey, setActiveTermKey] = useState(null);
   useEffect(() => { setActiveTermKey(null); }, [card && card.id]);
@@ -934,21 +945,24 @@ function FlashcardView({ card, flipped, setFlipped, onRate, index, total, catego
       <div style={{ fontSize: '11px', color: COLOR.muted, textAlign: 'center', marginTop: '8px' }}>
         {flipped ? 'Tap to see the term again' : 'Tap the card to reveal the definition'}
       </div>
-      <div className="flex gap-2 mt-4">
-        <button
-          onClick={() => onRate('incorrect')}
-          className="flex-1"
-          style={{ padding: '12px', borderRadius: '12px', border: `1px solid ${COLOR.red}`, color: COLOR.red, fontSize: '14px', fontWeight: 600, background: 'transparent' }}
-        >
-          ✕ Still learning
-        </button>
-        <button
-          onClick={() => onRate('correct')}
-          className="flex-1"
-          style={{ padding: '12px', borderRadius: '12px', background: COLOR.success, color: COLOR.onAccent, fontSize: '14px', fontWeight: 600 }}
-        >
-          ✓ Got it
-        </button>
+      <div style={{ fontSize: '10.5px', color: COLOR.muted, textAlign: 'center', marginBottom: '6px' }}>
+        How well did you know it?
+      </div>
+      <div className="flex gap-1">
+        {RATING_SCALE.map(({ n, label, color }) => (
+          <button
+            key={n}
+            onClick={() => onRate(n)}
+            className="flex-1"
+            style={{
+              padding: '9px 2px', borderRadius: '10px', border: `1px solid ${color}`, color, background: 'transparent',
+              fontSize: '10px', fontWeight: 600, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2px',
+            }}
+          >
+            <span style={{ fontSize: '14px', fontWeight: 700 }}>{n}</span>
+            <span>{label}</span>
+          </button>
+        ))}
       </div>
     </div>
   );

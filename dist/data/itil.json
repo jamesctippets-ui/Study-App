@@ -1,0 +1,1730 @@
+{
+  "categories": [
+    {
+      "key": "terms",
+      "label": "Key Terms",
+      "marks": 30,
+      "resources": [
+        {
+          "label": "AXELOS: ITIL 4 - Connecting the Key Concepts (Part 1)",
+          "url": "https://www.axelos.com/resource-hub/blog/itil-4-connecting-key-concepts-part-1"
+        },
+        {
+          "label": "PeopleCert: ITIL Foundation (Version 5)",
+          "url": "https://www.peoplecert.org/browse-certifications/it-governance-and-service-management/ITIL-1/itil-5-foundation-version-50-4154"
+        }
+      ]
+    },
+    {
+      "key": "valueSystem",
+      "label": "Value System",
+      "marks": 40,
+      "resources": [
+        {
+          "label": "AXELOS: ITIL 4 - A Clear Definition of Value",
+          "url": "https://www.axelos.com/resource-hub/blog/itil-4-a-clear-definition-of-value"
+        }
+      ]
+    },
+    {
+      "key": "dimensions",
+      "label": "Four Dimensions",
+      "marks": 10,
+      "resources": [
+        {
+          "label": "AXELOS: The Four Dimensions of Axle Car Hire",
+          "url": "https://www.axelos.com/resource-hub/blog/four-dimensions-of-axle-car-hire"
+        }
+      ]
+    },
+    {
+      "key": "lifecycle",
+      "label": "Lifecycle",
+      "marks": 10,
+      "resources": [
+        {
+          "label": "PeopleCert: ITIL Foundation (Version 5)",
+          "url": "https://www.peoplecert.org/browse-certifications/it-governance-and-service-management/ITIL-1/itil-5-foundation-version-50-4154"
+        }
+      ]
+    },
+    {
+      "key": "streams",
+      "label": "Value Streams",
+      "marks": 5,
+      "resources": [
+        {
+          "label": "AXELOS: ITIL 4 Value Streams - Doing the Right Things for Customers",
+          "url": "https://www.axelos.com/resource-hub/blog/itil-4-value-streams-doing-right-things-for-customers"
+        },
+        {
+          "label": "AXELOS: Value Streams and ITIL 4 CDS",
+          "url": "https://www.axelos.com/resource-hub/blog/value-streams-and-itil-4-cds"
+        }
+      ]
+    },
+    {
+      "key": "ai",
+      "label": "AI",
+      "marks": 3,
+      "resources": [
+        {
+          "label": "AXELOS: ITIL 4 and Artificial Intelligence (White Paper)",
+          "url": "https://www.axelos.com/resource-hub/white-paper/itil-4-and-artificial-intelligence"
+        }
+      ]
+    },
+    {
+      "key": "frameworks",
+      "label": "Other Frameworks",
+      "marks": 2,
+      "resources": [
+        {
+          "label": "AXELOS: Modern Service Management, ITIL 4 and Multiple Methods",
+          "url": "https://www.axelos.com/resource-hub/blog/modern_service_management_itil4_multiple_methods"
+        }
+      ]
+    }
+  ],
+  "flashcards": [
+    {
+      "id": "f1",
+      "cat": "terms",
+      "front": "Product vs. service",
+      "back": "A product is a configuration of an organization's resources. A service enables value co-creation by facilitating outcomes customers want, without the customer having to manage specific costs and risks themselves.",
+      "detail": "Example: Entra ID is a product. The identity management service you provide by configuring and supporting it is the service \u2014 value comes from the outcome, not the software itself."
+    },
+    {
+      "id": "f2",
+      "cat": "terms",
+      "front": "Digital product vs. digital service",
+      "back": "A digital product exists primarily in digital form, like software or data. A digital service is the value co-created through that product, i.e. the product is the app, the service is what using it accomplishes.",
+      "detail": "Exam trap: a SaaS platform itself is the digital product, while onboarding and supporting users on it is the digital service."
+    },
+    {
+      "id": "f3",
+      "cat": "terms",
+      "front": "Output vs. outcome",
+      "back": "An output is a tangible or intangible deliverable of an activity. An outcome is the result that output enables for a stakeholder. Outputs are what you produce, outcomes are what the stakeholder actually needed.",
+      "detail": "A resolved ticket is an output. The user being able to work uninterrupted again is the outcome ITIL actually cares about."
+    },
+    {
+      "id": "f4",
+      "cat": "terms",
+      "front": "Utility vs. warranty",
+      "back": "Utility is what the service does: functionality that supports performance or removes constraints (\"fit for purpose\"). Warranty is how well it does it: availability, capacity, security, continuity (\"fit for use\").",
+      "detail": "A firewall that blocks the right traffic has utility. One that stays up 99.9% of the time with proper failover has warranty. A service needs both to create value."
+    },
+    {
+      "id": "f5",
+      "cat": "terms",
+      "front": "Customer vs. user vs. sponsor",
+      "back": "Customer defines requirements and is accountable for outcomes. User actually uses the service day to day. Sponsor authorizes the budget. One person can hold more than one of these roles.",
+      "detail": "At an MSP, the client contact who signs the contract is often the sponsor, while their employees calling the help desk are users."
+    },
+    {
+      "id": "f6",
+      "cat": "terms",
+      "front": "Provider vs. consumer vs. digital product vendor",
+      "back": "Provider delivers the service. Consumer receives it, as customer, user, and/or sponsor. A digital product vendor supplies a product a provider or consumer uses, without itself being in a service relationship with them.",
+      "detail": "An MSP is the provider, the client is the consumer, and a software company selling licenses with no direct relationship management is closer to a digital product vendor."
+    },
+    {
+      "id": "f7",
+      "cat": "terms",
+      "front": "Cost vs. risk",
+      "back": "Cost is the money spent on a specific activity or resource. Risk is a possible event that could cause harm, loss, or make achieving objectives harder, including a missed opportunity, not only a downside.",
+      "detail": "Choosing a cheaper backup solution lowers cost but can raise risk. The exam likes scenarios where you have to weigh the two against each other."
+    },
+    {
+      "id": "f8",
+      "cat": "terms",
+      "front": "Service quality vs. service level vs. SLA",
+      "back": "Service quality is how well the service meets expectations overall. A service level is a measured target for one aspect of performance. An SLA is the documented agreement recording those targets.",
+      "detail": "\"99.9% uptime\" is a service level. The signed document guaranteeing it, with consequences for missing it, is the SLA."
+    },
+    {
+      "id": "f9",
+      "cat": "terms",
+      "front": "Core value stream vs. enabling value stream",
+      "back": "A core value stream directly creates value for an external customer. An enabling value stream supports other value streams internally, like supplier management, without touching the external customer directly.",
+      "detail": "Handling a client's support ticket is core. An internal process for renewing supplier licenses is enabling."
+    },
+    {
+      "id": "f10",
+      "cat": "terms",
+      "front": "Service relationship",
+      "back": "A cooperation between a service provider and consumer that includes service provision, service consumption, and service relationship management activities.",
+      "detail": "It covers the whole relationship, not just delivering the service, but how both sides manage and communicate around it."
+    },
+    {
+      "id": "f11",
+      "cat": "terms",
+      "front": "Service offering",
+      "back": "A description of one or more services designed to address the needs of a target consumer group, made up of goods, access to resources, and service actions.",
+      "detail": "Think of a support plan: the tiers, response times, and included tools together make up the offering, not just the raw technical capability."
+    },
+    {
+      "id": "f12",
+      "cat": "valueSystem",
+      "front": "The 5 components of the ITIL Value System",
+      "back": "Guiding principles, governance, the service value chain, management practices, and continual improvement.",
+      "detail": "A way to remember it: two are people-facing (principles, governance), one is the engine (value chain), one is the toolbox (practices), and one runs through everything (continual improvement)."
+    },
+    {
+      "id": "f13",
+      "cat": "valueSystem",
+      "front": "Guiding principles, purpose",
+      "back": "Recommendations that guide an organization in all circumstances, regardless of changes in goals, strategies, or structure.",
+      "detail": "They're deliberately generic so they apply whether you're troubleshooting a ticket or restructuring a whole team."
+    },
+    {
+      "id": "f14",
+      "cat": "valueSystem",
+      "front": "Governance, purpose",
+      "back": "The means by which an organization is directed and controlled: evaluating, directing, and monitoring performance and compliance.",
+      "detail": "Governance sits above day-to-day operations. It's leadership-level direction, not a specific practice like incident management."
+    },
+    {
+      "id": "f15",
+      "cat": "valueSystem",
+      "front": "Value chain, purpose",
+      "back": "An operating model outlining the key activities an organization undertakes to create value, converting inputs like demand and opportunity into outputs of value.",
+      "detail": "The value chain component of the Value System is expressed as the 8-stage Product and Service Lifecycle (Discover through Support) \u2014 see that flashcard for the full sequence."
+    },
+    {
+      "id": "f16",
+      "cat": "valueSystem",
+      "front": "Management practices, purpose",
+      "back": "Sets of organizational resources for performing work or accomplishing an objective. These are the \"how\" behind value chain activities.",
+      "detail": "There are 34 practices in Version 5, but Foundation only expects you to recognize a handful by name and purpose, like incident management or change enablement."
+    },
+    {
+      "id": "f17",
+      "cat": "valueSystem",
+      "front": "Continual improvement, purpose",
+      "back": "A recurring activity performed across every part of the organization to make sure performance keeps meeting stakeholder expectations.",
+      "detail": "It's not a one-time project. It's meant to be built into how every part of the organization already works."
+    },
+    {
+      "id": "f18",
+      "cat": "valueSystem",
+      "front": "Name the 7 guiding principles",
+      "back": "Focus on value; start where you are; progress iteratively with feedback; collaborate and promote visibility; think and work holistically; keep it simple and practical; optimize and automate.",
+      "detail": "A common exam trap: 'think and work holistically' means seeing the whole picture, while 'collaborate and promote visibility' means sharing information openly. Both are about openness but target different problems."
+    },
+    {
+      "id": "f19",
+      "cat": "valueSystem",
+      "front": "\"Focus on value\"",
+      "back": "Everything the organization does should map, directly or indirectly, to value for stakeholders. Always ask how a task benefits the customer or the business.",
+      "detail": "If a task doesn't map back to some stakeholder's outcome, this principle says question whether it's worth doing."
+    },
+    {
+      "id": "f20",
+      "cat": "valueSystem",
+      "front": "\"Start where you are\"",
+      "back": "Don't build from scratch. Assess what already exists and can be reused before creating something new.",
+      "detail": "This doesn't mean never changing anything. It means measuring the current state honestly before deciding what to keep."
+    },
+    {
+      "id": "f21",
+      "cat": "valueSystem",
+      "front": "\"Keep it simple and practical\"",
+      "back": "Use the minimum number of steps to accomplish an objective, and eliminate anything that doesn't contribute to value.",
+      "detail": "Watch for exam scenarios describing unnecessary approval steps or duplicate processes. That usually points to this principle."
+    },
+    {
+      "id": "f22",
+      "cat": "dimensions",
+      "front": "Name the Four Dimensions",
+      "back": "Organizations and people; information and technology; partners and suppliers; value streams and processes.",
+      "detail": "Exam scenarios often describe a change in one dimension causing a problem in another. That interaction is the whole point of calling them dimensions."
+    },
+    {
+      "id": "f23",
+      "cat": "dimensions",
+      "front": "Organizations and people, dimension",
+      "back": "Roles, responsibilities, structure, culture, and staffing needed to support the service.",
+      "detail": "Covers things like whether a support team has the right skills and headcount for a new application rollout."
+    },
+    {
+      "id": "f24",
+      "cat": "dimensions",
+      "front": "Information and technology, dimension",
+      "back": "The information and knowledge needed to manage services, plus the technologies that support them, including AI, cloud, and automation.",
+      "detail": "This is where AI, automation, and the actual toolset in use live in the model."
+    },
+    {
+      "id": "f25",
+      "cat": "dimensions",
+      "front": "Partners and suppliers, dimension",
+      "back": "Relationships with other organizations involved in designing, developing, deploying, or supporting services.",
+      "detail": "Ranges from a formal outsourcing arrangement to a simple software license. The exam expects you to recognize both count."
+    },
+    {
+      "id": "f26",
+      "cat": "dimensions",
+      "front": "What does PESTLE stand for?",
+      "back": "External factors affecting all four dimensions: Political, Economic, Social, Technological, Legal, Environmental.",
+      "detail": "You won't need to define each factor in depth, just recognize when a scenario describes an external pressure versus an internal one."
+    },
+    {
+      "id": "f27",
+      "cat": "lifecycle",
+      "front": "The 8 Product and Service Lifecycle activities, in order",
+      "back": "Discover, Design, Acquire, Build, Transition, Operate, Deliver, Support. Used iteratively, not strictly one-way.",
+      "detail": "Unlike the older six-activity value chain, this model is explicitly iterative. Work can loop back to an earlier activity at any point."
+    },
+    {
+      "id": "f28",
+      "cat": "lifecycle",
+      "front": "Discover",
+      "back": "Identifying opportunities, understanding demand, and exploring what a product or service could look like.",
+      "detail": "This is where 'is there a real problem worth solving here?' gets answered, before any design work starts."
+    },
+    {
+      "id": "f29",
+      "cat": "lifecycle",
+      "front": "Design",
+      "back": "Defining requirements and specifications for the product or service before it is acquired or built.",
+      "detail": "Requirements get defined here, but nothing is built yet. That boundary is a common thing the exam tests."
+    },
+    {
+      "id": "f30",
+      "cat": "lifecycle",
+      "front": "Acquire and Build",
+      "back": "Acquire: obtaining components from suppliers. Build: assembling or developing components in house. Both feed into a deployable product.",
+      "detail": "Buying a monitoring tool off the shelf is Acquire. Writing a custom automation script in-house is Build."
+    },
+    {
+      "id": "f31",
+      "cat": "lifecycle",
+      "front": "Transition",
+      "back": "Moving a new or changed product or service into live use, including testing and release.",
+      "detail": "This is where testing and release happen \u2014 think change management and deployment, not ongoing operation."
+    },
+    {
+      "id": "f32",
+      "cat": "lifecycle",
+      "front": "Operate, Deliver, Support",
+      "back": "Operate: running the service day to day. Deliver: providing the agreed outcomes to consumers. Support: resolving issues and requests that arise during use.",
+      "detail": "These three often get grouped on flashcards, but the exam can test them separately. Support specifically means responding to issues, not running the service day to day."
+    },
+    {
+      "id": "f33",
+      "cat": "streams",
+      "front": "Value stream",
+      "back": "A series of steps an organization undertakes to create and deliver products and services to consumers.",
+      "detail": "A value stream is made of value chain activities and practices strung together for a specific scenario, like 'resolve a user's incident.'"
+    },
+    {
+      "id": "f34",
+      "cat": "streams",
+      "front": "Value stream mapping",
+      "back": "Visualizing the end-to-end steps of a value stream to identify waste, delay, or handoffs that don't add value.",
+      "detail": "In practice this looks like a flowchart with timestamps, showing where a request sits waiting versus where real work happens."
+    },
+    {
+      "id": "f35",
+      "cat": "ai",
+      "front": "AI vs. generative AI vs. agentic AI",
+      "back": "AI: systems performing tasks that normally need human intelligence. Generative AI: creates new content. Agentic AI: can plan and act autonomously toward a goal with limited human intervention.",
+      "detail": "A chatbot that drafts a reply for a human to approve is generative. One that files the ticket, checks the knowledge base, and closes it itself is agentic."
+    },
+    {
+      "id": "f36",
+      "cat": "ai",
+      "front": "Why does AI governance matter in ITIL?",
+      "back": "AI must be directed and controlled like any other capability, covering accountability, transparency, ethics, and risk, not just technical deployment.",
+      "detail": "Expect exam questions testing whether you'd let AI act without any oversight. The correct answer is almost always no."
+    },
+    {
+      "id": "f37",
+      "cat": "frameworks",
+      "front": "ITIL and DevOps",
+      "back": "ITIL provides the broader service value system and governance. DevOps contributes specific practices for fast, collaborative delivery. They complement rather than compete.",
+      "detail": "DevOps practices like CI/CD can sit inside the 'Build' and 'Deliver & Support' stages of the Product and Service Lifecycle."
+    },
+    {
+      "id": "f38",
+      "cat": "frameworks",
+      "front": "ITIL and PRINCE2",
+      "back": "ITIL manages ongoing services. PRINCE2 manages the temporary, bounded work of projects. Projects often deliver changes that ITIL then operates.",
+      "detail": "A new system rollout might run as a PRINCE2 project, with ITIL practices taking over once it goes live and becomes an ongoing service."
+    },
+    {
+      "id": "f39",
+      "cat": "valueSystem",
+      "front": "The Continual Improvement Model, 7 steps",
+      "back": "What is the vision? \u2192 Where are we now? \u2192 Where do we want to be? \u2192 How do we get there? \u2192 Take action \u2192 Did we get there? \u2192 How do we keep the momentum going?",
+      "detail": "Each step depends on the one before it. You can't set a realistic target (step 3) without an honest baseline (step 2), which is why exam scenarios often describe a team that skipped a step."
+    },
+    {
+      "id": "f40",
+      "cat": "valueSystem",
+      "front": "Value chain vs. the Product and Service Lifecycle",
+      "back": "The Value System's value chain component is expressed as the same 8-stage Product and Service Lifecycle (Discover through Support), not a separate 6-activity model.",
+      "detail": "Exam trap: don't memorize two different activity lists for 'value chain' and 'lifecycle.' They describe the same set of activities from two angles."
+    },
+    {
+      "id": "f41",
+      "cat": "ai",
+      "front": "The AI Capability Model (the \"6Cs\")",
+      "back": "Six ways AI contributes to service management: Creation (generating content), Curation (organizing/filtering info), Clarification (explaining/simplifying), Cognition (deciding/predicting), Communication (interacting with humans), Coordination (orchestrating workflows).",
+      "detail": "Naming which \"C\" an AI system performs is the point: an AI that curates alerts needs different oversight than one that coordinates automated actions."
+    },
+    {
+      "id": "f42",
+      "cat": "dimensions",
+      "front": "AI and the Organizations and people dimension",
+      "back": "This dimension now explicitly covers how AI changes roles, skills, and culture, not just headcount and structure, including new skills to work alongside AI and oversight responsibilities for it.",
+      "detail": "Pairs with the AI Capability Model in Information and technology: one dimension covers what AI can do, the other covers who is accountable for it."
+    },
+    {
+      "id": "f43",
+      "cat": "valueSystem",
+      "front": "Practice groupings, current model",
+      "back": "34 total management practices are grouped as 12 general management practices and 22 product and service management practices. There is no longer a separate small \"technical management\" group.",
+      "detail": "Foundation doesn't require memorizing which of the 34 sits in which bucket, just recognizing that practices are the 'how' behind value chain activities."
+    },
+    {
+      "id": "f44",
+      "cat": "terms",
+      "front": "Service offering vs. service relationship",
+      "back": "A service offering describes what is offered, goods, resource access, and service actions, for a target consumer group. A service relationship is the ongoing cooperation between provider and consumer once that offering is taken up.",
+      "detail": "The offering is the menu; the relationship is what happens after the customer orders from it: provision, consumption, and relationship management activities."
+    },
+    {
+      "id": "f45",
+      "cat": "valueSystem",
+      "front": "Incident vs. problem vs. known error",
+      "back": "An incident is an unplanned interruption or reduction in quality of a service, resolved to restore service as fast as possible. A problem is the underlying cause of one or more incidents, investigated to prevent recurrence. A known error is a problem that has been analyzed but not yet permanently fixed, often with a documented workaround.",
+      "detail": "Restoring service fast (incident management) and finding the root cause (problem management) are deliberately separate practices \u2014 you can resolve an incident today with a workaround while the known error behind it stays open for a permanent fix later."
+    },
+    {
+      "id": "f46",
+      "cat": "valueSystem",
+      "front": "Change enablement: standard, normal, and emergency changes",
+      "back": "A standard change is pre-authorized, low-risk, and well-understood, needing no case-by-case approval. A normal change goes through assessment and authorization before implementation. An emergency change is fast-tracked through an expedited approval process because it must happen immediately, such as a fix for a live incident.",
+      "detail": "Recognizing which of the three a scenario describes is really about risk and urgency: routine and low-risk is standard, needs review is normal, and can't wait for the normal process is emergency."
+    },
+    {
+      "id": "f47",
+      "cat": "valueSystem",
+      "front": "Service desk",
+      "back": "The practice that acts as the single, agreed point of contact for users to report incidents, request services, and get status updates \u2014 the entry point into the value stream, even when it doesn't resolve every issue itself.",
+      "detail": "The service desk's real value is coordination and communication, not necessarily deep technical resolution \u2014 many issues it logs are escalated to specialist teams for problem vs. known error follow-up."
+    }
+  ],
+  "questions": [
+    {
+      "id": "q1",
+      "cat": "terms",
+      "type": "mc",
+      "question": "A team measures how many tickets were closed this week. Is that an output or an outcome?",
+      "options": [
+        "Output",
+        "Outcome",
+        "Utility",
+        "Warranty"
+      ],
+      "correct": 0,
+      "explanation": "Ticket count is a deliverable of the activity, so it's an output. Whether the customer's problem actually stayed solved is the outcome."
+    },
+    {
+      "id": "q2",
+      "cat": "terms",
+      "type": "mc",
+      "question": "Which pair correctly matches 'fit for purpose' and 'fit for use'?",
+      "options": [
+        "Output = fit for purpose, outcome = fit for use",
+        "Utility = fit for purpose, warranty = fit for use",
+        "Warranty = fit for purpose, utility = fit for use",
+        "Cost = fit for purpose, risk = fit for use"
+      ],
+      "correct": 1,
+      "explanation": "Utility is what the service does. Warranty is how well and reliably it does it."
+    },
+    {
+      "id": "q3",
+      "cat": "terms",
+      "type": "mc",
+      "question": "A client asks which sysadmin actually logs into the ticketing system every day. Which role is that?",
+      "options": [
+        "User",
+        "Customer",
+        "Sponsor",
+        "Provider"
+      ],
+      "correct": 0,
+      "explanation": "The user is whoever actually uses the service day to day, distinct from whoever defines requirements or pays for it."
+    },
+    {
+      "id": "q4",
+      "cat": "terms",
+      "type": "mc",
+      "question": "A finance director approves the annual budget for a helpdesk contract but never opens a ticket. What's their role?",
+      "options": [
+        "Provider",
+        "Sponsor",
+        "User",
+        "Digital product vendor"
+      ],
+      "correct": 1,
+      "explanation": "The sponsor authorizes the budget. They may or may not also be a customer or user."
+    },
+    {
+      "id": "q5",
+      "cat": "terms",
+      "type": "mc",
+      "question": "Which value stream type touches the external customer directly?",
+      "options": [
+        "Enabling value stream",
+        "Management practice",
+        "Improvement value stream",
+        "Core value stream"
+      ],
+      "correct": 3,
+      "explanation": "Core value streams create value for the external customer directly. Enabling value streams support internal work instead."
+    },
+    {
+      "id": "q6",
+      "cat": "terms",
+      "type": "mc",
+      "question": "A vendor sells licenses for a monitoring tool but has no ongoing service relationship with the buyer. What is the vendor?",
+      "options": [
+        "Sponsor",
+        "Service consumer",
+        "Service provider",
+        "Digital product vendor"
+      ],
+      "correct": 3,
+      "explanation": "A digital product vendor supplies a product without being in a service relationship with the buyer."
+    },
+    {
+      "id": "q7",
+      "cat": "terms",
+      "type": "mc",
+      "question": "What's the key difference between a service level and an SLA?",
+      "options": [
+        "An SLA applies to internal teams, and a service level applies to external customers",
+        "They mean exactly the same thing",
+        "A service level is a measured target, an SLA is the documented agreement recording those targets",
+        "A service level is set by the customer, while an SLA is set unilaterally by the provider"
+      ],
+      "correct": 2,
+      "explanation": "The service level is the target itself; the SLA is the formal document that records it."
+    },
+    {
+      "id": "q27",
+      "cat": "terms",
+      "type": "mc",
+      "question": "Which of these is an example of warranty rather than utility?",
+      "options": [
+        "A guaranteed 99.9% uptime commitment",
+        "A report showing ticket volume",
+        "The ability to reset a password online",
+        "A firewall rule blocking a specific port"
+      ],
+      "correct": 0,
+      "explanation": "Uptime guarantees are about reliability and availability \u2014 that's warranty. Password reset and firewall rules are functional capabilities \u2014 that's utility."
+    },
+    {
+      "id": "q35",
+      "cat": "terms",
+      "type": "mc",
+      "question": "A provider fixes a client's network issue for free after an SLA breach. Is the fix itself the value?",
+      "options": [
+        "Value comes from the cost savings of the free fix",
+        "Value is defined by what the SLA document specifies",
+        "Yes, the fix is the value",
+        "No, value is realized in the outcome the fix enables, not the fix itself"
+      ],
+      "correct": 3,
+      "explanation": "Value is realized when the outcome actually helps the stakeholder \u2014 the fix itself is just the mechanism, not the value."
+    },
+    {
+      "id": "q41",
+      "cat": "terms",
+      "type": "mc",
+      "question": "A provider markets a service as having '99.99% availability,' but the client also needs guaranteed 4-hour incident response times to actually be satisfied. What does this illustrate?",
+      "options": [
+        "Cost is what determines whether expectations are met",
+        "Warranty covers multiple dimensions, like availability and continuity, not just an uptime number alone",
+        "Utility already covers response times",
+        "Incident response time is a utility concern, not a warranty one"
+      ],
+      "correct": 1,
+      "explanation": "Warranty spans availability, capacity, security, and continuity \u2014 a single uptime figure doesn't capture the whole picture the customer actually needs."
+    },
+    {
+      "id": "q8",
+      "cat": "valueSystem",
+      "type": "mc",
+      "question": "Which of the following is NOT one of the five components of the ITIL Value System?",
+      "options": [
+        "Continual improvement",
+        "Governance",
+        "Value chain",
+        "Service desk"
+      ],
+      "correct": 3,
+      "explanation": "Service desk is a management practice, not one of the five Value System components."
+    },
+    {
+      "id": "q9",
+      "cat": "valueSystem",
+      "type": "mc",
+      "question": "A team is tempted to build a brand-new ticketing workflow instead of checking what's already in place. Which principle applies?",
+      "options": [
+        "Optimize and automate",
+        "Focus on value",
+        "Start where you are",
+        "Keep it simple and practical"
+      ],
+      "correct": 2,
+      "explanation": "Start where you are means assessing and reusing what already exists before building something new."
+    },
+    {
+      "id": "q10",
+      "cat": "valueSystem",
+      "type": "mc",
+      "question": "Always asking how a task benefits the customer or business describes which principle?",
+      "options": [
+        "Progress iteratively with feedback",
+        "Focus on value",
+        "Collaborate and promote visibility",
+        "Think and work holistically"
+      ],
+      "correct": 1,
+      "explanation": "Focus on value ties every activity back to stakeholder benefit."
+    },
+    {
+      "id": "q11",
+      "cat": "valueSystem",
+      "type": "mc",
+      "question": "How many guiding principles does ITIL define?",
+      "options": [
+        "5",
+        "9",
+        "6",
+        "7"
+      ],
+      "correct": 3,
+      "explanation": "There are seven guiding principles."
+    },
+    {
+      "id": "q12",
+      "cat": "valueSystem",
+      "type": "mc",
+      "question": "What does governance provide within the Value System?",
+      "options": [
+        "A list of management practices",
+        "The value chain's inputs",
+        "A single guiding principle",
+        "The means to direct and control the organization"
+      ],
+      "correct": 3,
+      "explanation": "Governance is about evaluating, directing, and monitoring the organization."
+    },
+    {
+      "id": "q13",
+      "cat": "valueSystem",
+      "type": "mc",
+      "question": "A team removes three approval steps that added no value to a change request. Which principle are they applying?",
+      "options": [
+        "Focus on value",
+        "Start where you are",
+        "Keep it simple and practical",
+        "Collaborate and promote visibility"
+      ],
+      "correct": 2,
+      "explanation": "Keep it simple and practical means using the minimum steps needed and cutting anything that doesn't add value."
+    },
+    {
+      "id": "q14",
+      "cat": "valueSystem",
+      "type": "mc",
+      "question": "What connects the guiding principles, governance, and practices to every part of the organization on a recurring basis?",
+      "options": [
+        "The value chain",
+        "Value streams",
+        "PESTLE",
+        "Continual improvement"
+      ],
+      "correct": 3,
+      "explanation": "Continual improvement recurs across every part of the Value System."
+    },
+    {
+      "id": "q28",
+      "cat": "valueSystem",
+      "type": "mc",
+      "question": "A service desk team gradually rolls out a new ticketing system to one department before expanding company-wide. Which principle are they following?",
+      "options": [
+        "Optimize and automate",
+        "Keep it simple and practical",
+        "Think and work holistically",
+        "Progress iteratively with feedback"
+      ],
+      "correct": 3,
+      "explanation": "Rolling out gradually and adjusting based on feedback is exactly what progress iteratively with feedback describes."
+    },
+    {
+      "id": "q29",
+      "cat": "valueSystem",
+      "type": "mc",
+      "question": "Sharing dashboards openly so every team can see current incident status demonstrates which principle?",
+      "options": [
+        "Optimize and automate",
+        "Focus on value",
+        "Start where you are",
+        "Collaborate and promote visibility"
+      ],
+      "correct": 3,
+      "explanation": "Openly sharing information so others can see what's happening is the core idea behind collaborate and promote visibility."
+    },
+    {
+      "id": "q36",
+      "cat": "valueSystem",
+      "type": "mc",
+      "question": "Which statement about management practices is correct?",
+      "options": [
+        "They only apply to IT operations",
+        "There are exactly 7 of them",
+        "They provide organizational resources for performing work toward an objective",
+        "They replace the guiding principles"
+      ],
+      "correct": 2,
+      "explanation": "Management practices are the organizational resources, including processes, people, and tools, used to carry out value chain activities."
+    },
+    {
+      "id": "q40",
+      "cat": "valueSystem",
+      "type": "mc",
+      "question": "A manager insists on adding a new approval step 'because that's how we've always handled security,' even though it duplicates a check already performed elsewhere. Which principle is most directly being violated?",
+      "options": [
+        "Focus on value",
+        "Keep it simple and practical",
+        "Collaborate and promote visibility",
+        "Start where you are"
+      ],
+      "correct": 1,
+      "explanation": "A redundant step that duplicates an existing check works against using the minimum number of steps needed \u2014 the core idea of keep it simple and practical."
+    },
+    {
+      "id": "q42",
+      "cat": "valueSystem",
+      "type": "mc",
+      "question": "A manual approval step is slow, error-prone, and also redundant with an earlier check. In what order should the guiding principles be applied here?",
+      "options": [
+        "Apply both simultaneously with no particular order",
+        "Optimize and automate first, then simplify afterward",
+        "Neither principle applies to automation decisions",
+        "Keep it simple and practical first, removing the redundant step, then optimize and automate what remains"
+      ],
+      "correct": 3,
+      "explanation": "Automating a broken process just makes it fail faster \u2014 simplify first, then automate what's left."
+    },
+    {
+      "id": "q15",
+      "cat": "dimensions",
+      "type": "mc",
+      "question": "A new remote-work policy requires retraining support staff and redefining roles. Which dimension does this affect most directly?",
+      "options": [
+        "Value streams and processes",
+        "Information and technology",
+        "Organizations and people",
+        "Partners and suppliers"
+      ],
+      "correct": 2,
+      "explanation": "Roles, structure, and staffing sit under organizations and people."
+    },
+    {
+      "id": "q16",
+      "cat": "dimensions",
+      "type": "mc",
+      "question": "Which dimension covers external factors like a new data privacy law?",
+      "options": [
+        "Only information and technology",
+        "Only organizations and people",
+        "Only partners and suppliers",
+        "None directly, PESTLE factors affect all four dimensions"
+      ],
+      "correct": 3,
+      "explanation": "PESTLE factors are external influences that can affect any or all of the four dimensions."
+    },
+    {
+      "id": "q17",
+      "cat": "dimensions",
+      "type": "mc",
+      "question": "A healthcare IT team relies on a third party to host its EHR platform. Which dimension is most relevant?",
+      "options": [
+        "Information and technology",
+        "Partners and suppliers",
+        "Value streams and processes",
+        "Organizations and people"
+      ],
+      "correct": 1,
+      "explanation": "Relationships with outside organizations sit under partners and suppliers."
+    },
+    {
+      "id": "q18",
+      "cat": "dimensions",
+      "type": "mc",
+      "question": "PESTLE stands for Political, Economic, Social, Technological, Legal, and ___?",
+      "options": [
+        "Environmental",
+        "Ethical",
+        "Educational",
+        "Experiential"
+      ],
+      "correct": 0,
+      "explanation": "The final factor is Environmental."
+    },
+    {
+      "id": "q30",
+      "cat": "dimensions",
+      "type": "mc",
+      "question": "A company automates password resets to cut down on support tickets. Which two dimensions does this touch most directly?",
+      "options": [
+        "Only organizations and people",
+        "Information and technology, and organizations and people",
+        "Only information and technology",
+        "Partners and suppliers, and value streams and processes only"
+      ],
+      "correct": 1,
+      "explanation": "Automating a process touches the technology used to do it and the people whose roles and workload change as a result."
+    },
+    {
+      "id": "q43",
+      "cat": "dimensions",
+      "type": "mc",
+      "question": "A company outsources network monitoring to a third party, who then requires in-house staff to be trained to interpret their alerts correctly. Which two dimensions are directly involved?",
+      "options": [
+        "Only information and technology",
+        "Only partners and suppliers",
+        "Value streams and processes, and partners and suppliers only",
+        "Partners and suppliers, and organizations and people"
+      ],
+      "correct": 3,
+      "explanation": "The outsourcing relationship sits under partners and suppliers, while the staff training need sits under organizations and people."
+    },
+    {
+      "id": "q19",
+      "cat": "lifecycle",
+      "type": "mc",
+      "question": "Put these in the correct lifecycle order: Transition, Discover, Build, Design.",
+      "options": [
+        "Design, Discover, Transition, Build",
+        "Discover, Design, Build, Transition",
+        "Discover, Build, Design, Transition",
+        "Build, Design, Discover, Transition"
+      ],
+      "correct": 1,
+      "explanation": "The lifecycle runs Discover, Design, Acquire, Build, Transition, Operate, Deliver, Support."
+    },
+    {
+      "id": "q20",
+      "cat": "lifecycle",
+      "type": "mc",
+      "question": "A team is exploring whether there's real demand for a self-service password reset tool. Which activity are they in?",
+      "options": [
+        "Discover",
+        "Operate",
+        "Design",
+        "Acquire"
+      ],
+      "correct": 0,
+      "explanation": "Exploring demand and opportunity is the Discover activity."
+    },
+    {
+      "id": "q21",
+      "cat": "lifecycle",
+      "type": "mc",
+      "question": "Which activity involves testing and releasing a new service into live use?",
+      "options": [
+        "Transition",
+        "Deliver",
+        "Build",
+        "Support"
+      ],
+      "correct": 0,
+      "explanation": "Transition covers moving a product or service into live use, including testing and release."
+    },
+    {
+      "id": "q22",
+      "cat": "lifecycle",
+      "type": "mc",
+      "question": "Resolving a user's incident ticket after a service has gone live falls under which activity?",
+      "options": [
+        "Discover",
+        "Support",
+        "Acquire",
+        "Design"
+      ],
+      "correct": 1,
+      "explanation": "Support covers resolving issues and requests that arise once a service is in use."
+    },
+    {
+      "id": "q31",
+      "cat": "lifecycle",
+      "type": "mc",
+      "question": "Which lifecycle activities directly involve creating or obtaining the components of a product?",
+      "options": [
+        "Discover and Design",
+        "Deliver and Support",
+        "Acquire and Build",
+        "Transition and Operate"
+      ],
+      "correct": 2,
+      "explanation": "Acquire, obtaining from suppliers, and Build, developing in-house, are the two activities that produce components."
+    },
+    {
+      "id": "q44",
+      "cat": "lifecycle",
+      "type": "mc",
+      "question": "A team already has an approved design and is now assembling a solution using one in-house component and one purchased component. Which two activities are they most likely in?",
+      "options": [
+        "Transition and Operate",
+        "Deliver and Support",
+        "Discover and Design",
+        "Build and Acquire"
+      ],
+      "correct": 3,
+      "explanation": "Acquire covers the purchased component, Build covers the in-house one \u2014 both come after Design."
+    },
+    {
+      "id": "q23",
+      "cat": "streams",
+      "type": "mc",
+      "question": "What is the purpose of value stream mapping?",
+      "options": [
+        "To formally document the guiding principles for a specific team",
+        "To assign a monetary budget to each value chain activity",
+        "To visualize the end-to-end steps and spot waste or delay",
+        "To define and negotiate SLA targets with a customer"
+      ],
+      "correct": 2,
+      "explanation": "Value stream mapping visualizes steps to find waste, delay, and unnecessary handoffs \u2014 it's a diagnostic tool for the flow of work, not a budgeting exercise, a way of documenting principles, or how SLA targets get set."
+    },
+    {
+      "id": "q32",
+      "cat": "streams",
+      "type": "mc",
+      "question": "Which best describes the relationship between value streams and the value chain?",
+      "options": [
+        "The value chain is a type of value stream",
+        "Value streams only exist in the Support activity",
+        "They are unrelated concepts",
+        "A value stream combines value chain activities and practices for a specific scenario"
+      ],
+      "correct": 3,
+      "explanation": "A value stream strings together value chain activities and practices for a specific end-to-end scenario."
+    },
+    {
+      "id": "q37",
+      "cat": "streams",
+      "type": "mc",
+      "question": "A team wants to see whether a request typically waits longest at the approval step or the fulfillment step. Which practice would they use?",
+      "options": [
+        "Continual improvement alone",
+        "The guiding principles alone",
+        "Value stream mapping",
+        "Governance"
+      ],
+      "correct": 2,
+      "explanation": "Value stream mapping visualizes each step of a value stream, including exactly where delay or waiting happens."
+    },
+    {
+      "id": "q24",
+      "cat": "ai",
+      "type": "mc",
+      "question": "An AI system that can independently plan and carry out a multi-step task with minimal human input is best described as:",
+      "options": [
+        "A guiding principle",
+        "Generative AI",
+        "Agentic AI",
+        "Rule-based automation"
+      ],
+      "correct": 2,
+      "explanation": "Agentic AI plans and acts autonomously toward a goal. Generative AI only creates content on request without that independent planning, rule-based automation just follows fixed if-then logic with no planning of its own, and a guiding principle is an ITIL recommendation, not a type of AI at all."
+    },
+    {
+      "id": "q25",
+      "cat": "ai",
+      "type": "mc",
+      "question": "Why does ITIL emphasize AI governance rather than just AI adoption?",
+      "options": [
+        "Because governance replaces the need for guiding principles",
+        "Because AI still needs accountability, transparency, and risk management like any other capability",
+        "Because AI is outside the four dimensions",
+        "Because ITIL forbids using AI"
+      ],
+      "correct": 1,
+      "explanation": "AI is treated as a capability that still needs direction and control, not an exception to governance."
+    },
+    {
+      "id": "q33",
+      "cat": "ai",
+      "type": "mc",
+      "question": "Which best distinguishes generative AI from agentic AI?",
+      "options": [
+        "There is no meaningful difference",
+        "Generative AI creates content; agentic AI plans and acts toward a goal",
+        "Generative AI is always more accurate",
+        "Agentic AI cannot use generative capabilities"
+      ],
+      "correct": 1,
+      "explanation": "Generative AI produces new content; agentic AI takes that further by planning and acting toward a goal with less human input."
+    },
+    {
+      "id": "q38",
+      "cat": "ai",
+      "type": "mc",
+      "question": "A support team lets an AI agent auto-resolve simple password resets, but requires human sign-off before any AI action affecting a production server. What does this reflect?",
+      "options": [
+        "A guiding principle being ignored",
+        "AI governance applied proportionally to risk",
+        "A rejection of agentic AI entirely",
+        "A failure of the value chain"
+      ],
+      "correct": 1,
+      "explanation": "This is AI governance in practice \u2014 oversight applied in proportion to risk, allowing autonomy for low-risk actions while requiring approval for higher-risk ones."
+    },
+    {
+      "id": "q45",
+      "cat": "ai",
+      "type": "mc",
+      "question": "An AI-assisted change process automatically approves low-risk standard changes but routes anything touching a regulated system to a human review board. What does this best describe?",
+      "options": [
+        "A violation of the four dimensions",
+        "An example of utility without warranty",
+        "A rejection of the guiding principles",
+        "AI governance calibrated to risk"
+      ],
+      "correct": 3,
+      "explanation": "Applying stronger human oversight in proportion to risk is exactly what proportionate AI governance looks like in practice."
+    },
+    {
+      "id": "q26",
+      "cat": "frameworks",
+      "type": "mc",
+      "question": "Which statement best describes how ITIL relates to PRINCE2?",
+      "options": [
+        "PRINCE2 replaces the ITIL Value System",
+        "They are competing, incompatible frameworks",
+        "ITIL only applies to projects, not services",
+        "PRINCE2 manages temporary project work that often delivers changes ITIL then operates"
+      ],
+      "correct": 3,
+      "explanation": "PRINCE2 handles bounded project work; ITIL handles the ongoing service that project delivers into."
+    },
+    {
+      "id": "q34",
+      "cat": "frameworks",
+      "type": "mc",
+      "question": "Which best describes why ITIL and Agile are often used together?",
+      "options": [
+        "Agile focuses on how work gets done iteratively; ITIL provides the wider service value context it happens within",
+        "They solve the exact same problem",
+        "ITIL forbids agile methods",
+        "Agile replaces the guiding principles"
+      ],
+      "correct": 0,
+      "explanation": "Agile and ITIL address different layers \u2014 Agile is about how work gets done iteratively, ITIL is about the wider value system that work happens within."
+    },
+    {
+      "id": "q39",
+      "cat": "frameworks",
+      "type": "mc",
+      "question": "A team automates its build, test, and deployment pipeline using DevOps practices, and separately wants ITIL to govern how those releases fit into the wider service value system. What's the most accurate way to describe how these fit together?",
+      "options": [
+        "DevOps and ITIL solve the exact same problem and cannot be used together",
+        "ITIL provides the wider service value system and governance; DevOps contributes specific practices for fast, collaborative delivery",
+        "DevOps replaces the need for a service value system entirely",
+        "ITIL forbids automated deployment pipelines"
+      ],
+      "correct": 1,
+      "explanation": "ITIL and DevOps operate at different layers and are meant to complement each other: DevOps practices like CI/CD can sit inside the Build and Deliver & Support stages of the value system, governed by the wider ITIL context rather than replacing it."
+    },
+    {
+      "id": "tf1",
+      "cat": "terms",
+      "type": "tf",
+      "question": "A user and a customer are mutually exclusive roles that can never be held by the same person.",
+      "answer": false,
+      "explanation": "They're distinct roles \u2014 a user consumes the service, a customer defines requirements and is accountable for outcomes \u2014 but nothing stops one person from holding both roles at once."
+    },
+    {
+      "id": "tf2",
+      "cat": "terms",
+      "type": "tf",
+      "question": "Utility refers to how available and secure a service is.",
+      "answer": false,
+      "explanation": "That's warranty. Utility is about what the service does \u2014 its functionality, or fit for purpose."
+    },
+    {
+      "id": "tf3",
+      "cat": "terms",
+      "type": "tf",
+      "question": "An SLA is simply another name for a single service level target.",
+      "answer": false,
+      "explanation": "A service level is one measured target. An SLA is the broader documented agreement that records one or more of those targets, along with the consequences of missing them."
+    },
+    {
+      "id": "tf4",
+      "cat": "terms",
+      "type": "tf",
+      "question": "A core value stream always involves direct interaction with the external customer.",
+      "answer": true,
+      "explanation": "That direct connection to the external customer is what defines a core value stream, as opposed to an enabling one."
+    },
+    {
+      "id": "tf5",
+      "cat": "valueSystem",
+      "type": "tf",
+      "question": "The ITIL Value System has five components.",
+      "answer": true,
+      "explanation": "Guiding principles, governance, the value chain, management practices, and continual improvement."
+    },
+    {
+      "id": "tf6",
+      "cat": "valueSystem",
+      "type": "tf",
+      "question": "Governance is considered one of the seven guiding principles.",
+      "answer": false,
+      "explanation": "Governance is a separate Value System component, not one of the guiding principles."
+    },
+    {
+      "id": "tf7",
+      "cat": "valueSystem",
+      "type": "tf",
+      "question": "Optimize and automate prioritizes automating a process as the first step, before making manual improvements to it.",
+      "answer": false,
+      "explanation": "It's the reverse order \u2014 optimize first, then automate what's left. Automating an inefficient process just makes it fail faster."
+    },
+    {
+      "id": "tf8",
+      "cat": "valueSystem",
+      "type": "tf",
+      "question": "Continual improvement is a one-time initiative completed after a major project.",
+      "answer": false,
+      "explanation": "It's an ongoing, recurring activity across the whole organization."
+    },
+    {
+      "id": "tf9",
+      "cat": "valueSystem",
+      "type": "tf",
+      "question": "The guiding principles are primarily intended for formal, large-scale service management initiatives rather than routine daily work.",
+      "answer": false,
+      "explanation": "They're meant to apply universally, in every circumstance regardless of the type or scale of work \u2014 routine daily decisions are exactly where they're meant to guide behavior too."
+    },
+    {
+      "id": "tf10",
+      "cat": "valueSystem",
+      "type": "tf",
+      "question": "Start where you are is best applied by keeping current processes exactly as they are for as long as possible.",
+      "answer": false,
+      "explanation": "It means assess and reuse what exists to decide what's actually worth changing \u2014 it's a starting point for informed change, not a reason to avoid changing anything."
+    },
+    {
+      "id": "tf11",
+      "cat": "dimensions",
+      "type": "tf",
+      "question": "PESTLE factors are internal to the four dimensions.",
+      "answer": false,
+      "explanation": "They're external factors that influence the four dimensions from outside the organization."
+    },
+    {
+      "id": "tf12",
+      "cat": "dimensions",
+      "type": "tf",
+      "question": "The four dimensions can affect each other.",
+      "answer": true,
+      "explanation": "A change in one dimension, like technology, often affects another, like people and roles."
+    },
+    {
+      "id": "tf13",
+      "cat": "dimensions",
+      "type": "tf",
+      "question": "Partners and suppliers primarily describes long-term, contractually formal outsourcing arrangements rather than smaller vendor relationships.",
+      "answer": false,
+      "explanation": "It covers the full range, from a single software license purchased from a vendor to a large formal outsourcing contract \u2014 scale and formality are not what define this dimension."
+    },
+    {
+      "id": "tf14",
+      "cat": "lifecycle",
+      "type": "tf",
+      "question": "The eight lifecycle activities are generally performed in a single pass from Discover through Support, with looping back to an earlier activity treated as a sign the process broke down.",
+      "answer": false,
+      "explanation": "They're used iteratively by design \u2014 looping back to an earlier activity, like returning to Design after issues surface in Build, is expected and normal, not a sign of failure."
+    },
+    {
+      "id": "tf15",
+      "cat": "lifecycle",
+      "type": "tf",
+      "question": "Support in the lifecycle model refers to running a service day to day.",
+      "answer": false,
+      "explanation": "That's Operate. Support means resolving issues and requests that come up while the service is in use."
+    },
+    {
+      "id": "tf16",
+      "cat": "lifecycle",
+      "type": "tf",
+      "question": "Acquire and Build both feed into producing a deployable product or service component.",
+      "answer": true,
+      "explanation": "Acquire obtains components from suppliers; Build develops them in house. Both lead toward a deployable result."
+    },
+    {
+      "id": "tf17",
+      "cat": "streams",
+      "type": "tf",
+      "question": "Value stream mapping is used to identify waste and delay in a process.",
+      "answer": true,
+      "explanation": "That's exactly its purpose \u2014 visualizing steps to spot where value gets held up."
+    },
+    {
+      "id": "tf18",
+      "cat": "ai",
+      "type": "tf",
+      "question": "Agentic AI can plan and carry out multi-step tasks with limited human intervention.",
+      "answer": true,
+      "explanation": "That autonomous planning and action is what distinguishes agentic AI from purely generative AI."
+    },
+    {
+      "id": "tf19",
+      "cat": "ai",
+      "type": "tf",
+      "question": "ITIL treats AI adoption primarily as a technology upgrade, where governance only becomes relevant once something goes wrong.",
+      "answer": false,
+      "explanation": "AI needs accountability, transparency, and risk management applied proactively, from the start, just like any other capability \u2014 not brought in reactively after a problem occurs."
+    },
+    {
+      "id": "tf20",
+      "cat": "frameworks",
+      "type": "tf",
+      "question": "PRINCE2 and ITIL are competing frameworks, and an organization has to choose only one to adopt.",
+      "answer": false,
+      "explanation": "They operate at different layers and are meant to complement each other \u2014 PRINCE2 manages temporary, bounded project work, while ITIL manages the ongoing service that project delivers into."
+    },
+    {
+      "id": "q46",
+      "cat": "valueSystem",
+      "type": "mc",
+      "question": "A team sets a measurable, time-bound target for cutting incident resolution time in half before building an action plan to get there. Which step of the Continual Improvement Model are they in?",
+      "options": [
+        "Where do we want to be?",
+        "What is the vision?",
+        "How do we get there?",
+        "Did we get there?"
+      ],
+      "correct": 0,
+      "explanation": "Setting a measurable, time-bound target is exactly the 'where do we want to be' step. It comes after assessing the current state and before building the action plan in 'how do we get there.'"
+    },
+    {
+      "id": "q47",
+      "cat": "valueSystem",
+      "type": "mc",
+      "question": "A team builds a detailed action plan to improve response times but never measured how long responses currently take. Which step of the Continual Improvement Model did they skip?",
+      "options": [
+        "Where are we now?",
+        "What is the vision?",
+        "Take action",
+        "How do we keep the momentum going?"
+      ],
+      "correct": 0,
+      "explanation": "Without an honest baseline from 'where are we now,' any target or plan built afterward is just a guess. The steps depend on the ones before them."
+    },
+    {
+      "id": "q48",
+      "cat": "valueSystem",
+      "type": "mc",
+      "question": "After migrating to a new ticketing system, a team discovers that reports another department relies on, pulled from the old system, are now broken. Which guiding principle would have surfaced this risk earlier?",
+      "options": [
+        "Think and work holistically",
+        "Keep it simple and practical",
+        "Focus on value",
+        "Start where you are"
+      ],
+      "correct": 0,
+      "explanation": "Think and work holistically means recognizing how a change ripples across the wider organization rather than just the team making it. Missing a downstream dependency like this is exactly what the principle is meant to prevent."
+    },
+    {
+      "id": "q49",
+      "cat": "valueSystem",
+      "type": "mc",
+      "question": "Which statement correctly describes the relationship between the value chain and the Product and Service Lifecycle?",
+      "options": [
+        "The value chain component of the Value System is expressed as the 8-stage lifecycle: Discover, Design, Acquire, Build, Transition, Operate, Deliver, Support",
+        "They are two unrelated models, and a provider must choose one or the other",
+        "The value chain always has exactly six fixed activities, separate from the lifecycle",
+        "The lifecycle replaced governance as a Value System component"
+      ],
+      "correct": 0,
+      "explanation": "The value chain isn't a separate list of activities anymore. It's expressed as the same 8-stage lifecycle used to describe how a product or service moves from idea through ongoing support."
+    },
+    {
+      "id": "q50",
+      "cat": "ai",
+      "type": "mc",
+      "question": "An AI tool automatically assigns an incoming incident to the right team and triggers the matching runbook. Which AI capability is this?",
+      "options": [
+        "Coordination",
+        "Curation",
+        "Cognition",
+        "Clarification"
+      ],
+      "correct": 0,
+      "explanation": "Orchestrating a workflow, like assigning a ticket and kicking off a runbook, is Coordination. Curation organizes or filters information, Cognition makes a decision or prediction, and Clarification explains something in simpler terms."
+    },
+    {
+      "id": "q51",
+      "cat": "ai",
+      "type": "ms",
+      "question": "Which two of the following are capabilities in the AI Capability Model? (Choose two.)",
+      "options": [
+        "Cognition",
+        "Curation",
+        "Compliance",
+        "Consumption"
+      ],
+      "correct": [
+        0,
+        1
+      ],
+      "explanation": "The six capabilities are Creation, Curation, Clarification, Cognition, Communication, and Coordination. Compliance and Consumption sound plausible but are not part of the model."
+    },
+    {
+      "id": "q52",
+      "cat": "terms",
+      "type": "ms",
+      "question": "Which two of the following statements about utility and warranty are correct? (Choose two.)",
+      "options": [
+        "Utility describes what a service does",
+        "Warranty describes how well and reliably a service performs",
+        "A service needs only utility to create value",
+        "Warranty is the functional capability the service provides"
+      ],
+      "correct": [
+        0,
+        1
+      ],
+      "explanation": "Utility is the functional 'what,' warranty is the reliability 'how well,' and a service needs both to create value. Option 3's 'only' and option 4, which swaps warranty for utility's job, are both wrong."
+    },
+    {
+      "id": "q53",
+      "cat": "terms",
+      "type": "mc",
+      "question": "A support plan bundles software licenses, help desk access, and defined response times for a specific client segment. What best describes this bundle itself?",
+      "options": [
+        "A service offering",
+        "A service relationship",
+        "A value stream",
+        "A guiding principle"
+      ],
+      "correct": 0,
+      "explanation": "A service offering is the description of what's provided, goods, access to resources, and service actions, for a target consumer group. The ongoing cooperation once a client takes up that offering is the service relationship, not the bundle itself."
+    },
+    {
+      "id": "q54",
+      "cat": "dimensions",
+      "type": "mc",
+      "question": "A company's rollout of an AI ticket-triage assistant requires staff to learn how to review and override its recommendations. Beyond information and technology, which dimension is most directly affected?",
+      "options": [
+        "Organizations and people",
+        "Partners and suppliers",
+        "Value streams and processes only",
+        "None, this is purely a technology change"
+      ],
+      "correct": 0,
+      "explanation": "New skills, oversight responsibilities, and role changes for staff sit under organizations and people. AI adoption is explicitly recognized as touching this dimension, not just the technology itself."
+    },
+    {
+      "id": "tf21",
+      "cat": "valueSystem",
+      "type": "tf",
+      "question": "The Continual Improvement Model's steps can be completed in any order, since improvement work isn't linear.",
+      "answer": false,
+      "explanation": "The steps build on each other in sequence, from vision through momentum. You can loop back to an earlier step as understanding improves, but you can't meaningfully skip ahead, like setting a target before knowing where you're starting from."
+    },
+    {
+      "id": "q55",
+      "cat": "terms",
+      "type": "ms",
+      "question": "Which two of the following are true about a service relationship? (Choose two.)",
+      "options": [
+        "It includes service provision, service consumption, and relationship management activities",
+        "It is the ongoing cooperation between a provider and a consumer",
+        "It is limited strictly to the moment a service is delivered",
+        "It replaces the need for a service offering entirely"
+      ],
+      "correct": [
+        0,
+        1
+      ],
+      "explanation": "A service relationship covers the full ongoing cooperation between provider and consumer, made up of provision, consumption, and relationship management activities, not a single moment of delivery, and it doesn't replace a service offering, which describes what's being provided in the first place."
+    },
+    {
+      "id": "q56",
+      "cat": "terms",
+      "type": "ms",
+      "question": "Which two statements correctly distinguish cost from risk in ITIL terms? (Choose two.)",
+      "options": [
+        "Risk can include a missed opportunity, not just a downside",
+        "Cost and risk always move in the same direction, e.g. lower cost always means lower risk",
+        "Cost is the money spent on a specific activity or resource",
+        "Risk always refers exclusively to financial loss"
+      ],
+      "correct": [
+        0,
+        2
+      ],
+      "explanation": "Cost is a straightforward spending figure, while risk is broader than pure downside \u2014 it includes missed opportunities and events beyond just money. Cost and risk often trade off against each other (a cheaper option can raise risk), so they don't move together, and risk isn't limited to financial loss alone."
+    },
+    {
+      "id": "q57",
+      "cat": "terms",
+      "type": "ms",
+      "question": "Which two of the following correctly describe the relationship between a service provider, consumer, and digital product vendor? (Choose two.)",
+      "options": [
+        "A consumer can hold the customer, user, and/or sponsor roles",
+        "A digital product vendor is always also the service provider",
+        "A digital product vendor is required to have a service relationship with the consumer",
+        "A provider delivers the service to the consumer"
+      ],
+      "correct": [
+        0,
+        3
+      ],
+      "explanation": "A consumer can combine the customer, user, and sponsor roles, and a provider is simply whoever delivers the service. A digital product vendor supplies a product without necessarily being in a service relationship with the provider or consumer, so the other two statements both overstate the vendor's role."
+    },
+    {
+      "id": "q58",
+      "cat": "valueSystem",
+      "type": "ms",
+      "question": "Which two of the following are among ITIL's seven guiding principles? (Choose two.)",
+      "options": [
+        "Maximize headcount",
+        "Optimize and automate",
+        "Progress iteratively with feedback",
+        "Standardize before improving"
+      ],
+      "correct": [
+        1,
+        2
+      ],
+      "explanation": "Optimize and automate and progress iteratively with feedback are two of the seven real guiding principles. The other two options sound plausible but are not part of the actual seven."
+    },
+    {
+      "id": "q59",
+      "cat": "valueSystem",
+      "type": "ms",
+      "question": "Which two statements correctly distinguish 'collaborate and promote visibility' from 'think and work holistically'? (Choose two.)",
+      "options": [
+        "They are two names for the exact same principle",
+        "'Collaborate and promote visibility' is about openly sharing information so others can see what's happening",
+        "'Think and work holistically' is specifically about automating manual work",
+        "'Think and work holistically' means seeing how a change ripples across the wider organization, not just one team"
+      ],
+      "correct": [
+        1,
+        3
+      ],
+      "explanation": "The two principles target different problems \u2014 one is about openness and shared visibility, the other about seeing the whole picture rather than one narrow part of it. They aren't duplicates of each other, and holistic thinking isn't specifically about automation, that's optimize and automate's job."
+    },
+    {
+      "id": "q60",
+      "cat": "valueSystem",
+      "type": "ms",
+      "question": "Which two of the following correctly describe how ITIL's 34 management practices are grouped? (Choose two.)",
+      "options": [
+        "There is a separate small technical management group",
+        "All 34 are considered general management practices",
+        "22 are product and service management practices",
+        "12 are general management practices"
+      ],
+      "correct": [
+        2,
+        3
+      ],
+      "explanation": "The 34 practices split into 12 general management practices and 22 product and service management practices. There is no longer a separate small technical management group in the current model, and they clearly aren't all lumped into one single general bucket."
+    },
+    {
+      "id": "q61",
+      "cat": "valueSystem",
+      "type": "ms",
+      "question": "Which two of the following are actual steps in the Continual Improvement Model? (Choose two.)",
+      "options": [
+        "Where do we want to be?",
+        "Did we get there?",
+        "How much will it cost?",
+        "Who is accountable?"
+      ],
+      "correct": [
+        0,
+        1
+      ],
+      "explanation": "Where do we want to be and did we get there are two genuine steps in the seven-step Continual Improvement Model. The other two options sound like reasonable project questions but are not part of the actual model."
+    },
+    {
+      "id": "q62",
+      "cat": "valueSystem",
+      "type": "ms",
+      "question": "Which two of the following are components of the ITIL Value System? (Choose two.)",
+      "options": [
+        "Governance",
+        "Service level management",
+        "Guiding principles",
+        "Incident resolution"
+      ],
+      "correct": [
+        0,
+        2
+      ],
+      "explanation": "Governance and guiding principles are two of the five Value System components. Service level management and incident resolution are both management practices, not components of the Value System itself."
+    },
+    {
+      "id": "q63",
+      "cat": "dimensions",
+      "type": "ms",
+      "question": "Which two of the following are among ITIL's Four Dimensions of Service Management? (Choose two.)",
+      "options": [
+        "Partners and suppliers",
+        "Cost and risk",
+        "Guiding principles and governance",
+        "Information and technology"
+      ],
+      "correct": [
+        0,
+        3
+      ],
+      "explanation": "Partners and suppliers, and information and technology, are two of the actual four dimensions. Cost and risk are a separate ITIL concept, not one of the dimensions, and guiding principles and governance are Value System components, not dimensions."
+    },
+    {
+      "id": "q64",
+      "cat": "lifecycle",
+      "type": "ms",
+      "question": "Which two of the following are activities in the 8-stage Product and Service Lifecycle (the value chain expressed as activities)? (Choose two.)",
+      "options": [
+        "Approve",
+        "Discover",
+        "Transition",
+        "Budget"
+      ],
+      "correct": [
+        1,
+        2
+      ],
+      "explanation": "Discover and Transition are two of the actual eight lifecycle activities: Discover, Design, Acquire, Build, Transition, Operate, Deliver, Support. The other two options sound like plausible project steps but are not part of this model."
+    },
+    {
+      "id": "q65",
+      "cat": "streams",
+      "type": "ms",
+      "question": "Which two of the following are true about value streams? (Choose two.)",
+      "options": [
+        "Every value stream must include all eight lifecycle activities",
+        "A value stream combines value chain activities and practices for a specific scenario",
+        "Value stream mapping is only used once, at project kickoff",
+        "An enabling value stream supports other value streams internally"
+      ],
+      "correct": [
+        1,
+        3
+      ],
+      "explanation": "A value stream strings together whichever value chain activities and practices a specific scenario needs, and an enabling value stream supports other value streams internally rather than touching the external customer directly. Not every value stream needs all eight lifecycle activities, and value stream mapping can be used any time waste or delay needs diagnosing, not only once at kickoff."
+    },
+    {
+      "id": "q66",
+      "cat": "ai",
+      "type": "ms",
+      "question": "Two of these are among the AI Capability Model's six capabilities, and two are not. Which two are the real ones? (Choose two.)",
+      "options": [
+        "Compliance",
+        "Configuration",
+        "Communication",
+        "Coordination"
+      ],
+      "correct": [
+        2,
+        3
+      ],
+      "explanation": "Communication and Coordination are two of the actual six capabilities in the AI Capability Model: Creation, Curation, Clarification, Cognition, Communication, and Coordination. The other two options sound plausible but are not part of the model."
+    },
+    {
+      "id": "q67",
+      "cat": "terms",
+      "type": "mc",
+      "question": "A company sells a SaaS platform (the software itself) and separately provides onboarding and support to help clients get value from it. Which is the digital product, and which is the digital service?",
+      "options": [
+        "The SaaS platform is the digital service; onboarding and support is the digital product",
+        "Both onboarding and the platform are considered digital products",
+        "The SaaS platform is the digital product; onboarding and support constitute the digital service",
+        "Neither counts as digital since a human is involved in onboarding"
+      ],
+      "correct": 2,
+      "explanation": "The platform itself, existing primarily in digital form, is the digital product. The value co-created through using it, including the onboarding and support that helps a client actually get outcomes from it, is the digital service. The first option simply swaps the two, and involving a human in support doesn't make something non-digital."
+    },
+    {
+      "id": "q68",
+      "cat": "valueSystem",
+      "type": "mc",
+      "question": "Which statement correctly describes the value chain component of the Value System?",
+      "options": [
+        "It is a single management practice focused on service desk operations",
+        "It is one of the seven guiding principles",
+        "It exists only to measure continual improvement progress",
+        "It is an operating model outlining the key activities an organization undertakes to convert inputs into value"
+      ],
+      "correct": 3,
+      "explanation": "The value chain is an operating model describing the key activities that convert inputs, like demand and opportunity, into outputs of value, expressed today as the 8-stage Product and Service Lifecycle. It is not a single practice, a guiding principle, or a continual-improvement measurement tool."
+    },
+    {
+      "id": "q69",
+      "cat": "dimensions",
+      "type": "mc",
+      "question": "A new government data-residency law forces a company to keep certain records within its home country. Which PESTLE factor does this best represent?",
+      "options": [
+        "Legal",
+        "Economic",
+        "Technological",
+        "Social"
+      ],
+      "correct": 0,
+      "explanation": "A government law creating a compliance requirement is a Legal factor. Economic factors involve market or financial conditions, technological factors involve tech trends, and social factors involve cultural or demographic shifts \u2014 none of which describe a legal mandate itself."
+    },
+    {
+      "id": "q70",
+      "cat": "lifecycle",
+      "type": "mc",
+      "question": "Which lifecycle activity specifically means providing the agreed-upon outcomes and value directly to consumers, as opposed to running the service day to day or resolving issues?",
+      "options": [
+        "Operate",
+        "Deliver",
+        "Support",
+        "Transition"
+      ],
+      "correct": 1,
+      "explanation": "Deliver means providing the agreed outcomes to consumers. Operate is running the service day to day, Support is resolving issues and requests, and Transition is moving a new or changed service into live use \u2014 three related but distinct activities the exam can test separately."
+    },
+    {
+      "id": "q71",
+      "cat": "streams",
+      "type": "mc",
+      "question": "An internal process for renewing supplier software licenses, which never directly touches an external customer, is an example of which type of value stream?",
+      "options": [
+        "Core value stream",
+        "A guiding principle",
+        "A management practice",
+        "Enabling value stream"
+      ],
+      "correct": 3,
+      "explanation": "An enabling value stream supports other value streams internally, like renewing supplier licenses, without directly touching the external customer \u2014 that direct external touch is what defines a core value stream instead. It is a value stream, not a guiding principle or a practice on its own."
+    },
+    {
+      "id": "q72",
+      "cat": "frameworks",
+      "type": "mc",
+      "question": "Why does ITIL work well alongside frameworks like Agile, DevOps, and PRINCE2 rather than needing to replace them?",
+      "options": [
+        "ITIL provides a wider service value context and governance, while those frameworks contribute specific practices for how work actually gets done",
+        "ITIL is only a marketing framework with no practical guidance of its own",
+        "Those frameworks are simply outdated versions of ITIL",
+        "ITIL requires organizations to abandon any other framework before adoption"
+      ],
+      "correct": 0,
+      "explanation": "ITIL operates at the level of the wider service value system and governance, while Agile, DevOps, and PRINCE2 each contribute specific, complementary practices for how particular kinds of work get done \u2014 they aren't competitors requiring an either/or choice, nor is ITIL merely marketing or those frameworks just older versions of it."
+    },
+    {
+      "id": "tf22",
+      "cat": "terms",
+      "type": "tf",
+      "question": "A digital product vendor can supply a product without ever being in a full service relationship with the consumer.",
+      "answer": true,
+      "explanation": "That's exactly what distinguishes a digital product vendor from a provider \u2014 supplying a product without the ongoing service relationship activities like provision, consumption, and relationship management."
+    },
+    {
+      "id": "tf23",
+      "cat": "dimensions",
+      "type": "tf",
+      "question": "The organizations and people dimension only covers headcount and staffing numbers, not skills or culture.",
+      "answer": false,
+      "explanation": "It covers roles, responsibilities, structure, culture, and staffing needs \u2014 not just raw headcount numbers."
+    },
+    {
+      "id": "tf24",
+      "cat": "lifecycle",
+      "type": "tf",
+      "question": "The Design activity focuses on defining requirements and specifications, not actually building or acquiring anything yet.",
+      "answer": true,
+      "explanation": "Requirements get defined in Design, but nothing is actually built or acquired yet \u2014 that boundary between Design and the activities that follow is a common thing the exam tests."
+    },
+    {
+      "id": "tf25",
+      "cat": "frameworks",
+      "type": "tf",
+      "question": "DevOps and ITIL are considered mutually exclusive; adopting one means abandoning all guiding principles of the other.",
+      "answer": false,
+      "explanation": "They're meant to complement each other \u2014 DevOps practices like CI/CD can sit inside stages of the ITIL value system, not replace its guiding principles."
+    }
+  ],
+  "cheatSheet": [
+    {
+      "heading": "The 7 guiding principles",
+      "points": [
+        "Focus on value \u2014 everything traces back to value for stakeholders.",
+        "Start where you are \u2014 assess and reuse what already exists before building new.",
+        "Progress iteratively with feedback \u2014 don't try to do everything in one big pass.",
+        "Collaborate and promote visibility \u2014 work across boundaries, make work visible.",
+        "Think and work holistically \u2014 no service stands alone.",
+        "Keep it simple and practical \u2014 use the minimum steps needed.",
+        "Optimize and automate \u2014 human effort only where it adds real value."
+      ]
+    },
+    {
+      "heading": "The 4 dimensions of service management",
+      "points": [
+        "Organizations and people \u2014 roles, responsibilities, culture, staffing.",
+        "Information and technology \u2014 the tech and knowledge used to deliver services.",
+        "Partners and suppliers \u2014 relationships with other organizations involved.",
+        "Value streams and processes \u2014 the activities, workflows, controls, procedures."
+      ]
+    },
+    {
+      "heading": "Service Value Chain activities",
+      "points": [
+        "Plan \u2192 Improve \u2192 Engage \u2192 Design & transition \u2192 Obtain/build \u2192 Deliver & support.",
+        "Engage sits at the center-ish, connecting to stakeholders throughout, not just at the start.",
+        "These 6 activities combine into value streams for specific scenarios (e.g. \"resolve an incident\")."
+      ]
+    },
+    {
+      "heading": "Key definitions to not mix up",
+      "points": [
+        "Service = a means of enabling value co-creation by facilitating outcomes customers want, without the customer managing costs/risks themselves.",
+        "Utility = what the service does (fitness for purpose). Warranty = how well it does it (fitness for use \u2014 availability, capacity, security, continuity).",
+        "Output = a tangible/intangible deliverable. Outcome = the actual result an output enables for a stakeholder.",
+        "Cost and Risk are what value is weighed against \u2014 value = (utility + warranty) balanced against cost and risk."
+      ]
+    },
+    {
+      "heading": "Practices you must be able to distinguish",
+      "points": [
+        "Incident = unplanned interruption/reduction in quality \u2014 restore service fast. Problem = the underlying cause of one or more incidents.",
+        "Known Error = a problem that has been analyzed but not yet resolved.",
+        "Change Enablement = ensures risks are properly assessed for changes (not \"change management\" in ITIL 4 terms).",
+        "Service Request = a formal request for something routine/pre-defined (not an incident \u2014 nothing is broken).",
+        "Service Level Management = ongoing activity of setting/monitoring/reviewing SLAs, not a one-time contract signing."
+      ]
+    },
+    {
+      "heading": "Exam-day reminders",
+      "points": [
+        "Real pass mark: 26/40 (65%), 40 questions, 60 minutes.",
+        "Questions often describe a scenario and ask \"which practice/principle applies\" \u2014 map the scenario to the definition, don't just pattern-match keywords.",
+        "\"Least effort\" / \"start where you are\" language usually points at Start where you are or Keep it simple and practical."
+      ]
+    }
+  ]
+}

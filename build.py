@@ -183,8 +183,13 @@ def validate():
         sys.exit(1)
 
 
-def build_data_json():
-    data = {
+def build_track_data():
+    """One dict, keyed by track, of exactly what a client needs to render
+    that track — the single source both the inline bundle (build_data_json)
+    and the standalone per-track JSON files (write_track_json_files) build
+    from, so the two can never drift apart.
+    """
+    return {
         key: {
             "categories": mod.CATEGORIES,
             "flashcards": mod.FLASHCARDS,
@@ -194,6 +199,10 @@ def build_data_json():
         }
         for key, mod in TRACK_MODULES.items()
     }
+
+
+def build_data_json():
+    data = build_track_data()
     return "\n".join(
         [
             f"const STORAGE_KEY = {json.dumps(tracks.STORAGE_KEY)};",
@@ -202,6 +211,28 @@ def build_data_json():
             f"const DATA = {json.dumps(data)};",
         ]
     )
+
+
+def write_track_json_files():
+    """Writes each track's content as its own standalone dist/data/<key>.json
+    (plus dist/data/tracks.json for TRACKS/EXAM_CONFIG) — content as
+    fetchable data instead of only ever baked into one HTML file, per
+    ROADMAP.md's "future-proofing for a standalone app" section. Additive
+    groundwork only: the live app here still inlines DATA into index.html
+    exactly as before (that's what build_data_json above still feeds it),
+    so this changes nothing about how today's single-page app behaves —
+    it just gives a future second client (a separate web deployment, an
+    iOS/Android app) a real per-track source of truth to fetch instead of
+    embedding its own copy of the content.
+    """
+    out_dir = ROOT / "dist" / "data"
+    out_dir.mkdir(parents=True, exist_ok=True)
+    data = build_track_data()
+    for key, track_data in data.items():
+        (out_dir / f"{key}.json").write_text(json.dumps(track_data, indent=2) + "\n")
+    manifest = {"storageKey": tracks.STORAGE_KEY, "tracks": tracks.TRACKS, "examConfig": tracks.EXAM_CONFIG}
+    (out_dir / "tracks.json").write_text(json.dumps(manifest, indent=2) + "\n")
+    return len(data)
 
 
 def build_app_script():
@@ -255,11 +286,13 @@ def main():
     out_path = ROOT / "index.html"
     out_path.write_text(output)
     sw_updated = sync_service_worker_cache_name(output)
+    json_track_count = write_track_json_files()
 
     total_flashcards = sum(len(mod.FLASHCARDS) for mod in TRACK_MODULES.values())
     total_questions = sum(len(mod.QUESTIONS) for mod in TRACK_MODULES.values())
     print(f"Built {out_path} ({len(output):,} bytes)")
     print(f"  {len(tracks.TRACKS)} tracks, {total_flashcards} flashcards, {total_questions} questions")
+    print(f"  dist/data/*.json refreshed ({json_track_count} tracks + tracks.json) — not yet consumed by index.html, see ROADMAP.md §10")
     if sw_updated:
         print("  service-worker.js CACHE_NAME updated (content changed) — commit it alongside index.html")
 

@@ -14,6 +14,7 @@ function CertStudyApp() {
   const [flipped, setFlipped] = useState(false);
   const [fIndex, setFIndex] = useState(0);
   const [syncMode, setSyncMode] = useState('loading');
+  const [saveError, setSaveError] = useState(false);
   const [stats, setStats] = useState(emptyStats);
   const [showAchievements, setShowAchievements] = useState(false);
   const [toastAchievement, setToastAchievement] = useState(null);
@@ -143,13 +144,21 @@ function CertStudyApp() {
     return () => { cancelled = true; if (unsub) unsub(); };
   }, []);
 
+  // saveLocal's return tells us whether the write actually landed —
+  // silently swallowing a failure (a full quota, private-browsing
+  // restrictions) would mean progress just stops saving with no signal
+  // at all, which is the opposite of "runs smoothly." setSaveError drives
+  // a small banner instead.
   const persistPayload = (payload) => {
     if (docRef.current) {
       writeChain.current = writeChain.current.then(() =>
-        docRef.current.set(payload).catch(() => { saveLocal(payload); })
+        docRef.current.set(payload).then(
+          () => setSaveError(false),
+          () => setSaveError(!saveLocal(payload))
+        )
       );
     } else {
-      saveLocal(payload);
+      setSaveError(!saveLocal(payload));
     }
   };
 
@@ -240,9 +249,9 @@ function CertStudyApp() {
   const markSeen = (ids) => markSeenFor(activeTrack, ids);
   const recordResult = (id, outcome) => recordResultFor(activeTrack, id, outcome);
 
-  const recordSrs = (id, outcome) => {
+  const recordSrs = (id, quality) => {
     const trackSrs = srs[activeTrack] || {};
-    const nextEntry = nextSrsEntry(trackSrs[id], outcome);
+    const nextEntry = nextSrsEntry(trackSrs[id], quality);
     saveSrs({ ...srs, [activeTrack]: { ...trackSrs, [id]: nextEntry } });
   };
 
@@ -364,6 +373,18 @@ function CertStudyApp() {
 
   useEffect(() => { setFIndex(0); setFlipped(false); }, [activeCat, mode, learnView, activeTrack]);
   useEffect(() => { setActiveCat('all'); }, [activeTrack]);
+
+  // Scrolls back to the top on every real navigation (mode/track/sub-tab
+  // change) — without this, switching views keeps whatever scroll
+  // position the previous one was at, which is easy to not notice on a
+  // short view but strands you mid-page (header and all) after leaving a
+  // deeply-scrolled one, most obviously Home once its dropdown is open.
+  useEffect(() => {
+    // The global `html { scroll-behavior: smooth }` (used for in-page
+    // anchor jumps elsewhere) would otherwise turn this reset into a
+    // slow animated scroll instead of an instant one.
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+  }, [mode, activeTrack, learnView, quizView]);
 
   const availableQuestions = useMemo(() => {
     const byCat = activeCat === 'all' ? questionsData : questionsData.filter((q) => q.cat === activeCat);
@@ -563,6 +584,29 @@ function CertStudyApp() {
     return map;
   }, [trackResults, categories, flashcardsData, questionsData]);
 
+  // Logs one per-category mastery snapshot a day for whichever track is
+  // actually open (not Home — there's no single "the" track there), so
+  // the weighted-mastery breakdown can show a real "+8% this week"
+  // instead of only ever a live snapshot. Skipped when nothing's actually
+  // changed today, same self-correcting pattern as the readiness-history
+  // effect above.
+  useEffect(() => {
+    if (syncMode === 'loading' || mode === 'home') return;
+    const pcts = {};
+    categories.forEach((c) => { pcts[c.key] = Math.round((masteryByCategory[c.key] || 0) * 100); });
+    const today = todayString();
+    const history = statsRef.current.categoryMasteryHistory || {};
+    const trackHistory = history[activeTrack] || {};
+    const unchanged = categories.every((c) => {
+      const catHistory = trackHistory[c.key] || [];
+      const last = catHistory[catHistory.length - 1];
+      return last && last.date === today && last.pct === pcts[c.key];
+    });
+    if (unchanged) return;
+    saveStats({ ...statsRef.current, categoryMasteryHistory: recordCategoryMasterySnapshot(history, activeTrack, pcts) });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mode, syncMode, activeTrack, masteryByCategory, categories]);
+
   const overallMastery = useMemo(() => trackMastery(activeTrack, results), [activeTrack, results]);
 
   // Cheat sheet's "Official resources" block: the track-level links already
@@ -578,10 +622,15 @@ function CertStudyApp() {
   const currentCard = filteredFlashcards[fIndex];
   const currentQ = quizSession[sessionIndex];
 
-  const nextCard = (outcome) => {
+  // `quality` is the 1-5 confidence rating FlashcardView collects. SRS
+  // scheduling uses the raw rating (real SM-2 quality scale); mastery %
+  // stays on the binary signal the rest of the app already assumes, via
+  // ratingToOutcome's 3+-counts-as-correct rule — see its comment in
+  // 03_helpers.js for why that seam exists.
+  const nextCard = (quality) => {
     if (currentCard) {
-      recordResult(currentCard.id, outcome);
-      recordSrs(currentCard.id, outcome);
+      recordResult(currentCard.id, ratingToOutcome(quality));
+      recordSrs(currentCard.id, quality);
       bumpDailyGoal(1);
     }
     setFlipped(false);
@@ -643,6 +692,29 @@ function CertStudyApp() {
   const doReset = () => {
     saveResults({ ...results, [activeTrack]: {} });
     saveSrs({ ...srs, [activeTrack]: {} });
+  };
+
+  // Triggers a browser download of `data` as a formatted JSON file. Lives
+  // here rather than in 03_helpers.js because it's a DOM-touching browser
+  // utility, not portable "core" logic — a future React Native client
+  // sharing that file wouldn't have `document`/`Blob`/`URL` to call.
+  // Returns false instead of throwing if the browser blocks it (e.g. a
+  // sandboxed iframe).
+  const downloadJSON = (filename, data) => {
+    try {
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      return true;
+    } catch (e) {
+      return false;
+    }
   };
 
   const doExport = () => {
@@ -862,7 +934,11 @@ function CertStudyApp() {
         </div>
       </div>
       <div className="max-w-md mx-auto px-4 py-5">
-        {syncMode === 'local' && (
+        {saveError ? (
+          <div style={{ fontSize: '10.5px', color: COLOR.red, marginBottom: '12px', padding: '8px 10px', borderRadius: '8px', border: `1px solid ${COLOR.red}`, background: 'rgba(181,87,74,0.1)' }}>
+            Your last save didn't go through — your browser's storage may be full. Try Data &amp; Progress → Export to back up what you have, then free up some space.
+          </div>
+        ) : syncMode === 'local' && (
           <div style={{ fontSize: '10.5px', color: COLOR.muted, marginBottom: '12px' }}>
             Saving progress to this browser. Open from your Claude account to sync across devices.
           </div>
@@ -1152,22 +1228,49 @@ function CertStudyApp() {
             Weighted mastery for {track.label} — segment width matches the real exam's emphasis
           </div>
           <div className="flex" style={{ gap: '2px', height: '10px', borderRadius: '6px', overflow: 'hidden' }}>
-            {categories.map((c) => (
-              <div
-                key={c.key}
-                onClick={() => setActiveCat(c.key)}
-                title={`${c.label}: ${Math.round((masteryByCategory[c.key] || 0) * 100)}%`}
-                style={{ flexGrow: c.marks, cursor: 'pointer', background: COLOR.surfaceRaised, position: 'relative' }}
-              >
+            {categories.map((c) => {
+              const trend = categoryMasteryTrend(stats.categoryMasteryHistory || {}, activeTrack, c.key);
+              const pct = Math.round((masteryByCategory[c.key] || 0) * 100);
+              return (
                 <div
-                  style={{
-                    position: 'absolute', inset: 0,
-                    width: `${Math.round((masteryByCategory[c.key] || 0) * 100)}%`,
-                    background: (masteryByCategory[c.key] || 0) > 0.7 ? COLOR.success : COLOR.gold,
-                  }}
-                />
-              </div>
-            ))}
+                  key={c.key}
+                  onClick={() => setActiveCat(c.key)}
+                  title={`${c.label}: ${pct}%${trend ? ` (${trend.delta > 0 ? '+' : ''}${trend.delta}% over ${trend.days}d)` : ''}`}
+                  style={{ flexGrow: c.marks, cursor: 'pointer', background: COLOR.surfaceRaised, position: 'relative' }}
+                >
+                  <div
+                    style={{
+                      position: 'absolute', inset: 0,
+                      width: `${pct}%`,
+                      background: (masteryByCategory[c.key] || 0) > 0.7 ? COLOR.success : COLOR.gold,
+                    }}
+                  />
+                </div>
+              );
+            })}
+          </div>
+          {/* A tap/hover title alone doesn't work on touch devices, so the
+              per-category % and trend are also spelled out here — the
+              only place this app shows mastery moving over time, not just
+              a live snapshot. */}
+          <div className="flex flex-col gap-1 mt-2">
+            {categories.map((c) => {
+              const trend = categoryMasteryTrend(stats.categoryMasteryHistory || {}, activeTrack, c.key);
+              const pct = Math.round((masteryByCategory[c.key] || 0) * 100);
+              return (
+                <div key={c.key} className="flex justify-between" style={{ fontSize: '10px', color: COLOR.muted }}>
+                  <span>{c.label}</span>
+                  <span>
+                    {pct}%
+                    {trend && (
+                      <span style={{ color: trend.delta > 0 ? COLOR.success : COLOR.red, marginLeft: '4px' }}>
+                        ({trend.delta > 0 ? '+' : ''}{trend.delta}% / {trend.days}d)
+                      </span>
+                    )}
+                  </span>
+                </div>
+              );
+            })}
           </div>
         </div>
         </React.Fragment>

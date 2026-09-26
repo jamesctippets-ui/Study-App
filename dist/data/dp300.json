@@ -1,0 +1,1237 @@
+{
+  "categories": [
+    {
+      "key": "platform",
+      "label": "Plan & Implement Data Platform Resources",
+      "marks": 20,
+      "resources": [
+        {
+          "label": "Microsoft Learn: Preparing for DP-300 - Plan and implement data platform resources",
+          "url": "https://learn.microsoft.com/en-us/shows/exam-readiness-zone/preparing-for-dp-300-01-fy25"
+        }
+      ]
+    },
+    {
+      "key": "security",
+      "label": "Implement a Secure Environment",
+      "marks": 20,
+      "resources": [
+        {
+          "label": "Microsoft Learn: Preparing for DP-300 - Implement a secure environment",
+          "url": "https://learn.microsoft.com/en-us/shows/exam-readiness-zone/preparing-for-dp-300-02-fy25"
+        }
+      ]
+    },
+    {
+      "key": "monitor",
+      "label": "Monitor & Optimize Operational Resources",
+      "marks": 15,
+      "resources": [
+        {
+          "label": "Microsoft Learn: Preparing for DP-300 - Monitor, configure, and optimize database resources",
+          "url": "https://learn.microsoft.com/en-us/shows/exam-readiness-zone/preparing-for-dp-300-03-fy25"
+        }
+      ]
+    },
+    {
+      "key": "queryPerf",
+      "label": "Optimize Query Performance",
+      "marks": 10,
+      "resources": [
+        {
+          "label": "Microsoft Learn: Optimize query performance in Azure SQL",
+          "url": "https://learn.microsoft.com/en-us/training/paths/optimize-query-performance-sql-server/"
+        }
+      ]
+    },
+    {
+      "key": "automation",
+      "label": "Perform Automation of Tasks",
+      "marks": 10,
+      "resources": [
+        {
+          "label": "Microsoft Learn: Preparing for DP-300 - Configure and manage automation of tasks",
+          "url": "https://learn.microsoft.com/en-us/shows/exam-readiness-zone/preparing-for-dp-300-04-fy25"
+        },
+        {
+          "label": "Microsoft Learn: Automation in Azure SQL overview",
+          "url": "https://learn.microsoft.com/en-us/azure/azure-sql/database/job-automation-overview?view=azuresql"
+        }
+      ]
+    },
+    {
+      "key": "hadr",
+      "label": "Plan & Implement HA/DR",
+      "marks": 25,
+      "resources": [
+        {
+          "label": "Microsoft Learn: Preparing for DP-300 - Plan and configure a high availability and disaster recovery environment",
+          "url": "https://learn.microsoft.com/en-us/shows/exam-readiness-zone/preparing-for-dp-300-05-fy25"
+        },
+        {
+          "label": "Microsoft Learn: Business continuity, high availability, and disaster recovery for Azure SQL Database",
+          "url": "https://learn.microsoft.com/en-us/azure/azure-sql/database/business-continuity-high-availability-disaster-recover-hadr-overview?view=azuresql"
+        }
+      ]
+    }
+  ],
+  "flashcards": [
+    {
+      "id": "f1",
+      "cat": "platform",
+      "front": "Azure SQL Database vs. Managed Instance vs. SQL Server on Azure VMs",
+      "back": "Azure SQL Database is a fully managed, single-database PaaS offering with the least administrative surface. Azure SQL Managed Instance is near-100% SQL Server engine compatible with instance-level features (cross-database queries, SQL Agent, linked servers) while still PaaS-managed. SQL Server on Azure VMs (IaaS) gives full OS and engine control for the few features neither PaaS option supports.",
+      "detail": "The deciding question is usually compatibility: if an app needs instance-scoped features like SQL Agent or cross-database transactions but the team still wants Microsoft managing patching and backups, Managed Instance is the fit \u2014 full IaaS is reserved for things even MI cannot do, like OS-level access or unsupported engine versions."
+    },
+    {
+      "id": "f2",
+      "cat": "platform",
+      "front": "DTU-based vs. vCore-based purchasing models",
+      "back": "The DTU model bundles compute, memory, and I/O into a single blended unit (Basic/Standard/Premium tiers), simple but opaque. The vCore model lets you choose compute and storage independently, exposes the actual generation of hardware, supports Azure Hybrid Benefit for licensing savings, and is required for Managed Instance and Hyperscale.",
+      "detail": "Only the vCore model can use Azure Hybrid Benefit to reuse existing SQL Server licenses, which is often the deciding factor for a cost-conscious migration from on-premises."
+    },
+    {
+      "id": "f3",
+      "cat": "platform",
+      "front": "Service tiers: General Purpose vs. Business Critical vs. Hyperscale",
+      "back": "General Purpose uses remote (Azure Premium) storage for balanced price/performance. Business Critical uses local SSD storage plus a built-in set of Always On Availability Groups replicas for the lowest latency and highest resiliency. Hyperscale decouples storage from compute for near-instant storage autogrowth up to 100 TB and fast backups/restores via snapshots.",
+      "detail": "Business Critical is the tier to reach for when a workload cannot tolerate the latency of remote storage and also wants built-in high availability without configuring anything extra \u2014 its secondary replicas are what give it that HA for free."
+    },
+    {
+      "id": "f4",
+      "cat": "platform",
+      "front": "Elastic pools",
+      "back": "An elastic pool lets many Azure SQL databases with unpredictable, non-simultaneous usage patterns share a fixed pool of eDTUs or vCores, billed once for the pool instead of per database, rather than each database being provisioned for its own peak.",
+      "detail": "Elastic pools make the most economic sense for multi-tenant SaaS scenarios with many databases whose usage peaks do not line up \u2014 pooling smooths out the aggregate demand so no single database needs to be sized for its own worst case."
+    },
+    {
+      "id": "f5",
+      "cat": "platform",
+      "front": "Serverless compute tier",
+      "back": "The serverless compute tier for Azure SQL Database auto-scales compute within a configured min/max vCore range based on workload demand, and can auto-pause after a configurable period of inactivity, billing only for storage while paused.",
+      "detail": "Auto-pause introduces a cold-start delay (typically under a minute) on the next connection, which makes serverless a poor fit for latency-sensitive, always-on production traffic but a strong fit for dev/test or intermittently used databases."
+    },
+    {
+      "id": "f6",
+      "cat": "platform",
+      "front": "Migration tooling: DMA vs. Azure Database Migration Service",
+      "back": "The Data Migration Assistant (DMA) is a free tool for assessment (compatibility issues, deprecated features) and for performing smaller, offline schema/data migrations. Azure Database Migration Service (DMS) performs the actual migration at scale, supporting both offline and minimal-downtime online (continuous sync) migrations into Azure SQL targets.",
+      "detail": "DMA is where a migration project usually starts, to surface blocking issues before committing to a path, while DMS is the service that carries out a large or near-zero-downtime cutover once the assessment looks clean."
+    },
+    {
+      "id": "f7",
+      "cat": "platform",
+      "front": "Patching responsibility across deployment models",
+      "back": "Azure SQL Database and Managed Instance are fully PaaS: Microsoft patches the underlying OS and SQL Server engine automatically, with no administrator action required. SQL Server on Azure VMs is IaaS: the administrator (or the SQL Server IaaS Agent Extension's automated patching feature) is responsible for OS and SQL Server updates.",
+      "detail": "The SQL Server IaaS Agent Extension can automate patching on an Azure VM within a defined maintenance window, but that automation still has to be explicitly configured \u2014 it is not on by default the way PaaS patching is."
+    },
+    {
+      "id": "f8",
+      "cat": "security",
+      "front": "Microsoft Entra ID (Azure AD) authentication for Azure SQL",
+      "back": "Azure SQL supports a Microsoft Entra ID admin (a user or group) at the server or managed instance level, and Microsoft Entra-based logins/users that authenticate through Entra ID instead of SQL authentication, enabling centralized identity, MFA, and conditional access.",
+      "detail": "A Microsoft Entra ID group set as the admin means group membership changes (adding or removing a DBA) take effect without ever touching the SQL Server itself \u2014 a common reason to prefer a group admin over an individual user admin."
+    },
+    {
+      "id": "f9",
+      "cat": "security",
+      "front": "Server-level vs. database-level firewall rules",
+      "back": "Server-level firewall rules apply to every database on the logical server and are stored in the master database. Database-level firewall rules apply to just one database, travel with that database on geo-replication or copy, and can be configured by a non-server-admin database owner.",
+      "detail": "Because database-level rules move with the database, they are the right choice when a database might be copied or geo-replicated to a different logical server and still needs the same client IP allowed automatically."
+    },
+    {
+      "id": "f10",
+      "cat": "security",
+      "front": "Always Encrypted",
+      "back": "Always Encrypted keeps sensitive column data encrypted at all times, including in memory and in query plans, because encryption and decryption happen inside a client driver using keys the database engine itself never sees. Deterministic encryption supports equality lookups and joins; randomized encryption is more secure but cannot be used in comparisons.",
+      "detail": "Because the database engine never holds the plaintext or the column encryption key, even a DBA with full sysadmin rights on the server cannot read the protected values without access to the separate key store \u2014 that is the entire threat model it addresses."
+    },
+    {
+      "id": "f11",
+      "cat": "security",
+      "front": "Transparent Data Encryption (TDE)",
+      "back": "TDE encrypts an entire database's data and log files at rest (on disk) using a database encryption key, transparently to applications, with no query or schema changes needed. It is on by default for new Azure SQL databases and can use a service-managed key or a customer-managed key in Azure Key Vault (bring your own key).",
+      "detail": "TDE protects data at rest against someone gaining access to the physical files or backups directly \u2014 it does not protect data in memory, in transit, or from a user with legitimate query access, which is exactly the gap Always Encrypted fills instead."
+    },
+    {
+      "id": "f12",
+      "cat": "security",
+      "front": "Dynamic Data Masking (DDM)",
+      "back": "DDM obscures the display of designated column values (like a full credit card number showing only its last four digits) for non-privileged users at query time, without changing the data actually stored on disk.",
+      "detail": "DDM is a presentation-layer control only \u2014 it does not encrypt anything and offers no protection against a user who queries the underlying data directly with sufficient permissions or exports it via a different path, so it should never be relied on as a real security boundary by itself."
+    },
+    {
+      "id": "f13",
+      "cat": "security",
+      "front": "Row-Level Security (RLS)",
+      "back": "RLS restricts which rows a query returns based on the executing user's context, enforced through an inline table-valued function wired up as a security predicate inside a CREATE SECURITY POLICY statement. A filter predicate silently hides rows from reads; a block predicate actively blocks writes that would violate the rule.",
+      "detail": "Because RLS is enforced centrally at the database layer via the security policy, no individual query or application needs a WHERE clause added to respect the restriction \u2014 it is applied automatically no matter how the row is accessed."
+    },
+    {
+      "id": "f14",
+      "cat": "security",
+      "front": "Microsoft Defender for SQL",
+      "back": "Microsoft Defender for SQL bundles SQL Vulnerability Assessment (scans for misconfigurations and missing best practices, producing a remediation report) with Advanced Threat Protection (detects anomalous activity like SQL injection attempts or unusual access patterns and raises security alerts).",
+      "detail": "Vulnerability Assessment is a point-in-time and scheduled configuration scanner, while Advanced Threat Protection is the always-on runtime detection layer \u2014 the two are complementary, not the same capability under different names."
+    },
+    {
+      "id": "f15",
+      "cat": "monitor",
+      "front": "Query Store",
+      "back": "Query Store automatically captures a history of query execution plans and their runtime statistics (duration, CPU, I/O) directly inside the database, letting an administrator find regressed queries after a deployment and force a previously good plan without changing application code.",
+      "detail": "Because Query Store persists plan history across restarts and failovers (unlike the plan cache, which is volatile), it is the tool of choice for diagnosing a performance regression that happened days ago, not just what is running right now."
+    },
+    {
+      "id": "f16",
+      "cat": "monitor",
+      "front": "Extended Events vs. SQL Trace",
+      "back": "Extended Events (XEvents) is the modern, lightweight event-capture engine in SQL Server and Azure SQL, with a much smaller performance footprint than the legacy SQL Trace/SQL Server Profiler, which is deprecated and unavailable against Azure SQL Database.",
+      "detail": "SQL Server Profiler cannot connect to Azure SQL Database at all \u2014 Extended Events (via the XEvent Profiler in SSMS, which mimics the old Profiler UI, or raw session definitions) is the only supported tracing path there."
+    },
+    {
+      "id": "f17",
+      "cat": "monitor",
+      "front": "sys.dm_db_resource_stats and DTU/vCore utilization",
+      "back": "sys.dm_db_resource_stats returns recent (roughly the last hour, at 15-second granularity) CPU, data I/O, log I/O, and memory consumption as a percentage of the database's provisioned limit, making it the fastest way to see whether a database is approaching its DTU or vCore ceiling right now.",
+      "detail": "Because it reports percentages of the current service objective's limits, the same query's numbers change meaning after a scale-up or scale-down \u2014 always confirm the current tier before interpreting a resource_stats reading."
+    },
+    {
+      "id": "f18",
+      "cat": "monitor",
+      "front": "Intelligent Insights",
+      "back": "Intelligent Insights uses built-in AI to continuously analyze Azure SQL Database query performance telemetry, automatically detect degradation patterns (like a regressed plan, blocking, or missing index), and log a diagnostic record explaining the likely root cause and impact.",
+      "detail": "Intelligent Insights is diagnostic, not corrective on its own \u2014 pairing it with Automatic Tuning is what lets some of the issues it identifies (like a bad plan) actually get fixed automatically rather than just reported."
+    },
+    {
+      "id": "f19",
+      "cat": "monitor",
+      "front": "Azure Monitor alerts and diagnostic settings for Azure SQL",
+      "back": "Diagnostic settings stream Azure SQL resource logs and metrics to a Log Analytics workspace, storage account, or Event Hub. Azure Monitor alert rules can then fire on a metric threshold (like DTU percentage) or on a log query result, notifying an action group by email, SMS, webhook, or automation runbook.",
+      "detail": "Without a diagnostic setting configured first, there is no historical log data flowing anywhere to alert on or query later \u2014 metrics-based alerts can work without one, but log-query-based alerts and long-term log retention both depend on it."
+    },
+    {
+      "id": "f20",
+      "cat": "queryPerf",
+      "front": "Estimated vs. actual execution plans",
+      "back": "An estimated execution plan shows what the optimizer intends to do based on statistics, without running the query. An actual execution plan runs the query and adds real row counts and runtime metrics per operator, making it possible to spot where the estimate and reality diverge.",
+      "detail": "A large gap between estimated and actual row counts at an operator is one of the clearest signals of stale or missing statistics, or of a parameter-sniffing problem \u2014 a warning sign to check for first when the actual plan looks surprisingly slow."
+    },
+    {
+      "id": "f21",
+      "cat": "queryPerf",
+      "front": "Missing index DMVs",
+      "back": "sys.dm_db_missing_index_details, sys.dm_db_missing_index_groups, and sys.dm_db_missing_index_group_stats together record indexes the optimizer noticed would have helped recent queries, along with estimated impact \u2014 the same underlying data behind the missing index recommendations shown in Query Store and SSMS.",
+      "detail": "These DMVs only ever suggest single-index designs based on what the optimizer happened to see \u2014 they never recommend combining several candidate indexes into one, so their output still needs human judgment before blindly creating every suggested index."
+    },
+    {
+      "id": "f22",
+      "cat": "queryPerf",
+      "front": "Automatic Tuning",
+      "back": "Automatic Tuning in Azure SQL Database can automatically create recommended indexes, drop indexes that go unused, and apply FORCE LAST GOOD PLAN to revert a query to its last known-good execution plan when Query Store detects a regression \u2014 each option can be enabled independently.",
+      "detail": "FORCE LAST GOOD PLAN is verified automatically: the service keeps monitoring after forcing the old plan and will back off if the forced plan turns out not to actually improve performance, rather than forcing it blindly and forgetting about it."
+    },
+    {
+      "id": "f23",
+      "cat": "queryPerf",
+      "front": "Parameter sniffing",
+      "back": "Parameter sniffing is when the optimizer compiles a plan based on the parameter values seen on first execution, then reuses that cached plan for later executions with very different parameter values, sometimes producing a badly suited plan. Fixes include OPTION (RECOMPILE), OPTIMIZE FOR a representative value, or forcing a known-good plan via Query Store.",
+      "detail": "OPTION (RECOMPILE) trades a fresh, tailored plan on every execution for the CPU cost of compiling every single time \u2014 it fixes the symptom but is rarely the right permanent answer for a query executed extremely frequently."
+    },
+    {
+      "id": "f24",
+      "cat": "automation",
+      "front": "Why SQL Agent jobs do not work in Azure SQL Database",
+      "back": "SQL Server Agent is an instance-level service, and Azure SQL Database is a single-database, instance-less PaaS offering with no SQL Agent available \u2014 Managed Instance does support SQL Agent, but single databases and elastic pools instead use Elastic Database Jobs for scheduled, cross-database T-SQL automation.",
+      "detail": "This is a frequent point of confusion for administrators migrating from on-premises SQL Server: a job defined in SQL Agent on a VM or Managed Instance simply has no equivalent surface to run on in single-database Azure SQL Database."
+    },
+    {
+      "id": "f25",
+      "cat": "automation",
+      "front": "Elastic Database Jobs components",
+      "back": "An Elastic Job Agent is the Azure resource that runs jobs, backed by a Job Database that stores job definitions, schedules, and execution history. Jobs target a target group (one or more databases, an elastic pool, or a logical server) and run the same T-SQL against every target in it.",
+      "detail": "Targeting an entire elastic pool or server, rather than listing databases individually, means a job automatically picks up new databases added later without anyone having to edit the job definition."
+    },
+    {
+      "id": "f26",
+      "cat": "automation",
+      "front": "Azure Automation runbooks for database administration",
+      "back": "Azure Automation runbooks (PowerShell, PowerShell Workflow, or Python) run on a schedule or in response to a webhook/alert, letting a DBA automate tasks like starting/stopping a dev database, scaling a service objective at off-peak hours, or rotating credentials, without needing SQL Agent or Elastic Jobs at all.",
+      "detail": "Because runbooks operate through Azure Resource Manager rather than a direct SQL connection, they are well suited to control-plane actions like changing a service tier, whereas T-SQL-level work across many databases is still usually better handled by Elastic Jobs."
+    },
+    {
+      "id": "f27",
+      "cat": "automation",
+      "front": "PowerShell and Azure CLI for repetitive DBA tasks",
+      "back": "The Az.Sql PowerShell module (and equivalent az sql CLI commands) scripts routine operations like creating databases, configuring firewall rules, setting service objectives, or triggering failovers, making them repeatable, source-controllable, and usable inside a pipeline or runbook.",
+      "detail": "Scripting these operations rather than clicking through the portal is what makes them reusable inside a CI/CD pipeline or an Azure Automation runbook \u2014 the portal and the CLI/PowerShell surface ultimately call the same underlying Azure Resource Manager APIs."
+    },
+    {
+      "id": "f28",
+      "cat": "hadr",
+      "front": "Azure SQL Database built-in high availability",
+      "back": "Every Azure SQL Database and Managed Instance includes built-in HA regardless of tier: General Purpose separates compute from remote storage and relies on that storage's own redundancy, while Business Critical (and Premium) runs a local set of Always On Availability Groups replicas under the hood for near-instant automatic failover.",
+      "detail": "This built-in HA is separate from, and does not require configuring, an auto-failover group or geo-replication \u2014 those are cross-region features layered on top for disaster recovery, not what protects against a single node failure."
+    },
+    {
+      "id": "f29",
+      "cat": "hadr",
+      "front": "Auto-failover groups",
+      "back": "An auto-failover group wraps one or more databases behind a stable read-write and read-only listener endpoint, replicating them to a secondary server (typically in another region) and optionally failing over automatically based on a configured grace period if the primary becomes unavailable.",
+      "detail": "Because applications connect to the failover group's listener endpoint rather than the server name directly, a failover (automatic or manual) requires no connection-string change on the application side."
+    },
+    {
+      "id": "f30",
+      "cat": "hadr",
+      "front": "Active geo-replication",
+      "back": "Active geo-replication asynchronously replicates a single database to up to four readable secondary databases in the same or different regions, with failover always manual (initiated by an administrator), unlike an auto-failover group's optional automatic failover.",
+      "detail": "Active geo-replication operates at the level of one database at a time, while an auto-failover group manages failover for a whole group of databases together behind one shared endpoint \u2014 pick geo-replication when only a single database, or fine-grained manual control, is needed."
+    },
+    {
+      "id": "f31",
+      "cat": "hadr",
+      "front": "Always On Availability Groups on SQL Server IaaS VMs",
+      "back": "An Availability Group replicates a set of user databases together as an availability replica, requires the VMs to be nodes of a Windows Server Failover Cluster (WSFC), and supports synchronous commit (zero data loss, usually same-region) or asynchronous commit (higher latency tolerance, typically for a DR replica in another region).",
+      "detail": "An Availability Group protects at the database level \u2014 only the specific databases added to it are covered \u2014 which is the key structural difference from a Failover Cluster Instance protecting the whole instance."
+    },
+    {
+      "id": "f32",
+      "cat": "hadr",
+      "front": "Failover Cluster Instances (FCI) vs. Availability Groups",
+      "back": "An FCI protects an entire SQL Server instance (every database on it) by failing the whole instance over between WSFC nodes that share access to the same storage (shared disk or Storage Spaces Direct). An Availability Group instead protects a chosen subset of user databases across nodes that each keep their own storage, replicating data rather than sharing a disk.",
+      "detail": "FCI has no data redundancy of its own beyond the shared storage layer itself, so it is commonly paired with Storage Spaces Direct or Storage Replica underneath to also protect against storage failure, since the FCI mechanism alone only handles the compute-node failover."
+    },
+    {
+      "id": "f33",
+      "cat": "hadr",
+      "front": "Automated backups and point-in-time restore (PITR)",
+      "back": "Azure SQL automatically takes full, differential, and transaction log backups and stores them in geo-redundant (by default) storage, enabling point-in-time restore to any moment within the configured retention window (default 7 days, configurable up to 35).",
+      "detail": "PITR restores create a new database rather than overwriting the existing one, which is exactly why it is safe to use to inspect or recover a specific moment in time without disturbing the currently running database."
+    },
+    {
+      "id": "f34",
+      "cat": "hadr",
+      "front": "Long-term retention (LTR)",
+      "back": "LTR policies copy selected automated backups (weekly, monthly, and/or yearly) into separate, durable storage for up to 10 years, independent of and beyond the normal PITR retention window, to satisfy compliance or audit requirements.",
+      "detail": "LTR backups are stored and billed separately from the standard backup retention used for PITR \u2014 enabling LTR does not extend or replace the PITR window, it runs alongside it as an additional, longer-term copy."
+    },
+    {
+      "id": "f35",
+      "cat": "hadr",
+      "front": "RTO/RPO comparison across HA/DR features",
+      "back": "Built-in HA (Business Critical replicas) offers the lowest RTO/RPO, near-instant and automatic, for a single-region node failure. Auto-failover groups add a configurable grace period before automatic cross-region failover, with a small RPO from asynchronous replication. Active geo-replication has a similarly small RPO but always requires a manual failover, adding to effective RTO. Restoring from backup has by far the largest RTO and RPO of the options.",
+      "detail": "Manual failover in geo-replication is not a limitation to work around so much as a deliberate design choice \u2014 it avoids an unwanted automatic failover (and its brief availability blip) being triggered by a transient network blip rather than a real regional outage."
+    },
+    {
+      "id": "f36",
+      "cat": "hadr",
+      "front": "Zone-redundant configuration",
+      "back": "A zone-redundant Azure SQL Database or Managed Instance (Business Critical or Premium tiers) spreads its replicas across multiple Azure availability zones within the same region, protecting against a datacenter-level failure without needing a separate region or a failover group.",
+      "detail": "Zone redundancy protects against losing one availability zone within a region; it does nothing for a full regional outage, which is exactly the gap that a cross-region auto-failover group or geo-replication is meant to cover instead."
+    },
+    {
+      "id": "f37",
+      "cat": "platform",
+      "front": "Azure Data Studio",
+      "back": "A lightweight, cross-platform (Windows, macOS, Linux) query and administration tool for SQL Server and Azure SQL, built around notebooks and extensions, distinct from the older, Windows-only SQL Server Management Studio.",
+      "detail": "A DBA working from macOS or Linux, or wanting notebook-style documentation alongside queries, reaches for Azure Data Studio; SSMS still has deeper GUI tooling for some administrative tasks on Windows."
+    },
+    {
+      "id": "f38",
+      "cat": "security",
+      "front": "Database scoped credential",
+      "back": "Stores the authentication secret a database needs to reach an external resource \u2014 like a storage account for PolyBase/external tables or a backup destination \u2014 separately from the actual external data source definition, so that credential can be reused and rotated in one place.",
+      "detail": "This works alongside Microsoft Entra ID (Azure AD) authentication for Azure SQL \u2014 the scoped credential is specifically for the database reaching *out* to another resource, not for a user or app authenticating *into* the database."
+    }
+  ],
+  "questions": [
+    {
+      "id": "q1",
+      "cat": "platform",
+      "type": "mc",
+      "question": "An application requires cross-database queries, linked servers, and SQL Server Agent jobs, but the company wants Microsoft to continue handling all OS and engine patching. Which deployment option best fits?",
+      "options": [
+        "Azure SQL Database single database",
+        "Azure SQL Managed Instance",
+        "SQL Server on an Azure VM with manual patching",
+        "Azure SQL Database elastic pool"
+      ],
+      "correct": 1,
+      "explanation": "Managed Instance provides near-complete SQL Server engine compatibility, including cross-database queries, linked servers, and SQL Agent, while remaining a fully PaaS-managed service with Microsoft handling patching. A single database or elastic pool does not support instance-scoped features like SQL Agent, and a VM would shift patching responsibility back to the customer."
+    },
+    {
+      "id": "q2",
+      "cat": "platform",
+      "type": "mc",
+      "question": "A team wants to reuse an existing on-premises SQL Server Enterprise Edition license to reduce the cost of an upcoming Azure SQL migration. Which purchasing model must they use, and why?",
+      "options": [
+        "The DTU-based model, because it includes licensing in its blended price",
+        "The vCore-based model, because Azure Hybrid Benefit for SQL Server is only available with it",
+        "Either model works identically for licensing purposes",
+        "The Basic tier, because it does not require any license at all"
+      ],
+      "correct": 1,
+      "explanation": "Azure Hybrid Benefit, which lets an existing SQL Server license reduce the compute cost, is only available under the vCore-based purchasing model, not the DTU-based model. The DTU model bundles a fixed price with no license-reuse mechanism."
+    },
+    {
+      "id": "q3",
+      "cat": "platform",
+      "type": "mc",
+      "question": "A financial workload cannot tolerate the latency of remote storage and also needs built-in high availability without any additional configuration. Which Azure SQL Database service tier should be selected?",
+      "options": [
+        "General Purpose",
+        "Hyperscale",
+        "Business Critical",
+        "Basic"
+      ],
+      "correct": 2,
+      "explanation": "Business Critical uses local SSD storage for the lowest latency and includes a built-in set of Always On Availability Group replicas that provide high availability with no extra configuration. General Purpose relies on remote storage with higher latency, and Hyperscale optimizes for very large, fast-growing databases rather than raw local-storage latency."
+    },
+    {
+      "id": "q4",
+      "cat": "platform",
+      "type": "mc",
+      "question": "A SaaS provider hosts 200 databases for different customers, each with unpredictable and non-overlapping usage spikes. Provisioning each database for its own peak would be very expensive. What should they configure to reduce cost?",
+      "options": [
+        "An elastic pool sized for the aggregate, typical demand across all 200 databases",
+        "A separate Hyperscale database for each customer",
+        "A single Managed Instance with 200 databases and no pooling",
+        "Serverless compute for every database with the maximum vCore ceiling set very high"
+      ],
+      "correct": 0,
+      "explanation": "An elastic pool lets many databases with staggered, non-simultaneous peaks share one billed pool of resources, which is exactly the economic benefit needed here since usage spikes do not overlap. Sizing every database for its own peak, as the other options effectively do, is the expensive approach this scenario is trying to avoid."
+    },
+    {
+      "id": "q5",
+      "cat": "platform",
+      "type": "mc",
+      "question": "A development database is queried only a few times a day, sits idle the rest of the time, and the team wants to avoid paying for compute while it is unused. Some cold-start latency on the next connection is acceptable. What should they configure?",
+      "options": [
+        "The Basic DTU tier with no other changes",
+        "The serverless compute tier with auto-pause enabled",
+        "A Hyperscale database with named replicas",
+        "An elastic pool shared with production databases"
+      ],
+      "correct": 1,
+      "explanation": "The serverless compute tier can auto-pause after a period of inactivity, billing only for storage while paused, and auto-resumes on the next connection \u2014 accepting a brief cold-start delay is exactly the tradeoff this scenario says is fine. The other options either still bill for idle compute or address an unrelated problem."
+    },
+    {
+      "id": "q6",
+      "cat": "platform",
+      "type": "mc",
+      "question": "Before committing to a migration path, a DBA wants to identify SQL Server features used by an on-premises database that are deprecated or incompatible with Azure SQL Database. Which tool should be run first?",
+      "options": [
+        "Azure Database Migration Service (DMS) in online mode",
+        "The Data Migration Assistant (DMA) assessment feature",
+        "SQL Server Agent job history",
+        "Azure Monitor diagnostic settings"
+      ],
+      "correct": 1,
+      "explanation": "DMA is specifically built to assess a database for compatibility issues and deprecated features before migration, surfacing blockers early. DMS is the tool that then performs the actual migration once the assessment looks clean, not the initial compatibility check."
+    },
+    {
+      "id": "q7",
+      "cat": "security",
+      "type": "mc",
+      "question": "A company wants its DBA team to authenticate to Azure SQL using their existing corporate identities, with multi-factor authentication enforced, and wants team membership changes to take effect without ever touching SQL Server configuration. What should they configure?",
+      "options": [
+        "A SQL authentication login shared by the whole team",
+        "A Microsoft Entra ID group set as the server-level Entra admin",
+        "A single Microsoft Entra ID user set as the server-level Entra admin",
+        "Row-Level Security scoped to the DBA team"
+      ],
+      "correct": 1,
+      "explanation": "Setting a Microsoft Entra ID group as the admin means adding or removing members from that group in Entra ID alone controls access, with no configuration change needed on the SQL Server itself, while still getting MFA and centralized identity. A single-user admin would require reconfiguring SQL Server itself every time the specific admin changes."
+    },
+    {
+      "id": "q8",
+      "cat": "security",
+      "type": "mc",
+      "question": "A database is occasionally copied to a different logical server as part of a disaster recovery test, and its allowed client IP ranges must travel with it automatically. Where should the firewall rule be configured?",
+      "options": [
+        "As a server-level firewall rule on the original server only",
+        "As a database-level firewall rule on the database itself",
+        "In the master database of the destination server only, after each copy",
+        "Firewall rules cannot be scoped to an individual database"
+      ],
+      "correct": 1,
+      "explanation": "Database-level firewall rules are stored with the database and move with it during copy or geo-replication operations, unlike server-level rules which are stored in master and stay behind on the original server. This makes database-level rules the right choice when the rule needs to follow the data."
+    },
+    {
+      "id": "q9",
+      "cat": "security",
+      "type": "mc",
+      "question": "A healthcare application must guarantee that column-level patient data remains encrypted at all times, including in server memory and in query plans, such that even a DBA with full administrative rights on the server cannot view the plaintext without a separate key. Which feature meets this requirement?",
+      "options": [
+        "Transparent Data Encryption (TDE)",
+        "Dynamic Data Masking",
+        "Always Encrypted",
+        "Row-Level Security"
+      ],
+      "correct": 2,
+      "explanation": "Always Encrypted performs encryption and decryption entirely inside the client driver using keys the database engine never has access to, so the data stays encrypted in memory, in query plans, and even from an administrator with full server rights. TDE only protects data at rest on disk, and Dynamic Data Masking is a display-layer control that does not encrypt anything."
+    },
+    {
+      "id": "q10",
+      "cat": "security",
+      "type": "mc",
+      "question": "An auditor asks how a company protects its Azure SQL database files and backups from being read if the underlying storage media were somehow accessed directly, with no changes to application queries. Which feature addresses this?",
+      "options": [
+        "Dynamic Data Masking",
+        "Transparent Data Encryption (TDE)",
+        "Row-Level Security",
+        "Always Encrypted with randomized encryption"
+      ],
+      "correct": 1,
+      "explanation": "TDE encrypts the data and log files at rest transparently, with no application or query changes needed, directly protecting against someone accessing the raw storage or backup files. Dynamic Data Masking only affects what a query result displays and does nothing for raw file access, and Always Encrypted requires application/driver changes to use."
+    },
+    {
+      "id": "q11",
+      "cat": "security",
+      "type": "mc",
+      "question": "Call center staff need to view customer records to do their jobs, but the company wants most staff to see only the last four digits of stored credit card numbers, without changing what is physically stored in the column. Which feature fits?",
+      "options": [
+        "Transparent Data Encryption",
+        "Always Encrypted with deterministic encryption",
+        "Dynamic Data Masking",
+        "Row-Level Security with a block predicate"
+      ],
+      "correct": 2,
+      "explanation": "Dynamic Data Masking obscures column values for non-privileged users at query time without altering the underlying stored data, which is exactly the partial-display need described. TDE and Always Encrypted operate on data at rest or via client-side encryption respectively and are not about selectively masking a query result's display."
+    },
+    {
+      "id": "q12",
+      "cat": "security",
+      "type": "mc",
+      "question": "A multi-tenant database must ensure that a query issued by any application user only ever returns rows belonging to that user's own tenant, enforced automatically no matter how the row is queried, without adding a WHERE clause to every application query. What should be implemented?",
+      "options": [
+        "Dynamic Data Masking",
+        "Row-Level Security using a filter predicate in a security policy",
+        "Transparent Data Encryption",
+        "A server-level firewall rule per tenant"
+      ],
+      "correct": 1,
+      "explanation": "Row-Level Security, enforced through a filter predicate defined in a CREATE SECURITY POLICY statement, automatically restricts which rows any query returns based on the executing context, with no per-query changes required. The other options address encryption or network access, not per-row visibility."
+    },
+    {
+      "id": "q13",
+      "cat": "security",
+      "type": "mc",
+      "question": "A security team wants both a scheduled scan that flags SQL misconfigurations and best-practice gaps, and always-on detection of anomalous activity like a possible SQL injection attempt. Which single Azure offering provides both?",
+      "options": [
+        "Dynamic Data Masking",
+        "Microsoft Defender for SQL",
+        "Transparent Data Encryption",
+        "Elastic Database Jobs"
+      ],
+      "correct": 1,
+      "explanation": "Microsoft Defender for SQL bundles Vulnerability Assessment, which scans for configuration and best-practice issues, together with Advanced Threat Protection, which continuously monitors for anomalous or suspicious activity \u2014 exactly the two capabilities described. None of the other options provide security scanning or threat detection."
+    },
+    {
+      "id": "q14",
+      "cat": "monitor",
+      "type": "mc",
+      "question": "After a recent deployment, a specific report query has become much slower, and the DBA wants to see a history of its execution plans and runtime statistics over the past week to find out when the regression started. Which feature should they use?",
+      "options": [
+        "sys.dm_exec_requests, since it shows currently executing queries",
+        "Query Store",
+        "Dynamic Data Masking configuration history",
+        "The transaction log backup history"
+      ],
+      "correct": 1,
+      "explanation": "Query Store persists a history of execution plans and their runtime statistics inside the database itself, making it possible to pinpoint exactly when a query's plan or performance changed, even days later. sys.dm_exec_requests only reflects what is executing right now, with no historical record."
+    },
+    {
+      "id": "q15",
+      "cat": "monitor",
+      "type": "mc",
+      "question": "A DBA who previously used SQL Server Profiler against on-premises SQL Server needs an equivalent lightweight tracing capability against an Azure SQL Database. What should they use instead?",
+      "options": [
+        "SQL Server Profiler connected directly to Azure SQL Database",
+        "Extended Events",
+        "The legacy SQL Trace stored procedures",
+        "Windows Performance Monitor counters"
+      ],
+      "correct": 1,
+      "explanation": "SQL Server Profiler and the legacy SQL Trace mechanism are deprecated and cannot connect to Azure SQL Database at all; Extended Events is the modern, lightweight, supported tracing engine there, and SSMS even provides an XEvent Profiler UI that mimics the old Profiler experience. Performance Monitor is a Windows-level tool unrelated to query-level tracing inside the database."
+    },
+    {
+      "id": "q16",
+      "cat": "monitor",
+      "type": "mc",
+      "question": "A DBA wants a quick way to check whether a database is approaching its provisioned CPU and I/O limits right now, at a fine (15-second) time granularity. Which DMV should they query?",
+      "options": [
+        "sys.dm_db_missing_index_details",
+        "sys.dm_db_resource_stats",
+        "sys.dm_exec_query_stats",
+        "sys.dm_os_wait_stats"
+      ],
+      "correct": 1,
+      "explanation": "sys.dm_db_resource_stats reports recent (roughly the last hour) CPU, data I/O, log I/O, and memory consumption as a percentage of the database's current provisioned limits at 15-second granularity, which is exactly the resource-utilization check described. For a longer, coarser view (about 14 days at 5-minute granularity), the master database's sys.resource_stats is the right DMV instead. The other options here address missing indexes, query-level statistics, and wait statistics respectively, not overall resource ceiling utilization."
+    },
+    {
+      "id": "q17",
+      "cat": "monitor",
+      "type": "mc",
+      "question": "A team wants Azure to automatically analyze query performance telemetry and surface a diagnostic explanation when it detects things like blocking, a regressed plan, or a missing index, without them having to write custom monitoring queries. What should they enable?",
+      "options": [
+        "Elastic Database Jobs",
+        "Intelligent Insights",
+        "Dynamic Data Masking",
+        "Always Encrypted"
+      ],
+      "correct": 1,
+      "explanation": "Intelligent Insights uses built-in AI-driven analysis of performance telemetry to automatically detect and log an explanation for degradation patterns such as blocking, plan regressions, or missing indexes. The other three options address job scheduling, data masking, and encryption, none of which involve performance diagnostics."
+    },
+    {
+      "id": "q18",
+      "cat": "monitor",
+      "type": "mc",
+      "question": "A company wants an email sent to the DBA team automatically whenever a database's CPU percentage stays above 90% for more than 10 minutes. What should they configure?",
+      "options": [
+        "A Dynamic Data Masking rule on the relevant tables",
+        "An Azure Monitor alert rule on the CPU percentage metric, with an action group configured for email",
+        "A Row-Level Security policy",
+        "An Elastic Database Job with no schedule"
+      ],
+      "correct": 1,
+      "explanation": "Azure Monitor alert rules can trigger on a metric threshold like CPU percentage sustained over a duration, and an associated action group is exactly the mechanism for sending the resulting notification by email. The other options have nothing to do with metric-based alerting."
+    },
+    {
+      "id": "q19",
+      "cat": "queryPerf",
+      "type": "mc",
+      "question": "A query's actual execution plan shows the optimizer estimated 50 rows would flow out of a join, but 500,000 rows actually did, and performance is poor. What does this large estimate-versus-actual gap most likely indicate?",
+      "options": [
+        "The transaction log is full",
+        "Stale or missing statistics, or a parameter-sniffing issue, causing a poor plan choice",
+        "The database has exceeded its DTU limit",
+        "Transparent Data Encryption is degrading performance"
+      ],
+      "correct": 1,
+      "explanation": "A large divergence between estimated and actual row counts at an operator is a classic sign that statistics are stale or missing, or that a cached plan was compiled against unrepresentative parameter values (parameter sniffing) \u2014 both lead the optimizer to choose a plan suited to the wrong row count. It has no relationship to log space, DTU limits, or TDE."
+    },
+    {
+      "id": "q20",
+      "cat": "queryPerf",
+      "type": "mc",
+      "question": "A DBA wants to see which candidate indexes the query optimizer believes would have most improved recent query performance, along with an estimated benefit. Which DMVs should be queried?",
+      "options": [
+        "sys.dm_db_missing_index_details and sys.dm_db_missing_index_group_stats",
+        "sys.dm_db_resource_stats",
+        "sys.dm_exec_connections",
+        "sys.dm_os_ring_buffers"
+      ],
+      "correct": 0,
+      "explanation": "The missing index DMVs record indexes the optimizer noticed would have helped recent queries, together with an estimated impact figure, which is exactly what is being asked for. The other DMVs relate to resource utilization, active connections, and internal ring buffers, not missing-index recommendations."
+    },
+    {
+      "id": "q21",
+      "cat": "queryPerf",
+      "type": "mc",
+      "question": "Query Store detects that a query's execution plan regressed after a schema change, causing a significant slowdown. The company wants Azure SQL Database to automatically revert to the previously good plan and keep monitoring to confirm the fix actually helped. Which capability should be enabled?",
+      "options": [
+        "Dynamic Data Masking",
+        "Automatic Tuning with FORCE LAST GOOD PLAN",
+        "Elastic Database Jobs",
+        "Always Encrypted"
+      ],
+      "correct": 1,
+      "explanation": "Automatic Tuning's FORCE LAST GOOD PLAN option is specifically designed to revert a regressed query to its last known-good plan using Query Store data, and it continues monitoring afterward to verify the forced plan actually helps, backing off if it does not. None of the other options relate to plan regression or automated tuning."
+    },
+    {
+      "id": "q22",
+      "cat": "queryPerf",
+      "type": "mc",
+      "question": "A stored procedure runs fine most of the time, but occasionally a very unusual parameter value causes the cached plan to perform extremely poorly for that specific execution. The procedure runs thousands of times per minute, so recompiling on every call is not acceptable. What is the best targeted fix?",
+      "options": [
+        "Add OPTION (RECOMPILE) to force a fresh plan on every single execution",
+        "Rewrite the query using OPTIMIZE FOR a representative typical value, or use Query Store to force a good general-purpose plan",
+        "Disable the plan cache database-wide",
+        "Enable Transparent Data Encryption on the procedure"
+      ],
+      "correct": 1,
+      "explanation": "Given the extremely high call frequency, OPTIMIZE FOR a representative value (or forcing a stable, generally-good plan via Query Store) fixes the parameter-sniffing problem without paying a full recompilation cost on every execution. OPTION (RECOMPILE) would fix the symptom but at a CPU cost that is explicitly ruled out here by the call volume."
+    },
+    {
+      "id": "q23",
+      "cat": "automation",
+      "type": "mc",
+      "question": "A team migrating from on-premises SQL Server to Azure SQL Database single databases is surprised that their existing SQL Server Agent jobs do not appear anywhere. What should they use instead to run the same scheduled T-SQL work across their databases?",
+      "options": [
+        "Elastic Database Jobs",
+        "Windows Task Scheduler on the database server",
+        "Always Encrypted scheduled key rotation",
+        "A server-level firewall rule with a schedule"
+      ],
+      "correct": 0,
+      "explanation": "SQL Server Agent does not exist in Azure SQL Database single databases at all, since it is instance-scoped and single databases have no instance; Elastic Database Jobs is the PaaS-native replacement for scheduled, cross-database T-SQL automation. There is no server to run Windows Task Scheduler on in a PaaS single database, and the other two options are unrelated capabilities."
+    },
+    {
+      "id": "q24",
+      "cat": "automation",
+      "type": "mc",
+      "question": "A DBA sets up an Elastic Database Job intended to rebuild fragmented indexes across every database in a growing elastic pool, including ones added in the future, without having to edit the job whenever a new database is provisioned. How should the job be targeted?",
+      "options": [
+        "List each current database individually by name in the job definition",
+        "Target the elastic pool itself as the target group",
+        "Create a brand new job every time a database is added",
+        "Target only the master database of the logical server"
+      ],
+      "correct": 1,
+      "explanation": "Targeting the elastic pool as a whole means the job automatically covers any database added to that pool later, with no need to edit the job definition. Listing individual databases by name would require ongoing manual maintenance every time a database is added or removed."
+    },
+    {
+      "id": "q25",
+      "cat": "automation",
+      "type": "mc",
+      "question": "A company wants to automatically scale a development Azure SQL Database down to a lower service objective every evening and back up every morning, using a script that runs on a schedule without any SQL Agent or Elastic Job infrastructure. What is a suitable approach?",
+      "options": [
+        "An Azure Automation runbook using Az.Sql PowerShell cmdlets on a schedule",
+        "A Row-Level Security policy scheduled to change at night",
+        "Dynamic Data Masking rules that vary by time of day",
+        "A database-level firewall rule that toggles nightly"
+      ],
+      "correct": 0,
+      "explanation": "An Azure Automation runbook using the Az.Sql module can change a database's service objective through Azure Resource Manager on a defined schedule, exactly matching this control-plane automation need, without requiring SQL Agent or Elastic Jobs. The other options are unrelated security or access features, not scaling mechanisms."
+    },
+    {
+      "id": "q26",
+      "cat": "automation",
+      "type": "mc",
+      "question": "A DBA needs to script the creation of a new Azure SQL Database and configuration of its firewall rules so the exact same steps can be repeated reliably across multiple environments and stored in source control. Which tool is best suited?",
+      "options": [
+        "Manually clicking through the Azure portal each time",
+        "Az.Sql PowerShell cmdlets or the equivalent az sql CLI commands",
+        "SQL Server Management Studio's GUI only, with no scripting",
+        "Dynamic Data Masking rule export"
+      ],
+      "correct": 1,
+      "explanation": "Az.Sql PowerShell cmdlets and az sql CLI commands can fully script database creation and firewall configuration, making the process repeatable and suitable for source control, unlike manual portal clicks which leave no reusable script. SSMS's GUI alone and Dynamic Data Masking exports do not address repeatable infrastructure provisioning."
+    },
+    {
+      "id": "q27",
+      "cat": "hadr",
+      "type": "mc",
+      "question": "A company runs a Business Critical tier Azure SQL Database and wants to understand what protects it from a single node failure without any additional configuration. What provides this protection?",
+      "options": [
+        "A manually configured auto-failover group in the same region",
+        "The built-in set of Always On Availability Group replicas that come with the Business Critical tier",
+        "A nightly full backup restored to a new database",
+        "Active geo-replication to a secondary region"
+      ],
+      "correct": 1,
+      "explanation": "Business Critical tier databases come with a built-in set of Always On Availability Group replicas as part of the tier itself, providing automatic node-level HA with no extra setup. Auto-failover groups and active geo-replication are separate, explicitly-configured cross-region DR features, not what protects against a single-node failure by default."
+    },
+    {
+      "id": "q28",
+      "cat": "hadr",
+      "type": "mc",
+      "question": "A company wants a group of databases to fail over together to a secondary region automatically if the primary region becomes unavailable, and wants the application's connection string to remain unchanged through a failover. What should they configure?",
+      "options": [
+        "Active geo-replication with manual failover per database",
+        "An auto-failover group with a configured automatic failover policy",
+        "A Failover Cluster Instance across regions",
+        "Row-Level Security scoped by region"
+      ],
+      "correct": 1,
+      "explanation": "An auto-failover group provides a stable read-write and read-only listener endpoint for a group of databases, and can be configured to fail over automatically based on a grace period, with the application's connection string never needing to change. Active geo-replication supports only manual failover and operates one database at a time, not as a group with automatic failover."
+    },
+    {
+      "id": "q29",
+      "cat": "hadr",
+      "type": "mc",
+      "question": "A single critical database needs up to four readable copies spread across different regions for reporting offload, with failover always explicitly triggered by an administrator rather than automatically. What should be configured?",
+      "options": [
+        "An auto-failover group with automatic failover enabled",
+        "Active geo-replication with up to four readable secondaries",
+        "A Failover Cluster Instance with shared storage",
+        "Zone redundancy alone, with no cross-region component"
+      ],
+      "correct": 1,
+      "explanation": "Active geo-replication supports up to four readable secondary databases and always requires a manual failover, matching both requirements in this scenario exactly. An auto-failover group is built around a group-level listener with optional automatic failover, not the specific up-to-four-readable-secondaries, always-manual-failover model described."
+    },
+    {
+      "id": "q30",
+      "cat": "hadr",
+      "type": "mc",
+      "question": "A team is deploying SQL Server on Azure VMs and needs the entire instance, including every database on it, to fail over together if a node goes down, using nodes that share access to a common storage volume. Which HA technology should they configure?",
+      "options": [
+        "An Always On Availability Group protecting only the production databases",
+        "A Failover Cluster Instance (FCI) built on a Windows Server Failover Cluster with shared storage",
+        "Active geo-replication",
+        "Dynamic Data Masking"
+      ],
+      "correct": 1,
+      "explanation": "An FCI protects an entire SQL Server instance, including every database on it, by failing the whole instance over between WSFC nodes that share a common storage volume \u2014 exactly matching the whole-instance, shared-storage requirement. An Availability Group instead protects only a chosen subset of databases and does not rely on shared storage, replicating data between nodes with independent storage instead."
+    },
+    {
+      "id": "q31",
+      "cat": "hadr",
+      "type": "mc",
+      "question": "A retention policy requires that specific yearly backups of a database be retrievable for up to seven years for regulatory compliance, well beyond the normal short-term backup window used for day-to-day point-in-time restore. What should be configured?",
+      "options": [
+        "Increase the standard PITR retention window to seven years",
+        "A long-term retention (LTR) policy selecting yearly backups for retention",
+        "Active geo-replication with a seven-year replica lag",
+        "Zone redundancy with extended storage"
+      ],
+      "correct": 1,
+      "explanation": "Long-term retention policies copy selected backups (weekly, monthly, and/or yearly) into separate durable storage for up to 10 years, independent of the standard PITR window, which is exactly the compliance need described. Standard PITR retention only extends up to 35 days and is not designed for multi-year regulatory retention."
+    },
+    {
+      "id": "tf1",
+      "cat": "platform",
+      "type": "tf",
+      "question": "Azure SQL Managed Instance offers substantially higher SQL Server engine compatibility than Azure SQL Database single databases, including support for SQL Server Agent and cross-database queries.",
+      "answer": true,
+      "explanation": "Managed Instance was specifically designed to close this compatibility gap, supporting instance-scoped features like SQL Agent, cross-database queries, and linked servers that single databases and elastic pools do not support."
+    },
+    {
+      "id": "tf2",
+      "cat": "platform",
+      "type": "tf",
+      "question": "The DTU-based purchasing model supports Azure Hybrid Benefit for reusing an existing SQL Server license.",
+      "answer": false,
+      "explanation": "Azure Hybrid Benefit is only available under the vCore-based purchasing model. The DTU model bundles compute, memory, and I/O into one price with no mechanism for applying an existing license."
+    },
+    {
+      "id": "tf3",
+      "cat": "platform",
+      "type": "tf",
+      "question": "In the serverless compute tier, a database that has auto-paused still bills for compute at the minimum vCore rate while idle.",
+      "answer": false,
+      "explanation": "While auto-paused, a serverless database bills only for storage, not for compute \u2014 that is the entire cost-saving point of auto-pause. Compute billing resumes only once a new connection triggers auto-resume."
+    },
+    {
+      "id": "tf4",
+      "cat": "security",
+      "type": "tf",
+      "question": "Always Encrypted allows the SQL Server or Azure SQL Database engine itself to decrypt protected column values when needed for query processing.",
+      "answer": false,
+      "explanation": "The entire design of Always Encrypted is that the database engine never has access to the column encryption keys or the plaintext \u2014 encryption and decryption happen only inside the client driver, keeping the data unreadable to the engine and to a DBA with only server-level access."
+    },
+    {
+      "id": "tf5",
+      "cat": "security",
+      "type": "tf",
+      "question": "Transparent Data Encryption protects data while it is being processed in server memory, in addition to protecting it at rest on disk.",
+      "answer": false,
+      "explanation": "TDE only encrypts data at rest \u2014 the data and log files on disk and in backups. Once loaded into memory for query processing, the data is not protected by TDE; that in-memory protection gap is what Always Encrypted is designed to close instead."
+    },
+    {
+      "id": "tf6",
+      "cat": "security",
+      "type": "tf",
+      "question": "Dynamic Data Masking changes the actual data stored in a column, not just what is displayed to certain users in query results.",
+      "answer": false,
+      "explanation": "Dynamic Data Masking only affects how column values are displayed to non-privileged users at query time \u2014 the underlying stored data is never altered. A user with sufficient permissions, or a different access path, can still see the real, unmasked data."
+    },
+    {
+      "id": "tf7",
+      "cat": "monitor",
+      "type": "tf",
+      "question": "Query Store persists query plan and runtime statistics history inside the database, so that history survives a database restart or failover.",
+      "answer": true,
+      "explanation": "Unlike the volatile plan cache, Query Store persists its captured plan and runtime statistics data inside the database itself, so the history remains available for analysis even after a restart or failover."
+    },
+    {
+      "id": "tf8",
+      "cat": "monitor",
+      "type": "tf",
+      "question": "SQL Server Profiler can connect directly to an Azure SQL Database to capture a live trace, the same way it connects to an on-premises SQL Server instance.",
+      "answer": false,
+      "explanation": "SQL Server Profiler (and the underlying legacy SQL Trace mechanism) is deprecated and cannot connect to Azure SQL Database at all. Extended Events is the supported tracing mechanism there, including through the XEvent Profiler UI in SSMS that mimics the old Profiler experience."
+    },
+    {
+      "id": "tf9",
+      "cat": "queryPerf",
+      "type": "tf",
+      "question": "The missing index DMVs in SQL Server can automatically combine several overlapping index suggestions into one optimal index design without administrator review.",
+      "answer": false,
+      "explanation": "The missing index DMVs only report single-index candidates the optimizer noticed based on recent queries, along with an estimated benefit \u2014 they never merge or reconcile multiple candidates into one design, so administrator judgment is still needed before creating indexes from their output."
+    },
+    {
+      "id": "tf10",
+      "cat": "automation",
+      "type": "tf",
+      "question": "Elastic Database Jobs can target an entire elastic pool as a group, automatically including any database added to that pool later.",
+      "answer": true,
+      "explanation": "Targeting a pool (or a server) as the target group means the job automatically covers databases added afterward, with no need to edit the job's target list whenever a new database is provisioned."
+    },
+    {
+      "id": "tf11",
+      "cat": "automation",
+      "type": "tf",
+      "question": "SQL Server Agent is available and fully functional for scheduling jobs on Azure SQL Database single databases.",
+      "answer": false,
+      "explanation": "SQL Server Agent is instance-scoped and does not exist for single-database Azure SQL Database, since a single database has no instance surface to host it. Managed Instance does support SQL Agent; single databases use Elastic Database Jobs instead."
+    },
+    {
+      "id": "tf12",
+      "cat": "hadr",
+      "type": "tf",
+      "question": "Active geo-replication always requires a manual failover, while an auto-failover group can be configured to fail over automatically.",
+      "answer": true,
+      "explanation": "This is the key operational distinction between the two features: active geo-replication is always manually failed over by an administrator, whereas an auto-failover group can be configured with an automatic failover policy and grace period."
+    },
+    {
+      "id": "tf13",
+      "cat": "hadr",
+      "type": "tf",
+      "question": "A Failover Cluster Instance (FCI) protects only a specific subset of user databases rather than the entire SQL Server instance.",
+      "answer": false,
+      "explanation": "An FCI protects the entire SQL Server instance and every database on it, since failover happens at the instance level across cluster nodes sharing the same storage. Protecting only a chosen subset of databases is instead the behavior of an Availability Group."
+    },
+    {
+      "id": "tf14",
+      "cat": "hadr",
+      "type": "tf",
+      "question": "Enabling long-term retention (LTR) automatically extends the standard point-in-time restore (PITR) window to match the LTR duration.",
+      "answer": false,
+      "explanation": "LTR stores selected backups separately, for up to 10 years, entirely independent of the standard PITR retention window (which tops out at 35 days) \u2014 enabling LTR does not change or extend the PITR window at all."
+    },
+    {
+      "id": "msq1",
+      "cat": "platform",
+      "type": "ms",
+      "question": "Which two of the following are true about Azure SQL Database service tiers? (Choose two.)",
+      "options": [
+        "General Purpose uses remote, Azure Premium storage rather than local SSDs",
+        "Hyperscale caps database size at 100 GB",
+        "Business Critical includes a built-in set of Always On Availability Group replicas",
+        "Basic tier is the recommended tier for production Business Critical workloads"
+      ],
+      "correct": [
+        0,
+        2
+      ],
+      "explanation": "General Purpose relies on remote Azure Premium storage, and Business Critical includes built-in Always On Availability Group replicas for local HA. Hyperscale is designed for very large databases up to 100 TB, not capped at 100 GB, and Basic is a low-end tier unsuited to production Business Critical-class workloads."
+    },
+    {
+      "id": "msq2",
+      "cat": "security",
+      "type": "ms",
+      "question": "Which two of the following correctly describe Always Encrypted? (Choose two.)",
+      "options": [
+        "Encryption and decryption happen inside the client driver, not the database engine",
+        "Deterministic encryption supports equality comparisons and joins on the encrypted column",
+        "The database engine can decrypt the data whenever a query requires it",
+        "Randomized encryption is preferred when the encrypted column needs to be used in a join"
+      ],
+      "correct": [
+        0,
+        1
+      ],
+      "explanation": "Always Encrypted performs all encryption and decryption in the client driver, keeping the engine blind to the plaintext, and deterministic encryption specifically supports equality-based operations like joins and lookups. The engine can never decrypt the data on its own, and randomized encryption (which is more secure but does not support comparisons) is the wrong choice when joins are needed on that column."
+    },
+    {
+      "id": "msq3",
+      "cat": "monitor",
+      "type": "ms",
+      "question": "Which two of the following are true about Query Store? (Choose two.)",
+      "options": [
+        "It can be used to force a previously good execution plan for a regressed query",
+        "It only reports on queries currently executing at this exact moment",
+        "It persists captured plan and runtime statistics history inside the database",
+        "It is the same feature as SQL Server Profiler, just renamed"
+      ],
+      "correct": [
+        0,
+        2
+      ],
+      "explanation": "Query Store lets an administrator force a known-good plan to fix a regression, and it persists its plan and runtime-statistics history inside the database so it survives restarts. It is not limited to only currently executing queries, and it is an entirely distinct, unrelated feature from SQL Server Profiler."
+    },
+    {
+      "id": "msq4",
+      "cat": "queryPerf",
+      "type": "ms",
+      "question": "Which two of the following are valid ways to address a parameter-sniffing problem? (Choose two.)",
+      "options": [
+        "Add OPTION (RECOMPILE) so a fresh plan compiles for every execution",
+        "Disable Transparent Data Encryption on the affected table",
+        "Use OPTIMIZE FOR to hint a representative parameter value",
+        "Enable Dynamic Data Masking on the parameter column"
+      ],
+      "correct": [
+        0,
+        2
+      ],
+      "explanation": "Both OPTION (RECOMPILE), which forces a fresh compilation each execution, and OPTIMIZE FOR, which hints the optimizer toward a representative value, are legitimate ways to address a parameter-sniffing issue. TDE and Dynamic Data Masking are unrelated encryption and masking features with no effect on plan compilation behavior."
+    },
+    {
+      "id": "msq5",
+      "cat": "hadr",
+      "type": "ms",
+      "question": "Which two of the following are true about auto-failover groups? (Choose two.)",
+      "options": [
+        "They provide a stable listener endpoint so the application connection string does not need to change on failover",
+        "They can be configured to fail over automatically based on a grace period",
+        "They support at most a single database per group",
+        "They require the application to reconnect to a new server name after every failover"
+      ],
+      "correct": [
+        0,
+        1
+      ],
+      "explanation": "An auto-failover group's listener endpoint stays the same through a failover so applications need no connection-string change, and it can be configured with an automatic failover policy and grace period. A group can contain multiple databases together, not just one, and applications specifically do not need to target a new server name after failover."
+    },
+    {
+      "id": "msq6",
+      "cat": "hadr",
+      "type": "ms",
+      "question": "Which two of the following correctly distinguish a Failover Cluster Instance (FCI) from an Always On Availability Group? (Choose two.)",
+      "options": [
+        "An FCI protects an entire instance, while an Availability Group protects a chosen subset of databases",
+        "An FCI requires nodes to share access to common storage, while an Availability Group replicas maintain independent storage",
+        "An Availability Group cannot use asynchronous commit mode",
+        "An FCI provides database-level, not instance-level, failover"
+      ],
+      "correct": [
+        0,
+        1
+      ],
+      "explanation": "An FCI fails over the whole instance using shared storage across cluster nodes, while an Availability Group protects only the databases added to it, with each replica keeping its own independent storage. Availability Groups do support asynchronous commit mode (commonly for a DR replica), and it is the FCI, not the Availability Group, that operates at the instance level rather than the database level."
+    },
+    {
+      "id": "msq7",
+      "cat": "hadr",
+      "type": "ms",
+      "question": "Which two of the following are true about Azure SQL automated backups and point-in-time restore (PITR)? (Choose two.)",
+      "options": [
+        "A point-in-time restore creates a new database rather than overwriting the existing one",
+        "The default PITR retention window is 7 days, configurable up to 35",
+        "PITR restores always overwrite the currently running database in place",
+        "Automated backups can only be restored to the exact same logical server they were taken on"
+      ],
+      "correct": [
+        0,
+        1
+      ],
+      "explanation": "A PITR restore creates a new database, leaving the original untouched, and the default retention window is 7 days, extendable up to 35. Restores do not overwrite the running database in place, and a restore can generally target a different logical server, not only the original one."
+    },
+    {
+      "id": "q32",
+      "cat": "platform",
+      "type": "mc",
+      "question": "An Azure SQL Database experiences heavy read-only reporting query load that competes with production write transactions for compute resources. Without provisioning a separate database, which built-in feature can route read-only queries to a separate replica?",
+      "options": [
+        "Auto-failover groups",
+        "Read scale-out",
+        "Elastic Database Jobs",
+        "Dynamic Data Masking"
+      ],
+      "correct": 1,
+      "explanation": "Read scale-out routes read-only connections to one of the database's existing replicas, offloading reporting queries from the primary that handles writes. Auto-failover groups address cross-region failover rather than day-to-day read offloading, Elastic Database Jobs run scheduled T-SQL rather than route live query traffic, and Dynamic Data Masking controls what data is displayed, not which replica serves a query."
+    },
+    {
+      "id": "q33",
+      "cat": "security",
+      "type": "mc",
+      "question": "A company wants to use its own encryption key stored in Azure Key Vault for Transparent Data Encryption, instead of the Microsoft-managed key, so it retains control over key rotation and revocation. What should be configured?",
+      "options": [
+        "Always Encrypted with a customer-managed key",
+        "Dynamic Data Masking with Key Vault integration",
+        "TDE with a customer-managed key (BYOK) in Azure Key Vault",
+        "Row-Level Security using a Key Vault-backed function"
+      ],
+      "correct": 2,
+      "explanation": "TDE supports bring-your-own-key (BYOK), where the database encryption key is protected by a customer-managed key stored in Azure Key Vault, giving the customer control over rotation and revocation. Always Encrypted protects specific columns end-to-end via a client driver rather than encrypting the whole database at rest, and Dynamic Data Masking and Row-Level Security have no relationship to encryption keys at all."
+    },
+    {
+      "id": "q34",
+      "cat": "security",
+      "type": "mc",
+      "question": "A compliance requirement mandates that every SELECT, INSERT, UPDATE, and DELETE against a specific Azure SQL Database be logged for later review, without modifying application code. Which feature should be enabled?",
+      "options": [
+        "Dynamic Data Masking",
+        "Query Store",
+        "Always Encrypted",
+        "Azure SQL Auditing"
+      ],
+      "correct": 3,
+      "explanation": "Azure SQL Auditing tracks database events, including statement execution, and writes them to a chosen log destination, with no application code changes required. Dynamic Data Masking only changes what non-privileged users see in query results, Query Store captures query plans and performance statistics rather than an audit trail, and Always Encrypted protects specific columns rather than logging activity."
+    },
+    {
+      "id": "q35",
+      "cat": "monitor",
+      "type": "mc",
+      "question": "A DBA suspects that queries are frequently blocked waiting on locks held by other sessions, rather than being CPU-bound. Which combination would best help confirm what queries are currently waiting on, and why?",
+      "options": [
+        "sys.dm_exec_requests joined with sys.dm_os_waiting_tasks",
+        "sys.dm_db_missing_index_details",
+        "sys.dm_db_resource_stats",
+        "sys.dm_db_missing_index_group_stats"
+      ],
+      "correct": 0,
+      "explanation": "Joining sys.dm_exec_requests with sys.dm_os_waiting_tasks reveals which currently executing requests are blocked, what they are waiting on, and which session is blocking them. The missing index DMVs report on index recommendations, not blocking, and sys.dm_db_resource_stats reports overall CPU, I/O, and memory utilization rather than session-level lock waits."
+    },
+    {
+      "id": "q36",
+      "cat": "queryPerf",
+      "type": "mc",
+      "question": "A reporting table receives heavy aggregate SUM and AVG queries scanning millions of rows across only a few columns, and is rarely updated. Which index type is best suited to accelerate these queries?",
+      "options": [
+        "No index, since indexes only help OLTP workloads",
+        "A clustered columnstore index",
+        "A unique nonclustered index on the primary key only",
+        "A full-text index"
+      ],
+      "correct": 1,
+      "explanation": "A clustered columnstore index stores data column by column with strong compression, letting aggregate queries scan only the columns they need across millions of rows extremely efficiently, and it fits a rarely updated table well. A unique nonclustered index on the primary key helps point lookups, not large aggregate scans, a full-text index is for text search, and indexes absolutely do help large analytical scans too, not just OLTP workloads."
+    },
+    {
+      "id": "q37",
+      "cat": "automation",
+      "type": "mc",
+      "question": "A team wants an Azure Automation runbook to run automatically the moment a specific Azure Monitor alert fires, rather than on a fixed schedule. What should be configured?",
+      "options": [
+        "An Elastic Database Job schedule",
+        "SQL Server Agent job step",
+        "A webhook on the runbook, called by the alert's action group",
+        "A Data Collector Set trigger"
+      ],
+      "correct": 2,
+      "explanation": "Configuring a webhook on the runbook and calling it from the firing alert's action group lets the runbook start immediately in response to that specific alert, rather than on a fixed schedule. Elastic Database Jobs and SQL Agent both run scheduled T-SQL rather than reacting to an Azure Monitor alert, and a Data Collector Set is a Performance Monitor concept, not an automation trigger."
+    },
+    {
+      "id": "q38",
+      "cat": "hadr",
+      "type": "mc",
+      "question": "A Business Critical Azure SQL Database needs to survive the loss of an entire datacenter within its current region, without provisioning a secondary region or an auto-failover group. What should be enabled?",
+      "options": [
+        "Active geo-replication to the same region",
+        "Long-term retention",
+        "Elastic pool zone pinning",
+        "Zone-redundant configuration"
+      ],
+      "correct": 3,
+      "explanation": "Zone-redundant configuration spreads a Business Critical database's replicas across multiple availability zones within the same region, protecting against a single datacenter (zone) loss without needing a second region at all. Active geo-replication and auto-failover groups are cross-region features the scenario explicitly rules out, long-term retention is a backup-retention feature unrelated to real-time availability, and elastic pool zone pinning is not a real Azure SQL feature."
+    },
+    {
+      "id": "tf15",
+      "cat": "platform",
+      "type": "tf",
+      "question": "Read scale-out is available at no additional compute cost on Premium and Business Critical tiers, because it routes read-only queries to one of the tier's already-provisioned HA replicas.",
+      "answer": true,
+      "explanation": "Premium and Business Critical tiers already run extra replicas for built-in high availability, and read scale-out simply routes read-only connections to one of those existing replicas at no extra compute cost, rather than provisioning anything new."
+    },
+    {
+      "id": "tf16",
+      "cat": "monitor",
+      "type": "tf",
+      "question": "An Extended Events session using a ring_buffer target persists its captured events to disk, surviving a server restart, the same way a file target does.",
+      "answer": false,
+      "explanation": "A ring_buffer target holds captured events only in memory and loses them on a server restart. A file target, by contrast, writes events to disk, which is what makes it the appropriate choice when captured events need to survive a restart or be reviewed later."
+    },
+    {
+      "id": "tf17",
+      "cat": "hadr",
+      "type": "tf",
+      "question": "A zone-redundant Azure SQL Database configuration protects against the loss of an entire Azure region, not just a single availability zone within that region.",
+      "answer": false,
+      "explanation": "Zone redundancy only protects against the loss of a single availability zone (datacenter) within one region. Protecting against a full regional outage requires a cross-region feature instead, such as an auto-failover group or active geo-replication."
+    },
+    {
+      "id": "msq8",
+      "cat": "security",
+      "type": "ms",
+      "question": "Which two of the following are true about Azure SQL Auditing? (Choose two.)",
+      "options": [
+        "It can write audit logs to a storage account, Log Analytics workspace, or Event Hub",
+        "It requires Always Encrypted to be enabled first",
+        "It can be configured at the server level to apply to every database",
+        "It physically prevents any DELETE statement from executing"
+      ],
+      "correct": [
+        0,
+        2
+      ],
+      "explanation": "Azure SQL Auditing can send its logs to a storage account, a Log Analytics workspace, or an Event Hub, and it can be enabled once at the server level to cover every database on it. It has no dependency on Always Encrypted, and auditing only records activity for review \u2014 it never blocks or prevents a statement from executing."
+    },
+    {
+      "id": "msq9",
+      "cat": "hadr",
+      "type": "ms",
+      "question": "Which two of the following are true about zone-redundant Azure SQL Database configuration? (Choose two.)",
+      "options": [
+        "It replaces the need for automated backups",
+        "It spreads replicas across multiple availability zones within one region",
+        "It is available on Business Critical and Premium tiers",
+        "It protects against a full regional outage on its own"
+      ],
+      "correct": [
+        1,
+        2
+      ],
+      "explanation": "Zone-redundant configuration spreads a database's replicas across multiple availability zones within one region and is offered on the Business Critical and Premium tiers. It does not replace automated backups, which remain a separate, necessary protection, and it protects only against a zone-level failure, not a full regional outage on its own."
+    }
+  ],
+  "cheatSheet": [
+    {
+      "heading": "HADR options",
+      "points": [
+        "Zone-redundant configuration (Business Critical/Premium tiers) spreads replicas across Availability Zones in ONE region \u2014 protects against a zone failure, not a full regional outage.",
+        "Active geo-replication / auto-failover groups replicate a database to a different region; a failover group adds an app-transparent listener endpoint so connection strings don't need to change after failover.",
+        "Business Critical tier includes a built-in Always On-based availability group with extra secondary replicas, giving both high availability and free read-scale-out.",
+        "SQL Server on an Azure VM has no built-in PaaS HA \u2014 you configure and manage your own Always On Availability Groups or Failover Cluster Instance (FCI).",
+        "RTO (max acceptable downtime) and RPO (max acceptable data loss) drive which HADR option is right \u2014 don't pick a feature before defining these two numbers from requirements."
+      ]
+    },
+    {
+      "heading": "Backup & restore strategy",
+      "points": [
+        "Automated backups happen on every tier; point-in-time restore (PITR) creates a NEW database from a chosen moment, it never overwrites the original.",
+        "Long-term retention (LTR) stores weekly/monthly/yearly backups for up to 10 years, completely independent of the PITR retention window.",
+        "Geo-restore rebuilds a database in another region from geo-redundant backups if the primary region has an outage \u2014 a DR mechanism, not a fast, low-RPO failover.",
+        "PITR retention is configurable per database (from 1 up to 35 days depending on tier) \u2014 don't confuse it with LTR's much longer, backup-type-based schedule."
+      ]
+    },
+    {
+      "heading": "Purchasing models & performance tuning",
+      "points": [
+        "DTU model bundles compute + storage + I/O into one simple unit (Basic/Standard/Premium) \u2014 easy to size but less granular control.",
+        "vCore model prices compute and storage separately, lets you pick hardware generation, and is the ONLY model eligible for Azure Hybrid Benefit on SQL Server licensing.",
+        "Serverless compute tier (vCore) auto-scales and can auto-pause during inactivity, billing per second of usage \u2014 ideal for intermittent/unpredictable workloads.",
+        "Query Store captures historical query plans and runtime stats, which is what you use to catch a regressed execution plan after a deployment.",
+        "Automatic tuning can auto-apply FORCE_LAST_GOOD_PLAN to revert a regressed plan, and can auto-create/drop indexes based on observed usage.",
+        "Elastic pools share compute resources across many databases with unpredictable, non-overlapping usage spikes \u2014 cheaper than provisioning each database at peak size individually."
+      ]
+    },
+    {
+      "heading": "Security features (don't mix these up)",
+      "points": [
+        "Transparent Data Encryption (TDE) encrypts data AT REST and is transparent to the application; it's on by default for Azure SQL Database.",
+        "Always Encrypted encrypts specific sensitive COLUMNS end-to-end, and the encryption keys are never revealed to the database engine \u2014 it protects data even from a DBA with full access.",
+        "Dynamic Data Masking obscures sensitive data in QUERY RESULTS for non-privileged users, without encrypting or changing the underlying stored data.",
+        "Row-Level Security restricts which ROWS a user can see, enforced through a predicate function, independent of column-level protections.",
+        "Auditing logs activity to a storage account, Log Analytics workspace, or Event Hub, and can be enabled once at the server level to cover every database on it."
+      ]
+    },
+    {
+      "heading": "Automation & monitoring tools",
+      "points": [
+        "Elastic Jobs run the same T-SQL script across many databases or an entire elastic pool on a schedule \u2014 built specifically for fleet-wide database management.",
+        "Azure Automation runbooks handle broader, general-purpose automation beyond just T-SQL execution.",
+        "Maintenance windows let you choose a predictable time slot for planned platform maintenance instead of it happening at an arbitrary time.",
+        "Query Performance Insight, Dynamic Management Views (DMVs), and Extended Events are the go-to tools for diagnosing a specific slow query or blocking chain."
+      ]
+    },
+    {
+      "heading": "Migration essentials",
+      "points": [
+        "Data Migration Assistant (DMA) ASSESSES compatibility issues and recommends fixes before you migrate \u2014 it doesn't move any data itself.",
+        "Azure Database Migration Service (DMS) performs the actual migration, supporting both offline (downtime during cutover) and online (minimal-downtime, continuous sync) modes.",
+        "The Azure SQL Migration extension in Azure Data Studio is the simplified, guided path specifically for migrating to Azure SQL Managed Instance or SQL Database."
+      ]
+    },
+    {
+      "heading": "Exam-day reminders",
+      "points": [
+        "DP-300 assumes hands-on T-SQL and Azure portal/CLI familiarity \u2014 expect \"what would you run/configure\" questions, not just terminology.",
+        "\"Protects sensitive columns even from DBAs\" always means Always Encrypted, never TDE or Dynamic Data Masking.",
+        "\"Restores to a specific point in time as a new database\" is PITR; \"restores in another region after an outage\" is geo-restore \u2014 don't swap these.",
+        "If the scenario stresses a hard 10-year retention requirement, that's Long-Term Retention (LTR), not standard PITR backups."
+      ]
+    }
+  ]
+}

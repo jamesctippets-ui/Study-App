@@ -82,11 +82,16 @@ function loadLocal() {
   }
 }
 
+// Returns whether the write actually succeeded (it can fail silently
+// otherwise — e.g. a full quota, private-browsing restrictions in some
+// browsers) so the caller can surface that instead of losing progress
+// with no signal at all.
 function saveLocal(payload) {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+    return true;
   } catch (e) {
-    // ignore, best effort
+    return false;
   }
 }
 
@@ -119,24 +124,43 @@ function normalizeSeenLog(raw) {
 
 /* ---------------- spaced repetition (flashcards) ---------------- */
 
-// Simplified SM-2. `prev` is this card's current schedule
+// Real SM-2, quality-scored. `prev` is this card's current schedule
 // ({interval, ease, reps, due}), or undefined for a never-rated card.
-// Returns the next schedule after rating it 'correct' or 'incorrect'. A
-// miss resets the interval to 1 day but only dents the ease factor rather
-// than losing all history, so a card that's usually easy recovers its
-// longer interval faster than one that's chronically shaky.
-function nextSrsEntry(prev, outcome, now) {
+// `quality` is the confidence rating a user picks after flipping a card,
+// 1 (total blank) through 5 (instant, no hesitation) — the same 0-5
+// "quality of response" scale SM-2 was originally designed around, not a
+// bolted-on replacement for it. A quality below 3 is a miss: it resets
+// the interval and repetition count (you're relearning it) but only
+// dents the ease factor rather than losing all history, so a card that's
+// usually easy recovers its longer interval faster than one that's
+// chronically shaky. A quality of 3+ is a pass: the ease factor moves by
+// the standard SM-2 formula (a 5 nudges it up more than a bare-pass 3),
+// and the interval grows by the *current* ease — a 3 still advances the
+// schedule, just more cautiously than a 5 would.
+function nextSrsEntry(prev, quality, now) {
   const t = now || Date.now();
   const DAY = 86400000;
   const p = prev || { interval: 0, ease: 2.5, reps: 0, due: t };
-  if (outcome === 'correct') {
-    const reps = p.reps + 1;
-    const ease = Math.min(2.8, p.ease + 0.1);
-    const interval = reps === 1 ? 1 : reps === 2 ? 3 : Math.max(1, Math.round(p.interval * ease));
-    return { interval, ease, reps, due: t + interval * DAY };
+  if (quality < 3) {
+    const ease = Math.max(1.3, p.ease - 0.2);
+    return { interval: 1, ease, reps: 0, due: t };
   }
-  const ease = Math.max(1.3, p.ease - 0.2);
-  return { interval: 1, ease, reps: 0, due: t };
+  const reps = p.reps + 1;
+  const ease = Math.max(1.3, p.ease + (0.1 - (5 - quality) * (0.08 + (5 - quality) * 0.02)));
+  const interval = reps === 1 ? 1 : reps === 2 ? 6 : Math.max(1, Math.round(p.interval * ease));
+  return { interval, ease, reps, due: t + interval * DAY };
+}
+
+// A flashcard rating (1-5) is stored for SRS scheduling above, but the
+// app's lifetime "mastery %" (trackMastery, achievements, exam
+// readiness) is built entirely on a binary correct/incorrect signal
+// shared with quiz questions — rethreading that into a 1-5-aware
+// average everywhere would be a much bigger, riskier change than the
+// rating UI itself. This is the one deliberate seam: a 3+ (an actual
+// pass, not just "not totally blank") counts as correct for mastery
+// purposes, same as it does for the SRS growth branch above.
+function ratingToOutcome(quality) {
+  return quality >= 3 ? 'correct' : 'incorrect';
 }
 
 function normalizeSrs(raw) {
@@ -303,25 +327,6 @@ function orderBySrs(list, srsForTrack, now) {
   return withDue.map((x) => x.card);
 }
 
-// Triggers a browser download of `data` as a formatted JSON file. Returns
-// false instead of throwing if the browser blocks it (e.g. sandboxed iframe).
-function downloadJSON(filename, data) {
-  try {
-    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = filename;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-    return true;
-  } catch (e) {
-    return false;
-  }
-}
-
 // Validates and normalizes a parsed JSON object from a previously-exported
 // progress file. Returns null if it doesn't look like one of ours at all,
 // so the caller can show an error instead of silently wiping progress.
@@ -361,6 +366,7 @@ function emptyStats() {
     dailyGoal: { target: 20, date: null, count: 0 },
     dailyChallenge: { date: null, question: null, vocab: null },
     readinessHistory: {},
+    categoryMasteryHistory: {},
   };
 }
 
@@ -384,6 +390,7 @@ function normalizeStats(raw) {
       vocab: rawChallenge.vocab && typeof rawChallenge.vocab === 'object' ? rawChallenge.vocab : null,
     },
     readinessHistory: raw.readinessHistory && typeof raw.readinessHistory === 'object' ? raw.readinessHistory : {},
+    categoryMasteryHistory: raw.categoryMasteryHistory && typeof raw.categoryMasteryHistory === 'object' ? raw.categoryMasteryHistory : {},
   };
 }
 
@@ -561,5 +568,42 @@ function readinessProjection(history, trackKey, target) {
   const daysNeeded = Math.ceil((target - last.score) / rate);
   if (daysNeeded > 365) return { status: 'flat', score: last.score };
   return { status: 'projected', score: last.score, daysNeeded, projectedDate: addDays(todayString(), daysNeeded) };
+}
+
+// Same self-correcting daily-snapshot pattern as recordReadinessSnapshot,
+// one level deeper (per track, per category) — records every category's
+// current mastery % for a track in one call, since they're always
+// computed together (masteryByCategory) and change together. Capped to
+// 30 entries per category so years of use can't grow this unbounded.
+function recordCategoryMasterySnapshot(history, trackKey, categoryPcts) {
+  const today = todayString();
+  const trackHistory = { ...(history[trackKey] || {}) };
+  Object.keys(categoryPcts).forEach((catKey) => {
+    const catHistory = trackHistory[catKey] || [];
+    const last = catHistory[catHistory.length - 1];
+    const pct = categoryPcts[catKey];
+    trackHistory[catKey] = last && last.date === today
+      ? [...catHistory.slice(0, -1), { date: today, pct }]
+      : [...catHistory, { date: today, pct }].slice(-30);
+  });
+  return { ...history, [trackKey]: trackHistory };
+}
+
+// The delta between a category's oldest and newest recorded snapshot —
+// deliberately simple (not a fitted trend line like readinessProjection)
+// since this is just "how much has this moved lately," not a forecast.
+// Returns null with fewer than 2 distinct days of history, or no
+// meaningful (rounds to 0%) change, so callers can skip a trend that
+// wouldn't say anything.
+function categoryMasteryTrend(history, trackKey, categoryKey) {
+  const catHistory = (history[trackKey] && history[trackKey][categoryKey]) || [];
+  if (catHistory.length < 2) return null;
+  const first = catHistory[0];
+  const last = catHistory[catHistory.length - 1];
+  const days = daysBetween(first.date, last.date);
+  if (days <= 0) return null;
+  const delta = Math.round(last.pct - first.pct);
+  if (delta === 0) return null;
+  return { delta, days };
 }
 

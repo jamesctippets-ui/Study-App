@@ -1,0 +1,1458 @@
+{
+  "categories": [
+    {
+      "key": "adDs",
+      "label": "Deploy and Manage AD DS",
+      "marks": 21,
+      "resources": [
+        {
+          "label": "Microsoft Learn: Deploy and Manage Active Directory Domain Services",
+          "url": "https://learn.microsoft.com/en-us/training/paths/deploy-manage-active-directory-domain-services/"
+        }
+      ]
+    },
+    {
+      "key": "hybridWorkloads",
+      "label": "Manage Windows Server Hybrid Workloads",
+      "marks": 12,
+      "resources": [
+        {
+          "label": "Microsoft Learn: Manage Windows Servers and workloads in a hybrid environment",
+          "url": "https://learn.microsoft.com/en-us/training/paths/manage-windows-servers-workloads-hybrid-environment/"
+        },
+        {
+          "label": "Microsoft Learn: Manage hybrid workloads with Azure Arc",
+          "url": "https://learn.microsoft.com/en-us/training/modules/manage-hybrid-workloads-azure-arc/"
+        }
+      ]
+    },
+    {
+      "key": "vmContainers",
+      "label": "Manage Virtual Machines & Containers",
+      "marks": 12,
+      "resources": [
+        {
+          "label": "Microsoft Learn: Configure and manage Hyper-V virtual machines",
+          "url": "https://learn.microsoft.com/en-us/training/modules/configure-manage-hyper-v-virtual-machines"
+        },
+        {
+          "label": "Microsoft Learn: Run containers on Windows Server",
+          "url": "https://learn.microsoft.com/en-us/training/modules/run-containers-windows-server"
+        }
+      ]
+    },
+    {
+      "key": "networking",
+      "label": "Implement On-Premises & Hybrid Networking",
+      "marks": 12,
+      "resources": [
+        {
+          "label": "Microsoft Learn: Implement and operate an on-premises and hybrid networking infrastructure",
+          "url": "https://learn.microsoft.com/en-us/training/paths/implement-operate-premises-hybrid"
+        }
+      ]
+    },
+    {
+      "key": "storage",
+      "label": "Manage Storage & File Services",
+      "marks": 16,
+      "resources": [
+        {
+          "label": "Microsoft Learn: Manage Storage and File Services",
+          "url": "https://learn.microsoft.com/en-us/training/paths/manage-storage-file-services/"
+        },
+        {
+          "label": "Microsoft Learn: Implement Storage Spaces and Storage Spaces Direct",
+          "url": "https://learn.microsoft.com/en-us/training/modules/implement-storage-spaces-storage-spaces-direct"
+        }
+      ]
+    },
+    {
+      "key": "security",
+      "label": "Secure Windows Server Hybrid Infrastructure",
+      "marks": 11,
+      "resources": [
+        {
+          "label": "Microsoft Learn: Secure Windows Server on-premises and hybrid infrastructures",
+          "url": "https://learn.microsoft.com/en-us/training/paths/secure-windows-server-premises-hybrid-infrastructures/"
+        }
+      ]
+    },
+    {
+      "key": "monitoring",
+      "label": "Monitor & Troubleshoot Windows Server",
+      "marks": 16,
+      "resources": [
+        {
+          "label": "Microsoft Learn: Monitor and troubleshoot Windows Server environments",
+          "url": "https://learn.microsoft.com/en-us/training/paths/monitor-troubleshoot-windows-server-environments/"
+        },
+        {
+          "label": "Microsoft Learn: Monitor Windows Server performance",
+          "url": "https://learn.microsoft.com/en-us/training/modules/monitor-windows-server-performance/"
+        }
+      ]
+    }
+  ],
+  "flashcards": [
+    {
+      "id": "f1",
+      "cat": "adDs",
+      "front": "The five FSMO roles",
+      "back": "Forest-wide (one per forest): Schema Master, Domain Naming Master. Domain-wide (one per domain): RID Master, PDC Emulator, Infrastructure Master.",
+      "detail": "PDC Emulator handles time sync and password-change urgency; Infrastructure Master fixes cross-domain group-membership references and should NOT sit on a Global Catalog server unless every DC in the domain is also a GC."
+    },
+    {
+      "id": "f2",
+      "cat": "adDs",
+      "front": "AD Sites and Services replication",
+      "back": "Intra-site replication is frequent (change-notification triggered) and uncompressed, using a ring topology built automatically by the Knowledge Consistency Checker (KCC). Inter-site replication runs on a schedule over site links, compressed to save WAN bandwidth.",
+      "detail": "A site link's cost and replication interval control how the KCC builds the inter-site spanning tree \u2014 lower cost is preferred, and bridgehead servers are the DCs that actually replicate across the link."
+    },
+    {
+      "id": "f3",
+      "cat": "adDs",
+      "front": "Trust types and transitivity",
+      "back": "A forest trust is transitive between two entire forests. An external trust is non-transitive, linking two specific domains (often across forests). A shortcut trust shortens the referral path between two domains deep in the same forest. A realm trust connects a domain to a non-Windows Kerberos realm.",
+      "detail": "Transitive doesn't mean unlimited \u2014 a forest trust does not automatically extend to a third forest that one of the two trusted forests trusts."
+    },
+    {
+      "id": "f4",
+      "cat": "adDs",
+      "front": "Group Policy processing order and precedence",
+      "back": "GPOs apply in the order Local, Site, Domain, OU (LSDOU), with the last one applied \u2014 the OU closest to the object \u2014 normally winning a conflict. 'Enforced' on a GPO overrides that and always wins, even against Block Inheritance on a child OU.",
+      "detail": "Block Inheritance stops higher-level GPOs from applying to an OU, but it cannot stop a GPO explicitly marked Enforced \u2014 enforcement beats blocking."
+    },
+    {
+      "id": "f5",
+      "cat": "adDs",
+      "front": "Microsoft Entra Connect authentication methods",
+      "back": "Password Hash Synchronization (PHS) syncs a hash of the password hash to Microsoft Entra ID so sign-in works even if on-premises AD is down. Pass-through Authentication (PTA) validates the password against on-premises AD in real time via an agent, keeping the actual validation on-premises. Federation (AD FS) delegates authentication entirely to an on-premises federation service.",
+      "detail": "PHS never transmits a recoverable, plaintext password to the cloud \u2014 only a hash of the hash \u2014 which is a common exam misconception to watch for."
+    },
+    {
+      "id": "f6",
+      "cat": "adDs",
+      "front": "Read-Only Domain Controller (RODC)",
+      "back": "An RODC holds a read-only copy of the AD database, ideal for branch offices with weaker physical security. It caches credentials only for accounts allowed by its Password Replication Policy (PRP), and it holds a filtered attribute set that excludes sensitive data.",
+      "detail": "If an RODC is compromised, only the passwords it was permitted to cache are at risk \u2014 not the whole domain's credentials \u2014 which is the entire point of the PRP."
+    },
+    {
+      "id": "f7",
+      "cat": "adDs",
+      "front": "AD Recycle Bin vs. tombstone reanimation",
+      "back": "The AD Recycle Bin (available once forest functional level is Windows Server 2008 R2 or higher and the feature is enabled) restores a deleted object with essentially all of its original attributes, including group memberships. Tombstone reanimation, the older method, recovers a bare object that has lost most of its link-valued attributes.",
+      "detail": "Enabling the AD Recycle Bin is a one-way, irreversible action for the forest \u2014 a detail the exam likes to test."
+    },
+    {
+      "id": "f8",
+      "cat": "adDs",
+      "front": "Group Managed Service Accounts (gMSA)",
+      "back": "A gMSA provides one identity that multiple servers (like a load-balanced web farm) can use for a service, with automatic password rotation managed by AD \u2014 no manual password management or synchronization needed across servers.",
+      "detail": "A standalone (single-server) MSA cannot be shared across multiple hosts \u2014 only a gMSA can, because only a gMSA replicates its managed password data through AD to every authorized host."
+    },
+    {
+      "id": "f9",
+      "cat": "adDs",
+      "front": "Global Catalog (GC)",
+      "back": "A GC server holds a full, writable copy of its own domain plus a partial, read-only copy of every other domain in the forest, enabling forest-wide searches and universal group membership resolution during logon.",
+      "detail": "Without a reachable GC, a user in a multi-domain forest logging on with a UPN, or one belonging to a universal group, can be blocked from completing logon \u2014 universal group membership can only be resolved via the GC."
+    },
+    {
+      "id": "f10",
+      "cat": "hybridWorkloads",
+      "front": "Azure Arc-enabled servers",
+      "back": "Azure Arc projects an on-premises (or other-cloud) server into Azure Resource Manager as an Arc-enabled resource via the Connected Machine agent, without migrating the actual workload. Once projected, you can apply Azure Policy, Azure Monitor, Microsoft Defender for Cloud, and Update Manager to it just like a native Azure VM.",
+      "detail": "Arc gives you Azure's management plane over a server that never leaves your datacenter \u2014 the compute itself stays exactly where it is."
+    },
+    {
+      "id": "f11",
+      "cat": "hybridWorkloads",
+      "front": "Windows Admin Center (WAC)",
+      "back": "A free, browser-based management tool for Windows Server (and Windows client), installed as a gateway on a management PC/server or as a service, giving a modern portal-style UI for managing local or remote servers including Server Core.",
+      "detail": "WAC extends with feature extensions (like Azure Arc integration) but runs entirely from a browser \u2014 no separate console application to install on every admin's workstation."
+    },
+    {
+      "id": "f12",
+      "cat": "hybridWorkloads",
+      "front": "Cluster-Aware Updating (CAU)",
+      "back": "Automates installing Windows updates across every node in a failover cluster one at a time, draining (moving) that node's workloads to other nodes before patching and rebooting it, then bringing it back before moving to the next node.",
+      "detail": "CAU can run against a remote CAU-enabled cluster on a schedule, with no dedicated CAU role required on the cluster itself, or in a self-updating mode where the cluster updates itself."
+    },
+    {
+      "id": "f13",
+      "cat": "hybridWorkloads",
+      "front": "Hyper-V Replica",
+      "back": "Asynchronously replicates a running VM's changes from a primary Hyper-V host to a replica host (on-premises or another site), on a configurable interval as low as 30 seconds, keeping extra recovery points and supporting a manual, planned, or unplanned failover.",
+      "detail": "Hyper-V Replica does not require Failover Clustering or shared storage at all \u2014 it works between two standalone Hyper-V hosts, which is a common exam distinction from clustered, S2D-based high availability."
+    },
+    {
+      "id": "f14",
+      "cat": "hybridWorkloads",
+      "front": "Storage Migration Service",
+      "back": "Migrates files, shares, and their security and configuration from an old file server (or cluster) to a new one, and can optionally transfer the old server's identity (name and IP address) to the new server afterward, so clients keep using the same UNC path with no reconfiguration.",
+      "detail": "It uses three roles \u2014 an orchestrator, a source server, and a destination server \u2014 and can inventory and migrate from Windows Server as far back as Windows Server 2003, and even from some NAS devices, not only recent Windows Server versions."
+    },
+    {
+      "id": "f44",
+      "cat": "hybridWorkloads",
+      "front": "Failover cluster quorum models and witness types",
+      "back": "A cluster stays online only while a majority of its votes are present. Node Majority gives one vote per node (best for an odd node count). Node and File Share Majority and Node and Disk Majority add one extra vote from a witness (a file share or a shared disk) so an even node count can still form a majority. Cloud Witness uses Azure Blob Storage as that witness instead, avoiding a second physical site.",
+      "detail": "Cloud Witness is the common exam-favorite pick for a two-node hybrid cluster with no convenient third site to host a traditional file-share witness \u2014 it needs only a small Azure Storage account, not a full VM or site."
+    },
+    {
+      "id": "f45",
+      "cat": "hybridWorkloads",
+      "front": "Cluster validation (Test-Cluster / Validate a Configuration)",
+      "back": "A wizard-driven or PowerShell-driven suite of tests (Test-Cluster) checking that nodes, storage, and networking meet Microsoft's requirements before a cluster is created, and useful again after changes to confirm the cluster still meets them.",
+      "detail": "Running validation is a prerequisite for a Microsoft-supported cluster \u2014 a cluster built while skipping or failing validation is explicitly called out as unsupported if a validation-related issue later causes an outage."
+    },
+    {
+      "id": "f15",
+      "cat": "vmContainers",
+      "front": "Hyper-V virtual switch types",
+      "back": "External: binds to a physical NIC, giving VMs access to the physical network (and the host, if allowed). Internal: lets VMs and the host communicate with each other, but not the physical network. Private: lets VMs on the same host communicate with each other only, isolated even from the host.",
+      "detail": "A private switch is the right call for an isolated test/lab network where VMs must talk to each other but must never reach the production network or even the host OS."
+    },
+    {
+      "id": "f16",
+      "cat": "vmContainers",
+      "front": "Generation 1 vs. Generation 2 virtual machines",
+      "back": "Generation 1 VMs emulate legacy BIOS hardware and boot from IDE/legacy devices, for maximum OS compatibility. Generation 2 VMs use UEFI firmware, support Secure Boot, and boot directly from SCSI, offering better performance and security features but requiring a 64-bit, UEFI-aware guest OS.",
+      "detail": "Once created, a VM's generation cannot be changed \u2014 choosing wrong means recreating the VM rather than converting it in place."
+    },
+    {
+      "id": "f17",
+      "cat": "vmContainers",
+      "front": "Standard vs. production checkpoints",
+      "back": "A standard checkpoint captures the VM's memory and device state, like a saved game \u2014 fast, but not application-aware. A production checkpoint uses Volume Shadow Copy Service (VSS) inside the guest to create an application-consistent point-in-time copy, safe to use against things like SQL Server or Active Directory.",
+      "detail": "Only production checkpoints are safe as a routine 'backup-like' snapshot of a database or domain controller VM \u2014 a standard checkpoint's crash-consistent state can cause serious problems if restored into a running DC."
+    },
+    {
+      "id": "f18",
+      "cat": "vmContainers",
+      "front": "Live Migration vs. Storage Migration vs. Hyper-V Replica",
+      "back": "Live Migration moves a running VM between Hyper-V hosts with no downtime, needing shared/replicated storage (or SMB 3.0) and compatible processors (or Processor Compatibility Mode). Storage Migration moves a VM's virtual disks to different storage with no downtime, without changing hosts. Hyper-V Replica asynchronously replicates a VM to a secondary host/site for disaster recovery, not for routine load balancing.",
+      "detail": "Hyper-V Replica is a DR tool, not a live-migration substitute \u2014 its replica VM sits offline until you actually fail over to it."
+    },
+    {
+      "id": "f19",
+      "cat": "vmContainers",
+      "front": "Windows container isolation: process vs. Hyper-V",
+      "back": "Process-isolated containers share the host's kernel directly, giving the lowest overhead but weaker isolation between containers. Hyper-V isolated containers each run inside their own lightweight utility VM with its own kernel instance, trading some overhead for stronger, VM-grade isolation.",
+      "detail": "Hyper-V isolation is the choice for running containers from mutually distrusting tenants on the same host, or when the container's base image doesn't exactly match the host's kernel version."
+    },
+    {
+      "id": "f20",
+      "cat": "networking",
+      "front": "DNS zone types",
+      "back": "A primary zone holds the writable, authoritative copy of a zone. A secondary zone holds a read-only copy transferred (via zone transfer) from a primary. A stub zone holds only NS, SOA, and glue A/AAAA records \u2014 enough to find the authoritative servers, not the full record set. An AD-integrated zone stores its data in Active Directory for automatic multi-master replication and secure dynamic updates.",
+      "detail": "A stub zone is much lighter than a secondary zone precisely because it only tracks who is authoritative for a namespace, not the records themselves \u2014 it's a referral shortcut, not a resolvable copy."
+    },
+    {
+      "id": "f21",
+      "cat": "networking",
+      "front": "DHCP failover: load balance vs. hot standby",
+      "back": "Load balance mode has both DHCP servers actively answering client requests, splitting the load by a configured percentage. Hot standby mode has one server active and one passive backup that only starts answering if the active server becomes unavailable.",
+      "detail": "Hot standby is the natural fit for a branch office scenario, where a central DHCP server normally handles everything and a local server only takes over if the WAN link to the central site drops."
+    },
+    {
+      "id": "f22",
+      "cat": "networking",
+      "front": "IP Address Management (IPAM)",
+      "back": "IPAM is a Windows Server role that discovers, monitors, and centrally manages DHCP and DNS servers and their IP address space from one console, including tracking utilization and flagging overlapping or duplicate scopes across the environment.",
+      "detail": "IPAM manages existing DHCP/DNS server roles \u2014 it isn't itself a DHCP or DNS server, and installing it doesn't remove the need to also deploy those roles somewhere."
+    },
+    {
+      "id": "f23",
+      "cat": "networking",
+      "front": "Site-to-Site VPN vs. ExpressRoute",
+      "back": "A site-to-site VPN connects on-premises networks to Azure over the public internet using encrypted tunnels \u2014 cheaper and quicker to stand up, but subject to internet variability. ExpressRoute uses a private, dedicated circuit provisioned through a connectivity provider, bypassing the public internet for more predictable latency, higher available bandwidth, and higher cost.",
+      "detail": "ExpressRoute traffic doesn't traverse the public internet at all, which is also why it's commonly paired with a VPN as an encrypted backup path in case the ExpressRoute circuit itself fails."
+    },
+    {
+      "id": "f24",
+      "cat": "networking",
+      "front": "Network Policy Server (NPS)",
+      "back": "NPS is Microsoft's RADIUS server and proxy implementation, centralizing authentication, authorization, and accounting for things like VPN connections, 802.1X wired/wireless access, and other RADIUS-aware network devices.",
+      "detail": "NPS itself doesn't terminate the VPN connection \u2014 RRAS (or a third-party VPN device) does that and forwards the authentication request to NPS as the RADIUS server."
+    },
+    {
+      "id": "f25",
+      "cat": "storage",
+      "front": "DFS Namespaces vs. DFS Replication",
+      "back": "DFS Namespaces (DFS-N) presents a single logical folder path (like \\\\contoso\\shares) that transparently points to shared folders on one or more servers. DFS Replication (DFS-R) keeps the actual folder contents synchronized between multiple servers so any of them can serve current data.",
+      "detail": "They're commonly used together \u2014 DFS-R keeps the copies in sync, while DFS-N gives users one path that resolves to whichever in-sync copy is closest or available \u2014 but each can be deployed independently of the other. Storage Replica solves a related but block-level replication problem, not a file-share one."
+    },
+    {
+      "id": "f26",
+      "cat": "storage",
+      "front": "Storage Spaces resiliency types",
+      "back": "Simple striping spreads data with no redundancy (fastest, no fault tolerance). A two-way (or three-way) mirror duplicates data across disks, tolerating one (or two) disk failures with strong write performance. Parity spreads data plus parity information, more storage-efficient than mirroring for the same fault tolerance, but with slower random writes.",
+      "detail": "Parity's storage efficiency comes at a real performance cost on writes \u2014 it's a better fit for larger, less write-intensive data like backups or archives than for a busy transactional workload."
+    },
+    {
+      "id": "f27",
+      "cat": "storage",
+      "front": "Storage Spaces Direct (S2D)",
+      "back": "S2D pools local, direct-attached storage (typically SATA/NVMe/SAS disks) across the nodes of a failover cluster into a single software-defined storage pool, enabling hyperconverged infrastructure without a separate SAN.",
+      "detail": "S2D requires a functioning failover cluster underneath it \u2014 it's a storage feature built on top of clustering, not a replacement for it, so failover cluster quorum models and witness types still apply to it."
+    },
+    {
+      "id": "f28",
+      "cat": "storage",
+      "front": "Data Deduplication",
+      "back": "A post-process, file-system-level feature (on volumes, not the OS volume by default) that finds and eliminates duplicate chunks of data on disk, replacing repeats with references to a single stored copy. It fits general file shares, VDI libraries, and backup targets well.",
+      "detail": "Deduplication is a poor fit for heavily and randomly modified files like live database (.mdf) files or files already compressed/encrypted, where duplicate chunks are rare or the savings aren't worth the processing overhead."
+    },
+    {
+      "id": "f29",
+      "cat": "storage",
+      "front": "Azure File Sync",
+      "back": "Azure File Sync keeps an on-premises Windows Server file share in sync with an Azure file share, and can enable cloud tiering \u2014 infrequently used files are replaced locally with a pointer while their full content stays safely in Azure, streamed back on access.",
+      "detail": "Cloud tiering means the local server's disk shows the full namespace even though cold files' actual bytes have been evicted locally \u2014 from a user's perspective the file is still just 'there,' just retrieved on demand."
+    },
+    {
+      "id": "f30",
+      "cat": "storage",
+      "front": "ReFS vs. NTFS",
+      "back": "ReFS (Resilient File System) prioritizes resiliency and scalability for large data volumes, using checksums and automatic corruption repair (with mirrored/parity Storage Spaces) and integrating tightly with features like block cloning. NTFS remains the general-purpose default and is required for the Windows Server boot/system volume.",
+      "detail": "ReFS is not supported as a boot volume for Windows Server \u2014 it's meant for data volumes, particularly ones backed by Storage Spaces where its self-healing features can actually repair detected corruption."
+    },
+    {
+      "id": "f31",
+      "cat": "storage",
+      "front": "Storage Replica",
+      "back": "Storage Replica provides block-level, volume-to-volume replication between servers or clusters, independent of the file system on top. Synchronous replication guarantees zero data loss but requires low latency between sites; asynchronous replication tolerates higher latency at the cost of a small, non-zero possible data loss window.",
+      "detail": "Because it replicates at the block level below the file system, Storage Replica works for any workload on the volume \u2014 it doesn't care whether the data is SQL files, general shares, or anything else."
+    },
+    {
+      "id": "f32",
+      "cat": "security",
+      "front": "Windows Defender Application Control (WDAC) vs. AppLocker",
+      "back": "WDAC enforces a code-integrity policy that determines what is allowed to run before it starts, evaluated by the kernel itself and applied system-wide. AppLocker is a rule-based allowlisting feature that runs at the user-mode level and can apply different rules per user or group, but is easier to bypass than WDAC.",
+      "detail": "WDAC policies can run in enforced or audit mode, and unlike AppLocker, a WDAC policy applies before a user even logs on, since it is enforced by the kernel rather than a user-mode service."
+    },
+    {
+      "id": "f33",
+      "cat": "security",
+      "front": "Credential Guard",
+      "back": "Uses virtualization-based security (VBS) to isolate the LSASS process and NTLM/Kerberos secrets inside a protected, hypervisor-enforced container, so that even an administrator on the host, or malware with kernel-level access, cannot extract them with tools like Mimikatz.",
+      "detail": "Credential Guard requires hardware virtualization support (Hyper-V, SLAT, a compatible processor) and blocks storing reversibly-encrypted passwords and unconstrained Kerberos delegation, which is a common reason it breaks specific legacy authentication scenarios."
+    },
+    {
+      "id": "f34",
+      "cat": "security",
+      "front": "Windows LAPS (Local Administrator Password Solution)",
+      "back": "Automatically rotates and stores the password for a local administrator account on each domain-joined (or Microsoft Entra-joined) computer, either in Active Directory or Microsoft Entra ID, with access controlled by delegated permissions.",
+      "detail": "Windows LAPS is built into modern Windows Server and Windows client and can back up a managed account's passphrase history, replacing the older, separately-installed LAPS tool."
+    },
+    {
+      "id": "f35",
+      "cat": "security",
+      "front": "Protected Users security group",
+      "back": "Adding an account to the Protected Users group blocks it from authenticating with NTLM, DES, or RC4 encryption, prevents credential caching, and disables delegation of its credentials, forcing Kerberos with stronger encryption only.",
+      "detail": "It is a strong control for high-privilege accounts, but it is unforgiving: an application or device that only supports NTLM will simply fail to authenticate that account, with no fallback available."
+    },
+    {
+      "id": "f36",
+      "cat": "security",
+      "front": "Microsoft Defender for Identity",
+      "back": "A cloud service that monitors on-premises AD DS, via sensors installed on domain controllers, for signs of compromise such as reconnaissance, pass-the-hash, DCSync attempts, or golden ticket usage, surfacing those alerts alongside other Microsoft Defender XDR signals.",
+      "detail": "Unlike Entra ID Identity Protection, which focuses on cloud sign-ins, Defender for Identity is specifically about detecting attacks against the on-premises identity plane itself."
+    },
+    {
+      "id": "f37",
+      "cat": "monitoring",
+      "front": "Performance Monitor and Data Collector Sets",
+      "back": "Performance Monitor displays real-time or logged performance counters (like CPU, memory, disk queue length). A Data Collector Set groups counters, trace data, and configuration into a single, reusable, schedulable collection job, so the same set of metrics can be captured consistently over time rather than configured freshly each time.",
+      "detail": "A Data Collector Set can be configured to trigger an alert, or run a task, when a counter crosses a defined threshold, which is what turns raw performance data into a proactive monitoring signal instead of a report someone has to read manually."
+    },
+    {
+      "id": "f38",
+      "cat": "monitoring",
+      "front": "Azure Monitor Agent (AMA) and Data Collection Rules (DCR)",
+      "back": "AMA is the unified agent installed on Azure VMs, Arc-enabled servers, or other machines to collect logs and performance data. A Data Collection Rule defines exactly what that agent collects, any transformation applied, and which Log Analytics workspace (or other destination) it is sent to.",
+      "detail": "AMA replaces the older Log Analytics (MMA/OMS) agent, and one DCR can be associated with many machines, which is what lets a single collection configuration apply consistently across a whole hybrid fleet."
+    },
+    {
+      "id": "f39",
+      "cat": "monitoring",
+      "front": "Log Analytics workspace and Kusto Query Language (KQL)",
+      "back": "A Log Analytics workspace is the container where Azure Monitor stores collected log data, queried using KQL, a read-only query language built around piping data through a chain of operators (like where, summarize, and project) to filter and shape results.",
+      "detail": "Workspace-based queries also power log alert rules, so a KQL query that flags a problem interactively can usually be turned directly into an automated alert with very little extra work."
+    },
+    {
+      "id": "f40",
+      "cat": "monitoring",
+      "front": "Azure Monitor alert rules and action groups",
+      "back": "A metric alert evaluates a numeric signal (like CPU percentage) against a threshold on a schedule. A log alert runs a KQL query on a schedule and fires based on its results. An action group defines what happens when either fires \u2014 for example, an email, an SMS, a webhook, or an Azure Automation runbook.",
+      "detail": "Separating the alert rule (the condition) from the action group (the response) means the same action group, say, paging the on-call team, can be reused across many different, unrelated alert rules."
+    },
+    {
+      "id": "f41",
+      "cat": "monitoring",
+      "front": "Windows Admin Center monitoring and alerts",
+      "back": "Windows Admin Center shows real-time and historical performance data for a managed server directly in the browser, and its Azure Monitor extension can forward that data to Log Analytics and configure alert rules from the same interface, without switching to the Azure portal.",
+      "detail": "This lets an admin manage a purely on-premises server's health with the same tool used for day-to-day administration, while still optionally layering on Azure-based alerting for it."
+    },
+    {
+      "id": "f42",
+      "cat": "monitoring",
+      "front": "Azure Update Manager",
+      "back": "Centrally assesses update compliance and schedules update installation across Azure VMs and Azure Arc-enabled on-premises (or other-cloud) servers from one place in the Azure portal, replacing the need to manage separate on-premises patching tools for those machines.",
+      "detail": "A server must be Arc-enabled, or be a native Azure VM, before Update Manager can see or patch it at all \u2014 a plain on-premises server with no Arc agent and no Azure connection is invisible to it."
+    },
+    {
+      "id": "f43",
+      "cat": "monitoring",
+      "front": "Reliability Monitor and Event Viewer for troubleshooting",
+      "back": "Reliability Monitor plots a rolling stability index over time and correlates it with specific events (installs, crashes, updates), making it easy to spot when a problem started. Event Viewer provides the full, detailed event logs (System, Application, Security, and role-specific logs) needed to diagnose exactly what happened at that point.",
+      "detail": "Reliability Monitor is a good first stop for figuring out when something started going wrong, after which Event Viewer's more detailed, filterable logs are what actually confirm the root cause."
+    },
+    {
+      "id": "f46",
+      "cat": "adDs",
+      "front": "Fine-Grained Password Policies (PSOs)",
+      "back": "Password Settings Objects let different password and lockout rules apply to specific users or groups within one domain, instead of the single domain-wide default policy applying to everyone equally.",
+      "detail": "A requirement for service accounts to follow a stricter, separate password policy than regular users \u2014 without splitting them into another domain \u2014 is exactly the scenario PSOs solve, often paired with Group Managed Service Accounts (gMSA) for the accounts themselves."
+    },
+    {
+      "id": "f47",
+      "cat": "hybridWorkloads",
+      "front": "Server Core installation option",
+      "back": "A minimal Windows Server install with no desktop shell or most GUI tools, managed remotely via PowerShell, Windows Admin Center, or Server Manager \u2014 reducing the attack surface, patching footprint, and resource use compared to Desktop Experience.",
+      "detail": "Server Core is commonly managed day-to-day through Windows Admin Center (WAC) precisely because there's no local desktop shell to open management consoles from directly."
+    },
+    {
+      "id": "f48",
+      "cat": "adDs",
+      "front": "Domain and forest functional levels",
+      "back": "A setting that gates which AD DS features are available, based on the oldest domain controller OS version the domain (or forest) must still support \u2014 raising the level unlocks newer features but permanently rules out adding an older-OS domain controller afterward.",
+      "detail": "This is why a domain controller upgrade project often plans to retire the oldest DCs first \u2014 the functional level can't go up while an old one is still present, and it can't come back down once raised."
+    },
+    {
+      "id": "f49",
+      "cat": "storage",
+      "front": "iSCSI Target Server",
+      "back": "A Windows Server role that presents block-level storage over the network as an iSCSI target, letting a client (physical or virtual) connect to it as if it were a local disk \u2014 a software-defined alternative to a dedicated SAN.",
+      "detail": "This is a different sharing model than DFS Namespaces vs. DFS Replication, which share file-level folders \u2014 iSCSI instead hands over a raw block device the client formats and manages itself."
+    },
+    {
+      "id": "f50",
+      "cat": "adDs",
+      "front": "Group Policy Preferences vs. Group Policy settings",
+      "back": "Group Policy settings are enforced and grayed out for the end user, reapplied continuously. Group Policy Preferences configure an initial value (like a mapped drive or a desktop shortcut) that the user can subsequently change, and aren't strictly re-enforced the same way.",
+      "detail": "This distinction \u2014 enforced vs. merely pre-configured \u2014 is a common exam trap, since both live in the same Group Policy Management Console and both flow through Group Policy processing order and precedence."
+    }
+  ],
+  "questions": [
+    {
+      "id": "q1",
+      "cat": "adDs",
+      "type": "mc",
+      "question": "The domain controller holding the PDC Emulator role for contoso.local suffers unrecoverable hardware failure with no viable backup. No other role-transfer window is available before this affects users. What should the administrator do to restore that role's function?",
+      "options": [
+        "Wait for the role to automatically fail over to another DC",
+        "Rebuild the failed DC with the same name and it will reclaim the role automatically",
+        "Seize the PDC Emulator role onto a surviving, healthy domain controller",
+        "Promote a new DC and manually copy the SYSVOL folder from a backup"
+      ],
+      "correct": 2,
+      "explanation": "FSMO roles never fail over automatically \u2014 when the role holder is permanently gone, an administrator must seize the role onto a surviving DC (typically with PowerShell's Move-ADDirectoryServerOperationMasterRole -Force, or ntdsutil). Simply rebuilding a DC with the same name doesn't restore a role that was never transferred off cleanly."
+    },
+    {
+      "id": "q2",
+      "cat": "adDs",
+      "type": "mc",
+      "question": "An organization has two Active Directory sites connected by a slow WAN link. Administrators notice changes made at one site take up to 15 minutes to appear at the other, while changes within the same site appear almost immediately. What explains this difference?",
+      "options": [
+        "Inter-site replication runs on a configurable schedule and is compressed to conserve WAN bandwidth, while intra-site replication is near-immediate and uncompressed",
+        "The two sites are in different forests, so replication uses SMTP instead of RPC",
+        "Global Catalog servers replicate slower than non-GC domain controllers by design",
+        "FSMO role holders always replicate last, regardless of site topology"
+      ],
+      "correct": 0,
+      "explanation": "This is exactly how intra-site vs. inter-site replication is designed to behave: intra-site uses change notification for near-real-time convergence, while inter-site replication is scheduled and compressed specifically to be considerate of limited WAN links. It has nothing to do with GC status, forest boundaries, or FSMO roles."
+    },
+    {
+      "id": "q3",
+      "cat": "adDs",
+      "type": "mc",
+      "question": "Two companies with separate Active Directory forests merge and need users in either forest to authenticate to resources in the other, with the relationship extending automatically to every domain in both forests. Which trust should be configured?",
+      "options": [
+        "A one-way external trust between the two root domains",
+        "A shortcut trust between the two forest roots",
+        "A realm trust to a non-Windows Kerberos environment",
+        "A two-way forest trust between the two forest root domains"
+      ],
+      "correct": 3,
+      "explanation": "A forest trust is transitive across every domain within both forests, which is exactly what's needed here, and making it two-way lets authentication flow in either direction. An external trust is explicitly non-transitive and would need to be repeated between every domain pair, and a shortcut trust only optimizes referral paths within a single existing forest."
+    },
+    {
+      "id": "q4",
+      "cat": "adDs",
+      "type": "mc",
+      "question": "A GPO linked at the domain level sets a screen lock timeout of 15 minutes. A GPO linked to a specific OU sets it to 5 minutes for higher-security accounts, and neither GPO is marked Enforced. Users in that OU report a 5-minute lockout. Why?",
+      "options": [
+        "Domain-linked GPOs are always ignored when any OU-level GPO exists",
+        "GPOs are processed in Local, Site, Domain, OU order, so the OU-linked GPO applies last and wins the conflict",
+        "The OU GPO must have Block Inheritance enabled to take precedence",
+        "Group Policy conflicts are resolved alphabetically by GPO name"
+      ],
+      "correct": 1,
+      "explanation": "With neither GPO enforced, normal processing order (Local, Site, Domain, OU) applies, and the setting from whichever GPO is processed last \u2014 the one closest to the object, here the OU-linked GPO \u2014 wins. Block Inheritance affects whether higher-level GPOs apply at all, not which of two applying GPOs wins a setting conflict."
+    },
+    {
+      "id": "q5",
+      "cat": "adDs",
+      "type": "mc",
+      "question": "A company wants Microsoft Entra ID sign-in to keep working for users even during a brief on-premises Active Directory outage, without standing up and maintaining AD FS servers. Which Microsoft Entra Connect authentication method should they choose?",
+      "options": [
+        "Password Hash Synchronization",
+        "Federation with AD FS",
+        "Pass-through Authentication",
+        "Seamless SSO used on its own with no other method"
+      ],
+      "correct": 0,
+      "explanation": "Password Hash Synchronization stores a hash of the password hash in Microsoft Entra ID, so authentication can complete in the cloud even if on-premises AD is temporarily unreachable. Pass-through Authentication and Federation both validate the password against on-premises infrastructure at sign-in time, which fails if that infrastructure is down."
+    },
+    {
+      "id": "q6",
+      "cat": "adDs",
+      "type": "mc",
+      "question": "A branch office with minimal physical security needs a local domain controller for fast logon, but the security team is worried about credential exposure if the hardware is stolen. Which deployment addresses this concern while still providing local authentication?",
+      "options": [
+        "A Read-Only Domain Controller with a restrictive Password Replication Policy",
+        "A writable DC with BitLocker enabled and no other changes",
+        "A Global Catalog server with the Infrastructure Master role",
+        "A domain controller placed in its own dedicated forest"
+      ],
+      "correct": 0,
+      "explanation": "An RODC caches credentials only for accounts explicitly permitted by its Password Replication Policy, and holds a filtered attribute set, so theft of the hardware exposes far fewer credentials than a writable DC would. BitLocker helps with data-at-rest but doesn't limit which credentials the DC caches in the first place."
+    },
+    {
+      "id": "q7",
+      "cat": "adDs",
+      "type": "mc",
+      "question": "A company runs an application pool identity across four load-balanced IIS servers and wants a single service identity used for Kerberos authentication, with AD automatically rotating its password across all four servers with zero manual synchronization. What should they configure?",
+      "options": [
+        "A single standalone Managed Service Account shared across all four servers",
+        "A group Managed Service Account (gMSA) authorized for use on all four servers",
+        "A shared domain user account with a manually scripted password rotation task",
+        "Four separate standalone MSAs, one per server, joined into a single security group"
+      ],
+      "correct": 1,
+      "explanation": "A gMSA is specifically designed to be used across multiple hosts, with AD managing and replicating its password automatically to every server authorized to use it. A standalone MSA is explicitly tied to a single computer and cannot be shared this way \u2014 attempting it doesn't work regardless of grouping."
+    },
+    {
+      "id": "q8",
+      "cat": "hybridWorkloads",
+      "type": "mc",
+      "question": "A company wants to apply Azure Policy and centralized Azure Monitor alerting to a set of on-premises Windows Servers, without migrating any workloads into Azure. Which approach achieves this?",
+      "options": [
+        "Enable Azure Arc-enabled servers with the Connected Machine agent on each server",
+        "Move each server into an Azure availability set",
+        "Install Windows Admin Center and connect it to the Azure portal",
+        "Configure ExpressRoute between the on-premises network and Azure"
+      ],
+      "correct": 0,
+      "explanation": "Azure Arc-enabled servers projects an on-premises server into Azure Resource Manager via the Connected Machine agent, making Azure Policy, Monitor, and other Azure management services available to it without moving the workload at all. ExpressRoute only provides network connectivity, and Windows Admin Center is a separate on-premises management tool, not an Azure resource-projection mechanism."
+    },
+    {
+      "id": "q9",
+      "cat": "hybridWorkloads",
+      "type": "mc",
+      "question": "An organization manages a mix of Server Core and Desktop Experience servers across two sites and wants a single, modern, browser-based tool that can manage both without RDP, including servers with no local GUI at all. What should they deploy?",
+      "options": [
+        "Remote Desktop Services with a full desktop session to each server",
+        "Windows Admin Center",
+        "Server Manager installed locally on every Server Core machine",
+        "A dedicated jump box running the full Desktop Experience for every managed server"
+      ],
+      "correct": 1,
+      "explanation": "Windows Admin Center is exactly this: a browser-based management surface that works equally well against Server Core (which lacks a local GUI shell) and Desktop Experience servers, all from one gateway. Server Manager's full GUI can't run locally on Server Core at all, and RDP-based approaches add overhead this scenario doesn't need."
+    },
+    {
+      "id": "q10",
+      "cat": "hybridWorkloads",
+      "type": "mc",
+      "question": "An administrator wants to patch every node in a six-node Hyper-V failover cluster with the latest cumulative update, one node at a time, automatically draining each node's VMs to other nodes before it reboots. Which feature accomplishes this without manual live migration of each workload?",
+      "options": [
+        "Cluster-Aware Updating (CAU)",
+        "Storage Replica",
+        "Network ATC",
+        "Scale-Out File Server"
+      ],
+      "correct": 0,
+      "explanation": "CAU is built exactly for this: it orchestrates draining, patching, and rebooting each cluster node in turn with no manual live migration required. The other three options address storage replication, network configuration, and file-serving roles respectively, none of which handle patch orchestration."
+    },
+    {
+      "id": "q11",
+      "cat": "hybridWorkloads",
+      "type": "mc",
+      "question": "A company runs two standalone Hyper-V hosts, one at its primary site and one at a secondary site, with no Failover Clustering configured between them and no shared storage. They want a specific VM's changes replicated to the secondary host roughly every 30 seconds, with the ability to fail over manually if the primary host fails. Which feature fits without requiring a cluster?",
+      "options": [
+        "Hyper-V Replica",
+        "Storage Spaces Direct",
+        "Cluster-Aware Updating",
+        "Scale-Out File Server"
+      ],
+      "correct": 0,
+      "explanation": "Hyper-V Replica works between two standalone Hyper-V hosts with no clustering or shared storage required, replicating a VM asynchronously as often as every 30 seconds. The other three options all depend on Failover Clustering, which this scenario explicitly does not have."
+    },
+    {
+      "id": "q12",
+      "cat": "hybridWorkloads",
+      "type": "mc",
+      "question": "An organization is decommissioning an aging file server and wants to move its shares to a new server while preserving the old server's name and IP address, so client UNC paths keep working with no reconfiguration. Which tool is purpose-built for this?",
+      "options": [
+        "Windows Server Migration Tools (WSMT)",
+        "Active Directory Migration Tool (ADMT)",
+        "Storage Migration Service",
+        "Printer Migration Wizard"
+      ],
+      "correct": 2,
+      "explanation": "Storage Migration Service migrates files, shares, and their settings, and can then transfer the source server's name and IP address to the destination so clients see no change at all. WSMT and ADMT handle general role settings and AD objects respectively, not this identity-transfer step, and the Printer Migration Wizard is specific to print servers."
+    },
+    {
+      "id": "q13",
+      "cat": "vmContainers",
+      "type": "mc",
+      "question": "A Hyper-V host has one physical NIC. Several VMs on that host need to reach resources on the physical LAN, and the host itself should also retain LAN connectivity through that same NIC. Which virtual switch type should be created?",
+      "options": [
+        "Private virtual switch",
+        "Internal virtual switch bound to a new virtual NIC only",
+        "External virtual switch with 'Allow management operating system to share this network adapter' enabled",
+        "No virtual switch is needed if the VMs use NAT"
+      ],
+      "correct": 2,
+      "explanation": "An external switch bound to the physical NIC gives VMs access to the physical network, and explicitly allowing the management OS to share that adapter keeps the host itself connected through the same NIC. A private switch isolates VMs from everything outside the host, and an internal switch alone doesn't reach the physical LAN at all."
+    },
+    {
+      "id": "q14",
+      "cat": "vmContainers",
+      "type": "mc",
+      "question": "A new VM must support Secure Boot and UEFI firmware for compliance reasons. What must be true about how the VM is created?",
+      "options": [
+        "It must be created as a Generation 1 VM with Secure Boot manually enabled afterward",
+        "Generation doesn't matter, as long as Secure Boot is enabled in the VM settings",
+        "It must be created as a Generation 2 VM, since only Generation 2 supports UEFI firmware and Secure Boot",
+        "It must run inside a Hyper-V isolated container instead of as a VM"
+      ],
+      "correct": 2,
+      "explanation": "Secure Boot and UEFI firmware are only available on Generation 2 VMs \u2014 Generation 1 emulates legacy BIOS and has no UEFI support at all, and this can't be changed after the fact since a VM's generation is fixed at creation."
+    },
+    {
+      "id": "q15",
+      "cat": "vmContainers",
+      "type": "mc",
+      "question": "An administrator wants to move a running, business-critical VM from one Hyper-V host to another with zero perceptible downtime for connected users, ahead of planned host maintenance. Which feature accomplishes this?",
+      "options": [
+        "Hyper-V Replica, failing over to the replica VM",
+        "Exporting and re-importing the VM on the new host",
+        "A production checkpoint applied on the new host",
+        "Live Migration, given shared/SMB storage and compatible processors between hosts"
+      ],
+      "correct": 3,
+      "explanation": "Live Migration is designed specifically to move a running VM between hosts with no perceptible downtime, provided the hosts share (or can access) the same storage and have compatible processors or Processor Compatibility Mode enabled. Hyper-V Replica failover is a DR action against an already-replicated but offline copy, not a live, zero-downtime move."
+    },
+    {
+      "id": "q16",
+      "cat": "vmContainers",
+      "type": "mc",
+      "question": "Two competing customers' workloads must run as containers on the same shared host, with a requirement that a kernel-level compromise in one customer's container cannot affect the other's. Which container isolation mode meets this requirement?",
+      "options": [
+        "Process isolation, since it is the default mode",
+        "Hyper-V isolation, since each container runs its own kernel inside a lightweight utility VM",
+        "Either mode, since both provide equivalent kernel isolation",
+        "Nested virtualization without containers at all"
+      ],
+      "correct": 1,
+      "explanation": "Hyper-V isolation gives each container its own kernel instance inside a lightweight utility VM, providing VM-grade separation appropriate for mutually distrusting tenants. Process isolation shares the host's single kernel across all containers, which does not meet a requirement for containing a kernel-level compromise."
+    },
+    {
+      "id": "q17",
+      "cat": "networking",
+      "type": "mc",
+      "question": "A company wants DNS records for a zone to replicate automatically and securely to every domain controller, with support for secure dynamic updates restricted to authenticated computers. Which zone type should they choose?",
+      "options": [
+        "A standard secondary zone",
+        "An Active Directory-integrated zone",
+        "A stub zone",
+        "A standard primary zone stored only in a text file"
+      ],
+      "correct": 1,
+      "explanation": "AD-integrated zones store zone data in Active Directory itself, giving automatic multi-master replication to every DC and enabling secure dynamic updates restricted to authenticated, authorized computers. A standard primary zone lacks that AD-based security and multi-master replication, and secondary/stub zones are read-only or partial by design."
+    },
+    {
+      "id": "q18",
+      "cat": "networking",
+      "type": "mc",
+      "question": "A branch office needs its own local DHCP server for resilience if the WAN link fails, but under normal conditions the central datacenter's DHCP server should handle all lease requests so IP assignment stays centrally managed. Which DHCP failover mode fits?",
+      "options": [
+        "Load balance mode with a 50/50 split",
+        "No failover \u2014 configure two entirely separate, non-overlapping scopes",
+        "Hot standby mode, with the datacenter server as active and the branch server as standby",
+        "Load balance mode with the branch office server weighted higher"
+      ],
+      "correct": 2,
+      "explanation": "Hot standby mode designates one server (the datacenter server, here) as active under normal conditions, with the other only stepping in if the active server becomes unreachable \u2014 exactly matching this requirement. Load balance mode has both servers actively answering requests all the time, which doesn't match wanting the datacenter server to normally handle everything."
+    },
+    {
+      "id": "q19",
+      "cat": "networking",
+      "type": "mc",
+      "question": "A company needs the most predictable latency and highest available bandwidth for a latency-sensitive hybrid application connecting an on-premises datacenter to Azure, and cost is a secondary concern compared to reliability. Which connectivity option best fits?",
+      "options": [
+        "A single site-to-site VPN tunnel over the public internet",
+        "Point-to-site VPN configured on each application server",
+        "Public internet connectivity with no VPN, using only TLS for the application traffic",
+        "ExpressRoute, using a private, dedicated circuit from a connectivity provider"
+      ],
+      "correct": 3,
+      "explanation": "ExpressRoute provides a private, dedicated circuit that avoids the public internet entirely, giving more predictable latency and higher available bandwidth than a VPN \u2014 matching a scenario where reliability outweighs cost. A site-to-site or point-to-site VPN both still ride over the variable public internet."
+    },
+    {
+      "id": "q20",
+      "cat": "networking",
+      "type": "mc",
+      "question": "A company deploys 802.1X authentication for wired switch ports and wants a centralized RADIUS server that can also handle VPN authentication requests from the same policy engine. What role should be deployed?",
+      "options": [
+        "DFS Replication",
+        "Active Directory Certificate Services with no NPS role",
+        "Network Policy Server (NPS)",
+        "DHCP failover"
+      ],
+      "correct": 2,
+      "explanation": "NPS is Microsoft's RADIUS server and proxy, capable of centralizing authentication and policy decisions for both 802.1X network access and VPN connections from one console. AD CS can issue the certificates 802.1X might use, but it isn't itself a RADIUS server, and DFS Replication/DHCP failover are unrelated to authentication."
+    },
+    {
+      "id": "q21",
+      "cat": "storage",
+      "type": "mc",
+      "question": "Users across three file servers need to access their files through a single, unified path like \\\\contoso\\shares regardless of which physical server actually holds their folder. What should be deployed?",
+      "options": [
+        "Data Deduplication on all three servers",
+        "Storage Replica between the three servers",
+        "DFS Namespaces, presenting one logical path across the three servers' shares",
+        "A single Storage Spaces Direct cluster replacing the three servers"
+      ],
+      "correct": 2,
+      "explanation": "DFS Namespaces is exactly for this: presenting one logical folder structure that transparently maps to shares that may physically live on different servers. Data Deduplication and Storage Replica address disk-space efficiency and replication respectively, not a unified namespace."
+    },
+    {
+      "id": "q22",
+      "cat": "storage",
+      "type": "mc",
+      "question": "A company wants the actual contents of a critical shared folder kept synchronized in near real time across two file servers in different offices, so either server can serve current files if the other goes down. What should be configured?",
+      "options": [
+        "DFS Namespaces only, with no replication configured",
+        "A stub zone linking the two servers",
+        "DFS Replication between the two servers' shared folders",
+        "Data Deduplication scheduled nightly on each server"
+      ],
+      "correct": 2,
+      "explanation": "DFS Replication is the feature that actually synchronizes folder contents between multiple servers, which is what's needed for either server to serve current data. DFS Namespaces alone only provides a unified path \u2014 without replication behind it, the two servers' content could diverge with nothing keeping them in sync."
+    },
+    {
+      "id": "q23",
+      "cat": "storage",
+      "type": "mc",
+      "question": "A company is building a hyperconverged Hyper-V cluster using only local NVMe and SATA disks in each cluster node, with no separate SAN or shared storage array. Which technology pools that local storage into a single, cluster-wide software-defined storage pool?",
+      "options": [
+        "DFS Namespaces",
+        "Data Deduplication",
+        "Azure File Sync",
+        "Storage Spaces Direct (S2D)"
+      ],
+      "correct": 3,
+      "explanation": "Storage Spaces Direct pools local, direct-attached disks across the nodes of a failover cluster into shared software-defined storage, which is the definition of a hyperconverged deployment with no separate SAN. DFS Namespaces and Azure File Sync solve file-sharing and cloud-sync problems, not local disk pooling."
+    },
+    {
+      "id": "q24",
+      "cat": "storage",
+      "type": "mc",
+      "question": "A file server hosting mostly static reference documents and old project archives is running low on disk space. Nightly backups already run to a separate location. Which built-in feature would most directly reclaim space with minimal risk to a live, transactional workload?",
+      "options": [
+        "Converting the volume to ReFS and using it as the new boot volume",
+        "Enabling Data Deduplication on the volume hosting those files",
+        "Enabling Storage Replica in synchronous mode",
+        "Moving the volume into a Storage Spaces Direct cluster"
+      ],
+      "correct": 1,
+      "explanation": "Data Deduplication is well suited to exactly this kind of data \u2014 largely static files with a lot of duplicate content \u2014 and reclaims space with low risk since these aren't heavily, randomly modified transactional files. ReFS as a boot volume isn't supported at all, and Storage Replica and S2D solve replication and pooling problems, not space reclamation on an existing volume."
+    },
+    {
+      "id": "q25",
+      "cat": "storage",
+      "type": "mc",
+      "question": "A branch office file server is running out of local disk space, but users still expect to see and open their full folder structure, including files they rarely touch. The company wants those rarely used files' actual content to live in Azure while remaining transparently accessible. What should be deployed?",
+      "options": [
+        "A larger local RAID 0 array with no cloud component",
+        "DFS Replication to an Azure VM running File Server",
+        "Storage Spaces Direct stretched to an Azure region",
+        "Azure File Sync with cloud tiering enabled"
+      ],
+      "correct": 3,
+      "explanation": "Azure File Sync with cloud tiering keeps the full namespace visible locally while evicting cold files' actual content to Azure, retrieving it transparently on access \u2014 exactly the described need. The other options either add no cloud capacity at all or aren't designed for this kind of transparent, on-demand file tiering."
+    },
+    {
+      "id": "q26",
+      "cat": "security",
+      "type": "mc",
+      "question": "A security team wants to prevent unauthorized executables from running on a fleet of Windows Server 2022 file servers, with policy enforcement happening at the kernel level before any unapproved binary can even start, surviving even if a local administrator account is compromised. Which technology should they deploy?",
+      "options": [
+        "AppLocker",
+        "Windows Defender Firewall with Advanced Security",
+        "Windows Defender Application Control (WDAC)",
+        "Just Enough Administration (JEA)"
+      ],
+      "correct": 2,
+      "explanation": "WDAC enforces code integrity at the kernel level system-wide, which is exactly what resists a compromised local administrator trying to run unapproved code. AppLocker enforces rules in user mode and is easier to bypass with sufficient local privilege, and JEA restricts what an admin can do in a PowerShell session but does not block arbitrary executables from running at all."
+    },
+    {
+      "id": "q27",
+      "cat": "security",
+      "type": "mc",
+      "question": "An organization wants to stop an attacker who gains local administrator rights on a domain-joined server from extracting cached NTLM and Kerberos credentials from memory using a tool such as Mimikatz. Which feature specifically defends against this?",
+      "options": [
+        "Credential Guard",
+        "BitLocker",
+        "Cluster-Aware Updating",
+        "Storage Replica"
+      ],
+      "correct": 0,
+      "explanation": "Credential Guard isolates LSASS secrets inside a virtualization-based security container that even a local administrator cannot read directly, which is precisely the scenario described. BitLocker protects data at rest on disk and has no effect on credentials held in memory, and the other two options are unrelated high-availability and DR features."
+    },
+    {
+      "id": "q28",
+      "cat": "security",
+      "type": "mc",
+      "question": "A helpdesk technician needs to look up the current local administrator password for a specific Windows Server so they can log on and troubleshoot it, without ever setting or knowing that password themselves ahead of time. Which feature both rotates and stores that password for retrieval?",
+      "options": [
+        "Group Managed Service Accounts (gMSA)",
+        "Windows LAPS",
+        "Protected Users group",
+        "Authentication policy silos"
+      ],
+      "correct": 1,
+      "explanation": "Windows LAPS automatically rotates each server's local administrator password and stores it, in AD DS or Microsoft Entra ID, for retrieval by delegated staff \u2014 exactly the lookup-on-demand workflow described. gMSA manages a service account's password rather than a local administrator account, and the other two options control authentication restrictions, not password storage."
+    },
+    {
+      "id": "q29",
+      "cat": "security",
+      "type": "mc",
+      "question": "A regulated company wants Windows Server security event logs, along with signals from Microsoft Defender for Identity, correlated together with alerts from its cloud workloads in a single security operations view, with automated response playbooks available. Which service should ingest this data?",
+      "options": [
+        "Azure Update Manager",
+        "Windows Admin Center",
+        "Azure Site Recovery",
+        "Microsoft Sentinel"
+      ],
+      "correct": 3,
+      "explanation": "Microsoft Sentinel is the cloud-native SIEM and SOAR platform built specifically to ingest and correlate signals like this across identity, servers, and cloud workloads, with automated playbooks for response. The other three tools serve entirely different purposes \u2014 patch management, server administration, and DR orchestration \u2014 with no SIEM or SOAR correlation capability."
+    },
+    {
+      "id": "q30",
+      "cat": "monitoring",
+      "type": "mc",
+      "question": "An administrator wants to capture a consistent, repeatable set of CPU, memory, and disk counters on a schedule, so the same metrics can be reviewed over time rather than being configured manually every time an issue comes up. Which Performance Monitor feature should they configure?",
+      "options": [
+        "A metric alert rule",
+        "A Data Collection Rule",
+        "Reliability Monitor",
+        "A Data Collector Set"
+      ],
+      "correct": 3,
+      "explanation": "A Data Collector Set groups counters, traces, and configuration into a single, reusable, schedulable job within Performance Monitor. A Data Collection Rule is the Azure Monitor Agent equivalent for cloud-side collection, Reliability Monitor tracks a stability index rather than arbitrary counters, and a metric alert only fires on a threshold rather than capturing ongoing data."
+    },
+    {
+      "id": "q31",
+      "cat": "monitoring",
+      "type": "mc",
+      "question": "A hybrid fleet includes both native Azure VMs and on-premises servers. The team wants one unified agent, with one shared configuration object defining exactly which logs and performance counters to collect and where to send them, deployed consistently across the whole fleet.",
+      "options": [
+        "Windows Admin Center extensions only",
+        "Azure Monitor Agent (AMA) with a Data Collection Rule (DCR)",
+        "The legacy Log Analytics (MMA) agent",
+        "Windows Server Backup with a custom policy"
+      ],
+      "correct": 1,
+      "explanation": "AMA is the unified, current agent for both Azure VMs and Arc-enabled on-premises servers, and a DCR is exactly the shared configuration object that defines what is collected and where it goes. The legacy MMA agent is what AMA replaces, and the other two options are unrelated to log and metric collection configuration."
+    },
+    {
+      "id": "q32",
+      "cat": "monitoring",
+      "type": "mc",
+      "question": "An operations team wants to write a query against collected log data using a chain of operators like where, summarize, and project to filter and shape results, then turn that same query directly into an automated alert. Which technology are they using?",
+      "options": [
+        "PowerShell Desired State Configuration",
+        "Windows Server Migration Tools",
+        "Kusto Query Language (KQL) against a Log Analytics workspace",
+        "Cluster-Aware Updating"
+      ],
+      "correct": 2,
+      "explanation": "KQL's operator-chaining query style against a Log Analytics workspace is exactly what is described, and workspace-based queries can be promoted directly into log alert rules with minimal extra work. The other three options are unrelated configuration, migration, and patching tools respectively, with no query language of this kind."
+    },
+    {
+      "id": "q33",
+      "cat": "monitoring",
+      "type": "mc",
+      "question": "A hybrid organization wants to see patch compliance and schedule update installation for both its Azure VMs and its Arc-enabled on-premises servers from a single place in the Azure portal, rather than maintaining a separate on-premises patching tool for those on-premises machines.",
+      "options": [
+        "Windows Server Update Services (WSUS) alone",
+        "Azure Update Manager",
+        "Storage Migration Service",
+        "A Data Collector Set"
+      ],
+      "correct": 1,
+      "explanation": "Azure Update Manager centrally assesses and schedules updates across both native Azure VMs and Arc-enabled on-premises servers from the Azure portal. WSUS alone has no visibility into Azure-native VM patch state, and the other two options are unrelated to patch management entirely."
+    },
+    {
+      "id": "q34",
+      "cat": "monitoring",
+      "type": "mc",
+      "question": "After a server begins experiencing intermittent crashes, an administrator first wants a quick visual timeline correlating the crashes with recent installs or updates, before digging into the full, detailed event logs to confirm the exact cause. Which tool should they check first?",
+      "options": [
+        "Azure Update Manager compliance dashboard",
+        "A Data Collection Rule audit log",
+        "Reliability Monitor",
+        "Storage Replica health report"
+      ],
+      "correct": 2,
+      "explanation": "Reliability Monitor plots a rolling stability index and correlates dips with specific events like installs or updates, making it a good first stop for spotting when a problem started before diving into Event Viewer's more detailed logs. The other three options address patch compliance, log collection configuration, and storage replication health, not this kind of stability timeline."
+    },
+    {
+      "id": "tf1",
+      "cat": "adDs",
+      "type": "tf",
+      "question": "An RODC caches credentials only for the accounts explicitly permitted by its Password Replication Policy, rather than the whole domain's credentials.",
+      "answer": true,
+      "explanation": "That is the entire security purpose of the Password Replication Policy \u2014 it limits which accounts' credentials an RODC is allowed to cache, so a compromised RODC exposes only a limited subset of credentials."
+    },
+    {
+      "id": "tf2",
+      "cat": "adDs",
+      "type": "tf",
+      "question": "A GPO marked as Enforced can still be overridden by enabling Block Inheritance on the target organizational unit.",
+      "answer": false,
+      "explanation": "Enforcement specifically overrides Block Inheritance \u2014 an Enforced GPO's settings still apply to a child OU even if that OU has Block Inheritance turned on. Enforcement is designed to win exactly this kind of conflict."
+    },
+    {
+      "id": "tf3",
+      "cat": "adDs",
+      "type": "tf",
+      "question": "Microsoft Entra Connect's Password Hash Synchronization feature transmits users' recoverable plaintext passwords to Microsoft Entra ID.",
+      "answer": false,
+      "explanation": "PHS synchronizes a hash of the on-premises password hash, never a plaintext or otherwise reversible password, to Microsoft Entra ID. This is a frequently tested distinction, since the name alone can make it sound less secure than it actually is."
+    },
+    {
+      "id": "tf4",
+      "cat": "hybridWorkloads",
+      "type": "tf",
+      "question": "A Server Core installation can still be managed remotely with Windows Admin Center or PowerShell, even though it has no local desktop shell to log into.",
+      "answer": true,
+      "explanation": "Server Core removes the local GUI shell and most graphical tools, but remote management via Windows Admin Center, PowerShell remoting, or RSAT from another machine works normally, which is exactly how Server Core is meant to be administered day to day."
+    },
+    {
+      "id": "tf5",
+      "cat": "hybridWorkloads",
+      "type": "tf",
+      "question": "Azure Site Recovery for on-premises Hyper-V hosts uses the same Configuration Server and Process Server components that VMware-to-Azure replication relies on.",
+      "answer": false,
+      "explanation": "Hyper-V-to-Azure replication uses the Hyper-V Replica provider built into the Hyper-V host itself. The Configuration Server, Process Server, and Master Target Server roles are specifically part of the VMware and physical-server replication architecture, not the Hyper-V one."
+    },
+    {
+      "id": "tf6",
+      "cat": "vmContainers",
+      "type": "tf",
+      "question": "Generation 2 Hyper-V virtual machines support UEFI firmware and Secure Boot, while Generation 1 machines emulate legacy BIOS.",
+      "answer": true,
+      "explanation": "This is the core distinction between the two generations, and it's fixed at VM creation time \u2014 a Generation 1 VM cannot gain UEFI/Secure Boot support later without being recreated as Generation 2."
+    },
+    {
+      "id": "tf7",
+      "cat": "vmContainers",
+      "type": "tf",
+      "question": "Containers running under Hyper-V isolation each get their own lightweight utility VM and kernel instance, rather than sharing the host kernel the way process-isolated containers do.",
+      "answer": true,
+      "explanation": "That extra utility-VM layer is exactly what gives Hyper-V isolation its stronger, VM-grade separation compared to process isolation, which shares a single host kernel across all its containers."
+    },
+    {
+      "id": "tf8",
+      "cat": "networking",
+      "type": "tf",
+      "question": "DHCP failover in hot standby mode designates one server as active and the other as a passive backup, rather than splitting client load evenly between the two.",
+      "answer": true,
+      "explanation": "That's the defining trait of hot standby mode, as opposed to load balance mode, where both servers actively answer requests according to a configured percentage split."
+    },
+    {
+      "id": "tf9",
+      "cat": "networking",
+      "type": "tf",
+      "question": "A DNS stub zone stores a full, authoritative copy of every record in the delegated zone, the same way a secondary zone does.",
+      "answer": false,
+      "explanation": "A stub zone stores only NS, SOA, and glue A/AAAA records \u2014 enough to know which servers are authoritative \u2014 not the zone's full record set. A secondary zone, by contrast, does hold a full read-only copy via zone transfer."
+    },
+    {
+      "id": "tf10",
+      "cat": "storage",
+      "type": "tf",
+      "question": "Storage Replica can perform synchronous, block-level replication between two servers with zero data loss, provided latency between them is low enough.",
+      "answer": true,
+      "explanation": "Synchronous replication in Storage Replica commits a write on both the source and destination before acknowledging it, guaranteeing zero data loss on failover \u2014 but it depends on latency being low enough that this round trip doesn't become a bottleneck, which is why it's typically used between nearby sites."
+    },
+    {
+      "id": "tf11",
+      "cat": "storage",
+      "type": "tf",
+      "question": "ReFS (Resilient File System) is fully supported as a boot volume for the Windows Server operating system, just like NTFS.",
+      "answer": false,
+      "explanation": "ReFS is not supported for the boot/system volume \u2014 Windows Server still requires NTFS there. ReFS is intended for data volumes, particularly ones backed by Storage Spaces where its self-healing and integrity-checking features can be fully used."
+    },
+    {
+      "id": "tf12",
+      "cat": "security",
+      "type": "tf",
+      "question": "Windows LAPS can store a managed local administrator password in Microsoft Entra ID for an Entra-joined device, not only in Active Directory Domain Services.",
+      "answer": true,
+      "explanation": "Windows LAPS supports backing up the managed password to either Active Directory or Microsoft Entra ID depending on how the device is joined, which is part of what makes it usable across hybrid and cloud-joined fleets, not just traditional on-premises domain members."
+    },
+    {
+      "id": "tf13",
+      "cat": "security",
+      "type": "tf",
+      "question": "An account in the Protected Users group can still fall back to NTLM authentication if Kerberos is briefly unavailable.",
+      "answer": false,
+      "explanation": "Protected Users membership removes the NTLM fallback entirely \u2014 if Kerberos cannot be used, authentication simply fails rather than falling back to a weaker protocol, which is the deliberate point of the control."
+    },
+    {
+      "id": "tf14",
+      "cat": "monitoring",
+      "type": "tf",
+      "question": "A server must be Azure Arc-enabled, or be a native Azure VM, before Azure Update Manager can assess or patch it.",
+      "answer": true,
+      "explanation": "Update Manager has no visibility into a plain on-premises server with no Arc agent and no Azure connection \u2014 Arc-enabling the server, or it being a native Azure VM, is the prerequisite that makes it visible to Update Manager at all."
+    },
+    {
+      "id": "tf15",
+      "cat": "monitoring",
+      "type": "tf",
+      "question": "A single Data Collection Rule (DCR) in Azure Monitor can only be associated with one machine at a time, requiring a separate DCR to be authored for every server in a fleet.",
+      "answer": false,
+      "explanation": "One DCR can be associated with many machines at once, which is what allows a single collection configuration to apply consistently across an entire hybrid fleet instead of being authored per server."
+    },
+    {
+      "id": "msq1",
+      "cat": "adDs",
+      "type": "ms",
+      "question": "Which two of the following FSMO roles exist once per domain rather than once per forest? (Choose two.)",
+      "options": [
+        "RID Master",
+        "Schema Master",
+        "PDC Emulator",
+        "Domain Naming Master"
+      ],
+      "correct": [
+        0,
+        2
+      ],
+      "explanation": "RID Master and PDC Emulator are domain-wide roles, existing once in every domain. Schema Master and Domain Naming Master are forest-wide roles, existing only once across the entire forest."
+    },
+    {
+      "id": "msq2",
+      "cat": "adDs",
+      "type": "ms",
+      "question": "Which two of the following are genuine Microsoft Entra Connect hybrid authentication methods? (Choose two.)",
+      "options": [
+        "Kerberos Constrained Delegation",
+        "LDAP Simple Bind over an unencrypted connection",
+        "Password Hash Synchronization",
+        "Pass-through Authentication"
+      ],
+      "correct": [
+        2,
+        3
+      ],
+      "explanation": "Password Hash Synchronization and Pass-through Authentication are both genuine Microsoft Entra Connect authentication methods (alongside Federation with AD FS). Kerberos Constrained Delegation and unencrypted LDAP simple bind are unrelated on-premises authentication/authorization mechanisms, not hybrid sign-in methods."
+    },
+    {
+      "id": "msq3",
+      "cat": "hybridWorkloads",
+      "type": "ms",
+      "question": "Which two of the following are true about Azure Arc-enabled servers? (Choose two.)",
+      "options": [
+        "It requires migrating the server's actual workload into an Azure VM",
+        "It replaces the need for any on-premises Active Directory infrastructure",
+        "It installs a Connected Machine agent that projects the server into Azure Resource Manager",
+        "It lets you apply Azure Policy and Azure Monitor to an on-premises server without moving it"
+      ],
+      "correct": [
+        2,
+        3
+      ],
+      "explanation": "Azure Arc's Connected Machine agent projects a server into Azure Resource Manager so Azure Policy, Monitor, and similar services can manage it, all without moving the workload itself. It has nothing to do with replacing on-premises AD, and it explicitly does not require migrating the workload into an Azure VM."
+    },
+    {
+      "id": "msq4",
+      "cat": "hybridWorkloads",
+      "type": "ms",
+      "question": "Which two of the following correctly distinguish an in-place upgrade from a migration to a new server? (Choose two.)",
+      "options": [
+        "An in-place upgrade keeps the same hardware or VM and updates the OS directly on it",
+        "A migration always requires reinstalling Active Directory Domain Services from scratch",
+        "A migration moves roles and data to a separate, already-provisioned destination server",
+        "An in-place upgrade is supported between any two Windows Server versions regardless of version gap"
+      ],
+      "correct": [
+        0,
+        2
+      ],
+      "explanation": "An in-place upgrade updates the existing server directly, while a migration moves roles and data to a separate destination server, leaving the source untouched until cutover. Migrations do not require reinstalling AD DS from scratch, and in-place upgrades are explicitly not supported across every version gap \u2014 that is exactly when migration becomes necessary instead."
+    },
+    {
+      "id": "q35",
+      "cat": "hybridWorkloads",
+      "type": "mc",
+      "question": "A company is building a two-node failover cluster split across two small branch offices with no third site available to host a witness server. Which witness type best fits, and why?",
+      "options": [
+        "Node Majority with no witness, since two nodes already form a majority together",
+        "Cloud Witness, since it only needs an Azure Storage account rather than a third physical site",
+        "Node and Disk Majority, using a shared disk located at one of the two branch offices",
+        "No witness is needed for any cluster with more than one node"
+      ],
+      "correct": 1,
+      "explanation": "With only two nodes, a single node failure leaves just one vote \u2014 not a majority \u2014 so an extra witness vote is required to keep the cluster online; a plain Node Majority model cannot survive a node failure here. Cloud Witness supplies that extra vote from Azure Blob Storage, avoiding the need for a third physical site. A shared disk witness at one of the two branch offices would tie the witness's availability to that specific site's health, defeating the purpose of a tie-breaking vote."
+    },
+    {
+      "id": "tf16",
+      "cat": "hybridWorkloads",
+      "type": "tf",
+      "question": "Skipping cluster validation (Test-Cluster) is fully supported by Microsoft as long as the cluster comes online successfully.",
+      "answer": false,
+      "explanation": "A cluster that skips or fails validation is explicitly unsupported if a validation-related problem later causes an outage, even though Windows Server will still let such a cluster be created and come online."
+    },
+    {
+      "id": "msq5",
+      "cat": "vmContainers",
+      "type": "ms",
+      "question": "Which two of the following are true about Hyper-V Live Migration? (Choose two.)",
+      "options": [
+        "It always requires the VM to be shut down first",
+        "It requires the destination host to have a compatible processor or Processor Compatibility Mode enabled",
+        "It permanently deletes the VM's existing checkpoints before migrating",
+        "It can move a running VM between hosts with no perceptible downtime when properly configured"
+      ],
+      "correct": [
+        1,
+        3
+      ],
+      "explanation": "Live Migration moves a running VM with no perceptible downtime, but it does require processor compatibility (or Processor Compatibility Mode) between the source and destination hosts. It neither requires shutting the VM down nor deletes existing checkpoints as part of the process."
+    },
+    {
+      "id": "msq6",
+      "cat": "networking",
+      "type": "ms",
+      "question": "Which two of the following are true about IP Address Management (IPAM)? (Choose two.)",
+      "options": [
+        "IPAM must itself be configured to act as the domain's primary DHCP server",
+        "IPAM can centrally monitor and manage multiple DHCP and DNS servers from one console",
+        "IPAM helps track IP address utilization and detect overlapping or duplicate DHCP scopes",
+        "IPAM removes the need to ever configure a DHCP or DNS server role anywhere"
+      ],
+      "correct": [
+        1,
+        2
+      ],
+      "explanation": "IPAM's job is centrally monitoring and managing existing DHCP and DNS servers, including tracking utilization and catching overlapping or duplicate scopes. It is not itself a DHCP server, and deploying it does not eliminate the need for separate DHCP/DNS server roles."
+    },
+    {
+      "id": "msq7",
+      "cat": "storage",
+      "type": "ms",
+      "question": "Which two of the following correctly describe Storage Spaces resiliency types? (Choose two.)",
+      "options": [
+        "Parity resiliency generally offers better write performance than mirroring",
+        "Simple resiliency spaces tolerate one disk failure without data loss",
+        "A two-way mirror can tolerate the loss of one physical disk without data loss",
+        "Parity resiliency is generally more storage-efficient than mirroring for the same fault tolerance"
+      ],
+      "correct": [
+        2,
+        3
+      ],
+      "explanation": "A two-way mirror tolerates one disk failure, and parity is generally more storage-efficient than mirroring at similar fault tolerance \u2014 though at the cost of slower random writes, not better write performance. Simple resiliency has no redundancy at all and tolerates zero disk failures."
+    },
+    {
+      "id": "msq8",
+      "cat": "storage",
+      "type": "ms",
+      "question": "Which two of the following are true about DFS Namespaces? (Choose two.)",
+      "options": [
+        "DFS Namespaces requires Data Deduplication to be enabled first",
+        "A domain-based namespace can have multiple namespace servers for redundancy",
+        "A standalone namespace's configuration is stored in Active Directory",
+        "A domain-based namespace stores its configuration in Active Directory"
+      ],
+      "correct": [
+        1,
+        3
+      ],
+      "explanation": "A domain-based DFS namespace stores its configuration in Active Directory and can be hosted on multiple namespace servers for redundancy. A standalone namespace, by contrast, keeps its configuration in the local registry of a single server rather than in AD, and DFS Namespaces has no dependency on Data Deduplication."
+    },
+    {
+      "id": "msq9",
+      "cat": "security",
+      "type": "ms",
+      "question": "Which two of the following are true about Microsoft Defender for Identity? (Choose two.)",
+      "options": [
+        "It is installed as sensors directly on domain controllers",
+        "It replaces the need for a certification authority",
+        "It can detect on-premises attack techniques such as pass-the-hash and DCSync",
+        "It only monitors cloud sign-in activity, not on-premises AD DS"
+      ],
+      "correct": [
+        0,
+        2
+      ],
+      "explanation": "Defender for Identity runs via sensors on domain controllers and is built specifically to detect on-premises identity attacks like pass-the-hash and DCSync. It has nothing to do with certificate issuance, and it is the opposite of cloud-sign-in-only \u2014 its whole focus is the on-premises identity plane."
+    },
+    {
+      "id": "msq10",
+      "cat": "monitoring",
+      "type": "ms",
+      "question": "Which two of the following are true about Azure Monitor alert rules? (Choose two.)",
+      "options": [
+        "A metric alert evaluates a numeric signal against a threshold on a schedule",
+        "A log alert runs a KQL query on a schedule and fires based on its results",
+        "An action group defines the alert condition itself, not the response",
+        "Alert rules cannot be attached to Arc-enabled on-premises servers"
+      ],
+      "correct": [
+        0,
+        1
+      ],
+      "explanation": "Metric alerts and log alerts are correctly described here \u2014 one evaluates a numeric threshold, the other runs a scheduled KQL query. An action group defines the response to a firing alert, not the condition, and Arc-enabled servers are exactly the kind of hybrid machine Azure Monitor alerting is designed to cover."
+    },
+    {
+      "id": "msq11",
+      "cat": "monitoring",
+      "type": "ms",
+      "question": "Which two of the following are true about Reliability Monitor and Event Viewer? (Choose two.)",
+      "options": [
+        "Reliability Monitor plots a rolling stability index correlated with events like installs and crashes",
+        "Event Viewer provides detailed, filterable logs across System, Application, Security, and role-specific channels",
+        "Event Viewer and Reliability Monitor are two names for the exact same tool",
+        "Reliability Monitor replaces the need to ever open Event Viewer"
+      ],
+      "correct": [
+        0,
+        1
+      ],
+      "explanation": "Reliability Monitor's stability-index timeline and Event Viewer's detailed, filterable logs are both accurately described, and they serve complementary rather than identical purposes \u2014 Reliability Monitor is typically a first look, and Event Viewer is where the detailed confirmation happens afterward, not a tool it replaces."
+    },
+    {
+      "id": "q36",
+      "cat": "adDs",
+      "type": "mc",
+      "question": "An OU containing several user accounts, along with their group memberships, was deleted three days ago. The forest functional level is Windows Server 2016, and the AD Recycle Bin feature was enabled a year ago. What is the most complete way to recover the users with their original group memberships intact?",
+      "options": [
+        "Perform a tombstone reanimation on each deleted user object",
+        "Restore only from a full system state backup taken before the deletion",
+        "Manually recreate each user account and re-add it to its groups by hand",
+        "Restore the deleted objects from the AD Recycle Bin, which preserves group memberships and most original attributes"
+      ],
+      "correct": 3,
+      "explanation": "With the AD Recycle Bin already enabled, deleted objects can be restored with essentially all of their original attributes, including group memberships, directly from the Recycle Bin \u2014 the most complete and least disruptive option. Tombstone reanimation, the older method, recovers a bare object that has lost most of its link-valued attributes, including group memberships, which would then have to be manually re-added anyway. A full system-state restore risks rolling back unrelated changes made since the backup. Manually recreating accounts is slow and error-prone, and creates new SIDs that lose the objects' original permissions history."
+    },
+    {
+      "id": "q37",
+      "cat": "hybridWorkloads",
+      "type": "mc",
+      "question": "A Hyper-V Replica primary VM is about to undergo scheduled maintenance. The administrator wants to fail over to the replica VM at the secondary site with zero data loss, and wants the original primary to automatically become the new replica afterward. Which type of failover should be performed?",
+      "options": [
+        "An unplanned failover, initiated immediately without checking the primary VM's status",
+        "A test failover, which brings the replica online in an isolated network only",
+        "A planned failover, initiated while the primary VM is still running and reachable",
+        "Failback using Hyper-V Live Migration instead of Replica failover"
+      ],
+      "correct": 2,
+      "explanation": "A planned failover requires the primary VM to be shut down gracefully first, replicates any final changes so there is zero data loss, and automatically reverses replication direction so the original primary becomes the new replica \u2014 exactly matching a scheduled maintenance scenario. An unplanned failover is the emergency path used when the primary is already unreachable and may lose any changes since the last replication cycle. A test failover only verifies the replica in an isolated sandbox network without redirecting production traffic. Live Migration requires shared or replicated storage between hosts and isn't how Hyper-V Replica performs a site failover."
+    },
+    {
+      "id": "q38",
+      "cat": "vmContainers",
+      "type": "mc",
+      "question": "Before applying a risky configuration change to a production domain controller running as a Hyper-V VM, an administrator wants to take a point-in-time snapshot that is safe to restore without corrupting the AD database, using Volume Shadow Copy Service inside the guest to ensure application consistency. Which checkpoint type should be used?",
+      "options": [
+        "A production checkpoint, which uses VSS inside the guest for an application-consistent snapshot",
+        "A standard checkpoint, since it captures memory and device state the fastest",
+        "An automatic checkpoint created only at VM startup",
+        "A saved-state export with no checkpoint at all"
+      ],
+      "correct": 0,
+      "explanation": "A production checkpoint uses VSS inside the guest OS to create an application-consistent, restorable point-in-time copy, which is specifically safe to use against workloads like Active Directory or SQL Server. A standard checkpoint only captures memory and device state like a saved game and is not application-aware, making it unsafe to restore into a running domain controller. Automatic checkpoints are unrelated to this manual, deliberate risk-mitigation step, and a plain saved-state export isn't a checkpoint or restorable snapshot mechanism at all."
+    },
+    {
+      "id": "q39",
+      "cat": "storage",
+      "type": "mc",
+      "question": "A three-node Hyper-V failover cluster stores its VM virtual disks on a single shared LUN. The administrator wants every node to be able to simultaneously read and write to that LUN as a common namespace, so any node can quickly take ownership of a VM without dismounting and remounting the disk. What should be configured?",
+      "options": [
+        "A dedicated disk resource owned exclusively by one node at a time",
+        "Cluster Shared Volumes (CSV), enabling simultaneous multi-node access to the same LUN",
+        "DFS Replication between each node's local disk",
+        "A Scale-Out File Server role with no cluster storage involved"
+      ],
+      "correct": 1,
+      "explanation": "Cluster Shared Volumes let every node in the cluster simultaneously access the same LUN through a common namespace, which is exactly what allows a VM to move between nodes almost instantly without a slow, disruptive disk dismount/remount cycle. A traditional dedicated disk resource is owned by only one node at a time, forcing exactly that kind of handoff on failover. DFS Replication synchronizes file content between separate volumes, not simultaneous access to one shared LUN. A Scale-Out File Server is a separate SMB file-serving role that itself typically relies on CSV underneath it, not a substitute for it."
+    },
+    {
+      "id": "q40",
+      "cat": "monitoring",
+      "type": "mc",
+      "question": "A team wants Security and Application event log entries from 50 servers centralized onto a single collector server for review, without deploying Azure Monitor Agent or a Log Analytics workspace, using only built-in Windows Server functionality. Which feature should be configured?",
+      "options": [
+        "Data Collector Sets configured individually on the collector server only",
+        "Reliability Monitor configured to poll each of the 50 servers",
+        "Windows Event Forwarding (WEF), using a subscription on the collector server and WinRM on each source server",
+        "Azure Update Manager with a centralized reporting dashboard"
+      ],
+      "correct": 2,
+      "explanation": "Windows Event Forwarding uses WinRM-based subscriptions so a collector server can gather selected event log entries from many source servers into its own forwarded-events log, entirely with built-in Windows Server functionality and no Azure agent required. Data Collector Sets on the collector alone wouldn't gather anything from the other 50 servers, since they capture local performance and trace data. Reliability Monitor only tracks a single server's own stability index locally. Update Manager is a patch-compliance service, unrelated to centralizing event logs."
+    },
+    {
+      "id": "q41",
+      "cat": "monitoring",
+      "type": "mc",
+      "question": "An operations team manages a hybrid fleet of Azure VMs and Arc-enabled on-premises servers and wants a single view showing each server's running processes, discovered application dependencies, and connections to other servers, to help plan a migration and troubleshoot cross-server issues. Which Azure Monitor capability provides this?",
+      "options": [
+        "Reliability Monitor",
+        "Windows Server Backup reporting",
+        "A Data Collector Set with only a CPU counter added",
+        "VM insights, using the dependency map feature"
+      ],
+      "correct": 3,
+      "explanation": "VM insights' dependency map, built on the Dependency Agent alongside Azure Monitor Agent, specifically visualizes running processes and the discovered connections and dependencies between servers, which is exactly what's needed for migration planning and cross-server troubleshooting, across both Azure VMs and Arc-enabled on-premises servers. Reliability Monitor only tracks one server's local stability index, not cross-server dependencies. Windows Server Backup reporting covers backup job status, not process or dependency mapping. A Data Collector Set with just a CPU counter captures only that one local metric."
+    },
+    {
+      "id": "tf17",
+      "cat": "adDs",
+      "type": "tf",
+      "question": "In a multi-domain forest, a user who is a member of a universal group can fail to complete logon if no Global Catalog server is reachable at logon time.",
+      "answer": true,
+      "explanation": "Universal group membership can only be resolved by querying a Global Catalog server, since only the GC holds a forest-wide partial replica listing universal group memberships; if none is reachable, logon can be blocked depending on caching settings. This is distinct from a single-domain forest, where a domain controller alone can fully resolve group membership without needing a GC at all."
+    },
+    {
+      "id": "tf18",
+      "cat": "security",
+      "type": "tf",
+      "question": "Just Enough Administration (JEA) lets an organization grant a support technician access to run a specific, limited set of PowerShell cmdlets under an elevated identity, without granting that technician full local administrator rights on the server.",
+      "answer": true,
+      "explanation": "JEA constrains a PowerShell session to a defined set of cmdlets, parameters, and values via a role capability file, running the elevated operations under a virtual account behind the scenes, so the connecting user never actually receives full administrator rights on the machine. This is different from simply adding a user to the local Administrators group, which grants unrestricted access."
+    },
+    {
+      "id": "msq12",
+      "cat": "networking",
+      "type": "ms",
+      "question": "Which two of the following correctly describe DNS record types used in a Windows Server environment? (Choose two.)",
+      "options": [
+        "A PTR record maps an IP address back to a hostname, used for reverse lookups",
+        "An SRV record maps a hostname directly to an IP address, identical to an A record",
+        "A CNAME record is an alias that points to another hostname rather than directly to an IP address",
+        "An MX record is required for a domain controller to be discoverable by client computers"
+      ],
+      "correct": [
+        0,
+        2
+      ],
+      "explanation": "A PTR record supports reverse lookup, resolving an IP address back to a hostname, and a CNAME record is an alias pointing to another hostname rather than directly to an IP address. An SRV record identifies the host and port for a specific service, such as locating domain controllers via _ldap._tcp SRV records \u2014 it is not the same as a simple A record mapping. MX records route mail delivery and have nothing to do with domain controller discovery, which instead relies on SRV records."
+    },
+    {
+      "id": "msq13",
+      "cat": "storage",
+      "type": "ms",
+      "question": "Which two of the following are true about the Volume Shadow Copy Service (VSS) and shadow copies of shared folders in Windows Server? (Choose two.)",
+      "options": [
+        "Shadow copies replace the need for any regular backup solution entirely",
+        "Enabling shadow copies lets users restore an earlier version of a file themselves via the Previous Versions tab, without administrator intervention",
+        "Shadow copies are stored on a different physical server from the source volume by default",
+        "VSS shadow copies are taken on a schedule and only store the changed blocks since the previous shadow copy, not a full duplicate of the volume"
+      ],
+      "correct": [
+        1,
+        3
+      ],
+      "explanation": "Shadow copies expose a self-service Previous Versions tab so users can recover an earlier file version without an administrator restoring from backup, and VSS is efficient because each shadow copy stores only the changed blocks since the previous one rather than a full volume duplicate. Shadow copies are a convenient point-in-time recovery aid, not a replacement for a real backup solution, and they live on the same volume/server by default rather than a different physical server, which is also why they don't protect against the loss of that server's hardware."
+    }
+  ],
+  "cheatSheet": [
+    {
+      "heading": "AD DS & hybrid identity essentials",
+      "points": [
+        "Five FSMO roles total: Schema Master and Domain Naming Master are forest-wide (one each per forest); RID Master, PDC Emulator, and Infrastructure Master are domain-wide (one each per domain).",
+        "Microsoft Entra Connect sync methods: Password Hash Sync (PHS) is simplest and most resilient, Pass-through Authentication (PTA) needs on-prem agents to stay online for every sign-in, and Federation (AD FS) is the most complex, rarely the right answer unless a specific requirement forces it.",
+        "The Infrastructure Master only matters in a multi-domain forest where the Global Catalog is not on every DC \u2014 otherwise it does nothing.",
+        "AD Recycle Bin needs forest functional level Windows Server 2008 R2 or higher and must be manually enabled \u2014 it isn't on by default.",
+        "A Read-Only Domain Controller (RODC) doesn't cache any account's password unless that account is explicitly added to its Password Replication Policy allow list."
+      ]
+    },
+    {
+      "heading": "Hyper-V & Storage Spaces Direct",
+      "points": [
+        "Generation 2 VMs support UEFI, Secure Boot, and larger boot volumes; Generation 1 exists mainly for older or 32-bit guest OSes.",
+        "Production checkpoints use VSS/file-system consistency and are safe for production workloads; Standard checkpoints also save memory/device state but are dev/test only.",
+        "Storage Spaces Direct needs a minimum of 2 nodes (a 2-node cluster needs a witness) and scales up to 16 nodes.",
+        "Two-way mirror behaves like RAID-1 and survives one node/drive failure; three-way mirror needs 3+ nodes and survives two failures; parity trades resiliency overhead for better usable capacity but costs more CPU.",
+        "Storage Replica synchronous mode gives zero data loss but needs low latency between sites; asynchronous mode tolerates higher latency but can lose in-flight data on failover."
+      ]
+    },
+    {
+      "heading": "Windows Server networking (DNS/DHCP/VPN)",
+      "points": [
+        "A conditional forwarder sends queries for a specific namespace to specific DNS servers; a stub zone stores only that zone's NS/SOA/glue records and refreshes them automatically.",
+        "AD-integrated zones replicate via AD (multi-master); standard Primary/Secondary zones use one-way zone transfers from the primary to each secondary.",
+        "DHCP failover has two modes: Hot standby (one server active, one passive backup) and Load balance (both serve requests, split by percentage).",
+        "Always On VPN is Microsoft's modern replacement for DirectAccess, which is being phased out.",
+        "Site-to-site VPN keeps two networks continuously connected; point-to-site VPN connects a single client machine to a network on demand."
+      ]
+    },
+    {
+      "heading": "Azure Arc-enabled server management",
+      "points": [
+        "Arc-enabled servers projects a non-Azure (on-prem or other-cloud) machine into Azure Resource Manager as a resource \u2014 it does NOT migrate or move the server itself.",
+        "Onboarding installs the Connected Machine agent (azcmagent), which needs outbound connectivity to specific Azure endpoints or Azure Private Link.",
+        "Once Arc-enabled, a server can receive Azure Policy, Azure Monitor, Microsoft Defender for Cloud, and Update Manager coverage just like a native Azure VM.",
+        "Arc-enabled servers get a resource ID and resource group like any Azure resource, enabling the same RBAC and tagging as cloud-native VMs."
+      ]
+    },
+    {
+      "heading": "Windows Admin Center basics",
+      "points": [
+        "Windows Admin Center is the modern, browser-based successor to many MMC snap-ins (Server Manager, Failover Cluster Manager, Disk Management), not a replacement for Active Directory Administrative Center.",
+        "It can run in gateway mode on a server managing many machines, or desktop mode on a Windows 10/11 client managing itself plus others it connects to.",
+        "WAC needs no Azure connection to manage local servers, but can optionally register with Azure for hybrid features like Azure Monitor and Azure Backup integration.",
+        "Extensions add functionality \u2014 for example Storage Migration Service or Azure Arc registration \u2014 beyond the built-in tools."
+      ]
+    },
+    {
+      "heading": "Security & patching",
+      "points": [
+        "Microsoft Defender for Cloud's free tier gives Secure Score and basic recommendations; paid Defender plans (e.g. Defender for Servers) add features like just-in-time VM access and file integrity monitoring.",
+        "Azure Update Manager (successor to Azure Update Management) can patch both Azure VMs and Arc-enabled on-prem/multi-cloud servers from one place.",
+        "WSUS is still the traditional on-prem patch approval/distribution tool \u2014 Update Manager doesn't replace an existing WSUS deployment, it can work alongside or independently of it.",
+        "BitLocker requires a TPM (or a USB startup key as a workaround), and recovery keys should be backed up to AD DS or Entra ID, not left only on the local machine."
+      ]
+    },
+    {
+      "heading": "Exam-day reminders",
+      "points": [
+        "AZ-802 assumes AZ-800-level knowledge \u2014 it now covers what used to be split across AZ-800 (core admin) and AZ-801 (advanced security), after those two exams were retired and consolidated.",
+        "Microsoft certification exams are typically scored 0\u20131000 with 700 required to pass, not a flat percentage.",
+        "Scenario questions often hinge on whether Entra ID/Azure is in scope at all \u2014 the 'right' tool depends on hybrid vs. on-prem-only requirements.",
+        "When two options both technically work, pick the one requiring the least new infrastructure/agents unless the scenario specifically asks for a security-hardening trade-off."
+      ]
+    }
+  ]
+}

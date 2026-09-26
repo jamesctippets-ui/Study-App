@@ -1,0 +1,1446 @@
+{
+  "categories": [
+    {
+      "key": "hl7v2Messaging",
+      "label": "HL7 v2 Messaging",
+      "marks": 25,
+      "resources": [
+        {
+          "label": "HL7 International: HL7 Messaging Standard Version 2.8 product brief",
+          "url": "https://www.hl7.org/implement/standards/product_brief.cfm?product_id=356"
+        }
+      ]
+    },
+    {
+      "key": "fhirModernApis",
+      "label": "FHIR & Modern APIs",
+      "marks": 30,
+      "resources": [
+        {
+          "label": "HL7 FHIR: Overview (FHIR v5.0.0 specification)",
+          "url": "https://hl7.org/fhir/overview.html"
+        },
+        {
+          "label": "HL7 FHIR: HTTP / RESTful API (FHIR v5.0.0 specification)",
+          "url": "https://www.hl7.org/fhir/http.html"
+        }
+      ]
+    },
+    {
+      "key": "integrationEngines",
+      "label": "Integration Engines & Architecture",
+      "marks": 25,
+      "resources": [
+        {
+          "label": "HL7 v2: Implementation Guides (conformance methodology)",
+          "url": "https://v2.hl7.org/conformance/HL7v2_Conformance_Methodology_R1_O1_Ballot_Revised_D9_-_September_2019_HL7_v2_Implementation_Guides.html"
+        }
+      ]
+    },
+    {
+      "key": "dataGovernance",
+      "label": "Healthcare Data Governance & Real-World Practice",
+      "marks": 20,
+      "resources": [
+        {
+          "label": "ONC / HealthIT.gov: HL7 FHIR national interoperability standard",
+          "url": "https://www.healthit.gov/topic/standards-technology/standards/fhir"
+        },
+        {
+          "label": "ONC Interoperability Standards Platform: United States Core Data for Interoperability (USCDI)",
+          "url": "https://isp.healthit.gov/united-states-core-data-interoperability-uscdi"
+        }
+      ]
+    }
+  ],
+  "flashcards": [
+    {
+      "id": "f1",
+      "cat": "hl7v2Messaging",
+      "front": "HL7 v2 message structure: segments and fields",
+      "back": "An HL7 v2 message is a pipe-delimited string made of segments (MSH, PID, PV1, OBX, etc.), each segment a line starting with a three-letter segment ID, and each segment split into pipe-separated fields, with fields further split into components by carets.",
+      "detail": "You rarely need to hand-parse HL7 v2, but knowing that MSH is always the first segment and that fields are ordered helps a lot when reading a raw message dump during troubleshooting."
+    },
+    {
+      "id": "f2",
+      "cat": "hl7v2Messaging",
+      "front": "ADT message type",
+      "back": "ADT (Admit/Discharge/Transfer) messages carry patient demographic and encounter-status events -- admits, discharges, transfers, registration updates -- and are the most common HL7 v2 feed keeping ancillary systems in sync with a patient's current location and status.",
+      "detail": "An ADT^A01 is an admit, A02 is a transfer, and A03 is a discharge; the trigger event code after the caret tells downstream systems exactly what happened."
+    },
+    {
+      "id": "f3",
+      "cat": "hl7v2Messaging",
+      "front": "ORM message type",
+      "back": "ORM (Order) messages communicate a new or updated order -- a lab draw, an imaging study, a medication order -- from an ordering system (often the EHR) to a filler system (like a lab or pharmacy information system).",
+      "detail": "ORM has largely been superseded in newer HL7 v2 versions by more granular order message types split by category, but many production interfaces still use the older ORM structure because it works and replacing it is costly."
+    },
+    {
+      "id": "f4",
+      "cat": "hl7v2Messaging",
+      "front": "ORU message type",
+      "back": "ORU (Observation Result) messages carry results back from a filler system to the ordering system -- lab values, vital signs, transcribed reports -- typically using OBX segments to hold each individual observation value.",
+      "detail": "A single ORU message can contain many OBX segments, one per resulted value, all tied back to the original order through the OBR segment."
+    },
+    {
+      "id": "f5",
+      "cat": "hl7v2Messaging",
+      "front": "SIU message type",
+      "back": "SIU (Scheduling Information Unsolicited) messages notify other systems about scheduling events -- a new appointment, a reschedule, a cancellation -- keeping systems like radiology or a patient portal aware of upcoming visits.",
+      "detail": "SIU messages use trigger events such as S12 (new appointment) and S15 (cancellation), mirroring the same trigger-event pattern used by ADT."
+    },
+    {
+      "id": "f6",
+      "cat": "hl7v2Messaging",
+      "front": "ACK and NAK: how HL7 v2 confirms delivery",
+      "back": "After receiving an HL7 v2 message, a receiving system returns an acknowledgment with a status code -- AA (Application Accept), AE (Application Error), or AR (Application Reject) -- so the sender knows whether the message was accepted, structurally rejected, or triggered a processing error.",
+      "detail": "An AA does not necessarily mean the data was processed correctly end-to-end -- only that the receiving application accepted the message structurally; some failures only surface later in a system's own internal error queue."
+    },
+    {
+      "id": "f7",
+      "cat": "hl7v2Messaging",
+      "front": "Why HL7 v2 has survived for decades",
+      "back": "HL7 v2 became the de facto wire format for hospital interfaces in the 1990s, and its enormous installed base of lab systems, pharmacy systems, monitors, and dictation systems already speaking it creates massive switching costs, so it remains dominant even though it lacks a strict schema and has loose, vendor-varying implementations.",
+      "detail": "The standard leaves so much optional that two vendors' HL7 v2 feeds for the same message type often are not byte-compatible without a translation map -- interoperability efforts increasingly add FHIR on top rather than replacing HL7 v2 outright."
+    },
+    {
+      "id": "f8",
+      "cat": "hl7v2Messaging",
+      "front": "Encoding characters in HL7 v2",
+      "back": "HL7 v2 messages use a small set of special characters defined in the MSH segment itself: the pipe as the field separator, the caret for components, the tilde for repetition, and the ampersand for subcomponents, plus a designated escape character -- so the message literally declares its own delimiters at the start.",
+      "detail": "If a data value contains one of these reserved characters, such as a patient name that includes an ampersand, it must be escaped using the message's own escape sequence, or the message will parse incorrectly."
+    },
+    {
+      "id": "f9",
+      "cat": "fhirModernApis",
+      "front": "What FHIR stands for and its core idea",
+      "back": "FHIR (Fast Healthcare Interoperability Resources) models healthcare data as small, discrete, RESTful resources -- Patient, Observation, Encounter, MedicationRequest -- each with a defined structure, instead of one large monolithic message format.",
+      "detail": "Where HL7 v2 sends one message containing many pieces of data at once, FHIR exposes each concept as its own resource that can be fetched, created, or updated independently over standard HTTP."
+    },
+    {
+      "id": "f10",
+      "cat": "fhirModernApis",
+      "front": "Core FHIR resources worth knowing",
+      "back": "Commonly used FHIR resources include Patient (demographics), Encounter (a visit or stay), Observation (vitals, labs, and other measurements), MedicationRequest (a prescription order), Condition (a diagnosis or problem), and AllergyIntolerance.",
+      "detail": "Resources reference each other -- an Observation typically references the Patient and Encounter it belongs to -- forming a connected graph rather than a flat message."
+    },
+    {
+      "id": "f11",
+      "cat": "fhirModernApis",
+      "front": "FHIR RESTful access pattern",
+      "back": "FHIR defines standard interactions over HTTP: GET to read a resource, POST to create one, PUT to update one, and search operations using query parameters against a resource type's endpoint, with data typically returned as JSON or XML.",
+      "detail": "A request like a GET against the Patient endpoint filtered by family name is a standard FHIR search -- no custom API design is needed once you know the resource types."
+    },
+    {
+      "id": "f12",
+      "cat": "fhirModernApis",
+      "front": "SMART on FHIR app launch",
+      "back": "SMART on FHIR defines a standard OAuth2-based launch sequence that lets a third-party app request an access token scoped to a specific patient and set of FHIR resources, launching either from inside the EHR (EHR launch) or on its own (standalone launch).",
+      "detail": "The launch flow is what lets an app written once be installed into many different EHR systems without custom per-vendor integration work, as long as both sides implement the SMART on FHIR specification."
+    },
+    {
+      "id": "f13",
+      "cat": "fhirModernApis",
+      "front": "OAuth2 scopes in SMART on FHIR",
+      "back": "SMART on FHIR access tokens carry scopes that limit exactly which resource types and operations an app is authorized to use, such as read-only access to a patient's observations or write access to medication orders for a logged-in clinician, following the principle of least privilege.",
+      "detail": "A patient-facing app typically gets patient-scoped read access, while a clinical decision support tool embedded in the EHR might get broader user-scoped access tied to the logged-in clinician."
+    },
+    {
+      "id": "f14",
+      "cat": "fhirModernApis",
+      "front": "US Core and USCDI",
+      "back": "US Core defines FHIR profiles (constraints and required elements) for the data classes in USCDI (United States Core Data for Interoperability), the federally defined minimum data set -- problems, medications, allergies, labs, and more -- that certified health IT must be able to exchange.",
+      "detail": "US Core is the FHIR implementation guide that operationalizes USCDI; a system that is US Core conformant is exposing FHIR resources shaped to meet the federal minimum interoperability requirements."
+    },
+    {
+      "id": "f15",
+      "cat": "fhirModernApis",
+      "front": "Why FHIR adoption grew so quickly",
+      "back": "FHIR adoption accelerated because of a combination of federal interoperability rules requiring patient access APIs, the rise of app-based healthcare ecosystems wanting a modern REST and JSON interface instead of HL7 v2, and FHIR's use of familiar web development patterns that lowered the barrier for non-healthcare developers.",
+      "detail": "US federal information-blocking and patient access API provisions specifically pushed EHR vendors to expose FHIR APIs, not just build them as an optional add-on."
+    },
+    {
+      "id": "f16",
+      "cat": "fhirModernApis",
+      "front": "Patient access APIs",
+      "back": "A patient access API is a FHIR-based API that lets patients (or apps they authorize) retrieve their own health records directly from a provider's or payer's system, typically using SMART on FHIR for authorization.",
+      "detail": "This is distinct from a provider-to-provider or system-to-system integration -- the patient is the one granting the app consent to pull their own data."
+    },
+    {
+      "id": "f17",
+      "cat": "fhirModernApis",
+      "front": "Bulk FHIR vs. individual resource calls",
+      "back": "Bulk FHIR (the export operation) lets a system request a large export of many patients' data as newline-delimited JSON files, intended for population-level use cases like analytics or payer-provider data exchange, instead of looping through thousands of individual per-patient REST calls.",
+      "detail": "Bulk export is asynchronous: the client kicks off the export, polls a status endpoint, and then downloads the resulting files once the export completes."
+    },
+    {
+      "id": "f18",
+      "cat": "fhirModernApis",
+      "front": "FHIR versions in practice",
+      "back": "FHIR has gone through several major versions (DSTU2, STU3, R4, R5), and R4 is the version most widely required by current US interoperability regulations and implementation guides, meaning most production FHIR APIs today are built against R4.",
+      "detail": "Resource names and structures can differ meaningfully between versions, so an integration built against one version's Patient resource is not guaranteed to work unmodified against another version's."
+    },
+    {
+      "id": "f19",
+      "cat": "integrationEngines",
+      "front": "What an integration engine does",
+      "back": "An integration engine (also called an interface engine) sits between clinical systems and handles routing, translation, and delivery of messages -- receiving a message from a source system, transforming its format or content as needed, and routing it to one or more destination systems.",
+      "detail": "Integration engines let hospitals avoid building a custom point-to-point interface between every pair of systems -- each system connects once to the engine, which then fans messages out to whoever needs them."
+    },
+    {
+      "id": "f20",
+      "cat": "integrationEngines",
+      "front": "Inbound vs. outbound interfaces",
+      "back": "An inbound interface receives data into the EHR from another system, such as lab results flowing in from a laboratory information system. An outbound interface sends data out of the EHR to another system, such as an order transmitted to a pharmacy system.",
+      "detail": "The same physical connection between two systems is often described from each side's own point of view -- what one system calls outbound, the receiving system calls inbound."
+    },
+    {
+      "id": "f21",
+      "cat": "integrationEngines",
+      "front": "Epic's HL7 interface engine, commonly called Bridges",
+      "back": "In widely published healthcare IT discussions, Epic's HL7 interface component is commonly referred to as Bridges -- the part of an Epic environment that handles inbound and outbound HL7 v2 message traffic with external systems like lab, pharmacy, and monitoring devices.",
+      "detail": "This is discussed here only at the level of general, publicly available healthcare-IT terminology -- not as a reproduction of any vendor's proprietary internal training or certification material."
+    },
+    {
+      "id": "f22",
+      "cat": "integrationEngines",
+      "front": "Epic's web-services layer, commonly called Interconnect",
+      "back": "In publicly discussed terms, Epic's web-services and API gateway component is commonly referred to as Interconnect -- the layer that exposes FHIR and other web-service-based access into an Epic environment for external applications, rather than the older HL7 v2 message-based path.",
+      "detail": "Interconnect-style components illustrate the generic pattern behind how modern SMART on FHIR apps reach a large EHR's underlying data without needing an HL7 v2 feed."
+    },
+    {
+      "id": "f23",
+      "cat": "integrationEngines",
+      "front": "Interface testing basics",
+      "back": "Testing a clinical interface generally means validating message structure against the expected specification, confirming required fields are populated correctly, and running sample messages through a non-production environment before ever touching a live interface serving real patient care.",
+      "detail": "A change that looks trivial, like adding one new field, can still break a downstream system's parser if that system was not built to tolerate unexpected segments or fields -- hence testing in a non-production environment first."
+    },
+    {
+      "id": "f24",
+      "cat": "integrationEngines",
+      "front": "Interface monitoring: what to watch for",
+      "back": "Ongoing interface monitoring typically tracks message volume against expected baselines, queue depth (messages waiting to be processed), and acknowledgment status, so a stalled or backed-up interface is caught quickly rather than discovered later when someone notices missing data.",
+      "detail": "A sudden drop in message volume is often a more urgent warning sign than an obvious error message, since a silently failed connection can simply stop sending anything at all."
+    },
+    {
+      "id": "f25",
+      "cat": "integrationEngines",
+      "front": "Common interface failure mode: queue backups",
+      "back": "A message queue backup happens when a receiving system or the engine itself cannot process incoming messages as fast as they arrive, causing a growing backlog that delays data delivery and can eventually exhaust storage or memory if not addressed.",
+      "detail": "Queue backups are often caused by a downstream system going down or slowing dramatically, not by the engine itself failing -- the messages have nowhere to go, so they pile up at the last healthy point in the pipeline."
+    },
+    {
+      "id": "f26",
+      "cat": "integrationEngines",
+      "front": "Common interface failure mode: ACK timeouts and schema mismatches",
+      "back": "An ACK timeout occurs when a sending system does not receive an acknowledgment within its expected window and may retry or flag the message as failed; a schema mismatch occurs when a message's actual structure does not match what the receiving system's parser expects, often after one side changes its message format without coordinating the change.",
+      "detail": "Schema mismatches are a classic result of an upgrade on one side of an interface that was not tested against the other side first -- which is why change control and coordinated testing matter so much for live interfaces."
+    },
+    {
+      "id": "f27",
+      "cat": "dataGovernance",
+      "front": "Master Patient Index (MPI)",
+      "back": "A Master Patient Index maintains a single, deduplicated identity record per patient across multiple systems, using matching algorithms on demographics (name, date of birth, sex, address, identifiers) to link records that represent the same real person even when each system assigns its own internal patient ID.",
+      "detail": "Poor patient matching can cause two dangerous outcomes: records for the same patient split across multiple IDs (a fragmented history), or records for two different patients incorrectly merged into one (an overlay error) -- both are patient safety risks."
+    },
+    {
+      "id": "f28",
+      "cat": "dataGovernance",
+      "front": "HIPAA considerations for data in transit vs. at rest",
+      "back": "Data in transit (moving across an interface between systems) should be encrypted using protocols like TLS. Data at rest (stored in a database or file system) should also be encrypted at the storage layer, though HIPAA's Security Rule technically lists at-rest encryption as an \"addressable\" implementation specification rather than a flat mandate -- in practice, nearly every hospital treats it as required and documents a specific reason on the rare occasion it is not used.",
+      "detail": "An interface that encrypts a connection but then writes unencrypted log files full of patient data has only addressed the in-transit half of the requirement."
+    },
+    {
+      "id": "f29",
+      "cat": "dataGovernance",
+      "front": "Why production interfaces need maintenance windows",
+      "back": "Editing a live production interface without a scheduled maintenance window risks silently dropping or corrupting real patient data mid-transaction, so interface changes are typically planned, tested in a non-production environment, and deployed during a defined window with a rollback plan ready.",
+      "detail": "A maintenance window is not just etiquette -- it is a deliberate period where the risk of a change is contained and communicated, rather than something patient care staff discover through unexplained data problems."
+    },
+    {
+      "id": "f30",
+      "cat": "dataGovernance",
+      "front": "Change control for clinical interfaces",
+      "back": "Change control for a live hospital interface generally requires documented approval, a tested change in a non-production environment, a defined rollback plan, and coordination with any teams or vendors on the other end of the interface, before the change goes live.",
+      "detail": "Because interfaces sit between two or more systems that may be owned by different teams or vendors, uncoordinated changes on just one side are a leading cause of interface outages."
+    },
+    {
+      "id": "f31",
+      "cat": "dataGovernance",
+      "front": "Care Everywhere, described generically as a health information exchange pattern",
+      "back": "In publicly discussed terms, Care Everywhere is commonly described as Epic's cross-organization health information exchange feature, letting separate Epic (and, through broader networks, non-Epic) instances query and retrieve records for a shared patient across organizational boundaries based on an existing treatment relationship.",
+      "detail": "This reflects a general pattern used across the industry -- cross-organization exchange networks -- described here only at the level of publicly available, general healthcare-IT terminology."
+    },
+    {
+      "id": "f32",
+      "cat": "dataGovernance",
+      "front": "On-call realities of interface engineering",
+      "back": "Interface engineering teams typically carry on-call rotations because a broken interface, such as a failed results feed, can directly affect patient care within hours, so alerting, clear escalation paths, and runbooks for common failure modes are standard parts of the role.",
+      "detail": "A results interface going down silently overnight is a classic on-call scenario -- clinicians may not immediately notice missing results, which is why proactive monitoring and alerting matter as much as having someone on call to respond."
+    },
+    {
+      "id": "f33",
+      "cat": "hl7v2Messaging",
+      "front": "DFT message type",
+      "back": "A Detailed Financial Transaction message, carrying billing-relevant charge or credit events (like a procedure charge) from a clinical or ancillary system into the billing/financial system, rather than clinical results or orders.",
+      "detail": "Alongside the ADT message type, ORM message type, and ORU message type, DFT rounds out the small set of message types that account for most day-to-day interface traffic in a hospital."
+    },
+    {
+      "id": "f34",
+      "cat": "fhirModernApis",
+      "front": "Continuity of Care Document (CCD/CCDA)",
+      "back": "A structured XML document standard (part of the C-CDA family) summarizing a patient's health information \u2014 problems, medications, allergies, results \u2014 exchanged as a complete document rather than queried resource-by-resource the way FHIR RESTful access pattern works.",
+      "detail": "CCDA and FHIR solve overlapping problems differently: CCDA hands over a whole summary document at a point in time, while FHIR lets a consumer query for just the specific resources it actually needs."
+    },
+    {
+      "id": "f35",
+      "cat": "hl7v2Messaging",
+      "front": "MLLP (Minimal Lower Layer Protocol)",
+      "back": "The lightweight TCP/IP transport wrapper most HL7 v2 interfaces actually travel over \u2014 start and end block characters framing the message so the receiving system knows exactly where one HL7 v2 message ends and the next begins on the same connection.",
+      "detail": "MLLP is just the envelope; it says nothing about the message's content \u2014 the ADT message type, ORM message type, and similar types still describe what's actually inside that envelope."
+    },
+    {
+      "id": "f36",
+      "cat": "fhirModernApis",
+      "front": "FHIR Subscriptions",
+      "back": "A FHIR resource that lets a client register interest in a change (like a new lab result) and receive a notification when it happens, instead of repeatedly polling the FHIR RESTful access pattern to check for updates.",
+      "detail": "This is FHIR's answer to the same real-time-notification need that ACK and NAK: how HL7 v2 confirms delivery addresses for message-based interfaces, just adapted to a resource-and-webhook model instead of a persistent connection."
+    },
+    {
+      "id": "f37",
+      "cat": "dataGovernance",
+      "front": "Health Information Exchange (HIE)",
+      "back": "A broader, often region- or state-level network that lets participating healthcare organizations share patient records with each other, regardless of which EHR vendor each one runs \u2014 a more vendor-neutral counterpart to a single vendor's own cross-organization exchange feature.",
+      "detail": "Care Everywhere, described generically as a health information exchange pattern is one vendor's version of this same underlying idea, built into its own ecosystem rather than acting as a neutral, vendor-agnostic network."
+    },
+    {
+      "id": "f38",
+      "cat": "hl7v2Messaging",
+      "front": "HL7 v2 version evolution (2.1 through 2.9)",
+      "back": "HL7 v2 has evolved through many point releases (2.1, 2.2, 2.3, 2.3.1, 2.4, 2.5, 2.5.1, 2.6, 2.7, 2.8, 2.9...) designed to be largely backward compatible: newer versions mostly add new optional segments, fields, and trigger events rather than removing or renumbering existing ones, so a message built against an older version can often still be read by a system built against a later one.",
+      "detail": "In practice, most production interfaces still declare an older version like 2.3 or 2.5.1 in the MSH segment because that's what got implemented years ago, and nobody wants to risk breaking a stable feed just to bump the declared version number."
+    },
+    {
+      "id": "f39",
+      "cat": "hl7v2Messaging",
+      "front": "NTE segment",
+      "back": "NTE (Notes and Comments) is a free-text segment that attaches a comment to the segment immediately preceding it in the message -- for example, an NTE following an OBX can carry a lab's interpretive comment about that specific result, or an NTE following an ORC/OBR can carry an order-level note.",
+      "detail": "Because NTE content is unstructured free text, it's easy for a receiving system to display it to a human but hard to act on programmatically -- a classic case of information reaching a reader but not reliably reaching downstream logic."
+    },
+    {
+      "id": "f40",
+      "cat": "hl7v2Messaging",
+      "front": "Z-segments (custom segments)",
+      "back": "A Z-segment is any segment whose ID starts with the letter Z, reserved by the HL7 v2 standard specifically for site-specific or vendor-specific extensions that aren't covered by a standard segment -- letting an organization carry local data, like an internal cost-center code, without violating the base specification.",
+      "detail": "Z-segments are exactly the kind of thing that breaks portability: a mapping built around one hospital's custom Z-segment will mean nothing to a different hospital's interface engine, so they should be documented carefully and used sparingly."
+    },
+    {
+      "id": "f41",
+      "cat": "hl7v2Messaging",
+      "front": "Batch and file-based HL7 v2 transport",
+      "back": "Beyond real-time MLLP-over-TCP delivery, HL7 v2 also defines a batch file format that wraps multiple messages inside BHS/BTS (and often an outer FHS/FTS) header and trailer segment pair, used for periodic bulk transfers -- like an end-of-day file of charge transactions -- rather than one-at-a-time live delivery.",
+      "detail": "A batch file arriving late or corrupted is a very different failure mode than a live MLLP connection dropping -- monitoring needs to watch for both a missing scheduled file and a stalled live socket."
+    },
+    {
+      "id": "f42",
+      "cat": "fhirModernApis",
+      "front": "FHIR references between resources",
+      "back": "A FHIR resource points to another resource through a reference field holding a relative or absolute URL, such as an Observation's subject field containing 'Patient/123' -- letting a client follow the link to fetch the full referenced resource instead of that data being duplicated inline.",
+      "detail": "A reference can also be resolved inline by including the referenced resource directly in a Bundle (via the _include search parameter), avoiding a second round-trip call when a client already knows it will need both resources."
+    },
+    {
+      "id": "f43",
+      "cat": "fhirModernApis",
+      "front": "FHIR search parameters and modifiers",
+      "back": "FHIR search parameters are named query parameters defined per resource type (like Patient's 'name', 'birthdate', or 'identifier'), and can be refined with modifiers (like ':exact' or ':contains') or extended into chained searches that filter on a field of a referenced resource, such as finding Observations by their subject's name.",
+      "detail": "Not every server implements every optional search parameter or modifier -- a CapabilityStatement is exactly where a client checks which ones a given server actually supports before relying on them."
+    },
+    {
+      "id": "f44",
+      "cat": "fhirModernApis",
+      "front": "FHIR Bundle types",
+      "back": "A Bundle is itself a FHIR resource that packages a set of other resources together, and its 'type' field determines what that packaging means -- a searchset bundle holds the results of a query, a transaction or batch bundle holds a set of operations to execute, and a document bundle holds a fixed, signed clinical document.",
+      "detail": "A transaction bundle is expected to succeed or fail as a whole, while a batch bundle processes each entry independently -- mixing up the two can produce very different behavior when one entry in the set fails."
+    },
+    {
+      "id": "f45",
+      "cat": "fhirModernApis",
+      "front": "FHIR extensions",
+      "back": "An extension lets an implementer represent a data element that isn't part of a resource's base structure, using a URL that uniquely identifies the extension's meaning and structure, without requiring any change to the core FHIR specification itself.",
+      "detail": "Because extensions are identified by URL rather than a fixed field name, two systems must agree on (or both implement) the same extension definition for the data to actually be understood the same way on both ends -- an extension alone doesn't guarantee interoperability."
+    },
+    {
+      "id": "f46",
+      "cat": "fhirModernApis",
+      "front": "CapabilityStatement",
+      "back": "A CapabilityStatement is the FHIR resource a server publishes to describe exactly what it supports -- which resource types, which RESTful interactions (read, search, create...), which search parameters, and which FHIR version -- letting a client discover a server's capabilities before writing integration code against it.",
+      "detail": "Two servers both claiming to be 'FHIR R4 compliant' can still support very different subsets of optional functionality -- checking the CapabilityStatement rather than assuming feature parity avoids painful surprises during integration."
+    },
+    {
+      "id": "f47",
+      "cat": "integrationEngines",
+      "front": "Message transformation and mapping",
+      "back": "Transformation (or mapping) is the step where an integration engine converts a message's structure or content from the sending system's dialect to the format the receiving system expects -- renaming fields, restructuring segments, translating coded values, or converting between standards like HL7 v2 and FHIR -- using engine-specific mapping rules or scripts.",
+      "detail": "Mapping logic is usually the single most fragile part of an interface, because it encodes assumptions about both systems' quirks -- a source system silently changing a coded value's meaning can break a mapping that looked syntactically fine."
+    },
+    {
+      "id": "f48",
+      "cat": "integrationEngines",
+      "front": "Dead-letter queue pattern",
+      "back": "A dead-letter queue is a separate holding location where an integration engine routes a message that has repeatedly failed delivery or processing after exhausting its retry attempts, instead of retrying forever or silently dropping it -- keeping the failed message available for manual review and reprocessing.",
+      "detail": "A dead-letter queue that nobody monitors is barely better than dropping the message outright -- the pattern only pays off when someone actually reviews and acts on what lands there."
+    },
+    {
+      "id": "f49",
+      "cat": "integrationEngines",
+      "front": "Hub-and-spoke integration topology",
+      "back": "In a hub-and-spoke topology, every clinical system connects once to a central integration engine (the hub), which then routes and transforms messages to whichever other systems (the spokes) need them -- replacing the alternative of building a dedicated point-to-point connection between every pair of systems that need to talk.",
+      "detail": "The tradeoff is concentration of risk: hub-and-spoke dramatically reduces the number of connections to build and maintain, but it also means the central engine becoming unavailable can simultaneously affect every interface that depends on it."
+    },
+    {
+      "id": "f50",
+      "cat": "integrationEngines",
+      "front": "Synthetic (canary) test messages for interface monitoring",
+      "back": "A synthetic or canary test message is a harmless, artificial message periodically sent all the way through a live interface path specifically to confirm end-to-end delivery is still working, rather than waiting to notice that a real clinical message failed to arrive.",
+      "detail": "Canary messages catch a class of failure that simple queue-depth or volume monitoring can miss -- a connection that looks 'up' but is silently dropping or corrupting messages in a way that doesn't show up as an obvious error."
+    },
+    {
+      "id": "f51",
+      "cat": "dataGovernance",
+      "front": "De-identification: Safe Harbor vs. Expert Determination",
+      "back": "HIPAA defines two accepted methods for de-identifying health data: the Safe Harbor method, which requires removing or generalizing a specific list of 18 identifier types (names, dates tied to an individual, geographic subdivisions smaller than a state, and more), and the Expert Determination method, where a qualified statistician formally certifies that the risk of re-identifying an individual from the remaining data is very small.",
+      "detail": "Safe Harbor is more mechanical and easier to audit, while Expert Determination can retain more analytically useful detail (like a more precise date) at the cost of needing a documented statistical justification."
+    },
+    {
+      "id": "f52",
+      "cat": "dataGovernance",
+      "front": "Consent models: opt-in, opt-out, and 42 CFR Part 2",
+      "back": "Patient consent for sharing health data varies by context: many general treatment-related exchanges rely on an opt-out model (data flows unless the patient objects), while certain especially sensitive categories -- like substance use disorder treatment records protected under 42 CFR Part 2 -- require explicit, granular opt-in consent that is more restrictive than standard HIPAA treatment-based disclosure rules.",
+      "detail": "An interface or HIE that doesn't specifically account for 42 CFR Part 2 data can end up disclosing substance-use treatment information under a general treatment consent that legally isn't sufficient for that category of data -- a common real-world compliance gap."
+    },
+    {
+      "id": "f53",
+      "cat": "dataGovernance",
+      "front": "Data quality dimensions in healthcare interfaces",
+      "back": "Data quality is commonly assessed across dimensions like completeness (are required fields populated), accuracy (does the value reflect reality), timeliness (does the data arrive when it's needed), and consistency (does the same concept get represented the same way across systems) -- and a broken or poorly mapped interface can degrade any of these even when the source data was originally correct.",
+      "detail": "A field can pass every technical validation check (right data type, right length) and still be a data-quality failure -- for example, a mapping that silently drops a coded value into the wrong terminology system passes structural validation but produces clinically wrong data downstream."
+    }
+  ],
+  "questions": [
+    {
+      "id": "q1",
+      "cat": "hl7v2Messaging",
+      "type": "mc",
+      "question": "In HL7 v2, which segment always appears first in a message and contains routing and metadata information such as sending and receiving application?",
+      "options": [
+        "PID",
+        "MSH",
+        "PV1",
+        "OBX"
+      ],
+      "correct": 1,
+      "explanation": "MSH (Message Header) is always the first segment in an HL7 v2 message and defines encoding characters, sending/receiving application, message type, and other routing metadata."
+    },
+    {
+      "id": "q2",
+      "cat": "hl7v2Messaging",
+      "type": "mc",
+      "question": "Which HL7 v2 message type is triggered by a patient admission, discharge, or transfer event?",
+      "options": [
+        "ORU",
+        "SIU",
+        "ADT",
+        "ORM"
+      ],
+      "correct": 2,
+      "explanation": "ADT (Admit/Discharge/Transfer) messages carry patient demographic and encounter-status events like admits, discharges, and transfers."
+    },
+    {
+      "id": "q3",
+      "cat": "hl7v2Messaging",
+      "type": "mc",
+      "question": "An ORU message is primarily used to communicate which of the following?",
+      "options": [
+        "A new medication order",
+        "A scheduling change for an appointment",
+        "A patient's insurance eligibility status",
+        "Observation and result values sent back to the ordering system"
+      ],
+      "correct": 3,
+      "explanation": "ORU (Observation Result) messages carry results, such as lab values or vitals, back to the system that originally placed the order."
+    },
+    {
+      "id": "q4",
+      "cat": "hl7v2Messaging",
+      "type": "mc",
+      "question": "In an HL7 v2 acknowledgment, what does a status code of AE typically indicate?",
+      "options": [
+        "The receiving application encountered an error processing the message",
+        "The message was accepted with no issues",
+        "The message was rejected for a formatting reason",
+        "The message was queued for later delivery"
+      ],
+      "correct": 0,
+      "explanation": "AE stands for Application Error, meaning the receiving application accepted the message structurally but hit an error while processing it."
+    },
+    {
+      "id": "q5",
+      "cat": "hl7v2Messaging",
+      "type": "mc",
+      "question": "Which of the following best explains why many hospitals still rely heavily on HL7 v2 despite newer standards existing?",
+      "options": [
+        "HL7 v2 is federally mandated for all new interfaces",
+        "HL7 v2 uses JSON, making it easier for developers",
+        "HL7 v2 replaced FHIR in most recent implementation guides",
+        "The existing installed base of systems already speaking HL7 v2 creates high switching costs"
+      ],
+      "correct": 3,
+      "explanation": "HL7 v2's enormous installed base of lab systems, pharmacy systems, monitors, and other devices already using it creates high switching costs, keeping it the dominant point-to-point messaging format."
+    },
+    {
+      "id": "q6",
+      "cat": "hl7v2Messaging",
+      "type": "mc",
+      "question": "In an HL7 v2 message, what is the role of the caret (^) character?",
+      "options": [
+        "It separates entire segments from each other",
+        "It marks the end of the message",
+        "It separates components within a single field",
+        "It is used only in the MSH segment"
+      ],
+      "correct": 2,
+      "explanation": "The caret separates components within a single field, for example splitting a name field into family and given name components."
+    },
+    {
+      "id": "q7",
+      "cat": "hl7v2Messaging",
+      "type": "mc",
+      "question": "An SIU message with trigger event S12 most likely represents which event?",
+      "options": [
+        "A new appointment being scheduled",
+        "A cancelled appointment",
+        "A patient being discharged",
+        "A new lab result"
+      ],
+      "correct": 0,
+      "explanation": "SIU^S12 represents a new appointment notification, while other trigger events like S15 represent cancellations."
+    },
+    {
+      "id": "q8",
+      "cat": "fhirModernApis",
+      "type": "mc",
+      "question": "What does FHIR stand for?",
+      "options": [
+        "Fast Healthcare Interoperability Resources",
+        "Federal Health Information Records",
+        "Flexible Hospital Information Registry",
+        "Framework for Health Interchange Rules"
+      ],
+      "correct": 0,
+      "explanation": "FHIR stands for Fast Healthcare Interoperability Resources, a standard that models healthcare data as discrete, RESTful resources."
+    },
+    {
+      "id": "q9",
+      "cat": "fhirModernApis",
+      "type": "mc",
+      "question": "Which of the following is a core FHIR resource used to represent a single lab value or vital sign measurement?",
+      "options": [
+        "Condition",
+        "Coverage",
+        "Observation",
+        "Encounter"
+      ],
+      "correct": 2,
+      "explanation": "Observation is the FHIR resource used to represent individual measurements such as lab values, vital signs, and other clinical findings."
+    },
+    {
+      "id": "q10",
+      "cat": "fhirModernApis",
+      "type": "mc",
+      "question": "In the FHIR RESTful API model, which HTTP method is used to create a new resource instance?",
+      "options": [
+        "GET",
+        "DELETE",
+        "POST",
+        "HEAD"
+      ],
+      "correct": 2,
+      "explanation": "POST is the standard HTTP method for creating a new FHIR resource instance on a server."
+    },
+    {
+      "id": "q11",
+      "cat": "fhirModernApis",
+      "type": "mc",
+      "question": "SMART on FHIR primarily standardizes which of the following?",
+      "options": [
+        "The physical network topology of a hospital",
+        "The billing codes used in claims data",
+        "The internal database schema an EHR must use",
+        "An OAuth2-based app launch and authorization flow for accessing FHIR data"
+      ],
+      "correct": 3,
+      "explanation": "SMART on FHIR defines a standard OAuth2-based launch and authorization sequence so third-party apps can access FHIR data consistently across different EHR systems."
+    },
+    {
+      "id": "q12",
+      "cat": "fhirModernApis",
+      "type": "mc",
+      "question": "US Core profiles are best described as which of the following?",
+      "options": [
+        "A proprietary Epic-only data format",
+        "FHIR profiles that constrain resources to meet USCDI data class requirements",
+        "An HL7 v2 message type",
+        "A replacement for the FHIR specification itself"
+      ],
+      "correct": 1,
+      "explanation": "US Core profiles are FHIR implementation guide constraints built to operationalize USCDI, the federally defined minimum interoperable data set."
+    },
+    {
+      "id": "q13",
+      "cat": "fhirModernApis",
+      "type": "mc",
+      "question": "Which factor most directly drove rapid FHIR adoption in the US healthcare system in recent years?",
+      "options": [
+        "FHIR eliminating the need for any authentication",
+        "Hospitals being required to abandon HL7 v2 entirely",
+        "Federal interoperability and patient access API requirements",
+        "FHIR being simpler to bill for than HL7 v2"
+      ],
+      "correct": 2,
+      "explanation": "Federal information-blocking rules and patient access API mandates directly pushed EHR vendors to expose FHIR APIs, accelerating adoption."
+    },
+    {
+      "id": "q14",
+      "cat": "fhirModernApis",
+      "type": "mc",
+      "question": "A patient access API, as typically implemented today, is best described as which of the following?",
+      "options": [
+        "An internal-only API used solely between hospital departments",
+        "A billing clearinghouse connection",
+        "A HL7 v2 feed sent nightly to a state registry",
+        "A FHIR-based API letting a patient-authorized app retrieve that patient's own records"
+      ],
+      "correct": 3,
+      "explanation": "A patient access API is typically a FHIR-based API, authorized through SMART on FHIR, that lets a patient's own app retrieve their records."
+    },
+    {
+      "id": "q15",
+      "cat": "fhirModernApis",
+      "type": "mc",
+      "question": "What is the primary purpose of Bulk FHIR (the export operation)?",
+      "options": [
+        "Replacing the need for OAuth2 authorization",
+        "Efficiently exporting data for many patients at once for population-level use cases",
+        "Sending real-time alerts for critical lab values",
+        "Encrypting individual patient records at rest"
+      ],
+      "correct": 1,
+      "explanation": "Bulk FHIR export is designed for population-level use cases, letting a system export many patients' data at once instead of making thousands of individual calls."
+    },
+    {
+      "id": "q16",
+      "cat": "integrationEngines",
+      "type": "mc",
+      "question": "What is the primary function of an integration engine in a hospital IT environment?",
+      "options": [
+        "Storing the permanent legal medical record for each patient",
+        "Routing, transforming, and delivering messages between clinical systems",
+        "Providing scheduling for physician clinic hours",
+        "Encrypting hard drives on clinical workstations"
+      ],
+      "correct": 1,
+      "explanation": "An integration engine centralizes the routing, transformation, and delivery of messages between clinical systems, rather than storing records or handling scheduling itself."
+    },
+    {
+      "id": "q17",
+      "cat": "integrationEngines",
+      "type": "mc",
+      "question": "An interface described as outbound from the EHR's perspective would most likely represent which of the following?",
+      "options": [
+        "Lab results arriving into the EHR",
+        "A patient logging into a portal",
+        "A nurse charting vitals directly in the EHR",
+        "An order sent from the EHR out to a pharmacy system"
+      ],
+      "correct": 3,
+      "explanation": "An outbound interface sends data out of the EHR to another system, such as transmitting an order to a pharmacy system."
+    },
+    {
+      "id": "q18",
+      "cat": "integrationEngines",
+      "type": "mc",
+      "question": "In publicly discussed terms, Epic's HL7 interface component, commonly called Bridges, is primarily responsible for which of the following?",
+      "options": [
+        "Handling inbound and outbound HL7 v2 message traffic with external systems",
+        "Rendering the EHR's clinical documentation screens",
+        "Managing user login credentials",
+        "Calculating clinical decision support risk scores"
+      ],
+      "correct": 0,
+      "explanation": "In generic, publicly discussed terms, this component handles HL7 v2 message traffic flowing into and out of the EHR environment."
+    },
+    {
+      "id": "q19",
+      "cat": "integrationEngines",
+      "type": "mc",
+      "question": "Which of the following is a classic early warning sign of a message queue backup on an interface?",
+      "options": [
+        "Message volume steadily matching its normal baseline",
+        "An increase in successfully delivered acknowledgments",
+        "A growing backlog of unprocessed messages waiting at the engine or receiving system",
+        "A decrease in the number of configured interfaces"
+      ],
+      "correct": 2,
+      "explanation": "A growing backlog of unprocessed messages is the defining symptom of a queue backup, usually caused by a downstream system slowing down or failing."
+    },
+    {
+      "id": "q20",
+      "cat": "integrationEngines",
+      "type": "mc",
+      "question": "A schema mismatch on a live interface most commonly results from which of the following?",
+      "options": [
+        "One side of the interface changing its message format without coordinating with the other side",
+        "Two systems using the exact same message version with no changes",
+        "A scheduled maintenance window being properly announced",
+        "An interface engine being taken offline intentionally for testing"
+      ],
+      "correct": 0,
+      "explanation": "Schema mismatches typically happen when one side of an interface changes its message structure without coordinating and testing against the other side first."
+    },
+    {
+      "id": "q21",
+      "cat": "integrationEngines",
+      "type": "mc",
+      "question": "Before deploying a change to a live clinical interface, which practice is standard?",
+      "options": [
+        "Making the change directly in production to save time",
+        "Skipping testing if the change looks small",
+        "Notifying no one, since interfaces are self-healing",
+        "Testing the change in a non-production environment first"
+      ],
+      "correct": 3,
+      "explanation": "Standard practice is to test interface changes in a non-production environment before deploying to a live, patient-facing interface."
+    },
+    {
+      "id": "q22",
+      "cat": "dataGovernance",
+      "type": "mc",
+      "question": "What is the primary purpose of a Master Patient Index (MPI)?",
+      "options": [
+        "Storing insurance claims data only",
+        "Maintaining a single deduplicated identity record per patient across systems",
+        "Encrypting HL7 v2 messages in transit",
+        "Scheduling appointments across departments"
+      ],
+      "correct": 1,
+      "explanation": "An MPI links records representing the same patient across multiple systems into a single, deduplicated identity record."
+    },
+    {
+      "id": "q23",
+      "cat": "dataGovernance",
+      "type": "mc",
+      "question": "Which of the following describes a dangerous overlay error in patient matching?",
+      "options": [
+        "A patient's record is correctly linked across two systems",
+        "A patient's record is never created in any system",
+        "Records for two different patients are incorrectly merged into one",
+        "A patient's appointment is rescheduled without notice"
+      ],
+      "correct": 2,
+      "explanation": "An overlay error occurs when records for two different patients are incorrectly merged into a single identity, a serious patient safety risk."
+    },
+    {
+      "id": "q24",
+      "cat": "dataGovernance",
+      "type": "mc",
+      "question": "For HIPAA purposes, encrypting data in transit primarily protects against which risk?",
+      "options": [
+        "Interception of data as it moves across a network connection between systems",
+        "Someone gaining physical access to a decommissioned hard drive",
+        "A clinician forgetting to log out of a workstation",
+        "A misconfigured printer in a nursing unit"
+      ],
+      "correct": 0,
+      "explanation": "Encrypting data in transit, such as with TLS, protects against interception while data moves across a network connection between systems."
+    },
+    {
+      "id": "q25",
+      "cat": "dataGovernance",
+      "type": "mc",
+      "question": "Why do hospital interface teams generally require a maintenance window before changing a live production interface?",
+      "options": [
+        "Maintenance windows are only a scheduling courtesy with no technical purpose",
+        "Live interfaces cannot technically be changed at all",
+        "Regulations prohibit any interface changes on weekdays",
+        "To contain and communicate the risk of a change that could otherwise silently drop or corrupt real patient data"
+      ],
+      "correct": 3,
+      "explanation": "A maintenance window contains and communicates the risk of a change, since an untested change to a live interface can silently drop or corrupt real patient data."
+    },
+    {
+      "id": "q26",
+      "cat": "dataGovernance",
+      "type": "mc",
+      "question": "In publicly discussed terms, Care Everywhere is generally described as which kind of capability?",
+      "options": [
+        "A billing reconciliation tool",
+        "A cross-organization health information exchange pattern for sharing patient records",
+        "A network security firewall product",
+        "An internal EHR password reset tool"
+      ],
+      "correct": 1,
+      "explanation": "In generic, publicly discussed terms, this describes a cross-organization health information exchange pattern for sharing records tied to a patient's treatment relationship."
+    },
+    {
+      "id": "tf1",
+      "cat": "hl7v2Messaging",
+      "type": "tf",
+      "question": "HL7 v2 messages are self-describing in the sense that the MSH segment itself defines the field and component delimiter characters used throughout the rest of the message.",
+      "answer": true,
+      "explanation": "The MSH segment's early fields specify the encoding characters (field separator, component separator, repetition separator, and escape character), so the message declares its own punctuation up front."
+    },
+    {
+      "id": "tf2",
+      "cat": "hl7v2Messaging",
+      "type": "tf",
+      "question": "An acknowledgment with status code AA means the receiving system has fully processed the clinical data with no possibility of downstream errors.",
+      "answer": false,
+      "explanation": "AA (Application Accept) only confirms the message was structurally accepted by the receiving application; it does not guarantee later internal processing will not fail."
+    },
+    {
+      "id": "tf3",
+      "cat": "hl7v2Messaging",
+      "type": "tf",
+      "question": "ORM and its more granular successor message types are all HL7 v2 message types used to communicate orders.",
+      "answer": true,
+      "explanation": "Later HL7 v2 versions broke the general ORM order message into more specific types by order category, but all of them still serve the general order-communication purpose."
+    },
+    {
+      "id": "tf4",
+      "cat": "fhirModernApis",
+      "type": "tf",
+      "question": "In FHIR, all resources are entirely independent and never reference one another.",
+      "answer": false,
+      "explanation": "FHIR resources routinely reference each other -- for example, an Observation typically references the Patient and Encounter it is associated with -- forming a connected data graph."
+    },
+    {
+      "id": "tf5",
+      "cat": "fhirModernApis",
+      "type": "tf",
+      "question": "SMART on FHIR relies on OAuth2 to scope and authorize what data an app is allowed to access.",
+      "answer": true,
+      "explanation": "SMART on FHIR is built directly on top of the OAuth2 authorization framework, adding healthcare-specific launch context and scopes."
+    },
+    {
+      "id": "tf6",
+      "cat": "fhirModernApis",
+      "type": "tf",
+      "question": "US Core profiles exist independently of USCDI and have no relationship to federally defined data classes.",
+      "answer": false,
+      "explanation": "US Core profiles are specifically built to operationalize the USCDI data classes as FHIR resources with the required elements federal rules call for."
+    },
+    {
+      "id": "tf7",
+      "cat": "integrationEngines",
+      "type": "tf",
+      "question": "An integration engine's main purpose is to eliminate the need for any interface between two clinical systems.",
+      "answer": false,
+      "explanation": "An integration engine does not eliminate interfaces -- it centralizes the routing, transformation, and delivery of messages so each system only needs to connect to the engine once instead of to every other system directly."
+    },
+    {
+      "id": "tf8",
+      "cat": "integrationEngines",
+      "type": "tf",
+      "question": "A sudden, unexplained drop in message volume on a monitored interface can be just as serious a warning sign as an outright error message.",
+      "answer": true,
+      "explanation": "A silently failed connection can simply stop sending messages altogether, so volume monitoring against an expected baseline catches failures that would not otherwise raise an explicit error."
+    },
+    {
+      "id": "tf9",
+      "cat": "dataGovernance",
+      "type": "tf",
+      "question": "It is considered acceptable practice to make an untested change directly to a live production clinical interface if the change appears small.",
+      "answer": false,
+      "explanation": "Even small-looking changes can break a downstream system's parsing logic; standard practice is to test in a non-production environment and deploy during a planned maintenance window regardless of how minor the change appears."
+    },
+    {
+      "id": "tf10",
+      "cat": "dataGovernance",
+      "type": "tf",
+      "question": "A Master Patient Index helps prevent both fragmented patient records and dangerous overlay (incorrect merge) errors by matching identity across systems.",
+      "answer": true,
+      "explanation": "By using matching algorithms on demographic and identifier data, an MPI works to keep one patient's data properly linked under one identity without incorrectly merging two different patients together."
+    },
+    {
+      "id": "msq1",
+      "cat": "hl7v2Messaging",
+      "type": "ms",
+      "question": "Which of the following are valid HL7 v2 message types? (Select all that apply)",
+      "options": [
+        "ADT",
+        "FHIR",
+        "ORU",
+        "SIU"
+      ],
+      "correct": [
+        0,
+        2,
+        3
+      ],
+      "explanation": "ADT, ORU, and SIU are all standard HL7 v2 message types; FHIR is an entirely separate, newer interoperability standard, not an HL7 v2 message type."
+    },
+    {
+      "id": "msq2",
+      "cat": "hl7v2Messaging",
+      "type": "ms",
+      "question": "Which of the following are true about HL7 v2 acknowledgments? (Select all that apply)",
+      "options": [
+        "AA generally indicates application-level acceptance",
+        "AE generally indicates an application error occurred",
+        "Acknowledgments are optional and never sent in production interfaces",
+        "A negative acknowledgment tells the sender the message was not accepted"
+      ],
+      "correct": [
+        0,
+        1,
+        3
+      ],
+      "explanation": "AA and AE are real acknowledgment status codes and a negative acknowledgment does signal non-acceptance; acknowledgments are a standard, expected part of production HL7 v2 interfaces, not something skipped."
+    },
+    {
+      "id": "msq3",
+      "cat": "fhirModernApis",
+      "type": "ms",
+      "question": "Which of the following are core FHIR resources? (Select all that apply)",
+      "options": [
+        "MSH",
+        "Patient",
+        "Observation",
+        "MedicationRequest"
+      ],
+      "correct": [
+        1,
+        2,
+        3
+      ],
+      "explanation": "Patient, Observation, and MedicationRequest are all core FHIR resources; MSH is an HL7 v2 segment, not a FHIR resource."
+    },
+    {
+      "id": "msq4",
+      "cat": "fhirModernApis",
+      "type": "ms",
+      "question": "Which of the following are true about SMART on FHIR? (Select all that apply)",
+      "options": [
+        "It uses OAuth2 for authorization",
+        "It supports both EHR launch and standalone launch modes",
+        "It requires abandoning all HL7 v2 interfaces in the same organization",
+        "It can scope access to a specific patient's data using defined scopes"
+      ],
+      "correct": [
+        0,
+        1,
+        3
+      ],
+      "explanation": "SMART on FHIR is built on OAuth2, supports EHR and standalone launch, and uses scopes to limit access to specific patient data; it does not require an organization to abandon its existing HL7 v2 interfaces."
+    },
+    {
+      "id": "msq5",
+      "cat": "integrationEngines",
+      "type": "ms",
+      "question": "Which of the following are common failure modes for a live clinical interface? (Select all that apply)",
+      "options": [
+        "Message queue backups",
+        "ACK timeouts",
+        "Schema mismatches between sender and receiver",
+        "A fully idle interface with zero configured connections"
+      ],
+      "correct": [
+        0,
+        1,
+        2
+      ],
+      "explanation": "Queue backups, ACK timeouts, and schema mismatches are all classic real-world interface failure modes; an interface with zero configured connections is not itself a failure mode, just an unused configuration."
+    },
+    {
+      "id": "msq6",
+      "cat": "integrationEngines",
+      "type": "ms",
+      "question": "Which of the following describe the generic role of an integration engine? (Select all that apply)",
+      "options": [
+        "Routing messages between systems",
+        "Serving as the hospital's sole electronic health record system",
+        "Transforming message formats between systems",
+        "Translating protocols between systems such as a lab system and an EHR"
+      ],
+      "correct": [
+        0,
+        2,
+        3
+      ],
+      "explanation": "Routing, transforming, and protocol-translating messages between systems are the generic roles of an integration engine; it does not itself serve as the hospital's electronic health record system."
+    },
+    {
+      "id": "msq7",
+      "cat": "dataGovernance",
+      "type": "ms",
+      "question": "Which of the following are appropriate practices before changing a live production clinical interface? (Select all that apply)",
+      "options": [
+        "Testing the change in a non-production environment",
+        "Scheduling a defined maintenance window",
+        "Having a rollback plan ready",
+        "Deploying immediately without notifying the other system's owning team"
+      ],
+      "correct": [
+        0,
+        1,
+        2
+      ],
+      "explanation": "Testing first, scheduling a maintenance window, and having a rollback plan are all standard change-control practices; deploying without notifying the other system's team is the opposite of appropriate practice."
+    },
+    {
+      "id": "msq8",
+      "cat": "dataGovernance",
+      "type": "ms",
+      "question": "Which of the following are legitimate purposes of a Master Patient Index? (Select all that apply)",
+      "options": [
+        "Guaranteeing that no two patients will ever share a similar name",
+        "Linking records for the same patient across multiple systems",
+        "Reducing the risk of fragmented patient histories",
+        "Reducing the risk of two different patients' records being incorrectly merged"
+      ],
+      "correct": [
+        1,
+        2,
+        3
+      ],
+      "explanation": "An MPI links records for the same patient and reduces both fragmentation and overlay (incorrect merge) risk; it does not guarantee that similarly named patients will never exist, which is exactly why matching algorithms are needed."
+    },
+    {
+      "id": "q27",
+      "cat": "hl7v2Messaging",
+      "type": "mc",
+      "question": "In a typical HL7 v2 ADT or ORU message, which segment carries the patient's identifying demographic information, such as name, date of birth, and medical record number?",
+      "options": [
+        "OBX",
+        "PID",
+        "MSH",
+        "OBR"
+      ],
+      "correct": 1,
+      "explanation": "PID (Patient Identification) is the segment that carries a patient's core demographic and identifying information. MSH only carries message routing and header metadata, OBX carries individual observation values, and OBR carries order detail -- none of which hold patient demographics themselves."
+    },
+    {
+      "id": "q28",
+      "cat": "hl7v2Messaging",
+      "type": "mc",
+      "question": "In an ORU (Observation Result) message, which segment ties a group of OBX result values back to the original order that produced them?",
+      "options": [
+        "PID",
+        "MSH",
+        "OBR",
+        "EVN"
+      ],
+      "correct": 2,
+      "explanation": "OBR (Observation Request) carries order-level detail and is what a message's OBX result segments are grouped under, tying results back to the order that produced them. PID holds patient demographics, MSH is message header metadata, and EVN (used in ADT messages) carries event-type information -- none of which link results to their originating order."
+    },
+    {
+      "id": "tf11",
+      "cat": "hl7v2Messaging",
+      "type": "tf",
+      "question": "In HL7 v2, the tilde (~) character is used to separate multiple repeating instances of the same field, such as several identifiers of the same type on one patient.",
+      "answer": true,
+      "explanation": "That's correct -- the tilde is HL7 v2's designated repetition separator, defined in the MSH segment along with the other encoding characters, and used whenever a field can legitimately repeat, such as multiple phone numbers or identifiers of the same type."
+    },
+    {
+      "id": "q29",
+      "cat": "fhirModernApis",
+      "type": "mc",
+      "question": "A developer wants to know, before writing any integration code, exactly which resource types and operations a particular FHIR server actually supports. Which resource is designed to answer that question?",
+      "options": [
+        "Bundle",
+        "Observation",
+        "AuditEvent",
+        "CapabilityStatement"
+      ],
+      "correct": 3,
+      "explanation": "CapabilityStatement is the FHIR resource specifically designed to describe what a given server supports -- which resource types, which operations, and which search parameters -- so a client can discover this before integrating. Bundle is a container for grouping other resources together, Observation represents a single clinical measurement, and AuditEvent records access and activity logs -- none of which describe a server's own supported capabilities."
+    },
+    {
+      "id": "q30",
+      "cat": "fhirModernApis",
+      "type": "mc",
+      "question": "A client performs a FHIR search that matches fifty Patient resources. In what form does the FHIR server return those fifty results in a single response?",
+      "options": [
+        "Wrapped together inside a single Bundle resource",
+        "As fifty separate HTTP responses sent in parallel",
+        "As one merged Patient resource containing all fifty records",
+        "Only as a downloadable CSV file"
+      ],
+      "correct": 0,
+      "explanation": "FHIR search results are returned as a Bundle -- a container resource that groups multiple resources, here the fifty matching Patient resources, into one response. They are not merged into a single resource, sent back as separate parallel responses, or converted into a CSV -- a Bundle is the standard, spec-defined container for exactly this kind of multi-resource result."
+    },
+    {
+      "id": "tf12",
+      "cat": "fhirModernApis",
+      "type": "tf",
+      "question": "FHIR resources can only be exchanged as XML and have no supported JSON representation.",
+      "answer": false,
+      "explanation": "FHIR explicitly supports both JSON and XML as interchangeable representations of the same resource, and in current practice JSON is the more commonly used format for RESTful FHIR APIs. A format restricted to XML only would contradict one of FHIR's basic design goals of being easy to work with using ordinary web tooling."
+    },
+    {
+      "id": "msq9",
+      "cat": "fhirModernApis",
+      "type": "ms",
+      "question": "Which two of the following are true about a standard FHIR search operation? (Select two.)",
+      "options": [
+        "A search operation always requires write-level access scopes",
+        "The matching resources are returned wrapped in a Bundle",
+        "A search can be performed using query parameters against a specific resource type's endpoint",
+        "Search results can only ever contain exactly one matching resource"
+      ],
+      "correct": [
+        1,
+        2
+      ],
+      "explanation": "FHIR search results come back as a Bundle, and searches are performed using query parameters, such as a name or date filter, against a given resource type's endpoint. Search is a read-level interaction, not something that requires write access, and there's no limit forcing exactly one result -- a search can legitimately return zero, one, or many matching resources."
+    },
+    {
+      "id": "q31",
+      "cat": "integrationEngines",
+      "type": "mc",
+      "question": "Many modern integration engines can translate messages between older HL7 v2 formats and newer FHIR resources. Why is this translation capability valuable in a real hospital environment?",
+      "options": [
+        "It automatically encrypts every message at rest with no configuration needed",
+        "It eliminates the need for a Master Patient Index entirely",
+        "It lets legacy HL7 v2 systems and newer FHIR-based applications exchange data without either side needing to natively support the other's format",
+        "It removes the need for any interface testing before go-live"
+      ],
+      "correct": 2,
+      "explanation": "Translation between HL7 v2 and FHIR lets an interface engine bridge an older system that only speaks HL7 v2 with a newer application built for FHIR, without either vendor having to natively implement the other's format themselves. It has nothing to do with automatic at-rest encryption, does not replace the identity-matching role of an MPI, and does not remove the ordinary need to test an interface change before it goes live."
+    },
+    {
+      "id": "q32",
+      "cat": "integrationEngines",
+      "type": "mc",
+      "question": "An integration engine is configured to hold incoming messages in a queue and keep retrying delivery if the destination system is temporarily unreachable, instead of dropping the messages. What pattern does this describe, and what does it protect against?",
+      "options": [
+        "Load balancing -- it protects against a single point of failure in the network",
+        "Thin provisioning -- it protects against running out of storage capacity",
+        "Blue-green deployment -- it protects against a failed software release",
+        "Store-and-forward queuing -- it protects against data loss while a downstream system is down"
+      ],
+      "correct": 3,
+      "explanation": "Holding messages in a queue and retrying delivery until the destination comes back is the store-and-forward pattern, and its purpose is exactly to prevent data loss while a downstream system is temporarily unavailable. The other options describe genuinely different concepts -- load balancing distributes traffic across servers, thin provisioning is a storage allocation technique, and blue-green deployment is a release strategy -- none of which involve queuing and retrying undelivered messages."
+    },
+    {
+      "id": "msq10",
+      "cat": "integrationEngines",
+      "type": "ms",
+      "question": "Which two of the following are typical capabilities of a modern integration engine? (Select two.)",
+      "options": [
+        "Serving as the hospital's permanent legal medical record repository",
+        "Routing a message to one or more destination systems based on its type or content",
+        "Guaranteeing that no interface will ever need to be tested again after initial setup",
+        "Translating a message's format or protocol between the sending and receiving systems"
+      ],
+      "correct": [
+        1,
+        3
+      ],
+      "explanation": "Content or type-based routing, and format or protocol translation between systems, are core, defining capabilities of an integration engine. It does not itself serve as the hospital's legal medical record system -- that role belongs to the EHR -- and no engine capability removes the ongoing need to test interface changes."
+    },
+    {
+      "id": "q33",
+      "cat": "dataGovernance",
+      "type": "mc",
+      "question": "A hospital contracts with a third-party vendor that will process and store patient data on the hospital's behalf as part of an interface project. What type of agreement does HIPAA require between them before that work begins?",
+      "options": [
+        "A Service Level Agreement (SLA) only",
+        "A Business Associate Agreement (BAA)",
+        "A non-disclosure agreement with no other requirements",
+        "A change control ticket"
+      ],
+      "correct": 1,
+      "explanation": "HIPAA requires a Business Associate Agreement between a covered entity and any vendor handling protected health information on its behalf, spelling out how that data must be protected and used. An SLA addresses service performance commitments, a plain NDA alone does not satisfy HIPAA's specific requirements for handling PHI, and a change control ticket is an internal IT process artifact, not a regulatory agreement between organizations."
+    },
+    {
+      "id": "tf13",
+      "cat": "dataGovernance",
+      "type": "tf",
+      "question": "Maintaining detailed audit logs of who accessed or modified a patient's record, and when, is a standard expectation for systems handling protected health information.",
+      "answer": true,
+      "explanation": "Audit logging of access to protected health information is a standard, expected control -- it supports security investigations after a suspected breach and is routinely reviewed as part of HIPAA compliance audits. A system that could not show who accessed or changed a given record would leave a significant gap in both accountability and breach investigation."
+    },
+    {
+      "id": "q34",
+      "cat": "hl7v2Messaging",
+      "type": "mc",
+      "question": "In HL7 v2, which segment is used to attach a free-text note or comment to the segment immediately preceding it, such as a lab's interpretive comment on a result?",
+      "options": [
+        "NTE",
+        "ZNT",
+        "OBX",
+        "MSA"
+      ],
+      "correct": 0,
+      "explanation": "NTE (Notes and Comments) attaches free-text commentary to whatever segment came directly before it; OBX carries structured observation values, MSA carries acknowledgment status, and ZNT isn't a defined HL7 v2 segment at all."
+    },
+    {
+      "id": "q35",
+      "cat": "hl7v2Messaging",
+      "type": "mc",
+      "question": "A hospital's lab system adds a custom segment whose ID starts with the letter Z, containing an internal cost-center code that isn't part of the base HL7 v2 standard. What is this kind of segment called, and what is it for?",
+      "options": [
+        "A Z-segment, reserved by the standard specifically for site-specific or vendor-specific data",
+        "An NTE segment, used for structured billing codes",
+        "An MSH segment, used to redefine message delimiters mid-message",
+        "An OBR segment, used to carry lab order detail"
+      ],
+      "correct": 0,
+      "explanation": "Segment IDs starting with Z are reserved by the HL7 v2 standard specifically for site- or vendor-specific data that has no standard segment defined for it. NTE is for free-text notes, MSH only appears once at the start of a message to define delimiters, and OBR carries order detail, not custom local data."
+    },
+    {
+      "id": "tf14",
+      "cat": "hl7v2Messaging",
+      "type": "tf",
+      "question": "HL7 v2's batch file format, which wraps multiple messages inside BHS/BTS (and often FHS/FTS) header and trailer segments, is meant for periodic bulk file transfer rather than real-time, one-message-at-a-time delivery over a live MLLP connection.",
+      "answer": true,
+      "explanation": "BHS/BTS (and the outer FHS/FTS) segments wrap a batch of messages into a single file meant to be transferred and processed as a unit -- a different transport model than MLLP's live, per-message TCP delivery, even though the messages inside the batch look like any other HL7 v2 message."
+    },
+    {
+      "id": "msq11",
+      "cat": "hl7v2Messaging",
+      "type": "ms",
+      "question": "Which of the following are true about HL7 v2 segments and versions? (Select all that apply)",
+      "options": [
+        "Later HL7 v2 versions are generally designed to be backward compatible by adding new optional fields and segments rather than removing existing ones",
+        "NTE segments attach a free-text note to the segment immediately preceding them",
+        "Z-segments are part of the official base HL7 v2 standard and are identical across every vendor implementation",
+        "Two systems must always run the exact same HL7 v2 version number, or no message between them can ever be parsed"
+      ],
+      "correct": [
+        0,
+        1
+      ],
+      "explanation": "HL7 v2's backward-compatible versioning approach and NTE's role as a free-text note attached to the prior segment are both accurate. Z-segments are explicitly reserved for site- or vendor-specific use and are not standardized across vendors, and HL7 v2's backward compatibility means systems on reasonably close but different versions can often still exchange and parse messages successfully."
+    },
+    {
+      "id": "q36",
+      "cat": "fhirModernApis",
+      "type": "mc",
+      "question": "In FHIR, when an Observation resource needs to identify which patient it belongs to, how is that relationship typically represented?",
+      "options": [
+        "The full Patient resource is copied and embedded directly inside the Observation",
+        "Through a reference field (such as subject: {reference: 'Patient/123'}) pointing to the Patient resource's id",
+        "By matching only on the patient's first and last name as plain text",
+        "FHIR resources are not permitted to relate to one another"
+      ],
+      "correct": 1,
+      "explanation": "FHIR resources link to each other through reference fields that point to another resource's type and id, letting a client follow the reference to fetch the full Patient resource separately rather than duplicating that data inline every time."
+    },
+    {
+      "id": "q37",
+      "cat": "fhirModernApis",
+      "type": "mc",
+      "question": "A FHIR client performs a search using a chained parameter to find Observations based on a field of the Patient each Observation references. What does this chained search let the client do?",
+      "options": [
+        "Filter search results based on a field of a resource referenced by the resource being searched, in a single request",
+        "Force the FHIR server to return results as an HL7 v2 message instead of JSON",
+        "Skip authorization scopes entirely for that one request",
+        "Nothing -- chained parameters are not part of the FHIR specification"
+      ],
+      "correct": 0,
+      "explanation": "A chained search parameter lets a client filter on a property of a referenced resource -- for example finding Observations whose subject Patient has a particular name -- all in one search request, instead of making a separate call to look up matching patients first."
+    },
+    {
+      "id": "q38",
+      "cat": "fhirModernApis",
+      "type": "mc",
+      "question": "How does a FHIR Bundle of type 'transaction' differ from one of type 'searchset'?",
+      "options": [
+        "A transaction bundle groups a set of operations that the server must apply together atomically, while a searchset bundle simply holds the results of a query",
+        "There is no meaningful difference between the two bundle types",
+        "A searchset bundle can only be used to delete resources",
+        "A transaction bundle can only ever contain a single resource"
+      ],
+      "correct": 0,
+      "explanation": "A transaction bundle packages multiple operations (creates, updates, deletes) that the server is expected to apply as a single atomic unit, succeeding or failing together, while a searchset bundle is simply the standard container FHIR uses to return the matching resources from a search."
+    },
+    {
+      "id": "tf15",
+      "cat": "fhirModernApis",
+      "type": "tf",
+      "question": "FHIR's extension mechanism lets implementers represent data elements that fall outside a resource's base specification, without requiring any change to the core FHIR standard itself.",
+      "answer": true,
+      "explanation": "Extensions are identified by a unique URL and can be attached to almost any FHIR element, which is exactly how implementers add locally or nationally needed data elements -- like a specific USCDI data point -- without waiting for a change to the base FHIR specification."
+    },
+    {
+      "id": "msq12",
+      "cat": "fhirModernApis",
+      "type": "ms",
+      "question": "Which of the following are true about FHIR Bundles? (Select all that apply)",
+      "options": [
+        "A Bundle can hold the results of a search operation",
+        "A Bundle can group multiple operations together for atomic execution as a transaction",
+        "A Bundle is a type of OAuth2 authorization scope used in SMART on FHIR",
+        "A Bundle is itself a FHIR resource that contains other resources as entries"
+      ],
+      "correct": [
+        0,
+        1,
+        3
+      ],
+      "explanation": "A Bundle is a FHIR resource in its own right that can package search results, group operations for atomic transactions, or serve other bundling purposes; it has nothing to do with OAuth2 scopes, which are a completely separate SMART on FHIR authorization concept."
+    },
+    {
+      "id": "q39",
+      "cat": "integrationEngines",
+      "type": "mc",
+      "question": "An integration engine converts a lab system's proprietary field layout into the structure an EHR expects to receive before delivering the message. What is this conversion process best described as?",
+      "options": [
+        "Message transformation, or mapping",
+        "Load balancing across multiple servers",
+        "De-identifying the patient's protected health information",
+        "Master patient indexing"
+      ],
+      "correct": 0,
+      "explanation": "Converting a message's structure or content from one system's format to another's is transformation, or mapping -- one of an integration engine's core jobs, distinct from load balancing (distributing traffic), de-identification (removing identifiers), or master patient indexing (matching patient identity)."
+    },
+    {
+      "id": "q40",
+      "cat": "integrationEngines",
+      "type": "mc",
+      "question": "An interface engine moves a message that has repeatedly failed delivery, after exhausting its configured retry attempts, into a separate holding location for manual review rather than continuing to retry indefinitely. What is this pattern called?",
+      "options": [
+        "A dead-letter queue",
+        "A load balancer",
+        "A CapabilityStatement",
+        "A Business Associate Agreement"
+      ],
+      "correct": 0,
+      "explanation": "This is the dead-letter queue pattern -- failed messages are set aside for manual review and reprocessing instead of retrying forever or silently disappearing. The other options are unrelated concepts from load balancing, FHIR server discovery, and HIPAA contracting."
+    },
+    {
+      "id": "tf16",
+      "cat": "integrationEngines",
+      "type": "tf",
+      "question": "In a hub-and-spoke integration topology, each clinical system connects once to the central integration engine rather than needing a dedicated point-to-point connection to every other system it exchanges data with.",
+      "answer": true,
+      "explanation": "That's the defining feature of hub-and-spoke topology -- systems connect once to the central hub, which then handles routing to whichever other systems need the data, dramatically reducing the total number of connections compared to a fully point-to-point mesh."
+    },
+    {
+      "id": "msq13",
+      "cat": "integrationEngines",
+      "type": "ms",
+      "question": "Which of the following are practices used to proactively monitor whether a live clinical interface is healthy? (Select all that apply)",
+      "options": [
+        "Sending periodic synthetic (canary) test messages through the interface to confirm end-to-end delivery",
+        "Tracking queue depth against an expected baseline",
+        "Waiting for a clinician to report missing data before investigating",
+        "Alerting when acknowledgment rates drop unexpectedly"
+      ],
+      "correct": [
+        0,
+        1,
+        3
+      ],
+      "explanation": "Canary messages, queue-depth baselines, and acknowledgment-rate alerting are all proactive monitoring practices designed to catch a failure before it affects care; waiting for a clinician to notice missing data is the reactive opposite of proactive monitoring."
+    },
+    {
+      "id": "q41",
+      "cat": "dataGovernance",
+      "type": "mc",
+      "question": "Under HIPAA, what does the Safe Harbor method of de-identifying health data require?",
+      "options": [
+        "Removing or generalizing a specific list of 18 identifier types, such as names, dates tied to an individual, and geographic subdivisions smaller than a state",
+        "Encrypting the data with TLS while it is in transit",
+        "Obtaining a signed Business Associate Agreement with every data recipient",
+        "Converting the data into HL7 v2 format before sharing it"
+      ],
+      "correct": 0,
+      "explanation": "Safe Harbor de-identification requires removing or generalizing a defined list of 18 identifier categories. Encryption in transit, a Business Associate Agreement, and message format are all separate, legitimate healthcare IT concerns, but none of them is what the Safe Harbor de-identification method itself specifies."
+    },
+    {
+      "id": "q42",
+      "cat": "dataGovernance",
+      "type": "mc",
+      "question": "A behavioral health record protected under 42 CFR Part 2 (federal substance use disorder treatment confidentiality rules) generally requires which additional safeguard beyond standard HIPAA treatment-based disclosure rules?",
+      "options": [
+        "No additional safeguard -- standard HIPAA treatment disclosure rules alone are sufficient",
+        "Specific, more restrictive patient consent for that category of data before it can be disclosed, even for treatment purposes",
+        "Automatic disclosure to any treating provider without any patient involvement",
+        "Conversion of the record into a FHIR Bundle before it can legally be viewed"
+      ],
+      "correct": 1,
+      "explanation": "42 CFR Part 2 imposes consent requirements for substance use disorder treatment records that are more restrictive than HIPAA's general treatment-based disclosure allowance, meaning a general HIPAA treatment consent alone is often not sufficient to disclose this category of data."
+    },
+    {
+      "id": "tf17",
+      "cat": "dataGovernance",
+      "type": "tf",
+      "question": "Data quality dimensions such as completeness, accuracy, and timeliness are purely a concern for the source clinical system and have no real connection to how well an integration engine's interfaces are built or maintained.",
+      "answer": false,
+      "explanation": "A poorly built or poorly mapped interface can degrade data quality even when the original source data was correct -- for example, silently dropping a field, delaying delivery, or mismapping a coded value all directly harm completeness, timeliness, or accuracy downstream, so interface design is very much a data-quality concern."
+    }
+  ],
+  "cheatSheet": [
+    {
+      "heading": "What this module is (and isn't)",
+      "points": [
+        "This is a self-study concepts reference for healthcare interoperability, not tied to any vendor certification or proctored exam.",
+        "The goal is recognizing the difference between HL7v2 and FHIR and understanding integration-engine mechanics well enough for real interface work or interviews.",
+        "Content here maps loosely to real-world interface analyst and health IT integration work, not to a specific test blueprint."
+      ]
+    },
+    {
+      "heading": "HL7 v2 message structure",
+      "points": [
+        "Messages are pipe-delimited; segments are lines starting with a three-letter ID (MSH, PID, PV1, OBX...); MSH is always first and defines the message's own delimiter characters.",
+        "Fields within a segment are separated by pipes, components within a field by carets, repetitions by tildes, and subcomponents by ampersands.",
+        "There is no strictly enforced schema -- two vendors' HL7v2 feeds for the same message type are often not byte-compatible without a translation/mapping layer."
+      ]
+    },
+    {
+      "heading": "Key HL7 v2 message types",
+      "points": [
+        "ADT (Admit/Discharge/Transfer) carries patient demographic and encounter-status events -- e.g. A01 admit, A02 transfer, A03 discharge.",
+        "ORM = an order request from an ordering system to a filler system (lab, pharmacy, radiology).",
+        "ORU = an observation result sent back from the filler system, carrying OBX segments tied to the original order via OBR.",
+        "SIU = scheduling events -- new appointment, reschedule, cancellation.",
+        "ACK/NAK responses use AA (accepted), AE (application error), or AR (rejected) -- AA only confirms structural acceptance, not that downstream processing succeeded."
+      ]
+    },
+    {
+      "heading": "FHIR fundamentals",
+      "points": [
+        "FHIR (Fast Healthcare Interoperability Resources) models data as small, discrete, RESTful resources -- Patient, Observation, Encounter, MedicationRequest, Condition -- instead of one large message.",
+        "Resources reference each other (e.g. an Observation references its Patient and Encounter), forming a connected graph rather than a flat message.",
+        "FHIR uses standard HTTP verbs (GET/POST/PUT/DELETE) against resource endpoints -- a fundamentally different interaction model from HL7v2's message-push pattern."
+      ]
+    },
+    {
+      "heading": "HL7v2 vs. FHIR -- the core contrast",
+      "points": [
+        "HL7v2 = message-based, push-oriented, loosely and vendor-specifically structured, dominant for decades of legacy hospital interfaces.",
+        "FHIR = resource-based, REST/API-oriented, strictly structured, designed for modern app-to-app and mobile access.",
+        "FHIR is increasingly layered on top of existing HL7v2 feeds rather than replacing them outright, because the installed base and switching costs are enormous."
+      ]
+    },
+    {
+      "heading": "Integration / interface engines",
+      "points": [
+        "An integration engine's core job is routing messages by content/type and translating format/protocol between systems that don't natively speak the same dialect.",
+        "It is middleware, not the system of record -- the EHR remains the legal medical record even though messages pass through the engine.",
+        "Interface changes still require testing -- a new field mapping or trigger event can silently break a downstream consumer -- an engine doesn't remove that need."
+      ]
+    },
+    {
+      "heading": "Healthcare data governance basics",
+      "points": [
+        "PHI (Protected Health Information) is any individually identifiable health data; access to it must be logged and auditable.",
+        "A Business Associate Agreement (BAA) is required under HIPAA before any third-party vendor processes or stores PHI on a covered entity's behalf -- an SLA or plain NDA does not satisfy this.",
+        "Audit logging of who accessed or modified a record, and when, is a standard, expected control, not an optional nicety."
+      ]
+    }
+  ]
+}

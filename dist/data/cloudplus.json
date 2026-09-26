@@ -1,0 +1,1454 @@
+{
+  "categories": [
+    {
+      "key": "archDesign",
+      "label": "Cloud Architecture & Design",
+      "marks": 23,
+      "resources": [
+        {
+          "label": "CompTIA: Cloud+ CV0-004 exam objectives (Domain 1.0 Cloud Architecture)",
+          "url": "https://comptiacdn.azureedge.net/webcontent/docs/default-source/exam-objectives/comptia-cloud-cv0-004-exam-objectives-(2-0).pdf"
+        }
+      ]
+    },
+    {
+      "key": "security",
+      "label": "Security",
+      "marks": 20,
+      "resources": [
+        {
+          "label": "CompTIA Blog: My CompTIA Cloud+ Favorites - Cloud Security",
+          "url": "https://www.comptia.org/en-us/blog/comptia-cloud-cloud-security/"
+        },
+        {
+          "label": "CompTIA: Cloud+ CV0-004 exam objectives (Domain 2.0 Security)",
+          "url": "https://comptiacdn.azureedge.net/webcontent/docs/default-source/exam-objectives/comptia-cloud-cv0-004-exam-objectives-(2-0).pdf"
+        }
+      ]
+    },
+    {
+      "key": "deployment",
+      "label": "Deployment",
+      "marks": 17,
+      "resources": [
+        {
+          "label": "CompTIA: Cloud+ CV0-004 exam objectives (Domain 3.0 Deployment)",
+          "url": "https://comptiacdn.azureedge.net/webcontent/docs/default-source/exam-objectives/comptia-cloud-cv0-004-exam-objectives-(2-0).pdf"
+        }
+      ]
+    },
+    {
+      "key": "opsSupport",
+      "label": "Operations & Support",
+      "marks": 22,
+      "resources": [
+        {
+          "label": "CompTIA: Cloud+ CV0-004 exam objectives (Domain 4.0 Operations)",
+          "url": "https://comptiacdn.azureedge.net/webcontent/docs/default-source/exam-objectives/comptia-cloud-cv0-004-exam-objectives-(2-0).pdf"
+        }
+      ]
+    },
+    {
+      "key": "troubleshooting",
+      "label": "Troubleshooting",
+      "marks": 18,
+      "resources": [
+        {
+          "label": "CompTIA: Cloud+ CV0-004 exam objectives (Domain 5.0 Troubleshooting)",
+          "url": "https://comptiacdn.azureedge.net/webcontent/docs/default-source/exam-objectives/comptia-cloud-cv0-004-exam-objectives-(2-0).pdf"
+        }
+      ]
+    }
+  ],
+  "flashcards": [
+    {
+      "id": "f1",
+      "cat": "archDesign",
+      "front": "Public vs. private vs. hybrid vs. community cloud",
+      "back": "Public: shared infrastructure owned by a third-party provider. Private: dedicated to one organization, on-premises or hosted. Hybrid: a mix of both, often connected for workload portability. Community: shared by several organizations with common requirements, like agencies in the same industry.",
+      "detail": "Exam trap: \"hybrid\" specifically implies connected, coordinated environments \u2014 just using two unrelated clouds for different things is closer to multi-cloud, not hybrid."
+    },
+    {
+      "id": "f2",
+      "cat": "archDesign",
+      "front": "Scalability vs. elasticity",
+      "back": "Scalability is the general capacity to handle more (or less) load by adding or removing resources, which can be planned and manual. Elasticity is scaling that happens automatically and dynamically in response to real-time demand.",
+      "detail": "Every elastic system is scalable, but not every scalable system is elastic \u2014 a system that only scales through a change request ticket is scalable, not elastic."
+    },
+    {
+      "id": "f3",
+      "cat": "archDesign",
+      "front": "Vertical scaling vs. horizontal scaling",
+      "back": "Vertical scaling (\"scaling up\") adds resources \u2014 CPU, RAM \u2014 to an existing instance. Horizontal scaling (\"scaling out\") adds more instances running in parallel.",
+      "detail": "Vertical scaling usually requires a restart and has a hardware ceiling. Horizontal scaling avoids both, but requires the workload to be designed to run across multiple instances (e.g., stateless, load-balanced)."
+    },
+    {
+      "id": "f4",
+      "cat": "archDesign",
+      "front": "High availability vs. fault tolerance vs. disaster recovery",
+      "back": "High availability minimizes downtime through redundancy, but a brief failover interruption may still occur. Fault tolerance keeps the system running through a failure with no interruption at all, usually at higher cost. Disaster recovery is the plan and process for restoring service after a major outage that HA/fault tolerance didn't prevent.",
+      "detail": "HA and fault tolerance are about avoiding downtime; DR assumes downtime already happened and is about getting back up."
+    },
+    {
+      "id": "f5",
+      "cat": "archDesign",
+      "front": "RTO vs. RPO",
+      "back": "RTO (Recovery Time Objective) is the maximum acceptable time to restore service after an outage. RPO (Recovery Point Objective) is the maximum acceptable amount of data loss, measured as time since the last good backup.",
+      "detail": "A 4-hour RPO means backups need to run at least every 4 hours. RTO and RPO are set by business requirements first, then the backup/DR architecture is built to meet them \u2014 not the other way around."
+    },
+    {
+      "id": "f6",
+      "cat": "archDesign",
+      "front": "Block vs. file vs. object storage",
+      "back": "Block storage presents raw, low-latency volumes ideal for databases and VM disks. File storage presents a shared, hierarchical filesystem accessed over a protocol like NFS or SMB. Object storage holds data as flat, metadata-rich objects, built for massive scale rather than low-latency random access.",
+      "detail": "A relational database wants block storage. A shared team drive wants file storage. Millions of backup archives or media files want object storage."
+    },
+    {
+      "id": "f7",
+      "cat": "archDesign",
+      "front": "Load balancing algorithms",
+      "back": "Round robin cycles requests evenly across servers in order. Least connections sends new requests to whichever server currently has the fewest active connections. Weighted (round robin or least connections) accounts for servers with different capacities. Source/IP-affinity keeps a given client pinned to the same backend server.",
+      "detail": "Source affinity matters for stateful apps that keep session data on one server \u2014 losing that pinning mid-session can log a user out or break their session."
+    },
+    {
+      "id": "f8",
+      "cat": "security",
+      "front": "Authentication vs. authorization vs. accounting (AAA)",
+      "back": "Authentication verifies who you are. Authorization determines what you're allowed to do once verified. Accounting logs what was actually done, for audit purposes.",
+      "detail": "A stolen-but-valid password is an authentication success with an authorization failure waiting to happen \u2014 the identity checks out, but it isn't really that person acting."
+    },
+    {
+      "id": "f9",
+      "cat": "security",
+      "front": "RBAC vs. ABAC",
+      "back": "Role-based access control (RBAC) grants permissions based on a user's assigned role (e.g., \"Backup Operator\"). Attribute-based access control (ABAC) evaluates a combination of attributes at request time \u2014 user department, resource tag, time of day, location \u2014 to make a more granular decision.",
+      "detail": "RBAC is simpler to administer at scale; ABAC is more flexible but harder to audit because the effective rule set is computed dynamically rather than assigned directly."
+    },
+    {
+      "id": "f10",
+      "cat": "security",
+      "front": "Encryption at rest vs. in transit vs. in use",
+      "back": "At rest protects stored data (on disk). In transit protects data moving across a network (e.g., TLS). In use protects data while it's actively being processed in memory, which is the hardest of the three to achieve and typically needs specialized hardware (e.g., a trusted execution environment).",
+      "detail": "A common exam trap: encrypting a database at rest does nothing to protect a query result being sent to a client over an unencrypted connection \u2014 that needs in-transit encryption too."
+    },
+    {
+      "id": "f11",
+      "cat": "security",
+      "front": "Zero Trust",
+      "back": "A security model that never grants trust based on network location alone. Every request is independently verified \u2014 identity, device posture, and context \u2014 regardless of whether it originates inside or outside the traditional network perimeter.",
+      "detail": "Zero Trust means a compromised perimeter (e.g., a stolen VPN credential) still isn't enough on its own to reach sensitive resources, because every subsequent request is re-checked."
+    },
+    {
+      "id": "f12",
+      "cat": "security",
+      "front": "IDS vs. IPS",
+      "back": "An Intrusion Detection System (IDS) monitors traffic and alerts on suspicious activity, but doesn't block it. An Intrusion Prevention System (IPS) sits inline and can actively block or drop traffic it identifies as malicious.",
+      "detail": "IPS's ability to block traffic is also its biggest risk: a false positive can actively break legitimate traffic, which a passive IDS never would."
+    },
+    {
+      "id": "f13",
+      "cat": "security",
+      "front": "Stateful vs. stateless packet filtering",
+      "back": "A stateful firewall tracks the state of active connections and automatically allows return traffic for a connection it already approved. A stateless filter (like a basic ACL) evaluates every packet independently against its rule set, with no memory of prior traffic.",
+      "detail": "Stateless filtering needs explicit rules for both inbound and outbound halves of a connection, since it has no concept of \"this reply belongs to a request I already allowed.\""
+    },
+    {
+      "id": "f14",
+      "cat": "security",
+      "front": "Tokenization vs. encryption",
+      "back": "Tokenization replaces sensitive data with a non-sensitive substitute (a token) that has no mathematical relationship to the original value, with the real data stored separately in a vault. Encryption transforms data using a reversible mathematical algorithm and a key.",
+      "detail": "Because a token can't be mathematically reversed back to the original value even if you had unlimited computing power, tokenization is often preferred for things like stored payment card numbers."
+    },
+    {
+      "id": "f15",
+      "cat": "deployment",
+      "front": "Blue-green vs. canary deployment",
+      "back": "Blue-green runs two full, identical production environments; traffic is switched entirely from one to the other once the new version is verified. Canary releases the new version to a small subset of users/traffic first, gradually increasing exposure as confidence grows.",
+      "detail": "Blue-green gives an instant, all-or-nothing rollback (just switch traffic back). Canary limits the blast radius of a bad release but takes longer to fully roll out."
+    },
+    {
+      "id": "f16",
+      "cat": "deployment",
+      "front": "Rolling vs. in-place deployment",
+      "back": "A rolling deployment updates instances gradually, a few at a time, so the service stays available throughout. An in-place deployment updates a server directly, typically taking that instance offline (or degraded) during the update.",
+      "detail": "Rolling deployments need a load balancer removing an instance from rotation before updating it, then adding it back \u2014 skip that step and you're serving errors from a mid-update instance."
+    },
+    {
+      "id": "f17",
+      "cat": "deployment",
+      "front": "Full vs. incremental vs. differential backup",
+      "back": "A full backup copies everything. An incremental backup copies only what changed since the last backup of any kind (fastest to create, slowest to restore \u2014 needs the full plus every incremental since). A differential backup copies everything changed since the last full backup (restore needs only the full plus the latest differential).",
+      "detail": "Incremental backups are smaller and faster individually, but a restore has to replay every incremental in sequence \u2014 if one link in that chain is corrupt, the restore fails past that point."
+    },
+    {
+      "id": "f18",
+      "cat": "deployment",
+      "front": "P2V, V2V, P2C, and V2C migrations",
+      "back": "P2V converts a physical server into a virtual machine. V2V moves a VM from one hypervisor/platform to another. P2C moves a still-physical on-premises workload straight into the cloud. V2C moves a workload that is already virtualized on-premises into the cloud \u2014 the distinction is what state the source was in before the move, not just where it ends up.",
+      "detail": "A 'lift and shift' cloud migration is usually a P2C or V2C migration \u2014 moving the workload largely as-is, versus refactoring it to use cloud-native PaaS services instead."
+    },
+    {
+      "id": "f19",
+      "cat": "deployment",
+      "front": "Thick vs. thin provisioning",
+      "back": "Thick provisioning allocates the full requested storage capacity immediately, whether or not it's used. Thin provisioning allocates storage on demand as data is actually written, letting you over-commit total capacity across multiple volumes.",
+      "detail": "Thin provisioning's risk: if many thin-provisioned volumes are all filled close to their allocated limit at once, the underlying physical storage can run out even though each individual volume still shows free space."
+    },
+    {
+      "id": "f20",
+      "cat": "deployment",
+      "front": "Infrastructure as Code (IaC)",
+      "back": "Defining infrastructure \u2014 networks, VMs, storage \u2014 as declarative configuration files that can be version-controlled and used to deploy the same environment repeatably, instead of manual configuration.",
+      "detail": "IaC's real value in a cert-exam sense: it makes environments idempotent and auditable \u2014 you can always tell exactly what was deployed by reading the file, and redeploying it produces the same result."
+    },
+    {
+      "id": "f21",
+      "cat": "deployment",
+      "front": "Continuous integration vs. continuous delivery vs. continuous deployment",
+      "back": "Continuous integration merges code changes and runs automated tests frequently. Continuous delivery goes further, keeping code always in a releasable state after passing tests, but a human still approves the actual release. Continuous deployment removes that manual gate \u2014 every change that passes automated tests ships to production automatically.",
+      "detail": "The one-word difference between 'delivery' and 'deployment' is the whole distinction: delivery is release-ready, deployment is already released."
+    },
+    {
+      "id": "f22",
+      "cat": "opsSupport",
+      "front": "Automation vs. orchestration",
+      "back": "Automation handles a single, well-defined task without human intervention (e.g., auto-restarting a failed service). Orchestration coordinates multiple automated tasks together into a larger workflow (e.g., provisioning a VM, then configuring it, then registering it with a load balancer, in sequence).",
+      "detail": "Orchestration is built ON TOP OF automation \u2014 you can't orchestrate a workflow out of steps that aren't individually automated first."
+    },
+    {
+      "id": "f23",
+      "cat": "opsSupport",
+      "front": "Chargeback vs. showback",
+      "back": "Chargeback actually bills internal departments for their share of cloud costs, moving real budget between them. Showback reports each department's usage and cost for visibility and accountability, without an actual internal transfer of funds.",
+      "detail": "Showback is often adopted first, as a lower-friction way to build cost awareness before an organization is ready for the accounting complexity of real chargeback."
+    },
+    {
+      "id": "f24",
+      "cat": "opsSupport",
+      "front": "SNMP vs. syslog",
+      "back": "SNMP (Simple Network Management Protocol) is used to monitor and manage network devices, polling or receiving traps about their status and metrics. Syslog is a standard for forwarding log messages from a device or application to a centralized logging server.",
+      "detail": "SNMP is generally for structured, device-health metrics (interface status, CPU load); syslog is for free-form event and log messages \u2014 the two are often run side by side, not as alternatives to each other."
+    },
+    {
+      "id": "f25",
+      "cat": "opsSupport",
+      "front": "Baseline vs. threshold",
+      "back": "A baseline is the normal, expected range of a metric under typical conditions, established by observing it over time. A threshold is a specific value that, when crossed, triggers an alert or action.",
+      "detail": "Thresholds set without first establishing a baseline tend to be either too sensitive (constant false alarms) or too loose (real problems go unnoticed) \u2014 baselining comes first."
+    },
+    {
+      "id": "f26",
+      "cat": "opsSupport",
+      "front": "SLA components",
+      "back": "A Service Level Agreement typically defines measurable commitments like uptime percentage, response time to incidents, and resolution time \u2014 along with the penalties or credits owed if those commitments aren't met.",
+      "detail": "\"Five nines\" (99.999% uptime) allows only about 5 minutes of downtime a year \u2014 a useful number to recognize on the exam when a scenario states an uptime percentage and asks how much downtime it allows."
+    },
+    {
+      "id": "f27",
+      "cat": "opsSupport",
+      "front": "Configuration management database (CMDB)",
+      "back": "A centralized repository that tracks an organization's IT assets (configuration items) and the relationships between them \u2014 which servers depend on which services, who owns what, and so on.",
+      "detail": "A CMDB is what lets a change or incident process answer \"what else does this affect?\" instead of relying on institutional memory."
+    },
+    {
+      "id": "f28",
+      "cat": "opsSupport",
+      "front": "Kubernetes: pod, node, and cluster",
+      "back": "A pod is the smallest deployable unit \u2014 one or more tightly-coupled containers that share networking and storage. A node is a physical or virtual machine that runs pods. A cluster is the full set of nodes managed together, coordinated by a control plane.",
+      "detail": "Scaling in Kubernetes usually means adding more pod replicas (horizontal), not making one pod bigger \u2014 matching the general cloud preference for horizontal over vertical scaling."
+    },
+    {
+      "id": "f29",
+      "cat": "troubleshooting",
+      "front": "The standard troubleshooting methodology",
+      "back": "1) Identify the problem. 2) Establish a theory of probable cause. 3) Test the theory. 4) Establish a plan of action and implement the solution. 5) Verify full system functionality. 6) Document findings and outcomes.",
+      "detail": "A common exam trap: jumping straight to \"implement a solution\" without first testing the theory \u2014 a plausible-sounding cause that turns out to be wrong wastes a maintenance window and can make things worse."
+    },
+    {
+      "id": "f30",
+      "cat": "troubleshooting",
+      "front": "\"Noisy neighbor\" problem",
+      "back": "In a multi-tenant environment, one tenant's heavy resource usage (CPU, disk I/O, network) degrades performance for other tenants sharing the same underlying physical hardware.",
+      "detail": "The typical fix is resource governance \u2014 CPU/IO limits, quality-of-service policies, or moving the noisy workload to dedicated hardware \u2014 rather than something the affected tenant can usually fix from their own side."
+    },
+    {
+      "id": "f31",
+      "cat": "troubleshooting",
+      "front": "Orphaned resources",
+      "back": "Cloud resources \u2014 disks, snapshots, public IPs, load balancers \u2014 left behind after the workload that created them was deleted, but never cleaned up themselves. They keep incurring cost with no one using them.",
+      "detail": "A classic root cause of 'why is our bill higher than expected' when the deployed workload footprint hasn't obviously grown."
+    },
+    {
+      "id": "f32",
+      "cat": "troubleshooting",
+      "front": "DNS-related connectivity failure",
+      "back": "A failure where the network path and destination service are both healthy, but a hostname simply won't resolve to the correct IP address \u2014 often due to a misconfigured or stale DNS record, or a caching resolver serving an outdated answer.",
+      "detail": "A good diagnostic instinct: if a service is unreachable by name but reachable by its raw IP address, the problem is DNS, not the network path or the service itself."
+    },
+    {
+      "id": "f33",
+      "cat": "troubleshooting",
+      "front": "Latency vs. bandwidth problems",
+      "back": "Latency is the delay before data begins to transfer (how long a single round trip takes). Bandwidth is the total volume of data that can transfer per unit of time once it's flowing. A connection can have plenty of bandwidth and still feel slow due to high latency.",
+      "detail": "A common trap: adding more bandwidth to a connection does nothing to fix a latency problem \u2014 they're independent characteristics with different causes and different fixes. A Content Delivery Network (CDN) is a latency fix specifically, not a bandwidth one."
+    },
+    {
+      "id": "f34",
+      "cat": "troubleshooting",
+      "front": "Licensing-related service failure",
+      "back": "A failure where infrastructure and configuration are otherwise correct, but a service stops working (or refuses to scale further) because a software license has expired or a licensed capacity limit (e.g., number of cores or seats) has been reached.",
+      "detail": "Easy to overlook because nothing about the infrastructure itself changed \u2014 the exam likes scenarios where a service 'just stopped working' with no recent configuration change, pointing at licensing or a certificate expiration instead."
+    },
+    {
+      "id": "f35",
+      "cat": "troubleshooting",
+      "front": "Root cause analysis vs. a workaround",
+      "back": "A workaround restores service quickly without necessarily fixing the underlying issue (e.g., restarting a hung service). Root cause analysis identifies and addresses the actual reason the problem happened, to prevent recurrence.",
+      "detail": "Applying a workaround isn't a mistake under time pressure \u2014 the mistake is stopping there and never following up with root cause analysis, so the same incident quietly repeats."
+    },
+    {
+      "id": "f36",
+      "cat": "archDesign",
+      "front": "IaaS vs. PaaS vs. SaaS",
+      "back": "IaaS (Infrastructure as a Service) provides raw compute, storage, and networking \u2014 the customer manages the OS upward. PaaS (Platform as a Service) adds a managed runtime/OS layer so the customer just deploys code. SaaS (Software as a Service) delivers a complete, ready-to-use application, with the provider managing everything underneath.",
+      "detail": "The customer's management responsibility shrinks as you move IaaS -> PaaS -> SaaS: with IaaS you patch the OS yourself, with SaaS you manage nothing but your own data and user accounts."
+    },
+    {
+      "id": "f37",
+      "cat": "archDesign",
+      "front": "Containers vs. virtual machines",
+      "back": "A virtual machine virtualizes hardware and includes its own full guest operating system, managed by a hypervisor. A container virtualizes at the OS level, packaging an application with its dependencies but sharing the host's kernel \u2014 no separate guest OS per instance.",
+      "detail": "That shared kernel is why containers start in seconds (or less) and have a much smaller footprint than a VM, but it also means containers on the same host are less isolated from each other than separate VMs would be."
+    },
+    {
+      "id": "f38",
+      "cat": "security",
+      "front": "Multifactor authentication (MFA) factor categories",
+      "back": "MFA combines at least two of: something you know (a password or PIN), something you have (a hardware token or authenticator app), something you are (a biometric like a fingerprint), and sometimes somewhere you are (location) or something you do (behavioral).",
+      "detail": "Two passwords, or a password plus a security question, are both still just \"something you know\" twice \u2014 that's not true multifactor, even though it feels like an extra step."
+    },
+    {
+      "id": "f39",
+      "cat": "security",
+      "front": "Public Key Infrastructure (PKI) basics",
+      "back": "PKI issues and manages digital certificates that bind a public key to an identity, signed by a trusted Certificate Authority (CA). TLS uses this to let a client verify a server's identity and negotiate encrypted communication.",
+      "detail": "A certificate that has expired, or was issued by a CA the client doesn't trust, will fail validation even if the underlying network path and server are perfectly healthy \u2014 a common troubleshooting trap that looks like a network outage but isn't."
+    },
+    {
+      "id": "f40",
+      "cat": "opsSupport",
+      "front": "Patch management and maintenance windows",
+      "back": "Patch management is the process of testing, approving, and applying software/OS updates on a controlled schedule rather than ad hoc. A maintenance window is a pre-approved, communicated time slot during which changes (including patching) are allowed to cause disruption.",
+      "detail": "Testing a patch in staging before production, and scheduling the rollout in an approved window, are both change management applied specifically to patching."
+    },
+    {
+      "id": "f41",
+      "cat": "opsSupport",
+      "front": "Capacity planning",
+      "back": "Using historical usage trends and baselines to forecast future resource needs (storage, compute, bandwidth) and provision ahead of demand, rather than reacting after a resource is already exhausted.",
+      "detail": "Good capacity planning depends on having a solid baseline first \u2014 without knowing normal growth trends, it's just guessing."
+    },
+    {
+      "id": "f42",
+      "cat": "deployment",
+      "front": "Hot, warm, and cold DR sites",
+      "back": "A hot site is fully equipped and kept in near real-time sync with production, ready for near-instant failover (fastest, most expensive). A warm site has infrastructure in place but needs some setup/data sync before use. A cold site has only basic facilities (power, space) and needs full buildout and data restoration before use (slowest, cheapest).",
+      "detail": "Site choice is really an RTO/cost trade-off: a lower RTO requirement pushes toward a hot site, while a looser RTO can tolerate the savings of a cold site."
+    },
+    {
+      "id": "f43",
+      "cat": "archDesign",
+      "front": "Common RAID levels",
+      "back": "RAID 0 stripes data across disks for performance with no redundancy (one disk failure loses everything). RAID 1 mirrors data for redundancy with no capacity gain. RAID 5 stripes data plus distributed parity, tolerating one disk failure. RAID 10 combines mirroring and striping for both redundancy and performance, at the cost of half the raw capacity.",
+      "detail": "RAID 0 is sometimes mistaken for a resilience feature because it \"spreads\" data across disks \u2014 it actually has zero fault tolerance and is only about speed."
+    },
+    {
+      "id": "f44",
+      "cat": "archDesign",
+      "front": "Content Delivery Network (CDN)",
+      "back": "A geographically distributed set of edge servers that cache content closer to end users, reducing the round-trip distance data has to travel and offloading traffic from the origin server.",
+      "detail": "A CDN mainly helps with latency and origin load, not raw available bandwidth \u2014 recognizing which one a scenario is actually describing (see latency vs. bandwidth problems) decides whether a CDN is really the fix."
+    },
+    {
+      "id": "f45",
+      "cat": "opsSupport",
+      "front": "Change management process",
+      "back": "A formal, documented process for proposing, reviewing, approving, and recording a change to production systems, including a rollback plan, before the change is actually made.",
+      "detail": "A configuration management database (CMDB) is what change management updates once a change is approved and completed \u2014 the CMDB should always reflect the environment's true current state."
+    },
+    {
+      "id": "f46",
+      "cat": "opsSupport",
+      "front": "Runbook",
+      "back": "A documented, step-by-step procedure for a specific operational task or incident response, written so it can be followed consistently by different people (or triggered automatically) with the same result each time.",
+      "detail": "A runbook is what automation vs. orchestration tooling actually executes \u2014 the runbook is the procedure; automation/orchestration is what carries it out without a human doing each step by hand."
+    },
+    {
+      "id": "f47",
+      "cat": "archDesign",
+      "front": "Load balancer health checks",
+      "back": "A periodic probe the load balancer sends to each backend instance to confirm it's actually able to serve traffic \u2014 an instance that fails enough consecutive checks is automatically taken out of rotation until it passes again.",
+      "detail": "This is what makes load balancing algorithms actually resilient to a failed instance \u2014 the algorithm only ever picks among instances the health check currently considers healthy."
+    },
+    {
+      "id": "f48",
+      "cat": "security",
+      "front": "Firewall as a Service (FWaaS)",
+      "back": "A cloud-delivered, centrally managed firewall service applied across an environment without deploying and maintaining physical or virtual firewall appliances at every location.",
+      "detail": "FWaaS commonly layers both stateful vs. stateless packet filtering and IDS vs. IPS-style inspection into one managed service rather than stitching those together from separate appliances."
+    },
+    {
+      "id": "f49",
+      "cat": "archDesign",
+      "front": "Service mesh",
+      "back": "A dedicated infrastructure layer (typically sidecar proxies alongside each service) that handles service-to-service traffic concerns \u2014 routing, retries, encryption, observability \u2014 without every microservice implementing that logic itself.",
+      "detail": "In a Kubernetes: pod, node, and cluster environment, a service mesh's sidecar proxies are commonly injected into each pod, working alongside the containers rather than replacing them."
+    },
+    {
+      "id": "f50",
+      "cat": "archDesign",
+      "front": "Type 1 (bare-metal) vs. Type 2 (hosted) hypervisor",
+      "back": "A Type 1 hypervisor runs directly on the physical hardware with no host OS underneath it \u2014 the standard for production datacenters and cloud providers. A Type 2 hypervisor runs as an application on top of a regular host OS, more common for a desktop/test environment.",
+      "detail": "Removing the host OS layer is exactly why Type 1 has less overhead and better performance \u2014 there's one less layer between the VM and the physical hardware than in a P2V, V2V, P2C, and V2C migrations scenario running Type 2."
+    },
+    {
+      "id": "f51",
+      "cat": "security",
+      "front": "Single sign-on (SSO)",
+      "back": "Lets a user authenticate once and gain access to multiple independent systems without signing in separately to each one, using a shared trust relationship between the identity provider and each application.",
+      "detail": "SSO is squarely about the authentication piece of authentication vs. authorization vs. accounting (AAA) \u2014 it doesn't decide what a user can do once signed in, only that they don't have to prove who they are over and over."
+    },
+    {
+      "id": "f52",
+      "cat": "opsSupport",
+      "front": "Immutable infrastructure",
+      "back": "A deployment approach where servers or containers are never modified after being provisioned \u2014 a change means replacing the instance entirely with a newly built one, rather than patching a live system in place.",
+      "detail": "This pairs naturally with Infrastructure as Code (IaC): if the whole environment is defined in code, replacing an instance instead of patching it becomes cheap and repeatable rather than risky."
+    },
+    {
+      "id": "f53",
+      "cat": "archDesign",
+      "front": "Chaos engineering",
+      "back": "Deliberately injecting failures into a production or production-like system (killing an instance, adding latency, cutting a dependency) to verify that resilience mechanisms actually work as designed, instead of only assuming they do.",
+      "detail": "This is how a team actually validates the high availability vs. fault tolerance vs. disaster recovery claims made about a system, rather than discovering the gaps for the first time during a real outage."
+    }
+  ],
+  "questions": [
+    {
+      "id": "q1",
+      "cat": "archDesign",
+      "type": "mc",
+      "question": "A university, a research lab, and a hospital network in the same region want to jointly fund and share a cloud environment built specifically around their shared compliance needs, without opening it to the general public. Which deployment model is this?",
+      "options": [
+        "Community cloud",
+        "Public cloud",
+        "Hybrid cloud",
+        "Private cloud, shared under a joint support contract"
+      ],
+      "correct": 0,
+      "explanation": "Community cloud is shared by several organizations with common requirements or compliance needs, distinct from a public cloud (open to anyone) or a private cloud (dedicated to one organization, even under a shared contract). Hybrid specifically means a mix of private and public environments connected together, which isn't what's described here."
+    },
+    {
+      "id": "q2",
+      "cat": "archDesign",
+      "type": "mc",
+      "question": "An application automatically adds server instances at 9 AM on weekdays and removes them at 6 PM, based on a fixed calendar schedule rather than real-time load. Which best describes this behavior?",
+      "options": [
+        "Vertical scaling",
+        "Scheduled scaling, a form of scalability but not elasticity",
+        "Elasticity, since it happens without manual intervention",
+        "Fault tolerance"
+      ],
+      "correct": 1,
+      "explanation": "This is automatic, but it's reacting to a fixed schedule, not real-time demand \u2014 elasticity specifically means scaling dynamically in response to actual, current load. It's also adding whole instances (horizontal), not resizing an existing one (vertical), and has nothing to do with tolerating failures."
+    },
+    {
+      "id": "q3",
+      "cat": "archDesign",
+      "type": "mc",
+      "question": "A database server is running out of headroom under load, and the team's fix is to increase its allocated vCPUs and RAM. Which approach does this represent, and what is its main limitation?",
+      "options": [
+        "Horizontal scaling \u2014 it's limited by the load balancer's connection limit",
+        "Vertical scaling \u2014 it's limited by the maximum size of a single instance and typically requires a restart",
+        "Elasticity \u2014 it's limited by the auto-scaling group's minimum instance count",
+        "Fault tolerance \u2014 it's limited by the number of availability zones in the region"
+      ],
+      "correct": 1,
+      "explanation": "Resizing a single existing instance is vertical scaling (scaling up), which is capped by the largest instance size available and usually needs a reboot to apply. Horizontal scaling would mean adding more instances rather than resizing one, which isn't what happened here."
+    },
+    {
+      "id": "q4",
+      "cat": "archDesign",
+      "type": "mc",
+      "question": "A business states its recovery point objective (RPO) for a critical system as 15 minutes. What does this actually commit the organization to?",
+      "options": [
+        "Notifying customers of an outage within 15 minutes",
+        "Backing up or replicating that system's data at least every 15 minutes",
+        "Restoring the system within 15 minutes of an outage being declared",
+        "Completing a full system failover within 15 minutes"
+      ],
+      "correct": 1,
+      "explanation": "RPO is about acceptable data loss, measured in time \u2014 a 15-minute RPO means the data backup/replication cadence must be frequent enough that no more than 15 minutes of data could ever be lost. Committing to a restoration or failover time window is what RTO covers instead."
+    },
+    {
+      "id": "q5",
+      "cat": "archDesign",
+      "type": "mc",
+      "question": "A media company needs to store several petabytes of archived video files that are rarely modified once uploaded, accessed by a web application via simple HTTP requests rather than a mounted filesystem. Which storage type fits best?",
+      "options": [
+        "Block storage",
+        "A relational database",
+        "File storage",
+        "Object storage"
+      ],
+      "correct": 3,
+      "explanation": "Object storage is built for exactly this: massive scale, HTTP-based access, metadata-rich, rarely-modified files. Block storage is meant for low-latency random I/O like a database's own disk, and file storage implies a mounted, hierarchical filesystem \u2014 neither matches 'accessed via HTTP requests, not a mounted drive.'"
+    },
+    {
+      "id": "q6",
+      "cat": "archDesign",
+      "type": "mc",
+      "question": "A stateful web application keeps each logged-in user's session data cached only on the specific backend server that first handled their login. Which load balancing approach is required to keep that application working correctly across multiple servers?",
+      "options": [
+        "Weighted round robin based on server capacity",
+        "Round robin",
+        "Source/IP affinity (sticky sessions)",
+        "Least connections"
+      ],
+      "correct": 2,
+      "explanation": "Since session data lives only on one specific server, that same client must keep being routed back to it \u2014 which is exactly what source/IP affinity provides. Round robin, least connections, and weighted round robin all distribute requests based on load or order, with no guarantee a given client lands back on the same server twice."
+    },
+    {
+      "id": "q40",
+      "cat": "archDesign",
+      "type": "mc",
+      "question": "A company wants a CDN (content delivery network) primarily to improve which aspect of serving static website content to a global audience?",
+      "options": [
+        "Encryption of data at rest",
+        "Latency, by caching content at edge locations closer to each user",
+        "Identity and access management for the origin server",
+        "The RPO of the origin server's backups"
+      ],
+      "correct": 1,
+      "explanation": "A CDN's core purpose is caching content at edge locations near end users, cutting the round-trip distance and thus latency. It doesn't handle at-rest encryption, IAM, or backup objectives \u2014 those are separate concerns entirely."
+    },
+    {
+      "id": "q14",
+      "cat": "security",
+      "type": "mc",
+      "question": "A user's password is stolen and used to log into a system successfully. Security logs show the attacker's every action was later traced and reviewed in detail. Which part of AAA specifically enabled that after-the-fact review?",
+      "options": [
+        "Authentication",
+        "Authorization",
+        "Non-repudiation",
+        "Accounting"
+      ],
+      "correct": 3,
+      "explanation": "Accounting is the logging of what was actually done, which is what allowed the after-the-fact review. Authentication (verifying identity) actually succeeded here despite being a stolen credential, and authorization determines what actions are permitted \u2014 neither one is about producing a reviewable log."
+    },
+    {
+      "id": "q15",
+      "cat": "security",
+      "type": "mc",
+      "question": "A company wants access decisions that factor in the requesting user's department, the sensitivity tag on the specific resource, and the time of day \u2014 evaluated dynamically for each request rather than through a fixed set of assigned roles. Which access control model fits?",
+      "options": [
+        "Discretionary access control granted permanently at account creation",
+        "RBAC (role-based access control)",
+        "ABAC (attribute-based access control)",
+        "Mandatory access control based on system-assigned classification labels"
+      ],
+      "correct": 2,
+      "explanation": "ABAC evaluates multiple attributes \u2014 department, resource tags, time of day \u2014 dynamically at request time. RBAC instead grants a fixed set of permissions tied to an assigned role, which doesn't flex per-request based on multiple contextual attributes."
+    },
+    {
+      "id": "q16",
+      "cat": "security",
+      "type": "mc",
+      "question": "A database is fully encrypted on disk, but a recent incident involved an attacker intercepting query results as they traveled from the database server to a reporting application over an internal network. What security gap does this specifically point to?",
+      "options": [
+        "Missing encryption at rest",
+        "Missing role-based access control on the reporting application",
+        "Missing multifactor authentication on the database",
+        "Missing encryption in transit"
+      ],
+      "correct": 3,
+      "explanation": "Encryption at rest protects data sitting on disk, which was already in place \u2014 it does nothing for data moving across the network afterward. The interception happened in transit, so that's the specific gap, not MFA or RBAC, which govern who can log in and what they can do, not how data is protected while moving."
+    },
+    {
+      "id": "q17",
+      "cat": "security",
+      "type": "mc",
+      "question": "A security appliance sits inline with network traffic and is configured to automatically drop packets that match a known attack signature, without waiting for a human to respond. Which type of system is this?",
+      "options": [
+        "A vulnerability scanner",
+        "An IPS (Intrusion Prevention System)",
+        "A SIEM (Security Information and Event Management) platform",
+        "An IDS (Intrusion Detection System)"
+      ],
+      "correct": 1,
+      "explanation": "Actively blocking traffic inline is the defining feature of an IPS. An IDS would only alert without blocking, a vulnerability scanner looks for weaknesses rather than live traffic, and a SIEM aggregates and correlates security events rather than acting on individual packets itself."
+    },
+    {
+      "id": "q18",
+      "cat": "security",
+      "type": "mc",
+      "question": "A network engineer configures a set of packet filtering rules that evaluate every single packet independently against a static rule list, with no awareness of whether a packet belongs to a connection already allowed. What kind of filtering is this, and what does it require that a connection-aware alternative would not?",
+      "options": [
+        "Stateless filtering \u2014 it requires explicit rules for both directions of every allowed connection",
+        "Stateful filtering \u2014 it requires explicit rules for both directions of every allowed connection",
+        "Stateless filtering \u2014 it automatically permits return traffic for any connection it already approved",
+        "An IPS \u2014 it requires a signature database to be kept current"
+      ],
+      "correct": 0,
+      "explanation": "No memory of prior traffic is exactly what makes it stateless, and because it can't recognize 'this is a reply to something I already let through,' both the outbound request and the inbound reply need their own explicit rule. A stateful filter is what automatically permits that return traffic without a second rule."
+    },
+    {
+      "id": "q19",
+      "cat": "security",
+      "type": "mc",
+      "question": "A company stores customer credit card numbers by substituting each one with a randomly generated, unrelated value, keeping the real numbers in a separate secure vault. Even with unlimited computing power, the substitute values cannot be mathematically reversed to reveal the originals. Which technique is this?",
+      "options": [
+        "Symmetric encryption",
+        "Tokenization",
+        "Asymmetric encryption",
+        "Hashing with a fixed salt"
+      ],
+      "correct": 1,
+      "explanation": "The key detail is 'no mathematical relationship' and 'cannot be reversed even with unlimited computing power' \u2014 that rules out encryption entirely (which is always reversible given the right key) and describes tokenization instead, where the substitute has no computable link back to the original at all."
+    },
+    {
+      "id": "q41",
+      "cat": "security",
+      "type": "mc",
+      "question": "An organization adopts a Zero Trust approach after a VPN credential is stolen and used to connect to the internal network. Which outcome would Zero Trust have most directly prevented?",
+      "options": [
+        "The attacker being detected by an IDS",
+        "The attacker reaching sensitive internal resources on the strength of network access alone, without further verification",
+        "The need for any authentication at all once inside the network perimeter",
+        "The VPN credential being stolen in the first place"
+      ],
+      "correct": 1,
+      "explanation": "Zero Trust's core principle is never granting trust based on network location alone \u2014 so reaching the internal network wouldn't be enough on its own to reach sensitive resources, since every subsequent request is independently verified. It doesn't prevent credential theft itself, and it actually requires MORE verification once inside, not less."
+    },
+    {
+      "id": "q27",
+      "cat": "deployment",
+      "type": "mc",
+      "question": "A team maintains two complete, identical production environments. New releases go to the currently-idle one, get fully verified, and then all live traffic is switched over to it at once \u2014 with the old environment kept running briefly in case an instant rollback is needed. Which deployment strategy is this?",
+      "options": [
+        "Blue-green deployment",
+        "Rolling deployment",
+        "Canary deployment",
+        "In-place deployment"
+      ],
+      "correct": 0,
+      "explanation": "Maintaining two full, identical environments and switching all traffic over at once is the defining trait of blue-green. Canary would gradually shift a small slice of traffic instead of switching all at once, and rolling/in-place deployments update the existing environment directly rather than maintaining a full duplicate."
+    },
+    {
+      "id": "q28",
+      "cat": "deployment",
+      "type": "mc",
+      "question": "A company runs a full backup every Sunday and a differential backup every other day of the week. If a failure happens on Thursday, which backups are needed to fully restore the data, and in what order?",
+      "options": [
+        "Sunday's full backup, then every differential from Monday through Wednesday, in sequence",
+        "Sunday's full backup, then Thursday's differential backup",
+        "Only Wednesday's differential backup",
+        "Sunday's full backup, then Wednesday's differential backup"
+      ],
+      "correct": 3,
+      "explanation": "A differential backup captures everything changed since the last FULL backup, so the most recent differential (Wednesday's) already contains all of Monday through Wednesday's changes on its own \u2014 only the full plus that single latest differential are needed. Needing to replay every differential in sequence is the restore pattern for incremental backups, not differential."
+    },
+    {
+      "id": "q29",
+      "cat": "deployment",
+      "type": "mc",
+      "question": "A company is moving a workload from an on-premises physical server directly into a cloud provider's virtual machine service, largely unchanged. What type of migration is this?",
+      "options": [
+        "V2C (virtual-to-cloud)",
+        "V2V (virtual-to-virtual)",
+        "P2V only, with no cloud component",
+        "P2C (physical-to-cloud)"
+      ],
+      "correct": 3,
+      "explanation": "Starting from a physical server and ending in the cloud makes this P2C. V2V would apply if the source were already a VM being moved to a different hypervisor, and V2C would apply if the source were already virtualized on-premises before the cloud move \u2014 neither matches a physical starting point."
+    },
+    {
+      "id": "q30",
+      "cat": "deployment",
+      "type": "mc",
+      "question": "A storage administrator allocates 500 GB volumes to twenty different servers on a storage array that only physically has 3 TB of actual capacity, on the assumption that most volumes won't use their full allocation at once. Which approach is this, and what is its main risk?",
+      "options": [
+        "Thin provisioning \u2014 the array reserves the full 500 GB physically before any data is written",
+        "Thin provisioning \u2014 if enough volumes fill up simultaneously, the physical storage can run out even though each volume shows free space",
+        "Thin provisioning \u2014 it makes each individual volume slower than a thick-provisioned one",
+        "Thick provisioning \u2014 it wastes capacity that could otherwise be used elsewhere"
+      ],
+      "correct": 1,
+      "explanation": "Allocating more logical capacity than physically exists, on the assumption it won't all be used, is thin provisioning \u2014 and its central risk is exactly that: if enough volumes actually use more of their allocation than expected, the underlying physical storage runs out mid-write. Thick provisioning would reserve the full 500 GB per volume up front, which this scenario explicitly isn't doing."
+    },
+    {
+      "id": "q31",
+      "cat": "deployment",
+      "type": "mc",
+      "question": "A team defines their entire network, VM, and storage configuration in version-controlled template files, and deploys new environments by running those templates rather than clicking through a console. What does this most directly guarantee that manual configuration does not?",
+      "options": [
+        "That the deployed environment will never need to be patched",
+        "That the environment is protected against a full regional outage",
+        "That the same template produces the same, auditable result every time it's deployed",
+        "That the environment will automatically scale based on demand"
+      ],
+      "correct": 2,
+      "explanation": "Infrastructure as Code's core guarantee is repeatable, auditable deployments \u2014 the same input produces the same result, and the exact configuration is always readable from the template. It says nothing about patching, autoscaling, or regional redundancy, which are separate concerns configured independently."
+    },
+    {
+      "id": "q42",
+      "cat": "deployment",
+      "type": "mc",
+      "question": "A team's pipeline automatically builds and tests every code change, and any change that passes all automated tests is released to production immediately with no manual approval step. Which practice does this describe?",
+      "options": [
+        "Continuous integration only, with no release automation",
+        "Continuous delivery",
+        "A canary release",
+        "Continuous deployment"
+      ],
+      "correct": 3,
+      "explanation": "The detail that removes any ambiguity is 'no manual approval step' \u2014 continuous delivery would still keep a human gate before the actual release, while continuous deployment removes that gate entirely so a passing change ships automatically. Continuous integration alone only covers the build/test merge step, not releasing to production."
+    },
+    {
+      "id": "q43",
+      "cat": "opsSupport",
+      "type": "mc",
+      "question": "An operations team scripts a workflow that provisions a new VM, installs required software on it, registers it with a load balancer, and then runs a health check \u2014 all as one coordinated sequence triggered by a single request. Which best describes what's happening here, beyond just automation of each individual step?",
+      "options": [
+        "Showback",
+        "Accounting",
+        "Baselining",
+        "Orchestration"
+      ],
+      "correct": 3,
+      "explanation": "Coordinating multiple already-automated steps into a single end-to-end workflow is specifically orchestration \u2014 automation alone would only cover one of those steps in isolation, without sequencing them together as a whole."
+    },
+    {
+      "id": "q44",
+      "cat": "opsSupport",
+      "type": "mc",
+      "question": "Finance wants each department to see a detailed monthly breakdown of exactly how much cloud spend their team is responsible for, purely for budget visibility \u2014 with no actual transfer of funds between department budgets. Which practice fits?",
+      "options": [
+        "A full resource lock on shared accounts",
+        "A CMDB entry per department",
+        "Chargeback",
+        "Showback"
+      ],
+      "correct": 3,
+      "explanation": "Reporting cost for visibility without moving actual budget between departments is showback. Chargeback would go further and actually bill each department's budget for their share \u2014 which this scenario explicitly rules out."
+    },
+    {
+      "id": "q45",
+      "cat": "opsSupport",
+      "type": "mc",
+      "question": "A monitoring team wants to know the normal, expected CPU utilization range for a server under typical daily load, observed over several weeks, before deciding what utilization level should trigger an alert. What are they establishing first?",
+      "options": [
+        "A CMDB record",
+        "An SLA",
+        "A threshold",
+        "A baseline"
+      ],
+      "correct": 3,
+      "explanation": "Observing normal behavior over time to understand the expected range is establishing a baseline. A threshold is the specific trigger value set afterward, usually informed by that baseline \u2014 setting a threshold without one first tends to produce either constant false alarms or missed real problems."
+    },
+    {
+      "id": "q46",
+      "cat": "opsSupport",
+      "type": "mc",
+      "question": "A provider's SLA guarantees 99.9% uptime for a service. Roughly how much downtime per year does that commitment actually allow?",
+      "options": [
+        "Zero \u2014 99.9% means no downtime is permitted",
+        "About 36 hours",
+        "About 8.75 hours",
+        "About 5 minutes"
+      ],
+      "correct": 2,
+      "explanation": "99.9% uptime ('three nines') allows roughly 8.75 hours of downtime per year. 'Five nines' (99.999%) is the tier that only allows about 5 minutes a year \u2014 a commonly confused pair on the exam, since both are often just referred to loosely as 'high uptime.'"
+    },
+    {
+      "id": "q50",
+      "cat": "troubleshooting",
+      "type": "mc",
+      "question": "Following the standard troubleshooting methodology, an administrator has identified the problem and formed a theory that a specific firewall rule is blocking traffic. What is the correct next step, before touching any configuration?",
+      "options": [
+        "Document the incident as resolved",
+        "Implement a fix by removing the suspected rule immediately",
+        "Escalate to a change advisory board without further investigation",
+        "Test the theory to confirm the firewall rule is actually the cause"
+      ],
+      "correct": 3,
+      "explanation": "The methodology calls for testing the theory before acting on it \u2014 jumping straight to removing a firewall rule based on an unconfirmed theory risks a wasted change (or a new security gap) if the actual cause turns out to be something else entirely."
+    },
+    {
+      "id": "q51",
+      "cat": "troubleshooting",
+      "type": "mc",
+      "question": "A tenant on a shared virtualization host reports their VM has become sluggish, even though their own workload and configuration haven't changed. Investigation shows another tenant on the same physical host is running an unusually CPU-intensive job. What is this scenario an example of?",
+      "options": [
+        "An orphaned resource",
+        "The \"noisy neighbor\" problem",
+        "A licensing failure",
+        "A DNS resolution failure"
+      ],
+      "correct": 1,
+      "explanation": "One tenant's heavy usage degrading another tenant's performance on shared hardware is the textbook noisy neighbor problem. It has nothing to do with licensing, name resolution, or leftover unused resources \u2014 the affected tenant's own environment is unchanged."
+    },
+    {
+      "id": "q52",
+      "cat": "troubleshooting",
+      "type": "mc",
+      "question": "A service is completely unreachable by its hostname, but connecting directly to its known IP address works perfectly. What does this strongly suggest the root cause is?",
+      "options": [
+        "A DNS resolution issue",
+        "A firewall blocking all traffic to the service",
+        "The service itself has crashed",
+        "Insufficient bandwidth to the service"
+      ],
+      "correct": 0,
+      "explanation": "If the raw IP address works but the hostname doesn't, the network path and the service itself are both clearly fine \u2014 the only thing standing between the two is name resolution, pointing squarely at DNS rather than a firewall, an outage, or a bandwidth problem."
+    },
+    {
+      "id": "q7",
+      "cat": "archDesign",
+      "type": "tf",
+      "question": "A hybrid cloud deployment simply means an organization uses two different public cloud providers for two unrelated projects.",
+      "answer": false,
+      "explanation": "That describes multi-cloud. Hybrid specifically means private and public environments connected and coordinated together, often for workload portability between them \u2014 not just using multiple unrelated clouds side by side."
+    },
+    {
+      "id": "tf1",
+      "cat": "archDesign",
+      "type": "tf",
+      "question": "A system can be highly available and still experience a brief interruption during a failover event.",
+      "answer": true,
+      "explanation": "High availability minimizes downtime through redundancy, but a short interruption during failover is often still possible. A system with zero interruption at all, even during a failure, is described as fault tolerant instead."
+    },
+    {
+      "id": "tf2",
+      "cat": "archDesign",
+      "type": "tf",
+      "question": "Object storage is generally the best choice for a high-transaction relational database requiring low-latency random reads and writes.",
+      "answer": false,
+      "explanation": "Block storage is built for that kind of low-latency, random-access workload. Object storage trades that per-operation latency for massive scale and simplicity, and is a poor fit for a live transactional database."
+    },
+    {
+      "id": "tf3",
+      "cat": "security",
+      "type": "tf",
+      "question": "An IDS (Intrusion Detection System) can automatically block malicious traffic it identifies, the same way an IPS does.",
+      "answer": false,
+      "explanation": "An IDS only detects and alerts \u2014 it doesn't sit inline or block anything. Only an IPS actively blocks traffic it identifies as malicious."
+    },
+    {
+      "id": "tf4",
+      "cat": "security",
+      "type": "tf",
+      "question": "Encrypting a database at rest also protects the data while it is being queried and transmitted to a client application.",
+      "answer": false,
+      "explanation": "At-rest encryption only protects stored data on disk. Data moving to a client over the network needs its own, separate in-transit encryption (like TLS) to be protected during that trip."
+    },
+    {
+      "id": "tf5",
+      "cat": "security",
+      "type": "tf",
+      "question": "A stateless packet filter automatically permits return traffic for a connection it has already approved, without a separate rule.",
+      "answer": false,
+      "explanation": "That's exactly what a stateful firewall does. A stateless filter evaluates every packet independently with no memory of prior traffic, so both directions of a connection need their own explicit rule."
+    },
+    {
+      "id": "tf6",
+      "cat": "security",
+      "type": "tf",
+      "question": "Tokenized data can be mathematically reversed back to its original value by anyone with sufficient computing power, the same as encrypted data with enough time.",
+      "answer": false,
+      "explanation": "This is the key difference from encryption: a token has no mathematical relationship to the original value at all, so no amount of computing power can reverse it \u2014 only looking it up in the separate, secured vault reveals the original."
+    },
+    {
+      "id": "tf7",
+      "cat": "deployment",
+      "type": "tf",
+      "question": "Restoring from an incremental backup chain only requires the most recent incremental backup, the same way a differential backup restore only needs the latest differential.",
+      "answer": false,
+      "explanation": "An incremental restore needs the original full backup PLUS every incremental backup taken since, applied in order \u2014 unlike a differential restore, which only ever needs the full plus the single latest differential, since each differential already contains everything since the last full."
+    },
+    {
+      "id": "tf8",
+      "cat": "deployment",
+      "type": "tf",
+      "question": "A canary deployment exposes a new release to all users simultaneously, the same way a blue-green deployment switches all traffic at once.",
+      "answer": false,
+      "explanation": "Canary deployments do the opposite \u2014 they gradually increase the new release's exposure, starting with a small subset of traffic, specifically to limit the impact of a bad release. Switching everyone over at once is the blue-green pattern."
+    },
+    {
+      "id": "tf9",
+      "cat": "opsSupport",
+      "type": "tf",
+      "question": "Orchestration can exist without any underlying task automation, purely as a manual coordination process.",
+      "answer": false,
+      "explanation": "Orchestration specifically means coordinating multiple already-automated tasks into a workflow. Without automated tasks to coordinate in the first place, there's nothing for orchestration to sequence."
+    },
+    {
+      "id": "tf10",
+      "cat": "opsSupport",
+      "type": "tf",
+      "question": "Chargeback involves actually transferring budget between departments based on their cloud usage, while showback only reports usage for visibility.",
+      "answer": true,
+      "explanation": "That's the correct distinction \u2014 chargeback moves real budget between departments based on their share of usage, while showback stops at reporting for awareness and accountability, without an actual internal transfer of funds."
+    },
+    {
+      "id": "tf11",
+      "cat": "troubleshooting",
+      "type": "tf",
+      "question": "Increasing available bandwidth on a connection will generally resolve a high-latency problem.",
+      "answer": false,
+      "explanation": "Latency and bandwidth are independent characteristics. Latency is about the delay before data starts moving; bandwidth is about how much can move once it's flowing. More bandwidth does nothing to shorten that initial delay."
+    },
+    {
+      "id": "tf12",
+      "cat": "troubleshooting",
+      "type": "tf",
+      "question": "Applying a quick workaround to restore service during an incident means root cause analysis is no longer necessary.",
+      "answer": false,
+      "explanation": "A workaround restores service without necessarily fixing the underlying issue. Root cause analysis is still needed afterward, or the same incident is likely to recur."
+    },
+    {
+      "id": "msq1",
+      "cat": "archDesign",
+      "type": "ms",
+      "question": "Which two of the following are examples of horizontal scaling, as opposed to vertical scaling? (Choose two.)",
+      "options": [
+        "Adding more replica nodes to a database cluster",
+        "Upgrading a VM to a larger instance size with more vCPUs",
+        "Adding three more web server instances behind a load balancer",
+        "Increasing a single VM's allocated RAM from 8 GB to 32 GB"
+      ],
+      "correct": [
+        0,
+        2
+      ],
+      "explanation": "Adding more instances or nodes running in parallel is horizontal scaling (scaling out). Increasing the resources of a single existing VM \u2014 RAM or vCPUs \u2014 is vertical scaling (scaling up), which the last two options both describe."
+    },
+    {
+      "id": "msq2",
+      "cat": "archDesign",
+      "type": "ms",
+      "question": "Which two statements correctly distinguish high availability from fault tolerance? (Choose two.)",
+      "options": [
+        "High availability minimizes downtime but may still allow a brief failover interruption",
+        "Fault tolerance and high availability are two names for the exact same thing",
+        "High availability is only relevant to on-premises systems, not cloud-hosted ones",
+        "Fault tolerance keeps a system running through a failure with no interruption at all"
+      ],
+      "correct": [
+        0,
+        3
+      ],
+      "explanation": "High availability reduces downtime through redundancy but can still involve a short interruption during failover; fault tolerance goes further, with no interruption at all, typically at higher cost. They're related but distinct concepts, and both apply equally to cloud and on-premises systems."
+    },
+    {
+      "id": "msq3",
+      "cat": "security",
+      "type": "ms",
+      "question": "Which two of the following are true about Zero Trust? (Choose two.)",
+      "options": [
+        "It verifies every request independently, regardless of network location",
+        "A compromised network perimeter alone is not enough to reach protected resources",
+        "It removes the need for authentication once a device is inside the network",
+        "It only applies to external users, not internal employees"
+      ],
+      "correct": [
+        0,
+        1
+      ],
+      "explanation": "Zero Trust verifies every request independently and specifically denies the assumption that being inside the network perimeter implies trust. It doesn't remove authentication for anyone \u2014 internal or external \u2014 since no request is trusted by default."
+    },
+    {
+      "id": "msq4",
+      "cat": "security",
+      "type": "ms",
+      "question": "Which two of the following correctly describe encryption at rest versus in transit? (Choose two.)",
+      "options": [
+        "Encryption in transit protects data moving across a network",
+        "Encryption at rest protects data stored on disk",
+        "Encryption at rest also automatically protects data once it leaves the server over the network",
+        "Encryption in transit removes the need to ever encrypt data at rest"
+      ],
+      "correct": [
+        0,
+        1
+      ],
+      "explanation": "At-rest and in-transit encryption protect data in two different states \u2014 stored, and moving across a network \u2014 and neither one substitutes for the other. Data encrypted only at rest is unprotected the moment it starts moving, and vice versa."
+    },
+    {
+      "id": "msq5",
+      "cat": "deployment",
+      "type": "ms",
+      "question": "Which two of the following are true about Infrastructure as Code (IaC)? (Choose two.)",
+      "options": [
+        "It allows the same environment configuration to be deployed repeatably",
+        "It replaces the need for any testing before deployment",
+        "It can be version-controlled like application source code",
+        "It guarantees an application will never need further code changes"
+      ],
+      "correct": [
+        0,
+        2
+      ],
+      "explanation": "IaC's real strengths are repeatable, consistent deployments and version-controlled configuration, just like application code. It has no bearing on whether the application itself needs future changes, and it doesn't replace testing \u2014 the infrastructure it defines still needs to be validated."
+    },
+    {
+      "id": "msq6",
+      "cat": "deployment",
+      "type": "ms",
+      "question": "Which two of the following are valid reasons a team might choose a rolling deployment over an in-place deployment? (Choose two.)",
+      "options": [
+        "The service needs to remain available throughout the update",
+        "It requires maintaining two complete duplicate production environments",
+        "Only a few instances are updated at a time, limiting exposure to a bad release",
+        "It is the fastest possible way to update every instance simultaneously"
+      ],
+      "correct": [
+        0,
+        2
+      ],
+      "explanation": "Rolling deployments keep the service available by updating a few instances at a time, which also limits how many instances are affected if something goes wrong. Maintaining two full duplicate environments describes blue-green, not rolling, and updating every instance simultaneously is closer to in-place, not the gradual rolling approach."
+    },
+    {
+      "id": "msq7",
+      "cat": "opsSupport",
+      "type": "ms",
+      "question": "Which two of the following are true about a Service Level Agreement (SLA)? (Choose two.)",
+      "options": [
+        "It typically defines measurable commitments like uptime percentage and response time",
+        "SLAs apply only to cloud providers and never to internal IT teams",
+        "A 99.9% uptime commitment allows for zero downtime whatsoever",
+        "It typically specifies penalties or credits if commitments are not met"
+      ],
+      "correct": [
+        0,
+        3
+      ],
+      "explanation": "SLAs define measurable commitments (like uptime or response time) and the consequences of missing them. 99.9% uptime still allows roughly 8.75 hours of downtime per year, not zero, and internal IT teams commonly use internal SLAs with their own business units too."
+    },
+    {
+      "id": "msq8",
+      "cat": "opsSupport",
+      "type": "ms",
+      "question": "Which two of the following correctly describe automation versus orchestration? (Choose two.)",
+      "options": [
+        "Automation and orchestration are interchangeable terms for the same concept",
+        "Orchestration coordinates multiple automated tasks into a larger workflow",
+        "Automation handles a single, well-defined task without human intervention",
+        "Orchestration can be built entirely without any underlying automated tasks"
+      ],
+      "correct": [
+        1,
+        2
+      ],
+      "explanation": "Automation is scoped to one task; orchestration coordinates several automated tasks together as a workflow, which means it depends on automated tasks existing underneath it \u2014 it can't be built purely on its own with nothing automated to coordinate."
+    },
+    {
+      "id": "msq9",
+      "cat": "troubleshooting",
+      "type": "ms",
+      "question": "Which two of the following are steps in the standard troubleshooting methodology, in the correct relative order? (Choose two.)",
+      "options": [
+        "Document findings, before identifying the problem",
+        "Establish a theory of probable cause, before testing that theory",
+        "Test the theory, before implementing a plan of action",
+        "Implement a solution, before establishing any theory of the cause"
+      ],
+      "correct": [
+        1,
+        2
+      ],
+      "explanation": "The methodology flows: identify the problem, establish a theory, test the theory, then implement a plan of action, verify, and document. Testing must come before implementing a fix, and documentation is the final step, not the first \u2014 the other two options both reverse the correct order."
+    },
+    {
+      "id": "msq10",
+      "cat": "troubleshooting",
+      "type": "ms",
+      "question": "A service was recently migrated to a new IP address and its DNS record updated. Some users still reach the old server while others reach the new one. Which two factors most plausibly explain this? (Choose two.)",
+      "options": [
+        "A low TTL was not set before the migration, so cached records at various resolvers have not expired yet",
+        "Some users are being served a cached answer from a resolver that has not yet refreshed the record",
+        "The service itself is completely down for everyone",
+        "The new IP address has no route to the internet at all"
+      ],
+      "correct": [
+        0,
+        1
+      ],
+      "explanation": "Split behavior right after a DNS change is the classic signature of caching: resolvers that already cached the old record under a long TTL won't re-query until it expires, while others pick up the new record right away. A completely down service or an unreachable new IP would fail for everyone, not just some users."
+    },
+    {
+      "id": "q53",
+      "cat": "troubleshooting",
+      "type": "mc",
+      "question": "Several VMs on the same virtualization host show consistently high \"CPU ready\" time in monitoring, even though each VM's own CPU utilization looks moderate. What does this metric specifically indicate?",
+      "options": [
+        "The host's physical CPUs are oversubscribed, so VMs are waiting in queue for CPU time to actually be scheduled",
+        "The VMs' guest operating systems have a memory leak",
+        "The host's storage array is the bottleneck, not the CPU",
+        "The VMs' NICs are misconfigured for the wrong VLAN"
+      ],
+      "correct": 0,
+      "explanation": "CPU ready time measures how long a vCPU is ready to run but waiting for the physical scheduler to actually give it time \u2014 high ready time across multiple VMs on one host is the signature of CPU oversubscription/contention, not a guest memory leak, a storage bottleneck, or a VLAN misconfiguration, none of which this metric reflects."
+    },
+    {
+      "id": "q54",
+      "cat": "troubleshooting",
+      "type": "mc",
+      "question": "After a hypervisor host's clock drifts several minutes out of sync, users suddenly can't authenticate to a Kerberos-based service, and TLS certificate validation begins failing intermittently across VMs on that host, even though no configuration changed. What is the most likely root cause?",
+      "options": [
+        "Time synchronization (NTP) drift on the host",
+        "A DNS resolution failure",
+        "An expired software license",
+        "Insufficient bandwidth between the VMs and the authentication server"
+      ],
+      "correct": 0,
+      "explanation": "Kerberos authentication and TLS certificate validation both depend on closely synchronized clocks \u2014 even a few minutes of drift can cause tickets and certificates to be rejected as expired or not-yet-valid. Nothing here points to DNS, licensing, or bandwidth, none of which would produce this specific pattern of authentication and certificate failures tied to a clock issue."
+    },
+    {
+      "id": "q55",
+      "cat": "troubleshooting",
+      "type": "mc",
+      "question": "New VMs being provisioned in a subnet intermittently fail to come online, with logs showing they never received an IP address. Existing VMs on the same subnet are unaffected. What is the most likely cause?",
+      "options": [
+        "The DHCP scope for that subnet has run out of available addresses",
+        "A DNS record for the new VMs is missing",
+        "The load balancer's health check is misconfigured",
+        "The new VMs' storage volumes are thin-provisioned"
+      ],
+      "correct": 0,
+      "explanation": "New instances failing to obtain an address while already-running instances (which already hold a lease) are unaffected is the classic sign of a DHCP scope with no addresses left to hand out. It isn't a naming issue at all since the VM never gets an IP to register in the first place, and it has nothing to do with load balancer health checks or how storage is provisioned."
+    },
+    {
+      "id": "tf13",
+      "cat": "troubleshooting",
+      "type": "tf",
+      "question": "In a high-availability cluster, a \"split-brain\" condition occurs when a network partition causes multiple nodes to each believe they are the only active primary, potentially leading both to accept writes independently.",
+      "answer": true,
+      "explanation": "That's the standard definition of split-brain \u2014 a communication failure between cluster nodes causes more than one node to assume the primary role at once, risking data divergence or corruption if both accept writes. It's why HA clustering typically includes a quorum or fencing mechanism specifically to prevent it."
+    },
+    {
+      "id": "msq11",
+      "cat": "troubleshooting",
+      "type": "ms",
+      "question": "A VM feels sluggish even though its own guest-level CPU and memory metrics look normal. Which two actions would help determine whether the real cause is contention with other tenants on the shared host? (Choose two.)",
+      "options": [
+        "Check hypervisor-level metrics like CPU ready time or memory ballooning for that host",
+        "Check whether other VMs on the same physical host are running unusually heavy workloads",
+        "Increase the affected VM's own allocated vCPU count without checking anything else",
+        "Assume the guest operating system needs to be reinstalled"
+      ],
+      "correct": [
+        0,
+        1
+      ],
+      "explanation": "Guest-level metrics can look fine while the real bottleneck is contention for the shared host's physical resources \u2014 hypervisor-level metrics (CPU ready, ballooning) and checking neighboring VMs' activity are exactly how a noisy-neighbor/contention issue gets confirmed. Adding more vCPUs to a VM that isn't even using its current allocation, or reinstalling its OS, diagnoses nothing and doesn't address host-level contention."
+    },
+    {
+      "id": "q56",
+      "cat": "opsSupport",
+      "type": "mc",
+      "question": "Before rolling a critical security patch out to production servers, an operations team first applies it to a staging environment that mirrors production, verifies nothing breaks, and only then schedules the production rollout during an approved maintenance window. What practice does this reflect?",
+      "options": [
+        "Following a formal change management process",
+        "Chargeback",
+        "Orphaned resource cleanup",
+        "Thin provisioning"
+      ],
+      "correct": 0,
+      "explanation": "Testing a change in a representative environment first and deploying it to production only through an approved, scheduled window is the core of change management, reducing the risk of an untested change causing an outage. It has nothing to do with cost allocation (chargeback), unused resources, or how storage is provisioned."
+    },
+    {
+      "id": "q57",
+      "cat": "opsSupport",
+      "type": "mc",
+      "question": "By tracking storage utilization baselines over the past year, a team notices consumption has grown steadily by about 10% per quarter and uses that trend to request additional capacity before the array actually fills up. What practice does this describe?",
+      "options": [
+        "Capacity planning based on trend analysis",
+        "Chargeback",
+        "Root cause analysis",
+        "A rolling deployment"
+      ],
+      "correct": 0,
+      "explanation": "Using historical trend data to forecast future resource needs and provision ahead of time is capacity planning. It's distinct from chargeback (a billing practice), root cause analysis (which investigates incidents after the fact), and rolling deployment (a release strategy) \u2014 none of which involve forecasting future demand."
+    },
+    {
+      "id": "tf14",
+      "cat": "opsSupport",
+      "type": "tf",
+      "question": "A runbook documents a specific, repeatable set of steps for handling a known type of incident, so responders don't have to reinvent the response each time it happens.",
+      "answer": true,
+      "explanation": "That's the purpose of a runbook \u2014 a pre-written, tested procedure for a known scenario, such as restarting a specific failed service or failing over a specific database, which speeds up and standardizes incident response compared to improvising a response from scratch every time."
+    },
+    {
+      "id": "msq12",
+      "cat": "opsSupport",
+      "type": "ms",
+      "question": "Which two of the following are true about a formal change management process? (Choose two.)",
+      "options": [
+        "Even an emergency change made outside the normal approval flow should still be documented afterward",
+        "Planned changes are typically reviewed and approved before being implemented in production",
+        "Once a change is approved, it never needs to be tested in a non-production environment first",
+        "Change management applies only to hardware changes, never to software or configuration changes"
+      ],
+      "correct": [
+        0,
+        1
+      ],
+      "explanation": "A sound change management process still requires documenting emergency changes after the fact, even when they bypass the usual advance approval, and routine changes are normally reviewed and approved before hitting production. Skipping non-production testing after approval, or limiting the process to hardware only, both defeat the purpose of change management."
+    },
+    {
+      "id": "q58",
+      "cat": "archDesign",
+      "type": "mc",
+      "question": "A development team deploys their application code to a provider's platform, which automatically handles the underlying operating system patching, runtime, and scaling \u2014 the team never manages a virtual machine directly. Which cloud service model is this?",
+      "options": [
+        "PaaS (Platform as a Service)",
+        "IaaS (Infrastructure as a Service)",
+        "SaaS (Software as a Service)",
+        "DRaaS (Disaster Recovery as a Service)"
+      ],
+      "correct": 0,
+      "explanation": "PaaS provides a managed runtime/platform where developers deploy code without managing the underlying OS or VM, which is the defining trait here. IaaS would still require the team to manage the VM/OS itself, SaaS delivers a complete end-user application rather than a platform to build on, and DRaaS is specifically about disaster recovery, not general application hosting."
+    },
+    {
+      "id": "q59",
+      "cat": "archDesign",
+      "type": "mc",
+      "question": "Compared to a traditional virtual machine, what is the main architectural difference that lets a container start in milliseconds and run with a much smaller footprint?",
+      "options": [
+        "A container shares the host operating system's kernel instead of including its own full guest OS",
+        "A container always runs on dedicated physical hardware with no virtualization layer at all",
+        "A container replicates the hypervisor for each instance",
+        "A container requires a full guest OS but no application dependencies"
+      ],
+      "correct": 0,
+      "explanation": "Containers package an application and its dependencies but share the host's kernel, avoiding the overhead of booting a full guest OS \u2014 that's why they start so much faster and use less memory/disk than a VM, which bundles a complete separate operating system per instance. The other options misdescribe both containers and how virtualization/hypervisors actually work."
+    },
+    {
+      "id": "q60",
+      "cat": "security",
+      "type": "mc",
+      "question": "After a user's password is compromised, an administrator requires that logins also present a time-based one-time code generated by an app on the user's registered phone. Which authentication factor category does this add?",
+      "options": [
+        "Something you have",
+        "Something you know",
+        "Something you are",
+        "Somewhere you are"
+      ],
+      "correct": 0,
+      "explanation": "A one-time code generated by a registered device the user physically possesses is a \"something you have\" factor. A password is \"something you know,\" a biometric is \"something you are,\" and location-based checks are \"somewhere you are\" \u2014 combining factors from different categories, rather than just two passwords, is what makes MFA effective against a stolen password alone."
+    },
+    {
+      "id": "q61",
+      "cat": "archDesign",
+      "type": "mc",
+      "question": "A network architecture separates the logic that decides how traffic should be routed (the control plane) from the hardware that actually forwards packets (the data plane), letting routing policy be managed centrally through software instead of configured device-by-device. What is this architecture called?",
+      "options": [
+        "A stateful firewall",
+        "Software-defined networking (SDN)",
+        "A content delivery network (CDN)",
+        "Network address translation (NAT)"
+      ],
+      "correct": 1,
+      "explanation": "Software-defined networking (SDN) is defined by exactly this separation -- a centralized control plane that programmatically manages routing and policy, decoupled from the data plane hardware that just forwards traffic. A stateful firewall and NAT are specific network functions, not an overall architecture, and a CDN is about caching content near end users, not about how routing decisions are made."
+    },
+    {
+      "id": "q62",
+      "cat": "security",
+      "type": "mc",
+      "question": "A company deploys an appliance in front of its public-facing web application specifically to inspect HTTP requests and block attacks like SQL injection and cross-site scripting before they reach the application. Which security control is this?",
+      "options": [
+        "A traditional network firewall filtering by port and IP address",
+        "An IPS operating purely at the network layer",
+        "A web application firewall (WAF)",
+        "A VPN concentrator"
+      ],
+      "correct": 2,
+      "explanation": "A WAF inspects application-layer HTTP traffic specifically for attacks like SQL injection and XSS, which is exactly what's described. A traditional network firewall filtering by port/IP has no visibility into HTTP request content, a purely network-layer IPS is similarly blind to application-layer payloads, and a VPN concentrator terminates encrypted remote-access tunnels rather than inspecting web application traffic."
+    },
+    {
+      "id": "q63",
+      "cat": "security",
+      "type": "mc",
+      "question": "An organization wants its encryption keys generated, stored, and used for cryptographic operations inside dedicated, tamper-resistant hardware, so the raw key material is never exposed to the operating system or application memory. Which solution fits this requirement?",
+      "options": [
+        "A software-based key stored in a configuration file",
+        "A stateless packet filter",
+        "A content delivery network",
+        "A hardware security module (HSM)"
+      ],
+      "correct": 3,
+      "explanation": "A hardware security module (HSM) is purpose-built dedicated hardware that generates, stores, and performs operations with cryptographic keys internally, so the raw key material never has to leave the device or be exposed in application memory. A key stored in a plain configuration file is exactly the exposure this requirement is trying to avoid, and a packet filter or CDN have nothing to do with protecting key material."
+    },
+    {
+      "id": "q64",
+      "cat": "deployment",
+      "type": "mc",
+      "question": "A development team ships new code to production behind a configuration switch that starts turned off, then enables that switch for users later, independent of any new code deployment. What does this practice let the team decouple?",
+      "options": [
+        "Deployment (getting new code into production) from release (actually exposing it to users)",
+        "Encryption at rest from encryption in transit",
+        "A full backup from a differential backup",
+        "Vertical scaling from horizontal scaling"
+      ],
+      "correct": 0,
+      "explanation": "This describes feature flags (feature toggles): the code is deployed to production while hidden behind a switch, and enabling it for users later is a separate action entirely -- decoupling when code ships from when it is actually exposed. The other pairings (backup types, scaling types, encryption types) describe entirely unrelated concepts that this scenario has nothing to do with."
+    },
+    {
+      "id": "q65",
+      "cat": "opsSupport",
+      "type": "mc",
+      "question": "After reviewing months of utilization data, a team discovers several production VMs are consistently using only about 15% of their allocated vCPUs and memory, and downsizes them to a smaller instance size to cut cost without harming performance. What practice does this describe?",
+      "options": [
+        "Chargeback",
+        "A canary deployment",
+        "Right-sizing",
+        "Orphaned resource cleanup"
+      ],
+      "correct": 2,
+      "explanation": "Right-sizing is specifically the practice of adjusting allocated resources to match actual observed usage, cutting cost without harming performance. Chargeback is a billing practice, a canary deployment is a release strategy, and orphaned resource cleanup deals with abandoned resources still incurring cost -- none of which describes resizing still-in-use instances to match their real usage."
+    },
+    {
+      "id": "q66",
+      "cat": "troubleshooting",
+      "type": "mc",
+      "question": "An application repeatedly calling a cloud provider's API begins receiving HTTP 429 responses, and the calls otherwise appear correctly formed with valid credentials. What does this response code most likely indicate?",
+      "options": [
+        "The requested resource does not exist",
+        "The API is rate-limiting or throttling the client for sending too many requests",
+        "The client's credentials have expired",
+        "The API server has crashed"
+      ],
+      "correct": 1,
+      "explanation": "HTTP 429 (\"Too Many Requests\") is the standard response code for rate limiting or throttling, telling the client it's exceeding an allowed request rate -- not that anything is wrong with the request's formatting or credentials. A missing resource would return 404, expired credentials would typically return 401, and a crashed server would fail to respond at all rather than returning a well-formed 429."
+    },
+    {
+      "id": "tf15",
+      "cat": "deployment",
+      "type": "tf",
+      "question": "A disaster recovery tabletop exercise involves stakeholders walking through and discussing the DR plan step by step, rather than actually failing services over to a backup site.",
+      "answer": true,
+      "explanation": "That's the standard definition of a tabletop exercise -- a discussion-based walkthrough used to validate the plan and find gaps without the risk or cost of an actual failover. A full-interruption or live failover test, by contrast, does actually move production traffic to the backup site."
+    },
+    {
+      "id": "tf16",
+      "cat": "opsSupport",
+      "type": "tf",
+      "question": "A backup job reporting \"completed successfully\" is sufficient on its own to guarantee the data can actually be restored, without ever needing to perform a test restore.",
+      "answer": false,
+      "explanation": "A job completing without error only confirms the backup process ran -- it doesn't confirm the resulting backup file is actually usable. Corruption, incomplete captures, and other issues can still make a \"successful\" backup unrestorable, which is exactly why periodic test restores are considered standard practice rather than optional."
+    },
+    {
+      "id": "msq13",
+      "cat": "archDesign",
+      "type": "ms",
+      "question": "Compared to a monolithic application, which two of the following are genuine advantages of a microservices architecture? (Choose two.)",
+      "options": [
+        "Individual services can be updated and deployed independently, without redeploying the entire application",
+        "A bug in any one component is guaranteed to never affect the rest of the system",
+        "Each service can be scaled independently based on its own specific demand",
+        "The entire application always runs as a single deployable unit"
+      ],
+      "correct": [
+        0,
+        2
+      ],
+      "explanation": "Microservices let teams deploy and scale each service independently, based on that service's own release cycle and load -- both genuine, well-documented advantages. A single deployable unit is a monolithic trait, not a microservices one, and microservices don't guarantee full fault isolation -- a failing dependency can still cascade to services that call it, which is why patterns like circuit breakers exist in the first place."
+    },
+    {
+      "id": "msq14",
+      "cat": "troubleshooting",
+      "type": "ms",
+      "question": "A database VM's queries have become noticeably slower. Which two of the following metrics would most directly help confirm the storage subsystem itself is the bottleneck? (Choose two.)",
+      "options": [
+        "A steady, unremarkable CPU utilization on the same VM",
+        "Disk queue length and I/O wait time consistently elevated above baseline",
+        "Read/write latency spiking well above its established baseline during the slowdown",
+        "A recent increase in successful DNS queries from the VM"
+      ],
+      "correct": [
+        1,
+        2
+      ],
+      "explanation": "Elevated disk queue length/I/O wait and latency spiking above baseline are direct, storage-specific performance indicators that point at the storage subsystem itself. Steady CPU utilization actually argues against CPU being the bottleneck rather than confirming a storage issue, and DNS query volume has no bearing on storage performance at all."
+    }
+  ],
+  "cheatSheet": [
+    {
+      "heading": "Exam format & domain weights",
+      "points": [
+        "Up to 90 questions in 90 minutes, scored on a 100-900 scale with 750 required to pass.",
+        "Six domains: Cloud Architecture 23%, Deployment 19%, Security 19%, Operations 17%, Troubleshooting 12%, DevOps Fundamentals 10%.",
+        "CV0-004 added the DevOps Fundamentals domain that the prior CV0-003 version did not have."
+      ]
+    },
+    {
+      "heading": "Service & deployment models (vendor-neutral)",
+      "points": [
+        "IaaS/PaaS/SaaS follow the same responsibility gradient as any vendor's version, but Cloud+ expects you to reason about it independent of any one brand.",
+        "Community cloud = shared by several organizations with common concerns (e.g., compliance) \u2014 distinct from public (open to anyone) and private (single org).",
+        "Multi-cloud = using more than one public cloud provider; hybrid cloud = mixing cloud with on-premises. Don't conflate the two terms."
+      ]
+    },
+    {
+      "heading": "High availability & scaling",
+      "points": [
+        "Vertical scaling (\"scale up\") = a bigger instance; horizontal scaling (\"scale out\") = more instances \u2014 horizontal generally scales further with less downtime.",
+        "Active-active = all nodes serve traffic simultaneously; active-passive = a standby node takes over only after a failure.",
+        "N+1 redundancy = one spare unit beyond what is needed; N+2 adds two \u2014 higher N raises resilience and cost together.",
+        "RTO (Recovery Time Objective) = how long you can tolerate being down; RPO (Recovery Point Objective) = how much data loss, measured in time, is acceptable."
+      ]
+    },
+    {
+      "heading": "Security domain essentials",
+      "points": [
+        "Encryption in transit (TLS) and encryption at rest (disk/storage-level) are normally both required, not an either/or choice.",
+        "Least privilege and role-based access apply the same cloud-agnostic way regardless of which vendor's IAM implements them.",
+        "Segmentation (VLANs, subnets, security groups) limits the blast radius of a single compromised host.",
+        "Compliance frameworks (HIPAA, PCI DSS, GDPR) drive specific technical controls, not just policy paperwork."
+      ]
+    },
+    {
+      "heading": "Deployment concepts",
+      "points": [
+        "Blue-green deployment = two full environments with traffic cut over all at once; canary = a gradual rollout to a subset of users first.",
+        "Infrastructure as Code (IaC) makes deployments repeatable and version-controlled versus manual, click-ops provisioning.",
+        "Functional, regression, performance/load, and usability testing each answer a different question \u2014 know which one a scenario is describing."
+      ]
+    },
+    {
+      "heading": "Operations & troubleshooting methodology",
+      "points": [
+        "CompTIA's troubleshooting methodology, in order: identify the problem, establish a theory, test the theory, establish a plan of action, implement the plan, verify full system functionality, document the incident.",
+        "Baseline metrics must be captured BEFORE an incident \u2014 without one you can't prove current behavior is actually abnormal.",
+        "Logging records events, monitoring observes trends over time, and alerting notifies when a threshold is crossed \u2014 three distinct layers, not synonyms."
+      ]
+    },
+    {
+      "heading": "DevOps fundamentals (the new domain)",
+      "points": [
+        "CI (continuous integration: merge/build/test frequently) feeds CD (continuous delivery/deployment: automated release).",
+        "Containers package an app with its dependencies for portability; orchestration manages many containers' lifecycle and scaling.",
+        "Version control and automated testing are treated as core DevOps practices on this exam, not optional extras."
+      ]
+    },
+    {
+      "heading": "Exam-day reminders",
+      "points": [
+        "Cloud+ is vendor-neutral \u2014 don't answer with a specific AWS/Azure/GCP service name unless the question itself names that provider.",
+        "On \"which metric confirms the bottleneck\" questions, pick the metric that directly measures that resource, not a plausible-sounding but unrelated one.",
+        "Real scenarios often touch multiple domains at once (e.g., a control that is both security and HA) \u2014 answer based on what the question emphasizes."
+      ]
+    }
+  ]
+}
