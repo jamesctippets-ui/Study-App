@@ -491,6 +491,7 @@ QUESTIONS = [
         'options': ['Contributor', 'No access', 'Reader', 'Owner'],
         'correct': 3,
         'explanation': "RBAC assignments are additive across scopes, and the more permissive assignment applies — Owner at that resource group wins there. Conflicting scopes don't cancel each other out into no access; the broader Contributor assignment from the subscription simply gets overridden by the more permissive Owner role at the narrower scope.",
+        'whyTested': "This question tests whether you actually understand 'additive across scopes' as a mechanism, not just as a phrase — the wrong options offer tempting shortcuts like 'no access' (as if conflicting scopes cancel out) or 'Reader' (as if the broader, less-permissive scope wins), both of which reverse how RBAC inheritance actually resolves.",
     },
     {
         'id': 'q6',
@@ -527,6 +528,7 @@ QUESTIONS = [
         'options': ['A Conditional Access policy', 'The storage account access key', 'A Shared Access Signature (SAS)', 'A Read-only resource lock'],
         'correct': 2,
         'explanation': "A SAS grants limited, time-boxed, scoped access (read-only, one container, 24 hours) without exposing the account's full access key. Handing over the storage account key would give the app full, unrestricted, non-expiring access to the whole account, far more than needed. A Conditional Access policy governs sign-ins to Microsoft Entra-integrated apps, not access to storage data itself, and a read-only resource lock only prevents accidental deletion/modification of the storage account resource -- it doesn't grant a third party access in the first place.",
+        'whyTested': "This question packs in four options that each belong to a genuinely real Azure access-control concept — that's the trap. It's testing whether you can tell apart identity sign-in controls, data-level access grants, and resource-protection locks, three categories that get taught separately but blur together the moment a scenario just says 'access.'",
     },
     {
         'id': 'q10',
@@ -591,6 +593,7 @@ QUESTIONS = [
         ],
         'correct': 0,
         'explanation': "Changing a managed disk's performance tier requires the VM to be stopped (deallocated) first — it isn't a live, no-downtime operation. Deleting and recreating the disk, or moving regions, are unnecessary and far more disruptive than the actual requirement.",
+        'whyTested': "AZ-104 likes testing small operational prerequisites like this one because they're exactly what trips up someone who understands the concept (disk tiers) but hasn't internalized the mechanical step required to actually change one — the distractors escalate to more drastic, wrong actions to see if you overcorrect instead of picking the minimal real requirement.",
     },
     {
         'id': 'q16',
@@ -677,6 +680,7 @@ QUESTIONS = [
         ],
         'correct': 2,
         'explanation': "Lower priority numbers are evaluated first and win — priority 100 (allow) is processed before priority 200 (deny), so the traffic is allowed. Deny doesn't have some inherent precedence over Allow, evaluation order runs from the lowest priority number up (not the other way around), and NSG rules aren't merged or blended — whichever rule is evaluated first decides the outcome outright.",
+        'whyTested': "This is one of the most heavily tested single facts on AZ-104 because the intuitive-but-wrong answer, 'Deny always wins over Allow,' feels like reasonable security instinct even though it's simply false for NSGs — exams keep testing it precisely because real admins carry that instinct in from other systems and misapply it here.",
     },
     {
         'id': 'q25',
@@ -776,6 +780,7 @@ QUESTIONS = [
         'options': ['A resource lock', 'Azure Advisor', 'Azure Backup alone', 'Azure Site Recovery'],
         'correct': 3,
         'explanation': 'Site Recovery replicates and fails over whole workloads to a secondary region, unlike Backup, which restores point-in-time copies.',
+        'whyTested': "Backup and Site Recovery get tested against each other constantly because both answer 'what if something goes wrong,' and the exam wants you to key in on scope, one restores a point-in-time copy, the other fails over a whole running workload, rather than treating the two as interchangeable disaster-protection tools.",
     },
     {
         'id': 'q36',
@@ -1320,6 +1325,7 @@ For people outside your organization, like contractors or partners, external B2B
             "External B2B users authenticate with their own identity — you don't create them a normal internal account.",
         ],
         'scenario': "A hospital's radiology department grows from 8 to 30 staff over a year. Rather than manually adding each new hire to a group and assigning a license individually, an administrator sets up a dynamic group based on department, with a license attached to that group — every new radiology hire is automatically added and licensed the moment their account is created, with zero manual steps.",
+        'onTheJob': "In a real tenant, dynamic groups and group-based licensing are what save an admin from a Friday afternoon of manually re-provisioning accounts every time a reorg happens, but they also mean a misconfigured rule can silently strip a whole department's license overnight with no one noticing until support tickets pile up. SSPR is usually the single biggest reduction in help-desk ticket volume an admin can point to when justifying their own workload to management, since password resets are consistently the most common ticket type any service desk handles.",
     },
     {
         'id': 'governance-cost',
@@ -1343,6 +1349,7 @@ Day to day, this ties back to cost: budgets with alert thresholds, and Cost Anal
         ],
         'portalMockup': 'roleAssignment',
         'scenario': 'A company wants a lead engineer to manage all resources in a specific resource group AND decide which teammates can access it, without giving them company-wide Owner rights. Assigning Owner at just that one resource group achieves this — Owner both manages resources and grants access, but scoped to that resource group alone, leaving the rest of the subscription untouched.',
+        'onTheJob': "RBAC assignments in a real subscription accumulate the way old keys accumulate in a junk drawer — a 'temporary' Contributor grant from a project two years ago that nobody remembers to revoke, discovered only during a security audit or an incident investigation. Budgets and cost alerts matter less as an exam fact and more as the thing that actually gets an admin paged when a forgotten VM Scale Set runs all weekend, since nobody reviews the bill in real time otherwise.",
     },
     {
         'id': 'storage-management',
@@ -1366,6 +1373,7 @@ Ongoing management includes lifecycle policies, which automatically move aging b
         ],
         'portalMockup': 'storageAccount',
         'scenario': 'A marketing agency needs to let an external contractor upload files to one specific container for 48 hours, then lose access automatically. Issuing a SAS scoped to that container, valid for 48 hours, does exactly this — no account key changes hands, and access expires on its own without anyone having to remember to revoke it.',
+        'onTheJob': "SAS tokens are the day-to-day answer to the constant stream of 'can you just send me the storage key' requests from a vendor or contractor, and part of an admin's actual job is pushing back on that request every time instead of taking the shortcut, because a leaked account key means rotating credentials across every application that uses it. Lifecycle management policies are also one of the few cost levers that quietly pay for themselves for years once configured, which is exactly why they're the first thing to check when a storage bill looks unexpectedly high.",
     },
     {
         'id': 'vms-compute',
@@ -1403,6 +1411,7 @@ Day-to-day operations include extensions, small agents that run post-deployment 
         ],
         'portalMockup': 'vmSize',
         'scenario': 'A team runs a database VM that needs consistent, high IOPS around the clock, plus a batch of short-lived web front-ends that spike unpredictably during business hours. The database gets a larger D-series or F-series VM with a Premium SSD or Ultra Disk. The front-ends go into a VM Scale Set, which adds instances automatically during the spikes and scales back down overnight, rather than running a fixed, oversized fleet all day.',
+        'onTheJob': "Picking a VM series in practice is often less about the workload spec sheet and more about what the team is already comfortable operating and who's on call for it — a burstable B-series VM under sustained production load is a classic middle-of-the-night page that traces back to a sizing decision nobody revisited after the workload grew. The requirement to deallocate before resizing or changing a disk tier is also the kind of detail that turns a routine maintenance window into an unplanned outage when a change gets scheduled without accounting for the downtime it actually requires.",
     },
     {
         'id': 'app-hosting-iac',
@@ -1426,6 +1435,7 @@ For repeatable deployments, ARM templates are Azure's native JSON Infrastructure
             'Bicep is not a different deployment mechanism — it compiles down to the same ARM JSON underneath.',
         ],
         'scenario': 'A team wants to test a major update to their web app without any risk to the live site, then cut over quickly once it checks out. They deploy the new version to a staging slot, run their validation there against production-like settings, and swap it into the production slot in seconds once satisfied — with the previous version now sitting in the staging slot in case a fast rollback is ever needed.',
+        'onTheJob': "Deployment slots are the thing that actually lets a team sleep at night before a release, since a bad swap can be reversed in seconds by swapping back — teams that skip slots and deploy straight to production are usually the ones with the worst on-call stories. Bicep versus raw ARM JSON is mostly a team-preference and readability argument in practice, not a functional one, so a manager standardizing on one over the other is usually optimizing for how fast a new hire can read the templates, not for what Azure actually does with them.",
     },
     {
         'id': 'az104-networking',
@@ -1449,6 +1459,7 @@ For secure remote access, Azure Bastion provides RDP or SSH through the portal w
             'Application Gateway can route by URL path; Azure Load Balancer only sees IP and port, not HTTP content.',
         ],
         'scenario': "An administrator needs to block a specific IP range from reaching a subnet while still allowing normal traffic through. They add a Deny rule at a lower priority number than the general Allow rule, so it's evaluated first — since NSGs stop at the first matching rule, that blocked range never reaches the broader allow rule beneath it.",
+        'onTheJob': "NSG rule priority is one of the most common sources of a self-inflicted outage page — someone adds a new rule without checking what priority number is already in use, and a lower-priority rule silently wins before the new one is ever evaluated. Change control around networking tends to be the strictest in a real Azure environment, precisely because a subnet or peering misconfiguration can quietly take down connectivity for teams who had nothing to do with the change that caused it.",
     },
     {
         'id': 'monitoring-recovery',
@@ -1470,6 +1481,7 @@ For disaster protection, the distinction that matters most is scope: Azure Backu
             'Backup restores a point-in-time copy; Site Recovery fails over a whole workload to another region.',
         ],
         'scenario': "A company's production database VM gets corrupted by a bad script at 2pm. They restore it from that morning's backup in the Recovery Services vault, losing a few hours of data but recovering quickly. Separately, that same company has Site Recovery configured for their whole application tier, so if their primary region ever goes down entirely, the application can fail over and keep serving customers from a secondary region within minutes.",
+        'onTheJob': "In practice, alert rules that aren't tied to a real action group are the alerts everyone learns to ignore — a mailbox full of unread threshold emails is a bigger operational risk than having no monitoring at all, since it trains the team to tune out the one alert that actually mattered. Backup and Site Recovery configurations also tend to only get tested for real during an actual incident, which is exactly the wrong time to discover a Recovery Services vault was never actually backing up the resource everyone assumed it was.",
     },
 ]
 

@@ -558,6 +558,7 @@ QUESTIONS = [
         ],
         'correct': 2,
         'explanation': "Compliance and data residency needs are a common, legitimate reason to keep some workloads on-premises while using public cloud elsewhere — some regulations specifically require certain data to stay off public cloud infrastructure entirely, not just within a given country's borders. Hybrid isn't reliably cheaper once you factor in running two environments, and identity still has to be managed for whatever on-premises systems remain, typically unified with something like Microsoft Entra ID rather than eliminated.",
+        'whyTested': "This question isn't really testing whether you know what hybrid cloud is — it's testing whether you can spot a plausible-sounding but wrong justification for it, since three of the four options reference real IT concepts (cost, identity, regional coverage) just slightly misapplied. Exams pair a correct-but-unglamorous answer like compliance against tempting distractors to see if you're pattern-matching keywords instead of reasoning through the actual claim being made.",
     },
     {
         'id': 'q10',
@@ -581,6 +582,7 @@ QUESTIONS = [
         ],
         'correct': 0,
         'explanation': "Under the shared responsibility model, the customer always retains some security responsibility — at minimum, their own data and identities — no matter how much the provider manages. The other three options describe reliability, scalability, and high availability respectively, which are all genuine, well-documented cloud benefits.",
+        'whyTested': "'NOT' questions test a different skill than recall: three of the four options are true statements, and only careful reading catches that the question flipped the usual 'pick the correct one' pattern. This format specifically punishes skimming, since 'complete elimination of security responsibilities' reads like it belongs on a list of benefits until you remember the shared responsibility model never fully goes away.",
     },
     {
         'id': 'q41',
@@ -595,6 +597,7 @@ QUESTIONS = [
         ],
         'correct': 1,
         'explanation': "IaaS resources are closer to raw infrastructure and generally port more easily than workloads built around a provider's specific PaaS or SaaS features. PaaS abstracting the infrastructure is exactly what deepens lock-in, not what reduces it, and lock-in risk very much differs by service model — a Reserved Instance is a pricing choice with no bearing on portability.",
+        'whyTested': "This question buries the actual concept, that IaaS ports more easily than PaaS, inside distractors that sound authoritative, like 'lock-in is the same across all models' or 'Reserved Instances create lock-in,' to test whether you can isolate the real driver of portability from plausible-sounding noise that name-drops adjacent AZ-900 concepts like pricing commitments.",
     },
     {
         'id': 'q12',
@@ -664,6 +667,7 @@ QUESTIONS = [
         ],
         'correct': 1,
         'explanation': "ZRS covers zone-level failures within a region. GRS goes further, adding a secondary paired region for protection against a full regional outage — which means GRS replicates to MORE locations, not fewer, and costs more accordingly. ZRS alone does not protect against a full region going down.",
+        'whyTested': "This tests whether you actually understand the redundancy hierarchy or just memorized the acronyms — the wrong options invert the relationship, claiming GRS is cheaper or that ZRS covers a regional outage, to catch anyone who recognizes the letters without remembering which option replicates further and why that costs more.",
     },
     {
         'id': 'q18',
@@ -710,6 +714,7 @@ QUESTIONS = [
         ],
         'correct': 0,
         'explanation': "RBAC governs permissions on resources once someone is signed in. Conditional Access governs the conditions required to sign in at all — they operate at different stages and don't overlap in what they check or enforce, and Conditional Access applies to any sign-in, not only external ones.",
+        'whyTested': "RBAC and Conditional Access get tested together constantly because they sound like they overlap — both are 'access control' in casual speech — and the exam wants to confirm you can articulate WHERE each one operates, permissions after sign-in versus conditions for signing in at all, rather than just knowing both terms exist.",
     },
     {
         'id': 'q22',
@@ -1759,6 +1764,7 @@ Within this structure, Azure Policy enforces configuration rules, while resource
         ],
         'portalMockup': 'resourceGroup',
         'scenario': 'An organization has Dev, Test, and Prod subscriptions, each needing the same "no deployments outside East US" rule and the same required tags. Rather than configuring that policy three separate times, an administrator creates a management group containing all three subscriptions and assigns the policy once at that level — it then applies automatically to every resource group and resource beneath it.',
+        'onTheJob': "In practice, subscription boundaries end up drawn as much by billing and procurement as by security — splitting Dev, Test, and Prod into separate subscriptions is often driven by finance wanting a clean cost-center split as much as by any technical isolation need. Azure Policy assignments also tend to accumulate messily over time as different teams add their own rules, so a real governance review often turns up conflicting or redundant policies nobody remembers assigning, not the tidy single-policy story a training scenario describes.",
     },
     {
         'id': 'compute-hosting',
@@ -1780,6 +1786,7 @@ For resilience, Azure offers different tools depending on what you're protecting
         ],
         'portalMockup': 'vmSize',
         'scenario': "A nightly report-generation job runs for about 15 minutes once a day. Running it on a VM that stays on 24/7 would waste money on 23-plus idle hours daily. Running it as an Azure Function instead means paying only for those 15 minutes of actual execution — a direct payoff of matching the compute model to the workload's real usage pattern.",
+        'onTheJob': "The VM-versus-container-versus-Functions choice in a real organization is driven less by architectural purity and more by what the team already knows how to operate and who gets paged if it breaks — a team with no serverless experience will often default to a familiar VM even when Functions would be cheaper, because the operational risk of the unfamiliar option outweighs the savings. Availability sets and Scale Sets are also the kind of thing that gets added to a postmortem after an avoidable outage, not configured up front, since the few extra dollars a month rarely feel urgent until something actually goes down.",
     },
     {
         'id': 'networking',
@@ -1803,6 +1810,7 @@ VNets can also be peered together, letting resources in two separate VNets talk 
         ],
         'portalMockup': 'virtualNetwork',
         'scenario': "A company's finance team sits in one subnet and its public-facing web servers in another, both inside the same VNet, with a rule blocking the finance subnet from being reached externally. When the company opens a second office, they connect it to Azure with a VPN Gateway rather than ExpressRoute, since the link doesn't need dedicated bandwidth — just a secure connection over their existing internet line.",
+        'onTheJob': "ExpressRoute's real cost isn't just the Azure side of the bill — provisioning it involves a telecom carrier, a physical circuit, and often weeks of lead time, which is why most smaller organizations stick with VPN Gateway despite ExpressRoute's better latency profile on paper. Networking changes are also usually the most tightly change-controlled work in a production Azure environment, because a subnet or peering mistake can quietly take down connectivity for teams that had nothing to do with the change that caused it.",
     },
     {
         'id': 'storage',
@@ -1826,6 +1834,7 @@ Redundancy options protect that data against hardware and datacenter failure. Lo
         ],
         'portalMockup': 'storageAccount',
         'scenario': 'A healthcare provider must keep patient records for seven years for compliance, but almost never opens files older than a year. Storing everything in Hot tier would be needlessly expensive. Moving records older than 12 months to Archive tier with a lifecycle management policy keeps them retrievable within the required window while cutting storage cost dramatically.',
+        'onTheJob': "Lifecycle management policies that automatically move aging data to Cool or Archive tiers are one of the highest-leverage, easiest-to-forget cost levers in a real subscription — a team that never configures one is often quietly overpaying for years without anyone noticing on the monthly bill. Choosing a redundancy option is also genuinely a conversation between whoever owns the compliance requirement and whoever owns the budget, since GRS roughly doubles storage cost for protection that may never actually get used.",
     },
     {
         'id': 'identity-security',
@@ -1847,6 +1856,7 @@ Zero Trust is the security philosophy underlying a lot of this: never assume tru
         ],
         'portalMockup': 'roleAssignment',
         'scenario': "An IT team grants a support technician Contributor access to a single resource group, so they can restart VMs there but nowhere else. Separately, they set up a Conditional Access policy requiring MFA whenever anyone signs in from outside the corporate network. Together, RBAC controls what the technician can touch, and Conditional Access controls the circumstances under which they're allowed in at all.",
+        'onTheJob': "RBAC assignments in a real tenant tend to sprawl into 'temporary' access grants that never get revoked, so periodic access reviews are less about clean exam-style role design and more about cleaning up permission debt nobody remembers creating. Conditional Access is also where a lot of real help-desk tickets originate — a policy tightened for good security reasons locks out a legitimate traveling employee, and someone has to weigh the security team's Zero Trust stance against a person just trying to do their job.",
     },
     {
         'id': 'cost-policy-monitoring',
@@ -1872,6 +1882,7 @@ You can manage all of this through the Azure portal, Cloud Shell (a browser-base
             "Azure Advisor is free — it's not a paid add-on.",
         ],
         'scenario': "A finance team notices unexpected spend in one department's subscription. Because every resource there was tagged with a CostCenter value at creation, Cost Management can break the bill down by tag and pinpoint exactly which team is responsible — while Azure Advisor separately flags a handful of unused disks in that same subscription quietly adding to the bill.",
+        'onTheJob': "Tags are the single biggest predictor of whether a monthly cost review is a five-minute glance or a multi-day investigation, and getting a team to apply them consistently, usually enforced through Azure Policy, is one of the few governance wins that pays for itself almost immediately. Azure Advisor's recommendations also tend to pile up and get ignored for months unless someone specifically owns acting on them, since flagging an idle disk and someone actually deleting it are two very different steps.",
     },
 ]
 

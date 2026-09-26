@@ -542,7 +542,8 @@
         "No, value is realized in the outcome the fix enables, not the fix itself"
       ],
       "correct": 3,
-      "explanation": "Value is realized when the outcome actually helps the stakeholder \u2014 the fix itself is just the mechanism, not the value."
+      "explanation": "Value is realized when the outcome actually helps the stakeholder \u2014 the fix itself is just the mechanism, not the value.",
+      "whyTested": "This tests whether you can apply the output/outcome vocabulary to a scenario instead of just defining the terms in isolation \u2014 exams describe an action, the fix, and ask you to correctly locate where the actual value sits, since conflating the deliverable with the result it produces is the single most common mistake candidates make with this vocabulary."
     },
     {
       "id": "q41",
@@ -724,7 +725,8 @@
         "Keep it simple and practical first, removing the redundant step, then optimize and automate what remains"
       ],
       "correct": 3,
-      "explanation": "Automating a broken process just makes it fail faster \u2014 simplify first, then automate what's left."
+      "explanation": "Automating a broken process just makes it fail faster \u2014 simplify first, then automate what's left.",
+      "whyTested": "Exams don't just ask you to name a guiding principle in isolation \u2014 they stack two principles in one scenario and ask which order they apply in, since 'optimize and automate' only makes sense once 'keep it simple and practical' has already stripped the waste out. Getting the sequence backwards, not failing to recognize either principle by name, is the actual trap here."
     },
     {
       "id": "q15",
@@ -808,7 +810,8 @@
         "Partners and suppliers, and organizations and people"
       ],
       "correct": 3,
-      "explanation": "The outsourcing relationship sits under partners and suppliers, while the staff training need sits under organizations and people."
+      "explanation": "The outsourcing relationship sits under partners and suppliers, while the staff training need sits under organizations and people.",
+      "whyTested": "Four Dimensions questions increasingly ask which TWO dimensions a single change touches, not just one, because real changes rarely stay inside one dimension \u2014 this format tests whether you can trace a ripple effect, an outsourcing decision that also forces staff retraining, rather than just matching a keyword to a single dimension label."
     },
     {
       "id": "q19",
@@ -1234,7 +1237,8 @@
         "How do we keep the momentum going?"
       ],
       "correct": 0,
-      "explanation": "Without an honest baseline from 'where are we now,' any target or plan built afterward is just a guess. The steps depend on the ones before them."
+      "explanation": "Without an honest baseline from 'where are we now,' any target or plan built afterward is just a guess. The steps depend on the ones before them.",
+      "whyTested": "The Continual Improvement Model gets tested less on 'name the seven steps' and more on catching when a team skipped one \u2014 specifically jumping to an action plan without an honest baseline \u2014 because that's the real-world failure mode the model is actually trying to prevent, and exams reward recognizing the skipped dependency over rote sequence memorization."
     },
     {
       "id": "q48",
@@ -1248,7 +1252,8 @@
         "Start where you are"
       ],
       "correct": 0,
-      "explanation": "Think and work holistically means recognizing how a change ripples across the wider organization rather than just the team making it. Missing a downstream dependency like this is exactly what the principle is meant to prevent."
+      "explanation": "Think and work holistically means recognizing how a change ripples across the wider organization rather than just the team making it. Missing a downstream dependency like this is exactly what the principle is meant to prevent.",
+      "whyTested": "This question pushes you past reciting what 'think and work holistically' means and into recognizing its actual failure mode in a scenario \u2014 a change that looks contained until it breaks something downstream \u2014 since Foundation-level exams increasingly ask you to diagnose which principle would have prevented a described mistake, not just define the principle in the abstract."
     },
     {
       "id": "q49",
@@ -1839,7 +1844,8 @@
         "A service level and an SLA are not interchangeable terms: the level is the target, the SLA is the agreement that documents it.",
         "Warranty covers more than uptime alone \u2014 capacity, security, and continuity all count too."
       ],
-      "scenario": "A managed service provider proudly reports that its help desk closed 500 tickets last month \u2014 an output. But when a client's finance team is asked whether things actually feel better, they mention that recurring printer failures still interrupt their workday weekly, just with faster tickets each time. The provider optimized for output volume while the outcome the client actually needed, uninterrupted printing, never improved. A revised SLA that tracks repeat-incident rate, not just closure speed, would better capture the warranty and outcome the client is actually paying for."
+      "scenario": "A managed service provider proudly reports that its help desk closed 500 tickets last month \u2014 an output. But when a client's finance team is asked whether things actually feel better, they mention that recurring printer failures still interrupt their workday weekly, just with faster tickets each time. The provider optimized for output volume while the outcome the client actually needed, uninterrupted printing, never improved. A revised SLA that tracks repeat-incident rate, not just closure speed, would better capture the warranty and outcome the client is actually paying for.",
+      "onTheJob": "In a real service desk, 'ticket volume' and 'first-response time' are exactly the output metrics that end up on a manager's dashboard because they're easy to count, even when everyone privately knows they don't reflect whether users are actually less frustrated \u2014 pushing a team to report on outcome measures like repeat-incident rate is usually an uphill argument, not a given. SLA negotiations in practice are also as much about which warranty dimension actually gets measured, uptime versus response time versus how a breach gets remediated, as about the headline percentage everyone fixates on first."
     },
     {
       "id": "roles-and-relationships",
@@ -1889,7 +1895,8 @@
         "Risk isn't limited to financial loss, and it includes missed opportunities, not just downside events.",
         "An enabling value stream still matters even though it never touches the external customer directly \u2014 it's what makes core value streams possible."
       ],
-      "scenario": "An IT consultancy sells a monitoring dashboard license outright to a client, with no support contract attached \u2014 that's a digital product vendor relationship, not a full service relationship. Separately, the same consultancy runs a managed help desk for another client, where the client's operations director approved the contract (sponsor), the client's IT manager defined the requirements (customer), and frontline staff log tickets daily (users). Internally, the consultancy's own supplier-renewal process for its ticketing software license is an enabling value stream \u2014 it never touches either client directly, but without it, the core value stream of actually resolving client tickets would eventually break down."
+      "scenario": "An IT consultancy sells a monitoring dashboard license outright to a client, with no support contract attached \u2014 that's a digital product vendor relationship, not a full service relationship. Separately, the same consultancy runs a managed help desk for another client, where the client's operations director approved the contract (sponsor), the client's IT manager defined the requirements (customer), and frontline staff log tickets daily (users). Internally, the consultancy's own supplier-renewal process for its ticketing software license is an enabling value stream \u2014 it never touches either client directly, but without it, the core value stream of actually resolving client tickets would eventually break down.",
+      "onTheJob": "Figuring out who the real 'customer' is on a support ticket matters in practice because escalations get routed differently depending on whether you're arguing with the day-to-day user or the budget-holding sponsor \u2014 a frustrated user complaining loudly is not always who has the authority to approve a fix that costs money. Enabling value streams, like renewing a monitoring tool's license, are also the first thing that gets deprioritized when a team is busy, right up until the license lapses and takes down the core value stream it was quietly supporting."
     },
     {
       "id": "value-system-and-principles",
@@ -1939,7 +1946,8 @@
         "'Optimize and automate' means simplify first, automate second \u2014 automating a bad process just fails faster.",
         "'Think and work holistically' and 'collaborate and promote visibility' are both about openness, but one is about seeing the whole picture and the other is about sharing information."
       ],
-      "scenario": "A change advisory board requires three separate sign-offs for every request, including for a routine, pre-approved standard change that's been run successfully a hundred times before. Removing the two unnecessary sign-offs and leaving the one that actually adds risk oversight is 'keep it simple and practical' in action. If the board then wants to automate that remaining approval step with a bot that checks a few fixed conditions, that's 'optimize and automate' \u2014 but only after the simplification happened first, not instead of it."
+      "scenario": "A change advisory board requires three separate sign-offs for every request, including for a routine, pre-approved standard change that's been run successfully a hundred times before. Removing the two unnecessary sign-offs and leaving the one that actually adds risk oversight is 'keep it simple and practical' in action. If the board then wants to automate that remaining approval step with a bot that checks a few fixed conditions, that's 'optimize and automate' \u2014 but only after the simplification happened first, not instead of it.",
+      "onTheJob": "In practice, 'keep it simple and practical' is the principle a manager actually invokes out loud, usually while killing a redundant approval step someone else added years ago for reasons nobody remembers \u2014 it's the guiding principle with the most day-to-day teeth. 'Start where you are' gets misused constantly as an excuse to never modernize anything, which is precisely the misreading the framework warns against, so a good manager ends up re-explaining that assessing what exists is a starting point for change, not a reason to avoid it."
     },
     {
       "id": "governance-continual-improvement-practices",
@@ -1990,7 +1998,8 @@
         "A standard change still requires pre-authorization; it's not the same as 'no process at all,' just no case-by-case approval.",
         "The service desk doesn't need to resolve every issue itself to be doing its job \u2014 coordination and communication are its real value."
       ],
-      "scenario": "After a spike in checkout failures on an e-commerce platform, the service desk logs the incidents and restores service by restarting a failed process, resolving the immediate incident within the hour. Problem management then investigates separately and finds a memory leak in a recent deployment, logging it as a known error with the workaround documented for the support team while a permanent code fix is scheduled through a normal change. Meanwhile, leadership's governance decision that every production deployment needs a rollback plan is what made that restart even possible in minutes rather than hours."
+      "scenario": "After a spike in checkout failures on an e-commerce platform, the service desk logs the incidents and restores service by restarting a failed process, resolving the immediate incident within the hour. Problem management then investigates separately and finds a memory leak in a recent deployment, logging it as a known error with the workaround documented for the support team while a permanent code fix is scheduled through a normal change. Meanwhile, leadership's governance decision that every production deployment needs a rollback plan is what made that restart even possible in minutes rather than hours.",
+      "onTheJob": "Incident and problem management get blurred together constantly on a real service desk because the same person often does both jobs back to back \u2014 restart the service, then separately dig into why it broke \u2014 and a manager's real job is making sure the root-cause investigation actually happens once the fire is out, since it's the step that gets skipped under pressure. Known errors with a documented workaround are also where a lot of technical debt quietly accumulates, since a workaround that's 'good enough' can sit unfixed for years once the pressure to permanently resolve it fades."
     },
     {
       "id": "four-dimensions",
@@ -2033,7 +2042,8 @@
         "Organizations and people covers more than headcount \u2014 skills, culture, and role clarity matter just as much.",
         "A change rarely stays inside one dimension \u2014 the exam often describes a ripple effect across two dimensions at once."
       ],
-      "scenario": "A logistics company outsources its network monitoring to a third-party provider (partners and suppliers), which requires its own staff to be retrained on how to interpret the vendor's alerts correctly (organizations and people). Around the same time, new environmental regulations (a PESTLE factor) push the company to consolidate data centers, forcing a redesign of how incident tickets get routed between the old and new infrastructure (value streams and processes) alongside the monitoring platform migration itself (information and technology). No single dimension captures the whole change \u2014 all four move together."
+      "scenario": "A logistics company outsources its network monitoring to a third-party provider (partners and suppliers), which requires its own staff to be retrained on how to interpret the vendor's alerts correctly (organizations and people). Around the same time, new environmental regulations (a PESTLE factor) push the company to consolidate data centers, forcing a redesign of how incident tickets get routed between the old and new infrastructure (value streams and processes) alongside the monitoring platform migration itself (information and technology). No single dimension captures the whole change \u2014 all four move together.",
+      "onTheJob": "A manager doing a real post-incident review uses the four dimensions less as vocabulary to recite and more as a checklist to make sure a fix doesn't just patch the technology while ignoring that staff also need retraining or that a vendor contract needs revisiting \u2014 missing one of the four is usually how the same incident recurs six months later. PESTLE factors show up as boring compliance memos from legal or HR that nobody reads until a new regulation forces an unplanned redesign of a process that was working fine the day before."
     },
     {
       "id": "product-service-lifecycle",
@@ -2079,7 +2089,8 @@
         "Operate, Deliver, and Support sound similar but are distinct: running the service, providing the outcome, and resolving issues are three separate jobs.",
         "The value chain and the Product and Service Lifecycle are the same model described two ways, not two separate lists to memorize."
       ],
-      "scenario": "A company explores whether customers actually want a self-service password reset tool (Discover), then defines exactly what it needs to do and its security requirements (Design) before writing a single line of code. It buys a third-party identity verification component (Acquire) while its own developers build the reset workflow itself (Build), then runs a controlled pilot with one department before a full release (Transition). Once live, the platform team keeps it running (Operate), users get the actual convenience of resetting their own passwords (Deliver), and the help desk still fields the occasional edge case that fails (Support) \u2014 with a spike in failed resets eventually looping the team back to Design to rework the verification flow."
+      "scenario": "A company explores whether customers actually want a self-service password reset tool (Discover), then defines exactly what it needs to do and its security requirements (Design) before writing a single line of code. It buys a third-party identity verification component (Acquire) while its own developers build the reset workflow itself (Build), then runs a controlled pilot with one department before a full release (Transition). Once live, the platform team keeps it running (Operate), users get the actual convenience of resetting their own passwords (Deliver), and the help desk still fields the occasional edge case that fails (Support) \u2014 with a spike in failed resets eventually looping the team back to Design to rework the verification flow.",
+      "onTheJob": "In practice, the Discover and Design stages are the ones that get skipped under deadline pressure \u2014 a team jumps straight to Build because a fix 'obviously' needs writing, and only discovers in Support that nobody actually confirmed the underlying demand was real. The looping-back behavior the framework treats as normal is also what a real change advisory board has to get comfortable with, since a manager who treats a return to Design as a project failure will quietly train their team to hide problems instead of surfacing them."
     },
     {
       "id": "streams-ai-and-frameworks",
@@ -2127,7 +2138,8 @@
         "PRINCE2 and ITIL are not competing frameworks needing an either/or choice \u2014 PRINCE2 manages the bounded project, ITIL manages the ongoing service it feeds into.",
         "AI still needs accountability and risk management like any other capability \u2014 governance is not something that only kicks in after something goes wrong."
       ],
-      "scenario": "A support team maps its incident-resolution value stream and discovers requests sit untouched in a queue for six hours before anyone even looks at them \u2014 the actual troubleshooting itself takes twenty minutes. Around the same time, they roll out an AI system that auto-triages incoming tickets to the right team, an agentic, Coordination-type capability, but require human sign-off before it touches anything on a production database, applying AI governance proportional to risk. The triage rollout itself runs as a short, iterative Agile project, feeding a change into the ongoing service that ITIL governs day to day once it's live."
+      "scenario": "A support team maps its incident-resolution value stream and discovers requests sit untouched in a queue for six hours before anyone even looks at them \u2014 the actual troubleshooting itself takes twenty minutes. Around the same time, they roll out an AI system that auto-triages incoming tickets to the right team, an agentic, Coordination-type capability, but require human sign-off before it touches anything on a production database, applying AI governance proportional to risk. The triage rollout itself runs as a short, iterative Agile project, feeding a change into the ongoing service that ITIL governs day to day once it's live.",
+      "onTheJob": "Value stream mapping in a real ops team almost always uncovers that the bottleneck isn't the actual technical work but a queue sitting untouched waiting for someone to notice it \u2014 the twenty-minutes-of-real-work-versus-six-hours-of-waiting pattern is closer to the norm than the exception. The generative-versus-agentic AI distinction is also what determines who signs off on a rollout in practice: a chatbot that drafts a reply for a human to send gets waved through, while one that can close tickets or touch a production system on its own is where a manager actually has to fight for a governance review before go-live."
     }
   ],
   "cheatSheet": [
