@@ -241,6 +241,81 @@ function DiagramStorageAccess() {
   );
 }
 
+function DiagramFourDimensions() {
+  return (
+    <svg viewBox="0 0 300 250" style={{ width: '100%', height: 'auto' }}>
+      <DCaption x={150} y={18} text="External environment — PESTLE factors" />
+      <rect x={8} y={26} width={284} height={196} rx="10" fill="none" stroke={COLOR.border} strokeDasharray="4 3" />
+      <DBox x={14} y={44} w={118} h={42} label="Organizations & People" />
+      <DBox x={168} y={44} w={118} h={42} label="Information & Technology" />
+      <DBox x={14} y={176} w={118} h={42} label="Partners & Suppliers" />
+      <DBox x={168} y={176} w={118} h={42} label="Value Streams & Processes" />
+      <DBox x={91} y={105} w={118} h={42} label="Value creation" sub="shaped by all four" />
+      <DLine x1={132} y1={86} x2={91} y2={105} />
+      <DLine x1={168} y1={86} x2={209} y2={105} />
+      <DLine x1={132} y1={176} x2={91} y2={147} />
+      <DLine x1={168} y1={176} x2={209} y2={147} />
+      <DCaption x={150} y={238} text="Each dimension shapes, and is shaped by, the other three" />
+    </svg>
+  );
+}
+
+function DiagramProductServiceLifecycle() {
+  return (
+    <svg viewBox="0 0 372 235" style={{ width: '100%', height: 'auto' }}>
+      <DBox x={12} y={16} w={76} h={32} label="Discover" />
+      <DBox x={102} y={16} w={76} h={32} label="Design" />
+      <DBox x={192} y={16} w={76} h={32} label="Acquire" />
+      <DBox x={282} y={16} w={76} h={32} label="Build" />
+      <DBox x={282} y={160} w={76} h={32} label="Transition" />
+      <DBox x={192} y={160} w={76} h={32} label="Operate" />
+      <DBox x={102} y={160} w={76} h={32} label="Deliver" />
+      <DBox x={12} y={160} w={76} h={32} label="Support" />
+      <DLine x1={88} y1={32} x2={102} y2={32} />
+      <DLine x1={178} y1={32} x2={192} y2={32} />
+      <DLine x1={268} y1={32} x2={282} y2={32} />
+      <DLine x1={320} y1={48} x2={320} y2={160} />
+      <DLine x1={282} y1={176} x2={268} y2={176} />
+      <DLine x1={192} y1={176} x2={178} y2={176} />
+      <DLine x1={102} y1={176} x2={88} y2={176} />
+      <line x1={50} y1={160} x2={50} y2={48} stroke={COLOR.primary} strokeWidth="1.3" strokeDasharray="4 3" />
+      <DCaption x={186} y={207} text="Solid: the forward flow, Discover through Support" />
+      <DCaption x={186} y={221} text="Dashed: work loops back to Discover as needed" />
+    </svg>
+  );
+}
+
+function DiagramContinualImprovementModel() {
+  const steps = [
+    'What is the vision?',
+    'Where are we now?',
+    'Where do we want to be?',
+    'How do we get there?',
+    'Take action',
+    'Did we get there?',
+    'Keep the momentum going',
+  ];
+  const boxY = [8, 46, 84, 122, 160, 198, 236];
+  return (
+    <svg viewBox="0 0 300 304" style={{ width: '100%', height: 'auto' }}>
+      {steps.map((label, i) => (
+        <DBox key={label} x={30} y={boxY[i]} w={230} h={28} label={label} />
+      ))}
+      {boxY.slice(0, -1).map((y, i) => (
+        <DLine key={i} x1={145} y1={y + 28} x2={145} y2={boxY[i + 1]} />
+      ))}
+      <polyline
+        points={`260,${boxY[6] + 14} 280,${boxY[6] + 14} 280,${boxY[0] + 14} 260,${boxY[0] + 14}`}
+        fill="none"
+        stroke={COLOR.primary}
+        strokeWidth="1.3"
+        strokeDasharray="4 3"
+      />
+      <DCaption x={150} y={296} text="Loops back — continual, not a one-time project" />
+    </svg>
+  );
+}
+
 const LESSON_DIAGRAMS = {
   serviceModels: DiagramServiceModels,
   hierarchy: DiagramHierarchy,
@@ -254,5 +329,8 @@ const LESSON_DIAGRAMS = {
   backupRecovery: DiagramBackupRecovery,
   groupLicensing: DiagramGroupLicensing,
   storageAccess: DiagramStorageAccess,
+  fourDimensions: DiagramFourDimensions,
+  productServiceLifecycle: DiagramProductServiceLifecycle,
+  continualImprovementModel: DiagramContinualImprovementModel,
 };
 

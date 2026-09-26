@@ -1669,6 +1669,341 @@
       "explanation": "They're meant to complement each other \u2014 DevOps practices like CI/CD can sit inside stages of the ITIL value system, not replace its guiding principles."
     }
   ],
+  "lessons": [
+    {
+      "id": "language-of-value",
+      "title": "The Language of Value: Products, Services & Outcomes",
+      "summary": "The precise vocabulary ITIL uses to separate what a provider delivers from what actually satisfies the customer.",
+      "diagram": null,
+      "vocabIds": [
+        "f1",
+        "f2",
+        "f3",
+        "f4",
+        "f8",
+        "f44"
+      ],
+      "quizIds": [
+        "q1",
+        "q2",
+        "q7",
+        "q27",
+        "q41",
+        "tf2",
+        "tf3"
+      ],
+      "reading": "ITIL draws a careful line between a product and a service. A product, in ITIL's terms, is a configuration of an organization's resources \u2014 the actual thing that exists, like a piece of software or a support contract. A service is what that product enables: value co-created with the customer by facilitating the outcomes they actually want, without the customer having to manage the underlying costs and risks themselves. The same distinction carries over to digital work specifically: a digital product is something that exists primarily in digital form \u2014 an app, a dataset, a SaaS platform \u2014 while the digital service is the value realized through using it, including everything from onboarding to ongoing support.\n\nThat same \"what you get\" versus \"what it does for you\" split shows up again in output versus outcome. An output is a tangible or intangible deliverable of some activity \u2014 a closed ticket, a deployed patch, a generated report. An outcome is the actual result that output makes possible for a stakeholder \u2014 the user working uninterrupted again, the business staying compliant. ITIL consistently steers attention toward outcomes, because counting outputs, like tickets closed or patches deployed, can look productive while missing whether anything real actually improved for the person on the other end.\n\nWithin a service itself, utility and warranty describe two different qualities. Utility is what the service does \u2014 its functionality, whether it removes a constraint or supports a performance need \u2014 commonly summarized as \"fit for purpose.\" Warranty is how well and reliably it does it: availability, capacity, security, and continuity, or \"fit for use.\" A service that's functionally perfect but constantly down has utility without warranty, and a service that never goes down but doesn't do what's needed has warranty without utility \u2014 value needs both. That warranty dimension gets formalized further through service level and SLA: a service level is one measured performance target, and an SLA is the documented agreement that records one or more of those targets along with what happens if they're missed.",
+      "fundamentalsLabel": "New to this kind of vocabulary? See the everyday analogy",
+      "fundamentals": "Think about buying a car versus what owning one actually gets you. The car itself \u2014 the metal, the engine, the software running it \u2014 is the product. What that car actually gives you, getting to work reliably every day without you having to be a mechanic yourself, is the service. Utility is whether the car does what you need, like whether it fits five passengers or gets good mileage; warranty is whether it's reliable enough to depend on, like whether it starts every morning or is covered if something breaks. And the odometer reading after a road trip is an output, a number produced by the drive, while actually arriving somewhere you needed to be is the outcome that made the drive worth taking.",
+      "keyTerms": [
+        "Product",
+        "Service",
+        "Digital product",
+        "Digital service",
+        "Output",
+        "Outcome",
+        "Utility",
+        "Warranty",
+        "Service level",
+        "SLA"
+      ],
+      "commonTraps": [
+        "Utility is not the same as quality overall \u2014 it's specifically the functional 'what,' not reliability.",
+        "An output isn't automatically valuable just because it was produced \u2014 the outcome is what determines whether it mattered.",
+        "A service level and an SLA are not interchangeable terms: the level is the target, the SLA is the agreement that documents it.",
+        "Warranty covers more than uptime alone \u2014 capacity, security, and continuity all count too."
+      ],
+      "scenario": "A managed service provider proudly reports that its help desk closed 500 tickets last month \u2014 an output. But when a client's finance team is asked whether things actually feel better, they mention that recurring printer failures still interrupt their workday weekly, just with faster tickets each time. The provider optimized for output volume while the outcome the client actually needed, uninterrupted printing, never improved. A revised SLA that tracks repeat-incident rate, not just closure speed, would better capture the warranty and outcome the client is actually paying for."
+    },
+    {
+      "id": "roles-and-relationships",
+      "title": "Roles, Relationships & Value Streams",
+      "summary": "Who is who in a service relationship, how cost and risk trade off, and what separates a core value stream from an enabling one.",
+      "diagram": null,
+      "vocabIds": [
+        "f5",
+        "f6",
+        "f7",
+        "f9",
+        "f10",
+        "f11"
+      ],
+      "quizIds": [
+        "q3",
+        "q4",
+        "q5",
+        "q6",
+        "q35",
+        "q53",
+        "tf1",
+        "tf4",
+        "q67",
+        "tf22"
+      ],
+      "reading": "ITIL separates the people involved in a service relationship into distinct roles, and more than one role can land on the same person. The customer defines requirements and is accountable for the outcomes the service produces. The user is whoever actually consumes the service day to day. The sponsor is whoever authorizes the budget that pays for it. A single department head might be customer, user, and sponsor all at once, or those roles might be split across three completely different people \u2014 the exam expects you to identify which role a scenario is actually describing, not assume they're always the same person.\n\nOn the provider side of the relationship, the provider is whoever delivers the service, and the consumer is whoever receives it, as customer, user, sponsor, or some combination. A digital product vendor sits slightly outside this: it supplies a product, like a licensed piece of software, without necessarily being in an ongoing service relationship with whoever uses it. That relationship itself, once it exists, is called the service relationship \u2014 the whole cooperation between provider and consumer covering service provision, service consumption, and the relationship management activities that keep it running, not just the moment of delivery. What's actually on offer in the first place is the service offering: the goods, resource access, and service actions bundled together for a specific consumer group, like the tiers of a support plan.\n\nTwo more distinctions round this category out. Cost is simply the money spent on a specific activity or resource, while risk is broader: a possible event that could cause harm or make objectives harder to reach, including a missed opportunity, not only a downside. The two often trade off against each other, and exam scenarios frequently ask you to weigh a cheaper option against the risk it introduces. Separately, a core value stream is one that creates value directly for an external customer, while an enabling value stream supports other value streams internally, like renewing a supplier contract, without ever touching that external customer directly.",
+      "fundamentalsLabel": "New to service roles? See the everyday analogy",
+      "fundamentals": "Picture a family cell phone plan. The parent who signs the contract and pays the bill is the sponsor. Whichever family member decided the plan needed unlimited data because everyone streams video is the customer. The teenager actually using the phone every day is the user \u2014 and none of that requires three different people; the parent could easily be sponsor, customer, and a user all at once. The phone manufacturer, meanwhile, sold a device but has no ongoing relationship with the family managing their plan \u2014 that's the digital product vendor. And choosing the cheapest carrier over a slightly pricier one with better coverage is a cost-versus-risk trade-off in miniature: less spent now, but more risk of dropped calls later.",
+      "keyTerms": [
+        "Customer",
+        "User",
+        "Sponsor",
+        "Provider",
+        "Consumer",
+        "Digital product vendor",
+        "Service relationship",
+        "Service offering",
+        "Cost",
+        "Risk",
+        "Core value stream",
+        "Enabling value stream"
+      ],
+      "commonTraps": [
+        "Customer, user, and sponsor are distinct roles, but nothing stops one person from holding all three at once.",
+        "A digital product vendor is not automatically the service provider \u2014 supplying a product does not require an ongoing service relationship.",
+        "Risk isn't limited to financial loss, and it includes missed opportunities, not just downside events.",
+        "An enabling value stream still matters even though it never touches the external customer directly \u2014 it's what makes core value streams possible."
+      ],
+      "scenario": "An IT consultancy sells a monitoring dashboard license outright to a client, with no support contract attached \u2014 that's a digital product vendor relationship, not a full service relationship. Separately, the same consultancy runs a managed help desk for another client, where the client's operations director approved the contract (sponsor), the client's IT manager defined the requirements (customer), and frontline staff log tickets daily (users). Internally, the consultancy's own supplier-renewal process for its ticketing software license is an enabling value stream \u2014 it never touches either client directly, but without it, the core value stream of actually resolving client tickets would eventually break down."
+    },
+    {
+      "id": "value-system-and-principles",
+      "title": "The ITIL Value System & Guiding Principles",
+      "summary": "The five components that make up the Value System, and the seven guiding principles that steer decisions everywhere.",
+      "diagram": null,
+      "vocabIds": [
+        "f12",
+        "f13",
+        "f18",
+        "f19",
+        "f20",
+        "f21",
+        "f43"
+      ],
+      "quizIds": [
+        "q8",
+        "q9",
+        "q10",
+        "q11",
+        "q13",
+        "tf5",
+        "tf9",
+        "tf10",
+        "q40",
+        "q42"
+      ],
+      "reading": "The ITIL Service Value System is the overall model tying everything else in the framework together, and it has exactly five components: guiding principles, governance, the service value chain, management practices, and continual improvement. Guiding principles are recommendations meant to guide an organization in every circumstance, regardless of what's changing around it \u2014 they're deliberately generic so they apply whether you're troubleshooting one ticket or restructuring an entire department. Management practices are the \"how\": organizational resources, people, process, and tools, assembled to actually perform value chain activities. In the current model, the 34 total practices split into 12 general management practices and 22 product and service management practices, with no separate small technical-management group the way older models had.\n\nThere are seven guiding principles, and Foundation expects you to recognize each by name and apply it to a scenario, not just recite the list. Focus on value means tracing every activity back to some benefit for a stakeholder \u2014 if a task doesn't map to that, it's worth questioning whether it's worth doing. Start where you are means assessing and reusing what already exists rather than building from scratch by default, which is not the same as refusing to change anything. Keep it simple and practical means using the minimum number of steps needed and cutting anything that doesn't add value \u2014 exam scenarios describing redundant approval steps almost always point here.\n\nThe remaining four principles fill in the rest of the picture: progress iteratively with feedback favors small, adjustable steps over one giant rollout; collaborate and promote visibility means sharing information openly across boundaries so people can see what's happening; think and work holistically means recognizing how a change in one part of the organization ripples into others; and optimize and automate means improving a process manually first, then automating what's left, since automating a broken process just makes it fail faster. These principles frequently get tested in pairs where two sound similar but target different problems, so read each scenario for exactly what's being described, not just which keyword it echoes.",
+      "fundamentalsLabel": "New to the idea of guiding principles? See the everyday analogy",
+      "fundamentals": "A family's household rules work the same way guiding principles do. 'Clean up your own mess' applies whether you're talking about dishes, laundry, or a school project \u2014 it's generic enough to guide behavior in any situation, the same way ITIL's principles are meant to apply whether you're handling a single ticket or a company reorganization. And just like a family might have several rules that sound similar but aren't the same, 'don't leave a mess' and 'don't waste food' both sound like tidiness rules, but one is about cleanliness and the other is about not being wasteful \u2014 exactly the kind of distinction the exam expects between principles like 'think and work holistically' and 'collaborate and promote visibility.'",
+      "keyTerms": [
+        "ITIL Value System",
+        "Guiding principles",
+        "Governance",
+        "Management practices",
+        "Focus on value",
+        "Start where you are",
+        "Keep it simple and practical",
+        "Progress iteratively with feedback",
+        "Collaborate and promote visibility",
+        "Think and work holistically",
+        "Optimize and automate"
+      ],
+      "commonTraps": [
+        "There are exactly seven guiding principles, not five, six, or nine \u2014 a common wrong-answer trap on the exam.",
+        "'Start where you are' does not mean never changing anything \u2014 it means assessing what exists honestly before deciding what to keep.",
+        "'Optimize and automate' means simplify first, automate second \u2014 automating a bad process just fails faster.",
+        "'Think and work holistically' and 'collaborate and promote visibility' are both about openness, but one is about seeing the whole picture and the other is about sharing information."
+      ],
+      "scenario": "A change advisory board requires three separate sign-offs for every request, including for a routine, pre-approved standard change that's been run successfully a hundred times before. Removing the two unnecessary sign-offs and leaving the one that actually adds risk oversight is 'keep it simple and practical' in action. If the board then wants to automate that remaining approval step with a bot that checks a few fixed conditions, that's 'optimize and automate' \u2014 but only after the simplification happened first, not instead of it."
+    },
+    {
+      "id": "governance-continual-improvement-practices",
+      "title": "Governance, Continual Improvement & Key Practices",
+      "summary": "How governance directs the organization, how the Continual Improvement Model drives change, and how a handful of core practices fit together.",
+      "diagram": "continualImprovementModel",
+      "vocabIds": [
+        "f14",
+        "f15",
+        "f16",
+        "f17",
+        "f39",
+        "f40",
+        "f45",
+        "f46",
+        "f47"
+      ],
+      "quizIds": [
+        "q12",
+        "q14",
+        "tf6",
+        "tf8",
+        "tf21",
+        "q46",
+        "q47",
+        "q49",
+        "q68"
+      ],
+      "reading": "Governance is the Value System component covering how an organization is directed and controlled \u2014 evaluating, directing, and monitoring performance and compliance from the top. It sits above day-to-day operations and above any single management practice: a company's leadership setting a policy that all IT changes require a documented risk assessment is governance, while the change enablement practice that actually carries that policy out day to day is a management practice, not governance itself. The value chain component of the Value System \u2014 an operating model outlining the key activities an organization undertakes to convert inputs like demand and opportunity into outputs of value \u2014 is what all of this ultimately serves; it's covered in depth in its own lesson as the eight-stage Product and Service Lifecycle, since that's the concrete form it takes today, not a separate six-activity list some older material still describes.\n\nContinual improvement is the Value System component that keeps all of this from going stale \u2014 a recurring activity performed across every part of the organization, not a one-time project, to make sure performance keeps meeting stakeholder expectations over time. It's operationalized through the seven-step Continual Improvement Model: what is the vision, where are we now, where do we want to be, how do we get there, take action, did we get there, and how do we keep the momentum going. The steps are sequential and dependent on each other \u2014 you can't credibly set a target (step 3) without an honest baseline (step 2), and skipping straight to an action plan without measuring the current state is one of the most common exam scenarios describing where a team went wrong. Teams can loop back to an earlier step as understanding improves, but they can't meaningfully skip ahead.\n\nA handful of management practices come up often enough on the exam to be worth knowing individually, even at Foundation level. Incident management restores service as fast as possible after an unplanned interruption or reduction in quality; problem management separately investigates the underlying cause of one or more incidents to prevent recurrence, sometimes producing a known error, a problem that's been analyzed but not yet permanently fixed, often with a documented workaround in the meantime. Change enablement classifies changes by risk and urgency: a standard change is pre-authorized and needs no case-by-case approval, a normal change goes through assessment and authorization first, and an emergency change is fast-tracked because it can't wait for the normal process. The service desk, finally, is the single agreed point of contact for users \u2014 its value is coordination and communication, logging and routing issues, even when the actual resolution happens somewhere else entirely.",
+      "fundamentalsLabel": "New to governance and continual improvement? See the everyday analogy",
+      "fundamentals": "Governance is like a city council setting building codes, while continual improvement is like the ongoing inspections that keep every building meeting code as materials age and standards evolve \u2014 one sets the rule, the other keeps checking it's still being met. And the seven-step model is exactly how you'd plan a home renovation: you wouldn't order kitchen cabinets, take action, before measuring your current kitchen, where are we now, and deciding what you actually want it to look like, where do we want to be \u2014 skipping either step means the cabinets probably won't fit or won't be what you needed.",
+      "keyTerms": [
+        "Governance",
+        "Continual improvement",
+        "Continual Improvement Model",
+        "Incident management",
+        "Problem management",
+        "Known error",
+        "Change enablement",
+        "Standard change",
+        "Normal change",
+        "Emergency change",
+        "Service desk"
+      ],
+      "commonTraps": [
+        "Restoring service fast (incident management) and finding the root cause (problem management) are deliberately separate practices, not one combined step.",
+        "The Continual Improvement Model's steps depend on each other in order \u2014 you can't set a credible target without first knowing your actual baseline.",
+        "A standard change still requires pre-authorization; it's not the same as 'no process at all,' just no case-by-case approval.",
+        "The service desk doesn't need to resolve every issue itself to be doing its job \u2014 coordination and communication are its real value."
+      ],
+      "scenario": "After a spike in checkout failures on an e-commerce platform, the service desk logs the incidents and restores service by restarting a failed process, resolving the immediate incident within the hour. Problem management then investigates separately and finds a memory leak in a recent deployment, logging it as a known error with the workaround documented for the support team while a permanent code fix is scheduled through a normal change. Meanwhile, leadership's governance decision that every production deployment needs a rollback plan is what made that restart even possible in minutes rather than hours."
+    },
+    {
+      "id": "four-dimensions",
+      "title": "The Four Dimensions of Service Management",
+      "summary": "The four angles every service must be viewed from, and the external PESTLE factors that press on all of them.",
+      "diagram": "fourDimensions",
+      "vocabIds": [
+        "f22",
+        "f23",
+        "f24",
+        "f25",
+        "f26",
+        "f42"
+      ],
+      "quizIds": [
+        "q15",
+        "q16",
+        "q17",
+        "q18",
+        "q54",
+        "tf12",
+        "tf13",
+        "q63",
+        "q69"
+      ],
+      "reading": "ITIL's Four Dimensions are a checklist for viewing any service from every angle needed to keep it working end to end, rather than fixating on just one. Organizations and people covers roles, responsibilities, structure, culture, and staffing \u2014 whether a support team actually has the right skills and headcount for what it's being asked to do. Information and technology covers the information and knowledge needed to manage services, plus the technologies that support them, explicitly including AI, cloud, and automation in the current model.\n\nPartners and suppliers covers relationships with other organizations involved in designing, developing, deploying, or supporting a service \u2014 and this ranges from a single software license purchased from a vendor all the way to a large, formal outsourcing arrangement; scale and formality don't change which dimension a relationship belongs to. Value streams and processes covers the actual activities, workflows, controls, and procedures an organization uses to achieve its objectives \u2014 the \"how work actually flows\" dimension.\n\nAll four dimensions sit inside a wider environment shaped by external PESTLE factors: Political, Economic, Social, Technological, Legal, and Environmental pressures the organization doesn't control but has to respond to. A new data-residency law is a Legal factor; a shift toward remote-work culture is Social. The exam's real focus, though, is less on memorizing PESTLE's letters and more on recognizing that the four dimensions constantly affect each other \u2014 a technology change, like rolling out AI-assisted triage, almost always has a knock-on effect in organizations and people, since staff need new skills to review and override it, and the current model explicitly folds that AI-related shift into the organizations and people dimension itself, not just information and technology.",
+      "fundamentalsLabel": "New to the four dimensions? See the everyday analogy",
+      "fundamentals": "Think about opening a small restaurant. You need the right staff with the right skills (organizations and people), a working point-of-sale system and kitchen equipment (information and technology), a reliable produce supplier (partners and suppliers), and an actual efficient process for taking an order and getting food to the table (value streams and processes). Miss any one of the four, and the whole restaurant suffers even if the other three are perfect \u2014 a great chef with no functioning register, or a great supplier relationship with untrained waitstaff, both fail the customer just the same. A new minimum-wage law, a PESTLE factor, can force changes across more than one of those four dimensions at once.",
+      "keyTerms": [
+        "Four Dimensions",
+        "Organizations and people",
+        "Information and technology",
+        "Partners and suppliers",
+        "Value streams and processes",
+        "PESTLE"
+      ],
+      "commonTraps": [
+        "PESTLE factors are external pressures on the four dimensions, not a fifth dimension themselves.",
+        "Partners and suppliers is not only about big formal outsourcing deals \u2014 a single software license counts too.",
+        "Organizations and people covers more than headcount \u2014 skills, culture, and role clarity matter just as much.",
+        "A change rarely stays inside one dimension \u2014 the exam often describes a ripple effect across two dimensions at once."
+      ],
+      "scenario": "A logistics company outsources its network monitoring to a third-party provider (partners and suppliers), which requires its own staff to be retrained on how to interpret the vendor's alerts correctly (organizations and people). Around the same time, new environmental regulations (a PESTLE factor) push the company to consolidate data centers, forcing a redesign of how incident tickets get routed between the old and new infrastructure (value streams and processes) alongside the monitoring platform migration itself (information and technology). No single dimension captures the whole change \u2014 all four move together."
+    },
+    {
+      "id": "product-service-lifecycle",
+      "title": "The Product & Service Lifecycle",
+      "summary": "The eight iterative activities that convert demand into delivered value \u2014 ITIL's value chain in practice.",
+      "diagram": "productServiceLifecycle",
+      "vocabIds": [
+        "f27",
+        "f28",
+        "f29",
+        "f30",
+        "f31",
+        "f32"
+      ],
+      "quizIds": [
+        "q19",
+        "q20",
+        "q21",
+        "q22",
+        "q31",
+        "q44",
+        "tf14",
+        "tf15",
+        "tf16"
+      ],
+      "reading": "The service value chain component of the Value System is expressed as the Product and Service Lifecycle: eight activities \u2014 Discover, Design, Acquire, Build, Transition, Operate, Deliver, Support \u2014 that convert inputs like demand and opportunity into outputs of value. This isn't a second, separate model sitting alongside \"the value chain\"; it's the same operating model, just expressed as a concrete, nameable sequence of activities rather than an abstract concept. Crucially, it's used iteratively, not as a strict one-way pipeline: work can loop back to an earlier activity at any point, and that looping is expected, not a sign something went wrong.\n\nThe first four activities take a service from idea to built component. Discover means identifying opportunities and understanding demand \u2014 is there a real problem worth solving here, before anything gets designed. Design defines requirements and specifications, but nothing gets built or acquired yet at this stage; that boundary between defining what's needed and actually producing it is a distinction the exam tests directly. Acquire and Build both then produce the actual components a solution needs: Acquire obtains them from outside suppliers, Build develops them in house, and a single project often uses both at once.\n\nThe final four activities move that built solution into live use and keep it running. Transition covers moving a new or changed product or service into live use, including testing and release \u2014 this is where change management and deployment activity concentrates, not ongoing day-to-day running. Operate, Deliver, and Support are often grouped together on flashcards but tested separately: Operate means running the service day to day, Deliver means providing the agreed outcomes and value directly to consumers, and Support means resolving the issues and requests that come up once the service is actually in use \u2014 distinct jobs that can each go wrong independently of the others.",
+      "fundamentalsLabel": "New to the idea of a service lifecycle? See the everyday analogy",
+      "fundamentals": "This maps closely to opening a new restaurant location. Discover is scouting whether there's actual demand in a neighborhood. Design is drawing up the menu and floor plan without ordering a single ingredient yet. Acquire is buying the ovens and dining furniture; Build is training the kitchen staff on the actual recipes in-house. Transition is the soft-opening test run before public launch. And once it's open, Operate is running the kitchen every night, Deliver is the meal actually reaching the table, and Support is handling a customer complaint about a wrong order \u2014 three related but genuinely different jobs, exactly like the exam expects you to keep separate.",
+      "keyTerms": [
+        "Product and Service Lifecycle",
+        "Discover",
+        "Design",
+        "Acquire",
+        "Build",
+        "Transition",
+        "Operate",
+        "Deliver",
+        "Support"
+      ],
+      "commonTraps": [
+        "The eight activities are not a strict one-way pipeline \u2014 looping back to an earlier activity, like returning to Design after Build surfaces an issue, is normal and expected.",
+        "Design defines requirements only; nothing is actually built or acquired until the activities that follow it.",
+        "Operate, Deliver, and Support sound similar but are distinct: running the service, providing the outcome, and resolving issues are three separate jobs.",
+        "The value chain and the Product and Service Lifecycle are the same model described two ways, not two separate lists to memorize."
+      ],
+      "scenario": "A company explores whether customers actually want a self-service password reset tool (Discover), then defines exactly what it needs to do and its security requirements (Design) before writing a single line of code. It buys a third-party identity verification component (Acquire) while its own developers build the reset workflow itself (Build), then runs a controlled pilot with one department before a full release (Transition). Once live, the platform team keeps it running (Operate), users get the actual convenience of resetting their own passwords (Deliver), and the help desk still fields the occasional edge case that fails (Support) \u2014 with a spike in failed resets eventually looping the team back to Design to rework the verification flow."
+    },
+    {
+      "id": "streams-ai-and-frameworks",
+      "title": "Value Streams, AI & Adjacent Frameworks",
+      "summary": "Mapping how work actually flows, where AI fits into service management, and how ITIL relates to Agile, DevOps, and PRINCE2.",
+      "diagram": null,
+      "vocabIds": [
+        "f33",
+        "f34",
+        "f35",
+        "f36",
+        "f41",
+        "f37",
+        "f38"
+      ],
+      "quizIds": [
+        "q23",
+        "q37",
+        "q32",
+        "q24",
+        "q33",
+        "q38",
+        "tf18",
+        "q26",
+        "q34",
+        "tf20"
+      ],
+      "reading": "A value stream is a series of steps an organization undertakes to create and deliver products and services to consumers, built by combining value chain activities and practices for a specific end-to-end scenario, like \"resolve a user's incident,\" rather than every activity in the lifecycle every time. Value stream mapping visualizes those end-to-end steps specifically to spot waste, delay, or handoffs that don't add value \u2014 in practice, this looks like a flowchart with timestamps showing exactly where a request sits waiting versus where real work is actually happening, and it's a diagnostic tool that can be used any time, not only once at project kickoff.\n\nITIL 4 folds AI in as a capability that needs the same governance as anything else, not a special exception. It distinguishes plain AI, systems performing tasks that normally need human intelligence, from generative AI, which creates new content, from agentic AI, which can plan and act autonomously toward a goal with limited human intervention \u2014 a chatbot that drafts a reply for a human to approve is generative, while one that files the ticket, checks the knowledge base, and closes it itself is agentic. The AI Capability Model further breaks down what AI actually contributes into six \"Cs\": Creation, Curation, Clarification, Cognition, Communication, and Coordination \u2014 naming which \"C\" a given AI system performs matters, because a system that curates alerts needs different oversight than one that coordinates automated actions across a workflow.\n\nITIL deliberately doesn't compete with adjacent frameworks; it operates at a different layer and expects to work alongside them. DevOps contributes specific practices for fast, collaborative delivery \u2014 CI/CD pipelines slot naturally inside the Build and Deliver & Support stages of the lifecycle, governed by ITIL's wider context rather than replacing it. PRINCE2 manages temporary, bounded project work, while ITIL manages the ongoing service that project eventually delivers into \u2014 a system rollout might run as a PRINCE2 project, with ITIL practices taking over the moment it goes live. Agile, similarly, is about how work gets done iteratively, while ITIL is about the wider value system that work happens within \u2014 different layers, not competing answers to the same question.",
+      "fundamentalsLabel": "New to how these frameworks fit together? See the everyday analogy",
+      "fundamentals": "Think of ITIL as a restaurant's overall business plan and health-code compliance, while Agile and DevOps are the specific techniques the kitchen uses to cook efficiently, and PRINCE2 is how a one-time kitchen renovation project gets managed. None of them compete with each other \u2014 the renovation project (PRINCE2) eventually hands off to day-to-day kitchen operations, governed by the overall plan (ITIL), which might use a fast, iterative prep technique (Agile/DevOps) without that technique ever needing to replace the business plan itself. And an AI system that just suggests tonight's specials based on ingredients about to expire (generative) is a very different level of trust from one that automatically reorders inventory and adjusts the menu on its own (agentic).",
+      "keyTerms": [
+        "Value stream",
+        "Value stream mapping",
+        "AI",
+        "Generative AI",
+        "Agentic AI",
+        "AI Capability Model",
+        "DevOps",
+        "PRINCE2",
+        "Agile"
+      ],
+      "commonTraps": [
+        "Value stream mapping is not a one-time kickoff exercise \u2014 it can and should be used whenever waste or delay needs diagnosing.",
+        "Agentic AI plans and acts with limited human input; generative AI only produces content on request without that independent follow-through.",
+        "PRINCE2 and ITIL are not competing frameworks needing an either/or choice \u2014 PRINCE2 manages the bounded project, ITIL manages the ongoing service it feeds into.",
+        "AI still needs accountability and risk management like any other capability \u2014 governance is not something that only kicks in after something goes wrong."
+      ],
+      "scenario": "A support team maps its incident-resolution value stream and discovers requests sit untouched in a queue for six hours before anyone even looks at them \u2014 the actual troubleshooting itself takes twenty minutes. Around the same time, they roll out an AI system that auto-triages incoming tickets to the right team, an agentic, Coordination-type capability, but require human sign-off before it touches anything on a production database, applying AI governance proportional to risk. The triage rollout itself runs as a short, iterative Agile project, feeding a change into the ongoing service that ITIL governs day to day once it's live."
+    }
+  ],
   "cheatSheet": [
     {
       "heading": "Exam-day strategy",
