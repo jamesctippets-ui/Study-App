@@ -404,9 +404,9 @@
       "type": "mc",
       "question": "A conglomerate has three independently run subsidiaries, each needing its own Azure Policy and RBAC boundary, but the parent company also wants one place to apply a small set of shared security policies, such as mandatory resource tagging, across all three at once. What structure best satisfies both needs?",
       "options": [
-        "One flat subscription per subsidiary directly under the tenant root, with policies assigned individually to each subscription",
-        "A single subscription shared by all three subsidiaries, separated only by resource groups",
-        "Separate Entra ID tenants for each subsidiary, unified later through B2B guest access",
+        "One flat subscription per subsidiary directly under the tenant root, with the shared tagging policy assigned individually and manually to each subscription every time",
+        "A single subscription shared by all three subsidiaries, separated only by resource groups, with no management group boundary between them at all",
+        "Separate Entra ID tenants for each subsidiary, with no parent structure tying their policies together, unified later through B2B guest access",
         "A parent management group with one child management group per subsidiary, applying shared policies at the parent and subsidiary-specific policies at each child"
       ],
       "correct": 3,
@@ -420,8 +420,8 @@
       "options": [
         "One centralized Log Analytics workspace for the whole organization, with RBAC used to restrict which teams can query which tables",
         "A dedicated Log Analytics workspace for the clinical subsidiary's regulated data, plus a separate centralized workspace for the rest of the organization",
-        "No Log Analytics workspace at all, relying solely on Azure Monitor Metrics for compliance data",
-        "A single Application Insights resource shared across the entire organization"
+        "A single Log Analytics workspace scoped only to the clinical subsidiary, with no monitoring at all for the rest of the organization",
+        "Two Application Insights resources, one per business unit, with no Log Analytics workspace behind either one"
       ],
       "correct": 1,
       "explanation": "A dedicated workspace for the regulated subsidiary keeps its retention and access boundary fully separate to meet compliance needs, while a shared centralized workspace still efficiently serves everyone else. Table-level RBAC in one shared workspace can restrict queries, but doesn't give the subsidiary its own retention policy or the hard boundary a dedicated workspace provides. Skipping Log Analytics would abandon log-based monitoring and most compliance auditing capability. A single Application Insights resource is scoped to application telemetry, not organization-wide infrastructure logs and compliance-driven retention."
@@ -1046,10 +1046,10 @@
       "type": "mc",
       "question": "A company enforces Conditional Access policies requiring MFA and a compliant device for all users, but wants to guarantee administrators can still sign in to Entra ID if the MFA service or a Conditional Access policy is ever accidentally misconfigured and locks everyone else out. What should be configured?",
       "options": [
-        "Disable Conditional Access entirely so a lockout can never occur",
-        "Grant Global Administrator to every helpdesk technician as a backup",
+        "Turn off the specific Conditional Access policy that looks like the likely culprit, leaving the rest of the tenant's policies enabled",
+        "Grant Global Administrator to every helpdesk technician, so someone is always able to sign in even if a policy misfires",
         "Create one or more break-glass emergency access accounts, excluded from the Conditional Access policies, with strong and closely monitored credentials",
-        "Require MFA using only a single phone number for every administrator"
+        "Require MFA for administrators through a single trusted authentication method shared across the team, so no one is ever left without a way to verify"
       ],
       "correct": 2,
       "explanation": "Break-glass emergency access accounts are cloud-only accounts deliberately excluded from Conditional Access policies, with strong credentials and close sign-in monitoring, kept for exactly this kind of lockout scenario. Disabling Conditional Access entirely removes protection for everyone rather than providing a narrow emergency path. Granting Global Administrator broadly to helpdesk staff increases the attack surface without solving the lockout risk. Requiring MFA tied to a single phone number doesn't address a Conditional Access misconfiguration and is itself a single point of failure."
@@ -1061,9 +1061,9 @@
       "question": "A storage account holds application logs that are accessed frequently for the first 30 days, occasionally for the next 60 days, and essentially never afterward, though they must be retained for a compliance period before being deleted. The team wants the tiering and eventual deletion handled automatically with no manual intervention. Which feature should be configured?",
       "options": [
         "A lifecycle management policy with rules to move blobs to Cool after 30 days, Archive after 90 days, and delete once the retention period ends",
-        "Soft delete enabled on the storage account",
-        "A manual PowerShell script an administrator runs every month to change blob tiers",
-        "A time-based immutability policy with a legal hold"
+        "Soft delete enabled on the storage account, so blobs recover their original tier automatically after the retention window",
+        "A manual PowerShell script an administrator runs every month to move blobs between tiers and delete expired ones",
+        "A time-based immutability policy with a legal hold, so blobs shift tier automatically once the hold is lifted"
       ],
       "correct": 0,
       "explanation": "A lifecycle management policy automates tiering and eventual deletion based on rules tied to blob age, exactly matching the need for hands-off tiering and cleanup. Soft delete only protects against accidental deletion for a retention window; it doesn't move data between tiers. A manual monthly script still requires ongoing administrative effort, which the requirement explicitly wants to avoid. An immutability policy with a legal hold actively prevents deletion, the opposite of what's needed once the retention period ends."
@@ -1088,9 +1088,9 @@
       "type": "mc",
       "question": "A company backs up its VMs to a Recovery Services vault configured with locally redundant storage (LRS). After a full regional outage destroys the primary region, the team attempts to restore from the vault's backups. What happens?",
       "options": [
-        "The restore succeeds normally from a copy automatically kept in a secondary region",
-        "The vault automatically switches to GRS the moment the region begins failing",
-        "Azure Backup guarantees a copy exists in a different region regardless of the vault's configured redundancy",
+        "The restore succeeds normally from a copy that Azure Backup keeps in a secondary region by default, independent of the vault's storage redundancy setting",
+        "The vault automatically switches to GRS the moment the region begins failing, so a secondary-region copy still exists in time for the restore",
+        "The restore mostly succeeds, since Recovery Services vaults keep a secondary-region copy of backup data regardless of which redundancy option was chosen",
         "The backup data is unavailable, because LRS keeps synchronous copies only within the primary region, with no secondary-region copy"
       ],
       "correct": 3,
@@ -1102,10 +1102,10 @@
       "type": "mc",
       "question": "An on-premises application connects to Azure over ExpressRoute and must reach an Azure SQL Database privately, with no traffic crossing the public internet, and the SQL server's public endpoint should be disabled entirely. Which networking feature enables this?",
       "options": [
-        "A service endpoint on the subnet hosting the on-premises gateway",
+        "A service endpoint on the subnet hosting the on-premises gateway, restricting the SQL server's public endpoint to that subnet's traffic",
         "A private endpoint for the Azure SQL Database, integrated into a VNet reachable over ExpressRoute",
-        "Azure Front Door placed in front of the SQL server",
-        "A public IP address on the SQL server restricted by an NSG rule"
+        "Azure Front Door placed in front of the SQL server, terminating ExpressRoute traffic at the edge before it reaches the database",
+        "A public IP address on the SQL server, locked down to the on-premises gateway's address range with an NSG rule"
       ],
       "correct": 1,
       "explanation": "A private endpoint gives the PaaS SQL Database a private IP address inside a VNet, and since that VNet is reachable from on-premises over ExpressRoute, traffic stays private end-to-end and the public endpoint can be disabled entirely. A service endpoint only optimizes routing for traffic that already originates inside the VNet \u2014 it doesn't extend to on-premises traffic. Front Door is an HTTP-layer global entry point and doesn't apply to a database protocol connection. A public IP restricted by an NSG rule still relies on the public endpoint, which this scenario explicitly wants disabled."
@@ -1203,10 +1203,10 @@
       "type": "mc",
       "question": "In the hub-spoke diagram shown, the two nonproduction spoke virtual networks are connected only by a dotted line labeled \"peered or directly connected,\" while every spoke's solid line runs to the hub. What does this indicate about the topology's default behavior?",
       "options": [
-        "Spokes automatically gain full connectivity to every other spoke the moment they're peered to the hub",
+        "Spokes automatically gain full connectivity to every other spoke the moment they're peered to the hub, since peering is transitive across a shared hub",
         "Spokes are isolated from each other by default; any spoke-to-spoke path has to be configured separately, on top of the hub peering",
-        "Only the two production spokes are ever allowed to communicate with each other",
-        "The dotted line means those two networks can never communicate under any configuration"
+        "Only spokes of the same type, production or nonproduction, are able to reach each other, based purely on that shared classification",
+        "The dotted line means those two networks require a full mesh of direct peerings before any traffic between them is possible"
       ],
       "correct": 1,
       "explanation": "VNet peering is non-transitive, so peering each spoke to the hub does not by itself let two spokes reach each other \u2014 that's exactly why the diagram draws spoke-to-spoke connectivity as a separate dotted line rather than as part of the solid hub peering. Any direct or routed spoke-to-spoke path has to be added deliberately.",
@@ -1218,10 +1218,10 @@
       "type": "mc",
       "question": "This real Azure Architecture Center diagram shows a VM workload deployed into an Azure landing zone, split into an \"Azure application landing zone subscription\" and an \"Azure platform landing zone subscription.\" According to the diagram, who owns the hub virtual network, Azure Firewall, and Azure Bastion shown in the platform landing zone subscription?",
       "options": [
-        "The application/workload team \u2014 the same team that owns the frontend and backend VM scale sets",
+        "The same application/workload team that owns the application landing zone subscription, keeping every subscription under one team's control",
         "A central platform team, separate from the workload team that owns the resources in the application landing zone subscription above it",
-        "No one \u2014 those resources are left unmanaged by design",
-        "Azure Support, reached through a support ticket every time a change is needed"
+        "A rotating on-call engineer, reassigned between the platform and workload teams every sprint",
+        "Azure Support, reached through a support ticket every time a change is needed to either subscription"
       ],
       "correct": 1,
       "explanation": "The diagram draws a clear line between the application landing zone subscription (workload-owned resources like the Application Gateway and VM scale sets) and the platform landing zone subscription (the hub, Firewall, and Bastion), matching the landing zone principle that a central platform team owns and maintains shared connectivity and security services centrally.",
@@ -1324,13 +1324,139 @@
       "question": "In the sharding diagram shown, every row from the original table lands in exactly one of the two shards, split by key range. If real-world traffic turned out to concentrate heavily on keys in the \"A-G\" range while the \"H-Z\" shard sat nearly idle, what problem would this illustrate?",
       "options": [
         "A hot partition, where an uneven key distribution overloads one shard regardless of how much capacity is provisioned",
-        "A consistency-level misconfiguration",
-        "A geo-redundancy failure",
-        "An access-tier misconfiguration"
+        "A consistency-level misconfiguration, where too weak a level lets reads pile up on whichever shard answers fastest",
+        "A geo-redundancy failure, where the secondary region silently stops receiving replicated writes for one shard",
+        "An access-tier misconfiguration, where one shard was left on a cheaper, lower-throughput storage tier than the other"
       ],
       "correct": 0,
       "explanation": "Concentrating traffic on one key range like this is exactly what a hot partition looks like \u2014 the partitioning scheme, not the amount of provisioned throughput or any consistency or storage setting, is what's causing one shard to take nearly all the load while the other sits idle. The fix is redesigning the partition key, not raising capacity or changing consistency.",
       "image": "dataPartitioningHorizontal"
+    },
+    {
+      "id": "q48",
+      "cat": "identityGovernance",
+      "type": "mc",
+      "question": "Which Entra ID feature evaluates signals such as user, device, and location at sign-in time and then applies a control, such as requiring MFA or blocking access outright?",
+      "options": [
+        "Conditional Access",
+        "Privileged Identity Management (PIM)",
+        "Entitlement management",
+        "Azure Policy"
+      ],
+      "correct": 0,
+      "explanation": "Conditional Access is the policy engine that evaluates sign-in signals and applies controls in response. PIM governs time-bound elevation of privileged roles rather than every sign-in. Entitlement management handles requestable access packages, and Azure Policy governs resource configuration, not user sign-in."
+    },
+    {
+      "id": "q49",
+      "cat": "dataStorage",
+      "type": "mc",
+      "question": "An application currently uses standard GRS for its storage account and wants to add the ability to read from the secondary region during normal operation, without waiting for a failover, while keeping the same geo-replication behavior otherwise. What is the minimal change needed?",
+      "options": [
+        "Enable read access on the existing GRS configuration to convert it to RA-GRS",
+        "Migrate the storage account to ZRS, which supports secondary-region reads by default",
+        "Manually trigger a failover to the secondary region whenever a read is needed",
+        "Add a private endpoint to the secondary region's storage account"
+      ],
+      "correct": 0,
+      "explanation": "Enabling read access on a GRS account converts it to RA-GRS, exposing the existing secondary-region copy for reads with no other change to replication behavior. ZRS only spreads copies across zones in one region and has no secondary region to read from at all. Triggering a failover for every read defeats the purpose, and a private endpoint only affects network access, not read availability."
+    },
+    {
+      "id": "q50",
+      "cat": "businessContinuity",
+      "type": "mc",
+      "question": "A team configures a Recovery Services vault with GRS and enables cross-region restore. After a regional outage, what does cross-region restore let them do that plain GRS redundancy alone would not?",
+      "options": [
+        "Restore VM backups directly into the secondary region, without waiting for Azure to declare a formal regional failover",
+        "Continue writing new backups to the primary region during the outage",
+        "Skip the vault's storage redundancy setting entirely",
+        "Automatically fail over the Site Recovery replication for the same VM"
+      ],
+      "correct": 0,
+      "explanation": "Cross-region restore specifically lets a team restore from the secondary-region backup copy directly, without needing Azure to first declare the primary region as failed. Writing new backups to a down primary region isn't possible during the outage, cross-region restore still depends on GRS/GZRS being configured (it doesn't skip the redundancy setting), and it's a Backup feature, unrelated to Site Recovery's separate replication and failover."
+    },
+    {
+      "id": "q51",
+      "cat": "infrastructure",
+      "type": "mc",
+      "question": "A workload behind Azure Front Door serves both cached static assets and dynamic, session-bound API calls that must always reach the same regional backend for a given user session. Which approach keeps session-bound calls pinned to one backend without breaking the caching of the static assets?",
+      "options": [
+        "Session affinity configured on the Front Door origin group, left disabled for the caching rules covering the static routes",
+        "Disabling caching platform-wide so every request, static or dynamic, is re-evaluated for routing on each call",
+        "A Traffic Manager profile placed in front of Front Door to pin sessions before requests ever reach Front Door's own routing",
+        "A single origin group with no session affinity, relying on Front Door's latency-based routing to coincidentally land on the same backend each time"
+      ],
+      "correct": 0,
+      "explanation": "Session affinity can be scoped to the routes that need it, pinning a session's dynamic API calls to one backend while the static routes keep their own caching rules unaffected. Disabling caching entirely sacrifices a working feature to fix an unrelated problem. Stacking Traffic Manager in front of Front Door adds a redundant DNS layer that doesn't solve session pinning inside Front Door's own routing. Relying on latency-based routing without affinity gives no actual guarantee a session stays on one backend."
+    },
+    {
+      "id": "q52",
+      "cat": "identityGovernance",
+      "type": "mc",
+      "question": "A company uses PIM for just-in-time elevation to an Azure role, but also wants a quarterly check confirming that everyone still eligible for that role actually still needs to be. Which feature should be layered on top of the existing PIM configuration?",
+      "options": [
+        "An access review scoped to the PIM-eligible role assignments",
+        "A Conditional Access policy requiring a compliant device for the same role",
+        "A second, duplicate PIM policy layered on top of the first",
+        "An Azure Policy initiative scoped to the subscription"
+      ],
+      "correct": 0,
+      "explanation": "Access reviews are built for exactly this: periodically recertifying existing eligible or active assignments, including PIM-eligible roles, so a reviewer can confirm or revoke them on a schedule. A Conditional Access device requirement changes how activation happens, not whether the eligibility itself gets re-certified. Duplicating the PIM policy doesn't add a review step, and an Azure Policy initiative governs resource configuration, not role eligibility."
+    },
+    {
+      "id": "q53",
+      "cat": "dataStorage",
+      "type": "mc",
+      "question": "Which Azure Storage feature keeps a deleted blob recoverable for a configurable retention period after the delete operation, without requiring a separate backup product?",
+      "options": [
+        "Soft delete",
+        "Lifecycle management",
+        "Immutability policy",
+        "Change feed"
+      ],
+      "correct": 0,
+      "explanation": "Soft delete retains a deleted blob in a recoverable state for a configured retention window, built into the storage account itself. Lifecycle management automates tiering and deletion based on age rather than recovering deleted blobs. An immutability policy prevents modification or deletion in the first place rather than recovering after the fact, and change feed records a log of changes rather than restoring deleted data."
+    },
+    {
+      "id": "q54",
+      "cat": "infrastructure",
+      "type": "mc",
+      "question": "A team deploys Azure Bastion into a hub VNet so administrators can reach spoke VMs over RDP without a public IP on any VM. A security reviewer asks whether NSG rules on the spoke subnets are still worth keeping now that Bastion is in place. What's the correct answer?",
+      "options": [
+        "Yes \u2014 Bastion removes the need for a public IP on the VM, but layered NSG rules on the spoke subnets still restrict which sources can reach the VM at all",
+        "No \u2014 Bastion fully replaces NSGs, so any existing rules can be safely removed",
+        "No \u2014 NSGs only apply to public IP addresses, so they have no effect once a VM's public IP is removed",
+        "Yes, but only until the next Windows security update is applied, after which NSGs stop being evaluated"
+      ],
+      "correct": 0,
+      "explanation": "Bastion solves the exposure problem of a public IP on the VM, but NSGs are a separate, complementary layer that still restricts which sources and ports can reach the VM at all, and layered defense is still recommended alongside Bastion. NSGs apply to private traffic just as much as public, and there's no such thing as an update that stops NSG evaluation."
+    },
+    {
+      "id": "q55",
+      "cat": "businessContinuity",
+      "type": "mc",
+      "question": "A payments platform needs an RTO under two minutes and can tolerate the added cost of running infrastructure in two regions, but its data layer cannot yet safely accept concurrent writes in two regions without risking double-processed payments. Which topology best fits, given that last constraint?",
+      "options": [
+        "Active-passive with a hot/warm standby region that already runs read replicas and can be promoted to accept writes within the RTO, while only one region accepts writes at a time",
+        "Active-active multi-region with both regions accepting writes simultaneously behind a global load balancer",
+        "A single-region deployment with availability zones only, accepting the risk of a full regional outage",
+        "Active-passive with a cold standby that is provisioned from scratch only after the primary region fails"
+      ],
+      "correct": 0,
+      "explanation": "A hot/warm standby keeps only one region accepting writes at a time, avoiding the double-write risk, while its already-running read replicas let it be promoted fast enough to meet a sub-two-minute RTO. Active-active would reintroduce exactly the concurrent-write conflict the scenario rules out. A single region with only zones doesn't survive a regional outage at all, and a cold standby provisioned from scratch would blow well past a two-minute RTO."
+    },
+    {
+      "id": "q56",
+      "cat": "infrastructure",
+      "type": "mc",
+      "question": "Which Azure networking service performs FQDN-based outbound filtering and centralized logging for traffic leaving a hub-and-spoke network?",
+      "options": [
+        "Azure Firewall",
+        "Network security groups",
+        "Azure Bastion",
+        "Azure Traffic Manager"
+      ],
+      "correct": 0,
+      "explanation": "Azure Firewall supports FQDN-based rules and centralized logging from a hub, protecting every peered spoke from one place. NSGs filter on IP, port, and protocol with no FQDN concept. Bastion provides secure RDP/SSH access, and Traffic Manager is a DNS-based routing service \u2014 neither filters outbound traffic by domain name."
     }
   ],
   "cheatSheet": [
@@ -1410,6 +1536,92 @@
         "Case-study-style questions expect you to reference stated constraints (budget, existing on-prem AD, compliance region) rather than a generic best practice that ignores them.",
         "When a requirement says \"minimize operational overhead,\" that pulls toward PaaS/serverless options over IaaS, unless another hard requirement rules that out."
       ]
+    }
+  ],
+  "madlibs": [
+    {
+      "id": "ml-az305-1",
+      "cat": "identityGovernance",
+      "scenario": "A company wants administrators to hold no standing access to sensitive roles, requesting time-bound elevation with justification only when needed \u2014 this calls for {b1}. Separately, they want an easy way to sign in during an emergency if Conditional Access or MFA is ever accidentally misconfigured and locks everyone else out \u2014 for that, they set up {b2}, deliberately excluded from the normal sign-in policies.",
+      "blanks": [
+        {
+          "key": "b1",
+          "options": [
+            "Privileged Identity Management (PIM)",
+            "Entitlement management",
+            "Access reviews",
+            "Azure Policy"
+          ],
+          "correct": 0
+        },
+        {
+          "key": "b2",
+          "options": [
+            "a break-glass emergency access account",
+            "a second Global Administrator for every team",
+            "a Conditional Access exclusion for all users",
+            "a service principal with Owner at the tenant root"
+          ],
+          "correct": 0
+        }
+      ],
+      "explanation": "PIM converts standing privileged access into time-bound, justified activations. A break-glass account is a small number of cloud-only accounts, deliberately excluded from Conditional Access and closely monitored, kept specifically so a misconfigured policy can never lock every administrator out at once \u2014 granting broad access to more accounts or excluding everyone would defeat the point of a narrow emergency path."
+    },
+    {
+      "id": "ml-az305-2",
+      "cat": "dataStorage",
+      "scenario": "A storage account needs to survive the loss of an entire datacenter within its region \u2014 protected by {b1} \u2014 and separately needs its data to also be readable from a second region without waiting for a failover, which additionally requires {b2}.",
+      "blanks": [
+        {
+          "key": "b1",
+          "options": [
+            "zone-redundant storage (ZRS)",
+            "locally-redundant storage (LRS)",
+            "a lifecycle management policy",
+            "soft delete"
+          ],
+          "correct": 0
+        },
+        {
+          "key": "b2",
+          "options": [
+            "read access enabled on a geo-redundant option (RA-GRS or RA-GZRS)",
+            "a second storage account manually synced by a script",
+            "a private endpoint in the secondary region",
+            "Archive tier in the primary region"
+          ],
+          "correct": 0
+        }
+      ],
+      "explanation": "ZRS synchronously spreads copies across zones in one region, surviving a single datacenter loss. LRS only protects against a hardware failure within one datacenter, not a zone loss. Reading from a secondary region before any failover specifically requires the read-access ('RA-') variant of a geo-redundant option \u2014 plain GRS replicates there but keeps that copy unreadable until an actual failover occurs."
+    },
+    {
+      "id": "ml-az305-3",
+      "cat": "infrastructure",
+      "scenario": "A team wants to run containerized microservices with built-in autoscaling on HTTP and event triggers, but explicitly doesn't want to manage cluster upgrades or node pools \u2014 that points to {b1}. A different team needs deep control over the Kubernetes API itself, including custom operators, and is willing to manage the cluster to get it \u2014 that points to {b2} instead.",
+      "blanks": [
+        {
+          "key": "b1",
+          "options": [
+            "Azure Container Apps",
+            "Azure Kubernetes Service (AKS)",
+            "Azure Virtual Machines",
+            "Azure Functions on a Premium plan"
+          ],
+          "correct": 0
+        },
+        {
+          "key": "b2",
+          "options": [
+            "Azure Container Apps",
+            "Azure Kubernetes Service (AKS)",
+            "Azure Batch",
+            "Azure App Service"
+          ],
+          "correct": 1
+        }
+      ],
+      "explanation": "Container Apps gives serverless containers with built-in autoscaling and no cluster to manage, matching a team that wants orchestration benefits without the operational burden. AKS gives full Kubernetes API control, including custom operators and schedulers, at the cost of managing the cluster yourself \u2014 the right trade for a team that specifically needs that depth of control."
     }
   ],
   "sequences": [

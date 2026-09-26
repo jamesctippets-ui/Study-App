@@ -470,7 +470,7 @@
         "Inter-site replication runs on a configurable schedule and is compressed to conserve WAN bandwidth, while intra-site replication is near-immediate and uncompressed",
         "The two sites are in different forests, so replication uses SMTP instead of RPC",
         "Global Catalog servers replicate slower than non-GC domain controllers by design",
-        "FSMO role holders always replicate last, regardless of site topology"
+        "FSMO role holders replicate on a separate, faster schedule than regular objects, independent of site topology"
       ],
       "correct": 0,
       "explanation": "This is exactly how intra-site vs. inter-site replication is designed to behave: intra-site uses change notification for near-real-time convergence, while inter-site replication is scheduled and compressed specifically to be considerate of limited WAN links. It has nothing to do with GC status, forest boundaries, or FSMO roles."
@@ -495,7 +495,7 @@
       "type": "mc",
       "question": "A GPO linked at the domain level sets a screen lock timeout of 15 minutes. A GPO linked to a specific OU sets it to 5 minutes for higher-security accounts, and neither GPO is marked Enforced. Users in that OU report a 5-minute lockout. Why?",
       "options": [
-        "Domain-linked GPOs are always ignored when any OU-level GPO exists",
+        "Domain-linked GPOs stop being evaluated once a GPO is also linked at the OU level",
         "GPOs are processed in Local, Site, Domain, OU order, so the OU-linked GPO applies last and wins the conflict",
         "The OU GPO must have Block Inheritance enabled to take precedence",
         "Group Policy conflicts are resolved alphabetically by GPO name"
@@ -621,10 +621,10 @@
       "type": "mc",
       "question": "A Hyper-V host has one physical NIC. Several VMs on that host need to reach resources on the physical LAN, and the host itself should also retain LAN connectivity through that same NIC. Which virtual switch type should be created?",
       "options": [
-        "Private virtual switch",
-        "Internal virtual switch bound to a new virtual NIC only",
+        "A private virtual switch, which isolates VM-to-VM traffic on the host with no path out to the physical LAN",
+        "An internal virtual switch, which lets VMs and the host talk to each other but never reaches the physical NIC at all",
         "External virtual switch with 'Allow management operating system to share this network adapter' enabled",
-        "No virtual switch is needed if the VMs use NAT"
+        "No virtual switch at all, relying on a NAT network created directly through Windows' built-in ICS/NAT feature instead"
       ],
       "correct": 2,
       "explanation": "An external switch bound to the physical NIC gives VMs access to the physical network, and explicitly allowing the management OS to share that adapter keeps the host itself connected through the same NIC. A private switch isolates VMs from everything outside the host, and an internal switch alone doesn't reach the physical LAN at all."
@@ -649,9 +649,9 @@
       "type": "mc",
       "question": "An administrator wants to move a running, business-critical VM from one Hyper-V host to another with zero perceptible downtime for connected users, ahead of planned host maintenance. Which feature accomplishes this?",
       "options": [
-        "Hyper-V Replica, failing over to the replica VM",
-        "Exporting and re-importing the VM on the new host",
-        "A production checkpoint applied on the new host",
+        "Hyper-V Replica, failing over to the already-replicated but offline copy at the secondary site",
+        "Exporting the VM's configuration and re-importing it on the new host, then powering it back on there",
+        "Taking a production checkpoint and manually applying it to a new VM created on the new host",
         "Live Migration, given shared/SMB storage and compatible processors between hosts"
       ],
       "correct": 3,
@@ -887,10 +887,10 @@
       "type": "mc",
       "question": "An operations team wants to write a query against collected log data using a chain of operators like where, summarize, and project to filter and shape results, then turn that same query directly into an automated alert. Which technology are they using?",
       "options": [
-        "PowerShell Desired State Configuration",
-        "Windows Server Migration Tools",
+        "PowerShell Desired State Configuration, declaring the desired state of a server and letting the engine enforce it",
+        "Windows Server Migration Tools, scripting the transfer of roles and data to a new server",
         "Kusto Query Language (KQL) against a Log Analytics workspace",
-        "Cluster-Aware Updating"
+        "Cluster-Aware Updating, orchestrating patch installation one cluster node at a time"
       ],
       "correct": 2,
       "explanation": "KQL's operator-chaining query style against a Log Analytics workspace is exactly what is described, and workspace-based queries can be promoted directly into log alert rules with minimal extra work. The other three options are unrelated configuration, migration, and patching tools respectively, with no query language of this kind."
@@ -1258,9 +1258,9 @@
       "type": "mc",
       "question": "An OU containing several user accounts, along with their group memberships, was deleted three days ago. The forest functional level is Windows Server 2016, and the AD Recycle Bin feature was enabled a year ago. What is the most complete way to recover the users with their original group memberships intact?",
       "options": [
-        "Perform a tombstone reanimation on each deleted user object",
-        "Restore only from a full system state backup taken before the deletion",
-        "Manually recreate each user account and re-add it to its groups by hand",
+        "Perform a tombstone reanimation on each deleted user object, using ldp.exe against the object's tombstone lifetime window",
+        "Restore only from a full system state backup taken before the deletion, using Windows Server Backup's authoritative restore mode",
+        "Manually recreate each user account and re-add it to its original groups one at a time using Active Directory Users and Computers",
         "Restore the deleted objects from the AD Recycle Bin, which preserves group memberships and most original attributes"
       ],
       "correct": 3,
@@ -1287,9 +1287,9 @@
       "question": "Before applying a risky configuration change to a production domain controller running as a Hyper-V VM, an administrator wants to take a point-in-time snapshot that is safe to restore without corrupting the AD database, using Volume Shadow Copy Service inside the guest to ensure application consistency. Which checkpoint type should be used?",
       "options": [
         "A production checkpoint, which uses VSS inside the guest for an application-consistent snapshot",
-        "A standard checkpoint, since it captures memory and device state the fastest",
-        "An automatic checkpoint created only at VM startup",
-        "A saved-state export with no checkpoint at all"
+        "A standard checkpoint, which captures memory and device state in a point-in-time snapshot without invoking VSS inside the guest",
+        "An automatic checkpoint, created automatically before a driver or configuration change to the VM's virtual hardware",
+        "A saved-state export, pausing the VM's execution and writing its memory to a saved-state file on disk"
       ],
       "correct": 0,
       "explanation": "A production checkpoint uses VSS inside the guest OS to create an application-consistent, restorable point-in-time copy, which is specifically safe to use against workloads like Active Directory or SQL Server. A standard checkpoint only captures memory and device state like a saved game and is not application-aware, making it unsafe to restore into a running domain controller. Automatic checkpoints are unrelated to this manual, deliberate risk-mitigation step, and a plain saved-state export isn't a checkpoint or restorable snapshot mechanism at all."
@@ -1314,10 +1314,10 @@
       "type": "mc",
       "question": "A team wants Security and Application event log entries from 50 servers centralized onto a single collector server for review, without deploying Azure Monitor Agent or a Log Analytics workspace, using only built-in Windows Server functionality. Which feature should be configured?",
       "options": [
-        "Data Collector Sets configured individually on the collector server only",
-        "Reliability Monitor configured to poll each of the 50 servers",
+        "Data Collector Sets, configured on the collector server and pointed at each of the 50 servers over WMI",
+        "Reliability Monitor, configured on the collector server to poll each of the 50 servers' stability index remotely",
         "Windows Event Forwarding (WEF), using a subscription on the collector server and WinRM on each source server",
-        "Azure Update Manager with a centralized reporting dashboard"
+        "Azure Update Manager, using its centralized reporting dashboard to pull patch and event data from each server"
       ],
       "correct": 2,
       "explanation": "Windows Event Forwarding uses WinRM-based subscriptions so a collector server can gather selected event log entries from many source servers into its own forwarded-events log, entirely with built-in Windows Server functionality and no Azure agent required. Data Collector Sets on the collector alone wouldn't gather anything from the other 50 servers, since they capture local performance and trace data. Reliability Monitor only tracks a single server's own stability index locally. Update Manager is a patch-compliance service, unrelated to centralizing event logs."
@@ -1385,6 +1385,132 @@
         3
       ],
       "explanation": "Shadow copies expose a self-service Previous Versions tab so users can recover an earlier file version without an administrator restoring from backup, and VSS is efficient because each shadow copy stores only the changed blocks since the previous one rather than a full volume duplicate. Shadow copies are a convenient point-in-time recovery aid, not a replacement for a real backup solution, and they live on the same volume/server by default rather than a different physical server, which is also why they don't protect against the loss of that server's hardware."
+    },
+    {
+      "id": "q42",
+      "cat": "adDs",
+      "type": "mc",
+      "question": "Which feature lets an administrator restore a deleted user object, including its original group memberships, directly and quickly, without restoring from a backup?",
+      "options": [
+        "The AD Recycle Bin",
+        "Tombstone reanimation alone",
+        "A full system state restore",
+        "The Protected Users group"
+      ],
+      "correct": 0,
+      "explanation": "The AD Recycle Bin restores a deleted object with essentially all of its original attributes, including link-valued attributes like group memberships, with no backup restore needed. Tombstone reanimation, the older method, recovers a bare object that has already lost most linked attributes. A full system state restore works but is slower and riskier, since it can roll back unrelated changes, and the Protected Users group is an authentication hardening feature unrelated to object recovery."
+    },
+    {
+      "id": "q43",
+      "cat": "adDs",
+      "type": "mc",
+      "question": "A single AD forest has two domains, sales.contoso.com and hr.contoso.com, both children of contoso.com. A user in sales.contoso.com needs to access a resource in hr.contoso.com. What lets this work without any administrator configuring a new trust?",
+      "options": [
+        "The implicit, transitive parent-child trust that already exists between domains in the same forest",
+        "A manually created external trust between the two domains",
+        "A realm trust to a non-Windows Kerberos realm",
+        "A one-way shortcut trust configured by the administrator"
+      ],
+      "correct": 0,
+      "explanation": "Parent-child trusts within a single forest are created automatically and are transitive, so no administrator action is needed for sales.contoso.com and hr.contoso.com to authenticate each other. External and realm trusts must always be explicitly created by an administrator, and a shortcut trust is an optional optimization added later to shorten an existing, already-working referral path \u2014 it isn't what enables access in the first place."
+    },
+    {
+      "id": "q44",
+      "cat": "hybridWorkloads",
+      "type": "mc",
+      "question": "A company Arc-enables 30 on-premises servers so they show up in the Azure portal, but Azure Update Manager still reports it has no update compliance data for them. What is most likely missing?",
+      "options": [
+        "The Connected Machine agent is installed, but Update Manager still needs to be enabled for those specific machines before patch data starts reporting",
+        "Arc-enabled servers can never be patched through Update Manager \u2014 only native Azure VMs support it",
+        "The servers must first be migrated into Azure VMs before any patch data can appear",
+        "WSUS must be fully uninstalled from the network before Update Manager will report anything"
+      ],
+      "correct": 0,
+      "explanation": "Arc projects a server into Azure Resource Manager, but update compliance reporting specifically requires Update Manager to be enabled for those machines on top of that \u2014 being Arc-enabled alone doesn't automatically start patch reporting. Update Manager fully supports Arc-enabled servers without any migration into a native Azure VM, and it has no dependency on removing WSUS from the network."
+    },
+    {
+      "id": "q45",
+      "cat": "vmContainers",
+      "type": "mc",
+      "question": "Which Hyper-V VM generation is required if a virtual machine needs to boot from a virtual hard disk larger than 2 TB using GPT partitioning?",
+      "options": [
+        "Generation 2",
+        "Generation 1",
+        "Either generation, since boot disk size has nothing to do with VM generation",
+        "Neither \u2014 a GPT boot disk isn't supported by Hyper-V at all"
+      ],
+      "correct": 0,
+      "explanation": "Generation 2 VMs boot via UEFI and support a GPT boot volume larger than 2 TB. Generation 1 VMs emulate legacy BIOS and are limited to MBR boot disks capped at 2 TB, and this is fixed at creation time, not something that can be toggled afterward. GPT boot disks are fully supported in Hyper-V, just only on Generation 2."
+    },
+    {
+      "id": "q46",
+      "cat": "networking",
+      "type": "mc",
+      "question": "A company runs DHCP failover in load balance mode between two servers with an 80/20 split favoring the datacenter server. The branch server's WAN link then fails for several hours. What happens to DHCP service at the branch during the outage, and why?",
+      "options": [
+        "Clients at the branch can still obtain and renew leases from the branch server alone, since load balance mode lets either partner keep answering independently from the shared scope's address pool",
+        "All DHCP service at the branch stops immediately, since load balance mode requires constant communication between partners to answer any request at all",
+        "The branch server automatically promotes itself into hot standby active mode until the link is restored",
+        "Clients at the branch fall back to APIPA addressing until the WAN link is restored, since no local DHCP server can operate independently"
+      ],
+      "correct": 0,
+      "explanation": "In load balance mode, each partner can independently answer client requests from its own share of the address pool even when it can't currently reach its partner \u2014 it just can't synchronize new lease state with that partner until the link returns. It doesn't require constant partner communication to answer requests at all, it doesn't automatically convert into a different failover mode, and clients don't fall back to APIPA since the branch server keeps answering on its own."
+    },
+    {
+      "id": "q47",
+      "cat": "storage",
+      "type": "mc",
+      "question": "A team building a Storage Spaces Direct volume for a Hyper-V workload wants the volume to automatically detect and repair background bit-rot corruption without taking the volume offline. Which file system should they format the volume with to get this?",
+      "options": [
+        "ReFS (Resilient File System)",
+        "NTFS, with periodic chkdsk runs scheduled as a background task",
+        "FAT32, since it has the simplest on-disk structure to scan",
+        "exFAT, since it's optimized for large removable media"
+      ],
+      "correct": 0,
+      "explanation": "ReFS includes built-in integrity streams and background scrubbing that automatically detect and repair corruption online, especially when paired with Storage Spaces resiliency underneath it. NTFS relies on an offline chkdsk pass rather than automatic online repair, and FAT32/exFAT have no equivalent integrity-checking mechanism and aren't used for Hyper-V storage volumes at all."
+    },
+    {
+      "id": "q48",
+      "cat": "storage",
+      "type": "mc",
+      "question": "A finance team needs a specific SQL Server database's data files replicated block-for-block to a second site with guaranteed byte-for-byte consistency for a clustered failover, while a separate team just needs a shared folder of loosely edited spreadsheets kept roughly in sync across two offices for convenience. Which pairing of technologies fits each need respectively?",
+      "options": [
+        "Storage Replica for the SQL Server data files; DFS Replication for the shared spreadsheet folder",
+        "DFS Replication for the SQL Server data files; Storage Replica for the shared spreadsheet folder",
+        "Storage Replica for both, since it is the newer technology and supersedes DFS Replication entirely",
+        "DFS Replication for both, since it works equally well at the block level and the file level"
+      ],
+      "correct": 0,
+      "explanation": "Storage Replica performs block-level, application-agnostic replication with byte-for-byte consistency, suited to a clustered SQL Server data volume. DFS Replication is a file-level, multi-master sync feature built for loosely edited shared folders, not for the block-level consistency a SQL cluster needs. Swapping the two applies the wrong granularity to each workload. Storage Replica hasn't replaced DFS Replication \u2014 they solve different problems, and DFS Replication doesn't operate at the block level at all."
+    },
+    {
+      "id": "q49",
+      "cat": "security",
+      "type": "mc",
+      "question": "A hardened server has both Windows LAPS and Credential Guard deployed. An attacker who gains local administrator rights on that server tries to (1) look up the local administrator's own password, and (2) extract other users' cached credentials from LSASS memory using a tool like Mimikatz. Which of these two actions does Credential Guard block?",
+      "options": [
+        "Only the LSASS credential-extraction attempt (2); Credential Guard has no bearing on LAPS-managed password storage or retrieval",
+        "Both actions (1) and (2), since Credential Guard supersedes LAPS entirely",
+        "Only the LAPS password lookup (1); Credential Guard has no effect on LSASS credential extraction",
+        "Neither action, since Credential Guard only protects Kerberos tickets, not NTLM or other LSASS secrets"
+      ],
+      "correct": 0,
+      "explanation": "Credential Guard isolates LSASS secrets, including cached NTLM and Kerberos credentials, inside a virtualization-based security container, blocking Mimikatz-style extraction \u2014 but it has nothing to do with where or how LAPS stores or exposes the local administrator password, which is retrieved through Entra ID or AD DS delegation instead. Credential Guard also protects more than just Kerberos tickets; it covers NTLM secrets held in LSASS too."
+    },
+    {
+      "id": "q50",
+      "cat": "monitoring",
+      "type": "mc",
+      "question": "A team wants to be paged within a minute if a server's disk queue length spikes, and separately wants a weekly report correlating that same spike with any application deployments that happened around the same time. Which combination of Azure Monitor capabilities fits each need respectively?",
+      "options": [
+        "A metric alert on disk queue length for the near-immediate page; a scheduled KQL query joining performance and deployment log data in Log Analytics for the weekly correlation report",
+        "A log alert running a KQL query every minute for the page; a Data Collector Set for the weekly correlation report",
+        "Reliability Monitor for the near-immediate page; a metric alert for the weekly correlation report",
+        "A single Data Collection Rule for both needs, since one DCR can both page on-call staff and generate scheduled reports"
+      ],
+      "correct": 0,
+      "explanation": "Metric alerts evaluate lightweight numeric thresholds fast enough for near-real-time paging, while a scheduled KQL query joining performance and deployment data is exactly the tool for a periodic, multi-source correlation report \u2014 matching each need to the mechanism built for its latency and complexity. A log alert every single minute is a heavier, slower mechanism than a metric alert for fast threshold paging, and a Data Collector Set only captures local counters, producing no correlation report on its own. Reliability Monitor and a metric alert are swapped into the wrong roles, and a DCR only defines what's collected and where it's sent \u2014 it doesn't page anyone or generate a report by itself."
     }
   ],
   "cheatSheet": [
@@ -1627,6 +1753,92 @@
         "-MaxEvents"
       ],
       "explanation": "Get-WinEvent is the modern replacement for Get-EventLog and works with both classic and newer structured (ETW) event logs \u2014 -MaxEvents caps how many entries come back, newest first."
+    }
+  ],
+  "madlibs": [
+    {
+      "id": "ml-az802-1",
+      "cat": "adDs",
+      "scenario": "Two companies merge, each with its own Active Directory forest, and need every domain in both forests to authenticate to the other automatically \u2014 that calls for a {b1}. Within a single one of those forests, a shortcut trust is later added between two distant child domains purely to shorten the {b2} that authentication requests would otherwise have to walk.",
+      "blanks": [
+        {
+          "key": "b1",
+          "options": [
+            "two-way forest trust",
+            "one-way external trust",
+            "realm trust",
+            "shortcut trust"
+          ],
+          "correct": 0
+        },
+        {
+          "key": "b2",
+          "options": [
+            "referral path",
+            "password hash",
+            "Group Policy link",
+            "schema partition"
+          ],
+          "correct": 0
+        }
+      ],
+      "explanation": "A forest trust is transitive across every domain in both forests, matching the merger's need for blanket authentication; an external trust is non-transitive and would need repeating per domain pair. A shortcut trust exists specifically to shorten the normal domain-tree referral path Kerberos would otherwise walk between two distant child domains already in the same forest."
+    },
+    {
+      "id": "ml-az802-2",
+      "cat": "vmContainers",
+      "scenario": "An administrator needs to move a running production VM to another host ahead of planned maintenance with zero perceptible downtime, given shared storage and compatible processors between the two hosts \u2014 that's {b1}. Separately, to keep an asynchronously up-to-date copy of that same VM at a secondary site in case the whole primary host is lost, they configure {b2}.",
+      "blanks": [
+        {
+          "key": "b1",
+          "options": [
+            "Live Migration",
+            "Hyper-V Replica",
+            "Storage Replica",
+            "Cluster-Aware Updating"
+          ],
+          "correct": 0
+        },
+        {
+          "key": "b2",
+          "options": [
+            "Live Migration",
+            "Hyper-V Replica",
+            "Cluster-Aware Updating",
+            "Cloud Witness"
+          ],
+          "correct": 1
+        }
+      ],
+      "explanation": "Live Migration moves a running VM between hosts with no perceptible downtime, given shared/compatible storage and processors. Hyper-V Replica instead keeps an asynchronous, periodically updated copy at a secondary site for disaster recovery \u2014 a different problem from a live, zero-downtime move between two hosts that are both currently healthy."
+    },
+    {
+      "id": "ml-az802-3",
+      "cat": "storage",
+      "scenario": "Users need one unified path like \\\\contoso\\shares that transparently maps to folders physically spread across three file servers \u2014 that's {b1}. To keep the actual file contents inside those folders synchronized between two of those servers, so either can serve current data, the administrator also configures {b2} underneath it.",
+      "blanks": [
+        {
+          "key": "b1",
+          "options": [
+            "DFS Namespaces",
+            "DFS Replication",
+            "Storage Spaces Direct",
+            "Data Deduplication"
+          ],
+          "correct": 0
+        },
+        {
+          "key": "b2",
+          "options": [
+            "DFS Namespaces",
+            "DFS Replication",
+            "Cluster-Aware Updating",
+            "Azure File Sync"
+          ],
+          "correct": 1
+        }
+      ],
+      "explanation": "DFS Namespaces provides the single unified logical path across multiple servers' shares. DFS Replication is the separate feature that actually synchronizes folder contents between servers \u2014 a namespace alone doesn't keep content in sync without replication configured underneath it."
     }
   ],
   "sequences": [

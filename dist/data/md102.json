@@ -512,7 +512,7 @@
       "question": "An administrator wants to enroll a fleet of devices into Windows Autopatch so Microsoft manages their update deployment rings automatically. What must be true about a device before it can be added?",
       "options": [
         "The device must already be enrolled and managed by Intune, and appropriately licensed for Autopatch",
-        "The device must be hybrid Entra joined only, never Microsoft Entra joined",
+        "The device must be hybrid Entra joined; Microsoft Entra joined devices aren't eligible for Autopatch enrollment",
         "The device must be under Configuration Manager co-management with no Intune enrollment",
         "The device requires no enrollment or licensing to join Autopatch"
       ],
@@ -525,9 +525,9 @@
       "type": "mc",
       "question": "A team wants to reduce how often end users are prompted to reboot for monthly security updates, without giving up periodic full cumulative updates entirely. What does deploying Windows Hotpatch achieve?",
       "options": [
-        "It permanently eliminates the need for any reboot on managed devices",
-        "It requires a reboot for every security update exactly as before",
-        "It has no relationship to security updates at all, only driver updates",
+        "It removes the need for a reboot after this specific update, though the following month's update goes back to requiring one",
+        "It still requires a reboot each month, but only for out-of-band emergency security fixes",
+        "It's specifically for driver updates, and rolls out separately from monthly security updates",
         "It applies a subset of security fixes in memory without the usual reboot, while periodic baseline cumulative updates are still needed occasionally"
       ],
       "correct": 3,
@@ -553,10 +553,10 @@
       "type": "mc",
       "question": "An update ring is configured with a 0-day quality update deferral but a 60-day feature update deferral. What happens to devices in that ring?",
       "options": [
-        "Both deferral values must match, so the ring effectively behaves as a single 60-day deferral for everything",
-        "Quality updates are blocked entirely until the 60-day feature deferral period expires",
+        "The lower of the two configured deferral values applies to both feature and quality updates on this ring",
+        "Quality updates wait for the 60-day feature deferral period to elapse before they're delivered to the ring",
         "Feature and quality update deferrals are independent, so the ring receives quality updates immediately while staying on its current feature version for up to 60 more days",
-        "The update ring only controls feature updates, and quality updates are managed elsewhere"
+        "The update ring controls feature updates only; quality updates are instead managed through a separate compliance policy"
       ],
       "correct": 2,
       "explanation": "Feature and quality update deferrals are configured and applied independently within the same update ring, so this ring gets near-immediate monthly quality updates while remaining on its current Windows feature version for up to 60 additional days. The two deferral types do not have to match, and an update ring controls both, not just one."
@@ -595,10 +595,10 @@
       "type": "mc",
       "question": "A specific model of laptop is not being offered the latest Windows feature update through its update ring, even though every configured deferral period has already elapsed. What is the most likely explanation?",
       "options": [
-        "An administrator must have misconfigured the ring's deferral period",
+        "An administrator must have misconfigured the ring's deferral period, since every device in the ring should otherwise receive the update together",
         "A safeguard hold that Microsoft applied automatically after detecting a known compatibility issue on that device or hardware model; an admin can review and choose to override it in Intune",
-        "The device has failed its compliance policy and is being blocked from all updates",
-        "The feature update requires the affected application to be reinstalled first"
+        "The device has failed its compliance policy, and noncompliant devices are automatically excluded from feature update rollout",
+        "The feature update package requires a specific application to be uninstalled and reinstalled first, which hasn't happened yet on this device"
       ],
       "correct": 1,
       "explanation": "A safeguard hold is applied automatically by Microsoft when a known compatibility issue is detected for a device or hardware/driver combination, blocking the specific feature update until Microsoft lifts it or an admin explicitly overrides the hold in Intune. It is unrelated to deferral misconfiguration or compliance policy status."
@@ -624,7 +624,7 @@
       "question": "A company wants only members of its managers group to be able to enroll iOS devices, while every other user is limited to three devices of any platform. How should this be configured?",
       "options": [
         "Create a higher-priority platform restriction and device limit restriction scoped to the managers group, leaving the lower-priority default restriction to apply to everyone else",
-        "Edit the default enrollment restriction directly, since only one restriction can ever exist per tenant",
+        "Edit the default enrollment restriction directly, lowering its priority so it applies only to the managers group instead",
         "Use a compliance policy to block iOS enrollment for non-managers",
         "Use a Conditional Access policy to prevent iOS enrollment"
       ],
@@ -637,9 +637,9 @@
       "type": "mc",
       "question": "A newly released CSP-backed setting is not available in any of the existing built-in device configuration profile templates, including Endpoint Protection. The administrator needs to configure it for managed Windows devices right away. What should they use?",
       "options": [
-        "The Endpoint Protection template regardless, since new settings are always added to existing templates automatically",
-        "Wait for Microsoft to update the template before configuring anything",
-        "A PowerShell script deployed manually to every device instead of any Intune profile",
+        "The Endpoint Protection template regardless, since a template's available settings periodically expand automatically behind the scenes",
+        "Wait for Microsoft to add the setting to an existing template in a future Intune service update before configuring anything",
+        "A PowerShell script deployed manually to every device instead of any Intune profile, since Intune has no way to reach settings this new",
         "The settings catalog, since it exposes newly available CSP-backed settings individually as they become available"
       ],
       "correct": 3,
@@ -651,10 +651,10 @@
       "type": "mc",
       "question": "A desktop is already joined to on-premises Active Directory via Group Policy and needs to also register with Microsoft Entra ID so it can be enrolled in Intune and evaluated by Conditional Access. What device state should it end up in?",
       "options": [
-        "Microsoft Entra registered only",
+        "Microsoft Entra registered only, since registration alone is sufficient for Intune enrollment and Conditional Access evaluation",
         "Hybrid Microsoft Entra joined, since it is already domain-joined to on-premises AD and also needs to register with Entra ID",
-        "Microsoft Entra joined with no relationship to on-premises AD at all",
-        "No Entra ID relationship is needed for Intune enrollment"
+        "Microsoft Entra joined, dropping the on-premises AD account entirely once Entra ID registration completes",
+        "No Entra ID relationship is needed, since on-premises Group Policy already provides equivalent device management"
       ],
       "correct": 1,
       "explanation": "Hybrid Microsoft Entra joined describes exactly this device: joined to on-premises AD and also registered with Microsoft Entra ID, enabling Intune enrollment and Conditional Access evaluation. Entra registered alone is typically for personal/BYOD devices, and Entra joined alone implies no existing on-premises AD account."
@@ -666,7 +666,7 @@
       "question": "Employees already hold Microsoft 365 E3 licenses, which include Intune for device management. The company now wants to provision Windows 365 Cloud PCs for some of those same employees. What additional step is required purely for licensing?",
       "options": [
         "Nothing extra is required, since Intune management already covers Windows 365",
-        "Every employee must be upgraded to Microsoft 365 E5",
+        "Every employee must be upgraded to Microsoft 365 E5, since only E5 includes the Windows 365 entitlement bundled in",
         "A separate Windows 365 Cloud PC license (Enterprise or Frontline) must be assigned, since Windows 365 is licensed separately from Intune device management",
         "Enterprise Mobility + Security alone is sufficient to provision Cloud PCs"
       ],
@@ -682,7 +682,7 @@
         "Assign a scope tag matching each region to the relevant devices and policies, and scope each regional admin's role assignment to that same tag",
         "Rely on Azure RBAC roles alone, since Intune has no native delegation mechanism",
         "Create a separate administrative unit for each region in Microsoft Entra ID, since scope tags do not exist in Intune",
-        "Configure a device enrollment restriction per region instead"
+        "Configure a device enrollment restriction per region instead, since restrictions can also scope which admins see which devices"
       ],
       "correct": 0,
       "explanation": "Scope tags applied to devices and policies, combined with role assignments scoped to those same tags, are exactly the built-in Intune mechanism for regional delegation within a single tenant. Administrative units and enrollment restrictions solve different problems, and Intune does have its own native scope-tag-based delegation."
@@ -721,10 +721,10 @@
       "type": "mc",
       "question": "A device fails its compliance policy this morning. The policy's noncompliance actions include a 5-day grace period before Conditional Access blocks access. What happens to the device's access today?",
       "options": [
-        "Access is blocked immediately regardless of any grace period",
-        "The device is never marked noncompliant unless the grace period fully expires",
+        "Access is blocked within the hour, since Conditional Access re-evaluates compliance signals hourly regardless of the configured grace period",
+        "The device isn't marked noncompliant at all until the grace period elapses without remediation",
         "The device is marked noncompliant immediately, but Conditional Access continues to allow access until the grace period expires",
-        "Compliance policies cannot include a grace period at all"
+        "Compliance policies only support a grace period on mobile platforms, not for a Windows endpoint like this one"
       ],
       "correct": 2,
       "explanation": "The device is flagged noncompliant right away, but the escalating noncompliance actions mean Conditional Access does not actually block access until the configured grace period elapses without remediation. Grace periods are a standard, configurable part of a compliance policy's noncompliance actions."
@@ -765,8 +765,8 @@
       "options": [
         "Assigned baselines update their settings automatically with no admin action",
         "The baseline profile instance must be explicitly moved to the newer baseline version before the updated settings take effect",
-        "A completely new profile must be built from scratch, since baseline versions cannot be updated in place",
-        "Baseline settings never change once a profile instance is assigned, by design"
+        "A brand new baseline profile must be created from an empty template, since existing instances are locked to the version they were first assigned",
+        "Baseline settings only change if the device group's membership itself changes, independent of the profile's baseline version"
       ],
       "correct": 1,
       "explanation": "Security baselines are versioned, and picking up a newer version's changes requires an administrator to explicitly move the existing profile instance to that new version; it does not happen automatically. The instance itself does not need to be rebuilt from scratch to do this, though."
@@ -819,9 +819,9 @@
       "type": "mc",
       "question": "Employees use their own personal, unenrolled phones to check corporate email in Outlook. The company wants to require a PIN and block copying corporate data into unmanaged apps, without enrolling any of these personal devices in MDM. What should be deployed?",
       "options": [
-        "A device compliance policy targeting the personal phones",
-        "A device configuration profile requiring MDM enrollment first",
-        "A security baseline applied to the Outlook app",
+        "A device compliance policy targeting the personal phones, since compliance policies can enforce PIN and copy-paste restrictions the same way app protection does",
+        "A device configuration profile requiring MDM enrollment first, since PIN and copy-paste controls are configuration-profile settings, not app-level ones",
+        "A security baseline applied to the Outlook app, since baselines can be scoped to individual applications instead of only devices",
         "An app protection (MAM) policy targeting the Outlook app, since it enforces data controls without requiring device enrollment"
       ],
       "correct": 3,
@@ -1389,6 +1389,132 @@
         2
       ],
       "explanation": "A Win32 app dependency causes Intune to automatically install the declared prerequisite app first, and the old Microsoft Store for Business/Education private store has been retired in favor of the Microsoft Store app (new) sourcing directly from the public store. Intune does not support or auto-resolve a circular dependency between two apps, and the Microsoft Store app (new) type does support the same required/available assignment intents as other app types."
+    },
+    {
+      "id": "q45",
+      "cat": "manageDevices",
+      "type": "mc",
+      "question": "Which built-in Windows Autopatch deployment ring is intended to receive updates last, after the Test, First, and Fast rings have already validated them?",
+      "options": [
+        "Broad",
+        "Test",
+        "First",
+        "Fast"
+      ],
+      "correct": 0,
+      "explanation": "Autopatch's four default rings are Test, First, Fast, and Broad, applied in that order, with Broad \u2014 holding the bulk of the fleet \u2014 receiving updates last, after the earlier, smaller rings have already validated them."
+    },
+    {
+      "id": "q46",
+      "cat": "manageDevices",
+      "type": "mc",
+      "question": "A device is enrolled in Autopatch and is eligible for Hotpatch, but it hasn't installed a baseline cumulative update in over four months, skipping several opportunities to do so. What is likely to happen the next time a hotpatch is released?",
+      "options": [
+        "The device isn't eligible to receive that hotpatch until it installs a baseline update first, since hotpatching applies a delta on top of a sufficiently recent baseline",
+        "The hotpatch installs normally regardless of how outdated the device's baseline update is",
+        "Autopatch permanently revokes the device's Hotpatch eligibility after one missed baseline",
+        "The device is removed from Autopatch entirely for being out of compliance"
+      ],
+      "correct": 0,
+      "explanation": "A hotpatch is a delta applied on top of a recent enough baseline cumulative update; a device too far behind on baseline updates isn't eligible for that hotpatch until it catches up. Missing baseline updates doesn't install a hotpatch anyway, doesn't permanently revoke eligibility, and doesn't remove the device from Autopatch outright."
+    },
+    {
+      "id": "q47",
+      "cat": "manageDevices",
+      "type": "mc",
+      "question": "A device is hybrid Entra joined, domain-joined, and already has the Configuration Manager client installed, but is not yet enrolled in Intune. GPO-based automatic MDM enrollment is configured tenant-wide. An administrator also enables co-management on this same device. What is the resulting Intune enrollment state, and which workloads does Intune control?",
+      "options": [
+        "The device becomes Intune-enrolled through automatic MDM enrollment, but Intune only becomes authoritative for the specific workloads whose co-management sliders have been moved to it \u2014 everything else stays with Configuration Manager",
+        "The device cannot be both Intune-enrolled and Configuration Manager-managed at the same time, so co-management fails until Configuration Manager is uninstalled",
+        "Intune becomes authoritative for every workload the moment enrollment completes, regardless of slider positions",
+        "GPO-based automatic enrollment is blocked on any device that already has the Configuration Manager client installed"
+      ],
+      "correct": 0,
+      "explanation": "GPO-based automatic enrollment works normally on an already domain-joined, hybrid Entra joined device regardless of the Configuration Manager client, and co-management is specifically designed to let that device be both Intune-enrolled and Configuration Manager-managed at once, with each workload slider independently deciding which tool is authoritative for it."
+    },
+    {
+      "id": "q48",
+      "cat": "prepareInfra",
+      "type": "mc",
+      "question": "A reseller wants to automatically register newly purchased Windows devices for Autopilot on the customer's behalf at the point of sale, without the customer manually uploading a hardware hash file for each device after delivery. Which registration method enables this?",
+      "options": [
+        "Registration via an OEM or Cloud Solution Provider (CSP) partner, tied to the device's hardware identity at the point of sale",
+        "Manually exporting each device's hardware hash with a PowerShell script after it arrives",
+        "Registering devices individually through Windows Configuration Designer after unboxing",
+        "Using a device enrollment restriction to register devices automatically"
+      ],
+      "correct": 0,
+      "explanation": "OEM and CSP partner registration captures a device's hardware identity at the point of sale and registers it for Autopilot on the customer's behalf, with no post-delivery hash export needed. A PowerShell hash export and Windows Configuration Designer both require the device to already be in hand, and an enrollment restriction only limits who can enroll \u2014 it doesn't register hardware for Autopilot at all."
+    },
+    {
+      "id": "q49",
+      "cat": "prepareInfra",
+      "type": "mc",
+      "question": "A global company wants regional IT admins to manage only their own region's Intune devices and policies within one tenant, and separately wants regional HR admins to manage only their own region's Entra ID user accounts and licensing, also within that same one tenant. Which pairing of features fits each need respectively?",
+      "options": [
+        "Scope tags with scoped role assignments for the regional Intune delegation; administrative units for the regional Entra ID user/license delegation",
+        "Administrative units for the regional Intune delegation; scope tags for the regional Entra ID user/license delegation",
+        "A single scope tag covering both the Intune and Entra ID objects for both teams",
+        "Separate Entra ID tenants, one per region, unified through B2B guest access"
+      ],
+      "correct": 0,
+      "explanation": "Scope tags with scoped role assignments are Intune's own delegation mechanism for devices and policies, while administrative units are Entra ID's delegation mechanism for scoping user and license administration \u2014 swapping the two applies the wrong tool to each directory. A single scope tag can't reach into Entra ID user/license administration at all, and separate tenants would be a far heavier solution than delegating within one."
+    },
+    {
+      "id": "q50",
+      "cat": "protectDevices",
+      "type": "mc",
+      "question": "A compliance policy's noncompliance actions currently only block Conditional Access access after a grace period. The security team also wants an email automatically sent to the device's user as soon as it's first marked noncompliant, before the grace period even starts counting down. What should be added to the policy?",
+      "options": [
+        "An additional noncompliance action sending an email notification, configured with an action schedule of 0 days",
+        "A Conditional Access policy with an email connector",
+        "A device configuration profile with a notification setting",
+        "An app protection policy targeting the user's mailbox app"
+      ],
+      "correct": 0,
+      "explanation": "A compliance policy supports multiple noncompliance actions, each with its own schedule; adding an email-notification action scheduled at 0 days fires immediately at first noncompliance, independent of the separate, longer-scheduled access-block action. Conditional Access, device configuration profiles, and app protection policies don't provide this kind of scheduled noncompliance notification at all."
+    },
+    {
+      "id": "q51",
+      "cat": "protectDevices",
+      "type": "mc",
+      "question": "A team wants standard users to be able to install and run one specific IT-approved application that needs administrator rights, without ever granting that user standing local administrator access, and separately wants help desk to still be able to look up a fallback local admin password for that same machine during an emergency. Which pairing of features satisfies both needs without contradiction?",
+      "options": [
+        "Endpoint Privilege Management for the scoped application elevation; Windows LAPS for the separate, rotated local administrator account password",
+        "Windows LAPS alone, granting the user a rotated local administrator password only when installing the approved app",
+        "Endpoint Privilege Management alone, since it also manages and rotates the local administrator account password",
+        "Adding the user to the local Administrators group, then removing them immediately after each install finishes"
+      ],
+      "correct": 0,
+      "explanation": "EPM elevates just the one approved application without granting standing admin rights, and Windows LAPS independently manages a rotated local administrator account password for the genuinely needed emergency fallback \u2014 the two are complementary, addressing different problems. LAPS doesn't grant users elevated rights to run apps, EPM doesn't manage or rotate the local administrator account's password, and manually toggling group membership around each install recreates the standing-access risk the team wants to avoid, and doesn't scale."
+    },
+    {
+      "id": "q52",
+      "cat": "manageApps",
+      "type": "mc",
+      "question": "An LOB Win32 app has a required assignment to a device group, and depends on a separate prerequisite Win32 app that is not yet assigned to that same group. What happens when Intune tries to install the required app?",
+      "options": [
+        "Intune automatically installs the declared dependency first, then installs the requiring app, without needing the prerequisite separately assigned to the group",
+        "The required app installation fails outright, since its dependency was never separately assigned",
+        "Intune skips the dependency and installs the requiring app anyway, leaving the prerequisite missing",
+        "The dependency must be manually installed by the end user before the required app will proceed"
+      ],
+      "correct": 0,
+      "explanation": "A Win32 app dependency relationship causes Intune to automatically install the declared prerequisite as part of deploying the requiring app, with no separate assignment of the prerequisite needed. Installation doesn't fail or skip the dependency, and nothing about this requires manual end-user action."
+    },
+    {
+      "id": "q53",
+      "cat": "optimizeOps",
+      "type": "mc",
+      "question": "A proactive remediation's detection script correctly identifies a stopped service on affected devices, but the paired remediation script that's supposed to restart that service keeps failing specifically on devices where the service depends on a mapped network drive available only in the interactively logged-on user's context. What is the most likely cause?",
+      "options": [
+        "Both scripts run under the SYSTEM account by default, which has no access to the interactive user's mapped drives unless the remediation is explicitly reconfigured to run in user context",
+        "Proactive remediation scripts can only detect problems and are never able to remediate them at all",
+        "The detection script must have a bug, since remediation scripts always inherit the exact same environment as the interactive user automatically",
+        "Remediation scripts are blocked from restarting any Windows service, regardless of execution context"
+      ],
+      "correct": 0,
+      "explanation": "Proactive remediation scripts run under the SYSTEM account by default, which has no visibility into a specific interactive user's mapped drives \u2014 reconfiguring the remediation to run in the logged-on user's context is what resolves this. Remediation scripts absolutely can fix problems (that's their purpose), they don't automatically inherit the interactive user's environment, and there's no blanket restriction on restarting services from a remediation script."
     }
   ],
   "cheatSheet": [
@@ -1464,6 +1590,92 @@
         "'Protect corporate data without enrolling the personal device' always points to App Protection Policies (MAM), never a compliance or configuration profile.",
         "Co-management workloads move individually \u2014 a scenario describing only Windows Update policy moving to Intune does not mean the whole device is now Intune-managed."
       ]
+    }
+  ],
+  "madlibs": [
+    {
+      "id": "ml-md102-1",
+      "cat": "manageDevices",
+      "scenario": "A company is setting up unattended digital-signage kiosks that must provision themselves with zero end-user interaction \u2014 that calls for a {b1} Autopilot profile. A separate IT partner instead completes lengthy driver installation and app packaging on new laptops before shipping them to remote hires, who only finish a short final phase themselves \u2014 that's a {b2} profile.",
+      "blanks": [
+        {
+          "key": "b1",
+          "options": [
+            "self-deploying",
+            "user-driven",
+            "pre-provisioned (white glove)",
+            "hybrid Entra join"
+          ],
+          "correct": 0
+        },
+        {
+          "key": "b2",
+          "options": [
+            "self-deploying",
+            "user-driven",
+            "pre-provisioned (white glove)",
+            "device preparation"
+          ],
+          "correct": 2
+        }
+      ],
+      "explanation": "A self-deploying profile authenticates using the device's own identity and needs no end-user sign-in at all, fitting an unattended kiosk. A pre-provisioned (white glove) profile is specifically for letting a partner or IT complete the time-consuming steps in advance, leaving only a short final phase for the end user \u2014 unlike a plain user-driven profile, where the user completes the entire process themselves."
+    },
+    {
+      "id": "ml-md102-2",
+      "cat": "protectDevices",
+      "scenario": "A device fails its compliance policy this morning; the policy's noncompliance actions include a 5-day grace period before Conditional Access blocks access. Today, the device is {b1}, but Conditional Access still {b2} it access until day five.",
+      "blanks": [
+        {
+          "key": "b1",
+          "options": [
+            "marked noncompliant immediately",
+            "left marked as compliant",
+            "deleted from Intune",
+            "automatically remediated"
+          ],
+          "correct": 0
+        },
+        {
+          "key": "b2",
+          "options": [
+            "allows",
+            "blocks",
+            "deletes",
+            "encrypts"
+          ],
+          "correct": 0
+        }
+      ],
+      "explanation": "The device is flagged noncompliant right away, but the escalating noncompliance actions mean Conditional Access continues to allow access until the configured grace period elapses without remediation \u2014 grace periods delay the access block, not the noncompliance flag itself."
+    },
+    {
+      "id": "ml-md102-3",
+      "cat": "manageApps",
+      "scenario": "Employees check corporate email in Outlook on their own unenrolled personal phones. The company wants to require a PIN and block copying corporate data into unmanaged apps, without enrolling those phones in MDM \u2014 that calls for an {b1} targeting the Outlook app. A different, company-owned laptop instead needs a specific registry value evaluated that no built-in template covers \u2014 that calls for a {b2} using a detection script.",
+      "blanks": [
+        {
+          "key": "b1",
+          "options": [
+            "app protection (MAM) policy",
+            "device compliance policy",
+            "device configuration profile",
+            "security baseline"
+          ],
+          "correct": 0
+        },
+        {
+          "key": "b2",
+          "options": [
+            "app protection (MAM) policy",
+            "custom compliance policy",
+            "app configuration policy",
+            "security baseline"
+          ],
+          "correct": 1
+        }
+      ],
+      "explanation": "App protection policies enforce PIN and copy-paste controls at the application level and work without MDM enrollment, exactly fitting BYOD. A custom compliance policy runs an administrator-supplied detection script and evaluates its reported data against rules, extending compliance checks to things like an arbitrary registry value that built-in templates don't cover."
     }
   ]
 }
