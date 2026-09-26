@@ -453,6 +453,7 @@ QUESTIONS = [
         ],
         'correct': 0,
         'explanation': "The Microsoft Authenticator app and FIDO2 security keys are considered the strongest methods among these options, though only FIDO2 (along with Windows Hello for Business and certificate-based authentication) is truly phishing-resistant -- standard Authenticator push notifications are still stronger than SMS or voice call, but remain vulnerable to MFA-fatigue and consent-phishing attacks. SMS and voice call are weaker methods being phased out, and security questions are not a supported MFA method at all in Microsoft Entra ID.",
+        'whyTested': "SC-300 tests whether you conflate 'strongest' with 'phishing-resistant' -- a terminology trap the exam likes because Microsoft's own guidance uses both words in ways that sound interchangeable but actually map to two different threats: a stolen one-time code versus a cloned login page.",
     },
     {
         'id': 'q10',
@@ -509,6 +510,7 @@ QUESTIONS = [
         ],
         'correct': 0,
         'explanation': "MFA remediates sign-in risk for that specific attempt, but a user risk policy is typically configured to require a secure password change to actually resolve the underlying identity-level risk, since the leaked credential itself is the issue, not just whether this one sign-in was genuine.",
+        'whyTested': "This isolates one of the exam's classic user-risk-versus-sign-in-risk pairs, testing whether you know MFA closes the door on this one sign-in attempt without touching the identity-level risk score underneath -- the two are remediated by genuinely different actions, and exams love making that look like the same fix.",
     },
     {
         'id': 'q14',
@@ -593,6 +595,7 @@ QUESTIONS = [
         ],
         'correct': 2,
         'explanation': "Workload identity federation lets the GitHub Actions OIDC token be exchanged directly for a Microsoft Entra ID token via a federated credential trust, with no secret or certificate stored anywhere in the pipeline. Rotating a secret still means a secret exists to be stolen; federation removes the secret from the picture entirely.",
+        'whyTested': "Exams like offering 'rotate the secret faster' as a plausible half-measure against a full architectural fix, testing whether you recognize that workload identity federation isn't just a more convenient secret-management habit -- it removes the secret as an attack surface entirely, which is the actual distinction being probed.",
     },
     {
         'id': 'q20',
@@ -691,6 +694,7 @@ QUESTIONS = [
         ],
         'correct': 1,
         'explanation': "When a PIM role setting requires approval, MFA and justification alone are not sufficient -- the request is routed to a designated approver who must explicitly approve it before the role actually becomes active. It does not activate automatically, immediately, or after a timeout with no reviewer action.",
+        'whyTested': "This tests the difference between PIM's authentication requirements (MFA, justification) and its separate approval requirement, which sit at two different points in the activation flow -- exams like checking whether you know an approval gate needs an actual human decision, not just proof you completed the other two steps.",
     },
     {
         'id': 'q27',
@@ -1289,6 +1293,7 @@ Beyond an organization's own employees, B2B collaboration lets a partner's users
             "After the 30-day recovery window closes, a deleted user is purged permanently -- there is no further recovery option.",
         ],
         'scenario': "A multinational company keeps its HR system authoritative in on-premises Active Directory across three regional forests, and wants sign-in to keep working even if one region's domain controllers go offline overnight for maintenance -- so it deploys Microsoft Entra Cloud Sync with an agent in each forest rather than a single Connect Sync server, and Password Hash Sync as the sign-in method rather than Pass-through Authentication. Regional helpdesk staff are each granted the Helpdesk Administrator role scoped to their own region's administrative unit, so a technician in the Singapore office can reset passwords for Singapore users but has no rights over the London office. When a contractor from a partner firm needs temporary access to a shared project site, the team adds them through B2B collaboration rather than creating a new password-managed account, and configures cross-tenant access settings to trust that partner's own MFA claims instead of re-challenging them a second time.",
+        'onTheJob': "Administrative units get adopted mostly because handing a global Helpdesk Administrator role to every regional support tech is the kind of overreach an access-governance audit flags immediately, and scoping it down after the fact is a miserable cleanup project compared to designing it in up front. Choosing PHS over PTA in practice is rarely a security debate -- it's usually decided the first time an on-premises outage takes down sign-in entirely and leadership demands it never happen again. And the 30-day soft-delete window is the thing that saves an admin's career the one time someone bulk-deletes the wrong CSV of users and needs those group memberships and licenses back before anyone notices.",
     },
     {
         'id': 'authentication-methods-selfservice',
@@ -1311,6 +1316,7 @@ Self-Service Password Reset lets a user recover a forgotten password without cal
             "A Temporary Access Pass is for onboarding or recovery, not an everyday sign-in method -- it's not meant to replace a registered method long-term.",
         ],
         'scenario': "A company just deployed Windows Hello for Business tenant-wide, but new hires currently receive a temporary password by email on day one, typed into a browser before anything else -- exactly the kind of phishable credential the rollout is trying to eliminate. Switching new-hire onboarding to issue a Temporary Access Pass instead lets each new employee sign in for the very first time and register Windows Hello for Business directly, without a traditional password ever existing to be phished, forwarded, or reused. Because combined registration is already enabled, that same registration session also satisfies the employee's SSPR requirement, so IT doesn't have to send a second, separate registration reminder later.",
+        'onTheJob': "MFA fatigue is a real, named attack technique for a reason -- real users get worn down by a flood of push notifications and eventually tap 'approve' just to make it stop, which is exactly why security teams are pushing so hard toward phishing-resistant methods instead of just any second factor. SSPR rollouts fail constantly for the boring reason that enabling the feature for a group and actually getting users to register their methods are two separate projects, and skipping the second one is why the help desk keeps getting password-reset calls the SSPR budget was supposed to eliminate. And Temporary Access Pass exists largely because IT got tired of emailing brand-new hires a plaintext temporary password that then sits in someone's inbox forever, phishable long after onboarding is over.",
     },
     {
         'id': 'conditional-access-risk',
@@ -1334,6 +1340,7 @@ Rolling out a brand-new or modified policy carries real risk of locking people o
             "Report-only mode logs what a policy would have done; it never actually blocks or grants access on its own.",
         ],
         'scenario': "A security team is about to roll out a new policy requiring the Phishing-resistant MFA authentication strength for every admin role, but worries it might lock out an admin who hasn't yet registered FIDO2. They turn the policy on in report-only mode first, reviewing a week of what it would have blocked before ever setting it to enforce, and use that same window to update Identity Secure Score's MFA-registration action item. Separately, Identity Protection flags one admin's credentials as leaked (raising user risk) while a completely unrelated sign-in from that same admin scores as low sign-in risk -- the team knows these are tracked independently, so they still force a password change to remediate the user risk rather than assuming the low-risk sign-in cleared anything.",
+        'onTheJob': "Report-only mode is what stands between a well-intentioned new Conditional Access policy and a Friday-afternoon company-wide lockout, which is why any experienced admin treats skipping that staging step as one of the more career-limiting mistakes available in this job. The user-risk-versus-sign-in-risk distinction is also where real incident response gets messy: a leaked credential doesn't clear itself just because someone's next sign-in looked normal, and forgetting that is how a genuinely compromised account keeps its standing access long after the 'risky sign-in' banner disappears. Identity Secure Score matters less as a number and more as the thing that gets waved around in a budget meeting to justify actually fixing the gaps it lists.",
     },
     {
         'id': 'workload-identities-apps',
@@ -1357,6 +1364,7 @@ Once an app is registered, what it's actually allowed to do comes down to its AP
             "Password-based SSO still requires a real password on the target app; Entra just stores and injects it -- SAML/OIDC SSO replace the password with a trusted token entirely.",
         ],
         'scenario': "A company automates its infrastructure deployments from GitHub Actions and originally stored an app registration's client secret as a repository variable, which then caused an outage when it silently expired. Switching to workload identity federation -- a federated credential trust between GitHub's own token issuer and the app registration -- removes that secret from the picture entirely, so there's nothing left to expire or rotate. Once deployed, that same pipeline calls Microsoft Graph unattended, with no user signed in, so it's granted an application permission rather than a delegated one, and because that permission is high-privilege, it requires a designated administrator's explicit admin consent before the pipeline can use it.",
+        'onTheJob': "A leaked or expired app secret sitting in a CI/CD pipeline's config is one of the most common real-world causes of a 3am outage page, which is exactly the failure mode workload identity federation is designed to make structurally impossible instead of just harder to hit. The difference between a system-assigned and a user-assigned managed identity is the kind of thing that only becomes painfully obvious the first time someone redeploys a Function app and discovers its identity -- and every role assignment tied to it -- vanished along with it. And an access-governance audit will flag an application permission granted without documented admin consent every time, because standing, unattended access is exactly the kind of thing auditors are trained to hunt for.",
     },
     {
         'id': 'identity-governance-pim',
@@ -1380,6 +1388,7 @@ A terms of use policy adds one more gate before access is granted at all: a user
             "Break-glass accounts must be explicitly excluded from Conditional Access and every risk policy -- the whole point is that they still work when everything else has failed.",
         ],
         'scenario': "An on-call rotation of engineers needs Exchange Administrator only during their on-call week, not permanently, so the team configures a PIM eligible assignment requiring MFA, justification, and approval, capped at a four-hour activation window -- nobody carries standing Global Admin-adjacent rights between shifts. Separately, a partner firm's employees need to self-request access to a shared Teams site and SharePoint library; the team registers the partner as a connected organization and bundles both resources into a single access package with a 90-day expiration and a recurring access review scoped specifically to guest membership, so anyone whose access lapses unnoticed still gets caught and removed automatically. Underneath all of it, two break-glass accounts sit excluded from every Conditional Access policy, checked weekly for any sign-in activity, ready in case a future Conditional Access misconfiguration ever locks out every other administrator at once.",
+        'onTheJob': "Access reviews are the task nobody on a team ever volunteers for, which is precisely why they get automated with a recurring schedule and a default decision instead of relying on a manager remembering to do it manually every quarter -- and skipping them is how a company ends up with a guest account from a project that ended two years ago still holding access nobody remembers granting. PIM's approval requirement exists because 'I have MFA and a good reason' isn't actually the same as 'someone in authority looked at this and said yes,' a distinction real privileged-access incidents keep proving matters. And break-glass accounts get tested maybe once a year if a team is disciplined, which is exactly the risk: the one time a Conditional Access misconfiguration locks out every real admin is also the one time nobody remembers whether the break-glass credentials still actually work.",
     },
 ]
 
