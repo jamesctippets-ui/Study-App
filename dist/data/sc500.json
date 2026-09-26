@@ -1550,6 +1550,281 @@
       "explanation": "Attack path analysis models resource relationships, exposure, and vulnerabilities on the cloud security graph specifically to trace multi-resource exploitation chains and prioritize the ones reaching a business-critical asset. It explicitly looks across chains of resources rather than one resource in isolation, and it complements Secure Score's aggregate trend metric rather than replacing it."
     }
   ],
+  "lessons": [
+    {
+      "id": "identity-access-governance",
+      "title": "Identity, Access & Governance",
+      "summary": "Continuous Access Evaluation, cross-tenant trust and workload identity federation, managed identities, entitlement management, and PIM.",
+      "diagram": "identity",
+      "vocabIds": [
+        "f1",
+        "f7",
+        "f8",
+        "f48",
+        "f53",
+        "f54"
+      ],
+      "quizIds": [
+        "q1",
+        "q3",
+        "q4",
+        "q5",
+        "q7",
+        "tf1",
+        "msq1",
+        "msq2",
+        "q48"
+      ],
+      "reading": "The identity platform underneath every other domain in this exam is Microsoft Entra ID, the current name for what was formerly branded Azure Active Directory \u2014 same tenant model, same APIs, just a renamed product, and a distractor still calling it \"Azure AD\" is testing whether you recognize that continuity rather than a different service entirely. Once a user authenticates, an access token is normally only re-evaluated when it naturally expires, sometimes up to an hour later. Continuous Access Evaluation closes that gap: it lets Microsoft Entra ID and CAE-enabled services react to a critical event, an account disabled, a password changed, a network location changed, in near real time, revoking or re-evaluating a token immediately instead of waiting it out. A shorter static token lifetime only narrows that exposure window in advance; it does not react to an event that has already happened, which is exactly why CAE and shorter token lifetimes solve different problems and both can appear as tempting-but-wrong answers for each other's scenario.\n\nTrust does not stop at the tenant boundary. Cross-tenant access settings control how much a Microsoft Entra tenant trusts users signing in from another Entra tenant under inbound or outbound B2B collaboration, including which of that partner's own MFA and device-compliance claims are trusted rather than re-challenged. Workload identity federation solves a related but distinct problem for non-human identities: it lets an external identity provider's token, from GitHub Actions or a Kubernetes service account, be exchanged for an Entra ID token with no client secret or certificate stored anywhere at all \u2014 the trust relationship itself replaces the secret, rather than the secret merely being rotated more often. A managed identity extends that same credential-free pattern to an Azure resource talking to another Azure service: a system-assigned managed identity is tied to one resource's lifecycle, created and deleted with it, while a user-assigned managed identity is a standalone resource that can be attached to many resources at once and outlives any single one of them.\n\nGoverning who gets standing or temporary access is its own layer on top of authentication. Entitlement management bundles resources, a group, a Teams membership, a SharePoint site, an enterprise app, into access packages a user can request as one unit, going through an approval workflow rather than an admin granting each resource separately, commonly with an expiration so access does not silently linger forever. Privileged Identity Management applies a different model to roles specifically, not standing resource access: PIM for Azure resource roles extends the same eligible-versus-active, time-bound activation pattern already used for Entra directory roles to Azure RBAC roles like Owner or Contributor, requiring justification, and optionally approval, before the role actually becomes active \u2014 a genuinely separate control from Just-in-time (JIT) VM access, which only narrows which source IPs and ports can reach a VM once someone already has network access, rather than governing whether they can hold a management-plane role at all.",
+      "fundamentalsLabel": "New to identity governance concepts? See the everyday analogy",
+      "fundamentals": "Continuous Access Evaluation is like a hotel key card system that deactivates a card the instant a guest is checked out, instead of waiting for the card's printed expiration date to pass on its own. Workload identity federation is like a courier service that verifies a delivery by trusting the sender's own signed manifest, rather than requiring the courier to carry a separate physical key that could be lost or copied. And PIM's eligible-versus-active model is like a spare set of keys kept in a locked case at the front desk: being on the list of people allowed to check them out (eligible) is not the same as actually holding them in your hand (active) \u2014 you still have to request them each time you need them.",
+      "keyTerms": [
+        "Microsoft Entra ID",
+        "Continuous Access Evaluation",
+        "Cross-tenant access settings",
+        "Workload identity federation",
+        "managed identity",
+        "system-assigned managed identity",
+        "user-assigned managed identity",
+        "Entitlement management",
+        "access packages",
+        "Privileged Identity Management",
+        "PIM for Azure resource roles",
+        "Just-in-time (JIT) VM access"
+      ],
+      "commonTraps": [
+        "A shorter static token lifetime narrows future exposure in advance \u2014 it does not react to an event, like a disabled account, that already happened; that is what Continuous Access Evaluation is for.",
+        "Holding an Entra ID directory role does not automatically grant Azure RBAC rights on a subscription; the two are separate authorization systems.",
+        "Workload identity federation is for non-human workloads exchanging tokens with an external identity provider, not for human partner sign-ins, which cross-tenant access settings govern instead.",
+        "PIM for Azure resource roles governs who can hold a privileged role at all \u2014 it is a different control from just-in-time VM access, which only narrows network reachability to a VM."
+      ],
+      "scenario": "A security team just disabled a Microsoft Entra ID account after confirming its credentials were leaked, but the attacker still holds an access token issued 20 minutes earlier that would otherwise remain valid for up to another hour. Because the relying application is CAE-enabled, Continuous Access Evaluation pushes the disable event to it in near real time, revoking the token immediately rather than letting it run out its normal lifetime. Separately, that same organization lets a partner's contractors request access to a shared project's group, Teams channel, and SharePoint site as one bundled access package with a 90-day expiration, while its own cloud engineers activate the Contributor role on that project's resource group through PIM only when they are actually doing deployment work, rather than holding it active around the clock."
+    },
+    {
+      "id": "network-perimeter-security",
+      "title": "Network & Perimeter Security",
+      "summary": "NSGs and ASGs, Azure Firewall tiers, Bastion, WAF, DDoS Protection, hub-and-spoke design, and ExpressRoute encryption.",
+      "diagram": "dmzZones",
+      "vocabIds": [
+        "f10",
+        "f11",
+        "f12",
+        "f13",
+        "f14",
+        "f15",
+        "f16",
+        "f17"
+      ],
+      "quizIds": [
+        "q8",
+        "q9",
+        "q10",
+        "q11",
+        "q12",
+        "q13",
+        "q14",
+        "tf6",
+        "msq3",
+        "msq4"
+      ],
+      "reading": "A network security group filters traffic to and from resources using rules based on source and destination IP, port, and protocol, applied to a subnet or a NIC directly. Hard-coding IP addresses into those rules gets unwieldy as VMs come and go, which is exactly what an application security group solves: it lets you group VMs by application role, like WebServers, and reference that group's name in an NSG rule instead of a list of addresses that has to be updated by hand every time membership changes. Sitting above individual VM-level rules, Azure Firewall provides centralized, network-wide filtering, and the tier matters: Standard covers L3-L7 filtering, FQDN filtering, and threat intelligence-based filtering, while Premium adds TLS inspection, intrusion detection and prevention, URL filtering, and web category filtering for genuinely inspecting inside encrypted traffic \u2014 a scenario asking the firewall to look inside TLS or detect an intrusion attempt is always pointing at Premium, since Standard simply cannot do either. For a public-facing web app specifically, rather than the network as a whole, a Web Application Firewall on Application Gateway or Front Door inspects HTTP requests for OWASP-based exploits like SQL injection and cross-site scripting, and it is worth testing changes in detection mode, which only logs matches, before switching to prevention mode, which actively blocks them, since a false positive in prevention mode can break real user traffic the moment it is enabled.\n\nSome access does not need a firewall rule at all if it never needs to be exposed in the first place. Azure Bastion is a fully managed PaaS service that provides RDP and SSH connectivity straight through the Azure portal over TLS, deployed into its own dedicated AzureBastionSubnet, without ever assigning the target VM a public IP address \u2014 that absence of a public IP is what defeats port scanning entirely, rather than merely closing a port that could still theoretically carry one. A private endpoint takes the same idea further for a PaaS service like a storage account or SQL database: it assigns that service an actual private IP address inside your VNet, so traffic never leaves the Microsoft backbone or touches the public internet, and because the service now has a genuine private IP, you can disable its public endpoint entirely \u2014 a stronger posture than a service endpoint, which extends your VNet's identity to the service over the Microsoft backbone while the service still keeps a public endpoint reachable.\n\nTying many of these controls together at scale is where topology comes in. A hub-and-spoke topology places shared security services, Azure Firewall, a VPN or ExpressRoute gateway, Bastion, in one hub VNet that every spoke VNet peers with and routes its traffic through, so controls and on-premises connectivity are managed in one place instead of duplicated per workload \u2014 though VNet peering alone does not force that routing; user-defined routes explicitly pointing spoke traffic at the hub firewall are what actually make the pattern secure. And connecting to Azure over that hub's ExpressRoute circuit is private, but private is not the same as encrypted: a circuit that never touches the public internet still carries no encryption by default, so getting encryption in transit specifically means layering on IPsec VPN over ExpressRoute via Microsoft peering, or MACsec on a direct connection, on top of the circuit's own privacy. Basic DDoS Protection is automatically enabled at no cost for every resource with always-on monitoring of common network-layer attacks; DDoS Protection Standard adds tuned, resource-specific mitigation policies, attack analytics and metrics, cost protection, and rapid-response support, applied at the virtual network level for a team that needs real visibility during an actual attack.",
+      "fundamentalsLabel": "New to network perimeter controls? See the everyday analogy",
+      "fundamentals": "Think of a building with several concentric rings of security. The application security group is like grouping people by job badge color instead of memorizing every individual employee's face at the door. Azure Bastion is a locked side door that only opens from inside the building's own portal, so nobody outside ever sees a doorknob to try in the first place \u2014 compare that to a private endpoint, which is like moving an entire external vendor's storefront inside the building's own walls so it never has a street-facing entrance at all. And assuming a private courier route into a building is automatically searched at the door is the ExpressRoute-encryption trap: private just means it did not go through the crowded public lobby, not that anything on it was actually screened.",
+      "keyTerms": [
+        "network security group",
+        "application security group",
+        "Azure Firewall",
+        "TLS inspection",
+        "Web Application Firewall",
+        "detection mode",
+        "prevention mode",
+        "Azure Bastion",
+        "private endpoint",
+        "service endpoint",
+        "hub-and-spoke topology",
+        "user-defined routes",
+        "ExpressRoute"
+      ],
+      "commonTraps": [
+        "Azure Firewall Standard cannot perform TLS inspection or IDPS \u2014 those are Premium-tier-only capabilities.",
+        "An ExpressRoute circuit is private but not encrypted by default; encryption in transit requires adding IPsec or MACsec on top of it.",
+        "VNet peering alone does not force spoke traffic through a hub firewall \u2014 user-defined routes are what actually enforce that path.",
+        "A service endpoint still leaves the PaaS service with a public endpoint; only a private endpoint lets you disable public access entirely."
+      ],
+      "scenario": "A security team needs administrators to reach a set of production VMs for RDP without any of those VMs ever having a public IP address, wants a firewall in front of the VNet that can inspect inside TLS-encrypted outbound traffic for intrusion attempts, and wants to guarantee that traffic to an Azure SQL Database stays entirely off the public internet. They deploy Azure Bastion for administrator access, Azure Firewall Premium (not Standard) for the TLS-inspecting, IDPS-capable perimeter, and a private endpoint for the SQL database so it can also disable its public endpoint entirely \u2014 all fronted by a hub-and-spoke design with user-defined routes that actually force spoke traffic through the firewall, rather than relying on VNet peering alone to make that happen."
+    },
+    {
+      "id": "data-secrets-protection",
+      "title": "Data & Secrets Protection",
+      "summary": "Key Vault access models, storage account authorization and network security, Azure SQL encryption options, Defender for SQL, and customer-managed keys.",
+      "diagram": "storageAccess",
+      "vocabIds": [
+        "f18",
+        "f19",
+        "f20",
+        "f21",
+        "f22",
+        "f50"
+      ],
+      "quizIds": [
+        "q15",
+        "q16",
+        "q17",
+        "tf7",
+        "tf8",
+        "msq5",
+        "q43",
+        "q44"
+      ],
+      "reading": "Every secret, key, and certificate an application needs ultimately has to live somewhere, and Azure Key Vault is where that usually is \u2014 but who can reach what inside it depends on which access model the vault uses. The legacy vault access policy model assigns permissions to keys, secrets, and certificates directly on the vault, while the newer Azure RBAC permission model uses ordinary role assignments at the vault or object level, consistent with how every other Azure resource is secured; Microsoft recommends RBAC for new vaults, and a vault uses one model at a time, not both together, so switching an existing vault to RBAC replaces its access policies rather than layering on top of them.\n\nStorage accounts face a similar three-way choice for authorization. Access keys grant full, unrestricted control over the entire account and should be tightly restricted given how much damage a leaked one can do. A shared access signature grants time-limited, scoped access to specific resources without ever exposing an account key. And Microsoft Entra ID authorization instead assigns Azure RBAC roles, like Storage Blob Data Reader, directly to identities for fine-grained, centrally audited access with no key or token changing hands at all \u2014 current Microsoft guidance favors Entra ID authorization over either alternative wherever it is workable. Network-level controls sit on top of whichever authorization model is chosen: a storage account firewall restricts access to specific virtual networks or IP ranges, and can allow trusted Microsoft services, like Azure Backup or Azure Monitor, to bypass it without opening the account to the wider internet, while pairing that firewall with a private endpoint lets the account's public endpoint be disabled entirely.\n\nAzure SQL layers three distinct protections that get tested for their differences more than their names. Transparent Data Encryption encrypts the database files at rest and is on by default, completely transparent to the application. Always Encrypted goes further, keeping sensitive column data encrypted even in memory and in query plans, decrypting only on a trusted client, so the database engine itself never sees the plaintext at all. Dynamic Data Masking is the odd one out: it only obscures sensitive column values in query results shown to lower-privileged users, without changing a single byte of the stored data, so it is not real protection against a determined attacker who already holds a masking-bypass permission, just a display-layer control for ordinary users. Microsoft Defender for SQL bundles two more capabilities on top of all three: vulnerability assessment scans for misconfigurations and outdated permissions, and advanced threat protection alerts on anomalous activity like SQL injection or unusual access patterns, both under the same plan applied to Azure SQL Database, Managed Instance, or SQL Server on an Azure VM. And regardless of which of these controls is layered on, Azure encrypts data at rest by default using Microsoft-managed keys with zero setup \u2014 customer-managed keys let an organization instead supply and control its own key in Key Vault for direct control over rotation and revocation, though revoking or deleting that key immediately makes the encrypted data inaccessible, a powerful compliance lever that is also a real operational risk without a proper key backup.",
+      "fundamentalsLabel": "New to data and secrets protection? See the everyday analogy",
+      "fundamentals": "An access key is a master key to an entire building, powerful and dangerous to hand out casually. A SAS token is a visitor badge that opens only one door for a limited window and can be revoked without changing the master key. And Entra ID authorization for storage is like swapping physical keys out entirely for a badge system tied to each person's own identity, so access can be audited and revoked person by person instead of key by key. Dynamic Data Masking, meanwhile, is like frosting a window so a passerby cannot casually read what is inside \u2014 it does nothing to stop someone who already has a key to the room.",
+      "keyTerms": [
+        "Azure Key Vault",
+        "vault access policy",
+        "Azure RBAC permission model",
+        "Access keys",
+        "shared access signature",
+        "Microsoft Entra ID authorization",
+        "storage account firewall",
+        "private endpoint",
+        "Transparent Data Encryption",
+        "Always Encrypted",
+        "Dynamic Data Masking",
+        "Microsoft Defender for SQL",
+        "customer-managed keys"
+      ],
+      "commonTraps": [
+        "A Key Vault uses one access model at a time \u2014 switching to the Azure RBAC permission model replaces its vault access policies rather than layering on top of them.",
+        "Dynamic Data Masking only changes what lower-privileged users see in query results; the underlying stored data is unchanged and still readable with the right permission.",
+        "Current Microsoft guidance favors Microsoft Entra ID authorization for storage over both access keys and SAS tokens wherever it is workable.",
+        "Deleting a customer-managed key makes the data it encrypts immediately inaccessible \u2014 a real operational risk without a reliable key backup."
+      ],
+      "scenario": "A compliance requirement states that sensitive salary columns in an Azure SQL Database must remain encrypted even from a database administrator with full access to the server, while a separate, unrelated requirement just wants ordinary support staff to stop seeing full salary figures in ticketing-tool query results. Always Encrypted satisfies the first requirement, since the database engine itself never sees the plaintext; Dynamic Data Masking satisfies the second, since it only needs to hide the value from lower-privileged viewers, not protect it from a privileged administrator. Meanwhile, the same team migrates a storage account away from shared access keys entirely, assigning Storage Blob Data Reader through Microsoft Entra ID authorization to each application identity that needs it, and adds a private endpoint so the account's public endpoint can be disabled outright."
+    },
+    {
+      "id": "ai-workload-security",
+      "title": "Compute & AI Workload Security",
+      "summary": "VM and container encryption, AKS and App Service hardening, Microsoft Entra Agent ID, Foundry agent governance, and Copilot data protection.",
+      "diagram": null,
+      "vocabIds": [
+        "f23",
+        "f24",
+        "f25",
+        "f26",
+        "f27",
+        "f28",
+        "f29",
+        "f30",
+        "f31",
+        "f32",
+        "f33",
+        "f34",
+        "f51"
+      ],
+      "quizIds": [
+        "q18",
+        "q19",
+        "q20",
+        "q21",
+        "q22",
+        "q23",
+        "q24",
+        "q25",
+        "q27",
+        "q28",
+        "msq7",
+        "q45"
+      ],
+      "reading": "Compute security starts with disks. Server-side encryption already encrypts managed disk data at rest by default, using platform-managed keys, entirely transparent to the VM's OS \u2014 so a requirement to add more protection is never about \"turning encryption on\" from nothing, it is about closing a specific remaining gap. Azure Disk Encryption closes the guest-level gap, encrypting OS and data disk volumes from inside the operating system itself using BitLocker on Windows or DM-Crypt on Linux. Encryption at host closes a different gap, covering the temporary disks and caches on the host running the VM that ADE does not reach. And confidential computing closes the one gap neither of those touches at all: it encrypts data while it is actively being processed in memory, inside a hardware-backed trusted execution environment, protecting it even from a privileged administrator or the cloud provider's own infrastructure. For orchestrated compute, Kubernetes network policies restrict pod-to-pod traffic within an AKS cluster, while Azure Policy's add-on for AKS enforces cluster-level guardrails, like disallowing privileged containers, evaluated against a built-in initiative \u2014 the two answer different questions and are typically combined rather than substituted for each other. On App Service, a managed identity lets the app authenticate to services like Key Vault with no stored credential at all, and mutual TLS lets the app also verify the calling client's certificate, going further than an HTTPS-only setting that merely redirects plain HTTP without validating who is actually connecting.\n\nAI workloads introduce identity and governance questions that barely existed a few years ago. Microsoft Entra Agent ID gives an AI agent its own individually identifiable, policy-controlled identity, distinct from a human user, a traditional app registration, or a generic shared service principal, so its actions can be authenticated, authorized, governed, and audited on their own across a full lifecycle from creation to retirement \u2014 and agent identity blueprints act as templates, so permissions and Conditional Access policies applied at the blueprint level automatically apply to every agent created from it, governing a whole fleet through one policy instead of configuring each agent individually. Conditional Access itself extends cleanly to these identities: it can require the same kinds of conditions, a trusted network, an approved calling application, before an agent identity is allowed to authenticate and act, rather than exempting agents from evaluation just because they are not human. Every agent built in Microsoft Foundry should also follow ordinary least-privilege scoping, granted only the specific data sources, tools, and downstream APIs it actually needs, since a Foundry agent given broad, unscoped permissions \"just in case\" becomes exactly the kind of high-value target that a single prompt injection or jailbreak can then use to reach everything that over-provisioned identity was allowed to touch. Deploying Azure API Management as an AI Gateway in front of Foundry gives a central point to enforce authentication, rate limiting, logging, and routing before a request ever reaches an underlying agent or model, making org-wide policies like a token-spend cap enforceable in one place instead of requiring every agent to implement the same control independently. And when Defender XDR does flag a suspicious or compromised agent identity, blast radius analysis maps out everything that identity could reach or had recently accessed, so a response can be scoped to what the agent could actually touch rather than guessing.\n\nTwo more governance layers matter specifically for Microsoft 365 Copilot. Copilot only surfaces content the requesting user already has permission to see, inheriting whatever SharePoint, OneDrive, and Microsoft 365 permissions already exist rather than introducing a new permission model of its own \u2014 but if those underlying permissions are already too broad, a site shared with \"Everyone\" from years ago, Copilot can now surface that overshared content far more easily and quickly than a human manually searching for it, which is why fixing Copilot oversharing risk means remediating the underlying sharing, not restricting Copilot itself. On top of that permission inheritance, Microsoft Purview DLP policies can be applied directly to Copilot and Copilot Chat prompts and responses, blocking Copilot from using or surfacing content that matches a sensitive information type or label, even for a user who is technically permitted to see the underlying file \u2014 closing a gap that content permissions alone cannot, since DLP can specifically restrict an AI-generated exposure a permission check alone would allow through.",
+      "fundamentalsLabel": "New to AI workload and agent identity security? See the everyday analogy",
+      "fundamentals": "Think of encryption at rest, in transit, and confidential computing as three different moments a valuable package could be stolen: locked in the warehouse (at rest), locked inside the delivery truck (in transit), and \u2014 the gap confidential computing closes \u2014 even while someone is actively unboxing and inspecting it on the loading dock (in use). And an AI agent with its own Entra Agent ID is like giving a new employee their own individually numbered badge instead of a spare copy of someone else's: if that one badge is ever compromised, security can see exactly which doors it opened, deactivate just that badge, and know precisely what needs checking \u2014 rather than wondering which of several people sharing one badge is actually responsible.",
+      "keyTerms": [
+        "Server-side encryption",
+        "Azure Disk Encryption",
+        "Encryption at host",
+        "confidential computing",
+        "Kubernetes network policies",
+        "managed identity",
+        "mutual TLS",
+        "Microsoft Entra Agent ID",
+        "agent identity blueprints",
+        "Microsoft Foundry",
+        "AI Gateway",
+        "blast radius analysis",
+        "Microsoft Purview DLP"
+      ],
+      "commonTraps": [
+        "Server-side encryption with platform-managed keys is already on by default \u2014 Azure Disk Encryption and encryption at host add specific additional coverage, they do not \"turn on\" encryption from nothing.",
+        "Only confidential computing protects data while it is actively being processed in memory; encryption at rest and in transit both leave that gap open.",
+        "A Foundry agent should be scoped to only the specific data and tools it needs \u2014 broad \"just in case\" permissions turn a single compromised agent into a much larger blast radius.",
+        "Microsoft 365 Copilot inherits existing SharePoint and OneDrive permissions rather than creating a new permission model; Copilot oversharing risk is fixed by remediating that underlying sharing."
+      ],
+      "scenario": "A financial services company wants a sensitive AI inferencing workload protected so thoroughly that even Microsoft, as the cloud provider, cannot inspect the data while it is being processed \u2014 a requirement that neither server-side encryption nor Azure Disk Encryption satisfies, since both only protect data at rest, so the team deploys the workload on confidential computing infrastructure instead. Separately, a Foundry agent that only needs to read one document index and call one internal pricing API is registered under its own Microsoft Entra Agent ID and scoped to exactly those two resources rather than broad standing access, with Conditional Access requiring it to authenticate only from an approved internal application. When Defender XDR later flags that same agent identity as potentially compromised, blast radius analysis confirms its reach was limited to just the document index and pricing API it was actually scoped to \u2014 containment that would have been far messier had the agent originally been granted broad, unscoped permissions."
+    },
+    {
+      "id": "security-posture-ops",
+      "title": "Security Posture & Monitoring",
+      "summary": "Defender for Cloud plans and posture tools, Sentinel data connectors and analytics, automation and playbooks, and hybrid/multicloud coverage.",
+      "diagram": null,
+      "vocabIds": [
+        "f36",
+        "f37",
+        "f38",
+        "f39",
+        "f40",
+        "f41",
+        "f42",
+        "f43",
+        "f44",
+        "f45",
+        "f47",
+        "f55",
+        "f57"
+      ],
+      "quizIds": [
+        "q32",
+        "q33",
+        "q34",
+        "q35",
+        "q36",
+        "q37",
+        "q38",
+        "q39",
+        "q40",
+        "q41",
+        "q42",
+        "q47",
+        "q51",
+        "q54"
+      ],
+      "reading": "Microsoft Defender for Cloud starts every environment with a percentage Secure Score, aggregating how many recommended security controls have actually been implemented, weighted by each recommendation's potential impact \u2014 improving the score means resolving the underlying recommendations, not the number itself, and a high score reflects following general best practice, which is not the same thing as passing a specific named regulatory standard. That distinction is exactly what the regulatory compliance dashboard exists for: it maps the environment against a specific standard like PCI DSS, ISO 27001, or NIST, showing which controls pass, fail, or do not apply, letting an organization see standing against a requirement it may be contractually or legally bound to meet, separate from general best practice. Beyond posture management, Defender for Cloud's free tier covers recommendations and secure score, while specific paid Defender plans, Servers, Storage, SQL, Containers, Key Vault, App Service, and more, are enabled independently per resource type and add workload-specific threat detection for that type alone \u2014 enabling Defender for Storage does not also enable Defender for SQL, so a scenario needing both requires enabling both plans explicitly. Two more Defender for Cloud features reduce everyday attack surface directly: Just-in-time (JIT) VM access locks down a VM's management ports by default, opening them only for a specific requester, source IP, and time window on explicit request, while adaptive application controls use machine learning to build an allowlist of known-safe applications for a group of VMs and alert, or enforce, when something outside that allowlist tries to run. And attack path analysis goes a step further than any single finding: it uses the cloud security graph to chain exploitable resources together, like an internet-facing VM with a vulnerability whose role assignment reaches a storage account holding sensitive data, ranking chains by real exploitability rather than by an individual finding's severity alone. None of this stays Azure-only, either: Azure Arc and native AWS/GCP connectors extend the same recommendations, secure score, and Defender plans to hybrid and multicloud resources, though onboarding through Arc has to happen first, since without it an on-premises or AWS/GCP VM has no Azure resource identity for Defender for Cloud to evaluate at all.\n\nMicrosoft Sentinel is where detection and response actually happen, built entirely on top of a Log Analytics workspace \u2014 the same storage and query backend Azure Monitor uses, queried with Kusto Query Language \u2014 so enabling Sentinel on a workspace that already collects other Azure Monitor logs makes that existing data available to Sentinel too, with no separate data store of its own. Data connectors are the mandatory first step: they ingest logs and events from Azure services, Microsoft 365, on-premises systems, and third-party or multicloud platforms into that workspace, and Sentinel has nothing to analyze until a source is connected. Once data is flowing, scheduled analytics rules run a KQL query on a set interval and generate an incident on a match, near-real-time rules run continuously for faster detection on a narrower set of supported queries, and Fusion uses machine learning to correlate multiple low-fidelity signals, an odd sign-in plus a separate unusual deployment, into one higher-confidence incident that no single scheduled rule watching one data source alone would have caught. An incident groups the evidence from one or more triggered alerts for investigation; a workbook is an interactive, recurring visualization built from the same underlying data for ongoing operational tracking; and a hunting query is a proactive, manually run KQL search for signs of compromise that has not yet triggered any rule or incident at all. Turning detection into an actual response is what automation rules and playbooks add: automation rules run centrally across one or more analytics rules, auto-assigning, tagging, suppressing, or closing incidents based on simple conditions before optionally handing off to a playbook, a Logic App that can disable a user account, isolate a VM, or post a Teams notification automatically \u2014 and because automation rules execute in sequence, a rule that closes an incident outright can prevent a later rule, or a playbook, further down that sequence from ever running against it.",
+      "fundamentalsLabel": "New to security posture and SOC operations? See the everyday analogy",
+      "fundamentals": "Secure Score is like a home inspector's general checklist score \u2014 a high score means you have followed broad best practice, like installing smoke detectors and locking your windows, but it is not the same as passing a specific fire-code certification a landlord might legally require, which is what the regulatory compliance dashboard checks instead. And the relationship between Sentinel's pieces is like a security camera system: data connectors are the cameras actually recording footage, an analytics rule is a guard watching a specific feed for a specific behavior, a hunting query is a guard scrubbing back through old footage looking for something nobody flagged yet, and a playbook is the automatic door lock that engages the instant the guard confirms a real intruder.",
+      "keyTerms": [
+        "Secure Score",
+        "regulatory compliance dashboard",
+        "Defender for Cloud",
+        "Just-in-time (JIT) VM access",
+        "adaptive application controls",
+        "attack path analysis",
+        "Log Analytics workspace",
+        "Data connectors",
+        "analytics rules",
+        "Fusion",
+        "hunting query",
+        "automation rules",
+        "playbook"
+      ],
+      "commonTraps": [
+        "A high Secure Score reflects general best practice \u2014 it is not the same as passing a specific named regulatory standard, which the compliance dashboard checks instead.",
+        "Enabling a Defender for Cloud plan for one resource type, like Storage, does not enable it for another, like SQL \u2014 each plan is enabled independently.",
+        "Sentinel has no independent data store of its own; it is built on, and queries, a Log Analytics workspace.",
+        "Automation rules run in sequence, and a rule that closes an incident outright can stop a later rule or playbook from ever running against it."
+      ],
+      "scenario": "A SOC lead wants leadership's single trending percentage to reflect general best-practice posture, but a separate auditor needs proof the environment meets PCI DSS specifically \u2014 the trending number is Secure Score, and the PCI-specific proof comes from the regulatory compliance dashboard, not the same feature answering two different questions. Meanwhile, a Sentinel analyst notices two unrelated low-severity alerts, an odd sign-in location and a separately flagged unusual resource deployment, that Fusion correlates into a single higher-confidence incident neither alert would have justified alone; an automation rule then auto-assigns that Fusion incident to the on-call analyst and hands off to a playbook that disables the affected account immediately, rather than waiting for a human to notice and act manually."
+    }
+  ],
   "cheatSheet": [
     {
       "heading": "Exam-day strategy",
