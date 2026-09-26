@@ -1517,6 +1517,284 @@
       "explanation": "Proactive remediation scripts run under the SYSTEM account by default, which has no visibility into a specific interactive user's mapped drives \u2014 reconfiguring the remediation to run in the logged-on user's context is what resolves this. Remediation scripts absolutely can fix problems (that's their purpose), they don't automatically inherit the interactive user's environment, and there's no blanket restriction on restarting services from a remediation script."
     }
   ],
+  "lessons": [
+    {
+      "id": "device-provisioning-updates",
+      "title": "Deploying and Updating Windows Devices",
+      "summary": "Windows Autopilot and Windows 365 provisioning, plus Windows Update for Business rings, Autopatch, and safeguard holds.",
+      "diagram": null,
+      "vocabIds": [
+        "f1",
+        "f2",
+        "f39",
+        "f45",
+        "f3",
+        "f4",
+        "f5",
+        "f8",
+        "f9",
+        "f11",
+        "f46",
+        "f48"
+      ],
+      "quizIds": [
+        "q1",
+        "q2",
+        "q5",
+        "q6",
+        "q9",
+        "tf1",
+        "tf3",
+        "msq1",
+        "msq2",
+        "q45"
+      ],
+      "reading": "Provisioning a new Windows device usually starts with Windows Autopilot, and picking the right deployment profile type is the first decision. A user-driven profile lets someone unbox their own laptop and sign in with their own Microsoft Entra ID account to finish setup. A self-deploying profile skips a human entirely and authenticates the device itself, which is why it needs a TPM 2.0 chip capable of proving identity with nobody there to sign in. A pre-provisioned, or white glove, profile lets a partner or IT complete the slow, time-consuming steps in advance, so the end user only finishes a short final phase. Whichever profile runs, the Enrollment Status Page blocks the desktop until required apps and configuration profiles finish installing, so a device only looks finished once it truly is ready for work. Underneath those classic profiles, Microsoft is steering new deployments toward device preparation, a newer, faster, cloud-native path \u2014 though it currently only supports Microsoft Entra joined devices, so a hybrid Entra joined deployment still needs a classic Autopilot profile. Getting new hardware into the right group before it even ships matters too: a group tag set during vendor reservation lets a dynamic Microsoft Entra ID device group filter on it automatically, routing freshly registered hardware into the correct group and, through that group, the correct deployment profile, with no manual per-device assignment.\n\nCloud PCs follow a different provisioning path entirely. Windows 365 Cloud PC provisioning policies decide which Microsoft Entra ID group receives a Cloud PC, which image it is built from, and whether it lands as Microsoft Entra joined or hybrid Entra joined \u2014 and it is what actually triggers Cloud PC creation once a user both holds a Windows 365 license and falls inside the policy's assigned group; having only one of the two produces no Cloud PC at all. Licensing itself comes in two shapes. Windows 365 Enterprise licenses one dedicated, always-on Cloud PC per named user, while Windows 365 Frontline licenses a smaller, shared pool of Cloud PCs across a larger set of shift-based users, capped at a limited number of concurrent connections per license set \u2014 the economical choice for shift workers, as long as no more of them are logged in at once than the license set allows.\n\nOnce a device is enrolled, keeping it current becomes its own discipline. Update rings are the core policy: they set deferral periods, whether updates install automatically, active hours, and whether a device sits in an early or broad deployment wave, commonly staged so a small pilot ring with a short or zero deferral catches a bad update before it reaches a much larger, longer-deferral ring. Two different deferral clocks run independently inside the same ring. Feature update deferral delays a new annual Windows version by up to 365 days, while quality update deferral delays that same month's cumulative security fixes by up to 30 days \u2014 delaying one never delays the other, so a device can sit on a much older Windows version while still receiving this month's patches on time. For organizations that would rather not hand-tune rings at all, Windows Autopatch takes over entirely: it automatically organizes enrolled, already Intune-managed devices into deployment rings and rolls out Windows quality updates, driver and firmware updates, Microsoft 365 Apps updates, and Edge updates on Microsoft's own schedule. Autopatch-eligible devices can also pick up Hotpatch updates, which apply a subset of security fixes to a running instance in memory with no reboot at all \u2014 though a Hotpatch device still periodically lands on a fresh baseline cumulative update, since not every fix can be applied purely in memory, so it reduces reboots rather than eliminating them.\n\nNot every update rollout is voluntary from the administrator's side, either. A safeguard hold is Microsoft's own protective mechanism: when Microsoft detects a known compatibility issue between a feature update and a specific device, it automatically blocks that device from being offered the upgrade until the issue is resolved or an admin deliberately overrides the hold \u2014 prevention before the update ever lands, distinct from a rollback that removes an update after it already landed and caused a problem. A feature update deployment profile and expedited quality updates give an admin more direct override power on top of ring deferrals: the deployment profile can pin a targeted group to a specific Windows version regardless of what its ring's deferral would otherwise allow, and expediting lets an urgent, already-released fix bypass a ring's normal deferral and active hours entirely \u2014 useful for a narrow, time-critical situation like a zero-day, but not a substitute for well-designed rings on an ordinary day.",
+      "fundamentalsLabel": "New to device provisioning and updates? See the everyday analogy",
+      "fundamentals": "Autopilot deployment profiles are like different ways a new desk chair arrives at the office. User-driven is flat-pack furniture you assemble yourself after signing for the delivery. Self-deploying is a chair that arrives already built and just gets wheeled into place, with nobody signing for anything. White glove is a mover who does all the heavy assembly in a warehouse first, so you only snap on the armrests once it reaches your desk. And update rings are like testing a new recipe on the pickiest eater in the house before serving it to the whole family \u2014 a small pilot group tastes it first, so a bad batch never reaches everyone at once.",
+      "keyTerms": [
+        "Enrollment Status Page",
+        "self-deploying profile",
+        "white glove",
+        "device preparation",
+        "group tag",
+        "Windows 365 Cloud PC provisioning policies",
+        "Windows 365 Frontline",
+        "Update rings",
+        "Feature update deferral",
+        "quality update deferral",
+        "Windows Autopatch",
+        "Hotpatch",
+        "safeguard hold"
+      ],
+      "commonTraps": [
+        "A self-deploying profile authenticates the device itself and needs no end user sign-in \u2014 that is the opposite of a user-driven profile.",
+        "Windows Autopilot device preparation only supports Microsoft Entra joined devices today; a hybrid Entra joined deployment still needs a classic Autopilot profile.",
+        "Delaying feature updates on a ring does not delay quality updates on that same ring \u2014 the two deferral clocks run independently.",
+        "A safeguard hold prevents an update from ever landing on an at-risk device; a rollback instead removes an update that already landed and caused a problem."
+      ],
+      "scenario": "A distribution company orders 200 identical laptops for warehouse kiosks that must power on and provision themselves with zero staff interaction, plus 15 executive laptops that a white-glove partner should fully prepare before shipping to a courier. The kiosks get a self-deploying Autopilot profile, since a TPM-backed device can authenticate itself with nobody there to sign in, while the executive laptops go through a pre-provisioned profile so IT only finishes a short final phase once they land. Each hardware order is registered with a group tag matching its purpose, Kiosk or Executive, before shipping, so a dynamic Entra ID device group automatically routes each batch into the correct deployment profile the moment it is provisioned \u2014 and because the kiosks need to stay current without staff monitoring them, they are also enrolled in Windows Autopatch rather than a hand-tuned update ring."
+    },
+    {
+      "id": "prepare-identity-infrastructure",
+      "title": "Preparing Identity & Infrastructure for Devices",
+      "summary": "MDM authority, enrollment restrictions, Microsoft Entra device states and groups, scope tags, and bridging to on-premises and virtual desktops.",
+      "diagram": "groupLicensing",
+      "vocabIds": [
+        "f12",
+        "f13",
+        "f16",
+        "f15",
+        "f51",
+        "f17",
+        "f14",
+        "f19",
+        "f18",
+        "f49",
+        "f41",
+        "f50"
+      ],
+      "quizIds": [
+        "q10",
+        "q11",
+        "q12",
+        "q13",
+        "tf6",
+        "msq3",
+        "q38",
+        "q39",
+        "tf16",
+        "q49"
+      ],
+      "reading": "Before any device can enroll, a few tenant-level prerequisites have to be right. MDM authority determines which service is actually in charge of managing mobile devices tenant-wide; a modern tenant runs Intune Standalone as sole authority, and a tenant with no MDM authority set at all cannot enroll a single device \u2014 one of the first things worth checking when enrollment fails everywhere at once, not just for one user. Assuming authority is set, licensing decides who is even eligible: Intune device management rides on Microsoft 365 E3/E5, Enterprise Mobility + Security E3/E5, or a standalone Intune Plan, while a Windows 365 Cloud PC needs its own separate per-user license layered on top \u2014 a user without an Intune-capable license can be assigned every policy in the world and their device still will not actually enroll or receive any of it. Once licensing is sorted, enrollment restrictions decide who is allowed to bring what: a platform restriction blocks or allows enrollment by OS type and version, while a device limit restriction caps how many devices one person can enroll \u2014 both evaluated in priority order like Conditional Access, with the most specific assignment winning and a built-in default restriction catching everyone else.\n\nOnce a device does enroll, what it actually becomes depends on its Microsoft Entra device state. A Microsoft Entra joined device is organization-owned with no on-premises AD account at all. A hybrid Entra joined device is joined to on-premises AD and also registered with Entra ID. A Microsoft Entra registered device is typically personal or BYOD, having added only an Entra ID account without a full organizational join \u2014 only a joined or hybrid joined device can enforce the full range of Intune device-level policy the same way a registered BYOD device cannot. Getting the right devices into the right policy targets is its own decision: a dynamic group evaluates device attributes automatically and updates its own membership, while an assigned group (often called a static group) requires an admin to add or remove each member by hand \u2014 though dynamic membership evaluation can lag by minutes, which matters for anything that must apply the instant a device is provisioned, like the Enrollment Status Page. None of this targeting changes who is allowed to manage the resulting objects, though; that is what a scope tag is for, limiting which Intune administrators can see and manage a given policy, app, or device so a regional helpdesk team's delegated access stays confined to its own tagged scope, without touching which end users or devices the policy itself is assigned to.\n\nBuilding the policy itself increasingly means reaching for the settings catalog, which exposes essentially every available CSP-backed setting individually and searchable, rather than older, template-based device configuration profiles, whose purpose-built templates group related settings together but that Microsoft is not always updating with new options. Whichever authoring style is used, two assigned profiles can still collide. When two profiles set the same setting differently for the same device, Intune reports a conflict, and neither value applies until it is resolved. Separately, assignment filters narrow which devices in an already-assigned group actually receive an item, based on properties like OS version or manufacturer; a device must satisfy both the group assignment and the filter to actually receive it.\n\nDevices do not always fit neatly into a purely cloud-native model. For hybrid Entra join specifically, the Intune Connector for Active Directory is the on-premises agent that lets Autopilot create the computer object in on-premises AD during provisioning \u2014 without it installed and healthy, a hybrid join Autopilot profile fails at the domain-join step even if every other setting is correct. Where an organization still runs Configuration Manager, tenant attach uploads its device and collection data into the Intune admin center for visibility and a limited set of remote actions, without moving any co-management workload or fully enrolling the device \u2014 a bridge for visibility, not a change in who is authoritative. For remote access without a full VPN client, Microsoft Tunnel gives managed iOS/iPadOS and Android devices per-app or full-device access to on-premises resources, often paired with an app protection policy where the device itself may not be enrolled at all. And when a scenario is really asking about compute model rather than management, remember that Azure Virtual Desktop is infrastructure the organization configures and scales itself, Windows 365 is a fixed-price, Microsoft-managed Cloud PC, and a physical endpoint is managed through Intune the same way regardless of which of the two virtual options also exist alongside it.",
+      "fundamentalsLabel": "New to identity and infrastructure prerequisites? See the everyday analogy",
+      "fundamentals": "Think of MDM authority like a building needing exactly one facilities manager before any tenant can move in \u2014 without one appointed, nobody can even request a keycard. A dynamic group is like an email list that adds people automatically based on their job title, while an assigned group is a list someone edits by hand every time staff changes. And a scope tag is less like a keycard and more like a manager's own badge: it decides which manager can see and touch a given office, not which employees are allowed inside that office in the first place.",
+      "keyTerms": [
+        "MDM authority",
+        "enrollment restrictions",
+        "Microsoft Entra joined",
+        "hybrid Entra joined",
+        "Microsoft Entra registered",
+        "dynamic group",
+        "assigned group",
+        "scope tag",
+        "settings catalog",
+        "device configuration profiles",
+        "assignment filters",
+        "Intune Connector for Active Directory",
+        "tenant attach"
+      ],
+      "commonTraps": [
+        "A tenant with no MDM authority configured cannot enroll any devices at all \u2014 check this first when enrollment fails tenant-wide.",
+        "A user without an Intune-capable license will not have their device actually enroll, even if every policy is otherwise correctly assigned.",
+        "Dynamic group membership evaluation can lag by minutes, so it is not the safest target for anything that must apply the instant a device is provisioned.",
+        "A scope tag limits which admins can manage an object; it does not change which end users or devices that object is assigned to."
+      ],
+      "scenario": "A global retailer wants its regional helpdesk teams to see and manage only the devices and policies belonging to their own region, without limiting which devices those policies actually target. The retailer assigns each region's device configuration profiles the matching scope tag so a Tokyo helpdesk admin cannot even see Berlin's policies, while separately building an Entra ID dynamic group per region \u2014 based on a device attribute set during Autopilot registration \u2014 so newly provisioned hardware is automatically assigned the right regional policy the moment it enrolls, with no manual per-device work from either helpdesk team."
+    },
+    {
+      "id": "protect-devices-and-access",
+      "title": "Protecting Devices and Gating Access",
+      "summary": "Compliance policies, Conditional Access device grant controls, Defender for Endpoint risk, security baselines, encryption, and endpoint hardening.",
+      "diagram": "identity",
+      "vocabIds": [
+        "f20",
+        "f21",
+        "f22",
+        "f23",
+        "f24",
+        "f25",
+        "f26",
+        "f52",
+        "f53",
+        "f54"
+      ],
+      "quizIds": [
+        "q18",
+        "q19",
+        "q20",
+        "q21",
+        "q22",
+        "q23",
+        "tf9",
+        "msq4",
+        "q40",
+        "q41"
+      ],
+      "reading": "A compliance policy defines requirements a device must meet \u2014 a minimum OS version, encryption, a passcode \u2014 and its actions for noncompliance define what happens when a device fails, on an escalating, sequenced schedule: send an email, mark the device noncompliant, and only after a grace period, block access if the device still has not been remediated. That last step is what a Conditional Access grant control checks at sign-in time: requiring a device to be marked as compliant blocks access unless that specific device, not just any device belonging to the user, is currently compliant, so a compliant device satisfies it even from a risky location, while the same user on a noncompliant personal device is blocked even from a trusted network. Compliance does not have to rest on static settings alone. Once a device is onboarded to Microsoft Defender for Endpoint through an Intune configuration profile, its real-time risk signals can feed directly into a compliance policy, letting a device that becomes actively compromised automatically fail compliance and lose Conditional Access-gated access without anyone having to notice and intervene manually.\n\nRather than building every settings catalog profile completely from scratch, a security baseline offers a Microsoft-curated, industry-standard starting point that can then be customized \u2014 though baselines are versioned, and an admin must explicitly move a profile instance to a newer baseline version to actually pick up whatever new or changed defaults that version introduces. One of the most common things a baseline, or a purpose-built encryption profile, actually enforces is BitLocker: requiring disk encryption on a Windows device, storing the recovery key in Microsoft Entra ID so a help desk technician can look it up during a self-service or assisted recovery, and specifying the encryption method and cipher strength, all without the end user ever having written a recovery key down themselves.\n\nEncryption protects data at rest, but plenty of everyday risk lives in what a signed-in user is allowed to run and reach. Endpoint Privilege Management lets a standard, non-administrator user elevate one specific, approved application to run with administrator rights \u2014 optionally requiring a business justification or Entra ID-integrated approval first \u2014 without ever granting that user full local administrator rights on the device. Attack surface reduction rules target specific, commonly exploited behaviors, like an Office app spawning a child process or credential theft from LSASS, and can block, audit, or warn on them independent of full antivirus signature detection; deploying them in audit mode first, then reviewing the resulting events, is the recommended way to catch false positives before enforcing block mode against a production population. For sign-in itself, Windows Hello for Business replaces a typed password with a PIN or biometric that unlocks a cryptographic key pair bound to the device's TPM, so the credential never transmits a shared secret over the network and cannot be reused on any other machine. And two more device-level controls round this out: an endpoint security firewall policy configures Windows Defender Firewall's domain, private, and public profiles independently, so a laptop enforces a strict rule set at a coffee shop and a more permissive one on the trusted corporate network without a manual switch, while Windows LAPS randomizes and periodically rotates each device's local administrator password, so compromising one machine's local admin credential no longer hands an attacker a password that also works everywhere else in the fleet.",
+      "fundamentalsLabel": "New to Conditional Access and device protection? See the everyday analogy",
+      "fundamentals": "A compliance policy is like a building's fire-code inspection: fail it, and you get a warning, then a formal notice, and only after a grace period does the building actually get shut down. Conditional Access's compliant-device check is the security guard at the front door who checks that specific inspection sticker on that specific visitor's badge, not just whether they work for a company that generally passes inspections. And Windows LAPS is like every apartment in a building getting its own unique lock changed regularly, instead of every unit sharing one master key that, once copied, opens every door in the building.",
+      "keyTerms": [
+        "compliance policy",
+        "actions for noncompliance",
+        "grant control",
+        "marked as compliant",
+        "Microsoft Defender for Endpoint",
+        "security baseline",
+        "BitLocker",
+        "Endpoint Privilege Management",
+        "Attack surface reduction rules",
+        "Windows Hello for Business",
+        "endpoint security firewall policy",
+        "Windows LAPS"
+      ],
+      "commonTraps": [
+        "Marking a device noncompliant and blocking its Conditional Access access are separate, sequenced steps \u2014 a device can be noncompliant while still inside its grace period.",
+        "The require-compliant-device grant control is device-bound, not user-bound: it checks the specific device signing in, not the user's devices in general.",
+        "Endpoint Privilege Management elevates one approved application, not the user's full account, to administrator rights.",
+        "Windows LAPS gives every device its own randomized password, so one compromised machine's local admin credential does not work anywhere else in the fleet."
+      ],
+      "scenario": "A security team wants a personal, unenrolled-feeling laptop scenario handled correctly: any device that fails its compliance policy should get a five-day grace period before losing access, but a device Defender for Endpoint flags as high risk should lose access immediately regardless of that grace period. They configure the compliance policy's standard noncompliance actions for ordinary failures, while separately feeding the device's Defender for Endpoint risk score into the same policy as its own compliance rule \u2014 so a device that becomes actively compromised fails compliance and gets blocked by the Conditional Access grant control right away, without waiting out a grace period meant for routine issues like a missed OS update."
+    },
+    {
+      "id": "manage-secure-applications",
+      "title": "Managing and Securing Applications",
+      "summary": "App deployment intents, app protection and configuration policies, Cloud PKI, Remote Help, and Win32 app packaging.",
+      "diagram": null,
+      "vocabIds": [
+        "f27",
+        "f28",
+        "f29",
+        "f30",
+        "f31",
+        "f32",
+        "f40",
+        "f55",
+        "f56",
+        "f57"
+      ],
+      "quizIds": [
+        "q24",
+        "q25",
+        "q26",
+        "q27",
+        "q28",
+        "q29",
+        "tf12",
+        "msq5",
+        "q42",
+        "q43"
+      ],
+      "reading": "An app in Intune can be deployed with one of three intents: a required assignment installs it automatically with no action needed, an available assignment lists it in the Company Portal so a user can choose to install it, and an uninstall assignment removes it \u2014 and because intent is set per assigned group, the same app can be required for one department while merely available to everyone else. The Company Portal is where that available-assignment experience actually lives: it is the end-user-facing app where someone enrolls their own device, installs company-published apps, and checks their device's compliance status without ever contacting IT.\n\nNot every app scenario starts with a managed device, though. An app protection policy applies data-protection controls, like requiring a PIN, blocking copy-paste into unmanaged apps, and remotely wiping just that one app's corporate data, entirely at the application level \u2014 it works even on a device that is not enrolled in MDM at all, which is exactly why it is central to BYOD scenarios protecting corporate data on a personal phone the organization does not otherwise manage. An app configuration policy complements this by pushing predefined settings, like a default server URL or a disabled feature flag, into a managed app at install or launch time, and it can target either MDM-managed devices or MAM-managed apps, matching whichever model the population uses. Conditional Access reaches into this same layer: requiring an approved client app only allows sign-in from a Microsoft-approved app, like Outlook, capable of enforcing app protection, while requiring an app protection policy goes further, also demanding that a compliant policy actually be applied to that app \u2014 together, these two controls are what let an organization allow mail access from a personal, unenrolled phone while still blocking a generic, unmanaged mail client from ever connecting to the same mailbox.\n\nIssuing certificates for Wi-Fi, VPN, or app authentication used to mean standing up an on-premises certificate authority and an NDES connector; Cloud PKI is a cloud-hosted certificate authority built into Intune that eliminates that on-premises infrastructure entirely. And when something does go wrong on a managed device, Remote Help lets a help desk technician take control of, or simply view, a user's remote screen to help troubleshoot, with session permissions like full control versus view-only governed by Entra ID role-based access control. Packaging the app itself has its own rules: a Win32 app's detection rule tells Intune how to confirm the app is already successfully installed \u2014 a file, registry key, or MSI product code \u2014 and is mandatory, since without one Intune can never confirm success even after the installer genuinely completed. A requirement rule instead gates whether the app is even attempted at all, based on prerequisites like OS version or free disk space. A supersedence relationship then lets a newer version automatically upgrade or replace an older deployed one, optionally uninstalling the old version first, while a dependency declares that a different app, like a runtime, must install first \u2014 dependencies can chain, but never circularly. And since Microsoft retired the old Microsoft Store for Business storefront, the modern Microsoft Store app (new) type sources apps directly from the public Microsoft Store, still supporting the same required and available assignment intents without a separate business store front end.",
+      "fundamentalsLabel": "New to app management models? See the everyday analogy",
+      "fundamentals": "Required versus available app assignment is like a company handing every new hire a laptop already loaded with the timesheet app (required) while leaving an app store icon on the desktop for anything optional they might want (available). An app protection policy is like a lockbox built into one specific work app on someone's personal phone: the company can wipe that lockbox's contents without ever touching the rest of the phone, because it never needed to manage the phone itself to protect just that one app's data.",
+      "keyTerms": [
+        "required assignment",
+        "available assignment",
+        "uninstall assignment",
+        "Company Portal",
+        "app protection policy",
+        "app configuration policy",
+        "approved client app",
+        "Cloud PKI",
+        "Remote Help",
+        "detection rule",
+        "requirement rule",
+        "supersedence",
+        "dependency"
+      ],
+      "commonTraps": [
+        "An app protection policy works without MDM enrollment \u2014 that is exactly why it fits BYOD scenarios a fully managed device policy cannot reach.",
+        "Skipping a Win32 app's detection rule is never allowed; without one, Intune cannot confirm install success even if the installer truly succeeded.",
+        "A dependency can chain across several apps, but a circular dependency between two apps is not allowed and causes a deployment error.",
+        "Requiring an approved client app is not the same as requiring an app protection policy \u2014 the second one also demands a compliant policy actually be applied."
+      ],
+      "scenario": "A company wants field technicians on personal, unenrolled Android phones to read corporate email in Outlook, but wants to block a generic third-party mail app from ever reaching the same mailbox, and wants the ability to wipe just that corporate mail data if a phone is lost. They configure an app protection policy requiring a PIN and blocking copy-paste to personal apps, then set Conditional Access to require both an approved client app and a compliant app protection policy \u2014 so Outlook with the policy applied gets through, an unmanaged mail client is blocked outright, and a lost phone can have its Outlook data wiped remotely without touching a single personal photo."
+    },
+    {
+      "id": "optimize-endpoint-operations",
+      "title": "Optimizing Endpoint Operations",
+      "summary": "Automating Intune with Graph, custom compliance and proactive remediation scripts, endpoint analytics, alerting, AI-assisted investigation, and reporting.",
+      "diagram": null,
+      "vocabIds": [
+        "f33",
+        "f34",
+        "f35",
+        "f36",
+        "f37",
+        "f38",
+        "f43",
+        "f58",
+        "f59"
+      ],
+      "quizIds": [
+        "q30",
+        "q31",
+        "q32",
+        "q33",
+        "q34",
+        "tf13",
+        "tf14",
+        "msq7",
+        "q44"
+      ],
+      "reading": "Nearly every Intune object is exposed through the Microsoft Graph API, and the Microsoft Graph PowerShell SDK provides cmdlets to script bulk creation, updates, and reporting against those objects \u2014 configuration profiles, compliance policies, app assignments, device actions \u2014 instead of clicking through the admin center one object at a time. This scripted, repeatable approach is also what backs most third-party Intune backup, migration, and configuration-as-code tooling, since the admin center itself has no built-in export and import for most policy types.\n\nTwo related but distinct automation patterns extend what compliance can check and what IT can fix without waiting for a ticket. A custom compliance policy runs an administrator-supplied PowerShell detection script on the device and compares its JSON output against rules defined in the policy \u2014 a specific registry value, an installed software version \u2014 extending compliance checks beyond Intune's built-in, template-based settings; the script only reports data back for evaluation and never remediates anything itself. A proactive remediation goes a step further by pairing a detection script with a separate remediation script, running on a schedule: if the detection script identifies a problem, the remediation script runs automatically to fix it, under the SYSTEM account by default, which is exactly why it can repair issues, like a corrupted registry key or a stopped service, that a standard end-user account has no rights to touch directly.\n\nKnowing something needs fixing in the first place is its own discipline. Endpoint analytics measures device and user experience signals \u2014 startup performance broken down by phase, application reliability, resource performance \u2014 surfacing a device or fleet-wide score so IT can prioritize experience problems proactively instead of waiting for a help desk ticket to reveal them; a slow-starting driver or app shows up specifically, turning a vague complaint into an actionable fix. An alert rule then closes the loop by monitoring a specific signal, like a configuration profile's failure rate or Autopatch deployment failures, against a configurable threshold and notifying the right recipients automatically, scoped by severity so a narrow team is paged only for the failures that are actually their responsibility. Increasingly, Security Copilot agents add a natural-language layer on top of all of this, helping an administrator investigate a policy conflict or summarize a device issue directly inside the familiar Intune admin center workflow, with an administrator still reviewing and approving any configuration change the AI-assisted investigation suggests.\n\nDay-to-day lifecycle actions round out operations. Wipe resets a device to factory settings, optionally keeping it enrolled for reprovisioning. Retire removes only company data, apps, and management while leaving personal data and the OS intact, the correct choice for BYOD offboarding where the organization has no right to touch personal data. Fresh Start reinstalls a clean copy of Windows, optionally keeping user data and enrollment, chiefly to strip out unwanted OEM software. Separately, an update rollback removes an already-installed quality update that regressed a device, reactive cleanup that is the mirror image of a safeguard hold's proactive prevention. And when it is time to actually look back at what happened across the fleet, built-in operational reports give near real-time, per-policy or per-device status, organizational reports offer larger exportable datasets like compliance trends, and a Data Warehouse or Microsoft Graph data export feeds Power BI or Log Analytics for custom, long-term, or cross-tenant analysis \u2014 organizational reports build asynchronously and can take real time to generate, which is why they suit a large historical export rather than an immediate one-off check.",
+      "fundamentalsLabel": "New to endpoint automation and reporting? See the everyday analogy",
+      "fundamentals": "A custom compliance script is like a building inspector who checks one specific thing and writes it down, without lifting a finger to fix anything found wrong. A proactive remediation is a maintenance worker who checks the same thing and, if it fails, immediately repairs it on the spot before anyone even files a complaint \u2014 running with a master key that can open doors a regular tenant never could. And endpoint analytics is a fleet manager's ongoing dashboard of small warning signs, catching a problem while it is still a minor annoyance instead of waiting for a driver to call in with a full breakdown.",
+      "keyTerms": [
+        "Microsoft Graph PowerShell SDK",
+        "custom compliance policy",
+        "detection script",
+        "proactive remediation",
+        "remediation script",
+        "Endpoint analytics",
+        "alert rule",
+        "Security Copilot agents",
+        "Wipe",
+        "Retire",
+        "Fresh Start",
+        "update rollback",
+        "organizational reports"
+      ],
+      "commonTraps": [
+        "A custom compliance policy's detection script only reports data for evaluation \u2014 it never remediates anything by itself, unlike a proactive remediation.",
+        "Proactive remediation scripts run under the SYSTEM account by default, letting them fix issues a standard user account has no rights to touch.",
+        "Retire, not Wipe, is the correct action for BYOD offboarding, since Wipe would also destroy the user's own personal data.",
+        "Organizational reports are generated asynchronously and can take time to build, unlike the near real-time built-in operational reports."
+      ],
+      "scenario": "A help desk keeps seeing the same background service silently stop on a subset of laptops, generating tickets only after users notice something is broken. The team builds a proactive remediation that detects the stopped service on a recurring schedule and restarts it automatically under the SYSTEM account the moment it is found down, closing the issue before a user ever has to file a ticket. Separately, leadership asks for a fleet-wide view of which devices are contributing the most to slow morning boot times; endpoint analytics' startup performance breakdown identifies one specific OEM driver as the common culprit across the affected machines, turning a vague complaint into a targeted driver update rather than a guessing game."
+    }
+  ],
   "cheatSheet": [
     {
       "heading": "Exam-day strategy",
