@@ -533,6 +533,17 @@ const REAL_PORTAL_SCREENSHOTS = {
     sourceUrl: 'https://github.com/MicrosoftDocs/architecture-center/blob/main/docs/best-practices/data-partitioning-content.md',
     product: 'Azure Architecture Center reference diagram',
   },
+  // SC-300 Privileged Identity Management screenshot — sourced from the
+  // MicrosoftDocs/entra-docs GitHub repo, a Microsoft Docs repo carrying
+  // the same CC BY 4.0 content license as azure-docs/memdocs above.
+  pimActivateRole: {
+    src: 'images/entra/pim-activate-role.png',
+    alt: 'Real Microsoft Entra admin center screenshot of the PIM role activation panel',
+    description: "The Activate panel for an eligible Microsoft Entra role (Privileged Role Administrator) opened from PIM's My roles list — the Duration (hours) slider capping how long the just-in-time activation lasts, and the required Reason field, with the banner above noting additional MFA verification is required before the request can proceed.",
+    sourceLabel: 'Microsoft Learn: Activate Microsoft Entra roles in PIM',
+    sourceUrl: 'https://github.com/MicrosoftDocs/entra-docs/blob/main/docs/id-governance/privileged-identity-management/pim-how-to-activate-role.yml',
+    product: 'Microsoft Entra admin center',
+  },
 };
 
 // `hideDescription` is set by quiz/exam question views — the description

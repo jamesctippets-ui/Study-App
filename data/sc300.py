@@ -13,7 +13,7 @@ CATEGORIES = [
     ]},
     {'key': 'identityGovernance', 'label': 'Plan and Implement Identity Governance', 'marks': 25, 'resources': [
         {'label': 'Microsoft Learn: SC-300 - Plan and implement an identity governance strategy', 'url': 'https://learn.microsoft.com/en-us/training/paths/plan-implement-identity-governance-strategy'},
-    ]},
+    ], 'screenshot': 'pimActivateRole'},
 ]
 
 FLASHCARDS = [
@@ -1294,7 +1294,7 @@ Beyond an organization's own employees, B2B collaboration lets a partner's users
         'id': 'authentication-methods-selfservice',
         'title': 'Authentication Methods & Self-Service Security',
         'summary': 'MFA, passwordless sign-in, SSPR, Temporary Access Pass, and the modern authentication methods policy.',
-        'diagram': None,
+        'diagram': 'authMethodsBootstrap',
         'vocabIds': ['f10', 'f11', 'f12', 'f13', 'f16', 'f18'],
         'quizIds': ['q9', 'q10', 'q11', 'q14', 'q15', 'tf7'],
         'reading': """Microsoft Entra supports a range of multifactor authentication methods, from the Microsoft Authenticator app (push notification or fully passwordless) and FIDO2 security keys down to weaker, legacy options like SMS and voice call that Microsoft is actively phasing out. It's worth separating two ideas that sound alike but aren't: "strongest" and "phishing-resistant" are not synonyms. A standard Authenticator push notification is stronger than SMS, but it can still be defeated by an MFA-fatigue attack, where an attacker floods a user with approval prompts until one gets accidentally approved, or a consent-phishing page. Only methods like FIDO2 security keys, Windows Hello for Business, and certificate-based authentication are genuinely phishing-resistant, because the proof of identity is cryptographically bound to hardware and to the specific site it was registered with, not something that can be typed or approved on a lookalike page.
@@ -1339,7 +1339,7 @@ Rolling out a brand-new or modified policy carries real risk of locking people o
         'id': 'workload-identities-apps',
         'title': 'Workload Identities & App Integrations',
         'summary': 'App registrations, service principals, managed identities, API permissions, and SSO/proxy for enterprise apps.',
-        'diagram': None,
+        'diagram': 'workloadIdentityLandscape',
         'vocabIds': ['f20', 'f21', 'f22', 'f23', 'f25', 'f26', 'f27', 'f28'],
         'quizIds': ['q16', 'q18', 'q19', 'q20', 'q22', 'q35'],
         'reading': """Every application that authenticates to Microsoft Entra ID has two related but distinct representations. An app registration is the global definition -- its app ID, redirect URIs, requested API permissions -- created once, typically in the tenant that owns the app. An enterprise application is the local, tenant-specific instance of that same app: the service principal that actually gets assignments, SSO configuration, and Conditional Access applied to it inside one particular tenant. Registering an app in your own tenant creates both automatically; consenting to somebody else's multi-tenant app instead creates only the enterprise application side in your tenant, with no app registration of your own to manage. Not every service principal traces back to a full app registration this way -- among Entra ID's service principal types are application (backing a registered app), managed identity (tied to an Azure resource's own lifecycle), and legacy (predating the current model), and a managed identity's service principal specifically has no corresponding app registration object at all.

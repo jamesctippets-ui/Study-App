@@ -1281,7 +1281,7 @@ LESSONS = [
         'id': 'sentinel-analytics-automation',
         'title': 'Sentinel Analytics, Automation & Tuning',
         'summary': 'Analytics rule types, automation rules vs. playbooks, ingestion pipelines, and the tuning tools that keep detections accurate.',
-        'diagram': None,
+        'diagram': 'sentinelDataFlow',
         'vocabIds': ['f3', 'f4', 'f5', 'f6', 'f11', 'f12', 'f13', 'f15', 'f39', 'f40'],
         'quizIds': ['q2', 'q3', 'q4', 'q5', 'q11', 'q12'],
         'reading': """Microsoft Sentinel's detections start as analytics rules, and its analytics rule types split into three the exam expects you to tell apart cleanly. A scheduled analytics rule is the default: it runs a KQL query on a defined interval and lookback period, generating an incident whenever the query's results match. A near-real-time (NRT) rule trades that flexibility for speed, running roughly every minute instead, but only against a narrower, specifically supported set of tables -- you reach for NRT specifically when the extra latency of a scheduled rule genuinely matters, not as a default choice. Fusion sits apart from both: it is a machine-learning correlation engine that stitches multiple lower-fidelity anomalies from different sources into one higher-confidence incident automatically, with no analyst writing any KQL for it at all. Rather than authoring every one of these from scratch, an analyst typically installs a packaged solution from the content hub -- bundling data connectors, analytics rule templates, workbooks, hunting queries, and playbooks for a specific product or scenario -- but installing a solution only stages its rule templates for review; each one still has to be explicitly enabled, and usually tuned, before it starts generating a single incident.
@@ -1304,7 +1304,7 @@ Handling what happens to an incident once it exists is split across two layers. 
         'id': 'xdr-copilot-threat-intel',
         'title': 'SOC Visibility: XDR, Copilot & Threat Intelligence',
         'summary': 'Defender XDR correlation and automation, Security Copilot, watchlists, UEBA, workbooks, and threat intelligence.',
-        'diagram': None,
+        'diagram': 'xdrCorrelationFanIn',
         'vocabIds': ['f1', 'f2', 'f7', 'f8', 'f9', 'f10', 'f14', 'f16', 'f43', 'f45'],
         'quizIds': ['q1', 'q6', 'q7', 'q8', 'q9', 'q14'],
         'reading': """Microsoft Defender XDR automatically correlates related alerts from Defender for Endpoint, Defender for Office 365, Defender for Identity, and Defender for Cloud Apps into a single incident, so an analyst investigates one correlated case in a unified incident queue instead of chasing separate alerts from each product individually -- all managed from the unified Microsoft Defender portal, alongside each product's own settings and, once onboarded, Sentinel itself. Automated investigation and response builds directly on that correlation: it investigates an alert using the same playbook a human analyst would follow, then either remediates the confirmed threat directly or produces a pending action in the Action Center for an analyst to approve, depending on the configured automation level -- 'Full' takes action with no waiting, while either 'Semi' level leaves some or all remediation pending review. Underneath all of Sentinel's own data sits the Advanced Security Information Model, which normalizes many different connectors' native schemas into a small set of common ones, so a single hunting query or analytics rule already written against a normalized field automatically picks up any new data source mapped to that same schema, with no rule rewritten needed per source.
@@ -1327,7 +1327,7 @@ Two further capabilities enrich an investigation with context an analytics rule'
         'id': 'endpoint-identity-response',
         'title': 'Endpoint & Identity Incident Response',
         'summary': 'Isolating and investigating compromised devices, blocking known-bad indicators, and identity-based detections.',
-        'diagram': None,
+        'diagram': 'endpointResponseFlow',
         'vocabIds': ['f17', 'f18', 'f19', 'f20', 'f23', 'f24', 'f27'],
         'quizIds': ['q15', 'q16', 'q18', 'q21', 'q22', 'q25'],
         'reading': """When Defender for Endpoint flags a compromised device, the first response decision is usually how completely to cut it off. Device isolation disconnects it from the network while keeping it connected to Defender for Endpoint itself, so an analyst can keep investigating and running response actions on it even though it can no longer reach other systems or exfiltrate anything. Full isolation blocks nearly all communication except to the Defender for Endpoint service itself; selective isolation instead carves out an exception for specific configured processes, useful when a business-critical service on that same host genuinely can't be cut off entirely. Once isolated, live response gives an analyst a remote, real-time command-line session on that specific device -- to run scripts, collect forensic artifacts, view and kill processes, or delete files directly -- without waiting on a scheduled scan or a full automated investigation to finish first. Any remediation action taken, whether by automated investigation or an analyst directly, shows up in the unified Action Center as either pending (awaiting explicit approval or rejection) or completed (and, where supported, reversible); approving a pending action from automated investigation lets that remediation proceed exactly as determined, while rejecting it stops only that specific action, leaving anything else already done untouched.
@@ -1350,7 +1350,7 @@ Defender for Identity contributes two distinctly different kinds of identity-foc
         'id': 'email-cloudapps-incident-mgmt',
         'title': 'Email, Cloud App Defense & Incident Management',
         'summary': 'Investigating phishing and OAuth risk, enforcing in-session cloud app controls, and running Sentinel incidents through to closure.',
-        'diagram': None,
+        'diagram': 'casbSessionControlFlow',
         'vocabIds': ['f21', 'f22', 'f25', 'f26', 'f28', 'f29', 'f30', 'f42', 'f44', 'f46'],
         'quizIds': ['q19', 'q20', 'q23', 'q24', 'q26', 'msq11'],
         'reading': """When a phishing or malware campaign is confirmed after messages have already reached mailboxes, Defender for Office 365's Threat Explorer lets an analyst search and filter email, URL, and file events across the whole tenant -- by sender, recipient, subject, malware family, or delivery action -- to scope exactly how far the campaign actually spread before remediating anything, and remediation can be launched straight from those search results rather than acting mailbox by mailbox. Some of that remediation happens automatically without any analyst involved at all: zero-hour auto purge retroactively detects and neutralizes a message that already reached a mailbox and looked clean at delivery time, moving it to Junk Email or Quarantine once updated detection signatures reclassify it as malicious after the fact -- without ZAP, that already-delivered message would simply sit untouched in the inbox indefinitely, however long it takes signatures to catch up.
@@ -1373,7 +1373,7 @@ Sentinel incident management has its own structure for working a case through to
         'id': 'kql-threat-hunting',
         'title': 'Threat Hunting with KQL',
         'summary': 'Writing and reusing KQL for proactive hunting, joins, cross-product correlation, and promoting a hunt into a real detection.',
-        'diagram': None,
+        'diagram': 'kqlPipelineJoins',
         'vocabIds': ['f31', 'f32', 'f33', 'f34', 'f35', 'f36', 'f37', 'f38', 'f41'],
         'quizIds': ['q27', 'q28', 'q29', 'q30', 'q31', 'q32'],
         'reading': """Every KQL query pipeline follows the same shape: start from a table, then pipe left to right through operators that each narrow or reshape the result of the one before -- where to filter rows, project or extend to shape columns, summarize to aggregate. Operator order isn't just style; it's performance, since filtering early with where before an expensive summarize or join means every later operator processes far less data than if the filter came last. Joining two tables together also demands picking the right join type for the actual question being asked: an inner join returns only rows with a matching key present on both sides, useful when correlating two sources where only confirmed matches matter, while a leftouter join instead keeps every row from the left table and fills in nulls where no match exists on the right -- exactly the tool for a negative question like 'which watchlisted accounts had zero sign-ins in the last 7 days,' since an inner join would simply drop every one of those non-matching accounts from the result instead of surfacing them.
