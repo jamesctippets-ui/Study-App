@@ -1378,3 +1378,36 @@ A quick fix and a real fix aren't the same thing. A workaround, like restarting 
         'scenario': "A support engineer gets a ticket that one VM feels sluggish. Rather than immediately resizing it, they follow the methodology: they identify the specific symptom, form a theory that another tenant on the same host is consuming excess CPU, and test that theory by checking hypervisor-level CPU ready time and the activity of neighboring VMs before touching anything — confirming a noisy-neighbor problem rather than a fault in the sluggish VM itself. In the same sprint, they trace an unexplained billing increase to a handful of orphaned disks left over from a deleted project, and separately restore a hung reporting service with a quick restart — a workaround they make sure to follow up with a proper root-cause investigation before closing the ticket, rather than treating the restart itself as the fix.",
     },
 ]
+
+MADLIBS = [
+    {
+        'id': 'ml-cloudplus-1',
+        'cat': 'archDesign',
+        'scenario': "A database server is running out of CPU and memory under load, so the team upgrades it to a bigger instance size — this is {b1} scaling. A separate web tier instead handles increased load by adding more identical server instances behind a load balancer — this is {b2} scaling.",
+        'blanks': [
+            {'key': 'b1', 'options': ['vertical', 'horizontal'], 'correct': 0},
+            {'key': 'b2', 'options': ['vertical', 'horizontal'], 'correct': 1},
+        ],
+        'explanation': "Vertical scaling (scale up) means a bigger single instance; horizontal scaling (scale out) means more instances in parallel — horizontal generally scales further but needs a load balancer and often a stateless design.",
+    },
+    {
+        'id': 'ml-cloudplus-2',
+        'cat': 'security',
+        'scenario': "Data sitting in a database file on disk is protected using encryption {b1}. That same data, while actively moving across the network between the app server and the database, is instead protected using encryption {b2}.",
+        'blanks': [
+            {'key': 'b1', 'options': ['at rest', 'in transit', 'in use'], 'correct': 0},
+            {'key': 'b2', 'options': ['at rest', 'in transit', 'in use'], 'correct': 1},
+        ],
+        'explanation': "At rest = stored data (disk, database files); in transit = data actively moving across a network (TLS); in use = data actively being processed in memory (a less commonly tested third state).",
+    },
+    {
+        'id': 'ml-cloudplus-3',
+        'cat': 'troubleshooting',
+        'scenario': "A tenant on a shared multi-tenant cloud host notices their VM's disk I/O performance randomly degrades even though their own workload hasn't changed — another tenant on the same physical hardware is consuming a disproportionate share of resources. This is called the {b1} problem, and one common mitigation is moving to {b2} hardware, which reserves the hardware exclusively for one tenant.",
+        'blanks': [
+            {'key': 'b1', 'options': ['noisy neighbor', 'split-brain', 'orphaned resource', 'thundering herd'], 'correct': 0},
+            {'key': 'b2', 'options': ['dedicated', 'shared', 'burstable', 'spot'], 'correct': 0},
+        ],
+        'explanation': "\"Noisy neighbor\" describes resource contention from other co-located tenants on shared infrastructure. Dedicated (single-tenant) hardware removes that contention entirely, at a higher cost.",
+    },
+]

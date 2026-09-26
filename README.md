@@ -292,6 +292,15 @@ This mode is deliberately self-contained — it doesn't feed mastery %,
 results, or exam readiness, so its score is tracked for the practice
 session only.
 
+Tracks with `MADLIBS` content (AZ-900, AZ-104, ITIL, and Cloud+ today)
+get a **Mad Libs** sub-tab: a short real-world scenario paragraph with a
+couple of inline dropdown blanks, each filled from a small set of term
+choices — reinforces vocabulary in context instead of as an isolated
+flashcard front/back. Unlike Verbal Quiz and Commands above, this one
+*does* feed into mastery %/results the normal way (scored all-or-nothing
+per scenario — every blank right, or it counts as one miss, the same
+logic the app's multi-select questions already use).
+
 **Fifteen tracks, all visible in the track switcher:**
 - **AZ-900** (Azure Fundamentals) — full course content, 106 questions.
 - **AB-650** (M365 & AI Services Administrator) — full question bank (52

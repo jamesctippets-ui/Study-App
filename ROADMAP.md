@@ -710,12 +710,29 @@ doesn't (and why it's still waiting).
   (e.g. `{"type": "compare", "scenario": ..., "optionA": ..., "optionB": ...,
   "betterKey": "A", "why": ...}`) and its own view alongside the existing
   `QuestionView`.
-- [ ] **Scenario Mad Libs.** A short real-world scenario paragraph with a
-  few blanks, each filled from a small set of term choices — reinforces
-  vocabulary in context instead of as an isolated flashcard front/back.
-  New per-track data (e.g. `MADLIBS`: a list of `{scenario, blanks: [{key,
-  options, correct}]}`), scored the same way everything else feeds into
-  `results`/mastery.
+- [x] **Scenario Mad Libs.** Shipped as a "Mad Libs" Quiz sub-tab (only
+  shown for tracks with `MADLIBS` content — AZ-900, AZ-104, ITIL, and
+  Cloud+ at launch, 3 scenarios each): a short real-world scenario
+  paragraph with 2-3 inline dropdown blanks, each filled from a small
+  set of term choices (`MadLibsView` in 04_shared_ui.jsx). Scored
+  all-or-nothing per scenario — every blank right, or the whole scenario
+  counts as one miss (matching the existing `ms` multi-select question's
+  all-or-nothing precedent) — and genuinely feeds into `results`/mastery
+  the same way flashcards and questions do: `trackMastery`
+  (03_helpers.js) and `masteryByCategory` (06_app.jsx) both fold in
+  `mod.madlibs` ids alongside flashcards/questions, unlike Verbal Quiz
+  and CLI practice above, which are deliberately unscored. Data shape:
+  `{id, cat, scenario, blanks: [{key, options, correct}], explanation}`,
+  where `scenario` is a template string with `{key}` placeholders split
+  on render (`item.scenario.split(/\{(\w+)\}/)`). `build.py` validates
+  every blank has a matching placeholder in its scenario and vice versa
+  (a common authoring mistake this catches immediately), plus the usual
+  unique-id/valid-category/non-empty-explanation checks — madlib ids
+  share the same id namespace as flashcards/questions (validated against
+  the same `item_ids` set) since they write into the same
+  `results[trackKey]` map. Broader per-track coverage (beyond the 4
+  tracks shipped) is open, same "started small, more can follow" pattern
+  as CLI_CHALLENGES above.
 - [ ] **Step-ordering / sequencing challenges.** Shuffle the steps for a
   stated goal — "stand up a compliant Azure VM," "triage a P1 incident per
   ITIL," "onboard a new user with proper Conditional Access" — and have the

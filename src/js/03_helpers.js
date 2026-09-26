@@ -227,7 +227,7 @@ function parseHash(hash, validTrackKeys) {
   const [trackKey, mode, sub] = parts;
   if (!validTrackKeys.has(trackKey)) return { mode: 'home' };
   if (mode === 'learn') return { mode: 'learn', trackKey, learnView: ['cards', 'study', 'sheet'].includes(sub) ? sub : 'study' };
-  if (mode === 'quiz') return { mode: 'quiz', trackKey, quizView: ['questions', 'match', 'verbal', 'commands'].includes(sub) ? sub : 'questions' };
+  if (mode === 'quiz') return { mode: 'quiz', trackKey, quizView: ['questions', 'match', 'verbal', 'commands', 'madlibs'].includes(sub) ? sub : 'questions' };
   if (mode === 'exam') return { mode: 'exam', trackKey };
   return { mode: 'home' };
 }
@@ -549,7 +549,11 @@ function trackMastery(trackKey, results) {
   const mod = DATA[trackKey];
   if (!mod) return 0;
   const trackResults = results[trackKey] || {};
-  const ids = [...mod.flashcards.map((f) => f.id), ...mod.questions.map((q) => q.id)];
+  // Mad Libs scenarios feed into mastery the same as flashcards/questions
+  // (each scored all-or-nothing — every blank right, or it counts as one
+  // miss — see submitMadlibAnswer in 06_app.jsx); CLI/PowerShell command
+  // practice deliberately does NOT (see ROADMAP.md section 4's reasoning).
+  const ids = [...mod.flashcards.map((f) => f.id), ...mod.questions.map((q) => q.id), ...(mod.madlibs || []).map((m) => m.id)];
   if (!ids.length) return 0;
   const correct = ids.filter((id) => trackResults[id] === 'correct').length;
   return Math.round((correct / ids.length) * 100);

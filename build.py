@@ -163,6 +163,48 @@ def validate():
                 elif any(not isinstance(p, str) or not p.strip() for p in points):
                     errors.append(f"[{key}] CHEAT_SHEET section '{heading}' has an empty point")
 
+        madlibs = getattr(mod, "MADLIBS", [])
+        for ml in madlibs:
+            mlid = ml.get("id")
+            if not mlid:
+                errors.append(f"[{key}] a MADLIBS entry is missing an 'id'")
+            elif mlid in item_ids:
+                errors.append(f"[{key}] duplicate id '{mlid}' (madlib shares an id with a flashcard/question)")
+            else:
+                item_ids.add(mlid)
+            if ml.get("cat") not in cat_keys:
+                errors.append(f"[{key}] MADLIBS '{mlid}' references unknown category '{ml.get('cat')}'")
+            scenario = ml.get("scenario", "")
+            if not scenario.strip():
+                errors.append(f"[{key}] MADLIBS '{mlid}' is missing a non-empty 'scenario'")
+            if not ml.get("explanation", "").strip():
+                errors.append(f"[{key}] MADLIBS '{mlid}' is missing a non-empty 'explanation'")
+            blanks = ml.get("blanks")
+            if not isinstance(blanks, list) or not blanks:
+                errors.append(f"[{key}] MADLIBS '{mlid}' needs a non-empty 'blanks' list")
+                continue
+            blank_keys_seen = set()
+            for b in blanks:
+                bkey = b.get("key")
+                if not bkey:
+                    errors.append(f"[{key}] MADLIBS '{mlid}' has a blank missing a 'key'")
+                elif bkey in blank_keys_seen:
+                    errors.append(f"[{key}] MADLIBS '{mlid}' has duplicate blank key '{bkey}'")
+                else:
+                    blank_keys_seen.add(bkey)
+                if ("{" + str(bkey) + "}") not in scenario:
+                    errors.append(f"[{key}] MADLIBS '{mlid}' blank '{bkey}' has no matching {{{bkey}}} placeholder in its scenario")
+                options = b.get("options")
+                if not isinstance(options, list) or len(options) < 2:
+                    errors.append(f"[{key}] MADLIBS '{mlid}' blank '{bkey}' needs an options list with at least 2 entries")
+                    continue
+                correct = b.get("correct")
+                if not isinstance(correct, int) or not (0 <= correct < len(options)):
+                    errors.append(f"[{key}] MADLIBS '{mlid}' blank '{bkey}' has an out-of-range or missing 'correct' index: {correct!r}")
+            for placeholder in re.findall(r"\{(\w+)\}", scenario):
+                if placeholder not in blank_keys_seen:
+                    errors.append(f"[{key}] MADLIBS '{mlid}' scenario references placeholder '{{{placeholder}}}' with no matching blank")
+
         cli_challenges = getattr(mod, "CLI_CHALLENGES", [])
         cli_ids_seen = set()
         for c in cli_challenges:
@@ -220,6 +262,7 @@ def build_track_data():
             **({"lessons": mod.LESSONS} if hasattr(mod, "LESSONS") else {}),
             **({"cheatSheet": mod.CHEAT_SHEET} if hasattr(mod, "CHEAT_SHEET") else {}),
             **({"cliChallenges": mod.CLI_CHALLENGES} if hasattr(mod, "CLI_CHALLENGES") else {}),
+            **({"madlibs": mod.MADLIBS} if hasattr(mod, "MADLIBS") else {}),
         }
         for key, mod in TRACK_MODULES.items()
     }

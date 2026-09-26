@@ -1527,3 +1527,36 @@ CLI_CHALLENGES = [
         'explanation': "--lock-type CanNotDelete still allows reads/writes, just not deletion; ReadOnly is the stricter option and blocks modification too, which can unexpectedly break autoscaling or extensions.",
     },
 ]
+
+MADLIBS = [
+    {
+        'id': 'ml-az104-1',
+        'cat': 'identityGov',
+        'scenario': "An admin needs to grant a contractor the ability to restart VMs in one resource group, but nothing else — this calls for an Azure {b1} role assignment scoped to that resource group. Separately, security wants to require MFA whenever anyone signs in from outside the corporate network — that's enforced with a {b2} policy, not a role assignment at all.",
+        'blanks': [
+            {'key': 'b1', 'options': ['RBAC', 'Conditional Access', 'Azure Policy', 'a management group'], 'correct': 0},
+            {'key': 'b2', 'options': ['RBAC', 'Conditional Access', 'Azure Policy', 'a management group'], 'correct': 1},
+        ],
+        'explanation': "RBAC controls what actions someone can perform on which resources. Conditional Access controls the conditions under which a sign-in is allowed (MFA, location, device compliance) — a completely separate control plane from RBAC.",
+    },
+    {
+        'id': 'ml-az104-2',
+        'cat': 'storage',
+        'scenario': "A developer needs to give a third-party vendor temporary, read-only access to a single blob container for the next 48 hours, without ever exposing the storage account's master credentials — this calls for a {b1}. For their own backend service that needs full, ongoing access to every container in the account, they instead use the account's {b2}.",
+        'blanks': [
+            {'key': 'b1', 'options': ['SAS token', 'access key', 'managed identity', 'service principal'], 'correct': 0},
+            {'key': 'b2', 'options': ['SAS token', 'access key', 'managed identity', 'service principal'], 'correct': 1},
+        ],
+        'explanation': "A SAS token is scoped and time-limited — exactly right for temporary, narrow external access. An access key grants full, unrestricted account access and should stay internal-only.",
+    },
+    {
+        'id': 'ml-az104-3',
+        'cat': 'networking',
+        'scenario': "A network security group has two rules: one at priority 100 that denies all inbound traffic on port 22, and another at priority 200 that allows inbound traffic on port 22 from a specific admin IP. Because Azure evaluates NSG rules in order from {b1} priority number to {b2}, and stops at the first match, the admin's allow rule at priority 200 will never actually apply — the deny rule wins.",
+        'blanks': [
+            {'key': 'b1', 'options': ['lowest', 'highest'], 'correct': 0},
+            {'key': 'b2', 'options': ['lowest', 'highest'], 'correct': 1},
+        ],
+        'explanation': "NSG rules process in ascending priority order (lowest number first); the first matching rule wins and evaluation stops there — a classic AZ-104 trap when a lower-priority-number deny rule shadows a higher-priority-number allow rule.",
+    },
+]

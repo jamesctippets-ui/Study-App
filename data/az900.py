@@ -1828,3 +1828,37 @@ CHEAT_SHEET = [
         ],
     },
 ]
+
+MADLIBS = [
+    {
+        'id': 'ml-az900-1',
+        'cat': 'cloudConcepts',
+        'scenario': "A startup's finance team likes that they no longer need to buy servers upfront and instead pay only for what they use each month — this shift from upfront capital investment to a pay-as-you-go model is called moving from {b1} to {b2}. When their app suddenly gets featured on a podcast and traffic spikes overnight, the platform automatically adds more capacity within minutes and scales back down once the surge passes — that automatic, on-demand responsiveness is called {b3}.",
+        'blanks': [
+            {'key': 'b1', 'options': ['CapEx', 'OpEx', 'TCO', 'SLA'], 'correct': 0},
+            {'key': 'b2', 'options': ['CapEx', 'OpEx', 'TCO', 'SLA'], 'correct': 1},
+            {'key': 'b3', 'options': ['Scalability', 'Elasticity', 'Fault tolerance', 'High availability'], 'correct': 1},
+        ],
+        'explanation': "CapEx (capital expenditure) is upfront purchase; OpEx (operational expenditure) is ongoing pay-as-you-go — cloud shifts spending from CapEx to OpEx. Elasticity specifically means automatically growing AND shrinking with demand; scalability alone just means the capacity to grow, without implying the automatic shrink-back.",
+    },
+    {
+        'id': 'ml-az900-2',
+        'cat': 'architecture',
+        'scenario': "A dev team wants to deploy a web app without managing the underlying VMs, OS patching, or web server configuration — they just want to push code and have it run. This points to {b1}. A separate team, however, insists on full control over the OS and everything installed on it, even though it means they're responsible for all patching themselves — that's {b2}.",
+        'blanks': [
+            {'key': 'b1', 'options': ['IaaS', 'PaaS', 'SaaS'], 'correct': 1},
+            {'key': 'b2', 'options': ['IaaS', 'PaaS', 'SaaS'], 'correct': 0},
+        ],
+        'explanation': "PaaS (like Azure App Service) hides the OS/server layer so you just deploy code; IaaS (VMs) gives full OS control but full patching responsibility too.",
+    },
+    {
+        'id': 'ml-az900-3',
+        'cat': 'management',
+        'scenario': "A large enterprise wants one place to apply a single policy across several subscriptions at once — for that, they create a {b1} above all the subscriptions. Within one subscription, they group related resources like a web app, its database, and its storage account together for unified lifecycle management using a {b2}.",
+        'blanks': [
+            {'key': 'b1', 'options': ['management group', 'resource group', 'subscription', 'tenant'], 'correct': 0},
+            {'key': 'b2', 'options': ['management group', 'resource group', 'subscription', 'tenant'], 'correct': 1},
+        ],
+        'explanation': "Management groups sit above subscriptions for org-wide governance; resource groups are the unit of lifecycle management within a subscription for related resources.",
+    },
+]

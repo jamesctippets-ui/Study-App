@@ -69,6 +69,14 @@ function CertStudyApp() {
   const [cliResult, setCliResult] = useState(null);
   const [cliScore, setCliScore] = useState({ correct: 0, total: 0 });
 
+  // Scenario Mad Libs (ROADMAP.md section 13) — only meaningful for tracks
+  // that ship MADLIBS (AZ-900, AZ-104, ITIL, Cloud+ today).
+  const [madlibSession, setMadlibSession] = useState([]);
+  const [madlibIndex, setMadlibIndex] = useState(0);
+  const [madlibAnswers, setMadlibAnswers] = useState({});
+  const [madlibSubmitted, setMadlibSubmitted] = useState(false);
+  const [madlibScore, setMadlibScore] = useState({ correct: 0, total: 0 });
+
   const [examTrack, setExamTrack] = useState(null);
   const [examSession, setExamSession] = useState([]);
   const [examAnswers, setExamAnswers] = useState({});
@@ -101,6 +109,7 @@ function CertStudyApp() {
   const categories = DATA[activeTrack].categories;
   const flashcardsData = DATA[activeTrack].flashcards;
   const questionsData = DATA[activeTrack].questions;
+  const madlibsData = DATA[activeTrack].madlibs || [];
   const trackResults = results[activeTrack] || {};
 
   // Applies a freshly-loaded (not user-edited) value to both the React
@@ -528,6 +537,48 @@ function CertStudyApp() {
     setCliResult(null);
   };
 
+  // The Mad Libs sub-tab only exists for tracks with MADLIBS — same
+  // fallback reasoning as the Commands tab above.
+  useEffect(() => {
+    if (quizView === 'madlibs' && !madlibsData.length) setQuizView('questions');
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeTrack, quizView]);
+
+  const startMadlibSession = () => {
+    const pool = activeCat === 'all' ? madlibsData : madlibsData.filter((m) => m.cat === activeCat);
+    setMadlibSession(shuffleArray(pool));
+    setMadlibIndex(0);
+    setMadlibAnswers({});
+    setMadlibSubmitted(false);
+    setMadlibScore({ correct: 0, total: 0 });
+  };
+
+  useEffect(() => {
+    if (mode !== 'quiz' || quizView !== 'madlibs') return;
+    startMadlibSession();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mode, quizView, activeTrack, activeCat]);
+
+  const setMadlibBlank = (key, idx) => {
+    if (madlibSubmitted) return;
+    setMadlibAnswers((a) => ({ ...a, [key]: idx }));
+  };
+
+  const submitMadlibAnswer = () => {
+    const item = madlibSession[madlibIndex];
+    if (!item) return;
+    const allCorrect = item.blanks.every((b) => madlibAnswers[b.key] === b.correct);
+    setMadlibSubmitted(true);
+    recordResult(item.id, allCorrect ? 'correct' : 'incorrect');
+    setMadlibScore((s) => ({ correct: s.correct + (allCorrect ? 1 : 0), total: s.total + 1 }));
+  };
+
+  const nextMadlibScenario = () => {
+    setMadlibIndex((i) => i + 1);
+    setMadlibAnswers({});
+    setMadlibSubmitted(false);
+  };
+
   const achievements = useMemo(() => evaluateAchievements(results, stats), [results, stats]);
 
   // Advance the daily streak once per load, after real data (local or cloud)
@@ -837,12 +888,13 @@ function CertStudyApp() {
       const items = [
         ...flashcardsData.filter((f) => f.cat === c.key).map((f) => f.id),
         ...questionsData.filter((q) => q.cat === c.key).map((q) => q.id),
+        ...madlibsData.filter((m) => m.cat === c.key).map((m) => m.id),
       ];
       const correct = items.filter((id) => trackResults[id] === 'correct').length;
       map[c.key] = items.length ? correct / items.length : 0;
     });
     return map;
-  }, [trackResults, categories, flashcardsData, questionsData]);
+  }, [trackResults, categories, flashcardsData, questionsData, madlibsData]);
 
   // Logs one per-category mastery snapshot a day for whichever track is
   // actually open (not Home — there's no single "the" track there), so
@@ -1315,6 +1367,15 @@ function CertStudyApp() {
                 Commands
               </button>
             )}
+            {madlibsData.length > 0 && (
+              <button
+                onClick={() => setQuizView('madlibs')}
+                className="flex-1"
+                style={{ padding: '6px 2px', borderRadius: '8px', fontSize: '10.5px', fontWeight: 600, background: quizView === 'madlibs' ? COLOR.surfaceRaised : 'transparent', color: quizView === 'madlibs' ? COLOR.text : COLOR.muted }}
+              >
+                Mad Libs
+              </button>
+            )}
           </div>
         )}
 
@@ -1444,6 +1505,21 @@ function CertStudyApp() {
             onSubmit={submitCliAnswer}
             onNext={nextCliChallenge}
             onRestart={startCliPractice}
+          />
+        )}
+
+        {mode === 'quiz' && quizView === 'madlibs' && (
+          <MadLibsView
+            session={madlibSession}
+            index={madlibIndex}
+            score={madlibScore}
+            categories={categories}
+            answers={madlibAnswers}
+            onSetBlank={setMadlibBlank}
+            submitted={madlibSubmitted}
+            onSubmit={submitMadlibAnswer}
+            onNext={nextMadlibScenario}
+            onRestart={startMadlibSession}
           />
         )}
 

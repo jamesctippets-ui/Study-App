@@ -1546,3 +1546,36 @@ ITIL deliberately doesn't compete with adjacent frameworks; it operates at a dif
         'scenario': "A support team maps its incident-resolution value stream and discovers requests sit untouched in a queue for six hours before anyone even looks at them — the actual troubleshooting itself takes twenty minutes. Around the same time, they roll out an AI system that auto-triages incoming tickets to the right team, an agentic, Coordination-type capability, but require human sign-off before it touches anything on a production database, applying AI governance proportional to risk. The triage rollout itself runs as a short, iterative Agile project, feeding a change into the ongoing service that ITIL governs day to day once it's live.",
     },
 ]
+
+MADLIBS = [
+    {
+        'id': 'ml-itil-1',
+        'cat': 'valueSystem',
+        'scenario': "A customer subscribes to a cloud backup service specifically because it does what they need — automatically backing up their files — this 'fitness for purpose' is the service's {b1}. But if that backup service is only available 95% of the time and frequently fails to restore files correctly, its 'fitness for use' — the {b2} — is poor, even though the core function works as designed.",
+        'blanks': [
+            {'key': 'b1', 'options': ['utility', 'warranty', 'outcome', 'output'], 'correct': 0},
+            {'key': 'b2', 'options': ['utility', 'warranty', 'outcome', 'output'], 'correct': 1},
+        ],
+        'explanation': "Utility is what the service does (functionality); warranty is how well it does it (availability, capacity, security, continuity) — a service can have great utility but poor warranty, or vice versa.",
+    },
+    {
+        'id': 'ml-itil-2',
+        'cat': 'valueSystem',
+        'scenario': "Rather than trying to redesign the entire incident management process in one giant six-month project, the team ships a small improvement, gets feedback, and ships another — following the guiding principle {b1}. When rolling it out, they make sure to involve the service desk agents who'll actually use the new process daily — following {b2}.",
+        'blanks': [
+            {'key': 'b1', 'options': ['Progress iteratively with feedback', 'Collaborate and promote visibility', 'Keep it simple and practical', 'Optimize and automate'], 'correct': 0},
+            {'key': 'b2', 'options': ['Progress iteratively with feedback', 'Collaborate and promote visibility', 'Keep it simple and practical', 'Optimize and automate'], 'correct': 1},
+        ],
+        'explanation': "\"Progress iteratively with feedback\" favors small, feedback-driven steps over one big-bang rollout. \"Collaborate and promote visibility\" is specifically about involving the right stakeholders and being transparent about the work.",
+    },
+    {
+        'id': 'ml-itil-3',
+        'cat': 'dimensions',
+        'scenario': "When designing a new service, the organization must consider not just its own staff but also the vendors and outsourced providers it depends on — the {b1} dimension. It must also consider the software, hardware, and knowledge/information needed to deliver and support that service — the {b2} dimension.",
+        'blanks': [
+            {'key': 'b1', 'options': ['Organizations & People', 'Information & Technology', 'Partners & Suppliers', 'Value Streams & Processes'], 'correct': 2},
+            {'key': 'b2', 'options': ['Organizations & People', 'Information & Technology', 'Partners & Suppliers', 'Value Streams & Processes'], 'correct': 1},
+        ],
+        'explanation': "Partners & Suppliers covers relationships with other organizations involved in service design/delivery/support. Information & Technology covers the technologies and information/knowledge used.",
+    },
+]

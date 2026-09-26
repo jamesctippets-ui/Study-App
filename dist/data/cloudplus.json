@@ -1731,5 +1731,85 @@
         "Real scenarios often touch multiple domains at once (e.g., a control that is both security and HA) \u2014 answer based on what the question emphasizes."
       ]
     }
+  ],
+  "madlibs": [
+    {
+      "id": "ml-cloudplus-1",
+      "cat": "archDesign",
+      "scenario": "A database server is running out of CPU and memory under load, so the team upgrades it to a bigger instance size \u2014 this is {b1} scaling. A separate web tier instead handles increased load by adding more identical server instances behind a load balancer \u2014 this is {b2} scaling.",
+      "blanks": [
+        {
+          "key": "b1",
+          "options": [
+            "vertical",
+            "horizontal"
+          ],
+          "correct": 0
+        },
+        {
+          "key": "b2",
+          "options": [
+            "vertical",
+            "horizontal"
+          ],
+          "correct": 1
+        }
+      ],
+      "explanation": "Vertical scaling (scale up) means a bigger single instance; horizontal scaling (scale out) means more instances in parallel \u2014 horizontal generally scales further but needs a load balancer and often a stateless design."
+    },
+    {
+      "id": "ml-cloudplus-2",
+      "cat": "security",
+      "scenario": "Data sitting in a database file on disk is protected using encryption {b1}. That same data, while actively moving across the network between the app server and the database, is instead protected using encryption {b2}.",
+      "blanks": [
+        {
+          "key": "b1",
+          "options": [
+            "at rest",
+            "in transit",
+            "in use"
+          ],
+          "correct": 0
+        },
+        {
+          "key": "b2",
+          "options": [
+            "at rest",
+            "in transit",
+            "in use"
+          ],
+          "correct": 1
+        }
+      ],
+      "explanation": "At rest = stored data (disk, database files); in transit = data actively moving across a network (TLS); in use = data actively being processed in memory (a less commonly tested third state)."
+    },
+    {
+      "id": "ml-cloudplus-3",
+      "cat": "troubleshooting",
+      "scenario": "A tenant on a shared multi-tenant cloud host notices their VM's disk I/O performance randomly degrades even though their own workload hasn't changed \u2014 another tenant on the same physical hardware is consuming a disproportionate share of resources. This is called the {b1} problem, and one common mitigation is moving to {b2} hardware, which reserves the hardware exclusively for one tenant.",
+      "blanks": [
+        {
+          "key": "b1",
+          "options": [
+            "noisy neighbor",
+            "split-brain",
+            "orphaned resource",
+            "thundering herd"
+          ],
+          "correct": 0
+        },
+        {
+          "key": "b2",
+          "options": [
+            "dedicated",
+            "shared",
+            "burstable",
+            "spot"
+          ],
+          "correct": 0
+        }
+      ],
+      "explanation": "\"Noisy neighbor\" describes resource contention from other co-located tenants on shared infrastructure. Dedicated (single-tenant) hardware removes that contention entirely, at a higher cost."
+    }
   ]
 }

@@ -2387,6 +2387,109 @@ function CommandPracticeView({ session, index, score, categories, input, setInpu
   );
 }
 
+// Scenario Mad Libs (ROADMAP.md section 13): a short real-world scenario
+// paragraph with a few dropdown blanks, filled from a small set of term
+// choices — reinforces vocabulary in context instead of as an isolated
+// flashcard front/back. Scored all-or-nothing per scenario (every blank
+// right, or it counts as a miss) and feeds into results/mastery the same
+// way flashcards and questions do (see trackMastery/masteryByCategory) —
+// unlike Verbal Quiz and CLI practice, which are deliberately unscored.
+function MadLibsView({ session, index, score, categories, answers, onSetBlank, submitted, onSubmit, onNext, onRestart }) {
+  if (!session.length) {
+    return (
+      <div style={{ textAlign: 'center', color: COLOR.muted, fontSize: '13px', padding: '30px 10px' }}>
+        No Mad Libs scenarios match this filter.
+      </div>
+    );
+  }
+
+  const item = session[index];
+  if (!item) {
+    return (
+      <div style={{ textAlign: 'center', padding: '30px 10px' }}>
+        <div className="itil-display" style={{ fontSize: '16px', fontWeight: 600, marginBottom: '8px' }}>Set complete</div>
+        <div style={{ fontSize: '12.5px', color: COLOR.muted, marginBottom: '18px' }}>
+          {score.correct} / {score.total} scenario{score.total === 1 ? '' : 's'} fully correct.
+        </div>
+        <button onClick={onRestart} style={{ padding: '10px 20px', borderRadius: '12px', background: COLOR.primary, color: COLOR.onAccent, fontSize: '13px', fontWeight: 600 }}>
+          New set
+        </button>
+      </div>
+    );
+  }
+
+  const categoryLabel = categories.find((c) => c.key === item.cat)?.label;
+  const total = session.length;
+  const parts = item.scenario.split(/\{(\w+)\}/);
+  const blanksByKey = {};
+  item.blanks.forEach((b) => { blanksByKey[b.key] = b; });
+  const allAnswered = item.blanks.every((b) => answers[b.key] !== undefined && answers[b.key] !== null);
+  const anyWrong = submitted && item.blanks.some((b) => answers[b.key] !== b.correct);
+
+  return (
+    <div>
+      <div className="flex justify-between items-center mb-2" style={{ fontSize: '11px', color: COLOR.muted }}>
+        <span>{categoryLabel}</span>
+        <span>{index + 1} / {total}</span>
+      </div>
+      <div style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderRadius: '18px', padding: '20px' }}>
+        <div style={{ fontSize: '15.5px', lineHeight: 2 }}>
+          {parts.map((part, i) => {
+            if (i % 2 === 0) return <span key={i}>{part}</span>;
+            const blank = blanksByKey[part];
+            if (!blank) return null;
+            const selectedIdx = answers[part];
+            const isCorrectSel = submitted && selectedIdx === blank.correct;
+            return (
+              <select
+                key={i}
+                value={selectedIdx === undefined || selectedIdx === null ? '' : selectedIdx}
+                disabled={submitted}
+                onChange={(e) => onSetBlank(part, Number(e.target.value))}
+                style={{
+                  margin: '0 3px', padding: '4px 8px', borderRadius: '8px', fontSize: '14px', fontWeight: 600,
+                  border: `1.5px solid ${submitted ? (isCorrectSel ? COLOR.success : COLOR.red) : COLOR.primary}`,
+                  background: submitted ? (isCorrectSel ? 'rgba(52,211,153,0.15)' : 'rgba(181,87,74,0.15)') : 'rgba(167,139,250,0.14)',
+                  color: submitted ? (isCorrectSel ? COLOR.success : COLOR.red) : COLOR.primary,
+                }}
+              >
+                <option value="" disabled>— choose —</option>
+                {blank.options.map((opt, oi) => <option key={oi} value={oi}>{opt}</option>)}
+              </select>
+            );
+          })}
+        </div>
+        {submitted && (
+          <div style={{ marginTop: '16px', paddingTop: '14px', borderTop: `1px solid ${COLOR.border}` }}>
+            {anyWrong && (
+              <div style={{ fontSize: '12px', color: COLOR.muted, marginBottom: '8px' }}>
+                Correct answer{item.blanks.length > 1 ? 's' : ''}: {item.blanks.map((b) => b.options[b.correct]).join(', ')}
+              </div>
+            )}
+            <div style={{ fontSize: '12.5px', color: COLOR.muted, lineHeight: 1.5 }}>{item.explanation}</div>
+          </div>
+        )}
+      </div>
+      {!submitted ? (
+        <button
+          onClick={onSubmit}
+          disabled={!allAnswered}
+          style={{ width: '100%', marginTop: '14px', padding: '12px', borderRadius: '12px', background: allAnswered ? COLOR.primary : COLOR.border, color: COLOR.onAccent, fontSize: '14px', fontWeight: 600 }}
+        >
+          Check
+        </button>
+      ) : (
+        <button
+          onClick={onNext}
+          style={{ width: '100%', marginTop: '14px', padding: '12px', borderRadius: '12px', background: COLOR.primary, color: COLOR.onAccent, fontSize: '14px', fontWeight: 600 }}
+        >
+          {index + 1 >= total ? 'Finish' : 'Next'}
+        </button>
+      )}
+    </div>
+  );
+}
+
 function QuestionView({ q, selected, onChoose, onNext, index, total, categoryLabel, badgeLabel, msPending, onToggleMs, onSubmitMs, nextLabel, hideMeta, hideNext, flashcardsData }) {
   const [activeTermKey, setActiveTermKey] = useState(null);
   useEffect(() => { setActiveTermKey(null); }, [q && q.id]);
