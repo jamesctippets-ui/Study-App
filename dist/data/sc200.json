@@ -1329,6 +1329,243 @@
       "explanation": "Each signal in isolation could look like ordinary activity, so finding both together for the same account is meaningfully stronger evidence, and once Purview audit data and Entra ID sign-in logs are connected as data sources, both can be queried and correlated directly in Sentinel or Defender XDR advanced hunting. An external-forwarding inbox rule is actually a classic BEC indicator, not irrelevant, and no manual export to a third-party tool is required to correlate connected data sources."
     }
   ],
+  "lessons": [
+    {
+      "id": "sentinel-analytics-automation",
+      "title": "Sentinel Analytics, Automation & Tuning",
+      "summary": "Analytics rule types, automation rules vs. playbooks, ingestion pipelines, and the tuning tools that keep detections accurate.",
+      "diagram": null,
+      "vocabIds": [
+        "f3",
+        "f4",
+        "f5",
+        "f6",
+        "f11",
+        "f12",
+        "f13",
+        "f15",
+        "f39",
+        "f40"
+      ],
+      "quizIds": [
+        "q2",
+        "q3",
+        "q4",
+        "q5",
+        "q11",
+        "q12"
+      ],
+      "reading": "Microsoft Sentinel's detections start as analytics rules, and its analytics rule types split into three the exam expects you to tell apart cleanly. A scheduled analytics rule is the default: it runs a KQL query on a defined interval and lookback period, generating an incident whenever the query's results match. A near-real-time (NRT) rule trades that flexibility for speed, running roughly every minute instead, but only against a narrower, specifically supported set of tables -- you reach for NRT specifically when the extra latency of a scheduled rule genuinely matters, not as a default choice. Fusion sits apart from both: it is a machine-learning correlation engine that stitches multiple lower-fidelity anomalies from different sources into one higher-confidence incident automatically, with no analyst writing any KQL for it at all. Rather than authoring every one of these from scratch, an analyst typically installs a packaged solution from the content hub -- bundling data connectors, analytics rule templates, workbooks, hunting queries, and playbooks for a specific product or scenario -- but installing a solution only stages its rule templates for review; each one still has to be explicitly enabled, and usually tuned, before it starts generating a single incident.\n\nNone of that detection logic has anything to query against until data actually lands in the underlying Log Analytics workspace -- the Azure Monitor data store Sentinel is built on top of, and the thing every KQL query, scheduled or ad hoc, ultimately runs against. Sentinel data connectors are the mechanism that gets a log source into that workspace in the first place, whether it's a Microsoft service, a third-party product, or a fully custom source; an analytics rule or hunting query referencing a table with no matching connector enabled will simply return nothing, which is a common early troubleshooting dead end. Ingesting a genuinely custom log source defines a new table, automatically suffixed _CL, whose shape is controlled by a Data Collection Rule -- and a DCR's ingestion-time transformation can filter, parse, or reshape that incoming data before it's ever stored and billed, which is the only point in the pipeline that actually reduces both storage cost and the volume every later query has to scan; filtering later inside an analytics rule's own query still means the full, unfiltered data was ingested and paid for first.\n\nHandling what happens to an incident once it exists is split across two layers. An automation rule is the lightweight, no-code layer: it decides what happens when an incident or alert is created or updated -- assigning an owner, changing severity, adding a tag, closing it outright as a false positive, or invoking one or more playbooks. A playbook is the Logic App that actually does the work a rule might invoke, like calling an API, isolating a device, or posting to Teams -- built on the Microsoft Sentinel incident trigger so it can act on the whole correlated incident, since automation rules can only invoke incident-trigger playbooks, not ones built on the narrower alert trigger. When multiple automation rules are scoped to the same analytics rule, they run in a defined numeric order, lowest first, and an earlier rule can stop further rules from processing that incident entirely -- which is why a broad 'assign and notify' rule accidentally ordered ahead of a narrower 'auto-close known-benign pattern' rule wastes a notification and an assignment on an incident that was always going to close automatically anyway. Getting the detections themselves right relies on two further tuning knobs: entity mapping tells Sentinel which query columns represent entities like Account or Host, which is what actually drives whether two alerts about the same compromised account correlate into one incident at all, and alert grouping settings decide whether multiple alerts from one rule within a time window combine into a single incident or stay separate. When a specific, known-noisy source like a vulnerability scanner keeps generating a false positive, excluding that one entity directly inside the analytics rule query is the durable, source-scoped fix -- a world apart from suppressing an already-triggered incident, which is only a temporary, incident-scoped snooze.",
+      "fundamentalsLabel": "New to Sentinel automation and tuning? See the everyday analogy",
+      "fundamentals": "Think of an automation rule as the triage nurse who looks at every new incident and decides who it goes to, how urgent it is, and whether it's worth a doctor's actual involvement -- while a playbook is the specific treatment procedure a doctor actually follows once involved. Entity mapping is like a hospital's patient-matching system correctly recognizing that two separate charts both belong to the same patient, so their history gets combined into one case instead of being treated as two strangers. And excluding a noisy scanner from an analytics rule is like permanently noting in a patient's file that their unusual-but-harmless heart rhythm is just how their heart normally beats, instead of the nurse re-flagging it as an emergency every single visit.",
+      "keyTerms": [
+        "analytics rule types",
+        "near-real-time (NRT)",
+        "Fusion",
+        "content hub",
+        "Log Analytics workspace",
+        "Sentinel data connectors",
+        "Data Collection Rule",
+        "automation rule",
+        "playbook",
+        "entity mapping",
+        "alert grouping"
+      ],
+      "commonTraps": [
+        "Installing a content hub solution only stages its analytics rule templates -- it doesn't enable or tune them for you.",
+        "NRT rules trade query flexibility for speed and can only query a narrower, specifically supported set of tables, not every table a scheduled rule can reach.",
+        "Automation rules can only invoke incident-trigger playbooks, never ones built on the alert trigger.",
+        "Suppressing an incident is a temporary snooze; excluding a known-noisy entity inside the analytics rule query is the permanent, source-scoped fix."
+      ],
+      "scenario": "A SOC installs a Sentinel solution for a new firewall vendor from the content hub, expecting incidents to start flowing immediately, but nothing appears even though the connector shows data arriving -- because the solution's analytics rule templates were only staged, not enabled. Once enabled, one particular rule starts firing constant false positives from a known vulnerability scanner, so instead of repeatedly suppressing each new incident, the team edits the rule's query to permanently exclude that scanner's IP address. Separately, they configure an automation rule ordered ahead of a broader notify-everyone rule, so incidents matching a known-benign pattern auto-close first and never waste an analyst's notification at all -- and because the auto-close rule needs the full incident context to check every correlated alert at once, it's built on the incident trigger, not the narrower alert trigger."
+    },
+    {
+      "id": "xdr-copilot-threat-intel",
+      "title": "SOC Visibility: XDR, Copilot & Threat Intelligence",
+      "summary": "Defender XDR correlation and automation, Security Copilot, watchlists, UEBA, workbooks, and threat intelligence.",
+      "diagram": null,
+      "vocabIds": [
+        "f1",
+        "f2",
+        "f7",
+        "f8",
+        "f9",
+        "f10",
+        "f14",
+        "f16",
+        "f43",
+        "f45"
+      ],
+      "quizIds": [
+        "q1",
+        "q6",
+        "q7",
+        "q8",
+        "q9",
+        "q14"
+      ],
+      "reading": "Microsoft Defender XDR automatically correlates related alerts from Defender for Endpoint, Defender for Office 365, Defender for Identity, and Defender for Cloud Apps into a single incident, so an analyst investigates one correlated case in a unified incident queue instead of chasing separate alerts from each product individually -- all managed from the unified Microsoft Defender portal, alongside each product's own settings and, once onboarded, Sentinel itself. Automated investigation and response builds directly on that correlation: it investigates an alert using the same playbook a human analyst would follow, then either remediates the confirmed threat directly or produces a pending action in the Action Center for an analyst to approve, depending on the configured automation level -- 'Full' takes action with no waiting, while either 'Semi' level leaves some or all remediation pending review. Underneath all of Sentinel's own data sits the Advanced Security Information Model, which normalizes many different connectors' native schemas into a small set of common ones, so a single hunting query or analytics rule already written against a normalized field automatically picks up any new data source mapped to that same schema, with no rule rewritten needed per source.\n\nKnowing what's actually being detected, and what isn't, is its own discipline. Sentinel tags every analytics rule with the MITRE ATT&CK tactics and techniques it detects, and the MITRE ATT&CK coverage view visualizes which techniques currently have active rule coverage, which are covered only by a rule that's currently disabled, and which have no coverage at all -- a gap in coverage for a technique relevant to the organization's own threat model is exactly what should drive which content hub rule template gets enabled next, rather than enabling rules at random. Microsoft Security Copilot layers a generative-AI assistant on top of all of this, embedded directly in both Sentinel and Defender XDR: it can summarize an incident in plain language, draft or suggest a KQL query from a natural-language description, reverse-engineer a suspicious script, or draft an incident report -- all grounded in the organization's own connected data, though an analyst is still expected to review and validate its output before acting on it, the same as any other analyst-authored finding. Sentinel workbooks round out this visibility layer: interactive reports built from KQL, used to visualize trends like incident volume by severity, rule health, connector ingestion latency, or SOC metrics like mean time to triage -- for a human to read and act on, since a workbook never itself generates an incident or takes remediation action.\n\nTwo further capabilities enrich an investigation with context an analytics rule's own query wouldn't otherwise have. A watchlist is analyst-curated reference data -- a list of VIP users, terminated employees, or known-good IP ranges, imported from a CSV -- that a query joins against using the _GetWatchlist() function, capable of turning an otherwise routine sign-in event into a high-priority incident purely because of who the account belongs to. User and Entity Behavior Analytics instead builds its own behavioral baseline per user and entity automatically from connected data, surfacing an anomaly like access to a resource that user has never touched before as enrichment on an investigation, independent of whether any single analytics rule's static condition actually fired -- catching activity that looks individually unremarkable but is anomalous specifically for that one entity's own history. Threat intelligence indicators -- IPs, domains, file hashes, URLs ingested from Microsoft Defender Threat Intelligence, TAXII feeds, or the upload API -- land in the ThreatIntelligenceIndicator table, matched automatically by built-in TI-based analytics rule templates, but also directly joinable from a hunting query checking historical log data for any past match against a newly learned indicator, not only future activity going forward.",
+      "fundamentalsLabel": "New to SOC visibility tooling? See the everyday analogy",
+      "fundamentals": "The unified Defender portal correlating alerts into one incident is like a hospital's single patient chart pulling together notes from radiology, the lab, and the pharmacy instead of three separate, disconnected folders nobody cross-references. The MITRE ATT&CK coverage view is like a building inspector's checklist showing exactly which fire code items have been verified, which were checked once but the sprinkler's since been shut off, and which were never inspected at all -- telling you exactly where to look next instead of re-inspecting everything at random. UEBA is the security guard who's worked the same building for years and notices instantly that today someone from accounting swiped into the server room for the first time ever, even though nothing about that badge swipe would look unusual to a guard who'd only just started.",
+      "keyTerms": [
+        "unified incident queue",
+        "Automated investigation and response",
+        "Microsoft Defender portal",
+        "Advanced Security Information Model",
+        "MITRE ATT&CK coverage",
+        "Microsoft Security Copilot",
+        "Sentinel workbooks",
+        "watchlist",
+        "User and Entity Behavior Analytics",
+        "Threat intelligence indicators"
+      ],
+      "commonTraps": [
+        "Installing AIR doesn't mean 'no analyst needed' -- only the Full automation level remediates without an approval step; either Semi level still leaves actions pending.",
+        "The MITRE ATT&CK coverage view distinguishes a technique with no rule at all from one covered only by a currently disabled rule -- treating both as 'no coverage' misses the disabled-rule case.",
+        "Security Copilot output still needs analyst review before acting on it -- being grounded in connected data isn't the same as being verified.",
+        "A workbook only visualizes a trend for a human to read; it never itself generates an incident or takes remediation action."
+      ],
+      "scenario": "A SOC lead reviews the MITRE ATT&CK coverage view and finds a technique relevant to their threat model shows as covered, but only by a rule an analyst disabled months ago during a noisy period -- a very different finding from 'no coverage at all,' and exactly what tells them which template to re-enable and re-tune next rather than installing something new. During triage, an analyst asks Security Copilot to draft a KQL query summarizing a suspicious pattern in plain language, then reviews and adjusts that draft before running it, rather than trusting it blind. Meanwhile, UEBA flags an account touching a file share it's never accessed before, even though no analytics rule's static condition matched that specific access -- enrichment the analyst pulls directly into the incident from the unified incident queue in the Microsoft Defender portal, alongside a watchlist join confirming the account also happens to belong to a recently terminated employee."
+    },
+    {
+      "id": "endpoint-identity-response",
+      "title": "Endpoint & Identity Incident Response",
+      "summary": "Isolating and investigating compromised devices, blocking known-bad indicators, and identity-based detections.",
+      "diagram": null,
+      "vocabIds": [
+        "f17",
+        "f18",
+        "f19",
+        "f20",
+        "f23",
+        "f24",
+        "f27"
+      ],
+      "quizIds": [
+        "q15",
+        "q16",
+        "q18",
+        "q21",
+        "q22",
+        "q25"
+      ],
+      "reading": "When Defender for Endpoint flags a compromised device, the first response decision is usually how completely to cut it off. Device isolation disconnects it from the network while keeping it connected to Defender for Endpoint itself, so an analyst can keep investigating and running response actions on it even though it can no longer reach other systems or exfiltrate anything. Full isolation blocks nearly all communication except to the Defender for Endpoint service itself; selective isolation instead carves out an exception for specific configured processes, useful when a business-critical service on that same host genuinely can't be cut off entirely. Once isolated, live response gives an analyst a remote, real-time command-line session on that specific device -- to run scripts, collect forensic artifacts, view and kill processes, or delete files directly -- without waiting on a scheduled scan or a full automated investigation to finish first. Any remediation action taken, whether by automated investigation or an analyst directly, shows up in the unified Action Center as either pending (awaiting explicit approval or rejection) or completed (and, where supported, reversible); approving a pending action from automated investigation lets that remediation proceed exactly as determined, while rejecting it stops only that specific action, leaving anything else already done untouched.\n\nBeyond acting on one flagged device at a time, an administrator can pre-emptively block a known-bad artifact tenant-wide by adding a custom indicator of compromise -- a file hash, IP address, URL/domain, or certificate -- with an action of allow, audit, warn, or block and remediate, so a single confirmed-malicious file hash stops running across every onboarded device the moment it's seen, a faster and broader response than isolating devices one at a time as each detection trickles in. For the fastest-moving, highest-confidence attacks -- the kind a human analyst realistically can't triage in time -- automatic attack disruption correlates high-confidence signals across Defender XDR products and contains the attack itself, such as disabling a compromised account or containing a compromised device, at machine speed, deliberately reserved for patterns like human-operated ransomware where every extra minute of manual triage is minutes an attacker gets to spread further.\n\nDefender for Identity contributes two distinctly different kinds of identity-focused signal. A lateral movement path is a proactive, exposure-focused finding: the chain of computers and accounts an attacker could hop through -- often via cached credentials -- to eventually reach a sensitive or highly privileged account, surfaced before any actual attack has happened at all, telling a responder which low-privilege compromise would be most dangerous to leave unaddressed given what it could ultimately reach. A honeytoken account is the opposite kind of signal entirely: a decoy account deliberately left unused in normal operations, configured so that essentially any authentication attempt against it -- since no legitimate user or service has any reason to ever touch it -- can be treated as a high-confidence true positive of malicious reconnaissance or credential-stuffing activity, unlike an alert on a real account, which always carries some chance of a legitimate explanation.",
+      "fundamentalsLabel": "New to endpoint and identity response? See the everyday analogy",
+      "fundamentals": "Full isolation is like locking every door of a building except the one the fire department uses to keep checking on it; selective isolation is the same lockdown but with a single phone line to a monitored, essential piece of equipment left open on purpose. Live response is the fire department actually walking through that locked building in person, moving things and checking rooms directly, rather than waiting for the automated sprinkler system to finish doing its own thing. A lateral movement path is like a security consultant mapping out, ahead of any actual break-in, exactly which unlocked side door would eventually let someone reach the safe -- useful information whether or not anyone ever tries. And a honeytoken account is a decoy wallet left in plain sight specifically to see who tries to pick it up, since nobody with a legitimate reason to be there would ever touch it in the first place.",
+      "keyTerms": [
+        "Device isolation",
+        "Selective isolation",
+        "live response",
+        "Action Center",
+        "custom indicator of compromise",
+        "automatic attack disruption",
+        "lateral movement path",
+        "honeytoken account"
+      ],
+      "commonTraps": [
+        "Full isolation cuts off the business-critical process too -- selective isolation is what carves out an exception for it.",
+        "Approving a pending action lets that one remediation proceed; rejecting it doesn't undo any other action already taken on the same investigation.",
+        "A lateral movement path is a proactive exposure finding, not proof an attack is already underway.",
+        "Attack disruption is reserved for very high-confidence, fast-moving patterns -- it isn't triggered on every alert regardless of confidence."
+      ],
+      "scenario": "An analyst confirms a laptop is compromised, but its backup agent -- a business-critical process -- must keep syncing, so they apply selective isolation rather than full isolation, then open a live response session to pull the malicious script off the device directly and kill its process without waiting for an automated investigation to finish on its own. Once they confirm the file's hash is genuinely malicious, they add it as a custom indicator set to block and remediate, stopping it from ever running again on any other onboarded device tenant-wide rather than waiting to isolate each affected machine one at a time. Separately, Defender for Identity flags a lateral movement path showing that same laptop's cached credentials could eventually reach a Domain Admin account -- a standing exposure worth fixing regardless of this specific incident -- while, unrelated, a sign-in attempt against a honeytoken account elsewhere in the tenant is treated as an immediate, high-confidence true positive with no further corroboration needed."
+    },
+    {
+      "id": "email-cloudapps-incident-mgmt",
+      "title": "Email, Cloud App Defense & Incident Management",
+      "summary": "Investigating phishing and OAuth risk, enforcing in-session cloud app controls, and running Sentinel incidents through to closure.",
+      "diagram": null,
+      "vocabIds": [
+        "f21",
+        "f22",
+        "f25",
+        "f26",
+        "f28",
+        "f29",
+        "f30",
+        "f42",
+        "f44",
+        "f46"
+      ],
+      "quizIds": [
+        "q19",
+        "q20",
+        "q23",
+        "q24",
+        "q26",
+        "msq11"
+      ],
+      "reading": "When a phishing or malware campaign is confirmed after messages have already reached mailboxes, Defender for Office 365's Threat Explorer lets an analyst search and filter email, URL, and file events across the whole tenant -- by sender, recipient, subject, malware family, or delivery action -- to scope exactly how far the campaign actually spread before remediating anything, and remediation can be launched straight from those search results rather than acting mailbox by mailbox. Some of that remediation happens automatically without any analyst involved at all: zero-hour auto purge retroactively detects and neutralizes a message that already reached a mailbox and looked clean at delivery time, moving it to Junk Email or Quarantine once updated detection signatures reclassify it as malicious after the fact -- without ZAP, that already-delivered message would simply sit untouched in the inbox indefinitely, however long it takes signatures to catch up.\n\nDefender for Cloud Apps extends real-time enforcement into an already-authenticated session. Conditional Access App Control routes that session through Defender for Cloud Apps as a reverse proxy, letting a session policy enforce controls like blocking a download, applying a label, or requiring step-up authentication on what a user does after they're already signed in -- distinct from an access policy, which only decides whether the session is allowed to start in the first place and has nothing more to say once it has. Built-in anomaly detection policies -- impossible travel, activity from an infrequent country, mass download, ransomware activity, and more -- run automatically the moment an app is connected, establishing their own per-user behavioral baseline with no analyst having to author custom detection logic first, conceptually similar to UEBA's own baseline but specific to Defender for Cloud Apps's own connected SaaS activity.\n\nSentinel incident management has its own structure for working a case through to closure: it moves through statuses -- New, Active, Closed -- carries an editable severity and owner, and, when closed, an accurate classification reason like True Positive or a specific False Positive variant, which is what actually feeds back into deciding which analytics rule or threshold needs adjusting, not just a formality for closing the case. That severity is a separate signal from an entity risk score -- a UEBA-driven measure of how anomalous a specific user or device's behavior has been over time -- so a High-severity incident can easily involve a normally low-risk user, and the reverse just as easily. False-positive triage means recognizing when a recurring incident is a genuine false positive from something like an approved automation account, and the durable fix is tuning the underlying detection itself -- excluding that entity in the query, or adjusting the source product's own threshold -- rather than manually closing each new occurrence by hand, which does nothing to reduce the pattern going forward. Incident tasks attach a checklist of investigation or containment steps directly to the incident record itself, either added manually or auto-populated from a template, so every analyst follows the same triage steps regardless of who picks it up, and the investigation graph gives a visual, interactive map of an incident's related entities to pivot outward from one alert and see the real blast radius instead of reading a flat list of raw events -- a bookmark created during a separate hunt can be pulled directly into that same graph. None of this triage duplicates effort across portals either: an incident correlated in Defender XDR that includes a Sentinel-connected source syncs bidirectionally, so status, severity, and comment changes made in either portal show up in the other moments later, rather than existing as two disconnected records.",
+      "fundamentalsLabel": "New to email, cloud app, and incident workflows? See the everyday analogy",
+      "fundamentals": "Threat Explorer is like a mail-room supervisor pulling every piece of mail matching a suspicious return address, no matter which department it was delivered to, before deciding what to do about any of it -- versus checking with each department one at a time. ZAP is the mail-room noticing after the fact that a package already delivered to someone's desk was mislabeled as safe, and quietly retrieving it once they learn otherwise. A session policy is a security guard who lets you into the building (that decision's already made) but still stops you from walking out the door with something you shouldn't -- a different job entirely from the guard checking IDs at the front entrance. And a false positive from an approved automation account is like a smoke detector that goes off every time the same toaster is used -- the fix isn't unplugging the fire alarm every single morning, it's telling the alarm to specifically ignore that one toaster.",
+      "keyTerms": [
+        "Threat Explorer",
+        "Zero-hour auto purge",
+        "session policy",
+        "Conditional Access App Control",
+        "anomaly detection policies",
+        "Sentinel incident management",
+        "entity risk score",
+        "False-positive triage",
+        "Incident tasks",
+        "investigation graph"
+      ],
+      "commonTraps": [
+        "An access policy only decides whether a session is allowed to start -- a session policy is what enforces controls like blocking a download after it's already begun.",
+        "ZAP acts on a message that already looked clean at delivery and was already delivered -- it isn't a pre-delivery scanning control.",
+        "Manually closing each new false-positive incident does nothing to stop it recurring -- only tuning the underlying detection (excluding the entity, adjusting a threshold) actually fixes it.",
+        "Incident severity and an entity's risk score are two separate signals -- a high-severity incident can still involve a normally low-risk user."
+      ],
+      "scenario": "During a suspected business email compromise, an analyst finds a newly created inbox rule silently forwarding messages containing 'invoice' to an external address, and a separate, unusual sign-in location for the same account around the same time -- together, since either alone could plausibly be dismissed as routine, the combination is what actually supports a BEC finding, correlated directly from Entra ID sign-in logs and Purview audit data connected into the same hunting environment. Using Threat Explorer, the analyst also confirms three other mailboxes received a similar phishing message and remediates all three directly from the search results, while ZAP has already quietly quarantined a fourth copy that was reclassified as malicious hours after its original clean-looking delivery. They close the case as a genuine True Positive with an accurate classification reason, attach the investigation graph showing every related entity, and separately configure a Conditional Access App Control session policy blocking downloads from that same account's sanctioned cloud app sessions until the investigation fully concludes."
+    },
+    {
+      "id": "kql-threat-hunting",
+      "title": "Threat Hunting with KQL",
+      "summary": "Writing and reusing KQL for proactive hunting, joins, cross-product correlation, and promoting a hunt into a real detection.",
+      "diagram": null,
+      "vocabIds": [
+        "f31",
+        "f32",
+        "f33",
+        "f34",
+        "f35",
+        "f36",
+        "f37",
+        "f38",
+        "f41"
+      ],
+      "quizIds": [
+        "q27",
+        "q28",
+        "q29",
+        "q30",
+        "q31",
+        "q32"
+      ],
+      "reading": "Every KQL query pipeline follows the same shape: start from a table, then pipe left to right through operators that each narrow or reshape the result of the one before -- where to filter rows, project or extend to shape columns, summarize to aggregate. Operator order isn't just style; it's performance, since filtering early with where before an expensive summarize or join means every later operator processes far less data than if the filter came last. Joining two tables together also demands picking the right join type for the actual question being asked: an inner join returns only rows with a matching key present on both sides, useful when correlating two sources where only confirmed matches matter, while a leftouter join instead keeps every row from the left table and fills in nulls where no match exists on the right -- exactly the tool for a negative question like 'which watchlisted accounts had zero sign-ins in the last 7 days,' since an inner join would simply drop every one of those non-matching accounts from the result instead of surfacing them.\n\nReusability matters as much as correctness in a hunting workflow. A let statement assigns a scalar value, a list, or an entire tabular query to a named variable within a query, and saving that as a reusable KQL function lets the exact same logic -- a list of suspicious process names, say -- be called by name across many different hunting queries instead of being retyped, and potentially mistyped, in each one separately. A hunting query itself is something an analyst runs manually, or on a schedule as a hunting rule, to proactively search for evidence of a threat that hasn't triggered any alert yet -- which is a fundamentally different job from an analytics rule, which runs automatically and creates an incident the moment its query condition matches; a hunting query that keeps turning up a genuine finding is exactly the kind of candidate worth promoting into a scheduled analytics rule, so the same pattern gets caught automatically going forward instead of depending on an analyst re-running it by hand. Along the way, a bookmark saves a specific set of interesting results -- the original query plus any analyst notes -- so that evidence can be revisited, shared, or added directly into a new or existing incident's investigation later, while livestream runs a query interactively and surfaces new matches in near real time during an active session, a temporary, session-based watch rather than anything saved or recurring.\n\nA hunt rarely stays confined to one product's own data. Defender XDR's advanced hunting exposes a shared M365D schema across products -- DeviceProcessEvents and DeviceNetworkEvents from Defender for Endpoint, EmailEvents from Defender for Office 365, IdentityLogonEvents from Defender for Identity, CloudAppEvents from Defender for Cloud Apps -- letting a single query join, say, DeviceProcessEvents to EmailEvents on a shared device or user identifier to trace a suspicious process directly back to the phishing email that likely delivered it, without switching between separate per-product consoles. Once Microsoft Entra ID sign-in and audit logs and Microsoft Purview audit data are connected as sources too, the same kind of query can correlate an endpoint or email finding with an identity sign-in pattern or a sensitive data-access event. Reasoning about how far any given intrusion has actually progressed, and what to hunt for at each stage, is where the cyber kill chain comes in: a model of an attack's sequential stages -- reconnaissance, initial access, execution, persistence, lateral movement, and exfiltration/impact -- that roughly maps onto the same progression Sentinel's MITRE ATT&CK coverage tags each analytics rule against, giving every hunt a sense of which stage it's actually looking for evidence of.",
+      "fundamentalsLabel": "New to KQL and threat hunting? See the everyday analogy",
+      "fundamentals": "A KQL pipeline is like an assembly line where each station only ever narrows or reshapes what the previous station handed it -- putting the quality-control station (where) as early as possible means every later station handles far fewer parts. An inner join is asking 'who showed up to both meetings' -- anyone who only made one meeting simply isn't in the answer -- while a leftouter join is asking 'who was invited to meeting A, and did they also show up to meeting B,' which is the only version of the question that can actually surface someone who was invited but never came. And promoting a hunting query into a scheduled analytics rule is like turning a detective's personal hunch, confirmed right three weeks running, into standing department policy that gets checked automatically from now on, instead of relying on that one detective to keep remembering to ask the same question by hand.",
+      "keyTerms": [
+        "KQL query pipeline",
+        "inner join",
+        "leftouter join",
+        "let statement",
+        "reusable KQL function",
+        "hunting query",
+        "Bookmarks",
+        "livestream",
+        "advanced hunting",
+        "cyber kill chain"
+      ],
+      "commonTraps": [
+        "An inner join drops exactly the non-matching rows a 'which accounts had zero activity' question needs -- leftouter is what keeps them, filled with nulls.",
+        "Filtering with where after an expensive summarize or join is too late -- put where as early in the pipeline as possible.",
+        "Livestream is a temporary, session-based watch, not a saved or recurring detection the way a scheduled analytics rule is.",
+        "A hunting query and an analytics rule aren't the same tool -- hunting is manual/proactive search; an analytics rule runs automatically and creates incidents on its own."
+      ],
+      "scenario": "An analyst defines a reusable list of suspicious process names once as a let statement saved as a function, so every hunting query going forward references it by name instead of retyping (and risking mistyping) the same list each time. Running a leftouter join between a VIP watchlist and SigninLogs, they find two accounts with zero sign-ins in the last seven days -- a result an inner join would have silently dropped. After the same underlying pattern turns up a genuine finding three weeks running, they promote it into a scheduled analytics rule so it fires automatically from now on, and along the way use livestream once to watch a related pattern unfold in real time during an active investigation, bookmarking the clearest evidence directly into the case. Because the hunt spans a phishing email and a suspicious process launch on the recipient's device, the query joins EmailEvents to DeviceProcessEvents directly in Defender XDR's shared advanced hunting schema -- reasoning, per the cyber kill chain, that this represents initial access via phishing followed immediately by execution on the endpoint."
+    }
+  ],
   "cheatSheet": [
     {
       "heading": "Exam-day strategy",
