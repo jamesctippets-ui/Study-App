@@ -454,10 +454,10 @@
       "type": "mc",
       "question": "An application automatically adds server instances at 9 AM on weekdays and removes them at 6 PM, based on a fixed calendar schedule rather than real-time load. Which best describes this behavior?",
       "options": [
-        "Vertical scaling",
+        "Vertical scaling, since existing servers were resized rather than any new ones added",
         "Scheduled scaling, a form of scalability but not elasticity",
         "Elasticity, since it happens without manual intervention",
-        "Fault tolerance"
+        "Fault tolerance, since the system keeps running without any interruption during the schedule change"
       ],
       "correct": 1,
       "explanation": "This is automatic, but it's reacting to a fixed schedule, not real-time demand \u2014 elasticity specifically means scaling dynamically in response to actual, current load. It's also adding whole instances (horizontal), not resizing an existing one (vertical), and has nothing to do with tolerating failures."
@@ -692,10 +692,10 @@
       "type": "mc",
       "question": "A team defines their entire network, VM, and storage configuration in version-controlled template files, and deploys new environments by running those templates rather than clicking through a console. What does this most directly guarantee that manual configuration does not?",
       "options": [
-        "That the deployed environment will never need to be patched",
-        "That the environment is protected against a full regional outage",
+        "That the deployed environment requires substantially less patching effort than one configured by hand",
+        "That the environment is automatically protected against a full regional outage, regardless of how it's architected",
         "That the same template produces the same, auditable result every time it's deployed",
-        "That the environment will automatically scale based on demand"
+        "That the environment will automatically scale up or down to match real-time demand"
       ],
       "correct": 2,
       "explanation": "Infrastructure as Code's core guarantee is repeatable, auditable deployments \u2014 the same input produces the same result, and the exact configuration is always readable from the template. It says nothing about patching, autoscaling, or regional redundancy, which are separate concerns configured independently."
@@ -776,9 +776,9 @@
       "type": "mc",
       "question": "Following the standard troubleshooting methodology, an administrator has identified the problem and formed a theory that a specific firewall rule is blocking traffic. What is the correct next step, before touching any configuration?",
       "options": [
-        "Document the incident as resolved",
-        "Implement a fix by removing the suspected rule immediately",
-        "Escalate to a change advisory board without further investigation",
+        "Document the incident as resolved, since the theory already explains the observed symptoms",
+        "Implement a fix by removing the suspected firewall rule immediately, before confirming anything further",
+        "Escalate to a change advisory board for approval to test the theory, without doing any hands-on verification first",
         "Test the theory to confirm the firewall rule is actually the cause"
       ],
       "correct": 3,
@@ -1093,9 +1093,9 @@
       "question": "Several VMs on the same virtualization host show consistently high \"CPU ready\" time in monitoring, even though each VM's own CPU utilization looks moderate. What does this metric specifically indicate?",
       "options": [
         "The host's physical CPUs are oversubscribed, so VMs are waiting in queue for CPU time to actually be scheduled",
-        "The VMs' guest operating systems have a memory leak",
-        "The host's storage array is the bottleneck, not the CPU",
-        "The VMs' NICs are misconfigured for the wrong VLAN"
+        "The VMs' guest operating systems all independently developed a memory leak around the same time",
+        "The host's storage array is running out of IOPS headroom, and the CPU metric is a red herring",
+        "The VMs' NICs are misconfigured for the wrong VLAN, causing retransmissions that look like CPU load"
       ],
       "correct": 0,
       "explanation": "CPU ready time measures how long a vCPU is ready to run but waiting for the physical scheduler to actually give it time \u2014 high ready time across multiple VMs on one host is the signature of CPU oversubscription/contention, not a guest memory leak, a storage bottleneck, or a VLAN misconfiguration, none of which this metric reflects."
@@ -1159,10 +1159,10 @@
       "type": "mc",
       "question": "Before rolling a critical security patch out to production servers, an operations team first applies it to a staging environment that mirrors production, verifies nothing breaks, and only then schedules the production rollout during an approved maintenance window. What practice does this reflect?",
       "options": [
-        "Following a formal change management process",
-        "Chargeback",
-        "Orphaned resource cleanup",
-        "Thin provisioning"
+        "Following a formal change management process, validating the change in staging before scheduling it into production",
+        "Chargeback, since the cost of the patch rollout is being billed to the requesting department",
+        "Orphaned resource cleanup, since the staging environment is being decommissioned afterward",
+        "Thin provisioning, since the staging environment reuses overallocated storage capacity"
       ],
       "correct": 0,
       "explanation": "Testing a change in a representative environment first and deploying it to production only through an approved, scheduled window is the core of change management, reducing the risk of an untested change causing an outage. It has nothing to do with cost allocation (chargeback), unused resources, or how storage is provisioned."
@@ -1227,9 +1227,9 @@
       "question": "Compared to a traditional virtual machine, what is the main architectural difference that lets a container start in milliseconds and run with a much smaller footprint?",
       "options": [
         "A container shares the host operating system's kernel instead of including its own full guest OS",
-        "A container always runs on dedicated physical hardware with no virtualization layer at all",
-        "A container replicates the hypervisor for each instance",
-        "A container requires a full guest OS but no application dependencies"
+        "A container typically runs alongside a lightweight virtualization layer that adds negligible overhead compared to a full hypervisor",
+        "A container replicates the hypervisor for each instance, providing the same isolation guarantees as a VM",
+        "A container packages a full guest OS but strips out unnecessary application dependencies to save space"
       ],
       "correct": 0,
       "explanation": "Containers package an application and its dependencies but share the host's kernel, avoiding the overhead of booting a full guest OS \u2014 that's why they start so much faster and use less memory/disk than a VM, which bundles a complete separate operating system per instance. The other options misdescribe both containers and how virtualization/hypervisors actually work."
@@ -1297,9 +1297,9 @@
       "question": "A development team ships new code to production behind a configuration switch that starts turned off, then enables that switch for users later, independent of any new code deployment. What does this practice let the team decouple?",
       "options": [
         "Deployment (getting new code into production) from release (actually exposing it to users)",
-        "Encryption at rest from encryption in transit",
-        "A full backup from a differential backup",
-        "Vertical scaling from horizontal scaling"
+        "Encryption at rest from encryption in transit, since the new code changes how data is protected in production",
+        "A full backup from a differential backup, since the deployment schedule determines when each runs in production",
+        "Vertical scaling from horizontal scaling, since enabling the switch for users changes how many instances are needed"
       ],
       "correct": 0,
       "explanation": "This describes feature flags (feature toggles): the code is deployed to production while hidden behind a switch, and enabling it for users later is a separate action entirely -- decoupling when code ships from when it is actually exposed. The other pairings (backup types, scaling types, encryption types) describe entirely unrelated concepts that this scenario has nothing to do with."
@@ -1324,10 +1324,10 @@
       "type": "mc",
       "question": "An application repeatedly calling a cloud provider's API begins receiving HTTP 429 responses, and the calls otherwise appear correctly formed with valid credentials. What does this response code most likely indicate?",
       "options": [
-        "The requested resource does not exist",
+        "The requested resource does not exist at the endpoint being called",
         "The API is rate-limiting or throttling the client for sending too many requests",
-        "The client's credentials have expired",
-        "The API server has crashed"
+        "The client's credentials have expired and are no longer being accepted",
+        "The API server has crashed and is no longer processing any requests"
       ],
       "correct": 1,
       "explanation": "HTTP 429 (\"Too Many Requests\") is the standard response code for rate limiting or throttling, telling the client it's exceeding an allowed request rate -- not that anything is wrong with the request's formatting or credentials. A missing resource would return 404, expired credentials would typically return 401, and a crashed server would fail to respond at all rather than returning a well-formed 429."
@@ -1381,6 +1381,140 @@
         2
       ],
       "explanation": "Elevated disk queue length/I/O wait and latency spiking above baseline are direct, storage-specific performance indicators that point at the storage subsystem itself. Steady CPU utilization actually argues against CPU being the bottleneck rather than confirming a storage issue, and DNS query volume has no bearing on storage performance at all."
+    },
+    {
+      "id": "q67",
+      "cat": "archDesign",
+      "type": "mc",
+      "question": "In cloud computing, what does \"multitenancy\" refer to?",
+      "options": [
+        "Multiple independent customers sharing the same underlying physical infrastructure, logically isolated from one another",
+        "A single customer running several separate on-premises data centers",
+        "A cloud provider physically dedicating a separate server to each individual customer",
+        "A backup strategy that stores copies of data across multiple geographic regions"
+      ],
+      "correct": 0,
+      "explanation": "Multitenancy is the shared-infrastructure model underlying public cloud economics: many customers' workloads run on the same physical hardware, kept logically isolated from each other rather than each getting dedicated hardware. Dedicating a separate physical server per customer is the opposite (single-tenant) model, and neither a single customer's own multiple data centers nor a multi-region backup strategy describes shared infrastructure between different customers."
+    },
+    {
+      "id": "q68",
+      "cat": "archDesign",
+      "type": "mc",
+      "question": "A team wants to scale a web tier horizontally to absorb traffic spikes, but each user's session data currently lives only in the local memory of whichever server first handled their login. Before adding more servers will actually help spread that load, what has to change first?",
+      "options": [
+        "Session state must be externalized to a shared store (or handled via sticky sessions) so any server can serve any request",
+        "The servers must first be vertically scaled to a larger instance size",
+        "The load balancer must be removed so each user connects directly to one specific server",
+        "The application must be converted from PaaS to IaaS before it can be scaled further"
+      ],
+      "correct": 0,
+      "explanation": "Adding more servers behind a load balancer doesn't help if a returning user's session data only exists on the one server that first handled them -- new servers just sit idle for that user's traffic unless sessions are moved to a shared external store (or sticky sessions pin each user consistently back to their original server). Resizing the existing servers is vertical scaling, a different axis entirely; removing the load balancer would break routing rather than fix session locality; and the service model (PaaS vs. IaaS) has no bearing on this specific session-affinity problem."
+    },
+    {
+      "id": "q69",
+      "cat": "security",
+      "type": "mc",
+      "question": "What does the principle of least privilege mean when assigning permissions to a user or service account?",
+      "options": [
+        "Granting only the minimum access necessary to perform the required task, and nothing more",
+        "Granting the broadest access available up front so the account never needs a future permission change",
+        "Granting access based solely on how long the account has existed",
+        "Granting the same access to every account in the organization, for consistency"
+      ],
+      "correct": 0,
+      "explanation": "Least privilege means scoping an account's permissions to exactly what its task requires, minimizing what a compromised account or a mistake could reach. Granting broad access to avoid future requests, basing access on account tenure, or giving every account identical access all work against that goal instead of implementing it."
+    },
+    {
+      "id": "q70",
+      "cat": "security",
+      "type": "mc",
+      "question": "During a TLS handshake, the client and server first use a slower asymmetric key exchange to safely agree on a shared secret, then switch to a much faster algorithm to actually encrypt the bulk of the session's data. Which type of encryption handles that second, bulk-encryption part?",
+      "options": [
+        "Symmetric encryption, since both sides now hold a common shared secret key",
+        "Asymmetric encryption, continued for the rest of the session for stronger security",
+        "Hashing, since the data no longer needs to be reversible at that point",
+        "Tokenization, since the original data is being substituted with a vault reference"
+      ],
+      "correct": 0,
+      "explanation": "Once the handshake establishes a shared secret, TLS switches to symmetric encryption for the actual session data because it's dramatically faster than asymmetric operations at scale -- asymmetric encryption is reserved for the initial key exchange, not sustained bulk encryption. Hashing produces a non-reversible digest rather than encrypting data for later retrieval, and tokenization substitutes values via an external vault lookup, which isn't how TLS protects data in transit at all."
+    },
+    {
+      "id": "q71",
+      "cat": "security",
+      "type": "mc",
+      "question": "A security team deploys one tool that passively monitors network traffic and raises an alert when it recognizes a known attack signature, without blocking anything itself. A separate platform then ingests those alerts alongside logs from many other systems, correlating related events into a single case for an analyst to review. Which two tools are being described, in that order?",
+      "options": [
+        "An IDS, then a SIEM",
+        "An IPS, then a SIEM",
+        "A SIEM, then an IDS",
+        "A WAF, then an IPS"
+      ],
+      "correct": 0,
+      "explanation": "Passively monitoring and alerting without blocking is the defining trait of an IDS, and correlating alerts alongside logs from many other systems into one case is exactly what a SIEM does. An IPS would sit inline and actively block matching traffic rather than just alert, reversing the order would have logs correlated before any alert existed to correlate, and a WAF/IPS pairing describes two different inline-blocking tools rather than a passive detector feeding a correlation platform."
+    },
+    {
+      "id": "q72",
+      "cat": "deployment",
+      "type": "mc",
+      "question": "A team never patches a running server directly. Instead, any change -- even a minor one -- requires building a brand-new server image with the change baked in and replacing the old running instance entirely. What principle is this following?",
+      "options": [
+        "Immutable infrastructure",
+        "Blue-green deployment, applied to a single server instead of a full environment",
+        "Thin provisioning",
+        "A rolling deployment that patches each instance in place"
+      ],
+      "correct": 0,
+      "explanation": "Immutable infrastructure means a running instance is never modified after deployment -- any change is rolled out as a brand-new replacement image instead, which is exactly what's described here. Blue-green deployment is about cutting traffic over between two full environments rather than a single-server replacement policy, thin provisioning is a storage allocation technique unrelated to patching approach, and a rolling deployment that patches in place is the direct opposite of never modifying a running instance."
+    },
+    {
+      "id": "q73",
+      "cat": "opsSupport",
+      "type": "mc",
+      "question": "After setting a CPU utilization alert threshold based on a solid baseline, the on-call team still gets paged dozens of times a day for brief, harmless spikes that self-resolve within seconds. What adjustment most directly addresses this without raising the threshold so high that a real, sustained problem would go unnoticed?",
+      "options": [
+        "Add a duration (sustained-breach) condition, so the alert only fires once the threshold is exceeded continuously for a defined period",
+        "Delete the alert entirely so the team stops getting paged",
+        "Lower the threshold further so spikes are caught even earlier",
+        "Route every alert to a shared inbox that nobody actively monitors"
+      ],
+      "correct": 0,
+      "explanation": "A duration or sustained-breach condition is the standard fix for alert fatigue from brief, self-resolving spikes -- it only pages when the threshold stays breached for a meaningful window, while still catching a genuinely sustained problem. Deleting the alert loses real visibility, lowering the threshold further would only page the team more often, and routing alerts to an unmonitored inbox just hides the noise instead of fixing the detection logic."
+    },
+    {
+      "id": "q74",
+      "cat": "opsSupport",
+      "type": "mc",
+      "question": "What is the primary purpose of a CMDB (Configuration Management Database)?",
+      "options": [
+        "To maintain an authoritative inventory of IT assets and the relationships and attributes between them",
+        "To store customers' billing and payment information",
+        "To run automated remediation scripts against misconfigured resources",
+        "To encrypt data at rest across the environment"
+      ],
+      "correct": 0,
+      "explanation": "A CMDB's job is tracking configuration items -- servers, applications, dependencies -- and how they relate to each other, giving operations and change management an authoritative source of truth about what exists and how it connects. It doesn't handle billing, run remediation itself, or provide encryption; those are separate systems entirely."
+    },
+    {
+      "id": "q75",
+      "cat": "troubleshooting",
+      "type": "mc",
+      "question": "A user reports that 'the application is slow.' Rather than guessing which layer is at fault, a troubleshooter first checks response time in the browser, then the web server, then the database, then the network, narrowing down at each step exactly where the delay is actually introduced. What troubleshooting approach is this?",
+      "options": [
+        "A top-down approach, systematically narrowing down which layer is responsible",
+        "A bottom-up approach, since the network is always checked last in this method",
+        "Root cause analysis performed without gathering any information first",
+        "A workaround, since no permanent fix is being pursued"
+      ],
+      "correct": 0,
+      "explanation": "Starting at the layer closest to the user (the application) and moving down toward the network, checking each layer in turn, is a top-down troubleshooting approach -- it isolates which specific layer introduces the delay rather than guessing. A bottom-up approach would start at the network and move up instead, this process is actively gathering evidence at every step rather than skipping straight to a root cause, and nothing here describes a temporary workaround rather than genuine diagnosis."
+    },
+    {
+      "id": "tf17",
+      "cat": "deployment",
+      "type": "tf",
+      "question": "A canary deployment, like a blue-green deployment, requires maintaining two complete, identical production environments at the same time.",
+      "answer": false,
+      "explanation": "Blue-green deployment is what requires two full duplicate environments with traffic cut over all at once. A canary deployment instead gradually shifts a small slice of traffic to the new version within the existing environment (or a much smaller parallel deployment), without needing a second full production-scale environment standing by."
     }
   ],
   "lessons": [
@@ -1810,6 +1944,44 @@
         }
       ],
       "explanation": "\"Noisy neighbor\" describes resource contention from other co-located tenants on shared infrastructure. Dedicated (single-tenant) hardware removes that contention entirely, at a higher cost."
+    },
+    {
+      "id": "ml-cloudplus-4",
+      "cat": "deployment",
+      "scenario": "A team wants to test a new release with just 5% of production traffic before expanding it further, so they choose a {b1} rollout. Another team instead maintains two complete, identical environments and cuts every user over in one atomic switch, which is a {b2} deployment. A third team can't spare duplicate infrastructure, so it updates only a few servers at a time while the rest keep serving traffic, which is a {b3} deployment.",
+      "blanks": [
+        {
+          "key": "b1",
+          "options": [
+            "canary",
+            "blue-green",
+            "in-place",
+            "rolling"
+          ],
+          "correct": 0
+        },
+        {
+          "key": "b2",
+          "options": [
+            "blue-green",
+            "canary",
+            "rolling",
+            "in-place"
+          ],
+          "correct": 0
+        },
+        {
+          "key": "b3",
+          "options": [
+            "rolling",
+            "blue-green",
+            "canary",
+            "in-place"
+          ],
+          "correct": 0
+        }
+      ],
+      "explanation": "Canary gradually exposes a new release to a small slice of traffic first, limiting the blast radius of a bad release. Blue-green keeps two full duplicate environments and switches all traffic at once, giving an instant, whole-environment rollback option. Rolling updates a subset of instances at a time within the existing environment -- no duplicate infrastructure needed -- unlike an in-place deployment, which updates everything at once with no gradual exposure at all."
     }
   ]
 }
