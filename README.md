@@ -141,6 +141,16 @@ their own more specific "Learn more" links too (see `resources` on each
 track's `CATEGORIES` in data/&lt;track&gt;.py) — shown on Study section pages, a
 lesson's Vocabulary block, and the cheat sheet.
 
+Some portal mockups are step-by-step **interactive walkthroughs** rather
+than one static illustration — a "Create a virtual machine" lesson (both
+AZ-900 and AZ-104 share this one) clicks through Basics → Size →
+Networking → Review + create → a completion screen, with a step counter,
+progress dots, and Back/Next controls. Any existing mockup can be
+upgraded the same way by adding an entry to `PORTAL_WALKTHROUGHS`
+(02_portal_mockups.jsx) keyed by the same string the lesson's
+`portalMockup` field already uses — no lesson data changes needed; every
+other mockup keeps rendering as its original single static illustration.
+
 AZ-900/AZ-104 lessons that have a portal mockup also show a real Azure
 Portal screenshot underneath it ("See the real thing:") for the topics
 where one was available — pulled directly from Microsoft's own

@@ -1827,7 +1827,8 @@ function LessonDetail({ lesson, flashcardsData, questionsData, categories, onBac
     .filter((c) => vocabItems.some((v) => v.cat === c.key) && c.resources && c.resources.length)
     .flatMap((c) => c.resources);
   const DiagramComp = lesson.diagram ? LESSON_DIAGRAMS[lesson.diagram] : null;
-  const MockupComp = lesson.portalMockup ? PORTAL_MOCKUPS[lesson.portalMockup] : null;
+  const walkthrough = lesson.portalMockup ? PORTAL_WALKTHROUGHS[lesson.portalMockup] : null;
+  const MockupComp = !walkthrough && lesson.portalMockup ? PORTAL_MOCKUPS[lesson.portalMockup] : null;
   const realShot = lesson.portalMockup ? REAL_PORTAL_SCREENSHOTS[lesson.portalMockup] : null;
 
   const paragraphs = lesson.reading.split('\n\n');
@@ -1935,14 +1936,18 @@ function LessonDetail({ lesson, flashcardsData, questionsData, categories, onBac
         )}
       </div>
 
-      {MockupComp && (
+      {(walkthrough || MockupComp) && (
         <div style={{ marginBottom: '16px' }}>
-          <div style={{ fontSize: '13px', fontWeight: 600, color: COLOR.gold, marginBottom: '4px' }}>Portal mockup</div>
+          <div style={{ fontSize: '13px', fontWeight: 600, color: COLOR.gold, marginBottom: '4px' }}>
+            {walkthrough ? `Try it: ${walkthrough.label}` : 'Portal mockup'}
+          </div>
           <div style={{ fontSize: '10.5px', color: COLOR.muted, marginBottom: '8px', lineHeight: 1.4 }}>
-            An illustration of the layout, not an exact screenshot — the real portal may look slightly different.
+            {walkthrough
+              ? 'A click-through illustration of the real flow, not an exact screenshot — the real portal may look slightly different.'
+              : 'An illustration of the layout, not an exact screenshot — the real portal may look slightly different.'}
           </div>
           <div style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderRadius: '14px', padding: '14px' }}>
-            <MockupComp />
+            {walkthrough ? <PortalWalkthroughPlayer walkthrough={walkthrough} /> : <MockupComp />}
           </div>
           {realShot && (
             <>

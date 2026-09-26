@@ -215,6 +215,154 @@ const PORTAL_MOCKUPS = {
   pricingCalculator: MockupPricingCalculator,
 };
 
+// Step-by-step interactive portal walkthroughs (ROADMAP.md section 4):
+// click through creating a resource across several connected portal
+// screens instead of one static illustration. Keyed by the SAME string a
+// lesson's `portalMockup` field already points at — LessonDetail
+// (04_shared_ui.jsx) checks PORTAL_WALKTHROUGHS first and renders the
+// walkthrough player instead of the single static Mockup* component when
+// an entry exists, so upgrading an existing lesson from static to
+// interactive needs zero changes to that lesson's own data, just a new
+// registry entry here. Every key without an entry here keeps rendering
+// exactly as before (fully backward compatible; no lesson has been
+// changed by adding this). Steps reuse the exact same PortalFrame/
+// MockField primitives as the static mockups above — just several small
+// screens chained together with Back/Next instead of one.
+function WalkthroughStep({ children, height }) {
+  return <PortalFrame height={height}>{children}</PortalFrame>;
+}
+
+const PORTAL_WALKTHROUGHS = {
+  vmSize: {
+    label: 'Create a virtual machine',
+    steps: [
+      {
+        caption: 'Basics: pick a resource group and name the VM.',
+        render: () => (
+          <WalkthroughStep height={150}>
+            <text x={12} y={40} fill={COLOR.text} fontSize="9" fontWeight="700">Create a virtual machine</text>
+            <text x={12} y={52} fill={COLOR.primary} fontSize="7" fontWeight="700">● Basics</text>
+            <text x={62} y={52} fill={COLOR.muted} fontSize="7">Disks</text>
+            <text x={98} y={52} fill={COLOR.muted} fontSize="7">Networking</text>
+            <text x={160} y={52} fill={COLOR.muted} fontSize="7">Review + create</text>
+            <MockField x={12} y={62} w={296} h={18} label="Resource group" value="rg-production" highlight />
+            <MockField x={12} y={96} w={296} h={18} label="Virtual machine name" value="vm-app01" highlight />
+          </WalkthroughStep>
+        ),
+      },
+      {
+        caption: 'Size: choose vCPU/RAM sized to the actual workload.',
+        render: () => (
+          <WalkthroughStep height={140}>
+            <text x={12} y={40} fill={COLOR.text} fontSize="9" fontWeight="700">Select a VM size</text>
+            <text x={18} y={54} fill={COLOR.muted} fontSize="7">Size</text>
+            <text x={200} y={54} fill={COLOR.muted} fontSize="7">vCPUs</text>
+            <text x={250} y={54} fill={COLOR.muted} fontSize="7">RAM</text>
+            <rect x={12} y={60} width="296" height="20" rx="4" fill="rgba(167,139,250,0.14)" stroke={COLOR.primary} strokeWidth="1" />
+            <text x={18} y={73} fill={COLOR.primary} fontSize="7.5">Standard_D2s_v5</text>
+            <text x={205} y={73} fill={COLOR.primary} fontSize="7.5">2</text>
+            <text x={252} y={73} fill={COLOR.primary} fontSize="7.5">8 GiB</text>
+            <rect x={12} y={84} width="296" height="20" rx="4" fill={COLOR.surface} stroke={COLOR.border} strokeWidth="1" />
+            <text x={18} y={97} fill={COLOR.muted} fontSize="7.5">Standard_B2s</text>
+            <text x={205} y={97} fill={COLOR.muted} fontSize="7.5">2</text>
+            <text x={252} y={97} fill={COLOR.muted} fontSize="7.5">4 GiB</text>
+          </WalkthroughStep>
+        ),
+      },
+      {
+        caption: 'Networking: open only the ports this VM actually needs.',
+        render: () => (
+          <WalkthroughStep height={150}>
+            <text x={12} y={40} fill={COLOR.text} fontSize="9" fontWeight="700">Networking — inbound ports</text>
+            <MockField x={12} y={52} w={296} h={18} label="Virtual network" value="vnet-prod" />
+            <text x={12} y={90} fill={COLOR.muted} fontSize="7">Public inbound ports</text>
+            <rect x={12} y={94} width="140" height="18" rx="4" fill="rgba(167,139,250,0.14)" stroke={COLOR.primary} strokeWidth="1" />
+            <text x={82} y={106} textAnchor="middle" fill={COLOR.primary} fontSize="7.5">● Allow selected</text>
+            <MockField x={12} y={120} w={296} h={18} label="Select inbound ports" value="HTTPS (443)" highlight />
+          </WalkthroughStep>
+        ),
+      },
+      {
+        caption: 'Review + create: confirm the summary, then deploy.',
+        render: () => (
+          <WalkthroughStep height={150}>
+            <text x={12} y={40} fill={COLOR.text} fontSize="9" fontWeight="700">Review + create</text>
+            <text x={12} y={58} fill={COLOR.success} fontSize="8" fontWeight="700">✓ Validation passed</text>
+            <MockField x={12} y={68} w={296} h={16} label="" value="Resource group: rg-production" />
+            <MockField x={12} y={92} w={296} h={16} label="" value="Size: Standard_D2s_v5" />
+            <rect x={230} y={124} width="78" height="18" rx="4" fill={COLOR.primary} />
+            <text x={269} y={136} textAnchor="middle" fill="#2B1620" fontSize="8" fontWeight="700">Create</text>
+          </WalkthroughStep>
+        ),
+      },
+      {
+        caption: 'Done — the VM is now deployed and running.',
+        render: () => (
+          <WalkthroughStep height={120}>
+            <text x={160} y={55} textAnchor="middle" fill={COLOR.success} fontSize="22">✓</text>
+            <text x={160} y={78} textAnchor="middle" fill={COLOR.text} fontSize="9" fontWeight="700">Your deployment is complete</text>
+            <text x={160} y={94} textAnchor="middle" fill={COLOR.muted} fontSize="7">vm-app01 is now running in rg-production</text>
+          </WalkthroughStep>
+        ),
+      },
+    ],
+  },
+};
+
+// Drives one PORTAL_WALKTHROUGHS entry: a step counter + progress dots,
+// the current step's fake portal screen and plain-language caption, and
+// Back/Next controls. Resets to step 0 whenever the walkthrough itself
+// changes (switching lessons) so a later lesson never opens mid-way
+// through an earlier one's steps.
+function PortalWalkthroughPlayer({ walkthrough }) {
+  const [step, setStep] = useState(0);
+  useEffect(() => { setStep(0); }, [walkthrough]);
+  const steps = walkthrough.steps;
+  const current = steps[step];
+  const isLast = step === steps.length - 1;
+  return (
+    <div>
+      <div className="flex justify-between items-center" style={{ marginBottom: '8px' }}>
+        <div style={{ fontSize: '11px', color: COLOR.muted }}>Step {step + 1} of {steps.length}</div>
+        <div className="flex" style={{ gap: '4px' }}>
+          {steps.map((_, i) => (
+            <div
+              key={i}
+              style={{ width: '6px', height: '6px', borderRadius: '999px', background: i <= step ? COLOR.primary : COLOR.border }}
+            />
+          ))}
+        </div>
+      </div>
+      <div style={{ fontSize: '11.5px', color: COLOR.muted, marginBottom: '8px', lineHeight: 1.4 }}>{current.caption}</div>
+      {current.render()}
+      <div className="flex gap-2" style={{ marginTop: '10px' }}>
+        <button
+          onClick={() => setStep((s) => Math.max(0, s - 1))}
+          disabled={step === 0}
+          className="flex-1"
+          style={{
+            padding: '10px', borderRadius: '10px', border: `1px solid ${COLOR.border}`, background: 'transparent',
+            color: step === 0 ? COLOR.border : COLOR.text, fontSize: '12.5px', fontWeight: 600,
+          }}
+        >
+          ‹ Back
+        </button>
+        <button
+          onClick={() => setStep((s) => Math.min(steps.length - 1, s + 1))}
+          disabled={isLast}
+          className="flex-1"
+          style={{
+            padding: '10px', borderRadius: '10px', background: isLast ? COLOR.surfaceRaised : COLOR.primary,
+            color: isLast ? COLOR.success : COLOR.onAccent, fontSize: '12.5px', fontWeight: 600,
+          }}
+        >
+          {isLast ? '✓ Done' : 'Next ›'}
+        </button>
+      </div>
+    </div>
+  );
+}
+
 // Real Azure Portal screenshots, pulled directly from Microsoft's own public
 // documentation source (the MicrosoftDocs/azure-docs and
 // MicrosoftDocs/azure-compute-docs GitHub repos), which publish their

@@ -55,9 +55,26 @@ come up.
 
 ## 4. Simulations (user's idea)
 
-- [ ] Turn the existing static portal mockups into **step-by-step interactive
+- [x] Turn the existing static portal mockups into **step-by-step interactive
   walkthroughs** (click through creating a resource across several fake
-  portal screens) instead of one static illustration per lesson.
+  portal screens) instead of one static illustration per lesson. Shipped
+  as `PORTAL_WALKTHROUGHS` + `PortalWalkthroughPlayer` (02_portal_mockups.jsx):
+  a registry keyed by the SAME string a lesson's `portalMockup` field
+  already points at, so `LessonDetail` checks it first and renders the
+  interactive player instead of the single static `Mockup*` component
+  whenever an entry exists — upgrading an existing lesson from static to
+  interactive needs zero changes to that lesson's own data, just a new
+  registry entry. Every other key without an entry keeps rendering
+  exactly as before (verified empirically, not just by inspection — a
+  still-static lesson shows no stray "Step X of Y" UI). The flagship
+  example converts the `vmSize` mockup (used by both an AZ-900 and an
+  AZ-104 lesson, so both upgrade at once) into a real 5-step "Create a
+  virtual machine" walkthrough — Basics → Size → Networking → Review +
+  create → a completion screen — with a step counter, progress dots, and
+  Back/Next controls, reusing the exact same `PortalFrame`/`MockField`
+  SVG primitives the static mockups already use. More existing mockup
+  keys can be upgraded the same way as course depth continues to expand;
+  most still render as their original single static illustration.
 - [x] A lightweight CLI/PowerShell **command-practice** mode: type the command
   for a stated task, get validated against expected syntax/flags, for tracks
   where that's core to the job (AZ-104, AZ-802 especially). Shipped as a
