@@ -148,14 +148,16 @@ come up.
   AZ-305 example, self-verifying with `build.py`). All 15 tracks now ship
   `CASE_STUDIES` — 18 case studies total (71 embedded questions), and
   Mad Libs grew from 49 to 79 scenarios in the same pass (see section 13).
-  **Caveat:** this session's outbound network briefly blocked the CDN
-  this app loads React/Babel from at runtime, so this feature shipped
-  verified only by `build.py`'s structural validation (every track's
-  content passes it) and manual code review against the already-working
-  Mad Libs/Sequence patterns it mirrors — not by opening it in an actual
-  browser. Worth a real Playwright pass through `full_smoke.js` (or
-  equivalent) once that's possible, before treating this as fully proven
-  out.
+  Initially shipped verified only by `build.py`'s structural validation
+  (this session's outbound network briefly blocked the CDN this app loads
+  React/Babel from at runtime, so no browser was reachable at the time) —
+  confirmed afterward with a real Playwright pass once a local mirror of
+  the CDN scripts unblocked testing: the full `full_smoke.js` regression
+  suite passes clean, a full picker→scenario→4-question→results→back
+  walkthrough on AZ-305 works end to end, and a spot-check across 7 more
+  tracks (ITIL, AZ-104, SC-300, Cloud+, EHR Integration, DP-900, AZ-802)
+  confirms both Mad Libs and Case Study render and open correctly with
+  zero real console errors.
 
 ## 5. Diagrams (user's idea)
 
