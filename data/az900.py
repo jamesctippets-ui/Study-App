@@ -454,6 +454,27 @@ FLASHCARDS = [
         'back': "Lets a service provider or central IT team manage resources across multiple Azure tenants from within their own tenant, without switching directories or needing a separate guest account in each customer's tenant.",
         'detail': "This is specifically for cross-tenant management at scale — an MSP managing dozens of customer tenants is the classic scenario, distinct from Azure RBAC, which governs access within a single tenant.",
     },
+    {
+        'id': 'f64',
+        'cat': 'architecture',
+        'front': 'Azure Key Vault',
+        'back': "A service for securely storing and tightly controlling access to secrets, encryption keys, and certificates, so they never sit hardcoded in application source code. An app typically authenticates to it using a Managed identity rather than an embedded credential, with access to individual secrets still governed through Microsoft Entra ID and Azure RBAC like any other resource.",
+        'detail': "Key Vault is the answer whenever a scenario wants to eliminate a hardcoded connection string or API key from source code entirely.",
+    },
+    {
+        'id': 'f65',
+        'cat': 'architecture',
+        'front': 'Azure Bastion',
+        'back': "A managed service that provides secure RDP and SSH access to virtual machines directly through the Azure portal over TLS, without needing a public endpoint on the VM itself or a client-side VPN. It works alongside a Network security group (NSG) rather than replacing it — the NSG still filters what traffic is allowed to reach the VM's subnet in the first place.",
+        'detail': "Bastion is the answer whenever a scenario wants to remove a VM's exposed public RDP/SSH port while still allowing administrators to connect.",
+    },
+    {
+        'id': 'f66',
+        'cat': 'architecture',
+        'front': 'Azure Backup',
+        'back': "A managed service that takes scheduled, application-consistent backups of Azure VMs, SQL databases, and other workloads into a Recovery Services vault. Those recovery points are protected using the same Redundancy options — LRS, ZRS, GRS, or RA-GRS — available to any other Storage account, so the vault itself can survive a datacenter or regional failure.",
+        'detail': "Azure Backup protects data that already exists by restoring it after loss or corruption; it's a different job from Site Recovery, which keeps a whole workload running by replicating it to fail over to.",
+    },
 ]
 
 QUESTIONS = [
@@ -1786,14 +1807,14 @@ For resilience, Azure offers different tools depending on what you're protecting
         ],
         'portalMockup': 'vmSize',
         'scenario': "A nightly report-generation job runs for about 15 minutes once a day. Running it on a VM that stays on 24/7 would waste money on 23-plus idle hours daily. Running it as an Azure Function instead means paying only for those 15 minutes of actual execution — a direct payoff of matching the compute model to the workload's real usage pattern.",
-        'onTheJob': "The VM-versus-container-versus-Functions choice in a real organization is driven less by architectural purity and more by what the team already knows how to operate and who gets paged if it breaks — a team with no serverless experience will often default to a familiar VM even when Functions would be cheaper, because the operational risk of the unfamiliar option outweighs the savings. Availability sets and Scale Sets are also the kind of thing that gets added to a postmortem after an avoidable outage, not configured up front, since the few extra dollars a month rarely feel urgent until something actually goes down.",
+        'onTheJob': "The VM-versus-container-versus-Functions choice in a real organization is driven less by architectural purity and more by what the team already knows how to operate and who gets paged if it breaks — a team with no serverless experience will often default to a familiar VM even when Functions would be cheaper, because the operational risk of the unfamiliar option outweighs the savings. Availability sets and Scale Sets are also the kind of thing that gets added to a postmortem after an avoidable outage, not configured up front, since the few extra dollars a month rarely feel urgent until something actually goes down. A subtler Scale Set misconfiguration shows up when autoscale rules trigger off average CPU across the whole set rather than per-instance load, which can hide one genuinely overloaded instance behind several idle ones while the average still looks healthy enough that scale-out never fires.",
     },
     {
         'id': 'networking',
         'title': 'Networking',
         'summary': 'VNets, subnets, and connecting Azure back to your own network.',
         'diagram': 'networking',
-        'vocabIds': ['f22', 'f23'],
+        'vocabIds': ['f22', 'f23', 'f65'],
         'quizIds': ['q14', 'tf11', 'tf14', 'msq14'],
         'reading': """An Azure Virtual Network, or VNet, is a private network you define in Azure, similar to a network you'd set up in an office. Subnets divide that VNet into smaller segments, similar to how VLANs divide a physical network by department or function.
 
@@ -1817,7 +1838,7 @@ VNets can also be peered together, letting resources in two separate VNets talk 
         'title': 'Storage',
         'summary': 'Blob, Files, Queue, Table, access tiers, and redundancy.',
         'diagram': 'storage',
-        'vocabIds': ['f24', 'f25', 'f26', 'f27', 'f28'],
+        'vocabIds': ['f24', 'f25', 'f26', 'f27', 'f28', 'f66'],
         'quizIds': ['q16', 'q17', 'tf12', 'msq15'],
         'reading': """Azure Storage accounts hold four main types of data: Blob storage for unstructured files like images and backups, Azure Files for SMB or NFS file shares you can mount like a network drive, Queue storage for lightweight messaging between applications, and Table storage for simple key-value data.
 
@@ -1834,14 +1855,14 @@ Redundancy options protect that data against hardware and datacenter failure. Lo
         ],
         'portalMockup': 'storageAccount',
         'scenario': 'A healthcare provider must keep patient records for seven years for compliance, but almost never opens files older than a year. Storing everything in Hot tier would be needlessly expensive. Moving records older than 12 months to Archive tier with a lifecycle management policy keeps them retrievable within the required window while cutting storage cost dramatically.',
-        'onTheJob': "Lifecycle management policies that automatically move aging data to Cool or Archive tiers are one of the highest-leverage, easiest-to-forget cost levers in a real subscription — a team that never configures one is often quietly overpaying for years without anyone noticing on the monthly bill. Choosing a redundancy option is also genuinely a conversation between whoever owns the compliance requirement and whoever owns the budget, since GRS roughly doubles storage cost for protection that may never actually get used.",
+        'onTheJob': "Lifecycle management policies that automatically move aging data to Cool or Archive tiers are one of the highest-leverage, easiest-to-forget cost levers in a real subscription — a team that never configures one is often quietly overpaying for years without anyone noticing on the monthly bill. Choosing a redundancy option is also genuinely a conversation between whoever owns the compliance requirement and whoever owns the budget, since GRS roughly doubles storage cost for protection that may never actually get used. A common misconception with GRS specifically is assuming failover to the secondary region happens automatically the moment the primary goes down — for most storage accounts a failover has to be explicitly triggered, so a disaster-recovery plan that never actually rehearses that trigger step hasn't really been tested at all.",
     },
     {
         'id': 'identity-security',
         'title': 'Identity & Security',
         'summary': 'Entra ID, RBAC, Conditional Access, and the Zero Trust mindset.',
         'diagram': 'identity',
-        'vocabIds': ['f29', 'f30', 'f31', 'f32', 'f33', 'f34', 'f35', 'f36', 'f49'],
+        'vocabIds': ['f29', 'f30', 'f31', 'f32', 'f33', 'f34', 'f35', 'f36', 'f49', 'f64'],
         'quizIds': ['q20', 'q21', 'q22', 'q19', 'q43', 'msq16'],
         'reading': """Microsoft Entra ID, formerly Azure Active Directory, is Azure's identity service — it manages users, groups, and what they're allowed to access. Two related but different tools control that access: Azure RBAC decides what an identity can do, like "this user can restart VMs," assigned at a scope such as a subscription or resource group. Conditional Access decides under what conditions someone is allowed to sign in at all — for example, requiring MFA only when someone signs in from an unfamiliar location or an unmanaged device.
 
@@ -1856,7 +1877,7 @@ Zero Trust is the security philosophy underlying a lot of this: never assume tru
         ],
         'portalMockup': 'roleAssignment',
         'scenario': "An IT team grants a support technician Contributor access to a single resource group, so they can restart VMs there but nowhere else. Separately, they set up a Conditional Access policy requiring MFA whenever anyone signs in from outside the corporate network. Together, RBAC controls what the technician can touch, and Conditional Access controls the circumstances under which they're allowed in at all.",
-        'onTheJob': "RBAC assignments in a real tenant tend to sprawl into 'temporary' access grants that never get revoked, so periodic access reviews are less about clean exam-style role design and more about cleaning up permission debt nobody remembers creating. Conditional Access is also where a lot of real help-desk tickets originate — a policy tightened for good security reasons locks out a legitimate traveling employee, and someone has to weigh the security team's Zero Trust stance against a person just trying to do their job.",
+        'onTheJob': "RBAC assignments in a real tenant tend to sprawl into 'temporary' access grants that never get revoked, so periodic access reviews are less about clean exam-style role design and more about cleaning up permission debt nobody remembers creating. Conditional Access is also where a lot of real help-desk tickets originate — a policy tightened for good security reasons locks out a legitimate traveling employee, and someone has to weigh the security team's Zero Trust stance against a person just trying to do their job. This same Conditional Access mechanism carries straight into AZ-104, Azure Administrator, where the exam goes a level deeper and expects you to reason about it layering on top of RBAC scope and inheritance rather than replacing either one.",
     },
     {
         'id': 'cost-policy-monitoring',

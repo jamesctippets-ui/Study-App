@@ -342,6 +342,34 @@
       "front": "Database scoped credential",
       "back": "Stores the authentication secret a database needs to reach an external resource \u2014 like a storage account for PolyBase/external tables or a backup destination \u2014 separately from the actual external data source definition, so that credential can be reused and rotated in one place.",
       "detail": "This works alongside Microsoft Entra ID (Azure AD) authentication for Azure SQL \u2014 the scoped credential is specifically for the database reaching *out* to another resource, not for a user or app authenticating *into* the database."
+    },
+    {
+      "id": "f39",
+      "cat": "security",
+      "front": "Azure SQL Auditing",
+      "back": "Logs database events like SELECT, INSERT, UPDATE, and DELETE statements to a chosen destination \u2014 a storage account, a Log Analytics workspace, or an Event Hub \u2014 for later review, with no application changes required. Auditing only records activity; unlike Microsoft Defender for SQL's Advanced Threat Protection, it never blocks or prevents a statement from executing, no matter how suspicious.",
+      "detail": "Auditing can be enabled once at the server level to cover every database on it, which is why it is the answer whenever a scenario wants a record of who did what, rather than active detection or prevention of a threat."
+    },
+    {
+      "id": "f40",
+      "cat": "hadr",
+      "front": "Read scale-out",
+      "back": "Routes read-only connections to one of the existing secondary replicas that Premium and Business Critical tiers already run as part of Azure SQL Database built-in high availability, offloading reporting or analytics traffic from the primary replica at no extra compute cost, since it reuses replicas that already exist rather than provisioning anything new.",
+      "detail": "Because it depends on those built-in HA replicas, read scale-out is only available on tiers that include them \u2014 it is not itself a separate feature to provision from scratch."
+    },
+    {
+      "id": "f41",
+      "cat": "monitor",
+      "front": "sys.resource_stats (master database)",
+      "back": "A DMV in the logical server's master database that reports roughly the last 14 days of resource utilization at 5-minute granularity, giving a longer, coarser historical view than sys.dm_db_resource_stats and DTU/vCore utilization, which covers only about the last hour at 15-second granularity from inside the database itself.",
+      "detail": "Reach for sys.resource_stats when a scenario asks about a trend over days or weeks; reach for the database-level DMV when it asks what is happening right now."
+    },
+    {
+      "id": "f42",
+      "cat": "platform",
+      "front": "Hyperscale named replicas",
+      "back": "Additional readable replicas of a Hyperscale database that can be scaled to their own independent compute size, for reporting, analytics, or isolating a workload from the primary \u2014 going beyond the single high-availability replica already included, and distinct from Read scale-out, which only reuses replicas that General Purpose or Business Critical already provision for HA rather than adding new dedicated ones.",
+      "detail": "Named replicas are specific to the Service tiers: General Purpose vs. Business Critical vs. Hyperscale tier's storage architecture, since Hyperscale's separated storage layer is what lets a replica be added or resized independently of the primary in the first place."
     }
   ],
   "questions": [
@@ -1342,7 +1370,7 @@
         "Auto-pause in the serverless tier stops compute billing but not storage billing, and introduces a cold-start delay on the next connection."
       ],
       "scenario": "A SaaS company hosts 200 small customer databases with unpredictable, non-overlapping usage spikes; sizing each one for its own peak would be very expensive. Pooling them into an elastic pool lets the aggregate, non-overlapping demand share one billed pool of resources instead \u2014 while a separate, rarely-used internal reporting database for the finance team goes on the serverless compute tier with auto-pause enabled, since its idle time far outweighs its active use.",
-      "onTheJob": "In practice, the DTU-vs-vCore decision often gets settled by finance before it ever reaches engineering \u2014 the moment someone points out the company already owns SQL Server licenses that only Azure Hybrid Benefit (vCore-only) can reuse, the technical debate is mostly over. A real DBA's least favorite kind of incident is discovering an elastic pool was sized for last year's traffic pattern, because the whole pitch of pooling only holds if the databases inside it still genuinely peak at different times \u2014 a new tenant that happens to onboard right as an existing one runs its own batch job can quietly blow past the pool's shared ceiling. Serverless auto-pause looks free on a pricing slide, but the DBA who enables it on anything customer-facing usually hears about the cold-start delay exactly once, from a very unhappy support ticket, before restricting it to genuinely idle dev and test databases only."
+      "onTheJob": "In practice, the DTU-vs-vCore decision often gets settled by finance before it ever reaches engineering \u2014 the moment someone points out the company already owns SQL Server licenses that only Azure Hybrid Benefit (vCore-only) can reuse, the technical debate is mostly over. A real DBA's least favorite kind of incident is discovering an elastic pool was sized for last year's traffic pattern, because the whole pitch of pooling only holds if the databases inside it still genuinely peak at different times \u2014 a new tenant that happens to onboard right as an existing one runs its own batch job can quietly blow past the pool's shared ceiling. Serverless auto-pause looks free on a pricing slide, but the DBA who enables it on anything customer-facing usually hears about the cold-start delay exactly once, from a very unhappy support ticket, before restricting it to genuinely idle dev and test databases only. Hyperscale's fast storage-snapshot backups look like a strict upgrade over General Purpose or Business Critical on paper, but a team that migrates without re-testing its specific restore procedure sometimes discovers a downstream integration expected a traditional full/differential/log backup chain that Hyperscale doesn't produce in quite the same way."
     },
     {
       "id": "security-and-data-protection",
@@ -1387,7 +1415,7 @@
         "Auditing only records activity for later review \u2014 it never blocks a statement from executing, no matter how suspicious."
       ],
       "scenario": "A healthcare company already has TDE enabled and assumes patient data is fully protected. A new requirement says one 'DiagnosisCode' column must stay encrypted even from a DBA running ad hoc queries with full sysadmin rights. TDE alone can't satisfy this, since the engine decrypts everything in memory for any query \u2014 the column instead needs Always Encrypted, so the plaintext never reaches the engine, or the DBA, at all.",
-      "onTheJob": "A real production security incident almost never starts with 'the encryption failed' \u2014 it starts with someone with legitimate access, a contractor, a departed employee whose account was never disabled, a DBA running an unrelated ad hoc query, seeing something they shouldn't have, which is exactly the gap TDE was never designed to close. Rolling out Row-Level Security or Dynamic Data Masking in a live system is as much a stakeholder negotiation as a technical task, because support and analytics teams will push back hard the moment their existing dashboards and queries suddenly return masked or filtered data they used to see. And 'we're already encrypted, we're fine' is one of the most common false assumptions a DBA has to correct in an actual compliance review, since an auditor's specific question is almost always about a threat model TDE alone doesn't cover."
+      "onTheJob": "A real production security incident almost never starts with 'the encryption failed' \u2014 it starts with someone with legitimate access, a contractor, a departed employee whose account was never disabled, a DBA running an unrelated ad hoc query, seeing something they shouldn't have, which is exactly the gap TDE was never designed to close. Rolling out Row-Level Security or Dynamic Data Masking in a live system is as much a stakeholder negotiation as a technical task, because support and analytics teams will push back hard the moment their existing dashboards and queries suddenly return masked or filtered data they used to see. And 'we're already encrypted, we're fine' is one of the most common false assumptions a DBA has to correct in an actual compliance review, since an auditor's specific question is almost always about a threat model TDE alone doesn't cover. This exact TDE-versus-Always-Encrypted line is also one SC-500 security architects have to draw clearly, since scoping which Azure SQL protection actually satisfies a compliance control requiring column data to stay hidden even from a database administrator is the same distinction tested here."
     },
     {
       "id": "monitoring-and-diagnostics",
@@ -1470,7 +1498,7 @@
         "OPTION (RECOMPILE) fixes parameter sniffing but forces a fresh compile on every single execution \u2014 a poor choice for a query run thousands of times a minute."
       ],
       "scenario": "A stored procedure runs fine almost always, but very rarely a wildly unusual parameter value causes its cached plan to perform terribly \u2014 and the procedure runs thousands of times a minute, so recompiling on every call is out of the question. Rather than OPTION (RECOMPILE), the DBA uses OPTIMIZE FOR to hint a representative value, and separately schedules an Elastic Database Job targeting the whole elastic pool to run an index-maintenance script across every database in it, including ones added after the job was created.",
-      "onTheJob": "The real tension every DBA lives with is performance tuning versus 'don't touch it, it's stable' \u2014 a production system that's been running fine for a year makes management nervous the moment someone proposes forcing a new plan or adding an index, even when the missing-index DMVs make a strong case for it, because the downside of a bad change is far more visible than the upside of a good one. Parameter sniffing in particular tends to get discovered the hard way, as an intermittent 'it's slow sometimes but I can't reproduce it' ticket that takes real digging to trace back to one unusual parameter value rather than a resourcing problem. Elastic Database Jobs and Azure Automation runbooks are what actually let a DBA stop babysitting the same maintenance script by hand across dozens of databases every week, which is less glamorous than tuning but is where a lot of a real DBA's time genuinely goes."
+      "onTheJob": "The real tension every DBA lives with is performance tuning versus 'don't touch it, it's stable' \u2014 a production system that's been running fine for a year makes management nervous the moment someone proposes forcing a new plan or adding an index, even when the missing-index DMVs make a strong case for it, because the downside of a bad change is far more visible than the upside of a good one. Parameter sniffing in particular tends to get discovered the hard way, as an intermittent 'it's slow sometimes but I can't reproduce it' ticket that takes real digging to trace back to one unusual parameter value rather than a resourcing problem. Elastic Database Jobs and Azure Automation runbooks are what actually let a DBA stop babysitting the same maintenance script by hand across dozens of databases every week, which is less glamorous than tuning but is where a lot of a real DBA's time genuinely goes. Forcing a plan through Query Store also quietly stops protecting a query the moment its underlying statistics change enough to invalidate that plan's original assumptions, so a DBA who forces a fix and never revisits it can end up defending a plan that has since become actively worse than what the optimizer would now choose fresh."
     },
     {
       "id": "high-availability-and-disaster-recovery",

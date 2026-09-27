@@ -558,6 +558,34 @@ come up.
   another term, since a natural, accurate definition doesn't always have
   one to reference. Continuing this in further batches is legitimate
   ongoing work, not a one-time fix.
+- [x] **Batch 5, plus two new cross-track initiatives, via 5 parallel
+  background agents (all 15 tracks this round, not just the weakest
+  few).** Grew flashcards from 764 to 814 (50 new cards), each one
+  filling a real content gap (a term already tested in `QUESTIONS`/
+  `CHEAT_SHEET`/a case study but never given its own flashcard) whose
+  `back` text was written to naturally reference 1-2 other real,
+  verbatim same-track flashcard fronts — every agent read that track's
+  actual `FLASHCARDS` list first rather than inventing cross-references.
+  Two things genuinely new this round, not just more of batch 1-4's
+  recipe: **(a) cross-course concept callouts** — one sentence added to
+  an existing lesson's `onTheJob` per track, naming a real sibling
+  track and the specific concept they share (verified by grepping that
+  other track's actual file before writing the sentence — e.g. AZ-104's
+  `monitoring-recovery` lesson now names AZ-305's identical "Azure
+  Monitor Metrics vs. Logs" tradeoff; SC-300 and SC-500 both test the
+  same "Entitlement management: access packages" model and now say so).
+  This is a different thing from the cross-reference flyouts above:
+  those make a term tappable within one track's own content; this makes
+  the student aware a concept they're studying here is the *same*
+  mechanism another cert tests, not a coincidence of naming.
+  **(b) Deeper learning** — 2 lessons per track (30 total) got one more
+  `onTheJob` sentence of genuine real-world nuance (an edge case, a
+  common misconfiguration) that wasn't already covered, not filler
+  restating the lesson body. Verified with a real Playwright pass
+  (not just `build.py`): full `full_smoke.js` regression clean, and a
+  direct in-page check of the live `DATA` object confirms the new
+  Azure Key Vault flashcard's exact content and the AZ-104→AZ-305
+  cross-course callout both render correctly.
 
 ## 10. Future-proofing for a standalone web/iOS/Android app (user's idea)
 

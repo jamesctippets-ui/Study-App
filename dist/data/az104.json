@@ -476,6 +476,34 @@
       "front": "Disk snapshots",
       "back": "A point-in-time, read-only copy of a managed disk, usable to create a new disk or VM from that captured state \u2014 separate from Blob versioning vs. soft delete vs. snapshots, which protects blob container data, not disks.",
       "detail": "Managed disks and disk types get protected by disk snapshots (or Recovery Services vault and backup policies for a fuller backup solution); blob snapshots are a completely separate mechanism for a completely separate storage type."
+    },
+    {
+      "id": "f61",
+      "cat": "identityGov",
+      "front": "Managed identities (system-assigned vs. user-assigned)",
+      "back": "A managed identity lets an Azure resource, like a VM or an App Service app, authenticate to other Azure services without any credential stored in code or configuration. A system-assigned identity is created and tied to the lifecycle of one specific resource, and is deleted automatically when that resource is. A user-assigned identity is instead its own standalone resource that can be attached to several resources at once. Storage data-plane RBAC roles are commonly assigned to a managed identity rather than to a human user.",
+      "detail": "This is the credential-free answer whenever a scenario wants one Azure resource to reach another without a stored secret or connection-string password sitting in application configuration."
+    },
+    {
+      "id": "f62",
+      "cat": "monitoring",
+      "front": "Azure Advisor",
+      "back": "Analyzes your resource configurations and usage telemetry to produce personalized recommendations across cost, security, reliability, operational excellence, and performance \u2014 a proactive best-practices check, distinct from Azure Monitor metrics vs. logs, which reports what is actually happening rather than what should be changed.",
+      "detail": "Advisor recommends configuration improvements before something breaks; it does not itself monitor live health or trigger alerts the way an alert rule paired with an action group does."
+    },
+    {
+      "id": "f63",
+      "cat": "monitoring",
+      "front": "Application Insights",
+      "back": "An Azure Monitor feature purpose-built for application performance monitoring: request rates, response times, failure rates, and dependency tracing down to individual requests, complementing the infrastructure-level telemetry that a Log Analytics workspace and KQL collect from the underlying VMs and platform resources.",
+      "detail": "Whenever a scenario is specifically about an application's own performance, like slow page loads or failing dependencies, Application Insights is the targeted answer, not general infrastructure monitoring."
+    },
+    {
+      "id": "f64",
+      "cat": "monitoring",
+      "front": "Azure Service Health",
+      "back": "Reports on Azure platform issues, outages, planned maintenance, and health advisories, filtered to the specific resources and regions your subscription actually uses \u2014 distinct from Azure Advisor, which recommends configuration improvements rather than reporting on ongoing platform incidents.",
+      "detail": "If a scenario is about whether an outage is Microsoft's problem or your own configuration, Service Health answers the first question and Advisor addresses the second."
     }
   ],
   "questions": [
@@ -1650,7 +1678,7 @@
         "External B2B users authenticate with their own identity \u2014 you don't create them a normal internal account."
       ],
       "scenario": "A hospital's radiology department grows from 8 to 30 staff over a year. Rather than manually adding each new hire to a group and assigning a license individually, an administrator sets up a dynamic group based on department, with a license attached to that group \u2014 every new radiology hire is automatically added and licensed the moment their account is created, with zero manual steps.",
-      "onTheJob": "In a real tenant, dynamic groups and group-based licensing are what save an admin from a Friday afternoon of manually re-provisioning accounts every time a reorg happens, but they also mean a misconfigured rule can silently strip a whole department's license overnight with no one noticing until support tickets pile up. SSPR is usually the single biggest reduction in help-desk ticket volume an admin can point to when justifying their own workload to management, since password resets are consistently the most common ticket type any service desk handles."
+      "onTheJob": "In a real tenant, dynamic groups and group-based licensing are what save an admin from a Friday afternoon of manually re-provisioning accounts every time a reorg happens, but they also mean a misconfigured rule can silently strip a whole department's license overnight with no one noticing until support tickets pile up. SSPR is usually the single biggest reduction in help-desk ticket volume an admin can point to when justifying their own workload to management, since password resets are consistently the most common ticket type any service desk handles. A dynamic group's membership rule also takes a few minutes to fully evaluate after a bulk attribute change, like an HR import updating hundreds of department fields at once, so an admin who expects instant membership updates right after a mass edit is usually just watching normal processing lag, not a broken rule."
     },
     {
       "id": "governance-cost",
@@ -1787,7 +1815,7 @@
       ],
       "portalMockup": "vmSize",
       "scenario": "A team runs a database VM that needs consistent, high IOPS around the clock, plus a batch of short-lived web front-ends that spike unpredictably during business hours. The database gets a larger D-series or F-series VM with a Premium SSD or Ultra Disk. The front-ends go into a VM Scale Set, which adds instances automatically during the spikes and scales back down overnight, rather than running a fixed, oversized fleet all day.",
-      "onTheJob": "Picking a VM series in practice is often less about the workload spec sheet and more about what the team is already comfortable operating and who's on call for it \u2014 a burstable B-series VM under sustained production load is a classic middle-of-the-night page that traces back to a sizing decision nobody revisited after the workload grew. The requirement to deallocate before resizing or changing a disk tier is also the kind of detail that turns a routine maintenance window into an unplanned outage when a change gets scheduled without accounting for the downtime it actually requires."
+      "onTheJob": "Picking a VM series in practice is often less about the workload spec sheet and more about what the team is already comfortable operating and who's on call for it \u2014 a burstable B-series VM under sustained production load is a classic middle-of-the-night page that traces back to a sizing decision nobody revisited after the workload grew. The requirement to deallocate before resizing or changing a disk tier is also the kind of detail that turns a routine maintenance window into an unplanned outage when a change gets scheduled without accounting for the downtime it actually requires. A Scale Set's autoscale rule is its own common source of a 3am page: a threshold tuned during initial testing against a quiet dataset can flap instances in and out under real production traffic, so the rule itself needs revisiting as usage patterns mature rather than being set once and forgotten."
     },
     {
       "id": "app-hosting-iac",
@@ -1918,7 +1946,7 @@
         "Backup restores a point-in-time copy; Site Recovery fails over a whole workload to another region."
       ],
       "scenario": "A company's production database VM gets corrupted by a bad script at 2pm. They restore it from that morning's backup in the Recovery Services vault, losing a few hours of data but recovering quickly. Separately, that same company has Site Recovery configured for their whole application tier, so if their primary region ever goes down entirely, the application can fail over and keep serving customers from a secondary region within minutes.",
-      "onTheJob": "In practice, alert rules that aren't tied to a real action group are the alerts everyone learns to ignore \u2014 a mailbox full of unread threshold emails is a bigger operational risk than having no monitoring at all, since it trains the team to tune out the one alert that actually mattered. Backup and Site Recovery configurations also tend to only get tested for real during an actual incident, which is exactly the wrong time to discover a Recovery Services vault was never actually backing up the resource everyone assumed it was."
+      "onTheJob": "In practice, alert rules that aren't tied to a real action group are the alerts everyone learns to ignore \u2014 a mailbox full of unread threshold emails is a bigger operational risk than having no monitoring at all, since it trains the team to tune out the one alert that actually mattered. Backup and Site Recovery configurations also tend to only get tested for real during an actual incident, which is exactly the wrong time to discover a Recovery Services vault was never actually backing up the resource everyone assumed it was. This same Azure Monitor metrics vs. logs distinction is exactly what AZ-305 architects have to choose between when designing a monitoring solution, deciding whether a workload's health signal belongs in a lightweight metric alert or a deeper Log Analytics query."
     }
   ],
   "cheatSheet": [

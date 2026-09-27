@@ -356,6 +356,20 @@ FLASHCARDS = [
         'back': "The practice that acts as the single, agreed point of contact for users to report incidents, request services, and get status updates — the entry point into the value stream, even when it doesn't resolve every issue itself.",
         'detail': "The service desk's real value is coordination and communication, not necessarily deep technical resolution — many issues it logs are escalated to specialist teams for problem vs. known error follow-up.",
     },
+    {
+        'id': 'f48',
+        'cat': 'valueSystem',
+        'front': 'Service request management',
+        'back': "The practice that fulfills formal, pre-defined, routine requests raised by users, such as a password reset or access to a new application — distinct from Incident vs. problem vs. known error, since nothing is actually broken. Requests are typically logged and tracked through the Service desk alongside incidents, even though resolving one never involves root-cause investigation.",
+        'detail': "Exam trap: a request for something routine that's already pre-approved is a service request, not a standard change — service request management and change enablement are separate practices even when fulfilling the request eventually requires a change to be carried out.",
+    },
+    {
+        'id': 'f49',
+        'cat': 'valueSystem',
+        'front': 'Service level management',
+        'back': "The practice that negotiates, agrees, monitors, and reviews service levels on an ongoing basis, producing and maintaining the SLAs referenced in Service quality vs. service level vs. SLA. It's a continuous activity of tracking whether targets are actually being met, not a one-time contract signing.",
+        'detail': "A scenario describing a team that reviews performance against targets every quarter and renegotiates them as needs change is describing service level management in action, not just the existence of an SLA document.",
+    },
 ]
 
 QUESTIONS = [
@@ -1552,7 +1566,7 @@ Within a service itself, utility and warranty describe two different qualities. 
             'Warranty covers more than uptime alone — capacity, security, and continuity all count too.',
         ],
         'scenario': "A managed service provider proudly reports that its help desk closed 500 tickets last month — an output. But when a client's finance team is asked whether things actually feel better, they mention that recurring printer failures still interrupt their workday weekly, just with faster tickets each time. The provider optimized for output volume while the outcome the client actually needed, uninterrupted printing, never improved. A revised SLA that tracks repeat-incident rate, not just closure speed, would better capture the warranty and outcome the client is actually paying for.",
-        'onTheJob': "In a real service desk, 'ticket volume' and 'first-response time' are exactly the output metrics that end up on a manager's dashboard because they're easy to count, even when everyone privately knows they don't reflect whether users are actually less frustrated — pushing a team to report on outcome measures like repeat-incident rate is usually an uphill argument, not a given. SLA negotiations in practice are also as much about which warranty dimension actually gets measured, uptime versus response time versus how a breach gets remediated, as about the headline percentage everyone fixates on first.",
+        'onTheJob': "In a real service desk, 'ticket volume' and 'first-response time' are exactly the output metrics that end up on a manager's dashboard because they're easy to count, even when everyone privately knows they don't reflect whether users are actually less frustrated — pushing a team to report on outcome measures like repeat-incident rate is usually an uphill argument, not a given. SLA negotiations in practice are also as much about which warranty dimension actually gets measured, uptime versus response time versus how a breach gets remediated, as about the headline percentage everyone fixates on first. A common misconfiguration is writing an SLA that only credits downtime against an uptime figure while leaving capacity or security failures out of the document entirely, which quietly narrows warranty down to just one of its four components until an incident falls outside what the contract actually covers.",
     },
     {
         'id': 'roles-and-relationships',
@@ -1624,7 +1638,7 @@ A handful of management practices come up often enough on the exam to be worth k
             "The service desk doesn't need to resolve every issue itself to be doing its job — coordination and communication are its real value.",
         ],
         'scenario': "After a spike in checkout failures on an e-commerce platform, the service desk logs the incidents and restores service by restarting a failed process, resolving the immediate incident within the hour. Problem management then investigates separately and finds a memory leak in a recent deployment, logging it as a known error with the workaround documented for the support team while a permanent code fix is scheduled through a normal change. Meanwhile, leadership's governance decision that every production deployment needs a rollback plan is what made that restart even possible in minutes rather than hours.",
-        'onTheJob': "Incident and problem management get blurred together constantly on a real service desk because the same person often does both jobs back to back — restart the service, then separately dig into why it broke — and a manager's real job is making sure the root-cause investigation actually happens once the fire is out, since it's the step that gets skipped under pressure. Known errors with a documented workaround are also where a lot of technical debt quietly accumulates, since a workaround that's 'good enough' can sit unfixed for years once the pressure to permanently resolve it fades.",
+        'onTheJob': "Incident and problem management get blurred together constantly on a real service desk because the same person often does both jobs back to back — restart the service, then separately dig into why it broke — and a manager's real job is making sure the root-cause investigation actually happens once the fire is out, since it's the step that gets skipped under pressure. Known errors with a documented workaround are also where a lot of technical debt quietly accumulates, since a workaround that's 'good enough' can sit unfixed for years once the pressure to permanently resolve it fades. This same documented, rollback-plan-first discipline around approving a production change is what CompTIA's Cloud+ certification tests directly under its own Change management process flashcard, just framed around cloud operations rather than ITIL's broader service value system.",
     },
     {
         'id': 'four-dimensions',
@@ -1648,7 +1662,7 @@ All four dimensions sit inside a wider environment shaped by external PESTLE fac
             'A change rarely stays inside one dimension — the exam often describes a ripple effect across two dimensions at once.',
         ],
         'scenario': "A logistics company outsources its network monitoring to a third-party provider (partners and suppliers), which requires its own staff to be retrained on how to interpret the vendor's alerts correctly (organizations and people). Around the same time, new environmental regulations (a PESTLE factor) push the company to consolidate data centers, forcing a redesign of how incident tickets get routed between the old and new infrastructure (value streams and processes) alongside the monitoring platform migration itself (information and technology). No single dimension captures the whole change — all four move together.",
-        'onTheJob': "A manager doing a real post-incident review uses the four dimensions less as vocabulary to recite and more as a checklist to make sure a fix doesn't just patch the technology while ignoring that staff also need retraining or that a vendor contract needs revisiting — missing one of the four is usually how the same incident recurs six months later. PESTLE factors show up as boring compliance memos from legal or HR that nobody reads until a new regulation forces an unplanned redesign of a process that was working fine the day before.",
+        'onTheJob': "A manager doing a real post-incident review uses the four dimensions less as vocabulary to recite and more as a checklist to make sure a fix doesn't just patch the technology while ignoring that staff also need retraining or that a vendor contract needs revisiting — missing one of the four is usually how the same incident recurs six months later. PESTLE factors show up as boring compliance memos from legal or HR that nobody reads until a new regulation forces an unplanned redesign of a process that was working fine the day before. A frequent blind spot inside partners and suppliers is treating a signed contract as proof the dimension is covered, when the more common real-world failure is that nobody ever actually tested the vendor's promised failover process until the day it was needed and it didn't work as documented.",
     },
     {
         'id': 'product-service-lifecycle',

@@ -318,6 +318,34 @@
       "front": "Data governance",
       "back": "The overall practice of managing data quality, access, ownership, and compliance across an organization \u2014 deciding who can see what data, ensuring it stays accurate, and tracking where it came from.",
       "detail": "Data professional roles like a data steward or data owner exist specifically to carry out data governance responsibilities day to day, rather than governance being an abstract policy with no one actually responsible for it."
+    },
+    {
+      "id": "f40",
+      "cat": "relational",
+      "front": "Denormalization",
+      "back": "Deliberately reintroducing redundancy into a table, the opposite of Normalization, to reduce the number of joins a read-heavy reporting query needs, at the cost of extra storage and more places to update when the data changes.",
+      "detail": "A data warehouse's star schema is itself a denormalized design on purpose \u2014 fact and dimension tables are shaped for fast aggregation, not for eliminating redundancy the way a normalized OLTP schema is."
+    },
+    {
+      "id": "f41",
+      "cat": "nonRelational",
+      "front": "Sharding (horizontal partitioning)",
+      "back": "Splitting a large dataset across multiple physical nodes or databases, each holding a subset of the rows called a shard, so no single node's storage or throughput becomes a bottleneck as the dataset grows \u2014 the physical distribution strategy behind horizontally-scaled stores like Azure Cosmos DB.",
+      "detail": "Sharding distributes rows across separate machines; it is a different concept from normalization, which reorganizes columns into separate related tables on the same database."
+    },
+    {
+      "id": "f42",
+      "cat": "coreData",
+      "front": "Microsoft Purview",
+      "back": "Microsoft's unified data governance service for discovering, cataloging, classifying, and tracking the lineage of data across an organization's estate \u2014 the concrete Azure tool that puts Data governance into practice rather than leaving it as policy alone.",
+      "detail": "A data map that shows which sensitive columns live in which database, and where that data flowed from, is a Purview capability, not something a database engine tracks on its own."
+    },
+    {
+      "id": "f43",
+      "cat": "nonRelational",
+      "front": "Consistency levels in Cosmos DB",
+      "back": "A tunable spectrum from strong (every read sees the most recent committed write) to eventual (a read may briefly return stale data), letting Azure Cosmos DB trade off latency and availability against how immediately consistent reads need to be across its globally distributed replicas.",
+      "detail": "Choosing a weaker consistency level is a deliberate trade for lower latency and higher availability, not a defect \u2014 the right level depends on whether an application can tolerate a brief delay before every region sees the same value."
     }
   ],
   "questions": [
@@ -1330,7 +1358,7 @@
         "SQL Server on Azure VMs is IaaS: the customer still patches the OS, unlike the two PaaS options."
       ],
       "scenario": "A company running an on-premises SQL Server estate that relies heavily on SQL Server Agent jobs and cross-database queries wants the least possible re-engineering while still moving off physical hardware. Azure SQL Managed Instance is the fit here \u2014 it preserves those instance-level features while still handing patching and backups to Microsoft, unlike Azure SQL Database, which doesn't support them, or SQL Server on an Azure VM, which would keep the OS-patching burden on the company.",
-      "onTheJob": "In practice, the DTU-vs-vCore decision often isn't a technical debate at all \u2014 it's decided the moment someone in finance points out the company already owns a stack of SQL Server licenses, since only the vCore model can apply Azure Hybrid Benefit against them, and that alone frequently settles the argument. Picking between SQL Database, Managed Instance, and a VM in a real migration is really a conversation about which legacy features an old application secretly depends on, and it's common to discover a critical SQL Server Agent job nobody remembers writing only after the simpler option has already been provisioned and something quietly breaks. A DBA choosing PostgreSQL or MySQL over SQL Server on Azure is rarely making a technology judgment at all \u2014 it's almost always inherited from whatever the original application team already knew how to run."
+      "onTheJob": "In practice, the DTU-vs-vCore decision often isn't a technical debate at all \u2014 it's decided the moment someone in finance points out the company already owns a stack of SQL Server licenses, since only the vCore model can apply Azure Hybrid Benefit against them, and that alone frequently settles the argument. Picking between SQL Database, Managed Instance, and a VM in a real migration is really a conversation about which legacy features an old application secretly depends on, and it's common to discover a critical SQL Server Agent job nobody remembers writing only after the simpler option has already been provisioned and something quietly breaks. A DBA choosing PostgreSQL or MySQL over SQL Server on Azure is rarely making a technology judgment at all \u2014 it's almost always inherited from whatever the original application team already knew how to run. A Managed Instance migration also tends to surface exactly one on-premises dependency nobody documented, like a cross-database view or a linked server pointing at a system that itself still needs migrating, which is why a compatibility assessment pass is worth running even when the team is already confident Managed Instance is the right target."
     },
     {
       "id": "non-relational-data-on-azure",
@@ -1372,7 +1400,7 @@
         "Table Storage is not a smaller Cosmos DB \u2014 it lacks Cosmos DB's global distribution and tunable consistency guarantees entirely."
       ],
       "scenario": "A gaming company needs to track which players are friends with which other players, and wants to efficiently query multi-hop relationships like 'friends of friends.' Modeling this in a document or key-value store would mean manually walking references one query at a time; Cosmos DB's Gremlin API instead treats players as graph nodes and friendships as edges, making that kind of relationship traversal a first-class, efficient query.",
-      "onTheJob": "Cosmos DB's per-API choice matters to a real team mostly because of cost and consistency tradeoffs that only show up on the monthly bill \u2014 a team that reaches for the most flexible consistency level by default, without thinking about it, often discovers later that they paid a real latency and dollar cost for a stronger guarantee than their application actually needed. Blob Storage access tiers are a classic place where a well-intentioned cost-savings project backfires: moving rarely-touched data to Archive without checking how often it's actually retrieved can turn an occasional read into a multi-hour, and surprisingly expensive, rehydration wait. Whoever owns Data Lake Storage Gen2's folder permissions in practice ends up being the person who fields every 'why can't I see this dataset' ticket, since those permissions map to organizational access politics far more than to a technical decision."
+      "onTheJob": "Cosmos DB's per-API choice matters to a real team mostly because of cost and consistency tradeoffs that only show up on the monthly bill \u2014 a team that reaches for the most flexible consistency level by default, without thinking about it, often discovers later that they paid a real latency and dollar cost for a stronger guarantee than their application actually needed. Blob Storage access tiers are a classic place where a well-intentioned cost-savings project backfires: moving rarely-touched data to Archive without checking how often it's actually retrieved can turn an occasional read into a multi-hour, and surprisingly expensive, rehydration wait. Whoever owns Data Lake Storage Gen2's folder permissions in practice ends up being the person who fields every 'why can't I see this dataset' ticket, since those permissions map to organizational access politics far more than to a technical decision. Azure Data Lake Storage Gen2 is not a DP-900-only concept either \u2014 AZ-305 architects design around this exact same hierarchical-namespace-on-Blob-Storage pattern when deciding whether an analytics workload's storage account needs the feature enabled from day one, since turning it on after data has already landed is far more disruptive than provisioning it correctly up front."
     },
     {
       "id": "data-warehousing-and-pipelines",
@@ -1458,7 +1486,7 @@
         "DirectQuery always reflects the live source but is typically slower per query; Import mode is faster but only as fresh as its last scheduled refresh."
       ],
       "scenario": "A retail analytics team runs unpredictable, occasional ad hoc queries against a small dataset most of the day, but needs to power a live executive dashboard from the same warehouse that must always reflect this second's sales figures. They'd reach for a serverless SQL pool for the ad hoc exploration, since it bills only for what's actually queried, and DirectQuery for the executive dashboard, accepting a small performance cost in exchange for always-current numbers rather than a stale, scheduled Import-mode refresh.",
-      "onTheJob": "The pitch behind Microsoft Fabric's OneLake is genuinely compelling in a sales meeting, but in a real org, migrating years of separate Synapse, Databricks, and Power BI datasets onto one shared lake is a multi-quarter project with its own political friction, since it usually means someone's carefully tuned existing pipeline has to be rebuilt rather than just pointed at a new endpoint. Import mode vs. DirectQuery in Power BI is a decision a report author often only revisits after an executive complains a dashboard 'still shows yesterday's numbers,' at which point the tradeoff between refresh staleness and live query cost stops being theoretical. Choosing serverless vs. dedicated Synapse SQL pools is frequently less about workload shape and more about whichever cost line item is easier for a given team to get approved that quarter \u2014 a per-query bill from serverless usage is a much easier expense to explain upward than a large provisioned reservation."
+      "onTheJob": "The pitch behind Microsoft Fabric's OneLake is genuinely compelling in a sales meeting, but in a real org, migrating years of separate Synapse, Databricks, and Power BI datasets onto one shared lake is a multi-quarter project with its own political friction, since it usually means someone's carefully tuned existing pipeline has to be rebuilt rather than just pointed at a new endpoint. Import mode vs. DirectQuery in Power BI is a decision a report author often only revisits after an executive complains a dashboard 'still shows yesterday's numbers,' at which point the tradeoff between refresh staleness and live query cost stops being theoretical. Choosing serverless vs. dedicated Synapse SQL pools is frequently less about workload shape and more about whichever cost line item is easier for a given team to get approved that quarter \u2014 a per-query bill from serverless usage is a much easier expense to explain upward than a large provisioned reservation. A dedicated SQL pool left running unpaused over a weekend because nobody scheduled a pause window is one of the most common self-inflicted Synapse cost surprises, since its compute bills continuously whether or not a single query actually runs against it."
     }
   ],
   "cheatSheet": [
