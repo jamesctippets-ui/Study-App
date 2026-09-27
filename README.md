@@ -201,7 +201,7 @@ descriptive caption deliberately hidden — showing it there would just
 hand over the answer.
 
 A **Glossary** button on Home opens a cross-track term reference
-(`GlossaryPanel` in 04_shared_ui.jsx): every visible track's flashcard
+(`GlossaryPanel` in 04b_panels_ui.jsx): every visible track's flashcard
 fronts merged by lowercased/trimmed text (so identical terms across
 tracks collapse into one entry with both tracks' badges, while genuinely
 different phrasing per track stays separate), searchable, with
@@ -242,7 +242,7 @@ counter guards the chain so any cancellation — toggling Listen off,
 switching tracks, unmounting — reliably stops it even on browsers that
 fire `onend` rather than `onerror` on an interrupted utterance.
 
-Opening the app always lands on **Home** (`HomeView` in `04_shared_ui.jsx`)
+Opening the app always lands on **Home** (`HomeView` in `04a_home_ui.jsx`)
 rather than resuming the last track+mode directly — a real dashboard to
 start from every time, not a mid-session drop-back-in. Home shows, top to
 bottom:
@@ -255,7 +255,7 @@ bottom:
   included), turns solid green once you hit it, and can be adjusted with
   a tap-to-reveal +/- 5 stepper.
 - **If you have an active cert path, Home leads with it** —
-  `CertPathHomeSection` in 04_shared_ui.jsx, not a card linking out to a
+  `CertPathHomeSection` in 04a_home_ui.jsx, not a card linking out to a
   separate panel. The first not-yet-passed cert gets a full "up next"
   hero: mastery, exam readiness (see below), a scheduled-date countdown
   badge if you've set one (red if overdue, gold inside a week), and a
@@ -459,9 +459,17 @@ src/js/
   01_diagrams.jsx        — SVG lesson diagrams
   02_portal_mockups.jsx  — fake Azure Portal screenshots used in lessons
   03_helpers.js          — shuffling, storage, question-prep helpers
-  04_shared_ui.jsx       — flashcards, quiz engine, lesson/course view
+  04a_home_ui.jsx        — Home, cert path, daily goal/question/vocab, achievements, Data panel
+  04b_panels_ui.jsx      — About/Legal, Glossary, term flyout, category filter
+  04c_lesson_ui.jsx      — flashcards, Study, cheat sheet, Match game, lesson/course view
+  04d_quiz_ui.jsx        — quiz setup, Verbal Quiz, CLI practice, Mad Libs, Sequence, QuestionView/QuizSummary
   05_final_exam_ui.jsx   — timed exam intro/runner/results
   06_app.jsx             — CertStudyApp, the top-level component
+
+  Files are concatenated in filename sort order (see build.py below), which
+  is why they're numerically prefixed; the 04a-04d split (formerly one
+  04_shared_ui.jsx) is purely for readability — see ROADMAP.md section 10
+  for why 06_app.jsx stays a single file.
 templates/
   index.html.tmpl        — the <head>/<body> shell, with a placeholder for
                             the assembled script

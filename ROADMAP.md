@@ -596,7 +596,36 @@ doesn't (and why it's still waiting).
   project doesn't currently have — README's "Where things stand" section
   already flags that as "a bigger call" needing its own justification,
   not something to bundle in as a side effect of an architecture cleanup
-  pass. Revisit when an actual second client shows up.
+  pass. Revisit when an actual second client shows up — most likely a
+  Capacitor/native wrapper if this ever heads toward app-store
+  distribution (a real but not-currently-prioritized goal), since that's
+  the point a second consumer of this code would actually exist.
+- [x] **Lighter file-organization cleanup (not the full module rework
+  above).** `04_shared_ui.jsx` had grown into a 3065-line grab-bag —
+  Home/cert-path widgets, overlay panels, lesson/study views, and every
+  quiz/game mode all in one file — genuinely hard to navigate even though
+  build.py's concatenation build doesn't require it to be one file. Split
+  into four files by responsibility, kept inside the same numeric-prefix
+  scheme so `build.py`'s `sorted(js_dir.glob("*.js*"))` concatenation
+  order is unaffected (`04a_home_ui.jsx` &lt; `04b_panels_ui.jsx` &lt;
+  `04c_lesson_ui.jsx` &lt; `04d_quiz_ui.jsx`, all still sorting between
+  `03_helpers.js` and `05_final_exam_ui.jsx`): `04a_home_ui.jsx` (Home,
+  `CertPathHomeSection`, `TrackListDropdown`, `TrackSwitcherSheet`,
+  `CertPathPanel`, daily goal/question/vocab widgets, achievements,
+  `DataPanel`), `04b_panels_ui.jsx` (About/Legal, Glossary, term flyout,
+  category filter), `04c_lesson_ui.jsx` (flashcards, Study, cheat sheet,
+  Match game, lesson/course views), `04d_quiz_ui.jsx` (quiz setup, Verbal
+  Quiz, CLI practice, Mad Libs, Sequence, `QuestionView`/`QuizSummary`).
+  Pure move — no logic changed — verified with a full rebuild
+  (`python3 build.py`) and the full Playwright regression suite passing
+  clean with zero errors. `06_app.jsx` (1845 lines) was evaluated too but
+  deliberately left as one file: it's a single `CertStudyApp` root
+  component whose ~35 `useState` hooks, ~25 effects, and mode-based JSX
+  routing all close over the same state — splitting it would mean either
+  extracting custom hooks (a real behavioral refactor, more than
+  "reorganize for readability") or spreading one function's body across
+  file boundaries with no actual decoupling benefit. Left for a future
+  pass if it's ever worth lifting state into hooks on its own merits.
 
 ## 11. More certification tracks (user's idea)
 

@@ -3140,7 +3140,7 @@ function categoryMasteryTrend(history, trackKey, categoryKey) {
 }
 
 
-/* ---------------- shared UI ---------------- */
+/* ---------------- shared UI: home & cert path ---------------- */
 
 function AchievementToast({ achievement }) {
   if (!achievement) return null;
@@ -4115,6 +4115,9 @@ function CertPathPanel({ tracks, certPlan, onAddTrack, onRemoveTrack, onMove, on
   );
 }
 
+
+/* ---------------- shared UI: overlay panels (about, glossary, terms) ---------------- */
+
 // A single bottom-sheet, same visual pattern as every other panel, holding
 // everything that isn't study content but still needs to live somewhere:
 // what the app is, what's changed recently, and the legal basics (Terms,
@@ -4387,6 +4390,9 @@ function CategoryFilterSelect({ categories, activeCat, onChange, masteryByCatego
     </select>
   );
 }
+
+
+/* ---------------- shared UI: lesson & study views ---------------- */
 
 // The SM-2 quality scale flashcards are rated on — 1 (total blank) through
 // 5 (instant, no hesitation). A 3+ counts as a pass for both SRS growth and
@@ -5468,6 +5474,9 @@ function CourseView({ lessons, flashcardsData, questionsData, categories, onQuiz
     </div>
   );
 }
+
+
+/* ---------------- shared UI: quiz & game modes ---------------- */
 
 function QuizSetup({ length, setLength, types, toggleType, onReroll, poolSize, missedCount, onReviewMissed, isMixed }) {
   const lengths = [5, 10, 15, 25];
