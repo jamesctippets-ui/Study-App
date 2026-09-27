@@ -1524,21 +1524,21 @@ function CertStudyApp() {
         <div className="flex gap-1 mb-4" style={{ boxShadow: SHADOW.card, background: COLOR.surface, padding: '4px', borderRadius: '12px', border: `1px solid ${COLOR.border}` }}>
           <button
             onClick={() => setMode('learn')}
-            className="flex-1"
+            className="flex-1 btn-flat"
             style={{ padding: '8px 2px', borderRadius: '9px', fontSize: '11px', fontWeight: 600, background: mode === 'learn' ? COLOR.primary : 'transparent', color: mode === 'learn' ? COLOR.onAccent : COLOR.muted }}
           >
             Learn
           </button>
           <button
             onClick={() => setMode('quiz')}
-            className="flex-1"
+            className="flex-1 btn-flat"
             style={{ padding: '8px 2px', borderRadius: '9px', fontSize: '11px', fontWeight: 600, background: mode === 'quiz' ? COLOR.primary : 'transparent', color: mode === 'quiz' ? COLOR.onAccent : COLOR.muted }}
           >
             Quiz
           </button>
           <button
             onClick={() => setMode('exam')}
-            className="flex-1"
+            className="flex-1 btn-flat"
             style={{ padding: '8px 2px', borderRadius: '9px', fontSize: '11px', fontWeight: 600, background: mode === 'exam' ? COLOR.gold : 'transparent', color: mode === 'exam' ? COLOR.onAccent : COLOR.muted }}
           >
             Exam
@@ -1549,21 +1549,21 @@ function CertStudyApp() {
           <div className="flex gap-1 mb-4" style={{ background: COLOR.bg, padding: '3px', borderRadius: '10px', border: `1px solid ${COLOR.border}` }}>
             <button
               onClick={() => setLearnView('cards')}
-              className="flex-1"
+              className="flex-1 btn-flat"
               style={{ padding: '6px 2px', borderRadius: '8px', fontSize: '10.5px', fontWeight: 600, background: learnView === 'cards' ? COLOR.surfaceRaised : 'transparent', color: learnView === 'cards' ? COLOR.text : COLOR.muted }}
             >
               Cards
             </button>
             <button
               onClick={() => setLearnView('study')}
-              className="flex-1"
+              className="flex-1 btn-flat"
               style={{ padding: '6px 2px', borderRadius: '8px', fontSize: '10.5px', fontWeight: 600, background: learnView === 'study' ? COLOR.surfaceRaised : 'transparent', color: learnView === 'study' ? COLOR.text : COLOR.muted }}
             >
               Study
             </button>
             <button
               onClick={() => setLearnView('sheet')}
-              className="flex-1"
+              className="flex-1 btn-flat"
               style={{ padding: '6px 2px', borderRadius: '8px', fontSize: '10.5px', fontWeight: 600, background: learnView === 'sheet' ? COLOR.surfaceRaised : 'transparent', color: learnView === 'sheet' ? COLOR.text : COLOR.muted }}
             >
               Sheet
@@ -1575,21 +1575,21 @@ function CertStudyApp() {
           <div className="flex gap-1 mb-4" style={{ background: COLOR.bg, padding: '3px', borderRadius: '10px', border: `1px solid ${COLOR.border}` }}>
             <button
               onClick={() => setQuizView('questions')}
-              className="flex-1"
+              className="flex-1 btn-flat"
               style={{ padding: '6px 2px', borderRadius: '8px', fontSize: '10.5px', fontWeight: 600, background: quizView === 'questions' ? COLOR.surfaceRaised : 'transparent', color: quizView === 'questions' ? COLOR.text : COLOR.muted }}
             >
               Questions
             </button>
             <button
               onClick={() => setQuizView('match')}
-              className="flex-1"
+              className="flex-1 btn-flat"
               style={{ padding: '6px 2px', borderRadius: '8px', fontSize: '10.5px', fontWeight: 600, background: quizView === 'match' ? COLOR.surfaceRaised : 'transparent', color: quizView === 'match' ? COLOR.text : COLOR.muted }}
             >
               Match
             </button>
             <button
               onClick={() => setQuizView('verbal')}
-              className="flex-1"
+              className="flex-1 btn-flat"
               style={{ padding: '6px 2px', borderRadius: '8px', fontSize: '10.5px', fontWeight: 600, background: quizView === 'verbal' ? COLOR.surfaceRaised : 'transparent', color: quizView === 'verbal' ? COLOR.text : COLOR.muted }}
             >
               Verbal
@@ -1597,7 +1597,7 @@ function CertStudyApp() {
             {DATA[activeTrack].cliChallenges && (
               <button
                 onClick={() => setQuizView('commands')}
-                className="flex-1"
+                className="flex-1 btn-flat"
                 style={{ padding: '6px 2px', borderRadius: '8px', fontSize: '10.5px', fontWeight: 600, background: quizView === 'commands' ? COLOR.surfaceRaised : 'transparent', color: quizView === 'commands' ? COLOR.text : COLOR.muted }}
               >
                 Commands
@@ -1606,7 +1606,7 @@ function CertStudyApp() {
             {madlibsData.length > 0 && (
               <button
                 onClick={() => setQuizView('madlibs')}
-                className="flex-1"
+                className="flex-1 btn-flat"
                 style={{ padding: '6px 2px', borderRadius: '8px', fontSize: '10.5px', fontWeight: 600, background: quizView === 'madlibs' ? COLOR.surfaceRaised : 'transparent', color: quizView === 'madlibs' ? COLOR.text : COLOR.muted }}
               >
                 Mad Libs
@@ -1615,7 +1615,7 @@ function CertStudyApp() {
             {sequencesData.length > 0 && (
               <button
                 onClick={() => setQuizView('sequence')}
-                className="flex-1"
+                className="flex-1 btn-flat"
                 style={{ padding: '6px 2px', borderRadius: '8px', fontSize: '10.5px', fontWeight: 600, background: quizView === 'sequence' ? COLOR.surfaceRaised : 'transparent', color: quizView === 'sequence' ? COLOR.text : COLOR.muted }}
               >
                 Sequence
@@ -1624,7 +1624,7 @@ function CertStudyApp() {
             {caseStudiesData.length > 0 && (
               <button
                 onClick={() => setQuizView('casestudy')}
-                className="flex-1"
+                className="flex-1 btn-flat"
                 style={{ padding: '6px 2px', borderRadius: '8px', fontSize: '10.5px', fontWeight: 600, background: quizView === 'casestudy' ? COLOR.surfaceRaised : 'transparent', color: quizView === 'casestudy' ? COLOR.text : COLOR.muted }}
               >
                 Case Study
