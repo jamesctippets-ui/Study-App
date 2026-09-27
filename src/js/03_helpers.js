@@ -490,7 +490,7 @@ function daysBetween(a, b) {
 function emptyStats() {
   return {
     streak: { current: 0, longest: 0, lastActiveDate: null },
-    counts: { quizzesCompleted: 0, examsPassed: 0, matchRoundsCompleted: 0, perfectQuizzes: 0 },
+    counts: { quizzesCompleted: 0, examsPassed: 0, matchRoundsCompleted: 0, perfectQuizzes: 0, caseStudiesCompleted: 0 },
     unlocked: [],
     lastVisited: null,
     dailyGoal: { target: 20, date: null, count: 0 },
@@ -560,6 +560,8 @@ const ACHIEVEMENTS = [
   { id: 'exam-ready', icon: '🏆', title: 'Exam Ready', description: 'Pass a timed Final Exam.', check: (c) => c.examsPassed >= 1, target: (c) => [Math.min(c.examsPassed, 1), 1] },
   { id: 'perfectionist', icon: '✨', title: 'Perfectionist', description: 'Score 100% on a quiz of 10+ questions.', check: (c) => c.perfectQuizzes >= 1, target: (c) => [Math.min(c.perfectQuizzes, 1), 1] },
   { id: 'match-maker', icon: '🧩', title: 'Match Maker', description: 'Complete 5 term-matching rounds.', check: (c) => c.matchRoundsCompleted >= 5, target: (c) => [Math.min(c.matchRoundsCompleted, 5), 5] },
+  { id: 'case-cracked', icon: '🕵️', title: 'Case Cracked', description: 'Finish your first mini case study.', check: (c) => c.caseStudiesCompleted >= 1, target: (c) => [Math.min(c.caseStudiesCompleted, 1), 1] },
+  { id: 'case-veteran', icon: '📂', title: 'Case Veteran', description: 'Finish 10 mini case studies.', check: (c) => c.caseStudiesCompleted >= 10, target: (c) => [Math.min(c.caseStudiesCompleted, 10), 10] },
 ];
 
 // Aggregates stats across every track (not just the active one) — achievements
@@ -571,7 +573,19 @@ function buildAchievementContext(results, stats) {
   Object.keys(DATA).forEach((key) => {
     const mod = DATA[key];
     const trackResults = results[key] || {};
-    const items = [...mod.flashcards.map((f) => f.id), ...mod.questions.map((q) => q.id)];
+    // Same id set trackMastery (below) folds in — flashcards/questions plus
+    // Mad Libs, Sequence, and case-study questions — so "correct answers,
+    // all-time" actually counts every scored item type, not just the two
+    // oldest ones. Without this, someone who studies mostly through case
+    // studies or Mad Libs would never see Quick Learner/Century Club/etc.
+    // move, despite those items counting toward mastery everywhere else.
+    const items = [
+      ...mod.flashcards.map((f) => f.id),
+      ...mod.questions.map((q) => q.id),
+      ...(mod.madlibs || []).map((m) => m.id),
+      ...(mod.sequences || []).map((s) => s.id),
+      ...(mod.caseStudies || []).flatMap((cs) => cs.questions.map((q) => q.id)),
+    ];
     const correctHere = items.filter((id) => trackResults[id] === 'correct').length;
     totalCorrect += correctHere;
     trackMasteries.push(items.length ? (correctHere / items.length) * 100 : 0);
@@ -594,6 +608,7 @@ function buildAchievementContext(results, stats) {
     examsPassed: stats.counts.examsPassed,
     perfectQuizzes: stats.counts.perfectQuizzes,
     matchRoundsCompleted: stats.counts.matchRoundsCompleted,
+    caseStudiesCompleted: stats.counts.caseStudiesCompleted,
   };
 }
 

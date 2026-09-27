@@ -147,8 +147,8 @@ function AboutLegalPanel({ onClose }) {
         <AboutSection title="About Cert Study Hub" defaultOpen>
           <p style={{ margin: '0 0 8px' }}>
             An independent study tool for IT certification exam prep — flashcards, timed quizzes, full mock
-            exams, and printable cheat sheets across Microsoft Azure/M365, CompTIA, ITIL, and a healthcare
-            interoperability track.
+            exams, scenario-based practice (Mad Libs and mini case studies), and printable cheat sheets across
+            Microsoft Azure/M365, CompTIA, ITIL, and a healthcare interoperability track.
           </p>
           <p style={{ margin: 0 }}>
             Found a wrong or outdated question, or have feedback? Reach out at{' '}
@@ -158,14 +158,13 @@ function AboutLegalPanel({ onClose }) {
 
         <AboutSection title="What's new">
           <ul style={{ margin: 0, paddingLeft: '18px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
-            <li>New Quiz modes: <strong>Verbal Quiz</strong> (hands-free, audio-only — reads questions and answers aloud for studying while driving), <strong>Commands</strong> (type real Azure CLI/PowerShell syntax for AZ-104 and AZ-802), <strong>Mad Libs</strong> (fill-in-the-blank scenarios for AZ-900, AZ-104, ITIL, and Cloud+), and <strong>Sequence</strong> (reorder the steps of a real procedure for AZ-104, AZ-305, ITIL, and AZ-802).</li>
-            <li>A Voice &amp; speech section in Data &amp; Progress — a rate slider and a voice picker that now apply to every 🔊 Listen button.</li>
-            <li>Real client-side routing — the browser's back/forward buttons and direct links to a specific track/mode now work properly.</li>
-            <li>ITIL and Cloud+ now have full course mode (lessons, diagrams), matching AZ-900/AZ-104; AZ-305 gained real architecture-center reference diagrams.</li>
-            <li>A cross-track Glossary, and every cheat sheet now opens with an exam-day strategy section (time budget, pass mark, process of elimination).</li>
-            <li>Confidence-based (1–5) flashcard rating with real spaced repetition, plus per-category mastery trends over time.</li>
-            <li>Per-category "Learn more" resource links, real Azure Portal screenshots, and printable one-page cheat sheets for every track.</li>
-            <li>Progress export/import, a daily streak, and 15 milestone achievements.</li>
+            <li>Home is now a real dashboard led by your own cert path — add the certs you're working toward and Home tracks progress, exam readiness, and a scheduled-date countdown for each right on the landing screen, with a header hamburger reaching "Manage cert path" and a house icon returning Home from anywhere.</li>
+            <li>New <strong>Case Study</strong> Quiz mode: a shared real-world scenario with several related questions answered in sequence, mirroring how associate/expert-level exams group multiple questions off one larger case instead of testing each fact in isolation — live across all 15 tracks.</li>
+            <li><strong>Mad Libs</strong> scenarios grew to 79 across all 15 tracks (up from 49), alongside 50 new flashcards written to reference other terms by name, so the tap-to-define flyouts fire more often.</li>
+            <li>"On the job" callouts (what a lesson means beyond the exam) and "Why this is tested" notes on trickier questions, plus new cross-course callouts that point out when a concept here is the exact same one another cert tests.</li>
+            <li>Smarter default text-to-speech voice selection and smoother sentence-by-sentence playback for every 🔊 Listen button and Verbal Quiz.</li>
+            <li>Quiz modes: <strong>Verbal Quiz</strong> (hands-free, audio-only), <strong>Commands</strong> (type real Azure CLI/PowerShell syntax), and <strong>Sequence</strong> (reorder the steps of a real procedure).</li>
+            <li>A cross-track Glossary, per-category mastery trends, progress export/import, a daily streak, and 17 milestone achievements.</li>
           </ul>
         </AboutSection>
 
@@ -191,7 +190,7 @@ function AboutLegalPanel({ onClose }) {
 
         <AboutSection title="Disclaimer & trademarks">
           <ul style={{ margin: 0, paddingLeft: '18px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-            <li>Microsoft, Azure, Microsoft 365, Entra ID, CompTIA, Cloud+, ITIL, and AXELOS are trademarks of their respective owners. This app is not affiliated with, endorsed by, or sponsored by any of them — those names are used only to describe which exam each track prepares you for.</li>
+            <li>Microsoft, Azure, Microsoft 365, Microsoft Copilot, Entra ID, CompTIA, Cloud+, ITIL, AXELOS, HL7, and FHIR are trademarks of their respective owners. This app is not affiliated with, endorsed by, or sponsored by any of them — those names are used only to describe which exam (or, for the healthcare interoperability track, which industry standards) each track covers.</li>
             <li>Real Azure Portal screenshots shown in some lessons are sourced from Microsoft's own CC BY 4.0-licensed documentation, with attribution shown alongside each one.</li>
             <li>Passing a real certification exam depends on many factors beyond any single study tool. Nothing here is a guarantee of exam results.</li>
           </ul>

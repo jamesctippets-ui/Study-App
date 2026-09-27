@@ -287,6 +287,18 @@ come up.
   pattern instead of introducing a new one. See LAUNCH_CHECKLIST.md
   section 1 for what's covered and what's still open (an accessibility
   statement, a persistent footer once this has its own domain).
+  - Refreshed later once enough had shipped to make the "what's new"
+    list stale: replaced the oldest entries (routing, ITIL/Cloud+ course
+    mode, SRS rating — all now baseline features, not "new") with the
+    Home/cert-path redesign, mini case studies, the Mad Libs/flashcard
+    expansion, on-the-job/why-tested callouts, and the smarter TTS voice
+    picker — keeping the list a recent-highlights reel rather than an
+    ever-growing one. The Disclaimer's trademark list also picked up two
+    real gaps found on review: Microsoft Copilot (AB-650 covers M365
+    Copilot administration) and HL7/FHIR (both are trademarks of HL7
+    International, and the EHR Integration track is built entirely
+    around them) — neither had been named despite both tracks existing
+    for a while.
 - [x] A **light/dark theme toggle** (user's idea) — a sun/moon sliding
   switch (`ThemeToggle`, `00_preamble.js`) in the header, dark mode a
   neutral dark grey (not the previous purple-tinted dark), light mode
@@ -399,11 +411,26 @@ come up.
 
 - [x] A daily streak counter (no accounts needed — this is exactly the kind
   of thing that fits the app's local-storage-only, no-login model).
-- [x] Milestone badges — 15 achievements (mastery, streaks, quiz/exam/match
-  counts, course completion) opened from a 🏆 header button, with a toast
-  on unlock. Once earned, an achievement stays shown as earned even if the
-  live condition later goes false (e.g. a new track diluting an all-tracks
-  mastery check) — see src/js/03_helpers.js's evaluateAchievements().
+- [x] Milestone badges — 17 achievements (mastery, streaks, quiz/exam/match/
+  case-study counts, course completion) opened from a 🏆 header button, with
+  a toast on unlock. Once earned, an achievement stays shown as earned even
+  if the live condition later goes false (e.g. a new track diluting an
+  all-tracks mastery check) — see src/js/03_helpers.js's evaluateAchievements().
+- [x] **Case Cracked / Case Veteran added, plus a real scoring bug fixed,
+  once mini case studies (section 4) and the Mad Libs/Sequence expansion
+  landed.** Two new achievements track `stats.counts.caseStudiesCompleted`
+  (incremented in `advanceCaseStudy`, 06_app.jsx, the same pattern as
+  `matchRoundsCompleted`): finish 1 case study, finish 10. Along the way,
+  found and fixed a real inconsistency: `buildAchievementContext`'s
+  `totalCorrect` (what "First Steps"/"Quick Learner"/"Century Club"/"Half
+  Grand" count) only ever summed flashcard + question ids — Mad Libs,
+  Sequence, and case-study answers already fed `trackMastery` everywhere
+  else in the app, but never counted toward these achievements. Someone
+  studying mostly through case studies or Mad Libs would answer plenty of
+  questions correctly and never see these achievements move. Fixed by
+  folding in the exact same id set `trackMastery` already uses. Verified
+  live (not just read the code): completing one AZ-305 case study took the
+  unlocked count from 0/17 to 2/17 in a real browser session.
 - No leaderboards or social features — those need accounts/a backend, which
   is a deliberate trade-off this app has made for staying fully static.
 

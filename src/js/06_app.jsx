@@ -748,6 +748,7 @@ function CertStudyApp() {
     setCsMsPending([]);
     if (csQIndex + 1 >= currentCaseStudy.questions.length) {
       setCsPhase('complete');
+      saveStats({ ...stats, counts: { ...stats.counts, caseStudiesCompleted: stats.counts.caseStudiesCompleted + 1 } });
     } else {
       setCsQIndex((i) => i + 1);
     }

@@ -207,8 +207,8 @@ tracks collapse into one entry with both tracks' badges, while genuinely
 different phrasing per track stays separate), searchable, with
 expand/collapse per entry.
 
-A trophy header button opens **Achievements** — 15 milestone badges (mastery,
-streaks, quiz/exam/match counts, course completion) plus a daily streak
+A trophy header button opens **Achievements** — 17 milestone badges (mastery,
+streaks, quiz/exam/match/case-study counts, course completion) plus a daily streak
 counter, all computed from progress already being tracked, no new data
 entry required. A gear **Data & progress** button opens export/import
 (download all progress as a JSON file, or restore from one — the only
