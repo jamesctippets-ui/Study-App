@@ -99,6 +99,13 @@ function CertStudyApp() {
   const writeChain = useRef(Promise.resolve());
   const utterRef = useRef(null);
   const skipNextAutoStart = useRef(false);
+  // Bumped on every speak()/stopSpeaking() call — each chained utterance
+  // in speak()'s sentence-by-sentence sequence checks its own captured
+  // value against this before speaking the next chunk, so a cancel from
+  // anywhere (toggling the same Listen button off, switching tracks,
+  // unmounting) reliably stops the whole chain even on browsers that fire
+  // `onend` rather than `onerror` for an interrupted utterance.
+  const speakGenerationRef = useRef(0);
 
   // Mirror results/seenLog/stats so persistPayload can always read the
   // latest value of the two fields a given save*() call isn't itself
@@ -358,33 +365,59 @@ function CertStudyApp() {
     });
   };
 
+  // Stops whatever speak() is currently doing (including mid-chain) from
+  // anywhere — bumping the generation ref first means the in-flight
+  // chain's own onend/onerror handlers see a stale generation and stop
+  // themselves, regardless of whether this browser fires onend or
+  // onerror for the utterance that cancel() just interrupted.
+  const stopSpeaking = () => {
+    speakGenerationRef.current += 1;
+    if (speechSupported) window.speechSynthesis.cancel();
+  };
+
   const speak = (id, text) => {
     if (!speechSupported) return;
-    window.speechSynthesis.cancel();
+    stopSpeaking();
     if (speakingId === id) { setSpeakingId(null); return; }
-    const utter = new SpeechSynthesisUtterance(text);
-    utter.rate = ttsRate;
-    if (ttsVoiceURI) {
-      const voice = ttsVoices.find((v) => v.voiceURI === ttsVoiceURI);
+    const myGeneration = speakGenerationRef.current;
+    const chunks = splitIntoSpeechChunks(text);
+    // A voice the user picked explicitly always wins; otherwise fall back
+    // to the best-guessed voice instead of leaving it unset (which just
+    // hands the choice to whatever the browser considers "default" —
+    // often its oldest, lowest-quality installed voice).
+    const voice = ttsVoiceURI
+      ? ttsVoices.find((v) => v.voiceURI === ttsVoiceURI)
+      : bestVoiceForLang(ttsVoices, 'en');
+
+    const speakChunk = (index) => {
+      if (speakGenerationRef.current !== myGeneration) return;
+      if (index >= chunks.length) { setSpeakingId(null); return; }
+      const utter = new SpeechSynthesisUtterance(chunks[index]);
+      utter.rate = ttsRate;
       if (voice) utter.voice = voice;
-    }
-    utter.onend = () => setSpeakingId(null);
-    utter.onerror = () => setSpeakingId(null);
-    // Keep a reference so the utterance isn't garbage-collected mid-speech
-    // (a well-known cross-browser bug that cuts playback short or silently
-    // no-ops).
-    utterRef.current = utter;
+      utter.onend = () => speakChunk(index + 1);
+      utter.onerror = () => { if (speakGenerationRef.current === myGeneration) setSpeakingId(null); };
+      // Keep a reference so the utterance isn't garbage-collected mid-speech
+      // (a well-known cross-browser bug that cuts playback short or silently
+      // no-ops).
+      utterRef.current = utter;
+      window.speechSynthesis.speak(utter);
+    };
+
     setSpeakingId(id);
-    // speak() MUST run synchronously within this same click-handler call
-    // stack — Safari (especially iOS) only allows speech synthesis inside
-    // a direct user-gesture chain, and a setTimeout/Promise tick in between
-    // breaks that chain, silently dropping the utterance. Do not defer this.
-    window.speechSynthesis.speak(utter);
+    // The first chunk MUST speak synchronously within this same click-
+    // handler call stack — Safari (especially iOS) only allows speech
+    // synthesis inside a direct user-gesture chain, and a setTimeout/
+    // Promise tick in between breaks that chain, silently dropping the
+    // utterance. Every later chunk speaks from the previous one's onend,
+    // which every browser here already treats as a valid continuation
+    // (the same pattern the Verbal Quiz driver below relies on).
+    speakChunk(0);
   };
 
   useEffect(() => {
     return () => {
-      if (speechSupported) window.speechSynthesis.cancel();
+      stopSpeaking();
       if (wakeLockRef.current) wakeLockRef.current.release().catch(() => {});
     };
     // eslint-disable-next-line
@@ -449,10 +482,10 @@ function CertStudyApp() {
 
     const utter = new SpeechSynthesisUtterance(text);
     utter.rate = ttsRate;
-    if (ttsVoiceURI) {
-      const voice = ttsVoices.find((v) => v.voiceURI === ttsVoiceURI);
-      if (voice) utter.voice = voice;
-    }
+    const verbalVoice = ttsVoiceURI
+      ? ttsVoices.find((v) => v.voiceURI === ttsVoiceURI)
+      : bestVoiceForLang(ttsVoices, 'en');
+    if (verbalVoice) utter.voice = verbalVoice;
     utter.onend = goNext;
     utter.onerror = goNext;
     window.speechSynthesis.speak(utter);
@@ -484,7 +517,7 @@ function CertStudyApp() {
   // fresh rather than resuming a stale session.
   useEffect(() => {
     if (mode === 'quiz' && quizView === 'verbal') return;
-    if (speechSupported) window.speechSynthesis.cancel();
+    stopSpeaking();
     setVerbalPhase((p) => (p === 'setup' ? p : 'setup'));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mode, quizView, activeTrack]);

@@ -1050,6 +1050,43 @@ specifically (still open).
     mid-session stops the speech and resets back to its own setup screen
     (a small effect keyed on `[mode, quizView, activeTrack]`) rather than
     letting it keep talking in the background.
+- [x] **Follow-up: smoother playback without adding a cloud TTS dependency.**
+  User feedback: the existing TTS didn't sound smooth enough. The app only
+  ever calls the browser's own `speechSynthesis` — there's no separate
+  "TTS agent" to swap — so a real quality jump (ElevenLabs/OpenAI/Azure/
+  Google neural voices) would mean a bring-your-own-API-key, per-character-
+  cost, online-only dependency, which breaks the fully-static/free/
+  offline-capable design this app has held to throughout. Shipped the
+  free, architecture-preserving half instead:
+  - **Voice quality heuristic** (`voiceQualityScore`/`bestVoiceForLang` in
+    03_helpers.js): every OS/browser that ships a nicer neural voice
+    alongside its older default flags it in the name somehow ("Natural",
+    "Online", "Neural", "Premium", "Enhanced", "Wavenet", "Studio" — Edge,
+    Chrome, and Android all use one), and a non-`localService` voice is
+    usually cloud-model-backed rather than the OS's older on-device
+    engine — both decent proxies for "will sound smoother" without ever
+    being able to actually hear a voice first. `speak()` (06_app.jsx) now
+    auto-picks the best-scoring English voice when the user hasn't chosen
+    one explicitly, instead of leaving `utter.voice` unset (which just
+    handed the choice to the browser's own arbitrary "default," often
+    its oldest, lowest-quality installed voice). The Data & Progress
+    voice picker sorts by the same score within each language (better
+    voices surface first instead of alphabetical) and marks whichever
+    voice the auto-pick would resolve to as "— recommended."
+  - **Sentence-chunked chained utterances** (`splitIntoSpeechChunks`):
+    `speak()` now splits text on sentence boundaries and speaks each as
+    its own utterance, chained via `onend`, rather than handing a whole
+    paragraph over as one long unbroken utterance — several engines
+    sound noticeably flatter/more monotone on a long run-on utterance
+    (no prosody reset between sentences) than the same text as several
+    shorter ones back to back, and very long text can hit a hard length
+    cutoff on some engines. A generation counter (`speakGenerationRef`)
+    guards every chained step, so a cancel from anywhere — toggling the
+    same Listen button off, switching tracks, unmounting — reliably
+    stops the whole chain even on browsers that fire `onend` rather than
+    `onerror` for an interrupted utterance (verified directly: a naive
+    version of this chain would otherwise let a stale utterance's onend
+    keep the old chain going after a supposedly-cancelling click).
 - [x] **All 15 tracks now have full course/LESSONS mode** (previously only
   AZ-900, AZ-104, ITIL, and Cloud+ did). Six background agents added
   `LESSONS` to the remaining 11 tracks in pairs (DP-900+DP-300,

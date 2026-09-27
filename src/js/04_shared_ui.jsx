@@ -84,15 +84,22 @@ function DataPanel({
   const fileInputRef = useRef(null);
   // English voices first (this app's own content is all English), but never
   // hide the rest — a bilingual user may still want their OS's other voices.
+  // Within each group, the better-sounding voices (per voiceQualityScore's
+  // name-hint/network-backed heuristic) surface first instead of plain
+  // alphabetical order, so the smoothest options aren't buried below a
+  // long list of older on-device voices.
   const sortedVoices = useMemo(() => {
     if (!ttsVoices || !ttsVoices.length) return [];
     return [...ttsVoices].sort((a, b) => {
       const aEn = a.lang.startsWith('en') ? 0 : 1;
       const bEn = b.lang.startsWith('en') ? 0 : 1;
       if (aEn !== bEn) return aEn - bEn;
+      const scoreDiff = voiceQualityScore(b) - voiceQualityScore(a);
+      if (scoreDiff !== 0) return scoreDiff;
       return a.name.localeCompare(b.name);
     });
   }, [ttsVoices]);
+  const recommendedVoice = useMemo(() => bestVoiceForLang(ttsVoices, 'en'), [ttsVoices]);
   return (
     <div
       onClick={onClose}
@@ -139,9 +146,11 @@ function DataPanel({
                 background: COLOR.surfaceRaised, border: `1px solid ${COLOR.border}`, color: COLOR.text, fontSize: '13px',
               }}
             >
-              <option value="">Browser default</option>
+              <option value="">Auto (picks the best-sounding voice available)</option>
               {sortedVoices.map((v) => (
-                <option key={v.voiceURI} value={v.voiceURI}>{v.name} ({v.lang})</option>
+                <option key={v.voiceURI} value={v.voiceURI}>
+                  {v.name} ({v.lang}){recommendedVoice && v.voiceURI === recommendedVoice.voiceURI ? ' — recommended' : ''}
+                </option>
               ))}
             </select>
             <button

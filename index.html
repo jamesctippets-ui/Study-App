@@ -2369,6 +2369,53 @@ function autoHighlightTerms(text, vocabPool, activeKey, onToggle, maxTerms, bloc
 
 /* ---------------- helpers ---------------- */
 
+// A rough, name-based quality signal for a SpeechSynthesisVoice — the Web
+// Speech API exposes no real quality metadata, just `name`/`lang`/
+// `localService`/`default`. Every OS/browser that ships a nicer neural
+// voice alongside its older default one flags it in the name somehow
+// ("Natural", "Online", "Neural", "Premium", "Enhanced", "Wavenet",
+// "Studio" — Edge, Chrome, and Android all use one of these), and a
+// non-local ("network") voice is usually backed by a cloud model rather
+// than the OS's older on-device engine, so both are decent proxies for
+// "this will sound smoother than the OS default" without ever being able
+// to actually hear the voice first.
+const TTS_QUALITY_NAME_HINTS = ['natural', 'neural', 'premium', 'enhanced', 'online', 'wavenet', 'studio'];
+function voiceQualityScore(voice) {
+  const name = (voice.name || '').toLowerCase();
+  let score = 0;
+  if (TTS_QUALITY_NAME_HINTS.some((hint) => name.includes(hint))) score += 10;
+  if (voice.localService === false) score += 5;
+  if (voice.default) score += 1;
+  return score;
+}
+
+// The best-guess default voice for a language, used both to auto-select a
+// voice when the user hasn't picked one explicitly and to sort the voice
+// picker so the better-sounding options surface first within each
+// language instead of plain alphabetical order.
+function bestVoiceForLang(voices, langPrefix) {
+  if (!voices || !voices.length) return null;
+  const lower = langPrefix.toLowerCase();
+  const candidates = voices.filter((v) => (v.lang || '').toLowerCase().startsWith(lower));
+  const pool = candidates.length ? candidates : voices;
+  return [...pool].sort((a, b) => voiceQualityScore(b) - voiceQualityScore(a))[0];
+}
+
+// Splits a block of text into roughly one-sentence chunks for a chained
+// sequence of shorter utterances instead of one long unbroken one. Several
+// speech engines sound noticeably flatter/more monotone on a long run-on
+// utterance (no real prosody reset between sentences) than on the same
+// text spoken as several shorter utterances back to back, and very long
+// text can hit a hard length cutoff on some engines. A plain sentence-
+// boundary split (. ! ? followed by whitespace) is a good-enough
+// heuristic here — it doesn't need to be perfect, just better than
+// handing the whole paragraph over as one string.
+function splitIntoSpeechChunks(text) {
+  const parts = text.match(/[^.!?]+[.!?]+(?:\s+|$)|[^.!?]+$/g);
+  if (!parts || parts.length <= 1) return [text];
+  return parts.map((p) => p.trim()).filter(Boolean);
+}
+
 function seededShuffle(arr, seed) {
   const a = [...arr];
   let s = seed;
@@ -3179,15 +3226,22 @@ function DataPanel({
   const fileInputRef = useRef(null);
   // English voices first (this app's own content is all English), but never
   // hide the rest — a bilingual user may still want their OS's other voices.
+  // Within each group, the better-sounding voices (per voiceQualityScore's
+  // name-hint/network-backed heuristic) surface first instead of plain
+  // alphabetical order, so the smoothest options aren't buried below a
+  // long list of older on-device voices.
   const sortedVoices = useMemo(() => {
     if (!ttsVoices || !ttsVoices.length) return [];
     return [...ttsVoices].sort((a, b) => {
       const aEn = a.lang.startsWith('en') ? 0 : 1;
       const bEn = b.lang.startsWith('en') ? 0 : 1;
       if (aEn !== bEn) return aEn - bEn;
+      const scoreDiff = voiceQualityScore(b) - voiceQualityScore(a);
+      if (scoreDiff !== 0) return scoreDiff;
       return a.name.localeCompare(b.name);
     });
   }, [ttsVoices]);
+  const recommendedVoice = useMemo(() => bestVoiceForLang(ttsVoices, 'en'), [ttsVoices]);
   return (
     <div
       onClick={onClose}
@@ -3234,9 +3288,11 @@ function DataPanel({
                 background: COLOR.surfaceRaised, border: `1px solid ${COLOR.border}`, color: COLOR.text, fontSize: '13px',
               }}
             >
-              <option value="">Browser default</option>
+              <option value="">Auto (picks the best-sounding voice available)</option>
               {sortedVoices.map((v) => (
-                <option key={v.voiceURI} value={v.voiceURI}>{v.name} ({v.lang})</option>
+                <option key={v.voiceURI} value={v.voiceURI}>
+                  {v.name} ({v.lang}){recommendedVoice && v.voiceURI === recommendedVoice.voiceURI ? ' — recommended' : ''}
+                </option>
               ))}
             </select>
             <button
@@ -6459,6 +6515,13 @@ function CertStudyApp() {
   const writeChain = useRef(Promise.resolve());
   const utterRef = useRef(null);
   const skipNextAutoStart = useRef(false);
+  // Bumped on every speak()/stopSpeaking() call — each chained utterance
+  // in speak()'s sentence-by-sentence sequence checks its own captured
+  // value against this before speaking the next chunk, so a cancel from
+  // anywhere (toggling the same Listen button off, switching tracks,
+  // unmounting) reliably stops the whole chain even on browsers that fire
+  // `onend` rather than `onerror` for an interrupted utterance.
+  const speakGenerationRef = useRef(0);
 
   // Mirror results/seenLog/stats so persistPayload can always read the
   // latest value of the two fields a given save*() call isn't itself
@@ -6718,33 +6781,59 @@ function CertStudyApp() {
     });
   };
 
+  // Stops whatever speak() is currently doing (including mid-chain) from
+  // anywhere — bumping the generation ref first means the in-flight
+  // chain's own onend/onerror handlers see a stale generation and stop
+  // themselves, regardless of whether this browser fires onend or
+  // onerror for the utterance that cancel() just interrupted.
+  const stopSpeaking = () => {
+    speakGenerationRef.current += 1;
+    if (speechSupported) window.speechSynthesis.cancel();
+  };
+
   const speak = (id, text) => {
     if (!speechSupported) return;
-    window.speechSynthesis.cancel();
+    stopSpeaking();
     if (speakingId === id) { setSpeakingId(null); return; }
-    const utter = new SpeechSynthesisUtterance(text);
-    utter.rate = ttsRate;
-    if (ttsVoiceURI) {
-      const voice = ttsVoices.find((v) => v.voiceURI === ttsVoiceURI);
+    const myGeneration = speakGenerationRef.current;
+    const chunks = splitIntoSpeechChunks(text);
+    // A voice the user picked explicitly always wins; otherwise fall back
+    // to the best-guessed voice instead of leaving it unset (which just
+    // hands the choice to whatever the browser considers "default" —
+    // often its oldest, lowest-quality installed voice).
+    const voice = ttsVoiceURI
+      ? ttsVoices.find((v) => v.voiceURI === ttsVoiceURI)
+      : bestVoiceForLang(ttsVoices, 'en');
+
+    const speakChunk = (index) => {
+      if (speakGenerationRef.current !== myGeneration) return;
+      if (index >= chunks.length) { setSpeakingId(null); return; }
+      const utter = new SpeechSynthesisUtterance(chunks[index]);
+      utter.rate = ttsRate;
       if (voice) utter.voice = voice;
-    }
-    utter.onend = () => setSpeakingId(null);
-    utter.onerror = () => setSpeakingId(null);
-    // Keep a reference so the utterance isn't garbage-collected mid-speech
-    // (a well-known cross-browser bug that cuts playback short or silently
-    // no-ops).
-    utterRef.current = utter;
+      utter.onend = () => speakChunk(index + 1);
+      utter.onerror = () => { if (speakGenerationRef.current === myGeneration) setSpeakingId(null); };
+      // Keep a reference so the utterance isn't garbage-collected mid-speech
+      // (a well-known cross-browser bug that cuts playback short or silently
+      // no-ops).
+      utterRef.current = utter;
+      window.speechSynthesis.speak(utter);
+    };
+
     setSpeakingId(id);
-    // speak() MUST run synchronously within this same click-handler call
-    // stack — Safari (especially iOS) only allows speech synthesis inside
-    // a direct user-gesture chain, and a setTimeout/Promise tick in between
-    // breaks that chain, silently dropping the utterance. Do not defer this.
-    window.speechSynthesis.speak(utter);
+    // The first chunk MUST speak synchronously within this same click-
+    // handler call stack — Safari (especially iOS) only allows speech
+    // synthesis inside a direct user-gesture chain, and a setTimeout/
+    // Promise tick in between breaks that chain, silently dropping the
+    // utterance. Every later chunk speaks from the previous one's onend,
+    // which every browser here already treats as a valid continuation
+    // (the same pattern the Verbal Quiz driver below relies on).
+    speakChunk(0);
   };
 
   useEffect(() => {
     return () => {
-      if (speechSupported) window.speechSynthesis.cancel();
+      stopSpeaking();
       if (wakeLockRef.current) wakeLockRef.current.release().catch(() => {});
     };
     // eslint-disable-next-line
@@ -6809,10 +6898,10 @@ function CertStudyApp() {
 
     const utter = new SpeechSynthesisUtterance(text);
     utter.rate = ttsRate;
-    if (ttsVoiceURI) {
-      const voice = ttsVoices.find((v) => v.voiceURI === ttsVoiceURI);
-      if (voice) utter.voice = voice;
-    }
+    const verbalVoice = ttsVoiceURI
+      ? ttsVoices.find((v) => v.voiceURI === ttsVoiceURI)
+      : bestVoiceForLang(ttsVoices, 'en');
+    if (verbalVoice) utter.voice = verbalVoice;
     utter.onend = goNext;
     utter.onerror = goNext;
     window.speechSynthesis.speak(utter);
@@ -6844,7 +6933,7 @@ function CertStudyApp() {
   // fresh rather than resuming a stale session.
   useEffect(() => {
     if (mode === 'quiz' && quizView === 'verbal') return;
-    if (speechSupported) window.speechSynthesis.cancel();
+    stopSpeaking();
     setVerbalPhase((p) => (p === 'setup' ? p : 'setup'));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mode, quizView, activeTrack]);

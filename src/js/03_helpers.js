@@ -1,5 +1,52 @@
 /* ---------------- helpers ---------------- */
 
+// A rough, name-based quality signal for a SpeechSynthesisVoice — the Web
+// Speech API exposes no real quality metadata, just `name`/`lang`/
+// `localService`/`default`. Every OS/browser that ships a nicer neural
+// voice alongside its older default one flags it in the name somehow
+// ("Natural", "Online", "Neural", "Premium", "Enhanced", "Wavenet",
+// "Studio" — Edge, Chrome, and Android all use one of these), and a
+// non-local ("network") voice is usually backed by a cloud model rather
+// than the OS's older on-device engine, so both are decent proxies for
+// "this will sound smoother than the OS default" without ever being able
+// to actually hear the voice first.
+const TTS_QUALITY_NAME_HINTS = ['natural', 'neural', 'premium', 'enhanced', 'online', 'wavenet', 'studio'];
+function voiceQualityScore(voice) {
+  const name = (voice.name || '').toLowerCase();
+  let score = 0;
+  if (TTS_QUALITY_NAME_HINTS.some((hint) => name.includes(hint))) score += 10;
+  if (voice.localService === false) score += 5;
+  if (voice.default) score += 1;
+  return score;
+}
+
+// The best-guess default voice for a language, used both to auto-select a
+// voice when the user hasn't picked one explicitly and to sort the voice
+// picker so the better-sounding options surface first within each
+// language instead of plain alphabetical order.
+function bestVoiceForLang(voices, langPrefix) {
+  if (!voices || !voices.length) return null;
+  const lower = langPrefix.toLowerCase();
+  const candidates = voices.filter((v) => (v.lang || '').toLowerCase().startsWith(lower));
+  const pool = candidates.length ? candidates : voices;
+  return [...pool].sort((a, b) => voiceQualityScore(b) - voiceQualityScore(a))[0];
+}
+
+// Splits a block of text into roughly one-sentence chunks for a chained
+// sequence of shorter utterances instead of one long unbroken one. Several
+// speech engines sound noticeably flatter/more monotone on a long run-on
+// utterance (no real prosody reset between sentences) than on the same
+// text spoken as several shorter utterances back to back, and very long
+// text can hit a hard length cutoff on some engines. A plain sentence-
+// boundary split (. ! ? followed by whitespace) is a good-enough
+// heuristic here — it doesn't need to be perfect, just better than
+// handing the whole paragraph over as one string.
+function splitIntoSpeechChunks(text) {
+  const parts = text.match(/[^.!?]+[.!?]+(?:\s+|$)|[^.!?]+$/g);
+  if (!parts || parts.length <= 1) return [text];
+  return parts.map((p) => p.trim()).filter(Boolean);
+}
+
 function seededShuffle(arr, seed) {
   const a = [...arr];
   let s = seed;

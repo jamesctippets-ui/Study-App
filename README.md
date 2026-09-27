@@ -215,11 +215,32 @@ entry required. A gear **Data & progress** button opens export/import
 backup/device-migration option, since the app has no accounts) alongside
 the existing per-track reset and a **Voice & speech** section — a rate
 slider and a voice picker (from `speechSynthesis.getVoices()`, English
-voices sorted first) for every 🔊 Listen button in the app, with a
-"Test voice" preview button. Both the theme and these speech settings are
-per-device localStorage preferences, not synced progress. Both use small
+voices sorted first, then by a quality heuristic within that — see
+below) for every 🔊 Listen button in the app, with a "Test voice" preview
+button. Both the theme and these speech settings are per-device
+localStorage preferences, not synced progress. Both use small
 wireframe (line-art) icons rather than emoji, matching the hamburger menu
 below.
+
+There's no separate "TTS agent" here to swap for a better one — every
+🔊 Listen button and Verbal Quiz mode call the browser's own
+`speechSynthesis` directly, and a genuinely better cloud neural voice
+(ElevenLabs/OpenAI/Azure/Google) would mean a bring-your-own-API-key,
+per-character-cost, online-only dependency that breaks this app's
+fully-static/free/offline-capable design. Two free improvements instead:
+picking a voice by a name-based quality heuristic
+(`voiceQualityScore`/`bestVoiceForLang` in 03_helpers.js — "Natural",
+"Online", "Neural", "Premium", "Enhanced", "Wavenet", or "Studio" in the
+name, or a non-`localService` voice, both usually mean a nicer cloud-
+backed voice rather than the OS's older on-device default) instead of
+leaving the choice to the browser's own arbitrary default when you
+haven't picked one yourself; and speaking text as a chain of
+sentence-by-sentence utterances (`splitIntoSpeechChunks`) rather than one
+long unbroken one, which several engines render flatter/more monotone on
+and which can hit a hard length cutoff on very long text. A generation
+counter guards the chain so any cancellation — toggling Listen off,
+switching tracks, unmounting — reliably stops it even on browsers that
+fire `onend` rather than `onerror` on an interrupted utterance.
 
 Opening the app always lands on **Home** (`HomeView` in `04_shared_ui.jsx`)
 rather than resuming the last track+mode directly — a real dashboard to
