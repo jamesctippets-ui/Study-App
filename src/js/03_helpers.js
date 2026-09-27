@@ -283,7 +283,7 @@ function parseHash(hash, validTrackKeys) {
   const [trackKey, mode, sub] = parts;
   if (!validTrackKeys.has(trackKey)) return { mode: 'home' };
   if (mode === 'learn') return { mode: 'learn', trackKey, learnView: ['cards', 'study', 'sheet'].includes(sub) ? sub : 'study' };
-  if (mode === 'quiz') return { mode: 'quiz', trackKey, quizView: ['questions', 'match', 'verbal', 'commands', 'madlibs', 'sequence'].includes(sub) ? sub : 'questions' };
+  if (mode === 'quiz') return { mode: 'quiz', trackKey, quizView: ['questions', 'match', 'verbal', 'commands', 'madlibs', 'sequence', 'casestudy'].includes(sub) ? sub : 'questions' };
   if (mode === 'exam') return { mode: 'exam', trackKey };
   return { mode: 'home' };
 }
@@ -620,12 +620,17 @@ function trackMastery(trackKey, results) {
   // Mad Libs and step-ordering both feed into mastery the same as
   // flashcards/questions (each scored all-or-nothing — see
   // submitMadlibAnswer/submitSequenceOrder in 06_app.jsx); CLI/PowerShell
-  // command practice deliberately does NOT (see ROADMAP.md section 4).
+  // command practice deliberately does NOT (see ROADMAP.md section 4). Mini
+  // case studies fold in per-embedded-question, not per-case-study — each
+  // question inside one is scored on its own (same as a regular quiz
+  // question), matching how the real exam format they mirror grades each
+  // question in a case study individually.
   const ids = [
     ...mod.flashcards.map((f) => f.id),
     ...mod.questions.map((q) => q.id),
     ...(mod.madlibs || []).map((m) => m.id),
     ...(mod.sequences || []).map((s) => s.id),
+    ...(mod.caseStudies || []).flatMap((cs) => cs.questions.map((q) => q.id)),
   ];
   if (!ids.length) return 0;
   const correct = ids.filter((id) => trackResults[id] === 'correct').length;

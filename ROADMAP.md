@@ -116,9 +116,40 @@ come up.
   flashcards+questions counts only, and this is meant to stay a
   lightweight practice add-on, not a third scored item type woven through
   the whole app — its running score is session-local only.
-- [ ] Longer term: scenario-based "mini case studies" that chain several
-  related questions off one larger setup, mirroring how AZ-305's real exam
-  works.
+- [x] Scenario-based "mini case studies" that chain several related
+  questions off one larger setup, mirroring how AZ-305's real exam works.
+  Shipped as a new optional `CASE_STUDIES` list per track (data/&lt;track&gt;.py),
+  each entry a `{id, cat, title, scenario, questions}` dict whose `questions`
+  reuse the exact same mc/tf/ms shape as `QUESTIONS` — deliberately not a
+  new question format, since `QuestionView` (04d_quiz_ui.jsx) already
+  renders all three types; only the shared scenario paragraph and the
+  grouping of several questions under it are new. New "Case Study" Quiz
+  sub-tab (only shown for tracks that ship one), with its own picker
+  screen (`CaseStudySetup`) since which case study is a real choice, not
+  something to shuffle into blindly the way Mad Libs/Sequence do —
+  `CaseStudyView` then shows the scenario pinned above the current
+  question and reuses `QuestionView` unchanged, with `QuizSummary` reused
+  for the completion screen (`QuizSummary` gained an optional
+  `restartLabel` prop so it can say "Back to case studies" here instead of
+  "New quiz"). Unlike Mad Libs/Sequence (scored all-or-nothing per
+  scenario), each embedded question is scored individually via the same
+  `recordResult` call a regular quiz question uses — matching how a real
+  case study's questions are graded independently — and folds into
+  mastery the same way (`trackMastery` in 03_helpers.js and
+  `masteryByCategory` in 06_app.jsx both flatten every case study's
+  question ids into their existing id lists). `build.py` validates the
+  new list the same way it validates MADLIBS/SEQUENCES: unique ids, a
+  real category, non-empty title/scenario, and every embedded question
+  checked against the same per-type rules QUESTIONS entries already get.
+  Launched with AZ-305 (2 case studies, matching this item's own "mirrors
+  AZ-305's real exam" framing) and rolled out to the other 14 tracks in
+  the same pass. **Caveat:** this session's outbound network briefly
+  blocked the CDN this app loads React/Babel from at runtime, so this
+  feature shipped verified only by `build.py`'s structural validation and
+  manual code review against the already-working Mad Libs/Sequence
+  patterns it mirrors — not by opening it in an actual browser. Worth a
+  real Playwright pass through `full_smoke.js` (or equivalent) once that's
+  possible, before treating this as fully proven out.
 
 ## 5. Diagrams (user's idea)
 

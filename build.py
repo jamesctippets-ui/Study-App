@@ -231,6 +231,64 @@ def validate():
             elif len(steps) != len(set(steps)):
                 errors.append(f"[{key}] SEQUENCES '{sqid}' has duplicate step text")
 
+        case_studies = getattr(mod, "CASE_STUDIES", [])
+        for cs in case_studies:
+            csid = cs.get("id")
+            if not csid:
+                errors.append(f"[{key}] a CASE_STUDIES entry is missing an 'id'")
+            elif csid in item_ids:
+                errors.append(f"[{key}] duplicate id '{csid}' (case study shares an id with a flashcard/question/madlib/sequence)")
+            else:
+                item_ids.add(csid)
+            if cs.get("cat") not in cat_keys:
+                errors.append(f"[{key}] CASE_STUDIES '{csid}' references unknown category '{cs.get('cat')}'")
+            if not cs.get("title", "").strip():
+                errors.append(f"[{key}] CASE_STUDIES '{csid}' is missing a non-empty 'title'")
+            if not cs.get("scenario", "").strip():
+                errors.append(f"[{key}] CASE_STUDIES '{csid}' is missing a non-empty 'scenario'")
+            cs_questions = cs.get("questions")
+            if not isinstance(cs_questions, list) or len(cs_questions) < 2:
+                errors.append(f"[{key}] CASE_STUDIES '{csid}' needs a 'questions' list with at least 2 entries")
+                continue
+            cs_question_ids_seen = set()
+            for q in cs_questions:
+                qid = q.get("id")
+                if not qid:
+                    errors.append(f"[{key}] CASE_STUDIES '{csid}' has a question missing an 'id'")
+                elif qid in item_ids or qid in cs_question_ids_seen:
+                    errors.append(f"[{key}] duplicate id '{qid}' (CASE_STUDIES '{csid}' question)")
+                else:
+                    item_ids.add(qid)
+                    cs_question_ids_seen.add(qid)
+                qtype = q.get("type")
+                if not q.get("question", "").strip():
+                    errors.append(f"[{key}] CASE_STUDIES '{csid}' question '{qid}' is missing non-empty 'question' text")
+                if qtype == "mc":
+                    options = q.get("options")
+                    if not isinstance(options, list) or len(options) < 2:
+                        errors.append(f"[{key}] CASE_STUDIES '{csid}' mc question '{qid}' needs an options list with at least 2 entries")
+                        continue
+                    correct = q.get("correct")
+                    if not isinstance(correct, int) or not (0 <= correct < len(options)):
+                        errors.append(f"[{key}] CASE_STUDIES '{csid}' mc question '{qid}' has out-of-range or missing 'correct' index: {correct!r}")
+                elif qtype == "tf":
+                    if not isinstance(q.get("answer"), bool):
+                        errors.append(f"[{key}] CASE_STUDIES '{csid}' tf question '{qid}' is missing a boolean 'answer' field")
+                elif qtype == "ms":
+                    options = q.get("options")
+                    if not isinstance(options, list) or len(options) < 2:
+                        errors.append(f"[{key}] CASE_STUDIES '{csid}' ms question '{qid}' needs an options list with at least 2 entries")
+                        continue
+                    correct = q.get("correct")
+                    if not isinstance(correct, list) or not correct:
+                        errors.append(f"[{key}] CASE_STUDIES '{csid}' ms question '{qid}' needs a non-empty 'correct' list")
+                    elif any(not isinstance(i, int) or not (0 <= i < len(options)) for i in correct):
+                        errors.append(f"[{key}] CASE_STUDIES '{csid}' ms question '{qid}' has an out-of-range index in 'correct': {correct!r}")
+                else:
+                    errors.append(f"[{key}] CASE_STUDIES '{csid}' question '{qid}' has unknown type '{qtype}'")
+                if not q.get("explanation", "").strip():
+                    errors.append(f"[{key}] CASE_STUDIES '{csid}' question '{qid}' is missing an explanation")
+
         cli_challenges = getattr(mod, "CLI_CHALLENGES", [])
         cli_ids_seen = set()
         for c in cli_challenges:
@@ -292,6 +350,7 @@ def build_track_data():
             **({"cliChallenges": mod.CLI_CHALLENGES} if hasattr(mod, "CLI_CHALLENGES") else {}),
             **({"madlibs": mod.MADLIBS} if hasattr(mod, "MADLIBS") else {}),
             **({"sequences": mod.SEQUENCES} if hasattr(mod, "SEQUENCES") else {}),
+            **({"caseStudies": mod.CASE_STUDIES} if hasattr(mod, "CASE_STUDIES") else {}),
         }
         for key, mod in TRACK_MODULES.items()
     }

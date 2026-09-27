@@ -128,6 +128,7 @@ function CertStudyApp() {
   const questionsData = DATA[activeTrack].questions;
   const madlibsData = DATA[activeTrack].madlibs || [];
   const sequencesData = DATA[activeTrack].sequences || [];
+  const caseStudiesData = DATA[activeTrack].caseStudies || [];
   const trackResults = results[activeTrack] || {};
 
   // Applies a freshly-loaded (not user-edited) value to both the React
@@ -691,6 +692,98 @@ function CertStudyApp() {
 
   const nextSequenceItem = () => setSeqIndex((i) => i + 1);
 
+  // Mini case studies (ROADMAP.md section 4) — only meaningful for tracks
+  // that ship CASE_STUDIES (AZ-305 at launch). Unlike every other Quiz
+  // sub-tab above, one "item" here is a shared scenario with 2+ related
+  // questions answered in sequence, mirroring how AZ-305's real exam
+  // groups several questions off one case — so this sub-tab has its own
+  // picker (csList/csActiveIndex) rather than jumping straight into a
+  // session the way Mad Libs/Sequence do. Each embedded question is still
+  // scored on its own via recordResult, exactly like a regular quiz
+  // question, so it folds into mastery/results the same way (see
+  // trackMastery in 03_helpers.js and masteryByCategory above) — only the
+  // scenario and question grouping are new, not the scoring model.
+  const [csList, setCsList] = useState([]);
+  const [csActiveIndex, setCsActiveIndex] = useState(null);
+  const [csQIndex, setCsQIndex] = useState(0);
+  const [csSelected, setCsSelected] = useState(null);
+  const [csMsPending, setCsMsPending] = useState([]);
+  const [csPhase, setCsPhase] = useState('active');
+  const [csScore, setCsScore] = useState({ correct: 0, total: 0 });
+  const [csAnswers, setCsAnswers] = useState([]);
+
+  useEffect(() => {
+    if (quizView === 'casestudy' && !caseStudiesData.length) setQuizView('questions');
+  }, [activeTrack, quizView]);
+
+  const startCaseStudyBrowse = () => {
+    const pool = activeCat === 'all' ? caseStudiesData : caseStudiesData.filter((cs) => cs.cat === activeCat);
+    setCsList(pool);
+    setCsActiveIndex(null);
+  };
+
+  useEffect(() => {
+    if (mode !== 'quiz' || quizView !== 'casestudy') return;
+    startCaseStudyBrowse();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mode, quizView, activeTrack, activeCat]);
+
+  const currentCaseStudy = csActiveIndex !== null ? csList[csActiveIndex] : null;
+  const currentCsQuestion = currentCaseStudy ? currentCaseStudy.questions[csQIndex] : null;
+
+  const startCaseStudy = (idx) => {
+    setCsActiveIndex(idx);
+    setCsQIndex(0);
+    setCsSelected(null);
+    setCsMsPending([]);
+    setCsPhase('active');
+    setCsScore({ correct: 0, total: 0 });
+    setCsAnswers([]);
+  };
+
+  const exitCaseStudy = () => setCsActiveIndex(null);
+
+  const advanceCaseStudy = () => {
+    setCsSelected(null);
+    setCsMsPending([]);
+    if (csQIndex + 1 >= currentCaseStudy.questions.length) {
+      setCsPhase('complete');
+    } else {
+      setCsQIndex((i) => i + 1);
+    }
+  };
+
+  const chooseCaseStudyAnswer = (idx) => {
+    if (csSelected !== null || !currentCsQuestion) return;
+    if (currentCsQuestion.type === 'ms') return;
+    let isCorrect;
+    if (currentCsQuestion.type === 'mc') isCorrect = idx === currentCsQuestion.correct;
+    else if (currentCsQuestion.type === 'tf') isCorrect = (idx === 0) === currentCsQuestion.answer;
+    else return;
+    setCsSelected(idx);
+    recordResult(currentCsQuestion.id, isCorrect ? 'correct' : 'incorrect');
+    bumpDailyGoal(1);
+    setCsScore((s) => ({ correct: s.correct + (isCorrect ? 1 : 0), total: s.total + 1 }));
+    setCsAnswers((a) => [...a, { id: currentCsQuestion.id, cat: currentCaseStudy.cat, prompt: currentCsQuestion.question, correct: isCorrect, explanation: currentCsQuestion.explanation, whyTested: currentCsQuestion.whyTested }]);
+  };
+
+  const toggleCaseStudyMs = (idx) => {
+    if (csSelected !== null) return;
+    setCsMsPending((prev) => (prev.includes(idx) ? prev.filter((i) => i !== idx) : [...prev, idx]));
+  };
+
+  const submitCaseStudyMs = () => {
+    if (csSelected !== null || !currentCsQuestion || currentCsQuestion.type !== 'ms' || csMsPending.length === 0) return;
+    const picked = [...csMsPending].sort();
+    const correct = [...currentCsQuestion.correct].sort();
+    const isCorrect = picked.length === correct.length && picked.every((v, i) => v === correct[i]);
+    setCsSelected(picked);
+    recordResult(currentCsQuestion.id, isCorrect ? 'correct' : 'incorrect');
+    bumpDailyGoal(1);
+    setCsScore((s) => ({ correct: s.correct + (isCorrect ? 1 : 0), total: s.total + 1 }));
+    setCsAnswers((a) => [...a, { id: currentCsQuestion.id, cat: currentCaseStudy.cat, prompt: currentCsQuestion.question, correct: isCorrect, explanation: currentCsQuestion.explanation, whyTested: currentCsQuestion.whyTested }]);
+  };
+
   const achievements = useMemo(() => evaluateAchievements(results, stats), [results, stats]);
 
   // Advance the daily streak once per load, after real data (local or cloud)
@@ -1002,12 +1095,13 @@ function CertStudyApp() {
         ...questionsData.filter((q) => q.cat === c.key).map((q) => q.id),
         ...madlibsData.filter((m) => m.cat === c.key).map((m) => m.id),
         ...sequencesData.filter((s) => s.cat === c.key).map((s) => s.id),
+        ...caseStudiesData.filter((cs) => cs.cat === c.key).flatMap((cs) => cs.questions.map((q) => q.id)),
       ];
       const correct = items.filter((id) => trackResults[id] === 'correct').length;
       map[c.key] = items.length ? correct / items.length : 0;
     });
     return map;
-  }, [trackResults, categories, flashcardsData, questionsData, madlibsData, sequencesData]);
+  }, [trackResults, categories, flashcardsData, questionsData, madlibsData, sequencesData, caseStudiesData]);
 
   // Logs one per-category mastery snapshot a day for whichever track is
   // actually open (not Home — there's no single "the" track there), so
@@ -1526,6 +1620,15 @@ function CertStudyApp() {
                 Sequence
               </button>
             )}
+            {caseStudiesData.length > 0 && (
+              <button
+                onClick={() => setQuizView('casestudy')}
+                className="flex-1"
+                style={{ padding: '6px 2px', borderRadius: '8px', fontSize: '10.5px', fontWeight: 600, background: quizView === 'casestudy' ? COLOR.surfaceRaised : 'transparent', color: quizView === 'casestudy' ? COLOR.text : COLOR.muted }}
+              >
+                Case Study
+              </button>
+            )}
           </div>
         )}
 
@@ -1686,6 +1789,28 @@ function CertStudyApp() {
             onSubmit={submitSequenceOrder}
             onNext={nextSequenceItem}
             onRestart={startSequenceSession}
+            flashcardsData={flashcardsData}
+          />
+        )}
+
+        {mode === 'quiz' && quizView === 'casestudy' && (
+          <CaseStudyView
+            list={csList}
+            activeIndex={csActiveIndex}
+            onStart={startCaseStudy}
+            onExit={exitCaseStudy}
+            categories={categories}
+            question={currentCsQuestion}
+            qIndex={csQIndex}
+            selected={csSelected}
+            onChoose={chooseCaseStudyAnswer}
+            msPending={csMsPending}
+            onToggleMs={toggleCaseStudyMs}
+            onSubmitMs={submitCaseStudyMs}
+            onNext={advanceCaseStudy}
+            phase={csPhase}
+            score={csScore}
+            answers={csAnswers}
             flashcardsData={flashcardsData}
           />
         )}

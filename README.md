@@ -387,6 +387,17 @@ back into the right order with simple up/down move buttons (no drag-
 and-drop needed). Also feeds mastery %/results the normal way, scored
 all-or-nothing per sequence.
 
+Tracks with `CASE_STUDIES` content get a **Case Study** sub-tab: a shared
+scenario paragraph (a fictional company/situation) with several related
+questions answered off it in sequence, mirroring how a real associate/
+expert-level exam groups multiple questions under one larger case instead
+of testing each fact in isolation. Each embedded question reuses the exact
+same mc/tf/ms `QuestionView` every other quiz question uses — only the
+scenario and the grouping are new — so unlike Mad Libs/Sequence above
+(scored all-or-nothing per item), each case-study question is scored
+individually the same way a regular quiz question is, matching how a real
+case study's questions are graded independently.
+
 Every multiple-choice question across all 15 tracks has been through a
 wording-giveaway audit — checking that the correct answer isn't
 identifiable just from being longer, more specific, free of absolute
@@ -462,7 +473,7 @@ src/js/
   04a_home_ui.jsx        — Home, cert path, daily goal/question/vocab, achievements, Data panel
   04b_panels_ui.jsx      — About/Legal, Glossary, term flyout, category filter
   04c_lesson_ui.jsx      — flashcards, Study, cheat sheet, Match game, lesson/course view
-  04d_quiz_ui.jsx        — quiz setup, Verbal Quiz, CLI practice, Mad Libs, Sequence, QuestionView/QuizSummary
+  04d_quiz_ui.jsx        — quiz setup, Verbal Quiz, CLI practice, Mad Libs, Sequence, Case Study, QuestionView/QuizSummary
   05_final_exam_ui.jsx   — timed exam intro/runner/results
   06_app.jsx             — CertStudyApp, the top-level component
 

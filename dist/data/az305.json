@@ -1972,5 +1972,113 @@
       ],
       "explanation": "Assessment has to happen before you can commit to a target (some compatibility issues rule out certain targets entirely). Continuous sync after the initial migration is what actually enables a low-downtime cutover \u2014 without it, cutover would require a long final full copy while the app is offline."
     }
+  ],
+  "caseStudies": [
+    {
+      "id": "cs-az305-contoso-retail",
+      "cat": "infrastructure",
+      "title": "Contoso Retail's Global Storefront Migration",
+      "scenario": "Contoso Retail runs its e-commerce storefront from a single datacenter in Chicago. The storefront is a containerized .NET application that the team already packages as Docker images, and traffic is heavily seasonal \u2014 Black Friday weekend sees 20x normal load, while most of the year the app runs well below capacity. The database tier is a SQL Server instance holding the product catalog and order history; the business requires it to remain available even if an entire Azure region goes offline. Contoso's platform team is small and does not want to manage Kubernetes control planes or patch VM operating systems by hand. Customers are located across North America, Europe, and Asia, and Contoso wants a single application endpoint that automatically routes each customer to their nearest healthy deployment.",
+      "questions": [
+        {
+          "id": "cs-az305-contoso-retail-q1",
+          "type": "mc",
+          "question": "Given the platform team's size and its wish to avoid managing Kubernetes control planes or patching VM operating systems, which compute service should be recommended for the containerized storefront?",
+          "options": [
+            "Azure Container Apps",
+            "Azure Kubernetes Service (AKS)",
+            "Azure Virtual Machines running Docker",
+            "Azure Kubernetes Service with the cluster autoscaler"
+          ],
+          "correct": 0,
+          "explanation": "Azure Container Apps runs containers on a fully-managed Kubernetes-based platform without exposing (or requiring anyone to manage) the control plane, VM patching, or node pools \u2014 a direct fit for a small team that explicitly wants none of that operational burden. AKS (with or without the cluster autoscaler) still hands the team a control plane and node pool to operate, and running Docker directly on VMs reintroduces the OS-patching work the scenario says to avoid."
+        },
+        {
+          "id": "cs-az305-contoso-retail-q2",
+          "type": "mc",
+          "question": "Which scaling approach best fits the storefront's 20x seasonal traffic swing between Black Friday and the rest of the year?",
+          "options": [
+            "Provision fixed capacity sized for Black Friday peak year-round",
+            "Scale automatically based on HTTP traffic and CPU/memory metrics, scaling to zero when idle",
+            "Manually resize the deployment before and after each expected peak",
+            "Provision fixed capacity sized for average traffic and accept slower response times during peaks"
+          ],
+          "correct": 1,
+          "explanation": "Automatic, metrics-driven scaling (including scale-to-zero) matches spend to actual demand, handling the 20x Black Friday spike without paying for that much capacity the other 51 weeks of the year. Fixed capacity at either peak or average levels wastes money most of the year or fails during peak; manual resizing depends on someone correctly predicting exact peak timing, which is exactly the operational burden autoscaling removes."
+        },
+        {
+          "id": "cs-az305-contoso-retail-q3",
+          "type": "mc",
+          "question": "Which storage redundancy option should be recommended for the SQL Server database given the requirement that it survive an entire regional outage?",
+          "options": [
+            "Locally-redundant storage (LRS)",
+            "Zone-redundant storage (ZRS)",
+            "Geo-redundant storage (GRS) or geo-zone-redundant storage (GZRS)",
+            "Read-access geo-redundant storage is unnecessary if backups run nightly"
+          ],
+          "correct": 2,
+          "explanation": "Only GRS/GZRS replicate data to a secondary Azure region, which is what surviving a full regional outage requires. LRS and ZRS both replicate only within the primary region (ZRS across availability zones, but still one region), so neither protects against that region going offline entirely. Nightly backups alone would still mean a real recovery-time gap and don't by themselves place a copy of the data in another region.",
+          "whyTested": "AZ-305 case studies frequently bury the real requirement (\"survive a regional outage\") inside a paragraph of unrelated detail \u2014 recognizing that single sentence as the one that rules out every region-local redundancy option is the actual skill being tested, not memorizing the redundancy tiers in isolation."
+        },
+        {
+          "id": "cs-az305-contoso-retail-q4",
+          "type": "mc",
+          "question": "Which Azure service should route each customer to their nearest healthy regional deployment through a single application endpoint?",
+          "options": [
+            "Azure Front Door",
+            "Azure Load Balancer",
+            "A single Application Gateway shared across all regions",
+            "Azure Traffic Manager only, with no Front Door or Application Gateway"
+          ],
+          "correct": 0,
+          "explanation": "Azure Front Door is a global, HTTP(S)-aware entry point that performs latency-based routing to the nearest healthy backend region behind one endpoint, plus health probes and failover \u2014 exactly what a global storefront with regional deployments needs. Azure Load Balancer operates within a single region, not across them. A single Application Gateway is also regional. Traffic Manager alone works at the DNS layer and lacks Front Door's Layer-7 features (like path-based routing and web application firewall integration), making Front Door the better fit for an HTTP storefront specifically."
+        }
+      ]
+    },
+    {
+      "id": "cs-az305-fabrikam-claims",
+      "cat": "businessContinuity",
+      "title": "Fabrikam Insurance's Claims Processing Recovery Plan",
+      "scenario": "Fabrikam Insurance runs a claims-processing application on Azure SQL Database in a single primary region. The business has set a strict recovery point objective (RPO) of under 5 seconds and a recovery time objective (RTO) of under 1 minute for the claims database, since adjusters must never lose an in-progress claim and downtime directly delays payouts. Separately, the company's internal claims-review web app runs on a handful of Azure Virtual Machines; for that workload, the business can tolerate up to 4 hours of downtime and up to 15 minutes of data loss if the primary region fails, and wants failover to be triggered automatically rather than requiring someone to be paged in the middle of the night. Fabrikam's compliance team also requires that every failover test be rehearsed without ever impacting the live production environment.",
+      "questions": [
+        {
+          "id": "cs-az305-fabrikam-claims-q1",
+          "type": "mc",
+          "question": "Which Azure SQL Database feature should be recommended to meet the claims database's sub-5-second RPO and sub-1-minute RTO?",
+          "options": [
+            "Auto-failover groups with active geo-replication",
+            "A nightly automated backup with point-in-time restore",
+            "Geo-redundant storage (GRS) on the underlying storage account",
+            "A manually-triggered geo-restore from backup"
+          ],
+          "correct": 0,
+          "explanation": "Auto-failover groups keep a continuously synchronized secondary replica and can fail over automatically within roughly a minute, meeting both the aggressive RPO and RTO. Nightly backups and geo-restore both imply recovery measured in potentially hours with data loss back to the last backup, not seconds. GRS protects the storage layer, not a live, queryable database replica, and doesn't by itself deliver an application-consistent database failover."
+        },
+        {
+          "id": "cs-az305-fabrikam-claims-q2",
+          "type": "tf",
+          "question": "True or false: for the claims-review VMs, whose business tolerance is up to 4 hours RTO and 15 minutes RPO with automatic failover, Azure Site Recovery replicating to a secondary region is an appropriate solution.",
+          "answer": true,
+          "explanation": "Azure Site Recovery is built for exactly this profile \u2014 VM-level replication to a secondary region with typical RPOs in the minutes and orchestrated (including automatic) failover, comfortably meeting a 4-hour RTO/15-minute RPO target without requiring the much tighter (and costlier) synchronous replication a sub-minute RTO would demand."
+        },
+        {
+          "id": "cs-az305-fabrikam-claims-q3",
+          "type": "ms",
+          "question": "Which of the following are true about meeting the compliance team's requirement to rehearse failover without impacting production? (Select all that apply.)",
+          "options": [
+            "Azure Site Recovery supports test failover into an isolated network, leaving the production VMs and replication untouched",
+            "A test failover validates the replicated copy is recoverable without triggering an actual failover of production traffic",
+            "The only way to validate DR readiness is to perform a real failover of production traffic on a schedule",
+            "Test failover should be run against an isolated virtual network, not the production VNet, to avoid IP or naming conflicts"
+          ],
+          "correct": [
+            0,
+            1,
+            3
+          ],
+          "explanation": "Azure Site Recovery's test failover feature spins up recovered VMs in an isolated network specifically so the drill validates recoverability without ever touching live production traffic or replication \u2014 which is why it should target an isolated VNet rather than production's, avoiding IP/naming collisions with the still-running primary. Requiring a real production failover on a schedule is the opposite of what the compliance requirement (\"never impacting live production\") asks for, and isn't how Site Recovery test failovers are meant to be exercised."
+        }
+      ]
+    }
   ]
 }

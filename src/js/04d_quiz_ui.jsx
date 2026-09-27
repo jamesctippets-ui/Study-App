@@ -678,7 +678,7 @@ function QuestionView({ q, selected, onChoose, onNext, index, total, categoryLab
   );
 }
 
-function QuizSummary({ score, answers, categories, onRestart }) {
+function QuizSummary({ score, answers, categories, onRestart, restartLabel }) {
   const missed = answers.filter((a) => !a.correct);
   // A Today's Mix session's missed answers can come from several tracks at
   // once, each with its own category set — resolve each one's label against
@@ -730,8 +730,93 @@ function QuizSummary({ score, answers, categories, onRestart }) {
         onClick={onRestart}
         style={{ width: '100%', marginTop: '16px', padding: '12px', borderRadius: '12px', background: COLOR.primary, color: COLOR.onAccent, fontSize: '14px', fontWeight: 600 }}
       >
-        New quiz
+        {restartLabel || 'New quiz'}
       </button>
+    </div>
+  );
+}
+
+// Mini case studies (ROADMAP.md section 4) — a shared scenario with 2+
+// related questions answered in sequence, mirroring how AZ-305's real exam
+// groups several questions off one case. Unlike Mad Libs/Sequence, this
+// sub-tab has its own picker screen (list of available case studies for the
+// active category filter) rather than dropping straight into a session,
+// since "which case study" is a real choice worth showing, not just a
+// shuffle. Each embedded question reuses QuestionView as-is (mc/tf/ms all
+// already supported there) — only the scenario panel above it and the
+// picker/completion screens around it are new.
+function CaseStudySetup({ list, onStart, categories }) {
+  if (list.length === 0) {
+    return (
+      <div style={{ textAlign: 'center', color: COLOR.muted, fontSize: '13px', padding: '30px 10px' }}>
+        No case studies match this filter — try "All categories."
+      </div>
+    );
+  }
+  return (
+    <div className="flex flex-col gap-2">
+      {list.map((cs, i) => {
+        const catLabel = categories.find((c) => c.key === cs.cat)?.label;
+        return (
+          <button
+            key={cs.id}
+            onClick={() => onStart(i)}
+            style={{
+              textAlign: 'left', padding: '14px 16px', borderRadius: '14px',
+              background: COLOR.surface, border: `1px solid ${COLOR.border}`, boxShadow: SHADOW.card,
+            }}
+          >
+            <div style={{ fontSize: '11px', color: COLOR.muted, marginBottom: '4px' }}>{catLabel}</div>
+            <div style={{ fontSize: '15px', fontWeight: 600, color: COLOR.text }}>{cs.title}</div>
+            <div style={{ fontSize: '11.5px', color: COLOR.muted, marginTop: '4px' }}>{cs.questions.length} questions</div>
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+function CaseStudyView({ list, activeIndex, onStart, onExit, categories, question, qIndex, selected, onChoose, msPending, onToggleMs, onSubmitMs, onNext, phase, score, answers, flashcardsData }) {
+  if (activeIndex === null) {
+    return <CaseStudySetup list={list} onStart={onStart} categories={categories} />;
+  }
+  const cs = list[activeIndex];
+  if (!cs) return null;
+  const catLabel = categories.find((c) => c.key === cs.cat)?.label;
+
+  if (phase === 'complete') {
+    return (
+      <div>
+        <div style={{ fontSize: '11px', color: COLOR.muted, marginBottom: '10px' }}>{catLabel} · {cs.title}</div>
+        <QuizSummary score={score} answers={answers} categories={categories} onRestart={onExit} restartLabel="Back to case studies" />
+      </div>
+    );
+  }
+
+  return (
+    <div>
+      <button onClick={onExit} className="btn-flat" style={{ color: COLOR.muted, fontSize: '11.5px', marginBottom: '10px', padding: '2px' }}>
+        ‹ All case studies
+      </button>
+      <div style={{ boxShadow: SHADOW.card, background: COLOR.surfaceRaised, border: `1px solid ${COLOR.border}`, borderRadius: '14px', padding: '14px 16px', marginBottom: '14px' }}>
+        <div style={{ fontSize: '10.5px', color: COLOR.muted, textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: '4px' }}>{catLabel} · {cs.title}</div>
+        <div style={{ fontSize: '13.5px', lineHeight: 1.55, color: COLOR.text }}>{cs.scenario}</div>
+      </div>
+      <QuestionView
+        q={question}
+        selected={selected}
+        onChoose={onChoose}
+        onNext={onNext}
+        index={qIndex}
+        total={cs.questions.length}
+        categoryLabel={catLabel}
+        badgeLabel="Case study"
+        msPending={msPending}
+        onToggleMs={onToggleMs}
+        onSubmitMs={onSubmitMs}
+        nextLabel={qIndex + 1 >= cs.questions.length ? 'See case study results' : 'Next question'}
+        flashcardsData={flashcardsData}
+      />
     </div>
   );
 }
