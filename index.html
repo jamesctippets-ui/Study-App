@@ -4225,6 +4225,7 @@ function GlossaryPanel({ onClose }) {
               <div key={key} style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderRadius: '12px', padding: '10px 12px' }}>
                 <button
                   onClick={() => setExpandedKey(open ? null : key)}
+                  className="btn-flat"
                   style={{ width: '100%', textAlign: 'left', background: 'transparent' }}
                 >
                   <div style={{ fontSize: '14px', fontWeight: 600, color: COLOR.text }}>{entry.front}</div>
