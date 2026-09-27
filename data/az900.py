@@ -2005,4 +2005,100 @@ MADLIBS = [
         ],
         'explanation': "ZRS spreads copies across availability zones in one region — enough for a datacenter-level failure, and cheaper than replicating all the way to another region. RA-GRS adds read access to the secondary region's copy even before a failover, which plain GRS does not provide; GRS replicates to the secondary region but keeps that copy unreadable until a failover is actually initiated.",
     },
+    {
+        'id': 'ml-az900-5',
+        'cat': 'cloudConcepts',
+        'scenario': "When a single server in the primary datacenter fails, traffic automatically shifts within seconds to a healthy duplicate server in that same datacenter, and users notice nothing at all — that's {b1}. When the entire primary region suffers a catastrophic outage and the company instead fails over to a pre-configured environment in a completely different region, accepting some downtime and a small amount of data loss along the way, that's {b2}.",
+        'blanks': [
+            {'key': 'b1', 'options': ['High availability', 'Disaster recovery', 'Scalability', 'Elasticity'], 'correct': 0},
+            {'key': 'b2', 'options': ['High availability', 'Disaster recovery', 'Scalability', 'Elasticity'], 'correct': 1},
+        ],
+        'explanation': "High availability keeps a service running through smaller, local failures with little to no user-visible interruption. Disaster recovery is the plan for recovering after a major, region-level disaster, and it explicitly accepts some recovery time (RTO) and possible data loss (RPO) rather than promising zero interruption. Scalability and elasticity both describe handling more or less load, not recovering from a failure.",
+    },
+    {
+        'id': 'ml-az900-6',
+        'cat': 'architecture',
+        'scenario': "To survive the loss of one entire datacenter without losing the app, a company spreads its VMs across multiple {b1} — physically separate locations within a single region, each with independent power, cooling, and networking. To survive an event that takes out that entire region instead, they'd need to fail over to a completely separate {b2}.",
+        'blanks': [
+            {'key': 'b1', 'options': ['Availability Zones', 'Regions', 'Resource groups', 'Scale sets'], 'correct': 0},
+            {'key': 'b2', 'options': ['Availability Zone', 'Region', 'Resource group', 'Scale set'], 'correct': 1},
+        ],
+        'explanation': "Availability Zones are physically separate locations within one region, each with independent power/cooling/networking, so they protect against a single datacenter-level failure. Surviving a failure of the whole region requires a separate region entirely — an Availability Zone can't help once the region itself is down. Resource groups and scale sets are organizational/scaling constructs, not fault-isolation boundaries.",
+    },
+]
+
+# Mini case studies (ROADMAP.md section 4): a shared scenario with several
+# related questions answered in sequence, mirroring how a real exam groups
+# multiple questions off one larger case rather than testing each fact in
+# isolation. Every embedded question still follows the same mc/tf/ms shape
+# as QUESTIONS above (see build.py's CASE_STUDIES validation) — only the
+# shared scenario and the grouping are new.
+CASE_STUDIES = [
+    {
+        'id': 'cs-az900-fabrikam-adoption',
+        'cat': 'cloudConcepts',
+        'title': "Fabrikam Manufacturing Evaluates Cloud Adoption",
+        'scenario': (
+            "Fabrikam Manufacturing currently runs its order-management application on aging servers "
+            "in a single on-premises datacenter that it owns and maintains outright. The finance team is "
+            "frustrated that every hardware refresh means a large upfront purchase, and they'd rather "
+            "spend based on actual monthly usage instead. Demand for the app is unpredictable — it's "
+            "quiet most of the year but spikes hard during quarterly inventory counts — and the current "
+            "servers are sized (and paid for) to handle the worst-case spike even though they sit mostly "
+            "idle the rest of the time. Compliance also requires certain manufacturing records to remain "
+            "on hardware Fabrikam controls directly, even as the company plans to move everything else "
+            "it can to the cloud. Separately, Fabrikam wants a security model where, once the cloud "
+            "migration happens, it never has to worry about patching the operating system of the servers "
+            "running its web front end."
+        ),
+        'questions': [
+            {
+                'id': 'cs-az900-fabrikam-adoption-q1',
+                'type': 'mc',
+                'question': "Which shift best describes what the finance team wants, moving away from large upfront hardware purchases toward paying only for what's actually used each month?",
+                'options': [
+                    "Moving from capital expenditure (CapEx) to operational expenditure (OpEx)",
+                    "Moving from operational expenditure (OpEx) to capital expenditure (CapEx)",
+                    "Increasing total cost of ownership (TCO)",
+                    "Adopting a private cloud deployment model",
+                ],
+                'correct': 0,
+                'explanation': "CapEx is the large upfront spend on owned hardware; OpEx is the ongoing, consumption-based spending model the cloud enables — exactly the direction finance wants to move. The reverse direction, OpEx to CapEx, describes going back to owned hardware, and this scenario isn't about TCO increasing or about a private cloud deployment (which would still mean owning the infrastructure).",
+            },
+            {
+                'id': 'cs-az900-fabrikam-adoption-q2',
+                'type': 'tf',
+                'question': "True or false: because demand is quiet most of the year and only spikes during quarterly inventory counts, sizing and paying for fixed capacity that covers the worst-case spike year-round is the cost-effective approach here.",
+                'answer': False,
+                'explanation': "This is precisely the problem elasticity solves: automatically scaling capacity up for the spike and back down afterward means Fabrikam pays close to actual usage instead of paying for peak capacity it barely uses most of the year. Provisioning fixed, worst-case capacity year-round is the expensive, on-premises pattern the scenario describes Fabrikam trying to escape, not a recommended cloud practice.",
+            },
+            {
+                'id': 'cs-az900-fabrikam-adoption-q3',
+                'type': 'mc',
+                'question': "Given that some manufacturing records must stay on hardware Fabrikam controls directly while the rest of its workloads move to the cloud, which cloud deployment model fits Fabrikam's overall plan?",
+                'options': [
+                    "Hybrid cloud",
+                    "Public cloud only",
+                    "Private cloud only",
+                    "Multi-cloud",
+                ],
+                'correct': 0,
+                'explanation': "Hybrid cloud is exactly the combination of retained on-premises/private infrastructure (for the records that must stay under Fabrikam's direct control) with public cloud for everything else. Public-cloud-only or private-cloud-only would each leave one of Fabrikam's two stated requirements unmet, and multi-cloud describes using multiple public cloud providers together, which isn't what's being described here.",
+            },
+            {
+                'id': 'cs-az900-fabrikam-adoption-q4',
+                'type': 'ms',
+                'question': "Fabrikam wants to never have to patch the operating system of the servers running its web front end after migrating. Which of the following statements about meeting this goal are accurate? (Select all that apply.)",
+                'options': [
+                    "Choosing a PaaS service, like Azure App Service, shifts OS patching responsibility to Microsoft",
+                    "Choosing IaaS (VMs) would still leave Fabrikam responsible for guest-OS patching",
+                    "The shared responsibility model means the customer always keeps some responsibility, even on PaaS, such as securing their own data and access",
+                    "Any Azure compute option automatically removes all OS-patching responsibility from the customer",
+                ],
+                'correct': [0, 1, 2],
+                'explanation': "PaaS services like Azure App Service manage the underlying OS and runtime, so Microsoft handles patching — a direct fit for Fabrikam's goal. IaaS VMs still put guest-OS patching on the customer, which is why PaaS (not IaaS) is the right choice here. The shared responsibility model never fully disappears — the customer always retains some responsibility, like their own data, identities, and access, regardless of service model. The last statement is false: responsibility shifts with service model, it doesn't vanish entirely on every option — IaaS in particular still leaves OS patching with the customer.",
+                'whyTested': "This question tests whether you can connect a stated business goal (\"never patch the OS\") to the specific service model that satisfies it, rather than just reciting the IaaS/PaaS/SaaS responsibility split in the abstract — and it also checks that you know the shared responsibility model never reaches zero customer responsibility, which the last, deliberately-too-absolute option is designed to catch.",
+            },
+        ],
+    },
 ]

@@ -1963,6 +1963,122 @@
         }
       ],
       "explanation": "App protection policies enforce PIN and copy-paste controls at the application level and work without MDM enrollment, exactly fitting BYOD. A custom compliance policy runs an administrator-supplied detection script and evaluates its reported data against rules, extending compliance checks to things like an arbitrary registry value that built-in templates don't cover."
+    },
+    {
+      "id": "ml-md102-4",
+      "cat": "prepareInfra",
+      "scenario": "IT wants company-owned devices in the Finance department capped at one enrolled device per user, while every other department stays capped at five \u2014 that per-group cap comes from a properly prioritized {b1}. Separately, so that only helpdesk technicians in EMEA can see and manage the Windows policies scoped to EMEA devices, without changing what US helpdesk staff can see, admins apply a {b2} to those policies and assign it to the EMEA-only helpdesk role.",
+      "blanks": [
+        {
+          "key": "b1",
+          "options": [
+            "device limit restriction",
+            "compliance policy",
+            "app protection policy",
+            "conditional access policy"
+          ],
+          "correct": 0
+        },
+        {
+          "key": "b2",
+          "options": [
+            "scope tag",
+            "dynamic group",
+            "Microsoft Entra administrative unit",
+            "app configuration policy"
+          ],
+          "correct": 0
+        }
+      ],
+      "explanation": "Device limit restrictions are evaluated in priority order, so a narrower, higher-priority restriction scoped to Finance overrides the broader default that applies to everyone else. Scope tags are Intune's own built-in mechanism for restricting which admins can see and manage specific scoped objects like policies \u2014 a Microsoft Entra administrative unit is a real but separate Entra ID construct, not Intune's native tool for this job."
+    },
+    {
+      "id": "ml-md102-5",
+      "cat": "optimizeOps",
+      "scenario": "IT wants a consistent, Microsoft-recommended set of Windows security settings, including BitLocker, applied across every clinic-owned laptop with minimal per-setting authoring \u2014 that calls for a {b1} rather than building every setting by hand. Separately, to see which single app-and-driver combination is generating the most unexpected reboots and hangs fleet-wide, so engineering can prioritize the worst offender first, leadership turns to {b2}.",
+      "blanks": [
+        {
+          "key": "b1",
+          "options": [
+            "security baseline profile",
+            "app protection (MAM) policy",
+            "device configuration profile authored setting-by-setting",
+            "conditional access policy"
+          ],
+          "correct": 0
+        },
+        {
+          "key": "b2",
+          "options": [
+            "Endpoint analytics",
+            "app configuration policy",
+            "Conditional Access sign-in logs",
+            "Autopatch deployment groups"
+          ],
+          "correct": 0
+        }
+      ],
+      "explanation": "A security baseline pre-packages Microsoft's recommended values for settings like BitLocker into one profile, sparing admins from authoring every individual setting by hand the way a plain device configuration profile would require. Endpoint analytics rolls up cross-device reliability and startup-performance signals into scores that surface the worst offending app/driver combination, which raw sign-in logs or deployment group data don't do on their own."
+    }
+  ],
+  "caseStudies": [
+    {
+      "id": "cs-md102-contoso-health",
+      "cat": "manageDevices",
+      "title": "Contoso Health Clinics' Endpoint Modernization",
+      "scenario": "Contoso Health Clinics is rolling out 300 new Windows laptops purchased directly from the OEM and registered for Windows Autopilot. Each laptop will be shipped straight to a home-based clinic administrator, who will unbox it, sign in with their own corporate credentials, and complete the entire setup themselves \u2014 no IT staff or reseller partner touches the device in between. Separately, Contoso is placing unattended check-in kiosks in waiting rooms; each kiosk must provision itself using only its own device identity, with no user ever signing in during setup. Compliance requires BitLocker enabled and a consistent, Microsoft-recommended set of Windows security settings applied to every clinic-owned laptop, without IT hand-authoring each individual setting. Clinical staff also want to check patient schedules in Outlook on their own personal iPads without enrolling those iPads in Intune at all, while still requiring a PIN and blocking corporate data from being copied into unmanaged apps.",
+      "questions": [
+        {
+          "id": "cs-md102-contoso-health-q1",
+          "type": "mc",
+          "question": "Which Autopilot deployment profile fits the 300 laptops shipped directly to home-based administrators, who complete the entire setup themselves with no partner or IT staging in between?",
+          "options": [
+            "User-driven",
+            "Pre-provisioned (white glove)",
+            "Self-deploying",
+            "Hybrid Microsoft Entra join with an on-premises staging OU"
+          ],
+          "correct": 0,
+          "explanation": "A user-driven profile has the end user complete the whole process themselves after signing in with their own credentials \u2014 exactly this shipped-direct, no-partner scenario. Pre-provisioned (white glove) specifically requires a partner or IT to complete the time-consuming steps in advance before the device ever reaches the user, which did not happen here; self-deploying skips end-user sign-in entirely and fits the unattended kiosks instead."
+        },
+        {
+          "id": "cs-md102-contoso-health-q2",
+          "type": "tf",
+          "question": "True or false: the waiting-room check-in kiosks, which must provision unattended with no signed-in user, are best deployed with a self-deploying Autopilot profile.",
+          "answer": true,
+          "explanation": "Self-deploying profiles authenticate using the device's own identity and require no end-user interaction at all, which is exactly what an unattended kiosk needs. A user-driven or white-glove profile both still expect a person to be involved in completing setup, which the kiosks don't have."
+        },
+        {
+          "id": "cs-md102-contoso-health-q3",
+          "type": "mc",
+          "question": "Which control lets clinical staff check Outlook on their own personal iPads with a required PIN and a block on copying corporate data into unmanaged apps, without enrolling those iPads in Intune?",
+          "options": [
+            "An app protection (MAM) policy targeting the Outlook app",
+            "A device compliance policy",
+            "A device configuration profile",
+            "A security baseline"
+          ],
+          "correct": 0,
+          "explanation": "App protection policies enforce PIN and data-copy controls at the application level and work on unenrolled personal devices, which is exactly what BYOD requires here. Device compliance policies, device configuration profiles, and security baselines all require the device itself to be enrolled in Intune, which clinical staff explicitly want to avoid for their personal iPads."
+        },
+        {
+          "id": "cs-md102-contoso-health-q4",
+          "type": "ms",
+          "question": "Which two of the following best satisfy the compliance requirement to apply a consistent, Microsoft-recommended set of Windows security settings, including BitLocker, across every clinic-owned laptop without hand-authoring each setting? (Select two.)",
+          "options": [
+            "Apply a Microsoft-recommended security baseline profile",
+            "Fall back to a device configuration profile only for a setting no baseline covers",
+            "Rely solely on each laptop's default out-of-box Windows settings",
+            "Apply an app protection (MAM) policy to every laptop"
+          ],
+          "correct": [
+            0,
+            1
+          ],
+          "explanation": "A security baseline profile pre-packages Microsoft's recommended values, including BitLocker-related settings, so IT doesn't have to author every setting individually \u2014 and a device configuration profile still has its place for the rare setting a baseline doesn't cover. Relying on default out-of-box settings meets no compliance requirement at all, and app protection (MAM) policies govern app-level data controls, not device-wide security settings like BitLocker.",
+          "whyTested": "It's tempting to treat baselines and device configuration profiles as an either/or choice, but real deployments commonly layer a baseline with a small number of supplemental configuration profiles \u2014 recognizing that the two are complementary, not competing, is the actual distinction this question is probing."
+        }
+      ]
     }
   ]
 }

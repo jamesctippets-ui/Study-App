@@ -1993,6 +1993,245 @@
         }
       ],
       "explanation": "Canary gradually exposes a new release to a small slice of traffic first, limiting the blast radius of a bad release. Blue-green keeps two full duplicate environments and switches all traffic at once, giving an instant, whole-environment rollback option. Rolling updates a subset of instances at a time within the existing environment -- no duplicate infrastructure needed -- unlike an in-place deployment, which updates everything at once with no gradual exposure at all."
+    },
+    {
+      "id": "ml-cloudplus-5",
+      "cat": "opsSupport",
+      "scenario": "An operations team spends three weeks watching CPU and memory metrics under normal conditions before configuring a single alert \u2014 establishing a {b1} first, so the alert {b2} it eventually sets won't misfire on ordinary variation. Once alerting is tuned, finance asks to see cloud spend broken out by department purely for visibility, with no budget actually changing hands between teams \u2014 that reporting model is {b3}, distinct from {b4}, which would actually transfer the cost.",
+      "blanks": [
+        {
+          "key": "b1",
+          "options": [
+            "baseline",
+            "threshold",
+            "runbook",
+            "CMDB"
+          ],
+          "correct": 0
+        },
+        {
+          "key": "b2",
+          "options": [
+            "threshold",
+            "baseline",
+            "SLA",
+            "RPO"
+          ],
+          "correct": 0
+        },
+        {
+          "key": "b3",
+          "options": [
+            "showback",
+            "chargeback",
+            "tokenization",
+            "orchestration"
+          ],
+          "correct": 0
+        },
+        {
+          "key": "b4",
+          "options": [
+            "chargeback",
+            "showback",
+            "automation",
+            "elasticity"
+          ],
+          "correct": 0
+        }
+      ],
+      "explanation": "A baseline (the expected normal range) has to be established before a threshold (the value that trips an alert) is set \u2014 otherwise the threshold is just a guess, producing either false alarms or missed problems. Showback reports cost for visibility only; chargeback is the model that actually bills the cost back to a department's budget."
+    },
+    {
+      "id": "ml-cloudplus-6",
+      "cat": "archDesign",
+      "scenario": "A database engine needs low-latency, random-access disk performance, so the team provisions {b1} storage for it. A separate team needs a shared drive that several application servers can mount and browse like an ordinary folder tree, so they choose {b2} storage instead. A third team is storing millions of infrequently accessed images accessed only through HTTP calls, which is a textbook case for {b3} storage.",
+      "blanks": [
+        {
+          "key": "b1",
+          "options": [
+            "block",
+            "file",
+            "object"
+          ],
+          "correct": 0
+        },
+        {
+          "key": "b2",
+          "options": [
+            "file",
+            "block",
+            "object"
+          ],
+          "correct": 0
+        },
+        {
+          "key": "b3",
+          "options": [
+            "object",
+            "block",
+            "file"
+          ],
+          "correct": 0
+        }
+      ],
+      "explanation": "Block storage suits low-latency, random-access workloads like a database's own disk. File storage provides a shared, mountable filesystem multiple servers can browse together. Object storage is built for massive-scale, metadata-rich data accessed over HTTP rather than mounted as a drive \u2014 a good match for large volumes of infrequently accessed images."
+    },
+    {
+      "id": "ml-cloudplus-7",
+      "cat": "security",
+      "scenario": "A user logs into a system with a password and then must also approve a push notification on their registered phone \u2014 two different factor categories, {b1} and {b2}, which is what makes this genuine multifactor authentication rather than just two checks of the same kind. Under a {b3} model, though, passing that login once doesn't automatically grant access to every internal resource afterward \u2014 each subsequent request still gets independently re-verified, regardless of where it's coming from.",
+      "blanks": [
+        {
+          "key": "b1",
+          "options": [
+            "something you know",
+            "something you have",
+            "something you are",
+            "somewhere you are"
+          ],
+          "correct": 0
+        },
+        {
+          "key": "b2",
+          "options": [
+            "something you have",
+            "something you know",
+            "something you are",
+            "something you do"
+          ],
+          "correct": 0
+        },
+        {
+          "key": "b3",
+          "options": [
+            "Zero Trust",
+            "perimeter-based",
+            "role-based access control",
+            "attribute-based access control"
+          ],
+          "correct": 0
+        }
+      ],
+      "explanation": "A password is a knowledge factor (something you know); a phone-based push approval is a possession factor (something you have) \u2014 two different categories, which is what genuine MFA requires, unlike two passwords, which would still be one category twice. Zero Trust is the model that keeps re-verifying every subsequent request rather than trusting a session just because it already got past the perimeter or an earlier login."
+    }
+  ],
+  "caseStudies": [
+    {
+      "id": "cs-cloudplus-solstice-outdoor",
+      "cat": "archDesign",
+      "title": "Solstice Outdoor Gear's Seasonal Cloud Redesign",
+      "scenario": "Solstice Outdoor Gear runs its online storefront out of a single small datacenter, but leadership has approved a move to the public cloud ahead of next year's holiday season. Traffic is brutally seasonal: the four days around Black Friday bring roughly 15 times normal order volume, while the rest of the year the storefront runs comfortably on a fraction of that capacity. The product catalog includes hundreds of thousands of high-resolution images and short product videos that are written once and then read constantly by the storefront's front end, but almost never modified afterward. The order database, by contrast, is a relational system under constant read/write load, and the business has set a hard requirement that it can lose no more than 15 minutes of transactions and be fully restored within one hour if the primary environment ever goes down. Solstice's small platform team specifically does not want to keep enough servers provisioned year-round to cover the Black Friday peak, since that capacity would sit mostly idle for the other 361 days of the year.",
+      "questions": [
+        {
+          "id": "cs-cloudplus-solstice-outdoor-q1",
+          "type": "mc",
+          "question": "Which storage type should Solstice use for the hundreds of thousands of rarely-modified product images and videos served to the storefront's front end?",
+          "options": [
+            "Object storage",
+            "Block storage",
+            "File storage",
+            "RAID 0 striped local disk"
+          ],
+          "correct": 0,
+          "explanation": "Object storage is built for massive-scale, metadata-rich data accessed over HTTP rather than mounted as a drive \u2014 a direct fit for huge volumes of infrequently-modified images and video. Block storage suits low-latency, random-access workloads like a database's own disk; file storage is a shared, mountable filesystem; RAID 0 is a disk-striping technique for raw speed with zero redundancy, not a storage-type category suited to this use case."
+        },
+        {
+          "id": "cs-cloudplus-solstice-outdoor-q2",
+          "type": "tf",
+          "question": "True or false: keeping enough servers provisioned year-round to fully cover the Black Friday peak is the most cost-effective way for Solstice to handle its seasonal traffic pattern.",
+          "answer": false,
+          "explanation": "Elasticity \u2014 automatic, metrics-driven scaling that adds and removes capacity as real demand changes \u2014 matches spend to actual load across a 15x seasonal swing. Provisioning fixed peak capacity year-round wastes money for the other 361 days, which is exactly what Solstice's team wants to avoid."
+        },
+        {
+          "id": "cs-cloudplus-solstice-outdoor-q3",
+          "type": "ms",
+          "question": "Given the order database's stated recovery requirements (no more than 15 minutes of lost transactions, fully restored within one hour), which of the following would actually help Solstice meet those targets? (Select all that apply.)",
+          "options": [
+            "Frequent replication or transaction-log shipping to a standby database at a warm or hot DR site",
+            "A cold DR site with only bare facilities, built out from scratch after a failure",
+            "A DR design explicitly built around a 15-minute RPO and a 1-hour RTO, rather than whatever replication happens to already exist",
+            "RAID 0 striping on the primary database's local disks for maximum write performance"
+          ],
+          "correct": [
+            0,
+            2
+          ],
+          "explanation": "A 15-minute RPO needs replication or log-shipping frequent enough that at most 15 minutes of transactions could ever be lost, and a 1-hour RTO needs a warm or hot site that's already synced closely enough to fail over quickly \u2014 a cold site's from-scratch rebuild would blow past that RTO. The targets have to be explicitly designed around, not assumed from whatever setup already exists. RAID 0 has zero redundancy and does nothing for either target; it's a performance-only choice easily confused with a resilience one.",
+          "whyTested": "Case-study questions often bury the real requirement (a specific RPO/RTO pair) inside a paragraph of unrelated detail, then offer a plausible-sounding distractor (RAID 0, a cold site) that sounds related to 'storage' or 'disaster recovery' without actually meeting the stated numbers \u2014 matching the design to the actual targets, not just the general topic, is the skill being tested."
+        },
+        {
+          "id": "cs-cloudplus-solstice-outdoor-q4",
+          "type": "mc",
+          "question": "Which scaling approach should Solstice apply to its storefront web tier to absorb the 15x Black Friday swing without paying for idle capacity the rest of the year?",
+          "options": [
+            "Horizontal autoscaling behind a load balancer",
+            "Vertical scaling of a single large instance",
+            "A permanently oversized fixed instance count sized for peak",
+            "Thick-provisioned storage sized for peak"
+          ],
+          "correct": 0,
+          "explanation": "Horizontal autoscaling adds and removes instances behind a load balancer as real demand changes, avoiding both a hard capacity ceiling and idle year-round spend. Vertical scaling hits a size ceiling and typically needs a restart; a permanently oversized fixed count is exactly the idle-capacity waste Solstice wants to avoid; thick provisioning is a storage-allocation concept, unrelated to compute scaling."
+        }
+      ]
+    },
+    {
+      "id": "cs-cloudplus-harborview-freight",
+      "cat": "troubleshooting",
+      "title": "A Support Ticket at Harborview Freight's Cloud Ops Desk",
+      "scenario": "Harborview Freight's small cloud operations team gets a ticket: a mid-tier VM running its shipment-tracking API has felt sluggish for the past two days, even though nothing in that VM's own configuration has changed. The on-call engineer wants to resize the VM immediately, but a senior teammate insists on following the standard troubleshooting methodology instead of jumping straight to a fix. Separately that same week, finance flags that the monthly cloud bill has crept up even though the team's actual deployed footprint \u2014 the number of instances and volumes they've provisioned \u2014 hasn't grown, and a different engineer notices that a partner integration times out only when it tries to reach a partner service by hostname; reaching that exact same partner service by its raw IP address works fine every time.",
+      "questions": [
+        {
+          "id": "cs-cloudplus-harborview-freight-q1",
+          "type": "mc",
+          "question": "Which step of the standard troubleshooting methodology should the on-call engineer take before resizing the sluggish VM?",
+          "options": [
+            "Establish and test a theory of probable cause",
+            "Immediately implement a plan of action",
+            "Document the incident",
+            "Escalate directly to the cloud provider"
+          ],
+          "correct": 0,
+          "explanation": "The methodology calls for forming a theory and testing it before implementing any fix \u2014 jumping straight to a resize risks spending time and a maintenance window on a change that doesn't address the real cause, or even makes things worse, if the theory turns out to be wrong."
+        },
+        {
+          "id": "cs-cloudplus-harborview-freight-q2",
+          "type": "tf",
+          "question": "True or false: because the sluggish VM's own configuration hasn't changed, a noisy-neighbor problem caused by another tenant on the same shared physical hardware can be ruled out as a cause.",
+          "answer": false,
+          "explanation": "A noisy-neighbor problem is defined by another co-located tenant consuming a disproportionate share of shared hardware \u2014 it happens without the affected tenant's own configuration changing at all, so an unchanged config doesn't rule it out. It's still a theory worth testing, typically via hypervisor-level metrics."
+        },
+        {
+          "id": "cs-cloudplus-harborview-freight-q3",
+          "type": "mc",
+          "question": "The partner integration reaches the partner service fine by raw IP address but times out when using its hostname. What does this specific pattern point to?",
+          "options": [
+            "A DNS resolution problem",
+            "A bandwidth problem",
+            "A noisy-neighbor problem on Harborview's own host",
+            "An expired encryption certificate"
+          ],
+          "correct": 0,
+          "explanation": "Working by IP but failing by hostname is the classic signature of a DNS resolution failure \u2014 the network path and destination service are both healthy, but the hostname itself isn't resolving correctly. Bandwidth and noisy-neighbor problems would typically affect both access methods equally, and nothing in the scenario points at certificate expiry.",
+          "whyTested": "Latency/bandwidth, DNS, and noisy-neighbor failures all present as 'something feels slow or broken' at first glance, but each has one distinguishing signature \u2014 here, IP-works/hostname-fails \u2014 and confusing bandwidth with DNS (adding more bandwidth fixes nothing for a resolution failure) is one of the most common mix-ups in this domain."
+        },
+        {
+          "id": "cs-cloudplus-harborview-freight-q4",
+          "type": "ms",
+          "question": "Which of the following plausibly explains the cloud bill creeping up even though Harborview's deployed footprint (instance and volume count) hasn't grown? (Select all that apply.)",
+          "options": [
+            "Orphaned resources (unattached disks, snapshots, public IPs, or load balancers) left over from deleted projects, still quietly incurring cost",
+            "Thin-provisioned volumes whose actual consumed data has grown, even though no new volumes or instances were provisioned",
+            "A vertical scaling event that permanently resized a running production instance to a larger tier",
+            "A workaround, like restarting a hung service, that resolved a symptom without changing what's actually deployed"
+          ],
+          "correct": [
+            0,
+            1
+          ],
+          "explanation": "Orphaned resources are a classic source of cost growth with no visible footprint change, since the resources themselves were never actually torn down. Thin-provisioned volumes can also drive up consumption-based billing as more data is actually written, even with no new volumes provisioned. A vertical resize would itself be footprint growth, contradicting the scenario, and a restart-only workaround has no cost impact at all."
+        }
+      ]
     }
   ]
 }

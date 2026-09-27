@@ -141,15 +141,21 @@ come up.
   new list the same way it validates MADLIBS/SEQUENCES: unique ids, a
   real category, non-empty title/scenario, and every embedded question
   checked against the same per-type rules QUESTIONS entries already get.
-  Launched with AZ-305 (2 case studies, matching this item's own "mirrors
-  AZ-305's real exam" framing) and rolled out to the other 14 tracks in
-  the same pass. **Caveat:** this session's outbound network briefly
-  blocked the CDN this app loads React/Babel from at runtime, so this
-  feature shipped verified only by `build.py`'s structural validation and
-  manual code review against the already-working Mad Libs/Sequence
-  patterns it mirrors — not by opening it in an actual browser. Worth a
-  real Playwright pass through `full_smoke.js` (or equivalent) once that's
-  possible, before treating this as fully proven out.
+  Piloted on AZ-305 by hand (2 case studies, matching this item's own
+  "mirrors AZ-305's real exam" framing), then rolled out to the other 14
+  tracks via 5 parallel background agents (each writing case studies +
+  additional Mad Libs scenarios for its assigned tracks against the
+  AZ-305 example, self-verifying with `build.py`). All 15 tracks now ship
+  `CASE_STUDIES` — 18 case studies total (71 embedded questions), and
+  Mad Libs grew from 49 to 79 scenarios in the same pass (see section 13).
+  **Caveat:** this session's outbound network briefly blocked the CDN
+  this app loads React/Babel from at runtime, so this feature shipped
+  verified only by `build.py`'s structural validation (every track's
+  content passes it) and manual code review against the already-working
+  Mad Libs/Sequence patterns it mirrors — not by opening it in an actual
+  browser. Worth a real Playwright pass through `full_smoke.js` (or
+  equivalent) once that's possible, before treating this as fully proven
+  out.
 
 ## 5. Diagrams (user's idea)
 
@@ -835,7 +841,11 @@ doesn't (and why it's still waiting).
   shown for tracks with `MADLIBS` content — now all 15 tracks, 3-4
   scenarios each, 49 total; started with AZ-900/AZ-104/ITIL/Cloud+ and
   later expanded to the remaining 11 in the same content-quality pass
-  as the question-bank audit below): a short real-world scenario
+  as the question-bank audit below). Grown again later (see section 4's
+  mini-case-studies entry) to 79 scenarios total (5-7 per track, up to 7
+  on Cloud+/EHR Integration), added by the same 5 background agents that
+  wrote the case study rollout, in the same pass, against the existing
+  entries' own tone/depth as the style reference. A short real-world scenario
   paragraph with 2-3 inline dropdown blanks, each filled from a small
   set of term choices (`MadLibsView` in 04_shared_ui.jsx). Scored
   all-or-nothing per scenario — every blank right, or the whole scenario

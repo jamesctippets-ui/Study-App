@@ -1722,6 +1722,123 @@
         }
       ],
       "explanation": "An eligible assignment requires an explicit activation step, with MFA, justification, and a maximum duration, before the role becomes active \u2014 exactly the just-in-time model this scenario needs. A permanent (active, standing) assignment instead grants the role continuously with no activation step, which is precisely the always-on access the on-call team wants to avoid."
+    },
+    {
+      "id": "ml-sc300-4",
+      "cat": "workloadIdentities",
+      "scenario": "A CI/CD pipeline running in GitHub Actions needs to deploy to Azure resources without ever storing a client secret or certificate in the pipeline's configuration. The team configures a {b1} on the app registration's service principal, trusting GitHub's OIDC token issuer for that specific repo and branch. Separately, a scheduled batch job running as an Azure VM needs to read from a storage account, and the platform team wants Azure to manage the credential's rotation automatically with zero setup burden, so they assign it a {b2} instead.",
+      "blanks": [
+        {
+          "key": "b1",
+          "options": [
+            "federated identity credential",
+            "client secret",
+            "self-signed certificate",
+            "password-based credential"
+          ],
+          "correct": 0
+        },
+        {
+          "key": "b2",
+          "options": [
+            "system-assigned managed identity",
+            "federated identity credential",
+            "service principal with a client secret",
+            "user-assigned application registration"
+          ],
+          "correct": 0
+        }
+      ],
+      "explanation": "A federated identity credential lets an external workload (like a GitHub Actions run) exchange its own OIDC token for a Microsoft Entra token with no secret ever stored in the pipeline, based on trust in the issuer and a matching subject claim. A managed identity is the right fit for compute Azure itself hosts, like a VM, since Azure creates, rotates, and secures the credential automatically with no federation setup needed at all \u2014 the two solve the same 'no stored secret' goal for two different hosting situations."
+    },
+    {
+      "id": "ml-sc300-5",
+      "cat": "authAccessMgmt",
+      "scenario": "A Conditional Access policy is created with the assignments and grant control fully configured, but the administrator leaves the enable policy toggle set to {b1} while validating it \u2014 it evaluates in the sign-in logs as if it would apply, but no sign-in is actually blocked or challenged. Once satisfied, she flips it to On. A different, older policy is retired by switching it to {b2} rather than deleting it outright, so its configuration is preserved for later reference and audit even though it no longer affects any sign-in.",
+      "blanks": [
+        {
+          "key": "b1",
+          "options": [
+            "Report-only",
+            "Off",
+            "On",
+            "Disabled"
+          ],
+          "correct": 0
+        },
+        {
+          "key": "b2",
+          "options": [
+            "Off",
+            "Report-only",
+            "On",
+            "archived"
+          ],
+          "correct": 0
+        }
+      ],
+      "explanation": "Report-only mode evaluates a policy against real sign-ins and logs what would have happened, without enforcing any grant or block control \u2014 exactly what's needed to validate a policy safely before going live. Off fully retires a policy while keeping its full configuration intact for later review, which is the intended way to retire (not delete) an old policy that's no longer meant to apply."
+    }
+  ],
+  "caseStudies": [
+    {
+      "id": "cs-sc300-meridian-health",
+      "cat": "authAccessMgmt",
+      "title": "Meridian Health Group's External Access Overhaul",
+      "scenario": "Meridian Health Group is a mid-size healthcare network rolling out Microsoft Entra ID across its clinics and back-office systems. Three groups need access: full-time clinical staff (internal members), a set of external billing contractors who need access to a claims-processing web app but are not Meridian employees, and a two-person IT security team that occasionally needs Global Administrator rights to fix urgent directory issues. The security team is worried about being locked out of the tenant entirely if Conditional Access is ever misconfigured or an MFA provider has an outage, so they want at least one safeguard for that scenario. They also want the billing contractors held to a stricter access bar than internal staff, since the claims app exposes protected health information. Finally, the Global Administrator role should never sit active on any account day-to-day \u2014 it should only become usable for a short window, and only after justification and approval.",
+      "questions": [
+        {
+          "id": "cs-sc300-meridian-health-q1",
+          "type": "mc",
+          "question": "To guard against being fully locked out of the tenant if Conditional Access is ever misconfigured or MFA has an outage, what should the security team create and exclude from every Conditional Access policy?",
+          "options": [
+            "One or more emergency access ('break-glass') accounts, excluded from Conditional Access and closely monitored for any sign-in activity",
+            "A second set of Global Administrator accounts with the same Conditional Access policies applied as everyone else",
+            "A Conditional Access policy that exempts all administrators from MFA by role",
+            "A PIM eligible assignment for Global Administrator with no activation requirements"
+          ],
+          "correct": 0,
+          "explanation": "A dedicated emergency access account, excluded from Conditional Access policies (and typically secured with a very strong credential and heavy sign-in monitoring instead), is the standard safeguard against a tenant-wide CA misconfiguration or MFA outage locking everyone out. Applying identical CA policies to a backup admin account does not remove the lockout risk, and broadly exempting admins from MFA by role trades one security gap for another rather than solving the lockout scenario."
+        },
+        {
+          "id": "cs-sc300-meridian-health-q2",
+          "type": "tf",
+          "question": "True or false: because the billing contractors are external users rather than Meridian employees, Conditional Access policies do not apply to them unless a separate, contractor-specific policy is created from scratch.",
+          "answer": false,
+          "explanation": "Conditional Access applies to guest/external users the same way it applies to members whenever a policy's user assignment includes them (directly, via a group, or via an 'All users' scope that includes guests) \u2014 there's no separate exemption by default. The task here isn't creating access from nothing, it's scoping a policy (or an additional, stricter one) to that specific set of external users."
+        },
+        {
+          "id": "cs-sc300-meridian-health-q3",
+          "type": "ms",
+          "question": "Which controls would appropriately hold the billing contractors to a stricter bar than internal clinical staff for the claims-processing app? (Select all that apply.)",
+          "options": [
+            "A Conditional Access policy scoped to the contractors' group requiring a compliant or Microsoft Entra hybrid joined device",
+            "Requiring acknowledgment of a terms of use policy before access to the app is granted",
+            "Removing MFA entirely for the contractors' accounts to simplify their sign-in",
+            "A Conditional Access policy scoped to the contractors' group requiring MFA on every sign-in to that app"
+          ],
+          "correct": [
+            0,
+            1,
+            3
+          ],
+          "explanation": "Requiring a compliant/hybrid-joined device, a terms of use acknowledgment, and per-sign-in MFA are all standard Conditional Access and governance controls for tightening access to a sensitive app for a specific population. Removing MFA does the opposite of what's asked \u2014 it weakens the contractors' access bar instead of raising it above the internal staff baseline.",
+          "whyTested": "The scenario states the stricter-bar requirement once and then lists several plausible controls, only one of which is actually a loosening of security \u2014 the skill being tested is catching that one option contradicts the stated goal rather than assuming every plausible-sounding security control belongs in the 'select all' answer."
+        },
+        {
+          "id": "cs-sc300-meridian-health-q4",
+          "type": "mc",
+          "question": "Which Privileged Identity Management (PIM) configuration ensures Global Administrator never sits active by default, and only becomes usable for a short window after justification and approval?",
+          "options": [
+            "A permanent active assignment with a Conditional Access policy requiring MFA to sign in",
+            "An eligible assignment with activation requiring approval, MFA, justification, and a maximum activation duration",
+            "A permanent eligible assignment with no maximum activation duration set",
+            "Adding the two IT security team members directly to the Global Administrators group with no PIM involvement"
+          ],
+          "correct": 1,
+          "explanation": "An eligible PIM assignment configured to require approval, MFA, and justification, with a bounded maximum duration, is exactly the just-in-time model this scenario needs \u2014 the role stays inactive until someone deliberately activates it and self-expires afterward. A permanent active assignment (with or without a CA MFA requirement) still leaves the role usable at all times, which is precisely what the security team wants to avoid, and skipping PIM entirely removes the activation, approval, and time-bound behavior altogether."
+        }
+      ]
     }
   ]
 }

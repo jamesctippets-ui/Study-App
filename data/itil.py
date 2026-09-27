@@ -1742,6 +1742,27 @@ MADLIBS = [
         ],
         'explanation': "A digital product vendor supplies a product, like a perpetual license, without an ongoing service relationship — that's what separates it from a full service provider. The sponsor is whoever authorizes the budget; the customer is whoever defines requirements and is accountable for outcomes — distinct roles, even though one person can sometimes hold more than one of them.",
     },
+    {
+        'id': 'ml-itil-5',
+        'cat': 'lifecycle',
+        'scenario': "Before a retailer's product team writes a single requirement for a redesigned self-checkout kiosk, they spend two weeks observing store staff and interviewing customers to understand exactly where the current kiosk frustrates people — that exploratory activity is {b1}. Once they've translated those findings into concrete functional and security specifications for the fix, the work moves into {b2}. Only once the updated kiosk software has been tested and is being rolled out into live stores does the work reach {b3}.",
+        'blanks': [
+            {'key': 'b1', 'options': ['Discover', 'Design', 'Transition', 'Acquire'], 'correct': 0},
+            {'key': 'b2', 'options': ['Discover', 'Design', 'Transition', 'Acquire'], 'correct': 1},
+            {'key': 'b3', 'options': ['Discover', 'Design', 'Transition', 'Acquire'], 'correct': 2},
+        ],
+        'explanation': "Discover is about understanding demand and opportunity before anything is specified — exactly the observation-and-interview work described. Design is where requirements and specifications get defined, but nothing is built yet. Transition is specifically where a new or changed product moves into live use, including testing and release, which is what rolling the kiosk update out to stores actually is.",
+    },
+    {
+        'id': 'ml-itil-6',
+        'cat': 'ai',
+        'scenario': "A service desk's virtual agent drafts a suggested reply to a routine password-reset ticket, which a human agent reviews and sends — under the AI Capability Model, that's an example of AI performing {b1}. Later, the team adds a feature that automatically reads every incoming support email and files it into the correct queue with no human involved at any point — that's an example of {b2} instead.",
+        'blanks': [
+            {'key': 'b1', 'options': ['Creation', 'Curation', 'Cognition', 'Coordination'], 'correct': 0},
+            {'key': 'b2', 'options': ['Creation', 'Curation', 'Cognition', 'Coordination'], 'correct': 1},
+        ],
+        'explanation': "Creation covers AI generating new content, like a drafted reply — even though a human still reviews it before it goes out. Curation covers organizing and filtering information, which is exactly what auto-sorting incoming emails into the right queue is; it isn't generating new content, so it doesn't count as Creation, and there's no decision-making or orchestration of a broader workflow involved, which is what Cognition and Coordination would describe.",
+    },
 ]
 
 SEQUENCES = [
@@ -1787,5 +1808,80 @@ SEQUENCES = [
             'Review the change afterward to confirm it achieved its objective',
         ],
         'explanation': "Risk/impact assessment has to happen before authorization can be meaningfully granted — an authority approving blind, unassessed risk defeats the point of change enablement. The post-implementation review is what actually closes the loop on whether the change worked.",
+    },
+]
+
+# Mini case studies (ROADMAP.md section 4): a shared scenario with several
+# related questions answered in sequence, mirroring how a real exam groups
+# multiple questions off one larger case rather than testing each fact in
+# isolation. Every embedded question still follows the same mc/tf/ms shape
+# as QUESTIONS above (see build.py's CASE_STUDIES validation) — only the
+# shared scenario and the grouping are new.
+CASE_STUDIES = [
+    {
+        'id': 'cs-itil-northwind-helpdesk',
+        'cat': 'lifecycle',
+        'title': "Northwind Logistics' Struggling Service Desk",
+        'scenario': (
+            "Northwind Logistics runs a 24-person service desk supporting 3,000 warehouse and office "
+            "staff. Over the last quarter, the same barcode-scanner connectivity issue has been logged "
+            "as a fresh incident more than 40 times; agents keep applying the same workaround (a device "
+            "reboot and a Wi-Fi profile reset) without ever recording why the underlying fault happens. "
+            "Meanwhile, the desk's manager has noticed that when a new hire is added to a distribution "
+            "team, requests for a laptop, a badge, and system access are handled as three separate, "
+            "uncoordinated tickets routed to three different teams, each unaware of the others' status. "
+            "Leadership also wants smaller, faster improvements to the ticketing workflow rather than a "
+            "single, disruptive process overhaul, and wants the team that actually works the desk each "
+            "day involved in shaping any changes, not just told about them after the fact."
+        ),
+        'questions': [
+            {
+                'id': 'cs-itil-northwind-helpdesk-q1',
+                'type': 'mc',
+                'question': "Which ITIL practice is missing from how the recurring barcode-scanner issue is being handled, given that the same workaround is applied over and over without ever recording why?",
+                'options': [
+                    "Problem management",
+                    "Incident management",
+                    "Change enablement",
+                    "Service request management",
+                ],
+                'correct': 0,
+                'explanation': "Problem management is specifically about identifying and recording the underlying cause of recurring incidents (a known error) so a permanent fix, not just a repeated workaround, becomes possible. Incident management is what's already happening every time the desk logs and resolves the issue in the moment; change enablement and service request management don't address root-cause investigation at all.",
+            },
+            {
+                'id': 'cs-itil-northwind-helpdesk-q2',
+                'type': 'tf',
+                'question': "True or false: routing a new hire's laptop, badge, and access requests as three separate, uncoordinated tickets is a well-designed value stream for onboarding.",
+                'answer': False,
+                'explanation': "A value stream is the end-to-end series of steps that should deliver a specific outcome — here, a fully onboarded new hire — as one coordinated flow. Three teams working in isolation, each unaware of the others' status, is exactly the kind of disconnected handoff that value stream mapping exists to expose and fix, not a sign of good design.",
+            },
+            {
+                'id': 'cs-itil-northwind-helpdesk-q3',
+                'type': 'mc',
+                'question': "Leadership wants smaller, faster improvements to the ticketing workflow instead of one disruptive overhaul, and wants the agents who work the desk daily involved in shaping the changes. Which pair of ITIL guiding principles does this describe?",
+                'options': [
+                    "Progress iteratively with feedback, and Collaborate and promote visibility",
+                    "Keep it simple and practical, and Optimize and automate",
+                    "Focus on value, and Think and work holistically",
+                    "Start where you are, and Focus on value",
+                ],
+                'correct': 0,
+                'explanation': "\"Progress iteratively with feedback\" is exactly about favoring small, feedback-driven steps over one big-bang overhaul. \"Collaborate and promote visibility\" is specifically about involving the people who'll actually do the work in shaping it, and being transparent with them, rather than deciding changes in isolation and announcing them afterward.",
+                'whyTested': "The scenario names no principle directly — it only describes behavior (small steps, involving the desk staff). The exam is testing whether you can map described behavior back to the correct named principle, instead of just recognizing the principle's name when it's already given to you.",
+            },
+            {
+                'id': 'cs-itil-northwind-helpdesk-q4',
+                'type': 'ms',
+                'question': "Once problem management identifies the barcode-scanner fault's underlying cause but no permanent fix is available yet, which of the following would be appropriate next steps? (Select all that apply.)",
+                'options': [
+                    "Record it as a known error, with the existing workaround documented for agents to apply consistently",
+                    "Close problem management's involvement immediately, since incident management can keep handling it case by case",
+                    "Raise a change request to implement a permanent fix once one is identified",
+                    "Stop logging future occurrences as incidents, since the cause is now understood",
+                ],
+                'correct': [0, 2],
+                'explanation': "A known error is precisely a problem that has been analyzed but not yet permanently resolved, with a workaround recorded so it can be applied consistently rather than reinvented each time. A permanent fix still requires a proper change request to be assessed, authorized, and implemented. Problem management shouldn't simply hand back to incident management and disengage, and each new occurrence is still a real incident affecting a user — it still needs to be logged, even though its underlying cause is now known.",
+            },
+        ],
     },
 ]

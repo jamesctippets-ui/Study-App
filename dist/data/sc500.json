@@ -2009,6 +2009,122 @@
         }
       ],
       "explanation": "SSE with platform-managed keys is on by default for managed disks, applied transparently outside the guest OS. Encryption at host is the feature that extends protection specifically to temporary disks and host-level caches, which default SSE does not cover. Confidential computing uses hardware-based trusted execution environments to protect data in use, isolating memory so not even the cloud operator can access it \u2014 a different guarantee than ADE's guest-OS BitLocker, which protects disks, not live memory."
+    },
+    {
+      "id": "ml-sc500-4",
+      "cat": "securityPostureOps",
+      "scenario": "A security architect wants a single number representing an Azure subscription's overall hardening level against Microsoft's benchmark recommendations, so she looks at its {b1} in Microsoft Defender for Cloud. To make sure a specific regulated workload's controls (like a named PCI DSS or ISO 27001 blueprint) are tracked separately from that general score, she also assigns it a {b2}, which reports pass/fail against that named standard's own control set.",
+      "blanks": [
+        {
+          "key": "b1",
+          "options": [
+            "secure score",
+            "attack surface reduction (ASR) rules",
+            "a Log Analytics workspace",
+            "Just-in-time VM access"
+          ],
+          "correct": 0
+        },
+        {
+          "key": "b2",
+          "options": [
+            "regulatory compliance standard (compliance dashboard entry)",
+            "secure score",
+            "a diagnostic setting",
+            "an Azure Policy initiative with no compliance mapping"
+          ],
+          "correct": 0
+        }
+      ],
+      "explanation": "Secure score is Defender for Cloud's single aggregate hardening metric, based on Microsoft's own recommendations, and is the general-purpose number an architect reads to gauge overall posture. A regulatory compliance standard added to the compliance dashboard instead tracks pass/fail against one specific named framework's control set (PCI DSS, ISO 27001, and so on), reported separately from \u2014 and alongside \u2014 the general secure score rather than folded into it."
+    },
+    {
+      "id": "ml-sc500-5",
+      "cat": "dataNetworkSecurity",
+      "scenario": "A web application firewall in front of a public-facing app needs to actively block known SQL injection and cross-site scripting patterns, not just log them, so the architect sets its WAF policy mode to {b1}. Separately, traffic between two peered VNets in the same region needs to be inspected and filtered by a centralized next-generation firewall appliance rather than simple allow/deny rules, which calls for routing traffic through {b2} instead of relying on network security groups alone.",
+      "blanks": [
+        {
+          "key": "b1",
+          "options": [
+            "Prevention",
+            "Detection",
+            "Report-only",
+            "Audit"
+          ],
+          "correct": 0
+        },
+        {
+          "key": "b2",
+          "options": [
+            "Azure Firewall (or a third-party NVA)",
+            "a network security group (NSG)",
+            "a service endpoint",
+            "a private endpoint"
+          ],
+          "correct": 0
+        }
+      ],
+      "explanation": "Prevention mode is what makes a WAF policy actually block matching malicious requests; Detection mode only logs matches without stopping any traffic. Azure Firewall (or another network virtual appliance) provides the centralized, rule-and-threat-intelligence-driven inspection this scenario needs \u2014 an NSG only filters on basic 5-tuple rules with no deep packet inspection, and service/private endpoints govern access to a PaaS service rather than inspecting VNet-to-VNet traffic."
+    }
+  ],
+  "caseStudies": [
+    {
+      "id": "cs-sc500-fabrikam-support-agent",
+      "cat": "aiComputeSecurity",
+      "title": "Fabrikam Financial's Customer-Support Foundry Agent",
+      "scenario": "Fabrikam Financial is building a customer-support agent on Azure AI Foundry. The agent answers account questions by grounding its responses in retrieved content from a document store of policy PDFs and past support tickets \u2014 some of which are uploaded by external partners and are not fully trusted. The security architect reviewing the design has three concerns: the agent's own identity was provisioned with broad, tenant-wide Contributor access 'to avoid permission issues later'; the underlying Azure OpenAI resource currently accepts calls from any public IP address; and there is no runtime monitoring in place to catch a jailbreak or injection attempt that slips past the application's own input handling once the agent is live in production.",
+      "questions": [
+        {
+          "id": "cs-sc500-fabrikam-support-agent-q1",
+          "type": "mc",
+          "question": "What is the primary risk of provisioning the agent's identity with broad, tenant-wide Contributor access, and what should replace it?",
+          "options": [
+            "A single successful prompt injection or jailbreak against the agent could then reach everything that over-provisioned identity can touch; it should be replaced with an identity scoped, via least privilege, to only the specific data source and API the agent actually needs",
+            "Contributor access is fine for an AI agent as long as Prompt Shields is also enabled",
+            "Broad access only matters for human accounts, not for an agent's managed or workload identity",
+            "The risk is purely a cost-management concern, not a security one, so it should be left as-is and monitored via budgets"
+          ],
+          "correct": 0,
+          "explanation": "Least privilege for an agent identity means scoping its permissions to exactly the data source and API it needs \u2014 broad or borrowed Contributor-level access turns a single prompt injection or jailbreak against that one agent into a much larger compromise than the agent's actual task requires. Prompt Shields is a complementary content-inspection control, not a substitute for scoping identity permissions, and identity over-provisioning is exactly as risky for an agent's identity as for a human one."
+        },
+        {
+          "id": "cs-sc500-fabrikam-support-agent-q2",
+          "type": "ms",
+          "question": "Which changes would appropriately restrict network access to the underlying Azure OpenAI resource so it no longer accepts calls from any public IP? (Select all that apply.)",
+          "options": [
+            "Configure a private endpoint for the Azure OpenAI resource and disable its public network access",
+            "Route the Foundry agent's calls to the resource over the private endpoint instead of its public endpoint",
+            "Leave public network access enabled, but rely on Prompt Shields to filter out any malicious inbound traffic",
+            "Add a network security group rule to the resource's own settings blade to block public IPs, since Azure OpenAI resources are filtered like VMs"
+          ],
+          "correct": [
+            0,
+            1
+          ],
+          "explanation": "A private endpoint gives the Azure OpenAI resource a private IP inside the VNet, and disabling public network access is the step that actually stops any public-IP traffic from reaching it \u2014 the agent's own calls must then be routed over that private path to keep working. Prompt Shields filters prompt content, not network reachability, and Azure OpenAI is a PaaS resource governed by its own public-network-access setting and private endpoints, not by NSGs the way a VM's NIC is."
+        },
+        {
+          "id": "cs-sc500-fabrikam-support-agent-q3",
+          "type": "mc",
+          "question": "Which Microsoft Defender for Cloud capability specifically adds runtime threat detection for the deployed agent once it's live in production, distinct from Foundry's own per-agent guardrails?",
+          "options": [
+            "Defender for AI Service",
+            "Defender for Storage",
+            "Just-in-time VM access",
+            "Adaptive network hardening"
+          ],
+          "correct": 0,
+          "explanation": "Defender for AI Service is the Defender for Cloud plan built specifically for deployed AI workloads and agents, adding runtime threat detection that is separate from and complementary to guardrails configured inside Foundry itself. Defender for Storage, JIT VM access, and adaptive network hardening protect entirely different resource types and don't address AI-workload runtime threats at all."
+        },
+        {
+          "id": "cs-sc500-fabrikam-support-agent-q4",
+          "type": "tf",
+          "question": "True or false: because some of the grounding documents come from external partners and are not fully trusted, Prompt Shields should be configured to inspect only the direct end-user prompts, since the grounding content itself was already reviewed before upload.",
+          "answer": false,
+          "explanation": "Prompt Shields is specifically built to inspect both direct user prompts (jailbreak attempts) and third-party grounding content (indirect prompt injection) before either can influence the model \u2014 the untrusted, externally-supplied documents in this scenario are exactly the indirect-injection risk that capability exists to cover, so limiting it to direct prompts only would leave that path unguarded.",
+          "whyTested": "The distractor leans on a false sense of safety from documents having been 'already reviewed' at upload time \u2014 the actual exam skill is recognizing that indirect prompt injection is a run-time risk baked into content itself, not something a one-time upload review can catch, which is why Prompt Shields checks grounding content on every use rather than only at ingestion."
+        }
+      ]
     }
   ]
 }

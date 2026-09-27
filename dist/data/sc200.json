@@ -1765,6 +1765,123 @@
         }
       ],
       "explanation": "A let statement, optionally saved as a function, defines reusable KQL logic once for many queries to reference by name. A leftouter join keeps every row from the left (watchlist) table and fills nulls where no match exists on the right, exactly what's needed to surface zero-sign-in accounts \u2014 an inner join would drop those non-matching accounts entirely instead. Promoting a reliable hunting query into a scheduled analytics rule automates the detection going forward; bookmarking only preserves one result set, and livestream is a temporary session-based watch rather than a permanent schedule."
+    },
+    {
+      "id": "ml-sc200-4",
+      "cat": "respondIncidents",
+      "scenario": "A ransomware incident is spreading between endpoints, so an analyst triggers {b1} to have Defender XDR automatically contain the affected devices and disable the compromised accounts it identifies as the propagation source, without waiting for her to act on each one individually. Once the spread is stopped, she opens the incident's {b2} to see a visual map of every affected user, device, mailbox, and app and exactly how they connect to each other.",
+      "blanks": [
+        {
+          "key": "b1",
+          "options": [
+            "automatic attack disruption",
+            "selective isolation",
+            "zero-hour auto purge (ZAP)",
+            "a hunting bookmark"
+          ],
+          "correct": 0
+        },
+        {
+          "key": "b2",
+          "options": [
+            "incident graph",
+            "workbook",
+            "watchlist",
+            "analytics rule"
+          ],
+          "correct": 0
+        }
+      ],
+      "explanation": "Automatic attack disruption is the Defender XDR capability built specifically to contain a fast-moving attack like ransomware in progress, taking actions such as isolating devices and disabling accounts across the whole incident automatically. Selective isolation is a manual, single-device action an analyst applies themselves, not an automatic cross-incident response. The incident graph is the visual entity map tying every correlated user, device, mailbox, and app together \u2014 a workbook only visualizes separately-queried data and a watchlist is just a reusable reference list."
+    },
+    {
+      "id": "ml-sc200-5",
+      "cat": "manageSecOps",
+      "scenario": "A Sentinel workspace ingests Azure Activity Logs, and the security team wants role-assignment changes routed there automatically without anyone manually exporting logs. They configure a {b1} on the subscription to stream that activity into the Log Analytics workspace. Separately, an analyst wants a single number on a dashboard tile showing how many high-severity incidents opened in the last 24 hours, refreshing live as new data arrives \u2014 she builds that into a {b2} rather than a raw saved query.",
+      "blanks": [
+        {
+          "key": "b1",
+          "options": [
+            "diagnostic setting",
+            "Data Collection Rule (DCR)",
+            "automation rule",
+            "playbook"
+          ],
+          "correct": 0
+        },
+        {
+          "key": "b2",
+          "options": [
+            "workbook",
+            "watchlist",
+            "analytics rule",
+            "hunting bookmark"
+          ],
+          "correct": 0
+        }
+      ],
+      "explanation": "A diagnostic setting is what routes an Azure resource's (or subscription's) platform logs, like Azure Activity Logs, into a Log Analytics workspace \u2014 a DCR instead governs how already-selected data is transformed and routed during ingestion, not the initial subscription-level export decision. A workbook is the dashboard/visualization layer built to show live, refreshing tiles like a rolling incident count; an analytics rule generates alerts rather than rendering a dashboard, and a watchlist is just static reference data."
+    }
+  ],
+  "caseStudies": [
+    {
+      "id": "cs-sc200-northwind-aitm",
+      "cat": "respondIncidents",
+      "title": "Northwind Traders' Adversary-in-the-Middle Phishing Incident",
+      "scenario": "A Sentinel incident correlates several alerts for the same Northwind Traders user: Defender for Office 365 flagged a phishing email containing a link to a fake sign-in page, and minutes later Microsoft Entra ID Protection flagged an unfamiliar sign-in location for that same user that nonetheless presented a valid session token and completed MFA successfully. The SOC analyst investigating suspects an adversary-in-the-middle (AiTM) phishing kit \u2014 a reverse proxy that relayed the user's real credentials and MFA approval to the genuine Microsoft 365 sign-in page in real time, then kept the resulting session token for itself. Shortly after, a new inbox rule appeared on the mailbox silently forwarding any email containing the word 'invoice' to an external address, and the user has not reported anything unusual. The analyst needs to both contain the immediate threat and confirm exactly what happened before closing the incident.",
+      "questions": [
+        {
+          "id": "cs-sc200-northwind-aitm-q1",
+          "type": "tf",
+          "question": "True or false: because the attacker's proxy relayed real MFA approval rather than bypassing it, forcing a password reset on the account is enough by itself to fully end the attacker's access.",
+          "answer": false,
+          "explanation": "In an AiTM attack, the thing the attacker actually stole is the already-issued session token/cookie, not just the password \u2014 that token keeps working independently of the account's current password. A password reset alone doesn't invalidate an existing session token, so it isn't sufficient on its own to cut the attacker off."
+        },
+        {
+          "id": "cs-sc200-northwind-aitm-q2",
+          "type": "mc",
+          "question": "Which single action most directly invalidates the stolen session token itself, rather than only affecting future sign-in attempts?",
+          "options": [
+            "Revoking the user's active sign-in sessions (refresh tokens) so previously issued tokens stop working",
+            "Resetting the user's password",
+            "Enabling a stricter Conditional Access sign-in frequency policy going forward",
+            "Enabling Microsoft Entra ID Protection user risk-based sign-in blocking"
+          ],
+          "correct": 0,
+          "explanation": "Revoking sign-in sessions invalidates the refresh tokens tied to the account, which forces every existing token \u2014 including the one the AiTM proxy stole \u2014 to stop working immediately. A password reset, a tighter sign-in frequency policy, or risk-based blocking all shape future sign-ins, but none of them reaches back and invalidates a token that was already issued."
+        },
+        {
+          "id": "cs-sc200-northwind-aitm-q3",
+          "type": "ms",
+          "question": "Which of the following are appropriate remediation steps for this specific incident? (Select all that apply.)",
+          "options": [
+            "Revoke the user's active sessions and require re-registration of MFA methods",
+            "Remove the malicious inbox forwarding rule from the mailbox",
+            "Disable Microsoft Entra ID Protection risk detections for this user going forward to reduce noise",
+            "Investigate and block the sender/URL involved in the original phishing email across the tenant"
+          ],
+          "correct": [
+            0,
+            1,
+            3
+          ],
+          "explanation": "Revoking sessions and re-registering MFA cuts off the stolen token and the (potentially attacker-controlled) MFA methods; removing the forwarding rule stops the ongoing mail exfiltration; and blocking the phishing sender/URL tenant-wide prevents the same kit from catching other users. Disabling risk detections for the user does the opposite of remediation \u2014 it would blind the very signal that helped catch this compromise in the first place.",
+          "whyTested": "The distractor about disabling risk detections sounds like a reasonable way to quiet down an already-investigated alert, but it actually removes future detection coverage for that user \u2014 case studies routinely include one option that looks like tidy incident closure but is actually a security regression."
+        },
+        {
+          "id": "cs-sc200-northwind-aitm-q4",
+          "type": "mc",
+          "question": "To hunt across the tenant for any other mailbox where a similar suspicious inbox rule was recently created, which Sentinel/Log Analytics table should the analyst query?",
+          "options": [
+            "OfficeActivity (Exchange mailbox audit events, including inbox rule creation)",
+            "SecurityAlert (only alerts already generated by connected products)",
+            "SigninLogs (Microsoft Entra ID sign-in events)",
+            "IdentityInfo (static identity/HR attribute data)"
+          ],
+          "correct": 0,
+          "explanation": "OfficeActivity carries Exchange/Office mailbox audit events, including inbox rule creation, so it's the correct table for a proactive hunt across every mailbox for that pattern. SecurityAlert only holds alerts a product has already raised (not a raw hunting source for a new pattern), SigninLogs covers authentication events rather than mailbox configuration changes, and IdentityInfo is static profile data with no event history at all."
+        }
+      ]
     }
   ]
 }

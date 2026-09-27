@@ -1727,6 +1727,26 @@ MADLIBS = [
         ],
         'explanation': "Shutting down a VM from inside its own OS leaves it 'allocated' — Azure still reserves the hardware for it, so compute charges keep accruing even though nothing is running. Deallocating (the Stop button in the portal, or az vm deallocate) releases that hardware reservation, which is what actually stops compute billing.",
     },
+    {
+        'id': 'ml-az104-5',
+        'cat': 'monitoring',
+        'scenario': "A company needs to restore a single accidentally-deleted folder from inside a VM using last night's scheduled recovery point — that's a job for {b1}. Separately, in case the entire primary region goes offline, they need to fail the whole VM over to a secondary region within minutes by continuously replicating it there — that calls for {b2} instead, since it replicates on an ongoing basis rather than taking periodic snapshots.",
+        'blanks': [
+            {'key': 'b1', 'options': ['Azure Backup', 'Azure Site Recovery', 'Azure Monitor', 'a resource lock'], 'correct': 0},
+            {'key': 'b2', 'options': ['Azure Backup', 'Azure Site Recovery', 'Azure Monitor', 'a resource lock'], 'correct': 1},
+        ],
+        'explanation': "Azure Backup takes scheduled, point-in-time recovery points and is what you restore individual files or the whole VM from. Azure Site Recovery continuously replicates entire VMs to a secondary region so it can fail them over quickly during a regional disaster — the two services solve different problems (backup/restore vs. disaster recovery) and are commonly used together, not interchangeably.",
+    },
+    {
+        'id': 'ml-az104-6',
+        'cat': 'identityGov',
+        'scenario': "A finance team wants to guarantee nobody can accidentally delete a critical storage account, while still letting engineers change its configuration day to day — that calls for a {b1} resource lock. If the account instead needs to be completely frozen, with no configuration changes and no deletion allowed at all, that calls for a {b2} resource lock instead.",
+        'blanks': [
+            {'key': 'b1', 'options': ['CanNotDelete', 'ReadOnly', 'Contributor', 'Owner'], 'correct': 0},
+            {'key': 'b2', 'options': ['CanNotDelete', 'ReadOnly', 'Contributor', 'Owner'], 'correct': 1},
+        ],
+        'explanation': "A CanNotDelete lock still allows reads and modifications, it only blocks deletion. A ReadOnly lock is stricter: it blocks both modification and deletion, freezing the resource entirely. Resource locks are a separate governance mechanism from RBAC roles like Contributor and Owner, which control who can act rather than what actions are blocked outright.",
+    },
 ]
 
 SEQUENCES = [
@@ -1768,5 +1788,80 @@ SEQUENCES = [
             'Trigger the restore and monitor the job until it completes',
         ],
         'explanation': "You have to locate the vault and the specific backup item before you can pick a recovery point, and the restore configuration (new VM vs. disks-only) has to be chosen before the restore job can actually be kicked off.",
+    },
+]
+
+# Mini case studies (ROADMAP.md section 4): a shared scenario with several
+# related questions answered in sequence, mirroring how a real exam groups
+# multiple questions off one larger case rather than testing each fact in
+# isolation. Every embedded question still follows the same mc/tf/ms shape
+# as QUESTIONS above (see build.py's CASE_STUDIES validation) — only the
+# shared scenario and the grouping are new.
+CASE_STUDIES = [
+    {
+        'id': 'cs-az104-fabrikam-branch',
+        'cat': 'networking',
+        'title': "Fabrikam Manufacturing's Branch Office Expansion",
+        'scenario': (
+            "Fabrikam Manufacturing is opening a new branch office and extending its Azure footprint to support "
+            "it. The company already has a hub virtual network in the East US region hosting its production "
+            "workloads. The new branch's virtual network must be able to reach resources in the hub network "
+            "without any VM in either network being assigned a public IP address. A storage account holding "
+            "manufacturing schematics must stay available even if an entire datacenter within the region fails, "
+            "though it does not need to survive the whole region going offline. IT wants new hires on the "
+            "network team to be able to view every network resource but never modify or delete any of them, and "
+            "wants to be alerted the moment CPU usage on any branch VM exceeds 90% for more than five minutes. "
+            "A contractor from a staffing agency also needs one-time access this week to restart a single VM, "
+            "and nothing else."
+        ),
+        'questions': [
+            {
+                'id': 'cs-az104-fabrikam-branch-q1',
+                'type': 'mc',
+                'question': "Which networking feature should connect the branch virtual network to the hub virtual network privately, without assigning public IP addresses to any VM?",
+                'options': [
+                    "Virtual network peering",
+                    "A public IP address on every VM in both networks",
+                    "Azure Front Door",
+                    "A site-to-site VPN routed over the public internet",
+                ],
+                'correct': 0,
+                'explanation': "Virtual network peering connects two Azure virtual networks directly over Microsoft's private backbone network, with no public IPs and no traffic ever touching the public internet. Front Door is a global HTTP(S) entry point for applications, not a VNet-to-VNet connectivity method, and a public-internet VPN adds cost and complexity that peering avoids when both networks already live in Azure.",
+            },
+            {
+                'id': 'cs-az104-fabrikam-branch-q2',
+                'type': 'tf',
+                'question': "True or false: configuring the storage account with zone-redundant storage (ZRS) is enough to meet the requirement that the schematics survive an entire datacenter failure, without needing geo-redundant storage (GRS).",
+                'answer': True,
+                'explanation': "ZRS synchronously replicates data across three physically separate availability zones (effectively separate datacenters) within one region, so it tolerates a full datacenter failure on its own. Since the requirement stops at surviving one datacenter — not the whole region — ZRS satisfies it without paying for GRS's cross-region replication.",
+                'whyTested': "The scenario is worded to sound like it needs disaster-grade redundancy, but the actual requirement (one datacenter, not the whole region) is satisfied by the cheaper zone-level option — reading the requirement precisely, rather than reaching for the strongest-sounding SKU, is the skill being tested.",
+            },
+            {
+                'id': 'cs-az104-fabrikam-branch-q3',
+                'type': 'mc',
+                'question': "Which built-in RBAC role should be assigned to the new network team members so they can view network resources but never modify or delete them?",
+                'options': [
+                    "Reader",
+                    "Network Contributor",
+                    "Contributor",
+                    "Owner",
+                ],
+                'correct': 0,
+                'explanation': "The built-in Reader role grants view-only access to resources, including network resources, with no ability to create, modify, or delete anything — an exact match for 'view but never change.' Network Contributor would let them create and delete network resources, which is more access than the requirement calls for, and Contributor/Owner are broader still.",
+            },
+            {
+                'id': 'cs-az104-fabrikam-branch-q4',
+                'type': 'ms',
+                'question': "Which of the following would actually satisfy the requirement to be alerted the moment CPU usage on a branch VM exceeds 90% for more than five minutes? (Select all that apply.)",
+                'options': [
+                    "An Azure Monitor metric alert rule on the Percentage CPU metric, with a 90% threshold over a 5-minute window",
+                    "An action group attached to that alert rule to actually deliver a notification",
+                    "Checking the Activity Log manually once a day",
+                    "A CanNotDelete resource lock on the VMs",
+                ],
+                'correct': [0, 1],
+                'explanation': "The metric alert rule is what detects the condition (CPU over 90% sustained for 5 minutes), and the action group is what turns a firing alert into an actual notification — email, SMS, or a webhook. Neither piece alone is a complete alerting solution. Checking the Activity Log once a day isn't 'the moment' it happens, and a resource lock only blocks accidental deletion; it has nothing to do with performance monitoring.",
+            },
+        ],
     },
 ]

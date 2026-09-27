@@ -370,7 +370,7 @@ This mode is deliberately self-contained — it doesn't feed mastery %,
 results, or exam readiness, so its score is tracked for the practice
 session only.
 
-Every track now ships `MADLIBS` content (49 scenarios total, 3-4 per
+Every track now ships `MADLIBS` content (79 scenarios total, 5-7 per
 track) and gets a **Mad Libs** sub-tab: a short real-world scenario paragraph with a
 couple of inline dropdown blanks, each filled from a small set of term
 choices — reinforces vocabulary in context instead of as an isolated
@@ -387,7 +387,8 @@ back into the right order with simple up/down move buttons (no drag-
 and-drop needed). Also feeds mastery %/results the normal way, scored
 all-or-nothing per sequence.
 
-Tracks with `CASE_STUDIES` content get a **Case Study** sub-tab: a shared
+Every track now ships `CASE_STUDIES` content too (18 case studies total,
+1-2 per track, 71 embedded questions) and gets a **Case Study** sub-tab: a shared
 scenario paragraph (a fictional company/situation) with several related
 questions answered off it in sequence, mirroring how a real associate/
 expert-level exam groups multiple questions under one larger case instead

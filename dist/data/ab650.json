@@ -1942,6 +1942,123 @@
         }
       ],
       "explanation": "DSPM for AI discovers and reports on oversharing and sensitive-data exposure risk in AI interactions, without itself blocking anything. A DLP policy scoped to Copilot interactions is the enforcement layer that actually restricts sensitive content from appearing in a response. Insider Risk Management and Communication compliance address different problems \u2014 user behavior risk and message-content review \u2014 not Copilot's own response content."
+    },
+    {
+      "id": "ml-ab650-4",
+      "cat": "tenantConfig",
+      "scenario": "An admin wants three billing clerks to be able to send and receive mail from 'billing@contoso.com' using their own individual sign-ins, with no extra license consumed for that mailbox itself \u2014 that calls for a {b1}. A separate team instead wants a collaborative space reachable by one email alias that comes with a shared calendar, a shared files library, and a Planner board \u2014 that calls for a {b2} instead.",
+      "blanks": [
+        {
+          "key": "b1",
+          "options": [
+            "shared mailbox",
+            "distribution group",
+            "Microsoft 365 group",
+            "security group"
+          ],
+          "correct": 0
+        },
+        {
+          "key": "b2",
+          "options": [
+            "shared mailbox",
+            "distribution group",
+            "Microsoft 365 group",
+            "security group"
+          ],
+          "correct": 2
+        }
+      ],
+      "explanation": "A shared mailbox needs no separate license and lets multiple users send and receive as that address using their own credentials. A Microsoft 365 group is the collaboration hub that bundles a shared calendar, SharePoint document library, and Planner under one alias \u2014 a distribution group only forwards mail (it has no mailbox of its own to send from), and a security group exists purely to manage permissions or licensing, not shared collaboration artifacts."
+    },
+    {
+      "id": "ml-ab650-5",
+      "cat": "governSecure",
+      "scenario": "A CISO wants Global Administrator to be a role nobody holds on a permanent, standing basis \u2014 instead, admins request it only when they actually need it, get it for a fixed time window, and lose it automatically when that window ends \u2014 that just-in-time model is provided by {b1}. Layered on top, the CISO also requires that any admin activating that role first complete multifactor authentication before the elevation is even granted \u2014 that condition is enforced by a {b2} policy scoped to the activation.",
+      "blanks": [
+        {
+          "key": "b1",
+          "options": [
+            "Microsoft Entra Privileged Identity Management (PIM)",
+            "Azure RBAC",
+            "Security defaults",
+            "Insider Risk Management"
+          ],
+          "correct": 0
+        },
+        {
+          "key": "b2",
+          "options": [
+            "Conditional Access",
+            "DLP",
+            "Communication compliance",
+            "Information barriers"
+          ],
+          "correct": 0
+        }
+      ],
+      "explanation": "PIM turns admin roles into eligible, time-bound assignments that must be explicitly activated and automatically expire, shrinking the number of standing privileged accounts. Conditional Access is the layer that evaluates conditions \u2014 like requiring MFA \u2014 before granting access, and it can be scoped to a PIM activation itself. Security defaults is an all-or-nothing baseline (not a targeted, layered condition), and Insider Risk Management, DLP, Communication compliance, and information barriers all address different problems entirely \u2014 user behavior risk, data exfiltration, message content, and cross-group visibility, respectively."
+    }
+  ],
+  "caseStudies": [
+    {
+      "id": "cs-ab650-contoso-copilot-rollout",
+      "cat": "aiServices",
+      "title": "Contoso Financial's Microsoft 365 Copilot Rollout",
+      "scenario": "Contoso Financial is rolling out Microsoft 365 Copilot to its 500-person advisory division. Before enabling it broadly, the security team runs a SharePoint permissions review and finds thousands of files still shared tenant-wide via old 'Anyone in the organization' links, many of which almost no one actually needs to see anymore. The compliance team separately requires that Copilot never quote or summarize the contents of a small set of highly sensitive client contract files, even for the handful of employees who technically retain view access to those specific files today. Legal also wants the ability to search, export, and place a hold on the actual prompts and responses a specific advisor exchanged with Copilot, in case a dispute over investment advice given through Copilot later ends up in litigation. Finally, only about 120 of the 500 advisors have actually been assigned the Microsoft 365 Copilot add-on license so far, with the rest of the rollout planned in phases over the next two quarters.",
+      "questions": [
+        {
+          "id": "cs-ab650-contoso-copilot-rollout-q1",
+          "type": "mc",
+          "question": "While the SharePoint permissions review is still underway, the security team wants a fast way to keep the broadly-shared legacy sites out of both organization-wide search and Copilot summarization, without changing anyone's existing site permissions yet. What should they use?",
+          "options": [
+            "Restricted SharePoint Search",
+            "A DLP policy scoped to Copilot interactions",
+            "Removing the 'Anyone in the organization' sharing links from every affected site",
+            "Microsoft Entra Conditional Access"
+          ],
+          "correct": 0,
+          "explanation": "Restricted SharePoint Search excludes specified sites from organization-wide search and Copilot grounding immediately, without touching the underlying permissions \u2014 exactly the fast, non-disruptive stopgap described while the permissions review continues. Removing the sharing links directly changes permissions (what the scenario says not to do yet); a DLP policy governs content in responses rather than which sites get searched at all; and Conditional Access governs sign-in conditions, not search or grounding scope."
+        },
+        {
+          "id": "cs-ab650-contoso-copilot-rollout-q2",
+          "type": "mc",
+          "question": "For the specific set of highly sensitive client contract files, compliance wants Copilot to never quote or summarize their content, even for employees who still retain direct view access. What should the admin configure to meet this requirement?",
+          "options": [
+            "A sensitivity label configured to restrict access for Copilot on those files",
+            "A retention label set to a longer retention period",
+            "Restricted SharePoint Search applied to the sites containing those files",
+            "DSPM for AI, in report-only mode"
+          ],
+          "correct": 0,
+          "explanation": "A sensitivity label can be configured so that even a user with view access to a labeled file is blocked from having Copilot quote or summarize its content \u2014 this is the control that reaches into Copilot's actual response behavior for specific files regardless of who can open them. A retention label governs how long content is kept, not what Copilot can do with it. Restricted SharePoint Search works at the site level for search/grounding, not as a per-file content restriction for users who already have access. DSPM for AI in report-only mode surfaces risk but doesn't itself enforce a block."
+        },
+        {
+          "id": "cs-ab650-contoso-copilot-rollout-q3",
+          "type": "tf",
+          "question": "True or false: legal can search, export, and place a hold on a specific advisor's actual Microsoft 365 Copilot prompts and responses through Microsoft Purview eDiscovery.",
+          "answer": true,
+          "explanation": "Copilot prompts and responses are captured as content that Purview eDiscovery can search, export, and place under legal hold, the same way it handles other Microsoft 365 content like email or Teams chats \u2014 which is exactly what lets legal investigate a dispute that touches advice given through Copilot."
+        },
+        {
+          "id": "cs-ab650-contoso-copilot-rollout-q4",
+          "type": "ms",
+          "question": "Only 120 of Contoso's 500 advisors have been assigned the Microsoft 365 Copilot add-on license so far. Which of the following statements about the other 380 advisors are accurate? (Select all that apply.)",
+          "options": [
+            "They cannot use the licensed Microsoft 365 Copilot features in Word, Excel, or Outlook without the add-on license assigned",
+            "They automatically gain full Copilot access anyway, since Contoso owns Copilot licenses at the organization level",
+            "Copilot still respects existing file and mailbox permissions for these users just as it would for a licensed user",
+            "They may still be able to use Microsoft 365 Copilot Chat, which is governed separately from the licensed, embedded Copilot experience"
+          ],
+          "correct": [
+            0,
+            2,
+            3
+          ],
+          "explanation": "The Copilot add-on license gates access to the licensed, embedded Copilot experience in apps like Word, Excel, and Outlook \u2014 an unlicensed user cannot use those features regardless of how many licenses the organization holds overall. Copilot's grounding always respects a user's existing permissions, licensed or not, so that protection doesn't change based on licensing. Microsoft 365 Copilot Chat is a separate, more limited experience from the fully licensed Copilot and can be available on its own governance track. The organization owning licenses generally does not automatically extend full Copilot access to every user \u2014 each user still needs the add-on assigned individually.",
+          "whyTested": "This mirrors a very common real-world rollout state \u2014 partial licensing during a phased deployment \u2014 and tests whether you can keep three related but distinct facts straight at once: what licensing gates, what permissions always govern regardless of licensing, and that Copilot Chat isn't simply the same thing as licensed Copilot under a different name."
+        }
+      ]
     }
   ]
 }

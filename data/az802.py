@@ -1593,6 +1593,26 @@ MADLIBS = [
         ],
         'explanation': "DFS Namespaces provides the single unified logical path across multiple servers' shares. DFS Replication is the separate feature that actually synchronizes folder contents between servers — a namespace alone doesn't keep content in sync without replication configured underneath it.",
     },
+    {
+        'id': 'ml-az802-4',
+        'cat': 'monitoring',
+        'scenario': "A hybrid administrator wants performance counters and Windows Event Log data collected the same way from both Azure VMs and on-premises servers, into one Log Analytics workspace, using collection logic authored once and applied to many machines at a time — that requires deploying the {b1} extension to each machine and associating it with a {b2}. Before an on-premises server can be targeted this way at all, it must first be Azure Arc-enabled.",
+        'blanks': [
+            {'key': 'b1', 'options': ['Azure Monitor Agent (AMA)', 'legacy Log Analytics agent (MMA)', 'Dependency agent', 'Network Watcher agent'], 'correct': 0},
+            {'key': 'b2', 'options': ['Data Collection Rule (DCR)', 'Recovery Services vault', 'Action Group', 'Automation runbook'], 'correct': 0},
+        ],
+        'explanation': "Azure Monitor Agent (AMA) is the current, unified agent for both Azure and Arc-enabled on-premises machines, replacing the legacy Log Analytics (MMA) agent. It's driven by a Data Collection Rule, which defines what to collect and where to send it once, then can be associated with many machines — a Recovery Services vault, Action Group, and Automation runbook all serve unrelated purposes (backup, alert routing, and scripted automation, respectively).",
+    },
+    {
+        'id': 'ml-az802-5',
+        'cat': 'security',
+        'scenario': "A security team wants to let a small group of junior admins run only a specific, pre-approved set of PowerShell cmdlets on a server — including restarting a particular service — without granting them full local administrator rights. That narrowly scoped, role-based constrained PowerShell endpoint is {b1}. Separately, to guarantee a service account's password is unique, complex, and automatically rotated without any human ever needing to know or type it, they configure a {b2} instead of a traditional user account with a manually set password.",
+        'blanks': [
+            {'key': 'b1', 'options': ['Just Enough Administration (JEA)', 'Just-In-Time (JIT) VM access', 'Windows LAPS', 'the Protected Users group'], 'correct': 0},
+            {'key': 'b2', 'options': ['Group Managed Service Account (gMSA)', 'Windows LAPS-managed local account', 'Protected Users group membership', 'Just Enough Administration (JEA) endpoint'], 'correct': 0},
+        ],
+        'explanation': "JEA defines constrained PowerShell endpoints that expose only an approved set of cmdlets to a role, without handing out full administrative rights — exactly the narrowly scoped access described. A gMSA is the account type purpose-built for automatic, complex password management on service accounts; Windows LAPS instead manages local administrator account passwords (not service accounts), and Protected Users restricts authentication protocols rather than managing any password.",
+    },
 ]
 
 CLI_CHALLENGES = [
@@ -1758,5 +1778,79 @@ SEQUENCES = [
             'Test failover between nodes',
         ],
         'explanation': "Cluster validation runs against nodes that already have the feature installed, and has to pass before creating the cluster is fully supported. The File Server role can't be configured as clustered until the cluster and its shared storage both already exist.",
+    },
+]
+
+# Mini case studies: a shared scenario with several related questions
+# answered in sequence, mirroring how a real exam groups multiple questions
+# off one larger case rather than testing each fact in isolation. Every
+# embedded question still follows the same mc/tf/ms shape as QUESTIONS above.
+CASE_STUDIES = [
+    {
+        'id': 'cs-az802-fabrikam-hybrid',
+        'cat': 'adDs',
+        'title': "Fabrikam Manufacturing's Hybrid Infrastructure Refresh",
+        'scenario': (
+            "Fabrikam Manufacturing runs a single Active Directory forest, fabrikam.local, with domain "
+            "controllers at its main plant and at two branch offices connected back to the plant by slow, "
+            "metered WAN links. Fabrikam wants Microsoft Entra ID sign-in for its cloud apps to keep working "
+            "even during a brief on-premises AD outage, without standing up and maintaining AD FS servers. "
+            "Separately, the IT team is retiring an aging physical file server by virtualizing it as a Hyper-V "
+            "VM, and that VM's file share must become highly available through Windows Failover Clustering "
+            "with shared storage, while a second, asynchronously updated copy of the same VM is kept at a "
+            "disaster-recovery site in case the primary plant is lost entirely. Finally, an audit flagged that "
+            "local administrator passwords on Fabrikam's servers are identical across many machines, and the "
+            "security team wants every server to get its own unique, automatically rotated local admin password "
+            "with no one ever needing to manually set or remember it."
+        ),
+        'questions': [
+            {
+                'id': 'cs-az802-fabrikam-hybrid-q1',
+                'type': 'mc',
+                'question': "Which Microsoft Entra Connect authentication method should Fabrikam choose so that cloud sign-in keeps working through a brief on-premises AD outage, without deploying AD FS?",
+                'options': [
+                    "Password Hash Synchronization",
+                    "Pass-through Authentication",
+                    "Federation with AD FS",
+                    "Seamless SSO used on its own with no other method",
+                ],
+                'correct': 0,
+                'explanation': "Password Hash Synchronization lets Microsoft Entra ID validate sign-ins on its own using a synchronized hash, so authentication keeps working even if on-premises AD is briefly unreachable. Pass-through Authentication and Federation both depend on validating against on-premises infrastructure at the moment of sign-in, so both fail during that same outage — and Seamless SSO by itself isn't an authentication method, it only removes extra sign-in prompts on top of one.",
+            },
+            {
+                'id': 'cs-az802-fabrikam-hybrid-q2',
+                'type': 'tf',
+                'question': "True or false: because the branch offices are connected to the main plant by slow WAN links, replication between those sites uses the same near-real-time change notification that domain controllers within the same site use.",
+                'answer': False,
+                'explanation': "Inter-site replication is deliberately scheduled and compressed to be considerate of limited WAN bandwidth, unlike intra-site replication, which does use change notification for near-immediate convergence. The slow links are exactly why Fabrikam's branch-to-plant replication behaves differently from replication within a single site, not the same way.",
+            },
+            {
+                'id': 'cs-az802-fabrikam-hybrid-q3',
+                'type': 'ms',
+                'question': "Which two of the following are steps in building the highly available clustered file server itself, as opposed to the separate disaster-recovery copy? (Select two.)",
+                'options': [
+                    "Install the Failover Clustering feature on each node",
+                    "Configure Hyper-V Replica to the disaster-recovery site",
+                    "Validate the cluster configuration before creating the cluster",
+                    "Enable Windows LAPS on the file server VM",
+                ],
+                'correct': [0, 2],
+                'explanation': "Installing Failover Clustering and validating the cluster configuration are both required steps toward creating the highly available cluster itself. Hyper-V Replica is the separate, unrelated mechanism that produces the asynchronous DR copy at the secondary site, and Windows LAPS manages local admin passwords — neither one builds or validates the cluster.",
+                'whyTested': "Case studies deliberately bundle a DR requirement and an HA requirement into the same scenario so a candidate has to sort which stated steps satisfy which requirement, rather than treating every clustering-adjacent term as interchangeable — Hyper-V Replica and Failover Clustering solve two different problems even though both appear in the same VM's story.",
+            },
+            {
+                'id': 'cs-az802-fabrikam-hybrid-q4',
+                'type': 'mc',
+                'question': "Which capability directly addresses the audit finding, giving every server its own unique, automatically rotated local administrator password with no one needing to manually set or remember it?",
+                'options': [
+                    "Windows LAPS",
+                    "Group Managed Service Account (gMSA)",
+                    "Just Enough Administration (JEA)",
+                    "Protected Users group membership",
+                ],
+                'correct': 0,
+                'explanation': "Windows LAPS is built specifically to randomize and automatically rotate the built-in local administrator account's password on each managed machine, backing it up to AD DS or Microsoft Entra ID. A gMSA solves the equivalent problem for a service account's password, not a local admin account; JEA scopes what cmdlets an admin can run rather than managing any password; and Protected Users only restricts which authentication protocols an account can fall back to.",
+            },
+        ],
     },
 ]

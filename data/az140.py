@@ -1741,4 +1741,97 @@ MADLIBS = [
         ],
         'explanation': "Screen capture protection actively blocks a session's content from being captured by screenshot or recording tools on the client. Watermarking only visibly overlays deterrent, traceable information — it doesn't technically prevent the capture the way screen capture protection does, which is why the two are complementary rather than interchangeable.",
     },
+    {
+        'id': 'ml-az140-4',
+        'cat': 'monitorMaintain',
+        'scenario': "An administrator needs to patch the golden image used by a pooled host pool without disrupting anyone currently connected — that means preventing new sessions from landing on a session host while letting its existing sessions finish naturally, which is {b1}. Once that host sits completely empty, only a host pool with a {b2} already enabled will actually notice and deallocate it to save cost — otherwise it just sits idle regardless.",
+        'blanks': [
+            {'key': 'b1', 'options': ['drain mode', 'maintenance mode', 'Conditional Access', 'FSLogix Cloud Cache'], 'correct': 0},
+            {'key': 'b2', 'options': ['scaling plan (autoscale)', 'MSIX app attach', 'Universal Print connector', 'watermarking policy'], 'correct': 0},
+        ],
+        'explanation': "Drain mode marks a session host so it stops accepting new sessions while existing ones keep running undisturbed — exactly what's needed before patching without disrupting connected users. But drain mode alone doesn't shut anything down: only a host pool with a scaling plan (autoscale) enabled will detect an emptied, drained host and actually deallocate it, since drain mode and autoscale solve two different halves of this problem.",
+    },
+    {
+        'id': 'ml-az140-5',
+        'cat': 'planInfra',
+        'scenario': "To let users on a personal host pool automatically power on their assigned session host only when they actually try to connect, instead of leaving every VM running around the clock, the administrator enables {b1}. To let those same connections take a more direct, lower-latency network path between client and session host instead of always relaying through the Azure Virtual Desktop gateway, the administrator separately enables {b2}.",
+        'blanks': [
+            {'key': 'b1', 'options': ['Start VM on Connect', 'a scaling plan (autoscale)', 'drain mode', 'FSLogix Cloud Cache'], 'correct': 0},
+            {'key': 'b2', 'options': ['RDP Shortpath', 'Start VM on Connect', 'Azure Firewall', 'FSLogix Application Masking'], 'correct': 0},
+        ],
+        'explanation': "Start VM on Connect powers on a stopped session host only when a user actually attempts to connect, avoiding paying for VMs that idle around the clock — it's the feature built for personal host pools, unlike scaling plans, which are the pooled-host-pool mechanism for consolidating and deallocating sessions. RDP Shortpath instead establishes a more direct, typically UDP-based transport between client and host, cutting latency versus always tunneling through the AVD gateway relay — the two features solve unrelated problems (compute cost vs. network path) and neither substitutes for the other.",
+    },
+]
+
+# Mini case studies: a shared scenario with several related questions
+# answered in sequence, mirroring how a real exam groups multiple questions
+# off one larger case rather than testing each fact in isolation. Every
+# embedded question still follows the same mc/tf/ms shape as QUESTIONS above.
+CASE_STUDIES = [
+    {
+        'id': 'cs-az140-northwind-avd',
+        'cat': 'planInfra',
+        'title': "Northwind Traders' Azure Virtual Desktop Rollout",
+        'scenario': (
+            "Northwind Traders is deploying Azure Virtual Desktop for two very different groups of users. "
+            "The first group is 500 call-center agents who all run the same line-of-business app and need "
+            "identical, non-persistent desktops drawn from a shared pool — none of them need to keep any "
+            "local customization between sessions. The second group is 20 computer-aided-design (CAD) "
+            "engineers who each need a dedicated, persistent VM that remembers their installed plugins and "
+            "customizations from one session to the next. Security has separately mandated that the CAD "
+            "engineers' workstations technically block any attempt to screenshot the proprietary designs on "
+            "screen, not just discourage it. Finally, the operations team wants the call-center pool's session "
+            "hosts to scale down automatically outside business hours to save cost, and wants a way to patch "
+            "that pool's golden image without disconnecting agents who are mid-shift."
+        ),
+        'questions': [
+            {
+                'id': 'cs-az140-northwind-avd-q1',
+                'type': 'mc',
+                'question': "Which host pool type fits the 500 call-center agents, who share identical, non-persistent desktops with no need to retain local customization between sessions?",
+                'options': [
+                    "A pooled host pool",
+                    "A personal host pool with direct assignment",
+                    "A personal host pool with automatic assignment",
+                    "A RemoteApp application group",
+                ],
+                'correct': 0,
+                'explanation': "A pooled host pool is exactly built for many non-persistent users load-balanced across shared multi-session VMs, matching the call-center agents' needs. Both personal host pool variants dedicate one VM per user rather than sharing them, and a RemoteApp application group is a way of publishing individual apps rather than a host pool type at all.",
+            },
+            {
+                'id': 'cs-az140-northwind-avd-q2',
+                'type': 'mc',
+                'question': "Which host pool type fits the 20 CAD engineers, who each need a dedicated VM that keeps their installed plugins and customizations between sessions?",
+                'options': [
+                    "A pooled host pool",
+                    "A personal host pool",
+                    "A RemoteApp application group",
+                    "A pooled host pool running Windows 11 Enterprise multi-session",
+                ],
+                'correct': 1,
+                'explanation': "A personal host pool dedicates one VM per user, so whatever a CAD engineer installs or customizes persists across sessions — the defining reason to choose personal over pooled. Every pooled variant, multi-session or not, shares VMs across users and doesn't guarantee the same VM (or its state) is there next time.",
+            },
+            {
+                'id': 'cs-az140-northwind-avd-q3',
+                'type': 'tf',
+                'question': "True or false: technically blocking the CAD engineers from capturing screenshots of their session, rather than just deterring it, requires enabling FSLogix Application Masking.",
+                'answer': False,
+                'explanation': "FSLogix Application Masking hides an installed app from unauthorized users — it has nothing to do with screen capture at all. The control that actually blocks a screenshot or recording attempt from succeeding is screen capture protection; watermarking is the weaker, deterrent-only control that doesn't block anything either.",
+            },
+            {
+                'id': 'cs-az140-northwind-avd-q4',
+                'type': 'ms',
+                'question': "Which two features should the operations team use to (a) scale the call-center pool's session hosts down automatically outside business hours and (b) patch that pool's golden image without disconnecting agents mid-shift? (Select two.)",
+                'options': [
+                    "A scaling plan (autoscale) applied to the pooled host pool",
+                    "Drain mode on the session host being patched",
+                    "FSLogix Cloud Cache for profile roaming",
+                    "Start VM on Connect",
+                ],
+                'correct': [0, 1],
+                'explanation': "A scaling plan (autoscale) is what actually powers hosts down (and back up) on a schedule to match off-peak demand. Drain mode is the separate control that stops a specific host from accepting new sessions while letting existing ones finish, which is what lets it be patched without disconnecting anyone already on it. FSLogix Cloud Cache addresses profile roaming resiliency, and Start VM on Connect is the personal-host-pool feature for powering on a VM on demand — neither one scales the pool down or supports a non-disruptive patch.",
+                'whyTested': "The scenario deliberately pairs two operational goals (cost savings and non-disruptive patching) that call for two different, easily confused AVD features — picking only one of the two correct options, or reaching for Start VM on Connect (a personal-host-pool feature) in a pooled-host-pool context, is the mistake this question is designed to catch.",
+            },
+        ],
+    },
 ]

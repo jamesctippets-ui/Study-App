@@ -1412,4 +1412,100 @@ MADLIBS = [
         ],
         'explanation': "A large gap between estimated and actual row counts is the textbook symptom of stale or missing statistics (or a related parameter-sniffing issue), which misleads the optimizer's plan choice. sys.dm_db_missing_index_details (paired with sys.dm_db_missing_index_group_stats) is what actually surfaces candidate indexes and their estimated benefit — the other DMVs cover ring buffers, connections, and overall resource stats, not missing-index recommendations.",
     },
+    {
+        'id': 'ml-dp300-4',
+        'cat': 'platform',
+        'scenario': "A startup's Azure SQL Database workload is intermittent — idle most of the night, bursty during business hours — and they want to pay only for compute actually used, with the database automatically pausing during idle stretches. That points to the {b1} compute tier. A steady, predictable, 24/7 production workload that needs consistent performance around the clock is instead better matched to the {b2} compute tier.",
+        'blanks': [
+            {'key': 'b1', 'options': ['serverless', 'provisioned', 'Hyperscale', 'Business Critical'], 'correct': 0},
+            {'key': 'b2', 'options': ['serverless', 'provisioned', 'Hyperscale', 'Business Critical'], 'correct': 1},
+        ],
+        'explanation': "The serverless compute tier auto-scales compute and can auto-pause during idle periods, billing only for storage while paused — ideal for intermittent, unpredictable workloads. The provisioned compute tier keeps a fixed amount of compute billed continuously, which better suits a steady, predictable production workload. Hyperscale and Business Critical are service tiers (built around storage architecture and I/O performance), not compute-billing models, so they don't answer this particular question.",
+    },
+    {
+        'id': 'ml-dp300-5',
+        'cat': 'automation',
+        'scenario': "A DBA needs to run the same index-maintenance T-SQL script every night across 200 Azure SQL Databases spread across many different logical servers, from one central place — that calls for {b1}. That's necessary because Azure SQL Database, unlike Managed Instance, has no built-in {b2} to schedule jobs directly against the database itself.",
+        'blanks': [
+            {'key': 'b1', 'options': ['Elastic Database Jobs', 'SQL Server Agent', 'Query Store', 'Azure Bastion'], 'correct': 0},
+            {'key': 'b2', 'options': ['SQL Server Agent', 'Elastic Database Jobs', 'Transparent Data Encryption', 'an auto-failover group'], 'correct': 0},
+        ],
+        'explanation': "Azure SQL Database (the single-database PaaS option) has no SQL Server Agent of its own — that's only available on Managed Instance or SQL Server on a VM. Elastic Database Jobs fills that gap, letting one job definition run the same T-SQL against many databases across many servers from a central job database.",
+    },
+]
+
+# Mini case studies (ROADMAP.md section 4): a shared scenario with several
+# related questions answered in sequence, mirroring how a real exam groups
+# multiple questions off one larger case rather than testing each fact in
+# isolation. Every embedded question still follows the same mc/tf/ms shape
+# as QUESTIONS above (see build.py's CASE_STUDIES validation) — only the
+# shared scenario and the grouping are new.
+CASE_STUDIES = [
+    {
+        'id': 'cs-dp300-northwind-reliability',
+        'cat': 'hadr',
+        'title': "Northwind Traders' Azure SQL Reliability Push",
+        'scenario': (
+            "Northwind Traders runs its order-processing system on a single Azure SQL Database in the East US "
+            "region. After a recent regional networking incident, the CIO now requires the application to keep "
+            "running — using the exact same connection string — even if the entire East US region becomes "
+            "unavailable, with failover happening automatically. Compliance separately now requires that even a "
+            "DBA with sysadmin-equivalent access must never be able to view the raw values in the "
+            "'CreditCardLast4' column, though the application itself must still be able to decrypt and read that "
+            "column when a customer completes checkout. Meanwhile, the on-call DBA has noticed timeouts every "
+            "morning and, digging into a slow session's execution plan, sees the query's actual row count "
+            "running at roughly 50 times the optimizer's estimate against a table that was bulk-loaded "
+            "overnight. Finally, management wants a simple way to see DTU/vCore utilization trends over the "
+            "last 30 days without writing custom queries each time they ask."
+        ),
+        'questions': [
+            {
+                'id': 'cs-dp300-northwind-reliability-q1',
+                'type': 'mc',
+                'question': "Which feature should Northwind configure so the application keeps using the same connection string and fails over automatically if the entire East US region goes down?",
+                'options': [
+                    "An auto-failover group",
+                    "Active geo-replication alone, with no group listener",
+                    "Zone-redundant storage",
+                    "Read scale-out",
+                ],
+                'correct': 0,
+                'explanation': "An auto-failover group provides a stable, group-level listener endpoint the application can keep pointing at unchanged, and it handles automatic failover to the secondary region on its own. Active geo-replication alone has no shared listener, so the application would need to be manually redirected to the new primary after a failover. Zone-redundant storage protects against a datacenter-level, not a full regional, failure, and read scale-out only offloads read-only queries within the same primary/secondary pair — it isn't a disaster-recovery mechanism.",
+            },
+            {
+                'id': 'cs-dp300-northwind-reliability-q2',
+                'type': 'mc',
+                'question': "Which feature keeps 'CreditCardLast4' unreadable to a sysadmin-equivalent DBA while still letting the application decrypt it at checkout?",
+                'options': [
+                    "Always Encrypted",
+                    "Transparent Data Encryption (TDE)",
+                    "Dynamic Data Masking",
+                    "Row-Level Security",
+                ],
+                'correct': 0,
+                'explanation': "Always Encrypted encrypts data client-side using keys the database engine never has access to, so even a sysadmin querying the column directly sees only ciphertext — only a client holding the column encryption key can decrypt it. TDE encrypts data at rest but still decrypts transparently for any query the engine itself runs, including the DBA's. Dynamic Data Masking only changes what's displayed to non-privileged users and is bypassable by anyone with sufficient permission, so it doesn't stop a sysadmin from seeing the real value.",
+                'whyTested': "TDE, Always Encrypted, and Dynamic Data Masking are frequently confused because they all sound like 'encryption' — the exam trap is picking TDE (the most familiar name) for a requirement that specifically excludes the database engine's own administrators, which only Always Encrypted actually satisfies.",
+            },
+            {
+                'id': 'cs-dp300-northwind-reliability-q3',
+                'type': 'tf',
+                'question': "True or false: the morning timeouts, with actual row counts running roughly 50 times the optimizer's estimate right after an overnight bulk load, most likely indicate the table's statistics have gone stale and need to be updated.",
+                'answer': True,
+                'explanation': "An overnight bulk load can change a table's data distribution enough that previously-collected statistics no longer reflect reality; the optimizer then badly misjudges row counts and picks a poor execution plan. Updating statistics (or making sure auto-update statistics fires promptly after the load) is the standard fix for exactly this estimate-versus-actual mismatch.",
+            },
+            {
+                'id': 'cs-dp300-northwind-reliability-q4',
+                'type': 'ms',
+                'question': "Which of the following would help management see DTU/vCore utilization trends over the last 30 days without writing custom queries each time? (Select all that apply.)",
+                'options': [
+                    "The built-in Azure portal metrics charts on the database's Overview/Monitoring pages",
+                    "Prebuilt Azure SQL Analytics monitoring dashboards",
+                    "Manually running sys.dm_db_resource_stats and recording the results by hand every day for 30 days",
+                    "Query Store's regressed-query report",
+                ],
+                'correct': [0, 1],
+                'explanation': "The portal's built-in Overview/Monitoring metrics charts and prebuilt Azure SQL Analytics dashboards both surface DTU/vCore utilization trends over a chosen window, like 30 days, with no hand-written queries required. Manually querying sys.dm_db_resource_stats every day is a real data source, but it's exactly the repetitive manual effort management wants to avoid, and Query Store's regressed-query report is about query performance regressions over time, not overall compute utilization.",
+            },
+        ],
+    },
 ]

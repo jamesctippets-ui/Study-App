@@ -2004,6 +2004,236 @@
         }
       ],
       "explanation": "Store-and-forward queuing is exactly the pattern that protects against data loss while a downstream system is temporarily unreachable, retrying delivery rather than dropping the message. Once retries are exhausted, moving that specific message into a dead-letter queue sets it aside for manual review instead of retrying indefinitely or silently losing it -- the other options are unrelated concepts from load balancing, storage allocation, deployment strategy, identity matching, FHIR server discovery, and HIPAA contracting."
+    },
+    {
+      "id": "ml-ehrintegration-4",
+      "cat": "dataGovernance",
+      "scenario": "A hospital's identity-matching system incorrectly merges two different patients' records into a single chart -- an {b1} error. In the opposite failure, one patient's own records instead get scattered across several unlinked chart IDs, which is called a {b2}. Before any external vendor may process that patient data on the hospital's behalf at all, HIPAA requires a signed {b3} spelling out how the vendor must protect and use it.",
+      "blanks": [
+        {
+          "key": "b1",
+          "options": [
+            "overlay",
+            "fragmented history",
+            "schema mismatch",
+            "queue backup"
+          ],
+          "correct": 0
+        },
+        {
+          "key": "b2",
+          "options": [
+            "fragmented history",
+            "overlay",
+            "dead-letter queue",
+            "Z-segment"
+          ],
+          "correct": 0
+        },
+        {
+          "key": "b3",
+          "options": [
+            "Business Associate Agreement",
+            "service-level agreement",
+            "non-disclosure agreement",
+            "CapabilityStatement"
+          ],
+          "correct": 0
+        }
+      ],
+      "explanation": "An overlay error merges two different patients into one record; a fragmented history is the opposite failure, splitting one patient across multiple unlinked IDs -- both are direct patient-safety risks from the same underlying matching problem. HIPAA specifically requires a signed Business Associate Agreement before a third-party vendor processes or stores PHI -- a plain SLA or NDA does not satisfy that requirement on its own."
+    },
+    {
+      "id": "ml-ehrintegration-5",
+      "cat": "hl7v2Messaging",
+      "scenario": "After a receiving system accepts an HL7 v2 message with no structural problems and processes it successfully, it returns an acknowledgment carrying the {b1} code. If that same message is structurally fine but a business-rule check inside the application fails while processing it, the response instead carries an {b2} code. And if the message itself is malformed and gets rejected outright before any real processing even begins, the response carries an {b3} code.",
+      "blanks": [
+        {
+          "key": "b1",
+          "options": [
+            "AA",
+            "AE",
+            "AR"
+          ],
+          "correct": 0
+        },
+        {
+          "key": "b2",
+          "options": [
+            "AE",
+            "AA",
+            "AR"
+          ],
+          "correct": 0
+        },
+        {
+          "key": "b3",
+          "options": [
+            "AR",
+            "AA",
+            "AE"
+          ],
+          "correct": 0
+        }
+      ],
+      "explanation": "AA (Application Accept) confirms the message was received and processed without a problem. AE (Application Error) means the message was structurally fine and was actually received and evaluated, but something failed during application-level processing. AR (Application Reject) means the message was rejected outright at the structural level, before real processing ever began -- a different signal from either AA or AE."
+    },
+    {
+      "id": "ml-ehrintegration-6",
+      "cat": "fhirModernApis",
+      "scenario": "A client sends a FHIR Bundle containing ten related resource-creation operations that must all succeed or all fail together as a single atomic unit -- that calls for a {b1} bundle. A different client instead sends ten independent, unrelated resource operations where each one should simply succeed or fail on its own regardless of the others -- that calls for a {b2} bundle instead. Either way, before assuming a new server even supports every operation being sent, the client should first check that server's {b3}.",
+      "blanks": [
+        {
+          "key": "b1",
+          "options": [
+            "transaction",
+            "batch",
+            "searchset",
+            "document"
+          ],
+          "correct": 0
+        },
+        {
+          "key": "b2",
+          "options": [
+            "batch",
+            "transaction",
+            "searchset",
+            "document"
+          ],
+          "correct": 0
+        },
+        {
+          "key": "b3",
+          "options": [
+            "CapabilityStatement",
+            "Master Patient Index",
+            "MSH segment",
+            "dead-letter queue"
+          ],
+          "correct": 0
+        }
+      ],
+      "explanation": "A transaction bundle is expected to succeed or fail as a single atomic unit; a batch bundle processes each entry independently, so one entry's failure doesn't roll back the rest. A searchset bundle holds query results and a document bundle holds a fixed clinical document -- neither describes a set of operations to execute. A CapabilityStatement is exactly what a client should check first, since two servers both claiming FHIR compliance can still support very different subsets of operations."
+    }
+  ],
+  "caseStudies": [
+    {
+      "id": "cs-ehrintegration-maple-ridge",
+      "cat": "integrationEngines",
+      "title": "Maple Ridge Health System's New Lab Interface Rollout",
+      "scenario": "Maple Ridge Health System is bringing a new outreach laboratory online and needs it to exchange messages with the hospital's EHR through the hospital's existing integration engine rather than building a direct point-to-point connection just for this one lab. Orders placed in the EHR need to reach the lab, and results need to come back and land in the right patient's chart. Before go-live, the interface team runs sample messages through a non-production environment and confirms that a message that can't be delivered because the lab's connection is temporarily down gets retried later rather than silently dropped. A few weeks after go-live, someone on the clinical side reports that some results seem to be arriving late during a specific afternoon window, though nothing has thrown an obvious hard error in the interface logs.",
+      "questions": [
+        {
+          "id": "cs-ehrintegration-maple-ridge-q1",
+          "type": "mc",
+          "question": "Which message type does the outreach lab send back to the EHR once it finishes processing an ordered test?",
+          "options": [
+            "ORU",
+            "ORM",
+            "ADT",
+            "SIU"
+          ],
+          "correct": 0,
+          "explanation": "ORU (Observation Result) is the message type used to send a completed test result back to the ordering system, carrying OBX segments tied to the original order via OBR. ORM is the order request going the other direction, ADT carries admit/discharge/transfer events, and SIU carries scheduling events -- none of which report a lab result."
+        },
+        {
+          "id": "cs-ehrintegration-maple-ridge-q2",
+          "type": "tf",
+          "question": "True or false: connecting the new outreach lab directly to the EHR with its own dedicated point-to-point link, bypassing the existing integration engine, would require fewer total connections to build and maintain across the hospital's system landscape than routing it through the existing hub.",
+          "answer": false,
+          "explanation": "A hub-and-spoke topology is exactly what keeps the total number of connections down -- every system connects once to the central engine, which then routes to whichever other systems need the data. Bypassing that hub for one more system reintroduces a direct connection instead of reusing the hub relationship every other system already has."
+        },
+        {
+          "id": "cs-ehrintegration-maple-ridge-q3",
+          "type": "mc",
+          "question": "The interface team wants a message that fails to deliver while the lab's connection is temporarily down to be retried automatically rather than lost. Which design pattern accomplishes this?",
+          "options": [
+            "Store-and-forward queuing",
+            "A dead-letter queue",
+            "Hub-and-spoke topology",
+            "A CapabilityStatement"
+          ],
+          "correct": 0,
+          "explanation": "Store-and-forward queuing holds an undelivered message and keeps retrying while the downstream system is temporarily unreachable. A dead-letter queue is instead where a message goes after every retry attempt is exhausted, for manual review. Hub-and-spoke is a topology, not a retry mechanism, and a CapabilityStatement is a FHIR-specific server description, unrelated to HL7 v2 delivery retries."
+        },
+        {
+          "id": "cs-ehrintegration-maple-ridge-q4",
+          "type": "ms",
+          "question": "Which of the following would help the team catch the kind of quiet, no-hard-error slowdown reported during the afternoon window, ideally before a clinician notices missing or late results? (Select all that apply.)",
+          "options": [
+            "Monitoring queue depth and message volume against an established baseline",
+            "Running a synthetic canary message through the same interface path on a regular schedule",
+            "Waiting for the next scheduled interface validation, planned once a year",
+            "Relying solely on ACK codes, since an AA response guarantees full downstream processing succeeded"
+          ],
+          "correct": [
+            0,
+            1
+          ],
+          "explanation": "Baseline-based queue depth and volume monitoring, and a regularly scheduled canary message run through the same live path, are both proactive ways to catch a silent slowdown before someone notices missing results. A once-a-year validation is far too infrequent to catch a recurring afternoon-window issue, and an AA acknowledgment only confirms structural acceptance -- never that downstream processing actually completed correctly -- so relying on it alone would miss exactly this kind of quiet failure.",
+          "whyTested": "It's tempting to treat a clean stream of AA acknowledgments as proof everything is fine, but AA only ever promises structural acceptance, not full downstream success -- recognizing that gap, and reaching for baseline monitoring and canary messages instead, is the real skill this kind of question is checking for."
+        }
+      ]
+    },
+    {
+      "id": "cs-ehrintegration-bright-path",
+      "cat": "fhirModernApis",
+      "title": "Bright Path Clinics' Patient-Facing App Rollout",
+      "scenario": "Bright Path Clinics is reviewing a new patient-facing mobile app that patients will download directly from an app store to view their own labs, medications, and allergies. The app will never run inside the EHR's own clinical session -- patients open it entirely on their own, outside any clinician's workflow. Bright Path's compliance team is reviewing the vendor's data request alongside IT's technical review of exactly what the app is asking for API access to, and separately confirming the standard contractual paperwork required before the vendor's backend can touch any real patient data at all.",
+      "questions": [
+        {
+          "id": "cs-ehrintegration-bright-path-q1",
+          "type": "mc",
+          "question": "Since patients open this app entirely on their own, outside any clinician's EHR session, which SMART on FHIR launch flow does it use?",
+          "options": [
+            "Standalone launch",
+            "EHR launch",
+            "Bulk FHIR export",
+            "CapabilityStatement discovery"
+          ],
+          "correct": 0,
+          "explanation": "Standalone launch is for an app that starts entirely on its own, outside the EHR, and initiates its own authorization sequence from scratch -- exactly this patient's own app-store download. EHR launch is for an app embedded inside the EHR's active session, inheriting context like the already-logged-in user; Bulk FHIR export and CapabilityStatement discovery are unrelated FHIR mechanisms, not launch flows."
+        },
+        {
+          "id": "cs-ehrintegration-bright-path-q2",
+          "type": "tf",
+          "question": "True or false: because the app is only requesting read access to a patient's own labs, medications, and allergies, its launch flow (standalone vs. EHR) is itself what limits it to only that data, rather than any other patient's records.",
+          "answer": false,
+          "explanation": "The launch flow only governs how the app gets authorized -- it says nothing about what the app can actually touch once authorized. The access token's granted OAuth2 scopes are what actually constrain which resource types and whose data the app is allowed to reach."
+        },
+        {
+          "id": "cs-ehrintegration-bright-path-q3",
+          "type": "mc",
+          "question": "Before the vendor's backend service can process or store any real patient data on Bright Path's behalf, which of the following does HIPAA specifically require to be in place first?",
+          "options": [
+            "A signed Business Associate Agreement",
+            "A CapabilityStatement",
+            "A Master Patient Index entry",
+            "A canary test message"
+          ],
+          "correct": 0,
+          "explanation": "HIPAA specifically requires a signed Business Associate Agreement before a third-party vendor processes or stores PHI on a covered entity's behalf. A CapabilityStatement describes a FHIR server's supported operations, a Master Patient Index resolves patient identity across systems, and a canary message tests interface health -- none of them satisfy HIPAA's contractual requirement."
+        },
+        {
+          "id": "cs-ehrintegration-bright-path-q4",
+          "type": "ms",
+          "question": "Which of the following should Bright Path's compliance and IT teams specifically check as part of this review? (Select all that apply.)",
+          "options": [
+            "That the requested OAuth2 scopes are limited to only the resource types (labs, medications, allergies) the app actually needs",
+            "That a signed Business Associate Agreement is in place before the vendor's backend touches any real patient data",
+            "That the app requests the broadest possible scopes up front so it never needs to be re-approved later",
+            "That the data requested doesn't exceed what's needed for the app's stated purpose, consistent with the minimum necessary standard"
+          ],
+          "correct": [
+            0,
+            1,
+            3
+          ],
+          "explanation": "Scopes should be limited to what the app actually needs (least privilege), a BAA must be in place before the vendor's backend touches PHI, and the minimum necessary standard limits any disclosure to only what the stated purpose actually requires. Requesting the broadest possible scopes up front to avoid future re-approval is the opposite of correct practice -- it's a real governance red flag, not a convenience worth granting.",
+          "whyTested": "An app requesting scopes far broader than its stated purpose needs is a genuine, recurring red flag in real hospital app-vetting, not a theoretical exam trap -- this question checks whether 'broad access now saves a re-approval later' gets correctly recognized as a governance failure rather than a reasonable shortcut."
+        }
+      ]
     }
   ]
 }

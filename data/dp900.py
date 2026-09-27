@@ -1190,4 +1190,99 @@ MADLIBS = [
         ],
         'explanation': "Microsoft Fabric unifies data engineering, data warehousing, and Power BI on top of OneLake, one shared data lake that every experience reads from and writes to, so nothing needs its own duplicated copy. Data Factory only orchestrates data movement, and Table Storage/SQL Database are individual data stores, not a unifying analytics platform.",
     },
+    {
+        'id': 'ml-dp900-4',
+        'cat': 'nonRelational',
+        'scenario': "A team building a global gaming leaderboard needs single-digit-millisecond reads and writes plus automatic multi-region replication with a choice of consistency levels — that points to {b1}. A different team just needs to cache session tokens in memory for sub-millisecond key lookups, with no need for the data to persist long-term — that points to {b2} instead.",
+        'blanks': [
+            {'key': 'b1', 'options': ['Azure Cosmos DB', 'Azure Blob Storage', 'Azure SQL Database', 'Azure Table Storage'], 'correct': 0},
+            {'key': 'b2', 'options': ['Azure Cache for Redis', 'Azure Cosmos DB', 'Azure Data Lake Storage', 'Azure Synapse Analytics'], 'correct': 0},
+        ],
+        'explanation': "Azure Cosmos DB is Azure's globally distributed, multi-model NoSQL database, built for low single-digit-millisecond latency at scale with tunable consistency levels — a strong fit for a global leaderboard. Azure Cache for Redis is an in-memory key-value store purpose-built for sub-millisecond caching scenarios like session tokens, not a general-purpose persistent database.",
+    },
+    {
+        'id': 'ml-dp900-5',
+        'cat': 'coreData',
+        'scenario': "A team stores raw video files and PDFs with no predefined schema at all — that's {b1} data. A different team stores JSON documents where every record can have a different set of fields, though each field still carries some internal organization — that's {b2} data, distinct from data that must fit one fixed, rigid schema.",
+        'blanks': [
+            {'key': 'b1', 'options': ['unstructured', 'semi-structured', 'structured', 'relational'], 'correct': 0},
+            {'key': 'b2', 'options': ['unstructured', 'semi-structured', 'structured', 'relational'], 'correct': 1},
+        ],
+        'explanation': "Unstructured data, like video files and PDFs, has no predefined schema at all. Semi-structured data, like JSON documents, carries some organizational structure (keys, tags, nesting) but doesn't require every record to conform to one fixed schema the way structured/relational data does.",
+    },
+]
+
+# Mini case studies (ROADMAP.md section 4): a shared scenario with several
+# related questions answered in sequence, mirroring how a real exam groups
+# multiple questions off one larger case rather than testing each fact in
+# isolation. Every embedded question still follows the same mc/tf/ms shape
+# as QUESTIONS above (see build.py's CASE_STUDIES validation) — only the
+# shared scenario and the grouping are new.
+CASE_STUDIES = [
+    {
+        'id': 'cs-dp900-contoso-coffee',
+        'cat': 'coreData',
+        'title': "Contoso Coffee's Data Platform Evaluation",
+        'scenario': (
+            "Contoso Coffee runs 300 retail stores and is modernizing its data platform. Its point-of-sale "
+            "system writes each transaction into an on-premises SQL Server database with a fixed, well-defined "
+            "schema — customer ID, item, price, and timestamp — and that part of the design isn't changing. "
+            "Separately, the marketing team wants to start storing each customer's app clickstream events for "
+            "building recommendations; the exact set of fields captured on any given event can vary widely from "
+            "event to event. The IT director wants a managed relational database in Azure that needs close to "
+            "zero day-to-day database administration, since there's no in-house DBA, with patching, tuning, and "
+            "backups handled automatically. Finally, leadership wants one dashboard summarizing yesterday's "
+            "total sales across all 300 stores, refreshed once each morning rather than updated transaction by "
+            "transaction throughout the day."
+        ),
+        'questions': [
+            {
+                'id': 'cs-dp900-contoso-coffee-q1',
+                'type': 'mc',
+                'question': "The point-of-sale transactions, with their fixed schema of customer ID, item, price, and timestamp, are best described as which type of data?",
+                'options': [
+                    "Structured data",
+                    "Unstructured data",
+                    "Semi-structured data",
+                    "Streaming-only data",
+                ],
+                'correct': 0,
+                'explanation': "Data that conforms to a fixed, predefined schema — a known set of columns applied consistently to every row — is structured data, the classic fit for a relational database like SQL Server.",
+            },
+            {
+                'id': 'cs-dp900-contoso-coffee-q2',
+                'type': 'mc',
+                'question': "Which Azure service best fits the IT director's requirement for a managed relational database with automatic patching, tuning, and backups, and no in-house DBA?",
+                'options': [
+                    "Azure SQL Database",
+                    "SQL Server on an Azure VM",
+                    "Azure SQL Managed Instance",
+                    "On-premises SQL Server",
+                ],
+                'correct': 0,
+                'explanation': "Azure SQL Database is the fully-managed, single-database PaaS option — Microsoft handles patching, tuning, and backups automatically, which matches 'close to zero DBA effort' with nothing else to weigh against it here. SQL Server on a VM is IaaS, so the customer still patches the OS and SQL Server themselves. Managed Instance is a reasonable PaaS choice too, but it exists mainly for lift-and-shift workloads with cross-database or instance-level dependencies, which this greenfield scenario doesn't have.",
+            },
+            {
+                'id': 'cs-dp900-contoso-coffee-q3',
+                'type': 'tf',
+                'question': "True or false: the clickstream events, where each event can have a different set of fields, are best modeled as structured data in a traditional relational table.",
+                'answer': False,
+                'explanation': "Data whose fields vary from record to record doesn't fit a fixed relational schema well; it's semi-structured data (such as JSON documents), typically better suited to a non-relational store like Azure Cosmos DB rather than forcing it into a rigid table structure.",
+                'whyTested': "It's tempting to reach for 'a database' whenever data needs to be stored, but DP-900 specifically tests whether you notice that varying, per-record fields are the signal for semi-structured/non-relational, not just 'more relational.'",
+            },
+            {
+                'id': 'cs-dp900-contoso-coffee-q4',
+                'type': 'ms',
+                'question': "Which characteristics apply to the once-a-day sales summary dashboard leadership wants? (Select all that apply.)",
+                'options': [
+                    "It is an example of batch processing",
+                    "It requires streaming (real-time) processing",
+                    "It can run on a schedule after each day's transactions are already complete",
+                    "It must notify someone within seconds of each individual sale",
+                ],
+                'correct': [0, 2],
+                'explanation': "Running once a day, after that day's data is already complete, is the definition of batch processing — scheduled, over a finished set of data. Streaming/real-time processing and second-by-second, per-transaction notification describe a different kind of requirement (like live fraud detection), not a once-daily summary.",
+            },
+        ],
+    },
 ]
