@@ -346,6 +346,111 @@
       "front": "Consistency levels in Cosmos DB",
       "back": "A tunable spectrum from strong (every read sees the most recent committed write) to eventual (a read may briefly return stale data), letting Azure Cosmos DB trade off latency and availability against how immediately consistent reads need to be across its globally distributed replicas.",
       "detail": "Choosing a weaker consistency level is a deliberate trade for lower latency and higher availability, not a defect \u2014 the right level depends on whether an application can tolerate a brief delay before every region sees the same value."
+    },
+    {
+      "id": "f44",
+      "cat": "coreData",
+      "front": "Data Scientist",
+      "back": "A data professional role focused on building, training, and evaluating machine learning and statistical models from data to generate predictions or insights \u2014 distinct from the reporting focus of a Data Analyst and the day-to-day upkeep handled by a Database Administrator, as covered under Data professional roles.",
+      "detail": "If a scenario is about training a model to predict an outcome, that's a Data Scientist; if it's about a dashboard, that's still a Data Analyst."
+    },
+    {
+      "id": "f45",
+      "cat": "coreData",
+      "front": "Schema-on-write vs. schema-on-read",
+      "back": "Schema-on-write validates and applies a fixed schema before data is ever stored, the approach a relational database takes. Schema-on-read stores data as-is and applies structure only when it's later queried, the approach a data lake uses so raw files of any shape can land first and get modeled afterward, as described under Database vs. data warehouse vs. data lake.",
+      "detail": "A scenario that says structure isn't known until the data is actually read is describing schema-on-read, not a database rejecting badly-formed rows on the way in."
+    },
+    {
+      "id": "f46",
+      "cat": "coreData",
+      "front": "Document, key-value, column-family, and graph stores",
+      "back": "The four common shapes non-relational data takes: document stores hold self-contained JSON-like records, key-value stores pair a simple key with a value for fast lookups, column-family stores group sparse, wide sets of columns for massive write-scale, and graph stores model entities as nodes connected by edges \u2014 the model family behind Azure Cosmos DB APIs like the NoSQL, Table, Cassandra, and Gremlin APIs.",
+      "detail": "Recognizing which of these four shapes a scenario is describing, before even thinking about a specific Azure service, is the first step to picking the right Cosmos DB API."
+    },
+    {
+      "id": "f47",
+      "cat": "coreData",
+      "front": "Data ingestion",
+      "back": "The process of collecting and importing data from one or more source systems into a storage or processing system \u2014 the first step before it can be transformed or analyzed, whether it arrives all at once or continuously, as described under Batch vs. streaming (real-time) processing.",
+      "detail": "A nightly file drop into a data lake and a live event feed into a streaming pipeline are both data ingestion \u2014 they just differ in which of the two processing patterns they use."
+    },
+    {
+      "id": "f48",
+      "cat": "relational",
+      "front": "Elastic pool",
+      "back": "A shared pool of compute and storage resources that multiple Azure SQL databases draw from together, letting databases with unpredictable, non-simultaneous usage spikes share capacity instead of each being sized and billed for its own worst case, as an option under DTU vs. vCore purchasing models.",
+      "detail": "Dozens of small databases that each only spike occasionally, and rarely all at once, is the classic signal pointing at an elastic pool instead of provisioning every database for its own peak."
+    },
+    {
+      "id": "f49",
+      "cat": "relational",
+      "front": "Hyperscale service tier",
+      "back": "A vCore-based Azure SQL Database service tier built for very large or fast-growing databases, supporting rapid storage auto-scaling up to 100 TB with backup and restore times that stay fast regardless of database size, unlike the lower size ceilings of the Standard or General Purpose tiers.",
+      "detail": "A scenario emphasizing multi-terabyte growth alongside fast restores no matter the size is describing Hyperscale, not just a larger General Purpose database."
+    },
+    {
+      "id": "f50",
+      "cat": "relational",
+      "front": "Failover groups and active geo-replication",
+      "back": "Active geo-replication keeps up to four readable secondary copies of an Azure SQL Database in other regions. A failover group wraps that replication with a single, stable connection endpoint that automatically redirects the application to the secondary region during an outage, so the application never has to track which region is currently active.",
+      "detail": "This is what makes Azure SQL Database resilient to a whole regional outage, on top of the automated backups it already takes for point-in-time restore within a single region."
+    },
+    {
+      "id": "f51",
+      "cat": "nonRelational",
+      "front": "Partition key",
+      "back": "The property chosen on each item in an Azure Cosmos DB container that determines which physical partition it's stored in, spreading a container's data and throughput across many nodes \u2014 the concrete mechanism behind Sharding (horizontal partitioning) in Cosmos DB specifically.",
+      "detail": "A partition key with only a few distinct values concentrates most items onto the same few partitions, defeating the point of choosing one at all."
+    },
+    {
+      "id": "f52",
+      "cat": "nonRelational",
+      "front": "Azure Cache for Redis",
+      "back": "A fully managed, in-memory key-value store built for sub-millisecond caching and session-state lookups, meant to take repeated load off a backend database rather than serve as a durable, long-term primary store the way Azure Cosmos DB or Azure Table Storage does.",
+      "detail": "Whenever a scenario needs the fastest possible repeated read of the same small piece of data, like a session token, and doesn't need it to persist long-term, this is the answer over a full database service."
+    },
+    {
+      "id": "f53",
+      "cat": "nonRelational",
+      "front": "Request Units (RU/s)",
+      "back": "The single currency Azure Cosmos DB uses to measure and bill the compute cost of every operation \u2014 every read, write, and query consumes some number of Request Units, and a container's throughput is provisioned, or scaled automatically, in RU/s rather than in raw CPU or memory.",
+      "detail": "A heavier query, like one that scans many items, simply consumes more Request Units per call than a single point read by ID."
+    },
+    {
+      "id": "f54",
+      "cat": "analytics",
+      "front": "Azure Data Explorer",
+      "back": "A fast, fully managed big-data analytics service purpose-built for ad hoc, interactive exploration of huge volumes of time-stamped log, telemetry, and event data, queried with the Kusto Query Language (KQL) rather than needing to be pre-modeled into a star schema first.",
+      "detail": "Contrast this with Azure Synapse Analytics: Data Explorer is optimized specifically for fast log and telemetry exploration, not general-purpose data warehousing."
+    },
+    {
+      "id": "f55",
+      "cat": "analytics",
+      "front": "Azure Event Hubs",
+      "back": "A big-data streaming ingestion service that can receive and buffer millions of events per second from applications and devices, acting as the front door that feeds a downstream processor like Azure Stream Analytics.",
+      "detail": "Event Hubs ingests and buffers the stream; Azure Stream Analytics is the separate engine that actually queries and analyzes it as it flows through."
+    },
+    {
+      "id": "f56",
+      "cat": "analytics",
+      "front": "Power BI dataset and dataflow",
+      "back": "A dataset is the data model a Power BI report queries, built from one or more connected sources. A dataflow is a reusable set of data preparation logic, built with Power Query, that can feed multiple datasets so the same cleanup steps aren't rebuilt inside every individual report.",
+      "detail": "A dataflow sits upstream of a dataset \u2014 it's where shared transformation logic lives once, instead of being copy-pasted into every report that needs it."
+    },
+    {
+      "id": "f57",
+      "cat": "analytics",
+      "front": "Power BI report vs. dashboard",
+      "back": "A report is a multi-page set of interactive visualizations built against one dataset. A dashboard is a single page of tiles pinned from one or more reports, often from different datasets entirely, built for at-a-glance monitoring rather than the deeper exploration a report supports.",
+      "detail": "A dashboard can mix tiles pinned from several different reports; a report itself is always tied to just the one dataset behind it."
+    },
+    {
+      "id": "f58",
+      "cat": "analytics",
+      "front": "Synapse pipelines",
+      "back": "A data integration and orchestration capability built directly into an Azure Synapse Analytics workspace, sharing the same underlying engine as Azure Data Factory, so pipelines can move and transform data without needing a separate Data Factory resource alongside Synapse.",
+      "detail": "This is why a team already living inside a Synapse workspace doesn't necessarily need to stand up Azure Data Factory separately just to orchestrate data movement."
     }
   ],
   "questions": [
@@ -1264,6 +1369,231 @@
       ],
       "correct": 0,
       "explanation": "Microsoft Fabric's OneLake is a single shared data lake underneath Spark (Data Engineering), T-SQL (Data Warehouse), and Power BI experiences, so none of them needs its own duplicated copy \u2014 exactly what this scenario asks for. Data Factory alone only moves and orchestrates data, it doesn't provide Spark notebooks or a warehouse engine; Databricks doesn't natively provide a T-SQL warehouse engine or built-in Power BI reporting; and three separate services with separate copies is precisely the duplication this scenario wants to avoid."
+    },
+    {
+      "id": "q47",
+      "cat": "coreData",
+      "type": "mc",
+      "question": "A team is training and evaluating a model that predicts which customers are likely to cancel their subscription next month, using several years of historical usage data. Which role is primarily responsible for this work?",
+      "options": [
+        "Data Scientist",
+        "Database Administrator",
+        "Data Analyst",
+        "Business Analyst"
+      ],
+      "correct": 0,
+      "explanation": "A Data Scientist builds, trains, and evaluates predictive models like a churn predictor from historical data. A Database Administrator maintains the databases themselves, a Data Analyst builds descriptive reports rather than predictive models, and a Business Analyst focuses on business requirements rather than model development."
+    },
+    {
+      "id": "tf19",
+      "cat": "coreData",
+      "type": "tf",
+      "question": "Schema-on-read means data is validated against a fixed schema and rejected if it doesn't match, before it is ever written to storage.",
+      "answer": false,
+      "explanation": "That describes schema-on-write, the relational database approach. Schema-on-read stores data as-is and applies structure only later, when it's queried \u2014 the approach a data lake takes with raw files."
+    },
+    {
+      "id": "q48",
+      "cat": "coreData",
+      "type": "mc",
+      "question": "A telemetry system stores billions of sparse rows where different rows can have very different sets of populated columns, and needs extremely fast writes at massive scale. Which non-relational data store shape fits best?",
+      "options": [
+        "Document store",
+        "Key-value store",
+        "Column-family store",
+        "Graph store"
+      ],
+      "correct": 2,
+      "explanation": "A column-family store groups sparse, wide sets of columns together and is built for exactly this kind of massive write-scale with varying populated columns per row. A document store models self-contained records with a more uniform internal shape, a key-value store pairs one simple value per key, and a graph store emphasizes relationships between entities rather than sparse wide-column layout."
+    },
+    {
+      "id": "msq8",
+      "cat": "coreData",
+      "type": "ms",
+      "question": "Which of the following are examples of data ingestion? (Select all that apply)",
+      "options": [
+        "Loading nightly export files from an on-premises system into a data lake",
+        "Continuously receiving clickstream events from a website into a streaming pipeline",
+        "Building a Power BI report on top of data that's already been loaded",
+        "Writing documentation describing what each column in a table means"
+      ],
+      "correct": [
+        0,
+        1
+      ],
+      "explanation": "Data ingestion is collecting and importing data into a storage or processing system, matching both the nightly file load and the continuous clickstream feed. Building a report consumes data that's already been ingested rather than ingesting it, and writing column documentation is a governance activity, not an ingestion step."
+    },
+    {
+      "id": "q49",
+      "cat": "coreData",
+      "type": "mc",
+      "question": "A system requires every row inserted into a table to already match a predefined set of columns and data types, rejecting anything that doesn't conform, before it is stored at all. Which concept does this describe?",
+      "options": [
+        "Schema-on-read",
+        "Schema-on-write",
+        "Data ingestion",
+        "Eventual consistency"
+      ],
+      "correct": 1,
+      "explanation": "Schema-on-write validates and enforces a fixed schema before data is ever stored, exactly the behavior described, typical of a relational database. Schema-on-read instead defers structure to query time, data ingestion is the broader act of importing data regardless of schema timing, and eventual consistency is a Cosmos DB consistency concept unrelated to schema enforcement."
+    },
+    {
+      "id": "tf20",
+      "cat": "relational",
+      "type": "tf",
+      "question": "An elastic pool lets multiple Azure SQL databases share a common pool of compute and storage resources instead of each being provisioned for its own peak load.",
+      "answer": true,
+      "explanation": "That is exactly what an elastic pool provides \u2014 shared resources across many databases with staggered, non-simultaneous usage, instead of sizing each one for its own worst case."
+    },
+    {
+      "id": "q50",
+      "cat": "relational",
+      "type": "mc",
+      "question": "A team's Azure SQL Database has grown to multiple terabytes, and heavy reporting queries are starting to compete with the production application for the same compute. The team wants to offload those reporting queries to a dedicated read-only replica without duplicating the whole database into a separate service. Which service tier offers this kind of built-in read-scale replica?",
+      "options": [
+        "The DTU-based Standard tier",
+        "The vCore-based General Purpose tier",
+        "The vCore-based Hyperscale tier",
+        "The Basic tier"
+      ],
+      "correct": 2,
+      "explanation": "Hyperscale supports built-in read-scale replicas that let reporting queries run against a separate compute replica without competing with the primary or duplicating the database into a whole separate service. Standard and General Purpose don't offer this same built-in multi-replica read-scale capability, and the Basic tier is meant for small, lightweight workloads, not multi-terabyte databases needing replica offload."
+    },
+    {
+      "id": "q51",
+      "cat": "relational",
+      "type": "mc",
+      "question": "A company needs its Azure SQL Database connections to automatically redirect to a readable secondary database in another region during a regional outage, without the application needing to track which region is currently active. Which capability provides this?",
+      "options": [
+        "A failover group",
+        "An elastic pool",
+        "The DTU purchasing model",
+        "A serverless SQL pool"
+      ],
+      "correct": 0,
+      "explanation": "A failover group wraps active geo-replication with a single, stable connection endpoint that automatically redirects to the secondary region during a failover, so the application never has to track which region is active. An elastic pool shares resources across databases within one region rather than replicating across regions, the DTU model is a purchasing option unrelated to failover, and a serverless SQL pool is an Azure Synapse Analytics concept, not an Azure SQL Database availability feature."
+    },
+    {
+      "id": "msq9",
+      "cat": "relational",
+      "type": "ms",
+      "question": "Which of the following are part of Azure SQL Database's built-in business continuity capabilities? (Select all that apply)",
+      "options": [
+        "Automated backups usable for point-in-time restore",
+        "Active geo-replication to readable secondary databases",
+        "Failover groups with a single connection endpoint",
+        "Manually rebuilding the database from a customer-maintained export"
+      ],
+      "correct": [
+        0,
+        1,
+        2
+      ],
+      "explanation": "Automated backups with point-in-time restore, active geo-replication, and failover groups are all business continuity capabilities Azure SQL Database provides automatically. Manually rebuilding a database from a customer-maintained export is exactly the manual process these managed features exist to avoid."
+    },
+    {
+      "id": "q52",
+      "cat": "nonRelational",
+      "type": "mc",
+      "question": "A globally distributed Cosmos DB container storing millions of IoT device readings needs its data and throughput spread evenly across many physical partitions, based on a property with many distinct values shared roughly evenly across items. Which concept determines how that data is distributed?",
+      "options": [
+        "The consistency level",
+        "The partition key",
+        "The Request Unit charge",
+        "The Blob Storage access tier"
+      ],
+      "correct": 1,
+      "explanation": "The partition key is the property Cosmos DB uses to spread a container's items and throughput across physical partitions, and a good choice has many distinct values spread evenly across items. Consistency level controls how up to date replicas must be, Request Units measure the cost of an operation rather than where data lives, and access tiers are a Blob Storage cost concept, not a Cosmos DB partitioning concept."
+    },
+    {
+      "id": "tf21",
+      "cat": "nonRelational",
+      "type": "tf",
+      "question": "Azure Cache for Redis is intended as a durable, long-term primary data store rather than an in-memory cache for frequently accessed data.",
+      "answer": false,
+      "explanation": "It's the reverse: Azure Cache for Redis is an in-memory cache built for sub-millisecond lookups of frequently accessed data, not a durable, long-term primary store \u2014 that role belongs to a database like Azure Cosmos DB or Azure SQL Database."
+    },
+    {
+      "id": "q53",
+      "cat": "nonRelational",
+      "type": "mc",
+      "question": "A Cosmos DB workload has an unpredictable traffic pattern that spikes during promotions and drops the rest of the time, and the team wants throughput to adjust automatically within a set range rather than manually reprovisioning Request Units every time. Which capability fits?",
+      "options": [
+        "Autoscale throughput",
+        "A fixed manual RU/s allocation sized for peak load at all times",
+        "Switching to the Table API",
+        "Enabling a hierarchical namespace"
+      ],
+      "correct": 0,
+      "explanation": "Autoscale throughput lets Cosmos DB automatically scale provisioned RU/s up and down within a configured range as demand changes, matching an unpredictable, spiky workload without manual reprovisioning. A fixed allocation sized for peak load at all times is the costly manual approach being avoided, switching APIs doesn't change throughput scaling behavior, and a hierarchical namespace is a Data Lake Storage Gen2 feature unrelated to Cosmos DB throughput."
+    },
+    {
+      "id": "q54",
+      "cat": "analytics",
+      "type": "mc",
+      "question": "A team already has a heavily modeled data warehouse in a Synapse dedicated SQL pool, but also needs to explore raw, high-volume application log data that changes shape often and hasn't been modeled into any schema yet. Which service should they add for that specific need?",
+      "options": [
+        "Azure Data Explorer",
+        "A second Synapse dedicated SQL pool",
+        "Azure SQL Managed Instance",
+        "Azure Files"
+      ],
+      "correct": 0,
+      "explanation": "Azure Data Explorer is built specifically for exploring raw, fast-changing log and telemetry data without first modeling it into a schema, complementing rather than replacing an already-modeled Synapse warehouse. Adding a second dedicated SQL pool would just mean modeling the same raw data before it could be queried, and Azure SQL Managed Instance and Azure Files are relational and file-storage services, not built for ad hoc log-scale analytical queries at all."
+    },
+    {
+      "id": "tf22",
+      "cat": "analytics",
+      "type": "tf",
+      "question": "Azure Event Hubs is designed to ingest and buffer millions of streaming events per second from applications and devices, feeding a downstream processor like Azure Stream Analytics.",
+      "answer": true,
+      "explanation": "That's exactly Event Hubs' role: a big-data streaming ingestion front door that buffers incoming events for a downstream processor to consume."
+    },
+    {
+      "id": "q55",
+      "cat": "analytics",
+      "type": "mc",
+      "question": "A BI team wants to define one shared set of Power Query data-cleaning steps just once, so several different Power BI reports and datasets can all reuse the same cleaned-up data instead of repeating the same transformations in every report. Which Power BI concept fits?",
+      "options": [
+        "A dataflow",
+        "A dashboard",
+        "A workspace",
+        "DirectQuery mode"
+      ],
+      "correct": 0,
+      "explanation": "A dataflow is a reusable set of data preparation logic built with Power Query that multiple datasets can draw from, avoiding repeated transformation work across reports. A dashboard is a page of pinned visualization tiles rather than a data preparation concept, a workspace is a container that organizes content rather than transforming data, and DirectQuery is a live-query connectivity mode, not a shared transformation layer."
+    },
+    {
+      "id": "msq10",
+      "cat": "analytics",
+      "type": "ms",
+      "question": "Which of the following statements about Power BI reports and dashboards are true? (Select all that apply)",
+      "options": [
+        "A report can span multiple pages of interactive visualizations built against one dataset",
+        "A dashboard is typically a single page of tiles pinned from one or more reports",
+        "A dashboard can display tiles sourced from more than one underlying dataset",
+        "A report and a dashboard are simply two names for the same artifact"
+      ],
+      "correct": [
+        0,
+        1,
+        2
+      ],
+      "explanation": "A report is a multi-page, interactive artifact tied to one dataset, while a dashboard is a single-page collection of pinned tiles that, unlike a report, can pull tiles from multiple different reports and datasets at once. They're distinct artifacts serving different purposes, not the same thing under two names."
+    },
+    {
+      "id": "q56",
+      "cat": "analytics",
+      "type": "mc",
+      "question": "A team already runs its data warehousing and Spark processing inside one Azure Synapse Analytics workspace and wants to also orchestrate data movement pipelines without standing up a separate resource just for that. Which capability lets them do this inside the same workspace?",
+      "options": [
+        "Synapse pipelines",
+        "Azure Table Storage",
+        "Power BI DirectQuery",
+        "Azure Cache for Redis"
+      ],
+      "correct": 0,
+      "explanation": "Synapse pipelines bring the same data integration and orchestration engine that powers Azure Data Factory directly into a Synapse workspace, so a team doesn't need a separate Data Factory resource. Table Storage and Azure Cache for Redis are data stores, not orchestration tools, and DirectQuery is a Power BI connectivity mode unrelated to pipeline orchestration."
     }
   ],
   "lessons": [

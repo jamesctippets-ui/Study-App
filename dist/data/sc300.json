@@ -379,6 +379,111 @@
       "front": "Conditional Access for workload identities",
       "back": "Conditional Access for workload identities is a separate policy scope that applies grant conditions -- like restricting sign-in to a known set of IP ranges -- directly to a service principal or managed identity, since ordinary Conditional Access policy structure: assignments and access controls targets human users and groups, and a non-interactive identity such as one created through Workload identity federation does not automatically inherit those user-targeted policies.",
       "detail": "This is exactly why a policy scoped to 'All users' never actually restricts an automated pipeline's service principal -- workload identities need their own dedicated Conditional Access policy scope to be governed at all."
+    },
+    {
+      "id": "f48",
+      "cat": "userIdentities",
+      "front": "Microsoft Entra device join types: joined, hybrid joined, and registered",
+      "back": "Microsoft Entra joined devices exist purely in the cloud with no on-premises Active Directory dependency, suited to corporate-owned devices managed entirely through Intune. Microsoft Entra hybrid joined devices are joined to both on-premises AD and Microsoft Entra ID, fitting existing domain-joined desktops that still need Entra ID sign-in. Microsoft Entra registered devices simply add a personal or BYOD device's owner account without making the device itself corporate-managed.",
+      "detail": "A Conditional Access policy requiring a hybrid Entra ID joined device will reject a personal phone that is only Microsoft Entra registered, even if that phone has otherwise passed every other grant control."
+    },
+    {
+      "id": "f49",
+      "cat": "userIdentities",
+      "front": "Group naming policy",
+      "back": "A group naming policy automatically enforces a prefix/suffix template (like a department code) and a custom blocked words list on every Microsoft 365 group name at creation time, letting self-service group creation continue under consistent, appropriate naming guardrails instead of disabling it outright.",
+      "detail": "This addresses inconsistent or inappropriate self-service group names without having to turn off self-service group creation for the whole tenant."
+    },
+    {
+      "id": "f50",
+      "cat": "userIdentities",
+      "front": "Guest user default access restrictions",
+      "back": "By default, a B2B collaboration guest user has more restricted visibility into directory objects (other users, groups) than a full member, and external collaboration settings control exactly how much of the directory a guest can see and who is allowed to invite new guests in the first place.",
+      "detail": "An organization that wants guests to browse the full address list the same as members has to explicitly loosen these external collaboration settings -- that visibility restriction is not something Conditional Access or an access package configures."
+    },
+    {
+      "id": "f51",
+      "cat": "userIdentities",
+      "front": "Azure AD B2C",
+      "back": "Azure AD B2C is a separate, customer-facing identity solution built on its own distinct tenant type, letting an organization's own customer-facing applications let end users sign up and sign in with local accounts or social identity providers -- distinct from B2B collaboration, which brings a partner organization's own employees into your workforce tenant as guests.",
+      "detail": "A scenario about a retail company's shoppers creating accounts to sign in to a public storefront app is pointing at B2C, not B2B collaboration, since shoppers are consumers, not another organization's employees."
+    },
+    {
+      "id": "f52",
+      "cat": "authAccessMgmt",
+      "front": "Security defaults",
+      "back": "Security defaults are a free, one-size-fits-all baseline that enforces MFA registration and blocks legacy authentication tenant-wide with no per-policy customization, and a tenant generally cannot run security defaults and Conditional Access policies at the same time -- turning on Conditional Access is how an organization graduates beyond security defaults' fixed rules.",
+      "detail": "A small organization with no Microsoft Entra ID P1/P2 licensing that just wants baseline MFA enforced with zero configuration is exactly the scenario security defaults is built for, while any organization that needs a Conditional Access policy structure: assignments and access controls approach has to disable security defaults first."
+    },
+    {
+      "id": "f53",
+      "cat": "authAccessMgmt",
+      "front": "Conditional Access 'What If' tool",
+      "back": "The What If tool simulates which Conditional Access policies would apply to a specified user, app, and set of conditions, without enforcing anything or waiting for a real sign-in, letting an administrator troubleshoot or validate policy design directly.",
+      "detail": "This differs from Conditional Access report-only mode, which evaluates real sign-ins over time and logs the outcome; What If instead answers a single hypothetical scenario on demand."
+    },
+    {
+      "id": "f54",
+      "cat": "authAccessMgmt",
+      "front": "Microsoft Entra Password Protection and smart lockout",
+      "back": "Microsoft Entra Password Protection blocks users from setting passwords that match a global banned list plus an administrator-defined custom banned list, optionally extended on-premises via a proxy and DC agent, while smart lockout separately locks out an account after a configurable number of failed sign-in attempts to slow down password-guessing attacks.",
+      "detail": "These two features solve different problems: banned password lists stop weak or predictable passwords from ever being set, while smart lockout responds to repeated failed guesses against whatever password is already set."
+    },
+    {
+      "id": "f55",
+      "cat": "authAccessMgmt",
+      "front": "Conditional Access session controls: sign-in frequency and persistent browser session",
+      "back": "Sign-in frequency forces reauthentication after a defined time interval instead of letting a token ride out its full lifetime, and the persistent browser session control, when disabled, ends the session the moment the browser is closed -- both apply after a sign-in has already been granted, unlike a grant control such as requiring MFA.",
+      "detail": "Disabling persistent browser sessions on unmanaged devices is a common way to make sure closing the browser actually signs the user out, rather than relying solely on the sign-in frequency window to eventually expire."
+    },
+    {
+      "id": "f56",
+      "cat": "workloadIdentities",
+      "front": "Supported account types for app registrations",
+      "back": "An app registration's supported account types setting controls who is allowed to sign in to it: single-tenant (only this organization), multi-tenant (any Microsoft Entra organization), multi-tenant plus personal Microsoft accounts, or personal Microsoft accounts only -- distinct from API permissions, which govern what the app can do once someone has signed in.",
+      "detail": "A consumer-facing app that wants to accept sign-ins from any organization's Entra tenant as well as personal Outlook.com or Xbox accounts needs the multi-tenant plus personal Microsoft accounts option, not single-tenant."
+    },
+    {
+      "id": "f57",
+      "cat": "workloadIdentities",
+      "front": "Automatic user provisioning (SCIM) for enterprise applications",
+      "back": "Automatic user provisioning uses the SCIM protocol to automatically create, update, and deprovision a user's account in a SaaS application based on Microsoft Entra ID group membership or attributes, instead of an administrator manually creating and removing accounts in that app one at a time.",
+      "detail": "Removing a user from the scoped group can automatically deprovision (disable or delete) their account in the target SaaS app, extending the same joiner/mover/leaver automation idea that Identity Governance lifecycle workflows apply inside Entra ID itself out to a downstream application."
+    },
+    {
+      "id": "f58",
+      "cat": "workloadIdentities",
+      "front": "Publisher verification and risk-based step-up consent",
+      "back": "Publisher verification confirms an app registration's publisher identity has been validated by Microsoft, shown as a verified badge during consent, while risk-based step-up consent automatically requires admin consent for a request that Microsoft Entra ID judges unusually risky, even if user consent would ordinarily be allowed for that permission.",
+      "detail": "A user consent request from an unverified publisher asking for high-risk permissions is exactly the combination risk-based step-up consent is designed to intercept and escalate to an administrator rather than letting the user approve it alone."
+    },
+    {
+      "id": "f59",
+      "cat": "workloadIdentities",
+      "front": "App roles",
+      "back": "App roles are custom roles an application developer defines (such as Reader or Approver) and assigns to users or groups on the enterprise application, letting the app receive that role in the user's token and enforce its own fine-grained authorization -- distinct from a delegated or application API permission, which governs what the app itself can do against Microsoft Graph or another API.",
+      "detail": "An application permission (delegated vs. application permissions) decides whether an app can act as itself against an external API; an app role instead decides what a specific signed-in user or group is authorized to do inside that one application."
+    },
+    {
+      "id": "f60",
+      "cat": "identityGovernance",
+      "front": "Segregation of duties (SoD) checks",
+      "back": "A segregation of duties check in entitlement management designates two access packages (or incompatible groups) as mutually exclusive, automatically blocking a user's request for one if they already hold the other, enforcing a fraud-prevention control like never letting the same person both approve and process a payment.",
+      "detail": "This is a preventive control enforced at request time, unlike an access review, which only reassesses access that has already been granted."
+    },
+    {
+      "id": "f61",
+      "cat": "identityGovernance",
+      "front": "Entitlement management catalogs",
+      "back": "A catalog is a container that groups related resources (groups, Teams, SharePoint sites, applications) together in entitlement management so a delegated catalog owner -- who need not be a full administrator -- can create and manage access packages built only from that catalog's resources.",
+      "detail": "Organizing resources into a catalog first is what lets a business-unit owner build and publish their own access packages without needing directory-wide administrative rights."
+    },
+    {
+      "id": "f62",
+      "cat": "identityGovernance",
+      "front": "PIM alerts",
+      "back": "Privileged Identity Management surfaces built-in alerts that flag risky configurations, such as too many users holding a permanent Global Administrator assignment, roles being activated too frequently, or duplicate role assignments, so an administrator can proactively investigate rather than only reacting after an incident.",
+      "detail": "These alerts complement PIM audit history, which is a searchable log of every activation, assignment change, and approval decision for after-the-fact investigation."
     }
   ],
   "questions": [
@@ -1351,6 +1456,217 @@
       ],
       "correct": 0,
       "explanation": "Removing direct group memberships and disabling the account through a leaver workflow doesn't automatically also revoke a separately tracked access package assignment -- that needs its own explicit removal task (or the package's own expiration or access review) unless specifically configured as part of the workflow. Disabling an account doesn't itself auto-revoke every access package grant, access packages absolutely do support expiration, and the leaver workflow's built-in tasks are configurable rather than a fixed set that always includes access package removal."
+    },
+    {
+      "id": "q47",
+      "cat": "userIdentities",
+      "type": "mc",
+      "question": "An employee wants to add their personal Android phone so it can access the corporate email app, but IT must never allow that phone to be treated as a corporate-managed device or affect any corporate device-compliance count. Which device join type applies?",
+      "options": [
+        "Microsoft Entra registered",
+        "Microsoft Entra joined",
+        "Microsoft Entra hybrid joined",
+        "A dynamic device group membership rule"
+      ],
+      "correct": 0,
+      "explanation": "Microsoft Entra registered devices simply add a personal or BYOD device's owner account for app access, without making the device itself corporate-managed or hybrid Entra ID joined. Microsoft Entra joined and hybrid joined both imply a level of corporate management the scenario explicitly rules out, and a dynamic device group only affects group membership, not join type."
+    },
+    {
+      "id": "q48",
+      "cat": "userIdentities",
+      "type": "mc",
+      "question": "A newly invited B2B guest user reports they cannot browse the full list of other users and groups in the tenant's directory the way a full-time employee can. Without changing any Conditional Access policy, what explains this by default?",
+      "options": [
+        "External collaboration settings restrict a guest's directory object visibility more than a member's by default",
+        "Guest users are automatically blocked from all sign-in until an access review approves them",
+        "The guest account was created without an assigned Microsoft Entra ID P1 license",
+        "A terms of use policy has not yet been accepted by the guest"
+      ],
+      "correct": 0,
+      "explanation": "By default, external collaboration settings give a guest user more restricted directory visibility than a full member, independent of Conditional Access. Guests are not automatically blocked from sign-in pending an access review, licensing does not control directory browsing visibility, and while an unaccepted terms of use policy can block app access entirely, it does not explain restricted-but-not-blocked directory browsing."
+    },
+    {
+      "id": "q49",
+      "cat": "authAccessMgmt",
+      "type": "mc",
+      "question": "A small organization with no Microsoft Entra ID P1 or P2 licensing wants a simple, no-cost baseline that requires MFA registration for all users and blocks legacy authentication, with no per-policy customization needed. Which feature fits, and what tradeoff comes with it?",
+      "options": [
+        "Security defaults, which cannot generally run at the same time as Conditional Access policies",
+        "Conditional Access templates, which require P1 licensing and can run alongside security defaults",
+        "PIM for Groups, which requires P2 licensing but needs no Conditional Access tradeoff",
+        "Identity Secure Score, which enforces MFA automatically once the score reaches 100%"
+      ],
+      "correct": 0,
+      "explanation": "Security defaults are the free, one-size-fits-all baseline requiring MFA and blocking legacy authentication with zero customization, and a tenant generally cannot run security defaults and Conditional Access at the same time -- adopting Conditional Access means turning security defaults off. Conditional Access templates and PIM for Groups both require paid licensing tiers, and Identity Secure Score is a scoring dashboard, not an enforcement mechanism."
+    },
+    {
+      "id": "q50",
+      "cat": "authAccessMgmt",
+      "type": "mc",
+      "question": "An attacker is scripting repeated password guesses against a single user account. Which Microsoft Entra ID feature temporarily locks the account after a defined number of failed attempts to slow this down, separately from any banned password list?",
+      "options": [
+        "Smart lockout",
+        "Microsoft Entra Password Protection's custom banned password list",
+        "Self-Service Password Reset registration",
+        "Conditional Access report-only mode"
+      ],
+      "correct": 0,
+      "explanation": "Smart lockout temporarily locks an account after a configurable number of failed sign-in attempts, directly slowing down a password-guessing attack. The banned password list instead stops weak or predictable passwords from ever being set in the first place, SSPR registration is unrelated to lockout, and report-only mode only logs what a Conditional Access policy would have done."
+    },
+    {
+      "id": "q51",
+      "cat": "workloadIdentities",
+      "type": "mc",
+      "question": "A consumer-facing productivity add-in should let a user from any Microsoft Entra organization sign in, and also let someone with only a personal Outlook.com account sign in. Which supported account types setting should the app registration use?",
+      "options": [
+        "Accounts in any organizational directory (multi-tenant) and personal Microsoft accounts",
+        "Accounts in this organizational directory only (single tenant)",
+        "Accounts in any organizational directory (multi-tenant) only",
+        "Personal Microsoft accounts only"
+      ],
+      "correct": 0,
+      "explanation": "The combined multi-tenant plus personal Microsoft accounts option is the only one of these that accepts both any Entra organization's users and personal Microsoft accounts like Outlook.com. Single-tenant blocks outside organizations entirely, multi-tenant-only excludes personal accounts, and personal-accounts-only excludes every organizational sign-in."
+    },
+    {
+      "id": "q52",
+      "cat": "workloadIdentities",
+      "type": "mc",
+      "question": "A line-of-business application wants users assigned to it to receive either a Reader or an Approver role inside its own token claims, so the application itself can enforce different in-app permissions per user. Which Microsoft Entra ID feature supports this?",
+      "options": [
+        "App roles defined on the app registration and assigned through the enterprise application",
+        "A delegated Microsoft Graph permission granted to the app",
+        "An application permission granted with admin consent",
+        "A Conditional Access authentication strength requirement"
+      ],
+      "correct": 0,
+      "explanation": "App roles are custom roles the app developer defines and assigns to users or groups so the app itself receives that role in the token and can enforce its own in-app authorization. Delegated and application permissions instead control what the app can do against an external API like Microsoft Graph, and an authentication strength governs which sign-in methods satisfy MFA, not in-app roles."
+    },
+    {
+      "id": "q53",
+      "cat": "identityGovernance",
+      "type": "mc",
+      "question": "A specific business unit's manager, who is not a directory administrator, needs to build and publish access packages using only that business unit's own groups and apps, without being granted any broader administrative rights. What should be configured first?",
+      "options": [
+        "A catalog containing that business unit's resources, with the manager delegated as catalog owner",
+        "A PIM eligible assignment making the manager a Global Administrator",
+        "A Conditional Access policy scoped to the business unit's group",
+        "An administrative unit containing the business unit's users"
+      ],
+      "correct": 0,
+      "explanation": "A catalog groups a specific set of resources together in entitlement management, and delegating someone as catalog owner lets them build and publish access packages from just that catalog's resources without any broader administrative role. Making them a Global Administrator vastly over-grants rights, and Conditional Access and administrative units address sign-in conditions and role-assignment scope, not access package authoring rights."
+    },
+    {
+      "id": "q54",
+      "cat": "identityGovernance",
+      "type": "mc",
+      "question": "Every new hire in the Finance department should automatically receive a specific access package the moment their user attributes indicate they've joined Finance, with no one having to submit or approve an individual request. Which entitlement management feature supports this?",
+      "options": [
+        "An access package auto-assignment policy scoped to a rule matching Finance department attributes",
+        "A request-based access package assignment policy requiring manager approval",
+        "A recurring access review scoped to the Finance department",
+        "A lifecycle workflow triggered only on a fixed calendar schedule"
+      ],
+      "correct": 0,
+      "explanation": "An auto-assignment policy on an access package assigns it automatically to any user matching a defined rule, such as a department attribute, with no request or approval step at all. A request-based policy still requires someone to submit a request, an access review only reassesses access already granted rather than granting new access, and a purely calendar-scheduled lifecycle workflow isn't triggered by an attribute match at all."
+    },
+    {
+      "id": "tf20",
+      "cat": "userIdentities",
+      "type": "tf",
+      "question": "A group naming policy can enforce a prefix/suffix template and a custom blocked words list on self-service group creation without disabling self-service creation entirely.",
+      "answer": true,
+      "explanation": "That is exactly what a group naming policy does -- it enforces naming guardrails automatically while still letting users create groups themselves."
+    },
+    {
+      "id": "tf21",
+      "cat": "authAccessMgmt",
+      "type": "tf",
+      "question": "The Conditional Access 'What If' tool enforces its simulated result immediately against the specified user's next real sign-in.",
+      "answer": false,
+      "explanation": "The What If tool only simulates which policies would apply to a hypothetical sign-in and displays the result -- it never enforces anything or affects a real sign-in."
+    },
+    {
+      "id": "tf22",
+      "cat": "workloadIdentities",
+      "type": "tf",
+      "question": "Automatic user provisioning using SCIM can deprovision a user's account in a SaaS application when that user is removed from the scoping group in Microsoft Entra ID.",
+      "answer": true,
+      "explanation": "SCIM-based automatic provisioning keeps the target app's accounts synchronized with Entra ID group membership and attributes, including disabling or deleting an account when a user falls out of scope."
+    },
+    {
+      "id": "tf23",
+      "cat": "workloadIdentities",
+      "type": "tf",
+      "question": "Risk-based step-up consent can require admin consent for an unusually risky permission request even if the tenant's user consent settings would normally allow the user to approve it themselves.",
+      "answer": true,
+      "explanation": "Risk-based step-up consent overrides a normally permissive user consent setting when Microsoft Entra ID judges a specific request unusually risky, escalating it to require admin consent instead."
+    },
+    {
+      "id": "tf24",
+      "cat": "identityGovernance",
+      "type": "tf",
+      "question": "An access review can be configured so that users review and self-attest to their own continued need for access, rather than always requiring a manager or resource owner as reviewer.",
+      "answer": true,
+      "explanation": "Self-review is a supported access review reviewer type, letting users confirm their own access is still needed instead of always routing it to a manager or resource owner."
+    },
+    {
+      "id": "tf25",
+      "cat": "identityGovernance",
+      "type": "tf",
+      "question": "PIM alerts exist purely for cosmetic reporting and cannot flag a risky configuration such as too many permanent Global Administrator assignments.",
+      "answer": false,
+      "explanation": "PIM alerts are specifically built to flag risky configurations like an excessive number of permanent Global Administrator assignments, letting an administrator investigate proactively rather than only after an incident."
+    },
+    {
+      "id": "msq11",
+      "cat": "userIdentities",
+      "type": "ms",
+      "question": "Which two of the following are true about B2B collaboration versus Azure AD B2C? (Choose two.)",
+      "options": [
+        "B2B collaboration is intended for inviting a partner organization's own employees into your tenant as guests",
+        "Azure AD B2C is built for an organization's own customer-facing applications, letting consumers sign up and sign in with local or social accounts",
+        "B2B collaboration and Azure AD B2C both use exactly the same underlying tenant type",
+        "Azure AD B2C is the correct choice for adding partner-company employees to your workforce tenant"
+      ],
+      "correct": [
+        0,
+        1
+      ],
+      "explanation": "B2B collaboration targets bringing a partner organization's employees in as guests, while Azure AD B2C targets an organization's own customer-facing apps and consumer sign-up/sign-in. The two use distinct tenant types rather than the same one, and B2C is not the right tool for adding partner employees -- that's exactly what B2B collaboration is for."
+    },
+    {
+      "id": "msq12",
+      "cat": "authAccessMgmt",
+      "type": "ms",
+      "question": "Which two of the following statements about sign-in frequency and persistent browser session controls are accurate? (Choose two.)",
+      "options": [
+        "Sign-in frequency can force reauthentication before a token's full lifetime would otherwise have expired",
+        "Disabling persistent browser sessions ends the session as soon as the browser is closed, regardless of the sign-in frequency window",
+        "Both controls are grant controls that decide whether a sign-in is allowed to start",
+        "Session controls take effect before any grant control, such as requiring MFA, is evaluated"
+      ],
+      "correct": [
+        0,
+        1
+      ],
+      "explanation": "Sign-in frequency forces reauthentication ahead of a token's natural lifetime, and disabling persistent browser sessions ends the session on browser close independent of that same sign-in frequency window. Both are session controls, not grant controls, and session controls apply after a sign-in has already been granted, not before grant controls are evaluated."
+    },
+    {
+      "id": "msq13",
+      "cat": "identityGovernance",
+      "type": "ms",
+      "question": "Which two of the following are true about Identity Governance lifecycle workflow triggers? (Choose two.)",
+      "options": [
+        "A workflow can be triggered on a recurring schedule that checks for upcoming joiner or leaver dates",
+        "A workflow can be triggered by a change to a specific user attribute, such as a department update",
+        "Lifecycle workflows can only be triggered by a manual administrator click, with no scheduled or attribute-based option",
+        "An access package auto-assignment policy is required before any lifecycle workflow can ever trigger"
+      ],
+      "correct": [
+        0,
+        1
+      ],
+      "explanation": "Lifecycle workflows support scheduled triggers (checking for upcoming dates) and attribute-based triggers (such as a department change), in addition to on-demand manual runs. They are not limited to manual triggering only, and lifecycle workflows and access package auto-assignment policies are independent features -- neither requires the other."
     }
   ],
   "lessons": [

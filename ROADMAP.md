@@ -467,6 +467,28 @@ come up.
   (roughly 30/40/30) rather than uniform difficulty, weighted across
   each track's categories proportional to their exam-weight `marks` —
   total question bank grew from 1126 to 1263 across all 15 tracks.
+- [x] **Balancing track depth toward AZ-900's bar (user's idea).** The user
+  judged AZ-900 "nearly complete" and asked that the other tracks be
+  brought up to roughly its depth, slimmest first. Measuring flashcard +
+  question count per track (the clearest, most comparable depth signal —
+  lesson prose, onTheJob coverage, Mad Libs, and case studies were
+  already roughly even across all 15 by this point) found AZ-900 a real
+  outlier at 185 combined (66 flashcards, 119 questions) against a pack
+  mostly in the 115-155 range. Round 1 targeted the 5 tracks furthest
+  below the pack: DP-900 (114), DP-300 (115), SC-300 (122), SC-200 (124),
+  AZ-305 (128) — one background agent per track, each adding ~15
+  flashcards and ~17 questions weighted toward its thinnest exam-weighted
+  categories, finding real gaps by cross-referencing existing content
+  against each track's own LESSONS/CHEAT_SHEET text and Microsoft's
+  official skills-measured objectives (not padding with filler), and
+  held to the same anti-wording-giveaway bar as the audit above. Grew
+  the overall question bank from 1263 to 1348 and flashcards from 814 to
+  889. All 5 targets now land in the 146-160 range, solidly mid-pack
+  instead of the bottom; the new lowest tier (AZ-802 135, EHR Integration
+  138, Cloud+ 139, AB-650/SC-500 142 each) is the natural target for a
+  round 2. AZ-900 itself stays the named bar to aim toward, not something
+  to exactly match number-for-number — its 3-broad-category shape doesn't
+  translate cleanly to tracks with 5-7 narrower categories.
 - [x] **Progress export/import.** The app has no accounts, so a cleared browser
   or a new device previously meant losing everything. The ⚙ Data & progress
   panel now downloads all progress (results, seenLog, stats) as a JSON file

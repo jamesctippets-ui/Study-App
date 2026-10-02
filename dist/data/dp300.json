@@ -239,6 +239,27 @@
       "detail": "OPTION (RECOMPILE) trades a fresh, tailored plan on every execution for the CPU cost of compiling every single time \u2014 it fixes the symptom but is rarely the right permanent answer for a query executed extremely frequently."
     },
     {
+      "id": "f50",
+      "cat": "queryPerf",
+      "front": "sys.dm_os_wait_stats",
+      "back": "Aggregates, since the last restart or manual reset, the total time queries have spent waiting on each distinct wait type \u2014 such as PAGEIOLATCH, LCK, or CXPACKET \u2014 making it the starting point for identifying a database's single biggest systemic performance bottleneck category rather than one specific query.",
+      "detail": "Because it is cumulative and database-wide rather than per-query, it complements Diagnosing blocking with sys.dm_exec_requests and sys.dm_os_waiting_tasks: the wait-stats DMV shows the big-picture pattern, while that live DMV pair shows a specific blocking incident happening right now."
+    },
+    {
+      "id": "f51",
+      "cat": "queryPerf",
+      "front": "In-Memory OLTP (memory-optimized tables)",
+      "back": "Stores selected tables entirely in memory with low-contention access and natively compiled stored procedures for the fastest possible execution \u2014 aimed at high-throughput OLTP workloads with heavy lock and latch contention on a small set of hot tables, available on Premium/Business Critical tiers and Managed Instance.",
+      "detail": "It targets contention on frequently updated tables specifically \u2014 a reporting workload dominated by large aggregate scans is better served by a clustered columnstore index instead."
+    },
+    {
+      "id": "f52",
+      "cat": "queryPerf",
+      "front": "Resumable online index operations",
+      "back": "Lets a long-running CREATE INDEX or ALTER INDEX REBUILD, with RESUMABLE = ON, be paused and later resumed from where it left off instead of restarting from scratch, which matters for a large table where the operation might otherwise need to be cancelled mid-way to free up a maintenance window.",
+      "detail": "Pausing a resumable rebuild releases the long-term schema-modification lock it was holding, which is what makes it possible to spread a big index maintenance job across more than one short maintenance window without blocking other work in between."
+    },
+    {
       "id": "f24",
       "cat": "automation",
       "front": "Why SQL Agent jobs do not work in Azure SQL Database",
@@ -265,6 +286,20 @@
       "front": "PowerShell and Azure CLI for repetitive DBA tasks",
       "back": "The Az.Sql PowerShell module (and equivalent az sql CLI commands) scripts routine operations like creating databases, configuring firewall rules, setting service objectives, or triggering failovers, making them repeatable, source-controllable, and usable inside a pipeline or runbook.",
       "detail": "Scripting these operations rather than clicking through the portal is what makes them reusable inside a CI/CD pipeline or an Azure Automation runbook \u2014 the portal and the CLI/PowerShell surface ultimately call the same underlying Azure Resource Manager APIs."
+    },
+    {
+      "id": "f53",
+      "cat": "automation",
+      "front": "Database Mail",
+      "back": "The SQL Server engine feature, available on Managed Instance and SQL Server on Azure VMs but not single-database Azure SQL Database, that sends email from T-SQL or a SQL Agent job step through an SMTP profile \u2014 commonly wired up so a SQL Agent alert or job failure notifies a DBA automatically.",
+      "detail": "Because it depends on SQL Agent and an instance-level mail host, it is not available on single-database Azure SQL Database at all \u2014 there, an Azure Monitor alert's action group is the equivalent way to get an automatic email notification."
+    },
+    {
+      "id": "f54",
+      "cat": "automation",
+      "front": "SQL Agent alerts (severity- and error-based)",
+      "back": "Defined on Managed Instance or SQL Server on Azure VMs to fire automatically when a specific error number occurs, or when any error of a chosen severity level is raised, triggering a SQL Agent job or a Database Mail notification \u2014 distinct from Azure Monitor alerts and diagnostic settings for Azure SQL, which watches platform metrics or log queries instead of raw SQL error events.",
+      "detail": "A SQL Agent alert reacts to an error condition raised inside the engine itself, while an Azure Monitor alert rule reacts to metrics or logged data exported to Azure Monitor \u2014 the two are complementary layers, not competing options for the same instance."
     },
     {
       "id": "f28",
@@ -351,11 +386,53 @@
       "detail": "Auditing can be enabled once at the server level to cover every database on it, which is why it is the answer whenever a scenario wants a record of who did what, rather than active detection or prevention of a threat."
     },
     {
+      "id": "f45",
+      "cat": "security",
+      "front": "Microsoft Entra-only authentication",
+      "back": "A server-level (or managed instance-level) setting that disables all SQL authentication logins entirely, so every connection must authenticate through Microsoft Entra ID \u2014 a step beyond simply configuring Microsoft Entra ID (Azure AD) authentication for Azure SQL, which still leaves SQL logins usable alongside it.",
+      "detail": "This is the setting to reach for when an audit finding says password-based SQL logins must not be usable at all, not merely discouraged, since a Microsoft Entra admin on its own only adds an identity option without removing the SQL-auth path."
+    },
+    {
+      "id": "f46",
+      "cat": "security",
+      "front": "SQL Data Discovery & Classification",
+      "back": "Scans a database's columns for potentially sensitive data, such as national ID numbers or financial account fields, recommends a sensitivity label and information type for each, and lets an administrator accept or adjust the labels, which then surface in audit logs and vulnerability assessment reports.",
+      "detail": "Classification only labels and reports on where sensitive data lives \u2014 applying actual protection to the columns it flags still requires layering on a control such as Dynamic Data Masking (DDM), Always Encrypted, or Row-Level Security (RLS)."
+    },
+    {
+      "id": "f47",
+      "cat": "security",
+      "front": "Private Link (Private Endpoint) for Azure SQL",
+      "back": "Assigns Azure SQL Database or Managed Instance a private IP address inside a virtual network, so traffic from that VNet reaches it over the Microsoft backbone without ever traversing the public internet \u2014 a stricter boundary than Server-level vs. database-level firewall rules, which only filter which public IP ranges may connect.",
+      "detail": "A firewall rule still lets the connection travel over the public endpoint, just from an approved IP; a Private Endpoint instead removes the public path for VNet-based clients entirely, which is the distinction an exam scenario tests when it rules out relying on IP allow-listing alone."
+    },
+    {
       "id": "f40",
       "cat": "hadr",
       "front": "Read scale-out",
       "back": "Routes read-only connections to one of the existing secondary replicas that Premium and Business Critical tiers already run as part of Azure SQL Database built-in high availability, offloading reporting or analytics traffic from the primary replica at no extra compute cost, since it reuses replicas that already exist rather than provisioning anything new.",
       "detail": "Because it depends on those built-in HA replicas, read scale-out is only available on tiers that include them \u2014 it is not itself a separate feature to provision from scratch."
+    },
+    {
+      "id": "f55",
+      "cat": "hadr",
+      "front": "Geo-restore",
+      "back": "Rebuilds a database in any Azure region from its most recent geo-redundant backup, used to recover after the primary region itself has an outage; unlike auto-failover groups or active geo-replication, there is no standing replica already running elsewhere, so both RTO and RPO are far larger.",
+      "detail": "Geo-restore depends on the source database using geo-redundant (or read-access geo-redundant) Backup storage redundancy (LRS/ZRS/GRS/RA-GRS) \u2014 a database configured with locally redundant backup storage has no geo-restore option at all if its region goes down."
+    },
+    {
+      "id": "f56",
+      "cat": "hadr",
+      "front": "Backup storage redundancy (LRS/ZRS/GRS/RA-GRS)",
+      "back": "Controls how many copies of automated backups are kept and where: locally redundant (LRS) keeps copies in one datacenter, zone-redundant (ZRS) spreads them across availability zones in one region, geo-redundant (GRS, the default) also copies them to a paired region, and read-access geo-redundant (RA-GRS) additionally allows read access to that paired-region copy.",
+      "detail": "Geo-restore only works when the backup storage redundancy is geo-redundant (GRS or RA-GRS) \u2014 a database using LRS or ZRS backup storage has nothing in a second region for Geo-restore to recover from."
+    },
+    {
+      "id": "f57",
+      "cat": "hadr",
+      "front": "Instance failover groups (Managed Instance)",
+      "back": "The Managed Instance equivalent of auto-failover groups: it fails over every database on the managed instance together as one unit behind a stable listener endpoint, replicating to a secondary managed instance in another region, rather than letting individual databases be added or removed one at a time the way active geo-replication is configured.",
+      "detail": "Because it operates at the whole-instance level, an instance failover group is the right answer whenever a scenario describes a Managed Instance, not single databases, needing coordinated, all-or-nothing cross-region failover."
     },
     {
       "id": "f41",
@@ -365,11 +442,39 @@
       "detail": "Reach for sys.resource_stats when a scenario asks about a trend over days or weeks; reach for the database-level DMV when it asks what is happening right now."
     },
     {
+      "id": "f48",
+      "cat": "monitor",
+      "front": "Query Performance Insight",
+      "back": "A single-database Azure portal blade that visualizes the top resource-consuming and longest-running queries over a selected time range, using Query Store data underneath, giving a DBA an at-a-glance view without writing any T-SQL against the Query Store catalog views directly.",
+      "detail": "It is a read-only visualization layer over the same data behind Query Store \u2014 a DBA who wants to force a specific plan still ends up in Query Store or SSMS's UI to take that action."
+    },
+    {
+      "id": "f49",
+      "cat": "monitor",
+      "front": "Diagnosing blocking with sys.dm_exec_requests and sys.dm_os_waiting_tasks",
+      "back": "Joining sys.dm_exec_requests (currently executing requests, including a blocking_session_id column) with sys.dm_os_waiting_tasks (what each waiting task is blocked on and by which session) lets a DBA identify, in real time, exactly which session is blocking which other sessions and on what resource.",
+      "detail": "This pair answers 'what is blocked right now and why' \u2014 for a historical view of why a query was slow after the fact, Query Store's wait-statistics category is the better source instead of these two live-snapshot DMVs."
+    },
+    {
       "id": "f42",
       "cat": "platform",
       "front": "Hyperscale named replicas",
       "back": "Additional readable replicas of a Hyperscale database that can be scaled to their own independent compute size, for reporting, analytics, or isolating a workload from the primary \u2014 going beyond the single high-availability replica already included, and distinct from Read scale-out, which only reuses replicas that General Purpose or Business Critical already provision for HA rather than adding new dedicated ones.",
       "detail": "Named replicas are specific to the Service tiers: General Purpose vs. Business Critical vs. Hyperscale tier's storage architecture, since Hyperscale's separated storage layer is what lets a replica be added or resized independently of the primary in the first place."
+    },
+    {
+      "id": "f43",
+      "cat": "platform",
+      "front": "Maintenance window (Azure SQL Database/Managed Instance)",
+      "back": "Lets an administrator select a predictable weekly window \u2014 a specific day and hour range \u2014 during which Azure's planned platform maintenance for a database or managed instance is applied, instead of that maintenance landing at an arbitrary time.",
+      "detail": "Configuring a maintenance window does not reduce how often maintenance happens or how long it takes \u2014 it only shifts when the brief, unavoidable reconnect event is allowed to occur, which matters most for a workload that cannot tolerate a surprise blip during business hours."
+    },
+    {
+      "id": "f44",
+      "cat": "platform",
+      "front": "Azure SQL Migration extension for Azure Data Studio",
+      "back": "A guided, wizard-driven migration path built into Azure Data Studio that assesses an on-premises SQL Server database and migrates it to Azure SQL Managed Instance or Azure SQL Database, including near-zero-downtime online migration, from inside the same tool used for day-to-day query work.",
+      "detail": "It builds on the same assessment and migration engine as Migration tooling: DMA vs. Azure Database Migration Service, but surfaces the whole workflow inside Azure Data Studio's UI instead of requiring a separately managed migration project elsewhere."
     }
   ],
   "questions": [
@@ -1323,6 +1428,235 @@
       ],
       "correct": 0,
       "explanation": "Auto-failover groups add a group-level abstraction with one stable read-write/read-only listener endpoint over a set of databases, so the whole group fails over together and the application's connection string doesn't change. Active geo-replication operates per database with no automatic grouping or stable listener, Always On Availability Groups are a SQL Server/VM feature rather than an Azure SQL Database construct, and zone redundancy protects against a zone failure within one region \u2014 it doesn't provide cross-region group failover."
+    },
+    {
+      "id": "q48",
+      "cat": "platform",
+      "type": "mc",
+      "question": "A DBA working primarily from a MacBook wants a lightweight, notebook-based query and administration tool that runs natively on macOS, rather than a Windows-only GUI tool. Which tool fits?",
+      "options": [
+        "SQL Server Management Studio (SSMS)",
+        "Azure Data Studio",
+        "SQL Server Configuration Manager",
+        "Azure Storage Explorer"
+      ],
+      "correct": 1,
+      "explanation": "Azure Data Studio is a lightweight, cross-platform (Windows, macOS, Linux) tool built around notebooks and extensions, making it the fit for a DBA on macOS. SSMS and SQL Server Configuration Manager are Windows-only, and Azure Storage Explorer manages blob and file storage rather than SQL databases."
+    },
+    {
+      "id": "tf18",
+      "cat": "platform",
+      "type": "tf",
+      "question": "Hyperscale named replicas can be provisioned with their own independent compute size for reporting workloads, whereas read scale-out only reuses replicas that a General Purpose or Business Critical database already runs for high availability.",
+      "answer": true,
+      "explanation": "Named replicas are additional Hyperscale-specific replicas that can be sized independently of the primary, going beyond the single HA replica included by default, while read scale-out simply routes read traffic to an HA replica that General Purpose or Business Critical already provisions rather than adding a new dedicated one."
+    },
+    {
+      "id": "q49",
+      "cat": "platform",
+      "type": "mc",
+      "question": "A retailer wants Azure's routine planned maintenance on its Azure SQL Database to always land during a specific overnight hour of their choosing, rather than at an unpredictable time. What should they configure?",
+      "options": [
+        "A maintenance window",
+        "Long-term retention",
+        "An elastic pool",
+        "Zone-redundant configuration"
+      ],
+      "correct": 0,
+      "explanation": "A maintenance window lets an administrator pick a predictable recurring time slot for planned platform maintenance to be applied. Long-term retention and zone-redundant configuration address backup retention and datacenter-level resiliency, and an elastic pool is about sharing compute across databases \u2014 none of these control maintenance timing."
+    },
+    {
+      "id": "q50",
+      "cat": "security",
+      "type": "mc",
+      "question": "An audit finding requires that password-based SQL logins can no longer be used to connect to an Azure SQL logical server at all, even though a Microsoft Entra ID admin is already configured. What should be enabled to fully close that path?",
+      "options": [
+        "A stricter server-level firewall rule",
+        "Microsoft Entra-only authentication",
+        "Transparent Data Encryption",
+        "Dynamic Data Masking"
+      ],
+      "correct": 1,
+      "explanation": "Microsoft Entra-only authentication disables SQL authentication logins entirely at the server level, closing the password-based path completely; having a Microsoft Entra admin configured on its own only adds an identity option without removing SQL logins. Firewall rules control network access rather than authentication method, and TDE and Dynamic Data Masking are unrelated to login authentication."
+    },
+    {
+      "id": "q51",
+      "cat": "security",
+      "type": "mc",
+      "question": "A DBA wants Azure SQL to scan a database's columns, suggest which ones likely hold sensitive information such as national ID numbers, and let the DBA confirm or adjust a sensitivity label for each, feeding into later audit and vulnerability reports. Which capability provides this?",
+      "options": [
+        "SQL Data Discovery & Classification",
+        "Row-Level Security",
+        "Elastic Database Jobs",
+        "Query Performance Insight"
+      ],
+      "correct": 0,
+      "explanation": "SQL Data Discovery & Classification scans columns, recommends a sensitivity label and information type, and lets an administrator accept or adjust them, with the results surfacing in audit logs and vulnerability assessment reports. Row-Level Security filters rows rather than labeling columns, and the other two options address job scheduling and query visualization, not sensitive-data discovery."
+    },
+    {
+      "id": "msq10",
+      "cat": "security",
+      "type": "ms",
+      "question": "Which two of the following are true about using a Private Endpoint (Private Link) for Azure SQL Database, compared to relying only on firewall rules? (Choose two.)",
+      "options": [
+        "It gives the database a private IP address inside a virtual network",
+        "It routes VNet-based client traffic over the Microsoft backbone instead of the public internet",
+        "It removes the need to ever configure Microsoft Entra ID authentication",
+        "It only works when database-level firewall rules are disabled first"
+      ],
+      "correct": [
+        0,
+        1
+      ],
+      "explanation": "A Private Endpoint assigns the database a private IP inside a VNet and lets approved VNet traffic reach it over the Microsoft backbone rather than the public internet, unlike firewall rules, which merely filter which public IPs may connect. It has no effect on authentication method, and it does not require disabling firewall rules \u2014 the two network controls can coexist."
+    },
+    {
+      "id": "q52",
+      "cat": "monitor",
+      "type": "mc",
+      "question": "Management asks for a simple portal view showing which queries have consumed the most CPU and taken the longest to run over the past week, without anyone writing a T-SQL query against Query Store's catalog views. What should they be pointed to?",
+      "options": [
+        "Query Performance Insight",
+        "sys.dm_db_resource_stats",
+        "Dynamic Data Masking configuration",
+        "Elastic Database Jobs history"
+      ],
+      "correct": 0,
+      "explanation": "Query Performance Insight is a portal blade that visualizes top resource-consuming and longest-running queries over a chosen time range, built on Query Store data, with no T-SQL required. sys.dm_db_resource_stats reports overall resource utilization rather than per-query detail, and the other two options are unrelated to query performance visualization."
+    },
+    {
+      "id": "tf19",
+      "cat": "monitor",
+      "type": "tf",
+      "question": "Joining sys.dm_exec_requests with sys.dm_os_waiting_tasks lets a DBA see, in real time, which session is currently blocking which other session and what resource it is waiting on.",
+      "answer": true,
+      "explanation": "sys.dm_exec_requests exposes each request's blocking_session_id, and sys.dm_os_waiting_tasks details what a waiting task is blocked on, so joining the two surfaces exactly which session is blocking which and why, right now."
+    },
+    {
+      "id": "q53",
+      "cat": "queryPerf",
+      "type": "mc",
+      "question": "A DBA wants to identify the single category of wait \u2014 such as I/O, locking, or CPU scheduling \u2014 that queries have spent the most cumulative time on since the last restart, to prioritize where to focus tuning effort. Which DMV provides this?",
+      "options": [
+        "sys.dm_os_wait_stats",
+        "sys.dm_db_missing_index_details",
+        "sys.dm_exec_connections",
+        "sys.dm_db_resource_stats"
+      ],
+      "correct": 0,
+      "explanation": "sys.dm_os_wait_stats aggregates cumulative time spent on each wait type since the last restart or reset, making it the starting point for identifying the biggest systemic bottleneck category. The missing index DMV reports index recommendations, sys.dm_exec_connections lists active connections, and sys.dm_db_resource_stats reports overall resource utilization rather than a breakdown by wait type."
+    },
+    {
+      "id": "q54",
+      "cat": "queryPerf",
+      "type": "mc",
+      "question": "A high-throughput order-entry table is experiencing heavy lock and latch contention from thousands of small concurrent updates per second, and a rewrite of the hot path is acceptable to reduce that contention. Which Azure SQL feature is purpose-built for this?",
+      "options": [
+        "A clustered columnstore index",
+        "In-Memory OLTP (memory-optimized tables)",
+        "Dynamic Data Masking",
+        "Read scale-out"
+      ],
+      "correct": 1,
+      "explanation": "In-Memory OLTP stores selected tables in memory with low-contention access and natively compiled stored procedures, specifically targeting high-throughput OLTP workloads with heavy contention on a small set of hot tables. A columnstore index instead accelerates large analytical scans rather than row-by-row OLTP contention, and Dynamic Data Masking and read scale-out address unrelated concerns."
+    },
+    {
+      "id": "msq11",
+      "cat": "queryPerf",
+      "type": "ms",
+      "question": "Which two of the following are true about a resumable online index rebuild (ALTER INDEX ... REBUILD WITH (ONLINE = ON, RESUMABLE = ON))? (Choose two.)",
+      "options": [
+        "It can be paused partway through and later resumed instead of restarting from scratch",
+        "Pausing it releases the long-term schema-modification lock it was holding",
+        "It is limited to tables smaller than 2 GB",
+        "It blocks all other queries against the table for its entire duration, the same as an offline rebuild"
+      ],
+      "correct": [
+        0,
+        1
+      ],
+      "explanation": "A resumable rebuild can be paused and resumed from where it left off, and pausing it releases the schema-modification lock so other work isn't blocked in the meantime. It is not limited by table size \u2014 it is specifically useful for large tables \u2014 and being online-capable, it does not block other queries for its entire duration the way an offline rebuild does."
+    },
+    {
+      "id": "q55",
+      "cat": "automation",
+      "type": "mc",
+      "question": "On a Managed Instance, a DBA wants a SQL Agent job step to send an email automatically when a nightly maintenance job fails. Which feature must be configured to make that possible?",
+      "options": [
+        "Database Mail with a configured SMTP profile",
+        "An Azure Monitor action group",
+        "Dynamic Data Masking",
+        "Elastic Database Jobs"
+      ],
+      "correct": 0,
+      "explanation": "Database Mail, configured with an SMTP profile, is the SQL Server engine feature that lets T-SQL or a SQL Agent job step send email directly, which is exactly what a SQL Agent job failure notification depends on. An Azure Monitor action group is the equivalent mechanism for Azure SQL Database's platform-level alerts, not for a SQL Agent job step on Managed Instance, and the other two options are unrelated features."
+    },
+    {
+      "id": "tf20",
+      "cat": "automation",
+      "type": "tf",
+      "question": "A SQL Agent alert configured to fire on any error of severity 19 or higher reacts to error conditions raised inside the SQL Server engine itself, rather than to an Azure platform metric or log query the way an Azure Monitor alert rule does.",
+      "answer": true,
+      "explanation": "SQL Agent alerts are defined against SQL Server engine error numbers or severity levels raised internally, whereas Azure Monitor alert rules watch platform-level metrics or Log Analytics query results \u2014 the two are complementary layers operating on different kinds of signals."
+    },
+    {
+      "id": "q56",
+      "cat": "automation",
+      "type": "mc",
+      "question": "A DBA needs to notify the on-call team the moment a specific SQL Server error with severity 21 occurs on a Managed Instance, using the engine's own built-in alerting rather than exporting logs to Azure Monitor first. What should they configure?",
+      "options": [
+        "An Azure Monitor alert rule on a custom log query",
+        "A SQL Agent alert tied to that severity level, paired with Database Mail",
+        "A database-level firewall rule",
+        "Long-term retention with a 10-year policy"
+      ],
+      "correct": 1,
+      "explanation": "A SQL Agent alert can be defined to fire on a specific error severity raised by the engine itself, and pairing it with Database Mail lets that alert send an email without needing anything exported to Azure Monitor first. An Azure Monitor alert rule depends on diagnostic data already flowing to Azure Monitor, and the other two options are unrelated to error-triggered notification."
+    },
+    {
+      "id": "q57",
+      "cat": "hadr",
+      "type": "mc",
+      "question": "The entire Azure region hosting a company's Azure SQL Database becomes unavailable, and no auto-failover group or geo-replication secondary was ever configured. Which option can still recover the database in a different region?",
+      "options": [
+        "Geo-restore from geo-redundant backups",
+        "Read scale-out to a secondary replica",
+        "Zone-redundant configuration",
+        "Dynamic Data Masking"
+      ],
+      "correct": 0,
+      "explanation": "Geo-restore rebuilds a database in any region from its most recent geo-redundant backup when no standing secondary replica exists elsewhere, though since nothing was already running, its RTO and RPO are far larger than a failover group's near-instant, pre-replicated failover. Read scale-out only offloads reads within an existing replica pair, zone redundancy protects against a zone loss within one region rather than a full regional outage, and Dynamic Data Masking has no relationship to disaster recovery."
+    },
+    {
+      "id": "q58",
+      "cat": "hadr",
+      "type": "mc",
+      "question": "A database currently uses locally redundant (LRS) backup storage. During a regional outage, the DBA attempts a geo-restore to another region and finds no backup available to restore from there. What is the most likely reason?",
+      "options": [
+        "Geo-restore requires geo-redundant backup storage, which LRS does not provide",
+        "Geo-restore only works for databases smaller than 100 GB",
+        "LRS backups expire after 24 hours, unlike GRS backups",
+        "Geo-restore requires an auto-failover group to already exist"
+      ],
+      "correct": 0,
+      "explanation": "Geo-restore depends on backup storage having already been copied to a paired region, which only happens with geo-redundant (GRS) or read-access geo-redundant (RA-GRS) storage \u2014 LRS keeps copies within a single datacenter only, so there is nothing in another region to restore from. The other options describe restrictions that do not actually apply to geo-restore."
+    },
+    {
+      "id": "msq12",
+      "cat": "hadr",
+      "type": "ms",
+      "question": "Which two of the following are true about instance failover groups on Azure SQL Managed Instance? (Choose two.)",
+      "options": [
+        "They fail over every database on the managed instance together as one unit",
+        "They replicate to a secondary managed instance in another region behind a stable listener endpoint",
+        "They are configured individually, one database at a time, the same way active geo-replication is",
+        "They are only available for Azure SQL Database single databases, not Managed Instance"
+      ],
+      "correct": [
+        0,
+        1
+      ],
+      "explanation": "An instance failover group fails over an entire managed instance's databases together as one unit, replicating to a secondary managed instance in another region behind a stable listener endpoint. It operates at the whole-instance level rather than being configured per database like active geo-replication, and it is specifically a Managed Instance feature, not a single-database one."
     }
   ],
   "lessons": [
