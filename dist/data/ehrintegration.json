@@ -445,6 +445,111 @@
       "front": "Information blocking",
       "back": "A practice, prohibited under federal rules, that unreasonably interferes with, prevents, or discourages the access, exchange, or use of electronic health information by actors like EHR vendors, health information networks, and healthcare providers -- distinct from a narrowly scoped, legitimate exception such as a genuine security risk or a truly infeasible request. Federal information-blocking rules are a major reason Why FHIR adoption grew so quickly, pushing EHR vendors to expose real, usable FHIR APIs instead of treating interoperability as an optional add-on.",
       "detail": "Information blocking isn't just a technical API question anymore -- it's the reason a hospital's own legal and compliance teams now get pulled into decisions, like which data elements an API is even allowed to withhold, that used to be purely engineering calls."
+    },
+    {
+      "id": "f57",
+      "cat": "hl7v2Messaging",
+      "front": "PV1 segment (Patient Visit)",
+      "back": "PV1 carries encounter-level details for a patient's current visit -- patient class (inpatient, outpatient, emergency), assigned location (nursing unit, room, bed), attending doctor, and admission type -- and typically appears alongside the PID segment in an ADT message type and other encounter-related messages.",
+      "detail": "A patient's current bed and unit assignment is exactly the kind of PV1 data that ancillary systems like dietary or housekeeping depend on to know where to physically find the patient right now."
+    },
+    {
+      "id": "f58",
+      "cat": "hl7v2Messaging",
+      "front": "ORC segment (Common Order)",
+      "back": "ORC carries order-level control information shared across order and result messages -- an order control code, the placer and filler order numbers used to track the order across systems, and the ordering provider -- and groups together with the more order-type-specific OBR segment that follows it.",
+      "detail": "Because the same ORC/OBR pairing structure appears in both an ORM message type and ORU message type, ORC is one of the easiest segments to recognize across otherwise very different messages."
+    },
+    {
+      "id": "f59",
+      "cat": "hl7v2Messaging",
+      "front": "MSA segment (Message Acknowledgment)",
+      "back": "MSA is the segment inside an acknowledgment message that actually carries the acknowledgment code described in ACK and NAK: how HL7 v2 confirms delivery, and echoes back the original message's control ID, letting the sender match the acknowledgment to the specific message it was replying to.",
+      "detail": "Without that echoed control ID, a system firing off many messages in quick succession would have no reliable way to tell which acknowledgment belonged to which outbound message."
+    },
+    {
+      "id": "f60",
+      "cat": "hl7v2Messaging",
+      "front": "VXU message type",
+      "back": "VXU (Unsolicited Vaccination Record Update) messages send immunization history to systems like state immunization registries, carrying one or more RXA segments with the vaccine given, date, lot number, and administering provider.",
+      "detail": "VXU traffic is a major reason public health agencies can maintain statewide immunization registries without every provider manually re-entering records into a separate portal."
+    },
+    {
+      "id": "f61",
+      "cat": "fhirModernApis",
+      "front": "Clinical terminology standards: LOINC, SNOMED CT, RxNorm, ICD-10",
+      "back": "FHIR and HL7 v2 both rely on external coding systems to make coded values actually interoperable: LOINC identifies lab tests and panels, SNOMED CT codes clinical findings and conditions, RxNorm codes medications, and ICD-10 codes diagnoses for billing -- a coded field in either standard is only as interoperable as the terminology system it points to.",
+      "detail": "Two systems can both send a 'glucose result' using the exact same field, but if one uses a local, homegrown code and the other uses LOINC, a receiving system has no reliable way to know they mean the same test without a mapping table."
+    },
+    {
+      "id": "f62",
+      "cat": "fhirModernApis",
+      "front": "DiagnosticReport resource",
+      "back": "DiagnosticReport represents the finalized result of a diagnostic study -- a lab panel, imaging study, or pathology report -- grouping one or more individual Observation results together under a single report-level status, conclusion, and reference to the ordering request.",
+      "detail": "Where a single Observation carries one measured value, DiagnosticReport is the resource that ties a whole panel of them together into the report a clinician actually reads, similar in spirit to how an OBR segment in HL7 v2 groups a set of OBX results together."
+    },
+    {
+      "id": "f63",
+      "cat": "fhirModernApis",
+      "front": "Immunization resource",
+      "back": "Immunization represents a vaccine administration event -- the vaccine product, date given, dose number, lot number, and administering provider -- the FHIR counterpart to the immunization history an HL7 v2 VXU message type carries to a registry using RXA segments.",
+      "detail": "A patient portal showing a vaccination history is very likely rendering Immunization resources pulled straight from a FHIR API rather than an HL7 v2 feed."
+    },
+    {
+      "id": "f64",
+      "cat": "fhirModernApis",
+      "front": "FHIR $everything operation",
+      "back": "The $everything operation, invoked against a specific Patient resource's endpoint, returns a single Bundle containing that patient's record and everything clinically relevant referencing it -- encounters, observations, conditions, medications -- in one call, instead of repeating the ordinary FHIR RESTful access pattern once per resource type.",
+      "detail": "This is the kind of operation a chart-summary or care-coordination app leans on heavily, trading a dozen or more individual searches for one broad pull of a patient's whole FHIR record."
+    },
+    {
+      "id": "f65",
+      "cat": "integrationEngines",
+      "front": "Mirth Connect channel pattern (source and destination connectors)",
+      "back": "A widely used open-source integration engine pattern organizes work into channels, each with one source connector that receives an inbound message, an optional chain of filters and transformers that accept/reject and reshape the message, and one or more destination connectors that deliver the transformed result onward -- the same generic source-filter-transform-destination shape most commercial integration engines follow under different names.",
+      "detail": "Thinking in channels makes troubleshooting concrete: a message that never arrived could have failed at the source connector, been rejected by a filter, broken during transformation, or failed at a specific destination -- each a different place to look."
+    },
+    {
+      "id": "f66",
+      "cat": "integrationEngines",
+      "front": "Content-based routing vs. type-based routing",
+      "back": "Type-based routing sends a message to its destinations purely based on its message type (every ADT message type goes to the same set of systems); content-based routing inspects values inside the message -- like a specific facility code or patient location -- to decide its destinations, letting the same message type fan out differently depending on what's actually in it.",
+      "detail": "Content-based routing is what lets one ADT feed serve ten different nursing units' downstream systems correctly, routing each admission only to the systems that actually care about that specific unit."
+    },
+    {
+      "id": "f67",
+      "cat": "integrationEngines",
+      "front": "Point-to-point integration topology",
+      "back": "In a point-to-point topology, each pair of systems that needs to exchange data gets its own dedicated, directly built connection, with no central engine in between -- simple for just two systems, but the number of connections needed grows sharply as more systems are added, which is exactly the scaling problem a Hub-and-spoke integration topology is built to avoid.",
+      "detail": "A hospital that grew its interfaces organically, one point-to-point connection at a time, often ends up migrating to a hub-and-spoke topology specifically because the point-to-point mesh became too costly to maintain as systems multiplied."
+    },
+    {
+      "id": "f68",
+      "cat": "integrationEngines",
+      "front": "Idempotency and duplicate message handling",
+      "back": "An idempotent interface design recognizes and safely ignores a message it has already processed -- using the message's unique control ID or a similar key -- so a legitimate retry after an ACK timeout doesn't create a duplicate admission, duplicate order, or duplicate charge the second time the same message arrives.",
+      "detail": "Without idempotency, a sender that retries after an ACK timeout, when the original message actually did arrive, can leave a receiving system with the same order or charge recorded twice."
+    },
+    {
+      "id": "f69",
+      "cat": "dataGovernance",
+      "front": "TEFCA (Trusted Exchange Framework and Common Agreement)",
+      "back": "TEFCA is the federal framework establishing a common set of legal and technical terms that qualified health information networks agree to, so that a provider connected to any one participating network can exchange data with providers on any other participating network without needing a separate one-off agreement for each connection.",
+      "detail": "TEFCA is meant to do for nationwide exchange what a single Health Information Exchange (HIE) already does regionally -- just at a much larger, network-of-networks scale, reducing the need for every pair of networks to negotiate their own bilateral agreement."
+    },
+    {
+      "id": "f70",
+      "cat": "dataGovernance",
+      "front": "Break-the-glass emergency access",
+      "back": "A break-the-glass override lets an authorized user access a patient's record outside their normal role-based permissions during a genuine emergency, typically requiring the user to document a reason at the time of access, with that access then flagged for mandatory after-the-fact audit review.",
+      "detail": "Break-the-glass trades some access friction for the near-certainty that someone will review the justification afterward -- it isn't an unmonitored backdoor, it's a documented, audited exception."
+    },
+    {
+      "id": "f71",
+      "cat": "dataGovernance",
+      "front": "Role-based access control (RBAC) in EHR systems",
+      "back": "RBAC grants system access based on a user's assigned role -- a nurse, a pharmacist, a billing clerk -- rather than configuring permissions individually per person, so a new hire in a given role automatically gets the access that role requires and nothing more, consistent with HIPAA's Minimum necessary standard.",
+      "detail": "RBAC is what makes a break-the-glass emergency access override meaningful as an exception -- it only matters because normal role-based access was deliberately narrower in the first place."
     }
   ],
   "questions": [
@@ -1546,6 +1651,234 @@
       ],
       "correct": 0,
       "explanation": "A BAA is specifically the HIPAA-required contract spelling out how a vendor handling protected health information on a covered entity's behalf must safeguard and use it. An uptime guarantee belongs in an SLA, an interface schema is a technical integration artifact, and a BAA constrains a vendor's use of data rather than granting it ownership."
+    },
+    {
+      "id": "q53",
+      "cat": "hl7v2Messaging",
+      "type": "mc",
+      "question": "Which HL7 v2 segment carries encounter-level details such as patient class, assigned nursing unit and bed, and attending doctor?",
+      "options": [
+        "PID",
+        "PV1",
+        "OBR",
+        "EVN"
+      ],
+      "correct": 1,
+      "explanation": "PV1 (Patient Visit) carries encounter-level details like patient class, location, and attending doctor. PID carries demographics, OBR carries order detail, and EVN carries event-type information in ADT messages -- none of which hold visit-level location data."
+    },
+    {
+      "id": "q54",
+      "cat": "hl7v2Messaging",
+      "type": "mc",
+      "question": "In an HL7 v2 acknowledgment message, which segment actually carries the AA, AE, or AR acknowledgment code and echoes back the original message's control ID?",
+      "options": [
+        "MSA",
+        "PID",
+        "NTE",
+        "PV1"
+      ],
+      "correct": 0,
+      "explanation": "MSA (Message Acknowledgment) carries the acknowledgment code and echoes the original message control ID so the sender can match the response to the right outbound message. PID holds patient demographics, NTE carries free-text notes, and PV1 carries visit details -- none of which carry acknowledgment status."
+    },
+    {
+      "id": "tf18",
+      "cat": "hl7v2Messaging",
+      "type": "tf",
+      "question": "A VXU message type is used to send a patient's immunization history to a system such as a state immunization registry.",
+      "answer": true,
+      "explanation": "VXU (Unsolicited Vaccination Record Update) messages carry immunization history, typically using RXA segments for each vaccine given, often to a state or regional immunization registry."
+    },
+    {
+      "id": "msq14",
+      "cat": "hl7v2Messaging",
+      "type": "ms",
+      "question": "Which of the following are true about the ORC segment in HL7 v2 order and result messages? (Select all that apply)",
+      "options": [
+        "It carries order-level control information like placer and filler order numbers",
+        "It typically appears alongside the OBR segment in order and result messages",
+        "It is a type of custom Z-segment reserved for vendor-specific data",
+        "It replaces the need for an OBR segment entirely in every order message"
+      ],
+      "correct": [
+        0,
+        1
+      ],
+      "explanation": "ORC carries shared order-control information, including placer and filler order numbers, and routinely appears paired with the OBR segment. It is a standard base-specification segment, not a Z-segment, and it doesn't replace OBR -- the two work together, each carrying different order details."
+    },
+    {
+      "id": "q55",
+      "cat": "fhirModernApis",
+      "type": "mc",
+      "question": "Which clinical terminology standard is most commonly used to code laboratory test and panel names in both FHIR Observations and HL7 v2 OBX segments?",
+      "options": [
+        "ICD-10",
+        "LOINC",
+        "RxNorm",
+        "CPT"
+      ],
+      "correct": 1,
+      "explanation": "LOINC is the standard specifically built to identify laboratory tests and panels. ICD-10 codes diagnoses, RxNorm codes medications, and CPT codes procedures for billing -- none of which is designed for identifying lab test names."
+    },
+    {
+      "id": "q56",
+      "cat": "fhirModernApis",
+      "type": "mc",
+      "question": "What does the DiagnosticReport resource primarily represent?",
+      "options": [
+        "A single raw measured value recorded with no surrounding report context",
+        "A finalized diagnostic study result that groups related Observations under one report",
+        "A request for a diagnostic study that has not been performed yet",
+        "A patient's insurance coverage information for diagnostic services rendered"
+      ],
+      "correct": 1,
+      "explanation": "DiagnosticReport groups one or more individual Observation results together under a single finalized report, with its own status and conclusion. A single raw value is just an Observation, a not-yet-performed request is a ServiceRequest, and insurance coverage is handled by the Coverage resource."
+    },
+    {
+      "id": "q57",
+      "cat": "fhirModernApis",
+      "type": "mc",
+      "question": "A care-coordination app calls the $everything operation against a specific Patient resource. What does this primarily let the app do?",
+      "options": [
+        "Retrieve every patient in the system within a single Bundle",
+        "Retrieve one patient's full clinically relevant record in a single call",
+        "Delete every resource associated with that patient in one request",
+        "Bypass SMART on FHIR scopes for that one request only"
+      ],
+      "correct": 1,
+      "explanation": "$everything pulls together one specific patient's clinically relevant resources into a single Bundle, saving the client from issuing a separate search per resource type. It does not return every patient in the system, delete anything, or bypass authorization scopes -- it's still subject to the same scoped access as any other FHIR call."
+    },
+    {
+      "id": "tf19",
+      "cat": "fhirModernApis",
+      "type": "tf",
+      "question": "The FHIR Immunization resource and an HL7 v2 VXU message generally carry the same kind of underlying information -- a vaccine administration event -- just represented in two different standards.",
+      "answer": true,
+      "explanation": "Both represent the same real-world event, a vaccine given to a patient; VXU carries it as an HL7 v2 message with RXA segments, while Immunization carries the equivalent information as a discrete FHIR resource."
+    },
+    {
+      "id": "msq15",
+      "cat": "fhirModernApis",
+      "type": "ms",
+      "question": "Which of the following statements about clinical terminology standards are accurate? (Select all that apply)",
+      "options": [
+        "LOINC is used to identify laboratory tests and panels",
+        "RxNorm is used to code medications",
+        "SNOMED CT is a transport protocol for moving HL7 v2 messages",
+        "ICD-10 is commonly used to code diagnoses for billing purposes"
+      ],
+      "correct": [
+        0,
+        1,
+        3
+      ],
+      "explanation": "LOINC codes lab tests, RxNorm codes medications, and ICD-10 codes diagnoses for billing -- all accurate. SNOMED CT is a clinical terminology for coding findings and conditions, not a transport protocol, and has nothing to do with moving messages between systems."
+    },
+    {
+      "id": "q58",
+      "cat": "integrationEngines",
+      "type": "mc",
+      "question": "In a Mirth Connect-style integration engine channel, what is the role of a destination connector?",
+      "options": [
+        "Receiving the original inbound message from the source system",
+        "Delivering the transformed message onward to a downstream system",
+        "Rejecting a message outright before any transformation occurs",
+        "Storing the hospital's permanent legal medical record"
+      ],
+      "correct": 1,
+      "explanation": "A destination connector delivers the transformed message onward to a downstream system, after the source connector receives it and any filters or transformers have run. Rejecting a message before transformation is a filter's job, and storing the legal medical record belongs to the EHR, not the integration engine."
+    },
+    {
+      "id": "q59",
+      "cat": "integrationEngines",
+      "type": "mc",
+      "question": "An integration engine is configured to route a message to different downstream systems depending on a facility code found inside the message itself, rather than just its message type. What routing approach does this describe?",
+      "options": [
+        "Type-based routing",
+        "Content-based routing",
+        "Hub-and-spoke routing",
+        "Store-and-forward routing"
+      ],
+      "correct": 1,
+      "explanation": "Content-based routing inspects values inside the message, like a facility code, to decide where it goes, letting the same message type fan out differently depending on content. Type-based routing would route purely by message type regardless of content, while hub-and-spoke and store-and-forward describe topology and reliability patterns, not routing logic."
+    },
+    {
+      "id": "tf20",
+      "cat": "integrationEngines",
+      "type": "tf",
+      "question": "In a point-to-point integration topology, the number of direct connections needed generally grows sharply as more systems are added, which is a key reason hospitals often migrate toward a hub-and-spoke integration topology instead.",
+      "answer": true,
+      "explanation": "Point-to-point connections scale poorly because every new system potentially needs its own dedicated connection to every other system it exchanges data with, which is exactly the scaling problem hub-and-spoke is designed to solve by centralizing connections through one hub."
+    },
+    {
+      "id": "msq16",
+      "cat": "integrationEngines",
+      "type": "ms",
+      "question": "Which of the following help an interface safely handle a legitimate message retry without creating duplicate data? (Select all that apply)",
+      "options": [
+        "Recognizing a message's unique control ID to detect it has already been processed",
+        "Designing the receiving system's processing to be idempotent for repeated messages",
+        "Creating a brand-new order or charge record every time a message arrives, without checking for duplicates",
+        "Ignoring ACK timeouts so the sender never retries in the first place"
+      ],
+      "correct": [
+        0,
+        1
+      ],
+      "explanation": "Recognizing an already-processed control ID and building idempotent processing are exactly what let a legitimate retry get safely ignored instead of creating a duplicate. Blindly creating a new record every time is the opposite of safe duplicate handling, and ignoring ACK timeouts doesn't prevent retries -- it just removes the sender's signal that something needs attention."
+    },
+    {
+      "id": "q60",
+      "cat": "dataGovernance",
+      "type": "mc",
+      "question": "What is the primary purpose of TEFCA (Trusted Exchange Framework and Common Agreement)?",
+      "options": [
+        "Letting participating health information networks exchange data under one common agreement instead of separate bilateral deals",
+        "Replacing HIPAA's minimum necessary standard with a less restrictive federal rule",
+        "Defining the specific FHIR resource structure used for immunization records",
+        "Requiring every hospital nationwide to adopt one single named EHR vendor"
+      ],
+      "correct": 0,
+      "explanation": "TEFCA establishes common terms that qualified health information networks agree to, so a provider on one participating network can exchange with providers on another without negotiating a separate one-off agreement each time. It does not replace minimum necessary, define a FHIR resource's structure, or mandate a single EHR vendor."
+    },
+    {
+      "id": "q61",
+      "cat": "dataGovernance",
+      "type": "mc",
+      "question": "Which access-control approach grants a new hire in the pharmacist role automatically whatever system permissions the pharmacist role requires, without configuring each person's access individually?",
+      "options": [
+        "Break-the-glass emergency access",
+        "Role-based access control (RBAC)",
+        "Minimum necessary standard",
+        "Expert Determination"
+      ],
+      "correct": 1,
+      "explanation": "RBAC grants access based on a user's assigned role, so a new pharmacist automatically inherits the role's standard permissions rather than needing individually configured access. Break-the-glass is a documented emergency override, minimum necessary limits the scope of a specific disclosure, and Expert Determination is a de-identification method -- none of which describe role-based provisioning."
+    },
+    {
+      "id": "tf21",
+      "cat": "dataGovernance",
+      "type": "tf",
+      "question": "A break-the-glass emergency access override is meant to function as a completely unmonitored way for any user to bypass normal access restrictions whenever they feel it's needed.",
+      "answer": false,
+      "explanation": "Break-the-glass is a documented, audited exception -- the user records a reason at the time of access, and that access is flagged for mandatory after-the-fact review, not left unmonitored or available for any reason a user happens to feel justifies it."
+    },
+    {
+      "id": "msq17",
+      "cat": "dataGovernance",
+      "type": "ms",
+      "question": "Which of the following are accurate about role-based access control (RBAC) and break-the-glass emergency access in an EHR? (Select all that apply)",
+      "options": [
+        "RBAC assigns permissions based on a user's role rather than configuring access person by person",
+        "Break-the-glass access requires documenting a reason and is subject to after-the-fact audit review",
+        "Break-the-glass access permanently replaces a user's normal role-based permissions going forward",
+        "RBAC is generally consistent with HIPAA's minimum necessary standard by limiting access to what a role actually needs"
+      ],
+      "correct": [
+        0,
+        1,
+        3
+      ],
+      "explanation": "RBAC's role-based permission model and its alignment with minimum necessary are accurate, as is break-the-glass requiring documentation and audit review. Break-the-glass is a temporary, logged exception for a specific access event -- it does not permanently replace a user's ordinary role-based permissions."
     }
   ],
   "lessons": [

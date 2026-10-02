@@ -446,6 +446,111 @@
       "front": "NSG flow logs vs. Traffic Analytics",
       "back": "NSG flow logs record raw accepted and denied traffic for a Network security group (NSG) vs. application security group (ASG), but by themselves are just log rows with no visualization. Traffic Analytics processes those same flow logs into a pre-built dashboard and anomaly insights, which is why enabling flow logs alone still leaves a team with no visual dashboard until Traffic Analytics is turned on as well.",
       "detail": "A team that enables flow logs and stops there commonly assumes visibility exists that doesn't \u2014 the raw logs are sitting in the workspace, but nobody actually looks at them until Traffic Analytics (or a custom KQL query) is layered on top."
+    },
+    {
+      "id": "f62",
+      "cat": "identityAccessGovernance",
+      "front": "Access reviews vs. entitlement management access packages",
+      "back": "Entitlement management: access packages handle requesting new bundled access through an approval workflow. Access reviews instead periodically recertify access a user already holds \u2014 a group, an access package, an app, or even a PIM role assignment \u2014 letting a reviewer confirm it should continue, be removed, or (if nobody responds) be automatically denied at the end of the review.",
+      "detail": "A one-time expiration date on an access package is a hard cutoff, not a recertification \u2014 an access review is the separate, recurring check on whether access that is still active should keep being active at all."
+    },
+    {
+      "id": "f63",
+      "cat": "identityAccessGovernance",
+      "front": "Lifecycle workflows (Microsoft Entra ID Governance)",
+      "back": "Automated, event-triggered Entra ID Governance workflows that run a defined set of tasks when a user joins, changes role, or leaves the organization \u2014 for example enabling an account and adding it to groups on a recorded hire date, or disabling the account and removing licenses on a recorded leaver date \u2014 without an administrator manually performing those steps.",
+      "detail": "Unlike Entitlement management: access packages, which a user actively requests, a lifecycle workflow triggers automatically off an HR-driven attribute change, so an account can be fully deprovisioned the moment a leaver date is recorded, with nobody needing to remember to request anything."
+    },
+    {
+      "id": "f64",
+      "cat": "identityAccessGovernance",
+      "front": "Emergency access (break-glass) accounts",
+      "back": "A small number of highly privileged, non-federated cloud-only accounts kept specifically excluded from Conditional Access policies, so an organization can still sign in and administer Microsoft Entra ID if its normal Conditional Access policies, MFA methods, or federated identity provider become unavailable. Their credentials and sign-in activity are tightly monitored and alerted on.",
+      "detail": "A break-glass account that isn't actually excluded from every Conditional Access policy can lock an organization out of its own tenant during exactly the kind of outage it exists to survive, which is why confirming that exclusion is a recurring audit check, not a one-time setup step."
+    },
+    {
+      "id": "f65",
+      "cat": "identityAccessGovernance",
+      "front": "Authentication context (step-up Conditional Access for privileged actions)",
+      "back": "Tags a specific sensitive action \u2014 such as activating a role in PIM for Azure resource roles or editing Conditional Access policy itself \u2014 with an authentication context value, letting a policy require a stronger control, like phishing-resistant MFA, only at that moment rather than applying the same requirement to every sign-in regardless of what the user is about to do.",
+      "detail": "This is what lets PIM role activation itself demand step-up verification: a user can sign in normally for everyday work, then still be challenged for phishing-resistant MFA the instant they try to activate a privileged role."
+    },
+    {
+      "id": "f66",
+      "cat": "identityAccessGovernance",
+      "front": "Microsoft Entra Connect Health",
+      "back": "Monitors the health, performance, and usage of on-premises hybrid identity infrastructure \u2014 Microsoft Entra Connect sync servers and AD FS \u2014 alerting on sync errors and surfacing risk detections such as password spray or brute-force attempts seen against on-premises authentication endpoints that would otherwise go unnoticed.",
+      "detail": "Without Connect Health, a broken sync server can silently stop provisioning or deprovisioning accounts into Microsoft Entra ID for days before anyone notices, which is exactly the blind spot Connect Health is meant to close."
+    },
+    {
+      "id": "f67",
+      "cat": "identityAccessGovernance",
+      "front": "Pass-through Authentication (PTA) vs. Password Hash Sync",
+      "back": "Password Hash Sync validates sign-ins against a hash of the user's on-premises password synced into Microsoft Entra ID, so authentication can still succeed even if on-premises servers are unreachable. Pass-through Authentication instead validates the password directly against on-premises Active Directory in real time through a lightweight agent, so a disabled or changed on-premises password takes effect immediately, at the cost of sign-in depending on that agent's availability.",
+      "detail": "Hardening PTA means securing and monitoring the PTA agent servers themselves, since they sit directly in the authentication path \u2014 if every PTA agent is offline, sign-in fails outright rather than quietly falling back to a stale password hash."
+    },
+    {
+      "id": "f68",
+      "cat": "dataNetworkSecurity",
+      "front": "Microsoft Defender for Storage",
+      "back": "A Defender for Cloud plan focused on blob and file storage, scanning uploaded files for malware and detecting anomalous access patterns \u2014 like an identity suddenly downloading unusually large volumes of data or accessing from an unfamiliar location \u2014 that could indicate active data exfiltration.",
+      "detail": "This is a separate plan from Microsoft Defender for SQL, enabled independently, and it specifically covers content-level threats to stored files that Storage account network security: firewall rules and private endpoints cannot catch, since those only control network reachability rather than what is inside an uploaded file."
+    },
+    {
+      "id": "f69",
+      "cat": "dataNetworkSecurity",
+      "front": "Azure SQL auditing vs. Microsoft Defender for SQL",
+      "back": "Azure SQL auditing records database and server events, like executed queries and schema changes, to a storage account, Log Analytics workspace, or event hub for retention and later review. Microsoft Defender for SQL instead actively alerts on anomalous activity, like SQL injection, in near real time \u2014 auditing answers 'what happened,' Defender for SQL answers 'is something happening right now.'",
+      "detail": "An organization can enable SQL auditing purely for compliance retention without enabling Defender for SQL at all, and vice versa \u2014 the two are configured and licensed independently, even though both read from the same underlying database activity."
+    },
+    {
+      "id": "f70",
+      "cat": "dataNetworkSecurity",
+      "front": "Azure Private Link service vs. private endpoint",
+      "back": "A private endpoint is what a consumer creates to privately reach a PaaS service like Storage or SQL. A Private Link service is the mirror-image feature an organization uses to publish its own custom application (running behind a Standard Load Balancer) so other customers or VNets can connect to it privately through their own private endpoints, without that application ever being exposed to the public internet.",
+      "detail": "A company that wants to share a service with other business units or partner tenants without any public exposure publishes a Private Link service \u2014 a private endpoint alone is only the consuming half of that same connection, with nothing to connect to until the publishing side exists."
+    },
+    {
+      "id": "f71",
+      "cat": "aiComputeSecurity",
+      "front": "Microsoft Defender for Containers",
+      "back": "A Defender for Cloud plan that scans container images in Azure Container Registry for known vulnerabilities before deployment, and separately provides runtime threat detection for running AKS clusters, surfacing both as Defender for Cloud recommendations and alerts.",
+      "detail": "This is distinct from Securing AKS: network policies and Azure Policy for Kubernetes \u2014 that pairing controls what is allowed to run or talk to what, while Defender for Containers instead scans what is actually inside an image and watches for suspicious behavior once a container is already running."
+    },
+    {
+      "id": "f72",
+      "cat": "aiComputeSecurity",
+      "front": "Foundry agent guardrails",
+      "back": "Configurable constraints inside Microsoft Foundry that filter and limit an agent's inputs, outputs, and permitted actions while it runs \u2014 for example blocking a category of output or preventing a specific tool call \u2014 distinct from scoping the agent's identity permissions (see Microsoft Foundry agent identity and least-privilege permission scoping) and from Prompt Shields (Azure AI Content Safety), which screens content for jailbreak and injection attempts before the agent acts on it at all.",
+      "detail": "Least-privilege identity scoping limits what an agent is technically capable of reaching, while guardrails limit what it is allowed to say or do within that reach \u2014 a well-scoped agent can still misbehave within its own permissions unless guardrails also constrain its behavior."
+    },
+    {
+      "id": "f73",
+      "cat": "aiComputeSecurity",
+      "front": "AI security posture management (AI-SPM)",
+      "back": "A Defender for Cloud capability that discovers AI workloads across an environment \u2014 models, orchestrators, and the data stores feeding them \u2014 building an inventory and surfacing posture risks, like an overly permissive agent identity or an exposed grounding data store, before any runtime attack actually occurs.",
+      "detail": "This is the posture, before-the-fact counterpart to Defender for AI Service, which instead detects an active threat, like a live jailbreak attempt, once a deployed agent is already running."
+    },
+    {
+      "id": "f74",
+      "cat": "securityPostureOps",
+      "front": "Defender for Cloud governance rules",
+      "back": "Assigns an owner and a remediation SLA (due date) to a security recommendation, and can escalate or surface a report when that assignment goes overdue \u2014 driving accountability for who actually fixes a finding, rather than leaving every recommendation sitting unowned in a shared list.",
+      "detail": "A governance rule does not remediate anything by itself \u2014 it only assigns ownership and a deadline; an owner, or separate automation, still has to actually perform the fix."
+    },
+    {
+      "id": "f75",
+      "cat": "securityPostureOps",
+      "front": "Microsoft Sentinel UEBA (User and Entity Behavior Analytics)",
+      "back": "Builds a behavioral baseline for each user and entity, like typical sign-in times, locations, and resources accessed, and flags deviations from that individual baseline \u2014 complementing Sentinel analytics rules: scheduled vs. near-real-time vs. Fusion, which look for known patterns or cross-source correlation rather than a deviation from one entity's own normal behavior.",
+      "detail": "UEBA can flag an insider-style anomaly, like a user suddenly accessing resources they have legitimate permission to but never normally touch, that a scheduled rule looking for a known attack signature would never be written to catch."
+    },
+    {
+      "id": "f76",
+      "cat": "securityPostureOps",
+      "front": "Microsoft Sentinel watchlists",
+      "back": "Reusable named lists of data, such as known-bad IP addresses, terminated employee names, or a set of high-value asset identifiers, imported once and referenced across analytics rules, hunting queries, and workbooks, instead of hard-coding the same values separately into every query that needs them.",
+      "detail": "Updating a watchlist's values once, like removing an employee after they're reinstated, automatically changes every analytics rule and hunting query that references it, rather than requiring someone to track down and edit each query individually."
     }
   ],
   "questions": [
@@ -1580,6 +1685,232 @@
         2
       ],
       "explanation": "Attack path analysis models resource relationships, exposure, and vulnerabilities on the cloud security graph specifically to trace multi-resource exploitation chains and prioritize the ones reaching a business-critical asset. It explicitly looks across chains of resources rather than one resource in isolation, and it complements Secure Score's aggregate trend metric rather than replacing it."
+    },
+    {
+      "id": "q55",
+      "cat": "identityAccessGovernance",
+      "type": "mc",
+      "question": "A security team wants a resource owner to periodically recertify whether a set of guest users still need their existing access to a group, with the review recurring every 90 days. Which feature should be configured?",
+      "options": [
+        "An access package in entitlement management, configured with a 90-day expiration",
+        "An access review scheduled to recur every 90 days",
+        "A dynamic group recalculated every 90 days based on membership rules",
+        "A Conditional Access policy requiring reauthentication every 90 days"
+      ],
+      "correct": 1,
+      "explanation": "Access reviews are the recurring recertification mechanism for access a user already holds. An access package's expiration is a one-time cutoff rather than a repeating recertification, and a dynamic group or a Conditional Access reauthentication requirement changes membership or sign-in frequency without asking anyone whether the access should actually continue."
+    },
+    {
+      "id": "q56",
+      "cat": "identityAccessGovernance",
+      "type": "mc",
+      "question": "An HR system records an employee's last day, and the security team wants Microsoft Entra ID to automatically disable the account and remove its group memberships on that date without an administrator manually performing those steps. Which feature should be configured?",
+      "options": [
+        "A leaver lifecycle workflow triggered by the recorded end date",
+        "An access package in entitlement management set to expire on that date",
+        "A Conditional Access policy blocking sign-in after that date",
+        "A PIM eligible assignment that lapses on that date"
+      ],
+      "correct": 0,
+      "explanation": "Lifecycle workflows run a defined set of tasks automatically off an HR-driven attribute like a recorded end date, including disabling the account and removing memberships, with no manual step required. An access package handles requesting bundled access rather than full deprovisioning, a Conditional Access policy would only block sign-in without touching memberships, and PIM governs role activation rather than general account lifecycle."
+    },
+    {
+      "id": "q57",
+      "cat": "identityAccessGovernance",
+      "type": "mc",
+      "question": "A Conditional Access policy requiring compliant devices is accidentally misconfigured and blocks every administrator from signing in, including those trying to fix the policy itself. What should already exist to prevent this from becoming a full lockout?",
+      "options": [
+        "A PIM eligible assignment for every administrator account",
+        "An emergency access (break-glass) account excluded from Conditional Access policies",
+        "A dynamic group containing all administrator accounts",
+        "A second Conditional Access policy covering the same administrators"
+      ],
+      "correct": 1,
+      "explanation": "Emergency access (break-glass) accounts are specifically kept excluded from Conditional Access policies for exactly this scenario, so the misconfigured policy can be fixed without losing all administrative access. A PIM eligible assignment, a dynamic group, or another Conditional Access policy would all still be subject to the same misconfigured policy, since every applicable Conditional Access policy on a sign-in must be satisfied together, not just one of them."
+    },
+    {
+      "id": "tf22",
+      "cat": "identityAccessGovernance",
+      "type": "tf",
+      "question": "Conditional Access authentication context lets a policy require phishing-resistant MFA specifically at the moment a user activates a privileged role through PIM, rather than only at initial sign-in.",
+      "answer": true,
+      "explanation": "Authentication context tags a specific sensitive action, like PIM role activation, so a Conditional Access policy can require a stronger control exactly at that moment instead of treating every sign-in and every later privileged action identically."
+    },
+    {
+      "id": "msq13",
+      "cat": "identityAccessGovernance",
+      "type": "ms",
+      "question": "Which two of the following are true about hybrid identity security features? (Choose two.)",
+      "options": [
+        "Microsoft Entra Connect Health can alert on sync errors and surfaces risk detections like password spray attempts against on-premises authentication",
+        "Pass-through Authentication validates a password directly against on-premises Active Directory in real time through a lightweight agent",
+        "Password Hash Sync requires on-premises domain controllers to be reachable for every sign-in to succeed",
+        "Microsoft Entra Connect Health must be configured before Password Hash Sync or Pass-through Authentication can be used at all"
+      ],
+      "correct": [
+        0,
+        1
+      ],
+      "explanation": "Connect Health monitors sync health and surfaces on-premises authentication risk signals, and Pass-through Authentication validates passwords in real time against on-premises AD through its agent. Requiring on-premises reachability for every sign-in actually describes Pass-through Authentication rather than Password Hash Sync, and Connect Health is an optional monitoring add-on, not a prerequisite for configuring either sync method."
+    },
+    {
+      "id": "q58",
+      "cat": "dataNetworkSecurity",
+      "type": "mc",
+      "question": "A file uploaded to a blob container turns out to contain embedded malware, and the security team wants this kind of threat caught automatically going forward, alongside the existing storage account firewall and private endpoint controls. Which capability should be enabled?",
+      "options": [
+        "Microsoft Defender for Storage",
+        "A stricter storage account firewall rule limiting access to one subnet",
+        "A private endpoint replacing the storage account's public endpoint",
+        "Microsoft Defender for SQL"
+      ],
+      "correct": 0,
+      "explanation": "Defender for Storage scans uploaded files for malware and flags anomalous access patterns, a content-level threat that firewall rules and private endpoints cannot catch, since those only restrict network reachability rather than inspecting what is inside an uploaded file. Defender for SQL protects a different resource type and would not surface a storage-based malware finding."
+    },
+    {
+      "id": "q59",
+      "cat": "dataNetworkSecurity",
+      "type": "mc",
+      "question": "A compliance requirement asks for a durable record of every query executed against an Azure SQL Database over the past year, retained in a Log Analytics workspace for later review. Which feature should be configured?",
+      "options": [
+        "Microsoft Defender for SQL vulnerability assessment",
+        "Azure SQL auditing, configured to write to the Log Analytics workspace",
+        "Dynamic Data Masking applied to the sensitive columns",
+        "Transparent Data Encryption enabled on the database"
+      ],
+      "correct": 1,
+      "explanation": "Azure SQL auditing records database and server events for retention and later review, and can be configured to write directly to a Log Analytics workspace. Defender for SQL instead alerts on anomalous activity in near real time rather than retaining a durable historical record, and Dynamic Data Masking and TDE address display-layer obscuring and at-rest encryption, not activity logging."
+    },
+    {
+      "id": "tf23",
+      "cat": "dataNetworkSecurity",
+      "type": "tf",
+      "question": "A company wants to publish its own custom application, running behind a Standard Load Balancer, so that other business units in different virtual networks can connect to it privately without it ever being exposed to the public internet. A private endpoint created by each consuming VNet is sufficient on its own, with nothing additional required on the publishing side.",
+      "answer": false,
+      "explanation": "The publishing side needs a Private Link service configured on top of the Standard Load Balancer; consumers then create private endpoints to reach it. A private endpoint alone is only the consuming half of that connection \u2014 without a Private Link service to publish the application, there is nothing for those private endpoints to privately connect to."
+    },
+    {
+      "id": "msq14",
+      "cat": "dataNetworkSecurity",
+      "type": "ms",
+      "question": "Which two of the following are true about Microsoft Defender for Storage and Azure SQL auditing? (Choose two.)",
+      "options": [
+        "Microsoft Defender for Storage and Microsoft Defender for SQL are enabled and licensed independently of each other",
+        "Azure SQL auditing can write its recorded events to a storage account, Log Analytics workspace, or event hub",
+        "Enabling Azure SQL auditing automatically enables Microsoft Defender for SQL's threat detection on the same database",
+        "Microsoft Defender for Storage only evaluates network-layer traffic, the same way a storage account firewall does"
+      ],
+      "correct": [
+        0,
+        1
+      ],
+      "explanation": "Each Defender plan is enabled independently regardless of resource type, so Storage and SQL plans do not turn each other on, and SQL auditing supports multiple destination targets for its recorded events. Enabling auditing does not automatically enable Defender for SQL's separate threat detection, and Defender for Storage specifically inspects file content and access patterns, not just network-layer traffic the way a firewall does."
+    },
+    {
+      "id": "q60",
+      "cat": "aiComputeSecurity",
+      "type": "mc",
+      "question": "A DevSecOps team wants every image pushed to Azure Container Registry scanned for known vulnerabilities before deployment, and also wants ongoing runtime threat detection once those containers are running in AKS. Which single Defender for Cloud plan provides both?",
+      "options": [
+        "Microsoft Defender for Containers",
+        "The Azure Policy add-on for AKS",
+        "Kubernetes network policies",
+        "Microsoft Defender for Servers"
+      ],
+      "correct": 0,
+      "explanation": "Defender for Containers bundles both image vulnerability scanning in Azure Container Registry and runtime threat detection for running AKS workloads under one plan. The Azure Policy add-on governs what configurations are allowed to deploy rather than scanning image contents, network policies restrict pod-to-pod traffic, and Defender for Servers protects VM-based compute rather than container images or AKS runtime behavior."
+    },
+    {
+      "id": "q61",
+      "cat": "aiComputeSecurity",
+      "type": "mc",
+      "question": "A Foundry agent's identity is already scoped tightly to one document index and one downstream API, following least-privilege practice. The team also wants to constrain what categories of output the agent is allowed to produce while it runs, independent of what it is technically permitted to reach. Which control addresses this second need?",
+      "options": [
+        "Narrowing the agent's identity permissions further within Microsoft Entra Agent ID",
+        "Configuring guardrails in Microsoft Foundry to filter the agent's outputs and permitted actions",
+        "Adding a stricter Conditional Access policy to the agent's identity",
+        "Enabling encryption at host on the compute hosting the agent"
+      ],
+      "correct": 1,
+      "explanation": "Guardrails in Foundry constrain what an agent is allowed to say or do while running, a separate layer from identity scoping, which only governs what it's technically capable of reaching. Narrowing identity permissions further still addresses reach rather than output, Conditional Access governs authentication conditions rather than in-session output, and encryption at host protects host-level data, unrelated to constraining agent behavior."
+    },
+    {
+      "id": "tf24",
+      "cat": "aiComputeSecurity",
+      "type": "tf",
+      "question": "AI security posture management (AI-SPM) in Defender for Cloud focuses on detecting an active jailbreak attempt against a deployed agent in real time, the same role Defender for AI Service plays.",
+      "answer": false,
+      "explanation": "AI-SPM is a posture capability, discovering AI workloads, models, and their data stores and surfacing risks like an overly permissive identity before any attack occurs. Defender for AI Service is the one that detects an active runtime threat like a live jailbreak attempt; the two are complementary but play different roles."
+    },
+    {
+      "id": "msq15",
+      "cat": "aiComputeSecurity",
+      "type": "ms",
+      "question": "Which two of the following are true about securing Microsoft Foundry agents and AI workloads more broadly? (Choose two.)",
+      "options": [
+        "Foundry agent guardrails constrain what an agent is allowed to output or do, separate from its identity permissions",
+        "AI security posture management (AI-SPM) builds an inventory of AI workloads and surfaces posture risks before a runtime attack occurs",
+        "Guardrails and least-privilege identity scoping are two names for the exact same control",
+        "AI-SPM replaces the need for Defender for AI Service's runtime threat detection entirely"
+      ],
+      "correct": [
+        0,
+        1
+      ],
+      "explanation": "Guardrails and identity scoping are complementary but distinct controls, one limits behavior and the other limits reach, and AI-SPM is specifically the posture and inventory layer that surfaces risk before an attack happens. They are not the same control, and AI-SPM's posture focus does not replace Defender for AI Service's separate runtime detection role."
+    },
+    {
+      "id": "q62",
+      "cat": "securityPostureOps",
+      "type": "mc",
+      "question": "A Defender for Cloud recommendation keeps going unaddressed because no one on the team feels responsible for fixing it. The security lead wants an owner and a fix-by date attached to the recommendation, with an escalation if that date passes. Which feature should be configured?",
+      "options": [
+        "A governance rule assigning an owner and remediation SLA to the recommendation",
+        "A higher weighting applied to the recommendation in Secure Score",
+        "A regulatory compliance standard mapped to the recommendation",
+        "An automation rule attached to a Sentinel analytics rule"
+      ],
+      "correct": 0,
+      "explanation": "Governance rules assign ownership and a remediation SLA to a recommendation and can escalate when that deadline passes, driving accountability. Reweighting Secure Score only changes how much the recommendation affects the aggregate percentage, a compliance standard mapping shows conformance to a named standard rather than assigning ownership, and automation rules operate on Sentinel incidents, not Defender for Cloud recommendations."
+    },
+    {
+      "id": "q63",
+      "cat": "securityPostureOps",
+      "type": "mc",
+      "question": "A user who normally signs in only during business hours from one city suddenly accesses several resources they are technically permitted to use, at 3 a.m. from a new location. No known attack signature matches this activity, but the security team still wants it flagged as unusual for that specific user. Which Sentinel capability is designed to catch this?",
+      "options": [
+        "A scheduled analytics rule written to detect that known pattern",
+        "User and Entity Behavior Analytics (UEBA)",
+        "Fusion correlation across unrelated low-severity alerts",
+        "A regulatory compliance dashboard check"
+      ],
+      "correct": 1,
+      "explanation": "UEBA builds a behavioral baseline per user and entity and flags a deviation from that individual's own normal pattern, exactly the kind of permitted-but-unusual activity described here. A scheduled rule needs a known pattern to match against, Fusion correlates multiple separate low-fidelity alerts rather than one person's behavioral baseline, and the compliance dashboard has nothing to do with behavioral detection."
+    },
+    {
+      "id": "tf25",
+      "cat": "securityPostureOps",
+      "type": "tf",
+      "question": "A Microsoft Sentinel watchlist lets a list of values, like known-bad IP addresses, be imported once and then referenced across multiple analytics rules and hunting queries, instead of hard-coding the same values into each query separately.",
+      "answer": true,
+      "explanation": "That is exactly what watchlists are for \u2014 a reusable, centrally updated named list that many analytics rules, hunting queries, and workbooks can reference, so updating the list once updates every query that uses it."
+    },
+    {
+      "id": "msq16",
+      "cat": "securityPostureOps",
+      "type": "ms",
+      "question": "Which two of the following are true about Defender for Cloud governance rules and Microsoft Sentinel UEBA? (Choose two.)",
+      "options": [
+        "A governance rule automatically remediates the underlying recommendation once an owner is assigned",
+        "Governance rules can surface overdue, unresolved ownership assignments as an escalation or reported metric",
+        "UEBA flags a deviation from an individual user or entity's own established behavioral baseline",
+        "UEBA requires a matching known attack signature before it can flag any activity as unusual"
+      ],
+      "correct": [
+        1,
+        2
+      ],
+      "explanation": "Governance rules track ownership and escalate when a remediation deadline is missed, but they do not perform the fix themselves, and UEBA's core value is flagging a deviation from one entity's own baseline rather than needing a known signature to match against first, the opposite of what a signature-based scheduled rule requires."
     }
   ],
   "lessons": [

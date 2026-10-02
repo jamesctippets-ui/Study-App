@@ -489,6 +489,15 @@ come up.
   round 2. AZ-900 itself stays the named bar to aim toward, not something
   to exactly match number-for-number — its 3-broad-category shape doesn't
   translate cleanly to tracks with 5-7 narrower categories.
+  - **Round 2**, same recipe, one agent per track on AZ-802, EHR
+    Integration, Cloud+, AB-650, and SC-500 (the round-1 leftovers).
+    Flashcards 889 → 964, questions 1348 → 1433. All 5 now land at
+    167-174 combined — ahead of the rest of the pack and closing in on
+    AZ-900's 185. New lowest tier for a round 3: MD-102 (143), AZ-140
+    (144), DP-900 (146), DP-300 (147), AZ-104 (151) — note DP-900/DP-300
+    already got a round-1 pass and still rank low, since round 1's goal
+    was closing the worst gaps, not full parity in one pass; a track can
+    legitimately need more than one round.
 - [x] **Progress export/import.** The app has no accounts, so a cleared browser
   or a new device previously meant losing everything. The ⚙ Data & progress
   panel now downloads all progress (results, seenLog, stats) as a JSON file

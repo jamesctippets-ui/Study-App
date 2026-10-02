@@ -473,6 +473,111 @@
       "front": "BitLocker Drive Encryption",
       "back": "BitLocker encrypts an entire volume at rest, typically sealed to a TPM chip so the drive only unlocks on its original hardware, with recovery keys escrowed to AD DS or Microsoft Entra ID rather than left only on the local machine. It protects a very different attack surface than Credential Guard, which isolates secrets already in memory on a running system \u2014 a stolen, powered-off drive is exactly what BitLocker defends, while a compromised, powered-on server still needs Credential Guard to keep an attacker from lifting credentials out of LSASS. For local administrator passwords specifically, Windows LAPS (Local Administrator Password Solution) plays the analogous escrow role, rotating and storing a password so it's never only kept on one device.",
       "detail": "BitLocker requires a TPM (or a USB startup key as a workaround) and, like Credential Guard, needs hardware virtualization or platform security features that a very old or virtualized-without-vTPM machine may not actually offer."
+    },
+    {
+      "id": "f55",
+      "cat": "adDs",
+      "front": "Authoritative vs. non-authoritative restore (Directory Services Restore Mode)",
+      "back": "A non-authoritative restore replays a backed-up domain controller's database and then lets normal replication catch it back up with any changes its partners made since the backup. An authoritative restore (performed with ntdsutil after booting into Directory Services Restore Mode, DSRM) instead marks specific restored objects as the ones to push out to every other domain controller, overwriting the newer changes \u2014 including an unwanted deletion \u2014 those DCs already hold.",
+      "detail": "DSRM is a special boot mode that starts a domain controller without AD DS running, unlocked with the separate DSRM administrator password set at promotion \u2014 a password many admins forget exists until the moment they actually need it."
+    },
+    {
+      "id": "f56",
+      "cat": "adDs",
+      "front": "Microsoft Entra Domain Services (Microsoft Entra DS)",
+      "back": "A fully managed service that stands up a traditional, domain-joinable AD DS domain in Azure \u2014 complete with Kerberos/NTLM authentication and Group Policy \u2014 without deploying or patching any domain controllers yourself. It's a separate, one-way-synced domain from on-premises AD, not the same thing as Microsoft Entra Connect authentication methods, which instead synchronize identities into Entra ID itself rather than creating a whole managed domain.",
+      "detail": "A frequent exam distinction: Microsoft Entra Connect synchronizes identity objects into Microsoft Entra ID for cloud sign-in, while Microsoft Entra Domain Services gives you an actual managed, domain-joinable AD DS environment in Azure for legacy apps that need traditional domain membership \u2014 they solve different problems and are often used together."
+    },
+    {
+      "id": "f57",
+      "cat": "hybridWorkloads",
+      "front": "Cluster sets",
+      "back": "A cluster set groups multiple separate failover clusters into one larger software-defined compute and storage fabric, letting VMs live-migrate across the member clusters' boundaries for far greater scale than any single cluster supports, while each member cluster keeps its own failover cluster quorum models and witness types.",
+      "detail": "Think of a cluster set as a 'cluster of clusters' \u2014 it's aimed at hyperscale or hosting-provider deployments that have outgrown a single cluster's node-count ceiling, not a typical mid-size organization's first failover cluster."
+    },
+    {
+      "id": "f58",
+      "cat": "hybridWorkloads",
+      "front": "Hyper-V Replica extended replication",
+      "back": "Extended replication adds a third copy of a VM on top of an ordinary Hyper-V Replica pair, replicating asynchronously from the existing replica host to a second replica host, often at a third site, so a single-site failure doesn't also take out the only remaining disaster-recovery copy.",
+      "detail": "Extended replication layers on top of an already-working primary-to-replica relationship \u2014 it isn't a replacement for that pair, just an additional safety net configured once the first replica is already running."
+    },
+    {
+      "id": "f59",
+      "cat": "vmContainers",
+      "front": "Windows container networking modes",
+      "back": "NAT mode (Docker's default on Windows) gives each container a private IP behind address translation on the host. Transparent mode connects a container directly to the physical network, appearing as its own host on the LAN. L2Bridge mode shares the host's IP subnet with containers using their own MAC address. Overlay mode spans multiple hosts for container-to-container networking across a cluster, typically with Docker Swarm.",
+      "detail": "Network mode choice is independent of isolation mode \u2014 see Process isolation and container base image compatibility for the separate build-matching constraint that applies only to process-isolated containers."
+    },
+    {
+      "id": "f60",
+      "cat": "vmContainers",
+      "front": "Shielded virtual machines and Host Guardian Service (HGS)",
+      "back": "A shielded VM encrypts its virtual disk and state with BitLocker and limits even fabric (host/hypervisor) administrators from inspecting it, console-connecting to it, or extracting its keys. The Host Guardian Service attests that a Hyper-V host is healthy and trusted before releasing the key needed to run that shielded VM, using either hardware-based TPM-trusted attestation or the weaker admin-trusted attestation.",
+      "detail": "This defends against a threat Credential Guard doesn't cover: Credential Guard isolates secrets on one already-running machine, while shielded VMs stop a compromised or malicious fabric administrator with full host console access from reading a tenant VM's memory or disk at all."
+    },
+    {
+      "id": "f61",
+      "cat": "vmContainers",
+      "front": "Process isolation and container base image compatibility",
+      "back": "A process-isolated Windows container shares the host's kernel directly, so its base container image build must match (or be compatible with) the host OS build \u2014 a mismatch simply fails to start the container. Hyper-V isolation avoids this constraint entirely, since each container runs its own kernel inside a lightweight utility VM.",
+      "detail": "This build-matching requirement is a frequent real-world container deployment failure on Windows Server \u2014 an image built against a newer Windows Server base often won't run process-isolated on an older host build, which is exactly when switching to Hyper-V isolation becomes the fix."
+    },
+    {
+      "id": "f62",
+      "cat": "networking",
+      "front": "Azure Network Adapter",
+      "back": "A Windows Admin Center feature that automatically provisions a point-to-site VPN connection from an on-premises server straight into an Azure virtual network, without manually configuring RRAS, certificates, or a VPN gateway by hand.",
+      "detail": "It's a quick way to reach Azure VNet resources from a single on-premises server for testing or a small workload \u2014 for connecting entire networks together at scale, a Site-to-Site VPN vs. ExpressRoute decision is still the right call instead."
+    },
+    {
+      "id": "f63",
+      "cat": "networking",
+      "front": "Routing and Remote Access Service (RRAS)",
+      "back": "A Windows Server role that turns a server into a software router, NAT device, and VPN termination point \u2014 handling site-to-site and point-to-site VPN connections, legacy DirectAccess infrastructure, and basic LAN/WAN routing, all from one role.",
+      "detail": "RRAS is the piece that actually terminates a VPN connection and forwards the authentication request onward to Network Policy Server (NPS) as the RADIUS server \u2014 RRAS and NPS are commonly deployed together but are not the same role."
+    },
+    {
+      "id": "f64",
+      "cat": "storage",
+      "front": "File Server Resource Manager (FSRM) quotas and file screening",
+      "back": "FSRM lets an administrator cap how much data a user or folder can store (quotas, as either a hard limit or a soft warning-only limit) and block specific file types from being saved to a share (file screening), plus generate storage reports \u2014 all without touching NTFS permissions.",
+      "detail": "A quota and a file screen solve different problems: a quota limits total space regardless of file type, while a file screen blocks specific file types, like .mp3 or .exe, regardless of how much space is left."
+    },
+    {
+      "id": "f65",
+      "cat": "storage",
+      "front": "Scale-Out File Server (SOFS)",
+      "back": "A clustered file server role, built on Cluster Shared Volumes, where every cluster node can serve the same SMB shares simultaneously and actively \u2014 unlike a traditional clustered general-use file server, where only one node owns a given share at a time.",
+      "detail": "SOFS is the typical front end for Hyper-V-over-SMB or Storage Spaces Direct (S2D)-backed storage, since active-active access across every node avoids the slower failover of a traditional file server share moving between nodes one at a time."
+    },
+    {
+      "id": "f66",
+      "cat": "security",
+      "front": "Just Enough Administration (JEA)",
+      "back": "A PowerShell-based constrained administration feature that limits a connecting user to a specific, defined set of cmdlets, parameters, and values (via a role capability file), running those operations under a virtual account behind the scenes \u2014 so a support technician can perform specific tasks without ever receiving full local administrator rights.",
+      "detail": "JEA solves a different problem than Windows LAPS (Local Administrator Password Solution): LAPS manages and rotates an actual local administrator password, while JEA avoids handing out administrator rights at all by constraining exactly what a non-administrator session is allowed to run."
+    },
+    {
+      "id": "f67",
+      "cat": "security",
+      "front": "Authentication policies and authentication policy silos",
+      "back": "An authentication policy restricts how a specific account, typically a high-privilege one, is allowed to authenticate \u2014 for example, only from specific domain controllers or devices \u2014 and can set a stricter Kerberos ticket lifetime for it. An authentication policy silo groups related accounts and the devices or servers they're allowed to touch into one boundary, so a compromised low-value account can't be used to reach high-value servers outside that silo.",
+      "detail": "This pairs naturally with the Protected Users security group \u2014 Protected Users forces stronger Kerberos-only authentication for an account, while an authentication policy silo additionally restricts which specific machines that account can even attempt to sign in to or from."
+    },
+    {
+      "id": "f68",
+      "cat": "monitoring",
+      "front": "Windows Event Forwarding (WEF)",
+      "back": "A built-in Windows feature that centralizes selected event log entries from many source servers onto one collector server, using a WinRM-based subscription \u2014 no Azure agent, Log Analytics workspace, or extra licensing required.",
+      "detail": "WEF is the right call when a scenario specifically rules out Azure Monitor Agent (AMA) and Data Collection Rules (DCR) and still wants centralized Security/Application log review using only built-in Windows Server functionality."
+    },
+    {
+      "id": "f69",
+      "cat": "monitoring",
+      "front": "VM insights and the dependency map",
+      "back": "VM insights, built on Azure Monitor Agent (AMA) and Data Collection Rules (DCR) plus a separate Dependency Agent, shows a server's running processes and the discovered connections and dependencies between servers \u2014 useful for migration planning and tracing a cross-server issue, across both Azure VMs and Arc-enabled on-premises servers.",
+      "detail": "The dependency map is what actually visualizes those discovered connections between machines \u2014 AMA alone collects logs and performance counters, but it's the separate Dependency Agent that supplies the process- and connection-level data the map is built from."
     }
   ],
   "questions": [
@@ -1544,6 +1649,208 @@
       ],
       "correct": 0,
       "explanation": "Metric alerts evaluate lightweight numeric thresholds fast enough for near-real-time paging, while a scheduled KQL query joining performance and deployment data is exactly the tool for a periodic, multi-source correlation report \u2014 matching each need to the mechanism built for its latency and complexity. A log alert every single minute is a heavier, slower mechanism than a metric alert for fast threshold paging, and a Data Collector Set only captures local counters, producing no correlation report on its own. Reliability Monitor and a metric alert are swapped into the wrong roles, and a DCR only defines what's collected and where it's sent \u2014 it doesn't page anyone or generate a report by itself."
+    },
+    {
+      "id": "q51",
+      "cat": "adDs",
+      "type": "mc",
+      "question": "An administrator accidentally deletes an OU containing 200 user accounts, and the deletion has already replicated to every domain controller in the domain. A system state backup taken the night before still has the OU intact. Which restore approach correctly brings the OU back without those objects simply being deleted again by normal replication?",
+      "options": [
+        "A non-authoritative restore of the affected domain controller from the backup",
+        "An authoritative restore of the OU, performed in Directory Services Restore Mode",
+        "A full forest recovery using the Install-ADDSForest cmdlet",
+        "Reinstalling AD DS on the domain controller and rejoining it to the domain"
+      ],
+      "correct": 1,
+      "explanation": "An authoritative restore, performed from Directory Services Restore Mode with ntdsutil, specifically marks the restored OU as authoritative so it replicates out and overwrites the deletion on every other domain controller. A plain non-authoritative restore would just let the restored DC's replication partners catch it back up to the deleted state, undoing the restore. A full forest recovery and reinstalling AD DS are far more disruptive responses to a single deleted OU."
+    },
+    {
+      "id": "tf19",
+      "cat": "adDs",
+      "type": "tf",
+      "question": "Microsoft Entra Domain Services provisions a fully managed, domain-joinable AD DS domain in Azure, which is a different service from Microsoft Entra Connect's identity synchronization.",
+      "answer": true,
+      "explanation": "Microsoft Entra Domain Services creates and manages an actual AD DS domain in Azure for domain-join scenarios, while Microsoft Entra Connect only synchronizes identity objects into Microsoft Entra ID for cloud sign-in \u2014 they address different problems and are commonly used side by side rather than being the same service."
+    },
+    {
+      "id": "q52",
+      "cat": "hybridWorkloads",
+      "type": "mc",
+      "question": "A hosting provider needs far more compute and storage capacity than a single failover cluster's node-count ceiling allows, but still wants VMs to live-migrate seamlessly across that larger pool. Which feature is built for this scale?",
+      "options": [
+        "Cluster-Aware Updating, extended to patch more nodes per run",
+        "A cluster set, grouping multiple member clusters into one larger fabric",
+        "Storage Spaces Direct, scaled to its maximum single-cluster node count",
+        "Hyper-V Replica, replicating VMs between every cluster in the datacenter"
+      ],
+      "correct": 1,
+      "explanation": "A cluster set groups several separate failover clusters into one larger software-defined fabric so VMs can live-migrate across member-cluster boundaries, scaling well beyond a single cluster's node limit. CAU only orchestrates patching and adds no capacity, S2D is still bounded by one cluster's own node-count ceiling, and Hyper-V Replica is a DR replication tool, not a capacity-pooling mechanism."
+    },
+    {
+      "id": "tf20",
+      "cat": "hybridWorkloads",
+      "type": "tf",
+      "question": "Hyper-V Replica extended replication requires tearing down the existing primary-to-replica relationship before a third copy of the VM can be configured.",
+      "answer": false,
+      "explanation": "Extended replication is layered on top of an already-working primary-to-replica pair, adding a third, asynchronously replicated copy at a second replica host \u2014 it doesn't require removing or reconfiguring the existing replication relationship first."
+    },
+    {
+      "id": "q53",
+      "cat": "vmContainers",
+      "type": "mc",
+      "question": "A development team builds a container image on a newer Windows Server base image, then tries to run it process-isolated on an older Windows Server host. The container fails to start with a version-mismatch error. What is the most direct fix that keeps the container process-isolated?",
+      "options": [
+        "Rebuild the container image against a matching base image build",
+        "Add more memory to the Hyper-V host running the container",
+        "Switch the Hyper-V virtual switch from internal to external mode",
+        "Enable Credential Guard on the container host"
+      ],
+      "correct": 0,
+      "explanation": "Process-isolated containers share the host kernel directly, so the container's base image build has to match (or be compatible with) the host OS build \u2014 rebuilding against a matching base image is the direct fix. Memory, virtual switch type, and Credential Guard have nothing to do with kernel build compatibility between a container image and its host."
+    },
+    {
+      "id": "q54",
+      "cat": "vmContainers",
+      "type": "mc",
+      "question": "A hosting provider's fabric administrators have full console and hypervisor access to every Hyper-V host, but tenants require that not even those administrators be able to inspect a tenant VM's memory or disk contents. Which feature is designed specifically for this threat model?",
+      "options": [
+        "Credential Guard, isolating LSASS secrets from the fabric administrator",
+        "Shielded virtual machines, attested and key-released through the Host Guardian Service",
+        "Windows Defender Application Control, blocking unapproved code on the host",
+        "BitLocker alone, enabled on the host's own boot volume"
+      ],
+      "correct": 1,
+      "explanation": "Shielded VMs encrypt a tenant VM's disk and state and restrict even a fabric administrator from inspecting or console-connecting to it, with the Host Guardian Service attesting the host is trusted before releasing the needed key \u2014 exactly the hosting-provider threat model described. Credential Guard protects LSASS secrets on a single machine, not a tenant VM's contents from its own host's administrator, WDAC controls what code runs rather than who can inspect a VM, and BitLocker on the host's own boot volume doesn't protect a guest VM's contents from that host's administrators at all."
+    },
+    {
+      "id": "tf21",
+      "cat": "vmContainers",
+      "type": "tf",
+      "question": "In NAT networking mode, a Windows container gets a private IP address behind address translation on the host, rather than appearing directly on the physical network.",
+      "answer": true,
+      "explanation": "NAT mode is Docker's default on Windows and gives each container a private, host-translated IP \u2014 transparent mode is the one that connects a container directly to the physical network as its own host."
+    },
+    {
+      "id": "msq14",
+      "cat": "vmContainers",
+      "type": "ms",
+      "question": "Which two of the following are true about Host Guardian Service (HGS) attestation for shielded VMs? (Choose two.)",
+      "options": [
+        "TPM-trusted attestation relies on hardware-based measurements of the host",
+        "Admin-trusted attestation is the stronger of the two attestation modes",
+        "A host must be attested as healthy and trusted before HGS releases the key needed to run the shielded VM",
+        "HGS attestation replaces the need for BitLocker on the shielded VM's virtual disk"
+      ],
+      "correct": [
+        0,
+        2
+      ],
+      "explanation": "TPM-trusted attestation uses hardware-based measurements of the host, and HGS only releases the key needed to run a shielded VM after that attestation confirms the host is healthy and trusted. Admin-trusted attestation is actually the weaker of the two modes, not the stronger one, and HGS attestation works alongside BitLocker encryption on the VM's disk rather than replacing it."
+    },
+    {
+      "id": "q55",
+      "cat": "networking",
+      "type": "mc",
+      "question": "An administrator needs a quick way to connect a single on-premises test server to resources in an Azure virtual network, without manually configuring RRAS, certificates, or a VPN gateway by hand. Which Windows Admin Center feature fits?",
+      "options": [
+        "Azure Network Adapter, provisioning a point-to-site VPN connection automatically",
+        "Azure File Sync, syncing the server's file share into the virtual network",
+        "Cluster-Aware Updating, draining the server before connecting it",
+        "Storage Migration Service, migrating the server's shares into Azure"
+      ],
+      "correct": 0,
+      "explanation": "Azure Network Adapter automatically provisions a point-to-site VPN connection from the server into an Azure virtual network with none of the manual RRAS, certificate, or gateway configuration otherwise required. The other three options sync files, orchestrate patching, or migrate shares \u2014 none of them establish network connectivity into a virtual network."
+    },
+    {
+      "id": "tf22",
+      "cat": "networking",
+      "type": "tf",
+      "question": "Routing and Remote Access Service (RRAS) is the component that actually terminates VPN connections, while Network Policy Server (NPS) separately handles the RADIUS authentication decision for them.",
+      "answer": true,
+      "explanation": "RRAS (or a third-party VPN device) terminates the VPN connection itself and forwards the authentication request to NPS, which makes the RADIUS authentication and policy decision \u2014 the two roles are commonly paired but serve distinct jobs."
+    },
+    {
+      "id": "msq15",
+      "cat": "networking",
+      "type": "ms",
+      "question": "Which two of the following are true about Azure Network Adapter? (Choose two.)",
+      "options": [
+        "It establishes a point-to-site VPN connection from the server into an Azure virtual network",
+        "It is the recommended way to connect two entire on-premises networks together at production scale",
+        "It can be configured directly from Windows Admin Center without manually building the VPN by hand",
+        "It permanently migrates the on-premises server's workload into the target virtual network"
+      ],
+      "correct": [
+        0,
+        2
+      ],
+      "explanation": "Azure Network Adapter sets up a point-to-site VPN from the server into an Azure virtual network, configurable straight from Windows Admin Center without hand-building RRAS, certificates, or a gateway. It isn't meant for connecting two entire networks at production scale \u2014 a Site-to-Site VPN or ExpressRoute fits that instead \u2014 and it only provides connectivity; it doesn't migrate the server's workload anywhere."
+    },
+    {
+      "id": "q56",
+      "cat": "storage",
+      "type": "mc",
+      "question": "A department shares a single folder, and management wants to both cap each user's storage at 5 GB and block anyone from saving .mp3 files there, without changing any NTFS permissions. Which Windows Server feature provides both controls?",
+      "options": [
+        "Data Deduplication, configured with a per-user exclusion list",
+        "File Server Resource Manager, using a quota and a file screen",
+        "Storage Replica, configured in asynchronous mode",
+        "DFS Namespaces, with a per-user folder target"
+      ],
+      "correct": 1,
+      "explanation": "FSRM provides exactly these two independent controls: a quota caps total space per user or folder, and a file screen blocks specific file types regardless of how much space remains \u2014 neither requires touching NTFS permissions. Data Deduplication reclaims duplicate space rather than enforcing limits, and Storage Replica and DFS Namespaces address replication and unified paths, not per-user quotas or file-type blocking."
+    },
+    {
+      "id": "tf23",
+      "cat": "storage",
+      "type": "tf",
+      "question": "A Scale-Out File Server lets every node in the cluster serve the same SMB share simultaneously and actively, unlike a traditional clustered file server where only one node owns a share at a time.",
+      "answer": true,
+      "explanation": "That active-active access across all nodes, built on Cluster Shared Volumes, is exactly what distinguishes a Scale-Out File Server from a traditional general-use clustered file server, where ownership of a given share moves between nodes one at a time on failover."
+    },
+    {
+      "id": "q57",
+      "cat": "security",
+      "type": "mc",
+      "question": "A security team wants a help-desk technician to be able to restart a specific set of services and clear specific event logs on a file server, under an elevated identity, but must not grant that technician's own account general local administrator rights on the box. Which feature should be configured?",
+      "options": [
+        "Add the technician's account to the local Administrators group, restricted by a logon script",
+        "Just Enough Administration (JEA), with a role capability file scoped to those cmdlets",
+        "Windows LAPS, so the technician can retrieve the local administrator password on demand",
+        "The Protected Users security group, applied to the technician's own account"
+      ],
+      "correct": 1,
+      "explanation": "JEA constrains a PowerShell session to a specific, defined set of cmdlets and parameters via a role capability file, running them under a virtual account \u2014 exactly matching a narrowly scoped task without granting full administrator rights. Adding the account to local Administrators grants broad, unrestricted access regardless of any logon script, Windows LAPS only manages the local administrator password itself rather than scoping what commands someone can run, and Protected Users restricts how an account authenticates, not what it's authorized to do once signed in."
+    },
+    {
+      "id": "tf24",
+      "cat": "security",
+      "type": "tf",
+      "question": "An authentication policy silo can restrict a group of related high-privilege accounts so they can only authenticate to and from a defined set of devices, limiting how far a compromised low-value account could reach.",
+      "answer": true,
+      "explanation": "That containment is exactly the point of an authentication policy silo \u2014 it groups accounts and the specific devices or servers they're allowed to touch into one boundary, so even a compromised account outside that boundary can't be used to reach into it."
+    },
+    {
+      "id": "q58",
+      "cat": "monitoring",
+      "type": "mc",
+      "question": "An administrator sets up Windows Event Forwarding so a collector server gathers specific events from 200 source servers spread across multiple sites, without having to individually configure each source server's subscription settings one at a time. Which WEF subscription type fits this scale?",
+      "options": [
+        "A collector-initiated (pull) subscription, listing every source server by name",
+        "A source-initiated (push) subscription, applied to source servers via Group Policy",
+        "A Data Collection Rule, pushed from Azure Monitor to each source server",
+        "A Data Collector Set, scheduled identically on all 200 servers"
+      ],
+      "correct": 1,
+      "explanation": "A source-initiated (push) subscription lets a GPO point many source servers at the collector at once, without the administrator individually naming and configuring each source server the way a collector-initiated (pull) subscription requires \u2014 which is exactly what scales to 200 machines across multiple sites. A Data Collection Rule and a Data Collector Set are Azure Monitor Agent and Performance Monitor concepts respectively, not part of Windows Event Forwarding's subscription model at all."
+    },
+    {
+      "id": "tf25",
+      "cat": "monitoring",
+      "type": "tf",
+      "question": "VM insights' dependency map relies on a separate Dependency Agent installed alongside Azure Monitor Agent to discover process-level connections between servers.",
+      "answer": true,
+      "explanation": "Azure Monitor Agent alone collects logs and performance counters, but the dependency map specifically needs the separate Dependency Agent to discover and visualize process-level connections and dependencies between servers \u2014 without it, VM insights still shows performance data but not the dependency map itself."
     }
   ],
   "lessons": [
