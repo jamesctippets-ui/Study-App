@@ -484,6 +484,111 @@
       "front": "PIM alerts",
       "back": "Privileged Identity Management surfaces built-in alerts that flag risky configurations, such as too many users holding a permanent Global Administrator assignment, roles being activated too frequently, or duplicate role assignments, so an administrator can proactively investigate rather than only reacting after an incident.",
       "detail": "These alerts complement PIM audit history, which is a searchable log of every activation, assignment change, and approval decision for after-the-fact investigation."
+    },
+    {
+      "id": "f63",
+      "cat": "userIdentities",
+      "front": "Restricted management administrative units",
+      "back": "A restricted management administrative unit hides its member objects from being viewed, edited, or even enumerated by any administrator who is not explicitly assigned a role scoped to that same administrative unit -- unlike a standard Administrative units setup, which only limits what an assigned role can do, not who can see the members at all.",
+      "detail": "This is commonly used to shield Break-glass emergency access accounts or an executive's own account from routine helpdesk visibility -- a Global Administrator who is not assigned to the unit still cannot view or modify its members through the portal or Microsoft Graph."
+    },
+    {
+      "id": "f64",
+      "cat": "userIdentities",
+      "front": "Group-based licensing",
+      "back": "Group-based licensing assigns one or more Microsoft 365 or Entra ID licenses to every member of a group automatically, adding or removing a user's license the moment their group membership changes, instead of an administrator assigning and removing licenses one user at a time. The group can be an ordinary assigned-membership group or a group governed by Dynamic group membership rules.",
+      "detail": "A license assigned directly to a user and the same license also inherited from a group both stay in effect until every assigning source is removed -- removing the user from the group alone does not remove a license that was also assigned to them directly."
+    },
+    {
+      "id": "f65",
+      "cat": "userIdentities",
+      "front": "Direct federation for B2B guest sign-in",
+      "back": "Direct federation configures a trust with a partner's own SAML or WS-Fed identity provider so its users can sign in as B2B guests using their existing organizational credentials, covering partner organizations that have no Microsoft Entra ID or Google Workspace identity at all -- distinct from standard External Identities: B2B collaboration with an Entra tenant, which trusts the partner's own Entra ID directly with no separate federation setup.",
+      "detail": "This is the right choice when a partner organization's identity provider is Okta, Ping, or another SAML/WS-Fed system rather than Microsoft Entra ID or Google, which are instead trusted natively with no federation trust to configure at all. It has nothing to do with Azure AD B2C, which serves an organization's own consumer-facing apps rather than a partner's workforce."
+    },
+    {
+      "id": "f66",
+      "cat": "authAccessMgmt",
+      "front": "Conditional Access authentication context",
+      "back": "An authentication context is a tag that can be applied to a specific sensitive action or resource (such as a SharePoint document with a particular sensitivity label, or one action inside a line-of-business app) so a Conditional Access policy can require extra verification, like step-up MFA, only at that specific point of access -- instead of the policy's cloud apps condition in Conditional Access policy structure: assignments and access controls applying the same requirement to the entire application.",
+      "detail": "A document library where only files labeled Highly Confidential trigger step-up MFA, while every other document on the same SharePoint site requires only ordinary sign-in, is the kind of scenario authentication context is built for."
+    },
+    {
+      "id": "f67",
+      "cat": "authAccessMgmt",
+      "front": "Custom authentication extensions",
+      "back": "A custom authentication extension calls an external REST API, typically hosted as an Azure Function, at a defined point in the sign-in or token-issuance process -- such as just before a token is issued -- letting an organization inject custom claims from an external system or evaluate external business logic as part of authentication, beyond what the authentication methods policy and Entra ID's own built-in attributes can do alone.",
+      "detail": "A common use is calling an external HR system during token issuance to add a custom claim, like an employee's cost center, into the token, or to block sign-in based on a live status that system tracks but Entra ID itself has no attribute for."
+    },
+    {
+      "id": "f68",
+      "cat": "authAccessMgmt",
+      "front": "Certificate-based authentication (CBA)",
+      "back": "Certificate-based authentication lets a user sign in directly with an X.509 client certificate, issued from an enterprise PKI and typically stored on a smart card or similar hardware, instead of a password -- satisfying both primary sign-in and the Conditional Access authentication strengths concept of phishing-resistant MFA in one single step, once the issuing certificate authority is configured as trusted in the tenant.",
+      "detail": "Configuring CBA requires uploading the issuing certificate authority's root and intermediate certificates and mapping a certificate attribute, such as the user principal name, to the matching Microsoft Entra ID user object."
+    },
+    {
+      "id": "f69",
+      "cat": "workloadIdentities",
+      "front": "Application management policies",
+      "back": "An application management policy restricts, tenant-wide or for specific apps, the maximum lifetime allowed for a newly added app registration client secret or certificate, blocking the creation of a new credential that exceeds that limit rather than relying on individual developers to self-police secret lifetimes.",
+      "detail": "This only constrains new credentials created going forward -- a secret that already exists and already exceeds the new limit is not immediately revoked just by enabling the policy. Where Workload identity federation can be adopted instead, it removes the need for any such secret at all."
+    },
+    {
+      "id": "f70",
+      "cat": "workloadIdentities",
+      "front": "Kerberos Constrained Delegation for Application Proxy",
+      "back": "Kerberos Constrained Delegation (KCD) lets a Microsoft Entra application proxy connector sign a user into an on-premises application that relies on Windows-integrated (Kerberos) authentication, impersonating that user toward the backend app so they get true single sign-on instead of being prompted a second time by the app's own Windows authentication.",
+      "detail": "Without KCD configured, a user who successfully signs in through Application Proxy can still hit a second, separate Windows-integrated sign-in prompt from the backend app itself, defeating the single sign-on experience Application Proxy is meant to provide for that kind of legacy app."
+    },
+    {
+      "id": "f71",
+      "cat": "workloadIdentities",
+      "front": "Application Proxy connector groups",
+      "back": "A connector group is a named set of one or more Microsoft Entra application proxy connectors that a published app is explicitly assigned to, letting an organization route a specific app's traffic through connectors in its own nearest region or dedicated to its own workload, instead of every published app sharing one single, undifferentiated pool of connectors.",
+      "detail": "Placing multiple connectors in the same group is also how high availability is achieved per app -- one connector in the group going offline does not take that app down, while a different app assigned to a different connector group fails over entirely independently."
+    },
+    {
+      "id": "f72",
+      "cat": "workloadIdentities",
+      "front": "Application registration owners",
+      "back": "An app registration (or enterprise application) owner is a specific user granted the ability to manage that one application's configuration -- credentials, permissions, branding -- without being granted a tenant-wide role like Application Administrator or Cloud Application Administrator. This is a separate concept from the App registration vs. enterprise application distinction itself.",
+      "detail": "This lets a development team manage its own app's secrets and redirect URIs day to day while a directory-wide administrative role stays reserved for broader, tenant-level application governance."
+    },
+    {
+      "id": "f73",
+      "cat": "workloadIdentities",
+      "front": "Workload identity risk detection",
+      "back": "Microsoft Entra ID Protection extends risk detection to service principals and other workload identities, surfacing signals like credentials leaked in a public code repository or sign-ins from anomalous locations, with a dedicated risk policy able to block or require remediation the same way Risk-based Conditional Access policies do for human user accounts.",
+      "detail": "This closes a real gap distinct from Conditional Access for workload identities, which only evaluates conditions like a fixed IP range: a compromised service principal has no password or MFA prompt to protect it the way a human user does, so dedicated risk detection built for workload identities is what catches a leaked secret being used from an unexpected location."
+    },
+    {
+      "id": "f74",
+      "cat": "identityGovernance",
+      "front": "PIM discovery and insights",
+      "back": "PIM discovery and insights scans a tenant for Microsoft Entra directory role assignments that are already permanent and active, outside of Privileged Identity Management entirely, and lets an administrator convert those existing standing assignments directly into PIM eligible vs. active role assignments from the findings, instead of hunting for them manually first.",
+      "detail": "This specifically targets the common real-world problem of a tenant adopting PIM years after go-live, by then full of permanent Global Administrator and other privileged assignments nobody ever circled back to convert."
+    },
+    {
+      "id": "f75",
+      "cat": "identityGovernance",
+      "front": "Multi-stage approval for access packages",
+      "back": "An Entitlement management: access packages request policy can require approval from more than one approver in sequence -- for example a resource owner's approval followed by a second, independent approver's sign-off -- rather than a single approval step being sufficient to grant the request.",
+      "detail": "Each stage can have its own designated approvers and its own response deadline, and a request rejected at an earlier stage never reaches a later stage at all."
+    },
+    {
+      "id": "f76",
+      "cat": "identityGovernance",
+      "front": "Access review recommendations",
+      "back": "During an Access reviews cycle, Microsoft Entra ID can generate a recommendation for each reviewer decision based on the user's actual recent sign-in activity and usage of the resource under review, suggesting Approve or Deny to speed up the reviewer's decision rather than leaving every single decision to the reviewer's own judgment alone.",
+      "detail": "A reviewer is not forced to follow the recommendation, but it meaningfully reduces review fatigue on a large access review by giving reviewers a defensible, data-driven default for users they do not personally know."
+    },
+    {
+      "id": "f77",
+      "cat": "identityGovernance",
+      "front": "Access package request policy requestor scope",
+      "back": "An Entitlement management: access packages request policy specifies exactly who is allowed to request it -- for example all users in your own directory, all users from one specific Connected organizations in entitlement management entry, specific named users or groups, or all users from every connected organization -- and a package can have several separate policies, each with its own requestor scope and approval settings.",
+      "detail": "Scoping one policy narrowly to a single named connected organization's users, rather than to all connected organizations, is how an access package avoids becoming requestable by every partner an organization has ever connected rather than just the one it is actually intended for."
     }
   ],
   "questions": [
@@ -1667,6 +1772,226 @@
         1
       ],
       "explanation": "Lifecycle workflows support scheduled triggers (checking for upcoming dates) and attribute-based triggers (such as a department change), in addition to on-demand manual runs. They are not limited to manual triggering only, and lifecycle workflows and access package auto-assignment policies are independent features -- neither requires the other."
+    },
+    {
+      "id": "q55",
+      "cat": "userIdentities",
+      "type": "mc",
+      "question": "A tenant keeps its two break-glass emergency access accounts as members of a dedicated administrative unit, specifically so that no helpdesk technician who is not explicitly assigned a role scoped to that unit can even view or search for those accounts in the directory. Which feature is being used?",
+      "options": [
+        "A restricted management administrative unit",
+        "A privileged access group",
+        "A Conditional Access named location",
+        "A dynamic administrative unit scoped by department"
+      ],
+      "correct": 0,
+      "explanation": "A restricted management administrative unit hides its member objects from any administrator not assigned a role scoped to that unit, which is exactly the visibility restriction described. A privileged access group governs just-in-time activation of group membership rather than hiding accounts, a named location is a network condition unrelated to directory visibility, and an ordinary dynamic administrative unit still does not hide its members' visibility the way a restricted one does."
+    },
+    {
+      "id": "q56",
+      "cat": "userIdentities",
+      "type": "mc",
+      "question": "A partner company uses Okta as its own corporate identity provider and has no Microsoft Entra ID or Google Workspace tenant of its own. The organization wants that partner's employees to sign in as B2B guests using their existing Okta credentials rather than a new password. What should be configured?",
+      "options": [
+        "Direct federation with the partner's SAML/WS-Fed identity provider",
+        "Azure AD B2C configured for the partner's domain",
+        "A shared Microsoft Entra ID account created for the partner's employees",
+        "Cross-tenant access settings trusting the partner's own Conditional Access claims"
+      ],
+      "correct": 0,
+      "explanation": "Direct federation establishes a SAML/WS-Fed trust with exactly this kind of partner identity provider, covering an organization that has no Entra ID or Google identity of its own. Azure AD B2C serves an organization's own consumer-facing apps rather than a partner's workforce, a shared account requires managing a password directly, and cross-tenant access settings only apply when the partner itself runs a Microsoft Entra tenant, which Okta alone does not provide."
+    },
+    {
+      "id": "q57",
+      "cat": "authAccessMgmt",
+      "type": "mc",
+      "question": "A SharePoint site stores one document labeled 'Highly Confidential' through a sensitivity label, while every other document on that same site uses ordinary access. The security team wants step-up MFA required only when a user opens that one labeled document, not for the rest of the site. Which Conditional Access capability fits?",
+      "options": [
+        "An authentication context applied to the sensitivity label, referenced by a dedicated Conditional Access policy",
+        "An authentication strength requiring phishing-resistant MFA for the entire SharePoint site",
+        "A named location restricting the SharePoint site to the corporate office network",
+        "A terms of use policy scoped to the SharePoint site"
+      ],
+      "correct": 0,
+      "explanation": "An authentication context tags one specific sensitive resource, like a labeled document, so a Conditional Access policy can reach inside the app and add a requirement only there. An authentication strength on the whole site would apply to every document, not just the one labeled file; a named location governs network location rather than document sensitivity; and a terms of use policy requires accepting a document, which doesn't add step-up MFA at all."
+    },
+    {
+      "id": "q58",
+      "cat": "authAccessMgmt",
+      "type": "mc",
+      "question": "An employee's eligibility to sign in depends on a termination flag stored only in the company's external HR system, which Microsoft Entra ID has no attribute for. The security team wants Entra ID to call that HR system's API during token issuance and block sign-in whenever the flag indicates the employee has already been terminated there. Which feature supports this?",
+      "options": [
+        "A custom authentication extension calling the HR system's REST API during token issuance",
+        "A custom security attribute that an administrator updates manually each day",
+        "A Conditional Access named location scoped to the HR system's IP range",
+        "An access review scheduled against the HR system's user list"
+      ],
+      "correct": 0,
+      "explanation": "A custom authentication extension calls an external REST API, such as the HR system's own endpoint, at a defined point like just before token issuance, which is exactly the live, authoritative lookup this scenario needs. A manually updated custom security attribute isn't a live check, a named location is a network condition unrelated to an HR termination flag, and an access review only periodically reassesses access rather than blocking a live sign-in attempt."
+    },
+    {
+      "id": "q59",
+      "cat": "workloadIdentities",
+      "type": "mc",
+      "question": "After several incidents caused by developers creating app registration secrets valid for several years, the security team wants every new client secret added to any app registration tenant-wide, going forward, to be rejected if its lifetime exceeds 90 days, without affecting secrets that already exist. What should be configured?",
+      "options": [
+        "An application management policy setting a maximum credential lifetime for new secrets and certificates",
+        "A Conditional Access policy requiring workload identities to re-authenticate every 90 days",
+        "Workload identity federation configured for every existing app registration",
+        "A PIM eligible assignment scoped to the Application Administrator role"
+      ],
+      "correct": 0,
+      "explanation": "An application management policy restricts the maximum lifetime allowed for newly created credentials tenant-wide, leaving existing secrets untouched, which matches this requirement exactly. Conditional Access doesn't govern how long a credential is allowed to be issued for, migrating every app to federation is a bigger architectural change than the scenario calls for and still wouldn't itself cap a secret's lifetime, and a PIM eligible assignment governs role activation, not credential issuance."
+    },
+    {
+      "id": "q60",
+      "cat": "workloadIdentities",
+      "type": "mc",
+      "question": "A finance team's legacy intranet application is published through Microsoft Entra application proxy, but after signing in through Entra ID, users are still prompted a second time by the application's own Windows-integrated authentication. What should be configured to eliminate that second prompt?",
+      "options": [
+        "Kerberos Constrained Delegation on the Application Proxy connector for that app",
+        "A second Application Proxy connector group dedicated to that one app",
+        "Password-based SSO configured on the app's enterprise application",
+        "A SCIM provisioning connector for that app"
+      ],
+      "correct": 0,
+      "explanation": "Kerberos Constrained Delegation lets the Application Proxy connector impersonate the signed-in user toward a backend app that relies on Windows-integrated authentication, removing the second prompt entirely. A second connector group would only affect routing or availability, not the double sign-in; password-based SSO is built for apps with their own password form, not Windows-integrated auth; and a SCIM connector provisions accounts rather than handling sign-in SSO."
+    },
+    {
+      "id": "q61",
+      "cat": "workloadIdentities",
+      "type": "mc",
+      "question": "A multinational company publishes two different applications through Microsoft Entra application proxy: one used mainly by its Tokyo office and one used mainly by its London office. The team wants each app's traffic to route through connectors physically closest to its primary user base, and wants a connector outage for one app to have no effect on the other app's availability. What should be configured?",
+      "options": [
+        "A separate connector group for each app, each containing connectors deployed near that app's primary office",
+        "A single shared connector group containing every connector in both offices",
+        "A Conditional Access named location for each office",
+        "Two separate Application Proxy tenants, one per office"
+      ],
+      "correct": 0,
+      "explanation": "Assigning each app its own connector group, populated with connectors local to that app's primary office, is exactly how Application Proxy achieves per-app regional routing and isolates one app's connector outage from the other. A single shared group would give up both the locality and the isolation the scenario wants, named locations govern Conditional Access sign-in conditions rather than proxy routing, and Application Proxy has no concept of separate per-office tenants within one Entra tenant."
+    },
+    {
+      "id": "q62",
+      "cat": "workloadIdentities",
+      "type": "mc",
+      "question": "A service principal's client secret is discovered publicly posted in a code repository, and shortly afterward sign-ins using that service principal begin arriving from an unfamiliar country at an unusual hour. Which Microsoft Entra capability is designed to detect and help remediate this specific kind of compromise?",
+      "options": [
+        "Workload identity risk detection in Microsoft Entra ID Protection",
+        "A sign-in risk policy scoped to the All Users group",
+        "Smart lockout configured on the tenant's password policy",
+        "An access review scheduled for the service principal's owners"
+      ],
+      "correct": 0,
+      "explanation": "Workload identity risk detection extends Identity Protection's leaked-credential and anomalous-location signals specifically to service principals and other workload identities, matching this scenario directly. A sign-in risk policy scoped to All Users targets human user sign-ins rather than a non-interactive service principal, smart lockout addresses repeated password guessing rather than a leaked secret, and an access review on the owners reassesses human access to manage the app rather than the service principal's own risky sign-in behavior."
+    },
+    {
+      "id": "q63",
+      "cat": "identityGovernance",
+      "type": "mc",
+      "question": "An organization adopts Privileged Identity Management two years after first deploying Microsoft Entra ID, and suspects several Global Administrator assignments made during that time are still permanent and active rather than PIM-eligible. What should the team use to find and convert those existing assignments?",
+      "options": [
+        "PIM discovery and insights",
+        "A recurring access review scoped to the Global Administrator role",
+        "PIM alerts",
+        "Identity Secure Score's improvement actions list"
+      ],
+      "correct": 0,
+      "explanation": "PIM discovery and insights specifically scans for pre-existing permanent or active directory role assignments made outside PIM and lets them be converted to eligible directly from the findings. An access review can later recertify assignments already inside PIM but isn't the tool used to first discover and convert standing ones, PIM alerts flag risky configurations reactively rather than enumerating assignments for conversion, and Identity Secure Score only scores overall posture without locating or converting individual role assignments."
+    },
+    {
+      "id": "q64",
+      "cat": "identityGovernance",
+      "type": "mc",
+      "question": "A highly sensitive access package requires sign-off first from the resource owner, and then, independently, a second and final sign-off from a compliance officer before access is granted, with a request the resource owner rejects never reaching the compliance officer at all. What access package request policy feature supports this?",
+      "options": [
+        "Multi-stage approval, with the resource owner and compliance officer as sequential approval stages",
+        "A segregation of duties check between the resource owner and compliance officer roles",
+        "A single-stage approval policy with both approvers added as alternates",
+        "An access review scheduled to run immediately after the request is submitted"
+      ],
+      "correct": 0,
+      "explanation": "Multi-stage approval is built for exactly this sequential pattern, where a rejection at an earlier stage stops the request before it ever reaches a later stage. A segregation of duties check instead blocks a request based on holding a conflicting access package, not sequential sign-off; a single-stage policy with alternates lets either approver act rather than requiring both in sequence; and an access review reassesses access already granted rather than gating a new request."
+    },
+    {
+      "id": "q65",
+      "cat": "identityGovernance",
+      "type": "mc",
+      "question": "An access package should be requestable only by users belonging to one specific partner organization that has already been added as a connected organization, and not by any other connected organization or by internal users. What should be configured on the access package's request policy?",
+      "options": [
+        "A requestor scope limited to that one specific connected organization",
+        "A requestor scope set to all users in your own directory",
+        "A requestor scope set to all configured connected organizations",
+        "A segregation of duties check referencing that connected organization"
+      ],
+      "correct": 0,
+      "explanation": "A request policy's requestor scope can be narrowed to one specific connected organization, matching exactly who should be able to request. Scoping to all users in your own directory would wrongly include internal staff and exclude the external partner entirely, scoping to all connected organizations would open the package to every partner rather than just the intended one, and a segregation of duties check governs incompatible access package combinations, not who may request in the first place."
+    },
+    {
+      "id": "tf26",
+      "cat": "userIdentities",
+      "type": "tf",
+      "question": "Removing a user from a group that assigned them a Microsoft 365 license through group-based licensing also removes any copy of that same license the user was separately assigned directly to their own account.",
+      "answer": false,
+      "explanation": "A license assigned directly to a user and a license inherited from group-based licensing are independent sources -- removing the user from the group only removes the group-inherited copy, leaving a separately, directly assigned copy of the same license in place."
+    },
+    {
+      "id": "tf27",
+      "cat": "authAccessMgmt",
+      "type": "tf",
+      "question": "Certificate-based authentication can let a user satisfy both primary sign-in and phishing-resistant MFA in a single step once the issuing certificate authority is configured as trusted in the tenant.",
+      "answer": true,
+      "explanation": "That is the defining characteristic of certificate-based authentication: the client certificate, bound to hardware like a smart card, can be configured to count as both the primary sign-in factor and a phishing-resistant MFA factor in one step, once its certificate authority is trusted in the tenant."
+    },
+    {
+      "id": "tf28",
+      "cat": "workloadIdentities",
+      "type": "tf",
+      "question": "Granting a developer the Owner role on a specific app registration lets them manage that app's credentials and permissions without receiving the tenant-wide Application Administrator role.",
+      "answer": true,
+      "explanation": "App registration owners get delegated management of just that one application -- its credentials, permissions, and branding -- without needing a directory-wide administrative role like Application Administrator."
+    },
+    {
+      "id": "tf29",
+      "cat": "identityGovernance",
+      "type": "tf",
+      "question": "Access review recommendations are generated purely from a fixed schedule and never take a user's actual recent sign-in or resource usage activity into account.",
+      "answer": false,
+      "explanation": "Access review recommendations are generated specifically from the user's actual recent sign-in and resource usage activity, suggesting Approve or Deny to speed up a reviewer's decision -- they are not produced from a fixed schedule alone."
+    },
+    {
+      "id": "msq14",
+      "cat": "userIdentities",
+      "type": "ms",
+      "question": "Which two of the following are true about group-based licensing and restricted management administrative units? (Choose two.)",
+      "options": [
+        "Group-based licensing automatically assigns or removes a license as a user's group membership changes",
+        "A restricted management administrative unit hides its member objects from administrators who are not assigned a role scoped to that unit",
+        "A standard (non-restricted) administrative unit already hides its members from administrators outside that unit by default",
+        "Group-based licensing requires a dynamic group and cannot be used with an assigned-membership group"
+      ],
+      "correct": [
+        0,
+        1
+      ],
+      "explanation": "Group-based licensing automatically tracks group membership changes, and a restricted management administrative unit specifically hides its members from administrators not assigned a role scoped to it. A standard administrative unit does not hide member visibility by default -- that restriction is unique to the restricted kind -- and group-based licensing works with either an assigned-membership group or a dynamic one, not only a dynamic group."
+    },
+    {
+      "id": "msq15",
+      "cat": "identityGovernance",
+      "type": "ms",
+      "question": "Which two of the following are true about PIM discovery and insights and multi-stage access package approval? (Choose two.)",
+      "options": [
+        "PIM discovery and insights can identify directory role assignments that are permanent and active outside of PIM, and offer to convert them to eligible",
+        "Multi-stage approval lets an access package require sequential sign-off from more than one independent approver",
+        "A request rejected at an earlier approval stage still proceeds to every later stage for a final decision",
+        "PIM discovery and insights can only scan Azure RBAC role assignments, never Microsoft Entra directory roles"
+      ],
+      "correct": [
+        0,
+        1
+      ],
+      "explanation": "PIM discovery and insights surfaces existing permanent/active directory role assignments made outside PIM so they can be converted to eligible, and multi-stage approval lets an access package require sequential sign-off from independent approvers. A request rejected at an earlier stage stops there rather than proceeding to later stages, and PIM discovery and insights covers Microsoft Entra directory roles as well as Azure RBAC roles, not Azure RBAC alone."
     }
   ],
   "lessons": [

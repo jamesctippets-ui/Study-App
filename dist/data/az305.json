@@ -479,6 +479,111 @@
       "front": "Virtual Machine Scale Sets (VMSS)",
       "back": "Manages a group of identical, load-balanced VMs as a single resource, automatically adding or removing instances based on autoscale rules \u2014 the VM-based equivalent of scaling out an App Service plan, but for IaaS workloads that need full OS control. Depending on how it's configured, a scale set's instances can be spread across Availability sets: fault domains and update domains within one datacenter, or across multiple availability zones.",
       "detail": "Combining autoscaling with either of those resiliency layouts means a scale set can absorb both a traffic spike and a rack- or zone-level failure without any manual intervention."
+    },
+    {
+      "id": "f63",
+      "cat": "dataStorage",
+      "front": "Azure SQL Database purchasing models: DTU vs. vCore, and Hyperscale",
+      "back": "The DTU-based model bundles compute, memory, and storage I/O into a single blended unit, simple to budget but hard to scale any one dimension independently. The vCore model prices compute and storage separately, maps directly to physical cores and memory (easing on-premises core-license comparisons), and is the only model that offers the Hyperscale service tier, which can scale storage into the tens of terabytes with near-instant backups and fast scale-out using read replicas.",
+      "detail": "Hyperscale decouples storage growth from compute size entirely, which is the detail that matters when a scenario describes a database that needs to grow far beyond what a fixed DTU tier or a General Purpose/Business Critical vCore tier can comfortably hold."
+    },
+    {
+      "id": "f64",
+      "cat": "dataStorage",
+      "front": "Cosmos DB throughput: provisioned vs. serverless capacity mode",
+      "back": "Provisioned throughput (standard or autoscale) reserves RU/s capacity ahead of time so performance is predictable, suited to steady or predictable workloads. Serverless capacity mode bills per request unit actually consumed, with no RU/s to provision or pay for while idle, suited to spiky or low-traffic workloads where paying for always-on capacity would waste money.",
+      "detail": "Autoscale, within provisioned mode, still reserves a maximum RU/s ceiling and scales automatically between a floor and that ceiling; serverless goes further and removes the need to provision any RU/s at all, but it caps total storage per container and isn't available alongside multi-region writes."
+    },
+    {
+      "id": "f65",
+      "cat": "dataStorage",
+      "front": "Azure Data Factory vs. Synapse pipelines for data integration",
+      "back": "Azure Data Factory is a standalone, code-free ETL/ELT orchestration service for moving and transforming data across on-premises and cloud sources with a large library of connectors. Synapse pipelines provide that same underlying pipeline engine and designer experience, but built directly inside Azure Synapse Analytics, alongside Azure Synapse Analytics: serverless vs. dedicated SQL pools and Spark pools in one unified workspace.",
+      "detail": "Choosing Synapse pipelines over a standalone Data Factory instance is mainly about workspace consolidation \u2014 keeping ingestion, transformation, and querying together in one Synapse workspace \u2014 rather than a difference in the underlying orchestration capability itself."
+    },
+    {
+      "id": "f66",
+      "cat": "identityGovernance",
+      "front": "Azure Lighthouse",
+      "back": "Lets a managing tenant, such as a managed service provider or a central IT organization, administer resources in one or more customer tenants directly, through delegated Azure RBAC roles, without the customer's resources ever leaving their own tenant and without the managing tenant needing a separate guest account in each one.",
+      "detail": "This is the design answer whenever a scenario describes a single team centrally managing resources across multiple, separate Entra ID tenants \u2014 Azure Lighthouse delegates access across tenant boundaries, something management groups and plain Azure RBAC can't do on their own, since both are scoped to a single tenant."
+    },
+    {
+      "id": "f67",
+      "cat": "identityGovernance",
+      "front": "Custom RBAC roles: Actions, NotActions, and DataActions",
+      "back": "A custom role definition grants permissions through Actions, the control-plane operations it allows, and can carve out exceptions with NotActions, operations explicitly excluded from what Actions already grants. Data-plane access \u2014 reading or writing the data inside a resource, like a blob or a queue message \u2014 is governed separately through DataActions, which Actions and NotActions never cover.",
+      "detail": "A built-in role like Reader can't be edited directly, so a requirement for a role just slightly narrower or broader than any built-in one \u2014 including some data-plane access that no existing built-in role quite matches \u2014 is the exam's signal to design a custom role instead."
+    },
+    {
+      "id": "f68",
+      "cat": "identityGovernance",
+      "front": "Microsoft Defender for Cloud",
+      "back": "A cloud security posture management (CSPM) and workload protection platform that continuously assesses resource configuration against security benchmarks, produces a Secure Score to track improvement over time, and can enable workload-specific threat protection for servers, storage, databases, and more, for active threat detection that goes beyond configuration assessment alone.",
+      "detail": "Secure Score is a continuously recalculated posture metric derived from actual configuration, which makes it a different kind of signal than Azure Advisor's recommendations \u2014 Advisor spans all five Well-Architected pillars, while Defender for Cloud's score is specifically a security-posture measurement."
+    },
+    {
+      "id": "f69",
+      "cat": "businessContinuity",
+      "front": "Azure Chaos Studio",
+      "back": "A fault-injection testing service that deliberately triggers failures \u2014 killing a VM, injecting network latency, throttling a dependency \u2014 against a running Azure environment, so a team can observe and validate how a workload's actual resiliency design behaves under real failure conditions, rather than only on paper.",
+      "detail": "This complements, rather than replaces, Azure Site Recovery test failover: Chaos Studio validates how a live, running architecture tolerates and recovers from in-place faults, while a Site Recovery test failover specifically validates that replicated data in a secondary location is recoverable."
+    },
+    {
+      "id": "f70",
+      "cat": "businessContinuity",
+      "front": "Cosmos DB multi-region failover priority and write-conflict resolution",
+      "back": "With multiple read regions configured, an account's failover priority list determines which region Cosmos DB promotes to primary if the current write region fails, and automatic failover follows that list without manual intervention unless it's disabled. If multi-region writes are enabled instead, concurrent writes to the same item in different regions are resolved automatically, by last-writer-wins based on a timestamp, unless a custom conflict resolution policy is defined.",
+      "detail": "A requirement that conflicting writes be resolved by specific business logic, rather than simply keeping whichever write has the latest timestamp, is the signal to configure a custom conflict resolution policy instead of relying on the default last-writer-wins behavior."
+    },
+    {
+      "id": "f71",
+      "cat": "businessContinuity",
+      "front": "Storage account customer-managed (account) failover",
+      "back": "Lets an administrator manually trigger an unplanned failover of a GRS, GZRS, RA-GRS, or RA-GZRS storage account, promoting the secondary region to primary during a real outage. After the failover, the account temporarily becomes locally redundant in the new primary region until geo-redundancy is explicitly reconfigured, and any writes that hadn't yet replicated to the secondary before the failover are lost.",
+      "detail": "This is a deliberate, administrator-triggered action for a genuine regional outage, not something Azure performs automatically on its own \u2014 a design that assumes failover happens by itself without anyone initiating it is assuming a behavior the feature doesn't actually provide."
+    },
+    {
+      "id": "f72",
+      "cat": "businessContinuity",
+      "front": "Azure Site Recovery recovery points: app-consistent vs. crash-consistent",
+      "back": "A crash-consistent recovery point captures disk data as if the VM had simply lost power, with no guarantee that in-memory or in-flight application transactions were flushed to disk first. An app-consistent recovery point additionally quiesces the application before the snapshot, guaranteeing that in-flight transactions are captured cleanly, at the cost of being taken less frequently than crash-consistent points.",
+      "detail": "A database workload that can't tolerate a failover point that might land mid-transaction is the scenario that calls for app-consistent recovery points specifically, even though they're captured on a longer interval than crash-consistent points."
+    },
+    {
+      "id": "f73",
+      "cat": "businessContinuity",
+      "front": "Traffic Manager routing methods: Priority, Weighted, Performance, and Geographic",
+      "back": "Priority routing sends all traffic to the highest-priority healthy endpoint, falling back to the next one only on failure \u2014 the method that actually implements an active-passive multi-region design at the DNS layer. Weighted distributes traffic across endpoints by a configured ratio, useful for a gradual rollout. Performance routes to whichever endpoint has the lowest network latency for the requester. Geographic routes based on the requester's geographic location, often to satisfy data-residency requirements.",
+      "detail": "Picking Priority for what's actually meant to be an active-active multi-region design would quietly turn the backup regions into idle, untested capacity \u2014 Performance or Weighted across every region is what an active-active design actually calls for at the DNS layer."
+    },
+    {
+      "id": "f74",
+      "cat": "infrastructure",
+      "front": "Azure Arc",
+      "back": "Extends Azure management \u2014 Azure Policy, RBAC, Azure Monitor, and tagging \u2014 to servers, Kubernetes clusters, and other infrastructure running outside Azure entirely: on-premises, at the edge, or in another cloud, by projecting each one as an Azure resource without migrating the underlying workload itself.",
+      "detail": "A requirement to apply the same governance and monitoring tooling to on-premises servers that an organization already applies to its native Azure VMs, without actually moving those servers into Azure, is the signal for Azure Arc rather than a migration tool like Azure Migrate."
+    },
+    {
+      "id": "f75",
+      "cat": "infrastructure",
+      "front": "Azure Private Link service vs. private endpoint",
+      "back": "A private endpoint, covered under Private endpoint vs. service endpoint, is how a consumer privately reaches an existing PaaS resource. Azure Private Link service is the other side of that same mechanism: it lets an organization publish its own service, running behind a Standard Load Balancer, so that other VNets, or even other tenants, can connect to it through a private endpoint of their own, without that traffic ever crossing the public internet.",
+      "detail": "A scenario about privately consuming someone else's PaaS resource needs a private endpoint; a scenario about an organization privately exposing its own custom service to outside consumers needs Private Link service on the provider's side."
+    },
+    {
+      "id": "f76",
+      "cat": "infrastructure",
+      "front": "API Management network integration: external vs. internal VNet modes",
+      "back": "In external mode, Azure API Management's gateway, developer portal, and management endpoints get a public IP, while the backends it calls can still sit privately inside a VNet. In internal mode, every one of those endpoints, including the gateway itself, only gets a private IP inside the VNet, so APIs are reachable only from within that network or something connected to it, with no public endpoint existing at all.",
+      "detail": "A requirement that an API only ever be reachable from inside the corporate network or over ExpressRoute, never from the public internet, is the signal for internal VNet mode specifically, not just locking down the backend behind the gateway."
+    },
+    {
+      "id": "f77",
+      "cat": "infrastructure",
+      "front": "Load Balancer SKUs: Basic vs. Standard",
+      "back": "The Basic SKU has no SLA, no zone redundancy, no outbound rules of its own, and is open by default, allowing inbound traffic even with no NSG attached. The Standard SKU adds a 99.99% SLA, supports a zone-redundant frontend IP, provides explicit outbound rules to manage SNAT port allocation, and is secure by default, blocking all inbound traffic unless an NSG explicitly allows it.",
+      "detail": "That last difference catches teams off guard migrating from Basic to Standard: VMs that were reachable with no NSG at all under Basic suddenly become unreachable under Standard until an explicit allow rule is added, since Standard assumes nothing is allowed until an NSG says otherwise."
     }
   ],
   "questions": [
@@ -1816,6 +1921,229 @@
         2
       ],
       "explanation": "Availability sets spread member VMs across separate fault domains (hardware/power) and update domains (planned maintenance groupings), all within a single datacenter. They don't protect against a regional loss \u2014 that requires a secondary region \u2014 and they're a distinct, datacenter-local construct that doesn't depend on availability zones being configured at all."
+    },
+    {
+      "id": "q65",
+      "cat": "identityGovernance",
+      "type": "mc",
+      "question": "A managed service provider manages Azure resources for 30 separate customer organizations, each in its own Entra ID tenant, and wants its engineers to administer all of them from one place without the provider's staff ever becoming guest users in each customer tenant. Which service should be used to delegate that access?",
+      "options": [
+        "Azure Lighthouse",
+        "A management group shared across all customer tenants",
+        "A single Entra ID tenant housing every customer's resources",
+        "An Azure Policy initiative assigned to each customer subscription"
+      ],
+      "correct": 0,
+      "explanation": "Azure Lighthouse delegates RBAC roles across tenant boundaries, letting the provider's own identities administer each customer tenant's resources directly without becoming a guest in each one. Management groups and policy initiatives both operate within a single tenant's own hierarchy and don't cross tenant boundaries on their own. Merging every customer into one shared tenant would abandon the separate-tenant isolation the scenario assumes."
+    },
+    {
+      "id": "q66",
+      "cat": "identityGovernance",
+      "type": "mc",
+      "question": "A team wants one score that tracks whether their Azure environment's actual security configuration is improving over time, separate from general cost or performance recommendations. Which Azure capability provides this?",
+      "options": [
+        "Microsoft Defender for Cloud's Secure Score",
+        "Azure Advisor's recommendation list",
+        "Azure Resource Graph query results",
+        "Azure Monitor Workbooks"
+      ],
+      "correct": 0,
+      "explanation": "Defender for Cloud continuously assesses configuration against security benchmarks and rolls that assessment into a single Secure Score, tracked over time specifically for security posture. Advisor's recommendations span all five Well-Architected pillars, not a dedicated security score. Resource Graph only returns resource metadata from a query, and Workbooks visualize monitoring data \u2014 neither one computes a posture score."
+    },
+    {
+      "id": "tf21",
+      "cat": "identityGovernance",
+      "type": "tf",
+      "question": "A custom RBAC role's DataActions property can grant permission to read the contents of a blob, something its Actions property alone cannot grant.",
+      "answer": true,
+      "explanation": "DataActions governs data-plane operations, such as reading or writing the data inside a resource like a blob's contents, while Actions governs control-plane operations, such as managing the storage account itself. Granting Actions on a resource doesn't by itself grant data-plane access to what's stored inside it \u2014 that distinction is exactly why DataActions exists as a separate property on a custom role definition."
+    },
+    {
+      "id": "q67",
+      "cat": "dataStorage",
+      "type": "mc",
+      "question": "An application's Azure SQL Database needs to grow to 60 TB of data, with near-instant backups and the ability to add read replicas quickly as reporting load grows. Which purchasing model and tier should be recommended?",
+      "options": [
+        "The DTU-based model at its highest tier",
+        "The vCore-based model's Hyperscale service tier",
+        "The vCore-based model's Business Critical tier at its smallest size",
+        "SQL Server on a virtual machine with manually attached disks"
+      ],
+      "correct": 1,
+      "explanation": "Hyperscale, available only in the vCore model, decouples storage growth from compute size, supporting tens of terabytes with near-instant backups and fast read-replica scale-out, matching every requirement. The DTU model has no comparable storage ceiling or backup behavior at this scale. Business Critical at its smallest size doesn't address the storage or backup requirement on its own, and a self-managed VM would require manually building replication and backup behavior that Hyperscale already provides natively."
+    },
+    {
+      "id": "q68",
+      "cat": "dataStorage",
+      "type": "mc",
+      "question": "A new Cosmos DB workload sees occasional, unpredictable bursts of traffic a few times a week and sits essentially idle the rest of the time. The team wants to avoid paying for reserved throughput capacity during the idle periods. Which capacity mode fits best?",
+      "options": [
+        "Standard (manual) provisioned throughput",
+        "Autoscale provisioned throughput",
+        "Serverless capacity mode",
+        "Multi-region writes with provisioned throughput in every region"
+      ],
+      "correct": 2,
+      "explanation": "Serverless bills per request unit actually consumed, with nothing reserved or paid for during idle periods, matching an unpredictable, mostly-idle workload. Standard provisioned throughput reserves a fixed RU/s around the clock regardless of use. Autoscale still reserves a maximum RU/s ceiling rather than removing provisioned capacity entirely. Multi-region writes with provisioned throughput in every region would multiply the always-on cost this scenario is trying to avoid."
+    },
+    {
+      "id": "tf18",
+      "cat": "dataStorage",
+      "type": "tf",
+      "question": "Azure Synapse pipelines and Azure Data Factory pipelines use a fundamentally different orchestration engine from one another.",
+      "answer": false,
+      "explanation": "Synapse pipelines are built on the same underlying pipeline engine and designer experience as Azure Data Factory; the real difference is that Synapse pipelines live inside a Synapse workspace alongside serverless and dedicated SQL pools and Spark pools, not a different orchestration technology."
+    },
+    {
+      "id": "msq18",
+      "cat": "dataStorage",
+      "type": "ms",
+      "question": "Which two of the following are true about Cosmos DB capacity modes? (Choose two.)",
+      "options": [
+        "Serverless capacity mode removes the need to provision RU/s ahead of time, billing per request unit consumed instead",
+        "Autoscale provisioned throughput has no upper RU/s ceiling at all",
+        "Serverless capacity mode can be combined with multi-region write accounts without restriction",
+        "Provisioned throughput, whether standard or autoscale, reserves capacity ahead of time for predictable performance"
+      ],
+      "correct": [
+        0,
+        3
+      ],
+      "explanation": "Serverless removes the need to provision RU/s, billing only for consumption, while both standard and autoscale provisioned throughput reserve capacity ahead of time for predictable performance. Autoscale does have a configured upper RU/s ceiling rather than being unlimited, and serverless specifically isn't available alongside multi-region write accounts."
+    },
+    {
+      "id": "q69",
+      "cat": "businessContinuity",
+      "type": "mc",
+      "question": "A team has already implemented availability zones, a secondary region, and automated failover for a critical workload, and now wants to verify how the running production architecture actually behaves when a dependency unexpectedly becomes slow or a VM is killed outright, rather than simply trusting the design on paper. Which service should they use?",
+      "options": [
+        "Azure Site Recovery test failover",
+        "Azure Chaos Studio",
+        "Azure Advisor",
+        "Azure Monitor action groups"
+      ],
+      "correct": 1,
+      "explanation": "Chaos Studio deliberately injects faults like VM failure or added latency into a running environment, letting a team observe how the actual architecture responds and recovers, rather than only validating that replicated data is recoverable. Site Recovery test failover validates recoverability of replicated VMs, not the fault tolerance of a currently running system. Advisor gives configuration-based recommendations, and action groups just execute a response once an alert already fires \u2014 neither one injects or observes real failure conditions."
+    },
+    {
+      "id": "q70",
+      "cat": "businessContinuity",
+      "type": "mc",
+      "question": "A Cosmos DB account has three read regions configured with automatic failover enabled, and the write region fails. Without any manual intervention, which region becomes the new write region?",
+      "options": [
+        "Whichever region currently has the lowest replication lag",
+        "The region highest on the account's configured failover priority list",
+        "A region chosen at random, to balance load across the remaining regions",
+        "No region is promoted automatically; every failover requires a manual trigger"
+      ],
+      "correct": 1,
+      "explanation": "With automatic failover enabled, Cosmos DB promotes the next region on the account's own configured failover priority list, in that order, without requiring anyone to intervene manually. It isn't chosen by replication lag or at random, and automatic failover specifically removes the need for a manual trigger, unlike an account where automatic failover has been disabled."
+    },
+    {
+      "id": "tf19",
+      "cat": "businessContinuity",
+      "type": "tf",
+      "question": "After a customer-managed (account) failover of a GRS storage account, the newly promoted primary region is automatically GRS-protected again, with no further configuration needed.",
+      "answer": false,
+      "explanation": "Immediately after an account failover, the storage account becomes locally redundant in its new primary region until an administrator explicitly reconfigures geo-redundancy \u2014 that protection isn't restored automatically on its own."
+    },
+    {
+      "id": "q71",
+      "cat": "businessContinuity",
+      "type": "mc",
+      "question": "A team replicating a transactional database VM with Azure Site Recovery wants to guarantee that a failover never lands mid-transaction, even though it means accepting recovery points that are captured less frequently. Which type of recovery point should they prioritize?",
+      "options": [
+        "Crash-consistent recovery points",
+        "App-consistent recovery points",
+        "Recovery points taken only once every 24 hours, regardless of consistency type",
+        "Whichever recovery point was most recently generated, regardless of its consistency type"
+      ],
+      "correct": 1,
+      "explanation": "App-consistent recovery points quiesce the application before the snapshot, guaranteeing in-flight transactions are captured cleanly, which is exactly the trade-off this team is explicitly willing to accept a longer interval for. Crash-consistent points are captured more frequently but offer no such guarantee, and neither a fixed 24-hour interval nor simply picking the most recent point addresses the consistency guarantee being asked for."
+    },
+    {
+      "id": "msq19",
+      "cat": "businessContinuity",
+      "type": "ms",
+      "question": "Which two of the following correctly match a Traffic Manager routing method to the scenario it's designed for? (Choose two.)",
+      "options": [
+        "Priority routing sends all traffic to one primary endpoint, falling back to the next only on failure \u2014 a fit for an active-passive design",
+        "Weighted routing requires every endpoint to be in the same Azure region",
+        "Performance routing sends traffic to whichever endpoint has the lowest network latency for the requester",
+        "Geographic routing ignores the requester's location entirely and routes purely by configured weight"
+      ],
+      "correct": [
+        0,
+        2
+      ],
+      "explanation": "Priority routing is exactly how Traffic Manager implements an active-passive failover design, and Performance routing specifically targets the lowest-latency endpoint for each requester. Weighted routing has no same-region requirement \u2014 it's designed to work across regions \u2014 and Geographic routing's entire purpose is routing based on the requester's location, the opposite of ignoring it."
+    },
+    {
+      "id": "q72",
+      "cat": "infrastructure",
+      "type": "mc",
+      "question": "An organization wants to apply the same Azure Policy assignments, RBAC roles, and Azure Monitor collection it already uses for its Azure VMs to a set of servers that will remain running in its own on-premises datacenter indefinitely, with no plan to migrate them. Which service lets those on-premises servers be managed this way?",
+      "options": [
+        "Azure Migrate",
+        "Azure Arc",
+        "Azure Site Recovery",
+        "Azure Virtual WAN"
+      ],
+      "correct": 1,
+      "explanation": "Azure Arc projects on-premises (or other-cloud) servers as Azure resources, letting the same Azure Policy, RBAC, and Monitor tooling apply to them without actually migrating the workload. Azure Migrate is for discovering and assessing workloads ahead of an actual move, which this scenario explicitly rules out. Site Recovery replicates workloads for failover, and Virtual WAN automates network connectivity \u2014 neither one projects an on-premises server as a governed Azure resource."
+    },
+    {
+      "id": "q73",
+      "cat": "infrastructure",
+      "type": "mc",
+      "question": "A software company wants to let its enterprise customers connect to its own multi-tenant SaaS service privately from inside their own VNets, without that traffic ever crossing the public internet, and without requiring the company to peer its VNet directly with every customer's network. What should the company configure behind its service?",
+      "options": [
+        "Azure Private Link service, so customers connect to it through their own private endpoints",
+        "A service endpoint on the company's own subnet",
+        "A public IP address restricted by NSG rules scoped to each customer's address range",
+        "VNet peering between the company's VNet and every customer's VNet"
+      ],
+      "correct": 0,
+      "explanation": "Private Link service is specifically designed to let an organization publish its own service behind a Standard Load Balancer so that other VNets, including customers' own VNets, connect to it privately through their own private endpoints, without direct VNet peering. A service endpoint only affects traffic originating inside the company's own VNet, not customer access. Restricting a public IP by NSG rule still relies on a public endpoint, and peering with every customer's VNet doesn't scale and creates direct network adjacency the company likely doesn't want."
+    },
+    {
+      "id": "tf20",
+      "cat": "infrastructure",
+      "type": "tf",
+      "question": "Deploying Azure API Management in internal VNet mode still leaves its developer portal reachable from the public internet, even though the gateway itself becomes private.",
+      "answer": false,
+      "explanation": "Internal VNet mode makes every API Management endpoint private, including the gateway, the developer portal, and the management endpoint, not just the gateway \u2014 none of them get a public IP in that mode. External mode is the one where the gateway and portal keep public reachability while backends can still sit privately inside a VNet."
+    },
+    {
+      "id": "q74",
+      "cat": "infrastructure",
+      "type": "mc",
+      "question": "A team migrates a set of backend VMs from a Basic SKU load balancer to a Standard SKU load balancer and keeps the same VNet and subnet configuration, with no NSG ever having been attached to either one. After the migration, what changes about inbound reachability to those VMs?",
+      "options": [
+        "Nothing changes, since both SKUs allow inbound traffic by default with no NSG attached",
+        "The VMs become unreachable, because Standard SKU blocks all inbound traffic by default unless an NSG explicitly allows it",
+        "The VMs become reachable only over ExpressRoute, since Standard SKU disables public inbound access entirely",
+        "The migration fails outright, since a load balancer SKU can never be changed once VMs are attached"
+      ],
+      "correct": 1,
+      "explanation": "Standard SKU is secure by default and blocks all inbound traffic unless an NSG explicitly permits it, unlike Basic SKU, which allows inbound traffic even with no NSG attached at all \u2014 so VMs that were reachable under Basic go dark under Standard until an explicit allow rule is added. Standard doesn't restrict inbound access to ExpressRoute only, and switching SKUs doesn't fail outright on its own, though it does require planning for exactly this behavior change."
+    },
+    {
+      "id": "msq20",
+      "cat": "infrastructure",
+      "type": "ms",
+      "question": "Which two of the following are true about Azure Arc? (Choose two.)",
+      "options": [
+        "It can project on-premises or other-cloud Kubernetes clusters as Azure resources for policy and monitoring purposes",
+        "It migrates the underlying workload into Azure as part of enabling it",
+        "It lets Azure Policy and RBAC be applied to non-Azure servers without moving them into Azure",
+        "It is limited to virtual machines and cannot manage Kubernetes clusters at all"
+      ],
+      "correct": [
+        0,
+        2
+      ],
+      "explanation": "Azure Arc can project both servers and Kubernetes clusters running outside Azure as Azure resources, and its whole point is applying Azure Policy, RBAC, and monitoring to them without migrating the underlying workload. That's the opposite of statement B, and Arc isn't limited to VMs alone, since Kubernetes clusters are explicitly one of the resource types it supports."
     }
   ],
   "lessons": [

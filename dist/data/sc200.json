@@ -482,6 +482,111 @@
       "front": "Search jobs and restoring archived logs",
       "back": "A search job runs an asynchronous query across data on the low-cost Basic Logs table plan or Archive tier and writes matching rows into a new, regular Analytics-tier table so they become queryable like any other table, while restoring a specific time range from Archive tier instead makes that whole range immediately query-ready in place for a bounded window, without waiting on a job to filter results.",
       "detail": "Both exist because Basic Logs and Archive-tier data are deliberately not directly queryable at full interactive speed the way standard Analytics-tier data in a Log Analytics workspace is, so a genuine long-range hunt over that older, cheaper data has to explicitly bring it back within reach first."
+    },
+    {
+      "id": "f65",
+      "cat": "manageSecOps",
+      "front": "Attack surface reduction (ASR) rules",
+      "back": "ASR rules in Defender for Endpoint are granular, independently toggleable controls that block specific risky behaviors before they succeed -- such as blocking credential theft from the Windows local security authority subsystem (lsass.exe), blocking Office applications from creating child processes, or blocking execution of potentially obfuscated scripts -- each configurable to block, audit, or warn.",
+      "detail": "Because each rule targets one specific technique rather than a broad category, a SOC rolls them out in audit mode first to see what each one would have blocked on real traffic before flipping it to block mode and risking a legitimate workflow breaking."
+    },
+    {
+      "id": "f66",
+      "cat": "manageSecOps",
+      "front": "Microsoft Defender Vulnerability Management",
+      "back": "Defender Vulnerability Management gives each onboarded device its own exposure score, built from a continuously updated software and vulnerability inventory, missing security baselines, and prioritized security recommendations -- a device-level, vulnerability-centric posture view distinct from Microsoft Defender for Cloud: Secure Score and regulatory compliance, which instead scores Azure (and multicloud) resource configuration against best practices.",
+      "detail": "A security recommendation here is prioritized using the same kind of real-world exploitability and threat context Security Copilot or threat intelligence might also surface, not just a raw CVSS severity number, so the top-ranked item isn't necessarily the highest-severity CVE on paper."
+    },
+    {
+      "id": "f67",
+      "cat": "manageSecOps",
+      "front": "Sentinel summary rules",
+      "back": "A summary rule runs on a schedule to pre-aggregate high-volume raw data (like a running count of sign-ins per user per hour) into a much smaller summary table, so a dashboard or hunting query that only needs the aggregate can scan that small table instead of re-scanning the full raw data every single time it runs.",
+      "detail": "This is a cost-and-performance optimization layered on top of already-ingested data -- unlike a Data Collection Rule transformation, which reshapes data before it is ever stored, a summary rule pre-computes a reusable aggregate from data already sitting in the workspace."
+    },
+    {
+      "id": "f68",
+      "cat": "manageSecOps",
+      "front": "Sentinel SOC optimization",
+      "back": "SOC optimization analyzes a workspace's own connected data, enabled analytics rules, and ingestion patterns to generate tailored recommendations -- such as a data source with no analytics rule using it, or a table being ingested at high cost with little actual query or detection value -- closing coverage gaps and cutting waste without an analyst having to audit every rule and table by hand.",
+      "detail": "This complements the MITRE ATT&CK coverage in Sentinel: coverage recommendations point at gaps relative to attacker techniques, while SOC optimization's cost-focused recommendations point at ingestion spend that isn't earning its keep."
+    },
+    {
+      "id": "f69",
+      "cat": "manageSecOps",
+      "front": "Microsoft Secure Score vs. Defender for Cloud Secure Score",
+      "back": "Microsoft Secure Score measures Microsoft 365 identity, device, app, and data posture tenant-wide (things like whether MFA is enforced or mailbox auditing is on), while Microsoft Defender for Cloud: Secure Score and regulatory compliance instead scores Azure and connected multicloud resource configuration specifically -- two separately calculated scores covering different resource types, not one combined number.",
+      "detail": "A tenant can carry a strong Microsoft Secure Score from solid identity hygiene while still showing a weak Defender for Cloud score from unencrypted disks or open management ports, since each score only reflects its own slice of the environment."
+    },
+    {
+      "id": "f70",
+      "cat": "manageSecOps",
+      "front": "Defender for Cloud attack path analysis",
+      "back": "Attack path analysis uses Defender for Cloud's cloud security graph -- a map of resources, their configurations, and how they connect -- to chain together individually low-risk findings (like an internet-exposed VM with a path to a key vault holding sensitive secrets) into a single prioritized path, surfacing which combination is actually exploitable rather than listing every recommendation with equal weight.",
+      "detail": "This reframes Microsoft Defender for Cloud: Secure Score and regulatory compliance's flat list of recommendations into a connected risk story -- two recommendations that look equally minor in isolation can matter far more once the graph shows they sit on the same reachable path to a sensitive resource."
+    },
+    {
+      "id": "f71",
+      "cat": "respondIncidents",
+      "front": "Defender for Identity sensor architecture",
+      "back": "Defender for Identity runs as lightweight sensors installed directly on domain controllers, AD FS, and AD CS servers, each monitoring local traffic and Windows events, while a cloud-based component correlates signals across all of them -- which is how it detects on-prem Active Directory attacks like Lateral movement paths or Honeytoken account hits without needing a network-wide traffic mirror or SPAN port.",
+      "detail": "Because the sensor runs directly on the monitored server rather than observing network traffic from outside it, Defender for Identity can see authentication activity even when it never crosses a network segment a traditional network sensor would have had visibility into."
+    },
+    {
+      "id": "f72",
+      "cat": "respondIncidents",
+      "front": "Incident evidence in Sentinel",
+      "back": "The Evidence tab on a Sentinel incident lists every alert, bookmark, file, and related entity tied to the case in one place, giving a flat, reviewable inventory of exactly what has been gathered -- a different view from the investigation graph in Sentinel, which instead visualizes how those same entities connect to each other rather than just listing them.",
+      "detail": "A bookmark pulled in from a separate hunt lands here as one more piece of evidence on the incident, alongside anything automation or an analyst has already attached, rather than needing to be re-described from scratch."
+    },
+    {
+      "id": "f73",
+      "cat": "respondIncidents",
+      "front": "Contain user and Contain device actions in Defender XDR",
+      "back": "Contain user and Contain device are unified Defender XDR response actions that restrict a suspicious account or unmanaged device just enough to stop it from spreading further -- blocking sign-in or network communication with managed resources -- without going as far as fully disabling the account or fully isolating a managed device the way Defender for Endpoint device isolation does.",
+      "detail": "These actions exist specifically for the in-between case automatic attack disruption in Defender XDR often reaches for -- an entity confident enough to contain right now, but not yet confirmed enough to warrant the fuller, more disruptive response of a full account disable or complete device isolation."
+    },
+    {
+      "id": "f74",
+      "cat": "respondIncidents",
+      "front": "Alert classification and determination in Defender XDR",
+      "back": "Closing an alert or incident in Defender XDR records both a classification (True positive, False positive, or Informational/expected activity) and a more specific determination within it (such as Malware, Phishing, Compromised account, or Security testing), giving a structured, auditable reason distinct from Sentinel incident management's own status/severity/classification fields on the synced incident.",
+      "detail": "Consistently picking an accurate determination, not just a classification, is what later analytics on alert quality and tuning priorities actually depend on -- two incidents both marked True positive can still need very different follow-up depending on whether the determination was Malware versus Compromised account."
+    },
+    {
+      "id": "f75",
+      "cat": "respondIncidents",
+      "front": "Defender for Endpoint device groups and RBAC",
+      "back": "Devices are organized into device groups (often by business unit, criticality, or OS), and role-based access control then scopes which analysts can see or act on which groups -- so a first-line analyst can be granted response actions only on a non-critical device group while a senior analyst retains access tenant-wide.",
+      "detail": "Device group membership can also drive which automated investigation and response (AIR) automation level applies, so a device group holding a company's most sensitive servers can be deliberately left on a Semi level requiring approval even while less sensitive groups run fully automatic remediation."
+    },
+    {
+      "id": "f76",
+      "cat": "respondIncidents",
+      "front": "Microsoft Defender for IoT in the SOC",
+      "back": "Defender for IoT discovers and monitors unmanaged IoT and operational technology (OT) devices -- the kind that cannot run a standard endpoint agent -- passively analyzing network traffic to detect anomalies and vulnerabilities, with its alerts flowing into the same unified Defender XDR incident queue and Sentinel workspace as every other connected product once integrated.",
+      "detail": "This closes a visibility gap none of the other Defender products address, since Defender for Endpoint's own sensor-based detection assumes a device that can actually run its agent, which most OT and IoT devices simply cannot."
+    },
+    {
+      "id": "f77",
+      "cat": "threatHunting",
+      "front": "union operator in KQL",
+      "back": "union combines rows from two or more tables with a similar or overlapping schema into one result set, stacking them vertically -- a different operation from a join type like inner or leftouter, which instead combines columns from two tables side by side by matching on a key.",
+      "detail": "A hunting query that needs every event of several related kinds -- say, union DeviceProcessEvents, DeviceNetworkEvents -- to look for a pattern spanning both reaches for union specifically because neither table alone has every row the hunt needs, and there's no shared key to join them on in the first place."
+    },
+    {
+      "id": "f78",
+      "cat": "threatHunting",
+      "front": "bag_unpack operator in KQL",
+      "back": "bag_unpack expands a single dynamic property bag column (key-value pairs, like a JSON object) into one column per key, which is the property-bag counterpart to mv-expand operator, which instead expands a dynamic array into one row per element.",
+      "detail": "A raw event with a single AdditionalFields column holding several named properties only becomes queryable field by field, each in its own column, after bag_unpack splits that property bag out -- compare that to a column holding an array of several values, which calls for mv-expand instead."
+    },
+    {
+      "id": "f79",
+      "cat": "threatHunting",
+      "front": "Cross-workspace KQL queries",
+      "back": "The workspace() function lets a KQL query in one Log Analytics workspace reach into a table in a different workspace -- and resource() does the same for a specific Azure resource's own logs -- letting a hunt correlate data that a larger organization has deliberately split across multiple separate Sentinel workspaces (often by subscription, region, or business unit).",
+      "detail": "This matters specifically because entity mapping, alert grouping, and most of a KQL query pipeline basics otherwise assume all the needed data already lives in one workspace -- without workspace(), a hunt split across workspace boundaries would have to be run and manually reconciled separately in each one."
     }
   ],
   "questions": [
@@ -1683,6 +1788,238 @@
         1
       ],
       "explanation": "A search job asynchronously pulls matching rows out into a new Analytics-tier table, and restoring an Archive-tier time range instead brings that whole range back within immediate interactive reach for a bounded window -- two different paths to the same underlying need. Basic Logs and Archive-tier data are deliberately not directly queryable at full interactive speed, which is exactly why a genuine long-range hunt over that cheaper data has to explicitly bring it back into reach first."
+    },
+    {
+      "id": "q56",
+      "cat": "manageSecOps",
+      "type": "mc",
+      "question": "A SOC wants to stop a specific technique -- credential theft from the Windows local security authority subsystem (lsass.exe) -- without disabling broader endpoint protection, and wants to first see what it would have blocked before enforcing it. What should they configure?",
+      "options": [
+        "A custom indicator of compromise set to audit",
+        "An attack surface reduction (ASR) rule for credential theft from lsass.exe, set to audit mode",
+        "Just-in-time (JIT) VM access on the affected hosts",
+        "A Defender for Cloud Apps session policy targeting the same devices"
+      ],
+      "correct": 1,
+      "explanation": "ASR rules target one specific risky technique at a time, like credential theft from lsass.exe, and each can independently be set to audit, warn, or block, which is exactly the staged rollout this scenario calls for. A custom indicator blocks a known-bad artifact rather than a behavior, JIT access manages VM port exposure, and a Defender for Cloud Apps session policy governs SaaS sessions, not endpoint process behavior."
+    },
+    {
+      "id": "q57",
+      "cat": "manageSecOps",
+      "type": "mc",
+      "question": "A security team wants a single, continuously updated exposure score per device, built from that device's own software inventory, missing security baselines, and outstanding vulnerabilities, to prioritize patching. Which capability provides this?",
+      "options": [
+        "Microsoft Defender Vulnerability Management",
+        "Microsoft Defender for Cloud's Secure Score",
+        "Sentinel's MITRE ATT&CK coverage view",
+        "A Sentinel workbook built from SecurityAlert"
+      ],
+      "correct": 0,
+      "explanation": "Defender Vulnerability Management produces a device-level exposure score from that device's own software inventory, missing baselines, and vulnerabilities, distinct from Defender for Cloud's Secure Score, which instead scores Azure/multicloud resource configuration rather than endpoint-level vulnerability posture. The ATT&CK coverage view addresses analytics rule technique coverage, and a workbook only visualizes existing data rather than computing its own exposure score."
+    },
+    {
+      "id": "q58",
+      "cat": "manageSecOps",
+      "type": "mc",
+      "question": "A Sentinel workspace ingests a very high volume of sign-in events, and a dashboard only ever needs a per-user, per-hour sign-in count rather than every raw row. The team wants that count pre-computed on a schedule into a small table so the dashboard query scans far less data each time it runs. What should they configure?",
+      "options": [
+        "A Data Collection Rule ingestion-time transformation",
+        "A summary rule",
+        "A watchlist",
+        "An NRT analytics rule"
+      ],
+      "correct": 1,
+      "explanation": "A summary rule runs on a schedule to pre-aggregate high-volume raw data already in the workspace into a small summary table, which is exactly what lets the dashboard query scan the aggregate instead of the full raw data every time. A DCR transformation reshapes data before it's ever stored rather than aggregating what's already there, a watchlist is static reference data, and an NRT rule generates incidents rather than precomputing an aggregate for a dashboard."
+    },
+    {
+      "id": "q59",
+      "cat": "manageSecOps",
+      "type": "tf",
+      "question": "Sentinel's SOC optimization recommendations can flag a data source that is being ingested at high cost but has little actual analytics rule or query usage.",
+      "answer": true,
+      "explanation": "SOC optimization analyzes a workspace's own ingestion patterns and enabled content to surface exactly this kind of recommendation -- a costly data source with little detection or query value -- alongside coverage-gap recommendations, without an analyst having to audit every table by hand."
+    },
+    {
+      "id": "q60",
+      "cat": "manageSecOps",
+      "type": "mc",
+      "question": "A tenant shows a strong Microsoft Secure Score from solid MFA enforcement and mailbox auditing, but a weak score in Microsoft Defender for Cloud from several VMs with disk encryption disabled. What does this combination illustrate?",
+      "options": [
+        "That the two scores are actually the same metric reported inconsistently, which should be reported as a bug",
+        "That Microsoft Secure Score and Defender for Cloud's Secure Score are two separately calculated scores covering different resource types",
+        "That the Microsoft Secure Score figure is outdated and should be ignored in favor of Defender for Cloud's score",
+        "That Defender for Cloud's score automatically factors in Microsoft Secure Score once both are enabled"
+      ],
+      "correct": 1,
+      "explanation": "Microsoft Secure Score covers Microsoft 365 identity, device, app, and data posture, while Defender for Cloud's Secure Score covers Azure and multicloud resource configuration -- two separate scores over different resource types, which is exactly why a tenant can look strong on one and weak on the other at the same time. Neither score subsumes or depends on the other, and this isn't a reporting inconsistency to flag as a bug."
+    },
+    {
+      "id": "q61",
+      "cat": "manageSecOps",
+      "type": "mc",
+      "question": "Defender for Cloud shows two individually low-severity recommendations: an internet-exposed VM, and a key vault holding sensitive secrets. The cloud security graph reveals the VM has a network path directly to that key vault. How should this be prioritized compared to treating each recommendation separately?",
+      "options": [
+        "Each recommendation should still be remediated strictly in isolation, since Secure Score only ever weighs findings individually",
+        "The chained path should be prioritized higher through attack path analysis, since the combination is more exploitable than either finding alone",
+        "The two findings should be merged into a single regulatory compliance control automatically",
+        "Only the key vault finding matters, since Defender for Cloud only scores resources that directly hold sensitive data"
+      ],
+      "correct": 1,
+      "explanation": "Attack path analysis is built specifically to chain individually low-risk findings together using the cloud security graph's resource connections, surfacing that this particular combination is more exploitable, and so more urgent, than either finding scored on its own. Secure Score recommendations are not strictly siloed from each other once attack path analysis is in play, this has nothing to do with a regulatory compliance control, and an exposed path to a sensitive resource is exactly the kind of finding that matters regardless of which resource directly holds the data."
+    },
+    {
+      "id": "msq15",
+      "cat": "manageSecOps",
+      "type": "ms",
+      "question": "Which two of the following are true about attack surface reduction (ASR) rules and Microsoft Defender Vulnerability Management? (Choose two.)",
+      "options": [
+        "Each ASR rule can be independently configured to block, audit, or warn",
+        "ASR rules and Defender Vulnerability Management are the same feature under two different names",
+        "Defender Vulnerability Management produces a device-level exposure score from software inventory and outstanding vulnerabilities",
+        "ASR rules can only be applied tenant-wide, never rolled out in a staged or audited way"
+      ],
+      "correct": [
+        0,
+        2
+      ],
+      "explanation": "Each ASR rule has its own independent block/audit/warn setting, and Defender Vulnerability Management computes a per-device exposure score from that device's software inventory and vulnerabilities. ASR rules and Defender Vulnerability Management address different concerns -- blocking specific risky behaviors versus scoring vulnerability exposure -- and ASR rules are commonly rolled out in audit mode first precisely because a staged rollout is supported."
+    },
+    {
+      "id": "q62",
+      "cat": "respondIncidents",
+      "type": "mc",
+      "question": "Defender for Identity detects a suspicious authentication pattern against a domain controller without any network-wide traffic mirror or SPAN port configured. How does Defender for Identity achieve this visibility?",
+      "options": [
+        "A lightweight sensor installed directly on the domain controller monitors local traffic and Windows events, correlated by a cloud-based component",
+        "It requires a Defender for Endpoint agent to be installed on every domain controller first",
+        "It relies entirely on Microsoft Entra ID sign-in logs, with no on-premises component at all",
+        "It requires a dedicated network tap on every subnet the domain controller is reachable from"
+      ],
+      "correct": 0,
+      "explanation": "Defender for Identity's sensor runs directly on the monitored server itself -- domain controllers, AD FS, and AD CS servers -- watching local traffic and events, with a cloud component correlating signals across all sensors, which is exactly why no network-wide traffic mirror is required. It is not a Defender for Endpoint agent, it isn't limited to cloud Entra ID sign-in data alone, and it doesn't require a dedicated network tap on every subnet."
+    },
+    {
+      "id": "q63",
+      "cat": "respondIncidents",
+      "type": "mc",
+      "question": "An analyst reviewing a Sentinel incident wants a single, flat inventory of every alert, bookmark, file, and related entity gathered on the case so far, without needing to interpret how those items visually connect to each other. Which incident feature fits?",
+      "options": [
+        "The investigation graph",
+        "The Evidence tab",
+        "A Sentinel workbook",
+        "The MITRE ATT&CK coverage view"
+      ],
+      "correct": 1,
+      "explanation": "The Evidence tab lists every alert, bookmark, file, and entity tied to the incident as a flat, reviewable inventory. The investigation graph instead visualizes how those same items connect to each other rather than just listing them, a workbook is a separate dashboard-style visualization over the whole workspace, and the ATT&CK coverage view addresses rule coverage, not a single incident's gathered evidence."
+    },
+    {
+      "id": "q64",
+      "cat": "respondIncidents",
+      "type": "mc",
+      "question": "A Defender XDR signal is confident enough to warrant stopping a suspicious but unmanaged device from reaching managed resources right now, but not yet confirmed enough to justify the fuller response of full account disablement or complete device isolation. Which response action fits this in-between case?",
+      "options": [
+        "Automatic attack disruption only, with no lesser option available",
+        "Device isolation, since it is the only containment action Defender XDR offers",
+        "Contain device, a more limited unified action restricting the device's communication with managed resources",
+        "Zero-hour auto purge targeting the device's traffic"
+      ],
+      "correct": 2,
+      "explanation": "Contain device (alongside Contain user for accounts) is a unified Defender XDR action built for exactly this in-between confidence level -- restricting communication with managed resources without going as far as full device isolation or disabling an account outright. Device isolation is the fuller action this scenario is specifically trying to avoid, ZAP is an email-specific post-delivery control unrelated to device containment, and automatic attack disruption is not the only containment option available at a lower confidence level."
+    },
+    {
+      "id": "q65",
+      "cat": "respondIncidents",
+      "type": "mc",
+      "question": "Two Defender XDR incidents are both closed with a classification of True positive, but one carries a determination of Malware and the other a determination of Compromised account. Why does recording the determination, not just the classification, matter?",
+      "options": [
+        "It doesn't -- classification alone is sufficient for every downstream analytics and tuning purpose",
+        "The determination only affects how the incident is displayed visually, with no analytical consequence",
+        "The two incidents likely need very different follow-up despite sharing the same classification, which only the more specific determination captures",
+        "Determination is required only for incidents classified as False positive, never for a True positive"
+      ],
+      "correct": 2,
+      "explanation": "A shared True positive classification can still hide very different follow-up needs -- a Malware determination and a Compromised account determination point toward different remediation paths -- so the more specific determination is what later tuning and analytics actually depend on, not classification alone. Determination applies to True positive incidents too, not only False positive ones, and it carries real analytical weight beyond mere display."
+    },
+    {
+      "id": "q66",
+      "cat": "respondIncidents",
+      "type": "mc",
+      "question": "A SOC wants a first-line analyst to be able to triage and take response actions only on devices belonging to a non-critical business unit, while a senior analyst retains access across every device group tenant-wide. What should be configured in Defender for Endpoint?",
+      "options": [
+        "Device groups scoped with role-based access control matching each analyst's intended reach",
+        "A single tenant-wide automation level applied identically to every analyst",
+        "A custom indicator of compromise limited to the first-line analyst's own account",
+        "A Conditional Access policy restricting the first-line analyst's own sign-in location"
+      ],
+      "correct": 0,
+      "explanation": "Device groups combined with role-based access control are exactly what scopes which analyst can see or act on which set of devices, letting a first-line analyst be limited to a non-critical group while a senior analyst keeps tenant-wide reach. An automation level governs AIR's own remediation behavior rather than analyst access, a custom indicator blocks an artifact rather than scoping analyst permissions, and a Conditional Access policy on the analyst's own sign-in doesn't scope which devices they can act on."
+    },
+    {
+      "id": "q67",
+      "cat": "respondIncidents",
+      "type": "mc",
+      "question": "A manufacturing facility has operational technology (OT) sensors on the factory floor that cannot run a standard endpoint agent. The security team wants anomalies on these devices detected and surfaced into the same incident queue as their other Defender products. Which capability fits?",
+      "options": [
+        "Defender for Endpoint, installed in a lightweight mode on each OT sensor",
+        "Microsoft Defender for IoT, passively monitoring network traffic from these unmanaged devices",
+        "Microsoft Defender Vulnerability Management, scanning each OT sensor directly",
+        "Attack surface reduction rules applied to each OT sensor's local policy"
+      ],
+      "correct": 1,
+      "explanation": "Defender for IoT is built specifically for unmanaged IoT and OT devices that cannot run a standard agent, passively analyzing network traffic to detect anomalies and vulnerabilities, with its alerts flowing into the same unified incident queue once integrated. Defender for Endpoint, Vulnerability Management, and ASR rules all assume a device capable of running an agent or local policy, which is exactly what these OT sensors cannot do."
+    },
+    {
+      "id": "msq16",
+      "cat": "respondIncidents",
+      "type": "ms",
+      "question": "Which two of the following are true about Contain user/Contain device and Defender for Endpoint device groups? (Choose two.)",
+      "options": [
+        "Contain device restricts communication with managed resources without necessarily going as far as full device isolation",
+        "Device group membership can influence which automated investigation and response (AIR) automation level applies to a device",
+        "Contain user permanently disables the account with no way to restore access",
+        "Device groups exist only for reporting and have no effect on role-based access or automation behavior"
+      ],
+      "correct": [
+        0,
+        1
+      ],
+      "explanation": "Contain device is a more limited unified action than full isolation, and a device group's membership can determine which AIR automation level applies to devices within it. Contain user is a restriction rather than a permanent, irreversible account disablement, and device groups directly affect both RBAC scoping and automation behavior rather than existing purely for reporting."
+    },
+    {
+      "id": "q68",
+      "cat": "threatHunting",
+      "type": "mc",
+      "question": "A hunting query needs every row from both DeviceProcessEvents and DeviceNetworkEvents stacked into one result set to look for a pattern spanning both tables, with no shared key available to match rows between them. Which KQL operator fits?",
+      "options": [
+        "join kind=inner",
+        "union",
+        "mv-expand",
+        "bag_unpack"
+      ],
+      "correct": 1,
+      "explanation": "union combines rows from multiple tables with a similar schema into one stacked result set, which is exactly what's needed when there's no shared key to join on and the goal is every row from both tables rather than matched pairs. A join type like inner instead combines columns side by side by matching keys, and mv-expand/bag_unpack expand array or property-bag columns rather than stacking separate tables together."
+    },
+    {
+      "id": "q69",
+      "cat": "threatHunting",
+      "type": "tf",
+      "question": "The bag_unpack operator expands a dynamic property bag column into one column per key, while mv-expand instead expands a dynamic array column into one row per element.",
+      "answer": true,
+      "explanation": "bag_unpack and mv-expand operator handle the two different shapes a dynamic column can take -- a property bag of key-value pairs versus an array of elements -- expanding each into columns or rows respectively so the buried values become individually queryable."
+    },
+    {
+      "id": "q70",
+      "cat": "threatHunting",
+      "type": "mc",
+      "question": "A large organization splits its Sentinel data across multiple Log Analytics workspaces by business unit. A hunting query running in the corporate workspace needs to also reach a table that lives only in a regional subsidiary's separate workspace. What should the query use?",
+      "options": [
+        "The workspace() function to reference the other workspace's table directly in the query",
+        "A Data Collection Rule configured to merge the two workspaces into one",
+        "A Sentinel watchlist re-imported from the other workspace's export",
+        "This is not possible -- each workspace's tables are only queryable from within that same workspace"
+      ],
+      "correct": 0,
+      "explanation": "The workspace() function lets a KQL query reach into a table in a different Log Analytics workspace directly, which is exactly the cross-workspace correlation this scenario needs; resource() does the equivalent for a specific Azure resource's own logs. A DCR governs ingestion rather than merging workspaces, a watchlist is static reference data requiring manual re-import rather than a live cross-workspace query, and cross-workspace querying is in fact supported, not impossible."
     }
   ],
   "lessons": [

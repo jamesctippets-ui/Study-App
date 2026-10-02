@@ -429,6 +429,111 @@
       "front": "Service level management",
       "back": "The practice that negotiates, agrees, monitors, and reviews service levels on an ongoing basis, producing and maintaining the SLAs referenced in Service quality vs. service level vs. SLA. It's a continuous activity of tracking whether targets are actually being met, not a one-time contract signing.",
       "detail": "A scenario describing a team that reviews performance against targets every quarter and renegotiates them as needs change is describing service level management in action, not just the existence of an SLA document."
+    },
+    {
+      "id": "f50",
+      "cat": "terms",
+      "front": "Value",
+      "back": "The perceived benefits, usefulness, and importance of something. A service creates value when the combination described in Utility vs. warranty it provides outweighs the Cost vs. risk involved for the stakeholder receiving it.",
+      "detail": "Value is always perceived by the stakeholder receiving it, not declared by the provider \u2014 two different customers can value the exact same service differently."
+    },
+    {
+      "id": "f51",
+      "cat": "terms",
+      "front": "Service management",
+      "back": "A set of organizational capabilities for enabling value for customers in the form of services \u2014 the overall discipline the ITIL Value System exists to support.",
+      "detail": "It's a capability, not a single team or tool \u2014 spanning people, process, information, and technology working together to deliver services."
+    },
+    {
+      "id": "f52",
+      "cat": "terms",
+      "front": "Practice vs. process",
+      "back": "A management practice bundles the organizational resources, people, process, and tools, described under Management practices, purpose for doing a kind of work. A process is narrower: just the structured set of activities within that practice, not the whole bundle.",
+      "detail": "Exam trap: 'incident management' is a practice. The documented steps for logging, diagnosing, and closing a ticket are one of the processes inside it."
+    },
+    {
+      "id": "f53",
+      "cat": "terms",
+      "front": "Stakeholder",
+      "back": "Any person or organization with an interest in or expectations of an activity, target, or decision. Customer vs. user vs. sponsor names specific stakeholder roles, but the category is broader than just those three.",
+      "detail": "A regulator, an internal auditor, or a shareholder who never touches the service can all still be stakeholders, since the term only requires an interest or expectation, not direct use."
+    },
+    {
+      "id": "f54",
+      "cat": "valueSystem",
+      "front": "\"Progress iteratively with feedback\"",
+      "back": "Resist the urge to do everything at once. Organize work into smaller, manageable pieces that can be completed, checked against real feedback, and adjusted before moving on to the next piece.",
+      "detail": "A phased rollout to one department before going company-wide, adjusting based on what that first group reports, is this principle in action."
+    },
+    {
+      "id": "f55",
+      "cat": "valueSystem",
+      "front": "\"Collaborate and promote visibility\"",
+      "back": "Work across boundaries rather than in isolation, and make work, progress, and decisions visible enough that the right people can see what's happening and get involved when needed.",
+      "detail": "This is about openness and shared information. A related but different idea, seeing how a change ripples elsewhere, is covered by think and work holistically instead."
+    },
+    {
+      "id": "f56",
+      "cat": "valueSystem",
+      "front": "\"Think and work holistically\"",
+      "back": "No service, practice, or team stands alone. Always consider how a change in one part of the organization is likely to affect other parts before acting on just the piece in front of you.",
+      "detail": "Missing a downstream dependency, like a report that silently breaks after a system migration, is the classic failure this principle is meant to prevent."
+    },
+    {
+      "id": "f57",
+      "cat": "valueSystem",
+      "front": "\"Optimize and automate\"",
+      "back": "Maximize the value created by people and technology together: simplify and optimize a process first, then automate what's left, since automating a broken or redundant process just makes it fail faster.",
+      "detail": "Order matters here \u2014 it's simplify, then automate, not the reverse. Baking a redundant step into a new bot doesn't remove the redundancy."
+    },
+    {
+      "id": "f58",
+      "cat": "valueSystem",
+      "front": "Governance vs. management practice",
+      "back": "Governance directs and controls from the top, such as leadership mandating that every change needs a documented risk assessment. A management practice, like Change enablement: standard, normal, and emergency changes, is the organizational resource that actually carries that mandate out day to day.",
+      "detail": "Governance sets the rule; the practice does the work the rule requires. A scenario describing a policy decision is governance, while one describing the team executing it is a practice."
+    },
+    {
+      "id": "f59",
+      "cat": "dimensions",
+      "front": "Value streams and processes, dimension",
+      "back": "The activities, workflows, controls, and procedures an organization uses to achieve its objectives \u2014 the 'how work actually flows' angle on a service. A Value stream draws together steps from across the other three dimensions into one specific scenario.",
+      "detail": "This is the dimension most often tested through a scenario describing unnecessary steps, handoffs, or delay in how a request moves, rather than a staffing, tooling, or vendor problem."
+    },
+    {
+      "id": "f60",
+      "cat": "dimensions",
+      "front": "Four Dimensions, cross-dimension impact",
+      "back": "A change rarely stays inside just one dimension. Outsourcing a function touches Partners and suppliers, dimension, while the retraining it usually forces lands under Organizations and people, dimension \u2014 exam scenarios increasingly ask which two dimensions a single change affects.",
+      "detail": "Reading a scenario for a ripple effect, not just one keyword, is the real skill being tested here."
+    },
+    {
+      "id": "f61",
+      "cat": "lifecycle",
+      "front": "Why the lifecycle loops instead of running once",
+      "back": "Unlike a strict one-way pipeline, The 8 Product and Service Lifecycle activities, in order are meant to be revisited \u2014 looping back to an earlier activity, like returning to Design after Build surfaces a gap, is expected, not a sign the process broke down.",
+      "detail": "A manager who treats a return to an earlier activity as project failure ends up teaching their team to hide problems instead of surfacing them."
+    },
+    {
+      "id": "f62",
+      "cat": "streams",
+      "front": "Example value streams",
+      "back": "Typical value streams include resolving a user's incident, onboarding a new employee, and developing and releasing a new feature \u2014 each one strings together whichever activities covered in Value chain, purpose and practices that specific scenario actually needs.",
+      "detail": "No two value streams need the same activities or practices \u2014 a request-fulfillment stream and an incident-resolution stream can look very different end to end."
+    },
+    {
+      "id": "f63",
+      "cat": "streams",
+      "front": "Value stream vs. management practice",
+      "back": "A management practice, like incident management, is a single set of resources for one kind of work. A Value stream strings several practices and value chain activities together end to end for one real scenario, like resolving an incident from first report to final closure.",
+      "detail": "If a scenario describes one kind of work in isolation, think practice. If it describes an end-to-end journey using several kinds of work in sequence, think value stream."
+    },
+    {
+      "id": "f64",
+      "cat": "streams",
+      "front": "What starts and ends a value stream",
+      "back": "A value stream typically starts from a demand or opportunity and ends once the consumer actually realizes value from it \u2014 the same inputs and outputs that Value chain, purpose exists to convert, applied to one specific scenario.",
+      "detail": "If nothing has actually created value for the consumer yet, the value stream isn't finished, even if every internal step has technically been completed."
     }
   ],
   "questions": [
@@ -1812,6 +1917,226 @@
       ],
       "correct": 0,
       "explanation": "Renewing an internal license never touches the external customer directly, which is exactly what makes it an enabling value stream -- it supports other value streams internally instead. Resolving a ticket, delivering a contract, and responding to an inquiry all involve direct interaction with an external customer, making each of those a core value stream instead."
+    },
+    {
+      "id": "q82",
+      "cat": "terms",
+      "type": "mc",
+      "question": "A provider adds a costly redundant failover system, and customers still consider the service worth paying for afterward because outages are now rare. What term describes that overall perceived worth, weighing the added cost against the reduced risk?",
+      "options": [
+        "Warranty",
+        "Value",
+        "Output",
+        "Governance"
+      ],
+      "correct": 1,
+      "explanation": "Value is the perceived benefit a stakeholder gets once utility and warranty are weighed against the cost and risk involved \u2014 exactly the trade-off described here."
+    },
+    {
+      "id": "tf26",
+      "cat": "terms",
+      "type": "tf",
+      "question": "Service management is best described as a set of organizational capabilities for enabling value for customers through services.",
+      "answer": true,
+      "explanation": "That's the core definition \u2014 a capability spanning people, process, information, and technology, not a single team, tool, or one-time project."
+    },
+    {
+      "id": "q83",
+      "cat": "terms",
+      "type": "mc",
+      "question": "A team documents clear, structured steps for logging and routing a ticket, but has no defined people, tools, or other resources organized around those steps yet. What's missing to call this a full management practice rather than just a process?",
+      "options": [
+        "Nothing -- a process and a practice mean exactly the same thing",
+        "The organizational resources, like people and tools, that a practice bundles around a process",
+        "A governance decision authorizing the steps",
+        "A guiding principle matching the steps"
+      ],
+      "correct": 1,
+      "explanation": "A practice is the broader bundle: people, tools, and other resources organized around one or more processes to accomplish an objective. A process alone is just the structured activities inside it."
+    },
+    {
+      "id": "q84",
+      "cat": "terms",
+      "type": "ms",
+      "question": "Which two of the following correctly describe how a stakeholder relates to the customer, user, and sponsor roles? (Choose two.)",
+      "options": [
+        "A stakeholder is any person or group with an interest in or expectations of an activity or decision",
+        "Customer, user, and sponsor are each broader categories than stakeholder",
+        "Customer, user, and sponsor are specific examples of stakeholders",
+        "Only people outside the organization can ever be considered stakeholders"
+      ],
+      "correct": [
+        0,
+        2
+      ],
+      "explanation": "Stakeholder is the general category; customer, user, and sponsor are specific roles that sit underneath it. The reverse ordering and the outsiders-only restriction are both wrong."
+    },
+    {
+      "id": "tf27",
+      "cat": "terms",
+      "type": "tf",
+      "question": "A regulator who never directly uses a service but still has an interest in how it is run can be considered a stakeholder.",
+      "answer": true,
+      "explanation": "Stakeholder only requires an interest in or expectations of an activity or decision, not direct use -- a regulator, auditor, or shareholder can all qualify without ever being a customer, user, or sponsor."
+    },
+    {
+      "id": "q85",
+      "cat": "valueSystem",
+      "type": "mc",
+      "question": "A migration project is broken into quarterly releases, with each one adjusted based on what users report after the previous release goes live. Which guiding principle does this best demonstrate?",
+      "options": [
+        "Think and work holistically",
+        "Progress iteratively with feedback",
+        "Optimize and automate",
+        "Start where you are"
+      ],
+      "correct": 1,
+      "explanation": "Breaking work into smaller pieces, checking it against real feedback, and adjusting before the next piece is exactly progress iteratively with feedback."
+    },
+    {
+      "id": "q86",
+      "cat": "valueSystem",
+      "type": "mc",
+      "question": "Before approving a system change, a project manager invites representatives from finance, security, and support to review it together. Which guiding principle is most directly illustrated?",
+      "options": [
+        "Collaborate and promote visibility",
+        "Keep it simple and practical",
+        "Focus on value",
+        "Progress iteratively with feedback"
+      ],
+      "correct": 0,
+      "explanation": "Bringing in the right people from across boundaries and making the decision visible to them is collaborate and promote visibility in practice."
+    },
+    {
+      "id": "tf28",
+      "cat": "valueSystem",
+      "type": "tf",
+      "question": "Think and work holistically means considering how a change in one part of the organization might affect other parts, rather than focusing only on the piece directly in front of you.",
+      "answer": true,
+      "explanation": "That's the core idea -- recognizing ripple effects across the wider organization instead of treating one part as if it existed in isolation."
+    },
+    {
+      "id": "q87",
+      "cat": "valueSystem",
+      "type": "ms",
+      "question": "Which two of the following are correct about the guiding principle optimize and automate? (Choose two.)",
+      "options": [
+        "It means automating a process first, then simplifying what remains",
+        "It means simplifying a process before automating it",
+        "Automating a broken or redundant process just makes it fail faster",
+        "It only ever applies to processes that are already fully manual"
+      ],
+      "correct": [
+        1,
+        2
+      ],
+      "explanation": "The correct order is simplify first, automate second -- reversing that order, or baking redundancy into automation, just makes the underlying problem run faster rather than fixing it."
+    },
+    {
+      "id": "q88",
+      "cat": "valueSystem",
+      "type": "mc",
+      "question": "Leadership mandates that every production change must include a documented rollback plan. The team that actually writes and tests each specific rollback plan is performing:",
+      "options": [
+        "Governance",
+        "A management practice",
+        "A guiding principle",
+        "PESTLE analysis"
+      ],
+      "correct": 1,
+      "explanation": "Leadership's mandate is governance, directing and controlling from the top. The team carrying that mandate out day to day, using organizational resources to do the work, is a management practice."
+    },
+    {
+      "id": "tf29",
+      "cat": "valueSystem",
+      "type": "tf",
+      "question": "Governance and management practices are really the same Value System component, just described at different levels of detail.",
+      "answer": false,
+      "explanation": "They're two distinct components. Governance directs and controls from the top; management practices are the organizational resources that carry a directive out day to day."
+    },
+    {
+      "id": "q89",
+      "cat": "dimensions",
+      "type": "mc",
+      "question": "A routine password reset request passes through four separate approval systems before completion, even though staffing, tools, and vendor relationships are all fine. Which dimension does this problem sit in?",
+      "options": [
+        "Organizations and people",
+        "Value streams and processes",
+        "Partners and suppliers",
+        "Information and technology"
+      ],
+      "correct": 1,
+      "explanation": "Unnecessary steps and handoffs in how a request actually moves are a value streams and processes problem, not a staffing, tooling, or vendor issue."
+    },
+    {
+      "id": "q90",
+      "cat": "dimensions",
+      "type": "ms",
+      "question": "A company switches to a new ticketing vendor and must retrain its support staff to use it. Which two dimensions does this change touch most directly? (Choose two.)",
+      "options": [
+        "Partners and suppliers",
+        "Organizations and people",
+        "Guiding principles",
+        "Continual improvement"
+      ],
+      "correct": [
+        0,
+        1
+      ],
+      "explanation": "The new vendor relationship sits under partners and suppliers, while the staff retraining need sits under organizations and people. Guiding principles and continual improvement are Value System components, not dimensions."
+    },
+    {
+      "id": "q91",
+      "cat": "lifecycle",
+      "type": "mc",
+      "question": "A team is in the Build activity when testing reveals the original requirements were incomplete. What should happen next, given how the Product and Service Lifecycle is meant to work?",
+      "options": [
+        "Keep building and fix the requirements later during Support",
+        "Loop back to Design to address the gap before continuing",
+        "Abandon the lifecycle model entirely, since looping back is not allowed",
+        "Escalate to governance to skip Design on the next attempt"
+      ],
+      "correct": 1,
+      "explanation": "Looping back to an earlier activity, like returning to Design when a gap in requirements surfaces during Build, is normal and expected, not a sign the process has failed."
+    },
+    {
+      "id": "q92",
+      "cat": "streams",
+      "type": "mc",
+      "question": "Which of the following best describes a value stream, rather than a single management practice on its own?",
+      "options": [
+        "Incident management",
+        "Resolving a user's incident from first report to final closure",
+        "Change enablement",
+        "Service desk"
+      ],
+      "correct": 1,
+      "explanation": "A value stream strings several practices and value chain activities together end to end for one real scenario. Incident management, change enablement, and the service desk are each single practices, not that end-to-end journey."
+    },
+    {
+      "id": "tf30",
+      "cat": "streams",
+      "type": "tf",
+      "question": "A value stream typically starts from a demand or opportunity and is only considered finished once the consumer actually realizes value from it.",
+      "answer": true,
+      "explanation": "That's exactly how a value stream is bounded -- completing every internal step doesn't finish it if the consumer hasn't actually realized value yet."
+    },
+    {
+      "id": "q93",
+      "cat": "streams",
+      "type": "ms",
+      "question": "Which two of the following are genuine examples of typical value streams? (Choose two.)",
+      "options": [
+        "Onboarding a new employee",
+        "Developing and releasing a new feature",
+        "Writing a single clause of an SLA",
+        "Naming a guiding principle"
+      ],
+      "correct": [
+        0,
+        1
+      ],
+      "explanation": "Onboarding a new employee and developing and releasing a new feature are both end-to-end scenarios that string together several activities and practices -- exactly what a value stream is. The other two are far too narrow to be a full value stream."
     }
   ],
   "lessons": [

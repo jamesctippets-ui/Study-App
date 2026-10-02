@@ -509,6 +509,15 @@ come up.
     (167) — all from round 1 or earlier, confirming a single pass isn't
     always enough and this really is iterative, ongoing work rather than
     a fixed list to clear once.
+  - **Round 4**: a *second* pass each for SC-300, SC-200, AZ-305, and
+    AZ-802, plus ITIL's first pass (it had been untouched by this
+    effort). Each repeat-track agent was told exactly what the earlier
+    round already covered by topic to avoid overlap. Flashcards 1039 →
+    1114, questions 1518 → 1603. Results: SC-300 186, ITIL 187, SC-200
+    188, AZ-305 192, AZ-802 199 combined — all five now clear AZ-900's
+    185 bar outright. New lowest tier for a round 5: EHR Integration
+    (170), Cloud+ (171), AB-650/SC-500 (174 each), MD-102 (175) — the
+    round-2/round-3 leftovers, each due for a second pass.
 - [x] **Progress export/import.** The app has no accounts, so a cleared browser
   or a new device previously meant losing everything. The ⚙ Data & progress
   panel now downloads all progress (results, seenLog, stats) as a JSON file
