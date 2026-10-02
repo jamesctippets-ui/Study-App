@@ -475,6 +475,111 @@
       "front": "Azure SQL Migration extension for Azure Data Studio",
       "back": "A guided, wizard-driven migration path built into Azure Data Studio that assesses an on-premises SQL Server database and migrates it to Azure SQL Managed Instance or Azure SQL Database, including near-zero-downtime online migration, from inside the same tool used for day-to-day query work.",
       "detail": "It builds on the same assessment and migration engine as Migration tooling: DMA vs. Azure Database Migration Service, but surfaces the whole workflow inside Azure Data Studio's UI instead of requiring a separately managed migration project elsewhere."
+    },
+    {
+      "id": "f58",
+      "cat": "platform",
+      "front": "PolyBase and external tables",
+      "back": "Lets Managed Instance (or SQL Server on Azure VMs) query data sitting in Azure Blob Storage, Azure Data Lake, or another SQL Server directly with T-SQL, through a CREATE EXTERNAL DATA SOURCE and CREATE EXTERNAL TABLE definition, without first loading that data into the database.",
+      "detail": "The external data source itself authenticates using a Database scoped credential, which is why the two features are usually described together \u2014 the credential supplies the secret, and the external table supplies the schema mapping for querying the remote data in place."
+    },
+    {
+      "id": "f59",
+      "cat": "platform",
+      "front": "Change Data Capture (CDC) vs. Change Tracking",
+      "back": "Change Data Capture records the actual before/after column values of every insert, update, and delete against a tracked table into change tables, useful for feeding an ETL pipeline. Change Tracking only records which rows changed and a version number, not the data itself, making it lighter-weight when a downstream process just needs to know what to re-sync rather than what specifically changed.",
+      "detail": "Both are supported on Azure SQL Database and Managed Instance, but CDC's richer, change-table-based history comes at a higher storage and I/O cost than Change Tracking's lightweight row-and-version tracking, which is the tradeoff a scenario is usually testing."
+    },
+    {
+      "id": "f60",
+      "cat": "security",
+      "front": "Contained database users",
+      "back": "A user created directly inside a database with CREATE USER ... WITH PASSWORD (or mapped to a Microsoft Entra ID identity), with no matching login at the server level, so authentication happens entirely within the database and the user moves with it on a copy or geo-replication.",
+      "detail": "This is what makes Azure SQL Database's authentication model work at all, since single databases have no server-level login store the way an on-premises instance does \u2014 every Azure SQL Database user is effectively a contained user by design."
+    },
+    {
+      "id": "f61",
+      "cat": "security",
+      "front": "Azure RBAC vs. SQL permissions (control plane vs. data plane)",
+      "back": "Azure role-based access control (built-in roles like SQL DB Contributor or Owner) governs control-plane actions against the Azure resource itself \u2014 creating, deleting, or scaling a database \u2014 while SQL logins, users, and database roles (db_datareader, db_owner, and so on) govern data-plane actions like reading or writing rows once connected.",
+      "detail": "Holding the SQL DB Contributor role lets someone delete or rescale the database resource entirely, but grants no ability to SELECT a single row inside it \u2014 the two permission systems are deliberately separate and neither substitutes for the other."
+    },
+    {
+      "id": "f62",
+      "cat": "monitor",
+      "front": "Resource Governor",
+      "back": "Classifies incoming sessions into workload groups and caps each group's CPU, memory, and I/O consumption through a resource pool, letting a Managed Instance or SQL Server on Azure VM stop one noisy workload (like an ad hoc reporting query) from starving another. It is not available on single-database Azure SQL Database.",
+      "detail": "Because it depends on instance-level configuration, Resource Governor sits alongside other instance-scoped tools like SQL Server Agent and Database Mail as a reason an administrator might choose Managed Instance over a single database in the first place."
+    },
+    {
+      "id": "f63",
+      "cat": "monitor",
+      "front": "sys.dm_exec_query_stats",
+      "back": "Returns cumulative execution statistics \u2014 total and average worker time, logical reads, and execution count \u2014 for every cached execution plan currently in the plan cache, giving a fast way to rank the most expensive queries since the cache was last cleared.",
+      "detail": "Unlike Query Store, this DMV's data lives only in the volatile plan cache, so it is lost whenever a plan is evicted or the instance restarts \u2014 Query Store is the better source once a historical view across restarts is needed instead."
+    },
+    {
+      "id": "f64",
+      "cat": "queryPerf",
+      "front": "Database compatibility level and the cardinality estimator",
+      "back": "ALTER DATABASE ... SET COMPATIBILITY_LEVEL controls which version of the query optimizer's behavior, including its cardinality estimator (the component that predicts row counts), a database uses \u2014 migrating an older on-premises database to Azure SQL often leaves it on an old compatibility level, which can produce different, sometimes worse, plans than the current level would.",
+      "detail": "Query Store can be used to test a compatibility level change safely: switch the level, watch for regressions in Query Store, and force a prior good plan or revert the level if a specific query regresses rather than rolling back everything."
+    },
+    {
+      "id": "f65",
+      "cat": "queryPerf",
+      "front": "Statistics maintenance (AUTO_CREATE_STATISTICS / AUTO_UPDATE_STATISTICS)",
+      "back": "SQL Server and Azure SQL automatically create single-column statistics and refresh them once enough rows have changed, by default using a sampled rather than full scan \u2014 the statistics the optimizer relies on for every cardinality estimate behind a plan choice.",
+      "detail": "A large bulk load that finishes before the automatic-update threshold is reached can leave statistics stale immediately afterward, which is exactly the scenario that produces a large gap between Estimated vs. actual execution plans until UPDATE STATISTICS runs or the threshold is finally crossed."
+    },
+    {
+      "id": "f66",
+      "cat": "queryPerf",
+      "front": "Database-scoped configuration options",
+      "back": "Settings like MAXDOP, LEGACY_CARDINALITY_ESTIMATION, and QUERY_OPTIMIZER_HOTFIXES that can be set per database with ALTER DATABASE SCOPED CONFIGURATION, instead of only at the instance level with sp_configure \u2014 useful because Azure SQL Database has no instance-level sp_configure surface to begin with, and because Managed Instance often hosts many databases with different tuning needs on one instance.",
+      "detail": "Setting LEGACY_CARDINALITY_ESTIMATION to ON for one specific database is a common, low-risk way to work around a Database compatibility level and the cardinality estimator regression in that database alone, without changing optimizer behavior for every other database on the same instance."
+    },
+    {
+      "id": "f67",
+      "cat": "automation",
+      "front": "Elastic Database Jobs authoring surface",
+      "back": "Jobs are created and managed through PowerShell cmdlets or by calling stored procedures directly against the job database, rather than through a full job-authoring designer in the Azure portal \u2014 unlike an on-premises SQL Server Agent job, which SSMS lets an administrator build entirely through a GUI.",
+      "detail": "This is a frequent surprise for a DBA used to right-clicking through SSMS's Job Agent node, since the Elastic Database Jobs components still need to be stood up and scripted rather than clicked together."
+    },
+    {
+      "id": "f68",
+      "cat": "automation",
+      "front": "SQL Agent multi-server administration (MSX/TSX)",
+      "back": "Designates one SQL Server instance as a master server (MSX) that defines and pushes jobs out to a fleet of target servers (TSX), which run the jobs locally and report status back \u2014 a way to centrally manage the same scheduled job across many SQL Server on Azure VMs or on-premises instances without configuring each one individually.",
+      "detail": "This solves a similar fleet-wide scheduling problem to Elastic Database Jobs components, but is specific to SQL Server Agent on IaaS/on-premises instances rather than PaaS single databases, which have no SQL Agent to enlist as a target server at all."
+    },
+    {
+      "id": "f69",
+      "cat": "automation",
+      "front": "Scripting planned failover tests",
+      "back": "Cmdlets like Invoke-AzSqlDatabaseFailover (for Active geo-replication or built-in HA replicas) and Switch-AzSqlDatabaseFailoverGroup (for Auto-failover groups) let a DBA trigger a failover from a script or runbook, making it practical to rehearse a disaster-recovery plan on a regular schedule instead of only reading through the runbook on paper.",
+      "detail": "Scripting the drill also makes it repeatable across environments and schedulable through an Azure Automation runbooks for database administration job, rather than depending on someone remembering to click through the portal's failover button by hand."
+    },
+    {
+      "id": "f70",
+      "cat": "hadr",
+      "front": "Managed Instance link",
+      "back": "Establishes a near real-time, replication-based connection between an on-premises (or VM-hosted) SQL Server 2019 or later instance and Azure SQL Managed Instance, letting data flow continuously in either direction and supporting a planned failover to Managed Instance with minimal downtime \u2014 usable for an online migration, a DR target, or offloading read traffic.",
+      "detail": "Unlike a one-time cutover through Azure Database Migration Service, the link keeps the source and the managed instance continuously synchronized until an administrator explicitly fails over, which is what gives it the option to fail back to the original SQL Server if needed."
+    },
+    {
+      "id": "f71",
+      "cat": "hadr",
+      "front": "Backup to URL",
+      "back": "Lets native SQL Server BACKUP DATABASE and BACKUP LOG statements write a backup directly to a blob in Azure Storage as the backup destination, instead of to a local disk or network share \u2014 useful for SQL Server on Azure VMs to get an offsite copy without managing separate backup infrastructure.",
+      "detail": "This is distinct from Automated backups and point-in-time restore (PITR), which only applies to the PaaS options \u2014 a SQL Server on Azure VM instead relies on native backups like this, or the SQL Server IaaS Agent Extension's automated backup feature built on top of it, since Microsoft does not manage backups for IaaS automatically."
+    },
+    {
+      "id": "f72",
+      "cat": "hadr",
+      "front": "Read-only routing (Always On Availability Groups)",
+      "back": "A ReadOnlyRoutingList configured on an availability group listener automatically directs a connection whose application intent is set to ReadOnly to one of the group's secondary replicas, instead of the primary, offloading read traffic without the application needing to know any individual replica's name.",
+      "detail": "This gives SQL Server on Azure VMs the same kind of read-offloading benefit that Read scale-out provides for Azure SQL Database's built-in HA replicas, but it requires explicit listener configuration rather than being available automatically."
     }
   ],
   "questions": [
@@ -1657,6 +1762,235 @@
         1
       ],
       "explanation": "An instance failover group fails over an entire managed instance's databases together as one unit, replicating to a secondary managed instance in another region behind a stable listener endpoint. It operates at the whole-instance level rather than being configured per database like active geo-replication, and it is specifically a Managed Instance feature, not a single-database one."
+    },
+    {
+      "id": "q59",
+      "cat": "platform",
+      "type": "mc",
+      "question": "A Managed Instance needs to run T-SQL queries directly against CSV files stored in Azure Data Lake Storage, without first copying that data into a SQL table. Which capability enables this?",
+      "options": [
+        "Elastic Database Jobs",
+        "PolyBase with an external table definition",
+        "Dynamic Data Masking",
+        "Resource Governor"
+      ],
+      "correct": 1,
+      "explanation": "PolyBase lets T-SQL query external data in place through a CREATE EXTERNAL DATA SOURCE and CREATE EXTERNAL TABLE definition, with no need to load the data into the database first. Elastic Database Jobs schedules T-SQL across databases, Dynamic Data Masking only changes how stored values display, and Resource Governor limits resource consumption \u2014 none of them query external files."
+    },
+    {
+      "id": "q60",
+      "cat": "platform",
+      "type": "mc",
+      "question": "An analytics pipeline needs to know exactly which rows changed in a source table and what the old and new values were for each change, so it can replay them downstream. Which feature should the pipeline read from?",
+      "options": [
+        "Change Tracking",
+        "Change Data Capture",
+        "Query Store",
+        "Resource Governor"
+      ],
+      "correct": 1,
+      "explanation": "Change Data Capture captures the actual before/after column values for every insert, update, and delete into change tables, which is exactly what replaying detailed changes downstream requires. Change Tracking only records that a row changed and a version number, not the values themselves, and Query Store and Resource Governor are unrelated to change tracking."
+    },
+    {
+      "id": "tf21",
+      "cat": "platform",
+      "type": "tf",
+      "question": "Change Tracking records the full before-and-after column values for every change to a tracked table, the same way Change Data Capture does.",
+      "answer": false,
+      "explanation": "Change Tracking only records which rows changed and a version number, not the actual data values \u2014 Change Data Capture is the feature that captures the full before/after column values into change tables. Change Tracking's lighter footprint is exactly why it is the leaner option when a process just needs to know what to re-sync."
+    },
+    {
+      "id": "q61",
+      "cat": "security",
+      "type": "mc",
+      "question": "A DBA needs to understand why Azure SQL Database users can authenticate directly to a single database with no corresponding login existing anywhere at a server level. What accounts for this?",
+      "options": [
+        "They are contained database users, since a single database has no server-level login store",
+        "A matching server-level login is silently created behind the scenes for each one",
+        "Authentication is skipped entirely for users created inside the database",
+        "Contained users work only on Managed Instance, never on single databases"
+      ],
+      "correct": 0,
+      "explanation": "Single-database Azure SQL Database has no server-level login store the way an on-premises instance does, so every database user authenticates entirely within the database itself as a contained user. No hidden server-level login gets created, authentication is still fully enforced, and contained users are supported on single databases, not only Managed Instance."
+    },
+    {
+      "id": "q62",
+      "cat": "security",
+      "type": "mc",
+      "question": "A team member has been assigned the Azure RBAC SQL DB Contributor role on a database but reports they cannot run a SELECT against any of its tables. What is the most likely explanation?",
+      "options": [
+        "SQL DB Contributor controls the Azure resource, not data access \u2014 a SQL login or user still needs database permissions",
+        "The role should instead have been assigned at the subscription scope rather than the database",
+        "Azure RBAC role assignments take a full day to propagate before granting any access",
+        "The SQL DB Contributor role no longer grants any access under current Azure policy"
+      ],
+      "correct": 0,
+      "explanation": "Azure RBAC roles like SQL DB Contributor control control-plane actions on the Azure resource \u2014 creating, deleting, scaling \u2014 not data-plane access to the rows inside it; reading data still requires a SQL login or Microsoft Entra ID user mapped inside the database with the right permissions. Assigning the role at a different scope would not add data access either, propagation delay is not the real cause here, and the role is not deprecated."
+    },
+    {
+      "id": "msq13",
+      "cat": "security",
+      "type": "ms",
+      "question": "Which two of the following correctly distinguish Azure RBAC from SQL-level permissions on an Azure SQL Database? (Choose two.)",
+      "options": [
+        "Azure RBAC governs control-plane actions like creating, deleting, or scaling the database resource",
+        "SQL logins, users, and database roles govern data-plane actions like reading or writing rows",
+        "Granting the Owner RBAC role automatically grants db_owner permissions inside every database",
+        "SQL permissions apply only to Managed Instance, never to Azure SQL Database"
+      ],
+      "correct": [
+        0,
+        1
+      ],
+      "explanation": "Azure RBAC roles control the Azure resource itself (the control plane), while SQL logins, users, and database roles control access to actual data once connected (the data plane) \u2014 the two systems are separate. Holding the Owner RBAC role on the resource does not automatically grant any SQL-level permission inside the database, and SQL-level permissions apply to both Azure SQL Database and Managed Instance, not just the latter."
+    },
+    {
+      "id": "q63",
+      "cat": "monitor",
+      "type": "mc",
+      "question": "A Managed Instance runs both a latency-sensitive OLTP application and an unpredictable ad hoc reporting workload on the same instance, and the reporting queries occasionally consume enough CPU to slow the OLTP workload down. What built-in instance-level feature can cap the reporting workload's resource consumption?",
+      "options": [
+        "Resource Governor",
+        "Query Store",
+        "Dynamic Data Masking",
+        "Elastic Database Jobs"
+      ],
+      "correct": 0,
+      "explanation": "Resource Governor classifies incoming sessions into workload groups and caps each group's CPU, memory, and I/O through a resource pool, which is exactly the mechanism for keeping one workload from starving another on the same instance. Query Store captures plan history rather than enforcing limits, and the other two options address data masking and job scheduling, not resource containment."
+    },
+    {
+      "id": "tf22",
+      "cat": "monitor",
+      "type": "tf",
+      "question": "Data returned by sys.dm_exec_query_stats persists across an instance restart, the same way Query Store's history does.",
+      "answer": false,
+      "explanation": "sys.dm_exec_query_stats only reflects whatever is currently sitting in the volatile plan cache, so a restart (or a plan simply being evicted from cache) clears its data. Query Store is the feature designed specifically to persist plan and runtime history across restarts instead."
+    },
+    {
+      "id": "q64",
+      "cat": "queryPerf",
+      "type": "mc",
+      "question": "After migrating an on-premises database to Azure SQL Database, it remains on an old compatibility level from its source instance, and several queries now run slower than they did on-premises with the same schema and data. What is a likely contributing factor worth investigating?",
+      "options": [
+        "The old compatibility level is using an outdated cardinality estimator that produces different plan choices than the current level would",
+        "Azure SQL Database ignores compatibility level settings entirely after a migration",
+        "Compatibility level only affects T-SQL syntax support, never plan choices or performance",
+        "The database must be rebuilt entirely before compatibility level has any effect on performance"
+      ],
+      "correct": 0,
+      "explanation": "Compatibility level controls which version of the optimizer's behavior, including the cardinality estimator, a database uses, and staying on an old level after migration can produce different, sometimes worse, plans than the current level would generate. Azure SQL Database fully honors the configured level rather than ignoring it, compatibility level affects plan choices and not just syntax support, and no rebuild is required for a level change to take effect."
+    },
+    {
+      "id": "q65",
+      "cat": "queryPerf",
+      "type": "mc",
+      "question": "A specific database on a Managed Instance regressed after a compatibility level change, while every other database on the same instance needs to stay on the new cardinality estimator. What lets an administrator revert just the cardinality estimator behavior for that one database?",
+      "options": [
+        "Setting LEGACY_CARDINALITY_ESTIMATION to ON through that database's scoped configuration",
+        "Lowering the compatibility level for the entire instance",
+        "Running sp_configure to change the cardinality estimator instance-wide",
+        "Rebuilding every statistics object on every database on the instance"
+      ],
+      "correct": 0,
+      "explanation": "ALTER DATABASE SCOPED CONFIGURATION lets LEGACY_CARDINALITY_ESTIMATION be toggled for one database alone, leaving every other database on the instance unaffected. Lowering compatibility level instance-wide or using sp_configure would change behavior for every database rather than just the regressed one, and rebuilding statistics everywhere doesn't target the cardinality estimator setting at all."
+    },
+    {
+      "id": "msq14",
+      "cat": "queryPerf",
+      "type": "ms",
+      "question": "Which two of the following are true about automatic statistics maintenance in Azure SQL? (Choose two.)",
+      "options": [
+        "Statistics are refreshed automatically once enough rows have changed since the last update",
+        "Automatic statistics updates use a sampled scan by default rather than always scanning every row",
+        "A large bulk load always updates statistics immediately as part of the load operation itself",
+        "Statistics only affect which index is used, never the estimated row counts in a plan"
+      ],
+      "correct": [
+        0,
+        1
+      ],
+      "explanation": "Automatic statistics maintenance refreshes a statistics object once its modification threshold is crossed, and by default samples rather than fully scanning the table to do it. A large bulk load does not automatically trigger an update the moment it finishes \u2014 it can leave statistics stale until the threshold is crossed or UPDATE STATISTICS runs manually \u2014 and statistics drive the optimizer's row-count estimates directly, not just index choice."
+    },
+    {
+      "id": "q66",
+      "cat": "automation",
+      "type": "mc",
+      "question": "A DBA who is used to right-clicking through SSMS's SQL Server Agent node to build a job visually is surprised to find no equivalent designer for Elastic Database Jobs in the Azure portal. How are Elastic Database Jobs actually created and managed?",
+      "options": [
+        "Through PowerShell cmdlets or by calling stored procedures against the job database directly",
+        "Only through SQL Server Management Studio's Job Agent node, same as on-premises",
+        "Elastic Database Jobs cannot be created at all once a database is in production",
+        "Through Azure Data Studio's built-in notebook execution scheduler"
+      ],
+      "correct": 0,
+      "explanation": "Elastic Database Jobs are authored and managed through PowerShell or by calling stored procedures against the job database, with no full visual designer in the Azure portal, unlike SSMS's GUI-based SQL Agent job designer. SSMS's Job Agent node is for SQL Server Agent, not Elastic Jobs, jobs can absolutely be created against a production database, and Azure Data Studio's notebooks are not the mechanism for creating these jobs."
+    },
+    {
+      "id": "tf23",
+      "cat": "automation",
+      "type": "tf",
+      "question": "SQL Agent multi-server administration (MSX/TSX) lets Azure SQL Database single databases be enlisted as target servers that receive jobs from a central master server.",
+      "answer": false,
+      "explanation": "MSX/TSX is a SQL Server Agent feature, and single-database Azure SQL Database has no SQL Server Agent at all, so it cannot be enlisted as a target server. MSX/TSX applies to SQL Server on Azure VMs, Managed Instance, or on-premises instances that actually run SQL Agent."
+    },
+    {
+      "id": "q67",
+      "cat": "automation",
+      "type": "mc",
+      "question": "A company wants to rehearse its disaster-recovery plan on a recurring schedule rather than only reading through the runbook on paper, by actually triggering a failover of an auto-failover group from an Azure Automation job. Which cmdlet accomplishes the failover itself?",
+      "options": [
+        "Switch-AzSqlDatabaseFailoverGroup",
+        "Invoke-AzSqlDatabaseCopy",
+        "New-AzSqlDatabaseLongTermRetentionBackup",
+        "Set-AzSqlDatabaseAuditing"
+      ],
+      "correct": 0,
+      "explanation": "Switch-AzSqlDatabaseFailoverGroup triggers a failover of an auto-failover group from a script or runbook, making a scheduled DR drill practical. Invoke-AzSqlDatabaseCopy copies a database rather than failing one over, and the other two cmdlets manage long-term retention backups and auditing settings, not failover."
+    },
+    {
+      "id": "q68",
+      "cat": "hadr",
+      "type": "mc",
+      "question": "A company wants to migrate an on-premises SQL Server 2019 database to Azure SQL Managed Instance with minimal downtime, keep the two continuously synchronized until they are ready to cut over, and retain the option to fail back to the on-premises server if a problem is found after cutover. Which feature fits?",
+      "options": [
+        "The Managed Instance link",
+        "Active geo-replication",
+        "Geo-restore",
+        "A Failover Cluster Instance"
+      ],
+      "correct": 0,
+      "explanation": "The Managed Instance link establishes a near real-time, continuous replication connection between an on-premises SQL Server 2019+ instance and Managed Instance, supporting a planned failover with minimal downtime and the option to fail back if needed. Active geo-replication and geo-restore operate only between Azure SQL databases, not from an on-premises source, and a Failover Cluster Instance protects a single instance's local nodes rather than linking to the cloud at all."
+    },
+    {
+      "id": "q69",
+      "cat": "hadr",
+      "type": "mc",
+      "question": "A team running SQL Server on an Azure VM wants native T-SQL backups to write directly to Azure Blob Storage as an offsite copy, without setting up a separate file share or backup appliance. What native capability supports this?",
+      "options": [
+        "Backup to URL, using BACKUP DATABASE ... TO URL",
+        "Automated backups and point-in-time restore, the same as Azure SQL Database",
+        "Long-term retention, configured directly from the VM",
+        "Geo-restore, pointed at the VM's local disk"
+      ],
+      "correct": 0,
+      "explanation": "Backup to URL lets native BACKUP DATABASE and BACKUP LOG statements target a blob in Azure Storage directly as the backup destination, giving a VM-hosted instance an offsite copy with no extra backup infrastructure. Automated PITR backups and long-term retention are PaaS-only features Microsoft manages for Azure SQL Database, not something configured directly on a VM, and geo-restore recovers from geo-redundant PaaS backups rather than backing up a VM's local disk."
+    },
+    {
+      "id": "msq15",
+      "cat": "hadr",
+      "type": "ms",
+      "question": "Which two of the following are true about read-only routing configured on an Always On Availability Group listener for SQL Server on Azure VMs? (Choose two.)",
+      "options": [
+        "It relies on a ReadOnlyRoutingList configured on the listener to direct read-intent connections to a secondary replica",
+        "A connection must set its application intent to ReadOnly for routing to apply",
+        "It is available automatically with no listener configuration, the same way Read scale-out works for Azure SQL Database",
+        "It can only route to the primary replica, never to a secondary"
+      ],
+      "correct": [
+        0,
+        1
+      ],
+      "explanation": "Read-only routing depends on an explicitly configured ReadOnlyRoutingList on the availability group listener, and it only applies to connections that set their application intent to ReadOnly. Unlike Azure SQL Database's built-in read scale-out, it requires that explicit listener configuration rather than working automatically, and its entire purpose is to route eligible connections to a secondary replica, not the primary."
     }
   ],
   "lessons": [

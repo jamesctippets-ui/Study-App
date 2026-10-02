@@ -504,6 +504,111 @@
       "front": "Azure Service Health",
       "back": "Reports on Azure platform issues, outages, planned maintenance, and health advisories, filtered to the specific resources and regions your subscription actually uses \u2014 distinct from Azure Advisor, which recommends configuration improvements rather than reporting on ongoing platform incidents.",
       "detail": "If a scenario is about whether an outage is Microsoft's problem or your own configuration, Service Health answers the first question and Advisor addresses the second."
+    },
+    {
+      "id": "f65",
+      "cat": "identityGov",
+      "front": "Azure Policy effects",
+      "back": "A policy definition's effect decides what happens to a non-compliant resource: Audit just flags it in reports, Deny blocks the request outright, Append/Modify quietly adds or changes specific fields in the request, and DeployIfNotExists automatically deploys a related resource, like a diagnostic setting, to bring it into compliance.",
+      "detail": "DeployIfNotExists is the one that actually fixes things going forward without blocking anyone \u2014 it's the automation answer whenever a scenario wants every new resource to come with some companion configuration already attached."
+    },
+    {
+      "id": "f66",
+      "cat": "identityGov",
+      "front": "Access reviews",
+      "back": "A recurring, scheduled process where a designated reviewer explicitly confirms whether a user, often a guest or someone in a privileged role, still needs the access they have, with access automatically revoked if it isn't confirmed.",
+      "detail": "This is the recertification answer whenever a scenario describes access that was granted long ago and now needs periodic, human-confirmed justification rather than running forever unchecked."
+    },
+    {
+      "id": "f67",
+      "cat": "identityGov",
+      "front": "Administrative units",
+      "back": "Scope a Microsoft Entra role, like Helpdesk Administrator, to only a defined subset of users, groups, or devices, such as one regional office or school, instead of that role applying across the whole tenant.",
+      "detail": "This builds on Microsoft Entra roles vs. Azure RBAC roles \u2014 an administrative unit narrows an Entra role's reach the same way scoping an Azure RBAC assignment to one resource group narrows its reach."
+    },
+    {
+      "id": "f68",
+      "cat": "storage",
+      "front": "Azure File Sync",
+      "back": "Keeps an on-premises Windows Server file share synchronized with an Azure file share. Cloud tiering can replace infrequently-accessed local files with lightweight pointers that fetch the content on demand, freeing local disk space while frequently-used files stay fully cached nearby.",
+      "detail": "This builds on Azure Files vs. Blob storage \u2014 it's specifically the hybrid on-premises-to-cloud sync layer on top of an Azure file share, not a replacement for one."
+    },
+    {
+      "id": "f69",
+      "cat": "storage",
+      "front": "Storage account failover (customer-initiated)",
+      "back": "Manually promotes a GRS, RA-GRS, or GZRS account's secondary region to primary during an outage. Because geo-replication to the secondary is asynchronous, the most recent writes made just before the outage may not have replicated yet and can be lost.",
+      "detail": "This is the operational other half of Redundancy at admin depth: RA-GRS \u2014 that flashcard covers reading from the secondary, this one covers actually cutting over to it."
+    },
+    {
+      "id": "f70",
+      "cat": "storage",
+      "front": "Object replication",
+      "back": "Asynchronously copies block blobs from a source storage account to a separate destination account, including across regions, for scenarios like serving a local read copy to users near the destination region or keeping an independently-managed secondary copy.",
+      "detail": "Unlike Redundancy at admin depth: RA-GRS, which is a Microsoft-managed secondary you can't address independently, object replication creates a real, separately-addressable destination account you control."
+    },
+    {
+      "id": "f71",
+      "cat": "compute",
+      "front": "Proximity placement groups",
+      "back": "Place a group of VMs as physically close together as possible within a datacenter, to minimize network latency between them \u2014 the opposite goal of Availability sets vs. zones vs. Scale Sets, which deliberately spread VMs apart for resiliency.",
+      "detail": "This is the answer whenever a scenario is about several VMs that talk to each other constantly and need the lowest possible latency between them, not protection from a shared failure."
+    },
+    {
+      "id": "f72",
+      "cat": "compute",
+      "front": "VM Scale Set upgrade policies",
+      "back": "Controls how instances pick up a changed Scale Set model: Manual requires explicitly upgrading each instance, Automatic updates every instance right away, and Rolling updates instances in small batches with health checks between batches so a bad update can't take down the whole set at once.",
+      "detail": "Rolling is the answer whenever a scenario wants a model change to roll out safely in waves rather than all at once or one instance at a time by hand."
+    },
+    {
+      "id": "f73",
+      "cat": "compute",
+      "front": "Azure Disk Encryption vs. server-side encryption",
+      "back": "Every managed disk already gets server-side encryption at rest automatically, using a platform-managed key by default, with no setup required. Azure Disk Encryption is an optional additional layer that encrypts the guest OS/data volumes from inside the VM itself, using BitLocker or DM-Crypt.",
+      "detail": "A scenario asking what protects data at rest with zero configuration is describing the platform-managed default, not Azure Disk Encryption, which is the extra, opt-in layer."
+    },
+    {
+      "id": "f74",
+      "cat": "networking",
+      "front": "Service endpoint",
+      "back": "Extends a subnet's identity onto the Microsoft backbone so traffic to a PaaS resource, like a storage account, takes an optimized route \u2014 but that resource keeps its normal public endpoint, reachable by other authorized callers too.",
+      "detail": "Contrast with Private Endpoint, which instead gives the PaaS resource an actual private IP address inside your VNet, changing how it's reached rather than just optimizing the route to its existing public one."
+    },
+    {
+      "id": "f75",
+      "cat": "networking",
+      "front": "User-defined routes (UDRs)",
+      "back": "Custom entries in a route table that override Azure's default system routes, letting traffic for a subnet be forced through a specific next hop, like a network virtual appliance or firewall, instead of its normal default path.",
+      "detail": "This is exactly how traffic gets forced through Azure Firewall or another inspection appliance in a hub-and-spoke design \u2014 the route table is what actually redirects it there."
+    },
+    {
+      "id": "f76",
+      "cat": "networking",
+      "front": "DDoS Protection: Basic vs. Standard",
+      "back": "Basic is automatically enabled for every Azure resource at no cost and defends against common network-layer flood attacks. Standard adds resource-tuned mitigation policies, attack analytics and alerting, and cost protection against scale-out charges incurred during a documented attack, for a per-resource fee.",
+      "detail": "If a scenario specifically wants attack-specific telemetry or billing protection during an attack, that's Standard \u2014 Basic is already running in the background either way."
+    },
+    {
+      "id": "f77",
+      "cat": "monitoring",
+      "front": "Diagnostic settings",
+      "back": "Define which resource logs and metrics a specific resource sends, and to where, like a Log Analytics workspace, a storage account, or an Event Hub. Without one configured, that resource's own logs aren't collected anywhere, even though basic platform metrics are already available in Azure Monitor automatically.",
+      "detail": "This is the missing piece whenever a scenario describes a resource whose detailed logs never show up in Log Analytics \u2014 platform metrics flow in automatically, but resource logs need a diagnostic setting routing them there explicitly."
+    },
+    {
+      "id": "f78",
+      "cat": "monitoring",
+      "front": "Data collection rules (DCRs)",
+      "back": "Define exactly what data the Azure Monitor Agent (AMA) collects from a VM, like a specific performance counter or event log channel, and which destination it's sent to \u2014 letting you include exactly what's needed and leave out noisier data you don't.",
+      "detail": "This is the configuration layer that sits behind Azure Monitor Agent (AMA) \u2014 the agent is the collector, but a DCR is what actually tells it what to collect and where to send it."
+    },
+    {
+      "id": "f79",
+      "cat": "monitoring",
+      "front": "Basic KQL query structure",
+      "back": "A Kusto query starts with a table name and pipes (|) the data through operators in sequence, like where to filter rows, summarize to aggregate them, and project to choose which columns to keep \u2014 order matters, since each operator works on the output of the one before it.",
+      "detail": "This builds on Log Analytics workspace and KQL \u2014 that flashcard names the language, this one is the actual shape a query takes once you start writing one."
     }
   ],
   "questions": [
@@ -1639,6 +1744,229 @@
       ],
       "correct": 0,
       "explanation": "A metric alert rule watches a specific metric like CPU percentage against a threshold and duration, and an action group defines what happens when it fires \u2014 including sending an email. Log Analytics stores and queries data but doesn't send scheduled summary emails on its own, Advisor gives periodic recommendations rather than real-time threshold alerts, and Application Insights is scoped to application-level telemetry, like an App Service plan's own metrics, not the CPU of an arbitrary VM."
+    },
+    {
+      "id": "q65",
+      "cat": "identityGov",
+      "type": "mc",
+      "question": "A compliance team wants every new storage account created in a subscription to automatically get a specific diagnostic setting applied at creation time, without anyone remembering to configure it by hand. Which Azure Policy effect fits this?",
+      "options": [
+        "DeployIfNotExists",
+        "Audit",
+        "Deny",
+        "Append"
+      ],
+      "correct": 0,
+      "explanation": "DeployIfNotExists evaluates new or updated resources against a condition and, if it isn't met, automatically deploys a related resource, like a diagnostic setting, to bring the resource into compliance. Audit only flags noncompliant resources in reports without changing them, Deny blocks the resource from being created in the first place rather than fixing it, and Append only adds or overwrites specific fields in the request itself \u2014 it doesn't deploy a separate related resource the way this scenario needs."
+    },
+    {
+      "id": "q66",
+      "cat": "identityGov",
+      "type": "mc",
+      "question": "A company has had the same set of guest users with access to a sensitive SharePoint site for two years and wants a recurring, scheduled process where a manager has to explicitly confirm each guest still needs access, or it gets automatically revoked. Which Microsoft Entra feature fits?",
+      "options": [
+        "Access reviews",
+        "Self-service password reset",
+        "A dynamic group",
+        "Conditional Access"
+      ],
+      "correct": 0,
+      "explanation": "Access reviews let an organization schedule a recurring review where a designated reviewer approves or denies continued access for each user, with denied access automatically revoked \u2014 exactly the ongoing recertification this scenario wants. SSPR only handles password resets, a dynamic group manages membership by attribute rather than periodic human approval, and Conditional Access controls sign-in conditions, not whether access should still be granted at all."
+    },
+    {
+      "id": "q67",
+      "cat": "storage",
+      "type": "mc",
+      "question": "A branch office runs a local Windows file server that's running low on disk space, but needs to keep offering fast local access to files that are actually opened often. Which Azure service lets infrequently-used files get replaced locally with lightweight pointers to a cloud copy, while frequently-used files stay fully cached on-premises?",
+      "options": [
+        "Azure File Sync with cloud tiering enabled",
+        "AzCopy run on a nightly schedule",
+        "A storage account lifecycle management policy",
+        "Azure Site Recovery, configured for the file server"
+      ],
+      "correct": 0,
+      "explanation": "Azure File Sync keeps an Azure file share and the on-premises file server in sync, and cloud tiering can replace cold, infrequently-accessed files locally with small pointer stubs that fetch the content from Azure on demand, freeing local disk space while keeping hot files cached nearby. AzCopy only performs one-off or scheduled copy jobs, not continuous sync with tiering; a lifecycle policy only moves blobs between access tiers in the cloud, not files on a local server; and Site Recovery replicates whole VMs for disaster recovery, unrelated to local disk space."
+    },
+    {
+      "id": "q68",
+      "cat": "storage",
+      "type": "mc",
+      "question": "A media company wants newly uploaded blobs in its primary storage account to be automatically and asynchronously copied to a separate storage account in another region, so read requests from users near that region can be served from a local copy. Which feature fits?",
+      "options": [
+        "Object replication",
+        "Blob lifecycle management",
+        "RA-GRS",
+        "A storage account access key"
+      ],
+      "correct": 0,
+      "explanation": "Object replication asynchronously copies block blobs from a source account to a destination account, including across regions, which is exactly this scenario of serving a local copy to users near the second region. Lifecycle management only moves blobs between access tiers within the same account, RA-GRS makes a Microsoft-managed secondary readable but doesn't create an independently addressable second storage account, and an access key is a credential, not a replication mechanism."
+    },
+    {
+      "id": "q69",
+      "cat": "compute",
+      "type": "mc",
+      "question": "A latency-sensitive trading application splits its workload across three VMs that constantly exchange data with each other, and the team wants Azure to place them as physically close together as possible within a datacenter to minimize network latency between them. Which feature fits?",
+      "options": [
+        "A proximity placement group",
+        "An availability set",
+        "An availability zone",
+        "A VM Scale Set"
+      ],
+      "correct": 0,
+      "explanation": "A proximity placement group is specifically for colocating VMs physically close together to minimize inter-VM network latency. An availability set and availability zones do the opposite, deliberately spreading VMs apart across hardware or datacenters for resiliency, and a Scale Set manages a group of identical instances but doesn't by itself guarantee physical proximity between them."
+    },
+    {
+      "id": "q70",
+      "cat": "compute",
+      "type": "mc",
+      "question": "A team updates their VM Scale Set's model with a new image version and wants Azure to update instances automatically in small batches, pausing to confirm each batch is healthy before moving to the next, rather than updating everything at once or requiring someone to upgrade each instance by hand. Which upgrade policy fits?",
+      "options": [
+        "Rolling",
+        "Manual",
+        "Automatic",
+        "Spot"
+      ],
+      "correct": 0,
+      "explanation": "A Rolling upgrade policy updates instances in batches with health checks between batches, limiting the damage if a bad update slips through. Manual requires explicitly triggering the upgrade on each instance, Automatic updates every instance right away with no batching or health gating, and Spot isn't an upgrade policy at all \u2014 it's a VM pricing and eviction model."
+    },
+    {
+      "id": "q71",
+      "cat": "compute",
+      "type": "mc",
+      "question": "An administrator wants to capture a configured VM as a reusable image that deploys new VMs with fresh, unique identities, not clones carrying the original VM's exact hostname and security identifiers. What must happen to the source VM immediately before capturing the image?",
+      "options": [
+        "Generalize it (e.g., with Sysprep on Windows), which removes machine-specific information",
+        "Resize it to the smallest available VM size",
+        "Enable boot diagnostics on it",
+        "Add it to a proximity placement group"
+      ],
+      "correct": 0,
+      "explanation": "Generalizing a VM, using Sysprep on Windows or the waagent deprovision command on Linux, strips out machine-specific information like the hostname and security identifiers, so an image built from it produces clean, unique VMs on each deployment. Resizing, enabling boot diagnostics, and placement groups are unrelated configuration steps that don't prepare a VM to serve as a reusable image template."
+    },
+    {
+      "id": "q72",
+      "cat": "networking",
+      "type": "mc",
+      "question": "An app team wants traffic from their subnet to a storage account to take an optimized path over the Microsoft backbone instead of the public internet, but the storage account itself can stay reachable at its existing public endpoint for other authorized callers. Which feature fits best?",
+      "options": [
+        "A service endpoint",
+        "A private endpoint",
+        "VNet peering",
+        "Azure Bastion"
+      ],
+      "correct": 0,
+      "explanation": "A service endpoint extends a subnet's identity onto the Microsoft backbone so traffic to the storage account takes an optimized route, while the storage account keeps its normal public endpoint reachable by other authorized callers. A private endpoint instead gives the storage account an actual private IP inside the VNet, changing how it's reached entirely rather than just optimizing the route. Peering connects two VNets to each other, not a VNet to a PaaS service, and Bastion is for RDP/SSH access to VMs, unrelated to storage connectivity."
+    },
+    {
+      "id": "q73",
+      "cat": "monitoring",
+      "type": "mc",
+      "question": "A team enables a new Azure SQL Database and expects its detailed resource logs, like query performance insights, to start flowing into their existing Log Analytics workspace automatically. A week later, the workspace still shows nothing for that database. What's the most likely cause?",
+      "options": [
+        "No diagnostic setting was configured on the database to route its resource logs anywhere",
+        "Log Analytics workspaces only accept data from virtual machines, not platform services like Azure SQL Database",
+        "The workspace has reached its maximum data retention limit and is rejecting new data",
+        "Resource logs take a minimum of 30 days to begin appearing after a resource is created"
+      ],
+      "correct": 0,
+      "explanation": "Resource logs aren't sent anywhere by default \u2014 a diagnostic setting has to be explicitly configured on the resource to route its logs to a destination like a Log Analytics workspace, a storage account, or an event hub. Log Analytics accepts data from many platform services, not just VMs; a workspace hitting its retention limit affects how long old data is kept, not whether new data is rejected; and there's no 30-day delay built into resource logging."
+    },
+    {
+      "id": "q74",
+      "cat": "monitoring",
+      "type": "mc",
+      "question": "A team needs the Azure Monitor Agent to collect one specific custom Windows event log channel from a fleet of VMs and send it to their Log Analytics workspace, leaving out the noisier default channels they don't need. Which component defines exactly what gets collected and where it goes?",
+      "options": [
+        "A data collection rule",
+        "An action group",
+        "A resource lock",
+        "An availability set"
+      ],
+      "correct": 0,
+      "explanation": "A data collection rule (DCR) tells the Azure Monitor Agent precisely which data sources, like a specific event log channel or performance counter, to collect and which destination to send them to, letting you include exactly the channel you need and exclude the rest. An action group defines a response to a fired alert, not what gets collected, and a resource lock or availability set are unrelated governance and resiliency constructs."
+    },
+    {
+      "id": "tf19",
+      "cat": "identityGov",
+      "type": "tf",
+      "question": "An administrative unit can scope a Microsoft Entra role, like Helpdesk Administrator, to only the users in one regional office instead of the whole tenant.",
+      "answer": true,
+      "explanation": "That's exactly what administrative units are for \u2014 restricting an Entra role assignment to a defined subset of users, groups, or devices, like one regional office or school, rather than granting that role tenant-wide."
+    },
+    {
+      "id": "tf20",
+      "cat": "storage",
+      "type": "tf",
+      "question": "Customer-initiated storage account failover promotes the secondary region to primary for a GRS account, but data written to the primary just before the outage may not have replicated yet and can be lost.",
+      "answer": true,
+      "explanation": "Because GRS replication to the secondary region is asynchronous, a customer-initiated failover can lose the most recent writes that had not yet replicated \u2014 a real tradeoff administrators need to plan around, not a lossless operation."
+    },
+    {
+      "id": "tf21",
+      "cat": "compute",
+      "type": "tf",
+      "question": "Every Azure managed disk is encrypted at rest automatically with server-side encryption using a platform-managed key by default, with no extra configuration required to get that baseline protection.",
+      "answer": true,
+      "explanation": "Server-side encryption at rest is on by default for every managed disk using a Microsoft platform-managed key, with no setup needed. Customer-managed keys or Azure Disk Encryption inside the guest OS are optional, additional layers on top of that baseline, not what's required to get it in the first place."
+    },
+    {
+      "id": "tf22",
+      "cat": "networking",
+      "type": "tf",
+      "question": "Within a single virtual network, Azure's default system routes already let two subnets communicate with each other automatically, with no route table entries required.",
+      "answer": true,
+      "explanation": "Azure creates default system routes automatically for intra-VNet communication, direct internet access, and a few other default destinations \u2014 a user-defined route is only needed when you want to override that default behavior, like forcing traffic through a firewall instead."
+    },
+    {
+      "id": "msq6",
+      "cat": "identityGov",
+      "type": "ms",
+      "question": "Which two of the following are true about Azure RBAC deny assignments? (Choose two.)",
+      "options": [
+        "A deny assignment blocks specified actions regardless of any role assignment that would otherwise allow them",
+        "Deny assignments are created and managed directly by subscription administrators the same way role assignments are",
+        "Deny assignments are most commonly created automatically by Azure Blueprints or managed apps to protect their own resources",
+        "A deny assignment can be overridden by assigning the affected user the Owner role"
+      ],
+      "correct": [
+        0,
+        2
+      ],
+      "explanation": "A deny assignment blocks specified actions no matter what role assignments would otherwise allow, and in practice they're usually created automatically by system features like Azure Blueprints or managed applications to protect resources they manage, not hand-authored by administrators the way ordinary role assignments are. Owner access doesn't override a deny assignment \u2014 deny always takes precedence over any allow, including Owner."
+    },
+    {
+      "id": "msq7",
+      "cat": "networking",
+      "type": "ms",
+      "question": "Which two of the following are benefits that DDoS Protection Standard adds on top of the Basic protection every Azure resource already gets automatically? (Choose two.)",
+      "options": [
+        "Attack analytics, metrics, and alerting tuned to the specific protected resource",
+        "Protection against common network-layer flood attacks",
+        "Cost protection credits for resource scale-out charges incurred during a documented attack",
+        "Automatic enrollment with no configuration or cost"
+      ],
+      "correct": [
+        0,
+        2
+      ],
+      "explanation": "DDoS Protection Standard adds resource-tuned attack analytics, metrics, and alerting, plus cost protection credits for scale-out charges incurred while defending against a documented attack \u2014 both are paid, Standard-only capabilities. Basic protection already covers common network-layer flood attacks for every resource at no cost, which is also why automatic, no-configuration, no-cost enrollment describes Basic, not something Standard adds on top of it."
+    },
+    {
+      "id": "msq8",
+      "cat": "monitoring",
+      "type": "ms",
+      "question": "Which two of the following are valid operators used to filter and aggregate data within a KQL (Kusto Query Language) query? (Choose two.)",
+      "options": [
+        "where",
+        "summarize",
+        "SELECT",
+        "GROUP BY"
+      ],
+      "correct": [
+        0,
+        1
+      ],
+      "explanation": "KQL pipes a table through operators like where to filter rows and summarize to aggregate them \u2014 both are real KQL syntax. SELECT and GROUP BY are SQL keywords, not KQL operators; KQL achieves the same goals with project to choose columns and summarize to group and aggregate, so bringing over literal SQL syntax does not work in a Kusto query."
     }
   ],
   "lessons": [

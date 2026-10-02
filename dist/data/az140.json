@@ -444,6 +444,111 @@
       "front": "FSLogix profile locking and the 'stuck on temp profile' symptom",
       "back": "A given FSLogix VHD(X) can only be mounted by one active session at a time, so a crashed or improperly disconnected session that never releases its lock leaves that same user's next sign-in unable to attach their real FSLogix Profile Containers file, silently dropping them into a temporary, unsaved local profile instead with no obvious error. FSLogix Cloud Cache reduces exposure to a single storage location failing outright, but it does not remove this single-session lock behavior.",
       "detail": "Clearing a stuck lock usually means confirming the user has no other active or disconnected session anywhere in the host pool and, if needed, having an admin close the open file handle on the storage side before the next sign-in can mount the container normally."
+    },
+    {
+      "id": "f58",
+      "cat": "planInfra",
+      "front": "Azure Image Builder for session host images",
+      "back": "A service that automates customizing and building a session host image through a repeatable template definition \u2014 installing applications, applying Windows updates, and running custom scripts \u2014 then distributing the finished image version to Azure Compute Gallery for AVD images, replacing a manual sysprep-and-capture workflow.",
+      "detail": "Azure Image Builder handles the build-and-customize step; Azure Compute Gallery for AVD images still handles the separate job of versioning, replicating, and distributing that finished image across regions and subscriptions."
+    },
+    {
+      "id": "f59",
+      "cat": "planInfra",
+      "front": "Network requirements for AVD service connectivity",
+      "back": "Session hosts need outbound internet access, with no inbound rule required, to a defined set of Microsoft-owned FQDNs and the 'WindowsVirtualDesktop' NSG/Azure Firewall service tag, covering the Broker, Diagnostics, and agent traffic the session host depends on to register and stay healthy.",
+      "detail": "This outbound-only requirement is the same reason Restricting session host network exposure works at all \u2014 an NSG can safely deny all inbound RDP since nothing ever needs to reach the session host from outside."
+    },
+    {
+      "id": "f60",
+      "cat": "planInfra",
+      "front": "Business continuity and disaster recovery (BCDR) for AVD",
+      "back": "Since the AVD control plane has no customer-facing failover to configure, BCDR for AVD means building redundancy into the data plane the customer owns: a host pool deployed in a secondary Azure region, a session host image replicated there via Azure Compute Gallery for AVD images, and FSLogix storage replicated or duplicated across regions so the failover host pool has both a usable image and reachable profile storage.",
+      "detail": "Because host pools in two regions are independent objects, users typically need to be reassigned to the secondary region's workspace during a failover, rather than an existing session silently moving itself."
+    },
+    {
+      "id": "f61",
+      "cat": "planInfra",
+      "front": "Start VM on Connect",
+      "back": "A host pool setting that automatically powers on a deallocated session host the moment its assigned user attempts to connect, without a fixed scaling-plan schedule or manual admin action, fitting a host pool with unpredictable, occasional usage.",
+      "detail": "It solves a different problem than Autoscale scaling plans, which start hosts on a predetermined schedule rather than reactively, the instant a specific user tries to connect \u2014 and it is available on both personal and pooled host pools, not restricted to only one type."
+    },
+    {
+      "id": "f62",
+      "cat": "identitySecurity",
+      "front": "Virtual Machine User Login / Virtual Machine Administrator Login roles",
+      "back": "Built-in Azure RBAC roles, separate from the Desktop Virtualization roles, that grant a user permission to actually sign in to a Microsoft Entra-joined or hybrid Entra-joined Azure VM with their Entra credentials \u2014 Virtual Machine User Login for standard sign-in, Virtual Machine Administrator Login for local admin rights on that VM.",
+      "detail": "Assigning a user the Desktop Virtualization User role without also assigning one of these VM login roles on an Entra-joined session host is a classic gap: the user can see and launch the published resource but is denied at the Windows sign-in screen itself."
+    },
+    {
+      "id": "f63",
+      "cat": "identitySecurity",
+      "front": "Conditional Access sign-in frequency for AVD sessions",
+      "back": "A Conditional Access session control that forces a user to re-authenticate after a defined time interval, which can be added to Conditional Access for Azure Virtual Desktop policies targeting the Azure Virtual Desktop and Windows Cloud Login apps, so a long-running AVD session periodically re-validates the user's identity rather than trusting one sign-in indefinitely.",
+      "detail": "This complements, rather than replaces, Single sign-on (SSO) for AVD sessions \u2014 SSO removes a redundant in-session prompt after a strong initial sign-in, while sign-in frequency decides how long that initial sign-in stays trusted before it must happen again."
+    },
+    {
+      "id": "f64",
+      "cat": "identitySecurity",
+      "front": "Custom RBAC roles for Azure Virtual Desktop",
+      "back": "When none of the Built-in Azure Virtual Desktop RBAC roles grant exactly the permissions needed, an administrator can define a custom Azure role scoped to specific Microsoft.DesktopVirtualization permissions, combining only the actions a particular team actually needs.",
+      "detail": "This is most often used to carve out a narrower role than any built-in option provides, such as letting a team view host pool configuration without granting any of the write or delete actions Desktop Virtualization Contributor includes."
+    },
+    {
+      "id": "f65",
+      "cat": "identitySecurity",
+      "front": "Legacy per-user MFA vs. Conditional Access-based MFA for AVD",
+      "back": "Legacy per-user multi-factor authentication, enabled directly on a user's account, applies MFA to that user everywhere with no ability to scope it to specific apps or conditions. Conditional Access for Azure Virtual Desktop is the modern, Microsoft-recommended approach instead, since it can be scoped by app, device compliance, location, or risk rather than being all-or-nothing.",
+      "detail": "Per-user MFA enabled on an account can still interact with and override an organization's Conditional Access design, which is one reason Microsoft recommends moving entirely to Conditional Access-based MFA rather than mixing the two approaches."
+    },
+    {
+      "id": "f66",
+      "cat": "userEnvApps",
+      "front": "MSIX app attach image formats: VHD, VHDX, and CIM",
+      "back": "MSIX app attach can stage an application's image as a VHD, VHDX, or CIM (Composite Image Format) file. CIM is the newer, recommended format, since it attaches faster and doesn't require pre-expanding or managing a fixed-size virtual disk the way VHD/VHDX does.",
+      "detail": "Because the underlying image format is just a packaging detail of how the app is staged, switching an existing MSIX app attach application from VHDX to CIM doesn't change anything about how the app appears or behaves for the end user."
+    },
+    {
+      "id": "f67",
+      "cat": "userEnvApps",
+      "front": "OneDrive Known Folder Move (KFM) for AVD",
+      "back": "Known Folder Move redirects a user's Desktop, Documents, and Pictures folders into OneDrive so that content syncs to the cloud, and on AVD it should be configured silently via Group Policy or Intune so every new session doesn't prompt the user to opt in manually.",
+      "detail": "KFM and FSLogix Profile Containers are complementary, not competing: KFM syncs known folder content to OneDrive in the cloud, while the profile container still roams everything else about the user's Windows profile between session hosts."
+    },
+    {
+      "id": "f68",
+      "cat": "userEnvApps",
+      "front": "Browser-based multimedia redirection requirements",
+      "back": "Multimedia redirection (MMR) for browser content needs two pieces installed: the multimedia redirection extension inside the supported browser (Microsoft Edge or Chrome) on the client, and the multimedia redirection service on the session host, so specific supported sites can have their video decoding offloaded to the client instead of the session host.",
+      "detail": "Multimedia redirection and Teams media optimization for AVD both offload media processing to the client device, but they target different workloads \u2014 MMR covers specific supported websites' video playback, while Teams media optimization covers Teams call and meeting media specifically."
+    },
+    {
+      "id": "f69",
+      "cat": "monitorMaintain",
+      "front": "Scaling plan ramp-down: force logoff",
+      "back": "A ramp-down phase setting inside Autoscale scaling plans that, after a configured notification period, forcibly signs out any users still connected to a session host being deallocated, instead of waiting indefinitely for them to disconnect on their own.",
+      "detail": "Leaving force logoff disabled is a common, easy-to-miss reason a host pool's overnight compute bill never actually drops to its expected minimum, since idle-but-still-connected sessions keep blocking affected hosts from ever reaching zero users."
+    },
+    {
+      "id": "f70",
+      "cat": "monitorMaintain",
+      "front": "Session host status values",
+      "back": "Each session host in a host pool reports a status such as Available (healthy and accepting sessions), Needs Assistance (registered but reporting an agent or health problem), Unavailable (not reachable or not registered), or Upgrading (agent update in progress), visible on the host pool's Session Hosts page.",
+      "detail": "Needs Assistance is the status worth investigating first during troubleshooting, since it specifically flags a host that is still registered with the service but reporting some kind of agent or health issue, rather than one that's simply offline."
+    },
+    {
+      "id": "f71",
+      "cat": "monitorMaintain",
+      "front": "FSLogix Apps Operational event log",
+      "back": "FSLogix writes its own detailed profile-load events to the FSLogix Apps Operational log, under Applications and Services Logs in Event Viewer on the session host \u2014 the first place to check for the specific error behind a failed or slow sign-in, including cases that match the FSLogix profile locking and the 'stuck on temp profile' symptom pattern.",
+      "detail": "Because this log lives locally on the session host rather than in Log Analytics by default, diagnosing a single user's bad FSLogix sign-in usually means connecting to the specific session host they landed on and reading this log directly, unless it has separately been configured to ship to Log Analytics."
+    },
+    {
+      "id": "f72",
+      "cat": "monitorMaintain",
+      "front": "Scaling plan schedules for weekdays vs. weekends",
+      "back": "A single Autoscale scaling plans configuration can define more than one schedule, each assigned to a specific set of days, letting an admin give weekdays an aggressive ramp-up/peak/ramp-down pattern for business-hours demand while weekends use a much lighter schedule, or no ramp-up at all, instead of forcing one schedule to fit every day.",
+      "detail": "Each schedule within the plan still configures its own ramp-up, peak, ramp-down, and off-peak phases independently, so weekday and weekend behavior can differ completely even though both live inside the same scaling plan object."
     }
   ],
   "questions": [
@@ -1591,6 +1696,232 @@
       ],
       "correct": 0,
       "explanation": "A workspace is the publishing container that groups application groups together into one feed a user sees in the Remote Desktop client. A host pool is the underlying collection of session hosts, a scaling plan governs power state, and an image definition is about versioning VM images \u2014 none of these publish a unified feed to end users."
+    },
+    {
+      "id": "q54",
+      "cat": "planInfra",
+      "type": "mc",
+      "question": "A team currently builds each new session host image by manually installing applications and updates on a reference VM, then running sysprep by hand before capturing it. They want this process automated and repeatable, defined as a reusable template that produces a new image version on demand. Which service should they adopt?",
+      "options": [
+        "Azure Image Builder",
+        "Azure Compute Gallery",
+        "Azure Update Manager",
+        "Azure Resource Mover"
+      ],
+      "correct": 0,
+      "explanation": "Azure Image Builder automates the customize-and-build step itself, running defined installs, updates, and scripts from a repeatable template instead of a manual reference VM process. Azure Compute Gallery stores and distributes the finished image once it exists, Azure Update Manager patches existing VMs rather than building new images, and Azure Resource Mover relocates resources between regions."
+    },
+    {
+      "id": "q55",
+      "cat": "planInfra",
+      "type": "mc",
+      "question": "A company wants a disaster recovery plan for Azure Virtual Desktop so that if an entire Azure region hosting their session hosts becomes unavailable, users can still be redirected to a working environment in another region. Which combination of actions builds this?",
+      "options": [
+        "Deploy a host pool in a secondary region with the image replicated via Compute Gallery and FSLogix storage available there too",
+        "Enable drain mode everywhere so traffic reroutes to another region automatically",
+        "Rely on the AVD control plane, since Microsoft already manages regional failover for customer host pools",
+        "Configure one scaling plan with schedules spanning host pools in both regions"
+      ],
+      "correct": 0,
+      "explanation": "Because the AVD control plane has no customer-facing failover switch, BC/DR has to be built in the data plane the customer owns: a host pool in a secondary region, an image replicated there, and FSLogix storage available in that region too. Drain mode only stops new sessions on specific hosts, the control plane's own resiliency does not extend to redirecting users between a customer's separate regional host pools, and a scaling plan is scoped to a single host pool, not multiple regions."
+    },
+    {
+      "id": "q56",
+      "cat": "planInfra",
+      "type": "mc",
+      "question": "A network team enables RDP Shortpath for managed networks between clients on the corporate VPN and session hosts, but connections keep silently falling back to the Gateway relay with no error shown. What is the most likely overlooked network requirement?",
+      "options": [
+        "UDP port 3390 must be open end-to-end between the client and session host, not just inbound to the session host",
+        "The Remote Desktop Gateway must be disabled entirely before Shortpath can establish a direct path",
+        "RDP Shortpath for managed networks only works for personal host pools, never pooled host pools",
+        "The host pool must be flagged as a validation environment before Shortpath can be enabled"
+      ],
+      "correct": 0,
+      "explanation": "RDP Shortpath for managed networks depends on UDP port 3390 being open end-to-end, and a firewall that only opened it on one side of a segmented internal network is a common, hard-to-spot reason Shortpath silently falls back to the Gateway relay with no error. The Gateway doesn't need to be disabled, Shortpath applies to both personal and pooled host pools, and the validation environment flag only affects the AVD update rollout ring."
+    },
+    {
+      "id": "tf21",
+      "cat": "planInfra",
+      "type": "tf",
+      "question": "Session hosts need an inbound network security group rule permitting traffic from the internet so the Azure Virtual Desktop Gateway can reach them directly.",
+      "answer": false,
+      "explanation": "Session hosts only need outbound connectivity to the required Microsoft endpoints and the 'WindowsVirtualDesktop' service tag; the Gateway never initiates an inbound connection to the session host, so no inbound internet-facing rule is needed at all."
+    },
+    {
+      "id": "msq15",
+      "cat": "planInfra",
+      "type": "ms",
+      "question": "Which two of the following are true about Start VM on Connect? (Choose two.)",
+      "options": [
+        "It automatically powers on a deallocated session host the moment its assigned user attempts to connect",
+        "It requires a fixed, predefined scaling-plan schedule to function",
+        "It fits a host pool with unpredictable, occasional usage",
+        "It works only on pooled host pools, never personal host pools"
+      ],
+      "correct": [
+        0,
+        2
+      ],
+      "explanation": "Start VM on Connect reacts the instant a user tries to connect rather than running on a fixed schedule, which fits a host pool used unpredictably. It needs no scaling-plan schedule to function at all, and it is available on both personal and pooled host pools, not restricted to only one type."
+    },
+    {
+      "id": "q57",
+      "cat": "identitySecurity",
+      "type": "mc",
+      "question": "A user is assigned the Desktop Virtualization User role and can see their published desktop in the feed, but their sign-in is rejected at the Windows lock screen on a Microsoft Entra-joined session host. What is most likely missing?",
+      "options": [
+        "The Virtual Machine User Login role, assigned on the session host or its resource group",
+        "The Desktop Virtualization Session Host Operator role",
+        "A Conditional Access policy requiring a compliant device",
+        "FSLogix Application Masking scoped to that user's group"
+      ],
+      "correct": 0,
+      "explanation": "On a Microsoft Entra-joined (or hybrid Entra-joined) session host, a user needs a VM login role like Virtual Machine User Login in addition to Desktop Virtualization User \u2014 the Desktop Virtualization role only grants access to the published resource, not permission to actually authenticate at the Windows sign-in screen. The other options affect administrative permissions, device compliance requirements, or application visibility, not the ability to sign in to the VM itself."
+    },
+    {
+      "id": "q58",
+      "cat": "identitySecurity",
+      "type": "mc",
+      "question": "A team needs a role that lets staff view host pool and session host configuration in the portal, but none of the built-in Desktop Virtualization roles offer read-only access without also granting write or delete permissions. What should the admin do?",
+      "options": [
+        "Define a custom Azure role scoped to only the read actions needed on Microsoft.DesktopVirtualization resources",
+        "Assign Desktop Virtualization Contributor, since no narrower option exists",
+        "Assign the Desktop Virtualization User role, since it grants read-only access to host pool configuration",
+        "Assign Owner at the subscription level so the team can view every resource including host pools"
+      ],
+      "correct": 0,
+      "explanation": "When no built-in role matches the exact permissions needed, a custom Azure role can be scoped to just the specific read actions required, avoiding the broader write/delete rights that Desktop Virtualization Contributor includes. Desktop Virtualization User only grants end-user access to app groups, not administrative visibility into configuration, and Owner grants far more than the narrow, read-only access the team actually needs."
+    },
+    {
+      "id": "tf22",
+      "cat": "identitySecurity",
+      "type": "tf",
+      "question": "A Conditional Access sign-in frequency control can force a user connected to a long-running AVD session to periodically re-authenticate instead of staying trusted indefinitely from one initial sign-in.",
+      "answer": true,
+      "explanation": "That is exactly what sign-in frequency does: it sets how long a session is trusted before Conditional Access requires the user to prove their identity again, which can be applied to the apps an AVD connection authenticates against."
+    },
+    {
+      "id": "msq16",
+      "cat": "identitySecurity",
+      "type": "ms",
+      "question": "Which two of the following are true about legacy per-user multi-factor authentication compared to Conditional Access-based MFA for Azure Virtual Desktop? (Choose two.)",
+      "options": [
+        "Legacy per-user MFA applies to a user account everywhere, with no way to scope it to specific apps or conditions",
+        "Conditional Access-based MFA can be scoped by app, device compliance, location, or sign-in risk",
+        "Legacy per-user MFA is the approach Microsoft currently recommends for new Azure Virtual Desktop deployments",
+        "Conditional Access-based MFA cannot target the Windows Cloud Login app, only the Azure Virtual Desktop app"
+      ],
+      "correct": [
+        0,
+        1
+      ],
+      "explanation": "Legacy per-user MFA is all-or-nothing across every app a user accesses, while Conditional Access-based MFA can be scoped by app, device compliance, location, or risk, which is why Microsoft recommends Conditional Access over the legacy approach for new deployments, not the other way around. Conditional Access-based MFA can target both the Azure Virtual Desktop and Windows Cloud Login apps."
+    },
+    {
+      "id": "q59",
+      "cat": "userEnvApps",
+      "type": "mc",
+      "question": "An organization is standardizing new MSIX app attach packages and wants the fastest possible attach time without managing a fixed-size virtual disk for each app. Which image format should they choose?",
+      "options": [
+        "VHD",
+        "VHDX",
+        "CIM (Composite Image Format)",
+        "ISO"
+      ],
+      "correct": 2,
+      "explanation": "CIM is the newer MSIX app attach image format, built to attach faster and avoid managing a fixed-size virtual disk the way VHD or VHDX require. ISO is not a supported MSIX app attach staging format at all."
+    },
+    {
+      "id": "q60",
+      "cat": "userEnvApps",
+      "type": "mc",
+      "question": "Users report that video on a supported website still plays back sluggishly inside their AVD session even after multimedia redirection was enabled on the session host. What is most likely still missing?",
+      "options": [
+        "The multimedia redirection extension installed in the user's browser on the client device",
+        "FSLogix Redirections.xml excluding the browser's cache folder",
+        "Depth-first load balancing on the host pool",
+        "A validation environment flag on the host pool"
+      ],
+      "correct": 0,
+      "explanation": "Browser-based multimedia redirection needs both the service on the session host and the multimedia redirection extension installed in the supported browser on the client device; enabling only the session host side leaves video processing happening on the host exactly as before. Redirections.xml, the load-balancing algorithm, and the validation environment flag don't affect multimedia redirection at all."
+    },
+    {
+      "id": "tf23",
+      "cat": "userEnvApps",
+      "type": "tf",
+      "question": "OneDrive Known Folder Move and FSLogix Profile Containers address the same need, so an organization should configure only one of the two, never both together.",
+      "answer": false,
+      "explanation": "Known Folder Move and FSLogix Profile Containers are complementary: KFM syncs specific known folders like Desktop and Documents to OneDrive, while the profile container still roams everything else about the Windows profile. Organizations commonly configure both together, not just one instead of the other."
+    },
+    {
+      "id": "msq17",
+      "cat": "userEnvApps",
+      "type": "ms",
+      "question": "Which two of the following accurately distinguish multimedia redirection (MMR) from Teams media optimization on Azure Virtual Desktop? (Choose two.)",
+      "options": [
+        "MMR targets video playback on specific supported websites, while Teams media optimization targets Teams call and meeting media specifically",
+        "Both features offload media processing to run on the client device instead of the session host",
+        "MMR requires no browser extension of any kind, unlike Teams media optimization",
+        "Teams media optimization is only available on personal host pools, never pooled host pools"
+      ],
+      "correct": [
+        0,
+        1
+      ],
+      "explanation": "MMR and Teams media optimization target different workloads \u2014 general supported-website video versus Teams calls specifically \u2014 but both share the same underlying goal of moving media processing to the client device instead of the shared session host. MMR does require a browser extension on the client, and Teams media optimization works on both personal and pooled host pools."
+    },
+    {
+      "id": "q61",
+      "cat": "monitorMaintain",
+      "type": "mc",
+      "question": "A pooled host pool's compute cost never actually drops to the expected minimum overnight, even though the scaling plan's ramp-down phase is configured correctly. Investigation shows several hosts still have idle, disconnected-but-not-signed-out sessions blocking them from being deallocated. What setting addresses this?",
+      "options": [
+        "Force logoff in the ramp-down phase, which signs out remaining users after a notification period",
+        "A lower capacity threshold percentage",
+        "Switching the load-balancing algorithm to breadth-first",
+        "Enabling drain mode permanently on the affected hosts"
+      ],
+      "correct": 0,
+      "explanation": "Force logoff in the ramp-down phase forcibly signs out users still connected after a configured notification period, which is exactly what's needed when idle sessions are blocking hosts from being deallocated. A lower capacity threshold affects scale-out triggering, not ramp-down behavior, breadth-first changes session distribution rather than forcing logoffs, and permanent drain mode would block new sessions on those hosts forever rather than just clearing the current ones."
+    },
+    {
+      "id": "tf24",
+      "cat": "monitorMaintain",
+      "type": "tf",
+      "question": "A session host showing a status of 'Needs Assistance' in the host pool overview means the host is completely unreachable and not registered with the service at all.",
+      "answer": false,
+      "explanation": "'Needs Assistance' specifically means the host is still registered with the service but is reporting some kind of agent or health problem \u2014 a genuinely unreachable, unregistered host instead shows as 'Unavailable,' a different status."
+    },
+    {
+      "id": "q62",
+      "cat": "monitorMaintain",
+      "type": "mc",
+      "question": "A single user reports a slow sign-in that fell back to a temporary profile, while every other user on the same session host signs in normally. Where should an admin look first for the specific FSLogix error behind that one failure?",
+      "options": [
+        "The FSLogix Apps Operational log in Event Viewer on the specific session host the user landed on",
+        "The Azure Activity Log for the subscription",
+        "The host pool's Validation environment setting",
+        "The WVDCheckpoints table, filtered by host pool name only"
+      ],
+      "correct": 0,
+      "explanation": "FSLogix writes detailed profile-load events to its own Apps Operational log in Event Viewer, locally on whichever session host the user landed on, which is the most direct place to find the specific error behind one user's failed or slow FSLogix sign-in. The Activity Log records subscription-level management operations, the validation environment setting only affects AVD service update rollout, and WVDCheckpoints would need filtering by that user or connection, not by host pool alone, to isolate a single failure."
+    },
+    {
+      "id": "msq18",
+      "cat": "monitorMaintain",
+      "type": "ms",
+      "question": "Which two of the following are true about schedules within an Autoscale scaling plan? (Choose two.)",
+      "options": [
+        "A single scaling plan can contain multiple schedules, each assigned to a different set of days",
+        "Each schedule can define its own independent ramp-up, peak, ramp-down, and off-peak phases",
+        "A scaling plan is limited to exactly one schedule that must apply to every day equally",
+        "Schedules within the same scaling plan must share identical capacity threshold settings"
+      ],
+      "correct": [
+        0,
+        1
+      ],
+      "explanation": "A scaling plan can hold multiple schedules, each tied to specific days, and each schedule configures its own independent ramp-up, peak, ramp-down, and off-peak phases \u2014 which is how weekday and weekend behavior can differ completely within one scaling plan. It is not limited to a single schedule, and different schedules are free to use different settings, including different capacity thresholds, rather than being forced to match."
     }
   ],
   "lessons": [

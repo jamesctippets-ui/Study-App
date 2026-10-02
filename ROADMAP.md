@@ -498,6 +498,17 @@ come up.
     already got a round-1 pass and still rank low, since round 1's goal
     was closing the worst gaps, not full parity in one pass; a track can
     legitimately need more than one round.
+  - **Round 3**: MD-102, AZ-140, AZ-104, plus a *second* pass each for
+    DP-900 and DP-300 — each of those two agents was explicitly told what
+    round 1 already added (by exact topic) so round 3's gaps didn't
+    overlap it. Flashcards 964 → 1039, questions 1433 → 1518. Results:
+    MD-102 175, AZ-140 176, DP-900 178, DP-300 179, AZ-104 183 combined —
+    AZ-104 is now within 2 of AZ-900's 185, and every round-3 target
+    cleared the entire round-1/round-2 pack. New lowest tier for a round
+    4: SC-300 (154), ITIL (155), SC-200 (156), AZ-305 (160), AZ-802
+    (167) — all from round 1 or earlier, confirming a single pass isn't
+    always enough and this really is iterative, ongoing work rather than
+    a fixed list to clear once.
 - [x] **Progress export/import.** The app has no accounts, so a cleared browser
   or a new device previously meant losing everything. The ⚙ Data & progress
   panel now downloads all progress (results, seenLog, stats) as a JSON file
