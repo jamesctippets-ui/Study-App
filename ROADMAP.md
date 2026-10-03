@@ -450,9 +450,10 @@ come up.
   Rehearsal" achievement (`finalMocksPassed` in stats.counts). The
   practice exam is unchanged. See `startExam(variant)` in 06_app.jsx and
   ExamIntro/ExamResults in 05_final_exam_ui.jsx.
-- [ ] An optional harder "stretch" question pool per track for confidence-
-  building beyond real exam difficulty (Tutorials Dojo's approach), kept
-  clearly labeled as harder-than-real so it doesn't skew mastery stats.
+- [~] **Decided against: a separate "stretch" question pool.** Dropped in
+  favor of raising difficulty in the main bank itself (the question-
+  hardening pass in section 10.5), so there's one pool that's already at
+  real-exam difficulty rather than a second, deliberately harder tier.
 
 ## 10.5. Data portability & review quality (not originally listed — added as they shipped)
 
@@ -894,17 +895,58 @@ doesn't (and why it's still waiting).
   reference diagrams, not portal screenshots, so get their own product
   label rather than misleadingly saying "Azure Portal"). Images in
   `images/az305-arch/`.
-- [ ] DP-300 (Azure SQL/Cosmos DB) and SC-200 (Defender for Cloud/Sentinel)
-  still need their actual source repo found. SC-300 stays blocked on
-  `entra-docs`' licensing per above unless a different, properly
-  CC-BY-licensed source turns up. Cloud+ has no real portal to screenshot
-  anyway (vendor-neutral by design).
+- [x] **DP-300, SC-300, and AZ-802 each got a first real screenshot** —
+  the "still need their source repo / blocked on licensing" notes above
+  are now resolved for those three: DP-300 from `MicrosoftDocs/sql-docs`
+  (an Azure SQL Database compute-utilization chart), SC-300 from
+  `entra-docs` (a PIM role-activation panel — see the comment above
+  `pimActivateRole` in `02_portal_mockups.jsx` for how its MIT-only
+  license was handled), and AZ-802 from the Windows Admin Center docs (a
+  Failover Cluster Manager drain-roles view). They're one image each,
+  though, so most categories in those tracks are still bare.
 - [x] More quiz/exam questions built around each new screenshot, matching
   the existing pattern (`'image': '<key>'` on the question dict) — done
   for AZ-305: 10 new questions (2 per new diagram, `q38`–`q47`) spanning
   the `infrastructure`, `identityGovernance`, and `dataStorage`
-  categories. MD-102 still doesn't have any of these yet, only the
-  Study-view placement.
+  categories. AZ-900 (4) and AZ-104 (3) have a few too. MD-102, DP-300,
+  SC-300, and AZ-802 have the Study-view placement but no screenshot-
+  backed questions yet.
+- [ ] **Queued next: bring real screenshots to every track with an admin
+  portal.** Coverage today, by track (categories with a real image of
+  their own / total): AZ-900 and AZ-104 every lesson; AZ-305 5 reference
+  diagrams; MD-102 5/5; DP-300 1/6; AZ-802 1/7; SC-300 1/4; **none yet:**
+  SC-200 (0/3), SC-500 (0/4), DP-900 (0/4), AZ-140 (0/4), AB-650 (0/3).
+  ITIL, Cloud+, and EHR Integration have no vendor portal to screenshot
+  (vendor-neutral by design) and stay out of scope. Order of work, each
+  step following the same rules as everything above — verify the source
+  repo exists and read its actual `LICENSE` file before reusing anything,
+  only use images genuinely embedded in a live docs article, and ship
+  each with alt text, a plain-language description, a source link, and
+  attribution:
+  1. **SC-200** (Sentinel / Defender XDR / KQL hunting) — largest
+     all-zero gap on a heavily portal-based exam. Source repo(s) still
+     to be found and license-checked (`azure-security-docs` was already
+     ruled out for Defender for Cloud/Sentinel).
+  2. **SC-500** — Defender for Cloud, Key Vault, Entra, and Azure AI
+     security surfaces (`azure-security-docs` is confirmed CC BY 4.0 for
+     Key Vault/HSM, and `entra-docs` is already in use for SC-300).
+  3. **DP-900** — Cosmos DB, storage/Data Lake, Synapse, and Power BI
+     surfaces.
+  4. **AZ-140** — Azure Virtual Desktop host pools, app groups, and
+     scaling plans.
+  5. **AB-650** — Microsoft 365 admin center, Purview, and Copilot
+     settings.
+  6. **Fill the thin tracks:** DP-300 (5 more categories), AZ-802 (6
+     more), SC-300 (3 more).
+  7. **Screenshot-backed questions** (about 2 per image, the AZ-305
+     pattern) for every screenshot above — the hardest class of
+     question to write badly, since the answer has to be read off the
+     image.
+  Sequencing note: steps 1-7 all touch each track's `data/<track>.py`
+  (a `screenshot` key on categories, `image` on questions), the same
+  files the question-hardening pass rewrites, so the data edits wait
+  until that pass is merged to avoid clobbering it. Image sourcing and
+  registering new entries in `REAL_PORTAL_SCREENSHOTS` can start any time.
 
 ## 13. Interactive learning games (user's idea)
 
@@ -1134,15 +1176,12 @@ trading away for shinier but shallower ones.
   incorrect is more honest self-assessment, and now genuinely does plug
   into real SM-2 interval math rather than just relabeling two buttons
   as five.
-- [ ] **Retrieval-practice "blurting."** Before flipping a flashcard, ask
-  the user to mentally (or literally, in a text box) recall the answer
-  first — self-graded, no backend/grading needed, but the extra effortful
-  step before reveal is a well-evidenced retention booster over passive
-  flip-and-read.
-- [ ] **A "teach it back" mode.** Free-text: explain a concept in your own
-  words before seeing the official explanation (the protégé effect) —
-  self-graded like blurting above, no AI grading required. Pairs well
-  with the "on the job" real-world callouts already in section 2.
+- [~] **Decided against: retrieval-practice "blurting" and a "teach it
+  back" mode.** Both were self-graded active-recall steps layered onto
+  flashcards (recall before flip; free-text explanation before the
+  official one). Dropped by the user — the existing confidence-rated
+  flashcards, SRS ordering, and the Quiz modes already cover active recall
+  well enough that these weren't worth the extra UI.
 - [x] **An explicit interleaved/mixed-category quiz option**, distinct
   from today's per-category or per-track quiz — pulling randomly across
   categories (or tracks, via Today's Mix above) on purpose. Blocked
@@ -1186,16 +1225,33 @@ trading away for shinier but shallower ones.
   redesign if this ever does feel cramped on a real device (see
   LAUNCH_CHECKLIST.md's cross-device QA item).
 
+- [ ] **Queued after the screenshot work: a UI cleanup pass (user's
+  request).** Scope is deliberately not fixed yet — start with a short
+  audit (phone-width screenshots of every screen, light and dark) and
+  agree the list with the user before changing anything. Rough edges
+  already known going in:
+  - The Quiz sub-tab bar has grown to up to 8 tabs (Questions, Match,
+    Verbal, Commands, Mad Libs, Sequence, Case Study, Compare) and is
+    cramped at 390px — "Case Study" already wraps onto two lines. Likely
+    wants a dropdown/segmented-overflow treatment instead of one more
+    equal-width button per mode.
+  - Long track subtitles wrap to 2-3 lines in the header on 320-360px
+    phones (flagged earlier in this section, left as-is on purpose).
+  - The Final Mock/practice Exam results screen is a very long single
+    scroll once a few dozen questions are missed; the score report and
+    review list could be collapsible.
+  - Re-sweep for the "double border" button bug class (fixed twice
+    already — Glossary rows and the Learn/Quiz/Exam tab bars) on any
+    new screens added since.
+  - Consistency of spacing/typography between the newer modes (Compare,
+    Case Study, Final Mock) and the older ones.
+
 ## 15. Content ideas beyond quiz questions
 
-- [ ] **A personal mnemonic bank.** Let a user attach their own short
-  note/mnemonic to any term (stored locally like everything else), which
-  then resurfaces alongside that term's flashcard/flyout — a low-effort
-  personalization layer that plain flashcards can't offer.
-- [ ] **Milestone "boss battle" sessions.** Once a track crosses a mastery
-  threshold, unlock a themed, harder mixed-mode session as a checkpoint —
-  distinct from routine quizzes, gamifying the mastery threshold itself
-  rather than just badge-collecting.
+- [~] **Decided against: a personal mnemonic bank** (a user's own note
+  attached to any term) **and milestone "boss battle" sessions** (a harder
+  themed session unlocked at a mastery threshold). Both dropped by the
+  user; nothing open in this section.
 
 ## 16. Text-to-speech revamp & a hands-free "Verbal Quiz" mode (user's idea)
 
