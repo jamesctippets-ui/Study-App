@@ -550,6 +550,111 @@
       "front": "Role-based access control (RBAC) in EHR systems",
       "back": "RBAC grants system access based on a user's assigned role -- a nurse, a pharmacist, a billing clerk -- rather than configuring permissions individually per person, so a new hire in a given role automatically gets the access that role requires and nothing more, consistent with HIPAA's Minimum necessary standard.",
       "detail": "RBAC is what makes a break-the-glass emergency access override meaningful as an exception -- it only matters because normal role-based access was deliberately narrower in the first place."
+    },
+    {
+      "id": "f72",
+      "cat": "hl7v2Messaging",
+      "front": "MDM message type",
+      "back": "MDM (Medical Document Management) messages notify a receiving system about a clinical document event -- a transcribed note or report being created, updated, or finalized -- using a TXA segment to carry the document's type and completion status rather than a lab value or order.",
+      "detail": "A finalized discharge summary moving into the chart is a classic MDM trigger; the TXA segment's completion status, such as a draft versus a signed, authenticated note, tells the receiving system exactly how final that document actually is."
+    },
+    {
+      "id": "f73",
+      "cat": "hl7v2Messaging",
+      "front": "EVN segment (Event Type)",
+      "back": "EVN carries the trigger event code and the date and time the event actually occurred, appearing near the start of an ADT message type right after MSH -- distinct from PID's demographic data and the PV1 segment (Patient Visit)'s encounter details, which describe who and where rather than what happened and when.",
+      "detail": "EVN's event-occurred timestamp can differ from when the message was actually sent, which matters when a delayed or backdated ADT message needs to be processed as if it happened at the original event time."
+    },
+    {
+      "id": "f74",
+      "cat": "hl7v2Messaging",
+      "front": "Original vs. enhanced acknowledgment mode",
+      "back": "In original (immediate) acknowledgment mode, a receiving system returns a single ACK that only reflects whether the message was received and syntactically valid; in enhanced acknowledgment mode, the receiver can return a fast accept acknowledgment for transport receipt and a separate, later application acknowledgment once the message has actually been processed by the application.",
+      "detail": "Enhanced mode's extra accept-level response is what separates 'the message safely arrived on the wire' from the accept, error, or reject verdict described in ACK and NAK: how HL7 v2 confirms delivery, which is the application's own judgment on the message, not the transport's."
+    },
+    {
+      "id": "f75",
+      "cat": "fhirModernApis",
+      "front": "AuditEvent resource",
+      "back": "AuditEvent is the FHIR resource that records a loggable security- or access-relevant event -- who accessed or changed what resource, when, and from where -- giving FHIR APIs a structured way to represent the kind of access logging HIPAA expects systems handling PHI to maintain.",
+      "detail": "A SMART on FHIR app that reads a patient's chart can itself generate an AuditEvent entry, turning an abstract audit-logging requirement into a concrete, queryable FHIR resource instead of just an internal server log file."
+    },
+    {
+      "id": "f76",
+      "cat": "fhirModernApis",
+      "front": "Consent resource",
+      "back": "Consent is the FHIR resource that records a patient's (or their representative's) permission or refusal for specific categories of data use or disclosure -- who is authorized, what data or purpose it covers, and for how long -- giving systems a structured way to represent rules like the stricter opt-in requirements in Consent models: opt-in, opt-out, and 42 CFR Part 2.",
+      "detail": "A Consent resource scoped narrowly to substance-use treatment data is exactly the kind of structured record a system would need to actually enforce 42 CFR Part 2's more restrictive consent rules in software, rather than just in a policy document."
+    },
+    {
+      "id": "f77",
+      "cat": "fhirModernApis",
+      "front": "OperationOutcome resource",
+      "back": "OperationOutcome is the FHIR resource a server returns to report the outcome of an operation that didn't simply succeed with the expected resource -- carrying one or more issues, each with a severity such as error, warning, or information, plus details about what went wrong.",
+      "detail": "Where an HL7 v2 interface signals a problem through an AE or AR acknowledgment code, a FHIR server facing an equivalent situation returns an OperationOutcome instead -- the same structural-error-versus-application-error distinction, just represented a very different way."
+    },
+    {
+      "id": "f78",
+      "cat": "integrationEngines",
+      "front": "Rhapsody and Cloverleaf as commercial integration engines",
+      "back": "Rhapsody and Cloverleaf are widely deployed commercial interface engines that, like the open-source Mirth Connect channel pattern (source and destination connectors), organize work around receiving, transforming, and routing messages between clinical systems -- the product names differ by vendor, but the underlying source-transform-destination shape is the same across them.",
+      "detail": "A hospital migrating from one of these engines to another is mostly re-implementing the same routing and mapping logic in a different tool's configuration language, not rethinking the underlying integration architecture itself."
+    },
+    {
+      "id": "f79",
+      "cat": "integrationEngines",
+      "front": "Filters vs. transformers in an integration engine channel",
+      "back": "A filter decides whether a message continues through a channel at all -- accepting or rejecting it based on a condition -- while a transformer reshapes a message that's already been accepted, such as renaming a field or converting a coded value, before it reaches a destination connector in a Mirth Connect channel pattern (source and destination connectors).",
+      "detail": "Mixing the two up during troubleshooting sends you looking in the wrong place: a message that never arrived because it didn't meet a condition failed at a filter, not during transformation, even though both can look like 'the message just disappeared.'"
+    },
+    {
+      "id": "f80",
+      "cat": "integrationEngines",
+      "front": "High availability and clustering for integration engines",
+      "back": "Running an integration engine as a clustered, multi-node deployment lets a second node take over processing if one node fails, reducing the risk that the engine itself becomes a single point of failure for every interface depending on it in a hub-and-spoke integration topology.",
+      "detail": "Clustering addresses the engine's own availability, but it doesn't fix a downstream system being unreachable -- that failure mode still needs store-and-forward queuing and the other patterns designed around a destination being temporarily down."
+    },
+    {
+      "id": "f81",
+      "cat": "integrationEngines",
+      "front": "Reprocessing messages from a dead-letter queue",
+      "back": "Reprocessing is the deliberate act of resubmitting a message held in a dead-letter queue pattern back through the interface once the underlying problem -- a downstream outage, a bad mapping, a data issue -- has actually been fixed, rather than leaving the message sitting there indefinitely.",
+      "detail": "Reprocessing a batch of dead-lettered messages without first confirming the root cause is fixed just recreates the same pile of failures a second time, which is why a real fix, not just a retry, has to come first."
+    },
+    {
+      "id": "f82",
+      "cat": "integrationEngines",
+      "front": "Synchronous vs. asynchronous integration patterns",
+      "back": "A synchronous (request-response) integration blocks the calling system until the other side returns a result, such as a real-time eligibility check; an asynchronous (fire-and-forget) integration sends a message and moves on without waiting, trusting a separate acknowledgment or later message to confirm delivery.",
+      "detail": "Most everyday HL7 v2 traffic -- an ORU result, an ADT update -- is asynchronous in spirit even though an ACK comes back quickly, because the sender doesn't block its own processing waiting for that response the way a true synchronous call would."
+    },
+    {
+      "id": "f83",
+      "cat": "integrationEngines",
+      "front": "Throttling inbound message traffic",
+      "back": "Throttling deliberately limits the rate at which an integration engine accepts or forwards messages during a traffic surge -- such as a mass patient-registration event -- protecting a slower downstream system from being overwhelmed, at the cost of some additional delay for messages waiting their turn.",
+      "detail": "Throttling trades a small, controlled delay for avoiding a much worse outcome -- the kind of common interface failure mode: queue backups that keeps growing until the downstream system falls over entirely under load it was never sized to handle."
+    },
+    {
+      "id": "f84",
+      "cat": "dataGovernance",
+      "front": "Deterministic vs. probabilistic patient matching",
+      "back": "Deterministic matching links two records only when specific identifying fields match exactly (such as the same medical record number), while probabilistic matching assigns a weighted likelihood score across several demographic fields and links records whose combined similarity clears a defined threshold, even without a single perfect field match.",
+      "detail": "A Master Patient Index (MPI) that relies purely on deterministic matching misses real matches whenever a single identifying field is entered inconsistently, which is exactly the gap probabilistic matching is designed to close."
+    },
+    {
+      "id": "f85",
+      "cat": "dataGovernance",
+      "front": "Data steward role",
+      "back": "A data steward is the person or role formally accountable for the quality, definition, and appropriate use of a specific data domain -- deciding, for example, what counts as a valid address format or how a coded field should be mapped -- so that data quality dimensions in healthcare interfaces don't rely on whichever team last touched the data to just know the right answer.",
+      "detail": "A data steward isn't the same as whoever happens to run the interface engine day to day -- stewardship is about owning the definition and quality rules for the data itself, independent of which specific system or interface happens to be moving it at a given moment."
+    },
+    {
+      "id": "f86",
+      "cat": "dataGovernance",
+      "front": "Enterprise Master Patient Index (EMPI)",
+      "back": "An EMPI extends the basic Master Patient Index (MPI) pattern across an entire multi-facility health system or a network of affiliated organizations, resolving patient identity consistently not just within one system but everywhere that system's facilities and partners need to recognize the same patient.",
+      "detail": "A hospital merger is a classic moment an EMPI effort becomes urgent -- two organizations that each ran their own internal MPI now need their patient populations reconciled against each other, often surfacing both fragmented histories and overlay errors that neither side's original index ever had to catch on its own."
     }
   ],
   "questions": [
@@ -1879,6 +1984,225 @@
         3
       ],
       "explanation": "RBAC's role-based permission model and its alignment with minimum necessary are accurate, as is break-the-glass requiring documentation and audit review. Break-the-glass is a temporary, logged exception for a specific access event -- it does not permanently replace a user's ordinary role-based permissions."
+    },
+    {
+      "id": "q62",
+      "cat": "integrationEngines",
+      "type": "mc",
+      "question": "Rhapsody, Cloverleaf, and Mirth Connect are all examples of which type of healthcare IT system?",
+      "options": [
+        "A commercial or open-source integration engine that routes and transforms messages between clinical systems",
+        "A certified electronic health record platform used for primary clinical documentation",
+        "A regional health information exchange network governed by a common legal agreement",
+        "A master patient index service dedicated solely to patient identity matching"
+      ],
+      "correct": 0,
+      "explanation": "Rhapsody, Cloverleaf, and Mirth Connect are all integration engines -- some commercial, some open-source -- that share the same underlying job of routing and transforming messages between systems, regardless of vendor. None of them is itself an EHR, a regional exchange network, or a dedicated identity-matching service, even though an integration engine often sits alongside all three."
+    },
+    {
+      "id": "q63",
+      "cat": "integrationEngines",
+      "type": "mc",
+      "question": "An integration engine is deployed as a two-node cluster so that if one node fails, the other can take over processing. What risk does this specifically reduce?",
+      "options": [
+        "The risk that a downstream receiving system itself stays offline for an extended period",
+        "The risk that the engine itself becomes a single point of failure for every interface depending on it",
+        "The risk that a message's content gets mapped to the wrong coded value",
+        "The risk that a sending system retries a message it already delivered successfully"
+      ],
+      "correct": 1,
+      "explanation": "Clustering addresses the engine's own availability, reducing the risk that the hub itself becomes a single point of failure for every dependent interface. It does nothing about a downstream system's own outage, a mapping error in the content, or a sender retrying a message that already arrived -- those are separate problems handled by different patterns entirely."
+    },
+    {
+      "id": "tf22",
+      "cat": "integrationEngines",
+      "type": "tf",
+      "question": "In an integration engine channel, a message rejected by a filter never reaches the transformation step that would otherwise reshape it.",
+      "answer": true,
+      "explanation": "A filter runs before transformation and decides whether a message continues through the channel at all; once rejected, that message doesn't proceed on to a transformer, since the transformer's job is to reshape messages that have already been accepted."
+    },
+    {
+      "id": "msq18",
+      "cat": "integrationEngines",
+      "type": "ms",
+      "question": "Which two of the following describe a synchronous, request-response integration pattern, as opposed to an asynchronous one? (Select two.)",
+      "options": [
+        "The calling system waits for a result before continuing its own processing",
+        "The calling system sends a message and immediately moves on without waiting for a result",
+        "A real-time insurance eligibility check is a typical example of this pattern",
+        "A nightly batch file transfer is a typical example of this pattern"
+      ],
+      "correct": [
+        0,
+        2
+      ],
+      "explanation": "A synchronous pattern blocks the caller until a result comes back, and a real-time eligibility check is a typical example of exactly that. Sending a message and moving on without waiting describes the asynchronous, fire-and-forget pattern instead, and a nightly batch file transfer is a classic asynchronous, not synchronous, example."
+    },
+    {
+      "id": "q64",
+      "cat": "integrationEngines",
+      "type": "mc",
+      "question": "A mass patient-registration event causes a sudden surge in inbound ADT traffic. The integration engine is configured to deliberately slow the rate at which it forwards these messages to a slower downstream system. What is this technique called, and what does it trade for that protection?",
+      "options": [
+        "Throttling -- trading a small, controlled delay for avoiding an overwhelmed downstream system",
+        "Idempotency -- trading duplicate detection for a slightly larger message size",
+        "Content-based routing -- trading routing simplicity for a dependency on message content",
+        "Store-and-forward queuing -- trading permanent message loss for faster delivery"
+      ],
+      "correct": 0,
+      "explanation": "Throttling deliberately limits delivery speed to protect a slower downstream system, accepting some added delay in exchange. Idempotency and content-based routing describe genuinely different mechanisms unrelated to pacing traffic, and store-and-forward queuing actually works to prevent message loss rather than trade it away for speed."
+    },
+    {
+      "id": "tf23",
+      "cat": "integrationEngines",
+      "type": "tf",
+      "question": "Resubmitting a batch of dead-lettered messages is a complete fix on its own, without needing to first confirm the underlying problem that caused them to fail has actually been resolved.",
+      "answer": false,
+      "explanation": "Reprocessing messages from a dead-letter queue without fixing the root cause first just recreates the same pile of failures a second time -- the resubmission itself isn't the fix, confirming the underlying problem is actually resolved is."
+    },
+    {
+      "id": "q65",
+      "cat": "integrationEngines",
+      "type": "mc",
+      "question": "A hospital already uses its EHR vendor's own built-in HL7 interface component. Why might the hospital still choose to deploy a separate commercial integration engine like Rhapsody or Cloverleaf alongside it?",
+      "options": [
+        "To route and transform messages for the many non-EHR systems that component wasn't built to directly manage",
+        "Because federal regulation requires every hospital to run at least two separate interface engines",
+        "Because a separate engine automatically removes the need for a Master Patient Index",
+        "Because the EHR vendor's own interface component cannot send any outbound messages at all"
+      ],
+      "correct": 0,
+      "explanation": "A separate engine is typically brought in to handle the broader web of ancillary systems -- labs, monitors, pharmacy, imaging -- that the EHR's own component wasn't primarily built to manage directly. There's no regulation mandating two engines, a separate engine doesn't remove the need for patient identity matching, and an EHR's own interface component is fully capable of sending outbound messages."
+    },
+    {
+      "id": "q66",
+      "cat": "fhirModernApis",
+      "type": "mc",
+      "question": "A FHIR-enabled system wants a structured, queryable record of exactly who accessed a patient's chart, when, and from where. Which FHIR resource is designed to hold that record?",
+      "options": [
+        "AuditEvent",
+        "Provenance",
+        "Consent",
+        "OperationOutcome"
+      ],
+      "correct": 0,
+      "explanation": "AuditEvent is the FHIR resource specifically designed to record a loggable security- or access-relevant event, such as who accessed a chart and when. Provenance instead tracks the authorship and history behind how a resource was created or changed, Consent records a patient's permission for data use, and OperationOutcome reports the result of an operation -- none of which is built for general access logging."
+    },
+    {
+      "id": "tf24",
+      "cat": "fhirModernApis",
+      "type": "tf",
+      "question": "A FHIR Consent resource can represent which categories of data a patient has authorized for disclosure, and for how long that authorization lasts.",
+      "answer": true,
+      "explanation": "Consent is built to capture exactly that kind of structured authorization -- who is permitted, what data or purpose it covers, and for how long -- rather than leaving those rules to live only in a policy document outside the system."
+    },
+    {
+      "id": "msq19",
+      "cat": "fhirModernApis",
+      "type": "ms",
+      "question": "Which of the following are real FHIR resources? (Select all that apply)",
+      "options": [
+        "AuditEvent",
+        "Consent",
+        "MSA",
+        "OperationOutcome"
+      ],
+      "correct": [
+        0,
+        1,
+        3
+      ],
+      "explanation": "AuditEvent, Consent, and OperationOutcome are all real FHIR resources; MSA is an HL7 v2 segment that carries an acknowledgment code, not a FHIR resource at all."
+    },
+    {
+      "id": "q67",
+      "cat": "fhirModernApis",
+      "type": "mc",
+      "question": "A FHIR server receives a request it cannot fulfill as asked -- say, a search parameter it doesn't actually support -- and needs to tell the client specifically what went wrong. What does the server return?",
+      "options": [
+        "An OperationOutcome resource describing the issue and its severity",
+        "A Bundle of type searchset containing zero entries and no further detail",
+        "A CapabilityStatement listing everything the server does support instead",
+        "A silent HTTP response with an empty response body"
+      ],
+      "correct": 0,
+      "explanation": "OperationOutcome is the resource built to report issues like this, carrying a severity and details about what actually went wrong. An empty searchset Bundle would misleadingly suggest a valid search that simply found nothing, a CapabilityStatement describes the server in general rather than responding to this specific failed request, and a silent empty response would give the client no way to understand the problem at all."
+    },
+    {
+      "id": "q68",
+      "cat": "hl7v2Messaging",
+      "type": "mc",
+      "question": "A transcription system finalizes a signed discharge summary and needs to notify the EHR that the document is now complete. Which HL7 v2 message type handles this kind of document-status notification?",
+      "options": [
+        "MDM",
+        "ORU",
+        "SIU",
+        "DFT"
+      ],
+      "correct": 0,
+      "explanation": "MDM (Medical Document Management) messages notify a receiving system about a clinical document event, such as a note being finalized, using a TXA segment to carry the document's type and completion status. ORU carries lab and vital-sign results, SIU carries scheduling events, and DFT carries billing transactions -- none of which represent a document's own completion status."
+    },
+    {
+      "id": "tf25",
+      "cat": "hl7v2Messaging",
+      "type": "tf",
+      "question": "In an HL7 v2 ADT message, the EVN segment carries the date and time the actual event occurred, which is not necessarily the same moment the message itself was sent.",
+      "answer": true,
+      "explanation": "EVN's event-occurred timestamp can differ from the message's own transmission time, which matters whenever a delayed or backdated ADT message needs to be processed as though it happened at its original event time rather than whenever it finally arrived."
+    },
+    {
+      "id": "q69",
+      "cat": "hl7v2Messaging",
+      "type": "mc",
+      "question": "A receiving system's HL7 v2 interface is configured for enhanced acknowledgment mode rather than original (immediate) mode. What capability does this specifically add?",
+      "options": [
+        "Returning a fast transport-level accept, plus a separate application-level acknowledgment once processing finishes",
+        "Skipping any acknowledgment entirely whenever a message processes without error",
+        "Encrypting the acknowledgment using a stronger cipher than original mode allows",
+        "Sending the acknowledgment before the original message has been fully received"
+      ],
+      "correct": 0,
+      "explanation": "Enhanced acknowledgment mode adds a fast, transport-level accept acknowledgment that's separate from a later application-level acknowledgment confirming actual processing finished. It has nothing to do with encryption strength, and it doesn't let a receiver skip acknowledgment entirely or respond before fully receiving the original message."
+    },
+    {
+      "id": "q70",
+      "cat": "dataGovernance",
+      "type": "mc",
+      "question": "A Master Patient Index links two records only when their medical record number field matches exactly character-for-character, with no tolerance for a near match on any other field. What kind of matching approach is this?",
+      "options": [
+        "Deterministic matching",
+        "Probabilistic matching",
+        "Expert Determination",
+        "Content-based routing"
+      ],
+      "correct": 0,
+      "explanation": "Deterministic matching requires specific fields to match exactly before linking two records. Probabilistic matching instead uses a weighted similarity score across several fields, Expert Determination is a HIPAA de-identification method, and content-based routing is an integration-engine routing technique -- none of which describe this exact-match identity approach."
+    },
+    {
+      "id": "tf26",
+      "cat": "dataGovernance",
+      "type": "tf",
+      "question": "A data steward is specifically the person responsible for day-to-day operation of the integration engine, rather than for defining data quality rules and standards for a given data domain.",
+      "answer": false,
+      "explanation": "A data steward's role is defining and owning the quality rules and standards for a specific data domain, independent of whoever happens to operate the integration engine moving that data day to day -- those are two separate responsibilities, not the same one."
+    },
+    {
+      "id": "msq20",
+      "cat": "dataGovernance",
+      "type": "ms",
+      "question": "Which of the following accurately describe an Enterprise Master Patient Index (EMPI)? (Select all that apply)",
+      "options": [
+        "It extends patient identity matching across an entire multi-facility health system rather than just one system",
+        "It becomes especially relevant during a hospital merger, when two organizations' patient populations need to be reconciled",
+        "It guarantees that a fragmented history can never occur anywhere in the combined organization",
+        "It can surface both fragmented histories and overlay errors that a single facility's own index never had to catch"
+      ],
+      "correct": [
+        0,
+        1,
+        3
+      ],
+      "explanation": "An EMPI extends matching across a whole multi-facility organization, is especially relevant during mergers, and can surface fragmentation and overlay problems a single facility's own index never had to face. No matching system -- EMPI included -- can guarantee that a fragmented history will never occur; it reduces that risk rather than eliminating it outright."
     }
   ],
   "lessons": [

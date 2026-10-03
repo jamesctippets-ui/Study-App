@@ -564,6 +564,111 @@
       "front": "Quorum and fencing",
       "back": "Quorum requires a cluster to have a majority of voting members able to communicate before it will act as the primary, preventing a split group from both claiming to be in charge. Fencing goes further, actively isolating or powering off a node that's lost quorum, so it can't keep accepting writes even if it still believes it's the primary.",
       "detail": "Quorum and fencing are the standard defenses against a split-brain condition -- without them, a network partition can leave two nodes both acting as primary at once, each accepting writes the other doesn't know about."
+    },
+    {
+      "id": "f73",
+      "cat": "troubleshooting",
+      "front": "Burstable instance CPU credit exhaustion",
+      "back": "Burstable instance types earn CPU credits during periods of low usage and spend them during bursts of higher CPU demand. Once the credit balance is exhausted, the instance is throttled to a fixed baseline performance level until it earns more credits, even though its own workload and configuration haven't changed.",
+      "detail": "This produces a sluggish-VM symptom that looks a lot like the \"Noisy neighbor\" problem at first glance, but checking the instance's own CPU credit balance -- not another tenant's activity on the host -- is what actually tells the two apart."
+    },
+    {
+      "id": "f74",
+      "cat": "troubleshooting",
+      "front": "Thundering herd problem",
+      "back": "A surge of near-simultaneous requests -- often triggered when a cache expires, a service recovers from an outage, or many clients retry at the same moment -- overwhelms a backend that could easily handle that same total request volume if it were spread out over time.",
+      "detail": "A common trigger is every client using the exact same retry interval after a failure; staggering retries with jitter (a small random delay) is the standard fix, spreading the reconnection surge out instead of letting it all land in the same instant."
+    },
+    {
+      "id": "f75",
+      "cat": "troubleshooting",
+      "front": "Autoscaling flapping (scaling oscillation)",
+      "back": "A condition where an autoscaling group repeatedly scales out and then back in within a short period because the scaling thresholds sit too close to normal, everyday load -- ordinary variation keeps crossing the trigger in both directions.",
+      "detail": "The fix mirrors Baseline vs. threshold discipline applied to autoscaling instead of alerting: widen the margin between the scale-out and scale-in triggers, or add a cooldown period, so routine fluctuation stops re-triggering a scaling action every few minutes."
+    },
+    {
+      "id": "f76",
+      "cat": "troubleshooting",
+      "front": "Core network troubleshooting tools: ping, traceroute, and packet capture",
+      "back": "Ping tests basic reachability and round-trip latency to a host. Traceroute (tracert) maps the hop-by-hop path a packet takes, showing where along that path delay or loss is actually introduced. A packet capture (e.g., tcpdump, Wireshark) records the raw traffic itself for deep inspection, for when the first two tools aren't specific enough to explain the symptom.",
+      "detail": "These three escalate in effort on purpose: ping confirms there's a problem, traceroute narrows down roughly where it is, and a packet capture is for when you need to see exactly what was actually sent and received."
+    },
+    {
+      "id": "f77",
+      "cat": "troubleshooting",
+      "front": "API throttling vs. service quota limit",
+      "back": "Throttling is a temporary rate limit -- the same request would succeed if it were sent more slowly, and it typically returns an HTTP 429. A service quota limit is a hard ceiling on a resource count (such as VMs allowed per region) that a request fails against no matter how slowly it's sent, until the quota itself is raised.",
+      "detail": "Throttling calls for backing off and retrying; a quota limit calls for requesting a limit increase from the provider -- retrying the exact same request against a quota failure just reproduces the same failure again."
+    },
+    {
+      "id": "f78",
+      "cat": "troubleshooting",
+      "front": "Asymmetric routing",
+      "back": "A condition where traffic from host A to host B takes one network path, but the return traffic from B back to A takes a different path -- often breaking a stateful device, like a firewall or a NAT gateway, sitting on only one of the two paths and never seeing the matching half of the connection.",
+      "detail": "This builds on Stateful vs. stateless packet filtering: a stateful firewall only recognizes return traffic that matches a connection it saw leave, so when that return traffic arrives over a different path, the firewall has no record of it at all."
+    },
+    {
+      "id": "f79",
+      "cat": "troubleshooting",
+      "front": "Container crash loop",
+      "back": "A container that repeatedly fails shortly after starting, gets automatically restarted by the orchestrator, fails again, and repeats -- usually caused by a bad configuration, a missing dependency, or an application error that happens on every single startup rather than only sometimes.",
+      "detail": "Because the orchestrator in a Kubernetes: pod, node, and cluster environment keeps restarting it automatically, a crash loop can look like a series of short outages in a monitoring dashboard rather than one persistent failure -- checking the container's own startup logs, not just its up/down status, is what actually reveals the real cause."
+    },
+    {
+      "id": "f80",
+      "cat": "troubleshooting",
+      "front": "Centralized log correlation",
+      "back": "Aggregating logs from many separate systems -- application, web server, database, network -- into one searchable platform, so events across all of them can be lined up by timestamp to reconstruct what actually happened during an incident.",
+      "detail": "Without correlation, each system's logs only tell part of the story; this is the same aggregation step that a SIEM vs. SOAR platform builds on top of, turning scattered log entries into one coherent timeline an analyst (or an automated response) can act on."
+    },
+    {
+      "id": "f81",
+      "cat": "opsSupport",
+      "front": "Alert fatigue and alert tuning",
+      "back": "A condition where on-call staff receive so many low-value or noisy alerts that they start ignoring or delaying their response to all of them, including the real ones. Tuning -- adding a sustained-duration condition, adjusting thresholds, or suppressing a known-noisy check -- reduces volume without losing genuine signal.",
+      "detail": "This is the practical cost of skipping Baseline vs. threshold discipline -- a threshold set without a solid baseline tends to misfire constantly, and alert fatigue is what that misfiring costs a team over time."
+    },
+    {
+      "id": "f82",
+      "cat": "opsSupport",
+      "front": "Change freeze (code freeze)",
+      "back": "A defined period -- commonly around a major event like a holiday shopping peak or a scheduled audit -- during which no non-emergency changes are permitted, to minimize the risk of a self-inflicted outage at the worst possible time.",
+      "detail": "A change freeze doesn't replace the Change management process; it temporarily tightens it -- an emergency change made during a freeze still has to go through added scrutiny and get documented, rather than skipping the process altogether."
+    },
+    {
+      "id": "f83",
+      "cat": "opsSupport",
+      "front": "Blameless post-incident review",
+      "back": "A structured review held after an incident is resolved, focused on identifying contributing factors and process gaps rather than assigning individual blame, so people report what actually happened honestly instead of covering up a mistake out of fear.",
+      "detail": "This is where Root cause analysis vs. a workaround formally gets written down and assigned an owner -- without a scheduled review like this, a root cause investigation started under time pressure is easy to never actually finish."
+    },
+    {
+      "id": "f84",
+      "cat": "deployment",
+      "front": "Deployment rollback plan",
+      "back": "A predefined, tested procedure for reverting to the last known-good version if a new release fails verification, prepared before the release goes out rather than improvised after something has already broken.",
+      "detail": "A Blue-green vs. canary deployment already offers an easy rollback path by design -- switching traffic back, or pulling the canary slice -- but a rolling or in-place deployment needs this plan spelled out explicitly, since reverting isn't automatic the way it is with a full duplicate environment."
+    },
+    {
+      "id": "f85",
+      "cat": "deployment",
+      "front": "DR failover vs. failback",
+      "back": "Failover is switching production operation over to a disaster recovery site after the primary site fails. Failback is the separate, later step of returning operation to the primary site once it's restored and verified healthy -- and it carries its own risk of data loss or conflict if changes made at the DR site during failover aren't properly reconciled first.",
+      "detail": "Testing a Hot, warm, and cold DR sites plan often only rehearses the failover half; a DR test that skips failback can leave a team discovering failback's reconciliation problems for the first time during a real event."
+    },
+    {
+      "id": "f86",
+      "cat": "security",
+      "front": "SIEM vs. SOAR",
+      "back": "A SIEM (Security Information and Event Management) platform ingests and correlates logs and alerts from many systems into a single view for an analyst to investigate. A SOAR (Security Orchestration, Automation, and Response) platform goes further, triggering automated response actions -- like isolating a host or disabling an account -- based on what the SIEM detects, without waiting for a person to act first.",
+      "detail": "SIEM and SOAR pair up the same way IDS vs. IPS does -- one observes and correlates, the other acts -- and in practice a SIEM commonly feeds the alerts that a SOAR platform then automates a response to."
+    },
+    {
+      "id": "f87",
+      "cat": "security",
+      "front": "Credential and key rotation",
+      "back": "Periodically replacing passwords, API keys, and certificates with new ones on a defined schedule (or immediately after a suspected compromise), so a credential that leaked or was exposed has only a limited window in which it's actually still valid.",
+      "detail": "This limits the damage of a leaked secret the same way the Principle of least privilege limits the damage of an over-broad grant -- neither one assumes a breach won't happen, both just shrink what it can actually reach, or how long it stays useful, once one does."
     }
   ],
   "questions": [
@@ -1873,6 +1978,232 @@
         1
       ],
       "explanation": "Quorum's role is requiring a reachable majority before a group acts as primary, and fencing's role is forcibly isolating or powering off a node that's lost that quorum, so it can't keep writing as if it were still primary. Neither one prevents a network partition from happening in the first place -- they only control what happens once one does -- and fencing isolates a node rather than repairing it."
+    },
+    {
+      "id": "q84",
+      "cat": "troubleshooting",
+      "type": "mc",
+      "question": "A burstable-type VM instance was fast immediately after being resized, but a few hours into a sustained CPU-heavy job it drops to a much lower, steady level of performance, even though CPU utilization in monitoring still shows high demand. What does this pattern most strongly suggest?",
+      "options": [
+        "The instance's CPU credit balance has been exhausted, throttling it to baseline performance",
+        "Another tenant on the same physical host has started a heavy workload",
+        "The instance's software license has reached its usage limit",
+        "A DNS record for the instance is returning a stale cached answer"
+      ],
+      "correct": 0,
+      "explanation": "Burstable instances draw down a credit balance during high CPU demand and get throttled to a fixed baseline rate once that balance runs out, producing exactly this pattern -- fine briefly, then settling into a lower steady rate the longer the demand continues. A noisy-neighbor issue wouldn't depend on how long the job has been running on this specific instance, and neither licensing nor DNS produces a gradual, time-dependent performance drop tied to sustained demand."
+    },
+    {
+      "id": "q85",
+      "cat": "troubleshooting",
+      "type": "mc",
+      "question": "A cached result used by thousands of clients expires at the same moment, and all of them immediately re-request the same data from the origin server at once, briefly overwhelming it even though the origin could easily handle that same total request volume spread across a few seconds. What does this describe?",
+      "options": [
+        "A thundering herd, caused by many clients reacting to the same event at the same instant",
+        "A noisy neighbor problem caused by another tenant's workload",
+        "An orphaned resource left behind after a deleted deployment",
+        "A licensing capacity limit being reached"
+      ],
+      "correct": 0,
+      "explanation": "A thundering herd is exactly this -- a surge of near-simultaneous requests triggered by a shared event, like a cache expiring for everyone at once, overwhelming a backend that could otherwise handle the same total load spread out over time. It isn't caused by another tenant's resource usage, an abandoned resource, or any kind of licensing ceiling."
+    },
+    {
+      "id": "q86",
+      "cat": "troubleshooting",
+      "type": "mc",
+      "question": "After a second network path is added for redundancy, a particular connection establishes successfully but then intermittently stalls, with a firewall log showing packets arriving that don't match any connection it tracked as outbound. What does this most likely indicate?",
+      "options": [
+        "Asymmetric routing, where the return traffic is taking a different path than the firewall saw the request leave on",
+        "A DNS resolution failure for the destination host",
+        "The destination service has exhausted its available licenses",
+        "The connection is being rate-limited by the destination's API"
+      ],
+      "correct": 0,
+      "explanation": "A stateful firewall only recognizes return traffic that matches a connection it saw leave -- if the reply arrives over a different path than the request took, the firewall has no record of it and may drop or mishandle it, which is the signature of asymmetric routing introduced by a new redundant path. DNS, licensing, and rate limiting would each produce a very different failure pattern, not an established connection stalling on mismatched return traffic."
+    },
+    {
+      "id": "q87",
+      "cat": "troubleshooting",
+      "type": "mc",
+      "question": "A container is observed repeatedly starting, failing within a few seconds, and being automatically restarted by the orchestrator, over and over. Monitoring shows this as a series of short up-and-down cycles rather than one continuous outage. Where should an engineer look first to find the actual cause?",
+      "options": [
+        "The container's own startup logs from one of its failed attempts",
+        "The load balancer's health check configuration",
+        "The hypervisor's memory ballooning activity for the host",
+        "The DNS TTL configured for the service's record"
+      ],
+      "correct": 0,
+      "explanation": "A crash loop is driven by something failing inside the container every time it starts -- a bad config, a missing dependency, an application error -- so the container's own startup logs from a failed attempt are what actually reveal the cause. A load balancer health check, hypervisor memory ballooning, and DNS TTL are all unrelated to why a container fails on every one of its own startup attempts."
+    },
+    {
+      "id": "q88",
+      "cat": "troubleshooting",
+      "type": "mc",
+      "question": "An automation script calling a cloud provider's API begins failing every single call to create a new VM in a particular region, always with the same error citing a maximum resource count for that region, regardless of how much the script slows down between calls. What kind of limit is this?",
+      "options": [
+        "A service quota (hard resource limit), which requires requesting an increase rather than retrying more slowly",
+        "API throttling, which would resolve on its own if the script simply retried more slowly",
+        "A licensing capacity limit on the operating system being deployed",
+        "An expired certificate on the API endpoint being called"
+      ],
+      "correct": 0,
+      "explanation": "Failing every attempt regardless of request pace, against a fixed resource count, is a hard service quota -- the fix is requesting a quota increase, not slowing down. Throttling would instead be pace-dependent and resolve with a slower retry rate, and nothing here points to OS licensing or a certificate problem."
+    },
+    {
+      "id": "q89",
+      "cat": "opsSupport",
+      "type": "mc",
+      "question": "An on-call team receives dozens of pages a day for brief CPU spikes that self-resolve within seconds, and over time engineers start waiting several minutes before even looking at a new page. What is this outcome called, and what change would most directly address it without risking a real sustained problem going unnoticed?",
+      "options": [
+        "Alert fatigue -- adding a sustained-duration condition so the alert only fires once the threshold stays breached for a defined period",
+        "A split-brain condition -- adding quorum so only a majority of monitoring nodes can trigger a page",
+        "A thundering herd -- staggering when each monitoring check runs with random jitter",
+        "Alert fatigue -- removing the CPU alert entirely and relying only on manual checks"
+      ],
+      "correct": 0,
+      "explanation": "Delayed response from being paged too often for noise is alert fatigue, and the fix that preserves real detection is a sustained-duration condition, so brief self-resolving spikes stop triggering a page while a genuinely sustained problem still does. Split-brain and thundering herd describe unrelated failure patterns, and removing the alert entirely trades noise for a real blind spot instead of fixing the underlying sensitivity."
+    },
+    {
+      "id": "q90",
+      "cat": "deployment",
+      "type": "mc",
+      "question": "A team performs a rolling deployment of a new application version, and partway through the rollout, error rates spike on the updated instances. Which preparation, made before the rollout began, would let the team revert cleanly without improvising a fix under pressure?",
+      "options": [
+        "A tested rollback plan defining exactly how to redeploy the prior known-good version to the affected instances",
+        "A thin-provisioned storage volume sized for the new version's expected growth",
+        "A chargeback report attributing the deployment's compute cost to the owning team",
+        "A CMDB entry documenting which team owns the application"
+      ],
+      "correct": 0,
+      "explanation": "A rollback plan prepared and tested ahead of the release is exactly what lets a team revert cleanly once a problem is discovered mid-rollout, rather than improvising under pressure. Storage provisioning, a cost report, and ownership documentation in a CMDB don't help revert a bad release at all."
+    },
+    {
+      "id": "q91",
+      "cat": "security",
+      "type": "mc",
+      "question": "A security team wants a platform that doesn't just correlate alerts from different systems, but can also automatically disable a compromised account the moment a high-confidence alert fires, without waiting for an analyst to act first. Which capability does this require beyond what a SIEM alone provides?",
+      "options": [
+        "SOAR (Security Orchestration, Automation, and Response), which can trigger an automated response action based on what the SIEM detects",
+        "A second SIEM platform running in parallel for redundancy",
+        "A hardware security module to generate the account's credentials",
+        "A web application firewall positioned in front of the account's login page"
+      ],
+      "correct": 0,
+      "explanation": "A SIEM correlates logs and alerts for an analyst to review, but automatically acting on a detection -- like disabling an account without a person stepping in first -- is specifically what a SOAR platform adds on top of that. A second SIEM, an HSM, and a WAF each solve a different problem, and none of them trigger an automated response action."
+    },
+    {
+      "id": "q92",
+      "cat": "troubleshooting",
+      "type": "mc",
+      "question": "Two VMs on different physical hosts both report sluggish performance under sustained load. One VM's performance recovers immediately once its workload stops; the other's recovers only gradually, climbing back to normal over the next several hours of light use. What does the difference in recovery pattern most likely point to?",
+      "options": [
+        "The first VM is affected by contention from another tenant, which clears as soon as that contention ends, while the second is a burstable instance slowly rebuilding its CPU credit balance",
+        "Both VMs are affected by the exact same root cause, just observed at two different points in its lifecycle",
+        "The first VM has a DNS caching issue, while the second has a licensing limit",
+        "The second VM's slow recovery means its storage is thin-provisioned and gradually reclaiming space"
+      ],
+      "correct": 0,
+      "explanation": "Contention from a noisy neighbor clears as soon as the other tenant's load does, giving an immediate recovery, while a burstable instance's CPU credit balance rebuilds gradually during periods of light use, giving a slow, climbing recovery -- the different recovery shapes point to two different mechanisms, not the same cause observed twice. DNS caching, licensing, and thin provisioning don't produce either of these specific recovery patterns."
+    },
+    {
+      "id": "tf23",
+      "cat": "troubleshooting",
+      "type": "tf",
+      "question": "Traceroute identifies the specific hop along a network path where delay or packet loss is being introduced, while ping only confirms whether a destination is reachable and measures round-trip time.",
+      "answer": true,
+      "explanation": "That's the correct division of labor -- ping is a quick reachability/latency check to one destination, while traceroute maps the hop-by-hop path to show where along that path a problem is actually occurring, which ping alone can't reveal."
+    },
+    {
+      "id": "tf24",
+      "cat": "troubleshooting",
+      "type": "tf",
+      "question": "Autoscaling flapping is fixed the same way a loose alert threshold is -- by widening the margin around normal baseline load or adding a cooldown period, rather than by increasing the maximum instance count.",
+      "answer": true,
+      "explanation": "Flapping happens when scale-out and scale-in thresholds sit too close to ordinary load variation, so the fix is the same kind of adjustment as tuning an overly sensitive alert: widen the margin or add a cooldown period. Simply raising the maximum instance count does nothing to stop the oscillation itself."
+    },
+    {
+      "id": "tf25",
+      "cat": "opsSupport",
+      "type": "tf",
+      "question": "A change freeze permanently replaces an organization's formal change management process rather than temporarily tightening it for a defined period.",
+      "answer": false,
+      "explanation": "A change freeze is a temporary, time-boxed restriction -- commonly around a high-risk period like a seasonal peak -- during which only emergency changes are allowed, and even those still require added scrutiny and documentation. It doesn't replace the ongoing change management process; it tightens it for that window."
+    },
+    {
+      "id": "tf26",
+      "cat": "deployment",
+      "type": "tf",
+      "question": "Failback carries its own distinct risk of data loss or conflict, separate from the risks already handled during the original failover to the DR site.",
+      "answer": true,
+      "explanation": "Failback is the later, separate step of returning operation to the primary site once it's restored, and it has its own risk: changes made at the DR site during the failover period have to be reconciled back to the primary, or data can be lost or conflict. A DR test that only rehearses failover can miss this risk entirely."
+    },
+    {
+      "id": "msq19",
+      "cat": "troubleshooting",
+      "type": "ms",
+      "question": "Which two of the following correctly describe how ping, traceroute, and packet capture are typically used together in network troubleshooting? (Choose two.)",
+      "options": [
+        "Ping is usually the fastest first check, confirming basic reachability before deeper tools are needed",
+        "Traceroute shows the hop-by-hop path a packet takes, helping narrow down where along that path a problem occurs",
+        "A packet capture should always be run before a simple ping check, since it provides more detail",
+        "Traceroute and a packet capture return exactly the same information, just in a different format"
+      ],
+      "correct": [
+        0,
+        1
+      ],
+      "explanation": "Ping is the quick, low-effort first check for basic reachability and latency, and traceroute narrows down where along a multi-hop path a problem is actually occurring -- both lighter-weight than reaching for a full packet capture. Capturing packets before a simple ping skips the cheapest and fastest check for no benefit, and a packet capture (full traffic content) and traceroute (hop path) return genuinely different information, not the same thing in a different format."
+    },
+    {
+      "id": "msq20",
+      "cat": "troubleshooting",
+      "type": "ms",
+      "question": "Which two of the following are genuine benefits of centralizing and correlating logs from many separate systems during an incident? (Choose two.)",
+      "options": [
+        "Events from different systems can be lined up by timestamp to reconstruct what actually happened",
+        "It automatically identifies and fixes the root cause without further investigation",
+        "A pattern across multiple systems can be spotted that no single system's own logs would reveal alone",
+        "It removes the need to ever review logs from an individual system in detail"
+      ],
+      "correct": [
+        0,
+        2
+      ],
+      "explanation": "Correlating logs across systems lets an investigator line events up by time and spot cross-system patterns that would be invisible looking at any one system's logs alone. It doesn't fix anything automatically by itself -- a person, or tooling built on top of it like a SOAR platform, still has to act -- and it doesn't remove the value of digging into an individual system's own detailed logs when needed."
+    },
+    {
+      "id": "msq21",
+      "cat": "opsSupport",
+      "type": "ms",
+      "question": "Which two of the following describe the purpose of a blameless post-incident review? (Choose two.)",
+      "options": [
+        "It focuses on identifying contributing factors and process gaps rather than blaming an individual",
+        "It encourages people to report what actually happened honestly, without fear of personal blame",
+        "It is held only when an individual's mistake needs to be formally documented for discipline",
+        "It replaces the need for any root cause analysis, since the incident is already resolved"
+      ],
+      "correct": [
+        0,
+        1
+      ],
+      "explanation": "A blameless review's whole point is examining contributing factors and process gaps while removing the fear of personal blame, which makes people far more likely to report what actually happened. Using it to document an individual for discipline defeats that purpose entirely, and it's where root cause analysis actually gets formally completed and assigned an owner, not a substitute for it."
+    },
+    {
+      "id": "msq22",
+      "cat": "security",
+      "type": "ms",
+      "question": "Which two of the following are genuine benefits of rotating credentials and API keys on a regular schedule? (Choose two.)",
+      "options": [
+        "A credential that leaked without anyone noticing has a limited window in which it's still valid",
+        "It removes the need for multifactor authentication on any rotated account",
+        "It limits how long a compromised key continues to grant access once it is replaced",
+        "It guarantees a leaked credential can never be used, even before the next rotation occurs"
+      ],
+      "correct": [
+        0,
+        2
+      ],
+      "explanation": "Regular rotation limits the usable lifetime of a credential that leaked unnoticed, and replacing a compromised key cuts off the access it was granting once the rotation happens. It doesn't remove the value of MFA, which protects a credential that's still valid, and it doesn't prevent use of a leaked credential before the next scheduled rotation actually occurs -- rotation reduces the exposure window, it doesn't eliminate it instantly."
     }
   ],
   "lessons": [

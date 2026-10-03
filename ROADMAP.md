@@ -518,6 +518,17 @@ come up.
     185 bar outright. New lowest tier for a round 5: EHR Integration
     (170), Cloud+ (171), AB-650/SC-500 (174 each), MD-102 (175) — the
     round-2/round-3 leftovers, each due for a second pass.
+  - **Round 5**: a second pass each for EHR Integration, Cloud+,
+    AB-650, SC-500, and MD-102. Flashcards 1114 → 1189, questions 1603
+    → 1688. Results: EHR Integration 202, Cloud+ 203, AB-650 206,
+    SC-500 206, MD-102 207 combined — every one of these previously-slim
+    tracks now exceeds AZ-900's own 185. With this round done, all 15
+    tracks sit in a tight 176-207 combined band (AZ-104 183, AZ-140 176,
+    DP-900 178, DP-300 179 are the only four still under the 185 bar,
+    each already on its second or third pass) — the depth gap that
+    motivated this effort is now closed in practice, though AZ-140/
+    DP-900/DP-300/AZ-104 remain the natural next targets if further
+    rounds continue.
 - [x] **Progress export/import.** The app has no accounts, so a cleared browser
   or a new device previously meant losing everything. The ⚙ Data & progress
   panel now downloads all progress (results, seenLog, stats) as a JSON file
