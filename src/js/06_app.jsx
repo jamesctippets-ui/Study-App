@@ -1301,6 +1301,10 @@ function CertStudyApp() {
       const cur = statsRef.current;
       saveStats({ ...cur, path: markPathStepDone(cur.path, activeTrack, stepId, pct, todayString()) });
     },
+    completeSteps: (stepIds, pct, via) => {
+      const cur = statsRef.current;
+      saveStats({ ...cur, path: markPathStepsDone(cur.path, activeTrack, stepIds, pct, todayString(), via) });
+    },
   };
 
   const doReset = () => {

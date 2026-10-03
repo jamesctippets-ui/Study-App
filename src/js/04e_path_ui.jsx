@@ -185,6 +185,7 @@ function PathQuizStep({ questions, passPct, label, categories, flashcardsData, o
   if (finished) {
     const pct = answers.length ? Math.round((correctCount / answers.length) * 100) : 0;
     const passed = pct >= passPct;
+    const reviewOnly = passPct === 0;
     return (
       <div>
         <div style={{
@@ -192,17 +193,19 @@ function PathQuizStep({ questions, passPct, label, categories, flashcardsData, o
           border: `1px solid ${passed ? COLOR.success : COLOR.gold}`, background: passed ? 'rgba(52,211,153,0.10)' : `${COLOR.gold}14`,
         }}>
           <div style={{ fontSize: '15px', fontWeight: 700, color: passed ? COLOR.success : COLOR.gold }}>
-            {passed ? `${label} passed` : `Not quite yet — ${passPct}% to pass`}
+            {passed ? (reviewOnly ? `${label} done` : `${label} passed`) : `Not quite yet — ${passPct}% to pass`}
           </div>
           <div style={{ fontSize: '12px', color: COLOR.muted, marginTop: '3px' }}>
-            {passed ? 'The questions you missed are below if you want to review them.' : 'Read the explanations below, then try again with a fresh set.'}
+            {passed
+              ? (reviewOnly ? 'Anything you missed again is below.' : 'The questions you missed are below if you want to review them.')
+              : 'Read the explanations below, then try again with a fresh set.'}
           </div>
           {passed && (
             <button
               onClick={() => onPass(pct)}
               style={{ width: '100%', marginTop: '12px', padding: '12px', borderRadius: '12px', background: COLOR.success, color: COLOR.onAccent, fontSize: '14px', fontWeight: 700 }}
             >
-              Continue ›
+              {reviewOnly ? 'Back to the path ›' : 'Continue ›'}
             </button>
           )}
         </div>
@@ -347,18 +350,18 @@ function PathApplyStep({ unit, categories, onDone }) {
   );
 }
 
-function PathStepComplete({ unit, step, pct, unitComplete, next, onNext, onBack }) {
+function PathStepComplete({ unit, step, pct, unitComplete, testedOut, next, onNext, onBack }) {
   return (
     <div style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderRadius: '18px', padding: '26px 22px', textAlign: 'center' }}>
       <div style={{ width: '56px', height: '56px', borderRadius: '50%', background: COLOR.success, color: COLOR.onAccent, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', marginBottom: '12px' }}>
         <PathIcon kind="check" size={28} />
       </div>
       <div className="itil-display" style={{ fontSize: '19px', fontWeight: 600 }}>
-        {unitComplete ? 'Unit complete' : 'Step complete'}
+        {testedOut ? 'Tested out' : unitComplete ? 'Unit complete' : 'Step complete'}
       </div>
       <div style={{ fontSize: '12.5px', color: COLOR.muted, marginTop: '4px', lineHeight: 1.5 }}>
-        {unitComplete ? `You've finished every step of ${unit.title}.` : step.label}
-        {pct !== null && pct !== undefined && !unitComplete ? ` · ${pct}%` : ''}
+        {testedOut ? `You tested out of ${unit.title} at ${pct}%.` : unitComplete ? `You've finished every step of ${unit.title}.` : step.label}
+        {pct !== null && pct !== undefined && !unitComplete && !testedOut ? ` · ${pct}%` : ''}
       </div>
       {next ? (
         <button
@@ -409,6 +412,10 @@ function PathView({ track, trackKey, doneMap, results, seenLog, categories, spee
   const questionById = new Map(mod.questions.map((q) => [q.id, q]));
   const overall = pathOverallProgress(units, doneMap);
   const next = pathNextStep(units, doneMap);
+  const reviewIds = pathReviewQuestionIds(units, doneMap, results, seenLog);
+  const startReview = () => startStep(null, {
+    id: 'review', kind: 'review', label: 'Review weak spots', poolIds: reviewIds, count: PATH_REVIEW_QUESTIONS,
+  });
 
   const preparedQuestions = (pool, count) => {
     const picked = pickRotated(pool, Math.min(count, pool.length), seenLog);
@@ -424,6 +431,10 @@ function PathView({ track, trackKey, doneMap, results, seenLog, categories, spee
         return { cards: step.cardIds.map((id) => flashById.get(id)).filter(Boolean) };
       case 'quiz':
       case 'quiz2':
+        return { questions: preparedQuestions(step.poolIds.map((id) => questionById.get(id)).filter(Boolean), step.count) };
+      case 'testout':
+        return { questions: preparedQuestions(step.poolIds.map((id) => questionById.get(id)).filter(Boolean), step.count) };
+      case 'review':
         return { questions: preparedQuestions(step.poolIds.map((id) => questionById.get(id)).filter(Boolean), step.count) };
       case 'checkpoint': {
         const earlier = units.slice(0, unit.index).flatMap((u) => u.poolIds);
@@ -454,12 +465,22 @@ function PathView({ track, trackKey, doneMap, results, seenLog, categories, spee
 
   const finishStep = (pct) => {
     const { unit, step } = session;
-    api.completeStep(step.id, pct);
-    setCompletion({ unit, step, pct });
+    if (step.kind === 'review') {
+      // Review is practice, not progress: it never completes a step.
+      setSession(null);
+      window.scrollTo({ top: 0, behavior: 'instant' });
+      return;
+    }
+    const testedOut = step.kind === 'testout';
+    const stepIds = testedOut ? unit.steps.map((s) => s.id) : [step.id];
+    if (testedOut) api.completeSteps(stepIds, pct, 'testout');
+    else api.completeStep(step.id, pct);
+    setCompletion({ unit, step, pct, testedOut });
     setSession(null);
     // Finishing a unit folds it away and opens the next one, so the map the
     // learner returns to is already pointing at what to do next.
-    const doneNow = { ...doneMap, [step.id]: true };
+    const doneNow = { ...doneMap };
+    stepIds.forEach((id) => { doneNow[id] = true; });
     const unitComplete = pathUnitProgress(unit, doneNow).complete;
     const nextNow = pathNextStep(units, doneNow);
     setExpanded((e) => {
@@ -482,12 +503,12 @@ function PathView({ track, trackKey, doneMap, results, seenLog, categories, spee
       runner = <PathReadStep key={runnerKey} unit={unit} flashcardsData={mod.flashcards} speech={speech} onDone={finishStep} />;
     } else if (step.kind === 'cards' || step.kind === 'cards2') {
       runner = <PathCardsStep key={runnerKey} cards={payload.cards} speech={speech} onRate={api.rateCard} onDone={finishStep} {...common} />;
-    } else if (step.kind === 'quiz' || step.kind === 'quiz2' || step.kind === 'checkpoint') {
+    } else if (step.kind === 'quiz' || step.kind === 'quiz2' || step.kind === 'checkpoint' || step.kind === 'testout' || step.kind === 'review') {
       runner = (
         <PathQuizStep
           key={runnerKey}
           questions={payload.questions}
-          passPct={PATH_PASS_PCT}
+          passPct={step.kind === 'testout' ? PATH_TESTOUT_PCT : step.kind === 'review' ? 0 : PATH_PASS_PCT}
           label={step.label}
           onAnswer={(id, ok) => api.recordResult(id, ok ? 'correct' : 'incorrect')}
           onFinished={api.finishQuiz}
@@ -525,7 +546,7 @@ function PathView({ track, trackKey, doneMap, results, seenLog, categories, spee
         </button>
         <div style={{ marginBottom: '14px' }}>
           <div style={{ fontSize: '10.5px', color: COLOR.muted, textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 600 }}>
-            Unit {unit.index + 1} · {unit.title}
+            {step.kind === 'review' ? 'Spaced review' : `Unit ${unit.index + 1} · ${unit.title}`}
           </div>
           <div className="itil-display" style={{ fontSize: '18px', fontWeight: 600, marginTop: '2px' }}>{step.label}</div>
         </div>
@@ -537,6 +558,7 @@ function PathView({ track, trackKey, doneMap, results, seenLog, categories, spee
   /* ---- a step just finished ---- */
   if (completion) {
     const doneNow = { ...doneMap, [completion.step.id]: true };
+    if (completion.testedOut) completion.unit.steps.forEach((st) => { doneNow[st.id] = true; });
     const unitComplete = pathUnitProgress(completion.unit, doneNow).complete;
     const nextNow = pathNextStep(units, doneNow);
     return (
@@ -545,6 +567,7 @@ function PathView({ track, trackKey, doneMap, results, seenLog, categories, spee
         step={completion.step}
         pct={completion.pct}
         unitComplete={unitComplete}
+        testedOut={!!completion.testedOut}
         next={nextNow}
         onNext={() => startStep(nextNow.unit, nextNow.step)}
         onBack={backToMap}
@@ -585,6 +608,25 @@ function PathView({ track, trackKey, doneMap, results, seenLog, categories, spee
           </div>
         )}
       </div>
+
+      {reviewIds.length > 0 && (
+        <button
+          onClick={startReview}
+          style={{
+            width: '100%', marginBottom: '14px', padding: '11px 14px', borderRadius: '12px', textAlign: 'left',
+            border: `1px solid ${COLOR.red}`, background: 'rgba(181,87,74,0.1)', color: COLOR.red, fontSize: '13px', fontWeight: 600,
+            display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px',
+          }}
+        >
+          <span>
+            Review weak spots
+            <span style={{ display: 'block', fontSize: '11.5px', fontWeight: 400, opacity: 0.85 }}>
+              {reviewIds.length} question{reviewIds.length === 1 ? '' : 's'} you missed in units you've started
+            </span>
+          </span>
+          <span style={{ fontSize: '16px' }}>›</span>
+        </button>
+      )}
 
       {units.map((unit) => {
         const prog = pathUnitProgress(unit, doneMap);
@@ -641,6 +683,15 @@ function PathView({ track, trackKey, doneMap, results, seenLog, categories, spee
                     </button>
                   );
                 })}
+                {!prog.complete && (
+                  <button
+                    onClick={() => startStep(unit, pathTestOutStep(unit))}
+                    className="btn-flat"
+                    style={{ marginTop: '6px', padding: '8px 0', background: 'transparent', color: COLOR.primary, fontSize: '12px', fontWeight: 600, textAlign: 'left' }}
+                  >
+                    Already know this? Test out of the unit ›
+                  </button>
+                )}
               </div>
             )}
           </div>

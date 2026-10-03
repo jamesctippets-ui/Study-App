@@ -574,6 +574,11 @@ const PATH_QUICK_QUIZ = 5;
 const PATH_PRACTICE_QUIZ = 8;
 const PATH_CHECKPOINT_QUIZ = 8;
 const PATH_CHECKPOINT_REVIEW = 3;
+// Test-out: a harder, longer check that, if passed, marks a whole unit done so
+// someone who already knows the material isn't made to re-read it.
+const PATH_TESTOUT_PCT = 80;
+const PATH_TESTOUT_QUESTIONS = 10;
+const PATH_REVIEW_QUESTIONS = 8;
 
 // The order rotates by unit so consecutive units don't feel identical.
 // Steps with no material for a given unit (e.g. no extra flashcards, no
@@ -594,7 +599,7 @@ function normalizePathStats(raw) {
     Object.keys(done).forEach((stepId) => {
       const d = done[stepId];
       if (d && typeof d === 'object') {
-        clean[stepId] = { at: typeof d.at === 'string' ? d.at : null, pct: Number.isFinite(d.pct) ? d.pct : null };
+        clean[stepId] = { at: typeof d.at === 'string' ? d.at : null, pct: Number.isFinite(d.pct) ? d.pct : null, via: d.via === 'testout' ? 'testout' : null };
       }
     });
     out[trackKey] = { done: clean };
@@ -602,10 +607,22 @@ function normalizePathStats(raw) {
   return out;
 }
 
+// Marks one or more steps done. Steps already done keep their original
+// record, so a later test-out never overwrites an honest earlier score.
+function markPathStepsDone(pathStats, trackKey, stepIds, pct, today, via) {
+  const base = pathStats || {};
+  const track = base[trackKey] || { done: {} };
+  const done = { ...track.done };
+  stepIds.forEach((id) => {
+    if (!done[id]) done[id] = { at: today, pct: Number.isFinite(pct) ? pct : null, via: via || null };
+  });
+  return { ...base, [trackKey]: { done } };
+}
+
 function markPathStepDone(pathStats, trackKey, stepId, pct, today) {
   const base = pathStats || {};
   const track = base[trackKey] || { done: {} };
-  return { ...base, [trackKey]: { done: { ...track.done, [stepId]: { at: today, pct: Number.isFinite(pct) ? pct : null } } } };
+  return { ...base, [trackKey]: { done: { ...track.done, [stepId]: { at: today, pct: Number.isFinite(pct) ? pct : null, via: null } } } };
 }
 
 // Hands each item (anything with a `cat`) to one of the units that cover
@@ -730,6 +747,25 @@ function pathOverallProgress(units, doneMap) {
     if (p.complete) unitsComplete += 1;
   });
   return { total, done, unitsComplete, unitCount: units.length, pct: total ? Math.round((done / total) * 100) : 0 };
+}
+
+// Questions worth revisiting: anything in a unit you've started that you last
+// got wrong — whether that was on the path or in Practice, since both write to
+// the same results. Oldest-seen first, so the longest-neglected come back
+// before ones you just saw.
+function pathReviewQuestionIds(units, doneMap, results, seenLog) {
+  const started = units.filter((u) => u.steps.some((s) => pathStepIsDone(doneMap, s.id)));
+  const ids = [...new Set(started.flatMap((u) => u.poolIds))].filter((id) => results[id] === 'incorrect');
+  return ids.sort((a, b) => ((seenLog && seenLog[a]) || 0) - ((seenLog && seenLog[b]) || 0));
+}
+
+// The synthetic step a unit's "test out" runs as. Not part of unit.steps — it
+// is never listed on the trail, only offered as a shortcut past it.
+function pathTestOutStep(unit) {
+  return {
+    id: `${unit.id}::testout`, kind: 'testout', label: `Test out: ${unit.title}`, meta: `${PATH_TESTOUT_QUESTIONS} questions · ${PATH_TESTOUT_PCT}% to pass`,
+    poolIds: unit.poolIds, count: PATH_TESTOUT_QUESTIONS,
+  };
 }
 
 const ACHIEVEMENTS = [
