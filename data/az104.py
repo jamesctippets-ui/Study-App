@@ -114,8 +114,8 @@ FLASHCARDS = [
         'id': 'f14',
         'cat': 'storage',
         'front': 'Blob versioning vs. soft delete vs. snapshots',
-        'back': 'Versioning automatically keeps prior versions when a blob is overwritten. Soft delete lets you recover a deleted blob within a retention window. A snapshot is a manual, read-only copy taken at a specific point in time.',
-        'detail': "Recovering an accidentally overwritten blob's prior content specifically calls for versioning, not soft delete.",
+        'back': "Versioning automatically keeps prior versions when a blob is overwritten. Soft delete lets you recover deleted blobs within a retention window and, when versioning is off, also keeps overwritten data as soft-deleted snapshots. A snapshot is a manual, read-only copy taken at a specific point in time.",
+        'detail': "Versioning is the fuller answer for getting back an overwritten blob's earlier content, since it keeps every prior version; soft delete alone only retains overwritten data as snapshots for its retention window.",
     },
     {
         'id': 'f15',
@@ -192,14 +192,14 @@ FLASHCARDS = [
         'cat': 'compute',
         'front': 'Container Instances vs. Container Apps vs. AKS',
         'back': 'Container Instances run a single container quickly with no orchestration. Container Apps add serverless scaling and microservices features without managing a cluster. AKS gives full Kubernetes control.',
-        'detail': 'As of the 2026 exam update, Container Apps sits alongside Container Instances as tested content, not just AKS.',
+        'detail': "Container Apps is called out in the skills outline alongside Container Instances, so it is tested content, not just AKS.",
     },
     {
         'id': 'f26',
         'cat': 'compute',
         'front': 'ARM templates vs. Bicep',
         'back': "ARM templates are Azure's native JSON Infrastructure as Code format. Bicep is a newer, more concise language that compiles down to ARM JSON — functionally equivalent, but easier to read and write.",
-        'detail': 'The 2026 exam update put more emphasis on Bicep over raw ARM JSON, reflecting real-world administrator practice.',
+        'detail': "The current skills outline expects you to be comfortable reading and modifying Bicep files, reflecting real-world administrator practice.",
     },
     {
         'id': 'f27',
@@ -338,7 +338,7 @@ FLASHCARDS = [
         'id': 'f46',
         'cat': 'storage',
         'front': 'Immutable blob storage (WORM policies)',
-        'back': 'Time-based retention and legal hold policies make blobs write-once-read-many: they cannot be modified or deleted by anyone, including the storage account Owner, until the retention period expires or the legal hold is removed.',
+        'back': "Time-based retention (once the policy is locked) and legal hold policies make blobs write-once-read-many: they cannot be modified or deleted by anyone, including the storage account Owner, until the retention period expires or the legal hold is removed.",
         'detail': 'This is the compliance answer whenever a scenario needs to prove data was never altered, not just backed up.',
     },
     {
@@ -381,7 +381,7 @@ FLASHCARDS = [
         'cat': 'identityGov',
         'front': 'Management group hierarchy',
         'back': 'Management groups sit above subscriptions in the scope hierarchy, letting you apply Azure Policy and RBAC assignments to many subscriptions at once instead of repeating them per subscription.',
-        'detail': 'Combined with RBAC scope and inheritance, an assignment at a management group flows down to every subscription and resource group underneath it.',
+        'detail': "Because RBAC assignments inherit downward through the scope hierarchy, an assignment made at a management group flows down to every subscription and resource group underneath it.",
     },
     {
         'id': 'f53',
@@ -395,7 +395,7 @@ FLASHCARDS = [
         'cat': 'networking',
         'front': 'Private Endpoint',
         'back': 'Gives a PaaS resource (like a storage account or SQL database) a private IP address inside your VNet, so traffic to it never traverses the public internet.',
-        'detail': 'Resolving that private IP correctly for the resource’s normal hostname is exactly what Azure DNS and private DNS zones are for.',
+        'detail': "Making the resource's normal hostname resolve to that private IP is exactly the job of a private DNS zone linked to the VNet.",
     },
     {
         'id': 'f55',
@@ -409,7 +409,7 @@ FLASHCARDS = [
         'cat': 'compute',
         'front': 'Custom RBAC roles',
         'back': 'A JSON-defined role built from a specific set of allowed and denied actions, for when the built-in roles are either too broad or too narrow for what a team actually needs to do.',
-        'detail': 'This builds on RBAC scope and inheritance — a custom role still gets assigned at a scope exactly the same way a built-in role does.',
+        'detail': "A custom role is assigned at a scope, and inherits downward from it, exactly the same way a built-in role does.",
     },
     {
         'id': 'f57',
@@ -423,41 +423,41 @@ FLASHCARDS = [
         'cat': 'identityGov',
         'front': 'Conditional Access',
         'back': "A policy engine that evaluates signals at sign-in time — user, device, location, and risk — and applies a control in response, such as requiring MFA or blocking access outright, rather than every user getting the same static access rules.",
-        'detail': "This is layered on top of, not instead of, RBAC scope and inheritance — Conditional Access decides whether a sign-in is allowed to happen at all; RBAC decides what that signed-in identity can then do.",
+        'detail': "This is layered on top of, not instead of, RBAC: Conditional Access decides whether a sign-in is allowed to happen at all, while RBAC decides what that signed-in identity can then do.",
     },
     {
         'id': 'f59',
         'cat': 'compute',
         'front': 'ARM deployment modes: complete vs. incremental',
         'back': "Incremental mode (the default) adds or updates resources in the template without touching anything else in the resource group. Complete mode deletes any resource in the resource group that isn't defined in the template being deployed.",
-        'detail': "Complete mode is the one that can silently delete resources someone else created by hand — a classic case for why ARM templates vs. Bicep deployments deserve a careful review, not a routine one.",
+        'detail': "Complete mode is the one that can silently delete resources someone else created by hand, which is a classic reason why ARM and Bicep deployments in Complete mode deserve a careful review, not a routine one.",
     },
     {
         'id': 'f60',
         'cat': 'storage',
         'front': 'Disk snapshots',
-        'back': "A point-in-time, read-only copy of a managed disk, usable to create a new disk or VM from that captured state — separate from Blob versioning vs. soft delete vs. snapshots, which protects blob container data, not disks.",
-        'detail': "Managed disks and disk types get protected by disk snapshots (or Recovery Services vault and backup policies for a fuller backup solution); blob snapshots are a completely separate mechanism for a completely separate storage type.",
+        'back': "A point-in-time, read-only copy of a managed disk, usable to create a new disk or VM from that captured state. It is separate from blob snapshots, which protect blob data rather than disks.",
+        'detail': "Managed disks are protected by disk snapshots, or by a backup policy in a Recovery Services vault for a fuller backup solution; blob snapshots are a completely separate mechanism for a completely separate storage type.",
     },
     {
         'id': 'f61',
         'cat': 'identityGov',
         'front': 'Managed identities (system-assigned vs. user-assigned)',
-        'back': "A managed identity lets an Azure resource, like a VM or an App Service app, authenticate to other Azure services without any credential stored in code or configuration. A system-assigned identity is created and tied to the lifecycle of one specific resource, and is deleted automatically when that resource is. A user-assigned identity is instead its own standalone resource that can be attached to several resources at once. Storage data-plane RBAC roles are commonly assigned to a managed identity rather than to a human user.",
+        'back': "A managed identity lets an Azure resource, like a VM or an App Service app, authenticate to other Azure services without any credential stored in code or configuration. A system-assigned identity is created and tied to the lifecycle of one specific resource, and is deleted automatically when that resource is. A user-assigned identity is instead its own standalone resource that can be attached to several resources at once. Data-plane storage roles, like Storage Blob Data Contributor, are commonly assigned to a managed identity rather than to a human user.",
         'detail': "This is the credential-free answer whenever a scenario wants one Azure resource to reach another without a stored secret or connection-string password sitting in application configuration.",
     },
     {
         'id': 'f62',
         'cat': 'monitoring',
         'front': 'Azure Advisor',
-        'back': "Analyzes your resource configurations and usage telemetry to produce personalized recommendations across cost, security, reliability, operational excellence, and performance — a proactive best-practices check, distinct from Azure Monitor metrics vs. logs, which reports what is actually happening rather than what should be changed.",
+        'back': "Analyzes your resource configurations and usage telemetry to produce personalized recommendations across cost, security, reliability, operational excellence, and performance. It is a proactive best-practices check, distinct from Azure Monitor metrics and logs, which report what is actually happening rather than what should be changed.",
         'detail': "Advisor recommends configuration improvements before something breaks; it does not itself monitor live health or trigger alerts the way an alert rule paired with an action group does.",
     },
     {
         'id': 'f63',
         'cat': 'monitoring',
         'front': 'Application Insights',
-        'back': "An Azure Monitor feature purpose-built for application performance monitoring: request rates, response times, failure rates, and dependency tracing down to individual requests, complementing the infrastructure-level telemetry that a Log Analytics workspace and KQL collect from the underlying VMs and platform resources.",
+        'back': "An Azure Monitor feature purpose-built for application performance monitoring: request rates, response times, failure rates, and dependency tracing down to individual requests. It complements the infrastructure-level telemetry that a Log Analytics workspace collects from the underlying VMs and platform resources.",
         'detail': "Whenever a scenario is specifically about an application's own performance, like slow page loads or failing dependencies, Application Insights is the targeted answer, not general infrastructure monitoring.",
     },
     {
@@ -486,34 +486,34 @@ FLASHCARDS = [
         'cat': 'identityGov',
         'front': 'Administrative units',
         'back': "Scope a Microsoft Entra role, like Helpdesk Administrator, to only a defined subset of users, groups, or devices, such as one regional office or school, instead of that role applying across the whole tenant.",
-        'detail': "This builds on Microsoft Entra roles vs. Azure RBAC roles — an administrative unit narrows an Entra role's reach the same way scoping an Azure RBAC assignment to one resource group narrows its reach.",
+        'detail': "Think of it as the Microsoft Entra counterpart to scoping an Azure RBAC assignment to one resource group: an administrative unit narrows an Entra role's reach in the same way.",
     },
     {
         'id': 'f68',
         'cat': 'storage',
         'front': 'Azure File Sync',
         'back': "Keeps an on-premises Windows Server file share synchronized with an Azure file share. Cloud tiering can replace infrequently-accessed local files with lightweight pointers that fetch the content on demand, freeing local disk space while frequently-used files stay fully cached nearby.",
-        'detail': "This builds on Azure Files vs. Blob storage — it's specifically the hybrid on-premises-to-cloud sync layer on top of an Azure file share, not a replacement for one.",
+        'detail': "This is specifically the hybrid on-premises-to-cloud sync layer on top of an Azure file share; it is not a replacement for one, and Blob storage does not offer it.",
     },
     {
         'id': 'f69',
         'cat': 'storage',
         'front': 'Storage account failover (customer-initiated)',
-        'back': "Manually promotes a GRS, RA-GRS, or GZRS account's secondary region to primary during an outage. Because geo-replication to the secondary is asynchronous, the most recent writes made just before the outage may not have replicated yet and can be lost.",
-        'detail': "This is the operational other half of Redundancy at admin depth: RA-GRS — that flashcard covers reading from the secondary, this one covers actually cutting over to it.",
+        'back': "Manually promotes the secondary region of a GRS, RA-GRS, GZRS, or RA-GZRS account to primary during an outage. Because geo-replication to the secondary is asynchronous, the most recent writes made just before the outage may not have replicated yet and can be lost.",
+        'detail': "This is the operational other half of read-access redundancy: RA-GRS lets you read from the secondary region, while a customer-initiated failover is what actually cuts over to it.",
     },
     {
         'id': 'f70',
         'cat': 'storage',
         'front': 'Object replication',
         'back': "Asynchronously copies block blobs from a source storage account to a separate destination account, including across regions, for scenarios like serving a local read copy to users near the destination region or keeping an independently-managed secondary copy.",
-        'detail': "Unlike Redundancy at admin depth: RA-GRS, which is a Microsoft-managed secondary you can't address independently, object replication creates a real, separately-addressable destination account you control.",
+        'detail': "Unlike the Microsoft-managed secondary behind RA-GRS, which you can't address independently, object replication creates a real, separately-addressable destination account you control.",
     },
     {
         'id': 'f71',
         'cat': 'compute',
         'front': 'Proximity placement groups',
-        'back': "Place a group of VMs as physically close together as possible within a datacenter, to minimize network latency between them — the opposite goal of Availability sets vs. zones vs. Scale Sets, which deliberately spread VMs apart for resiliency.",
+        'back': "Place a group of VMs as physically close together as possible within a datacenter, to minimize network latency between them. This is the opposite goal of availability sets and availability zones, which deliberately spread VMs apart for resiliency.",
         'detail': "This is the answer whenever a scenario is about several VMs that talk to each other constantly and need the lowest possible latency between them, not protection from a shared failure.",
     },
     {
@@ -528,7 +528,7 @@ FLASHCARDS = [
         'cat': 'compute',
         'front': 'Azure Disk Encryption vs. server-side encryption',
         'back': "Every managed disk already gets server-side encryption at rest automatically, using a platform-managed key by default, with no setup required. Azure Disk Encryption is an optional additional layer that encrypts the guest OS/data volumes from inside the VM itself, using BitLocker or DM-Crypt.",
-        'detail': "A scenario asking what protects data at rest with zero configuration is describing the platform-managed default, not Azure Disk Encryption, which is the extra, opt-in layer.",
+        'detail': "A scenario asking what protects data at rest with zero configuration is describing the platform-managed default, not Azure Disk Encryption, which is the extra, opt-in layer. Microsoft has announced that Azure Disk Encryption retires on September 15, 2028, with encryption at host as the recommended replacement.",
     },
     {
         'id': 'f74',
@@ -548,8 +548,8 @@ FLASHCARDS = [
         'id': 'f76',
         'cat': 'networking',
         'front': 'DDoS Protection: Basic vs. Standard',
-        'back': "Basic is automatically enabled for every Azure resource at no cost and defends against common network-layer flood attacks. Standard adds resource-tuned mitigation policies, attack analytics and alerting, and cost protection against scale-out charges incurred during a documented attack, for a per-resource fee.",
-        'detail': "If a scenario specifically wants attack-specific telemetry or billing protection during an attack, that's Standard — Basic is already running in the background either way.",
+        'back': "Basic (now called DDoS infrastructure protection) is automatically enabled for Azure public IPs at no cost and defends against common network-layer flood attacks. Standard (now offered as DDoS Network Protection, or per-public-IP DDoS IP Protection) adds tuned mitigation policies, attack analytics and alerting, and, with Network Protection, cost protection against scale-out charges incurred during a documented attack, for a paid plan.",
+        'detail': "If a scenario specifically wants attack-specific telemetry or billing protection during an attack, that's the paid tier; the free baseline is already running in the background either way.",
     },
     {
         'id': 'f77',
@@ -570,7 +570,7 @@ FLASHCARDS = [
         'cat': 'monitoring',
         'front': 'Basic KQL query structure',
         'back': "A Kusto query starts with a table name and pipes (|) the data through operators in sequence, like where to filter rows, summarize to aggregate them, and project to choose which columns to keep — order matters, since each operator works on the output of the one before it.",
-        'detail': "This builds on Log Analytics workspace and KQL — that flashcard names the language, this one is the actual shape a query takes once you start writing one.",
+        'detail': "Knowing the language is called KQL is only the start; this is the actual shape a query takes once you start writing one.",
     },
 ]
 
@@ -1870,13 +1870,13 @@ Day to day, this ties back to cost: budgets with alert thresholds, and Cost Anal
 
 For access, a storage account access key grants full, unrestricted control over the whole account — risky to hand out. A Shared Access Signature (SAS) instead grants limited, time-boxed access to specific resources, without ever exposing that key. A storage firewall adds a network-level layer on top, restricting access to specific VNets or IP ranges regardless of what credentials someone has.
 
-Ongoing management includes lifecycle policies, which automatically move aging blobs to cheaper tiers or delete them outright, and choosing the right protection for accidental changes: blob versioning keeps every prior version automatically, while soft delete recovers something that was deleted outright.""",
+Ongoing management includes lifecycle policies, which automatically move aging blobs to cheaper tiers or delete them outright, and choosing the right protection for accidental changes: blob versioning keeps every prior version automatically, while soft delete keeps deleted (and, with versioning off, overwritten) data recoverable for a retention window.""",
         'fundamentalsLabel': 'New to storage account administration? See the everyday analogy',
         'fundamentals': 'An access key is like a master key to an entire building — powerful, and dangerous to hand out casually. A SAS is like a visitor badge that only opens one door, only works for a limited window of time, and can be revoked without changing the master key at all.',
         'keyTerms': ['General-purpose v2', 'Standard', 'Premium', 'access key', 'Shared Access Signature', 'SAS', 'storage firewall', 'lifecycle', 'versioning', 'soft delete'],
         'commonTraps': [
             'An access key grants full account access — always prefer a scoped, time-limited SAS when sharing access externally.',
-            "Soft delete protects against deletion; recovering a blob's content after an overwrite specifically needs versioning.",
+            "Soft delete is about retention windows; versioning is the fuller answer for keeping every prior version of an overwritten blob.",
             'A storage firewall is a network-level control — separate from, and in addition to, who has valid credentials.',
         ],
         'portalMockup': 'storageAccount',
@@ -1997,9 +1997,9 @@ CHEAT_SHEET = [
     {
         'heading': 'Exam-day strategy',
         'points': [
-            'You have 100 minutes for 50 questions — about 2.0 minutes each on average. Budget more time for multi-part scenario questions and less for straight recall, rather than pacing every question identically.',
+            'Plan on roughly 100 minutes of exam time for about 40-60 questions, which works out to around 2 minutes each on average. Budget more time for multi-part scenario questions and less for straight recall, rather than pacing every question identically.',
             "Real scoring isn't a flat percentage of questions right (some count for more than others) — treat 75%+ as a safe buffer to aim for, not an exact threshold to just clear.",
-            "Flag anything you're unsure of and move on rather than stalling — a question later in the exam can sometimes jog a detail you needed earlier, and you get partial credit for nothing by running out of time on one question.",
+            "Flag anything you're unsure of and move on rather than stalling — a question later in the exam can sometimes jog a detail you needed earlier, and stalling on one question risks leaving others unanswered.",
             "On multi-select ('choose N') questions, eliminate the options you're confident are wrong first; guessing among 2 plausible answers beats guessing among 4.",
             'Your first read of a question is usually right — change an answer only when you find a specific detail you missed, not from general second-guessing.',
         ],
@@ -2048,7 +2048,7 @@ CHEAT_SHEET = [
             "Azure Monitor Metrics = lightweight numerical time-series data. Azure Monitor Logs = detailed queryable records in a Log Analytics workspace, searched with KQL.",
             "An alert rule defines the trigger condition; a separate action group defines the response (email, SMS, webhook, runbook).",
             "Azure Backup (Recovery Services vault) restores a VM/file to an earlier point in time. Azure Site Recovery replicates and fails over a whole workload to a secondary region — different scope, don't mix them up.",
-            "A backup policy sets the schedule and retention; changing retention doesn't retroactively delete or extend already-taken recovery points outside the new window automatically without a cleanup job.",
+            "A backup policy sets the schedule and retention; for Azure VM backups, changing the retention of an existing category applies to already-taken recovery points as well as new ones (so shortening it can expire older points), while a newly added retention category applies only going forward.",
         ],
     },
     {
@@ -2063,7 +2063,7 @@ CHEAT_SHEET = [
     {
         'heading': 'Exam-day reminders',
         'points': [
-            "This exam is heavy on hands-on labs — expect scenario/portal-sequence questions, not just recall.",
+            "This exam is heavily scenario-based and tests practical, portal-style tasks (the live-lab format is no longer used), so expect more than just recall.",
             "Watch for wording like \"least administrative effort\" or \"most cost-effective\" — pick the best fit among several technically-correct-sounding options.",
             "If a question says the connection \"doesn't use the public internet,\" that's ExpressRoute, not a VPN Gateway.",
             "\"Protect from a single datacenter failure\" points to Availability Zones; \"protect from a single rack/host failure\" points to Availability Sets.",
@@ -2090,7 +2090,7 @@ CLI_CHALLENGES = [
         'verb': 'az vm create',
         'command': 'az vm create --resource-group rg-web-prod --name vm-app01 --image Ubuntu2204',
         'requiredFlags': ['--resource-group', '--name', '--image'],
-        'explanation': "az vm create needs --resource-group, --name, and --image at minimum — the CLI fills in a generated admin username/SSH key pair if you don't pass your own.",
+        'explanation': "az vm create needs --resource-group, --name, and --image at minimum — other settings such as the admin credentials have defaults or can be supplied with extra flags.",
     },
     {
         'id': 'cli-az-3',
