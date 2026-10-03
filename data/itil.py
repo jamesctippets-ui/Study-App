@@ -284,7 +284,7 @@ FLASHCARDS = [
         'cat': 'frameworks',
         'front': 'ITIL and DevOps',
         'back': 'ITIL provides the broader service value system and governance. DevOps contributes specific practices for fast, collaborative delivery. They complement rather than compete.',
-        'detail': "DevOps practices like CI/CD can sit inside the 'Build' and 'Deliver & Support' stages of the Product and Service Lifecycle.",
+        'detail': "DevOps practices like CI/CD can sit inside the 'Build', 'Deliver', and 'Support' activities of the Product and Service Lifecycle.",
     },
     {
         'id': 'f38',
@@ -354,27 +354,27 @@ FLASHCARDS = [
         'cat': 'valueSystem',
         'front': 'Service desk',
         'back': "The practice that acts as the single, agreed point of contact for users to report incidents, request services, and get status updates — the entry point into the value stream, even when it doesn't resolve every issue itself.",
-        'detail': "The service desk's real value is coordination and communication, not necessarily deep technical resolution — many issues it logs are escalated to specialist teams for problem vs. known error follow-up.",
+        'detail': "The service desk's real value is coordination and communication, not necessarily deep technical resolution — many issues it logs are escalated to specialist teams, and recurring ones are handed to problem management for root-cause follow-up.",
     },
     {
         'id': 'f48',
         'cat': 'valueSystem',
         'front': 'Service request management',
-        'back': "The practice that fulfills formal, pre-defined, routine requests raised by users, such as a password reset or access to a new application — distinct from Incident vs. problem vs. known error, since nothing is actually broken. Requests are typically logged and tracked through the Service desk alongside incidents, even though resolving one never involves root-cause investigation.",
+        'back': "The practice that fulfills formal, pre-defined, routine requests raised by users, such as a password reset or access to a new application. It is distinct from an incident, since nothing is actually broken. Requests are typically logged and tracked through the service desk alongside incidents, even though resolving one never involves root-cause investigation.",
         'detail': "Exam trap: a request for something routine that's already pre-approved is a service request, not a standard change — service request management and change enablement are separate practices even when fulfilling the request eventually requires a change to be carried out.",
     },
     {
         'id': 'f49',
         'cat': 'valueSystem',
         'front': 'Service level management',
-        'back': "The practice that negotiates, agrees, monitors, and reviews service levels on an ongoing basis, producing and maintaining the SLAs referenced in Service quality vs. service level vs. SLA. It's a continuous activity of tracking whether targets are actually being met, not a one-time contract signing.",
+        'back': "The practice that negotiates, agrees, monitors, and reviews service levels on an ongoing basis, producing and maintaining the SLAs that document those targets. It's a continuous activity of tracking whether targets are actually being met, not a one-time contract signing.",
         'detail': "A scenario describing a team that reviews performance against targets every quarter and renegotiates them as needs change is describing service level management in action, not just the existence of an SLA document.",
     },
     {
         'id': 'f50',
         'cat': 'terms',
         'front': 'Value',
-        'back': "The perceived benefits, usefulness, and importance of something. A service creates value when the combination described in Utility vs. warranty it provides outweighs the Cost vs. risk involved for the stakeholder receiving it.",
+        'back': "The perceived benefits, usefulness, and importance of something. A service creates value when the combination of utility and warranty it provides outweighs the costs and risks involved for the stakeholder receiving it.",
         'detail': "Value is always perceived by the stakeholder receiving it, not declared by the provider — two different customers can value the exact same service differently.",
     },
     {
@@ -388,14 +388,14 @@ FLASHCARDS = [
         'id': 'f52',
         'cat': 'terms',
         'front': 'Practice vs. process',
-        'back': "A management practice bundles the organizational resources, people, process, and tools, described under Management practices, purpose for doing a kind of work. A process is narrower: just the structured set of activities within that practice, not the whole bundle.",
+        'back': "A management practice bundles the organizational resources (people, processes, information, and tools) used for doing a kind of work. A process is narrower: just the structured set of activities within that practice, not the whole bundle.",
         'detail': "Exam trap: 'incident management' is a practice. The documented steps for logging, diagnosing, and closing a ticket are one of the processes inside it.",
     },
     {
         'id': 'f53',
         'cat': 'terms',
         'front': 'Stakeholder',
-        'back': "Any person or organization with an interest in or expectations of an activity, target, or decision. Customer vs. user vs. sponsor names specific stakeholder roles, but the category is broader than just those three.",
+        'back': "Any person or organization with an interest in or expectations of an activity, target, or decision. Customer, user, and sponsor are specific stakeholder roles, but the category is broader than just those three.",
         'detail': "A regulator, an internal auditor, or a shareholder who never touches the service can all still be stakeholders, since the term only requires an interest or expectation, not direct use.",
     },
     {
@@ -430,49 +430,49 @@ FLASHCARDS = [
         'id': 'f58',
         'cat': 'valueSystem',
         'front': 'Governance vs. management practice',
-        'back': "Governance directs and controls from the top, such as leadership mandating that every change needs a documented risk assessment. A management practice, like Change enablement: standard, normal, and emergency changes, is the organizational resource that actually carries that mandate out day to day.",
+        'back': "Governance directs and controls from the top, such as leadership mandating that every change needs a documented risk assessment. A management practice, like change enablement, is the organizational resource that actually carries that mandate out day to day.",
         'detail': "Governance sets the rule; the practice does the work the rule requires. A scenario describing a policy decision is governance, while one describing the team executing it is a practice.",
     },
     {
         'id': 'f59',
         'cat': 'dimensions',
         'front': 'Value streams and processes, dimension',
-        'back': "The activities, workflows, controls, and procedures an organization uses to achieve its objectives — the 'how work actually flows' angle on a service. A Value stream draws together steps from across the other three dimensions into one specific scenario.",
+        'back': "The activities, workflows, controls, and procedures an organization uses to achieve its objectives — the 'how work actually flows' angle on a service. A value stream draws together steps from across the other three dimensions into one specific scenario.",
         'detail': "This is the dimension most often tested through a scenario describing unnecessary steps, handoffs, or delay in how a request moves, rather than a staffing, tooling, or vendor problem.",
     },
     {
         'id': 'f60',
         'cat': 'dimensions',
         'front': 'Four Dimensions, cross-dimension impact',
-        'back': "A change rarely stays inside just one dimension. Outsourcing a function touches Partners and suppliers, dimension, while the retraining it usually forces lands under Organizations and people, dimension — exam scenarios increasingly ask which two dimensions a single change affects.",
+        'back': "A change rarely stays inside just one dimension. Outsourcing a function touches the partners and suppliers dimension, while the retraining it usually forces lands under the organizations and people dimension — exam scenarios increasingly ask which two dimensions a single change affects.",
         'detail': "Reading a scenario for a ripple effect, not just one keyword, is the real skill being tested here.",
     },
     {
         'id': 'f61',
         'cat': 'lifecycle',
         'front': 'Why the lifecycle loops instead of running once',
-        'back': "Unlike a strict one-way pipeline, The 8 Product and Service Lifecycle activities, in order are meant to be revisited — looping back to an earlier activity, like returning to Design after Build surfaces a gap, is expected, not a sign the process broke down.",
+        'back': "Unlike a strict one-way pipeline, the eight Product and Service Lifecycle activities are meant to be revisited — looping back to an earlier activity, like returning to Design after Build surfaces a gap, is expected, not a sign the process broke down.",
         'detail': "A manager who treats a return to an earlier activity as project failure ends up teaching their team to hide problems instead of surfacing them.",
     },
     {
         'id': 'f62',
         'cat': 'streams',
         'front': 'Example value streams',
-        'back': "Typical value streams include resolving a user's incident, onboarding a new employee, and developing and releasing a new feature — each one strings together whichever activities covered in Value chain, purpose and practices that specific scenario actually needs.",
+        'back': "Typical value streams include resolving a user's incident, onboarding a new employee, and developing and releasing a new feature — each one strings together whichever value chain activities and practices that specific scenario actually needs.",
         'detail': "No two value streams need the same activities or practices — a request-fulfillment stream and an incident-resolution stream can look very different end to end.",
     },
     {
         'id': 'f63',
         'cat': 'streams',
         'front': 'Value stream vs. management practice',
-        'back': "A management practice, like incident management, is a single set of resources for one kind of work. A Value stream strings several practices and value chain activities together end to end for one real scenario, like resolving an incident from first report to final closure.",
+        'back': "A management practice, like incident management, is a single set of resources for one kind of work. A value stream strings several practices and value chain activities together end to end for one real scenario, like resolving an incident from first report to final closure.",
         'detail': "If a scenario describes one kind of work in isolation, think practice. If it describes an end-to-end journey using several kinds of work in sequence, think value stream.",
     },
     {
         'id': 'f64',
         'cat': 'streams',
         'front': 'What starts and ends a value stream',
-        'back': "A value stream typically starts from a demand or opportunity and ends once the consumer actually realizes value from it — the same inputs and outputs that Value chain, purpose exists to convert, applied to one specific scenario.",
+        'back': "A value stream typically starts from a demand or opportunity and ends once the consumer actually realizes value from it — the same demand-to-value conversion the value chain exists to perform, applied to one specific scenario.",
         'detail': "If nothing has actually created value for the consumer yet, the value stream isn't finished, even if every internal step has technically been completed.",
     },
 ]
@@ -1882,8 +1882,8 @@ CHEAT_SHEET = [
         'heading': 'Exam-day strategy',
         'points': [
             'You have 60 minutes for 40 questions — about 1.5 minutes each on average. Budget more time for multi-part scenario questions and less for straight recall, rather than pacing every question identically.',
-            "Real scoring isn't a flat percentage of questions right (some count for more than others) — treat 65%+ as a safe buffer to aim for, not an exact threshold to just clear.",
-            "Flag anything you're unsure of and move on rather than stalling — a question later in the exam can sometimes jog a detail you needed earlier, and you get partial credit for nothing by running out of time on one question.",
+            "Each question is worth one mark and there is no negative marking, so answer every question, even if you have to guess. The pass mark is 65% (26 of 40) — aim comfortably above it rather than for the bare minimum.",
+            "Flag anything you're unsure of and move on rather than stalling — a question later in the exam can sometimes jog a detail you needed earlier, and an unanswered question scores nothing, so never run out of time stalling on one.",
             "On multi-select ('choose N') questions, eliminate the options you're confident are wrong first; guessing among 2 plausible answers beats guessing among 4.",
             'Your first read of a question is usually right — change an answer only when you find a specific detail you missed, not from general second-guessing.',
         ],
@@ -1901,7 +1901,7 @@ CHEAT_SHEET = [
         ],
     },
     {
-        'heading': 'The 4 dimensions of service management',
+        'heading': 'The 4 dimensions of product and service management',
         'points': [
             'Organizations and people — roles, responsibilities, culture, staffing.',
             'Information and technology — the tech and knowledge used to deliver services.',
@@ -1910,11 +1910,11 @@ CHEAT_SHEET = [
         ],
     },
     {
-        'heading': 'Service Value Chain activities',
+        'heading': 'Product and Service Lifecycle activities',
         'points': [
-            'Plan → Improve → Engage → Design & transition → Obtain/build → Deliver & support.',
-            'Engage sits at the center-ish, connecting to stakeholders throughout, not just at the start.',
-            'These 6 activities combine into value streams for specific scenarios (e.g. "resolve an incident").',
+            'Discover → Design → Acquire → Build → Transition → Operate → Deliver → Support.',
+            'Eight activities, used iteratively: work can loop back to an earlier activity at any point. This replaces the older six-activity ITIL 4 service value chain (Plan, Improve, Engage, Design & transition, Obtain/build, Deliver & support).',
+            'Value streams combine these activities and practices for specific scenarios (e.g. "resolve an incident").',
         ],
     },
     {
@@ -1931,7 +1931,7 @@ CHEAT_SHEET = [
         'points': [
             'Incident = unplanned interruption/reduction in quality — restore service fast. Problem = the underlying cause of one or more incidents.',
             'Known Error = a problem that has been analyzed but not yet resolved.',
-            'Change Enablement = ensures risks are properly assessed for changes (not "change management" in ITIL 4 terms).',
+            'Change Enablement = ensures risks are properly assessed for changes (ITIL uses the term "change enablement" rather than "change management").',
             'Service Request = a formal request for something routine/pre-defined (not an incident — nothing is broken).',
             'Service Level Management = ongoing activity of setting/monitoring/reviewing SLAs, not a one-time contract signing.',
         ],
@@ -2100,9 +2100,9 @@ The final four activities move that built solution into live use and keep it run
         'quizIds': ['q23', 'q37', 'q32', 'q24', 'q33', 'q38', 'tf18', 'q26', 'q34', 'tf20'],
         'reading': """A value stream is a series of steps an organization undertakes to create and deliver products and services to consumers, built by combining value chain activities and practices for a specific end-to-end scenario, like "resolve a user's incident," rather than every activity in the lifecycle every time. Value stream mapping visualizes those end-to-end steps specifically to spot waste, delay, or handoffs that don't add value — in practice, this looks like a flowchart with timestamps showing exactly where a request sits waiting versus where real work is actually happening, and it's a diagnostic tool that can be used any time, not only once at project kickoff.
 
-ITIL 4 folds AI in as a capability that needs the same governance as anything else, not a special exception. It distinguishes plain AI, systems performing tasks that normally need human intelligence, from generative AI, which creates new content, from agentic AI, which can plan and act autonomously toward a goal with limited human intervention — a chatbot that drafts a reply for a human to approve is generative, while one that files the ticket, checks the knowledge base, and closes it itself is agentic. The AI Capability Model further breaks down what AI actually contributes into six "Cs": Creation, Curation, Clarification, Cognition, Communication, and Coordination — naming which "C" a given AI system performs matters, because a system that curates alerts needs different oversight than one that coordinates automated actions across a workflow.
+ITIL Version 5 folds AI in as a capability that needs the same governance as anything else, not a special exception. It distinguishes plain AI, systems performing tasks that normally need human intelligence, from generative AI, which creates new content, from agentic AI, which can plan and act autonomously toward a goal with limited human intervention — a chatbot that drafts a reply for a human to approve is generative, while one that files the ticket, checks the knowledge base, and closes it itself is agentic. The AI Capability Model further breaks down what AI actually contributes into six "Cs": Creation, Curation, Clarification, Cognition, Communication, and Coordination — naming which "C" a given AI system performs matters, because a system that curates alerts needs different oversight than one that coordinates automated actions across a workflow.
 
-ITIL deliberately doesn't compete with adjacent frameworks; it operates at a different layer and expects to work alongside them. DevOps contributes specific practices for fast, collaborative delivery — CI/CD pipelines slot naturally inside the Build and Deliver & Support stages of the lifecycle, governed by ITIL's wider context rather than replacing it. PRINCE2 manages temporary, bounded project work, while ITIL manages the ongoing service that project eventually delivers into — a system rollout might run as a PRINCE2 project, with ITIL practices taking over the moment it goes live. Agile, similarly, is about how work gets done iteratively, while ITIL is about the wider value system that work happens within — different layers, not competing answers to the same question.""",
+ITIL deliberately doesn't compete with adjacent frameworks; it operates at a different layer and expects to work alongside them. DevOps contributes specific practices for fast, collaborative delivery — CI/CD pipelines slot naturally inside the Build, Deliver, and Support activities of the lifecycle, governed by ITIL's wider context rather than replacing it. PRINCE2 manages temporary, bounded project work, while ITIL manages the ongoing service that project eventually delivers into — a system rollout might run as a PRINCE2 project, with ITIL practices taking over the moment it goes live. Agile, similarly, is about how work gets done iteratively, while ITIL is about the wider value system that work happens within — different layers, not competing answers to the same question.""",
         'fundamentalsLabel': 'New to how these frameworks fit together? See the everyday analogy',
         'fundamentals': "Think of ITIL as a restaurant's overall business plan and health-code compliance, while Agile and DevOps are the specific techniques the kitchen uses to cook efficiently, and PRINCE2 is how a one-time kitchen renovation project gets managed. None of them compete with each other — the renovation project (PRINCE2) eventually hands off to day-to-day kitchen operations, governed by the overall plan (ITIL), which might use a fast, iterative prep technique (Agile/DevOps) without that technique ever needing to replace the business plan itself. And an AI system that just suggests tonight's specials based on ingredients about to expire (generative) is a very different level of trust from one that automatically reorders inventory and adjusts the menu on its own (agentic).",
         'keyTerms': ['Value stream', 'Value stream mapping', 'AI', 'Generative AI', 'Agentic AI', 'AI Capability Model', 'DevOps', 'PRINCE2', 'Agile'],
@@ -2215,7 +2215,7 @@ SEQUENCES = [
     {
         'id': 'seq-itil-3',
         'cat': 'valueSystem',
-        'prompt': "Put these steps in order for a standard change going through ITIL change enablement.",
+        'prompt': "Put these steps in order for a normal change going through ITIL change enablement.",
         'steps': [
             'Submit a change request describing what and why',
             'Assess the risk and impact of the proposed change',
