@@ -681,7 +681,7 @@ QUESTIONS = [
             'Apply a ReadOnly management lock at the RG1 scope',
         ],
         'correct': 0,
-        'explanation': "RBAC is additive, so a narrower assignment can never subtract rights inherited from a wider one; the only way to carve RG1 out is to move Contributor down to the nine scopes where it is wanted, after which the inherited Reader from MG1 is all that applies in RG1. Assigning Reader at RG1 changes nothing because Contributor still flows down from Sub1. Deny assignments cannot be authored directly by administrators; they are created by Azure Blueprints and managed applications. A ReadOnly lock would make RG1 read-only for every principal, not just User1.",
+        'explanation': "RBAC is additive, so a narrower assignment can never subtract rights inherited from a wider one; the only way to carve RG1 out is to move Contributor down to the nine scopes where it is wanted, after which the inherited Reader from MG1 is all that applies in RG1. Assigning Reader at RG1 changes nothing because Contributor still flows down from Sub1. Deny assignments cannot be authored directly by administrators; they are created by Deployment Stacks (formerly Azure Blueprints) and managed applications. A ReadOnly lock would make RG1 read-only for every principal, not just User1.",
     },
     {
         'id': 'q9',
@@ -1294,7 +1294,7 @@ QUESTIONS = [
             'Apply a CanNotDelete lock to a resource group in Sub1',
         ],
         'correct': [0, 1],
-        'explanation': "Contributor grants every action except those under Microsoft.Authorization (role assignments, deny assignments, locks, elevate access) and Blueprints, so creating resource groups and deploying resources are both allowed. Assigning a role needs Microsoft.Authorization/roleAssignments/write, which Contributor excludes. The lock is the near-miss: management locks also live under Microsoft.Authorization/locks, so a Contributor can neither create nor remove them, even though it can otherwise fully manage the resource group.",
+        'explanation': "Contributor grants every action except those under Microsoft.Authorization (role assignments, deny assignments, locks, elevate access) and Blueprints (now being retired in favor of Deployment Stacks), so creating resource groups and deploying resources are both allowed. Assigning a role needs Microsoft.Authorization/roleAssignments/write, which Contributor excludes. The lock is the near-miss: management locks also live under Microsoft.Authorization/locks, so a Contributor can neither create nor remove them, even though it can otherwise fully manage the resource group.",
     },
     {
         'id': 'msq2',
@@ -1779,11 +1779,11 @@ QUESTIONS = [
         'options': [
             'A deny assignment blocks specified actions regardless of any role assignment that would otherwise allow them',
             'Deny assignments are created and managed directly by subscription administrators the same way role assignments are',
-            'Deny assignments are most commonly created automatically by Azure Blueprints or managed apps to protect their own resources',
+            'Deny assignments are most commonly created automatically by Deployment Stacks (formerly Azure Blueprints) or managed apps to protect their own resources',
             'A deny assignment can be overridden by assigning the affected user the Owner role',
         ],
         'correct': [0, 2],
-        'explanation': "A deny assignment blocks specified actions no matter what role assignments would otherwise allow, and in practice they're usually created automatically by system features like Azure Blueprints or managed applications to protect resources they manage, not hand-authored by administrators the way ordinary role assignments are. Owner access doesn't override a deny assignment — deny always takes precedence over any allow, including Owner.",
+        'explanation': "A deny assignment blocks specified actions no matter what role assignments would otherwise allow, and in practice they're usually created automatically by system features like Deployment Stacks (formerly Azure Blueprints) and managed applications to protect resources they manage, not hand-authored by administrators the way ordinary role assignments are. Owner access doesn't override a deny assignment — deny always takes precedence over any allow, including Owner.",
     },
     {
         'id': 'msq7',
@@ -1797,7 +1797,7 @@ QUESTIONS = [
             'Automatic enrollment with no configuration or cost',
         ],
         'correct': [0, 2],
-        'explanation': "DDoS Protection Standard adds resource-tuned attack analytics, metrics, and alerting, plus cost protection credits for scale-out charges incurred while defending against a documented attack — both are paid, Standard-only capabilities. Basic protection already covers common network-layer flood attacks for every resource at no cost, which is also why automatic, no-configuration, no-cost enrollment describes Basic, not something Standard adds on top of it.",
+        'explanation': "DDoS Protection Standard (now DDoS Network Protection) adds resource-tuned attack analytics, metrics, and alerting, plus cost protection credits for scale-out charges incurred while defending against a documented attack — both are paid, Standard-only capabilities. Basic protection already covers common network-layer flood attacks for every resource at no cost, which is also why automatic, no-configuration, no-cost enrollment describes Basic, not something Standard adds on top of it.",
     },
     {
         'id': 'msq8',

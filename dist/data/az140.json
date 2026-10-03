@@ -775,7 +775,7 @@
       "options": [
         "Screen capture protection, configured through the host pool's RDP properties",
         "AVD Insights enabled on the host pool with a Log Analytics workspace",
-        "Session watermarking, configured through the host pool's RDP properties",
+        "Session watermarking, configured on the session hosts with Intune or Group Policy",
         "Clipboard redirection disabled in the host pool's RDP properties"
       ],
       "correct": 2,

@@ -1155,7 +1155,7 @@
         "Azure machine configuration auditing"
       ],
       "correct": 2,
-      "explanation": "Adaptive application controls use machine learning to build an allowlist of known-good applications for a VM group and alert, or enforce, on anything outside it. File integrity monitoring tracks changes to files and registry keys rather than which applications execute, JIT controls management port exposure, and machine configuration audits OS settings against a baseline."
+      "explanation": "Adaptive application controls use machine learning to build an allowlist of known-good applications for a VM group and alert, or enforce, on anything outside it. File integrity monitoring tracks changes to files and registry keys rather than which applications execute, JIT controls management port exposure, and machine configuration audits OS settings against a baseline. Note that Microsoft has deprecated the Log Analytics agent-based version of adaptive application controls, so this is a legacy feature that older material and exam items may still reference."
     },
     {
       "id": "q36",
@@ -1962,9 +1962,9 @@
       "id": "tf24",
       "cat": "aiComputeSecurity",
       "type": "tf",
-      "question": "AI security posture management (AI-SPM) in Defender for Cloud focuses on detecting an active jailbreak attempt against a deployed agent in real time, the same role Defender for AI Service plays.",
+      "question": "AI security posture management (AI-SPM) in Defender for Cloud focuses on detecting an active jailbreak attempt against a deployed agent in real time, the same role Defender for AI Services plays.",
       "answer": false,
-      "explanation": "AI-SPM is a posture capability, discovering AI workloads, models, and their data stores and surfacing risks like an overly permissive identity before any attack occurs. Defender for AI Service is the one that detects an active runtime threat like a live jailbreak attempt; the two are complementary but play different roles."
+      "explanation": "AI-SPM is a posture capability, discovering AI workloads, models, and their data stores and surfacing risks like an overly permissive identity before any attack occurs. Defender for AI Services is the one that detects an active runtime threat like a live jailbreak attempt; the two are complementary but play different roles."
     },
     {
       "id": "msq15",
