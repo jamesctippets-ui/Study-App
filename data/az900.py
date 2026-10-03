@@ -518,7 +518,7 @@ QUESTIONS = [
         'question': 'A company currently spends heavily on capital equipment refreshes every three years for its datacenter. Moving fully to Azure IaaS would primarily shift this spending pattern to:',
         'options': ['A one-time Reserved Instance prepayment classified as CapEx', 'OpEx', 'A smaller but still recurring CapEx', 'No change in spending pattern'],
         'correct': 1,
-        'explanation': "Cloud computing shifts organizations from large upfront capital purchases toward ongoing operating expense. Even an upfront Reserved Instance purchase is still billed as a discounted rate on consumption — it's accounted for as OpEx, not CapEx, which is a commonly missed distinction.",
+        'explanation': "Cloud computing shifts organizations from large upfront capital purchases toward ongoing operating expense. Even an upfront Reserved Instance purchase is still billed as a discounted rate on consumption — it is still a consumption commitment billed through Azure, not an equipment purchase, so it is not CapEx — a commonly missed distinction.",
     },
     {
         'id': 'q5',
@@ -1026,7 +1026,7 @@ QUESTIONS = [
         'type': 'tf',
         'question': 'If the region chosen for a resource group suffers an outage, the resources in that group that were deployed to other regions stop running as well.',
         'answer': False,
-        'explanation': "A resource group's region only determines where the group's metadata is stored. The resources inside can live in any region, and they keep running on their own regional infrastructure regardless of what happens to the metadata region — at most, management operations on the group could be affected while it is unreachable. The statement treats the group as a runtime boundary when it is only a logical management and billing container.",
+        'explanation': "A resource group's region only determines where the group's metadata is stored. The resources inside can live in any region, and they keep running on their own regional infrastructure regardless of what happens to the metadata region — at most, management operations on the group could be affected while it is unreachable. The statement treats the group as a runtime boundary when it is only a logical management container.",
     },
     {
         'id': 'tf9',
@@ -1247,7 +1247,7 @@ QUESTIONS = [
         'type': 'ms',
         'question': 'A startup on the free Basic support plan, with no paid add-ons, wants to improve its environment without increasing spend. Which two capabilities are available to it at no additional charge? (Choose two.)',
         'options': [
-            'Personalized Azure Advisor recommendations across cost, security, reliability, and performance',
+            'Personalized Azure Advisor recommendations across cost, security, reliability, operational excellence, and performance',
             'Azure Service Health alerts for platform incidents affecting its regions',
             "Microsoft Defender for Cloud's enhanced workload protection plans",
             'A committed one-hour response time from Microsoft for a production outage',
@@ -1575,9 +1575,9 @@ QUESTIONS = [
         'cat': 'management',
         'type': 'mc',
         'question': 'A large enterprise wants to negotiate a direct, multi-year agreement with Microsoft covering a committed volume of Azure and other Microsoft products, rather than paying by credit card as usage occurs. Which Azure offer type fits?',
-        'options': ['Pay-As-You-Go under a Microsoft Customer Agreement', 'An Enterprise Agreement (EA)', 'The Cloud Solution Provider (CSP) program', 'A Visual Studio subscription with monthly Azure credits'],
+        'options': ['Pay-As-You-Go under a Microsoft Customer Agreement', 'An Enterprise Agreement (EA) / Microsoft Customer Agreement for enterprises', 'The Cloud Solution Provider (CSP) program', 'A Visual Studio subscription with monthly Azure credits'],
         'correct': 1,
-        'explanation': 'An Enterprise Agreement is a negotiated, direct, multi-year contract with Microsoft built around a committed volume of Azure and other Microsoft products, with centralized billing. Pay-As-You-Go under a Microsoft Customer Agreement is also a direct relationship, but it carries no upfront volume commitment and is billed as usage occurs — the model the enterprise is trying to move away from. CSP is the other near-miss: it is a real purchasing channel, but the agreement is with a Microsoft partner rather than negotiated directly with Microsoft. A Visual Studio subscription provides individual developer credits, not an organization-wide commercial agreement.',
+        'explanation': 'An Enterprise Agreement (EA) — or its successor for enterprises, the Microsoft Customer Agreement for enterprises, as new EAs are being phased out — is a negotiated, direct, multi-year contract with Microsoft built around a committed volume of Azure and other Microsoft products, with centralized billing. Pay-As-You-Go under a Microsoft Customer Agreement is also a direct relationship, but it carries no upfront volume commitment and is billed as usage occurs — the model the enterprise is trying to move away from. CSP is the other near-miss: it is a real purchasing channel, but the agreement is with a Microsoft partner rather than negotiated directly with Microsoft. A Visual Studio subscription provides individual developer credits, not an organization-wide commercial agreement.',
     },
     {
         'id': 'tf24',
@@ -1631,7 +1631,7 @@ QUESTIONS = [
             'They land in Central US unless the group is moved first',
         ],
         'correct': 0,
-        'explanation': "A resource group is a logical container, not a regional boundary. The Region field on this screen decides where the group's metadata (its list of members and settings) is stored — a detail that matters for data-residency rules — but the resources inside can live in any region. Each resource is billed at the rates of its own region, not the group's, and there is no need to 'move' a group before placing a resource elsewhere.",
+        'explanation': "A resource group is a logical container and management boundary, not a regional or billing boundary. The Region field on this screen decides where the group's metadata (its list of members and settings) is stored — a detail that matters for data-residency rules — but the resources inside can live in any region. Each resource is billed at the rates of its own region, not the group's, and there is no need to 'move' a group before placing a resource elsewhere.",
         'image': 'resourceGroup',
     },
     {
@@ -1737,12 +1737,12 @@ QUESTIONS = [
         'question': 'A company organizes its Azure resources so that a single resource group contains both a production web app in East US and its paired database in West US, deployed together for a coordinated app release. Is this a valid resource group design?',
         'options': [
             'No, because a resource group can only contain resources from a single Azure region',
-            'Yes, because a resource group is a management and billing boundary, not a regional one',
+            'Yes, because a resource group is a management boundary, not a regional one',
             'No, because paired regions must be managed in strictly separate resource groups for compliance reasons',
             'Yes, but only if both resources are deployed using the same ARM template',
         ],
         'correct': 1,
-        'explanation': "A resource group is a logical container for managing and billing related resources together — it can hold resources from multiple regions, as this scenario does. It isn't restricted to one region, there's no rule requiring paired-region resources to sit in separate groups, and using a shared ARM template isn't a precondition for this being valid.",
+        'explanation': "A resource group is a logical container for managing related resources together (it is a management boundary, not a billing boundary) — it can hold resources from multiple regions, as this scenario does. It isn't restricted to one region, there's no rule requiring paired-region resources to sit in separate groups, and using a shared ARM template isn't a precondition for this being valid.",
     },
     {
         'id': 'q70',
@@ -1798,7 +1798,7 @@ QUESTIONS = [
             'Both lists came from Microsoft Defender for Cloud, which also gives cost-saving recommendations',
         ],
         'correct': 0,
-        'explanation': "Advisor spans cost, reliability, performance, and security together — resizing for cost savings and an MFA gap are exactly the kind of two different pillars Advisor mixes into one recommendation list. Defender for Cloud is security-specific and wouldn't surface a cost recommendation at all — its list (just-in-time access, image vulnerabilities) has no cost content, which is the tell. The other two options either merge two genuinely separate tools into one, or hand Defender for Cloud a cost-recommendation role it doesn't have.",
+        'explanation': "Advisor spans cost, reliability, performance, operational excellence, and security together — resizing for cost savings and an MFA gap are exactly the kind of two different pillars Advisor mixes into one recommendation list. Defender for Cloud is security-specific and wouldn't surface a cost recommendation at all — its list (just-in-time access, image vulnerabilities) has no cost content, which is the tell. The other two options either merge two genuinely separate tools into one, or hand Defender for Cloud a cost-recommendation role it doesn't have.",
     },
 ]
 

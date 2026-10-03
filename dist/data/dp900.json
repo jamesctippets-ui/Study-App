@@ -948,12 +948,12 @@
       "question": "A development team already builds their application using MongoDB drivers and wants to move to a managed Azure database without rewriting their data access code. Which Cosmos DB API fits?",
       "options": [
         "The API for MongoDB",
-        "The NoSQL (Core) API",
-        "The Gremlin API",
-        "The Table API"
+        "The API for NoSQL (formerly Core (SQL))",
+        "The API for Apache Gremlin",
+        "The API for Table"
       ],
       "correct": 0,
-      "explanation": "The API for MongoDB lets an application built against MongoDB drivers connect to Cosmos DB with minimal code changes. The NoSQL (Core) API uses Cosmos DB's native document model instead, the Gremlin API is for graph data, and the Table API is for simple key-value data \u2014 none of those preserve existing MongoDB driver code."
+      "explanation": "The API for MongoDB lets an application built against MongoDB drivers connect to Cosmos DB with minimal code changes. The API for NoSQL (formerly the Core (SQL) API) uses Cosmos DB's native document model instead, the API for Apache Gremlin is for graph data, and the API for Table is for simple key-value data \u2014 none of those preserve existing MongoDB driver code."
     },
     {
       "id": "q18",
@@ -1300,7 +1300,7 @@
       "question": "A Cosmos DB container with provisioned throughput costs more than expected, and the team wants to lower the Request Units consumed without changing the data itself. Which change most directly reduces RU consumption per operation?",
       "options": [
         "Replacing cross-partition queries with point reads by id and partition key",
-        "Switching the account from the NoSQL API to the Table API",
+        "Switching the account from the API for NoSQL to the API for Table",
         "Combining several small items into one larger document",
         "Raising the default consistency level to Strong"
       ],
@@ -1325,7 +1325,7 @@
       "id": "q37",
       "cat": "analytics",
       "type": "mc",
-      "question": "An operations lead wants a single screen showing a revenue tile from the Finance report and a ticket-volume tile from the Support report, which use different datasets, for at-a-glance monitoring. Which Power BI item should be created?",
+      "question": "An operations lead wants a single screen showing a revenue tile from the Finance report and a ticket-volume tile from the Support report, which use different datasets (semantic models), for at-a-glance monitoring. Which Power BI item should be created?",
       "options": [
         "A dashboard",
         "A report",
@@ -1333,7 +1333,7 @@
         "A dataflow"
       ],
       "correct": 0,
-      "explanation": "A dashboard is a single page of tiles pinned from one or more reports, and because it pins visuals rather than binding to a model it can combine tiles from different datasets. A report is the near miss: it can have many pages, but every page is built on one dataset, so it cannot natively mix Finance and Support data. A dataset is the model a report queries, and a dataflow is reusable Power Query preparation logic upstream of datasets."
+      "explanation": "A dashboard is a single page of tiles pinned from one or more reports, and because it pins visuals rather than binding to a model it can combine tiles from different datasets. A report is the near miss: it can have many pages, but every page is built on one dataset, so it cannot natively mix Finance and Support data. A dataset (now called a semantic model) is the model a report queries, and a dataflow is reusable Power Query preparation logic upstream of datasets."
     },
     {
       "id": "tf16",
@@ -1463,7 +1463,7 @@
         "The Basic tier with manual sharding"
       ],
       "correct": 2,
-      "explanation": "Hyperscale supports databases up to 100 TB with rapid storage scaling and restore times that stay fast regardless of database size, matching both stated needs. Standard and General Purpose both have much lower practical size ceilings and restore times that grow with database size, and the Basic tier is meant for small, light workloads, not multi-terabyte growth."
+      "explanation": "Hyperscale supports databases up to 128 TB with rapid storage scaling and restore times that stay fast regardless of database size, matching both stated needs. Standard and General Purpose both have much lower practical size ceilings and restore times that grow with database size, and the Basic tier is meant for small, light workloads, not multi-terabyte growth."
     },
     {
       "id": "q43",
@@ -1471,13 +1471,13 @@
       "type": "mc",
       "question": "Which Cosmos DB API would you choose to model and query highly connected data, like a social network's friend-of-a-friend relationships?",
       "options": [
-        "The Gremlin API",
-        "The Table API",
+        "The API for Apache Gremlin",
+        "The API for Table",
         "The API for MongoDB",
-        "The NoSQL (Core) API"
+        "The API for NoSQL (formerly Core (SQL))"
       ],
       "correct": 0,
-      "explanation": "The Gremlin API is Cosmos DB's graph engine, purpose-built for modeling entities and the relationships between them, like a social graph. The Table API handles simple key-value data, the API for MongoDB targets document workloads built on MongoDB drivers, and the NoSQL (Core) API is Cosmos DB's native document model \u2014 none of the other three is optimized for traversing relationships the way a graph database is."
+      "explanation": "The API for Apache Gremlin (often called the Gremlin API) is Cosmos DB's graph engine, purpose-built for modeling entities and the relationships between them, like a social graph. The API for Table handles simple key-value data, the API for MongoDB targets document workloads built on MongoDB drivers, and the API for NoSQL (formerly Core (SQL)) is Cosmos DB's native document model \u2014 none of the other three is optimized for traversing relationships the way a graph database is."
     },
     {
       "id": "q44",
@@ -1486,7 +1486,7 @@
       "question": "An application currently uses Azure Table Storage for simple key-value data but now needs richer querying, automatic indexing of every property, and global distribution with low-latency reads close to users worldwide. Which service should it move to?",
       "options": [
         "Azure Blob Storage",
-        "Azure Cosmos DB (NoSQL API)",
+        "Azure Cosmos DB (API for NoSQL)",
         "A larger Azure Table Storage account",
         "Azure Files"
       ],
@@ -1668,7 +1668,7 @@
         "Azure Blob Storage in the Hot tier"
       ],
       "correct": 0,
-      "explanation": "Session state is small, short-lived, and read constantly, which is the in-memory caching pattern Azure Cache for Redis is built for, with sub-millisecond key lookups. Table Storage is also a cheap key-value store, but it is disk-based and typically responds in milliseconds, not sub-millisecond. Cosmos DB adds durability, global distribution, and RU-based cost the scenario does not need, and Blob Storage is object storage for files rather than a key-value lookup service."
+      "explanation": "Session state is small, short-lived, and read constantly, which is the in-memory caching pattern Azure Cache for Redis is built for, with sub-millisecond key lookups. Table Storage is also a cheap key-value store, but it is disk-based and typically responds in milliseconds, not sub-millisecond. Cosmos DB adds durability, global distribution, and RU-based cost the scenario does not need, and Blob Storage is object storage for files rather than a key-value lookup service. (Azure Cache for Redis is being retired in favor of Azure Managed Redis, but the in-memory caching pattern is unchanged.)"
     },
     {
       "id": "q53",
@@ -1710,7 +1710,7 @@
       "id": "q55",
       "cat": "analytics",
       "type": "mc",
-      "question": "A BI team wants to define one shared set of Power Query data-cleaning steps just once, so several different Power BI reports and datasets can all reuse the same cleaned-up data instead of repeating the same transformations in every report. Which Power BI concept fits?",
+      "question": "A BI team wants to define one shared set of Power Query data-cleaning steps just once, so several different Power BI reports and datasets (semantic models) can all reuse the same cleaned-up data instead of repeating the same transformations in every report. Which Power BI concept fits?",
       "options": [
         "A dataflow",
         "A dashboard",
@@ -1726,7 +1726,7 @@
       "type": "ms",
       "question": "Which of the following statements about Power BI reports and dashboards are true? (Select all that apply)",
       "options": [
-        "A report can span multiple pages of interactive visualizations built against one dataset",
+        "A report can span multiple pages of interactive visualizations built against one dataset (semantic model)",
         "A dashboard is typically a single page of tiles pinned from one or more reports",
         "A dashboard can display tiles sourced from more than one underlying dataset",
         "A dashboard is authored in Power BI Desktop and then published to the Power BI service"
@@ -1736,7 +1736,7 @@
         1,
         2
       ],
-      "explanation": "A report is multi-page and bound to one dataset, while a dashboard is a single page of pinned tiles that can draw on several reports and datasets. The near miss is the claim that dashboards are authored in Power BI Desktop: it describes how reports are made. Dashboards exist only in the Power BI service, where tiles are pinned from published reports; Power BI Desktop authors reports, not dashboards."
+      "explanation": "A report is multi-page and bound to one dataset (now called a semantic model), while a dashboard is a single page of pinned tiles that can draw on several reports and datasets. The near miss is the claim that dashboards are authored in Power BI Desktop: it describes how reports are made. Dashboards exist only in the Power BI service, where tiles are pinned from published reports; Power BI Desktop authors reports, not dashboards."
     },
     {
       "id": "q56",
@@ -1951,7 +1951,7 @@
         "Dynamic Data Masking"
       ],
       "correct": 0,
-      "explanation": "Azure Synapse Link connects an operational store like Cosmos DB directly to Synapse Analytics for near real-time analytics, with no separate ETL pipeline required. A nightly-loaded dedicated SQL pool and a weekly Data Factory pipeline both introduce a scheduled delay, and Dynamic Data Masking is an Azure SQL Database security feature unrelated to analytical connectivity."
+      "explanation": "Azure Synapse Link connects an operational store like Cosmos DB directly to Synapse Analytics for near real-time analytics, with no separate ETL pipeline required (for new work, mirroring into Microsoft Fabric is the recommended successor approach). A nightly-loaded dedicated SQL pool and a weekly Data Factory pipeline both introduce a scheduled delay, and Dynamic Data Masking is an Azure SQL Database security feature unrelated to analytical connectivity."
     },
     {
       "id": "q65",
@@ -2403,7 +2403,7 @@
           "correct": 0
         }
       ],
-      "explanation": "Azure Cosmos DB is Azure's globally distributed, multi-model NoSQL database, built for low single-digit-millisecond latency at scale with tunable consistency levels \u2014 a strong fit for a global leaderboard. Azure Cache for Redis is an in-memory key-value store purpose-built for sub-millisecond caching scenarios like session tokens, not a general-purpose persistent database."
+      "explanation": "Azure Cosmos DB is Azure's globally distributed, multi-model NoSQL database, built for low single-digit-millisecond latency at scale with tunable consistency levels \u2014 a strong fit for a global leaderboard. Azure Cache for Redis is an in-memory key-value store purpose-built for sub-millisecond caching scenarios like session tokens, not a general-purpose persistent database. (Azure Cache for Redis is being retired in favor of Azure Managed Redis; the in-memory caching concept is unchanged.)"
     },
     {
       "id": "ml-dp900-5",
