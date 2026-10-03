@@ -3,7 +3,7 @@
     {
       "key": "coreData",
       "label": "Core Data Concepts",
-      "marks": 28,
+      "marks": 29,
       "resources": [
         {
           "label": "Microsoft Learn: Explore core data concepts",
@@ -36,7 +36,7 @@
     {
       "key": "analytics",
       "label": "Analytics Workloads on Azure",
-      "marks": 31,
+      "marks": 30,
       "resources": [
         {
           "label": "Microsoft Learn: Explore data analytics in Azure",
@@ -183,7 +183,7 @@
       "id": "f20",
       "cat": "nonRelational",
       "front": "Azure Cosmos DB APIs",
-      "back": "Cosmos DB supports multiple APIs over the same underlying engine: the NoSQL (Core) API for JSON documents, the API for MongoDB, the API for Cassandra (column-family), the Gremlin API (graph data), and the Table API (key-value).",
+      "back": "Cosmos DB supports multiple APIs over the same underlying engine: the API for NoSQL (the native API, formerly called the Core (SQL) API) for JSON documents, the API for MongoDB, the API for Apache Cassandra (column-family), the API for Apache Gremlin (graph data), and the API for Table (key-value).",
       "detail": "Picking the right API usually comes down to what your application or existing skill set already uses \u2014 the MongoDB API for teams already using MongoDB drivers, Gremlin for graph and relationship-heavy data, and so on."
     },
     {
@@ -240,7 +240,7 @@
       "cat": "analytics",
       "front": "Azure Synapse Analytics",
       "back": "A unified analytics service combining big data and data warehousing, offering serverless and dedicated SQL pools for querying data, along with built-in Apache Spark pools, in a single workspace.",
-      "detail": "Synapse is the answer whenever a scenario wants one platform that spans data warehousing, big data (Spark), and pipeline orchestration together."
+      "detail": "Synapse is the answer whenever a scenario wants one platform that spans data warehousing, big data (Spark), and pipeline orchestration together. It remains supported, though Microsoft now positions Microsoft Fabric as the recommended platform for new analytics projects."
     },
     {
       "id": "f29",
@@ -289,21 +289,21 @@
       "cat": "relational",
       "front": "Indexes",
       "back": "A separate data structure that lets a database find rows matching a query without scanning every row in a table, at the cost of extra storage and slightly slower writes since the index itself must also be updated.",
-      "detail": "A primary key vs. foreign key column is commonly indexed automatically, since it\u2019s exactly the kind of column queries filter and join on most often."
+      "detail": "A primary key column is indexed automatically, and foreign key columns are often worth indexing too, since they are exactly the kind of columns queries filter and join on most often."
     },
     {
       "id": "f36",
       "cat": "analytics",
       "front": "Data lakehouse",
       "back": "An architecture combining a data lake\u2019s low-cost, flexible storage for any file type with a data warehouse\u2019s structured, query-optimized layer on top \u2014 one platform for both raw and curated data instead of maintaining two separate systems.",
-      "detail": "Microsoft Fabric is built around exactly this lakehouse pattern, unifying what used to be separate lake and warehouse services described under database vs. data warehouse vs. data lake into one workspace."
+      "detail": "Microsoft Fabric is built around exactly this lakehouse pattern, unifying what used to be a separate data lake and a separate data warehouse into one workspace."
     },
     {
       "id": "f37",
       "cat": "analytics",
       "front": "Fact table vs. dimension table",
       "back": "A fact table stores the numeric, measurable events at the center of a star schema \u2014 like a sales amount or a quantity sold. Dimension tables store the descriptive context around those facts \u2014 product, customer, date \u2014 used to filter and group them.",
-      "detail": "This is exactly the split inside Data warehouse and star schema \u2014 the fact table is what you aggregate; the dimension tables are what you slice and filter by."
+      "detail": "This is exactly the split at the heart of a star schema \u2014 the fact table is what you aggregate; the dimension tables are what you slice and filter by."
     },
     {
       "id": "f38",
@@ -317,13 +317,13 @@
       "cat": "coreData",
       "front": "Data governance",
       "back": "The overall practice of managing data quality, access, ownership, and compliance across an organization \u2014 deciding who can see what data, ensuring it stays accurate, and tracking where it came from.",
-      "detail": "Data professional roles like a data steward or data owner exist specifically to carry out data governance responsibilities day to day, rather than governance being an abstract policy with no one actually responsible for it."
+      "detail": "Roles like a data steward or data owner exist specifically to carry out data governance responsibilities day to day, rather than governance being an abstract policy with no one actually responsible for it."
     },
     {
       "id": "f40",
       "cat": "relational",
       "front": "Denormalization",
-      "back": "Deliberately reintroducing redundancy into a table, the opposite of Normalization, to reduce the number of joins a read-heavy reporting query needs, at the cost of extra storage and more places to update when the data changes.",
+      "back": "Deliberately reintroducing redundancy into a table, the opposite of normalization, to reduce the number of joins a read-heavy reporting query needs, at the cost of extra storage and more places to update when the data changes.",
       "detail": "A data warehouse's star schema is itself a denormalized design on purpose \u2014 fact and dimension tables are shaped for fast aggregation, not for eliminating redundancy the way a normalized OLTP schema is."
     },
     {
@@ -337,7 +337,7 @@
       "id": "f42",
       "cat": "coreData",
       "front": "Microsoft Purview",
-      "back": "Microsoft's unified data governance service for discovering, cataloging, classifying, and tracking the lineage of data across an organization's estate \u2014 the concrete Azure tool that puts Data governance into practice rather than leaving it as policy alone.",
+      "back": "Microsoft's unified data governance service for discovering, cataloging, classifying, and tracking the lineage of data across an organization's estate \u2014 the concrete Azure tool that puts data governance into practice rather than leaving it as policy alone.",
       "detail": "A data map that shows which sensitive columns live in which database, and where that data flowed from, is a Purview capability, not something a database engine tracks on its own."
     },
     {
@@ -351,14 +351,14 @@
       "id": "f44",
       "cat": "coreData",
       "front": "Data Scientist",
-      "back": "A data professional role focused on building, training, and evaluating machine learning and statistical models from data to generate predictions or insights \u2014 distinct from the reporting focus of a Data Analyst and the day-to-day upkeep handled by a Database Administrator, as covered under Data professional roles.",
+      "back": "A data professional role focused on building, training, and evaluating machine learning and statistical models from data to generate predictions or insights \u2014 distinct from the reporting focus of a Data Analyst and the day-to-day upkeep handled by a Database Administrator.",
       "detail": "If a scenario is about training a model to predict an outcome, that's a Data Scientist; if it's about a dashboard, that's still a Data Analyst."
     },
     {
       "id": "f45",
       "cat": "coreData",
       "front": "Schema-on-write vs. schema-on-read",
-      "back": "Schema-on-write validates and applies a fixed schema before data is ever stored, the approach a relational database takes. Schema-on-read stores data as-is and applies structure only when it's later queried, the approach a data lake uses so raw files of any shape can land first and get modeled afterward, as described under Database vs. data warehouse vs. data lake.",
+      "back": "Schema-on-write validates and applies a fixed schema before data is ever stored, the approach a relational database takes. Schema-on-read stores data as-is and applies structure only when it's later queried, the approach a data lake uses so raw files of any shape can land first and get modeled afterward.",
       "detail": "A scenario that says structure isn't known until the data is actually read is describing schema-on-read, not a database rejecting badly-formed rows on the way in."
     },
     {
@@ -372,21 +372,21 @@
       "id": "f47",
       "cat": "coreData",
       "front": "Data ingestion",
-      "back": "The process of collecting and importing data from one or more source systems into a storage or processing system \u2014 the first step before it can be transformed or analyzed, whether it arrives all at once or continuously, as described under Batch vs. streaming (real-time) processing.",
+      "back": "The process of collecting and importing data from one or more source systems into a storage or processing system \u2014 the first step before it can be transformed or analyzed, whether it arrives all at once in batches or continuously as a stream.",
       "detail": "A nightly file drop into a data lake and a live event feed into a streaming pipeline are both data ingestion \u2014 they just differ in which of the two processing patterns they use."
     },
     {
       "id": "f48",
       "cat": "relational",
       "front": "Elastic pool",
-      "back": "A shared pool of compute and storage resources that multiple Azure SQL databases draw from together, letting databases with unpredictable, non-simultaneous usage spikes share capacity instead of each being sized and billed for its own worst case, as an option under DTU vs. vCore purchasing models.",
+      "back": "A shared pool of compute and storage resources that multiple Azure SQL databases draw from together, letting databases with unpredictable, non-simultaneous usage spikes share capacity instead of each being sized and billed for its own worst case. Elastic pools are available under both the DTU and vCore purchasing models.",
       "detail": "Dozens of small databases that each only spike occasionally, and rarely all at once, is the classic signal pointing at an elastic pool instead of provisioning every database for its own peak."
     },
     {
       "id": "f49",
       "cat": "relational",
       "front": "Hyperscale service tier",
-      "back": "A vCore-based Azure SQL Database service tier built for very large or fast-growing databases, supporting rapid storage auto-scaling up to 100 TB with backup and restore times that stay fast regardless of database size, unlike the lower size ceilings of the Standard or General Purpose tiers.",
+      "back": "A vCore-based Azure SQL Database service tier built for very large or fast-growing databases, supporting rapid storage auto-scaling up to 128 TB with backup and restore times that stay fast regardless of database size, unlike the lower size ceilings of the Standard or General Purpose tiers.",
       "detail": "A scenario emphasizing multi-terabyte growth alongside fast restores no matter the size is describing Hyperscale, not just a larger General Purpose database."
     },
     {
@@ -400,7 +400,7 @@
       "id": "f51",
       "cat": "nonRelational",
       "front": "Partition key",
-      "back": "The property chosen on each item in an Azure Cosmos DB container that determines which physical partition it's stored in, spreading a container's data and throughput across many nodes \u2014 the concrete mechanism behind Sharding (horizontal partitioning) in Cosmos DB specifically.",
+      "back": "The property chosen on each item in an Azure Cosmos DB container that determines which physical partition it's stored in, spreading a container's data and throughput across many nodes \u2014 the concrete mechanism Cosmos DB uses to implement sharding, or horizontal partitioning.",
       "detail": "A partition key with only a few distinct values concentrates most items onto the same few partitions, defeating the point of choosing one at all."
     },
     {
@@ -408,7 +408,7 @@
       "cat": "nonRelational",
       "front": "Azure Cache for Redis",
       "back": "A fully managed, in-memory key-value store built for sub-millisecond caching and session-state lookups, meant to take repeated load off a backend database rather than serve as a durable, long-term primary store the way Azure Cosmos DB or Azure Table Storage does.",
-      "detail": "Whenever a scenario needs the fastest possible repeated read of the same small piece of data, like a session token, and doesn't need it to persist long-term, this is the answer over a full database service."
+      "detail": "Whenever a scenario needs the fastest possible repeated read of the same small piece of data, like a session token, and doesn't need it to persist long-term, this is the answer over a full database service. Microsoft has announced that Azure Cache for Redis is being retired in favor of Azure Managed Redis, but the in-memory caching concept being tested is unchanged."
     },
     {
       "id": "f53",
@@ -435,14 +435,14 @@
       "id": "f56",
       "cat": "analytics",
       "front": "Power BI dataset and dataflow",
-      "back": "A dataset is the data model a Power BI report queries, built from one or more connected sources. A dataflow is a reusable set of data preparation logic, built with Power Query, that can feed multiple datasets so the same cleanup steps aren't rebuilt inside every individual report.",
-      "detail": "A dataflow sits upstream of a dataset \u2014 it's where shared transformation logic lives once, instead of being copy-pasted into every report that needs it."
+      "back": "A dataset (now officially called a semantic model) is the data model a Power BI report queries, built from one or more connected sources. A dataflow is a reusable set of data preparation logic, built with Power Query, that can feed multiple datasets so the same cleanup steps aren't rebuilt inside every individual report.",
+      "detail": "A dataflow sits upstream of a dataset (semantic model) \u2014 it's where shared transformation logic lives once, instead of being copy-pasted into every report that needs it."
     },
     {
       "id": "f57",
       "cat": "analytics",
       "front": "Power BI report vs. dashboard",
-      "back": "A report is a multi-page set of interactive visualizations built against one dataset. A dashboard is a single page of tiles pinned from one or more reports, often from different datasets entirely, built for at-a-glance monitoring rather than the deeper exploration a report supports.",
+      "back": "A report is a multi-page set of interactive visualizations built against one dataset (semantic model). A dashboard is a single page of tiles pinned from one or more reports, often from different datasets entirely, built for at-a-glance monitoring rather than the deeper exploration a report supports.",
       "detail": "A dashboard can mix tiles pinned from several different reports; a report itself is always tied to just the one dataset behind it."
     },
     {
@@ -519,7 +519,7 @@
       "id": "f68",
       "cat": "nonRelational",
       "front": "Blob Storage lifecycle management",
-      "back": "Rule-based policies that automatically move blobs between access tiers, like Hot to Cool to Archive, or delete them outright, based on conditions like how long it's been since a blob was last modified or accessed \u2014 carrying out a Data retention policy without manual intervention.",
+      "back": "Rule-based policies that automatically move blobs between access tiers, like Hot to Cool to Archive, or delete them outright, based on conditions like how long it's been since a blob was last modified or accessed \u2014 carrying out a data retention policy without manual intervention.",
       "detail": "Rules like this are what actually save money from access tiers in practice \u2014 few teams manually re-tier files one by one as they age."
     },
     {
@@ -533,7 +533,7 @@
       "id": "f70",
       "cat": "analytics",
       "front": "Azure Synapse Link",
-      "back": "A capability that connects an operational store, like Azure Cosmos DB or Azure SQL Database, directly to Azure Synapse Analytics for near real-time analytics over operational data, without building or running a separate ETL pipeline to copy the data first.",
+      "back": "A capability that connects an operational store, like Azure Cosmos DB or Azure SQL Database, directly to Azure Synapse Analytics for near real-time analytics over operational data, without building or running a separate ETL pipeline to copy the data first. For new work, Microsoft now recommends mirroring into Microsoft Fabric as the successor approach to Synapse Link.",
       "detail": "This is hybrid transactional/analytical processing (HTAP) in practice \u2014 analytical queries run against a near real-time copy of operational data, instead of waiting on a nightly batch pipeline to catch up."
     },
     {
@@ -548,7 +548,7 @@
       "cat": "analytics",
       "front": "PolyBase and external tables",
       "back": "A feature of Azure Synapse Analytics dedicated SQL pools that lets T-SQL queries read data sitting in external storage, like files in a data lake, through an external table, without first loading or copying that data into the data warehouse.",
-      "detail": "This is what lets a Serverless SQL pool vs. dedicated SQL pool-style warehouse query raw data lake files directly, rather than requiring a full load step before any SQL can touch them."
+      "detail": "This is what lets a warehouse query raw data lake files directly, rather than requiring a full load step before any SQL can touch them."
     },
     {
       "id": "f73",
@@ -2108,14 +2108,14 @@
         "q21",
         "msq4"
       ],
-      "reading": "Azure Cosmos DB is Microsoft's flagship non-relational database: globally distributed, built for low-latency access at massive scale, with multiple tunable consistency levels. Rather than locking you into one data model, Cosmos DB exposes that same distributed engine through several APIs: the NoSQL (Core) API for JSON documents, the API for MongoDB for teams already using MongoDB drivers, the Gremlin API for graph data \u2014 nodes and the relationships between them \u2014 and the Table API for simple key-value data. Picking the right API is usually less about raw capability and more about what an application or team's existing skills already expect.\n\nAzure Table Storage is a simpler, cheaper key-value store for the same shape of data the Table API models, accessed by a partition key and a row key, without Cosmos DB's global distribution or guaranteed low-latency SLAs. Azure Blob Storage instead holds large amounts of unstructured data \u2014 images, video, log files, backups \u2014 organized into containers, with access tiers to balance storage cost against how quickly the data needs to come back. Azure Files rounds this out with fully managed file shares reachable over the standard SMB or NFS protocols, so it can be mounted like a traditional network drive rather than accessed through an application's storage API.\n\nAzure Data Lake Storage Gen2 builds on top of Blob Storage by adding a hierarchical namespace \u2014 real directories and folders instead of just a flat list of objects \u2014 plus fine-grained permissions on those folders, purpose-built for large-scale big data analytics rather than for general-purpose object storage alone.",
+      "reading": "Azure Cosmos DB is Microsoft's flagship non-relational database: globally distributed, built for low-latency access at massive scale, with multiple tunable consistency levels. Rather than locking you into one data model, Cosmos DB exposes that same distributed engine through several APIs: the API for NoSQL (formerly the Core (SQL) API) for JSON documents, the API for MongoDB for teams already using MongoDB drivers, the API for Apache Gremlin for graph data \u2014 nodes and the relationships between them \u2014 and the API for Table for simple key-value data. Picking the right API is usually less about raw capability and more about what an application or team's existing skills already expect.\n\nAzure Table Storage is a simpler, cheaper key-value store for the same shape of data the Table API models, accessed by a partition key and a row key, without Cosmos DB's global distribution or guaranteed low-latency SLAs. Azure Blob Storage instead holds large amounts of unstructured data \u2014 images, video, log files, backups \u2014 organized into containers, with access tiers to balance storage cost against how quickly the data needs to come back. Azure Files rounds this out with fully managed file shares reachable over the standard SMB or NFS protocols, so it can be mounted like a traditional network drive rather than accessed through an application's storage API.\n\nAzure Data Lake Storage Gen2 builds on top of Blob Storage by adding a hierarchical namespace \u2014 real directories and folders instead of just a flat list of objects \u2014 plus fine-grained permissions on those folders, purpose-built for large-scale big data analytics rather than for general-purpose object storage alone.",
       "fundamentalsLabel": "New to non-relational storage? See the everyday analogy",
       "fundamentals": "Picture a warehouse with different storage systems for different kinds of stuff. Blob Storage is like a shelf of labeled boxes for big miscellaneous items \u2014 you know the box, you grab it, you don't care what's inside until you open it. Table Storage is like a card catalog: fast lookup by a specific reference number, good for lots of small structured entries. Azure Files is like a shared filing cabinet everyone in the office can open the same way they always have. Cosmos DB is like having copies of that whole warehouse in several cities at once, so whichever one is closest to you responds instantly.",
       "keyTerms": [
         "Azure Cosmos DB",
         "API for MongoDB",
-        "Gremlin API",
-        "Table API",
+        "API for Apache Gremlin",
+        "API for Table",
         "Azure Table Storage",
         "Azure Blob Storage",
         "Azure Files",
@@ -2221,7 +2221,7 @@
     {
       "heading": "Exam-day strategy",
       "points": [
-        "You have 45 minutes for 50 questions \u2014 about 0.9 minutes each on average. Budget more time for multi-part scenario questions and less for straight recall, rather than pacing every question identically.",
+        "The exam is typically around 40\u201360 questions in roughly 45 minutes of testing time (the exact count varies), so you have about a minute per question on average. Budget more time for multi-part scenario questions and less for straight recall, rather than pacing every question identically.",
         "Real scoring isn't a flat percentage of questions right (some count for more than others) \u2014 treat 75%+ as a safe buffer to aim for, not an exact threshold to just clear.",
         "Flag anything you're unsure of and move on rather than stalling \u2014 a question later in the exam can sometimes jog a detail you needed earlier, and you get partial credit for nothing by running out of time on one question.",
         "On multi-select ('choose N') questions, eliminate the options you're confident are wrong first; guessing among 2 plausible answers beats guessing among 4.",
