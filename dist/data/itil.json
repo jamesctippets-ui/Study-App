@@ -1688,7 +1688,7 @@
         "Neither counts as digital since a human is involved in onboarding"
       ],
       "correct": 2,
-      "explanation": "The platform itself, existing primarily in digital form, is the digital product. The value co-created through using it, including the onboarding and support that helps a client actually get outcomes from it, is the digital service. The first option simply swaps the two, and involving a human in support doesn't make something non-digital."
+      "explanation": "The platform itself, existing primarily in digital form, is the digital product. The value co-created through using it, including the onboarding and support that helps a client actually get outcomes from it, is the digital service. Calling the platform the service and onboarding the product simply swaps the two, and involving a human in support doesn't make something non-digital."
     },
     {
       "id": "q68",

@@ -706,129 +706,129 @@
       "id": "q1",
       "cat": "tenantConfig",
       "type": "mc",
-      "question": "An admin adds a custom domain to a Microsoft 365 tenant. What must be published at the DNS host before Microsoft 365 will mark the domain as verified?",
+      "question": "Contoso adds contoso.com to its Microsoft 365 tenant. The DNS zone already contains an MX record pointing to the current third-party mail provider, an SPF record, and an Autodiscover CNAME. The domain still shows as unverified, and mail flow must not be disrupted during verification. What should you do?",
       "options": [
-        "A CNAME record pointing to autodiscover.outlook.com",
-        "An SPF TXT record listing all approved senders",
-        "An MX record pointing to the Exchange Online mail servers",
-        "A unique TXT record value provided by Microsoft 365"
+        "Add the TXT record value that Microsoft 365 generated for the domain",
+        "Change the MX record to point to the Exchange Online mail servers",
+        "Update the SPF record to include spf.protection.outlook.com",
+        "Point the Autodiscover CNAME at autodiscover.outlook.com"
       ],
-      "correct": 3,
-      "explanation": "Domain verification is completed by publishing the specific TXT record value Microsoft 365 generates for that domain. MX, Autodiscover CNAME, and SPF records matter for mail flow and authentication, but they are configured after (and separately from) ownership verification."
+      "correct": 0,
+      "explanation": "Ownership is proven only by the unique TXT verification value Microsoft 365 issues for that domain; publishing it has no effect on mail routing, so the current provider keeps working. Changing the MX record would cut mail over to Exchange Online before mailboxes exist there, which is the disruption the scenario rules out. Updating SPF and repointing Autodiscover are post-verification setup steps for sending and client configuration; neither proves ownership, so the domain would remain unverified."
     },
     {
       "id": "q2",
       "cat": "tenantConfig",
       "type": "mc",
-      "question": "A company wants every member of its \"Sales\" Microsoft Entra security group to automatically receive a Microsoft 365 E3 license, including new hires added to the group in the future, without manual per-user assignment. What should the admin configure?",
+      "question": "Contoso's HR system sets the department attribute on every new Microsoft Entra user. All users in the Sales department must receive a Microsoft 365 E3 license on their first day, and license assignment must require no per-hire action by IT. Which should you configure?",
       "options": [
-        "Group-based licensing on the Sales security group",
-        "A conditional access policy scoped to the Sales group",
-        "A shared mailbox delegated to the Sales group",
-        "A dynamic distribution group for Sales"
+        "A dynamic security group with a department membership rule, with the license assigned to the group",
+        "An assigned security group with the license assigned to the group, with HR adding new hires to it",
+        "A dynamic distribution group for the Sales department, with the license assigned to the group",
+        "A scheduled PowerShell script that assigns the license to any user whose department is Sales"
       ],
       "correct": 0,
-      "explanation": "Group-based licensing assigns a license to a group so that current and future members automatically inherit it, exactly matching the requirement. A dynamic distribution group only affects mail routing, not licensing, and Conditional Access does not assign licenses at all."
+      "explanation": "Group-based licensing on a dynamic security group means membership recalculates from the department attribute HR already populates, so the license follows automatically with no per-hire step. An assigned group still needs someone to add each new hire, which is exactly the manual action to avoid. A dynamic distribution group is an Exchange Online object, not a Microsoft Entra security group, so it cannot carry a license assignment. A scheduled script works but is custom code to maintain and runs on a delay, so it is more effort than the native feature."
     },
     {
       "id": "q3",
       "cat": "tenantConfig",
       "type": "mc",
-      "question": "An organization wants everyone in its Microsoft 365 E5 license to keep every service except Yammer, which should be disabled tenant-wide. What is the most efficient way to accomplish this?",
+      "question": "Finance users receive Microsoft 365 E5 through group-based licensing on the Finance security group. Compliance requires that Finance users not use Viva Engage, while every other department keeps it. You need to meet the requirement with the least administrative effort. What should you do?",
       "options": [
-        "Remove the Microsoft 365 E5 license from every user and reassign a custom SKU",
-        "Create a Conditional Access policy that blocks the Yammer cloud app",
-        "Delete the Yammer application registration from Microsoft Entra ID",
-        "Disable the Yammer service plan within the existing Microsoft 365 E5 license assignment"
+        "Disable the Viva Engage service plan on the Finance group's license assignment",
+        "Create a Conditional Access policy that blocks Viva Engage for the Finance group",
+        "Disable the Viva Engage service plan directly on each Finance user's account",
+        "Replace the group's Microsoft 365 E5 assignment with Office 365 E3 plus the missing add-ons"
       ],
-      "correct": 3,
-      "explanation": "Individual service plans within a license can be disabled without touching the rest of the bundle, which is exactly what is needed here. Removing and reassigning the whole license is unnecessary churn, and a Conditional Access block is a workaround, not a licensing control."
+      "correct": 0,
+      "explanation": "Service plans can be toggled per license assignment, so turning off Viva Engage on the Finance group's assignment removes it for every current and future member in one change while leaving other departments untouched. A Conditional Access block is an access workaround, not a licensing change, and leaves the users licensed for a service they are forbidden to use. Disabling the plan per user is repeated effort, and because the group assignment still enables the plan, a direct per-user disable does not take effect while the group grants it. Swapping SKUs is unnecessary churn and does not reproduce E5."
     },
     {
       "id": "q4",
       "cat": "tenantConfig",
       "type": "mc",
-      "question": "A Microsoft partner needs to support a customer tenant but should only be granted the specific, time-bound Microsoft Entra roles required for that engagement, not broad standing access. Which delegated administration model satisfies this requirement?",
+      "question": "Contoso buys licenses through a Cloud Solution Provider partner. The partner must manage Exchange Online for the next 90 days. Contoso requires least privilege and does not want partner accounts created in its own directory. What should you do?",
       "options": [
-        "Classic Delegated Admin Privileges (DAP)",
-        "A shared partner service account with Owner rights",
-        "A permanent Global Administrator guest account",
-        "Granular Delegated Admin Privileges (GDAP)"
+        "Approve a granular delegated admin privileges relationship scoped to the Exchange Administrator role with a 90-day duration",
+        "Create a guest account for each partner engineer and make it eligible for Exchange Administrator in Privileged Identity Management",
+        "Accept a classic delegated admin privileges relationship and ask the partner to remove it after 90 days",
+        "Assign the partner a custom Microsoft Entra role that contains only Exchange permissions, scoped to an administrative unit"
       ],
-      "correct": 3,
-      "explanation": "GDAP was designed specifically to grant least-privilege, time-bound role access to partners instead of the broad, non-expiring Admin Agent access that classic DAP granted. A shared account or standing Global Administrator guest access is exactly the over-privileged pattern GDAP replaces."
+      "correct": 0,
+      "explanation": "GDAP lets Contoso approve exactly the roles requested, for a set duration, and partner engineers use their own partner-tenant identities, so nothing is created in Contoso's directory. Guest accounts with PIM would achieve least privilege but create accounts in Contoso's tenant that must then be managed and removed. Classic DAP grants broad Admin Agent access with no expiration and relies on the partner to clean up. A custom Microsoft Entra role still has to be assigned to an identity inside Contoso's directory, and custom Entra roles cover directory permissions, not Exchange Online administration."
     },
     {
       "id": "q5",
       "cat": "tenantConfig",
       "type": "mc",
-      "question": "A regulated organization wants Microsoft 365 Apps feature updates delivered only twice a year, after the longest possible internal validation window. Which update channel should managed devices be moved to?",
+      "question": "Contoso manages Microsoft 365 Apps with Intune. The IT pilot ring must receive new features as soon as Microsoft releases them. All other devices must receive new features once per month on a predictable date, with no additional feature delay. Which update channels should you assign to the pilot ring and to the other devices, respectively?",
       "options": [
-        "Current Channel",
-        "Monthly Enterprise Channel",
-        "Semi-Annual Enterprise Channel",
-        "Beta Channel"
+        "Current Channel and Monthly Enterprise Channel",
+        "Beta Channel and Semi-Annual Enterprise Channel",
+        "Current Channel and Semi-Annual Enterprise Channel",
+        "Monthly Enterprise Channel and Current Channel"
       ],
-      "correct": 2,
-      "explanation": "Semi-Annual Enterprise Channel delivers feature updates only twice a year, giving organizations the longest validation window before features reach users. Current Channel updates most often, and Monthly Enterprise Channel is a monthly cadence, both far more frequent than required here."
+      "correct": 0,
+      "explanation": "Current Channel delivers features as soon as they are ready, which fits the pilot ring, and Monthly Enterprise Channel bundles that month's features onto one predictable date (the second Tuesday), which fits everyone else. Beta Channel delivers pre-release builds that are not supported for production devices, and Semi-Annual Enterprise Channel adds a feature delay of months, which the scenario rules out. The Monthly Enterprise Channel and Current Channel pairing is reversed: it would give the pilot ring the predictable cadence and the broad population the unpredictable one."
     },
     {
       "id": "q6",
       "cat": "tenantConfig",
       "type": "mc",
-      "question": "A team lead wants a single mailbox that several employees can send and receive from using their own credentials, without purchasing an additional license for that mailbox. What should be created?",
+      "question": "Contoso's reception team needs a reception@contoso.com address. Five staff members must send as the address, and every reply must land in one common Inbox rather than in each person's own mailbox. No SharePoint site, calendar, or Planner should be provisioned, and no additional license should be consumed. What should you create?",
       "options": [
+        "A shared mailbox",
         "A distribution group",
         "A Microsoft 365 group",
-        "A shared mailbox",
-        "A resource mailbox"
+        "A mail-enabled security group"
       ],
-      "correct": 2,
-      "explanation": "A shared mailbox lets multiple delegated users send and receive from one mailbox and does not require its own license under the size limit. A distribution group does not store mail at all, and a resource mailbox is meant for rooms/equipment scheduling, not general team collaboration."
+      "correct": 0,
+      "explanation": "A shared mailbox provides a single Inbox that delegated users open and send from with Send As permissions, needs no license under the size threshold, and provisions nothing else. A distribution group only fans mail out to each member's own mailbox, so there is no common Inbox for replies. A Microsoft 365 group would give a shared mailbox but also provisions a SharePoint site, calendar, and Planner, which the scenario excludes. A mail-enabled security group delivers to members like a distribution group and exists to grant permissions, not to hold mail."
     },
     {
       "id": "q7",
       "cat": "tenantConfig",
       "type": "mc",
-      "question": "Users report poor audio and video quality on Teams calls. Investigation shows all Microsoft 365 network traffic, including Teams media, is being routed through an on-premises proxy. According to Microsoft 365 network connectivity guidance, what should change?",
+      "question": "Contoso routes all internet traffic, including Microsoft 365, through an on-premises proxy. Users report choppy audio in Teams calls. The network team confirms the proxy is not overloaded. According to Microsoft 365 network connectivity principles, what should you change?",
       "options": [
-        "Route Optimize category endpoints, including Teams media, directly to the internet instead of through the proxy",
-        "Increase the proxy server's hardware specifications so it can handle the added media load",
-        "Physically relocate the proxy server closer to the Teams media servers it forwards traffic to",
-        "Disable Teams media optimization tenant-wide until the network team investigates further"
+        "Let Optimize category endpoints, including Teams media, bypass the proxy and egress directly to the internet",
+        "Configure split tunneling so that only Default category endpoints bypass the proxy and egress directly",
+        "Enable QoS DSCP marking for Teams audio and video traffic on the internal corporate network",
+        "Change the Teams meeting policy so that media is carried over TCP instead of UDP"
       ],
       "correct": 0,
-      "explanation": "Microsoft explicitly recommends that Optimize category endpoints, which include latency-sensitive Teams media traffic, bypass proxies and VPNs and take the most direct path to the internet. Upgrading or relocating the proxy does not remove the added latency that hairpinning through it causes."
+      "explanation": "Microsoft's connectivity principles say Optimize endpoints, which carry latency-sensitive Teams media, should bypass proxies and VPNs and take the shortest path to Microsoft's network. Bypassing only the Default category is backwards: Default traffic is the low-priority bucket that can stay on the normal path. QoS marking helps prioritize media on congested internal links but does not remove the latency added by hairpinning through a proxy. Forcing TCP makes real-time media worse, since UDP is preferred for Teams calls."
     },
     {
       "id": "q8",
       "cat": "governSecure",
       "type": "mc",
-      "question": "An admin wants to enable custom Conditional Access policies for their tenant. What must be done first regarding security defaults?",
+      "question": "Contoso's tenant has Microsoft 365 E3 licenses and security defaults enabled. The security team creates a Conditional Access policy that requires a compliant device for Exchange Online, but the portal will not let them turn the policy on. What should you do first?",
       "options": [
-        "Nothing; security defaults and Conditional Access work together automatically",
-        "Security defaults only need to be disabled for guest users",
-        "Security defaults must be upgraded to Conditional Access Premium",
-        "Security defaults must be turned off before Conditional Access policies can be enforced"
+        "Disable security defaults in the Microsoft Entra admin center",
+        "Purchase Microsoft Entra ID P2 licenses for the tenant",
+        "Set the policy to report-only mode instead of on",
+        "Exclude the break-glass accounts from the policy"
       ],
-      "correct": 3,
-      "explanation": "Security defaults and Conditional Access are mutually exclusive at the tenant level, so security defaults must be disabled before Conditional Access policies take over as the tenant's baseline protections. They are not layered together automatically.",
-      "whyTested": "This tests whether you know Conditional Access and security defaults are mutually exclusive rather than layered \u2014 a distinction that matters because 'enable the more granular thing on top of the baseline' is the intuitive, and wrong, mental model most people bring in from other product areas."
+      "correct": 0,
+      "explanation": "Security defaults and Conditional Access are mutually exclusive; while security defaults are on, Conditional Access policies cannot be enabled, so turning security defaults off is the prerequisite. Microsoft 365 E3 already includes Microsoft Entra ID P1, which is all Conditional Access needs; P2 adds risk-based policies and PIM but is not what blocks this. Report-only mode is a good evaluation step, but it does not change the mutual exclusivity, and excluding break-glass accounts is a best practice that comes after the policy can be enabled.",
+      "whyTested": "This checks that you know Conditional Access replaces security defaults rather than layering on top of it, and that you can separate that blocker from unrelated licensing and best-practice steps that sound like reasonable 'first' actions."
     },
     {
       "id": "q9",
       "cat": "governSecure",
       "type": "mc",
-      "question": "An organization wants cloud sign-in validated without ever storing even a password hash in Microsoft Entra ID, using lightweight on-premises agents to check credentials directly against Active Directory in real time. Which hybrid authentication method matches this requirement?",
+      "question": "Contoso's security policy forbids storing any form of user password credential in the cloud and requires that on-premises account disablement and sign-in hours take effect for cloud sign-ins immediately. Contoso does not want to deploy or maintain an AD FS farm. Which hybrid authentication method should you recommend?",
       "options": [
-        "Password hash synchronization",
-        "AD FS federation",
         "Pass-through authentication",
-        "Seamless single sign-on alone"
+        "Password hash synchronization with seamless single sign-on",
+        "Federation with Active Directory Federation Services",
+        "Microsoft Entra Cloud Sync with password hash synchronization"
       ],
-      "correct": 2,
-      "explanation": "Pass-through authentication validates credentials directly against on-premises Active Directory via lightweight agents and never stores a password hash in the cloud, matching the requirement exactly. Password hash sync does store a synced hash, and federation delegates authentication to an external IdP rather than validating via lightweight agents.",
-      "whyTested": "Exams stack three hybrid authentication methods that all accomplish 'cloud sign-in for on-prem accounts' to see if you can identify the one specific differentiator \u2014 whether a password hash ever touches the cloud at all \u2014 rather than just recognizing all three as generically valid hybrid options."
+      "correct": 0,
+      "explanation": "Pass-through authentication validates each sign-in against on-premises Active Directory through lightweight agents, so no hash is stored in the cloud and on-premises account state, sign-in hours, and password policies are enforced at sign-in time. Password hash synchronization, whether delivered by Microsoft Entra Connect or Cloud Sync, stores a hash of the password hash in Microsoft Entra ID, which the policy prohibits. Federation would satisfy both requirements but needs the AD FS infrastructure the organization wants to avoid.",
+      "whyTested": "Exams stack three hybrid authentication methods that all accomplish 'cloud sign-in for on-prem accounts' to see if you can identify the specific differentiators \u2014 whether a password hash ever touches the cloud, and whether on-premises policies are enforced in real time \u2014 rather than defaulting to the method Microsoft recommends in general."
     },
     {
       "id": "q10",
@@ -849,43 +849,43 @@
       "id": "q11",
       "cat": "governSecure",
       "type": "mc",
-      "question": "A phishing email contained a link that was benign when delivered but was weaponized by the attacker several hours later, after the message had already reached the inbox. Which Defender for Office 365 feature is designed specifically to catch this?",
+      "question": "Several Contoso users clicked links in emails that passed filtering at delivery but were weaponized hours later. You need protection that evaluates the URL at the moment a user clicks it, in email and in Office documents, and that can block the click. Which Defender for Office 365 capability should you configure?",
       "options": [
-        "Safe Attachments",
-        "Anti-spam policies",
-        "Safe Links time-of-click protection",
-        "Zero-hour auto purge on attachments"
+        "A Safe Links policy",
+        "Zero-hour auto purge for phishing messages",
+        "A Safe Attachments policy with Dynamic Delivery",
+        "An anti-phishing policy with impersonation protection"
       ],
-      "correct": 2,
-      "explanation": "Safe Links re-checks a URL at the moment it is clicked, not only at delivery time, which is exactly what catches a link weaponized after delivery. Safe Attachments sandboxes file attachments, not URLs, so it would not address this scenario."
+      "correct": 0,
+      "explanation": "Safe Links rewrites URLs and checks each one against threat intelligence at time of click, in email and in supported Office apps, and can block the click outright. Zero-hour auto purge is the closest alternative, but it retroactively removes delivered messages once they are judged malicious; it does not inspect at the moment of the click and does not cover links inside Office documents. Safe Attachments detonates file attachments, not URLs. Impersonation protection targets lookalike senders and display names, not links that turn malicious after delivery."
     },
     {
       "id": "q12",
       "cat": "governSecure",
       "type": "mc",
-      "question": "An analyst needs a single, correlated view of an attack that touched a phishing email, a compromised endpoint, and suspicious sign-in activity, instead of investigating three separate product alert queues. Where should they look?",
+      "question": "A Contoso analyst is investigating an attack that began with a phishing email, continued with malware on the recipient's laptop, and ended with anomalous sign-ins from the recipient's account. The analyst wants a single correlated investigation rather than three separate alert queues. Where should the analyst work?",
       "options": [
-        "The unified incident view in the Microsoft Defender portal",
-        "The Exchange admin center message trace",
-        "The Microsoft 365 admin center service health page",
-        "The Intune device compliance dashboard"
+        "The Incidents queue in the Microsoft Defender portal",
+        "Threat Explorer in Microsoft Defender for Office 365",
+        "The Risky sign-ins report in Microsoft Entra ID Protection",
+        "The device timeline in Microsoft Defender for Endpoint"
       ],
       "correct": 0,
-      "explanation": "Microsoft Defender XDR correlates related alerts across email, endpoint, and identity signals into a single unified incident in the Defender portal, exactly matching the need for one correlated investigation view. The other consoles are single-purpose and do not correlate cross-product alerts."
+      "explanation": "Microsoft Defender XDR correlates alerts from Defender for Office 365, Defender for Endpoint, and identity signals into a single incident, so the Incidents queue shows the whole attack chain in one place. Threat Explorer is excellent for the email stage but stops there. The Risky sign-ins report covers only the identity stage, and the device timeline covers only the endpoint stage; each of the three distractors is one of the separate queues the analyst wants to avoid."
     },
     {
       "id": "q13",
       "cat": "governSecure",
       "type": "mc",
-      "question": "A DLP policy that blocks sharing of documents containing credit card numbers is being rolled out. Before enforcing it, the admin wants to see how many legitimate business documents would be blocked. What should they do first?",
+      "question": "Contoso creates a DLP policy that blocks external sharing of content containing credit card numbers across Exchange, SharePoint, and OneDrive. Before enforcing it, the compliance team wants two weeks of data on how many legitimate business activities would match, without users becoming aware of the policy. What should you do first?",
       "options": [
-        "Enable the policy in test mode before turning on enforcement",
-        "Enable the policy directly in enforce mode and monitor for complaints",
-        "Apply the policy only to a single mailbox permanently",
-        "Skip testing since DLP policies cannot generate false positives"
+        "Run the policy in simulation mode with policy tips turned off",
+        "Run the policy in simulation mode with policy tips turned on",
+        "Turn the policy on with the block action set to allow user overrides",
+        "Turn the policy on for a pilot group only and review the incident reports"
       ],
       "correct": 0,
-      "explanation": "Running a DLP policy in test mode (with or without user notifications) surfaces likely matches and false positives before any enforcement disrupts real business activity, which is the recommended rollout pattern. Going straight to enforcement risks blocking legitimate work before the policy has been tuned."
+      "explanation": "Simulation mode records matches and generates reports without taking the configured actions, and leaving policy tips off keeps users unaware, which satisfies both constraints. Simulation with policy tips on still does not block, but it shows tips to users, so they would notice the policy. Allowing overrides still enforces the block for everyone until they override, and a pilot in enforce mode affects real users' work; neither is a measurement-only step."
     },
     {
       "id": "q14",
@@ -905,44 +905,49 @@
     {
       "id": "q15",
       "cat": "governSecure",
-      "type": "mc",
-      "question": "A document needs to be encrypted, watermarked \"Confidential\", and have permissions restricted, while separately being scheduled for automatic deletion after 5 years. Which two label types together satisfy this, and which one handles which requirement?",
+      "type": "ms",
+      "question": "Contoso has three requirements for its project documents: they must be encrypted and watermarked, they must be deleted automatically five years after creation, and they must be blocked from being shared with guests in Teams. Which three mappings of requirement to Purview capability are correct? (Choose three.)",
       "options": [
-        "A sensitivity label handles the encryption and watermarking; a retention label handles the 5-year deletion schedule",
-        "A retention label handles both requirements simultaneously",
-        "A sensitivity label handles both requirements simultaneously",
-        "A DLP policy handles the watermarking; a sensitivity label handles the deletion schedule"
+        "Encryption and watermark: a sensitivity label",
+        "Deletion after five years: a retention label",
+        "Blocking sharing with guests: a DLP policy",
+        "Watermark: a retention label",
+        "Deletion after five years: a sensitivity label"
       ],
-      "correct": 0,
-      "explanation": "A sensitivity label is what applies encryption, watermarking, and permission restrictions to the content, while a retention label independently governs the lifecycle/deletion schedule. Neither label type alone covers both jobs, and DLP policies do not apply watermarking."
+      "correct": [
+        0,
+        1,
+        2
+      ],
+      "explanation": "Sensitivity labels apply protection to content (encryption, markings such as watermarks, permissions), retention labels govern lifecycle (retain and then delete on a schedule), and DLP policies detect sensitive content and act on sharing, including blocking a share with guests in Teams and SharePoint. A retention label has no marking or protection settings, and a sensitivity label has no deletion schedule; those two near-misses swap the jobs of the two label types."
     },
     {
       "id": "q16",
       "cat": "governSecure",
       "type": "mc",
-      "question": "A legal team needs to send hold notifications to specific custodians, track their acknowledgment, and use near-duplicate detection and email threading across a large review set. Which Microsoft Purview capability is required?",
+      "question": "Contoso Legal receives a litigation notice. They must send hold notices to 12 named employees, track who has acknowledged them, and reduce the review volume by removing near-duplicate messages and threading email conversations. All users hold Microsoft 365 E5. Which should you create?",
       "options": [
-        "eDiscovery (Standard)",
-        "Communication compliance",
-        "Basic content search only",
-        "eDiscovery (Premium)"
+        "An eDiscovery (Premium) case",
+        "An eDiscovery (Standard) case with a hold on the 12 mailboxes",
+        "A Content search scoped to the 12 mailboxes with results exported to PST",
+        "A Litigation Hold on the 12 mailboxes and a Communication compliance policy"
       ],
-      "correct": 3,
-      "explanation": "Custodian management, hold notifications, and analytics like near-duplicate detection and email threading are eDiscovery Premium capabilities, not part of the more limited Standard tier. Communication compliance is a separate solution focused on policy violation review, not legal hold workflow."
+      "correct": 0,
+      "explanation": "Custodian management, hold notifications with acknowledgment tracking, and review-set analytics such as near-duplicate detection and threading are eDiscovery (Premium) features. A Standard case can hold and search the mailboxes, but it has no custodian workflow or analytics. Content search can find and export but cannot hold content or notify custodians. Litigation Hold preserves data, and Communication compliance reviews messages for policy violations; neither notifies custodians or reduces review volume."
     },
     {
       "id": "q17",
       "cat": "governSecure",
       "type": "mc",
-      "question": "A security team is investigating a suspected mailbox compromise and needs to determine exactly which email items were read by the attacker after gaining access. Which capability provides this level of detail?",
+      "question": "Nine months ago, an attacker accessed a Contoso executive's mailbox. The executive holds a Microsoft 365 E5 license. Legal needs to know exactly which messages the attacker opened during the compromise. Which capability should you use?",
       "options": [
-        "Audit (Standard), which is enabled by default",
-        "Message trace in the Exchange admin center",
-        "Audit (Premium), using the MailItemsAccessed event type",
-        "Mail flow rules reporting"
+        "Audit (Premium) search in the Microsoft Purview portal",
+        "Audit (Standard) search in the Microsoft Purview portal",
+        "Threat Explorer in Microsoft Defender for Office 365",
+        "Message trace in the Exchange admin center"
       ],
-      "correct": 2,
-      "explanation": "The MailItemsAccessed forensic event, which records exactly which mail items were accessed, is an Audit (Premium) capability not available in Audit (Standard). Message trace shows delivery routing, not which items were read after the fact."
+      "correct": 0,
+      "explanation": "Audit (Premium), which Microsoft 365 E5 includes, records the mailbox-access forensic events (such as MailItemsAccessed) that identify individual items that were read, and its default one-year retention still covers activity from nine months ago. Audit (Standard) retains records for 180 days by default, so nine-month-old activity has already aged out. Threat Explorer shows email threat detections and clicks over a recent window, not mailbox reads. Message trace follows delivery through the transport pipeline and shows nothing about what was opened after delivery."
     },
     {
       "id": "q18",
@@ -967,7 +972,7 @@
         "Assign the user to an appropriate Purview compliance role group",
         "Assign the user the Global Administrator role",
         "Assign the user the User Administrator Microsoft Entra role",
-        "Enable the Microsoft Purview compliance portal for the tenant, which grants edit rights to every existing admin automatically"
+        "Enable the Microsoft Purview portal for the tenant so existing admins automatically receive edit rights"
       ],
       "correct": 0,
       "explanation": "Purview compliance permissions are managed through role groups, a separate permission layer purpose-built for compliance solutions like DLP, and do not require any Microsoft Entra directory role. Global Administrator or User Administrator would grant far broader access than is needed or requested, and simply enabling the compliance portal doesn't hand out any permissions by itself \u2014 role group membership still has to be assigned explicitly."
@@ -976,15 +981,15 @@
       "id": "q20",
       "cat": "governSecure",
       "type": "mc",
-      "question": "A CISO wants an at-a-glance numeric measure of the organization's overall security posture, with linked recommendations for specific unimplemented actions across identity, devices, and data. Which feature provides this?",
+      "question": "Contoso's CISO wants a single number that tracks the tenant's security posture across identity, devices, apps, and data, with a ranked list of concrete actions (such as enabling MFA for admins) and the points each action would add. Which should you use?",
       "options": [
-        "Compliance Manager compliance score",
         "Microsoft Secure Score",
-        "Microsoft 365 admin center service health",
-        "Azure Cost Management"
+        "Compliance Manager compliance score",
+        "Microsoft Defender Vulnerability Management exposure score",
+        "Microsoft Entra ID Protection risk reports"
       ],
-      "correct": 1,
-      "explanation": "Microsoft Secure Score is specifically the numeric security posture measurement with linked improvement actions across identity, devices, apps, and data. Compliance score is a related but distinct measurement tracking regulatory/policy compliance actions, not general security posture."
+      "correct": 0,
+      "explanation": "Microsoft Secure Score is the posture metric that aggregates identity, device, app, and data recommendations into one score with point-valued improvement actions. Compliance score measures progress against regulatory assessments, not security posture. The exposure score is limited to device vulnerabilities and misconfigurations. ID Protection reports show detected risky users and sign-ins; they do not score configuration or recommend improvements across workloads."
     },
     {
       "id": "q21",
@@ -1004,25 +1009,25 @@
       "id": "tf1",
       "cat": "governSecure",
       "type": "tf",
-      "question": "Security defaults and custom Conditional Access policies can both be active on the same Microsoft 365 tenant at the same time.",
+      "question": "After Contoso disables security defaults to adopt Conditional Access, legacy authentication protocols remain blocked for all users until an administrator explicitly re-enables them.",
       "answer": false,
-      "explanation": "Security defaults and Conditional Access are mutually exclusive \u2014 enabling Conditional Access requires disabling security defaults first, since Conditional Access is meant to fully replace that baseline with tailored policies."
+      "explanation": "The legacy authentication block is one of the protections security defaults provides; turning security defaults off removes it along with the rest of the baseline. An organization moving to Conditional Access must recreate that protection as a policy that blocks legacy authentication clients, which is why the switch should be planned with report-only testing rather than assumed to carry over."
     },
     {
       "id": "tf2",
       "cat": "governSecure",
       "type": "tf",
-      "question": "Pass-through authentication validates sign-in credentials directly against on-premises Active Directory using lightweight on-premises agents.",
+      "question": "Contoso uses pass-through authentication as its sign-in method. Enabling password hash synchronization alongside it allows Microsoft Entra ID Protection to detect leaked credentials for Contoso users.",
       "answer": true,
-      "explanation": "Pass-through authentication validates credentials directly against on-premises Active Directory via lightweight agents and never stores a password hash in the cloud \u2014 that is what distinguishes it from password hash synchronization."
+      "explanation": "Leaked-credential detection compares synchronized password hashes against credential dumps, so it requires password hash synchronization even when PTA handles the actual sign-in. Running PHS in parallel also provides a fallback if the PTA agents become unavailable. The misconception is that choosing PTA rules PHS out, or that ID Protection can evaluate credentials it never receives."
     },
     {
       "id": "tf3",
       "cat": "governSecure",
       "type": "tf",
-      "question": "A retention label can be applied to individual items so that different content within the same SharePoint site can have different retention behavior than the site-wide retention policy.",
+      "question": "When a user deletes a OneDrive file that carries a standard seven-year retention label, the file disappears from the user's view but a copy is kept in the Preservation Hold library until the retention period ends.",
       "answer": true,
-      "explanation": "Retention labels apply item-level retention rules, which lets specific documents behave differently from the broader site-wide retention policy applied to the whole location."
+      "explanation": "A standard (non-record) retention label does not block deletion; it guarantees the content survives it. The deleted file moves to the site's Preservation Hold library, where it stays searchable by eDiscovery until the period expires. Only record and regulatory-record labels actually prevent the user from deleting the item, which is the distinction this statement tests."
     },
     {
       "id": "tf4",
@@ -1044,45 +1049,45 @@
       "id": "tf6",
       "cat": "governSecure",
       "type": "tf",
-      "question": "Audit (Premium) provides a longer default retention period for audit log records than Audit (Standard).",
+      "question": "In a tenant where some users hold Audit (Premium) and others hold only Audit (Standard), audit records generated by an Audit (Standard) user are kept for 180 days by default, regardless of the other users' licenses.",
       "answer": true,
-      "explanation": "Audit (Standard) retains most events for 180 days by default, while Audit (Premium) extends default retention to one year (or longer with an add-on), in addition to adding forensic event types Standard lacks."
+      "explanation": "Audit retention is applied per user based on that user's own license: Premium-licensed users' records default to one year, while Standard-licensed users' records default to 180 days unless an audit log retention policy extends them. One investigator holding Premium does not lengthen retention for the people being investigated."
     },
     {
       "id": "tf7",
       "cat": "governSecure",
       "type": "tf",
-      "question": "Information barriers can prevent two defined groups of users from finding each other in Teams search and starting a chat.",
-      "answer": true,
-      "explanation": "Information barriers explicitly restrict which users or groups can communicate and collaborate, including blocking chat and discovery between segmented groups, to prevent conflicts of interest."
+      "question": "An information barriers policy that blocks the Investment Banking and Research segments from communicating also blocks email between members of the two segments in Exchange Online.",
+      "answer": false,
+      "explanation": "Information barriers enforce restrictions in Microsoft Teams, SharePoint, and OneDrive: chats, calls, meetings, file sharing, and people search between segments. They do not apply to Exchange Online email; blocking email between groups requires a mail flow (transport) rule. The misconception is assuming one segmentation policy covers every workload."
     },
     {
       "id": "q23",
       "cat": "aiServices",
       "type": "mc",
-      "question": "A user holds a Microsoft 365 E3 subscription but has not been assigned the Microsoft 365 Copilot add-on license. What happens if they try to use Copilot in Word?",
+      "question": "Contoso purchased 100 Microsoft 365 Copilot licenses, which remain unassigned in the subscription. Managers with Microsoft 365 E3 report that Copilot is unavailable in Word and Outlook, although Microsoft 365 Copilot Chat works for them. What should you do?",
       "options": [
-        "Copilot works normally in Word, since Microsoft 365 E3 already includes every Copilot capability without any add-on",
-        "Copilot is unavailable to them, because the add-on license must be separately assigned on top of an eligible base subscription",
-        "Copilot works in Word but with a reduced feature set and a lower monthly usage cap until the add-on is purchased",
-        "Copilot works only inside Teams meetings, not in Word or other apps, until the add-on license is assigned"
+        "Assign the Microsoft 365 Copilot license to the managers, for example through a security group",
+        "Turn on Copilot for Word and Outlook on the Copilot settings page in the Microsoft 365 admin center",
+        "Upgrade the managers from Microsoft 365 E3 to Microsoft 365 E5",
+        "Enable web content grounding for the tenant so Copilot can start responding in the apps"
       ],
-      "correct": 1,
-      "explanation": "Microsoft 365 Copilot requires the add-on license assigned in addition to an eligible base subscription like Microsoft 365 E3; the base subscription alone does not include Copilot. Without the add-on assigned, Copilot capabilities are not available to that user at all."
+      "correct": 0,
+      "explanation": "Microsoft 365 Copilot is an add-on that must be assigned to each user on top of an eligible base license; licenses sitting unassigned in the subscription do nothing, and the free Copilot Chat working is exactly the symptom of an eligible user without the add-on. The admin center Copilot settings page controls behavior for licensed users, not entitlement. Microsoft 365 E5 does not include Copilot either, and web grounding only affects whether responses can use public web content."
     },
     {
       "id": "q24",
       "cat": "aiServices",
       "type": "mc",
-      "question": "What role does the Semantic Index play when Microsoft 365 Copilot generates a response grounded in organizational data?",
+      "question": "A licensed Contoso user asks Copilot what the team decided about Project Falcon. Copilot synthesizes an answer from a Teams chat, two emails, and a document, none of which contains that exact phrase, and cites only items the user already has access to. Which component makes this possible?",
       "options": [
-        "It grants the requesting user temporary elevated access to content they didn't already have permission to see",
-        "It is an encrypted, Microsoft Graph-based index of content and relationships that Copilot uses to ground its responses in context",
-        "It is a separate add-on license required only when using Copilot Studio to build custom agents",
-        "It replaces the need for Conditional Access policies when a user signs in to any Copilot experience"
+        "The Semantic Index for Copilot",
+        "A Microsoft Graph connector",
+        "Microsoft Search keyword indexing alone",
+        "The Copilot Studio orchestrator"
       ],
-      "correct": 1,
-      "explanation": "The Semantic Index is the encrypted, Graph-based index that lets Copilot understand relationships and context across organizational content to ground its answers. It does not grant any new access \u2014 it only helps Copilot use content the user already has permission to see."
+      "correct": 0,
+      "explanation": "The Semantic Index builds an encrypted, Graph-based map of content and relationships across a user's mail, chats, and files, so Copilot can reason about meaning rather than matching keywords, while staying permission-trimmed to what the user can already open. A Graph connector brings external, non-Microsoft 365 content into that index; it is not what grounds native content. Keyword indexing alone would miss items that lack the phrase, and the Copilot Studio orchestrator drives custom agents, not Microsoft 365 Copilot's grounding."
     },
     {
       "id": "q25",
@@ -1105,40 +1110,40 @@
       "question": "While a full SharePoint permissions review is underway, an admin wants a fast way to keep a set of legacy sites out of both organization-wide search and Copilot summarization, without changing any user's existing site permissions yet. What should they use?",
       "options": [
         "Restricted SharePoint Search",
-        "A Conditional Access policy blocking SharePoint",
-        "A sensitivity label with encryption applied to every file on those sites",
-        "Removing the sites from the SharePoint admin center"
+        "Restricted access control in SharePoint Advanced Management",
+        "A sensitivity label with the Groups & sites scope that sets the sites to private",
+        "A Purview DLP policy with the Microsoft 365 Copilot location"
       ],
       "correct": 0,
-      "explanation": "Restricted SharePoint Search excludes specific sites from organization-wide search and Copilot results without changing any underlying user permissions, exactly matching the fast, non-disruptive mitigation described. It is a search-visibility control, not a permissions or access control."
+      "explanation": "Restricted SharePoint Search keeps sites that are not on the allowed list out of organization-wide search and Copilot grounding while leaving every permission untouched, which is the only option that satisfies the 'no permission changes yet' constraint. Restricted access control and a private-site label both change who can access the sites, which is the disruptive step the team is deferring. A Copilot DLP policy acts on sensitive content in Copilot interactions; it does not hide whole sites from search."
     },
     {
       "id": "q27",
       "cat": "aiServices",
       "type": "mc",
-      "question": "An admin wants visibility into how employees are actually using generative AI tools like Copilot, wants to surface oversharing and sensitive-data risks tied to those interactions, and wants recommended or auto-applied DLP and labeling policies tailored to AI usage. Which Microsoft Purview capability is designed for exactly this?",
+      "question": "Contoso already runs DLP and sensitivity labeling. The CISO asks for a view of which generative AI sites and apps employees paste sensitive data into, including non-Microsoft AI sites, along with recommended Purview policies to reduce that risk, with minimal setup. Which should you use?",
       "options": [
-        "Data Security Posture Management for AI (DSPM for AI)",
-        "eDiscovery (Premium), for legal hold and case search",
-        "Compliance Manager, for tracking regulatory assessments",
-        "Communication compliance, for reviewing risky messages"
+        "Data Security Posture Management for AI in Microsoft Purview",
+        "Cloud app discovery in Microsoft Defender for Cloud Apps",
+        "Insider Risk Management browsing indicators",
+        "Activity explorer in Microsoft Purview"
       ],
       "correct": 0,
-      "explanation": "DSPM for AI is purpose-built to give visibility into AI app usage, surface oversharing and sensitive-data risk in AI interactions, and recommend or apply tailored DLP and labeling policies. eDiscovery, Compliance Manager, and communication compliance each serve different, narrower purposes."
+      "explanation": "DSPM for AI is built for this: it reports on sensitive information in prompts to Copilot and third-party AI sites and offers one-click recommended policies such as DLP for pasting into AI sites. Cloud app discovery shows which AI apps are in use and their risk scores, but not what sensitive data was entered or which Purview policies to deploy. Insider Risk Management scores individual users' behavior rather than giving a tenant-wide data view. Activity explorer shows activity on labeled and classified content, not a dedicated AI usage posture."
     },
     {
       "id": "q28",
       "cat": "aiServices",
       "type": "mc",
-      "question": "A user has view access to a file containing a sensitivity label that marks it as highly confidential. The organization wants Copilot to never quote or summarize that file's sensitive content in a response, even though the user can still open the file directly. What should the admin configure?",
+      "question": "Contoso's 'Highly Confidential' sensitivity label applies markings but no encryption, and Legal does not want to change how the labeled files open. Users who can open those files must not be able to have Microsoft 365 Copilot summarize or quote their content. The files are spread across many sites. What should you configure?",
       "options": [
-        "Remove the user's access to the file entirely, even though they still need it for their normal job",
-        "A Purview DLP policy scoped to Microsoft 365 Copilot interactions that restricts sensitive labeled content from appearing in responses",
-        "Apply a retention label with a shorter deletion schedule so the file is removed from the tenant sooner",
-        "Disable the Semantic Index tenant-wide so Copilot stops grounding answers in any organizational content"
+        "A Purview DLP policy with the Microsoft 365 Copilot location and a condition on the sensitivity label",
+        "Encryption on the sensitivity label that grants users View but not Extract rights",
+        "Restricted SharePoint Search covering the sites that hold labeled files",
+        "A retention label with a short deletion schedule applied to the labeled files"
       ],
-      "correct": 1,
-      "explanation": "DLP policies can be scoped specifically to Copilot interactions to prevent labeled sensitive content from being included in Copilot responses, while leaving the user's normal file access untouched. Removing file access entirely is broader than required, since the user should still be able to open the file directly."
+      "correct": 0,
+      "explanation": "A DLP policy scoped to the Microsoft 365 Copilot location can stop Copilot from processing content that carries the label, leaving file access and the label itself unchanged. Removing the Extract right through label encryption also keeps Copilot from using the content, but it changes the label to encrypt files, which Legal ruled out. Restricted SharePoint Search works at the site level, would hide unlabeled content too, and has no effect on files recently opened by or shared directly with the user. A retention label governs deletion, not Copilot behavior."
     },
     {
       "id": "q29",
@@ -1146,41 +1151,41 @@
       "type": "mc",
       "question": "A department wants a lightweight agent that answers questions using only the content of one specific SharePoint site, inheriting that site's existing permissions, built with minimal effort. What is the fastest supported way to create this?",
       "options": [
-        "Build a fully custom agent from scratch in Copilot Studio with manually configured connectors",
-        "Create an agent directly from the SharePoint site, which grounds it in that site's content and its existing permissions",
-        "Assign every department member the Microsoft Security Copilot add-on",
-        "Enable DSPM for AI on the site"
+        "Create an agent directly from the SharePoint site",
+        "Build a declarative agent in Copilot Studio and add the site as a knowledge source",
+        "Deploy a Microsoft Graph connector for the site before building an agent",
+        "Build a custom engine agent that calls the SharePoint REST API"
       ],
-      "correct": 1,
-      "explanation": "Creating an agent directly from a SharePoint site is the lightweight path: it grounds the agent in that site's content and automatically inherits the site's existing permissions, with far less setup than a full custom Copilot Studio agent. Security Copilot and DSPM for AI serve unrelated purposes."
+      "correct": 0,
+      "explanation": "Creating an agent from the SharePoint site itself takes a few clicks, grounds the agent in that site's content, and inherits the site's permissions automatically, which is the fastest supported path. A declarative agent in Copilot Studio with the site as a knowledge source also works and respects permissions, but it is more setup than the scenario needs. SharePoint content is already indexed in Microsoft Graph, so a Graph connector adds nothing, and a custom engine agent is the most effort of all."
     },
     {
       "id": "q30",
       "cat": "aiServices",
       "type": "mc",
-      "question": "An admin wants AI agents in the tenant to be discoverable, assignable to permissions, and subject to lifecycle governance similar to how service principals are governed for applications. Which Microsoft Entra capability provides this?",
+      "question": "Contoso's security team wants the Copilot Studio agents built by business units to be visible in Microsoft Entra as first-class identities, so they can be inventoried, included in access reviews, and governed with the same lifecycle tools used for service principals. Which capability provides this?",
       "options": [
-        "Microsoft Entra External ID",
-        "Microsoft Entra Conditional Access baseline policies",
-        "Microsoft Entra Privileged Identity Management for users only",
-        "Microsoft Entra Agent ID"
+        "Microsoft Entra Agent ID",
+        "A manually created app registration and service principal for each agent",
+        "Microsoft Entra workload identity federation",
+        "Microsoft Entra Permissions Management"
       ],
-      "correct": 3,
-      "explanation": "Microsoft Entra Agent ID gives AI agents their own first-class identity objects, similar to service principals for applications, enabling discovery, permission assignment, and lifecycle governance. External ID governs external/guest identities, not the agents themselves, and is unrelated here."
+      "correct": 0,
+      "explanation": "Microsoft Entra Agent ID gives agents their own identity objects in Microsoft Entra so they appear in the directory and can be governed like other identities. Creating an app registration per agent is the manual near-miss: it is laborious and depends on each business unit remembering to do it. Workload identity federation lets external workloads such as pipelines obtain tokens without secrets, and Permissions Management is a multicloud entitlement (CIEM) tool; neither represents agents in the directory."
     },
     {
       "id": "q31",
       "cat": "aiServices",
       "type": "mc",
-      "question": "A security operations team wants a generative AI assistant integrated with Defender, Entra, and Purview to help summarize incidents and generate investigation scripts, billed on flexible provisioned capacity rather than a fixed number of named-user licenses. Which product and licensing model fits?",
+      "question": "Contoso's six SOC analysts want a generative AI assistant inside the Microsoft Defender portal to summarize incidents and write KQL hunting queries. Procurement will not buy per-user AI licenses for the whole company. What should you purchase?",
       "options": [
-        "Microsoft 365 Copilot, licensed per user",
-        "Microsoft Security Copilot, billed using Security Compute Units (SCUs)",
-        "Copilot Studio, licensed per message",
-        "Microsoft Defender for Cloud Apps, licensed per app"
+        "Security Compute Units for Microsoft Security Copilot",
+        "Microsoft 365 Copilot add-on licenses for the six analysts",
+        "Copilot Studio message capacity packs",
+        "Microsoft Defender for Cloud Apps licenses for the analysts"
       ],
-      "correct": 1,
-      "explanation": "Microsoft Security Copilot is the standalone security-focused AI assistant integrated with Defender, Entra, and Purview, and it is billed on SCU-based consumption capacity rather than per-user licensing. Microsoft 365 Copilot is a general productivity assistant licensed per user, a different product entirely."
+      "correct": 0,
+      "explanation": "Microsoft Security Copilot is the security-specific assistant embedded in Defender, Entra, Purview, and Intune, and it is purchased as provisioned Security Compute Units rather than per user, so six analysts can share capacity. Microsoft 365 Copilot is the productivity assistant for Office apps and does not provide the Defender experience. Copilot Studio capacity funds custom agents, and Defender for Cloud Apps is a CASB with no AI assistant of its own."
     },
     {
       "id": "q32",
@@ -1188,13 +1193,13 @@
       "type": "mc",
       "question": "An organization wants Copilot to be able to ground answers in content from a third-party wiki that lives outside Microsoft 365, while still respecting that wiki's own access control list. What should be configured?",
       "options": [
-        "Direct Global Administrator access to the wiki so Copilot can read every page without restriction",
-        "A sensitivity label applied to every page of the wiki to mark its confidentiality level",
-        "A retention policy scoped to the wiki controlling how long its pages are kept",
-        "A Microsoft Graph connector for the wiki, with permissions correctly mapped to the source system"
+        "A Microsoft Graph connector for the wiki, with its permissions mapped to the wiki's access control list",
+        "A Copilot Studio agent that uses the wiki as a knowledge source through a connector",
+        "A nightly export of the wiki into a SharePoint site readable by everyone in the organization",
+        "Restricted SharePoint Search with the wiki added to the allowed list"
       ],
-      "correct": 3,
-      "explanation": "A Microsoft Graph connector indexes external content like a third-party wiki into Microsoft Search and the Semantic Index, and correctly mapping its permissions to the source system's access control list is what preserves the no-new-access guarantee for Copilot. Granting Copilot direct administrative access to the wiki would be a serious oversharing risk, not the correct control."
+      "correct": 0,
+      "explanation": "A Graph connector indexes the wiki into Microsoft Graph and the Semantic Index so Microsoft 365 Copilot can ground on it, and mapping the connector's ACL to the source is what keeps results permission-trimmed. A Copilot Studio agent with the wiki as a knowledge source would let that one agent answer wiki questions, but it does not make the content available to Microsoft 365 Copilot generally. A nightly export readable by everyone discards the wiki's access control list, creating oversharing. Restricted SharePoint Search only governs SharePoint sites and cannot include an external system."
     },
     {
       "id": "q33",
@@ -1213,184 +1218,187 @@
     {
       "id": "q34",
       "cat": "aiServices",
-      "type": "mc",
-      "question": "An admin is designing an ongoing governance process for AI agents in the tenant rather than a one-time approval step. Which sequence best reflects the responsible-AI oversight approach the exam expects?",
-      "options": [
-        "Approve each agent once at creation, and treat that approval as sufficient oversight going forward",
-        "Discover which agents exist, review their data access and permissions, monitor usage and behavior, and remediate or disable ones that misbehave",
-        "Delete every agent on a fixed quarterly schedule and require its creator to rebuild it from scratch",
-        "Rely on the agent's own creator to self-report any data access problems that come up later"
-      ],
-      "correct": 1,
-      "explanation": "Responsible oversight of AI agents is framed as an ongoing lifecycle \u2014 discover, review, monitor, remediate \u2014 mirroring how app governance already treats third-party applications, rather than a single approval at creation time. A one-time approval or self-reporting alone leaves no ongoing visibility into agent behavior."
-    },
-    {
-      "id": "tf8",
-      "cat": "aiServices",
-      "type": "tf",
-      "question": "A user without the Microsoft 365 Copilot add-on license assigned can still use Copilot features simply because their organization owns Copilot licenses generally.",
-      "answer": false,
-      "explanation": "The Microsoft 365 Copilot add-on license must be individually assigned to each user on top of an eligible base subscription; owning licenses at the organizational level does not automatically grant access to unlicensed users."
-    },
-    {
-      "id": "tf9",
-      "cat": "aiServices",
-      "type": "tf",
-      "question": "Pre-existing oversharing, such as files broadly shared with \"Anyone in the organization\" links, is a key risk factor to review before a wide Microsoft 365 Copilot rollout.",
-      "answer": true,
-      "explanation": "Copilot only surfaces content the requesting user already has at least view permission to; it does not grant any new access. This is exactly why pre-existing oversharing, not Copilot itself, is the underlying risk a rollout review must address."
-    },
-    {
-      "id": "tf10",
-      "cat": "aiServices",
-      "type": "tf",
-      "question": "Restricted SharePoint Search removes a user's direct permission to open an excluded site.",
-      "answer": false,
-      "explanation": "Restricted SharePoint Search only hides a site from organization-wide search and Copilot results; it does not change or remove any user's existing direct permissions to that site."
-    },
-    {
-      "id": "tf11",
-      "cat": "aiServices",
-      "type": "tf",
-      "question": "Microsoft Security Copilot is billed using a consumption-based model called Security Compute Units (SCUs), rather than per-user licensing.",
-      "answer": true,
-      "explanation": "Microsoft Security Copilot is a distinct, standalone security-focused assistant billed via Security Compute Units (SCUs), unlike Microsoft 365 Copilot, which is a general productivity assistant licensed per user."
-    },
-    {
-      "id": "msq1",
-      "cat": "tenantConfig",
       "type": "ms",
-      "question": "Which two statements accurately describe Microsoft 365 Apps update channels? (Choose two.)",
+      "question": "A marketing employee built a Copilot Studio agent that calls an unapproved file-storage connector and published it to Microsoft Teams, where other users can now find it. You must stop users from running the agent now and prevent any future agent from combining that connector with Microsoft 365 data, without affecting other agents. Which two actions should you take? (Choose two.)",
       "options": [
-        "Monthly Enterprise Channel delivers feature updates on a predictable, fixed monthly release date",
-        "Current Channel delivers new features as soon as they are ready, on a less predictable cadence",
-        "Semi-Annual Enterprise Channel delivers feature updates most frequently of the three channels",
-        "All three channels deliver identical feature sets on identical release dates"
+        "Block the agent in Integrated apps in the Microsoft 365 admin center so users can no longer run it",
+        "Create a Power Platform DLP policy that places the connector in the Blocked group for the environment",
+        "Delete the Power Platform environment that hosts the agent so the agent can no longer be invoked",
+        "Turn off web content grounding on the Copilot settings page in the Microsoft 365 admin center"
       ],
       "correct": [
         0,
         1
       ],
-      "explanation": "Monthly Enterprise Channel bundles updates on a fixed monthly date, while Current Channel delivers features as soon as ready, on a less predictable cadence. Semi-Annual Enterprise Channel is the least frequent of the three, not the most frequent, and the channels differ in both timing and cadence, not identical."
+      "explanation": "Blocking the agent in Integrated apps removes it from users immediately, and a Power Platform DLP policy that classifies the connector as Blocked prevents any agent or flow in that environment from using it going forward. Deleting the environment would also remove every other agent and flow in it, violating the 'without affecting other agents' constraint. Web content grounding controls whether Microsoft 365 Copilot can use public web results and has nothing to do with connectors."
+    },
+    {
+      "id": "tf8",
+      "cat": "aiServices",
+      "type": "tf",
+      "question": "To assign the Microsoft 365 Copilot add-on through group-based licensing, the add-on must be assigned by the same group that assigns the user's base Microsoft 365 license.",
+      "answer": false,
+      "explanation": "Group-based licensing evaluates each assignment independently; the add-on can be assigned by a dedicated pilot group while the base license comes from another group or from a direct assignment. The only requirement is that the user ends up with an eligible base license plus the add-on. Tying the two to one group is a common assumption that would force restructuring licensing groups unnecessarily."
+    },
+    {
+      "id": "tf9",
+      "cat": "aiServices",
+      "type": "tf",
+      "question": "Because Microsoft 365 Copilot honors existing permissions, a file shared with 'Everyone except external users' can be surfaced by Copilot to an internal user who has never opened it.",
+      "answer": true,
+      "explanation": "'Everyone except external users' grants every internal user permission, so Copilot can legitimately surface the file to any of them whether or not they ever opened it. Honoring permissions is exactly why broad grants like this are the oversharing risk to fix before a rollout; the misconception is treating 'never accessed' as if it meant 'not permitted'."
+    },
+    {
+      "id": "tf10",
+      "cat": "aiServices",
+      "type": "tf",
+      "question": "With Restricted SharePoint Search enabled, a user can still have Microsoft 365 Copilot reference a file from a site that is not on the allowed list if that file was shared directly with the user or the user recently opened it.",
+      "answer": true,
+      "explanation": "Restricted SharePoint Search limits organization-wide search and Copilot grounding to the allowed sites, but it deliberately keeps content a user owns, has recently accessed, or has had shared directly with them discoverable, since the user already works with it. It is a visibility stopgap for broadly shared sites, not a per-file access control."
+    },
+    {
+      "id": "tf11",
+      "cat": "aiServices",
+      "type": "tf",
+      "question": "A SOC analyst can use the Microsoft Security Copilot experience embedded in the Microsoft Defender portal without holding a Microsoft 365 Copilot add-on license, as long as the tenant has provisioned Security Compute Units and the analyst holds a Security Copilot role.",
+      "answer": true,
+      "explanation": "Security Copilot is a separate product funded by provisioned Security Compute Units and gated by its own role assignments; per-user Microsoft 365 Copilot licenses play no part. The two products are easy to conflate because both carry the Copilot name, but their licensing models are independent."
+    },
+    {
+      "id": "msq1",
+      "cat": "tenantConfig",
+      "type": "ms",
+      "question": "Contoso assigns Current Channel to an IT pilot ring, Monthly Enterprise Channel to most users, and Semi-Annual Enterprise Channel to a validation lab. Which two statements about this design are accurate? (Choose two.)",
+      "options": [
+        "Monthly Enterprise Channel devices receive that month's new features on a single predictable release date",
+        "Semi-Annual Enterprise Channel devices receive new features months after Current Channel devices do",
+        "Semi-Annual Enterprise Channel devices receive security updates only twice a year",
+        "Current Channel devices receive new features on a fixed monthly release date"
+      ],
+      "correct": [
+        0,
+        1
+      ],
+      "explanation": "Monthly Enterprise Channel bundles the month's features onto one release date, and Semi-Annual Enterprise Channel holds features back so they arrive months after Current Channel users already have them. Every channel, including Semi-Annual Enterprise, still receives security updates monthly; only feature updates are held back. Current Channel ships features as soon as they are ready, which is why its cadence is less predictable than Monthly Enterprise Channel's."
     },
     {
       "id": "msq2",
       "cat": "tenantConfig",
       "type": "ms",
-      "question": "Which two statements accurately describe Granular Delegated Admin Privileges (GDAP)? (Choose two.)",
+      "question": "Contoso's Cloud Solution Provider partner sends a granular delegated admin privileges (GDAP) relationship request. Which two statements describe what Contoso is agreeing to if it approves it? (Choose two.)",
       "options": [
-        "GDAP grants only the specific Microsoft Entra roles a partner needs for an engagement",
-        "GDAP grants the partner permanent, unrestricted Global Administrator access by default",
-        "GDAP access can be time-bound rather than permanent",
-        "GDAP is identical to classic Delegated Admin Privileges (DAP) in every respect"
+        "The partner receives only the Microsoft Entra roles listed in the request, for the duration specified",
+        "Partner staff gain access through their own partner-tenant identities rather than accounts created in Contoso's directory",
+        "The relationship automatically includes Global Administrator so the partner can recover the tenant",
+        "Contoso cannot end the relationship before its expiration date, because termination is controlled by the partner"
       ],
       "correct": [
         0,
-        2
+        1
       ],
-      "explanation": "GDAP is built around least-privilege, time-bound role assignment for partners, which is the opposite of classic DAP's broad, permanent Admin Agent access. It is a distinct, more granular model from DAP, not identical to it."
+      "explanation": "A GDAP relationship is explicitly scoped to the roles named in the request and runs for a defined duration, and partner engineers are mapped to those roles through security groups in the partner's own tenant, so no accounts are created in Contoso's directory. Global Administrator is included only if the partner requests it and Contoso approves it; nothing is added automatically. Contoso can terminate a GDAP relationship at any time from the Microsoft 365 admin center, which is part of what distinguishes it from classic DAP."
     },
     {
       "id": "msq3",
       "cat": "governSecure",
       "type": "ms",
-      "question": "Which two statements accurately describe Conditional Access grant controls and session controls? (Choose two.)",
+      "question": "Contoso's Conditional Access policy for SharePoint Online on unmanaged devices must require MFA, limit users to browser-only access with downloads blocked, and force re-authentication every four hours. Which two of these requirements are implemented as session controls? (Choose two.)",
       "options": [
-        "Grant controls decide whether access is allowed at all, such as requiring MFA",
-        "Session controls decide whether access is allowed before any session begins",
-        "Grant controls and session controls are the same thing under different names",
-        "Session controls apply restrictions during an already-granted session, such as blocking downloads"
+        "Browser-only access with downloads blocked, using app enforced restrictions",
+        "Re-authentication every four hours, using sign-in frequency",
+        "Requiring MFA before access is allowed",
+        "Requiring a compliant device before access is allowed"
       ],
       "correct": [
         0,
-        3
+        1
       ],
-      "explanation": "Grant controls determine whether access is permitted in the first place (like requiring MFA), while session controls apply restrictions within a session that has already been granted (like blocking downloads). They are distinct mechanisms, not the same concept under different labels."
+      "explanation": "App enforced restrictions and sign-in frequency both shape an already-granted session, so they are configured under the policy's Session controls. Requiring MFA is a grant control, since it decides whether access is permitted at all. Requiring a compliant device is also a grant control, and it is not even part of this scenario's requirements; it is included as a near-miss for candidates who associate 'device' with session behavior."
     },
     {
       "id": "msq4",
       "cat": "governSecure",
       "type": "ms",
-      "question": "Which two statements accurately describe Microsoft Purview retention policies and retention labels? (Choose two.)",
+      "question": "Contoso applies a retention policy to all SharePoint sites that retains content for three years and then deletes it. HR applies a retention label that retains for seven years to certain files on the HR site. In year two, an HR user deletes one of those labeled files. Which two statements are accurate? (Choose two.)",
       "options": [
-        "When retention rules conflict, the shorter retention period always wins",
-        "A retention policy applies uniformly across a whole location like a SharePoint site",
-        "A retention label can be applied to individual items so different content can have different retention behavior",
-        "Retention labels can only be applied automatically, never by a user"
+        "A copy of the deleted file is preserved in the Preservation Hold library until the seven-year period ends",
+        "The site policy's three-year deletion does not remove the labeled file, because the longer retention period wins",
+        "The user is prevented from deleting the labeled file while the retention period is in effect",
+        "The labeled file is permanently deleted at year three, because the site policy was applied first"
       ],
       "correct": [
-        1,
-        2
+        0,
+        1
       ],
-      "explanation": "A retention policy applies broadly across a whole location, while a retention label lets individual items carry their own retention behavior. When rules conflict, the longer retention period generally wins (not the shorter one), and labels can be applied either by users or automatically."
+      "explanation": "A standard retention label lets the user delete the file from view, but retention preserves a copy in the Preservation Hold library for the remainder of the seven years. When a policy and a label conflict, the longer retention period and the explicit retain instruction win, so the three-year deletion does not apply to labeled files. Deletion is only blocked when an item is declared a record, and which rule was applied first plays no part in the precedence."
     },
     {
       "id": "msq5",
       "cat": "governSecure",
       "type": "ms",
-      "question": "Which two statements accurately distinguish Audit (Standard) from Audit (Premium) in Microsoft Purview? (Choose two.)",
+      "question": "Eight months ago an attacker compromised a Contoso mailbox. Investigators now need the list of individual messages the attacker read. Which two statements are accurate? (Choose two.)",
       "options": [
-        "Audit (Standard) requires a separate add-on license while Audit (Premium) is enabled by default",
-        "Audit (Premium) retains audit log events for a longer default period than Audit (Standard)",
-        "Audit (Standard) and Audit (Premium) capture an identical set of event types",
-        "Audit (Premium) includes forensic event types, like MailItemsAccessed, that Audit (Standard) does not"
+        "If the mailbox owner was licensed only for Audit (Standard), records from eight months ago have already aged out of the 180-day default retention",
+        "If the mailbox owner was licensed for Audit (Premium), the default one-year retention still covers the activity",
+        "Assigning an Audit (Premium) license to the user now restores the audit records that already expired",
+        "A historical message trace can substitute for the audit records, because it shows which messages were opened"
       ],
       "correct": [
-        1,
-        3
+        0,
+        1
       ],
-      "explanation": "Audit (Premium) both retains events longer by default and adds forensic event types like MailItemsAccessed that Standard lacks. It is Audit (Standard) that is enabled by default at a broader tier, and the two tiers do not capture identical event sets."
+      "explanation": "Audit (Standard) retains records for 180 days by default, so eight-month-old activity is gone, whereas Audit (Premium) retains records for a year by default and adds the mailbox-access forensic events (such as MailItemsAccessed) this investigation depends on. Licensing cannot retroactively recreate records that have expired or were never generated. Message trace reports delivery through the transport pipeline over a limited window; it never records which items a signed-in user opened."
     },
     {
       "id": "msq6",
       "cat": "governSecure",
       "type": "ms",
-      "question": "Which two statements accurately describe Insider Risk Management? (Choose two.)",
+      "question": "Contoso configures an Insider Risk Management policy for data theft by departing users and connects the Microsoft 365 HR connector. Which two statements about the resulting alerts are accurate? (Choose two.)",
       "options": [
-        "It automatically discloses a flagged user's full identity to every reviewer immediately",
-        "It can only use file-download signals and ignores all other activity types",
-        "It can combine activity signals with HR events like resignation or termination",
-        "It pseudonymizes user identities in alerts by default until further investigation is needed"
+        "Alerts display pseudonymized user names until a user with the appropriate role reveals the identity",
+        "Resignation and termination dates imported through the HR connector act as triggering events for the policy",
+        "The policy blocks the flagged downloads in real time once an alert reaches high severity",
+        "Alerts for the policy are generated only after the user's termination date has passed"
       ],
       "correct": [
-        2,
-        3
+        0,
+        1
       ],
-      "explanation": "Insider Risk Management combines behavioral signals with HR data like resignation/termination events, and pseudonymizes identities by default to protect privacy during review. It does not disclose full identities immediately to every reviewer, and it considers a broad range of signals, not file downloads alone."
+      "explanation": "Insider Risk Management pseudonymizes identities in alerts by default, and the HR connector supplies the departure dates that trigger scoring for the departing-user policy template. The policy itself detects and scores activity for investigation; it does not block downloads, which would be DLP's job (or adaptive protection feeding a DLP policy). The policy watches a window of activity before and after the departure date, since the risky behavior usually happens before the last day."
     },
     {
       "id": "msq7",
       "cat": "aiServices",
       "type": "ms",
-      "question": "Which two statements accurately describe how Microsoft 365 Copilot handles data access? (Choose two.)",
+      "question": "During a Copilot pilot, a Contoso user shows that Copilot summarized a salary spreadsheet. Investigation finds the file sits on an HR site that was shared with 'Everyone except external users', and the user had never opened it. Which two conclusions are correct? (Choose two.)",
       "options": [
-        "Copilot only surfaces organizational content the requesting user already has permission to view",
-        "Copilot grants users new access to files they previously could not open",
-        "Copilot bypasses SharePoint and Exchange permission models entirely",
-        "Pre-existing oversharing (like broad \"Anyone\" links) increases the risk of Copilot surfacing content that should have been restricted"
+        "The user already had permission to the file through the broad sharing grant; Copilot did not create new access",
+        "Remediation belongs in SharePoint: remove the broad grant and review the HR site's sharing settings",
+        "Copilot cached the spreadsheet from another user's session and served it across accounts",
+        "Disabling the Semantic Index for the HR site would have prevented the exposure"
       ],
       "correct": [
         0,
-        3
+        1
       ],
-      "explanation": "Copilot strictly honors existing permissions and does not grant any new access, which is exactly why pre-existing oversharing (not Copilot itself) is the real risk exposed when Copilot summarizes broadly shared content. It does not bypass SharePoint or Exchange permissions."
+      "explanation": "Copilot only surfaces what the requesting user can open, so the spreadsheet was reachable because of the 'Everyone except external users' grant, and the fix is to correct that sharing, which SharePoint Advanced Management's data access governance reports help find at scale. Copilot has no cross-user cache; each response is grounded for the requesting identity. The Semantic Index cannot be disabled per site; hiding a site from Copilot during review is done with Restricted SharePoint Search."
     },
     {
       "id": "msq8",
       "cat": "aiServices",
       "type": "ms",
-      "question": "Which two statements accurately describe Data Security Posture Management for AI (DSPM for AI) in Microsoft Purview? (Choose two.)",
+      "question": "Contoso enables Data Security Posture Management for AI in Microsoft Purview. Which two outcomes can Contoso expect? (Choose two.)",
       "options": [
-        "It is a licensing add-on required before any user can be assigned a Copilot license",
-        "It provides visibility into how users interact with AI apps like Microsoft 365 Copilot",
-        "It can recommend or help apply DLP and sensitivity-label policies tailored to AI usage",
-        "It is limited to auditing only Microsoft Security Copilot, not general Copilot usage"
+        "Reports showing sensitive information types detected in prompts and responses across Copilot and third-party AI sites",
+        "One-click recommended policies, such as a DLP policy that limits pasting sensitive data into AI websites",
+        "Automatic blocking of any Copilot response that contains sensitive information",
+        "A licensing prerequisite that must be satisfied before Copilot licenses can be assigned"
       ],
       "correct": [
-        1,
-        2
+        0,
+        1
       ],
-      "explanation": "DSPM for AI gives visibility into AI app usage and recommends or helps apply tailored DLP and labeling policies for that usage. It is not a licensing prerequisite for assigning Copilot, and it is not limited to Security Copilot alone \u2014 it covers AI usage more broadly, including Microsoft 365 Copilot."
+      "explanation": "DSPM for AI provides visibility reports on sensitive data in AI interactions and surfaces recommended policies it can create for you, which is how it bridges discovery to action. It does not itself enforce anything; blocking requires a DLP policy with the Microsoft 365 Copilot location or endpoint DLP for AI sites. It is also not a licensing gate; Copilot licenses can be assigned whether or not DSPM for AI has ever been opened."
     },
     {
       "id": "q35",
@@ -1398,9 +1406,9 @@
       "type": "mc",
       "question": "An organization is migrating from Tenant A to Tenant B during a merger and wants to reuse its custom domain contoso.com in Tenant B. What must happen before contoso.com can be verified in Tenant B?",
       "options": [
-        "Nothing; the same domain can be verified in both tenants simultaneously",
-        "The domain must first be removed from Tenant A's verified domains before it can be added and verified in Tenant B",
-        "Tenant B must be granted GDAP access to Tenant A",
+        "Nothing; the same custom domain can be verified in both tenants at the same time",
+        "Remove the domain from Tenant A's verified domains, then add and verify it in Tenant B",
+        "Tenant B must be granted a GDAP relationship to Tenant A before the domain can be verified",
         "A new TXT record must be published for Tenant A only, and Tenant B inherits verification automatically"
       ],
       "correct": 1,
@@ -1410,15 +1418,15 @@
       "id": "q36",
       "cat": "tenantConfig",
       "type": "mc",
-      "question": "A company wants front-line support staff to be able to reset passwords for regular end users, without granting them the ability to reset a Global Administrator's password or manage any other tenant-wide settings. Which built-in role should be assigned?",
+      "question": "Contoso's service desk must be able to reset passwords for non-administrator users and open support requests with Microsoft. Service desk staff must not be able to reset passwords for users who hold admin roles or modify user accounts. You need to follow the principle of least privilege. Which role should you assign?",
       "options": [
-        "Global Administrator",
-        "User Administrator",
         "Helpdesk Administrator",
-        "Compliance Administrator"
+        "Password Administrator",
+        "User Administrator",
+        "Service Support Administrator"
       ],
-      "correct": 2,
-      "explanation": "Helpdesk Administrator is scoped specifically to resetting passwords and managing service requests for non-admin (and certain other limited) users, without the tenant-wide control Global Administrator would grant. It notably cannot reset passwords for users holding admin roles, which is exactly the least-privilege boundary the scenario requires."
+      "correct": 0,
+      "explanation": "Helpdesk Administrator can reset passwords for non-admins (and other helpdesk admins), and it can also create and manage Microsoft support requests, which covers both duties with no account-editing rights. Password Administrator can reset non-admin passwords but cannot open support requests. User Administrator adds the ability to create and modify users and groups, which exceeds least privilege. Service Support Administrator can open support requests and view service health but cannot reset anyone's password."
     },
     {
       "id": "q37",
@@ -1428,11 +1436,11 @@
       "options": [
         "Files & emails scope only",
         "Groups & sites scope",
-        "Retention scope",
-        "Communication compliance scope"
+        "Schematized data assets scope",
+        "Meetings and calendar events scope"
       ],
       "correct": 1,
-      "explanation": "The Groups & sites scope applies container-level settings \u2014 like privacy, external access, and unmanaged device restrictions \u2014 to the Microsoft 365 Group or Team itself. The Files & emails scope only protects individual documents and messages and has no effect on a team's container-level settings, and there is no 'retention scope' or 'communication compliance scope' for sensitivity labels."
+      "explanation": "The Groups & sites scope applies container-level settings \u2014 privacy, external access, and unmanaged device restrictions \u2014 to the Microsoft 365 Group or Team itself. The Files & emails scope only protects individual documents and messages (meetings are part of that same items scope, not a separate one), and the Schematized data assets scope covers database columns and similar assets in the Purview Data Map; none of those touch a team's container-level settings."
     },
     {
       "id": "q38",
@@ -1452,15 +1460,16 @@
       "id": "q39",
       "cat": "governSecure",
       "type": "mc",
-      "question": "Microsoft Entra ID Protection flags a sign-in attempt as high risk due to an impossible-travel pattern, while a separate, unrelated leaked-credential detection has marked the same user's account as high user risk. What is the key difference in how these two risk types are typically remediated?",
+      "question": "Contoso enforces risk-based Conditional Access policies. A user's sign-in is flagged with high sign-in risk because of impossible travel, and the same account separately shows high user risk from a leaked-credential detection. The user completes MFA successfully for the risky sign-in. What is the account's state afterward?",
       "options": [
-        "Both risk types are treated identically, and Microsoft Entra ID Protection applies the same remediation to each",
-        "Sign-in risk is often resolved by satisfying MFA for that session, while high user risk (like leaked credentials) typically requires a secure password change to clear",
-        "User risk is primarily a monitoring signal, with remediation usually handled through a separate manual investigation",
-        "Sign-in risk is typically resolved with a password change, while user risk is resolved by satisfying MFA"
+        "The sign-in risk is remediated, but the user risk remains until a secure password change",
+        "Both the sign-in risk and the user risk are remediated by the successful MFA",
+        "Neither risk is remediated until an administrator dismisses the user risk",
+        "The user risk is remediated, but the sign-in risk remains until an administrator confirms it safe"
       ],
-      "correct": 1,
-      "explanation": "Sign-in risk reflects a specific session's suspicious signal and can often be resolved by satisfying MFA in that session, while user risk reflects an ongoing likelihood the account itself is compromised (such as leaked credentials) and typically requires a password reset to actually clear. The two are evaluated and remediated differently, not interchangeably."
+      "correct": 0,
+      "explanation": "Sign-in risk is a per-session signal, so satisfying MFA remediates that sign-in. User risk from leaked credentials indicates the password itself is compromised, and it is remediated by a secure password change (self-service through a user-risk policy, or an admin reset); MFA alone does not clear it. Admin dismissal is a manual option, not a requirement, and the claim that user risk clears while sign-in risk lingers reverses which risk each remediation addresses.",
+      "whyTested": "This checks that you distinguish per-session sign-in risk from account-level user risk, and that you know MFA clears the former while only a password change clears the latter \u2014 the two are evaluated and remediated differently, not interchangeably."
     },
     {
       "id": "q40",
@@ -1471,24 +1480,24 @@
         "A static scope listing named users",
         "An adaptive scope based on a department attribute query",
         "A sensitivity label auto-labeling policy",
-        "Restricted SharePoint Search"
+        "A retention label published to the Finance users"
       ],
       "correct": 1,
-      "explanation": "Adaptive scopes dynamically include users, groups, or sites based on attribute queries like department, so the policy's coverage recalculates automatically as attributes or membership change. A static scope would require manual updates every time someone joins or leaves Finance, defeating the requirement."
+      "explanation": "Adaptive scopes dynamically include users, groups, or sites based on attribute queries like department, so the policy's coverage recalculates automatically as attributes or membership change. A static scope would require manual updates every time someone joins or leaves Finance, defeating the requirement. Sensitivity auto-labeling applies protection, not retention, and publishing a retention label only makes it available for users to apply by hand; it does not scope or apply a policy automatically."
     },
     {
       "id": "q41",
       "cat": "governSecure",
       "type": "mc",
-      "question": "A user has been assigned the Global Administrator Microsoft Entra role but is unable to run searches in the Microsoft Purview unified audit log. What is the most likely reason?",
+      "question": "A Contoso compliance analyst must search the unified audit log for a quarterly review and must not be able to change audit retention policies or any other Purview configuration. The analyst currently holds no roles. You need to follow least privilege. What should you do?",
       "options": [
-        "Audit log search requires a separate Purview role group or role assignment with audit rights, which is a distinct permission layer from Microsoft Entra directory roles",
-        "Global Administrator access to Purview compliance features was intentionally removed in a recent Microsoft security update",
-        "The unified audit log has been disabled by an Exchange Online configuration change and needs re-enabling",
-        "Audit log search requires a Microsoft 365 Copilot license"
+        "Add the analyst to the Audit Reader role group in Microsoft Purview",
+        "Add the analyst to the Audit Manager role group in Microsoft Purview",
+        "Add the analyst to the Compliance Administrator role group in Microsoft Purview",
+        "Assign the analyst the Reports Reader Microsoft Entra role"
       ],
       "correct": 0,
-      "explanation": "Purview permissions, including audit log search, are managed through a separate role-group permission layer from Microsoft Entra directory roles, so a Global Administrator may still need explicit audit-related role group assignment in some configurations. There's no such removal of Global Administrator's compliance access, audit logging is on by default in modern tenants rather than something that needs re-enabling, and none of this has anything to do with Copilot licensing."
+      "explanation": "Audit Reader grants exactly the View-Only Audit Logs permission needed to search the unified audit log. Audit Manager is the near-miss: it also allows creating and managing audit log retention policies, which the scenario forbids. Compliance Administrator spans most Purview solutions and is far broader than needed. Reports Reader is a Microsoft Entra role for usage reports and does not include audit log search."
     },
     {
       "id": "q42",
@@ -1496,10 +1505,10 @@
       "type": "mc",
       "question": "An admin wants to measure Microsoft 365 Copilot adoption across the organization \u2014 which apps it's used in and overall active-user trends \u2014 without being able to see the specific content of any individual user's prompts. Which capability should they use?",
       "options": [
-        "Microsoft Purview eDiscovery search on a named user's mailbox",
+        "A Microsoft Purview eDiscovery search across each named user's mailbox",
         "Microsoft 365 Copilot usage reports and the Viva Insights Copilot Dashboard",
-        "Insider Risk Management case details",
-        "Restricted SharePoint Search reporting"
+        "Insider Risk Management case details for each licensed user",
+        "Restricted SharePoint Search reporting in the SharePoint admin center"
       ],
       "correct": 1,
       "explanation": "Copilot usage reports in the Microsoft 365 admin center and the Viva Insights Copilot Dashboard show aggregated adoption metrics like active users and app usage trends without exposing individual prompt content. Seeing a specific user's actual prompts would require an eDiscovery search instead, which is a different, more invasive capability."
@@ -1525,7 +1534,7 @@
       "question": "A custom Copilot Studio agent built by one department is consuming far more messages than its bundled included capacity allows. What happens once that included message allotment is exhausted, assuming no capacity add-on has been purchased?",
       "options": [
         "The agent is deleted automatically the moment its included message capacity runs out",
-        "Additional usage is billed on a metered, pay-as-you-go basis, or the agent may stop responding if consumption billing isn't enabled",
+        "Further usage is billed pay-as-you-go if enabled; otherwise the agent may stop responding until the next period",
         "The agent's included capacity silently resets and usage continues with no billing impact",
         "Microsoft 365 Copilot licenses for the entire tenant are automatically suspended until capacity is purchased"
       ],
@@ -1544,9 +1553,9 @@
       "id": "tf13",
       "cat": "governSecure",
       "type": "tf",
-      "question": "With Microsoft Entra Privileged Identity Management (PIM), a user assigned as 'eligible' for an admin role has that role active at all times without needing to take any action.",
-      "answer": false,
-      "explanation": "An eligible PIM assignment requires the user to explicitly activate the role, often with MFA and a justification, for a limited time window \u2014 it is not active by default. This is exactly what reduces standing privileged access compared to a permanent role assignment."
+      "question": "In Privileged Identity Management, a user with an active Global Administrator assignment that expires in one month holds the role continuously for that month without activating it, unlike a user with an eligible assignment.",
+      "answer": true,
+      "explanation": "A time-bound active assignment is standing access for its whole window: the role is always on with no activation, justification, approval, or per-use audit entry. An eligible assignment grants nothing until the user activates it, typically with MFA, a justification, and optionally an approver, for a limited activation duration. Both have an end date, but only eligibility delivers just-in-time access."
     },
     {
       "id": "tf14",
@@ -1560,108 +1569,108 @@
       "id": "msq9",
       "cat": "tenantConfig",
       "type": "ms",
-      "question": "Which two statements accurately distinguish Microsoft Entra Cloud Sync from Microsoft Entra Connect? (Choose two.)",
+      "question": "Contoso synchronizes its single Active Directory forest with Microsoft Entra Connect. It acquires Fabrikam, whose forest has no network connectivity or trust with Contoso's forest, and must bring Fabrikam users into the same tenant. Which two statements are accurate? (Choose two.)",
       "options": [
-        "Cloud Sync can run multiple lightweight agents in parallel, simplifying sync from several disconnected on-premises AD forests",
-        "Microsoft Entra Connect supports more complex custom sync rules and scenarios within a single on-premises topology",
-        "Cloud Sync and Microsoft Entra Connect provide identical feature sets with no tradeoffs",
-        "Microsoft Entra Connect must be managed entirely from the cloud with no on-premises component"
+        "Microsoft Entra Cloud Sync agents can be installed in Fabrikam's forest and run alongside the existing Microsoft Entra Connect server",
+        "Cloud Sync does not require network line of sight from Contoso's Microsoft Entra Connect server to Fabrikam's domain controllers",
+        "A second active Microsoft Entra Connect server can be installed in Fabrikam's forest and pointed at the same tenant",
+        "A forest trust between Contoso and Fabrikam must be created before either tool can synchronize Fabrikam's users"
       ],
       "correct": [
         0,
         1
       ],
-      "explanation": "Cloud Sync's multiple lightweight agents make it simpler for merger scenarios with several disconnected AD forests, while Microsoft Entra Connect's more feature-rich single sync engine better handles complex custom rules within one forest topology. The two tools have real tradeoffs and are not identical, and Microsoft Entra Connect requires an on-premises server component rather than being managed purely from the cloud."
+      "explanation": "Cloud Sync's lightweight agents install inside the forest they synchronize and are managed from the Microsoft Entra admin center, so they can cover Fabrikam's disconnected forest while Microsoft Entra Connect keeps handling Contoso's forest; the two tools are supported side by side for different forests. Only one active Microsoft Entra Connect server is supported per tenant (additional servers must be in staging mode), so a second active server is not an option. Neither tool requires a forest trust; Microsoft Entra Connect would need network connectivity to Fabrikam's domain controllers, which is exactly what is missing."
     },
     {
       "id": "msq10",
       "cat": "governSecure",
       "type": "ms",
-      "question": "Which two statements accurately describe Microsoft Purview Compliance Manager assessments and templates? (Choose two.)",
+      "question": "Contoso adds the ISO 27001 and GDPR assessments to Compliance Manager, then enables MFA for all administrators. Which two statements are accurate? (Choose two.)",
       "options": [
-        "An organization can run multiple assessments concurrently against different regulatory templates like GDPR and ISO 27001",
-        "The same improvement action (like enabling MFA) can never count toward more than one assessment",
-        "Assessment templates translate regulatory requirements into tracked improvement actions with assigned point values",
-        "Compliance Manager can only track one regulation per tenant at a time"
+        "The MFA improvement action can contribute points to both assessments at the same time",
+        "Actions Microsoft is responsible for appear in each assessment with Microsoft's own test status, without Contoso implementing them",
+        "Marking the MFA action as implemented causes Compliance Manager to configure the Conditional Access policy",
+        "A 100 percent compliance score means Contoso has achieved ISO 27001 certification"
       ],
       "correct": [
         0,
-        2
+        1
       ],
-      "explanation": "Compliance Manager supports running multiple concurrent assessments against different regulatory templates, and each template turns requirements into trackable improvement actions with point values contributing to a compliance score. A single control like MFA often satisfies overlapping requirements and can count toward more than one assessment simultaneously, and there is no one-regulation-per-tenant limit."
+      "explanation": "Improvement actions are shared across assessments, so one control such as admin MFA earns credit wherever a template requires it, and Microsoft-managed actions are tracked with Microsoft's attestation under the shared responsibility model. Compliance Manager tracks and scores; it never configures tenant settings itself. The compliance score is an internal progress measure, not an auditor's certification."
     },
     {
       "id": "msq11",
       "cat": "aiServices",
       "type": "ms",
-      "question": "Which two statements accurately describe governing Copilot extensibility (plugins and published agents) in a Microsoft 365 tenant? (Choose two.)",
+      "question": "A Contoso employee publishes a Copilot Studio agent to Microsoft 365 Copilot, but colleagues cannot find it in their agent list. Which two statements are accurate? (Choose two.)",
       "options": [
-        "Admins can allow, block, or scope specific plugins and published agents to designated groups through Integrated apps and agent management settings",
-        "Any agent published in Copilot Studio automatically becomes available to every user in the tenant with no admin action",
-        "Extensibility governance lets an admin control which third-party plugins and Graph connectors are available tenant-wide",
-        "Published agents cannot be restricted to any subset of users once created"
+        "If the tenant requires admin approval for agents, the agent remains unavailable until an admin approves it in Integrated apps",
+        "An admin can make the approved agent available to specific users or groups rather than to everyone",
+        "Publishing from Copilot Studio automatically makes the agent available to every user in the tenant",
+        "An admin must first create an app registration for the agent in Microsoft Entra before it can appear"
       ],
       "correct": [
         0,
-        2
+        1
       ],
-      "explanation": "Admin-managed Integrated apps and agent management settings let admins allow, block, or scope plugins, connectors, and published agents to specific groups rather than leaving extensibility ungoverned. Publishing an agent does not automatically make it available tenant-wide \u2014 admin allow-listing is often what actually gates visibility and access."
+      "explanation": "Shared agents flow through Integrated apps, where tenants that require approval hold them until an admin acts, and the admin can then deploy the agent to all users, specific groups, or no one. Publishing alone does not grant tenant-wide availability, which is exactly why the colleagues cannot see it. Copilot Studio handles the agent's identity and registration as part of publishing; the admin does not hand-create an app registration."
     },
     {
       "id": "q45",
       "cat": "tenantConfig",
       "type": "mc",
-      "question": "Which Microsoft 365 group type is created automatically for a Teams channel and provides a shared mailbox, calendar, and file storage for its members?",
+      "question": "Contoso needs a group that project managers can email to reach all project leads, and that site owners can use to grant permissions on several SharePoint sites. The group must not provision its own mailbox, SharePoint site, or Planner. Which type of group should you create?",
       "options": [
-        "Security group",
-        "Distribution group",
-        "Microsoft 365 group",
-        "Dynamic distribution group"
+        "A mail-enabled security group",
+        "A Microsoft 365 group",
+        "A distribution group",
+        "A security group"
       ],
-      "correct": 2,
-      "explanation": "A Microsoft 365 group is the collaboration container behind Teams, provisioning a shared mailbox, calendar, and SharePoint file storage together. Security and distribution groups only manage access and mail distribution respectively, with no shared mailbox or file storage of their own, and a dynamic distribution group is just a mail-enabled group with rule-based membership."
+      "correct": 0,
+      "explanation": "A mail-enabled security group is both a mail recipient and a security principal, so it can receive email and be used in SharePoint permission grants without provisioning any connected resources. A Microsoft 365 group would also satisfy email and permissions, but it automatically creates a group mailbox, SharePoint site, and Planner, which the scenario excludes. A distribution group receives email but is not a security principal, so it cannot be used to grant SharePoint permissions. A plain security group can be used for permissions but is not mail-enabled."
     },
     {
       "id": "q46",
       "cat": "tenantConfig",
       "type": "mc",
-      "question": "A company creates a shared mailbox meant only to be accessed by several existing licensed users, with no one signing into it directly, and it stays under 50 GB. Does the shared mailbox itself need its own separate license assigned?",
+      "question": "Contoso's legal team asks you to place the shared mailbox contracts@contoso.com on Litigation Hold. The mailbox is accessed only through delegates who hold Microsoft 365 E3 licenses, and no one signs in to it directly. An administrator states that shared mailboxes never require a license. What should you do?",
       "options": [
-        "No, a shared mailbox under 50 GB doesn't need its own license as long as no one signs into it directly",
-        "Yes, every mailbox object in the tenant requires a full license regardless of type",
-        "No, but only if Conditional Access is disabled for that mailbox",
-        "Yes, but only an Exchange Online Kiosk license is required, never a full suite license"
+        "Assign an Exchange Online license to the shared mailbox before applying the hold",
+        "Apply the hold without a license, since no one signs in to the mailbox directly",
+        "Convert the shared mailbox to a user mailbox so the hold can be applied",
+        "Apply the hold to each delegate's mailbox instead, since their licenses cover the shared mailbox"
       ],
       "correct": 0,
-      "explanation": "A shared mailbox stays license-free as long as it remains under the size threshold and no one authenticates to it directly as its own identity \u2014 access instead flows through the licenses of the users delegated to it. Licensing has nothing to do with Conditional Access being enabled or disabled, and growing past the free threshold requires a license on the mailbox, not a specific Kiosk-only requirement."
+      "explanation": "A shared mailbox is license-free only while it stays under the size threshold with no archive, no hold, and no direct sign-in. Placing it on Litigation Hold is one of the conditions that requires an Exchange Online license on the shared mailbox itself. The 'no direct sign-in' rule covers normal delegated use, not holds. Converting to a user mailbox is unnecessary and still needs a license. Delegates' licenses never extend to the shared mailbox object, and holding their mailboxes would not preserve the shared mailbox's content."
     },
     {
       "id": "q47",
       "cat": "governSecure",
       "type": "mc",
-      "question": "Which Microsoft Entra feature requires a user to re-prove their identity through a second factor, beyond just a password, before completing sign-in?",
+      "question": "Contoso requires MFA through Conditional Access. Most users registered SMS as their only method. You need to move users to Microsoft Authenticator with number matching and stop new SMS registrations, without immediately locking out users who have only SMS today. What should you do first?",
       "options": [
-        "Multifactor authentication (MFA)",
-        "Self-service password reset",
-        "Group-based licensing",
-        "Dynamic distribution groups"
+        "Configure a registration campaign for Microsoft Authenticator in the Authentication methods policy",
+        "Apply the built-in Phishing-resistant MFA authentication strength in the Conditional Access policy",
+        "Disable the SMS method in the Authentication methods policy",
+        "Enable per-user MFA enforcement for all users in the legacy MFA portal"
       ],
       "correct": 0,
-      "explanation": "MFA requires a second verification factor beyond the password itself. Self-service password reset lets a user recover access to their own account without a second factor being the focus, and group-based licensing and dynamic distribution groups both manage group membership and license assignment, with no bearing on sign-in verification."
+      "explanation": "A registration campaign prompts users who still rely on weaker methods to set up Microsoft Authenticator at sign-in, with a snooze window, so adoption rises before SMS is switched off; that is the right first move. Requiring phishing-resistant strength would immediately reject SMS sign-ins and also reject Authenticator push, which is not phishing-resistant. Disabling SMS now locks out everyone who has nothing else registered. Per-user MFA is the legacy mechanism Microsoft steers customers away from, and it does not drive Authenticator registration."
     },
     {
       "id": "q48",
       "cat": "governSecure",
       "type": "mc",
-      "question": "A document needs to be encrypted and marked 'Confidential' so only authorized people can open it, while a separate requirement says the same document type must be kept for 7 years and then automatically deleted. Which combination of Purview features addresses both requirements?",
+      "question": "Contoso wants any document saved to SharePoint that contains credit card numbers to be encrypted automatically, with no action by the user who saved it. Users should keep working on the files normally. Which should you configure?",
       "options": [
-        "A sensitivity label for the encryption/marking requirement, and a retention label for the 7-year keep-then-delete requirement",
-        "A single retention label handles both the encryption and the 7-year deletion schedule",
-        "A single sensitivity label handles both the encryption and the 7-year deletion schedule",
-        "A DLP policy handles both requirements, since DLP can also encrypt content and set retention schedules"
+        "A sensitivity label auto-labeling policy for SharePoint with a label that applies encryption",
+        "A DLP policy for SharePoint with an action that encrypts matching content",
+        "A mandatory labeling policy that sets a default encrypted label for all documents",
+        "An auto-apply retention label policy that targets the credit card sensitive information type"
       ],
       "correct": 0,
-      "explanation": "Sensitivity labels handle protection actions like encryption and visual marking; retention labels handle the lifecycle question of how long content is kept before deletion \u2014 two distinct label types applied together. A retention label doesn't encrypt content, a sensitivity label doesn't manage a keep-then-delete timeline, and DLP policies detect and act on content patterns rather than applying encryption or retention schedules themselves."
+      "explanation": "Service-side auto-labeling scans content in SharePoint, OneDrive, and Exchange and applies a sensitivity label, including one that encrypts, with no user involvement. The DLP encrypt action is the near-miss: it exists, but it applies only to Exchange email, so it cannot encrypt SharePoint files. A mandatory default label depends on users saving from a client that applies it and would encrypt every document, not just those containing card numbers. A retention label governs how long content is kept and cannot encrypt anything."
     },
     {
       "id": "q49",
@@ -1669,13 +1678,13 @@
       "type": "mc",
       "question": "An organization wants to detect when an employee who is about to resign downloads an unusually large volume of files shortly before their last day, correlated with their HR-flagged departure status. Separately, they want to review whether employees are sharing offensive language in Teams chats company-wide. Which two Purview solutions address these, respectively?",
       "options": [
-        "Insider Risk Management for the departure-linked data exfiltration scenario, and Communication compliance for the offensive-language review",
+        "Insider Risk Management for the departure scenario, and Communication compliance for the language review",
         "Communication compliance for the departure scenario, and Insider Risk Management for the language review",
-        "eDiscovery (Premium) handles both, since it can also flag risky user behavior",
-        "DSPM for AI handles both, since it monitors any unusual data access pattern"
+        "eDiscovery (Premium) handles both, since its analytics can also flag risky behavior and offensive language",
+        "DSPM for AI handles both, since it monitors unusual data access patterns and risky messages"
       ],
       "correct": 0,
-      "explanation": "Insider Risk Management correlates HR signals like departure status with activity like unusual downloads to flag potential data exfiltration. Communication compliance reviews message content for policy violations like offensive language. The pairing is reversed in the second option, eDiscovery is a search/hold tool rather than a behavioral risk detector, and DSPM for AI is scoped to AI interaction risk, not general file-download or chat-content review."
+      "explanation": "Insider Risk Management correlates HR signals like departure status with activity like unusual downloads to flag potential data exfiltration. Communication compliance reviews message content for policy violations like offensive language. Swapping the two assigns each tool the job it does not do, eDiscovery is a search/hold tool rather than a behavioral risk detector, and DSPM for AI is scoped to AI interaction risk, not general file-download or chat-content review."
     },
     {
       "id": "q50",
@@ -1683,41 +1692,41 @@
       "type": "mc",
       "question": "A tenant currently relies on Security Defaults for baseline protection. The security team wants a more advanced rule \u2014 block sign-in from a specific country except for two named traveling executives \u2014 while keeping simple baseline MFA enforced everywhere else with no ongoing manual policy upkeep for every new user. What should they do?",
       "options": [
-        "Turn off Security Defaults and create custom Conditional Access policies covering the country-based block and the other baseline protections it was providing",
+        "Turn off Security Defaults and rebuild its baseline protections, plus the country-based block, as Conditional Access policies",
         "Keep Security Defaults enabled and add a separate Conditional Access policy for the country-based block exception",
         "Leave Security Defaults enabled, since it already supports per-country, per-user exceptions natively",
-        "Disable MFA entirely and rely only on the new country-based Conditional Access rule"
+        "Keep Security Defaults enabled and add the two executives to an exclusion list within Security Defaults"
       ],
       "correct": 0,
-      "explanation": "Security Defaults and custom Conditional Access policies can't run side by side \u2014 enabling the granular, per-country exception this scenario needs requires turning off Security Defaults and rebuilding its baseline protections (like tenant-wide MFA) as explicit Conditional Access policies. Security Defaults itself is an all-or-nothing baseline with no per-country or per-user exception support, and dropping MFA entirely would remove the baseline protection the team wants to keep."
+      "explanation": "Security Defaults and custom Conditional Access policies can't run side by side \u2014 enabling the granular, per-country exception this scenario needs requires turning off Security Defaults and rebuilding its baseline protections (like tenant-wide MFA) as explicit Conditional Access policies. Security Defaults itself is an all-or-nothing baseline with no per-country logic and no exclusion list of any kind, so neither 'keep it and add an exception' option is possible."
     },
     {
       "id": "q51",
       "cat": "aiServices",
       "type": "mc",
-      "question": "Which of these is required before a user can access the full paid Microsoft 365 Copilot experience across Word, Excel, and Outlook?",
+      "question": "Contoso has 1,000 employees with Microsoft 365 E3. All employees need web-grounded AI chat with enterprise data protection. Only the 100 managers need Copilot in Word, Excel, and Teams meetings grounded in organizational data. You need to minimize licensing cost. What should you do?",
       "options": [
-        "A qualifying Microsoft 365 base license plus the Copilot add-on license",
-        "Only the Copilot add-on license, with no base subscription required",
-        "Only a Microsoft Entra ID P2 license",
-        "A Copilot Studio message pack alone"
+        "Buy 100 Microsoft 365 Copilot licenses for the managers and rely on Microsoft 365 Copilot Chat for everyone else",
+        "Buy 1,000 Microsoft 365 Copilot licenses so every employee has a consistent Copilot experience",
+        "Buy 100 Microsoft 365 Copilot licenses and 900 Microsoft 365 Copilot Chat licenses",
+        "Upgrade all 1,000 employees to Microsoft 365 E5, which includes Copilot in the apps"
       ],
       "correct": 0,
-      "explanation": "The paid Microsoft 365 Copilot experience requires both an eligible base Microsoft 365 subscription and the separately assigned Copilot add-on license \u2014 neither alone is sufficient. Entra ID P2 governs identity protection and PIM, and a Copilot Studio message pack covers custom agent usage, not the in-app Word/Excel/Outlook experience."
+      "explanation": "Microsoft 365 Copilot Chat comes with every Microsoft Entra work account at no additional cost and provides web-grounded chat with enterprise data protection, so only the managers need the paid add-on that embeds Copilot in the apps and grounds it in organizational data. Licensing all 1,000 overspends by 900 licenses. There is no separate Copilot Chat license to buy, and Microsoft 365 E5 does not include Microsoft 365 Copilot."
     },
     {
       "id": "q52",
       "cat": "aiServices",
       "type": "mc",
-      "question": "A department wants Copilot to also pull live data from a third-party ticketing system when answering support questions, beyond what's already grounded in Microsoft 365 content. What enables this?",
+      "question": "Contoso's support team wants Microsoft 365 Copilot to answer questions such as 'what is the status of ticket 4821' using live data from a third-party ticketing system, and to create new tickets on request. What should you build?",
       "options": [
-        "A Copilot Studio connector or plugin that integrates with the ticketing system's API",
-        "A higher-tier Microsoft 365 Copilot license that unlocks unlimited grounding sources",
-        "A sensitivity label applied to records in the ticketing system",
-        "Enabling the Semantic Index for the ticketing system automatically"
+        "A Copilot Studio agent with an action that calls the ticketing system's API",
+        "A Microsoft Graph connector that indexes the ticketing system's records",
+        "A Power Platform DLP policy that allows the ticketing system connector",
+        "A SharePoint list synchronized nightly from the ticketing system and an agent grounded on it"
       ],
       "correct": 0,
-      "explanation": "Extending Copilot to a third-party system requires a connector or plugin built to talk to that system's API \u2014 that's the mechanism for pulling in live external data. There's no license tier that simply unlocks more grounding sources, sensitivity labels classify and protect content rather than connect Copilot to it, and the Semantic Index only covers content already ingested through Microsoft Graph, not an arbitrary external system automatically."
+      "explanation": "Live lookups and write-backs such as creating a ticket require an action (plugin) that calls the system's API at runtime, which is what a Copilot Studio agent with a connector action provides. A Graph connector is the near-miss: it indexes a copy of the records for search and grounding, so answers can be stale and it cannot create tickets. A Power Platform DLP policy only permits or blocks connectors; it builds nothing. A nightly SharePoint sync is neither live nor capable of taking actions."
     },
     {
       "id": "q53",
@@ -1725,9 +1734,9 @@
       "type": "mc",
       "question": "DSPM for AI reports show many interactions where Copilot surfaced files with an \"Anyone in the organization\" link that contain sensitive financial terms. The security team wants to move from just seeing this in reports to actually blocking Copilot from including that sensitive content in future responses. What's the necessary next step, and why doesn't DSPM for AI alone accomplish it?",
       "options": [
-        "Create or tune a Purview DLP policy targeting Copilot interactions, since DSPM for AI surfaces and reports on risk but doesn't itself enforce a blocking action",
-        "Nothing further is needed \u2014 DSPM for AI's reports automatically begin enforcing once a risk threshold is reached",
-        "Enable Insider Risk Management instead, since it is what actually blocks Copilot responses",
+        "Create or tune a Purview DLP policy scoped to Microsoft 365 Copilot, because DSPM for AI reports on risk but does not enforce",
+        "Nothing further is needed, because DSPM for AI reports begin enforcing once a risk threshold is reached",
+        "Enable Insider Risk Management instead, because it is what actually blocks Copilot responses",
         "Apply a sensitivity label to DSPM for AI itself, which extends its reporting into an enforcement policy"
       ],
       "correct": 0,
@@ -1737,15 +1746,15 @@
       "id": "q54",
       "cat": "tenantConfig",
       "type": "mc",
-      "question": "Which email authentication mechanism tells receiving mail servers what action to take (monitor, quarantine, or reject) when a message fails sender verification, and where to send aggregate failure reports?",
+      "question": "Contoso publishes SPF and DKIM records for contoso.com. Attackers still send spoofed messages that appear to come from contoso.com, and some partner mail systems deliver them. Contoso wants receiving systems to reject messages that fail authentication and wants to receive aggregate reports about those failures. What should you publish?",
       "options": [
-        "An SPF record alone",
-        "A DKIM signature alone",
-        "A DMARC policy published in DNS",
-        "Safe Links time-of-click verification"
+        "A DMARC TXT record with a reject policy and a reporting address",
+        "An SPF record that ends with a hard fail (-all) qualifier",
+        "A second DKIM selector with a longer signing key",
+        "An MX record that routes inbound mail through Exchange Online Protection"
       ],
-      "correct": 2,
-      "explanation": "DMARC is specifically the policy and reporting layer built on top of SPF and DKIM, defining the disposition action and where aggregate reports go. SPF only lists authorized sending servers and DKIM only signs messages \u2014 neither one alone specifies what a receiving server should do about a failure, and Safe Links is an unrelated post-delivery URL click-time protection."
+      "correct": 0,
+      "explanation": "DMARC is the policy layer on top of SPF and DKIM: it tells receiving servers what to do on failure (monitor, quarantine, or reject) and where to send aggregate reports, which covers both requirements. A hard-fail SPF qualifier only signals a failed sender check; it provides no reporting and receivers treat it inconsistently. Another DKIM selector strengthens signing but does not instruct receivers about disposition. Changing the MX record affects how Contoso receives its own mail, not how other organizations handle mail spoofing contoso.com."
     },
     {
       "id": "q55",
@@ -1793,26 +1802,26 @@
       "id": "tf15",
       "cat": "tenantConfig",
       "type": "tf",
-      "question": "A Microsoft Entra dynamic group updates its membership automatically based on a rule evaluated against attributes like department, without an admin manually adding or removing members.",
-      "answer": true,
-      "explanation": "Dynamic groups evaluate a membership rule against attributes and add or remove members automatically as those attributes change, with no manual curation required \u2014 this is exactly what lets a dependent process like group-based licensing stay current on its own."
+      "question": "A dynamic security group with the rule department -eq \"Finance\" is used for group-based licensing. When an administrator manually adds a contractor to that group, the contractor receives the group's license.",
+      "answer": false,
+      "explanation": "Membership of a dynamic group is calculated entirely from its rule; members cannot be added or removed manually, so the attempt is not possible and no license results. To license the contractor, set the attribute the rule evaluates, add the contractor to a separate assigned group that also carries the license, or assign the license directly. The misconception is treating a dynamic group like an assigned group with a helpful default rule."
     },
     {
       "id": "msq12",
       "cat": "tenantConfig",
       "type": "ms",
-      "question": "Which two statements accurately describe Teams meeting and messaging policies? (Choose two.)",
+      "question": "Contoso must prevent frontline workers from recording Teams meetings and must allow only executives to delete chat messages they have sent. Both settings must apply only to the relevant groups and must not change behavior for anyone else. Which two actions should you take? (Choose two.)",
       "options": [
-        "Meeting policies control capabilities like recording, transcription, and who can present",
-        "Messaging policies control chat capabilities like editing and deleting sent messages",
-        "Policy packages bundle Teams calling plans together with Exchange mailbox quotas",
-        "Meeting and messaging policies can only ever be applied tenant-wide, never scoped to a user or group"
+        "Create a meeting policy with cloud recording turned off and assign it to the frontline workers group",
+        "Create a messaging policy that allows deleting sent messages and assign it to the executives group",
+        "Turn off cloud recording in the Global (Org-wide default) meeting policy",
+        "Create a Conditional Access policy that blocks the Teams recording feature for frontline workers"
       ],
       "correct": [
         0,
         1
       ],
-      "explanation": "Meeting policies govern in-meeting capabilities and messaging policies govern chat capabilities, and both are assignable per user or group rather than only tenant-wide. Policy packages bundle related Teams policies for a role, not calling plans with mailbox quotas, which belong to entirely different admin areas."
+      "explanation": "Teams meeting policies control in-meeting capabilities such as recording, and messaging policies control chat behavior such as deleting sent messages; both can be assigned to a group so that only its members are affected. Changing the Global (Org-wide default) policy alters behavior for every user who has no custom policy, which violates the 'no one else' constraint. Conditional Access governs the conditions of sign-in and session, not individual Teams features such as recording."
     },
     {
       "id": "q58",
@@ -1862,10 +1871,10 @@
       "type": "mc",
       "question": "A bank wants to require that administrators sign in using only phishing-resistant authentication methods, such as a FIDO2 security key or certificate-based authentication, rather than accepting any MFA method including SMS. Which Conditional Access control should be configured?",
       "options": [
-        "A session control limiting sign-in frequency",
-        "An authentication strength grant control scoped to phishing-resistant methods",
-        "A basic grant control that simply requires MFA",
-        "Security defaults"
+        "A session control that limits sign-in frequency for administrators",
+        "A grant control that requires a phishing-resistant authentication strength",
+        "A grant control that requires multifactor authentication by any method",
+        "Security defaults, which enforce MFA for all administrator roles"
       ],
       "correct": 1,
       "explanation": "Authentication strength is a grant control that can mandate a specific combination of methods, like phishing-resistant ones, rather than accepting any second factor equally. A plain 'require MFA' control accepts weaker methods like SMS too, a session control only restricts an already-granted session rather than which method was used, and security defaults cannot be customized to this degree."
@@ -1874,26 +1883,26 @@
       "id": "tf16",
       "cat": "governSecure",
       "type": "tf",
-      "question": "Privileged Access Groups (PIM for Groups) let a security group's own membership be made eligible for just-in-time activation, the same way Privileged Identity Management does for individual Microsoft Entra roles.",
+      "question": "If a security group that is assigned the Exchange Administrator role is onboarded to PIM for Groups, making a user's membership eligible means the user holds Exchange Administrator only while an activated membership is in effect.",
       "answer": true,
-      "explanation": "Privileged Access Groups extends PIM's eligible, time-bound activation model to security and Microsoft 365 groups themselves, so a group's own owner or member assignment can require activation too, not only directly assignable Entra roles."
+      "explanation": "PIM for Groups makes group membership itself just-in-time. Any Microsoft Entra role, app role, or license the group grants is effective only while the user's activated membership lasts, so the role becomes just-in-time without configuring PIM separately on the role. The near-miss is assuming the role assignment to the group bypasses the membership activation."
     },
     {
       "id": "msq13",
       "cat": "governSecure",
       "type": "ms",
-      "question": "Which two statements accurately describe Microsoft Entra ID Governance entitlement management (access packages)? (Choose two.)",
+      "question": "A university creates an access package in entitlement management that bundles a Team, a SharePoint site, and an app role for a semester course. Which two statements about this access package are accurate? (Choose two.)",
       "options": [
-        "Access packages can require manager approval before granting bundled resource access",
-        "Access packages automatically expire access after a configured duration unless reapproved",
-        "Access packages can only be requested by admins, never by end users",
-        "Access packages remove any need for Conditional Access policies in the tenant"
+        "The request policy can be set so that access expires on a fixed date at the end of the semester",
+        "The request policy can require the requestor's manager to approve before access is granted",
+        "A recurring access review must be configured on the package before it can be published",
+        "Students from a partner university cannot request the package, because access packages are internal-only"
       ],
       "correct": [
         0,
         1
       ],
-      "explanation": "Access packages support configurable approval steps and automatic expiration unless access is reapproved, both genuine features. They are explicitly built for self-service end-user requests, not admin-only requests, and they don't replace Conditional Access, which remains a separate sign-in control layer."
+      "explanation": "Access package policies support lifecycle settings that expire access on a date or after a number of days, and approval stages that can name the requestor's manager as approver. Access reviews on a package are optional, not a publishing prerequisite. External users can be allowed to request packages through connected organizations, which is one of entitlement management's main uses for guest onboarding."
     },
     {
       "id": "q62",
@@ -1915,10 +1924,10 @@
       "type": "mc",
       "question": "An admin wants to stop Copilot in Word from searching the public web for extra context, while leaving its ability to ground answers in the organization's own files and emails untouched. Where should this be configured?",
       "options": [
-        "The EU Data Boundary settings",
-        "The Copilot page in the Microsoft 365 admin center, by turning off web content grounding",
-        "A Purview DLP policy scoped to Copilot",
-        "Restricted SharePoint Search"
+        "The EU Data Boundary configuration for the tenant's Microsoft 365 data",
+        "The web content grounding setting on the Copilot page in the Microsoft 365 admin center",
+        "A Purview DLP policy with the Microsoft 365 Copilot location",
+        "Restricted SharePoint Search in the SharePoint admin center"
       ],
       "correct": 1,
       "explanation": "The Copilot page in the Microsoft 365 admin center is where tenant-wide and app-specific Copilot settings, including the web content grounding toggle, are managed. The EU Data Boundary governs data residency rather than web grounding, a DLP policy restricts sensitive content in responses rather than toggling web search, and Restricted SharePoint Search only hides specific sites from search and Copilot, with no effect on web grounding."
@@ -1927,40 +1936,40 @@
       "id": "q64",
       "cat": "aiServices",
       "type": "mc",
-      "question": "Which Microsoft 365 Copilot protection is specifically designed to detect and block hidden malicious instructions embedded in grounding content, like a webpage or document, before they can hijack Copilot's response?",
+      "question": "A Contoso user asks Copilot to summarize a supplier's web page. Hidden text on the page instructs Copilot to email the user's recent documents to an external address. Copilot ignores the instruction and only summarizes the visible content. Which protection acted, and what class of attack was attempted?",
       "options": [
-        "Restricted SharePoint Search",
-        "Content safety and prompt-shielding protections against cross-prompt injection",
-        "A DLP policy scoped to Copilot interactions",
-        "Microsoft Entra Agent ID"
+        "Built-in content safety and prompt shields, defending against cross-prompt injection",
+        "A DLP policy with the Microsoft 365 Copilot location, defending against data exfiltration",
+        "Safe Links time-of-click scanning, defending against a malicious URL",
+        "Semantic Index permission trimming, defending against oversharing"
       ],
-      "correct": 1,
-      "explanation": "Content safety and prompt-shielding protections are built specifically to detect and block cross-prompt injection, where hidden instructions in grounding content try to hijack Copilot's behavior. Restricted SharePoint Search only hides sites from search, a DLP policy blocks sensitive content from appearing in output rather than detecting hidden instructions, and Entra Agent ID governs agent identity rather than content safety."
+      "correct": 0,
+      "explanation": "Instructions hidden in grounding content that try to hijack the assistant are cross-prompt injection, and Microsoft 365 Copilot's content safety classifiers and prompt shields are the controls designed to detect and ignore them. A Copilot DLP policy filters sensitive content out of responses but does not recognize hidden instructions. Safe Links evaluates URL reputation when a user clicks, not what a page tells an AI to do. Permission trimming limits what Copilot can read, not how it responds to what it reads."
     },
     {
       "id": "tf17",
       "cat": "aiServices",
       "type": "tf",
-      "question": "Cross-prompt injection refers to hidden malicious instructions embedded in a document or webpage that Copilot reads as grounding content, attempting to hijack its response.",
-      "answer": true,
-      "explanation": "This is exactly what cross-prompt injection is \u2014 an attacker uses content Copilot reads for grounding as a vector to insert hidden instructions, distinct from oversharing, which is about Copilot surfacing content a user could already see rather than being manipulated by it."
+      "question": "A Purview DLP policy with the Microsoft 365 Copilot location prevents cross-prompt injection attacks, because it inspects the grounding content that Copilot reads.",
+      "answer": false,
+      "explanation": "Copilot DLP policies act on sensitive content (labels and sensitive information types) to keep it out of Copilot processing and responses; they do not look for hidden instructions or stop an injected prompt from steering the model. Cross-prompt injection is addressed by Copilot's built-in content safety and prompt-shielding protections. Conflating the two is treating a data-leak control as a manipulation control."
     },
     {
       "id": "msq14",
       "cat": "aiServices",
       "type": "ms",
-      "question": "Which two statements accurately describe generative orchestration in Copilot Studio, compared to classic (topic-based) orchestration? (Choose two.)",
+      "question": "Contoso's HR agent in Copilot Studio must answer open-ended questions from a SharePoint policy library and must walk users through a fixed, scripted sequence when they request paid time off. Which two configurations support this design? (Choose two.)",
       "options": [
-        "Generative orchestration lets the agent's model dynamically decide which topic, knowledge source, or action best answers a message at runtime",
-        "Classic orchestration follows author-defined topics and trigger phrases rather than deciding dynamically",
-        "Generative orchestration requires every possible conversation path to be manually authored in advance",
-        "An agent can only use one orchestration mode and can never combine the two approaches"
+        "Enable generative orchestration so the agent picks the knowledge source or topic that best fits each message",
+        "Author a classic topic with trigger phrases and a scripted dialog for paid-time-off requests",
+        "Author a separate classic topic for every possible policy question in the SharePoint library",
+        "Switch the agent to classic orchestration only, because generative and classic cannot coexist in one agent"
       ],
       "correct": [
         0,
         1
       ],
-      "explanation": "Generative orchestration dynamically selects the best topic, knowledge source, or action at runtime, while classic orchestration instead relies on author-defined topics and trigger phrases. Generative orchestration specifically reduces the need to manually author every path rather than requiring it, and an agent can combine tightly authored classic topics with generative orchestration for open-ended questions."
+      "explanation": "Generative orchestration lets the model route open-ended policy questions to the SharePoint knowledge source at runtime, while an explicitly authored topic keeps the PTO flow deterministic; the two coexist in the same agent. Authoring a topic per policy question is exactly the manual effort generative orchestration removes, and the claim that the two modes cannot coexist is false, because an agent can combine generative orchestration with authored topics."
     },
     {
       "id": "q65",
@@ -1982,10 +1991,10 @@
       "type": "mc",
       "question": "An admin needs to fully block a specific finance-only SharePoint site from being opened by anyone outside one designated security group, even by users who otherwise hold broad admin permissions. Which capability actually accomplishes this, as opposed to only hiding the site from search and Copilot?",
       "options": [
-        "Restricted SharePoint Search",
+        "Restricted SharePoint Search applied to the finance site",
         "Restricted access control in SharePoint Advanced Management",
-        "A sensitivity label scoped to Files & emails",
-        "DSPM for AI reporting"
+        "A sensitivity label scoped to Files & emails applied to the site's documents",
+        "Data Security Posture Management for AI reporting"
       ],
       "correct": 1,
       "explanation": "Restricted access control in SharePoint Advanced Management actually limits who can access a site at all, unlike Restricted SharePoint Search, which only removes a site from search and Copilot results while leaving every existing permission untouched. A Files & emails-scoped sensitivity label protects individual documents rather than gating access to a whole site, and DSPM for AI only reports on risk rather than enforcing any access restriction."
@@ -1997,9 +2006,9 @@
       "question": "Before a Microsoft 365 Copilot rollout, an admin wants a prioritized list of SharePoint sites that are overshared, contain sensitive content, or have gone inactive, so remediation effort can focus on the highest-risk sites first. Which capability provides this site-level list?",
       "options": [
         "Data access governance reports in SharePoint Advanced Management",
-        "Microsoft 365 Copilot usage reports",
-        "Compliance Manager assessment templates",
-        "Content explorer alone"
+        "Microsoft 365 Copilot usage reports in the Microsoft 365 admin center",
+        "Compliance Manager assessment templates in Microsoft Purview",
+        "Content explorer in Microsoft Purview, used on its own"
       ],
       "correct": 0,
       "explanation": "Data access governance reports are built specifically to surface overshared, sensitive, or inactive SharePoint sites so remediation can be prioritized before a wider Copilot rollout. Usage reports measure Copilot adoption rather than site risk, Compliance Manager tracks regulatory requirements rather than SharePoint sharing risk, and Content explorer shows where labeled content currently sits without prioritizing sites by oversharing or inactivity."
@@ -2011,26 +2020,29 @@
       "question": "A team uses Microsoft 365 Copilot Chat to draft a project brief, then wants several teammates to keep editing and refining that draft together over the next several days rather than losing it as a one-time chat reply. What should they turn the draft into?",
       "options": [
         "A Copilot Page",
-        "A new Copilot Studio agent",
-        "A Microsoft Graph connector",
-        "A declarative agent"
+        "A Copilot Notebook",
+        "A new Teams channel post",
+        "A Teams meeting recap"
       ],
       "correct": 0,
-      "explanation": "A Copilot Page turns a chat response into a persistent, shareable canvas that multiple people can keep open and co-author over time, exactly matching this need. A Copilot Studio agent, a Graph connector, and a declarative agent are all tools for building or extending Copilot's capabilities, not for turning a single chat draft into an editable, shared document."
+      "explanation": "A Copilot Page turns a chat response into a persistent, shareable canvas that several people can keep open and co-author over the following days. A Copilot Notebook gathers references and chats into a workspace for grounding further prompts; it is not the way to co-edit one drafted document. A channel post and a meeting recap are static outputs rather than live, co-authored drafts."
     },
     {
       "id": "q69",
       "cat": "aiServices",
-      "type": "mc",
-      "question": "During a Teams meeting, a built-in Copilot agent automatically tracks discussion points and surfaces assigned action items live as the conversation happens, without anyone having built or published a custom agent for this purpose. Which Microsoft-provided agent is this?",
+      "type": "ms",
+      "question": "In Contoso's Teams meetings, participants speak English and Spanish. Contoso wants each participant to hear speech translated in real time, and wants live notes with action items captured during the meeting, using Microsoft-provided agents with no custom build. Which two agents should you enable? (Choose two.)",
       "options": [
         "Facilitator",
-        "A custom engine agent built in Copilot Studio",
-        "Microsoft Entra Agent ID",
-        "A Microsoft Graph connector"
+        "Interpreter",
+        "Researcher",
+        "Analyst"
       ],
-      "correct": 0,
-      "explanation": "Facilitator is a first-party Copilot agent that ships ready-made inside Teams meetings to track discussion and surface action items live, with no custom build required. A custom engine agent would require a team to build it themselves, Microsoft Entra Agent ID is an identity object type rather than a meeting agent, and a Graph connector only indexes external content for grounding."
+      "correct": [
+        0,
+        1
+      ],
+      "explanation": "Facilitator is the built-in meeting agent that keeps live notes and surfaces action items as the discussion happens, and Interpreter provides real-time speech translation in Teams meetings. Researcher performs multi-step research across work data and the web in Copilot Chat, and Analyst reasons over data and generates analysis; neither operates inside a live meeting."
     },
     {
       "id": "q70",
@@ -2064,34 +2076,34 @@
       "id": "tf18",
       "cat": "aiServices",
       "type": "tf",
-      "question": "A Copilot Page is a one-time chat response that cannot be edited or shared once it is generated.",
-      "answer": false,
-      "explanation": "A Copilot Page is the opposite of a one-time response \u2014 it's a persistent, shareable canvas that multiple people can keep editing and co-authoring over time, rather than a disappearing single reply."
+      "question": "Content a user writes into a Copilot Page is stored as a Loop file in the user's OneDrive and is within the scope of Purview eDiscovery.",
+      "answer": true,
+      "explanation": "A Copilot Page is a durable Loop file stored in OneDrive (or SharePoint for shared contexts), so eDiscovery, retention, and audit cover it like other Microsoft 365 content. The misconception is that because a Page is not an email or a chat message, it falls outside compliance tooling."
     },
     {
       "id": "tf19",
       "cat": "aiServices",
       "type": "tf",
-      "question": "Power Platform DLP policies that classify connectors into groups like Business and Non-Business can restrict which connectors a Copilot Studio agent is allowed to combine in the same action.",
-      "answer": true,
-      "explanation": "Power Platform DLP policies group connectors into classifications and block combining connectors from different groups in the same flow or agent action, governing what a Copilot Studio agent can connect to \u2014 a separate control from Purview DLP scoped to Copilot interactions."
+      "question": "A Purview DLP policy with the Microsoft 365 Copilot location prevents a Copilot Studio agent from using a Non-Business connector in the same action as a Business connector.",
+      "answer": false,
+      "explanation": "Connector grouping and combination rules are enforced by Power Platform DLP policies, which govern what a Copilot Studio agent, flow, or app is allowed to call. Purview DLP for Microsoft 365 Copilot governs sensitive content in Copilot interactions and has no concept of connector classification. The two 'DLP' features share a name but operate at different layers."
     },
     {
       "id": "msq15",
       "cat": "aiServices",
       "type": "ms",
-      "question": "Which two statements accurately describe capabilities within SharePoint Advanced Management? (Choose two.)",
+      "question": "Contoso licenses SharePoint Advanced Management and finds 40 overshared sites before its Copilot rollout. Which two actions rely on SharePoint Advanced Management capabilities? (Choose two.)",
       "options": [
-        "Restricted access control can limit a site's access to one specific security group, beyond what any user's broader permissions would otherwise allow",
-        "Data access governance reports help identify overshared, sensitive, or inactive sites before a Copilot rollout",
-        "SharePoint Advanced Management replaces the need for a Purview DLP policy scoped to Copilot interactions",
-        "SharePoint Advanced Management only affects which sites appear in Microsoft 365 Copilot results, with no effect on direct site access"
+        "Run data access governance reports to find sites shared with 'Everyone except external users' and launch site access reviews",
+        "Apply restricted access control so only members of a Finance security group can access the Finance site",
+        "Enable Restricted SharePoint Search with an allowed list that leaves the 40 sites out of Copilot results",
+        "Create a DLP policy with the Microsoft 365 Copilot location to keep labeled content out of responses"
       ],
       "correct": [
         0,
         1
       ],
-      "explanation": "Restricted access control enforces true site-level access limits, and data access governance reports prioritize remediation by surfacing overshared, sensitive, or inactive sites \u2014 both genuine SharePoint Advanced Management capabilities. It does not replace a Copilot-scoped DLP policy, which addresses sensitive content in Copilot responses rather than site access, and it goes beyond search/Copilot visibility to actually restrict direct site access as well."
+      "explanation": "Data access governance reports and the site access reviews launched from them, together with restricted access control, are SharePoint Advanced Management features. Restricted SharePoint Search is a tenant-level SharePoint setting that does not require the Advanced Management license, and a Copilot DLP policy is a Microsoft Purview capability; both help with a rollout but belong to different products."
     },
     {
       "id": "q72",
@@ -2113,10 +2125,10 @@
       "type": "mc",
       "question": "A document has been declared a regulatory record under Microsoft Purview Records Management. An admin later tries to remove its retention label to free up the document for editing. What happens?",
       "options": [
-        "Neither the label nor the record's key properties can be changed by anyone, including an admin, before the retention period ends",
+        "The removal fails; neither the label nor the record's key properties can be changed before the retention period ends",
         "The admin can remove the label right away, since admin accounts are exempt from records management locks",
         "The label is removed, though the document's underlying content stays unchanged and still editable",
-        "The record is deleted automatically the instant anyone attempts to remove its label"
+        "The record is deleted automatically the instant anyone, including an admin, attempts to remove its label"
       ],
       "correct": 0,
       "explanation": "Declaring an item a regulatory record locks down both its label and key properties so that nobody, including an admin, can change or remove them until the retention period actually ends \u2014 a stronger guarantee than a standard retention label allows. Admin accounts are not exempt, no removal succeeds at all in this scenario, and no deletion is triggered by a blocked removal attempt."
@@ -2133,18 +2145,18 @@
       "id": "msq16",
       "cat": "governSecure",
       "type": "ms",
-      "question": "Which two statements accurately distinguish a regulatory record (Microsoft Purview Records Management) from a standard retention label? (Choose two.)",
+      "question": "Contoso publishes three retention labels in SharePoint: a standard label, a label that marks items as records, and a label that marks items as regulatory records. Which two statements about labeled documents are accurate? (Choose two.)",
       "options": [
-        "A regulatory record's label and key properties cannot be changed or removed by anyone, including an admin, before its retention period ends",
-        "A standard retention label can, in some configurations, still be removed or have its underlying content edited by an authorized user",
-        "Both a regulatory record and a standard retention label behave identically in every respect",
-        "A regulatory record can always be freely re-labeled by any user who originally applied the label"
+        "A regulatory record's label cannot be removed by anyone, including a Global Administrator, before the retention period ends",
+        "A document labeled as a record can be temporarily unlocked by an authorized user in SharePoint to edit its content",
+        "A document with the standard label cannot be deleted by any user, including its owner, until the retention period ends",
+        "A document labeled as a regulatory record can be unlocked for editing by an authorized user in the same way as a record"
       ],
       "correct": [
         0,
         1
       ],
-      "explanation": "A regulatory record locks both its label and key properties against change or removal by anyone, while a standard retention label can still be removed or its content edited by an authorized user in some configurations \u2014 a meaningfully stronger guarantee, not identical behavior. A regulatory record specifically cannot be freely re-labeled, even by the original user who applied it."
+      "explanation": "Regulatory records are the most restrictive: the label cannot be removed or changed by anyone, and the content cannot be edited or unlocked. Records allow an authorized user to toggle the record lock in SharePoint to make edits, then re-lock the item. A standard retention label never blocks deletion; it preserves a copy in the Preservation Hold library instead, so the claim that a standard label blocks deletion describes record behavior, not standard-label behavior."
     },
     {
       "id": "q74",
@@ -2734,6 +2746,98 @@
           "whyTested": "This mirrors a very common real-world rollout state \u2014 partial licensing during a phased deployment \u2014 and tests whether you can keep three related but distinct facts straight at once: what licensing gates, what permissions always govern regardless of licensing, and that Copilot Chat isn't simply the same thing as licensed Copilot under a different name."
         }
       ]
+    }
+  ],
+  "compare": [
+    {
+      "id": "cmp-ab650-1",
+      "cat": "tenantConfig",
+      "scenario": "Contoso's Finance department must lose Viva Engage while every other department keeps it. Finance already receives Microsoft 365 E5 through group-based licensing on a Finance security group. Which approach is better?",
+      "optionA": "Create a Conditional Access policy that blocks the Viva Engage cloud app for members of the Finance group.",
+      "optionB": "Edit the Finance group's license assignment to turn off the Viva Engage service plan.",
+      "better": "B",
+      "why": "Disabling the service plan removes the entitlement itself for every current and future Finance member in one place, so the service never appears and licensing reports stay accurate. The Conditional Access block is a real control an admin might reach for, but it leaves Finance users licensed for a service they are forbidden to use, depends on the app being targetable at sign-in, and adds a policy to maintain for what is a licensing decision."
+    },
+    {
+      "id": "cmp-ab650-2",
+      "cat": "tenantConfig",
+      "scenario": "A vendor's project manager needs to chat and hold calls with Contoso employees a few times a month for a year, but should not see Contoso's Teams channels or files. Which approach is better?",
+      "optionA": "Allow external access (federation) with the vendor's domain in Teams.",
+      "optionB": "Invite the project manager as a guest and add them to a dedicated team.",
+      "better": "A",
+      "why": "External access lets the two organizations chat, call, and meet using their own accounts, with no identity in Contoso's directory and nothing to review or offboard later. Guest access would work, but it creates a B2B account, grants persistent membership in a team with its channels and files, and raises the access-review and lifecycle burden, none of which the scenario needs."
+    },
+    {
+      "id": "cmp-ab650-3",
+      "cat": "governSecure",
+      "scenario": "Contoso wants administrators to hold Exchange Administrator only when they are actively working a change, with MFA and a justification captured each time. Which approach is better?",
+      "optionA": "Create active Exchange Administrator assignments in Privileged Identity Management that expire after 30 days and must be renewed.",
+      "optionB": "Make the administrators eligible for Exchange Administrator in Privileged Identity Management, with MFA and justification required on activation.",
+      "better": "B",
+      "why": "Eligibility is the just-in-time model: the role is off until the admin activates it, and MFA and a justification are captured per activation. A 30-day active assignment is time-bound, so it feels controlled, but the role is standing for the whole window with no per-use activation, so nothing is captured when it is actually exercised and the attack surface is unchanged between renewals."
+    },
+    {
+      "id": "cmp-ab650-4",
+      "cat": "governSecure",
+      "scenario": "Contoso wants users on unmanaged devices to be able to read SharePoint documents in the browser but not download, print, or sync them, while managed devices keep full access. Which approach is better?",
+      "optionA": "A Conditional Access policy that uses the app enforced restrictions session control for unmanaged devices.",
+      "optionB": "A Conditional Access policy that requires a compliant device as a grant control for SharePoint Online.",
+      "better": "A",
+      "why": "The session control lets the unmanaged session proceed and hands SharePoint the signal to restrict it to browser-only, no-download access, which is exactly the split the scenario asks for. Requiring a compliant device is a legitimate hardening step, but it is a grant decision: unmanaged devices get no access at all, so the 'read in the browser' requirement fails."
+    },
+    {
+      "id": "cmp-ab650-5",
+      "cat": "governSecure",
+      "scenario": "A broker-dealer must assure regulators that a seven-year retention policy on trading communications cannot be shortened or turned off later by its own administrators. Which approach is better?",
+      "optionA": "Restrict the Compliance Administrator role to a small group and require Privileged Identity Management activation to use it.",
+      "optionB": "Apply Preservation Lock to the retention policy once it is finalized.",
+      "better": "B",
+      "why": "Preservation Lock is the control designed for this assurance: once locked, no one, including a Global Administrator, can disable the policy or reduce its retention. Limiting who can edit retention and gating it behind PIM is good hygiene, and a knowledgeable admin might stop there, but it still leaves a human path to weaken the policy, which is what the regulator wants ruled out."
+    },
+    {
+      "id": "cmp-ab650-6",
+      "cat": "governSecure",
+      "scenario": "HR wants Teams messages that contain harassment or threats to be surfaced to a trained reviewer with the surrounding conversation, and escalated to HR when confirmed. Messages must still be delivered. Which approach is better?",
+      "optionA": "A Communication compliance policy using the built-in harassment and threat classifiers.",
+      "optionB": "A DLP policy for Teams chat that detects the same classifiers and alerts an administrator.",
+      "better": "A",
+      "why": "Communication compliance is a detect-and-review workflow: it routes flagged messages with context to designated reviewers, supports tagging, escalation, and case creation, and never blocks delivery. A DLP policy can match the same classifiers and raise an alert, but it is built to act on data in motion, offers no reviewer workflow or escalation path, and its natural actions (block, restrict) are the opposite of what HR asked for."
+    },
+    {
+      "id": "cmp-ab650-7",
+      "cat": "aiServices",
+      "scenario": "During a permissions review before a Copilot rollout, Contoso needs 30 legacy sites to stop appearing in Copilot responses and org-wide search by next week, with no change to who can open them. Which approach is better?",
+      "optionA": "Enable Restricted SharePoint Search with an allowed list that leaves out the 30 sites.",
+      "optionB": "Apply restricted access control to the 30 sites, limited to each site's existing members.",
+      "better": "A",
+      "why": "Restricted SharePoint Search hides non-allowed sites from search and Copilot grounding while leaving every permission untouched, so it meets both the deadline and the no-change constraint. Restricted access control is the stronger remediation an admin might prefer long term, but it changes access: anyone outside the chosen group loses the ability to open the site, which the review has not yet decided."
+    },
+    {
+      "id": "cmp-ab650-8",
+      "cat": "aiServices",
+      "scenario": "Contoso's 'Confidential' label currently applies a header and footer only. Users who can open labeled files must not be able to have Microsoft 365 Copilot summarize or quote them, and Legal does not want to change how the files open. Which approach is better?",
+      "optionA": "Add encryption to the label that grants users View but not Extract rights.",
+      "optionB": "Create a Purview DLP policy with the Microsoft 365 Copilot location that excludes content carrying the label.",
+      "better": "B",
+      "why": "The DLP policy keeps Copilot from processing labeled content without altering the label or the files, so access and the open experience stay exactly as they are. Removing the Extract right also stops Copilot from using the content, and it is a valid design in a tenant that already encrypts, but here it would convert a marking-only label into an encrypting one, which Legal ruled out and which affects every app that opens the files."
+    },
+    {
+      "id": "cmp-ab650-9",
+      "cat": "aiServices",
+      "scenario": "Contoso wants Microsoft 365 Copilot to answer 'what is the status of ticket 4821' with current data from a third-party ticketing system and to open a new ticket when asked. Which approach is better?",
+      "optionA": "Deploy a Microsoft Graph connector that indexes the ticketing system into Microsoft Graph.",
+      "optionB": "Build a Copilot Studio agent with an action that calls the ticketing system's API.",
+      "better": "B",
+      "why": "An action calls the API at runtime, so status is live and the agent can create tickets as well as read them. A Graph connector is the natural choice for grounding Copilot on external content, which is why it tempts, but it indexes a periodically crawled copy of the records, so answers lag the source and it can never perform a write such as opening a ticket."
+    },
+    {
+      "id": "cmp-ab650-10",
+      "cat": "aiServices",
+      "scenario": "Finance built a Copilot Studio agent that must be usable only by the Finance department once an admin approves it. Which approach is better?",
+      "optionA": "Approve the agent in Integrated apps and deploy it to the Finance security group.",
+      "optionB": "Create a Power Platform DLP policy that allows the agent's connectors only in the Finance environment.",
+      "better": "A",
+      "why": "Integrated apps is where an admin approves a shared agent and chooses who receives it, so scoping the deployment to the Finance group satisfies the requirement directly. A Power Platform DLP policy governs which connectors agents in an environment may use; it does not control which users can see or run a published agent, so Finance-only connectors would not stop other users from finding the agent."
     }
   ]
 }

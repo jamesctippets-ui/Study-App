@@ -616,57 +616,57 @@
       "id": "q1",
       "cat": "identityGov",
       "type": "mc",
-      "question": "An administrator wants a group's membership to automatically include every user whose department attribute is 'Sales,' without manually adding people.",
+      "question": "You have a Microsoft Entra tenant with 5,000 users. A Conditional Access policy must apply to everyone in the Sales department, including people who transfer into Sales later. You need a group the policy can target. The solution must minimize administrative effort. What should you create?",
       "options": [
-        "A dynamic group with a membership rule based on the department attribute",
-        "A security group with manual membership that an administrator updates by hand",
-        "A Microsoft 365 group created with no membership rules configured at all",
-        "A resource group named Sales containing that department's resources"
+        "A security group with dynamic user membership based on the department attribute",
+        "A Microsoft 365 group with assigned membership, populated by a scheduled PowerShell script",
+        "An administrative unit that contains the Sales department users",
+        "A security group with assigned membership and group-based licensing enabled"
       ],
       "correct": 0,
-      "explanation": "A dynamic group with a rule on the department attribute keeps membership current automatically as people join, leave, or change departments. A security group with manual membership requires someone to add and remove people by hand, a Microsoft 365 group with no rules is just as manual, and a resource group organizes Azure resources, not user accounts, so it plays no role here at all."
+      "explanation": "A dynamic membership rule such as user.department -eq \"Sales\" is re-evaluated automatically whenever the attribute changes, and Conditional Access can target a security group directly. A script-populated assigned group reaches the same end state but is plumbing you must schedule, monitor, and fix. An administrative unit scopes Microsoft Entra role assignments to a subset of users; a Conditional Access policy cannot target an administrative unit. Group-based licensing hands licenses to whoever is already a member; it does nothing to decide who the members are."
     },
     {
       "id": "q2",
       "cat": "identityGov",
       "type": "mc",
-      "question": "A company wants new employees to automatically receive a Microsoft 365 E3 license the moment they're added to the 'All Employees' group.",
+      "question": "You assign Microsoft 365 E3 to Group1 through group-based licensing. User1, a member of Group1, also has E3 assigned directly from before the group existed. You need User1's license to be managed only through Group1, with no interruption to User1's mailbox or apps. What should you do?",
       "options": [
-        "A dynamic group with no license attached",
-        "Group-based licensing",
-        "Self-service password reset",
-        "An RBAC role assignment"
+        "Remove the direct E3 assignment from User1",
+        "Remove User1 from Group1, wait for the license to release, then add User1 back",
+        "Run Reprocess on Group1 to replace the direct assignment with the inherited one",
+        "Convert Group1 to a dynamic group so inherited licenses take precedence over direct ones"
       ],
-      "correct": 1,
-      "explanation": "Group-based licensing assigns a license to a group so every current and future member automatically receives it, with no per-user action needed. A dynamic group with no license attached only handles membership, not licensing, itself -- it still needs group-based licensing layered on top. SSPR handles password resets, and an RBAC role assignment grants permissions over Azure resources, neither of which touches Microsoft 365 licensing."
+      "correct": 0,
+      "explanation": "A directly assigned license and a group-inherited license for the same product coexist on the user, so removing the direct one simply leaves the inherited one in force with no gap in service. Removing and re-adding the user from the group never touches the direct assignment and risks a brief interruption. Reprocess only re-evaluates the group's own assignments; it does not remove direct assignments. Dynamic membership changes how members are selected, not how direct and inherited licenses are reconciled."
     },
     {
       "id": "q3",
       "cat": "identityGov",
       "type": "mc",
-      "question": "A contractor from a partner company needs temporary access to one SharePoint site, without your organization creating them a full internal account.",
+      "question": "Contoso needs 40 consultants from Fabrikam to access a SharePoint site and one Azure resource group. The consultants must authenticate with their Fabrikam credentials, Contoso must not store or reset their passwords, and Fabrikam's IT department will not take part in the setup. What should you do?",
       "options": [
-        "Create them a standard internal user account",
-        "Invite them as a B2B external/guest user",
-        "Assign them the Owner role at the subscription",
-        "Add them to a dynamic group"
+        "Invite each consultant as a guest user through Microsoft Entra External Identities",
+        "Configure cross-tenant synchronization between the Fabrikam and Contoso tenants",
+        "Create cloud-only member accounts for the consultants and require MFA at first sign-in",
+        "Create a Microsoft Entra External ID customer tenant and register the consultants in it"
       ],
-      "correct": 1,
-      "explanation": "A B2B guest invite lets the contractor sign in with their own existing identity, scoped to just the resources they're invited to, without your organization ever creating or managing a full internal account for them. Creating a standard internal account works but means provisioning and later deprovisioning a real identity for someone who isn't an employee. Assigning Owner at the subscription is wildly over-scoped for access to one SharePoint site, and a dynamic group only manages membership rules -- it doesn't grant an outside person any identity to be a member with in the first place."
+      "correct": 0,
+      "explanation": "A B2B invitation creates a guest object that the consultant redeems with their Fabrikam credentials, so Contoso never holds a password, and the guest can then be granted SharePoint and Azure RBAC access like any other identity. Cross-tenant synchronization also produces B2B users, but it must be configured in the source tenant by Fabrikam's administrators, which the scenario rules out. Member accounts mean Contoso owns and resets those passwords. An External ID customer tenant serves consumer-facing apps and does not grant access to Contoso's internal SharePoint or Azure resources."
     },
     {
       "id": "q4",
       "cat": "identityGov",
       "type": "mc",
-      "question": "A user forgot their password at 2am and needs to get back into their account without contacting the help desk.",
+      "question": "Your hybrid environment syncs on-premises Active Directory to Microsoft Entra ID. Self-service password reset is enabled and users complete resets successfully, but afterwards the new password only works for cloud apps; signing in to a domain-joined PC still requires the old password. What should you configure?",
       "options": [
-        "A dynamic group",
-        "Self-service password reset (SSPR)",
-        "Conditional Access",
-        "An RBAC role assignment"
+        "Password writeback in Microsoft Entra Connect",
+        "Password hash synchronization in Microsoft Entra Connect",
+        "Pass-through authentication with an additional authentication agent",
+        "Seamless single sign-on for the synchronized users"
       ],
-      "correct": 1,
-      "explanation": "SSPR lets a user verify their identity with pre-registered authentication methods (like a phone or authenticator app) and reset their own password without any help desk involvement, at 2am or any other time. A dynamic group and an RBAC role assignment are unrelated to password resets, and Conditional Access controls when/how sign-ins are allowed, but does not itself provide a self-service reset mechanism."
+      "correct": 0,
+      "explanation": "SSPR changes the cloud password; password writeback is the component that pushes that change back into on-premises Active Directory so domain sign-in matches. Password hash synchronization flows the other direction, on-premises to cloud, and would never carry a cloud-initiated reset downward. Pass-through authentication validates sign-ins against on-premises AD, so without writeback it would make the new password fail everywhere rather than fix it. Seamless SSO suppresses sign-in prompts on domain-joined devices and does not synchronize credentials at all."
     },
     {
       "id": "q5",
@@ -687,43 +687,43 @@
       "id": "q6",
       "cat": "identityGov",
       "type": "mc",
-      "question": "Which built-in role lets someone manage who has access to resources, without letting them manage the resources themselves?",
+      "question": "User1 must be able to grant colleagues access to resource group RG1, but must not be able to create, modify, or delete any resource in RG1. You need to assign a role to User1. The solution must follow the principle of least privilege. Which role assignment should you create?",
       "options": [
-        "Owner",
-        "Contributor",
-        "User Access Administrator",
-        "Reader"
+        "User Access Administrator at the RG1 scope",
+        "Owner at the RG1 scope",
+        "Contributor at the RG1 scope plus Reader at the subscription scope",
+        "The Privileged Role Administrator Microsoft Entra role"
       ],
-      "correct": 2,
-      "explanation": "User Access Administrator can grant and revoke role assignments (who has access) but has no permissions over the resources themselves. Owner and Contributor both include full or near-full management of the resources, not just access, and Reader can view resources but cannot manage access or resources at all -- none of the other three isolate access management the way this scenario asks for."
+      "correct": 0,
+      "explanation": "User Access Administrator grants Microsoft.Authorization/* for managing role assignments plus read access, and nothing that lets User1 change the resources themselves. Owner would satisfy the first requirement but hands over full resource management too. Contributor explicitly excludes Microsoft.Authorization/*/Write, so User1 could not grant access at all, and layering Reader on top changes nothing. Privileged Role Administrator is a directory role for managing Microsoft Entra role assignments; it carries no Azure RBAC permission on RG1."
     },
     {
       "id": "q7",
       "cat": "identityGov",
       "type": "mc",
-      "question": "A company wants to enforce a tagging standard requiring both a CostCenter tag and an Environment tag, assigned together as a single bundle.",
+      "question": "Your subscription has 200 resource groups. New resources must carry both a CostCenter and an Environment tag, and the compliance view must report one overall percentage for the tagging standard. You also want to add a third tag rule later without creating another assignment. What should you create?",
       "options": [
-        "An RBAC custom role",
-        "A single Azure Policy definition",
-        "An Azure Policy initiative",
-        "A management group with no policies"
+        "An initiative containing a require-tag policy per tag, assigned once at the subscription",
+        "Two separate policy assignments at the subscription, one per tag",
+        "One policy assignment with the Modify effect that inherits both tags from the resource group",
+        "A tag on each resource group, applied through the Tags blade"
       ],
-      "correct": 2,
-      "explanation": "An initiative groups multiple related policy definitions so they can be assigned together as one bundle."
+      "correct": 0,
+      "explanation": "An initiative is the construct that gives you a single assignment and a single aggregated compliance score across several definitions, and adding a definition to the initiative later flows through the existing assignment. Two separate assignments report separately and would need a third assignment for the next tag. A Modify policy that inherits from the resource group copies tags rather than requiring them, so resources in untagged groups stay untagged, and it is still a single policy rather than a standard. Tagging each group by hand enforces nothing on the resources inside."
     },
     {
       "id": "q8",
       "cat": "identityGov",
       "type": "mc",
-      "question": "An administrator assigns Reader at a management group and Contributor at a specific subscription beneath it. What's the effective access in that subscription?",
+      "question": "User1 has Reader at management group MG1 and Contributor at subscription Sub1 beneath it. Sub1 contains RG1 and nine other resource groups. You must ensure User1 can only read RG1 while keeping Contributor access to the other nine resource groups. What should you do?",
       "options": [
-        "Owner",
-        "Contributor",
-        "Reader",
-        "No access"
+        "Remove Contributor at Sub1 and assign it at each of the other nine resource groups",
+        "Assign User1 the Reader role at the RG1 scope so the narrower scope applies",
+        "Create a deny assignment for User1 at the RG1 scope in Access control (IAM)",
+        "Apply a ReadOnly management lock at the RG1 scope"
       ],
-      "correct": 1,
-      "explanation": "The more specific, more permissive assignment at the subscription level applies there, on top of the inherited Reader."
+      "correct": 0,
+      "explanation": "RBAC is additive, so a narrower assignment can never subtract rights inherited from a wider one; the only way to carve RG1 out is to move Contributor down to the nine scopes where it is wanted, after which the inherited Reader from MG1 is all that applies in RG1. Assigning Reader at RG1 changes nothing because Contributor still flows down from Sub1. Deny assignments cannot be authored directly by administrators; they are created by Azure Blueprints and managed applications. A ReadOnly lock would make RG1 read-only for every principal, not just User1."
     },
     {
       "id": "q9",
@@ -744,71 +744,71 @@
       "id": "q10",
       "cat": "storage",
       "type": "mc",
-      "question": "A storage account should automatically move blobs to Cool tier after 30 days of no access, then delete them after 365 days.",
+      "question": "You create a lifecycle management rule on a general-purpose v2 account that moves block blobs to the Cool tier 30 days after they were last accessed. Forty-five days later, blobs that nobody has read since upload are still in the Hot tier. What should you do first?",
       "options": [
-        "A SAS token",
-        "A lifecycle management policy",
-        "A resource lock",
-        "Blob versioning"
+        "Enable last access time tracking on the storage account",
+        "Change the rule to use days since last modification instead",
+        "Change the default access tier of the storage account to Cool",
+        "Upgrade the storage account to the Premium performance tier"
       ],
-      "correct": 1,
-      "explanation": "A lifecycle management policy can define exactly this: automatically move blobs to Cool tier after 30 days of no access, then delete them after 365 days, all rule-driven with no manual intervention. A SAS token only grants time-boxed access, it doesn't move or delete data on a schedule. A resource lock prevents deletion or modification of the storage account resource itself, working against what this scenario wants. Blob versioning keeps historical versions of a blob when it changes, which is unrelated to tiering or age-based cleanup."
+      "correct": 0,
+      "explanation": "A daysAfterLastAccessTimeGreaterThan condition only works once access time tracking is enabled on the account; without it the policy has no last-access timestamp to evaluate and silently skips those blobs. Switching to last-modified would move the blobs but changes the business rule, since a frequently read but rarely modified blob would also be demoted. Changing the default tier affects only new uploads without an explicit tier. Premium block blob accounts do not support Cool or Archive tiers at all."
     },
     {
       "id": "q11",
       "cat": "storage",
       "type": "mc",
-      "question": "A team accidentally overwrote a blob and needs to recover its previous content, without having taken a manual backup beforehand.",
+      "question": "A faulty script overwrote and deleted thousands of blobs in container data1 at 09:14 today. The storage account already has blob versioning, soft delete, change feed, and point-in-time restore enabled. You need to return the entire container to its 09:00 state with the least administrative effort. What should you do?",
       "options": [
-        "Blob versioning, if it was enabled",
-        "Static website hosting",
-        "A storage account access key",
-        "A resource lock"
+        "Perform a point-in-time restore of the container to 09:00",
+        "Undelete each affected blob and promote its previous version to current",
+        "Initiate a customer-managed failover to the secondary region",
+        "Copy the container from the most recent blob snapshots with AzCopy"
       ],
       "correct": 0,
-      "explanation": "Versioning automatically retains prior versions of a blob on overwrite, letting you recover earlier content."
+      "explanation": "Point-in-time restore uses the change feed plus versions and soft-deleted data to roll a whole container, or a range of blobs, back to a chosen moment in one operation. Promoting versions blob by blob reaches the same end state but is thousands of manual actions. A geo-failover does not help because the asynchronous replica already received the destructive writes. Blob snapshots are only created when something explicitly takes them, and nothing in the scenario did."
     },
     {
       "id": "q12",
       "cat": "storage",
       "type": "mc",
-      "question": "Which storage redundancy option allows an application to directly read from the secondary region during normal operation, not just after a failover?",
+      "question": "A storage account must stay writable if a single availability zone in its primary region fails, and an application must be able to read its data from the secondary region during a regional outage without waiting for a failover. The solution must minimize cost. Which redundancy option should you choose?",
       "options": [
-        "LRS (Locally-Redundant Storage)",
-        "ZRS (Zone-Redundant Storage)",
-        "GRS (Geo-Redundant Storage)",
-        "RA-GRS (Read-Access Geo-Redundant Storage)"
+        "Read-access geo-zone-redundant storage (RA-GZRS)",
+        "Geo-zone-redundant storage (GZRS)",
+        "Read-access geo-redundant storage (RA-GRS)",
+        "Zone-redundant storage (ZRS) with three copies across zones"
       ],
-      "correct": 3,
-      "explanation": "Plain GRS replicates to a secondary region but doesn't allow reads there until failover \u2014 RA-GRS specifically adds read access to the secondary. LRS and ZRS don't replicate to a second region at all, so neither offers secondary-region reads under any circumstances."
+      "correct": 0,
+      "explanation": "Surviving a zone loss while staying writable needs synchronous zone redundancy in the primary region, and reading from the secondary before a failover needs the read-access variant, so RA-GZRS is the cheapest option that satisfies both. GZRS covers the zone requirement but the secondary is not readable until you fail over. RA-GRS keeps the secondary readable, but its primary is locally redundant, so a zone failure takes writes offline. ZRS has no secondary region at all."
     },
     {
       "id": "q13",
       "cat": "storage",
       "type": "mc",
-      "question": "A team wants to mount a shared drive from Azure that multiple VMs can read and write to simultaneously over SMB.",
+      "question": "You migrate a departmental file server to Azure. Domain-joined Windows VMs must mount the share, and existing NTFS permissions must keep working so that each user sees only their own folders. The domain is on-premises Active Directory synced to Microsoft Entra ID. What should you deploy?",
       "options": [
-        "Queue storage",
-        "Table storage",
-        "Azure Files",
-        "Blob storage"
+        "An Azure Files SMB share with on-premises AD DS authentication enabled",
+        "An Azure Files NFS share on a premium file storage account",
+        "An Azure Files SMB share mounted with the storage account key",
+        "A blob container with the SFTP endpoint enabled"
       ],
-      "correct": 2,
-      "explanation": "Azure Files provides SMB (and NFS) file shares that multiple VMs can mount simultaneously and both read and write to, exactly like a traditional network drive. Queue storage holds messages for asynchronous processing, table storage is a NoSQL key-value store, and blob storage, while it can hold large amounts of unstructured data, is not natively mountable as a concurrent SMB file share the way Azure Files is."
+      "correct": 0,
+      "explanation": "Identity-based authentication over SMB lets Azure Files honor Windows ACLs with the users' existing AD DS identities. Mounting with the account key is the near-miss: the share mounts fine, but every user connects as the same super-user identity, so per-user NTFS permissions are not enforced. NFS shares use POSIX permissions and have no Windows Kerberos integration. SFTP on Blob Storage is file transfer, not a mountable share with NTFS semantics."
     },
     {
       "id": "q14",
       "cat": "storage",
       "type": "mc",
-      "question": "A storage account should reject all traffic except from two specific corporate office IP ranges and one specific VNet.",
+      "question": "A storage account must accept requests only from two corporate office public IP ranges and from subnet App1 in VNet1. Requests from anywhere else, even with a valid key or SAS, must be refused. What should you configure?",
       "options": [
-        "A resource lock applied to the storage account to prevent accidental deletion",
-        "Blob lifecycle management rules that move data between access tiers over time",
-        "A SAS token generated once and shared with both office networks",
-        "A storage account firewall / network rule configuration allowing only those sources"
+        "Storage firewall IP rules for the offices plus a virtual network rule for App1",
+        "A private endpoint for the storage account in subnet App1 of VNet1",
+        "A network security group on the storage account that permits those sources",
+        "A SAS token whose allowed IP range is limited to the office addresses"
       ],
-      "correct": 3,
-      "explanation": "Storage account firewall and network rules restrict access to specific networks or IP ranges at the network level \u2014 exactly this scenario. A resource lock only blocks delete/modify actions, not network traffic; a SAS token grants scoped data access but does nothing to block requests from other networks; and lifecycle management only governs which access tier blobs sit in, not who can reach the account."
+      "correct": 0,
+      "explanation": "The storage firewall is the account-level network control that blocks everything not explicitly allowed, regardless of what credential a caller presents. A private endpoint gives App1 a private path, but on its own it leaves the public endpoint open, and the offices arrive over the internet anyway. NSGs attach to subnets and NICs, not to storage accounts. An IP-restricted SAS only constrains callers using that particular token; the account key and other tokens still work from anywhere."
     },
     {
       "id": "q15",
@@ -829,57 +829,57 @@
       "id": "q16",
       "cat": "compute",
       "type": "mc",
-      "question": "A company wants a group of identical VMs that automatically add or remove instances based on CPU load.",
+      "question": "A stateless web tier must meet a 99.99% availability SLA, and the number of identical VMs must grow and shrink automatically with CPU load. The region supports availability zones. What should you deploy?",
       "options": [
-        "An availability set",
-        "Azure Virtual Desktop",
-        "A single large VM",
-        "A VM Scale Set"
+        "A VM Scale Set spread across three availability zones with an autoscale rule",
+        "A VM Scale Set in a single zone configured with five fault domains and an autoscale rule",
+        "An availability set with two update domains and three fault domains",
+        "Three VMs in separate proximity placement groups behind a load balancer"
       ],
-      "correct": 3,
-      "explanation": "A VM Scale Set manages a group of identical, load-balanced VMs and can automatically add or remove instances based on autoscale rules like CPU load. An availability set only spreads a fixed set of VMs across fault/update domains for resiliency, it does not add or remove instances. Azure Virtual Desktop is a virtual desktop service, unrelated to general-purpose autoscaling. A single large VM has no ability to scale out into multiple instances at all -- it can only scale up."
+      "correct": 0,
+      "explanation": "The 99.99% VM SLA applies only when instances are spread across two or more availability zones, and a Scale Set is what adds and removes instances automatically. A single-zone Scale Set with fault domains tops out at 99.95%, the same as an availability set, and the availability set cannot autoscale at all. Proximity placement groups pull VMs physically closer together for latency, which is the opposite of spreading risk and carries no SLA uplift."
     },
     {
       "id": "q17",
       "cat": "compute",
       "type": "mc",
-      "question": "An administrator needs to run a one-time configuration script on a VM immediately after it's provisioned, without manually logging in.",
+      "question": "You must run a PowerShell script once on 200 existing Windows VMs to change a registry value. The VMs have no public IP addresses, you must not sign in to any of them, and the change must not be re-applied automatically afterwards. What should you use?",
       "options": [
-        "A managed disk",
-        "The Custom Script Extension",
-        "An App Service plan",
-        "An availability set"
+        "The Custom Script Extension, deployed to each VM",
+        "cloud-init configuration added to each VM",
+        "Azure Machine Configuration with a configuration package",
+        "Scripted Azure Bastion sessions to each VM"
       ],
-      "correct": 1,
-      "explanation": "The Custom Script Extension runs a specified script on the VM automatically as part of provisioning, with no manual login required. A managed disk is just storage for the VM's OS/data, it runs nothing. An App Service plan is compute for web apps, not a mechanism for running a script on an existing VM. An availability set only affects fault/update-domain placement for resiliency and has no role in running configuration scripts."
+      "correct": 0,
+      "explanation": "The Custom Script Extension is delivered through the VM agent, so it runs on existing VMs with no inbound connectivity, executes once, and is done. cloud-init only runs during first boot of a Linux VM, so it cannot touch VMs that already exist. Machine Configuration continuously audits and re-applies desired state, which violates the one-time requirement. Bastion still means an interactive session into each machine."
     },
     {
       "id": "q18",
       "cat": "compute",
       "type": "mc",
-      "question": "A team wants to test a new version of a web app in production-like conditions before it goes live, then switch traffic to it with minimal downtime.",
+      "question": "A production App Service app runs in a Standard-tier plan. Each release must be validated against production settings, warmed up, switched to users with no cold start, and reverted within seconds if a problem appears. The solution must minimize cost. What should you do?",
       "options": [
-        "Deployment slots",
-        "A VM Scale Set",
-        "A new App Service plan for every version",
-        "A resource lock"
+        "Add a staging deployment slot, deploy there, then swap it with production",
+        "Create a second App Service plan and shift traffic with weighted Traffic Manager routing",
+        "Scale the plan out to two instances and deploy the release to one of them",
+        "Move the app to an App Service Environment with a separate staging app"
       ],
       "correct": 0,
-      "explanation": "A deployment slot is a live, separately-addressable environment within the same App Service plan, letting the team fully test the new version under production-like conditions, then perform a slot swap to cut over with minimal downtime and an easy rollback if needed. A VM Scale Set manages VM instance count, not app-version staging. Standing up a whole new App Service plan per version is far more overhead than slots and still needs its own cutover mechanism. A resource lock only prevents accidental deletion/modification, it has nothing to do with staging or swapping versions."
+      "explanation": "Slots run inside the same plan, so there is no extra compute to pay for; the swap warms the staging instance first, then exchanges routing almost instantly, and swapping back is the rollback. A second plan doubles compute cost and DNS-based traffic shifting reverts only as fast as TTLs expire. Instances of one plan all serve the same code, so you cannot deploy to only one of them. An App Service Environment is the most expensive option and solves an isolation problem nobody asked about."
     },
     {
       "id": "q19",
       "cat": "compute",
       "type": "mc",
-      "question": "Which compute option requires the least management overhead for running a single container with no orchestration needs?",
+      "question": "A nightly job runs for about 20 minutes inside a Linux container, started by a Logic App. It needs no inbound HTTP endpoint and no scaling to multiple replicas, and you must pay only while it runs. You want to deploy the fewest Azure resources. What should you use?",
       "options": [
-        "Azure Kubernetes Service (AKS)",
-        "Azure Container Instances",
-        "A virtual machine running Docker manually",
-        "A VM Scale Set"
+        "A container group in Azure Container Instances",
+        "An Azure Container Apps app in a new Container Apps environment",
+        "Web App for Containers on a Basic App Service plan",
+        "An Azure Kubernetes Service cluster with a CronJob"
       ],
-      "correct": 1,
-      "explanation": "Container Instances run a single container quickly with no cluster or orchestration to manage."
+      "correct": 0,
+      "explanation": "A container group is a single resource, bills per second only while the container runs, and the Logic App connector can start and stop it directly. Container Apps is the near-miss: it can also run on-demand work, but it requires a Container Apps environment first and is built around HTTP ingress, revisions, and replica scaling that this job never uses. An App Service plan bills continuously whether or not anything runs. An AKS cluster means node pools and upgrades for a 20-minute job."
     },
     {
       "id": "q20",
@@ -899,43 +899,43 @@
       "id": "q21",
       "cat": "compute",
       "type": "mc",
-      "question": "An administrator wants to redeploy the exact same infrastructure to three environments, using a more concise, readable syntax than raw ARM JSON.",
+      "question": "A developer deploys a Bicep file to resource group RG1 using az deployment group create with --mode Complete. Afterwards, a storage account an administrator had created manually in RG1 is gone. Future deployments of the file must update the templated resources without touching anything that is not in the file. What should you do?",
       "options": [
-        "Bicep",
-        "The Azure portal, repeated manually",
-        "A PowerShell script with no template",
-        "A resource lock"
+        "Deploy with the Incremental mode instead",
+        "Apply a CanNotDelete lock to the manually created resources in RG1",
+        "Run the what-if operation before each deployment",
+        "Declare the storage account in the Bicep file so Complete mode keeps it"
       ],
       "correct": 0,
-      "explanation": "Bicep compiles down to ARM JSON but is written in a more concise, readable syntax."
+      "explanation": "Complete mode deletes any resource in the group that the template does not declare; Incremental, the default, leaves undeclared resources alone and still updates the ones that are declared. A lock would make the Complete-mode deployment fail when it tries to delete the locked resource rather than make the deployment safe. What-if previews the deletions but does nothing to prevent them. Adding the storage account to the file works for that one resource, but it means every hand-made resource must be maintained in the template forever."
     },
     {
       "id": "q22",
       "cat": "compute",
       "type": "mc",
-      "question": "An administrator tries to resize a running VM to a size unavailable on its current hardware cluster. What's the most likely required step?",
+      "question": "VM1, VM2, and VM3 are in availability set AS1. You deallocate VM1 and try to resize it to Standard_E8s_v5, but that size is not offered for VM1 even though other VMs in the region can use it. You need to complete the resize with the least disruption. What should you do?",
       "options": [
-        "Move the VM to a different subscription",
-        "Deallocate (stop) the VM first, then resize",
-        "Nothing further \u2014 Azure automatically relocates the VM to compatible hardware during the resize",
-        "Delete and recreate the VM from scratch"
+        "Deallocate all three VMs in AS1, resize VM1, then start them",
+        "Remove VM1 from AS1, resize it, then add it back to AS1",
+        "Delete VM1 and recreate it from its disks in a new availability set",
+        "Move VM1 to a different resource group and resize it there"
       ],
-      "correct": 1,
-      "explanation": "A VM may need to be deallocated before resizing if the target size isn't available on its current hardware cluster \u2014 deallocating releases the hardware so Azure can place it on a cluster that supports the new size. Moving subscriptions doesn't change hardware compatibility, and a resize failure doesn't require deleting and rebuilding the VM."
+      "correct": 0,
+      "explanation": "VMs in an availability set are pinned to a shared hardware cluster, so a size that cluster lacks only becomes available once every VM in the set is deallocated and the set can be placed on a cluster that offers it. A VM cannot be moved into or out of an availability set after creation, so removing VM1 from AS1 and adding it back is not possible. Recreating the VM is far more disruptive than a coordinated stop. Resource group membership has no effect on which hardware cluster hosts the VM."
     },
     {
       "id": "q23",
       "cat": "compute",
       "type": "mc",
-      "question": "Which disk tier offers the highest, most consistent IOPS and throughput, configurable independently of the disk's size?",
+      "question": "A SQL Server VM needs a 512 GiB data disk that delivers 20,000 IOPS, and you must be able to raise or lower the IOPS later without resizing the disk or redeploying the VM. The VM size and region support every disk type. The solution must minimize cost. Which disk type should you use?",
       "options": [
-        "Standard SSD",
-        "Standard HDD",
+        "Premium SSD v2",
         "Ultra Disk",
-        "Cool tier storage"
+        "Premium SSD (P20) with on-demand bursting enabled",
+        "Standard SSD (E20)"
       ],
-      "correct": 2,
-      "explanation": "Ultra Disk allows configuring performance (IOPS and throughput) independently of the disk size, for the most demanding workloads."
+      "correct": 0,
+      "explanation": "Premium SSD v2 decouples IOPS and throughput from capacity, so 20,000 IOPS can be provisioned on 512 GiB and adjusted later, at a lower price than Ultra Disk. Ultra Disk meets every technical requirement but costs more for the same numbers. A P20 delivers 2,300 baseline IOPS, and on-demand bursting is only offered on disks larger than 512 GiB, so it cannot be enabled here. Standard SSD E20 provides 500 IOPS."
     },
     {
       "id": "q24",
@@ -956,141 +956,141 @@
       "id": "q25",
       "cat": "networking",
       "type": "mc",
-      "question": "Two VNets are peered, and one of those VNets is also peered to a third VNet. Can the first and third VNets communicate directly?",
+      "question": "Hub-VNet contains an Azure Firewall. Spoke1 and Spoke2 are each peered with Hub-VNet. Traffic between Spoke1 and Spoke2 must pass through the firewall for inspection, and you must not create any additional peerings. What should you configure?",
       "options": [
-        "Only if they're in the same region",
-        "No, VNet peering is not transitive",
-        "Only if a VPN Gateway is also configured",
-        "Yes, connectivity extends automatically to anything peered with either VNet"
+        "Route tables on the spoke subnets sending the other spoke's prefix to the firewall's private IP as next hop",
+        "Use remote gateways on the spoke peerings and Allow gateway transit on the hub side of each peering",
+        "Allow forwarded traffic on the existing hub and spoke peerings, with no other changes",
+        "A direct peering between Spoke1 and Spoke2 with the hub firewall configured as its gateway"
       ],
-      "correct": 1,
-      "explanation": "Peering is not transitive \u2014 the first and third VNets would need their own direct peering to communicate. Region and a VPN Gateway are both irrelevant to this limitation; it applies regardless of region and has nothing to do with gateway configuration."
+      "correct": 0,
+      "explanation": "Peering is not transitive, so spoke-to-spoke traffic only flows if a user-defined route sends it to the firewall as a virtual appliance next hop. Gateway transit is the near-miss: it shares a VPN or ExpressRoute gateway through the hub, not a firewall or NVA. Allow forwarded traffic is required for the firewall's forwarded packets to be accepted, but on its own nothing routes to the firewall in the first place. A direct spoke-to-spoke peering violates the constraint and bypasses inspection."
     },
     {
       "id": "q26",
       "cat": "networking",
       "type": "mc",
-      "question": "A company needs to distribute HTTPS traffic based on URL path (/images to one backend, /api to another) and terminate SSL centrally.",
+      "question": "A web application runs in App Service in East US and West Europe. Users worldwide must be routed to the nearest healthy region, requests to /api and /images must go to different backend pools, a web application firewall must inspect traffic, and TLS must terminate at the edge. Which service should you deploy?",
       "options": [
-        "VNet peering",
-        "Azure Load Balancer",
-        "Network Watcher",
-        "Application Gateway"
+        "Azure Front Door Premium",
+        "Application Gateway v2 with the WAF SKU",
+        "Traffic Manager with the Performance routing method",
+        "A cross-region Azure Load Balancer"
       ],
-      "correct": 3,
-      "explanation": "Application Gateway operates at layer 7 and can route by URL path while terminating SSL centrally \u2014 Load Balancer cannot."
+      "correct": 0,
+      "explanation": "Front Door is the global layer-7 entry point: it chooses the closest healthy origin, routes by URL path, includes WAF, and terminates TLS at Microsoft's edge. Application Gateway offers the same path routing and WAF but is regional, so it would need a global service in front of it to steer users between regions. Traffic Manager steers by DNS and never sees the HTTP request, so no path routing, WAF, or TLS termination. Cross-region Load Balancer works at layer 4."
     },
     {
       "id": "q27",
       "cat": "networking",
       "type": "mc",
-      "question": "A company needs to load-balance raw TCP traffic to backend VMs based on IP and port only, with no awareness of HTTP content.",
+      "question": "Two network virtual appliances in an active-active pair must receive every TCP and UDP flow from the spoke subnets, on any port, through a single internal load balancer frontend. What should you create?",
       "options": [
-        "Azure Load Balancer",
-        "Azure DNS",
-        "Application Gateway",
-        "Azure Bastion"
+        "A Standard internal load balancer with an HA ports load-balancing rule",
+        "A Basic internal load balancer with one load-balancing rule per protocol and port",
+        "An Application Gateway v2 with both appliances in its backend pool",
+        "A Standard public load balancer with an outbound rule for the spoke subnets"
       ],
       "correct": 0,
-      "explanation": "Load Balancer works at layer 4, distributing TCP/UDP traffic by IP and port with no content awareness."
+      "explanation": "An HA ports rule (port 0, protocol All) on a Standard internal load balancer forwards every port and protocol to the backend pool, which is exactly the pattern for highly available NVAs. The Basic SKU has no HA ports feature, and one rule per port cannot cover every port anyway. Application Gateway only handles HTTP and HTTPS. An outbound rule provides SNAT for egress; it does not distribute inbound flows to the appliances."
     },
     {
       "id": "q28",
       "cat": "networking",
       "type": "mc",
-      "question": "An application inside a VNet needs to resolve a custom domain name to an internal resource, without that name being resolvable from the public internet.",
+      "question": "VMs in VNet1 must resolve each other by name under corp.internal, with records created and removed automatically as VMs are deployed and deleted. VMs in VNet2 must resolve those same names, but VNet2's own VMs must not register records. What should you do?",
       "options": [
-        "Azure public DNS",
-        "A public Load Balancer",
-        "Azure Bastion",
-        "An Azure private DNS zone"
+        "A private DNS zone corp.internal linked to VNet1 with auto-registration on and to VNet2 with auto-registration off",
+        "A private DNS zone corp.internal linked to both VNets with auto-registration enabled on both links",
+        "A public Azure DNS zone corp.internal with name servers delegated from both virtual networks",
+        "Custom DNS servers on VNet2 set to the private IP addresses of two VMs in VNet1"
       ],
-      "correct": 3,
-      "explanation": "Private DNS zones provide name resolution within a VNet without exposing those records publicly."
+      "correct": 0,
+      "explanation": "Auto-registration is a per-link setting on a private DNS zone, so you can register from VNet1 while VNet2 gets resolution only. Enabling it on both links would make VNet2's VMs register records too. A public zone would expose the names on the internet and cannot auto-register VMs. Pointing VNet2 at VMs in VNet1 presumes those VMs run a DNS service and recreates by hand what a private zone link does natively."
     },
     {
       "id": "q29",
       "cat": "networking",
       "type": "mc",
-      "question": "An administrator needs to securely RDP into a VM from the portal without exposing a public IP on that VM or setting up a VPN.",
+      "question": "Azure Bastion (Basic SKU) is deployed in VNet1. Administrators must connect to VMs in VNet1 using the native ssh client and key files on their workstations rather than the browser, and the VMs must still have no public IP addresses. What should you do?",
       "options": [
-        "A public Load Balancer",
-        "VPN Gateway",
-        "ExpressRoute",
-        "Azure Bastion"
+        "Upgrade the Bastion host to the Standard SKU and enable native client support",
+        "Deploy an additional Bastion host in each subnet that contains VMs",
+        "Assign a public IP to each VM and allow TCP 22 from the administrators' addresses in the NSG",
+        "Enable just-in-time VM access in Microsoft Defender for Cloud"
       ],
-      "correct": 3,
-      "explanation": "Azure Bastion provides secure RDP/SSH through the portal without a public IP on the VM or a separate VPN."
+      "correct": 0,
+      "explanation": "Native client connectivity through az network bastion ssh or tunnel is a Standard-SKU feature; the Basic SKU is browser-only. One Bastion host serves a whole VNet, and even peered VNets, so more hosts add cost without adding the feature. Public IPs break the stated constraint. Just-in-time access narrows when an NSG rule is open, but it still needs the VM to be reachable through a public IP or a VPN."
     },
     {
       "id": "q30",
       "cat": "networking",
       "type": "mc",
-      "question": "A connectivity issue between two VMs needs diagnosing \u2014 specifically, whether an NSG rule is blocking the traffic path.",
+      "question": "VM1 in subnet A cannot reach VM2 in subnet B on TCP 1433. Both subnets are in the same VNet, and a route table is associated with subnet A. You suspect the traffic is being sent to a network virtual appliance that is offline. Which Network Watcher tool shows where VM1's packets to VM2 are being sent?",
       "options": [
-        "A resource lock",
-        "Network Watcher's IP flow verify",
-        "Azure Policy",
-        "Azure Advisor"
+        "Next hop",
+        "IP flow verify",
+        "Effective security rules",
+        "NSG flow logs"
       ],
-      "correct": 1,
-      "explanation": "Network Watcher's IP flow verify tool specifically checks whether an NSG rule allows or denies a given traffic flow."
+      "correct": 0,
+      "explanation": "Next hop evaluates the effective routes for a source VM and destination address and reports the next hop type and IP, which exposes a user-defined route pointing at a dead appliance. IP flow verify is the near-miss: it answers only whether an NSG rule allows or denies the flow, and says nothing about routing. Effective security rules lists the NSG rules applied to a NIC, and flow logs record what the NSGs allowed or denied after the fact."
     },
     {
       "id": "q31",
       "cat": "networking",
       "type": "mc",
-      "question": "How many IP addresses does Azure reserve in every subnet, regardless of its size?",
+      "question": "You are adding a subnet to VNet1 (10.10.0.0/16) that must host 60 virtual machines, each with a single network interface, and you want to consume as little address space as possible. Which subnet prefix should you use?",
       "options": [
-        "2",
-        "0",
-        "5",
-        "10"
+        "10.10.1.0/25",
+        "10.10.1.0/26",
+        "10.10.1.0/27",
+        "10.10.0.0/24"
       ],
-      "correct": 2,
-      "explanation": "Azure reserves 5 addresses in every subnet for internal use, regardless of the subnet's overall size."
+      "correct": 0,
+      "explanation": "Azure reserves five addresses in every subnet (network, broadcast, and three for the platform), so a /26 provides 64 minus 5, or 59 usable addresses, one short of the 60 NICs. A /25 yields 123 usable and is the smallest prefix that fits. A /27 leaves 27. A /24 works but wastes space, and 10.10.0.0/24 may collide with an existing subnet at the start of the range."
     },
     {
       "id": "q32",
       "cat": "networking",
       "type": "mc",
-      "question": "A company wants load balancing purely between internal application tiers, with no exposure to the public internet at all.",
+      "question": "Application-tier VMs in VNet1 are spread across three availability zones and listen on TCP 8443 and a custom UDP port. Web-tier VMs in peered VNet2 must reach them through one private IP address that keeps working if a zone fails. Nothing may be exposed to the internet. What should you deploy?",
       "options": [
-        "Application Gateway with a public IP",
-        "Azure Front Door",
-        "A public Load Balancer",
-        "An internal (private) Load Balancer"
+        "A Standard internal load balancer with a zone-redundant frontend",
+        "A Basic internal load balancer with a frontend in the application subnet",
+        "A Standard public load balancer with an NSG that denies the Internet service tag",
+        "An Application Gateway v2 with a private frontend IP address"
       ],
-      "correct": 3,
-      "explanation": "An internal Load Balancer only distributes traffic within a VNet, never from the public internet."
+      "correct": 0,
+      "explanation": "Only the Standard SKU supports availability zones, and a zone-redundant frontend is served from every zone so the single private IP survives a zone outage. The Basic SKU is the near-miss: it is internal and private, but it has no zone awareness and goes down with its zone. A public load balancer wrapped in an NSG still has an internet-facing IP. Application Gateway proxies HTTP and HTTPS only, so the UDP port rules it out."
     },
     {
       "id": "q33",
       "cat": "monitoring",
       "type": "mc",
-      "question": "An administrator wants to be notified by email and automatically trigger a runbook when a VM's CPU exceeds 90% for 10 minutes.",
+      "question": "You must receive an email within minutes whenever any virtual machine in resource group RG1 is deleted, including deletions performed through the CLI or a template. What should you create?",
       "options": [
-        "Network Watcher",
-        "An alert rule paired with an action group",
-        "Azure Advisor alone",
-        "A resource lock"
+        "An activity log alert for the Delete Virtual Machine operation at RG1 scope, with an action group",
+        "A metric alert rule on Percentage CPU with a threshold of 0 for the VMs in RG1",
+        "A log search alert rule on the Heartbeat table that fires when a VM in RG1 stops reporting",
+        "A Service Health alert rule for virtual machines in the region that contains RG1"
       ],
-      "correct": 1,
-      "explanation": "The alert rule defines the trigger condition; the action group defines the response, like sending an email or running automation."
+      "correct": 0,
+      "explanation": "Deleting a VM is a control-plane operation recorded in the activity log, and an activity log alert on that operation fires on every delete regardless of the tool used. The heartbeat query is the near-miss: a deleted VM does stop sending heartbeats, but so does a stopped, deallocated, or disconnected one, and the alert only fires after the missing-heartbeat window elapses. A deleted VM emits no metrics at all, so a CPU threshold never evaluates. Service Health reports Microsoft platform incidents, not actions taken in your subscription."
     },
     {
       "id": "q34",
       "cat": "monitoring",
       "type": "mc",
-      "question": "Which Azure Monitor data type would you query with KQL to investigate a detailed sequence of application errors over the last week?",
+      "question": "Fifty Windows VMs send their Security event log to a Log Analytics workspace through the Azure Monitor Agent. You must be alerted when event ID 4625 occurs more than 20 times in any 15-minute period on any single VM. Which type of alert rule should you create?",
       "options": [
-        "Logs, via Log Analytics",
-        "Metrics",
-        "Azure Service Health",
-        "Azure Advisor recommendations"
+        "A log search alert rule that queries the Event table, split by computer",
+        "A metric alert rule on the VMs with a dynamic threshold",
+        "An activity log alert rule filtered to the Security category",
+        "A Service Health alert rule with the Incident event type"
       ],
       "correct": 0,
-      "explanation": "Logs hold detailed, queryable event data; metrics are lightweight numerical time-series data, not detailed event sequences."
+      "explanation": "Event IDs live in log data, so only a log search alert can count a specific ID per computer over a window and fire per VM using a dimension split. Metric alerts evaluate numeric time series such as CPU or disk; there is no metric for a Windows event ID. The activity log's Security category covers Defender for Cloud alerts about Azure resources, not events from inside a guest OS. Service Health alerts cover Azure platform incidents."
     },
     {
       "id": "q35",
@@ -1111,111 +1111,117 @@
       "id": "q36",
       "cat": "monitoring",
       "type": "mc",
-      "question": "A VM's disk was corrupted by a bad update yesterday. Which service would restore it to a point before the update?",
+      "question": "A user deleted a 2 GB folder from the data disk of VM1 yesterday. VM1 is protected by Azure Backup in a Recovery Services vault and must keep running. You need to recover only that folder with the least administrative effort. What should you do?",
       "options": [
-        "Azure Advisor",
-        "Network Watcher",
-        "Azure Backup, via a Recovery Services vault",
-        "Azure Site Recovery"
+        "Use File Recovery on the recovery point to mount the disk and copy the folder back",
+        "Restore the recovery point to a new VM, then copy the folder across the network",
+        "Restore the recovery point as disks, attach them to VM1, and copy the folder",
+        "Use Azure Site Recovery to fail VM1 over to yesterday's recovery point"
       ],
-      "correct": 2,
-      "explanation": "Backup restores a resource to an earlier point-in-time state \u2014 Site Recovery is for regional failover, not point-in-time restores."
+      "correct": 0,
+      "explanation": "File Recovery generates a script that mounts the recovery point's disks over iSCSI directly on VM1 or another machine, so you browse to the folder and copy it, then unmount. Restoring a whole VM or restoring disks and attaching them both work, but they create extra resources, cost, and cleanup for 2 GB of data. Site Recovery replicates VMs to another region for disaster recovery; it is not a backup product and VM1 has no replica to fail over to."
     },
     {
       "id": "tf1",
       "cat": "identityGov",
       "type": "tf",
-      "question": "RBAC role assignments are inherited from a higher scope down to lower scopes.",
-      "answer": true,
-      "explanation": "A role assigned at, say, a subscription applies to every resource group and resource beneath it, unless a more specific assignment changes things."
+      "question": "Assigning the Reader role at a resource group to a user who already holds Contributor at the parent subscription restricts that user to read-only access inside the resource group.",
+      "answer": false,
+      "explanation": "Role assignments are additive across scopes and the most permissive applicable assignment wins, so the inherited Contributor still applies in that resource group and the extra Reader assignment is redundant. Narrowing someone's access means removing or moving the broader assignment, not stacking a smaller one beneath it."
     },
     {
       "id": "tf2",
       "cat": "identityGov",
       "type": "tf",
-      "question": "A user can have RBAC permissions assigned directly at a single resource, even with no role assigned at the subscription level.",
-      "answer": true,
-      "explanation": "RBAC can be assigned at any scope independently \u2014 a resource-level assignment doesn't require a subscription-level one first."
+      "question": "A user who holds the Contributor role at the subscription scope can assign the Reader role to a colleague on any resource group in that subscription.",
+      "answer": false,
+      "explanation": "Contributor's NotActions exclude Microsoft.Authorization/*/Write and /Delete, which is exactly what creating a role assignment requires, so a Contributor can manage every resource yet cannot grant anyone access. Only Owner, User Access Administrator, or a custom role that includes the role-assignment write action can do that."
     },
     {
       "id": "tf3",
       "cat": "identityGov",
       "type": "tf",
-      "question": "An Azure Policy initiative is just a single, standalone policy definition.",
+      "question": "When a policy with the Deny effect is assigned at a management group, existing resources beneath it that violate the policy are automatically removed or brought into compliance.",
       "answer": false,
-      "explanation": "An initiative is a group of related policy definitions assigned together, not a single standalone policy."
+      "explanation": "Deny only blocks new create or update requests that would violate the rule. Existing resources are evaluated and reported as non-compliant, but nothing is changed or deleted. Fixing what already exists requires a DeployIfNotExists or Modify policy together with a remediation task."
     },
     {
       "id": "tf4",
       "cat": "storage",
       "type": "tf",
-      "question": "Read-access geo-redundant storage (RA-GRS) allows reading data from the secondary region even when the primary is fully available.",
-      "answer": true,
-      "explanation": "That's exactly what distinguishes RA-GRS from plain GRS, which only makes the secondary readable after a failover."
+      "question": "When you create a storage account with geo-redundant storage (GRS), you choose which secondary region the data replicates to.",
+      "answer": false,
+      "explanation": "GRS and GZRS always replicate to the fixed Azure paired region of the primary; the administrator cannot pick a different secondary. If data must be copied to a region of your choosing, that calls for object replication to a second storage account, not a redundancy setting."
     },
     {
       "id": "tf5",
       "cat": "storage",
       "type": "tf",
-      "question": "Soft delete alone guarantees recovery of a blob's exact content after it has been overwritten by a new upload.",
+      "question": "Enabling soft delete for blobs on a storage account also protects the Azure file shares in that account from accidental deletion.",
       "answer": false,
-      "explanation": "Soft delete protects against deletion. Recovering prior content after an overwrite specifically requires blob versioning."
+      "explanation": "Blob soft delete and file share soft delete are separate settings configured in different places (Data protection for blobs, the File shares settings for shares) with their own retention periods. Turning on one does nothing for the other, which is a common gap discovered only after a share is deleted."
     },
     {
       "id": "tf6",
       "cat": "storage",
       "type": "tf",
-      "question": "A Shared Access Signature (SAS) can grant access without ever sharing the storage account's access keys.",
-      "answer": true,
-      "explanation": "A SAS is a separate, scoped, time-limited credential that doesn't expose the underlying account key."
+      "question": "A shared access signature that was signed with storage account key1 keeps working after key1 is regenerated, because the token carries its own expiry time.",
+      "answer": false,
+      "explanation": "A SAS is validated by recomputing its signature with the key that signed it, so regenerating that key immediately invalidates every SAS it signed, whatever their expiry. That is also why rotating keys is the emergency way to revoke an ad hoc SAS, and why a stored access policy is the gentler option for revoking a service SAS without rotating keys."
     },
     {
       "id": "tf7",
       "cat": "compute",
       "type": "tf",
-      "question": "An Azure VM Scale Set can only scale based on a fixed schedule, not real-time metrics like CPU.",
-      "answer": false,
-      "explanation": "Scale Sets can autoscale based on both real-time metrics, like CPU, and fixed schedules."
+      "question": "An autoscale rule on a VM Scale Set can use a metric from a different resource, such as the active message count of a Service Bus queue, instead of a metric emitted by the scale set itself.",
+      "answer": true,
+      "explanation": "Autoscale rules let you pick a different metric source resource, so a worker tier can scale on queue depth, storage queue length, or any other Azure Monitor metric rather than only on its own CPU or memory. The common misconception is that scale sets can only react to host metrics from their own instances."
     },
     {
       "id": "tf8",
       "cat": "compute",
       "type": "tf",
-      "question": "Bicep files compile down to ARM JSON templates before deployment.",
-      "answer": true,
-      "explanation": "Bicep is a more concise authoring language that compiles to the same underlying ARM JSON format."
+      "question": "Deploying the same Bicep file a second time to the same resource group fails because the resources it declares already exist.",
+      "answer": false,
+      "explanation": "Resource Manager deployments are idempotent: a resource that already matches the template is left as is, and one whose properties differ is updated in place. Repeating a deployment is the normal way to roll out changes. The only time a redeploy removes anything is Complete mode, which deletes resources that are missing from the file."
     },
     {
       "id": "tf9",
       "cat": "compute",
       "type": "tf",
-      "question": "Azure Container Instances provide built-in Kubernetes-style orchestration across multiple containers.",
-      "answer": false,
-      "explanation": "That's AKS. Container Instances run standalone containers with no orchestration layer."
+      "question": "An Azure Container Instances container group can run several containers that share the same host, lifecycle, local network, and mounted volumes.",
+      "answer": true,
+      "explanation": "A container group is scheduled as a unit, much like a Kubernetes pod: its containers start and stop together, reach each other on localhost, and can mount the same Azure Files volume. What Container Instances lacks is orchestration across many groups, such as replica scaling and rolling updates, which is where Container Apps or AKS come in."
     },
     {
       "id": "tf10",
       "cat": "networking",
       "type": "tf",
-      "question": "VNet peering allows transitive routing between all peered VNets automatically.",
+      "question": "Two virtual networks whose address spaces overlap can be peered as long as the overlapping ranges are not assigned to any subnet.",
       "answer": false,
-      "explanation": "Peering is not transitive \u2014 each pair of VNets that needs to communicate must be peered directly."
+      "explanation": "Peering is refused whenever the address spaces overlap at all, used or not, because Azure routes between peered networks by address space, not by subnet. Fixing it means removing the overlapping prefix from one VNet's address space before the peering can be created."
     },
     {
       "id": "tf11",
       "cat": "networking",
       "type": "tf",
-      "question": "An internal (private) Load Balancer can distribute traffic originating from the public internet.",
-      "answer": false,
-      "explanation": "An internal Load Balancer only distributes traffic within a VNet, never from the public internet."
+      "question": "A network security group associated with a subnet also filters traffic between two virtual machines that are both inside that same subnet.",
+      "answer": true,
+      "explanation": "A subnet-level NSG is enforced on every flow to and from the NICs in that subnet, including VM-to-VM traffic that never leaves it. The default AllowVnetInBound rule is why that traffic normally works, and a custom deny rule with a lower priority number will block it, which surprises people who assume the NSG only guards the subnet boundary."
     },
     {
       "id": "tf12",
       "cat": "networking",
-      "type": "tf",
-      "question": "Azure Bastion eliminates the need to expose a VM's public IP for RDP or SSH access.",
-      "answer": true,
-      "explanation": "Bastion provides secure access through the portal without the VM itself needing a public IP."
+      "type": "mc",
+      "question": "You plan to deploy Azure Bastion (Standard SKU) into VNet1 (10.1.0.0/16) so administrators can reach VMs that have no public IP addresses. Which subnet should you create for the Bastion host?",
+      "options": [
+        "AzureBastionSubnet with prefix 10.1.1.0/26",
+        "AzureBastionSubnet with prefix 10.1.1.0/27",
+        "BastionSubnet with prefix 10.1.1.0/26",
+        "GatewaySubnet with prefix 10.1.1.0/26"
+      ],
+      "correct": 0,
+      "explanation": "The subnet name must be exactly AzureBastionSubnet, and it must be /26 or larger so the service can scale its instances. A /27 is rejected at deployment time. A differently named subnet is simply not recognized by Bastion. GatewaySubnet is the reserved name for VPN and ExpressRoute gateways, which cannot be shared with Bastion."
     },
     {
       "id": "q37",
@@ -1293,13 +1299,13 @@
       "type": "mc",
       "question": "An administrator is deploying monitoring to a fleet of new VMs and wants Microsoft's current, supported agent for collecting metrics and logs into Azure Monitor.",
       "options": [
-        "The Azure Monitor Agent (AMA)",
-        "The legacy Log Analytics agent (MMA)",
-        "The Diagnostics extension only",
-        "No agent \u2014 Azure Monitor needs nothing installed on the VM"
+        "The Azure Monitor Agent with a data collection rule",
+        "The legacy Log Analytics agent (MMA) with a workspace key",
+        "The Azure Diagnostics extension (WAD) sending to a storage account",
+        "The Dependency agent on its own"
       ],
       "correct": 0,
-      "explanation": "The Azure Monitor Agent (AMA), configured through data collection rules, is the current agent. The legacy Log Analytics agent (MMA) was retired in August 2024 and should not be used for new deployments."
+      "explanation": "The Azure Monitor Agent, configured through data collection rules, is the supported agent for new deployments. The Log Analytics agent was retired in August 2024 and should not be used for anything new. The Azure Diagnostics extension is an older collector aimed at storage accounts and Event Hubs, not Log Analytics. The Dependency agent only adds process and connection mapping for VM insights and depends on the Azure Monitor Agent being present."
     },
     {
       "id": "q43",
@@ -1307,13 +1313,13 @@
       "type": "mc",
       "question": "A company needs a VM's resource logs both queryable right away in Log Analytics and archived cheaply for 7 years to satisfy a compliance requirement.",
       "options": [
-        "One diagnostic setting sending logs to both a Log Analytics workspace and a storage account",
-        "Two separate resources, since a diagnostic setting supports only one destination",
-        "Azure Backup, configured to capture logs",
-        "A resource lock with a 7-year expiration"
+        "One diagnostic setting that sends the logs to both a Log Analytics workspace and a storage account",
+        "Two diagnostic settings on the VM, because a diagnostic setting supports a single destination",
+        "Azure Backup of the VM with a seven-year retention rule in the vault policy",
+        "Continuous export from Microsoft Defender for Cloud to a storage account"
       ],
       "correct": 0,
-      "explanation": "A single diagnostic setting can send the same logs to multiple destinations at once, including a Log Analytics workspace for querying and a storage account for long-term archival \u2014 no need for separate configurations per destination."
+      "explanation": "A single diagnostic setting can fan the same logs out to several destinations at once, so one setting covers the workspace for querying and the storage account for cheap long-term archive. A second setting is unnecessary because the one-destination limit does not exist. Azure Backup protects disks, not the log stream. Continuous export from Defender for Cloud ships security alerts and recommendations, not a resource's own diagnostic logs."
     },
     {
       "id": "q44",
@@ -1321,13 +1327,13 @@
       "type": "mc",
       "question": "An administrator needs to schedule recurring patch installation windows across dozens of Windows and Linux Azure VMs, and track patch compliance centrally.",
       "options": [
-        "Azure Update Manager",
-        "Azure Advisor",
-        "Azure Policy alone",
-        "Azure Site Recovery"
+        "Azure Update Manager with a maintenance configuration",
+        "Azure Automation Update Management",
+        "Automatic VM guest patching enabled on each VM",
+        "An Azure Policy assignment with the DeployIfNotExists effect"
       ],
       "correct": 0,
-      "explanation": "Azure Update Manager is the current unified service for assessing and scheduling OS patch compliance and installation across VMs at scale, replacing the older Update Management solution."
+      "explanation": "Update Manager is the current service for assessing compliance across a fleet and installing updates in maintenance configurations you schedule. Automation Update Management is the near-miss: it did the same job, but it was retired in August 2024 along with the Log Analytics agent it depended on. Automatic guest patching installs updates during off-peak hours Azure chooses, with no administrator-defined window across the fleet. Policy can enforce that patch settings exist, but it does not orchestrate installations."
     },
     {
       "id": "tf13",
@@ -1357,66 +1363,66 @@
       "id": "msq1",
       "cat": "identityGov",
       "type": "ms",
-      "question": "Which two built-in Azure roles let someone grant other users access to resources, not just manage the resources themselves? (Choose two.)",
+      "question": "User1 is assigned the Contributor role at the scope of subscription Sub1 and holds no other role assignments. Which two actions can User1 perform? (Choose two.)",
       "options": [
-        "Owner",
-        "User Access Administrator",
-        "Contributor",
-        "Reader"
+        "Create a new resource group in Sub1",
+        "Deploy a virtual machine into an existing resource group in Sub1",
+        "Assign the Reader role to User2 on a resource group in Sub1",
+        "Apply a CanNotDelete lock to a resource group in Sub1"
       ],
       "correct": [
         0,
         1
       ],
-      "explanation": "Owner can manage resources and assign roles to others. User Access Administrator can assign roles without managing the resources themselves. Contributor can manage resources but cannot grant access, and Reader can do neither."
+      "explanation": "Contributor grants every action except those under Microsoft.Authorization (role assignments, deny assignments, locks, elevate access) and Blueprints, so creating resource groups and deploying resources are both allowed. Assigning a role needs Microsoft.Authorization/roleAssignments/write, which Contributor excludes. The lock is the near-miss: management locks also live under Microsoft.Authorization/locks, so a Contributor can neither create nor remove them, even though it can otherwise fully manage the resource group."
     },
     {
       "id": "msq2",
       "cat": "compute",
       "type": "ms",
-      "question": "Which two Azure managed disk types let you configure IOPS and throughput independently of the disk's provisioned size? (Choose two.)",
+      "question": "You plan to attach Premium SSD v2 disks to a new virtual machine. Which two statements about Premium SSD v2 are true? (Choose two.)",
       "options": [
-        "Ultra Disk",
-        "Premium SSD v2",
-        "Standard SSD",
-        "Premium SSD"
+        "It cannot be used as the operating system disk of the VM",
+        "Its IOPS and throughput can be adjusted without changing the disk size",
+        "It supports ReadOnly host caching on the VM",
+        "It requires the VM to be deployed in a proximity placement group"
       ],
       "correct": [
         0,
         1
       ],
-      "explanation": "Ultra Disk and the newer Premium SSD v2 both allow tuning IOPS and throughput separately from capacity. Standard SSD and the original Premium SSD scale their performance according to the size tier provisioned."
+      "explanation": "Premium SSD v2 is a data-disk-only type, and its headline feature is performance provisioned independently of capacity, the same decoupling Ultra Disk offers at a lower price. Host caching is the near-miss: the original Premium SSD supports ReadOnly and ReadWrite caching, but Premium SSD v2 does not, which matters when migrating a disk that relied on it. Proximity placement groups are unrelated to disk type."
     },
     {
       "id": "msq3",
       "cat": "monitoring",
       "type": "ms",
-      "question": "Which two of the following are valid actions an Azure Monitor action group can trigger when an alert fires? (Choose two.)",
+      "question": "An alert rule fires when a VM's CPU exceeds 90%. Which two of the following can the alert's action group do directly? (Choose two.)",
       "options": [
-        "A webhook",
-        "An Automation runbook",
-        "A resource lock",
-        "A management group"
+        "Start an Azure Automation runbook",
+        "Send a push notification to the Azure mobile app",
+        "Increase the instance count of a VM Scale Set",
+        "Restart the virtual machine without any additional resource"
       ],
       "correct": [
         0,
         1
       ],
-      "explanation": "Action groups can call webhooks, Automation runbooks, Azure Functions, Logic Apps, and more, plus notify people by email, SMS, or voice. Resource locks and management groups are governance constructs, not things an alert can trigger."
+      "explanation": "Action groups deliver notifications (email, SMS, voice, push) and invoke automation targets such as runbooks, Functions, Logic Apps, and webhooks. Changing a Scale Set's instance count is the job of autoscale rules, not alert actions; an alert can only reach a runbook that then calls the scale API. Likewise, restarting a VM is not a built-in action type, so it requires a runbook or Function to perform the restart."
     },
     {
       "id": "q45",
       "cat": "identityGov",
       "type": "mc",
-      "question": "A security team wants to block all sign-ins using legacy authentication protocols, which do not support MFA, across the whole tenant, while still allowing modern authentication sign-ins as normal. Which feature should they configure?",
+      "question": "Your tenant has 2,000 users. You must block sign-ins that use legacy authentication protocols such as IMAP and SMTP AUTH, but one on-premises scanner account must keep using SMTP AUTH, and users must not be forced to register for MFA as part of this change. What should you configure?",
       "options": [
-        "A Conditional Access policy",
-        "An Azure Policy assignment",
-        "A custom RBAC role",
-        "A resource lock"
+        "A Conditional Access policy that blocks the Other clients client-app condition, excluding the scanner account",
+        "Security defaults enabled at the tenant level in Microsoft Entra ID properties",
+        "Per-user multifactor authentication set to Enforced for the user accounts, excluding the scanner",
+        "A sign-in risk policy in Microsoft Entra ID Protection that blocks medium and high risk sign-ins"
       ],
       "correct": 0,
-      "explanation": "Conditional Access can target legacy authentication specifically as a condition and block it tenant-wide, while leaving modern authentication sign-ins unaffected. Azure Policy governs resource configuration, not sign-in behavior; a custom RBAC role only changes what an already-authenticated identity can do to resources; and a resource lock only prevents deletion or modification of a resource's own configuration, so none of the other three touch sign-in enforcement at all."
+      "explanation": "Conditional Access exposes legacy protocols as a client-app condition and supports per-user exclusions, so the scanner can be carved out. Security defaults block legacy authentication too, but tenant-wide with no exclusions, and they also require every user to register for MFA. Per-user MFA does not block legacy protocols directly; legacy clients simply fail MFA inconsistently, and it forces registration. A sign-in risk policy reacts to risk signals, not to the protocol a client uses."
     },
     {
       "id": "q46",
@@ -1424,13 +1430,13 @@
       "type": "mc",
       "question": "An organization wants administrators to normally hold no standing Global Administrator access, activating that role with approval and only for a limited, time-boxed window when actually needed. Which feature enables this?",
       "options": [
-        "Self-service password reset (SSPR) for standing admin accounts",
-        "Azure Policy with a Deny effect on privileged role assignments",
-        "Microsoft Entra Privileged Identity Management (PIM)",
-        "A dynamic security group containing every Global Administrator"
+        "Microsoft Entra Privileged Identity Management (PIM) with eligible assignments",
+        "A quarterly access review of the Global Administrator role",
+        "A Conditional Access policy with a one-hour sign-in frequency for administrators",
+        "An administrative unit that contains the administrator accounts"
       ],
-      "correct": 2,
-      "explanation": "PIM enables just-in-time, time-boxed role activation, often requiring approval or justification, instead of granting standing or permanent access to a privileged role. SSPR only handles password resets, a Deny-effect policy governs resource configuration compliance rather than role activation timing, and a dynamic group only manages who's a member, not how long they hold standing access \u2014 none of the three provide time-boxed privileged role activation."
+      "correct": 0,
+      "explanation": "PIM makes the role assignment eligible rather than active, so the administrator must activate it, optionally with approval and justification, and it expires after the configured duration. An access review is the near-miss: it periodically confirms whether someone should keep a role, but between reviews the assignment is still standing access. A sign-in frequency control forces re-authentication; it does not remove the role between uses. An administrative unit narrows which users a role applies to, not when the role is held."
     },
     {
       "id": "q47",
@@ -1466,13 +1472,13 @@
       "type": "mc",
       "question": "An organization wants to build one standardized, versioned custom VM image and make it available for deployment across multiple subscriptions and regions in their tenant. Which service fits?",
       "options": [
-        "A managed disk snapshot",
-        "The Custom Script Extension",
-        "An availability set",
-        "Azure Compute Gallery (Shared Image Gallery)"
+        "Azure Compute Gallery with an image definition and versions replicated to each region",
+        "A managed disk snapshot copied to a storage account in each target region",
+        "The Custom Script Extension with the configuration applied at first boot",
+        "A managed image created in each region from a generalized copy of the VM"
       ],
-      "correct": 3,
-      "explanation": "Azure Compute Gallery is built specifically for publishing, versioning, and replicating custom VM images for reuse across subscriptions and regions. A snapshot is a point-in-time copy of a single disk, without the versioning or multi-region replication a shared image catalog provides. The Custom Script Extension configures a VM after it is already running, and an availability set is a resiliency grouping unrelated to image management."
+      "correct": 0,
+      "explanation": "Azure Compute Gallery is built for publishing versioned images, replicating them to chosen regions, and sharing them across subscriptions or the whole tenant. A snapshot is a point-in-time copy of one disk with no versioning or sharing model. The Custom Script Extension configures a VM after it is already running rather than producing an image. A managed image is the near-miss: it is a real image, but it is regional, unversioned, and lives in one subscription, so you would end up maintaining many copies by hand."
     },
     {
       "id": "q50",
@@ -1480,13 +1486,13 @@
       "type": "mc",
       "question": "An administrator wants traffic from a subnet destined for the internet to be forced through a network virtual appliance for inspection first, instead of going directly out. Which feature enables this custom routing?",
       "options": [
-        "A network security group rule",
-        "A user-defined route (UDR) in a route table",
-        "VNet peering",
-        "A service endpoint"
+        "A user-defined route in a route table with the appliance as the next hop",
+        "A network security group rule that redirects outbound traffic to the appliance",
+        "VNet peering between the subnet's VNet and the appliance's VNet with gateway transit",
+        "A NAT gateway associated with the subnet in front of the appliance"
       ],
-      "correct": 1,
-      "explanation": "A user-defined route in a route table overrides Azure default system routes, letting traffic be forced through a specific next hop, like a network virtual appliance, instead of the default path. An NSG rule only allows or denies traffic, it does not redirect it, and peering or a service endpoint both establish connectivity or an optimized path but do not force traffic through a custom inspection point."
+      "correct": 0,
+      "explanation": "A user-defined route for 0.0.0.0/0 with next hop type Virtual appliance overrides the default internet system route, so the subnet's egress is steered through the appliance. NSG rules allow or deny traffic; they have no concept of redirecting it. Peering with gateway transit shares a VPN or ExpressRoute gateway, not an inspection appliance, and establishes connectivity rather than a forced path. A NAT gateway performs outbound SNAT for the subnet and would send traffic straight to the internet, bypassing the appliance."
     },
     {
       "id": "q51",
@@ -1520,9 +1526,9 @@
       "id": "tf16",
       "cat": "identityGov",
       "type": "tf",
-      "question": "A custom Azure RBAC role can be defined with a narrower set of permissions than any single built-in role, such as allowing only VM restarts and nothing else.",
-      "answer": true,
-      "explanation": "Custom roles are built from individual allowed, and optionally excluded, actions, so they can be scoped far more narrowly than any built-in role, including down to a single action like restarting VMs. This is exactly why custom roles exist, to implement least-privilege access that the built-in roles do not precisely match."
+      "question": "A custom role that grants only Microsoft.Compute/virtualMachines/restart/action, with no read action, lets the assignee restart virtual machines from the Azure portal.",
+      "answer": false,
+      "explanation": "The portal has to list and open the VM before it can offer a Restart button, and that requires Microsoft.Compute/virtualMachines/read. Without a read action the VM is invisible in the portal, even though a CLI call that targets the resource ID directly could still succeed. Real least-privilege custom roles pair the specific action with the matching read permission."
     },
     {
       "id": "tf17",
@@ -1544,35 +1550,35 @@
       "id": "msq4",
       "cat": "storage",
       "type": "ms",
-      "question": "Which two of the following are true about Azure Storage private endpoints? (Choose two.)",
+      "question": "You create a private endpoint for storage account st1 in VNet1. A VM in VNet1 still resolves st1.blob.core.windows.net to a public IP address, and st1 remains reachable from the internet. Which two actions should you take? (Choose two.)",
       "options": [
-        "They assign the storage account a private IP address inside a VNet",
-        "They are the same thing as a service endpoint",
-        "Traffic to a private endpoint can be kept off the public internet entirely",
-        "They eliminate the need for any RBAC or SAS-based authorization"
+        "Link a privatelink.blob.core.windows.net private DNS zone that holds the endpoint A record to VNet1",
+        "Set Public network access on st1 to Disabled",
+        "Add a service endpoint for Microsoft.Storage to the VM subnet",
+        "Add an NSG rule on the VM subnet that allows outbound TCP 443 to the storage service tag"
       ],
       "correct": [
         0,
-        2
+        1
       ],
-      "explanation": "A private endpoint places a private IP for the storage account directly inside the VNet, keeping that traffic off the public internet entirely. It is not the same as a service endpoint: a service endpoint routes over the Microsoft backbone but the target resource keeps a public endpoint, while a private endpoint gives it a VNet-local address. And a private endpoint only controls network reachability, it does not replace identity-based authorization like RBAC or a SAS, which are still enforced independently."
+      "explanation": "The private endpoint only creates a NIC with a private IP; name resolution to that IP depends on a private DNS zone linked to the VNet, and the public endpoint stays open until public network access is disabled or restricted. A service endpoint is the near-miss: it optimizes the route to the public endpoint and does not change DNS or close public access. An NSG rule permitting 443 was never the problem, since traffic to the public endpoint already works."
     },
     {
       "id": "msq5",
       "cat": "networking",
       "type": "ms",
-      "question": "Which two of the following are true about Azure Traffic Manager? (Choose two.)",
+      "question": "An application in two regions sits behind an Azure Traffic Manager profile. Which two statements describe how Traffic Manager behaves? (Choose two.)",
       "options": [
-        "It requires ExpressRoute to function",
-        "It routes traffic using DNS, directing clients to an endpoint rather than proxying traffic itself",
-        "It operates at Layer 7 and inspects HTTP headers on every request",
-        "It can route users to the closest healthy regional endpoint"
+        "It returns a DNS response pointing the client at one endpoint rather than proxying the traffic itself",
+        "Its Performance routing method directs each client to the endpoint with the lowest network latency",
+        "It can send requests for different URL paths to different endpoints",
+        "An existing TCP connection moves to a healthy endpoint immediately when the current endpoint fails a health check"
       ],
       "correct": [
-        1,
-        3
+        0,
+        1
       ],
-      "explanation": "Traffic Manager works purely at the DNS level: it resolves a domain name to the IP of the best available endpoint, for example the closest healthy region, and steps out of the path entirely, rather than proxying every request the way a Layer 7 service would. It does not inspect HTTP traffic itself since it never sits in the data path, and it has no dependency on ExpressRoute at all."
+      "explanation": "Traffic Manager works purely at the DNS layer, resolving the profile name to the best endpoint and then stepping out of the path; Performance routing picks the lowest-latency endpoint for the client's source network. Because it never sees the HTTP request it cannot route by URL path, which is a layer-7 job for Application Gateway or Front Door. And since clients hold a cached DNS answer, failover only takes effect when the TTL expires and the client re-resolves; established connections are not redirected."
     },
     {
       "id": "q53",
@@ -1623,15 +1629,15 @@
       "id": "q56",
       "cat": "identityGov",
       "type": "mc",
-      "question": "Which statement correctly distinguishes a Microsoft Entra role from an Azure RBAC role?",
+      "question": "User2 is assigned the Owner role at subscription Sub1. User2 must also be able to reset the passwords of standard, non-administrator users in the Microsoft Entra tenant, and currently receives an access-denied error when trying. The solution must follow the principle of least privilege. What should you do?",
       "options": [
-        "Microsoft Entra roles govern directory-level tasks like resetting passwords; Azure RBAC roles govern access to Azure resources like VMs and storage accounts",
-        "Azure RBAC roles govern directory-level tasks; Microsoft Entra roles govern access to Azure resources",
-        "The two are simply two names for the same underlying role assignments",
-        "Microsoft Entra roles apply only to guest users, while Azure RBAC roles apply only to internal employees"
+        "Assign User2 the Password Administrator Microsoft Entra role",
+        "Assign User2 the Owner role at the Tenant Root Group management group",
+        "Assign User2 the User Access Administrator role at the Tenant Root Group",
+        "Assign User2 the Global Administrator Microsoft Entra role"
       ],
       "correct": 0,
-      "explanation": "Microsoft Entra roles (like Global Administrator or Helpdesk Administrator) manage the directory itself \u2014 users, groups, licenses. Azure RBAC roles (like Contributor or Reader) manage access to Azure resources at a management group, subscription, resource group, or resource scope. The other three swap that division, treat the two as identical, or invent a guest/internal restriction that neither role type actually has."
+      "explanation": "Password resets are a directory operation, and no Azure RBAC assignment at any scope, even the Tenant Root Group, grants directory permissions; Owner and User Access Administrator there only widen control over Azure resources. Password Administrator is the narrowest Microsoft Entra role that covers resetting passwords for non-administrators. Global Administrator would work but is far broader than the requirement."
     },
     {
       "id": "q57",
@@ -1651,15 +1657,15 @@
       "id": "q58",
       "cat": "storage",
       "type": "mc",
-      "question": "Which Azure Storage service is purpose-built for storing unstructured data like images, videos, and log files?",
+      "question": "An IoT platform writes about 2 TB of sensor files per day. Files are read often during the first week, rarely afterwards, and must be retained for one year. You need to choose storage that minimizes cost over the retention period. What should you use?",
       "options": [
-        "Azure Files",
-        "Azure Blob Storage",
-        "Azure Table Storage",
-        "Azure Queue Storage"
+        "Block blobs in a standard GPv2 account with a lifecycle management policy",
+        "Block blobs in a premium block blob storage account for low-latency reads",
+        "A standard Azure Files share with daily share snapshots for retention",
+        "Azure Table storage with one entity per sensor file and a timestamp property"
       ],
-      "correct": 1,
-      "explanation": "Blob Storage is designed for unstructured data such as images, video, and logs. Files provides managed SMB/NFS file shares, Table Storage holds structured NoSQL key-value data, and Queue Storage holds messages for asynchronous processing \u2014 none of the other three is built for general unstructured object data."
+      "correct": 0,
+      "explanation": "Standard GPv2 blob storage offers Hot, Cool, Cold, and Archive tiers, so a lifecycle rule can push each file to cheaper tiers as it ages. Premium block blob accounts give low latency for hot, high-transaction data but offer no cooler tiers, so a year of rarely read files stays at the highest price. Azure Files is priced for file-share semantics and does not tier individual files. Table storage holds structured entities, not multi-megabyte files."
     },
     {
       "id": "q59",
@@ -1679,15 +1685,15 @@
       "id": "q60",
       "cat": "compute",
       "type": "mc",
-      "question": "Which Azure compute option gives an administrator the most direct control over the guest operating system, including choosing exactly which patches to apply and when?",
+      "question": "You migrate a line-of-business application to Azure. Its installer registers a Windows service, writes under HKEY_LOCAL_MACHINE, and loads a third-party kernel-mode driver. You want the lowest operational overhead that still supports the application. Where should you host it?",
       "options": [
-        "Azure Functions",
-        "Azure App Service",
-        "Azure Virtual Machines",
-        "Azure Container Instances"
+        "An Azure virtual machine",
+        "Azure App Service on a Windows plan",
+        "Azure Container Apps with a Windows container image",
+        "Azure Functions on a Premium plan"
       ],
-      "correct": 2,
-      "explanation": "VMs expose the full guest OS to the administrator, including manual control over patch timing. App Service and Functions both abstract the OS away as a managed platform, and Container Instances runs containers without exposing a guest OS to patch directly."
+      "correct": 0,
+      "explanation": "Installing services and kernel drivers requires full control of the guest operating system, which only a VM provides. The App Service sandbox blocks Windows services, kernel drivers, and HKLM writes. Container Apps runs Linux containers only, and a kernel driver cannot be packaged into a container in any case. Functions hosts event-driven code, not an installer-based desktop application."
     },
     {
       "id": "q61",
@@ -1695,27 +1701,27 @@
       "type": "mc",
       "question": "A team runs a VM Scale Set where new instances need a configuration script to run automatically the moment they're provisioned, with no one logging in manually. They also want existing instances to keep running with their current configuration even after the script is updated later. Which approach fits both requirements?",
       "options": [
-        "Add the Custom Script Extension to the Scale Set model, so it runs on every new instance created going forward, without re-running it against existing instances",
-        "Run the script manually on each new instance as it appears in the portal",
-        "Bake the script into a scheduled task that runs on all instances, new and existing, every time the Scale Set model is updated",
-        "Use Azure Automation State Configuration to reapply the script to every instance nightly"
+        "Add the Custom Script Extension to the Scale Set model, so it runs on each new instance without touching existing ones",
+        "Run the script manually on each new instance as it appears, using the Run Command feature in the portal",
+        "Add the script to a scheduled task on each instance that re-runs whenever the Scale Set model is updated",
+        "Use Azure Machine Configuration to apply the script to the existing and new instances nightly"
       ],
       "correct": 0,
-      "explanation": "Adding the Custom Script Extension to the Scale Set model means it's part of every new instance's provisioning going forward, but updating the model doesn't retroactively re-run it against instances that already exist and are running fine \u2014 matching both stated requirements. Manual execution doesn't scale and reintroduces the human step this scenario wants removed, and the other two options both force the update onto existing instances, which is exactly what the team wants to avoid."
+      "explanation": "Adding the Custom Script Extension to the Scale Set model makes it part of every new instance's provisioning, but with a Manual upgrade policy an updated model is not pushed to instances that already exist, which matches both requirements. Run Command on each new instance reintroduces the human step the team wants removed. A scheduled task keyed to model updates and Machine Configuration both force the change onto existing instances, which is exactly what the team wants to avoid."
     },
     {
       "id": "q62",
       "cat": "networking",
       "type": "mc",
-      "question": "A company's on-premises network connects to Azure over an ExpressRoute circuit. During a rare ExpressRoute outage, they want traffic to automatically fail over to a site-to-site VPN connection instead of losing connectivity entirely. What's required to enable this?",
+      "question": "A company's on-premises network connects to Azure over an ExpressRoute circuit. During a rare ExpressRoute outage, they want traffic to automatically fail over to a site-to-site VPN connection instead of losing connectivity entirely. What should you do?",
       "options": [
-        "Configuring both an ExpressRoute circuit and a VPN Gateway connection to the same virtual network, so routing can fail over between them",
-        "Nothing \u2014 Azure automatically creates a VPN fallback whenever an ExpressRoute circuit is provisioned",
-        "Replacing the ExpressRoute circuit with Azure Virtual WAN, which does not support VPN connections",
-        "Enabling zone redundancy on the ExpressRoute circuit itself"
+        "Deploy a VPN gateway connection to the same virtual network, coexisting with the ExpressRoute connection",
+        "Nothing further, because an ExpressRoute circuit includes an automatic VPN fallback path",
+        "Migrate the circuit to Azure Virtual WAN, which fails over to the internet on its own",
+        "Enable zone-redundant gateways and ExpressRoute Direct for the circuit"
       ],
       "correct": 0,
-      "explanation": "A coexisting VPN Gateway connection alongside the ExpressRoute circuit, both attached to the same virtual network, lets routing fail over to the VPN path if ExpressRoute becomes unavailable \u2014 this has to be deliberately configured, it isn't automatic. Virtual WAN actually supports both ExpressRoute and VPN connections side by side, and zone redundancy protects against a datacenter failure within a region, not a circuit-level ExpressRoute outage."
+      "explanation": "ExpressRoute and site-to-site VPN connections can coexist on the same virtual network, and with both routes advertised the VPN path takes over when the circuit's routes disappear; this has to be deliberately configured, since nothing is created automatically. Virtual WAN also needs an explicit VPN connection before it can fail over to one. Zone-redundant gateways protect the gateway instances within a region, and ExpressRoute Direct is higher-bandwidth connectivity; neither provides an alternate path when the circuit itself is down."
     },
     {
       "id": "q63",
@@ -1765,13 +1771,13 @@
       "type": "mc",
       "question": "A company has had the same set of guest users with access to a sensitive SharePoint site for two years and wants a recurring, scheduled process where a manager has to explicitly confirm each guest still needs access, or it gets automatically revoked. Which Microsoft Entra feature fits?",
       "options": [
-        "Access reviews",
-        "Self-service password reset",
-        "A dynamic group",
-        "Conditional Access"
+        "An access review of the guest users, recurring quarterly, with results applied automatically",
+        "A Conditional Access policy that limits guest sign-in frequency to 24 hours",
+        "Privileged Identity Management eligible assignments for the guest users",
+        "The guest user access restrictions setting in External collaboration settings"
       ],
       "correct": 0,
-      "explanation": "Access reviews let an organization schedule a recurring review where a designated reviewer approves or denies continued access for each user, with denied access automatically revoked \u2014 exactly the ongoing recertification this scenario wants. SSPR only handles password resets, a dynamic group manages membership by attribute rather than periodic human approval, and Conditional Access controls sign-in conditions, not whether access should still be granted at all."
+      "explanation": "Access reviews are the recertification feature: a designated reviewer approves or denies each guest on a schedule and denied users lose access automatically. A sign-in frequency control forces guests to re-authenticate but never asks anyone whether they should still have access. PIM provides time-boxed activation of privileged roles, which does not fit ongoing access to a site. Guest access restrictions limit what guests can see in the directory; they do not review or remove existing site access."
     },
     {
       "id": "q67",
@@ -1835,13 +1841,13 @@
       "type": "mc",
       "question": "An administrator wants to capture a configured VM as a reusable image that deploys new VMs with fresh, unique identities, not clones carrying the original VM's exact hostname and security identifiers. What must happen to the source VM immediately before capturing the image?",
       "options": [
-        "Generalize it (e.g., with Sysprep on Windows), which removes machine-specific information",
-        "Resize it to the smallest available VM size",
-        "Enable boot diagnostics on it",
-        "Add it to a proximity placement group"
+        "Generalize it with Sysprep on Windows or waagent -deprovision on Linux",
+        "Deallocate it and take an incremental snapshot of the OS disk first",
+        "Enable boot diagnostics and reset the local administrator password",
+        "Add it to a proximity placement group and resize it to the smallest size"
       ],
       "correct": 0,
-      "explanation": "Generalizing a VM, using Sysprep on Windows or the waagent deprovision command on Linux, strips out machine-specific information like the hostname and security identifiers, so an image built from it produces clean, unique VMs on each deployment. Resizing, enabling boot diagnostics, and placement groups are unrelated configuration steps that don't prepare a VM to serve as a reusable image template."
+      "explanation": "Generalizing strips machine-specific state such as the hostname, security identifiers, and cached credentials, so an image built from it produces clean, unique VMs on each deployment. A snapshot is the near-miss: it captures the disk faithfully, but a VM created from a specialized snapshot is an exact clone with the same SID and name. Boot diagnostics, password resets, placement groups, and resizing change nothing about the identity baked into the disk."
     },
     {
       "id": "q72",
@@ -1877,21 +1883,21 @@
       "type": "mc",
       "question": "A team needs the Azure Monitor Agent to collect one specific custom Windows event log channel from a fleet of VMs and send it to their Log Analytics workspace, leaving out the noisier default channels they don't need. Which component defines exactly what gets collected and where it goes?",
       "options": [
-        "A data collection rule",
-        "An action group",
-        "A resource lock",
-        "An availability set"
+        "A data collection rule associated with the VMs",
+        "A diagnostic setting on each VM",
+        "The Azure Diagnostics extension (WAD) with a storage account sink",
+        "VM insights enabled on the VMs"
       ],
       "correct": 0,
-      "explanation": "A data collection rule (DCR) tells the Azure Monitor Agent precisely which data sources, like a specific event log channel or performance counter, to collect and which destination to send them to, letting you include exactly the channel you need and exclude the rest. An action group defines a response to a fired alert, not what gets collected, and a resource lock or availability set are unrelated governance and resiliency constructs."
+      "explanation": "A data collection rule tells the Azure Monitor Agent which data sources to collect, down to an XPath filter for one event channel, and which workspace to send them to. A diagnostic setting is the near-miss: it routes a resource's platform logs and metrics, but it has no view into the guest operating system's event logs. The Azure Diagnostics extension is the legacy collector aimed at storage accounts. VM insights deploys its own rule for performance counters and dependency maps, not custom event channels."
     },
     {
       "id": "tf19",
       "cat": "identityGov",
       "type": "tf",
-      "question": "An administrative unit can scope a Microsoft Entra role, like Helpdesk Administrator, to only the users in one regional office instead of the whole tenant.",
-      "answer": true,
-      "explanation": "That's exactly what administrative units are for \u2014 restricting an Entra role assignment to a defined subset of users, groups, or devices, like one regional office or school, rather than granting that role tenant-wide."
+      "question": "If the User Administrator role is assigned to User1 with its scope set to administrative unit AU1, User1 can reset passwords for every non-administrator in the tenant except members of other administrative units.",
+      "answer": false,
+      "explanation": "An administrative-unit-scoped assignment applies only to the users, groups, and devices that are members of that unit. Users who belong to no administrative unit at all are still out of reach. Tenant-wide scope requires assigning the role at the tenant level rather than at AU1."
     },
     {
       "id": "tf20",
@@ -1905,17 +1911,17 @@
       "id": "tf21",
       "cat": "compute",
       "type": "tf",
-      "question": "Every Azure managed disk is encrypted at rest automatically with server-side encryption using a platform-managed key by default, with no extra configuration required to get that baseline protection.",
-      "answer": true,
-      "explanation": "Server-side encryption at rest is on by default for every managed disk using a Microsoft platform-managed key, with no setup needed. Customer-managed keys or Azure Disk Encryption inside the guest OS are optional, additional layers on top of that baseline, not what's required to get it in the first place."
+      "question": "Enabling encryption at host for a virtual machine requires installing the Azure Disk Encryption extension inside the guest operating system.",
+      "answer": false,
+      "explanation": "Encryption at host is a platform setting on the VM that encrypts temp disks and disk caches on the host itself, with no agent or extension in the guest. Azure Disk Encryption is the separate in-guest option that uses BitLocker or DM-Crypt, and the two cannot be enabled on the same VM, so confusing them leads to a failed configuration rather than extra protection."
     },
     {
       "id": "tf22",
       "cat": "networking",
       "type": "tf",
-      "question": "Within a single virtual network, Azure's default system routes already let two subnets communicate with each other automatically, with no route table entries required.",
-      "answer": true,
-      "explanation": "Azure creates default system routes automatically for intra-VNet communication, direct internet access, and a few other default destinations \u2014 a user-defined route is only needed when you want to override that default behavior, like forcing traffic through a firewall instead."
+      "question": "If a route table on subnet A contains a 0.0.0.0/0 route whose next hop is a network virtual appliance, traffic between two VMs that are both in subnet A is also sent through the appliance.",
+      "answer": false,
+      "explanation": "Routes are selected by longest prefix match, and the system route for the VNet's own address space is far more specific than 0.0.0.0/0, so intra-subnet and intra-VNet traffic keeps going direct. Forcing that traffic through an appliance requires an explicit user-defined route for the VNet or subnet prefix with the appliance as next hop."
     },
     {
       "id": "msq6",
@@ -1955,18 +1961,18 @@
       "id": "msq8",
       "cat": "monitoring",
       "type": "ms",
-      "question": "Which two of the following are valid operators used to filter and aggregate data within a KQL (Kusto Query Language) query? (Choose two.)",
+      "question": "You need a KQL query against the SigninLogs table that returns, for the last 24 hours, the number of failed sign-ins per user and nothing else. Which two operators does the query require? (Choose two.)",
       "options": [
         "where",
         "summarize",
-        "SELECT",
-        "GROUP BY"
+        "join",
+        "union"
       ],
       "correct": [
         0,
         1
       ],
-      "explanation": "KQL pipes a table through operators like where to filter rows and summarize to aggregate them \u2014 both are real KQL syntax. SELECT and GROUP BY are SQL keywords, not KQL operators; KQL achieves the same goals with project to choose columns and summarize to group and aggregate, so bringing over literal SQL syntax does not work in a Kusto query."
+      "explanation": "where narrows the rows to TimeGenerated > ago(24h) and ResultType != 0, and summarize count() by UserPrincipalName produces the per-user totals, which is the complete query. join and union both combine rows from more than one table or query, and only SigninLogs is involved here, so adding either would be unnecessary work at best."
     }
   ],
   "lessons": [
@@ -2785,6 +2791,98 @@
           "explanation": "The metric alert rule is what detects the condition (CPU over 90% sustained for 5 minutes), and the action group is what turns a firing alert into an actual notification \u2014 email, SMS, or a webhook. Neither piece alone is a complete alerting solution. Checking the Activity Log once a day isn't 'the moment' it happens, and a resource lock only blocks accidental deletion; it has nothing to do with performance monitoring."
         }
       ]
+    }
+  ],
+  "compare": [
+    {
+      "id": "cmp-az104-1",
+      "cat": "identityGov",
+      "scenario": "A help desk team must be able to reset passwords and manage MFA methods for the 300 users at the Lyon office, and for nobody else in the 8,000-user tenant. Which approach is better?",
+      "optionA": "Assign the Helpdesk Administrator role tenant-wide and add a Conditional Access policy that only lets the help desk sign in from the Lyon office network.",
+      "optionB": "Create an administrative unit containing the Lyon users and assign the Helpdesk Administrator role scoped to that administrative unit.",
+      "better": "B",
+      "why": "Conditional Access controls where and how the help desk signs in, not whose accounts they may touch; once signed in from Lyon they could still reset anyone in the tenant. An administrative unit is the construct that limits a directory role to a defined population, so the scoped assignment enforces the requirement itself rather than relying on a network boundary."
+    },
+    {
+      "id": "cmp-az104-2",
+      "cat": "identityGov",
+      "scenario": "A DevOps team holds Contributor on RG-App so it can deploy freely. The production SQL server in RG-App must never be deleted, even by mistake or by a pipeline. Which safeguard is better?",
+      "optionA": "Apply a CanNotDelete resource lock to the SQL server, and leave the team's Contributor assignment in place.",
+      "optionB": "Replace Contributor with a custom role that omits the Microsoft.Sql/servers/delete action.",
+      "better": "A",
+      "why": "The custom role is a reasonable least-privilege instinct, but it still allows deleting the whole resource group, which takes the server with it, and it protects against only that one team rather than Owners, service principals, or scripts. The lock sits on the resource regardless of who is acting and has to be removed deliberately before any delete succeeds."
+    },
+    {
+      "id": "cmp-az104-3",
+      "cat": "identityGov",
+      "scenario": "Every storage account created in the subscription must have its minimum TLS version set to 1.2. Teams create accounts through the portal, the CLI, and deployment pipelines. Which policy design is better?",
+      "optionA": "Assign an Azure Policy with the Deny effect that rejects storage accounts whose minimumTlsVersion is not TLS1_2.",
+      "optionB": "Assign an Azure Policy with the Audit effect for minimumTlsVersion and review the compliance dashboard each week.",
+      "better": "A",
+      "why": "Audit is the gentler rollout, and it never breaks a pipeline, but it only records the violation after the account already exists and is accepting TLS 1.0 connections until someone reads the report and fixes it. The requirement says must, and Deny is the effect that makes a non-compliant request fail at creation no matter which tool submitted it."
+    },
+    {
+      "id": "cmp-az104-4",
+      "cat": "storage",
+      "scenario": "A partner uploads files to one container every night for the next six months from a server with a fixed public IP. You may need to cut off the partner early without disturbing other clients of the account. Which credential is better?",
+      "optionA": "A service SAS for the container, tied to a stored access policy, with the partner's IP range in the token.",
+      "optionB": "A user delegation SAS for the container, issued with a six-month expiry and the partner's IP range.",
+      "better": "A",
+      "why": "A user delegation SAS is normally the stronger choice because it is backed by Microsoft Entra credentials, but the user delegation key it depends on lives at most seven days, so a six-month token cannot be issued. The stored access policy also gives you a clean kill switch: edit or delete the policy and that SAS stops working, with no key rotation that would break every other client."
+    },
+    {
+      "id": "cmp-az104-5",
+      "cat": "storage",
+      "scenario": "Audit records in a blob container must be provably unmodifiable and undeletable for seven years, with no exception for administrators or the subscription Owner. Which control is better?",
+      "optionA": "A ReadOnly resource lock on the storage account, with data-plane access limited to the Storage Blob Data Reader role.",
+      "optionB": "A time-based immutability policy on the container, locked once it has been validated.",
+      "better": "B",
+      "why": "A ReadOnly lock protects the account's configuration on the control plane, but it does not stop data-plane writes and deletes, and an Owner can simply remove the lock or hand out a broader data role. A locked immutability policy enforces write-once-read-many on the data itself and cannot be shortened or removed by anyone, including the account owner, until the retention period expires."
+    },
+    {
+      "id": "cmp-az104-6",
+      "cat": "compute",
+      "scenario": "A CI build farm of 20 Windows VMs is busy only during weekday business hours. A build that is interrupted is simply re-queued. You must reduce compute spend as much as possible. Which approach is better?",
+      "optionA": "Buy one-year reserved instances covering all 20 VMs, keeping the farm on regular, non-interruptible capacity.",
+      "optionB": "Run the farm as a VM Scale Set of Spot VMs with the Deallocate eviction policy, scaled to zero outside business hours.",
+      "better": "B",
+      "why": "Reservations are the right lever for steady 24x7 workloads, but they bill for every hour of the term, so a farm that runs about forty hours a week pays for more idle time than it saves. Spot capacity is discounted far more deeply, interruption is acceptable here by definition, and scaling to zero removes the idle hours entirely."
+    },
+    {
+      "id": "cmp-az104-7",
+      "cat": "compute",
+      "scenario": "A web app in a Standard S1 App Service plan hits 90% CPU for three hours each weekday afternoon and idles the rest of the time. Memory is never a problem. You need to absorb the peaks at the lowest cost. Which change is better?",
+      "optionA": "Add an autoscale setting that scales out on CPU percentage and scales back in when the peak passes.",
+      "optionB": "Scale the plan up to a Premium P2v3 tier so a single larger instance absorbs the afternoon peak.",
+      "better": "A",
+      "why": "Scaling up does fix the afternoon peak, but the larger tier is billed around the clock, including the twenty-one hours a day when S1 was already enough. Scaling out adds instances only while the CPU condition holds and removes them afterwards, which matches a short daily spike far more cheaply."
+    },
+    {
+      "id": "cmp-az104-8",
+      "cat": "networking",
+      "scenario": "VMs in five subnets must reach an Azure SQL Database server. Traffic must stay on the Microsoft network, and the server's public endpoint must be unreachable from the internet. Which design is better?",
+      "optionA": "Enable a Microsoft.Sql service endpoint on each subnet and add virtual network rules for those subnets to the server firewall.",
+      "optionB": "Create a private endpoint for the server in the VNet with a private DNS zone, and disable public network access on the server.",
+      "better": "B",
+      "why": "Service endpoints do keep the traffic on the backbone, and the firewall rules restrict who may connect, but the server keeps its public IP and is still a public endpoint behind an allow-list. A private endpoint gives the server an address inside the VNet, and disabling public access removes the public endpoint altogether, which is what the second requirement actually asks for."
+    },
+    {
+      "id": "cmp-az104-9",
+      "cat": "networking",
+      "scenario": "An on-premises datacenter needs a connection to Azure that sustains 2 Gbps with predictable latency, and company policy says the traffic must not traverse the public internet. Which connection is better?",
+      "optionA": "An ExpressRoute circuit with private peering.",
+      "optionB": "A site-to-site VPN using an active-active VpnGw3 gateway.",
+      "better": "A",
+      "why": "The VPN is cheaper and faster to stand up, and its encryption protects the data, but the tunnels still ride the public internet, which the policy forbids, and a VpnGw3 gateway's per-tunnel throughput falls short of a sustained 2 Gbps. ExpressRoute is a private circuit with committed bandwidth, so it meets both the throughput and the no-internet requirement."
+    },
+    {
+      "id": "cmp-az104-10",
+      "cat": "monitoring",
+      "scenario": "A single-region application runs on two VMs. The business accepts losing up to 24 hours of data and an 8-hour recovery time, and wants the cheapest protection against disk corruption and accidental deletion. Which service is better?",
+      "optionA": "Azure Site Recovery replicating both VMs to the paired region.",
+      "optionB": "Azure Backup with a daily policy in a Recovery Services vault, with soft delete enabled.",
+      "better": "B",
+      "why": "Site Recovery offers a much tighter RPO and RTO, but it continuously replicates to another region, which costs more and solves a regional outage that the business did not ask to be protected from; a corrupted disk would also replicate faithfully. Daily backups meet the stated 24-hour RPO and 8-hour RTO at far lower cost and restore to a point before the corruption or deletion."
     }
   ]
 }

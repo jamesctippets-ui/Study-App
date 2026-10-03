@@ -40,6 +40,31 @@ TRACK_MODULES = {
 }
 
 
+# The app shuffles mc/ms option order at render time (prepareQuestion in
+# src/js/03_helpers.js), so any text that points at an option by position
+# ("the last option", "option B", "all of the above") names the wrong answer
+# on screen. Refer to options by their content instead.
+POSITIONAL_REF = re.compile(
+    r"\b(?:the\s+)?(?:first|second|third|fourth|fifth|last|final|top|bottom|previous|above)\s+(?:option|answer|choice)s?\b"
+    r"|\boption\s+[A-E]\b|\b(?:answer|choice)\s+[A-E]\b"
+    r"|\b(?:all|none|both)\s+of\s+the\s+above\b|\bboth\s+[A-D]\s+and\s+[A-D]\b",
+    re.IGNORECASE,
+)
+
+
+def positional_ref_errors(label, fields):
+    """One error per field of `label` that refers to an option by position."""
+    errors = []
+    for field, text in fields:
+        if isinstance(text, str):
+            m = POSITIONAL_REF.search(text)
+            if m:
+                errors.append(
+                    f"{label} {field} refers to an option by position ({m.group(0)!r}) — options are shuffled at render time, name the option by its content instead"
+                )
+    return errors
+
+
 def validate():
     errors = []
 
@@ -146,6 +171,12 @@ def validate():
 
             if "whyTested" in q and not q["whyTested"].strip():
                 errors.append(f"[{key}] question '{qid}' has an empty 'whyTested' field")
+
+            errors.extend(positional_ref_errors(
+                f"[{key}] question '{qid}'",
+                [("question", q.get("question")), ("explanation", q.get("explanation")), ("whyTested", q.get("whyTested"))]
+                + [("option", o) for o in (q.get("options") or [])],
+            ))
 
         cheat_sheet = getattr(mod, "CHEAT_SHEET", [])
         if not cheat_sheet:
@@ -288,6 +319,11 @@ def validate():
                     errors.append(f"[{key}] CASE_STUDIES '{csid}' question '{qid}' has unknown type '{qtype}'")
                 if not q.get("explanation", "").strip():
                     errors.append(f"[{key}] CASE_STUDIES '{csid}' question '{qid}' is missing an explanation")
+                errors.extend(positional_ref_errors(
+                    f"[{key}] CASE_STUDIES '{csid}' question '{qid}'",
+                    [("question", q.get("question")), ("explanation", q.get("explanation")), ("whyTested", q.get("whyTested"))]
+                    + [("option", o) for o in (q.get("options") or [])],
+                ))
 
         compare = getattr(mod, "COMPARE", [])
         seen_compare_scenarios = {}
@@ -320,6 +356,10 @@ def validate():
                 errors.append(f"[{key}] COMPARE '{cpid}' needs 'better' set to 'A' or 'B', got {cp.get('better')!r}")
             if not cp.get("why", "").strip():
                 errors.append(f"[{key}] COMPARE '{cpid}' is missing a non-empty 'why'")
+            errors.extend(positional_ref_errors(
+                f"[{key}] COMPARE '{cpid}'",
+                [("scenario", cp.get("scenario")), ("optionA", cp.get("optionA")), ("optionB", cp.get("optionB")), ("why", cp.get("why"))],
+            ))
 
         cli_challenges = getattr(mod, "CLI_CHALLENGES", [])
         cli_ids_seen = set()
