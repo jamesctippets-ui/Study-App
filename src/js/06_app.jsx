@@ -283,7 +283,7 @@ function CertStudyApp() {
 
   const goToCertPathTrack = (key) => {
     setActiveTrack(key);
-    setMode((m) => (m === 'home' ? 'learn' : m));
+    setMode((m) => (m === 'home' ? 'path' : m));
     setShowCertPath(false);
   };
 
@@ -295,7 +295,7 @@ function CertStudyApp() {
   // landing spot for any track.
   const switchTrack = (key) => {
     setActiveTrack(key);
-    setMode('learn');
+    setMode('path');
     setShowTrackSwitcher(false);
   };
 
@@ -1266,6 +1266,47 @@ function CertStudyApp() {
     setSessionAnswers((a) => [...a, { id: currentQ.id, cat: currentQ.cat, prompt: currentQ.question, correct: isCorrect, explanation: currentQ.explanation, whyTested: currentQ.whyTested, track: qTrack }]);
   };
 
+  // The guided path (04e_path_ui.jsx) runs its own small sessions, but every
+  // answer, rating, and counter still goes through the same recorders the
+  // Practice tab uses, so mastery, spaced repetition, streaks, the daily
+  // goal, and achievements need no path-specific scoring.
+  const pathApi = {
+    rateCard: (id, quality) => {
+      recordResult(id, ratingToOutcome(quality));
+      recordSrs(id, quality);
+      bumpDailyGoal(1);
+    },
+    recordResult: (id, outcome) => {
+      recordResult(id, outcome);
+      bumpDailyGoal(1);
+    },
+    markSeen,
+    finishQuiz: (correct, total) => {
+      const cur = statsRef.current;
+      const perfect = total >= 10 && correct === total;
+      saveStats({
+        ...cur,
+        counts: {
+          ...cur.counts,
+          quizzesCompleted: cur.counts.quizzesCompleted + 1,
+          perfectQuizzes: cur.counts.perfectQuizzes + (perfect ? 1 : 0),
+        },
+      });
+    },
+    onMatchRound: () => {
+      const cur = statsRef.current;
+      saveStats({ ...cur, counts: { ...cur.counts, matchRoundsCompleted: cur.counts.matchRoundsCompleted + 1 } });
+    },
+    completeStep: (stepId, pct) => {
+      const cur = statsRef.current;
+      saveStats({ ...cur, path: markPathStepDone(cur.path, activeTrack, stepId, pct, todayString()) });
+    },
+    completeSteps: (stepIds, pct, via) => {
+      const cur = statsRef.current;
+      saveStats({ ...cur, path: markPathStepsDone(cur.path, activeTrack, stepIds, pct, todayString(), via) });
+    },
+  };
+
   const doReset = () => {
     saveResults({ ...results, [activeTrack]: {} });
     saveSrs({ ...srs, [activeTrack]: {} });
@@ -1589,7 +1630,7 @@ function CertStudyApp() {
             onResume={() => {
               if (stats.lastVisited) { setActiveTrack(stats.lastVisited.track); setMode(stats.lastVisited.mode); }
             }}
-            onSelectTrack={(key) => { setActiveTrack(key); setMode('learn'); }}
+            onSelectTrack={(key) => { setActiveTrack(key); setMode('path'); }}
             onAddToPath={addToCertPath}
             onOpenAbout={() => setShowAbout(true)}
             onOpenGlossary={() => setShowGlossary(true)}
@@ -1600,27 +1641,21 @@ function CertStudyApp() {
         ) : (
         <React.Fragment>
         <div className="flex gap-1 mb-4" style={{ boxShadow: SHADOW.card, background: COLOR.surface, padding: '4px', borderRadius: '12px', border: `1px solid ${COLOR.border}` }}>
-          <button
-            onClick={() => setMode('learn')}
-            className="flex-1 btn-flat"
-            style={{ padding: '8px 2px', borderRadius: '9px', fontSize: '11px', fontWeight: 600, background: mode === 'learn' ? COLOR.primary : 'transparent', color: mode === 'learn' ? COLOR.onAccent : COLOR.muted }}
-          >
-            Learn
-          </button>
-          <button
-            onClick={() => setMode('quiz')}
-            className="flex-1 btn-flat"
-            style={{ padding: '8px 2px', borderRadius: '9px', fontSize: '11px', fontWeight: 600, background: mode === 'quiz' ? COLOR.primary : 'transparent', color: mode === 'quiz' ? COLOR.onAccent : COLOR.muted }}
-          >
-            Quiz
-          </button>
-          <button
-            onClick={() => setMode('exam')}
-            className="flex-1 btn-flat"
-            style={{ padding: '8px 2px', borderRadius: '9px', fontSize: '11px', fontWeight: 600, background: mode === 'exam' ? COLOR.gold : 'transparent', color: mode === 'exam' ? COLOR.onAccent : COLOR.muted }}
-          >
-            Exam
-          </button>
+          {[
+            { m: 'path', label: 'Path' },
+            { m: 'quiz', label: 'Practice' },
+            { m: 'learn', label: 'Reference' },
+            { m: 'exam', label: 'Exam' },
+          ].map((t) => (
+            <button
+              key={t.m}
+              onClick={() => setMode(t.m)}
+              className="flex-1 btn-flat"
+              style={{ padding: '8px 2px', borderRadius: '9px', fontSize: '11px', fontWeight: 600, background: mode === t.m ? (t.m === 'exam' ? COLOR.gold : COLOR.primary) : 'transparent', color: mode === t.m ? COLOR.onAccent : COLOR.muted }}
+            >
+              {t.label}
+            </button>
+          ))}
         </div>
 
         {mode === 'learn' && (
@@ -1650,74 +1685,17 @@ function CertStudyApp() {
         )}
 
         {mode === 'quiz' && (
-          <div className="flex gap-1 mb-4" style={{ background: COLOR.bg, padding: '3px', borderRadius: '10px', border: `1px solid ${COLOR.border}` }}>
-            <button
-              onClick={() => setQuizView('questions')}
-              className="flex-1 btn-flat"
-              style={{ padding: '6px 2px', borderRadius: '8px', fontSize: '10.5px', fontWeight: 600, background: quizView === 'questions' ? COLOR.surfaceRaised : 'transparent', color: quizView === 'questions' ? COLOR.text : COLOR.muted }}
-            >
-              Questions
-            </button>
-            <button
-              onClick={() => setQuizView('match')}
-              className="flex-1 btn-flat"
-              style={{ padding: '6px 2px', borderRadius: '8px', fontSize: '10.5px', fontWeight: 600, background: quizView === 'match' ? COLOR.surfaceRaised : 'transparent', color: quizView === 'match' ? COLOR.text : COLOR.muted }}
-            >
-              Match
-            </button>
-            <button
-              onClick={() => setQuizView('verbal')}
-              className="flex-1 btn-flat"
-              style={{ padding: '6px 2px', borderRadius: '8px', fontSize: '10.5px', fontWeight: 600, background: quizView === 'verbal' ? COLOR.surfaceRaised : 'transparent', color: quizView === 'verbal' ? COLOR.text : COLOR.muted }}
-            >
-              Verbal
-            </button>
-            {DATA[activeTrack].cliChallenges && (
-              <button
-                onClick={() => setQuizView('commands')}
-                className="flex-1 btn-flat"
-                style={{ padding: '6px 2px', borderRadius: '8px', fontSize: '10.5px', fontWeight: 600, background: quizView === 'commands' ? COLOR.surfaceRaised : 'transparent', color: quizView === 'commands' ? COLOR.text : COLOR.muted }}
-              >
-                Commands
-              </button>
-            )}
-            {madlibsData.length > 0 && (
-              <button
-                onClick={() => setQuizView('madlibs')}
-                className="flex-1 btn-flat"
-                style={{ padding: '6px 2px', borderRadius: '8px', fontSize: '10.5px', fontWeight: 600, background: quizView === 'madlibs' ? COLOR.surfaceRaised : 'transparent', color: quizView === 'madlibs' ? COLOR.text : COLOR.muted }}
-              >
-                Mad Libs
-              </button>
-            )}
-            {sequencesData.length > 0 && (
-              <button
-                onClick={() => setQuizView('sequence')}
-                className="flex-1 btn-flat"
-                style={{ padding: '6px 2px', borderRadius: '8px', fontSize: '10.5px', fontWeight: 600, background: quizView === 'sequence' ? COLOR.surfaceRaised : 'transparent', color: quizView === 'sequence' ? COLOR.text : COLOR.muted }}
-              >
-                Sequence
-              </button>
-            )}
-            {caseStudiesData.length > 0 && (
-              <button
-                onClick={() => setQuizView('casestudy')}
-                className="flex-1 btn-flat"
-                style={{ padding: '6px 2px', borderRadius: '8px', fontSize: '10.5px', fontWeight: 600, background: quizView === 'casestudy' ? COLOR.surfaceRaised : 'transparent', color: quizView === 'casestudy' ? COLOR.text : COLOR.muted }}
-              >
-                Case Study
-              </button>
-            )}
-            {compareData.length > 0 && (
-              <button
-                onClick={() => setQuizView('compare')}
-                className="flex-1 btn-flat"
-                style={{ padding: '6px 2px', borderRadius: '8px', fontSize: '10.5px', fontWeight: 600, background: quizView === 'compare' ? COLOR.surfaceRaised : 'transparent', color: quizView === 'compare' ? COLOR.text : COLOR.muted }}
-              >
-                Compare
-              </button>
-            )}
-          </div>
+          <PracticeToolPicker
+            quizView={quizView}
+            available={{
+              compare: compareData.length > 0,
+              casestudy: caseStudiesData.length > 0,
+              madlibs: madlibsData.length > 0,
+              sequence: sequencesData.length > 0,
+              commands: !!DATA[activeTrack].cliChallenges,
+            }}
+            onSelect={setQuizView}
+          />
         )}
 
         {(mode === 'quiz' || (mode === 'learn' && learnView !== 'sheet' && (learnView !== 'study' || !DATA[activeTrack].lessons))) && (
@@ -1747,6 +1725,20 @@ function CertStudyApp() {
             onSpeak={speak}
             speechSupported={speechSupported}
             flashcardsData={flashcardsData}
+          />
+        )}
+
+        {mode === 'path' && (
+          <PathView
+            key={activeTrack}
+            track={track}
+            trackKey={activeTrack}
+            doneMap={((stats.path || {})[activeTrack] || {}).done || {}}
+            results={trackResults}
+            seenLog={seenLog[activeTrack] || {}}
+            categories={categories}
+            speech={{ speakingId, onSpeak: speak, speechSupported }}
+            api={pathApi}
           />
         )}
 

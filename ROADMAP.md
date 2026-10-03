@@ -1252,77 +1252,69 @@ trading away for shinier but shallower ones.
   redesign if this ever does feel cramped on a real device (see
   LAUNCH_CHECKLIST.md's cross-device QA item).
 
-- [ ] **Queued: navigation declutter + a guided study path (user's
-  request — the app "is starting to feel cluttered").** Two linked pieces;
-  the path is also the main way to *reduce* the clutter, because most
-  people shouldn't have to choose among 8 quiz tools at all.
+- [x] **Navigation declutter + a guided study path (user's request — the
+  app "was starting to feel cluttered").** Shipped in two linked pieces;
+  the path is also the main way the clutter was reduced, since most people
+  shouldn't have to choose among 8 quiz tools at all.
 
-  **A. Navigation declutter.** Group instead of adding more equal-width
-  buttons. Rough edges already known:
-  - The Quiz sub-tab bar has grown to up to 8 tabs (Questions, Match,
-    Verbal, Commands, Mad Libs, Sequence, Case Study, Compare) and is
-    cramped at 390px — "Case Study" already wraps onto two lines.
-  - Learn has Cards/Study/Sheet, Quiz has up to 8 sub-tabs, plus Exam,
-    plus the hamburger/switcher/glossary/achievements/data panels — a lot
-    of peer-level choices on one screen.
-  - Long track subtitles wrap to 2-3 lines in the header on 320-360px
-    phones (flagged earlier in this section, left as-is on purpose).
-  - The Final Mock/practice Exam results screen is a very long single
-    scroll once a few dozen questions are missed; the score report and
-    review list could be collapsible.
-  - Re-sweep for the "double border" button bug class (fixed twice
-    already) on any new screens, and make spacing/typography consistent
-    between the newer modes (Compare, Case Study, Final Mock) and older
-    ones.
-  Proposed shape (to confirm with the user before building): four top-
-  level tabs — **Path** (guided, the default), **Practice** (every free-
-  choice tool — questions, match, verbal, commands, Mad Libs, sequence,
-  compare, case study — as a launcher grid or dropdown instead of a tab
-  row), **Reference** (Study text, flashcards, cheat sheet, glossary), and
-  **Exam** (practice exam + Final Mock). Same features, fewer peers on
-  screen at once.
+  **A. Navigation.** The Learn/Quiz/Exam tab bar became four tabs —
+  **Path** (the guided default), **Practice**, **Reference**, **Exam** —
+  and the 8-button Quiz sub-tab row (where "Case Study" already wrapped at
+  390px) became one grouped dropdown, `PracticeToolPicker`: Test yourself
+  (Questions, Compare, Case Study), Games & drills (Mad Libs, Sequence,
+  Match, Commands), Hands-free (Verbal), listing only tools the track
+  supports, each with a one-line description. Reference holds Cards /
+  Study / Sheet. URLs became `/path`, `/practice/...`, `/reference/...`
+  (`routeToHash`/`parseHash`), with the old `/learn` and `/quiz` segments
+  still accepted so bookmarks keep working. The Questions screen's length
+  and question-type controls fold into one "Options" summary row (the
+  first question now sits on the first screen instead of below the fold),
+  and long exam review lists show five at a time with "Show all N".
+  Internally the modes are still `'learn'`/`'quiz'` so every session effect
+  that keys off them is untouched; only labels and URLs changed.
 
-  **B. A guided "Path" per track, Duolingo-style (user's idea).** A
-  vertical, winding trail of nodes grouped into **units**, one per lesson,
-  that walks you through the cert's content in a deliberately mixed order
-  rather than "read everything, then quiz everything." Not a revival of
-  the removed multi-cert Learning Paths (section 1) — that sequenced
-  *several tracks*; this sequences the content *inside one track*.
-  - **No new content needed to start.** Each lesson already carries a
-    reading, `vocabIds` (6-11 flashcards), `quizIds` (4-11 questions),
-    key terms, a scenario, and on-the-job notes; Mad Libs, Sequence,
-    Compare, and case studies are tagged by category and can be matched
-    to the lesson whose items mostly fall in that category.
-  - **Step template per unit, varied so it isn't monotone** — e.g. Read
-    → 5 flashcards → quick quiz → a mini-game (Mad Lib / Sequence /
-    Compare / Match, whichever the track has) → scenario or on-the-job
-    read → longer quiz → unit checkpoint. The template rotates between
-    units; later units add a **review node** that pulls items from
-    earlier units you're weakest on (reusing SRS due-dates and results).
-  - **Progression:** each step completes on finishing it (quiz steps need
-    a pass threshold, e.g. 70%); a unit unlocks the next; a **checkpoint**
-    mixes the unit with prior ones. Open question: strictly sequential
-    like Duolingo, or everything visible with a "recommended next" marker
-    and an optional test-out to skip ahead (recommended, so someone who
-    already knows the material isn't stuck re-reading).
-  - **Reuses what exists:** the step runner renders the existing reading
-    (`LessonDetail` sections), card, `QuestionView`, Mad Libs, Sequence,
-    and Compare views over a given id list rather than a new quiz
-    engine; results still go through `recordResult`, so mastery, SRS,
-    streaks, the daily goal, and achievements all keep working. Needs
-    "session from a given id list" entry points, since today's sessions
-    are built from the active category filter inside `06_app.jsx`.
-  - **State:** per-track completed-step map in `stats` (persisted and
-    cloud-synced through the same `persistPayload` path as everything
-    else); add a normalizer so older saves load cleanly.
-  - **Visuals:** a node trail with locked / available / in-progress /
-    complete / crowned states, a per-unit progress ring, and a "Continue"
-    button on Home that jumps to the next step. No mascot needed.
-  - **Phasing:** (1) navigation restructure; (2) path MVP over lessons
-    with a fixed step template and sequential unlock; (3) review nodes,
-    checkpoints, and test-out; (4) polish and a visual pass. Pilot on
-    AZ-900 (7 lessons, richest content), then enable every track that
-    ships lessons — all 15 do.
+  **B. The Path.** A vertical, winding trail of nodes grouped into one unit
+  per lesson, walking through the track in a mixed order (not a revival
+  of the removed multi-cert Learning Paths in section 1 — that sequenced
+  *several tracks*; this sequences the content *inside one*). Built
+  entirely from existing data, no new authoring: `buildPathUnits` takes
+  each lesson's `vocabIds`/`quizIds`, then hands every other flashcard,
+  question, Mad Lib, sequence, and Compare item in the same categories to
+  exactly one unit round-robin, so 100% of questions in all 15 tracks are
+  reachable from the path (76-100% of flashcards; the rest are capped out
+  of the "more flashcards" step and still reachable in Practice). A unit's
+  step order rotates through three variants — read, cards, quick check,
+  game, apply-it, more cards, practice quiz, checkpoint — so consecutive
+  units differ. Steps reuse existing views (reading with tappable terms,
+  `FlashcardView`, `QuestionView`, `MatchGame`, `MadLibsView`,
+  `SequenceView`, `CompareView`, and a `LessonApplySections` component
+  extracted from `LessonDetail` so Reference and the path render the
+  apply-it content identically) and record through the same handlers
+  Practice uses, so mastery, spaced repetition, streaks, the daily goal,
+  and achievements need no path-specific scoring. Everything is visible,
+  nothing locked: "Continue" opens the first unfinished step, the current
+  unit is open and finished ones fold away. Quiz steps need 70%
+  (`PATH_PASS_PCT`), a miss shows explanations and offers a fresh draw;
+  the checkpoint mixes the unit with up to three missed questions from
+  earlier units; **test-out** (10 questions at 80%) marks a whole unit
+  done, tagged `via: 'testout'` and never overwriting an earlier honest
+  score; and a **Review weak spots** card pulls the longest-neglected
+  missed questions from started units — from the path and Practice alike —
+  without ever completing a step. State is `stats.path[track].done`
+  (normalized on load, persisted and cloud-synced like the rest).
+  Verified by driving a full unit end to end in a real browser (all 8
+  steps, a deliberate quiz failure and retry, the Match step, test-out,
+  the review card, persistence, and the achievements it unlocks) plus an
+  audit that every track yields complete, reference-valid units.
+
+  **Not done / known rough edges.** The Home screen's resume button
+  returns to the last mode but doesn't deep-link to the next path step.
+  The path covers lessons only, so Case Studies, CLI Commands, and Verbal
+  stay Practice-only. Header subtitles on 320-360px phones still wrap
+  (deliberately left, flagged earlier in this section). Reloading any
+  deep link lands on Home rather than the linked view — that predates
+  this work (confirmed on the previous build): the first-render hash
+  writer overwrites the incoming hash before the route is applied.
 
 ## 15. Content ideas beyond quiz questions
 

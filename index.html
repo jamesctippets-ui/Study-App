@@ -2632,9 +2632,16 @@ function normalizeSrs(raw) {
 // resolve (GitHub Pages included), and a hash needs none: the fragment
 // never even reaches the server. `mode === 'home'` collapses to a bare
 // `#/home` since it has no track/sub-view of its own.
+//
+// The internal mode names ('learn', 'quiz') predate the Path / Practice /
+// Reference / Exam navigation and are kept as-is so every session effect
+// that keys off them still works; only the user-facing labels and URLs
+// changed (learn -> reference, quiz -> practice). parseHash still accepts
+// the old `learn`/`quiz` URL segments so existing bookmarks keep working.
 function routeToHash(mode, trackKey, learnView, quizView) {
-  if (mode === 'learn') return `#/${trackKey}/learn/${learnView}`;
-  if (mode === 'quiz') return `#/${trackKey}/quiz/${quizView}`;
+  if (mode === 'path') return `#/${trackKey}/path`;
+  if (mode === 'learn') return `#/${trackKey}/reference/${learnView}`;
+  if (mode === 'quiz') return `#/${trackKey}/practice/${quizView}`;
   if (mode === 'exam') return `#/${trackKey}/exam`;
   return '#/home';
 }
@@ -2651,8 +2658,9 @@ function parseHash(hash, validTrackKeys) {
   if (!parts.length || parts[0] === 'home') return { mode: 'home' };
   const [trackKey, mode, sub] = parts;
   if (!validTrackKeys.has(trackKey)) return { mode: 'home' };
-  if (mode === 'learn') return { mode: 'learn', trackKey, learnView: ['cards', 'study', 'sheet'].includes(sub) ? sub : 'study' };
-  if (mode === 'quiz') return { mode: 'quiz', trackKey, quizView: ['questions', 'match', 'verbal', 'commands', 'madlibs', 'sequence', 'casestudy', 'compare'].includes(sub) ? sub : 'questions' };
+  if (mode === 'path') return { mode: 'path', trackKey };
+  if (mode === 'reference' || mode === 'learn') return { mode: 'learn', trackKey, learnView: ['cards', 'study', 'sheet'].includes(sub) ? sub : 'study' };
+  if (mode === 'practice' || mode === 'quiz') return { mode: 'quiz', trackKey, quizView: ['questions', 'match', 'verbal', 'commands', 'madlibs', 'sequence', 'casestudy', 'compare'].includes(sub) ? sub : 'questions' };
   if (mode === 'exam') return { mode: 'exam', trackKey };
   return { mode: 'home' };
 }
@@ -2866,6 +2874,7 @@ function emptyStats() {
     dailyChallenge: { date: null, question: null, vocab: null },
     readinessHistory: {},
     categoryMasteryHistory: {},
+    path: {},
   };
 }
 
@@ -2890,6 +2899,7 @@ function normalizeStats(raw) {
     },
     readinessHistory: raw.readinessHistory && typeof raw.readinessHistory === 'object' ? raw.readinessHistory : {},
     categoryMasteryHistory: raw.categoryMasteryHistory && typeof raw.categoryMasteryHistory === 'object' ? raw.categoryMasteryHistory : {},
+    path: normalizePathStats(raw.path),
   };
 }
 
@@ -2911,6 +2921,220 @@ function advanceStreak(streak) {
   const gap = streak.lastActiveDate ? daysBetween(streak.lastActiveDate, today) : null;
   const nextCurrent = gap === 1 ? streak.current + 1 : 1;
   return { current: nextCurrent, longest: Math.max(streak.longest, nextCurrent), lastActiveDate: today };
+}
+
+/* ---------------- guided study path ---------------- */
+
+// A Duolingo-style walk through one track's content, built entirely from
+// data the track already has — no extra authoring. One unit per lesson; each
+// unit is a mixed-order run of steps (read, flashcards, quiz, a mini-game,
+// an apply-it scenario, more cards/quiz, then a checkpoint) assembled from
+// that lesson's own vocab/quiz ids plus whatever else in the track covers
+// the same categories.
+//
+// Persisted shape (stats.path): { [trackKey]: { done: { [stepId]: { at, pct } } } }.
+// A step id is `${lessonId}::${kind}`; ids that no longer match a lesson
+// (content changed since the save) are simply ignored, never an error.
+
+const PATH_PASS_PCT = 70;
+const PATH_CARDS_FIRST = 7;
+const PATH_CARDS_MORE = 8;
+const PATH_QUICK_QUIZ = 5;
+const PATH_PRACTICE_QUIZ = 8;
+const PATH_CHECKPOINT_QUIZ = 8;
+const PATH_CHECKPOINT_REVIEW = 3;
+// Test-out: a harder, longer check that, if passed, marks a whole unit done so
+// someone who already knows the material isn't made to re-read it.
+const PATH_TESTOUT_PCT = 80;
+const PATH_TESTOUT_QUESTIONS = 10;
+const PATH_REVIEW_QUESTIONS = 8;
+
+// The order rotates by unit so consecutive units don't feel identical.
+// Steps with no material for a given unit (e.g. no extra flashcards, no
+// scenario) are dropped when the unit is built.
+const PATH_VARIANTS = [
+  ['read', 'cards', 'quiz', 'game', 'apply', 'cards2', 'quiz2', 'checkpoint'],
+  ['read', 'quiz', 'cards', 'apply', 'game', 'quiz2', 'cards2', 'checkpoint'],
+  ['read', 'game', 'cards', 'quiz', 'apply', 'quiz2', 'cards2', 'checkpoint'],
+];
+
+function normalizePathStats(raw) {
+  const out = {};
+  if (!raw || typeof raw !== 'object') return out;
+  Object.keys(raw).forEach((trackKey) => {
+    const entry = raw[trackKey];
+    const done = entry && typeof entry.done === 'object' && entry.done ? entry.done : {};
+    const clean = {};
+    Object.keys(done).forEach((stepId) => {
+      const d = done[stepId];
+      if (d && typeof d === 'object') {
+        clean[stepId] = { at: typeof d.at === 'string' ? d.at : null, pct: Number.isFinite(d.pct) ? d.pct : null, via: d.via === 'testout' ? 'testout' : null };
+      }
+    });
+    out[trackKey] = { done: clean };
+  });
+  return out;
+}
+
+// Marks one or more steps done. Steps already done keep their original
+// record, so a later test-out never overwrites an honest earlier score.
+function markPathStepsDone(pathStats, trackKey, stepIds, pct, today, via) {
+  const base = pathStats || {};
+  const track = base[trackKey] || { done: {} };
+  const done = { ...track.done };
+  stepIds.forEach((id) => {
+    if (!done[id]) done[id] = { at: today, pct: Number.isFinite(pct) ? pct : null, via: via || null };
+  });
+  return { ...base, [trackKey]: { done } };
+}
+
+function markPathStepDone(pathStats, trackKey, stepId, pct, today) {
+  const base = pathStats || {};
+  const track = base[trackKey] || { done: {} };
+  return { ...base, [trackKey]: { done: { ...track.done, [stepId]: { at: today, pct: Number.isFinite(pct) ? pct : null, via: null } } } };
+}
+
+// Hands each item (anything with a `cat`) to one of the units that cover
+// its category, round-robin, so material a lesson doesn't list explicitly
+// still lands in exactly one unit instead of being duplicated across all of
+// the lessons that happen to share a category.
+function spreadAcrossUnits(items, units, claimed, push) {
+  const counters = {};
+  items.forEach((item) => {
+    if (claimed && claimed.has(item.id)) return;
+    const covering = units.filter((u) => u.cats.includes(item.cat));
+    if (!covering.length) return;
+    const n = counters[item.cat] || 0;
+    push(covering[n % covering.length], item);
+    counters[item.cat] = n + 1;
+  });
+}
+
+function lessonHasApplyContent(lesson) {
+  return !!(lesson.scenario || (lesson.commonTraps && lesson.commonTraps.length) || lesson.onTheJob || lesson.portalMockup);
+}
+
+function estimateReadMinutes(text) {
+  const words = (text || '').split(/\s+/).filter(Boolean).length;
+  return Math.max(1, Math.round(words / 200));
+}
+
+function buildPathUnits(trackKey) {
+  const mod = DATA[trackKey];
+  const lessons = (mod && mod.lessons) || [];
+  if (!lessons.length) return [];
+  const flashById = new Map(mod.flashcards.map((f) => [f.id, f]));
+  const questionIds = new Set(mod.questions.map((q) => q.id));
+
+  const units = lessons.map((lesson, index) => {
+    const vocab = lesson.vocabIds.map((id) => flashById.get(id)).filter(Boolean);
+    const cats = [...new Set(vocab.map((v) => v.cat))];
+    const coreQuestionIds = lesson.quizIds.filter((id) => questionIds.has(id));
+    if (!cats.length) {
+      const byId = new Map(mod.questions.map((q) => [q.id, q]));
+      coreQuestionIds.forEach((id) => { const q = byId.get(id); if (q && !cats.includes(q.cat)) cats.push(q.cat); });
+    }
+    return {
+      id: lesson.id, index, lesson, cats,
+      coreCardIds: vocab.map((v) => v.id),
+      coreQuestionIds,
+      extraCardIds: [],
+      extraQuestionIds: [],
+      games: [],
+    };
+  });
+
+  const claimedCards = new Set(units.flatMap((u) => u.coreCardIds));
+  const claimedQuestions = new Set(units.flatMap((u) => u.coreQuestionIds));
+  spreadAcrossUnits(mod.flashcards, units, claimedCards, (u, f) => u.extraCardIds.push(f.id));
+  spreadAcrossUnits(mod.questions, units, claimedQuestions, (u, q) => u.extraQuestionIds.push(q.id));
+  const gameItems = [
+    ...(mod.compare || []).map((g) => ({ kind: 'compare', id: g.id, cat: g.cat })),
+    ...(mod.madlibs || []).map((g) => ({ kind: 'madlib', id: g.id, cat: g.cat })),
+    ...(mod.sequences || []).map((g) => ({ kind: 'sequence', id: g.id, cat: g.cat })),
+  ];
+  spreadAcrossUnits(gameItems, units, null, (u, g) => u.games.push(g));
+
+  return units.map((u) => {
+    const { lesson } = u;
+    const cardsA = u.coreCardIds.slice(0, PATH_CARDS_FIRST);
+    const cardsB = [...u.coreCardIds.slice(PATH_CARDS_FIRST), ...u.extraCardIds].slice(0, PATH_CARDS_MORE);
+    const quickPool = u.coreQuestionIds.length ? u.coreQuestionIds : u.extraQuestionIds;
+    const fullPool = [...u.coreQuestionIds, ...u.extraQuestionIds];
+    const game = u.games.length
+      ? u.games[u.index % u.games.length]
+      : (u.coreCardIds.length >= 3 ? { kind: 'match', id: null, cat: u.cats[0] } : null);
+    const gameLabels = { match: 'Match the terms', madlib: 'Mad Lib', sequence: 'Put it in order', compare: 'Pick the better answer' };
+    const spec = {
+      read: { label: 'Read the lesson', meta: `${estimateReadMinutes(lesson.reading)} min read`, ok: !!lesson.reading },
+      cards: { label: 'Flashcards', meta: `${cardsA.length} cards`, cardIds: cardsA, ok: cardsA.length > 0 },
+      quiz: { label: 'Quick check', meta: `${Math.min(PATH_QUICK_QUIZ, quickPool.length)} questions`, poolIds: quickPool, count: PATH_QUICK_QUIZ, ok: quickPool.length > 0 },
+      game: { label: game ? gameLabels[game.kind] : 'Game', meta: 'Mini-game', game, ok: !!game },
+      apply: { label: 'Apply it', meta: 'Scenario and on the job', ok: lessonHasApplyContent(lesson) },
+      cards2: { label: 'More flashcards', meta: `${cardsB.length} cards`, cardIds: cardsB, ok: cardsB.length > 0 },
+      quiz2: { label: 'Practice quiz', meta: `${Math.min(PATH_PRACTICE_QUIZ, fullPool.length)} questions`, poolIds: fullPool, count: PATH_PRACTICE_QUIZ, ok: fullPool.length > 0 },
+      checkpoint: { label: 'Unit checkpoint', meta: `${Math.min(PATH_CHECKPOINT_QUIZ, fullPool.length + 3)} mixed questions`, poolIds: fullPool, count: PATH_CHECKPOINT_QUIZ, ok: fullPool.length > 0 },
+    };
+    const steps = PATH_VARIANTS[u.index % PATH_VARIANTS.length]
+      .filter((kind) => spec[kind].ok)
+      .map((kind) => ({ id: `${lesson.id}::${kind}`, kind, ...spec[kind] }));
+    return {
+      id: u.id, index: u.index, lesson, title: lesson.title, summary: lesson.summary, cats: u.cats,
+      poolIds: fullPool, steps,
+    };
+  });
+}
+
+function pathStepIsDone(doneMap, stepId) {
+  return !!(doneMap && doneMap[stepId]);
+}
+
+function pathUnitProgress(unit, doneMap) {
+  const total = unit.steps.length;
+  const done = unit.steps.filter((s) => pathStepIsDone(doneMap, s.id)).length;
+  return { done, total, complete: total > 0 && done === total };
+}
+
+// The first step you haven't finished, scanning in path order — what the
+// "Continue" button opens. Null once everything is done.
+function pathNextStep(units, doneMap) {
+  for (const unit of units) {
+    const step = unit.steps.find((s) => !pathStepIsDone(doneMap, s.id));
+    if (step) return { unit, step };
+  }
+  return null;
+}
+
+function pathOverallProgress(units, doneMap) {
+  let total = 0;
+  let done = 0;
+  let unitsComplete = 0;
+  units.forEach((u) => {
+    const p = pathUnitProgress(u, doneMap);
+    total += p.total;
+    done += p.done;
+    if (p.complete) unitsComplete += 1;
+  });
+  return { total, done, unitsComplete, unitCount: units.length, pct: total ? Math.round((done / total) * 100) : 0 };
+}
+
+// Questions worth revisiting: anything in a unit you've started that you last
+// got wrong — whether that was on the path or in Practice, since both write to
+// the same results. Oldest-seen first, so the longest-neglected come back
+// before ones you just saw.
+function pathReviewQuestionIds(units, doneMap, results, seenLog) {
+  const started = units.filter((u) => u.steps.some((s) => pathStepIsDone(doneMap, s.id)));
+  const ids = [...new Set(started.flatMap((u) => u.poolIds))].filter((id) => results[id] === 'incorrect');
+  return ids.sort((a, b) => ((seenLog && seenLog[a]) || 0) - ((seenLog && seenLog[b]) || 0));
+}
+
+// The synthetic step a unit's "test out" runs as. Not part of unit.steps — it
+// is never listed on the trail, only offered as a shortcut past it.
+function pathTestOutStep(unit) {
+  return {
+    id: `${unit.id}::testout`, kind: 'testout', label: `Test out: ${unit.title}`, meta: `${PATH_TESTOUT_QUESTIONS} questions · ${PATH_TESTOUT_PCT}% to pass`,
+    poolIds: unit.poolIds, count: PATH_TESTOUT_QUESTIONS,
+  };
 }
 
 const ACHIEVEMENTS = [
@@ -3404,7 +3628,7 @@ function DataPanel({
   );
 }
 
-const MODE_LABELS = { learn: 'Learn', quiz: 'Quiz', exam: 'Exam' };
+const MODE_LABELS = { path: 'Path', learn: 'Reference', quiz: 'Practice', exam: 'Exam' };
 
 // A small self-set "study N cards/questions today" ring — cheap to build
 // since it just tallies activity already recorded elsewhere (flashcard
@@ -3833,7 +4057,7 @@ function HomeView({ tracks, results, seenLog, stats, certPlan, onResume, onSelec
         >
           <div style={{ fontSize: '11px', color: COLOR.muted, marginBottom: '2px' }}>Continue where you left off</div>
           <div style={{ fontSize: '15px', fontWeight: 600, color: trackAccent(resumeTrack.key) }}>
-            {resumeTrack.label} · {MODE_LABELS[lastVisited.mode] || 'Learn'}
+            {resumeTrack.label} · {MODE_LABELS[lastVisited.mode] || 'Path'}
           </div>
         </button>
       )}
@@ -4719,7 +4943,7 @@ function CheatSheetView({ trackLabel, sections, resources }) {
   );
 }
 
-function MatchGame({ flashcards, roundSize, onContinue, onRoundComplete }) {
+function MatchGame({ flashcards, roundSize, onContinue, onRoundComplete, continueLabel }) {
   // Fewer pairs per round (was 6) so a round fits more comfortably on one
   // screen and it's easier to actually see which term is being connected
   // to which definition, rather than scanning a wall of six of each.
@@ -4920,7 +5144,7 @@ function MatchGame({ flashcards, roundSize, onContinue, onRoundComplete }) {
               onClick={onContinue}
               style={{ background: COLOR.primary, color: COLOR.onAccent, borderRadius: '10px', padding: '10px 20px', fontSize: '13px', fontWeight: 600 }}
             >
-              Continue reading →
+              {continueLabel || 'Continue reading →'}
             </button>
           )}
         </div>
@@ -5165,6 +5389,103 @@ function ReadingCheckGate({ question, onPassed }) {
   );
 }
 
+// The "apply it" half of a lesson — portal mockup or walkthrough, the real
+// screenshot, the worked scenario, common exam traps, and the on-the-job
+// note. Shared by the Reference tab's LessonDetail and the guided path's
+// "Apply it" step so both render it identically.
+function LessonApplySections({ lesson, categories, lessonCatKeys }) {
+  const walkthrough = lesson.portalMockup ? PORTAL_WALKTHROUGHS[lesson.portalMockup] : null;
+  const MockupComp = !walkthrough && lesson.portalMockup ? PORTAL_MOCKUPS[lesson.portalMockup] : null;
+  const realShot = lesson.portalMockup ? REAL_PORTAL_SCREENSHOTS[lesson.portalMockup] : null;
+  // Some flat (non-course) tracks carry a real screenshot on the CATEGORY
+  // itself (CategoryScreenshot in StudyView) rather than on a lesson's
+  // portalMockup — e.g. MD-102's Intune screenshots predate its course
+  // content. Once such a track gains LESSONS, CourseView replaces
+  // StudyView entirely (see the mode==='learn' branch in 06_app.jsx), so
+  // without this fallback those screenshots would become unreachable.
+  // Only kicks in when the lesson has no mockup/walkthrough of its own.
+  // A lesson can span more than one category (e.g. AZ-802's clustering
+  // lesson pulls vocab from both hybridWorkloads and vmContainers) — this
+  // still resolves as long as exactly one of those categories carries a
+  // screenshot, so it never duplicates a real screenshot already shown
+  // above and never guesses between two competing candidates.
+  const lessonScreenshotCats = !walkthrough && !MockupComp
+    ? lessonCatKeys
+        .map((k) => (categories || []).find((c) => c.key === k))
+        .filter((c) => c && c.screenshot)
+    : [];
+  const categoryScreenshotKey = lessonScreenshotCats.length === 1 ? lessonScreenshotCats[0].screenshot : null;
+  const categoryRealShot = categoryScreenshotKey ? REAL_PORTAL_SCREENSHOTS[categoryScreenshotKey] : null;
+  return (
+    <React.Fragment>
+      {(walkthrough || MockupComp) && (
+        <div style={{ marginBottom: '16px' }}>
+          <div style={{ fontSize: '13px', fontWeight: 600, color: COLOR.gold, marginBottom: '4px' }}>
+            {walkthrough ? `Try it: ${walkthrough.label}` : 'Portal mockup'}
+          </div>
+          <div style={{ fontSize: '10.5px', color: COLOR.muted, marginBottom: '8px', lineHeight: 1.4 }}>
+            {walkthrough
+              ? 'A click-through illustration of the real flow, not an exact screenshot — the real portal may look slightly different.'
+              : 'An illustration of the layout, not an exact screenshot — the real portal may look slightly different.'}
+          </div>
+          <div style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderRadius: '14px', padding: '14px' }}>
+            {walkthrough ? <PortalWalkthroughPlayer walkthrough={walkthrough} /> : <MockupComp />}
+          </div>
+          {realShot && (
+            <>
+              <div style={{ fontSize: '10.5px', color: COLOR.muted, marginTop: '12px', marginBottom: '2px' }}>
+                See the real thing:
+              </div>
+              <RealPortalScreenshot shot={realShot} />
+            </>
+          )}
+        </div>
+      )}
+
+      {categoryRealShot && (
+        <div style={{ marginBottom: '16px' }}>
+          <div style={{ fontSize: '13px', fontWeight: 600, color: COLOR.gold, marginBottom: '4px' }}>Portal screenshot</div>
+          <RealPortalScreenshot shot={categoryRealShot} />
+        </div>
+      )}
+
+      {lesson.scenario && (
+        <div style={{ marginBottom: '16px' }}>
+          <div style={{ fontSize: '13px', fontWeight: 600, color: COLOR.gold, marginBottom: '8px' }}>Worked scenario</div>
+          <div style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderLeft: `3px solid ${COLOR.primary}`, borderRadius: '10px', padding: '12px 14px' }}>
+            <p style={{ fontSize: '14px', lineHeight: 1.65, color: COLOR.text }}>{lesson.scenario}</p>
+          </div>
+        </div>
+      )}
+
+      {lesson.commonTraps && lesson.commonTraps.length > 0 && (
+        <div style={{ marginBottom: '16px' }}>
+          <div style={{ fontSize: '13px', fontWeight: 600, color: COLOR.red, marginBottom: '8px' }}>Common exam traps</div>
+          <div className="flex flex-col gap-2">
+            {lesson.commonTraps.map((t, i) => (
+              <div
+                key={i}
+                style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderLeft: `3px solid ${COLOR.red}`, borderRadius: '10px', padding: '10px 12px', fontSize: '13.5px', lineHeight: 1.55, color: COLOR.text }}
+              >
+                {t}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {lesson.onTheJob && (
+        <div style={{ marginBottom: '16px' }}>
+          <div style={{ fontSize: '13px', fontWeight: 600, color: COLOR.teal, marginBottom: '8px' }}>On the job</div>
+          <div style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderLeft: `3px solid ${COLOR.teal}`, borderRadius: '10px', padding: '12px 14px' }}>
+            <p style={{ fontSize: '13.5px', lineHeight: 1.6, color: COLOR.text }}>{lesson.onTheJob}</p>
+          </div>
+        </div>
+      )}
+    </React.Fragment>
+  );
+}
+
 function LessonDetail({ lesson, flashcardsData, questionsData, categories, onBack, onQuiz, speakingId, onSpeak, speechSupported, isFirstLesson, isLastLesson, onPrevLesson, onNextLesson }) {
   const [showFundamentals, setShowFundamentals] = useState(false);
   const [showVocabulary, setShowVocabulary] = useState(false);
@@ -5192,28 +5513,6 @@ function LessonDetail({ lesson, flashcardsData, questionsData, categories, onBac
     .filter((c) => vocabItems.some((v) => v.cat === c.key) && c.resources && c.resources.length)
     .flatMap((c) => c.resources);
   const DiagramComp = lesson.diagram ? LESSON_DIAGRAMS[lesson.diagram] : null;
-  const walkthrough = lesson.portalMockup ? PORTAL_WALKTHROUGHS[lesson.portalMockup] : null;
-  const MockupComp = !walkthrough && lesson.portalMockup ? PORTAL_MOCKUPS[lesson.portalMockup] : null;
-  const realShot = lesson.portalMockup ? REAL_PORTAL_SCREENSHOTS[lesson.portalMockup] : null;
-  // Some flat (non-course) tracks carry a real screenshot on the CATEGORY
-  // itself (CategoryScreenshot in StudyView) rather than on a lesson's
-  // portalMockup — e.g. MD-102's Intune screenshots predate its course
-  // content. Once such a track gains LESSONS, CourseView replaces
-  // StudyView entirely (see the mode==='learn' branch in 06_app.jsx), so
-  // without this fallback those screenshots would become unreachable.
-  // Only kicks in when the lesson has no mockup/walkthrough of its own.
-  // A lesson can span more than one category (e.g. AZ-802's clustering
-  // lesson pulls vocab from both hybridWorkloads and vmContainers) — this
-  // still resolves as long as exactly one of those categories carries a
-  // screenshot, so it never duplicates a real screenshot already shown
-  // above and never guesses between two competing candidates.
-  const lessonScreenshotCats = !walkthrough && !MockupComp
-    ? lessonCatKeys
-        .map((k) => (categories || []).find((c) => c.key === k))
-        .filter((c) => c && c.screenshot)
-    : [];
-  const categoryScreenshotKey = lessonScreenshotCats.length === 1 ? lessonScreenshotCats[0].screenshot : null;
-  const categoryRealShot = categoryScreenshotKey ? REAL_PORTAL_SCREENSHOTS[categoryScreenshotKey] : null;
 
   const paragraphs = lesson.reading.split('\n\n');
   const readingPages = [];
@@ -5320,70 +5619,7 @@ function LessonDetail({ lesson, flashcardsData, questionsData, categories, onBac
         )}
       </div>
 
-      {(walkthrough || MockupComp) && (
-        <div style={{ marginBottom: '16px' }}>
-          <div style={{ fontSize: '13px', fontWeight: 600, color: COLOR.gold, marginBottom: '4px' }}>
-            {walkthrough ? `Try it: ${walkthrough.label}` : 'Portal mockup'}
-          </div>
-          <div style={{ fontSize: '10.5px', color: COLOR.muted, marginBottom: '8px', lineHeight: 1.4 }}>
-            {walkthrough
-              ? 'A click-through illustration of the real flow, not an exact screenshot — the real portal may look slightly different.'
-              : 'An illustration of the layout, not an exact screenshot — the real portal may look slightly different.'}
-          </div>
-          <div style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderRadius: '14px', padding: '14px' }}>
-            {walkthrough ? <PortalWalkthroughPlayer walkthrough={walkthrough} /> : <MockupComp />}
-          </div>
-          {realShot && (
-            <>
-              <div style={{ fontSize: '10.5px', color: COLOR.muted, marginTop: '12px', marginBottom: '2px' }}>
-                See the real thing:
-              </div>
-              <RealPortalScreenshot shot={realShot} />
-            </>
-          )}
-        </div>
-      )}
-
-      {categoryRealShot && (
-        <div style={{ marginBottom: '16px' }}>
-          <div style={{ fontSize: '13px', fontWeight: 600, color: COLOR.gold, marginBottom: '4px' }}>Portal screenshot</div>
-          <RealPortalScreenshot shot={categoryRealShot} />
-        </div>
-      )}
-
-      {lesson.scenario && (
-        <div style={{ marginBottom: '16px' }}>
-          <div style={{ fontSize: '13px', fontWeight: 600, color: COLOR.gold, marginBottom: '8px' }}>Worked scenario</div>
-          <div style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderLeft: `3px solid ${COLOR.primary}`, borderRadius: '10px', padding: '12px 14px' }}>
-            <p style={{ fontSize: '14px', lineHeight: 1.65, color: COLOR.text }}>{lesson.scenario}</p>
-          </div>
-        </div>
-      )}
-
-      {lesson.commonTraps && lesson.commonTraps.length > 0 && (
-        <div style={{ marginBottom: '16px' }}>
-          <div style={{ fontSize: '13px', fontWeight: 600, color: COLOR.red, marginBottom: '8px' }}>Common exam traps</div>
-          <div className="flex flex-col gap-2">
-            {lesson.commonTraps.map((t, i) => (
-              <div
-                key={i}
-                style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderLeft: `3px solid ${COLOR.red}`, borderRadius: '10px', padding: '10px 12px', fontSize: '13.5px', lineHeight: 1.55, color: COLOR.text }}
-              >
-                {t}
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {lesson.onTheJob && (
-        <div style={{ marginBottom: '16px' }}>
-          <div style={{ fontSize: '13px', fontWeight: 600, color: COLOR.teal, marginBottom: '8px' }}>On the job</div>
-          <div style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderLeft: `3px solid ${COLOR.teal}`, borderRadius: '10px', padding: '12px 14px' }}>
-            <p style={{ fontSize: '13.5px', lineHeight: 1.6, color: COLOR.text }}>{lesson.onTheJob}</p>
-          </div>
-        </div>
-      )}
+      <LessonApplySections lesson={lesson} categories={categories} lessonCatKeys={lessonCatKeys} />
 
       <button
         onClick={() => setShowFundamentals((s) => !s)}
@@ -5509,6 +5745,13 @@ function CourseView({ lessons, flashcardsData, questionsData, categories, onQuiz
 
 function QuizSetup({ length, setLength, types, toggleType, onReroll, poolSize, missedCount, onReviewMissed, isMixed }) {
   const lengths = [5, 10, 15, 25];
+  // Length and question-type filters are set-and-forget for most sessions,
+  // so they fold into one summary row instead of stacking three more
+  // always-visible control rows above the first question.
+  const [optionsOpen, setOptionsOpen] = useState(false);
+  const typeNames = [['mc', 'Multiple choice'], ['ms', 'Multi-select'], ['tf', 'True / False']]
+    .filter(([key]) => types[key]).map(([, label]) => label);
+  const typeSummary = typeNames.length === 3 ? 'all types' : typeNames.join(', ');
   return (
     <div style={{ marginBottom: '14px' }}>
       {missedCount > 0 && (
@@ -5519,49 +5762,63 @@ function QuizSetup({ length, setLength, types, toggleType, onReroll, poolSize, m
           Review {missedCount} missed question{missedCount === 1 ? '' : 's'}
         </button>
       )}
-      {isMixed && (
-        <div style={{ fontSize: '10.5px', color: COLOR.muted, marginBottom: '8px' }}>
-          Mixed practice — questions interleaved across every category on purpose, not just left unfiltered.
-        </div>
-      )}
       <div className="flex justify-between items-center mb-2">
-        <div style={{ fontSize: '11px', color: COLOR.muted }}>{poolSize} questions match this filter</div>
+        <div style={{ fontSize: '11px', color: COLOR.muted }}>
+          {poolSize} questions{isMixed ? ' · mixed across every category on purpose' : ''}
+        </div>
         <button
           onClick={onReroll}
-          style={{ fontSize: '11px', color: COLOR.primary, background: 'transparent', padding: '4px 8px', borderRadius: '8px', border: `1px solid ${COLOR.primary}` }}
+          style={{ fontSize: '11px', color: COLOR.primary, background: 'transparent', padding: '4px 8px', borderRadius: '8px', border: `1px solid ${COLOR.primary}`, flexShrink: 0 }}
         >
           New quiz
         </button>
       </div>
-      <div className="flex items-center gap-2 mb-2">
-        <label htmlFor="quiz-length-select" style={{ fontSize: '11px', color: COLOR.muted }}>Length</label>
-        <select
-          id="quiz-length-select"
-          value={length}
-          onChange={(e) => setLength(Number(e.target.value))}
-          style={{
-            padding: '6px 10px', borderRadius: '9px', fontSize: '12.5px', fontWeight: 600,
-            border: `1px solid ${COLOR.primary}`, background: 'rgba(167,139,250,0.14)', color: COLOR.primary,
-          }}
+      <div style={{ border: `1px solid ${COLOR.border}`, borderRadius: '12px', background: COLOR.surface, overflow: 'hidden' }}>
+        <button
+          onClick={() => setOptionsOpen((o) => !o)}
+          className="btn-flat"
+          style={{ width: '100%', textAlign: 'left', padding: '9px 12px', background: 'transparent', color: COLOR.text, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px' }}
         >
-          {lengths.map((n) => <option key={n} value={n}>{n} questions</option>)}
-        </select>
-      </div>
-      <div className="flex gap-2" style={{ overflowX: 'auto', paddingBottom: '2px' }}>
-        {[['mc', 'Multiple choice'], ['ms', 'Multi-select'], ['tf', 'True / False']].map(([key, label]) => (
-          <button
-            key={key}
-            onClick={() => toggleType(key)}
-            style={{
-              flexShrink: 0, padding: '6px 12px', borderRadius: '999px', fontSize: '12px', fontWeight: 500,
-              border: `1px solid ${types[key] ? COLOR.gold : COLOR.border}`,
-              background: types[key] ? 'rgba(211,164,101,0.14)' : COLOR.surface,
-              color: types[key] ? COLOR.gold : COLOR.muted,
-            }}
-          >
-            {label}
-          </button>
-        ))}
+          <span style={{ fontSize: '12px' }}>
+            <span style={{ color: COLOR.muted }}>Options: </span>
+            <span style={{ fontWeight: 600 }}>{length} questions · {typeSummary}</span>
+          </span>
+          <span style={{ fontSize: '11px', color: COLOR.muted }}>{optionsOpen ? '▴' : '▾'}</span>
+        </button>
+        {optionsOpen && (
+          <div style={{ padding: '4px 12px 12px', borderTop: `1px solid ${COLOR.border}` }}>
+            <div className="flex items-center gap-2" style={{ margin: '10px 0' }}>
+              <label htmlFor="quiz-length-select" style={{ fontSize: '11px', color: COLOR.muted }}>Length</label>
+              <select
+                id="quiz-length-select"
+                value={length}
+                onChange={(e) => setLength(Number(e.target.value))}
+                style={{
+                  padding: '6px 10px', borderRadius: '9px', fontSize: '12.5px', fontWeight: 600,
+                  border: `1px solid ${COLOR.primary}`, background: 'rgba(167,139,250,0.14)', color: COLOR.primary,
+                }}
+              >
+                {lengths.map((n) => <option key={n} value={n}>{n} questions</option>)}
+              </select>
+            </div>
+            <div className="flex gap-2" style={{ flexWrap: 'wrap' }}>
+              {[['mc', 'Multiple choice'], ['ms', 'Multi-select'], ['tf', 'True / False']].map(([key, label]) => (
+                <button
+                  key={key}
+                  onClick={() => toggleType(key)}
+                  style={{
+                    flexShrink: 0, padding: '6px 12px', borderRadius: '999px', fontSize: '12px', fontWeight: 500,
+                    border: `1px solid ${types[key] ? COLOR.gold : COLOR.border}`,
+                    background: types[key] ? 'rgba(211,164,101,0.14)' : COLOR.surface,
+                    color: types[key] ? COLOR.gold : COLOR.muted,
+                  }}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
@@ -6032,6 +6289,78 @@ function SequenceView({ session, index, score, categories, workingOrder, onMove,
   );
 }
 
+// Grouped so the Practice tab reads as three small sections instead of one
+// 8-wide row of equal tabs. `requires` names the track capability a tool
+// depends on (matching the same guards the old tab row used).
+const PRACTICE_TOOLS = [
+  { key: 'questions', group: 'Test yourself', label: 'Questions', desc: 'Mixed or per-category practice quiz' },
+  { key: 'compare', group: 'Test yourself', label: 'Compare', desc: 'Pick the better of two plausible answers', requires: 'compare' },
+  { key: 'casestudy', group: 'Test yourself', label: 'Case Study', desc: 'Several questions off one shared scenario', requires: 'casestudy' },
+  { key: 'madlibs', group: 'Games & drills', label: 'Mad Libs', desc: 'Fill the blanks in a real-world scenario', requires: 'madlibs' },
+  { key: 'sequence', group: 'Games & drills', label: 'Sequence', desc: 'Put a procedure\'s steps in the right order', requires: 'sequence' },
+  { key: 'match', group: 'Games & drills', label: 'Match', desc: 'Draw lines between terms and definitions' },
+  { key: 'commands', group: 'Games & drills', label: 'Commands', desc: 'Type the right CLI or PowerShell command', requires: 'commands' },
+  { key: 'verbal', group: 'Hands-free', label: 'Verbal', desc: 'Audio-only quiz for driving or walking' },
+];
+
+function PracticeToolPicker({ quizView, available, onSelect }) {
+  const [open, setOpen] = useState(false);
+  useEscapeToClose(() => setOpen(false));
+  const tools = PRACTICE_TOOLS.filter((t) => !t.requires || available[t.requires]);
+  const current = tools.find((t) => t.key === quizView) || tools[0];
+  const groups = [];
+  tools.forEach((t) => {
+    let g = groups.find((x) => x.name === t.group);
+    if (!g) { g = { name: t.group, items: [] }; groups.push(g); }
+    g.items.push(t);
+  });
+  return (
+    <div style={{ marginBottom: '14px', position: 'relative' }}>
+      <button
+        onClick={() => setOpen((o) => !o)}
+        style={{
+          width: '100%', textAlign: 'left', padding: '10px 14px', borderRadius: '12px',
+          border: `1px solid ${COLOR.border}`, background: COLOR.surface, color: COLOR.text,
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px',
+        }}
+      >
+        <span style={{ minWidth: 0 }}>
+          <span style={{ display: 'block', fontSize: '10px', color: COLOR.muted, textTransform: 'uppercase', letterSpacing: '0.04em', fontWeight: 600 }}>Practice tool</span>
+          <span style={{ display: 'block', fontSize: '14.5px', fontWeight: 600 }}>{current.label}</span>
+          <span style={{ display: 'block', fontSize: '11.5px', color: COLOR.muted, marginTop: '1px' }}>{current.desc}</span>
+        </span>
+        <span style={{ fontSize: '12px', color: COLOR.muted, flexShrink: 0 }}>{open ? '▴' : '▾'}</span>
+      </button>
+      {open && (
+        <div style={{ boxShadow: SHADOW.card, marginTop: '6px', background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderRadius: '12px', overflow: 'hidden' }}>
+          {groups.map((g, gi) => (
+            <div key={g.name} style={{ borderTop: gi === 0 ? 'none' : `1px solid ${COLOR.border}` }}>
+              <div style={{ padding: '8px 14px 4px', fontSize: '10px', fontWeight: 700, color: COLOR.muted, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{g.name}</div>
+              {g.items.map((t) => {
+                const active = t.key === current.key;
+                return (
+                  <button
+                    key={t.key}
+                    onClick={() => { onSelect(t.key); setOpen(false); }}
+                    className="btn-flat"
+                    style={{
+                      width: '100%', textAlign: 'left', padding: '9px 14px', background: active ? COLOR.surfaceRaised : 'transparent',
+                      color: COLOR.text, display: 'flex', alignItems: 'baseline', gap: '10px',
+                    }}
+                  >
+                    <span style={{ fontSize: '13.5px', fontWeight: 600, color: active ? COLOR.primary : COLOR.text, minWidth: '74px' }}>{t.label}</span>
+                    <span style={{ fontSize: '11.5px', color: COLOR.muted, lineHeight: 1.35 }}>{t.desc}</span>
+                  </button>
+                );
+              })}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 function CompareView({ session, index, score, categories, choice, onChoose, onNext, onRestart, flashcardsData }) {
   const [activeTermKey, setActiveTermKey] = useState(null);
   useEffect(() => { setActiveTermKey(null); }, [session[index] && session[index].id]);
@@ -6428,6 +6757,709 @@ function CaseStudyView({ list, activeIndex, onStart, onExit, categories, questio
 }
 
 
+/* ---------------- guided study path ---------------- */
+
+// The Path tab: a Duolingo-style walk through one track, one unit per lesson,
+// each unit a mixed-order run of steps (read, flashcards, quiz, a mini-game,
+// an apply-it scenario, more cards/quiz, a checkpoint). The unit/step model
+// and progress maths live in 03_helpers.js (buildPathUnits and friends); this
+// file is only the screens. Every step reuses an existing view over a given
+// set of items and records through the same handlers the Practice tab uses
+// (passed in as `api`), so mastery, spaced repetition, streaks, the daily
+// goal, and achievements all keep working with no path-specific scoring.
+
+function PathIcon({ kind, size = 20 }) {
+  const common = { width: size, height: size, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 2, strokeLinecap: 'round', strokeLinejoin: 'round' };
+  switch (kind) {
+    case 'read':
+      return <svg {...common}><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" /><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" /></svg>;
+    case 'cards':
+    case 'cards2':
+      return <svg {...common}><polygon points="12 2 2 7 12 12 22 7 12 2" /><polyline points="2 17 12 22 22 17" /><polyline points="2 12 12 17 22 12" /></svg>;
+    case 'quiz':
+    case 'quiz2':
+      return <svg {...common}><circle cx="12" cy="12" r="10" /><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" /><line x1="12" y1="17" x2="12.01" y2="17" /></svg>;
+    case 'game':
+      return <svg {...common}><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" /></svg>;
+    case 'apply':
+      return <svg {...common}><rect x="2" y="7" width="20" height="14" rx="2" ry="2" /><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" /></svg>;
+    case 'checkpoint':
+      return <svg {...common}><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z" /><line x1="4" y1="22" x2="4" y2="15" /></svg>;
+    case 'check':
+      return <svg {...common} strokeWidth={3}><polyline points="20 6 9 17 4 12" /></svg>;
+    default:
+      return null;
+  }
+}
+
+function PathRing({ done, total, size = 40 }) {
+  const r = (size - 6) / 2;
+  const c = 2 * Math.PI * r;
+  const frac = total ? done / total : 0;
+  const complete = total > 0 && done === total;
+  return (
+    <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} style={{ flexShrink: 0 }}>
+      <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke={COLOR.border} strokeWidth="4" />
+      <circle
+        cx={size / 2} cy={size / 2} r={r} fill="none" stroke={complete ? COLOR.success : COLOR.primary} strokeWidth="4"
+        strokeLinecap="round" strokeDasharray={`${c * frac} ${c}`} transform={`rotate(-90 ${size / 2} ${size / 2})`}
+      />
+      <text x="50%" y="50%" textAnchor="middle" dominantBaseline="central" fontSize="10.5" fontWeight="700" fill={complete ? COLOR.success : COLOR.text}>
+        {done}/{total}
+      </text>
+    </svg>
+  );
+}
+
+/* ---- step runners ---- */
+
+function PathReadStep({ unit, flashcardsData, speech, onDone }) {
+  const { lesson } = unit;
+  const [page, setPage] = useState(0);
+  const [activeTermKey, setActiveTermKey] = useState(null);
+  useEscapeToClose(() => setActiveTermKey(null));
+  useClickOutsideToClose(!!activeTermKey, () => setActiveTermKey(null));
+  useEffect(() => { setActiveTermKey(null); }, [page]);
+  const paragraphs = lesson.reading.split('\n\n');
+  const pages = [];
+  for (let i = 0; i < paragraphs.length; i += 2) pages.push(paragraphs.slice(i, i + 2));
+  const isLast = page === pages.length - 1;
+  const DiagramComp = page === 0 && lesson.diagram ? LESSON_DIAGRAMS[lesson.diagram] : null;
+  return (
+    <div>
+      {DiagramComp && (
+        <div style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderRadius: '14px', padding: '14px', marginBottom: '16px' }}>
+          <DiagramComp />
+        </div>
+      )}
+      <div className="flex justify-between items-center" style={{ marginBottom: '8px' }}>
+        <div style={{ fontSize: '13px', fontWeight: 600, color: COLOR.gold }}>
+          Reading{pages.length > 1 ? ` · page ${page + 1} of ${pages.length}` : ''}
+        </div>
+        {speech.speechSupported && (
+          <SpeakButton id={'path-read-' + lesson.id + '-' + page} text={pages[page].join(' ')} speakingId={speech.speakingId} onSpeak={speech.onSpeak} />
+        )}
+      </div>
+      <div style={{ fontSize: '11px', color: COLOR.muted, marginBottom: '8px' }}>Tap a highlighted term for its definition.</div>
+      {pages[page].map((p, i) => (
+        <p key={i} style={{ fontSize: '14px', lineHeight: 1.65, color: COLOR.text, marginBottom: '10px' }}>
+          {highlightTerms(p, lesson.keyTerms, flashcardsData, activeTermKey, setActiveTermKey, 'pp' + i)}
+        </p>
+      ))}
+      <div className="flex gap-2" style={{ marginTop: '14px' }}>
+        {page > 0 && (
+          <button
+            onClick={() => setPage((n) => n - 1)}
+            className="flex-1"
+            style={{ padding: '12px', borderRadius: '12px', border: `1px solid ${COLOR.border}`, background: 'transparent', color: COLOR.text, fontSize: '13px', fontWeight: 600 }}
+          >
+            ‹ Back
+          </button>
+        )}
+        <button
+          onClick={() => (isLast ? onDone(null) : setPage((n) => n + 1))}
+          className="flex-1"
+          style={{ padding: '12px', borderRadius: '12px', background: COLOR.primary, color: COLOR.onAccent, fontSize: '14px', fontWeight: 600 }}
+        >
+          {isLast ? 'Done reading' : 'Next ›'}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function PathCardsStep({ cards, categories, flashcardsData, speech, onRate, onDone }) {
+  const [index, setIndex] = useState(0);
+  const [flipped, setFlipped] = useState(false);
+  const [known, setKnown] = useState(0);
+  const card = cards[index];
+  const rate = (quality) => {
+    onRate(card.id, quality);
+    const nextKnown = known + (quality >= 3 ? 1 : 0);
+    setKnown(nextKnown);
+    setFlipped(false);
+    if (index + 1 >= cards.length) onDone(Math.round((nextKnown / cards.length) * 100));
+    else setIndex(index + 1);
+  };
+  return (
+    <FlashcardView
+      card={card}
+      flipped={flipped}
+      setFlipped={setFlipped}
+      onRate={rate}
+      index={index}
+      total={cards.length}
+      categoryLabel={categories.find((c) => c.key === card.cat)?.label}
+      speakingId={speech.speakingId}
+      onSpeak={speech.onSpeak}
+      speechSupported={speech.speechSupported}
+      flashcardsData={flashcardsData}
+    />
+  );
+}
+
+function PathQuizStep({ questions, passPct, label, categories, flashcardsData, onAnswer, onFinished, onPass, onRetry }) {
+  const [index, setIndex] = useState(0);
+  const [selected, setSelected] = useState(null);
+  const [msPending, setMsPending] = useState([]);
+  const [answers, setAnswers] = useState([]);
+  const [finished, setFinished] = useState(false);
+  const q = questions[index];
+  const correctCount = answers.filter((a) => a.correct).length;
+
+  const record = (isCorrect, selection) => {
+    setSelected(selection);
+    setAnswers((a) => [...a, { id: q.id, cat: q.cat, prompt: q.question, correct: isCorrect, explanation: q.explanation, whyTested: q.whyTested }]);
+    onAnswer(q.id, isCorrect);
+  };
+  const choose = (idx) => {
+    if (selected !== null || !q || q.type === 'ms') return;
+    const isCorrect = q.type === 'mc' ? idx === q.correct : (idx === 0) === q.answer;
+    record(isCorrect, idx);
+  };
+  const toggleMs = (idx) => {
+    if (selected !== null) return;
+    setMsPending((prev) => (prev.includes(idx) ? prev.filter((i) => i !== idx) : [...prev, idx]));
+  };
+  const submitMs = () => {
+    if (selected !== null || !q || q.type !== 'ms' || !msPending.length) return;
+    const picked = [...msPending].sort();
+    const correct = [...q.correct].sort();
+    record(picked.length === correct.length && picked.every((v, i) => v === correct[i]), picked);
+  };
+  const advance = () => {
+    setSelected(null);
+    setMsPending([]);
+    if (index + 1 >= questions.length) setFinished(true);
+    else setIndex((i) => i + 1);
+  };
+
+  useEffect(() => {
+    if (!finished) return;
+    window.scrollTo({ top: 0, behavior: 'instant' });
+    onFinished(correctCount, answers.length);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [finished]);
+
+  if (finished) {
+    const pct = answers.length ? Math.round((correctCount / answers.length) * 100) : 0;
+    const passed = pct >= passPct;
+    const reviewOnly = passPct === 0;
+    return (
+      <div>
+        <div style={{
+          marginBottom: '14px', padding: '14px', borderRadius: '14px', textAlign: 'center',
+          border: `1px solid ${passed ? COLOR.success : COLOR.gold}`, background: passed ? 'rgba(52,211,153,0.10)' : `${COLOR.gold}14`,
+        }}>
+          <div style={{ fontSize: '15px', fontWeight: 700, color: passed ? COLOR.success : COLOR.gold }}>
+            {passed ? (reviewOnly ? `${label} done` : `${label} passed`) : `Not quite yet — ${passPct}% to pass`}
+          </div>
+          <div style={{ fontSize: '12px', color: COLOR.muted, marginTop: '3px' }}>
+            {passed
+              ? (reviewOnly ? 'Anything you missed again is below.' : 'The questions you missed are below if you want to review them.')
+              : 'Read the explanations below, then try again with a fresh set.'}
+          </div>
+          {passed && (
+            <button
+              onClick={() => onPass(pct)}
+              style={{ width: '100%', marginTop: '12px', padding: '12px', borderRadius: '12px', background: COLOR.success, color: COLOR.onAccent, fontSize: '14px', fontWeight: 700 }}
+            >
+              {reviewOnly ? 'Back to the path ›' : 'Continue ›'}
+            </button>
+          )}
+        </div>
+        <QuizSummary
+          score={{ correct: correctCount, total: answers.length }}
+          answers={answers}
+          categories={categories}
+          onRestart={onRetry}
+          restartLabel={passed ? 'Practice again' : 'Try again'}
+        />
+      </div>
+    );
+  }
+
+  return (
+    <QuestionView
+      q={q}
+      selected={selected}
+      onChoose={choose}
+      onNext={advance}
+      index={index}
+      total={questions.length}
+      categoryLabel={categories.find((c) => c.key === q.cat)?.label}
+      badgeLabel={label}
+      msPending={msPending}
+      onToggleMs={toggleMs}
+      onSubmitMs={submitMs}
+      flashcardsData={flashcardsData}
+    />
+  );
+}
+
+function PathMadlibStep({ item, categories, flashcardsData, onResult, onDone }) {
+  const [answers, setAnswers] = useState({});
+  const [submitted, setSubmitted] = useState(false);
+  const [score, setScore] = useState({ correct: 0, total: 0 });
+  const submit = () => {
+    const ok = item.blanks.every((b) => answers[b.key] === b.correct);
+    setSubmitted(true);
+    setScore({ correct: ok ? 1 : 0, total: 1 });
+    onResult(item.id, ok ? 'correct' : 'incorrect');
+  };
+  return (
+    <MadLibsView
+      session={[item]}
+      index={0}
+      score={score}
+      categories={categories}
+      answers={answers}
+      onSetBlank={(key, idx) => { if (!submitted) setAnswers((a) => ({ ...a, [key]: idx })); }}
+      submitted={submitted}
+      onSubmit={submit}
+      onNext={() => onDone(score.correct ? 100 : 0)}
+      onRestart={() => {}}
+      flashcardsData={flashcardsData}
+    />
+  );
+}
+
+function PathSequenceStep({ item, categories, flashcardsData, onResult, onDone }) {
+  const [order, setOrder] = useState(() => {
+    let o = shuffleArray(item.steps.map((_, i) => i));
+    if (o.length > 1 && o.every((v, i) => v === i)) o = [...o].reverse();
+    return o;
+  });
+  const [submitted, setSubmitted] = useState(false);
+  const [score, setScore] = useState({ correct: 0, total: 0 });
+  const move = (position, direction) => {
+    if (submitted) return;
+    setOrder((cur) => {
+      const target = position + direction;
+      if (target < 0 || target >= cur.length) return cur;
+      const next = [...cur];
+      [next[position], next[target]] = [next[target], next[position]];
+      return next;
+    });
+  };
+  const submit = () => {
+    const ok = checkSequenceOrder(order);
+    setSubmitted(true);
+    setScore({ correct: ok ? 1 : 0, total: 1 });
+    onResult(item.id, ok ? 'correct' : 'incorrect');
+  };
+  return (
+    <SequenceView
+      session={[item]}
+      index={0}
+      score={score}
+      categories={categories}
+      workingOrder={order}
+      onMove={move}
+      submitted={submitted}
+      onSubmit={submit}
+      onNext={() => onDone(score.correct ? 100 : 0)}
+      onRestart={() => {}}
+      flashcardsData={flashcardsData}
+    />
+  );
+}
+
+function PathCompareStep({ item, categories, flashcardsData, onResult, onDone }) {
+  const prepared = useMemo(() => {
+    const swap = Math.random() < 0.5;
+    const better = item.better === 'A' ? 0 : 1;
+    return { ...item, options: swap ? [item.optionB, item.optionA] : [item.optionA, item.optionB], betterIdx: swap ? 1 - better : better };
+  }, [item.id]);
+  const [choice, setChoice] = useState(null);
+  const [score, setScore] = useState({ correct: 0, total: 0 });
+  const choose = (i) => {
+    if (choice !== null) return;
+    const ok = i === prepared.betterIdx;
+    setChoice(i);
+    setScore({ correct: ok ? 1 : 0, total: 1 });
+    onResult(item.id, ok ? 'correct' : 'incorrect');
+  };
+  return (
+    <CompareView
+      session={[prepared]}
+      index={0}
+      score={score}
+      categories={categories}
+      choice={choice}
+      onChoose={choose}
+      onNext={() => onDone(score.correct ? 100 : 0)}
+      onRestart={() => {}}
+      flashcardsData={flashcardsData}
+    />
+  );
+}
+
+function PathApplyStep({ unit, categories, onDone }) {
+  return (
+    <div>
+      <LessonApplySections lesson={unit.lesson} categories={categories} lessonCatKeys={unit.cats} />
+      <button
+        onClick={() => onDone(null)}
+        style={{ width: '100%', padding: '12px', borderRadius: '12px', background: COLOR.primary, color: COLOR.onAccent, fontSize: '14px', fontWeight: 600 }}
+      >
+        Got it
+      </button>
+    </div>
+  );
+}
+
+function PathStepComplete({ unit, step, pct, unitComplete, testedOut, next, onNext, onBack }) {
+  return (
+    <div style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderRadius: '18px', padding: '26px 22px', textAlign: 'center' }}>
+      <div style={{ width: '56px', height: '56px', borderRadius: '50%', background: COLOR.success, color: COLOR.onAccent, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', marginBottom: '12px' }}>
+        <PathIcon kind="check" size={28} />
+      </div>
+      <div className="itil-display" style={{ fontSize: '19px', fontWeight: 600 }}>
+        {testedOut ? 'Tested out' : unitComplete ? 'Unit complete' : 'Step complete'}
+      </div>
+      <div style={{ fontSize: '12.5px', color: COLOR.muted, marginTop: '4px', lineHeight: 1.5 }}>
+        {testedOut ? `You tested out of ${unit.title} at ${pct}%.` : unitComplete ? `You've finished every step of ${unit.title}.` : step.label}
+        {pct !== null && pct !== undefined && !unitComplete && !testedOut ? ` · ${pct}%` : ''}
+      </div>
+      {next ? (
+        <button
+          onClick={onNext}
+          style={{ width: '100%', marginTop: '18px', padding: '13px', borderRadius: '12px', background: COLOR.primary, color: COLOR.onAccent, fontSize: '14px', fontWeight: 700 }}
+        >
+          {next.unit.index !== unit.index ? `Next unit: ${next.unit.title}` : `Next: ${next.step.label}`}
+        </button>
+      ) : (
+        <div style={{ marginTop: '16px', fontSize: '13px', fontWeight: 600, color: COLOR.success }}>That's the whole path.</div>
+      )}
+      <button
+        onClick={onBack}
+        style={{ width: '100%', marginTop: '10px', padding: '11px', borderRadius: '12px', border: `1px solid ${COLOR.border}`, background: 'transparent', color: COLOR.text, fontSize: '13px', fontWeight: 600 }}
+      >
+        Back to the path
+      </button>
+    </div>
+  );
+}
+
+/* ---- the path itself ---- */
+
+const PATH_NODE_OFFSETS = [0, 24, 40, 24];
+
+function PathView({ track, trackKey, doneMap, results, seenLog, categories, speech, api }) {
+  const mod = DATA[trackKey];
+  const units = useMemo(() => buildPathUnits(trackKey), [trackKey]);
+  const [session, setSession] = useState(null);
+  const [completion, setCompletion] = useState(null);
+  const [expanded, setExpanded] = useState(() => {
+    const first = pathNextStep(units, doneMap);
+    return { [first ? first.unit.index : 0]: true };
+  });
+
+  if (!units.length) {
+    return (
+      <div style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderRadius: '18px', padding: '22px', textAlign: 'center' }}>
+        <div className="itil-display" style={{ fontSize: '17px', fontWeight: 600, marginBottom: '6px' }}>No guided path yet</div>
+        <div style={{ fontSize: '12.5px', color: COLOR.muted, lineHeight: 1.5 }}>
+          {track.label} doesn't have lessons to build a path from. Use Practice for quizzes and games, or Reference for the study notes.
+        </div>
+      </div>
+    );
+  }
+
+  const flashById = new Map(mod.flashcards.map((f) => [f.id, f]));
+  const questionById = new Map(mod.questions.map((q) => [q.id, q]));
+  const overall = pathOverallProgress(units, doneMap);
+  const next = pathNextStep(units, doneMap);
+  const reviewIds = pathReviewQuestionIds(units, doneMap, results, seenLog);
+  const startReview = () => startStep(null, {
+    id: 'review', kind: 'review', label: 'Review weak spots', poolIds: reviewIds, count: PATH_REVIEW_QUESTIONS,
+  });
+
+  const preparedQuestions = (pool, count) => {
+    const picked = pickRotated(pool, Math.min(count, pool.length), seenLog);
+    const prepared = picked.map(prepareQuestion);
+    api.markSeen(prepared.map((q) => q.id));
+    return prepared;
+  };
+
+  const buildPayload = (unit, step) => {
+    switch (step.kind) {
+      case 'cards':
+      case 'cards2':
+        return { cards: step.cardIds.map((id) => flashById.get(id)).filter(Boolean) };
+      case 'quiz':
+      case 'quiz2':
+        return { questions: preparedQuestions(step.poolIds.map((id) => questionById.get(id)).filter(Boolean), step.count) };
+      case 'testout':
+        return { questions: preparedQuestions(step.poolIds.map((id) => questionById.get(id)).filter(Boolean), step.count) };
+      case 'review':
+        return { questions: preparedQuestions(step.poolIds.map((id) => questionById.get(id)).filter(Boolean), step.count) };
+      case 'checkpoint': {
+        const earlier = units.slice(0, unit.index).flatMap((u) => u.poolIds);
+        const weak = earlier.filter((id) => results[id] !== 'correct').map((id) => questionById.get(id)).filter(Boolean);
+        const review = pickRotated(weak, Math.min(PATH_CHECKPOINT_REVIEW, weak.length), seenLog);
+        const own = pickRotated(step.poolIds.map((id) => questionById.get(id)).filter(Boolean), Math.max(1, step.count - review.length), seenLog);
+        const prepared = shuffleArray([...review, ...own]).map(prepareQuestion);
+        api.markSeen(prepared.map((q) => q.id));
+        return { questions: prepared, reviewCount: review.length };
+      }
+      case 'game': {
+        const g = step.game;
+        if (g.kind === 'match') return { kind: 'match', cards: unit.lesson.vocabIds.map((id) => flashById.get(id)).filter(Boolean) };
+        const source = g.kind === 'madlib' ? mod.madlibs : g.kind === 'sequence' ? mod.sequences : mod.compare;
+        return { kind: g.kind, item: (source || []).find((x) => x.id === g.id) };
+      }
+      default:
+        return {};
+    }
+  };
+
+  const startStep = (unit, step) => {
+    const payload = buildPayload(unit, step);
+    setCompletion(null);
+    setSession({ unit, step, payload, nonce: Date.now() });
+    window.scrollTo({ top: 0, behavior: 'instant' });
+  };
+
+  const finishStep = (pct) => {
+    const { unit, step } = session;
+    if (step.kind === 'review') {
+      // Review is practice, not progress: it never completes a step.
+      setSession(null);
+      window.scrollTo({ top: 0, behavior: 'instant' });
+      return;
+    }
+    const testedOut = step.kind === 'testout';
+    const stepIds = testedOut ? unit.steps.map((s) => s.id) : [step.id];
+    if (testedOut) api.completeSteps(stepIds, pct, 'testout');
+    else api.completeStep(step.id, pct);
+    setCompletion({ unit, step, pct, testedOut });
+    setSession(null);
+    // Finishing a unit folds it away and opens the next one, so the map the
+    // learner returns to is already pointing at what to do next.
+    const doneNow = { ...doneMap };
+    stepIds.forEach((id) => { doneNow[id] = true; });
+    const unitComplete = pathUnitProgress(unit, doneNow).complete;
+    const nextNow = pathNextStep(units, doneNow);
+    setExpanded((e) => {
+      const copy = { ...e, [unit.index]: !unitComplete };
+      if (nextNow) copy[nextNow.unit.index] = true;
+      return copy;
+    });
+    window.scrollTo({ top: 0, behavior: 'instant' });
+  };
+
+  const backToMap = () => { setSession(null); setCompletion(null); };
+
+  /* ---- a step is running ---- */
+  if (session) {
+    const { unit, step, payload } = session;
+    const runnerKey = step.id + '-' + session.nonce;
+    const common = { categories, flashcardsData: mod.flashcards };
+    let runner = null;
+    if (step.kind === 'read') {
+      runner = <PathReadStep key={runnerKey} unit={unit} flashcardsData={mod.flashcards} speech={speech} onDone={finishStep} />;
+    } else if (step.kind === 'cards' || step.kind === 'cards2') {
+      runner = <PathCardsStep key={runnerKey} cards={payload.cards} speech={speech} onRate={api.rateCard} onDone={finishStep} {...common} />;
+    } else if (step.kind === 'quiz' || step.kind === 'quiz2' || step.kind === 'checkpoint' || step.kind === 'testout' || step.kind === 'review') {
+      runner = (
+        <PathQuizStep
+          key={runnerKey}
+          questions={payload.questions}
+          passPct={step.kind === 'testout' ? PATH_TESTOUT_PCT : step.kind === 'review' ? 0 : PATH_PASS_PCT}
+          label={step.label}
+          onAnswer={(id, ok) => api.recordResult(id, ok ? 'correct' : 'incorrect')}
+          onFinished={api.finishQuiz}
+          onPass={finishStep}
+          onRetry={() => startStep(unit, step)}
+          {...common}
+        />
+      );
+    } else if (step.kind === 'apply') {
+      runner = <PathApplyStep key={runnerKey} unit={unit} categories={categories} onDone={finishStep} />;
+    } else if (step.kind === 'game') {
+      if (payload.kind === 'match') {
+        runner = (
+          <MatchGame
+            key={runnerKey}
+            flashcards={payload.cards}
+            roundSize={Math.min(5, payload.cards.length)}
+            onRoundComplete={api.onMatchRound}
+            onContinue={() => finishStep(null)}
+            continueLabel="Continue ›"
+          />
+        );
+      } else if (payload.kind === 'madlib') {
+        runner = <PathMadlibStep key={runnerKey} item={payload.item} onResult={api.recordResult} onDone={finishStep} {...common} />;
+      } else if (payload.kind === 'sequence') {
+        runner = <PathSequenceStep key={runnerKey} item={payload.item} onResult={api.recordResult} onDone={finishStep} {...common} />;
+      } else {
+        runner = <PathCompareStep key={runnerKey} item={payload.item} onResult={api.recordResult} onDone={finishStep} {...common} />;
+      }
+    }
+    return (
+      <div>
+        <button onClick={backToMap} className="btn-flat" style={{ fontSize: '12px', color: COLOR.primary, background: 'transparent', marginBottom: '10px', padding: 0 }}>
+          ‹ Back to the path
+        </button>
+        <div style={{ marginBottom: '14px' }}>
+          <div style={{ fontSize: '10.5px', color: COLOR.muted, textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 600 }}>
+            {step.kind === 'review' ? 'Spaced review' : `Unit ${unit.index + 1} · ${unit.title}`}
+          </div>
+          <div className="itil-display" style={{ fontSize: '18px', fontWeight: 600, marginTop: '2px' }}>{step.label}</div>
+        </div>
+        {runner}
+      </div>
+    );
+  }
+
+  /* ---- a step just finished ---- */
+  if (completion) {
+    const doneNow = { ...doneMap, [completion.step.id]: true };
+    if (completion.testedOut) completion.unit.steps.forEach((st) => { doneNow[st.id] = true; });
+    const unitComplete = pathUnitProgress(completion.unit, doneNow).complete;
+    const nextNow = pathNextStep(units, doneNow);
+    return (
+      <PathStepComplete
+        unit={completion.unit}
+        step={completion.step}
+        pct={completion.pct}
+        unitComplete={unitComplete}
+        testedOut={!!completion.testedOut}
+        next={nextNow}
+        onNext={() => startStep(nextNow.unit, nextNow.step)}
+        onBack={backToMap}
+      />
+    );
+  }
+
+  /* ---- the map ---- */
+  return (
+    <div>
+      <div style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderRadius: '16px', padding: '16px', marginBottom: '14px' }}>
+        <div className="flex justify-between items-baseline" style={{ marginBottom: '8px' }}>
+          <div className="itil-display" style={{ fontSize: '17px', fontWeight: 600 }}>{track.label} path</div>
+          <div style={{ fontSize: '12px', color: COLOR.muted }}>{overall.unitsComplete} of {overall.unitCount} units</div>
+        </div>
+        <div style={{ height: '6px', borderRadius: '3px', background: COLOR.surfaceRaised, overflow: 'hidden', marginBottom: '6px' }}>
+          <div style={{ height: '100%', width: `${overall.pct}%`, background: COLOR.success, borderRadius: '3px' }} />
+        </div>
+        <div style={{ fontSize: '11px', color: COLOR.muted, marginBottom: '12px' }}>
+          {overall.done} of {overall.total} steps done · reading, flashcards, quizzes, and games in a mixed order
+        </div>
+        {next ? (
+          <button
+            onClick={() => startStep(next.unit, next.step)}
+            style={{ width: '100%', padding: '13px', borderRadius: '12px', background: COLOR.primary, color: COLOR.onAccent, fontSize: '14px', fontWeight: 700, textAlign: 'left', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px' }}
+          >
+            <span style={{ minWidth: 0 }}>
+              <span style={{ display: 'block', fontSize: '10px', opacity: 0.8, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                {overall.done === 0 ? 'Start' : 'Continue'} · Unit {next.unit.index + 1}
+              </span>
+              <span style={{ display: 'block' }}>{next.step.label}</span>
+            </span>
+            <span style={{ fontSize: '18px' }}>›</span>
+          </button>
+        ) : (
+          <div style={{ fontSize: '13px', fontWeight: 600, color: COLOR.success, textAlign: 'center' }}>
+            Path complete — open any step below to review it.
+          </div>
+        )}
+      </div>
+
+      {reviewIds.length > 0 && (
+        <button
+          onClick={startReview}
+          style={{
+            width: '100%', marginBottom: '14px', padding: '11px 14px', borderRadius: '12px', textAlign: 'left',
+            border: `1px solid ${COLOR.red}`, background: 'rgba(181,87,74,0.1)', color: COLOR.red, fontSize: '13px', fontWeight: 600,
+            display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px',
+          }}
+        >
+          <span>
+            Review weak spots
+            <span style={{ display: 'block', fontSize: '11.5px', fontWeight: 400, opacity: 0.85 }}>
+              {reviewIds.length} question{reviewIds.length === 1 ? '' : 's'} you missed in units you've started
+            </span>
+          </span>
+          <span style={{ fontSize: '16px' }}>›</span>
+        </button>
+      )}
+
+      {units.map((unit) => {
+        const prog = pathUnitProgress(unit, doneMap);
+        const open = !!expanded[unit.index];
+        return (
+          <div key={unit.id} style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderRadius: '16px', marginBottom: '12px', overflow: 'hidden' }}>
+            <button
+              onClick={() => setExpanded((e) => ({ ...e, [unit.index]: !e[unit.index] }))}
+              className="btn-flat"
+              style={{ width: '100%', textAlign: 'left', padding: '12px 14px', background: 'transparent', color: COLOR.text, display: 'flex', alignItems: 'center', gap: '12px' }}
+            >
+              <PathRing done={prog.done} total={prog.total} />
+              <span style={{ flex: 1, minWidth: 0 }}>
+                <span style={{ display: 'block', fontSize: '10px', color: COLOR.muted, textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 600 }}>Unit {unit.index + 1}</span>
+                <span style={{ display: 'block', fontSize: '14.5px', fontWeight: 600 }}>{unit.title}</span>
+                {!open && <span style={{ display: 'block', fontSize: '11.5px', color: COLOR.muted, marginTop: '1px' }}>{unit.summary}</span>}
+              </span>
+              <span style={{ fontSize: '12px', color: COLOR.muted }}>{open ? '▴' : '▾'}</span>
+            </button>
+            {open && (
+              <div style={{ padding: '2px 14px 14px', borderTop: `1px solid ${COLOR.border}` }}>
+                <div style={{ fontSize: '12px', color: COLOR.muted, margin: '10px 0 6px', lineHeight: 1.45 }}>{unit.summary}</div>
+                {unit.steps.map((step, i) => {
+                  const done = pathStepIsDone(doneMap, step.id);
+                  const isNext = !!next && next.step.id === step.id;
+                  const accent = step.kind === 'checkpoint' ? COLOR.gold : COLOR.primary;
+                  const lit = done || isNext;
+                  return (
+                    <button
+                      key={step.id}
+                      onClick={() => startStep(unit, step)}
+                      className="btn-flat"
+                      aria-label={`${step.label}, ${done ? 'completed' : 'not completed'}`}
+                      style={{
+                        width: `calc(100% - ${PATH_NODE_OFFSETS[i % PATH_NODE_OFFSETS.length]}px)`, marginLeft: `${PATH_NODE_OFFSETS[i % PATH_NODE_OFFSETS.length]}px`,
+                        textAlign: 'left', background: 'transparent', color: COLOR.text, padding: '7px 0', display: 'flex', alignItems: 'center', gap: '14px',
+                      }}
+                    >
+                      <span style={{
+                        width: '46px', height: '46px', borderRadius: '50%', flexShrink: 0, display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                        background: done ? COLOR.success : isNext ? accent : COLOR.surfaceRaised,
+                        color: lit ? COLOR.onAccent : COLOR.muted,
+                        border: `2px solid ${done ? COLOR.success : (isNext || step.kind === 'checkpoint') ? accent : COLOR.border}`,
+                        boxShadow: isNext ? `0 0 0 5px ${accent}33` : 'none',
+                      }}>
+                        <PathIcon kind={done ? 'check' : step.kind} size={21} />
+                      </span>
+                      <span style={{ minWidth: 0 }}>
+                        <span style={{ display: 'block', fontSize: '13.5px', fontWeight: isNext ? 700 : 600, color: done ? COLOR.muted : COLOR.text }}>{step.label}</span>
+                        <span style={{ display: 'block', fontSize: '11.5px', color: COLOR.muted }}>
+                          {done ? 'Done' : step.meta}{isNext ? ' · up next' : ''}
+                        </span>
+                      </span>
+                    </button>
+                  );
+                })}
+                {!prog.complete && (
+                  <button
+                    onClick={() => startStep(unit, pathTestOutStep(unit))}
+                    className="btn-flat"
+                    style={{ marginTop: '6px', padding: '8px 0', background: 'transparent', color: COLOR.primary, fontSize: '12px', fontWeight: 600, textAlign: 'left' }}
+                  >
+                    Already know this? Test out of the unit ›
+                  </button>
+                )}
+              </div>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 /* ---------------- final exam UI ---------------- */
 
 const READINESS_COLOR = {
@@ -6592,9 +7624,13 @@ function ExamQuestionView({ q, selectedIdx, onSelect }) {
   );
 }
 
+const REVIEW_PREVIEW_COUNT = 5;
+
 function ExamResults({ result, config, track, categories, onRestart, variant }) {
+  const [showAllMissed, setShowAllMissed] = useState(false);
   const pct = result.total ? Math.round((result.correct / result.total) * 100) : 0;
   const missed = result.items.filter((i) => !i.correct);
+  const shownMissed = showAllMissed ? missed : missed.slice(0, REVIEW_PREVIEW_COUNT);
   const isItil = track.key === 'itil';
   const isFinal = variant === 'final';
   const onTarget = pct >= config.passPct;
@@ -6653,9 +7689,11 @@ function ExamResults({ result, config, track, categories, onRestart, variant }) 
       )}
       {missed.length > 0 && (
         <div className="mt-4">
-          <div style={{ fontSize: '12px', color: COLOR.muted, marginBottom: '8px' }}>Review these:</div>
+          <div style={{ fontSize: '12px', color: COLOR.muted, marginBottom: '8px' }}>
+            Review these{missed.length > REVIEW_PREVIEW_COUNT ? ` (${shownMissed.length} of ${missed.length})` : ''}:
+          </div>
           <div className="flex flex-col gap-2">
-            {missed.map((m, i) => (
+            {shownMissed.map((m, i) => (
               <div key={i} style={{ boxShadow: SHADOW.card, background: COLOR.surfaceRaised, borderRadius: '10px', padding: '10px 12px', fontSize: '13px' }}>
                 <div style={{ fontSize: '10px', color: COLOR.muted, marginBottom: '2px' }}>
                   {categories.find((c) => c.key === m.cat)?.label}{!m.answered ? ' — left blank' : ''}
@@ -6675,6 +7713,14 @@ function ExamResults({ result, config, track, categories, onRestart, variant }) 
               </div>
             ))}
           </div>
+          {missed.length > REVIEW_PREVIEW_COUNT && (
+            <button
+              onClick={() => setShowAllMissed((v) => !v)}
+              style={{ width: '100%', marginTop: '10px', padding: '10px', borderRadius: '12px', border: `1px solid ${COLOR.border}`, background: 'transparent', color: COLOR.primary, fontSize: '13px', fontWeight: 600 }}
+            >
+              {showAllMissed ? 'Show fewer' : `Show all ${missed.length} missed questions`}
+            </button>
+          )}
         </div>
       )}
       <button
@@ -6973,7 +8019,7 @@ function CertStudyApp() {
 
   const goToCertPathTrack = (key) => {
     setActiveTrack(key);
-    setMode((m) => (m === 'home' ? 'learn' : m));
+    setMode((m) => (m === 'home' ? 'path' : m));
     setShowCertPath(false);
   };
 
@@ -6985,7 +8031,7 @@ function CertStudyApp() {
   // landing spot for any track.
   const switchTrack = (key) => {
     setActiveTrack(key);
-    setMode('learn');
+    setMode('path');
     setShowTrackSwitcher(false);
   };
 
@@ -7956,6 +9002,47 @@ function CertStudyApp() {
     setSessionAnswers((a) => [...a, { id: currentQ.id, cat: currentQ.cat, prompt: currentQ.question, correct: isCorrect, explanation: currentQ.explanation, whyTested: currentQ.whyTested, track: qTrack }]);
   };
 
+  // The guided path (04e_path_ui.jsx) runs its own small sessions, but every
+  // answer, rating, and counter still goes through the same recorders the
+  // Practice tab uses, so mastery, spaced repetition, streaks, the daily
+  // goal, and achievements need no path-specific scoring.
+  const pathApi = {
+    rateCard: (id, quality) => {
+      recordResult(id, ratingToOutcome(quality));
+      recordSrs(id, quality);
+      bumpDailyGoal(1);
+    },
+    recordResult: (id, outcome) => {
+      recordResult(id, outcome);
+      bumpDailyGoal(1);
+    },
+    markSeen,
+    finishQuiz: (correct, total) => {
+      const cur = statsRef.current;
+      const perfect = total >= 10 && correct === total;
+      saveStats({
+        ...cur,
+        counts: {
+          ...cur.counts,
+          quizzesCompleted: cur.counts.quizzesCompleted + 1,
+          perfectQuizzes: cur.counts.perfectQuizzes + (perfect ? 1 : 0),
+        },
+      });
+    },
+    onMatchRound: () => {
+      const cur = statsRef.current;
+      saveStats({ ...cur, counts: { ...cur.counts, matchRoundsCompleted: cur.counts.matchRoundsCompleted + 1 } });
+    },
+    completeStep: (stepId, pct) => {
+      const cur = statsRef.current;
+      saveStats({ ...cur, path: markPathStepDone(cur.path, activeTrack, stepId, pct, todayString()) });
+    },
+    completeSteps: (stepIds, pct, via) => {
+      const cur = statsRef.current;
+      saveStats({ ...cur, path: markPathStepsDone(cur.path, activeTrack, stepIds, pct, todayString(), via) });
+    },
+  };
+
   const doReset = () => {
     saveResults({ ...results, [activeTrack]: {} });
     saveSrs({ ...srs, [activeTrack]: {} });
@@ -8279,7 +9366,7 @@ function CertStudyApp() {
             onResume={() => {
               if (stats.lastVisited) { setActiveTrack(stats.lastVisited.track); setMode(stats.lastVisited.mode); }
             }}
-            onSelectTrack={(key) => { setActiveTrack(key); setMode('learn'); }}
+            onSelectTrack={(key) => { setActiveTrack(key); setMode('path'); }}
             onAddToPath={addToCertPath}
             onOpenAbout={() => setShowAbout(true)}
             onOpenGlossary={() => setShowGlossary(true)}
@@ -8290,27 +9377,21 @@ function CertStudyApp() {
         ) : (
         <React.Fragment>
         <div className="flex gap-1 mb-4" style={{ boxShadow: SHADOW.card, background: COLOR.surface, padding: '4px', borderRadius: '12px', border: `1px solid ${COLOR.border}` }}>
-          <button
-            onClick={() => setMode('learn')}
-            className="flex-1 btn-flat"
-            style={{ padding: '8px 2px', borderRadius: '9px', fontSize: '11px', fontWeight: 600, background: mode === 'learn' ? COLOR.primary : 'transparent', color: mode === 'learn' ? COLOR.onAccent : COLOR.muted }}
-          >
-            Learn
-          </button>
-          <button
-            onClick={() => setMode('quiz')}
-            className="flex-1 btn-flat"
-            style={{ padding: '8px 2px', borderRadius: '9px', fontSize: '11px', fontWeight: 600, background: mode === 'quiz' ? COLOR.primary : 'transparent', color: mode === 'quiz' ? COLOR.onAccent : COLOR.muted }}
-          >
-            Quiz
-          </button>
-          <button
-            onClick={() => setMode('exam')}
-            className="flex-1 btn-flat"
-            style={{ padding: '8px 2px', borderRadius: '9px', fontSize: '11px', fontWeight: 600, background: mode === 'exam' ? COLOR.gold : 'transparent', color: mode === 'exam' ? COLOR.onAccent : COLOR.muted }}
-          >
-            Exam
-          </button>
+          {[
+            { m: 'path', label: 'Path' },
+            { m: 'quiz', label: 'Practice' },
+            { m: 'learn', label: 'Reference' },
+            { m: 'exam', label: 'Exam' },
+          ].map((t) => (
+            <button
+              key={t.m}
+              onClick={() => setMode(t.m)}
+              className="flex-1 btn-flat"
+              style={{ padding: '8px 2px', borderRadius: '9px', fontSize: '11px', fontWeight: 600, background: mode === t.m ? (t.m === 'exam' ? COLOR.gold : COLOR.primary) : 'transparent', color: mode === t.m ? COLOR.onAccent : COLOR.muted }}
+            >
+              {t.label}
+            </button>
+          ))}
         </div>
 
         {mode === 'learn' && (
@@ -8340,74 +9421,17 @@ function CertStudyApp() {
         )}
 
         {mode === 'quiz' && (
-          <div className="flex gap-1 mb-4" style={{ background: COLOR.bg, padding: '3px', borderRadius: '10px', border: `1px solid ${COLOR.border}` }}>
-            <button
-              onClick={() => setQuizView('questions')}
-              className="flex-1 btn-flat"
-              style={{ padding: '6px 2px', borderRadius: '8px', fontSize: '10.5px', fontWeight: 600, background: quizView === 'questions' ? COLOR.surfaceRaised : 'transparent', color: quizView === 'questions' ? COLOR.text : COLOR.muted }}
-            >
-              Questions
-            </button>
-            <button
-              onClick={() => setQuizView('match')}
-              className="flex-1 btn-flat"
-              style={{ padding: '6px 2px', borderRadius: '8px', fontSize: '10.5px', fontWeight: 600, background: quizView === 'match' ? COLOR.surfaceRaised : 'transparent', color: quizView === 'match' ? COLOR.text : COLOR.muted }}
-            >
-              Match
-            </button>
-            <button
-              onClick={() => setQuizView('verbal')}
-              className="flex-1 btn-flat"
-              style={{ padding: '6px 2px', borderRadius: '8px', fontSize: '10.5px', fontWeight: 600, background: quizView === 'verbal' ? COLOR.surfaceRaised : 'transparent', color: quizView === 'verbal' ? COLOR.text : COLOR.muted }}
-            >
-              Verbal
-            </button>
-            {DATA[activeTrack].cliChallenges && (
-              <button
-                onClick={() => setQuizView('commands')}
-                className="flex-1 btn-flat"
-                style={{ padding: '6px 2px', borderRadius: '8px', fontSize: '10.5px', fontWeight: 600, background: quizView === 'commands' ? COLOR.surfaceRaised : 'transparent', color: quizView === 'commands' ? COLOR.text : COLOR.muted }}
-              >
-                Commands
-              </button>
-            )}
-            {madlibsData.length > 0 && (
-              <button
-                onClick={() => setQuizView('madlibs')}
-                className="flex-1 btn-flat"
-                style={{ padding: '6px 2px', borderRadius: '8px', fontSize: '10.5px', fontWeight: 600, background: quizView === 'madlibs' ? COLOR.surfaceRaised : 'transparent', color: quizView === 'madlibs' ? COLOR.text : COLOR.muted }}
-              >
-                Mad Libs
-              </button>
-            )}
-            {sequencesData.length > 0 && (
-              <button
-                onClick={() => setQuizView('sequence')}
-                className="flex-1 btn-flat"
-                style={{ padding: '6px 2px', borderRadius: '8px', fontSize: '10.5px', fontWeight: 600, background: quizView === 'sequence' ? COLOR.surfaceRaised : 'transparent', color: quizView === 'sequence' ? COLOR.text : COLOR.muted }}
-              >
-                Sequence
-              </button>
-            )}
-            {caseStudiesData.length > 0 && (
-              <button
-                onClick={() => setQuizView('casestudy')}
-                className="flex-1 btn-flat"
-                style={{ padding: '6px 2px', borderRadius: '8px', fontSize: '10.5px', fontWeight: 600, background: quizView === 'casestudy' ? COLOR.surfaceRaised : 'transparent', color: quizView === 'casestudy' ? COLOR.text : COLOR.muted }}
-              >
-                Case Study
-              </button>
-            )}
-            {compareData.length > 0 && (
-              <button
-                onClick={() => setQuizView('compare')}
-                className="flex-1 btn-flat"
-                style={{ padding: '6px 2px', borderRadius: '8px', fontSize: '10.5px', fontWeight: 600, background: quizView === 'compare' ? COLOR.surfaceRaised : 'transparent', color: quizView === 'compare' ? COLOR.text : COLOR.muted }}
-              >
-                Compare
-              </button>
-            )}
-          </div>
+          <PracticeToolPicker
+            quizView={quizView}
+            available={{
+              compare: compareData.length > 0,
+              casestudy: caseStudiesData.length > 0,
+              madlibs: madlibsData.length > 0,
+              sequence: sequencesData.length > 0,
+              commands: !!DATA[activeTrack].cliChallenges,
+            }}
+            onSelect={setQuizView}
+          />
         )}
 
         {(mode === 'quiz' || (mode === 'learn' && learnView !== 'sheet' && (learnView !== 'study' || !DATA[activeTrack].lessons))) && (
@@ -8437,6 +9461,20 @@ function CertStudyApp() {
             onSpeak={speak}
             speechSupported={speechSupported}
             flashcardsData={flashcardsData}
+          />
+        )}
+
+        {mode === 'path' && (
+          <PathView
+            key={activeTrack}
+            track={track}
+            trackKey={activeTrack}
+            doneMap={((stats.path || {})[activeTrack] || {}).done || {}}
+            results={trackResults}
+            seenLog={seenLog[activeTrack] || {}}
+            categories={categories}
+            speech={{ speakingId, onSpeak: speak, speechSupported }}
+            api={pathApi}
           />
         )}
 

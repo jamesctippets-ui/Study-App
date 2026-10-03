@@ -296,7 +296,7 @@ function CheatSheetView({ trackLabel, sections, resources }) {
   );
 }
 
-function MatchGame({ flashcards, roundSize, onContinue, onRoundComplete }) {
+function MatchGame({ flashcards, roundSize, onContinue, onRoundComplete, continueLabel }) {
   // Fewer pairs per round (was 6) so a round fits more comfortably on one
   // screen and it's easier to actually see which term is being connected
   // to which definition, rather than scanning a wall of six of each.
@@ -497,7 +497,7 @@ function MatchGame({ flashcards, roundSize, onContinue, onRoundComplete }) {
               onClick={onContinue}
               style={{ background: COLOR.primary, color: COLOR.onAccent, borderRadius: '10px', padding: '10px 20px', fontSize: '13px', fontWeight: 600 }}
             >
-              Continue reading →
+              {continueLabel || 'Continue reading →'}
             </button>
           )}
         </div>
@@ -742,6 +742,103 @@ function ReadingCheckGate({ question, onPassed }) {
   );
 }
 
+// The "apply it" half of a lesson — portal mockup or walkthrough, the real
+// screenshot, the worked scenario, common exam traps, and the on-the-job
+// note. Shared by the Reference tab's LessonDetail and the guided path's
+// "Apply it" step so both render it identically.
+function LessonApplySections({ lesson, categories, lessonCatKeys }) {
+  const walkthrough = lesson.portalMockup ? PORTAL_WALKTHROUGHS[lesson.portalMockup] : null;
+  const MockupComp = !walkthrough && lesson.portalMockup ? PORTAL_MOCKUPS[lesson.portalMockup] : null;
+  const realShot = lesson.portalMockup ? REAL_PORTAL_SCREENSHOTS[lesson.portalMockup] : null;
+  // Some flat (non-course) tracks carry a real screenshot on the CATEGORY
+  // itself (CategoryScreenshot in StudyView) rather than on a lesson's
+  // portalMockup — e.g. MD-102's Intune screenshots predate its course
+  // content. Once such a track gains LESSONS, CourseView replaces
+  // StudyView entirely (see the mode==='learn' branch in 06_app.jsx), so
+  // without this fallback those screenshots would become unreachable.
+  // Only kicks in when the lesson has no mockup/walkthrough of its own.
+  // A lesson can span more than one category (e.g. AZ-802's clustering
+  // lesson pulls vocab from both hybridWorkloads and vmContainers) — this
+  // still resolves as long as exactly one of those categories carries a
+  // screenshot, so it never duplicates a real screenshot already shown
+  // above and never guesses between two competing candidates.
+  const lessonScreenshotCats = !walkthrough && !MockupComp
+    ? lessonCatKeys
+        .map((k) => (categories || []).find((c) => c.key === k))
+        .filter((c) => c && c.screenshot)
+    : [];
+  const categoryScreenshotKey = lessonScreenshotCats.length === 1 ? lessonScreenshotCats[0].screenshot : null;
+  const categoryRealShot = categoryScreenshotKey ? REAL_PORTAL_SCREENSHOTS[categoryScreenshotKey] : null;
+  return (
+    <React.Fragment>
+      {(walkthrough || MockupComp) && (
+        <div style={{ marginBottom: '16px' }}>
+          <div style={{ fontSize: '13px', fontWeight: 600, color: COLOR.gold, marginBottom: '4px' }}>
+            {walkthrough ? `Try it: ${walkthrough.label}` : 'Portal mockup'}
+          </div>
+          <div style={{ fontSize: '10.5px', color: COLOR.muted, marginBottom: '8px', lineHeight: 1.4 }}>
+            {walkthrough
+              ? 'A click-through illustration of the real flow, not an exact screenshot — the real portal may look slightly different.'
+              : 'An illustration of the layout, not an exact screenshot — the real portal may look slightly different.'}
+          </div>
+          <div style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderRadius: '14px', padding: '14px' }}>
+            {walkthrough ? <PortalWalkthroughPlayer walkthrough={walkthrough} /> : <MockupComp />}
+          </div>
+          {realShot && (
+            <>
+              <div style={{ fontSize: '10.5px', color: COLOR.muted, marginTop: '12px', marginBottom: '2px' }}>
+                See the real thing:
+              </div>
+              <RealPortalScreenshot shot={realShot} />
+            </>
+          )}
+        </div>
+      )}
+
+      {categoryRealShot && (
+        <div style={{ marginBottom: '16px' }}>
+          <div style={{ fontSize: '13px', fontWeight: 600, color: COLOR.gold, marginBottom: '4px' }}>Portal screenshot</div>
+          <RealPortalScreenshot shot={categoryRealShot} />
+        </div>
+      )}
+
+      {lesson.scenario && (
+        <div style={{ marginBottom: '16px' }}>
+          <div style={{ fontSize: '13px', fontWeight: 600, color: COLOR.gold, marginBottom: '8px' }}>Worked scenario</div>
+          <div style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderLeft: `3px solid ${COLOR.primary}`, borderRadius: '10px', padding: '12px 14px' }}>
+            <p style={{ fontSize: '14px', lineHeight: 1.65, color: COLOR.text }}>{lesson.scenario}</p>
+          </div>
+        </div>
+      )}
+
+      {lesson.commonTraps && lesson.commonTraps.length > 0 && (
+        <div style={{ marginBottom: '16px' }}>
+          <div style={{ fontSize: '13px', fontWeight: 600, color: COLOR.red, marginBottom: '8px' }}>Common exam traps</div>
+          <div className="flex flex-col gap-2">
+            {lesson.commonTraps.map((t, i) => (
+              <div
+                key={i}
+                style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderLeft: `3px solid ${COLOR.red}`, borderRadius: '10px', padding: '10px 12px', fontSize: '13.5px', lineHeight: 1.55, color: COLOR.text }}
+              >
+                {t}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {lesson.onTheJob && (
+        <div style={{ marginBottom: '16px' }}>
+          <div style={{ fontSize: '13px', fontWeight: 600, color: COLOR.teal, marginBottom: '8px' }}>On the job</div>
+          <div style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderLeft: `3px solid ${COLOR.teal}`, borderRadius: '10px', padding: '12px 14px' }}>
+            <p style={{ fontSize: '13.5px', lineHeight: 1.6, color: COLOR.text }}>{lesson.onTheJob}</p>
+          </div>
+        </div>
+      )}
+    </React.Fragment>
+  );
+}
+
 function LessonDetail({ lesson, flashcardsData, questionsData, categories, onBack, onQuiz, speakingId, onSpeak, speechSupported, isFirstLesson, isLastLesson, onPrevLesson, onNextLesson }) {
   const [showFundamentals, setShowFundamentals] = useState(false);
   const [showVocabulary, setShowVocabulary] = useState(false);
@@ -769,28 +866,6 @@ function LessonDetail({ lesson, flashcardsData, questionsData, categories, onBac
     .filter((c) => vocabItems.some((v) => v.cat === c.key) && c.resources && c.resources.length)
     .flatMap((c) => c.resources);
   const DiagramComp = lesson.diagram ? LESSON_DIAGRAMS[lesson.diagram] : null;
-  const walkthrough = lesson.portalMockup ? PORTAL_WALKTHROUGHS[lesson.portalMockup] : null;
-  const MockupComp = !walkthrough && lesson.portalMockup ? PORTAL_MOCKUPS[lesson.portalMockup] : null;
-  const realShot = lesson.portalMockup ? REAL_PORTAL_SCREENSHOTS[lesson.portalMockup] : null;
-  // Some flat (non-course) tracks carry a real screenshot on the CATEGORY
-  // itself (CategoryScreenshot in StudyView) rather than on a lesson's
-  // portalMockup — e.g. MD-102's Intune screenshots predate its course
-  // content. Once such a track gains LESSONS, CourseView replaces
-  // StudyView entirely (see the mode==='learn' branch in 06_app.jsx), so
-  // without this fallback those screenshots would become unreachable.
-  // Only kicks in when the lesson has no mockup/walkthrough of its own.
-  // A lesson can span more than one category (e.g. AZ-802's clustering
-  // lesson pulls vocab from both hybridWorkloads and vmContainers) — this
-  // still resolves as long as exactly one of those categories carries a
-  // screenshot, so it never duplicates a real screenshot already shown
-  // above and never guesses between two competing candidates.
-  const lessonScreenshotCats = !walkthrough && !MockupComp
-    ? lessonCatKeys
-        .map((k) => (categories || []).find((c) => c.key === k))
-        .filter((c) => c && c.screenshot)
-    : [];
-  const categoryScreenshotKey = lessonScreenshotCats.length === 1 ? lessonScreenshotCats[0].screenshot : null;
-  const categoryRealShot = categoryScreenshotKey ? REAL_PORTAL_SCREENSHOTS[categoryScreenshotKey] : null;
 
   const paragraphs = lesson.reading.split('\n\n');
   const readingPages = [];
@@ -897,70 +972,7 @@ function LessonDetail({ lesson, flashcardsData, questionsData, categories, onBac
         )}
       </div>
 
-      {(walkthrough || MockupComp) && (
-        <div style={{ marginBottom: '16px' }}>
-          <div style={{ fontSize: '13px', fontWeight: 600, color: COLOR.gold, marginBottom: '4px' }}>
-            {walkthrough ? `Try it: ${walkthrough.label}` : 'Portal mockup'}
-          </div>
-          <div style={{ fontSize: '10.5px', color: COLOR.muted, marginBottom: '8px', lineHeight: 1.4 }}>
-            {walkthrough
-              ? 'A click-through illustration of the real flow, not an exact screenshot — the real portal may look slightly different.'
-              : 'An illustration of the layout, not an exact screenshot — the real portal may look slightly different.'}
-          </div>
-          <div style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderRadius: '14px', padding: '14px' }}>
-            {walkthrough ? <PortalWalkthroughPlayer walkthrough={walkthrough} /> : <MockupComp />}
-          </div>
-          {realShot && (
-            <>
-              <div style={{ fontSize: '10.5px', color: COLOR.muted, marginTop: '12px', marginBottom: '2px' }}>
-                See the real thing:
-              </div>
-              <RealPortalScreenshot shot={realShot} />
-            </>
-          )}
-        </div>
-      )}
-
-      {categoryRealShot && (
-        <div style={{ marginBottom: '16px' }}>
-          <div style={{ fontSize: '13px', fontWeight: 600, color: COLOR.gold, marginBottom: '4px' }}>Portal screenshot</div>
-          <RealPortalScreenshot shot={categoryRealShot} />
-        </div>
-      )}
-
-      {lesson.scenario && (
-        <div style={{ marginBottom: '16px' }}>
-          <div style={{ fontSize: '13px', fontWeight: 600, color: COLOR.gold, marginBottom: '8px' }}>Worked scenario</div>
-          <div style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderLeft: `3px solid ${COLOR.primary}`, borderRadius: '10px', padding: '12px 14px' }}>
-            <p style={{ fontSize: '14px', lineHeight: 1.65, color: COLOR.text }}>{lesson.scenario}</p>
-          </div>
-        </div>
-      )}
-
-      {lesson.commonTraps && lesson.commonTraps.length > 0 && (
-        <div style={{ marginBottom: '16px' }}>
-          <div style={{ fontSize: '13px', fontWeight: 600, color: COLOR.red, marginBottom: '8px' }}>Common exam traps</div>
-          <div className="flex flex-col gap-2">
-            {lesson.commonTraps.map((t, i) => (
-              <div
-                key={i}
-                style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderLeft: `3px solid ${COLOR.red}`, borderRadius: '10px', padding: '10px 12px', fontSize: '13.5px', lineHeight: 1.55, color: COLOR.text }}
-              >
-                {t}
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {lesson.onTheJob && (
-        <div style={{ marginBottom: '16px' }}>
-          <div style={{ fontSize: '13px', fontWeight: 600, color: COLOR.teal, marginBottom: '8px' }}>On the job</div>
-          <div style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderLeft: `3px solid ${COLOR.teal}`, borderRadius: '10px', padding: '12px 14px' }}>
-            <p style={{ fontSize: '13.5px', lineHeight: 1.6, color: COLOR.text }}>{lesson.onTheJob}</p>
-          </div>
-        </div>
-      )}
+      <LessonApplySections lesson={lesson} categories={categories} lessonCatKeys={lessonCatKeys} />
 
       <button
         onClick={() => setShowFundamentals((s) => !s)}

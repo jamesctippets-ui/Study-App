@@ -6,8 +6,10 @@ proper Python source tree instead of one giant file.
 
 ## What's inside
 
-Three top-level tabs: **Learn**, **Quiz**, **Exam**. Learn holds two
-sub-views — Cards (flashcards, ordered by a real SM-2 spaced-repetition
+Four top-level tabs per track: **Path** (a guided, Duolingo-style walk
+through the track — see below), **Practice** (every quiz and game, picked
+from one grouped dropdown), **Reference** (the study material), and
+**Exam**. Reference holds three sub-views — Cards (flashcards, ordered by a real SM-2 spaced-repetition
 schedule and rated on the same 1-5 confidence scale SM-2 was originally
 designed around — 1 "Blank" through 5 "Easy" — rather than a binary
 right/wrong; a 3+ resurfaces the card later by a growing interval, under
@@ -39,8 +41,8 @@ flashes red, a correct one leaves a permanent dashed line joining the pair;
 dragging near the top/bottom edge auto-scrolls, for the rare round still
 taller than one screen. Respects the current category filter, tracks
 mistakes, and deals a fresh random round each time). Match lives under
-Quiz rather than Learn since it's a recall
-self-test like the rest of Quiz, not a reading/reference view like Cards or
+Practice rather than Reference since it's a recall
+self-test like the rest of Practice, not a reading/reference view like Cards or
 Study. Starting a specific quiz programmatically — "Quiz this section," a
 lesson's own quiz, reviewing missed questions — always lands on Questions
 even if Match was the last sub-view open, so you never get dropped into the
@@ -85,7 +87,7 @@ days out, so a 90%-mastery track you haven't touched in two months reads
 as less exam-ready than the same 90% built this week. It's a more honest
 answer to "am I actually ready" than a percentage that never decays, and
 it needed no new data — just a different read on results/seenLog that are
-already recorded. Every Learn/Quiz/Exam view for a track ends with a
+already recorded. Every Path/Practice/Reference/Exam view for a track ends with a
 weighted-mastery breakdown (segment width matches the real exam's category
 emphasis) that also tracks **trend over time**, not just today's snapshot:
 `stats.categoryMasteryHistory` logs one self-correcting daily score per
@@ -307,10 +309,10 @@ bottom:
 
 From inside any track, the track name itself in the header is now a
 button — tapping it opens a **track switcher** (`TrackSwitcherSheet`)
-right there on Learn/Quiz/Exam, no trip back to Home required: your cert
+right there from any tab, no trip back to Home required: your cert
 path listed first (numbered, same order as Home), every other track
 below it, current track highlighted. Picking one always lands you on
-Learn for that track — Quiz/Exam session state isn't built to survive an
+that track's Path — Practice/Exam session state isn't built to survive an
 `activeTrack` swap mid-session, so this sidesteps that instead of risking
 it.
 
@@ -322,14 +324,15 @@ Home, and does what ☰ used to do: takes you all the way back to the Home
 dashboard — a real navigation destination, not a bottom-sheet overlay.
 Navigation is also real client-side routing, not
 just in-memory state: the URL hash always reflects where you are
-(`#/az900/quiz/questions`, `#/home`), so the browser's back/forward
+(`#/az900/practice/questions`, `#/az900/path`, `#/home`), so the browser's back/forward
 buttons walk through actual
 app history instead of doing nothing, and a link straight to a specific
 track+mode+sub-tab lands there directly on load — hash-based rather than
 real paths, deliberately, since a static site with no server has nowhere
 to add the rewrite rule a path router needs for a refreshed deep link to
 resolve, and a hash needs none (see `routeToHash`/`parseHash` in
-`03_helpers.js`). Quiz and Exam missed-question review lists show each question's
+`03_helpers.js`; the old `/learn` and `/quiz` URL segments still resolve to
+Reference and Practice, so existing bookmarks keep working). Practice and Exam missed-question review lists show each question's
 explanation alongside the prompt, not just what you got wrong. A
 hand-picked 66 of the 1263 questions (the genuinely trickiest — multi-
 concept traps, scenario questions with subtly-wrong distractors) also
@@ -346,7 +349,11 @@ exam traps" — real-world context that goes beyond exam scope entirely
 alert fatigue really looks like, HIPAA-adjacent PHI-access realities for
 EHR Integration) rather than pretending to be examinable content.
 
-Quiz mode has a third **Verbal** sub-tab (alongside Questions and Match) —
+Practice's tools (Questions, Compare, Case Study, Mad Libs, Sequence, Match,
+Commands, Verbal) are chosen from one grouped dropdown — Test yourself,
+Games & drills, Hands-free — that only lists what the track supports,
+instead of a row of eight tabs; wherever this README says "sub-tab" for one
+of them, read "practice tool". Verbal is one of those tools —
 hands-free, audio-only studying for e.g. driving. Pick a length and a
 "thinking pause" duration, hit Start, and it reads each question aloud
 (and its options, for multiple-choice), pauses, then reads the correct
@@ -404,7 +411,7 @@ scenario and the grouping are new — so unlike Mad Libs/Sequence above
 individually the same way a regular quiz question is, matching how a real
 case study's questions are graded independently.
 
-Tracks with `COMPARE` content get a **Compare** sub-tab ("choose the
+Tracks with `COMPARE` content get a **Compare** practice tool ("choose the
 more correct answer"): a scenario with two options that are *both*
 plausible, where only one is the better fit — pick it, then read why
 the runner-up falls short. This exercises the best-answer-not-just-a-
@@ -412,6 +419,33 @@ correct-one judgment real Microsoft/CompTIA exams lean on, which plain
 multiple choice can't quite reach. The displayed A/B order is re-
 shuffled per session so position never gives the answer away. Feeds
 mastery %/results the normal way, scored all-or-nothing per item.
+
+The **Path** tab is the default way into a track — a guided, Duolingo-style
+walk through its content instead of choosing among tools yourself. Each
+lesson becomes a unit, and each unit is a run of steps in a deliberately
+mixed order rather than "read everything, then quiz everything": read the
+lesson, flashcards, a quick-check quiz, a mini-game (a Compare, Mad Lib,
+Sequence, or Match round, whichever the unit has), an apply-it scenario with
+the portal mockup and on-the-job note, more flashcards, a longer practice
+quiz, and a unit checkpoint. The order rotates between units so consecutive
+ones don't feel identical. Everything is visible and nothing is locked: a
+"Continue" button always opens the first step you haven't finished, and the
+current unit is open while finished ones fold away. Quiz steps need 70% to
+count (a miss shows the explanations and offers a fresh set), the checkpoint
+mixes the unit with up to three questions you've missed from earlier units,
+and **Already know this? Test out** runs a 10-question check at 80% that
+marks a whole unit done. Once any started unit has missed questions, a
+**Review weak spots** card pulls the longest-neglected ones back — from the
+path and from Practice alike, since both write to the same results.
+Nothing here needs extra authoring: units are built from each lesson's own
+vocab and quiz ids, and every other flashcard, question, Mad Lib, sequence,
+and Compare item in the same categories is handed to exactly one unit
+(round-robin), so every question in a track is reachable from its path. Each
+step reuses an existing view over its own set of items and records through
+the same handlers Practice uses, so mastery, spaced repetition, streaks, the
+daily goal, and achievements need no path-specific scoring. Progress lives
+in `stats.path` and persists and syncs like everything else. See
+`buildPathUnits` and friends in `03_helpers.js` and `04e_path_ui.jsx`.
 
 Every multiple-choice question across all 15 tracks has been through a
 wording-giveaway audit — checking that the correct answer isn't
@@ -488,7 +522,8 @@ src/js/
   04a_home_ui.jsx        — Home, cert path, daily goal/question/vocab, achievements, Data panel
   04b_panels_ui.jsx      — About/Legal, Glossary, term flyout, category filter
   04c_lesson_ui.jsx      — flashcards, Study, cheat sheet, Match game, lesson/course view
-  04d_quiz_ui.jsx        — quiz setup, Verbal Quiz, CLI practice, Mad Libs, Sequence, Compare, Case Study, QuestionView/QuizSummary
+  04d_quiz_ui.jsx        — practice tool picker, quiz setup, Verbal Quiz, CLI practice, Mad Libs, Sequence, Compare, Case Study, QuestionView/QuizSummary
+  04e_path_ui.jsx        — the guided Path tab: unit map, step runners, test-out, weak-spot review
   05_final_exam_ui.jsx   — timed exam intro/runner/results (practice exam + proctored-style Final Mock)
   06_app.jsx             — CertStudyApp, the top-level component
 
