@@ -115,7 +115,7 @@ FLASHCARDS = [
         'id': 'f15',
         'cat': 'architecture',
         'front': 'Resources & resource groups',
-        'back': 'A resource is any deployable item in Azure, like a VM or database. A resource group is a logical container holding related resources, managed and billed together — and can contain resources from more than one region.',
+        'back': 'A resource is any deployable item in Azure, like a VM or database. A resource group is a logical container holding related resources that you deploy, manage, and delete as a group — and can contain resources from more than one region.',
         'detail': "Deleting a resource group deletes everything inside it — a common 'what happens if' exam scenario.",
     },
     {
@@ -228,7 +228,7 @@ FLASHCARDS = [
         'cat': 'architecture',
         'front': 'External identities',
         'back': 'Lets people outside your organization, like partners or customers, sign in using their own identities rather than you creating them a new account in your directory.',
-        'detail': 'This is the answer when a scenario mentions collaborating with an outside company without issuing them internal accounts.',
+        'detail': 'This is the answer when a scenario mentions collaborating with an outside company without issuing them internal accounts. Microsoft Entra External ID is the current product family for this.',
     },
     {
         'id': 'f32',
@@ -262,7 +262,7 @@ FLASHCARDS = [
         'id': 'f36',
         'cat': 'architecture',
         'front': 'Microsoft Defender for Cloud',
-        'back': 'A tool that assesses your security posture across Azure resources and gives recommendations to improve it, plus threat protection for workloads.',
+        'back': 'A tool that assesses your security posture across Azure, hybrid, and other-cloud resources and gives recommendations to improve it, plus threat protection for workloads.',
         'detail': 'Defender for Cloud is narrower and security-specific. Azure Advisor is broader, covering cost, reliability, and performance too.',
     },
     {
@@ -332,8 +332,8 @@ FLASHCARDS = [
         'id': 'f45',
         'cat': 'management',
         'front': 'Azure Advisor',
-        'back': 'A free tool that analyzes your resource configuration and usage, then gives personalized recommendations across cost, security, reliability, and performance.',
-        'detail': 'Advisor is broad (cost, security, reliability, performance). Defender for Cloud is specifically security-focused.',
+        'back': 'A free tool that analyzes your resource configuration and usage, then gives personalized recommendations across cost, security, reliability, operational excellence, and performance.',
+        'detail': 'Advisor is broad (cost, security, reliability, operational excellence, performance). Defender for Cloud is specifically security-focused.',
     },
     {
         'id': 'f46',
@@ -424,14 +424,14 @@ FLASHCARDS = [
         'cat': 'architecture',
         'front': 'Azure CDN vs. Azure Front Door',
         'back': 'Azure CDN caches static content at edge points-of-presence close to users to cut latency. Azure Front Door adds global HTTP(S) load balancing, path-based routing, and an optional Web Application Firewall on top of an edge network, for full web-application delivery, not just static caching.',
-        'detail': "If a scenario needs only 'serve images/video faster worldwide,' that's CDN. If it also needs routing logic or a WAF at the edge, that's Front Door.",
+        'detail': "If a scenario needs only 'serve images/video faster worldwide,' that's CDN. If it also needs routing logic or a WAF at the edge, that's Front Door, which is also where Microsoft is steering new work: Azure CDN Standard from Microsoft (classic) is slated for retirement in 2027.",
     },
     {
         'id': 'f60',
         'cat': 'management',
         'front': 'Azure Cost Management + Billing',
         'back': "The set of tools for analyzing spend (Cost Analysis), setting spending alerts (budgets), and viewing and paying invoices, across one or more subscriptions.",
-        'detail': "This is the actual portal experience behind factors affecting Azure costs — it's where those factors show up as real, analyzable numbers, and where the pricing calculator vs. TCO calculator's estimates get checked against reality.",
+        'detail': "This is where the factors that drive Azure costs show up as real, analyzable numbers, and where the estimates from the Pricing and TCO calculators get checked against what you actually spend.",
     },
     {
         'id': 'f61',
@@ -445,7 +445,7 @@ FLASHCARDS = [
         'cat': 'management',
         'front': 'Azure Well-Architected Framework',
         'back': "Microsoft's guidance for evaluating a workload against five pillars — reliability, security, cost optimization, operational excellence, and performance efficiency — used to weigh trade-offs against each other rather than optimizing just one in isolation.",
-        'detail': "Azure Advisor's recommendations are essentially this framework applied automatically to your actual resources, flagging where a workload falls short on one of these same pillars.",
+        'detail': "Azure Advisor's recommendations are aligned with these same pillars and are generated automatically from your actual resources, flagging where a workload falls short.",
     },
     {
         'id': 'f63',
@@ -458,21 +458,21 @@ FLASHCARDS = [
         'id': 'f64',
         'cat': 'architecture',
         'front': 'Azure Key Vault',
-        'back': "A service for securely storing and tightly controlling access to secrets, encryption keys, and certificates, so they never sit hardcoded in application source code. An app typically authenticates to it using a Managed identity rather than an embedded credential, with access to individual secrets still governed through Microsoft Entra ID and Azure RBAC like any other resource.",
+        'back': "A service for securely storing and tightly controlling access to secrets, encryption keys, and certificates, so they never sit hardcoded in application source code. An app typically authenticates to it using a managed identity rather than an embedded credential, with access to individual secrets still governed through Microsoft Entra ID and Azure RBAC like any other resource.",
         'detail': "Key Vault is the answer whenever a scenario wants to eliminate a hardcoded connection string or API key from source code entirely.",
     },
     {
         'id': 'f65',
         'cat': 'architecture',
         'front': 'Azure Bastion',
-        'back': "A managed service that provides secure RDP and SSH access to virtual machines directly through the Azure portal over TLS, without needing a public endpoint on the VM itself or a client-side VPN. It works alongside a Network security group (NSG) rather than replacing it — the NSG still filters what traffic is allowed to reach the VM's subnet in the first place.",
+        'back': "A managed service that provides secure RDP and SSH access to virtual machines directly through the Azure portal over TLS, without needing a public endpoint on the VM itself or a client-side VPN. It works alongside a network security group (NSG) rather than replacing it — the NSG still filters what traffic is allowed to reach the VM's subnet in the first place.",
         'detail': "Bastion is the answer whenever a scenario wants to remove a VM's exposed public RDP/SSH port while still allowing administrators to connect.",
     },
     {
         'id': 'f66',
         'cat': 'architecture',
         'front': 'Azure Backup',
-        'back': "A managed service that takes scheduled, application-consistent backups of Azure VMs, SQL databases, and other workloads into a Recovery Services vault. Those recovery points are protected using the same Redundancy options — LRS, ZRS, GRS, or RA-GRS — available to any other Storage account, so the vault itself can survive a datacenter or regional failure.",
+        'back': "A managed service that takes scheduled, application-consistent backups of Azure VMs, SQL databases, and other workloads into a Recovery Services vault. Those recovery points are protected by the vault's own storage redundancy setting — LRS, ZRS, or GRS (the default) — so the backup data can survive a datacenter failure, or with GRS a regional one.",
         'detail': "Azure Backup protects data that already exists by restoring it after loss or corruption; it's a different job from Site Recovery, which keeps a whole workload running by replicating it to fail over to.",
     },
 ]
@@ -1955,7 +1955,7 @@ Zero Trust is the security philosophy underlying a lot of this: never assume tru
         'quizIds': ['q27', 'q28', 'q33', 'q29', 'q31', 'msq17'],
         'reading': """Managing an Azure environment day to day means keeping an eye on cost, compliance, and health. Azure Policy enforces configuration rules, like requiring a specific region, and can even block a deployment outright if it doesn't comply. Resource locks add a separate layer of protection on individual resources, preventing accidental deletion or changes regardless of a user's normal permissions.
 
-For cost, the Pricing calculator estimates what planned resources will cost, while the Total Cost of Ownership calculator compares an entire on-premises setup against running it in Azure. Tags make it possible to break spending down by department or project in Cost Management. Azure Advisor rounds this out with free, personalized recommendations across cost, security, reliability, and performance.
+For cost, the Pricing calculator estimates what planned resources will cost, while the Total Cost of Ownership calculator compares an entire on-premises setup against running it in Azure. Tags make it possible to break spending down by department or project in Cost Management. Azure Advisor rounds this out with free, personalized recommendations across cost, security, reliability, operational excellence, and performance.
 
 For health, Azure Monitor tracks your own resources — metrics, logs, and alerts — while Azure Service Health specifically reports on the health of the Azure platform itself, like a regional outage that isn't your fault at all.
 
@@ -1977,7 +1977,7 @@ CHEAT_SHEET = [
     {
         'heading': 'Exam-day strategy',
         'points': [
-            'You have 45 minutes for 50 questions — about 0.9 minutes each on average. Budget more time for multi-part scenario questions and less for straight recall, rather than pacing every question identically.',
+            'Expect roughly 40–60 questions in about 45 minutes of exam time — a bit under a minute each on average. Budget more time for multi-part scenario questions and less for straight recall, rather than pacing every question identically.',
             "Real scoring isn't a flat percentage of questions right (some count for more than others) — treat 75%+ as a safe buffer to aim for, not an exact threshold to just clear.",
             "Flag anything you're unsure of and move on rather than stalling — a question later in the exam can sometimes jog a detail you needed earlier, and you get partial credit for nothing by running out of time on one question.",
             "On multi-select ('choose N') questions, eliminate the options you're confident are wrong first; guessing among 2 plausible answers beats guessing among 4.",
@@ -2027,7 +2027,7 @@ CHEAT_SHEET = [
             'Blob storage = unstructured data (files, media). Disk storage = VM disks. File storage = SMB file shares.',
             'Storage redundancy: LRS (one datacenter) < ZRS (zone) < GRS (paired region, not readable) < RA-GRS (paired region, readable).',
             'Microsoft Entra ID (formerly Azure AD) = identity service; RBAC = who can do what on which resource; Conditional Access = under what conditions access is allowed.',
-            'MFA = something you know + something you have/are — always the strongest single control for compromised passwords.',
+            'MFA = something you know + something you have/are — one of the most effective single controls against compromised passwords.',
         ],
     },
     {
@@ -2036,7 +2036,7 @@ CHEAT_SHEET = [
             'Azure Policy enforces rules (can block non-compliant deployments). Resource locks (Delete/Read-only) just prevent an accidental action.',
             'Pricing calculator estimates cost of planned resources. TCO calculator compares on-premises vs. Azure cost.',
             'Tags enable cost breakdown by department/project in Cost Management.',
-            'Azure Advisor = free personalized recommendations across cost, security, reliability, performance.',
+            'Azure Advisor = free personalized recommendations across cost, security, reliability, operational excellence, performance.',
             'Azure Monitor = health of YOUR resources. Azure Service Health = health of the Azure platform itself.',
         ],
     },
