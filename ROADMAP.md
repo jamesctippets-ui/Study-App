@@ -1316,6 +1316,21 @@ trading away for shinier but shallower ones.
   this work (confirmed on the previous build): the first-render hash
   writer overwrites the incoming hash before the route is applied.
 
+- [ ] **Queued: a "tough terms" flashcard deck (user's request).** Track how
+  each flashcard was last rated (the 1-5 confidence rating already feeds
+  `srs` and `results`) and offer a deck built from every card currently
+  rated 3 ("OK") or below, so the learner can go back through just the
+  terms they find hard. Open design points to settle when building it:
+  a per-track deck on the Reference > Cards screen (and a card on the
+  Path map next to "Review weak spots"); cards leave the deck once they
+  are later rated 4 or 5; the last rating per card needs storing, since
+  `srs` keeps the schedule (interval, ease, reps) rather than the rating
+  itself, and `results` only keeps correct/incorrect.
+- [ ] **Queued: finish the question-hardening pass.** SC-200, SC-500,
+  DP-300, Cloud+, and EHR Integration are not done — their agents were cut
+  off by a session rate limit before finishing and nothing was saved, so
+  they need relaunching. The other ten tracks are merged.
+
 ## 15. Content ideas beyond quiz questions
 
 - [~] **Decided against: a personal mnemonic bank** (a user's own note
