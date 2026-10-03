@@ -665,7 +665,7 @@
         "Export a BACPAC and import it into a new database, then review failures in the import log"
       ],
       "correct": 0,
-      "explanation": "Assessment (the Data Migration Assistant or the Azure SQL Migration extension) surfaces blocking and deprecated features and sizes the target before any data moves, so problems are found while they are cheap to fix. Starting a migration first discovers the same issues mid-flight. A native .bak restore is not supported by Azure SQL Database at all (it works for Managed Instance), so it fails regardless. A BACPAC import is offline and would only reveal incompatibilities after the downtime has started."
+      "explanation": "Assessment (formerly the Data Migration Assistant or the Azure SQL Migration extension, both now retired; today use the assessment experiences in Azure Arc, Azure Migrate, and SSMS) surfaces blocking and deprecated features and sizes the target before any data moves, so problems are found while they are cheap to fix. Starting a migration first discovers the same issues mid-flight. A native .bak restore is not supported by Azure SQL Database at all (it works for Managed Instance), so it fails regardless. A BACPAC import is offline and would only reveal incompatibilities after the downtime has started."
     },
     {
       "id": "q7",
@@ -1548,13 +1548,13 @@
       "type": "mc",
       "question": "A DBA on a macOS laptop must connect to Azure SQL with Microsoft Entra MFA, keep runbook-style notebooks mixing T-SQL and notes, and run a migration assessment of an on-premises server without maintaining a Windows machine. Which tool fits?",
       "options": [
-        "Azure Data Studio with the Azure SQL Migration extension",
+        "Azure Data Studio with the Azure SQL Migration extension (both retired Feb 2026; now the MSSQL extension for VS Code plus Azure Arc, Azure Migrate, and DMS)",
         "SQL Server Management Studio running locally",
-        "The Data Migration Assistant desktop application",
+        "The Data Migration Assistant desktop application (retired July 2025)",
         "Azure Storage Explorer with the SQL extension"
       ],
       "correct": 0,
-      "explanation": "Azure Data Studio runs natively on macOS, supports Entra authentication and notebooks, and its Azure SQL Migration extension performs assessment and migration from the same tool. SSMS and the Data Migration Assistant are Windows applications. Azure Storage Explorer manages blob, file, and queue data and has no T-SQL query or migration assessment capability."
+      "explanation": "Azure Data Studio runs natively on macOS, supports Entra authentication and notebooks, and its Azure SQL Migration extension performed assessment and migration from the same tool; this wording comes from older exam material, since Azure Data Studio and the extension were retired on February 28, 2026, and the current equivalent is the MSSQL extension for Visual Studio Code (cross-platform) together with the migration experiences in Azure Arc, Azure Migrate, and Azure Database Migration Service. SSMS and the Data Migration Assistant (itself retired in July 2025) are Windows applications. Azure Storage Explorer manages blob, file, and queue data and has no T-SQL query or migration assessment capability."
     },
     {
       "id": "tf18",

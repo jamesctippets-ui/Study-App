@@ -795,7 +795,7 @@
       "question": "A team plans to move an on-premises SQL Server with 12 databases to Azure SQL Managed Instance, with minimal downtime at cutover. Which step should the team take FIRST?",
       "options": [
         "Take full backups of every database and restore them to the target with native restore",
-        "Assess the source databases for compatibility blockers, for example with Data Migration Assistant",
+        "Assess the source databases for compatibility blockers, for example with Azure Migrate",
         "Provision a Managed Instance sized to match the source server's CPU and memory",
         "Start an online migration in Database Migration Service and fix errors as they appear"
       ],
@@ -1364,13 +1364,13 @@
       "type": "mc",
       "question": "Backend VMs span all three availability zones, and the application uses a non-HTTP TCP protocol. The load balancer's frontend IP address must stay available if an entire zone fails, with one frontend address for clients. Which configuration meets this?",
       "options": [
-        "A Basic Load Balancer with VMs from all three zones in its backend pool",
+        "A Basic Load Balancer (a retired SKU) with VMs from all three zones in its backend pool",
         "Three Standard Load Balancers, one per zone, behind Traffic Manager",
         "A Standard Load Balancer with a zonal frontend pinned to zone 1",
         "A Standard Load Balancer with a zone-redundant frontend IP configuration"
       ],
       "correct": 3,
-      "explanation": "A zone-redundant frontend IP is served from all zones at once, so a single address keeps working when a zone fails. A zonal frontend lives in one zone, so losing that zone takes the address down even though backends in other zones are healthy. The Basic SKU has no zone support. Three load balancers behind Traffic Manager give three addresses and DNS-based failover, which is more complex and slower than the single zone-redundant address the requirement describes.",
+      "explanation": "A zone-redundant frontend IP is served from all zones at once, so a single address keeps working when a zone fails. A zonal frontend lives in one zone, so losing that zone takes the address down even though backends in other zones are healthy. The Basic SKU (now retired) has no zone support. Three load balancers behind Traffic Manager give three addresses and DNS-based failover, which is more complex and slower than the single zone-redundant address the requirement describes.",
       "whyTested": "This tests the Standard Load Balancer's zone-redundant versus zonal frontend distinction, plus the Basic SKU's lack of zone support. The exam likes to probe whether you know a specific SKU or configuration detail decides zone resilience, rather than treating all load balancer setups as interchangeable."
     },
     {
@@ -1707,7 +1707,7 @@
         "Azure Firewall Basic with application rules"
       ],
       "correct": 0,
-      "explanation": "Only the Premium SKU can decrypt outbound TLS so the contents can be examined, and it adds a signature-based intrusion detection and prevention system (IDPS), both managed centrally in the hub. Standard filters on FQDNs, network rules, and threat intelligence but cannot look inside encrypted payloads. NSG flow logs record who talked to whom and do not inspect content. The Basic SKU is a reduced-feature option intended for small environments."
+      "explanation": "Only the Premium SKU can decrypt outbound TLS so the contents can be examined, and it adds a signature-based intrusion detection and prevention system (IDPS), both managed centrally in the hub. Standard filters on FQDNs, network rules, and threat intelligence but cannot look inside encrypted payloads. NSG flow logs (being retired on 30 September 2027 in favor of virtual network flow logs) record who talked to whom and do not inspect content. The Basic SKU is a reduced-feature option intended for small environments."
     },
     {
       "id": "q57",
@@ -2141,7 +2141,7 @@
       "id": "q74",
       "cat": "infrastructure",
       "type": "mc",
-      "question": "Backend VMs behind a Basic load balancer served public HTTP traffic with no NSG attached anywhere. After the team upgrades to a Standard load balancer and Standard public IP, clients can no longer reach the VMs, though the load-balancing rules are unchanged. What should you do?",
+      "question": "Backend VMs behind a Basic load balancer (a SKU since retired) served public HTTP traffic with no NSG attached anywhere. After the team upgrades to a Standard load balancer and Standard public IP, clients can no longer reach the VMs, though the load-balancing rules are unchanged. What should you do?",
       "options": [
         "Enable HA ports on the load-balancing rule to accept traffic on every port",
         "Add the VMs' NICs to an application security group that names the web tier",
