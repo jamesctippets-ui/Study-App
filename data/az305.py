@@ -56,7 +56,7 @@ FLASHCARDS = [
         'cat': 'identityGovernance',
         'front': "Azure Policy effects: Deny, Audit, and DeployIfNotExists",
         'back': "Deny blocks the creation or update of a noncompliant resource outright. Audit flags noncompliant resources for visibility without blocking anything. DeployIfNotExists automatically remediates by deploying a related resource (like a diagnostic setting) when a required one is missing.",
-        'detail': "Only DeployIfNotExists actively fixes existing noncompliant resources; Audit only reports on them, and Deny only stops new noncompliant ones from being created.",
+        'detail': "Only DeployIfNotExists and Modify can fix resources that are already noncompliant, and only when a remediation task is run; Audit only reports on them, and Deny only stops new noncompliant ones from being created.",
     },
     {
         'id': 'f7',
@@ -125,8 +125,8 @@ FLASHCARDS = [
         'id': 'f16',
         'cat': 'dataStorage',
         'front': "Data Migration Assistant (DMA) vs. Database Migration Service (DMS)",
-        'back': "DMA assesses an on-premises database for compatibility issues and deprecated features before any migration happens. DMS performs the actual migration — online (minimal downtime) or offline — into the target Azure data service.",
-        'detail': "DMA answers \"will this break after we move it?\"; DMS is the tool that actually moves the data once you're ready to go.",
+        'back': "DMA assessed an on-premises database for compatibility issues and deprecated features before any migration happened, but Microsoft retired it on 16 July 2025 and it is no longer available to download. Its assessment role now falls to Azure Migrate (for assessing SQL Server estates at scale) and the SSMS migration component, while Azure Database Migration Service (DMS) performs the actual migration — online (minimal downtime) or offline — into the target Azure data service.",
+        'detail': "Older material still pairs the two tools: the assessment step (\"will this break after we move it?\") came from DMA, while DMS is the service that actually moves the data once you're ready to go.",
     },
     {
         'id': 'f17',
@@ -167,7 +167,7 @@ FLASHCARDS = [
         'id': 'f22',
         'cat': 'businessContinuity',
         'front': "Recovery Services vault",
-        'back': "The container that stores Azure Backup data and Azure Site Recovery replication configuration and metadata. A single vault can hold both backup and Site Recovery items, and the vault's own redundancy setting — LRS, GRS, or Zone-redundant storage (ZRS) — determines whether it survives a regional loss.",
+        'back': "The container that stores Azure Backup data and Azure Site Recovery replication configuration and metadata. A single vault can hold both backup and Site Recovery items, and the vault's own storage redundancy setting (locally redundant, geo-redundant, or zone-redundant) determines whether it survives a regional loss, and only geo-redundant storage keeps a copy in another region.",
         'detail': "It's easy to assume backups automatically survive a regional outage — that depends entirely on the vault's own storage redundancy setting, which is worth checking explicitly.",
     },
     {
@@ -217,7 +217,7 @@ FLASHCARDS = [
         'cat': 'infrastructure',
         'front': "Azure Migrate",
         'back': "The hub service for discovering on-premises servers and workloads, assessing them (right-sizing, readiness, cost estimation), and coordinating the actual migration tools, all before any workload is moved.",
-        'detail': "Azure Migrate is the answer for the discovery-and-assessment phase; the actual data move is often handed off to a more specialized tool like the Database Migration Service.",
+        'detail': "Azure Migrate is the answer for the discovery-and-assessment phase; the actual data move is often handed off to a more specialized tool like Azure Database Migration Service.",
     },
     {
         'id': 'f30',
@@ -273,7 +273,7 @@ FLASHCARDS = [
         'cat': 'dataStorage',
         'front': 'Zone-redundant storage (ZRS)',
         'back': 'Synchronously replicates data across three availability zones within one region, protecting against a datacenter-level failure without the latency or cost of replicating to a second region entirely.',
-        'detail': "This sits between locally-redundant storage (protects against a single rack/disk failure only) and the cross-region options covered under availability zones vs. paired (secondary) regions.",
+        'detail': "ZRS sits between locally-redundant storage, which only protects against a single rack or disk failure, and the cross-region options that add a paired secondary region.",
     },
     {
         'id': 'f38',
@@ -286,21 +286,21 @@ FLASHCARDS = [
         'id': 'f39',
         'cat': 'dataStorage',
         'front': 'Geo-zone-redundant storage (GZRS)',
-        'back': 'Combines zone-redundant storage (ZRS) synchronous replication within the primary region with asynchronous replication to a second, paired region — protecting against both a zone failure and a full regional outage in one redundancy setting.',
-        'detail': "This is the strongest option among storage redundancy: LRS, ZRS, GRS, and GZRS for a design that must survive a regional outage without sacrificing the zone-level durability ZRS already provides day to day.",
+        'back': 'Combines synchronous zone-redundant replication across availability zones in the primary region with asynchronous replication to a second, paired region — protecting against both a zone failure and a full regional outage in one redundancy setting.',
+        'detail': "Of LRS, ZRS, GRS, and GZRS, this is the strongest option for a design that must survive a regional outage without giving up the zone-level durability that ZRS already provides day to day.",
     },
     {
         'id': 'f40',
         'cat': 'identityGovernance',
         'front': 'Diagnostic settings',
         'back': "The configuration on an Azure resource that routes its platform logs and metrics to a destination — a Log Analytics workspace, storage account, or Event Hub — since resource logs aren't collected anywhere by default until a diagnostic setting sends them there.",
-        'detail': "This is the piece a design is missing if Azure Monitor Metrics vs. Logs mentions a log type that never seems to show up anywhere — the resource-level diagnostic setting to actually emit it hasn't been configured.",
+        'detail': "This is the missing piece when a resource log type never seems to show up in Azure Monitor anywhere — the resource-level diagnostic setting that would actually emit it hasn't been configured.",
     },
     {
         'id': 'f41',
         'cat': 'identityGovernance',
         'front': 'Bicep and ARM templates for landing zone deployment',
-        'back': 'Enterprise-scale landing zones are deployed and updated as Infrastructure as Code (IaC) — Bicep or ARM templates, sometimes Terraform — rather than clicked together in the portal, so the same governed baseline (Azure landing zones) can be redeployed consistently across subscriptions and re-applied whenever the reference architecture changes.',
+        'back': 'Enterprise-scale landing zones are deployed and updated as infrastructure as code — Bicep or ARM templates, sometimes Terraform — rather than clicked together in the portal, so the same governed baseline can be redeployed consistently across subscriptions and re-applied whenever the reference architecture changes.',
         'detail': "Treating a landing zone's own definition as IaC means a change to policy or hub networking gets tested and versioned like any other code change, instead of being a one-off manual edit to a subscription that already exists.",
     },
     {
@@ -314,35 +314,35 @@ FLASHCARDS = [
         'id': 'f43',
         'cat': 'identityGovernance',
         'front': 'Azure Resource Graph',
-        'back': 'Resource Graph queries resource metadata (type, location, tags, configuration) across many subscriptions at once using a Kusto-like query language, letting an architect audit governance and compliance for management groups, subscriptions, and resource groups without opening each one individually in the portal.',
+        'back': 'Resource Graph queries resource metadata (type, location, tags, configuration) across many subscriptions at once using a Kusto-like query language, letting an architect audit governance and compliance across management groups, subscriptions, and resource groups without opening each one individually in the portal.',
         'detail': 'This is read-only inventory and querying — Azure Policy is still the tool that actually enforces or remediates what Resource Graph merely reports on.',
     },
     {
         'id': 'f44',
         'cat': 'infrastructure',
         'front': 'Network Watcher',
-        'back': 'Network Watcher provides network-level diagnostic tools — IP flow verify (is a specific rule allowing or blocking a flow), NSG flow logs (a record of every evaluated flow), and Connection Troubleshoot (an end-to-end reachability test) — for troubleshooting connectivity issues after a network is already built.',
+        'back': 'Network Watcher provides network-level diagnostic tools — IP flow verify (is a specific rule allowing or blocking a flow), flow logs (a record of the traffic flowing through a network; NSG flow logs are being retired on 30 September 2027 in favor of virtual network flow logs), and Connection Troubleshoot (an end-to-end reachability test) — for troubleshooting connectivity issues after a network is already built.',
         'detail': 'These are diagnostic tools for an existing network, not design-time governance controls — Azure landing zones and Azure Policy govern how a network gets built and configured in the first place.',
     },
     {
         'id': 'f45',
         'cat': 'infrastructure',
         'front': 'Azure Bastion',
-        'back': "A managed service that provides browser-based RDP or SSH access to a VM through the Azure portal over TLS, without ever requiring a public IP address on the target VM itself. Bastion must be deployed into a dedicated AzureBastionSubnet within a VNet — commonly the hub VNet in a hub-and-spoke network topology — and it's a complementary layer, not a replacement, for the network security group (NSG) vs. Azure Firewall filtering that still protects those same VMs.",
+        'back': "A managed service that provides browser-based RDP or SSH access to a VM through the Azure portal over TLS, without ever requiring a public IP address on the target VM itself. In its standard deployment, Bastion lives in a dedicated subnet named AzureBastionSubnet within a VNet — commonly the hub VNet of a hub-and-spoke topology — and it is a complementary layer, not a replacement, for the NSG and Azure Firewall filtering that still protects those same VMs.",
         'detail': "Removing the VM's public IP closes one attack surface, but it doesn't make NSG rules optional — layered defense still applies with Bastion in place, not instead of it.",
     },
     {
         'id': 'f46',
         'cat': 'dataStorage',
         'front': 'Blob storage lifecycle management policy',
-        'back': "A rule-based policy on a storage account that automatically moves blobs between access tiers: Hot, Cool, Cold, and Archive as they age, and deletes them once a defined retention period ends, all without anyone manually re-tiering or cleaning up data by hand. This is what actually enforces a cost-driven access-tier strategy over time, rather than a one-time manual tier assignment made only at upload.",
+        'back': "A rule-based policy on a storage account that automatically moves blobs down through the Hot, Cool, Cold, and Archive access tiers as they age, and deletes them once a defined retention period ends, all without anyone manually re-tiering or cleaning up data by hand. This is what actually enforces a cost-driven tiering strategy over time, rather than a one-time manual tier assignment made only at upload.",
         'detail': "A lifecycle policy is what actually delivers on the cost promise of Archive tier in practice — without one, data that should have aged into a cheaper tier months ago just sits in Hot, quietly costing more than it needs to.",
     },
     {
         'id': 'f47',
         'cat': 'infrastructure',
         'front': "Migration strategies: the 5 R's",
-        'back': "A shorthand for the range of ways a workload can move to the cloud, from least to most change: Rehost (lift-and-shift, minimal change), Refactor/re-platform (small optimizations, like moving to a managed database), Rearchitect (redesign for cloud-native scale), Rebuild (start over cloud-native), and Retire (decommission it instead of moving it at all). Azure Migrate is the tool that typically drives the discovery and assessment deciding which of these five paths actually fits a given workload.",
+        'back': "A shorthand for the range of ways a workload can move to the cloud, from least to most change: Rehost (lift-and-shift, minimal change), Refactor/re-platform (small optimizations, like moving to a managed database), Rearchitect (redesign for cloud-native scale), Rebuild (start over cloud-native), and Replace (swap it for a SaaS product instead of moving it at all). Azure Migrate typically drives the discovery and assessment that decides which of these five paths actually fits a given workload.",
         'detail': "A design question that only ever considers Rehost is missing the point of the framework — the 5 R's exist specifically because different workloads justify different amounts of change, and picking the same strategy for everything usually means either overpaying for cloud-native rework nobody needed, or under-investing in a workload that would have benefited from it.",
     },
     {
@@ -356,35 +356,35 @@ FLASHCARDS = [
         'id': 'f49',
         'cat': 'identityGovernance',
         'front': "Azure Policy initiative (policy set definition)",
-        'back': "An initiative groups multiple individual policy definitions into a single assignable unit with a shared set of parameters, so an organization can assign, track compliance for, and manage many related policies — such as tagging, allowed resource types, and encryption requirements — together instead of as separate assignments. An initiative can bundle policies using any of the effects described in Azure Policy effects: Deny, Audit, and DeployIfNotExists into one assignable set.",
+        'back': "An initiative groups multiple individual policy definitions into a single assignable unit with a shared set of parameters, so an organization can assign, track compliance for, and manage many related policies — such as tagging, allowed resource types, and encryption requirements — together instead of as separate assignments. The bundled policies can use any mix of effects, such as Deny, Audit, and DeployIfNotExists, within the one assignable set.",
         'detail': "Built-in initiatives are commonly what actually get assigned at a management group scope, so a whole bundled set of controls applies consistently to every subscription underneath, rather than assigning 15 separate policies by hand to each one.",
     },
     {
         'id': 'f50',
         'cat': 'identityGovernance',
         'front': "Break-glass emergency access accounts",
-        'back': "A small number of cloud-only, non-federated accounts with strong credentials, deliberately excluded from Conditional Access policies and closely monitored, kept specifically so an administrator can still sign in if a Conditional Access misconfiguration or an MFA outage locks everyone else out. These accounts are the deliberate exception carved out of every Conditional Access vs. multifactor authentication (MFA) policy in the tenant.",
-        'detail': "Excluding these accounts from Conditional Access isn't a security gap — it's the one deliberate exception that keeps the whole tenant from being permanently locked out by its own policies.",
+        'back': "A small number of cloud-only, non-federated accounts protected by strong, preferably phishing-resistant credentials (such as FIDO2 passkeys or certificate-based authentication), closely monitored, and kept specifically so an administrator can still sign in if a Conditional Access misconfiguration or an MFA outage locks everyone else out. They are the deliberate exception that is typically excluded from the tenant's Conditional Access policies, so those policies can never lock them out.",
+        'detail': "Excluding these accounts from Conditional Access isn't a security gap — it's the one deliberate exception that keeps the whole tenant from being permanently locked out by its own policies, which is why their own credentials need to be strong and their sign-ins alerted on.",
     },
     {
         'id': 'f51',
         'cat': 'dataStorage',
         'front': "Cosmos DB APIs: Core (SQL), MongoDB, Cassandra, Gremlin, and Table",
-        'back': "Cosmos DB is a multi-model service, and the API chosen determines the data model and drivers an application uses: Core (SQL) for native JSON documents with SQL-like queries, MongoDB for wire-protocol compatibility with existing MongoDB apps, Cassandra for existing Cassandra workloads, Gremlin for graph data and traversal queries, and Table for a premium, higher-scale replacement for Azure Table storage. Cosmos DB consistency levels and Cosmos DB partition key design apply the same way no matter which API is chosen.",
+        'back': "Cosmos DB is a multi-model service, and the API chosen determines the data model and drivers an application uses: Core (SQL), now branded the API for NoSQL, for native JSON documents with SQL-like queries, MongoDB for wire-protocol compatibility with existing MongoDB apps, Cassandra for existing Cassandra workloads, Gremlin for graph data and traversal queries, and Table for a premium, higher-scale replacement for Azure Table storage. Consistency levels and partition key design apply the same way no matter which API is chosen.",
         'detail': "Picking the API isn't just a syntax preference — it's what lets an existing MongoDB or Cassandra application move to Cosmos DB with minimal code changes, since the wire protocol stays compatible.",
     },
     {
         'id': 'f52',
         'cat': 'dataStorage',
         'front': "Azure Database for PostgreSQL / MySQL Flexible Server",
-        'back': "Fully managed, open-source relational database hosting with built-in high availability (zone-redundant or same-zone), granular control over maintenance windows, and lower cost than the older single-server deployment option it has largely superseded. This sits alongside Azure SQL Database vs. Managed Instance vs. SQL Server on a VM as the equivalent hosting choice for open-source engines instead of SQL Server.",
+        'back': "Fully managed, open-source relational database hosting with built-in high availability (zone-redundant or same-zone), granular control over maintenance windows, and lower cost than the older Single Server deployment option, which Microsoft has retired (PostgreSQL Single Server on 28 March 2025 and MySQL Single Server on 16 September 2024). It is the hosting choice for open-source engines, much as Azure SQL Database, Managed Instance, or SQL Server on a VM are the choices for SQL Server.",
         'detail': "This is the answer whenever a scenario needs to migrate an existing PostgreSQL or MySQL application to Azure while keeping the same open-source engine, rather than rewriting it against Azure SQL Database or Cosmos DB.",
     },
     {
         'id': 'f53',
         'cat': 'dataStorage',
         'front': "Blob storage immutability policies (WORM)",
-        'back': "A time-based immutability policy enforces write-once, read-many (WORM) protection on blobs, preventing modification or deletion until a set retention period elapses. In locked mode, not even an account administrator can shorten the retention period or remove the policy before it expires. This is a stronger, prevention-based guarantee than a Blob storage lifecycle management policy, which only automates tiering and deletion over time rather than blocking either outright.",
+        'back': "A time-based immutability policy enforces write-once, read-many (WORM) protection on blobs, preventing modification or deletion until a set retention period elapses. In locked mode, not even an account administrator can shorten the retention period or remove the policy before it expires. This is a stronger, prevention-based guarantee than a lifecycle management policy, which only automates tiering and deletion over time rather than blocking either outright.",
         'detail': "A regulatory requirement that data be genuinely undeletable until a retention period ends calls for a locked immutability policy specifically, not just soft delete, which still permits eventual deletion.",
     },
     {
@@ -398,7 +398,7 @@ FLASHCARDS = [
         'id': 'f55',
         'cat': 'businessContinuity',
         'front': "Availability sets: fault domains and update domains",
-        'back': "An availability set spreads VMs across fault domains (separate physical racks with independent power and network, protecting against hardware failure) and update domains (groups that Azure patches and reboots at different times, protecting against planned maintenance), all within a single datacenter. This operates at a narrower scope than Availability zones vs. paired (secondary) regions — protecting against rack-level and maintenance-level failure inside one datacenter, not the loss of the datacenter itself.",
+        'back': "An availability set spreads VMs across fault domains (separate physical racks with independent power and network, protecting against hardware failure) and update domains (groups that Azure patches and reboots at different times, protecting against planned maintenance), all within a single datacenter. This is a narrower scope of protection than availability zones or a paired secondary region: it covers rack-level and maintenance-level failure inside one datacenter, not the loss of the datacenter itself.",
         'detail': "An availability set is the lighter-weight, single-datacenter alternative to spreading VMs across availability zones, worth reaching for when a scenario explicitly doesn't need datacenter-level protection.",
     },
     {
@@ -412,21 +412,21 @@ FLASHCARDS = [
         'id': 'f57',
         'cat': 'businessContinuity',
         'front': "Backup retention: the grandfather-father-son (GFS) pattern",
-        'back': "A common backup retention design that keeps daily backups (son) for a short window, weekly backups (father) for a medium window, and monthly or yearly backups (grandfather) for the longest window, balancing storage cost against how far back a restore point needs to reach. This retention design is configured on an Azure Backup policy, the same service covered in Azure Backup vs. Azure Site Recovery, not on Site Recovery's replication settings.",
+        'back': "A common backup retention design that keeps daily backups (son) for a short window, weekly backups (father) for a medium window, and monthly or yearly backups (grandfather) for the longest window, balancing storage cost against how far back a restore point needs to reach. This retention design is configured on an Azure Backup policy, not on Azure Site Recovery's replication settings.",
         'detail': "Azure Backup policies implement this by letting daily, weekly, monthly, and yearly retention rules be configured independently on the same policy, rather than keeping every daily recovery point forever.",
     },
     {
         'id': 'f58',
         'cat': 'businessContinuity',
         'front': "Azure Site Recovery test failover",
-        'back': "Spins up recovered VMs in an isolated network specifically to validate that replicated data is recoverable, without touching production traffic or the live replication itself. This is a feature of Azure Site Recovery specifically, the same service covered in Azure Backup vs. Azure Site Recovery, not of Azure Backup.",
+        'back': "Spins up recovered VMs in an isolated network specifically to validate that replicated data is recoverable, without touching production traffic or the live replication itself. This is a feature of Azure Site Recovery specifically, not of Azure Backup.",
         'detail': "Running the test into an isolated virtual network, not the production VNet, avoids IP address and naming conflicts with the still-running primary VMs during the drill.",
     },
     {
         'id': 'f59',
         'cat': 'infrastructure',
         'front': "Azure DNS: public zones vs. Private DNS zones",
-        'back': "A public DNS zone hosts a domain's records for internet-wide resolution. A Private DNS zone resolves names only within one or more linked virtual networks, commonly used to give a private endpoint a friendly name that still resolves to its private IP address instead of its public one. This is the missing piece referenced under Private endpoint vs. service endpoint: without a linked Private DNS zone, a private endpoint's normal hostname won't automatically resolve to its private IP address.",
+        'back': "A public DNS zone hosts a domain's records for internet-wide resolution. A Private DNS zone resolves names only within one or more linked virtual networks, commonly used to give a private endpoint a friendly name that still resolves to its private IP address instead of its public one. This is the usual missing piece in a private endpoint design: without a linked Private DNS zone, a private endpoint's normal hostname won't automatically resolve to its private IP address.",
         'detail': "A private endpoint needs a linked Private DNS zone to make its private IP resolve automatically for VNet-based clients — without one, an application would have to be reconfigured to use the private endpoint's raw IP address directly.",
     },
     {
@@ -447,7 +447,7 @@ FLASHCARDS = [
         'id': 'f62',
         'cat': 'infrastructure',
         'front': "Virtual Machine Scale Sets (VMSS)",
-        'back': "Manages a group of identical, load-balanced VMs as a single resource, automatically adding or removing instances based on autoscale rules — the VM-based equivalent of scaling out an App Service plan, but for IaaS workloads that need full OS control. Depending on how it's configured, a scale set's instances can be spread across Availability sets: fault domains and update domains within one datacenter, or across multiple availability zones.",
+        'back': "Manages a group of identical, load-balanced VMs as a single resource, automatically adding or removing instances based on autoscale rules — the VM-based equivalent of scaling out an App Service plan, but for IaaS workloads that need full OS control. Depending on how it's configured, a scale set's instances can be spread across fault domains within one datacenter, or across multiple availability zones.",
         'detail': "Combining autoscaling with either of those resiliency layouts means a scale set can absorb both a traffic spike and a rack- or zone-level failure without any manual intervention.",
     },
     {
@@ -468,7 +468,7 @@ FLASHCARDS = [
         'id': 'f65',
         'cat': 'dataStorage',
         'front': "Azure Data Factory vs. Synapse pipelines for data integration",
-        'back': "Azure Data Factory is a standalone, code-free ETL/ELT orchestration service for moving and transforming data across on-premises and cloud sources with a large library of connectors. Synapse pipelines provide that same underlying pipeline engine and designer experience, but built directly inside Azure Synapse Analytics, alongside Azure Synapse Analytics: serverless vs. dedicated SQL pools and Spark pools in one unified workspace.",
+        'back': "Azure Data Factory is a standalone, code-free ETL/ELT orchestration service for moving and transforming data across on-premises and cloud sources with a large library of connectors. Synapse pipelines provide that same underlying pipeline engine and designer experience, but built directly inside Azure Synapse Analytics, alongside its serverless and dedicated SQL pools and Spark pools in one unified workspace.",
         'detail': "Choosing Synapse pipelines over a standalone Data Factory instance is mainly about workspace consolidation — keeping ingestion, transformation, and querying together in one Synapse workspace — rather than a difference in the underlying orchestration capability itself.",
     },
     {
@@ -538,7 +538,7 @@ FLASHCARDS = [
         'id': 'f75',
         'cat': 'infrastructure',
         'front': "Azure Private Link service vs. private endpoint",
-        'back': "A private endpoint, covered under Private endpoint vs. service endpoint, is how a consumer privately reaches an existing PaaS resource. Azure Private Link service is the other side of that same mechanism: it lets an organization publish its own service, running behind a Standard Load Balancer, so that other VNets, or even other tenants, can connect to it through a private endpoint of their own, without that traffic ever crossing the public internet.",
+        'back': "A private endpoint is how a consumer privately reaches an existing PaaS resource. Azure Private Link service is the other side of that same mechanism: it lets an organization publish its own service, running behind a Standard Load Balancer, so that other VNets, or even other tenants, can connect to it through a private endpoint of their own, without that traffic ever crossing the public internet.",
         'detail': "A scenario about privately consuming someone else's PaaS resource needs a private endpoint; a scenario about an organization privately exposing its own custom service to outside consumers needs Private Link service on the provider's side.",
     },
     {
@@ -552,8 +552,8 @@ FLASHCARDS = [
         'id': 'f77',
         'cat': 'infrastructure',
         'front': "Load Balancer SKUs: Basic vs. Standard",
-        'back': "The Basic SKU has no SLA, no zone redundancy, no outbound rules of its own, and is open by default, allowing inbound traffic even with no NSG attached. The Standard SKU adds a 99.99% SLA, supports a zone-redundant frontend IP, provides explicit outbound rules to manage SNAT port allocation, and is secure by default, blocking all inbound traffic unless an NSG explicitly allows it.",
-        'detail': "That last difference catches teams off guard migrating from Basic to Standard: VMs that were reachable with no NSG at all under Basic suddenly become unreachable under Standard until an explicit allow rule is added, since Standard assumes nothing is allowed until an NSG says otherwise.",
+        'back': "The Basic SKU was retired on 30 September 2025 (new deployments were blocked after 31 March 2025), so Standard is the only SKU to design with. Basic had no SLA, no zone redundancy, no outbound rules of its own, and was open by default, allowing inbound traffic even with no NSG attached. The Standard SKU adds a 99.99% SLA, supports a zone-redundant frontend IP, provides explicit outbound rules to manage SNAT port allocation, and is secure by default, blocking all inbound traffic unless an NSG explicitly allows it.",
+        'detail': "That last difference catches teams off guard when upgrading an existing Basic load balancer to Standard: VMs that were reachable with no NSG at all under Basic suddenly become unreachable under Standard until an explicit allow rule is added, since Standard assumes nothing is allowed until an NSG says otherwise.",
     },
 ]
 
@@ -2089,7 +2089,7 @@ LESSONS = [
         'quizIds': ['q1', 'q2', 'tf1', 'tf2', 'msq1', 'q6', 'q48', 'q32', 'q52'],
         'reading': """A design that touches identity almost always starts with how users actually sign in, and for an organization with an on-premises Active Directory, that means choosing among password hash sync, pass-through authentication, and federation. Password hash sync replicates a hash of each user's on-premises password hash up to Microsoft Entra ID, so sign-in keeps working even if on-premises infrastructure has a brief outage — Entra ID can validate the sign-in entirely on its own. Pass-through authentication instead validates every sign-in against on-premises Active Directory in real time through a lightweight agent, which means no password data is ever stored in the cloud, but it also means sign-in stops working if every authentication agent happens to be offline at once. Federation goes further still, handing authentication off entirely to an on-premises identity provider such as AD FS — useful when an organization has authentication requirements Entra ID can't satisfy on its own, at the cost of taking on and operating that federation infrastructure.
 
-Once someone is authenticated, Conditional Access decides the conditions under which they're actually allowed to sign in — evaluating signals like the user, their device, their location, and a calculated risk score, then responding with a control. MFA is one of the controls Conditional Access can enforce, not a separate policy engine sitting next to it — a well-designed set of Conditional Access policies might require MFA only for risky sign-ins or unmanaged devices, rather than for absolutely everyone regardless of context. Because a Conditional Access misconfiguration could lock out every administrator at once, well-designed tenants also keep a small, tightly monitored emergency-access account deliberately excluded from those same Conditional Access policies — not a security hole, but the one guaranteed way in if the main policies ever misfire.
+Once someone is authenticated, Conditional Access decides the conditions under which they're actually allowed to sign in — evaluating signals like the user, their device, their location, and a calculated risk score, then responding with a control. MFA is one of the controls Conditional Access can enforce, not a separate policy engine sitting next to it — a well-designed set of Conditional Access policies might require MFA only for risky sign-ins or unmanaged devices, rather than for absolutely everyone regardless of context. Because a Conditional Access misconfiguration could lock out every administrator at once, well-designed tenants also keep a small, tightly monitored emergency-access account, typically excluded from those same Conditional Access policies and protected by strong, ideally phishing-resistant credentials such as a FIDO2 passkey — not a security hole, but the one guaranteed way in if the main policies ever misfire.
 
 Even with strong sign-in and Conditional Access controls in place, most organizations still don't want administrators walking around with permanent, standing access to privileged roles. Privileged Identity Management (PIM) solves that by making privileged role membership something you activate — just-in-time and time-bound, optionally requiring approval and a written justification — rather than something that sits active on an account all day, every day, whether or not it's actually being used. PIM and Conditional Access are commonly layered together, such as requiring MFA (a Conditional Access control) as a condition of actually activating a PIM-eligible role.
 
@@ -2113,7 +2113,7 @@ Standing access outside of privileged roles gets managed differently, and this i
         'diagram': 'hierarchy',
         'vocabIds': ['f5', 'f6', 'f7', 'f8', 'f9', 'f35', 'f36', 'f40', 'f42', 'f43'],
         'quizIds': ['q3', 'q4', 'q5', 'q7', 'q8', 'msq2', 'msq3', 'tf11', 'q40'],
-        'reading': """At the largest scale, Azure's resource hierarchy exists so governance can be set once and inherit downward instead of being repeated everywhere. Management groups sit above subscriptions, letting an organization apply a single Azure Policy assignment or RBAC role once at the top and have it flow down to every subscription, resource group, and resource underneath — a conglomerate with independently run subsidiaries can still give each one its own policy and RBAC boundary at the subscription level while sharing a small set of mandatory controls, like required tags, applied once at a shared management group above them all. Azure Policy itself has several effects worth telling apart: Deny blocks a noncompliant resource from being created or updated at all; Audit flags noncompliant resources for visibility without blocking anything; and DeployIfNotExists actively remediates by deploying something like a missing diagnostic setting whenever a required one isn't already there. Only DeployIfNotExists reaches back and fixes resources that are already noncompliant — Audit only reports on them, and Deny only stops new ones.
+        'reading': """At the largest scale, Azure's resource hierarchy exists so governance can be set once and inherit downward instead of being repeated everywhere. Management groups sit above subscriptions, letting an organization apply a single Azure Policy assignment or RBAC role once at the top and have it flow down to every subscription, resource group, and resource underneath — a conglomerate with independently run subsidiaries can still give each one its own policy and RBAC boundary at the subscription level while sharing a small set of mandatory controls, like required tags, applied once at a shared management group above them all. Azure Policy itself has several effects worth telling apart: Deny blocks a noncompliant resource from being created or updated at all; Audit flags noncompliant resources for visibility without blocking anything; and DeployIfNotExists actively remediates by deploying something like a missing diagnostic setting whenever a required one isn't already there. Only DeployIfNotExists and Modify can reach back and fix resources that are already noncompliant, by running a remediation task — Audit only reports on them, and Deny only stops new ones.
 
 Rather than building this governance structure by hand for every new environment, Azure landing zones give an organization a pre-provisioned, consistent starting point — the management group hierarchy, policy assignments, identity foundations, and hub networking already built, so every new subscription lands into a governed environment from day one instead of each team configuring governance independently. Landing zones are the concrete, deployable implementation of the Cloud Adoption Framework (CAF), Microsoft's broader methodology for an organization's whole cloud journey — strategy, readiness, adoption, governance, and ongoing management. Where CAF and landing zones shape how an environment gets built, the Azure Well-Architected Framework shapes how any individual workload's design gets evaluated afterward, across five pillars: reliability, security, cost optimization, operational excellence, and performance efficiency. A lot of AZ-305 scenario questions are really asking which of those five pillars a particular requirement is prioritizing, since a design can rarely maximize all five pillars at once.
 
@@ -2124,7 +2124,7 @@ Once that telemetry is flowing, Azure Monitor splits it into two different tools
         'fundamentals': "Think of the management group hierarchy the way a franchise chain sets policy. Corporate sets a handful of non-negotiable rules once, at the top, and every franchise location inherits them automatically without corporate having to visit each location individually — while each location owner still runs their own day-to-day operations underneath that shared umbrella. A landing zone is like corporate handing a brand-new franchisee a fully built-out store, already up to code and already carrying the corporate signage, instead of making them build the whole space from an empty lot themselves.",
         'keyTerms': ['management groups', 'Azure Policy', 'landing zones', 'Cloud Adoption Framework (CAF)', 'Well-Architected Framework', 'Log Analytics workspace', 'diagnostic setting', 'Metrics', 'Logs', 'Azure Advisor', 'Resource Graph'],
         'commonTraps': [
-            "Only DeployIfNotExists actively fixes existing noncompliant resources — Audit only reports on them, and Deny only blocks new ones from being created.",
+            "Only DeployIfNotExists and Modify can fix existing noncompliant resources (through a remediation task) — Audit only reports on them, and Deny only blocks new ones from being created.",
             "A landing zone is the deployable environment; the Cloud Adoption Framework is the broader strategy and methodology it implements — they aren't interchangeable terms for the same thing.",
             "Reaching for Logs and KQL for a simple, fast threshold alert adds unnecessary query latency — that's what Metrics and alert rules are for.",
             "A resource's logs aren't collected anywhere by default — a diagnostic setting has to be configured on that resource to actually send them to a destination.",
@@ -2145,7 +2145,7 @@ For non-relational, globally distributed data, Cosmos DB exposes five consistenc
 
 Storage redundancy answers a different question: how many copies of your data exist, and how far apart are they? Locally-redundant storage (LRS) keeps three synchronous copies within one datacenter — the cheapest option, but it only survives a hardware-level failure. Zone-redundant storage (ZRS) spreads those synchronous copies across availability zones within the same region instead, surviving the loss of an entire datacenter without the cost or latency of replicating to a second region. Geo-redundant storage (GRS) asynchronously replicates to a paired secondary region, without any zone redundancy in the primary region itself, while geo-zone-redundant storage (GZRS) combines both — zone redundancy at home and geo-replication to a second region — for the strongest protection available. Only the read-access ("RA-") variants of GRS or GZRS actually let an application read from that secondary region before a real failover ever happens.
 
-Everyday storage management layers a few more decisions on top. Access tiers trade storage cost against retrieval cost and speed: Hot suits data you touch constantly, at the highest storage cost and cheapest access; Cool and Cold suit infrequently accessed data; and Archive is the cheapest tier of all, but blobs have to be rehydrated, a process that can take hours, before they can be read again — the right pick when cost matters more than instant access, never when data needs to be readable at a moment's notice. For large-scale analytics, Azure Data Lake Storage Gen2 is Blob storage with a hierarchical namespace turned on, giving engines like Synapse or Databricks POSIX-like access control and efficient directory-level operations instead of flat object storage. When it's time to actually migrate a database, Data Migration Assistant assesses an on-premises database for compatibility issues before anything moves, while Database Migration Service performs the real migration, online or offline, once you're ready — DMA answers "will this break after we move it," DMS is the tool that actually moves it. And for reaching a PaaS data service privately, a private endpoint gives it a private IP address inside your VNet, reachable even from on-premises networks over ExpressRoute or a VPN, while a service endpoint keeps the public IP in place and only optimizes and restricts routing for traffic that already starts inside the VNet — only a private endpoint reaches a PaaS service privately from on-premises.""",
+Everyday storage management layers a few more decisions on top. Access tiers trade storage cost against retrieval cost and speed: Hot suits data you touch constantly, at the highest storage cost and cheapest access; Cool and Cold suit infrequently accessed data; and Archive is the cheapest tier of all, but blobs have to be rehydrated, a process that can take hours, before they can be read again — the right pick when cost matters more than instant access, never when data needs to be readable at a moment's notice. For large-scale analytics, Azure Data Lake Storage Gen2 is Blob storage with a hierarchical namespace turned on, giving engines like Synapse or Databricks POSIX-like access control and efficient directory-level operations instead of flat object storage. When it's time to actually migrate a database, the work splits into assessment and movement. The assessment step checks an on-premises database for compatibility issues before anything moves — historically the job of Data Migration Assistant (DMA), which Microsoft retired on 16 July 2025, with Azure Migrate and the SSMS migration component now covering that ground. Azure Database Migration Service (DMS) then performs the real migration, online or offline, once you're ready — assessment answers "will this break after we move it," and DMS is the service that actually moves it. And for reaching a PaaS data service privately, a private endpoint gives it a private IP address inside your VNet, reachable even from on-premises networks over ExpressRoute or a VPN, while a service endpoint keeps the public IP in place and only optimizes and restricts routing for traffic that already starts inside the VNet — only a private endpoint reaches a PaaS service privately from on-premises.""",
         'fundamentalsLabel': 'New to Azure data platform trade-offs? See the everyday analogy',
         'fundamentals': "Choosing between Azure SQL Database, Managed Instance, and SQL Server on a VM is like choosing an apartment, a townhouse, or a standalone house: the apartment (Azure SQL Database) has the least upkeep but the least customization; the townhouse (Managed Instance) gives you more of your own space and rules while someone else still handles the roof and the plumbing; the house (a VM) gives total control, but you're the one calling a repair person, or being one, for every single thing that breaks. Storage redundancy is like deciding how many copies of your family photos to keep, and how far apart: one copy in a drawer (LRS) protects against a spill, copies split across two rooms of the same house (ZRS) protect against a room flooding, and a copy at a relative's house in another city (GRS/GZRS) is the only thing that survives the whole house burning down.",
         'keyTerms': ['Azure SQL Database', 'Managed Instance', 'Cosmos DB', 'consistency levels', 'partition key', 'LRS', 'ZRS', 'GRS', 'GZRS', 'access tiers', 'Archive', 'private endpoint', 'service endpoint'],
@@ -2155,8 +2155,8 @@ Everyday storage management layers a few more decisions on top. Access tiers tra
             "Plain GRS replicates to a secondary region, but that copy isn't readable until an actual failover — only the read-access (RA-) variants can be read from directly beforehand.",
             "A service endpoint only optimizes traffic that already starts inside the VNet — reaching a PaaS resource privately from on-premises specifically requires a private endpoint.",
         ],
-        'scenario': "A healthcare analytics company is migrating an on-premises SQL Server database that relies on SQL Agent jobs and needs its Data Lake Storage Gen2 account reachable privately from its on-premises network over ExpressRoute. It runs Data Migration Assistant first to catch compatibility issues, then targets SQL Managed Instance rather than Azure SQL Database, since Managed Instance supports SQL Agent jobs while still avoiding OS management, and uses Database Migration Service for the actual online migration. For its Cosmos DB telemetry store, it redesigns a low-cardinality partition key that was creating a hot partition, and keeps Session consistency since each device needs to see its own latest writes immediately. Its storage account is configured for GZRS, protecting both against a single datacenter's loss and a full regional outage, with a lifecycle policy moving telemetry older than a year into Archive tier, and a private endpoint — not a service endpoint — providing the required private, on-premises reachability.",
-        'onTheJob': "Choosing Managed Instance over Azure SQL Database because of SQL Agent jobs is a decision an architect often has to defend twice — once to a DBA team attached to its legacy tooling, and again to a finance stakeholder who sees the bigger line item and assumes it's over-engineering. GZRS and an Archive-tier lifecycle policy look great in a cost-optimization slide until a client remembers that rehydrating archived data takes hours, at which point the real conversation becomes what data can actually tolerate that delay versus what the business insists it can't. Partition key redesign for Cosmos DB is the kind of fix that's cheap on a whiteboard and genuinely painful in production, since it usually means a data migration the client didn't budget for when they signed off on the original design. A Data Migration Assistant report that comes back clean is also not the same thing as a guaranteed-compatible migration — CLR assemblies, specific SQL Agent proxy accounts, and other instance-level quirks DMA doesn't fully evaluate are exactly why a real proof-of-concept restore into a non-production Managed Instance is worth doing even after a spotless assessment.",
+        'scenario': "A healthcare analytics company is migrating an on-premises SQL Server database that relies on SQL Agent jobs and needs its Data Lake Storage Gen2 account reachable privately from its on-premises network over ExpressRoute. It runs a compatibility assessment first (through Azure Migrate), then targets SQL Managed Instance rather than Azure SQL Database, since Managed Instance supports SQL Agent jobs while still avoiding OS management, and uses Azure Database Migration Service for the actual online migration. For its Cosmos DB telemetry store, it redesigns a low-cardinality partition key that was creating a hot partition, and keeps Session consistency since each device needs to see its own latest writes immediately. Its storage account is configured for GZRS, protecting both against a single datacenter's loss and a full regional outage, with a lifecycle policy moving telemetry older than a year into Archive tier, and a private endpoint — not a service endpoint — providing the required private, on-premises reachability.",
+        'onTheJob': "Choosing Managed Instance over Azure SQL Database because of SQL Agent jobs is a decision an architect often has to defend twice — once to a DBA team attached to its legacy tooling, and again to a finance stakeholder who sees the bigger line item and assumes it's over-engineering. GZRS and an Archive-tier lifecycle policy look great in a cost-optimization slide until a client remembers that rehydrating archived data takes hours, at which point the real conversation becomes what data can actually tolerate that delay versus what the business insists it can't. Partition key redesign for Cosmos DB is the kind of fix that's cheap on a whiteboard and genuinely painful in production, since it usually means a data migration the client didn't budget for when they signed off on the original design. A compatibility assessment that comes back clean is also not the same thing as a guaranteed-compatible migration — CLR assemblies, specific SQL Agent proxy accounts, and other instance-level quirks that assessment tools may not fully evaluate are exactly why a real proof-of-concept restore into a non-production Managed Instance is worth doing even after a spotless assessment.",
     },
     {
         'id': 'business-continuity',
@@ -2208,7 +2208,7 @@ Two more decisions round out this design space. Scaling an App Service plan up c
             "NSGs have no concept of an FQDN — centralized, FQDN-based outbound filtering across a hub-and-spoke estate needs Azure Firewall, not more NSG rules.",
         ],
         'scenario': "A retailer is redesigning its Azure networking and compute footprint. It builds a hub-and-spoke topology, with Azure Firewall in the hub doing FQDN-based outbound filtering that individual NSGs in each spoke can't provide, and an ExpressRoute circuit connecting the hub back to its on-premises datacenter for predictable, high-bandwidth traffic. Its new checkout microservices go into Container Apps, since the team wants built-in autoscaling under Black Friday traffic without taking on cluster management, while a legacy inventory system that needs full OS access stays on a VM. Globally, Azure Front Door sits in front of the whole storefront, caching static assets at the edge and enforcing a Web Application Firewall across every region — deliberately not Traffic Manager, since the retailer specifically needs real content-aware routing and failover, not just a DNS answer. Every piece of this — the hub, the spokes, the firewall rules, the Front Door configuration — is deployed through Bicep templates checked into source control, so the whole environment can be rebuilt consistently in a new region if it ever needs to be.",
-        'onTheJob': "Container Apps versus AKS is as much an organizational-maturity question as a technical one — a team pushing for AKS because it's what they already know is a common design-review fight, and the architect's real job is separating 'we genuinely need custom orchestration' from 'we don't want to learn something new.' ExpressRoute gets proposed constantly for its predictable latency, right up until procurement sees the monthly cost and asks whether a Site-to-Site VPN would really be that much worse — a question that usually has a real, testable answer instead of a gut-feel one. Azure Firewall's FQDN filtering sounds like nice-to-have governance in a proposal, but it becomes the thing everyone's grateful for the day someone has to reconstruct what an entire hub-and-spoke estate's outbound traffic rules actually allow. The Infrastructure as Code (IaC) discipline that closes out this design — version-controlled Bicep or Terraform instead of manual portal clicks — is the same concept CompTIA's Cloud+ exam tests vendor-neutrally, and it's the reason a hub-and-spoke estate built this way can actually be torn down and rebuilt in a new region on demand, rather than existing only as institutional memory of what someone once clicked.",
+        'onTheJob': "Container Apps versus AKS is as much an organizational-maturity question as a technical one — a team pushing for AKS because it's what they already know is a common design-review fight, and the architect's real job is separating 'we genuinely need custom orchestration' from 'we don't want to learn something new.' ExpressRoute gets proposed constantly for its predictable latency, right up until procurement sees the monthly cost and asks whether a Site-to-Site VPN would really be that much worse — a question that usually has a real, testable answer instead of a gut-feel one. Azure Firewall's FQDN filtering sounds like nice-to-have governance in a proposal, but it becomes the thing everyone's grateful for the day someone has to reconstruct what an entire hub-and-spoke estate's outbound traffic rules actually allow. The Infrastructure as Code (IaC) discipline that closes out this design — version-controlled Bicep or Terraform instead of manual portal clicks — is the reason a hub-and-spoke estate built this way can actually be torn down and rebuilt in a new region on demand, rather than existing only as institutional memory of what someone once clicked.",
     },
     {
         'id': 'migration-integration-operations',
@@ -2223,7 +2223,7 @@ Once workloads are in Azure, connecting them together calls for the right messag
 
 Exposing and orchestrating that backend often needs its own layer, too. Azure API Management is a facade placed in front of backend APIs regardless of how or where they're actually hosted — VMs, App Service, anything — adding one consistent gateway for authentication, rate limiting, versioning, and a developer portal, so API consumers are decoupled from the underlying implementation. For integration logic itself, Logic Apps is a low-code, designer-driven workflow orchestrator with hundreds of prebuilt connectors, well suited to integrating SaaS and enterprise systems in a way business analysts, not just developers, can follow and adjust. Azure Functions is code-first, event-triggered compute instead, better suited when custom logic or fine-grained execution control is the real priority.
 
-At the largest scale, Azure Virtual WAN automates hub-and-spoke connectivity — branch offices, VPN and ExpressRoute connections, hubs, and routing — across many regions at once, instead of hand-building and peering each regional hub yourself. Day to day, once a network is actually built, Network Watcher provides the diagnostic tools to troubleshoot it: IP flow verify checks whether a specific rule is allowing or blocking a given flow, NSG flow logs record every flow that gets evaluated, and Connection Troubleshoot runs an end-to-end reachability test — these are diagnostics for a network that already exists, not design-time governance controls. And for secure administrative access into that network, Azure Bastion provides RDP or SSH through the portal itself, without ever exposing a VM's public IP address — a detail worth remembering whenever a scenario asks for remote access without any public IP exposure at all.""",
+At the largest scale, Azure Virtual WAN automates hub-and-spoke connectivity — branch offices, VPN and ExpressRoute connections, hubs, and routing — across many regions at once, instead of hand-building and peering each regional hub yourself. Day to day, once a network is actually built, Network Watcher provides the diagnostic tools to troubleshoot it: IP flow verify checks whether a specific rule is allowing or blocking a given flow, flow logs record the traffic moving through the network (NSG flow logs are being retired on 30 September 2027 in favor of virtual network flow logs), and Connection Troubleshoot runs an end-to-end reachability test — these are diagnostics for a network that already exists, not design-time governance controls. And for secure administrative access into that network, Azure Bastion provides RDP or SSH through the portal itself, without ever exposing a VM's public IP address — a detail worth remembering whenever a scenario asks for remote access without any public IP exposure at all.""",
         'fundamentalsLabel': 'New to Azure integration and eventing? See the everyday analogy',
         'fundamentals': "Service Bus, Event Grid, and Event Hubs are like three different ways a business handles incoming information. Service Bus is like a certified mail queue — every item gets processed, in order, exactly once, with a signature confirming delivery. Event Grid is like a text alert telling a manager the instant something specific happens, with no ongoing queue to process. Event Hubs is like a firehose of sensor readings pouring in continuously — the goal isn't to process each drop individually, it's to capture and analyze the whole stream at massive volume.",
         'keyTerms': ['Azure Migrate', 'Service Bus', 'Event Grid', 'Event Hubs', 'Azure API Management', 'Logic Apps', 'Azure Functions', 'Azure Virtual WAN', 'Network Watcher'],
@@ -2242,9 +2242,9 @@ CHEAT_SHEET = [
     {
         'heading': 'Exam-day strategy',
         'points': [
-            'You have 120 minutes for 50 questions — about 2.4 minutes each on average. Budget more time for multi-part scenario questions and less for straight recall, rather than pacing every question identically.',
+            'Expect roughly 40-60 questions in about two hours (the exact count and time vary by exam sitting, so check your confirmation email) — on the order of 2-3 minutes each on average. Budget more time for multi-part scenario questions and less for straight recall, rather than pacing every question identically.',
             "Real scoring isn't a flat percentage of questions right (some count for more than others) — treat 75%+ as a safe buffer to aim for, not an exact threshold to just clear.",
-            "Flag anything you're unsure of and move on rather than stalling — a question later in the exam can sometimes jog a detail you needed earlier, and you get partial credit for nothing by running out of time on one question.",
+            "Flag anything you're unsure of and move on rather than stalling — a question later in the exam can sometimes jog a detail you needed earlier, and running out of time on one question costs you every unanswered question after it.",
             "On multi-select ('choose N') questions, eliminate the options you're confident are wrong first; guessing among 2 plausible answers beats guessing among 4.",
             'Your first read of a question is usually right — change an answer only when you find a specific detail you missed, not from general second-guessing.',
         ],
@@ -2303,9 +2303,9 @@ CHEAT_SHEET = [
     {
         'heading': 'Migration strategy basics',
         'points': [
-            "The migration strategies (the \"R's\"): Rehost (lift-and-shift, fastest, least change), Refactor/Re-platform (small optimizations, e.g. move to a managed database), Rearchitect (redesign for cloud-native scale), Rebuild (start over cloud-native), Retire (decommission what's no longer needed).",
+            "The migration strategies (the \"R's\"): Rehost (lift-and-shift, fastest, least change), Refactor/Re-platform (small optimizations, e.g. move to a managed database), Rearchitect (redesign for cloud-native scale), Rebuild (start over cloud-native), Replace (swap in a SaaS product instead of migrating the application).",
             "Azure Migrate is the central hub for discovery, assessment, and migration of servers, databases, and web apps at scale — start there before picking point tools.",
-            "Azure Database Migration Service (DMS) performs the actual database migration (offline or online/minimal-downtime); Data Migration Assistant only assesses compatibility beforehand.",
+            "Azure Database Migration Service (DMS) performs the actual database migration (offline or online/minimal-downtime); compatibility assessment happens beforehand with other tools (Data Migration Assistant, the older assessment tool, was retired on 16 July 2025).",
         ],
     },
     {
@@ -2327,7 +2327,7 @@ MADLIBS = [
             {'key': 'b1', 'options': ['Privileged Identity Management (PIM)', 'Entitlement management', 'Access reviews', 'Azure Policy'], 'correct': 0},
             {'key': 'b2', 'options': ['a break-glass emergency access account', 'a second Global Administrator for every team', 'a Conditional Access exclusion for all users', 'a service principal with Owner at the tenant root'], 'correct': 0},
         ],
-        'explanation': "PIM converts standing privileged access into time-bound, justified activations. A break-glass account is a small number of cloud-only accounts, deliberately excluded from Conditional Access and closely monitored, kept specifically so a misconfigured policy can never lock every administrator out at once — granting broad access to more accounts or excluding everyone would defeat the point of a narrow emergency path.",
+        'explanation': "PIM converts standing privileged access into time-bound, justified activations. A break-glass account is a small number of cloud-only accounts, typically excluded from Conditional Access, protected with strong (ideally phishing-resistant) credentials, and closely monitored, kept specifically so a misconfigured policy can never lock every administrator out at once — granting broad access to more accounts or excluding everyone would defeat the point of a narrow emergency path.",
     },
     {
         'id': 'ml-az305-2',
@@ -2383,7 +2383,7 @@ SEQUENCES = [
         'cat': 'dataStorage',
         'prompt': "Put these steps in order for migrating an on-premises SQL Server database to Azure with minimal downtime.",
         'steps': [
-            'Assess the source database using Data Migration Assistant',
+            'Assess the source database for compatibility and readiness (for example with Azure Migrate)',
             'Choose the migration target (Azure SQL Database, Managed Instance, or SQL on a VM)',
             'Set up Azure Database Migration Service',
             'Perform an initial full data migration',
@@ -2484,8 +2484,8 @@ CASE_STUDIES = [
             "since adjusters must never lose an in-progress claim and downtime directly delays payouts. "
             "Separately, the company's internal claims-review web app runs on a handful of Azure Virtual "
             "Machines; for that workload, the business can tolerate up to 4 hours of downtime and up to "
-            "15 minutes of data loss if the primary region fails, and wants failover to be triggered "
-            "automatically rather than requiring someone to be paged in the middle of the night. "
+            "15 minutes of data loss if the primary region fails, and wants failover to be orchestrated "
+            "and automated through a scripted plan rather than requiring someone to work through manual steps in the middle of the night. "
             "Fabrikam's compliance team also requires that every failover test be rehearsed without ever "
             "impacting the live production environment."
         ),
@@ -2506,9 +2506,9 @@ CASE_STUDIES = [
             {
                 'id': 'cs-az305-fabrikam-claims-q2',
                 'type': 'tf',
-                'question': "True or false: for the claims-review VMs, whose business tolerance is up to 4 hours RTO and 15 minutes RPO with automatic failover, Azure Site Recovery replicating to a secondary region is an appropriate solution.",
+                'question': "True or false: for the claims-review VMs, whose business tolerance is up to 4 hours RTO and 15 minutes RPO with a scripted, orchestrated failover, Azure Site Recovery replicating to a secondary region is an appropriate solution.",
                 'answer': True,
-                'explanation': "Azure Site Recovery is built for exactly this profile — VM-level replication to a secondary region with typical RPOs in the minutes and orchestrated (including automatic) failover, comfortably meeting a 4-hour RTO/15-minute RPO target without requiring the much tighter (and costlier) synchronous replication a sub-minute RTO would demand.",
+                'explanation': "Azure Site Recovery is built for exactly this profile — VM-level replication to a secondary region with typical RPOs in the minutes and failover orchestrated through recovery plans (which can be scripted with Azure Automation runbooks, though the failover itself is initiated rather than triggered automatically by Site Recovery), comfortably meeting a 4-hour RTO/15-minute RPO target without requiring the much tighter (and costlier) synchronous replication a sub-minute RTO would demand.",
             },
             {
                 'id': 'cs-az305-fabrikam-claims-q3',
