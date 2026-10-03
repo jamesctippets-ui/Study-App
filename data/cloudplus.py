@@ -1,21 +1,24 @@
 """Categories, flashcards, and quiz questions for CompTIA Cloud+ (CV0-004)."""
 
+# marks follow the CV0-004 domain weights (Architecture 23, Deployment 19, Security 19,
+# Operations 17, Troubleshooting 12, DevOps Fundamentals 10). This app has no separate
+# DevOps category, so its 10 points are folded into Deployment (IaC, CI/CD, feature flags).
 CATEGORIES = [
     {'key': 'archDesign', 'label': 'Cloud Architecture & Design', 'marks': 23, 'resources': [
         {'label': 'CompTIA: Cloud+ CV0-004 exam objectives (Domain 1.0 Cloud Architecture)', 'url': 'https://comptiacdn.azureedge.net/webcontent/docs/default-source/exam-objectives/comptia-cloud-cv0-004-exam-objectives-(2-0).pdf'},
     ]},
-    {'key': 'security', 'label': 'Security', 'marks': 20, 'resources': [
+    {'key': 'security', 'label': 'Security', 'marks': 19, 'resources': [
         {'label': 'CompTIA Blog: My CompTIA Cloud+ Favorites - Cloud Security', 'url': 'https://www.comptia.org/en-us/blog/comptia-cloud-cloud-security/'},
-        {'label': 'CompTIA: Cloud+ CV0-004 exam objectives (Domain 2.0 Security)', 'url': 'https://comptiacdn.azureedge.net/webcontent/docs/default-source/exam-objectives/comptia-cloud-cv0-004-exam-objectives-(2-0).pdf'},
+        {'label': 'CompTIA: Cloud+ CV0-004 exam objectives (Security domain)', 'url': 'https://comptiacdn.azureedge.net/webcontent/docs/default-source/exam-objectives/comptia-cloud-cv0-004-exam-objectives-(2-0).pdf'},
     ]},
-    {'key': 'deployment', 'label': 'Deployment', 'marks': 17, 'resources': [
-        {'label': 'CompTIA: Cloud+ CV0-004 exam objectives (Domain 3.0 Deployment)', 'url': 'https://comptiacdn.azureedge.net/webcontent/docs/default-source/exam-objectives/comptia-cloud-cv0-004-exam-objectives-(2-0).pdf'},
+    {'key': 'deployment', 'label': 'Deployment', 'marks': 29, 'resources': [
+        {'label': 'CompTIA: Cloud+ CV0-004 exam objectives (Domain 2.0 Deployment)', 'url': 'https://comptiacdn.azureedge.net/webcontent/docs/default-source/exam-objectives/comptia-cloud-cv0-004-exam-objectives-(2-0).pdf'},
     ]},
-    {'key': 'opsSupport', 'label': 'Operations & Support', 'marks': 22, 'resources': [
-        {'label': 'CompTIA: Cloud+ CV0-004 exam objectives (Domain 4.0 Operations)', 'url': 'https://comptiacdn.azureedge.net/webcontent/docs/default-source/exam-objectives/comptia-cloud-cv0-004-exam-objectives-(2-0).pdf'},
+    {'key': 'opsSupport', 'label': 'Operations & Support', 'marks': 17, 'resources': [
+        {'label': 'CompTIA: Cloud+ CV0-004 exam objectives (Operations domain)', 'url': 'https://comptiacdn.azureedge.net/webcontent/docs/default-source/exam-objectives/comptia-cloud-cv0-004-exam-objectives-(2-0).pdf'},
     ]},
-    {'key': 'troubleshooting', 'label': 'Troubleshooting', 'marks': 18, 'resources': [
-        {'label': 'CompTIA: Cloud+ CV0-004 exam objectives (Domain 5.0 Troubleshooting)', 'url': 'https://comptiacdn.azureedge.net/webcontent/docs/default-source/exam-objectives/comptia-cloud-cv0-004-exam-objectives-(2-0).pdf'},
+    {'key': 'troubleshooting', 'label': 'Troubleshooting', 'marks': 12, 'resources': [
+        {'label': 'CompTIA: Cloud+ CV0-004 exam objectives (Troubleshooting domain)', 'url': 'https://comptiacdn.azureedge.net/webcontent/docs/default-source/exam-objectives/comptia-cloud-cv0-004-exam-objectives-(2-0).pdf'},
     ]},
 ]
 
@@ -249,7 +252,7 @@ FLASHCARDS = [
         'cat': 'troubleshooting',
         'front': 'Latency vs. bandwidth problems',
         'back': "Latency is the delay before data begins to transfer (how long a single round trip takes). Bandwidth is the total volume of data that can transfer per unit of time once it's flowing. A connection can have plenty of bandwidth and still feel slow due to high latency.",
-        'detail': "A common trap: adding more bandwidth to a connection does nothing to fix a latency problem — they're independent characteristics with different causes and different fixes. A Content Delivery Network (CDN) is a latency fix specifically, not a bandwidth one.",
+        'detail': "A common trap: adding more bandwidth to a connection does nothing to fix a latency problem — they're independent characteristics with different causes and different fixes. A CDN (content delivery network) is a latency fix specifically, not a bandwidth one.",
     },
     {
         'id': 'f34',
@@ -326,76 +329,76 @@ FLASHCARDS = [
         'cat': 'archDesign',
         'front': 'Content Delivery Network (CDN)',
         'back': 'A geographically distributed set of edge servers that cache content closer to end users, reducing the round-trip distance data has to travel and offloading traffic from the origin server.',
-        'detail': 'A CDN mainly helps with latency and origin load, not raw available bandwidth — recognizing which one a scenario is actually describing (see latency vs. bandwidth problems) decides whether a CDN is really the fix.',
+        'detail': 'A CDN mainly helps with latency and origin load, not raw available bandwidth, so before recommending one, check whether the scenario describes a latency problem (distance) or a bandwidth problem (capacity).',
     },
     {
         'id': 'f45',
         'cat': 'opsSupport',
         'front': 'Change management process',
         'back': 'A formal, documented process for proposing, reviewing, approving, and recording a change to production systems, including a rollback plan, before the change is actually made.',
-        'detail': "A configuration management database (CMDB) is what change management updates once a change is approved and completed — the CMDB should always reflect the environment's true current state.",
+        'detail': "Once an approved change is completed, the CMDB (configuration management database) should be updated so that it always reflects the environment's true current state.",
     },
     {
         'id': 'f46',
         'cat': 'opsSupport',
         'front': 'Runbook',
         'back': 'A documented, step-by-step procedure for a specific operational task or incident response, written so it can be followed consistently by different people (or triggered automatically) with the same result each time.',
-        'detail': 'A runbook is what automation vs. orchestration tooling actually executes — the runbook is the procedure; automation/orchestration is what carries it out without a human doing each step by hand.',
+        'detail': 'A runbook is what automation and orchestration tooling actually executes — the runbook is the procedure, and the tooling carries it out without a human performing each step by hand.',
     },
     {
         'id': 'f47',
         'cat': 'archDesign',
         'front': 'Load balancer health checks',
         'back': "A periodic probe the load balancer sends to each backend instance to confirm it's actually able to serve traffic — an instance that fails enough consecutive checks is automatically taken out of rotation until it passes again.",
-        'detail': "This is what makes load balancing algorithms actually resilient to a failed instance — the algorithm only ever picks among instances the health check currently considers healthy.",
+        'detail': 'This is what keeps a load balancing algorithm resilient to a failed instance — the algorithm only ever picks among instances the health check currently considers healthy.',
     },
     {
         'id': 'f48',
         'cat': 'security',
         'front': 'Firewall as a Service (FWaaS)',
         'back': 'A cloud-delivered, centrally managed firewall service applied across an environment without deploying and maintaining physical or virtual firewall appliances at every location.',
-        'detail': 'FWaaS commonly layers both stateful vs. stateless packet filtering and IDS vs. IPS-style inspection into one managed service rather than stitching those together from separate appliances.',
+        'detail': 'FWaaS commonly bundles stateful packet filtering and IDS/IPS-style inspection into one managed service, rather than stitching them together from separate appliances.',
     },
     {
         'id': 'f49',
         'cat': 'archDesign',
         'front': 'Service mesh',
         'back': "A dedicated infrastructure layer (typically sidecar proxies alongside each service) that handles service-to-service traffic concerns — routing, retries, encryption, observability — without every microservice implementing that logic itself.",
-        'detail': "In a Kubernetes: pod, node, and cluster environment, a service mesh's sidecar proxies are commonly injected into each pod, working alongside the containers rather than replacing them.",
+        'detail': "In a Kubernetes cluster, a service mesh's sidecar proxies are commonly injected into each pod, working alongside the application containers rather than replacing them.",
     },
     {
         'id': 'f50',
         'cat': 'archDesign',
         'front': 'Type 1 (bare-metal) vs. Type 2 (hosted) hypervisor',
         'back': "A Type 1 hypervisor runs directly on the physical hardware with no host OS underneath it — the standard for production datacenters and cloud providers. A Type 2 hypervisor runs as an application on top of a regular host OS, more common for a desktop/test environment.",
-        'detail': "Removing the host OS layer is exactly why Type 1 has less overhead and better performance — there's one less layer between the VM and the physical hardware than in a P2V, V2V, P2C, and V2C migrations scenario running Type 2.",
+        'detail': 'Removing the host OS layer is exactly why Type 1 has less overhead and better performance — there is one less layer between the VM and the physical hardware than there is under a Type 2 hypervisor running on a regular desktop OS.',
     },
     {
         'id': 'f51',
         'cat': 'security',
         'front': 'Single sign-on (SSO)',
         'back': "Lets a user authenticate once and gain access to multiple independent systems without signing in separately to each one, using a shared trust relationship between the identity provider and each application.",
-        'detail': "SSO is squarely about the authentication piece of authentication vs. authorization vs. accounting (AAA) — it doesn't decide what a user can do once signed in, only that they don't have to prove who they are over and over.",
+        'detail': "SSO covers only the authentication piece of AAA — it doesn't decide what a user can do once signed in, only that they don't have to prove who they are over and over.",
     },
     {
         'id': 'f52',
         'cat': 'opsSupport',
         'front': 'Immutable infrastructure',
         'back': "A deployment approach where servers or containers are never modified after being provisioned — a change means replacing the instance entirely with a newly built one, rather than patching a live system in place.",
-        'detail': "This pairs naturally with Infrastructure as Code (IaC): if the whole environment is defined in code, replacing an instance instead of patching it becomes cheap and repeatable rather than risky.",
+        'detail': 'This pairs naturally with Infrastructure as Code: if the whole environment is defined in code, replacing an instance instead of patching it becomes cheap and repeatable rather than risky.',
     },
     {
         'id': 'f53',
         'cat': 'archDesign',
         'front': 'Chaos engineering',
         'back': "Deliberately injecting failures into a production or production-like system (killing an instance, adding latency, cutting a dependency) to verify that resilience mechanisms actually work as designed, instead of only assuming they do.",
-        'detail': "This is how a team actually validates the high availability vs. fault tolerance vs. disaster recovery claims made about a system, rather than discovering the gaps for the first time during a real outage.",
+        'detail': 'This is how a team validates its high availability, fault tolerance, and disaster recovery claims, rather than discovering the gaps for the first time during a real outage.',
     },
     {
         'id': 'f54',
         'cat': 'archDesign',
         'front': 'Software-defined networking (SDN)',
-        'back': "An architecture that separates the control plane (the logic deciding how traffic should be routed) from the data plane (the hardware that just forwards packets), letting routing policy be managed centrally through software instead of configured device-by-device. Load balancing algorithms and Firewall as a Service (FWaaS) are both everyday examples of that same centralized, policy-driven control being applied to one specific network function instead of the whole network.",
+        'back': 'An architecture that separates the control plane (the logic deciding how traffic should be routed) from the data plane (the hardware that just forwards packets), letting routing policy be managed centrally through software instead of configured device-by-device. A software-driven load balancer or a cloud-delivered firewall service is an everyday example of that same centralized, policy-driven control applied to one specific network function instead of the whole network.',
         'detail': "SDN is the generalization; a single load balancer or a single FWaaS deployment is just one narrow application of the same control-plane/data-plane split across an entire network.",
     },
     {
@@ -409,14 +412,14 @@ FLASHCARDS = [
         'id': 'f56',
         'cat': 'security',
         'front': 'Web Application Firewall (WAF)',
-        'back': "A security appliance placed in front of a web application that inspects HTTP request content specifically for application-layer attacks like SQL injection and cross-site scripting, unlike a traditional network firewall filtering only by port and IP address. A WAF is often layered alongside IDS vs. IPS-style network inspection, but works one level up the stack -- reading the actual HTTP payload rather than just packet headers.",
+        'back': 'A security appliance placed in front of a web application that inspects HTTP request content specifically for application-layer attacks like SQL injection and cross-site scripting, unlike a traditional network firewall filtering only by port and IP address. A WAF is often layered alongside network-level IDS/IPS inspection, but works one level up the stack -- reading the actual HTTP payload rather than just packet headers.',
         'detail': "A WAF blind to encrypted payloads is a common gap -- it typically needs to sit where TLS is already terminated, or hold the private key itself, to actually inspect the request content it's meant to protect.",
     },
     {
         'id': 'f57',
         'cat': 'security',
         'front': 'Hardware security module (HSM)',
-        'back': "Dedicated, tamper-resistant hardware that generates, stores, and performs operations with cryptographic keys internally, so the raw key material is never exposed to the operating system or application memory. An HSM frequently backs a Certificate Authority's private key in a Public Key Infrastructure (PKI) basics deployment, and is also one of the specialized-hardware approaches that make the hardest of the three states in encryption at rest vs. in transit vs. in use -- protecting data in use -- actually achievable.",
+        'back': "Dedicated, tamper-resistant hardware that generates, stores, and performs operations with cryptographic keys internally, so the raw key material is never exposed to the operating system or application memory. An HSM frequently backs a Certificate Authority's private key in a PKI deployment, and is also commonly used to protect the keys behind disk, database, and application encryption.",
         'detail': "Losing access to an HSM (a failed device with no backup key ceremony performed) can be as damaging as a breach -- the keys inside are deliberately built to never be extracted, which cuts both ways.",
     },
     {
@@ -424,21 +427,21 @@ FLASHCARDS = [
         'cat': 'archDesign',
         'front': 'Active-active vs. active-passive clustering',
         'back': "In an active-active cluster, every node handles traffic at the same time, sharing the load across all of them. In an active-passive cluster, one or more standby nodes sit idle and only take over once the active node fails. Active-active makes fuller use of available hardware; active-passive is simpler to keep consistent, since only one node is ever accepting writes.",
-        'detail': "Active-active and active-passive are both ways of achieving High availability vs. fault tolerance vs. disaster recovery -- the choice decides how fast failover happens and how much of the cluster's capacity sits idle waiting for a failure.",
+        'detail': "Active-active and active-passive are both ways of achieving high availability -- the choice decides how fast failover happens and how much of the cluster's capacity sits idle waiting for a failure.",
     },
     {
         'id': 'f59',
         'cat': 'archDesign',
         'front': 'N+1 vs. N+2 redundancy',
         'back': "N+1 redundancy provisions one spare unit beyond what current load requires, so a single failure can be absorbed without a service impact. N+2 provisions two spares, tolerating two simultaneous failures (or one failure plus planned maintenance on another unit) at a higher ongoing cost.",
-        'detail': "This is the same raise-the-cost-for-more-resilience trade-off as Hot, warm, and cold DR sites -- more spare capacity costs more every day it isn't needed, in exchange for surviving a worse day.",
+        'detail': "This is the same raise-the-cost-for-more-resilience trade-off as choosing between hot, warm, and cold DR sites -- more spare capacity costs more every day it isn't needed, in exchange for surviving a worse day.",
     },
     {
         'id': 'f60',
         'cat': 'archDesign',
         'front': 'Kubernetes: Deployment, ReplicaSet, and Service objects',
         'back': "A ReplicaSet keeps a specified number of identical pod replicas running, replacing any that fail. A Deployment manages ReplicaSets on your behalf, handling rolling updates and rollbacks as the desired pod spec changes. A Service gives a stable network address and DNS name that routes to whichever healthy pods currently exist, even as individual pods are replaced underneath it.",
-        'detail': "Building on Kubernetes: pod, node, and cluster -- a Service solves exactly the problem individual pods have: pods come and go with new IPs each time, but the Service address stays constant so nothing else has to track that churn.",
+        'detail': 'Building on pods, nodes, and clusters -- a Service solves exactly the problem individual pods have: pods come and go with new IPs each time, but the Service address stays constant so nothing else has to track that churn.',
     },
     {
         'id': 'f61',
@@ -452,28 +455,28 @@ FLASHCARDS = [
         'cat': 'security',
         'front': 'Principle of least privilege',
         'back': "Granting a user or service account only the minimum access needed to perform its required task, and nothing more. It limits what a mistake, a compromised credential, or a misused role can actually reach.",
-        'detail': "Least privilege is what RBAC vs. ABAC is supposed to enforce in practice -- assigning a role or attribute set that's broader than the job actually requires defeats the point of either access control model.",
+        'detail': "Least privilege is what both RBAC and ABAC are supposed to enforce in practice -- assigning a role or attribute set that's broader than the job actually requires defeats the point of either access control model.",
     },
     {
         'id': 'f63',
         'cat': 'security',
         'front': 'Security groups vs. network ACLs (NACLs)',
         'back': "A security group is a stateful firewall applied at the instance/interface level -- allow a request in, and its response is automatically allowed back out. A network ACL (NACL) is a stateless filter applied at the subnet level, evaluating inbound and outbound traffic independently, so both directions need their own explicit rule.",
-        'detail': "This is Stateful vs. stateless packet filtering applied to two specific, commonly paired cloud controls -- a NACL sets a broad subnet-wide boundary, while security groups add finer, per-instance rules inside it.",
+        'detail': 'This is the stateful-versus-stateless distinction applied to two specific, commonly paired cloud controls -- a NACL sets a broad subnet-wide boundary, while security groups add finer, per-instance rules inside it.',
     },
     {
         'id': 'f64',
         'cat': 'deployment',
         'front': "The \"6 R's\" of cloud migration strategy",
         'back': "Rehost (move as-is, \"lift and shift\"), Replatform (move with light optimization, no architecture change), Repurchase (switch to a different, often SaaS, product), Refactor/Re-architect (redesign for cloud-native services), Retire (decommission, since it's no longer needed), and Retain (keep it on-premises for now).",
-        'detail': "Rehost lines up with the P2V, V2V, P2C, and V2C migrations idea of moving a workload largely as-is; Refactor is the opposite end of that same spectrum, redesigning around cloud-native services instead of just relocating the existing build.",
+        'detail': 'Rehost lines up with the lift-and-shift style of P2C and V2C migration, moving a workload largely as-is; Refactor is the opposite end of that same spectrum, redesigning around cloud-native services instead of just relocating the existing build.',
     },
     {
         'id': 'f65',
         'cat': 'deployment',
         'front': 'Functional, regression, performance, and usability testing',
         'back': "Functional testing checks that a feature works as specified. Regression testing confirms a change didn't break something that previously worked. Performance (load) testing measures behavior under expected or peak traffic. Usability testing evaluates how easily real users can actually use the result.",
-        'detail': "A pipeline running Continuous integration vs. continuous delivery vs. continuous deployment leans hardest on automated functional and regression testing -- usability testing in particular usually still needs a human, which is part of why continuous deployment is riskier without it.",
+        'detail': 'A CI/CD pipeline leans hardest on automated functional and regression testing -- usability testing in particular usually still needs a human, which is part of why continuous deployment is riskier without it.',
     },
     {
         'id': 'f66',
@@ -486,29 +489,29 @@ FLASHCARDS = [
         'id': 'f67',
         'cat': 'opsSupport',
         'front': 'Reserved vs. on-demand vs. spot instances',
-        'back': "On-demand instances are paid for by usage with no commitment, at the highest per-hour rate. Reserved instances commit to a term (often 1-3 years) in exchange for a substantially lower rate, suited to steady, predictable workloads. Spot instances bid on unused provider capacity at the deepest discount, but can be reclaimed by the provider with little notice -- a fit only for fault-tolerant, interruptible work.",
-        'detail': "Choosing wrong here is a common Capacity planning mistake -- reserving capacity for a bursty, unpredictable workload wastes the commitment, while running a steady production database on spot instances risks losing it mid-transaction.",
+        'back': "On-demand instances are paid for by usage with no commitment, at the highest per-hour rate. Reserved instances commit to a term (often 1-3 years) in exchange for a substantially lower rate, suited to steady, predictable workloads. Spot instances use the provider's unused capacity at the deepest discount, but can be reclaimed by the provider with little notice -- a fit only for fault-tolerant, interruptible work.",
+        'detail': 'Choosing wrong here is a common capacity planning mistake -- reserving capacity for a bursty, unpredictable workload wastes the commitment, while running a steady production database on spot instances risks losing it mid-transaction.',
     },
     {
         'id': 'f68',
         'cat': 'opsSupport',
         'front': 'MTTR vs. MTBF',
         'back': "MTTR (Mean Time To Repair/Recovery) is the average time it takes to fix a failure and restore service once it occurs. MTBF (Mean Time Between Failures) is the average time a system runs between failures -- a measure of reliability rather than recovery speed.",
-        'detail': "MTBF is about how often something breaks; MTTR is about how fast it gets fixed once it does -- a system can have a short MTBF (fails often) but still keep good uptime if its MTTR is low enough, unlike SLA components, which are negotiated targets rather than measured historical averages.",
+        'detail': "MTBF is about how often something breaks; MTTR is about how fast it gets fixed once it does -- a system can fail often (short MTBF) and still keep good uptime if its MTTR is low enough. Both are measured historical averages, unlike an SLA's negotiated targets.",
     },
     {
         'id': 'f69',
         'cat': 'opsSupport',
         'front': 'Resource tagging',
         'back': "Attaching key-value metadata (like department, environment, or cost center) to cloud resources at creation, so they can be filtered, grouped, and attributed automatically instead of tracked by memory or naming convention alone.",
-        'detail': "Tagging is what actually makes Chargeback vs. showback and a CMDB practical at scale -- without a consistent tag on every resource, there's no reliable way to automatically attribute cost or ownership to the right team.",
+        'detail': "Tagging is what makes chargeback, showback, and a CMDB practical at scale -- without a consistent tag on every resource, there's no reliable way to automatically attribute cost or ownership to the right team.",
     },
     {
         'id': 'f70',
         'cat': 'troubleshooting',
         'front': 'Memory ballooning',
         'back': "A hypervisor technique for reclaiming memory from a VM that isn't actively using all of what it was allocated, by asking a driver inside the guest to artificially claim (\"balloon\") that memory so the hypervisor can hand it to another VM that needs it more. Pushed too far, the guest starts swapping to disk instead, which is far slower than RAM.",
-        'detail': "Ballooning shows up alongside CPU ready time as one of the hypervisor-level metrics used to investigate the \"Noisy neighbor\" problem -- a VM whose own metrics look fine can still be starved if the host is aggressively ballooning its memory for another tenant.",
+        'detail': 'Ballooning shows up alongside CPU ready time as one of the hypervisor-level metrics used to investigate a noisy-neighbor problem -- a VM whose own metrics look fine can still be starved if the host is aggressively ballooning its memory for another tenant.',
     },
     {
         'id': 'f71',
@@ -529,7 +532,7 @@ FLASHCARDS = [
         'cat': 'troubleshooting',
         'front': 'Burstable instance CPU credit exhaustion',
         'back': "Burstable instance types earn CPU credits during periods of low usage and spend them during bursts of higher CPU demand. Once the credit balance is exhausted, the instance is throttled to a fixed baseline performance level until it earns more credits, even though its own workload and configuration haven't changed.",
-        'detail': "This produces a sluggish-VM symptom that looks a lot like the \"Noisy neighbor\" problem at first glance, but checking the instance's own CPU credit balance -- not another tenant's activity on the host -- is what actually tells the two apart.",
+        'detail': "This produces a sluggish-VM symptom that looks a lot like a noisy-neighbor problem at first glance, but checking the instance's own CPU credit balance -- not another tenant's activity on the host -- is what actually tells the two apart.",
     },
     {
         'id': 'f74',
@@ -543,7 +546,7 @@ FLASHCARDS = [
         'cat': 'troubleshooting',
         'front': 'Autoscaling flapping (scaling oscillation)',
         'back': "A condition where an autoscaling group repeatedly scales out and then back in within a short period because the scaling thresholds sit too close to normal, everyday load -- ordinary variation keeps crossing the trigger in both directions.",
-        'detail': "The fix mirrors Baseline vs. threshold discipline applied to autoscaling instead of alerting: widen the margin between the scale-out and scale-in triggers, or add a cooldown period, so routine fluctuation stops re-triggering a scaling action every few minutes.",
+        'detail': 'The fix mirrors baseline-versus-threshold discipline applied to autoscaling instead of alerting: widen the margin between the scale-out and scale-in triggers, or add a cooldown period, so routine fluctuation stops re-triggering a scaling action every few minutes.',
     },
     {
         'id': 'f76',
@@ -564,70 +567,70 @@ FLASHCARDS = [
         'cat': 'troubleshooting',
         'front': 'Asymmetric routing',
         'back': "A condition where traffic from host A to host B takes one network path, but the return traffic from B back to A takes a different path -- often breaking a stateful device, like a firewall or a NAT gateway, sitting on only one of the two paths and never seeing the matching half of the connection.",
-        'detail': "This builds on Stateful vs. stateless packet filtering: a stateful firewall only recognizes return traffic that matches a connection it saw leave, so when that return traffic arrives over a different path, the firewall has no record of it at all.",
+        'detail': 'This builds on stateful packet filtering: a stateful firewall only recognizes return traffic that matches a connection it saw leave, so when that return traffic arrives over a different path, the firewall has no record of it at all.',
     },
     {
         'id': 'f79',
         'cat': 'troubleshooting',
         'front': 'Container crash loop',
         'back': "A container that repeatedly fails shortly after starting, gets automatically restarted by the orchestrator, fails again, and repeats -- usually caused by a bad configuration, a missing dependency, or an application error that happens on every single startup rather than only sometimes.",
-        'detail': "Because the orchestrator in a Kubernetes: pod, node, and cluster environment keeps restarting it automatically, a crash loop can look like a series of short outages in a monitoring dashboard rather than one persistent failure -- checking the container's own startup logs, not just its up/down status, is what actually reveals the real cause.",
+        'detail': "Because the orchestrator in a Kubernetes cluster keeps restarting it automatically, a crash loop can look like a series of short outages in a monitoring dashboard rather than one persistent failure -- checking the container's own startup logs, not just its up/down status, is what actually reveals the real cause.",
     },
     {
         'id': 'f80',
         'cat': 'troubleshooting',
         'front': 'Centralized log correlation',
         'back': "Aggregating logs from many separate systems -- application, web server, database, network -- into one searchable platform, so events across all of them can be lined up by timestamp to reconstruct what actually happened during an incident.",
-        'detail': "Without correlation, each system's logs only tell part of the story; this is the same aggregation step that a SIEM vs. SOAR platform builds on top of, turning scattered log entries into one coherent timeline an analyst (or an automated response) can act on.",
+        'detail': "Without correlation, each system's logs only tell part of the story; this is the same aggregation step that a SIEM builds on, turning scattered log entries into one coherent timeline an analyst (or an automated response) can act on.",
     },
     {
         'id': 'f81',
         'cat': 'opsSupport',
         'front': 'Alert fatigue and alert tuning',
         'back': "A condition where on-call staff receive so many low-value or noisy alerts that they start ignoring or delaying their response to all of them, including the real ones. Tuning -- adding a sustained-duration condition, adjusting thresholds, or suppressing a known-noisy check -- reduces volume without losing genuine signal.",
-        'detail': "This is the practical cost of skipping Baseline vs. threshold discipline -- a threshold set without a solid baseline tends to misfire constantly, and alert fatigue is what that misfiring costs a team over time.",
+        'detail': 'This is the practical cost of skipping baselining before setting thresholds -- a threshold set without a solid baseline tends to misfire constantly, and alert fatigue is what that misfiring costs a team over time.',
     },
     {
         'id': 'f82',
         'cat': 'opsSupport',
         'front': 'Change freeze (code freeze)',
         'back': "A defined period -- commonly around a major event like a holiday shopping peak or a scheduled audit -- during which no non-emergency changes are permitted, to minimize the risk of a self-inflicted outage at the worst possible time.",
-        'detail': "A change freeze doesn't replace the Change management process; it temporarily tightens it -- an emergency change made during a freeze still has to go through added scrutiny and get documented, rather than skipping the process altogether.",
+        'detail': "A change freeze doesn't replace the change management process; it temporarily tightens it -- an emergency change made during a freeze still has to go through added scrutiny and get documented, rather than skipping the process altogether.",
     },
     {
         'id': 'f83',
         'cat': 'opsSupport',
         'front': 'Blameless post-incident review',
         'back': "A structured review held after an incident is resolved, focused on identifying contributing factors and process gaps rather than assigning individual blame, so people report what actually happened honestly instead of covering up a mistake out of fear.",
-        'detail': "This is where Root cause analysis vs. a workaround formally gets written down and assigned an owner -- without a scheduled review like this, a root cause investigation started under time pressure is easy to never actually finish.",
+        'detail': 'This is where root cause analysis (as opposed to a quick workaround) formally gets written down and assigned an owner -- without a scheduled review like this, a root cause investigation started under time pressure is easy to never actually finish.',
     },
     {
         'id': 'f84',
         'cat': 'deployment',
         'front': 'Deployment rollback plan',
         'back': "A predefined, tested procedure for reverting to the last known-good version if a new release fails verification, prepared before the release goes out rather than improvised after something has already broken.",
-        'detail': "A Blue-green vs. canary deployment already offers an easy rollback path by design -- switching traffic back, or pulling the canary slice -- but a rolling or in-place deployment needs this plan spelled out explicitly, since reverting isn't automatic the way it is with a full duplicate environment.",
+        'detail': "Blue-green and canary deployments already offer an easy rollback path by design -- switching traffic back, or pulling the canary slice -- but a rolling or in-place deployment needs this plan spelled out explicitly, since reverting isn't automatic the way it is with a full duplicate environment.",
     },
     {
         'id': 'f85',
         'cat': 'deployment',
         'front': 'DR failover vs. failback',
         'back': "Failover is switching production operation over to a disaster recovery site after the primary site fails. Failback is the separate, later step of returning operation to the primary site once it's restored and verified healthy -- and it carries its own risk of data loss or conflict if changes made at the DR site during failover aren't properly reconciled first.",
-        'detail': "Testing a Hot, warm, and cold DR sites plan often only rehearses the failover half; a DR test that skips failback can leave a team discovering failback's reconciliation problems for the first time during a real event.",
+        'detail': "Testing a DR plan built on hot, warm, or cold sites often only rehearses the failover half; a DR test that skips failback can leave a team discovering failback's reconciliation problems for the first time during a real event.",
     },
     {
         'id': 'f86',
         'cat': 'security',
         'front': 'SIEM vs. SOAR',
         'back': "A SIEM (Security Information and Event Management) platform ingests and correlates logs and alerts from many systems into a single view for an analyst to investigate. A SOAR (Security Orchestration, Automation, and Response) platform goes further, triggering automated response actions -- like isolating a host or disabling an account -- based on what the SIEM detects, without waiting for a person to act first.",
-        'detail': "SIEM and SOAR pair up the same way IDS vs. IPS does -- one observes and correlates, the other acts -- and in practice a SIEM commonly feeds the alerts that a SOAR platform then automates a response to.",
+        'detail': 'SIEM and SOAR pair up the same way an IDS and an IPS do -- one observes and correlates, the other acts -- and in practice a SIEM commonly feeds the alerts that a SOAR platform then automates a response to.',
     },
     {
         'id': 'f87',
         'cat': 'security',
         'front': 'Credential and key rotation',
         'back': "Periodically replacing passwords, API keys, and certificates with new ones on a defined schedule (or immediately after a suspected compromise), so a credential that leaked or was exposed has only a limited window in which it's actually still valid.",
-        'detail': "This limits the damage of a leaked secret the same way the Principle of least privilege limits the damage of an over-broad grant -- neither one assumes a breach won't happen, both just shrink what it can actually reach, or how long it stays useful, once one does.",
+        'detail': "This limits the damage of a leaked secret the same way the principle of least privilege limits the damage of an over-broad grant -- neither one assumes a breach won't happen, both just shrink what it can actually reach, or how long it stays useful, once one does.",
     },
 ]
 
@@ -2185,8 +2188,8 @@ CHEAT_SHEET = [
         'heading': 'Exam-day strategy',
         'points': [
             'You have 90 minutes for 90 questions — about 1.0 minutes each on average. Budget more time for multi-part scenario questions and less for straight recall, rather than pacing every question identically.',
-            "Real scoring isn't a flat percentage of questions right (some count for more than others) — treat 83%+ as a safe buffer to aim for, not an exact threshold to just clear.",
-            "Flag anything you're unsure of and move on rather than stalling — a question later in the exam can sometimes jog a detail you needed earlier, and you get partial credit for nothing by running out of time on one question.",
+            "Scores are scaled to 100-900 rather than reported as a flat percentage of questions right, so 750 isn't a fixed raw count — aim comfortably above the minimum instead of trying to just clear it.",
+            "Flag anything you're unsure of and move on rather than stalling — a question later in the exam can sometimes jog a detail you needed earlier, and any question left unanswered when time runs out earns nothing.",
             "On multi-select ('choose N') questions, eliminate the options you're confident are wrong first; guessing among 2 plausible answers beats guessing among 4.",
             'Your first read of a question is usually right — change an answer only when you find a specific detail you missed, not from general second-guessing.',
         ],
@@ -2194,7 +2197,7 @@ CHEAT_SHEET = [
     {
         'heading': 'Exam format & domain weights',
         'points': [
-            'Up to 90 questions in 90 minutes, scored on a 100-900 scale with 750 required to pass.',
+            'A maximum of 90 multiple-choice and performance-based questions in 90 minutes, scored on a 100-900 scale with 750 required to pass.',
             'Six domains: Cloud Architecture 23%, Deployment 19%, Security 19%, Operations 17%, Troubleshooting 12%, DevOps Fundamentals 10%.',
             'CV0-004 added the DevOps Fundamentals domain that the prior CV0-003 version did not have.',
         ],
@@ -2236,7 +2239,7 @@ CHEAT_SHEET = [
     {
         'heading': 'Operations & troubleshooting methodology',
         'points': [
-            "CompTIA's troubleshooting methodology, in order: identify the problem, establish a theory, test the theory, establish a plan of action, implement the plan, verify full system functionality, document the incident.",
+            "CompTIA's troubleshooting methodology, in order: identify the problem, establish a theory of probable cause, test the theory, establish a plan of action and implement the solution, verify full system functionality (adding preventive measures where applicable), and document findings, actions, and outcomes.",
             "Baseline metrics must be captured BEFORE an incident — without one you can't prove current behavior is actually abnormal.",
             'Logging records events, monitoring observes trends over time, and alerting notifies when a threshold is crossed — three distinct layers, not synonyms.',
         ],
@@ -2320,7 +2323,7 @@ None of this is worth much if it's never actually tested. Chaos engineering deli
         'quizIds': ['q14', 'q15', 'q17', 'q41', 'q60', 'q62'],
         'reading': """Every access decision on this exam ultimately traces back to AAA: authentication verifies who you are, authorization determines what you're allowed to do once verified, and accounting logs what was actually done, for audit purposes. A stolen-but-valid password is an authentication success and an authorization problem waiting to happen — the credential checks out, but it isn't really that person acting. Two access control models decide the authorization half differently: RBAC grants permissions based on a user's assigned role, simple to administer at scale, while ABAC evaluates a combination of attributes — department, resource tag, time of day, location — dynamically at request time, more flexible but harder to audit since the effective rule set isn't fixed in advance. Single sign-on sits entirely on the authentication side, letting a user log in once and reach multiple systems without proving their identity over and over.
 
-Protecting data means matching the right control to the state that data is actually in. Encryption at rest protects data sitting on disk; encryption in transit protects it moving across a network, like TLS; encryption in use protects data while it's actively being processed in memory, the hardest of the three and typically requiring specialized hardware. A password stolen in transit was never protected by strong at-rest encryption at all — the two controls don't substitute for each other. Tokenization takes a different approach for something like a stored card number: it substitutes the value with a randomly generated token that has no mathematical relationship to the original, with the real data held in a separate vault — unlike encryption, which is always reversible given the right key, a token can't be reversed at all, even with unlimited computing power. Multifactor authentication combines factors from different categories — something you know, something you have, something you are, and sometimes somewhere you are or something you do — and two factors from the same category, like two passwords, still isn't true MFA.
+Protecting data means matching the right control to the state that data is actually in. Encryption at rest protects data sitting on disk; encryption in transit protects it moving across a network, like TLS; encryption in use protects data while it's actively being processed in memory, the hardest of the three and typically requiring specialized hardware. A password stolen in transit was never protected by strong at-rest encryption at all — the two controls don't substitute for each other. Tokenization takes a different approach for something like a stored card number: it substitutes the value with a randomly generated token that has no mathematical relationship to the original, with the real data held in a separate vault — unlike encryption, which is always reversible given the right key, a token can't be mathematically reversed, even with unlimited computing power — only a lookup in the vault maps it back. Multifactor authentication combines factors from different categories — something you know, something you have, something you are, and sometimes somewhere you are or something you do — and two factors from the same category, like two passwords, still isn't true MFA.
 
 Zero Trust ties all of this together as a philosophy rather than a single tool: no request is trusted just because it came from inside the network perimeter, so a compromised VPN credential or a breached firewall alone still isn't enough to reach sensitive resources, because every subsequent request gets independently re-verified. Enforcing that in practice usually means layered network controls: an IDS monitors and alerts on suspicious traffic without blocking it, while an IPS sits inline and can actively block traffic it identifies as malicious — at the cost of a false positive potentially breaking legitimate traffic, a risk a passive IDS never carries. A stateful firewall tracks a connection's state and automatically allows its return traffic; a stateless filter evaluates every packet independently, with no memory of prior traffic, so it needs explicit rules for both directions of every connection. Segmenting a network into zones — a DMZ holding public-facing servers behind an edge firewall, with a second firewall protecting the internal network behind it — limits how far a breach in one zone can reach.""",
         'fundamentalsLabel': 'New to security concepts? See the everyday analogy',
@@ -2332,8 +2335,8 @@ Zero Trust ties all of this together as a philosophy rather than a single tool: 
             "Encrypting data at rest does nothing to protect it once it starts moving across a network — that needs its own, separate in-transit encryption.",
             "A token has no mathematical relationship to the original value at all, unlike encryption, which is always reversible given the right key.",
         ],
-        'scenario': "A company puts its public-facing web and mail servers in a DMZ, sitting behind an edge firewall facing the internet and a second, internal firewall separating that DMZ from the private LAN — so a compromise of the web server doesn't automatically reach internal systems. Administrators must pass MFA and a device-compliance check before reaching anything, consistent with a Zero Trust posture, and every action they take is logged for later audit. Separately, the payment team tokenizes stored card numbers rather than encrypting them, so that even a full database breach exposes only meaningless substitute values with no way to reverse them back to a real card number.",
-        'onTheJob': "Zero Trust is as much an organizational fight as a technical rollout — the pushback usually comes from teams annoyed at being re-verified on every request when 'we're already inside the VPN' used to be good enough, and rolling it out gradually, starting with the most sensitive systems, is usually how it survives contact with a real org chart. An IPS blocking real traffic instead of just malicious traffic is a classic on-call nightmare: a signature update that's slightly too aggressive can silently drop a legitimate partner integration, and figuring out 'is this an attack or did we just break something' under pressure is a big part of what security operations actually does day to day. Tokenization vs. encryption decisions in practice usually come down to a compliance auditor's specific requirement, like PCI-DSS favoring tokenization for stored card data, rather than a pure security-engineering call.",
+        'scenario': "A company puts its public-facing web and mail servers in a DMZ, sitting behind an edge firewall facing the internet and a second, internal firewall separating that DMZ from the private LAN — so a compromise of the web server doesn't automatically reach internal systems. Administrators must pass MFA and a device-compliance check before reaching anything, consistent with a Zero Trust posture, and every action they take is logged for later audit. Separately, the payment team tokenizes stored card numbers rather than encrypting them, so that even a full database breach exposes only meaningless substitute values with no mathematical way to reverse them back to a real card number.",
+        'onTheJob': "Zero Trust is as much an organizational fight as a technical rollout — the pushback usually comes from teams annoyed at being re-verified on every request when 'we're already inside the VPN' used to be good enough, and rolling it out gradually, starting with the most sensitive systems, is usually how it survives contact with a real org chart. An IPS blocking real traffic instead of just malicious traffic is a classic on-call nightmare: a signature update that's slightly too aggressive can silently drop a legitimate partner integration, and figuring out 'is this an attack or did we just break something' under pressure is a big part of what security operations actually does day to day. Tokenization vs. encryption decisions in practice usually come down to a compliance auditor's specific requirement — tokenization is a common way to shrink the PCI DSS scope of stored card data — rather than a pure security-engineering call.",
     },
     {
         'id': 'deployment-strategies',
