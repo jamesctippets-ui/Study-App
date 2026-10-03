@@ -1266,6 +1266,43 @@ function CertStudyApp() {
     setSessionAnswers((a) => [...a, { id: currentQ.id, cat: currentQ.cat, prompt: currentQ.question, correct: isCorrect, explanation: currentQ.explanation, whyTested: currentQ.whyTested, track: qTrack }]);
   };
 
+  // The guided path (04e_path_ui.jsx) runs its own small sessions, but every
+  // answer, rating, and counter still goes through the same recorders the
+  // Practice tab uses, so mastery, spaced repetition, streaks, the daily
+  // goal, and achievements need no path-specific scoring.
+  const pathApi = {
+    rateCard: (id, quality) => {
+      recordResult(id, ratingToOutcome(quality));
+      recordSrs(id, quality);
+      bumpDailyGoal(1);
+    },
+    recordResult: (id, outcome) => {
+      recordResult(id, outcome);
+      bumpDailyGoal(1);
+    },
+    markSeen,
+    finishQuiz: (correct, total) => {
+      const cur = statsRef.current;
+      const perfect = total >= 10 && correct === total;
+      saveStats({
+        ...cur,
+        counts: {
+          ...cur.counts,
+          quizzesCompleted: cur.counts.quizzesCompleted + 1,
+          perfectQuizzes: cur.counts.perfectQuizzes + (perfect ? 1 : 0),
+        },
+      });
+    },
+    onMatchRound: () => {
+      const cur = statsRef.current;
+      saveStats({ ...cur, counts: { ...cur.counts, matchRoundsCompleted: cur.counts.matchRoundsCompleted + 1 } });
+    },
+    completeStep: (stepId, pct) => {
+      const cur = statsRef.current;
+      saveStats({ ...cur, path: markPathStepDone(cur.path, activeTrack, stepId, pct, todayString()) });
+    },
+  };
+
   const doReset = () => {
     saveResults({ ...results, [activeTrack]: {} });
     saveSrs({ ...srs, [activeTrack]: {} });
@@ -1687,7 +1724,19 @@ function CertStudyApp() {
           />
         )}
 
-        {mode === 'path' && <PathView track={track} />}
+        {mode === 'path' && (
+          <PathView
+            key={activeTrack}
+            track={track}
+            trackKey={activeTrack}
+            doneMap={((stats.path || {})[activeTrack] || {}).done || {}}
+            results={trackResults}
+            seenLog={seenLog[activeTrack] || {}}
+            categories={categories}
+            speech={{ speakingId, onSpeak: speak, speechSupported }}
+            api={pathApi}
+          />
+        )}
 
         {mode === 'quiz' && quizView === 'questions' && (
           <React.Fragment>

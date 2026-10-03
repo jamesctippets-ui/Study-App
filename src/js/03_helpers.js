@@ -505,6 +505,7 @@ function emptyStats() {
     dailyChallenge: { date: null, question: null, vocab: null },
     readinessHistory: {},
     categoryMasteryHistory: {},
+    path: {},
   };
 }
 
@@ -529,6 +530,7 @@ function normalizeStats(raw) {
     },
     readinessHistory: raw.readinessHistory && typeof raw.readinessHistory === 'object' ? raw.readinessHistory : {},
     categoryMasteryHistory: raw.categoryMasteryHistory && typeof raw.categoryMasteryHistory === 'object' ? raw.categoryMasteryHistory : {},
+    path: normalizePathStats(raw.path),
   };
 }
 
@@ -550,6 +552,184 @@ function advanceStreak(streak) {
   const gap = streak.lastActiveDate ? daysBetween(streak.lastActiveDate, today) : null;
   const nextCurrent = gap === 1 ? streak.current + 1 : 1;
   return { current: nextCurrent, longest: Math.max(streak.longest, nextCurrent), lastActiveDate: today };
+}
+
+/* ---------------- guided study path ---------------- */
+
+// A Duolingo-style walk through one track's content, built entirely from
+// data the track already has — no extra authoring. One unit per lesson; each
+// unit is a mixed-order run of steps (read, flashcards, quiz, a mini-game,
+// an apply-it scenario, more cards/quiz, then a checkpoint) assembled from
+// that lesson's own vocab/quiz ids plus whatever else in the track covers
+// the same categories.
+//
+// Persisted shape (stats.path): { [trackKey]: { done: { [stepId]: { at, pct } } } }.
+// A step id is `${lessonId}::${kind}`; ids that no longer match a lesson
+// (content changed since the save) are simply ignored, never an error.
+
+const PATH_PASS_PCT = 70;
+const PATH_CARDS_FIRST = 7;
+const PATH_CARDS_MORE = 8;
+const PATH_QUICK_QUIZ = 5;
+const PATH_PRACTICE_QUIZ = 8;
+const PATH_CHECKPOINT_QUIZ = 8;
+const PATH_CHECKPOINT_REVIEW = 3;
+
+// The order rotates by unit so consecutive units don't feel identical.
+// Steps with no material for a given unit (e.g. no extra flashcards, no
+// scenario) are dropped when the unit is built.
+const PATH_VARIANTS = [
+  ['read', 'cards', 'quiz', 'game', 'apply', 'cards2', 'quiz2', 'checkpoint'],
+  ['read', 'quiz', 'cards', 'apply', 'game', 'quiz2', 'cards2', 'checkpoint'],
+  ['read', 'game', 'cards', 'quiz', 'apply', 'quiz2', 'cards2', 'checkpoint'],
+];
+
+function normalizePathStats(raw) {
+  const out = {};
+  if (!raw || typeof raw !== 'object') return out;
+  Object.keys(raw).forEach((trackKey) => {
+    const entry = raw[trackKey];
+    const done = entry && typeof entry.done === 'object' && entry.done ? entry.done : {};
+    const clean = {};
+    Object.keys(done).forEach((stepId) => {
+      const d = done[stepId];
+      if (d && typeof d === 'object') {
+        clean[stepId] = { at: typeof d.at === 'string' ? d.at : null, pct: Number.isFinite(d.pct) ? d.pct : null };
+      }
+    });
+    out[trackKey] = { done: clean };
+  });
+  return out;
+}
+
+function markPathStepDone(pathStats, trackKey, stepId, pct, today) {
+  const base = pathStats || {};
+  const track = base[trackKey] || { done: {} };
+  return { ...base, [trackKey]: { done: { ...track.done, [stepId]: { at: today, pct: Number.isFinite(pct) ? pct : null } } } };
+}
+
+// Hands each item (anything with a `cat`) to one of the units that cover
+// its category, round-robin, so material a lesson doesn't list explicitly
+// still lands in exactly one unit instead of being duplicated across all of
+// the lessons that happen to share a category.
+function spreadAcrossUnits(items, units, claimed, push) {
+  const counters = {};
+  items.forEach((item) => {
+    if (claimed && claimed.has(item.id)) return;
+    const covering = units.filter((u) => u.cats.includes(item.cat));
+    if (!covering.length) return;
+    const n = counters[item.cat] || 0;
+    push(covering[n % covering.length], item);
+    counters[item.cat] = n + 1;
+  });
+}
+
+function lessonHasApplyContent(lesson) {
+  return !!(lesson.scenario || (lesson.commonTraps && lesson.commonTraps.length) || lesson.onTheJob || lesson.portalMockup);
+}
+
+function estimateReadMinutes(text) {
+  const words = (text || '').split(/\s+/).filter(Boolean).length;
+  return Math.max(1, Math.round(words / 200));
+}
+
+function buildPathUnits(trackKey) {
+  const mod = DATA[trackKey];
+  const lessons = (mod && mod.lessons) || [];
+  if (!lessons.length) return [];
+  const flashById = new Map(mod.flashcards.map((f) => [f.id, f]));
+  const questionIds = new Set(mod.questions.map((q) => q.id));
+
+  const units = lessons.map((lesson, index) => {
+    const vocab = lesson.vocabIds.map((id) => flashById.get(id)).filter(Boolean);
+    const cats = [...new Set(vocab.map((v) => v.cat))];
+    const coreQuestionIds = lesson.quizIds.filter((id) => questionIds.has(id));
+    if (!cats.length) {
+      const byId = new Map(mod.questions.map((q) => [q.id, q]));
+      coreQuestionIds.forEach((id) => { const q = byId.get(id); if (q && !cats.includes(q.cat)) cats.push(q.cat); });
+    }
+    return {
+      id: lesson.id, index, lesson, cats,
+      coreCardIds: vocab.map((v) => v.id),
+      coreQuestionIds,
+      extraCardIds: [],
+      extraQuestionIds: [],
+      games: [],
+    };
+  });
+
+  const claimedCards = new Set(units.flatMap((u) => u.coreCardIds));
+  const claimedQuestions = new Set(units.flatMap((u) => u.coreQuestionIds));
+  spreadAcrossUnits(mod.flashcards, units, claimedCards, (u, f) => u.extraCardIds.push(f.id));
+  spreadAcrossUnits(mod.questions, units, claimedQuestions, (u, q) => u.extraQuestionIds.push(q.id));
+  const gameItems = [
+    ...(mod.compare || []).map((g) => ({ kind: 'compare', id: g.id, cat: g.cat })),
+    ...(mod.madlibs || []).map((g) => ({ kind: 'madlib', id: g.id, cat: g.cat })),
+    ...(mod.sequences || []).map((g) => ({ kind: 'sequence', id: g.id, cat: g.cat })),
+  ];
+  spreadAcrossUnits(gameItems, units, null, (u, g) => u.games.push(g));
+
+  return units.map((u) => {
+    const { lesson } = u;
+    const cardsA = u.coreCardIds.slice(0, PATH_CARDS_FIRST);
+    const cardsB = [...u.coreCardIds.slice(PATH_CARDS_FIRST), ...u.extraCardIds].slice(0, PATH_CARDS_MORE);
+    const quickPool = u.coreQuestionIds.length ? u.coreQuestionIds : u.extraQuestionIds;
+    const fullPool = [...u.coreQuestionIds, ...u.extraQuestionIds];
+    const game = u.games.length
+      ? u.games[u.index % u.games.length]
+      : (u.coreCardIds.length >= 3 ? { kind: 'match', id: null, cat: u.cats[0] } : null);
+    const gameLabels = { match: 'Match the terms', madlib: 'Mad Lib', sequence: 'Put it in order', compare: 'Pick the better answer' };
+    const spec = {
+      read: { label: 'Read the lesson', meta: `${estimateReadMinutes(lesson.reading)} min read`, ok: !!lesson.reading },
+      cards: { label: 'Flashcards', meta: `${cardsA.length} cards`, cardIds: cardsA, ok: cardsA.length > 0 },
+      quiz: { label: 'Quick check', meta: `${Math.min(PATH_QUICK_QUIZ, quickPool.length)} questions`, poolIds: quickPool, count: PATH_QUICK_QUIZ, ok: quickPool.length > 0 },
+      game: { label: game ? gameLabels[game.kind] : 'Game', meta: 'Mini-game', game, ok: !!game },
+      apply: { label: 'Apply it', meta: 'Scenario and on the job', ok: lessonHasApplyContent(lesson) },
+      cards2: { label: 'More flashcards', meta: `${cardsB.length} cards`, cardIds: cardsB, ok: cardsB.length > 0 },
+      quiz2: { label: 'Practice quiz', meta: `${Math.min(PATH_PRACTICE_QUIZ, fullPool.length)} questions`, poolIds: fullPool, count: PATH_PRACTICE_QUIZ, ok: fullPool.length > 0 },
+      checkpoint: { label: 'Unit checkpoint', meta: `${Math.min(PATH_CHECKPOINT_QUIZ, fullPool.length + 3)} mixed questions`, poolIds: fullPool, count: PATH_CHECKPOINT_QUIZ, ok: fullPool.length > 0 },
+    };
+    const steps = PATH_VARIANTS[u.index % PATH_VARIANTS.length]
+      .filter((kind) => spec[kind].ok)
+      .map((kind) => ({ id: `${lesson.id}::${kind}`, kind, ...spec[kind] }));
+    return {
+      id: u.id, index: u.index, lesson, title: lesson.title, summary: lesson.summary, cats: u.cats,
+      poolIds: fullPool, steps,
+    };
+  });
+}
+
+function pathStepIsDone(doneMap, stepId) {
+  return !!(doneMap && doneMap[stepId]);
+}
+
+function pathUnitProgress(unit, doneMap) {
+  const total = unit.steps.length;
+  const done = unit.steps.filter((s) => pathStepIsDone(doneMap, s.id)).length;
+  return { done, total, complete: total > 0 && done === total };
+}
+
+// The first step you haven't finished, scanning in path order — what the
+// "Continue" button opens. Null once everything is done.
+function pathNextStep(units, doneMap) {
+  for (const unit of units) {
+    const step = unit.steps.find((s) => !pathStepIsDone(doneMap, s.id));
+    if (step) return { unit, step };
+  }
+  return null;
+}
+
+function pathOverallProgress(units, doneMap) {
+  let total = 0;
+  let done = 0;
+  let unitsComplete = 0;
+  units.forEach((u) => {
+    const p = pathUnitProgress(u, doneMap);
+    total += p.total;
+    done += p.done;
+    if (p.complete) unitsComplete += 1;
+  });
+  return { total, done, unitsComplete, unitCount: units.length, pct: total ? Math.round((done / total) * 100) : 0 };
 }
 
 const ACHIEVEMENTS = [
