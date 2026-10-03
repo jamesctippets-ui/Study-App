@@ -162,9 +162,13 @@ function ExamQuestionView({ q, selectedIdx, onSelect }) {
   );
 }
 
+const REVIEW_PREVIEW_COUNT = 5;
+
 function ExamResults({ result, config, track, categories, onRestart, variant }) {
+  const [showAllMissed, setShowAllMissed] = useState(false);
   const pct = result.total ? Math.round((result.correct / result.total) * 100) : 0;
   const missed = result.items.filter((i) => !i.correct);
+  const shownMissed = showAllMissed ? missed : missed.slice(0, REVIEW_PREVIEW_COUNT);
   const isItil = track.key === 'itil';
   const isFinal = variant === 'final';
   const onTarget = pct >= config.passPct;
@@ -223,9 +227,11 @@ function ExamResults({ result, config, track, categories, onRestart, variant }) 
       )}
       {missed.length > 0 && (
         <div className="mt-4">
-          <div style={{ fontSize: '12px', color: COLOR.muted, marginBottom: '8px' }}>Review these:</div>
+          <div style={{ fontSize: '12px', color: COLOR.muted, marginBottom: '8px' }}>
+            Review these{missed.length > REVIEW_PREVIEW_COUNT ? ` (${shownMissed.length} of ${missed.length})` : ''}:
+          </div>
           <div className="flex flex-col gap-2">
-            {missed.map((m, i) => (
+            {shownMissed.map((m, i) => (
               <div key={i} style={{ boxShadow: SHADOW.card, background: COLOR.surfaceRaised, borderRadius: '10px', padding: '10px 12px', fontSize: '13px' }}>
                 <div style={{ fontSize: '10px', color: COLOR.muted, marginBottom: '2px' }}>
                   {categories.find((c) => c.key === m.cat)?.label}{!m.answered ? ' — left blank' : ''}
@@ -245,6 +251,14 @@ function ExamResults({ result, config, track, categories, onRestart, variant }) 
               </div>
             ))}
           </div>
+          {missed.length > REVIEW_PREVIEW_COUNT && (
+            <button
+              onClick={() => setShowAllMissed((v) => !v)}
+              style={{ width: '100%', marginTop: '10px', padding: '10px', borderRadius: '12px', border: `1px solid ${COLOR.border}`, background: 'transparent', color: COLOR.primary, fontSize: '13px', fontWeight: 600 }}
+            >
+              {showAllMissed ? 'Show fewer' : `Show all ${missed.length} missed questions`}
+            </button>
+          )}
         </div>
       )}
       <button

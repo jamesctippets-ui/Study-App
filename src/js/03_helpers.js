@@ -263,9 +263,16 @@ function normalizeSrs(raw) {
 // resolve (GitHub Pages included), and a hash needs none: the fragment
 // never even reaches the server. `mode === 'home'` collapses to a bare
 // `#/home` since it has no track/sub-view of its own.
+//
+// The internal mode names ('learn', 'quiz') predate the Path / Practice /
+// Reference / Exam navigation and are kept as-is so every session effect
+// that keys off them still works; only the user-facing labels and URLs
+// changed (learn -> reference, quiz -> practice). parseHash still accepts
+// the old `learn`/`quiz` URL segments so existing bookmarks keep working.
 function routeToHash(mode, trackKey, learnView, quizView) {
-  if (mode === 'learn') return `#/${trackKey}/learn/${learnView}`;
-  if (mode === 'quiz') return `#/${trackKey}/quiz/${quizView}`;
+  if (mode === 'path') return `#/${trackKey}/path`;
+  if (mode === 'learn') return `#/${trackKey}/reference/${learnView}`;
+  if (mode === 'quiz') return `#/${trackKey}/practice/${quizView}`;
   if (mode === 'exam') return `#/${trackKey}/exam`;
   return '#/home';
 }
@@ -282,8 +289,9 @@ function parseHash(hash, validTrackKeys) {
   if (!parts.length || parts[0] === 'home') return { mode: 'home' };
   const [trackKey, mode, sub] = parts;
   if (!validTrackKeys.has(trackKey)) return { mode: 'home' };
-  if (mode === 'learn') return { mode: 'learn', trackKey, learnView: ['cards', 'study', 'sheet'].includes(sub) ? sub : 'study' };
-  if (mode === 'quiz') return { mode: 'quiz', trackKey, quizView: ['questions', 'match', 'verbal', 'commands', 'madlibs', 'sequence', 'casestudy', 'compare'].includes(sub) ? sub : 'questions' };
+  if (mode === 'path') return { mode: 'path', trackKey };
+  if (mode === 'reference' || mode === 'learn') return { mode: 'learn', trackKey, learnView: ['cards', 'study', 'sheet'].includes(sub) ? sub : 'study' };
+  if (mode === 'practice' || mode === 'quiz') return { mode: 'quiz', trackKey, quizView: ['questions', 'match', 'verbal', 'commands', 'madlibs', 'sequence', 'casestudy', 'compare'].includes(sub) ? sub : 'questions' };
   if (mode === 'exam') return { mode: 'exam', trackKey };
   return { mode: 'home' };
 }

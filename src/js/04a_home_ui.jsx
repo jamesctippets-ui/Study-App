@@ -233,7 +233,7 @@ function DataPanel({
   );
 }
 
-const MODE_LABELS = { learn: 'Learn', quiz: 'Quiz', exam: 'Exam' };
+const MODE_LABELS = { path: 'Path', learn: 'Reference', quiz: 'Practice', exam: 'Exam' };
 
 // A small self-set "study N cards/questions today" ring — cheap to build
 // since it just tallies activity already recorded elsewhere (flashcard
@@ -662,7 +662,7 @@ function HomeView({ tracks, results, seenLog, stats, certPlan, onResume, onSelec
         >
           <div style={{ fontSize: '11px', color: COLOR.muted, marginBottom: '2px' }}>Continue where you left off</div>
           <div style={{ fontSize: '15px', fontWeight: 600, color: trackAccent(resumeTrack.key) }}>
-            {resumeTrack.label} · {MODE_LABELS[lastVisited.mode] || 'Learn'}
+            {resumeTrack.label} · {MODE_LABELS[lastVisited.mode] || 'Path'}
           </div>
         </button>
       )}

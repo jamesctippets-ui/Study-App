@@ -2,6 +2,13 @@
 
 function QuizSetup({ length, setLength, types, toggleType, onReroll, poolSize, missedCount, onReviewMissed, isMixed }) {
   const lengths = [5, 10, 15, 25];
+  // Length and question-type filters are set-and-forget for most sessions,
+  // so they fold into one summary row instead of stacking three more
+  // always-visible control rows above the first question.
+  const [optionsOpen, setOptionsOpen] = useState(false);
+  const typeNames = [['mc', 'Multiple choice'], ['ms', 'Multi-select'], ['tf', 'True / False']]
+    .filter(([key]) => types[key]).map(([, label]) => label);
+  const typeSummary = typeNames.length === 3 ? 'all types' : typeNames.join(', ');
   return (
     <div style={{ marginBottom: '14px' }}>
       {missedCount > 0 && (
@@ -12,49 +19,63 @@ function QuizSetup({ length, setLength, types, toggleType, onReroll, poolSize, m
           Review {missedCount} missed question{missedCount === 1 ? '' : 's'}
         </button>
       )}
-      {isMixed && (
-        <div style={{ fontSize: '10.5px', color: COLOR.muted, marginBottom: '8px' }}>
-          Mixed practice — questions interleaved across every category on purpose, not just left unfiltered.
-        </div>
-      )}
       <div className="flex justify-between items-center mb-2">
-        <div style={{ fontSize: '11px', color: COLOR.muted }}>{poolSize} questions match this filter</div>
+        <div style={{ fontSize: '11px', color: COLOR.muted }}>
+          {poolSize} questions{isMixed ? ' · mixed across every category on purpose' : ''}
+        </div>
         <button
           onClick={onReroll}
-          style={{ fontSize: '11px', color: COLOR.primary, background: 'transparent', padding: '4px 8px', borderRadius: '8px', border: `1px solid ${COLOR.primary}` }}
+          style={{ fontSize: '11px', color: COLOR.primary, background: 'transparent', padding: '4px 8px', borderRadius: '8px', border: `1px solid ${COLOR.primary}`, flexShrink: 0 }}
         >
           New quiz
         </button>
       </div>
-      <div className="flex items-center gap-2 mb-2">
-        <label htmlFor="quiz-length-select" style={{ fontSize: '11px', color: COLOR.muted }}>Length</label>
-        <select
-          id="quiz-length-select"
-          value={length}
-          onChange={(e) => setLength(Number(e.target.value))}
-          style={{
-            padding: '6px 10px', borderRadius: '9px', fontSize: '12.5px', fontWeight: 600,
-            border: `1px solid ${COLOR.primary}`, background: 'rgba(167,139,250,0.14)', color: COLOR.primary,
-          }}
+      <div style={{ border: `1px solid ${COLOR.border}`, borderRadius: '12px', background: COLOR.surface, overflow: 'hidden' }}>
+        <button
+          onClick={() => setOptionsOpen((o) => !o)}
+          className="btn-flat"
+          style={{ width: '100%', textAlign: 'left', padding: '9px 12px', background: 'transparent', color: COLOR.text, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px' }}
         >
-          {lengths.map((n) => <option key={n} value={n}>{n} questions</option>)}
-        </select>
-      </div>
-      <div className="flex gap-2" style={{ overflowX: 'auto', paddingBottom: '2px' }}>
-        {[['mc', 'Multiple choice'], ['ms', 'Multi-select'], ['tf', 'True / False']].map(([key, label]) => (
-          <button
-            key={key}
-            onClick={() => toggleType(key)}
-            style={{
-              flexShrink: 0, padding: '6px 12px', borderRadius: '999px', fontSize: '12px', fontWeight: 500,
-              border: `1px solid ${types[key] ? COLOR.gold : COLOR.border}`,
-              background: types[key] ? 'rgba(211,164,101,0.14)' : COLOR.surface,
-              color: types[key] ? COLOR.gold : COLOR.muted,
-            }}
-          >
-            {label}
-          </button>
-        ))}
+          <span style={{ fontSize: '12px' }}>
+            <span style={{ color: COLOR.muted }}>Options: </span>
+            <span style={{ fontWeight: 600 }}>{length} questions · {typeSummary}</span>
+          </span>
+          <span style={{ fontSize: '11px', color: COLOR.muted }}>{optionsOpen ? '▴' : '▾'}</span>
+        </button>
+        {optionsOpen && (
+          <div style={{ padding: '4px 12px 12px', borderTop: `1px solid ${COLOR.border}` }}>
+            <div className="flex items-center gap-2" style={{ margin: '10px 0' }}>
+              <label htmlFor="quiz-length-select" style={{ fontSize: '11px', color: COLOR.muted }}>Length</label>
+              <select
+                id="quiz-length-select"
+                value={length}
+                onChange={(e) => setLength(Number(e.target.value))}
+                style={{
+                  padding: '6px 10px', borderRadius: '9px', fontSize: '12.5px', fontWeight: 600,
+                  border: `1px solid ${COLOR.primary}`, background: 'rgba(167,139,250,0.14)', color: COLOR.primary,
+                }}
+              >
+                {lengths.map((n) => <option key={n} value={n}>{n} questions</option>)}
+              </select>
+            </div>
+            <div className="flex gap-2" style={{ flexWrap: 'wrap' }}>
+              {[['mc', 'Multiple choice'], ['ms', 'Multi-select'], ['tf', 'True / False']].map(([key, label]) => (
+                <button
+                  key={key}
+                  onClick={() => toggleType(key)}
+                  style={{
+                    flexShrink: 0, padding: '6px 12px', borderRadius: '999px', fontSize: '12px', fontWeight: 500,
+                    border: `1px solid ${types[key] ? COLOR.gold : COLOR.border}`,
+                    background: types[key] ? 'rgba(211,164,101,0.14)' : COLOR.surface,
+                    color: types[key] ? COLOR.gold : COLOR.muted,
+                  }}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
@@ -520,6 +541,78 @@ function SequenceView({ session, index, score, categories, workingOrder, onMove,
         >
           {index + 1 >= total ? 'Finish' : 'Next'}
         </button>
+      )}
+    </div>
+  );
+}
+
+// Grouped so the Practice tab reads as three small sections instead of one
+// 8-wide row of equal tabs. `requires` names the track capability a tool
+// depends on (matching the same guards the old tab row used).
+const PRACTICE_TOOLS = [
+  { key: 'questions', group: 'Test yourself', label: 'Questions', desc: 'Mixed or per-category practice quiz' },
+  { key: 'compare', group: 'Test yourself', label: 'Compare', desc: 'Pick the better of two plausible answers', requires: 'compare' },
+  { key: 'casestudy', group: 'Test yourself', label: 'Case Study', desc: 'Several questions off one shared scenario', requires: 'casestudy' },
+  { key: 'madlibs', group: 'Games & drills', label: 'Mad Libs', desc: 'Fill the blanks in a real-world scenario', requires: 'madlibs' },
+  { key: 'sequence', group: 'Games & drills', label: 'Sequence', desc: 'Put a procedure\'s steps in the right order', requires: 'sequence' },
+  { key: 'match', group: 'Games & drills', label: 'Match', desc: 'Draw lines between terms and definitions' },
+  { key: 'commands', group: 'Games & drills', label: 'Commands', desc: 'Type the right CLI or PowerShell command', requires: 'commands' },
+  { key: 'verbal', group: 'Hands-free', label: 'Verbal', desc: 'Audio-only quiz for driving or walking' },
+];
+
+function PracticeToolPicker({ quizView, available, onSelect }) {
+  const [open, setOpen] = useState(false);
+  useEscapeToClose(() => setOpen(false));
+  const tools = PRACTICE_TOOLS.filter((t) => !t.requires || available[t.requires]);
+  const current = tools.find((t) => t.key === quizView) || tools[0];
+  const groups = [];
+  tools.forEach((t) => {
+    let g = groups.find((x) => x.name === t.group);
+    if (!g) { g = { name: t.group, items: [] }; groups.push(g); }
+    g.items.push(t);
+  });
+  return (
+    <div style={{ marginBottom: '14px', position: 'relative' }}>
+      <button
+        onClick={() => setOpen((o) => !o)}
+        style={{
+          width: '100%', textAlign: 'left', padding: '10px 14px', borderRadius: '12px',
+          border: `1px solid ${COLOR.border}`, background: COLOR.surface, color: COLOR.text,
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px',
+        }}
+      >
+        <span style={{ minWidth: 0 }}>
+          <span style={{ display: 'block', fontSize: '10px', color: COLOR.muted, textTransform: 'uppercase', letterSpacing: '0.04em', fontWeight: 600 }}>Practice tool</span>
+          <span style={{ display: 'block', fontSize: '14.5px', fontWeight: 600 }}>{current.label}</span>
+          <span style={{ display: 'block', fontSize: '11.5px', color: COLOR.muted, marginTop: '1px' }}>{current.desc}</span>
+        </span>
+        <span style={{ fontSize: '12px', color: COLOR.muted, flexShrink: 0 }}>{open ? '▴' : '▾'}</span>
+      </button>
+      {open && (
+        <div style={{ boxShadow: SHADOW.card, marginTop: '6px', background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderRadius: '12px', overflow: 'hidden' }}>
+          {groups.map((g, gi) => (
+            <div key={g.name} style={{ borderTop: gi === 0 ? 'none' : `1px solid ${COLOR.border}` }}>
+              <div style={{ padding: '8px 14px 4px', fontSize: '10px', fontWeight: 700, color: COLOR.muted, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{g.name}</div>
+              {g.items.map((t) => {
+                const active = t.key === current.key;
+                return (
+                  <button
+                    key={t.key}
+                    onClick={() => { onSelect(t.key); setOpen(false); }}
+                    className="btn-flat"
+                    style={{
+                      width: '100%', textAlign: 'left', padding: '9px 14px', background: active ? COLOR.surfaceRaised : 'transparent',
+                      color: COLOR.text, display: 'flex', alignItems: 'baseline', gap: '10px',
+                    }}
+                  >
+                    <span style={{ fontSize: '13.5px', fontWeight: 600, color: active ? COLOR.primary : COLOR.text, minWidth: '74px' }}>{t.label}</span>
+                    <span style={{ fontSize: '11.5px', color: COLOR.muted, lineHeight: 1.35 }}>{t.desc}</span>
+                  </button>
+                );
+              })}
+            </div>
+          ))}
+        </div>
       )}
     </div>
   );
