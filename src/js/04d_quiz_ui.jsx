@@ -525,6 +525,105 @@ function SequenceView({ session, index, score, categories, workingOrder, onMove,
   );
 }
 
+function CompareView({ session, index, score, categories, choice, onChoose, onNext, onRestart, flashcardsData }) {
+  const [activeTermKey, setActiveTermKey] = useState(null);
+  useEffect(() => { setActiveTermKey(null); }, [session[index] && session[index].id]);
+  useEscapeToClose(() => setActiveTermKey(null));
+  useClickOutsideToClose(!!activeTermKey, () => setActiveTermKey(null));
+
+  if (!session.length) {
+    return (
+      <div style={{ textAlign: 'center', color: COLOR.muted, fontSize: '13px', padding: '30px 10px' }}>
+        No "more correct answer" comparisons match this filter.
+      </div>
+    );
+  }
+
+  const item = session[index];
+  if (!item) {
+    return (
+      <div style={{ textAlign: 'center', padding: '30px 10px' }}>
+        <div className="itil-display" style={{ fontSize: '16px', fontWeight: 600, marginBottom: '8px' }}>Set complete</div>
+        <div style={{ fontSize: '12.5px', color: COLOR.muted, marginBottom: '18px' }}>
+          {score.correct} / {score.total} time{score.total === 1 ? '' : 's'} you picked the better answer.
+        </div>
+        <button onClick={onRestart} style={{ padding: '10px 20px', borderRadius: '12px', background: COLOR.primary, color: COLOR.onAccent, fontSize: '13px', fontWeight: 600 }}>
+          New set
+        </button>
+      </div>
+    );
+  }
+
+  const categoryLabel = categories.find((c) => c.key === item.cat)?.label;
+  const total = session.length;
+  const submitted = choice !== null;
+  const gotIt = submitted && choice === item.betterIdx;
+
+  return (
+    <div>
+      <div className="flex justify-between items-center mb-2" style={{ fontSize: '11px', color: COLOR.muted }}>
+        <span>{categoryLabel}</span>
+        <span>{index + 1} / {total}</span>
+      </div>
+      <div style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderRadius: '18px', padding: '20px' }}>
+        <div style={{ fontSize: '11px', color: COLOR.gold, marginBottom: '8px', fontWeight: 600 }}>
+          Both options are plausible — which is the better answer?
+        </div>
+        <div style={{ fontSize: '15px', lineHeight: 1.5, fontWeight: 500, marginBottom: '16px' }}>
+          {autoHighlightTerms(item.scenario, flashcardsData, activeTermKey, setActiveTermKey, 2, 'cmp-scn-' + item.id)}
+        </div>
+        <div className="flex flex-col gap-2">
+          {item.options.map((opt, i) => {
+            const isBetter = i === item.betterIdx;
+            const isChosen = i === choice;
+            let bg = COLOR.surfaceRaised, border = COLOR.border, color = COLOR.text;
+            if (submitted) {
+              if (isBetter) { bg = 'rgba(52,211,153,0.15)'; border = COLOR.success; color = COLOR.success; }
+              else if (isChosen) { bg = 'rgba(181,87,74,0.15)'; border = COLOR.red; color = COLOR.red; }
+            }
+            return (
+              <button
+                key={i}
+                disabled={submitted}
+                onClick={() => onChoose(i)}
+                style={{
+                  textAlign: 'left', padding: '12px 14px', borderRadius: '12px',
+                  border: `1px solid ${border}`, background: bg, color, fontSize: '14px', lineHeight: 1.45,
+                  display: 'flex', alignItems: 'flex-start', gap: '10px',
+                  cursor: submitted ? 'default' : 'pointer',
+                }}
+              >
+                <span style={{ fontSize: '11px', fontWeight: 700, color: submitted ? color : COLOR.muted, minWidth: '14px', paddingTop: '2px' }}>{i === 0 ? 'A' : 'B'}</span>
+                <span style={{ flex: 1 }}>{opt}</span>
+                {submitted && isBetter && <span style={{ fontSize: '10px', fontWeight: 700, whiteSpace: 'nowrap', paddingTop: '3px' }}>BETTER</span>}
+                {submitted && isChosen && !isBetter && <span style={{ fontSize: '10px', fontWeight: 700, whiteSpace: 'nowrap', paddingTop: '3px' }}>RUNNER-UP</span>}
+              </button>
+            );
+          })}
+        </div>
+        {submitted && (
+          <div style={{ marginTop: '14px', paddingTop: '14px', borderTop: `1px solid ${COLOR.border}` }}>
+            <div style={{ fontSize: '12px', fontWeight: 700, color: gotIt ? COLOR.success : COLOR.red, marginBottom: '6px' }}>
+              {gotIt ? 'Right call.' : 'Close — but the other one is the better fit.'}
+            </div>
+            <div style={{ fontSize: '12.5px', color: COLOR.muted, lineHeight: 1.55 }}>
+              {autoHighlightTerms(item.why, flashcardsData, activeTermKey, setActiveTermKey, 3, 'cmp-why-' + item.id)}
+            </div>
+          </div>
+        )}
+      </div>
+      {submitted && (
+        <button
+          onClick={onNext}
+          style={{ width: '100%', marginTop: '14px', padding: '12px', borderRadius: '12px', background: COLOR.primary, color: COLOR.onAccent, fontSize: '14px', fontWeight: 600 }}
+        >
+          {index + 1 >= total ? 'Finish' : 'Next'}
+        </button>
+      )}
+    </div>
+  );
+}
+
 function QuestionView({ q, selected, onChoose, onNext, index, total, categoryLabel, badgeLabel, msPending, onToggleMs, onSubmitMs, nextLabel, hideMeta, hideNext, flashcardsData }) {
   const [activeTermKey, setActiveTermKey] = useState(null);
   useEffect(() => { setActiveTermKey(null); }, [q && q.id]);

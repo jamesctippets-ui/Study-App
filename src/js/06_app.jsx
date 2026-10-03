@@ -87,6 +87,12 @@ function CertStudyApp() {
   const [seqSubmitted, setSeqSubmitted] = useState(false);
   const [seqScore, setSeqScore] = useState({ correct: 0, total: 0 });
 
+  const [cmpSession, setCmpSession] = useState([]);
+  const [cmpIndex, setCmpIndex] = useState(0);
+  const [cmpChoice, setCmpChoice] = useState(null);
+  const [cmpScore, setCmpScore] = useState({ correct: 0, total: 0 });
+
+  const [examVariant, setExamVariant] = useState('standard');
   const [examTrack, setExamTrack] = useState(null);
   const [examSession, setExamSession] = useState([]);
   const [examAnswers, setExamAnswers] = useState({});
@@ -129,6 +135,7 @@ function CertStudyApp() {
   const madlibsData = DATA[activeTrack].madlibs || [];
   const sequencesData = DATA[activeTrack].sequences || [];
   const caseStudiesData = DATA[activeTrack].caseStudies || [];
+  const compareData = DATA[activeTrack].compare || [];
   const trackResults = results[activeTrack] || {};
 
   // Applies a freshly-loaded (not user-edited) value to both the React
@@ -692,6 +699,55 @@ function CertStudyApp() {
 
   const nextSequenceItem = () => setSeqIndex((i) => i + 1);
 
+  // "Choose the more correct answer" (ROADMAP.md section 12): two options
+  // that are both plausible, only one of which is the *better* fit for the
+  // stated scenario — the best-answer-not-just-a-correct-one reasoning real
+  // Microsoft/CompTIA exams lean on. The data marks the better one as
+  // 'A'/'B', but the displayed order is re-shuffled per session item so
+  // position never leaks the answer. Scored all-or-nothing per item via
+  // recordResult, same as Mad Libs/Sequence.
+  useEffect(() => {
+    if (quizView === 'compare' && !compareData.length) setQuizView('questions');
+  }, [activeTrack, quizView]);
+
+  const startCompareSession = () => {
+    const pool = activeCat === 'all' ? compareData : compareData.filter((c) => c.cat === activeCat);
+    const session = shuffleArray(pool).map((item) => {
+      const swap = Math.random() < 0.5;
+      const better = item.better === 'A' ? 0 : 1;
+      return {
+        ...item,
+        options: swap ? [item.optionB, item.optionA] : [item.optionA, item.optionB],
+        betterIdx: swap ? 1 - better : better,
+      };
+    });
+    setCmpSession(session);
+    setCmpIndex(0);
+    setCmpChoice(null);
+    setCmpScore({ correct: 0, total: 0 });
+  };
+
+  useEffect(() => {
+    if (mode !== 'quiz' || quizView !== 'compare') return;
+    startCompareSession();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mode, quizView, activeTrack, activeCat]);
+
+  const chooseCompare = (i) => {
+    if (cmpChoice !== null) return;
+    const item = cmpSession[cmpIndex];
+    if (!item) return;
+    const correct = i === item.betterIdx;
+    setCmpChoice(i);
+    recordResult(item.id, correct ? 'correct' : 'incorrect');
+    setCmpScore((s) => ({ correct: s.correct + (correct ? 1 : 0), total: s.total + 1 }));
+  };
+
+  const nextCompareItem = () => {
+    setCmpChoice(null);
+    setCmpIndex((i) => i + 1);
+  };
+
   // Mini case studies (ROADMAP.md section 4) — only meaningful for tracks
   // that ship CASE_STUDIES (AZ-305 at launch). Unlike every other Quiz
   // sub-tab above, one "item" here is a shared scenario with 2+ related
@@ -1097,12 +1153,13 @@ function CertStudyApp() {
         ...madlibsData.filter((m) => m.cat === c.key).map((m) => m.id),
         ...sequencesData.filter((s) => s.cat === c.key).map((s) => s.id),
         ...caseStudiesData.filter((cs) => cs.cat === c.key).flatMap((cs) => cs.questions.map((q) => q.id)),
+        ...compareData.filter((cp) => cp.cat === c.key).map((cp) => cp.id),
       ];
       const correct = items.filter((id) => trackResults[id] === 'correct').length;
       map[c.key] = items.length ? correct / items.length : 0;
     });
     return map;
-  }, [trackResults, categories, flashcardsData, questionsData, madlibsData, sequencesData, caseStudiesData]);
+  }, [trackResults, categories, flashcardsData, questionsData, madlibsData, sequencesData, caseStudiesData, compareData]);
 
   // Logs one per-category mastery snapshot a day for whichever track is
   // actually open (not Home — there's no single "the" track there), so
@@ -1271,11 +1328,17 @@ function CertStudyApp() {
 
   /* ---- final exam logic ---- */
 
-  const startExam = () => {
+  // `variant` is 'standard' (navigate freely, submit any time) or 'final'
+  // (the proctored-style Final Mock: answers lock on advance, no back
+  // navigation, no early submit, straight pass/fail with a per-area score
+  // report). Same question pool, length, and clock either way — the
+  // difference is purely the rules around answering.
+  const startExam = (variant = 'standard') => {
     const cfg = EXAM_CONFIG[activeTrack];
     const pool = DATA[activeTrack].questions.filter((q) => q.type === 'mc' || q.type === 'tf' || q.type === 'ms');
     const picked = pickRotated(pool, Math.min(cfg.length, pool.length), seenLog[activeTrack] || {});
     const session = picked.map(prepareQuestion);
+    setExamVariant(variant);
     setExamTrack(activeTrack);
     setExamSession(session);
     setExamAnswers({});
@@ -1328,7 +1391,16 @@ function CertStudyApp() {
     const pct = examSession.length ? Math.round((correct / examSession.length) * 100) : 0;
     const passed = pct >= EXAM_CONFIG[trackKey].passPct;
     const answeredCount = items.filter((it) => it.answered).length;
-    const statsWithExam = passed ? { ...stats, counts: { ...stats.counts, examsPassed: stats.counts.examsPassed + 1 } } : stats;
+    const statsWithExam = passed
+      ? {
+        ...stats,
+        counts: {
+          ...stats.counts,
+          examsPassed: stats.counts.examsPassed + 1,
+          finalMocksPassed: (stats.counts.finalMocksPassed || 0) + (examVariant === 'final' ? 1 : 0),
+        },
+      }
+      : stats;
     const nextStats = { ...statsWithExam, dailyGoal: recordDailyActivity(statsWithExam.dailyGoal, answeredCount) };
     resultsRef.current = nextResults;
     statsRef.current = nextStats;
@@ -1343,6 +1415,12 @@ function CertStudyApp() {
     const sel = examAnswers[q.id];
     return q.type === 'ms' ? Array.isArray(sel) && sel.length > 0 : sel !== undefined;
   }).length;
+  const examCurrentAnswered = examCurrentQ
+    ? (examCurrentQ.type === 'ms'
+      ? Array.isArray(examAnswers[examCurrentQ.id]) && examAnswers[examCurrentQ.id].length > 0
+      : examAnswers[examCurrentQ.id] !== undefined)
+    : false;
+  const isFinalMock = examVariant === 'final';
 
   return (
     <div
@@ -1630,6 +1708,15 @@ function CertStudyApp() {
                 Case Study
               </button>
             )}
+            {compareData.length > 0 && (
+              <button
+                onClick={() => setQuizView('compare')}
+                className="flex-1 btn-flat"
+                style={{ padding: '6px 2px', borderRadius: '8px', fontSize: '10.5px', fontWeight: 600, background: quizView === 'compare' ? COLOR.surfaceRaised : 'transparent', color: quizView === 'compare' ? COLOR.text : COLOR.muted }}
+              >
+                Compare
+              </button>
+            )}
           </div>
         )}
 
@@ -1816,6 +1903,20 @@ function CertStudyApp() {
           />
         )}
 
+        {mode === 'quiz' && quizView === 'compare' && (
+          <CompareView
+            session={cmpSession}
+            index={cmpIndex}
+            score={cmpScore}
+            categories={categories}
+            choice={cmpChoice}
+            onChoose={chooseCompare}
+            onNext={nextCompareItem}
+            onRestart={startCompareSession}
+            flashcardsData={flashcardsData}
+          />
+        )}
+
         {mode === 'learn' && learnView === 'study' && (
           DATA[activeTrack].lessons ? (
             <CourseView
@@ -1841,11 +1942,14 @@ function CertStudyApp() {
 
         {mode === 'exam' && (
           examPhase === 'intro' ? (
-            <ExamIntro track={track} config={EXAM_CONFIG[activeTrack]} readiness={examReadiness(activeTrack, results, seenLog)} onStart={startExam} />
+            <ExamIntro track={track} config={EXAM_CONFIG[activeTrack]} readiness={examReadiness(activeTrack, results, seenLog)} onStart={() => startExam('standard')} onStartFinal={() => startExam('final')} />
           ) : examPhase === 'active' ? (
             <div>
               <div className="flex justify-between items-center mb-2">
-                <span style={{ fontSize: '11px', color: COLOR.muted }}>Question {examIndex + 1} of {examSession.length}</span>
+                <span style={{ fontSize: '11px', color: COLOR.muted }}>
+                  {isFinalMock && <span style={{ color: COLOR.gold, fontWeight: 700, letterSpacing: '0.04em', marginRight: '6px' }}>FINAL MOCK</span>}
+                  Question {examIndex + 1} of {examSession.length}
+                </span>
                 <span style={{ fontSize: '13px', fontWeight: 700, color: examTimeLeft <= 300 ? COLOR.red : examTimeLeft <= 600 ? COLOR.gold : COLOR.muted }}>
                   {formatTime(examTimeLeft)}
                 </span>
@@ -1863,42 +1967,48 @@ function CertStudyApp() {
                 })}
               />
               <div style={{ fontSize: '11px', color: COLOR.muted, textAlign: 'center', marginTop: '8px' }}>
-                {examAnsweredCount} of {examSession.length} answered
+                {isFinalMock ? 'Answers lock the moment you move on — no going back.' : `${examAnsweredCount} of ${examSession.length} answered`}
               </div>
               <div className="flex gap-2 mt-3">
-                <button
-                  disabled={examIndex === 0}
-                  onClick={() => setExamIndex((i) => Math.max(0, i - 1))}
-                  className="flex-1"
-                  style={{ padding: '12px', borderRadius: '12px', border: `1px solid ${COLOR.border}`, background: 'transparent', color: examIndex === 0 ? COLOR.border : COLOR.text, fontSize: '14px', fontWeight: 600 }}
-                >
-                  Previous
-                </button>
+                {!isFinalMock && (
+                  <button
+                    disabled={examIndex === 0}
+                    onClick={() => setExamIndex((i) => Math.max(0, i - 1))}
+                    className="flex-1"
+                    style={{ padding: '12px', borderRadius: '12px', border: `1px solid ${COLOR.border}`, background: 'transparent', color: examIndex === 0 ? COLOR.border : COLOR.text, fontSize: '14px', fontWeight: 600 }}
+                  >
+                    Previous
+                  </button>
+                )}
                 {examIndex + 1 < examSession.length ? (
                   <button
+                    disabled={isFinalMock && !examCurrentAnswered}
                     onClick={() => setExamIndex((i) => i + 1)}
                     className="flex-1"
-                    style={{ padding: '12px', borderRadius: '12px', background: COLOR.primary, color: COLOR.onAccent, fontSize: '14px', fontWeight: 600 }}
+                    style={{ padding: '12px', borderRadius: '12px', background: isFinalMock && !examCurrentAnswered ? COLOR.surfaceRaised : COLOR.primary, color: isFinalMock && !examCurrentAnswered ? COLOR.muted : COLOR.onAccent, fontSize: '14px', fontWeight: 600 }}
                   >
-                    Next
+                    {isFinalMock ? 'Lock in & next' : 'Next'}
                   </button>
                 ) : (
                   <button
+                    disabled={isFinalMock && !examCurrentAnswered}
                     onClick={() => setExamPhase('complete')}
                     className="flex-1"
-                    style={{ padding: '12px', borderRadius: '12px', background: COLOR.gold, color: COLOR.onAccent, fontSize: '14px', fontWeight: 700 }}
+                    style={{ padding: '12px', borderRadius: '12px', background: isFinalMock && !examCurrentAnswered ? COLOR.surfaceRaised : COLOR.gold, color: isFinalMock && !examCurrentAnswered ? COLOR.muted : COLOR.onAccent, fontSize: '14px', fontWeight: 700 }}
                   >
                     Submit Exam
                   </button>
                 )}
               </div>
-              <button
-                onClick={() => setExamPhase('complete')}
-                className="btn-flat"
-                style={{ width: '100%', marginTop: '8px', padding: '6px', fontSize: '11px', color: COLOR.muted, background: 'transparent' }}
-              >
-                Submit early
-              </button>
+              {!isFinalMock && (
+                <button
+                  onClick={() => setExamPhase('complete')}
+                  className="btn-flat"
+                  style={{ width: '100%', marginTop: '8px', padding: '6px', fontSize: '11px', color: COLOR.muted, background: 'transparent' }}
+                >
+                  Submit early
+                </button>
+              )}
             </div>
           ) : (
             examResult && (
@@ -1907,6 +2017,7 @@ function CertStudyApp() {
                 config={EXAM_CONFIG[examTrack || activeTrack]}
                 track={TRACKS.find((t) => t.key === (examTrack || activeTrack))}
                 categories={DATA[examTrack || activeTrack].categories}
+                variant={examVariant}
                 onRestart={() => setExamPhase('intro')}
               />
             )

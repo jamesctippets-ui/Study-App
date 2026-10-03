@@ -68,7 +68,12 @@ interleaving across topics is the more evidence-backed technique for
 actual exam-day transfer than always drilling one category in a row. A
 short caption under the quiz setup calls this out so it reads as an
 intentional mode. Exam is a timed Final Exam mode matching each real exam's
-length/pass mark. Once you've attempted anything in a track, its Exam tab
+length/pass mark, in two flavors: the **practice exam** (navigate freely,
+change answers, submit whenever) and a proctored-style **Final Mock** —
+same questions and clock, but every answer locks the moment you move on,
+there's no going back or submitting early, nothing is shown until the end,
+and the result is a straight pass/fail at the real pass mark with a
+per-area score report like the real one. Once you've attempted anything in a track, its Exam tab
 also shows a blended **exam readiness** signal (`examReadiness` in
 `03_helpers.js`) above the "Start Exam" button — labeled "Just starting,"
 "Building," "Getting there," or "Exam ready" — instead of just the flat
@@ -399,6 +404,15 @@ scenario and the grouping are new — so unlike Mad Libs/Sequence above
 individually the same way a regular quiz question is, matching how a real
 case study's questions are graded independently.
 
+Tracks with `COMPARE` content get a **Compare** sub-tab ("choose the
+more correct answer"): a scenario with two options that are *both*
+plausible, where only one is the better fit — pick it, then read why
+the runner-up falls short. This exercises the best-answer-not-just-a-
+correct-one judgment real Microsoft/CompTIA exams lean on, which plain
+multiple choice can't quite reach. The displayed A/B order is re-
+shuffled per session so position never gives the answer away. Feeds
+mastery %/results the normal way, scored all-or-nothing per item.
+
 Every multiple-choice question across all 15 tracks has been through a
 wording-giveaway audit — checking that the correct answer isn't
 identifiable just from being longer, more specific, free of absolute
@@ -474,8 +488,8 @@ src/js/
   04a_home_ui.jsx        — Home, cert path, daily goal/question/vocab, achievements, Data panel
   04b_panels_ui.jsx      — About/Legal, Glossary, term flyout, category filter
   04c_lesson_ui.jsx      — flashcards, Study, cheat sheet, Match game, lesson/course view
-  04d_quiz_ui.jsx        — quiz setup, Verbal Quiz, CLI practice, Mad Libs, Sequence, Case Study, QuestionView/QuizSummary
-  05_final_exam_ui.jsx   — timed exam intro/runner/results
+  04d_quiz_ui.jsx        — quiz setup, Verbal Quiz, CLI practice, Mad Libs, Sequence, Compare, Case Study, QuestionView/QuizSummary
+  05_final_exam_ui.jsx   — timed exam intro/runner/results (practice exam + proctored-style Final Mock)
   06_app.jsx             — CertStudyApp, the top-level component
 
   Files are concatenated in filename sort order (see build.py below), which

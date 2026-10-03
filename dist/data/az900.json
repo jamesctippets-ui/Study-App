@@ -2699,5 +2699,61 @@
         }
       ]
     }
+  ],
+  "compare": [
+    {
+      "id": "cmp-az900-1",
+      "cat": "cloudConcepts",
+      "scenario": "A retailer's web traffic triples every Black Friday weekend and returns to normal by Tuesday. They want to pay for the extra capacity only while it's actually needed. Which better describes the cloud benefit they are relying on?",
+      "optionA": "Scalability \u2014 the ability to add resources so the application can handle increased load.",
+      "optionB": "Elasticity \u2014 resources are added as demand rises and automatically removed again as it falls.",
+      "better": "B",
+      "why": "Scalability is true but incomplete: it only says capacity can grow. The scenario stresses paying only while the surge lasts, which depends on capacity shrinking back afterward \u2014 that is Elasticity. On the exam, when a scenario mentions both the spike and the return to normal, elasticity is the sharper answer."
+    },
+    {
+      "id": "cmp-az900-2",
+      "cat": "cloudConcepts",
+      "scenario": "A hospital must keep patient-record processing on servers it owns for regulatory reasons, but wants to run month-end analytics on Azure using copies of de-identified data. Which better describes the deployment model?",
+      "optionA": "Private cloud, because the sensitive workloads stay on hardware the hospital controls.",
+      "optionB": "Hybrid cloud, because on-premises systems and public cloud resources are used together for the same organization's workloads.",
+      "better": "B",
+      "why": "The private-cloud answer describes only the most sensitive half of the picture. As soon as on-premises infrastructure and Azure are combined to serve one organization's workloads, the model as a whole is hybrid \u2014 the exam expects you to name the combined arrangement, not its most restricted part."
+    },
+    {
+      "id": "cmp-az900-3",
+      "cat": "architecture",
+      "scenario": "A team needs to host a containerized API with no cluster to operate. It sits idle most of the day, with short bursts of traffic. Which is the better choice?",
+      "optionA": "Azure Kubernetes Service (AKS), because it is Azure's managed container orchestrator.",
+      "optionB": "Azure Container Apps, because it runs containers without exposing an orchestrator and can scale to zero when idle.",
+      "better": "B",
+      "why": "AKS is managed, but you still own node pools, upgrades, and cluster-level configuration \u2014 the scenario explicitly wants no cluster to operate. Container Apps hides the orchestrator entirely and scales to zero during idle hours, which also matches the burst-then-idle traffic pattern and its cost profile."
+    },
+    {
+      "id": "cmp-az900-4",
+      "cat": "architecture",
+      "scenario": "An application stores millions of product images that are read far more often than written and must be served to users worldwide at the lowest practical cost. Which storage choice is better?",
+      "optionA": "Azure Files, because it provides a fully managed file share the application can mount.",
+      "optionB": "Azure Blob Storage, because it is object storage built for massive amounts of unstructured data.",
+      "better": "B",
+      "why": "Azure Files would work, but it exists for SMB/NFS file-share semantics such as lift-and-shift apps and shared configuration, and is priced for that. Blob Storage is the service designed for unstructured objects like images at scale, with access tiers to cut cost on rarely-read files and native integration with a CDN for worldwide delivery."
+    },
+    {
+      "id": "cmp-az900-5",
+      "cat": "management",
+      "scenario": "A company wants to guarantee that nobody \u2014 including subscription Owners \u2014 can create virtual machines outside the East US region. Which control is better?",
+      "optionA": "A custom RBAC role that grants VM permissions, assigned to every team that deploys infrastructure.",
+      "optionB": "An Azure Policy assignment with an allowed-locations rule at the subscription scope.",
+      "better": "B",
+      "why": "RBAC answers who may perform which actions; it cannot express a condition like \"only in this region,\" and an Owner can grant themselves more rights anyway. Azure Policy evaluates the properties of what is being deployed (such as location) and applies to everyone at that scope, Owners included \u2014 exactly what the scenario asks for."
+    },
+    {
+      "id": "cmp-az900-6",
+      "cat": "management",
+      "scenario": "A finance team wants to be warned before monthly Azure spend passes $10,000, ideally based on a forecast early in the month rather than after the money is gone. Which tool is better?",
+      "optionA": "Azure Advisor cost recommendations, which identify underused resources that are inflating the bill.",
+      "optionB": "A Cost Management budget with alert thresholds, which notifies when actual or forecasted spend crosses a limit.",
+      "better": "B",
+      "why": "Advisor's cost recommendations are useful but reactive \u2014 they suggest right-sizing after the fact and never track a spend ceiling. A budget in Cost Management is the feature built to define a dollar limit and alert on actual or forecasted spend against it, which is the early warning the team asked for."
+    }
   ]
 }

@@ -283,7 +283,7 @@ function parseHash(hash, validTrackKeys) {
   const [trackKey, mode, sub] = parts;
   if (!validTrackKeys.has(trackKey)) return { mode: 'home' };
   if (mode === 'learn') return { mode: 'learn', trackKey, learnView: ['cards', 'study', 'sheet'].includes(sub) ? sub : 'study' };
-  if (mode === 'quiz') return { mode: 'quiz', trackKey, quizView: ['questions', 'match', 'verbal', 'commands', 'madlibs', 'sequence', 'casestudy'].includes(sub) ? sub : 'questions' };
+  if (mode === 'quiz') return { mode: 'quiz', trackKey, quizView: ['questions', 'match', 'verbal', 'commands', 'madlibs', 'sequence', 'casestudy', 'compare'].includes(sub) ? sub : 'questions' };
   if (mode === 'exam') return { mode: 'exam', trackKey };
   return { mode: 'home' };
 }
@@ -490,7 +490,7 @@ function daysBetween(a, b) {
 function emptyStats() {
   return {
     streak: { current: 0, longest: 0, lastActiveDate: null },
-    counts: { quizzesCompleted: 0, examsPassed: 0, matchRoundsCompleted: 0, perfectQuizzes: 0, caseStudiesCompleted: 0 },
+    counts: { quizzesCompleted: 0, examsPassed: 0, matchRoundsCompleted: 0, perfectQuizzes: 0, caseStudiesCompleted: 0, finalMocksPassed: 0 },
     unlocked: [],
     lastVisited: null,
     dailyGoal: { target: 20, date: null, count: 0 },
@@ -562,32 +562,38 @@ const ACHIEVEMENTS = [
   { id: 'match-maker', icon: '🧩', title: 'Match Maker', description: 'Complete 5 term-matching rounds.', check: (c) => c.matchRoundsCompleted >= 5, target: (c) => [Math.min(c.matchRoundsCompleted, 5), 5] },
   { id: 'case-cracked', icon: '🕵️', title: 'Case Cracked', description: 'Finish your first mini case study.', check: (c) => c.caseStudiesCompleted >= 1, target: (c) => [Math.min(c.caseStudiesCompleted, 1), 1] },
   { id: 'case-veteran', icon: '📂', title: 'Case Veteran', description: 'Finish 10 mini case studies.', check: (c) => c.caseStudiesCompleted >= 10, target: (c) => [Math.min(c.caseStudiesCompleted, 10), 10] },
+  { id: 'fine-print', icon: '⚖️', title: 'Fine Print', description: 'Pick the more correct answer 10 times.', check: (c) => c.compareCorrect >= 10, target: (c) => [Math.min(c.compareCorrect, 10), 10] },
+  { id: 'dress-rehearsal', icon: '🎭', title: 'Dress Rehearsal', description: 'Pass a Final Mock exam under proctored-style rules.', check: (c) => c.finalMocksPassed >= 1, target: (c) => [Math.min(c.finalMocksPassed, 1), 1] },
 ];
 
 // Aggregates stats across every track (not just the active one) — achievements
 // are account-wide, matching the app's single-profile, no-login model.
 function buildAchievementContext(results, stats) {
   let totalCorrect = 0;
+  let compareCorrect = 0;
   const trackMasteries = [];
   let anyCourseComplete = false;
   Object.keys(DATA).forEach((key) => {
     const mod = DATA[key];
     const trackResults = results[key] || {};
     // Same id set trackMastery (below) folds in — flashcards/questions plus
-    // Mad Libs, Sequence, and case-study questions — so "correct answers,
-    // all-time" actually counts every scored item type, not just the two
-    // oldest ones. Without this, someone who studies mostly through case
-    // studies or Mad Libs would never see Quick Learner/Century Club/etc.
-    // move, despite those items counting toward mastery everywhere else.
+    // Mad Libs, Sequence, Compare, and case-study questions — so "correct
+    // answers, all-time" actually counts every scored item type, not just
+    // the two oldest ones. Without this, someone who studies mostly through
+    // case studies or Mad Libs would never see Quick Learner/Century Club/
+    // etc. move, despite those items counting toward mastery everywhere else.
+    const compareIds = (mod.compare || []).map((c) => c.id);
     const items = [
       ...mod.flashcards.map((f) => f.id),
       ...mod.questions.map((q) => q.id),
       ...(mod.madlibs || []).map((m) => m.id),
       ...(mod.sequences || []).map((s) => s.id),
       ...(mod.caseStudies || []).flatMap((cs) => cs.questions.map((q) => q.id)),
+      ...compareIds,
     ];
     const correctHere = items.filter((id) => trackResults[id] === 'correct').length;
     totalCorrect += correctHere;
+    compareCorrect += compareIds.filter((id) => trackResults[id] === 'correct').length;
     trackMasteries.push(items.length ? (correctHere / items.length) * 100 : 0);
     if (mod.lessons && mod.lessons.length) {
       const allStrong = mod.lessons.every((lesson) => {
@@ -609,6 +615,8 @@ function buildAchievementContext(results, stats) {
     perfectQuizzes: stats.counts.perfectQuizzes,
     matchRoundsCompleted: stats.counts.matchRoundsCompleted,
     caseStudiesCompleted: stats.counts.caseStudiesCompleted,
+    compareCorrect,
+    finalMocksPassed: stats.counts.finalMocksPassed || 0,
   };
 }
 
@@ -646,6 +654,7 @@ function trackMastery(trackKey, results) {
     ...(mod.madlibs || []).map((m) => m.id),
     ...(mod.sequences || []).map((s) => s.id),
     ...(mod.caseStudies || []).flatMap((cs) => cs.questions.map((q) => q.id)),
+    ...(mod.compare || []).map((c) => c.id),
   ];
   if (!ids.length) return 0;
   const correct = ids.filter((id) => trackResults[id] === 'correct').length;

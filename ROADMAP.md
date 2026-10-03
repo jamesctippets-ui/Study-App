@@ -436,9 +436,20 @@ come up.
 
 ## 9. Exam realism (from research)
 
-- [ ] A stricter "final mock" variant of Exam mode: no mid-exam retries, only
+- [x] A stricter "final mock" variant of Exam mode: no mid-exam retries, only
   reviewable at the very end, closer to the real proctored experience than
-  the current Exam mode already is.
+  the current Exam mode already is. Shipped as a second start button on
+  the Exam tab ("Start Final Mock", under a gold rules card). Same
+  question pool, length, and clock as the practice exam, but each answer
+  locks the moment you advance ("Lock in & next" — no Previous button and
+  it stays disabled until you've answered), there's no early submit, the
+  running answered-count is hidden, and the result is a straight PASS/FAIL
+  at the real pass mark plus a per-area score report (correct/total and %
+  per category, colored against the pass mark) the way a real Microsoft/
+  CompTIA score report breaks it down. Passing one unlocks the "Dress
+  Rehearsal" achievement (`finalMocksPassed` in stats.counts). The
+  practice exam is unchanged. See `startExam(variant)` in 06_app.jsx and
+  ExamIntro/ExamResults in 05_final_exam_ui.jsx.
 - [ ] An optional harder "stretch" question pool per track for confidence-
   building beyond real exam difficulty (Tutorials Dojo's approach), kept
   clearly labeled as harder-than-real so it doesn't skew mastery stats.
@@ -947,15 +958,23 @@ doesn't (and why it's still waiting).
   smaller size instead of overflowing or wrapping into a ransom note —
   short terms get to be noticeably bigger rather than everything sharing
   one compromise size.
-- [ ] **"Choose the more correct answer."** A comparative-judgment mode:
+- [x] **"Choose the more correct answer."** A comparative-judgment mode:
   given a scenario, show two plausible-but-imperfect answers and ask which
   is *better*, with an explanation of what makes the runner-up fall short.
   This targets the "best answer, not just a correct one" reasoning real
-  Microsoft/CompTIA exams lean on, which today's single-best-answer
-  multiple choice doesn't quite exercise. Needs a new question shape
-  (e.g. `{"type": "compare", "scenario": ..., "optionA": ..., "optionB": ...,
-  "betterKey": "A", "why": ...}`) and its own view alongside the existing
-  `QuestionView`.
+  Microsoft/CompTIA exams lean on, which single-best-answer multiple
+  choice doesn't quite exercise. Shipped as a **Compare** Quiz sub-tab
+  for any track whose data module ships a `COMPARE` list: each entry is
+  `{id, cat, scenario, optionA, optionB, better: 'A'|'B', why}`, validated
+  by build.py (unique ids and scenario text, non-identical options,
+  `better` in A/B, non-empty `why`). The app re-shuffles the displayed
+  A/B order per session item so position never leaks the answer, shows
+  BETTER / RUNNER-UP tags plus the `why` after a pick, and scores each
+  item all-or-nothing through recordResult — so it folds into mastery,
+  results, and achievements exactly like Mad Libs and Sequence (10 right
+  picks across any tracks unlocks "Fine Print"). AZ-900 was seeded first;
+  the question-hardening pass (section 10.5) extends it to every track.
+  See CompareView in 04d_quiz_ui.jsx and the `cmp*` state in 06_app.jsx.
 - [x] **Scenario Mad Libs.** Shipped as a "Mad Libs" Quiz sub-tab (only
   shown for tracks with `MADLIBS` content — now all 15 tracks, 3-4
   scenarios each, 49 total; started with AZ-900/AZ-104/ITIL/Cloud+ and

@@ -289,6 +289,38 @@ def validate():
                 if not q.get("explanation", "").strip():
                     errors.append(f"[{key}] CASE_STUDIES '{csid}' question '{qid}' is missing an explanation")
 
+        compare = getattr(mod, "COMPARE", [])
+        seen_compare_scenarios = {}
+        for cp in compare:
+            cpid = cp.get("id")
+            if not cpid:
+                errors.append(f"[{key}] a COMPARE entry is missing an 'id'")
+            elif cpid in item_ids:
+                errors.append(f"[{key}] duplicate id '{cpid}' (COMPARE shares an id with another item)")
+            else:
+                item_ids.add(cpid)
+            if cp.get("cat") not in cat_keys:
+                errors.append(f"[{key}] COMPARE '{cpid}' references unknown category '{cp.get('cat')}'")
+            scenario = cp.get("scenario", "")
+            if not scenario.strip():
+                errors.append(f"[{key}] COMPARE '{cpid}' is missing a non-empty 'scenario'")
+            else:
+                scenario_key = " ".join(scenario.split()).lower()
+                if scenario_key in seen_compare_scenarios:
+                    errors.append(f"[{key}] COMPARE '{seen_compare_scenarios[scenario_key]}' and '{cpid}' have identical scenario text")
+                else:
+                    seen_compare_scenarios[scenario_key] = cpid
+            opt_a = cp.get("optionA", "")
+            opt_b = cp.get("optionB", "")
+            if not opt_a.strip() or not opt_b.strip():
+                errors.append(f"[{key}] COMPARE '{cpid}' needs non-empty 'optionA' and 'optionB'")
+            elif opt_a.strip().lower() == opt_b.strip().lower():
+                errors.append(f"[{key}] COMPARE '{cpid}' has identical optionA and optionB")
+            if cp.get("better") not in ("A", "B"):
+                errors.append(f"[{key}] COMPARE '{cpid}' needs 'better' set to 'A' or 'B', got {cp.get('better')!r}")
+            if not cp.get("why", "").strip():
+                errors.append(f"[{key}] COMPARE '{cpid}' is missing a non-empty 'why'")
+
         cli_challenges = getattr(mod, "CLI_CHALLENGES", [])
         cli_ids_seen = set()
         for c in cli_challenges:
@@ -351,6 +383,7 @@ def build_track_data():
             **({"madlibs": mod.MADLIBS} if hasattr(mod, "MADLIBS") else {}),
             **({"sequences": mod.SEQUENCES} if hasattr(mod, "SEQUENCES") else {}),
             **({"caseStudies": mod.CASE_STUDIES} if hasattr(mod, "CASE_STUDIES") else {}),
+            **({"compare": mod.COMPARE} if hasattr(mod, "COMPARE") else {}),
         }
         for key, mod in TRACK_MODULES.items()
     }
