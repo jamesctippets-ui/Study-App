@@ -541,6 +541,33 @@ come up.
     motivated this effort is now closed in practice, though AZ-140/
     DP-900/DP-300/AZ-104 remain the natural next targets if further
     rounds continue.
+- [~] **Question-difficulty hardening pass (user's request: "make questions
+  more difficult across all paths") — in progress.** The audit above fixed
+  *wording giveaways*; this pass raises the *difficulty itself*, because
+  too many questions were definition recall ("What is X?") or restated-
+  definition true/false that the real exams almost never ask. Each track's
+  questions were classified as recall, trivial TF, weak distractors, or
+  already scenario-based, and the first three rewritten **in place** (same
+  `id` and `cat`, so saved progress carries over; type changed only where
+  it made a better question) into short workplace scenarios with a hard
+  constraint, a near-miss distractor drawn from the same concept family,
+  and an explanation that says why each wrong option is less fitting. TF
+  items now encode one specific misconception rather than restating a
+  definition, kept roughly balanced between True and False. Every track
+  also gained ~10 **Compare** items (see section 13). Done so far: ITIL
+  (106 of 123 touched), AB-650 (84 of 111), DP-900 (67 of 105), AZ-900
+  (63 of 119), AZ-104 (61 of 104); the other ten tracks follow in two more
+  waves. Lessons learned along the way: the app shuffles mc/ms options at
+  render time, so text like "the last option" or "option B" names the
+  wrong answer on screen — `build.py` now rejects any stem, option,
+  explanation, or Compare text that refers to an option by position
+  (it caught 7 existing instances plus 14 more in the first ITIL rewrite).
+  Agents were told to flag, not edit, factual doubts outside the questions;
+  two so far, both for a follow-up pass: AB-650's lesson/cheat sheet say
+  `MailItemsAccessed` needs Audit (Premium) although Microsoft expanded
+  Audit (Standard) to include it, and AZ-104's flashcard f14 and Storage
+  lesson still say soft delete alone can't recover an overwritten blob,
+  which current docs contradict.
 - [x] **Progress export/import.** The app has no accounts, so a cleared browser
   or a new device previously meant losing everything. The ⚙ Data & progress
   panel now downloads all progress (results, seenLog, stats) as a JSON file
