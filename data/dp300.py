@@ -42,7 +42,7 @@ FLASHCARDS = [
         'id': 'f3',
         'cat': 'platform',
         'front': "Service tiers: General Purpose vs. Business Critical vs. Hyperscale",
-        'back': "General Purpose uses remote (Azure Premium) storage for balanced price/performance. Business Critical uses local SSD storage plus a built-in set of Always On Availability Groups replicas for the lowest latency and highest resiliency. Hyperscale decouples storage from compute for near-instant storage autogrowth up to 100 TB and fast backups/restores via snapshots.",
+        'back': "General Purpose uses remote (Azure Premium) storage for balanced price/performance. Business Critical uses local SSD storage plus a built-in set of Always On Availability Groups replicas for the lowest latency and highest resiliency. Hyperscale decouples storage from compute for near-instant storage autogrowth up to 128 TB and fast backups/restores via snapshots.",
         'detail': "Business Critical is the tier to reach for when a workload cannot tolerate the latency of remote storage and also wants built-in high availability without configuring anything extra — its secondary replicas are what give it that HA for free.",
     },
     {
@@ -63,8 +63,8 @@ FLASHCARDS = [
         'id': 'f6',
         'cat': 'platform',
         'front': "Migration tooling: DMA vs. Azure Database Migration Service",
-        'back': "The Data Migration Assistant (DMA) is a free tool for assessment (compatibility issues, deprecated features) and for performing smaller, offline schema/data migrations. Azure Database Migration Service (DMS) performs the actual migration at scale, supporting both offline and minimal-downtime online (continuous sync) migrations into Azure SQL targets.",
-        'detail': "DMA is where a migration project usually starts, to surface blocking issues before committing to a path, while DMS is the service that carries out a large or near-zero-downtime cutover once the assessment looks clean.",
+        'back': "The Data Migration Assistant (DMA) was a free tool for assessing compatibility issues and deprecated features and for smaller offline migrations; Microsoft retired it on July 16, 2025 and now points to Azure Database Migration Service (DMS) and the SQL assessment and migration experiences in Azure Arc, Azure Migrate, and SSMS instead. DMS performs the actual migration at scale, supporting both offline and minimal-downtime online (continuous sync) migrations into Azure SQL targets.",
+        'detail': "Assessment is still where a migration project starts, to surface blocking issues before committing to a path (older exam material names DMA for this step), while DMS is the service that carries out a large or near-zero-downtime cutover once the assessment looks clean.",
     },
     {
         'id': 'f7',
@@ -190,13 +190,13 @@ FLASHCARDS = [
         'cat': 'queryPerf',
         'front': 'sys.dm_os_wait_stats',
         'back': "Aggregates, since the last restart or manual reset, the total time queries have spent waiting on each distinct wait type — such as PAGEIOLATCH, LCK, or CXPACKET — making it the starting point for identifying a database's single biggest systemic performance bottleneck category rather than one specific query.",
-        'detail': "Because it is cumulative and database-wide rather than per-query, it complements Diagnosing blocking with sys.dm_exec_requests and sys.dm_os_waiting_tasks: the wait-stats DMV shows the big-picture pattern, while that live DMV pair shows a specific blocking incident happening right now.",
+        'detail': "Because it is cumulative and database-wide rather than per-query, it complements live blocking diagnosis with sys.dm_exec_requests and sys.dm_os_waiting_tasks: the wait-stats DMV shows the big-picture pattern, while that live DMV pair shows a specific blocking incident happening right now.",
     },
     {
         'id': 'f51',
         'cat': 'queryPerf',
         'front': 'In-Memory OLTP (memory-optimized tables)',
-        'back': "Stores selected tables entirely in memory with low-contention access and natively compiled stored procedures for the fastest possible execution — aimed at high-throughput OLTP workloads with heavy lock and latch contention on a small set of hot tables, available on Premium/Business Critical tiers and Managed Instance.",
+        'back': "Stores selected tables entirely in memory with low-contention access and natively compiled stored procedures for the fastest possible execution — aimed at high-throughput OLTP workloads with heavy lock and latch contention on a small set of hot tables, available on the Premium and Business Critical tiers, including Managed Instance Business Critical.",
         'detail': "It targets contention on frequently updated tables specifically — a reporting workload dominated by large aggregate scans is better served by a clustered columnstore index instead.",
     },
     {
@@ -245,7 +245,7 @@ FLASHCARDS = [
         'id': 'f54',
         'cat': 'automation',
         'front': 'SQL Agent alerts (severity- and error-based)',
-        'back': "Defined on Managed Instance or SQL Server on Azure VMs to fire automatically when a specific error number occurs, or when any error of a chosen severity level is raised, triggering a SQL Agent job or a Database Mail notification — distinct from Azure Monitor alerts and diagnostic settings for Azure SQL, which watches platform metrics or log queries instead of raw SQL error events.",
+        'back': "Defined on Managed Instance or SQL Server on Azure VMs to fire automatically when a specific error number occurs, or when any error of a chosen severity level is raised, triggering a SQL Agent job or a Database Mail notification — distinct from Azure Monitor alert rules, which watch platform metrics or log queries instead of raw SQL error events.",
         'detail': "A SQL Agent alert reacts to an error condition raised inside the engine itself, while an Azure Monitor alert rule reacts to metrics or logged data exported to Azure Monitor — the two are complementary layers, not competing options for the same instance.",
     },
     {
@@ -287,7 +287,7 @@ FLASHCARDS = [
         'id': 'f33',
         'cat': 'hadr',
         'front': "Automated backups and point-in-time restore (PITR)",
-        'back': "Azure SQL automatically takes full, differential, and transaction log backups and stores them in geo-redundant (by default) storage, enabling point-in-time restore to any moment within the configured retention window (default 7 days, configurable up to 35).",
+        'back': "Azure SQL automatically takes full, differential, and transaction log backups and stores them in geo-redundant (by default) storage, enabling point-in-time restore to any moment within the configured retention window (default 7 days, configurable from 1 up to 35 days, though the Basic tier is limited to 7).",
         'detail': "PITR restores create a new database rather than overwriting the existing one, which is exactly why it is safe to use to inspect or recover a specific moment in time without disturbing the currently running database.",
     },
     {
@@ -308,22 +308,22 @@ FLASHCARDS = [
         'id': 'f36',
         'cat': 'hadr',
         'front': "Zone-redundant configuration",
-        'back': "A zone-redundant Azure SQL Database or Managed Instance (Business Critical or Premium tiers) spreads its replicas across multiple Azure availability zones within the same region, protecting against a datacenter-level failure without needing a separate region or a failover group.",
+        'back': "A zone-redundant Azure SQL Database (vCore General Purpose, Business Critical, or Hyperscale, or DTU Premium) or Managed Instance, where the region and hardware support it, spreads its replicas across multiple Azure availability zones within the same region, protecting against a datacenter-level failure without needing a separate region or a failover group.",
         'detail': "Zone redundancy protects against losing one availability zone within a region; it does nothing for a full regional outage, which is exactly the gap that a cross-region auto-failover group or geo-replication is meant to cover instead.",
     },
     {
         'id': 'f37',
         'cat': 'platform',
         'front': "Azure Data Studio",
-        'back': "A lightweight, cross-platform (Windows, macOS, Linux) query and administration tool for SQL Server and Azure SQL, built around notebooks and extensions, distinct from the older, Windows-only SQL Server Management Studio.",
-        'detail': "A DBA working from macOS or Linux, or wanting notebook-style documentation alongside queries, reaches for Azure Data Studio; SSMS still has deeper GUI tooling for some administrative tasks on Windows.",
+        'back': "A lightweight, cross-platform (Windows, macOS, Linux) query and administration tool for SQL Server and Azure SQL, built around notebooks and extensions (still named in older exam material), distinct from the older, Windows-only SQL Server Management Studio. Microsoft retired Azure Data Studio on February 28, 2026 and recommends the MSSQL extension for Visual Studio Code in its place.",
+        'detail': "A DBA working from macOS or Linux, or wanting notebook-style documentation alongside queries, used to reach for this tool and is now pointed to VS Code with the MSSQL extension; SSMS still has deeper GUI tooling for some administrative tasks on Windows.",
     },
     {
         'id': 'f38',
         'cat': 'security',
         'front': "Database scoped credential",
         'back': "Stores the authentication secret a database needs to reach an external resource — like a storage account for PolyBase/external tables or a backup destination — separately from the actual external data source definition, so that credential can be reused and rotated in one place.",
-        'detail': "This works alongside Microsoft Entra ID (Azure AD) authentication for Azure SQL — the scoped credential is specifically for the database reaching *out* to another resource, not for a user or app authenticating *into* the database.",
+        'detail': "This is separate from Microsoft Entra authentication for Azure SQL — the scoped credential is specifically for the database reaching *out* to another resource, not for a user or app authenticating *into* the database.",
     },
     {
         'id': 'f39',
@@ -336,7 +336,7 @@ FLASHCARDS = [
         'id': 'f45',
         'cat': 'security',
         'front': 'Microsoft Entra-only authentication',
-        'back': "A server-level (or managed instance-level) setting that disables all SQL authentication logins entirely, so every connection must authenticate through Microsoft Entra ID — a step beyond simply configuring Microsoft Entra ID (Azure AD) authentication for Azure SQL, which still leaves SQL logins usable alongside it.",
+        'back': "A server-level (or managed instance-level) setting that disables all SQL authentication logins entirely, so every connection must authenticate through Microsoft Entra ID — a step beyond simply configuring a Microsoft Entra admin, which still leaves SQL logins usable alongside it.",
         'detail': "This is the setting to reach for when an audit finding says password-based SQL logins must not be usable at all, not merely discouraged, since a Microsoft Entra admin on its own only adds an identity option without removing the SQL-auth path.",
     },
     {
@@ -350,29 +350,29 @@ FLASHCARDS = [
         'id': 'f47',
         'cat': 'security',
         'front': 'Private Link (Private Endpoint) for Azure SQL',
-        'back': "Assigns Azure SQL Database or Managed Instance a private IP address inside a virtual network, so traffic from that VNet reaches it over the Microsoft backbone without ever traversing the public internet — a stricter boundary than Server-level vs. database-level firewall rules, which only filter which public IP ranges may connect.",
+        'back': "Assigns Azure SQL Database or Managed Instance a private IP address inside a virtual network, so traffic from that VNet reaches it over the Microsoft backbone without ever traversing the public internet — a stricter boundary than IP-based server-level and database-level firewall rules, which only filter which public IP ranges may connect.",
         'detail': "A firewall rule still lets the connection travel over the public endpoint, just from an approved IP; a Private Endpoint instead removes the public path for VNet-based clients entirely, which is the distinction an exam scenario tests when it rules out relying on IP allow-listing alone.",
     },
     {
         'id': 'f40',
         'cat': 'hadr',
         'front': 'Read scale-out',
-        'back': "Routes read-only connections to one of the existing secondary replicas that Premium and Business Critical tiers already run as part of Azure SQL Database built-in high availability, offloading reporting or analytics traffic from the primary replica at no extra compute cost, since it reuses replicas that already exist rather than provisioning anything new.",
-        'detail': "Because it depends on those built-in HA replicas, read scale-out is only available on tiers that include them — it is not itself a separate feature to provision from scratch.",
+        'back': "Routes read-only connections to one of the existing secondary replicas that the Premium and Business Critical tiers already run as part of their built-in high availability design, offloading reporting or analytics traffic from the primary replica at no extra compute cost, since it reuses replicas that already exist rather than provisioning anything new.",
+        'detail': "Because it depends on those built-in HA replicas, read scale-out is only available on tiers that include them (Hyperscale uses a high-availability secondary replica that must be added and is billed) — it is not itself a separate feature to provision from scratch.",
     },
     {
         'id': 'f55',
         'cat': 'hadr',
         'front': 'Geo-restore',
         'back': "Rebuilds a database in any Azure region from its most recent geo-redundant backup, used to recover after the primary region itself has an outage; unlike auto-failover groups or active geo-replication, there is no standing replica already running elsewhere, so both RTO and RPO are far larger.",
-        'detail': "Geo-restore depends on the source database using geo-redundant (or read-access geo-redundant) Backup storage redundancy (LRS/ZRS/GRS/RA-GRS) — a database configured with locally redundant backup storage has no geo-restore option at all if its region goes down.",
+        'detail': "Geo-restore depends on the source database using geo-redundant (GRS) or read-access geo-redundant (RA-GRS) backup storage — a database configured with locally redundant backup storage has no geo-restore option at all if its region goes down.",
     },
     {
         'id': 'f56',
         'cat': 'hadr',
         'front': 'Backup storage redundancy (LRS/ZRS/GRS/RA-GRS)',
         'back': "Controls how many copies of automated backups are kept and where: locally redundant (LRS) keeps copies in one datacenter, zone-redundant (ZRS) spreads them across availability zones in one region, geo-redundant (GRS, the default) also copies them to a paired region, and read-access geo-redundant (RA-GRS) additionally allows read access to that paired-region copy.",
-        'detail': "Geo-restore only works when the backup storage redundancy is geo-redundant (GRS or RA-GRS) — a database using LRS or ZRS backup storage has nothing in a second region for Geo-restore to recover from.",
+        'detail': "Geo-restore only works when the backup storage redundancy is geo-redundant (GRS or RA-GRS) — a database using LRS or ZRS backup storage has nothing in a second region for geo-restore to recover from.",
     },
     {
         'id': 'f57',
@@ -385,7 +385,7 @@ FLASHCARDS = [
         'id': 'f41',
         'cat': 'monitor',
         'front': 'sys.resource_stats (master database)',
-        'back': "A DMV in the logical server's master database that reports roughly the last 14 days of resource utilization at 5-minute granularity, giving a longer, coarser historical view than sys.dm_db_resource_stats and DTU/vCore utilization, which covers only about the last hour at 15-second granularity from inside the database itself.",
+        'back': "A DMV in the logical server's master database that reports roughly the last 14 days of resource utilization at 5-minute granularity, giving a longer, coarser historical view than sys.dm_db_resource_stats, which covers only about the last hour at 15-second granularity from inside the database itself.",
         'detail': "Reach for sys.resource_stats when a scenario asks about a trend over days or weeks; reach for the database-level DMV when it asks what is happening right now.",
     },
     {
@@ -406,8 +406,8 @@ FLASHCARDS = [
         'id': 'f42',
         'cat': 'platform',
         'front': 'Hyperscale named replicas',
-        'back': "Additional readable replicas of a Hyperscale database that can be scaled to their own independent compute size, for reporting, analytics, or isolating a workload from the primary — going beyond the single high-availability replica already included, and distinct from Read scale-out, which only reuses replicas that General Purpose or Business Critical already provision for HA rather than adding new dedicated ones.",
-        'detail': "Named replicas are specific to the Service tiers: General Purpose vs. Business Critical vs. Hyperscale tier's storage architecture, since Hyperscale's separated storage layer is what lets a replica be added or resized independently of the primary in the first place.",
+        'back': "Additional readable replicas of a Hyperscale database that can be scaled to their own independent compute size, for reporting, analytics, or isolating a workload from the primary — going beyond the single high-availability replica already included, and distinct from read scale-out, which only reuses the readable replica that Premium and Business Critical already provision for HA rather than adding new dedicated ones.",
+        'detail': "Named replicas are specific to the Hyperscale service tier's storage architecture, since Hyperscale's separated storage layer is what lets a replica be added or resized independently of the primary in the first place.",
     },
     {
         'id': 'f43',
@@ -420,15 +420,15 @@ FLASHCARDS = [
         'id': 'f44',
         'cat': 'platform',
         'front': 'Azure SQL Migration extension for Azure Data Studio',
-        'back': "A guided, wizard-driven migration path built into Azure Data Studio that assesses an on-premises SQL Server database and migrates it to Azure SQL Managed Instance or Azure SQL Database, including near-zero-downtime online migration, from inside the same tool used for day-to-day query work.",
-        'detail': "It builds on the same assessment and migration engine as Migration tooling: DMA vs. Azure Database Migration Service, but surfaces the whole workflow inside Azure Data Studio's UI instead of requiring a separately managed migration project elsewhere.",
+        'back': "A guided, wizard-driven migration path that was built into Azure Data Studio, assessing an on-premises SQL Server database and migrating it to Azure SQL Managed Instance or Azure SQL Database, including near-zero-downtime online migration, from inside the same tool used for day-to-day query work. It was retired together with Azure Data Studio on February 28, 2026; Microsoft points to the SQL migration experience in Azure Arc, Azure Database Migration Service, and SSMS instead.",
+        'detail': "It was built on the same migration engine as Azure Database Migration Service, but surfaced the whole workflow inside the Azure Data Studio UI instead of requiring a separately managed migration project elsewhere.",
     },
     {
         'id': 'f58',
         'cat': 'platform',
         'front': 'PolyBase and external tables',
         'back': "Lets Managed Instance (or SQL Server on Azure VMs) query data sitting in Azure Blob Storage, Azure Data Lake, or another SQL Server directly with T-SQL, through a CREATE EXTERNAL DATA SOURCE and CREATE EXTERNAL TABLE definition, without first loading that data into the database.",
-        'detail': "The external data source itself authenticates using a Database scoped credential, which is why the two features are usually described together — the credential supplies the secret, and the external table supplies the schema mapping for querying the remote data in place.",
+        'detail': "The external data source itself authenticates using a database scoped credential, which is why the two features are usually described together — the credential supplies the secret, and the external table supplies the schema mapping for querying the remote data in place.",
     },
     {
         'id': 'f59',
@@ -442,7 +442,7 @@ FLASHCARDS = [
         'cat': 'security',
         'front': 'Contained database users',
         'back': "A user created directly inside a database with CREATE USER ... WITH PASSWORD (or mapped to a Microsoft Entra ID identity), with no matching login at the server level, so authentication happens entirely within the database and the user moves with it on a copy or geo-replication.",
-        'detail': "This is what makes Azure SQL Database's authentication model work at all, since single databases have no server-level login store the way an on-premises instance does — every Azure SQL Database user is effectively a contained user by design.",
+        'detail': "Contained users keep a database portable between servers: because they authenticate against the database itself, they move with a copy or geo-replication and need no matching server-level login. Azure SQL Database does also support logins stored in the master database, but contained users are the recommended approach for portability and failover.",
     },
     {
         'id': 'f61',
@@ -477,56 +477,56 @@ FLASHCARDS = [
         'cat': 'queryPerf',
         'front': 'Statistics maintenance (AUTO_CREATE_STATISTICS / AUTO_UPDATE_STATISTICS)',
         'back': "SQL Server and Azure SQL automatically create single-column statistics and refresh them once enough rows have changed, by default using a sampled rather than full scan — the statistics the optimizer relies on for every cardinality estimate behind a plan choice.",
-        'detail': "A large bulk load that finishes before the automatic-update threshold is reached can leave statistics stale immediately afterward, which is exactly the scenario that produces a large gap between Estimated vs. actual execution plans until UPDATE STATISTICS runs or the threshold is finally crossed.",
+        'detail': "A large bulk load that finishes before the automatic-update threshold is reached can leave statistics stale immediately afterward, which is exactly the scenario that produces a large gap between estimated and actual row counts in an execution plan until UPDATE STATISTICS runs or the threshold is finally crossed.",
     },
     {
         'id': 'f66',
         'cat': 'queryPerf',
         'front': 'Database-scoped configuration options',
         'back': "Settings like MAXDOP, LEGACY_CARDINALITY_ESTIMATION, and QUERY_OPTIMIZER_HOTFIXES that can be set per database with ALTER DATABASE SCOPED CONFIGURATION, instead of only at the instance level with sp_configure — useful because Azure SQL Database has no instance-level sp_configure surface to begin with, and because Managed Instance often hosts many databases with different tuning needs on one instance.",
-        'detail': "Setting LEGACY_CARDINALITY_ESTIMATION to ON for one specific database is a common, low-risk way to work around a Database compatibility level and the cardinality estimator regression in that database alone, without changing optimizer behavior for every other database on the same instance.",
+        'detail': "Setting LEGACY_CARDINALITY_ESTIMATION to ON for one specific database is a common, low-risk way to work around a cardinality estimator regression caused by a newer compatibility level in that database alone, without changing optimizer behavior for every other database on the same instance.",
     },
     {
         'id': 'f67',
         'cat': 'automation',
         'front': 'Elastic Database Jobs authoring surface',
         'back': "Jobs are created and managed through PowerShell cmdlets or by calling stored procedures directly against the job database, rather than through a full job-authoring designer in the Azure portal — unlike an on-premises SQL Server Agent job, which SSMS lets an administrator build entirely through a GUI.",
-        'detail': "This is a frequent surprise for a DBA used to right-clicking through SSMS's Job Agent node, since the Elastic Database Jobs components still need to be stood up and scripted rather than clicked together.",
+        'detail': "This is a frequent surprise for a DBA used to right-clicking through SSMS's Job Agent node, since the elastic job agent and job database still need to be stood up and scripted rather than clicked together.",
     },
     {
         'id': 'f68',
         'cat': 'automation',
         'front': 'SQL Agent multi-server administration (MSX/TSX)',
         'back': "Designates one SQL Server instance as a master server (MSX) that defines and pushes jobs out to a fleet of target servers (TSX), which run the jobs locally and report status back — a way to centrally manage the same scheduled job across many SQL Server on Azure VMs or on-premises instances without configuring each one individually.",
-        'detail': "This solves a similar fleet-wide scheduling problem to Elastic Database Jobs components, but is specific to SQL Server Agent on IaaS/on-premises instances rather than PaaS single databases, which have no SQL Agent to enlist as a target server at all.",
+        'detail': "This solves a similar fleet-wide scheduling problem to Elastic Database Jobs, but is specific to SQL Server Agent on IaaS/on-premises instances rather than PaaS single databases, which have no SQL Agent to enlist as a target server at all.",
     },
     {
         'id': 'f69',
         'cat': 'automation',
         'front': 'Scripting planned failover tests',
-        'back': "Cmdlets like Invoke-AzSqlDatabaseFailover (for Active geo-replication or built-in HA replicas) and Switch-AzSqlDatabaseFailoverGroup (for Auto-failover groups) let a DBA trigger a failover from a script or runbook, making it practical to rehearse a disaster-recovery plan on a regular schedule instead of only reading through the runbook on paper.",
-        'detail': "Scripting the drill also makes it repeatable across environments and schedulable through an Azure Automation runbooks for database administration job, rather than depending on someone remembering to click through the portal's failover button by hand.",
+        'back': "Cmdlets like Invoke-AzSqlDatabaseFailover (for built-in HA replicas), Set-AzSqlDatabaseSecondary -Failover (for active geo-replication), and Switch-AzSqlDatabaseFailoverGroup (for auto-failover groups) let a DBA trigger a failover from a script or runbook, making it practical to rehearse a disaster-recovery plan on a regular schedule instead of only reading through the runbook on paper.",
+        'detail': "Scripting the drill also makes it repeatable across environments and schedulable through an Azure Automation runbook, rather than depending on someone remembering to click through the portal's failover button by hand.",
     },
     {
         'id': 'f70',
         'cat': 'hadr',
         'front': 'Managed Instance link',
-        'back': "Establishes a near real-time, replication-based connection between an on-premises (or VM-hosted) SQL Server 2019 or later instance and Azure SQL Managed Instance, letting data flow continuously in either direction and supporting a planned failover to Managed Instance with minimal downtime — usable for an online migration, a DR target, or offloading read traffic.",
-        'detail': "Unlike a one-time cutover through Azure Database Migration Service, the link keeps the source and the managed instance continuously synchronized until an administrator explicitly fails over, which is what gives it the option to fail back to the original SQL Server if needed.",
+        'back': "Establishes a near real-time, replication-based connection between an on-premises (or VM-hosted) SQL Server 2016 or later instance and Azure SQL Managed Instance, replicating changes continuously from SQL Server and supporting a planned failover to Managed Instance with minimal downtime (and, from SQL Server 2022 onward, failing back to SQL Server) — usable for an online migration, a DR target, or offloading read traffic.",
+        'detail': "Unlike a one-time cutover through Azure Database Migration Service, the link keeps the source and the managed instance continuously synchronized until an administrator explicitly fails over, which, with SQL Server 2022 or later, also gives it the option to fail back to the original SQL Server if needed.",
     },
     {
         'id': 'f71',
         'cat': 'hadr',
         'front': 'Backup to URL',
         'back': "Lets native SQL Server BACKUP DATABASE and BACKUP LOG statements write a backup directly to a blob in Azure Storage as the backup destination, instead of to a local disk or network share — useful for SQL Server on Azure VMs to get an offsite copy without managing separate backup infrastructure.",
-        'detail': "This is distinct from Automated backups and point-in-time restore (PITR), which only applies to the PaaS options — a SQL Server on Azure VM instead relies on native backups like this, or the SQL Server IaaS Agent Extension's automated backup feature built on top of it, since Microsoft does not manage backups for IaaS automatically.",
+        'detail': "This is distinct from automated backups and point-in-time restore (PITR), which only apply to the PaaS options — a SQL Server on Azure VM instead relies on native backups like this, or the SQL Server IaaS Agent Extension's automated backup feature built on top of it, since Microsoft does not manage backups for IaaS automatically.",
     },
     {
         'id': 'f72',
         'cat': 'hadr',
         'front': 'Read-only routing (Always On Availability Groups)',
         'back': "A ReadOnlyRoutingList configured on an availability group listener automatically directs a connection whose application intent is set to ReadOnly to one of the group's secondary replicas, instead of the primary, offloading read traffic without the application needing to know any individual replica's name.",
-        'detail': "This gives SQL Server on Azure VMs the same kind of read-offloading benefit that Read scale-out provides for Azure SQL Database's built-in HA replicas, but it requires explicit listener configuration rather than being available automatically.",
+        'detail': "This gives SQL Server on Azure VMs the same kind of read-offloading benefit that read scale-out provides for Azure SQL Database's built-in HA replicas, but it requires explicit listener configuration rather than being available automatically.",
     },
 ]
 
@@ -1914,11 +1914,11 @@ LESSONS = [
         'quizIds': ['q1', 'q3', 'q4', 'q6', 'tf2'],
         'reading': """Azure gives you three ways to run SQL Server-compatible workloads, trading compatibility and control for less day-to-day management. Azure SQL Database is the fully managed, single-database platform-as-a-service (PaaS) option, with the least administrative surface but also the least instance-level compatibility. Azure SQL Managed Instance closes most of that compatibility gap — supporting features like cross-database queries and SQL Server Agent — while remaining PaaS-managed. SQL Server on Azure VMs is the infrastructure-as-a-service (IaaS) option: full control over the operating system and engine, but the administrator (or an automated agent extension) is responsible for patching it, unlike the two PaaS options where Microsoft handles patching automatically.
 
-Azure SQL Database and Managed Instance are further split into service tiers. General Purpose uses remote, Azure Premium storage for balanced price and performance. Business Critical uses local SSD storage plus a built-in set of Always On Availability Group replicas for the lowest latency and highest resiliency, with high availability included at no extra configuration. Hyperscale decouples storage from compute entirely, supporting near-instant storage autogrowth up to 100 TB and fast backups and restores through storage snapshots regardless of database size.
+Azure SQL Database and Managed Instance are further split into service tiers. General Purpose uses remote, Azure Premium storage for balanced price and performance. Business Critical uses local SSD storage plus a built-in set of Always On Availability Group replicas for the lowest latency and highest resiliency, with high availability included at no extra configuration. Hyperscale decouples storage from compute entirely, supporting near-instant storage autogrowth up to 128 TB and fast backups and restores through storage snapshots regardless of database size.
 
 Two features address cost for variable workloads. An elastic pool lets many databases with unpredictable, non-simultaneous usage share one billed pool of resources instead of each being sized for its own peak — ideal for a multi-tenant SaaS with many databases whose spikes don't line up. The serverless compute tier instead auto-scales one database's compute within a configured range and can auto-pause after a period of inactivity, billing only for storage while paused, at the cost of a brief cold-start delay on the next connection.
 
-Cost is set through one of two purchasing models: the DTU model bundles compute, memory, and I/O into one blended unit, while the vCore model prices compute and storage independently and is the only model that supports Azure Hybrid Benefit for reusing an existing SQL Server license. Before migrating an existing SQL Server database, the Data Migration Assistant assesses it for compatibility issues and deprecated features, and Azure Database Migration Service then performs the actual migration at scale, supporting both offline and near-zero-downtime online modes.""",
+Cost is set through one of two purchasing models: the DTU model bundles compute, memory, and I/O into one blended unit, while the vCore model prices compute and storage independently and is the only model that supports Azure Hybrid Benefit for reusing an existing SQL Server license. Before migrating an existing SQL Server database, an assessment tool checks it for compatibility issues and deprecated features (the Data Migration Assistant historically, now retired in favor of the assessment experiences in Azure Arc, Azure Migrate, and SSMS), and Azure Database Migration Service then performs the actual migration at scale, supporting both offline and near-zero-downtime online modes.""",
         'fundamentalsLabel': 'New to Azure SQL deployment choices? See the everyday analogy',
         'fundamentals': "Renting living space is a good analogy again: Azure SQL Database is a furnished studio, Managed Instance is a furnished house with more rooms and instance-level amenities, and SQL Server on a VM is buying the house outright. An elastic pool, meanwhile, is like a shared parking garage for several offices whose employees never all arrive at once — one lot serves everyone's peak, instead of each office building its own oversized private lot.",
         'keyTerms': ['Azure SQL Database', 'Azure SQL Managed Instance', 'SQL Server on Azure VMs', 'DTU', 'vCore', 'Business Critical', 'Hyperscale', 'elastic pool', 'serverless compute tier', 'Data Migration Assistant', 'Azure Database Migration Service'],
@@ -2012,7 +2012,7 @@ For automation that goes beyond running T-SQL, Azure Automation runbooks — wri
         'diagram': 'backupRecovery',
         'vocabIds': ['f28', 'f29', 'f30', 'f31', 'f32', 'f33', 'f34', 'f35', 'f36'],
         'quizIds': ['q27', 'q28', 'q29', 'q30', 'q31', 'tf12'],
-        'reading': """Every Azure SQL Database and Managed Instance includes built-in high availability regardless of tier, protecting against a single-node failure with no extra configuration: General Purpose relies on its remote storage's own redundancy, while Business Critical runs a local set of Always On Availability Group replicas under the hood for near-instant automatic failover. A zone-redundant configuration on Business Critical or Premium tiers goes one step further, spreading those replicas across multiple availability zones within the same region — protecting against losing a whole datacenter, though it does nothing for a full regional outage.
+        'reading': """Every Azure SQL Database and Managed Instance includes built-in high availability regardless of tier, protecting against a single-node failure with no extra configuration: General Purpose relies on its remote storage's own redundancy, while Business Critical runs a local set of Always On Availability Group replicas under the hood for near-instant automatic failover. A zone-redundant configuration (available on General Purpose, Business Critical, Hyperscale, and Premium, depending on region and hardware) goes one step further, spreading replicas, or storage and standby compute in General Purpose, across multiple availability zones within the same region — protecting against losing a whole datacenter, though it does nothing for a full regional outage.
 
 Surviving a full regional outage instead needs a cross-region feature. An auto-failover group wraps one or more databases behind a stable read-write and read-only listener endpoint, replicating them to a secondary region and optionally failing over automatically after a configured grace period — because the application connects to that listener rather than a server name directly, failover needs no connection-string change. Active geo-replication instead replicates a single database to up to four readable secondaries, with failover always manual, and no shared listener across a group — the right choice for one database, or for fine-grained manual control, rather than a coordinated group failover.
 
@@ -2036,7 +2036,7 @@ CHEAT_SHEET = [
     {
         'heading': 'Exam-day strategy',
         'points': [
-            'You have 120 minutes for 52 questions — about 2.3 minutes each on average. Budget more time for multi-part scenario questions and less for straight recall, rather than pacing every question identically.',
+            'The exam allows roughly 100 minutes of testing time (plan on up to about two hours of seat time with check-in and surveys) and the question count varies, commonly 40 to 60 — so budget about two minutes per question on average. Budget more time for multi-part scenario questions and less for straight recall, rather than pacing every question identically.',
             "Real scoring isn't a flat percentage of questions right (some count for more than others) — treat 70%+ as a safe buffer to aim for, not an exact threshold to just clear.",
             "Flag anything you're unsure of and move on rather than stalling — a question later in the exam can sometimes jog a detail you needed earlier, and you get partial credit for nothing by running out of time on one question.",
             "On multi-select ('choose N') questions, eliminate the options you're confident are wrong first; guessing among 2 plausible answers beats guessing among 4.",
@@ -2046,7 +2046,7 @@ CHEAT_SHEET = [
     {
         'heading': 'HADR options',
         'points': [
-            "Zone-redundant configuration (Business Critical/Premium tiers) spreads replicas across Availability Zones in ONE region — protects against a zone failure, not a full regional outage.",
+            "Zone-redundant configuration (available on several tiers, region-dependent) spreads replicas across Availability Zones in ONE region — protects against a zone failure, not a full regional outage.",
             "Active geo-replication / auto-failover groups replicate a database to a different region; a failover group adds an app-transparent listener endpoint so connection strings don't need to change after failover.",
             "Business Critical tier includes a built-in Always On-based availability group with extra secondary replicas, giving both high availability and free read-scale-out.",
             "SQL Server on an Azure VM has no built-in PaaS HA — you configure and manage your own Always On Availability Groups or Failover Cluster Instance (FCI).",
@@ -2059,7 +2059,7 @@ CHEAT_SHEET = [
             "Automated backups happen on every tier; point-in-time restore (PITR) creates a NEW database from a chosen moment, it never overwrites the original.",
             "Long-term retention (LTR) stores weekly/monthly/yearly backups for up to 10 years, completely independent of the PITR retention window.",
             "Geo-restore rebuilds a database in another region from geo-redundant backups if the primary region has an outage — a DR mechanism, not a fast, low-RPO failover.",
-            "PITR retention is configurable per database (from 1 up to 35 days depending on tier) — don't confuse it with LTR's much longer, backup-type-based schedule.",
+            "PITR retention is configurable per database (from 1 up to 35 days, with Basic limited to 7) — don't confuse it with LTR's much longer, backup-type-based schedule.",
         ],
     },
     {
@@ -2095,9 +2095,9 @@ CHEAT_SHEET = [
     {
         'heading': 'Migration essentials',
         'points': [
-            "Data Migration Assistant (DMA) ASSESSES compatibility issues and recommends fixes before you migrate — it doesn't move any data itself.",
+            "Data Migration Assistant (DMA) ASSESSED compatibility issues and recommended fixes before you migrated — it never moved data itself — and was retired on July 16, 2025; assessment now lives in Azure Arc, Azure Migrate, and SSMS.",
             "Azure Database Migration Service (DMS) performs the actual migration, supporting both offline (downtime during cutover) and online (minimal-downtime, continuous sync) modes.",
-            "The Azure SQL Migration extension in Azure Data Studio is the simplified, guided path specifically for migrating to Azure SQL Managed Instance or SQL Database.",
+            "The Azure SQL Migration extension in Azure Data Studio was the simplified, guided path for migrating to Azure SQL Managed Instance or SQL Database, but it was retired with Azure Data Studio on February 28, 2026 — current guidance points to Azure DMS and the migration experiences in Azure Arc and SSMS.",
         ],
     },
     {
@@ -2229,12 +2229,12 @@ CASE_STUDIES = [
                 'question': "Which of the following would help management see DTU/vCore utilization trends over the last 30 days without writing custom queries each time? (Select all that apply.)",
                 'options': [
                     "The built-in Azure portal metrics charts on the database's Overview/Monitoring pages",
-                    "Prebuilt Azure SQL Analytics monitoring dashboards",
+                    "Azure Monitor workbooks or database watcher dashboards",
                     "Manually running sys.dm_db_resource_stats and recording the results by hand every day for 30 days",
                     "Query Store's regressed-query report",
                 ],
                 'correct': [0, 1],
-                'explanation': "The portal's built-in Overview/Monitoring metrics charts and prebuilt Azure SQL Analytics dashboards both surface DTU/vCore utilization trends over a chosen window, like 30 days, with no hand-written queries required. Manually querying sys.dm_db_resource_stats every day is a real data source, but it's exactly the repetitive manual effort management wants to avoid, and Query Store's regressed-query report is about query performance regressions over time, not overall compute utilization.",
+                'explanation': "The portal's built-in Overview/Monitoring metrics charts and Azure Monitor workbooks or database watcher dashboards (which replace the legacy Azure SQL Analytics solution) both surface DTU/vCore utilization trends over a chosen window, like 30 days, with no hand-written queries required. Manually querying sys.dm_db_resource_stats every day is a real data source, but it's exactly the repetitive manual effort management wants to avoid, and Query Store's regressed-query report is about query performance regressions over time, not overall compute utilization.",
             },
         ],
     },
