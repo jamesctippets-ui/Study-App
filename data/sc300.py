@@ -722,12 +722,12 @@ QUESTIONS = [
         'question': 'SSPR is enabled for all users, yet the help desk still handles many reset calls because most users never registered authentication information. Contoso wants users to be prompted to register the next time they sign in. Which setting should be changed?',
         'options': [
             'In the SSPR on-premises integration settings, turn on password writeback',
-            'In the SSPR registration settings, require users to register when signing in',
+            'In the SSPR registration settings (the legacy "require users to register when signing in" setting), require users to register at sign-in',
             'In the SSPR settings, lower the number of methods required to reset a password to one',
             'In the authentication methods policy, enable the Temporary Access Pass method',
         ],
         'correct': 1,
-        'explanation': 'Requiring registration at sign-in is the setting that makes users enter their reset methods the next time they authenticate. Lowering the number of required methods makes registration easier to satisfy but never prompts anyone to register. Password writeback is needed so a cloud reset reaches on-premises Active Directory, and it has no effect on whether users have registered. Enabling Temporary Access Pass gives administrators a bootstrap credential to issue, but it does not prompt users for SSPR registration.',
+        'explanation': 'Requiring registration at sign-in is the setting that makes users enter their reset methods the next time they authenticate. Note that this legacy SSPR setting was retired on September 30, 2025; the modern equivalent is a registration campaign in the authentication methods policy, but of the choices offered it is the only one that prompts for registration at sign-in. Lowering the number of required methods makes registration easier to satisfy but never prompts anyone to register. Password writeback is needed so a cloud reset reaches on-premises Active Directory, and it has no effect on whether users have registered. Enabling Temporary Access Pass gives administrators a bootstrap credential to issue, but it does not prompt users for SSPR registration.',
     },
     {
         'id': 'q12',
@@ -1258,13 +1258,13 @@ QUESTIONS = [
         'type': 'mc',
         'question': "New employees frequently delay registering strong authentication methods until they are unexpectedly prompted during a risky sign-in weeks later. The security team wants users nudged to register additional authentication methods proactively, during routine sign-in, before any risk event ever occurs. Which policy should be configured?",
         'options': [
-            "The MFA registration policy in Microsoft Entra ID Protection",
+            "A registration campaign in the authentication methods policy",
             "The sign-in risk policy, set to block access until MFA is completed",
             "A Conditional Access policy requiring a compliant device for every sign-in",
             "The user risk policy, set to require a password change",
         ],
         'correct': 0,
-        'explanation': "The MFA registration policy in Identity Protection proactively prompts users who have not yet registered required strong authentication methods during ordinary, non-risky sign-in, rather than waiting for a risk event to force the issue. The sign-in risk and user risk policies both react to risk signals that have already occurred rather than proactively encouraging registration beforehand, and device compliance has nothing to do with authentication method registration.",
+        'explanation': "A registration campaign in the authentication methods policy proactively nudges users who have not yet registered a stronger authentication method (such as Microsoft Authenticator) during ordinary, non-risky sign-in, rather than waiting for a risk event to force the issue. It replaces the legacy Identity Protection MFA registration policy. The sign-in risk and user risk policies both react to risk signals that have already occurred rather than proactively encouraging registration beforehand, and device compliance has nothing to do with authentication method registration.",
     },
     {
         'id': 'q33',
@@ -1315,12 +1315,12 @@ QUESTIONS = [
         'question': 'Contoso wants a way to regain Global Administrator access if an MFA provider outage, a Conditional Access misconfiguration, or a failure of on-premises identity services blocks every normal administrator. What should be configured?',
         'options': [
             'Global Administrator accounts that sign in through AD FS with smart cards and are exempt from MFA',
-            'Two cloud-only Global Administrator accounts with permanent active roles, excluded from Conditional Access, with sign-in alerts',
+            'Two cloud-only Global Administrator accounts with permanent active roles, excluded from the Conditional Access policies that could block them, with sign-in alerts',
             'Two Global Administrator accounts synchronized from Active Directory and covered by the same Conditional Access policies as other administrators',
             'A PIM eligible Global Administrator assignment for every IT staff member, approved by the security team',
         ],
         'correct': 1,
-        'explanation': 'Emergency access accounts must be independent of everything that can fail: cloud-only, permanently active so no activation step is needed, excluded from Conditional Access, and monitored so any use is noticed. Synchronized accounts under the normal policies depend on both on-premises services and the very policies that may be locking everyone out. PIM eligible assignments need working MFA and activation, which are the paths that may be down. Accounts that sign in through AD FS depend on the on-premises federation farm, which is one of the failure modes listed.',
+        'explanation': 'Emergency access accounts must be independent of everything that can fail: cloud-only, permanently active so no activation step is needed, excluded from the Conditional Access policies that could block them, and monitored so any use is noticed. Synchronized accounts under the normal policies depend on both on-premises services and the very policies that may be locking everyone out. PIM eligible assignments need working MFA and activation, which are the paths that may be down. Accounts that sign in through AD FS depend on the on-premises federation farm, which is one of the failure modes listed.',
     },
     {
         'id': 'q37',

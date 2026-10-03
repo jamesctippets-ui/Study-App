@@ -751,7 +751,7 @@ QUESTIONS = [
             "Ingest the feed into a custom _CL table and write a separate rule for each indicator type",
         ],
         'correct': 0,
-        'explanation': "Threat intelligence indicators carry confidence and validity dates, land in the ThreatIntelligenceIndicator table, and are matched by built-in TI analytics rule templates that honor expiry. A watchlist is static reference data with no concept of indicator expiry or confidence. A custom table duplicates what the TI blade already provides. A Defender for Endpoint indicator blocks or alerts on devices but does not match Entra sign-in logs in Sentinel.",
+        'explanation': "Threat intelligence indicators carry confidence and validity dates, land in the ThreatIntelIndicators table (which replaced the legacy ThreatIntelligenceIndicator table), and are matched by built-in TI analytics rule templates that honor expiry. A watchlist is static reference data with no concept of indicator expiry or confidence. A custom table duplicates what the TI blade already provides. A Defender for Endpoint indicator blocks or alerts on devices but does not match Entra sign-in logs in Sentinel.",
     },
     {
         'id': 'q14',
@@ -1075,7 +1075,7 @@ QUESTIONS = [
         'type': 'tf',
         'question': "With selective isolation, an analyst can exempt any business application on the device, identified by its process name, so that it keeps network access while everything else is blocked.",
         'answer': False,
-        'explanation': "Selective isolation is a fixed option that keeps Outlook, Microsoft Teams and Skype for Business connected. It is not a general allow list by process name, so an arbitrary business application, such as a backup agent, would still be cut off.",
+        'explanation': "Selective isolation is a fixed option that keeps Outlook, Microsoft Teams and Skype for Business connected. It is not a general allow list by process name, so an arbitrary business application, such as a backup agent, would still be cut off under selective isolation. Where the newer isolation exclusions feature is enabled, admins can separately exempt specific processes, IP addresses, or services, but that is a different capability from selective isolation.",
     },
     {
         'id': 'tf8',
@@ -1256,7 +1256,7 @@ QUESTIONS = [
         'id': 'q33',
         'cat': 'manageSecOps',
         'type': 'mc',
-        'question': "A scheduled analytics rule contains the following KQL:\n\nlet riskyIPs = ThreatIntelligenceIndicator\n| where ConfidenceScore > 70\n| project NetworkIP = IndicatorValue;\nSigninLogs\n| where TimeGenerated > ago(1d)\n| join kind=inner riskyIPs on $left.IPAddress == $right.NetworkIP\n| project UserPrincipalName, IPAddress, TimeGenerated\n\nWhat does this query return?",
+        'question': "A scheduled analytics rule contains the following KQL:\n\nlet riskyIPs = ThreatIntelIndicators\n| where Confidence > 70\n| project NetworkIP = ObservableValue;\nSigninLogs\n| where TimeGenerated > ago(1d)\n| join kind=inner riskyIPs on $left.IPAddress == $right.NetworkIP\n| project UserPrincipalName, IPAddress, TimeGenerated\n\nWhat does this query return?",
         'options': [
             "Every sign-in from the last day, annotated with a null NetworkIP column when no threat intelligence match exists",
             "Only sign-ins from the last day whose IP address matches a high-confidence threat intelligence indicator",
@@ -1264,7 +1264,7 @@ QUESTIONS = [
             "A syntax error, since join requires the left and right column names to be identical",
         ],
         'correct': 1,
-        'explanation': "kind=inner keeps only rows with a matching key on both sides, so this query returns sign-ins from the last day whose IPAddress matches a high-confidence (ConfidenceScore > 70) threat intelligence indicator value. Returning every sign-in with nulls for non-matches describes a leftouter join instead, returning every indicator regardless of a sign-in match describes a rightouter join, and join explicitly supports differently named join columns through the $left. and $right. prefixes in the on clause, so this is not a syntax error.",
+        'explanation': "kind=inner keeps only rows with a matching key on both sides, so this query returns sign-ins from the last day whose IPAddress matches a high-confidence (Confidence > 70) threat intelligence indicator value. Returning every sign-in with nulls for non-matches describes a leftouter join instead, returning every indicator regardless of a sign-in match describes a rightouter join, and join explicitly supports differently named join columns through the $left. and $right. prefixes in the on clause, so this is not a syntax error.",
     },
     {
         'id': 'q34',
