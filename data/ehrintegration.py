@@ -2506,7 +2506,7 @@ A few more pieces round out the modern FHIR picture. Bulk FHIR (the export opera
         "title": "Integration Engines: Architecture & Day-to-Day Operations",
         "summary": "How an integration engine routes and transforms messages, the topology it enables, and the failure modes teams monitor for in production.",
         "diagram": "integrationEngineHubSpoke",
-        "vocabIds": ["f19", "f20", "f21", "f22", "f23", "f24", "f25", "f26", "f47", "f48", "f49", "f50"],
+        "vocabIds": ["f19", "f20", "f21", "f22", "f23", "f24", "f25", "f26", "f47", "f48", "f49", "f50", "f68"],
         "quizIds": ["q16", "q17", "q19", "q20", "q31", "q32", "q39", "q40", "msq6", "msq13"],
         "reading": """An integration engine (also called an interface engine) sits in the middle of a hospital's system landscape, handling the routing, transformation, and delivery of messages between clinical systems rather than leaving every pair of systems to build a custom connection directly with each other. In a hub-and-spoke topology, every system connects once to the central engine (the hub), which then routes and transforms messages to whichever other systems (the spokes) actually need them -- dramatically cutting the number of connections to build and maintain compared to a fully point-to-point mesh, at the cost of concentrating risk in that one central hub if it goes down. The same physical connection gets described from each side's own point of view: what one system calls an outbound interface sending data out, the receiving system calls an inbound interface bringing data in -- an order transmitted out from the EHR to a pharmacy system is outbound from the EHR's perspective and inbound from the pharmacy's.
 

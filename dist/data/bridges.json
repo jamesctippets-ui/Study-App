@@ -1465,12 +1465,12 @@
       {
         "track": "itil",
         "lesson": "language-of-value",
-        "angle": "ITIL separates the service level (one measured target, such as 99.9% availability) from the SLA (the document that records it) and from service level management, the ongoing practice of monitoring and renegotiating them. Warranty is broader than uptime, and the think and work holistically principle flags an SLA agreed without noticing a supplier whose own targets are looser."
+        "angle": "ITIL separates the service level (one measured target, such as 99.9% availability) from the SLA (the documented agreement that records one or more such targets and what happens if they are missed). Warranty is broader than uptime (availability, capacity, security and continuity), so an SLA that measures only uptime narrows what the customer is actually paying for."
       },
       {
         "track": "az900",
-        "lesson": "cloud-fundamentals",
-        "angle": "AZ-900 tests that an SLA is a commitment backed by service credits, not a guarantee of zero downtime. Chaining dependent services multiplies their uptime figures into a lower composite SLA, an independent redundant path can raise it, and preview features are commonly excluded from SLA guarantees."
+        "lesson": "cost-policy-monitoring",
+        "angle": "AZ-900 tests that an SLA is a commitment backed by service credits, not a guarantee of zero downtime. Chaining dependent services multiplies their uptime figures into a lower composite SLA, an independent redundant path can raise it, and preview features are commonly excluded from SLA guarantees, so a preview feature's SLA cannot simply be assumed to match a generally available one."
       },
       {
         "track": "az305",
@@ -1520,11 +1520,11 @@
         "options": [
           "Include it in the composite as if it carried the same figure as a generally available feature, because stable testing shows it will perform the same",
           "Multiply the preview feature's SLA like any other component, since every Azure service has a published SLA",
-          "Treat it as a dependency with no committed supplier SLA behind it, and either wait for general availability or add a fallback before promising 99.95%",
+          "Treat it as a dependency that may have no committed supplier SLA behind it unless its terms say otherwise, and either wait for general availability or add a fallback before promising 99.95%",
           "Promise the figure anyway and offer larger service credits in the customer SLA, since credits replace the need for supplier backing"
         ],
         "correct": 2,
-        "explanation": "Preview features are commonly excluded from SLA guarantees, so stable testing does not give the supplier commitment that a composite calculation assumes. In ITIL terms this is a partners and suppliers gap, the same think and work holistically failure as agreeing an SLA that rests on a supplier with looser targets. The sound moves are to wait for general availability or design a fallback that does not depend on the feature. Treating preview as generally available, multiplying a figure that does not exist, or paying bigger credits all leave the promise resting on nothing."
+        "explanation": "Preview features are commonly excluded from SLA guarantees (unless Microsoft states otherwise for a specific feature), so stable testing does not give the supplier commitment that a composite calculation assumes. In ITIL terms this is a partners and suppliers gap, the kind of missed dependency that the think and work holistically principle warns about when an SLA is agreed without noticing a supplier whose own targets are looser. The sound moves are to wait for general availability or design a fallback that does not depend on the feature. Treating preview as generally available, multiplying a figure that may not exist, or paying bigger credits all leave the promise resting on a commitment nobody has made."
       }
     ]
   },
@@ -1536,7 +1536,7 @@
       {
         "track": "itil",
         "lesson": "governance-continual-improvement-practices",
-        "angle": "ITIL separates outputs (closed tickets, SLA compliance) from outcomes (people working without interruption). The seven-step Continual Improvement Model runs from the vision through where are we now (the baseline), where do we want to be, how do we get there, take action, did we get there, and how do we keep the momentum going. A team that builds an action plan with no baseline has skipped a step."
+        "angle": "ITIL separates outputs (closed tickets, tickets closed within target) from outcomes (people working without interruption). The seven-step Continual Improvement Model runs from the vision through where are we now (the baseline), where do we want to be, how do we get there, take action, did we get there, and how do we keep the momentum going. A team that builds an action plan with no baseline has skipped a step."
       },
       {
         "track": "md102",
@@ -1572,11 +1572,11 @@
         "options": [
           "A Purview eDiscovery search of every licensed user's Copilot interactions, because the prompts themselves show who benefits",
           "Copilot usage reports and the Viva Insights Copilot Dashboard, which show active users, apps and trends but not content or whether oversharing was fixed",
-          "A DSPM for AI report, because it counts how many licensed users are active in Copilot",
+          "A Purview DLP policy scoped to Copilot, because it reports how many licensed users are active in Copilot",
           "Microsoft Secure Score, because a higher score means more people are using Copilot safely"
         ],
         "correct": 1,
-        "explanation": "Usage reports in the Microsoft 365 admin center and the Viva Insights Copilot Dashboard show aggregated adoption: active users, which apps, trends, and licensed users who are not adopting. They measure activity rather than content or value, and they say nothing about whether oversharing was cleaned up beforehand, which is what a readiness assessment checks. eDiscovery can retrieve specific prompts but is a targeted, invasive capability and not an adoption metric. DSPM for AI reports on oversharing and AI usage risk rather than rollout adoption, and Secure Score measures security posture.",
+        "explanation": "Usage reports in the Microsoft 365 admin center and the Viva Insights Copilot Dashboard show aggregated adoption: active users, which apps, trends, and licensed users who are not adopting. They measure activity rather than content or value, and they say nothing about whether oversharing was cleaned up beforehand, which is what a readiness assessment checks. eDiscovery can retrieve specific prompts but is a targeted, invasive capability and not an adoption metric. A DLP policy scoped to Copilot enforces what Copilot may process rather than reporting adoption, and Secure Score measures security posture.",
         "whyTested": "AB-650 separates before-rollout readiness from after-rollout adoption reporting, which mirrors ITIL's difference between a baseline and a did-we-get-there check."
       },
       {
@@ -1647,7 +1647,7 @@
           "An access package with an approval workflow and a 90-day expiration, with the partner registered as a connected organization"
         ],
         "correct": 3,
-        "explanation": "An access package bundles both resources behind one request with approval and expiry, and a connected organization lets the partner's users be targeted as requestors even though they are not guests yet. PIM eligible assignments elevate directory or Azure roles on activation and do not bundle resource access for external requesters. Manual invitations work but are the admin-driven, non-expiring pattern the catalog replaces. Terms of use records acceptance of a document and does not request, approve or expire access.",
+        "explanation": "An access package bundles both resources behind one request with approval and expiry, and a connected organization lets the partner's users be targeted as requestors even though they are not guests yet. PIM eligible assignments elevate directory or Azure roles on activation and do not bundle resource access for external requesters. Manual invitations work but are the admin-driven pattern, with no built-in request, approval or expiry workflow, that the catalog replaces. Terms of use records that a user accepted a document and does not bundle resources or run a request and approval workflow.",
         "whyTested": "SC-300 contrasts access packages, PIM and terms of use, and each answers a different question: who may request, who may elevate, and what must be accepted."
       },
       {
@@ -1673,7 +1673,7 @@
       {
         "track": "dp900",
         "lesson": "core-data-concepts",
-        "angle": "DP-900 defines OLTP as many short read/write transactions and OLAP as complex analytical queries over large volumes of history, typically read-heavy and denormalized into a star schema. It expects you to keep a database, a data warehouse and a data lake distinct, and warns that asking a warehouse built for batched history for a live operational number is the wrong tool."
+        "angle": "DP-900 defines OLTP as many short read/write transactions and OLAP as complex analytical queries over large volumes of history, typically read-heavy and denormalized for aggregation (the warehouse lesson shapes this as a star schema). It expects you to keep a database, a data warehouse and a data lake distinct, and warns that asking a warehouse built for batched history for a live operational number is the wrong tool."
       },
       {
         "track": "dp300",
@@ -1686,7 +1686,7 @@
         "angle": "AZ-305 asks which store fits each need: Azure SQL Database, Managed Instance or SQL Server on a VM for relational transactional workloads, Cosmos DB for globally distributed non-relational data, and Data Lake Storage Gen2, which is Blob storage with a hierarchical namespace, for large-scale analytics read by engines such as Synapse or Databricks."
       }
     ],
-    "watchOut": "A readable replica is not a warehouse. Read scale-out and named replicas move reporting off the primary, which relieves contention, but they hold the same operational schema and only current data, so they cannot give modeled, historical, multi-source analytics. \"Reporting\" also hides two different needs: a live operational number that must reflect this second, which stays close to the transactional system, and historical aggregation over years, which belongs in a warehouse or lake.",
+    "watchOut": "A readable replica is not a warehouse. Read scale-out and named replicas move reporting off the primary, which relieves contention, but they hold the same operational schema and only that one system's data, so they cannot give modeled, multi-source analytics. \"Reporting\" also hides two different needs: a live operational number that must reflect this second, which stays close to the transactional system, and historical aggregation over years, which belongs in a warehouse or lake.",
     "questions": [
       {
         "id": "br-more-oltp-olap-q1",
@@ -1699,7 +1699,7 @@
           "Add a Hyperscale named replica, which combines the other two sources automatically"
         ],
         "correct": 1,
-        "explanation": "The requirement is historical, multi-source aggregation, which is an OLAP job. A read scale-out replica relieves contention on the primary but holds only that system's current operational data in its transactional schema. Loading all three sources into a warehouse or lakehouse and modeling a fact table with dimensions is what makes the aggregation fast and combinable. In-Memory OLTP targets contention on hot tables, which would not combine sources, and a named replica is still a readable copy of one database.",
+        "explanation": "The requirement is historical, multi-source aggregation, which is an OLAP job. A read scale-out replica relieves read load on the primary but holds only that one system's data in its transactional schema. Loading all three sources into a warehouse or lakehouse and modeling a fact table with dimensions is what makes the aggregation fast and combinable. In-Memory OLTP targets contention on hot tables, which would not combine sources, and a named replica is still a readable copy of one database.",
         "whyTested": "DP-900 tests the OLTP/OLAP split, and DP-300 offers several replica features that sound like a fix but only solve contention."
       },
       {
@@ -1739,7 +1739,7 @@
       {
         "track": "dp900",
         "lesson": "non-relational-data-on-azure",
-        "angle": "DP-900 ties ACID (atomicity, consistency, isolation, durability) to relational databases and notes that many NoSQL databases deliberately relax some guarantees for scale. For Cosmos DB it teaches a tunable spectrum from strong to eventual as a deliberate trade for lower latency and higher availability, and it points out that Table Storage lacks Cosmos DB's tunable consistency."
+        "angle": "DP-900 ties ACID (atomicity, consistency, isolation, durability) to relational databases and notes that non-relational databases trade some of those guarantees for scale. For Cosmos DB it teaches a tunable spectrum from strong to eventual as a deliberate trade for lower latency and higher availability, while Table Storage is the simpler, cheaper key-value store without Cosmos DB's global distribution or guaranteed low-latency SLAs."
       },
       {
         "track": "az305",
@@ -1881,7 +1881,7 @@
       {
         "track": "sc200",
         "lesson": "endpoint-identity-response",
-        "angle": "SC-200 sits on the response side. Defender for Identity adds a proactive lateral movement path, the chain of machines and accounts an attacker could hop through to reach a privileged account, found before any attack, and honeytoken accounts, where any authentication attempt is a high-confidence signal. Sentinel's UEBA baselines each user and surfaces anomalies as enrichment, and an analyst can revoke a compromised user's active sessions directly instead of waiting for a risk policy to catch the next sign-in."
+        "angle": "SC-200 sits on the response side. Defender for Identity adds a proactive lateral movement path, the chain of machines and accounts an attacker could hop through to reach a privileged account, found before any attack, and honeytoken accounts, where any authentication attempt is a high-confidence signal. A risk-based Conditional Access policy can remediate user risk and sign-in risk automatically, but an analyst can also revoke a compromised user's active sessions directly, which cuts off an already-stolen token instead of waiting for a risk policy to catch the next sign-in."
       }
     ],
     "watchOut": "\"Risk\" is not one score. Entra user risk and sign-in risk, Sentinel's entity investigation priority from UEBA, an incident's severity and a Defender for Identity lateral movement path are different measurements from different products, and none of them blocks anything by itself. A high user risk does nothing until a Conditional Access policy acts on it, a UEBA anomaly is enrichment for an analyst rather than an alert, and a lateral movement path is exposure rather than evidence that an attack has started.",
@@ -1942,10 +1942,10 @@
       {
         "track": "md102",
         "lesson": "protect-devices-and-access",
-        "angle": "MD-102 contains through access. Once the Intune connection to Defender for Endpoint is on and devices are onboarded, a compliance policy can require a maximum machine risk score so an actively compromised device fails compliance and loses Conditional Access-gated access. The Mark device noncompliant schedule is a grace period during which the device still counts as compliant, and Wipe, Retire and Fresh Start are separate remote actions with very different effects on data."
+        "angle": "MD-102 contains through access. Once the Intune connection to Defender for Endpoint is on and devices are onboarded, a compliance policy can require a maximum machine risk score so an actively compromised device fails compliance and loses Conditional Access-gated access. The Mark device noncompliant schedule is a grace period during which the device still counts as compliant, and Wipe, Retire and Fresh Start, taught with endpoint operations, are separate remote actions with very different effects on data."
       }
     ],
-    "watchOut": "\"Isolate\", \"noncompliant\", \"retire\" and \"wipe\" are different layers, not synonyms. Isolation cuts network traffic but does not by itself change what Conditional Access thinks of the device, noncompliance blocks sign-ins to protected apps but leaves the machine on the network, and a grace period on the noncompliant action means a high-risk device keeps access until it ends. Retire removes company data and management and leaves personal data, whereas Wipe resets the whole device.",
+    "watchOut": "\"Isolate\", \"noncompliant\", \"retire\" and \"wipe\" are different layers, not synonyms. Isolation is a network action rather than a compliance state, so Conditional Access reacts to the device's compliance (for example a high machine risk score), not to the isolation itself, noncompliance blocks sign-ins to protected apps but leaves the machine on the network, and a grace period on the noncompliant action means a high-risk device keeps access until it ends. Retire removes company data and management and leaves personal data, whereas Wipe resets the whole device.",
     "questions": [
       {
         "id": "br-more-contain-compromised-device-q1",
@@ -1986,7 +1986,7 @@
           "A custom indicator set to audit, Retire, and Wipe"
         ],
         "correct": 0,
-        "explanation": "A custom indicator with block and remediate stops a known-bad hash on all onboarded devices at once, isolation disconnects a single device from the network while keeping it reachable for investigation, and Retire removes company data and management from a personal enrolled device while leaving the employee's own data. A compliance policy gates access rather than stopping a file from running, an audit-only indicator just records the event, live response is a per-device investigation session, Wipe would destroy the employee's personal data, and Fresh Start reinstalls Windows mainly to strip pre-installed OEM software."
+        "explanation": "A custom indicator with block and remediate stops a known-bad hash on all onboarded devices at once, isolation disconnects a single device from the network while keeping it reachable for investigation, and Retire removes company data and management from a personal enrolled device while leaving the employee's own data. A compliance policy gates access rather than stopping a file from running, an audit-only indicator lets the file run and only raises an alert, live response is a per-device investigation session, Wipe would destroy the employee's personal data, and Fresh Start reinstalls Windows mainly to strip pre-installed OEM software."
       }
     ]
   },
@@ -1998,7 +1998,7 @@
       {
         "track": "ehrintegration",
         "lesson": "integration-engines-architecture-and-operations",
-        "angle": "HL7 v2 receivers reply with an acknowledgment whose status is AA (accepted), AE (error found) or AR (rejected), and AA only confirms acceptance, not that downstream processing succeeded. An ACK timeout, with no response at all, points at connectivity and may trigger a retry. Integration engines hold messages with store-and-forward, set repeat failures aside in a dead-letter queue, and are monitored through queue depth, volume against baseline and canary messages."
+        "angle": "HL7 v2 receivers reply with an acknowledgment whose status is AA (accepted), AE (error found) or AR (rejected), and AA only confirms acceptance, not that downstream processing succeeded (the codes themselves are covered in the acknowledgments lesson). This lesson covers what an engine does around them: an ACK timeout, with no response at all, means the sender may retry or flag the message as failed, and a retry after a message that actually arrived is why interfaces need duplicate handling. Engines hold messages with store-and-forward queuing, set repeat failures aside in a dead-letter queue, and are monitored through queue depth, volume against baseline and canary messages."
       },
       {
         "track": "az305",
@@ -2063,7 +2063,7 @@
       {
         "track": "ehrintegration",
         "lesson": "smart-on-fhir-and-interop-rules",
-        "angle": "SMART on FHIR is an OAuth2 launch sequence for clinical data. An app requests scopes such as read-only access to a patient's Observations, following least privilege. The launch type, EHR launch inside a clinician's session or standalone from outside, decides how the app gets authorized, while the scope decides what the token may touch. Reviewing an app that asks for far broader scopes than its purpose needs is a recurring hospital IT task."
+        "angle": "SMART on FHIR is an OAuth2 launch sequence for clinical data. An app requests scopes such as read-only access to a patient's Observations, following least privilege. The launch type, EHR launch from inside the EHR or standalone on its own, decides how the app gets authorized, while the scope decides what the token may touch, so an app that asks for far broader scopes than its purpose needs deserves scrutiny."
       },
       {
         "track": "sc200",

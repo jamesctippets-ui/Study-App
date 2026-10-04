@@ -2084,7 +2084,7 @@ LESSONS = [
         'title': 'Plan & Implement Data Platform Resources',
         'summary': 'Choosing between Azure SQL Database, Managed Instance, and SQL Server on Azure VMs, plus service tiers, elastic pools, and purchasing models.',
         'diagram': 'serviceModels',
-        'vocabIds': ['f1', 'f2', 'f3', 'f4', 'f5', 'f6', 'f7', 'f37'],
+        'vocabIds': ['f1', 'f2', 'f3', 'f4', 'f5', 'f6', 'f7', 'f37', 'f40', 'f42', 'f51'],
         'quizIds': ['q1', 'q3', 'q4', 'q6', 'tf2'],
         'reading': """Azure gives you three ways to run SQL Server-compatible workloads, trading compatibility and control for less day-to-day management. Azure SQL Database is the fully managed, single-database platform-as-a-service (PaaS) option, with the least administrative surface but also the least instance-level compatibility. Azure SQL Managed Instance closes most of that compatibility gap — supporting features like cross-database queries and SQL Server Agent — while remaining PaaS-managed. SQL Server on Azure VMs is the infrastructure-as-a-service (IaaS) option: full control over the operating system and engine, but the administrator (or an automated agent extension) is responsible for patching it, unlike the two PaaS options where Microsoft handles patching automatically.
 

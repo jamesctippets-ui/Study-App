@@ -1397,14 +1397,37 @@ trading away for shinier but shallower ones.
   ordering claim ("closing an incident stops later rules") could not be
   verified and was reworded everywhere it appeared, and the AZ-104 storage
   lesson's "GPv2 offers Premium performance" was corrected.
-- [ ] **Home path — still open.** The 10 newest bridges have not had the
-  independent fact-check the first 35 got; several attach to the nearest
-  lesson rather than one that teaches the fact (the facts live in flashcards
-  and questions no lesson lists), so those matches are loose — a good moment
-  to add `vocabIds` or short lesson passages that actually cover them. Review
-  could also include case-study questions. A weighting that blends exam date
-  with readiness more smoothly, and surfacing a bridge for certs outside the
-  plan as a taster, are untried.
+- [x] **Home path, round three — the open items closed.** (1) *Blended cert
+  order:* "Exam date + weakest" is now one smooth priority per cert instead of
+  buckets: urgency decays with days to the exam (100 on the day, about half at
+  two weeks, a few points at two months) and counts 60%, weakness (100 minus
+  readiness) counts 40%, and a cert with a unit half done gets a +10 bonus so
+  the order doesn't flip mid-unit; a past date still counts as no date; ties
+  keep plan order. (2) *Case-study reviews:* a **Missed case studies** review
+  shows the scenario and only the questions you missed (one case a round) and
+  is the fourth part of "Review everything due". (3) *Bridge taster:* where a
+  bridge describes a cert that isn't in the plan, its card offers "Add <cert>
+  to my plan" and "Take a look". (4) *Independent fact-check of the 10 newest
+  bridges:* about 20 wording fixes (no answer keys changed) — unsupported
+  clauses removed (Table Storage lacking tunable consistency, "SLA compliance"
+  as an output, replicas holding "only current data"), absolutes softened
+  (preview features "may have no SLA unless terms say otherwise"), one
+  distractor replaced that was partly true, and several explanations aligned
+  with the flashcards they cite. (5) *Loose lesson links tightened:* one
+  bridge re-attached to a better lesson (AZ-900 SLA now sits on the
+  Cost, Policy & Monitoring lesson), and 17 flashcards the bridges rely on
+  were added to the `vocabIds` of the lessons that should teach them (AZ-900,
+  AZ-305, ITIL, DP-300, DP-900, SC-200, AB-650, EHR Integration), so the facts
+  are in the Path. Two matches stay loose by design and are signposted in the
+  angle text instead (the HL7 acknowledgment codes live in another EHR lesson;
+  Wipe/Retire/Fresh Start live in the MD-102 operations lesson). Known cost:
+  DP-300's Platform lesson now carries three cards from other categories
+  (read scale-out, named replicas, In-Memory OLTP) because no single lesson
+  covers those features.
+- [ ] **Home path — nothing blocking.** Untried: a "teach me" lesson passage
+  for the Wipe/Retire/Fresh Start and HL7 ACK cross-references, an
+  adjustable reminder to review, and counting optional sections toward the
+  daily goal differently from core steps.
 
 - [x] **Tough terms flashcard deck.** Each `srs` entry now also stores the
   raw 1-5 rating it was last given (`last`). A card is "tough" when that

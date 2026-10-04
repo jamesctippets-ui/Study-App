@@ -2024,7 +2024,7 @@ The remaining four principles fill in the rest of the picture: progress iterativ
         'title': 'Governance, Continual Improvement & Key Practices',
         'summary': 'How governance directs the organization, how the Continual Improvement Model drives change, and how a handful of core practices fit together.',
         'diagram': 'continualImprovementModel',
-        'vocabIds': ['f14', 'f15', 'f16', 'f17', 'f39', 'f40', 'f45', 'f46', 'f47'],
+        'vocabIds': ['f14', 'f15', 'f16', 'f17', 'f39', 'f40', 'f45', 'f46', 'f47', 'f48'],
         'quizIds': ['q12', 'q14', 'tf6', 'tf8', 'tf21', 'q46', 'q47', 'q49', 'q68'],
         'reading': """Governance is the Value System component covering how an organization is directed and controlled — evaluating, directing, and monitoring performance and compliance from the top. It sits above day-to-day operations and above any single management practice: a company's leadership setting a policy that all IT changes require a documented risk assessment is governance, while the change enablement practice that actually carries that policy out day to day is a management practice, not governance itself. The value chain component of the Value System — an operating model outlining the key activities an organization undertakes to convert inputs like demand and opportunity into outputs of value — is what all of this ultimately serves; it's covered in depth in its own lesson as the eight-stage Product and Service Lifecycle, since that's the concrete form it takes today, not a separate six-activity list some older material still describes.
 

@@ -2163,7 +2163,7 @@ Everyday storage management layers a few more decisions on top. Access tiers tra
         'title': 'Business Continuity & Disaster Recovery',
         'summary': 'RTO/RPO-driven design, Azure Backup vs. Azure Site Recovery, availability zones vs. paired regions, and active-active vs. active-passive.',
         'diagram': 'backupRecovery',
-        'vocabIds': ['f18', 'f19', 'f20', 'f21', 'f22', 'f23'],
+        'vocabIds': ['f18', 'f19', 'f20', 'f21', 'f22', 'f23', 'f56'],
         'quizIds': ['q16', 'q17', 'q18', 'q19', 'q20', 'tf4', 'tf7', 'msq6', 'q55'],
         'reading': """Every business continuity design should start from two numbers the business sets, not the other way around: RTO (recovery time objective), the maximum tolerable downtime, and RPO (recovery point objective), the maximum tolerable data loss. Only once those numbers are known does it make sense to pick a backup frequency, a replication approach, and how much failover automation to build — a design question that states specific RTO/RPO numbers is really asking for the cheapest architecture that still satisfies both, not the most impressive-sounding one available.
 

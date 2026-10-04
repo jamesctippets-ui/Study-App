@@ -1611,7 +1611,7 @@ LESSONS = [
         'title': 'Core Data Concepts',
         'summary': "Structured vs. semi-structured vs. unstructured data, OLTP vs. OLAP, ACID, big data's four V's, and the roles that work with all of it.",
         'diagram': 'oltpVsOlap',
-        'vocabIds': ['f1', 'f2', 'f3', 'f4', 'f6', 'f7', 'f8', 'f9', 'f39'],
+        'vocabIds': ['f1', 'f2', 'f3', 'f4', 'f6', 'f7', 'f8', 'f9', 'f39', 'f59', 'f60', 'f61'],
         'quizIds': ['q1', 'q2', 'q6', 'q7', 'msq1'],
         'reading': """Every dataset Azure works with falls into one of three basic shapes. Structured data fits a fixed schema of rows and columns, like a spreadsheet or a relational table — every record has exactly the same fields. Semi-structured data, like a JSON document, has some organization such as keys or tags, but no schema that every record must follow identically. Unstructured data has no predefined organization at all — a video file, an image, or a block of free-form text are the classic examples. Recognizing which of the three a described dataset falls into is one of the most frequently tested skills on this exam.
 
@@ -1661,7 +1661,7 @@ Azure SQL Database's cost is set through one of two purchasing models. The DTU m
         'title': 'Non-Relational Data on Azure',
         'summary': 'Cosmos DB and its APIs, Table Storage, Blob Storage, Azure Files, and Data Lake Storage Gen2.',
         'diagram': 'storage',
-        'vocabIds': ['f19', 'f20', 'f21', 'f22', 'f23', 'f24'],
+        'vocabIds': ['f19', 'f20', 'f21', 'f22', 'f23', 'f24', 'f43'],
         'quizIds': ['q16', 'q17', 'q19', 'q21', 'msq4'],
         'reading': """Azure Cosmos DB is Microsoft's flagship non-relational database: globally distributed, built for low-latency access at massive scale, with multiple tunable consistency levels. Rather than locking you into one data model, Cosmos DB exposes that same distributed engine through several APIs: the API for NoSQL (formerly the Core (SQL) API) for JSON documents, the API for MongoDB for teams already using MongoDB drivers, the API for Apache Gremlin for graph data — nodes and the relationships between them — and the API for Table for simple key-value data. Picking the right API is usually less about raw capability and more about what an application or team's existing skills already expect.
 
