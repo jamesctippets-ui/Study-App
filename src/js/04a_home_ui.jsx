@@ -545,7 +545,7 @@ function CertPathHomeSection({ pathOrder, results, certPlan, studyingKey, pathPr
 // for that split. Reachable again from any track's Learn/Quiz/Exam view
 // via the header's home icon; the header's hamburger (Manage cert path)
 // is reachable from every mode including this one.
-function HomeView({ tracks, results, seenLog, stats, certPlan, speech, srs, makePathApi, onSetHomePathMode, onResume, onSelectTrack, onAddToPath, onOpenAbout, onOpenGlossary, onSetGoalTarget, onAnswerDailyQuestion, onRevealDailyVocab }) {
+function HomeView({ tracks, results, seenLog, stats, certPlan, speech, srs, makePathApi, onSetHomePathMode, onSetHomePathOrder, onResume, onSelectTrack, onAddToPath, onOpenAbout, onOpenGlossary, onSetGoalTarget, onAnswerDailyQuestion, onRevealDailyVocab }) {
   const masteries = tracks.map((t) => ({ track: t, pct: trackMastery(t.key, results) }));
   const overallAvg = masteries.length ? Math.round(masteries.reduce((s, m) => s + m.pct, 0) / masteries.length) : 0;
   const lastVisited = stats.lastVisited;
@@ -596,7 +596,9 @@ function HomeView({ tracks, results, seenLog, stats, certPlan, speech, srs, make
   pathKeys.forEach((k) => { doneByTrack[k] = ((stats.path || {})[k] || {}).done || {}; });
   doneByTrack[BRIDGE_DONE_KEY] = ((stats.path || {})[BRIDGE_DONE_KEY] || {}).done || {};
   const homePathMode = (stats.homePath && stats.homePath.mode) || 'core';
-  const homeRemaining = homePathRemaining(unitsByTrack, pathKeys, doneByTrack, homePathMode);
+  const homePathOrder = (stats.homePath && stats.homePath.order) || 'plan';
+  const studyKeys = homePathOrder === 'smart' ? smartCertOrder(pathKeys, certPlan, results, seenLog) : pathKeys;
+  const homeRemaining = homePathRemaining(unitsByTrack, studyKeys, doneByTrack, homePathMode);
   const homeProgress = homePathProgress(unitsByTrack, pathKeys, doneByTrack);
   const homeOptional = homePathOptionalProgress(unitsByTrack, pathKeys, doneByTrack);
   const pathProgressByTrack = {};
@@ -605,6 +607,7 @@ function HomeView({ tracks, results, seenLog, stats, certPlan, speech, srs, make
   const studyingKey = (homeRemaining.find((e) => !e.step.optional) || homeRemaining[0] || {}).trackKey || (pathKeys[0] || null);
   const weakTotal = crossCertWeakQuestions(pathKeys, results, seenLog).total;
   const toughTotal = crossCertToughCards(pathKeys, srs).total;
+  const gamesTotal = crossCertWeakGames(pathKeys, results).total;
   const [homeRun, setHomeRun] = useState(null);
   const startHomeRun = (e) => setHomeRun({ kind: 'step', trackKey: e.trackKey, doneKey: e.doneKey, unit: e.unit, step: e.step, nonce: Date.now() });
   const skipHomeStep = (e) => makePathApi(e.doneKey || e.trackKey).skipStep(e.step.id);
@@ -630,7 +633,7 @@ function HomeView({ tracks, results, seenLog, stats, certPlan, speech, srs, make
         run={homeRun}
         tracks={tracks}
         unitsByTrack={unitsByTrack}
-        trackKeys={pathKeys}
+        trackKeys={studyKeys}
         doneByTrack={doneByTrack}
         mode={homePathMode}
         results={results}
@@ -659,7 +662,11 @@ function HomeView({ tracks, results, seenLog, stats, certPlan, speech, srs, make
           optionalProgress={homeOptional}
           mode={homePathMode}
           onSetMode={onSetHomePathMode}
+          order={homePathOrder}
+          onSetOrder={onSetHomePathOrder}
+          certCount={pathKeys.length}
           onStart={startHomeRun}
+          onTestOut={(e) => startHomeRun({ ...e, step: pathTestOutStep(e.unit) })}
           onSkip={skipHomeStep}
           onOpenCert={onSelectTrack}
           certPlan={certPlan}
@@ -672,8 +679,8 @@ function HomeView({ tracks, results, seenLog, stats, certPlan, speech, srs, make
         <HomeReviewCard
           weakTotal={weakTotal}
           toughTotal={toughTotal}
-          onWeak={() => setHomeRun({ kind: 'weak', nonce: Date.now() })}
-          onTough={() => setHomeRun({ kind: 'tough', nonce: Date.now() })}
+          gamesTotal={gamesTotal}
+          onStartReview={(kind) => setHomeRun({ kind, nonce: Date.now() })}
         />
       )}
 

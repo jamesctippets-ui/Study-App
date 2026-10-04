@@ -525,7 +525,7 @@ function emptyStats() {
     counts: { quizzesCompleted: 0, examsPassed: 0, matchRoundsCompleted: 0, perfectQuizzes: 0, caseStudiesCompleted: 0, finalMocksPassed: 0 },
     unlocked: [],
     lastVisited: null,
-    homePath: { mode: 'interleave' },
+    homePath: { mode: 'core', order: 'plan' },
     dailyGoal: { target: 20, date: null, count: 0 },
     dailyChallenge: { date: null, question: null, vocab: null },
     readinessHistory: {},
@@ -823,8 +823,41 @@ const DEEP_DIVE_CARDS = 5;
 const DEEP_DIVE_QUESTIONS = 4;
 const BONUS_GAMES_PER_UNIT = 2;
 
+// 'plan' follows the order the learner set; 'smart' puts certs with an
+// upcoming exam first (soonest first) and orders the rest weakest first.
+const HOME_PATH_ORDERS = ['plan', 'smart'];
+
 function normalizeHomePath(raw) {
-  return { mode: raw && HOME_PATH_MODES.includes(raw.mode) ? raw.mode : 'core' };
+  return {
+    mode: raw && HOME_PATH_MODES.includes(raw.mode) ? raw.mode : 'core',
+    order: raw && HOME_PATH_ORDERS.includes(raw.order) ? raw.order : 'plan',
+  };
+}
+
+// The order certs are studied in under the 'smart' setting. Dated certs with
+// an exam still ahead come first, soonest first. Everything else follows,
+// lowest readiness first — but readiness is bucketed in 20-point steps (and
+// ties fall back to plan order) so the order doesn't flip back and forth as a
+// score creeps up while you study. An exam date already past counts as no
+// date: it is not clear whether the exam happened.
+function smartCertOrder(trackKeys, certPlan, results, seenLog) {
+  const today = todayString();
+  const rows = trackKeys.map((key, i) => {
+    const sched = certPlan.scheduled[key];
+    const days = sched ? daysBetween(today, sched) : null;
+    return {
+      key, i,
+      upcoming: days !== null && days >= 0 ? days : null,
+      bucket: Math.floor(examReadiness(key, results, seenLog).score / 20),
+    };
+  });
+  rows.sort((a, b) => {
+    if (a.upcoming !== null && b.upcoming !== null) return a.upcoming - b.upcoming || a.i - b.i;
+    if (a.upcoming !== null) return -1;
+    if (b.upcoming !== null) return 1;
+    return a.bucket - b.bucket || a.i - b.i;
+  });
+  return rows.map((r) => r.key);
 }
 
 // The optional sections that can follow `unit` of cert `trackKey`. `anchor`
@@ -987,6 +1020,28 @@ function crossCertWeakQuestions(trackKeys, results, seenLog, limit) {
 function crossCertToughCards(trackKeys, srs, limit) {
   const lists = toughCardsByTrack(trackKeys, srs);
   return { picks: roundRobin(lists, limit || CROSS_REVIEW_CARDS), total: lists.reduce((n, l) => n + l.length, 0) };
+}
+
+// Mad Libs, Sequence, and Compare items you last got wrong. They record
+// results by their own ids, like questions do. `kind` says which runner to use.
+function missedGamesByTrack(trackKeys, results) {
+  return trackKeys.map((key) => {
+    const trackResults = results[key] || {};
+    const mod = DATA[key];
+    return [
+      ...(mod.madlibs || []).map((g) => ({ kind: 'madlib', g })),
+      ...(mod.sequences || []).map((g) => ({ kind: 'sequence', g })),
+      ...(mod.compare || []).map((g) => ({ kind: 'compare', g })),
+    ]
+      .filter(({ g }) => trackResults[g.id] === 'incorrect')
+      .map(({ kind, g }) => ({ trackKey: key, item: g, kind }));
+  });
+}
+
+const CROSS_REVIEW_GAMES = 3;
+function crossCertWeakGames(trackKeys, results, limit) {
+  const lists = missedGamesByTrack(trackKeys, results);
+  return { picks: roundRobin(lists, limit || CROSS_REVIEW_GAMES), total: lists.reduce((n, l) => n + l.length, 0) };
 }
 
 // Items from several certs share ids (every track has an f1 and a q1), so

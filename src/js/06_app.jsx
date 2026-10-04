@@ -1374,6 +1374,10 @@ function CertStudyApp() {
     const cur = statsRef.current;
     saveStats({ ...cur, homePath: { ...(cur.homePath || {}), mode: pathMode } });
   };
+  const setHomePathOrder = (order) => {
+    const cur = statsRef.current;
+    saveStats({ ...cur, homePath: { ...(cur.homePath || {}), order } });
+  };
 
   const doReset = () => {
     saveResults({ ...results, [activeTrack]: {} });
@@ -1699,6 +1703,7 @@ function CertStudyApp() {
             makePathApi={makePathApi}
             srs={srs}
             onSetHomePathMode={setHomePathMode}
+            onSetHomePathOrder={setHomePathOrder}
             onResume={() => {
               const lv = stats.lastVisited;
               if (!lv) return;
