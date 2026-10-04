@@ -621,6 +621,46 @@ const REAL_PORTAL_SCREENSHOTS = {
     sourceLabel: 'Microsoft Learn: Microsoft Entra Kerberos Authentication for Azure Files',
     sourceUrl: 'https://learn.microsoft.com/en-us/azure/storage/files/storage-files-identity-auth-hybrid-identities-enable',
   },
+  sentinelRuleScheduling: {
+    src: 'images/defender/sentinel-rule-scheduling.png',
+    alt: 'Real Microsoft Sentinel screenshot of the Analytics rule wizard Query scheduling, Alert threshold, Event grouping, and Suppression settings',
+    description: 'The Analytics rule wizard step for a scheduled rule in Microsoft Sentinel (labelled "Azure Sentinel" in the screenshot): Query scheduling runs the query every 5 minutes with a lookup of the last 5 minutes, the alert threshold is "Is greater than" 0, Event grouping is set to "Group all events into a single alert" (the alternative is "Trigger an alert for each event"), and the Suppression toggle "Stop running query after alert is generated" is Off.',
+    sourceLabel: 'Microsoft Learn: Configure security analytics for Azure Active Directory B2C data with Microsoft Sentinel',
+    sourceUrl: 'https://learn.microsoft.com/en-us/azure/active-directory-b2c/configure-security-analytics-sentinel',
+    product: 'Microsoft Sentinel',
+  },
+  sentinelAutomatedResponse: {
+    src: 'images/defender/sentinel-automated-response.png',
+    alt: 'Real Microsoft Sentinel screenshot of the Automated response tab of an analytics rule showing alert automation and incident automation',
+    description: 'The Automated response tab when editing an existing scheduled rule named "B2C Non-successful logins". Alert automation says the selected playbook receives the alert as its input and that only playbooks configured with the alert trigger can be selected; it lists one playbook, new-inc-notification, with status Enabled. Incident automation (preview) says automation rules receive the incident as input, that only playbooks configured with the incident trigger can be called by automation rules, and its table shows "No automation rules".',
+    sourceLabel: 'Microsoft Learn: Configure security analytics for Azure Active Directory B2C data with Microsoft Sentinel',
+    sourceUrl: 'https://learn.microsoft.com/en-us/azure/active-directory-b2c/configure-security-analytics-sentinel',
+    product: 'Microsoft Sentinel',
+  },
+  sentinelIncidentQueue: {
+    src: 'images/defender/sentinel-incident-queue.png',
+    alt: 'Real Microsoft Sentinel screenshot of the Incidents page with an incident list and a side panel for the selected incident',
+    description: 'The Incidents page in Microsoft Sentinel: counters for open, new, and active incidents with an open-incidents-by-severity bar, a list filtered to Severity All and Status New, Active over the last 30 days, and a side panel for the selected incident showing its owner (Unassigned), status (New), severity (High), description, and Evidence counts of events, alerts, and bookmarks, with Entities and Tactics both at 0, a note about the investigation graph needing entities, and View full details and Actions buttons.',
+    sourceLabel: 'Microsoft Learn: Configure security analytics for Azure Active Directory B2C data with Microsoft Sentinel',
+    sourceUrl: 'https://learn.microsoft.com/en-us/azure/active-directory-b2c/configure-security-analytics-sentinel',
+    product: 'Microsoft Sentinel',
+  },
+  sentinelIncidentDetails: {
+    src: 'images/defender/sentinel-incident-details.png',
+    alt: 'Real Microsoft Sentinel screenshot of the full incident page with timeline, evidence summary, and alert details pane',
+    description: 'The full incident page in Microsoft Sentinel: the left pane shows owner, status, severity, description, an Evidence summary of events, alerts, and bookmarks, entity and tactic counts, an Incident Overview workbook link, and Investigate and Actions buttons. The main area has Timeline, Alerts, Bookmarks, Entities, and Comments tabs with one alert on the timeline, and an alert details pane whose Events entry offers a "Link to LA" link.',
+    sourceLabel: 'Microsoft Learn: Configure security analytics for Azure Active Directory B2C data with Microsoft Sentinel',
+    sourceUrl: 'https://learn.microsoft.com/en-us/azure/active-directory-b2c/configure-security-analytics-sentinel',
+    product: 'Microsoft Sentinel',
+  },
+  sentinelLogsKql: {
+    src: 'images/defender/sentinel-logs-kql.png',
+    alt: 'Real Log Analytics screenshot of a KQL query against SigninLogs and its summarized results',
+    description: 'A Log Analytics query window used with Microsoft Sentinel: a KQL query over SigninLogs that filters ResultType, summarizes a count by a 60-second time bin and UserPrincipalName, projects Count and UserPrincipalName, and keeps rows where Count is at least 1, with the Results tab below showing two rows with Count values 3 and 1 for a sample user address.',
+    sourceLabel: 'Microsoft Learn: Configure security analytics for Azure Active Directory B2C data with Microsoft Sentinel',
+    sourceUrl: 'https://learn.microsoft.com/en-us/azure/active-directory-b2c/configure-security-analytics-sentinel',
+    product: 'Log Analytics in Microsoft Sentinel',
+  },
 };
 
 // `hideDescription` is set by quiz/exam question views — the description
