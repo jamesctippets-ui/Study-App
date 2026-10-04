@@ -934,42 +934,40 @@ doesn't (and why it's still waiting).
   categories. AZ-900 (4) and AZ-104 (3) have a few too. MD-102, DP-300,
   SC-300, and AZ-802 have the Study-view placement but no screenshot-
   backed questions yet.
-- [ ] **Queued next: bring real screenshots to every track with an admin
-  portal.** Coverage today, by track (categories with a real image of
-  their own / total): AZ-900 and AZ-104 every lesson; AZ-305 5 reference
-  diagrams; MD-102 5/5; DP-300 1/6; AZ-802 1/7; SC-300 1/4; **none yet:**
-  SC-200 (0/3), SC-500 (0/4), DP-900 (0/4), AZ-140 (0/4), AB-650 (0/3).
-  ITIL, Cloud+, and EHR Integration have no vendor portal to screenshot
-  (vendor-neutral by design) and stay out of scope. Order of work, each
-  step following the same rules as everything above — verify the source
-  repo exists and read its actual `LICENSE` file before reusing anything,
-  only use images genuinely embedded in a live docs article, and ship
-  each with alt text, a plain-language description, a source link, and
-  attribution:
-  1. **SC-200** (Sentinel / Defender XDR / KQL hunting) — largest
-     all-zero gap on a heavily portal-based exam. Source repo(s) still
-     to be found and license-checked (`azure-security-docs` was already
-     ruled out for Defender for Cloud/Sentinel).
-  2. **SC-500** — Defender for Cloud, Key Vault, Entra, and Azure AI
-     security surfaces (`azure-security-docs` is confirmed CC BY 4.0 for
-     Key Vault/HSM, and `entra-docs` is already in use for SC-300).
-  3. **DP-900** — Cosmos DB, storage/Data Lake, Synapse, and Power BI
-     surfaces.
-  4. **AZ-140** — Azure Virtual Desktop host pools, app groups, and
-     scaling plans.
-  5. **AB-650** — Microsoft 365 admin center, Purview, and Copilot
-     settings.
-  6. **Fill the thin tracks:** DP-300 (5 more categories), AZ-802 (6
-     more), SC-300 (3 more).
-  7. **Screenshot-backed questions** (about 2 per image, the AZ-305
-     pattern) for every screenshot above — the hardest class of
-     question to write badly, since the answer has to be read off the
-     image.
-  Sequencing note: steps 1-7 all touch each track's `data/<track>.py`
-  (a `screenshot` key on categories, `image` on questions), the same
-  files the question-hardening pass rewrites, so the data edits wait
-  until that pass is merged to avoid clobbering it. Image sourcing and
-  registering new entries in `REAL_PORTAL_SCREENSHOTS` can start any time.
+- [x] **Real screenshots for SC-200, SC-500, DP-900, AZ-140, and AB-650
+  (first pass).** 24 new genuine images (all CC BY 4.0, each from an
+  article's own embedded media, with a source link and attribution) plus
+  48 image-dependent questions (1688 -> 1736 total): SC-200 5 images / 10
+  questions, SC-500 6 / 12, DP-900 5 / 10, AZ-140 2 / 4, AB-650 6 / 12.
+  Every image was opened and described only by what is visible. What limited
+  coverage: most Microsoft Learn source repos could not be license-checked
+  from the sandbox (`raw.githubusercontent.com` works, `github.com` and the
+  API do not). `azure-security-docs`, `memdocs`, `defender-docs`,
+  `purview-docs`, the Copilot repos, and `powerbi-docs` all returned 404 for
+  their LICENSE, so the earlier "confirmed CC BY" notes for
+  `azure-security-docs` and `memdocs` could not be re-verified this time,
+  and AVD, Defender for Cloud, Purview, Cosmos DB, and Power BI have no
+  image. Confirmed CC BY 4.0 and usable: `azure-docs`, `sql-docs`,
+  `azure-ai-docs`, `azure-monitor-docs`, `microsoft-365-docs` (default
+  branch `public`), `power-platform`, `fabric-docs`. Not usable: `entra-docs`
+  (MIT only). Caveats worth knowing: SC-200's five images all come from one
+  azure-docs article (Azure AD B2C security analytics) and still show the
+  older "Azure Sentinel" UI; one SC-200 image shows playbooks attached to an
+  analytics rule, a method retired in March 2026 (its questions state only
+  what the image says); AZ-140's two images come from the Azure Files Entra
+  Kerberos article (FSLogix profile storage), not an AVD article, and one
+  image's pane text says "hybrid identities" only, which current docs have
+  since relaxed.
+- [ ] **Still open on screenshots:** (1) gaps — AZ-140 planInfra and
+  monitorMaintain; DP-900 Cosmos DB/Power BI; AB-650 Purview, Defender, and
+  Copilot Studio; SC-200 Defender XDR; SC-500 Defender for Cloud, Key Vault,
+  PIM — all blocked on finding a reachable CC BY source repo (or on a
+  different, license-clean source such as screenshots the maintainer takes
+  themselves). (2) The thin tracks: DP-300 (5 categories), AZ-802 (6),
+  SC-300 (3, entra-docs is MIT-only), plus screenshot-backed questions for
+  them. (3) Only 15 image files are precached by the service worker; every
+  screenshot added since (including all of these) loads online only, so a
+  fully offline session shows broken images for them.
 
 ## 13. Interactive learning games (user's idea)
 
