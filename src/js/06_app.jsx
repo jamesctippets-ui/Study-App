@@ -12,6 +12,10 @@ function CertStudyApp() {
   const [srs, setSrs] = useState(emptyTrackMap);
   const [certPlan, setCertPlan] = useState(emptyCertPlan);
   const [flipped, setFlipped] = useState(false);
+  // 'all' | 'tough'. In tough mode the deck is the ordered list of card ids
+  // (hardest first) captured when you opened it; cards rated 4-5 drop out.
+  const [cardDeck, setCardDeck] = useState('all');
+  const [toughIds, setToughIds] = useState([]);
   const [fIndex, setFIndex] = useState(0);
   const [syncMode, setSyncMode] = useState('loading');
   const [saveError, setSaveError] = useState(false);
@@ -880,16 +884,29 @@ function CertStudyApp() {
   // switch category, switch track, or reload.
   const filteredFlashcards = useMemo(() => {
     const list = activeCat === 'all' ? flashcardsData : flashcardsData.filter((c) => c.cat === activeCat);
+    if (cardDeck === 'tough') {
+      const byId = new Map(list.map((c) => [c.id, c]));
+      return toughIds.map((id) => byId.get(id)).filter(Boolean);
+    }
     return orderBySrs(list, srsRef.current[activeTrack] || {});
     // syncMode is included so this recomputes once when the initial
     // cloud/local load finishes (loading -> local/cloud is a one-time
     // transition), picking up real srs data instead of the empty default —
     // not so it re-sorts on every subsequent change.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeCat, flashcardsData, syncMode]);
+  }, [activeCat, flashcardsData, syncMode, cardDeck, toughIds]);
 
-  useEffect(() => { setFIndex(0); setFlipped(false); }, [activeCat, mode, learnView, activeTrack]);
-  useEffect(() => { setActiveCat('all'); }, [activeTrack]);
+  // Live count for the deck toggle (and the Path card); the deck itself is
+  // only snapshotted when you open it.
+  const toughCount = useMemo(() => toughCardIds(srs[activeTrack], flashcardsData).length, [srs, activeTrack, flashcardsData]);
+
+  const openCardDeck = (deck) => {
+    if (deck === 'tough') setToughIds(toughCardIds(srsRef.current[activeTrack], flashcardsData));
+    setCardDeck(deck);
+  };
+
+  useEffect(() => { setFIndex(0); setFlipped(false); }, [activeCat, mode, learnView, activeTrack, cardDeck]);
+  useEffect(() => { setActiveCat('all'); setCardDeck('all'); }, [activeTrack]);
 
   // Scrolls back to the top on every real navigation (mode/track/sub-tab
   // change) — without this, switching views keeps whatever scroll
@@ -1209,6 +1226,16 @@ function CertStudyApp() {
       recordResult(currentCard.id, ratingToOutcome(quality));
       recordSrs(currentCard.id, quality);
       bumpDailyGoal(1);
+      // Tough deck: a 4 or 5 graduates the card out of the deck, so the same
+      // index now points at the next card; anything lower keeps it in and
+      // moves on.
+      if (cardDeck === 'tough' && quality > TOUGH_MAX_RATING) {
+        const id = currentCard.id;
+        setToughIds((ids) => ids.filter((x) => x !== id));
+        setFlipped(false);
+        setFIndex((i) => (i >= filteredFlashcards.length - 1 ? 0 : i));
+        return;
+      }
     }
     setFlipped(false);
     setFIndex((i) => (i + 1) % Math.max(filteredFlashcards.length, 1));
@@ -1271,6 +1298,12 @@ function CertStudyApp() {
   // Practice tab uses, so mastery, spaced repetition, streaks, the daily
   // goal, and achievements need no path-specific scoring.
   const pathApi = {
+    openToughTerms: () => {
+      setToughIds(toughCardIds(srsRef.current[activeTrack], flashcardsData));
+      setCardDeck('tough');
+      setLearnView('cards');
+      setMode('learn');
+    },
     rateCard: (id, quality) => {
       recordResult(id, ratingToOutcome(quality));
       recordSrs(id, quality);
@@ -1707,12 +1740,40 @@ function CertStudyApp() {
           />
         )}
 
-        {mode === 'learn' && learnView === 'cards' && Object.keys(srs[activeTrack] || {}).length > 0 && (
+        {mode === 'learn' && learnView === 'cards' && (toughCount > 0 || cardDeck === 'tough') && (
+          <div className="flex gap-1 mb-3" style={{ background: COLOR.bg, padding: '3px', borderRadius: '10px', border: `1px solid ${COLOR.border}` }}>
+            {[['all', 'All cards'], ['tough', `Tough terms (${cardDeck === 'tough' ? toughIds.length : toughCount})`]].map(([key, label]) => (
+              <button
+                key={key}
+                onClick={() => openCardDeck(key)}
+                className="flex-1 btn-flat"
+                style={{ padding: '6px 2px', borderRadius: '8px', fontSize: '10.5px', fontWeight: 600, background: cardDeck === key ? COLOR.surfaceRaised : 'transparent', color: cardDeck === key ? COLOR.text : COLOR.muted }}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+        )}
+        {mode === 'learn' && learnView === 'cards' && cardDeck === 'all' && Object.keys(srs[activeTrack] || {}).length > 0 && (
           <div style={{ fontSize: '10.5px', color: COLOR.muted, marginBottom: '8px', textAlign: 'center' }}>
             Cards you're overdue to review come first.
           </div>
         )}
-        {mode === 'learn' && learnView === 'cards' && (
+        {mode === 'learn' && learnView === 'cards' && cardDeck === 'tough' && (
+          <div style={{ fontSize: '10.5px', color: COLOR.muted, marginBottom: '8px', textAlign: 'center' }}>
+            Cards you last rated OK or lower, hardest first. Rate one Good or Easy and it leaves this deck.
+          </div>
+        )}
+        {mode === 'learn' && learnView === 'cards' && cardDeck === 'tough' && filteredFlashcards.length === 0 && (
+          <div style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderRadius: '14px', padding: '22px 16px', textAlign: 'center' }}>
+            <div className="itil-display" style={{ fontSize: '17px', fontWeight: 600, marginBottom: '6px' }}>Tough terms cleared</div>
+            <div style={{ fontSize: '13px', color: COLOR.muted, lineHeight: 1.5, marginBottom: '12px' }}>
+              {activeCat === 'all' ? 'Nothing left in this deck.' : 'No tough terms in this category.'} Cards show up here whenever you rate them OK or lower.
+            </div>
+            <button onClick={() => openCardDeck('all')} className="btn-flat" style={{ padding: '8px 14px', borderRadius: '10px', fontSize: '12px', fontWeight: 600, border: `1px solid ${COLOR.border}`, color: COLOR.text }}>Back to all cards</button>
+          </div>
+        )}
+        {mode === 'learn' && learnView === 'cards' && !(cardDeck === 'tough' && filteredFlashcards.length === 0) && (
           <FlashcardView
             card={currentCard}
             flipped={flipped}
@@ -1739,6 +1800,7 @@ function CertStudyApp() {
             categories={categories}
             speech={{ speakingId, onSpeak: speak, speechSupported }}
             api={pathApi}
+            toughCount={toughCount}
           />
         )}
 

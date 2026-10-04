@@ -1312,20 +1312,31 @@ trading away for shinier but shallower ones.
   this work (confirmed on the previous build): the first-render hash
   writer overwrites the incoming hash before the route is applied.
 
-- [ ] **Queued: a "tough terms" flashcard deck (user's request).** Track how
-  each flashcard was last rated (the 1-5 confidence rating already feeds
-  `srs` and `results`) and offer a deck built from every card currently
-  rated 3 ("OK") or below, so the learner can go back through just the
-  terms they find hard. Open design points to settle when building it:
-  a per-track deck on the Reference > Cards screen (and a card on the
-  Path map next to "Review weak spots"); cards leave the deck once they
-  are later rated 4 or 5; the last rating per card needs storing, since
-  `srs` keeps the schedule (interval, ease, reps) rather than the rating
-  itself, and `results` only keeps correct/incorrect.
-- [ ] **Queued: finish the question-hardening pass.** SC-200, SC-500,
-  DP-300, Cloud+, and EHR Integration are not done — their agents were cut
-  off by a session rate limit before finishing and nothing was saved, so
-  they need relaunching. The other ten tracks are merged.
+- [x] **Tough terms flashcard deck.** Each `srs` entry now also stores the
+  raw 1-5 rating it was last given (`last`). A card is "tough" when that
+  rating is 3 (OK) or lower; entries saved before this existed count as
+  tough only if they were a miss (reps reset), since nothing else survives
+  in the old data. Reference > Cards shows an All cards / Tough terms (N)
+  toggle once any card qualifies, and the Path map gets a "Tough terms" card
+  beside "Review weak spots". The deck is snapshotted when opened, hardest
+  first (lowest rating, then most overdue); rating a card 4 or 5 graduates
+  it out immediately, anything lower keeps it in, and the deck ends on a
+  "Tough terms cleared" screen. Respects the category filter. Ratings feed
+  mastery and SRS exactly as before.
+- [x] **Factual accuracy pass (all 15 tracks).** Every track's flashcards,
+  lessons, cheat sheets, Mad Libs, and case studies were checked against
+  Microsoft Learn / CompTIA / HL7 / PeopleCert material and corrected, and
+  the flashcard text garbled by pasted-in card titles (a few hundred cards)
+  was rewritten. Then a second pass reworded the question and Compare items
+  that conflicted with the corrections (retired tools such as Data Migration
+  Assistant, Azure Data Studio, the Require approved client app grant,
+  Basic Load Balancer, Restricted SharePoint Search; renamed products such as
+  Windows 365 Flex and Copilot Credits). Answer keys were not changed.
+  Caveat: learn.microsoft.com was blocked in the sandbox, so facts were
+  verified through search-result snippets, and several 2026 retirement and
+  licensing items rest on third-party write-ups. Re-verify those before
+  relying on them (notably Intune Suite licensing, Windows 365 Flex, Restricted
+  SharePoint Search dates, and the Cloud+ CV0-004 domain weights).
 
 ## 15. Content ideas beyond quiz questions
 

@@ -387,7 +387,7 @@ function PathStepComplete({ unit, step, pct, unitComplete, testedOut, next, onNe
 
 const PATH_NODE_OFFSETS = [0, 24, 40, 24];
 
-function PathView({ track, trackKey, doneMap, results, seenLog, categories, speech, api }) {
+function PathView({ track, trackKey, doneMap, results, seenLog, categories, speech, api, toughCount }) {
   const mod = DATA[trackKey];
   const units = useMemo(() => buildPathUnits(trackKey), [trackKey]);
   const [session, setSession] = useState(null);
@@ -622,6 +622,25 @@ function PathView({ track, trackKey, doneMap, results, seenLog, categories, spee
             Review weak spots
             <span style={{ display: 'block', fontSize: '11.5px', fontWeight: 400, opacity: 0.85 }}>
               {reviewIds.length} question{reviewIds.length === 1 ? '' : 's'} you missed in units you've started
+            </span>
+          </span>
+          <span style={{ fontSize: '16px' }}>›</span>
+        </button>
+      )}
+
+      {toughCount > 0 && (
+        <button
+          onClick={api.openToughTerms}
+          style={{
+            width: '100%', marginBottom: '14px', padding: '11px 14px', borderRadius: '12px', textAlign: 'left',
+            border: `1px solid ${COLOR.gold}`, background: 'rgba(200,160,60,0.1)', color: COLOR.gold, fontSize: '13px', fontWeight: 600,
+            display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px',
+          }}
+        >
+          <span>
+            Tough terms
+            <span style={{ display: 'block', fontSize: '11.5px', fontWeight: 400, opacity: 0.85 }}>
+              {toughCount} flashcard{toughCount === 1 ? '' : 's'} you rated OK or lower
             </span>
           </span>
           <span style={{ fontSize: '16px' }}>›</span>

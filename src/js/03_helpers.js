@@ -228,12 +228,36 @@ function nextSrsEntry(prev, quality, now) {
   const p = prev || { interval: 0, ease: 2.5, reps: 0, due: t };
   if (quality < 3) {
     const ease = Math.max(1.3, p.ease - 0.2);
-    return { interval: 1, ease, reps: 0, due: t };
+    return { interval: 1, ease, reps: 0, due: t, last: quality };
   }
   const reps = p.reps + 1;
   const ease = Math.max(1.3, p.ease + (0.1 - (5 - quality) * (0.08 + (5 - quality) * 0.02)));
   const interval = reps === 1 ? 1 : reps === 2 ? 6 : Math.max(1, Math.round(p.interval * ease));
-  return { interval, ease, reps, due: t + interval * DAY };
+  return { interval, ease, reps, due: t + interval * DAY, last: quality };
+}
+
+// "Tough terms": cards whose most recent rating was 3 (OK) or lower. `last`
+// is the raw 1-5 rating nextSrsEntry now stores alongside the schedule.
+// Entries saved before it existed have no `last`; a miss (reps reset to 0)
+// is the only thing they can still tell us, so that counts as tough, and
+// anything with reps > 0 was a 3+ pass we can't distinguish from 4-5 and
+// leave out rather than flood the deck with guesses. A card leaves the deck
+// the next time it's rated 4 or 5.
+const TOUGH_MAX_RATING = 3;
+function isToughEntry(entry) {
+  if (!entry) return false;
+  if (typeof entry.last === 'number') return entry.last <= TOUGH_MAX_RATING;
+  return entry.reps === 0;
+}
+
+// Tough card ids for a track, hardest first (lowest last rating, then the
+// most overdue), restricted to ids that still exist in `flashcards`.
+function toughCardIds(srsForTrack, flashcards) {
+  const live = new Set((flashcards || []).map((c) => c.id));
+  const rank = (e) => (typeof e.last === 'number' ? e.last : 2);
+  return Object.keys(srsForTrack || {})
+    .filter((id) => live.has(id) && isToughEntry(srsForTrack[id]))
+    .sort((a, b) => rank(srsForTrack[a]) - rank(srsForTrack[b]) || (srsForTrack[a].due || 0) - (srsForTrack[b].due || 0));
 }
 
 // A flashcard rating (1-5) is stored for SRS scheduling above, but the

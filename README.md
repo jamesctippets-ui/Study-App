@@ -14,7 +14,9 @@ schedule and rated on the same 1-5 confidence scale SM-2 was originally
 designed around — 1 "Blank" through 5 "Easy" — rather than a binary
 right/wrong; a 3+ resurfaces the card later by a growing interval, under
 3 resets it sooner. The order is computed fresh each time you enter a
-category/track rather than reshuffling mid-session) and Study
+category/track rather than reshuffling mid-session; once any card has been rated 3 or lower a
+"Tough terms" deck appears beside All cards — the cards you last rated OK or below, hardest first,
+where a 4 or 5 graduates a card out — and the Path map links to it too) and Study
 (for tracks without a course, a flashcard list paginated one category/section
 at a time — Previous/Next section controls instead of one long scroll; for
 AZ-900/AZ-104, a full mini-course per topic: reading with tappable key terms,
