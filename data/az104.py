@@ -86,7 +86,7 @@ FLASHCARDS = [
         'id': 'f10',
         'cat': 'storage',
         'front': 'Storage account types and performance tiers',
-        'back': 'General-purpose v2 is the standard account type for most scenarios. Performance tiers are Standard (HDD-backed, cost-effective) and Premium (SSD-backed, for high-throughput, low-latency needs like disks).',
+        'back': 'General-purpose v2 is the standard account type for most scenarios and uses Standard performance (HDD-backed, cost-effective). Premium performance (SSD-backed, for high-throughput, low-latency needs) comes from premium account types such as premium block blob, file share, and page blob accounts instead.',
         'detail': 'Premium is the answer whenever a scenario stresses low latency or high transaction rates.',
     },
     {
@@ -1866,7 +1866,7 @@ Day to day, this ties back to cost: budgets with alert thresholds, and Cost Anal
         'diagram': 'storageAccess',
         'vocabIds': ['f10', 'f11', 'f12', 'f13', 'f14', 'f15', 'f16', 'f17', 'f18'],
         'quizIds': ['q9', 'q10', 'q11', 'q12', 'q13', 'tf4', 'tf5', 'tf6'],
-        'reading': """Managing storage at the administrator level means configuring the account itself, not just knowing what it holds. General-purpose v2 is the standard account type, with Standard (HDD-backed) and Premium (SSD-backed) performance tiers depending on how demanding the workload is.
+        'reading': """Managing storage at the administrator level means configuring the account itself, not just knowing what it holds. General-purpose v2 is the standard account type and uses Standard (HDD-backed) performance, while Premium (SSD-backed) performance comes from premium account types (block blob, file share, page blob), chosen by how demanding the workload is.
 
 For access, a storage account access key grants full, unrestricted control over the whole account — risky to hand out. A Shared Access Signature (SAS) instead grants limited, time-boxed access to specific resources, without ever exposing that key. A storage firewall adds a network-level layer on top, restricting access to specific VNets or IP ranges regardless of what credentials someone has.
 

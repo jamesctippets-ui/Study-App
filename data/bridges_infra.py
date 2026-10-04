@@ -30,10 +30,10 @@ BRIDGES = [
             {
                 'track': 'dp300',
                 'lesson': 'security-and-data-protection',
-                'angle': 'Azure SQL has its own firewall at the service endpoint: server-level rules (stored in master) cover every database on the logical server, database-level rules travel with one database through copy and geo-replication, and both only filter which public IP ranges may connect. A private endpoint is the stricter boundary that removes the public path for VNet clients.',
+                'angle': 'Azure SQL has its own firewall at the service endpoint: server-level rules (stored in master) cover every database on the logical server, database-level rules travel with one database through copy and geo-replication, and both are allow-only rules for who may reach the public endpoint (there are no deny rules). A private endpoint is the stricter boundary that removes the public path for VNet clients.',
             },
         ],
-        'watchOut': "Three things called a firewall rule behave differently. A Cloud+ network ACL is stateless and needs a rule for each direction, but an Azure NSG is stateful, so a reply to an allowed inbound connection is not stopped by an outbound deny. NSG rules are ordered by priority number, not by list position and not by deny-beats-allow. And an NSG on your subnet does not govern who reaches an Azure SQL logical server's public endpoint, where the only firewall rules are allow rules for IP ranges.",
+        'watchOut': "Three things called a firewall rule behave differently. A Cloud+ network ACL is stateless and needs a rule for each direction, but an Azure NSG is stateful, so a reply to an allowed inbound connection is not stopped by an outbound deny. NSG rules are ordered by priority number, not by list position and not by deny-beats-allow. And an NSG on your subnet does not govern who reaches an Azure SQL logical server's public endpoint, where the firewall is allow-only: you list what may connect (IP ranges), and there are no deny rules.",
         'questions': [
             {
                 'id': 'br-infra-traffic-filtering-q1',
@@ -74,7 +74,7 @@ BRIDGES = [
                     'Create a private endpoint for the logical server in the VNet and turn off public network access to it',
                 ],
                 'correct': 3,
-                'explanation': "A private endpoint gives the logical server a private IP in the VNet and, with public network access turned off, removes the public path entirely, so no IP allow list is needed. Server-level and database-level firewall rules both work by allowing public IP addresses, so the traffic still uses the public endpoint and someone still maintains the list (database-level rules differ only in traveling with the database). An NSG on the application subnet filters traffic to and from the VMs in that subnet; it does not control who can reach the SQL logical server's public endpoint.",
+                'explanation': "A private endpoint gives the logical server a private IP in the VNet and, with public network access turned off, removes the public path entirely, so no IP allow list is needed. Server-level and database-level IP firewall rules both work by allowing public IP addresses, so the traffic still uses the public endpoint and someone still maintains the list (database-level rules differ only in traveling with the database). An NSG on the application subnet filters traffic to and from the VMs in that subnet; it does not control who can reach the SQL logical server's public endpoint.",
                 'whyTested': 'The NSG answer is the correct tool in the network frame and simply does not apply to a platform service endpoint, which is the DP-300 point.',
             },
         ],
@@ -196,7 +196,7 @@ BRIDGES = [
                     'ExpressRoute with encryption added on top, such as IPsec tunnels or TLS between the endpoints',
                 ],
                 'correct': 3,
-                'explanation': 'ExpressRoute supplies the private path and predictable latency, but it is not encrypted by default, so the encryption requirement is met by layering your own (an IPsec tunnel or application-level TLS). ExpressRoute alone leaves the encryption requirement unmet because private does not mean encrypted. A Site-to-Site VPN is encrypted but crosses the public internet, so it fails both the avoid-the-internet and predictable-latency requirements, and a redundant second tunnel changes neither.',
+                'explanation': 'ExpressRoute supplies the private path and predictable latency, but it is not encrypted by default, so the encryption requirement is met by layering your own (an IPsec tunnel or application-level TLS end to end; MACsec on ExpressRoute Direct ports protects only the physical link to Microsoft). ExpressRoute alone leaves the encryption requirement unmet because private does not mean encrypted. A Site-to-Site VPN is encrypted but crosses the public internet, so it fails both the avoid-the-internet and predictable-latency requirements, and a redundant second tunnel changes neither.',
                 'whyTested': 'The private-means-encrypted assumption is the single most repeated trap across the Azure fundamentals and architect exams.',
             },
             {
@@ -299,7 +299,7 @@ BRIDGES = [
                     'Expand the boot disk past 2 TB on the Generation 1 VM and protect it with a production checkpoint',
                 ],
                 'correct': 1,
-                'explanation': 'A VM generation is fixed at creation. Secure Boot and boot disks larger than 2 TB need Generation 2 (UEFI with GPT), so the fix is a new Generation 2 VM and a migration of the workload. Hyper-V is itself a Type 1 hypervisor, so the host type is not the problem and moving hosts changes nothing. There is no in-place conversion. A Generation 1 VM boots through legacy BIOS and cannot boot from a disk beyond that limit, and a production checkpoint is a backup mechanism, not a way around the limit.',
+                'explanation': 'A VM generation is fixed at creation. Secure Boot and boot disks larger than 2 TB need Generation 2 (UEFI with GPT), so the fix is a new Generation 2 VM and a migration of the workload. Hyper-V is itself a Type 1 hypervisor, so the host type is not the problem and moving hosts changes nothing. There is no in-place conversion. A Generation 1 VM boots through legacy BIOS and cannot boot from a disk beyond that limit, and a production checkpoint is just a recovery point for the VM, not a way around the limit.',
                 'whyTested': 'The Type 1 versus Type 2 vocabulary from Cloud+ is a distractor here; the real constraint is a Hyper-V-specific, permanent creation-time choice.',
             },
         ],

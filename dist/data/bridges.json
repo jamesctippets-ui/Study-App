@@ -149,7 +149,7 @@
       {
         "track": "az104",
         "lesson": "storage-management",
-        "angle": "AZ-104 turns this into configuration: Azure Files shares that VMs mount over SMB or NFS vs Blob containers reached by REST or SDK, Standard vs Premium performance on a general-purpose v2 account, and lifecycle policies that move aging blobs to cheaper tiers or delete them."
+        "angle": "AZ-104 turns this into configuration: Azure Files shares that VMs mount over SMB or NFS vs Blob containers reached by REST or SDK, Standard vs Premium performance options for a storage account, and lifecycle policies that move aging blobs to cheaper tiers or delete them."
       },
       {
         "track": "cloudplus",
@@ -574,7 +574,7 @@
           "Pass-through authentication with agents installed on Azure virtual machines"
         ],
         "correct": 1,
-        "explanation": "Password hash sync puts a hash of the password hash in Entra ID, so sign-in is validated entirely in the cloud during an on-premises outage, and those hashes are what let Entra ID Protection detect leaked credentials. Pass-through authentication still needs a reachable on-premises domain controller at every sign-in, so extra agents (wherever they run) do not remove that dependency, and it stores nothing in the cloud for leak detection. AD FS on Azure virtual machines still depends on reaching AD DS and means operating a federation farm, which the company ruled out.",
+        "explanation": "Password hash sync puts a hash of the password hash in Entra ID, so sign-in is validated entirely in the cloud during an on-premises outage, and those hashes are what let Entra ID Protection detect leaked credentials. Pass-through authentication still needs a reachable on-premises domain controller at every sign-in, so extra agents (wherever they run) do not remove that dependency, and on its own it gives Entra ID no password hashes to check against leaked-credential data. AD FS on Azure virtual machines still depends on reaching AD DS and means operating a federation farm, which the company ruled out.",
         "whyTested": "Combines the design-resilience framing of AZ-305 with the Entra ID Protection framing of AB-650."
       },
       {
@@ -711,7 +711,7 @@
           "Publish a Just Enough Administration endpoint that exposes the deployment tool to the developers"
         ],
         "correct": 2,
-        "explanation": "Endpoint Privilege Management elevates one approved application for a standard user, and a user-confirmed rule can require a business justification, so the developer never holds full local administrator rights. Adding them to the local Administrators group is exactly the standing privilege being avoided. Handing out the LAPS password gives full local administrator access to anyone who has it, and LAPS only manages that password. Just Enough Administration constrains PowerShell sessions to a set of cmdlets and does not elevate an arbitrary executable."
+        "explanation": "Endpoint Privilege Management elevates one approved application for a standard user, and a user-confirmed rule can require a business justification, so the developer never holds full local administrator rights. Adding them to the local Administrators group is exactly the standing privilege being avoided. Handing out the LAPS password gives full local administrator access to anyone who has it, and LAPS only manages that password. Just Enough Administration is a constrained PowerShell remoting endpoint for running an approved set of commands, not a way to let a standard user elevate a desktop application on a laptop."
       },
       {
         "id": "br-id-local-admin-least-privilege-q2",
@@ -976,10 +976,10 @@
       {
         "track": "dp300",
         "lesson": "security-and-data-protection",
-        "angle": "Azure SQL has its own firewall at the service endpoint: server-level rules (stored in master) cover every database on the logical server, database-level rules travel with one database through copy and geo-replication, and both only filter which public IP ranges may connect. A private endpoint is the stricter boundary that removes the public path for VNet clients."
+        "angle": "Azure SQL has its own firewall at the service endpoint: server-level rules (stored in master) cover every database on the logical server, database-level rules travel with one database through copy and geo-replication, and both are allow-only rules for who may reach the public endpoint (there are no deny rules). A private endpoint is the stricter boundary that removes the public path for VNet clients."
       }
     ],
-    "watchOut": "Three things called a firewall rule behave differently. A Cloud+ network ACL is stateless and needs a rule for each direction, but an Azure NSG is stateful, so a reply to an allowed inbound connection is not stopped by an outbound deny. NSG rules are ordered by priority number, not by list position and not by deny-beats-allow. And an NSG on your subnet does not govern who reaches an Azure SQL logical server's public endpoint, where the only firewall rules are allow rules for IP ranges.",
+    "watchOut": "Three things called a firewall rule behave differently. A Cloud+ network ACL is stateless and needs a rule for each direction, but an Azure NSG is stateful, so a reply to an allowed inbound connection is not stopped by an outbound deny. NSG rules are ordered by priority number, not by list position and not by deny-beats-allow. And an NSG on your subnet does not govern who reaches an Azure SQL logical server's public endpoint, where the firewall is allow-only: you list what may connect (IP ranges), and there are no deny rules.",
     "questions": [
       {
         "id": "br-infra-traffic-filtering-q1",
@@ -1020,7 +1020,7 @@
           "Create a private endpoint for the logical server in the VNet and turn off public network access to it"
         ],
         "correct": 3,
-        "explanation": "A private endpoint gives the logical server a private IP in the VNet and, with public network access turned off, removes the public path entirely, so no IP allow list is needed. Server-level and database-level firewall rules both work by allowing public IP addresses, so the traffic still uses the public endpoint and someone still maintains the list (database-level rules differ only in traveling with the database). An NSG on the application subnet filters traffic to and from the VMs in that subnet; it does not control who can reach the SQL logical server's public endpoint.",
+        "explanation": "A private endpoint gives the logical server a private IP in the VNet and, with public network access turned off, removes the public path entirely, so no IP allow list is needed. Server-level and database-level IP firewall rules both work by allowing public IP addresses, so the traffic still uses the public endpoint and someone still maintains the list (database-level rules differ only in traveling with the database). An NSG on the application subnet filters traffic to and from the VMs in that subnet; it does not control who can reach the SQL logical server's public endpoint.",
         "whyTested": "The NSG answer is the correct tool in the network frame and simply does not apply to a platform service endpoint, which is the DP-300 point."
       }
     ]
@@ -1136,7 +1136,7 @@
           "ExpressRoute with encryption added on top, such as IPsec tunnels or TLS between the endpoints"
         ],
         "correct": 3,
-        "explanation": "ExpressRoute supplies the private path and predictable latency, but it is not encrypted by default, so the encryption requirement is met by layering your own (an IPsec tunnel or application-level TLS). ExpressRoute alone leaves the encryption requirement unmet because private does not mean encrypted. A Site-to-Site VPN is encrypted but crosses the public internet, so it fails both the avoid-the-internet and predictable-latency requirements, and a redundant second tunnel changes neither.",
+        "explanation": "ExpressRoute supplies the private path and predictable latency, but it is not encrypted by default, so the encryption requirement is met by layering your own (an IPsec tunnel or application-level TLS end to end; MACsec on ExpressRoute Direct ports protects only the physical link to Microsoft). ExpressRoute alone leaves the encryption requirement unmet because private does not mean encrypted. A Site-to-Site VPN is encrypted but crosses the public internet, so it fails both the avoid-the-internet and predictable-latency requirements, and a redundant second tunnel changes neither.",
         "whyTested": "The private-means-encrypted assumption is the single most repeated trap across the Azure fundamentals and architect exams."
       },
       {
@@ -1236,7 +1236,7 @@
           "Expand the boot disk past 2 TB on the Generation 1 VM and protect it with a production checkpoint"
         ],
         "correct": 1,
-        "explanation": "A VM generation is fixed at creation. Secure Boot and boot disks larger than 2 TB need Generation 2 (UEFI with GPT), so the fix is a new Generation 2 VM and a migration of the workload. Hyper-V is itself a Type 1 hypervisor, so the host type is not the problem and moving hosts changes nothing. There is no in-place conversion. A Generation 1 VM boots through legacy BIOS and cannot boot from a disk beyond that limit, and a production checkpoint is a backup mechanism, not a way around the limit.",
+        "explanation": "A VM generation is fixed at creation. Secure Boot and boot disks larger than 2 TB need Generation 2 (UEFI with GPT), so the fix is a new Generation 2 VM and a migration of the workload. Hyper-V is itself a Type 1 hypervisor, so the host type is not the problem and moving hosts changes nothing. There is no in-place conversion. A Generation 1 VM boots through legacy BIOS and cannot boot from a disk beyond that limit, and a production checkpoint is just a recovery point for the VM, not a way around the limit.",
         "whyTested": "The Type 1 versus Type 2 vocabulary from Cloud+ is a distractor here; the real constraint is a Hyper-V-specific, permanent creation-time choice."
       }
     ]
@@ -1665,7 +1665,7 @@
           "Expedite a quality update to every device so the whole fleet converges on the same build"
         ],
         "correct": 0,
-        "explanation": "An update rollback removes the regressed update from devices that already have it, which is the restore-service step; the pilot ring missing the hardware is the underlying cause to fix afterward, so the next bad update is caught before the broad ring. A safeguard hold prevents an update from being offered to an at-risk device and does not uninstall anything already installed. Feature and quality deferral run on independent clocks, and raising a deferral cannot undo an update that has already landed. Expediting an update speeds delivery, which spreads the problem rather than restoring service.",
+        "explanation": "An update rollback removes the regressed update from devices that already have it, which is the restore-service step; the pilot ring missing the hardware is the underlying cause to fix afterward, so the next bad update is caught before the broad ring. A safeguard hold is Microsoft's own block on offering a feature update to a device with a known compatibility issue, so it is not an admin action and does not uninstall anything already installed. Feature and quality deferral run on independent clocks, and raising a deferral cannot undo an update that has already landed. Expediting an update speeds delivery, which spreads the problem rather than restoring service.",
         "whyTested": "A rollback and a safeguard hold sound alike; one is incident response and the other is prevention."
       }
     ]
@@ -1915,8 +1915,8 @@
           "Assign it with the Audit effect and review the compliance results before switching the effect to Deny"
         ],
         "correct": 3,
-        "explanation": "Audit flags noncompliant resources in compliance reporting without blocking anything, so the team can see the impact and then change the effect to Deny. DeployIfNotExists deploys a related resource and is not a removal mechanism. Assigning Deny first blocks real deployments on day one. Simulation mode is a Purview DLP feature, not a setting on an Azure Policy assignment.",
-        "whyTested": "AB-650's simulation mode is the tenant-side habit of testing before enforcing; Azure Policy's equivalent is a different effect."
+        "explanation": "Audit flags noncompliant resources in compliance reporting without blocking anything, so the team can see the impact and then change the effect to Deny. DeployIfNotExists deploys a related resource and is not a removal mechanism. Assigning Deny first blocks real deployments on day one. Simulation mode is the Purview DLP feature; Azure Policy's way to preview impact is the Audit effect (or an assignment set to Do not enforce), not a simulation mode.",
+        "whyTested": "AB-650's simulation mode is the tenant-side habit of testing before enforcing; Azure Policy's equivalent is a different mechanism, the Audit effect."
       },
       {
         "id": "br-ops-policy-enforce-vs-report-q2",
@@ -2138,7 +2138,7 @@
           "Azure Policy with the Audit effect, because it reports every resource that is out of compliance"
         ],
         "correct": 2,
-        "explanation": "Compliance Manager works from regulatory templates and applies the shared responsibility model: actions Microsoft fulfills as provider are separated from those the organization implements and attests to. Microsoft Secure Score is a general posture number, not a regulation tracker. Defender for Cloud's dashboard maps cloud resources to standards and has no notion of Microsoft 365 provider-fulfilled actions. Policy audits resource configuration, not regulatory requirements for tenant data."
+        "explanation": "Compliance Manager works from regulatory templates and applies the shared responsibility model: actions Microsoft fulfills as provider are separated from those the organization implements and attests to. Microsoft Secure Score is a general posture number, not a regulation tracker. Defender for Cloud's dashboard maps Azure, hybrid and multicloud resources to standards, so it is not the tool for tracking Microsoft 365 tenant obligations. Policy audits resource configuration, not regulatory requirements for tenant data."
       },
       {
         "id": "br-sec-posture-vs-compliance-q3",
@@ -2209,7 +2209,7 @@
           "Raise the order number of the auto-close rule, because higher numbers run first"
         ],
         "correct": 0,
-        "explanation": "Automation rules on the same analytics rule execute in numeric order, lowest first, and closing an incident can stop later rules and playbooks from running, so the narrow auto-close rule must come ahead of the broad notify rule. A higher number runs later, not earlier. Attaching playbooks directly inside an analytics rule has been retired in favor of automation rules. Alert suppression pauses the whole rule for a period and silences every source, not just the scanner."
+        "explanation": "Automation rules on the same analytics rule execute in numeric order, lowest first, and each rule sees the incident as earlier rules left it, so once a rule has closed an incident a later rule whose conditions need an open or New incident no longer matches it \u2014 the narrow auto-close rule must come ahead of the broad notify rule. A higher number runs later, not earlier. Attaching playbooks directly inside an analytics rule has been retired in favor of automation rules. Alert suppression pauses the whole rule for a period and silences every source, not just the scanner."
       },
       {
         "id": "br-sec-detect-and-automate-q3",
@@ -2219,10 +2219,10 @@
           "Switch to a log query alert, because log alerts do not produce false positives",
           "Raise the threshold to 100 percent so only real exhaustion fires",
           "Have the alert's action group run a runbook that scales the database up on every alert",
-          "Keep the diagnostic history, establish a baseline of normal behavior over time, and set the threshold relative to it"
+          "Establish a baseline of normal behavior from the metric's history over time, and set the threshold relative to it"
         ],
         "correct": 3,
-        "explanation": "A threshold is only meaningful against a baseline of what normal looks like, and diagnostic settings keep the history needed to learn it. Setting the threshold at 100 percent turns the alert into a notice that the problem has already happened. Log alerts can be just as noisy if the condition is wrong. Automating a scale-up responds to the symptom but leaves the badly chosen threshold, and the cost, in place.",
+        "explanation": "A threshold is only meaningful against a baseline of what normal looks like, which comes from observing the metric over time, including the nightly batch pattern. Setting the threshold at 100 percent turns the alert into a notice that the problem has already happened. Log alerts can be just as noisy if the condition is wrong. Automating a scale-up responds to the symptom but leaves the badly chosen threshold, and the cost, in place.",
         "whyTested": "Cloud+ teaches baseline-before-threshold; the Azure monitoring exams supply the alert and action-group mechanics."
       }
     ]
@@ -2266,7 +2266,7 @@
           "Azure SQL Auditing of every SELECT plus Defender for SQL vulnerability assessment"
         ],
         "correct": 1,
-        "explanation": "Dynamic Data Masking shows partial values to non-privileged users and lets privileged roles, such as billing, see the real value, while Row-Level Security filters rows centrally by the querying user's context. TDE protects files at rest and firewall rules govern network reach, so neither shapes what a query returns. Randomized Always Encrypted would hide the value even from the app and cannot show a partial value, and sensitivity labels do not apply to rows in a SQL table. Auditing and vulnerability assessment record or scan but control nothing.",
+        "explanation": "Dynamic Data Masking shows partial values to non-privileged users and lets privileged roles, such as billing, see the real value, while Row-Level Security filters rows centrally by the querying user's context. TDE protects files at rest and firewall rules govern network reach, so neither shapes what a query returns. Randomized Always Encrypted would hide the value even from the app and cannot show a partial value, and a sensitivity label on a table classifies data without changing what a query returns for each user. Auditing and vulnerability assessment record or scan but control nothing.",
         "whyTested": "DP-300 tests the query-time controls by name, and the healthcare scenario explains why you would want different views of the same table."
       },
       {
@@ -2293,7 +2293,7 @@
           "Microsoft Purview, which builds a data map and classifies sensitive data across hybrid and multicloud sources"
         ],
         "correct": 3,
-        "explanation": "Purview's job is discovering and classifying sensitive data across Azure, on-premises, and other clouds, which is the input that labeling and DLP decisions need. A DLP policy is scoped to configured locations such as Exchange, SharePoint, OneDrive, Teams, and endpoint devices, not a database or a foreign cloud bucket. Defender for Cloud assesses posture and threats, not what each column contains. Masking presupposes you already know which columns are sensitive.",
+        "explanation": "Purview's job is discovering and classifying sensitive data across Azure, on-premises, and other clouds, which is the input that labeling and DLP decisions need. A DLP policy only covers its configured locations, such as Exchange, SharePoint, OneDrive, Teams, and endpoint devices, which do not include an Azure SQL database, so it cannot report matches across all three sources. Defender for Cloud assesses posture and threats, not what each column contains. Masking presupposes you already know which columns are sensitive.",
         "whyTested": "AZ-900 tests discovery as Purview's role, and AB-650 tests what DLP and labels do once you know where the data is."
       }
     ]

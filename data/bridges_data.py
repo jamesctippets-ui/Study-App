@@ -125,7 +125,7 @@ BRIDGES = [
             {'track': 'az900', 'lesson': 'storage',
              'angle': "AZ-900 names the account's data services (Blob, Azure Files, Queue, Table) and the Blob access tiers: Hot is cheapest to access, Archive is cheapest to store but takes hours to retrieve."},
             {'track': 'az104', 'lesson': 'storage-management',
-             'angle': "AZ-104 turns this into configuration: Azure Files shares that VMs mount over SMB or NFS vs Blob containers reached by REST or SDK, Standard vs Premium performance on a general-purpose v2 account, and lifecycle policies that move aging blobs to cheaper tiers or delete them."},
+             'angle': "AZ-104 turns this into configuration: Azure Files shares that VMs mount over SMB or NFS vs Blob containers reached by REST or SDK, Standard vs Premium performance options for a storage account, and lifecycle policies that move aging blobs to cheaper tiers or delete them."},
             {'track': 'cloudplus', 'lesson': 'scaling-resilience-storage',
              'angle': "Cloud+ frames the first decision generically as block, file or object storage, and lists lifecycle rules that move older objects to cheaper tiers as the way to control long-term cost."},
             {'track': 'dp900', 'lesson': 'non-relational-data-on-azure',

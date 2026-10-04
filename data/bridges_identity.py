@@ -118,7 +118,7 @@ BRIDGES = [
                     'Pass-through authentication with agents installed on Azure virtual machines',
                 ],
                 'correct': 1,
-                'explanation': 'Password hash sync puts a hash of the password hash in Entra ID, so sign-in is validated entirely in the cloud during an on-premises outage, and those hashes are what let Entra ID Protection detect leaked credentials. Pass-through authentication still needs a reachable on-premises domain controller at every sign-in, so extra agents (wherever they run) do not remove that dependency, and it stores nothing in the cloud for leak detection. AD FS on Azure virtual machines still depends on reaching AD DS and means operating a federation farm, which the company ruled out.',
+                'explanation': 'Password hash sync puts a hash of the password hash in Entra ID, so sign-in is validated entirely in the cloud during an on-premises outage, and those hashes are what let Entra ID Protection detect leaked credentials. Pass-through authentication still needs a reachable on-premises domain controller at every sign-in, so extra agents (wherever they run) do not remove that dependency, and on its own it gives Entra ID no password hashes to check against leaked-credential data. AD FS on Azure virtual machines still depends on reaching AD DS and means operating a federation farm, which the company ruled out.',
                 'whyTested': 'Combines the design-resilience framing of AZ-305 with the Entra ID Protection framing of AB-650.',
             },
             {
@@ -257,7 +257,7 @@ BRIDGES = [
                     'Publish a Just Enough Administration endpoint that exposes the deployment tool to the developers',
                 ],
                 'correct': 2,
-                'explanation': 'Endpoint Privilege Management elevates one approved application for a standard user, and a user-confirmed rule can require a business justification, so the developer never holds full local administrator rights. Adding them to the local Administrators group is exactly the standing privilege being avoided. Handing out the LAPS password gives full local administrator access to anyone who has it, and LAPS only manages that password. Just Enough Administration constrains PowerShell sessions to a set of cmdlets and does not elevate an arbitrary executable.',
+                'explanation': 'Endpoint Privilege Management elevates one approved application for a standard user, and a user-confirmed rule can require a business justification, so the developer never holds full local administrator rights. Adding them to the local Administrators group is exactly the standing privilege being avoided. Handing out the LAPS password gives full local administrator access to anyone who has it, and LAPS only manages that password. Just Enough Administration is a constrained PowerShell remoting endpoint for running an approved set of commands, not a way to let a standard user elevate a desktop application on a laptop.',
             },
             {
                 'id': 'br-id-local-admin-least-privilege-q2',

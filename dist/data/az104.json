@@ -124,7 +124,7 @@
       "id": "f10",
       "cat": "storage",
       "front": "Storage account types and performance tiers",
-      "back": "General-purpose v2 is the standard account type for most scenarios. Performance tiers are Standard (HDD-backed, cost-effective) and Premium (SSD-backed, for high-throughput, low-latency needs like disks).",
+      "back": "General-purpose v2 is the standard account type for most scenarios and uses Standard performance (HDD-backed, cost-effective). Premium performance (SSD-backed, for high-throughput, low-latency needs) comes from premium account types such as premium block blob, file share, and page blob accounts instead.",
       "detail": "Premium is the answer whenever a scenario stresses low latency or high transaction rates."
     },
     {
@@ -2081,7 +2081,7 @@
         "tf5",
         "tf6"
       ],
-      "reading": "Managing storage at the administrator level means configuring the account itself, not just knowing what it holds. General-purpose v2 is the standard account type, with Standard (HDD-backed) and Premium (SSD-backed) performance tiers depending on how demanding the workload is.\n\nFor access, a storage account access key grants full, unrestricted control over the whole account \u2014 risky to hand out. A Shared Access Signature (SAS) instead grants limited, time-boxed access to specific resources, without ever exposing that key. A storage firewall adds a network-level layer on top, restricting access to specific VNets or IP ranges regardless of what credentials someone has.\n\nOngoing management includes lifecycle policies, which automatically move aging blobs to cheaper tiers or delete them outright, and choosing the right protection for accidental changes: blob versioning keeps every prior version automatically, while soft delete keeps deleted (and, with versioning off, overwritten) data recoverable for a retention window.",
+      "reading": "Managing storage at the administrator level means configuring the account itself, not just knowing what it holds. General-purpose v2 is the standard account type and uses Standard (HDD-backed) performance, while Premium (SSD-backed) performance comes from premium account types (block blob, file share, page blob), chosen by how demanding the workload is.\n\nFor access, a storage account access key grants full, unrestricted control over the whole account \u2014 risky to hand out. A Shared Access Signature (SAS) instead grants limited, time-boxed access to specific resources, without ever exposing that key. A storage firewall adds a network-level layer on top, restricting access to specific VNets or IP ranges regardless of what credentials someone has.\n\nOngoing management includes lifecycle policies, which automatically move aging blobs to cheaper tiers or delete them outright, and choosing the right protection for accidental changes: blob versioning keeps every prior version automatically, while soft delete keeps deleted (and, with versioning off, overwritten) data recoverable for a retention window.",
       "fundamentalsLabel": "New to storage account administration? See the everyday analogy",
       "fundamentals": "An access key is like a master key to an entire building \u2014 powerful, and dangerous to hand out casually. A SAS is like a visitor badge that only opens one door, only works for a limited window of time, and can be revoked without changing the master key at all.",
       "keyTerms": [
