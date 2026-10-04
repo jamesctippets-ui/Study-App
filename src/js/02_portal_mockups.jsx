@@ -607,6 +607,20 @@ const REAL_PORTAL_SCREENSHOTS = {
     sourceLabel: 'Microsoft Learn: Create a Stream Analytics Job using Azure portal',
     sourceUrl: 'https://learn.microsoft.com/en-us/azure/stream-analytics/stream-analytics-quick-create-portal',
   },
+  avdFilesEntraKerberos: {
+    src: 'images/avd/azure-files-entra-kerberos.png',
+    alt: 'Real Azure Portal screenshot of the Identity-based access page for an Azure Files storage account with the Microsoft Entra Kerberos pane open',
+    description: 'The Identity-based access page of a storage account\'s file shares, used when FSLogix profile containers live on Azure Files. Step 1 lists three identity sources (Active Directory Domain Services, Microsoft Entra Domain Services, and Microsoft Entra Kerberos), all currently Disabled, with Set up highlighted under Microsoft Entra Kerberos. The Microsoft Entra Kerberos pane on the right has its checkbox ticked, a banner saying admin consent must be explicitly granted to the new Microsoft Entra ID application, and optional Domain name and Domain GUID fields for configuring directory- and file-level permissions through Windows File Explorer (not required if you use icacls). Step 2 below sets default share-level permissions, currently "Disable permissions and no access is allowed to file shares".',
+    sourceLabel: 'Microsoft Learn: Microsoft Entra Kerberos Authentication for Azure Files',
+    sourceUrl: 'https://learn.microsoft.com/en-us/azure/storage/files/storage-files-identity-auth-hybrid-identities-enable',
+  },
+  avdFilesShareSettings: {
+    src: 'images/avd/azure-files-share-settings.png',
+    alt: 'Real Azure Portal screenshot of the File shares blade and File share settings for an Azure Files storage account',
+    description: 'The File shares blade of a storage account that could host an FSLogix profile share. The File share settings strip shows Identity-based access: Not configured (highlighted), Default share-level permissions: Disabled, Soft delete: Disabled, Maximum capacity: 100 TiB, and Security: Maximum compatibility. One share, myfileshare, is listed with the Transaction optimized access tier and a 100 TiB quota.',
+    sourceLabel: 'Microsoft Learn: Microsoft Entra Kerberos Authentication for Azure Files',
+    sourceUrl: 'https://learn.microsoft.com/en-us/azure/storage/files/storage-files-identity-auth-hybrid-identities-enable',
+  },
 };
 
 // `hideDescription` is set by quiz/exam question views — the description
