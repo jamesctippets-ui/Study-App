@@ -812,6 +812,88 @@ const REAL_PORTAL_SCREENSHOTS = {
     sourceLabel: 'Microsoft Learn: Change Automated Backup Settings (Azure SQL Database)',
     sourceUrl: 'https://learn.microsoft.com/en-us/azure/azure-sql/database/automated-backups-change-settings?view=azuresql',
   },
+  // AZ-802 additional real screenshots. All are images embedded in live
+  // Microsoft Learn articles whose source repos carry a CC BY 4.0 LICENSE
+  // (MicrosoftDocs/windowsserverdocs, azure-docs, azure-monitor-docs; the
+  // first line of each repo's LICENSE file reads "Attribution 4.0
+  // International"). The Windows Admin Center and Windows LAPS images are not
+  // the Azure portal, so `product` labels them accordingly.
+  smsTransferMapping: {
+    src: 'images/windowsadmincenter/storage-migration-service-transfer-mapping.png',
+    alt: 'Real Windows Admin Center screenshot of the Storage Migration Service Transfer data step mapping source volumes and shares to a destination server',
+    description: "Windows Admin Center's Storage Migration Service job named afstest2 on the Transfer data step, titled 'Specify the destination for' a source server. The Destination radio buttons offer 'Use an existing server or VM' (selected), 'Create a new Azure VM' and a choice not to transfer files; a destination device is entered with Browse and Scan. 'Map each source volume to a destination volume' lists source volumes C: and E: (both NTFS) mapped to destination volumes C: and E:, with available space of 35.6 GB and 12.6 GB, required space of 0 B and 1.82 GB, and an Azure File Sync column showing a Disabled check box for each. 'Select the shares to transfer' lists the SMB shares sales (C:\\sales, 0 B) and public (E:\\public, 1.82 GB), each with its Include check box ticked.",
+    sourceLabel: 'Microsoft Learn: Migrate a file server by using Storage Migration Service',
+    sourceUrl: 'https://learn.microsoft.com/en-us/windows-server/storage/storage-migration-service/migrate-data',
+    product: 'Windows Admin Center',
+  },
+  smsCutoverConfig: {
+    src: 'images/windowsadmincenter/storage-migration-service-cutover-config.png',
+    alt: 'Real Windows Admin Center screenshot of the Storage Migration Service Cut over step configuring network adapters and the source rename',
+    description: "Windows Admin Center's Storage Migration Service job afstest2 on the Cut over to the new servers step, titled 'Configure cutover from' a source server 'to' a destination server. The check boxes 'Include this device', 'Migrate network settings' and 'All network adapters migrated' are ticked. Source network adapters shows Local Area Connection 3 (Microsoft Hyper-V Network Adapter #3) with IP information beginning 10.0.0.202, labelled as a statically-assigned IP address, with a 'Use DHCP' check box ticked; Destination network adapters shows the adapter Ethernet selected, with IP information beginning 10.231.84.13. Below, 'Rename the source device after cutover' has 'Use randomly generated name' selected rather than 'Choose a new name'.",
+    sourceLabel: 'Microsoft Learn: Migrate a file server by using Storage Migration Service',
+    sourceUrl: 'https://learn.microsoft.com/en-us/windows-server/storage/storage-migration-service/migrate-data',
+    product: 'Windows Admin Center',
+  },
+  wacVmMemorySettings: {
+    src: 'images/windowsadmincenter/wac-vm-memory-settings.png',
+    alt: 'Real Windows Admin Center screenshot of the Memory settings pane for a Hyper-V virtual machine',
+    description: "Windows Admin Center (Hyper-Converged Cluster Manager) showing 'Settings for vm-test-1' with the Memory tab selected (tabs: General, Memory, Processors, Disks, Networks, Boot order, Checkpoints). Startup memory (GB) is 0.5, 'Enable dynamic memory' is ticked, Minimum memory (GB) is 0.5, Maximum memory (GB) is 1024, Memory buffer (%) is 20, and a Memory weight slider sits near the middle. The Save memory settings and Discard changes buttons are greyed out; Close is available.",
+    sourceLabel: 'Microsoft Learn: Manage Virtual Machines with Windows Admin Center',
+    sourceUrl: 'https://learn.microsoft.com/en-us/windows-server/manage/windows-admin-center/use/manage-virtual-machines',
+    product: 'Windows Admin Center',
+  },
+  wacHyperVHostSettings: {
+    src: 'images/windowsadmincenter/wac-hyper-v-host-settings.png',
+    alt: 'Real Windows Admin Center screenshot of the Hyper-V host General settings including the hypervisor scheduler type',
+    description: "Windows Admin Center (Hyper-Converged Cluster Manager) Settings page with the Hyper-V Host Settings group (General, Enhanced Session Mode, NUMA Spanning, Live Migration, Storage Migration) and General selected. A blue notice reads 'Any changes will be applied to all cluster nodes.' Fields show a default Virtual Hard Disks Path and Virtual Machines Path, each with a Browse button. Under Hypervisor Scheduler Type the radio buttons are 'Core Scheduler (Recommended)' and 'Classic Scheduler', with Classic Scheduler selected and an orange warning strongly recommending a switch to the core scheduler to protect SMT-enabled processors against side-channel security vulnerabilities, followed by a 'Restart the server to apply changes?' check box that is unticked.",
+    sourceLabel: 'Microsoft Learn: Manage Virtual Machines with Windows Admin Center',
+    sourceUrl: 'https://learn.microsoft.com/en-us/windows-server/manage/windows-admin-center/use/manage-virtual-machines',
+    product: 'Windows Admin Center',
+  },
+  dnsResolverRulesetRules: {
+    src: 'images/windowsadmincenter/dns-private-resolver-ruleset-rules.png',
+    alt: 'Real Azure portal screenshot of the Rules page of an Azure DNS forwarding ruleset listing three forwarding rules',
+    description: "The Azure portal page 'myruleset | Rules' for a DNS forwarding ruleset. Its text says domain name resolution requests are forwarded to the destination IP addresses in matching rules and that rules are prioritized by longest suffix match. Three rules are listed, all with rule state Enabled: AzurePrivate for azure.contoso.com. forwarding to 10.0.0.4:53, Internal for internal.contoso.com. forwarding to 10.1.0.5:53, and Wildcard for the root domain '.' forwarding to 10.5.5.5:53. The Settings menu includes Rules, Virtual Network Links and Outbound endpoints.",
+    sourceLabel: 'Microsoft Learn: Quickstart - Create an Azure DNS Private Resolver using the Azure portal',
+    sourceUrl: 'https://learn.microsoft.com/en-us/azure/dns/dns-private-resolver-get-started-portal',
+  },
+  dnsResolverRulesetLinks: {
+    src: 'images/windowsadmincenter/dns-private-resolver-ruleset-vnet-links.png',
+    alt: 'Real Azure portal screenshot of the Virtual Network Links page of an Azure DNS forwarding ruleset',
+    description: "The Azure portal page 'myruleset | Virtual Network Links' for a DNS forwarding ruleset. Its text says virtual networks linked to this ruleset forward DNS requests according to matching rules, and that virtual networks can only be linked to a ruleset within the same region. Two links are listed in resource group myresourcegroup: myvnet-link for virtual network myvnet and myvnet2-link for virtual network myvnet2. The toolbar offers Add, Remove and Refresh.",
+    sourceLabel: 'Microsoft Learn: Quickstart - Create an Azure DNS Private Resolver using the Azure portal',
+    sourceUrl: 'https://learn.microsoft.com/en-us/azure/dns/dns-private-resolver-get-started-portal',
+  },
+  vmInsightsMapDependencies: {
+    src: 'images/windowsadmincenter/vm-insights-map-dependencies.png',
+    alt: 'Real Azure portal screenshot of the VM insights Map tab showing a virtual machine and its connected client and server-port groups',
+    description: "The Azure portal 'ContosoWeb1 | Insights' page for a virtual machine with the Map tab selected and the time range 'Last 30 minutes as of 20 Mar 17:46'. In the centre is the ContosoWeb1 node (41 Processes). A client group of 18 Clients connects to it from the left. To the right are server-port groups: Port 53 (2 Servers), Port 443 (26 Servers), Port 3268 (1 Servers), Port 22 (1 Servers), Port 1433 (2 Servers) and Port 80 (2 Servers). The connection to the Port 22 group is drawn as a red dashed line while the others are solid grey. A separate group of 7 Clients sits at the top right. A right-hand strip offers Properties, Log Events, Alerts and Connections, and the left menu lists Backup, Disaster recovery, Update management, Insights and Alerts.",
+    sourceLabel: 'Microsoft Learn: View app dependencies with VM insights',
+    sourceUrl: 'https://learn.microsoft.com/en-us/azure/azure-monitor/vm/vminsights-maps',
+  },
+  vmInsightsPerformanceDisks: {
+    src: 'images/windowsadmincenter/vm-insights-performance-disks.png',
+    alt: 'Real Azure portal screenshot of the VM insights Performance tab with performance insights and a logical disk performance table',
+    description: "The Azure portal 'demoVM1 | Insights' page for a virtual machine with the Performance tab selected and the time range 'Last hour'. A 'Performance insights (14)' section has a 'Go to Performance Diagnostics' link, the text 'Run continuous or on-demand diagnostics', filters for Impact, Category and Diagnostic Type, and rows of Medium-impact CPU insights whose diagnostic type is Continuous. Below, 'Logical Disk Performance' lists drive C: (current size 126.45 GB, 37% used), drive D: (64 GB, 8% used) and a Total row (190.45 GB, 27% used) with P95 IOPs, throughput and latency columns, followed by a 'CPU Utilization %' chart with Avg, Min, 50th, 90th, 95th and Max buttons.",
+    sourceLabel: 'Microsoft Learn: Analyze the health and status of your virtual machine with Azure Monitor',
+    sourceUrl: 'https://learn.microsoft.com/en-us/azure/azure-monitor/vm/vminsights-performance',
+  },
+  windowsLapsAdProperties: {
+    src: 'images/windowsadmincenter/windows-laps-ad-properties-dialog.png',
+    alt: 'Real Active Directory Users and Computers screenshot of the Windows LAPS tab in a computer object Properties dialog',
+    description: "The 'LAPSAD2 Properties' dialog of a computer object in Active Directory Users and Computers with the LAPS tab selected (other tabs: General, Operating System, Member Of, Delegation, Location, Managed By, Dial-in). Under 'Local Administrator Password Solution' it shows the current LAPS password expiration (Sunday, July 31, 2022 1:35 PM), a date-time control to set a new expiration with an 'Expire now' button, the LAPS account name Administrator, the LAPS password masked with dots, and 'Copy password' and 'Show password' buttons. OK, Cancel, Apply and Help sit along the bottom, with Apply greyed out.",
+    sourceLabel: 'Microsoft Learn: Set up Windows LAPS in the LAPS properties dialog',
+    sourceUrl: 'https://learn.microsoft.com/en-us/windows-server/identity/laps/laps-management-user-interface',
+    product: 'Active Directory Users and Computers',
+  },
+  windowsLapsEventLog: {
+    src: 'images/windowsadmincenter/windows-laps-event-viewer-password-update.png',
+    alt: 'Real Event Viewer screenshot of the Windows LAPS Operational log with event 10018 selected',
+    description: "Windows Event Viewer showing the LAPS > Operational log under Applications and Services Logs (number of events: 7). Information events from source LAPS appear in the list with event IDs 10004, 10020, 10018, 10014, 10009 and 10023; event 10018 is selected. Its General tab, outlined in red, reads 'LAPS successfully updated Active Directory with the new password.' The details show log name Microsoft-Windows-LAPS/Operational, source LAPS, event ID 10018, level Information, user SYSTEM and computer lapsAD2.laps.com.",
+    sourceLabel: 'Microsoft Learn: Get started with Windows LAPS and Windows Server Active Directory',
+    sourceUrl: 'https://learn.microsoft.com/en-us/windows-server/identity/laps/laps-scenarios-windows-server-active-directory',
+    product: 'Windows Event Viewer',
+  },
 };
 
 // `hideDescription` is set by quiz/exam question views — the description

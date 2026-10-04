@@ -958,16 +958,22 @@ doesn't (and why it's still waiting).
   Kerberos article (FSLogix profile storage), not an AVD article, and one
   image's pane text says "hybrid identities" only, which current docs have
   since relaxed.
+- [x] **Thin tracks DP-300 and AZ-802 filled in.** DP-300 now has a real
+  screenshot on all 6 categories (6 new images from `sql-docs`, 12 questions);
+  AZ-802 went from 1 to 6 of 7 categories (10 new images from
+  `windowsserverdocs`, `azure-docs`, and `azure-monitor-docs`, all confirmed
+  CC BY 4.0, plus 20 questions). Totals: 63 registered screenshots, 1768
+  questions. AZ-802 adDs has none (the checkable AD DS articles have no
+  images). Two AZ-802 questions (q73 restart check box, q81 Expire now) rest on
+  standard behavior the cited article doesn't state outright.
 - [ ] **Still open on screenshots:** (1) gaps — AZ-140 planInfra and
-  monitorMaintain; DP-900 Cosmos DB/Power BI; AB-650 Purview, Defender, and
-  Copilot Studio; SC-200 Defender XDR; SC-500 Defender for Cloud, Key Vault,
-  PIM — all blocked on finding a reachable CC BY source repo (or on a
-  different, license-clean source such as screenshots the maintainer takes
-  themselves). (2) The thin tracks: DP-300 (5 categories), AZ-802 (6),
-  SC-300 (3, entra-docs is MIT-only), plus screenshot-backed questions for
-  them. (3) Only 15 image files are precached by the service worker; every
-  screenshot added since (including all of these) loads online only, so a
-  fully offline session shows broken images for them.
+  monitorMaintain; AZ-802 adDs; DP-900 Cosmos DB/Power BI; AB-650 Purview,
+  Defender, and Copilot Studio; SC-200 Defender XDR; SC-500 Defender for
+  Cloud, Key Vault, PIM; SC-300's three unfilled categories (entra-docs is
+  MIT-only) — all blocked on finding a reachable CC BY source repo, or on
+  screenshots the maintainer takes themselves. (2) Only 15 image files are
+  precached by the service worker; every screenshot added since loads online
+  only, so a fully offline session shows broken images for them.
 
 ## 13. Interactive learning games (user's idea)
 
