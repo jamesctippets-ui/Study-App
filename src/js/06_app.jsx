@@ -1347,6 +1347,13 @@ function CertStudyApp() {
       const cur = statsRef.current;
       saveStats({ ...cur, path: markPathStepDone(cur.path, trackKey, stepId, pct, todayString()) });
     },
+    // Optional sections can be set aside; skipped counts as done but is kept
+    // distinguishable from completed.
+    skipStep: (stepId) => {
+      const cur = statsRef.current;
+      saveStats({ ...cur, path: markPathStepDone(cur.path, trackKey, stepId, null, todayString(), 'skipped') });
+    },
+    bumpGoal: () => bumpDailyGoal(1),
     completeSteps: (stepIds, pct, via) => {
       const cur = statsRef.current;
       saveStats({ ...cur, path: markPathStepsDone(cur.path, trackKey, stepIds, pct, todayString(), via) });
@@ -1690,6 +1697,7 @@ function CertStudyApp() {
             certPlan={certPlan}
             speech={{ speakingId, onSpeak: speak, speechSupported }}
             makePathApi={makePathApi}
+            srs={srs}
             onSetHomePathMode={setHomePathMode}
             onResume={() => {
               const lv = stats.lastVisited;

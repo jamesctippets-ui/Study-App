@@ -609,6 +609,8 @@ const PATH_REVIEW_QUESTIONS = 8;
 // The order rotates by unit so consecutive units don't feel identical.
 // Steps with no material for a given unit (e.g. no extra flashcards, no
 // scenario) are dropped when the unit is built.
+const PATH_GAME_LABELS = { match: 'Match the terms', madlib: 'Mad Lib', sequence: 'Put it in order', compare: 'Pick the better answer' };
+
 const PATH_VARIANTS = [
   ['read', 'cards', 'quiz', 'game', 'apply', 'cards2', 'quiz2', 'checkpoint'],
   ['read', 'quiz', 'cards', 'apply', 'game', 'quiz2', 'cards2', 'checkpoint'],
@@ -625,7 +627,7 @@ function normalizePathStats(raw) {
     Object.keys(done).forEach((stepId) => {
       const d = done[stepId];
       if (d && typeof d === 'object') {
-        clean[stepId] = { at: typeof d.at === 'string' ? d.at : null, pct: Number.isFinite(d.pct) ? d.pct : null, via: d.via === 'testout' ? 'testout' : null };
+        clean[stepId] = { at: typeof d.at === 'string' ? d.at : null, pct: Number.isFinite(d.pct) ? d.pct : null, via: d.via === 'testout' || d.via === 'skipped' ? d.via : null };
       }
     });
     out[trackKey] = { done: clean };
@@ -645,10 +647,10 @@ function markPathStepsDone(pathStats, trackKey, stepIds, pct, today, via) {
   return { ...base, [trackKey]: { done } };
 }
 
-function markPathStepDone(pathStats, trackKey, stepId, pct, today) {
+function markPathStepDone(pathStats, trackKey, stepId, pct, today, via) {
   const base = pathStats || {};
   const track = base[trackKey] || { done: {} };
-  return { ...base, [trackKey]: { done: { ...track.done, [stepId]: { at: today, pct: Number.isFinite(pct) ? pct : null, via: null } } } };
+  return { ...base, [trackKey]: { done: { ...track.done, [stepId]: { at: today, pct: Number.isFinite(pct) ? pct : null, via: via || null } } } };
 }
 
 // Hands each item (anything with a `cat`) to one of the units that cover
@@ -721,7 +723,7 @@ function buildPathUnits(trackKey) {
     const game = u.games.length
       ? u.games[u.index % u.games.length]
       : (u.coreCardIds.length >= 3 ? { kind: 'match', id: null, cat: u.cats[0] } : null);
-    const gameLabels = { match: 'Match the terms', madlib: 'Mad Lib', sequence: 'Put it in order', compare: 'Pick the better answer' };
+    const gameLabels = PATH_GAME_LABELS;
     const spec = {
       read: { label: 'Read the lesson', meta: `${estimateReadMinutes(lesson.reading)} min read`, ok: !!lesson.reading },
       cards: { label: 'Flashcards', meta: `${cardsA.length} cards`, cardIds: cardsA, ok: cardsA.length > 0 },
@@ -738,6 +740,10 @@ function buildPathUnits(trackKey) {
     return {
       id: u.id, index: u.index, lesson, title: lesson.title, summary: lesson.summary, cats: u.cats,
       poolIds: fullPool, steps,
+      // Not path steps themselves — what the Home path's optional sections
+      // are built from (see buildOptionalSteps).
+      coreCardIds: u.coreCardIds, extraCardIds: u.extraCardIds, extraQuestionIds: u.extraQuestionIds,
+      games: u.games, coreGame: game,
     };
   });
 }
@@ -797,52 +803,112 @@ function pathTestOutStep(unit) {
 /* ---------------- cross-cert home path ---------------- */
 
 // The Home tab's own study path: one trail built from every active cert in
-// the user's cert plan, so a learner can work through their whole plan from
-// Home and only open a cert when they want to go deeper. It adds no content
-// and no new progress record — each entry is a unit/step that
+// the user's plan, so a learner can work through their whole plan from
+// Home and only open a cert when they want to go deeper. It adds no core
+// content and no new progress record — each core entry is a unit/step
 // buildPathUnits already produces for a cert, and finishing one writes to
 // that cert's own stats.path[track].done, so Home and the cert's Path tab
 // can never disagree.
 //
-// 'interleave' (default) hands out one unit per cert in plan order, round
-// after round (a1, b1, c1, a2, b2, ...), which spaces each cert's material
-// out instead of finishing one before touching the next; 'block' finishes a
-// cert before moving on (a1, a2, b1, b2). The order is computed over every
-// unit and only then filtered to unfinished ones, so it stays put as units
-// complete rather than reshuffling under the learner.
-const HOME_PATH_MODES = ['interleave', 'block'];
+// Certs run in plan order, one after another. What the learner chooses is
+// how much surrounds that core: 'core' is just their certs, 'extended' mixes
+// in optional sections — a deep dive on the unit's terms, extra games, and
+// cross-cert "bridges" to other certs that teach the same idea. Optional
+// steps are never required (each can be skipped), never count toward core
+// progress, and never appear on a cert's own Path tab.
+const HOME_PATH_MODES = ['core', 'extended'];
 const HOME_PATH_UPCOMING = 5;
+const BRIDGE_DONE_KEY = 'bridges';
+const DEEP_DIVE_CARDS = 5;
+const DEEP_DIVE_QUESTIONS = 4;
+const BONUS_GAMES_PER_UNIT = 2;
 
 function normalizeHomePath(raw) {
-  const mode = raw && HOME_PATH_MODES.includes(raw.mode) ? raw.mode : 'interleave';
-  return { mode };
+  return { mode: raw && HOME_PATH_MODES.includes(raw.mode) ? raw.mode : 'core' };
 }
 
-function homePathUnitOrder(unitsByTrack, trackKeys, mode) {
-  const lists = trackKeys.map((key) => (unitsByTrack[key] || []).map((unit) => ({ trackKey: key, unit })));
-  if (mode === 'block') return lists.flat();
+// The optional sections that can follow `unit` of cert `trackKey`. `anchor`
+// is the core step kind each one slots in after (falling back to the end of
+// the unit), so they are mixed into the unit rather than all piled on the
+// end. A bridge is attached to the unit whose lesson it names; it records
+// its done state under BRIDGE_DONE_KEY, not the cert, because it belongs to
+// several certs and must only ever be offered once.
+function buildOptionalSteps(trackKey, unit) {
+  const mod = DATA[trackKey];
   const out = [];
-  const longest = lists.reduce((m, l) => Math.max(m, l.length), 0);
-  for (let i = 0; i < longest; i++) {
-    lists.forEach((list) => { if (list[i]) out.push(list[i]); });
+  const flashById = new Map(mod.flashcards.map((f) => [f.id, f]));
+  const deepCards = [...unit.coreCardIds, ...unit.extraCardIds]
+    .map((id) => flashById.get(id))
+    .filter((c) => c && c.detail)
+    .slice(0, DEEP_DIVE_CARDS);
+  const deepPool = unit.extraQuestionIds.length >= DEEP_DIVE_QUESTIONS ? unit.extraQuestionIds : unit.poolIds;
+  if (deepCards.length >= 2 && deepPool.length) {
+    out.push({
+      id: `${unit.id}::deep`, kind: 'deep', optional: true, anchor: 'cards2', label: 'Deep dive',
+      meta: `${deepCards.length} terms in depth, then ${Math.min(DEEP_DIVE_QUESTIONS, deepPool.length)} questions`,
+      cardIds: deepCards.map((c) => c.id), poolIds: deepPool, count: DEEP_DIVE_QUESTIONS,
+    });
   }
+  const usedGame = unit.coreGame;
+  (unit.games || [])
+    .filter((g) => !(usedGame && g.kind === usedGame.kind && g.id === usedGame.id))
+    .slice(0, BONUS_GAMES_PER_UNIT)
+    .forEach((g, i) => {
+      out.push({
+        id: `${unit.id}::bonus${i + 1}`, kind: 'game', optional: true, anchor: 'game',
+        label: `Bonus: ${PATH_GAME_LABELS[g.kind] || 'Game'}`, meta: 'Extra practice game', game: g,
+      });
+    });
+  BRIDGES
+    .filter((b) => b.appearsIn.some((a) => a.track === trackKey && a.lesson === unit.id))
+    .forEach((b) => {
+      const others = b.appearsIn.filter((a) => a.track !== trackKey).map((a) => (TRACKS.find((t) => t.key === a.track) || { label: a.track }).label);
+      out.push({
+        id: `bridge::${b.id}`, kind: 'bridge', optional: true, anchor: 'end', doneKey: BRIDGE_DONE_KEY, bridgeId: b.id,
+        label: `Bridge: ${b.title}`, meta: others.length ? `Also in ${others.join(', ')}` : 'Cross-cert idea',
+      });
+    });
   return out;
 }
 
-// Everything left on the Home path, in order: { trackKey, unit, step }
-// entries for each unfinished step of each unfinished unit. `doneByTrack`
-// maps track key -> that track's done map (stats.path[track].done).
+function homePathUnitOrder(unitsByTrack, trackKeys) {
+  return trackKeys.flatMap((key) => (unitsByTrack[key] || []).map((unit) => ({ trackKey: key, unit })));
+}
+
+// Everything left on the Home path, in order: { trackKey, unit, step,
+// doneKey } entries. In 'extended' mode each unit's unfinished optional
+// steps are slotted in after the core step they anchor to (units carry them
+// as `unit.optional`). `doneByTrack` maps a done-key (a track key, or
+// BRIDGE_DONE_KEY) to that map of finished step ids. Order is computed over
+// everything and only then filtered to unfinished steps, so it stays put as
+// work completes.
 function homePathRemaining(unitsByTrack, trackKeys, doneByTrack, mode) {
   const out = [];
-  homePathUnitOrder(unitsByTrack, trackKeys, mode).forEach(({ trackKey, unit }) => {
-    const done = doneByTrack[trackKey] || {};
+  const seenBridges = new Set();
+  homePathUnitOrder(unitsByTrack, trackKeys).forEach(({ trackKey, unit }) => {
+    const isDone = (step) => pathStepIsDone(doneByTrack[step.doneKey || trackKey] || {}, step.id);
+    const entry = (step) => ({ trackKey, unit, step, doneKey: step.doneKey || trackKey });
+    const optional = mode === 'extended'
+      ? (unit.optional || []).filter((st) => {
+        if (st.kind !== 'bridge') return true;
+        if (seenBridges.has(st.bridgeId)) return false;
+        seenBridges.add(st.bridgeId);
+        return true;
+      })
+      : [];
+    const coreKinds = new Set(unit.steps.map((st) => st.kind));
+    const anchoredAt = (kind, lastKind) => optional.filter((st) => (coreKinds.has(st.anchor) ? st.anchor : lastKind) === kind);
+    const lastKind = unit.steps.length ? unit.steps[unit.steps.length - 1].kind : null;
     unit.steps.forEach((step) => {
-      if (!pathStepIsDone(done, step.id)) out.push({ trackKey, unit, step });
+      if (!isDone(step)) out.push(entry(step));
+      anchoredAt(step.kind, lastKind).filter((st) => !isDone(st)).forEach((st) => out.push(entry(st)));
     });
+    if (!unit.steps.length) optional.filter((st) => !isDone(st)).forEach((st) => out.push(entry(st)));
   });
   return out;
 }
 
+// Core progress only (optional work never dilutes the path percentage).
 function homePathProgress(unitsByTrack, trackKeys, doneByTrack) {
   let total = 0;
   let done = 0;
@@ -852,6 +918,84 @@ function homePathProgress(unitsByTrack, trackKeys, doneByTrack) {
     done += p.done;
   });
   return { total, done, pct: total ? Math.round((done / total) * 100) : 0 };
+}
+
+// How much of the optional layer is available and how much is finished or
+// skipped, counting each bridge once.
+function homePathOptionalProgress(unitsByTrack, trackKeys, doneByTrack) {
+  let total = 0;
+  let done = 0;
+  const seen = new Set();
+  homePathUnitOrder(unitsByTrack, trackKeys).forEach(({ trackKey, unit }) => {
+    (unit.optional || []).forEach((st) => {
+      if (st.kind === 'bridge') {
+        if (seen.has(st.bridgeId)) return;
+        seen.add(st.bridgeId);
+      }
+      total += 1;
+      if (pathStepIsDone(doneByTrack[st.doneKey || trackKey] || {}, st.id)) done += 1;
+    });
+  });
+  return { total, done };
+}
+
+/* ---------------- cross-cert reviews ---------------- */
+
+// Review pools drawn across every cert in the plan, so a learner can go back
+// over what they've missed or found hard without picking a cert first. Items
+// are taken from each cert in turn (hardest / longest-neglected first within
+// a cert) so one cert with a long backlog can't crowd out the others.
+const CROSS_REVIEW_QUESTIONS = 10;
+const CROSS_REVIEW_CARDS = 15;
+
+function roundRobin(lists, limit) {
+  const out = [];
+  const longest = lists.reduce((m, l) => Math.max(m, l.length), 0);
+  for (let i = 0; i < longest && out.length < limit; i++) {
+    for (const list of lists) {
+      if (list[i] && out.length < limit) out.push(list[i]);
+    }
+  }
+  return out;
+}
+
+function missedQuestionsByTrack(trackKeys, results, seenLog) {
+  return trackKeys.map((key) => {
+    const trackResults = results[key] || {};
+    const seen = (seenLog && seenLog[key]) || {};
+    return DATA[key].questions
+      .filter((q) => trackResults[q.id] === 'incorrect')
+      .sort((a, b) => (seen[a.id] || 0) - (seen[b.id] || 0))
+      .map((q) => ({ trackKey: key, item: q }));
+  });
+}
+
+function toughCardsByTrack(trackKeys, srs) {
+  return trackKeys.map((key) => {
+    const byId = new Map(DATA[key].flashcards.map((c) => [c.id, c]));
+    return toughCardIds((srs && srs[key]) || {}, DATA[key].flashcards).map((id) => ({ trackKey: key, item: byId.get(id) }));
+  });
+}
+
+// { trackKey, item } entries to run, plus the full backlog size for the
+// card's count. `item` is the original question/flashcard.
+function crossCertWeakQuestions(trackKeys, results, seenLog, limit) {
+  const lists = missedQuestionsByTrack(trackKeys, results, seenLog);
+  return { picks: roundRobin(lists, limit || CROSS_REVIEW_QUESTIONS), total: lists.reduce((n, l) => n + l.length, 0) };
+}
+
+function crossCertToughCards(trackKeys, srs, limit) {
+  const lists = toughCardsByTrack(trackKeys, srs);
+  return { picks: roundRobin(lists, limit || CROSS_REVIEW_CARDS), total: lists.reduce((n, l) => n + l.length, 0) };
+}
+
+// Items from several certs share ids (every track has an f1 and a q1), so
+// review items get a "<track>:<id>" id while they run, and these split it
+// back apart to record each answer against its own cert.
+function reviewItemId(trackKey, id) { return `${trackKey}:${id}`; }
+function splitReviewId(composite) {
+  const i = composite.indexOf(':');
+  return { trackKey: composite.slice(0, i), id: composite.slice(i + 1) };
 }
 
 const ACHIEVEMENTS = [

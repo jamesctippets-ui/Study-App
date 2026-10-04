@@ -19,6 +19,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent
 sys.path.insert(0, str(ROOT))
 
+from data import bridges as bridges_data
 from data import tracks, itil, az900, ab650, az104, dp900, dp300, az305, az802, az140, md102, sc300, sc200, sc500, cloudplus, ehrintegration
 
 TRACK_MODULES = {
@@ -62,6 +63,72 @@ def positional_ref_errors(label, fields):
                 errors.append(
                     f"{label} {field} refers to an option by position ({m.group(0)!r}) — options are shuffled at render time, name the option by its content instead"
                 )
+    return errors
+
+
+def validate_bridges():
+    """Checks data/bridges_*.py against the shape documented in data/bridges.py."""
+    errors = []
+    seen_ids = set()
+    seen_question_ids = set()
+    for b in bridges_data.BRIDGES:
+        bid = b.get("id") or "<missing id>"
+        label = f"[bridge {bid}]"
+        if not b.get("id") or not str(b["id"]).startswith("br-"):
+            errors.append(f"{label} id must be non-empty and start with 'br-'")
+        if bid in seen_ids:
+            errors.append(f"{label} duplicate bridge id")
+        seen_ids.add(bid)
+        for field in ("title", "summary", "watchOut"):
+            if not isinstance(b.get(field), str) or not b[field].strip():
+                errors.append(f"{label} is missing a non-empty '{field}'")
+        appears = b.get("appearsIn") or []
+        if len(appears) < 2:
+            errors.append(f"{label} needs at least 2 'appearsIn' entries (a bridge links certs)")
+        tracks_seen = set()
+        for a in appears:
+            t = a.get("track")
+            if t not in TRACK_MODULES:
+                errors.append(f"{label} appearsIn names unknown track {t!r}")
+                continue
+            if t in tracks_seen:
+                errors.append(f"{label} lists track {t!r} twice in appearsIn")
+            tracks_seen.add(t)
+            lesson_ids = {l["id"] for l in getattr(TRACK_MODULES[t], "LESSONS", [])}
+            if a.get("lesson") not in lesson_ids:
+                errors.append(f"{label} appearsIn[{t}] lesson {a.get('lesson')!r} is not a lesson of that track")
+            if not isinstance(a.get("angle"), str) or not a["angle"].strip():
+                errors.append(f"{label} appearsIn[{t}] is missing a non-empty 'angle'")
+        qs = b.get("questions") or []
+        if not 2 <= len(qs) <= 4:
+            errors.append(f"{label} needs 2-4 questions, has {len(qs)}")
+        for q in qs:
+            qid = q.get("id") or "<missing id>"
+            qlabel = f"{label} question {qid}"
+            if not q.get("id") or qid in seen_question_ids:
+                errors.append(f"{qlabel} id is missing or not unique across bridges")
+            seen_question_ids.add(qid)
+            if q.get("type") != "mc":
+                errors.append(f"{qlabel} must have type 'mc'")
+            opts = q.get("options") or []
+            if not 3 <= len(opts) <= 5 or len(set(opts)) != len(opts):
+                errors.append(f"{qlabel} needs 3-5 distinct options")
+            if not isinstance(q.get("correct"), int) or not 0 <= q["correct"] < len(opts):
+                errors.append(f"{qlabel} 'correct' must be an index into options")
+            for field in ("question", "explanation"):
+                if not isinstance(q.get(field), str) or not q[field].strip():
+                    errors.append(f"{qlabel} is missing a non-empty '{field}'")
+            errors.extend(
+                positional_ref_errors(
+                    qlabel,
+                    [("question", q.get("question")), ("explanation", q.get("explanation")), ("whyTested", q.get("whyTested"))]
+                    + [(f"option {i}", o) for i, o in enumerate(opts)],
+                )
+            )
+        errors.extend(
+            positional_ref_errors(label, [("summary", b.get("summary")), ("watchOut", b.get("watchOut"))]
+                                  + [(f"angle[{a.get('track')}]", a.get("angle")) for a in appears])
+        )
     return errors
 
 
@@ -399,6 +466,8 @@ def validate():
             if "onTheJob" in lesson and not lesson["onTheJob"].strip():
                 errors.append(f"[{key}] lesson '{lesson['id']}' has an empty 'onTheJob' field")
 
+    errors.extend(validate_bridges())
+
     if errors:
         print("Data validation failed:", file=sys.stderr)
         for e in errors:
@@ -437,6 +506,7 @@ def build_data_json():
             f"const TRACKS = {json.dumps(tracks.TRACKS)};",
             f"const EXAM_CONFIG = {json.dumps(tracks.EXAM_CONFIG)};",
             f"const DATA = {json.dumps(data)};",
+            f"const BRIDGES = {json.dumps(bridges_data.BRIDGES)};",
         ]
     )
 
@@ -460,6 +530,7 @@ def write_track_json_files():
         (out_dir / f"{key}.json").write_text(json.dumps(track_data, indent=2) + "\n")
     manifest = {"storageKey": tracks.STORAGE_KEY, "tracks": tracks.TRACKS, "examConfig": tracks.EXAM_CONFIG}
     (out_dir / "tracks.json").write_text(json.dumps(manifest, indent=2) + "\n")
+    (out_dir / "bridges.json").write_text(json.dumps(bridges_data.BRIDGES, indent=2) + "\n")
     return len(data)
 
 

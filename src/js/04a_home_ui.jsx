@@ -491,73 +491,45 @@ function readinessProjectionMessage(projection, trackLabel) {
 // — opened from the header's hamburger button now (available from any
 // mode, not just Home) rather than duplicated inline here — this view is
 // for seeing and jumping, not editing.
-function CertPathHomeSection({ pathOrder, results, seenLog, certPlan, onSelectTrack }) {
-  const [next, ...rest] = pathOrder;
-  const nextAccent = trackAccent(next.key);
-  const nextScheduled = certPlan.scheduled[next.key];
-  const nextDaysUntil = nextScheduled ? daysBetween(todayString(), nextScheduled) : null;
-  const nextReadiness = examReadiness(next.key, results, seenLog);
-  const nextReadinessColor = READINESS_COLOR[nextReadiness.label] || COLOR.muted;
-
+function CertPathHomeSection({ pathOrder, results, certPlan, studyingKey, pathProgressByTrack, onSelectTrack }) {
   return (
     <div className="mb-4">
-      <div style={{ fontSize: '12px', color: COLOR.muted, fontWeight: 600, marginBottom: '8px' }}>Your cert path ({pathOrder.length})</div>
-
-      <button
-        onClick={() => onSelectTrack(next.key)}
-        style={{
-          width: '100%', textAlign: 'left', marginBottom: rest.length ? '8px' : 0, padding: '14px 16px', borderRadius: '14px',
-          background: `${nextAccent}1F`, border: `1px solid ${nextAccent}`, boxShadow: SHADOW.card,
-        }}
-      >
-        <div className="flex justify-between items-start" style={{ gap: '10px' }}>
-          <div style={{ minWidth: 0 }}>
-            <div style={{ fontSize: '11px', color: COLOR.muted, marginBottom: '2px' }}>Up next</div>
-            <div style={{ fontSize: '16px', fontWeight: 600, color: nextAccent }}>{next.label}</div>
-            <div style={{ fontSize: '11px', color: COLOR.muted, marginTop: '2px' }}>{next.subtitle}</div>
-          </div>
-          {nextScheduled && (
-            <div style={{ flexShrink: 0, textAlign: 'right' }}>
-              <div style={{ fontSize: '14px', fontWeight: 700, color: nextDaysUntil < 0 ? COLOR.red : nextDaysUntil <= 7 ? COLOR.gold : COLOR.text }}>
-                {nextDaysUntil < 0 ? `${-nextDaysUntil}d over` : nextDaysUntil === 0 ? 'Today' : nextDaysUntil === 1 ? '1 day' : `${nextDaysUntil} days`}
-              </div>
-              <div style={{ fontSize: '9.5px', color: COLOR.muted }}>{formatDateShort(nextScheduled)}</div>
-            </div>
-          )}
-        </div>
-        {nextReadiness.label !== 'Not started' && (
-          <div style={{ marginTop: '8px', fontSize: '11.5px', fontWeight: 600, color: nextReadinessColor }}>
-            {nextReadiness.label} · {nextReadiness.score}% readiness
-          </div>
-        )}
-      </button>
-
-      {rest.map((t, i) => {
+      <div style={{ fontSize: '12px', color: COLOR.muted, fontWeight: 600, marginBottom: '8px' }}>Your certs ({pathOrder.length})</div>
+      {pathOrder.map((t, i) => {
         const accent = trackAccent(t.key);
         const scheduledDate = certPlan.scheduled[t.key];
+        const days = scheduledDate ? daysBetween(todayString(), scheduledDate) : null;
         const pct = trackMastery(t.key, results);
+        const prog = pathProgressByTrack[t.key];
+        const studying = t.key === studyingKey;
         return (
           <button
             key={t.key}
             onClick={() => onSelectTrack(t.key)}
             style={{
               width: '100%', textAlign: 'left', display: 'flex', alignItems: 'center', gap: '10px',
-              padding: '10px 14px', borderRadius: '12px', marginBottom: i === rest.length - 1 ? 0 : '6px',
-              background: COLOR.surface, border: `1px solid ${COLOR.border}`, boxShadow: SHADOW.card,
+              padding: '10px 14px', borderRadius: '12px', marginBottom: i === pathOrder.length - 1 ? 0 : '6px',
+              background: studying ? `${accent}1F` : COLOR.surface, border: `1px solid ${studying ? accent : COLOR.border}`, boxShadow: SHADOW.card,
             }}
           >
-            <div style={{ fontSize: '11px', color: COLOR.muted, width: '14px', flexShrink: 0, textAlign: 'center' }}>{i + 2}</div>
+            <div style={{ fontSize: '11px', color: COLOR.muted, width: '14px', flexShrink: 0, textAlign: 'center' }}>{i + 1}</div>
             <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ fontSize: '13px', fontWeight: 600, color: accent }}>{t.label}</div>
-              <div style={{ fontSize: '10.5px', color: COLOR.muted, marginTop: '1px' }}>{t.subtitle}</div>
-            </div>
-            {scheduledDate ? (
-              <div style={{ fontSize: '10px', fontWeight: 600, color: COLOR.gold, flexShrink: 0, textAlign: 'right', whiteSpace: 'nowrap' }}>
-                {formatDateShort(scheduledDate)}
+              <div className="flex items-center gap-2" style={{ display: 'flex' }}>
+                <span style={{ fontSize: '13px', fontWeight: 600, color: accent }}>{t.label}</span>
+                {studying && <span style={{ fontSize: '9.5px', fontWeight: 700, color: accent, textTransform: 'uppercase', letterSpacing: '0.04em' }}>Studying now</span>}
               </div>
-            ) : (
-              <div style={{ fontSize: '12px', fontWeight: 700, color: pct >= 70 ? COLOR.success : COLOR.muted, flexShrink: 0 }}>{pct}%</div>
-            )}
+              <div style={{ fontSize: '10.5px', color: COLOR.muted, marginTop: '1px' }}>
+                {t.subtitle}{prog && prog.total ? ` · path ${prog.pct}%` : ''}
+              </div>
+            </div>
+            <div style={{ flexShrink: 0, textAlign: 'right', whiteSpace: 'nowrap' }}>
+              {scheduledDate && (
+                <div style={{ fontSize: '10px', fontWeight: 600, color: days < 0 ? COLOR.red : days <= 7 ? COLOR.gold : COLOR.muted }}>
+                  {days < 0 ? `${-days}d over` : days === 0 ? 'Today' : `${days}d · ${formatDateShort(scheduledDate)}`}
+                </div>
+              )}
+              <div style={{ fontSize: '12px', fontWeight: 700, color: pct >= 70 ? COLOR.success : COLOR.muted }}>{pct}%</div>
+            </div>
           </button>
         );
       })}
@@ -573,7 +545,7 @@ function CertPathHomeSection({ pathOrder, results, seenLog, certPlan, onSelectTr
 // for that split. Reachable again from any track's Learn/Quiz/Exam view
 // via the header's home icon; the header's hamburger (Manage cert path)
 // is reachable from every mode including this one.
-function HomeView({ tracks, results, seenLog, stats, certPlan, speech, makePathApi, onSetHomePathMode, onResume, onSelectTrack, onAddToPath, onOpenAbout, onOpenGlossary, onSetGoalTarget, onAnswerDailyQuestion, onRevealDailyVocab }) {
+function HomeView({ tracks, results, seenLog, stats, certPlan, speech, srs, makePathApi, onSetHomePathMode, onResume, onSelectTrack, onAddToPath, onOpenAbout, onOpenGlossary, onSetGoalTarget, onAnswerDailyQuestion, onRevealDailyVocab }) {
   const masteries = tracks.map((t) => ({ track: t, pct: trackMastery(t.key, results) }));
   const overallAvg = masteries.length ? Math.round(masteries.reduce((s, m) => s + m.pct, 0) / masteries.length) : 0;
   const lastVisited = stats.lastVisited;
@@ -614,19 +586,44 @@ function HomeView({ tracks, results, seenLog, stats, certPlan, speech, makePathA
   const pathKeys = pathOrder.map((t) => t.key);
   const unitsByTrack = useMemo(() => {
     const map = {};
-    pathKeys.forEach((k) => { map[k] = buildPathUnits(k); });
+    pathKeys.forEach((k) => {
+      map[k] = buildPathUnits(k).map((u) => ({ ...u, optional: buildOptionalSteps(k, u) }));
+    });
     return map;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pathKeys.join(',')]);
   const doneByTrack = {};
   pathKeys.forEach((k) => { doneByTrack[k] = ((stats.path || {})[k] || {}).done || {}; });
-  const homePathMode = (stats.homePath && stats.homePath.mode) || 'interleave';
+  doneByTrack[BRIDGE_DONE_KEY] = ((stats.path || {})[BRIDGE_DONE_KEY] || {}).done || {};
+  const homePathMode = (stats.homePath && stats.homePath.mode) || 'core';
   const homeRemaining = homePathRemaining(unitsByTrack, pathKeys, doneByTrack, homePathMode);
   const homeProgress = homePathProgress(unitsByTrack, pathKeys, doneByTrack);
+  const homeOptional = homePathOptionalProgress(unitsByTrack, pathKeys, doneByTrack);
+  const pathProgressByTrack = {};
+  pathKeys.forEach((k) => { pathProgressByTrack[k] = pathOverallProgress(unitsByTrack[k] || [], doneByTrack[k] || {}); });
   const hasHomePath = homeProgress.total > 0;
+  const studyingKey = (homeRemaining.find((e) => !e.step.optional) || homeRemaining[0] || {}).trackKey || (pathKeys[0] || null);
+  const weakTotal = crossCertWeakQuestions(pathKeys, results, seenLog).total;
+  const toughTotal = crossCertToughCards(pathKeys, srs).total;
   const [homeRun, setHomeRun] = useState(null);
-  const startHomeRun = (e) => setHomeRun({ trackKey: e.trackKey, unit: e.unit, step: e.step, nonce: Date.now() });
+  const startHomeRun = (e) => setHomeRun({ kind: 'step', trackKey: e.trackKey, doneKey: e.doneKey, unit: e.unit, step: e.step, nonce: Date.now() });
+  const skipHomeStep = (e) => makePathApi(e.doneKey || e.trackKey).skipStep(e.step.id);
 
+  if (homeRun && homeRun.kind !== 'step') {
+    return (
+      <HomeReviewRun
+        key={homeRun.nonce}
+        kind={homeRun.kind}
+        trackKeys={pathKeys}
+        results={results}
+        seenLog={seenLog}
+        srs={srs}
+        speech={speech}
+        makeApi={makePathApi}
+        onExit={() => setHomeRun(null)}
+      />
+    );
+  }
   if (homeRun) {
     return (
       <HomePathRun
@@ -659,10 +656,24 @@ function HomeView({ tracks, results, seenLog, stats, certPlan, speech, makePathA
           tracks={tracks}
           remaining={homeRemaining}
           progress={homeProgress}
+          optionalProgress={homeOptional}
           mode={homePathMode}
           onSetMode={onSetHomePathMode}
           onStart={startHomeRun}
+          onSkip={skipHomeStep}
           onOpenCert={onSelectTrack}
+          certPlan={certPlan}
+          results={results}
+          seenLog={seenLog}
+        />
+      )}
+
+      {pathOrder.length > 0 && (
+        <HomeReviewCard
+          weakTotal={weakTotal}
+          toughTotal={toughTotal}
+          onWeak={() => setHomeRun({ kind: 'weak', nonce: Date.now() })}
+          onTough={() => setHomeRun({ kind: 'tough', nonce: Date.now() })}
         />
       )}
 
@@ -690,8 +701,9 @@ function HomeView({ tracks, results, seenLog, stats, certPlan, speech, makePathA
         <CertPathHomeSection
           pathOrder={pathOrder}
           results={results}
-          seenLog={seenLog}
           certPlan={certPlan}
+          studyingKey={studyingKey}
+          pathProgressByTrack={pathProgressByTrack}
           onSelectTrack={onSelectTrack}
         />
       ) : (

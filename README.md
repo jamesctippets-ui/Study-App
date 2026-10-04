@@ -289,10 +289,19 @@ bottom:
   shows here (an empty path has no hero to fold it into), for whichever
   track you last visited, or AZ-900 by default.
 - A **study path** across your whole cert plan: one trail of the units from
-  every cert you've added (mixed across certs by default, or one cert at a
-  time), with an up-next step that runs right on Home, the next few steps
-  tagged by cert, and a "Go deeper" link into the cert itself. Progress is
-  the same progress each cert's own Path tab shows.
+  every cert you've added, in plan order, with an up-next step that runs right
+  on Home, the next few steps tagged by cert, the up-next cert's exam
+  countdown and readiness, and a "Go deeper" link into the cert itself.
+  Progress is the same progress each cert's own Path tab shows. A switch
+  chooses **Just my certs** or **Extended learning**, which mixes in optional,
+  skippable sections: a deep dive on the unit's terms, bonus games, and
+  cross-cert "bridges" that teach an idea several certs share and how each
+  frames it.
+- A **Review across your certs** card: Weak spots (missed questions) and
+  Tough terms (flashcards rated OK or lower), mixed from every cert in your
+  plan, with each answer recorded to its own cert.
+- A compact **Your certs** list (order, path progress, exam countdown,
+  mastery) with the cert you're studying marked.
 - A **"Continue where you left off"** button once you've actually
   visited a track this browser (tracked separately from the path, so
   Home is never mistaken for "a place you left off at").

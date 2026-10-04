@@ -139,7 +139,7 @@ function PathCardsStep({ cards, categories, flashcardsData, speech, onRate, onDo
   );
 }
 
-function PathQuizStep({ questions, passPct, label, categories, flashcardsData, onAnswer, onFinished, onPass, onRetry }) {
+function PathQuizStep({ questions, passPct, label, categories, flashcardsData, onAnswer, onFinished, onPass, onRetry, continueLabel }) {
   const [index, setIndex] = useState(0);
   const [selected, setSelected] = useState(null);
   const [msPending, setMsPending] = useState([]);
@@ -205,7 +205,7 @@ function PathQuizStep({ questions, passPct, label, categories, flashcardsData, o
               onClick={() => onPass(pct)}
               style={{ width: '100%', marginTop: '12px', padding: '12px', borderRadius: '12px', background: COLOR.success, color: COLOR.onAccent, fontSize: '14px', fontWeight: 700 }}
             >
-              {reviewOnly ? 'Back to the path ›' : 'Continue ›'}
+              {reviewOnly ? (continueLabel || 'Back to the path ›') : 'Continue ›'}
             </button>
           )}
         </div>
@@ -416,6 +416,15 @@ function buildStepPayload(trackKey, units, results, seenLog, api, unit, step) {
       api.markSeen(prepared.map((q) => q.id));
       return { questions: prepared, reviewCount: review.length };
     }
+    case 'deep':
+      return {
+        cards: step.cardIds.map((id) => flashById.get(id)).filter(Boolean),
+        questions: preparedQuestions(poolQuestions(step.poolIds), step.count),
+      };
+    case 'bridge': {
+      const bridge = BRIDGES.find((b) => b.id === step.bridgeId);
+      return { bridge, questions: bridge ? bridge.questions.map(prepareQuestion) : [] };
+    }
     case 'game': {
       const g = step.game;
       if (g.kind === 'match') return { kind: 'match', cards: unit.lesson.vocabIds.map((id) => flashById.get(id)).filter(Boolean) };
@@ -431,7 +440,7 @@ function buildStepPayload(trackKey, units, results, seenLog, api, unit, step) {
 // Home study path, so a step behaves identically in both. `onDone(pct)` is
 // called when the step finishes and the caller decides what that means
 // (recording it, showing the completion screen); `onExit` backs out.
-function PathStepRunner({ trackKey, units, unit, step, results, seenLog, categories, speech, api, onDone, onExit, exitLabel, certLabel }) {
+function PathStepRunner({ trackKey, units, unit, step, results, seenLog, categories, speech, api, onDone, onExit, exitLabel, certLabel, planKeys }) {
   const mod = DATA[trackKey];
   const [run, setRun] = useState(() => ({ payload: buildStepPayload(trackKey, units, results, seenLog, api, unit, step), nonce: 0 }));
   const { payload, nonce } = run;
@@ -457,6 +466,10 @@ function PathStepRunner({ trackKey, units, unit, step, results, seenLog, categor
         {...common}
       />
     );
+  } else if (step.kind === 'deep') {
+    runner = <PathDeepStep key={runnerKey} cards={payload.cards} questions={payload.questions} speech={speech} api={api} onRetry={retry} onDone={onDone} {...common} />;
+  } else if (step.kind === 'bridge') {
+    runner = <PathBridgeStep key={runnerKey} bridge={payload.bridge} questions={payload.questions} planKeys={planKeys || []} api={api} onRetry={retry} onDone={onDone} />;
   } else if (step.kind === 'apply') {
     runner = <PathApplyStep key={runnerKey} unit={unit} categories={categories} onDone={onDone} />;
   } else if (step.kind === 'game') {
@@ -486,7 +499,7 @@ function PathStepRunner({ trackKey, units, unit, step, results, seenLog, categor
       </button>
       <div style={{ marginBottom: '14px' }}>
         <div style={{ fontSize: '10.5px', color: COLOR.muted, textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 600 }}>
-          {step.kind === 'review' ? 'Spaced review' : `${certLabel ? certLabel + ' · ' : ''}Unit ${unit.index + 1} · ${unit.title}`}
+          {step.kind === 'review' ? 'Spaced review' : step.kind === 'bridge' ? 'Optional · Cross-cert bridge' : `${certLabel ? certLabel + ' · ' : ''}Unit ${unit.index + 1} · ${unit.title}${step.optional ? ' · Optional' : ''}`}
         </div>
         <div className="itil-display" style={{ fontSize: '18px', fontWeight: 600, marginTop: '2px' }}>{step.label}</div>
       </div>

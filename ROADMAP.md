@@ -1327,39 +1327,65 @@ trading away for shinier but shallower ones.
   one-shot, so a later visit to the Path tab shows the map as usual. A
   fully completed path just opens the map.
 
-- [x] **Cross-cert study path on Home — foundation shipped (user's idea).**
-  Home now has a "Your study path" card built from the certs in the user's
-  plan: a progress bar across all of them, an up-next hero that runs the step
-  right on Home (the same runner a cert's Path tab uses, extracted as
-  `PathStepRunner`, with a completion screen that rolls straight into the
-  next step), the next five steps tagged with a colored cert chip, a "Go
-  deeper in <cert>" link that opens that cert's own Path, and a Mix certs /
-  One cert at a time switch (`stats.homePath.mode`, persisted and synced).
-  Nothing new is stored per step: completion writes to each cert's own
-  `stats.path[track].done`, so Home and a cert's Path tab always agree, and
-  ratings, results, seen-log, daily goal, and achievements all record to the
-  step's own cert (`makePathApi(trackKey)` replaced the active-track-only
-  handler). Pure logic lives in `03_helpers.js` (`homePathUnitOrder`,
-  `homePathRemaining`, `homePathProgress`, `normalizeHomePath`) and was
-  checked for ordering stability: the order is computed over every unit and
-  only then filtered to unfinished ones, so it doesn't reshuffle as units
-  complete. UI is `04f_home_path_ui.jsx`. Verified end to end in a browser
-  (run a step on Home, see it counted on the cert's Path, mode toggle persists)
-  plus logic checks on interleave, block, mid-unit, empty and unknown certs.
-- [ ] **Cross-cert Home path — next steps.** What's deliberately not done
-  yet: (1) *Weighting.* The ordering is plain plan order; the planned
-  refinement is weighting by exam date and readiness so the cert with the
-  nearest date or lowest readiness gets more of the next steps (and
-  degrading cleanly when no dates are set). (2) *Finer interleaving.* Mixing
-  is per unit, so the first screen still shows one cert's whole unit before
-  the others appear; interleaving a few steps at a time (or surfacing each
-  cert's next step) would make "Mix certs" visible sooner. (3) *Cross-cert
-  review.* A combined Review weak spots and Tough terms entry across all
-  selected certs. (4) *Windowing/overlap.* The existing "Your cert path"
-  section below the card still has its own up-next hero, which now
-  overlaps with the study path's; the two likely merge. (5) Per-step "go
-  deeper" links (today there is one for the current step's cert), and a
-  "test out" shortcut from Home.
+- [x] **Cross-cert study path on Home (user's idea).** Home has a "Your study
+  path" card built from the certs in the user's plan: a progress bar across
+  all of them, an up-next hero that runs the step right on Home (the same
+  runner a cert's Path tab uses, extracted as `PathStepRunner`, with a
+  completion screen that rolls into the next step), the next five steps
+  tagged with a colored cert chip, a "Go deeper in <cert>" link that opens
+  that cert's own Path, and the cert's exam countdown and readiness under the
+  hero. Certs run in plan order, one after another. Nothing new is stored for
+  core steps: completion writes to each cert's own `stats.path[track].done`,
+  so Home and a cert's Path tab always agree, and ratings, results, seen-log,
+  daily goal, and achievements all record to the step's own cert
+  (`makePathApi(trackKey)`).
+- [x] **Optional "Extended learning" replaces per-unit cert mixing.** The
+  earlier idea of interleaving certs unit by unit is gone. Instead the
+  learner picks **Just my certs** (core steps only, the default) or
+  **Extended learning**, which mixes optional sections in after the core step
+  they relate to: a **Deep dive** (the unit's terms with their full detail
+  text, then four harder questions from the unit's extra pool), up to two
+  **Bonus games** (the unit's other Mad Libs, Sequence, and Compare items),
+  and **cross-cert bridges**. Optional steps are tagged Optional, never count
+  toward core progress, never appear on a cert's own Path tab, and can always
+  be skipped (stored as done with `via: 'skipped'`). `stats.homePath.mode`
+  holds the choice (persisted and synced; old values fall back to core).
+- [x] **Cross-cert bridges.** 35 short lessons (105 questions) in
+  `data/bridges_{identity,security,data,infra,ops}.py`, loaded by
+  `data/bridges.py` and validated by `build.py` (real lesson ids, 2-4 distinct
+  certs each, mc questions only, positional-reference lint). Each bridge
+  states the shared idea, how each cert frames it (certs in the learner's plan
+  are flagged), a "Watch out" cross-cert trap, then a three-question check.
+  A bridge attaches to the unit whose lesson it names, is offered once across
+  the whole plan, and records under a `bridges` pseudo-cert in `stats.path`
+  (its questions are not added to any cert's results). Written by agents from
+  the fact-checked lessons and flashcards; a handful of statements came from
+  general product knowledge rather than the data files (NSG statefulness,
+  ARM/Bicep incremental vs complete mode, ExpressRoute not encrypted by
+  default, Cosmos DB single-partition transactions, share-level soft delete,
+  Storage Replica failover-only) and deserve a review pass.
+- [x] **The "Your cert path" section merged into the study path.** The
+  separate "Up next" hero is gone; its exam countdown and readiness line now
+  sit under the study path's hero, and what remains is a compact "Your certs"
+  list (order, subtitle, path %, exam date or days left, mastery) with the
+  cert being studied marked "Studying now".
+- [x] **Cross-cert reviews (first version).** A "Review across your certs"
+  card on Home offers **Weak spots** (questions you last missed) and **Tough
+  terms** (flashcards rated OK or lower), each drawn from every cert in the
+  plan in turn (oldest-seen / hardest first within a cert) so a long backlog
+  in one cert can't crowd out the others — 10 questions or 15 cards a round.
+  Items run under `<cert>:<id>` ids and each answer or rating is recorded to
+  its own cert; a 4 or 5 on a card graduates it from the deck as usual.
+- [ ] **Home path — still open.** (1) *Weighting:* order is plain plan order;
+  weight by exam date and readiness so the cert with the nearest date or
+  lowest readiness leads (degrading cleanly with no dates). (2) *More bridge
+  coverage:* ITIL, DP-900, and SC-200 each appear in only a few bridges;
+  bridges could also be offered for certs outside the plan as a taster.
+  (3) *Review depth:* Weak spots covers all question types but not Mad Libs,
+  Sequence, or case-study misses; a "Review everything due" round that mixes
+  both reviews is a natural next step. (4) *Windowing:* the Coming up list
+  shows five steps plus a count; long optional runs may need grouping.
+  (5) A "test out" shortcut from Home, and per-step Go deeper links.
 
 - [x] **Tough terms flashcard deck.** Each `srs` entry now also stores the
   raw 1-5 rating it was last given (`last`). A card is "tough" when that
