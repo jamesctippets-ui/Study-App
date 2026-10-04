@@ -350,7 +350,7 @@ function PathApplyStep({ unit, categories, onDone }) {
   );
 }
 
-function PathStepComplete({ unit, step, pct, unitComplete, testedOut, next, onNext, onBack }) {
+function PathStepComplete({ unit, step, pct, unitComplete, testedOut, next, onNext, onBack, nextLabel, backLabel }) {
   return (
     <div style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderRadius: '18px', padding: '26px 22px', textAlign: 'center' }}>
       <div style={{ width: '56px', height: '56px', borderRadius: '50%', background: COLOR.success, color: COLOR.onAccent, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', marginBottom: '12px' }}>
@@ -368,7 +368,7 @@ function PathStepComplete({ unit, step, pct, unitComplete, testedOut, next, onNe
           onClick={onNext}
           style={{ width: '100%', marginTop: '18px', padding: '13px', borderRadius: '12px', background: COLOR.primary, color: COLOR.onAccent, fontSize: '14px', fontWeight: 700 }}
         >
-          {next.unit.index !== unit.index ? `Next unit: ${next.unit.title}` : `Next: ${next.step.label}`}
+          {nextLabel || (next.unit.index !== unit.index ? `Next unit: ${next.unit.title}` : `Next: ${next.step.label}`)}
         </button>
       ) : (
         <div style={{ marginTop: '16px', fontSize: '13px', fontWeight: 600, color: COLOR.success }}>That's the whole path.</div>
@@ -377,13 +377,123 @@ function PathStepComplete({ unit, step, pct, unitComplete, testedOut, next, onNe
         onClick={onBack}
         style={{ width: '100%', marginTop: '10px', padding: '11px', borderRadius: '12px', border: `1px solid ${COLOR.border}`, background: 'transparent', color: COLOR.text, fontSize: '13px', fontWeight: 600 }}
       >
-        Back to the path
+        {backLabel || 'Back to the path'}
       </button>
     </div>
   );
 }
 
 /* ---- the path itself ---- */
+
+// Builds what a step needs to run: the cards/questions/game item for it,
+// drawn from the cert `trackKey`. Pure apart from `api.markSeen`.
+function buildStepPayload(trackKey, units, results, seenLog, api, unit, step) {
+  const mod = DATA[trackKey];
+  const flashById = new Map(mod.flashcards.map((f) => [f.id, f]));
+  const questionById = new Map(mod.questions.map((q) => [q.id, q]));
+  const poolQuestions = (ids) => ids.map((id) => questionById.get(id)).filter(Boolean);
+  const preparedQuestions = (pool, count) => {
+    const picked = pickRotated(pool, Math.min(count, pool.length), seenLog);
+    const prepared = picked.map(prepareQuestion);
+    api.markSeen(prepared.map((q) => q.id));
+    return prepared;
+  };
+  switch (step.kind) {
+    case 'cards':
+    case 'cards2':
+      return { cards: step.cardIds.map((id) => flashById.get(id)).filter(Boolean) };
+    case 'quiz':
+    case 'quiz2':
+    case 'testout':
+    case 'review':
+      return { questions: preparedQuestions(poolQuestions(step.poolIds), step.count) };
+    case 'checkpoint': {
+      const earlier = units.slice(0, unit.index).flatMap((u) => u.poolIds);
+      const weak = poolQuestions(earlier.filter((id) => results[id] !== 'correct'));
+      const review = pickRotated(weak, Math.min(PATH_CHECKPOINT_REVIEW, weak.length), seenLog);
+      const own = pickRotated(poolQuestions(step.poolIds), Math.max(1, step.count - review.length), seenLog);
+      const prepared = shuffleArray([...review, ...own]).map(prepareQuestion);
+      api.markSeen(prepared.map((q) => q.id));
+      return { questions: prepared, reviewCount: review.length };
+    }
+    case 'game': {
+      const g = step.game;
+      if (g.kind === 'match') return { kind: 'match', cards: unit.lesson.vocabIds.map((id) => flashById.get(id)).filter(Boolean) };
+      const source = g.kind === 'madlib' ? mod.madlibs : g.kind === 'sequence' ? mod.sequences : mod.compare;
+      return { kind: g.kind, item: (source || []).find((x) => x.id === g.id) };
+    }
+    default:
+      return {};
+  }
+}
+
+// Runs one path step for any cert. Used by a cert's own Path tab and by the
+// Home study path, so a step behaves identically in both. `onDone(pct)` is
+// called when the step finishes and the caller decides what that means
+// (recording it, showing the completion screen); `onExit` backs out.
+function PathStepRunner({ trackKey, units, unit, step, results, seenLog, categories, speech, api, onDone, onExit, exitLabel, certLabel }) {
+  const mod = DATA[trackKey];
+  const [run, setRun] = useState(() => ({ payload: buildStepPayload(trackKey, units, results, seenLog, api, unit, step), nonce: 0 }));
+  const { payload, nonce } = run;
+  const retry = () => setRun((r) => ({ payload: buildStepPayload(trackKey, units, results, seenLog, api, unit, step), nonce: r.nonce + 1 }));
+  const runnerKey = step.id + '-' + nonce;
+  const common = { categories, flashcardsData: mod.flashcards };
+  let runner = null;
+  if (step.kind === 'read') {
+    runner = <PathReadStep key={runnerKey} unit={unit} flashcardsData={mod.flashcards} speech={speech} onDone={onDone} />;
+  } else if (step.kind === 'cards' || step.kind === 'cards2') {
+    runner = <PathCardsStep key={runnerKey} cards={payload.cards} speech={speech} onRate={api.rateCard} onDone={onDone} {...common} />;
+  } else if (step.kind === 'quiz' || step.kind === 'quiz2' || step.kind === 'checkpoint' || step.kind === 'testout' || step.kind === 'review') {
+    runner = (
+      <PathQuizStep
+        key={runnerKey}
+        questions={payload.questions}
+        passPct={step.kind === 'testout' ? PATH_TESTOUT_PCT : step.kind === 'review' ? 0 : PATH_PASS_PCT}
+        label={step.label}
+        onAnswer={(id, ok) => api.recordResult(id, ok ? 'correct' : 'incorrect')}
+        onFinished={api.finishQuiz}
+        onPass={onDone}
+        onRetry={retry}
+        {...common}
+      />
+    );
+  } else if (step.kind === 'apply') {
+    runner = <PathApplyStep key={runnerKey} unit={unit} categories={categories} onDone={onDone} />;
+  } else if (step.kind === 'game') {
+    if (payload.kind === 'match') {
+      runner = (
+        <MatchGame
+          key={runnerKey}
+          flashcards={payload.cards}
+          roundSize={Math.min(5, payload.cards.length)}
+          onRoundComplete={api.onMatchRound}
+          onContinue={() => onDone(null)}
+          continueLabel="Continue ›"
+        />
+      );
+    } else if (payload.kind === 'madlib') {
+      runner = <PathMadlibStep key={runnerKey} item={payload.item} onResult={api.recordResult} onDone={onDone} {...common} />;
+    } else if (payload.kind === 'sequence') {
+      runner = <PathSequenceStep key={runnerKey} item={payload.item} onResult={api.recordResult} onDone={onDone} {...common} />;
+    } else {
+      runner = <PathCompareStep key={runnerKey} item={payload.item} onResult={api.recordResult} onDone={onDone} {...common} />;
+    }
+  }
+  return (
+    <div>
+      <button onClick={onExit} className="btn-flat" style={{ fontSize: '12px', color: COLOR.primary, background: 'transparent', marginBottom: '10px', padding: 0 }}>
+        {exitLabel}
+      </button>
+      <div style={{ marginBottom: '14px' }}>
+        <div style={{ fontSize: '10.5px', color: COLOR.muted, textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 600 }}>
+          {step.kind === 'review' ? 'Spaced review' : `${certLabel ? certLabel + ' · ' : ''}Unit ${unit.index + 1} · ${unit.title}`}
+        </div>
+        <div className="itil-display" style={{ fontSize: '18px', fontWeight: 600, marginTop: '2px' }}>{step.label}</div>
+      </div>
+      {runner}
+    </div>
+  );
+}
 
 const PATH_NODE_OFFSETS = [0, 24, 40, 24];
 
@@ -419,8 +529,6 @@ function PathView({ track, trackKey, doneMap, results, seenLog, categories, spee
     );
   }
 
-  const flashById = new Map(mod.flashcards.map((f) => [f.id, f]));
-  const questionById = new Map(mod.questions.map((q) => [q.id, q]));
   const overall = pathOverallProgress(units, doneMap);
   const next = pathNextStep(units, doneMap);
   const reviewIds = pathReviewQuestionIds(units, doneMap, results, seenLog);
@@ -428,49 +536,9 @@ function PathView({ track, trackKey, doneMap, results, seenLog, categories, spee
     id: 'review', kind: 'review', label: 'Review weak spots', poolIds: reviewIds, count: PATH_REVIEW_QUESTIONS,
   });
 
-  const preparedQuestions = (pool, count) => {
-    const picked = pickRotated(pool, Math.min(count, pool.length), seenLog);
-    const prepared = picked.map(prepareQuestion);
-    api.markSeen(prepared.map((q) => q.id));
-    return prepared;
-  };
-
-  const buildPayload = (unit, step) => {
-    switch (step.kind) {
-      case 'cards':
-      case 'cards2':
-        return { cards: step.cardIds.map((id) => flashById.get(id)).filter(Boolean) };
-      case 'quiz':
-      case 'quiz2':
-        return { questions: preparedQuestions(step.poolIds.map((id) => questionById.get(id)).filter(Boolean), step.count) };
-      case 'testout':
-        return { questions: preparedQuestions(step.poolIds.map((id) => questionById.get(id)).filter(Boolean), step.count) };
-      case 'review':
-        return { questions: preparedQuestions(step.poolIds.map((id) => questionById.get(id)).filter(Boolean), step.count) };
-      case 'checkpoint': {
-        const earlier = units.slice(0, unit.index).flatMap((u) => u.poolIds);
-        const weak = earlier.filter((id) => results[id] !== 'correct').map((id) => questionById.get(id)).filter(Boolean);
-        const review = pickRotated(weak, Math.min(PATH_CHECKPOINT_REVIEW, weak.length), seenLog);
-        const own = pickRotated(step.poolIds.map((id) => questionById.get(id)).filter(Boolean), Math.max(1, step.count - review.length), seenLog);
-        const prepared = shuffleArray([...review, ...own]).map(prepareQuestion);
-        api.markSeen(prepared.map((q) => q.id));
-        return { questions: prepared, reviewCount: review.length };
-      }
-      case 'game': {
-        const g = step.game;
-        if (g.kind === 'match') return { kind: 'match', cards: unit.lesson.vocabIds.map((id) => flashById.get(id)).filter(Boolean) };
-        const source = g.kind === 'madlib' ? mod.madlibs : g.kind === 'sequence' ? mod.sequences : mod.compare;
-        return { kind: g.kind, item: (source || []).find((x) => x.id === g.id) };
-      }
-      default:
-        return {};
-    }
-  };
-
   const startStep = (unit, step) => {
-    const payload = buildPayload(unit, step);
     setCompletion(null);
-    setSession({ unit, step, payload, nonce: Date.now() });
+    setSession({ unit, step, nonce: Date.now() });
     window.scrollTo({ top: 0, behavior: 'instant' });
   };
 
@@ -506,63 +574,22 @@ function PathView({ track, trackKey, doneMap, results, seenLog, categories, spee
 
   /* ---- a step is running ---- */
   if (session) {
-    const { unit, step, payload } = session;
-    const runnerKey = step.id + '-' + session.nonce;
-    const common = { categories, flashcardsData: mod.flashcards };
-    let runner = null;
-    if (step.kind === 'read') {
-      runner = <PathReadStep key={runnerKey} unit={unit} flashcardsData={mod.flashcards} speech={speech} onDone={finishStep} />;
-    } else if (step.kind === 'cards' || step.kind === 'cards2') {
-      runner = <PathCardsStep key={runnerKey} cards={payload.cards} speech={speech} onRate={api.rateCard} onDone={finishStep} {...common} />;
-    } else if (step.kind === 'quiz' || step.kind === 'quiz2' || step.kind === 'checkpoint' || step.kind === 'testout' || step.kind === 'review') {
-      runner = (
-        <PathQuizStep
-          key={runnerKey}
-          questions={payload.questions}
-          passPct={step.kind === 'testout' ? PATH_TESTOUT_PCT : step.kind === 'review' ? 0 : PATH_PASS_PCT}
-          label={step.label}
-          onAnswer={(id, ok) => api.recordResult(id, ok ? 'correct' : 'incorrect')}
-          onFinished={api.finishQuiz}
-          onPass={finishStep}
-          onRetry={() => startStep(unit, step)}
-          {...common}
-        />
-      );
-    } else if (step.kind === 'apply') {
-      runner = <PathApplyStep key={runnerKey} unit={unit} categories={categories} onDone={finishStep} />;
-    } else if (step.kind === 'game') {
-      if (payload.kind === 'match') {
-        runner = (
-          <MatchGame
-            key={runnerKey}
-            flashcards={payload.cards}
-            roundSize={Math.min(5, payload.cards.length)}
-            onRoundComplete={api.onMatchRound}
-            onContinue={() => finishStep(null)}
-            continueLabel="Continue ›"
-          />
-        );
-      } else if (payload.kind === 'madlib') {
-        runner = <PathMadlibStep key={runnerKey} item={payload.item} onResult={api.recordResult} onDone={finishStep} {...common} />;
-      } else if (payload.kind === 'sequence') {
-        runner = <PathSequenceStep key={runnerKey} item={payload.item} onResult={api.recordResult} onDone={finishStep} {...common} />;
-      } else {
-        runner = <PathCompareStep key={runnerKey} item={payload.item} onResult={api.recordResult} onDone={finishStep} {...common} />;
-      }
-    }
     return (
-      <div>
-        <button onClick={backToMap} className="btn-flat" style={{ fontSize: '12px', color: COLOR.primary, background: 'transparent', marginBottom: '10px', padding: 0 }}>
-          ‹ Back to the path
-        </button>
-        <div style={{ marginBottom: '14px' }}>
-          <div style={{ fontSize: '10.5px', color: COLOR.muted, textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 600 }}>
-            {step.kind === 'review' ? 'Spaced review' : `Unit ${unit.index + 1} · ${unit.title}`}
-          </div>
-          <div className="itil-display" style={{ fontSize: '18px', fontWeight: 600, marginTop: '2px' }}>{step.label}</div>
-        </div>
-        {runner}
-      </div>
+      <PathStepRunner
+        key={session.step.id + '-' + session.nonce}
+        trackKey={trackKey}
+        units={units}
+        unit={session.unit}
+        step={session.step}
+        results={results}
+        seenLog={seenLog}
+        categories={categories}
+        speech={speech}
+        api={api}
+        onDone={finishStep}
+        onExit={backToMap}
+        exitLabel="‹ Back to the path"
+      />
     );
   }
 

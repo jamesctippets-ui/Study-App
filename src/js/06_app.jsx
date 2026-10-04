@@ -328,11 +328,12 @@ function CertStudyApp() {
   const markSeen = (ids) => markSeenFor(activeTrack, ids);
   const recordResult = (id, outcome) => recordResultFor(activeTrack, id, outcome);
 
-  const recordSrs = (id, quality) => {
-    const trackSrs = srs[activeTrack] || {};
-    const nextEntry = nextSrsEntry(trackSrs[id], quality);
-    saveSrs({ ...srs, [activeTrack]: { ...trackSrs, [id]: nextEntry } });
+  const recordSrsFor = (trackKey, id, quality) => {
+    const cur = srsRef.current;
+    const trackSrs = cur[trackKey] || {};
+    saveSrs({ ...cur, [trackKey]: { ...trackSrs, [id]: nextSrsEntry(trackSrs[id], quality) } });
   };
+  const recordSrs = (id, quality) => recordSrsFor(activeTrack, id, quality);
 
   // Reads/writes through statsRef (not the `stats` state closure) for the
   // same reason markSeenFor/recordResultFor do — a rating and its
@@ -1311,23 +1312,21 @@ function CertStudyApp() {
   // answer, rating, and counter still goes through the same recorders the
   // Practice tab uses, so mastery, spaced repetition, streaks, the daily
   // goal, and achievements need no path-specific scoring.
-  const pathApi = {
-    openToughTerms: () => {
-      setToughIds(toughCardIds(srsRef.current[activeTrack], flashcardsData));
-      setCardDeck('tough');
-      setLearnView('cards');
-      setMode('learn');
-    },
+  // The handlers a path step runs against, bound to one cert. A cert's own
+  // Path tab binds the active track; the Home study path binds whichever cert
+  // each step belongs to, so a step always records to its own cert no matter
+  // which one happens to be open.
+  const makePathApi = (trackKey) => ({
     rateCard: (id, quality) => {
-      recordResult(id, ratingToOutcome(quality));
-      recordSrs(id, quality);
+      recordResultFor(trackKey, id, ratingToOutcome(quality));
+      recordSrsFor(trackKey, id, quality);
       bumpDailyGoal(1);
     },
     recordResult: (id, outcome) => {
-      recordResult(id, outcome);
+      recordResultFor(trackKey, id, outcome);
       bumpDailyGoal(1);
     },
-    markSeen,
+    markSeen: (ids) => markSeenFor(trackKey, ids),
     finishQuiz: (correct, total) => {
       const cur = statsRef.current;
       const perfect = total >= 10 && correct === total;
@@ -1346,12 +1345,27 @@ function CertStudyApp() {
     },
     completeStep: (stepId, pct) => {
       const cur = statsRef.current;
-      saveStats({ ...cur, path: markPathStepDone(cur.path, activeTrack, stepId, pct, todayString()) });
+      saveStats({ ...cur, path: markPathStepDone(cur.path, trackKey, stepId, pct, todayString()) });
     },
     completeSteps: (stepIds, pct, via) => {
       const cur = statsRef.current;
-      saveStats({ ...cur, path: markPathStepsDone(cur.path, activeTrack, stepIds, pct, todayString(), via) });
+      saveStats({ ...cur, path: markPathStepsDone(cur.path, trackKey, stepIds, pct, todayString(), via) });
     },
+  });
+
+  const pathApi = {
+    ...makePathApi(activeTrack),
+    openToughTerms: () => {
+      setToughIds(toughCardIds(srsRef.current[activeTrack], flashcardsData));
+      setCardDeck('tough');
+      setLearnView('cards');
+      setMode('learn');
+    },
+  };
+
+  const setHomePathMode = (pathMode) => {
+    const cur = statsRef.current;
+    saveStats({ ...cur, homePath: { ...(cur.homePath || {}), mode: pathMode } });
   };
 
   const doReset = () => {
@@ -1674,6 +1688,9 @@ function CertStudyApp() {
             seenLog={seenLog}
             stats={stats}
             certPlan={certPlan}
+            speech={{ speakingId, onSpeak: speak, speechSupported }}
+            makePathApi={makePathApi}
+            onSetHomePathMode={setHomePathMode}
             onResume={() => {
               const lv = stats.lastVisited;
               if (!lv) return;

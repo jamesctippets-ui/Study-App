@@ -525,6 +525,7 @@ function emptyStats() {
     counts: { quizzesCompleted: 0, examsPassed: 0, matchRoundsCompleted: 0, perfectQuizzes: 0, caseStudiesCompleted: 0, finalMocksPassed: 0 },
     unlocked: [],
     lastVisited: null,
+    homePath: { mode: 'interleave' },
     dailyGoal: { target: 20, date: null, count: 0 },
     dailyChallenge: { date: null, question: null, vocab: null },
     readinessHistory: {},
@@ -546,6 +547,7 @@ function normalizeStats(raw) {
     counts: { ...base.counts, ...(raw.counts || {}) },
     unlocked: Array.isArray(raw.unlocked) ? raw.unlocked : [],
     lastVisited,
+    homePath: normalizeHomePath(raw.homePath),
     dailyGoal: { target, date: rawGoal.date || null, count },
     dailyChallenge: {
       date: rawChallenge.date || null,
@@ -790,6 +792,66 @@ function pathTestOutStep(unit) {
     id: `${unit.id}::testout`, kind: 'testout', label: `Test out: ${unit.title}`, meta: `${PATH_TESTOUT_QUESTIONS} questions · ${PATH_TESTOUT_PCT}% to pass`,
     poolIds: unit.poolIds, count: PATH_TESTOUT_QUESTIONS,
   };
+}
+
+/* ---------------- cross-cert home path ---------------- */
+
+// The Home tab's own study path: one trail built from every active cert in
+// the user's cert plan, so a learner can work through their whole plan from
+// Home and only open a cert when they want to go deeper. It adds no content
+// and no new progress record — each entry is a unit/step that
+// buildPathUnits already produces for a cert, and finishing one writes to
+// that cert's own stats.path[track].done, so Home and the cert's Path tab
+// can never disagree.
+//
+// 'interleave' (default) hands out one unit per cert in plan order, round
+// after round (a1, b1, c1, a2, b2, ...), which spaces each cert's material
+// out instead of finishing one before touching the next; 'block' finishes a
+// cert before moving on (a1, a2, b1, b2). The order is computed over every
+// unit and only then filtered to unfinished ones, so it stays put as units
+// complete rather than reshuffling under the learner.
+const HOME_PATH_MODES = ['interleave', 'block'];
+const HOME_PATH_UPCOMING = 5;
+
+function normalizeHomePath(raw) {
+  const mode = raw && HOME_PATH_MODES.includes(raw.mode) ? raw.mode : 'interleave';
+  return { mode };
+}
+
+function homePathUnitOrder(unitsByTrack, trackKeys, mode) {
+  const lists = trackKeys.map((key) => (unitsByTrack[key] || []).map((unit) => ({ trackKey: key, unit })));
+  if (mode === 'block') return lists.flat();
+  const out = [];
+  const longest = lists.reduce((m, l) => Math.max(m, l.length), 0);
+  for (let i = 0; i < longest; i++) {
+    lists.forEach((list) => { if (list[i]) out.push(list[i]); });
+  }
+  return out;
+}
+
+// Everything left on the Home path, in order: { trackKey, unit, step }
+// entries for each unfinished step of each unfinished unit. `doneByTrack`
+// maps track key -> that track's done map (stats.path[track].done).
+function homePathRemaining(unitsByTrack, trackKeys, doneByTrack, mode) {
+  const out = [];
+  homePathUnitOrder(unitsByTrack, trackKeys, mode).forEach(({ trackKey, unit }) => {
+    const done = doneByTrack[trackKey] || {};
+    unit.steps.forEach((step) => {
+      if (!pathStepIsDone(done, step.id)) out.push({ trackKey, unit, step });
+    });
+  });
+  return out;
+}
+
+function homePathProgress(unitsByTrack, trackKeys, doneByTrack) {
+  let total = 0;
+  let done = 0;
+  trackKeys.forEach((key) => {
+    const p = pathOverallProgress(unitsByTrack[key] || [], doneByTrack[key] || {});
+    total += p.total;
+    done += p.done;
+  });
+  return { total, done, pct: total ? Math.round((done / total) * 100) : 0 };
 }
 
 const ACHIEVEMENTS = [

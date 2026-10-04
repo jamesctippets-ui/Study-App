@@ -573,7 +573,7 @@ function CertPathHomeSection({ pathOrder, results, seenLog, certPlan, onSelectTr
 // for that split. Reachable again from any track's Learn/Quiz/Exam view
 // via the header's home icon; the header's hamburger (Manage cert path)
 // is reachable from every mode including this one.
-function HomeView({ tracks, results, seenLog, stats, certPlan, onResume, onSelectTrack, onAddToPath, onOpenAbout, onOpenGlossary, onSetGoalTarget, onAnswerDailyQuestion, onRevealDailyVocab }) {
+function HomeView({ tracks, results, seenLog, stats, certPlan, speech, makePathApi, onSetHomePathMode, onResume, onSelectTrack, onAddToPath, onOpenAbout, onOpenGlossary, onSetGoalTarget, onAnswerDailyQuestion, onRevealDailyVocab }) {
   const masteries = tracks.map((t) => ({ track: t, pct: trackMastery(t.key, results) }));
   const overallAvg = masteries.length ? Math.round(masteries.reduce((s, m) => s + m.pct, 0) / masteries.length) : 0;
   const lastVisited = stats.lastVisited;
@@ -609,6 +609,43 @@ function HomeView({ tracks, results, seenLog, stats, certPlan, onResume, onSelec
   const readinessColor = READINESS_COLOR[readiness.label] || COLOR.muted;
   const pathOrder = activeCertOrder(tracks, certPlan);
 
+  // The cross-cert study path (see 04f_home_path_ui.jsx). Units are built once
+  // per set of certs; what's done is read live from stats.path.
+  const pathKeys = pathOrder.map((t) => t.key);
+  const unitsByTrack = useMemo(() => {
+    const map = {};
+    pathKeys.forEach((k) => { map[k] = buildPathUnits(k); });
+    return map;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pathKeys.join(',')]);
+  const doneByTrack = {};
+  pathKeys.forEach((k) => { doneByTrack[k] = ((stats.path || {})[k] || {}).done || {}; });
+  const homePathMode = (stats.homePath && stats.homePath.mode) || 'interleave';
+  const homeRemaining = homePathRemaining(unitsByTrack, pathKeys, doneByTrack, homePathMode);
+  const homeProgress = homePathProgress(unitsByTrack, pathKeys, doneByTrack);
+  const hasHomePath = homeProgress.total > 0;
+  const [homeRun, setHomeRun] = useState(null);
+  const startHomeRun = (e) => setHomeRun({ trackKey: e.trackKey, unit: e.unit, step: e.step, nonce: Date.now() });
+
+  if (homeRun) {
+    return (
+      <HomePathRun
+        run={homeRun}
+        tracks={tracks}
+        unitsByTrack={unitsByTrack}
+        trackKeys={pathKeys}
+        doneByTrack={doneByTrack}
+        mode={homePathMode}
+        results={results}
+        seenLog={seenLog}
+        speech={speech}
+        makeApi={makePathApi}
+        onStart={startHomeRun}
+        onExit={() => setHomeRun(null)}
+      />
+    );
+  }
+
   return (
     <div>
       <div style={{ fontSize: '12px', color: COLOR.muted, marginBottom: '14px' }}>
@@ -616,6 +653,18 @@ function HomeView({ tracks, results, seenLog, stats, certPlan, onResume, onSelec
       </div>
 
       <DailyGoalRing dailyGoal={stats.dailyGoal} onSetTarget={onSetGoalTarget} />
+
+      {hasHomePath && (
+        <HomeStudyPath
+          tracks={tracks}
+          remaining={homeRemaining}
+          progress={homeProgress}
+          mode={homePathMode}
+          onSetMode={onSetHomePathMode}
+          onStart={startHomeRun}
+          onOpenCert={onSelectTrack}
+        />
+      )}
 
       {/* The path hero already shows the up-next track's own readiness, so
           the standalone readiness card here would just repeat it — only

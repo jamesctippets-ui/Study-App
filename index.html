@@ -3220,6 +3220,7 @@ function emptyStats() {
     counts: { quizzesCompleted: 0, examsPassed: 0, matchRoundsCompleted: 0, perfectQuizzes: 0, caseStudiesCompleted: 0, finalMocksPassed: 0 },
     unlocked: [],
     lastVisited: null,
+    homePath: { mode: 'interleave' },
     dailyGoal: { target: 20, date: null, count: 0 },
     dailyChallenge: { date: null, question: null, vocab: null },
     readinessHistory: {},
@@ -3241,6 +3242,7 @@ function normalizeStats(raw) {
     counts: { ...base.counts, ...(raw.counts || {}) },
     unlocked: Array.isArray(raw.unlocked) ? raw.unlocked : [],
     lastVisited,
+    homePath: normalizeHomePath(raw.homePath),
     dailyGoal: { target, date: rawGoal.date || null, count },
     dailyChallenge: {
       date: rawChallenge.date || null,
@@ -3485,6 +3487,66 @@ function pathTestOutStep(unit) {
     id: `${unit.id}::testout`, kind: 'testout', label: `Test out: ${unit.title}`, meta: `${PATH_TESTOUT_QUESTIONS} questions · ${PATH_TESTOUT_PCT}% to pass`,
     poolIds: unit.poolIds, count: PATH_TESTOUT_QUESTIONS,
   };
+}
+
+/* ---------------- cross-cert home path ---------------- */
+
+// The Home tab's own study path: one trail built from every active cert in
+// the user's cert plan, so a learner can work through their whole plan from
+// Home and only open a cert when they want to go deeper. It adds no content
+// and no new progress record — each entry is a unit/step that
+// buildPathUnits already produces for a cert, and finishing one writes to
+// that cert's own stats.path[track].done, so Home and the cert's Path tab
+// can never disagree.
+//
+// 'interleave' (default) hands out one unit per cert in plan order, round
+// after round (a1, b1, c1, a2, b2, ...), which spaces each cert's material
+// out instead of finishing one before touching the next; 'block' finishes a
+// cert before moving on (a1, a2, b1, b2). The order is computed over every
+// unit and only then filtered to unfinished ones, so it stays put as units
+// complete rather than reshuffling under the learner.
+const HOME_PATH_MODES = ['interleave', 'block'];
+const HOME_PATH_UPCOMING = 5;
+
+function normalizeHomePath(raw) {
+  const mode = raw && HOME_PATH_MODES.includes(raw.mode) ? raw.mode : 'interleave';
+  return { mode };
+}
+
+function homePathUnitOrder(unitsByTrack, trackKeys, mode) {
+  const lists = trackKeys.map((key) => (unitsByTrack[key] || []).map((unit) => ({ trackKey: key, unit })));
+  if (mode === 'block') return lists.flat();
+  const out = [];
+  const longest = lists.reduce((m, l) => Math.max(m, l.length), 0);
+  for (let i = 0; i < longest; i++) {
+    lists.forEach((list) => { if (list[i]) out.push(list[i]); });
+  }
+  return out;
+}
+
+// Everything left on the Home path, in order: { trackKey, unit, step }
+// entries for each unfinished step of each unfinished unit. `doneByTrack`
+// maps track key -> that track's done map (stats.path[track].done).
+function homePathRemaining(unitsByTrack, trackKeys, doneByTrack, mode) {
+  const out = [];
+  homePathUnitOrder(unitsByTrack, trackKeys, mode).forEach(({ trackKey, unit }) => {
+    const done = doneByTrack[trackKey] || {};
+    unit.steps.forEach((step) => {
+      if (!pathStepIsDone(done, step.id)) out.push({ trackKey, unit, step });
+    });
+  });
+  return out;
+}
+
+function homePathProgress(unitsByTrack, trackKeys, doneByTrack) {
+  let total = 0;
+  let done = 0;
+  trackKeys.forEach((key) => {
+    const p = pathOverallProgress(unitsByTrack[key] || [], doneByTrack[key] || {});
+    total += p.total;
+    done += p.done;
+  });
+  return { total, done, pct: total ? Math.round((done / total) * 100) : 0 };
 }
 
 const ACHIEVEMENTS = [
@@ -4318,7 +4380,7 @@ function CertPathHomeSection({ pathOrder, results, seenLog, certPlan, onSelectTr
 // for that split. Reachable again from any track's Learn/Quiz/Exam view
 // via the header's home icon; the header's hamburger (Manage cert path)
 // is reachable from every mode including this one.
-function HomeView({ tracks, results, seenLog, stats, certPlan, onResume, onSelectTrack, onAddToPath, onOpenAbout, onOpenGlossary, onSetGoalTarget, onAnswerDailyQuestion, onRevealDailyVocab }) {
+function HomeView({ tracks, results, seenLog, stats, certPlan, speech, makePathApi, onSetHomePathMode, onResume, onSelectTrack, onAddToPath, onOpenAbout, onOpenGlossary, onSetGoalTarget, onAnswerDailyQuestion, onRevealDailyVocab }) {
   const masteries = tracks.map((t) => ({ track: t, pct: trackMastery(t.key, results) }));
   const overallAvg = masteries.length ? Math.round(masteries.reduce((s, m) => s + m.pct, 0) / masteries.length) : 0;
   const lastVisited = stats.lastVisited;
@@ -4354,6 +4416,43 @@ function HomeView({ tracks, results, seenLog, stats, certPlan, onResume, onSelec
   const readinessColor = READINESS_COLOR[readiness.label] || COLOR.muted;
   const pathOrder = activeCertOrder(tracks, certPlan);
 
+  // The cross-cert study path (see 04f_home_path_ui.jsx). Units are built once
+  // per set of certs; what's done is read live from stats.path.
+  const pathKeys = pathOrder.map((t) => t.key);
+  const unitsByTrack = useMemo(() => {
+    const map = {};
+    pathKeys.forEach((k) => { map[k] = buildPathUnits(k); });
+    return map;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pathKeys.join(',')]);
+  const doneByTrack = {};
+  pathKeys.forEach((k) => { doneByTrack[k] = ((stats.path || {})[k] || {}).done || {}; });
+  const homePathMode = (stats.homePath && stats.homePath.mode) || 'interleave';
+  const homeRemaining = homePathRemaining(unitsByTrack, pathKeys, doneByTrack, homePathMode);
+  const homeProgress = homePathProgress(unitsByTrack, pathKeys, doneByTrack);
+  const hasHomePath = homeProgress.total > 0;
+  const [homeRun, setHomeRun] = useState(null);
+  const startHomeRun = (e) => setHomeRun({ trackKey: e.trackKey, unit: e.unit, step: e.step, nonce: Date.now() });
+
+  if (homeRun) {
+    return (
+      <HomePathRun
+        run={homeRun}
+        tracks={tracks}
+        unitsByTrack={unitsByTrack}
+        trackKeys={pathKeys}
+        doneByTrack={doneByTrack}
+        mode={homePathMode}
+        results={results}
+        seenLog={seenLog}
+        speech={speech}
+        makeApi={makePathApi}
+        onStart={startHomeRun}
+        onExit={() => setHomeRun(null)}
+      />
+    );
+  }
+
   return (
     <div>
       <div style={{ fontSize: '12px', color: COLOR.muted, marginBottom: '14px' }}>
@@ -4361,6 +4460,18 @@ function HomeView({ tracks, results, seenLog, stats, certPlan, onResume, onSelec
       </div>
 
       <DailyGoalRing dailyGoal={stats.dailyGoal} onSetTarget={onSetGoalTarget} />
+
+      {hasHomePath && (
+        <HomeStudyPath
+          tracks={tracks}
+          remaining={homeRemaining}
+          progress={homeProgress}
+          mode={homePathMode}
+          onSetMode={onSetHomePathMode}
+          onStart={startHomeRun}
+          onOpenCert={onSelectTrack}
+        />
+      )}
 
       {/* The path hero already shows the up-next track's own readiness, so
           the standalone readiness card here would just repeat it — only
@@ -7475,7 +7586,7 @@ function PathApplyStep({ unit, categories, onDone }) {
   );
 }
 
-function PathStepComplete({ unit, step, pct, unitComplete, testedOut, next, onNext, onBack }) {
+function PathStepComplete({ unit, step, pct, unitComplete, testedOut, next, onNext, onBack, nextLabel, backLabel }) {
   return (
     <div style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderRadius: '18px', padding: '26px 22px', textAlign: 'center' }}>
       <div style={{ width: '56px', height: '56px', borderRadius: '50%', background: COLOR.success, color: COLOR.onAccent, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', marginBottom: '12px' }}>
@@ -7493,7 +7604,7 @@ function PathStepComplete({ unit, step, pct, unitComplete, testedOut, next, onNe
           onClick={onNext}
           style={{ width: '100%', marginTop: '18px', padding: '13px', borderRadius: '12px', background: COLOR.primary, color: COLOR.onAccent, fontSize: '14px', fontWeight: 700 }}
         >
-          {next.unit.index !== unit.index ? `Next unit: ${next.unit.title}` : `Next: ${next.step.label}`}
+          {nextLabel || (next.unit.index !== unit.index ? `Next unit: ${next.unit.title}` : `Next: ${next.step.label}`)}
         </button>
       ) : (
         <div style={{ marginTop: '16px', fontSize: '13px', fontWeight: 600, color: COLOR.success }}>That's the whole path.</div>
@@ -7502,13 +7613,123 @@ function PathStepComplete({ unit, step, pct, unitComplete, testedOut, next, onNe
         onClick={onBack}
         style={{ width: '100%', marginTop: '10px', padding: '11px', borderRadius: '12px', border: `1px solid ${COLOR.border}`, background: 'transparent', color: COLOR.text, fontSize: '13px', fontWeight: 600 }}
       >
-        Back to the path
+        {backLabel || 'Back to the path'}
       </button>
     </div>
   );
 }
 
 /* ---- the path itself ---- */
+
+// Builds what a step needs to run: the cards/questions/game item for it,
+// drawn from the cert `trackKey`. Pure apart from `api.markSeen`.
+function buildStepPayload(trackKey, units, results, seenLog, api, unit, step) {
+  const mod = DATA[trackKey];
+  const flashById = new Map(mod.flashcards.map((f) => [f.id, f]));
+  const questionById = new Map(mod.questions.map((q) => [q.id, q]));
+  const poolQuestions = (ids) => ids.map((id) => questionById.get(id)).filter(Boolean);
+  const preparedQuestions = (pool, count) => {
+    const picked = pickRotated(pool, Math.min(count, pool.length), seenLog);
+    const prepared = picked.map(prepareQuestion);
+    api.markSeen(prepared.map((q) => q.id));
+    return prepared;
+  };
+  switch (step.kind) {
+    case 'cards':
+    case 'cards2':
+      return { cards: step.cardIds.map((id) => flashById.get(id)).filter(Boolean) };
+    case 'quiz':
+    case 'quiz2':
+    case 'testout':
+    case 'review':
+      return { questions: preparedQuestions(poolQuestions(step.poolIds), step.count) };
+    case 'checkpoint': {
+      const earlier = units.slice(0, unit.index).flatMap((u) => u.poolIds);
+      const weak = poolQuestions(earlier.filter((id) => results[id] !== 'correct'));
+      const review = pickRotated(weak, Math.min(PATH_CHECKPOINT_REVIEW, weak.length), seenLog);
+      const own = pickRotated(poolQuestions(step.poolIds), Math.max(1, step.count - review.length), seenLog);
+      const prepared = shuffleArray([...review, ...own]).map(prepareQuestion);
+      api.markSeen(prepared.map((q) => q.id));
+      return { questions: prepared, reviewCount: review.length };
+    }
+    case 'game': {
+      const g = step.game;
+      if (g.kind === 'match') return { kind: 'match', cards: unit.lesson.vocabIds.map((id) => flashById.get(id)).filter(Boolean) };
+      const source = g.kind === 'madlib' ? mod.madlibs : g.kind === 'sequence' ? mod.sequences : mod.compare;
+      return { kind: g.kind, item: (source || []).find((x) => x.id === g.id) };
+    }
+    default:
+      return {};
+  }
+}
+
+// Runs one path step for any cert. Used by a cert's own Path tab and by the
+// Home study path, so a step behaves identically in both. `onDone(pct)` is
+// called when the step finishes and the caller decides what that means
+// (recording it, showing the completion screen); `onExit` backs out.
+function PathStepRunner({ trackKey, units, unit, step, results, seenLog, categories, speech, api, onDone, onExit, exitLabel, certLabel }) {
+  const mod = DATA[trackKey];
+  const [run, setRun] = useState(() => ({ payload: buildStepPayload(trackKey, units, results, seenLog, api, unit, step), nonce: 0 }));
+  const { payload, nonce } = run;
+  const retry = () => setRun((r) => ({ payload: buildStepPayload(trackKey, units, results, seenLog, api, unit, step), nonce: r.nonce + 1 }));
+  const runnerKey = step.id + '-' + nonce;
+  const common = { categories, flashcardsData: mod.flashcards };
+  let runner = null;
+  if (step.kind === 'read') {
+    runner = <PathReadStep key={runnerKey} unit={unit} flashcardsData={mod.flashcards} speech={speech} onDone={onDone} />;
+  } else if (step.kind === 'cards' || step.kind === 'cards2') {
+    runner = <PathCardsStep key={runnerKey} cards={payload.cards} speech={speech} onRate={api.rateCard} onDone={onDone} {...common} />;
+  } else if (step.kind === 'quiz' || step.kind === 'quiz2' || step.kind === 'checkpoint' || step.kind === 'testout' || step.kind === 'review') {
+    runner = (
+      <PathQuizStep
+        key={runnerKey}
+        questions={payload.questions}
+        passPct={step.kind === 'testout' ? PATH_TESTOUT_PCT : step.kind === 'review' ? 0 : PATH_PASS_PCT}
+        label={step.label}
+        onAnswer={(id, ok) => api.recordResult(id, ok ? 'correct' : 'incorrect')}
+        onFinished={api.finishQuiz}
+        onPass={onDone}
+        onRetry={retry}
+        {...common}
+      />
+    );
+  } else if (step.kind === 'apply') {
+    runner = <PathApplyStep key={runnerKey} unit={unit} categories={categories} onDone={onDone} />;
+  } else if (step.kind === 'game') {
+    if (payload.kind === 'match') {
+      runner = (
+        <MatchGame
+          key={runnerKey}
+          flashcards={payload.cards}
+          roundSize={Math.min(5, payload.cards.length)}
+          onRoundComplete={api.onMatchRound}
+          onContinue={() => onDone(null)}
+          continueLabel="Continue ›"
+        />
+      );
+    } else if (payload.kind === 'madlib') {
+      runner = <PathMadlibStep key={runnerKey} item={payload.item} onResult={api.recordResult} onDone={onDone} {...common} />;
+    } else if (payload.kind === 'sequence') {
+      runner = <PathSequenceStep key={runnerKey} item={payload.item} onResult={api.recordResult} onDone={onDone} {...common} />;
+    } else {
+      runner = <PathCompareStep key={runnerKey} item={payload.item} onResult={api.recordResult} onDone={onDone} {...common} />;
+    }
+  }
+  return (
+    <div>
+      <button onClick={onExit} className="btn-flat" style={{ fontSize: '12px', color: COLOR.primary, background: 'transparent', marginBottom: '10px', padding: 0 }}>
+        {exitLabel}
+      </button>
+      <div style={{ marginBottom: '14px' }}>
+        <div style={{ fontSize: '10.5px', color: COLOR.muted, textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 600 }}>
+          {step.kind === 'review' ? 'Spaced review' : `${certLabel ? certLabel + ' · ' : ''}Unit ${unit.index + 1} · ${unit.title}`}
+        </div>
+        <div className="itil-display" style={{ fontSize: '18px', fontWeight: 600, marginTop: '2px' }}>{step.label}</div>
+      </div>
+      {runner}
+    </div>
+  );
+}
 
 const PATH_NODE_OFFSETS = [0, 24, 40, 24];
 
@@ -7544,8 +7765,6 @@ function PathView({ track, trackKey, doneMap, results, seenLog, categories, spee
     );
   }
 
-  const flashById = new Map(mod.flashcards.map((f) => [f.id, f]));
-  const questionById = new Map(mod.questions.map((q) => [q.id, q]));
   const overall = pathOverallProgress(units, doneMap);
   const next = pathNextStep(units, doneMap);
   const reviewIds = pathReviewQuestionIds(units, doneMap, results, seenLog);
@@ -7553,49 +7772,9 @@ function PathView({ track, trackKey, doneMap, results, seenLog, categories, spee
     id: 'review', kind: 'review', label: 'Review weak spots', poolIds: reviewIds, count: PATH_REVIEW_QUESTIONS,
   });
 
-  const preparedQuestions = (pool, count) => {
-    const picked = pickRotated(pool, Math.min(count, pool.length), seenLog);
-    const prepared = picked.map(prepareQuestion);
-    api.markSeen(prepared.map((q) => q.id));
-    return prepared;
-  };
-
-  const buildPayload = (unit, step) => {
-    switch (step.kind) {
-      case 'cards':
-      case 'cards2':
-        return { cards: step.cardIds.map((id) => flashById.get(id)).filter(Boolean) };
-      case 'quiz':
-      case 'quiz2':
-        return { questions: preparedQuestions(step.poolIds.map((id) => questionById.get(id)).filter(Boolean), step.count) };
-      case 'testout':
-        return { questions: preparedQuestions(step.poolIds.map((id) => questionById.get(id)).filter(Boolean), step.count) };
-      case 'review':
-        return { questions: preparedQuestions(step.poolIds.map((id) => questionById.get(id)).filter(Boolean), step.count) };
-      case 'checkpoint': {
-        const earlier = units.slice(0, unit.index).flatMap((u) => u.poolIds);
-        const weak = earlier.filter((id) => results[id] !== 'correct').map((id) => questionById.get(id)).filter(Boolean);
-        const review = pickRotated(weak, Math.min(PATH_CHECKPOINT_REVIEW, weak.length), seenLog);
-        const own = pickRotated(step.poolIds.map((id) => questionById.get(id)).filter(Boolean), Math.max(1, step.count - review.length), seenLog);
-        const prepared = shuffleArray([...review, ...own]).map(prepareQuestion);
-        api.markSeen(prepared.map((q) => q.id));
-        return { questions: prepared, reviewCount: review.length };
-      }
-      case 'game': {
-        const g = step.game;
-        if (g.kind === 'match') return { kind: 'match', cards: unit.lesson.vocabIds.map((id) => flashById.get(id)).filter(Boolean) };
-        const source = g.kind === 'madlib' ? mod.madlibs : g.kind === 'sequence' ? mod.sequences : mod.compare;
-        return { kind: g.kind, item: (source || []).find((x) => x.id === g.id) };
-      }
-      default:
-        return {};
-    }
-  };
-
   const startStep = (unit, step) => {
-    const payload = buildPayload(unit, step);
     setCompletion(null);
-    setSession({ unit, step, payload, nonce: Date.now() });
+    setSession({ unit, step, nonce: Date.now() });
     window.scrollTo({ top: 0, behavior: 'instant' });
   };
 
@@ -7631,63 +7810,22 @@ function PathView({ track, trackKey, doneMap, results, seenLog, categories, spee
 
   /* ---- a step is running ---- */
   if (session) {
-    const { unit, step, payload } = session;
-    const runnerKey = step.id + '-' + session.nonce;
-    const common = { categories, flashcardsData: mod.flashcards };
-    let runner = null;
-    if (step.kind === 'read') {
-      runner = <PathReadStep key={runnerKey} unit={unit} flashcardsData={mod.flashcards} speech={speech} onDone={finishStep} />;
-    } else if (step.kind === 'cards' || step.kind === 'cards2') {
-      runner = <PathCardsStep key={runnerKey} cards={payload.cards} speech={speech} onRate={api.rateCard} onDone={finishStep} {...common} />;
-    } else if (step.kind === 'quiz' || step.kind === 'quiz2' || step.kind === 'checkpoint' || step.kind === 'testout' || step.kind === 'review') {
-      runner = (
-        <PathQuizStep
-          key={runnerKey}
-          questions={payload.questions}
-          passPct={step.kind === 'testout' ? PATH_TESTOUT_PCT : step.kind === 'review' ? 0 : PATH_PASS_PCT}
-          label={step.label}
-          onAnswer={(id, ok) => api.recordResult(id, ok ? 'correct' : 'incorrect')}
-          onFinished={api.finishQuiz}
-          onPass={finishStep}
-          onRetry={() => startStep(unit, step)}
-          {...common}
-        />
-      );
-    } else if (step.kind === 'apply') {
-      runner = <PathApplyStep key={runnerKey} unit={unit} categories={categories} onDone={finishStep} />;
-    } else if (step.kind === 'game') {
-      if (payload.kind === 'match') {
-        runner = (
-          <MatchGame
-            key={runnerKey}
-            flashcards={payload.cards}
-            roundSize={Math.min(5, payload.cards.length)}
-            onRoundComplete={api.onMatchRound}
-            onContinue={() => finishStep(null)}
-            continueLabel="Continue ›"
-          />
-        );
-      } else if (payload.kind === 'madlib') {
-        runner = <PathMadlibStep key={runnerKey} item={payload.item} onResult={api.recordResult} onDone={finishStep} {...common} />;
-      } else if (payload.kind === 'sequence') {
-        runner = <PathSequenceStep key={runnerKey} item={payload.item} onResult={api.recordResult} onDone={finishStep} {...common} />;
-      } else {
-        runner = <PathCompareStep key={runnerKey} item={payload.item} onResult={api.recordResult} onDone={finishStep} {...common} />;
-      }
-    }
     return (
-      <div>
-        <button onClick={backToMap} className="btn-flat" style={{ fontSize: '12px', color: COLOR.primary, background: 'transparent', marginBottom: '10px', padding: 0 }}>
-          ‹ Back to the path
-        </button>
-        <div style={{ marginBottom: '14px' }}>
-          <div style={{ fontSize: '10.5px', color: COLOR.muted, textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 600 }}>
-            {step.kind === 'review' ? 'Spaced review' : `Unit ${unit.index + 1} · ${unit.title}`}
-          </div>
-          <div className="itil-display" style={{ fontSize: '18px', fontWeight: 600, marginTop: '2px' }}>{step.label}</div>
-        </div>
-        {runner}
-      </div>
+      <PathStepRunner
+        key={session.step.id + '-' + session.nonce}
+        trackKey={trackKey}
+        units={units}
+        unit={session.unit}
+        step={session.step}
+        results={results}
+        seenLog={seenLog}
+        categories={categories}
+        speech={speech}
+        api={api}
+        onDone={finishStep}
+        onExit={backToMap}
+        exitLabel="‹ Back to the path"
+      />
     );
   }
 
@@ -7853,6 +7991,171 @@ function PathView({ track, trackKey, doneMap, results, seenLog, categories, spee
         );
       })}
     </div>
+  );
+}
+
+/* ---------------- Home study path (cross-cert) ---------------- */
+
+// The Home tab's own learning path: one trail through every cert in the
+// user's plan (see homePathRemaining in 03_helpers.js for how it is ordered).
+// Steps run right here on Home using the same runner a cert's Path tab uses,
+// and record to that cert's own progress; "Go deeper" opens the cert itself.
+
+const HOME_PATH_MODE_LABELS = { interleave: 'Mix certs', block: 'One cert at a time' };
+
+// Small colored cert tag shown on every step so a mixed trail stays legible.
+function HomePathCertChip({ track }) {
+  const accent = trackAccent(track.key);
+  return (
+    <span style={{ fontSize: '10px', fontWeight: 700, color: accent, border: `1px solid ${accent}`, borderRadius: '999px', padding: '1px 7px', whiteSpace: 'nowrap' }}>
+      {track.label}
+    </span>
+  );
+}
+
+// The collapsed Home card: progress, the up-next hero, and the next few steps.
+function HomeStudyPath({ tracks, remaining, progress, mode, onSetMode, onStart, onOpenCert }) {
+  const trackByKey = new Map(tracks.map((t) => [t.key, t]));
+  const [first, ...rest] = remaining;
+  const upcoming = rest.slice(0, HOME_PATH_UPCOMING);
+  const later = rest.length - upcoming.length;
+  const firstTrack = first ? trackByKey.get(first.trackKey) : null;
+  const accent = firstTrack ? trackAccent(firstTrack.key) : COLOR.primary;
+  return (
+    <div style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderRadius: '16px', padding: '16px', marginBottom: '14px' }}>
+      <div className="flex justify-between items-baseline" style={{ marginBottom: '8px' }}>
+        <div className="itil-display" style={{ fontSize: '17px', fontWeight: 600 }}>Your study path</div>
+        <div style={{ fontSize: '12px', color: COLOR.muted }}>{progress.done} of {progress.total} steps</div>
+      </div>
+      <div style={{ height: '6px', borderRadius: '3px', background: COLOR.surfaceRaised, overflow: 'hidden', marginBottom: '8px' }}>
+        <div style={{ height: '100%', width: `${progress.pct}%`, background: COLOR.success, borderRadius: '3px' }} />
+      </div>
+      <div className="flex gap-1" style={{ background: COLOR.bg, padding: '3px', borderRadius: '10px', border: `1px solid ${COLOR.border}`, marginBottom: '12px' }}>
+        {HOME_PATH_MODES.map((m) => (
+          <button
+            key={m}
+            onClick={() => onSetMode(m)}
+            className="flex-1 btn-flat"
+            style={{ padding: '5px 2px', borderRadius: '8px', fontSize: '10.5px', fontWeight: 600, background: mode === m ? COLOR.surfaceRaised : 'transparent', color: mode === m ? COLOR.text : COLOR.muted }}
+          >
+            {HOME_PATH_MODE_LABELS[m]}
+          </button>
+        ))}
+      </div>
+
+      {first && firstTrack ? (
+        <React.Fragment>
+          <button
+            onClick={() => onStart(first)}
+            style={{ width: '100%', padding: '13px', borderRadius: '12px', background: accent, color: COLOR.onAccent, textAlign: 'left', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px' }}
+          >
+            <span style={{ minWidth: 0 }}>
+              <span style={{ display: 'block', fontSize: '10px', opacity: 0.85, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                {progress.done === 0 ? 'Start' : 'Continue'} · {firstTrack.label} · Unit {first.unit.index + 1}
+              </span>
+              <span style={{ display: 'block', fontSize: '14px', fontWeight: 700 }}>{first.step.label}</span>
+            </span>
+            <span style={{ fontSize: '18px' }}>›</span>
+          </button>
+          <button
+            onClick={() => onOpenCert(firstTrack.key)}
+            className="btn-flat"
+            style={{ background: 'transparent', color: accent, fontSize: '11.5px', fontWeight: 600, padding: '8px 2px 0' }}
+          >
+            Go deeper in {firstTrack.label} ›
+          </button>
+        </React.Fragment>
+      ) : (
+        <div style={{ fontSize: '13px', fontWeight: 600, color: COLOR.success, textAlign: 'center', padding: '6px 0' }}>
+          Path complete — open any cert below to review it.
+        </div>
+      )}
+
+      {upcoming.length > 0 && (
+        <div style={{ marginTop: '10px', borderTop: `1px solid ${COLOR.border}`, paddingTop: '8px' }}>
+          <div style={{ fontSize: '10.5px', color: COLOR.muted, textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 600, marginBottom: '2px' }}>Coming up</div>
+          {upcoming.map((e) => (
+            <button
+              key={e.trackKey + e.step.id}
+              onClick={() => onStart(e)}
+              className="btn-flat"
+              style={{ width: '100%', textAlign: 'left', background: 'transparent', color: COLOR.text, display: 'flex', alignItems: 'center', gap: '10px', padding: '6px 0' }}
+            >
+              <span style={{ width: '28px', height: '28px', borderRadius: '50%', flexShrink: 0, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', background: COLOR.surfaceRaised, color: COLOR.muted }}>
+                <PathIcon kind={e.step.kind} size={15} />
+              </span>
+              <span style={{ flex: 1, minWidth: 0 }}>
+                <span style={{ display: 'block', fontSize: '12.5px', fontWeight: 600 }}>{e.step.label}</span>
+                <span style={{ display: 'block', fontSize: '10.5px', color: COLOR.muted }}>Unit {e.unit.index + 1} · {e.unit.title}</span>
+              </span>
+              {trackByKey.get(e.trackKey) && <HomePathCertChip track={trackByKey.get(e.trackKey)} />}
+            </button>
+          ))}
+          {later > 0 && <div style={{ fontSize: '10.5px', color: COLOR.muted, paddingTop: '4px' }}>+ {later} more step{later === 1 ? '' : 's'} after these</div>}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// A step running on Home (and the "step complete" screen after it). Takes
+// over the Home tab while active, like a cert's own Path does on its tab.
+function HomePathRun({ run, tracks, unitsByTrack, trackKeys, doneByTrack, mode, results, seenLog, speech, makeApi, onStart, onExit }) {
+  const [completion, setCompletion] = useState(null);
+  const track = tracks.find((t) => t.key === run.trackKey);
+  const api = makeApi(run.trackKey);
+  const units = unitsByTrack[run.trackKey] || [];
+
+  const finish = (pct) => {
+    const { unit, step } = run;
+    if (step.kind === 'review') { onExit(); return; }
+    const testedOut = step.kind === 'testout';
+    const stepIds = testedOut ? unit.steps.map((s) => s.id) : [step.id];
+    if (testedOut) api.completeSteps(stepIds, pct, 'testout');
+    else api.completeStep(step.id, pct);
+    // What's left once this step lands — doneByTrack hasn't re-rendered yet.
+    const doneNow = { ...doneByTrack, [run.trackKey]: { ...(doneByTrack[run.trackKey] || {}) } };
+    stepIds.forEach((id) => { doneNow[run.trackKey][id] = true; });
+    const left = homePathRemaining(unitsByTrack, trackKeys, doneNow, mode);
+    setCompletion({ pct, testedOut, next: left[0] || null, unitComplete: pathUnitProgress(unit, doneNow[run.trackKey]).complete });
+    window.scrollTo({ top: 0, behavior: 'instant' });
+  };
+
+  if (completion) {
+    const nextTrack = completion.next ? tracks.find((t) => t.key === completion.next.trackKey) : null;
+    return (
+      <PathStepComplete
+        unit={run.unit}
+        step={run.step}
+        pct={completion.pct}
+        unitComplete={completion.unitComplete}
+        testedOut={completion.testedOut}
+        next={completion.next}
+        nextLabel={completion.next && nextTrack ? `Next: ${nextTrack.label} · ${completion.next.step.label}` : null}
+        onNext={() => onStart(completion.next)}
+        onBack={onExit}
+        backLabel="Back to Home"
+      />
+    );
+  }
+
+  return (
+    <PathStepRunner
+      key={run.step.id + '-' + run.nonce}
+      trackKey={run.trackKey}
+      units={units}
+      unit={run.unit}
+      step={run.step}
+      results={results[run.trackKey] || {}}
+      seenLog={seenLog[run.trackKey] || {}}
+      categories={DATA[run.trackKey].categories}
+      speech={speech}
+      api={api}
+      onDone={finish}
+      onExit={onExit}
+      exitLabel="‹ Back to Home"
+      certLabel={track ? track.label : null}
+    />
   );
 }
 
@@ -8460,11 +8763,12 @@ function CertStudyApp() {
   const markSeen = (ids) => markSeenFor(activeTrack, ids);
   const recordResult = (id, outcome) => recordResultFor(activeTrack, id, outcome);
 
-  const recordSrs = (id, quality) => {
-    const trackSrs = srs[activeTrack] || {};
-    const nextEntry = nextSrsEntry(trackSrs[id], quality);
-    saveSrs({ ...srs, [activeTrack]: { ...trackSrs, [id]: nextEntry } });
+  const recordSrsFor = (trackKey, id, quality) => {
+    const cur = srsRef.current;
+    const trackSrs = cur[trackKey] || {};
+    saveSrs({ ...cur, [trackKey]: { ...trackSrs, [id]: nextSrsEntry(trackSrs[id], quality) } });
   };
+  const recordSrs = (id, quality) => recordSrsFor(activeTrack, id, quality);
 
   // Reads/writes through statsRef (not the `stats` state closure) for the
   // same reason markSeenFor/recordResultFor do — a rating and its
@@ -9443,23 +9747,21 @@ function CertStudyApp() {
   // answer, rating, and counter still goes through the same recorders the
   // Practice tab uses, so mastery, spaced repetition, streaks, the daily
   // goal, and achievements need no path-specific scoring.
-  const pathApi = {
-    openToughTerms: () => {
-      setToughIds(toughCardIds(srsRef.current[activeTrack], flashcardsData));
-      setCardDeck('tough');
-      setLearnView('cards');
-      setMode('learn');
-    },
+  // The handlers a path step runs against, bound to one cert. A cert's own
+  // Path tab binds the active track; the Home study path binds whichever cert
+  // each step belongs to, so a step always records to its own cert no matter
+  // which one happens to be open.
+  const makePathApi = (trackKey) => ({
     rateCard: (id, quality) => {
-      recordResult(id, ratingToOutcome(quality));
-      recordSrs(id, quality);
+      recordResultFor(trackKey, id, ratingToOutcome(quality));
+      recordSrsFor(trackKey, id, quality);
       bumpDailyGoal(1);
     },
     recordResult: (id, outcome) => {
-      recordResult(id, outcome);
+      recordResultFor(trackKey, id, outcome);
       bumpDailyGoal(1);
     },
-    markSeen,
+    markSeen: (ids) => markSeenFor(trackKey, ids),
     finishQuiz: (correct, total) => {
       const cur = statsRef.current;
       const perfect = total >= 10 && correct === total;
@@ -9478,12 +9780,27 @@ function CertStudyApp() {
     },
     completeStep: (stepId, pct) => {
       const cur = statsRef.current;
-      saveStats({ ...cur, path: markPathStepDone(cur.path, activeTrack, stepId, pct, todayString()) });
+      saveStats({ ...cur, path: markPathStepDone(cur.path, trackKey, stepId, pct, todayString()) });
     },
     completeSteps: (stepIds, pct, via) => {
       const cur = statsRef.current;
-      saveStats({ ...cur, path: markPathStepsDone(cur.path, activeTrack, stepIds, pct, todayString(), via) });
+      saveStats({ ...cur, path: markPathStepsDone(cur.path, trackKey, stepIds, pct, todayString(), via) });
     },
+  });
+
+  const pathApi = {
+    ...makePathApi(activeTrack),
+    openToughTerms: () => {
+      setToughIds(toughCardIds(srsRef.current[activeTrack], flashcardsData));
+      setCardDeck('tough');
+      setLearnView('cards');
+      setMode('learn');
+    },
+  };
+
+  const setHomePathMode = (pathMode) => {
+    const cur = statsRef.current;
+    saveStats({ ...cur, homePath: { ...(cur.homePath || {}), mode: pathMode } });
   };
 
   const doReset = () => {
@@ -9806,6 +10123,9 @@ function CertStudyApp() {
             seenLog={seenLog}
             stats={stats}
             certPlan={certPlan}
+            speech={{ speakingId, onSpeak: speak, speechSupported }}
+            makePathApi={makePathApi}
+            onSetHomePathMode={setHomePathMode}
             onResume={() => {
               const lv = stats.lastVisited;
               if (!lv) return;

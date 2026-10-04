@@ -288,6 +288,11 @@ bottom:
   goes straight into studying it. The standalone readiness card only
   shows here (an empty path has no hero to fold it into), for whichever
   track you last visited, or AZ-900 by default.
+- A **study path** across your whole cert plan: one trail of the units from
+  every cert you've added (mixed across certs by default, or one cert at a
+  time), with an up-next step that runs right on Home, the next few steps
+  tagged by cert, and a "Go deeper" link into the cert itself. Progress is
+  the same progress each cert's own Path tab shows.
 - A **"Continue where you left off"** button once you've actually
   visited a track this browser (tracked separately from the path, so
   Home is never mistaken for "a place you left off at").
