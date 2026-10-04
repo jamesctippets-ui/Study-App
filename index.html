@@ -4323,6 +4323,17 @@ function HomeView({ tracks, results, seenLog, stats, certPlan, onResume, onSelec
   const overallAvg = masteries.length ? Math.round(masteries.reduce((s, m) => s + m.pct, 0) / masteries.length) : 0;
   const lastVisited = stats.lastVisited;
   const resumeTrack = lastVisited ? tracks.find((t) => t.key === lastVisited.track) : null;
+  // For a Path resume, name the exact step the button will open.
+  const resumeStep = useMemo(() => {
+    if (!resumeTrack || !lastVisited || lastVisited.mode !== 'path') return null;
+    const done = ((stats.path || {})[resumeTrack.key] || {}).done || {};
+    return pathNextStep(buildPathUnits(resumeTrack.key), done);
+  }, [resumeTrack && resumeTrack.key, lastVisited && lastVisited.mode, stats.path]);
+  const resumeViewLabel = lastVisited && lastVisited.mode === 'quiz' && lastVisited.view && PRACTICE_TOOLS.some((t) => t.key === lastVisited.view)
+    ? PRACTICE_TOOLS.find((t) => t.key === lastVisited.view).label
+    : lastVisited && lastVisited.mode === 'learn' && lastVisited.view
+      ? { cards: 'Cards', study: 'Study', sheet: 'Sheet' }[lastVisited.view]
+      : null;
 
   const focusKey = focusTrackKey(certPlan, lastVisited);
   const focusTrack = tracks.find((t) => t.key === focusKey);
@@ -4407,8 +4418,13 @@ function HomeView({ tracks, results, seenLog, stats, certPlan, onResume, onSelec
         >
           <div style={{ fontSize: '11px', color: COLOR.muted, marginBottom: '2px' }}>Continue where you left off</div>
           <div style={{ fontSize: '15px', fontWeight: 600, color: trackAccent(resumeTrack.key) }}>
-            {resumeTrack.label} · {MODE_LABELS[lastVisited.mode] || 'Path'}
+            {resumeTrack.label} · {MODE_LABELS[lastVisited.mode] || 'Path'}{resumeViewLabel ? ` · ${resumeViewLabel}` : ''}
           </div>
+          {resumeStep && (
+            <div style={{ fontSize: '12px', color: COLOR.muted, marginTop: '3px' }}>
+              Next up: Unit {resumeStep.unit.index + 1} · {resumeStep.step.label}
+            </div>
+          )}
         </button>
       )}
 
@@ -7496,7 +7512,7 @@ function PathStepComplete({ unit, step, pct, unitComplete, testedOut, next, onNe
 
 const PATH_NODE_OFFSETS = [0, 24, 40, 24];
 
-function PathView({ track, trackKey, doneMap, results, seenLog, categories, speech, api, toughCount }) {
+function PathView({ track, trackKey, doneMap, results, seenLog, categories, speech, api, toughCount, autoStart, onAutoStarted }) {
   const mod = DATA[trackKey];
   const units = useMemo(() => buildPathUnits(trackKey), [trackKey]);
   const [session, setSession] = useState(null);
@@ -7505,6 +7521,17 @@ function PathView({ track, trackKey, doneMap, results, seenLog, categories, spee
     const first = pathNextStep(units, doneMap);
     return { [first ? first.unit.index : 0]: true };
   });
+
+  // Home's "Continue where you left off" asks for the next unfinished step
+  // to open directly instead of the map. One-shot: the flag is cleared as
+  // soon as it's consumed so later visits to the Path tab show the map.
+  useEffect(() => {
+    if (!autoStart) return;
+    const upNext = units.length ? pathNextStep(units, doneMap) : null;
+    if (upNext) startStep(upNext.unit, upNext.step);
+    if (onAutoStarted) onAutoStarted();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   if (!units.length) {
     return (
@@ -8117,6 +8144,7 @@ function CertStudyApp() {
   const [srs, setSrs] = useState(emptyTrackMap);
   const [certPlan, setCertPlan] = useState(emptyCertPlan);
   const [flipped, setFlipped] = useState(false);
+  const [pathAutoStart, setPathAutoStart] = useState(false);
   // 'all' | 'tough'. In tough mode the deck is the ordered list of card ids
   // (hardest first) captured when you opened it; cards rated 4-5 drop out.
   const [cardDeck, setCardDeck] = useState('all');
@@ -9070,13 +9098,25 @@ function CertStudyApp() {
       window.history.replaceState(null, '', '#/home');
     } else {
       applyHash();
+      // A hash that names nothing real (stale link, hidden track, typo)
+      // lands on Home — tidy the address bar to match.
+      if (parseHash(window.location.hash, validTrackKeys).mode === 'home') {
+        window.history.replaceState(null, '', '#/home');
+      }
     }
     window.addEventListener('hashchange', applyHash);
     return () => window.removeEventListener('hashchange', applyHash);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // The very first run is skipped: at that moment state still holds its
+  // defaults (Home), so writing the hash from it would overwrite the deep
+  // link the mount effect above is in the middle of applying — the cause of
+  // "reload any deep link and land on Home". Once applyHash's setters have
+  // re-rendered, the next run writes the (now matching) hash as usual.
+  const routeWriterReady = useRef(false);
   useEffect(() => {
+    if (!routeWriterReady.current) { routeWriterReady.current = true; return; }
     const hash = routeToHash(mode, activeTrack, learnView, quizView);
     if (window.location.hash !== hash) window.location.hash = hash.replace(/^#/, '');
   }, [mode, activeTrack, learnView, quizView]);
@@ -9148,11 +9188,12 @@ function CertStudyApp() {
   // overwritten.
   useEffect(() => {
     if (syncMode === 'loading' || mode === 'home') return;
+    const view = mode === 'learn' ? learnView : mode === 'quiz' ? quizView : null;
     const current = stats.lastVisited;
-    if (current && current.track === activeTrack && current.mode === mode) return;
-    saveStats({ ...stats, lastVisited: { track: activeTrack, mode } });
+    if (current && current.track === activeTrack && current.mode === mode && (current.view || null) === view) return;
+    saveStats({ ...stats, lastVisited: { track: activeTrack, mode, view } });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeTrack, mode, syncMode]);
+  }, [activeTrack, mode, learnView, quizView, syncMode]);
 
   // Logs one readiness snapshot a day for Home's "current cert" — the
   // only source readinessProjection has to extrapolate from. Only writes
@@ -9766,7 +9807,14 @@ function CertStudyApp() {
             stats={stats}
             certPlan={certPlan}
             onResume={() => {
-              if (stats.lastVisited) { setActiveTrack(stats.lastVisited.track); setMode(stats.lastVisited.mode); }
+              const lv = stats.lastVisited;
+              if (!lv) return;
+              setActiveTrack(lv.track);
+              if (lv.mode === 'learn' && ['cards', 'study', 'sheet'].includes(lv.view)) setLearnView(lv.view);
+              if (lv.mode === 'quiz' && lv.view) setQuizView(lv.view);
+              // Resuming the Path drops straight into the next unfinished step.
+              setPathAutoStart(lv.mode === 'path');
+              setMode(lv.mode);
             }}
             onSelectTrack={(key) => { setActiveTrack(key); setMode('path'); }}
             onAddToPath={addToCertPath}
@@ -9906,6 +9954,8 @@ function CertStudyApp() {
             speech={{ speakingId, onSpeak: speak, speechSupported }}
             api={pathApi}
             toughCount={toughCount}
+            autoStart={pathAutoStart}
+            onAutoStarted={() => setPathAutoStart(false)}
           />
         )}
 

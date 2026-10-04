@@ -12,6 +12,7 @@ function CertStudyApp() {
   const [srs, setSrs] = useState(emptyTrackMap);
   const [certPlan, setCertPlan] = useState(emptyCertPlan);
   const [flipped, setFlipped] = useState(false);
+  const [pathAutoStart, setPathAutoStart] = useState(false);
   // 'all' | 'tough'. In tough mode the deck is the ordered list of card ids
   // (hardest first) captured when you opened it; cards rated 4-5 drop out.
   const [cardDeck, setCardDeck] = useState('all');
@@ -965,13 +966,25 @@ function CertStudyApp() {
       window.history.replaceState(null, '', '#/home');
     } else {
       applyHash();
+      // A hash that names nothing real (stale link, hidden track, typo)
+      // lands on Home — tidy the address bar to match.
+      if (parseHash(window.location.hash, validTrackKeys).mode === 'home') {
+        window.history.replaceState(null, '', '#/home');
+      }
     }
     window.addEventListener('hashchange', applyHash);
     return () => window.removeEventListener('hashchange', applyHash);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // The very first run is skipped: at that moment state still holds its
+  // defaults (Home), so writing the hash from it would overwrite the deep
+  // link the mount effect above is in the middle of applying — the cause of
+  // "reload any deep link and land on Home". Once applyHash's setters have
+  // re-rendered, the next run writes the (now matching) hash as usual.
+  const routeWriterReady = useRef(false);
   useEffect(() => {
+    if (!routeWriterReady.current) { routeWriterReady.current = true; return; }
     const hash = routeToHash(mode, activeTrack, learnView, quizView);
     if (window.location.hash !== hash) window.location.hash = hash.replace(/^#/, '');
   }, [mode, activeTrack, learnView, quizView]);
@@ -1043,11 +1056,12 @@ function CertStudyApp() {
   // overwritten.
   useEffect(() => {
     if (syncMode === 'loading' || mode === 'home') return;
+    const view = mode === 'learn' ? learnView : mode === 'quiz' ? quizView : null;
     const current = stats.lastVisited;
-    if (current && current.track === activeTrack && current.mode === mode) return;
-    saveStats({ ...stats, lastVisited: { track: activeTrack, mode } });
+    if (current && current.track === activeTrack && current.mode === mode && (current.view || null) === view) return;
+    saveStats({ ...stats, lastVisited: { track: activeTrack, mode, view } });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeTrack, mode, syncMode]);
+  }, [activeTrack, mode, learnView, quizView, syncMode]);
 
   // Logs one readiness snapshot a day for Home's "current cert" — the
   // only source readinessProjection has to extrapolate from. Only writes
@@ -1661,7 +1675,14 @@ function CertStudyApp() {
             stats={stats}
             certPlan={certPlan}
             onResume={() => {
-              if (stats.lastVisited) { setActiveTrack(stats.lastVisited.track); setMode(stats.lastVisited.mode); }
+              const lv = stats.lastVisited;
+              if (!lv) return;
+              setActiveTrack(lv.track);
+              if (lv.mode === 'learn' && ['cards', 'study', 'sheet'].includes(lv.view)) setLearnView(lv.view);
+              if (lv.mode === 'quiz' && lv.view) setQuizView(lv.view);
+              // Resuming the Path drops straight into the next unfinished step.
+              setPathAutoStart(lv.mode === 'path');
+              setMode(lv.mode);
             }}
             onSelectTrack={(key) => { setActiveTrack(key); setMode('path'); }}
             onAddToPath={addToCertPath}
@@ -1801,6 +1822,8 @@ function CertStudyApp() {
             speech={{ speakingId, onSpeak: speak, speechSupported }}
             api={pathApi}
             toughCount={toughCount}
+            autoStart={pathAutoStart}
+            onAutoStarted={() => setPathAutoStart(false)}
           />
         )}
 

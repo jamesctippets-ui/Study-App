@@ -1307,14 +1307,59 @@ trading away for shinier but shallower ones.
   the review card, persistence, and the achievements it unlocks) plus an
   audit that every track yields complete, reference-valid units.
 
-  **Not done / known rough edges.** The Home screen's resume button
-  returns to the last mode but doesn't deep-link to the next path step.
-  The path covers lessons only, so Case Studies, CLI Commands, and Verbal
-  stay Practice-only. Header subtitles on 320-360px phones still wrap
-  (deliberately left, flagged earlier in this section). Reloading any
-  deep link lands on Home rather than the linked view — that predates
-  this work (confirmed on the previous build): the first-render hash
-  writer overwrites the incoming hash before the route is applied.
+  **Not done / known rough edges.** The path covers lessons only, so Case
+  Studies, CLI Commands, and Verbal stay Practice-only. Header subtitles on
+  320-360px phones still wrap (deliberately left, flagged earlier in this
+  section). (Two earlier rough edges are fixed — see the next two items.)
+
+- [x] **Deep links survive a reload.** Reloading `#/sc500/practice/compare`
+  (or any route) used to land on Home: on first render the hash-writer
+  effect ran with the default state (Home) and overwrote the incoming hash
+  before the route had been applied. The writer now skips that first run,
+  and a hash that names nothing real (stale link, hidden track, typo) is
+  tidied to `#/home`. Verified for path, reference, practice, and exam
+  routes, reload, back/forward, a bad hash, and no hash.
+- [x] **Home's resume button goes to the exact spot.** `stats.lastVisited`
+  now records the Reference/Practice sub-view as well as the mode, so the
+  button reads e.g. "SC-500 · Practice · Compare" and returns there. For
+  the Path it opens the next unfinished step directly (no map in between)
+  and the card names it ("Next up: Unit 1 · Flashcards"). The auto-start is
+  one-shot, so a later visit to the Path tab shows the map as usual. A
+  fully completed path just opens the map.
+
+- [ ] **Queued (user's idea): a cross-cert custom learning path on Home.**
+  Build one personalized path from the certs the user has selected (their
+  cert plan on Home) and populate it on the Home tab, so a learner can study
+  end to end from Home alone — following the path step by step — and only
+  open an individual cert when they want deeper study. Design notes for
+  when this is built:
+  - *Source*: the active (not completed) certs in `certPlan.order`. Units
+    come from each cert's existing `buildPathUnits`, so there is no new
+    content to write, and the steps reuse the existing runners (read,
+    flashcards, quiz, mini-game, apply, checkpoint, test-out).
+  - *Progress is shared, not duplicated*: completion keeps writing to
+    `stats.path[track].done`, so the Home path and a cert's own Path tab
+    always agree, and Review weak spots and the Tough terms deck keep
+    working per cert.
+  - *Ordering* is the main open design question. Candidates: block by cert
+    in plan order; round-robin interleave units across certs (better
+    retention, a known learning-science win); or weight by exam date and
+    readiness so the cert with the nearest date or lowest readiness gets
+    more of the next steps. Likely a default of interleaved-with-weighting
+    plus a simple switch to "one cert at a time".
+  - *UX*: Home shows the path as a continuous trail with each step tagged by
+    its cert (the track accent colors already exist), an "up next" hero
+    that runs the step in place on Home, and a per-step or per-unit "Go
+    deeper in <cert>" link that opens that cert's Path or Reference at the
+    matching unit. Empty state when no certs are selected points to adding
+    some; adding or removing a cert reflows the path without losing done
+    steps.
+  - *Cross-cert extras to consider*: a combined review-weak-spots and
+    tough-terms entry across all selected certs, and counting steps toward
+    the daily goal ring and streak as they already do.
+  - *Care points*: Home gets long, so the trail should be windowed (a few
+    upcoming steps plus a collapsed "later" list); and exam-date weighting
+    must degrade gracefully when no dates are set.
 
 - [x] **Tough terms flashcard deck.** Each `srs` entry now also stores the
   raw 1-5 rating it was last given (`last`). A card is "tough" when that

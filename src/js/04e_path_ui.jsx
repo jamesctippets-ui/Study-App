@@ -387,7 +387,7 @@ function PathStepComplete({ unit, step, pct, unitComplete, testedOut, next, onNe
 
 const PATH_NODE_OFFSETS = [0, 24, 40, 24];
 
-function PathView({ track, trackKey, doneMap, results, seenLog, categories, speech, api, toughCount }) {
+function PathView({ track, trackKey, doneMap, results, seenLog, categories, speech, api, toughCount, autoStart, onAutoStarted }) {
   const mod = DATA[trackKey];
   const units = useMemo(() => buildPathUnits(trackKey), [trackKey]);
   const [session, setSession] = useState(null);
@@ -396,6 +396,17 @@ function PathView({ track, trackKey, doneMap, results, seenLog, categories, spee
     const first = pathNextStep(units, doneMap);
     return { [first ? first.unit.index : 0]: true };
   });
+
+  // Home's "Continue where you left off" asks for the next unfinished step
+  // to open directly instead of the map. One-shot: the flag is cleared as
+  // soon as it's consumed so later visits to the Path tab show the map.
+  useEffect(() => {
+    if (!autoStart) return;
+    const upNext = units.length ? pathNextStep(units, doneMap) : null;
+    if (upNext) startStep(upNext.unit, upNext.step);
+    if (onAutoStarted) onAutoStarted();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   if (!units.length) {
     return (

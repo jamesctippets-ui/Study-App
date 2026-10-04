@@ -578,6 +578,17 @@ function HomeView({ tracks, results, seenLog, stats, certPlan, onResume, onSelec
   const overallAvg = masteries.length ? Math.round(masteries.reduce((s, m) => s + m.pct, 0) / masteries.length) : 0;
   const lastVisited = stats.lastVisited;
   const resumeTrack = lastVisited ? tracks.find((t) => t.key === lastVisited.track) : null;
+  // For a Path resume, name the exact step the button will open.
+  const resumeStep = useMemo(() => {
+    if (!resumeTrack || !lastVisited || lastVisited.mode !== 'path') return null;
+    const done = ((stats.path || {})[resumeTrack.key] || {}).done || {};
+    return pathNextStep(buildPathUnits(resumeTrack.key), done);
+  }, [resumeTrack && resumeTrack.key, lastVisited && lastVisited.mode, stats.path]);
+  const resumeViewLabel = lastVisited && lastVisited.mode === 'quiz' && lastVisited.view && PRACTICE_TOOLS.some((t) => t.key === lastVisited.view)
+    ? PRACTICE_TOOLS.find((t) => t.key === lastVisited.view).label
+    : lastVisited && lastVisited.mode === 'learn' && lastVisited.view
+      ? { cards: 'Cards', study: 'Study', sheet: 'Sheet' }[lastVisited.view]
+      : null;
 
   const focusKey = focusTrackKey(certPlan, lastVisited);
   const focusTrack = tracks.find((t) => t.key === focusKey);
@@ -662,8 +673,13 @@ function HomeView({ tracks, results, seenLog, stats, certPlan, onResume, onSelec
         >
           <div style={{ fontSize: '11px', color: COLOR.muted, marginBottom: '2px' }}>Continue where you left off</div>
           <div style={{ fontSize: '15px', fontWeight: 600, color: trackAccent(resumeTrack.key) }}>
-            {resumeTrack.label} · {MODE_LABELS[lastVisited.mode] || 'Path'}
+            {resumeTrack.label} · {MODE_LABELS[lastVisited.mode] || 'Path'}{resumeViewLabel ? ` · ${resumeViewLabel}` : ''}
           </div>
+          {resumeStep && (
+            <div style={{ fontSize: '12px', color: COLOR.muted, marginTop: '3px' }}>
+              Next up: Unit {resumeStep.unit.index + 1} · {resumeStep.step.label}
+            </div>
+          )}
         </button>
       )}
 
