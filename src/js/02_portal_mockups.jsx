@@ -712,6 +712,60 @@ const REAL_PORTAL_SCREENSHOTS = {
     sourceUrl: 'https://learn.microsoft.com/en-us/microsoft-365/admin/manage/agent-registry',
     product: 'Microsoft 365 admin center',
   },
+  // SC-500 screenshots — sourced from MicrosoftDocs/azure-docs (identity ABAC,
+  // Application Gateway WAF), MicrosoftDocs/azure-ai-docs (AI services
+  // networking) and MicrosoftDocs/azure-monitor-docs (Log Analytics access
+  // mode, Activity log). Each of those repos' own LICENSE file is
+  // "Attribution 4.0 International" (CC BY 4.0) for content, confirmed via
+  // https://raw.githubusercontent.com/MicrosoftDocs/<repo>/main/LICENSE.
+  rbacConditionCode: {
+    src: 'images/azuresec/rbac-condition-code-editor.png',
+    alt: 'Real Azure Portal screenshot of the Add role assignment condition page showing a Storage Blob Data Reader condition in the code editor',
+    description: "The Add role assignment condition page for a Storage Blob Data Reader role assignment with the Editor type set to Code. The condition text has two OR-ed parts: the first excludes the blob read action when the sub-operation is Blob.List, and the second compares a blob index tag named Project (the key is marked case-sensitive) using StringEqualsIgnoreCase against the value 'Cascade'.",
+    sourceLabel: 'Microsoft Learn: Add or edit Azure role assignment conditions using the Azure portal',
+    sourceUrl: 'https://learn.microsoft.com/en-us/azure/role-based-access-control/conditions-role-assignments-portal',
+    product: 'Azure portal',
+  },
+  appGatewayWafConfigure: {
+    src: 'images/azuresec/app-gateway-waf-configure.png',
+    alt: 'Real Azure Portal screenshot of the Web application firewall Configure tab on an Application Gateway',
+    description: "The Web application firewall blade of an Application Gateway named gw, on its Configure tab: the tier toggle (Standard V2 or WAF V2), the Firewall status toggle, the Firewall mode toggle (Detection or Prevention), an empty Exclusions table with Field, Operator and Selector columns, and the Global parameters for request body inspection, maximum request body size and file upload limit.",
+    sourceLabel: 'Microsoft Learn: Create Web Application Firewall policies for Application Gateway',
+    sourceUrl: 'https://learn.microsoft.com/en-us/azure/web-application-firewall/ag/create-waf-policy-ag',
+    product: 'Azure portal',
+  },
+  aiServicesNetworking: {
+    src: 'images/azuresec/ai-services-networking.png',
+    alt: 'Real Azure Portal screenshot of the Networking page for an Azure AI services resource, Firewalls and virtual networks tab',
+    description: "The Networking page (Firewalls and virtual networks tab) of an Azure AI services resource named contoso-custom-vision. The Allow access from selector offers All networks, Selected Networks and Private Endpoints, or Disabled; below it are a Virtual networks table, a Firewall section with an address range box, and a second tab for Private endpoint connections.",
+    sourceLabel: 'Microsoft Learn: Configure virtual networks for Foundry Tools',
+    sourceUrl: 'https://learn.microsoft.com/en-us/azure/ai-services/cognitive-services-virtual-networks',
+    product: 'Azure portal',
+  },
+  aiServicesNetworkAcls: {
+    src: 'images/azuresec/ai-services-network-acls-json.png',
+    alt: 'Real Azure Portal screenshot of the Resource JSON pane showing a networkAcls block',
+    description: "A fragment of an Azure resource's Resource JSON pane showing its networkAcls property, a block of four settings that together express the resource's network firewall configuration.",
+    sourceLabel: 'Microsoft Learn: Configure virtual networks for Foundry Tools',
+    sourceUrl: 'https://learn.microsoft.com/en-us/azure/ai-services/cognitive-services-virtual-networks',
+    product: 'Azure portal',
+  },
+  logAnalyticsAccessMode: {
+    src: 'images/azuresec/log-analytics-access-control-mode.png',
+    alt: 'Real Azure Portal screenshot of a Log Analytics workspace Overview page with the Access control mode field highlighted',
+    description: "The Overview page of a Log Analytics workspace named CH1-LA. The Essentials section lists resource group, status, location, subscription, workspace name and ID, pricing tier, and an Access control mode field (highlighted with a red box). The left menu includes Access control (IAM), Tables, Data export and Network isolation.",
+    sourceLabel: 'Microsoft Learn: Manage access to Log Analytics workspaces',
+    sourceUrl: 'https://learn.microsoft.com/en-us/azure/azure-monitor/logs/manage-access',
+    product: 'Azure portal',
+  },
+  monitorActivityLog: {
+    src: 'images/azuresec/monitor-activity-log.png',
+    alt: 'Real Azure Portal screenshot of the Azure Monitor Activity log list with filters and operation rows',
+    description: "The Monitor - Activity log page: a toolbar (Edit columns, Refresh, Export to Event Hub, Download as CSV, Logs, Pin current filters, Reset filters), filter chips for management group, subscription, timespan and event severity, and a table of operations with Status, Time, Subscription and Event initiated by columns. The Settings section of the left menu includes Diagnostics settings.",
+    sourceLabel: 'Microsoft Learn: Activity log in Azure Monitor',
+    sourceUrl: 'https://learn.microsoft.com/en-us/azure/azure-monitor/fundamentals/activity-log',
+    product: 'Azure portal',
+  },
 };
 
 // `hideDescription` is set by quiz/exam question views — the description
