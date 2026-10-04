@@ -597,7 +597,9 @@ function HomeView({ tracks, results, seenLog, stats, certPlan, speech, srs, make
   doneByTrack[BRIDGE_DONE_KEY] = ((stats.path || {})[BRIDGE_DONE_KEY] || {}).done || {};
   const homePathMode = (stats.homePath && stats.homePath.mode) || 'core';
   const homePathOrder = (stats.homePath && stats.homePath.order) || 'plan';
-  const studyKeys = homePathOrder === 'smart' ? smartCertOrder(pathKeys, certPlan, results, seenLog) : pathKeys;
+  const studyKeys = homePathOrder === 'smart'
+    ? smartCertOrder(pathKeys, certPlan, results, seenLog, certsMidUnit(unitsByTrack, pathKeys, doneByTrack))
+    : pathKeys;
   const homeRemaining = homePathRemaining(unitsByTrack, studyKeys, doneByTrack, homePathMode);
   const homeProgress = homePathProgress(unitsByTrack, pathKeys, doneByTrack);
   const homeOptional = homePathOptionalProgress(unitsByTrack, pathKeys, doneByTrack);
@@ -608,6 +610,7 @@ function HomeView({ tracks, results, seenLog, stats, certPlan, speech, srs, make
   const weakTotal = crossCertWeakQuestions(pathKeys, results, seenLog).total;
   const toughTotal = crossCertToughCards(pathKeys, srs).total;
   const gamesTotal = crossCertWeakGames(pathKeys, results).total;
+  const casesTotal = crossCertWeakCases(pathKeys, results).total;
   const [homeRun, setHomeRun] = useState(null);
   const startHomeRun = (e) => setHomeRun({ kind: 'step', trackKey: e.trackKey, doneKey: e.doneKey, unit: e.unit, step: e.step, nonce: Date.now() });
   const skipHomeStep = (e) => makePathApi(e.doneKey || e.trackKey).skipStep(e.step.id);
@@ -642,6 +645,8 @@ function HomeView({ tracks, results, seenLog, stats, certPlan, speech, srs, make
         makeApi={makePathApi}
         onStart={startHomeRun}
         onExit={() => setHomeRun(null)}
+        onOpenCert={onSelectTrack}
+        onAddToPlan={onAddToPath}
       />
     );
   }
@@ -680,6 +685,7 @@ function HomeView({ tracks, results, seenLog, stats, certPlan, speech, srs, make
           weakTotal={weakTotal}
           toughTotal={toughTotal}
           gamesTotal={gamesTotal}
+          casesTotal={casesTotal}
           onStartReview={(kind) => setHomeRun({ kind, nonce: Date.now() })}
         />
       )}

@@ -834,30 +834,47 @@ function normalizeHomePath(raw) {
   };
 }
 
-// The order certs are studied in under the 'smart' setting. Dated certs with
-// an exam still ahead come first, soonest first. Everything else follows,
-// lowest readiness first — but readiness is bucketed in 20-point steps (and
-// ties fall back to plan order) so the order doesn't flip back and forth as a
-// score creeps up while you study. An exam date already past counts as no
-// date: it is not clear whether the exam happened.
-function smartCertOrder(trackKeys, certPlan, results, seenLog) {
+// The order certs are studied in under the 'smart' setting: a blend of how
+// close the exam is and how weak the cert still is, as one priority number
+// (higher goes first). Urgency decays smoothly with days to the exam — 100 on
+// the day, about half at two weeks, a few points by two months — and weakness
+// is 100 minus readiness; urgency counts 60% and weakness 40%, so a near exam
+// outranks a weak cert with no date while a far-off exam barely moves things.
+// A cert with a unit half done gets a small bonus (finish what you started)
+// so the order doesn't flip mid-unit as readiness creeps up. A past exam date
+// counts as no date: it is not clear whether the exam happened. Ties fall
+// back to plan order.
+const SMART_URGENCY_DAYS = 21;
+const SMART_URGENCY_WEIGHT = 0.6;
+const SMART_WEAKNESS_WEIGHT = 0.4;
+const SMART_IN_PROGRESS_BONUS = 10;
+
+function smartCertPriority(days, readinessScore, inProgress) {
+  const urgency = days !== null && days >= 0 ? 100 * Math.exp(-days / SMART_URGENCY_DAYS) : 0;
+  const weakness = 100 - readinessScore;
+  return urgency * SMART_URGENCY_WEIGHT + weakness * SMART_WEAKNESS_WEIGHT + (inProgress ? SMART_IN_PROGRESS_BONUS : 0);
+}
+
+function smartCertOrder(trackKeys, certPlan, results, seenLog, inProgressKeys) {
   const today = todayString();
-  const rows = trackKeys.map((key, i) => {
-    const sched = certPlan.scheduled[key];
-    const days = sched ? daysBetween(today, sched) : null;
-    return {
-      key, i,
-      upcoming: days !== null && days >= 0 ? days : null,
-      bucket: Math.floor(examReadiness(key, results, seenLog).score / 20),
-    };
-  });
-  rows.sort((a, b) => {
-    if (a.upcoming !== null && b.upcoming !== null) return a.upcoming - b.upcoming || a.i - b.i;
-    if (a.upcoming !== null) return -1;
-    if (b.upcoming !== null) return 1;
-    return a.bucket - b.bucket || a.i - b.i;
-  });
-  return rows.map((r) => r.key);
+  const mid = new Set(inProgressKeys || []);
+  return trackKeys
+    .map((key, i) => {
+      const sched = certPlan.scheduled[key];
+      const days = sched ? daysBetween(today, sched) : null;
+      return { key, i, priority: smartCertPriority(days, examReadiness(key, results, seenLog).score, mid.has(key)) };
+    })
+    .sort((a, b) => b.priority - a.priority || a.i - b.i)
+    .map((r) => r.key);
+}
+
+// Certs with at least one unit that has some, but not all, of its core steps
+// done — the ones with something in progress.
+function certsMidUnit(unitsByTrack, trackKeys, doneByTrack) {
+  return trackKeys.filter((key) => (unitsByTrack[key] || []).some((u) => {
+    const p = pathUnitProgress(u, doneByTrack[key] || {});
+    return p.done > 0 && !p.complete;
+  }));
 }
 
 // The optional sections that can follow `unit` of cert `trackKey`. `anchor`
@@ -1036,6 +1053,24 @@ function missedGamesByTrack(trackKeys, results) {
       .filter(({ g }) => trackResults[g.id] === 'incorrect')
       .map(({ kind, g }) => ({ trackKey: key, item: g, kind }));
   });
+}
+
+// Case studies where you last missed at least one question. Their questions
+// lean on a shared scenario, so a round shows the scenario and only the
+// questions you missed from it.
+const CROSS_REVIEW_CASES = 1;
+function missedCasesByTrack(trackKeys, results) {
+  return trackKeys.map((key) => {
+    const trackResults = results[key] || {};
+    return (DATA[key].caseStudies || [])
+      .map((cs) => ({ cs, missed: cs.questions.filter((q) => trackResults[q.id] === 'incorrect') }))
+      .filter((c) => c.missed.length)
+      .map((c) => ({ trackKey: key, item: c }));
+  });
+}
+function crossCertWeakCases(trackKeys, results, limit) {
+  const lists = missedCasesByTrack(trackKeys, results);
+  return { picks: roundRobin(lists, limit || CROSS_REVIEW_CASES), total: lists.reduce((n, l) => n + l.length, 0) };
 }
 
 const CROSS_REVIEW_GAMES = 3;

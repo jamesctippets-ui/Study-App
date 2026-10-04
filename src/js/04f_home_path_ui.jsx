@@ -9,10 +9,10 @@
 
 const HOME_PATH_UPCOMING_MAX = 40;
 const HOME_PATH_MODE_LABELS = { core: 'Just my certs', extended: 'Extended learning' };
-const HOME_PATH_ORDER_LABELS = { plan: 'My plan order', smart: 'Exam date, then weakest' };
+const HOME_PATH_ORDER_LABELS = { plan: 'My plan order', smart: 'Exam date + weakest' };
 const HOME_PATH_ORDER_HINTS = {
   plan: 'Certs run in the order set in your cert path.',
-  smart: 'Certs with an upcoming exam go first (soonest first); the rest go weakest first.',
+  smart: 'Blends how close each exam is with how weak the cert still is, and finishes a unit you\'ve started before switching.',
 };
 const HOME_PATH_MODE_HINTS = {
   core: 'Only the core steps of the certs in your plan.',
@@ -89,7 +89,7 @@ function PathDeepStep({ cards, questions, categories, flashcardsData, speech, ap
 
 // Cross-cert bridge: the shared idea, how each cert frames it (certs in the
 // learner's plan are flagged), the cross-cert trap, then a short check.
-function PathBridgeStep({ bridge, questions, planKeys, api, onRetry, onDone }) {
+function PathBridgeStep({ bridge, questions, planKeys, api, onRetry, onDone, onOpenCert, onAddToPlan }) {
   const [phase, setPhase] = useState('read');
   if (!bridge) { onDone(null); return null; }
   if (phase === 'quiz') {
@@ -125,6 +125,20 @@ function PathBridgeStep({ bridge, questions, planKeys, api, onRetry, onDone }) {
               {planKeys.includes(a.track) && <span style={{ fontSize: '9.5px', color: COLOR.muted }}>in your plan</span>}
             </div>
             <div style={{ fontSize: '12.5px', lineHeight: 1.55 }}>{a.angle}</div>
+            {!planKeys.includes(a.track) && (onOpenCert || onAddToPlan) && (
+              <div className="flex gap-3" style={{ marginTop: '6px' }}>
+                {onAddToPlan && (
+                  <button onClick={() => onAddToPlan(a.track)} className="btn-flat" style={{ background: 'transparent', color: accent, fontSize: '11px', fontWeight: 600, padding: 0 }}>
+                    Add {t ? t.label : a.track} to my plan
+                  </button>
+                )}
+                {onOpenCert && (
+                  <button onClick={() => onOpenCert(a.track)} className="btn-flat" style={{ background: 'transparent', color: COLOR.muted, fontSize: '11px', fontWeight: 600, padding: 0 }}>
+                    Take a look ›
+                  </button>
+                )}
+              </div>
+            )}
           </div>
         );
       })}
@@ -326,7 +340,7 @@ function HomeStudyPath({ tracks, remaining, progress, optionalProgress, mode, on
 
 // A step running on Home (and the "step complete" screen after it). Takes
 // over the Home tab while active, like a cert's own Path does on its tab.
-function HomePathRun({ run, tracks, unitsByTrack, trackKeys, doneByTrack, mode, results, seenLog, speech, makeApi, onStart, onExit }) {
+function HomePathRun({ run, tracks, unitsByTrack, trackKeys, doneByTrack, mode, results, seenLog, speech, makeApi, onStart, onExit, onOpenCert, onAddToPlan }) {
   const [completion, setCompletion] = useState(null);
   const track = tracks.find((t) => t.key === run.trackKey);
   const api = makeApi(run.trackKey);
@@ -387,6 +401,8 @@ function HomePathRun({ run, tracks, unitsByTrack, trackKeys, doneByTrack, mode, 
       exitLabel="‹ Back to Home"
       certLabel={track ? track.label : null}
       planKeys={trackKeys}
+      onOpenCert={onOpenCert}
+      onAddToPlan={onAddToPlan}
     />
   );
 }
@@ -397,10 +413,10 @@ function HomePathRun({ run, tracks, unitsByTrack, trackKeys, doneByTrack, mode, 
 // you last missed, flashcards you rated OK or lower, and Mad Libs / Sequence /
 // Compare items you got wrong — or, when more than one has something waiting,
 // a single mixed round of all of them.
-const REVIEW_MIXED = { weak: 6, tough: 8, games: 2 };
+const REVIEW_MIXED = { weak: 6, tough: 8, games: 2, cases: 1 };
 
-function HomeReviewCard({ weakTotal, toughTotal, gamesTotal, onStartReview }) {
-  const available = [weakTotal, toughTotal, gamesTotal].filter((n) => n > 0).length;
+function HomeReviewCard({ weakTotal, toughTotal, gamesTotal, casesTotal, onStartReview }) {
+  const available = [weakTotal, toughTotal, gamesTotal, casesTotal].filter((n) => n > 0).length;
   if (!available) return null;
   const row = (label, count, sub, kind, accent) => (
     <button
@@ -427,13 +443,14 @@ function HomeReviewCard({ weakTotal, toughTotal, gamesTotal, onStartReview }) {
         >
           <span>
             Review everything due
-            <span style={{ display: 'block', fontSize: '11px', fontWeight: 500, opacity: 0.85 }}>A short round of questions, flashcards, and games</span>
+            <span style={{ display: 'block', fontSize: '11px', fontWeight: 500, opacity: 0.85 }}>A short round of questions, flashcards, games, and a case study</span>
           </span>
           <span style={{ fontSize: '16px' }}>›</span>
         </button>
       )}
       {row('Weak spots', weakTotal, `${weakTotal} missed question${weakTotal === 1 ? '' : 's'}${weakTotal > CROSS_REVIEW_QUESTIONS ? ` · ${CROSS_REVIEW_QUESTIONS} per round` : ''}`, 'weak', COLOR.red)}
       {row('Tough terms', toughTotal, `${toughTotal} flashcard${toughTotal === 1 ? '' : 's'} rated OK or lower${toughTotal > CROSS_REVIEW_CARDS ? ` · ${CROSS_REVIEW_CARDS} per round` : ''}`, 'tough', COLOR.gold)}
+      {casesTotal > 0 && row('Missed case studies', casesTotal, `${casesTotal} case stud${casesTotal === 1 ? 'y' : 'ies'} with a missed question · one per round`, 'cases', COLOR.primary)}
       {gamesTotal > 0 && row('Missed games', gamesTotal, `${gamesTotal} Mad Lib / Sequence / Compare item${gamesTotal === 1 ? '' : 's'} to redo${gamesTotal > CROSS_REVIEW_GAMES ? ` · ${CROSS_REVIEW_GAMES} per round` : ''}`, 'games', COLOR.primary)}
     </div>
   );
@@ -449,7 +466,9 @@ function buildReviewPhase(phase, trackKeys, results, seenLog, srs, makeApi, limi
     ? crossCertWeakQuestions(trackKeys, results, seenLog, limit).picks
     : phase === 'tough'
       ? crossCertToughCards(trackKeys, srs, limit).picks
-      : crossCertWeakGames(trackKeys, results, limit).picks;
+      : phase === 'cases'
+        ? crossCertWeakCases(trackKeys, results, limit).picks
+        : crossCertWeakGames(trackKeys, results, limit).picks;
   const used = [...new Set(picks.map((p) => p.trackKey))];
   const categories = [];
   const flashcards = [];
@@ -459,6 +478,13 @@ function buildReviewPhase(phase, trackKeys, results, seenLog, srs, makeApi, limi
     DATA[key].flashcards.forEach((f) => flashcards.push(f));
   });
   const items = picks.map(({ trackKey, item, kind }) => {
+    if (phase === 'cases') {
+      const cat = `${trackKey}:${item.cs.cat}`;
+      return {
+        title: item.cs.title, scenario: item.cs.scenario, cat,
+        questions: item.missed.map((q) => prepareQuestion({ ...q, id: reviewItemId(trackKey, q.id), cat })),
+      };
+    }
     const wrapped = { ...item, id: reviewItemId(trackKey, item.id), cat: `${trackKey}:${item.cat}` };
     if (phase === 'weak') return prepareQuestion(wrapped);
     if (phase === 'games') return { kind, item: wrapped };
@@ -472,14 +498,14 @@ function buildReviewPhase(phase, trackKeys, results, seenLog, srs, makeApi, limi
 
 function buildReviewRound(kind, trackKeys, results, seenLog, srs, makeApi) {
   const nonce = Date.now() + Math.random();
-  const order = kind === 'mixed' ? ['weak', 'tough', 'games'] : [kind];
+  const order = kind === 'mixed' ? ['weak', 'tough', 'games', 'cases'] : [kind];
   const phases = order
     .map((ph) => buildReviewPhase(ph, trackKeys, results, seenLog, srs, makeApi, kind === 'mixed' ? REVIEW_MIXED[ph] : undefined))
     .filter((p) => p.items.length);
   return { phases, nonce };
 }
 
-const REVIEW_PHASE_LABELS = { weak: 'Weak spots', tough: 'Tough terms', games: 'Missed games' };
+const REVIEW_PHASE_LABELS = { weak: 'Weak spots', tough: 'Tough terms', games: 'Missed games', cases: 'Missed case studies' };
 
 // Runs one round of a cross-cert review: one phase for the single reviews,
 // up to three in a row for the mixed round. Each answer, rating, or game
@@ -544,6 +570,31 @@ function HomeReviewRun({ kind, trackKeys, results, seenLog, srs, speech, makeApi
         speech={speech}
         onRate={(id, q) => { const { id: orig } = splitReviewId(id); apiFor(id).rateCard(orig, q); }}
         onDone={advance}
+      />
+    );
+  } else if (phase.phase === 'cases') {
+    const cs = phase.items[gameIndex];
+    const lastItem = gameIndex + 1 >= phase.items.length;
+    const catLabel = (phase.categories.find((c) => c.key === cs.cat) || {}).label;
+    body = (
+      <PathQuizStep
+        key={round.nonce + 'c' + gameIndex}
+        questions={cs.questions}
+        passPct={0}
+        label="Case study"
+        categories={phase.categories}
+        flashcardsData={phase.flashcards}
+        header={(
+          <div style={{ boxShadow: SHADOW.card, background: COLOR.surfaceRaised, border: `1px solid ${COLOR.border}`, borderRadius: '14px', padding: '14px 16px', marginBottom: '14px' }}>
+            <div style={{ fontSize: '10.5px', color: COLOR.muted, textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: '4px' }}>{catLabel} · {cs.title}</div>
+            <div style={{ fontSize: '13.5px', lineHeight: 1.55 }}>{cs.scenario}</div>
+          </div>
+        )}
+        onAnswer={(id, ok) => { const { id: orig } = splitReviewId(id); apiFor(id).recordResult(orig, ok ? 'correct' : 'incorrect'); }}
+        onFinished={(c, t) => makeApi(trackKeys[0]).finishQuiz(c, t)}
+        onPass={() => (lastItem ? advance(null) : setGameIndex(gameIndex + 1))}
+        onRetry={retry}
+        continueLabel={lastItem && phaseIndex + 1 >= round.phases.length ? 'Finish ›' : 'Next ›'}
       />
     );
   } else {

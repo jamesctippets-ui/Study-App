@@ -139,7 +139,7 @@ function PathCardsStep({ cards, categories, flashcardsData, speech, onRate, onDo
   );
 }
 
-function PathQuizStep({ questions, passPct, label, categories, flashcardsData, onAnswer, onFinished, onPass, onRetry, continueLabel }) {
+function PathQuizStep({ questions, passPct, label, categories, flashcardsData, onAnswer, onFinished, onPass, onRetry, continueLabel, header }) {
   const [index, setIndex] = useState(0);
   const [selected, setSelected] = useState(null);
   const [msPending, setMsPending] = useState([]);
@@ -221,6 +221,8 @@ function PathQuizStep({ questions, passPct, label, categories, flashcardsData, o
   }
 
   return (
+    <div>
+    {header}
     <QuestionView
       q={q}
       selected={selected}
@@ -235,6 +237,7 @@ function PathQuizStep({ questions, passPct, label, categories, flashcardsData, o
       onSubmitMs={submitMs}
       flashcardsData={flashcardsData}
     />
+    </div>
   );
 }
 
@@ -440,7 +443,7 @@ function buildStepPayload(trackKey, units, results, seenLog, api, unit, step) {
 // Home study path, so a step behaves identically in both. `onDone(pct)` is
 // called when the step finishes and the caller decides what that means
 // (recording it, showing the completion screen); `onExit` backs out.
-function PathStepRunner({ trackKey, units, unit, step, results, seenLog, categories, speech, api, onDone, onExit, exitLabel, certLabel, planKeys }) {
+function PathStepRunner({ trackKey, units, unit, step, results, seenLog, categories, speech, api, onDone, onExit, exitLabel, certLabel, planKeys, onOpenCert, onAddToPlan }) {
   const mod = DATA[trackKey];
   const [run, setRun] = useState(() => ({ payload: buildStepPayload(trackKey, units, results, seenLog, api, unit, step), nonce: 0 }));
   const { payload, nonce } = run;
@@ -469,7 +472,7 @@ function PathStepRunner({ trackKey, units, unit, step, results, seenLog, categor
   } else if (step.kind === 'deep') {
     runner = <PathDeepStep key={runnerKey} cards={payload.cards} questions={payload.questions} speech={speech} api={api} onRetry={retry} onDone={onDone} {...common} />;
   } else if (step.kind === 'bridge') {
-    runner = <PathBridgeStep key={runnerKey} bridge={payload.bridge} questions={payload.questions} planKeys={planKeys || []} api={api} onRetry={retry} onDone={onDone} />;
+    runner = <PathBridgeStep key={runnerKey} bridge={payload.bridge} questions={payload.questions} planKeys={planKeys || []} api={api} onRetry={retry} onDone={onDone} onOpenCert={onOpenCert} onAddToPlan={onAddToPlan} />;
   } else if (step.kind === 'apply') {
     runner = <PathApplyStep key={runnerKey} unit={unit} categories={categories} onDone={onDone} />;
   } else if (step.kind === 'game') {
