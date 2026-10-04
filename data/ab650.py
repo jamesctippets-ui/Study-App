@@ -922,7 +922,7 @@ QUESTIONS = [
             'Message trace in the Exchange admin center',
         ],
         'correct': 0,
-        'explanation': 'Audit (Premium), which Microsoft 365 E5 includes, records the mailbox-access forensic events (such as MailItemsAccessed) that identify individual items that were read, and its default one-year retention still covers activity from nine months ago. Audit (Standard) retains records for 180 days by default, so nine-month-old activity has already aged out. Threat Explorer shows email threat detections and clicks over a recent window, not mailbox reads. Message trace follows delivery through the transport pipeline and shows nothing about what was opened after delivery.',
+        'explanation': 'The MailItemsAccessed event that identifies individual items that were read is now generated for Audit (Standard) as well, so the deciding factor is retention: Audit (Premium), which Microsoft 365 E5 includes, keeps records for one year by default and still covers activity from nine months ago. Audit (Standard) retains records for 180 days by default, so nine-month-old activity has already aged out. Threat Explorer shows email threat detections and clicks over a recent window, not mailbox reads. Message trace follows delivery through the transport pipeline and shows nothing about what was opened after delivery.',
     },
     {
         'id': 'q18',
@@ -1090,7 +1090,7 @@ QUESTIONS = [
             'A Purview DLP policy with the Microsoft 365 Copilot location',
         ],
         'correct': 0,
-        'explanation': "Restricted SharePoint Search keeps sites that are not on the allowed list out of organization-wide search and Copilot grounding while leaving every permission untouched, which is the only option that satisfies the 'no permission changes yet' constraint. Restricted access control and a private-site label both change who can access the sites, which is the disruptive step the team is deferring. A Copilot DLP policy acts on sensitive content in Copilot interactions; it does not hide whole sites from search.",
+        'explanation': "Restricted SharePoint Search (being retired; successor: Restricted Content Discovery) keeps sites that are not on the allowed list out of organization-wide search and Copilot grounding while leaving every permission untouched, which is the only option that satisfies the 'no permission changes yet' constraint. Restricted access control and a private-site label both change who can access the sites, which is the disruptive step the team is deferring. A Copilot DLP policy acts on sensitive content in Copilot interactions; it does not hide whole sites from search.",
     },
     {
         'id': 'q27',
@@ -1118,7 +1118,7 @@ QUESTIONS = [
             'A retention label with a short deletion schedule applied to the labeled files',
         ],
         'correct': 0,
-        'explanation': 'A DLP policy scoped to the Microsoft 365 Copilot location can stop Copilot from processing content that carries the label, leaving file access and the label itself unchanged. Removing the Extract right through label encryption also keeps Copilot from using the content, but it changes the label to encrypt files, which Legal ruled out. Restricted SharePoint Search works at the site level, would hide unlabeled content too, and has no effect on files recently opened by or shared directly with the user. A retention label governs deletion, not Copilot behavior.',
+        'explanation': 'A DLP policy scoped to the Microsoft 365 Copilot location can stop Copilot from processing content that carries the label, leaving file access and the label itself unchanged. Removing the Extract right through label encryption also keeps Copilot from using the content, but it changes the label to encrypt files, which Legal ruled out. Restricted SharePoint Search (being retired; successor: Restricted Content Discovery) works at the site level, would hide unlabeled content too, and has no effect on files recently opened by or shared directly with the user. A retention label governs deletion, not Copilot behavior.',
     },
     {
         'id': 'q29',
@@ -1174,7 +1174,7 @@ QUESTIONS = [
             'Restricted SharePoint Search with the wiki added to the allowed list',
         ],
         'correct': 0,
-        'explanation': "A Graph connector indexes the wiki into Microsoft Graph and the Semantic Index so Microsoft 365 Copilot can ground on it, and mapping the connector's ACL to the source is what keeps results permission-trimmed. A Copilot Studio agent with the wiki as a knowledge source would let that one agent answer wiki questions, but it does not make the content available to Microsoft 365 Copilot generally. A nightly export readable by everyone discards the wiki's access control list, creating oversharing. Restricted SharePoint Search only governs SharePoint sites and cannot include an external system.",
+        'explanation': "A Graph connector indexes the wiki into Microsoft Graph and the Semantic Index so Microsoft 365 Copilot can ground on it, and mapping the connector's ACL to the source is what keeps results permission-trimmed. A Copilot Studio agent with the wiki as a knowledge source would let that one agent answer wiki questions, but it does not make the content available to Microsoft 365 Copilot generally. A nightly export readable by everyone discards the wiki's access control list, creating oversharing. Restricted SharePoint Search (being retired; successor: Restricted Content Discovery) only governs SharePoint sites and cannot include an external system.",
     },
     {
         'id': 'q33',
@@ -1196,13 +1196,13 @@ QUESTIONS = [
         'type': 'ms',
         'question': 'A marketing employee built a Copilot Studio agent that calls an unapproved file-storage connector and published it to Microsoft Teams, where other users can now find it. You must stop users from running the agent now and prevent any future agent from combining that connector with Microsoft 365 data, without affecting other agents. Which two actions should you take? (Choose two.)',
         'options': [
-            'Block the agent in Integrated apps in the Microsoft 365 admin center so users can no longer run it',
+            'Block the agent in the Agents area of the Copilot Control System in the Microsoft 365 admin center so users can no longer run it',
             'Create a Power Platform DLP policy that places the connector in the Blocked group for the environment',
             'Delete the Power Platform environment that hosts the agent so the agent can no longer be invoked',
-            'Turn off web content grounding on the Copilot settings page in the Microsoft 365 admin center',
+            'Turn off the Allow web search in Copilot policy in the Cloud Policy service',
         ],
         'correct': [0, 1],
-        'explanation': "Blocking the agent in Integrated apps removes it from users immediately, and a Power Platform DLP policy that classifies the connector as Blocked prevents any agent or flow in that environment from using it going forward. Deleting the environment would also remove every other agent and flow in it, violating the 'without affecting other agents' constraint. Web content grounding controls whether Microsoft 365 Copilot can use public web results and has nothing to do with connectors.",
+        'explanation': "Blocking the agent in the Agents area of the Copilot Control System (which grew out of Integrated apps) removes it from users immediately, and a Power Platform DLP policy that classifies the connector as Blocked prevents any agent or flow in that environment from using it going forward. Deleting the environment would also remove every other agent and flow in it, violating the 'without affecting other agents' constraint. The Allow web search in Copilot policy controls whether Microsoft 365 Copilot can use public web results and has nothing to do with connectors.",
     },
     {
         'id': 'tf8',
@@ -1226,7 +1226,7 @@ QUESTIONS = [
         'type': 'tf',
         'question': 'With Restricted SharePoint Search enabled, a user can still have Microsoft 365 Copilot reference a file from a site that is not on the allowed list if that file was shared directly with the user or the user recently opened it.',
         'answer': True,
-        'explanation': 'Restricted SharePoint Search limits organization-wide search and Copilot grounding to the allowed sites, but it deliberately keeps content a user owns, has recently accessed, or has had shared directly with them discoverable, since the user already works with it. It is a visibility stopgap for broadly shared sites, not a per-file access control.',
+        'explanation': 'Restricted SharePoint Search (being retired; successor: Restricted Content Discovery) limits organization-wide search and Copilot grounding to the allowed sites, but it deliberately keeps content a user owns, has recently accessed, or has had shared directly with them discoverable, since the user already works with it. It is a visibility stopgap for broadly shared sites, not a per-file access control.',
     },
     {
         'id': 'tf11',
@@ -1304,7 +1304,7 @@ QUESTIONS = [
             'A historical message trace can substitute for the audit records, because it shows which messages were opened',
         ],
         'correct': [0, 1],
-        'explanation': 'Audit (Standard) retains records for 180 days by default, so eight-month-old activity is gone, whereas Audit (Premium) retains records for a year by default and adds the mailbox-access forensic events (such as MailItemsAccessed) this investigation depends on. Licensing cannot retroactively recreate records that have expired or were never generated. Message trace reports delivery through the transport pipeline over a limited window; it never records which items a signed-in user opened.',
+        'explanation': 'Audit (Standard) retains records for 180 days by default, so eight-month-old activity is gone, whereas Audit (Premium) retains records for a year by default. The mailbox-access event this investigation depends on (MailItemsAccessed) is now generated for Audit (Standard) too, so retention is what separates the two. Licensing cannot retroactively recreate records that have expired or were never generated. Message trace reports delivery through the transport pipeline over a limited window; it never records which items a signed-in user opened.',
     },
     {
         'id': 'msq6',
@@ -1332,7 +1332,7 @@ QUESTIONS = [
             'Disabling the Semantic Index for the HR site would have prevented the exposure',
         ],
         'correct': [0, 1],
-        'explanation': "Copilot only surfaces what the requesting user can open, so the spreadsheet was reachable because of the 'Everyone except external users' grant, and the fix is to correct that sharing, which SharePoint Advanced Management's data access governance reports help find at scale. Copilot has no cross-user cache; each response is grounded for the requesting identity. The Semantic Index cannot be disabled per site; hiding a site from Copilot during review is done with Restricted SharePoint Search.",
+        'explanation': "Copilot only surfaces what the requesting user can open, so the spreadsheet was reachable because of the 'Everyone except external users' grant, and the fix is to correct that sharing, which SharePoint Advanced Management's data access governance reports help find at scale. Copilot has no cross-user cache; each response is grounded for the requesting identity. The Semantic Index cannot be disabled per site; hiding a site from Copilot during review is done with Restricted SharePoint Search (being retired; successor: Restricted Content Discovery).",
     },
     {
         'id': 'msq8',
@@ -1479,15 +1479,15 @@ QUESTIONS = [
         'id': 'q44',
         'cat': 'aiServices',
         'type': 'mc',
-        'question': 'A custom Copilot Studio agent built by one department is consuming far more messages than its bundled included capacity allows. What happens once that included message allotment is exhausted, assuming no capacity add-on has been purchased?',
+        'question': 'A custom Copilot Studio agent built by one department is consuming far more usage than its prepaid Copilot Credit capacity (formerly measured in messages) allows. What happens once that prepaid capacity is exhausted, assuming no additional capacity has been purchased?',
         'options': [
-            'The agent is deleted automatically the moment its included message capacity runs out',
+            'The agent is deleted automatically the moment its prepaid Copilot Credit capacity runs out',
             'Further usage is billed pay-as-you-go if enabled; otherwise the agent may stop responding until the next period',
-            "The agent's included capacity silently resets and usage continues with no billing impact",
+            "The agent's prepaid capacity silently resets and usage continues with no billing impact",
             'Microsoft 365 Copilot licenses for the entire tenant are automatically suspended until capacity is purchased',
         ],
         'correct': 1,
-        'explanation': 'Once included message capacity is exhausted, further Copilot Studio agent usage draws on metered pay-as-you-go billing if enabled, or the agent may stop responding until the next capacity period if it is not. Monitoring capacity consumption matters because usage does not simply reset immediately, and unrelated tenant-wide Copilot licenses are not suspended.',
+        'explanation': 'Once prepaid Copilot Credit capacity (formerly messages) is exhausted, further Copilot Studio agent usage draws on metered pay-as-you-go billing if enabled, or the agent may stop responding until the next capacity period if it is not. Monitoring capacity consumption matters because usage does not simply reset immediately, and unrelated tenant-wide Copilot licenses are not suspended.',
     },
     {
         'id': 'tf12',
@@ -1547,13 +1547,13 @@ QUESTIONS = [
         'type': 'ms',
         'question': 'A Contoso employee publishes a Copilot Studio agent to Microsoft 365 Copilot, but colleagues cannot find it in their agent list. Which two statements are accurate? (Choose two.)',
         'options': [
-            'If the tenant requires admin approval for agents, the agent remains unavailable until an admin approves it in Integrated apps',
+            'If the tenant requires admin approval for agents, the agent remains unavailable until an admin approves it in the Agents area of the Copilot Control System',
             'An admin can make the approved agent available to specific users or groups rather than to everyone',
             'Publishing from Copilot Studio automatically makes the agent available to every user in the tenant',
             'An admin must first create an app registration for the agent in Microsoft Entra before it can appear',
         ],
         'correct': [0, 1],
-        'explanation': "Shared agents flow through Integrated apps, where tenants that require approval hold them until an admin acts, and the admin can then deploy the agent to all users, specific groups, or no one. Publishing alone does not grant tenant-wide availability, which is exactly why the colleagues cannot see it. Copilot Studio handles the agent's identity and registration as part of publishing; the admin does not hand-create an app registration.",
+        'explanation': "Shared agents flow through the Agents area of the Copilot Control System (which grew out of Integrated apps), where tenants that require approval hold them until an admin acts, and the admin can then deploy the agent to all users, specific groups, or no one. Publishing alone does not grant tenant-wide availability, which is exactly why the colleagues cannot see it. Copilot Studio handles the agent's identity and registration as part of publishing; the admin does not hand-create an app registration.",
     },
     {
         'id': 'q45',
@@ -1679,7 +1679,7 @@ QUESTIONS = [
             'Apply a sensitivity label to DSPM for AI itself, which extends its reporting into an enforcement policy',
         ],
         'correct': 0,
-        'explanation': "DSPM for AI is a discovery and reporting capability — it surfaces oversharing and sensitive-data risk in AI interactions, but a separate DLP policy scoped to Copilot interactions is what actually blocks sensitive content from appearing in responses. Its reports don't self-escalate into enforcement, Insider Risk Management addresses user behavior risk rather than content-level blocking, and a sensitivity label can't be applied to DSPM for AI itself — it's a reporting tool, not a document.",
+        'explanation': "DSPM for AI is a discovery and reporting capability — it surfaces oversharing and sensitive-data risk in AI interactions, but a separate DLP policy scoped to the Microsoft 365 Copilot location is what actually enforces: a sensitivity-label condition keeps labeled content out of Copilot processing, and a sensitive-information-type condition blocks prompts that contain that data. Its reports don't self-escalate into enforcement, Insider Risk Management addresses user behavior risk rather than content-level blocking, and a sensitivity label can't be applied to DSPM for AI itself — it's a reporting tool, not a document.",
     },
     {
         'id': 'q54',
@@ -1858,12 +1858,12 @@ QUESTIONS = [
         'question': "An admin wants to stop Copilot in Word from searching the public web for extra context, while leaving its ability to ground answers in the organization's own files and emails untouched. Where should this be configured?",
         'options': [
             "The EU Data Boundary configuration for the tenant's Microsoft 365 data",
-            'The web content grounding setting on the Copilot page in the Microsoft 365 admin center',
+            'The Allow web search in Copilot policy, configured through the Cloud Policy service',
             'A Purview DLP policy with the Microsoft 365 Copilot location',
             'Restricted SharePoint Search in the SharePoint admin center',
         ],
         'correct': 1,
-        'explanation': 'The Copilot page in the Microsoft 365 admin center is where tenant-wide and app-specific Copilot settings, including the web content grounding toggle, are managed. The EU Data Boundary governs data residency rather than web grounding, a DLP policy restricts sensitive content in responses rather than toggling web search, and Restricted SharePoint Search only hides specific sites from search and Copilot, with no effect on web grounding.',
+        'explanation': 'The Allow web search in Copilot policy, configured through the Cloud Policy service (and reached from the Copilot page in the Microsoft 365 admin center), controls whether Copilot can search the public web while leaving grounding in organizational content alone. The EU Data Boundary governs data residency rather than web search, a DLP policy restricts sensitive content in responses rather than toggling web search, and Restricted SharePoint Search (being retired; successor: Restricted Content Discovery) only hides sites that are not on its allowed list from search and Copilot, with no effect on web search.',
     },
     {
         'id': 'q64',
@@ -1885,7 +1885,7 @@ QUESTIONS = [
         'type': 'tf',
         'question': 'A Purview DLP policy with the Microsoft 365 Copilot location prevents cross-prompt injection attacks, because it inspects the grounding content that Copilot reads.',
         'answer': False,
-        'explanation': "Copilot DLP policies act on sensitive content (labels and sensitive information types) to keep it out of Copilot processing and responses; they do not look for hidden instructions or stop an injected prompt from steering the model. Cross-prompt injection is addressed by Copilot's built-in content safety and prompt-shielding protections. Conflating the two is treating a data-leak control as a manipulation control.",
+        'explanation': "Copilot DLP policies act on sensitive content: a sensitivity-label condition keeps labeled content out of Copilot processing, and a sensitive-information-type condition blocks prompts that contain that data; they do not look for hidden instructions or stop an injected prompt from steering the model. Cross-prompt injection is addressed by Copilot's built-in content safety and prompt-shielding protections. Conflating the two is treating a data-leak control as a manipulation control.",
     },
     {
         'id': 'msq14',
@@ -1927,13 +1927,13 @@ QUESTIONS = [
             'Data Security Posture Management for AI reporting',
         ],
         'correct': 1,
-        'explanation': 'Restricted access control in SharePoint Advanced Management actually limits who can access a site at all, unlike Restricted SharePoint Search, which only removes a site from search and Copilot results while leaving every existing permission untouched. A Files & emails-scoped sensitivity label protects individual documents rather than gating access to a whole site, and DSPM for AI only reports on risk rather than enforcing any access restriction.',
+        'explanation': 'Restricted access control in SharePoint Advanced Management actually limits who can access a site at all, unlike Restricted SharePoint Search (being retired; successor: Restricted Content Discovery), which only removes a site from search and Copilot results while leaving every existing permission untouched. A Files & emails-scoped sensitivity label protects individual documents rather than gating access to a whole site, and DSPM for AI only reports on risk rather than enforcing any access restriction.',
     },
     {
         'id': 'q67',
         'cat': 'aiServices',
         'type': 'mc',
-        'question': 'Before a Microsoft 365 Copilot rollout, an admin wants a prioritized list of SharePoint sites that are overshared, contain sensitive content, or have gone inactive, so remediation effort can focus on the highest-risk sites first. Which capability provides this site-level list?',
+        'question': 'Before a Microsoft 365 Copilot rollout, an admin wants a prioritized list of SharePoint sites that are overshared or contain sensitive content, so remediation effort can focus on the highest-risk sites first. Which capability provides this site-level list?',
         'options': [
             'Data access governance reports in SharePoint Advanced Management',
             'Microsoft 365 Copilot usage reports in the Microsoft 365 admin center',
@@ -1941,7 +1941,7 @@ QUESTIONS = [
             'Content explorer in Microsoft Purview, used on its own',
         ],
         'correct': 0,
-        'explanation': 'Data access governance reports are built specifically to surface overshared, sensitive, or inactive SharePoint sites so remediation can be prioritized before a wider Copilot rollout. Usage reports measure Copilot adoption rather than site risk, Compliance Manager tracks regulatory requirements rather than SharePoint sharing risk, and Content explorer shows where labeled content currently sits without prioritizing sites by oversharing or inactivity.',
+        'explanation': 'Data access governance reports are built specifically to surface overshared or sensitive SharePoint sites so remediation can be prioritized before a wider Copilot rollout. Usage reports measure Copilot adoption rather than site risk, Compliance Manager tracks regulatory requirements rather than SharePoint sharing risk, and Content explorer shows where labeled content currently sits without prioritizing sites by oversharing.',
     },
     {
         'id': 'q68',
@@ -1992,12 +1992,12 @@ QUESTIONS = [
         'question': 'An organization wants to require a compliant device specifically before Microsoft 365 Copilot sign-in succeeds, while leaving its existing sign-in requirements for the rest of Microsoft 365 unchanged. How should this be configured?',
         'options': [
             'Enabling security defaults, since it automatically applies stricter rules to Copilot only',
-            'A Conditional Access policy that targets Copilot and Copilot Studio as its own cloud app',
+            'A Conditional Access policy that targets the Enterprise Copilot Platform service principal as its own cloud app',
             'A Purview DLP policy scoped specifically to Copilot interactions',
-            "The Copilot page's web content grounding toggle in the admin center",
+            'The Allow web search in Copilot policy in Cloud Policy',
         ],
         'correct': 1,
-        'explanation': 'Because Copilot and Copilot Studio authenticate through the same Microsoft Entra sign-in as other Microsoft 365 apps, a Conditional Access policy can target them specifically as their own cloud app, layering a stricter device requirement onto Copilot sign-in without touching the rest of Microsoft 365. Security defaults apply one uncustomizable baseline to everything rather than singling out Copilot, a DLP policy governs content in responses rather than sign-in requirements, and the web content grounding toggle only controls whether Copilot searches the public web.',
+        'explanation': 'Because Microsoft 365 Copilot authenticates through the same Microsoft Entra sign-in as other Microsoft 365 apps, a Conditional Access policy can target its Enterprise Copilot Platform service principal (which may first need to be created so it appears in the app picker) as its own cloud app, layering a stricter device requirement onto Copilot sign-in without touching the rest of Microsoft 365. Security defaults apply one uncustomizable baseline to everything rather than singling out Copilot, a DLP policy governs content in responses rather than sign-in requirements, and the Allow web search in Copilot policy only controls whether Copilot searches the public web.',
     },
     {
         'id': 'tf18',
@@ -2027,7 +2027,7 @@ QUESTIONS = [
             'Create a DLP policy with the Microsoft 365 Copilot location to keep labeled content out of responses',
         ],
         'correct': [0, 1],
-        'explanation': 'Data access governance reports and the site access reviews launched from them, together with restricted access control, are SharePoint Advanced Management features. Restricted SharePoint Search is a tenant-level SharePoint setting that does not require the Advanced Management license, and a Copilot DLP policy is a Microsoft Purview capability; both help with a rollout but belong to different products.',
+        'explanation': 'Data access governance reports and the site access reviews launched from them, together with restricted access control, are SharePoint Advanced Management features. Restricted SharePoint Search (being retired; successor: Restricted Content Discovery) is a tenant-level SharePoint setting that does not require the Advanced Management license, and a Copilot DLP policy is a Microsoft Purview capability; both help with a rollout but belong to different products.',
     },
     {
         'id': 'q72',
@@ -2083,7 +2083,7 @@ QUESTIONS = [
         'id': 'q74',
         'cat': 'tenantConfig',
         'type': 'mc',
-        'question': 'An admin configures SSPR to require two authentication methods during registration, but only one of those methods is required to actually perform a reset later. A user loses access to one of their two registered methods. What is the effect on their ability to reset their own password going forward?',
+        'question': 'An admin configures SSPR to require one authentication method to reset a password, and a user has registered two methods. The user then loses access to one of their two registered methods. What is the effect on their ability to reset their own password going forward?',
         'options': [
             'They can still reset their password using their one remaining registered method, since only one method is required at reset time',
             'They can no longer use self-service password reset at all until both original methods are restored',
@@ -2091,7 +2091,7 @@ QUESTIONS = [
             'SSPR requires exactly the same number of methods at reset as at registration, so losing one method blocks all self-service reset',
         ],
         'correct': 0,
-        'explanation': 'Requiring more methods at registration than at reset is intentional — it gives a user more than one option to fall back on, so losing access to just one registered method still leaves them able to reset using the other. The reset step itself only requires the smaller number configured for reset, not the full registration count, and none of this disables the account automatically.',
+        'explanation': 'Registering more methods than a reset requires is deliberate — it gives a user more than one option to fall back on, so losing access to just one registered method still leaves them able to reset using the other. The reset step only requires the number of methods configured for reset (here one), not however many the user happened to register, and none of this disables the account automatically.',
     },
     {
         'id': 'q75',
@@ -2410,7 +2410,7 @@ CASE_STUDIES = [
                     "Microsoft Entra Conditional Access",
                 ],
                 'correct': 0,
-                'explanation': "Restricted SharePoint Search excludes specified sites from organization-wide search and Copilot grounding immediately, without touching the underlying permissions — exactly the fast, non-disruptive stopgap described while the permissions review continues. Removing the sharing links directly changes permissions (what the scenario says not to do yet); a DLP policy governs content in responses rather than which sites get searched at all; and Conditional Access governs sign-in conditions, not search or grounding scope.",
+                'explanation': "Restricted SharePoint Search (being retired; successor: Restricted Content Discovery) limits organization-wide search and Copilot grounding to an admin-curated allowed list of sites, so sites left off the list drop out immediately, without touching the underlying permissions — exactly the fast, non-disruptive stopgap described while the permissions review continues. Removing the sharing links directly changes permissions (what the scenario says not to do yet); a DLP policy governs content in responses rather than which sites get searched at all; and Conditional Access governs sign-in conditions, not search or grounding scope.",
             },
             {
                 'id': 'cs-ab650-contoso-copilot-rollout-q2',
@@ -2423,7 +2423,7 @@ CASE_STUDIES = [
                     "DSPM for AI, in report-only mode",
                 ],
                 'correct': 0,
-                'explanation': "A sensitivity label can be configured so that even a user with view access to a labeled file is blocked from having Copilot quote or summarize its content — this is the control that reaches into Copilot's actual response behavior for specific files regardless of who can open them. A retention label governs how long content is kept, not what Copilot can do with it. Restricted SharePoint Search works at the site level for search/grounding, not as a per-file content restriction for users who already have access. DSPM for AI in report-only mode surfaces risk but doesn't itself enforce a block.",
+                'explanation': "A sensitivity label can be set up (for example, encryption that withholds the Extract usage right, or a Copilot-location DLP policy keyed to the label) so that Copilot cannot quote or summarize labeled content even though a user with view access can still open the file — this is the control that reaches into Copilot's actual response behavior for specific files. A retention label governs how long content is kept, not what Copilot can do with it. Restricted SharePoint Search (being retired; successor: Restricted Content Discovery) works at the site level for search/grounding, not as a per-file content restriction for users who already have access. DSPM for AI in report-only mode surfaces risk but doesn't itself enforce a block.",
             },
             {
                 'id': 'cs-ab650-contoso-copilot-rollout-q3',
@@ -2515,7 +2515,7 @@ COMPARE = [
         'optionA': 'Enable Restricted SharePoint Search with an allowed list that leaves out the 30 sites.',
         'optionB': "Apply restricted access control to the 30 sites, limited to each site's existing members.",
         'better': 'A',
-        'why': 'Restricted SharePoint Search hides non-allowed sites from search and Copilot grounding while leaving every permission untouched, so it meets both the deadline and the no-change constraint. Restricted access control is the stronger remediation an admin might prefer long term, but it changes access: anyone outside the chosen group loses the ability to open the site, which the review has not yet decided.',
+        'why': 'Restricted SharePoint Search (being retired; successor: Restricted Content Discovery) hides non-allowed sites from search and Copilot grounding while leaving every permission untouched, so it meets both the deadline and the no-change constraint. Restricted access control is the stronger remediation an admin might prefer long term, but it changes access: anyone outside the chosen group loses the ability to open the site, which the review has not yet decided.',
     },
     {
         'id': 'cmp-ab650-8',
@@ -2539,9 +2539,9 @@ COMPARE = [
         'id': 'cmp-ab650-10',
         'cat': 'aiServices',
         'scenario': 'Finance built a Copilot Studio agent that must be usable only by the Finance department once an admin approves it. Which approach is better?',
-        'optionA': 'Approve the agent in Integrated apps and deploy it to the Finance security group.',
+        'optionA': 'Approve the agent in the Agents area of the Copilot Control System and deploy it to the Finance security group.',
         'optionB': "Create a Power Platform DLP policy that allows the agent's connectors only in the Finance environment.",
         'better': 'A',
-        'why': 'Integrated apps is where an admin approves a shared agent and chooses who receives it, so scoping the deployment to the Finance group satisfies the requirement directly. A Power Platform DLP policy governs which connectors agents in an environment may use; it does not control which users can see or run a published agent, so Finance-only connectors would not stop other users from finding the agent.',
+        'why': 'The Agents area of the Copilot Control System (which grew out of Integrated apps) is where an admin approves a shared agent and chooses who receives it, so scoping the deployment to the Finance group satisfies the requirement directly. A Power Platform DLP policy governs which connectors agents in an environment may use; it does not control which users can see or run a published agent, so Finance-only connectors would not stop other users from finding the agent.',
     },
 ]

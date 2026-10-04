@@ -2086,7 +2086,7 @@ QUESTIONS = [
         "type": "tf",
         "question": "When a delayed ADT discharge arrives with an event time from three days earlier, the receiving system should stamp the discharge with the header's transmission time, because that is the authoritative moment of the event.",
         "answer": False,
-        "explanation": "The event-occurred time in EVN records when the discharge really happened, which can differ from when the message was sent. Using transmission time would backdate or forward-date the encounter incorrectly, affecting length of stay, billing, and bed history. Header time only says when the sender built the message.",
+        "explanation": "The event-occurred time in EVN (EVN-6) records when the discharge really happened, which can differ from when the message was sent. Using transmission time would backdate or forward-date the encounter incorrectly, affecting length of stay, billing, and bed history. Header time only says when the sender built the message.",
     },
     {
         "id": "q69",
