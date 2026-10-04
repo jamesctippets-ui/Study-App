@@ -9,7 +9,8 @@
           "label": "Microsoft Learn: Preparing for DP-300 - Plan and implement data platform resources",
           "url": "https://learn.microsoft.com/en-us/shows/exam-readiness-zone/preparing-for-dp-300-01-fy25"
         }
-      ]
+      ],
+      "screenshot": "sqlManagedInstanceCompute"
     },
     {
       "key": "security",
@@ -20,7 +21,8 @@
           "label": "Microsoft Learn: Preparing for DP-300 - Implement a secure environment",
           "url": "https://learn.microsoft.com/en-us/shows/exam-readiness-zone/preparing-for-dp-300-02-fy25"
         }
-      ]
+      ],
+      "screenshot": "sqlAuditingSettings"
     },
     {
       "key": "monitor",
@@ -43,7 +45,8 @@
           "label": "Microsoft Learn: Optimize query performance in Azure SQL",
           "url": "https://learn.microsoft.com/en-us/training/paths/optimize-query-performance-sql-server/"
         }
-      ]
+      ],
+      "screenshot": "sqlQueryPerformanceInsight"
     },
     {
       "key": "automation",
@@ -58,7 +61,8 @@
           "label": "Microsoft Learn: Automation in Azure SQL overview",
           "url": "https://learn.microsoft.com/en-us/azure/azure-sql/database/job-automation-overview?view=azuresql"
         }
-      ]
+      ],
+      "screenshot": "sqlElasticJobExecutions"
     },
     {
       "key": "hadr",
@@ -73,7 +77,8 @@
           "label": "Microsoft Learn: Business continuity, high availability, and disaster recovery for Azure SQL Database",
           "url": "https://learn.microsoft.com/en-us/azure/azure-sql/database/business-continuity-high-availability-disaster-recover-hadr-overview?view=azuresql"
         }
-      ]
+      ],
+      "screenshot": "sqlFailoverGroupPage"
     }
   ],
   "flashcards": [
@@ -2001,6 +2006,186 @@
         1
       ],
       "explanation": "Routing happens at the listener and depends on the connection declaring read intent, and each target secondary must be readable and have a routing URL configured. A Basic availability group's secondary cannot accept connections, and an FCI's passive node is not readable, so routing has nowhere to send traffic in those designs."
+    },
+    {
+      "id": "q70",
+      "cat": "platform",
+      "type": "mc",
+      "question": "A team is filling in the Create Azure SQL Managed Instance page shown. Their regulator requires that backups never leave the region chosen for the instance. Reading the Compute + storage summary on this page, what should they do before creating the instance?",
+      "options": [
+        "Select Configure Managed Instance and change the backup storage redundancy, because the summary shows geo-redundant backup storage, which copies backups to the paired region",
+        "Nothing, because the summary shows zone redundancy disabled, which means backups are already kept only in the chosen region",
+        "Move the instance from the General Purpose tier to a different tier, because geo-redundant backups are tied to the General Purpose tier",
+        "Leave the setting and add a policy after deployment, because backup storage redundancy cannot be chosen for a managed instance"
+      ],
+      "correct": 0,
+      "explanation": "The summary on the page lists Geo-redundant backup storage, which replicates backups to the paired Azure region and therefore breaks a same-region residency rule. The Configure Managed Instance link opens the Compute + storage page, where the backup storage redundancy can be set to local or zone redundancy so backups stay in one region. The zone redundancy wording in the summary describes the instance's compute, not where backups are stored, so it does not satisfy the rule. Backup redundancy is not tied to the service tier, and it is a choice offered during creation, not something a post-deployment policy replaces.",
+      "whyTested": "DP-300 asks you to read a provisioning summary and spot the default that conflicts with a requirement. Geo-redundant backup storage is the default for managed instances, and data residency wording in a scenario is the cue to change it to local or zone redundancy.",
+      "image": "sqlManagedInstanceCompute"
+    },
+    {
+      "id": "msq16",
+      "cat": "platform",
+      "type": "ms",
+      "question": "Which two statements are supported by the Compute + storage summary on the Create Azure SQL Managed Instance page shown? (Choose two.)",
+      "options": [
+        "The instance is set to the General Purpose service tier on Standard-series (Gen 5) hardware",
+        "The instance is sized with 8 vCores and 256 GB of storage",
+        "Zone redundancy is turned on for the instance",
+        "Backups are stored in zone-redundant storage within the region only"
+      ],
+      "correct": [
+        0,
+        1
+      ],
+      "explanation": "The summary states General Purpose, Standard-series (Gen 5), 8 vCores and 256 GB storage, so the tier, hardware generation, vCore count and storage size are all readable directly. It also states that zone redundancy is disabled and that backup storage is geo-redundant, which rules out the other two statements: the instance is not zone redundant, and backups are copied to another region rather than staying in-region zone-redundant storage.",
+      "whyTested": "Exam items often show a configuration summary and ask which statements follow from it. The trap is confusing instance zone redundancy with backup storage redundancy, which are separate settings that the summary reports separately.",
+      "image": "sqlManagedInstanceCompute"
+    },
+    {
+      "id": "q71",
+      "cat": "security",
+      "type": "mc",
+      "question": "On the database Auditing blade shown, a security team wants audit events to stay queryable with Kusto and usable in alert rules, and also to be streamed into a third-party SIEM through a streaming pipeline. Given the destinations already selected on this blade, what additional change is needed?",
+      "options": [
+        "Select Event Hub as an additional destination and pick the event hub, because Log Analytics is already selected for Kusto queries and alert rules",
+        "Select Log Analytics, because it is currently unchecked, and also select Storage for the SIEM feed",
+        "Replace the Storage destination with Event Hub, because auditing allows only one destination at a time",
+        "Switch the Auditing toggle off and back on, because Log Analytics supports Kusto queries only after auditing is re-enabled"
+      ],
+      "correct": 0,
+      "explanation": "The blade shows Storage and Log Analytics already checked and Event Hub unchecked. Log Analytics already covers Kusto queries and alert rules, and Event Hub is the audit destination built for routing events to other applications such as a SIEM. Azure SQL auditing accepts several destinations at once, so nothing needs to be replaced or toggled; the only gap is the unchecked Event Hub destination, and the change takes effect once Save is selected.",
+      "whyTested": "DP-300 expects you to map each audit destination to its job: Storage for retention, Log Analytics for queries and alerts, Event Hub for streaming to other systems. Reading which boxes are already ticked is what separates the answer from the distractors.",
+      "image": "sqlAuditingSettings"
+    },
+    {
+      "id": "q72",
+      "cat": "security",
+      "type": "mc",
+      "question": "The Auditing blade shown for a database reads \"Server-level Auditing: Disabled\" while the database's own Auditing toggle is set to ON with destinations chosen. What does this configuration mean once Save is selected?",
+      "options": [
+        "The database's audit events are written to the selected destinations, because database-level auditing works independently of the server-level setting",
+        "Nothing is audited until the server-level setting is also enabled, because the database toggle is ignored while the server policy is disabled",
+        "Saving the blade also switches the server-level policy to enabled, so every database on the server is audited",
+        "Only the Storage destination receives events, because Log Analytics requires server-level auditing to be enabled"
+      ],
+      "correct": 0,
+      "explanation": "The database-level and server-level auditing policies are separate. With the database toggle ON and destinations selected, saving enables auditing for that one database even though the server-level line shows Disabled, and events go to every destination that is checked. Enabling it at the server level would audit all databases on the server, and if both levels are enabled a database is audited twice, so the server-level policy is the usual choice unless one database needs a unique configuration.",
+      "whyTested": "The scope of auditing, server versus database, is a common DP-300 trap. Candidates assume one setting overrides the other, when in fact they are independent and can overlap.",
+      "image": "sqlAuditingSettings"
+    },
+    {
+      "id": "q73",
+      "cat": "queryPerf",
+      "type": "mc",
+      "question": "In the Query Performance Insight view shown (top 5 queries by CPU, aggregation SUM, last 24 hours), the DBA wants to tune for latency first, targeting the query whose individual executions are slowest on average. Using the Duration and Executions count columns, which query ID is the best choice?",
+      "options": [
+        "Query 152, which has about 8,527 seconds of total duration across 1,234 executions, roughly 6.9 seconds each",
+        "Query 151, because it has the highest CPU percentage and the longest total duration",
+        "Query 153, because it has the third-highest total duration and a similar execution count to the next query",
+        "Query 155, because it has the lowest CPU percentage and so is least likely to be CPU-bound"
+      ],
+      "correct": 0,
+      "explanation": "With aggregation SUM, the Duration column is total time spent across all executions in the window, so average latency is duration divided by executions. Query 151 is about 44,744 seconds over 6,642 executions, roughly 6.74 seconds each. Query 152 is about 8,527 seconds over 1,234 executions, roughly 6.91 seconds each, which is the slowest per execution. Queries 153, 154 and 155 all average about 5 seconds. The highest CPU share and longest total duration belong to query 151 only because it runs far more often, so total time is not the same as per-execution latency.",
+      "whyTested": "Query Performance Insight shows aggregated totals, and the exam tests whether you notice that SUM aggregation hides per-execution cost. Dividing duration by execution count is the skill; the highest-CPU row is the bait.",
+      "image": "sqlQueryPerformanceInsight"
+    },
+    {
+      "id": "msq17",
+      "cat": "queryPerf",
+      "type": "ms",
+      "question": "Which two conclusions are supported by the Query Performance Insight table shown for the top five queries by CPU? (Choose two.)",
+      "options": [
+        "None of the five listed queries shows any Data IO or Log IO percentage, so none is driven by I/O in this window",
+        "Query 151 alone has a CPU percentage higher than the other four queries combined",
+        "Query 155 has the highest execution count of the five queries",
+        "The five queries were ranked by Data IO rather than by CPU"
+      ],
+      "correct": [
+        0,
+        1
+      ],
+      "explanation": "The Data IO[%] and Log IO[%] columns read 0 for all five queries. Query 151 shows 51.97 percent CPU, while queries 152 to 155 add up to 9.88 + 7.15 + 3.64 + 3.59 = 24.26 percent, so 151 is higher than the other four combined. Query 155 has the lowest execution count of the five, 606, with query 151 at 6,642 the highest, and the Top 5 queries by selector is set to CPU, not Data IO.",
+      "whyTested": "Exam items on Query Performance Insight reward careful reading of the table and its selector. Checking the ranking metric and the other resource columns before drawing a conclusion is the habit being tested.",
+      "image": "sqlQueryPerformanceInsight"
+    },
+    {
+      "id": "q74",
+      "cat": "automation",
+      "type": "mc",
+      "question": "The Overview page of an elastic job agent shows nine recent executions of a job named t-sql Demo. Every run shows Succeeded, and the start times fall about hourly from 9:00 AM to 5:00 PM, each lasting only a few seconds. Which schedule is the job most plausibly configured with?",
+      "options": [
+        "A recurring schedule with a one-hour interval",
+        "A single run scheduled once at 9:00 AM and re-triggered by hand",
+        "A recurring schedule with a 15-minute interval",
+        "A recurring schedule that runs once a day at 5:00 PM"
+      ],
+      "correct": 0,
+      "explanation": "Consecutive executions are spaced about one hour apart and start within seconds of the hour, which matches a recurring schedule with a one-hour interval. A 15-minute interval would show several runs inside each hour, and a once-a-day schedule would show one run per day rather than nine in a single day. A one-time schedule would have only one execution, and re-triggering by hand would not produce such a regular spacing.",
+      "whyTested": "DP-300 covers elastic jobs as the scheduler for T-SQL across many databases. Inferring an interval from an execution history is a realistic way to test whether you understand how job schedules show up in monitoring.",
+      "image": "sqlElasticJobExecutions"
+    },
+    {
+      "id": "q75",
+      "cat": "hadr",
+      "type": "mc",
+      "question": "The failover group page shown has mysqlserver (West US) as Primary and mysqlsecondary (East US) as Secondary, with the Read/Write failover policy shown. The West US region suffers an outage and mysqlserver becomes unreachable. What happens, and what must the DBA do?",
+      "options": [
+        "Nothing fails over on its own; the DBA must start the failover, using Forced Failover because the primary is unreachable, and accept that recent data may be lost",
+        "Azure starts failover to East US on its own once the grace period expires, because failover groups always fail over automatically",
+        "Azure runs a planned Failover that waits for mysqlserver to come back so that no data is lost",
+        "The DBA must delete the failover group and recreate it with East US as the primary before connections can succeed"
+      ],
+      "correct": 0,
+      "explanation": "The table shows the Read/Write failover policy as Customer managed, which means failover is manual: with the Automatic policy Azure would fail over after the configured grace period, but this group does not use it. With the primary unreachable, a planned Failover cannot synchronize first, so the DBA uses Forced Failover from the page's toolbar, which promotes the secondary immediately and can lose transactions that had not replicated. The group endpoints keep working afterward, so deleting and recreating the group is not needed.",
+      "whyTested": "The failover policy value is the detail the exam hides in plain sight. Knowing that Customer managed means manual, and that forced failover is the tool when the primary is gone, is core HA/DR knowledge for DP-300.",
+      "image": "sqlFailoverGroupPage"
+    },
+    {
+      "id": "q76",
+      "cat": "hadr",
+      "type": "mc",
+      "question": "The Configure policies pane shown for a SQL server has the point-in-time-restore retention and the differential backup frequency at the values shown. A new requirement says databases must be restorable to any point within the last 21 days, with restores that are as fast as the available settings allow. Which change meets it?",
+      "options": [
+        "Set the point-in-time-restore retention to 21 days and the differential backup frequency to 12 hours",
+        "Set the weekly long-term retention backups to keep for 3 weeks and leave the other values as they are",
+        "Set the point-in-time-restore retention to 21 days and leave the differential backup frequency at 24 hours",
+        "Leave the retention at its current value and set only the differential backup frequency to 12 hours"
+      ],
+      "correct": 0,
+      "explanation": "The pane shows point-in-time-restore retention at 7 days and a 24 hour differential frequency. Restoring to any point in 21 days needs the point-in-time retention raised to 21 days, which is within the supported range of 1 to 35 days. A 12 hour differential frequency shortens the restore chain and so typically reduces restore time compared with 24 hours. Long-term retention keeps periodic full backups for weekly, monthly or yearly restores, not arbitrary points in time. Changing only the frequency leaves the 7 day window in place.",
+      "whyTested": "DP-300 repeatedly contrasts point-in-time restore with long-term retention. The scenario gives a point-in-time requirement plus a speed requirement, and the pane exposes exactly the two controls that address them.",
+      "image": "sqlBackupRetentionPolicies"
+    },
+    {
+      "id": "tf24",
+      "cat": "automation",
+      "type": "tf",
+      "question": "The banner above the job executions table shown says the table lists only the last 15 job executions, so reviewing the full execution history requires opening the separate Job executions view.",
+      "answer": true,
+      "explanation": "The banner states that the table shows the last 15 job executions and links to the Job executions view for the complete list, and a View all job executions button sits under the table for the same purpose. The Overview page is a quick summary of recent runs, not the full history, so older runs or runs beyond the 15 shown are found in the dedicated view.",
+      "whyTested": "Monitoring elastic jobs is part of automation. Knowing that the Overview page is truncated, and where the complete history lives, avoids assuming that the visible rows are everything that ran.",
+      "image": "sqlElasticJobExecutions"
+    },
+    {
+      "id": "tf25",
+      "cat": "hadr",
+      "type": "tf",
+      "question": "On the failover group page shown, selecting Failover (not Forced Failover) would synchronize the databases first and then swap the roles, making mysqlsecondary (East US) the primary and mysqlserver (West US) the secondary, without data loss.",
+      "answer": true,
+      "explanation": "The plain Failover action is a planned failover: Azure fully synchronizes the secondary with the primary before switching roles, so no data is lost, and the former primary becomes the new secondary. It needs both servers to be reachable. Forced Failover is the other toolbar action, which promotes the secondary immediately and can lose transactions that had not yet replicated.",
+      "whyTested": "Planned versus forced failover is a recurring DP-300 distinction. The toolbar on the page shows both actions side by side, and the exam asks which one preserves data.",
+      "image": "sqlFailoverGroupPage"
+    },
+    {
+      "id": "tf26",
+      "cat": "hadr",
+      "type": "tf",
+      "question": "With the point-in-time-restore retention left at the value shown in the Configure policies pane, a database can be restored to a point 10 days ago using point-in-time restore alone, without any long-term retention backups.",
+      "answer": false,
+      "explanation": "The pane shows the point-in-time-restore retention at 7 days, so Azure keeps enough backups to restore only within the last 7 days, and a point 10 days ago is already outside that window. Reaching it would have needed the retention raised beforehand, up to 35 days, or a long-term retention policy that keeps periodic full backups. The weekly and monthly long-term retention boxes visible in the pane both read 0, so they provide nothing for this either.",
+      "whyTested": "Retention windows are a favourite exam trap. Reading the configured value in the pane and comparing it with the age of the requested restore point is the quick check the question trains.",
+      "image": "sqlBackupRetentionPolicies"
     }
   ],
   "lessons": [

@@ -766,6 +766,52 @@ const REAL_PORTAL_SCREENSHOTS = {
     sourceUrl: 'https://learn.microsoft.com/en-us/azure/azure-monitor/fundamentals/activity-log',
     product: 'Azure portal',
   },
+  // DP-300 Azure SQL portal screenshots — sourced from the MicrosoftDocs/sql-docs
+  // GitHub repo (branch `live`), whose LICENSE file is Creative Commons
+  // Attribution 4.0 International (https://raw.githubusercontent.com/MicrosoftDocs/sql-docs/live/LICENSE).
+  // Each image is embedded in the cited live Microsoft Learn article.
+  sqlManagedInstanceCompute: {
+    src: 'images/azuresql/managed-instance-compute-storage.png',
+    alt: 'Real Azure Portal screenshot of the Basics tab of Create Azure SQL Managed Instance, with the Compute + storage summary and the Configure Managed Instance link highlighted',
+    description: "The Basics tab of the Create Azure SQL Managed Instance page, with tabs for Basics, Networking, Security, Additional settings, Tags and Review + create. Under Managed Instance details the name is sql-mi-docs-sample and the region is (US) West US 2. The Compute + storage summary reads General Purpose, Standard-series (Gen 5), 8 vCores, 256 GB storage, Geo-redundant backup storage, zone redundancy disabled, followed by a highlighted Configure Managed Instance link that opens the page where those settings are changed.",
+    sourceLabel: 'Microsoft Learn: Quickstart: Create Azure SQL Managed Instance',
+    sourceUrl: 'https://learn.microsoft.com/en-us/azure/azure-sql/managed-instance/instance-create-quickstart?view=azuresql',
+  },
+  sqlAuditingSettings: {
+    src: 'images/azuresql/auditing-settings.png',
+    alt: 'Real Azure Portal screenshot of the Auditing settings blade for an Azure SQL database with Auditing set to ON and Storage and Log Analytics selected as destinations',
+    description: "The Auditing blade for an Azure SQL database. The toolbar shows Save (highlighted), Discard, a greyed-out View audit logs and Feedback. A line reads Server-level Auditing: Disabled in red, with a View server settings link beside it. Below it the Auditing toggle is set to ON, and under Audit log destination (choose at least one) the Storage box is checked with storage details sqlaudit4, the Log Analytics box is checked with Log Analytics details oms-test4, and the Event Hub box is left unchecked.",
+    sourceLabel: 'Microsoft Learn: Secure a Database (Azure SQL Database tutorial)',
+    sourceUrl: 'https://learn.microsoft.com/en-us/azure/azure-sql/database/secure-database-tutorial?view=azuresql',
+  },
+  sqlQueryPerformanceInsight: {
+    src: 'images/azuresql/query-performance-insight-top-queries.png',
+    alt: 'Real Azure Portal screenshot of Query Performance Insight for a SQL database showing the top five resource-consuming queries by CPU with a per-query table of CPU, Data IO, Log IO, duration and executions',
+    description: "Query Performance Insight for a SQL database named CRM Database, on the Resource consuming queries tab (the other tabs are Long running queries and Custom). The Top 5 queries by selector is set to CPU, Aggregation type is SUM and Time period is LAST 24 HRS. A stacked bar chart with a line for overall resource use sits above a Metrics comparison chart. The table at the bottom lists query IDs 151 to 155 with these columns: CPU[%] 51.97, 9.88, 7.15, 3.64, 3.59; Data IO[%] and Log IO[%] all 0; Duration[HH:MM:SS] 12:25:43.980, 02:22:07.459, 01:40:27.310, 00:51:20.70, 00:50:30.70; Executions count 6642, 1234, 1212, 615, 606.",
+    sourceLabel: 'Microsoft Learn: Query Performance Insight for Azure SQL Database',
+    sourceUrl: 'https://learn.microsoft.com/en-us/azure/azure-sql/database/query-performance-insight-use?view=azuresql',
+  },
+  sqlElasticJobExecutions: {
+    src: 'images/azuresql/elastic-job-executions.png',
+    alt: 'Real Azure Portal screenshot of the Most recent job executions table on an elastic job agent Overview page, showing nine succeeded runs of a job named t-sql Demo',
+    description: "The Most recent job executions section of an elastic job agent's Overview page. A banner says the table shows the last 15 job executions, with a link to the Job executions view. Filters read Job name: All and Job execution status: All. Nine rows are listed, every one for a job named t-sql Demo with a Succeeded status. They start at about 9:00 AM, 10:00 AM and so on, hour by hour, up to about 5:00 PM on 4/2/2024, each finishing within a few seconds. A View all job executions button sits under the table.",
+    sourceLabel: 'Microsoft Learn: Elastic Jobs Overview',
+    sourceUrl: 'https://learn.microsoft.com/en-us/azure/azure-sql/database/elastic-jobs-overview?view=azuresql',
+  },
+  sqlFailoverGroupPage: {
+    src: 'images/azuresql/failover-group-page.png',
+    alt: 'Real Azure Portal screenshot of a failover group page for Azure SQL Database showing a world map, a Primary server in West US, a Secondary server in East US and a Customer managed failover policy',
+    description: "The page for a failover group named failovergrouptutorial under mysqlserver | Failover groups. The toolbar has Save, Discard, Add databases, Edit configuration, Remove databases (these three outlined in red), Failover, Forced Failover and Delete. Tabs read Configuration details, Databases within group, Databases selected to be added (0) and Databases selected for removal (0). A world map joins two markers, one on the US west coast and one on the US east coast. The table underneath lists mysqlserver (West US) with role Primary and Read/Write failover policy Customer managed, and mysqlsecondary (East US) with role Secondary.",
+    sourceLabel: 'Microsoft Learn: Configure a Failover Group (Azure SQL Database)',
+    sourceUrl: 'https://learn.microsoft.com/en-us/azure/azure-sql/database/failover-group-configure-sql-db?view=azuresql',
+  },
+  sqlBackupRetentionPolicies: {
+    src: 'images/azuresql/backup-retention-policies.png',
+    alt: 'Real Azure Portal screenshot of a SQL server Backups blade on the Retention policies tab with the Configure policies pane open showing point-in-time restore retention of 7 days and a 24 hour differential backup frequency',
+    description: "The Backups blade of a logical SQL server named contosohotels-acc-sqlserver, with Backups selected in the left menu (under Data management) and the Retention policies tab open. The grid lists a database named Test_Database_1 with PITR 7 Days and a differential backup frequency of 24 Hours. The Configure policies pane on the right shows Point-in-time-restore with the slider and box set to 7 days, Differential backup frequency set to 24 Hours, and a Long-term retention section whose Weekly LTR Backups and Monthly LTR Backups boxes both read 0 with Week(s) selected. Apply is greyed out and Cancel is available.",
+    sourceLabel: 'Microsoft Learn: Change Automated Backup Settings (Azure SQL Database)',
+    sourceUrl: 'https://learn.microsoft.com/en-us/azure/azure-sql/database/automated-backups-change-settings?view=azuresql',
+  },
 };
 
 // `hideDescription` is set by quiz/exam question views — the description
