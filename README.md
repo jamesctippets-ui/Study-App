@@ -296,10 +296,11 @@ bottom:
   chooses **Just my certs** or **Extended learning**, which mixes in optional,
   skippable sections: a deep dive on the unit's terms, bonus games, and
   cross-cert "bridges" that teach an idea several certs share and how each
-  frames it.
-- A **Review across your certs** card: Weak spots (missed questions) and
-  Tough terms (flashcards rated OK or lower), mixed from every cert in your
-  plan, with each answer recorded to its own cert.
+  frames it. A second switch can order certs by your cert path or by exam date and then weakest. An "Already know this? Test out" link skips an untouched unit.
+- A **Review across your certs** card: Weak spots (missed questions), Tough
+  terms (flashcards rated OK or lower), and Missed games, plus a single
+  "Review everything due" round that mixes all three — drawn from every cert in
+  your plan, with each answer recorded to its own cert.
 - A compact **Your certs** list (order, path progress, exam countdown,
   mastery) with the cert you're studying marked.
 - A **"Continue where you left off"** button once you've actually

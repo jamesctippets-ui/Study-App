@@ -1376,16 +1376,35 @@ trading away for shinier but shallower ones.
   in one cert can't crowd out the others — 10 questions or 15 cards a round.
   Items run under `<cert>:<id>` ids and each answer or rating is recorded to
   its own cert; a 4 or 5 on a card graduates it from the deck as usual.
-- [ ] **Home path — still open.** (1) *Weighting:* order is plain plan order;
-  weight by exam date and readiness so the cert with the nearest date or
-  lowest readiness leads (degrading cleanly with no dates). (2) *More bridge
-  coverage:* ITIL, DP-900, and SC-200 each appear in only a few bridges;
-  bridges could also be offered for certs outside the plan as a taster.
-  (3) *Review depth:* Weak spots covers all question types but not Mad Libs,
-  Sequence, or case-study misses; a "Review everything due" round that mixes
-  both reviews is a natural next step. (4) *Windowing:* the Coming up list
-  shows five steps plus a count; long optional runs may need grouping.
-  (5) A "test out" shortcut from Home, and per-step Go deeper links.
+- [x] **Home path, round two.** (1) *Cert order:* a second switch picks **My
+  plan order** or **Exam date, then weakest** (`stats.homePath.order`, shown
+  with two or more certs): certs with an upcoming exam first, soonest first,
+  then the rest weakest first. Readiness is bucketed in 20-point steps and ties
+  fall back to plan order so the path doesn't flip as a score creeps up; a
+  past exam date counts as no date. (2) *Reviews:* a **Missed games** review
+  (Mad Libs, Sequence, Compare items last got wrong, three a round) and a
+  **Review everything due** round that runs six weak questions, eight tough
+  flashcards, and two missed games in a row, each recorded to its own cert.
+  Case-study misses are not included (their questions lean on the shared
+  scenario). (3) *Coming up:* five rows, "Show more" ten at a time up to 40,
+  "Show fewer". (4) *Test out and Go deeper:* an "Already know this? Test out"
+  link on the first step of an untouched unit runs the unit's test-out on
+  Home; each Coming up row's cert tag now opens that cert. (5) *Bridges:* 10
+  more (`data/bridges_more.py`) bring ITIL to 5 appearances, DP-900 to 7,
+  SC-200 to 8; 45 bridges and 135 questions in all. (6) *Fact-check:* an
+  agent checked all 35 original bridges against the lessons and the web and
+  made 14 wording corrections (no answer keys changed); the automation-rule
+  ordering claim ("closing an incident stops later rules") could not be
+  verified and was reworded everywhere it appeared, and the AZ-104 storage
+  lesson's "GPv2 offers Premium performance" was corrected.
+- [ ] **Home path — still open.** The 10 newest bridges have not had the
+  independent fact-check the first 35 got; several attach to the nearest
+  lesson rather than one that teaches the fact (the facts live in flashcards
+  and questions no lesson lists), so those matches are loose — a good moment
+  to add `vocabIds` or short lesson passages that actually cover them. Review
+  could also include case-study questions. A weighting that blends exam date
+  with readiness more smoothly, and surfacing a bridge for certs outside the
+  plan as a taster, are untried.
 
 - [x] **Tough terms flashcard deck.** Each `srs` entry now also stores the
   raw 1-5 rating it was last given (`last`). A card is "tough" when that
