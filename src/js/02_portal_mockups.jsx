@@ -568,6 +568,45 @@ const REAL_PORTAL_SCREENSHOTS = {
     sourceUrl: 'https://github.com/MicrosoftDocs/entra-docs/blob/main/docs/id-governance/privileged-identity-management/pim-how-to-activate-role.yml',
     product: 'Microsoft Entra admin center',
   },
+  // DP-900 screenshots. Sources: MicrosoftDocs/azure-docs (LICENSE = CC BY 4.0,
+  // https://raw.githubusercontent.com/MicrosoftDocs/azure-docs/main/LICENSE) and
+  // MicrosoftDocs/sql-docs (LICENSE = CC BY 4.0, branch "live",
+  // https://raw.githubusercontent.com/MicrosoftDocs/sql-docs/live/LICENSE).
+  streamAnalyticsOutputJson: {
+    src: 'images/data/stream-analytics-output-json.png',
+    alt: 'Real Azure Portal screenshot of a blob opened in Edit view showing ten lines of JSON, each with messageId, deviceId, temperature, humidity and EventProcessedUtcTime fields',
+    description: "The Edit tab of a blob in an Azure Storage container, with the JSON format selected. Ten numbered lines are shown, and each line is its own JSON object containing the field names messageId, deviceId, temperature, humidity and EventProcessedUtcTime followed by their values. The blob is the output file a Stream Analytics job wrote to blob storage.",
+    sourceLabel: 'Microsoft Learn: Create a Stream Analytics Job using Azure portal',
+    sourceUrl: 'https://learn.microsoft.com/en-us/azure/stream-analytics/stream-analytics-quick-create-portal',
+  },
+  sqlQueryEditorJoin: {
+    src: 'images/data/sql-query-editor-join.png',
+    alt: 'Real Azure Portal screenshot of the Query editor for an Azure SQL database showing a SELECT TOP 20 join query and its results',
+    description: "The Query editor (preview) page for a SQL database named mySampleDatabase. The query pane holds SELECT TOP 20 pc.Name as CategoryName, p.name as ProductName FROM SalesLT.ProductCategory pc JOIN SalesLT.Product p ON pc.productcategoryid = p.productcategoryid, and the Results pane lists CategoryName and ProductName columns with rows such as Road Frames, Helmets, Socks and Caps paired with product names. The Run button and Results tab are outlined in red.",
+    sourceLabel: 'Microsoft Learn: Create a single database - Azure SQL Database',
+    sourceUrl: 'https://learn.microsoft.com/en-us/azure/azure-sql/database/single-database-create-quickstart',
+  },
+  sqlCreateAdditionalSettings: {
+    src: 'images/data/sql-create-additional-settings.png',
+    alt: 'Real Azure Portal screenshot of the Additional settings tab of the Create SQL Database wizard with Sample selected',
+    description: "The Additional settings tab of the Create SQL Database wizard. Under Data source, the Use existing data toggle offers None, Backup and Sample, with Sample selected and outlined in red, and the text AdventureWorksLT will be created as the sample database. Under Database collation, the page notes that collation cannot be changed after database creation and the Collation box shows SQL_Latin1_General_CP1_CI_AS. The Review + create button is outlined in red at the bottom.",
+    sourceLabel: 'Microsoft Learn: Create a single database - Azure SQL Database',
+    sourceUrl: 'https://learn.microsoft.com/en-us/azure/azure-sql/database/single-database-create-quickstart',
+  },
+  tableStorageAddEntity: {
+    src: 'images/data/table-storage-add-entity.png',
+    alt: 'Real Azure Portal screenshot of the Add entity dialog for an Azure Table storage table',
+    description: "The Add entity dialog in Storage browser for an Azure Table storage table. It lists four properties with a Property Name, Type and Value for each: PartitionKey (String, mypartitionkey) and RowKey (String, myrowkey1), both greyed out, then LastName (String, Adams) and FirstName (String, Sam). An Add property button sits below the list, with Insert and Cancel buttons at the bottom.",
+    sourceLabel: 'Microsoft Learn: Create a table in the Azure portal',
+    sourceUrl: 'https://learn.microsoft.com/en-us/azure/storage/tables/table-storage-quickstart-portal',
+  },
+  streamAnalyticsQuery: {
+    src: 'images/data/stream-analytics-query.png',
+    alt: 'Real Azure Portal screenshot of a Stream Analytics job Query page with a SELECT INTO FROM WHERE Temperature > 27 query',
+    description: "The Query page of an Azure Stream Analytics job. The job topology pane lists Inputs (1) with IoTHubInput, Outputs (1) with BlobOutput, and Functions (0). The query editor shows four lines: SELECT *, INTO BlobOutput, FROM IoTHubInput, WHERE Temperature > 27. Below it, the Input preview pane shows a warning that no data was received from '2' partitions while sampling, and the toolbar shows a Job ready to start status.",
+    sourceLabel: 'Microsoft Learn: Create a Stream Analytics Job using Azure portal',
+    sourceUrl: 'https://learn.microsoft.com/en-us/azure/stream-analytics/stream-analytics-quick-create-portal',
+  },
 };
 
 // `hideDescription` is set by quiz/exam question views — the description
