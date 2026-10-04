@@ -661,6 +661,57 @@ const REAL_PORTAL_SCREENSHOTS = {
     sourceUrl: 'https://learn.microsoft.com/en-us/azure/active-directory-b2c/configure-security-analytics-sentinel',
     product: 'Log Analytics in Microsoft Sentinel',
   },
+  // Microsoft 365 admin center screenshots (AB-650) — sourced from the
+  // MicrosoftDocs/microsoft-365-docs GitHub repo (public branch), whose
+  // LICENSE is CC BY 4.0 (https://raw.githubusercontent.com/MicrosoftDocs/microsoft-365-docs/public/LICENSE).
+  m365AdminCenterDashboard: {
+    src: 'images/m365/m365-admin-center-dashboard.png',
+    alt: 'Real Microsoft 365 admin center screenshot of the Home page in Dashboard view',
+    description: 'The Microsoft 365 admin center Home page in Dashboard view, with quick actions (Add a user, Reset password, Add a group) and cards for Microsoft Teams, User management, Billing, Training, guides & assistance, and Microsoft 365 apps. The Teams card shows status lines such as "Teams is on for your organization" and "Guest access is on", and the Microsoft 365 apps card reports how many licensed users have installed the apps. The left navigation lists Home, Copilot, Users, Teams & groups, Marketplace, Billing and Setup, plus Customize navigation and Show all.',
+    sourceLabel: 'Microsoft Learn: Add users and assign licenses in Microsoft 365',
+    sourceUrl: 'https://learn.microsoft.com/en-us/microsoft-365/admin/add-users/add-users',
+    product: 'Microsoft 365 admin center',
+  },
+  m365UsageDashboard: {
+    src: 'images/m365/m365-usage-dashboard.png',
+    alt: 'Real Microsoft 365 admin center screenshot of the Usage dashboard overview',
+    description: 'The Usage overview page in the Microsoft 365 admin center, showing an Active users trend chart for the past 30 days and summary cards such as Active users - Microsoft 365 Services, Active users - Microsoft 365 Apps, Email activity and Microsoft Teams activity, with OneDrive files, SharePoint files and Office activations cards below. A Product Reports list (Exchange, Forms, Microsoft Teams, OneDrive, SharePoint, Yammer and others) sits on the left, and the intro text states which reporting periods are available and how soon data appears.',
+    sourceLabel: 'Microsoft Learn: Microsoft 365 admin center usage reports overview',
+    sourceUrl: 'https://learn.microsoft.com/en-us/microsoft-365/admin/activity-reports/activity-reports',
+    product: 'Microsoft 365 admin center',
+  },
+  m365CompareAdminRoles: {
+    src: 'images/m365/m365-compare-admin-roles.png',
+    alt: 'Real Microsoft 365 admin center screenshot of the Compare roles permission table for Global admin and User admin',
+    description: 'The Compare roles view in the Microsoft 365 admin center, listing permissions in rows with a green dot under each role that has them. Two roles are compared — Global admin ("Has unlimited access to all management features and most data in all admin centers") and User admin ("Resets user passwords, creates and manages users and groups, including filters, manages service requests, and monitors service health"). Admins use this to find the least permissive role that still grants the permissions a task needs.',
+    sourceLabel: 'Microsoft Learn: Assign admin roles in the Microsoft 365 admin center',
+    sourceUrl: 'https://learn.microsoft.com/en-us/microsoft-365/admin/add-users/assign-admin-roles',
+    product: 'Microsoft 365 admin center',
+  },
+  copilotAgentsDataAccess: {
+    src: 'images/m365/copilot-agents-data-access.png',
+    alt: 'Real Microsoft 365 admin center screenshot of Copilot Settings, Data access tab, with the Agents settings pane open',
+    description: 'Copilot > Settings in the Microsoft 365 admin center with the Data access tab selected (listing Agents, Copilot in Power Platform and Dynamics 365, and Web search for Microsoft 365 Copilot and Microsoft 365 Copilot Chat) and the Agents pane open on the right. The pane notes that data processed by non-Microsoft services is not subject to Microsoft agreements, then offers "Choose who can access agents" (All users, No users, Specific users/groups) and two checkboxes for allowing apps and agents created by Microsoft and by external publishers.',
+    sourceLabel: 'Microsoft Learn: Agents admin guide for Microsoft 365',
+    sourceUrl: 'https://learn.microsoft.com/en-us/microsoft-365/copilot/agent-essentials/m365-agents-admin-guide',
+    product: 'Microsoft 365 admin center',
+  },
+  agentSharingSettings: {
+    src: 'images/m365/agent-sharing-settings.png',
+    alt: 'Real Microsoft 365 admin center screenshot of the agent Sharing settings pane',
+    description: 'The Sharing pane under Agent settings in the Microsoft 365 admin center. It explains that only agents built with Copilot Studio Lite are available for sharing and that users restricted from sharing with the entire organization can still share their agents with individual users. The setting "Choose who has permission to share agents with your entire organization" offers three choices — allow all users, no users (but they can choose who they share agents with), or specific groups of users — with a search box for adding users or groups and a Save button.',
+    sourceLabel: 'Microsoft Learn: Agent settings in Microsoft 365 admin center',
+    sourceUrl: 'https://learn.microsoft.com/en-us/microsoft-365/admin/manage/agent-settings',
+    product: 'Microsoft 365 admin center',
+  },
+  agentRegistryOverview: {
+    src: 'images/m365/agent-registry.png',
+    alt: 'Real Microsoft 365 admin center screenshot of the All agents page, Registry tab',
+    description: 'The All agents page in the Microsoft 365 admin center with the Registry tab selected (alongside Map and Requests). Summary tiles show Total agents, Agents without owners and Blocked agents; the toolbar offers Refresh, Export to Excel, Upload custom agent and Manage pinned agents; the filter bar shows Status, an active "Publisher: Microsoft" filter, Channel, Platform and Data source; and the table lists agents with Status, Platform, High Risks, Active users (30 days), Total sessions (30 days) and Date created columns.',
+    sourceLabel: 'Microsoft Learn: Agent Registry in Microsoft 365 admin center',
+    sourceUrl: 'https://learn.microsoft.com/en-us/microsoft-365/admin/manage/agent-registry',
+    product: 'Microsoft 365 admin center',
+  },
 };
 
 // `hideDescription` is set by quiz/exam question views — the description
