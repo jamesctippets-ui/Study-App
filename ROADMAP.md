@@ -1442,10 +1442,45 @@ trading away for shinier but shallower ones.
   3.8-4.8 s in headless Chromium. Left alone on purpose: the `_` placeholder
   parameters, optional `size` props on icon components, and the derived
   `dist/data/*.json` files (still groundwork for a second client).
-- [ ] **Home path — nothing blocking.** Untried: a "teach me" lesson passage
-  for the Wipe/Retire/Fresh Start and HL7 ACK cross-references, an
-  adjustable reminder to review, and counting optional sections toward the
-  daily goal differently from core steps.
+- [x] **Home path — the easy items.** (1) *Lesson passages:* the MD-102
+  operations lesson now teaches Wipe vs. Retire vs. Fresh Start and the EHR
+  Integration HL7 lesson teaches the ACK codes, so the two bridges that were
+  "loose by design" now have a real lesson to point at. (2) *Adjustable
+  review reminder:* the Review card has a selector (Off, Daily, Every 3 days,
+  Weekly; default every 3 days) stored as `stats.reviewReminder`; an in-app
+  banner (no push notifications, the app is static) shows when something is
+  waiting and the last Home review was at least that many days ago.
+  (3) *Optional sections and the daily goal:* finishing a deep dive or a
+  bridge adds a flat `OPTIONAL_SECTION_GOAL_BONUS` (2) toward the daily goal,
+  since those have no per-answer scoring; bonus games already count per
+  result. Subtitle wrapping on the Home cards was checked at phone width; no
+  change needed.
+- [x] **Definition flyouts everywhere, and acronyms spelled out.** (1)
+  *Coverage:* the term index now matches a card by its front, its front
+  without a trailing parenthetical, a parenthetical acronym, or either half
+  of an "A vs. B" front, and acronyms with no card of their own get a
+  "Stands for ..." pseudo-card. Flyouts were added to lesson sections
+  (summary, fundamentals, scenario, traps, on the job), case-study
+  scenarios, cheat-sheet points, final-exam results, bridges and deep
+  dives through one `GlossText` component, and only one flyout is open at a
+  time (`currentGlossClose`). (2) *Acronym expansion:* `data/acronyms.py`
+  holds about 470 expansions (13 ambiguous acronyms list every meaning, the
+  best match for the surrounding text first, the rest as "(also: ...)"; 30
+  trivial tokens such as ID and OS are `trigger: False` so they aren't
+  tappable alone). Every flyout leads with "**RBAC** stands for Role-Based
+  Access Control", and acronyms in the definition get a footer (max six).
+  (3) *Enforced coverage:* `build.py` fails when content uses an
+  acronym-shaped token at least twice that is in neither `ACRONYMS` nor
+  `IGNORE`; `--check-acronyms` lists the gaps. (4) The Glossary has a Terms /
+  Acronyms switch. Caveats: the expansions were written from knowledge and
+  spot-checked, not independently verified entry by entry (CIM was corrected
+  to "Composite Image File System (CimFS)" and VPP checked); the least
+  certain are TAXII, OWASP, VPP, M365D, MTTR and AAAA, and PV1 is classed as
+  an HL7 segment. The detector only looks at tokens with at least two
+  capitals or digits, so mixed-case words like "Mac" are never flagged.
+- [ ] **Home path — nothing blocking.** Untried: expanding the acronym
+  dictionary through a second-reader fact-check, and letting a learner add
+  their own acronyms or terms.
 
 - [x] **Tough terms flashcard deck.** Each `srs` entry now also stores the
   raw 1-5 rating it was last given (`last`). A card is "tough" when that

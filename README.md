@@ -143,6 +143,32 @@ every other track auto-detects terms by matching flashcard fronts against
 the surrounding text, so coverage scales to new content with no
 per-question authoring needed.
 
+**Flyouts spell out acronyms.** Every flyout says what its acronym stands
+for: tap `RBAC` and it opens with "**RBAC** stands for Role-Based Access
+Control", then the card's definition. Acronyms that appear in a card's
+definition get a short "Acronyms" footer (capped at six). Those expansions
+live in `data/acronyms.py` (`ACRONYMS`, about 470 entries; an entry is
+`{'exp': 'text' | ['meaning 1', 'meaning 2'], 'trigger': False}` where
+`trigger: False` stops a trivial token like ID or OS from being tappable by
+itself). An acronym with several meanings (CA, CI, MDM, SAS, SOC...) lists
+them all, best match for the surrounding text first, with the others shown
+as "(also: ...)". Matching is alias-based: a card is found by its front, its
+front without a trailing parenthetical, a parenthetical acronym
+("Role-Based Access Control (RBAC)" is also matched by "RBAC"), or either
+half of an "A vs. B" front, and an acronym that has no flashcard of its own
+still gets a definition-less "Stands for ..." flyout. Flyouts now also work
+on lesson sections (summary, fundamentals, scenario, traps, on the job),
+case-study scenarios, cheat-sheet points, final-exam results, Home bridges
+and deep dives, all through one `GlossText` component. The Glossary has a
+**Terms / Acronyms** switch so you can browse or search the expansions
+directly.
+
+`python3 build.py` **fails** if the content uses an acronym-shaped token
+(2+ capitals/digits, used at least twice) that is neither in `ACRONYMS` nor
+in the `IGNORE` set of non-acronyms (plurals are covered by the singular).
+`python3 build.py --check-acronyms` lists what's missing. Add the expansion,
+or add the token to `IGNORE` if it isn't an acronym.
+
 The Exam tab for each track links out to real official study resources —
 Microsoft Learn study guides and certification pages for the Microsoft
 tracks, PeopleCert for ITIL, CompTIA for Cloud+, and HL7 International's
@@ -300,7 +326,11 @@ bottom:
 - A **Review across your certs** card: Weak spots (missed questions), Tough
   terms (flashcards rated OK or lower), and Missed games, plus a single
   "Review everything due" round that mixes all three — drawn from every cert in
-  your plan, with each answer recorded to its own cert.
+  your plan, with each answer recorded to its own cert. A selector on that card
+  sets an in-app review reminder (Off, Daily, Every 3 days, Weekly; default
+  every 3 days) that shows once something is waiting and you haven't reviewed
+  for that long; finishing a deep dive or a bridge adds a small flat bonus to
+  the daily goal.
 - A compact **Your certs** list (order, path progress, exam countdown,
   mastery) with the cert you're studying marked.
 - A **"Continue where you left off"** button once you've actually
@@ -527,6 +557,7 @@ don't edit it directly, it'll be overwritten. The real source is:
 ```
 data/
   tracks.py     — TRACKS (which certs exist / are visible) and EXAM_CONFIG
+  acronyms.py   — acronym → expansion dictionary for flyouts (coverage enforced by build.py)
   itil.py       — ITIL categories, flashcards, questions, course lessons
   az900.py      — AZ-900 categories, flashcards, questions, course lessons
   az104.py      — AZ-104 categories, flashcards, questions, course lessons
@@ -534,7 +565,7 @@ data/
 src/js/
   00_preamble.js        — React hook imports, the COLOR palette
   01_diagrams.jsx        — SVG lesson diagrams
-  02_portal_mockups.jsx  — fake Azure Portal screenshots used in lessons
+  02_portal_mockups.jsx  — fake Azure Portal screenshots used in lessons; the term-flyout engine (alias matching, acronym lookup, GlossText)
   03_helpers.js          — shuffling, storage, question-prep helpers
   04a_home_ui.jsx        — Home, cert path, daily goal/question/vocab, achievements, Data panel
   04b_panels_ui.jsx      — About/Legal, Glossary, term flyout, category filter

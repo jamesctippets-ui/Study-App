@@ -257,11 +257,16 @@ function AboutLegalPanel({ onClose }) {
 // wrapper) — not a block appended below the whole paragraph/card. The
 // `term-flyout` class is what useClickOutsideToClose looks for to know a
 // click landed inside it rather than outside.
-function TermFlyout({ term, triggerText, onClose, shift, arrowLeft }) {
+function TermFlyout({ term, triggerText, context, onClose, shift, arrowLeft }) {
   if (!term) return null;
   const s = shift || 0;
   const acr = flyoutAcronyms(term, triggerText);
-  const spell = (key) => acronymExpansions(key).join(' or ');
+  const ctx = `${context || ''} ${term.front || ''} ${term.back || ''} ${term.detail || ''}`;
+  // The best-fitting meaning for this context first; any others are shown
+  // quietly after it so an ambiguous acronym (CA, SAS...) never misleads.
+  const meanings = (key) => acronymExpansions(key, ctx);
+  const spell = (key) => meanings(key)[0];
+  const alsoMeans = (key) => meanings(key).slice(1);
   return (
     <span
       className="term-flyout"
@@ -289,10 +294,12 @@ function TermFlyout({ term, triggerText, onClose, shift, arrowLeft }) {
       {acr.lead.map((k) => (term.acronymOnly ? (
         <span key={k} style={{ display: 'block', fontSize: '12.5px', lineHeight: 1.5, color: COLOR.text, position: 'relative' }}>
           Stands for <strong>{spell(k)}</strong>
+          {alsoMeans(k).length > 0 && <span style={{ color: COLOR.muted, fontSize: '11px' }}> (also: {alsoMeans(k).join('; ')})</span>}
         </span>
       ) : (
         <span key={k} style={{ display: 'block', fontSize: '12px', lineHeight: 1.45, color: COLOR.gold, marginBottom: '4px', position: 'relative' }}>
           <strong>{k}</strong> stands for {spell(k)}
+          {alsoMeans(k).length > 0 && <span style={{ color: COLOR.muted, fontSize: '11px' }}> (also: {alsoMeans(k).join('; ')})</span>}
         </span>
       )))}
       {term.back && <span style={{ display: 'block', fontSize: '12.5px', lineHeight: 1.5, color: COLOR.text, position: 'relative' }}>{term.back}</span>}

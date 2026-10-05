@@ -475,7 +475,7 @@ FLASHCARDS = [
         'id': 'f66',
         'cat': 'userEnvApps',
         'front': "MSIX app attach image formats: VHD, VHDX, and CIM",
-        'back': "MSIX app attach can stage an application's image as a VHD, VHDX, or CIM (Composite Image Format) file. CIM is the newer, recommended format, since it attaches faster and doesn't require pre-expanding or managing a fixed-size virtual disk the way VHD/VHDX does.",
+        'back': "MSIX app attach can stage an application's image as a VHD, VHDX, or CIM (Composite Image File System, or CimFS) file. CIM is the newer, recommended format, since it attaches faster and doesn't require pre-expanding or managing a fixed-size virtual disk the way VHD/VHDX does.",
         'detail': "Because the underlying image format is just a packaging detail of how the app is staged, switching an existing MSIX app attach application from VHDX to CIM doesn't change anything about how the app appears or behaves for the end user.",
     },
     {
@@ -1780,7 +1780,7 @@ QUESTIONS = [
             "ISO, a mounted optical disc image",
             "VHDX, a virtual hard disk image",
             "VHD, the older virtual hard disk image",
-            "CIM, the Composite Image Format",
+            "CIM, the Composite Image File System (CimFS)",
         ],
         'correct': 3,
         'explanation': "CIM is the newer image format built for app attach: it attaches faster and uses less CPU and memory than mounting a virtual disk. VHDX works and is the near-miss, and VHD is the older virtual disk format with the same overhead. ISO is not a supported staging format for app attach.",

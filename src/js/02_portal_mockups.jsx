@@ -946,7 +946,7 @@ function findTermCard(term, vocabPool) {
 // whole paragraph/card) — the wrapping span's `position: relative` is what
 // makes the flyout's `position: absolute` land right under this specific
 // word instead of the block's bottom edge.
-function TermTrigger({ text, card, isActive, onToggle }) {
+function TermTrigger({ text, card, isActive, onToggle, context }) {
   const wrapperRef = useRef(null);
   // Anchored under the trigger word via `left: 0` by default (see
   // TermFlyout), which overflows off the right edge of the screen for any
@@ -989,7 +989,7 @@ function TermTrigger({ text, card, isActive, onToggle }) {
       >
         {text}
       </button>
-      {isActive && <TermFlyout term={card} triggerText={text} onClose={onToggle} shift={pos.shift} arrowLeft={pos.arrowLeft} />}
+      {isActive && <TermFlyout term={card} triggerText={text} context={context} onClose={onToggle} shift={pos.shift} arrowLeft={pos.arrowLeft} />}
     </span>
   );
 }
@@ -1008,9 +1008,16 @@ function acronymKey(token) {
   return null;
 }
 
-function acronymExpansions(key) {
+// The expansions of an acronym. When it has several meanings and `context` (the
+// text it appeared in) is given, the meanings whose words show up in that text
+// come first, so "CA" next to "Conditional Access" leads with Conditional Access.
+function acronymExpansions(key, context) {
   const e = ACRONYMS[key];
-  return e ? (Array.isArray(e.exp) ? e.exp : [e.exp]) : [];
+  const list = e ? (Array.isArray(e.exp) ? e.exp : [e.exp]) : [];
+  if (list.length < 2 || !context) return list;
+  const ctx = context.toLowerCase();
+  const score = (exp) => exp.toLowerCase().split(/[^a-z0-9]+/).filter((w) => w.length >= 5 && ctx.includes(w)).length;
+  return list.map((exp, i) => ({ exp, i, s: score(exp) })).sort((a, b) => b.s - a.s || a.i - b.i).map((x) => x.exp);
 }
 
 // Each defined acronym in `text`, in order of first appearance.
@@ -1028,6 +1035,7 @@ const squash = (s) => s.toLowerCase().replace(/[^a-z0-9]/g, '');
 
 const FLYOUT_FOOTER_ACRONYMS = 6;
 
+// (Ubiquitous acronyms marked `trigger: False` in data/acronyms.py — ID, OS, IP... — are left out of the lists to keep flyouts short.)
 // What a flyout should spell out: `lead` are the acronyms of the term itself
 // (its title, or the acronym that was tapped), skipped when the title already
 // spells them out ("Role-based access control (RBAC)"); `footer` are the other
@@ -1037,9 +1045,9 @@ function flyoutAcronyms(term, triggerText) {
   const spelledInFront = (key) => acronymExpansions(key).some((e) => frontSquashed.includes(squash(e)));
   const lead = [];
   const tappedKey = triggerText ? acronymKey(triggerText.trim()) : null;
-  [tappedKey, ...acronymsIn(term.front)].forEach((k) => { if (k && !lead.includes(k) && !spelledInFront(k)) lead.push(k); });
+  [tappedKey, ...acronymsIn(term.front).filter((k) => ACRONYMS[k].trigger !== false)].forEach((k) => { if (k && !lead.includes(k) && !spelledInFront(k)) lead.push(k); });
   const footer = acronymsIn(`${term.back || ''} ${term.detail || ''}`)
-    .filter((k) => !lead.includes(k) && !spelledInFront(k))
+    .filter((k) => !lead.includes(k) && !spelledInFront(k) && ACRONYMS[k].trigger !== false)
     .slice(0, FLYOUT_FOOTER_ACRONYMS);
   return { lead, footer };
 }
@@ -1194,7 +1202,7 @@ function renderGlossed(text, { curated, pool, activeKey, onToggle, maxTerms, blo
     } else {
       const key = (blockId || '') + ':' + sp.start;
       out.push(
-        <TermTrigger key={'k' + sp.start} text={sp.text} card={sp.card} isActive={key === activeKey} onToggle={() => onToggle(key === activeKey ? null : key)} />
+        <TermTrigger key={'k' + sp.start} text={sp.text} card={sp.card} isActive={key === activeKey} onToggle={() => onToggle(key === activeKey ? null : key)} context={text} />
       );
     }
     pos = sp.end;
