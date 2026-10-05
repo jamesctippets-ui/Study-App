@@ -590,6 +590,258 @@
       "front": "Cross-workspace KQL queries",
       "back": "The workspace() function lets a KQL query in one Log Analytics workspace reach into a table in a different workspace -- and resource() does the same for a specific Azure resource's own logs -- letting a hunt correlate data that a larger organization has deliberately split across multiple separate Sentinel workspaces (often by subscription, region, or business unit).",
       "detail": "This matters specifically because entity mapping, alert grouping, and most KQL pipelines otherwise assume all the needed data already lives in one workspace -- without workspace(), a hunt split across workspace boundaries would have to be run and manually reconciled separately in each one."
+    },
+    {
+      "id": "f80",
+      "cat": "manageSecOps",
+      "front": "Scheduled analytics rule settings: query frequency, lookback period, and event grouping",
+      "back": "A scheduled analytics rule runs its KQL query every set interval and looks back over a set period of data. An alert threshold decides how many results trigger it, and event grouping chooses between one alert summarizing all results or a separate alert for each result.",
+      "detail": "Keep the lookback at least as long as the run frequency so no events fall between runs. Event grouping controls how many alerts one run produces, not whether alerts merge into an incident."
+    },
+    {
+      "id": "f81",
+      "cat": "manageSecOps",
+      "front": "Table plans in Microsoft Sentinel: Analytics, Basic, and Auxiliary",
+      "back": "Each Log Analytics table in Sentinel has a plan. Analytics gives full KQL, analytics rules and hunting. Basic and Auxiliary cost less per gigabyte but limit queries and features, which makes them suited to high-volume, low-value data such as verbose firewall logs.",
+      "detail": "Data on a Basic or Auxiliary plan cannot be the source of an analytics rule. If a detection rule depends on a table, that table must stay on the Analytics plan."
+    },
+    {
+      "id": "f82",
+      "cat": "manageSecOps",
+      "front": "Microsoft Sentinel data lake",
+      "back": "The Sentinel data lake is a low-cost tier in the Defender portal for keeping large volumes of security data for up to 12 years. You query it with KQL, jobs and Jupyter notebooks, and jobs can promote useful data to the Analytics tier for detections.",
+      "detail": "Use it for compliance retention, forensics and large-scale hunting over old data, and keep data you alert on in the Analytics tier. Lake queries are billed by use."
+    },
+    {
+      "id": "f83",
+      "cat": "manageSecOps",
+      "front": "Syslog and Common Event Format (CEF) via AMA connectors",
+      "back": "These Sentinel connectors use the Azure Monitor Agent on a Linux machine to collect Syslog messages, and CEF messages from firewalls and other security appliances, under a data collection rule. The machine can be the source itself or a forwarder for other devices.",
+      "detail": "CEF lands in the CommonSecurityLog table and plain Syslog in the Syslog table. A log forwarder is the usual answer when appliances can only send syslog over the network."
+    },
+    {
+      "id": "f84",
+      "cat": "manageSecOps",
+      "front": "Anomaly analytics rules in Microsoft Sentinel",
+      "back": "Anomaly rules are machine-learning templates tuned by Microsoft that flag unusual behavior and write results to the Anomalies table. They run in a flighting mode for testing and then in production, and you can adjust their thresholds without any machine learning knowledge.",
+      "detail": "By default anomalies are signals, not alerts or incidents. Use them in hunting queries or as an input to a scheduled rule. UEBA focuses on who behaves oddly, while these rules focus on what activity is odd."
+    },
+    {
+      "id": "f85",
+      "cat": "manageSecOps",
+      "front": "Microsoft Sentinel Automation Contributor role",
+      "back": "This role is assigned to the Microsoft Sentinel service account on the resource group that holds a playbook, so that automation rules can run it. It is used only for that purpose and is not given to people.",
+      "detail": "If an automation rule cannot trigger a playbook, check this role assignment on the playbook's resource group. Running playbooks manually also needs Logic App Contributor."
+    },
+    {
+      "id": "f86",
+      "cat": "manageSecOps",
+      "front": "Resource-context RBAC and table-level RBAC in Sentinel",
+      "back": "Resource-context RBAC lets people read logs for Azure resources they already have access to, without access to the whole workspace. Table-level RBAC grants access to specific tables only. Both give narrow data access without the full Sentinel experience.",
+      "detail": "Use them to let an application team query their own VM logs, or give an auditor one table. Do not give workspace-wide roles when only some data is needed."
+    },
+    {
+      "id": "f87",
+      "cat": "manageSecOps",
+      "front": "Microsoft Sentinel in the Defender portal (unified security operations)",
+      "back": "Microsoft is moving Sentinel into the Microsoft Defender portal, where SIEM data and XDR incidents appear together in one queue. Sentinel in the Azure portal is scheduled to be retired on March 31, 2027, after which it is managed only in the Defender portal.",
+      "detail": "Exam angle: the same Sentinel features continue, only the portal changes. Connecting a workspace to the Defender portal also brings in the unified incident queue and Defender XDR hunting."
+    },
+    {
+      "id": "f88",
+      "cat": "manageSecOps",
+      "front": "Defender for Office 365 preset security policies (Standard and Strict)",
+      "back": "Preset security policies apply Microsoft's recommended anti-spam, anti-malware, anti-phishing, Safe Links and Safe Attachments settings in one step. Standard suits most users, Strict suits high-value targets, and Built-in protection is the only preset on by default.",
+      "detail": "Presets are not editable, so use them for fast, consistent protection. Assign Strict to executives and finance, and keep Standard for everyone else."
+    },
+    {
+      "id": "f89",
+      "cat": "manageSecOps",
+      "front": "Custom detection rules in Defender XDR",
+      "back": "A custom detection rule turns an advanced hunting query into a scheduled rule that creates alerts and can take automated response actions on devices, files, users or emails that the query returns. It works across Defender XDR data.",
+      "detail": "The query must return a timestamp and identifying columns, and for Defender for Endpoint tables that includes DeviceId and ReportId. This is the Defender XDR counterpart to a Sentinel analytics rule."
+    },
+    {
+      "id": "f90",
+      "cat": "manageSecOps",
+      "front": "Defender for Cloud plans: Foundational CSPM, Defender CSPM, and workload protection",
+      "back": "Foundational CSPM is free and covers inventory, recommendations, secure score and compliance. Defender CSPM is a paid plan adding attack path analysis, agentless scanning and a cloud security graph. Workload protection plans, such as Defender for Servers and Storage, add threat detection.",
+      "detail": "Pick Defender CSPM when the question mentions attack paths. Pick the workload plan for the resource type being attacked, because each plan protects a specific kind of resource."
+    },
+    {
+      "id": "f91",
+      "cat": "manageSecOps",
+      "front": "Defender for Cloud Apps: Cloud Discovery",
+      "back": "Cloud Discovery analyzes firewall and proxy logs, or traffic from Defender for Endpoint devices, against a catalog of cloud apps to show which apps are in use, how risky they are and how many users use them. It is the shadow IT feature.",
+      "detail": "Admins can mark discovered apps as unsanctioned, and with Defender for Endpoint integration block indicators are created to stop those apps on devices."
+    },
+    {
+      "id": "f92",
+      "cat": "manageSecOps",
+      "front": "Windows Security Events via AMA connector",
+      "back": "This Sentinel connector collects Windows security events from servers and workstations with the Azure Monitor Agent and a data collection rule, and writes them to the SecurityEvent table. You choose a preset, such as All, Common or Minimal, or a custom set of event IDs.",
+      "detail": "It replaces the legacy agent-based Security Events connector. Choose Minimal or Common to control ingestion cost, and use custom XPath filters to drop noisy event IDs."
+    },
+    {
+      "id": "f93",
+      "cat": "respondIncidents",
+      "front": "Threat analytics in Defender XDR",
+      "back": "Threat analytics is a set of reports from Microsoft security researchers on specific named threats, such as an active campaign or a new vulnerability. Each report shows related incidents, impacted assets and whether your devices are exposed, with mitigation guidance.",
+      "detail": "Use it to learn whether a headline threat affects you. It reports on specific threats and exposure, unlike MITRE coverage, which maps your detections to techniques."
+    },
+    {
+      "id": "f94",
+      "cat": "respondIncidents",
+      "front": "Collect investigation package (Defender for Endpoint)",
+      "back": "Collect investigation package is a response action that gathers a fixed set of forensic data from a device into an archive, such as installed programs, autostart entries, running processes, network connections and event logs. It runs no commands on the device.",
+      "detail": "It fits when you need evidence to analyze offline. If the analyst needs to run scripts or fetch a particular file interactively, use live response instead."
+    },
+    {
+      "id": "f95",
+      "cat": "respondIncidents",
+      "front": "Restrict app execution (Defender for Endpoint)",
+      "back": "Restrict app execution applies a code integrity policy to a Windows device so that only Microsoft-signed apps can run. It limits what an attacker can launch on a compromised machine while the device stays on the network, and it can be removed later.",
+      "detail": "It is milder than full isolation, which cuts network access. Choose it when you want to stop unknown binaries running but keep the device reachable for investigation."
+    },
+    {
+      "id": "f96",
+      "cat": "respondIncidents",
+      "front": "Run antivirus scan (Defender for Endpoint response action)",
+      "back": "Run antivirus scan starts a quick or full Microsoft Defender Antivirus scan on a device from the device page in the Defender portal. The result is recorded in the Action center, and detected threats are handled by the antivirus policy.",
+      "detail": "It is a manual action, so it needs no automation setup. It is available in Plan 1 as well as Plan 2, unlike live response, which needs Plan 2."
+    },
+    {
+      "id": "f97",
+      "cat": "respondIncidents",
+      "front": "Stop and quarantine a file (Defender for Endpoint)",
+      "back": "Stop and quarantine a file ends the processes running a file and moves that file into quarantine on the device, so it can no longer run. The action can be reversed from the Action center if the file turns out to be safe.",
+      "detail": "Add an indicator to block a file, by contrast, blocks it across the whole organization. Quarantine handles a file seen in an alert, and an indicator blocks it everywhere."
+    },
+    {
+      "id": "f98",
+      "cat": "respondIncidents",
+      "front": "Entity pages in Microsoft Sentinel",
+      "back": "An entity page collects what Sentinel knows about one entity, such as an account, host, IP address or URL. It shows basic details, a timeline of related alerts, bookmarks and activities, and behavior insights, and can be opened from an incident or by search.",
+      "detail": "It is the quickest place to answer what else this account or host has been doing. The timeline makes it easy to see related alerts across incidents."
+    },
+    {
+      "id": "f99",
+      "cat": "respondIncidents",
+      "front": "Email remediation actions: soft delete vs hard delete",
+      "back": "In Defender for Office 365, an admin can remediate delivered email by moving it to Inbox, Junk or Deleted Items, or by soft deleting or hard deleting it. Soft delete leaves the message recoverable by the user, while hard delete removes it permanently.",
+      "detail": "Use soft delete for a likely threat you may need to restore, and hard delete for confirmed malicious mail. Purge actions are limited to messages delivered in roughly the last 30 days."
+    },
+    {
+      "id": "f100",
+      "cat": "respondIncidents",
+      "front": "Admin submissions in the Defender portal",
+      "back": "Admin submissions let a security admin send messages, URLs or files to Microsoft for analysis and say whether they were wrongly blocked, a false positive, or wrongly allowed, a false negative. The verdict can also feed allow or block entries.",
+      "detail": "Use submissions to report a missed phish so detections improve. It also makes Microsoft's verdict visible, so you can see why a message was or was not blocked."
+    },
+    {
+      "id": "f101",
+      "cat": "respondIncidents",
+      "front": "Attack simulation training (Defender for Office 365)",
+      "back": "Attack simulation training lets an organization run harmless phishing simulations, such as credential harvest or malicious attachment, against its users and assign training to those who fall for them. It needs Defender for Office 365 Plan 2 or Microsoft 365 E5.",
+      "detail": "It measures and improves user behavior rather than blocking mail. Reports show click and report rates, and payload automation can turn real reported phish into simulations."
+    },
+    {
+      "id": "f102",
+      "cat": "respondIncidents",
+      "front": "Pass-the-hash and pass-the-ticket attacks",
+      "back": "In pass-the-hash, an attacker reuses a captured NTLM password hash to authenticate without knowing the password. In pass-the-ticket, they reuse a stolen Kerberos ticket. Both let them move laterally using credentials taken from memory, and Defender for Identity detects them.",
+      "detail": "Both are lateral movement techniques that use stolen credentials. Defender for Identity raises alerts such as suspected pass-the-ticket, and lateral movement paths show which accounts make this easy."
+    },
+    {
+      "id": "f103",
+      "cat": "respondIncidents",
+      "front": "DCSync attack",
+      "back": "In a DCSync attack, an attacker with directory replication rights pretends to be a domain controller and asks for password data through the directory replication protocol. This can reveal account hashes, including the krbtgt account. Defender for Identity detects it.",
+      "detail": "Alerts fire when replication is requested by a machine that is not a domain controller. Watch for accounts holding replicating directory changes rights that should not have them."
+    },
+    {
+      "id": "f104",
+      "cat": "respondIncidents",
+      "front": "Mean time to detect (MTTD) and mean time to respond (MTTR)",
+      "back": "Mean time to detect is the average time from an attack starting to the SOC noticing it. Mean time to respond is the average time from detection to containing or closing the incident. They are the headline measures of how well a SOC performs.",
+      "detail": "Automation rules, playbooks and tuned analytics rules aim to lower both numbers. Sentinel workbooks that track incident time to triage and time to closure help show whether changes are working."
+    },
+    {
+      "id": "f105",
+      "cat": "threatHunting",
+      "front": "KQL aggregation functions: count(), dcount(), and arg_max()",
+      "back": "Used with summarize, count() totals all rows, dcount() returns the approximate number of distinct values, and arg_max() returns the full row with the highest value of a column. Together they turn raw events into per-user or per-device summaries.",
+      "detail": "dcount(IPAddress) by user finds users signing in from many addresses, while count() would only total sign-ins. arg_max(TimeGenerated, *) keeps the latest row and all its columns."
+    },
+    {
+      "id": "f106",
+      "cat": "threatHunting",
+      "front": "KQL bin() and ago() functions",
+      "back": "ago() returns a point in time a given distance in the past, such as ago(7d), and is used to filter by recent time. bin() rounds values down to a fixed size, so summarize by bin(TimeGenerated, 1h) buckets events into hourly groups.",
+      "detail": "Combine them to count events per hour over the last day. Narrow the time range first with ago(), because it makes the query faster and cheaper."
+    },
+    {
+      "id": "f107",
+      "cat": "threatHunting",
+      "front": "KQL make-series and series_decompose_anomalies",
+      "back": "make-series builds a regular time series, with a value for every time slot, and series_decompose_anomalies() flags points that break the normal trend or seasonal pattern. It is how a hunter finds unusual spikes without picking a fixed threshold.",
+      "detail": "Typical use: build an hourly count of sign-ins or data uploads, then flag the hour that deviates from the baseline. Results are arrays, so mv-expand or render timechart makes them readable."
+    },
+    {
+      "id": "f108",
+      "cat": "threatHunting",
+      "front": "KQL externaldata and datatable operators",
+      "back": "datatable defines a small table inline in the query, and externaldata reads a table from a file at a URL, such as a list of bad IP addresses in a storage account. Both let a query use a custom list without ingesting it first.",
+      "detail": "Use datatable for a short allow or block list typed into the query, and externaldata for a larger list that someone else maintains. A Sentinel watchlist is the managed alternative."
+    },
+    {
+      "id": "f109",
+      "cat": "threatHunting",
+      "front": "KQL parse_json() and dynamic columns",
+      "back": "parse_json() converts a JSON string into a dynamic value that the query can read by property name, as in AdditionalFields.ProcessName. todynamic() does the same, and the resulting properties can then be filtered, projected and summarized.",
+      "detail": "Many security tables store details as a string of JSON. Without parsing it you can only search the whole text, while parsing lets you filter on one field."
+    },
+    {
+      "id": "f110",
+      "cat": "threatHunting",
+      "front": "KQL regex: extract() and matches regex",
+      "back": "extract() pulls the text matched by a regular expression capture group out of a string, and the matches regex operator filters rows whose text matches a pattern. They help when the value you need is buried inside a longer string.",
+      "detail": "Use extract() to take a domain from a URL or a user from a log line. Regex is slower than has or ==, so use it only after cheaper filters have reduced the rows."
+    },
+    {
+      "id": "f111",
+      "cat": "threatHunting",
+      "front": "SecurityAlert and SecurityIncident tables",
+      "back": "In a Sentinel workspace, SecurityAlert holds alerts from analytics rules and connected Microsoft security products, and SecurityIncident holds incidents with their status, owner and classification. Both can be queried with KQL to report on or hunt through alerts.",
+      "detail": "SecurityIncident writes a new row each time an incident changes, so use arg_max(TimeGenerated, *) by IncidentNumber to see the latest state of each incident."
+    },
+    {
+      "id": "f112",
+      "cat": "threatHunting",
+      "front": "CommonSecurityLog and Syslog tables",
+      "back": "CommonSecurityLog stores Common Event Format messages from firewalls, proxies and other security appliances, and Syslog stores standard Linux and network device syslog messages. They are the main tables for network device and Linux hunting in Sentinel.",
+      "detail": "Firewall allow and deny events, and many Linux logins, are found here. If a hunt needs network device logs, check these tables first."
+    },
+    {
+      "id": "f113",
+      "cat": "threatHunting",
+      "front": "OfficeActivity table",
+      "back": "OfficeActivity holds Microsoft 365 audit activity from Exchange Online, SharePoint Online and Teams, collected through the Microsoft 365 connector in Sentinel. It records actions such as file downloads, mailbox rule creation and sharing.",
+      "detail": "A hunter looking for suspicious mailbox forwarding rules or mass file downloads queries this table. It complements sign-in logs by showing what a user did after authenticating."
+    },
+    {
+      "id": "f114",
+      "cat": "threatHunting",
+      "front": "Hunts in Microsoft Sentinel",
+      "back": "The Hunts feature in Sentinel organizes proactive threat hunting around a hypothesis. It groups related queries and bookmarks, records whether the hypothesis was validated, and lets the hunter turn findings into analytics rules, threat indicators or incidents.",
+      "detail": "It is the structured, trackable way to hunt. A saved query alone shows results, but a hunt keeps the evidence, notes and outcome together."
+    },
+    {
+      "id": "f115",
+      "cat": "threatHunting",
+      "front": "AlertInfo and AlertEvidence tables (advanced hunting)",
+      "back": "In Defender XDR advanced hunting, AlertInfo holds alert details such as title, severity and category, and AlertEvidence holds the files, IP addresses, URLs, users and devices tied to each alert. Both share an AlertId column for joining.",
+      "detail": "Join them on AlertId to list every entity involved in an alert. They cover alerts from all Defender workloads, and they replace the older device-only alerts table."
     }
   ],
   "questions": [

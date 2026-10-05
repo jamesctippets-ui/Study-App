@@ -669,6 +669,272 @@
       "front": "Credential and key rotation",
       "back": "Periodically replacing passwords, API keys, and certificates with new ones on a defined schedule (or immediately after a suspected compromise), so a credential that leaked or was exposed has only a limited window in which it's actually still valid.",
       "detail": "This limits the damage of a leaked secret the same way the principle of least privilege limits the damage of an over-broad grant -- neither one assumes a breach won't happen, both just shrink what it can actually reach, or how long it stays useful, once one does."
+    },
+    {
+      "id": "f88",
+      "cat": "archDesign",
+      "front": "Shared responsibility model",
+      "back": "Security and operations duties are split between the cloud provider and the customer. The provider secures the underlying infrastructure (facilities, hardware, hypervisor), while the customer secures what they put on it: their data, identities, access settings, and, depending on the service model, the guest OS and applications.",
+      "detail": "The line moves with the service model: in IaaS the customer patches the guest OS, in SaaS the provider does. Data and access management always stay with the customer."
+    },
+    {
+      "id": "f89",
+      "cat": "archDesign",
+      "front": "Virtual private cloud (VPC) and subnets",
+      "back": "A VPC (called a virtual network in some clouds) is a logically isolated private network inside a public cloud, defined by an IP range in CIDR notation. It is divided into subnets, commonly public ones with a route to an internet gateway and private ones without, and subnets are placed in availability zones.",
+      "detail": "In a typical three-tier design, web servers sit in a public subnet while application and database servers sit in private subnets with no direct internet route."
+    },
+    {
+      "id": "f90",
+      "cat": "archDesign",
+      "front": "Transit gateway and network peering",
+      "back": "Peering connects two networks directly so they can talk privately, but it is not transitive. A transit gateway is a central hub that many VPCs and on-premises networks attach to, letting them route to each other without building a full mesh of peering links.",
+      "detail": "Ten VPCs in a full peering mesh need 45 connections, while a transit gateway needs only 10 attachments, which is why it scales better for many networks."
+    },
+    {
+      "id": "f91",
+      "cat": "archDesign",
+      "front": "Site-to-site VPN vs. dedicated connection",
+      "back": "A site-to-site VPN sends encrypted traffic over the public internet, so it is quick and inexpensive to set up but its latency and bandwidth vary. A dedicated connection is a private link from the datacenter to the provider, with consistent latency and higher bandwidth, but at higher cost and longer lead time, and it is not encrypted by default.",
+      "detail": "A common pattern is a dedicated connection as the primary path with a VPN as an encrypted backup. Choose the dedicated link when a scenario stresses predictable latency or high throughput."
+    },
+    {
+      "id": "f92",
+      "cat": "archDesign",
+      "front": "Serverless computing and Function as a service (FaaS)",
+      "back": "Serverless means the provider runs and scales the servers while the customer pays per execution. FaaS is its event-triggered form: small functions run in response to events such as an HTTP request or a file upload, and scale down to zero when idle.",
+      "detail": "It suits spiky, event-driven work. Typical trade-offs are execution time limits, cold-start delay on first invocation, and tighter lock-in to the provider's event services."
+    },
+    {
+      "id": "f93",
+      "cat": "archDesign",
+      "front": "Microservices vs. monolithic architecture",
+      "back": "A monolith packages all of an application's functions into one deployable unit. Microservices split it into small, loosely coupled services that communicate through APIs, so each can be deployed, scaled, and fail independently of the others.",
+      "detail": "Microservices let you scale only a busy checkout service, but they add network calls and make troubleshooting harder, which is why tracing and centralized logging become important."
+    },
+    {
+      "id": "f94",
+      "cat": "archDesign",
+      "front": "Regions and availability zones",
+      "back": "A region is a geographic area containing multiple datacenters. An availability zone is one or more isolated datacenters inside a region, with independent power, cooling, and networking. Spreading across zones protects against a datacenter failure, and spreading across regions protects against a regional disaster.",
+      "detail": "High availability within a region points to a multi-zone design, while disaster recovery or data locality requirements point to a second region."
+    },
+    {
+      "id": "f95",
+      "cat": "archDesign",
+      "front": "Relational vs. non-relational (NoSQL) databases",
+      "back": "Relational databases store data in tables with a fixed schema, use SQL, and provide ACID transactions, which suits structured, related data. Non-relational databases, such as key-value, document, column, and graph stores, use flexible schemas and usually scale out horizontally.",
+      "detail": "Orders and payments that need strict consistency fit a relational database, while session data or a huge product catalog with varied fields fits a key-value or document store."
+    },
+    {
+      "id": "f96",
+      "cat": "security",
+      "front": "Data loss prevention (DLP)",
+      "back": "Controls that detect and block sensitive data, such as card numbers or personal records, from leaving approved boundaries through email, uploads, endpoints, or cloud storage. DLP inspects content and applies rules based on how the data is classified.",
+      "detail": "A scenario about stopping staff from uploading customer records to personal storage points to DLP. It works best after data has been classified."
+    },
+    {
+      "id": "f97",
+      "cat": "security",
+      "front": "Data sovereignty vs. data locality",
+      "back": "Data sovereignty is the legal principle that data is subject to the laws of the jurisdiction where it is collected, stored, or processed. Data locality is the physical or geographic location where the data is stored and processed.",
+      "detail": "Choosing an in-country region satisfies a locality rule, but backups or replicas copied to another region can break it, so check replication and backup settings too."
+    },
+    {
+      "id": "f98",
+      "cat": "security",
+      "front": "Federation (SAML and OpenID Connect)",
+      "back": "Federation lets one identity provider authenticate users for services run by other organizations or apps, so users sign in once with their home credentials. SAML passes signed XML assertions and is common for enterprise web single sign-on, while OpenID Connect adds an identity layer on OAuth 2.0 using JSON tokens, common for modern web and mobile apps.",
+      "detail": "A requirement for partner staff to use their own company logins without separate accounts in your cloud is a federation scenario."
+    },
+    {
+      "id": "f99",
+      "cat": "security",
+      "front": "Secrets management",
+      "back": "Storing and distributing credentials such as API keys, passwords, tokens, and certificates in a dedicated vault service with access control, audit logging, and rotation, instead of hardcoding them in source code, images, or configuration files.",
+      "detail": "A cloud key found in a public Git repository is the failure it prevents. Applications fetch secrets at runtime using their own identity, which pairs with credential rotation."
+    },
+    {
+      "id": "f100",
+      "cat": "security",
+      "front": "Bastion host (jump box)",
+      "back": "A hardened, closely monitored host that is the single entry point for administrative SSH or RDP access into private instances, which have no public IP addresses. Admins connect to the bastion first and then onward to the target.",
+      "detail": "It shrinks the exposed attack surface to one logged system instead of many. Managed bastion services provide the same pattern without maintaining the host yourself."
+    },
+    {
+      "id": "f101",
+      "cat": "security",
+      "front": "Vulnerability scanning and CVE",
+      "back": "Vulnerability scanning automatically checks systems, images, and containers for known weaknesses. Findings are usually identified by CVE (Common Vulnerabilities and Exposures) numbers and ranked by severity so teams can prioritize patching or configuration fixes.",
+      "detail": "A scan only finds problems, so remediation and a re-scan to verify the fix must follow. It differs from a penetration test, which actively tries to exploit weaknesses."
+    },
+    {
+      "id": "f102",
+      "cat": "security",
+      "front": "Defense in depth",
+      "back": "Layering several independent security controls, such as network segmentation, firewalls, identity controls, encryption, and monitoring, so that the failure or bypass of any one layer does not expose the asset.",
+      "detail": "A WAF in front of an app is one layer, but the app should still validate input, the database should restrict access, and data should be encrypted. Relying on a single control is the exam trap."
+    },
+    {
+      "id": "f103",
+      "cat": "security",
+      "front": "Compliance frameworks: PCI DSS, ISO 27001, and SOC 2",
+      "back": "PCI DSS sets requirements for protecting payment card data. ISO/IEC 27001 specifies an information security management system that can be independently certified. SOC 2 is an audit report on a service organization's controls against trust criteria such as security and availability.",
+      "detail": "A provider's SOC 2 report or ISO certificate is evidence about its own controls, but it does not make the customer's workload compliant. That still depends on the shared responsibility model."
+    },
+    {
+      "id": "f104",
+      "cat": "security",
+      "front": "Symmetric vs. asymmetric encryption",
+      "back": "Symmetric encryption uses one shared secret key to both encrypt and decrypt, and it is fast, so it protects bulk data. Asymmetric encryption uses a public and private key pair, is slower, and is used for key exchange, digital signatures, and certificates.",
+      "detail": "TLS combines them: asymmetric cryptography authenticates the server and agrees on a key, then symmetric encryption protects the actual session data."
+    },
+    {
+      "id": "f105",
+      "cat": "deployment",
+      "front": "Configuration drift",
+      "back": "The gradual divergence of a deployed environment from its intended, defined configuration, usually caused by manual changes made outside the automation. Drift detection compares the actual state with the declared infrastructure-as-code state and flags the differences.",
+      "detail": "A server hand-edited during an outage is the classic cause. Reapplying the IaC definition, or replacing the instance, brings it back to the declared state."
+    },
+    {
+      "id": "f106",
+      "cat": "deployment",
+      "front": "Declarative vs. imperative provisioning",
+      "back": "Declarative tools, such as Terraform or cloud templates, describe the desired end state and the tool works out the steps. Imperative scripts, such as shell or CLI commands, specify each step in order, so the author handles ordering and existing state.",
+      "detail": "Running a declarative definition twice leaves the same result, while a naive imperative script may create duplicates the second time. That repeatability is the exam point."
+    },
+    {
+      "id": "f107",
+      "cat": "deployment",
+      "front": "Golden image",
+      "back": "A pre-built, hardened, tested virtual machine or container image containing the OS, patches, agents, and baseline configuration, used as the standard template for launching new instances so every instance starts identical.",
+      "detail": "Patching means building a new golden image and replacing instances from it. That reduces boot-time setup and configuration drift."
+    },
+    {
+      "id": "f108",
+      "cat": "deployment",
+      "front": "Source control: branching, pull requests, and merging",
+      "back": "Version control, commonly Git, records every change to code and IaC. Teams make changes on separate branches, then open a pull request to merge into the main branch, which triggers code review and automated checks before the merge.",
+      "detail": "Protecting the main branch so changes need an approved pull request keeps unreviewed infrastructure changes out of production."
+    },
+    {
+      "id": "f109",
+      "cat": "deployment",
+      "front": "CI/CD artifacts and repositories",
+      "back": "An artifact is the versioned output of a build stage, such as a container image, VM image, or package (RPM, Debian, ZIP, tar). It is stored in a repository or registry and promoted unchanged through test, staging, and production.",
+      "detail": "Build once and deploy that same artifact everywhere. Rebuilding separately for each environment risks differences that only show up in production."
+    },
+    {
+      "id": "f110",
+      "cat": "deployment",
+      "front": "JSON and YAML",
+      "back": "Two text formats used for IaC templates and configuration files. JSON uses braces and quoted keys and is strict, with no comments. YAML uses indentation, is more readable, and allows comments. Both can express variables, lists, and nested structures.",
+      "detail": "A YAML pipeline that fails to parse is often an indentation error, while a JSON file fails on a stray trailing comma."
+    },
+    {
+      "id": "f111",
+      "cat": "deployment",
+      "front": "Event-driven automation",
+      "back": "Automation that runs in response to an event rather than a schedule or a person, such as a file arriving in storage, an alert firing, or a code push. It is commonly built with webhooks, message queues, and serverless functions.",
+      "detail": "An alert that triggers a function to restart a failed service is event-driven. A nightly script is scheduled, not event-driven."
+    },
+    {
+      "id": "f112",
+      "cat": "opsSupport",
+      "front": "Observability: logs, metrics, and traces",
+      "back": "The ability to understand a system's internal state from the data it emits. Logs are records of discrete events, metrics are numeric measurements over time such as CPU or latency, and traces follow one request across services.",
+      "detail": "Metrics show that latency rose, traces show which service in the chain is slow, and logs show the error behind it. Together they explain why, not just that something is wrong."
+    },
+    {
+      "id": "f113",
+      "cat": "opsSupport",
+      "front": "Distributed tracing",
+      "back": "Follows a single request as it passes through multiple services, assigning it a trace ID and recording a timed span for each hop, so you can see where time is spent or where an error originates.",
+      "detail": "It is the right tool when a request is slow only sometimes in a microservices app. Separate per-service logs cannot easily be lined up to show the path of one request."
+    },
+    {
+      "id": "f114",
+      "cat": "opsSupport",
+      "front": "Triggered, scheduled, and manual scaling",
+      "back": "Triggered (dynamic) scaling adds or removes capacity when a metric crosses a threshold. Scheduled scaling changes capacity at set times for predictable demand. Manual scaling is an operator changing capacity directly.",
+      "detail": "A known 9 a.m. rush calls for scheduled scaling, while an unpredictable traffic spike calls for triggered scaling."
+    },
+    {
+      "id": "f115",
+      "cat": "opsSupport",
+      "front": "Backup retention and replication",
+      "back": "A retention policy sets how long backups are kept before deletion, driven by recovery needs and compliance. Replication copies backups to another zone, region, or account so that a site failure does not destroy both the data and its backups. Backups should also be encrypted.",
+      "detail": "Backups stored beside the primary data will not survive a regional outage. The 3-2-1 rule means three copies, on two media types, with one kept offsite."
+    },
+    {
+      "id": "f116",
+      "cat": "opsSupport",
+      "front": "Recovery testing: in-place vs. parallel recovery",
+      "back": "Restoring from backup on a schedule proves the backups work. In-place recovery restores over the original resource, replacing its current state. Parallel recovery restores to a separate new resource, leaving the original untouched so the data can be checked before cutover.",
+      "detail": "A backup that has never been test-restored is unproven. Parallel recovery is safer for tests because production is not overwritten."
+    },
+    {
+      "id": "f117",
+      "cat": "opsSupport",
+      "front": "Ephemeral vs. persistent data",
+      "back": "Ephemeral data disappears when an instance stops or is replaced, such as instance store disks, container filesystems, and memory. Persistent data survives, kept on durable volumes, databases, or object storage.",
+      "detail": "Autoscaled instances that are destroyed on scale-in lose any logs or files stored locally, so those should be shipped to central persistent storage."
+    },
+    {
+      "id": "f118",
+      "cat": "opsSupport",
+      "front": "Resource lifecycle management and decommissioning",
+      "back": "Tracking cloud resources from provisioning through use, updates, and retirement. Proper decommissioning removes access, securely deletes data, deletes dependent items such as disks, snapshots, and IP addresses, and updates the CMDB.",
+      "detail": "Skipping it leaves orphaned resources that cost money and leftover data that is a security risk."
+    },
+    {
+      "id": "f119",
+      "cat": "opsSupport",
+      "front": "Right-sizing",
+      "back": "Matching an instance's size (vCPU, memory, storage) to the workload actually observed in monitoring data, so you neither pay for idle capacity nor run into limits. It often reduces cost without hurting performance.",
+      "detail": "A VM averaging 8 percent CPU is a candidate to downsize. This is separate from buying reserved capacity, which changes the price, not the size."
+    },
+    {
+      "id": "f120",
+      "cat": "troubleshooting",
+      "front": "MTU mismatch",
+      "back": "The maximum transmission unit is the largest packet a link can carry. A mismatch, often caused by VPN or tunnel overhead, makes large packets fragment or be dropped, especially when the don't-fragment flag is set and the ICMP messages that report the problem are blocked.",
+      "detail": "The classic symptom is that ping and the TCP handshake work but large transfers or HTTPS pages hang. Lowering the MTU or clamping the TCP segment size on the tunnel fixes it."
+    },
+    {
+      "id": "f121",
+      "cat": "troubleshooting",
+      "front": "CPU ready time",
+      "back": "On a virtualized host, the time a VM has work ready to run but waits for the hypervisor to schedule it on a physical CPU. High CPU ready time means vCPUs are contending for cores, even when utilization inside the guest looks low.",
+      "detail": "A sluggish VM with low guest CPU but high CPU ready points to host contention. Fixes include reducing overcommitment, right-sizing vCPU counts, or moving VMs, as with a noisy neighbor."
+    },
+    {
+      "id": "f122",
+      "cat": "troubleshooting",
+      "front": "Time synchronization failure (NTP and clock skew)",
+      "back": "Systems use NTP (Network Time Protocol) to keep clocks aligned. Clock skew breaks anything that depends on timestamps, including Kerberos authentication, TLS certificate validity checks, token expiry, and log correlation.",
+      "detail": "Sudden authentication failures on one VM, with a healthy network and valid credentials, point to its clock. Kerberos tolerates only a few minutes of skew, five by default."
+    },
+    {
+      "id": "f123",
+      "cat": "troubleshooting",
+      "front": "DNS TTL and propagation delay",
+      "back": "A record's time to live is how long resolvers may cache its answer. After a record changes, clients keep using the old answer until the TTL expires, so a cutover appears to work for some users and not others.",
+      "detail": "Lower the TTL ahead of a planned migration or blue-green switch so the change takes effect quickly. Flushing a local cache fixes only that machine."
+    },
+    {
+      "id": "f124",
+      "cat": "troubleshooting",
+      "front": "Packet loss and jitter",
+      "back": "Packet loss is the share of packets that never arrive, forcing retransmission in TCP or causing gaps in UDP traffic. Jitter is variation in packet delay. Both hurt real-time traffic such as voice and video more than file transfers.",
+      "detail": "Choppy voice calls with a healthy bandwidth test point to loss or jitter, not capacity. Check path statistics with tools like ping or mtr and review QoS settings."
+    },
+    {
+      "id": "f125",
+      "cat": "troubleshooting",
+      "front": "Memory leak",
+      "back": "A software bug in which memory is allocated but never released, so usage climbs over time until the process or host slows, swaps heavily, or is killed for running out of memory.",
+      "detail": "A steady upward memory trend that a restart temporarily clears is the tell. Moving to a larger instance only delays the failure, so the fix is in the application."
     }
   ],
   "questions": [

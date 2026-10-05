@@ -551,6 +551,244 @@
       "front": "Scaling plan schedules for weekdays vs. weekends",
       "back": "A single scaling plan can define more than one schedule, each assigned to a specific set of days, letting an admin give weekdays an aggressive ramp-up/peak/ramp-down pattern for business-hours demand while weekends use a much lighter schedule, or no ramp-up at all, instead of forcing one schedule to fit every day.",
       "detail": "Each schedule within the plan still configures its own ramp-up, peak, ramp-down, and off-peak phases independently, so weekday and weekend behavior can differ completely even though both live inside the same scaling plan object."
+    },
+    {
+      "id": "f73",
+      "cat": "planInfra",
+      "front": "Reverse connect transport",
+      "back": "The connection model Azure Virtual Desktop uses by default: the session host's agent opens an outbound connection to the AVD service, and the user's session is joined to it through the gateway. The host needs no inbound ports or public IP address, and RDP Shortpath UDP is layered on top of it.",
+      "detail": "Reverse connect is why denying all inbound traffic to session hosts works. If RDP Shortpath cannot form a direct UDP path, the session simply keeps using reverse connect, so Shortpath never replaces it."
+    },
+    {
+      "id": "f74",
+      "cat": "planInfra",
+      "front": "Session Traversal Utilities for NAT (STUN)",
+      "back": "A protocol that lets a client behind a NAT device discover its public IP address and port. RDP Shortpath for public networks uses STUN to find these endpoints and try a direct UDP connection between the client and the session host.",
+      "detail": "STUN servers use UDP port 3478, so hosts need outbound UDP rather than a public IP address. If the direct path fails, a TURN relay is tried, and then the connection falls back to reverse connect."
+    },
+    {
+      "id": "f75",
+      "cat": "planInfra",
+      "front": "Traversal Using Relays around NAT (TURN)",
+      "back": "A protocol that relays UDP traffic through an intermediary server when a direct path between two endpoints cannot be formed because of NAT or firewall rules. RDP Shortpath for public networks can use a TURN relay as the fallback after a direct STUN attempt.",
+      "detail": "A relayed path adds some latency compared with a direct STUN path, but it is still UDP, so it generally beats the TCP path through the gateway. Firewalls must allow the published relay address ranges."
+    },
+    {
+      "id": "f76",
+      "cat": "planInfra",
+      "front": "Azure Private Link for Azure Virtual Desktop",
+      "back": "Uses private endpoints so traffic between clients, session hosts, and the AVD service travels over private IP addresses in your virtual network instead of public endpoints. It uses one private endpoint per host pool, one per workspace for feed download, and a single one for initial feed discovery.",
+      "detail": "Private Link moves service endpoints onto private IPs but does not create the direct UDP data path that RDP Shortpath provides. Plan private DNS zones too, so names resolve to the private addresses."
+    },
+    {
+      "id": "f77",
+      "cat": "planInfra",
+      "front": "Session host",
+      "back": "A virtual machine registered to a host pool that runs the AVD agent and side-by-side stack, and on which users' desktop or RemoteApp sessions actually run. Pooled hosts run multi-session Windows; personal hosts are assigned to one user.",
+      "detail": "Session hosts live in your subscription, so you size, patch, secure, and pay for them. They register with the service using a host pool registration key, which is short-lived."
+    },
+    {
+      "id": "f78",
+      "cat": "planInfra",
+      "front": "Remote Desktop Protocol (RDP)",
+      "back": "Microsoft's remote-display protocol that carries a session's screen, keyboard and mouse input, audio, clipboard, and device redirection between client and host. AVD runs RDP over a TCP reverse connect transport, and over UDP when RDP Shortpath is available.",
+      "detail": "Host pool RDP properties switch protocol features such as drive, clipboard, and camera redirection on or off. Changes take effect at the user's next connection."
+    },
+    {
+      "id": "f79",
+      "cat": "planInfra",
+      "front": "RDP properties",
+      "back": "Settings on a host pool, set in the portal's RDP Properties tab or as a custom property string, that control how connections behave: which devices redirect (clipboard, drives, printers, camera), display and multi-monitor options, and features such as single sign-on and screen capture protection.",
+      "detail": "They apply to every user of the host pool's application groups and take effect at the next connection. Turning off clipboard or drive redirection here is a data-loss control."
+    },
+    {
+      "id": "f80",
+      "cat": "planInfra",
+      "front": "Azure Virtual Desktop agent and side-by-side stack",
+      "back": "The Remote Desktop Agent registers a session host with the AVD service and brokers connections to it, and the side-by-side stack is the RDP stack that lets multiple remote sessions run. Both are installed on every session host and update automatically by default.",
+      "detail": "Their health reports drive session host status values such as Available or Needs Assistance. Scheduled agent updates control only when these components update, not Windows updates."
+    },
+    {
+      "id": "f81",
+      "cat": "planInfra",
+      "front": "Golden image (master image)",
+      "back": "A reference VM configured once with the operating system, applications, and settings, then generalized with Sysprep and captured as an image so every session host deployed from it is identical. Versions are usually stored in an Azure Compute Gallery.",
+      "detail": "Install apps machine-wide and run Sysprep before capture, or deployed hosts end up with duplicate identities. Azure Image Builder can automate building and updating the image."
+    },
+    {
+      "id": "f82",
+      "cat": "planInfra",
+      "front": "Licensing for Azure Virtual Desktop",
+      "back": "Each user needs an eligible license: Microsoft 365 E3, E5, A3, A5, F3, or Business Premium, or Windows Enterprise E3 or E5, Education A3 or A5, or Windows VDA per user, for Windows client desktops. Windows Server session hosts need Remote Desktop Services licenses with Software Assurance, or RDS user subscription licenses.",
+      "detail": "These licenses cover user access rights only; you still pay Azure consumption for VMs, disks, and storage. Microsoft 365 Business Basic or Microsoft 365 Apps alone do not entitle a user to Windows desktops."
+    },
+    {
+      "id": "f83",
+      "cat": "planInfra",
+      "front": "Server Message Block (SMB)",
+      "back": "The network file-sharing protocol, on TCP port 445, that session hosts use to reach FSLogix profile storage and MSIX app attach images on Azure Files or Azure NetApp Files. FSLogix needs SMB access to mount each user's VHD or VHDX.",
+      "detail": "Blocked outbound traffic on port 445 from the session host subnet to the storage is a common cause of profile mount failures and temporary profiles."
+    },
+    {
+      "id": "f84",
+      "cat": "planInfra",
+      "front": "Delegated subnet (Azure NetApp Files)",
+      "back": "A dedicated subnet delegated to the Microsoft.NetApp/volumes service, which Azure NetApp Files requires for its volumes' network interfaces. Only one subnet per virtual network can be delegated to it, and the subnet cannot hold other kinds of resources.",
+      "detail": "Session hosts do not have to sit in the delegated subnet; they only need network reachability to it, for example from the same or a peered VNet."
+    },
+    {
+      "id": "f85",
+      "cat": "planInfra",
+      "front": "Capacity pool (Azure NetApp Files)",
+      "back": "The block of provisioned storage, with a chosen service level such as Standard, Premium, or Ultra, from which Azure NetApp Files volumes are carved. Each volume's size counts against its pool, and the pool must exist before volumes can be created.",
+      "detail": "You pay for the provisioned pool capacity rather than only the data used, so right-size it for the FSLogix containers. The service level determines the throughput available per tebibyte."
+    },
+    {
+      "id": "f86",
+      "cat": "identitySecurity",
+      "front": "Microsoft Entra ID",
+      "back": "Microsoft's cloud identity service, formerly Azure Active Directory. Azure Virtual Desktop authorizes users through it and assigns application groups to Entra identities, so users must exist there, either cloud-only or synchronized from on-premises AD DS.",
+      "detail": "How session hosts are joined does not change this. Domain join only affects how the hosts authenticate users after they connect."
+    },
+    {
+      "id": "f87",
+      "cat": "identitySecurity",
+      "front": "Microsoft Entra Connect",
+      "back": "A synchronization tool that copies users and groups, and optionally password hashes, from on-premises AD DS into Microsoft Entra ID, producing hybrid identities. Microsoft Entra Cloud Sync is a lighter, cloud-managed alternative.",
+      "detail": "AVD needs AD DS users synchronized before they can be assigned to application groups, even when the session hosts are only Microsoft Entra-joined."
+    },
+    {
+      "id": "f88",
+      "cat": "identitySecurity",
+      "front": "Microsoft Entra Domain Services (Microsoft Entra DS)",
+      "back": "A managed AD DS domain in Azure whose domain controllers Microsoft runs, offering Kerberos, NTLM, and Group Policy. AVD session hosts can join this managed domain when there are no on-premises or IaaS domain controllers.",
+      "detail": "Identities sync one way from Microsoft Entra ID. Choosing it assumes hosts join that managed domain, and it is not a prerequisite for Microsoft Entra Kerberos on Azure Files."
+    },
+    {
+      "id": "f89",
+      "cat": "identitySecurity",
+      "front": "Microsoft Entra Kerberos authentication for Azure Files",
+      "back": "Lets hybrid user identities reach an Azure Files share over SMB using Kerberos tickets issued by Microsoft Entra ID, with no line of sight to domain controllers. Microsoft Entra-joined session hosts can then mount FSLogix profile shares.",
+      "detail": "After enabling it on the storage account, grant admin consent to the new app registration, then set the share-level permissions. It is meant for hybrid identities that exist in both on-premises AD and Entra ID."
+    },
+    {
+      "id": "f90",
+      "cat": "identitySecurity",
+      "front": "Identity source (Azure Files)",
+      "back": "Azure Files authenticates SMB access with Kerberos from one identity source per storage account: on-premises AD DS, Microsoft Entra Domain Services, or Microsoft Entra Kerberos for hybrid identities. The right choice depends on how session hosts are joined and whether they can reach domain controllers.",
+      "detail": "Entra Kerberos suits Entra-joined hosts with no domain controller access, AD DS suits domain-joined hosts that can reach them, and Entra Domain Services suits hosts in that managed domain."
+    },
+    {
+      "id": "f91",
+      "cat": "identitySecurity",
+      "front": "Share-level permissions (Azure Files)",
+      "back": "Azure RBAC roles that control who can mount an Azure Files share over SMB. They are the first of two layers, with NTFS permissions on folders and files as the second. A default share-level permission can apply to all authenticated users, or roles can be assigned to users and groups.",
+      "detail": "Both layers must allow access. A missing share-level role gives 'Access is denied' even when NTFS permissions are correct, and clinicians or other users end up on temporary profiles."
+    },
+    {
+      "id": "f92",
+      "cat": "identitySecurity",
+      "front": "Storage File Data SMB Share Contributor",
+      "back": "A built-in Azure role that grants read, write, and delete access to files and directories in an Azure Files share over SMB. The Elevated Contributor variant additionally lets a user change NTFS permissions.",
+      "detail": "Assign it to the users' group on the share or storage account so FSLogix can create and write profile containers. Storage Blob Data Contributor and Storage Account Contributor do not give access to file share data."
+    },
+    {
+      "id": "f93",
+      "cat": "identitySecurity",
+      "front": "Windows LAPS (Local Administrator Password Solution)",
+      "back": "Windows LAPS automatically randomizes and rotates each device's local administrator password and backs it up to Microsoft Entra ID or Active Directory. It is built into current Windows and replaces the older Microsoft LAPS.",
+      "detail": "Microsoft Entra-joined session hosts with no AD DS use the Entra ID backup, deployed through an Intune policy, because legacy LAPS can only store passwords in Active Directory."
+    },
+    {
+      "id": "f94",
+      "cat": "identitySecurity",
+      "front": "Windows Hello for Business",
+      "back": "A passwordless sign-in method that replaces a password with a key bound to the device and unlocked by a PIN or biometric. The private key stays in the device's TPM when one is available, which makes the credential phishing-resistant and multifactor by design.",
+      "detail": "A user who signed in to the AVD feed with Hello for Business is still prompted again at the session host unless single sign-on is enabled in the host pool's RDP properties."
+    },
+    {
+      "id": "f95",
+      "cat": "identitySecurity",
+      "front": "Compliant device (Intune device compliance)",
+      "back": "A device that meets the compliance rules defined in Microsoft Intune, such as disk encryption, a minimum OS version, or a required security state, and is therefore marked compliant in Microsoft Entra ID. Conditional Access can require a compliant device as a grant control.",
+      "detail": "For AVD, requiring MFA or a compliant device lets you challenge only unmanaged or non-compliant client devices instead of every user on every sign-in."
+    },
+    {
+      "id": "f96",
+      "cat": "identitySecurity",
+      "front": "Role-based access control (RBAC)",
+      "back": "Azure RBAC grants access by assigning a role to a user, group, or service principal at a scope such as a subscription, resource group, or resource. AVD uses several layers of it: Desktop Virtualization roles for AVD objects, VM login roles for sign-in, and storage roles for file data.",
+      "detail": "A user can hold the right Desktop Virtualization role and still fail at the VM login or the file share, so check each layer separately when troubleshooting access."
+    },
+    {
+      "id": "f97",
+      "cat": "userEnvApps",
+      "front": "Microsoft Intune",
+      "back": "Microsoft's cloud endpoint management service for configuring, securing, and deploying apps to devices. For AVD it manages Microsoft Entra-joined session hosts through settings catalog and security baseline policies, Win32 app deployment, and device compliance.",
+      "detail": "Domain Group Policy cannot reach Entra-joined hosts that have no domain, so Intune policies are how you continuously enforce settings such as session watermarking on them."
+    },
+    {
+      "id": "f98",
+      "cat": "userEnvApps",
+      "front": "Drive redirection",
+      "back": "An RDP feature that exposes the client's local drives inside the remote session so users can copy files between the two. It is controlled by a host pool RDP property or by policy, and can be turned off to stop data being copied out.",
+      "detail": "Disabling drive and clipboard redirection are real data-loss controls, but neither stops someone photographing the screen. That needs session watermarking and screen capture protection."
+    },
+    {
+      "id": "f99",
+      "cat": "userEnvApps",
+      "front": "Clipboard redirection",
+      "back": "An RDP feature that lets users copy and paste between their local device and the remote session. It can be disabled, or limited to one direction, through a host pool RDP property or policy.",
+      "detail": "Screen capture protection does not turn it off; clipboard redirection is a separate RDP property, so blocking copy-and-paste out of the session must be configured on its own."
+    },
+    {
+      "id": "f100",
+      "cat": "userEnvApps",
+      "front": "Microsoft 365 Apps shared computer activation",
+      "back": "A licensing mode for Microsoft 365 Apps on hosts that many users share, where each user who signs in activates the apps under their own license instead of consuming one of a limited number of per-user device installs. It is required on multi-session session hosts.",
+      "detail": "Enable it when installing, with a machine-wide installation on the master image. Microsoft 365 Apps use user-based licensing, so a KMS host key is not the answer."
+    },
+    {
+      "id": "f101",
+      "cat": "userEnvApps",
+      "front": "Remote Desktop client (Windows App)",
+      "back": "The app users run to subscribe to a workspace feed and connect to their AVD desktops and RemoteApps. Microsoft's current unified client is Windows App, which replaces the older Remote Desktop clients and also runs in a browser on devices where nothing can be installed.",
+      "detail": "The older Remote Desktop MSI client and web client reached end of support for public cloud on 27 March 2026, so new designs point users to Windows App."
+    },
+    {
+      "id": "f102",
+      "cat": "userEnvApps",
+      "front": "MSIX package signing certificate",
+      "back": "An MSIX package must be digitally signed, and the signing certificate must be trusted by the machines that install it. For MSIX app attach, that means the session hosts, not the users' client devices.",
+      "detail": "If an app attach package never appears in sessions despite correct share permissions, check certificate trust on the session hosts and that the hosts' computer accounts can read the image share."
+    },
+    {
+      "id": "f103",
+      "cat": "monitorMaintain",
+      "front": "Log Analytics workspace",
+      "back": "The Azure Monitor Logs store that AVD diagnostic settings, AVD Insights, and Azure Monitor Agent data collection rules send data to. AVD tables such as WVDConnections, WVDErrors, WVDCheckpoints, and WVDAgentHealthStatus are queried with KQL.",
+      "detail": "A workspace is required to use AVD Insights. Retention is set per table, so adjust it to balance troubleshooting history against cost."
+    },
+    {
+      "id": "f104",
+      "cat": "monitorMaintain",
+      "front": "Azure Update Manager",
+      "back": "Azure's service for assessing and scheduling operating system updates across Azure VMs and Azure Arc-enabled servers from one place, using maintenance schedules. For AVD it patches the Windows OS on session hosts, separately from the AVD agent's own updates.",
+      "detail": "Combine maintenance windows with drain mode or autoscale so users are not signed out mid-session, or patch the golden image and redeploy hosts instead."
+    },
+    {
+      "id": "f105",
+      "cat": "monitorMaintain",
+      "front": "Capacity threshold (autoscale)",
+      "back": "A pooled-host-pool scaling plan setting: the percentage of the pool's total session capacity at which autoscale acts. Above the threshold it starts more session hosts; below it, it can deallocate surplus ones. Capacity is session hosts multiplied by the max session limit.",
+      "detail": "Autoscale does nothing when usage exactly equals the threshold. It works together with the minimum percentage of hosts, which sets a floor on how many hosts stay on."
+    },
+    {
+      "id": "f106",
+      "cat": "monitorMaintain",
+      "front": "Azure Activity log",
+      "back": "A subscription-level log that records control-plane operations on Azure resources: who created, changed, or deleted something, and when. It is kept for 90 days by default, and can be sent to a Log Analytics workspace for longer retention.",
+      "detail": "Use it to find who deleted a host pool or changed a scaling plan. Connection and session data come from AVD diagnostic logs instead."
     }
   ],
   "questions": [

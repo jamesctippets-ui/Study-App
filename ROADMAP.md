@@ -1629,6 +1629,34 @@ trading away for shinier but shallower ones.
   together, and can be edited or deleted. They are a self-test only: they never
   touch results, mastery or the daily goal. Both lists live in stats, so they
   travel with export and import.
+- [x] **Colour, Profile, path games and more definitions.** (1) *Colour:*
+  every cert accent, unit banner, trail node, Home tile and bottom-bar tab now
+  has its own hue (new blue, orange and pink join the existing palette), in both
+  themes. In light mode `ink()` darkens an accent for text so contrast holds
+  (`--accent-darken`); `tint()` mixes a hue into a card background with
+  `color-mix`. (2) *Profile:* a sixth tab (also reachable from the header,
+  `#/profile`) with a study level, tiles for streak, days studied, questions
+  answered, cards reviewed, path steps and exams passed, a 12-week activity map
+  fed by a small per-day `activityLog`, **earned certifications** (mark a cert earned or undo it), **My plan**
+  (order, dates, days to exam, with a link to manage the plan) and
+  achievements; name and avatar colour are stored in `stats.profile`. All of it
+  lives in stats, so it travels with export and import. (3) *Path games:* each
+  unit now has 11 steps, not 8. A **Match round**, a **Quick-fire** true or
+  false set and a **second game** are woven between the old steps, in one of three
+  orders chosen by unit number so units don't all feel the same. Saves from before
+  the change are migrated once (`pathVersion`, `migratePathSteps`): a finished
+  unit stays finished and a half-done unit keeps what it had, with the added
+  steps marked done. (4) *Definitions:* about 550 new flashcards across all 15
+  certs (1,189 to 1,736), 40 new acronym entries (467 to 507) and three
+  more meanings for CI, CSV and MAA, with `IGNORE` extended for the SQL keywords
+  and sample names the new cards use. Practice question stems now carry
+  tappable terms and acronyms too, not only the answers and explanations.
+  Honest limit: the new cards were written by parallel workers from
+  knowledge and a spot-check, not looked up card by card, so the factual pass
+  in section 14 has not yet been repeated on them. (5) *Tests:* the home-path
+  and bridge tests were updated for the longer unit and for term triggers in
+  question stems; `full_smoke.js` and a few older scripts still describe the
+  pre-Path navigation and no longer run.
 - [ ] **Open ideas.** Sounds for the verbal quiz and the case-study end screen;
   sharing a scenario or term list between devices without a full export; a
   step bank that also learns from your own earlier scenarios; the real module

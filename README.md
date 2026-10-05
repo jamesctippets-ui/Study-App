@@ -6,7 +6,7 @@ proper Python source tree instead of one giant file.
 
 ## What's inside
 
-Four top-level tabs per track: **Path** (a guided, Duolingo-style walk
+The bottom bar has Home and Profile plus four top-level tabs per track: **Path** (a guided, Duolingo-style walk
 through the track — see below), **Practice** (every quiz and game, picked
 from one grouped dropdown), **Reference** (the study material), and
 **Exam**. Reference holds three sub-views — Cards (flashcards, ordered by a real SM-2 spaced-repetition
@@ -380,6 +380,7 @@ On a cert's Path tab, a unit stays locked until the one before it is finished (o
 you tap "Unlock anyway"; units you've started never lock), and a chime can play
 on step completion. Both are switches under Data & Progress → Path & sounds.
 Your own terms can be limited to one cert and saved straight from a flyout, and Practice > Sequence lets you build your own step-ordering scenarios (with a step bank) alongside the built-in ones. Answer sounds also cover the Match, Compare, Mad Libs, Sequence and command games.
+Every cert accent, unit banner and tab has its own hue in both themes. The **Profile** tab (`#/profile`, `04g_profile_ui.jsx`) shows a study level, stat tiles (streak, days studied, questions, cards, path steps, exams), a 12-week activity map, earned certifications you can mark or undo, your plan with exam dates, and achievements. Path units now have 11 steps, with a Match round, a Quick-fire true or false set and a second game woven in (saves from earlier versions are migrated once). Practice question stems carry tappable definitions, and there are about 550 more flashcards (1,736 in all) and 507 acronym expansions.
 Fonts are self-hosted (`fonts/`) with an OpenDyslexic option, every image and font is precached for offline use, and the Glossary has a **Mine** tab for your own terms and acronyms, which then appear in flyouts. Sounds (celebration chimes and right/wrong answer tones) are opt-in in Data & Progress.
 Call-to-action buttons use `.btn-3d` (a solid pressable edge), and the font is
 Nunito, loaded from Google Fonts, with Inter as the fallback.

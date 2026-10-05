@@ -702,6 +702,251 @@
       "front": "Teams external access (federation) vs. guest access",
       "back": "External access (federation) lets users in one organization's tenant chat, call, and meet with users in another organization's tenant without either side becoming a member of the other's tenant. Guest access instead adds an external user as an actual Microsoft Entra B2B guest member of a specific team, giving them persistent access to that team's channels, files, and apps.",
       "detail": "A vendor who should be able to message your employees occasionally needs external access; a long-term contractor who needs to sit inside one specific Team's channels and files day after day needs to be added as a guest instead."
+    },
+    {
+      "id": "f96",
+      "cat": "tenantConfig",
+      "front": "Cloud Policy service for Microsoft 365",
+      "back": "A service in the Microsoft 365 Apps admin center that enforces Office policy settings, much like Group Policy, on Microsoft 365 Apps wherever a targeted user signs in, even on devices that are not domain joined or otherwise managed.",
+      "detail": "Policies apply to users and Microsoft Entra groups, not devices. The Allow web search in Copilot policy is one of the settings an admin can configure here."
+    },
+    {
+      "id": "f97",
+      "cat": "tenantConfig",
+      "front": "Microsoft Entra administrative units",
+      "back": "Containers that subdivide a tenant so a role assignment can be limited to the users, groups, or devices inside that unit instead of applying tenant-wide. They let you delegate administration without granting broad rights.",
+      "detail": "A Helpdesk Administrator scoped to the Sales administrative unit can reset passwords only for Sales users and cannot change tenant-wide settings."
+    },
+    {
+      "id": "f98",
+      "cat": "tenantConfig",
+      "front": "Global Administrator role",
+      "back": "The most privileged Microsoft Entra role, with access to nearly every administrative feature and the ability to assign any other role. Microsoft recommends fewer than five Global Administrators and using narrower roles for daily work.",
+      "detail": "Exam angle: when a scenario needs only one task, such as resetting passwords or reading reports, the answer is a least-privilege role, not Global Administrator."
+    },
+    {
+      "id": "f99",
+      "cat": "tenantConfig",
+      "front": "User Administrator vs. Helpdesk Administrator",
+      "back": "User Administrator can create and manage users and groups, assign licenses, and reset passwords for users and some limited admin roles. Helpdesk Administrator can reset passwords and sign users out, but only for non-administrators and other helpdesk admins, and cannot create users.",
+      "detail": "A support tier that only unlocks accounts needs Helpdesk Administrator. Onboarding staff who must create accounts and assign licenses needs User Administrator."
+    },
+    {
+      "id": "f100",
+      "cat": "tenantConfig",
+      "front": "Service principal vs. app registration",
+      "back": "An app registration is the definition of an application in Microsoft Entra ID. A service principal is that app's identity inside a specific tenant, appearing as an enterprise application, where permissions and access are actually granted.",
+      "detail": "Admins assign permissions and Conditional Access to the service principal. That is why the Copilot sign-in policy targets a service principal rather than an app registration."
+    },
+    {
+      "id": "f101",
+      "cat": "tenantConfig",
+      "front": "Active Directory Federation Services (AD FS)",
+      "back": "An on-premises service that provides federated sign-in. With federation, Microsoft Entra ID redirects authentication to AD FS, so passwords are validated by your own infrastructure instead of in the cloud.",
+      "detail": "It gives the most control but needs servers you must keep highly available. Password hash sync is the simplest hybrid choice, which is why moving off AD FS is a common simplification."
+    },
+    {
+      "id": "f102",
+      "cat": "tenantConfig",
+      "front": "Microsoft Entra ID P1 vs. P2",
+      "back": "P1 adds premium features such as Conditional Access, dynamic groups, and self-service password reset with writeback. P2 includes everything in P1 and adds Microsoft Entra ID Protection with risk-based Conditional Access, plus Privileged Identity Management.",
+      "detail": "If a scenario needs sign-in risk or user risk policies, or just-in-time admin elevation, the license answer is P2. Basic Conditional Access alone only needs P1."
+    },
+    {
+      "id": "f103",
+      "cat": "governSecure",
+      "front": "Microsoft Entra ID Protection",
+      "back": "A service that detects identity risks, such as risky sign-ins and risky users, using signals like leaked credentials, impossible travel, and anonymous IP addresses. It feeds those risk levels into Conditional Access for automatic responses. It needs Microsoft Entra ID P2.",
+      "detail": "A user flagged with high user risk can be forced to change their password, while a risky sign-in can require MFA. The signal drives the policy, not the other way around."
+    },
+    {
+      "id": "f104",
+      "cat": "governSecure",
+      "front": "Microsoft Defender for Cloud Apps",
+      "back": "A cloud access security broker that discovers which cloud apps people use, controls access and sessions to them, and detects unusual activity. Session controls work through Conditional Access to limit what users can do inside an app.",
+      "detail": "Blocking downloads of labeled files from an unmanaged device, while still allowing browser viewing, is a classic session-policy use case."
+    },
+    {
+      "id": "f105",
+      "cat": "governSecure",
+      "front": "Microsoft Defender for Office 365 plans (Plan 1 and Plan 2)",
+      "back": "Plan 1 gives preventive protection: Safe Links, Safe Attachments, and anti-phishing with impersonation detection. Plan 2 adds investigation and response, including Threat Explorer, automated investigation and response (AIR), campaigns, and Attack simulation training.",
+      "detail": "A scenario that asks to hunt for a phishing message across mailboxes, or to remediate it automatically, needs Plan 2. Blocking bad links at click time is already Plan 1."
+    },
+    {
+      "id": "f106",
+      "cat": "governSecure",
+      "front": "Legacy authentication",
+      "back": "Older sign-in methods, such as IMAP, POP, SMTP AUTH, and some older Office clients using basic authentication, that cannot perform multifactor authentication. Attackers use them for password spray because MFA cannot stop them.",
+      "detail": "Security defaults block legacy authentication automatically. With Conditional Access, you create a policy that blocks it yourself."
+    },
+    {
+      "id": "f107",
+      "cat": "governSecure",
+      "front": "Microsoft Authenticator number matching",
+      "back": "When approving a sign-in in the Microsoft Authenticator app, the user must type a number shown on the sign-in screen into the app. This makes it much harder to approve a request by accident or under pressure.",
+      "detail": "It counters MFA fatigue, where an attacker floods a user with push prompts hoping for one tap. A plain approve button gives no proof the user started the sign-in."
+    },
+    {
+      "id": "f108",
+      "cat": "governSecure",
+      "front": "Temporary Access Pass (TAP)",
+      "back": "A time-limited passcode issued by an admin that lets a user sign in without a password to register passwordless methods, such as a FIDO2 key or Authenticator, or to recover access. It can be set as one-time use or multi-use.",
+      "detail": "Use it for a new hire's first sign-in or a user who lost their phone. It bootstraps passwordless credentials without ever giving a permanent password."
+    },
+    {
+      "id": "f109",
+      "cat": "governSecure",
+      "front": "Conditional Access report-only mode",
+      "back": "A policy state that evaluates a Conditional Access policy for each sign-in and logs what would have happened, without enforcing it. Admins review the results before turning the policy on.",
+      "detail": "Putting a new block-by-location policy in report-only first reveals which legitimate users it would lock out. It is the safe way to test before enforcement."
+    },
+    {
+      "id": "f110",
+      "cat": "governSecure",
+      "front": "Named locations in Conditional Access",
+      "back": "Defined sets of IP address ranges, or countries and regions, that a Conditional Access policy can use as a condition. A named location can be marked trusted, such as an office network.",
+      "detail": "Require MFA for every sign-in except from the trusted office range, or block sign-ins from countries where the company has no staff. Both use named locations."
+    },
+    {
+      "id": "f111",
+      "cat": "governSecure",
+      "front": "Sensitive information types (SITs)",
+      "back": "Pattern-based detectors for data like credit card or national ID numbers, using regular expressions, keywords, checksums, and a confidence level. Microsoft Purview uses them in DLP, auto-labeling, and retention.",
+      "detail": "Use a SIT when data has a recognizable format. For documents defined by their content rather than a pattern, a trainable classifier is the better tool."
+    },
+    {
+      "id": "f112",
+      "cat": "governSecure",
+      "front": "Trainable classifiers",
+      "back": "Machine learning models that recognize a category of content, such as contracts or source code, by learning from sample documents instead of matching a pattern. Microsoft provides built-in ones, and you can train your own.",
+      "detail": "A SIT finds a credit card number. A trainable classifier recognizes a whole document as, say, a financial statement and can then drive a label or retention policy."
+    },
+    {
+      "id": "f113",
+      "cat": "governSecure",
+      "front": "Endpoint data loss prevention (Endpoint DLP)",
+      "back": "Extends Microsoft Purview DLP to files on onboarded Windows and macOS devices, so admins can audit or restrict actions such as copying to USB, uploading to cloud services, printing, or copying to the clipboard.",
+      "detail": "Preventing a labeled file from going to a USB drive needs Endpoint DLP. Exchange and SharePoint DLP locations cannot see what happens on a local device."
+    },
+    {
+      "id": "f114",
+      "cat": "governSecure",
+      "front": "DLP policy tips and user overrides",
+      "back": "A policy tip is a notice in the app telling a user that content conflicts with a DLP policy. An override lets the user proceed after giving a business justification or reporting a false positive, and the action is still logged.",
+      "detail": "A rule in simulation mode with tips off collects data silently. Allowing overrides keeps work moving but still records who bypassed the rule and why."
+    },
+    {
+      "id": "f115",
+      "cat": "governSecure",
+      "front": "Preservation Hold library",
+      "back": "A hidden library in a SharePoint site or OneDrive where Microsoft Purview keeps a copy of the original of any item changed or deleted while subject to retention. The copy stays until the retention period ends.",
+      "detail": "A user deletes a contract that is under a retention policy: it vanishes from the site but remains in the Preservation Hold library. It is for retention and eDiscovery, not user recovery."
+    },
+    {
+      "id": "f116",
+      "cat": "governSecure",
+      "front": "Recoverable Items folder",
+      "back": "A hidden Exchange mailbox folder that holds deleted items and retained copies for holds and retention. Teams and Copilot interaction data under retention is kept in its SubstrateHolds subfolder.",
+      "detail": "A litigation hold on a mailbox keeps items here even after the user empties Deleted Items. It is the Exchange counterpart of the Preservation Hold library."
+    },
+    {
+      "id": "f117",
+      "cat": "governSecure",
+      "front": "Adaptive Protection",
+      "back": "A Microsoft Purview feature linking Insider Risk Management with DLP. It assigns users an insider risk level of elevated, moderate, or minor and applies stricter DLP controls to higher-risk users, relaxing them as risk drops.",
+      "detail": "Instead of blocking everyone, a policy can apply tough restrictions only to users whose behavior has raised their risk level, so low-risk users keep working normally."
+    },
+    {
+      "id": "f118",
+      "cat": "aiServices",
+      "front": "Enterprise data protection (EDP) for Copilot Chat",
+      "back": "When a user signs in with a Microsoft Entra work account, Copilot Chat prompts and responses are protected: encrypted, isolated per tenant, and not used to train foundation models. It also honors permissions, sensitivity labels, retention, and auditing.",
+      "detail": "It is why Copilot Chat is acceptable for work content even for users with no Copilot license, unlike a consumer chat tool with a personal account."
+    },
+    {
+      "id": "f119",
+      "cat": "aiServices",
+      "front": "Restricted Content Discovery (RCD)",
+      "back": "A SharePoint Advanced Management setting that keeps content from selected SharePoint sites out of organization-wide search and Microsoft 365 Copilot, without changing any site permissions. It replaces Restricted SharePoint Search.",
+      "detail": "It is a visibility control, not a security boundary: users who already have access can still open the files. Use restricted access control to truly limit who can access a site."
+    },
+    {
+      "id": "f120",
+      "cat": "aiServices",
+      "front": "SharePoint Advanced Management: site access review",
+      "back": "A feature that lets an admin start a review in which site owners confirm whether the content shared on their site is appropriate, then fix excess permissions through a dashboard.",
+      "detail": "After data access governance reports flag an overshared site, a site access review puts the cleanup in the hands of the people who know the content best."
+    },
+    {
+      "id": "f121",
+      "cat": "aiServices",
+      "front": "Copilot Dashboard in Viva Insights",
+      "back": "A dashboard in Viva Insights showing readiness, adoption, and impact metrics for Microsoft 365 Copilot, aimed at helping leaders see how Copilot is changing work, beyond simply counting active users.",
+      "detail": "Admin center usage reports show who is using Copilot. The Copilot Dashboard is where leaders look to judge whether adoption is producing business impact."
+    },
+    {
+      "id": "f122",
+      "cat": "aiServices",
+      "front": "Microsoft 365 Copilot Notebooks",
+      "back": "A workspace in Microsoft 365 Copilot where a user gathers chats, files, pages, meeting notes, and links for a topic, then asks Copilot to find answers and themes across that material. Notebooks can be shared with teammates.",
+      "detail": "A project lead can collect all project materials in one notebook and ask for a status summary. It needs a Microsoft 365 Copilot or Copilot Chat license."
+    },
+    {
+      "id": "f123",
+      "cat": "aiServices",
+      "front": "Copilot Studio knowledge sources",
+      "back": "The content a Copilot Studio agent uses to answer generatively, such as SharePoint sites, Dataverse, public websites, uploaded files, and Copilot connectors. For enterprise sources, the agent's answers follow the user's own permissions.",
+      "detail": "An agent given a wiki as a knowledge source answers questions from it, but that does not make the wiki available to Microsoft 365 Copilot in general."
+    },
+    {
+      "id": "f124",
+      "cat": "aiServices",
+      "front": "Web search (web grounding) in Microsoft 365 Copilot",
+      "back": "When enabled, Copilot can create a short search query, sent to Bing, to add public web information to an answer. The query is not the full prompt and does not include the user's Microsoft Entra identity details.",
+      "detail": "Admins control it with the Allow web search in Copilot policy. Turning it off does not stop Copilot from grounding in work data, and a DLP policy does not toggle it."
+    },
+    {
+      "id": "f125",
+      "cat": "aiServices",
+      "front": "Model Context Protocol (MCP)",
+      "back": "An open standard for exposing tools and knowledge to AI agents. When an MCP server is added to a Copilot Studio agent, each tool the server exposes becomes available for the agent to call during a conversation.",
+      "detail": "It lets makers connect an agent to existing systems quickly. For admins, each MCP server an agent can reach is another extension to review, like a connector or plugin."
+    },
+    {
+      "id": "f126",
+      "cat": "aiServices",
+      "front": "Sensitivity label inheritance in Copilot",
+      "back": "Copilot responses, and new files it creates from labeled content, take the highest-priority sensitivity label among the sources used. Label priority is set in Microsoft Purview, with higher priority meaning more restrictive.",
+      "detail": "Summarizing a General file and a Confidential file gives a Confidential result. The label follows the most sensitive source, so protection is not lost in the new content."
+    },
+    {
+      "id": "f127",
+      "cat": "aiServices",
+      "front": "Usage rights VIEW and EXTRACT for Copilot",
+      "back": "For encrypted content, Copilot returns it to a user only if that user has both the VIEW and EXTRACT usage rights. Content protected without the EXTRACT right stays hidden from Copilot even if the user can open it.",
+      "detail": "Do Not Forward leaves out EXTRACT, so a user may see an email yet get nothing from Copilot about it. Check the label's usage rights when Copilot cannot find protected content."
+    },
+    {
+      "id": "f128",
+      "cat": "aiServices",
+      "front": "Microsoft Agent 365",
+      "back": "A control plane for governing AI agents across the organization. It keeps a registry (inventory) of agents, applies access control through Microsoft Entra, and gives admins visibility and security oversight of them.",
+      "detail": "Entra Agent ID gives an agent an identity, while Agent 365 is where admins see and govern the whole fleet. Both address the risk of invisible, unmanaged agents."
+    },
+    {
+      "id": "f129",
+      "cat": "aiServices",
+      "front": "Large language model (LLM)",
+      "back": "A machine learning model trained on very large amounts of text to understand and generate language. It powers Copilot's responses, but it only knows organizational data when that data is supplied as grounding.",
+      "detail": "Microsoft states that prompts and data accessed through Microsoft Graph are not used to train the foundation models. The model reasons over what it is given."
+    },
+    {
+      "id": "f130",
+      "cat": "aiServices",
+      "front": "Grounding (retrieval-augmented generation)",
+      "back": "Giving a language model relevant, current information, such as the user's permitted files, emails, and chats or web results, along with the prompt so its answer is based on facts rather than just its training. It is also called retrieval-augmented generation.",
+      "detail": "Grounding is trimmed to what the user can already access, which is why Copilot does not expose data beyond existing permissions. Oversharing, not the model, is the risk."
     }
   ],
   "questions": [

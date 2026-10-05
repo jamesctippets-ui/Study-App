@@ -496,6 +496,265 @@
       "front": "Azure Backup",
       "back": "A managed service that takes scheduled, application-consistent backups of Azure VMs, SQL databases, and other workloads into a Recovery Services vault. Those recovery points are protected by the vault's own storage redundancy setting \u2014 LRS, ZRS, or GRS (the default) \u2014 so the backup data can survive a datacenter failure, or with GRS a regional one.",
       "detail": "Azure Backup protects data that already exists by restoring it after loss or corruption; it's a different job from Site Recovery, which keeps a whole workload running by replicating it to fail over to."
+    },
+    {
+      "id": "f67",
+      "cat": "cloudConcepts",
+      "front": "High availability",
+      "back": "Designing a workload so it stays accessible with as little downtime as possible, usually by running redundant components and spreading them across separate failure boundaries such as availability zones.",
+      "detail": "Two VMs in different availability zones behind a load balancer is a high availability design. It is measured as an uptime percentage, which is exactly what an SLA promises."
+    },
+    {
+      "id": "f68",
+      "cat": "cloudConcepts",
+      "front": "Fault tolerance",
+      "back": "The ability of a system to keep working correctly when one of its components fails, usually because redundant parts take over automatically. The goal is that users notice no interruption.",
+      "detail": "Exam angle: high availability aims to minimize downtime, while fault tolerance aims to avoid a visible failure altogether. Spreading VMs across zones supports both."
+    },
+    {
+      "id": "f69",
+      "cat": "cloudConcepts",
+      "front": "Disaster recovery",
+      "back": "The plan and tooling for restoring workloads and data after a major disruption, such as the loss of a whole datacenter or region. It is a different job from handling small, routine component failures.",
+      "detail": "Replicating VMs to a second region with Azure Site Recovery is disaster recovery. Availability zones cover a datacenter failure but not a regional outage."
+    },
+    {
+      "id": "f70",
+      "cat": "cloudConcepts",
+      "front": "Recovery time objective (RTO) and recovery point objective (RPO)",
+      "back": "RTO is the longest acceptable time to restore a service after a failure. RPO is the largest amount of data loss, measured in time, that is acceptable. Together they set how much redundancy and backup a workload needs.",
+      "detail": "Nightly backups mean an RPO of up to 24 hours. A business that cannot lose more than five minutes of data needs far more frequent replication than that."
+    },
+    {
+      "id": "f71",
+      "cat": "cloudConcepts",
+      "front": "Azure Reservations (Reserved Instances)",
+      "back": "A pricing option where you commit to specific resources, such as a VM size in a region, for one or three years in return for a discount of up to 72 percent compared with pay-as-you-go.",
+      "detail": "Best for steady, predictable workloads that run all the time, like a production database VM. It saves nothing on usage you stop needing, so it is wrong for short-lived or unpredictable use."
+    },
+    {
+      "id": "f72",
+      "cat": "cloudConcepts",
+      "front": "Azure savings plan for compute",
+      "back": "A pricing option where you commit to a fixed hourly spend for one or three years and get discounted rates, up to 65 percent, on eligible compute usage across services and regions without tying it to one VM size.",
+      "detail": "Choose it over a reservation when VM sizes or regions change often. The trade-off is a slightly lower maximum discount in exchange for flexibility."
+    },
+    {
+      "id": "f73",
+      "cat": "cloudConcepts",
+      "front": "Microservices",
+      "back": "An architecture that splits an application into small, independent services, each built, deployed, and scaled on its own and communicating over well-defined interfaces. Containers are a common way to run them.",
+      "detail": "Updating a checkout service without redeploying the product catalog is the payoff. Azure Container Apps and AKS are common homes for microservices."
+    },
+    {
+      "id": "f74",
+      "cat": "cloudConcepts",
+      "front": "Autoscaling",
+      "back": "Automatically adding or removing resources in response to load, based on metrics or a schedule. Scaling out and in changes the number of instances. Scaling up and down changes the size of one instance.",
+      "detail": "A web tier that adds instances during a sale and removes them afterward shows elasticity, which keeps cost tied to demand. Azure Monitor autoscale drives it for scale sets and App Service."
+    },
+    {
+      "id": "f75",
+      "cat": "cloudConcepts",
+      "front": "Economies of scale",
+      "back": "A cloud provider operating at huge size buys hardware, power, and capacity in bulk and spreads costs across many customers, so each customer's unit price can be lower than running the same infrastructure alone.",
+      "detail": "It is one reason cloud pricing can beat on-premises costs for similar capacity, and part of why the consumption model works for small organizations."
+    },
+    {
+      "id": "f76",
+      "cat": "cloudConcepts",
+      "front": "Manageability in the cloud",
+      "back": "The benefit that cloud resources are easier to run and control: you manage the cloud with automated scaling, templates, and monitoring, and manage in the cloud through portals, command-line tools, and APIs.",
+      "detail": "Deploying identical environments from a template, then monitoring them from a single portal, is manageability. It is a different benefit from reliability or scalability."
+    },
+    {
+      "id": "f77",
+      "cat": "architecture",
+      "front": "Availability sets",
+      "back": "A logical grouping of VMs that Azure spreads across fault domains, separate racks with their own power and network, and update domains, groups rebooted one at a time during planned maintenance. It protects within a single datacenter.",
+      "detail": "A single VM has a lower SLA than two or more VMs in an availability set, and zones give an even higher one. An availability set does not survive the loss of the whole datacenter."
+    },
+    {
+      "id": "f78",
+      "cat": "architecture",
+      "front": "Virtual Machine Scale Sets",
+      "back": "A group of load-balanced VMs created from the same configuration that Azure can grow or shrink automatically on demand or on a schedule. They are meant for scalable, highly available applications.",
+      "detail": "A web tier that needs more instances during weekday peaks is a scale set scenario. It is about adding identical VMs, not about spreading failures across racks like an availability set."
+    },
+    {
+      "id": "f79",
+      "cat": "architecture",
+      "front": "Azure App Service",
+      "back": "A platform-as-a-service offering for hosting web apps, APIs, and mobile backends. Azure manages the operating system, patching, and load balancing, and it supports several languages and containers.",
+      "detail": "App Service is the usual answer when a scenario needs a website with minimal infrastructure management. You supply code or a container, not a VM."
+    },
+    {
+      "id": "f80",
+      "cat": "architecture",
+      "front": "Azure Container Instances",
+      "back": "A way to run a container in Azure without managing a VM or an orchestrator, started in seconds and billed for the time it runs. It suits simple, short-lived, or single-container workloads.",
+      "detail": "Running one batch job in a container and then letting it exit fits Container Instances. Orchestrating many containers at scale is the job of AKS instead."
+    },
+    {
+      "id": "f81",
+      "cat": "architecture",
+      "front": "Azure Container Apps",
+      "back": "A serverless platform for running microservices and containerized apps, built on Kubernetes but hiding the cluster. It handles HTTP ingress and scales each app, down to zero replicas when idle.",
+      "detail": "Choose it for microservices when you do not want to manage Kubernetes. If a scenario needs direct access to the Kubernetes API or node pools, that points to AKS."
+    },
+    {
+      "id": "f82",
+      "cat": "architecture",
+      "front": "Azure Functions",
+      "back": "An event-driven, serverless compute service that runs small pieces of code when triggered by something like an HTTP request, a timer, or a queue message. On the Consumption plan you pay per execution.",
+      "detail": "Resizing an image each time one is uploaded to Blob Storage is a typical Function. You write the code and never provision or patch a server."
+    },
+    {
+      "id": "f83",
+      "cat": "architecture",
+      "front": "Azure VPN Gateway",
+      "back": "A gateway that sends encrypted traffic between an Azure virtual network and an on-premises network (site-to-site) or individual devices (point-to-site) across the public internet.",
+      "detail": "It is cheaper and quicker to set up than ExpressRoute, but traffic crosses the internet, so performance is less predictable. Encryption is built in."
+    },
+    {
+      "id": "f84",
+      "cat": "architecture",
+      "front": "Azure ExpressRoute",
+      "back": "A private, dedicated connection from an on-premises network to Azure through a connectivity provider, which does not cross the public internet. It offers more reliable, predictable latency and high bandwidth.",
+      "detail": "Private does not mean encrypted: add an IPsec VPN over the circuit or MACsec to encrypt. Pick ExpressRoute for consistent performance, VPN Gateway for a quicker, cheaper link."
+    },
+    {
+      "id": "f85",
+      "cat": "architecture",
+      "front": "Azure DNS",
+      "back": "A service for hosting DNS zones and records on Azure's global network, so a domain's names resolve using Azure infrastructure. Private DNS zones resolve names only inside linked virtual networks.",
+      "detail": "A private zone lets VMs find each other by name inside a VNet without exposing those names to the internet. A public zone answers queries from anywhere."
+    },
+    {
+      "id": "f86",
+      "cat": "architecture",
+      "front": "Virtual network peering",
+      "back": "A connection between two virtual networks that lets their resources talk using private IP addresses over the Microsoft backbone, as if they were one network. It works within a region and across regions.",
+      "detail": "Peering is not transitive: if A peers with B and B with C, A and C still cannot talk unless they are also peered. It also needs no gateway or public internet."
+    },
+    {
+      "id": "f87",
+      "cat": "architecture",
+      "front": "Azure Traffic Manager",
+      "back": "A DNS-based traffic load balancer that directs users to the best of several endpoints, possibly in different regions, using methods like priority, weighted, performance, or geographic routing.",
+      "detail": "Because it works at the DNS level, it steers clients but does not proxy the traffic. It suits regional failover, while Front Door adds edge routing and a web application firewall."
+    },
+    {
+      "id": "f88",
+      "cat": "architecture",
+      "front": "Azure Blob Storage",
+      "back": "Azure's object storage for large amounts of unstructured data such as images, video, backups, and logs, accessible over HTTP or HTTPS. Data can sit in the Hot, Cool, Cold, or Archive access tier.",
+      "detail": "Storing website images or long-term backups is a Blob scenario. It is the answer for unstructured files, not for a shared drive that users mount like a network folder."
+    },
+    {
+      "id": "f89",
+      "cat": "architecture",
+      "front": "Azure Files",
+      "back": "Fully managed file shares in the cloud reachable through the SMB protocol, and the NFS protocol on supported share types. They can be mounted at the same time from Azure or on-premises machines.",
+      "detail": "Replacing an on-premises file server with a mountable cloud share is Azure Files. Add Azure File Sync to keep a local server and the share continuously in step."
+    },
+    {
+      "id": "f90",
+      "cat": "architecture",
+      "front": "Azure Cosmos DB",
+      "back": "A fully managed, globally distributed NoSQL database offering very low latency and automatic replication to multiple regions. It supports several APIs and data models.",
+      "detail": "A worldwide app that needs fast reads and writes close to users in every region fits Cosmos DB. A traditional relational workload points to Azure SQL Database."
+    },
+    {
+      "id": "f91",
+      "cat": "architecture",
+      "front": "Azure SQL Database",
+      "back": "A managed relational database service built on the SQL Server engine. Azure handles patching, backups, and built-in high availability, so you manage only the data and the schema.",
+      "detail": "Moving a relational app to Azure SQL Database trades control for less administration. Running SQL Server on a VM instead keeps full control but leaves patching to you."
+    },
+    {
+      "id": "f92",
+      "cat": "architecture",
+      "front": "Microsoft Entra Connect",
+      "back": "A tool that synchronizes identities from an on-premises Active Directory to Microsoft Entra ID, so users can sign in to cloud and on-premises resources with the same identity. This setup is called hybrid identity.",
+      "detail": "A company keeping on-premises Active Directory while moving to Microsoft 365 uses it so staff do not need a second set of accounts."
+    },
+    {
+      "id": "f93",
+      "cat": "architecture",
+      "front": "Web Application Firewall (WAF)",
+      "back": "A firewall that inspects HTTP and HTTPS traffic to protect web applications from common attacks such as SQL injection and cross-site scripting. In Azure it is an option on Application Gateway and Front Door.",
+      "detail": "A network security group filters by IP and port only, so blocking a malicious request body needs a WAF. It is the layer 7 protection for web apps."
+    },
+    {
+      "id": "f94",
+      "cat": "management",
+      "front": "Azure Resource Manager (ARM)",
+      "back": "Azure's deployment and management layer. Every request from the portal, CLI, PowerShell, SDKs, or REST APIs goes through it, so authentication, RBAC, policies, and locks are applied consistently however you manage resources.",
+      "detail": "ARM templates and Bicep deploy through it. That is why a resource created in the CLI immediately shows up in the portal with the same permissions."
+    },
+    {
+      "id": "f95",
+      "cat": "management",
+      "front": "Azure Resource Health",
+      "back": "A service that reports the health of an individual resource, such as one VM or database, and its recent history, helping you tell whether unavailability comes from the Azure platform or from your own configuration.",
+      "detail": "Service Health tells you about platform events affecting your regions and services. Resource Health tells you about your one specific resource."
+    },
+    {
+      "id": "f96",
+      "cat": "management",
+      "front": "Log Analytics workspace",
+      "back": "The store inside Azure Monitor where log data from many resources is collected and queried using Kusto Query Language (KQL). It is the place to search and analyze logs, not a separate product from Monitor.",
+      "detail": "Sending VM and application logs to one workspace lets you run a single query across all of them. Alerts can then be built from those queries."
+    },
+    {
+      "id": "f97",
+      "cat": "management",
+      "front": "Application Insights",
+      "back": "An Azure Monitor feature for application performance monitoring. It tracks request rates, response times, failures, dependencies, and user behavior in live web applications so developers can find and diagnose problems.",
+      "detail": "Use it when a scenario asks why a deployed app is slow or throwing errors. Azure Monitor metrics on the VM host would not show failing application requests."
+    },
+    {
+      "id": "f98",
+      "cat": "management",
+      "front": "Azure Monitor alerts and action groups",
+      "back": "An alert rule watches metrics, logs, or activity events and fires when a condition is met. It then calls an action group, a reusable set of notifications and automated actions such as email, SMS, webhooks, or a Function.",
+      "detail": "An alert for CPU above 90 percent that emails the on-call team is one rule plus one action group. The same group can be reused by many rules."
+    },
+    {
+      "id": "f99",
+      "cat": "management",
+      "front": "Azure Policy effects (Audit, Deny, Modify)",
+      "back": "A policy's effect decides what happens to a non-compliant resource. Audit only flags it, Deny blocks the request, and Modify changes properties such as adding a tag. DeployIfNotExists deploys a related resource.",
+      "detail": "Audit reports without stopping anyone. Existing resources are only flagged, not changed, unless a remediation task is run. Deny only stops new or updated resources."
+    },
+    {
+      "id": "f100",
+      "cat": "management",
+      "front": "Azure built-in roles (Owner, Contributor, Reader)",
+      "back": "Owner has full access and can grant access to others. Contributor can create and manage resources but cannot grant access. Reader can only view resources. User Access Administrator manages access only.",
+      "detail": "A developer who must deploy resources but not assign permissions gets Contributor. An auditor who must only look gets Reader. Both are applied through Azure RBAC at a chosen scope."
+    },
+    {
+      "id": "f101",
+      "cat": "management",
+      "front": "Microsoft Cloud Adoption Framework for Azure",
+      "back": "Microsoft's guidance, best practices, and tools for adopting the cloud, organized into Strategy, Plan, Ready, Adopt, Govern, Secure, and Manage. It covers the whole journey, from business case to day-two operations.",
+      "detail": "Landing zones come from the Ready phase. Do not confuse it with the Well-Architected Framework, which guides the design quality of a single workload."
+    },
+    {
+      "id": "f102",
+      "cat": "management",
+      "front": "Microsoft Customer Agreement (MCA)",
+      "back": "Microsoft's standard agreement for buying Azure and other Microsoft cloud services directly. Costs are organized under a billing account, with billing profiles for invoices and invoice sections for grouping charges.",
+      "detail": "Pay-as-you-go under an MCA has no upfront volume commitment and is billed as usage occurs. That contrasts with a commitment-based enterprise purchasing agreement."
+    },
+    {
+      "id": "f103",
+      "cat": "management",
+      "front": "Public preview vs. general availability (GA)",
+      "back": "Public preview features can be tried by any customer before official release, may change, and are excluded from SLAs. General availability means a service is released for production use and covered by its SLA and full support.",
+      "detail": "Do not run mission-critical workloads on a preview feature. A private preview is invitation-only and is not covered by Azure support plans."
     }
   ],
   "questions": [

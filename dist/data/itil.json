@@ -534,6 +534,258 @@
       "front": "What starts and ends a value stream",
       "back": "A value stream typically starts from a demand or opportunity and ends once the consumer actually realizes value from it \u2014 the same demand-to-value conversion the value chain exists to perform, applied to one specific scenario.",
       "detail": "If nothing has actually created value for the consumer yet, the value stream isn't finished, even if every internal step has technically been completed."
+    },
+    {
+      "id": "f65",
+      "cat": "terms",
+      "front": "Value co-creation",
+      "back": "The idea that value is created through active collaboration between the provider and the consumer, not handed over one way by the provider. Both sides contribute effort, information, or decisions to get the outcome.",
+      "detail": "A service desk cannot fix a laptop fault alone: the user has to describe the symptoms, try the fix, and confirm it worked. That shared effort is co-creation."
+    },
+    {
+      "id": "f66",
+      "cat": "terms",
+      "front": "Service provision vs. service consumption",
+      "back": "Service provision covers what the provider does to deliver a service, such as running its resources and acting on requests. Service consumption covers what the consumer does to use it, such as requesting services and using them. Both are part of the service relationship.",
+      "detail": "Exam angle: a question about the consumer's side of a relationship, like users raising requests and using the service, points to consumption, while the provider's delivery work is provision."
+    },
+    {
+      "id": "f67",
+      "cat": "terms",
+      "front": "Demand vs. opportunity",
+      "back": "Demand is the need or desire for products and services from internal and external consumers. Opportunity is an option or possibility to add value for stakeholders or otherwise improve the organization. Both are inputs the value chain turns into value.",
+      "detail": "A user asking for a new reporting feature is demand. Spotting that automation could cut onboarding time without anyone asking is an opportunity."
+    },
+    {
+      "id": "f68",
+      "cat": "terms",
+      "front": "Configuration item (CI)",
+      "back": "Any component that needs to be managed in order to deliver an IT service, such as a server, application, contract, or document. Its details and its relationships to other CIs are recorded so changes and faults can be understood.",
+      "detail": "If a database server fails, the recorded relationships show which applications and services depend on that CI. That is what makes impact assessment faster."
+    },
+    {
+      "id": "f69",
+      "cat": "valueSystem",
+      "front": "Change authority",
+      "back": "The person or group who authorizes a change. Who it is depends on the risk and type of change: a standard change may be pre-authorized, a normal change might go to a manager or a board, and a high-impact change to senior leadership.",
+      "detail": "Exam trap: the change authority is a role, not always a committee. Matching the approver to the change's risk, instead of sending everything to one board, keeps change enablement fast."
+    },
+    {
+      "id": "f70",
+      "cat": "valueSystem",
+      "front": "Change advisory board (CAB)",
+      "back": "A group of stakeholders who assess and advise on proposed changes, often acting as the change authority for higher-risk normal changes. It reviews risk, impact, and timing instead of rubber-stamping every request.",
+      "detail": "Sending every routine, low-risk change to a weekly CAB creates delay with no extra safety. Reserving it for changes that need expert review is the 'keep it simple and practical' fix."
+    },
+    {
+      "id": "f71",
+      "cat": "valueSystem",
+      "front": "Workaround",
+      "back": "A solution that reduces or eliminates the impact of an incident or problem when a full resolution is not yet available. It restores service without removing the underlying cause.",
+      "detail": "Rebooting a scanner and resetting its Wi-Fi profile clears each incident but fixes nothing. Documenting that workaround on a known error is the bridge until problem management finds a permanent fix."
+    },
+    {
+      "id": "f72",
+      "cat": "valueSystem",
+      "front": "Problem management",
+      "back": "The practice of reducing the likelihood and impact of incidents by identifying actual and potential causes, managing workarounds, and recording known errors. It looks for root causes so the same incidents stop recurring.",
+      "detail": "Forty identical tickets in a quarter is the classic signal that problem management is missing. Incident management restores service each time but never asks why it keeps breaking."
+    },
+    {
+      "id": "f73",
+      "cat": "valueSystem",
+      "front": "Continual improvement register",
+      "back": "A single place to record, track, and prioritize improvement ideas from identification through to action. It keeps ideas from being lost and lets the organization choose which ones are worth the effort.",
+      "detail": "A team that collects improvement ideas in scattered emails and chats has no register. Putting them in one visible list makes the 'how do we get there' step of the Continual Improvement Model manageable."
+    },
+    {
+      "id": "f74",
+      "cat": "valueSystem",
+      "front": "Escalation: functional vs. hierarchical",
+      "back": "Functional escalation passes an incident to a team with more specialized skills or tools when the first line cannot resolve it. Hierarchical escalation brings in higher levels of management for awareness, authority, or resources.",
+      "detail": "A service desk agent who cannot fix a database fault escalates functionally to the database team. A manager is alerted when a major incident threatens a deadline, which is hierarchical."
+    },
+    {
+      "id": "f75",
+      "cat": "valueSystem",
+      "front": "Impact vs. urgency",
+      "back": "Impact is how much an incident affects the business or its users. Urgency is how quickly it needs to be resolved. Together they set an incident's priority, so a big impact that can wait is treated differently from a small one that cannot.",
+      "detail": "A fault that stops one person's non-essential tool is low impact and low urgency. Payroll failing on payday is high on both, so it jumps the queue."
+    },
+    {
+      "id": "f76",
+      "cat": "valueSystem",
+      "front": "Major incident",
+      "back": "An incident with significant business impact that needs an immediate, coordinated response. It is typically handled outside the normal incident flow, with its own prioritized procedure and a named coordinator.",
+      "detail": "A company-wide email outage is a major incident. Exam angle: a major incident gets its own coordinated procedure instead of waiting in the normal queue."
+    },
+    {
+      "id": "f77",
+      "cat": "valueSystem",
+      "front": "Service catalogue management",
+      "back": "The practice that provides a single source of consistent information on all services and service offerings and makes it available to the relevant audience. It tells consumers what they can get and how.",
+      "detail": "A portal where employees see which services exist, who they are for, and how to request them is the output of this practice. Without one, people guess whom to ask."
+    },
+    {
+      "id": "f78",
+      "cat": "valueSystem",
+      "front": "Service configuration management",
+      "back": "The practice that ensures accurate and reliable information about the configuration of services and the configuration items that support them is available when and where it is needed, including how they are configured and related.",
+      "detail": "A configuration management database is the usual tool. The exam angle is that it holds items plus their relationships, not just an equipment list."
+    },
+    {
+      "id": "f79",
+      "cat": "valueSystem",
+      "front": "Monitoring and event management",
+      "back": "The practice of systematically observing services and their components and recording selected changes of state as events. It decides which events matter and what response each should trigger, including warnings that could lead to incidents.",
+      "detail": "A disk reaching 90 percent full raises a warning event that triggers cleanup before anything breaks. That is the proactive side that separates it from incident management."
+    },
+    {
+      "id": "f80",
+      "cat": "valueSystem",
+      "front": "Knowledge management",
+      "back": "The practice of maintaining and improving the effective, efficient, and convenient use of information and knowledge across the organization. It makes sure the right information reaches the right people when they need it.",
+      "detail": "A documented known-error workaround that every service desk agent can find is knowledge management working. Fixes that live only in one engineer's head are not."
+    },
+    {
+      "id": "f81",
+      "cat": "valueSystem",
+      "front": "Availability management",
+      "back": "The practice that ensures services deliver the agreed levels of availability to meet the needs of customers and users. It plans, measures, and improves how reliably a service can be used when wanted.",
+      "detail": "Availability is one of the four warranty aspects. A scenario about uptime targets, redundancy, or reducing outage minutes points to this practice."
+    },
+    {
+      "id": "f82",
+      "cat": "valueSystem",
+      "front": "Capacity and performance management",
+      "back": "The practice that ensures services achieve agreed and expected performance, satisfying current and future demand in a cost-effective way. It watches resource use and plans for growth before slowdowns appear.",
+      "detail": "Forecasting that a growing user base will saturate storage next quarter, then adding capacity in advance, is this practice. It aims at the capacity part of warranty."
+    },
+    {
+      "id": "f83",
+      "cat": "valueSystem",
+      "front": "Service continuity management",
+      "back": "The practice that ensures a service's availability and performance stay at a sufficient level during a disaster. It plans how essential services will carry on, or recover, after a serious disruption.",
+      "detail": "A tested disaster recovery plan that restores the payment system at a secondary site is this practice. It covers the continuity aspect of warranty."
+    },
+    {
+      "id": "f84",
+      "cat": "valueSystem",
+      "front": "Information security management",
+      "back": "The practice that protects the information the organization needs to run its business. It covers keeping information confidential, accurate, and available to those entitled to it, across people, processes, and technology.",
+      "detail": "Security is a warranty aspect, so a service that works but leaks data lacks warranty. Exam angle: the practice protects information, not just the network."
+    },
+    {
+      "id": "f85",
+      "cat": "valueSystem",
+      "front": "Risk management",
+      "back": "The practice that ensures the organization understands and effectively handles risks. It identifies, assesses, and treats risks so decisions are made knowing what could go wrong or be missed.",
+      "detail": "Choosing a cheaper backup solution means weighing lower cost against higher risk. Risk management is the structured way to make that trade-off visibly instead of by instinct."
+    },
+    {
+      "id": "f86",
+      "cat": "dimensions",
+      "front": "Supplier management",
+      "back": "The practice that ensures the organization's suppliers and their performance are managed appropriately, so products and services are provided smoothly and to the quality needed. It governs contracts and relationships with outside providers.",
+      "detail": "An outsourced backup-monitoring vendor falls under this practice and the partners and suppliers dimension. Integrating one after a merger means managing the contract and its performance."
+    },
+    {
+      "id": "f87",
+      "cat": "dimensions",
+      "front": "Relationship management",
+      "back": "The practice that establishes and nurtures the links between the organization and its stakeholders at strategic and tactical levels. It identifies, analyzes, and monitors stakeholder needs and keeps communication going.",
+      "detail": "Regular check-ins with a client's sponsor to see how the service is landing are relationship management. It keeps the service relationship healthy beyond the daily tickets."
+    },
+    {
+      "id": "f88",
+      "cat": "dimensions",
+      "front": "Workforce and talent management",
+      "back": "The practice that ensures the organization has the right people with the right skills and knowledge, in the right roles, to support its objectives. It covers recruiting, development, and planning.",
+      "detail": "A new AI triage tool that requires analysts to learn new skills is a workforce and talent question. It belongs under the organizations and people dimension."
+    },
+    {
+      "id": "f89",
+      "cat": "dimensions",
+      "front": "Organizational change management",
+      "back": "The practice that ensures changes in an organization are implemented smoothly and that lasting benefits are achieved by managing the human aspects of the change. It focuses on people's adoption, not just technical delivery.",
+      "detail": "A flawless system rollout that staff avoid using has failed this practice. Exam trap: it is different from change enablement, which governs IT changes and their risk."
+    },
+    {
+      "id": "f90",
+      "cat": "lifecycle",
+      "front": "Business analysis",
+      "back": "The practice of analyzing a business or part of it, defining its needs, and recommending solutions to address them or solve a problem, so that value is created for stakeholders. It turns needs into clear requirements.",
+      "detail": "Interviewing branch staff about lock-outs to define what a reset tool must do is business analysis. It supports the Discover and Design activities before anything is built."
+    },
+    {
+      "id": "f91",
+      "cat": "lifecycle",
+      "front": "Service design",
+      "back": "The practice that designs products and services that are fit for purpose and fit for use, and that the organization and its ecosystem can deliver. It turns requirements into a design covering people, processes, information, and technology.",
+      "detail": "Specifying functionality and the availability and security targets together reflects utility plus warranty. Exam angle: design defines how the service will work, but nothing is built yet."
+    },
+    {
+      "id": "f92",
+      "cat": "lifecycle",
+      "front": "Software development and management",
+      "back": "The practice that ensures applications meet stakeholder needs in terms of functionality, reliability, maintainability, compliance, and auditability. It covers how software is built, tested, and evolved over its life.",
+      "detail": "Writing a custom automation script in-house is the Build activity in practice. This practice is what keeps the script maintainable instead of becoming a one-off nobody dares to change."
+    },
+    {
+      "id": "f93",
+      "cat": "lifecycle",
+      "front": "Service validation and testing",
+      "back": "The practice that ensures new or changed products and services meet defined requirements. It checks that a service really delivers the agreed utility and warranty before it goes live.",
+      "detail": "Testing a new kiosk update for functionality and security before it reaches live stores is validation. It sits at the edge of Build and Transition."
+    },
+    {
+      "id": "f94",
+      "cat": "lifecycle",
+      "front": "Release management",
+      "back": "The practice that makes new and changed services and features available for use. It decides what goes live and when, coordinating the packaging, timing, and communication of a release.",
+      "detail": "Making the new version available to users on a planned date is a release. Exam angle: release management is about availability for use, not about physically moving the software."
+    },
+    {
+      "id": "f95",
+      "cat": "lifecycle",
+      "front": "Deployment management",
+      "back": "The practice that moves new or changed hardware, software, documentation, processes, or other components to live environments. It can also move components to other environments, such as testing.",
+      "detail": "Pushing an update to production servers is deployment. A deployed feature can stay hidden from users until a separate release decision makes it available."
+    },
+    {
+      "id": "f96",
+      "cat": "streams",
+      "front": "Incident management",
+      "back": "The practice that minimizes the negative impact of incidents by restoring normal service operation as quickly as possible. It logs, categorizes, prioritizes, diagnoses, resolves, and closes incidents, escalating when needed.",
+      "detail": "Restarting a failed process within the hour is incident management. Finding why it failed is a separate job for problem management, which is the distinction the exam keeps testing."
+    },
+    {
+      "id": "f97",
+      "cat": "ai",
+      "front": "Human-in-the-loop",
+      "back": "A design in which a person reviews, approves, or can override what an AI system proposes before it takes effect. It limits risk by keeping accountability with a human while still gaining AI speed.",
+      "detail": "An AI that suggests a ticket category which an analyst accepts or changes is human-in-the-loop. The lower risk of this design is why proportionate governance can be lighter than for fully autonomous agents."
+    },
+    {
+      "id": "f98",
+      "cat": "frameworks",
+      "front": "Agile",
+      "back": "An approach to delivering work in small, iterative increments with frequent feedback and close collaboration, as set out in the Agile Manifesto. It is a way of doing the work, not a competitor to ITIL.",
+      "detail": "A team working in two-week sprints and demoing to users is Agile. ITIL supplies the wider service value context, and the guiding principle 'progress iteratively with feedback' already favors that style."
+    },
+    {
+      "id": "f99",
+      "cat": "frameworks",
+      "front": "Continuous integration and continuous delivery (CI/CD)",
+      "back": "Continuous integration merges and automatically tests code changes frequently. Continuous delivery keeps that code in a state that can be released at any time through an automated pipeline. Together they speed up safe delivery.",
+      "detail": "A CI/CD pipeline slots into the Build, Transition, and Deliver activities of the lifecycle. It is a DevOps technique that ITIL governs, not replaces."
+    },
+    {
+      "id": "f100",
+      "cat": "frameworks",
+      "front": "Project management",
+      "back": "The practice that ensures all projects in the organization succeed by planning, delegating, monitoring, and controlling the work needed to reach defined objectives within time and budget.",
+      "detail": "A new system rollout run as a project ends when it hands over to ongoing service operations. That boundary is why PRINCE2-style projects and ITIL practices complement each other."
     }
   ],
   "questions": [

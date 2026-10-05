@@ -89,7 +89,8 @@
   "CI": {
     "exp": [
       "Continuous integration",
-      "Case-insensitive"
+      "Case-insensitive",
+      "Configuration item"
     ]
   },
   "CLI": {
@@ -1086,7 +1087,10 @@
     "exp": "Change Data Capture"
   },
   "CSV": {
-    "exp": "Comma-separated values"
+    "exp": [
+      "Comma-separated values",
+      "Cluster Shared Volumes"
+    ]
   },
   "DB": {
     "exp": "Database",
@@ -1485,5 +1489,128 @@
   "ZIP": {
     "exp": "Zone Improvement Plan",
     "trigger": false
+  },
+  "ADAL": {
+    "exp": "Active Directory Authentication Library"
+  },
+  "ADLS": {
+    "exp": "Azure Data Lake Storage"
+  },
+  "ASE": {
+    "exp": "App Service Environment"
+  },
+  "CAB": {
+    "exp": "Change advisory board"
+  },
+  "CDA": {
+    "exp": "Clinical Document Architecture"
+  },
+  "CVE": {
+    "exp": "Common Vulnerabilities and Exposures"
+  },
+  "DAX": {
+    "exp": "Data Analysis Expressions"
+  },
+  "DCL": {
+    "exp": "Data Control Language"
+  },
+  "DDL": {
+    "exp": "Data Definition Language"
+  },
+  "DML": {
+    "exp": "Data Manipulation Language"
+  },
+  "EMET": {
+    "exp": "Enhanced Mitigation Experience Toolkit"
+  },
+  "FaaS": {
+    "exp": "Function as a service"
+  },
+  "ICMP": {
+    "exp": "Internet Control Message Protocol"
+  },
+  "IG": {
+    "exp": "Implementation guide"
+  },
+  "IMAP": {
+    "exp": "Internet Message Access Protocol"
+  },
+  "IME": {
+    "exp": "Intune Management Extension"
+  },
+  "JWT": {
+    "exp": "JSON Web Token"
+  },
+  "MAA": {
+    "exp": [
+      "Multiple Administrator Approval",
+      "Microsoft Azure Attestation"
+    ]
+  },
+  "MARS": {
+    "exp": "Microsoft Azure Recovery Services"
+  },
+  "MCA": {
+    "exp": "Microsoft Customer Agreement"
+  },
+  "MCP": {
+    "exp": "Model Context Protocol"
+  },
+  "MCSB": {
+    "exp": "Microsoft cloud security benchmark"
+  },
+  "MIME": {
+    "exp": "Multipurpose Internet Mail Extensions"
+  },
+  "MSAL": {
+    "exp": "Microsoft Authentication Library"
+  },
+  "MTD": {
+    "exp": "Mobile Threat Defense"
+  },
+  "MTTD": {
+    "exp": "Mean time to detect"
+  },
+  "NFC": {
+    "exp": "Near Field Communication"
+  },
+  "P2S": {
+    "exp": "Point-to-site"
+  },
+  "PII": {
+    "exp": "Personally identifiable information"
+  },
+  "POP": {
+    "exp": "Post Office Protocol"
+  },
+  "PRT": {
+    "exp": "Primary refresh token"
+  },
+  "PUA": {
+    "exp": "Potentially unwanted application"
+  },
+  "SCH": {
+    "exp": "Schedule Activity Information (HL7 segment)"
+  },
+  "SIT": {
+    "exp": "Sensitive information type"
+  },
+  "SOAP": {
+    "exp": "Simple Object Access Protocol"
+  },
+  "SSTP": {
+    "exp": "Secure Socket Tunneling Protocol"
+  },
+  "STIX": {
+    "exp": "Structured Threat Information Expression"
+  },
+  "VDA": {
+    "exp": "Virtual Desktop Access"
+  },
+  "VPC": {
+    "exp": "Virtual private cloud"
+  },
+  "YAML": {
+    "exp": "YAML Ain't Markup Language"
   }
 }
