@@ -401,6 +401,7 @@ function TrackListDropdown({ tracks, masteries, certPlan, onSelectTrack, onAddTo
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ fontSize: '13.5px', fontWeight: 600, color: ink(accent) }}>{t.label}</div>
                   <div style={{ fontSize: '11px', color: COLOR.muted, marginTop: '2px' }}>{t.subtitle}</div>
+                  <ExperienceChip trackKey={t.key} style={{ marginTop: '4px' }} />
                 </div>
                 {isCompleted ? (
                   <div title="Passed" style={{ fontSize: '13px', fontWeight: 700, color: COLOR.success, flexShrink: 0 }}>✓ Passed</div>
@@ -598,6 +599,7 @@ function CertPathHomeSection({ pathOrder, results, certPlan, studyingKey, pathPr
               <div style={{ fontSize: '11.5px', color: COLOR.muted, marginTop: '1px' }}>
                 {t.subtitle}{prog && prog.total ? ` · path ${prog.pct}%` : ''}
               </div>
+              <ExperienceChip trackKey={t.key} style={{ marginTop: '3px' }} />
             </div>
             <div style={{ flexShrink: 0, textAlign: 'right', whiteSpace: 'nowrap' }}>
               {scheduledDate && (
@@ -919,6 +921,7 @@ function TrackSwitcherSheet({ tracks, results, certPlan, activeTrack, onSelect, 
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ fontSize: '13.5px', fontWeight: 600, color: ink(accent) }}>{t.label}{isActive && <span style={{ color: COLOR.muted, fontWeight: 400 }}> · current</span>}</div>
           <div style={{ fontSize: '11px', color: COLOR.muted, marginTop: '2px' }}>{t.subtitle}</div>
+          <ExperienceChip trackKey={t.key} style={{ marginTop: '4px' }} />
         </div>
         <div style={{ fontSize: '12px', fontWeight: 700, color: pct >= 70 ? COLOR.success : COLOR.muted, flexShrink: 0 }}>{pct}%</div>
       </button>
@@ -1014,6 +1017,7 @@ function CertPathPanel({ tracks, certPlan, onAddTrack, onRemoveTrack, onMove, on
             <div style={{ fontSize: '16px', fontWeight: 600, color: ink(trackAccent(nextTrack.key)) }}>
               {nextTrack.label} <span style={{ fontWeight: 400, color: COLOR.muted, fontSize: '12px' }}>· {nextTrack.subtitle}</span>
             </div>
+            <ExperienceChip trackKey={nextTrack.key} style={{ marginTop: '6px' }} />
             {certPlan.scheduled[nextTrack.key] && (
               <div style={{ fontSize: '11.5px', color: COLOR.muted, marginTop: '4px' }}>Scheduled {formatScheduledLabel(certPlan.scheduled[nextTrack.key])}</div>
             )}
@@ -1096,7 +1100,7 @@ function CertPathPanel({ tracks, certPlan, onAddTrack, onRemoveTrack, onMove, on
                 style={{ flex: 1, minWidth: 0, padding: '9px', borderRadius: '9px', background: COLOR.surface, border: `2px solid ${COLOR.border}`, color: COLOR.text, fontSize: '13px' }}
               >
                 <option value="">Choose a cert…</option>
-                {addable.map((t) => <option key={t.key} value={t.key}>{t.label} — {t.subtitle}</option>)}
+                {addable.map((t) => <option key={t.key} value={t.key}>{t.label} — {t.subtitle}{trackExperience(t.key) && trackExperience(t.key).level === 'required' ? ` (${experienceShort(trackExperience(t.key))})` : ''}</option>)}
               </select>
               <button
                 onClick={() => { if (addingKey) { onAddTrack(addingKey); setAddingKey(''); } }}

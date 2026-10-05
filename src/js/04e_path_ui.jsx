@@ -755,6 +755,7 @@ function PathView({ track, trackKey, doneMap, unlockedMap, pathLocking, results,
           <div className="itil-display" style={{ fontSize: '17px', fontWeight: 600 }}>{track.label} path</div>
           <div style={{ fontSize: '12px', color: COLOR.muted }}>{overall.unitsComplete} of {overall.unitCount} units</div>
         </div>
+        <ExperienceChip trackKey={trackKey} style={{ marginBottom: '8px' }} />
         <div style={{ height: '6px', borderRadius: '3px', background: COLOR.surfaceRaised, overflow: 'hidden', marginBottom: '6px' }}>
           <div style={{ height: '100%', width: `${overall.pct}%`, background: COLOR.success, borderRadius: '3px' }} />
         </div>

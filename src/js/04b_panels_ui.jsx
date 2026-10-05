@@ -499,3 +499,34 @@ function BottomTabBar({ mode, onChange }) {
     </nav>
   );
 }
+
+// "5 yrs experience required" pill for certifications that ask for work
+// experience (see trackExperience). Renders nothing for tracks without one.
+function ExperienceChip({ trackKey, style }) {
+  const exp = trackExperience(trackKey);
+  if (!exp) return null;
+  const hue = exp.level === 'required' ? COLOR.orange : exp.level === 'recommended' ? COLOR.blue : COLOR.success;
+  return (
+    <span title={exp.summary} style={{ display: 'inline-block', fontSize: '10.5px', fontWeight: 800, letterSpacing: '0.02em', padding: '2px 8px', borderRadius: '999px', background: tint(hue, 16), color: ink(hue), border: `1px solid color-mix(in srgb, ${hue} 40%, transparent)`, whiteSpace: 'nowrap', ...style }}>
+      {experienceShort(exp)}
+    </span>
+  );
+}
+
+// The full experience requirement: the headline, how it can be reduced, and
+// what happens if you pass without it.
+function ExperienceCard({ trackKey }) {
+  const exp = trackExperience(trackKey);
+  if (!exp) return null;
+  const hue = exp.level === 'required' ? COLOR.orange : exp.level === 'recommended' ? COLOR.blue : COLOR.success;
+  return (
+    <div style={{ marginBottom: '16px', padding: '12px 14px', borderRadius: '12px', background: tint(hue, 10), border: `2px solid color-mix(in srgb, ${hue} 35%, ${COLOR.border})` }}>
+      <div style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.04em', textTransform: 'uppercase', color: ink(hue), marginBottom: '6px' }}>
+        Experience · {experienceShort(exp)}
+      </div>
+      <div style={{ fontSize: '12.5px', lineHeight: 1.5, color: COLOR.text }}>{exp.summary}</div>
+      {(exp.waivers || []).map((w) => <div key={w} style={{ fontSize: '12px', lineHeight: 1.5, color: COLOR.muted, marginTop: '6px' }}>{w}</div>)}
+      {exp.associate && <div style={{ fontSize: '12px', lineHeight: 1.5, color: COLOR.muted, marginTop: '6px' }}>{exp.associate}</div>}
+    </div>
+  );
+}

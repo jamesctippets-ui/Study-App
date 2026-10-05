@@ -214,6 +214,7 @@ function ProfileView({ tracks, results, seenLog, srs, stats, certPlan, achieveme
                     <span style={{ fontSize: '12px', fontWeight: 800 }}>{info.mastery}%</span>
                   </div>
                   <div style={{ fontSize: '12px', color: COLOR.muted, marginTop: '1px' }}>{t.subtitle}</div>
+                  <ExperienceChip trackKey={k} style={{ marginTop: '4px' }} />
                   <div style={{ height: '6px', borderRadius: '3px', background: COLOR.surfaceRaised, overflow: 'hidden', marginTop: '8px' }}>
                     <div style={{ height: '100%', width: `${info.path ? info.path.pct : info.mastery || 0}%`, background: accent, borderRadius: '3px' }} />
                   </div>

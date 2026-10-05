@@ -62,6 +62,13 @@ const TRACK_ACCENTS = {
   cloudplus: '#FACC15',
   ehrintegration: '#94A3B8',
   ab650: '#F59E0B',
+  ccna: '#10B981',
+  isc2cc: '#A3E635',
+  sscp: '#14B8A6',
+  cissp: '#EF4444',
+  ccsp: '#8B5CF6',
+  cgrc: '#F97316',
+  csslp: '#3B82F6',
 };
 
 // A soft tint of an accent over the card surface, so sections can carry their

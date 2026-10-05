@@ -1,0 +1,126 @@
+{
+  "categories": [
+    {
+      "key": "netFundamentals",
+      "label": "Network Fundamentals",
+      "marks": 20,
+      "resources": [
+        {
+          "label": "Official exam outline",
+          "url": "https://example.com/placeholder"
+        }
+      ]
+    },
+    {
+      "key": "netAccess",
+      "label": "Network Access",
+      "marks": 20,
+      "resources": [
+        {
+          "label": "Official exam outline",
+          "url": "https://example.com/placeholder"
+        }
+      ]
+    },
+    {
+      "key": "ipConnectivity",
+      "label": "IP Connectivity",
+      "marks": 25,
+      "resources": [
+        {
+          "label": "Official exam outline",
+          "url": "https://example.com/placeholder"
+        }
+      ]
+    },
+    {
+      "key": "ipServices",
+      "label": "IP Services",
+      "marks": 10,
+      "resources": [
+        {
+          "label": "Official exam outline",
+          "url": "https://example.com/placeholder"
+        }
+      ]
+    },
+    {
+      "key": "secFundamentals",
+      "label": "Security Fundamentals",
+      "marks": 15,
+      "resources": [
+        {
+          "label": "Official exam outline",
+          "url": "https://example.com/placeholder"
+        }
+      ]
+    },
+    {
+      "key": "automation",
+      "label": "Automation and Programmability",
+      "marks": 10,
+      "resources": [
+        {
+          "label": "Official exam outline",
+          "url": "https://example.com/placeholder"
+        }
+      ]
+    }
+  ],
+  "flashcards": [
+    {
+      "id": "f1",
+      "cat": "netFundamentals",
+      "front": "Placeholder term",
+      "detail": "placeholder",
+      "back": "Placeholder definition."
+    },
+    {
+      "id": "f1001",
+      "cat": "ipConnectivity",
+      "front": "Placeholder term B",
+      "detail": "placeholder",
+      "back": "Placeholder definition."
+    }
+  ],
+  "questions": [
+    {
+      "id": "tf1",
+      "cat": "netFundamentals",
+      "type": "tf",
+      "question": "This is a placeholder question.",
+      "answer": true,
+      "explanation": "Placeholder."
+    },
+    {
+      "id": "tf1001",
+      "cat": "ipConnectivity",
+      "type": "tf",
+      "question": "This is a placeholder question B.",
+      "answer": true,
+      "explanation": "Placeholder."
+    }
+  ],
+  "lessons": [],
+  "cheatSheet": [
+    {
+      "heading": "Placeholder",
+      "points": [
+        "Placeholder point one.",
+        "Placeholder point two."
+      ]
+    },
+    {
+      "heading": "Placeholder B",
+      "points": [
+        "Placeholder point one.",
+        "Placeholder point two."
+      ]
+    }
+  ],
+  "cliChallenges": [],
+  "madlibs": [],
+  "sequences": [],
+  "caseStudies": [],
+  "compare": []
+}

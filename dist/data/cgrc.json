@@ -1,0 +1,114 @@
+{
+  "categories": [
+    {
+      "key": "cgrcProgram",
+      "label": "Security and Privacy Governance, Risk Management and Compliance Program",
+      "marks": 16,
+      "resources": [
+        {
+          "label": "Official exam outline",
+          "url": "https://example.com/placeholder"
+        }
+      ]
+    },
+    {
+      "key": "cgrcScope",
+      "label": "Scope of the System",
+      "marks": 10,
+      "resources": [
+        {
+          "label": "Official exam outline",
+          "url": "https://example.com/placeholder"
+        }
+      ]
+    },
+    {
+      "key": "cgrcSelect",
+      "label": "Selection and Approval of Framework, Security and Privacy Controls",
+      "marks": 14,
+      "resources": [
+        {
+          "label": "Official exam outline",
+          "url": "https://example.com/placeholder"
+        }
+      ]
+    },
+    {
+      "key": "cgrcImplement",
+      "label": "Implementation of Security and Privacy Controls",
+      "marks": 17,
+      "resources": [
+        {
+          "label": "Official exam outline",
+          "url": "https://example.com/placeholder"
+        }
+      ]
+    },
+    {
+      "key": "cgrcAssess",
+      "label": "Assessment/Audit of Security and Privacy Controls",
+      "marks": 16,
+      "resources": [
+        {
+          "label": "Official exam outline",
+          "url": "https://example.com/placeholder"
+        }
+      ]
+    },
+    {
+      "key": "cgrcCompliance",
+      "label": "System Compliance",
+      "marks": 14,
+      "resources": [
+        {
+          "label": "Official exam outline",
+          "url": "https://example.com/placeholder"
+        }
+      ]
+    },
+    {
+      "key": "cgrcMaintain",
+      "label": "Compliance Maintenance",
+      "marks": 13,
+      "resources": [
+        {
+          "label": "Official exam outline",
+          "url": "https://example.com/placeholder"
+        }
+      ]
+    }
+  ],
+  "flashcards": [
+    {
+      "id": "f1",
+      "cat": "cgrcProgram",
+      "front": "Placeholder term",
+      "detail": "placeholder",
+      "back": "Placeholder definition."
+    }
+  ],
+  "questions": [
+    {
+      "id": "tf1",
+      "cat": "cgrcProgram",
+      "type": "tf",
+      "question": "This is a placeholder question.",
+      "answer": true,
+      "explanation": "Placeholder."
+    }
+  ],
+  "lessons": [],
+  "cheatSheet": [
+    {
+      "heading": "Placeholder",
+      "points": [
+        "Placeholder point one.",
+        "Placeholder point two."
+      ]
+    }
+  ],
+  "madlibs": [],
+  "sequences": [],
+  "caseStudies": [],
+  "compare": []
+}

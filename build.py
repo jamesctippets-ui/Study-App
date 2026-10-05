@@ -21,7 +21,7 @@ sys.path.insert(0, str(ROOT))
 
 from data import acronyms as acronyms_data
 from data import bridges as bridges_data
-from data import tracks, itil, az900, ab650, az104, dp900, dp300, az305, az802, az140, md102, sc300, sc200, sc500, cloudplus, ehrintegration
+from data import tracks, itil, az900, ab650, az104, dp900, dp300, az305, az802, az140, md102, sc300, sc200, sc500, cloudplus, ehrintegration, ccna, isc2cc, sscp, cissp, ccsp, cgrc, csslp
 
 TRACK_MODULES = {
     "itil": itil,
@@ -39,6 +39,13 @@ TRACK_MODULES = {
     "sc500": sc500,
     "cloudplus": cloudplus,
     "ehrintegration": ehrintegration,
+    "ccna": ccna,
+    "isc2cc": isc2cc,
+    "sscp": sscp,
+    "cissp": cissp,
+    "ccsp": ccsp,
+    "cgrc": cgrc,
+    "csslp": csslp,
 }
 
 
@@ -226,6 +233,24 @@ def validate():
                     errors.append(f"[{key}] a resources entry is missing a 'label' or 'url'")
                 elif not r["url"].startswith("http"):
                     errors.append(f"[{key}] resource '{r['label']}' has a non-http url: {r['url']!r}")
+
+    for key, cfg in tracks.EXAM_CONFIG.items():
+        exp = cfg.get("experience")
+        if exp is None:
+            continue
+        if exp.get("level") not in ("required", "recommended", "none"):
+            errors.append(f"[{key}] experience.level must be 'required', 'recommended' or 'none'")
+        if not isinstance(exp.get("years"), int) or exp["years"] < 0:
+            errors.append(f"[{key}] experience.years must be a non-negative integer")
+        elif (exp.get("level") == "none") != (exp["years"] == 0):
+            errors.append(f"[{key}] experience.years is 0 exactly when experience.level is 'none'")
+        if not isinstance(exp.get("summary"), str) or not exp["summary"].strip():
+            errors.append(f"[{key}] experience needs a non-empty 'summary'")
+        for field in ("waivers",):
+            if field in exp and (not isinstance(exp[field], list) or any(not isinstance(w, str) or not w.strip() for w in exp[field])):
+                errors.append(f"[{key}] experience.{field} must be a list of non-empty strings")
+        if "associate" in exp and (not isinstance(exp["associate"], str) or not exp["associate"].strip()):
+            errors.append(f"[{key}] experience.associate must be a non-empty string")
 
     for key, mod in TRACK_MODULES.items():
         cat_keys = {c["key"] for c in mod.CATEGORIES}
@@ -513,8 +538,8 @@ def validate():
                 cli_ids_seen.add(cid)
             if c.get("cat") not in cat_keys:
                 errors.append(f"[{key}] CLI_CHALLENGES '{cid}' references unknown category '{c.get('cat')}'")
-            if c.get("tool") not in ("az", "powershell"):
-                errors.append(f"[{key}] CLI_CHALLENGES '{cid}' has unknown 'tool' {c.get('tool')!r} (expected 'az' or 'powershell')")
+            if c.get("tool") not in ("az", "powershell", "ios"):
+                errors.append(f"[{key}] CLI_CHALLENGES '{cid}' has unknown 'tool' {c.get('tool')!r} (expected 'az', 'powershell' or 'ios')")
             for field in ("prompt", "verb", "command", "explanation"):
                 if not c.get(field, "").strip():
                     errors.append(f"[{key}] CLI_CHALLENGES '{cid}' is missing a non-empty '{field}'")

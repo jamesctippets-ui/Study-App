@@ -1,0 +1,103 @@
+{
+  "categories": [
+    {
+      "key": "ccspConcepts",
+      "label": "Cloud Concepts, Architecture and Design",
+      "marks": 17,
+      "resources": [
+        {
+          "label": "Official exam outline",
+          "url": "https://example.com/placeholder"
+        }
+      ]
+    },
+    {
+      "key": "ccspData",
+      "label": "Cloud Data Security",
+      "marks": 20,
+      "resources": [
+        {
+          "label": "Official exam outline",
+          "url": "https://example.com/placeholder"
+        }
+      ]
+    },
+    {
+      "key": "ccspPlatform",
+      "label": "Cloud Platform and Infrastructure Security",
+      "marks": 17,
+      "resources": [
+        {
+          "label": "Official exam outline",
+          "url": "https://example.com/placeholder"
+        }
+      ]
+    },
+    {
+      "key": "ccspApp",
+      "label": "Cloud Application Security",
+      "marks": 16,
+      "resources": [
+        {
+          "label": "Official exam outline",
+          "url": "https://example.com/placeholder"
+        }
+      ]
+    },
+    {
+      "key": "ccspOps",
+      "label": "Cloud Security Operations",
+      "marks": 17,
+      "resources": [
+        {
+          "label": "Official exam outline",
+          "url": "https://example.com/placeholder"
+        }
+      ]
+    },
+    {
+      "key": "ccspLegal",
+      "label": "Legal, Risk and Compliance",
+      "marks": 13,
+      "resources": [
+        {
+          "label": "Official exam outline",
+          "url": "https://example.com/placeholder"
+        }
+      ]
+    }
+  ],
+  "flashcards": [
+    {
+      "id": "f1",
+      "cat": "ccspConcepts",
+      "front": "Placeholder term",
+      "detail": "placeholder",
+      "back": "Placeholder definition."
+    }
+  ],
+  "questions": [
+    {
+      "id": "tf1",
+      "cat": "ccspConcepts",
+      "type": "tf",
+      "question": "This is a placeholder question.",
+      "answer": true,
+      "explanation": "Placeholder."
+    }
+  ],
+  "lessons": [],
+  "cheatSheet": [
+    {
+      "heading": "Placeholder",
+      "points": [
+        "Placeholder point one.",
+        "Placeholder point two."
+      ]
+    }
+  ],
+  "madlibs": [],
+  "sequences": [],
+  "caseStudies": [],
+  "compare": []
+}

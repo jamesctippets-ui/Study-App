@@ -388,6 +388,21 @@ function seededIndex(seedStr, len) {
   return len > 0 ? hashString(seedStr) % len : 0;
 }
 
+// The work experience a certification asks for (EXAM_CONFIG[key].experience,
+// authored in data/tracks.py). Null for tracks that don't carry one (the
+// Microsoft, ITIL and EHR tracks), so callers can simply render nothing.
+function trackExperience(trackKey) {
+  const cfg = typeof EXAM_CONFIG !== 'undefined' ? EXAM_CONFIG[trackKey] : null;
+  return cfg && cfg.experience ? cfg.experience : null;
+}
+
+function experienceShort(exp) {
+  if (!exp) return '';
+  if (exp.level === 'none') return 'No experience required';
+  const yrs = `${exp.years} ${exp.years === 1 ? 'yr' : 'yrs'}`;
+  return exp.level === 'recommended' ? `${yrs} experience recommended` : `${yrs} experience required`;
+}
+
 // Which track Home's "current cert" widgets — Question of the Day, Vocab
 // of the Day, and the exam-readiness prediction — all focus on: the Cert
 // Path's Up Next cert if one is set (the same priority pick Today's Mix
