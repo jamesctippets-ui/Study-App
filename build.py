@@ -19,6 +19,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent
 sys.path.insert(0, str(ROOT))
 
+from data import acronyms as acronyms_data
 from data import bridges as bridges_data
 from data import tracks, itil, az900, ab650, az104, dp900, dp300, az305, az802, az140, md102, sc300, sc200, sc500, cloudplus, ehrintegration
 
@@ -63,6 +64,78 @@ def positional_ref_errors(label, fields):
                 errors.append(
                     f"{label} {field} refers to an option by position ({m.group(0)!r}) — options are shuffled at render time, name the option by its content instead"
                 )
+    return errors
+
+
+ACRONYM_TOKEN = re.compile(r"(?<![A-Za-z0-9])([A-Z][A-Za-z0-9]{1,7})(?![A-Za-z0-9])")
+
+
+def acronym_token_counts():
+    """How often each acronym-like token (2-8 characters, at least two capitals
+    or digits, starting with a capital) appears across all content text."""
+    counts = {}
+
+    def scan(text):
+        for m in ACRONYM_TOKEN.finditer(text):
+            tok = m.group(1)
+            if sum(1 for c in tok if c.isupper() or c.isdigit()) < 2 or tok.isdigit():
+                continue
+            counts[tok] = counts.get(tok, 0) + 1
+
+    def walk(o):
+        if isinstance(o, str):
+            scan(o)
+        elif isinstance(o, list):
+            for x in o:
+                walk(x)
+        elif isinstance(o, dict):
+            for v in o.values():
+                walk(v)
+
+    for mod in TRACK_MODULES.values():
+        for name in ("FLASHCARDS", "QUESTIONS", "LESSONS", "CHEAT_SHEET", "MADLIBS", "SEQUENCES",
+                     "CASE_STUDIES", "COMPARE", "CLI_CHALLENGES", "CATEGORIES"):
+            walk(getattr(mod, name, None))
+    walk(bridges_data.BRIDGES)
+    return counts
+
+
+def acronym_is_covered(tok):
+    known = acronyms_data.ACRONYMS
+    return tok in known or tok in acronyms_data.IGNORE or (tok.endswith("s") and tok[:-1] in known)
+
+
+def missing_acronyms():
+    return sorted(
+        ((tok, n) for tok, n in acronym_token_counts().items() if n >= 2 and not acronym_is_covered(tok)),
+        key=lambda x: (-x[1], x[0]),
+    )
+
+
+def validate_acronyms():
+    errors = []
+    for key, entry in acronyms_data.ACRONYMS.items():
+        label = f"[acronym {key}]"
+        if not re.fullmatch(r"[A-Za-z0-9]{2,8}", key):
+            errors.append(f"{label} key must be 2-8 letters/digits")
+        if key in acronyms_data.IGNORE:
+            errors.append(f"{label} is also listed in IGNORE")
+        exp = entry.get("exp") if isinstance(entry, dict) else None
+        exps = exp if isinstance(exp, list) else [exp]
+        if not exps or not all(isinstance(e, str) and e.strip() for e in exps):
+            errors.append(f"{label} needs a non-empty 'exp' string or list of strings")
+        if "trigger" in entry and not isinstance(entry["trigger"], bool):
+            errors.append(f"{label} 'trigger' must be True or False")
+        if set(entry) - {"exp", "trigger"}:
+            errors.append(f"{label} has unknown fields {set(entry) - {'exp', 'trigger'}}")
+    if acronyms_data.ENFORCE_COVERAGE:
+        missing = missing_acronyms()
+        if missing:
+            shown = ", ".join(f"{t} ({n})" for t, n in missing[:40])
+            errors.append(
+                f"{len(missing)} acronym-like tokens used in content are in neither ACRONYMS nor IGNORE "
+                f"(data/acronyms.py): {shown}{' ...' if len(missing) > 40 else ''}"
+            )
     return errors
 
 
@@ -467,6 +540,7 @@ def validate():
                 errors.append(f"[{key}] lesson '{lesson['id']}' has an empty 'onTheJob' field")
 
     errors.extend(validate_bridges())
+    errors.extend(validate_acronyms())
 
     if errors:
         print("Data validation failed:", file=sys.stderr)
@@ -507,6 +581,7 @@ def build_data_json():
             f"const EXAM_CONFIG = {json.dumps(tracks.EXAM_CONFIG)};",
             f"const DATA = {json.dumps(data)};",
             f"const BRIDGES = {json.dumps(bridges_data.BRIDGES)};",
+            f"const ACRONYMS = {json.dumps(acronyms_data.ACRONYMS)};",
         ]
     )
 
@@ -531,6 +606,7 @@ def write_track_json_files():
     manifest = {"storageKey": tracks.STORAGE_KEY, "tracks": tracks.TRACKS, "examConfig": tracks.EXAM_CONFIG}
     (out_dir / "tracks.json").write_text(json.dumps(manifest, indent=2) + "\n")
     (out_dir / "bridges.json").write_text(json.dumps(bridges_data.BRIDGES, indent=2) + "\n")
+    (out_dir / "acronyms.json").write_text(json.dumps(acronyms_data.ACRONYMS, indent=2) + "\n")
     return len(data)
 
 
@@ -576,6 +652,12 @@ def sync_service_worker_cache_name(html):
 
 
 def main():
+    if "--check-acronyms" in sys.argv:
+        missing = missing_acronyms()
+        print(f"{len(missing)} acronym-like tokens used at least twice are in neither ACRONYMS nor IGNORE:")
+        for tok, n in missing:
+            print(f"  {tok} ({n})")
+        return
     validate()
     app_script = build_app_script()
     template = (ROOT / "templates" / "index.html.tmpl").read_text()
