@@ -222,6 +222,7 @@ function VerbalQuizPanel({
 // item kind into that math wasn't worth the risk for what's meant to be
 // a lightweight practice add-on; score is tracked for the session only.
 function CommandPracticeView({ session, index, score, categories, input, setInput, result, onSubmit, onNext, onRestart }) {
+  useScrollTopOnChange(index);
   if (!session.length) {
     return (
       <div style={{ textAlign: 'center', color: COLOR.muted, fontSize: '13px', padding: '30px 10px' }}>
@@ -319,6 +320,7 @@ function CommandPracticeView({ session, index, score, categories, input, setInpu
 // way flashcards and questions do (see trackMastery/masteryByCategory) —
 // unlike Verbal Quiz and CLI practice, which are deliberately unscored.
 function MadLibsView({ session, index, score, categories, answers, onSetBlank, submitted, onSubmit, onNext, onRestart, flashcardsData }) {
+  useScrollTopOnChange(index);
   const [activeTermKey, setActiveTermKey] = useState(null);
   useEffect(() => { setActiveTermKey(null); }, [session[index] && session[index].id]);
   useEscapeToClose(() => setActiveTermKey(null));
@@ -434,6 +436,7 @@ function MadLibsView({ session, index, score, categories, answers, onSetBlank, s
 // Scored all-or-nothing per sequence and feeds into results/mastery the
 // same way Mad Libs does (see checkSequenceOrder in 03_helpers.js).
 function SequenceView({ session, index, score, categories, workingOrder, onMove, submitted, onSubmit, onNext, onRestart, flashcardsData }) {
+  useScrollTopOnChange(index);
   const [activeTermKey, setActiveTermKey] = useState(null);
   useEffect(() => { setActiveTermKey(null); }, [session[index] && session[index].id]);
   useEscapeToClose(() => setActiveTermKey(null));
@@ -619,6 +622,7 @@ function PracticeToolPicker({ quizView, available, onSelect }) {
 }
 
 function CompareView({ session, index, score, categories, choice, onChoose, onNext, onRestart, flashcardsData }) {
+  useScrollTopOnChange(index);
   const [activeTermKey, setActiveTermKey] = useState(null);
   useEffect(() => { setActiveTermKey(null); }, [session[index] && session[index].id]);
   useEscapeToClose(() => setActiveTermKey(null));
@@ -718,6 +722,7 @@ function CompareView({ session, index, score, categories, choice, onChoose, onNe
 }
 
 function QuestionView({ q, selected, onChoose, onNext, index, total, categoryLabel, badgeLabel, msPending, onToggleMs, onSubmitMs, nextLabel, hideMeta, hideNext, flashcardsData }) {
+  useScrollTopOnChange(index);
   const [activeTermKey, setActiveTermKey] = useState(null);
   useEffect(() => { setActiveTermKey(null); }, [q && q.id]);
   useEscapeToClose(() => setActiveTermKey(null));
@@ -969,6 +974,7 @@ function CaseStudySetup({ list, onStart, categories }) {
 }
 
 function CaseStudyView({ list, activeIndex, onStart, onExit, categories, question, qIndex, selected, onChoose, msPending, onToggleMs, onSubmitMs, onNext, phase, score, answers, flashcardsData }) {
+  useScrollTopOnChange(qIndex);
   if (activeIndex === null) {
     return <CaseStudySetup list={list} onStart={onStart} categories={categories} />;
   }

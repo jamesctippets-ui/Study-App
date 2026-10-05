@@ -1522,10 +1522,31 @@ trading away for shinier but shallower ones.
   nodes. (5) *Type:* Nunito (rounded, weights 500-900) replaces Inter for body
   and Fraunces for headings; Inter stays as the fallback. Fonts come from
   Google Fonts at runtime, so a fully offline first load falls back to Inter.
-  Untried: restyling Home itself as a trail (it still has the list-style "Coming
-  up" because the cross-cert skip and optional-step controls live there),
-  celebration screens on step completion, scrolling to the top when a question
-  advances in an exam, and a gentler lock state for later units.
+  Follow-up round below.
+- [x] **Celebration, scroll-to-top, and the Home trail.** (1) *Step
+  complete:* the screen after a step (Path tab and Home) is now a celebration:
+  a popping 3D check (a gold trophy for a finished unit), a praise line scaled
+  to the score ("Perfect!" at 90%+, "Great work!" at 70%+, "Keep going!"
+  below, "Unit conquered!", "Skipped ahead!" for a test-out), up to three
+  animated stars when the step had a score, confetti on a perfect score, a
+  finished unit or a test-out, and two chips showing your streak and today's
+  goal (read through `ProgressSummaryContext`, so nothing is threaded through
+  the runners). Reduced-motion settings turn the animation and confetti off.
+  The old headline strings ("Step complete", "Unit complete", "Tested out")
+  are unchanged. (2) *Scroll to top:* `useScrollTopOnChange` scrolls to the top
+  when the question or item index changes, in the practice quiz, Path quizzes,
+  Mad Libs, Sequence, Compare, command practice, case studies, and between
+  exam questions and on reaching the exam results. (3) *Home trail:* the Home
+  path card now draws the up-next step as a big node in its cert's colour with
+  a bouncing START / UP NEXT bubble, then the next three steps as a winding
+  trail (Show more / Show fewer still add ten at a time), each with its cert
+  chip (opens that cert) and an Optional tag where it applies. Skip, the exam
+  countdown line, "Go deeper in <cert>" and "Already know this? Test out"
+  stay under the up-next node. Bug fixed on the way: opening the app through a
+  deep link (for example straight to a cert's Path tab) lost the day's streak
+  increase, because two effects saved from the same stale render; both now
+  build on the latest stats. Untried: a lock state for later units and a sound
+  option for the celebration.
 - [ ] **Home path — nothing blocking.** Untried: expanding the acronym
   dictionary through a second-reader fact-check, and letting a learner add
   their own acronyms or terms.

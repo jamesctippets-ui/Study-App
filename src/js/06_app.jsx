@@ -103,7 +103,9 @@ function CertStudyApp() {
   const [examSession, setExamSession] = useState([]);
   const [examAnswers, setExamAnswers] = useState({});
   const [examIndex, setExamIndex] = useState(0);
+  useScrollTopOnChange(examIndex);
   const [examPhase, setExamPhase] = useState('intro');
+  useScrollTopOnChange(examPhase);
   const [examTimeLeft, setExamTimeLeft] = useState(0);
   const [examResult, setExamResult] = useState(null);
 
@@ -856,8 +858,9 @@ function CertStudyApp() {
   useEffect(() => {
     if (syncMode === 'loading' || streakAdvancedRef.current) return;
     streakAdvancedRef.current = true;
-    const advanced = advanceStreak(stats.streak);
-    if (advanced !== stats.streak) saveStats({ ...stats, streak: advanced });
+    const cur = statsRef.current;
+    const advanced = advanceStreak(cur.streak);
+    if (advanced !== cur.streak) saveStats({ ...cur, streak: advanced });
     // eslint-disable-next-line
   }, [syncMode]);
 
@@ -1059,9 +1062,12 @@ function CertStudyApp() {
   useEffect(() => {
     if (syncMode === 'loading' || mode === 'home') return;
     const view = mode === 'learn' ? learnView : mode === 'quiz' ? quizView : null;
-    const current = stats.lastVisited;
+    // Build on the latest saved stats (the ref), not this render's `stats`:
+    // the streak effect can fire in the same commit and must not be overwritten.
+    const cur = statsRef.current;
+    const current = cur.lastVisited;
     if (current && current.track === activeTrack && current.mode === mode && (current.view || null) === view) return;
-    saveStats({ ...stats, lastVisited: { track: activeTrack, mode, view } });
+    saveStats({ ...cur, lastVisited: { track: activeTrack, mode, view } });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeTrack, mode, learnView, quizView, syncMode]);
 
@@ -1543,7 +1549,14 @@ function CertStudyApp() {
     : false;
   const isFinalMock = examVariant === 'final';
 
+  const progressSummary = {
+    streak: stats.streak.current,
+    goalCount: stats.dailyGoal.date === todayString() ? stats.dailyGoal.count : 0,
+    goalTarget: stats.dailyGoal.target,
+  };
+
   return (
+    <ProgressSummaryContext.Provider value={progressSummary}>
     <div
       style={{
         background: COLOR.bg,
@@ -2155,5 +2168,6 @@ function CertStudyApp() {
       </div>
       <BottomTabBar mode={mode} onChange={setMode} />
     </div>
+    </ProgressSummaryContext.Provider>
   );
 }

@@ -134,7 +134,13 @@
   .trail-node:active { transform: none !important; }
   @keyframes bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
   @keyframes pulseRing { 0% { box-shadow: 0 6px 0 rgba(0,0,0,0.30), 0 0 0 0 var(--ring, rgba(167,139,250,0.55)); } 100% { box-shadow: 0 6px 0 rgba(0,0,0,0.30), 0 0 0 14px rgba(167,139,250,0); } }
-  @media (prefers-reduced-motion: reduce) { .bob, .pulse { animation: none !important; } }
+  @keyframes popIn { 0% { transform: scale(0.3); opacity: 0; } 60% { transform: scale(1.15); opacity: 1; } 100% { transform: scale(1); opacity: 1; } }
+  @keyframes riseIn { from { transform: translateY(14px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+  @keyframes confettiFall { 0% { transform: translateY(-24px) rotate(0deg); opacity: 1; } 85% { opacity: 1; } 100% { transform: translateY(320px) rotate(600deg); opacity: 0; } }
+  .pop-in { animation: popIn 0.5s cubic-bezier(0.2, 0.9, 0.3, 1.2) both; }
+  .rise-in { animation: riseIn 0.4s ease-out both; }
+  .confetti-piece { position: absolute; top: 0; width: 9px; height: 14px; border-radius: 2px; opacity: 0; animation: confettiFall 2.2s ease-in both; pointer-events: none; }
+  @media (prefers-reduced-motion: reduce) { .bob, .pulse, .pop-in, .rise-in { animation: none !important; } .confetti-piece { display: none; } }
   @keyframes achievementIn { from { opacity: 0; transform: translate(-50%, -10px); } to { opacity: 1; transform: translate(-50%, 0); } }
 
   /* Static replacements for the ~20 Tailwind utility classes this app actually

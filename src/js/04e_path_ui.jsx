@@ -334,35 +334,91 @@ function PathApplyStep({ unit, categories, flashcardsData, onDone }) {
   );
 }
 
-function PathStepComplete({ unit, step, pct, unitComplete, testedOut, next, onNext, onBack, nextLabel, backLabel }) {
+// A burst of confetti behind the celebration card. Positions, colours and
+// timings come from the index so the burst is the same every time.
+function Confetti({ count = 18 }) {
+  const colors = [COLOR.primary, COLOR.gold, COLOR.success, COLOR.red, COLOR.teal, '#38BDF8'];
   return (
-    <div style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `2px solid ${COLOR.border}`, borderRadius: '18px', padding: '26px 22px', textAlign: 'center' }}>
-      <div style={{ width: '56px', height: '56px', borderRadius: '50%', background: COLOR.success, color: COLOR.onAccent, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', marginBottom: '12px' }}>
-        <PathIcon kind="check" size={28} />
-      </div>
-      <div className="itil-display" style={{ fontSize: '19px', fontWeight: 600 }}>
-        {testedOut ? 'Tested out' : unitComplete ? 'Unit complete' : 'Step complete'}
-      </div>
-      <div style={{ fontSize: '12.5px', color: COLOR.muted, marginTop: '4px', lineHeight: 1.5 }}>
-        {testedOut ? `You tested out of ${unit.title} at ${pct}%.` : unitComplete ? `You've finished every step of ${unit.title}.` : step.label}
-        {pct !== null && pct !== undefined && !unitComplete && !testedOut ? ` · ${pct}%` : ''}
-      </div>
-      {next ? (
-        <button className="btn-3d"
-          onClick={onNext}
-          style={{ width: '100%', marginTop: '18px', padding: '13px', borderRadius: '12px', background: COLOR.primary, color: COLOR.onAccent, fontSize: '14px', fontWeight: 700 }}
+    <div aria-hidden="true" style={{ position: 'absolute', inset: 0, overflow: 'hidden', pointerEvents: 'none' }}>
+      {Array.from({ length: count }, (_, i) => (
+        <span
+          key={i}
+          className="confetti-piece"
+          style={{
+            left: `${(i * 37 + 11) % 97}%`, background: colors[i % colors.length],
+            animationDelay: `${((i * 13) % 9) * 0.09}s`, animationDuration: `${1.8 + ((i * 7) % 8) * 0.1}s`,
+            width: i % 3 === 0 ? '7px' : '9px', height: i % 3 === 1 ? '9px' : '14px',
+          }}
+        />
+      ))}
+    </div>
+  );
+}
+
+function PathStepComplete({ unit, step, pct, unitComplete, testedOut, next, onNext, onBack, nextLabel, backLabel }) {
+  const { streak, goalCount, goalTarget } = React.useContext(ProgressSummaryContext);
+  const hasScore = pct !== null && pct !== undefined;
+  const stars = !hasScore ? 0 : pct >= 90 ? 3 : pct >= 70 ? 2 : 1;
+  const eyebrow = unitComplete ? 'Unit conquered!' : testedOut ? 'Skipped ahead!'
+    : !hasScore ? 'Nice work!' : pct >= 90 ? 'Perfect!' : pct >= 70 ? 'Great work!' : 'Keep going!';
+  const confetti = unitComplete ? 34 : testedOut ? 22 : stars === 3 ? 18 : 0;
+  const goalMet = goalTarget > 0 && goalCount >= goalTarget;
+  const goalPct = goalTarget > 0 ? Math.min(100, Math.round((goalCount / goalTarget) * 100)) : 0;
+  return (
+    <div style={{ position: 'relative', boxShadow: SHADOW.card, background: COLOR.surface, border: `2px solid ${COLOR.border}`, borderRadius: '20px', padding: '30px 22px 22px', textAlign: 'center', overflow: 'hidden' }}>
+      {confetti > 0 && <Confetti count={confetti} />}
+      <div style={{ position: 'relative' }}>
+        <div className="pop-in" style={{ width: '84px', height: '84px', borderRadius: '50%', background: unitComplete ? COLOR.gold : COLOR.success, color: COLOR.onAccent, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 6px 0 rgba(0,0,0,0.3)' }}>
+          {unitComplete ? <TabIcon kind="exam" size={40} /> : <PathIcon kind="check" size={40} />}
+        </div>
+        <div className="rise-in" style={{ animationDelay: '0.15s', fontSize: '13px', fontWeight: 900, letterSpacing: '0.08em', textTransform: 'uppercase', color: unitComplete ? COLOR.gold : COLOR.success, marginTop: '16px' }}>{eyebrow}</div>
+        <div className="itil-display rise-in" style={{ animationDelay: '0.2s', fontSize: '24px', marginTop: '2px' }}>
+          {testedOut ? 'Tested out' : unitComplete ? 'Unit complete' : 'Step complete'}
+        </div>
+        <div className="rise-in" style={{ animationDelay: '0.25s', fontSize: '14px', color: COLOR.muted, marginTop: '6px', lineHeight: 1.5 }}>
+          {testedOut ? `You tested out of ${unit.title} at ${pct}%.` : unitComplete ? `You've finished every step of ${unit.title}.` : step.label}
+          {hasScore && !unitComplete && !testedOut ? ` · ${pct}%` : ''}
+        </div>
+        {stars > 0 && (
+          <div style={{ display: 'flex', justifyContent: 'center', gap: '8px', marginTop: '14px' }} aria-label={`${stars} of 3 stars`}>
+            {[0, 1, 2].map((i) => (
+              <svg key={i} className="pop-in" style={{ animationDelay: `${0.35 + i * 0.18}s` }} width="38" height="38" viewBox="0 0 24 24" fill={i < stars ? COLOR.gold : 'none'} stroke={i < stars ? COLOR.gold : COLOR.border} strokeWidth="2" strokeLinejoin="round">
+                <polygon points="12 2 15 9 22 9.5 16.5 14.5 18 22 12 18 6 22 7.5 14.5 2 9.5 9" />
+              </svg>
+            ))}
+          </div>
+        )}
+        <div className="rise-in" style={{ animationDelay: '0.5s', display: 'flex', gap: '8px', marginTop: '18px', textAlign: 'left' }}>
+          <div style={{ flex: 1, minWidth: 0, border: `2px solid ${COLOR.border}`, borderRadius: '14px', padding: '8px 12px' }}>
+            <div style={{ fontSize: '11px', fontWeight: 800, letterSpacing: '0.06em', textTransform: 'uppercase', color: '#FF9A3D' }}>Streak</div>
+            <div style={{ fontSize: '18px', fontWeight: 800 }}>🔥 {streak} day{streak === 1 ? '' : 's'}</div>
+          </div>
+          <div style={{ flex: 1, minWidth: 0, border: `2px solid ${goalMet ? COLOR.success : COLOR.border}`, borderRadius: '14px', padding: '8px 12px' }}>
+            <div style={{ fontSize: '11px', fontWeight: 800, letterSpacing: '0.06em', textTransform: 'uppercase', color: goalMet ? COLOR.success : COLOR.primary }}>{goalMet ? 'Goal met' : 'Daily goal'}</div>
+            <div style={{ fontSize: '18px', fontWeight: 800 }}>{goalMet ? '✓ ' : ''}{goalCount} / {goalTarget}</div>
+            <div style={{ height: '5px', borderRadius: '3px', background: COLOR.surfaceRaised, marginTop: '4px', overflow: 'hidden' }}>
+              <div style={{ height: '100%', width: `${goalPct}%`, background: goalMet ? COLOR.success : COLOR.primary }} />
+            </div>
+          </div>
+        </div>
+        {next ? (
+          <button
+            onClick={onNext}
+            className="btn-3d"
+            style={{ width: '100%', marginTop: '20px', padding: '14px', borderRadius: '14px', background: COLOR.primary, color: COLOR.onAccent, fontSize: '15px', fontWeight: 800 }}
+          >
+            {nextLabel || (next.unit.index !== unit.index ? `Next unit: ${next.unit.title}` : `Next: ${next.step.label}`)}
+          </button>
+        ) : (
+          <div style={{ marginTop: '18px', fontSize: '14px', fontWeight: 800, color: COLOR.success }}>That's the whole path.</div>
+        )}
+        <button
+          onClick={onBack}
+          style={{ width: '100%', marginTop: '12px', padding: '12px', borderRadius: '14px', border: `2px solid ${COLOR.border}`, background: 'transparent', color: COLOR.text, fontSize: '14px', fontWeight: 700 }}
         >
-          {nextLabel || (next.unit.index !== unit.index ? `Next unit: ${next.unit.title}` : `Next: ${next.step.label}`)}
+          {backLabel || 'Back to the path'}
         </button>
-      ) : (
-        <div style={{ marginTop: '16px', fontSize: '13px', fontWeight: 600, color: COLOR.success }}>That's the whole path.</div>
-      )}
-      <button
-        onClick={onBack}
-        style={{ width: '100%', marginTop: '10px', padding: '11px', borderRadius: '12px', border: `2px solid ${COLOR.border}`, background: 'transparent', color: COLOR.text, fontSize: '13px', fontWeight: 600 }}
-      >
-        {backLabel || 'Back to the path'}
-      </button>
+      </div>
     </div>
   );
 }

@@ -90,6 +90,23 @@ function useClickOutsideToClose(active, onClose) {
   }, [active, onClose]);
 }
 
+// The few live numbers the step-complete screen celebrates (streak, today's
+// goal), provided once at the app root so the path runners don't need them
+// threaded through every layer.
+const ProgressSummaryContext = React.createContext({ streak: 0, goalCount: 0, goalTarget: 20 });
+
+// Scrolls the page back to the top whenever `value` changes after the first
+// render, so moving to the next question/item starts at the top of the card
+// instead of wherever the previous one was scrolled to. The first render is
+// skipped (opening a screen is already handled by whoever navigated to it).
+function useScrollTopOnChange(value) {
+  const first = useRef(true);
+  useEffect(() => {
+    if (first.current) { first.current = false; return; }
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+  }, [value]);
+}
+
 // Fixed chrome heights: the sticky top bar and the bottom tab bar. Sticky unit
 // banners sit just under the top bar, and page content is padded clear of the
 // tab bar, so both numbers live here.

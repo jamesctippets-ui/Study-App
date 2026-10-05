@@ -134,7 +134,13 @@
   .trail-node:active { transform: none !important; }
   @keyframes bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
   @keyframes pulseRing { 0% { box-shadow: 0 6px 0 rgba(0,0,0,0.30), 0 0 0 0 var(--ring, rgba(167,139,250,0.55)); } 100% { box-shadow: 0 6px 0 rgba(0,0,0,0.30), 0 0 0 14px rgba(167,139,250,0); } }
-  @media (prefers-reduced-motion: reduce) { .bob, .pulse { animation: none !important; } }
+  @keyframes popIn { 0% { transform: scale(0.3); opacity: 0; } 60% { transform: scale(1.15); opacity: 1; } 100% { transform: scale(1); opacity: 1; } }
+  @keyframes riseIn { from { transform: translateY(14px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+  @keyframes confettiFall { 0% { transform: translateY(-24px) rotate(0deg); opacity: 1; } 85% { opacity: 1; } 100% { transform: translateY(320px) rotate(600deg); opacity: 0; } }
+  .pop-in { animation: popIn 0.5s cubic-bezier(0.2, 0.9, 0.3, 1.2) both; }
+  .rise-in { animation: riseIn 0.4s ease-out both; }
+  .confetti-piece { position: absolute; top: 0; width: 9px; height: 14px; border-radius: 2px; opacity: 0; animation: confettiFall 2.2s ease-in both; pointer-events: none; }
+  @media (prefers-reduced-motion: reduce) { .bob, .pulse, .pop-in, .rise-in { animation: none !important; } .confetti-piece { display: none; } }
   @keyframes achievementIn { from { opacity: 0; transform: translate(-50%, -10px); } to { opacity: 1; transform: translate(-50%, 0); } }
 
   /* Static replacements for the ~20 Tailwind utility classes this app actually
@@ -278,6 +284,23 @@ function useClickOutsideToClose(active, onClose) {
     document.addEventListener('mousedown', handler);
     return () => document.removeEventListener('mousedown', handler);
   }, [active, onClose]);
+}
+
+// The few live numbers the step-complete screen celebrates (streak, today's
+// goal), provided once at the app root so the path runners don't need them
+// threaded through every layer.
+const ProgressSummaryContext = React.createContext({ streak: 0, goalCount: 0, goalTarget: 20 });
+
+// Scrolls the page back to the top whenever `value` changes after the first
+// render, so moving to the next question/item starts at the top of the card
+// instead of wherever the previous one was scrolled to. The first render is
+// skipped (opening a screen is already handled by whoever navigated to it).
+function useScrollTopOnChange(value) {
+  const first = useRef(true);
+  useEffect(() => {
+    if (first.current) { first.current = false; return; }
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+  }, [value]);
 }
 
 // Fixed chrome heights: the sticky top bar and the bottom tab bar. Sticky unit
@@ -7127,6 +7150,7 @@ function VerbalQuizPanel({
 // item kind into that math wasn't worth the risk for what's meant to be
 // a lightweight practice add-on; score is tracked for the session only.
 function CommandPracticeView({ session, index, score, categories, input, setInput, result, onSubmit, onNext, onRestart }) {
+  useScrollTopOnChange(index);
   if (!session.length) {
     return (
       <div style={{ textAlign: 'center', color: COLOR.muted, fontSize: '13px', padding: '30px 10px' }}>
@@ -7224,6 +7248,7 @@ function CommandPracticeView({ session, index, score, categories, input, setInpu
 // way flashcards and questions do (see trackMastery/masteryByCategory) —
 // unlike Verbal Quiz and CLI practice, which are deliberately unscored.
 function MadLibsView({ session, index, score, categories, answers, onSetBlank, submitted, onSubmit, onNext, onRestart, flashcardsData }) {
+  useScrollTopOnChange(index);
   const [activeTermKey, setActiveTermKey] = useState(null);
   useEffect(() => { setActiveTermKey(null); }, [session[index] && session[index].id]);
   useEscapeToClose(() => setActiveTermKey(null));
@@ -7339,6 +7364,7 @@ function MadLibsView({ session, index, score, categories, answers, onSetBlank, s
 // Scored all-or-nothing per sequence and feeds into results/mastery the
 // same way Mad Libs does (see checkSequenceOrder in 03_helpers.js).
 function SequenceView({ session, index, score, categories, workingOrder, onMove, submitted, onSubmit, onNext, onRestart, flashcardsData }) {
+  useScrollTopOnChange(index);
   const [activeTermKey, setActiveTermKey] = useState(null);
   useEffect(() => { setActiveTermKey(null); }, [session[index] && session[index].id]);
   useEscapeToClose(() => setActiveTermKey(null));
@@ -7524,6 +7550,7 @@ function PracticeToolPicker({ quizView, available, onSelect }) {
 }
 
 function CompareView({ session, index, score, categories, choice, onChoose, onNext, onRestart, flashcardsData }) {
+  useScrollTopOnChange(index);
   const [activeTermKey, setActiveTermKey] = useState(null);
   useEffect(() => { setActiveTermKey(null); }, [session[index] && session[index].id]);
   useEscapeToClose(() => setActiveTermKey(null));
@@ -7623,6 +7650,7 @@ function CompareView({ session, index, score, categories, choice, onChoose, onNe
 }
 
 function QuestionView({ q, selected, onChoose, onNext, index, total, categoryLabel, badgeLabel, msPending, onToggleMs, onSubmitMs, nextLabel, hideMeta, hideNext, flashcardsData }) {
+  useScrollTopOnChange(index);
   const [activeTermKey, setActiveTermKey] = useState(null);
   useEffect(() => { setActiveTermKey(null); }, [q && q.id]);
   useEscapeToClose(() => setActiveTermKey(null));
@@ -7874,6 +7902,7 @@ function CaseStudySetup({ list, onStart, categories }) {
 }
 
 function CaseStudyView({ list, activeIndex, onStart, onExit, categories, question, qIndex, selected, onChoose, msPending, onToggleMs, onSubmitMs, onNext, phase, score, answers, flashcardsData }) {
+  useScrollTopOnChange(qIndex);
   if (activeIndex === null) {
     return <CaseStudySetup list={list} onStart={onStart} categories={categories} />;
   }
@@ -8255,35 +8284,91 @@ function PathApplyStep({ unit, categories, flashcardsData, onDone }) {
   );
 }
 
-function PathStepComplete({ unit, step, pct, unitComplete, testedOut, next, onNext, onBack, nextLabel, backLabel }) {
+// A burst of confetti behind the celebration card. Positions, colours and
+// timings come from the index so the burst is the same every time.
+function Confetti({ count = 18 }) {
+  const colors = [COLOR.primary, COLOR.gold, COLOR.success, COLOR.red, COLOR.teal, '#38BDF8'];
   return (
-    <div style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `2px solid ${COLOR.border}`, borderRadius: '18px', padding: '26px 22px', textAlign: 'center' }}>
-      <div style={{ width: '56px', height: '56px', borderRadius: '50%', background: COLOR.success, color: COLOR.onAccent, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', marginBottom: '12px' }}>
-        <PathIcon kind="check" size={28} />
-      </div>
-      <div className="itil-display" style={{ fontSize: '19px', fontWeight: 600 }}>
-        {testedOut ? 'Tested out' : unitComplete ? 'Unit complete' : 'Step complete'}
-      </div>
-      <div style={{ fontSize: '12.5px', color: COLOR.muted, marginTop: '4px', lineHeight: 1.5 }}>
-        {testedOut ? `You tested out of ${unit.title} at ${pct}%.` : unitComplete ? `You've finished every step of ${unit.title}.` : step.label}
-        {pct !== null && pct !== undefined && !unitComplete && !testedOut ? ` · ${pct}%` : ''}
-      </div>
-      {next ? (
-        <button className="btn-3d"
-          onClick={onNext}
-          style={{ width: '100%', marginTop: '18px', padding: '13px', borderRadius: '12px', background: COLOR.primary, color: COLOR.onAccent, fontSize: '14px', fontWeight: 700 }}
+    <div aria-hidden="true" style={{ position: 'absolute', inset: 0, overflow: 'hidden', pointerEvents: 'none' }}>
+      {Array.from({ length: count }, (_, i) => (
+        <span
+          key={i}
+          className="confetti-piece"
+          style={{
+            left: `${(i * 37 + 11) % 97}%`, background: colors[i % colors.length],
+            animationDelay: `${((i * 13) % 9) * 0.09}s`, animationDuration: `${1.8 + ((i * 7) % 8) * 0.1}s`,
+            width: i % 3 === 0 ? '7px' : '9px', height: i % 3 === 1 ? '9px' : '14px',
+          }}
+        />
+      ))}
+    </div>
+  );
+}
+
+function PathStepComplete({ unit, step, pct, unitComplete, testedOut, next, onNext, onBack, nextLabel, backLabel }) {
+  const { streak, goalCount, goalTarget } = React.useContext(ProgressSummaryContext);
+  const hasScore = pct !== null && pct !== undefined;
+  const stars = !hasScore ? 0 : pct >= 90 ? 3 : pct >= 70 ? 2 : 1;
+  const eyebrow = unitComplete ? 'Unit conquered!' : testedOut ? 'Skipped ahead!'
+    : !hasScore ? 'Nice work!' : pct >= 90 ? 'Perfect!' : pct >= 70 ? 'Great work!' : 'Keep going!';
+  const confetti = unitComplete ? 34 : testedOut ? 22 : stars === 3 ? 18 : 0;
+  const goalMet = goalTarget > 0 && goalCount >= goalTarget;
+  const goalPct = goalTarget > 0 ? Math.min(100, Math.round((goalCount / goalTarget) * 100)) : 0;
+  return (
+    <div style={{ position: 'relative', boxShadow: SHADOW.card, background: COLOR.surface, border: `2px solid ${COLOR.border}`, borderRadius: '20px', padding: '30px 22px 22px', textAlign: 'center', overflow: 'hidden' }}>
+      {confetti > 0 && <Confetti count={confetti} />}
+      <div style={{ position: 'relative' }}>
+        <div className="pop-in" style={{ width: '84px', height: '84px', borderRadius: '50%', background: unitComplete ? COLOR.gold : COLOR.success, color: COLOR.onAccent, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 6px 0 rgba(0,0,0,0.3)' }}>
+          {unitComplete ? <TabIcon kind="exam" size={40} /> : <PathIcon kind="check" size={40} />}
+        </div>
+        <div className="rise-in" style={{ animationDelay: '0.15s', fontSize: '13px', fontWeight: 900, letterSpacing: '0.08em', textTransform: 'uppercase', color: unitComplete ? COLOR.gold : COLOR.success, marginTop: '16px' }}>{eyebrow}</div>
+        <div className="itil-display rise-in" style={{ animationDelay: '0.2s', fontSize: '24px', marginTop: '2px' }}>
+          {testedOut ? 'Tested out' : unitComplete ? 'Unit complete' : 'Step complete'}
+        </div>
+        <div className="rise-in" style={{ animationDelay: '0.25s', fontSize: '14px', color: COLOR.muted, marginTop: '6px', lineHeight: 1.5 }}>
+          {testedOut ? `You tested out of ${unit.title} at ${pct}%.` : unitComplete ? `You've finished every step of ${unit.title}.` : step.label}
+          {hasScore && !unitComplete && !testedOut ? ` · ${pct}%` : ''}
+        </div>
+        {stars > 0 && (
+          <div style={{ display: 'flex', justifyContent: 'center', gap: '8px', marginTop: '14px' }} aria-label={`${stars} of 3 stars`}>
+            {[0, 1, 2].map((i) => (
+              <svg key={i} className="pop-in" style={{ animationDelay: `${0.35 + i * 0.18}s` }} width="38" height="38" viewBox="0 0 24 24" fill={i < stars ? COLOR.gold : 'none'} stroke={i < stars ? COLOR.gold : COLOR.border} strokeWidth="2" strokeLinejoin="round">
+                <polygon points="12 2 15 9 22 9.5 16.5 14.5 18 22 12 18 6 22 7.5 14.5 2 9.5 9" />
+              </svg>
+            ))}
+          </div>
+        )}
+        <div className="rise-in" style={{ animationDelay: '0.5s', display: 'flex', gap: '8px', marginTop: '18px', textAlign: 'left' }}>
+          <div style={{ flex: 1, minWidth: 0, border: `2px solid ${COLOR.border}`, borderRadius: '14px', padding: '8px 12px' }}>
+            <div style={{ fontSize: '11px', fontWeight: 800, letterSpacing: '0.06em', textTransform: 'uppercase', color: '#FF9A3D' }}>Streak</div>
+            <div style={{ fontSize: '18px', fontWeight: 800 }}>🔥 {streak} day{streak === 1 ? '' : 's'}</div>
+          </div>
+          <div style={{ flex: 1, minWidth: 0, border: `2px solid ${goalMet ? COLOR.success : COLOR.border}`, borderRadius: '14px', padding: '8px 12px' }}>
+            <div style={{ fontSize: '11px', fontWeight: 800, letterSpacing: '0.06em', textTransform: 'uppercase', color: goalMet ? COLOR.success : COLOR.primary }}>{goalMet ? 'Goal met' : 'Daily goal'}</div>
+            <div style={{ fontSize: '18px', fontWeight: 800 }}>{goalMet ? '✓ ' : ''}{goalCount} / {goalTarget}</div>
+            <div style={{ height: '5px', borderRadius: '3px', background: COLOR.surfaceRaised, marginTop: '4px', overflow: 'hidden' }}>
+              <div style={{ height: '100%', width: `${goalPct}%`, background: goalMet ? COLOR.success : COLOR.primary }} />
+            </div>
+          </div>
+        </div>
+        {next ? (
+          <button
+            onClick={onNext}
+            className="btn-3d"
+            style={{ width: '100%', marginTop: '20px', padding: '14px', borderRadius: '14px', background: COLOR.primary, color: COLOR.onAccent, fontSize: '15px', fontWeight: 800 }}
+          >
+            {nextLabel || (next.unit.index !== unit.index ? `Next unit: ${next.unit.title}` : `Next: ${next.step.label}`)}
+          </button>
+        ) : (
+          <div style={{ marginTop: '18px', fontSize: '14px', fontWeight: 800, color: COLOR.success }}>That's the whole path.</div>
+        )}
+        <button
+          onClick={onBack}
+          style={{ width: '100%', marginTop: '12px', padding: '12px', borderRadius: '14px', border: `2px solid ${COLOR.border}`, background: 'transparent', color: COLOR.text, fontSize: '14px', fontWeight: 700 }}
         >
-          {nextLabel || (next.unit.index !== unit.index ? `Next unit: ${next.unit.title}` : `Next: ${next.step.label}`)}
+          {backLabel || 'Back to the path'}
         </button>
-      ) : (
-        <div style={{ marginTop: '16px', fontSize: '13px', fontWeight: 600, color: COLOR.success }}>That's the whole path.</div>
-      )}
-      <button
-        onClick={onBack}
-        style={{ width: '100%', marginTop: '10px', padding: '11px', borderRadius: '12px', border: `2px solid ${COLOR.border}`, background: 'transparent', color: COLOR.text, fontSize: '13px', fontWeight: 600 }}
-      >
-        {backLabel || 'Back to the path'}
-      </button>
+      </div>
     </div>
   );
 }
@@ -8978,41 +9063,50 @@ function HomeStudyPath({ tracks, remaining, progress, optionalProgress, mode, on
       )}
 
       {first && firstTrack ? (
-        <React.Fragment>
-          <div className="flex gap-2">
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', paddingTop: '4px' }}>
+          {/* The current step: a big node in its cert's colour. The button's own
+              text keeps the "Continue · CERT · Unit n" line the rest of the app
+              (and its tests) read as the path's primary action. */}
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
+            <span className="bob" style={{ fontSize: '12px', fontWeight: 900, letterSpacing: '0.08em', color: accent, background: COLOR.surface, border: `2px solid ${COLOR.border}`, borderRadius: '10px', padding: '3px 10px', marginBottom: '8px', animation: 'bob 1.4s ease-in-out infinite' }}>
+              {firstOptional ? 'OPTIONAL' : progress.done === 0 ? 'START' : 'UP NEXT'}
+            </span>
             <button
               onClick={() => onStart(first)}
-              className={firstOptional ? 'flex-1' : 'flex-1 btn-3d'}
-              style={{
-                padding: '13px 14px', borderRadius: '14px', textAlign: 'left', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px', minWidth: 0,
-                background: firstOptional ? 'transparent' : accent, color: firstOptional ? accent : COLOR.onAccent,
-                border: firstOptional ? `1px dashed ${accent}` : '1px solid transparent',
-              }}
+              className="btn-flat trail-node"
+              style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', background: 'transparent', color: COLOR.text, padding: 0, width: '100%', maxWidth: '260px' }}
             >
-              <span style={{ minWidth: 0 }}>
-                <span style={{ display: 'block', fontSize: '11px', opacity: 0.85, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                  {firstOptional ? 'Optional' : progress.done === 0 ? 'Start' : 'Continue'} · {firstTrack.label} · Unit {first.unit.index + 1}
-                </span>
-                <span style={{ display: 'block', fontSize: '14px', fontWeight: 700 }}>{first.step.label}</span>
-              </span>
-              <span style={{ fontSize: '18px' }}>›</span>
-            </button>
-            {firstOptional && (
-              <button
-                onClick={() => onSkip(first)}
-                style={{ padding: '0 14px', borderRadius: '12px', border: `2px solid ${COLOR.border}`, background: 'transparent', color: COLOR.muted, fontSize: '12px', fontWeight: 600 }}
+              <span
+                className="node-face pulse"
+                style={{
+                  width: '84px', height: '84px', borderRadius: '50%', display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                  background: firstOptional ? COLOR.surface : accent, color: firstOptional ? accent : COLOR.onAccent,
+                  border: firstOptional ? `3px dashed ${accent}` : 'none', ['--ring']: `${accent}88`, animation: 'pulseRing 1.6s ease-out infinite',
+                }}
               >
-                Skip
-              </button>
-            )}
+                <PathIcon kind={first.step.kind === 'deep' || first.step.kind === 'bridge' ? 'read' : first.step.kind} size={36} />
+              </span>
+              <span style={{ marginTop: '12px', fontSize: '11.5px', fontWeight: 800, letterSpacing: '0.05em', textTransform: 'uppercase', color: COLOR.muted, textAlign: 'center' }}>
+                {firstOptional ? 'Optional' : progress.done === 0 ? 'Start' : 'Continue'} · {firstTrack.label} · Unit {first.unit.index + 1}
+              </span>
+              <span style={{ fontSize: '17px', fontWeight: 800, textAlign: 'center', lineHeight: 1.25, marginTop: '2px' }}>{first.step.label}</span>
+            </button>
           </div>
-          {firstOptional && first.step.meta && <div style={{ fontSize: '11px', color: COLOR.muted, marginTop: '5px' }}>{first.step.meta}</div>}
-          {certLine && <div style={{ fontSize: '11px', color: certLine.color, marginTop: '6px' }}>{firstTrack.label}: {certLine.text}</div>}
-          <div className="flex gap-3" style={{ flexWrap: 'wrap' }}>
+          {firstOptional && (
+            <button
+              onClick={() => onSkip(first)}
+              style={{ marginTop: '10px', padding: '6px 18px', borderRadius: '12px', border: `2px solid ${COLOR.border}`, background: 'transparent', color: COLOR.muted, fontSize: '13px', fontWeight: 700 }}
+            >
+              Skip
+            </button>
+          )}
+          {firstOptional && first.step.meta && <div style={{ fontSize: '12px', color: COLOR.muted, marginTop: '6px', textAlign: 'center' }}>{first.step.meta}</div>}
+          {certLine && <div style={{ fontSize: '12px', color: certLine.color, marginTop: '8px', textAlign: 'center' }}>{firstTrack.label}: {certLine.text}</div>}
+          <div className="flex gap-3" style={{ flexWrap: 'wrap', justifyContent: 'center', marginBottom: '8px' }}>
             <button
               onClick={() => onOpenCert(firstTrack.key)}
               className="btn-flat"
-              style={{ background: 'transparent', color: accent, fontSize: '11.5px', fontWeight: 600, padding: '8px 2px 0' }}
+              style={{ background: 'transparent', color: accent, fontSize: '12px', fontWeight: 700, padding: '8px 2px 0' }}
             >
               Go deeper in {firstTrack.label} ›
             </button>
@@ -9020,63 +9114,72 @@ function HomeStudyPath({ tracks, remaining, progress, optionalProgress, mode, on
               <button
                 onClick={() => onTestOut(first)}
                 className="btn-flat"
-                style={{ background: 'transparent', color: COLOR.muted, fontSize: '11.5px', fontWeight: 600, padding: '8px 2px 0' }}
+                style={{ background: 'transparent', color: COLOR.muted, fontSize: '12px', fontWeight: 700, padding: '8px 2px 0' }}
               >
                 Already know this? Test out ›
               </button>
             )}
           </div>
-        </React.Fragment>
+        </div>
       ) : (
-        <div style={{ fontSize: '13px', fontWeight: 600, color: COLOR.success, textAlign: 'center', padding: '6px 0' }}>
+        <div style={{ fontSize: '14px', fontWeight: 700, color: COLOR.success, textAlign: 'center', padding: '6px 0' }}>
           Path complete — open any cert below to review it.
         </div>
       )}
 
       {upcoming.length > 0 && (
-        <div style={{ marginTop: '10px', borderTop: `1px solid ${COLOR.border}`, paddingTop: '8px' }}>
-          <div style={{ fontSize: '11.5px', color: COLOR.muted, textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 600, marginBottom: '2px' }}>Coming up</div>
-          {upcoming.map((e) => (
-            <div key={e.doneKey + e.step.id} className="flex items-center gap-2" style={{ display: 'flex' }}>
-              <button
-                onClick={() => onStart(e)}
-                className="btn-flat trail-node"
-                style={{ flex: 1, minWidth: 0, textAlign: 'left', background: 'transparent', color: COLOR.text, display: 'flex', alignItems: 'center', gap: '12px', padding: '8px 0' }}
+        <div style={{ marginTop: '14px', borderTop: `2px solid ${COLOR.border}`, paddingTop: '16px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+          {upcoming.map((e, i) => {
+            const t = trackByKey.get(e.trackKey);
+            return (
+              <div
+                key={e.doneKey + e.step.id}
+                style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '190px', marginBottom: '20px', transform: `translateX(${PATH_WAVE[(i + 1) % PATH_WAVE.length]}px)` }}
               >
-                <span className="node-face" style={{ width: '44px', height: '44px', borderRadius: '50%', flexShrink: 0, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', background: COLOR.surfaceRaised, color: COLOR.muted, border: e.step.optional ? `2px dashed ${COLOR.muted}` : `2px solid ${COLOR.border}`, boxShadow: '0 4px 0 rgba(0,0,0,0.30)' }}>
-                  <PathIcon kind={e.step.kind === 'deep' || e.step.kind === 'bridge' ? 'read' : e.step.kind} size={20} />
-                </span>
-                <span style={{ flex: 1, minWidth: 0 }}>
-                  <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <span style={{ fontSize: '12.5px', fontWeight: 600 }}>{e.step.label}</span>
-                    {e.step.optional && <OptionalTag />}
+                <button
+                  onClick={() => onStart(e)}
+                  className="btn-flat trail-node"
+                  style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', background: 'transparent', color: COLOR.text, padding: 0, width: '100%' }}
+                >
+                  <span
+                    className="node-face"
+                    style={{
+                      width: '62px', height: '62px', borderRadius: '50%', display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                      background: COLOR.surfaceRaised, color: COLOR.muted, border: e.step.optional ? `2px dashed ${COLOR.muted}` : `2px solid ${COLOR.border}`,
+                    }}
+                  >
+                    <PathIcon kind={e.step.kind === 'deep' || e.step.kind === 'bridge' ? 'read' : e.step.kind} size={26} />
                   </span>
-                  <span style={{ display: 'block', fontSize: '11.5px', color: COLOR.muted }}>
+                  <span style={{ marginTop: '10px', fontSize: '13px', fontWeight: 700, textAlign: 'center', lineHeight: 1.25 }}>{e.step.label}</span>
+                  <span style={{ fontSize: '11.5px', color: COLOR.muted, textAlign: 'center', marginTop: '1px' }}>
                     {e.step.kind === 'bridge' ? e.step.meta : `Unit ${e.unit.index + 1} · ${e.unit.title}`}
                   </span>
-                </span>
-              </button>
-              {trackByKey.get(e.trackKey) && (
-                <button
-                  onClick={() => onOpenCert(e.trackKey)}
-                  className="btn-flat"
-                  title={`Go deeper in ${trackByKey.get(e.trackKey).label}`}
-                  aria-label={`Open ${trackByKey.get(e.trackKey).label}`}
-                  style={{ background: 'transparent', padding: 0, flexShrink: 0 }}
-                >
-                  <HomePathCertChip track={trackByKey.get(e.trackKey)} />
                 </button>
-              )}
-            </div>
-          ))}
-          <div className="flex gap-3" style={{ paddingTop: '4px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '6px' }}>
+                  {e.step.optional && <OptionalTag />}
+                  {t && (
+                    <button
+                      onClick={() => onOpenCert(e.trackKey)}
+                      className="btn-flat"
+                      title={`Go deeper in ${t.label}`}
+                      aria-label={`Open ${t.label}`}
+                      style={{ background: 'transparent', padding: 0 }}
+                    >
+                      <HomePathCertChip track={t} />
+                    </button>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+          <div className="flex gap-3" style={{ paddingTop: '2px' }}>
             {later > 0 && shown < HOME_PATH_UPCOMING_MAX && (
-              <button onClick={() => setShown((n) => Math.min(n + 10, HOME_PATH_UPCOMING_MAX))} className="btn-flat" style={{ background: 'transparent', color: COLOR.primary, fontSize: '11px', fontWeight: 600, padding: 0 }}>
+              <button onClick={() => setShown((n) => Math.min(n + 10, HOME_PATH_UPCOMING_MAX))} className="btn-flat" style={{ background: 'transparent', color: COLOR.primary, fontSize: '12px', fontWeight: 700, padding: 0 }}>
                 Show more ({later} left)
               </button>
             )}
             {shown > HOME_PATH_UPCOMING && (
-              <button onClick={() => setShown(HOME_PATH_UPCOMING)} className="btn-flat" style={{ background: 'transparent', color: COLOR.muted, fontSize: '11px', fontWeight: 600, padding: 0 }}>
+              <button onClick={() => setShown(HOME_PATH_UPCOMING)} className="btn-flat" style={{ background: 'transparent', color: COLOR.muted, fontSize: '12px', fontWeight: 700, padding: 0 }}>
                 Show fewer
               </button>
             )}
@@ -9784,7 +9887,9 @@ function CertStudyApp() {
   const [examSession, setExamSession] = useState([]);
   const [examAnswers, setExamAnswers] = useState({});
   const [examIndex, setExamIndex] = useState(0);
+  useScrollTopOnChange(examIndex);
   const [examPhase, setExamPhase] = useState('intro');
+  useScrollTopOnChange(examPhase);
   const [examTimeLeft, setExamTimeLeft] = useState(0);
   const [examResult, setExamResult] = useState(null);
 
@@ -10537,8 +10642,9 @@ function CertStudyApp() {
   useEffect(() => {
     if (syncMode === 'loading' || streakAdvancedRef.current) return;
     streakAdvancedRef.current = true;
-    const advanced = advanceStreak(stats.streak);
-    if (advanced !== stats.streak) saveStats({ ...stats, streak: advanced });
+    const cur = statsRef.current;
+    const advanced = advanceStreak(cur.streak);
+    if (advanced !== cur.streak) saveStats({ ...cur, streak: advanced });
     // eslint-disable-next-line
   }, [syncMode]);
 
@@ -10740,9 +10846,12 @@ function CertStudyApp() {
   useEffect(() => {
     if (syncMode === 'loading' || mode === 'home') return;
     const view = mode === 'learn' ? learnView : mode === 'quiz' ? quizView : null;
-    const current = stats.lastVisited;
+    // Build on the latest saved stats (the ref), not this render's `stats`:
+    // the streak effect can fire in the same commit and must not be overwritten.
+    const cur = statsRef.current;
+    const current = cur.lastVisited;
     if (current && current.track === activeTrack && current.mode === mode && (current.view || null) === view) return;
-    saveStats({ ...stats, lastVisited: { track: activeTrack, mode, view } });
+    saveStats({ ...cur, lastVisited: { track: activeTrack, mode, view } });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeTrack, mode, learnView, quizView, syncMode]);
 
@@ -11224,7 +11333,14 @@ function CertStudyApp() {
     : false;
   const isFinalMock = examVariant === 'final';
 
+  const progressSummary = {
+    streak: stats.streak.current,
+    goalCount: stats.dailyGoal.date === todayString() ? stats.dailyGoal.count : 0,
+    goalTarget: stats.dailyGoal.target,
+  };
+
   return (
+    <ProgressSummaryContext.Provider value={progressSummary}>
     <div
       style={{
         background: COLOR.bg,
@@ -11836,6 +11952,7 @@ function CertStudyApp() {
       </div>
       <BottomTabBar mode={mode} onChange={setMode} />
     </div>
+    </ProgressSummaryContext.Provider>
   );
 }
 

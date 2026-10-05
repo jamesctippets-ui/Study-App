@@ -372,6 +372,10 @@ cross-cert dashboard (its tab button is titled "Home"), and the other four act o
 the track named in the top bar. The Path tab draws each unit as a sticky banner
 over a winding trail of large round nodes (done, current with a START bubble,
 checkpoint, upcoming), with up to three stars from a step's stored score.
+Home draws the same trail for the cross-cert path (the up-next step as a big node in
+its cert's colour, then the next few). Finishing a step shows a celebration screen
+(stars, confetti on a perfect score or a finished unit, streak and daily-goal
+chips), and moving to the next question scrolls back to the top.
 Call-to-action buttons use `.btn-3d` (a solid pressable edge), and the font is
 Nunito, loaded from Google Fonts, with Inter as the fallback.
 Navigation is also real client-side routing, not

@@ -266,41 +266,50 @@ function HomeStudyPath({ tracks, remaining, progress, optionalProgress, mode, on
       )}
 
       {first && firstTrack ? (
-        <React.Fragment>
-          <div className="flex gap-2">
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', paddingTop: '4px' }}>
+          {/* The current step: a big node in its cert's colour. The button's own
+              text keeps the "Continue · CERT · Unit n" line the rest of the app
+              (and its tests) read as the path's primary action. */}
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
+            <span className="bob" style={{ fontSize: '12px', fontWeight: 900, letterSpacing: '0.08em', color: accent, background: COLOR.surface, border: `2px solid ${COLOR.border}`, borderRadius: '10px', padding: '3px 10px', marginBottom: '8px', animation: 'bob 1.4s ease-in-out infinite' }}>
+              {firstOptional ? 'OPTIONAL' : progress.done === 0 ? 'START' : 'UP NEXT'}
+            </span>
             <button
               onClick={() => onStart(first)}
-              className={firstOptional ? 'flex-1' : 'flex-1 btn-3d'}
-              style={{
-                padding: '13px 14px', borderRadius: '14px', textAlign: 'left', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px', minWidth: 0,
-                background: firstOptional ? 'transparent' : accent, color: firstOptional ? accent : COLOR.onAccent,
-                border: firstOptional ? `1px dashed ${accent}` : '1px solid transparent',
-              }}
+              className="btn-flat trail-node"
+              style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', background: 'transparent', color: COLOR.text, padding: 0, width: '100%', maxWidth: '260px' }}
             >
-              <span style={{ minWidth: 0 }}>
-                <span style={{ display: 'block', fontSize: '11px', opacity: 0.85, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                  {firstOptional ? 'Optional' : progress.done === 0 ? 'Start' : 'Continue'} · {firstTrack.label} · Unit {first.unit.index + 1}
-                </span>
-                <span style={{ display: 'block', fontSize: '14px', fontWeight: 700 }}>{first.step.label}</span>
-              </span>
-              <span style={{ fontSize: '18px' }}>›</span>
-            </button>
-            {firstOptional && (
-              <button
-                onClick={() => onSkip(first)}
-                style={{ padding: '0 14px', borderRadius: '12px', border: `2px solid ${COLOR.border}`, background: 'transparent', color: COLOR.muted, fontSize: '12px', fontWeight: 600 }}
+              <span
+                className="node-face pulse"
+                style={{
+                  width: '84px', height: '84px', borderRadius: '50%', display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                  background: firstOptional ? COLOR.surface : accent, color: firstOptional ? accent : COLOR.onAccent,
+                  border: firstOptional ? `3px dashed ${accent}` : 'none', ['--ring']: `${accent}88`, animation: 'pulseRing 1.6s ease-out infinite',
+                }}
               >
-                Skip
-              </button>
-            )}
+                <PathIcon kind={first.step.kind === 'deep' || first.step.kind === 'bridge' ? 'read' : first.step.kind} size={36} />
+              </span>
+              <span style={{ marginTop: '12px', fontSize: '11.5px', fontWeight: 800, letterSpacing: '0.05em', textTransform: 'uppercase', color: COLOR.muted, textAlign: 'center' }}>
+                {firstOptional ? 'Optional' : progress.done === 0 ? 'Start' : 'Continue'} · {firstTrack.label} · Unit {first.unit.index + 1}
+              </span>
+              <span style={{ fontSize: '17px', fontWeight: 800, textAlign: 'center', lineHeight: 1.25, marginTop: '2px' }}>{first.step.label}</span>
+            </button>
           </div>
-          {firstOptional && first.step.meta && <div style={{ fontSize: '11px', color: COLOR.muted, marginTop: '5px' }}>{first.step.meta}</div>}
-          {certLine && <div style={{ fontSize: '11px', color: certLine.color, marginTop: '6px' }}>{firstTrack.label}: {certLine.text}</div>}
-          <div className="flex gap-3" style={{ flexWrap: 'wrap' }}>
+          {firstOptional && (
+            <button
+              onClick={() => onSkip(first)}
+              style={{ marginTop: '10px', padding: '6px 18px', borderRadius: '12px', border: `2px solid ${COLOR.border}`, background: 'transparent', color: COLOR.muted, fontSize: '13px', fontWeight: 700 }}
+            >
+              Skip
+            </button>
+          )}
+          {firstOptional && first.step.meta && <div style={{ fontSize: '12px', color: COLOR.muted, marginTop: '6px', textAlign: 'center' }}>{first.step.meta}</div>}
+          {certLine && <div style={{ fontSize: '12px', color: certLine.color, marginTop: '8px', textAlign: 'center' }}>{firstTrack.label}: {certLine.text}</div>}
+          <div className="flex gap-3" style={{ flexWrap: 'wrap', justifyContent: 'center', marginBottom: '8px' }}>
             <button
               onClick={() => onOpenCert(firstTrack.key)}
               className="btn-flat"
-              style={{ background: 'transparent', color: accent, fontSize: '11.5px', fontWeight: 600, padding: '8px 2px 0' }}
+              style={{ background: 'transparent', color: accent, fontSize: '12px', fontWeight: 700, padding: '8px 2px 0' }}
             >
               Go deeper in {firstTrack.label} ›
             </button>
@@ -308,63 +317,72 @@ function HomeStudyPath({ tracks, remaining, progress, optionalProgress, mode, on
               <button
                 onClick={() => onTestOut(first)}
                 className="btn-flat"
-                style={{ background: 'transparent', color: COLOR.muted, fontSize: '11.5px', fontWeight: 600, padding: '8px 2px 0' }}
+                style={{ background: 'transparent', color: COLOR.muted, fontSize: '12px', fontWeight: 700, padding: '8px 2px 0' }}
               >
                 Already know this? Test out ›
               </button>
             )}
           </div>
-        </React.Fragment>
+        </div>
       ) : (
-        <div style={{ fontSize: '13px', fontWeight: 600, color: COLOR.success, textAlign: 'center', padding: '6px 0' }}>
+        <div style={{ fontSize: '14px', fontWeight: 700, color: COLOR.success, textAlign: 'center', padding: '6px 0' }}>
           Path complete — open any cert below to review it.
         </div>
       )}
 
       {upcoming.length > 0 && (
-        <div style={{ marginTop: '10px', borderTop: `1px solid ${COLOR.border}`, paddingTop: '8px' }}>
-          <div style={{ fontSize: '11.5px', color: COLOR.muted, textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 600, marginBottom: '2px' }}>Coming up</div>
-          {upcoming.map((e) => (
-            <div key={e.doneKey + e.step.id} className="flex items-center gap-2" style={{ display: 'flex' }}>
-              <button
-                onClick={() => onStart(e)}
-                className="btn-flat trail-node"
-                style={{ flex: 1, minWidth: 0, textAlign: 'left', background: 'transparent', color: COLOR.text, display: 'flex', alignItems: 'center', gap: '12px', padding: '8px 0' }}
+        <div style={{ marginTop: '14px', borderTop: `2px solid ${COLOR.border}`, paddingTop: '16px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+          {upcoming.map((e, i) => {
+            const t = trackByKey.get(e.trackKey);
+            return (
+              <div
+                key={e.doneKey + e.step.id}
+                style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '190px', marginBottom: '20px', transform: `translateX(${PATH_WAVE[(i + 1) % PATH_WAVE.length]}px)` }}
               >
-                <span className="node-face" style={{ width: '44px', height: '44px', borderRadius: '50%', flexShrink: 0, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', background: COLOR.surfaceRaised, color: COLOR.muted, border: e.step.optional ? `2px dashed ${COLOR.muted}` : `2px solid ${COLOR.border}`, boxShadow: '0 4px 0 rgba(0,0,0,0.30)' }}>
-                  <PathIcon kind={e.step.kind === 'deep' || e.step.kind === 'bridge' ? 'read' : e.step.kind} size={20} />
-                </span>
-                <span style={{ flex: 1, minWidth: 0 }}>
-                  <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <span style={{ fontSize: '12.5px', fontWeight: 600 }}>{e.step.label}</span>
-                    {e.step.optional && <OptionalTag />}
+                <button
+                  onClick={() => onStart(e)}
+                  className="btn-flat trail-node"
+                  style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', background: 'transparent', color: COLOR.text, padding: 0, width: '100%' }}
+                >
+                  <span
+                    className="node-face"
+                    style={{
+                      width: '62px', height: '62px', borderRadius: '50%', display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                      background: COLOR.surfaceRaised, color: COLOR.muted, border: e.step.optional ? `2px dashed ${COLOR.muted}` : `2px solid ${COLOR.border}`,
+                    }}
+                  >
+                    <PathIcon kind={e.step.kind === 'deep' || e.step.kind === 'bridge' ? 'read' : e.step.kind} size={26} />
                   </span>
-                  <span style={{ display: 'block', fontSize: '11.5px', color: COLOR.muted }}>
+                  <span style={{ marginTop: '10px', fontSize: '13px', fontWeight: 700, textAlign: 'center', lineHeight: 1.25 }}>{e.step.label}</span>
+                  <span style={{ fontSize: '11.5px', color: COLOR.muted, textAlign: 'center', marginTop: '1px' }}>
                     {e.step.kind === 'bridge' ? e.step.meta : `Unit ${e.unit.index + 1} · ${e.unit.title}`}
                   </span>
-                </span>
-              </button>
-              {trackByKey.get(e.trackKey) && (
-                <button
-                  onClick={() => onOpenCert(e.trackKey)}
-                  className="btn-flat"
-                  title={`Go deeper in ${trackByKey.get(e.trackKey).label}`}
-                  aria-label={`Open ${trackByKey.get(e.trackKey).label}`}
-                  style={{ background: 'transparent', padding: 0, flexShrink: 0 }}
-                >
-                  <HomePathCertChip track={trackByKey.get(e.trackKey)} />
                 </button>
-              )}
-            </div>
-          ))}
-          <div className="flex gap-3" style={{ paddingTop: '4px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '6px' }}>
+                  {e.step.optional && <OptionalTag />}
+                  {t && (
+                    <button
+                      onClick={() => onOpenCert(e.trackKey)}
+                      className="btn-flat"
+                      title={`Go deeper in ${t.label}`}
+                      aria-label={`Open ${t.label}`}
+                      style={{ background: 'transparent', padding: 0 }}
+                    >
+                      <HomePathCertChip track={t} />
+                    </button>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+          <div className="flex gap-3" style={{ paddingTop: '2px' }}>
             {later > 0 && shown < HOME_PATH_UPCOMING_MAX && (
-              <button onClick={() => setShown((n) => Math.min(n + 10, HOME_PATH_UPCOMING_MAX))} className="btn-flat" style={{ background: 'transparent', color: COLOR.primary, fontSize: '11px', fontWeight: 600, padding: 0 }}>
+              <button onClick={() => setShown((n) => Math.min(n + 10, HOME_PATH_UPCOMING_MAX))} className="btn-flat" style={{ background: 'transparent', color: COLOR.primary, fontSize: '12px', fontWeight: 700, padding: 0 }}>
                 Show more ({later} left)
               </button>
             )}
             {shown > HOME_PATH_UPCOMING && (
-              <button onClick={() => setShown(HOME_PATH_UPCOMING)} className="btn-flat" style={{ background: 'transparent', color: COLOR.muted, fontSize: '11px', fontWeight: 600, padding: 0 }}>
+              <button onClick={() => setShown(HOME_PATH_UPCOMING)} className="btn-flat" style={{ background: 'transparent', color: COLOR.muted, fontSize: '12px', fontWeight: 700, padding: 0 }}>
                 Show fewer
               </button>
             )}
