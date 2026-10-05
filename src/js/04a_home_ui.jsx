@@ -771,7 +771,7 @@ function HomeView({ tracks, results, seenLog, stats, certPlan, speech, srs, make
           card={dailyVocab}
           trackLabel={focusLabel}
           revealed={vocabRevealed}
-          onReveal={() => onRevealDailyVocab(focusKey, dailyVocab)}
+          onReveal={() => onRevealDailyVocab(dailyVocab)}
         />
       )}
 

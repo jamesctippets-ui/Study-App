@@ -549,7 +549,7 @@ def build_app_script():
         "  });\n"
         "}\n"
     )
-    return build_data_json() + "\n\n" + "\n".join(chunks) + bootstrap
+    return "\n".join(chunks) + bootstrap
 
 
 def sync_service_worker_cache_name(html):
@@ -579,9 +579,14 @@ def main():
     validate()
     app_script = build_app_script()
     template = (ROOT / "templates" / "index.html.tmpl").read_text()
-    if "__APP_SCRIPT__" not in template:
-        raise SystemExit("templates/index.html.tmpl is missing the __APP_SCRIPT__ placeholder")
-    output = template.replace("__APP_SCRIPT__", app_script)
+    for placeholder in ("__DATA_SCRIPT__", "__APP_SCRIPT__"):
+        if placeholder not in template:
+            raise SystemExit(f"templates/index.html.tmpl is missing the {placeholder} placeholder")
+    # The content (several MB of JSON-shaped constants) goes in a plain script
+    # so the browser parses it natively; only the app code goes through
+    # in-browser Babel. "</" is escaped so no string can close the tag early.
+    data_script = build_data_json().replace("</", "<\\/")
+    output = template.replace("__DATA_SCRIPT__", data_script).replace("__APP_SCRIPT__", app_script)
     out_path = ROOT / "index.html"
     out_path.write_text(output)
     sw_updated = sync_service_worker_cache_name(output)

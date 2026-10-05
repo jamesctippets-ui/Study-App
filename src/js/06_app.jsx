@@ -371,7 +371,7 @@ function CertStudyApp() {
     });
   };
 
-  const revealDailyVocab = (trackKey, card) => {
+  const revealDailyVocab = (card) => {
     bumpDailyGoal(1);
     saveStats({
       ...statsRef.current,

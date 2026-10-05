@@ -470,7 +470,7 @@ function PathStepRunner({ trackKey, units, unit, step, results, seenLog, categor
       />
     );
   } else if (step.kind === 'deep') {
-    runner = <PathDeepStep key={runnerKey} cards={payload.cards} questions={payload.questions} speech={speech} api={api} onRetry={retry} onDone={onDone} {...common} />;
+    runner = <PathDeepStep key={runnerKey} cards={payload.cards} questions={payload.questions} api={api} onRetry={retry} onDone={onDone} {...common} />;
   } else if (step.kind === 'bridge') {
     runner = <PathBridgeStep key={runnerKey} bridge={payload.bridge} questions={payload.questions} planKeys={planKeys || []} api={api} onRetry={retry} onDone={onDone} onOpenCert={onOpenCert} onAddToPlan={onAddToPlan} />;
   } else if (step.kind === 'apply') {
@@ -514,7 +514,6 @@ function PathStepRunner({ trackKey, units, unit, step, results, seenLog, categor
 const PATH_NODE_OFFSETS = [0, 24, 40, 24];
 
 function PathView({ track, trackKey, doneMap, results, seenLog, categories, speech, api, toughCount, autoStart, onAutoStarted }) {
-  const mod = DATA[trackKey];
   const units = useMemo(() => buildPathUnits(trackKey), [trackKey]);
   const [session, setSession] = useState(null);
   const [completion, setCompletion] = useState(null);

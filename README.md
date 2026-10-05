@@ -704,13 +704,17 @@ what you already have before troubleshooting further.
 
 ## Where things stand / ideas for Claude Code
 
-- **In-browser Babel is the remaining load-time cost.** Every page load re-transpiles
-  the JSX in `src/js/` with Babel Standalone before React can render anything.
-  Removing it means precompiling the JSX ahead of time as part of `build.py`, which
-  needs a JS toolchain (Babel CLI or esbuild via Node) available wherever the build
-  runs — a bigger call since it adds a non-Python dependency to a build that's
-  currently pure Python. Worth doing if load time on a phone still feels slow; hold
-  off otherwise.
+- **In-browser Babel is still a load-time cost, but a much smaller one.** Every
+  page load re-transpiles the JSX in `src/js/` with Babel Standalone before React
+  can render anything. The several MB of content (`DATA`, `BRIDGES`, ...) used to be
+  inside that same Babel script, so Babel had to chew through all of it; it now sits
+  in its own plain `<script>` ahead of the app code, so only the ~0.6 MB of app code
+  is transpiled. Measured in headless Chromium: Home interactive in about 1.8 s,
+  down from 3.8-4.8 s. Removing Babel entirely means precompiling the JSX as part
+  of `build.py`, which needs a JS toolchain (Babel CLI or esbuild via Node) wherever
+  the build runs — a bigger call since it adds a non-Python dependency to a build
+  that's currently pure Python. Worth doing if load time on a phone still feels
+  slow; hold off otherwise.
 - **AZ-104's course is now fully complete on both diagram and portal mockup/
   screenshot coverage across all 7 lessons**, matching AZ-900. The last two
   gaps — Identities & Access and Storage Management — got their own new

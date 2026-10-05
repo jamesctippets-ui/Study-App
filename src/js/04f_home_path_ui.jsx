@@ -41,7 +41,7 @@ function OptionalTag() {
 
 // Deep dive: the unit's terms with their full detail text, one at a time, then
 // a few harder questions. Never gates anything (passPct 0).
-function PathDeepStep({ cards, questions, categories, flashcardsData, speech, api, onRetry, onDone }) {
+function PathDeepStep({ cards, questions, categories, flashcardsData, api, onRetry, onDone }) {
   const [page, setPage] = useState(0);
   const [phase, setPhase] = useState(cards.length ? 'read' : 'quiz');
   const card = cards[page];

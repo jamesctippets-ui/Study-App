@@ -1424,6 +1424,24 @@ trading away for shinier but shallower ones.
   DP-300's Platform lesson now carries three cards from other categories
   (read scale-out, named replicas, In-Memory OLTP) because no single lesson
   covers those features.
+- [x] **Code audit and clean-up.** The app source (11k lines across
+  `src/js`), `build.py`, and the data modules were audited with ESLint
+  (no-unused-vars, no-undef, rules-of-hooks, duplicate keys/redeclares),
+  Pyflakes and Vulture, plus custom checks for orphaned diagrams, portal
+  mockups, screenshots, image files, CSS classes, handler methods, data
+  fields no UI reads, component props passed but not accepted, and
+  service-worker precache entries pointing at missing files. The code was
+  already clean on every one of those except four unused leftovers, now
+  removed: a dead `now` parameter on `orderBySrs`, an unused `mod` in
+  `PathView`, an unused `speech` prop on `PathDeepStep`, an unused `trackKey`
+  on `revealDailyVocab`, and one unused CSS utility (`gap-5`). **Performance:**
+  the app's content (~4 MB of `DATA`/`BRIDGES`) used to sit inside the same
+  `text/babel` script as the app code, so Babel Standalone transpiled all
+  4.4 MB on every load. It now goes in its own plain `<script>` (with `</`
+  escaped), leaving ~0.6 MB for Babel: Home interactive in about 1.8 s vs
+  3.8-4.8 s in headless Chromium. Left alone on purpose: the `_` placeholder
+  parameters, optional `size` props on icon components, and the derived
+  `dist/data/*.json` files (still groundwork for a second client).
 - [ ] **Home path — nothing blocking.** Untried: a "teach me" lesson passage
   for the Wipe/Retire/Fresh Start and HL7 ACK cross-references, an
   adjustable reminder to review, and counting optional sections toward the

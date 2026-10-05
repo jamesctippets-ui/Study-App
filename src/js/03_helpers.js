@@ -477,8 +477,7 @@ function formatScheduledLabel(dateStr) {
 // have never been rated at all) sort first, most-overdue first; cards not
 // yet due follow, soonest-due first. A seeded shuffle breaks ties so cards
 // with the same due-ness don't always land in the same relative order.
-function orderBySrs(list, srsForTrack, now) {
-  const t = now || Date.now();
+function orderBySrs(list, srsForTrack) {
   const NEVER_RATED = Number.MIN_SAFE_INTEGER;
   const shuffled = seededShuffle(list, 7);
   const withDue = shuffled.map((card, i) => {
