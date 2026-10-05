@@ -135,7 +135,7 @@ function GlossaryPanel({ onClose }) {
                       return (
                         <span
                           key={tk}
-                          style={{ fontSize: '9px', fontWeight: 700, color: accent, border: `1px solid ${accent}`, borderRadius: '999px', padding: '1px 6px' }}
+                          style={{ fontSize: '10px', fontWeight: 700, color: accent, border: `1px solid ${accent}`, borderRadius: '999px', padding: '1px 6px' }}
                         >
                           {t ? t.label : tk}
                         </span>
@@ -243,7 +243,7 @@ function AboutLegalPanel({ onClose }) {
           </ul>
         </AboutSection>
 
-        <div style={{ fontSize: '10.5px', color: COLOR.muted, textAlign: 'center', marginTop: '6px' }}>
+        <div style={{ fontSize: '11.5px', color: COLOR.muted, textAlign: 'center', marginTop: '6px' }}>
           This is a first draft written for a small independent project, not legal advice — worth a proper review before wider release.
         </div>
       </div>
@@ -309,7 +309,7 @@ function TermFlyout({ term, triggerText, context, onClose, shift, arrowLeft }) {
         </span>
       )}
       {acr.footer.length > 0 && (
-        <span style={{ display: 'block', fontSize: '10.5px', lineHeight: 1.5, color: COLOR.muted, marginTop: '6px', paddingTop: '5px', borderTop: `1px solid ${COLOR.border}`, position: 'relative' }}>
+        <span style={{ display: 'block', fontSize: '11.5px', lineHeight: 1.5, color: COLOR.muted, marginTop: '6px', paddingTop: '5px', borderTop: `1px solid ${COLOR.border}`, position: 'relative' }}>
           {acr.footer.map((k, i) => (
             <React.Fragment key={k}>{i > 0 ? ' · ' : ''}<strong>{k}</strong> {spell(k)}</React.Fragment>
           ))}

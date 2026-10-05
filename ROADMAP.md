@@ -1478,6 +1478,30 @@ trading away for shinier but shallower ones.
   certain are TAXII, OWASP, VPP, M365D, MTTR and AAAA, and PV1 is classed as
   an HL7 segment. The detector only looks at tokens with at least two
   capitals or digits, so mixed-case words like "Mac" are never flagged.
+- [x] **Declutter pass (less dense, same app).** Screens were audited on a
+  390px phone and a 1280px desktop; Home went from about 2,630px tall to
+  about 1,600px. Changes: (1) *Home:* the path card keeps the mode switch but
+  the order switch and both hint paragraphs moved behind an "Order: ... ▾"
+  line; "Coming up" shows 3 steps, not 5; the review card shows a "N waiting"
+  count, the reminder nudge as one line instead of a boxed banner, and Weak
+  spots / Tough terms (plus Case studies / Missed games when present) as
+  two-per-row tiles; the average-mastery line folded into the daily-goal
+  card; **Question of the Day is collapsed to one row** until tapped (open
+  state is not remembered, it starts closed each visit); the vocab card is
+  one compact card with its label inside. (2) *Every screen:* the "Saving
+  progress to this browser" note moved from the top of every page to the
+  bottom of Home; the header subtitle says "Welcome back" once a plan exists;
+  the mastery-by-exam-area footer is a bar plus a "Details" toggle instead of
+  a full list under every tab; the header icon buttons, goal ring and title
+  no longer pick up the global button shadow (`btn-flat`). (3) *Path tab:*
+  the helper sentence under the progress bar is gone and collapsed units show
+  a one-line summary. (4) *Reference lessons:* the portal mockup and real
+  screenshot sit behind a "Portal mockup" row (the guided path's Apply step
+  still shows them open). (5) *Type:* the 50 style declarations at 9-10.5px
+  in the app screens went up by one step (to 10-11.5px); the fake portal
+  mockups were left alone. Untried: the Practice picker, Cards, Exam intro,
+  and quiz screens, and whether to remember the Question of the Day's open
+  state.
 - [ ] **Home path — nothing blocking.** Untried: expanding the acronym
   dictionary through a second-reader fact-check, and letting a learner add
   their own acronyms or terms.

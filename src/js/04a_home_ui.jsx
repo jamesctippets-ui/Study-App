@@ -13,7 +13,7 @@ function AchievementToast({ achievement }) {
     >
       <div style={{ fontSize: '22px' }}>{achievement.icon}</div>
       <div>
-        <div style={{ fontSize: '10.5px', color: COLOR.gold, fontWeight: 700, letterSpacing: '0.02em' }}>ACHIEVEMENT UNLOCKED</div>
+        <div style={{ fontSize: '11.5px', color: COLOR.gold, fontWeight: 700, letterSpacing: '0.02em' }}>ACHIEVEMENT UNLOCKED</div>
         <div style={{ fontSize: '13.5px', fontWeight: 600, color: COLOR.text }}>{achievement.title}</div>
       </div>
     </div>
@@ -241,7 +241,7 @@ const MODE_LABELS = { path: 'Path', learn: 'Reference', quiz: 'Practice', exam: 
 // tracking anything new per-item. Tapping the ring opens a small +/-
 // stepper to change the target; the ring itself never resets the count —
 // that only happens the next time recordDailyActivity sees a new day.
-function DailyGoalRing({ dailyGoal, onSetTarget }) {
+function DailyGoalRing({ dailyGoal, onSetTarget, note }) {
   const [editing, setEditing] = useState(false);
   const target = dailyGoal.target;
   const count = dailyGoal.date === todayString() ? dailyGoal.count : 0;
@@ -257,6 +257,7 @@ function DailyGoalRing({ dailyGoal, onSetTarget }) {
     }}>
       <button
         onClick={() => setEditing((e) => !e)}
+        className="btn-flat"
         title="Tap to adjust your daily goal"
         style={{ position: 'relative', width: size, height: size, flexShrink: 0, background: 'transparent', border: 'none', padding: 0, cursor: 'pointer' }}
       >
@@ -282,7 +283,7 @@ function DailyGoalRing({ dailyGoal, onSetTarget }) {
         <div style={{ fontSize: '12.5px', fontWeight: 600, color: COLOR.text }}>
           {count} / {target} today
         </div>
-        <div style={{ fontSize: '10.5px', color: COLOR.muted }}>Daily goal · tap the ring to change it</div>
+        <div style={{ fontSize: '11.5px', color: COLOR.muted }}>Daily goal{note ? ` · ${note}` : ''}</div>
       </div>
       {editing && (
         <div style={{ display: 'flex', alignItems: 'center', gap: '4px', flexShrink: 0 }}>
@@ -348,7 +349,7 @@ function TrackListDropdown({ tracks, masteries, certPlan, onSelectTrack, onAddTo
                 {isCompleted ? (
                   <div title="Passed" style={{ fontSize: '13px', fontWeight: 700, color: COLOR.success, flexShrink: 0 }}>✓ Passed</div>
                 ) : scheduledDate ? (
-                  <div title="Scheduled" style={{ fontSize: '10.5px', fontWeight: 600, color: COLOR.gold, flexShrink: 0, textAlign: 'right', whiteSpace: 'nowrap' }}>
+                  <div title="Scheduled" style={{ fontSize: '11.5px', fontWeight: 600, color: COLOR.gold, flexShrink: 0, textAlign: 'right', whiteSpace: 'nowrap' }}>
                     {formatDateShort(scheduledDate)}
                   </div>
                 ) : (
@@ -388,6 +389,7 @@ function TrackListDropdown({ tracks, masteries, certPlan, onSelectTrack, onAddTo
 function DailyQuestionCard({ q, trackLabel, stored, onAnswer }) {
   const [selected, setSelected] = useState(stored ? stored.selected : null);
   const [msPending, setMsPending] = useState([]);
+  const [open, setOpen] = useState(false);
   useEffect(() => { setSelected(stored ? stored.selected : null); setMsPending([]); }, [q.id, stored]);
 
   const choose = (idx) => {
@@ -412,28 +414,48 @@ function DailyQuestionCard({ q, trackLabel, stored, onAnswer }) {
     onAnswer(isCorrect, picked);
   };
 
+  const answered = selected !== null;
   return (
     <div className="mb-4">
-      <div style={{ fontSize: '11px', color: COLOR.gold, fontWeight: 700, marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-        Question of the day · {trackLabel}
-      </div>
-      <QuestionView
-        q={q}
-        selected={selected}
-        onChoose={choose}
-        onNext={() => {}}
-        index={0}
-        total={1}
-        hideMeta
-        hideNext
-        msPending={msPending}
-        onToggleMs={toggleMs}
-        onSubmitMs={submitMs}
-        flashcardsData={DATA[q.__homeTrack]?.flashcards}
-      />
-      {selected !== null && (
-        <div style={{ fontSize: '10.5px', color: COLOR.muted, textAlign: 'center', marginTop: '6px' }}>
-          New question tomorrow.
+      <button
+        onClick={() => setOpen((o) => !o)}
+        aria-expanded={open}
+        style={{
+          width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px', textAlign: 'left',
+          padding: '12px 14px', borderRadius: '12px', background: COLOR.surface, border: `1px solid ${COLOR.border}`, boxShadow: SHADOW.card,
+        }}
+      >
+        <span style={{ minWidth: 0 }}>
+          <span style={{ display: 'block', fontSize: '11px', color: COLOR.gold, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+            Question of the day · {trackLabel}
+          </span>
+          <span style={{ display: 'block', fontSize: '12.5px', color: COLOR.muted, marginTop: '2px' }}>
+            {answered ? 'Answered · tap to review' : 'One question, about a minute'}
+          </span>
+        </span>
+        <span style={{ fontSize: '11px', color: COLOR.muted, transform: open ? 'rotate(180deg)' : 'none', transition: 'transform 0.15s ease' }}>▾</span>
+      </button>
+      {open && (
+        <div style={{ marginTop: '8px' }}>
+          <QuestionView
+            q={q}
+            selected={selected}
+            onChoose={choose}
+            onNext={() => {}}
+            index={0}
+            total={1}
+            hideMeta
+            hideNext
+            msPending={msPending}
+            onToggleMs={toggleMs}
+            onSubmitMs={submitMs}
+            flashcardsData={DATA[q.__homeTrack]?.flashcards}
+          />
+          {answered && (
+            <div style={{ fontSize: '11.5px', color: COLOR.muted, textAlign: 'center', marginTop: '6px' }}>
+              New question tomorrow.
+            </div>
+          )}
         </div>
       )}
     </div>
@@ -448,23 +470,22 @@ function DailyQuestionCard({ q, trackLabel, stored, onAnswer }) {
 function DailyVocabCard({ card, trackLabel, revealed, onReveal, pool }) {
   return (
     <div className="mb-4">
-      <div style={{ fontSize: '11px', color: COLOR.primary, fontWeight: 700, marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-        Vocab of the day · {trackLabel}
-      </div>
       <div
         onClick={() => { if (!revealed) onReveal(); }}
         style={{
           boxShadow: SHADOW.card, background: revealed ? COLOR.surfaceRaised : COLOR.surface,
-          border: `1px solid ${COLOR.border}`, borderRadius: '18px', padding: '22px 20px', minHeight: '96px',
-          display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-          textAlign: 'center', cursor: revealed ? 'default' : 'pointer',
+          border: `1px solid ${COLOR.border}`, borderRadius: '12px', padding: '12px 14px',
+          cursor: revealed ? 'default' : 'pointer',
         }}
       >
-        <div className="itil-display" style={{ fontSize: '18px', fontWeight: 600, marginBottom: revealed ? '10px' : 0 }}>{card.front}</div>
-        {revealed && <div style={{ fontSize: '14px', lineHeight: 1.55, color: COLOR.muted }}><GlossText text={card.back} pool={pool} max={2} blockId="dv" /></div>}
-      </div>
-      <div style={{ fontSize: '10.5px', color: COLOR.muted, textAlign: 'center', marginTop: '6px' }}>
-        {revealed ? 'New term tomorrow.' : 'Tap to reveal the definition'}
+        <div style={{ fontSize: '11px', color: COLOR.primary, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+          Vocab of the day · {trackLabel}
+        </div>
+        <div className="itil-display" style={{ fontSize: '17px', fontWeight: 600, marginTop: '4px' }}>{card.front}</div>
+        {revealed
+          ? <div style={{ fontSize: '14px', lineHeight: 1.55, color: COLOR.muted, marginTop: '8px' }}><GlossText text={card.back} pool={pool} max={2} blockId="dv" /></div>
+          : <div style={{ fontSize: '12.5px', color: COLOR.muted, marginTop: '2px' }}>Tap to reveal the definition</div>}
+        {revealed && <div style={{ fontSize: '11.5px', color: COLOR.muted, marginTop: '8px' }}>New term tomorrow.</div>}
       </div>
     </div>
   );
@@ -516,15 +537,15 @@ function CertPathHomeSection({ pathOrder, results, certPlan, studyingKey, pathPr
             <div style={{ flex: 1, minWidth: 0 }}>
               <div className="flex items-center gap-2" style={{ display: 'flex' }}>
                 <span style={{ fontSize: '13px', fontWeight: 600, color: accent }}>{t.label}</span>
-                {studying && <span style={{ fontSize: '9.5px', fontWeight: 700, color: accent, textTransform: 'uppercase', letterSpacing: '0.04em' }}>Studying now</span>}
+                {studying && <span style={{ fontSize: '10.5px', fontWeight: 700, color: accent, textTransform: 'uppercase', letterSpacing: '0.04em' }}>Studying now</span>}
               </div>
-              <div style={{ fontSize: '10.5px', color: COLOR.muted, marginTop: '1px' }}>
+              <div style={{ fontSize: '11.5px', color: COLOR.muted, marginTop: '1px' }}>
                 {t.subtitle}{prog && prog.total ? ` · path ${prog.pct}%` : ''}
               </div>
             </div>
             <div style={{ flexShrink: 0, textAlign: 'right', whiteSpace: 'nowrap' }}>
               {scheduledDate && (
-                <div style={{ fontSize: '10px', fontWeight: 600, color: days < 0 ? COLOR.red : days <= 7 ? COLOR.gold : COLOR.muted }}>
+                <div style={{ fontSize: '11px', fontWeight: 600, color: days < 0 ? COLOR.red : days <= 7 ? COLOR.gold : COLOR.muted }}>
                   {days < 0 ? `${-days}d over` : days === 0 ? 'Today' : `${days}d · ${formatDateShort(scheduledDate)}`}
                 </div>
               )}
@@ -545,7 +566,7 @@ function CertPathHomeSection({ pathOrder, results, certPlan, studyingKey, pathPr
 // for that split. Reachable again from any track's Learn/Quiz/Exam view
 // via the header's home icon; the header's hamburger (Manage cert path)
 // is reachable from every mode including this one.
-function HomeView({ tracks, results, seenLog, stats, certPlan, speech, srs, makePathApi, onSetHomePathMode, onSetHomePathOrder, onSetReviewReminder, onReviewStarted, onResume, onSelectTrack, onAddToPath, onOpenAbout, onOpenGlossary, onSetGoalTarget, onAnswerDailyQuestion, onRevealDailyVocab }) {
+function HomeView({ tracks, results, seenLog, stats, certPlan, speech, srs, makePathApi, onSetHomePathMode, onSetHomePathOrder, onSetReviewReminder, onReviewStarted, onResume, onSelectTrack, onAddToPath, onOpenAbout, onOpenGlossary, onSetGoalTarget, onAnswerDailyQuestion, onRevealDailyVocab, footerNote }) {
   const masteries = tracks.map((t) => ({ track: t, pct: trackMastery(t.key, results) }));
   const overallAvg = masteries.length ? Math.round(masteries.reduce((s, m) => s + m.pct, 0) / masteries.length) : 0;
   const lastVisited = stats.lastVisited;
@@ -653,11 +674,7 @@ function HomeView({ tracks, results, seenLog, stats, certPlan, speech, srs, make
 
   return (
     <div>
-      <div style={{ fontSize: '12px', color: COLOR.muted, marginBottom: '14px' }}>
-        {stats.streak.current > 0 ? `🔥 ${stats.streak.current}-day streak · ` : ''}{overallAvg}% average mastery across {tracks.length} tracks
-      </div>
-
-      <DailyGoalRing dailyGoal={stats.dailyGoal} onSetTarget={onSetGoalTarget} />
+      <DailyGoalRing dailyGoal={stats.dailyGoal} onSetTarget={onSetGoalTarget} note={`${overallAvg}% avg mastery`} />
 
       {hasHomePath && (
         <HomeStudyPath
@@ -706,7 +723,7 @@ function HomeView({ tracks, results, seenLog, stats, certPlan, speech, srs, make
             <span style={{ fontSize: '15px', fontWeight: 700, color: readinessColor }}>{readiness.score}%</span>
           </div>
           <div style={{ fontSize: '13px', fontWeight: 600, color: readinessColor }}>{readiness.label}</div>
-          <div style={{ fontSize: '10.5px', color: COLOR.muted, marginTop: '4px', lineHeight: 1.4 }}>
+          <div style={{ fontSize: '11.5px', color: COLOR.muted, marginTop: '4px', lineHeight: 1.4 }}>
             {readinessProjectionMessage(projection, focusLabel)}
           </div>
         </div>
@@ -808,6 +825,7 @@ function HomeView({ tracks, results, seenLog, stats, certPlan, speech, srs, make
       >
         About & Legal
       </button>
+      {footerNote && <div style={{ fontSize: '11.5px', color: COLOR.muted, textAlign: 'center', lineHeight: 1.45, padding: '0 8px' }}>{footerNote}</div>}
     </div>
   );
 }
@@ -995,8 +1013,8 @@ function CertPathPanel({ tracks, certPlan, onAddTrack, onRemoveTrack, onMove, on
                   />
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', flexShrink: 0 }}>
-                  <button onClick={() => onMove(key, 'up')} disabled={i === 0} title="Move up" className="btn-flat" style={{ opacity: i === 0 ? 0.3 : 1, color: COLOR.muted, fontSize: '10px', padding: '2px 5px', lineHeight: 1 }}>▲</button>
-                  <button onClick={() => onMove(key, 'down')} disabled={i === activeOrder.length - 1} title="Move down" className="btn-flat" style={{ opacity: i === activeOrder.length - 1 ? 0.3 : 1, color: COLOR.muted, fontSize: '10px', padding: '2px 5px', lineHeight: 1 }}>▼</button>
+                  <button onClick={() => onMove(key, 'up')} disabled={i === 0} title="Move up" className="btn-flat" style={{ opacity: i === 0 ? 0.3 : 1, color: COLOR.muted, fontSize: '11px', padding: '2px 5px', lineHeight: 1 }}>▲</button>
+                  <button onClick={() => onMove(key, 'down')} disabled={i === activeOrder.length - 1} title="Move down" className="btn-flat" style={{ opacity: i === activeOrder.length - 1 ? 0.3 : 1, color: COLOR.muted, fontSize: '11px', padding: '2px 5px', lineHeight: 1 }}>▼</button>
                 </div>
                 <button
                   onClick={() => onToggleCompleted(key)}

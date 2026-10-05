@@ -3706,7 +3706,7 @@ function pathTestOutStep(unit) {
 // steps are never required (each can be skipped), never count toward core
 // progress, and never appear on a cert's own Path tab.
 const HOME_PATH_MODES = ['core', 'extended'];
-const HOME_PATH_UPCOMING = 5;
+const HOME_PATH_UPCOMING = 3;
 const BRIDGE_DONE_KEY = 'bridges';
 const DEEP_DIVE_CARDS = 5;
 const DEEP_DIVE_QUESTIONS = 4;
@@ -4275,7 +4275,7 @@ function AchievementToast({ achievement }) {
     >
       <div style={{ fontSize: '22px' }}>{achievement.icon}</div>
       <div>
-        <div style={{ fontSize: '10.5px', color: COLOR.gold, fontWeight: 700, letterSpacing: '0.02em' }}>ACHIEVEMENT UNLOCKED</div>
+        <div style={{ fontSize: '11.5px', color: COLOR.gold, fontWeight: 700, letterSpacing: '0.02em' }}>ACHIEVEMENT UNLOCKED</div>
         <div style={{ fontSize: '13.5px', fontWeight: 600, color: COLOR.text }}>{achievement.title}</div>
       </div>
     </div>
@@ -4503,7 +4503,7 @@ const MODE_LABELS = { path: 'Path', learn: 'Reference', quiz: 'Practice', exam: 
 // tracking anything new per-item. Tapping the ring opens a small +/-
 // stepper to change the target; the ring itself never resets the count —
 // that only happens the next time recordDailyActivity sees a new day.
-function DailyGoalRing({ dailyGoal, onSetTarget }) {
+function DailyGoalRing({ dailyGoal, onSetTarget, note }) {
   const [editing, setEditing] = useState(false);
   const target = dailyGoal.target;
   const count = dailyGoal.date === todayString() ? dailyGoal.count : 0;
@@ -4519,6 +4519,7 @@ function DailyGoalRing({ dailyGoal, onSetTarget }) {
     }}>
       <button
         onClick={() => setEditing((e) => !e)}
+        className="btn-flat"
         title="Tap to adjust your daily goal"
         style={{ position: 'relative', width: size, height: size, flexShrink: 0, background: 'transparent', border: 'none', padding: 0, cursor: 'pointer' }}
       >
@@ -4544,7 +4545,7 @@ function DailyGoalRing({ dailyGoal, onSetTarget }) {
         <div style={{ fontSize: '12.5px', fontWeight: 600, color: COLOR.text }}>
           {count} / {target} today
         </div>
-        <div style={{ fontSize: '10.5px', color: COLOR.muted }}>Daily goal · tap the ring to change it</div>
+        <div style={{ fontSize: '11.5px', color: COLOR.muted }}>Daily goal{note ? ` · ${note}` : ''}</div>
       </div>
       {editing && (
         <div style={{ display: 'flex', alignItems: 'center', gap: '4px', flexShrink: 0 }}>
@@ -4610,7 +4611,7 @@ function TrackListDropdown({ tracks, masteries, certPlan, onSelectTrack, onAddTo
                 {isCompleted ? (
                   <div title="Passed" style={{ fontSize: '13px', fontWeight: 700, color: COLOR.success, flexShrink: 0 }}>✓ Passed</div>
                 ) : scheduledDate ? (
-                  <div title="Scheduled" style={{ fontSize: '10.5px', fontWeight: 600, color: COLOR.gold, flexShrink: 0, textAlign: 'right', whiteSpace: 'nowrap' }}>
+                  <div title="Scheduled" style={{ fontSize: '11.5px', fontWeight: 600, color: COLOR.gold, flexShrink: 0, textAlign: 'right', whiteSpace: 'nowrap' }}>
                     {formatDateShort(scheduledDate)}
                   </div>
                 ) : (
@@ -4650,6 +4651,7 @@ function TrackListDropdown({ tracks, masteries, certPlan, onSelectTrack, onAddTo
 function DailyQuestionCard({ q, trackLabel, stored, onAnswer }) {
   const [selected, setSelected] = useState(stored ? stored.selected : null);
   const [msPending, setMsPending] = useState([]);
+  const [open, setOpen] = useState(false);
   useEffect(() => { setSelected(stored ? stored.selected : null); setMsPending([]); }, [q.id, stored]);
 
   const choose = (idx) => {
@@ -4674,28 +4676,48 @@ function DailyQuestionCard({ q, trackLabel, stored, onAnswer }) {
     onAnswer(isCorrect, picked);
   };
 
+  const answered = selected !== null;
   return (
     <div className="mb-4">
-      <div style={{ fontSize: '11px', color: COLOR.gold, fontWeight: 700, marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-        Question of the day · {trackLabel}
-      </div>
-      <QuestionView
-        q={q}
-        selected={selected}
-        onChoose={choose}
-        onNext={() => {}}
-        index={0}
-        total={1}
-        hideMeta
-        hideNext
-        msPending={msPending}
-        onToggleMs={toggleMs}
-        onSubmitMs={submitMs}
-        flashcardsData={DATA[q.__homeTrack]?.flashcards}
-      />
-      {selected !== null && (
-        <div style={{ fontSize: '10.5px', color: COLOR.muted, textAlign: 'center', marginTop: '6px' }}>
-          New question tomorrow.
+      <button
+        onClick={() => setOpen((o) => !o)}
+        aria-expanded={open}
+        style={{
+          width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px', textAlign: 'left',
+          padding: '12px 14px', borderRadius: '12px', background: COLOR.surface, border: `1px solid ${COLOR.border}`, boxShadow: SHADOW.card,
+        }}
+      >
+        <span style={{ minWidth: 0 }}>
+          <span style={{ display: 'block', fontSize: '11px', color: COLOR.gold, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+            Question of the day · {trackLabel}
+          </span>
+          <span style={{ display: 'block', fontSize: '12.5px', color: COLOR.muted, marginTop: '2px' }}>
+            {answered ? 'Answered · tap to review' : 'One question, about a minute'}
+          </span>
+        </span>
+        <span style={{ fontSize: '11px', color: COLOR.muted, transform: open ? 'rotate(180deg)' : 'none', transition: 'transform 0.15s ease' }}>▾</span>
+      </button>
+      {open && (
+        <div style={{ marginTop: '8px' }}>
+          <QuestionView
+            q={q}
+            selected={selected}
+            onChoose={choose}
+            onNext={() => {}}
+            index={0}
+            total={1}
+            hideMeta
+            hideNext
+            msPending={msPending}
+            onToggleMs={toggleMs}
+            onSubmitMs={submitMs}
+            flashcardsData={DATA[q.__homeTrack]?.flashcards}
+          />
+          {answered && (
+            <div style={{ fontSize: '11.5px', color: COLOR.muted, textAlign: 'center', marginTop: '6px' }}>
+              New question tomorrow.
+            </div>
+          )}
         </div>
       )}
     </div>
@@ -4710,23 +4732,22 @@ function DailyQuestionCard({ q, trackLabel, stored, onAnswer }) {
 function DailyVocabCard({ card, trackLabel, revealed, onReveal, pool }) {
   return (
     <div className="mb-4">
-      <div style={{ fontSize: '11px', color: COLOR.primary, fontWeight: 700, marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-        Vocab of the day · {trackLabel}
-      </div>
       <div
         onClick={() => { if (!revealed) onReveal(); }}
         style={{
           boxShadow: SHADOW.card, background: revealed ? COLOR.surfaceRaised : COLOR.surface,
-          border: `1px solid ${COLOR.border}`, borderRadius: '18px', padding: '22px 20px', minHeight: '96px',
-          display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-          textAlign: 'center', cursor: revealed ? 'default' : 'pointer',
+          border: `1px solid ${COLOR.border}`, borderRadius: '12px', padding: '12px 14px',
+          cursor: revealed ? 'default' : 'pointer',
         }}
       >
-        <div className="itil-display" style={{ fontSize: '18px', fontWeight: 600, marginBottom: revealed ? '10px' : 0 }}>{card.front}</div>
-        {revealed && <div style={{ fontSize: '14px', lineHeight: 1.55, color: COLOR.muted }}><GlossText text={card.back} pool={pool} max={2} blockId="dv" /></div>}
-      </div>
-      <div style={{ fontSize: '10.5px', color: COLOR.muted, textAlign: 'center', marginTop: '6px' }}>
-        {revealed ? 'New term tomorrow.' : 'Tap to reveal the definition'}
+        <div style={{ fontSize: '11px', color: COLOR.primary, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+          Vocab of the day · {trackLabel}
+        </div>
+        <div className="itil-display" style={{ fontSize: '17px', fontWeight: 600, marginTop: '4px' }}>{card.front}</div>
+        {revealed
+          ? <div style={{ fontSize: '14px', lineHeight: 1.55, color: COLOR.muted, marginTop: '8px' }}><GlossText text={card.back} pool={pool} max={2} blockId="dv" /></div>
+          : <div style={{ fontSize: '12.5px', color: COLOR.muted, marginTop: '2px' }}>Tap to reveal the definition</div>}
+        {revealed && <div style={{ fontSize: '11.5px', color: COLOR.muted, marginTop: '8px' }}>New term tomorrow.</div>}
       </div>
     </div>
   );
@@ -4778,15 +4799,15 @@ function CertPathHomeSection({ pathOrder, results, certPlan, studyingKey, pathPr
             <div style={{ flex: 1, minWidth: 0 }}>
               <div className="flex items-center gap-2" style={{ display: 'flex' }}>
                 <span style={{ fontSize: '13px', fontWeight: 600, color: accent }}>{t.label}</span>
-                {studying && <span style={{ fontSize: '9.5px', fontWeight: 700, color: accent, textTransform: 'uppercase', letterSpacing: '0.04em' }}>Studying now</span>}
+                {studying && <span style={{ fontSize: '10.5px', fontWeight: 700, color: accent, textTransform: 'uppercase', letterSpacing: '0.04em' }}>Studying now</span>}
               </div>
-              <div style={{ fontSize: '10.5px', color: COLOR.muted, marginTop: '1px' }}>
+              <div style={{ fontSize: '11.5px', color: COLOR.muted, marginTop: '1px' }}>
                 {t.subtitle}{prog && prog.total ? ` · path ${prog.pct}%` : ''}
               </div>
             </div>
             <div style={{ flexShrink: 0, textAlign: 'right', whiteSpace: 'nowrap' }}>
               {scheduledDate && (
-                <div style={{ fontSize: '10px', fontWeight: 600, color: days < 0 ? COLOR.red : days <= 7 ? COLOR.gold : COLOR.muted }}>
+                <div style={{ fontSize: '11px', fontWeight: 600, color: days < 0 ? COLOR.red : days <= 7 ? COLOR.gold : COLOR.muted }}>
                   {days < 0 ? `${-days}d over` : days === 0 ? 'Today' : `${days}d · ${formatDateShort(scheduledDate)}`}
                 </div>
               )}
@@ -4807,7 +4828,7 @@ function CertPathHomeSection({ pathOrder, results, certPlan, studyingKey, pathPr
 // for that split. Reachable again from any track's Learn/Quiz/Exam view
 // via the header's home icon; the header's hamburger (Manage cert path)
 // is reachable from every mode including this one.
-function HomeView({ tracks, results, seenLog, stats, certPlan, speech, srs, makePathApi, onSetHomePathMode, onSetHomePathOrder, onSetReviewReminder, onReviewStarted, onResume, onSelectTrack, onAddToPath, onOpenAbout, onOpenGlossary, onSetGoalTarget, onAnswerDailyQuestion, onRevealDailyVocab }) {
+function HomeView({ tracks, results, seenLog, stats, certPlan, speech, srs, makePathApi, onSetHomePathMode, onSetHomePathOrder, onSetReviewReminder, onReviewStarted, onResume, onSelectTrack, onAddToPath, onOpenAbout, onOpenGlossary, onSetGoalTarget, onAnswerDailyQuestion, onRevealDailyVocab, footerNote }) {
   const masteries = tracks.map((t) => ({ track: t, pct: trackMastery(t.key, results) }));
   const overallAvg = masteries.length ? Math.round(masteries.reduce((s, m) => s + m.pct, 0) / masteries.length) : 0;
   const lastVisited = stats.lastVisited;
@@ -4915,11 +4936,7 @@ function HomeView({ tracks, results, seenLog, stats, certPlan, speech, srs, make
 
   return (
     <div>
-      <div style={{ fontSize: '12px', color: COLOR.muted, marginBottom: '14px' }}>
-        {stats.streak.current > 0 ? `🔥 ${stats.streak.current}-day streak · ` : ''}{overallAvg}% average mastery across {tracks.length} tracks
-      </div>
-
-      <DailyGoalRing dailyGoal={stats.dailyGoal} onSetTarget={onSetGoalTarget} />
+      <DailyGoalRing dailyGoal={stats.dailyGoal} onSetTarget={onSetGoalTarget} note={`${overallAvg}% avg mastery`} />
 
       {hasHomePath && (
         <HomeStudyPath
@@ -4968,7 +4985,7 @@ function HomeView({ tracks, results, seenLog, stats, certPlan, speech, srs, make
             <span style={{ fontSize: '15px', fontWeight: 700, color: readinessColor }}>{readiness.score}%</span>
           </div>
           <div style={{ fontSize: '13px', fontWeight: 600, color: readinessColor }}>{readiness.label}</div>
-          <div style={{ fontSize: '10.5px', color: COLOR.muted, marginTop: '4px', lineHeight: 1.4 }}>
+          <div style={{ fontSize: '11.5px', color: COLOR.muted, marginTop: '4px', lineHeight: 1.4 }}>
             {readinessProjectionMessage(projection, focusLabel)}
           </div>
         </div>
@@ -5070,6 +5087,7 @@ function HomeView({ tracks, results, seenLog, stats, certPlan, speech, srs, make
       >
         About & Legal
       </button>
+      {footerNote && <div style={{ fontSize: '11.5px', color: COLOR.muted, textAlign: 'center', lineHeight: 1.45, padding: '0 8px' }}>{footerNote}</div>}
     </div>
   );
 }
@@ -5257,8 +5275,8 @@ function CertPathPanel({ tracks, certPlan, onAddTrack, onRemoveTrack, onMove, on
                   />
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', flexShrink: 0 }}>
-                  <button onClick={() => onMove(key, 'up')} disabled={i === 0} title="Move up" className="btn-flat" style={{ opacity: i === 0 ? 0.3 : 1, color: COLOR.muted, fontSize: '10px', padding: '2px 5px', lineHeight: 1 }}>▲</button>
-                  <button onClick={() => onMove(key, 'down')} disabled={i === activeOrder.length - 1} title="Move down" className="btn-flat" style={{ opacity: i === activeOrder.length - 1 ? 0.3 : 1, color: COLOR.muted, fontSize: '10px', padding: '2px 5px', lineHeight: 1 }}>▼</button>
+                  <button onClick={() => onMove(key, 'up')} disabled={i === 0} title="Move up" className="btn-flat" style={{ opacity: i === 0 ? 0.3 : 1, color: COLOR.muted, fontSize: '11px', padding: '2px 5px', lineHeight: 1 }}>▲</button>
+                  <button onClick={() => onMove(key, 'down')} disabled={i === activeOrder.length - 1} title="Move down" className="btn-flat" style={{ opacity: i === activeOrder.length - 1 ? 0.3 : 1, color: COLOR.muted, fontSize: '11px', padding: '2px 5px', lineHeight: 1 }}>▼</button>
                 </div>
                 <button
                   onClick={() => onToggleCompleted(key)}
@@ -5466,7 +5484,7 @@ function GlossaryPanel({ onClose }) {
                       return (
                         <span
                           key={tk}
-                          style={{ fontSize: '9px', fontWeight: 700, color: accent, border: `1px solid ${accent}`, borderRadius: '999px', padding: '1px 6px' }}
+                          style={{ fontSize: '10px', fontWeight: 700, color: accent, border: `1px solid ${accent}`, borderRadius: '999px', padding: '1px 6px' }}
                         >
                           {t ? t.label : tk}
                         </span>
@@ -5574,7 +5592,7 @@ function AboutLegalPanel({ onClose }) {
           </ul>
         </AboutSection>
 
-        <div style={{ fontSize: '10.5px', color: COLOR.muted, textAlign: 'center', marginTop: '6px' }}>
+        <div style={{ fontSize: '11.5px', color: COLOR.muted, textAlign: 'center', marginTop: '6px' }}>
           This is a first draft written for a small independent project, not legal advice — worth a proper review before wider release.
         </div>
       </div>
@@ -5640,7 +5658,7 @@ function TermFlyout({ term, triggerText, context, onClose, shift, arrowLeft }) {
         </span>
       )}
       {acr.footer.length > 0 && (
-        <span style={{ display: 'block', fontSize: '10.5px', lineHeight: 1.5, color: COLOR.muted, marginTop: '6px', paddingTop: '5px', borderTop: `1px solid ${COLOR.border}`, position: 'relative' }}>
+        <span style={{ display: 'block', fontSize: '11.5px', lineHeight: 1.5, color: COLOR.muted, marginTop: '6px', paddingTop: '5px', borderTop: `1px solid ${COLOR.border}`, position: 'relative' }}>
           {acr.footer.map((k, i) => (
             <React.Fragment key={k}>{i > 0 ? ' · ' : ''}<strong>{k}</strong> {spell(k)}</React.Fragment>
           ))}
@@ -5731,7 +5749,7 @@ function FlashcardView({ card, flipped, setFlipped, onRate, index, total, catego
       <div style={{ fontSize: '11px', color: COLOR.muted, textAlign: 'center', marginTop: '8px' }}>
         {flipped ? 'Tap to see the term again' : 'Tap the card to reveal the definition'}
       </div>
-      <div style={{ fontSize: '10.5px', color: COLOR.muted, textAlign: 'center', marginBottom: '6px' }}>
+      <div style={{ fontSize: '11.5px', color: COLOR.muted, textAlign: 'center', marginBottom: '6px' }}>
         How well did you know it?
       </div>
       <div className="flex gap-1">
@@ -5742,7 +5760,7 @@ function FlashcardView({ card, flipped, setFlipped, onRate, index, total, catego
             className="flex-1"
             style={{
               padding: '9px 2px', borderRadius: '10px', border: `1px solid ${color}`, color, background: 'transparent',
-              fontSize: '10px', fontWeight: 600, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2px',
+              fontSize: '11px', fontWeight: 600, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2px',
             }}
           >
             <span style={{ fontSize: '14px', fontWeight: 700 }}>{n}</span>
@@ -5788,7 +5806,7 @@ function ResourceLinksRow({ resources, label }) {
   if (!resources || !resources.length) return null;
   return (
     <div style={{ marginBottom: '10px' }}>
-      {label && <div style={{ fontSize: '10.5px', color: COLOR.muted, marginBottom: '3px' }}>{label}</div>}
+      {label && <div style={{ fontSize: '11.5px', color: COLOR.muted, marginBottom: '3px' }}>{label}</div>}
       <div className="flex flex-col gap-1">
         {resources.map((r, i) => (
           <a
@@ -6225,7 +6243,7 @@ function MatchGame({ flashcards, roundSize, onContinue, onRoundComplete, continu
     <span
       style={{
         position: 'absolute', top: '-7px', left: '-7px', width: '20px', height: '20px', borderRadius: '50%',
-        display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '10.5px', fontWeight: 700,
+        display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '11.5px', fontWeight: 700,
         background: COLOR.surfaceRaised, border: `1px solid ${COLOR.border}`, color: COLOR.muted,
       }}
     >
@@ -6424,7 +6442,8 @@ function ReadingCheckGate({ question, onPassed }) {
 // screenshot, the worked scenario, common exam traps, and the on-the-job
 // note. Shared by the Reference tab's LessonDetail and the guided path's
 // "Apply it" step so both render it identically.
-function LessonApplySections({ lesson, categories, lessonCatKeys, flashcardsData }) {
+function LessonApplySections({ lesson, categories, lessonCatKeys, flashcardsData, collapsePortal }) {
+  const [portalOpen, setPortalOpen] = useState(!collapsePortal);
   const walkthrough = lesson.portalMockup ? PORTAL_WALKTHROUGHS[lesson.portalMockup] : null;
   const MockupComp = !walkthrough && lesson.portalMockup ? PORTAL_MOCKUPS[lesson.portalMockup] : null;
   const realShot = lesson.portalMockup ? REAL_PORTAL_SCREENSHOTS[lesson.portalMockup] : null;
@@ -6447,14 +6466,37 @@ function LessonApplySections({ lesson, categories, lessonCatKeys, flashcardsData
     : [];
   const categoryScreenshotKey = lessonScreenshotCats.length === 1 ? lessonScreenshotCats[0].screenshot : null;
   const categoryRealShot = categoryScreenshotKey ? REAL_PORTAL_SCREENSHOTS[categoryScreenshotKey] : null;
+  const hasPortal = !!(walkthrough || MockupComp || categoryRealShot);
+  // On the Reference page the mockup and screenshot are big, so they sit
+  // behind one tap; the guided path's Apply step shows them open.
+  const portalTitle = walkthrough ? `Try it: ${walkthrough.label}` : MockupComp ? 'Portal mockup' : 'Portal screenshot';
   return (
     <React.Fragment>
-      {(walkthrough || MockupComp) && (
+      {hasPortal && collapsePortal && (
+        <button
+          onClick={() => setPortalOpen((o) => !o)}
+          aria-expanded={portalOpen}
+          style={{
+            width: '100%', marginBottom: portalOpen ? '10px' : '16px', padding: '11px 14px', borderRadius: '12px', textAlign: 'left',
+            background: COLOR.surface, border: `1px solid ${COLOR.border}`, boxShadow: SHADOW.card,
+            display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px',
+          }}
+        >
+          <span>
+            <span style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: COLOR.gold }}>{portalTitle}</span>
+            <span style={{ display: 'block', fontSize: '11.5px', color: COLOR.muted }}>{walkthrough ? 'Click through the real flow' : realShot || categoryRealShot ? 'Layout sketch and a real screenshot' : 'A sketch of the layout'}</span>
+          </span>
+          <span style={{ fontSize: '11px', color: COLOR.muted }}>{portalOpen ? '▴' : '▾'}</span>
+        </button>
+      )}
+      {portalOpen && (walkthrough || MockupComp) && (
         <div style={{ marginBottom: '16px' }}>
-          <div style={{ fontSize: '13px', fontWeight: 600, color: COLOR.gold, marginBottom: '4px' }}>
-            {walkthrough ? `Try it: ${walkthrough.label}` : 'Portal mockup'}
-          </div>
-          <div style={{ fontSize: '10.5px', color: COLOR.muted, marginBottom: '8px', lineHeight: 1.4 }}>
+          {!collapsePortal && (
+            <div style={{ fontSize: '13px', fontWeight: 600, color: COLOR.gold, marginBottom: '4px' }}>
+              {portalTitle}
+            </div>
+          )}
+          <div style={{ fontSize: '11.5px', color: COLOR.muted, marginBottom: '8px', lineHeight: 1.4 }}>
             {walkthrough
               ? 'A click-through illustration of the real flow, not an exact screenshot — the real portal may look slightly different.'
               : 'An illustration of the layout, not an exact screenshot — the real portal may look slightly different.'}
@@ -6464,7 +6506,7 @@ function LessonApplySections({ lesson, categories, lessonCatKeys, flashcardsData
           </div>
           {realShot && (
             <>
-              <div style={{ fontSize: '10.5px', color: COLOR.muted, marginTop: '12px', marginBottom: '2px' }}>
+              <div style={{ fontSize: '11.5px', color: COLOR.muted, marginTop: '12px', marginBottom: '2px' }}>
                 See the real thing:
               </div>
               <RealPortalScreenshot shot={realShot} />
@@ -6473,9 +6515,9 @@ function LessonApplySections({ lesson, categories, lessonCatKeys, flashcardsData
         </div>
       )}
 
-      {categoryRealShot && (
+      {portalOpen && categoryRealShot && (
         <div style={{ marginBottom: '16px' }}>
-          <div style={{ fontSize: '13px', fontWeight: 600, color: COLOR.gold, marginBottom: '4px' }}>Portal screenshot</div>
+          {!collapsePortal && <div style={{ fontSize: '13px', fontWeight: 600, color: COLOR.gold, marginBottom: '4px' }}>Portal screenshot</div>}
           <RealPortalScreenshot shot={categoryRealShot} />
         </div>
       )}
@@ -6650,7 +6692,7 @@ function LessonDetail({ lesson, flashcardsData, questionsData, categories, onBac
         )}
       </div>
 
-      <LessonApplySections lesson={lesson} categories={categories} lessonCatKeys={lessonCatKeys} flashcardsData={flashcardsData} />
+      <LessonApplySections lesson={lesson} categories={categories} lessonCatKeys={lessonCatKeys} flashcardsData={flashcardsData} collapsePortal />
 
       <button
         onClick={() => setShowFundamentals((s) => !s)}
@@ -6906,7 +6948,7 @@ function VerbalQuizPanel({
           </select>
         </div>
         <div style={{ fontSize: '11px', color: COLOR.muted, marginBottom: '14px' }}>{poolSize} questions available with this filter.</div>
-        <div style={{ fontSize: '10.5px', color: COLOR.muted, marginBottom: '16px', lineHeight: 1.4 }}>
+        <div style={{ fontSize: '11.5px', color: COLOR.muted, marginBottom: '16px', lineHeight: 1.4 }}>
           Keeps this screen awake while playing, so audio doesn't stop the moment your phone would
           otherwise lock — leave the app open and in view. Backgrounding the tab or a hard screen-lock
           can still pause playback; that's outside any web app's control.
@@ -7029,7 +7071,7 @@ function CommandPracticeView({ session, index, score, categories, input, setInpu
         <span>{index + 1} / {total}</span>
       </div>
       <div style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderRadius: '18px', padding: '20px' }}>
-        <div style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.04em', color: COLOR.gold, marginBottom: '8px', textTransform: 'uppercase' }}>
+        <div style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.04em', color: COLOR.gold, marginBottom: '8px', textTransform: 'uppercase' }}>
           {challenge.tool === 'powershell' ? 'PowerShell' : 'Azure CLI'}
         </div>
         <div style={{ fontSize: '16px', lineHeight: 1.45, fontWeight: 500, marginBottom: '14px' }}>{challenge.prompt}</div>
@@ -7356,7 +7398,7 @@ function PracticeToolPicker({ quizView, available, onSelect }) {
         }}
       >
         <span style={{ minWidth: 0 }}>
-          <span style={{ display: 'block', fontSize: '10px', color: COLOR.muted, textTransform: 'uppercase', letterSpacing: '0.04em', fontWeight: 600 }}>Practice tool</span>
+          <span style={{ display: 'block', fontSize: '11px', color: COLOR.muted, textTransform: 'uppercase', letterSpacing: '0.04em', fontWeight: 600 }}>Practice tool</span>
           <span style={{ display: 'block', fontSize: '14.5px', fontWeight: 600 }}>{current.label}</span>
           <span style={{ display: 'block', fontSize: '11.5px', color: COLOR.muted, marginTop: '1px' }}>{current.desc}</span>
         </span>
@@ -7366,7 +7408,7 @@ function PracticeToolPicker({ quizView, available, onSelect }) {
         <div style={{ boxShadow: SHADOW.card, marginTop: '6px', background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderRadius: '12px', overflow: 'hidden' }}>
           {groups.map((g, gi) => (
             <div key={g.name} style={{ borderTop: gi === 0 ? 'none' : `1px solid ${COLOR.border}` }}>
-              <div style={{ padding: '8px 14px 4px', fontSize: '10px', fontWeight: 700, color: COLOR.muted, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{g.name}</div>
+              <div style={{ padding: '8px 14px 4px', fontSize: '11px', fontWeight: 700, color: COLOR.muted, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{g.name}</div>
               {g.items.map((t) => {
                 const active = t.key === current.key;
                 return (
@@ -7462,8 +7504,8 @@ function CompareView({ session, index, score, categories, choice, onChoose, onNe
               >
                 <span style={{ fontSize: '11px', fontWeight: 700, color: submitted ? color : COLOR.muted, minWidth: '14px', paddingTop: '2px' }}>{i === 0 ? 'A' : 'B'}</span>
                 <span style={{ flex: 1 }}>{opt}</span>
-                {submitted && isBetter && <span style={{ fontSize: '10px', fontWeight: 700, whiteSpace: 'nowrap', paddingTop: '3px' }}>BETTER</span>}
-                {submitted && isChosen && !isBetter && <span style={{ fontSize: '10px', fontWeight: 700, whiteSpace: 'nowrap', paddingTop: '3px' }}>RUNNER-UP</span>}
+                {submitted && isBetter && <span style={{ fontSize: '11px', fontWeight: 700, whiteSpace: 'nowrap', paddingTop: '3px' }}>BETTER</span>}
+                {submitted && isChosen && !isBetter && <span style={{ fontSize: '11px', fontWeight: 700, whiteSpace: 'nowrap', paddingTop: '3px' }}>RUNNER-UP</span>}
               </button>
             );
           })}
@@ -7599,7 +7641,7 @@ function QuestionView({ q, selected, onChoose, onNext, index, total, categoryLab
                   >
                     <span>{opt}</span>
                     {selected !== null && isCorrectOpt && wasSelected && <span>✓</span>}
-                    {selected !== null && isCorrectOpt && !wasSelected && <span style={{ fontSize: '9px' }}>missed</span>}
+                    {selected !== null && isCorrectOpt && !wasSelected && <span style={{ fontSize: '10px' }}>missed</span>}
                     {selected !== null && !isCorrectOpt && wasSelected && <span>✕</span>}
                     {selected === null && wasSelected && <span>●</span>}
                   </button>
@@ -7626,7 +7668,7 @@ function QuestionView({ q, selected, onChoose, onNext, index, total, categoryLab
 
         {selected !== null && q.whyTested && (
           <div style={{ marginTop: '10px', padding: '12px', borderRadius: '10px', background: `${COLOR.teal}14`, border: `1px solid ${COLOR.teal}`, fontSize: '12.5px', lineHeight: 1.5, color: COLOR.text }}>
-            <div style={{ fontSize: '10.5px', fontWeight: 700, color: COLOR.teal, textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: '4px' }}>Why this is tested</div>
+            <div style={{ fontSize: '11.5px', fontWeight: 700, color: COLOR.teal, textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: '4px' }}>Why this is tested</div>
             {q.whyTested}
           </div>
         )}
@@ -7674,7 +7716,7 @@ function QuizSummary({ score, answers, categories, onRestart, restartLabel }) {
           <div className="flex flex-col gap-2">
             {missed.map((m, i) => (
               <div key={i} style={{ boxShadow: SHADOW.card, background: COLOR.surfaceRaised, borderRadius: '10px', padding: '10px 12px', fontSize: '13px' }}>
-                <div style={{ fontSize: '10px', color: COLOR.muted, marginBottom: '2px' }}>{categoryLabelFor(m)}</div>
+                <div style={{ fontSize: '11px', color: COLOR.muted, marginBottom: '2px' }}>{categoryLabelFor(m)}</div>
                 <div>{m.prompt}</div>
                 {m.explanation && (
                   <div style={{ marginTop: '6px', paddingTop: '6px', borderTop: `1px solid ${COLOR.border}`, fontSize: '12px', color: COLOR.muted, lineHeight: 1.5 }}>
@@ -7683,7 +7725,7 @@ function QuizSummary({ score, answers, categories, onRestart, restartLabel }) {
                 )}
                 {m.whyTested && (
                   <div style={{ marginTop: '6px', padding: '8px 10px', borderRadius: '8px', background: `${COLOR.teal}14`, border: `1px solid ${COLOR.teal}`, fontSize: '11.5px', lineHeight: 1.5, color: COLOR.text }}>
-                    <div style={{ fontSize: '9.5px', fontWeight: 700, color: COLOR.teal, textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: '3px' }}>Why this is tested</div>
+                    <div style={{ fontSize: '10.5px', fontWeight: 700, color: COLOR.teal, textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: '3px' }}>Why this is tested</div>
                     {m.whyTested}
                   </div>
                 )}
@@ -7765,7 +7807,7 @@ function CaseStudyView({ list, activeIndex, onStart, onExit, categories, questio
         ‹ All case studies
       </button>
       <div style={{ boxShadow: SHADOW.card, background: COLOR.surfaceRaised, border: `1px solid ${COLOR.border}`, borderRadius: '14px', padding: '14px 16px', marginBottom: '14px' }}>
-        <div style={{ fontSize: '10.5px', color: COLOR.muted, textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: '4px' }}>{catLabel} · {cs.title}</div>
+        <div style={{ fontSize: '11.5px', color: COLOR.muted, textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: '4px' }}>{catLabel} · {cs.title}</div>
         <div style={{ fontSize: '13.5px', lineHeight: 1.55, color: COLOR.text }}><GlossText text={cs.scenario} pool={flashcardsData} max={3} blockId="cs-scn" /></div>
       </div>
       <QuestionView
@@ -8291,7 +8333,7 @@ function PathStepRunner({ trackKey, units, unit, step, results, seenLog, categor
         {exitLabel}
       </button>
       <div style={{ marginBottom: '14px' }}>
-        <div style={{ fontSize: '10.5px', color: COLOR.muted, textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 600 }}>
+        <div style={{ fontSize: '11.5px', color: COLOR.muted, textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 600 }}>
           {step.kind === 'review' ? 'Spaced review' : step.kind === 'bridge' ? 'Optional · Cross-cert bridge' : `${certLabel ? certLabel + ' · ' : ''}Unit ${unit.index + 1} · ${unit.title}${step.optional ? ' · Optional' : ''}`}
         </div>
         <div className="itil-display" style={{ fontSize: '18px', fontWeight: 600, marginTop: '2px' }}>{step.label}</div>
@@ -8429,8 +8471,8 @@ function PathView({ track, trackKey, doneMap, results, seenLog, categories, spee
         <div style={{ height: '6px', borderRadius: '3px', background: COLOR.surfaceRaised, overflow: 'hidden', marginBottom: '6px' }}>
           <div style={{ height: '100%', width: `${overall.pct}%`, background: COLOR.success, borderRadius: '3px' }} />
         </div>
-        <div style={{ fontSize: '11px', color: COLOR.muted, marginBottom: '12px' }}>
-          {overall.done} of {overall.total} steps done · reading, flashcards, quizzes, and games in a mixed order
+        <div style={{ fontSize: '12px', color: COLOR.muted, marginBottom: '12px' }}>
+          {overall.done} of {overall.total} steps done
         </div>
         {next ? (
           <button
@@ -8438,7 +8480,7 @@ function PathView({ track, trackKey, doneMap, results, seenLog, categories, spee
             style={{ width: '100%', padding: '13px', borderRadius: '12px', background: COLOR.primary, color: COLOR.onAccent, fontSize: '14px', fontWeight: 700, textAlign: 'left', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px' }}
           >
             <span style={{ minWidth: 0 }}>
-              <span style={{ display: 'block', fontSize: '10px', opacity: 0.8, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+              <span style={{ display: 'block', fontSize: '11px', opacity: 0.8, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                 {overall.done === 0 ? 'Start' : 'Continue'} · Unit {next.unit.index + 1}
               </span>
               <span style={{ display: 'block' }}>{next.step.label}</span>
@@ -8502,9 +8544,9 @@ function PathView({ track, trackKey, doneMap, results, seenLog, categories, spee
             >
               <PathRing done={prog.done} total={prog.total} />
               <span style={{ flex: 1, minWidth: 0 }}>
-                <span style={{ display: 'block', fontSize: '10px', color: COLOR.muted, textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 600 }}>Unit {unit.index + 1}</span>
+                <span style={{ display: 'block', fontSize: '11px', color: COLOR.muted, textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 600 }}>Unit {unit.index + 1}</span>
                 <span style={{ display: 'block', fontSize: '14.5px', fontWeight: 600 }}>{unit.title}</span>
-                {!open && <span style={{ display: 'block', fontSize: '11.5px', color: COLOR.muted, marginTop: '1px' }}>{unit.summary}</span>}
+                {!open && <span style={{ display: 'block', fontSize: '12px', color: COLOR.muted, marginTop: '1px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{unit.summary}</span>}
               </span>
               <span style={{ fontSize: '12px', color: COLOR.muted }}>{open ? '▴' : '▾'}</span>
             </button>
@@ -8589,7 +8631,7 @@ const HOME_PATH_MODE_HINTS = {
 function HomePathCertChip({ track }) {
   const accent = trackAccent(track.key);
   return (
-    <span style={{ fontSize: '10px', fontWeight: 700, color: accent, border: `1px solid ${accent}`, borderRadius: '999px', padding: '1px 7px', whiteSpace: 'nowrap' }}>
+    <span style={{ fontSize: '11px', fontWeight: 700, color: accent, border: `1px solid ${accent}`, borderRadius: '999px', padding: '1px 7px', whiteSpace: 'nowrap' }}>
       {track.label}
     </span>
   );
@@ -8597,7 +8639,7 @@ function HomePathCertChip({ track }) {
 
 function OptionalTag() {
   return (
-    <span style={{ fontSize: '9px', fontWeight: 700, color: COLOR.muted, border: `1px dashed ${COLOR.muted}`, borderRadius: '999px', padding: '0 6px', textTransform: 'uppercase', letterSpacing: '0.04em', whiteSpace: 'nowrap' }}>
+    <span style={{ fontSize: '10px', fontWeight: 700, color: COLOR.muted, border: `1px dashed ${COLOR.muted}`, borderRadius: '999px', padding: '0 6px', textTransform: 'uppercase', letterSpacing: '0.04em', whiteSpace: 'nowrap' }}>
       Optional
     </span>
   );
@@ -8700,7 +8742,7 @@ function PathBridgeStep({ bridge, questions, planKeys, api, onRetry, onDone, onO
         <div className="itil-display" style={{ fontSize: '17px', fontWeight: 600, marginBottom: '6px' }}>{bridge.title}</div>
         <div style={{ fontSize: '13.5px', lineHeight: 1.6 }}><GlossText text={bridge.summary} pool={pool} max={3} blockId="br-sum" /></div>
       </div>
-      <div style={{ fontSize: '10.5px', color: COLOR.muted, textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 600, margin: '0 2px 6px' }}>How each cert frames it</div>
+      <div style={{ fontSize: '11.5px', color: COLOR.muted, textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 600, margin: '0 2px 6px' }}>How each cert frames it</div>
       {bridge.appearsIn.map((a) => {
         const t = TRACKS.find((x) => x.key === a.track);
         const accent = trackAccent(a.track);
@@ -8708,7 +8750,7 @@ function PathBridgeStep({ bridge, questions, planKeys, api, onRetry, onDone, onO
           <div key={a.track} style={{ background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderLeft: `3px solid ${accent}`, borderRadius: '12px', padding: '10px 12px', marginBottom: '8px' }}>
             <div className="flex items-center gap-2" style={{ marginBottom: '3px' }}>
               <span style={{ fontSize: '12.5px', fontWeight: 700, color: accent }}>{t ? t.label : a.track}</span>
-              {planKeys.includes(a.track) && <span style={{ fontSize: '9.5px', color: COLOR.muted }}>in your plan</span>}
+              {planKeys.includes(a.track) && <span style={{ fontSize: '10.5px', color: COLOR.muted }}>in your plan</span>}
             </div>
             <div style={{ fontSize: '12.5px', lineHeight: 1.55 }}><GlossText text={a.angle} pool={pool} max={2} blockId={'br-a-' + a.track} /></div>
             {!planKeys.includes(a.track) && (onOpenCert || onAddToPlan) && (
@@ -8746,6 +8788,7 @@ function PathBridgeStep({ bridge, questions, planKeys, api, onRetry, onDone, onO
 
 function HomeStudyPath({ tracks, remaining, progress, optionalProgress, mode, onSetMode, order, onSetOrder, certCount, onStart, onTestOut, onSkip, onOpenCert, certPlan, results, seenLog }) {
   const [shown, setShown] = useState(HOME_PATH_UPCOMING);
+  const [showOrder, setShowOrder] = useState(false);
   const trackByKey = new Map(tracks.map((t) => [t.key, t]));
   const [first, ...rest] = remaining;
   const upcoming = rest.slice(0, shown);
@@ -8784,34 +8827,50 @@ function HomeStudyPath({ tracks, remaining, progress, optionalProgress, mode, on
           <button
             key={m}
             onClick={() => onSetMode(m)}
+            title={HOME_PATH_MODE_HINTS[m]}
             className="flex-1 btn-flat"
-            style={{ padding: '5px 2px', borderRadius: '8px', fontSize: '10.5px', fontWeight: 600, background: mode === m ? COLOR.surfaceRaised : 'transparent', color: mode === m ? COLOR.text : COLOR.muted }}
+            style={{ padding: '7px 2px', borderRadius: '8px', fontSize: '12px', fontWeight: 600, background: mode === m ? COLOR.surfaceRaised : 'transparent', color: mode === m ? COLOR.text : COLOR.muted }}
           >
             {HOME_PATH_MODE_LABELS[m]}
           </button>
         ))}
       </div>
-      {certCount > 1 && (
-        <React.Fragment>
+      {/* The order switch and the explanatory hints are second-level options:
+          one quiet line until the learner asks for them. */}
+      <div className="flex items-center justify-between" style={{ display: 'flex', gap: '8px', marginBottom: '12px', minHeight: '20px' }}>
+        <div style={{ fontSize: '11.5px', color: COLOR.muted, lineHeight: 1.4, minWidth: 0 }}>
+          {mode === 'extended'
+            ? (optionalProgress.total > 0 ? `${optionalProgress.done} of ${optionalProgress.total} optional sections done` : 'Optional sections included')
+            : 'Core steps only'}
+        </div>
+        {certCount > 1 && (
+          <button
+            onClick={() => setShowOrder((v) => !v)}
+            aria-expanded={showOrder}
+            className="btn-flat"
+            style={{ background: 'transparent', color: COLOR.muted, fontSize: '11.5px', fontWeight: 600, padding: 0, whiteSpace: 'nowrap' }}
+          >
+            Order: {HOME_PATH_ORDER_LABELS[order]} {showOrder ? '▴' : '▾'}
+          </button>
+        )}
+      </div>
+      {certCount > 1 && showOrder && (
+        <div style={{ marginTop: '-4px', marginBottom: '12px' }}>
           <div className="flex gap-1" style={{ background: COLOR.bg, padding: '3px', borderRadius: '10px', border: `1px solid ${COLOR.border}`, marginBottom: '6px' }}>
             {HOME_PATH_ORDERS.map((o) => (
               <button
                 key={o}
                 onClick={() => onSetOrder(o)}
                 className="flex-1 btn-flat"
-                style={{ padding: '5px 2px', borderRadius: '8px', fontSize: '10.5px', fontWeight: 600, background: order === o ? COLOR.surfaceRaised : 'transparent', color: order === o ? COLOR.text : COLOR.muted }}
+                style={{ padding: '7px 2px', borderRadius: '8px', fontSize: '12px', fontWeight: 600, background: order === o ? COLOR.surfaceRaised : 'transparent', color: order === o ? COLOR.text : COLOR.muted }}
               >
                 {HOME_PATH_ORDER_LABELS[o]}
               </button>
             ))}
           </div>
-          <div style={{ fontSize: '10.5px', color: COLOR.muted, lineHeight: 1.4, marginBottom: '6px' }}>{HOME_PATH_ORDER_HINTS[order]}</div>
-        </React.Fragment>
+          <div style={{ fontSize: '11.5px', color: COLOR.muted, lineHeight: 1.45 }}>{HOME_PATH_ORDER_HINTS[order]}</div>
+        </div>
       )}
-      <div style={{ fontSize: '10.5px', color: COLOR.muted, lineHeight: 1.4, marginBottom: '12px' }}>
-        {HOME_PATH_MODE_HINTS[mode]}
-        {mode === 'extended' && optionalProgress.total > 0 ? ` ${optionalProgress.done} of ${optionalProgress.total} optional sections done.` : ''}
-      </div>
 
       {first && firstTrack ? (
         <React.Fragment>
@@ -8826,7 +8885,7 @@ function HomeStudyPath({ tracks, remaining, progress, optionalProgress, mode, on
               }}
             >
               <span style={{ minWidth: 0 }}>
-                <span style={{ display: 'block', fontSize: '10px', opacity: 0.85, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                <span style={{ display: 'block', fontSize: '11px', opacity: 0.85, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                   {firstOptional ? 'Optional' : progress.done === 0 ? 'Start' : 'Continue'} · {firstTrack.label} · Unit {first.unit.index + 1}
                 </span>
                 <span style={{ display: 'block', fontSize: '14px', fontWeight: 700 }}>{first.step.label}</span>
@@ -8871,7 +8930,7 @@ function HomeStudyPath({ tracks, remaining, progress, optionalProgress, mode, on
 
       {upcoming.length > 0 && (
         <div style={{ marginTop: '10px', borderTop: `1px solid ${COLOR.border}`, paddingTop: '8px' }}>
-          <div style={{ fontSize: '10.5px', color: COLOR.muted, textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 600, marginBottom: '2px' }}>Coming up</div>
+          <div style={{ fontSize: '11.5px', color: COLOR.muted, textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 600, marginBottom: '2px' }}>Coming up</div>
           {upcoming.map((e) => (
             <div key={e.doneKey + e.step.id} className="flex items-center gap-2" style={{ display: 'flex' }}>
               <button
@@ -8887,7 +8946,7 @@ function HomeStudyPath({ tracks, remaining, progress, optionalProgress, mode, on
                     <span style={{ fontSize: '12.5px', fontWeight: 600 }}>{e.step.label}</span>
                     {e.step.optional && <OptionalTag />}
                   </span>
-                  <span style={{ display: 'block', fontSize: '10.5px', color: COLOR.muted }}>
+                  <span style={{ display: 'block', fontSize: '11.5px', color: COLOR.muted }}>
                     {e.step.kind === 'bridge' ? e.step.meta : `Unit ${e.unit.index + 1} · ${e.unit.title}`}
                   </span>
                 </span>
@@ -8916,7 +8975,7 @@ function HomeStudyPath({ tracks, remaining, progress, optionalProgress, mode, on
                 Show fewer
               </button>
             )}
-            {later > 0 && shown >= HOME_PATH_UPCOMING_MAX && <span style={{ fontSize: '10.5px', color: COLOR.muted }}>+ {later} more after these</span>}
+            {later > 0 && shown >= HOME_PATH_UPCOMING_MAX && <span style={{ fontSize: '11.5px', color: COLOR.muted }}>+ {later} more after these</span>}
           </div>
         </div>
       )}
@@ -9010,29 +9069,36 @@ function HomeReviewCard({ weakTotal, toughTotal, gamesTotal, casesTotal, reminde
   if (!available) return null;
   const waiting = weakTotal + toughTotal + gamesTotal + casesTotal;
   const nudge = reviewReminderStatus(reminder, waiting, todayString());
-  const row = (label, count, sub, kind, accent) => (
+  // Tiles sit two to a row so four review types don't stack into a wall of
+  // outlined boxes; a type with nothing waiting stays visible but quiet.
+  const tile = (label, count, sub, kind, accent) => (
     <button
+      key={kind}
       onClick={() => onStartReview(kind)}
       disabled={!count}
       className="btn-flat"
-      style={{ width: '100%', textAlign: 'left', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px', padding: '10px 12px', borderRadius: '12px', border: `1px solid ${count ? accent : COLOR.border}`, background: 'transparent', color: count ? accent : COLOR.muted, opacity: count ? 1 : 0.6, marginTop: '6px' }}
+      style={{ textAlign: 'left', padding: '10px 12px', borderRadius: '12px', border: `1px solid ${count ? accent : COLOR.border}`, background: 'transparent', color: count ? accent : COLOR.muted, opacity: count ? 1 : 0.55, minWidth: 0 }}
     >
-      <span>
-        <span style={{ display: 'block', fontSize: '13px', fontWeight: 600 }}>{label}</span>
-        <span style={{ display: 'block', fontSize: '11px', fontWeight: 400, opacity: 0.85 }}>{count ? sub : 'Nothing to review right now'}</span>
-      </span>
-      <span style={{ fontSize: '16px' }}>›</span>
+      <span style={{ display: 'block', fontSize: '13px', fontWeight: 600 }}>{label}</span>
+      <span style={{ display: 'block', fontSize: '11.5px', fontWeight: 400, opacity: 0.9, marginTop: '1px' }}>{count ? sub : 'Nothing waiting'}</span>
     </button>
   );
+  const tiles = [
+    tile('Weak spots', weakTotal, `${weakTotal} missed question${weakTotal === 1 ? '' : 's'}`, 'weak', COLOR.red),
+    tile('Tough terms', toughTotal, `${toughTotal} card${toughTotal === 1 ? '' : 's'} rated OK or lower`, 'tough', COLOR.gold),
+    casesTotal > 0 && tile('Case studies', casesTotal, `${casesTotal} with a miss`, 'cases', COLOR.primary),
+    gamesTotal > 0 && tile('Missed games', gamesTotal, `${gamesTotal} item${gamesTotal === 1 ? '' : 's'} to redo`, 'games', COLOR.primary),
+  ].filter(Boolean);
   return (
     <div style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderRadius: '16px', padding: '14px 16px', marginBottom: '14px' }}>
-      <div className="itil-display" style={{ fontSize: '16px', fontWeight: 600 }}>Review across your certs</div>
-      <div style={{ fontSize: '11px', color: COLOR.muted, marginTop: '2px' }}>Mixed from every cert in your plan, so one big backlog can't crowd out the rest.</div>
+      <div className="flex justify-between items-baseline">
+        <div className="itil-display" style={{ fontSize: '16px', fontWeight: 600 }}>Review across your certs</div>
+        <div style={{ fontSize: '12px', color: nudge.due ? COLOR.gold : COLOR.muted, fontWeight: nudge.due ? 700 : 400 }}>{waiting} waiting</div>
+      </div>
       {nudge.due && (
-        <div style={{ marginTop: '10px', padding: '9px 12px', borderRadius: '10px', border: `1px solid ${COLOR.gold}`, background: `${COLOR.gold}14`, fontSize: '12px', lineHeight: 1.45 }}>
+        <div style={{ fontSize: '12px', lineHeight: 1.45, color: COLOR.muted, marginTop: '4px' }}>
           <span style={{ fontWeight: 700, color: COLOR.gold }}>Time for a review.</span>{' '}
-          {nudge.daysSince === null ? 'You haven\'t reviewed yet' : `You last reviewed ${nudge.daysSince} day${nudge.daysSince === 1 ? '' : 's'} ago`}
-          {' '}and there {waiting === 1 ? 'is' : 'are'} {waiting} item{waiting === 1 ? '' : 's'} waiting.
+          {nudge.daysSince === null ? 'You haven\'t reviewed yet.' : `You last reviewed ${nudge.daysSince} day${nudge.daysSince === 1 ? '' : 's'} ago.`}
         </div>
       )}
       {available > 1 && (
@@ -9042,21 +9108,18 @@ function HomeReviewCard({ weakTotal, toughTotal, gamesTotal, casesTotal, reminde
         >
           <span>
             Review everything due
-            <span style={{ display: 'block', fontSize: '11px', fontWeight: 500, opacity: 0.85 }}>A short round of questions, flashcards, games, and a case study</span>
+            <span style={{ display: 'block', fontSize: '11.5px', fontWeight: 500, opacity: 0.9 }}>A short mixed round: questions, cards, games, a case study</span>
           </span>
           <span style={{ fontSize: '16px' }}>›</span>
         </button>
       )}
-      {row('Weak spots', weakTotal, `${weakTotal} missed question${weakTotal === 1 ? '' : 's'}${weakTotal > CROSS_REVIEW_QUESTIONS ? ` · ${CROSS_REVIEW_QUESTIONS} per round` : ''}`, 'weak', COLOR.red)}
-      {row('Tough terms', toughTotal, `${toughTotal} flashcard${toughTotal === 1 ? '' : 's'} rated OK or lower${toughTotal > CROSS_REVIEW_CARDS ? ` · ${CROSS_REVIEW_CARDS} per round` : ''}`, 'tough', COLOR.gold)}
-      {casesTotal > 0 && row('Missed case studies', casesTotal, `${casesTotal} case stud${casesTotal === 1 ? 'y' : 'ies'} with a missed question · one per round`, 'cases', COLOR.primary)}
-      {gamesTotal > 0 && row('Missed games', gamesTotal, `${gamesTotal} Mad Lib / Sequence / Compare item${gamesTotal === 1 ? '' : 's'} to redo${gamesTotal > CROSS_REVIEW_GAMES ? ` · ${CROSS_REVIEW_GAMES} per round` : ''}`, 'games', COLOR.primary)}
-      <label className="flex items-center justify-between" style={{ display: 'flex', marginTop: '12px', fontSize: '11px', color: COLOR.muted }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '8px', marginTop: '8px' }}>{tiles}</div>
+      <label className="flex items-center justify-between" style={{ display: 'flex', marginTop: '12px', fontSize: '12px', color: COLOR.muted }}>
         <span>Remind me to review</span>
         <select
           value={reminder ? reminder.days : REVIEW_REMINDER_DEFAULT_DAYS}
           onChange={(e) => onSetReminder(Number(e.target.value))}
-          style={{ padding: '4px 8px', borderRadius: '8px', fontSize: '11px', border: `1px solid ${COLOR.border}`, background: COLOR.surfaceRaised, color: COLOR.text }}
+          style={{ padding: '4px 8px', borderRadius: '8px', fontSize: '12px', border: `1px solid ${COLOR.border}`, background: COLOR.surfaceRaised, color: COLOR.text }}
         >
           {REVIEW_REMINDER_OPTIONS.map((o) => <option key={o.days} value={o.days}>{o.label}</option>)}
         </select>
@@ -9195,7 +9258,7 @@ function HomeReviewRun({ kind, trackKeys, results, seenLog, srs, speech, makeApi
         flashcardsData={phase.flashcards}
         header={(
           <div style={{ boxShadow: SHADOW.card, background: COLOR.surfaceRaised, border: `1px solid ${COLOR.border}`, borderRadius: '14px', padding: '14px 16px', marginBottom: '14px' }}>
-            <div style={{ fontSize: '10.5px', color: COLOR.muted, textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: '4px' }}>{catLabel} · {cs.title}</div>
+            <div style={{ fontSize: '11.5px', color: COLOR.muted, textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: '4px' }}>{catLabel} · {cs.title}</div>
             <div style={{ fontSize: '13.5px', lineHeight: 1.55 }}>{cs.scenario}</div>
           </div>
         )}
@@ -9225,7 +9288,7 @@ function HomeReviewRun({ kind, trackKeys, results, seenLog, srs, speech, makeApi
     <div>
       <button onClick={onExit} className="btn-flat" style={{ fontSize: '12px', color: COLOR.primary, background: 'transparent', marginBottom: '10px', padding: 0 }}>‹ Back to Home</button>
       <div style={{ marginBottom: '14px' }}>
-        <div style={{ fontSize: '10.5px', color: COLOR.muted, textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 600 }}>
+        <div style={{ fontSize: '11.5px', color: COLOR.muted, textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 600 }}>
           Review across your certs{kind === 'mixed' && !finished ? ` · part ${phaseIndex + 1} of ${round.phases.length}` : ''}
         </div>
         <div className="itil-display" style={{ fontSize: '18px', fontWeight: 600, marginTop: '2px' }}>
@@ -9262,7 +9325,7 @@ function ExamIntro({ track, config, readiness, onStart, onStartFinal }) {
             <span style={{ fontSize: '15px', fontWeight: 700, color: readinessColor }}>{readiness.score}%</span>
           </div>
           <div style={{ fontSize: '13px', fontWeight: 600, color: readinessColor }}>{readiness.label}</div>
-          <div style={{ fontSize: '10.5px', color: COLOR.muted, marginTop: '4px', lineHeight: 1.4 }}>
+          <div style={{ fontSize: '11.5px', color: COLOR.muted, marginTop: '4px', lineHeight: 1.4 }}>
             {readiness.mastery}% lifetime mastery{readiness.freshness < 0.99 ? ', discounted for how long it\'s been since you last practiced' : ''} — not just a flat percentage that never decays.
           </div>
         </div>
@@ -9459,7 +9522,7 @@ function ExamResults({ result, config, track, categories, onRestart, variant, fl
               </div>
             );
           })}
-          <div style={{ fontSize: '10.5px', color: COLOR.muted, marginTop: '4px', lineHeight: 1.5 }}>
+          <div style={{ fontSize: '11.5px', color: COLOR.muted, marginTop: '4px', lineHeight: 1.5 }}>
             Areas under the pass mark are where a real attempt would most likely fall short.
           </div>
         </div>
@@ -9472,7 +9535,7 @@ function ExamResults({ result, config, track, categories, onRestart, variant, fl
           <div className="flex flex-col gap-2">
             {shownMissed.map((m, i) => (
               <div key={i} style={{ boxShadow: SHADOW.card, background: COLOR.surfaceRaised, borderRadius: '10px', padding: '10px 12px', fontSize: '13px' }}>
-                <div style={{ fontSize: '10px', color: COLOR.muted, marginBottom: '2px' }}>
+                <div style={{ fontSize: '11px', color: COLOR.muted, marginBottom: '2px' }}>
                   {categories.find((c) => c.key === m.cat)?.label}{!m.answered ? ' — left blank' : ''}
                 </div>
                 <div>{m.prompt}</div>
@@ -9483,7 +9546,7 @@ function ExamResults({ result, config, track, categories, onRestart, variant, fl
                 )}
                 {m.whyTested && (
                   <div style={{ marginTop: '6px', padding: '8px 10px', borderRadius: '8px', background: `${COLOR.teal}14`, border: `1px solid ${COLOR.teal}`, fontSize: '11.5px', lineHeight: 1.5, color: COLOR.text }}>
-                    <div style={{ fontSize: '9.5px', fontWeight: 700, color: COLOR.teal, textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: '3px' }}>Why this is tested</div>
+                    <div style={{ fontSize: '10.5px', fontWeight: 700, color: COLOR.teal, textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: '3px' }}>Why this is tested</div>
                     {m.whyTested}
                   </div>
                 )}
@@ -9541,6 +9604,7 @@ function CertStudyApp() {
   const [showData, setShowData] = useState(false);
   const [showCertPath, setShowCertPath] = useState(false);
   const [showTrackSwitcher, setShowTrackSwitcher] = useState(false);
+  const [showMasteryDetail, setShowMasteryDetail] = useState(false);
   const [importMessage, setImportMessage] = useState(null);
 
   const [quizLength, setQuizLength] = useState(10);
@@ -11127,6 +11191,7 @@ function CertStudyApp() {
               <div className="flex items-center" style={{ gap: '4px', marginBottom: '2px' }}>
                 <button
                   onClick={() => setShowCertPath(true)}
+                  className="btn-flat"
                   title="Manage cert path"
                   style={{
                     display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: '26px', height: '26px',
@@ -11138,6 +11203,7 @@ function CertStudyApp() {
                 {mode !== 'home' && (
                   <button
                     onClick={() => setMode('home')}
+                    className="btn-flat"
                     title="Home"
                     style={{
                       display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: '26px', height: '26px',
@@ -11152,12 +11218,13 @@ function CertStudyApp() {
                 <React.Fragment>
                   <div className="itil-display" style={{ fontSize: '21px', fontWeight: 600, lineHeight: 1.2 }}>Cert Study Hub</div>
                   <div style={{ fontSize: '12px', color: COLOR.muted, marginTop: '2px' }}>
-                    {stats.streak.current > 0 ? `🔥 ${stats.streak.current}-day streak` : 'Pick a track to get started'}
+                    {stats.streak.current > 0 ? `🔥 ${stats.streak.current}-day streak` : certPlan.order.length ? 'Welcome back' : 'Pick a track to get started'}
                   </div>
                 </React.Fragment>
               ) : (
                 <button
                   onClick={() => setShowTrackSwitcher(true)}
+                  className="btn-flat"
                   title="Switch track"
                   style={{ display: 'block', textAlign: 'left', background: 'transparent', border: 'none', padding: 0, width: '100%' }}
                 >
@@ -11204,14 +11271,10 @@ function CertStudyApp() {
       </div>
       <div className="max-w-md mx-auto px-4 py-5">
         {saveError ? (
-          <div style={{ fontSize: '10.5px', color: COLOR.red, marginBottom: '12px', padding: '8px 10px', borderRadius: '8px', border: `1px solid ${COLOR.red}`, background: 'rgba(181,87,74,0.1)' }}>
+          <div style={{ fontSize: '11.5px', color: COLOR.red, marginBottom: '12px', padding: '8px 10px', borderRadius: '8px', border: `1px solid ${COLOR.red}`, background: 'rgba(181,87,74,0.1)' }}>
             Your last save didn't go through — your browser's storage may be full. Try Data &amp; Progress → Export to back up what you have, then free up some space.
           </div>
-        ) : syncMode === 'local' && (
-          <div style={{ fontSize: '10.5px', color: COLOR.muted, marginBottom: '12px' }}>
-            Saving progress to this browser. Open from your Claude account to sync across devices.
-          </div>
-        )}
+        ) : null}
 
         {mode === 'home' ? (
           <HomeView
@@ -11244,6 +11307,7 @@ function CertStudyApp() {
             onSetGoalTarget={setDailyGoalTarget}
             onAnswerDailyQuestion={answerDailyQuestion}
             onRevealDailyVocab={revealDailyVocab}
+            footerNote={syncMode === 'local' ? 'Saving progress to this browser. Open from your Claude account to sync across devices.' : null}
           />
         ) : (
         <React.Fragment>
@@ -11270,21 +11334,21 @@ function CertStudyApp() {
             <button
               onClick={() => setLearnView('cards')}
               className="flex-1 btn-flat"
-              style={{ padding: '6px 2px', borderRadius: '8px', fontSize: '10.5px', fontWeight: 600, background: learnView === 'cards' ? COLOR.surfaceRaised : 'transparent', color: learnView === 'cards' ? COLOR.text : COLOR.muted }}
+              style={{ padding: '6px 2px', borderRadius: '8px', fontSize: '11.5px', fontWeight: 600, background: learnView === 'cards' ? COLOR.surfaceRaised : 'transparent', color: learnView === 'cards' ? COLOR.text : COLOR.muted }}
             >
               Cards
             </button>
             <button
               onClick={() => setLearnView('study')}
               className="flex-1 btn-flat"
-              style={{ padding: '6px 2px', borderRadius: '8px', fontSize: '10.5px', fontWeight: 600, background: learnView === 'study' ? COLOR.surfaceRaised : 'transparent', color: learnView === 'study' ? COLOR.text : COLOR.muted }}
+              style={{ padding: '6px 2px', borderRadius: '8px', fontSize: '11.5px', fontWeight: 600, background: learnView === 'study' ? COLOR.surfaceRaised : 'transparent', color: learnView === 'study' ? COLOR.text : COLOR.muted }}
             >
               Study
             </button>
             <button
               onClick={() => setLearnView('sheet')}
               className="flex-1 btn-flat"
-              style={{ padding: '6px 2px', borderRadius: '8px', fontSize: '10.5px', fontWeight: 600, background: learnView === 'sheet' ? COLOR.surfaceRaised : 'transparent', color: learnView === 'sheet' ? COLOR.text : COLOR.muted }}
+              style={{ padding: '6px 2px', borderRadius: '8px', fontSize: '11.5px', fontWeight: 600, background: learnView === 'sheet' ? COLOR.surfaceRaised : 'transparent', color: learnView === 'sheet' ? COLOR.text : COLOR.muted }}
             >
               Sheet
             </button>
@@ -11321,7 +11385,7 @@ function CertStudyApp() {
                 key={key}
                 onClick={() => openCardDeck(key)}
                 className="flex-1 btn-flat"
-                style={{ padding: '6px 2px', borderRadius: '8px', fontSize: '10.5px', fontWeight: 600, background: cardDeck === key ? COLOR.surfaceRaised : 'transparent', color: cardDeck === key ? COLOR.text : COLOR.muted }}
+                style={{ padding: '6px 2px', borderRadius: '8px', fontSize: '11.5px', fontWeight: 600, background: cardDeck === key ? COLOR.surfaceRaised : 'transparent', color: cardDeck === key ? COLOR.text : COLOR.muted }}
               >
                 {label}
               </button>
@@ -11329,12 +11393,12 @@ function CertStudyApp() {
           </div>
         )}
         {mode === 'learn' && learnView === 'cards' && cardDeck === 'all' && Object.keys(srs[activeTrack] || {}).length > 0 && (
-          <div style={{ fontSize: '10.5px', color: COLOR.muted, marginBottom: '8px', textAlign: 'center' }}>
+          <div style={{ fontSize: '11.5px', color: COLOR.muted, marginBottom: '8px', textAlign: 'center' }}>
             Cards you're overdue to review come first.
           </div>
         )}
         {mode === 'learn' && learnView === 'cards' && cardDeck === 'tough' && (
-          <div style={{ fontSize: '10.5px', color: COLOR.muted, marginBottom: '8px', textAlign: 'center' }}>
+          <div style={{ fontSize: '11.5px', color: COLOR.muted, marginBottom: '8px', textAlign: 'center' }}>
             Cards you last rated OK or lower, hardest first. Rate one Good or Easy and it leaves this deck.
           </div>
         )}
@@ -11656,9 +11720,15 @@ function CertStudyApp() {
         )}
 
         <div className="mt-6">
-          <div style={{ fontSize: '11px', color: COLOR.muted, marginBottom: '6px' }}>
-            Weighted mastery for {track.label} — segment width matches the real exam's emphasis
-          </div>
+          <button
+            onClick={() => setShowMasteryDetail((v) => !v)}
+            aria-expanded={showMasteryDetail}
+            className="btn-flat"
+            style={{ width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'transparent', padding: '0 0 6px', fontSize: '12px', color: COLOR.muted, textAlign: 'left' }}
+          >
+            <span>Mastery by exam area · {track.label}</span>
+            <span style={{ fontSize: '11px' }}>{showMasteryDetail ? 'Hide ▴' : 'Details ▾'}</span>
+          </button>
           <div className="flex" style={{ gap: '2px', height: '10px', borderRadius: '6px', overflow: 'hidden' }}>
             {categories.map((c) => {
               const trend = categoryMasteryTrend(stats.categoryMasteryHistory || {}, activeTrack, c.key);
@@ -11685,12 +11755,14 @@ function CertStudyApp() {
               per-category % and trend are also spelled out here — the
               only place this app shows mastery moving over time, not just
               a live snapshot. */}
+          {showMasteryDetail && (
           <div className="flex flex-col gap-1 mt-2">
+            <div style={{ fontSize: '11.5px', color: COLOR.muted, marginBottom: '2px' }}>Each segment's width matches that area's weight on the real exam.</div>
             {categories.map((c) => {
               const trend = categoryMasteryTrend(stats.categoryMasteryHistory || {}, activeTrack, c.key);
               const pct = Math.round((masteryByCategory[c.key] || 0) * 100);
               return (
-                <div key={c.key} className="flex justify-between" style={{ fontSize: '10px', color: COLOR.muted }}>
+                <div key={c.key} className="flex justify-between" style={{ fontSize: '11.5px', color: COLOR.muted }}>
                   <span>{c.label}</span>
                   <span>
                     {pct}%
@@ -11704,6 +11776,7 @@ function CertStudyApp() {
               );
             })}
           </div>
+          )}
         </div>
         </React.Fragment>
         )}

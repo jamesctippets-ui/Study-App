@@ -53,7 +53,7 @@ function FlashcardView({ card, flipped, setFlipped, onRate, index, total, catego
       <div style={{ fontSize: '11px', color: COLOR.muted, textAlign: 'center', marginTop: '8px' }}>
         {flipped ? 'Tap to see the term again' : 'Tap the card to reveal the definition'}
       </div>
-      <div style={{ fontSize: '10.5px', color: COLOR.muted, textAlign: 'center', marginBottom: '6px' }}>
+      <div style={{ fontSize: '11.5px', color: COLOR.muted, textAlign: 'center', marginBottom: '6px' }}>
         How well did you know it?
       </div>
       <div className="flex gap-1">
@@ -64,7 +64,7 @@ function FlashcardView({ card, flipped, setFlipped, onRate, index, total, catego
             className="flex-1"
             style={{
               padding: '9px 2px', borderRadius: '10px', border: `1px solid ${color}`, color, background: 'transparent',
-              fontSize: '10px', fontWeight: 600, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2px',
+              fontSize: '11px', fontWeight: 600, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2px',
             }}
           >
             <span style={{ fontSize: '14px', fontWeight: 700 }}>{n}</span>
@@ -110,7 +110,7 @@ function ResourceLinksRow({ resources, label }) {
   if (!resources || !resources.length) return null;
   return (
     <div style={{ marginBottom: '10px' }}>
-      {label && <div style={{ fontSize: '10.5px', color: COLOR.muted, marginBottom: '3px' }}>{label}</div>}
+      {label && <div style={{ fontSize: '11.5px', color: COLOR.muted, marginBottom: '3px' }}>{label}</div>}
       <div className="flex flex-col gap-1">
         {resources.map((r, i) => (
           <a
@@ -547,7 +547,7 @@ function MatchGame({ flashcards, roundSize, onContinue, onRoundComplete, continu
     <span
       style={{
         position: 'absolute', top: '-7px', left: '-7px', width: '20px', height: '20px', borderRadius: '50%',
-        display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '10.5px', fontWeight: 700,
+        display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '11.5px', fontWeight: 700,
         background: COLOR.surfaceRaised, border: `1px solid ${COLOR.border}`, color: COLOR.muted,
       }}
     >
@@ -746,7 +746,8 @@ function ReadingCheckGate({ question, onPassed }) {
 // screenshot, the worked scenario, common exam traps, and the on-the-job
 // note. Shared by the Reference tab's LessonDetail and the guided path's
 // "Apply it" step so both render it identically.
-function LessonApplySections({ lesson, categories, lessonCatKeys, flashcardsData }) {
+function LessonApplySections({ lesson, categories, lessonCatKeys, flashcardsData, collapsePortal }) {
+  const [portalOpen, setPortalOpen] = useState(!collapsePortal);
   const walkthrough = lesson.portalMockup ? PORTAL_WALKTHROUGHS[lesson.portalMockup] : null;
   const MockupComp = !walkthrough && lesson.portalMockup ? PORTAL_MOCKUPS[lesson.portalMockup] : null;
   const realShot = lesson.portalMockup ? REAL_PORTAL_SCREENSHOTS[lesson.portalMockup] : null;
@@ -769,14 +770,37 @@ function LessonApplySections({ lesson, categories, lessonCatKeys, flashcardsData
     : [];
   const categoryScreenshotKey = lessonScreenshotCats.length === 1 ? lessonScreenshotCats[0].screenshot : null;
   const categoryRealShot = categoryScreenshotKey ? REAL_PORTAL_SCREENSHOTS[categoryScreenshotKey] : null;
+  const hasPortal = !!(walkthrough || MockupComp || categoryRealShot);
+  // On the Reference page the mockup and screenshot are big, so they sit
+  // behind one tap; the guided path's Apply step shows them open.
+  const portalTitle = walkthrough ? `Try it: ${walkthrough.label}` : MockupComp ? 'Portal mockup' : 'Portal screenshot';
   return (
     <React.Fragment>
-      {(walkthrough || MockupComp) && (
+      {hasPortal && collapsePortal && (
+        <button
+          onClick={() => setPortalOpen((o) => !o)}
+          aria-expanded={portalOpen}
+          style={{
+            width: '100%', marginBottom: portalOpen ? '10px' : '16px', padding: '11px 14px', borderRadius: '12px', textAlign: 'left',
+            background: COLOR.surface, border: `1px solid ${COLOR.border}`, boxShadow: SHADOW.card,
+            display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px',
+          }}
+        >
+          <span>
+            <span style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: COLOR.gold }}>{portalTitle}</span>
+            <span style={{ display: 'block', fontSize: '11.5px', color: COLOR.muted }}>{walkthrough ? 'Click through the real flow' : realShot || categoryRealShot ? 'Layout sketch and a real screenshot' : 'A sketch of the layout'}</span>
+          </span>
+          <span style={{ fontSize: '11px', color: COLOR.muted }}>{portalOpen ? '▴' : '▾'}</span>
+        </button>
+      )}
+      {portalOpen && (walkthrough || MockupComp) && (
         <div style={{ marginBottom: '16px' }}>
-          <div style={{ fontSize: '13px', fontWeight: 600, color: COLOR.gold, marginBottom: '4px' }}>
-            {walkthrough ? `Try it: ${walkthrough.label}` : 'Portal mockup'}
-          </div>
-          <div style={{ fontSize: '10.5px', color: COLOR.muted, marginBottom: '8px', lineHeight: 1.4 }}>
+          {!collapsePortal && (
+            <div style={{ fontSize: '13px', fontWeight: 600, color: COLOR.gold, marginBottom: '4px' }}>
+              {portalTitle}
+            </div>
+          )}
+          <div style={{ fontSize: '11.5px', color: COLOR.muted, marginBottom: '8px', lineHeight: 1.4 }}>
             {walkthrough
               ? 'A click-through illustration of the real flow, not an exact screenshot — the real portal may look slightly different.'
               : 'An illustration of the layout, not an exact screenshot — the real portal may look slightly different.'}
@@ -786,7 +810,7 @@ function LessonApplySections({ lesson, categories, lessonCatKeys, flashcardsData
           </div>
           {realShot && (
             <>
-              <div style={{ fontSize: '10.5px', color: COLOR.muted, marginTop: '12px', marginBottom: '2px' }}>
+              <div style={{ fontSize: '11.5px', color: COLOR.muted, marginTop: '12px', marginBottom: '2px' }}>
                 See the real thing:
               </div>
               <RealPortalScreenshot shot={realShot} />
@@ -795,9 +819,9 @@ function LessonApplySections({ lesson, categories, lessonCatKeys, flashcardsData
         </div>
       )}
 
-      {categoryRealShot && (
+      {portalOpen && categoryRealShot && (
         <div style={{ marginBottom: '16px' }}>
-          <div style={{ fontSize: '13px', fontWeight: 600, color: COLOR.gold, marginBottom: '4px' }}>Portal screenshot</div>
+          {!collapsePortal && <div style={{ fontSize: '13px', fontWeight: 600, color: COLOR.gold, marginBottom: '4px' }}>Portal screenshot</div>}
           <RealPortalScreenshot shot={categoryRealShot} />
         </div>
       )}
@@ -972,7 +996,7 @@ function LessonDetail({ lesson, flashcardsData, questionsData, categories, onBac
         )}
       </div>
 
-      <LessonApplySections lesson={lesson} categories={categories} lessonCatKeys={lessonCatKeys} flashcardsData={flashcardsData} />
+      <LessonApplySections lesson={lesson} categories={categories} lessonCatKeys={lessonCatKeys} flashcardsData={flashcardsData} collapsePortal />
 
       <button
         onClick={() => setShowFundamentals((s) => !s)}

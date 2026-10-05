@@ -818,7 +818,7 @@ function pathTestOutStep(unit) {
 // steps are never required (each can be skipped), never count toward core
 // progress, and never appear on a cert's own Path tab.
 const HOME_PATH_MODES = ['core', 'extended'];
-const HOME_PATH_UPCOMING = 5;
+const HOME_PATH_UPCOMING = 3;
 const BRIDGE_DONE_KEY = 'bridges';
 const DEEP_DIVE_CARDS = 5;
 const DEEP_DIVE_QUESTIONS = 4;

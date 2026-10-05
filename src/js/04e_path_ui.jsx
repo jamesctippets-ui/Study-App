@@ -501,7 +501,7 @@ function PathStepRunner({ trackKey, units, unit, step, results, seenLog, categor
         {exitLabel}
       </button>
       <div style={{ marginBottom: '14px' }}>
-        <div style={{ fontSize: '10.5px', color: COLOR.muted, textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 600 }}>
+        <div style={{ fontSize: '11.5px', color: COLOR.muted, textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 600 }}>
           {step.kind === 'review' ? 'Spaced review' : step.kind === 'bridge' ? 'Optional · Cross-cert bridge' : `${certLabel ? certLabel + ' · ' : ''}Unit ${unit.index + 1} · ${unit.title}${step.optional ? ' · Optional' : ''}`}
         </div>
         <div className="itil-display" style={{ fontSize: '18px', fontWeight: 600, marginTop: '2px' }}>{step.label}</div>
@@ -639,8 +639,8 @@ function PathView({ track, trackKey, doneMap, results, seenLog, categories, spee
         <div style={{ height: '6px', borderRadius: '3px', background: COLOR.surfaceRaised, overflow: 'hidden', marginBottom: '6px' }}>
           <div style={{ height: '100%', width: `${overall.pct}%`, background: COLOR.success, borderRadius: '3px' }} />
         </div>
-        <div style={{ fontSize: '11px', color: COLOR.muted, marginBottom: '12px' }}>
-          {overall.done} of {overall.total} steps done · reading, flashcards, quizzes, and games in a mixed order
+        <div style={{ fontSize: '12px', color: COLOR.muted, marginBottom: '12px' }}>
+          {overall.done} of {overall.total} steps done
         </div>
         {next ? (
           <button
@@ -648,7 +648,7 @@ function PathView({ track, trackKey, doneMap, results, seenLog, categories, spee
             style={{ width: '100%', padding: '13px', borderRadius: '12px', background: COLOR.primary, color: COLOR.onAccent, fontSize: '14px', fontWeight: 700, textAlign: 'left', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px' }}
           >
             <span style={{ minWidth: 0 }}>
-              <span style={{ display: 'block', fontSize: '10px', opacity: 0.8, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+              <span style={{ display: 'block', fontSize: '11px', opacity: 0.8, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                 {overall.done === 0 ? 'Start' : 'Continue'} · Unit {next.unit.index + 1}
               </span>
               <span style={{ display: 'block' }}>{next.step.label}</span>
@@ -712,9 +712,9 @@ function PathView({ track, trackKey, doneMap, results, seenLog, categories, spee
             >
               <PathRing done={prog.done} total={prog.total} />
               <span style={{ flex: 1, minWidth: 0 }}>
-                <span style={{ display: 'block', fontSize: '10px', color: COLOR.muted, textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 600 }}>Unit {unit.index + 1}</span>
+                <span style={{ display: 'block', fontSize: '11px', color: COLOR.muted, textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 600 }}>Unit {unit.index + 1}</span>
                 <span style={{ display: 'block', fontSize: '14.5px', fontWeight: 600 }}>{unit.title}</span>
-                {!open && <span style={{ display: 'block', fontSize: '11.5px', color: COLOR.muted, marginTop: '1px' }}>{unit.summary}</span>}
+                {!open && <span style={{ display: 'block', fontSize: '12px', color: COLOR.muted, marginTop: '1px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{unit.summary}</span>}
               </span>
               <span style={{ fontSize: '12px', color: COLOR.muted }}>{open ? '▴' : '▾'}</span>
             </button>

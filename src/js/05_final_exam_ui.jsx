@@ -23,7 +23,7 @@ function ExamIntro({ track, config, readiness, onStart, onStartFinal }) {
             <span style={{ fontSize: '15px', fontWeight: 700, color: readinessColor }}>{readiness.score}%</span>
           </div>
           <div style={{ fontSize: '13px', fontWeight: 600, color: readinessColor }}>{readiness.label}</div>
-          <div style={{ fontSize: '10.5px', color: COLOR.muted, marginTop: '4px', lineHeight: 1.4 }}>
+          <div style={{ fontSize: '11.5px', color: COLOR.muted, marginTop: '4px', lineHeight: 1.4 }}>
             {readiness.mastery}% lifetime mastery{readiness.freshness < 0.99 ? ', discounted for how long it\'s been since you last practiced' : ''} — not just a flat percentage that never decays.
           </div>
         </div>
@@ -220,7 +220,7 @@ function ExamResults({ result, config, track, categories, onRestart, variant, fl
               </div>
             );
           })}
-          <div style={{ fontSize: '10.5px', color: COLOR.muted, marginTop: '4px', lineHeight: 1.5 }}>
+          <div style={{ fontSize: '11.5px', color: COLOR.muted, marginTop: '4px', lineHeight: 1.5 }}>
             Areas under the pass mark are where a real attempt would most likely fall short.
           </div>
         </div>
@@ -233,7 +233,7 @@ function ExamResults({ result, config, track, categories, onRestart, variant, fl
           <div className="flex flex-col gap-2">
             {shownMissed.map((m, i) => (
               <div key={i} style={{ boxShadow: SHADOW.card, background: COLOR.surfaceRaised, borderRadius: '10px', padding: '10px 12px', fontSize: '13px' }}>
-                <div style={{ fontSize: '10px', color: COLOR.muted, marginBottom: '2px' }}>
+                <div style={{ fontSize: '11px', color: COLOR.muted, marginBottom: '2px' }}>
                   {categories.find((c) => c.key === m.cat)?.label}{!m.answered ? ' — left blank' : ''}
                 </div>
                 <div>{m.prompt}</div>
@@ -244,7 +244,7 @@ function ExamResults({ result, config, track, categories, onRestart, variant, fl
                 )}
                 {m.whyTested && (
                   <div style={{ marginTop: '6px', padding: '8px 10px', borderRadius: '8px', background: `${COLOR.teal}14`, border: `1px solid ${COLOR.teal}`, fontSize: '11.5px', lineHeight: 1.5, color: COLOR.text }}>
-                    <div style={{ fontSize: '9.5px', fontWeight: 700, color: COLOR.teal, textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: '3px' }}>Why this is tested</div>
+                    <div style={{ fontSize: '10.5px', fontWeight: 700, color: COLOR.teal, textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: '3px' }}>Why this is tested</div>
                     {m.whyTested}
                   </div>
                 )}

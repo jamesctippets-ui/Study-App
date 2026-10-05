@@ -336,7 +336,7 @@ bottom:
 - A **"Continue where you left off"** button once you've actually
   visited a track this browser (tracked separately from the path, so
   Home is never mistaken for "a place you left off at").
-- A **Question of the Day** and **Vocab of the Day** — one question and
+- A **Question of the Day** (collapsed to one row until tapped) and **Vocab of the Day** — one question and
   one flashcard, deterministically picked each day (`seededIndex`, hashed
   from the date so the pick is stable across reloads without needing to
   store which item was chosen) from your "current cert": the Cert Path's

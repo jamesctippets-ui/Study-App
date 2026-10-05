@@ -28,6 +28,7 @@ function CertStudyApp() {
   const [showData, setShowData] = useState(false);
   const [showCertPath, setShowCertPath] = useState(false);
   const [showTrackSwitcher, setShowTrackSwitcher] = useState(false);
+  const [showMasteryDetail, setShowMasteryDetail] = useState(false);
   const [importMessage, setImportMessage] = useState(null);
 
   const [quizLength, setQuizLength] = useState(10);
@@ -1614,6 +1615,7 @@ function CertStudyApp() {
               <div className="flex items-center" style={{ gap: '4px', marginBottom: '2px' }}>
                 <button
                   onClick={() => setShowCertPath(true)}
+                  className="btn-flat"
                   title="Manage cert path"
                   style={{
                     display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: '26px', height: '26px',
@@ -1625,6 +1627,7 @@ function CertStudyApp() {
                 {mode !== 'home' && (
                   <button
                     onClick={() => setMode('home')}
+                    className="btn-flat"
                     title="Home"
                     style={{
                       display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: '26px', height: '26px',
@@ -1639,12 +1642,13 @@ function CertStudyApp() {
                 <React.Fragment>
                   <div className="itil-display" style={{ fontSize: '21px', fontWeight: 600, lineHeight: 1.2 }}>Cert Study Hub</div>
                   <div style={{ fontSize: '12px', color: COLOR.muted, marginTop: '2px' }}>
-                    {stats.streak.current > 0 ? `🔥 ${stats.streak.current}-day streak` : 'Pick a track to get started'}
+                    {stats.streak.current > 0 ? `🔥 ${stats.streak.current}-day streak` : certPlan.order.length ? 'Welcome back' : 'Pick a track to get started'}
                   </div>
                 </React.Fragment>
               ) : (
                 <button
                   onClick={() => setShowTrackSwitcher(true)}
+                  className="btn-flat"
                   title="Switch track"
                   style={{ display: 'block', textAlign: 'left', background: 'transparent', border: 'none', padding: 0, width: '100%' }}
                 >
@@ -1691,14 +1695,10 @@ function CertStudyApp() {
       </div>
       <div className="max-w-md mx-auto px-4 py-5">
         {saveError ? (
-          <div style={{ fontSize: '10.5px', color: COLOR.red, marginBottom: '12px', padding: '8px 10px', borderRadius: '8px', border: `1px solid ${COLOR.red}`, background: 'rgba(181,87,74,0.1)' }}>
+          <div style={{ fontSize: '11.5px', color: COLOR.red, marginBottom: '12px', padding: '8px 10px', borderRadius: '8px', border: `1px solid ${COLOR.red}`, background: 'rgba(181,87,74,0.1)' }}>
             Your last save didn't go through — your browser's storage may be full. Try Data &amp; Progress → Export to back up what you have, then free up some space.
           </div>
-        ) : syncMode === 'local' && (
-          <div style={{ fontSize: '10.5px', color: COLOR.muted, marginBottom: '12px' }}>
-            Saving progress to this browser. Open from your Claude account to sync across devices.
-          </div>
-        )}
+        ) : null}
 
         {mode === 'home' ? (
           <HomeView
@@ -1731,6 +1731,7 @@ function CertStudyApp() {
             onSetGoalTarget={setDailyGoalTarget}
             onAnswerDailyQuestion={answerDailyQuestion}
             onRevealDailyVocab={revealDailyVocab}
+            footerNote={syncMode === 'local' ? 'Saving progress to this browser. Open from your Claude account to sync across devices.' : null}
           />
         ) : (
         <React.Fragment>
@@ -1757,21 +1758,21 @@ function CertStudyApp() {
             <button
               onClick={() => setLearnView('cards')}
               className="flex-1 btn-flat"
-              style={{ padding: '6px 2px', borderRadius: '8px', fontSize: '10.5px', fontWeight: 600, background: learnView === 'cards' ? COLOR.surfaceRaised : 'transparent', color: learnView === 'cards' ? COLOR.text : COLOR.muted }}
+              style={{ padding: '6px 2px', borderRadius: '8px', fontSize: '11.5px', fontWeight: 600, background: learnView === 'cards' ? COLOR.surfaceRaised : 'transparent', color: learnView === 'cards' ? COLOR.text : COLOR.muted }}
             >
               Cards
             </button>
             <button
               onClick={() => setLearnView('study')}
               className="flex-1 btn-flat"
-              style={{ padding: '6px 2px', borderRadius: '8px', fontSize: '10.5px', fontWeight: 600, background: learnView === 'study' ? COLOR.surfaceRaised : 'transparent', color: learnView === 'study' ? COLOR.text : COLOR.muted }}
+              style={{ padding: '6px 2px', borderRadius: '8px', fontSize: '11.5px', fontWeight: 600, background: learnView === 'study' ? COLOR.surfaceRaised : 'transparent', color: learnView === 'study' ? COLOR.text : COLOR.muted }}
             >
               Study
             </button>
             <button
               onClick={() => setLearnView('sheet')}
               className="flex-1 btn-flat"
-              style={{ padding: '6px 2px', borderRadius: '8px', fontSize: '10.5px', fontWeight: 600, background: learnView === 'sheet' ? COLOR.surfaceRaised : 'transparent', color: learnView === 'sheet' ? COLOR.text : COLOR.muted }}
+              style={{ padding: '6px 2px', borderRadius: '8px', fontSize: '11.5px', fontWeight: 600, background: learnView === 'sheet' ? COLOR.surfaceRaised : 'transparent', color: learnView === 'sheet' ? COLOR.text : COLOR.muted }}
             >
               Sheet
             </button>
@@ -1808,7 +1809,7 @@ function CertStudyApp() {
                 key={key}
                 onClick={() => openCardDeck(key)}
                 className="flex-1 btn-flat"
-                style={{ padding: '6px 2px', borderRadius: '8px', fontSize: '10.5px', fontWeight: 600, background: cardDeck === key ? COLOR.surfaceRaised : 'transparent', color: cardDeck === key ? COLOR.text : COLOR.muted }}
+                style={{ padding: '6px 2px', borderRadius: '8px', fontSize: '11.5px', fontWeight: 600, background: cardDeck === key ? COLOR.surfaceRaised : 'transparent', color: cardDeck === key ? COLOR.text : COLOR.muted }}
               >
                 {label}
               </button>
@@ -1816,12 +1817,12 @@ function CertStudyApp() {
           </div>
         )}
         {mode === 'learn' && learnView === 'cards' && cardDeck === 'all' && Object.keys(srs[activeTrack] || {}).length > 0 && (
-          <div style={{ fontSize: '10.5px', color: COLOR.muted, marginBottom: '8px', textAlign: 'center' }}>
+          <div style={{ fontSize: '11.5px', color: COLOR.muted, marginBottom: '8px', textAlign: 'center' }}>
             Cards you're overdue to review come first.
           </div>
         )}
         {mode === 'learn' && learnView === 'cards' && cardDeck === 'tough' && (
-          <div style={{ fontSize: '10.5px', color: COLOR.muted, marginBottom: '8px', textAlign: 'center' }}>
+          <div style={{ fontSize: '11.5px', color: COLOR.muted, marginBottom: '8px', textAlign: 'center' }}>
             Cards you last rated OK or lower, hardest first. Rate one Good or Easy and it leaves this deck.
           </div>
         )}
@@ -2143,9 +2144,15 @@ function CertStudyApp() {
         )}
 
         <div className="mt-6">
-          <div style={{ fontSize: '11px', color: COLOR.muted, marginBottom: '6px' }}>
-            Weighted mastery for {track.label} — segment width matches the real exam's emphasis
-          </div>
+          <button
+            onClick={() => setShowMasteryDetail((v) => !v)}
+            aria-expanded={showMasteryDetail}
+            className="btn-flat"
+            style={{ width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'transparent', padding: '0 0 6px', fontSize: '12px', color: COLOR.muted, textAlign: 'left' }}
+          >
+            <span>Mastery by exam area · {track.label}</span>
+            <span style={{ fontSize: '11px' }}>{showMasteryDetail ? 'Hide ▴' : 'Details ▾'}</span>
+          </button>
           <div className="flex" style={{ gap: '2px', height: '10px', borderRadius: '6px', overflow: 'hidden' }}>
             {categories.map((c) => {
               const trend = categoryMasteryTrend(stats.categoryMasteryHistory || {}, activeTrack, c.key);
@@ -2172,12 +2179,14 @@ function CertStudyApp() {
               per-category % and trend are also spelled out here — the
               only place this app shows mastery moving over time, not just
               a live snapshot. */}
+          {showMasteryDetail && (
           <div className="flex flex-col gap-1 mt-2">
+            <div style={{ fontSize: '11.5px', color: COLOR.muted, marginBottom: '2px' }}>Each segment's width matches that area's weight on the real exam.</div>
             {categories.map((c) => {
               const trend = categoryMasteryTrend(stats.categoryMasteryHistory || {}, activeTrack, c.key);
               const pct = Math.round((masteryByCategory[c.key] || 0) * 100);
               return (
-                <div key={c.key} className="flex justify-between" style={{ fontSize: '10px', color: COLOR.muted }}>
+                <div key={c.key} className="flex justify-between" style={{ fontSize: '11.5px', color: COLOR.muted }}>
                   <span>{c.label}</span>
                   <span>
                     {pct}%
@@ -2191,6 +2200,7 @@ function CertStudyApp() {
               );
             })}
           </div>
+          )}
         </div>
         </React.Fragment>
         )}

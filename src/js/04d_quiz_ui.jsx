@@ -132,7 +132,7 @@ function VerbalQuizPanel({
           </select>
         </div>
         <div style={{ fontSize: '11px', color: COLOR.muted, marginBottom: '14px' }}>{poolSize} questions available with this filter.</div>
-        <div style={{ fontSize: '10.5px', color: COLOR.muted, marginBottom: '16px', lineHeight: 1.4 }}>
+        <div style={{ fontSize: '11.5px', color: COLOR.muted, marginBottom: '16px', lineHeight: 1.4 }}>
           Keeps this screen awake while playing, so audio doesn't stop the moment your phone would
           otherwise lock — leave the app open and in view. Backgrounding the tab or a hard screen-lock
           can still pause playback; that's outside any web app's control.
@@ -255,7 +255,7 @@ function CommandPracticeView({ session, index, score, categories, input, setInpu
         <span>{index + 1} / {total}</span>
       </div>
       <div style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderRadius: '18px', padding: '20px' }}>
-        <div style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.04em', color: COLOR.gold, marginBottom: '8px', textTransform: 'uppercase' }}>
+        <div style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.04em', color: COLOR.gold, marginBottom: '8px', textTransform: 'uppercase' }}>
           {challenge.tool === 'powershell' ? 'PowerShell' : 'Azure CLI'}
         </div>
         <div style={{ fontSize: '16px', lineHeight: 1.45, fontWeight: 500, marginBottom: '14px' }}>{challenge.prompt}</div>
@@ -582,7 +582,7 @@ function PracticeToolPicker({ quizView, available, onSelect }) {
         }}
       >
         <span style={{ minWidth: 0 }}>
-          <span style={{ display: 'block', fontSize: '10px', color: COLOR.muted, textTransform: 'uppercase', letterSpacing: '0.04em', fontWeight: 600 }}>Practice tool</span>
+          <span style={{ display: 'block', fontSize: '11px', color: COLOR.muted, textTransform: 'uppercase', letterSpacing: '0.04em', fontWeight: 600 }}>Practice tool</span>
           <span style={{ display: 'block', fontSize: '14.5px', fontWeight: 600 }}>{current.label}</span>
           <span style={{ display: 'block', fontSize: '11.5px', color: COLOR.muted, marginTop: '1px' }}>{current.desc}</span>
         </span>
@@ -592,7 +592,7 @@ function PracticeToolPicker({ quizView, available, onSelect }) {
         <div style={{ boxShadow: SHADOW.card, marginTop: '6px', background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderRadius: '12px', overflow: 'hidden' }}>
           {groups.map((g, gi) => (
             <div key={g.name} style={{ borderTop: gi === 0 ? 'none' : `1px solid ${COLOR.border}` }}>
-              <div style={{ padding: '8px 14px 4px', fontSize: '10px', fontWeight: 700, color: COLOR.muted, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{g.name}</div>
+              <div style={{ padding: '8px 14px 4px', fontSize: '11px', fontWeight: 700, color: COLOR.muted, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{g.name}</div>
               {g.items.map((t) => {
                 const active = t.key === current.key;
                 return (
@@ -688,8 +688,8 @@ function CompareView({ session, index, score, categories, choice, onChoose, onNe
               >
                 <span style={{ fontSize: '11px', fontWeight: 700, color: submitted ? color : COLOR.muted, minWidth: '14px', paddingTop: '2px' }}>{i === 0 ? 'A' : 'B'}</span>
                 <span style={{ flex: 1 }}>{opt}</span>
-                {submitted && isBetter && <span style={{ fontSize: '10px', fontWeight: 700, whiteSpace: 'nowrap', paddingTop: '3px' }}>BETTER</span>}
-                {submitted && isChosen && !isBetter && <span style={{ fontSize: '10px', fontWeight: 700, whiteSpace: 'nowrap', paddingTop: '3px' }}>RUNNER-UP</span>}
+                {submitted && isBetter && <span style={{ fontSize: '11px', fontWeight: 700, whiteSpace: 'nowrap', paddingTop: '3px' }}>BETTER</span>}
+                {submitted && isChosen && !isBetter && <span style={{ fontSize: '11px', fontWeight: 700, whiteSpace: 'nowrap', paddingTop: '3px' }}>RUNNER-UP</span>}
               </button>
             );
           })}
@@ -825,7 +825,7 @@ function QuestionView({ q, selected, onChoose, onNext, index, total, categoryLab
                   >
                     <span>{opt}</span>
                     {selected !== null && isCorrectOpt && wasSelected && <span>✓</span>}
-                    {selected !== null && isCorrectOpt && !wasSelected && <span style={{ fontSize: '9px' }}>missed</span>}
+                    {selected !== null && isCorrectOpt && !wasSelected && <span style={{ fontSize: '10px' }}>missed</span>}
                     {selected !== null && !isCorrectOpt && wasSelected && <span>✕</span>}
                     {selected === null && wasSelected && <span>●</span>}
                   </button>
@@ -852,7 +852,7 @@ function QuestionView({ q, selected, onChoose, onNext, index, total, categoryLab
 
         {selected !== null && q.whyTested && (
           <div style={{ marginTop: '10px', padding: '12px', borderRadius: '10px', background: `${COLOR.teal}14`, border: `1px solid ${COLOR.teal}`, fontSize: '12.5px', lineHeight: 1.5, color: COLOR.text }}>
-            <div style={{ fontSize: '10.5px', fontWeight: 700, color: COLOR.teal, textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: '4px' }}>Why this is tested</div>
+            <div style={{ fontSize: '11.5px', fontWeight: 700, color: COLOR.teal, textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: '4px' }}>Why this is tested</div>
             {q.whyTested}
           </div>
         )}
@@ -900,7 +900,7 @@ function QuizSummary({ score, answers, categories, onRestart, restartLabel }) {
           <div className="flex flex-col gap-2">
             {missed.map((m, i) => (
               <div key={i} style={{ boxShadow: SHADOW.card, background: COLOR.surfaceRaised, borderRadius: '10px', padding: '10px 12px', fontSize: '13px' }}>
-                <div style={{ fontSize: '10px', color: COLOR.muted, marginBottom: '2px' }}>{categoryLabelFor(m)}</div>
+                <div style={{ fontSize: '11px', color: COLOR.muted, marginBottom: '2px' }}>{categoryLabelFor(m)}</div>
                 <div>{m.prompt}</div>
                 {m.explanation && (
                   <div style={{ marginTop: '6px', paddingTop: '6px', borderTop: `1px solid ${COLOR.border}`, fontSize: '12px', color: COLOR.muted, lineHeight: 1.5 }}>
@@ -909,7 +909,7 @@ function QuizSummary({ score, answers, categories, onRestart, restartLabel }) {
                 )}
                 {m.whyTested && (
                   <div style={{ marginTop: '6px', padding: '8px 10px', borderRadius: '8px', background: `${COLOR.teal}14`, border: `1px solid ${COLOR.teal}`, fontSize: '11.5px', lineHeight: 1.5, color: COLOR.text }}>
-                    <div style={{ fontSize: '9.5px', fontWeight: 700, color: COLOR.teal, textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: '3px' }}>Why this is tested</div>
+                    <div style={{ fontSize: '10.5px', fontWeight: 700, color: COLOR.teal, textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: '3px' }}>Why this is tested</div>
                     {m.whyTested}
                   </div>
                 )}
@@ -991,7 +991,7 @@ function CaseStudyView({ list, activeIndex, onStart, onExit, categories, questio
         ‹ All case studies
       </button>
       <div style={{ boxShadow: SHADOW.card, background: COLOR.surfaceRaised, border: `1px solid ${COLOR.border}`, borderRadius: '14px', padding: '14px 16px', marginBottom: '14px' }}>
-        <div style={{ fontSize: '10.5px', color: COLOR.muted, textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: '4px' }}>{catLabel} · {cs.title}</div>
+        <div style={{ fontSize: '11.5px', color: COLOR.muted, textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: '4px' }}>{catLabel} · {cs.title}</div>
         <div style={{ fontSize: '13.5px', lineHeight: 1.55, color: COLOR.text }}><GlossText text={cs.scenario} pool={flashcardsData} max={3} blockId="cs-scn" /></div>
       </div>
       <QuestionView

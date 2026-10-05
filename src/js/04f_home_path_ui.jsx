@@ -24,7 +24,7 @@ const HOME_PATH_MODE_HINTS = {
 function HomePathCertChip({ track }) {
   const accent = trackAccent(track.key);
   return (
-    <span style={{ fontSize: '10px', fontWeight: 700, color: accent, border: `1px solid ${accent}`, borderRadius: '999px', padding: '1px 7px', whiteSpace: 'nowrap' }}>
+    <span style={{ fontSize: '11px', fontWeight: 700, color: accent, border: `1px solid ${accent}`, borderRadius: '999px', padding: '1px 7px', whiteSpace: 'nowrap' }}>
       {track.label}
     </span>
   );
@@ -32,7 +32,7 @@ function HomePathCertChip({ track }) {
 
 function OptionalTag() {
   return (
-    <span style={{ fontSize: '9px', fontWeight: 700, color: COLOR.muted, border: `1px dashed ${COLOR.muted}`, borderRadius: '999px', padding: '0 6px', textTransform: 'uppercase', letterSpacing: '0.04em', whiteSpace: 'nowrap' }}>
+    <span style={{ fontSize: '10px', fontWeight: 700, color: COLOR.muted, border: `1px dashed ${COLOR.muted}`, borderRadius: '999px', padding: '0 6px', textTransform: 'uppercase', letterSpacing: '0.04em', whiteSpace: 'nowrap' }}>
       Optional
     </span>
   );
@@ -135,7 +135,7 @@ function PathBridgeStep({ bridge, questions, planKeys, api, onRetry, onDone, onO
         <div className="itil-display" style={{ fontSize: '17px', fontWeight: 600, marginBottom: '6px' }}>{bridge.title}</div>
         <div style={{ fontSize: '13.5px', lineHeight: 1.6 }}><GlossText text={bridge.summary} pool={pool} max={3} blockId="br-sum" /></div>
       </div>
-      <div style={{ fontSize: '10.5px', color: COLOR.muted, textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 600, margin: '0 2px 6px' }}>How each cert frames it</div>
+      <div style={{ fontSize: '11.5px', color: COLOR.muted, textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 600, margin: '0 2px 6px' }}>How each cert frames it</div>
       {bridge.appearsIn.map((a) => {
         const t = TRACKS.find((x) => x.key === a.track);
         const accent = trackAccent(a.track);
@@ -143,7 +143,7 @@ function PathBridgeStep({ bridge, questions, planKeys, api, onRetry, onDone, onO
           <div key={a.track} style={{ background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderLeft: `3px solid ${accent}`, borderRadius: '12px', padding: '10px 12px', marginBottom: '8px' }}>
             <div className="flex items-center gap-2" style={{ marginBottom: '3px' }}>
               <span style={{ fontSize: '12.5px', fontWeight: 700, color: accent }}>{t ? t.label : a.track}</span>
-              {planKeys.includes(a.track) && <span style={{ fontSize: '9.5px', color: COLOR.muted }}>in your plan</span>}
+              {planKeys.includes(a.track) && <span style={{ fontSize: '10.5px', color: COLOR.muted }}>in your plan</span>}
             </div>
             <div style={{ fontSize: '12.5px', lineHeight: 1.55 }}><GlossText text={a.angle} pool={pool} max={2} blockId={'br-a-' + a.track} /></div>
             {!planKeys.includes(a.track) && (onOpenCert || onAddToPlan) && (
@@ -181,6 +181,7 @@ function PathBridgeStep({ bridge, questions, planKeys, api, onRetry, onDone, onO
 
 function HomeStudyPath({ tracks, remaining, progress, optionalProgress, mode, onSetMode, order, onSetOrder, certCount, onStart, onTestOut, onSkip, onOpenCert, certPlan, results, seenLog }) {
   const [shown, setShown] = useState(HOME_PATH_UPCOMING);
+  const [showOrder, setShowOrder] = useState(false);
   const trackByKey = new Map(tracks.map((t) => [t.key, t]));
   const [first, ...rest] = remaining;
   const upcoming = rest.slice(0, shown);
@@ -219,34 +220,50 @@ function HomeStudyPath({ tracks, remaining, progress, optionalProgress, mode, on
           <button
             key={m}
             onClick={() => onSetMode(m)}
+            title={HOME_PATH_MODE_HINTS[m]}
             className="flex-1 btn-flat"
-            style={{ padding: '5px 2px', borderRadius: '8px', fontSize: '10.5px', fontWeight: 600, background: mode === m ? COLOR.surfaceRaised : 'transparent', color: mode === m ? COLOR.text : COLOR.muted }}
+            style={{ padding: '7px 2px', borderRadius: '8px', fontSize: '12px', fontWeight: 600, background: mode === m ? COLOR.surfaceRaised : 'transparent', color: mode === m ? COLOR.text : COLOR.muted }}
           >
             {HOME_PATH_MODE_LABELS[m]}
           </button>
         ))}
       </div>
-      {certCount > 1 && (
-        <React.Fragment>
+      {/* The order switch and the explanatory hints are second-level options:
+          one quiet line until the learner asks for them. */}
+      <div className="flex items-center justify-between" style={{ display: 'flex', gap: '8px', marginBottom: '12px', minHeight: '20px' }}>
+        <div style={{ fontSize: '11.5px', color: COLOR.muted, lineHeight: 1.4, minWidth: 0 }}>
+          {mode === 'extended'
+            ? (optionalProgress.total > 0 ? `${optionalProgress.done} of ${optionalProgress.total} optional sections done` : 'Optional sections included')
+            : 'Core steps only'}
+        </div>
+        {certCount > 1 && (
+          <button
+            onClick={() => setShowOrder((v) => !v)}
+            aria-expanded={showOrder}
+            className="btn-flat"
+            style={{ background: 'transparent', color: COLOR.muted, fontSize: '11.5px', fontWeight: 600, padding: 0, whiteSpace: 'nowrap' }}
+          >
+            Order: {HOME_PATH_ORDER_LABELS[order]} {showOrder ? '▴' : '▾'}
+          </button>
+        )}
+      </div>
+      {certCount > 1 && showOrder && (
+        <div style={{ marginTop: '-4px', marginBottom: '12px' }}>
           <div className="flex gap-1" style={{ background: COLOR.bg, padding: '3px', borderRadius: '10px', border: `1px solid ${COLOR.border}`, marginBottom: '6px' }}>
             {HOME_PATH_ORDERS.map((o) => (
               <button
                 key={o}
                 onClick={() => onSetOrder(o)}
                 className="flex-1 btn-flat"
-                style={{ padding: '5px 2px', borderRadius: '8px', fontSize: '10.5px', fontWeight: 600, background: order === o ? COLOR.surfaceRaised : 'transparent', color: order === o ? COLOR.text : COLOR.muted }}
+                style={{ padding: '7px 2px', borderRadius: '8px', fontSize: '12px', fontWeight: 600, background: order === o ? COLOR.surfaceRaised : 'transparent', color: order === o ? COLOR.text : COLOR.muted }}
               >
                 {HOME_PATH_ORDER_LABELS[o]}
               </button>
             ))}
           </div>
-          <div style={{ fontSize: '10.5px', color: COLOR.muted, lineHeight: 1.4, marginBottom: '6px' }}>{HOME_PATH_ORDER_HINTS[order]}</div>
-        </React.Fragment>
+          <div style={{ fontSize: '11.5px', color: COLOR.muted, lineHeight: 1.45 }}>{HOME_PATH_ORDER_HINTS[order]}</div>
+        </div>
       )}
-      <div style={{ fontSize: '10.5px', color: COLOR.muted, lineHeight: 1.4, marginBottom: '12px' }}>
-        {HOME_PATH_MODE_HINTS[mode]}
-        {mode === 'extended' && optionalProgress.total > 0 ? ` ${optionalProgress.done} of ${optionalProgress.total} optional sections done.` : ''}
-      </div>
 
       {first && firstTrack ? (
         <React.Fragment>
@@ -261,7 +278,7 @@ function HomeStudyPath({ tracks, remaining, progress, optionalProgress, mode, on
               }}
             >
               <span style={{ minWidth: 0 }}>
-                <span style={{ display: 'block', fontSize: '10px', opacity: 0.85, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                <span style={{ display: 'block', fontSize: '11px', opacity: 0.85, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                   {firstOptional ? 'Optional' : progress.done === 0 ? 'Start' : 'Continue'} · {firstTrack.label} · Unit {first.unit.index + 1}
                 </span>
                 <span style={{ display: 'block', fontSize: '14px', fontWeight: 700 }}>{first.step.label}</span>
@@ -306,7 +323,7 @@ function HomeStudyPath({ tracks, remaining, progress, optionalProgress, mode, on
 
       {upcoming.length > 0 && (
         <div style={{ marginTop: '10px', borderTop: `1px solid ${COLOR.border}`, paddingTop: '8px' }}>
-          <div style={{ fontSize: '10.5px', color: COLOR.muted, textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 600, marginBottom: '2px' }}>Coming up</div>
+          <div style={{ fontSize: '11.5px', color: COLOR.muted, textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 600, marginBottom: '2px' }}>Coming up</div>
           {upcoming.map((e) => (
             <div key={e.doneKey + e.step.id} className="flex items-center gap-2" style={{ display: 'flex' }}>
               <button
@@ -322,7 +339,7 @@ function HomeStudyPath({ tracks, remaining, progress, optionalProgress, mode, on
                     <span style={{ fontSize: '12.5px', fontWeight: 600 }}>{e.step.label}</span>
                     {e.step.optional && <OptionalTag />}
                   </span>
-                  <span style={{ display: 'block', fontSize: '10.5px', color: COLOR.muted }}>
+                  <span style={{ display: 'block', fontSize: '11.5px', color: COLOR.muted }}>
                     {e.step.kind === 'bridge' ? e.step.meta : `Unit ${e.unit.index + 1} · ${e.unit.title}`}
                   </span>
                 </span>
@@ -351,7 +368,7 @@ function HomeStudyPath({ tracks, remaining, progress, optionalProgress, mode, on
                 Show fewer
               </button>
             )}
-            {later > 0 && shown >= HOME_PATH_UPCOMING_MAX && <span style={{ fontSize: '10.5px', color: COLOR.muted }}>+ {later} more after these</span>}
+            {later > 0 && shown >= HOME_PATH_UPCOMING_MAX && <span style={{ fontSize: '11.5px', color: COLOR.muted }}>+ {later} more after these</span>}
           </div>
         </div>
       )}
@@ -445,29 +462,36 @@ function HomeReviewCard({ weakTotal, toughTotal, gamesTotal, casesTotal, reminde
   if (!available) return null;
   const waiting = weakTotal + toughTotal + gamesTotal + casesTotal;
   const nudge = reviewReminderStatus(reminder, waiting, todayString());
-  const row = (label, count, sub, kind, accent) => (
+  // Tiles sit two to a row so four review types don't stack into a wall of
+  // outlined boxes; a type with nothing waiting stays visible but quiet.
+  const tile = (label, count, sub, kind, accent) => (
     <button
+      key={kind}
       onClick={() => onStartReview(kind)}
       disabled={!count}
       className="btn-flat"
-      style={{ width: '100%', textAlign: 'left', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px', padding: '10px 12px', borderRadius: '12px', border: `1px solid ${count ? accent : COLOR.border}`, background: 'transparent', color: count ? accent : COLOR.muted, opacity: count ? 1 : 0.6, marginTop: '6px' }}
+      style={{ textAlign: 'left', padding: '10px 12px', borderRadius: '12px', border: `1px solid ${count ? accent : COLOR.border}`, background: 'transparent', color: count ? accent : COLOR.muted, opacity: count ? 1 : 0.55, minWidth: 0 }}
     >
-      <span>
-        <span style={{ display: 'block', fontSize: '13px', fontWeight: 600 }}>{label}</span>
-        <span style={{ display: 'block', fontSize: '11px', fontWeight: 400, opacity: 0.85 }}>{count ? sub : 'Nothing to review right now'}</span>
-      </span>
-      <span style={{ fontSize: '16px' }}>›</span>
+      <span style={{ display: 'block', fontSize: '13px', fontWeight: 600 }}>{label}</span>
+      <span style={{ display: 'block', fontSize: '11.5px', fontWeight: 400, opacity: 0.9, marginTop: '1px' }}>{count ? sub : 'Nothing waiting'}</span>
     </button>
   );
+  const tiles = [
+    tile('Weak spots', weakTotal, `${weakTotal} missed question${weakTotal === 1 ? '' : 's'}`, 'weak', COLOR.red),
+    tile('Tough terms', toughTotal, `${toughTotal} card${toughTotal === 1 ? '' : 's'} rated OK or lower`, 'tough', COLOR.gold),
+    casesTotal > 0 && tile('Case studies', casesTotal, `${casesTotal} with a miss`, 'cases', COLOR.primary),
+    gamesTotal > 0 && tile('Missed games', gamesTotal, `${gamesTotal} item${gamesTotal === 1 ? '' : 's'} to redo`, 'games', COLOR.primary),
+  ].filter(Boolean);
   return (
     <div style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderRadius: '16px', padding: '14px 16px', marginBottom: '14px' }}>
-      <div className="itil-display" style={{ fontSize: '16px', fontWeight: 600 }}>Review across your certs</div>
-      <div style={{ fontSize: '11px', color: COLOR.muted, marginTop: '2px' }}>Mixed from every cert in your plan, so one big backlog can't crowd out the rest.</div>
+      <div className="flex justify-between items-baseline">
+        <div className="itil-display" style={{ fontSize: '16px', fontWeight: 600 }}>Review across your certs</div>
+        <div style={{ fontSize: '12px', color: nudge.due ? COLOR.gold : COLOR.muted, fontWeight: nudge.due ? 700 : 400 }}>{waiting} waiting</div>
+      </div>
       {nudge.due && (
-        <div style={{ marginTop: '10px', padding: '9px 12px', borderRadius: '10px', border: `1px solid ${COLOR.gold}`, background: `${COLOR.gold}14`, fontSize: '12px', lineHeight: 1.45 }}>
+        <div style={{ fontSize: '12px', lineHeight: 1.45, color: COLOR.muted, marginTop: '4px' }}>
           <span style={{ fontWeight: 700, color: COLOR.gold }}>Time for a review.</span>{' '}
-          {nudge.daysSince === null ? 'You haven\'t reviewed yet' : `You last reviewed ${nudge.daysSince} day${nudge.daysSince === 1 ? '' : 's'} ago`}
-          {' '}and there {waiting === 1 ? 'is' : 'are'} {waiting} item{waiting === 1 ? '' : 's'} waiting.
+          {nudge.daysSince === null ? 'You haven\'t reviewed yet.' : `You last reviewed ${nudge.daysSince} day${nudge.daysSince === 1 ? '' : 's'} ago.`}
         </div>
       )}
       {available > 1 && (
@@ -477,21 +501,18 @@ function HomeReviewCard({ weakTotal, toughTotal, gamesTotal, casesTotal, reminde
         >
           <span>
             Review everything due
-            <span style={{ display: 'block', fontSize: '11px', fontWeight: 500, opacity: 0.85 }}>A short round of questions, flashcards, games, and a case study</span>
+            <span style={{ display: 'block', fontSize: '11.5px', fontWeight: 500, opacity: 0.9 }}>A short mixed round: questions, cards, games, a case study</span>
           </span>
           <span style={{ fontSize: '16px' }}>›</span>
         </button>
       )}
-      {row('Weak spots', weakTotal, `${weakTotal} missed question${weakTotal === 1 ? '' : 's'}${weakTotal > CROSS_REVIEW_QUESTIONS ? ` · ${CROSS_REVIEW_QUESTIONS} per round` : ''}`, 'weak', COLOR.red)}
-      {row('Tough terms', toughTotal, `${toughTotal} flashcard${toughTotal === 1 ? '' : 's'} rated OK or lower${toughTotal > CROSS_REVIEW_CARDS ? ` · ${CROSS_REVIEW_CARDS} per round` : ''}`, 'tough', COLOR.gold)}
-      {casesTotal > 0 && row('Missed case studies', casesTotal, `${casesTotal} case stud${casesTotal === 1 ? 'y' : 'ies'} with a missed question · one per round`, 'cases', COLOR.primary)}
-      {gamesTotal > 0 && row('Missed games', gamesTotal, `${gamesTotal} Mad Lib / Sequence / Compare item${gamesTotal === 1 ? '' : 's'} to redo${gamesTotal > CROSS_REVIEW_GAMES ? ` · ${CROSS_REVIEW_GAMES} per round` : ''}`, 'games', COLOR.primary)}
-      <label className="flex items-center justify-between" style={{ display: 'flex', marginTop: '12px', fontSize: '11px', color: COLOR.muted }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '8px', marginTop: '8px' }}>{tiles}</div>
+      <label className="flex items-center justify-between" style={{ display: 'flex', marginTop: '12px', fontSize: '12px', color: COLOR.muted }}>
         <span>Remind me to review</span>
         <select
           value={reminder ? reminder.days : REVIEW_REMINDER_DEFAULT_DAYS}
           onChange={(e) => onSetReminder(Number(e.target.value))}
-          style={{ padding: '4px 8px', borderRadius: '8px', fontSize: '11px', border: `1px solid ${COLOR.border}`, background: COLOR.surfaceRaised, color: COLOR.text }}
+          style={{ padding: '4px 8px', borderRadius: '8px', fontSize: '12px', border: `1px solid ${COLOR.border}`, background: COLOR.surfaceRaised, color: COLOR.text }}
         >
           {REVIEW_REMINDER_OPTIONS.map((o) => <option key={o.days} value={o.days}>{o.label}</option>)}
         </select>
@@ -630,7 +651,7 @@ function HomeReviewRun({ kind, trackKeys, results, seenLog, srs, speech, makeApi
         flashcardsData={phase.flashcards}
         header={(
           <div style={{ boxShadow: SHADOW.card, background: COLOR.surfaceRaised, border: `1px solid ${COLOR.border}`, borderRadius: '14px', padding: '14px 16px', marginBottom: '14px' }}>
-            <div style={{ fontSize: '10.5px', color: COLOR.muted, textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: '4px' }}>{catLabel} · {cs.title}</div>
+            <div style={{ fontSize: '11.5px', color: COLOR.muted, textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: '4px' }}>{catLabel} · {cs.title}</div>
             <div style={{ fontSize: '13.5px', lineHeight: 1.55 }}>{cs.scenario}</div>
           </div>
         )}
@@ -660,7 +681,7 @@ function HomeReviewRun({ kind, trackKeys, results, seenLog, srs, speech, makeApi
     <div>
       <button onClick={onExit} className="btn-flat" style={{ fontSize: '12px', color: COLOR.primary, background: 'transparent', marginBottom: '10px', padding: 0 }}>‹ Back to Home</button>
       <div style={{ marginBottom: '14px' }}>
-        <div style={{ fontSize: '10.5px', color: COLOR.muted, textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 600 }}>
+        <div style={{ fontSize: '11.5px', color: COLOR.muted, textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 600 }}>
           Review across your certs{kind === 'mixed' && !finished ? ` · part ${phaseIndex + 1} of ${round.phases.length}` : ''}
         </div>
         <div className="itil-display" style={{ fontSize: '18px', fontWeight: 600, marginTop: '2px' }}>
