@@ -531,6 +531,7 @@ function emptyStats() {
     readinessHistory: {},
     categoryMasteryHistory: {},
     path: {},
+    pathLocking: true,
   };
 }
 
@@ -558,6 +559,7 @@ function normalizeStats(raw) {
     readinessHistory: raw.readinessHistory && typeof raw.readinessHistory === 'object' ? raw.readinessHistory : {},
     categoryMasteryHistory: raw.categoryMasteryHistory && typeof raw.categoryMasteryHistory === 'object' ? raw.categoryMasteryHistory : {},
     path: normalizePathStats(raw.path),
+    pathLocking: raw.pathLocking !== false,
   };
 }
 
@@ -631,7 +633,10 @@ function normalizePathStats(raw) {
         clean[stepId] = { at: typeof d.at === 'string' ? d.at : null, pct: Number.isFinite(d.pct) ? d.pct : null, via: d.via === 'testout' || d.via === 'skipped' ? d.via : null };
       }
     });
-    out[trackKey] = { done: clean };
+    const rawUnlocked = entry && typeof entry.unlocked === 'object' && entry.unlocked ? entry.unlocked : {};
+    const unlocked = {};
+    Object.keys(rawUnlocked).forEach((unitId) => { if (rawUnlocked[unitId]) unlocked[unitId] = true; });
+    out[trackKey] = Object.keys(unlocked).length ? { done: clean, unlocked } : { done: clean };
   });
   return out;
 }
@@ -645,13 +650,30 @@ function markPathStepsDone(pathStats, trackKey, stepIds, pct, today, via) {
   stepIds.forEach((id) => {
     if (!done[id]) done[id] = { at: today, pct: Number.isFinite(pct) ? pct : null, via: via || null };
   });
-  return { ...base, [trackKey]: { done } };
+  return { ...base, [trackKey]: { ...track, done } };
 }
 
 function markPathStepDone(pathStats, trackKey, stepId, pct, today, via) {
   const base = pathStats || {};
   const track = base[trackKey] || { done: {} };
-  return { ...base, [trackKey]: { done: { ...track.done, [stepId]: { at: today, pct: Number.isFinite(pct) ? pct : null, via: via || null } } } };
+  return { ...base, [trackKey]: { ...track, done: { ...track.done, [stepId]: { at: today, pct: Number.isFinite(pct) ? pct : null, via: via || null } } } };
+}
+
+// Unit locking on a cert's Path tab. A unit is locked while an earlier unit is
+// unfinished, unless the learner unlocked it ("Unlock anyway") or already has
+// progress in it (so saves from before locking existed never lock you out of
+// work you've started). Turning locking off in settings unlocks everything.
+function unlockPathUnit(pathStats, trackKey, unitId) {
+  const base = pathStats || {};
+  const track = base[trackKey] || { done: {} };
+  return { ...base, [trackKey]: { ...track, unlocked: { ...(track.unlocked || {}), [unitId]: true } } };
+}
+
+function isPathUnitLocked(units, unit, doneMap, unlockedMap, lockingOn) {
+  if (!lockingOn || unit.index === 0) return false;
+  if (unlockedMap && unlockedMap[unit.id]) return false;
+  if (unit.steps.some((st) => pathStepIsDone(doneMap, st.id))) return false;
+  return units.some((u) => u.index < unit.index && !pathUnitProgress(u, doneMap).complete);
 }
 
 // Hands each item (anything with a `cat`) to one of the units that cover

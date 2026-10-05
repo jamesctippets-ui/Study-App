@@ -50,6 +50,7 @@ function CertStudyApp() {
   const [speakingId, setSpeakingId] = useState(null);
   const speechSupported = typeof window !== 'undefined' && 'speechSynthesis' in window;
   const { ttsRate, ttsVoiceURI, setTtsRate, setTtsVoiceURI } = useTtsPrefs();
+  const [soundOn, setSoundOn] = useSoundPrefs();
   const [ttsVoices, setTtsVoices] = useState([]);
 
   // Verbal Quiz — a hands-free, audio-only quiz flow (read question, pause
@@ -1349,6 +1350,10 @@ function CertStudyApp() {
       const cur = statsRef.current;
       saveStats({ ...cur, counts: { ...cur.counts, matchRoundsCompleted: cur.counts.matchRoundsCompleted + 1 } });
     },
+    unlockUnit: (unitId) => {
+      const cur = statsRef.current;
+      saveStats({ ...cur, path: unlockPathUnit(cur.path, trackKey, unitId) });
+    },
     completeStep: (stepId, pct) => {
       const cur = statsRef.current;
       saveStats({ ...cur, path: markPathStepDone(cur.path, trackKey, stepId, pct, todayString()) });
@@ -1618,6 +1623,10 @@ function CertStudyApp() {
           onSetTtsVoiceURI={setTtsVoiceURI}
           onTestVoice={() => speak('__tts_test__', 'This is how flashcards and questions will sound when read aloud.')}
           isTestSpeaking={speakingId === '__tts_test__'}
+          soundOn={soundOn}
+          onSetSoundOn={setSoundOn}
+          pathLocking={stats.pathLocking !== false}
+          onSetPathLocking={(on) => saveStats({ ...statsRef.current, pathLocking: on })}
         />
       )}
       <div style={{ background: COLOR.navBar, borderBottom: `1px solid ${COLOR.border}`, position: 'sticky', top: 0, zIndex: 30 }}>
@@ -1818,6 +1827,8 @@ function CertStudyApp() {
             track={track}
             trackKey={activeTrack}
             doneMap={((stats.path || {})[activeTrack] || {}).done || {}}
+            unlockedMap={((stats.path || {})[activeTrack] || {}).unlocked || {}}
+            pathLocking={stats.pathLocking !== false}
             results={trackResults}
             seenLog={seenLog[activeTrack] || {}}
             categories={categories}

@@ -26,6 +26,8 @@ function PathIcon({ kind, size = 20 }) {
       return <svg {...common}><rect x="2" y="7" width="20" height="14" rx="2" ry="2" /><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" /></svg>;
     case 'checkpoint':
       return <svg {...common}><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z" /><line x1="4" y1="22" x2="4" y2="15" /></svg>;
+    case 'lock':
+      return <svg {...common}><rect x="4" y="11" width="16" height="10" rx="2" /><path d="M8 11V7a4 4 0 0 1 8 0v4" /></svg>;
     case 'check':
       return <svg {...common} strokeWidth={3}><polyline points="20 6 9 17 4 12" /></svg>;
     default:
@@ -362,6 +364,10 @@ function PathStepComplete({ unit, step, pct, unitComplete, testedOut, next, onNe
   const eyebrow = unitComplete ? 'Unit conquered!' : testedOut ? 'Skipped ahead!'
     : !hasScore ? 'Nice work!' : pct >= 90 ? 'Perfect!' : pct >= 70 ? 'Great work!' : 'Keep going!';
   const confetti = unitComplete ? 34 : testedOut ? 22 : stars === 3 ? 18 : 0;
+  useEffect(() => {
+    playCelebrationSound(unitComplete ? 'unit' : testedOut || stars === 3 ? 'great' : 'ok');
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   const goalMet = goalTarget > 0 && goalCount >= goalTarget;
   const goalPct = goalTarget > 0 ? Math.min(100, Math.round((goalCount / goalTarget) * 100)) : 0;
   return (
@@ -605,7 +611,7 @@ function PathTrailNode({ step, index, done, isNext, entry, onOpen }) {
   );
 }
 
-function PathView({ track, trackKey, doneMap, results, seenLog, categories, speech, api, toughCount, autoStart, onAutoStarted }) {
+function PathView({ track, trackKey, doneMap, unlockedMap, pathLocking, results, seenLog, categories, speech, api, toughCount, autoStart, onAutoStarted }) {
   const units = useMemo(() => buildPathUnits(trackKey), [trackKey]);
   const [session, setSession] = useState(null);
   const [completion, setCompletion] = useState(null);
@@ -787,6 +793,8 @@ function PathView({ track, trackKey, doneMap, results, seenLog, categories, spee
       {units.map((unit) => {
         const prog = pathUnitProgress(unit, doneMap);
         const open = !!expanded[unit.index];
+        const locked = isPathUnitLocked(units, unit, doneMap, unlockedMap, pathLocking);
+        const blocker = locked ? units.find((u) => u.index < unit.index && !pathUnitProgress(u, doneMap).complete) : null;
         return (
           <div key={unit.id} style={{ marginBottom: '14px' }}>
             <div style={{ position: 'sticky', top: `${APP_HEADER_HEIGHT}px`, zIndex: 20, background: COLOR.bg, padding: '10px 0 8px' }}>
@@ -797,21 +805,35 @@ function PathView({ track, trackKey, doneMap, results, seenLog, categories, spee
               style={{
                 width: '100%', textAlign: 'left', display: 'flex', alignItems: 'stretch',
                 borderRadius: '18px', padding: 0, overflow: 'hidden',
-                background: prog.complete ? COLOR.success : COLOR.primary, color: COLOR.onAccent,
+                background: locked ? COLOR.surfaceRaised : prog.complete ? COLOR.success : COLOR.primary, color: locked ? COLOR.muted : COLOR.onAccent,
+                border: locked ? `2px solid ${COLOR.border}` : 'none',
               }}
             >
               <span style={{ flex: 1, minWidth: 0, padding: '12px 16px' }}>
                 <span style={{ display: 'block', fontSize: '12px', fontWeight: 800, letterSpacing: '0.06em', textTransform: 'uppercase', opacity: 0.85 }}>
-                  Unit {unit.index + 1} · {prog.done}/{prog.total}
+                  Unit {unit.index + 1} · {locked ? 'Locked' : `${prog.done}/${prog.total}`}
                 </span>
                 <span style={{ display: 'block', fontSize: '18px', fontWeight: 800, lineHeight: 1.2 }}>{unit.title}</span>
               </span>
               <span style={{ width: '52px', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', borderLeft: '2px solid rgba(0,0,0,0.18)', fontSize: '14px' }}>
-                {open ? '▴' : '▾'}
+                {locked ? <PathIcon kind="lock" size={20} /> : open ? '▴' : '▾'}
               </span>
             </button>
             </div>
-            {open ? (
+            {open && locked ? (
+              <div style={{ padding: '14px 4px 4px', textAlign: 'center' }}>
+                <div style={{ fontSize: '13.5px', color: COLOR.muted, lineHeight: 1.5, maxWidth: '300px', margin: '0 auto' }}>
+                  Finish Unit {blocker ? blocker.index + 1 : unit.index} to open this one, or jump ahead if you already know the earlier material.
+                </div>
+                <button
+                  onClick={() => api.unlockUnit(unit.id)}
+                  className="btn-flat"
+                  style={{ marginTop: '12px', padding: '10px 18px', borderRadius: '14px', border: `2px solid ${COLOR.primary}`, background: 'transparent', color: COLOR.primary, fontSize: '13px', fontWeight: 800 }}
+                >
+                  Unlock anyway
+                </button>
+              </div>
+            ) : open ? (
               <div style={{ padding: '20px 0 4px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                 <div style={{ fontSize: '13px', color: COLOR.muted, textAlign: 'center', maxWidth: '300px', lineHeight: 1.45, marginBottom: '22px' }}>{unit.summary}</div>
                 {unit.steps.map((step, i) => (

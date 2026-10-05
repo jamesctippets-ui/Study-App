@@ -1545,8 +1545,21 @@ trading away for shinier but shallower ones.
   stay under the up-next node. Bug fixed on the way: opening the app through a
   deep link (for example straight to a cert's Path tab) lost the day's streak
   increase, because two effects saved from the same stale render; both now
-  build on the latest stats. Untried: a lock state for later units and a sound
-  option for the celebration.
+  build on the latest stats.
+- [x] **Locked units and celebration sounds.** (1) *Unit locking (Path tab):* a
+  unit is locked while an earlier unit is unfinished. Its banner goes grey with
+  a lock and "Unit n · Locked"; tapping it explains what unlocks it and offers
+  **Unlock anyway**, which is saved per unit (`stats.path[track].unlocked`).
+  Unit 1 never locks, and neither does any unit you have already started, so
+  saves from before locking existed are untouched. Steps inside a unit stay
+  free-order, and Home's cross-cert path is unaffected (it already runs units
+  in order). **Settings → Data & Progress → Path & sounds → Lock later units**
+  (`stats.pathLocking`, default on) turns locking off everywhere. (2) *Sounds:*
+  opt-in (off by default, stored per device like theme and voice) synthesized
+  chimes via Web Audio, no audio files: two notes for an ordinary step, four
+  for a perfect score or test-out, six for a finished unit; a "Play a test
+  sound" button in the same settings block. Silent when the browser has no Web
+  Audio. Not covered: sounds for correct/incorrect answers.
 - [ ] **Home path — nothing blocking.** Untried: expanding the acronym
   dictionary through a second-reader fact-check, and letting a learner add
   their own acronyms or terms.

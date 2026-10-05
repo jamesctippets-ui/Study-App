@@ -272,6 +272,59 @@ function TabIcon({ kind, size = 24 }) {
   }
 }
 
+// Celebration sounds: tiny synthesized arpeggios (Web Audio, no audio files).
+// Off by default, and a per-device preference like theme and voice, so it
+// lives in plain localStorage rather than in synced progress.
+const SOUND_STORAGE_KEY = 'certStudyHub_soundPrefs';
+const SOUND_STATE = { enabled: false, ctx: null };
+
+function useSoundPrefs() {
+  const [soundOn, setSoundOnState] = useState(() => {
+    try { return !!JSON.parse(localStorage.getItem(SOUND_STORAGE_KEY) || '{}').enabled; } catch (e) { return false; }
+  });
+  useEffect(() => { SOUND_STATE.enabled = soundOn; }, [soundOn]);
+  const setSoundOn = (on) => {
+    setSoundOnState(on);
+    SOUND_STATE.enabled = on;
+    try { localStorage.setItem(SOUND_STORAGE_KEY, JSON.stringify({ enabled: on })); } catch (e) { /* ignore */ }
+  };
+  return [soundOn, setSoundOn];
+}
+
+// kind: 'ok' (a step), 'great' (a perfect score or test-out), 'unit' (a
+// finished unit). `force` plays even when sounds are off (the settings test
+// button). Silent if the browser has no Web Audio or blocks it.
+function playCelebrationSound(kind, force) {
+  if (!force && !SOUND_STATE.enabled) return;
+  try {
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) return;
+    if (!SOUND_STATE.ctx) SOUND_STATE.ctx = new AC();
+    const ctx = SOUND_STATE.ctx;
+    if (ctx.state === 'suspended' && ctx.resume) ctx.resume();
+    const C5 = 523.25, E5 = 659.25, G5 = 783.99, C6 = 1046.5, E6 = 1318.5, G6 = 1568;
+    const notes = kind === 'unit' ? [C5, E5, G5, C6, E6, G6] : kind === 'great' ? [C5, E5, G5, C6] : [C5, G5];
+    const step = kind === 'unit' ? 0.11 : 0.13;
+    const t0 = ctx.currentTime + 0.02;
+    notes.forEach((freq, i) => {
+      const last = i === notes.length - 1;
+      const start = t0 + i * step;
+      const len = last ? 0.55 : 0.2;
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'triangle';
+      osc.frequency.value = freq;
+      gain.gain.setValueAtTime(0.0001, start);
+      gain.gain.exponentialRampToValueAtTime(0.16, start + 0.015);
+      gain.gain.exponentialRampToValueAtTime(0.0001, start + len);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(start);
+      osc.stop(start + len + 0.05);
+    });
+  } catch (e) { /* audio unavailable — celebrate silently */ }
+}
+
 // A real sliding switch (not just an icon button) per the user's request —
 // track shows both a sun and a moon so the target state is visible even
 // before tapping, thumb slides to whichever side is currently active.

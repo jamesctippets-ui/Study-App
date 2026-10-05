@@ -376,6 +376,9 @@ Home draws the same trail for the cross-cert path (the up-next step as a big nod
 its cert's colour, then the next few). Finishing a step shows a celebration screen
 (stars, confetti on a perfect score or a finished unit, streak and daily-goal
 chips), and moving to the next question scrolls back to the top.
+On a cert's Path tab, a unit stays locked until the one before it is finished (or
+you tap "Unlock anyway"; units you've started never lock), and a chime can play
+on step completion. Both are switches under Data & Progress → Path & sounds.
 Call-to-action buttons use `.btn-3d` (a solid pressable edge), and the font is
 Nunito, loaded from Google Fonts, with Inter as the fallback.
 Navigation is also real client-side routing, not

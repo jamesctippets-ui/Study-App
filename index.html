@@ -468,6 +468,59 @@ function TabIcon({ kind, size = 24 }) {
   }
 }
 
+// Celebration sounds: tiny synthesized arpeggios (Web Audio, no audio files).
+// Off by default, and a per-device preference like theme and voice, so it
+// lives in plain localStorage rather than in synced progress.
+const SOUND_STORAGE_KEY = 'certStudyHub_soundPrefs';
+const SOUND_STATE = { enabled: false, ctx: null };
+
+function useSoundPrefs() {
+  const [soundOn, setSoundOnState] = useState(() => {
+    try { return !!JSON.parse(localStorage.getItem(SOUND_STORAGE_KEY) || '{}').enabled; } catch (e) { return false; }
+  });
+  useEffect(() => { SOUND_STATE.enabled = soundOn; }, [soundOn]);
+  const setSoundOn = (on) => {
+    setSoundOnState(on);
+    SOUND_STATE.enabled = on;
+    try { localStorage.setItem(SOUND_STORAGE_KEY, JSON.stringify({ enabled: on })); } catch (e) { /* ignore */ }
+  };
+  return [soundOn, setSoundOn];
+}
+
+// kind: 'ok' (a step), 'great' (a perfect score or test-out), 'unit' (a
+// finished unit). `force` plays even when sounds are off (the settings test
+// button). Silent if the browser has no Web Audio or blocks it.
+function playCelebrationSound(kind, force) {
+  if (!force && !SOUND_STATE.enabled) return;
+  try {
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) return;
+    if (!SOUND_STATE.ctx) SOUND_STATE.ctx = new AC();
+    const ctx = SOUND_STATE.ctx;
+    if (ctx.state === 'suspended' && ctx.resume) ctx.resume();
+    const C5 = 523.25, E5 = 659.25, G5 = 783.99, C6 = 1046.5, E6 = 1318.5, G6 = 1568;
+    const notes = kind === 'unit' ? [C5, E5, G5, C6, E6, G6] : kind === 'great' ? [C5, E5, G5, C6] : [C5, G5];
+    const step = kind === 'unit' ? 0.11 : 0.13;
+    const t0 = ctx.currentTime + 0.02;
+    notes.forEach((freq, i) => {
+      const last = i === notes.length - 1;
+      const start = t0 + i * step;
+      const len = last ? 0.55 : 0.2;
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'triangle';
+      osc.frequency.value = freq;
+      gain.gain.setValueAtTime(0.0001, start);
+      gain.gain.exponentialRampToValueAtTime(0.16, start + 0.015);
+      gain.gain.exponentialRampToValueAtTime(0.0001, start + len);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(start);
+      osc.stop(start + len + 0.05);
+    });
+  } catch (e) { /* audio unavailable — celebrate silently */ }
+}
+
 // A real sliding switch (not just an icon button) per the user's request —
 // track shows both a sun and a moon so the target state is visible even
 // before tapping, thumb slides to whichever side is currently active.
@@ -3482,6 +3535,7 @@ function emptyStats() {
     readinessHistory: {},
     categoryMasteryHistory: {},
     path: {},
+    pathLocking: true,
   };
 }
 
@@ -3509,6 +3563,7 @@ function normalizeStats(raw) {
     readinessHistory: raw.readinessHistory && typeof raw.readinessHistory === 'object' ? raw.readinessHistory : {},
     categoryMasteryHistory: raw.categoryMasteryHistory && typeof raw.categoryMasteryHistory === 'object' ? raw.categoryMasteryHistory : {},
     path: normalizePathStats(raw.path),
+    pathLocking: raw.pathLocking !== false,
   };
 }
 
@@ -3582,7 +3637,10 @@ function normalizePathStats(raw) {
         clean[stepId] = { at: typeof d.at === 'string' ? d.at : null, pct: Number.isFinite(d.pct) ? d.pct : null, via: d.via === 'testout' || d.via === 'skipped' ? d.via : null };
       }
     });
-    out[trackKey] = { done: clean };
+    const rawUnlocked = entry && typeof entry.unlocked === 'object' && entry.unlocked ? entry.unlocked : {};
+    const unlocked = {};
+    Object.keys(rawUnlocked).forEach((unitId) => { if (rawUnlocked[unitId]) unlocked[unitId] = true; });
+    out[trackKey] = Object.keys(unlocked).length ? { done: clean, unlocked } : { done: clean };
   });
   return out;
 }
@@ -3596,13 +3654,30 @@ function markPathStepsDone(pathStats, trackKey, stepIds, pct, today, via) {
   stepIds.forEach((id) => {
     if (!done[id]) done[id] = { at: today, pct: Number.isFinite(pct) ? pct : null, via: via || null };
   });
-  return { ...base, [trackKey]: { done } };
+  return { ...base, [trackKey]: { ...track, done } };
 }
 
 function markPathStepDone(pathStats, trackKey, stepId, pct, today, via) {
   const base = pathStats || {};
   const track = base[trackKey] || { done: {} };
-  return { ...base, [trackKey]: { done: { ...track.done, [stepId]: { at: today, pct: Number.isFinite(pct) ? pct : null, via: via || null } } } };
+  return { ...base, [trackKey]: { ...track, done: { ...track.done, [stepId]: { at: today, pct: Number.isFinite(pct) ? pct : null, via: via || null } } } };
+}
+
+// Unit locking on a cert's Path tab. A unit is locked while an earlier unit is
+// unfinished, unless the learner unlocked it ("Unlock anyway") or already has
+// progress in it (so saves from before locking existed never lock you out of
+// work you've started). Turning locking off in settings unlocks everything.
+function unlockPathUnit(pathStats, trackKey, unitId) {
+  const base = pathStats || {};
+  const track = base[trackKey] || { done: {} };
+  return { ...base, [trackKey]: { ...track, unlocked: { ...(track.unlocked || {}), [unitId]: true } } };
+}
+
+function isPathUnitLocked(units, unit, doneMap, unlockedMap, lockingOn) {
+  if (!lockingOn || unit.index === 0) return false;
+  if (unlockedMap && unlockedMap[unit.id]) return false;
+  if (unit.steps.some((st) => pathStepIsDone(doneMap, st.id))) return false;
+  return units.some((u) => u.index < unit.index && !pathUnitProgress(u, doneMap).complete);
 }
 
 // Hands each item (anything with a `cat`) to one of the units that cover
@@ -4403,6 +4478,7 @@ function AchievementsPanel({ achievements, streak, onClose }) {
 function DataPanel({
   trackLabel, onExport, onImportFile, importMessage, onReset, onClose,
   speechSupported, ttsVoices, ttsRate, ttsVoiceURI, onSetTtsRate, onSetTtsVoiceURI, onTestVoice, isTestSpeaking,
+  soundOn, onSetSoundOn, pathLocking, onSetPathLocking,
 }) {
   useEscapeToClose(onClose);
   const [confirmingReset, setConfirmingReset] = useState(false);
@@ -4441,6 +4517,31 @@ function DataPanel({
         <div className="flex justify-between items-center mb-2">
           <div className="itil-display" style={{ fontSize: '18px', fontWeight: 600 }}>Data & Progress</div>
           <button onClick={onClose} className="btn-flat" style={{ color: COLOR.muted, fontSize: '15px', padding: '4px' }}>✕</button>
+        </div>
+
+        <div style={{ marginTop: '14px', padding: '14px', borderRadius: '14px', background: COLOR.surface, border: `2px solid ${COLOR.border}` }}>
+          <div style={{ fontSize: '13.5px', fontWeight: 600, marginBottom: '4px' }}>Path &amp; sounds</div>
+          <label style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '12px', marginTop: '8px', fontSize: '12.5px' }}>
+            <span>
+              Lock later units
+              <span style={{ display: 'block', fontSize: '11.5px', color: COLOR.muted, lineHeight: 1.4 }}>A unit opens once the one before it is finished, or when you tap "Unlock anyway". Units you've started never lock.</span>
+            </span>
+            <input type="checkbox" checked={!!pathLocking} onChange={(e) => onSetPathLocking(e.target.checked)} style={{ width: '20px', height: '20px', flexShrink: 0, marginTop: '2px' }} aria-label="Lock later units" />
+          </label>
+          <label style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '12px', marginTop: '12px', fontSize: '12.5px' }}>
+            <span>
+              Celebration sounds
+              <span style={{ display: 'block', fontSize: '11.5px', color: COLOR.muted, lineHeight: 1.4 }}>A short chime when you finish a step or a unit. Off by default; saved on this device only.</span>
+            </span>
+            <input type="checkbox" checked={!!soundOn} onChange={(e) => onSetSoundOn(e.target.checked)} style={{ width: '20px', height: '20px', flexShrink: 0, marginTop: '2px' }} aria-label="Celebration sounds" />
+          </label>
+          <button
+            onClick={() => playCelebrationSound('great', true)}
+            className="btn-flat"
+            style={{ marginTop: '10px', padding: '6px 12px', borderRadius: '10px', border: `2px solid ${COLOR.border}`, background: 'transparent', color: COLOR.text, fontSize: '12px', fontWeight: 700 }}
+          >
+            Play a test sound
+          </button>
         </div>
 
         {speechSupported && (
@@ -7976,6 +8077,8 @@ function PathIcon({ kind, size = 20 }) {
       return <svg {...common}><rect x="2" y="7" width="20" height="14" rx="2" ry="2" /><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" /></svg>;
     case 'checkpoint':
       return <svg {...common}><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z" /><line x1="4" y1="22" x2="4" y2="15" /></svg>;
+    case 'lock':
+      return <svg {...common}><rect x="4" y="11" width="16" height="10" rx="2" /><path d="M8 11V7a4 4 0 0 1 8 0v4" /></svg>;
     case 'check':
       return <svg {...common} strokeWidth={3}><polyline points="20 6 9 17 4 12" /></svg>;
     default:
@@ -8312,6 +8415,10 @@ function PathStepComplete({ unit, step, pct, unitComplete, testedOut, next, onNe
   const eyebrow = unitComplete ? 'Unit conquered!' : testedOut ? 'Skipped ahead!'
     : !hasScore ? 'Nice work!' : pct >= 90 ? 'Perfect!' : pct >= 70 ? 'Great work!' : 'Keep going!';
   const confetti = unitComplete ? 34 : testedOut ? 22 : stars === 3 ? 18 : 0;
+  useEffect(() => {
+    playCelebrationSound(unitComplete ? 'unit' : testedOut || stars === 3 ? 'great' : 'ok');
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   const goalMet = goalTarget > 0 && goalCount >= goalTarget;
   const goalPct = goalTarget > 0 ? Math.min(100, Math.round((goalCount / goalTarget) * 100)) : 0;
   return (
@@ -8555,7 +8662,7 @@ function PathTrailNode({ step, index, done, isNext, entry, onOpen }) {
   );
 }
 
-function PathView({ track, trackKey, doneMap, results, seenLog, categories, speech, api, toughCount, autoStart, onAutoStarted }) {
+function PathView({ track, trackKey, doneMap, unlockedMap, pathLocking, results, seenLog, categories, speech, api, toughCount, autoStart, onAutoStarted }) {
   const units = useMemo(() => buildPathUnits(trackKey), [trackKey]);
   const [session, setSession] = useState(null);
   const [completion, setCompletion] = useState(null);
@@ -8737,6 +8844,8 @@ function PathView({ track, trackKey, doneMap, results, seenLog, categories, spee
       {units.map((unit) => {
         const prog = pathUnitProgress(unit, doneMap);
         const open = !!expanded[unit.index];
+        const locked = isPathUnitLocked(units, unit, doneMap, unlockedMap, pathLocking);
+        const blocker = locked ? units.find((u) => u.index < unit.index && !pathUnitProgress(u, doneMap).complete) : null;
         return (
           <div key={unit.id} style={{ marginBottom: '14px' }}>
             <div style={{ position: 'sticky', top: `${APP_HEADER_HEIGHT}px`, zIndex: 20, background: COLOR.bg, padding: '10px 0 8px' }}>
@@ -8747,21 +8856,35 @@ function PathView({ track, trackKey, doneMap, results, seenLog, categories, spee
               style={{
                 width: '100%', textAlign: 'left', display: 'flex', alignItems: 'stretch',
                 borderRadius: '18px', padding: 0, overflow: 'hidden',
-                background: prog.complete ? COLOR.success : COLOR.primary, color: COLOR.onAccent,
+                background: locked ? COLOR.surfaceRaised : prog.complete ? COLOR.success : COLOR.primary, color: locked ? COLOR.muted : COLOR.onAccent,
+                border: locked ? `2px solid ${COLOR.border}` : 'none',
               }}
             >
               <span style={{ flex: 1, minWidth: 0, padding: '12px 16px' }}>
                 <span style={{ display: 'block', fontSize: '12px', fontWeight: 800, letterSpacing: '0.06em', textTransform: 'uppercase', opacity: 0.85 }}>
-                  Unit {unit.index + 1} · {prog.done}/{prog.total}
+                  Unit {unit.index + 1} · {locked ? 'Locked' : `${prog.done}/${prog.total}`}
                 </span>
                 <span style={{ display: 'block', fontSize: '18px', fontWeight: 800, lineHeight: 1.2 }}>{unit.title}</span>
               </span>
               <span style={{ width: '52px', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', borderLeft: '2px solid rgba(0,0,0,0.18)', fontSize: '14px' }}>
-                {open ? '▴' : '▾'}
+                {locked ? <PathIcon kind="lock" size={20} /> : open ? '▴' : '▾'}
               </span>
             </button>
             </div>
-            {open ? (
+            {open && locked ? (
+              <div style={{ padding: '14px 4px 4px', textAlign: 'center' }}>
+                <div style={{ fontSize: '13.5px', color: COLOR.muted, lineHeight: 1.5, maxWidth: '300px', margin: '0 auto' }}>
+                  Finish Unit {blocker ? blocker.index + 1 : unit.index} to open this one, or jump ahead if you already know the earlier material.
+                </div>
+                <button
+                  onClick={() => api.unlockUnit(unit.id)}
+                  className="btn-flat"
+                  style={{ marginTop: '12px', padding: '10px 18px', borderRadius: '14px', border: `2px solid ${COLOR.primary}`, background: 'transparent', color: COLOR.primary, fontSize: '13px', fontWeight: 800 }}
+                >
+                  Unlock anyway
+                </button>
+              </div>
+            ) : open ? (
               <div style={{ padding: '20px 0 4px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                 <div style={{ fontSize: '13px', color: COLOR.muted, textAlign: 'center', maxWidth: '300px', lineHeight: 1.45, marginBottom: '22px' }}>{unit.summary}</div>
                 {unit.steps.map((step, i) => (
@@ -9834,6 +9957,7 @@ function CertStudyApp() {
   const [speakingId, setSpeakingId] = useState(null);
   const speechSupported = typeof window !== 'undefined' && 'speechSynthesis' in window;
   const { ttsRate, ttsVoiceURI, setTtsRate, setTtsVoiceURI } = useTtsPrefs();
+  const [soundOn, setSoundOn] = useSoundPrefs();
   const [ttsVoices, setTtsVoices] = useState([]);
 
   // Verbal Quiz — a hands-free, audio-only quiz flow (read question, pause
@@ -11133,6 +11257,10 @@ function CertStudyApp() {
       const cur = statsRef.current;
       saveStats({ ...cur, counts: { ...cur.counts, matchRoundsCompleted: cur.counts.matchRoundsCompleted + 1 } });
     },
+    unlockUnit: (unitId) => {
+      const cur = statsRef.current;
+      saveStats({ ...cur, path: unlockPathUnit(cur.path, trackKey, unitId) });
+    },
     completeStep: (stepId, pct) => {
       const cur = statsRef.current;
       saveStats({ ...cur, path: markPathStepDone(cur.path, trackKey, stepId, pct, todayString()) });
@@ -11402,6 +11530,10 @@ function CertStudyApp() {
           onSetTtsVoiceURI={setTtsVoiceURI}
           onTestVoice={() => speak('__tts_test__', 'This is how flashcards and questions will sound when read aloud.')}
           isTestSpeaking={speakingId === '__tts_test__'}
+          soundOn={soundOn}
+          onSetSoundOn={setSoundOn}
+          pathLocking={stats.pathLocking !== false}
+          onSetPathLocking={(on) => saveStats({ ...statsRef.current, pathLocking: on })}
         />
       )}
       <div style={{ background: COLOR.navBar, borderBottom: `1px solid ${COLOR.border}`, position: 'sticky', top: 0, zIndex: 30 }}>
@@ -11602,6 +11734,8 @@ function CertStudyApp() {
             track={track}
             trackKey={activeTrack}
             doneMap={((stats.path || {})[activeTrack] || {}).done || {}}
+            unlockedMap={((stats.path || {})[activeTrack] || {}).unlocked || {}}
+            pathLocking={stats.pathLocking !== false}
             results={trackResults}
             seenLog={seenLog[activeTrack] || {}}
             categories={categories}
