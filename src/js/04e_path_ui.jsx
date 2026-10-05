@@ -33,25 +33,6 @@ function PathIcon({ kind, size = 20 }) {
   }
 }
 
-function PathRing({ done, total, size = 40 }) {
-  const r = (size - 6) / 2;
-  const c = 2 * Math.PI * r;
-  const frac = total ? done / total : 0;
-  const complete = total > 0 && done === total;
-  return (
-    <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} style={{ flexShrink: 0 }}>
-      <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke={COLOR.border} strokeWidth="4" />
-      <circle
-        cx={size / 2} cy={size / 2} r={r} fill="none" stroke={complete ? COLOR.success : COLOR.primary} strokeWidth="4"
-        strokeLinecap="round" strokeDasharray={`${c * frac} ${c}`} transform={`rotate(-90 ${size / 2} ${size / 2})`}
-      />
-      <text x="50%" y="50%" textAnchor="middle" dominantBaseline="central" fontSize="10.5" fontWeight="700" fill={complete ? COLOR.success : COLOR.text}>
-        {done}/{total}
-      </text>
-    </svg>
-  );
-}
-
 /* ---- step runners ---- */
 
 function PathReadStep({ unit, flashcardsData, speech, onDone }) {
@@ -69,7 +50,7 @@ function PathReadStep({ unit, flashcardsData, speech, onDone }) {
   return (
     <div>
       {DiagramComp && (
-        <div style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderRadius: '14px', padding: '14px', marginBottom: '16px' }}>
+        <div style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `2px solid ${COLOR.border}`, borderRadius: '14px', padding: '14px', marginBottom: '16px' }}>
           <DiagramComp />
         </div>
       )}
@@ -92,7 +73,7 @@ function PathReadStep({ unit, flashcardsData, speech, onDone }) {
           <button
             onClick={() => setPage((n) => n - 1)}
             className="flex-1"
-            style={{ padding: '12px', borderRadius: '12px', border: `1px solid ${COLOR.border}`, background: 'transparent', color: COLOR.text, fontSize: '13px', fontWeight: 600 }}
+            style={{ padding: '12px', borderRadius: '12px', border: `2px solid ${COLOR.border}`, background: 'transparent', color: COLOR.text, fontSize: '13px', fontWeight: 600 }}
           >
             ‹ Back
           </button>
@@ -355,7 +336,7 @@ function PathApplyStep({ unit, categories, flashcardsData, onDone }) {
 
 function PathStepComplete({ unit, step, pct, unitComplete, testedOut, next, onNext, onBack, nextLabel, backLabel }) {
   return (
-    <div style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderRadius: '18px', padding: '26px 22px', textAlign: 'center' }}>
+    <div style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `2px solid ${COLOR.border}`, borderRadius: '18px', padding: '26px 22px', textAlign: 'center' }}>
       <div style={{ width: '56px', height: '56px', borderRadius: '50%', background: COLOR.success, color: COLOR.onAccent, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', marginBottom: '12px' }}>
         <PathIcon kind="check" size={28} />
       </div>
@@ -367,7 +348,7 @@ function PathStepComplete({ unit, step, pct, unitComplete, testedOut, next, onNe
         {pct !== null && pct !== undefined && !unitComplete && !testedOut ? ` · ${pct}%` : ''}
       </div>
       {next ? (
-        <button
+        <button className="btn-3d"
           onClick={onNext}
           style={{ width: '100%', marginTop: '18px', padding: '13px', borderRadius: '12px', background: COLOR.primary, color: COLOR.onAccent, fontSize: '14px', fontWeight: 700 }}
         >
@@ -378,7 +359,7 @@ function PathStepComplete({ unit, step, pct, unitComplete, testedOut, next, onNe
       )}
       <button
         onClick={onBack}
-        style={{ width: '100%', marginTop: '10px', padding: '11px', borderRadius: '12px', border: `1px solid ${COLOR.border}`, background: 'transparent', color: COLOR.text, fontSize: '13px', fontWeight: 600 }}
+        style={{ width: '100%', marginTop: '10px', padding: '11px', borderRadius: '12px', border: `2px solid ${COLOR.border}`, background: 'transparent', color: COLOR.text, fontSize: '13px', fontWeight: 600 }}
       >
         {backLabel || 'Back to the path'}
       </button>
@@ -511,7 +492,62 @@ function PathStepRunner({ trackKey, units, unit, step, results, seenLog, categor
   );
 }
 
-const PATH_NODE_OFFSETS = [0, 24, 40, 24];
+// Horizontal wiggle of the trail, in px from centre, cycling per node.
+const PATH_WAVE = [0, 44, 68, 44, 0, -44, -68, -44];
+
+function PathStars({ pct }) {
+  const n = pct >= 90 ? 3 : pct >= 70 ? 2 : 1;
+  return (
+    <span aria-label={`${n} of 3 stars`} style={{ display: 'inline-flex', gap: '2px', marginTop: '6px' }}>
+      {[0, 1, 2].map((i) => (
+        <svg key={i} width="14" height="14" viewBox="0 0 24 24" fill={i < n ? COLOR.gold : 'none'} stroke={i < n ? COLOR.gold : COLOR.border} strokeWidth="2.2" strokeLinejoin="round">
+          <polygon points="12 2 15 9 22 9.5 16.5 14.5 18 22 12 18 6 22 7.5 14.5 2 9.5 9 9" />
+        </svg>
+      ))}
+    </span>
+  );
+}
+
+// One stop on the trail: a big round "3D" node with its label. The whole
+// thing is a single button; the face sinks when pressed.
+function PathTrailNode({ step, index, done, isNext, entry, onOpen }) {
+  const checkpoint = step.kind === 'checkpoint';
+  const size = isNext ? 78 : 68;
+  const bg = done ? COLOR.success : isNext ? COLOR.primary : checkpoint ? COLOR.gold : COLOR.surfaceRaised;
+  const fg = done || isNext || checkpoint ? COLOR.onAccent : COLOR.muted;
+  const starKinds = ['quiz', 'quiz2', 'game', 'checkpoint'];
+  const showStars = done && entry && typeof entry.pct === 'number' && starKinds.includes(step.kind);
+  return (
+    <button
+      onClick={onOpen}
+      className="btn-flat trail-node"
+      aria-label={`${step.label}, ${done ? 'completed' : 'not completed'}`}
+      style={{
+        display: 'flex', flexDirection: 'column', alignItems: 'center', background: 'transparent', color: COLOR.text, padding: 0,
+        transform: `translateX(${PATH_WAVE[index % PATH_WAVE.length]}px)`, marginBottom: '22px', width: '170px',
+      }}
+    >
+      {isNext && (
+        <span className="bob" style={{ fontSize: '12px', fontWeight: 900, letterSpacing: '0.08em', color: COLOR.primary, background: COLOR.surface, border: `2px solid ${COLOR.border}`, borderRadius: '10px', padding: '3px 10px', marginBottom: '8px', position: 'relative', animation: 'bob 1.4s ease-in-out infinite' }}>
+          START
+        </span>
+      )}
+      <span
+        className={`node-face${isNext ? ' pulse' : ''}`}
+        style={{
+          width: `${size}px`, height: `${size}px`, borderRadius: '50%', display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+          background: bg, color: fg, border: !done && !isNext && !checkpoint ? `2px solid ${COLOR.border}` : 'none',
+          animation: isNext ? 'pulseRing 1.6s ease-out infinite' : 'none',
+        }}
+      >
+        <PathIcon kind={done ? 'check' : step.kind} size={isNext ? 34 : 30} />
+      </span>
+      {showStars && <PathStars pct={entry.pct} />}
+      <span style={{ marginTop: showStars ? '4px' : '10px', fontSize: '13px', fontWeight: isNext ? 800 : 700, color: done ? COLOR.muted : COLOR.text, textAlign: 'center', lineHeight: 1.25 }}>{step.label}</span>
+      {isNext && step.meta && <span style={{ fontSize: '12px', color: COLOR.muted, marginTop: '1px' }}>{step.meta}</span>}
+    </button>
+  );
+}
 
 function PathView({ track, trackKey, doneMap, results, seenLog, categories, speech, api, toughCount, autoStart, onAutoStarted }) {
   const units = useMemo(() => buildPathUnits(trackKey), [trackKey]);
@@ -535,7 +571,7 @@ function PathView({ track, trackKey, doneMap, results, seenLog, categories, spee
 
   if (!units.length) {
     return (
-      <div style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderRadius: '18px', padding: '22px', textAlign: 'center' }}>
+      <div style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `2px solid ${COLOR.border}`, borderRadius: '18px', padding: '22px', textAlign: 'center' }}>
         <div className="itil-display" style={{ fontSize: '17px', fontWeight: 600, marginBottom: '6px' }}>No guided path yet</div>
         <div style={{ fontSize: '12.5px', color: COLOR.muted, lineHeight: 1.5 }}>
           {track.label} doesn't have lessons to build a path from. Use Practice for quizzes and games, or Reference for the study notes.
@@ -631,7 +667,7 @@ function PathView({ track, trackKey, doneMap, results, seenLog, categories, spee
   /* ---- the map ---- */
   return (
     <div>
-      <div style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderRadius: '16px', padding: '16px', marginBottom: '14px' }}>
+      <div style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `2px solid ${COLOR.border}`, borderRadius: '16px', padding: '16px', marginBottom: '14px' }}>
         <div className="flex justify-between items-baseline" style={{ marginBottom: '8px' }}>
           <div className="itil-display" style={{ fontSize: '17px', fontWeight: 600 }}>{track.label} path</div>
           <div style={{ fontSize: '12px', color: COLOR.muted }}>{overall.unitsComplete} of {overall.unitCount} units</div>
@@ -645,7 +681,8 @@ function PathView({ track, trackKey, doneMap, results, seenLog, categories, spee
         {next ? (
           <button
             onClick={() => startStep(next.unit, next.step)}
-            style={{ width: '100%', padding: '13px', borderRadius: '12px', background: COLOR.primary, color: COLOR.onAccent, fontSize: '14px', fontWeight: 700, textAlign: 'left', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px' }}
+            className="btn-3d"
+            style={{ width: '100%', padding: '13px', borderRadius: '14px', background: COLOR.primary, color: COLOR.onAccent, fontSize: '14px', fontWeight: 700, textAlign: 'left', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px' }}
           >
             <span style={{ minWidth: 0 }}>
               <span style={{ display: 'block', fontSize: '11px', opacity: 0.8, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
@@ -662,109 +699,88 @@ function PathView({ track, trackKey, doneMap, results, seenLog, categories, spee
         )}
       </div>
 
-      {reviewIds.length > 0 && (
-        <button
-          onClick={startReview}
-          style={{
-            width: '100%', marginBottom: '14px', padding: '11px 14px', borderRadius: '12px', textAlign: 'left',
-            border: `1px solid ${COLOR.red}`, background: 'rgba(181,87,74,0.1)', color: COLOR.red, fontSize: '13px', fontWeight: 600,
-            display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px',
-          }}
-        >
-          <span>
-            Review weak spots
-            <span style={{ display: 'block', fontSize: '11.5px', fontWeight: 400, opacity: 0.85 }}>
-              {reviewIds.length} question{reviewIds.length === 1 ? '' : 's'} you missed in units you've started
-            </span>
-          </span>
-          <span style={{ fontSize: '16px' }}>›</span>
-        </button>
-      )}
-
-      {toughCount > 0 && (
-        <button
-          onClick={api.openToughTerms}
-          style={{
-            width: '100%', marginBottom: '14px', padding: '11px 14px', borderRadius: '12px', textAlign: 'left',
-            border: `1px solid ${COLOR.gold}`, background: 'rgba(200,160,60,0.1)', color: COLOR.gold, fontSize: '13px', fontWeight: 600,
-            display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px',
-          }}
-        >
-          <span>
-            Tough terms
-            <span style={{ display: 'block', fontSize: '11.5px', fontWeight: 400, opacity: 0.85 }}>
-              {toughCount} flashcard{toughCount === 1 ? '' : 's'} you rated OK or lower
-            </span>
-          </span>
-          <span style={{ fontSize: '16px' }}>›</span>
-        </button>
+      {(reviewIds.length > 0 || toughCount > 0) && (
+        <div style={{ display: 'grid', gridTemplateColumns: reviewIds.length > 0 && toughCount > 0 ? 'repeat(2, minmax(0, 1fr))' : '1fr', gap: '8px', marginBottom: '16px' }}>
+          {reviewIds.length > 0 && (
+            <button
+              onClick={startReview}
+              className="btn-flat"
+              style={{ padding: '10px 12px', borderRadius: '14px', textAlign: 'left', border: `2px solid ${COLOR.red}`, background: 'rgba(181,87,74,0.1)', color: COLOR.red, minWidth: 0 }}
+            >
+              <span style={{ display: 'block', fontSize: '13px', fontWeight: 800 }}>Review weak spots</span>
+              <span style={{ display: 'block', fontSize: '11.5px', fontWeight: 600, opacity: 0.9 }}>
+                {reviewIds.length} question{reviewIds.length === 1 ? '' : 's'} missed
+              </span>
+            </button>
+          )}
+          {toughCount > 0 && (
+            <button
+              onClick={api.openToughTerms}
+              className="btn-flat"
+              style={{ padding: '10px 12px', borderRadius: '14px', textAlign: 'left', border: `2px solid ${COLOR.gold}`, background: 'rgba(200,160,60,0.1)', color: COLOR.gold, minWidth: 0 }}
+            >
+              <span style={{ display: 'block', fontSize: '13px', fontWeight: 800 }}>Tough terms</span>
+              <span style={{ display: 'block', fontSize: '11.5px', fontWeight: 600, opacity: 0.9 }}>
+                {toughCount} flashcard{toughCount === 1 ? '' : 's'} to revisit
+              </span>
+            </button>
+          )}
+        </div>
       )}
 
       {units.map((unit) => {
         const prog = pathUnitProgress(unit, doneMap);
         const open = !!expanded[unit.index];
         return (
-          <div key={unit.id} style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderRadius: '16px', marginBottom: '12px', overflow: 'hidden' }}>
+          <div key={unit.id} style={{ marginBottom: '14px' }}>
+            <div style={{ position: 'sticky', top: `${APP_HEADER_HEIGHT}px`, zIndex: 20, background: COLOR.bg, padding: '10px 0 8px' }}>
             <button
               onClick={() => setExpanded((e) => ({ ...e, [unit.index]: !e[unit.index] }))}
-              className="btn-flat"
-              style={{ width: '100%', textAlign: 'left', padding: '12px 14px', background: 'transparent', color: COLOR.text, display: 'flex', alignItems: 'center', gap: '12px' }}
+              className="btn-3d"
+              aria-expanded={open}
+              style={{
+                width: '100%', textAlign: 'left', display: 'flex', alignItems: 'stretch',
+                borderRadius: '18px', padding: 0, overflow: 'hidden',
+                background: prog.complete ? COLOR.success : COLOR.primary, color: COLOR.onAccent,
+              }}
             >
-              <PathRing done={prog.done} total={prog.total} />
-              <span style={{ flex: 1, minWidth: 0 }}>
-                <span style={{ display: 'block', fontSize: '11px', color: COLOR.muted, textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 600 }}>Unit {unit.index + 1}</span>
-                <span style={{ display: 'block', fontSize: '14.5px', fontWeight: 600 }}>{unit.title}</span>
-                {!open && <span style={{ display: 'block', fontSize: '12px', color: COLOR.muted, marginTop: '1px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{unit.summary}</span>}
+              <span style={{ flex: 1, minWidth: 0, padding: '12px 16px' }}>
+                <span style={{ display: 'block', fontSize: '12px', fontWeight: 800, letterSpacing: '0.06em', textTransform: 'uppercase', opacity: 0.85 }}>
+                  Unit {unit.index + 1} · {prog.done}/{prog.total}
+                </span>
+                <span style={{ display: 'block', fontSize: '18px', fontWeight: 800, lineHeight: 1.2 }}>{unit.title}</span>
               </span>
-              <span style={{ fontSize: '12px', color: COLOR.muted }}>{open ? '▴' : '▾'}</span>
+              <span style={{ width: '52px', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', borderLeft: '2px solid rgba(0,0,0,0.18)', fontSize: '14px' }}>
+                {open ? '▴' : '▾'}
+              </span>
             </button>
-            {open && (
-              <div style={{ padding: '2px 14px 14px', borderTop: `1px solid ${COLOR.border}` }}>
-                <div style={{ fontSize: '12px', color: COLOR.muted, margin: '10px 0 6px', lineHeight: 1.45 }}>{unit.summary}</div>
-                {unit.steps.map((step, i) => {
-                  const done = pathStepIsDone(doneMap, step.id);
-                  const isNext = !!next && next.step.id === step.id;
-                  const accent = step.kind === 'checkpoint' ? COLOR.gold : COLOR.primary;
-                  const lit = done || isNext;
-                  return (
-                    <button
-                      key={step.id}
-                      onClick={() => startStep(unit, step)}
-                      className="btn-flat"
-                      aria-label={`${step.label}, ${done ? 'completed' : 'not completed'}`}
-                      style={{
-                        width: `calc(100% - ${PATH_NODE_OFFSETS[i % PATH_NODE_OFFSETS.length]}px)`, marginLeft: `${PATH_NODE_OFFSETS[i % PATH_NODE_OFFSETS.length]}px`,
-                        textAlign: 'left', background: 'transparent', color: COLOR.text, padding: '7px 0', display: 'flex', alignItems: 'center', gap: '14px',
-                      }}
-                    >
-                      <span style={{
-                        width: '46px', height: '46px', borderRadius: '50%', flexShrink: 0, display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-                        background: done ? COLOR.success : isNext ? accent : COLOR.surfaceRaised,
-                        color: lit ? COLOR.onAccent : COLOR.muted,
-                        border: `2px solid ${done ? COLOR.success : (isNext || step.kind === 'checkpoint') ? accent : COLOR.border}`,
-                        boxShadow: isNext ? `0 0 0 5px ${accent}33` : 'none',
-                      }}>
-                        <PathIcon kind={done ? 'check' : step.kind} size={21} />
-                      </span>
-                      <span style={{ minWidth: 0 }}>
-                        <span style={{ display: 'block', fontSize: '13.5px', fontWeight: isNext ? 700 : 600, color: done ? COLOR.muted : COLOR.text }}>{step.label}</span>
-                        <span style={{ display: 'block', fontSize: '11.5px', color: COLOR.muted }}>
-                          {done ? 'Done' : step.meta}{isNext ? ' · up next' : ''}
-                        </span>
-                      </span>
-                    </button>
-                  );
-                })}
+            </div>
+            {open ? (
+              <div style={{ padding: '20px 0 4px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                <div style={{ fontSize: '13px', color: COLOR.muted, textAlign: 'center', maxWidth: '300px', lineHeight: 1.45, marginBottom: '22px' }}>{unit.summary}</div>
+                {unit.steps.map((step, i) => (
+                  <PathTrailNode
+                    key={step.id}
+                    step={step}
+                    index={i}
+                    done={pathStepIsDone(doneMap, step.id)}
+                    isNext={!!next && next.step.id === step.id}
+                    entry={doneMap[step.id]}
+                    onOpen={() => startStep(unit, step)}
+                  />
+                ))}
                 {!prog.complete && (
                   <button
                     onClick={() => startStep(unit, pathTestOutStep(unit))}
                     className="btn-flat"
-                    style={{ marginTop: '6px', padding: '8px 0', background: 'transparent', color: COLOR.primary, fontSize: '12px', fontWeight: 600, textAlign: 'left' }}
+                    style={{ padding: '10px 18px', borderRadius: '14px', border: `2px solid ${COLOR.border}`, background: 'transparent', color: COLOR.muted, fontSize: '13px', fontWeight: 800 }}
                   >
-                    Already know this? Test out of the unit ›
+                    Already know this? Test out ›
                   </button>
                 )}
               </div>
+            ) : (
+              unit.summary && <div style={{ fontSize: '12.5px', color: COLOR.muted, padding: '10px 6px 0', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{unit.summary}</div>
             )}
           </div>
         );

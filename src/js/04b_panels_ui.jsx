@@ -15,12 +15,12 @@ function AboutSection({ title, defaultOpen, children }) {
     <div style={{ marginBottom: '10px' }}>
       <button
         onClick={() => setOpen((o) => !o)}
-        style={{ width: '100%', textAlign: 'left', background: COLOR.surfaceRaised, border: `1px solid ${COLOR.border}`, borderRadius: '12px', padding: '12px', fontSize: '13px', color: COLOR.text, fontWeight: 600 }}
+        style={{ width: '100%', textAlign: 'left', background: COLOR.surfaceRaised, border: `2px solid ${COLOR.border}`, borderRadius: '12px', padding: '12px', fontSize: '13px', color: COLOR.text, fontWeight: 600 }}
       >
         {open ? '▾ ' : '▸ '}{title}
       </button>
       {open && (
-        <div style={{ background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderTop: 'none', borderRadius: '0 0 12px 12px', padding: '14px', fontSize: '12.5px', lineHeight: 1.6, color: COLOR.muted }}>
+        <div style={{ background: COLOR.surface, border: `2px solid ${COLOR.border}`, borderTop: 'none', borderRadius: '0 0 12px 12px', padding: '14px', fontSize: '12.5px', lineHeight: 1.6, color: COLOR.muted }}>
           {children}
         </div>
       )}
@@ -77,7 +77,7 @@ function GlossaryPanel({ onClose }) {
           Every term across all {TRACKS.filter((t) => !t.hidden).length} tracks, in one searchable list — a term
           explained once here shows every track that uses it, not just whichever one you're currently in.
         </div>
-        <div className="flex gap-1" style={{ background: COLOR.surface, padding: '3px', borderRadius: '10px', border: `1px solid ${COLOR.border}`, marginBottom: '10px' }}>
+        <div className="flex gap-1" style={{ background: COLOR.surface, padding: '3px', borderRadius: '10px', border: `2px solid ${COLOR.border}`, marginBottom: '10px' }}>
           {[['terms', `Terms (${entries.length})`], ['acronyms', `Acronyms (${acronymEntries.length})`]].map(([k, label]) => (
             <button
               key={k}
@@ -94,7 +94,7 @@ function GlossaryPanel({ onClose }) {
           onChange={(e) => setQuery(e.target.value)}
           placeholder={tab === 'terms' ? 'Search terms…' : 'Search acronyms or what they stand for…'}
           style={{
-            width: '100%', padding: '10px 12px', borderRadius: '10px', border: `1px solid ${COLOR.border}`,
+            width: '100%', padding: '10px 12px', borderRadius: '10px', border: `2px solid ${COLOR.border}`,
             background: COLOR.surface, color: COLOR.text, fontSize: '13px', marginBottom: '10px',
           }}
         />
@@ -106,7 +106,7 @@ function GlossaryPanel({ onClose }) {
         {tab === 'acronyms' && (
           <div className="flex flex-col gap-2">
             {filteredAcronyms.map((a) => (
-              <div key={a.key} style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderRadius: '12px', padding: '9px 12px', display: 'flex', gap: '10px', alignItems: 'baseline' }}>
+              <div key={a.key} style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `2px solid ${COLOR.border}`, borderRadius: '12px', padding: '9px 12px', display: 'flex', gap: '10px', alignItems: 'baseline' }}>
                 <span className="itil-display" style={{ fontSize: '14px', fontWeight: 700, color: COLOR.gold, minWidth: '56px' }}>{a.key}</span>
                 <span style={{ fontSize: '13px', color: COLOR.text, lineHeight: 1.45 }}>{a.exps.join(' / ')}</span>
               </div>
@@ -121,7 +121,7 @@ function GlossaryPanel({ onClose }) {
             const key = entry.front.toLowerCase();
             const open = expandedKey === key;
             return (
-              <div key={key} style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderRadius: '12px', padding: '10px 12px' }}>
+              <div key={key} style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `2px solid ${COLOR.border}`, borderRadius: '12px', padding: '10px 12px' }}>
                 <button
                   onClick={() => setExpandedKey(open ? null : key)}
                   className="btn-flat"
@@ -344,3 +344,52 @@ function CategoryFilterSelect({ categories, activeCat, onChange, masteryByCatego
   );
 }
 
+
+
+// The persistent bottom navigation (Home / Path / Practice / Reference /
+// Exam). Path, Practice, Reference and Exam all act on the track in the top
+// bar; Home is the cross-cert dashboard.
+const TAB_BAR_ITEMS = [
+  { m: 'home', label: 'Home', icon: 'home' },
+  { m: 'path', label: 'Path', icon: 'path' },
+  { m: 'quiz', label: 'Practice', icon: 'quiz' },
+  { m: 'learn', label: 'Reference', icon: 'learn' },
+  { m: 'exam', label: 'Exam', icon: 'exam' },
+];
+
+function BottomTabBar({ mode, onChange }) {
+  return (
+    <nav
+      aria-label="Main"
+      style={{
+        position: 'fixed', left: 0, right: 0, bottom: 0, zIndex: 40, background: COLOR.navBar,
+        borderTop: `2px solid ${COLOR.border}`, paddingBottom: 'env(safe-area-inset-bottom)',
+      }}
+    >
+      <div className="max-w-md mx-auto flex" style={{ height: `${TAB_BAR_HEIGHT}px`, padding: '6px 8px', gap: '4px' }}>
+        {TAB_BAR_ITEMS.map((t) => {
+          const active = mode === t.m;
+          const tint = t.m === 'exam' ? COLOR.gold : COLOR.primary;
+          return (
+            <button
+              key={t.m}
+              onClick={() => onChange(t.m)}
+              title={t.label}
+              aria-current={active ? 'page' : undefined}
+              className="btn-flat flex-1"
+              style={{
+                display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '2px',
+                borderRadius: '14px', background: active ? `color-mix(in srgb, ${tint} 16%, transparent)` : 'transparent',
+                border: `2px solid ${active ? tint : 'transparent'}`, color: active ? tint : COLOR.muted, minWidth: 0,
+                fontSize: '11px', fontWeight: 800, letterSpacing: '0.02em',
+              }}
+            >
+              <TabIcon kind={t.icon} size={24} />
+              {t.label}
+            </button>
+          );
+        })}
+      </div>
+    </nav>
+  );
+}

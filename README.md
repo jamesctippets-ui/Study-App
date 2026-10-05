@@ -363,12 +363,17 @@ that track's Path — Practice/Exam session state isn't built to survive an
 `activeTrack` swap mid-session, so this sidesteps that instead of risking
 it.
 
-The top-left corner of the header is now consistent everywhere: a ☰
-button (titled "Manage cert path") always opens `CertPathPanel` directly
-— in every mode, including Home itself, since editing your path is just
-as relevant there. Next to it, a house icon only appears once you've left
-Home, and does what ☰ used to do: takes you all the way back to the Home
-dashboard — a real navigation destination, not a bottom-sheet overlay.
+Navigation follows a gamified-learning-app layout. A slim, sticky top bar
+holds a ☰ button (titled "Manage cert path", always opens `CertPathPanel`),
+the track chip (tap to switch tracks), your streak, the theme switch,
+achievements, and settings. A fixed bottom tab bar (`BottomTabBar` in
+04b_panels_ui.jsx) holds Home / Path / Practice / Reference / Exam; Home is the
+cross-cert dashboard (its tab button is titled "Home"), and the other four act on
+the track named in the top bar. The Path tab draws each unit as a sticky banner
+over a winding trail of large round nodes (done, current with a START bubble,
+checkpoint, upcoming), with up to three stars from a step's stored score.
+Call-to-action buttons use `.btn-3d` (a solid pressable edge), and the font is
+Nunito, loaded from Google Fonts, with Inter as the fallback.
 Navigation is also real client-side routing, not
 just in-memory state: the URL hash always reflects where you are
 (`#/az900/practice/questions`, `#/az900/path`, `#/home`), so the browser's back/forward

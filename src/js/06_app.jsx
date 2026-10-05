@@ -1217,7 +1217,6 @@ function CertStudyApp() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mode, syncMode, activeTrack, masteryByCategory, categories]);
 
-  const overallMastery = useMemo(() => trackMastery(activeTrack, results), [activeTrack, results]);
 
   // Cheat sheet's "Official resources" block: the track-level links already
   // shown on the Exam tab, plus every category's own links, deduped by URL
@@ -1608,92 +1607,59 @@ function CertStudyApp() {
           isTestSpeaking={speakingId === '__tts_test__'}
         />
       )}
-      <div style={{ background: COLOR.navBar, borderBottom: `1px solid ${COLOR.border}`, boxShadow: '0 1px 4px rgba(0,0,0,0.12)', position: 'relative', zIndex: 1 }}>
-        <div className="max-w-md mx-auto px-4" style={{ paddingTop: '14px', paddingBottom: '14px' }}>
-          <div className="flex justify-between items-start">
-            <div style={{ flex: 1, minWidth: 0, position: 'relative', paddingRight: '10px' }}>
-              <div className="flex items-center" style={{ gap: '4px', marginBottom: '2px' }}>
-                <button
-                  onClick={() => setShowCertPath(true)}
-                  className="btn-flat"
-                  title="Manage cert path"
-                  style={{
-                    display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: '26px', height: '26px',
-                    borderRadius: '8px', border: 'none', background: 'transparent', color: COLOR.muted, padding: 0,
-                  }}
-                >
-                  <IconMenu />
-                </button>
-                {mode !== 'home' && (
-                  <button
-                    onClick={() => setMode('home')}
-                    className="btn-flat"
-                    title="Home"
-                    style={{
-                      display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: '26px', height: '26px',
-                      borderRadius: '8px', border: 'none', background: 'transparent', color: COLOR.muted, padding: 0,
-                    }}
-                  >
-                    <IconHome />
-                  </button>
-                )}
-              </div>
-              {mode === 'home' ? (
-                <React.Fragment>
-                  <div className="itil-display" style={{ fontSize: '21px', fontWeight: 600, lineHeight: 1.2 }}>Cert Study Hub</div>
-                  <div style={{ fontSize: '12px', color: COLOR.muted, marginTop: '2px' }}>
-                    {stats.streak.current > 0 ? `🔥 ${stats.streak.current}-day streak` : certPlan.order.length ? 'Welcome back' : 'Pick a track to get started'}
-                  </div>
-                </React.Fragment>
-              ) : (
-                <button
-                  onClick={() => setShowTrackSwitcher(true)}
-                  className="btn-flat"
-                  title="Switch track"
-                  style={{ display: 'block', textAlign: 'left', background: 'transparent', border: 'none', padding: 0, width: '100%' }}
-                >
-                  <div className="flex items-center" style={{ gap: '4px' }}>
-                    <div className="itil-display" style={{ fontSize: '21px', fontWeight: 600, lineHeight: 1.2, color: trackAccent(activeTrack) }}>{track.label}</div>
-                    <span style={{ fontSize: '11px', color: COLOR.muted, marginTop: '2px' }}>▾</span>
-                  </div>
-                  <div style={{ fontSize: '12px', color: COLOR.muted, marginTop: '2px' }}>{track.subtitle}</div>
-                </button>
-              )}
-            </div>
-            <div className="flex items-start gap-1" style={{ flexShrink: 0 }}>
-              {mode !== 'home' && (
-                <div style={{ textAlign: 'right', marginRight: '2px' }}>
-                  <div style={{ fontSize: '18px', fontWeight: 700, color: COLOR.success }}>{overallMastery}%</div>
-                </div>
-              )}
-              <ThemeToggle theme={theme} onToggle={toggleTheme} />
+      <div style={{ background: COLOR.navBar, borderBottom: `1px solid ${COLOR.border}`, position: 'sticky', top: 0, zIndex: 30 }}>
+        <div className="max-w-md mx-auto px-4 flex items-center" style={{ height: `${APP_HEADER_HEIGHT}px`, gap: '8px' }}>
+          <button
+            onClick={() => setShowCertPath(true)}
+            className="btn-flat"
+            title="Manage cert path"
+            style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: '34px', height: '34px', borderRadius: '10px', border: 'none', background: 'transparent', color: COLOR.muted, padding: 0, flexShrink: 0 }}
+          >
+            <IconMenu />
+          </button>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            {mode === 'home' ? (
+              <div className="itil-display" style={{ fontSize: '20px', lineHeight: 1.1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>Cert Study</div>
+            ) : (
               <button
-                onClick={() => setShowAchievements(true)}
-                title="Achievements"
-                style={{
-                  minWidth: '40px', minHeight: '40px', padding: '6px 10px', borderRadius: '10px',
-                  border: `1px solid ${COLOR.gold}`, background: 'transparent', color: COLOR.gold, fontSize: '12px', fontWeight: 600,
-                  display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px',
-                }}
+                onClick={() => setShowTrackSwitcher(true)}
+                className="btn-flat"
+                title="Switch track"
+                style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', textAlign: 'left', background: 'transparent', border: 'none', padding: '4px 0', maxWidth: '100%' }}
               >
-                <IconTrophy /> {stats.unlocked.length}
+                <span className="itil-display" style={{ fontSize: '22px', lineHeight: 1.1, color: trackAccent(activeTrack) }}>{track.label}</span>
+                <span style={{ fontSize: '12px', color: COLOR.muted }}>▾</span>
               </button>
-              <button
-                onClick={() => { setImportMessage(null); setShowData(true); }}
-                title="Data & progress"
-                style={{
-                  minWidth: '40px', minHeight: '40px', padding: '6px 10px', borderRadius: '10px',
-                  border: `1px solid ${COLOR.border}`, background: 'transparent', color: COLOR.muted,
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                }}
-              >
-                <IconSettings />
-              </button>
+            )}
+          </div>
+          <div className="flex items-center" style={{ gap: '8px', flexShrink: 0 }}>
+            <div
+              title={stats.streak.current > 0 ? `${stats.streak.current}-day streak` : 'Study today to start a streak'}
+              style={{ display: 'inline-flex', alignItems: 'center', gap: '3px', fontSize: '15px', fontWeight: 800, color: stats.streak.current > 0 ? '#FF9A3D' : COLOR.muted }}
+            >
+              <span style={{ fontSize: '17px', filter: stats.streak.current > 0 ? 'none' : 'grayscale(1)', opacity: stats.streak.current > 0 ? 1 : 0.7 }}>🔥</span>{stats.streak.current}
             </div>
+            <ThemeToggle theme={theme} onToggle={toggleTheme} />
+            <button
+              onClick={() => setShowAchievements(true)}
+              className="btn-flat"
+              title="Achievements"
+              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '3px', minWidth: '34px', height: '34px', padding: '0 4px', borderRadius: '10px', border: 'none', background: 'transparent', color: COLOR.gold, fontSize: '13px', fontWeight: 800 }}
+            >
+              <IconTrophy /> {stats.unlocked.length}
+            </button>
+            <button
+              onClick={() => { setImportMessage(null); setShowData(true); }}
+              className="btn-flat"
+              title="Data & progress"
+              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '34px', height: '34px', padding: 0, borderRadius: '10px', border: 'none', background: 'transparent', color: COLOR.muted }}
+            >
+              <IconSettings />
+            </button>
           </div>
         </div>
       </div>
-      <div className="max-w-md mx-auto px-4 py-5">
+      <div className="max-w-md mx-auto px-4 py-5" style={{ paddingBottom: `calc(${TAB_BAR_HEIGHT + 24}px + env(safe-area-inset-bottom))` }}>
         {saveError ? (
           <div style={{ fontSize: '11.5px', color: COLOR.red, marginBottom: '12px', padding: '8px 10px', borderRadius: '8px', border: `1px solid ${COLOR.red}`, background: 'rgba(181,87,74,0.1)' }}>
             Your last save didn't go through — your browser's storage may be full. Try Data &amp; Progress → Export to back up what you have, then free up some space.
@@ -1735,26 +1701,8 @@ function CertStudyApp() {
           />
         ) : (
         <React.Fragment>
-        <div className="flex gap-1 mb-4" style={{ boxShadow: SHADOW.card, background: COLOR.surface, padding: '4px', borderRadius: '12px', border: `1px solid ${COLOR.border}` }}>
-          {[
-            { m: 'path', label: 'Path' },
-            { m: 'quiz', label: 'Practice' },
-            { m: 'learn', label: 'Reference' },
-            { m: 'exam', label: 'Exam' },
-          ].map((t) => (
-            <button
-              key={t.m}
-              onClick={() => setMode(t.m)}
-              className="flex-1 btn-flat"
-              style={{ padding: '8px 2px', borderRadius: '9px', fontSize: '11px', fontWeight: 600, background: mode === t.m ? (t.m === 'exam' ? COLOR.gold : COLOR.primary) : 'transparent', color: mode === t.m ? COLOR.onAccent : COLOR.muted }}
-            >
-              {t.label}
-            </button>
-          ))}
-        </div>
-
         {mode === 'learn' && (
-          <div className="flex gap-1 mb-4" style={{ background: COLOR.bg, padding: '3px', borderRadius: '10px', border: `1px solid ${COLOR.border}` }}>
+          <div className="flex gap-1 mb-4" style={{ background: COLOR.bg, padding: '3px', borderRadius: '10px', border: `2px solid ${COLOR.border}` }}>
             <button
               onClick={() => setLearnView('cards')}
               className="flex-1 btn-flat"
@@ -1803,7 +1751,7 @@ function CertStudyApp() {
         )}
 
         {mode === 'learn' && learnView === 'cards' && (toughCount > 0 || cardDeck === 'tough') && (
-          <div className="flex gap-1 mb-3" style={{ background: COLOR.bg, padding: '3px', borderRadius: '10px', border: `1px solid ${COLOR.border}` }}>
+          <div className="flex gap-1 mb-3" style={{ background: COLOR.bg, padding: '3px', borderRadius: '10px', border: `2px solid ${COLOR.border}` }}>
             {[['all', 'All cards'], ['tough', `Tough terms (${cardDeck === 'tough' ? toughIds.length : toughCount})`]].map(([key, label]) => (
               <button
                 key={key}
@@ -1827,12 +1775,12 @@ function CertStudyApp() {
           </div>
         )}
         {mode === 'learn' && learnView === 'cards' && cardDeck === 'tough' && filteredFlashcards.length === 0 && (
-          <div style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderRadius: '14px', padding: '22px 16px', textAlign: 'center' }}>
+          <div style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `2px solid ${COLOR.border}`, borderRadius: '14px', padding: '22px 16px', textAlign: 'center' }}>
             <div className="itil-display" style={{ fontSize: '17px', fontWeight: 600, marginBottom: '6px' }}>Tough terms cleared</div>
             <div style={{ fontSize: '13px', color: COLOR.muted, lineHeight: 1.5, marginBottom: '12px' }}>
               {activeCat === 'all' ? 'Nothing left in this deck.' : 'No tough terms in this category.'} Cards show up here whenever you rate them OK or lower.
             </div>
-            <button onClick={() => openCardDeck('all')} className="btn-flat" style={{ padding: '8px 14px', borderRadius: '10px', fontSize: '12px', fontWeight: 600, border: `1px solid ${COLOR.border}`, color: COLOR.text }}>Back to all cards</button>
+            <button onClick={() => openCardDeck('all')} className="btn-flat" style={{ padding: '8px 14px', borderRadius: '10px', fontSize: '12px', fontWeight: 600, border: `2px solid ${COLOR.border}`, color: COLOR.text }}>Back to all cards</button>
           </div>
         )}
         {mode === 'learn' && learnView === 'cards' && !(cardDeck === 'tough' && filteredFlashcards.length === 0) && (
@@ -2093,7 +2041,7 @@ function CertStudyApp() {
                     disabled={examIndex === 0}
                     onClick={() => setExamIndex((i) => Math.max(0, i - 1))}
                     className="flex-1"
-                    style={{ padding: '12px', borderRadius: '12px', border: `1px solid ${COLOR.border}`, background: 'transparent', color: examIndex === 0 ? COLOR.border : COLOR.text, fontSize: '14px', fontWeight: 600 }}
+                    style={{ padding: '12px', borderRadius: '12px', border: `2px solid ${COLOR.border}`, background: 'transparent', color: examIndex === 0 ? COLOR.border : COLOR.text, fontSize: '14px', fontWeight: 600 }}
                   >
                     Previous
                   </button>
@@ -2205,6 +2153,7 @@ function CertStudyApp() {
         </React.Fragment>
         )}
       </div>
+      <BottomTabBar mode={mode} onChange={setMode} />
     </div>
   );
 }

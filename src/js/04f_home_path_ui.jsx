@@ -70,14 +70,14 @@ function PathDeepStep({ cards, questions, categories, flashcardsData, api, onRet
     return (
       <div>
         <div style={{ fontSize: '11px', color: COLOR.muted, marginBottom: '8px' }}>Term {page + 1} of {cards.length} · the longer explanation behind each one</div>
-        <div style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderRadius: '16px', padding: '18px 16px' }}>
+        <div style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `2px solid ${COLOR.border}`, borderRadius: '16px', padding: '18px 16px' }}>
           <div className="itil-display" style={{ fontSize: '18px', fontWeight: 600, marginBottom: '8px' }}>{card.front}</div>
           <div style={{ fontSize: '14px', lineHeight: 1.6, marginBottom: '10px' }}><GlossText text={card.back} pool={flashcardsData} max={2} blockId={'dd-b' + page} /></div>
           <div style={{ fontSize: '13px', lineHeight: 1.6, color: COLOR.muted, borderLeft: `2px solid ${COLOR.primary}`, paddingLeft: '10px' }}><GlossText text={card.detail} pool={flashcardsData} max={2} blockId={'dd-d' + page} /></div>
         </div>
         <div className="flex gap-2" style={{ marginTop: '14px' }}>
           {page > 0 && (
-            <button onClick={() => setPage((n) => n - 1)} style={{ padding: '12px 16px', borderRadius: '12px', border: `1px solid ${COLOR.border}`, color: COLOR.text, fontSize: '14px', fontWeight: 600, background: 'transparent' }}>‹ Back</button>
+            <button onClick={() => setPage((n) => n - 1)} style={{ padding: '12px 16px', borderRadius: '12px', border: `2px solid ${COLOR.border}`, color: COLOR.text, fontSize: '14px', fontWeight: 600, background: 'transparent' }}>‹ Back</button>
           )}
           <button
             onClick={() => (last ? setPhase('quiz') : setPage((n) => n + 1))}
@@ -131,7 +131,7 @@ function PathBridgeStep({ bridge, questions, planKeys, api, onRetry, onDone, onO
   }
   return (
     <div>
-      <div style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderRadius: '16px', padding: '16px', marginBottom: '12px' }}>
+      <div style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `2px solid ${COLOR.border}`, borderRadius: '16px', padding: '16px', marginBottom: '12px' }}>
         <div className="itil-display" style={{ fontSize: '17px', fontWeight: 600, marginBottom: '6px' }}>{bridge.title}</div>
         <div style={{ fontSize: '13.5px', lineHeight: 1.6 }}><GlossText text={bridge.summary} pool={pool} max={3} blockId="br-sum" /></div>
       </div>
@@ -140,7 +140,7 @@ function PathBridgeStep({ bridge, questions, planKeys, api, onRetry, onDone, onO
         const t = TRACKS.find((x) => x.key === a.track);
         const accent = trackAccent(a.track);
         return (
-          <div key={a.track} style={{ background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderLeft: `3px solid ${accent}`, borderRadius: '12px', padding: '10px 12px', marginBottom: '8px' }}>
+          <div key={a.track} style={{ background: COLOR.surface, border: `2px solid ${COLOR.border}`, borderLeft: `3px solid ${accent}`, borderRadius: '12px', padding: '10px 12px', marginBottom: '8px' }}>
             <div className="flex items-center gap-2" style={{ marginBottom: '3px' }}>
               <span style={{ fontSize: '12.5px', fontWeight: 700, color: accent }}>{t ? t.label : a.track}</span>
               {planKeys.includes(a.track) && <span style={{ fontSize: '10.5px', color: COLOR.muted }}>in your plan</span>}
@@ -207,7 +207,7 @@ function HomeStudyPath({ tracks, remaining, progress, optionalProgress, mode, on
   }
 
   return (
-    <div style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderRadius: '16px', padding: '16px', marginBottom: '14px' }}>
+    <div style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `2px solid ${COLOR.border}`, borderRadius: '16px', padding: '16px', marginBottom: '14px' }}>
       <div className="flex justify-between items-baseline" style={{ marginBottom: '8px' }}>
         <div className="itil-display" style={{ fontSize: '17px', fontWeight: 600 }}>Your study path</div>
         <div style={{ fontSize: '12px', color: COLOR.muted }}>{progress.done} of {progress.total} steps</div>
@@ -215,7 +215,7 @@ function HomeStudyPath({ tracks, remaining, progress, optionalProgress, mode, on
       <div style={{ height: '6px', borderRadius: '3px', background: COLOR.surfaceRaised, overflow: 'hidden', marginBottom: '8px' }}>
         <div style={{ height: '100%', width: `${progress.pct}%`, background: COLOR.success, borderRadius: '3px' }} />
       </div>
-      <div className="flex gap-1" style={{ background: COLOR.bg, padding: '3px', borderRadius: '10px', border: `1px solid ${COLOR.border}`, marginBottom: '6px' }}>
+      <div className="flex gap-1" style={{ background: COLOR.bg, padding: '3px', borderRadius: '10px', border: `2px solid ${COLOR.border}`, marginBottom: '6px' }}>
         {HOME_PATH_MODES.map((m) => (
           <button
             key={m}
@@ -249,7 +249,7 @@ function HomeStudyPath({ tracks, remaining, progress, optionalProgress, mode, on
       </div>
       {certCount > 1 && showOrder && (
         <div style={{ marginTop: '-4px', marginBottom: '12px' }}>
-          <div className="flex gap-1" style={{ background: COLOR.bg, padding: '3px', borderRadius: '10px', border: `1px solid ${COLOR.border}`, marginBottom: '6px' }}>
+          <div className="flex gap-1" style={{ background: COLOR.bg, padding: '3px', borderRadius: '10px', border: `2px solid ${COLOR.border}`, marginBottom: '6px' }}>
             {HOME_PATH_ORDERS.map((o) => (
               <button
                 key={o}
@@ -270,9 +270,9 @@ function HomeStudyPath({ tracks, remaining, progress, optionalProgress, mode, on
           <div className="flex gap-2">
             <button
               onClick={() => onStart(first)}
-              className="flex-1"
+              className={firstOptional ? 'flex-1' : 'flex-1 btn-3d'}
               style={{
-                padding: '13px', borderRadius: '12px', textAlign: 'left', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px', minWidth: 0,
+                padding: '13px 14px', borderRadius: '14px', textAlign: 'left', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px', minWidth: 0,
                 background: firstOptional ? 'transparent' : accent, color: firstOptional ? accent : COLOR.onAccent,
                 border: firstOptional ? `1px dashed ${accent}` : '1px solid transparent',
               }}
@@ -288,7 +288,7 @@ function HomeStudyPath({ tracks, remaining, progress, optionalProgress, mode, on
             {firstOptional && (
               <button
                 onClick={() => onSkip(first)}
-                style={{ padding: '0 14px', borderRadius: '12px', border: `1px solid ${COLOR.border}`, background: 'transparent', color: COLOR.muted, fontSize: '12px', fontWeight: 600 }}
+                style={{ padding: '0 14px', borderRadius: '12px', border: `2px solid ${COLOR.border}`, background: 'transparent', color: COLOR.muted, fontSize: '12px', fontWeight: 600 }}
               >
                 Skip
               </button>
@@ -328,11 +328,11 @@ function HomeStudyPath({ tracks, remaining, progress, optionalProgress, mode, on
             <div key={e.doneKey + e.step.id} className="flex items-center gap-2" style={{ display: 'flex' }}>
               <button
                 onClick={() => onStart(e)}
-                className="btn-flat"
-                style={{ flex: 1, minWidth: 0, textAlign: 'left', background: 'transparent', color: COLOR.text, display: 'flex', alignItems: 'center', gap: '10px', padding: '6px 0' }}
+                className="btn-flat trail-node"
+                style={{ flex: 1, minWidth: 0, textAlign: 'left', background: 'transparent', color: COLOR.text, display: 'flex', alignItems: 'center', gap: '12px', padding: '8px 0' }}
               >
-                <span style={{ width: '28px', height: '28px', borderRadius: '50%', flexShrink: 0, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', background: COLOR.surfaceRaised, color: COLOR.muted, border: e.step.optional ? `1px dashed ${COLOR.muted}` : 'none' }}>
-                  <PathIcon kind={e.step.kind === 'deep' || e.step.kind === 'bridge' ? 'read' : e.step.kind} size={15} />
+                <span className="node-face" style={{ width: '44px', height: '44px', borderRadius: '50%', flexShrink: 0, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', background: COLOR.surfaceRaised, color: COLOR.muted, border: e.step.optional ? `2px dashed ${COLOR.muted}` : `2px solid ${COLOR.border}`, boxShadow: '0 4px 0 rgba(0,0,0,0.30)' }}>
+                  <PathIcon kind={e.step.kind === 'deep' || e.step.kind === 'bridge' ? 'read' : e.step.kind} size={20} />
                 </span>
                 <span style={{ flex: 1, minWidth: 0 }}>
                   <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -483,7 +483,7 @@ function HomeReviewCard({ weakTotal, toughTotal, gamesTotal, casesTotal, reminde
     gamesTotal > 0 && tile('Missed games', gamesTotal, `${gamesTotal} item${gamesTotal === 1 ? '' : 's'} to redo`, 'games', COLOR.primary),
   ].filter(Boolean);
   return (
-    <div style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderRadius: '16px', padding: '14px 16px', marginBottom: '14px' }}>
+    <div style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `2px solid ${COLOR.border}`, borderRadius: '16px', padding: '14px 16px', marginBottom: '14px' }}>
       <div className="flex justify-between items-baseline">
         <div className="itil-display" style={{ fontSize: '16px', fontWeight: 600 }}>Review across your certs</div>
         <div style={{ fontSize: '12px', color: nudge.due ? COLOR.gold : COLOR.muted, fontWeight: nudge.due ? 700 : 400 }}>{waiting} waiting</div>
@@ -512,7 +512,7 @@ function HomeReviewCard({ weakTotal, toughTotal, gamesTotal, casesTotal, reminde
         <select
           value={reminder ? reminder.days : REVIEW_REMINDER_DEFAULT_DAYS}
           onChange={(e) => onSetReminder(Number(e.target.value))}
-          style={{ padding: '4px 8px', borderRadius: '8px', fontSize: '12px', border: `1px solid ${COLOR.border}`, background: COLOR.surfaceRaised, color: COLOR.text }}
+          style={{ padding: '4px 8px', borderRadius: '8px', fontSize: '12px', border: `2px solid ${COLOR.border}`, background: COLOR.surfaceRaised, color: COLOR.text }}
         >
           {REVIEW_REMINDER_OPTIONS.map((o) => <option key={o.days} value={o.days}>{o.label}</option>)}
         </select>
@@ -590,9 +590,9 @@ function HomeReviewRun({ kind, trackKeys, results, seenLog, srs, speech, makeApi
 
   if (!phase) {
     return (
-      <div style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderRadius: '16px', padding: '22px', textAlign: 'center' }}>
+      <div style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `2px solid ${COLOR.border}`, borderRadius: '16px', padding: '22px', textAlign: 'center' }}>
         <div className="itil-display" style={{ fontSize: '17px', fontWeight: 600, marginBottom: '6px' }}>Nothing left to review</div>
-        <button onClick={onExit} style={{ marginTop: '10px', padding: '11px 16px', borderRadius: '12px', border: `1px solid ${COLOR.border}`, background: 'transparent', color: COLOR.text, fontSize: '13px', fontWeight: 600 }}>Back to Home</button>
+        <button onClick={onExit} style={{ marginTop: '10px', padding: '11px 16px', borderRadius: '12px', border: `2px solid ${COLOR.border}`, background: 'transparent', color: COLOR.text, fontSize: '13px', fontWeight: 600 }}>Back to Home</button>
       </div>
     );
   }
@@ -600,13 +600,13 @@ function HomeReviewRun({ kind, trackKeys, results, seenLog, srs, speech, makeApi
   let body;
   if (finished) {
     body = (
-      <div style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderRadius: '16px', padding: '22px', textAlign: 'center' }}>
+      <div style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `2px solid ${COLOR.border}`, borderRadius: '16px', padding: '22px', textAlign: 'center' }}>
         <div className="itil-display" style={{ fontSize: '18px', fontWeight: 600 }}>Round complete</div>
         <div style={{ fontSize: '12.5px', color: COLOR.muted, marginTop: '6px', lineHeight: 1.5 }}>
           Anything you got right is recorded to its own cert, and flashcards rated Good or Easy have left the Tough terms deck. What's still weak stays for next time.
         </div>
-        <button onClick={retry} style={{ width: '100%', marginTop: '16px', padding: '12px', borderRadius: '12px', background: COLOR.primary, color: COLOR.onAccent, fontSize: '14px', fontWeight: 700 }}>Another round</button>
-        <button onClick={onExit} style={{ width: '100%', marginTop: '8px', padding: '11px', borderRadius: '12px', border: `1px solid ${COLOR.border}`, background: 'transparent', color: COLOR.text, fontSize: '13px', fontWeight: 600 }}>Back to Home</button>
+        <button className="btn-3d" onClick={retry} style={{ width: '100%', marginTop: '16px', padding: '12px', borderRadius: '12px', background: COLOR.primary, color: COLOR.onAccent, fontSize: '14px', fontWeight: 700 }}>Another round</button>
+        <button onClick={onExit} style={{ width: '100%', marginTop: '8px', padding: '11px', borderRadius: '12px', border: `2px solid ${COLOR.border}`, background: 'transparent', color: COLOR.text, fontSize: '13px', fontWeight: 600 }}>Back to Home</button>
       </div>
     );
   } else if (phase.phase === 'weak') {
@@ -650,7 +650,7 @@ function HomeReviewRun({ kind, trackKeys, results, seenLog, srs, speech, makeApi
         categories={phase.categories}
         flashcardsData={phase.flashcards}
         header={(
-          <div style={{ boxShadow: SHADOW.card, background: COLOR.surfaceRaised, border: `1px solid ${COLOR.border}`, borderRadius: '14px', padding: '14px 16px', marginBottom: '14px' }}>
+          <div style={{ boxShadow: SHADOW.card, background: COLOR.surfaceRaised, border: `2px solid ${COLOR.border}`, borderRadius: '14px', padding: '14px 16px', marginBottom: '14px' }}>
             <div style={{ fontSize: '11.5px', color: COLOR.muted, textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: '4px' }}>{catLabel} · {cs.title}</div>
             <div style={{ fontSize: '13.5px', lineHeight: 1.55 }}>{cs.scenario}</div>
           </div>

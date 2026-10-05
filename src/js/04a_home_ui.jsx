@@ -119,7 +119,7 @@ function DataPanel({
         </div>
 
         {speechSupported && (
-          <div style={{ marginTop: '14px', padding: '14px', borderRadius: '14px', background: COLOR.surface, border: `1px solid ${COLOR.border}` }}>
+          <div style={{ marginTop: '14px', padding: '14px', borderRadius: '14px', background: COLOR.surface, border: `2px solid ${COLOR.border}` }}>
             <div style={{ fontSize: '13.5px', fontWeight: 600, marginBottom: '4px' }}>Voice &amp; speech</div>
             <div style={{ fontSize: '11.5px', color: COLOR.muted, marginBottom: '10px', lineHeight: 1.4 }}>
               Controls every 🔊 Listen button, plus Verbal Quiz mode. Saved on this device only.
@@ -143,7 +143,7 @@ function DataPanel({
               onChange={(e) => onSetTtsVoiceURI(e.target.value)}
               style={{
                 width: '100%', padding: '9px 10px', borderRadius: '10px', marginBottom: '10px',
-                background: COLOR.surfaceRaised, border: `1px solid ${COLOR.border}`, color: COLOR.text, fontSize: '13px',
+                background: COLOR.surfaceRaised, border: `2px solid ${COLOR.border}`, color: COLOR.text, fontSize: '13px',
               }}
             >
               <option value="">Auto (picks the best-sounding voice available)</option>
@@ -162,12 +162,12 @@ function DataPanel({
           </div>
         )}
 
-        <div style={{ marginTop: '14px', padding: '14px', borderRadius: '14px', background: COLOR.surface, border: `1px solid ${COLOR.border}` }}>
+        <div style={{ marginTop: '14px', padding: '14px', borderRadius: '14px', background: COLOR.surface, border: `2px solid ${COLOR.border}` }}>
           <div style={{ fontSize: '13.5px', fontWeight: 600, marginBottom: '4px' }}>Export progress</div>
           <div style={{ fontSize: '11.5px', color: COLOR.muted, marginBottom: '10px', lineHeight: 1.4 }}>
             Download every track's quiz/exam history, flashcard mastery, streak, and achievements as a JSON file — a backup, or a way to move progress to a new device.
           </div>
-          <button
+          <button className="btn-3d"
             onClick={onExport}
             style={{ width: '100%', padding: '10px', borderRadius: '10px', background: COLOR.primary, color: COLOR.onAccent, fontSize: '13px', fontWeight: 600 }}
           >
@@ -175,7 +175,7 @@ function DataPanel({
           </button>
         </div>
 
-        <div style={{ marginTop: '12px', padding: '14px', borderRadius: '14px', background: COLOR.surface, border: `1px solid ${COLOR.border}` }}>
+        <div style={{ marginTop: '12px', padding: '14px', borderRadius: '14px', background: COLOR.surface, border: `2px solid ${COLOR.border}` }}>
           <div style={{ fontSize: '13.5px', fontWeight: 600, marginBottom: '4px' }}>Import progress</div>
           <div style={{ fontSize: '11.5px', color: COLOR.muted, marginBottom: '10px', lineHeight: 1.4 }}>
             Restore from a previously exported file. This replaces all progress currently saved in this browser.
@@ -204,7 +204,7 @@ function DataPanel({
           )}
         </div>
 
-        <div style={{ marginTop: '12px', padding: '14px', borderRadius: '14px', background: COLOR.surface, border: `1px solid ${COLOR.border}` }}>
+        <div style={{ marginTop: '12px', padding: '14px', borderRadius: '14px', background: COLOR.surface, border: `2px solid ${COLOR.border}` }}>
           <div style={{ fontSize: '13.5px', fontWeight: 600, marginBottom: '4px' }}>Reset progress</div>
           {!confirmingReset ? (
             <>
@@ -223,7 +223,7 @@ function DataPanel({
               <div style={{ fontSize: '12.5px', marginBottom: '8px' }}>Clear saved progress for {trackLabel}? Export a backup first if you're not sure.</div>
               <div className="flex gap-2">
                 <button onClick={() => { onReset(); setConfirmingReset(false); }} style={{ flex: 1, background: COLOR.red, color: '#fff', borderRadius: '8px', padding: '8px', fontSize: '13px', fontWeight: 600 }}>Clear it</button>
-                <button onClick={() => setConfirmingReset(false)} style={{ flex: 1, background: 'transparent', border: `1px solid ${COLOR.border}`, color: COLOR.text, borderRadius: '8px', padding: '8px', fontSize: '13px' }}>Cancel</button>
+                <button onClick={() => setConfirmingReset(false)} style={{ flex: 1, background: 'transparent', border: `2px solid ${COLOR.border}`, color: COLOR.text, borderRadius: '8px', padding: '8px', fontSize: '13px' }}>Cancel</button>
               </div>
             </div>
           )}
@@ -253,7 +253,7 @@ function DailyGoalRing({ dailyGoal, onSetTarget, note }) {
     <div style={{
       display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '10px',
       padding: '10px 12px', borderRadius: '14px', background: COLOR.surface,
-      border: `1px solid ${COLOR.border}`, boxShadow: SHADOW.card,
+      border: `2px solid ${COLOR.border}`, boxShadow: SHADOW.card,
     }}>
       <button
         onClick={() => setEditing((e) => !e)}
@@ -289,14 +289,14 @@ function DailyGoalRing({ dailyGoal, onSetTarget, note }) {
         <div style={{ display: 'flex', alignItems: 'center', gap: '4px', flexShrink: 0 }}>
           <button
             onClick={() => onSetTarget(Math.max(5, target - 5))}
-            style={{ width: '26px', height: '26px', borderRadius: '8px', border: `1px solid ${COLOR.border}`, background: COLOR.surfaceRaised, color: COLOR.text, fontSize: '15px', lineHeight: 1 }}
+            style={{ width: '26px', height: '26px', borderRadius: '8px', border: `2px solid ${COLOR.border}`, background: COLOR.surfaceRaised, color: COLOR.text, fontSize: '15px', lineHeight: 1 }}
           >
             −
           </button>
           <span style={{ fontSize: '12px', color: COLOR.muted, minWidth: '18px', textAlign: 'center' }}>{target}</span>
           <button
             onClick={() => onSetTarget(target + 5)}
-            style={{ width: '26px', height: '26px', borderRadius: '8px', border: `1px solid ${COLOR.border}`, background: COLOR.surfaceRaised, color: COLOR.text, fontSize: '15px', lineHeight: 1 }}
+            style={{ width: '26px', height: '26px', borderRadius: '8px', border: `2px solid ${COLOR.border}`, background: COLOR.surfaceRaised, color: COLOR.text, fontSize: '15px', lineHeight: 1 }}
           >
             +
           </button>
@@ -320,7 +320,7 @@ function TrackListDropdown({ tracks, masteries, certPlan, onSelectTrack, onAddTo
         style={{
           width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
           padding: '12px 14px', borderRadius: '12px', background: COLOR.surface,
-          border: `1px solid ${COLOR.border}`, boxShadow: SHADOW.card,
+          border: `2px solid ${COLOR.border}`, boxShadow: SHADOW.card,
         }}
       >
         <span style={{ fontSize: '13px', fontWeight: 600, color: COLOR.text }}>{label || `All tracks (${tracks.length})`}</span>
@@ -339,7 +339,7 @@ function TrackListDropdown({ tracks, masteries, certPlan, onSelectTrack, onAddTo
                 onClick={() => onSelectTrack(t.key)}
                 style={{
                   textAlign: 'left', display: 'flex', alignItems: 'center', gap: '10px', padding: '12px 14px', borderRadius: '12px',
-                  background: COLOR.surface, border: `1px solid ${COLOR.border}`, boxShadow: SHADOW.card,
+                  background: COLOR.surface, border: `2px solid ${COLOR.border}`, boxShadow: SHADOW.card,
                 }}
               >
                 <div style={{ flex: 1, minWidth: 0 }}>
@@ -422,7 +422,7 @@ function DailyQuestionCard({ q, trackLabel, stored, onAnswer }) {
         aria-expanded={open}
         style={{
           width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px', textAlign: 'left',
-          padding: '12px 14px', borderRadius: '12px', background: COLOR.surface, border: `1px solid ${COLOR.border}`, boxShadow: SHADOW.card,
+          padding: '12px 14px', borderRadius: '12px', background: COLOR.surface, border: `2px solid ${COLOR.border}`, boxShadow: SHADOW.card,
         }}
       >
         <span style={{ minWidth: 0 }}>
@@ -474,7 +474,7 @@ function DailyVocabCard({ card, trackLabel, revealed, onReveal, pool }) {
         onClick={() => { if (!revealed) onReveal(); }}
         style={{
           boxShadow: SHADOW.card, background: revealed ? COLOR.surfaceRaised : COLOR.surface,
-          border: `1px solid ${COLOR.border}`, borderRadius: '12px', padding: '12px 14px',
+          border: `2px solid ${COLOR.border}`, borderRadius: '12px', padding: '12px 14px',
           cursor: revealed ? 'default' : 'pointer',
         }}
       >
@@ -810,7 +810,7 @@ function HomeView({ tracks, results, seenLog, stats, certPlan, speech, srs, make
         onClick={onOpenGlossary}
         style={{
           width: '100%', textAlign: 'left', marginTop: '10px', padding: '12px 14px', borderRadius: '12px',
-          background: COLOR.surface, border: `1px solid ${COLOR.border}`, boxShadow: SHADOW.card,
+          background: COLOR.surface, border: `2px solid ${COLOR.border}`, boxShadow: SHADOW.card,
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
         }}
       >
@@ -1001,7 +1001,7 @@ function CertPathPanel({ tracks, certPlan, onAddTrack, onRemoveTrack, onMove, on
             const accent = trackAccent(key);
             const scheduledDate = certPlan.scheduled[key];
             return (
-              <div key={key} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 12px', borderRadius: '12px', background: COLOR.surface, border: `1px solid ${COLOR.border}` }}>
+              <div key={key} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 12px', borderRadius: '12px', background: COLOR.surface, border: `2px solid ${COLOR.border}` }}>
                 <div style={{ fontSize: '12px', color: COLOR.muted, width: '14px', flexShrink: 0, textAlign: 'center' }}>{i + 1}</div>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ fontSize: '13px', fontWeight: 600, color: accent }}>{t.label}</div>
@@ -1009,7 +1009,7 @@ function CertPathPanel({ tracks, certPlan, onAddTrack, onRemoveTrack, onMove, on
                     type="date"
                     value={scheduledDate || ''}
                     onChange={(e) => onSetScheduled(key, e.target.value || null)}
-                    style={{ marginTop: '4px', fontSize: '11px', color: COLOR.muted, background: 'transparent', border: `1px solid ${COLOR.border}`, borderRadius: '6px', padding: '3px 5px', maxWidth: '130px' }}
+                    style={{ marginTop: '4px', fontSize: '11px', color: COLOR.muted, background: 'transparent', border: `2px solid ${COLOR.border}`, borderRadius: '6px', padding: '3px 5px', maxWidth: '130px' }}
                   />
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', flexShrink: 0 }}>
@@ -1036,7 +1036,7 @@ function CertPathPanel({ tracks, certPlan, onAddTrack, onRemoveTrack, onMove, on
               <select
                 value={addingKey}
                 onChange={(e) => setAddingKey(e.target.value)}
-                style={{ flex: 1, minWidth: 0, padding: '9px', borderRadius: '9px', background: COLOR.surface, border: `1px solid ${COLOR.border}`, color: COLOR.text, fontSize: '13px' }}
+                style={{ flex: 1, minWidth: 0, padding: '9px', borderRadius: '9px', background: COLOR.surface, border: `2px solid ${COLOR.border}`, color: COLOR.text, fontSize: '13px' }}
               >
                 <option value="">Choose a cert…</option>
                 {addable.map((t) => <option key={t.key} value={t.key}>{t.label} — {t.subtitle}</option>)}
@@ -1056,7 +1056,7 @@ function CertPathPanel({ tracks, certPlan, onAddTrack, onRemoveTrack, onMove, on
           <div>
             <button
               onClick={() => setCompletedOpen((o) => !o)}
-              style={{ width: '100%', textAlign: 'left', background: COLOR.surfaceRaised, border: `1px solid ${COLOR.border}`, borderRadius: '12px', padding: '10px 12px', fontSize: '12.5px', color: COLOR.text, fontWeight: 600 }}
+              style={{ width: '100%', textAlign: 'left', background: COLOR.surfaceRaised, border: `2px solid ${COLOR.border}`, borderRadius: '12px', padding: '10px 12px', fontSize: '12.5px', color: COLOR.text, fontWeight: 600 }}
             >
               {completedOpen ? '▾ ' : '▸ '}Completed ({completedOrder.length})
             </button>
@@ -1065,7 +1065,7 @@ function CertPathPanel({ tracks, certPlan, onAddTrack, onRemoveTrack, onMove, on
                 {completedOrder.map((key) => {
                   const t = trackByKey(key);
                   return (
-                    <div key={key} style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '10px 12px', borderRadius: '12px', background: COLOR.surface, border: `1px solid ${COLOR.border}` }}>
+                    <div key={key} style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '10px 12px', borderRadius: '12px', background: COLOR.surface, border: `2px solid ${COLOR.border}` }}>
                       <div style={{ fontSize: '13px', color: COLOR.success, flexShrink: 0 }}>✓</div>
                       <div style={{ flex: 1, minWidth: 0 }}>
                         <div style={{ fontSize: '13px', fontWeight: 600, color: COLOR.text }}>{t.label}</div>

@@ -90,8 +90,16 @@ function useClickOutsideToClose(active, onClose) {
   }, [active, onClose]);
 }
 
+// Fixed chrome heights: the sticky top bar and the bottom tab bar. Sticky unit
+// banners sit just under the top bar, and page content is padded clear of the
+// tab bar, so both numbers live here.
+const APP_HEADER_HEIGHT = 56;
+const TAB_BAR_HEIGHT = 68;
+
 const SHADOW = {
-  card: '0 3px 10px rgba(0,0,0,0.32), inset 0 1px 0 rgba(255,255,255,0.04)',
+  // A flat, solid edge under each card (the same "raised" cue the 3D buttons
+  // use) instead of a blurry drop shadow.
+  card: '0 3px 0 rgba(0,0,0,0.22)',
 };
 
 // Wireframe/line-art icons for header and menu chrome (Feather-icons style)
@@ -226,6 +234,25 @@ function useTtsPrefs() {
   const setTtsVoiceURI = (voiceURI) => { setTtsVoiceURIState(voiceURI); persist(ttsRate, voiceURI); };
 
   return { ttsRate, ttsVoiceURI, setTtsRate, setTtsVoiceURI };
+}
+
+// Icons for the bottom tab bar (Home, Path, Practice, Reference, Exam).
+function TabIcon({ kind, size = 24 }) {
+  const c = { width: size, height: size, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 2.2, strokeLinecap: 'round', strokeLinejoin: 'round' };
+  switch (kind) {
+    case 'home':
+      return <svg {...c}><path d="M3 11.5 12 4l9 7.5" /><path d="M5.5 10v9.5h13V10" /><path d="M10 19.5v-5h4v5" /></svg>;
+    case 'path':
+      return <svg {...c}><circle cx="6" cy="19" r="2.2" /><circle cx="18" cy="5" r="2.2" /><path d="M8 19h5.5a3.5 3.5 0 0 0 0-7h-3a3.5 3.5 0 0 1 0-7H16" /></svg>;
+    case 'quiz':
+      return <svg {...c}><polygon points="13 2 4 14 12 14 11 22 20 10 12 10 13 2" /></svg>;
+    case 'learn':
+      return <svg {...c}><path d="M2 4h6a4 4 0 0 1 4 4v13a3 3 0 0 0-3-3H2z" /><path d="M22 4h-6a4 4 0 0 0-4 4v13a3 3 0 0 1 3-3h7z" /></svg>;
+    case 'exam':
+      return <svg {...c}><path d="M5 3h14v5a7 7 0 0 1-14 0z" /><path d="M9 21h6M12 15v6" /><path d="M5 5H2.5a3 3 0 0 0 3 4M19 5h2.5a3 3 0 0 1-3 4" /></svg>;
+    default:
+      return null;
+  }
 }
 
 // A real sliding switch (not just an icon button) per the user's request —

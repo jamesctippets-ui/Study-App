@@ -1502,6 +1502,30 @@ trading away for shinier but shallower ones.
   mockups were left alone. Untried: the Practice picker, Cards, Exam intro,
   and quiz screens, and whether to remember the Question of the Day's open
   state.
+- [x] **Duolingo-style rework (patterns, not assets).** Borrowed the
+  interaction patterns of a gamified learning app, with our own look: (1) *Top
+  bar:* one slim sticky row: menu, the track chip (tap to switch), streak,
+  theme switch, achievements, settings. The old two-line header, the mastery %,
+  and the Home icon are gone. (2) *Bottom tab bar:* Home / Path / Practice /
+  Reference / Exam, always visible, replacing the segmented control; the four
+  track tabs act on the track in the top bar. Labels are bare text nodes so
+  `button:text-is("Practice")` selectors still work. (3) *Path trail:* each
+  unit is a full-width sticky banner (UNIT n · done/total, completed units turn
+  green) over a winding trail of big round nodes: done (green check, up to
+  three stars on quiz, game and checkpoint steps from the stored score), the
+  current step (purple, pulsing, bouncing START bubble, meta line), checkpoint
+  (gold) and not-yet (grey). The whole node plus label is one button. Weak
+  spots and Tough terms became a two-up tile row. (4) *Chunky controls:*
+  `.btn-3d` gives call-to-action buttons a solid pressable edge (22 buttons
+  plus the two path heroes); cards got 2px outlines and a flat bottom edge in
+  place of blurred shadows (`SHADOW.card`); Home's "Coming up" icons are 3D
+  nodes. (5) *Type:* Nunito (rounded, weights 500-900) replaces Inter for body
+  and Fraunces for headings; Inter stays as the fallback. Fonts come from
+  Google Fonts at runtime, so a fully offline first load falls back to Inter.
+  Untried: restyling Home itself as a trail (it still has the list-style "Coming
+  up" because the cross-cert skip and optional-step controls live there),
+  celebration screens on step completion, scrolling to the top when a question
+  advances in an exam, and a gentler lock state for later units.
 - [ ] **Home path — nothing blocking.** Untried: expanding the acronym
   dictionary through a second-reader fact-check, and letting a learner add
   their own acronyms or terms.
