@@ -5525,6 +5525,7 @@ function HomeView({ tracks, results, seenLog, stats, certPlan, speech, srs, make
   if (homeRun) {
     return (
       <HomePathRun
+        key={homeRun.nonce}
         run={homeRun}
         tracks={tracks}
         unitsByTrack={unitsByTrack}
