@@ -49,6 +49,20 @@ TRACK_MODULES = {
 }
 
 
+# Tracks whose data modules are still placeholders (content in progress). They
+# are registered and validated like any other, but left out of everything the
+# app ships (TRACKS, EXAM_CONFIG, DATA, dist/data) until removed from this set.
+UNFINISHED_TRACKS = {"ccna", "isc2cc", "sscp", "cissp", "ccsp", "cgrc", "csslp"}
+
+
+def live_tracks():
+    return [t for t in tracks.TRACKS if t["key"] not in UNFINISHED_TRACKS]
+
+
+def live_exam_config():
+    return {k: v for k, v in tracks.EXAM_CONFIG.items() if k not in UNFINISHED_TRACKS}
+
+
 # The app shuffles mc/ms option order at render time (prepareQuestion in
 # src/js/03_helpers.js), so any text that points at an option by position
 # ("the last option", "option B", "all of the above") names the wrong answer
@@ -594,6 +608,7 @@ def build_track_data():
             **({"compare": mod.COMPARE} if hasattr(mod, "COMPARE") else {}),
         }
         for key, mod in TRACK_MODULES.items()
+        if key not in UNFINISHED_TRACKS
     }
 
 
@@ -602,8 +617,8 @@ def build_data_json():
     return "\n".join(
         [
             f"const STORAGE_KEY = {json.dumps(tracks.STORAGE_KEY)};",
-            f"const TRACKS = {json.dumps(tracks.TRACKS)};",
-            f"const EXAM_CONFIG = {json.dumps(tracks.EXAM_CONFIG)};",
+            f"const TRACKS = {json.dumps(live_tracks())};",
+            f"const EXAM_CONFIG = {json.dumps(live_exam_config())};",
             f"const DATA = {json.dumps(data)};",
             f"const BRIDGES = {json.dumps(bridges_data.BRIDGES)};",
             f"const ACRONYMS = {json.dumps(acronyms_data.ACRONYMS)};",
@@ -628,7 +643,7 @@ def write_track_json_files():
     data = build_track_data()
     for key, track_data in data.items():
         (out_dir / f"{key}.json").write_text(json.dumps(track_data, indent=2) + "\n")
-    manifest = {"storageKey": tracks.STORAGE_KEY, "tracks": tracks.TRACKS, "examConfig": tracks.EXAM_CONFIG}
+    manifest = {"storageKey": tracks.STORAGE_KEY, "tracks": live_tracks(), "examConfig": live_exam_config()}
     (out_dir / "tracks.json").write_text(json.dumps(manifest, indent=2) + "\n")
     (out_dir / "bridges.json").write_text(json.dumps(bridges_data.BRIDGES, indent=2) + "\n")
     (out_dir / "acronyms.json").write_text(json.dumps(acronyms_data.ACRONYMS, indent=2) + "\n")
@@ -712,10 +727,10 @@ def main():
     sw_updated = sync_service_worker_cache_name(output)
     json_track_count = write_track_json_files()
 
-    total_flashcards = sum(len(mod.FLASHCARDS) for mod in TRACK_MODULES.values())
-    total_questions = sum(len(mod.QUESTIONS) for mod in TRACK_MODULES.values())
+    total_flashcards = sum(len(mod.FLASHCARDS) for k, mod in TRACK_MODULES.items() if k not in UNFINISHED_TRACKS)
+    total_questions = sum(len(mod.QUESTIONS) for k, mod in TRACK_MODULES.items() if k not in UNFINISHED_TRACKS)
     print(f"Built {out_path} ({len(output):,} bytes)")
-    print(f"  {len(tracks.TRACKS)} tracks, {total_flashcards} flashcards, {total_questions} questions")
+    print(f"  {len(live_tracks())} tracks, {total_flashcards} flashcards, {total_questions} questions")
     print(f"  dist/data/*.json refreshed ({json_track_count} tracks + tracks.json) — not yet consumed by index.html, see ROADMAP.md §10")
     if sw_updated:
         print("  service-worker.js CACHE_NAME updated (content changed) — commit it alongside index.html")
