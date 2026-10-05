@@ -877,6 +877,29 @@ function reviewReminderStatus(reminder, waiting, today) {
   return { due: daysSince >= reminder.days, daysSince };
 }
 
+// The cert Home calls "Studying now": the one its path is currently working
+// on (honouring the learner's order and Core/Extended setting), which is what
+// the track-specific tabs should open on when the learner hasn't picked a cert
+// themselves. Falls back to the first cert in the plan, then to focusTrackKey.
+function studyingTrackKey(tracks, certPlan, results, seenLog, stats) {
+  const pathKeys = activeCertOrder(tracks, certPlan).map((t) => t.key);
+  if (!pathKeys.length) return focusTrackKey(certPlan, stats.lastVisited);
+  const unitsByTrack = {};
+  const doneByTrack = {};
+  pathKeys.forEach((k) => {
+    unitsByTrack[k] = buildPathUnits(k).map((u) => ({ ...u, optional: buildOptionalSteps(k, u) }));
+    doneByTrack[k] = ((stats.path || {})[k] || {}).done || {};
+  });
+  doneByTrack[BRIDGE_DONE_KEY] = ((stats.path || {})[BRIDGE_DONE_KEY] || {}).done || {};
+  const homePath = normalizeHomePath(stats.homePath);
+  const studyKeys = homePath.order === 'smart'
+    ? smartCertOrder(pathKeys, certPlan, results, seenLog, certsMidUnit(unitsByTrack, pathKeys, doneByTrack))
+    : pathKeys;
+  const remaining = homePathRemaining(unitsByTrack, studyKeys, doneByTrack, homePath.mode);
+  const hit = remaining.find((e) => !e.step.optional) || remaining[0];
+  return (hit && hit.trackKey) || pathKeys[0];
+}
+
 function normalizeHomePath(raw) {
   return {
     mode: raw && HOME_PATH_MODES.includes(raw.mode) ? raw.mode : 'core',

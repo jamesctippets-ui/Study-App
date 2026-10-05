@@ -1560,6 +1560,15 @@ trading away for shinier but shallower ones.
   for a perfect score or test-out, six for a finished unit; a "Play a test
   sound" button in the same settings block. Silent when the browser has no Web
   Audio. Not covered: sounds for correct/incorrect answers.
+- [x] **Tabs follow your cert plan, not AZ-900.** The bottom bar's Path,
+  Practice, Reference and Exam tabs used to open on a hard-coded AZ-900 until
+  you picked a cert. They now open on the cert Home calls "Studying now"
+  (`studyingTrackKey` in 03_helpers.js: it honours your plan order, the Exam
+  date + weakest order, Core/Extended mode, and skips finished certs). The
+  active cert is also set to that once your saved data loads. Anything you pick
+  yourself still wins for the rest of the visit: the track switcher, a row on
+  Home, Continue where you left off, a deep link or the back button. With no
+  plan at all it falls back to the cert you last visited, then AZ-900.
 - [ ] **Home path — nothing blocking.** Untried: expanding the acronym
   dictionary through a second-reader fact-check, and letting a learner add
   their own acronyms or terms.

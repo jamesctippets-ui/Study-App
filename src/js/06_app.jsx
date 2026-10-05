@@ -138,6 +138,24 @@ function CertStudyApp() {
 
   const track = TRACKS.find((t) => t.key === activeTrack);
   const visibleTracks = TRACKS.filter((t) => !t.hidden);
+
+  // Which cert the track-specific tabs (Path / Practice / Reference / Exam)
+  // open on. Until the learner picks a cert themselves (switcher, a row on
+  // Home, a deep link, Continue), it follows their plan: the cert Home shows
+  // as "Studying now", not a hard-coded default.
+  const trackPickedRef = useRef(false);
+  const pickTrack = (key) => { trackPickedRef.current = true; setActiveTrack(key); };
+  const planDefaultTrack = () => studyingTrackKey(visibleTracks, certPlan, results, seenLog, stats);
+  const openTab = (m) => {
+    if (m !== 'home' && mode === 'home' && !trackPickedRef.current) setActiveTrack(planDefaultTrack());
+    setMode(m);
+  };
+  // Once saved data has loaded, adopt the plan's cert as the active one.
+  useEffect(() => {
+    if (syncMode === 'loading' || trackPickedRef.current) return;
+    setActiveTrack(planDefaultTrack());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [syncMode]);
   const categories = DATA[activeTrack].categories;
   const flashcardsData = DATA[activeTrack].flashcards;
   const questionsData = DATA[activeTrack].questions;
@@ -291,7 +309,7 @@ function CertStudyApp() {
   };
 
   const goToCertPathTrack = (key) => {
-    setActiveTrack(key);
+    pickTrack(key);
     setMode((m) => (m === 'home' ? 'path' : m));
     setShowCertPath(false);
   };
@@ -303,7 +321,7 @@ function CertStudyApp() {
   // an activeTrack swap mid-session, and Learn is always a safe, valid
   // landing spot for any track.
   const switchTrack = (key) => {
-    setActiveTrack(key);
+    pickTrack(key);
     setMode('path');
     setShowTrackSwitcher(false);
   };
@@ -963,7 +981,7 @@ function CertStudyApp() {
         setMode('home');
         return;
       }
-      setActiveTrack(parsed.trackKey);
+      pickTrack(parsed.trackKey);
       setMode(parsed.mode);
       if (parsed.mode === 'learn') setLearnView(parsed.learnView);
       if (parsed.mode === 'quiz') setQuizView(parsed.quizView);
@@ -1705,14 +1723,14 @@ function CertStudyApp() {
             onResume={() => {
               const lv = stats.lastVisited;
               if (!lv) return;
-              setActiveTrack(lv.track);
+              pickTrack(lv.track);
               if (lv.mode === 'learn' && ['cards', 'study', 'sheet'].includes(lv.view)) setLearnView(lv.view);
               if (lv.mode === 'quiz' && lv.view) setQuizView(lv.view);
               // Resuming the Path drops straight into the next unfinished step.
               setPathAutoStart(lv.mode === 'path');
               setMode(lv.mode);
             }}
-            onSelectTrack={(key) => { setActiveTrack(key); setMode('path'); }}
+            onSelectTrack={(key) => { pickTrack(key); setMode('path'); }}
             onAddToPath={addToCertPath}
             onOpenAbout={() => setShowAbout(true)}
             onOpenGlossary={() => setShowGlossary(true)}
@@ -2177,7 +2195,7 @@ function CertStudyApp() {
         </React.Fragment>
         )}
       </div>
-      <BottomTabBar mode={mode} onChange={setMode} />
+      <BottomTabBar mode={mode} onChange={openTab} />
     </div>
     </ProgressSummaryContext.Provider>
   );
