@@ -559,7 +559,7 @@ ACRONYMS = {
     'MCSB': {'exp': 'Microsoft cloud security benchmark'},
     'MIME': {'exp': 'Multipurpose Internet Mail Extensions'},
     'MSAL': {'exp': 'Microsoft Authentication Library'},
-    'MTD': {'exp': 'Mobile Threat Defense'},
+    'MTD': {'exp': ['Mobile Threat Defense', 'Maximum tolerable downtime']},
     'MTTD': {'exp': 'Mean time to detect'},
     'NFC': {'exp': 'Near Field Communication'},
     'P2S': {'exp': 'Point-to-site'},
@@ -575,6 +575,25 @@ ACRONYMS = {
     'VDA': {'exp': 'Virtual Desktop Access'},
     'VPC': {'exp': 'Virtual private cloud'},
     'YAML': {'exp': "YAML Ain't Markup Language"},
+    # ISC2 CC track
+    'AES': {'exp': 'Advanced Encryption Standard'},
+    'BCP': {'exp': 'Business continuity plan'},
+    'BIA': {'exp': 'Business impact analysis'},
+    'CIA': {'exp': 'Confidentiality, integrity and availability'},
+    'CSF': {'exp': 'Cybersecurity Framework'},
+    'DRP': {'exp': 'Disaster recovery plan'},
+    'DoS': {'exp': 'Denial of service'},
+    'FTP': {'exp': 'File Transfer Protocol'},
+    'GRC': {'exp': 'Governance, risk and compliance'},
+    'IPv4': {'exp': 'Internet Protocol version 4'},
+    'IPv6': {'exp': 'Internet Protocol version 6'},
+    'KPI': {'exp': 'Key performance indicator'},
+    'KRI': {'exp': 'Key risk indicator'},
+    'OSI': {'exp': 'Open Systems Interconnection'},
+    'RSA': {'exp': 'Rivest-Shamir-Adleman'},
+    'SP': {'exp': 'Special Publication', 'trigger': False},
+    'WEP': {'exp': 'Wired Equivalent Privacy'},
+    'WPA3': {'exp': 'Wi-Fi Protected Access 3'},
 }
 
 IGNORE = {
@@ -608,4 +627,7 @@ IGNORE = {
 
     # Added with the path games / definitions pass: SQL keywords, product names, sample names
     'AlertId', 'DACPAC', 'DROP', 'ETag', 'EXTRACT', 'GRANT', 'JOIN', 'KEY', 'NULL', 'O21', 'QUIC', 'REBUILD', 'RECOVERY', 'REVOKE', 'S14', 'STANDBY', 'STATE', 'TABLE', 'VIEW', 'VMware', 'WITH', 'XPath',
+
+    # ISC2 CC track
+    'CC', 'ISC2',
 }

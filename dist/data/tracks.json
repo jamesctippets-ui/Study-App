@@ -75,6 +75,11 @@
       "key": "ehrintegration",
       "label": "EHR Integration",
       "subtitle": "Healthcare Interoperability Concepts (not a certification)"
+    },
+    {
+      "key": "isc2cc",
+      "label": "ISC2 CC",
+      "subtitle": "Certified in Cybersecurity"
     }
   ],
   "examConfig": {
@@ -291,6 +296,28 @@
         {
           "label": "HL7 International: Version 2 (V2) standard overview",
           "url": "https://www.hl7.org/implement/standards/product_brief.cfm?product_id=185"
+        }
+      ]
+    },
+    "isc2cc": {
+      "length": 50,
+      "minutes": 60,
+      "passPct": 75,
+      "passLabel": "ISC2 scores this 0-1000 with 700 to pass, not a flat percentage. Treat 75%+ here as a safe buffer, not an exact predictor. The real exam is adaptive, with 100-125 questions in 2 hours; this mock is shorter.",
+      "experience": {
+        "level": "none",
+        "years": 0,
+        "summary": "No work experience is required. CC is an entry-level credential built for people starting out in cybersecurity.",
+        "waivers": []
+      },
+      "resources": [
+        {
+          "label": "ISC2: Certified in Cybersecurity (CC)",
+          "url": "https://www.isc2.org/certifications/cc"
+        },
+        {
+          "label": "ISC2: CC exam outline",
+          "url": "https://www.isc2.org/Certifications/CC/Certification-Exam-Outline"
         }
       ]
     }

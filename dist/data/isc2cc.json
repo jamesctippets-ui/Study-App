@@ -1,0 +1,3143 @@
+{
+  "categories": [
+    {
+      "key": "ccPrinciples",
+      "label": "Security Principles",
+      "marks": 24,
+      "resources": [
+        {
+          "label": "ISC2: Certified in Cybersecurity exam outline",
+          "url": "https://www.isc2.org/certifications/cc/cc-certification-exam-outline"
+        },
+        {
+          "label": "ISC2: Code of Ethics",
+          "url": "https://www.isc2.org/ethics"
+        },
+        {
+          "label": "NIST SP 800-30 Rev. 1: Guide for Conducting Risk Assessments",
+          "url": "https://csrc.nist.gov/pubs/sp/800/30/r1/final"
+        }
+      ]
+    },
+    {
+      "key": "ccGovernance",
+      "label": "Security Governance",
+      "marks": 17,
+      "resources": [
+        {
+          "label": "ISC2: Inside the updated CC exam",
+          "url": "https://www.isc2.org/Insights/2026/08/inside-the-updated-isc2-cc-exam"
+        },
+        {
+          "label": "NIST Cybersecurity Framework (CSF) 2.0",
+          "url": "https://www.nist.gov/cyberframework"
+        }
+      ]
+    },
+    {
+      "key": "ccIam",
+      "label": "Identity and Access Management Concepts",
+      "marks": 20,
+      "resources": [
+        {
+          "label": "ISC2: Certified in Cybersecurity exam outline",
+          "url": "https://www.isc2.org/certifications/cc/cc-certification-exam-outline"
+        },
+        {
+          "label": "NIST SP 800-63-4: Digital Identity Guidelines",
+          "url": "https://pages.nist.gov/800-63-4/"
+        }
+      ]
+    },
+    {
+      "key": "ccNetCloud",
+      "label": "Networking and Cloud Security Concepts",
+      "marks": 22,
+      "resources": [
+        {
+          "label": "NIST SP 800-145: The NIST Definition of Cloud Computing",
+          "url": "https://csrc.nist.gov/pubs/sp/800/145/final"
+        },
+        {
+          "label": "NIST SP 800-207: Zero Trust Architecture",
+          "url": "https://csrc.nist.gov/pubs/sp/800/207/final"
+        },
+        {
+          "label": "CISA: Cybersecurity best practices",
+          "url": "https://www.cisa.gov/topics/cybersecurity-best-practices"
+        }
+      ]
+    },
+    {
+      "key": "ccSecOps",
+      "label": "Security Operations and Incident Response",
+      "marks": 17,
+      "resources": [
+        {
+          "label": "NIST SP 800-61: Incident Response Recommendations",
+          "url": "https://csrc.nist.gov/pubs/sp/800/61/r3/final"
+        },
+        {
+          "label": "NIST SP 800-34 Rev. 1: Contingency Planning Guide",
+          "url": "https://csrc.nist.gov/pubs/sp/800/34/r1/upd1/final"
+        }
+      ]
+    }
+  ],
+  "flashcards": [
+    {
+      "id": "f1",
+      "cat": "ccPrinciples",
+      "front": "CIA triad (confidentiality, integrity, availability)",
+      "back": "The three core goals of security. Confidentiality keeps information from people who should not see it, integrity keeps it accurate and unaltered, and availability keeps systems and data usable when authorized people need them.",
+      "detail": "Nearly every scenario maps to one of the three: a leaked file is confidentiality, a tampered record is integrity, a crashed server is availability."
+    },
+    {
+      "id": "f2",
+      "cat": "ccPrinciples",
+      "front": "Confidentiality",
+      "back": "Limiting information to authorized people, processes and systems. Encryption, access controls and data classification are the usual tools.",
+      "detail": "Confidentiality failures are disclosures: a stolen laptop, an email sent to the wrong person, or a misconfigured public storage bucket."
+    },
+    {
+      "id": "f3",
+      "cat": "ccPrinciples",
+      "front": "Integrity",
+      "back": "Making sure data and systems are accurate, complete and have not been changed in an unauthorized way. Hashing, digital signatures, change control and file integrity monitoring support it.",
+      "detail": "Integrity is about trust in the content, not secrecy: a changed invoice amount is an integrity problem even if nobody outside ever saw it."
+    },
+    {
+      "id": "f4",
+      "cat": "ccPrinciples",
+      "front": "Availability",
+      "back": "Making sure systems, applications and data are accessible and working when authorized users need them. Redundancy, backups, capacity planning and protection from denial-of-service attacks support it.",
+      "detail": "Ransomware and DDoS are availability attacks; a power outage with no backup power is an availability failure with no attacker at all."
+    },
+    {
+      "id": "f5",
+      "cat": "ccPrinciples",
+      "front": "Authentication",
+      "back": "Proving that someone or something is who or what it claims to be, using something you know, have or are. It answers 'Are you really who you say you are?'",
+      "detail": "Often confused with authorization: authentication checks identity first; what that identity may do comes afterward."
+    },
+    {
+      "id": "f6",
+      "cat": "ccPrinciples",
+      "front": "Non-repudiation",
+      "back": "Assurance that a person cannot credibly deny having performed an action, such as sending a message or approving a payment. Digital signatures and tamper-resistant audit logs provide it.",
+      "detail": "Remember it as 'cannot say it was not me'. Symmetric encryption alone does not give it because both parties share the same key."
+    },
+    {
+      "id": "f7",
+      "cat": "ccPrinciples",
+      "front": "Privacy",
+      "back": "The right of individuals to control how their personal information is collected, used, shared and kept. Security protects the data; privacy decides what is appropriate to do with it.",
+      "detail": "Security and privacy overlap but differ: a company can secure data perfectly and still violate privacy by collecting or using it without consent."
+    },
+    {
+      "id": "f8",
+      "cat": "ccPrinciples",
+      "front": "Personally identifiable information (PII)",
+      "back": "Any data that can identify a specific person on its own or combined with other data, such as a name, Social Security number, email address or biometric record.",
+      "detail": "Combinations count: a birth date and ZIP code may look harmless alone but together can single out one individual."
+    },
+    {
+      "id": "f9",
+      "cat": "ccPrinciples",
+      "front": "Risk",
+      "back": "The possibility of loss when a threat takes advantage of a vulnerability to harm an asset. It is commonly judged by how likely the event is and how big the impact would be.",
+      "detail": "A threat with no matching vulnerability, or a vulnerability on an asset nobody values, produces little risk."
+    },
+    {
+      "id": "f10",
+      "cat": "ccPrinciples",
+      "front": "Threat, vulnerability and asset",
+      "back": "An asset is anything of value to the organization. A vulnerability is a weakness in it, and a threat is something that could exploit that weakness to cause harm.",
+      "detail": "Example: the asset is a customer database, the vulnerability is an unpatched server, and the threat is an attacker or malware."
+    },
+    {
+      "id": "f11",
+      "cat": "ccPrinciples",
+      "front": "Likelihood and impact",
+      "back": "The two inputs to a risk assessment: likelihood is how probable it is that a threat event will happen, and impact is the amount of harm if it does. Higher on either scale raises the risk.",
+      "detail": "A rare but catastrophic event can outrank a frequent but trivial one, which is why risk is prioritized, not just counted."
+    },
+    {
+      "id": "f12",
+      "cat": "ccPrinciples",
+      "front": "Risk management process",
+      "back": "The repeating cycle of identifying risks, assessing how serious they are, deciding how to treat them, and monitoring the results. It is continuous because assets and threats keep changing.",
+      "detail": "Risk is managed, not eliminated: the goal is to bring it to a level management is willing to accept."
+    },
+    {
+      "id": "f13",
+      "cat": "ccPrinciples",
+      "front": "Risk treatment options (accept, avoid, mitigate, transfer)",
+      "back": "Accept the risk and live with it, avoid it by stopping the risky activity, mitigate it by adding controls that reduce it, or transfer it by shifting the financial burden, for example through insurance or a contract.",
+      "detail": "Transfer moves the financial loss, not the responsibility: a breached company is still accountable to its customers."
+    },
+    {
+      "id": "f14",
+      "cat": "ccPrinciples",
+      "front": "Risk avoidance",
+      "back": "Removing the risk entirely by not doing the activity that creates it, such as deciding not to store payment card numbers at all.",
+      "detail": "Avoidance is the most complete treatment but often costs business opportunity, so it is chosen when the risk outweighs the benefit."
+    },
+    {
+      "id": "f15",
+      "cat": "ccPrinciples",
+      "front": "Risk mitigation",
+      "back": "Reducing the likelihood or impact of a risk by applying safeguards such as patching, training, encryption or monitoring.",
+      "detail": "Mitigation never reaches zero, so some residual risk always remains afterward."
+    },
+    {
+      "id": "f16",
+      "cat": "ccPrinciples",
+      "front": "Risk transfer",
+      "back": "Passing the financial consequence of a risk to another party, usually with cyber insurance or by contract with a vendor.",
+      "detail": "Insurance pays for losses; it does not stop the incident or remove legal and reputational damage."
+    },
+    {
+      "id": "f17",
+      "cat": "ccPrinciples",
+      "front": "Risk acceptance",
+      "back": "A conscious, documented decision to tolerate a risk because the cost of treating it is greater than the expected loss or because it falls within tolerance.",
+      "detail": "Acceptance is a formal management decision; simply ignoring a risk nobody noticed is not acceptance."
+    },
+    {
+      "id": "f18",
+      "cat": "ccPrinciples",
+      "front": "Residual risk",
+      "back": "The risk that remains after controls have been applied. Management decides whether that leftover level is acceptable.",
+      "detail": "Inherent risk is before controls, residual is after; the exam likes the before/after wording."
+    },
+    {
+      "id": "f19",
+      "cat": "ccPrinciples",
+      "front": "Risk appetite and risk tolerance",
+      "back": "Risk appetite is the broad amount of risk an organization is willing to pursue to meet its goals. Risk tolerance is the acceptable variation around a specific objective or limit.",
+      "detail": "Appetite is the big-picture attitude set by leadership; tolerance is the measurable boundary that tells staff when to escalate."
+    },
+    {
+      "id": "f20",
+      "cat": "ccPrinciples",
+      "front": "Security control categories (technical, administrative, physical)",
+      "back": "Technical controls are implemented in technology, like firewalls and encryption. Administrative controls are policies, procedures and training. Physical controls protect the real world, like locks, fences and guards.",
+      "detail": "Technical is also called logical, and administrative is also called managerial. Sort the control by what it is made of, not by what it does."
+    },
+    {
+      "id": "f21",
+      "cat": "ccPrinciples",
+      "front": "Security control functions (preventive, detective, corrective, deterrent, compensating)",
+      "back": "Preventive controls stop an event, detective controls spot it, corrective controls fix things afterward, deterrent controls discourage attempts, and compensating controls substitute when the ideal control is not possible.",
+      "detail": "A single control can have a type and a function: a security camera is physical and detective, and a visible warning sign is physical and deterrent."
+    },
+    {
+      "id": "f22",
+      "cat": "ccPrinciples",
+      "front": "Defense in depth",
+      "back": "Layering several different controls, such as physical, technical and administrative, so that if one fails others still protect the asset. It is also called layered security.",
+      "detail": "The tested point is that no single control is trusted alone; a firewall only is not defense in depth."
+    },
+    {
+      "id": "f23",
+      "cat": "ccPrinciples",
+      "front": "ISC2 Code of Ethics canons",
+      "back": "In order: protect society, the common good, necessary public trust and confidence, and the infrastructure; act honorably, honestly, justly, responsibly and legally; provide diligent and competent service to principals; advance and protect the profession.",
+      "detail": "The order is a priority list. If duties conflict, protecting society comes before your employer, and your employer before the profession."
+    },
+    {
+      "id": "f24",
+      "cat": "ccPrinciples",
+      "front": "Resolving an ethical conflict under the ISC2 Code",
+      "back": "When canons conflict, the earlier one in the list takes priority. A member who sees a conflict resolves it by that order and, where appropriate, seeks guidance and reports unethical behavior through proper channels.",
+      "detail": "Exam scenarios often pit loyalty to an employer against public safety; the Code says public safety wins."
+    },
+    {
+      "id": "f25",
+      "cat": "ccPrinciples",
+      "front": "Conflict of interest",
+      "back": "A situation where personal or financial interests could compromise your professional judgment. The ethical response is to disclose it and, if needed, step away from the decision.",
+      "detail": "Typical example: recommending a vendor you secretly own shares in."
+    },
+    {
+      "id": "f26",
+      "cat": "ccPrinciples",
+      "front": "Security concerns of artificial intelligence (AI)",
+      "back": "AI systems add assets to protect, such as models, training data and prompts, and new threats like data leakage through prompts, poisoned data, and attackers using AI for convincing phishing or deepfakes.",
+      "detail": "At the CC level, treat AI as another asset and threat source covered by existing principles: classification, access control, policy and awareness."
+    },
+    {
+      "id": "f27",
+      "cat": "ccGovernance",
+      "front": "Security governance",
+      "back": "The system of leadership, structure and rules that directs and oversees how an organization manages security so it supports business goals. Senior management sets direction and is ultimately accountable.",
+      "detail": "Governance decides what must be done and who is accountable; management and operations carry it out."
+    },
+    {
+      "id": "f28",
+      "cat": "ccGovernance",
+      "front": "Governance, risk and compliance (GRC)",
+      "back": "An integrated approach that links governance (direction and oversight), risk management (knowing and treating threats) and compliance (meeting laws, regulations and internal rules).",
+      "detail": "GRC exists so the three do not run as separate silos with conflicting priorities."
+    },
+    {
+      "id": "f29",
+      "cat": "ccGovernance",
+      "front": "Policy",
+      "back": "A high-level, mandatory statement of management's intent and expectations, such as 'all laptops must be encrypted'. It says what must happen and why, not the exact steps.",
+      "detail": "Policies are approved by senior management and are the top of the document hierarchy; standards, procedures and guidelines hang below them."
+    },
+    {
+      "id": "f30",
+      "cat": "ccGovernance",
+      "front": "Standard",
+      "back": "A mandatory, specific requirement that supports a policy, such as 'laptops must use AES-256 disk encryption'. It makes the policy measurable and consistent.",
+      "detail": "Standards are mandatory like policies but more technical and more likely to change as technology changes."
+    },
+    {
+      "id": "f31",
+      "cat": "ccGovernance",
+      "front": "Procedure",
+      "back": "A detailed, step-by-step set of instructions for carrying out a task in line with policy and standards, such as how to onboard a new account.",
+      "detail": "If the question asks for exact steps in order, the document is a procedure."
+    },
+    {
+      "id": "f32",
+      "cat": "ccGovernance",
+      "front": "Guideline",
+      "back": "Recommended advice or best practice that is not mandatory. Staff can use judgment about whether to follow it.",
+      "detail": "Policy, standard and procedure are mandatory; guideline is the odd one out because it is optional."
+    },
+    {
+      "id": "f33",
+      "cat": "ccGovernance",
+      "front": "Compliance",
+      "back": "Following the laws, regulations, contractual obligations and internal policies that apply to the organization. Failure can bring fines, legal action or lost business.",
+      "detail": "Compliance is a minimum, not a guarantee of security: a company can pass an audit and still be breached."
+    },
+    {
+      "id": "f34",
+      "cat": "ccGovernance",
+      "front": "General Data Protection Regulation (GDPR)",
+      "back": "A European Union law on protecting the personal data of people in the EU. It requires a lawful basis for processing, gives individuals rights over their data, and requires breach notification, with large fines for violations.",
+      "detail": "It applies based on whose data is processed, so a company outside the EU can still be covered."
+    },
+    {
+      "id": "f35",
+      "cat": "ccGovernance",
+      "front": "Health Insurance Portability and Accountability Act (HIPAA)",
+      "back": "A United States law that sets privacy and security rules for protected health information held by healthcare providers, health plans and their business associates.",
+      "detail": "Think healthcare data in the U.S.; its scope is defined by who handles the data, not by every kind of medical-sounding information."
+    },
+    {
+      "id": "f36",
+      "cat": "ccGovernance",
+      "front": "Payment Card Industry Data Security Standard (PCI DSS)",
+      "back": "An industry standard, set by the card brands, for organizations that store, process or transmit payment card data. It is a contractual requirement, not a government law.",
+      "detail": "Classic trap: PCI DSS is enforced through contracts with banks and card brands, not by statute."
+    },
+    {
+      "id": "f37",
+      "cat": "ccGovernance",
+      "front": "NIST Cybersecurity Framework (CSF) 2.0",
+      "back": "A voluntary framework that organizes cybersecurity outcomes into six functions: Govern, Identify, Protect, Detect, Respond and Recover. It helps organizations of any size manage and communicate cyber risk.",
+      "detail": "Version 2.0 added Govern as the sixth function. A framework offers structure and does not by itself implement anything."
+    },
+    {
+      "id": "f38",
+      "cat": "ccGovernance",
+      "front": "Due care vs. due diligence",
+      "back": "Due diligence is investigating and planning before acting, such as researching risks and vendors. Due care is acting responsibly on that knowledge, such as actually applying the controls and keeping them working.",
+      "detail": "Short memory hook: diligence is 'think and verify', care is 'do and maintain'. Both protect the organization from claims of negligence."
+    },
+    {
+      "id": "f39",
+      "cat": "ccGovernance",
+      "front": "Security awareness training",
+      "back": "Regular education that teaches all employees to recognize threats such as phishing, handle data correctly and report problems. Simulated phishing is a common way to practice and measure it.",
+      "detail": "People are often the weakest link and also the best sensors; awareness training turns them into detectors."
+    },
+    {
+      "id": "f40",
+      "cat": "ccGovernance",
+      "front": "Security culture",
+      "back": "The shared attitudes and habits that make employees treat security as part of everyday work. It is shaped by leadership example, clear expectations and a no-blame way to report mistakes.",
+      "detail": "If staff fear punishment for clicking a bad link, they hide it, and the incident gets worse."
+    },
+    {
+      "id": "f41",
+      "cat": "ccGovernance",
+      "front": "Acceptable use policy (AUP)",
+      "back": "A policy that explains what employees may and may not do with company systems, data and networks. Users commonly acknowledge it in writing before getting access.",
+      "detail": "The signed acknowledgment is what lets the company discipline misuse later because the person was told the rules."
+    },
+    {
+      "id": "f42",
+      "cat": "ccGovernance",
+      "front": "Change management",
+      "back": "A controlled process for requesting, reviewing, approving, testing and recording changes to systems so they do not cause outages or new vulnerabilities.",
+      "detail": "Unapproved 'quick fixes' are a common cause of both outages (availability) and security gaps."
+    },
+    {
+      "id": "f43",
+      "cat": "ccGovernance",
+      "front": "Security audit",
+      "back": "A systematic, independent check of whether controls exist and work as the policies and standards require. Internal audits are done by the organization's own staff and external audits by outside parties.",
+      "detail": "External audits carry more credibility with regulators and customers because the auditor has no stake in the result."
+    },
+    {
+      "id": "f44",
+      "cat": "ccGovernance",
+      "front": "Security metrics (KPIs and KRIs)",
+      "back": "Measurements that show how well security is performing. Key performance indicators track how well controls work, such as time to patch, and key risk indicators warn that risk is rising, such as growing failed logins.",
+      "detail": "Good metrics let leadership make decisions; reports full of raw counts without meaning do not."
+    },
+    {
+      "id": "f45",
+      "cat": "ccGovernance",
+      "front": "Redundancy and single point of failure",
+      "back": "Redundancy means duplicating critical components, such as power, network links or servers, so one failure does not stop service. A single point of failure is any part whose loss would bring everything down.",
+      "detail": "Redundancy supports availability; it is not a replacement for backups, because a copy that mirrors deletions or corruption spreads the damage."
+    },
+    {
+      "id": "f46",
+      "cat": "ccIam",
+      "front": "Identity and access management (IAM)",
+      "back": "The policies, processes and tools that create and manage digital identities and control what each one can access. It covers identification, authentication, authorization and accountability.",
+      "detail": "IAM is the front door of nearly every other control, which is why stolen credentials are such a common root cause of breaches."
+    },
+    {
+      "id": "f47",
+      "cat": "ccIam",
+      "front": "Identification",
+      "back": "Claiming an identity, such as typing a username or presenting a badge number. By itself it proves nothing.",
+      "detail": "Order to remember: identify, authenticate, authorize, account."
+    },
+    {
+      "id": "f48",
+      "cat": "ccIam",
+      "front": "Authorization",
+      "back": "Deciding what an authenticated identity is allowed to do or reach, such as read a file but not change it. It happens after authentication.",
+      "detail": "Logging in successfully does not mean being allowed to do everything; authorization sets the boundaries."
+    },
+    {
+      "id": "f49",
+      "cat": "ccIam",
+      "front": "Accountability (accounting) and AAA",
+      "back": "Accountability means recording and tying actions to a specific identity through logs so people can be held responsible. AAA stands for authentication, authorization and accounting.",
+      "detail": "Shared accounts break accountability because logs cannot show which person acted."
+    },
+    {
+      "id": "f50",
+      "cat": "ccIam",
+      "front": "Authentication factors (know, have, are)",
+      "back": "Something you know (password or PIN), something you have (token, phone or smart card) and something you are (fingerprint or face). Using two different types is stronger than one.",
+      "detail": "A password plus a security question is still just 'know', so it is not true multi-factor."
+    },
+    {
+      "id": "f51",
+      "cat": "ccIam",
+      "front": "Multi-factor authentication (MFA)",
+      "back": "Requiring two or more different types of authentication factor to sign in. A stolen password alone is not enough to get in.",
+      "detail": "Phishing-resistant methods such as security keys and passkeys are stronger than codes sent by text message, which can be intercepted or tricked out of users."
+    },
+    {
+      "id": "f52",
+      "cat": "ccIam",
+      "front": "Password best practices",
+      "back": "Long, unique passwords or passphrases for every account, stored in a password manager, and checked against known breached lists. Current guidance favors length over forced complexity and avoids routine forced changes.",
+      "detail": "Reuse is the real danger: one breached site gives attackers a working password for many others (credential stuffing)."
+    },
+    {
+      "id": "f53",
+      "cat": "ccIam",
+      "front": "Passkeys and security keys (FIDO2)",
+      "back": "Phishing-resistant sign-in methods based on public-key cryptography. The private key stays on your device, and the site only receives a proof that works for that real site.",
+      "detail": "A fake login page cannot reuse a passkey, which is why these resist phishing better than passwords or one-time codes."
+    },
+    {
+      "id": "f54",
+      "cat": "ccIam",
+      "front": "Biometrics",
+      "back": "Authentication based on a physical or behavioral trait, such as a fingerprint, face or iris. Accuracy is described by false rejection (valid user denied) and false acceptance (impostor allowed).",
+      "detail": "Biometrics cannot be changed if stolen, so they are usually combined with another factor and protected as sensitive personal data."
+    },
+    {
+      "id": "f55",
+      "cat": "ccIam",
+      "front": "Single sign-on (SSO)",
+      "back": "Letting a user sign in once and then reach multiple applications without logging in again. It reduces password fatigue and centralizes control.",
+      "detail": "The trade-off is a single point of attack, so SSO accounts need strong protection such as MFA."
+    },
+    {
+      "id": "f56",
+      "cat": "ccIam",
+      "front": "Federated identity",
+      "back": "Trusting identities that are proven by another organization's identity provider, so one set of credentials works across separate organizations. Standards such as SAML and OpenID Connect carry the proof.",
+      "detail": "'Sign in with your company account' on a partner portal is federation; SSO is the experience, federation is the trust arrangement behind it."
+    },
+    {
+      "id": "f57",
+      "cat": "ccIam",
+      "front": "Principle of least privilege",
+      "back": "Giving each user, program or system only the minimum access needed to do its job, and no more. It limits the damage from mistakes, malware and stolen accounts.",
+      "detail": "The most tested access principle: when a question asks how to reduce what a compromised account can do, the answer is usually least privilege."
+    },
+    {
+      "id": "f58",
+      "cat": "ccIam",
+      "front": "Need to know",
+      "back": "Access to specific information is granted only when a person's duties require it, even if they hold the right clearance or role in general.",
+      "detail": "Least privilege is about the minimum rights; need to know is about the specific information. The two are used together."
+    },
+    {
+      "id": "f59",
+      "cat": "ccIam",
+      "front": "Segregation (separation) of duties",
+      "back": "Splitting a sensitive task among two or more people so no single person can complete and hide misuse alone, such as one person requesting a payment and another approving it.",
+      "detail": "It defends against fraud and honest mistakes; collusion between two people is the remaining weakness. Job rotation and mandatory vacations help detect it."
+    },
+    {
+      "id": "f60",
+      "cat": "ccIam",
+      "front": "Privileged access management (PAM)",
+      "back": "Controls and monitoring for accounts with powerful rights, such as administrators. Common features are separate admin accounts, vaulted credentials, temporary elevation and session recording.",
+      "detail": "Privileged accounts are top targets; admins should not use their powerful account for email and browsing."
+    },
+    {
+      "id": "f61",
+      "cat": "ccIam",
+      "front": "Role-based access control (RBAC)",
+      "back": "Granting permissions to roles that match job functions, then assigning people to roles. A person gets the role's permissions rather than individually chosen ones.",
+      "detail": "RBAC is easy to manage at scale and fits least privilege when roles are designed tightly; changing jobs means changing roles."
+    },
+    {
+      "id": "f62",
+      "cat": "ccIam",
+      "front": "Discretionary access control (DAC)",
+      "back": "An access model where the owner of a resource decides who else may access it, like sharing a document with a colleague.",
+      "detail": "Flexible but easy to misuse because owners can make unwise decisions; common in everyday file sharing."
+    },
+    {
+      "id": "f63",
+      "cat": "ccIam",
+      "front": "Mandatory access control (MAC)",
+      "back": "An access model where the system enforces access using labels, such as classification levels on data and clearances on users, and owners cannot override it.",
+      "detail": "Used in high-security and government settings. 'Mandatory' means users cannot change the rules, unlike DAC."
+    },
+    {
+      "id": "f64",
+      "cat": "ccIam",
+      "front": "Attribute-based access control (ABAC)",
+      "back": "An access model that decides using attributes of the user, the resource and the situation, such as department, data sensitivity, device health, location and time of day.",
+      "detail": "ABAC is more fine-grained and dynamic than RBAC; think 'context-aware rules'."
+    },
+    {
+      "id": "f65",
+      "cat": "ccIam",
+      "front": "Account provisioning and deprovisioning",
+      "back": "Provisioning creates accounts and grants appropriate access when someone joins or changes roles. Deprovisioning removes or disables access promptly when they leave.",
+      "detail": "Orphaned accounts of former staff are a classic risk; the key point is to disable access at departure, not weeks later."
+    },
+    {
+      "id": "f66",
+      "cat": "ccIam",
+      "front": "Physical access controls",
+      "back": "Measures that control who can enter places and reach equipment, including badges, locks, guards, cameras, visitor logs, fences and access control vestibules (mantraps).",
+      "detail": "A badge reader is preventive; a camera is detective. Tailgating, following someone through a door, defeats many of them."
+    },
+    {
+      "id": "f67",
+      "cat": "ccIam",
+      "front": "Privilege creep and access reviews",
+      "back": "Privilege creep is the gradual buildup of unneeded access as people change roles. Regular access reviews, where managers confirm who still needs what, find and remove it.",
+      "detail": "The cure for privilege creep is periodic review plus removing old rights when roles change, not just adding new ones."
+    },
+    {
+      "id": "f68",
+      "cat": "ccNetCloud",
+      "front": "LAN, WAN and the internet",
+      "back": "A local area network (LAN) connects devices in one place such as an office. A wide area network (WAN) links separate locations over long distances. The internet is the global network of networks.",
+      "detail": "Most security design is about the boundary where a trusted LAN meets a less trusted network."
+    },
+    {
+      "id": "f69",
+      "cat": "ccNetCloud",
+      "front": "OSI model (seven layers)",
+      "back": "A reference model that splits networking into seven layers: Physical, Data Link, Network, Transport, Session, Presentation and Application. Each layer has a job and talks to the layers above and below it.",
+      "detail": "Remember the bottom-up order with 'Please Do Not Throw Sausage Pizza Away'. Switches work at layer 2, routers at layer 3, and TCP and UDP at layer 4."
+    },
+    {
+      "id": "f70",
+      "cat": "ccNetCloud",
+      "front": "TCP/IP model",
+      "back": "The practical four-layer model the internet runs on: Link, Internet, Transport and Application. It maps loosely onto the seven OSI layers.",
+      "detail": "OSI is the teaching model, TCP/IP is what is actually deployed. If a question names layers 1 to 7, it is asking about OSI."
+    },
+    {
+      "id": "f71",
+      "cat": "ccNetCloud",
+      "front": "IP address (IPv4 and IPv6)",
+      "back": "A number that identifies a device on a network so data can be routed to it. IPv4 uses 32 bits written like 192.168.1.10, and IPv6 uses 128 bits written in hexadecimal, which provides vastly more addresses.",
+      "detail": "IPv6 was created because IPv4 addresses ran short; it is not automatically more secure than IPv4."
+    },
+    {
+      "id": "f72",
+      "cat": "ccNetCloud",
+      "front": "Private IP address ranges",
+      "back": "Address blocks reserved for internal use that are not routed on the public internet: 10.0.0.0/8, 172.16.0.0/12 and 192.168.0.0/16. Devices using them reach the internet through network address translation.",
+      "detail": "Seeing a 10.x, 172.16-31.x or 192.168.x address tells you the device is on an internal network."
+    },
+    {
+      "id": "f73",
+      "cat": "ccNetCloud",
+      "front": "Network port",
+      "back": "A number from 0 to 65535 that identifies a specific service on a device, so one IP address can run many services. An open port is a service listening for connections.",
+      "detail": "Unneeded open ports enlarge the attack surface, so closing them is basic hardening."
+    },
+    {
+      "id": "f74",
+      "cat": "ccNetCloud",
+      "front": "Common well-known ports",
+      "back": "FTP 21, SSH 22, Telnet 23, SMTP 25, DNS 53, HTTP 80, HTTPS 443, and RDP 3389. DHCP uses 67 and 68, and POP3 uses 110 and IMAP uses 143.",
+      "detail": "Know the secure versus insecure pairs: Telnet 23 versus SSH 22, and HTTP 80 versus HTTPS 443."
+    },
+    {
+      "id": "f75",
+      "cat": "ccNetCloud",
+      "front": "TCP vs. UDP",
+      "back": "TCP is connection-oriented and reliable: it sets up a session, confirms delivery and resends lost data. UDP is connectionless and faster, with no delivery guarantee, which suits live video, voice and DNS lookups.",
+      "detail": "If a question stresses reliability, think TCP; if it stresses speed and tolerating loss, think UDP."
+    },
+    {
+      "id": "f76",
+      "cat": "ccNetCloud",
+      "front": "Domain Name System (DNS)",
+      "back": "The service that translates human-friendly names such as example.com into IP addresses. It uses port 53 and is a frequent target of redirection attacks.",
+      "detail": "DNS spoofing or poisoning sends users to a fake site even though they typed the right name."
+    },
+    {
+      "id": "f77",
+      "cat": "ccNetCloud",
+      "front": "Dynamic Host Configuration Protocol (DHCP)",
+      "back": "A service that automatically gives devices an IP address and related settings when they join a network.",
+      "detail": "A rogue DHCP server can hand out bad settings, which is one reason switches offer protections against unauthorized DHCP sources."
+    },
+    {
+      "id": "f78",
+      "cat": "ccNetCloud",
+      "front": "Router vs. switch",
+      "back": "A switch connects devices inside one network and forwards frames using hardware (MAC) addresses. A router connects different networks and forwards packets using IP addresses.",
+      "detail": "Switch is layer 2 within a network; router is layer 3 between networks."
+    },
+    {
+      "id": "f79",
+      "cat": "ccNetCloud",
+      "front": "Firewall",
+      "back": "A device or software that allows or blocks network traffic according to rules, such as source, destination, port and protocol. Next-generation firewalls also understand applications and users.",
+      "detail": "A firewall controls traffic that passes through it; it cannot stop an attacker who is already inside or a user who is tricked into running malware."
+    },
+    {
+      "id": "f80",
+      "cat": "ccNetCloud",
+      "front": "IDS vs. IPS",
+      "back": "An intrusion detection system (IDS) watches traffic or hosts and alerts on suspicious activity. An intrusion prevention system (IPS) sits in the traffic path and can also block it.",
+      "detail": "D is for detect, P is for prevent. An IPS that makes a false-positive mistake can block legitimate traffic."
+    },
+    {
+      "id": "f81",
+      "cat": "ccNetCloud",
+      "front": "Demilitarized zone (DMZ) or screened subnet",
+      "back": "A separate network segment, behind a firewall, that holds public-facing systems such as web servers. If one is compromised, attackers still face another barrier before reaching the internal network.",
+      "detail": "Putting public servers in the DMZ keeps the internal network from being exposed directly to the internet."
+    },
+    {
+      "id": "f82",
+      "cat": "ccNetCloud",
+      "front": "Network segmentation, VLANs and microsegmentation",
+      "back": "Segmentation divides a network into smaller zones so a breach cannot spread freely. A virtual LAN (VLAN) does this logically on shared switches, and microsegmentation applies very fine-grained rules between individual workloads.",
+      "detail": "Segmentation limits lateral movement. Ransomware spreading across a flat network is the classic case it prevents."
+    },
+    {
+      "id": "f83",
+      "cat": "ccNetCloud",
+      "front": "Virtual private network (VPN)",
+      "back": "An encrypted tunnel across an untrusted network such as the internet, letting remote users or sites communicate as if on a private network.",
+      "detail": "A VPN protects data in transit; it does not make a compromised device safe or stop malware."
+    },
+    {
+      "id": "f84",
+      "cat": "ccNetCloud",
+      "front": "Network address translation (NAT)",
+      "back": "Translating private internal addresses to a public address as traffic leaves the network, so many devices share one public IP. It also hides internal addressing from outsiders.",
+      "detail": "NAT is not a firewall, though it incidentally blocks unsolicited inbound connections."
+    },
+    {
+      "id": "f85",
+      "cat": "ccNetCloud",
+      "front": "Wi-Fi security (WPA2 and WPA3)",
+      "back": "Wi-Fi Protected Access protocols that encrypt wireless traffic. WPA3 is the newest and strongest; WEP and original WPA are obsolete and should not be used.",
+      "detail": "An open public Wi-Fi network has no encryption, so use a VPN and HTTPS when on it."
+    },
+    {
+      "id": "f86",
+      "cat": "ccNetCloud",
+      "front": "Transport Layer Security (TLS) and HTTPS",
+      "back": "TLS encrypts data moving between a client and a server and verifies the server's identity with a certificate. HTTPS is HTTP carried over TLS, on port 443.",
+      "detail": "The padlock means the connection is encrypted, not that the website is trustworthy; phishing sites can use HTTPS too."
+    },
+    {
+      "id": "f87",
+      "cat": "ccNetCloud",
+      "front": "Zero trust",
+      "back": "A security approach summed up as 'never trust, always verify'. No user, device or network location is trusted by default; each request is authenticated, authorized with least privilege and continuously checked.",
+      "detail": "Zero trust is a strategy, not a single product. It replaces the idea that everything inside the network perimeter is safe."
+    },
+    {
+      "id": "f88",
+      "cat": "ccNetCloud",
+      "front": "Cloud computing essential characteristics",
+      "back": "The NIST definition lists five: on-demand self-service, broad network access, resource pooling, rapid elasticity and measured service.",
+      "detail": "Measured service is why you can be billed for what you use; rapid elasticity is why capacity can grow and shrink on demand."
+    },
+    {
+      "id": "f89",
+      "cat": "ccNetCloud",
+      "front": "Cloud service models (IaaS, PaaS, SaaS)",
+      "back": "Infrastructure as a service (IaaS) rents virtual servers, storage and networks. Platform as a service (PaaS) rents a managed environment for building and running applications. Software as a service (SaaS) delivers a finished application over the internet.",
+      "detail": "Move from IaaS to PaaS to SaaS and the provider manages more while you manage less."
+    },
+    {
+      "id": "f90",
+      "cat": "ccNetCloud",
+      "front": "Cloud deployment models (public, private, hybrid, community)",
+      "back": "Public cloud is shared infrastructure run by a provider for many customers. Private cloud serves one organization. Hybrid cloud combines two or more models, and community cloud is shared by organizations with common needs.",
+      "detail": "The deployment model says who owns and shares the cloud; the service model says what you rent. Do not mix the two up."
+    },
+    {
+      "id": "f91",
+      "cat": "ccNetCloud",
+      "front": "Shared responsibility model",
+      "back": "In the cloud, the provider secures the underlying infrastructure while the customer secures what they put in it, such as data, identities and configuration. The split shifts with the service model.",
+      "detail": "Whatever the model, the customer is always responsible for their data and who can access it; most cloud breaches come from customer misconfiguration."
+    },
+    {
+      "id": "f92",
+      "cat": "ccSecOps",
+      "front": "Data classification and handling",
+      "back": "Labeling data by sensitivity, such as public, internal, confidential and restricted, so each level gets matching protection. Handling rules cover storage, sharing, transmission and disposal.",
+      "detail": "Classification drives everything else: you cannot choose the right controls until you know how sensitive the data is."
+    },
+    {
+      "id": "f93",
+      "cat": "ccSecOps",
+      "front": "Data retention and secure destruction",
+      "back": "Retention rules say how long data must be kept for legal or business reasons. Secure destruction, such as shredding, degaussing or cryptographic erasure, makes disposed data unrecoverable.",
+      "detail": "Keeping data forever is a risk; ordinary deleting or formatting a drive does not reliably remove data."
+    },
+    {
+      "id": "f94",
+      "cat": "ccSecOps",
+      "front": "Symmetric vs. asymmetric encryption",
+      "back": "Symmetric encryption uses one shared secret key for both locking and unlocking and is fast, as with AES. Asymmetric encryption uses a public and private key pair and is slower but solves key sharing, as with RSA.",
+      "detail": "In practice they work together: asymmetric methods exchange a key that symmetric encryption then uses for bulk data."
+    },
+    {
+      "id": "f95",
+      "cat": "ccSecOps",
+      "front": "Hashing",
+      "back": "A one-way function that turns data of any size into a fixed-length fingerprint (digest). It cannot be reversed, and any change to the input changes the output, so it checks integrity.",
+      "detail": "Hashing is not encryption: there is no key and no decrypting. Old hashes such as MD5 are considered broken for security use."
+    },
+    {
+      "id": "f96",
+      "cat": "ccSecOps",
+      "front": "Digital signature and public key infrastructure (PKI)",
+      "back": "A digital signature is created with the sender's private key and checked with the public key, proving who signed and that the content was not altered. PKI is the system of certificate authorities and certificates that vouches for public keys.",
+      "detail": "Signatures provide integrity, authentication and non-repudiation, but not confidentiality."
+    },
+    {
+      "id": "f97",
+      "cat": "ccSecOps",
+      "front": "Configuration management and baselines",
+      "back": "Keeping systems in a known, approved, documented secure state (the baseline) and tracking any changes from it. Hardening removes unneeded services and default settings.",
+      "detail": "Default passwords and unnecessary services are common weaknesses that a baseline is meant to eliminate."
+    },
+    {
+      "id": "f98",
+      "cat": "ccSecOps",
+      "front": "Patch and vulnerability management",
+      "back": "Regularly scanning for weaknesses, ranking them by severity and exposure, and applying vendor patches in a tested, timely way. Patching removes known vulnerabilities attackers actively exploit.",
+      "detail": "A zero-day is a flaw with no patch yet, so layered controls matter; most attacks, though, use old known flaws."
+    },
+    {
+      "id": "f99",
+      "cat": "ccSecOps",
+      "front": "Logging, monitoring and SIEM",
+      "back": "Logs record events on systems, and monitoring reviews them. A security information and event management (SIEM) tool collects logs from many sources, correlates them and raises alerts.",
+      "detail": "Logs only help if they are protected from tampering, kept long enough and actually reviewed."
+    },
+    {
+      "id": "f100",
+      "cat": "ccSecOps",
+      "front": "Malware types (virus, worm, trojan, ransomware, spyware)",
+      "back": "A virus attaches to files and needs a user to run it. A worm spreads by itself across networks. A trojan disguises itself as something useful, ransomware encrypts data for payment, and spyware secretly gathers information.",
+      "detail": "Self-spreading with no user action points to a worm; looks legitimate but is not points to a trojan."
+    },
+    {
+      "id": "f101",
+      "cat": "ccSecOps",
+      "front": "Social engineering and phishing",
+      "back": "Manipulating people instead of technology to gain access or information. Phishing uses fraudulent email, vishing uses phone calls, smishing uses text messages, and pretexting uses an invented story.",
+      "detail": "Targeted phishing of a specific person is spear phishing; of senior executives, whaling. The defense is awareness, verification and reporting."
+    },
+    {
+      "id": "f102",
+      "cat": "ccSecOps",
+      "front": "Common cyberattacks (DoS/DDoS, on-path, brute force, credential stuffing)",
+      "back": "Denial-of-service floods a target to make it unavailable, and DDoS does so from many sources. An on-path attack secretly sits between two parties, brute force guesses passwords, and credential stuffing reuses leaked passwords on other sites.",
+      "detail": "Match attack to CIA property: DoS hits availability, on-path hits confidentiality and integrity, password attacks hit authentication."
+    },
+    {
+      "id": "f103",
+      "cat": "ccSecOps",
+      "front": "Cyber threat intelligence",
+      "back": "Information about threat actors, their methods and indicators of compromise, such as malicious IP addresses or file hashes, that defenders use to anticipate and detect attacks.",
+      "detail": "Intelligence is only useful when acted on: for example, feeding indicators into monitoring tools."
+    },
+    {
+      "id": "f104",
+      "cat": "ccSecOps",
+      "front": "Event, incident and breach",
+      "back": "An event is any observable occurrence. An incident is an event that actually or potentially harms confidentiality, integrity or availability, or violates policy. A breach is an incident where data is exposed or accessed without authorization.",
+      "detail": "Every breach is an incident and every incident is an event, but most events are harmless."
+    },
+    {
+      "id": "f105",
+      "cat": "ccSecOps",
+      "front": "Incident response lifecycle",
+      "back": "Preparation; detection and analysis; containment, eradication and recovery; and post-incident activity (lessons learned). The cycle feeds back into better preparation.",
+      "detail": "The sequence is tested often: contain before you eradicate, and recover before you review. Preparation always comes first."
+    },
+    {
+      "id": "f106",
+      "cat": "ccSecOps",
+      "front": "Incident response plan and team",
+      "back": "A documented plan defines roles, contacts, severity levels, escalation and communication steps. A trained incident response team follows it when something happens.",
+      "detail": "Plans that nobody has practiced fail under pressure, so tabletop exercises test them before a real incident."
+    },
+    {
+      "id": "f107",
+      "cat": "ccSecOps",
+      "front": "Digital forensics and chain of custody",
+      "back": "Forensics collects and analyzes digital evidence in a way that preserves it. Chain of custody is the documented record of who held the evidence, when and why, from collection to court.",
+      "detail": "A break in the chain of custody can make evidence unusable. Capture volatile data such as memory first."
+    },
+    {
+      "id": "f108",
+      "cat": "ccSecOps",
+      "front": "Business continuity plan (BCP)",
+      "back": "A plan to keep critical business functions running, or restore them quickly, during and after a disruption. It covers people, processes, facilities and technology.",
+      "detail": "BCP is the broad business-wide plan; the disaster recovery plan is its technology-focused subset."
+    },
+    {
+      "id": "f109",
+      "cat": "ccSecOps",
+      "front": "Business impact analysis (BIA), MTD, RTO and RPO",
+      "back": "A BIA identifies critical functions and what an outage costs. Maximum tolerable downtime (MTD) is how long a function can be down before serious harm. Recovery time objective (RTO) is the target time to restore, and recovery point objective (RPO) is the most data loss, measured in time, that is acceptable.",
+      "detail": "RTO looks forward to when systems return; RPO looks back to the last good copy of data. RTO must be shorter than MTD."
+    },
+    {
+      "id": "f110",
+      "cat": "ccSecOps",
+      "front": "Disaster recovery plan (DRP) and recovery sites",
+      "back": "A DRP restores IT systems and data after a major disruption. Backup sites are hot (ready to run almost immediately), warm (equipment but needs data and setup) or cold (space and power only).",
+      "detail": "Faster recovery costs more: hot is fastest and most expensive, cold slowest and cheapest. Backups must be tested by restoring them."
+    }
+  ],
+  "questions": [
+    {
+      "id": "q1",
+      "cat": "ccPrinciples",
+      "type": "mc",
+      "question": "An HR assistant accidentally emails a spreadsheet of employee salaries to the entire company instead of just the payroll team. Which part of the CIA triad was primarily violated?",
+      "options": [
+        "Integrity, because the spreadsheet was not meant to be sent",
+        "Confidentiality, because unauthorized people could see sensitive data",
+        "Availability, because the file was shared with too many people",
+        "Non-repudiation, because the sender can deny sending it"
+      ],
+      "correct": 1,
+      "explanation": "Salary data was disclosed to people who had no right to see it, which is a confidentiality failure. Nothing was altered, so integrity is intact, and the data stayed accessible rather than becoming unavailable. Non-repudiation is about proving who did something, and the email logs actually show who sent it."
+    },
+    {
+      "id": "q2",
+      "cat": "ccPrinciples",
+      "type": "mc",
+      "question": "An attacker quietly changes the account numbers in a company's vendor payment file, so payments go to the attacker. Which security goal does this attack primarily defeat?",
+      "options": [
+        "Availability",
+        "Confidentiality",
+        "Authentication",
+        "Integrity"
+      ],
+      "correct": 3,
+      "explanation": "The data was modified without authorization, so it is no longer accurate, which is an integrity failure. The file remained usable (availability) and nobody needed to read it secretly (confidentiality). Authentication might have been how the attacker got in, but the property that was damaged in the file itself is integrity."
+    },
+    {
+      "id": "q3",
+      "cat": "ccPrinciples",
+      "type": "mc",
+      "question": "A hospital's patient records system is locked by ransomware, and doctors cannot open any charts. Which CIA property is most directly affected?",
+      "options": [
+        "Availability, because authorized users cannot reach the data",
+        "Integrity, because the attackers changed the records",
+        "Confidentiality, because the attackers have the records",
+        "Accountability, because nobody can see who logged in"
+      ],
+      "correct": 0,
+      "explanation": "Ransomware's main effect is that legitimate users cannot access their data, which is availability. Integrity and confidentiality can also be at risk if data is altered or stolen first, but the situation described, charts that cannot be opened, is an availability problem. Accountability is about tracing actions to people and is not what the scenario describes."
+    },
+    {
+      "id": "q4",
+      "cat": "ccPrinciples",
+      "type": "mc",
+      "question": "A supplier signs a purchase order using a digital signature. Later the supplier claims they never sent it. Which security concept does the digital signature support in this dispute?",
+      "options": [
+        "Availability",
+        "Non-repudiation",
+        "Confidentiality",
+        "Least privilege"
+      ],
+      "correct": 1,
+      "explanation": "A digital signature is made with a private key only the signer holds, so the signer cannot credibly deny it. That is non-repudiation. A signature does not hide the content (confidentiality), keep systems running (availability), or limit access rights (least privilege)."
+    },
+    {
+      "id": "q5",
+      "cat": "ccPrinciples",
+      "type": "mc",
+      "question": "A web server runs software with a known flaw for which the vendor has released a fix, but nobody has applied it. In risk terms, what is the unpatched flaw?",
+      "options": [
+        "A threat",
+        "An asset",
+        "A vulnerability",
+        "A control"
+      ],
+      "correct": 2,
+      "explanation": "A vulnerability is a weakness that can be exploited, and an unpatched flaw is exactly that. The threat would be the attacker or malware that might exploit it, the asset is the server or its data, and a control is a safeguard, which the missing patch is not."
+    },
+    {
+      "id": "q6",
+      "cat": "ccPrinciples",
+      "type": "mc",
+      "question": "A company decides that storing customer payment card numbers is too risky and switches to a payment provider so it never handles card data. Which risk treatment is this?",
+      "options": [
+        "Risk acceptance",
+        "Risk transfer",
+        "Risk mitigation",
+        "Risk avoidance"
+      ],
+      "correct": 3,
+      "explanation": "The company stopped doing the risky activity of holding card numbers, which is avoidance. Mitigation would keep the activity and add controls, transfer would shift financial loss through insurance or contract while still holding the data, and acceptance would mean tolerating the risk as is."
+    },
+    {
+      "id": "q7",
+      "cat": "ccPrinciples",
+      "type": "mc",
+      "question": "A small business buys a cyber insurance policy to cover the cost of a possible data breach. Which risk treatment option does this represent?",
+      "options": [
+        "Risk transfer",
+        "Risk avoidance",
+        "Risk acceptance",
+        "Risk elimination"
+      ],
+      "correct": 0,
+      "explanation": "Insurance moves the financial burden of a loss to another party, which is transfer. The business still holds the data, so it has not avoided the risk, and it did not simply accept it. Elimination is not a standard option because risk cannot be fully removed."
+    },
+    {
+      "id": "q8",
+      "cat": "ccPrinciples",
+      "type": "mc",
+      "question": "After a company encrypts its laptops and rolls out MFA, a small chance of data loss from a stolen laptop remains. What is this remaining risk called?",
+      "options": [
+        "Inherent risk",
+        "Residual risk",
+        "Transferred risk",
+        "Total risk appetite"
+      ],
+      "correct": 1,
+      "explanation": "Residual risk is what is left after controls are in place. Inherent risk is the level before any controls, so it is the wrong time frame. Transferred risk describes a treatment decision, and risk appetite is the amount of risk leadership is willing to pursue, not the leftover amount."
+    },
+    {
+      "id": "q9",
+      "cat": "ccPrinciples",
+      "type": "mc",
+      "question": "A company installs a keypad lock on its server room door. Which description fits this control best?",
+      "options": [
+        "Administrative and detective",
+        "Technical and corrective",
+        "Physical and preventive",
+        "Technical and deterrent"
+      ],
+      "correct": 2,
+      "explanation": "A lock is a real-world barrier, so it is physical, and it stops unauthorized entry before it happens, so it is preventive. It does not detect events or fix damage afterward, and although the keypad is electronic, the control's purpose is the physical barrier rather than a technology safeguard on data."
+    },
+    {
+      "id": "q10",
+      "cat": "ccPrinciples",
+      "type": "mc",
+      "question": "A company requires every new employee to complete security awareness training in their first week. Into which control category does this fall?",
+      "options": [
+        "Administrative",
+        "Technical",
+        "Physical",
+        "Compensating"
+      ],
+      "correct": 0,
+      "explanation": "Training is carried out through policy and people management, so it is an administrative (managerial) control. It is not technology, so not technical, and it does not protect buildings or equipment, so not physical. Compensating describes a function, a substitute when the normal control is not possible, not a category."
+    },
+    {
+      "id": "q11",
+      "cat": "ccPrinciples",
+      "type": "mc",
+      "question": "Which design best demonstrates defense in depth for protecting a customer database?",
+      "options": [
+        "A very expensive, top-rated firewall placed at the network edge of the company",
+        "Encrypting the database and relying on that encryption as the only protection",
+        "Firewall, network segmentation, MFA, encryption, logging and staff training working together",
+        "Training all staff to be careful with their passwords and to report anything odd"
+      ],
+      "correct": 2,
+      "explanation": "Defense in depth layers different types of controls so a failure in one is caught by another. Each of the other choices relies on a single control, which becomes a single point of failure even if it is strong."
+    },
+    {
+      "id": "q12",
+      "cat": "ccPrinciples",
+      "type": "mc",
+      "question": "A security analyst discovers that her employer is quietly leaking customers' personal data and the manager asks her to keep quiet. According to the ISC2 Code of Ethics, which duty takes priority?",
+      "options": [
+        "Loyalty to the employer, because it pays her salary",
+        "Protecting society and the public trust",
+        "Advancing the profession's reputation",
+        "Providing competent service to the manager"
+      ],
+      "correct": 1,
+      "explanation": "The canons are listed in priority order, and protecting society, the common good and public trust comes first. Service to principals such as an employer is third, and advancing the profession is last. Staying silent to protect the employer would put a lower duty above a higher one."
+    },
+    {
+      "id": "q13",
+      "cat": "ccPrinciples",
+      "type": "mc",
+      "question": "A control to stop a low-impact, very unlikely risk would cost far more each year than the loss it would prevent. After review, management signs a note agreeing to live with the risk. Which treatment is this?",
+      "options": [
+        "Risk acceptance",
+        "Risk avoidance",
+        "Risk mitigation",
+        "Risk transfer"
+      ],
+      "correct": 0,
+      "explanation": "A documented decision to tolerate a risk because treating it costs more than it is worth is risk acceptance. No control was added (mitigation), no activity was stopped (avoidance), and no insurer or vendor took on the loss (transfer)."
+    },
+    {
+      "id": "q14",
+      "cat": "ccPrinciples",
+      "type": "mc",
+      "question": "A company puts up visible warning signs and cameras around its warehouse to discourage thieves from even trying. What is the main function of these signs and cameras?",
+      "options": [
+        "Corrective",
+        "Recovery",
+        "Deterrent",
+        "Compensating"
+      ],
+      "correct": 2,
+      "explanation": "Visible warnings and cameras are meant to discourage attempts, which is the definition of a deterrent. Corrective controls repair damage after an event and recovery controls restore operations. A compensating control is a substitute where the usual control cannot be used, which is not the situation here."
+    },
+    {
+      "id": "q15",
+      "cat": "ccPrinciples",
+      "type": "mc",
+      "question": "An employee pastes confidential customer details into a public AI chatbot to help write an email. Which is the best response by the security team?",
+      "options": [
+        "Block internet access for all employees permanently so nobody can reach any AI tool",
+        "Ignore it, since the chatbot only generates text",
+        "Publish an acceptable use rule for AI tools, train staff, and offer an approved tool",
+        "Ask the chatbot provider to forget the data and then take no other action at all"
+      ],
+      "correct": 2,
+      "explanation": "The main risk is loss of confidentiality through an unapproved tool. A clear policy, training and a safe alternative address the cause using existing governance ideas. Blocking all internet is an overreaction, ignoring it leaves a data exposure unaddressed, and relying on a provider's goodwill is not a control."
+    },
+    {
+      "id": "q16",
+      "cat": "ccPrinciples",
+      "type": "mc",
+      "question": "Before sending a large software update to customers, a vendor publishes its hash value. What does a customer verify by comparing the hash of the downloaded file to the published value?",
+      "options": [
+        "That the file is confidential",
+        "That the file has not been altered or corrupted",
+        "That the vendor is a trustworthy company",
+        "That the download was fast enough"
+      ],
+      "correct": 1,
+      "explanation": "Matching hashes show the file is identical to what was published, which is integrity. A hash does not hide content, vouch for the vendor's honesty, or measure speed. Note that if an attacker can change both file and hash on the same site, the check proves less, which is why signatures are stronger."
+    },
+    {
+      "id": "msq1",
+      "cat": "ccPrinciples",
+      "type": "ms",
+      "question": "Which two of the following are technical (logical) controls? (Choose two.)",
+      "options": [
+        "Disk encryption on laptops",
+        "A written clean-desk policy",
+        "Firewall rules that block unused ports",
+        "A security guard at reception",
+        "Annual security awareness training"
+      ],
+      "correct": [
+        0,
+        2
+      ],
+      "explanation": "Encryption and firewall rules are implemented in technology, so they are technical controls. A clean-desk policy and training are administrative, and a guard is a physical control."
+    },
+    {
+      "id": "msq2",
+      "cat": "ccPrinciples",
+      "type": "ms",
+      "question": "Which two actions are examples of risk mitigation? (Choose two.)",
+      "options": [
+        "Applying security patches to servers",
+        "Buying an insurance policy",
+        "Stopping a service that is too risky to run",
+        "Requiring MFA for all remote logins",
+        "Signing a note that accepts the risk"
+      ],
+      "correct": [
+        0,
+        3
+      ],
+      "explanation": "Patching and MFA reduce the likelihood or impact of an attack, which is mitigation. Insurance is transfer, shutting down the service is avoidance, and the signed note is acceptance."
+    },
+    {
+      "id": "msq3",
+      "cat": "ccPrinciples",
+      "type": "ms",
+      "question": "Which two controls are primarily preventive? (Choose two.)",
+      "options": [
+        "A door that unlocks only with an authorized badge",
+        "A security camera recording the lobby",
+        "A firewall rule that blocks inbound traffic on unused ports",
+        "A log review that finds last week's failed logins",
+        "A restore from backup after a failure"
+      ],
+      "correct": [
+        0,
+        2
+      ],
+      "explanation": "The badge-controlled door and the firewall rule stop unwanted actions before they succeed. A camera and log review detect after the fact, and restoring from backup is corrective or recovery."
+    },
+    {
+      "id": "msq4",
+      "cat": "ccPrinciples",
+      "type": "ms",
+      "question": "Which two statements about the ISC2 Code of Ethics are correct? (Choose two.)",
+      "options": [
+        "The canons are listed in order of priority",
+        "Duty to the employer outranks duty to the public",
+        "Protecting society and the common good is the first canon",
+        "Ethics rules apply only while on duty at work",
+        "Advancing the profession is the highest-priority canon"
+      ],
+      "correct": [
+        0,
+        2
+      ],
+      "explanation": "The canons are ordered by priority, and protecting society comes first. The employer (principal) comes after society, and the profession comes last, so claims that reverse these are wrong. The Code is a professional standard that is not limited to work hours."
+    },
+    {
+      "id": "tf1",
+      "cat": "ccPrinciples",
+      "type": "tf",
+      "question": "Encrypting a file guarantees that nobody can modify it without detection.",
+      "answer": false,
+      "explanation": "Encryption mainly protects confidentiality. Detecting modification needs integrity tools such as hashes, message authentication codes or digital signatures. Someone could still corrupt or replace an encrypted file."
+    },
+    {
+      "id": "tf2",
+      "cat": "ccPrinciples",
+      "type": "tf",
+      "question": "With enough controls, an organization can reduce its risk to exactly zero.",
+      "answer": false,
+      "explanation": "Risk can be reduced but never fully eliminated. Some residual risk always remains, and management decides whether it is acceptable."
+    },
+    {
+      "id": "tf3",
+      "cat": "ccPrinciples",
+      "type": "tf",
+      "question": "Buying cyber insurance removes an organization's responsibility to its customers if their data is breached.",
+      "answer": false,
+      "explanation": "Risk transfer shifts financial loss to the insurer, but legal duties, customer trust and reputation remain with the organization. Responsibility cannot be insured away."
+    },
+    {
+      "id": "tf4",
+      "cat": "ccPrinciples",
+      "type": "tf",
+      "question": "Residual risk is the level of risk that exists before any controls are applied.",
+      "answer": false,
+      "explanation": "That describes inherent risk. Residual risk is what remains after controls have been applied."
+    },
+    {
+      "id": "tf5",
+      "cat": "ccPrinciples",
+      "type": "tf",
+      "question": "A security camera that records who entered a restricted room is a physical, detective control.",
+      "answer": true,
+      "explanation": "A camera is a physical device, and recording events for later review detects rather than prevents. Its visibility may also deter, but its core function is detective."
+    },
+    {
+      "id": "tf6",
+      "cat": "ccPrinciples",
+      "type": "tf",
+      "question": "If a company secures personal data perfectly, it cannot violate anyone's privacy.",
+      "answer": false,
+      "explanation": "Security protects data from unauthorized access, but privacy concerns whether the data should be collected and how it may be used. A company could secure data well and still use it without proper consent."
+    },
+    {
+      "id": "q17",
+      "cat": "ccGovernance",
+      "type": "mc",
+      "question": "A help-desk team needs exact, numbered steps for resetting a locked user account safely. Which type of governance document should they follow?",
+      "options": [
+        "Policy",
+        "Guideline",
+        "Standard",
+        "Procedure"
+      ],
+      "correct": 3,
+      "explanation": "A procedure gives detailed step-by-step instructions for performing a task. A policy states high-level management intent, a standard sets specific mandatory requirements, and a guideline offers optional recommendations. None of those gives the ordered steps."
+    },
+    {
+      "id": "q18",
+      "cat": "ccGovernance",
+      "type": "mc",
+      "question": "A security team publishes some tips on creating memorable passphrases. Staff may follow them or not, depending on their judgment. Which document type is this?",
+      "options": [
+        "Guideline",
+        "Policy",
+        "Standard",
+        "Procedure"
+      ],
+      "correct": 0,
+      "explanation": "Guidelines are recommendations and are not mandatory. Policies, standards and procedures are all expected to be followed, which is the key difference."
+    },
+    {
+      "id": "q19",
+      "cat": "ccGovernance",
+      "type": "mc",
+      "question": "After a serious breach, regulators ask who is ultimately accountable for the organization's security program. Who is it?",
+      "options": [
+        "The help-desk analyst who found the breach",
+        "The vendor that supplied the firewall",
+        "The IT administrator who manages the servers",
+        "Senior management"
+      ],
+      "correct": 3,
+      "explanation": "Governance places ultimate accountability on senior management, who set direction, approve policy and provide resources. Others carry out tasks or supply tools, but they do not hold final accountability."
+    },
+    {
+      "id": "q20",
+      "cat": "ccGovernance",
+      "type": "mc",
+      "question": "A management-approved document states, \"All company laptops must be encrypted.\" It does not say how. What is it?",
+      "options": [
+        "A procedure",
+        "A policy",
+        "A guideline",
+        "A baseline"
+      ],
+      "correct": 1,
+      "explanation": "A high-level, mandatory statement of what must be done is a policy. A procedure would list the steps, and a guideline would only recommend the action. A baseline is a minimum configuration state, not a statement of management intent."
+    },
+    {
+      "id": "q21",
+      "cat": "ccGovernance",
+      "type": "mc",
+      "question": "An online shop wants to accept credit cards. Which statement about PCI DSS is correct?",
+      "options": [
+        "It is a United States federal law passed by Congress",
+        "It is a contractual industry standard from the payment card brands",
+        "It applies only to banks and never to merchants",
+        "It is a European Union privacy regulation"
+      ],
+      "correct": 1,
+      "explanation": "PCI DSS is created by the card industry and enforced through contracts with merchants, banks and card brands. It is not a statute, it applies to any organization that handles card data, and it is not an EU privacy law, which would be GDPR."
+    },
+    {
+      "id": "q22",
+      "cat": "ccGovernance",
+      "type": "mc",
+      "question": "A company headquartered in the United States sells products online to customers living in Germany and stores their personal data. Which regulation most likely applies to that data?",
+      "options": [
+        "HIPAA",
+        "GDPR",
+        "PCI DSS only",
+        "No regulation, because the company is not in Europe"
+      ],
+      "correct": 1,
+      "explanation": "GDPR protects the personal data of people in the EU, so it applies based on whose data is handled, not where the company is. HIPAA is for U.S. health information, and PCI DSS covers card data but is not a privacy law for personal data in general."
+    },
+    {
+      "id": "q23",
+      "cat": "ccGovernance",
+      "type": "mc",
+      "question": "Before hiring a cloud vendor, a company reviews the vendor's audit reports and security questionnaire. Which concept does this best illustrate?",
+      "options": [
+        "Due diligence",
+        "Due care",
+        "Separation of duties",
+        "Risk acceptance"
+      ],
+      "correct": 0,
+      "explanation": "Investigating and verifying before committing is due diligence. Due care is acting responsibly afterward, such as monitoring the vendor and enforcing controls. The other options are unrelated to researching a vendor."
+    },
+    {
+      "id": "q24",
+      "cat": "ccGovernance",
+      "type": "mc",
+      "question": "An employee clicked a phishing link but is afraid to tell anyone because last year a colleague was publicly blamed. Which change would most improve the organization's security culture?",
+      "options": [
+        "Add harsher penalties for any employee who clicks a suspicious link",
+        "Stop phishing awareness training",
+        "Encourage fast reporting; treat honest mistakes as learning",
+        "Publish the names of staff who fail phishing tests so others learn from them"
+      ],
+      "correct": 2,
+      "explanation": "People report problems quickly only when they feel safe doing so, and fast reporting limits damage. Punishment and shaming teach staff to hide mistakes, and ending training removes the skills that help them spot the next attack."
+    },
+    {
+      "id": "q25",
+      "cat": "ccGovernance",
+      "type": "mc",
+      "question": "Which function was added in version 2.0 of the NIST Cybersecurity Framework?",
+      "options": [
+        "Detect",
+        "Recover",
+        "Govern",
+        "Protect"
+      ],
+      "correct": 2,
+      "explanation": "CSF 2.0 added Govern, covering strategy, roles, policy and oversight, to the earlier Identify, Protect, Detect, Respond and Recover. The other functions existed in version 1.x."
+    },
+    {
+      "id": "q26",
+      "cat": "ccGovernance",
+      "type": "mc",
+      "question": "A system administrator wants to install an urgent update on a production server right now, without telling anyone. What should the organization's change management process require?",
+      "options": [
+        "Nothing at all, because urgent changes are exempt from the process",
+        "That the change is made first and documented only if something breaks",
+        "That the administrator keeps a private record of it in case of questions",
+        "A reviewed, approved and recorded request, with an emergency path"
+      ],
+      "correct": 3,
+      "explanation": "Change management exists so changes are reviewed, tested where possible, approved and tracked, including an expedited emergency process. Skipping it or documenting only after a failure leaves unrecorded changes that cause outages and security gaps."
+    },
+    {
+      "id": "q27",
+      "cat": "ccGovernance",
+      "type": "mc",
+      "question": "A company wants to show regulators and customers credible, unbiased evidence that its controls work. Which option provides the strongest assurance?",
+      "options": [
+        "A self-assessment by the security team",
+        "An external audit by an independent firm",
+        "A review by the manager who owns the controls",
+        "A summary written by the IT director"
+      ],
+      "correct": 1,
+      "explanation": "An independent external auditor has no stake in the result, so the findings carry the most credibility. The other options are reviews by people who own or run the controls, which creates a conflict of interest."
+    },
+    {
+      "id": "q28",
+      "cat": "ccGovernance",
+      "type": "mc",
+      "question": "A company's website depends on a single internet connection. It adds a second connection from a different provider. Which security property does this primarily improve?",
+      "options": [
+        "Confidentiality",
+        "Non-repudiation",
+        "Availability",
+        "Integrity"
+      ],
+      "correct": 2,
+      "explanation": "A second link removes a single point of failure, so the site stays reachable if one provider fails, which is availability. It does nothing on its own to hide data, prove who acted, or keep data accurate."
+    },
+    {
+      "id": "msq5",
+      "cat": "ccGovernance",
+      "type": "ms",
+      "question": "Which two of the following are laws or regulations rather than voluntary frameworks or industry standards? (Choose two.)",
+      "options": [
+        "GDPR",
+        "NIST Cybersecurity Framework",
+        "HIPAA",
+        "PCI DSS",
+        "A company's acceptable use policy"
+      ],
+      "correct": [
+        0,
+        2
+      ],
+      "explanation": "GDPR and HIPAA are legal requirements. The NIST framework is voluntary, PCI DSS is a contractual industry standard, and an acceptable use policy is an internal rule, not a law."
+    },
+    {
+      "id": "msq6",
+      "cat": "ccGovernance",
+      "type": "ms",
+      "question": "Which two measurements would best show whether phishing awareness training is working? (Choose two.)",
+      "options": [
+        "The percentage of staff who click a simulated phishing link",
+        "The number of slides in the training deck",
+        "The percentage of staff who report simulated phishing messages",
+        "The length of the training video",
+        "The number of firewalls installed"
+      ],
+      "correct": [
+        0,
+        2
+      ],
+      "explanation": "Falling click rates and rising report rates show changed behavior, which is the goal of training. Slide counts, video length and unrelated equipment numbers measure effort or inventory, not effectiveness."
+    },
+    {
+      "id": "msq7",
+      "cat": "ccGovernance",
+      "type": "ms",
+      "question": "Which two measures remove a single point of failure for a critical application? (Choose two.)",
+      "options": [
+        "Installing two independent power supplies in the server",
+        "Making passwords longer",
+        "Adding a second server that takes over if the first fails",
+        "Writing a clearer acceptable use policy",
+        "Encrypting the database"
+      ],
+      "correct": [
+        0,
+        2
+      ],
+      "explanation": "Duplicate power and a standby server are redundancy, so one failure does not stop the service. Longer passwords, a policy and encryption help other goals but do not provide backup components."
+    },
+    {
+      "id": "tf7",
+      "cat": "ccGovernance",
+      "type": "tf",
+      "question": "Guidelines are mandatory requirements that must be followed just like policies.",
+      "answer": false,
+      "explanation": "Guidelines are recommendations. Policies, standards and procedures are the mandatory elements."
+    },
+    {
+      "id": "tf8",
+      "cat": "ccGovernance",
+      "type": "tf",
+      "question": "Passing a compliance audit proves an organization cannot be breached.",
+      "answer": false,
+      "explanation": "Compliance shows that required controls were present at the time of review, but attackers and new vulnerabilities do not follow checklists. It is a minimum, not a guarantee."
+    },
+    {
+      "id": "tf9",
+      "cat": "ccGovernance",
+      "type": "tf",
+      "question": "Due care means actually implementing and maintaining the protections that due diligence showed were needed.",
+      "answer": true,
+      "explanation": "Due diligence is the research and planning, and due care is acting responsibly on it. Failing to do so can be treated as negligence."
+    },
+    {
+      "id": "tf10",
+      "cat": "ccGovernance",
+      "type": "tf",
+      "question": "A redundant system that mirrors data to a second server makes backups unnecessary.",
+      "answer": false,
+      "explanation": "A mirror copies everything, including accidental deletion, corruption and ransomware encryption, so the damage spreads. Backups keep separate, earlier copies that can be restored."
+    },
+    {
+      "id": "q29",
+      "cat": "ccIam",
+      "type": "mc",
+      "question": "A user types a username into a login screen and has not yet entered a password. Which step of access control has the user just performed?",
+      "options": [
+        "Authentication",
+        "Authorization",
+        "Identification",
+        "Accountability"
+      ],
+      "correct": 2,
+      "explanation": "Claiming an identity by giving a username is identification. Authentication comes when the system verifies the claim, for example with a password, authorization decides what the identity may do, and accountability is the logging of what it did."
+    },
+    {
+      "id": "q30",
+      "cat": "ccIam",
+      "type": "mc",
+      "question": "Which combination is a true example of multi-factor authentication?",
+      "options": [
+        "A password and a PIN",
+        "A password and the answer to a personal security question",
+        "A password plus a code from an authenticator app on a phone",
+        "Two different passwords, one for each of two different systems"
+      ],
+      "correct": 2,
+      "explanation": "A password is something you know and a phone-based code proves something you have, so two different factor types are used. A password with a PIN or a security question uses the same type twice, and separate passwords for separate systems are not even one combined login."
+    },
+    {
+      "id": "q31",
+      "cat": "ccIam",
+      "type": "mc",
+      "question": "A summer intern needs to read monthly sales reports stored in one shared folder. Which access should the intern be given?",
+      "options": [
+        "Read-only access to that one folder",
+        "Full control of the entire shared drive, to avoid future requests",
+        "The same access as the department manager",
+        "Administrator rights on the file server"
+      ],
+      "correct": 0,
+      "explanation": "Least privilege means the minimum access required for the job, which here is read-only on one folder. The other choices grant far more than needed and would increase the damage from a mistake or compromised account."
+    },
+    {
+      "id": "q32",
+      "cat": "ccIam",
+      "type": "mc",
+      "question": "In a small company, one employee can add new vendors and also approve payments to them. Which principle would best reduce the risk of fraud here?",
+      "options": [
+        "Segregation of duties",
+        "Defense in depth",
+        "Non-repudiation",
+        "Data classification"
+      ],
+      "correct": 0,
+      "explanation": "Splitting the add-vendor and approve-payment tasks between two people stops one person from completing and hiding a fraud alone. Defense in depth is about layered controls, non-repudiation is about proving who acted, and classification is about labeling data sensitivity."
+    },
+    {
+      "id": "q33",
+      "cat": "ccIam",
+      "type": "mc",
+      "question": "An employee has been dismissed and leaves the building at noon. When should their accounts and badge be disabled?",
+      "options": [
+        "At the end of the month, with other administrative tasks",
+        "When the employee next tries to sign in",
+        "Immediately, as part of the departure process",
+        "After a 30-day review period"
+      ],
+      "correct": 2,
+      "explanation": "Deprovisioning should happen right away so a former employee cannot misuse access. Waiting leaves an open window, and relying on the person to try signing in means the first sign of trouble would be a misuse."
+    },
+    {
+      "id": "q34",
+      "cat": "ccIam",
+      "type": "mc",
+      "question": "On a shared drive, the creator of a folder decides which colleagues get access to it. Which access control model is this?",
+      "options": [
+        "Mandatory access control",
+        "Attribute-based access control",
+        "Discretionary access control",
+        "Role-based access control"
+      ],
+      "correct": 2,
+      "explanation": "When the resource owner chooses who gets access, the model is discretionary. Mandatory control is enforced by the system using labels, role-based control grants access through job roles, and attribute-based control evaluates context and attributes."
+    },
+    {
+      "id": "q35",
+      "cat": "ccIam",
+      "type": "mc",
+      "question": "A company hires a new accounts-payable clerk. What is the most efficient way to give the clerk the correct access if the company uses RBAC?",
+      "options": [
+        "Copy the permissions of a random coworker",
+        "Assign the clerk to the accounts-payable role",
+        "Grant temporary administrator rights and trim them later",
+        "Give each permission one at a time, based on the clerk's requests"
+      ],
+      "correct": 1,
+      "explanation": "RBAC groups permissions into roles that match job functions, so assigning the role gives exactly what that job needs. Copying a coworker or granting admin rights spreads over-privilege, and granting permission by permission is slow and error-prone."
+    },
+    {
+      "id": "q36",
+      "cat": "ccIam",
+      "type": "mc",
+      "question": "A company wants to allow access to a financial application only when the user is in the finance department, using a managed device, during business hours. Which access control model uses this kind of conditions?",
+      "options": [
+        "Discretionary access control",
+        "Attribute-based access control",
+        "Role-based access control only",
+        "Mandatory access control"
+      ],
+      "correct": 1,
+      "explanation": "Attribute-based control makes decisions from attributes of the user, device, resource and context, such as department, device status and time. Role-based control alone does not evaluate device or time, discretionary lets owners decide, and mandatory uses fixed labels and clearances."
+    },
+    {
+      "id": "q37",
+      "cat": "ccIam",
+      "type": "mc",
+      "question": "A fingerprint reader accepts a stranger's finger and lets them into a lab. What kind of biometric error is this?",
+      "options": [
+        "False rejection",
+        "Crossover error",
+        "Enrollment failure",
+        "False acceptance"
+      ],
+      "correct": 3,
+      "explanation": "Letting an unauthorized person in is a false acceptance, which is the more dangerous error for security. A false rejection denies a valid user, and crossover error is the point where the two error rates are equal, not a single event."
+    },
+    {
+      "id": "q38",
+      "cat": "ccIam",
+      "type": "mc",
+      "question": "A bank wants its customers' sign-in to resist phishing, including fake login pages that capture one-time codes. Which method is best?",
+      "options": [
+        "Longer passwords",
+        "Codes sent by text message",
+        "Passkeys or hardware security keys",
+        "Security questions"
+      ],
+      "correct": 2,
+      "explanation": "Passkeys and security keys are bound to the real website, so a fake page cannot reuse them. Text-message codes and passwords can be typed into a fake page, and security questions can often be researched or guessed."
+    },
+    {
+      "id": "q39",
+      "cat": "ccIam",
+      "type": "mc",
+      "question": "A company rolls out single sign-on so staff log in once to reach all their apps. What is the main added risk, and the best way to handle it?",
+      "options": [
+        "One compromised login now opens many apps; protect SSO with MFA",
+        "Users forget passwords more often; require simpler passwords",
+        "Apps stop working; keep separate logins as well",
+        "Audit logs disappear; turn off logging"
+      ],
+      "correct": 0,
+      "explanation": "SSO concentrates access behind one credential, so that account must be heavily protected, ideally with MFA. Simpler passwords would weaken it, SSO normally reduces forgotten passwords, and SSO makes central logging easier, not harder."
+    },
+    {
+      "id": "q40",
+      "cat": "ccIam",
+      "type": "mc",
+      "question": "An employee has moved through three departments in five years and still has access from all of them. What is this problem called, and what is the best fix?",
+      "options": [
+        "Tailgating; install stronger doors and better locks",
+        "Privilege creep; do regular access reviews and prune rights",
+        "Credential stuffing; require much longer passwords for everyone",
+        "Shadow IT; ban cloud applications"
+      ],
+      "correct": 1,
+      "explanation": "Accumulated, no-longer-needed access is privilege creep, and periodic access reviews plus removing old rights when roles change fix it. Tailgating is physical entry, credential stuffing reuses leaked passwords, and shadow IT is unapproved technology."
+    },
+    {
+      "id": "q41",
+      "cat": "ccIam",
+      "type": "mc",
+      "question": "An outsider carrying boxes follows an employee through a badge-controlled door without using a badge. Which pair of measures best addresses this?",
+      "options": [
+        "A vestibule (mantrap) plus staff who challenge strangers",
+        "Longer passwords and encrypted laptops for all employees",
+        "A stronger firewall and a VPN",
+        "More backups and a disaster recovery site"
+      ],
+      "correct": 0,
+      "explanation": "Following someone through a door is tailgating. A vestibule that admits one person at a time plus trained staff who politely challenge unknown people address it directly. The other choices protect networks or data, not physical entry."
+    },
+    {
+      "id": "msq8",
+      "cat": "ccIam",
+      "type": "ms",
+      "question": "Which two statements about mandatory access control (MAC) are correct? (Choose two.)",
+      "options": [
+        "Access decisions use labels such as classifications and clearances",
+        "Resource owners can freely share access with anyone",
+        "The system enforces the rules and users cannot override them",
+        "It is the model used for everyday file sharing between coworkers",
+        "Permissions are assigned based only on job role"
+      ],
+      "correct": [
+        0,
+        2
+      ],
+      "explanation": "MAC compares labels on users and data, and the system enforces the result so owners cannot change it. Owner-controlled sharing describes discretionary control, and role-only assignment describes role-based control."
+    },
+    {
+      "id": "msq9",
+      "cat": "ccIam",
+      "type": "ms",
+      "question": "Which two practices help protect privileged (administrator) accounts? (Choose two.)",
+      "options": [
+        "Use a separate standard account for email and web browsing",
+        "Share one administrator password among all IT staff",
+        "Record and monitor privileged sessions",
+        "Give every user local administrator rights for convenience",
+        "Disable logging for administrators to protect their privacy"
+      ],
+      "correct": [
+        0,
+        2
+      ],
+      "explanation": "Separating everyday and admin accounts limits exposure to phishing and malware, and monitoring sessions creates accountability. Shared passwords destroy accountability, broad admin rights violate least privilege, and disabling admin logs removes oversight."
+    },
+    {
+      "id": "msq10",
+      "cat": "ccIam",
+      "type": "ms",
+      "question": "Which two practices match current password guidance? (Choose two.)",
+      "options": [
+        "Use long passphrases or let a password manager generate unique passwords",
+        "Reuse one strong password everywhere so it is easier to remember",
+        "Check new passwords against lists of known breached passwords",
+        "Force users to change passwords every 30 days even with no sign of compromise",
+        "Write passwords on a sticky note under the keyboard"
+      ],
+      "correct": [
+        0,
+        2
+      ],
+      "explanation": "Length, uniqueness and screening against breached passwords make guessing and reuse attacks harder. Reuse is the root of credential stuffing, frequent forced changes lead people to make predictable small changes, and sticky notes expose the password."
+    },
+    {
+      "id": "tf11",
+      "cat": "ccIam",
+      "type": "tf",
+      "question": "When several staff share one administrator account, logs cannot show which person performed an action.",
+      "answer": true,
+      "explanation": "Accountability depends on unique identities. A shared account means the log only shows the account name, so actions cannot be tied to a specific person."
+    },
+    {
+      "id": "tf12",
+      "cat": "ccIam",
+      "type": "tf",
+      "question": "Authentication and authorization mean the same thing.",
+      "answer": false,
+      "explanation": "Authentication verifies who you are, while authorization decides what you are allowed to do once your identity is verified."
+    },
+    {
+      "id": "tf13",
+      "cat": "ccIam",
+      "type": "tf",
+      "question": "Requiring a password and a PIN counts as multi-factor authentication.",
+      "answer": false,
+      "explanation": "Both are something you know, so they are the same factor type. True MFA combines different types such as know plus have, or know plus are."
+    },
+    {
+      "id": "tf14",
+      "cat": "ccIam",
+      "type": "tf",
+      "question": "Least privilege and need to know are identical concepts with no practical difference.",
+      "answer": false,
+      "explanation": "Least privilege limits the rights an account has to what its job requires, while need to know limits access to specific information to those whose duties require it. They work together but are not identical."
+    },
+    {
+      "id": "tf15",
+      "cat": "ccIam",
+      "type": "tf",
+      "question": "If a fingerprint template is stolen, the person can simply be issued a new fingerprint.",
+      "answer": false,
+      "explanation": "Biometric traits cannot be changed like a password, which is why templates must be protected as sensitive data and biometrics are best combined with another factor."
+    },
+    {
+      "id": "tf16",
+      "cat": "ccIam",
+      "type": "tf",
+      "question": "Federated identity lets one organization accept identities that were verified by another organization's identity provider.",
+      "answer": true,
+      "explanation": "That is the point of federation: a trust relationship, often using standards such as SAML or OpenID Connect, so people can use one set of credentials across separate organizations."
+    },
+    {
+      "id": "q42",
+      "cat": "ccNetCloud",
+      "type": "mc",
+      "question": "A device forwards packets between two different networks by looking at destination IP addresses. At which OSI layer does it primarily operate?",
+      "options": [
+        "Layer 2, Data Link",
+        "Layer 3, Network",
+        "Layer 4, Transport",
+        "Layer 7, Application"
+      ],
+      "correct": 1,
+      "explanation": "Routing by IP address is the job of the Network layer, layer 3. Layer 2 uses hardware (MAC) addresses within one network, layer 4 handles ports and delivery with TCP and UDP, and layer 7 is where applications such as web browsers work."
+    },
+    {
+      "id": "q43",
+      "cat": "ccNetCloud",
+      "type": "mc",
+      "question": "An administrator must manage a server remotely over an untrusted network and wants the session encrypted. Which protocol and port should be used?",
+      "options": [
+        "Telnet on port 23",
+        "HTTP on port 80",
+        "FTP on port 21",
+        "SSH on port 22"
+      ],
+      "correct": 3,
+      "explanation": "SSH on port 22 encrypts remote administration sessions. Telnet and FTP send everything, including passwords, in clear text, and HTTP is unencrypted web traffic that is not used for shell administration."
+    },
+    {
+      "id": "q44",
+      "cat": "ccNetCloud",
+      "type": "mc",
+      "question": "A company wants its customer web portal to encrypt traffic between browsers and the server. Which port does standard HTTPS use?",
+      "options": [
+        "80",
+        "25",
+        "443",
+        "3389"
+      ],
+      "correct": 2,
+      "explanation": "HTTPS uses TCP port 443. Port 80 is plain HTTP, port 25 is SMTP mail transfer, and port 3389 is the Remote Desktop Protocol."
+    },
+    {
+      "id": "q45",
+      "cat": "ccNetCloud",
+      "type": "mc",
+      "question": "A company must host a public web server and wants a compromise of it not to expose the internal network directly. Where should the server be placed?",
+      "options": [
+        "On the internal network next to the file servers",
+        "Directly on the internet with no firewall",
+        "In a DMZ (screened subnet) behind a firewall",
+        "On the same switch as the executive laptops"
+      ],
+      "correct": 2,
+      "explanation": "A DMZ isolates public-facing systems so attackers who compromise one still face another barrier before reaching internal systems. Placing it internally or beside sensitive hosts gives attackers a direct path in, and no firewall leaves it unprotected."
+    },
+    {
+      "id": "q46",
+      "cat": "ccNetCloud",
+      "type": "mc",
+      "question": "A security team wants a device that detects malicious traffic and automatically blocks it in real time. What should they deploy?",
+      "options": [
+        "An intrusion prevention system placed inline",
+        "An intrusion detection system that only sends alerts",
+        "A network hub",
+        "A DHCP server"
+      ],
+      "correct": 0,
+      "explanation": "An IPS sits in the traffic path and can drop malicious traffic. An IDS only alerts, so a person or other tool must act. A hub just repeats traffic and a DHCP server hands out addresses."
+    },
+    {
+      "id": "q47",
+      "cat": "ccNetCloud",
+      "type": "mc",
+      "question": "An analyst sees a laptop with the address 192.168.1.20. What does this tell her about the address?",
+      "options": [
+        "It is a public address that is routed on the internet",
+        "It is a private address for internal networks",
+        "It is an IPv6 address",
+        "It is a broadcast address that reaches all networks"
+      ],
+      "correct": 1,
+      "explanation": "192.168.0.0/16 is one of the reserved private ranges and is not routed on the public internet. It is an IPv4 address, not IPv6, and it is not a broadcast address."
+    },
+    {
+      "id": "q48",
+      "cat": "ccNetCloud",
+      "type": "mc",
+      "question": "Customers type the correct web address of a bank but land on a look-alike fake site because their name lookups were tampered with. Which service was attacked?",
+      "options": [
+        "DHCP",
+        "NTP",
+        "SMTP",
+        "DNS"
+      ],
+      "correct": 3,
+      "explanation": "DNS translates names into IP addresses, and poisoning or spoofing it sends users to the attacker's server despite a correct name. DHCP assigns addresses, NTP sets time, and SMTP sends email."
+    },
+    {
+      "id": "q49",
+      "cat": "ccNetCloud",
+      "type": "mc",
+      "question": "A company with one large flat network fears that ransomware on one PC could spread to everything. Which design change helps most?",
+      "options": [
+        "Adding more users and more devices to the same flat network",
+        "Segmenting the network into zones with firewall rules between them",
+        "Replacing the switches with hubs",
+        "Turning off logging to save disk space"
+      ],
+      "correct": 1,
+      "explanation": "Segmentation limits lateral movement, so a compromise in one zone is contained. Hubs expose more traffic, more users on the same network increases exposure, and turning off logging removes the ability to detect spread."
+    },
+    {
+      "id": "q50",
+      "cat": "ccNetCloud",
+      "type": "mc",
+      "question": "A consultant must connect to the company network from hotel Wi-Fi. What is the best way to protect the connection?",
+      "options": [
+        "Use the hotel's open Wi-Fi without any extra protection",
+        "Use a VPN so the traffic is encrypted end to end",
+        "Disable the laptop's firewall to avoid any blocked connections",
+        "Share the hotel password so colleagues can connect too"
+      ],
+      "correct": 1,
+      "explanation": "A VPN creates an encrypted tunnel across the untrusted network. Using open Wi-Fi unprotected exposes traffic, disabling the firewall removes a layer of defense, and sharing the password does nothing for security."
+    },
+    {
+      "id": "q51",
+      "cat": "ccNetCloud",
+      "type": "mc",
+      "question": "A company rents virtual machines from a cloud provider under an IaaS model. Who is responsible for applying security patches to the guest operating system inside those machines?",
+      "options": [
+        "The customer",
+        "The cloud provider",
+        "The internet service provider",
+        "The hardware manufacturer"
+      ],
+      "correct": 0,
+      "explanation": "With IaaS the provider secures the physical infrastructure and virtualization layer, while the customer manages the guest operating system, applications and data. The provider does not patch inside a customer's machine."
+    },
+    {
+      "id": "q52",
+      "cat": "ccNetCloud",
+      "type": "mc",
+      "question": "A customer accidentally configures a cloud storage bucket so that anyone on the internet can read it, and customer data leaks. Under the shared responsibility model, who is mainly responsible?",
+      "options": [
+        "The cloud provider, because it owns and operates the whole datacenter",
+        "The customer, because configuring their own resources is their duty",
+        "Both equally, regardless of who made the change",
+        "No one, because the cloud is secure by default"
+      ],
+      "correct": 1,
+      "explanation": "Providers secure the underlying platform, but customers are responsible for how they configure and use their resources and data. Misconfiguration is a leading cause of cloud breaches, and the cloud is not automatically safe."
+    },
+    {
+      "id": "q53",
+      "cat": "ccNetCloud",
+      "type": "mc",
+      "question": "A company uses a web-based email and calendar service managed entirely by the provider. Which cloud service model is this?",
+      "options": [
+        "Infrastructure as a service",
+        "Platform as a service",
+        "Software as a service",
+        "Community cloud"
+      ],
+      "correct": 2,
+      "explanation": "A finished application delivered over the internet is SaaS. IaaS rents infrastructure, PaaS rents an environment for building applications, and community cloud is a deployment model, not a service model."
+    },
+    {
+      "id": "q54",
+      "cat": "ccNetCloud",
+      "type": "mc",
+      "question": "A hospital keeps patient records in its own data center and uses a public cloud for temporary extra computing power, with the two connected. Which deployment model is this?",
+      "options": [
+        "Public cloud",
+        "Private cloud",
+        "Community cloud",
+        "Hybrid cloud"
+      ],
+      "correct": 3,
+      "explanation": "Combining private infrastructure with public cloud that work together is hybrid cloud. Public means only the provider's shared platform, private means only one organization's dedicated environment, and community means organizations with shared concerns pool a cloud."
+    },
+    {
+      "id": "q55",
+      "cat": "ccNetCloud",
+      "type": "mc",
+      "question": "A user connects through the corporate VPN and is now on the internal network. Under zero trust principles, how should the application treat this user's requests?",
+      "options": [
+        "Trust them fully, because they are inside the network",
+        "Trust them for a full 24 hours, then re-check their identity afterward",
+        "Skip any further authentication, because the VPN already authenticated them",
+        "Keep verifying identity, device health and permission per request"
+      ],
+      "correct": 3,
+      "explanation": "Zero trust removes implicit trust based on network location and keeps verifying identity, device state and authorization with least privilege. Trusting anyone inside the network, even for a time window, is the old perimeter model."
+    },
+    {
+      "id": "msq11",
+      "cat": "ccNetCloud",
+      "type": "ms",
+      "question": "Which two statements about TCP and UDP are correct? (Choose two.)",
+      "options": [
+        "TCP sets up a connection and confirms delivery",
+        "UDP guarantees that every packet arrives in order",
+        "UDP is faster and suits live voice or video where small losses are tolerable",
+        "TCP is connectionless and never retransmits data",
+        "UDP is used only for encrypted traffic"
+      ],
+      "correct": [
+        0,
+        2
+      ],
+      "explanation": "TCP is reliable and connection-oriented, and UDP is connectionless and lightweight, which fits real-time uses. UDP offers no delivery guarantee, TCP does retransmit lost data, and neither protocol is defined by encryption."
+    },
+    {
+      "id": "msq12",
+      "cat": "ccNetCloud",
+      "type": "ms",
+      "question": "Which two are essential characteristics of cloud computing in the NIST definition? (Choose two.)",
+      "options": [
+        "Rapid elasticity",
+        "Customer-owned physical hardware",
+        "Measured service",
+        "Fixed capacity that cannot change",
+        "Manual provisioning through paper forms"
+      ],
+      "correct": [
+        0,
+        2
+      ],
+      "explanation": "NIST's five characteristics are on-demand self-service, broad network access, resource pooling, rapid elasticity and measured service. Customer-owned hardware, fixed capacity and paper-based provisioning are the opposite of cloud behavior."
+    },
+    {
+      "id": "msq13",
+      "cat": "ccNetCloud",
+      "type": "ms",
+      "question": "Which two actions improve the security of a company's wireless network? (Choose two.)",
+      "options": [
+        "Use WPA3 encryption where supported",
+        "Keep WEP so older devices still work",
+        "Change the default administrator password on the wireless access points",
+        "Rely only on hiding the network name",
+        "Leave the guest network open and connected to the internal network"
+      ],
+      "correct": [
+        0,
+        2
+      ],
+      "explanation": "WPA3 is the strongest current wireless protection, and default admin credentials are widely known so they must be changed. WEP is broken, a hidden network name is trivial to discover, and an open guest network joined to the internal network exposes it."
+    },
+    {
+      "id": "msq14",
+      "cat": "ccNetCloud",
+      "type": "ms",
+      "question": "Which two items remain the customer's responsibility even when using a SaaS application? (Choose two.)",
+      "options": [
+        "Deciding who is allowed to use the application and what they can do",
+        "Patching the provider's physical servers",
+        "Protecting and classifying the data they put into it",
+        "Maintaining the provider's data center power systems",
+        "Replacing the provider's network cabling"
+      ],
+      "correct": [
+        0,
+        2
+      ],
+      "explanation": "Even with SaaS the customer manages user access and the data it chooses to store. The provider handles servers, power and cabling under the shared responsibility model."
+    },
+    {
+      "id": "tf17",
+      "cat": "ccNetCloud",
+      "type": "tf",
+      "question": "A padlock icon in the browser proves that a website is trustworthy and safe to enter your password.",
+      "answer": false,
+      "explanation": "The padlock means the connection is encrypted and the certificate matches the domain. Criminals can also get certificates for their phishing sites, so you still need to check the address."
+    },
+    {
+      "id": "tf18",
+      "cat": "ccNetCloud",
+      "type": "tf",
+      "question": "A firewall can stop a user who is tricked into downloading and running malware over an allowed connection.",
+      "answer": false,
+      "explanation": "Firewalls enforce rules on network traffic, and a download over an allowed web connection looks legitimate to them. Endpoint protection, awareness training and least privilege help here."
+    },
+    {
+      "id": "tf19",
+      "cat": "ccNetCloud",
+      "type": "tf",
+      "question": "Zero trust is a single product that an organization can buy and install to become secure.",
+      "answer": false,
+      "explanation": "Zero trust is a strategy and architecture approach that combines identity, device checks, segmentation and monitoring. No single product delivers it."
+    },
+    {
+      "id": "tf20",
+      "cat": "ccNetCloud",
+      "type": "tf",
+      "question": "In a SaaS model, the customer is responsible for patching the operating systems on the provider's servers.",
+      "answer": false,
+      "explanation": "In SaaS the provider manages the infrastructure, operating systems and application. The customer manages user access, configuration choices and its own data."
+    },
+    {
+      "id": "tf21",
+      "cat": "ccNetCloud",
+      "type": "tf",
+      "question": "Network address translation lets many devices that use private addresses share one public IP address.",
+      "answer": true,
+      "explanation": "NAT translates internal private addresses to a public address as traffic leaves, so many devices share it. It is not a substitute for a firewall."
+    },
+    {
+      "id": "tf22",
+      "cat": "ccNetCloud",
+      "type": "tf",
+      "question": "UDP guarantees that every packet reaches its destination in order.",
+      "answer": false,
+      "explanation": "UDP is connectionless and does not confirm delivery or order. TCP provides those guarantees."
+    },
+    {
+      "id": "q56",
+      "cat": "ccSecOps",
+      "type": "mc",
+      "question": "A company wants to decide how strongly to protect each of its information stores. What should it do first?",
+      "options": [
+        "Encrypt everything with the same algorithm",
+        "Classify the data by sensitivity and set handling rules",
+        "Buy the newest and most expensive security tools available",
+        "Move all data to the cloud"
+      ],
+      "correct": 1,
+      "explanation": "Classification shows how sensitive each data set is, which drives the strength of controls and handling rules. Treating everything the same wastes effort or leaves sensitive data under-protected, and buying tools or moving to the cloud does not answer what needs protection."
+    },
+    {
+      "id": "q57",
+      "cat": "ccSecOps",
+      "type": "mc",
+      "question": "A company is retiring old hard drives that held customer records. Which action best ensures the data cannot be recovered?",
+      "options": [
+        "Deleting the files and then emptying the recycle bin on each PC",
+        "Quick-formatting the drives",
+        "Securely destroying the drives by shredding or degaussing",
+        "Moving the drives to a storage closet"
+      ],
+      "correct": 2,
+      "explanation": "Physical destruction or approved sanitization makes recovery impractical. Deleting and quick formatting leave the data in place and recoverable with common tools, and storing the drives leaves the data fully exposed to anyone who obtains them."
+    },
+    {
+      "id": "q58",
+      "cat": "ccSecOps",
+      "type": "mc",
+      "question": "A company needs to encrypt a very large database quickly, with both sides already sharing a secret key. Which type of encryption is best suited?",
+      "options": [
+        "Asymmetric encryption, because it is faster for bulk data",
+        "Hashing, because it is reversible",
+        "A digital signature, because it hides the content",
+        "Symmetric encryption, such as AES"
+      ],
+      "correct": 3,
+      "explanation": "Symmetric encryption is fast and efficient for large amounts of data when a key can be shared securely. Asymmetric encryption is slower and mostly used to exchange keys or sign, hashing cannot be reversed, and signatures prove origin rather than hide content."
+    },
+    {
+      "id": "q59",
+      "cat": "ccSecOps",
+      "type": "mc",
+      "question": "A forensic analyst copies a suspect's disk and must show a court that the copy is identical to the original. What should the analyst compare?",
+      "options": [
+        "File names on both disks",
+        "The hash values of the original and the copy",
+        "The time the copy was made",
+        "The brand of the disk"
+      ],
+      "correct": 1,
+      "explanation": "Identical hash values show that the contents match exactly, as any change would produce a different hash. File names, copy time or disk brand say nothing about whether every bit is the same."
+    },
+    {
+      "id": "q60",
+      "cat": "ccSecOps",
+      "type": "mc",
+      "question": "A malicious program spreads from computer to computer across a company network by itself, without any user opening a file. What is this type of malware?",
+      "options": [
+        "Trojan",
+        "Worm",
+        "Spyware",
+        "Adware"
+      ],
+      "correct": 1,
+      "explanation": "A worm self-replicates across networks without user action. A trojan pretends to be something useful and needs the user to run it, spyware secretly gathers information, and adware displays unwanted ads."
+    },
+    {
+      "id": "q61",
+      "cat": "ccSecOps",
+      "type": "mc",
+      "question": "An employee gets a phone call from someone claiming to be from IT who urgently asks for the employee's password to fix a problem. What is the best response?",
+      "options": [
+        "Give the password, since the IT department may well need it",
+        "Give only the first half of the password, to be on the safe side",
+        "Politely refuse, hang up, and report it to the security team",
+        "Ask for a request by email, then reply to it with the password"
+      ],
+      "correct": 2,
+      "explanation": "This is vishing, a voice-based social engineering attack. Real IT staff do not ask for passwords, so the safe response is to refuse, verify through a trusted channel and report. Giving part of a password or sending it by email still leaks it."
+    },
+    {
+      "id": "q62",
+      "cat": "ccSecOps",
+      "type": "mc",
+      "question": "A store's website suddenly receives millions of requests per second from thousands of infected devices and customers cannot load pages. Which attack is this and which property does it target?",
+      "options": [
+        "On-path attack targeting the integrity of stored data",
+        "Phishing, which targets confidentiality of secrets",
+        "Brute force guessing, targeting the authentication process",
+        "DDoS targeting availability"
+      ],
+      "correct": 3,
+      "explanation": "A flood from many sources that makes a service unusable is a DDoS attack, which targets availability. On-path attacks intercept traffic, phishing tricks people, and brute force guesses credentials."
+    },
+    {
+      "id": "q63",
+      "cat": "ccSecOps",
+      "type": "mc",
+      "question": "A company wants one place that collects logs from firewalls, servers and applications, correlates them and alerts on suspicious patterns. Which tool fits?",
+      "options": [
+        "A SIEM",
+        "A VPN gateway",
+        "A DHCP server",
+        "A hardware token"
+      ],
+      "correct": 0,
+      "explanation": "A security information and event management system aggregates and correlates logs and raises alerts. A VPN provides encrypted access, DHCP assigns addresses, and a token is an authentication device."
+    },
+    {
+      "id": "q64",
+      "cat": "ccSecOps",
+      "type": "mc",
+      "question": "A laptop is confirmed to be infected with malware that is contacting an outside server. Which action is part of the containment phase of incident response?",
+      "options": [
+        "Writing the lessons-learned report",
+        "Isolating the laptop from the network",
+        "Reviewing the incident response plan next year",
+        "Buying a new antivirus subscription"
+      ],
+      "correct": 1,
+      "explanation": "Containment limits the spread and damage, and disconnecting the affected system from the network is a typical step. A lessons-learned report is post-incident activity, and plan reviews and purchases are not immediate containment actions."
+    },
+    {
+      "id": "q65",
+      "cat": "ccSecOps",
+      "type": "mc",
+      "question": "Services are fully restored after a breach and the team meets to discuss what went well, what failed and how to improve. Which phase of the incident response lifecycle is this?",
+      "options": [
+        "Preparation",
+        "Detection and analysis",
+        "Containment",
+        "Post-incident activity"
+      ],
+      "correct": 3,
+      "explanation": "Reviewing lessons learned after recovery is post-incident activity. Preparation happens before incidents, detection and analysis happens when an incident is being identified and scoped, and containment limits the damage during the incident."
+    },
+    {
+      "id": "q66",
+      "cat": "ccSecOps",
+      "type": "mc",
+      "question": "A business impact analysis sets a recovery point objective (RPO) of 4 hours for an order system. What does that mean?",
+      "options": [
+        "The system must be back online again within 4 hours of failure",
+        "The system can be down for at most 4 days in total",
+        "The business can lose up to 4 hours of data",
+        "Backups must be retained for 4 hours only, then discarded"
+      ],
+      "correct": 2,
+      "explanation": "RPO measures how much data loss, expressed as time since the last good copy, is acceptable, so backups or replication must happen at least every 4 hours. The time to restore service is the RTO, and tolerable total downtime is the MTD."
+    },
+    {
+      "id": "msq15",
+      "cat": "ccSecOps",
+      "type": "ms",
+      "question": "Which two statements about disaster recovery planning are correct? (Choose two.)",
+      "options": [
+        "Recovery time objective is the target time for restoring a service",
+        "A cold site is the fastest and most expensive recovery option",
+        "Backups should be tested by performing restores",
+        "A disaster recovery plan only needs to be reviewed after an actual disaster",
+        "Recovery point objective measures how long the restore takes"
+      ],
+      "correct": [
+        0,
+        2
+      ],
+      "explanation": "RTO is a time target for restoration, and a backup that has never been restored might not work when needed. A cold site is the slowest and cheapest, plans should be reviewed and exercised regularly, and RPO measures acceptable data loss, not restore time."
+    },
+    {
+      "id": "msq16",
+      "cat": "ccSecOps",
+      "type": "ms",
+      "question": "Which two actions help preserve digital evidence for a possible legal case? (Choose two.)",
+      "options": [
+        "Document everyone who handles the evidence in a chain of custody",
+        "Reboot the suspect computer to see what happens",
+        "Analyze a verified copy instead of the original media",
+        "Delete the malware immediately so it cannot spread",
+        "Let each analyst browse the original disk to look for clues"
+      ],
+      "correct": [
+        0,
+        2
+      ],
+      "explanation": "A chain of custody shows evidence was handled properly, and working from a verified copy keeps the original unchanged. Rebooting, deleting files or browsing the original media alters or destroys evidence."
+    },
+    {
+      "id": "tf23",
+      "cat": "ccSecOps",
+      "type": "tf",
+      "question": "A hash can be reversed with the right key to recover the original data.",
+      "answer": false,
+      "explanation": "Hashing is one-way and uses no key. Encryption is the reversible process that needs a key."
+    },
+    {
+      "id": "tf24",
+      "cat": "ccSecOps",
+      "type": "tf",
+      "question": "Applying vendor patches removes known vulnerabilities, so delaying them leaves systems open to attacks that already exist.",
+      "answer": true,
+      "explanation": "Attackers actively exploit known flaws whose fixes are available. Timely, tested patching is one of the most effective risk reductions."
+    },
+    {
+      "id": "tf25",
+      "cat": "ccSecOps",
+      "type": "tf",
+      "question": "A backup that has never been restored in a test can still be fully trusted to work.",
+      "answer": false,
+      "explanation": "Backups can fail silently, be incomplete or be corrupted. Only a successful test restore demonstrates they are usable."
+    },
+    {
+      "id": "tf26",
+      "cat": "ccSecOps",
+      "type": "tf",
+      "question": "If the chain of custody for evidence is broken, the evidence may not be accepted or trusted.",
+      "answer": true,
+      "explanation": "Chain of custody shows who held evidence and that it was not altered. Gaps make it possible to argue it was tampered with."
+    },
+    {
+      "id": "tf27",
+      "cat": "ccSecOps",
+      "type": "tf",
+      "question": "A hot recovery site is the cheapest and slowest recovery option.",
+      "answer": false,
+      "explanation": "A hot site is ready to run almost immediately, so it is the fastest and the most expensive. A cold site is the cheapest and slowest."
+    },
+    {
+      "id": "tf28",
+      "cat": "ccSecOps",
+      "type": "tf",
+      "question": "A digital signature keeps the content of a message secret from eavesdroppers.",
+      "answer": false,
+      "explanation": "A signature proves who signed and that the message was not altered, but it does not hide the content. Encryption provides confidentiality."
+    }
+  ],
+  "lessons": [
+    {
+      "id": "cia-risk-controls-ethics",
+      "title": "Security Principles: CIA, Risk, Controls and Ethics",
+      "summary": "The three goals of security, how risk is judged and treated, the types of controls, and the professional code you are expected to follow.",
+      "diagram": null,
+      "vocabIds": [
+        "f1",
+        "f5",
+        "f6",
+        "f13",
+        "f18",
+        "f20",
+        "f21",
+        "f22",
+        "f23"
+      ],
+      "quizIds": [
+        "q1",
+        "q6",
+        "q8",
+        "q9",
+        "q12",
+        "tf2"
+      ],
+      "reading": "Everything in cybersecurity starts from three goals, known as the CIA triad. Confidentiality means only the right people can see information. Integrity means information is accurate and has not been changed by someone who should not change it. Availability means systems and data work when authorized people need them. When you read any scenario, ask which of the three just went wrong. A stolen customer list is a confidentiality failure. A tampered invoice is an integrity failure. A website knocked offline by an attacker, or by a power cut, is an availability failure. Two related ideas show up often: authentication, which proves you are who you claim to be, and non-repudiation, which means a person cannot credibly deny what they did, for example because they signed a message with a digital signature only they control.\n\nSecurity is really about managing risk, not removing it. Four words matter. An asset is anything of value, such as a database. A vulnerability is a weakness, such as software that has not been updated. A threat is something that could take advantage of that weakness, such as a criminal or a piece of malware. Risk is the chance that a threat will exploit the vulnerability and cause harm, judged by how likely it is and how bad the impact would be.\n\nOnce a risk is understood, an organization chooses one of four treatments. It can avoid the risk by not doing the risky activity at all, for example by never storing card numbers. It can mitigate the risk by adding controls such as patching or encryption. It can transfer the financial cost, usually with insurance or a contract, though the legal and reputational responsibility stays with the organization. Or it can accept the risk, which is a deliberate and documented decision, usually because treating it costs more than it is worth. Whatever is left after the controls are in place is called residual risk, and management decides whether that leftover amount is tolerable.\n\nControls are the safeguards that reduce risk, and the exam sorts them in two ways. By category, a control is technical (built in technology, like a firewall or encryption), administrative (policies, procedures and training), or physical (locks, fences, guards, cameras). By function, a control may be preventive (stops it), detective (notices it), corrective (fixes it afterward), deterrent (discourages the attempt) or compensating (stands in when the ideal control is not possible). One control can be described both ways: a door lock is physical and preventive, and a camera is physical and detective. Strong security layers many different controls so that a single failure is not fatal. This idea is called defense in depth.\n\nFinally, professionals are held to an ethical standard. The ISC2 Code of Ethics has a short preamble and four canons, listed in priority order: protect society, the common good, public trust and the infrastructure; act honorably, honestly, justly, responsibly and legally; provide diligent and competent service to those you work for; and advance and protect the profession. Because the order is a priority list, society comes before your employer, and your employer comes before the profession.",
+      "fundamentalsLabel": "New to security principles? See the everyday analogy",
+      "fundamentals": "Think of protecting your home. Confidentiality is curtains and locked drawers so strangers cannot see your private papers. Integrity is knowing nobody has quietly swapped the labels on your medicine bottles. Availability is making sure the front door key works and the lights come on when you need them. Risk is the chance that a burglar finds your unlocked back window and the cost if they do. You might avoid the risk by not keeping jewelry at home, mitigate it with better locks, transfer part of the cost with home insurance, or accept it for low-value items. A lock is a physical preventive control, a camera is a physical detective control, and the habit of always locking up is an administrative control. Using the lock, the camera, the alarm and the insurance together is defense in depth.",
+      "keyTerms": [
+        "CIA triad",
+        "Authentication",
+        "Non-repudiation",
+        "Threat, vulnerability, asset",
+        "Risk treatment",
+        "Residual risk",
+        "Control categories",
+        "Control functions",
+        "Defense in depth"
+      ],
+      "commonTraps": [
+        "Risk transfer moves the financial loss, not the accountability. A company that buys insurance is still responsible to its customers after a breach.",
+        "Do not confuse a control's category (technical, administrative, physical) with its function (preventive, detective, corrective, deterrent). A camera is physical and detective, not technical.",
+        "Residual risk is what remains after controls; inherent risk is before controls. Risk can be reduced but never reduced to zero.",
+        "In the ISC2 Code of Ethics the order matters: public safety and trust outrank your employer, and your employer outranks the profession."
+      ],
+      "scenario": "A regional clinic stores patient records on a server in a back room. An assessment finds that the server is missing security updates and the room is unlocked. Leadership discusses options. They install a lock and a camera, enroll all staff in training, encrypt the server, and buy cyber insurance. One manager also suggests that the clinic simply accept the small remaining risk of a sophisticated attack. The team records which risk is treated by which measure and what residual risk is left for the board to approve.",
+      "onTheJob": "In real work, nobody asks you to recite the triad. They ask whether a change will help or hurt it. When you propose a control, say which property it protects and what it might cost another. Strong encryption protects confidentiality but a lost key hurts availability, and a very strict lockout rule can prevent an attacker from guessing passwords but also lock out real users. Always write down risk acceptances with the name of the manager who accepted and a review date, because an undocumented decision to ignore a risk looks like negligence later. If you ever face an ethics question, escalate through the proper channel and keep records rather than deciding alone."
+    },
+    {
+      "id": "governance-policies-compliance",
+      "title": "Security Governance: Policies, Compliance and Culture",
+      "summary": "How organizations direct security through leadership, written rules, laws and frameworks, and how people and measurement make those rules real.",
+      "diagram": null,
+      "vocabIds": [
+        "f27",
+        "f28",
+        "f29",
+        "f30",
+        "f31",
+        "f32",
+        "f34",
+        "f36",
+        "f38"
+      ],
+      "quizIds": [
+        "q17",
+        "q20",
+        "q22",
+        "q23",
+        "q24",
+        "q28"
+      ],
+      "reading": "Governance answers the question, who decides how security is done and who is accountable when it goes wrong? In a healthy organization senior management sets the direction, approves the rules, provides money and people, and is ultimately accountable. Technical staff carry the rules out, but they do not own the accountability. Many organizations tie this together under governance, risk and compliance, often shortened to GRC: governance gives direction, risk management shows what could go wrong, and compliance shows that legal and internal rules are being met.\n\nDirection becomes real through a set of written documents with a clear pecking order. A policy is a high-level, mandatory statement from management, such as 'all laptops must be encrypted'. A standard is a specific, mandatory requirement that supports the policy, such as which encryption algorithm and strength to use. A procedure is the step-by-step instruction for doing a task correctly. A guideline is advice and best practice that is not mandatory. The easy way to sort them on the exam is to ask whether it is mandatory and how detailed it is. An acceptable use policy is a common example: it tells staff what they may do with company systems, and a signed acknowledgment lets the company enforce it.\n\nOrganizations also face outside rules. Laws and regulations are legal requirements: GDPR protects the personal data of people in the European Union and applies based on whose data is handled, and HIPAA covers protected health information in the United States. PCI DSS is different because it is an industry standard that card brands enforce through contracts, not a law. Voluntary frameworks such as the NIST Cybersecurity Framework 2.0 give a shared structure of six functions, Govern, Identify, Protect, Detect, Respond and Recover, to organize a program and discuss it with leaders. Being compliant is a minimum standard, not proof of safety, because attackers do not read checklists.\n\nTwo legal-sounding ideas appear often. Due diligence is the investigation and planning: researching a vendor, finding the risks, choosing sensible controls. Due care is acting responsibly on that knowledge: applying the controls and keeping them working. Failing at either can be treated as negligence. Related practices keep the program honest. Change management makes sure changes to systems are reviewed, approved, tested and recorded. Audits, internal or external, independently check that controls exist and work, and external audits carry the most credibility because the auditor has no stake in the result.\n\nRules only work if people follow them, so governance also covers culture and awareness. Regular security awareness training, including simulated phishing, teaches everyone to spot and report problems. A no-blame reporting culture matters because people who fear punishment hide mistakes, and hidden mistakes become large incidents. Leaders can then watch measures such as key performance indicators, which show how well controls work, and key risk indicators, which warn that risk is rising. Finally, redundancy, such as a second internet link or power supply, removes single points of failure and supports availability.",
+      "fundamentalsLabel": "New to governance? See the everyday analogy",
+      "fundamentals": "Think of a school. The school board decides it wants children to be safe and answers to parents for it; that is governance. The board approves a policy: 'visitors must be signed in.' The principal turns this into a standard: 'every visitor wears a numbered badge.' The front office has a procedure: step one, check ID; step two, print the badge; step three, call the teacher. A guideline is advice such as 'greet visitors with a smile.' Local law is the legal rulebook, and a sports league's safety code is like PCI DSS, an industry rulebook you agreed to follow. Fire drills are awareness training, and an inspector's visit is an audit.",
+      "keyTerms": [
+        "GRC",
+        "Policy",
+        "Standard",
+        "Procedure",
+        "Guideline",
+        "GDPR",
+        "PCI DSS",
+        "NIST CSF 2.0",
+        "Due care and due diligence"
+      ],
+      "commonTraps": [
+        "Policy, standard and procedure are mandatory; only a guideline is optional. Procedures give steps, standards give specifics, and policies give intent.",
+        "PCI DSS is an industry standard enforced by contract. GDPR and HIPAA are laws. The NIST framework is voluntary.",
+        "Due diligence is investigating and planning; due care is acting and maintaining. The exam loves to swap them.",
+        "Passing an audit shows compliance at a point in time. It does not guarantee the organization is secure."
+      ],
+      "scenario": "A small online retailer starts selling to customers in Europe and accepts card payments. The owner asks the new security coordinator what rules apply. The coordinator explains that GDPR may apply because the customers are in the EU, that PCI DSS applies through the contract with the payment processor, and that the company's own policies must be updated to match. She drafts a short acceptable use policy, plans awareness training with simulated phishing, and sets up a request-and-approval process for changes to the website. Management signs off on everything and asks for quarterly reports.",
+      "onTheJob": "Most governance work is writing things people will actually read and then checking they are followed. A policy that is twenty pages long and approved by nobody is worth nothing. Keep policies short, have a named senior owner, and put the technical detail in standards that can change faster. Expect to translate between worlds: tell executives about risk and money, and tell engineers about standards and procedures. When a manager says 'we passed the audit, so we are fine,' gently point out what the audit did not cover. And protect the reporting culture: thank the person who reports a mistake, because the next person will only speak up if the last one was treated well."
+    },
+    {
+      "id": "identity-access-management",
+      "title": "Identity and Access Management Concepts",
+      "summary": "How systems know who you are, decide what you may do, and limit access with least privilege, roles and good account hygiene.",
+      "diagram": null,
+      "vocabIds": [
+        "f46",
+        "f47",
+        "f50",
+        "f51",
+        "f57",
+        "f59",
+        "f61",
+        "f64",
+        "f65"
+      ],
+      "quizIds": [
+        "q29",
+        "q30",
+        "q31",
+        "q32",
+        "q35",
+        "q40"
+      ],
+      "reading": "Identity and access management, usually shortened to IAM, is the discipline of creating digital identities and controlling what each one can reach. It is easiest to learn as a chain of four steps. Identification is claiming an identity, for example by typing a username. Authentication is proving the claim. Authorization is deciding what that proven identity is allowed to do. Accountability, sometimes called accounting, is recording what the identity actually did so people can be held responsible (the last three are AAA). Logging in does not mean you may do anything, and logs create accountability only when every person has a unique account.\n\nAuthentication can use three kinds of factor: something you know, such as a password or PIN; something you have, such as a phone, smart card or security key; and something you are, such as a fingerprint or face. Multi-factor authentication, or MFA, means combining at least two different kinds, so a stolen password alone is not enough. A password plus a PIN is not MFA because both are things you know. Not all MFA is equally strong. Codes sent by text message can be intercepted or typed into a fake page, while passkeys and hardware security keys are tied to the real website and resist phishing. For passwords, current guidance favors long passphrases, a unique password per site kept in a password manager, and screening against breached passwords over forced symbols and constant changes.\n\nSingle sign-on lets you log in once to reach many applications, and federation extends that trust across organizations, so a partner portal can accept the identity your own company verified. These reduce password fatigue and let administrators manage access in one place, but they also concentrate risk, which is why those accounts deserve MFA. Biometrics have error rates: a false rejection locks out a real user and a false acceptance lets in an impostor, the dangerous one.\n\nAfter a person is authenticated, access models decide what they can do. In discretionary access control the owner of a resource decides who gets access. In mandatory access control the system enforces rules from labels, such as data classification and user clearance, and owners cannot override them. In role-based access control permissions are attached to job roles and people receive roles, which scales well. In attribute-based access control decisions use attributes and context, such as department, device health, location and time. All of them should follow least privilege, giving only the minimum access needed, and need to know, limiting access to specific information to those who require it. Segregation of duties splits sensitive tasks between two people so nobody can commit and hide fraud alone.\n\nAccess must also be managed through its life. Provisioning gives new staff the right access, deprovisioning removes it promptly when they leave, and periodic access reviews catch privilege creep, the slow buildup of rights as people change roles. Privileged accounts, such as administrators, need extra protection: separate accounts for daily work, monitored sessions and vaulted credentials. Physical access follows the same logic with badges, guards, cameras and access control vestibules, called mantraps, that admit one person at a time to stop tailgating.",
+      "fundamentalsLabel": "New to access control? See the everyday analogy",
+      "fundamentals": "Think of entering a hospital. At the front desk you say who you are (identification) and show a photo ID (authentication). A badge printed for you says which floors you may visit (authorization), a visitor who is a doctor gets different access from one visiting a relative (roles), and the badge only works during visiting hours (attributes). A nurse can enter the medicine room, but a second person must co-sign for controlled drugs (segregation of duties). Cameras and sign-in sheets keep a record (accountability). When a contractor finishes, their badge is turned off the same day (deprovisioning), and managers review who still has keys every few months (access review).",
+      "keyTerms": [
+        "Identification and authentication",
+        "Authorization",
+        "Accountability (AAA)",
+        "Multi-factor authentication",
+        "Least privilege",
+        "Segregation of duties",
+        "RBAC",
+        "ABAC",
+        "Privilege creep"
+      ],
+      "commonTraps": [
+        "Two things you know (password plus PIN or security question) is not multi-factor authentication. You need two different factor types.",
+        "Authentication proves who you are; authorization decides what you can do. Typing a username is identification only.",
+        "In mandatory access control the system enforces labels; in discretionary access control the owner decides. The names are a hint: 'mandatory' means users cannot change it.",
+        "Shared accounts destroy accountability because logs cannot show which person acted.",
+        "Least privilege is about the minimum rights needed; need to know is about specific information. They are related but not identical."
+      ],
+      "scenario": "A finance team member moves to the sales department. Six months later an access review shows she can still approve payments, which she no longer needs. The reviewer removes those rights, records the change, and asks the manager to confirm that her new role matches the sales role in the system. A few weeks earlier, a departing contractor's account had stayed active for a month after his last day, and nobody noticed until the review found it. The company decides to link account removal to the departure checklist and to require MFA for every sign-in.",
+      "onTheJob": "Most real breaches involve stolen or misused credentials, so IAM fixes are among the highest-value work you can do. Turn on MFA first for email, administrator accounts and remote access, and prefer phishing-resistant methods where you can. Make the offboarding checklist a real checklist that HR and IT both own, because old accounts are quiet and dangerous. When someone asks for 'full access just in case,' ask what task they are trying to do and grant exactly that. Review administrator accounts more often than ordinary ones, and never let people use their powerful account for email and browsing. Keep a log of who approved which access, because auditors will ask."
+    },
+    {
+      "id": "networking-fundamentals",
+      "title": "Networking Fundamentals for Security",
+      "summary": "IP addresses, ports, protocols, the OSI model, and the devices that move and filter traffic.",
+      "diagram": null,
+      "vocabIds": [
+        "f69",
+        "f71",
+        "f73",
+        "f74",
+        "f75",
+        "f76",
+        "f78",
+        "f79",
+        "f80"
+      ],
+      "quizIds": [
+        "q42",
+        "q43",
+        "q44",
+        "q46",
+        "q47",
+        "q48"
+      ],
+      "reading": "A network is simply devices connected so they can exchange data. A local area network, or LAN, links devices in one place such as an office, a wide area network links separate places, and the internet is the global network of networks. Every device needs an address. An IP address identifies a device so data can be routed to it. IPv4 addresses are 32 bits, written like 192.168.1.10, and IPv6 addresses are 128 bits written in hexadecimal; IPv6 exists because IPv4 addresses ran short. Some ranges are private and used only inside organizations: 10.0.0.0, 172.16.0.0 through 172.31.255.255, and 192.168.0.0. Devices with private addresses reach the internet through network address translation, which lets many of them share one public address. The Domain Name System, or DNS, translates names such as example.com into IP addresses, and DHCP automatically hands out addresses to devices when they join.\n\nAn IP address finds the device, and a port finds the service on it. Ports are numbers from 0 to 65535, and common ones are worth memorizing: FTP 21, SSH 22, Telnet 23, SMTP 25, DNS 53, HTTP 80, HTTPS 443 and Remote Desktop 3389. Learn them as pairs of insecure and secure: Telnet sends everything including passwords in clear text, while SSH encrypts; HTTP is clear text, while HTTPS wraps web traffic in TLS encryption. Every open port is a service listening for connections, so closing ports you do not need shrinks the attack surface. Two transport protocols carry most traffic. TCP is reliable: it sets up a connection, confirms delivery and resends lost data. UDP is faster and lighter with no guarantee, which suits live video, voice and DNS lookups.\n\nThe OSI model is a seven-layer way to talk about networks, from bottom to top: Physical, Data Link, Network, Transport, Session, Presentation and Application. A memory aid is 'Please Do Not Throw Sausage Pizza Away'. The layers that come up most are layer 2, where switches forward frames using hardware addresses inside a network; layer 3, where routers forward packets between networks using IP addresses; layer 4, where TCP, UDP and port numbers live; and layer 7, where applications such as web browsers operate.\n\nSeveral devices enforce security on this traffic. A firewall allows or blocks traffic by rules such as source, destination, port and protocol, and newer ones also understand applications and users. An intrusion detection system, IDS, watches for suspicious activity and raises alerts; an intrusion prevention system, IPS, sits in the traffic path and can block it, with the risk that a false alarm may block legitimate traffic. Remember that a firewall controls traffic passing through it. It cannot stop a user who is tricked into downloading malware over an allowed connection, which is why networks need layers.\n\nWireless and encrypted channels round out the basics. Wi-Fi should use WPA3 where possible, and old WEP is broken. An open public hotspot has no encryption, so sensitive work there needs a VPN, which wraps traffic in an encrypted tunnel, and HTTPS. Transport Layer Security, or TLS, encrypts data between a client and server and checks the server's certificate. The browser padlock means the connection is encrypted, not that the site is honest.",
+      "fundamentalsLabel": "New to networking? See the everyday analogy",
+      "fundamentals": "Think of the postal system delivering letters to an apartment building. The IP address is the street address of the building and the port is the apartment number, so the letter reaches the right service. DNS is the phone book that turns a name into the address. TCP is registered mail that asks for a signature and resends if lost, while UDP is a postcard that is quick but may never arrive. A router is the post office sorting mail between cities, and a switch is the mailroom inside the building. A firewall is the guard at the door who checks the address and sender against a list, and an encrypted VPN is a locked, sealed envelope inside an armored van.",
+      "keyTerms": [
+        "IP address",
+        "Private IP ranges",
+        "Port",
+        "TCP vs UDP",
+        "DNS",
+        "OSI model",
+        "Router and switch",
+        "Firewall",
+        "IDS and IPS"
+      ],
+      "commonTraps": [
+        "Insecure and secure pairs: Telnet 23 versus SSH 22, and HTTP 80 versus HTTPS 443. If a question asks for an encrypted option, pick the secure one.",
+        "A switch works at layer 2 using hardware addresses inside a network; a router works at layer 3 using IP addresses between networks.",
+        "IDS detects and alerts; IPS prevents by blocking. A false positive on an IPS can drop legitimate traffic.",
+        "The browser padlock means an encrypted connection, not a trustworthy website.",
+        "NAT hides internal addresses but is not a firewall, and IPv6 is not automatically more secure than IPv4."
+      ],
+      "scenario": "A small company's office printers, laptops and phones all use addresses beginning with 192.168. A staff member reports that the company website is slow, and an administrator checks the firewall logs and sees many requests to port 23 from the internet toward an old server. Port 23 is Telnet, an insecure remote administration protocol that should be replaced with SSH on port 22. The administrator blocks the port at the firewall, moves management to SSH, and confirms that the public website still works on port 443.",
+      "onTheJob": "You will use ports and addresses every week when reading logs and firewall rules. Get in the habit of asking what a service listening on a port is for and whether anyone needs it. Default-deny is a good firewall mindset: block everything, then allow only what is necessary. When a user says the internet is down, work from the bottom up: is the cable or Wi-Fi connected, does the device have an IP address, can it reach the router, can it resolve names? That mirrors the layers and saves time. Never assume that traffic inside your network is safe, and never assume that the padlock on a website means the site is honest."
+    },
+    {
+      "id": "cloud-segmentation-zero-trust",
+      "title": "Cloud Security, Segmentation and Zero Trust",
+      "summary": "Cloud service and deployment models, who is responsible for what, and how segmentation and zero trust limit the damage from a breach.",
+      "diagram": null,
+      "vocabIds": [
+        "f81",
+        "f82",
+        "f83",
+        "f87",
+        "f88",
+        "f89",
+        "f90",
+        "f91"
+      ],
+      "quizIds": [
+        "q45",
+        "q49",
+        "q51",
+        "q52",
+        "q54",
+        "q55"
+      ],
+      "reading": "Cloud computing means renting computing resources from a provider over the internet instead of owning them. The official NIST definition lists five essential characteristics: on-demand self-service, where you create resources yourself without calling anyone; broad network access; resource pooling, where many customers share the provider's hardware; rapid elasticity, where capacity grows and shrinks as needed; and measured service, where you pay for what you use. These are what make something genuinely cloud rather than just a hosted server.\n\nCloud services come in three models, defined by how much the provider manages. Infrastructure as a service, IaaS, rents virtual servers, storage and networks, and you manage the operating system and everything above it. Platform as a service, PaaS, provides a managed environment where you deploy your own application code. Software as a service, SaaS, delivers a finished application such as web email, where you mostly manage users and your data. Do not confuse these with deployment models, which describe who owns and shares the cloud. A public cloud is run by a provider for many customers, a private cloud serves one organization, a hybrid cloud combines models that work together, and a community cloud is shared by organizations with common needs.\n\nThe most important cloud idea for the exam is the shared responsibility model. The provider is responsible for security of the cloud: the buildings, hardware, power and the virtualization layer. The customer is responsible for security in the cloud: their data, who has access, and how their resources are configured. As you move from IaaS to PaaS to SaaS the provider takes on more, but the customer always keeps responsibility for their data and for access to it. Most cloud breaches come from customer mistakes such as a storage bucket accidentally left open to the public, not from the provider being hacked. Contracts and service level agreements spell out what the provider promises, and customers should read them.\n\nInside any network, segmentation limits how far an attacker can travel. A flat network lets malware that lands on one computer reach everything. Splitting the network into zones with firewall rules between them contains the damage. A virtual LAN, or VLAN, does this logically, and microsegmentation applies very fine rules between individual workloads. A demilitarized zone, or screened subnet, holds public-facing servers such as web servers behind a firewall so a compromise there does not give direct access to internal systems. A virtual private network encrypts traffic across untrusted networks, and network access control can check a device's health before letting it connect.\n\nZero trust ties these ideas together. The old model trusted anything inside the network perimeter. Zero trust says never trust, always verify: every request is authenticated, authorized with least privilege, and checked for context such as device health, and nothing is trusted just because of where it connects from. It matters because users work from home and cloud services, so the perimeter has largely disappeared. Zero trust is a strategy that combines strong identity and MFA, device checks, segmentation and monitoring. It is not a single product you can buy.",
+      "fundamentalsLabel": "New to cloud security? See the everyday analogy",
+      "fundamentals": "Renting in the cloud is like renting an apartment instead of building a house. The landlord keeps the roof, the wiring and the front-door lock working, but you decide who gets a key to your unit and whether you leave your window open. If you rent an unfurnished apartment (IaaS) you bring and maintain all your furniture. A furnished one (PaaS) saves you that work, and a hotel room (SaaS) is almost entirely looked after, though you are still responsible for your belongings and who you let in. Segmentation is the walls between apartments, and zero trust is a building where every door needs a key card check, even if you are already inside the building.",
+      "keyTerms": [
+        "Essential cloud characteristics",
+        "IaaS, PaaS, SaaS",
+        "Public, private, hybrid, community cloud",
+        "Shared responsibility model",
+        "Segmentation and VLAN",
+        "DMZ",
+        "VPN",
+        "Zero trust"
+      ],
+      "commonTraps": [
+        "Service models (IaaS, PaaS, SaaS) describe what you rent; deployment models (public, private, hybrid, community) describe who owns and shares the cloud.",
+        "Under shared responsibility the customer always keeps responsibility for their data and access, even with SaaS.",
+        "Most cloud breaches come from customer misconfiguration, not from the provider being hacked.",
+        "Zero trust is a strategy of continuous verification, not a product, and being on the VPN or inside the building does not make a request trusted.",
+        "A VPN protects data in transit; it does not clean up a compromised device."
+      ],
+      "scenario": "A startup runs its customer database on rented virtual machines in a public cloud. An engineer creates a storage bucket for backups and accidentally sets it to public. A researcher finds it and tells the company. The post-incident review finds that the provider's platform worked as designed, and the exposure came from the customer's own configuration. The company adopts a rule that new storage defaults to private, requires MFA for all engineers, places the database in a separate network segment, and begins moving toward zero trust by verifying device health before allowing access.",
+      "onTheJob": "When your organization adopts a cloud service, the first question is always which parts are mine to secure. Read the provider's shared responsibility documentation and turn it into a checklist. The common failures are public storage, overly broad access permissions and unused administrator accounts, so check those first. Turn on logging from day one, because you cannot investigate what you did not record. Segment production from test, and treat anything reachable from the internet as hostile. When someone says 'we are inside the VPN, so it is fine,' that is the perimeter thinking zero trust is designed to replace. Practical zero trust starts with strong identity, MFA, and least privilege."
+    },
+    {
+      "id": "operations-malware-incident-response",
+      "title": "Security Operations, Threats and Incident Response",
+      "summary": "Protecting data and systems day to day, recognizing common attacks, responding to incidents, and keeping the business running through disasters.",
+      "diagram": null,
+      "vocabIds": [
+        "f92",
+        "f94",
+        "f95",
+        "f100",
+        "f101",
+        "f104",
+        "f105",
+        "f108",
+        "f109"
+      ],
+      "quizIds": [
+        "q56",
+        "q60",
+        "q61",
+        "q64",
+        "q65",
+        "q66"
+      ],
+      "reading": "Security operations is the daily work of keeping systems safe. It begins with data: classify information by sensitivity, such as public, internal, confidential and restricted, then apply handling rules for storage, sharing and disposal. When data is no longer needed it must be destroyed properly. Deleting files or quick-formatting a drive leaves data recoverable, while shredding, degaussing or approved wiping does not. Systems themselves are kept in a known secure state with configuration baselines, which means removing unneeded services and default passwords, and patch and vulnerability management means scanning for weaknesses and applying vendor fixes promptly. Logs are collected and reviewed, often with a SIEM, which gathers logs from many sources and raises alerts.\n\nCryptography protects data in operation. Symmetric encryption uses one shared key and is fast, so it handles bulk data, with AES as the standard example. Asymmetric encryption uses a public and private key pair, is slower, and solves the problem of sharing keys safely; it also enables digital signatures, which prove who signed and that the content was not altered. Hashing is different from both: it is a one-way function that produces a fixed fingerprint, so any change to the data changes the hash, which makes it ideal for checking integrity. A hash has no key and cannot be reversed.\n\nDefenders must recognize the main threats. Malware includes viruses that attach to files, worms that spread by themselves across networks, trojans that pretend to be useful, spyware that watches in secret, and ransomware that locks data until payment. Social engineering attacks people rather than machines: phishing uses email, vishing uses phone calls, smishing uses text messages, and pretexting uses an invented story, while tailgating follows someone through a secure door. Other common attacks include denial-of-service, which floods a system to make it unavailable, on-path attacks that secretly sit between two parties, brute force password guessing, and credential stuffing, which reuses passwords leaked from other sites.\n\nWhen something goes wrong, an event is any observable occurrence, an incident is an event that harms or threatens confidentiality, integrity or availability, and a breach is an incident where data is exposed without authorization. A prepared team follows the incident response lifecycle: preparation, detection and analysis, containment, eradication and recovery, and finally post-incident activity, where lessons learned improve the next response. Containment, such as isolating an infected laptop, comes before eradication, which removes the cause. Evidence is handled with a documented chain of custody, working from verified copies.\n\nBeyond a single incident, organizations plan to keep operating. A business impact analysis finds the critical functions and sets targets: the maximum tolerable downtime, the recovery time objective for restoring a service, and the recovery point objective, which is how much data loss, measured in time, is acceptable. The business continuity plan keeps the whole business running, and the disaster recovery plan restores technology. Backup sites are hot, warm or cold, trading cost for speed, and backups are trusted only when restores are tested.",
+      "fundamentalsLabel": "New to security operations? See the everyday analogy",
+      "fundamentals": "Running security operations is like running a small hospital's emergency readiness. Day to day you label supplies, lock the medicine cabinet, keep equipment maintained and check cameras (classification, configuration, patching, monitoring). When a fire alarm rings, a written plan decides who raises the alert, who shuts the doors to contain the fire, who puts it out, and who restores wards afterward. The next day everyone meets to talk about what to improve. The continuity plan is how the hospital keeps treating patients while one wing is closed, the recovery objectives are how fast a ward must reopen and how many hours of records may be lost, and a backup generator is the hot site that takes over right away.",
+      "keyTerms": [
+        "Data classification",
+        "Symmetric and asymmetric encryption",
+        "Hashing",
+        "Malware types",
+        "Social engineering",
+        "Incident response lifecycle",
+        "Chain of custody",
+        "RTO and RPO",
+        "Business continuity plan"
+      ],
+      "commonTraps": [
+        "Hashing is one-way and keyless; encryption is reversible with a key. A digital signature proves origin and integrity but does not hide content.",
+        "In incident response, contain before you eradicate, and recover before you do the lessons-learned review. Preparation is always first.",
+        "RTO is how fast you restore; RPO is how much data loss you can accept. A hot site is the fastest and costliest, a cold site the slowest and cheapest.",
+        "A worm spreads by itself; a trojan needs the user to run it; a virus attaches to a file.",
+        "Deleting or quick-formatting does not securely destroy data, and an untested backup cannot be trusted."
+      ],
+      "scenario": "An employee receives a text message claiming to be from the delivery company and taps a link that installs malware. The next morning the security analyst notices unusual traffic in the logs and escalates according to the response plan. The team isolates the laptop to contain the infection, collects a verified disk copy with a chain of custody record, removes the malware and resets the employee's passwords, and restores files from a tested backup. In the review meeting they update awareness training to cover text-message phishing and add the malicious address to monitoring tools.",
+      "onTheJob": "Day to day, security operations is mostly unglamorous: patch, review logs, check backups, tidy accounts. During an incident, calm and order matter more than speed. Follow the plan, write down times and actions as you go, and avoid heroics such as deleting files or rebooting machines that may be evidence. Tell people what they need to know, no more, and use the communication channels the plan names. Test your backups by restoring them, and run a tabletop exercise at least once a year so people have practiced before the real thing. Treat every report from a user, especially a suspicious email, as useful information and say thank you."
+    }
+  ],
+  "cheatSheet": [
+    {
+      "heading": "CIA triad and core security terms",
+      "points": [
+        "Confidentiality: only authorized people see data. Integrity: data is accurate and unaltered. Availability: systems work when needed. Map every scenario to one of the three.",
+        "Authentication proves identity; authorization decides what you can do; accountability records what you did; non-repudiation means you cannot credibly deny it.",
+        "Asset = something of value. Vulnerability = weakness. Threat = what could exploit it. Risk = likelihood times impact.",
+        "Privacy is about appropriate use of personal data (PII); security protects the data. You can have one without the other."
+      ]
+    },
+    {
+      "heading": "Risk treatment and controls",
+      "points": [
+        "Four treatments: avoid (stop the activity), mitigate (add controls), transfer (insurance or contract, financial loss only), accept (documented decision).",
+        "Inherent risk is before controls; residual risk is after. Risk is never reduced to zero.",
+        "Control categories: technical (logical), administrative (managerial), physical. Functions: preventive, detective, corrective, deterrent, compensating, recovery.",
+        "Defense in depth means layering different controls so no single failure is fatal."
+      ]
+    },
+    {
+      "heading": "ISC2 Code of Ethics",
+      "points": [
+        "The four canons in priority order: protect society, the common good, public trust and the infrastructure; act honorably, honestly, justly, responsibly and legally; provide diligent and competent service to principals; advance and protect the profession.",
+        "When duties conflict, the earlier canon wins: public safety before the employer, employer before the profession.",
+        "Disclose conflicts of interest and report unethical behavior through proper channels."
+      ]
+    },
+    {
+      "heading": "Governance, policies and compliance",
+      "points": [
+        "Policy = mandatory high-level intent. Standard = mandatory specific requirement. Procedure = step-by-step instructions. Guideline = optional advice.",
+        "Senior management is ultimately accountable. GRC joins governance, risk management and compliance.",
+        "GDPR is an EU law about personal data and applies by whose data it is. HIPAA is a U.S. law for health information. PCI DSS is a contractual industry standard for card data.",
+        "NIST CSF 2.0 has six functions: Govern, Identify, Protect, Detect, Respond, Recover. Due diligence = investigate and plan; due care = act and maintain.",
+        "Awareness training, a no-blame reporting culture, change management, audits (external is most credible) and KPIs and KRIs keep governance real."
+      ]
+    },
+    {
+      "heading": "Identity and access management",
+      "points": [
+        "Factors: know, have, are. MFA needs two different types; password plus PIN is not MFA. Passkeys and security keys resist phishing; text-message codes do not.",
+        "Least privilege = minimum rights for the job. Need to know = only the information required. Segregation of duties = split sensitive tasks among people.",
+        "Models: DAC (owner decides), MAC (system enforces labels), RBAC (permissions by role), ABAC (attributes and context).",
+        "Deprovision accounts immediately at departure; run access reviews to catch privilege creep; protect privileged accounts with separate admin accounts and session monitoring.",
+        "Physical controls: badges, guards, cameras, visitor logs, mantraps (access control vestibules) against tailgating."
+      ]
+    },
+    {
+      "heading": "Networking, ports and OSI",
+      "points": [
+        "OSI layers 1 to 7: Physical, Data Link, Network, Transport, Session, Presentation, Application. Switch = layer 2, router = layer 3, TCP and UDP = layer 4.",
+        "Ports: FTP 21, SSH 22, Telnet 23, SMTP 25, DNS 53, HTTP 80, HTTPS 443, RDP 3389. Secure versus insecure: SSH over Telnet, HTTPS over HTTP.",
+        "Private IPv4 ranges: 10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16. IPv4 is 32 bits; IPv6 is 128 bits.",
+        "TCP is reliable and connection-oriented; UDP is fast with no delivery guarantee. DNS translates names to addresses; DHCP assigns addresses; NAT lets private addresses share a public one.",
+        "Firewall filters by rules; IDS detects and alerts; IPS blocks inline. Use WPA3 for Wi-Fi and a VPN on untrusted networks."
+      ]
+    },
+    {
+      "heading": "Cloud, segmentation and zero trust",
+      "points": [
+        "NIST cloud characteristics: on-demand self-service, broad network access, resource pooling, rapid elasticity, measured service.",
+        "Service models: IaaS (you manage OS and up), PaaS (you manage apps and data), SaaS (you manage users and data). Deployment: public, private, hybrid, community.",
+        "Shared responsibility: provider secures the cloud itself; customer secures data, identities and configuration. Customer misconfiguration is the top cause of cloud breaches.",
+        "Segmentation, VLANs and DMZs contain breaches. Zero trust = never trust, always verify, with least privilege; it is a strategy, not a product."
+      ]
+    },
+    {
+      "heading": "Threats, cryptography and data handling",
+      "points": [
+        "Malware: virus attaches to files, worm self-spreads, trojan disguises itself, ransomware locks data, spyware watches. Social engineering: phishing, vishing, smishing, pretexting, tailgating.",
+        "DoS and DDoS attack availability; on-path attacks intercept; brute force guesses; credential stuffing reuses leaked passwords.",
+        "Symmetric = one shared key, fast (AES). Asymmetric = key pair, solves key sharing (RSA). Hash = one-way fingerprint for integrity. Signature = integrity plus authentication plus non-repudiation, but not confidentiality.",
+        "Classify data first, then apply handling, retention and destruction rules. Deleting or quick-formatting does not securely destroy data.",
+        "Baselines and hardening, patching, logging with a SIEM, and threat intelligence keep operations secure."
+      ]
+    },
+    {
+      "heading": "Incident response and BC/DR",
+      "points": [
+        "Event, incident, breach: every breach is an incident and every incident is an event. Lifecycle: preparation; detection and analysis; containment, eradication and recovery; post-incident activity.",
+        "Contain before you eradicate. Preserve evidence with a chain of custody and work from verified copies.",
+        "BIA finds critical functions. MTD is how long an outage can last before serious harm; RTO is the target time to restore; RPO is acceptable data loss in time. RTO must be shorter than MTD.",
+        "BCP keeps the business running; DRP restores IT. Sites: hot (fast, costly), warm, cold (slow, cheap). Test restores and exercise plans."
+      ]
+    },
+    {
+      "heading": "Exam-day strategy",
+      "points": [
+        "Format as ISC2 lists it: 100 to 125 multiple-choice items in 2 hours, scored on a scale of 0 to 1000 with 700 needed to pass. No experience is required to sit the exam. Confirm the current item count and rules when you book.",
+        "That is roughly one minute per item. Answer straight recall fast and bank time for scenario questions. Flag anything you are unsure about, and make a choice before moving on because a blank answer scores nothing.",
+        "Questions are foundational and use plain wording: identify the concept being tested, then eliminate options that are too extreme, off-topic or name the wrong layer or property.",
+        "Watch for keywords such as BEST, FIRST and MOST. FIRST often points to containment before eradication, classification before controls, or verification before action.",
+        "Do not overthink: when two options look good, prefer the one that is preventive over detective, follows least privilege, protects people and the public first, and follows the written process.",
+        "The 2026 outline weights are Security Principles 24 percent, Security Governance 17.3, IAM concepts 20, Networking and Cloud 21.3, Security Operations and Incident Response 17.3, with basic AI awareness woven through all of them."
+      ]
+    }
+  ],
+  "madlibs": [
+    {
+      "id": "ml-isc2cc-1",
+      "cat": "ccPrinciples",
+      "scenario": "A ransomware attack that locks every file so staff cannot work is mainly an attack on {b1}. An attacker who quietly changes the amount on a payment instruction has broken {b2}. A stolen customer list is a loss of {b3}.",
+      "blanks": [
+        {
+          "key": "b1",
+          "options": [
+            "availability",
+            "confidentiality",
+            "integrity"
+          ],
+          "correct": 0
+        },
+        {
+          "key": "b2",
+          "options": [
+            "availability",
+            "confidentiality",
+            "integrity"
+          ],
+          "correct": 2
+        },
+        {
+          "key": "b3",
+          "options": [
+            "availability",
+            "confidentiality",
+            "integrity"
+          ],
+          "correct": 1
+        }
+      ],
+      "explanation": "Availability is about access when needed, integrity is about accuracy and unauthorized change, and confidentiality is about keeping information from people who should not see it. Match the damage to the property."
+    },
+    {
+      "id": "ml-isc2cc-2",
+      "cat": "ccPrinciples",
+      "scenario": "A company that buys cyber insurance is using risk {b1}. A company that stops storing card numbers altogether is using risk {b2}. After all controls are in place, the risk that remains is called {b3} risk.",
+      "blanks": [
+        {
+          "key": "b1",
+          "options": [
+            "transfer",
+            "avoidance",
+            "acceptance"
+          ],
+          "correct": 0
+        },
+        {
+          "key": "b2",
+          "options": [
+            "transfer",
+            "avoidance",
+            "acceptance"
+          ],
+          "correct": 1
+        },
+        {
+          "key": "b3",
+          "options": [
+            "inherent",
+            "residual",
+            "transferred"
+          ],
+          "correct": 1
+        }
+      ],
+      "explanation": "Insurance shifts financial loss (transfer), dropping the risky activity removes the risk (avoidance), and what remains after controls is residual risk. Inherent risk is the level before controls."
+    },
+    {
+      "id": "ml-isc2cc-3",
+      "cat": "ccGovernance",
+      "scenario": "A high-level, mandatory statement from management is a {b1}. Detailed step-by-step instructions for a task are a {b2}. Advice that staff may follow or ignore is a {b3}.",
+      "blanks": [
+        {
+          "key": "b1",
+          "options": [
+            "policy",
+            "procedure",
+            "guideline"
+          ],
+          "correct": 0
+        },
+        {
+          "key": "b2",
+          "options": [
+            "policy",
+            "procedure",
+            "guideline"
+          ],
+          "correct": 1
+        },
+        {
+          "key": "b3",
+          "options": [
+            "policy",
+            "standard",
+            "guideline"
+          ],
+          "correct": 2
+        }
+      ],
+      "explanation": "Policies state intent, procedures give steps, standards give specific mandatory requirements, and guidelines are optional recommendations."
+    },
+    {
+      "id": "ml-isc2cc-4",
+      "cat": "ccIam",
+      "scenario": "Signing in with a password plus a fingerprint combines something you {b1} with something you {b2}, which is multi-factor authentication. Giving each account only the access its job requires is the principle of {b3}.",
+      "blanks": [
+        {
+          "key": "b1",
+          "options": [
+            "know",
+            "have",
+            "are"
+          ],
+          "correct": 0
+        },
+        {
+          "key": "b2",
+          "options": [
+            "know",
+            "have",
+            "are"
+          ],
+          "correct": 2
+        },
+        {
+          "key": "b3",
+          "options": [
+            "least privilege",
+            "defense in depth",
+            "non-repudiation"
+          ],
+          "correct": 0
+        }
+      ],
+      "explanation": "A password is something you know, a fingerprint is something you are, and giving only the minimum access needed is least privilege. Defense in depth is layering controls, and non-repudiation is not being able to deny an action."
+    },
+    {
+      "id": "ml-isc2cc-5",
+      "cat": "ccNetCloud",
+      "scenario": "To administer a server remotely with encryption, use {b1} on port {b2}. Secure web traffic uses HTTPS on port {b3}.",
+      "blanks": [
+        {
+          "key": "b1",
+          "options": [
+            "Telnet",
+            "SSH",
+            "FTP"
+          ],
+          "correct": 1
+        },
+        {
+          "key": "b2",
+          "options": [
+            "23",
+            "80",
+            "22"
+          ],
+          "correct": 2
+        },
+        {
+          "key": "b3",
+          "options": [
+            "80",
+            "25",
+            "443"
+          ],
+          "correct": 2
+        }
+      ],
+      "explanation": "SSH on port 22 replaces clear-text Telnet on port 23, and HTTPS uses port 443 while plain HTTP uses port 80."
+    },
+    {
+      "id": "ml-isc2cc-6",
+      "cat": "ccSecOps",
+      "scenario": "Isolating an infected laptop from the network belongs to the {b1} phase of incident response. The amount of data loss, measured in time, that a business can tolerate is the {b2}, while the target time to restore service is the {b3}.",
+      "blanks": [
+        {
+          "key": "b1",
+          "options": [
+            "preparation",
+            "containment",
+            "post-incident activity"
+          ],
+          "correct": 1
+        },
+        {
+          "key": "b2",
+          "options": [
+            "RTO",
+            "MTD",
+            "RPO"
+          ],
+          "correct": 2
+        },
+        {
+          "key": "b3",
+          "options": [
+            "RPO",
+            "RTO",
+            "BIA"
+          ],
+          "correct": 1
+        }
+      ],
+      "explanation": "Containment limits damage during an incident. The recovery point objective is acceptable data loss, and the recovery time objective is the target time to restore service."
+    }
+  ],
+  "sequences": [
+    {
+      "id": "seq-isc2cc-1",
+      "cat": "ccSecOps",
+      "prompt": "Put the phases of the incident response lifecycle in order, from first to last.",
+      "steps": [
+        "Preparation: plans, tools and training are in place",
+        "Detection and analysis: confirm and scope the incident",
+        "Containment: isolate affected systems to limit damage",
+        "Eradication: remove the malware or the cause",
+        "Recovery: restore systems and return to normal operation",
+        "Post-incident activity: lessons learned and improvements"
+      ],
+      "explanation": "Preparation comes first, so the team is ready before anything happens. The incident is then detected and analyzed, contained before it spreads, eradicated at its source, and recovered from. A lessons-learned review closes the cycle and feeds better preparation."
+    },
+    {
+      "id": "seq-isc2cc-2",
+      "cat": "ccPrinciples",
+      "prompt": "Put these steps of the risk management process in a sensible order.",
+      "steps": [
+        "Identify assets, threats and vulnerabilities",
+        "Assess the likelihood and impact of each risk",
+        "Prioritize the risks",
+        "Choose a treatment: avoid, mitigate, transfer or accept",
+        "Implement the chosen controls",
+        "Monitor results and review the risk regularly"
+      ],
+      "explanation": "You cannot judge a risk until you know what it applies to, and you cannot choose a treatment until you know how serious it is. After controls are in place, monitoring continues because assets and threats keep changing."
+    },
+    {
+      "id": "seq-isc2cc-3",
+      "cat": "ccIam",
+      "prompt": "Put these steps in the order they happen when an employee opens a confidential file.",
+      "steps": [
+        "The employee enters a username (identification)",
+        "The system verifies the password and a second factor (authentication)",
+        "The system checks the permissions for that file (authorization)",
+        "The access is written to an audit log (accountability)"
+      ],
+      "explanation": "A claim of identity comes first, then proof of the claim, then a decision about what the proven identity may do, and finally a record of what happened so actions can be traced to a person."
+    },
+    {
+      "id": "seq-isc2cc-4",
+      "cat": "ccNetCloud",
+      "prompt": "Put the seven layers of the OSI model in order, from layer 1 at the bottom to layer 7 at the top.",
+      "steps": [
+        "Physical",
+        "Data Link",
+        "Network",
+        "Transport",
+        "Session",
+        "Presentation",
+        "Application"
+      ],
+      "explanation": "The order from the bottom is Physical, Data Link, Network, Transport, Session, Presentation, Application. A memory aid is 'Please Do Not Throw Sausage Pizza Away'. Switches work at layer 2, routers at layer 3, and TCP and UDP at layer 4."
+    }
+  ],
+  "caseStudies": [
+    {
+      "id": "cs-isc2cc-brightpath-clinic",
+      "cat": "ccPrinciples",
+      "title": "BrightPath Family Clinic's First Security Review",
+      "scenario": "BrightPath Family Clinic has twelve staff and keeps all patient records on a single server in an unlocked back room. The owner hires a consultant, who holds an ISC2 certification, to review security. The consultant finds four problems. The server is missing several security updates. The back room door is never locked. Every staff member signs in to the records software with one shared login. And logs show that last year a misconfigured web page exposed a folder of patient records to anyone on the internet for about two weeks before it was noticed and fixed. The owner is embarrassed and asks the consultant to leave the old exposure out of the written report and not to mention it to anyone, because patients might lose trust. The owner is willing to pay for improvements but has a limited budget. The consultant lays out options that include applying updates and encrypting the server, installing a lock on the back room, giving each employee an individual login with a second factor, and buying a cyber insurance policy to cover the cost of any future breach.",
+      "questions": [
+        {
+          "id": "cs-isc2cc-brightpath-clinic-q1",
+          "type": "mc",
+          "question": "Patient records were visible to anyone on the internet for two weeks. Which CIA property was primarily violated?",
+          "options": [
+            "Confidentiality",
+            "Integrity",
+            "Availability",
+            "Non-repudiation"
+          ],
+          "correct": 0,
+          "explanation": "The records were disclosed to people with no right to see them, which is a loss of confidentiality. Nothing shows the records were changed or made unavailable, and non-repudiation concerns proving who performed an action."
+        },
+        {
+          "id": "cs-isc2cc-brightpath-clinic-q2",
+          "type": "mc",
+          "question": "Which action best addresses the unlocked back room with a preventive control?",
+          "options": [
+            "Installing a security camera that records visits to the room",
+            "Writing a policy that says the door should be kept locked",
+            "Installing a lock and issuing keys only to authorized staff",
+            "Buying a cyber insurance policy"
+          ],
+          "correct": 2,
+          "explanation": "A lock stops unauthorized entry before it happens, which is a physical preventive control. A camera only detects after the fact, a policy without enforcement does not stop anyone, and insurance transfers financial loss rather than preventing entry."
+        },
+        {
+          "id": "cs-isc2cc-brightpath-clinic-q3",
+          "type": "mc",
+          "question": "The owner asks the consultant to leave the past exposure out of the report and tell no one. According to the ISC2 Code of Ethics, what should the consultant do?",
+          "options": [
+            "Comply, because the consultant's duty is to the client who pays",
+            "Leave it out, but mention it verbally to the owner only",
+            "Report honestly, advise the owner of their legal duties such as notifying patients, and not mislead the public",
+            "Immediately post the exposure publicly without telling the owner"
+          ],
+          "correct": 2,
+          "explanation": "The canons are ordered by priority: protecting society and public trust, and acting honorably and legally, come before duty to the client. The consultant should be honest, advise on legal obligations and use proper channels. Hiding it puts the client's comfort above the public, and posting it publicly without any discussion is not a measured or proper response."
+        },
+        {
+          "id": "cs-isc2cc-brightpath-clinic-q4",
+          "type": "ms",
+          "question": "Which two actions are risk mitigation rather than transfer, avoidance or acceptance? (Choose two.)",
+          "options": [
+            "Applying the missing updates and encrypting the server",
+            "Buying a cyber insurance policy",
+            "Giving each employee an individual login with a second factor",
+            "Signing a note that accepts the remaining risk",
+            "Stopping all electronic record keeping"
+          ],
+          "correct": [
+            0,
+            2
+          ],
+          "explanation": "Updates, encryption and individual MFA logins reduce the likelihood or impact of a compromise, which is mitigation. Insurance is transfer, signing a note is acceptance, and stopping electronic record keeping would be avoidance."
+        }
+      ]
+    },
+    {
+      "id": "cs-isc2cc-harbor-supply",
+      "cat": "ccSecOps",
+      "title": "Harbor Supply Responds to a Phishing Text",
+      "scenario": "Harbor Supply is an online hardware retailer with forty employees. Its storefront runs on a software-as-a-service e-commerce platform, and its order data is copied from a local server to a backup once each night at midnight. The company's business continuity plan states a recovery point objective of four hours and a recovery time objective of eight hours for the order system. On Tuesday an employee taps a link in a text message that claims to be from a delivery company, and malware is installed on her laptop. At 2 a.m. on Wednesday the security information and event management system raises an alert about unusual outbound traffic from that laptop. The on-call analyst confirms the alert is real and begins following the incident response plan. The team wants to understand how the attack happened and may need to give evidence to the company's insurer, so it keeps careful records. After service is back to normal, the manager schedules a meeting to review what happened and decide on improvements.",
+      "questions": [
+        {
+          "id": "cs-isc2cc-harbor-supply-q1",
+          "type": "mc",
+          "question": "After confirming that the laptop is infected and sending data out, what should the analyst do first?",
+          "options": [
+            "Reinstall the operating system immediately",
+            "Isolate the laptop from the network to contain the incident",
+            "Write the lessons-learned report",
+            "Tell all customers that the store is permanently closed"
+          ],
+          "correct": 1,
+          "explanation": "Containment limits the spread and the data loss, and disconnecting the laptop is a standard first step once an incident is confirmed. Reinstalling destroys evidence and does not explain the entry point, the lessons-learned report comes last, and closing the store is not warranted by one infected laptop."
+        },
+        {
+          "id": "cs-isc2cc-harbor-supply-q2",
+          "type": "mc",
+          "question": "The order data is backed up once each night, but the recovery point objective is four hours. What is the problem?",
+          "options": [
+            "There is no problem, because a nightly backup is always acceptable",
+            "The backup schedule could lose up to a day of data, which exceeds the four-hour target",
+            "The recovery time objective should be shorter than the recovery point objective",
+            "Backups cannot be used for order systems"
+          ],
+          "correct": 1,
+          "explanation": "An RPO of four hours means no more than four hours of data may be lost, so backups or replication must occur at least that often. A nightly backup could lose almost 24 hours. The RTO and RPO measure different things and are not compared, and backups are a normal recovery method for order systems."
+        },
+        {
+          "id": "cs-isc2cc-harbor-supply-q3",
+          "type": "tf",
+          "question": "The team can wipe and rebuild the infected laptop right away and still preserve useful evidence.",
+          "answer": false,
+          "explanation": "Wiping the laptop destroys the evidence needed to understand the attack and support an insurer or legal process. The team should first capture a verified copy and record the chain of custody, then eradicate and recover."
+        },
+        {
+          "id": "cs-isc2cc-harbor-supply-q4",
+          "type": "mc",
+          "question": "The review meeting after service is restored belongs to which incident response phase, and what is a sensible outcome?",
+          "options": [
+            "Preparation; buying more laptops",
+            "Containment; disconnecting the laptop again",
+            "Eradication; removing the malware",
+            "Post-incident activity; updating awareness training to cover text-message phishing"
+          ],
+          "correct": 3,
+          "explanation": "Reviewing what happened after recovery is post-incident activity, and improving training for the attack method that succeeded is a typical result. Preparation happens before incidents, and containment and eradication happen during the response, not after service is restored."
+        }
+      ]
+    }
+  ],
+  "compare": [
+    {
+      "id": "cmp-isc2cc-1",
+      "cat": "ccPrinciples",
+      "scenario": "A company wants to stop unauthorized people from entering its server room, not just record who tried. Which control is better?",
+      "optionA": "A badge-controlled door that opens only for authorized staff.",
+      "optionB": "A security camera that records everyone who approaches the door.",
+      "better": "A",
+      "why": "The badge-controlled door is preventive, so it stops entry before it happens. The camera is the tempting runner-up because it feels like security, but it is detective: it records after the fact and does not stop anyone. Cameras are a good addition for defense in depth, but the stated goal is to stop entry."
+    },
+    {
+      "id": "cmp-isc2cc-2",
+      "cat": "ccPrinciples",
+      "scenario": "An old, rarely used feature of an application has a serious flaw and is not needed by the business. Which treatment is better?",
+      "optionA": "Remove the feature entirely so the risk no longer exists.",
+      "optionB": "Keep the feature and buy extra cyber insurance to cover possible losses.",
+      "better": "A",
+      "why": "Avoidance is cleanest when the activity gives no business value, because it removes the risk completely. Insurance is the tempting runner-up, but it only transfers the financial loss, leaving the vulnerability, the downtime and the reputational damage in place."
+    },
+    {
+      "id": "cmp-isc2cc-3",
+      "cat": "ccGovernance",
+      "scenario": "A company wants to reduce the number of employees who fall for phishing emails. Which approach is better?",
+      "optionA": "Short, regular training with simulated phishing and a no-blame way to report suspicious messages.",
+      "optionB": "One long training session each year, with penalties for anyone who clicks a bad link.",
+      "better": "A",
+      "why": "Frequent, practical training with a safe reporting culture changes behavior and gets problems reported early. Annual training with penalties is the tempting runner-up because it looks strict, but infrequent training is quickly forgotten and fear of punishment makes people hide mistakes."
+    },
+    {
+      "id": "cmp-isc2cc-4",
+      "cat": "ccIam",
+      "scenario": "A contractor needs access to one application for three weeks. Which approach follows good access control practice?",
+      "optionA": "Create a shared contractor account that has the same rights as a full-time employee.",
+      "optionB": "Create an individual account with a role limited to that application and an automatic expiry date.",
+      "better": "B",
+      "why": "An individual, role-limited account that expires follows least privilege and keeps accountability. The shared account is the tempting runner-up because it is quick to set up, but it breaks accountability, grants far more than needed and tends to outlive the project."
+    },
+    {
+      "id": "cmp-isc2cc-5",
+      "cat": "ccIam",
+      "scenario": "A company wants stronger sign-in protection for its administrators, who are frequent phishing targets. Which is the better choice?",
+      "optionA": "A one-time code sent by text message after the password.",
+      "optionB": "A hardware security key or passkey that works only with the real website.",
+      "better": "B",
+      "why": "Security keys and passkeys are phishing-resistant because they are bound to the genuine site. Text message codes are the tempting runner-up because they are real multi-factor authentication and better than a password alone, but a fake login page can capture the code and relay it immediately."
+    },
+    {
+      "id": "cmp-isc2cc-6",
+      "cat": "ccNetCloud",
+      "scenario": "A company must host a public website and wants to limit the damage if the web server is compromised. Which placement is better?",
+      "optionA": "In a screened subnet (DMZ) with firewalls between it, the internet and the internal network.",
+      "optionB": "On the internal network, with one firewall rule that allows web traffic from the internet.",
+      "better": "A",
+      "why": "A DMZ keeps a compromised public server separated from internal systems by another barrier. Placing it inside is the tempting runner-up because the firewall rule limits the ports, but once the server is compromised the attacker is already on the internal network and can move sideways."
+    },
+    {
+      "id": "cmp-isc2cc-7",
+      "cat": "ccNetCloud",
+      "scenario": "Remote employees need to reach internal applications. Which approach best matches zero trust thinking?",
+      "optionA": "A VPN that gives full access to the internal network once the user signs in.",
+      "optionB": "Per-application access that checks the user's identity and device health on every request.",
+      "better": "B",
+      "why": "Zero trust verifies each request and gives only the access that is needed. A VPN with full network access is the tempting runner-up because it encrypts traffic and requires a login, but it still treats everything inside the network as trusted, so one stolen credential opens the whole network."
+    },
+    {
+      "id": "cmp-isc2cc-8",
+      "cat": "ccSecOps",
+      "scenario": "Ransomware is detected on one employee's workstation. What should the response team do first?",
+      "optionA": "Isolate the workstation from the network, then investigate according to the incident response plan.",
+      "optionB": "Wipe and reinstall the workstation immediately to remove the malware.",
+      "better": "A",
+      "why": "Containment stops the spread while preserving evidence needed to understand how the attack happened. Wiping at once is the tempting runner-up because it removes the malware quickly, but it destroys evidence, does not explain the entry point, and may leave the cause in place for the next attack."
+    }
+  ]
+}

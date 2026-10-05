@@ -1566,7 +1566,10 @@
     "exp": "Microsoft Authentication Library"
   },
   "MTD": {
-    "exp": "Mobile Threat Defense"
+    "exp": [
+      "Mobile Threat Defense",
+      "Maximum tolerable downtime"
+    ]
   },
   "MTTD": {
     "exp": "Mean time to detect"
@@ -1612,5 +1615,60 @@
   },
   "YAML": {
     "exp": "YAML Ain't Markup Language"
+  },
+  "AES": {
+    "exp": "Advanced Encryption Standard"
+  },
+  "BCP": {
+    "exp": "Business continuity plan"
+  },
+  "BIA": {
+    "exp": "Business impact analysis"
+  },
+  "CIA": {
+    "exp": "Confidentiality, integrity and availability"
+  },
+  "CSF": {
+    "exp": "Cybersecurity Framework"
+  },
+  "DRP": {
+    "exp": "Disaster recovery plan"
+  },
+  "DoS": {
+    "exp": "Denial of service"
+  },
+  "FTP": {
+    "exp": "File Transfer Protocol"
+  },
+  "GRC": {
+    "exp": "Governance, risk and compliance"
+  },
+  "IPv4": {
+    "exp": "Internet Protocol version 4"
+  },
+  "IPv6": {
+    "exp": "Internet Protocol version 6"
+  },
+  "KPI": {
+    "exp": "Key performance indicator"
+  },
+  "KRI": {
+    "exp": "Key risk indicator"
+  },
+  "OSI": {
+    "exp": "Open Systems Interconnection"
+  },
+  "RSA": {
+    "exp": "Rivest-Shamir-Adleman"
+  },
+  "SP": {
+    "exp": "Special Publication",
+    "trigger": false
+  },
+  "WEP": {
+    "exp": "Wired Equivalent Privacy"
+  },
+  "WPA3": {
+    "exp": "Wi-Fi Protected Access 3"
   }
 }
