@@ -207,7 +207,7 @@ EXAM_CONFIG = {
         'length': 60, 'minutes': 90, 'passPct': 75, 'passLabel': "ISC2 scores this 0-1000 with 700 to pass, not a flat percentage. Treat 75%+ here as a safe buffer, not an exact predictor. The real exam has 125 questions in 3 hours; this mock is shorter.",
         'experience': {
             'level': 'required', 'years': 2,
-            'summary': 'Two years of cumulative paid work experience in one or more of the seven CGRC domains.',
+            'summary': 'Two years of cumulative, paid, full-time work experience in one or more of the seven CGRC domains. Part-time work and internships may also count toward it.',
             'waivers': [],
             'associate': 'No experience yet? Pass the exam to become an Associate of ISC2, then you have three years to earn the experience.',
         },
