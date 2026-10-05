@@ -339,10 +339,10 @@ function PathCompareStep({ item, categories, flashcardsData, onResult, onDone })
   );
 }
 
-function PathApplyStep({ unit, categories, onDone }) {
+function PathApplyStep({ unit, categories, flashcardsData, onDone }) {
   return (
     <div>
-      <LessonApplySections lesson={unit.lesson} categories={categories} lessonCatKeys={unit.cats} />
+      <LessonApplySections lesson={unit.lesson} categories={categories} lessonCatKeys={unit.cats} flashcardsData={flashcardsData} />
       <button
         onClick={() => onDone(null)}
         style={{ width: '100%', padding: '12px', borderRadius: '12px', background: COLOR.primary, color: COLOR.onAccent, fontSize: '14px', fontWeight: 600 }}
@@ -474,7 +474,7 @@ function PathStepRunner({ trackKey, units, unit, step, results, seenLog, categor
   } else if (step.kind === 'bridge') {
     runner = <PathBridgeStep key={runnerKey} bridge={payload.bridge} questions={payload.questions} planKeys={planKeys || []} api={api} onRetry={retry} onDone={onDone} onOpenCert={onOpenCert} onAddToPlan={onAddToPlan} />;
   } else if (step.kind === 'apply') {
-    runner = <PathApplyStep key={runnerKey} unit={unit} categories={categories} onDone={onDone} />;
+    runner = <PathApplyStep key={runnerKey} unit={unit} categories={categories} flashcardsData={mod.flashcards} onDone={onDone} />;
   } else if (step.kind === 'game') {
     if (payload.kind === 'match') {
       runner = (

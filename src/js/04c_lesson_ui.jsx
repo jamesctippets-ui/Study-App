@@ -244,7 +244,7 @@ function StudyView({ activeCat, categories, flashcards, questionsData, onQuizCat
   );
 }
 
-function CheatSheetView({ trackLabel, sections, resources }) {
+function CheatSheetView({ trackLabel, sections, resources, flashcardsData }) {
   if (!sections.length) {
     return (
       <div style={{ textAlign: 'center', color: COLOR.muted, fontSize: '13px', padding: '30px 10px' }}>
@@ -286,7 +286,7 @@ function CheatSheetView({ trackLabel, sections, resources }) {
             </div>
             <ul style={{ margin: 0, paddingLeft: '18px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
               {section.points.map((p, j) => (
-                <li key={j} style={{ fontSize: '13.5px', lineHeight: 1.5, color: COLOR.text }}>{p}</li>
+                <li key={j} style={{ fontSize: '13.5px', lineHeight: 1.5, color: COLOR.text }}><GlossText text={p} pool={flashcardsData} max={2} blockId={'cs' + i + '-' + j} /></li>
               ))}
             </ul>
           </div>
@@ -746,7 +746,7 @@ function ReadingCheckGate({ question, onPassed }) {
 // screenshot, the worked scenario, common exam traps, and the on-the-job
 // note. Shared by the Reference tab's LessonDetail and the guided path's
 // "Apply it" step so both render it identically.
-function LessonApplySections({ lesson, categories, lessonCatKeys }) {
+function LessonApplySections({ lesson, categories, lessonCatKeys, flashcardsData }) {
   const walkthrough = lesson.portalMockup ? PORTAL_WALKTHROUGHS[lesson.portalMockup] : null;
   const MockupComp = !walkthrough && lesson.portalMockup ? PORTAL_MOCKUPS[lesson.portalMockup] : null;
   const realShot = lesson.portalMockup ? REAL_PORTAL_SCREENSHOTS[lesson.portalMockup] : null;
@@ -806,7 +806,7 @@ function LessonApplySections({ lesson, categories, lessonCatKeys }) {
         <div style={{ marginBottom: '16px' }}>
           <div style={{ fontSize: '13px', fontWeight: 600, color: COLOR.gold, marginBottom: '8px' }}>Worked scenario</div>
           <div style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderLeft: `3px solid ${COLOR.primary}`, borderRadius: '10px', padding: '12px 14px' }}>
-            <p style={{ fontSize: '14px', lineHeight: 1.65, color: COLOR.text }}>{lesson.scenario}</p>
+            <p style={{ fontSize: '14px', lineHeight: 1.65, color: COLOR.text }}><GlossText text={lesson.scenario} pool={flashcardsData} max={3} blockId="scn" /></p>
           </div>
         </div>
       )}
@@ -820,7 +820,7 @@ function LessonApplySections({ lesson, categories, lessonCatKeys }) {
                 key={i}
                 style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderLeft: `3px solid ${COLOR.red}`, borderRadius: '10px', padding: '10px 12px', fontSize: '13.5px', lineHeight: 1.55, color: COLOR.text }}
               >
-                {t}
+                <GlossText text={t} pool={flashcardsData} max={2} blockId={'trap' + i} />
               </div>
             ))}
           </div>
@@ -831,7 +831,7 @@ function LessonApplySections({ lesson, categories, lessonCatKeys }) {
         <div style={{ marginBottom: '16px' }}>
           <div style={{ fontSize: '13px', fontWeight: 600, color: COLOR.teal, marginBottom: '8px' }}>On the job</div>
           <div style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderLeft: `3px solid ${COLOR.teal}`, borderRadius: '10px', padding: '12px 14px' }}>
-            <p style={{ fontSize: '13.5px', lineHeight: 1.6, color: COLOR.text }}>{lesson.onTheJob}</p>
+            <p style={{ fontSize: '13.5px', lineHeight: 1.6, color: COLOR.text }}><GlossText text={lesson.onTheJob} pool={flashcardsData} max={3} blockId="otj" /></p>
           </div>
         </div>
       )}
@@ -893,7 +893,7 @@ function LessonDetail({ lesson, flashcardsData, questionsData, categories, onBac
         ‹ All lessons
       </button>
       <div className="itil-display" style={{ fontSize: '19px', fontWeight: 600, marginBottom: '4px' }}>{lesson.title}</div>
-      <div style={{ fontSize: '12px', color: COLOR.muted, marginBottom: '12px' }}>{lesson.summary}</div>
+      <div style={{ fontSize: '12px', color: COLOR.muted, marginBottom: '12px' }}><GlossText text={lesson.summary} pool={flashcardsData} max={2} blockId="sum" /></div>
       <ResourceLinksRow resources={vocabResources} label="Learn more" />
 
       {DiagramComp && (
@@ -972,7 +972,7 @@ function LessonDetail({ lesson, flashcardsData, questionsData, categories, onBac
         )}
       </div>
 
-      <LessonApplySections lesson={lesson} categories={categories} lessonCatKeys={lessonCatKeys} />
+      <LessonApplySections lesson={lesson} categories={categories} lessonCatKeys={lessonCatKeys} flashcardsData={flashcardsData} />
 
       <button
         onClick={() => setShowFundamentals((s) => !s)}
@@ -988,7 +988,7 @@ function LessonDetail({ lesson, flashcardsData, questionsData, categories, onBac
             </div>
           )}
           {lesson.fundamentals.split('\n\n').map((p, i) => (
-            <p key={i} style={{ fontSize: '13px', lineHeight: 1.6, color: COLOR.text, marginBottom: '8px' }}>{p}</p>
+            <p key={i} style={{ fontSize: '13px', lineHeight: 1.6, color: COLOR.text, marginBottom: '8px' }}><GlossText text={p} pool={flashcardsData} max={2} blockId={'fund' + i} /></p>
           ))}
         </div>
       )}

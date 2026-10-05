@@ -38,12 +38,22 @@ function GlossaryPanel({ onClose }) {
   useEscapeToClose(onClose);
   const [query, setQuery] = useState('');
   const [expandedKey, setExpandedKey] = useState(null);
+  const [tab, setTab] = useState('terms');
   const entries = useMemo(() => buildGlossaryEntries(), []);
+  const acronymEntries = useMemo(
+    () => Object.keys(ACRONYMS).sort((a, b) => a.localeCompare(b)).map((k) => ({ key: k, exps: acronymExpansions(k) })),
+    []
+  );
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     if (!q) return entries;
     return entries.filter((e) => e.front.toLowerCase().includes(q) || e.back.toLowerCase().includes(q));
   }, [entries, query]);
+  const filteredAcronyms = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (!q) return acronymEntries;
+    return acronymEntries.filter((a) => a.key.toLowerCase().includes(q) || a.exps.some((e) => e.toLowerCase().includes(q)));
+  }, [acronymEntries, query]);
   const shown = filtered.slice(0, 200);
 
   return (
@@ -67,19 +77,46 @@ function GlossaryPanel({ onClose }) {
           Every term across all {TRACKS.filter((t) => !t.hidden).length} tracks, in one searchable list — a term
           explained once here shows every track that uses it, not just whichever one you're currently in.
         </div>
+        <div className="flex gap-1" style={{ background: COLOR.surface, padding: '3px', borderRadius: '10px', border: `1px solid ${COLOR.border}`, marginBottom: '10px' }}>
+          {[['terms', `Terms (${entries.length})`], ['acronyms', `Acronyms (${acronymEntries.length})`]].map(([k, label]) => (
+            <button
+              key={k}
+              onClick={() => { setTab(k); setExpandedKey(null); }}
+              className="flex-1 btn-flat"
+              style={{ padding: '6px 2px', borderRadius: '8px', fontSize: '11.5px', fontWeight: 600, background: tab === k ? COLOR.surfaceRaised : 'transparent', color: tab === k ? COLOR.text : COLOR.muted }}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
         <input
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="Search terms…"
+          placeholder={tab === 'terms' ? 'Search terms…' : 'Search acronyms or what they stand for…'}
           style={{
             width: '100%', padding: '10px 12px', borderRadius: '10px', border: `1px solid ${COLOR.border}`,
             background: COLOR.surface, color: COLOR.text, fontSize: '13px', marginBottom: '10px',
           }}
         />
         <div style={{ fontSize: '11px', color: COLOR.muted, marginBottom: '8px' }}>
-          {filtered.length} term{filtered.length === 1 ? '' : 's'}{filtered.length > shown.length ? ` (showing first ${shown.length})` : ''}
+          {tab === 'terms'
+            ? `${filtered.length} term${filtered.length === 1 ? '' : 's'}${filtered.length > shown.length ? ` (showing first ${shown.length})` : ''}`
+            : `${filteredAcronyms.length} acronym${filteredAcronyms.length === 1 ? '' : 's'}`}
         </div>
-        <div className="flex flex-col gap-2">
+        {tab === 'acronyms' && (
+          <div className="flex flex-col gap-2">
+            {filteredAcronyms.map((a) => (
+              <div key={a.key} style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderRadius: '12px', padding: '9px 12px', display: 'flex', gap: '10px', alignItems: 'baseline' }}>
+                <span className="itil-display" style={{ fontSize: '14px', fontWeight: 700, color: COLOR.gold, minWidth: '56px' }}>{a.key}</span>
+                <span style={{ fontSize: '13px', color: COLOR.text, lineHeight: 1.45 }}>{a.exps.join(' / ')}</span>
+              </div>
+            ))}
+            {!filteredAcronyms.length && (
+              <div style={{ fontSize: '12px', color: COLOR.muted, textAlign: 'center', padding: '20px 0' }}>No acronyms match "{query}".</div>
+            )}
+          </div>
+        )}
+        <div className="flex flex-col gap-2" style={{ display: tab === 'terms' ? undefined : 'none' }}>
           {shown.map((entry) => {
             const key = entry.front.toLowerCase();
             const open = expandedKey === key;
@@ -109,6 +146,15 @@ function GlossaryPanel({ onClose }) {
                 {open && (
                   <div style={{ marginTop: '8px', paddingTop: '8px', borderTop: `1px solid ${COLOR.border}`, fontSize: '13px', color: COLOR.muted, lineHeight: 1.5 }}>
                     {entry.back}
+                    {(() => {
+                      const a = flyoutAcronyms({ front: entry.front, back: entry.back });
+                      const all = [...a.lead, ...a.footer];
+                      return all.length ? (
+                        <div style={{ marginTop: '6px', fontSize: '11px', color: COLOR.gold, lineHeight: 1.5 }}>
+                          {all.map((k, i) => <React.Fragment key={k}>{i > 0 ? ' · ' : ''}<strong>{k}</strong> {acronymExpansions(k).join(' or ')}</React.Fragment>)}
+                        </div>
+                      ) : null;
+                    })()}
                   </div>
                 )}
               </div>
@@ -211,9 +257,11 @@ function AboutLegalPanel({ onClose }) {
 // wrapper) — not a block appended below the whole paragraph/card. The
 // `term-flyout` class is what useClickOutsideToClose looks for to know a
 // click landed inside it rather than outside.
-function TermFlyout({ term, onClose, shift, arrowLeft }) {
+function TermFlyout({ term, triggerText, onClose, shift, arrowLeft }) {
   if (!term) return null;
   const s = shift || 0;
+  const acr = flyoutAcronyms(term, triggerText);
+  const spell = (key) => acronymExpansions(key).join(' or ');
   return (
     <span
       className="term-flyout"
@@ -238,10 +286,26 @@ function TermFlyout({ term, onClose, shift, arrowLeft }) {
         <span className="itil-display" style={{ fontSize: '13px', fontWeight: 600, color: COLOR.primary }}>{term.front}</span>
         <button onClick={onClose} className="btn-flat" style={{ background: 'transparent', color: COLOR.muted, padding: '0 0 0 8px', fontSize: '12px' }}>✕</button>
       </span>
-      <span style={{ display: 'block', fontSize: '12.5px', lineHeight: 1.5, color: COLOR.text, position: 'relative' }}>{term.back}</span>
+      {acr.lead.map((k) => (term.acronymOnly ? (
+        <span key={k} style={{ display: 'block', fontSize: '12.5px', lineHeight: 1.5, color: COLOR.text, position: 'relative' }}>
+          Stands for <strong>{spell(k)}</strong>
+        </span>
+      ) : (
+        <span key={k} style={{ display: 'block', fontSize: '12px', lineHeight: 1.45, color: COLOR.gold, marginBottom: '4px', position: 'relative' }}>
+          <strong>{k}</strong> stands for {spell(k)}
+        </span>
+      )))}
+      {term.back && <span style={{ display: 'block', fontSize: '12.5px', lineHeight: 1.5, color: COLOR.text, position: 'relative' }}>{term.back}</span>}
       {term.detail && (
         <span style={{ display: 'block', fontSize: '11.5px', lineHeight: 1.5, color: COLOR.muted, marginTop: '6px', borderLeft: `2px solid ${COLOR.primary}`, paddingLeft: '8px', position: 'relative' }}>
           {term.detail}
+        </span>
+      )}
+      {acr.footer.length > 0 && (
+        <span style={{ display: 'block', fontSize: '10.5px', lineHeight: 1.5, color: COLOR.muted, marginTop: '6px', paddingTop: '5px', borderTop: `1px solid ${COLOR.border}`, position: 'relative' }}>
+          {acr.footer.map((k, i) => (
+            <React.Fragment key={k}>{i > 0 ? ' · ' : ''}<strong>{k}</strong> {spell(k)}</React.Fragment>
+          ))}
         </span>
       )}
     </span>

@@ -2054,7 +2054,7 @@ function CertStudyApp() {
         )}
 
         {mode === 'learn' && learnView === 'sheet' && (
-          <CheatSheetView trackLabel={track.label} sections={DATA[activeTrack].cheatSheet || []} resources={cheatSheetResources} />
+          <CheatSheetView trackLabel={track.label} sections={DATA[activeTrack].cheatSheet || []} resources={cheatSheetResources} flashcardsData={flashcardsData} />
         )}
 
         {mode === 'exam' && (
@@ -2134,6 +2134,7 @@ function CertStudyApp() {
                 config={EXAM_CONFIG[examTrack || activeTrack]}
                 track={TRACKS.find((t) => t.key === (examTrack || activeTrack))}
                 categories={DATA[examTrack || activeTrack].categories}
+                flashcardsData={DATA[examTrack || activeTrack].flashcards}
                 variant={examVariant}
                 onRestart={() => setExamPhase('intro')}
               />

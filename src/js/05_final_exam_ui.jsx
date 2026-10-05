@@ -164,7 +164,7 @@ function ExamQuestionView({ q, selectedIdx, onSelect }) {
 
 const REVIEW_PREVIEW_COUNT = 5;
 
-function ExamResults({ result, config, track, categories, onRestart, variant }) {
+function ExamResults({ result, config, track, categories, onRestart, variant, flashcardsData }) {
   const [showAllMissed, setShowAllMissed] = useState(false);
   const pct = result.total ? Math.round((result.correct / result.total) * 100) : 0;
   const missed = result.items.filter((i) => !i.correct);
@@ -239,7 +239,7 @@ function ExamResults({ result, config, track, categories, onRestart, variant }) 
                 <div>{m.prompt}</div>
                 {m.explanation && (
                   <div style={{ marginTop: '6px', paddingTop: '6px', borderTop: `1px solid ${COLOR.border}`, fontSize: '12px', color: COLOR.muted, lineHeight: 1.5 }}>
-                    {m.explanation}
+                    <GlossText text={m.explanation} pool={flashcardsData} max={3} blockId={'ex' + i} />
                   </div>
                 )}
                 {m.whyTested && (

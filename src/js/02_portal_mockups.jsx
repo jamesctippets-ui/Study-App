@@ -989,72 +989,255 @@ function TermTrigger({ text, card, isActive, onToggle }) {
       >
         {text}
       </button>
-      {isActive && <TermFlyout term={card} onClose={onToggle} shift={pos.shift} arrowLeft={pos.arrowLeft} />}
+      {isActive && <TermFlyout term={card} triggerText={text} onClose={onToggle} shift={pos.shift} arrowLeft={pos.arrowLeft} />}
     </span>
   );
 }
 
-// `activeKey`/`onToggle` let the caller track which single occurrence (if
-// any) has its flyout open — `blockId` disambiguates occurrence indices
-// across multiple calls in the same component (e.g. one call per paragraph)
-// so two different paragraphs' "3rd highlighted word" don't collide.
-function highlightTerms(text, terms, vocabPool, activeKey, onToggle, blockId) {
-  if (!terms || !terms.length) return text;
-  const sorted = [...terms].sort((a, b) => b.length - a.length);
-  const escaped = sorted.map(escapeRegExp);
-  const re = new RegExp('(' + escaped.join('|') + ')', 'g');
-  const parts = text.split(re);
-  return parts.map((part, i) => {
-    const isTerm = sorted.some((t) => t === part);
-    if (!isTerm) return <React.Fragment key={i}>{part}</React.Fragment>;
-    const card = vocabPool ? findTermCard(part, vocabPool) : null;
-    if (!card || !onToggle) {
-      return <span key={i} style={{ color: COLOR.gold, fontWeight: 700 }}>{part}</span>;
-    }
-    const key = (blockId || '') + ':' + i;
-    return (
-      <TermTrigger
-        key={i}
-        text={part}
-        card={card}
-        isActive={key === activeKey}
-        onToggle={() => onToggle(key === activeKey ? null : key)}
-      />
-    );
-  });
+/* ---------------- acronyms ---------------- */
+
+// Acronym expansions (ACRONYMS, from data/acronyms.py) are shown inside every
+// definition flyout, and an acronym used on its own in running text can be
+// tapped to see what it stands for.
+const ACRONYM_TOKEN_RE = /\b[A-Z][A-Za-z0-9]{1,7}\b/g;
+
+// The dictionary key a token resolves to ('VMs' -> 'VM'), or null.
+function acronymKey(token) {
+  if (ACRONYMS[token]) return token;
+  if (token.length > 2 && token.endsWith('s') && ACRONYMS[token.slice(0, -1)]) return token.slice(0, -1);
+  return null;
 }
 
-// Like highlightTerms, but with no curated `keyTerms` list to work from —
-// it scans a track's own flashcard fronts for ones that appear in `text`
-// and makes those clickable, so every track gets term popouts for free
-// (no per-question authoring needed). Capped at `maxTerms` distinct terms
-// per call so a dense explanation doesn't turn into a wall of gold links.
-function autoHighlightTerms(text, vocabPool, activeKey, onToggle, maxTerms, blockId) {
-  const cap = maxTerms || 3;
-  if (!text || !vocabPool || !vocabPool.length || !onToggle) return text;
-  const candidates = vocabPool.filter((v) => v.front && v.front.length >= 4);
-  if (!candidates.length) return text;
-  const sorted = [...candidates].sort((a, b) => b.front.length - a.front.length);
-  const escaped = sorted.map((v) => escapeRegExp(v.front));
-  const re = new RegExp('\\b(' + escaped.join('|') + ')\\b', 'gi');
-  const parts = text.split(re);
-  const shown = new Set();
-  return parts.map((part, i) => {
-    const match = sorted.find((v) => v.front.toLowerCase() === (part || '').toLowerCase());
-    if (!match) return <React.Fragment key={i}>{part}</React.Fragment>;
-    const dedupeKey = match.front.toLowerCase();
-    if (!shown.has(dedupeKey) && shown.size >= cap) return <React.Fragment key={i}>{part}</React.Fragment>;
-    shown.add(dedupeKey);
-    const key = (blockId || '') + ':' + i;
-    return (
-      <TermTrigger
-        key={i}
-        text={part}
-        card={match}
-        isActive={key === activeKey}
-        onToggle={() => onToggle(key === activeKey ? null : key)}
-      />
-    );
+function acronymExpansions(key) {
+  const e = ACRONYMS[key];
+  return e ? (Array.isArray(e.exp) ? e.exp : [e.exp]) : [];
+}
+
+// Each defined acronym in `text`, in order of first appearance.
+function acronymsIn(text) {
+  const out = [];
+  (text || '').replace(ACRONYM_TOKEN_RE, (tok) => {
+    const key = acronymKey(tok);
+    if (key && !out.includes(key)) out.push(key);
+    return tok;
   });
+  return out;
+}
+
+const squash = (s) => s.toLowerCase().replace(/[^a-z0-9]/g, '');
+
+const FLYOUT_FOOTER_ACRONYMS = 6;
+
+// What a flyout should spell out: `lead` are the acronyms of the term itself
+// (its title, or the acronym that was tapped), skipped when the title already
+// spells them out ("Role-based access control (RBAC)"); `footer` are the other
+// acronyms its definition and detail text use.
+function flyoutAcronyms(term, triggerText) {
+  const frontSquashed = squash(term.front || '');
+  const spelledInFront = (key) => acronymExpansions(key).some((e) => frontSquashed.includes(squash(e)));
+  const lead = [];
+  const tappedKey = triggerText ? acronymKey(triggerText.trim()) : null;
+  [tappedKey, ...acronymsIn(term.front)].forEach((k) => { if (k && !lead.includes(k) && !spelledInFront(k)) lead.push(k); });
+  const footer = acronymsIn(`${term.back || ''} ${term.detail || ''}`)
+    .filter((k) => !lead.includes(k) && !spelledInFront(k))
+    .slice(0, FLYOUT_FOOTER_ACRONYMS);
+  return { lead, footer };
+}
+
+/* ---------------- term matching ---------------- */
+
+// How a flashcard can be referred to in running text, beyond its exact front:
+// the front without a parenthetical ("Service Level Agreement (SLA)" ->
+// "Service Level Agreement"), an acronym in parentheses ("SLA"), and the parts
+// of a "A vs. B" comparison card. Lower priority number = stronger match, so
+// when a block has more candidates than its cap, exact fronts win.
+const PRI_FRONT = 1;
+const PRI_PHRASE = 2;
+const PRI_CARD_ACRONYM = 3;
+const PRI_VS_PART = 4;
+const PRI_ACRONYM_ONLY = 5;
+const ACRONYM_ONLY_CAP = 3;
+
+function frontAliases(front) {
+  const phrases = [];
+  const acronyms = [];
+  const noParen = front.replace(/\s*\([^)]*\)/g, '').replace(/\s+/g, ' ').trim();
+  const isVs = /\svs\.?\s/i.test(front);
+  if (!isVs && noParen && noParen !== front) phrases.push({ text: noParen, pri: PRI_PHRASE });
+  const re = /\(([^)]+)\)/g;
+  let m;
+  while ((m = re.exec(front))) {
+    const inner = m[1].trim();
+    if (/^[A-Z][A-Za-z0-9/-]{1,9}$/.test(inner) && (inner.match(/[A-Z0-9]/g) || []).length >= 2) acronyms.push(inner);
+  }
+  if (isVs) {
+    front.split(/\s+vs\.?\s+/i).forEach((part) => {
+      const p = part.replace(/\s*\([^)]*\)/g, '').trim();
+      // A single ordinary word ("Audit") would link far too many sentences.
+      if (p.length >= 4 && (/\s/.test(p) || /[A-Z]/.test(p.slice(1)))) phrases.push({ text: p, pri: PRI_VS_PART });
+    });
+  }
+  return { phrases, acronyms };
+}
+
+const TERM_INDEX_CACHE = new Map();
+
+function getTermIndex(pool) {
+  if (!pool.length) return null;
+  const sig = [pool.length, pool[0].front, pool[pool.length >> 1].front, pool[pool.length - 1].front].join('|');
+  const cached = TERM_INDEX_CACHE.get(sig);
+  if (cached) return cached;
+  const phrases = new Map();   // lowercase phrase -> { card, pri }
+  const acronyms = new Map();  // acronym token -> { card, pri }
+  const putPhrase = (text, card, pri) => {
+    const k = text.toLowerCase();
+    if (text.length >= 4 && (!phrases.has(k) || phrases.get(k).pri > pri)) phrases.set(k, { card, pri });
+  };
+  pool.forEach((card) => {
+    if (!card.front) return;
+    putPhrase(card.front, card, PRI_FRONT);
+    const al = frontAliases(card.front);
+    al.phrases.forEach((p) => putPhrase(p.text, card, p.pri));
+    al.acronyms.forEach((t) => { if (!acronyms.has(t)) acronyms.set(t, { card, pri: PRI_CARD_ACRONYM }); });
+  });
+  Object.keys(ACRONYMS).forEach((t) => {
+    if (ACRONYMS[t].trigger !== false && !acronyms.has(t)) acronyms.set(t, { card: null, pri: PRI_ACRONYM_ONLY });
+  });
+  const phraseKeys = [...phrases.keys()].sort((a, b) => b.length - a.length).map(escapeRegExp);
+  const acrKeys = [...acronyms.keys()].sort((a, b) => b.length - a.length).map(escapeRegExp);
+  const index = {
+    phrases, acronyms,
+    phraseRe: phraseKeys.length ? new RegExp('\\b(' + phraseKeys.join('|') + ')\\b', 'gi') : null,
+    acrRe: acrKeys.length ? new RegExp('\\b(' + acrKeys.join('|') + ')s?\\b', 'g') : null,
+  };
+  if (TERM_INDEX_CACHE.size > 300) TERM_INDEX_CACHE.clear();
+  TERM_INDEX_CACHE.set(sig, index);
+  return index;
+}
+
+// Every place in `text` that names a card or a defined acronym, as
+// { start, end, text, card, key, pri } spans (overlaps resolved, longest and
+// earliest first). An acronym with no card of its own gets a small
+// "acronymOnly" card that the flyout renders as just its expansion.
+function findTermSpans(text, index) {
+  if (!index) return [];
+  const spans = [];
+  if (index.phraseRe) {
+    index.phraseRe.lastIndex = 0;
+    let m;
+    while ((m = index.phraseRe.exec(text))) {
+      const hit = index.phrases.get(m[0].toLowerCase());
+      if (hit) spans.push({ start: m.index, end: m.index + m[0].length, text: m[0], card: hit.card, key: 'c:' + hit.card.front.toLowerCase(), pri: hit.pri });
+    }
+  }
+  if (index.acrRe) {
+    index.acrRe.lastIndex = 0;
+    let m;
+    while ((m = index.acrRe.exec(text))) {
+      const tok = index.acronyms.has(m[0]) ? m[0] : m[0].slice(0, -1);
+      const hit = index.acronyms.get(tok);
+      if (!hit) continue;
+      const card = hit.card || { front: tok, back: '', acronymOnly: true };
+      spans.push({ start: m.index, end: m.index + m[0].length, text: m[0], card, key: hit.card ? 'c:' + hit.card.front.toLowerCase() : 'a:' + tok, pri: hit.pri });
+    }
+  }
+  spans.sort((a, b) => a.start - b.start || (b.end - b.start) - (a.end - a.start));
+  const out = [];
+  let lastEnd = -1;
+  spans.forEach((sp) => { if (sp.start >= lastEnd) { out.push(sp); lastEnd = sp.end; } });
+  return out;
+}
+
+// The one place text becomes tappable terms. `curated` (a lesson's keyTerms)
+// are always highlighted; automatic matches from `pool` are added on top, at
+// most `maxTerms` distinct card terms plus a few acronym-only ones, preferring
+// exact flashcard fronts over looser aliases when a block has more than that.
+function renderGlossed(text, { curated, pool, activeKey, onToggle, maxTerms, blockId }) {
+  if (!text) return text;
+  const cap = maxTerms === 0 ? 0 : (maxTerms || 3);
+  const spans = [];
+  if (curated && curated.length) {
+    const sorted = [...curated].sort((a, b) => b.length - a.length);
+    const re = new RegExp('(' + sorted.map(escapeRegExp).join('|') + ')', 'g');
+    let m;
+    while ((m = re.exec(text))) {
+      const card = pool && onToggle ? findTermCard(m[0], pool) : null;
+      spans.push({ start: m.index, end: m.index + m[0].length, text: m[0], card, plain: !card, curated: true });
+    }
+  }
+  let auto = [];
+  if (pool && pool.length && onToggle && cap > 0) {
+    const chosen = new Map();   // key -> best priority among its spans
+    const all = findTermSpans(text, getTermIndex(pool));
+    all.forEach((sp) => { if (!chosen.has(sp.key) || chosen.get(sp.key) > sp.pri) chosen.set(sp.key, sp.pri); });
+    const curatedKeys = new Set(spans.filter((sp) => sp.card).map((sp) => 'c:' + sp.card.front.toLowerCase()));
+    const firstAt = new Map();
+    all.forEach((sp) => { if (!firstAt.has(sp.key)) firstAt.set(sp.key, sp.start); });
+    const ranked = [...chosen.keys()].filter((k) => !curatedKeys.has(k)).sort((a, b) => chosen.get(a) - chosen.get(b) || firstAt.get(a) - firstAt.get(b));
+    const keep = new Set();
+    let cards = 0;
+    let acr = 0;
+    ranked.forEach((k) => {
+      if (k.startsWith('a:')) { if (acr < ACRONYM_ONLY_CAP) { keep.add(k); acr += 1; } }
+      else if (cards < cap) { keep.add(k); cards += 1; }
+    });
+    auto = all.filter((sp) => keep.has(sp.key));
+  }
+  const merged = [...spans, ...auto].sort((a, b) => a.start - b.start || (b.curated ? 1 : 0) - (a.curated ? 1 : 0) || (b.end - b.start) - (a.end - a.start));
+  const out = [];
+  let pos = 0;
+  merged.forEach((sp) => {
+    if (sp.start < pos) return;
+    if (sp.start > pos) out.push(<React.Fragment key={'t' + pos}>{text.slice(pos, sp.start)}</React.Fragment>);
+    if (sp.plain) {
+      out.push(<span key={'p' + sp.start} style={{ color: COLOR.gold, fontWeight: 700 }}>{sp.text}</span>);
+    } else {
+      const key = (blockId || '') + ':' + sp.start;
+      out.push(
+        <TermTrigger key={'k' + sp.start} text={sp.text} card={sp.card} isActive={key === activeKey} onToggle={() => onToggle(key === activeKey ? null : key)} />
+      );
+    }
+    pos = sp.end;
+  });
+  if (pos < text.length) out.push(<React.Fragment key={'t' + pos}>{text.slice(pos)}</React.Fragment>);
+  return out;
+}
+
+// `activeKey`/`onToggle` let the caller track which single occurrence (if
+// any) has its flyout open — `blockId` disambiguates occurrences across
+// multiple calls in the same component (e.g. one call per paragraph).
+function highlightTerms(text, terms, vocabPool, activeKey, onToggle, blockId) {
+  if (!terms || !terms.length) return autoHighlightTerms(text, vocabPool, activeKey, onToggle, 2, blockId);
+  return renderGlossed(text, { curated: terms, pool: vocabPool, activeKey, onToggle, maxTerms: 2, blockId });
+}
+
+// With no curated `keyTerms` to work from, scans a track's flashcards (fronts,
+// aliases, and acronyms) for matches in `text` and makes them clickable, so
+// every track gets term popouts for free (no per-question authoring needed).
+function autoHighlightTerms(text, vocabPool, activeKey, onToggle, maxTerms, blockId) {
+  return renderGlossed(text, { pool: vocabPool, activeKey, onToggle, maxTerms: maxTerms || 3, blockId });
+}
+
+// A self-contained glossed run of text for places that don't already manage
+// an open-flyout state of their own (lesson sections, case studies, the cheat
+// sheet, bridges): owns the open term, closes on Escape or an outside click,
+// and closes whichever other GlossText flyout is open so only one shows.
+let currentGlossClose = null;
+function GlossText({ text, pool, max, blockId }) {
+  const [active, setActiveRaw] = useState(null);
+  const close = useCallback(() => setActiveRaw(null), []);
+  const setActive = useCallback((key) => {
+    if (key) {
+      if (currentGlossClose && currentGlossClose !== close) currentGlossClose();
+      currentGlossClose = close;
+    } else if (currentGlossClose === close) {
+      currentGlossClose = null;
+    }
+    setActiveRaw(key);
+  }, [close]);
+  useEffect(() => () => { if (currentGlossClose === close) currentGlossClose = null; }, [close]);
+  useEscapeToClose(close);
+  useClickOutsideToClose(!!active, close);
+  return <React.Fragment>{autoHighlightTerms(text, pool, active, setActive, max, blockId || 'g')}</React.Fragment>;
 }
 

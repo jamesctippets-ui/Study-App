@@ -40,6 +40,25 @@ function OptionalTag() {
 
 /* ---- optional step runners ---- */
 
+// The flashcards a bridge's text can pull definitions from: those of every cert
+// it spans (deduplicated by front), cached per bridge.
+const BRIDGE_POOL_CACHE = new Map();
+function bridgeGlossPool(bridge) {
+  if (!bridge) return [];
+  if (!BRIDGE_POOL_CACHE.has(bridge.id)) {
+    const seen = new Set();
+    const pool = [];
+    bridge.appearsIn.forEach((a) => {
+      ((DATA[a.track] && DATA[a.track].flashcards) || []).forEach((c) => {
+        const k = c.front.toLowerCase();
+        if (!seen.has(k)) { seen.add(k); pool.push(c); }
+      });
+    });
+    BRIDGE_POOL_CACHE.set(bridge.id, pool);
+  }
+  return BRIDGE_POOL_CACHE.get(bridge.id);
+}
+
 // Deep dive: the unit's terms with their full detail text, one at a time, then
 // a few harder questions. Never gates anything (passPct 0).
 function PathDeepStep({ cards, questions, categories, flashcardsData, api, onRetry, onDone }) {
@@ -53,8 +72,8 @@ function PathDeepStep({ cards, questions, categories, flashcardsData, api, onRet
         <div style={{ fontSize: '11px', color: COLOR.muted, marginBottom: '8px' }}>Term {page + 1} of {cards.length} · the longer explanation behind each one</div>
         <div style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderRadius: '16px', padding: '18px 16px' }}>
           <div className="itil-display" style={{ fontSize: '18px', fontWeight: 600, marginBottom: '8px' }}>{card.front}</div>
-          <div style={{ fontSize: '14px', lineHeight: 1.6, marginBottom: '10px' }}>{card.back}</div>
-          <div style={{ fontSize: '13px', lineHeight: 1.6, color: COLOR.muted, borderLeft: `2px solid ${COLOR.primary}`, paddingLeft: '10px' }}>{card.detail}</div>
+          <div style={{ fontSize: '14px', lineHeight: 1.6, marginBottom: '10px' }}><GlossText text={card.back} pool={flashcardsData} max={2} blockId={'dd-b' + page} /></div>
+          <div style={{ fontSize: '13px', lineHeight: 1.6, color: COLOR.muted, borderLeft: `2px solid ${COLOR.primary}`, paddingLeft: '10px' }}><GlossText text={card.detail} pool={flashcardsData} max={2} blockId={'dd-d' + page} /></div>
         </div>
         <div className="flex gap-2" style={{ marginTop: '14px' }}>
           {page > 0 && (
@@ -93,6 +112,7 @@ function PathDeepStep({ cards, questions, categories, flashcardsData, api, onRet
 function PathBridgeStep({ bridge, questions, planKeys, api, onRetry, onDone, onOpenCert, onAddToPlan }) {
   const [phase, setPhase] = useState('read');
   if (!bridge) { onDone(null); return null; }
+  const pool = bridgeGlossPool(bridge);
   if (phase === 'quiz') {
     return (
       <PathQuizStep
@@ -100,7 +120,7 @@ function PathBridgeStep({ bridge, questions, planKeys, api, onRetry, onDone, onO
         passPct={0}
         label="Bridge check"
         categories={[]}
-        flashcardsData={[]}
+        flashcardsData={pool}
         onAnswer={() => api.bumpGoal()}
         onFinished={api.finishQuiz}
         onPass={onDone}
@@ -113,7 +133,7 @@ function PathBridgeStep({ bridge, questions, planKeys, api, onRetry, onDone, onO
     <div>
       <div style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderRadius: '16px', padding: '16px', marginBottom: '12px' }}>
         <div className="itil-display" style={{ fontSize: '17px', fontWeight: 600, marginBottom: '6px' }}>{bridge.title}</div>
-        <div style={{ fontSize: '13.5px', lineHeight: 1.6 }}>{bridge.summary}</div>
+        <div style={{ fontSize: '13.5px', lineHeight: 1.6 }}><GlossText text={bridge.summary} pool={pool} max={3} blockId="br-sum" /></div>
       </div>
       <div style={{ fontSize: '10.5px', color: COLOR.muted, textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 600, margin: '0 2px 6px' }}>How each cert frames it</div>
       {bridge.appearsIn.map((a) => {
@@ -125,7 +145,7 @@ function PathBridgeStep({ bridge, questions, planKeys, api, onRetry, onDone, onO
               <span style={{ fontSize: '12.5px', fontWeight: 700, color: accent }}>{t ? t.label : a.track}</span>
               {planKeys.includes(a.track) && <span style={{ fontSize: '9.5px', color: COLOR.muted }}>in your plan</span>}
             </div>
-            <div style={{ fontSize: '12.5px', lineHeight: 1.55 }}>{a.angle}</div>
+            <div style={{ fontSize: '12.5px', lineHeight: 1.55 }}><GlossText text={a.angle} pool={pool} max={2} blockId={'br-a-' + a.track} /></div>
             {!planKeys.includes(a.track) && (onOpenCert || onAddToPlan) && (
               <div className="flex gap-3" style={{ marginTop: '6px' }}>
                 {onAddToPlan && (
@@ -145,7 +165,7 @@ function PathBridgeStep({ bridge, questions, planKeys, api, onRetry, onDone, onO
       })}
       <div style={{ marginTop: '10px', padding: '12px 14px', borderRadius: '12px', border: `1px solid ${COLOR.gold}`, background: `${COLOR.gold}14` }}>
         <div style={{ fontSize: '11px', fontWeight: 700, color: COLOR.gold, textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: '3px' }}>Watch out</div>
-        <div style={{ fontSize: '12.5px', lineHeight: 1.55 }}>{bridge.watchOut}</div>
+        <div style={{ fontSize: '12.5px', lineHeight: 1.55 }}><GlossText text={bridge.watchOut} pool={pool} max={2} blockId="br-w" /></div>
       </div>
       <button
         onClick={() => (questions.length ? setPhase('quiz') : onDone(null))}

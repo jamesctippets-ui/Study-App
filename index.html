@@ -2625,73 +2625,256 @@ function TermTrigger({ text, card, isActive, onToggle }) {
       >
         {text}
       </button>
-      {isActive && <TermFlyout term={card} onClose={onToggle} shift={pos.shift} arrowLeft={pos.arrowLeft} />}
+      {isActive && <TermFlyout term={card} triggerText={text} onClose={onToggle} shift={pos.shift} arrowLeft={pos.arrowLeft} />}
     </span>
   );
 }
 
-// `activeKey`/`onToggle` let the caller track which single occurrence (if
-// any) has its flyout open — `blockId` disambiguates occurrence indices
-// across multiple calls in the same component (e.g. one call per paragraph)
-// so two different paragraphs' "3rd highlighted word" don't collide.
-function highlightTerms(text, terms, vocabPool, activeKey, onToggle, blockId) {
-  if (!terms || !terms.length) return text;
-  const sorted = [...terms].sort((a, b) => b.length - a.length);
-  const escaped = sorted.map(escapeRegExp);
-  const re = new RegExp('(' + escaped.join('|') + ')', 'g');
-  const parts = text.split(re);
-  return parts.map((part, i) => {
-    const isTerm = sorted.some((t) => t === part);
-    if (!isTerm) return <React.Fragment key={i}>{part}</React.Fragment>;
-    const card = vocabPool ? findTermCard(part, vocabPool) : null;
-    if (!card || !onToggle) {
-      return <span key={i} style={{ color: COLOR.gold, fontWeight: 700 }}>{part}</span>;
-    }
-    const key = (blockId || '') + ':' + i;
-    return (
-      <TermTrigger
-        key={i}
-        text={part}
-        card={card}
-        isActive={key === activeKey}
-        onToggle={() => onToggle(key === activeKey ? null : key)}
-      />
-    );
-  });
+/* ---------------- acronyms ---------------- */
+
+// Acronym expansions (ACRONYMS, from data/acronyms.py) are shown inside every
+// definition flyout, and an acronym used on its own in running text can be
+// tapped to see what it stands for.
+const ACRONYM_TOKEN_RE = /\b[A-Z][A-Za-z0-9]{1,7}\b/g;
+
+// The dictionary key a token resolves to ('VMs' -> 'VM'), or null.
+function acronymKey(token) {
+  if (ACRONYMS[token]) return token;
+  if (token.length > 2 && token.endsWith('s') && ACRONYMS[token.slice(0, -1)]) return token.slice(0, -1);
+  return null;
 }
 
-// Like highlightTerms, but with no curated `keyTerms` list to work from —
-// it scans a track's own flashcard fronts for ones that appear in `text`
-// and makes those clickable, so every track gets term popouts for free
-// (no per-question authoring needed). Capped at `maxTerms` distinct terms
-// per call so a dense explanation doesn't turn into a wall of gold links.
-function autoHighlightTerms(text, vocabPool, activeKey, onToggle, maxTerms, blockId) {
-  const cap = maxTerms || 3;
-  if (!text || !vocabPool || !vocabPool.length || !onToggle) return text;
-  const candidates = vocabPool.filter((v) => v.front && v.front.length >= 4);
-  if (!candidates.length) return text;
-  const sorted = [...candidates].sort((a, b) => b.front.length - a.front.length);
-  const escaped = sorted.map((v) => escapeRegExp(v.front));
-  const re = new RegExp('\\b(' + escaped.join('|') + ')\\b', 'gi');
-  const parts = text.split(re);
-  const shown = new Set();
-  return parts.map((part, i) => {
-    const match = sorted.find((v) => v.front.toLowerCase() === (part || '').toLowerCase());
-    if (!match) return <React.Fragment key={i}>{part}</React.Fragment>;
-    const dedupeKey = match.front.toLowerCase();
-    if (!shown.has(dedupeKey) && shown.size >= cap) return <React.Fragment key={i}>{part}</React.Fragment>;
-    shown.add(dedupeKey);
-    const key = (blockId || '') + ':' + i;
-    return (
-      <TermTrigger
-        key={i}
-        text={part}
-        card={match}
-        isActive={key === activeKey}
-        onToggle={() => onToggle(key === activeKey ? null : key)}
-      />
-    );
+function acronymExpansions(key) {
+  const e = ACRONYMS[key];
+  return e ? (Array.isArray(e.exp) ? e.exp : [e.exp]) : [];
+}
+
+// Each defined acronym in `text`, in order of first appearance.
+function acronymsIn(text) {
+  const out = [];
+  (text || '').replace(ACRONYM_TOKEN_RE, (tok) => {
+    const key = acronymKey(tok);
+    if (key && !out.includes(key)) out.push(key);
+    return tok;
   });
+  return out;
+}
+
+const squash = (s) => s.toLowerCase().replace(/[^a-z0-9]/g, '');
+
+const FLYOUT_FOOTER_ACRONYMS = 6;
+
+// What a flyout should spell out: `lead` are the acronyms of the term itself
+// (its title, or the acronym that was tapped), skipped when the title already
+// spells them out ("Role-based access control (RBAC)"); `footer` are the other
+// acronyms its definition and detail text use.
+function flyoutAcronyms(term, triggerText) {
+  const frontSquashed = squash(term.front || '');
+  const spelledInFront = (key) => acronymExpansions(key).some((e) => frontSquashed.includes(squash(e)));
+  const lead = [];
+  const tappedKey = triggerText ? acronymKey(triggerText.trim()) : null;
+  [tappedKey, ...acronymsIn(term.front)].forEach((k) => { if (k && !lead.includes(k) && !spelledInFront(k)) lead.push(k); });
+  const footer = acronymsIn(`${term.back || ''} ${term.detail || ''}`)
+    .filter((k) => !lead.includes(k) && !spelledInFront(k))
+    .slice(0, FLYOUT_FOOTER_ACRONYMS);
+  return { lead, footer };
+}
+
+/* ---------------- term matching ---------------- */
+
+// How a flashcard can be referred to in running text, beyond its exact front:
+// the front without a parenthetical ("Service Level Agreement (SLA)" ->
+// "Service Level Agreement"), an acronym in parentheses ("SLA"), and the parts
+// of a "A vs. B" comparison card. Lower priority number = stronger match, so
+// when a block has more candidates than its cap, exact fronts win.
+const PRI_FRONT = 1;
+const PRI_PHRASE = 2;
+const PRI_CARD_ACRONYM = 3;
+const PRI_VS_PART = 4;
+const PRI_ACRONYM_ONLY = 5;
+const ACRONYM_ONLY_CAP = 3;
+
+function frontAliases(front) {
+  const phrases = [];
+  const acronyms = [];
+  const noParen = front.replace(/\s*\([^)]*\)/g, '').replace(/\s+/g, ' ').trim();
+  const isVs = /\svs\.?\s/i.test(front);
+  if (!isVs && noParen && noParen !== front) phrases.push({ text: noParen, pri: PRI_PHRASE });
+  const re = /\(([^)]+)\)/g;
+  let m;
+  while ((m = re.exec(front))) {
+    const inner = m[1].trim();
+    if (/^[A-Z][A-Za-z0-9/-]{1,9}$/.test(inner) && (inner.match(/[A-Z0-9]/g) || []).length >= 2) acronyms.push(inner);
+  }
+  if (isVs) {
+    front.split(/\s+vs\.?\s+/i).forEach((part) => {
+      const p = part.replace(/\s*\([^)]*\)/g, '').trim();
+      // A single ordinary word ("Audit") would link far too many sentences.
+      if (p.length >= 4 && (/\s/.test(p) || /[A-Z]/.test(p.slice(1)))) phrases.push({ text: p, pri: PRI_VS_PART });
+    });
+  }
+  return { phrases, acronyms };
+}
+
+const TERM_INDEX_CACHE = new Map();
+
+function getTermIndex(pool) {
+  if (!pool.length) return null;
+  const sig = [pool.length, pool[0].front, pool[pool.length >> 1].front, pool[pool.length - 1].front].join('|');
+  const cached = TERM_INDEX_CACHE.get(sig);
+  if (cached) return cached;
+  const phrases = new Map();   // lowercase phrase -> { card, pri }
+  const acronyms = new Map();  // acronym token -> { card, pri }
+  const putPhrase = (text, card, pri) => {
+    const k = text.toLowerCase();
+    if (text.length >= 4 && (!phrases.has(k) || phrases.get(k).pri > pri)) phrases.set(k, { card, pri });
+  };
+  pool.forEach((card) => {
+    if (!card.front) return;
+    putPhrase(card.front, card, PRI_FRONT);
+    const al = frontAliases(card.front);
+    al.phrases.forEach((p) => putPhrase(p.text, card, p.pri));
+    al.acronyms.forEach((t) => { if (!acronyms.has(t)) acronyms.set(t, { card, pri: PRI_CARD_ACRONYM }); });
+  });
+  Object.keys(ACRONYMS).forEach((t) => {
+    if (ACRONYMS[t].trigger !== false && !acronyms.has(t)) acronyms.set(t, { card: null, pri: PRI_ACRONYM_ONLY });
+  });
+  const phraseKeys = [...phrases.keys()].sort((a, b) => b.length - a.length).map(escapeRegExp);
+  const acrKeys = [...acronyms.keys()].sort((a, b) => b.length - a.length).map(escapeRegExp);
+  const index = {
+    phrases, acronyms,
+    phraseRe: phraseKeys.length ? new RegExp('\\b(' + phraseKeys.join('|') + ')\\b', 'gi') : null,
+    acrRe: acrKeys.length ? new RegExp('\\b(' + acrKeys.join('|') + ')s?\\b', 'g') : null,
+  };
+  if (TERM_INDEX_CACHE.size > 300) TERM_INDEX_CACHE.clear();
+  TERM_INDEX_CACHE.set(sig, index);
+  return index;
+}
+
+// Every place in `text` that names a card or a defined acronym, as
+// { start, end, text, card, key, pri } spans (overlaps resolved, longest and
+// earliest first). An acronym with no card of its own gets a small
+// "acronymOnly" card that the flyout renders as just its expansion.
+function findTermSpans(text, index) {
+  if (!index) return [];
+  const spans = [];
+  if (index.phraseRe) {
+    index.phraseRe.lastIndex = 0;
+    let m;
+    while ((m = index.phraseRe.exec(text))) {
+      const hit = index.phrases.get(m[0].toLowerCase());
+      if (hit) spans.push({ start: m.index, end: m.index + m[0].length, text: m[0], card: hit.card, key: 'c:' + hit.card.front.toLowerCase(), pri: hit.pri });
+    }
+  }
+  if (index.acrRe) {
+    index.acrRe.lastIndex = 0;
+    let m;
+    while ((m = index.acrRe.exec(text))) {
+      const tok = index.acronyms.has(m[0]) ? m[0] : m[0].slice(0, -1);
+      const hit = index.acronyms.get(tok);
+      if (!hit) continue;
+      const card = hit.card || { front: tok, back: '', acronymOnly: true };
+      spans.push({ start: m.index, end: m.index + m[0].length, text: m[0], card, key: hit.card ? 'c:' + hit.card.front.toLowerCase() : 'a:' + tok, pri: hit.pri });
+    }
+  }
+  spans.sort((a, b) => a.start - b.start || (b.end - b.start) - (a.end - a.start));
+  const out = [];
+  let lastEnd = -1;
+  spans.forEach((sp) => { if (sp.start >= lastEnd) { out.push(sp); lastEnd = sp.end; } });
+  return out;
+}
+
+// The one place text becomes tappable terms. `curated` (a lesson's keyTerms)
+// are always highlighted; automatic matches from `pool` are added on top, at
+// most `maxTerms` distinct card terms plus a few acronym-only ones, preferring
+// exact flashcard fronts over looser aliases when a block has more than that.
+function renderGlossed(text, { curated, pool, activeKey, onToggle, maxTerms, blockId }) {
+  if (!text) return text;
+  const cap = maxTerms === 0 ? 0 : (maxTerms || 3);
+  const spans = [];
+  if (curated && curated.length) {
+    const sorted = [...curated].sort((a, b) => b.length - a.length);
+    const re = new RegExp('(' + sorted.map(escapeRegExp).join('|') + ')', 'g');
+    let m;
+    while ((m = re.exec(text))) {
+      const card = pool && onToggle ? findTermCard(m[0], pool) : null;
+      spans.push({ start: m.index, end: m.index + m[0].length, text: m[0], card, plain: !card, curated: true });
+    }
+  }
+  let auto = [];
+  if (pool && pool.length && onToggle && cap > 0) {
+    const chosen = new Map();   // key -> best priority among its spans
+    const all = findTermSpans(text, getTermIndex(pool));
+    all.forEach((sp) => { if (!chosen.has(sp.key) || chosen.get(sp.key) > sp.pri) chosen.set(sp.key, sp.pri); });
+    const curatedKeys = new Set(spans.filter((sp) => sp.card).map((sp) => 'c:' + sp.card.front.toLowerCase()));
+    const firstAt = new Map();
+    all.forEach((sp) => { if (!firstAt.has(sp.key)) firstAt.set(sp.key, sp.start); });
+    const ranked = [...chosen.keys()].filter((k) => !curatedKeys.has(k)).sort((a, b) => chosen.get(a) - chosen.get(b) || firstAt.get(a) - firstAt.get(b));
+    const keep = new Set();
+    let cards = 0;
+    let acr = 0;
+    ranked.forEach((k) => {
+      if (k.startsWith('a:')) { if (acr < ACRONYM_ONLY_CAP) { keep.add(k); acr += 1; } }
+      else if (cards < cap) { keep.add(k); cards += 1; }
+    });
+    auto = all.filter((sp) => keep.has(sp.key));
+  }
+  const merged = [...spans, ...auto].sort((a, b) => a.start - b.start || (b.curated ? 1 : 0) - (a.curated ? 1 : 0) || (b.end - b.start) - (a.end - a.start));
+  const out = [];
+  let pos = 0;
+  merged.forEach((sp) => {
+    if (sp.start < pos) return;
+    if (sp.start > pos) out.push(<React.Fragment key={'t' + pos}>{text.slice(pos, sp.start)}</React.Fragment>);
+    if (sp.plain) {
+      out.push(<span key={'p' + sp.start} style={{ color: COLOR.gold, fontWeight: 700 }}>{sp.text}</span>);
+    } else {
+      const key = (blockId || '') + ':' + sp.start;
+      out.push(
+        <TermTrigger key={'k' + sp.start} text={sp.text} card={sp.card} isActive={key === activeKey} onToggle={() => onToggle(key === activeKey ? null : key)} />
+      );
+    }
+    pos = sp.end;
+  });
+  if (pos < text.length) out.push(<React.Fragment key={'t' + pos}>{text.slice(pos)}</React.Fragment>);
+  return out;
+}
+
+// `activeKey`/`onToggle` let the caller track which single occurrence (if
+// any) has its flyout open — `blockId` disambiguates occurrences across
+// multiple calls in the same component (e.g. one call per paragraph).
+function highlightTerms(text, terms, vocabPool, activeKey, onToggle, blockId) {
+  if (!terms || !terms.length) return autoHighlightTerms(text, vocabPool, activeKey, onToggle, 2, blockId);
+  return renderGlossed(text, { curated: terms, pool: vocabPool, activeKey, onToggle, maxTerms: 2, blockId });
+}
+
+// With no curated `keyTerms` to work from, scans a track's flashcards (fronts,
+// aliases, and acronyms) for matches in `text` and makes them clickable, so
+// every track gets term popouts for free (no per-question authoring needed).
+function autoHighlightTerms(text, vocabPool, activeKey, onToggle, maxTerms, blockId) {
+  return renderGlossed(text, { pool: vocabPool, activeKey, onToggle, maxTerms: maxTerms || 3, blockId });
+}
+
+// A self-contained glossed run of text for places that don't already manage
+// an open-flyout state of their own (lesson sections, case studies, the cheat
+// sheet, bridges): owns the open term, closes on Escape or an outside click,
+// and closes whichever other GlossText flyout is open so only one shows.
+let currentGlossClose = null;
+function GlossText({ text, pool, max, blockId }) {
+  const [active, setActiveRaw] = useState(null);
+  const close = useCallback(() => setActiveRaw(null), []);
+  const setActive = useCallback((key) => {
+    if (key) {
+      if (currentGlossClose && currentGlossClose !== close) currentGlossClose();
+      currentGlossClose = close;
+    } else if (currentGlossClose === close) {
+      currentGlossClose = null;
+    }
+    setActiveRaw(key);
+  }, [close]);
+  useEffect(() => () => { if (currentGlossClose === close) currentGlossClose = null; }, [close]);
+  useEscapeToClose(close);
+  useClickOutsideToClose(!!active, close);
+  return <React.Fragment>{autoHighlightTerms(text, pool, active, setActive, max, blockId || 'g')}</React.Fragment>;
 }
 
 
@@ -4516,7 +4699,7 @@ function DailyQuestionCard({ q, trackLabel, stored, onAnswer }) {
 // fast glance rather than another SRS-scored rep. Revealing it still
 // counts toward the daily goal ring (it's real study time), just not
 // toward mastery/SRS scheduling the way an actual rating would.
-function DailyVocabCard({ card, trackLabel, revealed, onReveal }) {
+function DailyVocabCard({ card, trackLabel, revealed, onReveal, pool }) {
   return (
     <div className="mb-4">
       <div style={{ fontSize: '11px', color: COLOR.primary, fontWeight: 700, marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
@@ -4532,7 +4715,7 @@ function DailyVocabCard({ card, trackLabel, revealed, onReveal }) {
         }}
       >
         <div className="itil-display" style={{ fontSize: '18px', fontWeight: 600, marginBottom: revealed ? '10px' : 0 }}>{card.front}</div>
-        {revealed && <div style={{ fontSize: '14px', lineHeight: 1.55, color: COLOR.muted }}>{card.back}</div>}
+        {revealed && <div style={{ fontSize: '14px', lineHeight: 1.55, color: COLOR.muted }}><GlossText text={card.back} pool={pool} max={2} blockId="dv" /></div>}
       </div>
       <div style={{ fontSize: '10.5px', color: COLOR.muted, textAlign: 'center', marginTop: '6px' }}>
         {revealed ? 'New term tomorrow.' : 'Tap to reveal the definition'}
@@ -4844,6 +5027,7 @@ function HomeView({ tracks, results, seenLog, stats, certPlan, speech, srs, make
           card={dailyVocab}
           trackLabel={focusLabel}
           revealed={vocabRevealed}
+          pool={vPool.filter((v) => v.id !== dailyVocab.id)}
           onReveal={() => onRevealDailyVocab(dailyVocab)}
         />
       )}
@@ -5177,12 +5361,22 @@ function GlossaryPanel({ onClose }) {
   useEscapeToClose(onClose);
   const [query, setQuery] = useState('');
   const [expandedKey, setExpandedKey] = useState(null);
+  const [tab, setTab] = useState('terms');
   const entries = useMemo(() => buildGlossaryEntries(), []);
+  const acronymEntries = useMemo(
+    () => Object.keys(ACRONYMS).sort((a, b) => a.localeCompare(b)).map((k) => ({ key: k, exps: acronymExpansions(k) })),
+    []
+  );
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     if (!q) return entries;
     return entries.filter((e) => e.front.toLowerCase().includes(q) || e.back.toLowerCase().includes(q));
   }, [entries, query]);
+  const filteredAcronyms = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (!q) return acronymEntries;
+    return acronymEntries.filter((a) => a.key.toLowerCase().includes(q) || a.exps.some((e) => e.toLowerCase().includes(q)));
+  }, [acronymEntries, query]);
   const shown = filtered.slice(0, 200);
 
   return (
@@ -5206,19 +5400,46 @@ function GlossaryPanel({ onClose }) {
           Every term across all {TRACKS.filter((t) => !t.hidden).length} tracks, in one searchable list — a term
           explained once here shows every track that uses it, not just whichever one you're currently in.
         </div>
+        <div className="flex gap-1" style={{ background: COLOR.surface, padding: '3px', borderRadius: '10px', border: `1px solid ${COLOR.border}`, marginBottom: '10px' }}>
+          {[['terms', `Terms (${entries.length})`], ['acronyms', `Acronyms (${acronymEntries.length})`]].map(([k, label]) => (
+            <button
+              key={k}
+              onClick={() => { setTab(k); setExpandedKey(null); }}
+              className="flex-1 btn-flat"
+              style={{ padding: '6px 2px', borderRadius: '8px', fontSize: '11.5px', fontWeight: 600, background: tab === k ? COLOR.surfaceRaised : 'transparent', color: tab === k ? COLOR.text : COLOR.muted }}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
         <input
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="Search terms…"
+          placeholder={tab === 'terms' ? 'Search terms…' : 'Search acronyms or what they stand for…'}
           style={{
             width: '100%', padding: '10px 12px', borderRadius: '10px', border: `1px solid ${COLOR.border}`,
             background: COLOR.surface, color: COLOR.text, fontSize: '13px', marginBottom: '10px',
           }}
         />
         <div style={{ fontSize: '11px', color: COLOR.muted, marginBottom: '8px' }}>
-          {filtered.length} term{filtered.length === 1 ? '' : 's'}{filtered.length > shown.length ? ` (showing first ${shown.length})` : ''}
+          {tab === 'terms'
+            ? `${filtered.length} term${filtered.length === 1 ? '' : 's'}${filtered.length > shown.length ? ` (showing first ${shown.length})` : ''}`
+            : `${filteredAcronyms.length} acronym${filteredAcronyms.length === 1 ? '' : 's'}`}
         </div>
-        <div className="flex flex-col gap-2">
+        {tab === 'acronyms' && (
+          <div className="flex flex-col gap-2">
+            {filteredAcronyms.map((a) => (
+              <div key={a.key} style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderRadius: '12px', padding: '9px 12px', display: 'flex', gap: '10px', alignItems: 'baseline' }}>
+                <span className="itil-display" style={{ fontSize: '14px', fontWeight: 700, color: COLOR.gold, minWidth: '56px' }}>{a.key}</span>
+                <span style={{ fontSize: '13px', color: COLOR.text, lineHeight: 1.45 }}>{a.exps.join(' / ')}</span>
+              </div>
+            ))}
+            {!filteredAcronyms.length && (
+              <div style={{ fontSize: '12px', color: COLOR.muted, textAlign: 'center', padding: '20px 0' }}>No acronyms match "{query}".</div>
+            )}
+          </div>
+        )}
+        <div className="flex flex-col gap-2" style={{ display: tab === 'terms' ? undefined : 'none' }}>
           {shown.map((entry) => {
             const key = entry.front.toLowerCase();
             const open = expandedKey === key;
@@ -5248,6 +5469,15 @@ function GlossaryPanel({ onClose }) {
                 {open && (
                   <div style={{ marginTop: '8px', paddingTop: '8px', borderTop: `1px solid ${COLOR.border}`, fontSize: '13px', color: COLOR.muted, lineHeight: 1.5 }}>
                     {entry.back}
+                    {(() => {
+                      const a = flyoutAcronyms({ front: entry.front, back: entry.back });
+                      const all = [...a.lead, ...a.footer];
+                      return all.length ? (
+                        <div style={{ marginTop: '6px', fontSize: '11px', color: COLOR.gold, lineHeight: 1.5 }}>
+                          {all.map((k, i) => <React.Fragment key={k}>{i > 0 ? ' · ' : ''}<strong>{k}</strong> {acronymExpansions(k).join(' or ')}</React.Fragment>)}
+                        </div>
+                      ) : null;
+                    })()}
                   </div>
                 )}
               </div>
@@ -5350,9 +5580,11 @@ function AboutLegalPanel({ onClose }) {
 // wrapper) — not a block appended below the whole paragraph/card. The
 // `term-flyout` class is what useClickOutsideToClose looks for to know a
 // click landed inside it rather than outside.
-function TermFlyout({ term, onClose, shift, arrowLeft }) {
+function TermFlyout({ term, triggerText, onClose, shift, arrowLeft }) {
   if (!term) return null;
   const s = shift || 0;
+  const acr = flyoutAcronyms(term, triggerText);
+  const spell = (key) => acronymExpansions(key).join(' or ');
   return (
     <span
       className="term-flyout"
@@ -5377,10 +5609,26 @@ function TermFlyout({ term, onClose, shift, arrowLeft }) {
         <span className="itil-display" style={{ fontSize: '13px', fontWeight: 600, color: COLOR.primary }}>{term.front}</span>
         <button onClick={onClose} className="btn-flat" style={{ background: 'transparent', color: COLOR.muted, padding: '0 0 0 8px', fontSize: '12px' }}>✕</button>
       </span>
-      <span style={{ display: 'block', fontSize: '12.5px', lineHeight: 1.5, color: COLOR.text, position: 'relative' }}>{term.back}</span>
+      {acr.lead.map((k) => (term.acronymOnly ? (
+        <span key={k} style={{ display: 'block', fontSize: '12.5px', lineHeight: 1.5, color: COLOR.text, position: 'relative' }}>
+          Stands for <strong>{spell(k)}</strong>
+        </span>
+      ) : (
+        <span key={k} style={{ display: 'block', fontSize: '12px', lineHeight: 1.45, color: COLOR.gold, marginBottom: '4px', position: 'relative' }}>
+          <strong>{k}</strong> stands for {spell(k)}
+        </span>
+      )))}
+      {term.back && <span style={{ display: 'block', fontSize: '12.5px', lineHeight: 1.5, color: COLOR.text, position: 'relative' }}>{term.back}</span>}
       {term.detail && (
         <span style={{ display: 'block', fontSize: '11.5px', lineHeight: 1.5, color: COLOR.muted, marginTop: '6px', borderLeft: `2px solid ${COLOR.primary}`, paddingLeft: '8px', position: 'relative' }}>
           {term.detail}
+        </span>
+      )}
+      {acr.footer.length > 0 && (
+        <span style={{ display: 'block', fontSize: '10.5px', lineHeight: 1.5, color: COLOR.muted, marginTop: '6px', paddingTop: '5px', borderTop: `1px solid ${COLOR.border}`, position: 'relative' }}>
+          {acr.footer.map((k, i) => (
+            <React.Fragment key={k}>{i > 0 ? ' · ' : ''}<strong>{k}</strong> {spell(k)}</React.Fragment>
+          ))}
         </span>
       )}
     </span>
@@ -5659,7 +5907,7 @@ function StudyView({ activeCat, categories, flashcards, questionsData, onQuizCat
   );
 }
 
-function CheatSheetView({ trackLabel, sections, resources }) {
+function CheatSheetView({ trackLabel, sections, resources, flashcardsData }) {
   if (!sections.length) {
     return (
       <div style={{ textAlign: 'center', color: COLOR.muted, fontSize: '13px', padding: '30px 10px' }}>
@@ -5701,7 +5949,7 @@ function CheatSheetView({ trackLabel, sections, resources }) {
             </div>
             <ul style={{ margin: 0, paddingLeft: '18px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
               {section.points.map((p, j) => (
-                <li key={j} style={{ fontSize: '13.5px', lineHeight: 1.5, color: COLOR.text }}>{p}</li>
+                <li key={j} style={{ fontSize: '13.5px', lineHeight: 1.5, color: COLOR.text }}><GlossText text={p} pool={flashcardsData} max={2} blockId={'cs' + i + '-' + j} /></li>
               ))}
             </ul>
           </div>
@@ -6161,7 +6409,7 @@ function ReadingCheckGate({ question, onPassed }) {
 // screenshot, the worked scenario, common exam traps, and the on-the-job
 // note. Shared by the Reference tab's LessonDetail and the guided path's
 // "Apply it" step so both render it identically.
-function LessonApplySections({ lesson, categories, lessonCatKeys }) {
+function LessonApplySections({ lesson, categories, lessonCatKeys, flashcardsData }) {
   const walkthrough = lesson.portalMockup ? PORTAL_WALKTHROUGHS[lesson.portalMockup] : null;
   const MockupComp = !walkthrough && lesson.portalMockup ? PORTAL_MOCKUPS[lesson.portalMockup] : null;
   const realShot = lesson.portalMockup ? REAL_PORTAL_SCREENSHOTS[lesson.portalMockup] : null;
@@ -6221,7 +6469,7 @@ function LessonApplySections({ lesson, categories, lessonCatKeys }) {
         <div style={{ marginBottom: '16px' }}>
           <div style={{ fontSize: '13px', fontWeight: 600, color: COLOR.gold, marginBottom: '8px' }}>Worked scenario</div>
           <div style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderLeft: `3px solid ${COLOR.primary}`, borderRadius: '10px', padding: '12px 14px' }}>
-            <p style={{ fontSize: '14px', lineHeight: 1.65, color: COLOR.text }}>{lesson.scenario}</p>
+            <p style={{ fontSize: '14px', lineHeight: 1.65, color: COLOR.text }}><GlossText text={lesson.scenario} pool={flashcardsData} max={3} blockId="scn" /></p>
           </div>
         </div>
       )}
@@ -6235,7 +6483,7 @@ function LessonApplySections({ lesson, categories, lessonCatKeys }) {
                 key={i}
                 style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderLeft: `3px solid ${COLOR.red}`, borderRadius: '10px', padding: '10px 12px', fontSize: '13.5px', lineHeight: 1.55, color: COLOR.text }}
               >
-                {t}
+                <GlossText text={t} pool={flashcardsData} max={2} blockId={'trap' + i} />
               </div>
             ))}
           </div>
@@ -6246,7 +6494,7 @@ function LessonApplySections({ lesson, categories, lessonCatKeys }) {
         <div style={{ marginBottom: '16px' }}>
           <div style={{ fontSize: '13px', fontWeight: 600, color: COLOR.teal, marginBottom: '8px' }}>On the job</div>
           <div style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderLeft: `3px solid ${COLOR.teal}`, borderRadius: '10px', padding: '12px 14px' }}>
-            <p style={{ fontSize: '13.5px', lineHeight: 1.6, color: COLOR.text }}>{lesson.onTheJob}</p>
+            <p style={{ fontSize: '13.5px', lineHeight: 1.6, color: COLOR.text }}><GlossText text={lesson.onTheJob} pool={flashcardsData} max={3} blockId="otj" /></p>
           </div>
         </div>
       )}
@@ -6308,7 +6556,7 @@ function LessonDetail({ lesson, flashcardsData, questionsData, categories, onBac
         ‹ All lessons
       </button>
       <div className="itil-display" style={{ fontSize: '19px', fontWeight: 600, marginBottom: '4px' }}>{lesson.title}</div>
-      <div style={{ fontSize: '12px', color: COLOR.muted, marginBottom: '12px' }}>{lesson.summary}</div>
+      <div style={{ fontSize: '12px', color: COLOR.muted, marginBottom: '12px' }}><GlossText text={lesson.summary} pool={flashcardsData} max={2} blockId="sum" /></div>
       <ResourceLinksRow resources={vocabResources} label="Learn more" />
 
       {DiagramComp && (
@@ -6387,7 +6635,7 @@ function LessonDetail({ lesson, flashcardsData, questionsData, categories, onBac
         )}
       </div>
 
-      <LessonApplySections lesson={lesson} categories={categories} lessonCatKeys={lessonCatKeys} />
+      <LessonApplySections lesson={lesson} categories={categories} lessonCatKeys={lessonCatKeys} flashcardsData={flashcardsData} />
 
       <button
         onClick={() => setShowFundamentals((s) => !s)}
@@ -6403,7 +6651,7 @@ function LessonDetail({ lesson, flashcardsData, questionsData, categories, onBac
             </div>
           )}
           {lesson.fundamentals.split('\n\n').map((p, i) => (
-            <p key={i} style={{ fontSize: '13px', lineHeight: 1.6, color: COLOR.text, marginBottom: '8px' }}>{p}</p>
+            <p key={i} style={{ fontSize: '13px', lineHeight: 1.6, color: COLOR.text, marginBottom: '8px' }}><GlossText text={p} pool={flashcardsData} max={2} blockId={'fund' + i} /></p>
           ))}
         </div>
       )}
@@ -7503,7 +7751,7 @@ function CaseStudyView({ list, activeIndex, onStart, onExit, categories, questio
       </button>
       <div style={{ boxShadow: SHADOW.card, background: COLOR.surfaceRaised, border: `1px solid ${COLOR.border}`, borderRadius: '14px', padding: '14px 16px', marginBottom: '14px' }}>
         <div style={{ fontSize: '10.5px', color: COLOR.muted, textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: '4px' }}>{catLabel} · {cs.title}</div>
-        <div style={{ fontSize: '13.5px', lineHeight: 1.55, color: COLOR.text }}>{cs.scenario}</div>
+        <div style={{ fontSize: '13.5px', lineHeight: 1.55, color: COLOR.text }}><GlossText text={cs.scenario} pool={flashcardsData} max={3} blockId="cs-scn" /></div>
       </div>
       <QuestionView
         q={question}
@@ -7866,10 +8114,10 @@ function PathCompareStep({ item, categories, flashcardsData, onResult, onDone })
   );
 }
 
-function PathApplyStep({ unit, categories, onDone }) {
+function PathApplyStep({ unit, categories, flashcardsData, onDone }) {
   return (
     <div>
-      <LessonApplySections lesson={unit.lesson} categories={categories} lessonCatKeys={unit.cats} />
+      <LessonApplySections lesson={unit.lesson} categories={categories} lessonCatKeys={unit.cats} flashcardsData={flashcardsData} />
       <button
         onClick={() => onDone(null)}
         style={{ width: '100%', padding: '12px', borderRadius: '12px', background: COLOR.primary, color: COLOR.onAccent, fontSize: '14px', fontWeight: 600 }}
@@ -8001,7 +8249,7 @@ function PathStepRunner({ trackKey, units, unit, step, results, seenLog, categor
   } else if (step.kind === 'bridge') {
     runner = <PathBridgeStep key={runnerKey} bridge={payload.bridge} questions={payload.questions} planKeys={planKeys || []} api={api} onRetry={retry} onDone={onDone} onOpenCert={onOpenCert} onAddToPlan={onAddToPlan} />;
   } else if (step.kind === 'apply') {
-    runner = <PathApplyStep key={runnerKey} unit={unit} categories={categories} onDone={onDone} />;
+    runner = <PathApplyStep key={runnerKey} unit={unit} categories={categories} flashcardsData={mod.flashcards} onDone={onDone} />;
   } else if (step.kind === 'game') {
     if (payload.kind === 'match') {
       runner = (
@@ -8342,6 +8590,25 @@ function OptionalTag() {
 
 /* ---- optional step runners ---- */
 
+// The flashcards a bridge's text can pull definitions from: those of every cert
+// it spans (deduplicated by front), cached per bridge.
+const BRIDGE_POOL_CACHE = new Map();
+function bridgeGlossPool(bridge) {
+  if (!bridge) return [];
+  if (!BRIDGE_POOL_CACHE.has(bridge.id)) {
+    const seen = new Set();
+    const pool = [];
+    bridge.appearsIn.forEach((a) => {
+      ((DATA[a.track] && DATA[a.track].flashcards) || []).forEach((c) => {
+        const k = c.front.toLowerCase();
+        if (!seen.has(k)) { seen.add(k); pool.push(c); }
+      });
+    });
+    BRIDGE_POOL_CACHE.set(bridge.id, pool);
+  }
+  return BRIDGE_POOL_CACHE.get(bridge.id);
+}
+
 // Deep dive: the unit's terms with their full detail text, one at a time, then
 // a few harder questions. Never gates anything (passPct 0).
 function PathDeepStep({ cards, questions, categories, flashcardsData, api, onRetry, onDone }) {
@@ -8355,8 +8622,8 @@ function PathDeepStep({ cards, questions, categories, flashcardsData, api, onRet
         <div style={{ fontSize: '11px', color: COLOR.muted, marginBottom: '8px' }}>Term {page + 1} of {cards.length} · the longer explanation behind each one</div>
         <div style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderRadius: '16px', padding: '18px 16px' }}>
           <div className="itil-display" style={{ fontSize: '18px', fontWeight: 600, marginBottom: '8px' }}>{card.front}</div>
-          <div style={{ fontSize: '14px', lineHeight: 1.6, marginBottom: '10px' }}>{card.back}</div>
-          <div style={{ fontSize: '13px', lineHeight: 1.6, color: COLOR.muted, borderLeft: `2px solid ${COLOR.primary}`, paddingLeft: '10px' }}>{card.detail}</div>
+          <div style={{ fontSize: '14px', lineHeight: 1.6, marginBottom: '10px' }}><GlossText text={card.back} pool={flashcardsData} max={2} blockId={'dd-b' + page} /></div>
+          <div style={{ fontSize: '13px', lineHeight: 1.6, color: COLOR.muted, borderLeft: `2px solid ${COLOR.primary}`, paddingLeft: '10px' }}><GlossText text={card.detail} pool={flashcardsData} max={2} blockId={'dd-d' + page} /></div>
         </div>
         <div className="flex gap-2" style={{ marginTop: '14px' }}>
           {page > 0 && (
@@ -8395,6 +8662,7 @@ function PathDeepStep({ cards, questions, categories, flashcardsData, api, onRet
 function PathBridgeStep({ bridge, questions, planKeys, api, onRetry, onDone, onOpenCert, onAddToPlan }) {
   const [phase, setPhase] = useState('read');
   if (!bridge) { onDone(null); return null; }
+  const pool = bridgeGlossPool(bridge);
   if (phase === 'quiz') {
     return (
       <PathQuizStep
@@ -8402,7 +8670,7 @@ function PathBridgeStep({ bridge, questions, planKeys, api, onRetry, onDone, onO
         passPct={0}
         label="Bridge check"
         categories={[]}
-        flashcardsData={[]}
+        flashcardsData={pool}
         onAnswer={() => api.bumpGoal()}
         onFinished={api.finishQuiz}
         onPass={onDone}
@@ -8415,7 +8683,7 @@ function PathBridgeStep({ bridge, questions, planKeys, api, onRetry, onDone, onO
     <div>
       <div style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderRadius: '16px', padding: '16px', marginBottom: '12px' }}>
         <div className="itil-display" style={{ fontSize: '17px', fontWeight: 600, marginBottom: '6px' }}>{bridge.title}</div>
-        <div style={{ fontSize: '13.5px', lineHeight: 1.6 }}>{bridge.summary}</div>
+        <div style={{ fontSize: '13.5px', lineHeight: 1.6 }}><GlossText text={bridge.summary} pool={pool} max={3} blockId="br-sum" /></div>
       </div>
       <div style={{ fontSize: '10.5px', color: COLOR.muted, textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 600, margin: '0 2px 6px' }}>How each cert frames it</div>
       {bridge.appearsIn.map((a) => {
@@ -8427,7 +8695,7 @@ function PathBridgeStep({ bridge, questions, planKeys, api, onRetry, onDone, onO
               <span style={{ fontSize: '12.5px', fontWeight: 700, color: accent }}>{t ? t.label : a.track}</span>
               {planKeys.includes(a.track) && <span style={{ fontSize: '9.5px', color: COLOR.muted }}>in your plan</span>}
             </div>
-            <div style={{ fontSize: '12.5px', lineHeight: 1.55 }}>{a.angle}</div>
+            <div style={{ fontSize: '12.5px', lineHeight: 1.55 }}><GlossText text={a.angle} pool={pool} max={2} blockId={'br-a-' + a.track} /></div>
             {!planKeys.includes(a.track) && (onOpenCert || onAddToPlan) && (
               <div className="flex gap-3" style={{ marginTop: '6px' }}>
                 {onAddToPlan && (
@@ -8447,7 +8715,7 @@ function PathBridgeStep({ bridge, questions, planKeys, api, onRetry, onDone, onO
       })}
       <div style={{ marginTop: '10px', padding: '12px 14px', borderRadius: '12px', border: `1px solid ${COLOR.gold}`, background: `${COLOR.gold}14` }}>
         <div style={{ fontSize: '11px', fontWeight: 700, color: COLOR.gold, textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: '3px' }}>Watch out</div>
-        <div style={{ fontSize: '12.5px', lineHeight: 1.55 }}>{bridge.watchOut}</div>
+        <div style={{ fontSize: '12.5px', lineHeight: 1.55 }}><GlossText text={bridge.watchOut} pool={pool} max={2} blockId="br-w" /></div>
       </div>
       <button
         onClick={() => (questions.length ? setPhase('quiz') : onDone(null))}
@@ -9120,7 +9388,7 @@ function ExamQuestionView({ q, selectedIdx, onSelect }) {
 
 const REVIEW_PREVIEW_COUNT = 5;
 
-function ExamResults({ result, config, track, categories, onRestart, variant }) {
+function ExamResults({ result, config, track, categories, onRestart, variant, flashcardsData }) {
   const [showAllMissed, setShowAllMissed] = useState(false);
   const pct = result.total ? Math.round((result.correct / result.total) * 100) : 0;
   const missed = result.items.filter((i) => !i.correct);
@@ -9195,7 +9463,7 @@ function ExamResults({ result, config, track, categories, onRestart, variant }) 
                 <div>{m.prompt}</div>
                 {m.explanation && (
                   <div style={{ marginTop: '6px', paddingTop: '6px', borderTop: `1px solid ${COLOR.border}`, fontSize: '12px', color: COLOR.muted, lineHeight: 1.5 }}>
-                    {m.explanation}
+                    <GlossText text={m.explanation} pool={flashcardsData} max={3} blockId={'ex' + i} />
                   </div>
                 )}
                 {m.whyTested && (
@@ -11284,7 +11552,7 @@ function CertStudyApp() {
         )}
 
         {mode === 'learn' && learnView === 'sheet' && (
-          <CheatSheetView trackLabel={track.label} sections={DATA[activeTrack].cheatSheet || []} resources={cheatSheetResources} />
+          <CheatSheetView trackLabel={track.label} sections={DATA[activeTrack].cheatSheet || []} resources={cheatSheetResources} flashcardsData={flashcardsData} />
         )}
 
         {mode === 'exam' && (
@@ -11364,6 +11632,7 @@ function CertStudyApp() {
                 config={EXAM_CONFIG[examTrack || activeTrack]}
                 track={TRACKS.find((t) => t.key === (examTrack || activeTrack))}
                 categories={DATA[examTrack || activeTrack].categories}
+                flashcardsData={DATA[examTrack || activeTrack].flashcards}
                 variant={examVariant}
                 onRestart={() => setExamPhase('intro')}
               />

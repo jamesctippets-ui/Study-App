@@ -445,7 +445,7 @@ function DailyQuestionCard({ q, trackLabel, stored, onAnswer }) {
 // fast glance rather than another SRS-scored rep. Revealing it still
 // counts toward the daily goal ring (it's real study time), just not
 // toward mastery/SRS scheduling the way an actual rating would.
-function DailyVocabCard({ card, trackLabel, revealed, onReveal }) {
+function DailyVocabCard({ card, trackLabel, revealed, onReveal, pool }) {
   return (
     <div className="mb-4">
       <div style={{ fontSize: '11px', color: COLOR.primary, fontWeight: 700, marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
@@ -461,7 +461,7 @@ function DailyVocabCard({ card, trackLabel, revealed, onReveal }) {
         }}
       >
         <div className="itil-display" style={{ fontSize: '18px', fontWeight: 600, marginBottom: revealed ? '10px' : 0 }}>{card.front}</div>
-        {revealed && <div style={{ fontSize: '14px', lineHeight: 1.55, color: COLOR.muted }}>{card.back}</div>}
+        {revealed && <div style={{ fontSize: '14px', lineHeight: 1.55, color: COLOR.muted }}><GlossText text={card.back} pool={pool} max={2} blockId="dv" /></div>}
       </div>
       <div style={{ fontSize: '10.5px', color: COLOR.muted, textAlign: 'center', marginTop: '6px' }}>
         {revealed ? 'New term tomorrow.' : 'Tap to reveal the definition'}
@@ -773,6 +773,7 @@ function HomeView({ tracks, results, seenLog, stats, certPlan, speech, srs, make
           card={dailyVocab}
           trackLabel={focusLabel}
           revealed={vocabRevealed}
+          pool={vPool.filter((v) => v.id !== dailyVocab.id)}
           onReveal={() => onRevealDailyVocab(dailyVocab)}
         />
       )}

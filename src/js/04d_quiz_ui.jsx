@@ -992,7 +992,7 @@ function CaseStudyView({ list, activeIndex, onStart, onExit, categories, questio
       </button>
       <div style={{ boxShadow: SHADOW.card, background: COLOR.surfaceRaised, border: `1px solid ${COLOR.border}`, borderRadius: '14px', padding: '14px 16px', marginBottom: '14px' }}>
         <div style={{ fontSize: '10.5px', color: COLOR.muted, textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: '4px' }}>{catLabel} · {cs.title}</div>
-        <div style={{ fontSize: '13.5px', lineHeight: 1.55, color: COLOR.text }}>{cs.scenario}</div>
+        <div style={{ fontSize: '13.5px', lineHeight: 1.55, color: COLOR.text }}><GlossText text={cs.scenario} pool={flashcardsData} max={3} blockId="cs-scn" /></div>
       </div>
       <QuestionView
         q={question}
