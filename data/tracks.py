@@ -220,8 +220,8 @@ EXAM_CONFIG = {
         'length': 60, 'minutes': 90, 'passPct': 75, 'passLabel': "ISC2 scores this 0-1000 with 700 to pass, not a flat percentage. Treat 75%+ here as a safe buffer, not an exact predictor. The real exam has 125 questions in 3 hours; this mock is shorter.",
         'experience': {
             'level': 'required', 'years': 4,
-            'summary': 'Four years of cumulative paid work experience in one or more of the eight CSSLP domains.',
-            'waivers': ['One year can be waived with a four-year degree in computer science or a related field, or with an approved credential.'],
+            'summary': 'Four years of cumulative, paid, full-time work experience in one or more of the eight CSSLP domains.',
+            'waivers': ['One year can be waived with a four-year degree in computer science, IT or a related field. An approved ISC2 credential may also waive a year; check ISC2\'s current list.'],
             'associate': 'No experience yet? Pass the exam to become an Associate of ISC2, then you have five years to earn the experience.',
         },
         'resources': [
