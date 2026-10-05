@@ -8,6 +8,7 @@
 // bridges) are mixed in and can always be skipped.
 
 const HOME_PATH_UPCOMING_MAX = 40;
+const OPTIONAL_SECTION_GOAL_BONUS = 2;
 const HOME_PATH_MODE_LABELS = { core: 'Just my certs', extended: 'Extended learning' };
 const HOME_PATH_ORDER_LABELS = { plan: 'My plan order', smart: 'Exam date + weakest' };
 const HOME_PATH_ORDER_HINTS = {
@@ -354,6 +355,10 @@ function HomePathRun({ run, tracks, unitsByTrack, trackKeys, doneByTrack, mode, 
     const stepIds = testedOut ? unit.steps.map((s) => s.id) : [step.id];
     if (testedOut) doneApi.completeSteps(stepIds, pct, 'testout');
     else doneApi.completeStep(step.id, pct);
+    // Reading a deep dive or bridge earns no per-item credit of its own (only
+    // the questions after it do), so finishing one adds a small flat bonus
+    // toward today's goal. Games already count per result.
+    if (step.optional && (step.kind === 'deep' || step.kind === 'bridge')) api.bumpGoal(OPTIONAL_SECTION_GOAL_BONUS);
     // What's left once this step lands — doneByTrack hasn't re-rendered yet.
     const doneNow = { ...doneByTrack, [doneKey]: { ...(doneByTrack[doneKey] || {}) } };
     stepIds.forEach((id) => { doneNow[doneKey][id] = true; });
@@ -415,9 +420,11 @@ function HomePathRun({ run, tracks, unitsByTrack, trackKeys, doneByTrack, mode, 
 // a single mixed round of all of them.
 const REVIEW_MIXED = { weak: 6, tough: 8, games: 2, cases: 1 };
 
-function HomeReviewCard({ weakTotal, toughTotal, gamesTotal, casesTotal, onStartReview }) {
+function HomeReviewCard({ weakTotal, toughTotal, gamesTotal, casesTotal, reminder, onSetReminder, onStartReview }) {
   const available = [weakTotal, toughTotal, gamesTotal, casesTotal].filter((n) => n > 0).length;
   if (!available) return null;
+  const waiting = weakTotal + toughTotal + gamesTotal + casesTotal;
+  const nudge = reviewReminderStatus(reminder, waiting, todayString());
   const row = (label, count, sub, kind, accent) => (
     <button
       onClick={() => onStartReview(kind)}
@@ -436,6 +443,13 @@ function HomeReviewCard({ weakTotal, toughTotal, gamesTotal, casesTotal, onStart
     <div style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderRadius: '16px', padding: '14px 16px', marginBottom: '14px' }}>
       <div className="itil-display" style={{ fontSize: '16px', fontWeight: 600 }}>Review across your certs</div>
       <div style={{ fontSize: '11px', color: COLOR.muted, marginTop: '2px' }}>Mixed from every cert in your plan, so one big backlog can't crowd out the rest.</div>
+      {nudge.due && (
+        <div style={{ marginTop: '10px', padding: '9px 12px', borderRadius: '10px', border: `1px solid ${COLOR.gold}`, background: `${COLOR.gold}14`, fontSize: '12px', lineHeight: 1.45 }}>
+          <span style={{ fontWeight: 700, color: COLOR.gold }}>Time for a review.</span>{' '}
+          {nudge.daysSince === null ? 'You haven\'t reviewed yet' : `You last reviewed ${nudge.daysSince} day${nudge.daysSince === 1 ? '' : 's'} ago`}
+          {' '}and there {waiting === 1 ? 'is' : 'are'} {waiting} item{waiting === 1 ? '' : 's'} waiting.
+        </div>
+      )}
       {available > 1 && (
         <button
           onClick={() => onStartReview('mixed')}
@@ -452,6 +466,16 @@ function HomeReviewCard({ weakTotal, toughTotal, gamesTotal, casesTotal, onStart
       {row('Tough terms', toughTotal, `${toughTotal} flashcard${toughTotal === 1 ? '' : 's'} rated OK or lower${toughTotal > CROSS_REVIEW_CARDS ? ` · ${CROSS_REVIEW_CARDS} per round` : ''}`, 'tough', COLOR.gold)}
       {casesTotal > 0 && row('Missed case studies', casesTotal, `${casesTotal} case stud${casesTotal === 1 ? 'y' : 'ies'} with a missed question · one per round`, 'cases', COLOR.primary)}
       {gamesTotal > 0 && row('Missed games', gamesTotal, `${gamesTotal} Mad Lib / Sequence / Compare item${gamesTotal === 1 ? '' : 's'} to redo${gamesTotal > CROSS_REVIEW_GAMES ? ` · ${CROSS_REVIEW_GAMES} per round` : ''}`, 'games', COLOR.primary)}
+      <label className="flex items-center justify-between" style={{ display: 'flex', marginTop: '12px', fontSize: '11px', color: COLOR.muted }}>
+        <span>Remind me to review</span>
+        <select
+          value={reminder ? reminder.days : REVIEW_REMINDER_DEFAULT_DAYS}
+          onChange={(e) => onSetReminder(Number(e.target.value))}
+          style={{ padding: '4px 8px', borderRadius: '8px', fontSize: '11px', border: `1px solid ${COLOR.border}`, background: COLOR.surfaceRaised, color: COLOR.text }}
+        >
+          {REVIEW_REMINDER_OPTIONS.map((o) => <option key={o.days} value={o.days}>{o.label}</option>)}
+        </select>
+      </label>
     </div>
   );
 }

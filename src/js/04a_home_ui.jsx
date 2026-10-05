@@ -545,7 +545,7 @@ function CertPathHomeSection({ pathOrder, results, certPlan, studyingKey, pathPr
 // for that split. Reachable again from any track's Learn/Quiz/Exam view
 // via the header's home icon; the header's hamburger (Manage cert path)
 // is reachable from every mode including this one.
-function HomeView({ tracks, results, seenLog, stats, certPlan, speech, srs, makePathApi, onSetHomePathMode, onSetHomePathOrder, onResume, onSelectTrack, onAddToPath, onOpenAbout, onOpenGlossary, onSetGoalTarget, onAnswerDailyQuestion, onRevealDailyVocab }) {
+function HomeView({ tracks, results, seenLog, stats, certPlan, speech, srs, makePathApi, onSetHomePathMode, onSetHomePathOrder, onSetReviewReminder, onReviewStarted, onResume, onSelectTrack, onAddToPath, onOpenAbout, onOpenGlossary, onSetGoalTarget, onAnswerDailyQuestion, onRevealDailyVocab }) {
   const masteries = tracks.map((t) => ({ track: t, pct: trackMastery(t.key, results) }));
   const overallAvg = masteries.length ? Math.round(masteries.reduce((s, m) => s + m.pct, 0) / masteries.length) : 0;
   const lastVisited = stats.lastVisited;
@@ -686,7 +686,9 @@ function HomeView({ tracks, results, seenLog, stats, certPlan, speech, srs, make
           toughTotal={toughTotal}
           gamesTotal={gamesTotal}
           casesTotal={casesTotal}
-          onStartReview={(kind) => setHomeRun({ kind, nonce: Date.now() })}
+          reminder={stats.reviewReminder}
+          onSetReminder={onSetReviewReminder}
+          onStartReview={(kind) => { onReviewStarted(); setHomeRun({ kind, nonce: Date.now() }); }}
         />
       )}
 

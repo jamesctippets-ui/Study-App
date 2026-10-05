@@ -525,6 +525,7 @@ function emptyStats() {
     unlocked: [],
     lastVisited: null,
     homePath: { mode: 'core', order: 'plan' },
+    reviewReminder: { days: REVIEW_REMINDER_DEFAULT_DAYS, lastReviewAt: null },
     dailyGoal: { target: 20, date: null, count: 0 },
     dailyChallenge: { date: null, question: null, vocab: null },
     readinessHistory: {},
@@ -547,6 +548,7 @@ function normalizeStats(raw) {
     unlocked: Array.isArray(raw.unlocked) ? raw.unlocked : [],
     lastVisited,
     homePath: normalizeHomePath(raw.homePath),
+    reviewReminder: normalizeReviewReminder(raw.reviewReminder),
     dailyGoal: { target, date: rawGoal.date || null, count },
     dailyChallenge: {
       date: rawChallenge.date || null,
@@ -825,6 +827,33 @@ const BONUS_GAMES_PER_UNIT = 2;
 // 'plan' follows the order the learner set; 'smart' puts certs with an
 // upcoming exam first (soonest first) and orders the rest weakest first.
 const HOME_PATH_ORDERS = ['plan', 'smart'];
+
+// The cross-cert review reminder: an in-app nudge on Home (no notifications —
+// this is a static app) once reviewable items have been waiting longer than the
+// chosen number of days since the learner last started a Home review. `days`
+// of 0 turns it off; `lastReviewAt` is a 'YYYY-MM-DD' date or null.
+const REVIEW_REMINDER_OPTIONS = [
+  { days: 0, label: 'Off' },
+  { days: 1, label: 'Daily' },
+  { days: 3, label: 'Every 3 days' },
+  { days: 7, label: 'Weekly' },
+];
+const REVIEW_REMINDER_DEFAULT_DAYS = 3;
+
+function normalizeReviewReminder(raw) {
+  const days = raw && REVIEW_REMINDER_OPTIONS.some((o) => o.days === raw.days) ? raw.days : REVIEW_REMINDER_DEFAULT_DAYS;
+  const last = raw && typeof raw.lastReviewAt === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(raw.lastReviewAt) ? raw.lastReviewAt : null;
+  return { days, lastReviewAt: last };
+}
+
+// { due, daysSince } — due only when the reminder is on, something is waiting,
+// and the last review (or never) is at least `days` ago.
+function reviewReminderStatus(reminder, waiting, today) {
+  if (!reminder || !reminder.days || !waiting) return { due: false, daysSince: null };
+  if (!reminder.lastReviewAt) return { due: true, daysSince: null };
+  const daysSince = daysBetween(reminder.lastReviewAt, today);
+  return { due: daysSince >= reminder.days, daysSince };
+}
 
 function normalizeHomePath(raw) {
   return {

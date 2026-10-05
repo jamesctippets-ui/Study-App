@@ -1353,7 +1353,7 @@ function CertStudyApp() {
       const cur = statsRef.current;
       saveStats({ ...cur, path: markPathStepDone(cur.path, trackKey, stepId, null, todayString(), 'skipped') });
     },
-    bumpGoal: () => bumpDailyGoal(1),
+    bumpGoal: (n) => bumpDailyGoal(n || 1),
     completeSteps: (stepIds, pct, via) => {
       const cur = statsRef.current;
       saveStats({ ...cur, path: markPathStepsDone(cur.path, trackKey, stepIds, pct, todayString(), via) });
@@ -1373,6 +1373,14 @@ function CertStudyApp() {
   const setHomePathMode = (pathMode) => {
     const cur = statsRef.current;
     saveStats({ ...cur, homePath: { ...(cur.homePath || {}), mode: pathMode } });
+  };
+  const setReviewReminderDays = (days) => {
+    const cur = statsRef.current;
+    saveStats({ ...cur, reviewReminder: { ...normalizeReviewReminder(cur.reviewReminder), days } });
+  };
+  const markReviewStarted = () => {
+    const cur = statsRef.current;
+    saveStats({ ...cur, reviewReminder: { ...normalizeReviewReminder(cur.reviewReminder), lastReviewAt: todayString() } });
   };
   const setHomePathOrder = (order) => {
     const cur = statsRef.current;
@@ -1704,6 +1712,8 @@ function CertStudyApp() {
             srs={srs}
             onSetHomePathMode={setHomePathMode}
             onSetHomePathOrder={setHomePathOrder}
+            onSetReviewReminder={setReviewReminderDays}
+            onReviewStarted={markReviewStarted}
             onResume={() => {
               const lv = stats.lastVisited;
               if (!lv) return;
