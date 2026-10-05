@@ -95,6 +95,11 @@ function useClickOutsideToClose(active, onClose) {
 // threaded through every layer.
 const ProgressSummaryContext = React.createContext({ streak: 0, goalCount: 0, goalTarget: 20 });
 
+// The learner's own terms and a way to save one, provided at the app root so
+// a definition flyout (rendered deep inside lessons and quizzes) can offer
+// "Save to my terms" without the callback being threaded through every view.
+const CustomTermsContext = React.createContext({ terms: [], save: null });
+
 // Scrolls the page back to the top whenever `value` changes after the first
 // render, so moving to the next question/item starts at the top of the card
 // instead of wherever the previous one was scrolled to. The first render is
@@ -129,15 +134,6 @@ function IconMenu({ size = 18 }) {
       <line x1="3" y1="6" x2="21" y2="6" />
       <line x1="3" y1="12" x2="21" y2="12" />
       <line x1="3" y1="18" x2="21" y2="18" />
-    </svg>
-  );
-}
-
-function IconHome({ size = 18 }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M3 11.5 12 4l9 7.5" />
-      <path d="M5.5 10v9a1 1 0 0 0 1 1H9a1 1 0 0 0 1-1v-4a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v4a1 1 0 0 0 1 1h2.5a1 1 0 0 0 1-1v-9" />
     </svg>
   );
 }
@@ -346,6 +342,18 @@ function playTones(notes, step, endLen, vol) {
       osc.stop(start + len + 0.05);
     });
   } catch (e) { /* audio unavailable: carry on silently */ }
+}
+
+// Plays the right/wrong answer tone once, at the moment `done` turns true (an
+// item being submitted or chosen), never for something already done on mount.
+// `isCorrect` is called then, so it reads the freshest answers.
+function useResultSound(done, isCorrect) {
+  const prev = useRef(done);
+  useEffect(() => {
+    if (!prev.current && done) playAnswerSound(!!isCorrect());
+    prev.current = done;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [done]);
 }
 
 // kind: 'ok' (a step), 'great' (a perfect score or test-out), 'unit' (a

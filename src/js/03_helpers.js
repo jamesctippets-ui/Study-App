@@ -533,6 +533,7 @@ function emptyStats() {
     path: {},
     pathLocking: true,
     customTerms: [],
+    customScenarios: [],
   };
 }
 
@@ -562,6 +563,7 @@ function normalizeStats(raw) {
     path: normalizePathStats(raw.path),
     pathLocking: raw.pathLocking !== false,
     customTerms: normalizeCustomTerms(raw.customTerms),
+    customScenarios: normalizeCustomScenarios(raw.customScenarios),
   };
 }
 
@@ -927,7 +929,7 @@ const CUSTOM_ACRONYM_RE = /^[A-Z][A-Za-z0-9]{1,7}$/;
 
 // Returns an error message, or null when the entry can be saved. `existing` is
 // the current list, `editingId` the entry being edited (so it can keep its own name).
-function validateCustomTerm(kind, front, back, existing, editingId) {
+function validateCustomTerm(kind, front, back, existing, editingId, track) {
   const f = (front || '').trim();
   const b = (back || '').trim();
   if (!f) return kind === 'acronym' ? 'Enter the acronym.' : 'Enter the term.';
@@ -941,7 +943,8 @@ function validateCustomTerm(kind, front, back, existing, editingId) {
   } else if (f.length < 4) {
     return 'Terms need at least 4 characters to be recognised in text. Use the Acronym type for short ones.';
   }
-  const dupe = (existing || []).some((t) => t.id !== editingId && t.kind === kind && t.front.toLowerCase() === f.toLowerCase() && t.back.toLowerCase() === b.toLowerCase());
+  const scope = track || 'all';
+  const dupe = (existing || []).some((t) => t.id !== editingId && t.kind === kind && (t.track || 'all') === scope && t.front.toLowerCase() === f.toLowerCase() && t.back.toLowerCase() === b.toLowerCase());
   if (dupe) return 'You already added that.';
   if ((existing || []).length >= CUSTOM_TERMS_MAX && !editingId) return `You can keep up to ${CUSTOM_TERMS_MAX} terms.`;
   return null;
@@ -960,7 +963,53 @@ function normalizeCustomTerms(raw) {
     if (!kind || !id || seen.has(id) || out.length >= CUSTOM_TERMS_MAX) return;
     if (validateCustomTerm(kind, front, back, [], null)) return;
     seen.add(id);
-    out.push({ id, kind, front, back, at: typeof t.at === 'string' ? t.at : null });
+    const track = typeof t.track === 'string' && t.track !== 'all' && DATA[t.track] ? t.track : 'all';
+    out.push({ id, kind, front, back, track, at: typeof t.at === 'string' ? t.at : null });
+  });
+  return out;
+}
+
+// The learner's own step-ordering scenarios (stats.customScenarios): a title,
+// 3 to 12 steps in the correct order, and an optional note, kept per cert and
+// played in the Sequence game alongside the built-in challenges. Playing them
+// does not touch results or mastery (they have no place in an exam bank).
+const CUSTOM_SCENARIOS_MAX = 100;
+const SCENARIO_STEPS_MIN = 3;
+const SCENARIO_STEPS_MAX = 12;
+const SCENARIO_TITLE_MAX = 120;
+const SCENARIO_STEP_MAX = 160;
+const SCENARIO_NOTE_MAX = 400;
+
+function validateScenario(title, steps, note, existing, editingId, track) {
+  const t = (title || '').trim();
+  const list = (steps || []).map((x) => (x || '').trim()).filter(Boolean);
+  if (!t) return 'Give the scenario a title.';
+  if (t.length > SCENARIO_TITLE_MAX) return `Keep the title under ${SCENARIO_TITLE_MAX} characters.`;
+  if (list.length < SCENARIO_STEPS_MIN) return `Add at least ${SCENARIO_STEPS_MIN} steps.`;
+  if (list.length > SCENARIO_STEPS_MAX) return `Use at most ${SCENARIO_STEPS_MAX} steps.`;
+  if (list.some((x) => x.length > SCENARIO_STEP_MAX)) return `Keep each step under ${SCENARIO_STEP_MAX} characters.`;
+  if (new Set(list.map((x) => x.toLowerCase())).size !== list.length) return 'Every step needs different wording.';
+  if ((note || '').length > SCENARIO_NOTE_MAX) return `Keep the note under ${SCENARIO_NOTE_MAX} characters.`;
+  if (!editingId && (existing || []).length >= CUSTOM_SCENARIOS_MAX) return `You can keep up to ${CUSTOM_SCENARIOS_MAX} scenarios.`;
+  const dupe = (existing || []).some((x) => x.id !== editingId && x.track === track && x.title.toLowerCase() === t.toLowerCase());
+  if (dupe) return 'You already have a scenario with that title for this cert.';
+  return null;
+}
+
+function normalizeCustomScenarios(raw) {
+  if (!Array.isArray(raw)) return [];
+  const seen = new Set();
+  const out = [];
+  raw.forEach((x) => {
+    if (!x || typeof x !== 'object' || out.length >= CUSTOM_SCENARIOS_MAX) return;
+    const id = typeof x.id === 'string' && x.id ? x.id : null;
+    const track = typeof x.track === 'string' && DATA[x.track] ? x.track : null;
+    const title = typeof x.title === 'string' ? x.title.trim() : '';
+    const steps = Array.isArray(x.steps) ? x.steps.filter((st) => typeof st === 'string').map((st) => st.trim()).filter(Boolean) : [];
+    const note = typeof x.note === 'string' ? x.note.trim() : '';
+    if (!id || !track || seen.has(id) || validateScenario(title, steps, note, [], null, track)) return;
+    seen.add(id);
+    out.push({ id, track, title, steps, note, at: typeof x.at === 'string' ? x.at : null });
   });
   return out;
 }

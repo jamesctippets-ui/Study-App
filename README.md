@@ -379,6 +379,7 @@ chips), and moving to the next question scrolls back to the top.
 On a cert's Path tab, a unit stays locked until the one before it is finished (or
 you tap "Unlock anyway"; units you've started never lock), and a chime can play
 on step completion. Both are switches under Data & Progress → Path & sounds.
+Your own terms can be limited to one cert and saved straight from a flyout, and Practice > Sequence lets you build your own step-ordering scenarios (with a step bank) alongside the built-in ones. Answer sounds also cover the Match, Compare, Mad Libs, Sequence and command games.
 Fonts are self-hosted (`fonts/`) with an OpenDyslexic option, every image and font is precached for offline use, and the Glossary has a **Mine** tab for your own terms and acronyms, which then appear in flyouts. Sounds (celebration chimes and right/wrong answer tones) are opt-in in Data & Progress.
 Call-to-action buttons use `.btn-3d` (a solid pressable edge), and the font is
 Nunito, loaded from Google Fonts, with Inter as the fallback.

@@ -350,6 +350,7 @@ function MatchGame({ flashcards, roundSize, onContinue, onRoundComplete, continu
   const isDone = round.picked.length > 0 && matched.length === round.picked.length;
 
   useEffect(() => {
+    if (isDone) playCelebrationSound(mistakes === 0 ? 'great' : 'ok');
     if (isDone && onRoundComplete) onRoundComplete();
     // eslint-disable-next-line
   }, [isDone]);
@@ -407,9 +408,11 @@ function MatchGame({ flashcards, roundSize, onContinue, onRoundComplete, continu
   // interaction styles can never disagree about what counts as a match.
   const evaluateMatch = (termId, defId) => {
     if (termId === defId) {
+      playAnswerSound(true);
       setMatched((m) => [...m, termId]);
       setSelected(null);
     } else {
+      playAnswerSound(false);
       setWrongPair({ termId, defId });
       setMistakes((m) => m + 1);
       setTimeout(() => { setWrongPair(null); setSelected(null); }, 500);

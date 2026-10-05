@@ -1603,10 +1603,36 @@ trading away for shinier but shallower ones.
   bridge test now completes (it was clicking the bottom bar after answering), the
   panels test matches the current header, and the answer-sound, font and
   custom-term flows each have a test.
-- [ ] **Open ideas.** Add extra acronym meanings only when a lesson uses
-  them; a "save to my terms" button inside a flyout; per-cert scoping for your
-  own terms; sounds for the Match and Mad Libs games; and the build-your-own
-  scenario game and the real module build listed above.
+- [x] **The open-ideas batch.** (1) *Acronym meanings:* ASR (also Azure Site
+  Recovery), CIM (also Common Information Model), DAC (also Dedicated
+  Administrator Connection and Data-tier Application), IDE (also integrated
+  development environment), VIP (also Virtual IP), HCI (notes Azure Local) and
+  DAP (notes GDAP) now list every meaning, the one whose words appear in the
+  surrounding text first and the rest as "(also: ...)". (2) *Save to my terms:*
+  a built-in definition flyout (or an acronym-only flyout) has a **+ Save to my
+  terms** button that copies it into the Mine list, scoped to the cert you are
+  reading, where you can reword it; once saved the flyout becomes your copy
+  ("Your term"). Not offered for terms that are already yours or too short to
+  save. (3) *Per-cert terms:* every term and acronym has an **Applies to** choice
+  (all certs or one cert). The flyout engine works out which cert a block of text
+  belongs to from its own flashcards, so a term scoped to AZ-104 never lights up
+  in AZ-900; the Glossary always shows everything. Existing terms stay "all
+  certs". (4) *Game sounds:* the Answer sounds switch now also covers Compare,
+  Mad Libs, Sequence, command practice and the Match game (a tone per pair, plus
+  a celebration chime when a round is finished, under the Celebration sounds
+  switch). (5) *Build your own scenario:* Practice > Sequence has **+ Build your
+  own scenario** on every cert (even those with no built-in challenges). Give it
+  a title and 3 to 12 steps in the correct order, typing them or tapping steps
+  from a **step bank** drawn from that cert's built-in challenges, plus an
+  optional note shown after you answer. Saved scenarios (per cert, up to 100)
+  are mixed into the Sequence game, can be practiced one at a time or all
+  together, and can be edited or deleted. They are a self-test only: they never
+  touch results, mastery or the daily goal. Both lists live in stats, so they
+  travel with export and import.
+- [ ] **Open ideas.** Sounds for the verbal quiz and the case-study end screen;
+  sharing a scenario or term list between devices without a full export; a
+  step bank that also learns from your own earlier scenarios; the real module
+  build, the new tracks and the screenshot gaps listed above.
 
 - [x] **Tough terms flashcard deck.** Each `srs` entry now also stores the
   raw 1-5 rating it was last given (`last`). A card is "tough" when that

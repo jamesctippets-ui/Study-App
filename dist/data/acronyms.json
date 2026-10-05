@@ -100,7 +100,7 @@
     "trigger": false
   },
   "HCI": {
-    "exp": "Hyper-converged infrastructure"
+    "exp": "Hyper-converged infrastructure (Azure Stack HCI, now Azure Local)"
   },
   "KEDA": {
     "exp": "Kubernetes Event-driven Autoscaling"
@@ -173,7 +173,10 @@
     "exp": "Windows Server Failover Cluster"
   },
   "CIM": {
-    "exp": "Composite Image File System (CimFS)"
+    "exp": [
+      "Composite Image File System (CimFS)",
+      "Common Information Model"
+    ]
   },
   "CimFS": {
     "exp": "Composite Image File System"
@@ -214,7 +217,10 @@
     "exp": "Hard disk drive"
   },
   "IDE": {
-    "exp": "Integrated Drive Electronics"
+    "exp": [
+      "Integrated Drive Electronics",
+      "Integrated development environment"
+    ]
   },
   "IOPS": {
     "exp": "Input/output operations per second"
@@ -543,10 +549,14 @@
     "exp": "Credential Security Support Provider"
   },
   "DAC": {
-    "exp": "Discretionary access control"
+    "exp": [
+      "Discretionary access control",
+      "Dedicated Administrator Connection",
+      "Data-tier Application"
+    ]
   },
   "DAP": {
-    "exp": "Delegated Admin Privileges"
+    "exp": "Delegated Admin Privileges (being replaced by GDAP)"
   },
   "DES": {
     "exp": "Data Encryption Standard"
@@ -923,7 +933,10 @@
     "exp": "Advanced Security Information Model"
   },
   "ASR": {
-    "exp": "Attack surface reduction"
+    "exp": [
+      "Attack surface reduction",
+      "Azure Site Recovery"
+    ]
   },
   "ATT": {
     "exp": "Adversarial Tactics, Techniques, and Common Knowledge (MITRE ATT&CK)"
@@ -1463,7 +1476,10 @@
     "exp": "Quality assurance"
   },
   "VIP": {
-    "exp": "Very important person",
+    "exp": [
+      "Very important person",
+      "Virtual IP"
+    ],
     "trigger": false
   },
   "ZIP": {

@@ -23,7 +23,9 @@ material uses it, and the least certain ones were confirmed with web searches
 (TAXII, OWASP, VPP, PV1, MTTR, WDAC). Entries whose product or organisation was
 renamed keep the expansion exams still use and add the current name in
 parentheses (M365D, WDAC, OMS, ONC). Extra meanings that no content uses were
-deliberately not added, so flyouts never list a meaning the app never teaches.
+added later once their wording was confirmed: ASR, CIM, DAC, HCI, IDE, VIP, DAP.
+When several meanings exist a flyout leads with the one whose words appear in the
+surrounding text and shows the rest as "(also: ...)".
 
 `IGNORE` lists tokens the content uses that are NOT acronyms (SQL keywords,
 product and brand names, sample variable names, cert codes, units) so
@@ -69,7 +71,7 @@ ACRONYMS = {
     'CI': {'exp': ['Continuous integration', 'Case-insensitive']},
     'CLI': {'exp': 'Command-line interface'},
     'GUI': {'exp': 'Graphical user interface', 'trigger': False},
-    'HCI': {'exp': 'Hyper-converged infrastructure'},
+    'HCI': {'exp': 'Hyper-converged infrastructure (Azure Stack HCI, now Azure Local)'},
     'KEDA': {'exp': 'Kubernetes Event-driven Autoscaling'},
     'P2C': {'exp': 'Physical-to-cloud'},
     'P2V': {'exp': 'Physical-to-virtual'},
@@ -97,7 +99,7 @@ ACRONYMS = {
     'WSFC': {'exp': 'Windows Server Failover Cluster'},
 
     # Storage, disks and file systems
-    'CIM': {'exp': 'Composite Image File System (CimFS)'},
+    'CIM': {'exp': ['Composite Image File System (CimFS)', 'Common Information Model']},
     'CimFS': {'exp': 'Composite Image File System'},
     'DFS': {'exp': 'Distributed File System'},
     'DM': {'exp': 'Device Mapper (as in DM-Crypt)'},
@@ -110,7 +112,7 @@ ACRONYMS = {
     'GUID': {'exp': 'Globally unique identifier'},
     'GZRS': {'exp': 'Geo-zone-redundant storage'},
     'HDD': {'exp': 'Hard disk drive'},
-    'IDE': {'exp': 'Integrated Drive Electronics'},
+    'IDE': {'exp': ['Integrated Drive Electronics', 'Integrated development environment']},
     'IOPS': {'exp': 'Input/output operations per second'},
     'JBOD': {'exp': 'Just a bunch of disks'},
     'LRS': {'exp': 'Locally redundant storage'},
@@ -219,8 +221,8 @@ ACRONYMS = {
     'CHAP': {'exp': 'Challenge-Handshake Authentication Protocol'},
     'CHAPv2': {'exp': 'Microsoft Challenge Handshake Authentication Protocol version 2 (MS-CHAPv2)'},
     'CredSSP': {'exp': 'Credential Security Support Provider'},
-    'DAC': {'exp': 'Discretionary access control'},
-    'DAP': {'exp': 'Delegated Admin Privileges'},
+    'DAC': {'exp': ['Discretionary access control', 'Dedicated Administrator Connection', 'Data-tier Application']},
+    'DAP': {'exp': 'Delegated Admin Privileges (being replaced by GDAP)'},
     'DES': {'exp': 'Data Encryption Standard'},
     'EAP': {'exp': 'Extensible Authentication Protocol'},
     'FIDO2': {'exp': 'Fast Identity Online 2'},
@@ -350,7 +352,7 @@ ACRONYMS = {
     'AiTM': {'exp': 'Adversary-in-the-middle'},
     'AMA': {'exp': 'Azure Monitor Agent'},
     'ASIM': {'exp': 'Advanced Security Information Model'},
-    'ASR': {'exp': 'Attack surface reduction'},
+    'ASR': {'exp': ['Attack surface reduction', 'Azure Site Recovery']},
     'ATT': {'exp': 'Adversarial Tactics, Techniques, and Common Knowledge (MITRE ATT&CK)'},
     'BEC': {'exp': 'Business email compromise'},
     'CASB': {'exp': 'Cloud access security broker'},
@@ -530,7 +532,7 @@ ACRONYMS = {
     'PM': {'exp': 'Post meridiem', 'trigger': False},
     'PRINCE2': {'exp': 'PRojects IN Controlled Environments, version 2'},
     'QA': {'exp': 'Quality assurance'},
-    'VIP': {'exp': 'Very important person', 'trigger': False},
+    'VIP': {'exp': ['Very important person', 'Virtual IP'], 'trigger': False},
     'ZIP': {'exp': 'Zone Improvement Plan', 'trigger': False},
 }
 

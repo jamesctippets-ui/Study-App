@@ -223,6 +223,7 @@ function VerbalQuizPanel({
 // a lightweight practice add-on; score is tracked for the session only.
 function CommandPracticeView({ session, index, score, categories, input, setInput, result, onSubmit, onNext, onRestart }) {
   useScrollTopOnChange(index);
+  useResultSound(result !== null, () => result !== 'incorrect');
   if (!session.length) {
     return (
       <div style={{ textAlign: 'center', color: COLOR.muted, fontSize: '13px', padding: '30px 10px' }}>
@@ -321,6 +322,7 @@ function CommandPracticeView({ session, index, score, categories, input, setInpu
 // unlike Verbal Quiz and CLI practice, which are deliberately unscored.
 function MadLibsView({ session, index, score, categories, answers, onSetBlank, submitted, onSubmit, onNext, onRestart, flashcardsData }) {
   useScrollTopOnChange(index);
+  useResultSound(!!submitted, () => { const it = session[index]; return !!it && it.blanks.every((b) => answers[b.key] === b.correct); });
   const [activeTermKey, setActiveTermKey] = useState(null);
   useEffect(() => { setActiveTermKey(null); }, [session[index] && session[index].id]);
   useEscapeToClose(() => setActiveTermKey(null));
@@ -429,6 +431,107 @@ function MadLibsView({ session, index, score, categories, answers, onSetBlank, s
   );
 }
 
+// Build-your-own scenario for the Sequence game: choose a title, then put the
+// steps in the correct order yourself (type them, or tap suggestions from the
+// step bank drawn from this cert's own challenges). Saved per cert and played
+// alongside the built-in challenges; see validateScenario in 03_helpers.js.
+function ScenarioBuilder({ trackKey, bankSteps, scenarios, onSave, onDelete, onPractice, onClose }) {
+  const [title, setTitle] = useState('');
+  const [steps, setSteps] = useState(['', '', '']);
+  const [note, setNote] = useState('');
+  const [editingId, setEditingId] = useState(null);
+  const [error, setError] = useState(null);
+  const [bankOpen, setBankOpen] = useState(false);
+  const [bankQuery, setBankQuery] = useState('');
+  const mine = scenarios.filter((x) => x.track === trackKey);
+  const reset = () => { setTitle(''); setSteps(['', '', '']); setNote(''); setEditingId(null); setError(null); };
+  const setStep = (i, v) => setSteps((a) => a.map((x, j) => (j === i ? v : x)));
+  const move = (i, d) => setSteps((a) => { const j = i + d; if (j < 0 || j >= a.length) return a; const n = [...a]; [n[i], n[j]] = [n[j], n[i]]; return n; });
+  const remove = (i) => setSteps((a) => (a.length <= 1 ? a : a.filter((_, j) => j !== i)));
+  const addFromBank = (text) => setSteps((a) => {
+    if (a.some((x) => x.trim().toLowerCase() === text.toLowerCase())) return a;
+    const emptyAt = a.findIndex((x) => !x.trim());
+    if (emptyAt >= 0) return a.map((x, j) => (j === emptyAt ? text : x));
+    return a.length >= SCENARIO_STEPS_MAX ? a : [...a, text];
+  });
+  const submit = () => {
+    const err = validateScenario(title, steps, note, scenarios, editingId, trackKey);
+    if (err) { setError(err); return; }
+    onSave({ id: editingId, track: trackKey, title: title.trim(), steps: steps.map((x) => x.trim()).filter(Boolean), note: note.trim() });
+    reset();
+  };
+  const edit = (x) => { setTitle(x.title); setSteps([...x.steps]); setNote(x.note || ''); setEditingId(x.id); setError(null); window.scrollTo({ top: 0, behavior: 'instant' }); };
+  const field = { width: '100%', padding: '9px 11px', borderRadius: '10px', border: `2px solid ${COLOR.border}`, background: COLOR.surface, color: COLOR.text, fontSize: '13px' };
+  const bank = (bankSteps || []).filter((x) => !bankQuery.trim() || x.toLowerCase().includes(bankQuery.trim().toLowerCase())).slice(0, 40);
+  const small = { padding: '4px 8px', borderRadius: '8px', border: `2px solid ${COLOR.border}`, background: 'transparent', color: COLOR.muted, fontSize: '12px', fontWeight: 700 };
+  return (
+    <div>
+      <div className="flex justify-between items-center" style={{ marginBottom: '8px' }}>
+        <div className="itil-display" style={{ fontSize: '17px' }}>{editingId ? 'Edit scenario' : 'Build your own scenario'}</div>
+        <button onClick={onClose} className="btn-flat" style={{ background: 'transparent', color: COLOR.muted, fontSize: '13px', fontWeight: 700 }}>‹ Back to the game</button>
+      </div>
+      <div style={{ fontSize: '12px', color: COLOR.muted, lineHeight: 1.45, marginBottom: '12px' }}>
+        Write the steps in the <strong>correct order</strong>. The game shuffles them and you put them back, like the built-in challenges. Your scenarios stay on this device and don't affect your mastery.
+      </div>
+      <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="What's the task? e.g. Onboard a new clinic" aria-label="Scenario title" maxLength={SCENARIO_TITLE_MAX} style={{ ...field, marginBottom: '10px' }} />
+      <div style={{ fontSize: '12px', fontWeight: 700, color: COLOR.muted, marginBottom: '6px' }}>Steps, in the correct order</div>
+      <div className="flex flex-col gap-2" style={{ marginBottom: '8px' }}>
+        {steps.map((st, i) => (
+          <div key={i} className="flex items-center gap-1">
+            <span style={{ width: '20px', fontSize: '12px', fontWeight: 800, color: COLOR.muted, textAlign: 'center' }}>{i + 1}</span>
+            <input value={st} onChange={(e) => setStep(i, e.target.value)} placeholder={`Step ${i + 1}`} aria-label={`Step ${i + 1}`} maxLength={SCENARIO_STEP_MAX} style={{ ...field, flex: 1, minWidth: 0 }} />
+            <button onClick={() => move(i, -1)} disabled={i === 0} aria-label={`Move step ${i + 1} up`} className="btn-flat" style={{ ...small, opacity: i === 0 ? 0.4 : 1 }}>↑</button>
+            <button onClick={() => move(i, 1)} disabled={i === steps.length - 1} aria-label={`Move step ${i + 1} down`} className="btn-flat" style={{ ...small, opacity: i === steps.length - 1 ? 0.4 : 1 }}>↓</button>
+            <button onClick={() => remove(i)} aria-label={`Remove step ${i + 1}`} className="btn-flat" style={{ ...small, color: COLOR.red }}>✕</button>
+          </div>
+        ))}
+      </div>
+      <div className="flex gap-2" style={{ marginBottom: '10px', flexWrap: 'wrap' }}>
+        <button onClick={() => setSteps((a) => (a.length >= SCENARIO_STEPS_MAX ? a : [...a, '']))} className="btn-flat" style={{ ...small, color: COLOR.primary, borderColor: COLOR.primary }}>+ Add a step</button>
+        {bankSteps && bankSteps.length > 0 && (
+          <button onClick={() => setBankOpen((o) => !o)} aria-expanded={bankOpen} className="btn-flat" style={small}>{bankOpen ? 'Hide step bank ▴' : `Step bank (${bankSteps.length}) ▾`}</button>
+        )}
+      </div>
+      {bankOpen && (
+        <div style={{ border: `2px solid ${COLOR.border}`, borderRadius: '12px', padding: '10px', marginBottom: '10px', background: COLOR.surface }}>
+          <div style={{ fontSize: '11.5px', color: COLOR.muted, marginBottom: '6px' }}>Steps from this cert's built-in challenges. Tap one to add it to your scenario, then reorder.</div>
+          <input value={bankQuery} onChange={(e) => setBankQuery(e.target.value)} placeholder="Search the bank…" aria-label="Search the step bank" style={{ ...field, marginBottom: '8px' }} />
+          <div className="flex flex-col gap-1" style={{ maxHeight: '220px', overflowY: 'auto' }}>
+            {bank.map((x) => (
+              <button key={x} onClick={() => addFromBank(x)} className="btn-flat" style={{ textAlign: 'left', padding: '7px 10px', borderRadius: '8px', border: `1px solid ${COLOR.border}`, background: COLOR.surfaceRaised, color: COLOR.text, fontSize: '12px', lineHeight: 1.4 }}>+ {x}</button>
+            ))}
+            {!bank.length && <div style={{ fontSize: '12px', color: COLOR.muted, padding: '6px' }}>No steps match.</div>}
+          </div>
+        </div>
+      )}
+      <textarea value={note} onChange={(e) => setNote(e.target.value)} placeholder="Optional: why this order? (shown after you answer)" aria-label="Note" rows={2} maxLength={SCENARIO_NOTE_MAX} style={{ ...field, marginBottom: '8px', resize: 'vertical' }} />
+      {error && <div role="alert" style={{ fontSize: '12px', color: COLOR.red, marginBottom: '8px', lineHeight: 1.4 }}>{error}</div>}
+      <div className="flex gap-2" style={{ marginBottom: '18px' }}>
+        <button onClick={submit} className="btn-3d flex-1" style={{ padding: '10px', borderRadius: '12px', background: COLOR.primary, color: COLOR.onAccent, fontSize: '13px', fontWeight: 800 }}>{editingId ? 'Save changes' : 'Save scenario'}</button>
+        {editingId && <button onClick={reset} className="btn-flat" style={{ padding: '10px 14px', borderRadius: '12px', border: `2px solid ${COLOR.border}`, background: 'transparent', color: COLOR.text, fontSize: '13px', fontWeight: 700 }}>Cancel</button>}
+      </div>
+      <div className="flex justify-between items-center" style={{ marginBottom: '8px' }}>
+        <div style={{ fontSize: '13px', fontWeight: 800 }}>My scenarios ({mine.length})</div>
+        {mine.length > 1 && <button onClick={() => onPractice(mine.map((x) => x.id))} className="btn-flat" style={{ background: 'transparent', color: COLOR.primary, fontSize: '12px', fontWeight: 800 }}>Practice all ›</button>}
+      </div>
+      <div className="flex flex-col gap-2">
+        {mine.map((x) => (
+          <div key={x.id} style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `2px solid ${COLOR.border}`, borderRadius: '12px', padding: '10px 12px' }}>
+            <div style={{ fontSize: '14px', fontWeight: 700 }}>{x.title}</div>
+            <div style={{ fontSize: '12px', color: COLOR.muted, marginTop: '2px' }}>{x.steps.length} steps</div>
+            <div className="flex gap-3" style={{ marginTop: '6px' }}>
+              <button onClick={() => onPractice([x.id])} className="btn-flat" style={{ background: 'transparent', color: COLOR.primary, fontSize: '12px', fontWeight: 800, padding: 0 }}>Practice</button>
+              <button onClick={() => edit(x)} className="btn-flat" style={{ background: 'transparent', color: COLOR.text, fontSize: '12px', fontWeight: 700, padding: 0 }}>Edit</button>
+              <button onClick={() => { onDelete(x.id); if (editingId === x.id) reset(); }} className="btn-flat" style={{ background: 'transparent', color: COLOR.red, fontSize: '12px', fontWeight: 700, padding: 0 }}>Delete</button>
+            </div>
+          </div>
+        ))}
+        {!mine.length && <div style={{ fontSize: '12px', color: COLOR.muted, textAlign: 'center', padding: '10px 0' }}>None yet for this cert.</div>}
+      </div>
+    </div>
+  );
+}
+
 // Step-ordering / sequencing challenges (ROADMAP.md section 13): shuffle
 // the steps for a stated procedure and have the user arrange them back
 // into the right order with simple up/down move buttons (drag-to-reorder
@@ -437,6 +540,7 @@ function MadLibsView({ session, index, score, categories, answers, onSetBlank, s
 // same way Mad Libs does (see checkSequenceOrder in 03_helpers.js).
 function SequenceView({ session, index, score, categories, workingOrder, onMove, submitted, onSubmit, onNext, onRestart, flashcardsData }) {
   useScrollTopOnChange(index);
+  useResultSound(!!submitted, () => workingOrder.every((originalIdx, pos) => originalIdx === pos));
   const [activeTermKey, setActiveTermKey] = useState(null);
   useEffect(() => { setActiveTermKey(null); }, [session[index] && session[index].id]);
   useEscapeToClose(() => setActiveTermKey(null));
@@ -465,7 +569,7 @@ function SequenceView({ session, index, score, categories, workingOrder, onMove,
     );
   }
 
-  const categoryLabel = categories.find((c) => c.key === item.cat)?.label;
+  const categoryLabel = item.mine ? 'My scenario' : categories.find((c) => c.key === item.cat)?.label;
   const total = session.length;
   const anyWrong = submitted && workingOrder.some((originalIdx, pos) => originalIdx !== pos);
 
@@ -623,6 +727,7 @@ function PracticeToolPicker({ quizView, available, onSelect }) {
 
 function CompareView({ session, index, score, categories, choice, onChoose, onNext, onRestart, flashcardsData }) {
   useScrollTopOnChange(index);
+  useResultSound(choice !== null, () => { const it = session[index]; return !!it && choice === it.betterIdx; });
   const [activeTermKey, setActiveTermKey] = useState(null);
   useEffect(() => { setActiveTermKey(null); }, [session[index] && session[index].id]);
   useEscapeToClose(() => setActiveTermKey(null));

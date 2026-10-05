@@ -36,15 +36,16 @@ function MyTermsEditor({ customTerms, onSave, onDelete }) {
   const [front, setFront] = useState('');
   const [back, setBack] = useState('');
   const [editingId, setEditingId] = useState(null);
+  const [track, setTrack] = useState('all');
   const [error, setError] = useState(null);
   const reset = () => { setFront(''); setBack(''); setEditingId(null); setError(null); };
   const submit = () => {
-    const err = validateCustomTerm(kind, front, back, customTerms, editingId);
+    const err = validateCustomTerm(kind, front, back, customTerms, editingId, track);
     if (err) { setError(err); return; }
-    onSave({ id: editingId, kind, front, back });
+    onSave({ id: editingId, kind, front, back, track });
     reset();
   };
-  const edit = (t) => { setKind(t.kind); setFront(t.front); setBack(t.back); setEditingId(t.id); setError(null); };
+  const edit = (t) => { setKind(t.kind); setFront(t.front); setBack(t.back); setTrack(t.track || 'all'); setEditingId(t.id); setError(null); };
   const input = { width: '100%', padding: '9px 11px', borderRadius: '10px', border: `2px solid ${COLOR.border}`, background: COLOR.surface, color: COLOR.text, fontSize: '13px' };
   return (
     <div>
@@ -61,6 +62,13 @@ function MyTermsEditor({ customTerms, onSave, onDelete }) {
       </div>
       <input value={front} onChange={(e) => setFront(e.target.value)} placeholder={kind === 'acronym' ? 'Acronym, e.g. ADT' : 'Term, e.g. Break-glass account'} aria-label={kind === 'acronym' ? 'Acronym' : 'Term'} maxLength={CUSTOM_FRONT_MAX} style={{ ...input, marginBottom: '8px' }} />
       <textarea value={back} onChange={(e) => setBack(e.target.value)} placeholder={kind === 'acronym' ? 'What it stands for' : 'What it means'} aria-label={kind === 'acronym' ? 'What it stands for' : 'Definition'} maxLength={CUSTOM_BACK_MAX} rows={3} style={{ ...input, marginBottom: '8px', resize: 'vertical' }} />
+      <label style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px', fontSize: '12.5px', marginBottom: '8px' }}>
+        <span>Applies to</span>
+        <select value={track} onChange={(e) => setTrack(e.target.value)} aria-label="Applies to" style={{ ...input, width: 'auto', maxWidth: '60%', padding: '6px 10px' }}>
+          <option value="all">All certs</option>
+          {TRACKS.filter((t) => !t.hidden).map((t) => <option key={t.key} value={t.key}>{t.label}</option>)}
+        </select>
+      </label>
       {error && <div role="alert" style={{ fontSize: '12px', color: COLOR.red, marginBottom: '8px', lineHeight: 1.4 }}>{error}</div>}
       <div className="flex gap-2" style={{ marginBottom: '14px' }}>
         <button onClick={submit} className="btn-3d flex-1" style={{ padding: '10px', borderRadius: '12px', background: COLOR.primary, color: COLOR.onAccent, fontSize: '13px', fontWeight: 800 }}>
@@ -75,7 +83,7 @@ function MyTermsEditor({ customTerms, onSave, onDelete }) {
           <div key={t.id} style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `2px solid ${COLOR.border}`, borderRadius: '12px', padding: '10px 12px' }}>
             <div className="flex justify-between items-baseline" style={{ gap: '8px' }}>
               <span style={{ fontSize: '14px', fontWeight: 700, color: t.kind === 'acronym' ? COLOR.gold : COLOR.text }}>{t.front}</span>
-              <span style={{ fontSize: '10.5px', fontWeight: 700, color: COLOR.muted, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{t.kind}</span>
+              <span style={{ fontSize: '10.5px', fontWeight: 700, color: COLOR.muted, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{t.kind} · {t.track && t.track !== 'all' ? (TRACKS.find((x) => x.key === t.track) || { label: t.track }).label : 'All certs'}</span>
             </div>
             <div style={{ fontSize: '12.5px', color: COLOR.muted, lineHeight: 1.45, marginTop: '3px' }}>{t.back}</div>
             <div className="flex gap-3" style={{ marginTop: '6px' }}>
@@ -98,18 +106,19 @@ function MyTermsEditor({ customTerms, onSave, onDelete }) {
 // keystroke; the search itself just filters that fixed list.
 function GlossaryPanel({ onClose, customTerms, onSaveCustomTerm, onDeleteCustomTerm }) {
   useEscapeToClose(onClose);
+  SCOPE.active = '*';   // the Glossary shows everything, whichever cert it belongs to
   const [query, setQuery] = useState('');
   const [expandedKey, setExpandedKey] = useState(null);
   const [tab, setTab] = useState('terms');
   const builtInEntries = useMemo(() => buildGlossaryEntries(), []);
   const mineTerms = (customTerms || []).filter((t) => t.kind === 'term');
   const entries = useMemo(
-    () => [...mineTerms.map((t) => ({ front: t.front, back: t.back, tracks: [], mine: true })), ...builtInEntries]
+    () => [...mineTerms.map((t) => ({ front: t.front, back: t.back, tracks: t.track && t.track !== 'all' ? [t.track] : [], mine: true })), ...builtInEntries]
       .sort((a, b) => a.front.localeCompare(b.front)),
     [builtInEntries, customTerms]
   );
   const acronymEntries = useMemo(
-    () => Object.keys(ACRONYMS).sort((a, b) => a.localeCompare(b)).map((k) => ({ key: k, exps: acronymExpansions(k), mine: !!ACRONYMS[k].mine })),
+    () => allAcronymKeys().sort((a, b) => a.localeCompare(b)).map((k) => ({ key: k, exps: acronymExpansions(k), mine: !!getAcronym(k).mine })),
     [customTerms]
   );
   const filtered = useMemo(() => {
@@ -329,8 +338,10 @@ function AboutLegalPanel({ onClose }) {
 // wrapper) — not a block appended below the whole paragraph/card. The
 // `term-flyout` class is what useClickOutsideToClose looks for to know a
 // click landed inside it rather than outside.
-function TermFlyout({ term, triggerText, context, onClose, shift, arrowLeft }) {
+function TermFlyout({ term, triggerText, context, scope, onClose, shift, arrowLeft }) {
+  const customCtx = React.useContext(CustomTermsContext);
   if (!term) return null;
+  if (scope) SCOPE.active = scope;
   const s = shift || 0;
   const acr = flyoutAcronyms(term, triggerText);
   const ctx = `${context || ''} ${term.front || ''} ${term.back || ''} ${term.detail || ''}`;
@@ -339,6 +350,17 @@ function TermFlyout({ term, triggerText, context, onClose, shift, arrowLeft }) {
   const meanings = (key) => acronymExpansions(key, ctx);
   const spell = (key) => meanings(key)[0];
   const alsoMeans = (key) => meanings(key).slice(1);
+  // "Save to my terms": a built-in definition (or an acronym's meaning) copied
+  // into your own list, scoped to the cert you're reading, where you can
+  // reword it. Not offered for terms that are already yours.
+  const savedScope = scope && scope !== '*' ? scope : 'all';
+  let saveCandidate = null;
+  if (!term.custom) {
+    if (term.acronymOnly && acr.lead[0]) saveCandidate = { kind: 'acronym', front: acr.lead[0], back: spell(acr.lead[0]), track: savedScope };
+    else if (term.front && term.back) saveCandidate = { kind: 'term', front: term.front, back: term.back, track: savedScope };
+    if (saveCandidate && validateCustomTerm(saveCandidate.kind, saveCandidate.front, saveCandidate.back, [], null)) saveCandidate = null;
+  }
+  const alreadySaved = !!saveCandidate && (customCtx.terms || []).some((t) => t.kind === saveCandidate.kind && t.front.toLowerCase() === saveCandidate.front.toLowerCase() && (t.track || 'all') === saveCandidate.track && t.back === saveCandidate.back);
   return (
     <span
       className="term-flyout"
@@ -380,6 +402,16 @@ function TermFlyout({ term, triggerText, context, onClose, shift, arrowLeft }) {
         <span style={{ display: 'block', fontSize: '11.5px', lineHeight: 1.5, color: COLOR.muted, marginTop: '6px', borderLeft: `2px solid ${COLOR.primary}`, paddingLeft: '8px', position: 'relative' }}>
           {term.detail}
         </span>
+      )}
+      {saveCandidate && customCtx.save && (
+        <button
+          onClick={(e) => { e.stopPropagation(); if (!alreadySaved) customCtx.save(saveCandidate); }}
+          disabled={alreadySaved}
+          className="btn-flat"
+          style={{ display: 'block', marginTop: '8px', padding: '4px 10px', borderRadius: '8px', border: `1px solid ${alreadySaved ? COLOR.success : COLOR.primary}`, background: 'transparent', color: alreadySaved ? COLOR.success : COLOR.primary, fontSize: '11.5px', fontWeight: 700, position: 'relative' }}
+        >
+          {alreadySaved ? 'Saved to My terms ✓' : '+ Save to my terms'}
+        </button>
       )}
       {acr.footer.length > 0 && (
         <span style={{ display: 'block', fontSize: '11.5px', lineHeight: 1.5, color: COLOR.muted, marginTop: '6px', paddingTop: '5px', borderTop: `1px solid ${COLOR.border}`, position: 'relative' }}>

@@ -946,7 +946,7 @@ function findTermCard(term, vocabPool) {
 // whole paragraph/card) — the wrapping span's `position: relative` is what
 // makes the flyout's `position: absolute` land right under this specific
 // word instead of the block's bottom edge.
-function TermTrigger({ text, card, isActive, onToggle, context }) {
+function TermTrigger({ text, card, isActive, onToggle, context, scope }) {
   const wrapperRef = useRef(null);
   // Anchored under the trigger word via `left: 0` by default (see
   // TermFlyout), which overflows off the right edge of the screen for any
@@ -989,7 +989,7 @@ function TermTrigger({ text, card, isActive, onToggle, context }) {
       >
         {text}
       </button>
-      {isActive && <TermFlyout term={card} triggerText={text} context={context} onClose={onToggle} shift={pos.shift} arrowLeft={pos.arrowLeft} />}
+      {isActive && <TermFlyout term={card} triggerText={text} context={context} scope={scope} onClose={onToggle} shift={pos.shift} arrowLeft={pos.arrowLeft} />}
     </span>
   );
 }
@@ -1003,8 +1003,8 @@ const ACRONYM_TOKEN_RE = /\b[A-Z][A-Za-z0-9]{1,7}\b/g;
 
 // The dictionary key a token resolves to ('VMs' -> 'VM'), or null.
 function acronymKey(token) {
-  if (ACRONYMS[token]) return token;
-  if (token.length > 2 && token.endsWith('s') && ACRONYMS[token.slice(0, -1)]) return token.slice(0, -1);
+  if (getAcronym(token)) return token;
+  if (token.length > 2 && token.endsWith('s') && getAcronym(token.slice(0, -1))) return token.slice(0, -1);
   return null;
 }
 
@@ -1012,8 +1012,8 @@ function acronymKey(token) {
 // text it appeared in) is given, the meanings whose words show up in that text
 // come first, so "CA" next to "Conditional Access" leads with Conditional Access.
 function acronymExpansions(key, context) {
-  const e = ACRONYMS[key];
-  const list = e ? (Array.isArray(e.exp) ? e.exp : [e.exp]) : [];
+  const e = getAcronym(key);
+  const list = e ? e.exp : [];
   if (list.length < 2 || !context) return list;
   const ctx = context.toLowerCase();
   const score = (exp) => exp.toLowerCase().split(/[^a-z0-9]+/).filter((w) => w.length >= 5 && ctx.includes(w)).length;
@@ -1035,32 +1035,61 @@ const squash = (s) => s.toLowerCase().replace(/[^a-z0-9]/g, '');
 
 /* ---- the learner's own terms ---- */
 
-// stats.customTerms is folded into the same structures the built-in terms use:
-// custom acronyms are merged into ACRONYMS (so every acronym lookup, flyout and
-// the Glossary just sees them), and custom terms become extra flashcard-shaped
-// cards appended to every track's term pool. syncCustomTerms is idempotent and
-// runs whenever the list changes; `version` invalidates the term-index cache.
-const CUSTOM_STATE = { version: 0, cards: [], touched: new Set(), builtin: null };
+// stats.customTerms feeds the same lookups the built-in terms use. Custom
+// acronyms are kept beside the dictionary (CUSTOM_STATE.acr) and merged in by
+// getAcronym; custom terms become extra flashcard-shaped cards added to a
+// track's term pool. Each item has a scope: 'all' certs or one track key, so a
+// term can belong to a single cert. SCOPE.active is the cert whose text is being
+// rendered right now (set by renderGlossed and TermFlyout from the pool's own
+// track); '*' means "everything", used by the Glossary. syncCustomTerms runs
+// whenever the list changes and bumps `version` so the term-index cache rebuilds.
+const CUSTOM_STATE = { version: 0, cards: [], acr: {} };
+const SCOPE = { active: '*' };
+const inScope = (itemScope) => SCOPE.active === '*' || !itemScope || itemScope === 'all' || itemScope === SCOPE.active;
 
 function syncCustomTerms(items) {
-  if (!CUSTOM_STATE.builtin) CUSTOM_STATE.builtin = JSON.parse(JSON.stringify(ACRONYMS));
-  CUSTOM_STATE.touched.forEach((k) => {
-    if (CUSTOM_STATE.builtin[k]) ACRONYMS[k] = JSON.parse(JSON.stringify(CUSTOM_STATE.builtin[k]));
-    else delete ACRONYMS[k];
-  });
-  CUSTOM_STATE.touched = new Set();
   const list = items || [];
-  list.filter((i) => i.kind === 'acronym').forEach((i) => {
-    const prev = ACRONYMS[i.front];
-    const exps = prev ? (Array.isArray(prev.exp) ? prev.exp : [prev.exp]) : [];
-    // Your meaning is listed alongside the built-in ones when you define a token the app already knows.
-    ACRONYMS[i.front] = { exp: exps.length ? [...exps, i.back] : i.back, mine: true };
-    CUSTOM_STATE.touched.add(i.front);
-  });
-  CUSTOM_STATE.cards = list.filter((i) => i.kind === 'term').map((i) => ({ id: 'custom:' + i.id, front: i.front, back: i.back, detail: '', cat: 'custom', custom: true }));
+  const acr = {};
+  list.filter((i) => i.kind === 'acronym').forEach((i) => { (acr[i.front] = acr[i.front] || []).push({ exp: i.back, scope: i.track || 'all' }); });
+  CUSTOM_STATE.acr = acr;
+  CUSTOM_STATE.cards = list.filter((i) => i.kind === 'term').map((i) => ({ id: 'custom:' + i.id, front: i.front, back: i.back, detail: '', cat: 'custom', custom: true, scope: i.track || 'all' }));
   CUSTOM_STATE.version += 1;
   TERM_INDEX_CACHE.clear();
   return CUSTOM_STATE.version;
+}
+
+// An acronym as { exp: [meanings], trigger, mine } for the active scope, or
+// null: the built-in meanings first, then yours (de-duplicated).
+function getAcronym(key) {
+  const base = ACRONYMS[key];
+  const mine = (CUSTOM_STATE.acr[key] || []).filter((c) => inScope(c.scope)).map((c) => c.exp);
+  if (!base && !mine.length) return null;
+  const exp = base ? [...(Array.isArray(base.exp) ? base.exp : [base.exp])] : [];
+  mine.forEach((m) => { if (!exp.includes(m)) exp.push(m); });
+  return { exp, trigger: mine.length ? true : base.trigger, mine: mine.length > 0 };
+}
+
+// Every acronym key visible in the active scope.
+function allAcronymKeys() {
+  const keys = new Set(Object.keys(ACRONYMS));
+  Object.keys(CUSTOM_STATE.acr).forEach((k) => { if (CUSTOM_STATE.acr[k].some((c) => inScope(c.scope))) keys.add(k); });
+  return [...keys];
+}
+
+// Which track a term pool belongs to, found from the card objects themselves
+// (pools are the track's own flashcards or subsets of them); null if unknown.
+let CARD_TRACK = null;
+function poolTrack(pool) {
+  if (!pool || !pool.length) return null;
+  if (!CARD_TRACK) {
+    CARD_TRACK = new Map();
+    Object.keys(DATA).forEach((k) => (DATA[k].flashcards || []).forEach((c) => CARD_TRACK.set(c, k)));
+  }
+  for (let i = 0; i < Math.min(pool.length, 6); i += 1) {
+    const t = CARD_TRACK.get(pool[i]);
+    if (t) return t;
+  }
+  return null;
 }
 
 const FLYOUT_FOOTER_ACRONYMS = 6;
@@ -1075,9 +1104,9 @@ function flyoutAcronyms(term, triggerText) {
   const spelledInFront = (key) => acronymExpansions(key).some((e) => frontSquashed.includes(squash(e)));
   const lead = [];
   const tappedKey = triggerText ? acronymKey(triggerText.trim()) : null;
-  [tappedKey, ...acronymsIn(term.front).filter((k) => ACRONYMS[k].trigger !== false)].forEach((k) => { if (k && !lead.includes(k) && !spelledInFront(k)) lead.push(k); });
+  [tappedKey, ...acronymsIn(term.front).filter((k) => getAcronym(k).trigger !== false)].forEach((k) => { if (k && !lead.includes(k) && !spelledInFront(k)) lead.push(k); });
   const footer = acronymsIn(`${term.back || ''} ${term.detail || ''}`)
-    .filter((k) => !lead.includes(k) && !spelledInFront(k) && ACRONYMS[k].trigger !== false)
+    .filter((k) => !lead.includes(k) && !spelledInFront(k) && getAcronym(k).trigger !== false)
     .slice(0, FLYOUT_FOOTER_ACRONYMS);
   return { lead, footer };
 }
@@ -1123,8 +1152,9 @@ const TERM_INDEX_CACHE = new Map();
 function getTermIndex(basePool) {
   if (!basePool.length) return null;
   // Your own terms go first so your wording wins over a built-in card with the same name.
-  const pool = CUSTOM_STATE.cards.length ? CUSTOM_STATE.cards.concat(basePool) : basePool;
-  const sig = [CUSTOM_STATE.version, pool.length, pool[0].front, pool[pool.length >> 1].front, pool[pool.length - 1].front].join('|');
+  const mineCards = CUSTOM_STATE.cards.filter((c) => inScope(c.scope));
+  const pool = mineCards.length ? mineCards.concat(basePool) : basePool;
+  const sig = [CUSTOM_STATE.version, SCOPE.active, pool.length, pool[0].front, pool[pool.length >> 1].front, pool[pool.length - 1].front].join('|');
   const cached = TERM_INDEX_CACHE.get(sig);
   if (cached) return cached;
   const phrases = new Map();   // lowercase phrase -> { card, pri }
@@ -1140,8 +1170,8 @@ function getTermIndex(basePool) {
     al.phrases.forEach((p) => putPhrase(p.text, card, p.pri));
     al.acronyms.forEach((t) => { if (!acronyms.has(t)) acronyms.set(t, { card, pri: PRI_CARD_ACRONYM }); });
   });
-  Object.keys(ACRONYMS).forEach((t) => {
-    if (ACRONYMS[t].trigger !== false && !acronyms.has(t)) acronyms.set(t, { card: null, pri: PRI_ACRONYM_ONLY });
+  allAcronymKeys().forEach((t) => {
+    if (getAcronym(t).trigger !== false && !acronyms.has(t)) acronyms.set(t, { card: null, pri: PRI_ACRONYM_ONLY });
   });
   const phraseKeys = [...phrases.keys()].sort((a, b) => b.length - a.length).map(escapeRegExp);
   const acrKeys = [...acronyms.keys()].sort((a, b) => b.length - a.length).map(escapeRegExp);
@@ -1194,6 +1224,8 @@ function findTermSpans(text, index) {
 // exact flashcard fronts over looser aliases when a block has more than that.
 function renderGlossed(text, { curated, pool, activeKey, onToggle, maxTerms, blockId }) {
   if (!text) return text;
+  const scope = poolTrack(pool) || 'all';
+  SCOPE.active = scope;
   const cap = maxTerms === 0 ? 0 : (maxTerms || 3);
   const spans = [];
   if (curated && curated.length) {
@@ -1234,7 +1266,7 @@ function renderGlossed(text, { curated, pool, activeKey, onToggle, maxTerms, blo
     } else {
       const key = (blockId || '') + ':' + sp.start;
       out.push(
-        <TermTrigger key={'k' + sp.start} text={sp.text} card={sp.card} isActive={key === activeKey} onToggle={() => onToggle(key === activeKey ? null : key)} context={text} />
+        <TermTrigger key={'k' + sp.start} text={sp.text} card={sp.card} isActive={key === activeKey} onToggle={() => onToggle(key === activeKey ? null : key)} context={text} scope={scope} />
       );
     }
     pos = sp.end;

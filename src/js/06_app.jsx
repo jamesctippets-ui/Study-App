@@ -94,6 +94,7 @@ function CertStudyApp() {
   // AZ-802 today).
   const [seqSession, setSeqSession] = useState([]);
   const [seqIndex, setSeqIndex] = useState(0);
+  const [seqBuilderOpen, setSeqBuilderOpen] = useState(false);
   const [seqWorkingOrder, setSeqWorkingOrder] = useState([]);
   const [seqSubmitted, setSeqSubmitted] = useState(false);
   const [seqScore, setSeqScore] = useState({ correct: 0, total: 0 });
@@ -677,15 +678,37 @@ function CertStudyApp() {
 
   // The Sequence sub-tab only exists for tracks with SEQUENCES — same
   // fallback reasoning as Commands/Mad Libs above.
-  useEffect(() => {
-    if (quizView === 'sequence' && !sequencesData.length) setQuizView('questions');
-  }, [activeTrack, quizView]);
+  // (Sequence is always available: with no built-in challenges a cert can still
+  // have the learner's own scenarios.)
+  const mySequences = (stats.customScenarios || [])
+    .filter((x) => x.track === activeTrack)
+    .map((x) => ({ id: 'my:' + x.id, mine: true, cat: 'mine', prompt: x.title, steps: x.steps, explanation: x.note || 'This is the order you set when you built the scenario.' }));
 
   const startSequenceSession = () => {
     const pool = activeCat === 'all' ? sequencesData : sequencesData.filter((s) => s.cat === activeCat);
-    setSeqSession(shuffleArray(pool));
+    setSeqSession(shuffleArray(activeCat === 'all' ? [...pool, ...mySequences] : pool));
     setSeqIndex(0);
     setSeqScore({ correct: 0, total: 0 });
+    setSeqBuilderOpen(false);
+  };
+  const practiceMyScenarios = (ids) => {
+    const wanted = new Set(ids.map((id) => 'my:' + id));
+    setSeqSession(shuffleArray(mySequences.filter((x) => wanted.has(x.id))));
+    setSeqIndex(0);
+    setSeqScore({ correct: 0, total: 0 });
+    setSeqBuilderOpen(false);
+  };
+  const saveScenario = (item) => {
+    const cur = statsRef.current;
+    const list = cur.customScenarios || [];
+    const next = item.id && list.some((x) => x.id === item.id)
+      ? list.map((x) => (x.id === item.id ? { ...x, title: item.title, steps: item.steps, note: item.note } : x))
+      : [...list, { id: 'sc' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6), track: item.track, title: item.title, steps: item.steps, note: item.note, at: todayString() }];
+    saveStats({ ...cur, customScenarios: next });
+  };
+  const deleteScenario = (id) => {
+    const cur = statsRef.current;
+    saveStats({ ...cur, customScenarios: (cur.customScenarios || []).filter((x) => x.id !== id) });
   };
 
   useEffect(() => {
@@ -725,7 +748,8 @@ function CertStudyApp() {
     if (!item) return;
     const correct = checkSequenceOrder(seqWorkingOrder);
     setSeqSubmitted(true);
-    recordResult(item.id, correct ? 'correct' : 'incorrect');
+    // Your own scenarios are a self-test only: no result, mastery or goal credit.
+    if (!item.mine) recordResult(item.id, correct ? 'correct' : 'incorrect');
     setSeqScore((s) => ({ correct: s.correct + (correct ? 1 : 0), total: s.total + 1 }));
   };
 
@@ -1424,8 +1448,8 @@ function CertStudyApp() {
     const cur = statsRef.current;
     const list = cur.customTerms || [];
     const next = item.id && list.some((t) => t.id === item.id)
-      ? list.map((t) => (t.id === item.id ? { ...t, kind: item.kind, front: item.front.trim(), back: item.back.trim() } : t))
-      : [...list, { id: 'ct' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6), kind: item.kind, front: item.front.trim(), back: item.back.trim(), at: todayString() }];
+      ? list.map((t) => (t.id === item.id ? { ...t, kind: item.kind, front: item.front.trim(), back: item.back.trim(), track: item.track || 'all' } : t))
+      : [...list, { id: 'ct' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6), kind: item.kind, front: item.front.trim(), back: item.back.trim(), track: item.track || 'all', at: todayString() }];
     saveStats({ ...cur, customTerms: next });
   };
   const deleteCustomTerm = (id) => {
@@ -1597,6 +1621,7 @@ function CertStudyApp() {
 
   return (
     <ProgressSummaryContext.Provider value={progressSummary}>
+    <CustomTermsContext.Provider value={{ terms: stats.customTerms || [], save: saveCustomTerm }}>
     <div
       style={{
         background: COLOR.bg,
@@ -1795,7 +1820,7 @@ function CertStudyApp() {
               compare: compareData.length > 0,
               casestudy: caseStudiesData.length > 0,
               madlibs: madlibsData.length > 0,
-              sequence: sequencesData.length > 0,
+              sequence: true,
               commands: !!DATA[activeTrack].cliChallenges,
             }}
             onSelect={setQuizView}
@@ -1995,6 +2020,27 @@ function CertStudyApp() {
         )}
 
         {mode === 'quiz' && quizView === 'sequence' && (
+          <React.Fragment>
+            {!seqBuilderOpen && (
+              <button
+                onClick={() => setSeqBuilderOpen(true)}
+                className="btn-flat"
+                style={{ width: '100%', marginBottom: '12px', padding: '10px 14px', borderRadius: '12px', border: `2px dashed ${COLOR.primary}`, background: 'transparent', color: COLOR.primary, fontSize: '13px', fontWeight: 800, textAlign: 'left' }}
+              >
+                + Build your own scenario{mySequences.length ? ` (${mySequences.length} saved)` : ''}
+              </button>
+            )}
+            {seqBuilderOpen ? (
+              <ScenarioBuilder
+                trackKey={activeTrack}
+                bankSteps={[...new Set(sequencesData.flatMap((x) => x.steps))]}
+                scenarios={stats.customScenarios || []}
+                onSave={saveScenario}
+                onDelete={deleteScenario}
+                onPractice={practiceMyScenarios}
+                onClose={() => setSeqBuilderOpen(false)}
+              />
+            ) : (
           <SequenceView
             session={seqSession}
             index={seqIndex}
@@ -2008,6 +2054,8 @@ function CertStudyApp() {
             onRestart={startSequenceSession}
             flashcardsData={flashcardsData}
           />
+            )}
+          </React.Fragment>
         )}
 
         {mode === 'quiz' && quizView === 'casestudy' && (
@@ -2218,6 +2266,7 @@ function CertStudyApp() {
       </div>
       <BottomTabBar mode={mode} onChange={openTab} />
     </div>
+    </CustomTermsContext.Provider>
     </ProgressSummaryContext.Provider>
   );
 }
