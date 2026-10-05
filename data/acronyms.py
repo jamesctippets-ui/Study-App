@@ -18,6 +18,13 @@ different things in different certs lists every meaning.
   inside flyouts but not turned into tappable words in running text.
 * A plural ('VMs', 'NSGs') is covered by its singular entry.
 
+Fact-check (October 2026): every entry was reviewed against how its cert
+material uses it, and the least certain ones were confirmed with web searches
+(TAXII, OWASP, VPP, PV1, MTTR, WDAC). Entries whose product or organisation was
+renamed keep the expansion exams still use and add the current name in
+parentheses (M365D, WDAC, OMS, ONC). Extra meanings that no content uses were
+deliberately not added, so flyouts never list a meaning the app never teaches.
+
 `IGNORE` lists tokens the content uses that are NOT acronyms (SQL keywords,
 product and brand names, sample variable names, cert codes, units) so
 build.py's coverage check can require that every real acronym is defined.
@@ -210,7 +217,7 @@ ACRONYMS = {
     'CAE': {'exp': 'Continuous access evaluation'},
     'CBA': {'exp': 'Certificate-based authentication'},
     'CHAP': {'exp': 'Challenge-Handshake Authentication Protocol'},
-    'CHAPv2': {'exp': 'Challenge-Handshake Authentication Protocol version 2'},
+    'CHAPv2': {'exp': 'Microsoft Challenge Handshake Authentication Protocol version 2 (MS-CHAPv2)'},
     'CredSSP': {'exp': 'Credential Security Support Provider'},
     'DAC': {'exp': 'Discretionary access control'},
     'DAP': {'exp': 'Delegated Admin Privileges'},
@@ -283,7 +290,7 @@ ACRONYMS = {
     'RSAT': {'exp': 'Remote Server Administration Tools'},
     'RSoP': {'exp': 'Resultant Set of Policy'},
     'WAC': {'exp': 'Windows Admin Center'},
-    'WDAC': {'exp': 'Windows Defender Application Control'},
+    'WDAC': {'exp': 'Windows Defender Application Control (now App Control for Business)'},
     'WEF': {'exp': 'Windows Event Forwarding'},
     'WinRM': {'exp': 'Windows Remote Management'},
     'WSUS': {'exp': 'Windows Server Update Services'},
@@ -334,7 +341,7 @@ ACRONYMS = {
     'PFX': {'exp': 'Personal Information Exchange'},
     'PKCS': {'exp': 'Public Key Cryptography Standards'},
     'SCEP': {'exp': 'Simple Certificate Enrollment Protocol'},
-    'VPP': {'exp': 'Volume Purchase Program'},
+    'VPP': {'exp': 'Volume Purchase Program (Apple Business Manager apps and books)'},
     'WE': {'exp': 'Without enrollment (as in MAM-WE)'},
 
     # Security controls, monitoring and operations
@@ -368,11 +375,11 @@ ACRONYMS = {
     'IPS': {'exp': 'Intrusion prevention system'},
     'KQL': {'exp': 'Kusto Query Language'},
     'LA': {'exp': 'Log Analytics'},
-    'M365D': {'exp': 'Microsoft 365 Defender'},
+    'M365D': {'exp': 'Microsoft 365 Defender (now Microsoft Defender XDR)'},
     'MMA': {'exp': 'Microsoft Monitoring Agent'},
     'NACL': {'exp': 'Network access control list'},
     'NRT': {'exp': 'Near-real-time'},
-    'OMS': {'exp': 'Operations Management Suite'},
+    'OMS': {'exp': 'Operations Management Suite (retired; now Azure Monitor / Log Analytics)'},
     'OT': {'exp': 'Operational technology'},
     'OWASP': {'exp': 'Open Worldwide Application Security Project'},
     'SCU': {'exp': 'Security Compute Unit'},
@@ -382,7 +389,7 @@ ACRONYMS = {
     'SPF': {'exp': 'Sender Policy Framework'},
     'SPM': {'exp': 'Security posture management'},
     'SSE': {'exp': 'Server-side encryption'},
-    'TAXII': {'exp': 'Trusted Automated Exchange of Intelligence Information'},
+    'TAXII': {'exp': 'Trusted Automated eXchange of Intelligence Information'},
     'TDE': {'exp': 'Transparent Data Encryption'},
     'TI': {'exp': 'Threat intelligence'},
     'UEBA': {'exp': 'User and Entity Behavior Analytics'},
@@ -491,7 +498,7 @@ ACRONYMS = {
     'ISO': {'exp': ['International Organization for Standardization', 'ISO disc image (ISO 9660 file)']},
     'NDA': {'exp': 'Non-disclosure agreement'},
     'NIST': {'exp': 'National Institute of Standards and Technology'},
-    'ONC': {'exp': 'Office of the National Coordinator for Health Information Technology'},
+    'ONC': {'exp': 'Office of the National Coordinator for Health Information Technology (now ASTP/ONC)'},
     'PCI': {'exp': 'Payment Card Industry'},
     'PHI': {'exp': 'Protected health information'},
     'SSN': {'exp': 'Social Security number'},

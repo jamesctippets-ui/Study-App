@@ -293,57 +293,78 @@ function useFontPrefs() {
   return [dyslexic, setDyslexic];
 }
 
-// Celebration sounds: tiny synthesized arpeggios (Web Audio, no audio files).
-// Off by default, and a per-device preference like theme and voice, so it
-// lives in plain localStorage rather than in synced progress.
+// Sounds: tiny synthesized tones (Web Audio, no audio files). Two separate,
+// opt-in switches, both off by default: celebration chimes when a step or unit
+// finishes, and a short right/wrong tone when a practice question is answered.
+// Per-device preferences like theme and voice, so plain localStorage rather
+// than synced progress.
 const SOUND_STORAGE_KEY = 'certStudyHub_soundPrefs';
-const SOUND_STATE = { enabled: false, ctx: null };
+const SOUND_STATE = { enabled: false, answers: false, ctx: null };
 
 function useSoundPrefs() {
-  const [soundOn, setSoundOnState] = useState(() => {
-    try { return !!JSON.parse(localStorage.getItem(SOUND_STORAGE_KEY) || '{}').enabled; } catch (e) { return false; }
+  const [prefs, setPrefs] = useState(() => {
+    try {
+      const saved = JSON.parse(localStorage.getItem(SOUND_STORAGE_KEY) || '{}');
+      return { enabled: !!saved.enabled, answers: !!saved.answers };
+    } catch (e) { return { enabled: false, answers: false }; }
   });
-  useEffect(() => { SOUND_STATE.enabled = soundOn; }, [soundOn]);
-  const setSoundOn = (on) => {
-    setSoundOnState(on);
-    SOUND_STATE.enabled = on;
-    try { localStorage.setItem(SOUND_STORAGE_KEY, JSON.stringify({ enabled: on })); } catch (e) { /* ignore */ }
+  useEffect(() => { SOUND_STATE.enabled = prefs.enabled; SOUND_STATE.answers = prefs.answers; }, [prefs]);
+  const update = (patch) => {
+    const next = { ...prefs, ...patch };
+    setPrefs(next);
+    SOUND_STATE.enabled = next.enabled;
+    SOUND_STATE.answers = next.answers;
+    try { localStorage.setItem(SOUND_STORAGE_KEY, JSON.stringify(next)); } catch (e) { /* ignore */ }
   };
-  return [soundOn, setSoundOn];
+  return { soundOn: prefs.enabled, answerSoundOn: prefs.answers, setSoundOn: (on) => update({ enabled: on }), setAnswerSoundOn: (on) => update({ answers: on }) };
 }
 
-// kind: 'ok' (a step), 'great' (a perfect score or test-out), 'unit' (a
-// finished unit). `force` plays even when sounds are off (the settings test
-// button). Silent if the browser has no Web Audio or blocks it.
-function playCelebrationSound(kind, force) {
-  if (!force && !SOUND_STATE.enabled) return;
+// Plays a list of [frequency, seconds] notes through one shared AudioContext.
+// Silent if the browser has no Web Audio or blocks it.
+function playTones(notes, step, endLen, vol) {
   try {
     const AC = window.AudioContext || window.webkitAudioContext;
     if (!AC) return;
     if (!SOUND_STATE.ctx) SOUND_STATE.ctx = new AC();
     const ctx = SOUND_STATE.ctx;
     if (ctx.state === 'suspended' && ctx.resume) ctx.resume();
-    const C5 = 523.25, E5 = 659.25, G5 = 783.99, C6 = 1046.5, E6 = 1318.5, G6 = 1568;
-    const notes = kind === 'unit' ? [C5, E5, G5, C6, E6, G6] : kind === 'great' ? [C5, E5, G5, C6] : [C5, G5];
-    const step = kind === 'unit' ? 0.11 : 0.13;
     const t0 = ctx.currentTime + 0.02;
     notes.forEach((freq, i) => {
       const last = i === notes.length - 1;
       const start = t0 + i * step;
-      const len = last ? 0.55 : 0.2;
+      const len = last ? endLen : Math.max(step * 1.5, 0.12);
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
       osc.type = 'triangle';
       osc.frequency.value = freq;
       gain.gain.setValueAtTime(0.0001, start);
-      gain.gain.exponentialRampToValueAtTime(0.16, start + 0.015);
+      gain.gain.exponentialRampToValueAtTime(vol, start + 0.015);
       gain.gain.exponentialRampToValueAtTime(0.0001, start + len);
       osc.connect(gain);
       gain.connect(ctx.destination);
       osc.start(start);
       osc.stop(start + len + 0.05);
     });
-  } catch (e) { /* audio unavailable — celebrate silently */ }
+  } catch (e) { /* audio unavailable: carry on silently */ }
+}
+
+// kind: 'ok' (a step), 'great' (a perfect score or test-out), 'unit' (a
+// finished unit). `force` plays even when sounds are off (the settings test
+// button).
+function playCelebrationSound(kind, force) {
+  if (!force && !SOUND_STATE.enabled) return;
+  const C5 = 523.25, E5 = 659.25, G5 = 783.99, C6 = 1046.5, E6 = 1318.5, G6 = 1568;
+  const notes = kind === 'unit' ? [C5, E5, G5, C6, E6, G6] : kind === 'great' ? [C5, E5, G5, C6] : [C5, G5];
+  playTones(notes, kind === 'unit' ? 0.11 : 0.13, 0.55, 0.16);
+}
+
+// A right answer is two quick rising notes; a wrong one is a single soft,
+// low, falling tone. Deliberately quiet and brief, since it plays on every
+// answered question. `force` is for the settings test button.
+function playAnswerSound(correct, force) {
+  if (!force && !SOUND_STATE.answers) return;
+  if (correct) playTones([659.25, 987.77], 0.09, 0.22, 0.12);
+  else playTones([220, 174.61], 0.12, 0.3, 0.12);
 }
 
 // A real sliding switch (not just an icon button) per the user's request —

@@ -1033,6 +1033,36 @@ function acronymsIn(text) {
 
 const squash = (s) => s.toLowerCase().replace(/[^a-z0-9]/g, '');
 
+/* ---- the learner's own terms ---- */
+
+// stats.customTerms is folded into the same structures the built-in terms use:
+// custom acronyms are merged into ACRONYMS (so every acronym lookup, flyout and
+// the Glossary just sees them), and custom terms become extra flashcard-shaped
+// cards appended to every track's term pool. syncCustomTerms is idempotent and
+// runs whenever the list changes; `version` invalidates the term-index cache.
+const CUSTOM_STATE = { version: 0, cards: [], touched: new Set(), builtin: null };
+
+function syncCustomTerms(items) {
+  if (!CUSTOM_STATE.builtin) CUSTOM_STATE.builtin = JSON.parse(JSON.stringify(ACRONYMS));
+  CUSTOM_STATE.touched.forEach((k) => {
+    if (CUSTOM_STATE.builtin[k]) ACRONYMS[k] = JSON.parse(JSON.stringify(CUSTOM_STATE.builtin[k]));
+    else delete ACRONYMS[k];
+  });
+  CUSTOM_STATE.touched = new Set();
+  const list = items || [];
+  list.filter((i) => i.kind === 'acronym').forEach((i) => {
+    const prev = ACRONYMS[i.front];
+    const exps = prev ? (Array.isArray(prev.exp) ? prev.exp : [prev.exp]) : [];
+    // Your meaning is listed alongside the built-in ones when you define a token the app already knows.
+    ACRONYMS[i.front] = { exp: exps.length ? [...exps, i.back] : i.back, mine: true };
+    CUSTOM_STATE.touched.add(i.front);
+  });
+  CUSTOM_STATE.cards = list.filter((i) => i.kind === 'term').map((i) => ({ id: 'custom:' + i.id, front: i.front, back: i.back, detail: '', cat: 'custom', custom: true }));
+  CUSTOM_STATE.version += 1;
+  TERM_INDEX_CACHE.clear();
+  return CUSTOM_STATE.version;
+}
+
 const FLYOUT_FOOTER_ACRONYMS = 6;
 
 // (Ubiquitous acronyms marked `trigger: False` in data/acronyms.py — ID, OS, IP... — are left out of the lists to keep flyouts short.)
@@ -1090,9 +1120,11 @@ function frontAliases(front) {
 
 const TERM_INDEX_CACHE = new Map();
 
-function getTermIndex(pool) {
-  if (!pool.length) return null;
-  const sig = [pool.length, pool[0].front, pool[pool.length >> 1].front, pool[pool.length - 1].front].join('|');
+function getTermIndex(basePool) {
+  if (!basePool.length) return null;
+  // Your own terms go first so your wording wins over a built-in card with the same name.
+  const pool = CUSTOM_STATE.cards.length ? CUSTOM_STATE.cards.concat(basePool) : basePool;
+  const sig = [CUSTOM_STATE.version, pool.length, pool[0].front, pool[pool.length >> 1].front, pool[pool.length - 1].front].join('|');
   const cached = TERM_INDEX_CACHE.get(sig);
   if (cached) return cached;
   const phrases = new Map();   // lowercase phrase -> { card, pri }

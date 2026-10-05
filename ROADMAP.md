@@ -1569,9 +1569,44 @@ trading away for shinier but shallower ones.
   yourself still wins for the rest of the visit: the track switcher, a row on
   Home, Continue where you left off, a deep link or the back button. With no
   plan at all it falls back to the cert you last visited, then AZ-900.
-- [ ] **Home path — nothing blocking.** Untried: expanding the acronym
-  dictionary through a second-reader fact-check, and letting a learner add
-  their own acronyms or terms.
+- [x] **Fonts, answer sounds, acronym fact-check, your own terms, test cleanup.**
+  (1) *Fonts:* Nunito and OpenDyslexic are now self-hosted in `fonts/` (no
+  Google Fonts request; licences in `fonts/README.md`). **Data & Progress →
+  Reading → OpenDyslexic font** switches the whole app (`data-font="dyslexic"`
+  on the page, saved per device, applied before first paint). The OpenDyslexic
+  header title is set a little smaller so it fits. (2) *Offline:* `build.py` now
+  regenerates the service worker's precache list from every file in `images/`
+  and `fonts/` (about 7.5 MB), so a fully offline session shows every
+  screenshot and the right typeface; the cache name also changes when that list
+  does. (3) *Answer sounds:* a separate opt-in switch, off by default: a short
+  rising tone for a right answer and a soft low one for a wrong answer in
+  practice questions (not in exams, which give no feedback, and not for an answer
+  shown already given). (4) *Acronym fact-check:* all 467 expansions were
+  reviewed by four parallel read-only workers; the least certain were then
+  confirmed by search (TAXII's official capitalisation "eXchange" was wrong and
+  is fixed; OWASP, PV1, MTTR, VPP, WDAC confirmed). Seven entries now carry the
+  current product or organisation name next to the one exams still use (M365D,
+  WDAC, OMS, ONC, VPP) plus CHAPv2 (it is Microsoft's MS-CHAPv2) and TAXII.
+  Extra meanings no content uses (IDE as "development environment", DAC as
+  "Dedicated Administrator Connection", ASR as "Azure Site Recovery", CIM as
+  "Common Information Model") were left out on purpose and can be added if a
+  lesson starts using them. Honest limit: the workers searched only a handful of
+  entries each and judged the rest from knowledge. (5) *Your own terms:*
+  Glossary → **Mine** tab: add a Term (4+ characters, any wording) or an
+  Acronym (2-8 characters, capital first, two or more capitals or digits) with
+  its meaning; edit and delete them. They appear in definition flyouts wherever
+  the text names them (marked "Your term"; your wording wins over a built-in
+  card of the same name), in the Terms and Acronyms tabs with a "Mine" badge, and
+  are saved with your progress and so travel in export and import
+  (`stats.customTerms`, at most 300). A custom acronym for a token the app
+  already defines is listed alongside the built-in meanings. (6) *Tests:* the
+  bridge test now completes (it was clicking the bottom bar after answering), the
+  panels test matches the current header, and the answer-sound, font and
+  custom-term flows each have a test.
+- [ ] **Open ideas.** Add extra acronym meanings only when a lesson uses
+  them; a "save to my terms" button inside a flyout; per-cert scoping for your
+  own terms; sounds for the Match and Mad Libs games; and the build-your-own
+  scenario game and the real module build listed above.
 
 - [x] **Tough terms flashcard deck.** Each `srs` entry now also stores the
   raw 1-5 rating it was last given (`last`). A card is "tough" when that

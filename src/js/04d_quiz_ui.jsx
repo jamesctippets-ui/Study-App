@@ -723,6 +723,14 @@ function CompareView({ session, index, score, categories, choice, onChoose, onNe
 
 function QuestionView({ q, selected, onChoose, onNext, index, total, categoryLabel, badgeLabel, msPending, onToggleMs, onSubmitMs, nextLabel, hideMeta, hideNext, flashcardsData }) {
   useScrollTopOnChange(index);
+  // Optional right/wrong tone the moment a question gets answered (not when
+  // one is shown already answered, e.g. today's question on a revisit).
+  const prevSelected = useRef(selected);
+  useEffect(() => {
+    if (prevSelected.current === null && selected !== null && q) playAnswerSound(questionAnsweredCorrectly(q, selected));
+    prevSelected.current = selected;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selected]);
   const [activeTermKey, setActiveTermKey] = useState(null);
   useEffect(() => { setActiveTermKey(null); }, [q && q.id]);
   useEscapeToClose(() => setActiveTermKey(null));

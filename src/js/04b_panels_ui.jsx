@@ -28,21 +28,89 @@ function AboutSection({ title, defaultOpen, children }) {
   );
 }
 
+// "Mine" tab of the Glossary: add, edit and delete your own terms and
+// acronyms. They appear in flyouts, the Terms and Acronyms tabs, and are saved
+// (and exported) with the rest of your progress.
+function MyTermsEditor({ customTerms, onSave, onDelete }) {
+  const [kind, setKind] = useState('term');
+  const [front, setFront] = useState('');
+  const [back, setBack] = useState('');
+  const [editingId, setEditingId] = useState(null);
+  const [error, setError] = useState(null);
+  const reset = () => { setFront(''); setBack(''); setEditingId(null); setError(null); };
+  const submit = () => {
+    const err = validateCustomTerm(kind, front, back, customTerms, editingId);
+    if (err) { setError(err); return; }
+    onSave({ id: editingId, kind, front, back });
+    reset();
+  };
+  const edit = (t) => { setKind(t.kind); setFront(t.front); setBack(t.back); setEditingId(t.id); setError(null); };
+  const input = { width: '100%', padding: '9px 11px', borderRadius: '10px', border: `2px solid ${COLOR.border}`, background: COLOR.surface, color: COLOR.text, fontSize: '13px' };
+  return (
+    <div>
+      <div style={{ fontSize: '11.5px', color: COLOR.muted, marginBottom: '10px', lineHeight: 1.45 }}>
+        Add terms or acronyms from your own work or notes. They show up in definition flyouts wherever the text mentions them, and stay on this device with your progress.
+      </div>
+      <div className="flex gap-1" style={{ background: COLOR.surface, padding: '3px', borderRadius: '10px', border: `2px solid ${COLOR.border}`, marginBottom: '8px' }}>
+        {[['term', 'Term'], ['acronym', 'Acronym']].map(([k, label]) => (
+          <button key={k} onClick={() => { setKind(k); setError(null); }} className="flex-1 btn-flat" aria-pressed={kind === k}
+            style={{ padding: '6px 2px', borderRadius: '8px', fontSize: '12px', fontWeight: 700, background: kind === k ? COLOR.surfaceRaised : 'transparent', color: kind === k ? COLOR.text : COLOR.muted }}>
+            {label}
+          </button>
+        ))}
+      </div>
+      <input value={front} onChange={(e) => setFront(e.target.value)} placeholder={kind === 'acronym' ? 'Acronym, e.g. ADT' : 'Term, e.g. Break-glass account'} aria-label={kind === 'acronym' ? 'Acronym' : 'Term'} maxLength={CUSTOM_FRONT_MAX} style={{ ...input, marginBottom: '8px' }} />
+      <textarea value={back} onChange={(e) => setBack(e.target.value)} placeholder={kind === 'acronym' ? 'What it stands for' : 'What it means'} aria-label={kind === 'acronym' ? 'What it stands for' : 'Definition'} maxLength={CUSTOM_BACK_MAX} rows={3} style={{ ...input, marginBottom: '8px', resize: 'vertical' }} />
+      {error && <div role="alert" style={{ fontSize: '12px', color: COLOR.red, marginBottom: '8px', lineHeight: 1.4 }}>{error}</div>}
+      <div className="flex gap-2" style={{ marginBottom: '14px' }}>
+        <button onClick={submit} className="btn-3d flex-1" style={{ padding: '10px', borderRadius: '12px', background: COLOR.primary, color: COLOR.onAccent, fontSize: '13px', fontWeight: 800 }}>
+          {editingId ? 'Save changes' : kind === 'acronym' ? 'Add acronym' : 'Add term'}
+        </button>
+        {editingId && (
+          <button onClick={reset} className="btn-flat" style={{ padding: '10px 14px', borderRadius: '12px', border: `2px solid ${COLOR.border}`, background: 'transparent', color: COLOR.text, fontSize: '13px', fontWeight: 700 }}>Cancel</button>
+        )}
+      </div>
+      <div className="flex flex-col gap-2">
+        {customTerms.map((t) => (
+          <div key={t.id} style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `2px solid ${COLOR.border}`, borderRadius: '12px', padding: '10px 12px' }}>
+            <div className="flex justify-between items-baseline" style={{ gap: '8px' }}>
+              <span style={{ fontSize: '14px', fontWeight: 700, color: t.kind === 'acronym' ? COLOR.gold : COLOR.text }}>{t.front}</span>
+              <span style={{ fontSize: '10.5px', fontWeight: 700, color: COLOR.muted, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{t.kind}</span>
+            </div>
+            <div style={{ fontSize: '12.5px', color: COLOR.muted, lineHeight: 1.45, marginTop: '3px' }}>{t.back}</div>
+            <div className="flex gap-3" style={{ marginTop: '6px' }}>
+              <button onClick={() => edit(t)} className="btn-flat" style={{ background: 'transparent', color: COLOR.primary, fontSize: '12px', fontWeight: 700, padding: 0 }}>Edit</button>
+              <button onClick={() => { onDelete(t.id); if (editingId === t.id) reset(); }} className="btn-flat" style={{ background: 'transparent', color: COLOR.red, fontSize: '12px', fontWeight: 700, padding: 0 }}>Delete</button>
+            </div>
+          </div>
+        ))}
+        {!customTerms.length && <div style={{ fontSize: '12px', color: COLOR.muted, textAlign: 'center', padding: '14px 0' }}>Nothing here yet.</div>}
+      </div>
+    </div>
+  );
+}
+
 // A cross-track term lookup — every flashcard's front across every
 // visible track, deduplicated and alphabetized (buildGlossaryEntries in
 // 03_helpers.js), so a term you half-remember from a different cert
 // doesn't require guessing which track it lives in. Computed once per
 // panel open (flashcards don't change mid-session) rather than on every
 // keystroke; the search itself just filters that fixed list.
-function GlossaryPanel({ onClose }) {
+function GlossaryPanel({ onClose, customTerms, onSaveCustomTerm, onDeleteCustomTerm }) {
   useEscapeToClose(onClose);
   const [query, setQuery] = useState('');
   const [expandedKey, setExpandedKey] = useState(null);
   const [tab, setTab] = useState('terms');
-  const entries = useMemo(() => buildGlossaryEntries(), []);
+  const builtInEntries = useMemo(() => buildGlossaryEntries(), []);
+  const mineTerms = (customTerms || []).filter((t) => t.kind === 'term');
+  const entries = useMemo(
+    () => [...mineTerms.map((t) => ({ front: t.front, back: t.back, tracks: [], mine: true })), ...builtInEntries]
+      .sort((a, b) => a.front.localeCompare(b.front)),
+    [builtInEntries, customTerms]
+  );
   const acronymEntries = useMemo(
-    () => Object.keys(ACRONYMS).sort((a, b) => a.localeCompare(b)).map((k) => ({ key: k, exps: acronymExpansions(k) })),
-    []
+    () => Object.keys(ACRONYMS).sort((a, b) => a.localeCompare(b)).map((k) => ({ key: k, exps: acronymExpansions(k), mine: !!ACRONYMS[k].mine })),
+    [customTerms]
   );
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -78,7 +146,7 @@ function GlossaryPanel({ onClose }) {
           explained once here shows every track that uses it, not just whichever one you're currently in.
         </div>
         <div className="flex gap-1" style={{ background: COLOR.surface, padding: '3px', borderRadius: '10px', border: `2px solid ${COLOR.border}`, marginBottom: '10px' }}>
-          {[['terms', `Terms (${entries.length})`], ['acronyms', `Acronyms (${acronymEntries.length})`]].map(([k, label]) => (
+          {[['terms', `Terms (${entries.length})`], ['acronyms', `Acronyms (${acronymEntries.length})`], ['mine', `Mine (${(customTerms || []).length})`]].map(([k, label]) => (
             <button
               key={k}
               onClick={() => { setTab(k); setExpandedKey(null); }}
@@ -89,7 +157,10 @@ function GlossaryPanel({ onClose }) {
             </button>
           ))}
         </div>
-        <input
+        {tab === 'mine' && (
+          <MyTermsEditor customTerms={customTerms || []} onSave={onSaveCustomTerm} onDelete={onDeleteCustomTerm} />
+        )}
+        {tab !== 'mine' && <input
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder={tab === 'terms' ? 'Search terms…' : 'Search acronyms or what they stand for…'}
@@ -97,18 +168,18 @@ function GlossaryPanel({ onClose }) {
             width: '100%', padding: '10px 12px', borderRadius: '10px', border: `2px solid ${COLOR.border}`,
             background: COLOR.surface, color: COLOR.text, fontSize: '13px', marginBottom: '10px',
           }}
-        />
-        <div style={{ fontSize: '11px', color: COLOR.muted, marginBottom: '8px' }}>
+        />}
+        {tab !== 'mine' && <div style={{ fontSize: '11px', color: COLOR.muted, marginBottom: '8px' }}>
           {tab === 'terms'
             ? `${filtered.length} term${filtered.length === 1 ? '' : 's'}${filtered.length > shown.length ? ` (showing first ${shown.length})` : ''}`
             : `${filteredAcronyms.length} acronym${filteredAcronyms.length === 1 ? '' : 's'}`}
-        </div>
+        </div>}
         {tab === 'acronyms' && (
           <div className="flex flex-col gap-2">
             {filteredAcronyms.map((a) => (
               <div key={a.key} style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `2px solid ${COLOR.border}`, borderRadius: '12px', padding: '9px 12px', display: 'flex', gap: '10px', alignItems: 'baseline' }}>
                 <span className="itil-display" style={{ fontSize: '14px', fontWeight: 700, color: COLOR.gold, minWidth: '56px' }}>{a.key}</span>
-                <span style={{ fontSize: '13px', color: COLOR.text, lineHeight: 1.45 }}>{a.exps.join(' / ')}</span>
+                <span style={{ fontSize: '13px', color: COLOR.text, lineHeight: 1.45 }}>{a.exps.join(' / ')}{a.mine && <span style={{ marginLeft: '6px', fontSize: '10.5px', fontWeight: 700, color: COLOR.primary, border: `1px solid ${COLOR.primary}`, borderRadius: '999px', padding: '0 6px' }}>Mine</span>}</span>
               </div>
             ))}
             {!filteredAcronyms.length && (
@@ -129,6 +200,7 @@ function GlossaryPanel({ onClose }) {
                 >
                   <div style={{ fontSize: '14px', fontWeight: 600, color: COLOR.text }}>{entry.front}</div>
                   <div className="flex gap-1" style={{ marginTop: '4px', flexWrap: 'wrap' }}>
+                    {entry.mine && <span style={{ fontSize: '10.5px', fontWeight: 700, color: COLOR.primary, border: `1px solid ${COLOR.primary}`, borderRadius: '999px', padding: '1px 6px' }}>Mine</span>}
                     {entry.tracks.map((tk) => {
                       const t = TRACKS.find((tt) => tt.key === tk);
                       const accent = trackAccent(tk);
@@ -302,6 +374,7 @@ function TermFlyout({ term, triggerText, context, onClose, shift, arrowLeft }) {
           {alsoMeans(k).length > 0 && <span style={{ color: COLOR.muted, fontSize: '11px' }}> (also: {alsoMeans(k).join('; ')})</span>}
         </span>
       )))}
+      {term.custom && <span style={{ display: 'block', fontSize: '10.5px', fontWeight: 700, letterSpacing: '0.05em', textTransform: 'uppercase', color: COLOR.primary, marginBottom: '2px', position: 'relative' }}>Your term</span>}
       {term.back && <span style={{ display: 'block', fontSize: '12.5px', lineHeight: 1.5, color: COLOR.text, position: 'relative' }}>{term.back}</span>}
       {term.detail && (
         <span style={{ display: 'block', fontSize: '11.5px', lineHeight: 1.5, color: COLOR.muted, marginTop: '6px', borderLeft: `2px solid ${COLOR.primary}`, paddingLeft: '8px', position: 'relative' }}>

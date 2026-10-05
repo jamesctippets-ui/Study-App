@@ -78,7 +78,7 @@ function AchievementsPanel({ achievements, streak, onClose }) {
 function DataPanel({
   trackLabel, onExport, onImportFile, importMessage, onReset, onClose,
   speechSupported, ttsVoices, ttsRate, ttsVoiceURI, onSetTtsRate, onSetTtsVoiceURI, onTestVoice, isTestSpeaking,
-  soundOn, onSetSoundOn, pathLocking, onSetPathLocking, dyslexicFont, onSetDyslexicFont,
+  soundOn, onSetSoundOn, pathLocking, onSetPathLocking, dyslexicFont, onSetDyslexicFont, answerSoundOn, onSetAnswerSoundOn,
 }) {
   useEscapeToClose(onClose);
   const [confirmingReset, setConfirmingReset] = useState(false);
@@ -149,13 +149,29 @@ function DataPanel({
             </span>
             <input type="checkbox" checked={!!soundOn} onChange={(e) => onSetSoundOn(e.target.checked)} style={{ width: '20px', height: '20px', flexShrink: 0, marginTop: '2px' }} aria-label="Celebration sounds" />
           </label>
-          <button
-            onClick={() => playCelebrationSound('great', true)}
-            className="btn-flat"
-            style={{ marginTop: '10px', padding: '6px 12px', borderRadius: '10px', border: `2px solid ${COLOR.border}`, background: 'transparent', color: COLOR.text, fontSize: '12px', fontWeight: 700 }}
-          >
-            Play a test sound
-          </button>
+          <label style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '12px', marginTop: '12px', fontSize: '12.5px' }}>
+            <span>
+              Answer sounds
+              <span style={{ display: 'block', fontSize: '11.5px', color: COLOR.muted, lineHeight: 1.4 }}>A short rising tone for a right answer and a soft low one for a wrong answer in practice questions. Off by default; saved on this device only.</span>
+            </span>
+            <input type="checkbox" checked={!!answerSoundOn} onChange={(e) => onSetAnswerSoundOn(e.target.checked)} style={{ width: '20px', height: '20px', flexShrink: 0, marginTop: '2px' }} aria-label="Answer sounds" />
+          </label>
+          <div style={{ display: 'flex', gap: '8px', marginTop: '10px', flexWrap: 'wrap' }}>
+            <button
+              onClick={() => playCelebrationSound('great', true)}
+              className="btn-flat"
+              style={{ padding: '6px 12px', borderRadius: '10px', border: `2px solid ${COLOR.border}`, background: 'transparent', color: COLOR.text, fontSize: '12px', fontWeight: 700 }}
+            >
+              Play a test sound
+            </button>
+            <button
+              onClick={() => { playAnswerSound(true, true); setTimeout(() => playAnswerSound(false, true), 500); }}
+              className="btn-flat"
+              style={{ padding: '6px 12px', borderRadius: '10px', border: `2px solid ${COLOR.border}`, background: 'transparent', color: COLOR.text, fontSize: '12px', fontWeight: 700 }}
+            >
+              Test answer sounds
+            </button>
+          </div>
         </div>
 
         {speechSupported && (

@@ -50,8 +50,11 @@ function CertStudyApp() {
   const [speakingId, setSpeakingId] = useState(null);
   const speechSupported = typeof window !== 'undefined' && 'speechSynthesis' in window;
   const { ttsRate, ttsVoiceURI, setTtsRate, setTtsVoiceURI } = useTtsPrefs();
-  const [soundOn, setSoundOn] = useSoundPrefs();
+  const { soundOn, setSoundOn, answerSoundOn, setAnswerSoundOn } = useSoundPrefs();
   const [dyslexicFont, setDyslexicFont] = useFontPrefs();
+  // Fold the learner's own terms/acronyms into the flyout engine before any
+  // child renders (stats.customTerms changes only when they add, edit or delete).
+  useMemo(() => syncCustomTerms(stats.customTerms), [stats.customTerms]);
   const [ttsVoices, setTtsVoices] = useState([]);
 
   // Verbal Quiz — a hands-free, audio-only quiz flow (read question, pause
@@ -1417,6 +1420,19 @@ function CertStudyApp() {
     saveStats({ ...cur, homePath: { ...(cur.homePath || {}), order } });
   };
 
+  const saveCustomTerm = (item) => {
+    const cur = statsRef.current;
+    const list = cur.customTerms || [];
+    const next = item.id && list.some((t) => t.id === item.id)
+      ? list.map((t) => (t.id === item.id ? { ...t, kind: item.kind, front: item.front.trim(), back: item.back.trim() } : t))
+      : [...list, { id: 'ct' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6), kind: item.kind, front: item.front.trim(), back: item.back.trim(), at: todayString() }];
+    saveStats({ ...cur, customTerms: next });
+  };
+  const deleteCustomTerm = (id) => {
+    const cur = statsRef.current;
+    saveStats({ ...cur, customTerms: (cur.customTerms || []).filter((t) => t.id !== id) });
+  };
+
   const doReset = () => {
     saveResults({ ...results, [activeTrack]: {} });
     saveSrs({ ...srs, [activeTrack]: {} });
@@ -1601,7 +1617,7 @@ function CertStudyApp() {
         />
       )}
       {showAbout && <AboutLegalPanel onClose={() => setShowAbout(false)} />}
-      {showGlossary && <GlossaryPanel onClose={() => setShowGlossary(false)} />}
+      {showGlossary && <GlossaryPanel onClose={() => setShowGlossary(false)} customTerms={stats.customTerms || []} onSaveCustomTerm={saveCustomTerm} onDeleteCustomTerm={deleteCustomTerm} />}
       {showCertPath && (
         <CertPathPanel
           tracks={visibleTracks}
@@ -1644,6 +1660,8 @@ function CertStudyApp() {
           isTestSpeaking={speakingId === '__tts_test__'}
           soundOn={soundOn}
           onSetSoundOn={setSoundOn}
+          answerSoundOn={answerSoundOn}
+          onSetAnswerSoundOn={setAnswerSoundOn}
           dyslexicFont={dyslexicFont}
           onSetDyslexicFont={setDyslexicFont}
           pathLocking={stats.pathLocking !== false}

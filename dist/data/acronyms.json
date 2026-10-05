@@ -537,7 +537,7 @@
     "exp": "Challenge-Handshake Authentication Protocol"
   },
   "CHAPv2": {
-    "exp": "Challenge-Handshake Authentication Protocol version 2"
+    "exp": "Microsoft Challenge Handshake Authentication Protocol version 2 (MS-CHAPv2)"
   },
   "CredSSP": {
     "exp": "Credential Security Support Provider"
@@ -757,7 +757,7 @@
     "exp": "Windows Admin Center"
   },
   "WDAC": {
-    "exp": "Windows Defender Application Control"
+    "exp": "Windows Defender Application Control (now App Control for Business)"
   },
   "WEF": {
     "exp": "Windows Event Forwarding"
@@ -902,7 +902,7 @@
     "exp": "Simple Certificate Enrollment Protocol"
   },
   "VPP": {
-    "exp": "Volume Purchase Program"
+    "exp": "Volume Purchase Program (Apple Business Manager apps and books)"
   },
   "WE": {
     "exp": "Without enrollment (as in MAM-WE)"
@@ -998,7 +998,7 @@
     "exp": "Log Analytics"
   },
   "M365D": {
-    "exp": "Microsoft 365 Defender"
+    "exp": "Microsoft 365 Defender (now Microsoft Defender XDR)"
   },
   "MMA": {
     "exp": "Microsoft Monitoring Agent"
@@ -1010,7 +1010,7 @@
     "exp": "Near-real-time"
   },
   "OMS": {
-    "exp": "Operations Management Suite"
+    "exp": "Operations Management Suite (retired; now Azure Monitor / Log Analytics)"
   },
   "OT": {
     "exp": "Operational technology"
@@ -1043,7 +1043,7 @@
     "exp": "Server-side encryption"
   },
   "TAXII": {
-    "exp": "Trusted Automated Exchange of Intelligence Information"
+    "exp": "Trusted Automated eXchange of Intelligence Information"
   },
   "TDE": {
     "exp": "Transparent Data Encryption"
@@ -1360,7 +1360,7 @@
     "exp": "National Institute of Standards and Technology"
   },
   "ONC": {
-    "exp": "Office of the National Coordinator for Health Information Technology"
+    "exp": "Office of the National Coordinator for Health Information Technology (now ASTP/ONC)"
   },
   "PCI": {
     "exp": "Payment Card Industry"

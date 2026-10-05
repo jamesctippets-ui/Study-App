@@ -532,6 +532,7 @@ function emptyStats() {
     categoryMasteryHistory: {},
     path: {},
     pathLocking: true,
+    customTerms: [],
   };
 }
 
@@ -560,6 +561,7 @@ function normalizeStats(raw) {
     categoryMasteryHistory: raw.categoryMasteryHistory && typeof raw.categoryMasteryHistory === 'object' ? raw.categoryMasteryHistory : {},
     path: normalizePathStats(raw.path),
     pathLocking: raw.pathLocking !== false,
+    customTerms: normalizeCustomTerms(raw.customTerms),
   };
 }
 
@@ -898,6 +900,69 @@ function studyingTrackKey(tracks, certPlan, results, seenLog, stats) {
   const remaining = homePathRemaining(unitsByTrack, studyKeys, doneByTrack, homePath.mode);
   const hit = remaining.find((e) => !e.step.optional) || remaining[0];
   return (hit && hit.trackKey) || pathKeys[0];
+}
+
+// Whether `selected` (as QuestionView stores it: an option index for
+// multiple choice, 0 = True / 1 = False for true/false, a list of indices for
+// multi-select) is the right answer to `q`.
+function questionAnsweredCorrectly(q, selected) {
+  if (!q || selected === null || selected === undefined) return false;
+  if (q.type === 'mc') return selected === q.correct;
+  if (q.type === 'tf') return (selected === 0) === q.answer;
+  if (q.type === 'ms' && Array.isArray(selected) && Array.isArray(q.correct)) {
+    const picked = [...selected].sort();
+    const right = [...q.correct].sort();
+    return picked.length === right.length && picked.every((v, i) => v === right[i]);
+  }
+  return false;
+}
+
+// The learner's own terms and acronyms (stats.customTerms), shown in flyouts
+// and the Glossary alongside the built-in ones. kind 'term' is a phrase with a
+// definition; kind 'acronym' is a short token with what it stands for.
+const CUSTOM_TERMS_MAX = 300;
+const CUSTOM_FRONT_MAX = 80;
+const CUSTOM_BACK_MAX = 600;
+const CUSTOM_ACRONYM_RE = /^[A-Z][A-Za-z0-9]{1,7}$/;
+
+// Returns an error message, or null when the entry can be saved. `existing` is
+// the current list, `editingId` the entry being edited (so it can keep its own name).
+function validateCustomTerm(kind, front, back, existing, editingId) {
+  const f = (front || '').trim();
+  const b = (back || '').trim();
+  if (!f) return kind === 'acronym' ? 'Enter the acronym.' : 'Enter the term.';
+  if (!b) return kind === 'acronym' ? 'Enter what it stands for.' : 'Enter a definition.';
+  if (f.length > CUSTOM_FRONT_MAX) return `Keep the ${kind === 'acronym' ? 'acronym' : 'term'} under ${CUSTOM_FRONT_MAX} characters.`;
+  if (b.length > CUSTOM_BACK_MAX) return `Keep the ${kind === 'acronym' ? 'meaning' : 'definition'} under ${CUSTOM_BACK_MAX} characters.`;
+  if (kind === 'acronym') {
+    if (!CUSTOM_ACRONYM_RE.test(f) || (f.match(/[A-Z0-9]/g) || []).length < 2) {
+      return 'Acronyms are 2 to 8 letters or digits, start with a capital, and have at least two capitals or digits (like RBAC or Azure2).';
+    }
+  } else if (f.length < 4) {
+    return 'Terms need at least 4 characters to be recognised in text. Use the Acronym type for short ones.';
+  }
+  const dupe = (existing || []).some((t) => t.id !== editingId && t.kind === kind && t.front.toLowerCase() === f.toLowerCase() && t.back.toLowerCase() === b.toLowerCase());
+  if (dupe) return 'You already added that.';
+  if ((existing || []).length >= CUSTOM_TERMS_MAX && !editingId) return `You can keep up to ${CUSTOM_TERMS_MAX} terms.`;
+  return null;
+}
+
+function normalizeCustomTerms(raw) {
+  if (!Array.isArray(raw)) return [];
+  const seen = new Set();
+  const out = [];
+  raw.forEach((t) => {
+    if (!t || typeof t !== 'object') return;
+    const kind = t.kind === 'acronym' ? 'acronym' : t.kind === 'term' ? 'term' : null;
+    const front = typeof t.front === 'string' ? t.front.trim() : '';
+    const back = typeof t.back === 'string' ? t.back.trim() : '';
+    const id = typeof t.id === 'string' && t.id ? t.id : null;
+    if (!kind || !id || seen.has(id) || out.length >= CUSTOM_TERMS_MAX) return;
+    if (validateCustomTerm(kind, front, back, [], null)) return;
+    seen.add(id);
+    out.push({ id, kind, front, back, at: typeof t.at === 'string' ? t.at : null });
+  });
+  return out;
 }
 
 function normalizeHomePath(raw) {
