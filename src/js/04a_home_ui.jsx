@@ -308,8 +308,8 @@ function DailyGoalRing({ dailyGoal, onSetTarget, note }) {
   return (
     <div style={{
       display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '10px',
-      padding: '10px 12px', borderRadius: '14px', background: COLOR.surface,
-      border: `2px solid ${COLOR.border}`, boxShadow: SHADOW.card,
+      padding: '10px 12px', borderRadius: '14px', background: tint(COLOR.orange, 10),
+      border: `2px solid color-mix(in srgb, ${COLOR.orange} 40%, ${COLOR.border})`, boxShadow: SHADOW.card,
     }}>
       <button
         onClick={() => setEditing((e) => !e)}
@@ -375,8 +375,8 @@ function TrackListDropdown({ tracks, masteries, certPlan, onSelectTrack, onAddTo
         onClick={() => setOpen((o) => !o)}
         style={{
           width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-          padding: '12px 14px', borderRadius: '12px', background: COLOR.surface,
-          border: `2px solid ${COLOR.border}`, boxShadow: SHADOW.card,
+          padding: '12px 14px', borderRadius: '12px', background: tint(COLOR.blue, 9),
+          border: `2px solid color-mix(in srgb, ${COLOR.blue} 35%, ${COLOR.border})`, boxShadow: SHADOW.card,
         }}
       >
         <span style={{ fontSize: '13px', fontWeight: 600, color: COLOR.text }}>{label || `All tracks (${tracks.length})`}</span>
@@ -399,7 +399,7 @@ function TrackListDropdown({ tracks, masteries, certPlan, onSelectTrack, onAddTo
                 }}
               >
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontSize: '13.5px', fontWeight: 600, color: accent }}>{t.label}</div>
+                  <div style={{ fontSize: '13.5px', fontWeight: 600, color: ink(accent) }}>{t.label}</div>
                   <div style={{ fontSize: '11px', color: COLOR.muted, marginTop: '2px' }}>{t.subtitle}</div>
                 </div>
                 {isCompleted ? (
@@ -478,7 +478,7 @@ function DailyQuestionCard({ q, trackLabel, stored, onAnswer }) {
         aria-expanded={open}
         style={{
           width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px', textAlign: 'left',
-          padding: '12px 14px', borderRadius: '12px', background: COLOR.surface, border: `2px solid ${COLOR.border}`, boxShadow: SHADOW.card,
+          padding: '12px 14px', borderRadius: '12px', background: tint(COLOR.gold, 11), border: `2px solid color-mix(in srgb, ${COLOR.gold} 40%, ${COLOR.border})`, boxShadow: SHADOW.card,
         }}
       >
         <span style={{ minWidth: 0 }}>
@@ -529,12 +529,12 @@ function DailyVocabCard({ card, trackLabel, revealed, onReveal, pool }) {
       <div
         onClick={() => { if (!revealed) onReveal(); }}
         style={{
-          boxShadow: SHADOW.card, background: revealed ? COLOR.surfaceRaised : COLOR.surface,
-          border: `2px solid ${COLOR.border}`, borderRadius: '12px', padding: '12px 14px',
+          boxShadow: SHADOW.card, background: tint(COLOR.teal, revealed ? 16 : 10),
+          border: `2px solid color-mix(in srgb, ${COLOR.teal} 40%, ${COLOR.border})`, borderRadius: '12px', padding: '12px 14px',
           cursor: revealed ? 'default' : 'pointer',
         }}
       >
-        <div style={{ fontSize: '11px', color: COLOR.primary, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+        <div style={{ fontSize: '11px', color: COLOR.teal, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
           Vocab of the day · {trackLabel}
         </div>
         <div className="itil-display" style={{ fontSize: '17px', fontWeight: 600, marginTop: '4px' }}>{card.front}</div>
@@ -586,14 +586,14 @@ function CertPathHomeSection({ pathOrder, results, certPlan, studyingKey, pathPr
             style={{
               width: '100%', textAlign: 'left', display: 'flex', alignItems: 'center', gap: '10px',
               padding: '10px 14px', borderRadius: '12px', marginBottom: i === pathOrder.length - 1 ? 0 : '6px',
-              background: studying ? `${accent}1F` : COLOR.surface, border: `1px solid ${studying ? accent : COLOR.border}`, boxShadow: SHADOW.card,
+              background: studying ? tint(accent, 20) : tint(accent, 7), border: `2px solid ${studying ? accent : `color-mix(in srgb, ${accent} 30%, ${COLOR.border})`}`, boxShadow: SHADOW.card,
             }}
           >
             <div style={{ fontSize: '11px', color: COLOR.muted, width: '14px', flexShrink: 0, textAlign: 'center' }}>{i + 1}</div>
             <div style={{ flex: 1, minWidth: 0 }}>
               <div className="flex items-center gap-2" style={{ display: 'flex' }}>
-                <span style={{ fontSize: '13px', fontWeight: 600, color: accent }}>{t.label}</span>
-                {studying && <span style={{ fontSize: '10.5px', fontWeight: 700, color: accent, textTransform: 'uppercase', letterSpacing: '0.04em' }}>Studying now</span>}
+                <span style={{ fontSize: '13px', fontWeight: 600, color: ink(accent) }}>{t.label}</span>
+                {studying && <span style={{ fontSize: '10.5px', fontWeight: 700, color: ink(accent), textTransform: 'uppercase', letterSpacing: '0.04em' }}>Studying now</span>}
               </div>
               <div style={{ fontSize: '11.5px', color: COLOR.muted, marginTop: '1px' }}>
                 {t.subtitle}{prog && prog.total ? ` · path ${prog.pct}%` : ''}
@@ -821,7 +821,7 @@ function HomeView({ tracks, results, seenLog, stats, certPlan, speech, srs, make
           }}
         >
           <div style={{ fontSize: '11px', color: COLOR.muted, marginBottom: '2px' }}>Continue where you left off</div>
-          <div style={{ fontSize: '15px', fontWeight: 600, color: trackAccent(resumeTrack.key) }}>
+          <div style={{ fontSize: '15px', fontWeight: 600, color: ink(trackAccent(resumeTrack.key)) }}>
             {resumeTrack.label} · {MODE_LABELS[lastVisited.mode] || 'Path'}{resumeViewLabel ? ` · ${resumeViewLabel}` : ''}
           </div>
           {resumeStep && (
@@ -866,7 +866,7 @@ function HomeView({ tracks, results, seenLog, stats, certPlan, speech, srs, make
         onClick={onOpenGlossary}
         style={{
           width: '100%', textAlign: 'left', marginTop: '10px', padding: '12px 14px', borderRadius: '12px',
-          background: COLOR.surface, border: `2px solid ${COLOR.border}`, boxShadow: SHADOW.card,
+          background: tint(COLOR.pink, 9), border: `2px solid color-mix(in srgb, ${COLOR.pink} 35%, ${COLOR.border})`, boxShadow: SHADOW.card,
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
         }}
       >
@@ -916,7 +916,7 @@ function TrackSwitcherSheet({ tracks, results, certPlan, activeTrack, onSelect, 
       >
         {rank && <div style={{ fontSize: '11px', color: COLOR.muted, width: '14px', flexShrink: 0, textAlign: 'center' }}>{rank}</div>}
         <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ fontSize: '13.5px', fontWeight: 600, color: accent }}>{t.label}{isActive && <span style={{ color: COLOR.muted, fontWeight: 400 }}> · current</span>}</div>
+          <div style={{ fontSize: '13.5px', fontWeight: 600, color: ink(accent) }}>{t.label}{isActive && <span style={{ color: COLOR.muted, fontWeight: 400 }}> · current</span>}</div>
           <div style={{ fontSize: '11px', color: COLOR.muted, marginTop: '2px' }}>{t.subtitle}</div>
         </div>
         <div style={{ fontSize: '12px', fontWeight: 700, color: pct >= 70 ? COLOR.success : COLOR.muted, flexShrink: 0 }}>{pct}%</div>
@@ -1010,7 +1010,7 @@ function CertPathPanel({ tracks, certPlan, onAddTrack, onRemoveTrack, onMove, on
             background: `${trackAccent(nextTrack.key)}1F`, border: `1px solid ${trackAccent(nextTrack.key)}`, boxShadow: SHADOW.card,
           }}>
             <div style={{ fontSize: '11px', color: COLOR.muted, marginBottom: '2px' }}>Up next</div>
-            <div style={{ fontSize: '16px', fontWeight: 600, color: trackAccent(nextTrack.key) }}>
+            <div style={{ fontSize: '16px', fontWeight: 600, color: ink(trackAccent(nextTrack.key)) }}>
               {nextTrack.label} <span style={{ fontWeight: 400, color: COLOR.muted, fontSize: '12px' }}>· {nextTrack.subtitle}</span>
             </div>
             {certPlan.scheduled[nextTrack.key] && (
@@ -1060,7 +1060,7 @@ function CertPathPanel({ tracks, certPlan, onAddTrack, onRemoveTrack, onMove, on
               <div key={key} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 12px', borderRadius: '12px', background: COLOR.surface, border: `2px solid ${COLOR.border}` }}>
                 <div style={{ fontSize: '12px', color: COLOR.muted, width: '14px', flexShrink: 0, textAlign: 'center' }}>{i + 1}</div>
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontSize: '13px', fontWeight: 600, color: accent }}>{t.label}</div>
+                  <div style={{ fontSize: '13px', fontWeight: 600, color: ink(accent) }}>{t.label}</div>
                   <input
                     type="date"
                     value={scheduledDate || ''}

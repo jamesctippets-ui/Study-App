@@ -30,6 +30,10 @@ const COLOR = {
   gold: 'var(--color-gold)',
   // A genuine teal, used sparingly for secondary accents/variety.
   teal: 'var(--color-teal)',
+  // More hues for variety: used to tell tabs, step types, units and sections apart.
+  blue: 'var(--color-blue)',
+  orange: 'var(--color-orange)',
+  pink: 'var(--color-pink)',
   // The text color to use ON TOP of a primary/gold/success/red background
   // (buttons, badges) — dark in dark mode (since those accents stay light
   // there) and light in light mode (since light mode darkens those same
@@ -59,6 +63,33 @@ const TRACK_ACCENTS = {
   ehrintegration: '#94A3B8',
   ab650: '#F59E0B',
 };
+
+// A soft tint of an accent over the card surface, so sections can carry their
+// own colour without any new theme tokens (works in light and dark).
+function tint(color, pct) {
+  return `color-mix(in srgb, ${color} ${pct == null ? 12 : pct}%, ${COLOR.surface})`;
+}
+
+// One hue per kind of path step, and a rotating hue per unit, so a trail reads
+// as a varied road instead of a single purple line.
+const STEP_HUE = {
+  read: COLOR.teal, cards: COLOR.blue, cards2: COLOR.blue, quiz: COLOR.orange, quiz2: COLOR.orange,
+  game: COLOR.pink, match: COLOR.pink, quick: COLOR.orange, apply: COLOR.success, checkpoint: COLOR.gold,
+  testout: COLOR.gold, review: COLOR.red, deep: COLOR.teal, bridge: COLOR.blue, bonus: COLOR.pink,
+};
+const UNIT_HUES = [COLOR.primary, COLOR.blue, COLOR.teal, COLOR.orange, COLOR.pink, COLOR.success, COLOR.gold];
+// The colour of each main area; the bottom tab, the top bar tint and the page
+// accents for that area all draw from it.
+const MODE_HUE = { home: COLOR.blue, path: COLOR.primary, quiz: COLOR.orange, learn: COLOR.teal, exam: COLOR.gold, profile: COLOR.pink };
+function modeHue(mode) { return MODE_HUE[mode] || COLOR.primary; }
+function unitHue(index) { return UNIT_HUES[index % UNIT_HUES.length]; }
+function stepHue(kind) { return STEP_HUE[kind] || COLOR.primary; }
+
+// A cert accent used as TEXT: the same hue, darkened in the light theme (via
+// --accent-darken, 0% in dark) so pale accents like cyan stay readable.
+function ink(color) {
+  return `color-mix(in srgb, ${color}, black var(--accent-darken, 0%))`;
+}
 
 function trackAccent(key) {
   return TRACK_ACCENTS[key] || COLOR.primary;
@@ -261,6 +292,8 @@ function TabIcon({ kind, size = 24 }) {
       return <svg {...c}><polygon points="13 2 4 14 12 14 11 22 20 10 12 10 13 2" /></svg>;
     case 'learn':
       return <svg {...c}><path d="M2 4h6a4 4 0 0 1 4 4v13a3 3 0 0 0-3-3H2z" /><path d="M22 4h-6a4 4 0 0 0-4 4v13a3 3 0 0 1 3-3h7z" /></svg>;
+    case 'profile':
+      return <svg {...c}><circle cx="12" cy="8" r="4" /><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7" /></svg>;
     case 'exam':
       return <svg {...c}><path d="M5 3h14v5a7 7 0 0 1-14 0z" /><path d="M9 21h6M12 15v6" /><path d="M5 5H2.5a3 3 0 0 0 3 4M19 5h2.5a3 3 0 0 1-3 4" /></svg>;
     default:

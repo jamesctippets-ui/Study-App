@@ -216,7 +216,7 @@ function GlossaryPanel({ onClose, customTerms, onSaveCustomTerm, onDeleteCustomT
                       return (
                         <span
                           key={tk}
-                          style={{ fontSize: '10px', fontWeight: 700, color: accent, border: `1px solid ${accent}`, borderRadius: '999px', padding: '1px 6px' }}
+                          style={{ fontSize: '10px', fontWeight: 700, color: ink(accent), border: `1px solid ${accent}`, borderRadius: '999px', padding: '1px 6px' }}
                         >
                           {t ? t.label : tk}
                         </span>
@@ -460,6 +460,7 @@ const TAB_BAR_ITEMS = [
   { m: 'quiz', label: 'Practice', icon: 'quiz' },
   { m: 'learn', label: 'Reference', icon: 'learn' },
   { m: 'exam', label: 'Exam', icon: 'exam' },
+  { m: 'profile', label: 'Profile', icon: 'profile' },
 ];
 
 function BottomTabBar({ mode, onChange }) {
@@ -471,10 +472,10 @@ function BottomTabBar({ mode, onChange }) {
         borderTop: `2px solid ${COLOR.border}`, paddingBottom: 'env(safe-area-inset-bottom)',
       }}
     >
-      <div className="max-w-md mx-auto flex" style={{ height: `${TAB_BAR_HEIGHT}px`, padding: '6px 8px', gap: '4px' }}>
+      <div className="max-w-md mx-auto flex" style={{ height: `${TAB_BAR_HEIGHT}px`, padding: '6px 6px', gap: '2px' }}>
         {TAB_BAR_ITEMS.map((t) => {
           const active = mode === t.m;
-          const tint = t.m === 'exam' ? COLOR.gold : COLOR.primary;
+          const hue = modeHue(t.m);
           return (
             <button
               key={t.m}
@@ -484,9 +485,9 @@ function BottomTabBar({ mode, onChange }) {
               className="btn-flat flex-1"
               style={{
                 display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '2px',
-                borderRadius: '14px', background: active ? `color-mix(in srgb, ${tint} 16%, transparent)` : 'transparent',
-                border: `2px solid ${active ? tint : 'transparent'}`, color: active ? tint : COLOR.muted, minWidth: 0,
-                fontSize: '11px', fontWeight: 800, letterSpacing: '0.02em',
+                borderRadius: '14px', background: active ? `color-mix(in srgb, ${hue} 18%, transparent)` : 'transparent',
+                border: `2px solid ${active ? hue : 'transparent'}`, color: active ? hue : `color-mix(in srgb, ${hue} 55%, ${COLOR.muted})`, minWidth: 0,
+                fontSize: '10.5px', fontWeight: 800, letterSpacing: 0,
               }}
             >
               <TabIcon kind={t.icon} size={24} />

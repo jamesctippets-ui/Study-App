@@ -152,7 +152,7 @@ function CertStudyApp() {
   const pickTrack = (key) => { trackPickedRef.current = true; setActiveTrack(key); };
   const planDefaultTrack = () => studyingTrackKey(visibleTracks, certPlan, results, seenLog, stats);
   const openTab = (m) => {
-    if (m !== 'home' && mode === 'home' && !trackPickedRef.current) setActiveTrack(planDefaultTrack());
+    if (m !== 'home' && m !== 'profile' && (mode === 'home' || mode === 'profile') && !trackPickedRef.current) setActiveTrack(planDefaultTrack());
     setMode(m);
   };
   // Once saved data has loaded, adopt the plan's cert as the active one.
@@ -315,7 +315,7 @@ function CertStudyApp() {
 
   const goToCertPathTrack = (key) => {
     pickTrack(key);
-    setMode((m) => (m === 'home' ? 'path' : m));
+    setMode((m) => (m === 'home' || m === 'profile' ? 'path' : m));
     setShowCertPath(false);
   };
 
@@ -369,7 +369,7 @@ function CertStudyApp() {
   // today's goal.
   const bumpDailyGoal = (n = 1) => {
     const current = statsRef.current;
-    saveStats({ ...current, dailyGoal: recordDailyActivity(current.dailyGoal, n) });
+    saveStats(withActivity(current, n));
   };
 
   const setDailyGoalTarget = (target) => {
@@ -899,6 +899,17 @@ function CertStudyApp() {
 
   const achievements = useMemo(() => evaluateAchievements(results, stats), [results, stats]);
 
+  // One-time: keep units finished before the path games were added finished.
+  const pathMigratedRef = useRef(false);
+  useEffect(() => {
+    if (syncMode === 'loading' || pathMigratedRef.current) return;
+    pathMigratedRef.current = true;
+    const cur = statsRef.current;
+    if ((cur.pathVersion || 0) >= PATH_PROGRESS_VERSION) return;
+    saveStats({ ...cur, path: migratePathSteps(cur.path, todayString()), pathVersion: PATH_PROGRESS_VERSION });
+    // eslint-disable-next-line
+  }, [syncMode]);
+
   // Advance the daily streak once per load, after real data (local or cloud)
   // has replaced the empty initial state — never while still `loading`.
   const streakAdvancedRef = useRef(false);
@@ -999,14 +1010,14 @@ function CertStudyApp() {
     function applyHash() {
       const parsed = parseHash(window.location.hash, validTrackKeys);
       const cur = routeStateRef.current;
-      const same = parsed.mode === 'home'
-        ? cur.mode === 'home'
+      const same = parsed.mode === 'home' || parsed.mode === 'profile'
+        ? cur.mode === parsed.mode
         : parsed.trackKey === cur.activeTrack && parsed.mode === cur.mode
           && (parsed.mode !== 'learn' || parsed.learnView === cur.learnView)
           && (parsed.mode !== 'quiz' || parsed.quizView === cur.quizView);
       if (same) return;
-      if (parsed.mode === 'home') {
-        setMode('home');
+      if (parsed.mode === 'home' || parsed.mode === 'profile') {
+        setMode(parsed.mode);
         return;
       }
       pickTrack(parsed.trackKey);
@@ -1107,7 +1118,7 @@ function CertStudyApp() {
   // `stats` closure — runs last and its write isn't the one that gets
   // overwritten.
   useEffect(() => {
-    if (syncMode === 'loading' || mode === 'home') return;
+    if (syncMode === 'loading' || mode === 'home' || mode === 'profile') return;
     const view = mode === 'learn' ? learnView : mode === 'quiz' ? quizView : null;
     // Build on the latest saved stats (the ref), not this render's `stats`:
     // the streak effect can fire in the same commit and must not be overwritten.
@@ -1254,7 +1265,7 @@ function CertStudyApp() {
   // changed today, same self-correcting pattern as the readiness-history
   // effect above.
   useEffect(() => {
-    if (syncMode === 'loading' || mode === 'home') return;
+    if (syncMode === 'loading' || mode === 'home' || mode === 'profile') return;
     const pcts = {};
     categories.forEach((c) => { pcts[c.key] = Math.round((masteryByCategory[c.key] || 0) * 100); });
     const today = todayString();
@@ -1592,7 +1603,7 @@ function CertStudyApp() {
         },
       }
       : stats;
-    const nextStats = { ...statsWithExam, dailyGoal: recordDailyActivity(statsWithExam.dailyGoal, answeredCount) };
+    const nextStats = withActivity(statsWithExam, answeredCount);
     resultsRef.current = nextResults;
     statsRef.current = nextStats;
     setResults(nextResults);
@@ -1693,7 +1704,7 @@ function CertStudyApp() {
           onSetPathLocking={(on) => saveStats({ ...statsRef.current, pathLocking: on })}
         />
       )}
-      <div style={{ background: COLOR.navBar, borderBottom: `1px solid ${COLOR.border}`, position: 'sticky', top: 0, zIndex: 30 }}>
+      <div style={{ background: `color-mix(in srgb, ${modeHue(mode)} 9%, ${COLOR.navBar})`, borderBottom: `2px solid color-mix(in srgb, ${modeHue(mode)} 45%, ${COLOR.border})`, position: 'sticky', top: 0, zIndex: 30, transition: 'background-color 0.2s ease' }}>
         <div className="max-w-md mx-auto px-4 flex items-center" style={{ height: `${APP_HEADER_HEIGHT}px`, gap: '8px' }}>
           <button
             onClick={() => setShowCertPath(true)}
@@ -1704,8 +1715,8 @@ function CertStudyApp() {
             <IconMenu />
           </button>
           <div style={{ flex: 1, minWidth: 0 }}>
-            {mode === 'home' ? (
-              <div className="itil-display app-title" style={{ fontSize: '20px', lineHeight: 1.1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>Cert Study</div>
+            {mode === 'home' || mode === 'profile' ? (
+              <div className="itil-display app-title" style={{ fontSize: '20px', lineHeight: 1.1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{mode === 'profile' ? 'Profile' : 'Cert Study'}</div>
             ) : (
               <button
                 onClick={() => setShowTrackSwitcher(true)}
@@ -1713,7 +1724,7 @@ function CertStudyApp() {
                 title="Switch track"
                 style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', textAlign: 'left', background: 'transparent', border: 'none', padding: '4px 0', maxWidth: '100%' }}
               >
-                <span className="itil-display app-title" style={{ fontSize: '22px', lineHeight: 1.1, color: trackAccent(activeTrack) }}>{track.label}</span>
+                <span className="itil-display app-title" style={{ fontSize: '22px', lineHeight: 1.1, color: ink(trackAccent(activeTrack)) }}>{track.label}</span>
                 <span style={{ fontSize: '12px', color: COLOR.muted }}>▾</span>
               </button>
             )}
@@ -1752,7 +1763,24 @@ function CertStudyApp() {
           </div>
         ) : null}
 
-        {mode === 'home' ? (
+        {mode === 'profile' ? (
+          <ProfileView
+            tracks={visibleTracks}
+            results={results}
+            seenLog={seenLog}
+            srs={srs}
+            stats={stats}
+            certPlan={certPlan}
+            achievements={achievements}
+            onSaveProfile={(profile) => saveStats({ ...statsRef.current, profile })}
+            onToggleCompleted={toggleCertCompleted}
+            onSelectTrack={(key) => { pickTrack(key); setMode('path'); }}
+            onOpenCertPath={() => setShowCertPath(true)}
+            onOpenAchievements={() => setShowAchievements(true)}
+            onOpenData={() => { setImportMessage(null); setShowData(true); }}
+            onOpenGlossary={() => setShowGlossary(true)}
+          />
+        ) : mode === 'home' ? (
           <HomeView
             tracks={visibleTracks}
             results={results}
@@ -1964,7 +1992,7 @@ function CertStudyApp() {
         {mode === 'quiz' && quizView === 'match' && (
           <MatchGame
             flashcards={filteredFlashcards}
-            onRoundComplete={() => saveStats({ ...stats, counts: { ...stats.counts, matchRoundsCompleted: stats.counts.matchRoundsCompleted + 1 } })}
+            onRoundComplete={() => { const cur = statsRef.current; saveStats({ ...cur, counts: { ...cur.counts, matchRoundsCompleted: cur.counts.matchRoundsCompleted + 1 } }); }}
           />
         )}
 

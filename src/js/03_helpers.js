@@ -298,6 +298,7 @@ function routeToHash(mode, trackKey, learnView, quizView) {
   if (mode === 'learn') return `#/${trackKey}/reference/${learnView}`;
   if (mode === 'quiz') return `#/${trackKey}/practice/${quizView}`;
   if (mode === 'exam') return `#/${trackKey}/exam`;
+  if (mode === 'profile') return '#/profile';
   return '#/home';
 }
 
@@ -311,6 +312,7 @@ function parseHash(hash, validTrackKeys) {
   const path = (hash || '').replace(/^#\/?/, '');
   const parts = path.split('/').filter(Boolean);
   if (!parts.length || parts[0] === 'home') return { mode: 'home' };
+  if (parts[0] === 'profile') return { mode: 'profile' };
   const [trackKey, mode, sub] = parts;
   if (!validTrackKeys.has(trackKey)) return { mode: 'home' };
   if (mode === 'path') return { mode: 'path', trackKey };
@@ -534,6 +536,9 @@ function emptyStats() {
     pathLocking: true,
     customTerms: [],
     customScenarios: [],
+    pathVersion: PATH_PROGRESS_VERSION,
+    activityLog: {},
+    profile: { name: '', hue: 'primary' },
   };
 }
 
@@ -564,6 +569,9 @@ function normalizeStats(raw) {
     pathLocking: raw.pathLocking !== false,
     customTerms: normalizeCustomTerms(raw.customTerms),
     customScenarios: normalizeCustomScenarios(raw.customScenarios),
+    pathVersion: Number.isFinite(raw.pathVersion) ? raw.pathVersion : 0,
+    activityLog: normalizeActivityLog(raw.activityLog),
+    profile: normalizeProfile(raw.profile),
   };
 }
 
@@ -618,11 +626,23 @@ const PATH_REVIEW_QUESTIONS = 8;
 // scenario) are dropped when the unit is built.
 const PATH_GAME_LABELS = { match: 'Match the terms', madlib: 'Mad Lib', sequence: 'Put it in order', compare: 'Pick the better answer' };
 
+// Each unit alternates learning chunks (read, cards, practice) with short games:
+// a matching round, a 3-question quick-fire, and up to two mini-games, so no
+// stretch of the path is more than a couple of steps of the same kind. The
+// order rotates per unit so units don't all feel identical.
+const PATH_QUICKFIRE = 3;
+const PATH_QUICK_PASS_PCT = 60;
+const PATH_MATCH_CARDS = 12;
 const PATH_VARIANTS = [
-  ['read', 'cards', 'quiz', 'game', 'apply', 'cards2', 'quiz2', 'checkpoint'],
-  ['read', 'quiz', 'cards', 'apply', 'game', 'quiz2', 'cards2', 'checkpoint'],
-  ['read', 'game', 'cards', 'quiz', 'apply', 'quiz2', 'cards2', 'checkpoint'],
+  ['read', 'cards', 'quiz', 'match', 'game', 'apply', 'quick', 'cards2', 'quiz2', 'game2', 'checkpoint'],
+  ['read', 'quiz', 'cards', 'match', 'apply', 'game', 'quick', 'quiz2', 'cards2', 'game2', 'checkpoint'],
+  ['read', 'game', 'cards', 'quiz', 'match', 'apply', 'quick', 'quiz2', 'cards2', 'game2', 'checkpoint'],
 ];
+// The steps that existed before the games were woven in, and the ones added:
+// used to keep a finished unit finished (see migratePathSteps).
+const PATH_LEGACY_KINDS = ['read', 'cards', 'quiz', 'game', 'apply', 'cards2', 'quiz2', 'checkpoint'];
+const PATH_ADDED_KINDS = ['match', 'quick', 'game2'];
+const PATH_PROGRESS_VERSION = 2;
 
 function normalizePathStats(raw) {
   const out = {};
@@ -751,11 +771,18 @@ function buildPathUnits(trackKey) {
       ? u.games[u.index % u.games.length]
       : (u.coreCardIds.length >= 3 ? { kind: 'match', id: null, cat: u.cats[0] } : null);
     const gameLabels = PATH_GAME_LABELS;
+    // A second game of a different kind when the unit has one to offer.
+    const otherGames = u.games.filter((g) => !game || g.kind !== game.kind || g.id !== game.id);
+    const game2 = otherGames.length ? otherGames[u.index % otherGames.length] : null;
+    const matchCards = [...u.coreCardIds, ...u.extraCardIds].slice(0, PATH_MATCH_CARDS);
     const spec = {
       read: { label: 'Read the lesson', meta: `${estimateReadMinutes(lesson.reading)} min read`, ok: !!lesson.reading },
       cards: { label: 'Flashcards', meta: `${cardsA.length} cards`, cardIds: cardsA, ok: cardsA.length > 0 },
       quiz: { label: 'Quick check', meta: `${Math.min(PATH_QUICK_QUIZ, quickPool.length)} questions`, poolIds: quickPool, count: PATH_QUICK_QUIZ, ok: quickPool.length > 0 },
       game: { label: game ? gameLabels[game.kind] : 'Game', meta: 'Mini-game', game, ok: !!game },
+      match: { label: 'Match the terms', meta: `${Math.min(5, matchCards.length)} pairs`, cardIds: matchCards, ok: !(game && game.kind === 'match') && matchCards.length >= 4 },
+      quick: { label: 'Quick-fire', meta: `${Math.min(PATH_QUICKFIRE, fullPool.length)} questions`, poolIds: fullPool, count: PATH_QUICKFIRE, ok: fullPool.length >= PATH_QUICKFIRE },
+      game2: { label: game2 ? gameLabels[game2.kind] : 'Game', meta: 'Mini-game', game: game2, ok: !!game2 },
       apply: { label: 'Apply it', meta: 'Scenario and on the job', ok: lessonHasApplyContent(lesson) },
       cards2: { label: 'More flashcards', meta: `${cardsB.length} cards`, cardIds: cardsB, ok: cardsB.length > 0 },
       quiz2: { label: 'Practice quiz', meta: `${Math.min(PATH_PRACTICE_QUIZ, fullPool.length)} questions`, poolIds: fullPool, count: PATH_PRACTICE_QUIZ, ok: fullPool.length > 0 },
@@ -1012,6 +1039,94 @@ function normalizeCustomScenarios(raw) {
     out.push({ id, track, title, steps, note, at: typeof x.at === 'string' ? x.at : null });
   });
   return out;
+}
+
+// When the games were woven into the path (PATH_PROGRESS_VERSION 2), units
+// already finished kept their "complete" status: any added step in a unit whose
+// older steps were all done is recorded as done (via 'skipped') so nobody has to
+// redo a unit they completed. Partly finished units simply gain the new steps.
+function migratePathSteps(pathStats, today) {
+  const base = pathStats || {};
+  let changed = false;
+  const out = { ...base };
+  Object.keys(base).forEach((trackKey) => {
+    if (!DATA[trackKey]) return;
+    const entry = base[trackKey] || { done: {} };
+    const done = { ...(entry.done || {}) };
+    buildPathUnits(trackKey).forEach((unit) => {
+      const legacy = unit.steps.filter((st) => PATH_LEGACY_KINDS.includes(st.kind));
+      const added = unit.steps.filter((st) => PATH_ADDED_KINDS.includes(st.kind));
+      if (!legacy.length || !added.length) return;
+      if (!legacy.every((st) => done[st.id])) return;
+      added.forEach((st) => { if (!done[st.id]) { done[st.id] = { at: today, pct: null, via: 'skipped' }; changed = true; } });
+    });
+    out[trackKey] = { ...entry, done };
+  });
+  return changed ? out : pathStats;
+}
+
+// Profile data. activityLog is { 'YYYY-MM-DD': number of study actions } for the
+// last ~year, feeding the Profile's activity map; profile is the learner's own
+// display name and avatar colour (all stored on this device with the progress).
+const ACTIVITY_LOG_DAYS = 400;
+const PROFILE_HUES = ['primary', 'blue', 'teal', 'success', 'orange', 'pink', 'gold', 'red'];
+const PROFILE_NAME_MAX = 30;
+
+function normalizeActivityLog(raw) {
+  if (!raw || typeof raw !== 'object') return {};
+  const out = {};
+  Object.keys(raw).forEach((d) => {
+    if (/^\d{4}-\d{2}-\d{2}$/.test(d) && Number.isFinite(raw[d]) && raw[d] > 0) out[d] = Math.round(raw[d]);
+  });
+  return pruneActivityLog(out);
+}
+
+function pruneActivityLog(log) {
+  const keys = Object.keys(log).sort();
+  if (keys.length <= ACTIVITY_LOG_DAYS) return log;
+  const out = {};
+  keys.slice(-ACTIVITY_LOG_DAYS).forEach((k) => { out[k] = log[k]; });
+  return out;
+}
+
+function normalizeProfile(raw) {
+  const name = raw && typeof raw.name === 'string' ? raw.name.trim().slice(0, PROFILE_NAME_MAX) : '';
+  const hue = raw && PROFILE_HUES.includes(raw.hue) ? raw.hue : 'primary';
+  return { name, hue };
+}
+
+// stats with `n` more study actions counted today: the daily goal and the
+// activity log move together so they can never disagree.
+function withActivity(stats, n) {
+  const today = todayString();
+  const log = { ...(stats.activityLog || {}) };
+  log[today] = (log[today] || 0) + n;
+  return { ...stats, dailyGoal: recordDailyActivity(stats.dailyGoal, n), activityLog: pruneActivityLog(log) };
+}
+
+// Consecutive days with any activity ending today (or yesterday, so a streak
+// isn't shown as broken before today's session), and the best such run.
+function activityRuns(log) {
+  const days = Object.keys(log || {}).filter((d) => log[d] > 0).sort();
+  let best = 0;
+  let run = 0;
+  let prev = null;
+  days.forEach((d) => {
+    run = prev && daysBetween(prev, d) === 1 ? run + 1 : 1;
+    best = Math.max(best, run);
+    prev = d;
+  });
+  return { days: days.length, best, first: days[0] || null };
+}
+
+// A level from lifetime activity: level n starts at 25 * n * (n - 1) actions
+// (so 25, 75, 150...), purely a friendly progress read-out.
+function studyLevel(totalActions) {
+  let level = 1;
+  while (totalActions >= 25 * level * (level + 1)) level += 1;
+  const floor = 25 * level * (level - 1);
+  const next = 25 * level * (level + 1);
+  return { level, into: totalActions - floor, span: next - floor };
 }
 
 function normalizeHomePath(raw) {

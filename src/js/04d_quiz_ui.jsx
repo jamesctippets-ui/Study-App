@@ -851,7 +851,11 @@ function QuestionView({ q, selected, onChoose, onNext, index, total, categoryLab
         </div>
       )}
       <div style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `2px solid ${COLOR.border}`, borderRadius: '18px', padding: '20px' }}>
-        <div style={{ fontSize: '17px', lineHeight: 1.45, fontWeight: 500, marginBottom: q.image ? '10px' : '16px' }}>{q.question}</div>
+        <div style={{ fontSize: '17px', lineHeight: 1.45, fontWeight: 500, marginBottom: q.image ? '10px' : '16px' }}>
+          {/* Terms in the question itself are tappable for a definition (practice only;
+              the timed exams use their own question view with no help). */}
+          {flashcardsData ? autoHighlightTerms(q.question, flashcardsData, activeTermKey, setActiveTermKey, 2, 'qstem-' + q.id) : q.question}
+        </div>
         {q.image && REAL_PORTAL_SCREENSHOTS[q.image] && (
           <div style={{ marginBottom: '16px' }}>
             <RealPortalScreenshot shot={REAL_PORTAL_SCREENSHOTS[q.image]} hideDescription />

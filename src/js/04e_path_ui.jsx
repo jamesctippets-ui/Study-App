@@ -21,7 +21,12 @@ function PathIcon({ kind, size = 20 }) {
     case 'quiz2':
       return <svg {...common}><circle cx="12" cy="12" r="10" /><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" /><line x1="12" y1="17" x2="12.01" y2="17" /></svg>;
     case 'game':
+    case 'game2':
       return <svg {...common}><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" /></svg>;
+    case 'match':
+      return <svg {...common}><rect x="3" y="4" width="7" height="7" rx="1.5" /><rect x="14" y="13" width="7" height="7" rx="1.5" /><path d="M10 7.5h2a3 3 0 0 1 3 3V13" /></svg>;
+    case 'quick':
+      return <svg {...common}><circle cx="12" cy="13" r="8" /><path d="M12 9v4l2.5 2M9 2h6" /></svg>;
     case 'apply':
       return <svg {...common}><rect x="2" y="7" width="20" height="14" rx="2" ry="2" /><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" /></svg>;
     case 'checkpoint':
@@ -450,9 +455,12 @@ function buildStepPayload(trackKey, units, results, seenLog, api, unit, step) {
       return { cards: step.cardIds.map((id) => flashById.get(id)).filter(Boolean) };
     case 'quiz':
     case 'quiz2':
+    case 'quick':
     case 'testout':
     case 'review':
       return { questions: preparedQuestions(poolQuestions(step.poolIds), step.count) };
+    case 'match':
+      return { kind: 'match', cards: step.cardIds.map((id) => flashById.get(id)).filter(Boolean) };
     case 'checkpoint': {
       const earlier = units.slice(0, unit.index).flatMap((u) => u.poolIds);
       const weak = poolQuestions(earlier.filter((id) => results[id] !== 'correct'));
@@ -471,7 +479,8 @@ function buildStepPayload(trackKey, units, results, seenLog, api, unit, step) {
       const bridge = BRIDGES.find((b) => b.id === step.bridgeId);
       return { bridge, questions: bridge ? bridge.questions.map(prepareQuestion) : [] };
     }
-    case 'game': {
+    case 'game':
+    case 'game2': {
       const g = step.game;
       if (g.kind === 'match') return { kind: 'match', cards: unit.lesson.vocabIds.map((id) => flashById.get(id)).filter(Boolean) };
       const source = g.kind === 'madlib' ? mod.madlibs : g.kind === 'sequence' ? mod.sequences : mod.compare;
@@ -498,12 +507,23 @@ function PathStepRunner({ trackKey, units, unit, step, results, seenLog, categor
     runner = <PathReadStep key={runnerKey} unit={unit} flashcardsData={mod.flashcards} speech={speech} onDone={onDone} />;
   } else if (step.kind === 'cards' || step.kind === 'cards2') {
     runner = <PathCardsStep key={runnerKey} cards={payload.cards} speech={speech} onRate={api.rateCard} onDone={onDone} {...common} />;
-  } else if (step.kind === 'quiz' || step.kind === 'quiz2' || step.kind === 'checkpoint' || step.kind === 'testout' || step.kind === 'review') {
+  } else if (step.kind === 'match') {
+    runner = (
+      <MatchGame
+        key={runnerKey}
+        flashcards={payload.cards}
+        roundSize={Math.min(5, payload.cards.length)}
+        onRoundComplete={api.onMatchRound}
+        onContinue={() => onDone(null)}
+        continueLabel="Continue ›"
+      />
+    );
+  } else if (step.kind === 'quiz' || step.kind === 'quiz2' || step.kind === 'quick' || step.kind === 'checkpoint' || step.kind === 'testout' || step.kind === 'review') {
     runner = (
       <PathQuizStep
         key={runnerKey}
         questions={payload.questions}
-        passPct={step.kind === 'testout' ? PATH_TESTOUT_PCT : step.kind === 'review' ? 0 : PATH_PASS_PCT}
+        passPct={step.kind === 'testout' ? PATH_TESTOUT_PCT : step.kind === 'review' ? 0 : step.kind === 'quick' ? PATH_QUICK_PASS_PCT : PATH_PASS_PCT}
         label={step.label}
         onAnswer={(id, ok) => api.recordResult(id, ok ? 'correct' : 'incorrect')}
         onFinished={api.finishQuiz}
@@ -518,7 +538,7 @@ function PathStepRunner({ trackKey, units, unit, step, results, seenLog, categor
     runner = <PathBridgeStep key={runnerKey} bridge={payload.bridge} questions={payload.questions} planKeys={planKeys || []} api={api} onRetry={retry} onDone={onDone} onOpenCert={onOpenCert} onAddToPlan={onAddToPlan} />;
   } else if (step.kind === 'apply') {
     runner = <PathApplyStep key={runnerKey} unit={unit} categories={categories} flashcardsData={mod.flashcards} onDone={onDone} />;
-  } else if (step.kind === 'game') {
+  } else if (step.kind === 'game' || step.kind === 'game2') {
     if (payload.kind === 'match') {
       runner = (
         <MatchGame
@@ -575,9 +595,10 @@ function PathStars({ pct }) {
 function PathTrailNode({ step, index, done, isNext, entry, onOpen }) {
   const checkpoint = step.kind === 'checkpoint';
   const size = isNext ? 78 : 68;
-  const bg = done ? COLOR.success : isNext ? COLOR.primary : checkpoint ? COLOR.gold : COLOR.surfaceRaised;
-  const fg = done || isNext || checkpoint ? COLOR.onAccent : COLOR.muted;
-  const starKinds = ['quiz', 'quiz2', 'game', 'checkpoint'];
+  const hue = stepHue(step.kind);
+  const bg = done ? COLOR.success : isNext || checkpoint ? hue : tint(hue, 16);
+  const fg = done || isNext || checkpoint ? COLOR.onAccent : hue;
+  const starKinds = ['quiz', 'quiz2', 'quick', 'game', 'game2', 'checkpoint'];
   const showStars = done && entry && typeof entry.pct === 'number' && starKinds.includes(step.kind);
   return (
     <button
@@ -590,7 +611,7 @@ function PathTrailNode({ step, index, done, isNext, entry, onOpen }) {
       }}
     >
       {isNext && (
-        <span className="bob" style={{ fontSize: '12px', fontWeight: 900, letterSpacing: '0.08em', color: COLOR.primary, background: COLOR.surface, border: `2px solid ${COLOR.border}`, borderRadius: '10px', padding: '3px 10px', marginBottom: '8px', position: 'relative', animation: 'bob 1.4s ease-in-out infinite' }}>
+        <span className="bob" style={{ fontSize: '12px', fontWeight: 900, letterSpacing: '0.08em', color: hue, background: COLOR.surface, border: `2px solid ${hue}`, borderRadius: '10px', padding: '3px 10px', marginBottom: '8px', position: 'relative', animation: 'bob 1.4s ease-in-out infinite' }}>
           START
         </span>
       )}
@@ -598,7 +619,7 @@ function PathTrailNode({ step, index, done, isNext, entry, onOpen }) {
         className={`node-face${isNext ? ' pulse' : ''}`}
         style={{
           width: `${size}px`, height: `${size}px`, borderRadius: '50%', display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-          background: bg, color: fg, border: !done && !isNext && !checkpoint ? `2px solid ${COLOR.border}` : 'none',
+          background: bg, color: fg, border: !done && !isNext && !checkpoint ? `2px solid color-mix(in srgb, ${hue} 55%, ${COLOR.border})` : 'none', ['--ring']: `color-mix(in srgb, ${hue} 55%, transparent)`,
           animation: isNext ? 'pulseRing 1.6s ease-out infinite' : 'none',
         }}
       >
@@ -744,7 +765,7 @@ function PathView({ track, trackKey, doneMap, unlockedMap, pathLocking, results,
           <button
             onClick={() => startStep(next.unit, next.step)}
             className="btn-3d"
-            style={{ width: '100%', padding: '13px', borderRadius: '14px', background: COLOR.primary, color: COLOR.onAccent, fontSize: '14px', fontWeight: 700, textAlign: 'left', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px' }}
+            style={{ width: '100%', padding: '13px', borderRadius: '14px', background: stepHue(next.step.kind), color: COLOR.onAccent, fontSize: '14px', fontWeight: 700, textAlign: 'left', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px' }}
           >
             <span style={{ minWidth: 0 }}>
               <span style={{ display: 'block', fontSize: '11px', opacity: 0.8, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
@@ -805,7 +826,7 @@ function PathView({ track, trackKey, doneMap, unlockedMap, pathLocking, results,
               style={{
                 width: '100%', textAlign: 'left', display: 'flex', alignItems: 'stretch',
                 borderRadius: '18px', padding: 0, overflow: 'hidden',
-                background: locked ? COLOR.surfaceRaised : prog.complete ? COLOR.success : COLOR.primary, color: locked ? COLOR.muted : COLOR.onAccent,
+                background: locked ? COLOR.surfaceRaised : prog.complete ? COLOR.success : unitHue(unit.index), color: locked ? COLOR.muted : COLOR.onAccent,
                 border: locked ? `2px solid ${COLOR.border}` : 'none',
               }}
             >

@@ -88,7 +88,11 @@
     --color-red: #F87171;
     --color-gold: #E3B274;
     --color-teal: #2DD4BF;
+    --color-blue: #60A5FA;
+    --color-orange: #FB923C;
+    --color-pink: #F472B6;
     --color-on-accent: #2B1620;
+    --accent-darken: 0%;
   }
   :root[data-theme="light"] {
     color-scheme: light;
@@ -103,8 +107,12 @@
     --color-success: #059669;
     --color-red: #DC2626;
     --color-gold: #B45309;
-    --color-teal: #0D9488;
+    --color-teal: #0F766E;
+    --color-blue: #1D4ED8;
+    --color-orange: #C2410C;
+    --color-pink: #BE185D;
     --color-on-accent: #FFFFFF;
+    --accent-darken: 42%;
   }
   html { scroll-behavior: smooth; }
   html, body { margin: 0; padding: 0; background: var(--color-bg); transition: background-color 0.15s ease; }
@@ -234,6 +242,10 @@ const COLOR = {
   gold: 'var(--color-gold)',
   // A genuine teal, used sparingly for secondary accents/variety.
   teal: 'var(--color-teal)',
+  // More hues for variety: used to tell tabs, step types, units and sections apart.
+  blue: 'var(--color-blue)',
+  orange: 'var(--color-orange)',
+  pink: 'var(--color-pink)',
   // The text color to use ON TOP of a primary/gold/success/red background
   // (buttons, badges) — dark in dark mode (since those accents stay light
   // there) and light in light mode (since light mode darkens those same
@@ -263,6 +275,33 @@ const TRACK_ACCENTS = {
   ehrintegration: '#94A3B8',
   ab650: '#F59E0B',
 };
+
+// A soft tint of an accent over the card surface, so sections can carry their
+// own colour without any new theme tokens (works in light and dark).
+function tint(color, pct) {
+  return `color-mix(in srgb, ${color} ${pct == null ? 12 : pct}%, ${COLOR.surface})`;
+}
+
+// One hue per kind of path step, and a rotating hue per unit, so a trail reads
+// as a varied road instead of a single purple line.
+const STEP_HUE = {
+  read: COLOR.teal, cards: COLOR.blue, cards2: COLOR.blue, quiz: COLOR.orange, quiz2: COLOR.orange,
+  game: COLOR.pink, match: COLOR.pink, quick: COLOR.orange, apply: COLOR.success, checkpoint: COLOR.gold,
+  testout: COLOR.gold, review: COLOR.red, deep: COLOR.teal, bridge: COLOR.blue, bonus: COLOR.pink,
+};
+const UNIT_HUES = [COLOR.primary, COLOR.blue, COLOR.teal, COLOR.orange, COLOR.pink, COLOR.success, COLOR.gold];
+// The colour of each main area; the bottom tab, the top bar tint and the page
+// accents for that area all draw from it.
+const MODE_HUE = { home: COLOR.blue, path: COLOR.primary, quiz: COLOR.orange, learn: COLOR.teal, exam: COLOR.gold, profile: COLOR.pink };
+function modeHue(mode) { return MODE_HUE[mode] || COLOR.primary; }
+function unitHue(index) { return UNIT_HUES[index % UNIT_HUES.length]; }
+function stepHue(kind) { return STEP_HUE[kind] || COLOR.primary; }
+
+// A cert accent used as TEXT: the same hue, darkened in the light theme (via
+// --accent-darken, 0% in dark) so pale accents like cyan stay readable.
+function ink(color) {
+  return `color-mix(in srgb, ${color}, black var(--accent-darken, 0%))`;
+}
 
 function trackAccent(key) {
   return TRACK_ACCENTS[key] || COLOR.primary;
@@ -465,6 +504,8 @@ function TabIcon({ kind, size = 24 }) {
       return <svg {...c}><polygon points="13 2 4 14 12 14 11 22 20 10 12 10 13 2" /></svg>;
     case 'learn':
       return <svg {...c}><path d="M2 4h6a4 4 0 0 1 4 4v13a3 3 0 0 0-3-3H2z" /><path d="M22 4h-6a4 4 0 0 0-4 4v13a3 3 0 0 1 3-3h7z" /></svg>;
+    case 'profile':
+      return <svg {...c}><circle cx="12" cy="8" r="4" /><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7" /></svg>;
     case 'exam':
       return <svg {...c}><path d="M5 3h14v5a7 7 0 0 1-14 0z" /><path d="M9 21h6M12 15v6" /><path d="M5 5H2.5a3 3 0 0 0 3 4M19 5h2.5a3 3 0 0 1-3 4" /></svg>;
     default:
@@ -3424,6 +3465,7 @@ function routeToHash(mode, trackKey, learnView, quizView) {
   if (mode === 'learn') return `#/${trackKey}/reference/${learnView}`;
   if (mode === 'quiz') return `#/${trackKey}/practice/${quizView}`;
   if (mode === 'exam') return `#/${trackKey}/exam`;
+  if (mode === 'profile') return '#/profile';
   return '#/home';
 }
 
@@ -3437,6 +3479,7 @@ function parseHash(hash, validTrackKeys) {
   const path = (hash || '').replace(/^#\/?/, '');
   const parts = path.split('/').filter(Boolean);
   if (!parts.length || parts[0] === 'home') return { mode: 'home' };
+  if (parts[0] === 'profile') return { mode: 'profile' };
   const [trackKey, mode, sub] = parts;
   if (!validTrackKeys.has(trackKey)) return { mode: 'home' };
   if (mode === 'path') return { mode: 'path', trackKey };
@@ -3660,6 +3703,9 @@ function emptyStats() {
     pathLocking: true,
     customTerms: [],
     customScenarios: [],
+    pathVersion: PATH_PROGRESS_VERSION,
+    activityLog: {},
+    profile: { name: '', hue: 'primary' },
   };
 }
 
@@ -3690,6 +3736,9 @@ function normalizeStats(raw) {
     pathLocking: raw.pathLocking !== false,
     customTerms: normalizeCustomTerms(raw.customTerms),
     customScenarios: normalizeCustomScenarios(raw.customScenarios),
+    pathVersion: Number.isFinite(raw.pathVersion) ? raw.pathVersion : 0,
+    activityLog: normalizeActivityLog(raw.activityLog),
+    profile: normalizeProfile(raw.profile),
   };
 }
 
@@ -3744,11 +3793,23 @@ const PATH_REVIEW_QUESTIONS = 8;
 // scenario) are dropped when the unit is built.
 const PATH_GAME_LABELS = { match: 'Match the terms', madlib: 'Mad Lib', sequence: 'Put it in order', compare: 'Pick the better answer' };
 
+// Each unit alternates learning chunks (read, cards, practice) with short games:
+// a matching round, a 3-question quick-fire, and up to two mini-games, so no
+// stretch of the path is more than a couple of steps of the same kind. The
+// order rotates per unit so units don't all feel identical.
+const PATH_QUICKFIRE = 3;
+const PATH_QUICK_PASS_PCT = 60;
+const PATH_MATCH_CARDS = 12;
 const PATH_VARIANTS = [
-  ['read', 'cards', 'quiz', 'game', 'apply', 'cards2', 'quiz2', 'checkpoint'],
-  ['read', 'quiz', 'cards', 'apply', 'game', 'quiz2', 'cards2', 'checkpoint'],
-  ['read', 'game', 'cards', 'quiz', 'apply', 'quiz2', 'cards2', 'checkpoint'],
+  ['read', 'cards', 'quiz', 'match', 'game', 'apply', 'quick', 'cards2', 'quiz2', 'game2', 'checkpoint'],
+  ['read', 'quiz', 'cards', 'match', 'apply', 'game', 'quick', 'quiz2', 'cards2', 'game2', 'checkpoint'],
+  ['read', 'game', 'cards', 'quiz', 'match', 'apply', 'quick', 'quiz2', 'cards2', 'game2', 'checkpoint'],
 ];
+// The steps that existed before the games were woven in, and the ones added:
+// used to keep a finished unit finished (see migratePathSteps).
+const PATH_LEGACY_KINDS = ['read', 'cards', 'quiz', 'game', 'apply', 'cards2', 'quiz2', 'checkpoint'];
+const PATH_ADDED_KINDS = ['match', 'quick', 'game2'];
+const PATH_PROGRESS_VERSION = 2;
 
 function normalizePathStats(raw) {
   const out = {};
@@ -3877,11 +3938,18 @@ function buildPathUnits(trackKey) {
       ? u.games[u.index % u.games.length]
       : (u.coreCardIds.length >= 3 ? { kind: 'match', id: null, cat: u.cats[0] } : null);
     const gameLabels = PATH_GAME_LABELS;
+    // A second game of a different kind when the unit has one to offer.
+    const otherGames = u.games.filter((g) => !game || g.kind !== game.kind || g.id !== game.id);
+    const game2 = otherGames.length ? otherGames[u.index % otherGames.length] : null;
+    const matchCards = [...u.coreCardIds, ...u.extraCardIds].slice(0, PATH_MATCH_CARDS);
     const spec = {
       read: { label: 'Read the lesson', meta: `${estimateReadMinutes(lesson.reading)} min read`, ok: !!lesson.reading },
       cards: { label: 'Flashcards', meta: `${cardsA.length} cards`, cardIds: cardsA, ok: cardsA.length > 0 },
       quiz: { label: 'Quick check', meta: `${Math.min(PATH_QUICK_QUIZ, quickPool.length)} questions`, poolIds: quickPool, count: PATH_QUICK_QUIZ, ok: quickPool.length > 0 },
       game: { label: game ? gameLabels[game.kind] : 'Game', meta: 'Mini-game', game, ok: !!game },
+      match: { label: 'Match the terms', meta: `${Math.min(5, matchCards.length)} pairs`, cardIds: matchCards, ok: !(game && game.kind === 'match') && matchCards.length >= 4 },
+      quick: { label: 'Quick-fire', meta: `${Math.min(PATH_QUICKFIRE, fullPool.length)} questions`, poolIds: fullPool, count: PATH_QUICKFIRE, ok: fullPool.length >= PATH_QUICKFIRE },
+      game2: { label: game2 ? gameLabels[game2.kind] : 'Game', meta: 'Mini-game', game: game2, ok: !!game2 },
       apply: { label: 'Apply it', meta: 'Scenario and on the job', ok: lessonHasApplyContent(lesson) },
       cards2: { label: 'More flashcards', meta: `${cardsB.length} cards`, cardIds: cardsB, ok: cardsB.length > 0 },
       quiz2: { label: 'Practice quiz', meta: `${Math.min(PATH_PRACTICE_QUIZ, fullPool.length)} questions`, poolIds: fullPool, count: PATH_PRACTICE_QUIZ, ok: fullPool.length > 0 },
@@ -4138,6 +4206,94 @@ function normalizeCustomScenarios(raw) {
     out.push({ id, track, title, steps, note, at: typeof x.at === 'string' ? x.at : null });
   });
   return out;
+}
+
+// When the games were woven into the path (PATH_PROGRESS_VERSION 2), units
+// already finished kept their "complete" status: any added step in a unit whose
+// older steps were all done is recorded as done (via 'skipped') so nobody has to
+// redo a unit they completed. Partly finished units simply gain the new steps.
+function migratePathSteps(pathStats, today) {
+  const base = pathStats || {};
+  let changed = false;
+  const out = { ...base };
+  Object.keys(base).forEach((trackKey) => {
+    if (!DATA[trackKey]) return;
+    const entry = base[trackKey] || { done: {} };
+    const done = { ...(entry.done || {}) };
+    buildPathUnits(trackKey).forEach((unit) => {
+      const legacy = unit.steps.filter((st) => PATH_LEGACY_KINDS.includes(st.kind));
+      const added = unit.steps.filter((st) => PATH_ADDED_KINDS.includes(st.kind));
+      if (!legacy.length || !added.length) return;
+      if (!legacy.every((st) => done[st.id])) return;
+      added.forEach((st) => { if (!done[st.id]) { done[st.id] = { at: today, pct: null, via: 'skipped' }; changed = true; } });
+    });
+    out[trackKey] = { ...entry, done };
+  });
+  return changed ? out : pathStats;
+}
+
+// Profile data. activityLog is { 'YYYY-MM-DD': number of study actions } for the
+// last ~year, feeding the Profile's activity map; profile is the learner's own
+// display name and avatar colour (all stored on this device with the progress).
+const ACTIVITY_LOG_DAYS = 400;
+const PROFILE_HUES = ['primary', 'blue', 'teal', 'success', 'orange', 'pink', 'gold', 'red'];
+const PROFILE_NAME_MAX = 30;
+
+function normalizeActivityLog(raw) {
+  if (!raw || typeof raw !== 'object') return {};
+  const out = {};
+  Object.keys(raw).forEach((d) => {
+    if (/^\d{4}-\d{2}-\d{2}$/.test(d) && Number.isFinite(raw[d]) && raw[d] > 0) out[d] = Math.round(raw[d]);
+  });
+  return pruneActivityLog(out);
+}
+
+function pruneActivityLog(log) {
+  const keys = Object.keys(log).sort();
+  if (keys.length <= ACTIVITY_LOG_DAYS) return log;
+  const out = {};
+  keys.slice(-ACTIVITY_LOG_DAYS).forEach((k) => { out[k] = log[k]; });
+  return out;
+}
+
+function normalizeProfile(raw) {
+  const name = raw && typeof raw.name === 'string' ? raw.name.trim().slice(0, PROFILE_NAME_MAX) : '';
+  const hue = raw && PROFILE_HUES.includes(raw.hue) ? raw.hue : 'primary';
+  return { name, hue };
+}
+
+// stats with `n` more study actions counted today: the daily goal and the
+// activity log move together so they can never disagree.
+function withActivity(stats, n) {
+  const today = todayString();
+  const log = { ...(stats.activityLog || {}) };
+  log[today] = (log[today] || 0) + n;
+  return { ...stats, dailyGoal: recordDailyActivity(stats.dailyGoal, n), activityLog: pruneActivityLog(log) };
+}
+
+// Consecutive days with any activity ending today (or yesterday, so a streak
+// isn't shown as broken before today's session), and the best such run.
+function activityRuns(log) {
+  const days = Object.keys(log || {}).filter((d) => log[d] > 0).sort();
+  let best = 0;
+  let run = 0;
+  let prev = null;
+  days.forEach((d) => {
+    run = prev && daysBetween(prev, d) === 1 ? run + 1 : 1;
+    best = Math.max(best, run);
+    prev = d;
+  });
+  return { days: days.length, best, first: days[0] || null };
+}
+
+// A level from lifetime activity: level n starts at 25 * n * (n - 1) actions
+// (so 25, 75, 150...), purely a friendly progress read-out.
+function studyLevel(totalActions) {
+  let level = 1;
+  while (totalActions >= 25 * level * (level + 1)) level += 1;
+  const floor = 25 * level * (level - 1);
+  const next = 25 * level * (level + 1);
+  return { level, into: totalActions - floor, span: next - floor };
 }
 
 function normalizeHomePath(raw) {
@@ -4967,8 +5123,8 @@ function DailyGoalRing({ dailyGoal, onSetTarget, note }) {
   return (
     <div style={{
       display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '10px',
-      padding: '10px 12px', borderRadius: '14px', background: COLOR.surface,
-      border: `2px solid ${COLOR.border}`, boxShadow: SHADOW.card,
+      padding: '10px 12px', borderRadius: '14px', background: tint(COLOR.orange, 10),
+      border: `2px solid color-mix(in srgb, ${COLOR.orange} 40%, ${COLOR.border})`, boxShadow: SHADOW.card,
     }}>
       <button
         onClick={() => setEditing((e) => !e)}
@@ -5034,8 +5190,8 @@ function TrackListDropdown({ tracks, masteries, certPlan, onSelectTrack, onAddTo
         onClick={() => setOpen((o) => !o)}
         style={{
           width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-          padding: '12px 14px', borderRadius: '12px', background: COLOR.surface,
-          border: `2px solid ${COLOR.border}`, boxShadow: SHADOW.card,
+          padding: '12px 14px', borderRadius: '12px', background: tint(COLOR.blue, 9),
+          border: `2px solid color-mix(in srgb, ${COLOR.blue} 35%, ${COLOR.border})`, boxShadow: SHADOW.card,
         }}
       >
         <span style={{ fontSize: '13px', fontWeight: 600, color: COLOR.text }}>{label || `All tracks (${tracks.length})`}</span>
@@ -5058,7 +5214,7 @@ function TrackListDropdown({ tracks, masteries, certPlan, onSelectTrack, onAddTo
                 }}
               >
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontSize: '13.5px', fontWeight: 600, color: accent }}>{t.label}</div>
+                  <div style={{ fontSize: '13.5px', fontWeight: 600, color: ink(accent) }}>{t.label}</div>
                   <div style={{ fontSize: '11px', color: COLOR.muted, marginTop: '2px' }}>{t.subtitle}</div>
                 </div>
                 {isCompleted ? (
@@ -5137,7 +5293,7 @@ function DailyQuestionCard({ q, trackLabel, stored, onAnswer }) {
         aria-expanded={open}
         style={{
           width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px', textAlign: 'left',
-          padding: '12px 14px', borderRadius: '12px', background: COLOR.surface, border: `2px solid ${COLOR.border}`, boxShadow: SHADOW.card,
+          padding: '12px 14px', borderRadius: '12px', background: tint(COLOR.gold, 11), border: `2px solid color-mix(in srgb, ${COLOR.gold} 40%, ${COLOR.border})`, boxShadow: SHADOW.card,
         }}
       >
         <span style={{ minWidth: 0 }}>
@@ -5188,12 +5344,12 @@ function DailyVocabCard({ card, trackLabel, revealed, onReveal, pool }) {
       <div
         onClick={() => { if (!revealed) onReveal(); }}
         style={{
-          boxShadow: SHADOW.card, background: revealed ? COLOR.surfaceRaised : COLOR.surface,
-          border: `2px solid ${COLOR.border}`, borderRadius: '12px', padding: '12px 14px',
+          boxShadow: SHADOW.card, background: tint(COLOR.teal, revealed ? 16 : 10),
+          border: `2px solid color-mix(in srgb, ${COLOR.teal} 40%, ${COLOR.border})`, borderRadius: '12px', padding: '12px 14px',
           cursor: revealed ? 'default' : 'pointer',
         }}
       >
-        <div style={{ fontSize: '11px', color: COLOR.primary, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+        <div style={{ fontSize: '11px', color: COLOR.teal, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
           Vocab of the day · {trackLabel}
         </div>
         <div className="itil-display" style={{ fontSize: '17px', fontWeight: 600, marginTop: '4px' }}>{card.front}</div>
@@ -5245,14 +5401,14 @@ function CertPathHomeSection({ pathOrder, results, certPlan, studyingKey, pathPr
             style={{
               width: '100%', textAlign: 'left', display: 'flex', alignItems: 'center', gap: '10px',
               padding: '10px 14px', borderRadius: '12px', marginBottom: i === pathOrder.length - 1 ? 0 : '6px',
-              background: studying ? `${accent}1F` : COLOR.surface, border: `1px solid ${studying ? accent : COLOR.border}`, boxShadow: SHADOW.card,
+              background: studying ? tint(accent, 20) : tint(accent, 7), border: `2px solid ${studying ? accent : `color-mix(in srgb, ${accent} 30%, ${COLOR.border})`}`, boxShadow: SHADOW.card,
             }}
           >
             <div style={{ fontSize: '11px', color: COLOR.muted, width: '14px', flexShrink: 0, textAlign: 'center' }}>{i + 1}</div>
             <div style={{ flex: 1, minWidth: 0 }}>
               <div className="flex items-center gap-2" style={{ display: 'flex' }}>
-                <span style={{ fontSize: '13px', fontWeight: 600, color: accent }}>{t.label}</span>
-                {studying && <span style={{ fontSize: '10.5px', fontWeight: 700, color: accent, textTransform: 'uppercase', letterSpacing: '0.04em' }}>Studying now</span>}
+                <span style={{ fontSize: '13px', fontWeight: 600, color: ink(accent) }}>{t.label}</span>
+                {studying && <span style={{ fontSize: '10.5px', fontWeight: 700, color: ink(accent), textTransform: 'uppercase', letterSpacing: '0.04em' }}>Studying now</span>}
               </div>
               <div style={{ fontSize: '11.5px', color: COLOR.muted, marginTop: '1px' }}>
                 {t.subtitle}{prog && prog.total ? ` · path ${prog.pct}%` : ''}
@@ -5480,7 +5636,7 @@ function HomeView({ tracks, results, seenLog, stats, certPlan, speech, srs, make
           }}
         >
           <div style={{ fontSize: '11px', color: COLOR.muted, marginBottom: '2px' }}>Continue where you left off</div>
-          <div style={{ fontSize: '15px', fontWeight: 600, color: trackAccent(resumeTrack.key) }}>
+          <div style={{ fontSize: '15px', fontWeight: 600, color: ink(trackAccent(resumeTrack.key)) }}>
             {resumeTrack.label} · {MODE_LABELS[lastVisited.mode] || 'Path'}{resumeViewLabel ? ` · ${resumeViewLabel}` : ''}
           </div>
           {resumeStep && (
@@ -5525,7 +5681,7 @@ function HomeView({ tracks, results, seenLog, stats, certPlan, speech, srs, make
         onClick={onOpenGlossary}
         style={{
           width: '100%', textAlign: 'left', marginTop: '10px', padding: '12px 14px', borderRadius: '12px',
-          background: COLOR.surface, border: `2px solid ${COLOR.border}`, boxShadow: SHADOW.card,
+          background: tint(COLOR.pink, 9), border: `2px solid color-mix(in srgb, ${COLOR.pink} 35%, ${COLOR.border})`, boxShadow: SHADOW.card,
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
         }}
       >
@@ -5575,7 +5731,7 @@ function TrackSwitcherSheet({ tracks, results, certPlan, activeTrack, onSelect, 
       >
         {rank && <div style={{ fontSize: '11px', color: COLOR.muted, width: '14px', flexShrink: 0, textAlign: 'center' }}>{rank}</div>}
         <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ fontSize: '13.5px', fontWeight: 600, color: accent }}>{t.label}{isActive && <span style={{ color: COLOR.muted, fontWeight: 400 }}> · current</span>}</div>
+          <div style={{ fontSize: '13.5px', fontWeight: 600, color: ink(accent) }}>{t.label}{isActive && <span style={{ color: COLOR.muted, fontWeight: 400 }}> · current</span>}</div>
           <div style={{ fontSize: '11px', color: COLOR.muted, marginTop: '2px' }}>{t.subtitle}</div>
         </div>
         <div style={{ fontSize: '12px', fontWeight: 700, color: pct >= 70 ? COLOR.success : COLOR.muted, flexShrink: 0 }}>{pct}%</div>
@@ -5669,7 +5825,7 @@ function CertPathPanel({ tracks, certPlan, onAddTrack, onRemoveTrack, onMove, on
             background: `${trackAccent(nextTrack.key)}1F`, border: `1px solid ${trackAccent(nextTrack.key)}`, boxShadow: SHADOW.card,
           }}>
             <div style={{ fontSize: '11px', color: COLOR.muted, marginBottom: '2px' }}>Up next</div>
-            <div style={{ fontSize: '16px', fontWeight: 600, color: trackAccent(nextTrack.key) }}>
+            <div style={{ fontSize: '16px', fontWeight: 600, color: ink(trackAccent(nextTrack.key)) }}>
               {nextTrack.label} <span style={{ fontWeight: 400, color: COLOR.muted, fontSize: '12px' }}>· {nextTrack.subtitle}</span>
             </div>
             {certPlan.scheduled[nextTrack.key] && (
@@ -5719,7 +5875,7 @@ function CertPathPanel({ tracks, certPlan, onAddTrack, onRemoveTrack, onMove, on
               <div key={key} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 12px', borderRadius: '12px', background: COLOR.surface, border: `2px solid ${COLOR.border}` }}>
                 <div style={{ fontSize: '12px', color: COLOR.muted, width: '14px', flexShrink: 0, textAlign: 'center' }}>{i + 1}</div>
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontSize: '13px', fontWeight: 600, color: accent }}>{t.label}</div>
+                  <div style={{ fontSize: '13px', fontWeight: 600, color: ink(accent) }}>{t.label}</div>
                   <input
                     type="date"
                     value={scheduledDate || ''}
@@ -6018,7 +6174,7 @@ function GlossaryPanel({ onClose, customTerms, onSaveCustomTerm, onDeleteCustomT
                       return (
                         <span
                           key={tk}
-                          style={{ fontSize: '10px', fontWeight: 700, color: accent, border: `1px solid ${accent}`, borderRadius: '999px', padding: '1px 6px' }}
+                          style={{ fontSize: '10px', fontWeight: 700, color: ink(accent), border: `1px solid ${accent}`, borderRadius: '999px', padding: '1px 6px' }}
                         >
                           {t ? t.label : tk}
                         </span>
@@ -6262,6 +6418,7 @@ const TAB_BAR_ITEMS = [
   { m: 'quiz', label: 'Practice', icon: 'quiz' },
   { m: 'learn', label: 'Reference', icon: 'learn' },
   { m: 'exam', label: 'Exam', icon: 'exam' },
+  { m: 'profile', label: 'Profile', icon: 'profile' },
 ];
 
 function BottomTabBar({ mode, onChange }) {
@@ -6273,10 +6430,10 @@ function BottomTabBar({ mode, onChange }) {
         borderTop: `2px solid ${COLOR.border}`, paddingBottom: 'env(safe-area-inset-bottom)',
       }}
     >
-      <div className="max-w-md mx-auto flex" style={{ height: `${TAB_BAR_HEIGHT}px`, padding: '6px 8px', gap: '4px' }}>
+      <div className="max-w-md mx-auto flex" style={{ height: `${TAB_BAR_HEIGHT}px`, padding: '6px 6px', gap: '2px' }}>
         {TAB_BAR_ITEMS.map((t) => {
           const active = mode === t.m;
-          const tint = t.m === 'exam' ? COLOR.gold : COLOR.primary;
+          const hue = modeHue(t.m);
           return (
             <button
               key={t.m}
@@ -6286,9 +6443,9 @@ function BottomTabBar({ mode, onChange }) {
               className="btn-flat flex-1"
               style={{
                 display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '2px',
-                borderRadius: '14px', background: active ? `color-mix(in srgb, ${tint} 16%, transparent)` : 'transparent',
-                border: `2px solid ${active ? tint : 'transparent'}`, color: active ? tint : COLOR.muted, minWidth: 0,
-                fontSize: '11px', fontWeight: 800, letterSpacing: '0.02em',
+                borderRadius: '14px', background: active ? `color-mix(in srgb, ${hue} 18%, transparent)` : 'transparent',
+                border: `2px solid ${active ? hue : 'transparent'}`, color: active ? hue : `color-mix(in srgb, ${hue} 55%, ${COLOR.muted})`, minWidth: 0,
+                fontSize: '10.5px', fontWeight: 800, letterSpacing: 0,
               }}
             >
               <TabIcon kind={t.icon} size={24} />
@@ -8277,7 +8434,11 @@ function QuestionView({ q, selected, onChoose, onNext, index, total, categoryLab
         </div>
       )}
       <div style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `2px solid ${COLOR.border}`, borderRadius: '18px', padding: '20px' }}>
-        <div style={{ fontSize: '17px', lineHeight: 1.45, fontWeight: 500, marginBottom: q.image ? '10px' : '16px' }}>{q.question}</div>
+        <div style={{ fontSize: '17px', lineHeight: 1.45, fontWeight: 500, marginBottom: q.image ? '10px' : '16px' }}>
+          {/* Terms in the question itself are tappable for a definition (practice only;
+              the timed exams use their own question view with no help). */}
+          {flashcardsData ? autoHighlightTerms(q.question, flashcardsData, activeTermKey, setActiveTermKey, 2, 'qstem-' + q.id) : q.question}
+        </div>
         {q.image && REAL_PORTAL_SCREENSHOTS[q.image] && (
           <div style={{ marginBottom: '16px' }}>
             <RealPortalScreenshot shot={REAL_PORTAL_SCREENSHOTS[q.image]} hideDescription />
@@ -8582,7 +8743,12 @@ function PathIcon({ kind, size = 20 }) {
     case 'quiz2':
       return <svg {...common}><circle cx="12" cy="12" r="10" /><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" /><line x1="12" y1="17" x2="12.01" y2="17" /></svg>;
     case 'game':
+    case 'game2':
       return <svg {...common}><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" /></svg>;
+    case 'match':
+      return <svg {...common}><rect x="3" y="4" width="7" height="7" rx="1.5" /><rect x="14" y="13" width="7" height="7" rx="1.5" /><path d="M10 7.5h2a3 3 0 0 1 3 3V13" /></svg>;
+    case 'quick':
+      return <svg {...common}><circle cx="12" cy="13" r="8" /><path d="M12 9v4l2.5 2M9 2h6" /></svg>;
     case 'apply':
       return <svg {...common}><rect x="2" y="7" width="20" height="14" rx="2" ry="2" /><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" /></svg>;
     case 'checkpoint':
@@ -9011,9 +9177,12 @@ function buildStepPayload(trackKey, units, results, seenLog, api, unit, step) {
       return { cards: step.cardIds.map((id) => flashById.get(id)).filter(Boolean) };
     case 'quiz':
     case 'quiz2':
+    case 'quick':
     case 'testout':
     case 'review':
       return { questions: preparedQuestions(poolQuestions(step.poolIds), step.count) };
+    case 'match':
+      return { kind: 'match', cards: step.cardIds.map((id) => flashById.get(id)).filter(Boolean) };
     case 'checkpoint': {
       const earlier = units.slice(0, unit.index).flatMap((u) => u.poolIds);
       const weak = poolQuestions(earlier.filter((id) => results[id] !== 'correct'));
@@ -9032,7 +9201,8 @@ function buildStepPayload(trackKey, units, results, seenLog, api, unit, step) {
       const bridge = BRIDGES.find((b) => b.id === step.bridgeId);
       return { bridge, questions: bridge ? bridge.questions.map(prepareQuestion) : [] };
     }
-    case 'game': {
+    case 'game':
+    case 'game2': {
       const g = step.game;
       if (g.kind === 'match') return { kind: 'match', cards: unit.lesson.vocabIds.map((id) => flashById.get(id)).filter(Boolean) };
       const source = g.kind === 'madlib' ? mod.madlibs : g.kind === 'sequence' ? mod.sequences : mod.compare;
@@ -9059,12 +9229,23 @@ function PathStepRunner({ trackKey, units, unit, step, results, seenLog, categor
     runner = <PathReadStep key={runnerKey} unit={unit} flashcardsData={mod.flashcards} speech={speech} onDone={onDone} />;
   } else if (step.kind === 'cards' || step.kind === 'cards2') {
     runner = <PathCardsStep key={runnerKey} cards={payload.cards} speech={speech} onRate={api.rateCard} onDone={onDone} {...common} />;
-  } else if (step.kind === 'quiz' || step.kind === 'quiz2' || step.kind === 'checkpoint' || step.kind === 'testout' || step.kind === 'review') {
+  } else if (step.kind === 'match') {
+    runner = (
+      <MatchGame
+        key={runnerKey}
+        flashcards={payload.cards}
+        roundSize={Math.min(5, payload.cards.length)}
+        onRoundComplete={api.onMatchRound}
+        onContinue={() => onDone(null)}
+        continueLabel="Continue ›"
+      />
+    );
+  } else if (step.kind === 'quiz' || step.kind === 'quiz2' || step.kind === 'quick' || step.kind === 'checkpoint' || step.kind === 'testout' || step.kind === 'review') {
     runner = (
       <PathQuizStep
         key={runnerKey}
         questions={payload.questions}
-        passPct={step.kind === 'testout' ? PATH_TESTOUT_PCT : step.kind === 'review' ? 0 : PATH_PASS_PCT}
+        passPct={step.kind === 'testout' ? PATH_TESTOUT_PCT : step.kind === 'review' ? 0 : step.kind === 'quick' ? PATH_QUICK_PASS_PCT : PATH_PASS_PCT}
         label={step.label}
         onAnswer={(id, ok) => api.recordResult(id, ok ? 'correct' : 'incorrect')}
         onFinished={api.finishQuiz}
@@ -9079,7 +9260,7 @@ function PathStepRunner({ trackKey, units, unit, step, results, seenLog, categor
     runner = <PathBridgeStep key={runnerKey} bridge={payload.bridge} questions={payload.questions} planKeys={planKeys || []} api={api} onRetry={retry} onDone={onDone} onOpenCert={onOpenCert} onAddToPlan={onAddToPlan} />;
   } else if (step.kind === 'apply') {
     runner = <PathApplyStep key={runnerKey} unit={unit} categories={categories} flashcardsData={mod.flashcards} onDone={onDone} />;
-  } else if (step.kind === 'game') {
+  } else if (step.kind === 'game' || step.kind === 'game2') {
     if (payload.kind === 'match') {
       runner = (
         <MatchGame
@@ -9136,9 +9317,10 @@ function PathStars({ pct }) {
 function PathTrailNode({ step, index, done, isNext, entry, onOpen }) {
   const checkpoint = step.kind === 'checkpoint';
   const size = isNext ? 78 : 68;
-  const bg = done ? COLOR.success : isNext ? COLOR.primary : checkpoint ? COLOR.gold : COLOR.surfaceRaised;
-  const fg = done || isNext || checkpoint ? COLOR.onAccent : COLOR.muted;
-  const starKinds = ['quiz', 'quiz2', 'game', 'checkpoint'];
+  const hue = stepHue(step.kind);
+  const bg = done ? COLOR.success : isNext || checkpoint ? hue : tint(hue, 16);
+  const fg = done || isNext || checkpoint ? COLOR.onAccent : hue;
+  const starKinds = ['quiz', 'quiz2', 'quick', 'game', 'game2', 'checkpoint'];
   const showStars = done && entry && typeof entry.pct === 'number' && starKinds.includes(step.kind);
   return (
     <button
@@ -9151,7 +9333,7 @@ function PathTrailNode({ step, index, done, isNext, entry, onOpen }) {
       }}
     >
       {isNext && (
-        <span className="bob" style={{ fontSize: '12px', fontWeight: 900, letterSpacing: '0.08em', color: COLOR.primary, background: COLOR.surface, border: `2px solid ${COLOR.border}`, borderRadius: '10px', padding: '3px 10px', marginBottom: '8px', position: 'relative', animation: 'bob 1.4s ease-in-out infinite' }}>
+        <span className="bob" style={{ fontSize: '12px', fontWeight: 900, letterSpacing: '0.08em', color: hue, background: COLOR.surface, border: `2px solid ${hue}`, borderRadius: '10px', padding: '3px 10px', marginBottom: '8px', position: 'relative', animation: 'bob 1.4s ease-in-out infinite' }}>
           START
         </span>
       )}
@@ -9159,7 +9341,7 @@ function PathTrailNode({ step, index, done, isNext, entry, onOpen }) {
         className={`node-face${isNext ? ' pulse' : ''}`}
         style={{
           width: `${size}px`, height: `${size}px`, borderRadius: '50%', display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-          background: bg, color: fg, border: !done && !isNext && !checkpoint ? `2px solid ${COLOR.border}` : 'none',
+          background: bg, color: fg, border: !done && !isNext && !checkpoint ? `2px solid color-mix(in srgb, ${hue} 55%, ${COLOR.border})` : 'none', ['--ring']: `color-mix(in srgb, ${hue} 55%, transparent)`,
           animation: isNext ? 'pulseRing 1.6s ease-out infinite' : 'none',
         }}
       >
@@ -9305,7 +9487,7 @@ function PathView({ track, trackKey, doneMap, unlockedMap, pathLocking, results,
           <button
             onClick={() => startStep(next.unit, next.step)}
             className="btn-3d"
-            style={{ width: '100%', padding: '13px', borderRadius: '14px', background: COLOR.primary, color: COLOR.onAccent, fontSize: '14px', fontWeight: 700, textAlign: 'left', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px' }}
+            style={{ width: '100%', padding: '13px', borderRadius: '14px', background: stepHue(next.step.kind), color: COLOR.onAccent, fontSize: '14px', fontWeight: 700, textAlign: 'left', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px' }}
           >
             <span style={{ minWidth: 0 }}>
               <span style={{ display: 'block', fontSize: '11px', opacity: 0.8, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
@@ -9366,7 +9548,7 @@ function PathView({ track, trackKey, doneMap, unlockedMap, pathLocking, results,
               style={{
                 width: '100%', textAlign: 'left', display: 'flex', alignItems: 'stretch',
                 borderRadius: '18px', padding: 0, overflow: 'hidden',
-                background: locked ? COLOR.surfaceRaised : prog.complete ? COLOR.success : COLOR.primary, color: locked ? COLOR.muted : COLOR.onAccent,
+                background: locked ? COLOR.surfaceRaised : prog.complete ? COLOR.success : unitHue(unit.index), color: locked ? COLOR.muted : COLOR.onAccent,
                 border: locked ? `2px solid ${COLOR.border}` : 'none',
               }}
             >
@@ -9454,7 +9636,7 @@ const HOME_PATH_MODE_HINTS = {
 function HomePathCertChip({ track }) {
   const accent = trackAccent(track.key);
   return (
-    <span style={{ fontSize: '11px', fontWeight: 700, color: accent, border: `1px solid ${accent}`, borderRadius: '999px', padding: '1px 7px', whiteSpace: 'nowrap' }}>
+    <span style={{ fontSize: '11px', fontWeight: 700, color: ink(accent), border: `1px solid ${accent}`, borderRadius: '999px', padding: '1px 7px', whiteSpace: 'nowrap' }}>
       {track.label}
     </span>
   );
@@ -9572,14 +9754,14 @@ function PathBridgeStep({ bridge, questions, planKeys, api, onRetry, onDone, onO
         return (
           <div key={a.track} style={{ background: COLOR.surface, border: `2px solid ${COLOR.border}`, borderLeft: `3px solid ${accent}`, borderRadius: '12px', padding: '10px 12px', marginBottom: '8px' }}>
             <div className="flex items-center gap-2" style={{ marginBottom: '3px' }}>
-              <span style={{ fontSize: '12.5px', fontWeight: 700, color: accent }}>{t ? t.label : a.track}</span>
+              <span style={{ fontSize: '12.5px', fontWeight: 700, color: ink(accent) }}>{t ? t.label : a.track}</span>
               {planKeys.includes(a.track) && <span style={{ fontSize: '10.5px', color: COLOR.muted }}>in your plan</span>}
             </div>
             <div style={{ fontSize: '12.5px', lineHeight: 1.55 }}><GlossText text={a.angle} pool={pool} max={2} blockId={'br-a-' + a.track} /></div>
             {!planKeys.includes(a.track) && (onOpenCert || onAddToPlan) && (
               <div className="flex gap-3" style={{ marginTop: '6px' }}>
                 {onAddToPlan && (
-                  <button onClick={() => onAddToPlan(a.track)} className="btn-flat" style={{ background: 'transparent', color: accent, fontSize: '11px', fontWeight: 600, padding: 0 }}>
+                  <button onClick={() => onAddToPlan(a.track)} className="btn-flat" style={{ background: 'transparent', color: ink(accent), fontSize: '11px', fontWeight: 600, padding: 0 }}>
                     Add {t ? t.label : a.track} to my plan
                   </button>
                 )}
@@ -9637,7 +9819,7 @@ function HomeStudyPath({ tracks, remaining, progress, optionalProgress, mode, on
   }
 
   return (
-    <div style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `2px solid ${COLOR.border}`, borderRadius: '16px', padding: '16px', marginBottom: '14px' }}>
+    <div style={{ boxShadow: SHADOW.card, background: tint(accent, 7), border: `2px solid color-mix(in srgb, ${accent} 40%, ${COLOR.border})`, borderRadius: '16px', padding: '16px', marginBottom: '14px' }}>
       <div className="flex justify-between items-baseline" style={{ marginBottom: '8px' }}>
         <div className="itil-display" style={{ fontSize: '17px', fontWeight: 600 }}>Your study path</div>
         <div style={{ fontSize: '12px', color: COLOR.muted }}>{progress.done} of {progress.total} steps</div>
@@ -9701,7 +9883,7 @@ function HomeStudyPath({ tracks, remaining, progress, optionalProgress, mode, on
               text keeps the "Continue · CERT · Unit n" line the rest of the app
               (and its tests) read as the path's primary action. */}
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
-            <span className="bob" style={{ fontSize: '12px', fontWeight: 900, letterSpacing: '0.08em', color: accent, background: COLOR.surface, border: `2px solid ${COLOR.border}`, borderRadius: '10px', padding: '3px 10px', marginBottom: '8px', animation: 'bob 1.4s ease-in-out infinite' }}>
+            <span className="bob" style={{ fontSize: '12px', fontWeight: 900, letterSpacing: '0.08em', color: ink(accent), background: COLOR.surface, border: `2px solid ${COLOR.border}`, borderRadius: '10px', padding: '3px 10px', marginBottom: '8px', animation: 'bob 1.4s ease-in-out infinite' }}>
               {firstOptional ? 'OPTIONAL' : progress.done === 0 ? 'START' : 'UP NEXT'}
             </span>
             <button
@@ -9739,7 +9921,7 @@ function HomeStudyPath({ tracks, remaining, progress, optionalProgress, mode, on
             <button
               onClick={() => onOpenCert(firstTrack.key)}
               className="btn-flat"
-              style={{ background: 'transparent', color: accent, fontSize: '12px', fontWeight: 700, padding: '8px 2px 0' }}
+              style={{ background: 'transparent', color: ink(accent), fontSize: '12px', fontWeight: 700, padding: '8px 2px 0' }}
             >
               Go deeper in {firstTrack.label} ›
             </button>
@@ -9778,7 +9960,7 @@ function HomeStudyPath({ tracks, remaining, progress, optionalProgress, mode, on
                     className="node-face"
                     style={{
                       width: '62px', height: '62px', borderRadius: '50%', display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-                      background: COLOR.surfaceRaised, color: COLOR.muted, border: e.step.optional ? `2px dashed ${COLOR.muted}` : `2px solid ${COLOR.border}`,
+                      background: tint(stepHue(e.step.kind), 16), color: stepHue(e.step.kind), border: e.step.optional ? `2px dashed ${stepHue(e.step.kind)}` : `2px solid color-mix(in srgb, ${stepHue(e.step.kind)} 55%, ${COLOR.border})`,
                     }}
                   >
                     <PathIcon kind={e.step.kind === 'deep' || e.step.kind === 'bridge' ? 'read' : e.step.kind} size={26} />
@@ -9931,7 +10113,7 @@ function HomeReviewCard({ weakTotal, toughTotal, gamesTotal, casesTotal, reminde
     gamesTotal > 0 && tile('Missed games', gamesTotal, `${gamesTotal} item${gamesTotal === 1 ? '' : 's'} to redo`, 'games', COLOR.primary),
   ].filter(Boolean);
   return (
-    <div style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `2px solid ${COLOR.border}`, borderRadius: '16px', padding: '14px 16px', marginBottom: '14px' }}>
+    <div style={{ boxShadow: SHADOW.card, background: tint(COLOR.primary, 8), border: `2px solid color-mix(in srgb, ${COLOR.primary} 38%, ${COLOR.border})`, borderRadius: '16px', padding: '14px 16px', marginBottom: '14px' }}>
       <div className="flex justify-between items-baseline">
         <div className="itil-display" style={{ fontSize: '16px', fontWeight: 600 }}>Review across your certs</div>
         <div style={{ fontSize: '12px', color: nudge.due ? COLOR.gold : COLOR.muted, fontWeight: nudge.due ? 700 : 400 }}>{waiting} waiting</div>
@@ -10137,6 +10319,269 @@ function HomeReviewRun({ kind, trackKeys, results, seenLog, srs, speech, makeApi
         </div>
       </div>
       {body}
+    </div>
+  );
+}
+
+/* ---------------- Profile: study stats, earned certs, plan ---------------- */
+
+// The learner's own page: who they are (a display name and an avatar colour, both
+// kept on this device with their progress), how much they have studied, their
+// activity over the last twelve weeks, where each cert in their plan stands, the
+// certs they have marked as passed, and their achievements. Everything here is
+// read from data the app already tracks (results, spaced repetition, path
+// progress, streak) plus the small activityLog added for the activity map.
+
+const PROFILE_HUE_COLOR = {
+  primary: COLOR.primary, blue: COLOR.blue, teal: COLOR.teal, success: COLOR.success,
+  orange: COLOR.orange, pink: COLOR.pink, gold: COLOR.gold, red: COLOR.red,
+};
+const HEATMAP_WEEKS = 12;
+const DAY_LABELS = ['Mon', '', 'Wed', '', 'Fri', '', 'Sun'];
+
+function ProfileSection({ title, hue, right, children }) {
+  return (
+    <div style={{ boxShadow: SHADOW.card, background: tint(hue, 7), border: `2px solid color-mix(in srgb, ${hue} 38%, ${COLOR.border})`, borderRadius: '16px', padding: '14px 16px', marginBottom: '14px' }}>
+      <div className="flex justify-between items-baseline" style={{ marginBottom: '10px' }}>
+        <div className="itil-display" style={{ fontSize: '16px', color: ink(hue) }}>{title}</div>
+        {right}
+      </div>
+      {children}
+    </div>
+  );
+}
+
+function StatTile({ label, value, sub, hue }) {
+  return (
+    <div style={{ minWidth: 0, background: tint(hue, 13), border: `2px solid color-mix(in srgb, ${hue} 40%, ${COLOR.border})`, borderRadius: '14px', padding: '10px 12px' }}>
+      <div style={{ fontSize: '11px', fontWeight: 800, letterSpacing: '0.05em', textTransform: 'uppercase', color: ink(hue) }}>{label}</div>
+      <div style={{ fontSize: '22px', fontWeight: 800, lineHeight: 1.15, marginTop: '2px' }}>{value}</div>
+      {sub && <div style={{ fontSize: '11.5px', color: COLOR.muted, marginTop: '1px' }}>{sub}</div>}
+    </div>
+  );
+}
+
+// Twelve weeks of activity, one column per week, Monday at the top.
+function ActivityMap({ log }) {
+  const today = todayString();
+  const dow = (new Date().getDay() + 6) % 7;            // Monday = 0
+  const start = addDays(today, -(dow + 7 * (HEATMAP_WEEKS - 1)));
+  const cells = [];
+  for (let i = 0; i < HEATMAP_WEEKS * 7; i += 1) {
+    const date = addDays(start, i);
+    cells.push({ date, count: date > today ? null : (log[date] || 0) });
+  }
+  const level = (n) => (n >= 30 ? 4 : n >= 15 ? 3 : n >= 5 ? 2 : n >= 1 ? 1 : 0);
+  const bg = (n) => (n === null ? 'transparent' : n === 0 ? COLOR.surfaceRaised : `color-mix(in srgb, ${COLOR.success} ${[0, 28, 52, 76, 100][level(n)]}%, ${COLOR.surfaceRaised})`);
+  return (
+    <div style={{ display: 'flex', gap: '6px' }} role="img" aria-label={`Study activity over the last ${HEATMAP_WEEKS} weeks`}>
+      <div style={{ display: 'grid', gridTemplateRows: 'repeat(7, 1fr)', gap: '3px', fontSize: '9.5px', color: COLOR.muted, paddingTop: '1px' }}>
+        {DAY_LABELS.map((d, i) => <div key={i} style={{ height: '100%', display: 'flex', alignItems: 'center' }}>{d}</div>)}
+      </div>
+      <div style={{ flex: 1, display: 'grid', gridTemplateRows: 'repeat(7, 1fr)', gridAutoFlow: 'column', gridAutoColumns: '1fr', gap: '3px' }}>
+        {cells.map((c) => (
+          <div
+            key={c.date}
+            title={c.count === null ? '' : `${formatDateShort(c.date)}: ${c.count} ${c.count === 1 ? 'action' : 'actions'}`}
+            style={{ aspectRatio: '1 / 1', borderRadius: '3px', background: bg(c.count), border: c.date === today ? `1.5px solid ${COLOR.text}` : 'none' }}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function ProfileHeader({ profile, level, totalActions, firstDay, onSave }) {
+  const [editing, setEditing] = useState(false);
+  const [name, setName] = useState(profile.name);
+  const [hue, setHue] = useState(profile.hue);
+  const color = PROFILE_HUE_COLOR[profile.hue] || COLOR.primary;
+  const initial = (profile.name || 'You').trim().charAt(0).toUpperCase();
+  const save = () => { onSave({ name: name.trim().slice(0, PROFILE_NAME_MAX), hue }); setEditing(false); };
+  return (
+    <div style={{ boxShadow: SHADOW.card, background: tint(color, 12), border: `2px solid color-mix(in srgb, ${color} 45%, ${COLOR.border})`, borderRadius: '18px', padding: '16px', marginBottom: '14px' }}>
+      <div className="flex items-center" style={{ gap: '14px' }}>
+        <div aria-hidden="true" style={{ width: '64px', height: '64px', borderRadius: '50%', background: color, color: COLOR.onAccent, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '28px', fontWeight: 800, boxShadow: '0 5px 0 rgba(0,0,0,0.28)', flexShrink: 0 }}>{initial}</div>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div className="itil-display" style={{ fontSize: '21px', lineHeight: 1.15, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{profile.name || 'Your profile'}</div>
+          <div style={{ fontSize: '12px', color: COLOR.muted, marginTop: '2px' }}>{firstDay ? `Studying since ${formatDateShort(firstDay)}` : 'Your study stats will build up here'}</div>
+        </div>
+        <button onClick={() => { setName(profile.name); setHue(profile.hue); setEditing((e) => !e); }} aria-expanded={editing} className="btn-flat" style={{ padding: '6px 12px', borderRadius: '10px', border: `2px solid ${COLOR.border}`, background: 'transparent', color: COLOR.text, fontSize: '12px', fontWeight: 700 }}>
+          {editing ? 'Close' : 'Edit'}
+        </button>
+      </div>
+      {editing && (
+        <div style={{ marginTop: '12px' }}>
+          <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Your name or nickname" aria-label="Display name" maxLength={PROFILE_NAME_MAX} style={{ width: '100%', padding: '9px 11px', borderRadius: '10px', border: `2px solid ${COLOR.border}`, background: COLOR.surface, color: COLOR.text, fontSize: '13px', marginBottom: '10px' }} />
+          <div style={{ fontSize: '12px', fontWeight: 700, color: COLOR.muted, marginBottom: '6px' }}>Avatar colour</div>
+          <div className="flex gap-2" style={{ flexWrap: 'wrap', marginBottom: '12px' }}>
+            {PROFILE_HUES.map((h) => (
+              <button key={h} onClick={() => setHue(h)} aria-label={`Avatar colour ${h}`} aria-pressed={hue === h} className="btn-flat" style={{ width: '30px', height: '30px', borderRadius: '50%', background: PROFILE_HUE_COLOR[h], border: hue === h ? `3px solid ${COLOR.text}` : '3px solid transparent' }} />
+            ))}
+          </div>
+          <button onClick={save} className="btn-3d" style={{ width: '100%', padding: '10px', borderRadius: '12px', background: color, color: COLOR.onAccent, fontSize: '13px', fontWeight: 800 }}>Save profile</button>
+        </div>
+      )}
+      <div style={{ marginTop: '14px' }}>
+        <div className="flex justify-between" style={{ fontSize: '12px', fontWeight: 800 }}>
+          <span style={{ color: ink(color) }}>Level {level.level}</span>
+          <span style={{ color: COLOR.muted, fontWeight: 600 }}>{level.into} / {level.span} to level {level.level + 1}</span>
+        </div>
+        <div style={{ height: '8px', borderRadius: '4px', background: COLOR.surfaceRaised, overflow: 'hidden', marginTop: '5px' }}>
+          <div style={{ height: '100%', width: `${Math.min(100, Math.round((level.into / level.span) * 100))}%`, background: color, borderRadius: '4px' }} />
+        </div>
+        <div style={{ fontSize: '11.5px', color: COLOR.muted, marginTop: '4px' }}>{totalActions} study actions so far: every answer, card, game and step counts.</div>
+      </div>
+    </div>
+  );
+}
+
+function ProfileView({ tracks, results, seenLog, srs, stats, certPlan, achievements, onSaveProfile, onToggleCompleted, onSelectTrack, onOpenCertPath, onOpenAchievements, onOpenData, onOpenGlossary }) {
+  const log = stats.activityLog || {};
+  const runs = useMemo(() => activityRuns(log), [log]);
+  const totalActions = useMemo(() => Object.keys(log).reduce((n, d) => n + log[d], 0), [log]);
+  const level = studyLevel(totalActions);
+  const today = todayString();
+  const week = useMemo(() => { let n = 0; for (let i = 0; i < 7; i += 1) n += log[addDays(today, -i)] || 0; return n; }, [log, today]);
+  const bestDay = useMemo(() => Object.keys(log).reduce((m, d) => Math.max(m, log[d]), 0), [log]);
+
+  const trackByKey = new Map(tracks.map((t) => [t.key, t]));
+  const planKeys = certPlan.order.filter((k) => trackByKey.has(k));
+  const certInfo = useMemo(() => {
+    const out = {};
+    planKeys.forEach((k) => {
+      const units = buildPathUnits(k);
+      const done = ((stats.path || {})[k] || {}).done || {};
+      out[k] = {
+        mastery: trackMastery(k, results),
+        readiness: examReadiness(k, results, seenLog),
+        path: units.length ? pathOverallProgress(units, done) : null,
+      };
+    });
+    return out;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [planKeys.join(','), results, seenLog, stats.path]);
+
+  let attempted = 0;
+  let correct = 0;
+  tracks.forEach((t) => {
+    const r = results[t.key] || {};
+    Object.keys(r).forEach((id) => { attempted += 1; if (r[id] === 'correct') correct += 1; });
+  });
+  const cards = tracks.reduce((n, t) => n + Object.keys((srs || {})[t.key] || {}).length, 0);
+  const steps = Object.keys(stats.path || {}).reduce((n, k) => n + Object.keys(((stats.path || {})[k] || {}).done || {}).length, 0);
+  const earned = planKeys.filter((k) => certPlan.completed[k]).sort((a, b) => certPlan.completed[b].localeCompare(certPlan.completed[a]));
+  const active = planKeys.filter((k) => !certPlan.completed[k]);
+  const upcoming = active.filter((k) => certPlan.scheduled[k]).sort((a, b) => certPlan.scheduled[a].localeCompare(certPlan.scheduled[b]));
+  const unlocked = achievements.filter((a) => a.unlocked);
+  const studyingKey = active[0];
+
+  return (
+    <div>
+      <ProfileHeader profile={stats.profile || { name: '', hue: 'primary' }} level={level} totalActions={totalActions} firstDay={runs.first} onSave={onSaveProfile} />
+
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '10px', marginBottom: '14px' }}>
+        <StatTile label="Day streak" value={`🔥 ${stats.streak.current}`} sub={`Best: ${Math.max(stats.streak.longest, stats.streak.current)} days`} hue={COLOR.orange} />
+        <StatTile label="Days studied" value={runs.days} sub={`${week} actions this week`} hue={COLOR.success} />
+        <StatTile label="Questions" value={attempted} sub={attempted ? `${Math.round((correct / attempted) * 100)}% last answered right` : 'Answer one to start'} hue={COLOR.blue} />
+        <StatTile label="Cards reviewed" value={cards} sub="in spaced repetition" hue={COLOR.teal} />
+        <StatTile label="Path steps" value={steps} sub={`${stats.counts.matchRoundsCompleted} match rounds`} hue={COLOR.primary} />
+        <StatTile label="Exams passed" value={stats.counts.examsPassed + stats.counts.finalMocksPassed} sub={`${stats.counts.perfectQuizzes} perfect quizzes`} hue={COLOR.gold} />
+      </div>
+
+      <ProfileSection title="Activity" hue={COLOR.success} right={<span style={{ fontSize: '11.5px', color: COLOR.muted }}>Best day: {bestDay}</span>}>
+        <ActivityMap log={log} />
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '4px', fontSize: '10.5px', color: COLOR.muted, marginTop: '8px' }}>
+          Less
+          {[0, 28, 52, 76, 100].map((p) => <span key={p} style={{ width: '11px', height: '11px', borderRadius: '3px', background: p === 0 ? COLOR.surfaceRaised : `color-mix(in srgb, ${COLOR.success} ${p}%, ${COLOR.surfaceRaised})` }} />)}
+          More
+        </div>
+      </ProfileSection>
+
+      <ProfileSection title="Earned certifications" hue={COLOR.gold} right={<span style={{ fontSize: '11.5px', color: COLOR.muted }}>{earned.length} earned</span>}>
+        {earned.length ? (
+          <div className="flex flex-col gap-2">
+            {earned.map((k) => {
+              const t = trackByKey.get(k);
+              const accent = trackAccent(k);
+              return (
+                <div key={k} className="flex items-center" style={{ gap: '12px', padding: '10px 12px', borderRadius: '12px', background: tint(accent, 14), border: `2px solid ${accent}` }}>
+                  <span aria-hidden="true" style={{ width: '38px', height: '38px', borderRadius: '50%', background: accent, color: COLOR.onAccent, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 3px 0 rgba(0,0,0,0.28)', flexShrink: 0 }}><TabIcon kind="exam" size={20} /></span>
+                  <span style={{ flex: 1, minWidth: 0 }}>
+                    <span style={{ display: 'block', fontSize: '14px', fontWeight: 800, color: ink(accent) }}>{t.label} · Passed</span>
+                    <span style={{ display: 'block', fontSize: '12px', color: COLOR.muted }}>{t.subtitle} · {formatDateShort(certPlan.completed[k])}</span>
+                  </span>
+                  <button onClick={() => onToggleCompleted(k)} className="btn-flat" style={{ background: 'transparent', color: COLOR.muted, fontSize: '11.5px', fontWeight: 700, padding: 0 }}>Undo</button>
+                </div>
+              );
+            })}
+          </div>
+        ) : (
+          <div style={{ fontSize: '12.5px', color: COLOR.muted, lineHeight: 1.5 }}>
+            Passed an exam? Tap <strong>Mark as passed</strong> on a cert in your plan below and it appears here as an earned certification.
+          </div>
+        )}
+      </ProfileSection>
+
+      <ProfileSection title="My plan" hue={COLOR.primary} right={<button onClick={onOpenCertPath} className="btn-flat" style={{ background: 'transparent', color: ink(COLOR.primary), fontSize: '12px', fontWeight: 800, padding: 0 }}>Manage ›</button>}>
+        {active.length ? (
+          <div className="flex flex-col gap-2">
+            {active.map((k) => {
+              const t = trackByKey.get(k);
+              const accent = trackAccent(k);
+              const info = certInfo[k] || {};
+              const sched = certPlan.scheduled[k];
+              const days = sched ? daysBetween(today, sched) : null;
+              return (
+                <div key={k} style={{ padding: '10px 12px', borderRadius: '12px', background: tint(accent, k === studyingKey ? 16 : 8), border: `2px solid ${k === studyingKey ? accent : `color-mix(in srgb, ${accent} 30%, ${COLOR.border})`}` }}>
+                  <div className="flex justify-between items-baseline" style={{ gap: '8px' }}>
+                    <button onClick={() => onSelectTrack(k)} className="btn-flat" style={{ background: 'transparent', padding: 0, textAlign: 'left', fontSize: '14px', fontWeight: 800, color: ink(accent) }}>{t.label}{k === studyingKey ? <span style={{ fontSize: '10.5px', marginLeft: '8px', letterSpacing: '0.05em', textTransform: 'uppercase' }}>Studying now</span> : null}</button>
+                    <span style={{ fontSize: '12px', fontWeight: 800 }}>{info.mastery}%</span>
+                  </div>
+                  <div style={{ fontSize: '12px', color: COLOR.muted, marginTop: '1px' }}>{t.subtitle}</div>
+                  <div style={{ height: '6px', borderRadius: '3px', background: COLOR.surfaceRaised, overflow: 'hidden', marginTop: '8px' }}>
+                    <div style={{ height: '100%', width: `${info.path ? info.path.pct : info.mastery || 0}%`, background: accent, borderRadius: '3px' }} />
+                  </div>
+                  <div className="flex justify-between" style={{ fontSize: '11.5px', color: COLOR.muted, marginTop: '5px', gap: '8px', flexWrap: 'wrap' }}>
+                    <span>{info.path ? `Path ${info.path.pct}% · ${info.path.unitsComplete}/${info.path.unitCount} units` : 'Practice-only cert'}</span>
+                    <span>{info.readiness && info.readiness.label !== 'Not started' ? `${info.readiness.label} · ${info.readiness.score}% ready` : 'Not started'}</span>
+                  </div>
+                  <div className="flex justify-between items-center" style={{ marginTop: '6px', gap: '8px' }}>
+                    <span style={{ fontSize: '11.5px', fontWeight: 700, color: days !== null && days >= 0 && days <= 7 ? COLOR.gold : COLOR.muted }}>
+                      {sched ? (days < 0 ? `Exam was ${-days}d ago` : days === 0 ? 'Exam today' : `Exam in ${days} days · ${formatDateShort(sched)}`) : 'No exam date set'}
+                    </span>
+                    <button onClick={() => onToggleCompleted(k)} className="btn-flat" style={{ padding: '3px 10px', borderRadius: '8px', border: `2px solid ${COLOR.success}`, background: 'transparent', color: COLOR.success, fontSize: '11.5px', fontWeight: 800 }}>Mark as passed</button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        ) : (
+          <div style={{ fontSize: '12.5px', color: COLOR.muted, lineHeight: 1.5 }}>
+            Your plan is empty. Add the certs you are working toward from the menu and they show up here with progress and exam countdowns.
+            <button onClick={onOpenCertPath} className="btn-3d" style={{ display: 'block', width: '100%', marginTop: '10px', padding: '10px', borderRadius: '12px', background: COLOR.primary, color: COLOR.onAccent, fontSize: '13px', fontWeight: 800 }}>Build my plan</button>
+          </div>
+        )}
+        {upcoming.length > 0 && (
+          <div style={{ marginTop: '12px', paddingTop: '10px', borderTop: `1px solid ${COLOR.border}`, fontSize: '12px', color: COLOR.muted }}>
+            Next exam: <strong style={{ color: COLOR.text }}>{trackByKey.get(upcoming[0]).label}</strong> on {formatDateShort(certPlan.scheduled[upcoming[0]])}
+          </div>
+        )}
+      </ProfileSection>
+
+      <ProfileSection title="Achievements" hue={COLOR.pink} right={<button onClick={onOpenAchievements} className="btn-flat" style={{ background: 'transparent', color: ink(COLOR.pink), fontSize: '12px', fontWeight: 800, padding: 0 }}>See all ›</button>}>
+        <div style={{ fontSize: '12.5px', color: COLOR.muted, marginBottom: '8px' }}>{unlocked.length} of {achievements.length} unlocked</div>
+        <div className="flex gap-2" style={{ flexWrap: 'wrap' }}>
+          {achievements.map((a) => (
+            <span key={a.id} title={`${a.title}: ${a.description}`} style={{ width: '38px', height: '38px', borderRadius: '12px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: '19px', background: a.unlocked ? tint(COLOR.pink, 18) : COLOR.surfaceRaised, border: `2px solid ${a.unlocked ? COLOR.pink : COLOR.border}`, filter: a.unlocked ? 'none' : 'grayscale(1)', opacity: a.unlocked ? 1 : 0.45 }}>{a.icon}</span>
+          ))}
+        </div>
+      </ProfileSection>
+
+      <div className="flex gap-2" style={{ marginBottom: '8px' }}>
+        <button onClick={onOpenData} className="btn-flat flex-1" style={{ padding: '11px', borderRadius: '12px', border: `2px solid ${COLOR.border}`, background: 'transparent', color: COLOR.text, fontSize: '13px', fontWeight: 700 }}>Settings &amp; data</button>
+        <button onClick={onOpenGlossary} className="btn-flat flex-1" style={{ padding: '11px', borderRadius: '12px', border: `2px solid ${COLOR.border}`, background: 'transparent', color: COLOR.text, fontSize: '13px', fontWeight: 700 }}>My terms</button>
+      </div>
     </div>
   );
 }
@@ -10569,7 +11014,7 @@ function CertStudyApp() {
   const pickTrack = (key) => { trackPickedRef.current = true; setActiveTrack(key); };
   const planDefaultTrack = () => studyingTrackKey(visibleTracks, certPlan, results, seenLog, stats);
   const openTab = (m) => {
-    if (m !== 'home' && mode === 'home' && !trackPickedRef.current) setActiveTrack(planDefaultTrack());
+    if (m !== 'home' && m !== 'profile' && (mode === 'home' || mode === 'profile') && !trackPickedRef.current) setActiveTrack(planDefaultTrack());
     setMode(m);
   };
   // Once saved data has loaded, adopt the plan's cert as the active one.
@@ -10732,7 +11177,7 @@ function CertStudyApp() {
 
   const goToCertPathTrack = (key) => {
     pickTrack(key);
-    setMode((m) => (m === 'home' ? 'path' : m));
+    setMode((m) => (m === 'home' || m === 'profile' ? 'path' : m));
     setShowCertPath(false);
   };
 
@@ -10786,7 +11231,7 @@ function CertStudyApp() {
   // today's goal.
   const bumpDailyGoal = (n = 1) => {
     const current = statsRef.current;
-    saveStats({ ...current, dailyGoal: recordDailyActivity(current.dailyGoal, n) });
+    saveStats(withActivity(current, n));
   };
 
   const setDailyGoalTarget = (target) => {
@@ -11316,6 +11761,17 @@ function CertStudyApp() {
 
   const achievements = useMemo(() => evaluateAchievements(results, stats), [results, stats]);
 
+  // One-time: keep units finished before the path games were added finished.
+  const pathMigratedRef = useRef(false);
+  useEffect(() => {
+    if (syncMode === 'loading' || pathMigratedRef.current) return;
+    pathMigratedRef.current = true;
+    const cur = statsRef.current;
+    if ((cur.pathVersion || 0) >= PATH_PROGRESS_VERSION) return;
+    saveStats({ ...cur, path: migratePathSteps(cur.path, todayString()), pathVersion: PATH_PROGRESS_VERSION });
+    // eslint-disable-next-line
+  }, [syncMode]);
+
   // Advance the daily streak once per load, after real data (local or cloud)
   // has replaced the empty initial state — never while still `loading`.
   const streakAdvancedRef = useRef(false);
@@ -11416,14 +11872,14 @@ function CertStudyApp() {
     function applyHash() {
       const parsed = parseHash(window.location.hash, validTrackKeys);
       const cur = routeStateRef.current;
-      const same = parsed.mode === 'home'
-        ? cur.mode === 'home'
+      const same = parsed.mode === 'home' || parsed.mode === 'profile'
+        ? cur.mode === parsed.mode
         : parsed.trackKey === cur.activeTrack && parsed.mode === cur.mode
           && (parsed.mode !== 'learn' || parsed.learnView === cur.learnView)
           && (parsed.mode !== 'quiz' || parsed.quizView === cur.quizView);
       if (same) return;
-      if (parsed.mode === 'home') {
-        setMode('home');
+      if (parsed.mode === 'home' || parsed.mode === 'profile') {
+        setMode(parsed.mode);
         return;
       }
       pickTrack(parsed.trackKey);
@@ -11524,7 +11980,7 @@ function CertStudyApp() {
   // `stats` closure — runs last and its write isn't the one that gets
   // overwritten.
   useEffect(() => {
-    if (syncMode === 'loading' || mode === 'home') return;
+    if (syncMode === 'loading' || mode === 'home' || mode === 'profile') return;
     const view = mode === 'learn' ? learnView : mode === 'quiz' ? quizView : null;
     // Build on the latest saved stats (the ref), not this render's `stats`:
     // the streak effect can fire in the same commit and must not be overwritten.
@@ -11671,7 +12127,7 @@ function CertStudyApp() {
   // changed today, same self-correcting pattern as the readiness-history
   // effect above.
   useEffect(() => {
-    if (syncMode === 'loading' || mode === 'home') return;
+    if (syncMode === 'loading' || mode === 'home' || mode === 'profile') return;
     const pcts = {};
     categories.forEach((c) => { pcts[c.key] = Math.round((masteryByCategory[c.key] || 0) * 100); });
     const today = todayString();
@@ -12009,7 +12465,7 @@ function CertStudyApp() {
         },
       }
       : stats;
-    const nextStats = { ...statsWithExam, dailyGoal: recordDailyActivity(statsWithExam.dailyGoal, answeredCount) };
+    const nextStats = withActivity(statsWithExam, answeredCount);
     resultsRef.current = nextResults;
     statsRef.current = nextStats;
     setResults(nextResults);
@@ -12110,7 +12566,7 @@ function CertStudyApp() {
           onSetPathLocking={(on) => saveStats({ ...statsRef.current, pathLocking: on })}
         />
       )}
-      <div style={{ background: COLOR.navBar, borderBottom: `1px solid ${COLOR.border}`, position: 'sticky', top: 0, zIndex: 30 }}>
+      <div style={{ background: `color-mix(in srgb, ${modeHue(mode)} 9%, ${COLOR.navBar})`, borderBottom: `2px solid color-mix(in srgb, ${modeHue(mode)} 45%, ${COLOR.border})`, position: 'sticky', top: 0, zIndex: 30, transition: 'background-color 0.2s ease' }}>
         <div className="max-w-md mx-auto px-4 flex items-center" style={{ height: `${APP_HEADER_HEIGHT}px`, gap: '8px' }}>
           <button
             onClick={() => setShowCertPath(true)}
@@ -12121,8 +12577,8 @@ function CertStudyApp() {
             <IconMenu />
           </button>
           <div style={{ flex: 1, minWidth: 0 }}>
-            {mode === 'home' ? (
-              <div className="itil-display app-title" style={{ fontSize: '20px', lineHeight: 1.1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>Cert Study</div>
+            {mode === 'home' || mode === 'profile' ? (
+              <div className="itil-display app-title" style={{ fontSize: '20px', lineHeight: 1.1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{mode === 'profile' ? 'Profile' : 'Cert Study'}</div>
             ) : (
               <button
                 onClick={() => setShowTrackSwitcher(true)}
@@ -12130,7 +12586,7 @@ function CertStudyApp() {
                 title="Switch track"
                 style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', textAlign: 'left', background: 'transparent', border: 'none', padding: '4px 0', maxWidth: '100%' }}
               >
-                <span className="itil-display app-title" style={{ fontSize: '22px', lineHeight: 1.1, color: trackAccent(activeTrack) }}>{track.label}</span>
+                <span className="itil-display app-title" style={{ fontSize: '22px', lineHeight: 1.1, color: ink(trackAccent(activeTrack)) }}>{track.label}</span>
                 <span style={{ fontSize: '12px', color: COLOR.muted }}>▾</span>
               </button>
             )}
@@ -12169,7 +12625,24 @@ function CertStudyApp() {
           </div>
         ) : null}
 
-        {mode === 'home' ? (
+        {mode === 'profile' ? (
+          <ProfileView
+            tracks={visibleTracks}
+            results={results}
+            seenLog={seenLog}
+            srs={srs}
+            stats={stats}
+            certPlan={certPlan}
+            achievements={achievements}
+            onSaveProfile={(profile) => saveStats({ ...statsRef.current, profile })}
+            onToggleCompleted={toggleCertCompleted}
+            onSelectTrack={(key) => { pickTrack(key); setMode('path'); }}
+            onOpenCertPath={() => setShowCertPath(true)}
+            onOpenAchievements={() => setShowAchievements(true)}
+            onOpenData={() => { setImportMessage(null); setShowData(true); }}
+            onOpenGlossary={() => setShowGlossary(true)}
+          />
+        ) : mode === 'home' ? (
           <HomeView
             tracks={visibleTracks}
             results={results}
@@ -12381,7 +12854,7 @@ function CertStudyApp() {
         {mode === 'quiz' && quizView === 'match' && (
           <MatchGame
             flashcards={filteredFlashcards}
-            onRoundComplete={() => saveStats({ ...stats, counts: { ...stats.counts, matchRoundsCompleted: stats.counts.matchRoundsCompleted + 1 } })}
+            onRoundComplete={() => { const cur = statsRef.current; saveStats({ ...cur, counts: { ...cur.counts, matchRoundsCompleted: cur.counts.matchRoundsCompleted + 1 } }); }}
           />
         )}
 
