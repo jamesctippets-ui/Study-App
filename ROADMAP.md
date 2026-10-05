@@ -830,6 +830,7 @@ doesn't (and why it's still waiting).
     complements AB-650/MD-102 without much overlap.
   - **PL-300** (Power BI Data Analyst) — adjacent to the DP-900/DP-300 data
     cluster, useful if reporting/analytics work comes up.
+  - (**CCNA** and the six main **ISC2** certs have shipped — see section 14.)
   - **CompTIA Security+** — pairs with the existing Cloud+ track the same
     way AZ-900 pairs with AZ-104, and is a common next step after Cloud+.
   - A **second healthcare-interoperability track** (e.g. content aligned with
@@ -1657,8 +1658,34 @@ trading away for shinier but shallower ones.
   and bridge tests were updated for the longer unit and for term triggers in
   question stems; `full_smoke.js` and a few older scripts still describe the
   pre-Path navigation and no longer run.
+- [x] **CCNA and the ISC2 certifications (22 tracks now).** New tracks: **CCNA**
+  (200-301 v1.1), **ISC2 CC**, **SSCP**, **CISSP**, **CCSP**, **CGRC**, **CSSLP**, about
+  1,160 flashcards, 1,130 questions, 65 lessons, 45 IOS command challenges and the usual
+  games between them. (1) *Experience requirements:* `EXAM_CONFIG[key].experience`
+  (`level` required / recommended / none, `years`, `summary`, `waivers`, `associate`,
+  validated by `build.py`) drives an **ExperienceChip** on the Home cert lists, the
+  Path header, the Up-next card and the Profile plan, an option suffix in the add-cert
+  menu, and an **ExperienceCard** on the Exam tab. Values: CC none; SSCP 1 year;
+  CGRC 2; CSSLP 4; CISSP 5; CCSP 5 (3 in security); CCNA 1 recommended. Waivers
+  and Associate of ISC2 windows are included; the CISSP waiver note records the
+  April 1, 2026 cut of the approved-credential list. (2) *Cisco IOS commands:* the
+  Commands practice mode gains an `ios` tool (labelled "Cisco IOS"), graded by the
+  same verb and required-token check, with `altCommands` for common abbreviations.
+  (3) *Outlines covered:* CC's September 1, 2026 outline, CCSP's August 1, 2026
+  outline (AI woven into every domain), CISSP's April 2024 outline, CGRC's June 2024
+  outline, CSSLP's current eight domains and CCNA v1.1 with a cheat-sheet section on
+  what changes in v2.0 from February 3, 2027. (4) *Build:* CCNA and CISSP are written
+  in two parts (`_a`, `_b`) combined by `data/ccna.py` and `data/cissp.py`; `build.py`
+  has an `UNFINISHED_TRACKS` set that hides a registered track from everything shipped
+  while its content is a placeholder (empty now). Honest limits: isc2.org, cisco.com
+  and nist.gov were blocked in the build environment, so outlines, weights, formats
+  and experience rules rest on search-result snippets and the resource URLs are from
+  memory; worker-flagged soft spots include NIST SP 800-63B wording, SOC 2 reporting
+  periods, OSPF `maximum-paths` and QoS voice figures. No lesson diagrams or
+  cross-cert bridges exist for these tracks yet, and ISSAP, ISSEP and ISSMP are not
+  covered.
 - [ ] **Open ideas.** Sounds for the verbal quiz and the case-study end screen;
-  sharing a scenario or term list between devices without a full export; a
+  lesson diagrams (OSI, subnetting, STP, OSPF, RMF) and cross-cert bridges for the new tracks, a Security+ track to sit beside CC and SSCP; sharing a scenario or term list between devices without a full export; a
   step bank that also learns from your own earlier scenarios; the real module
   build, the new tracks and the screenshot gaps listed above.
 

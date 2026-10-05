@@ -169,7 +169,7 @@ EXAM_CONFIG = {
         'experience': {
             'level': 'required', 'years': 1,
             'summary': 'One year of cumulative paid work experience in one or more of the seven SSCP domains.',
-            'waivers': ['A bachelor\'s or master\'s degree in a cybersecurity program can satisfy the one year.'],
+            'waivers': ['A bachelor\'s or master\'s degree in a cybersecurity program (or one on ISC2\'s pre-approved list) can satisfy the one year.'],
             'associate': 'No experience yet? Pass the exam to become an Associate of ISC2, then you have two years to earn the one year of experience.',
         },
         'resources': [
@@ -182,7 +182,7 @@ EXAM_CONFIG = {
         'experience': {
             'level': 'required', 'years': 5,
             'summary': 'Five years of cumulative paid work experience in two or more of the eight CISSP domains.',
-            'waivers': ['One year can be waived with a four-year degree (or regional equivalent) or an approved credential from ISC2\'s list. Only one year can be waived.'],
+            'waivers': ['One year can be waived with a four-year degree (or regional equivalent) or an approved credential from ISC2\'s list (cut to about 25 credentials on April 1, 2026; CEH, CISA, CRISC and OSCP were removed). Only one year can be waived.'],
             'associate': 'No experience yet? Pass the exam to become an Associate of ISC2, then you have six years to earn the experience.',
         },
         'resources': [
@@ -195,7 +195,7 @@ EXAM_CONFIG = {
         'experience': {
             'level': 'required', 'years': 5,
             'summary': 'Five years of cumulative paid work experience in information technology, including three in information security and one in one or more of the six CCSP domains.',
-            'waivers': ['Holding the CISSP credential satisfies the whole experience requirement.'],
+            'waivers': ['Holding the CISSP credential satisfies the whole experience requirement.', 'A relevant degree can cover up to one year, and CSA\'s CCSK certificate can cover one year. Check ISC2 for the current rules.'],
             'associate': 'No experience yet? Pass the exam to become an Associate of ISC2, then you have six years to earn the experience.',
         },
         'resources': [

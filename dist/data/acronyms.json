@@ -259,7 +259,8 @@
   "RA": {
     "exp": [
       "Read-access",
-      "Risk assessment (SP 800-53 control family)"
+      "Risk assessment (SP 800-53 control family)",
+      "Registration authority"
     ]
   },
   "RAID": {
@@ -875,7 +876,10 @@
     "exp": "Endpoint Privilege Management"
   },
   "ESP": {
-    "exp": "Enrollment Status Page"
+    "exp": [
+      "Enrollment Status Page",
+      "Encapsulating Security Payload"
+    ]
   },
   "IMEI": {
     "exp": "International Mobile Equipment Identity"
@@ -1672,7 +1676,10 @@
     "exp": "Rivest-Shamir-Adleman"
   },
   "SP": {
-    "exp": "Special Publication",
+    "exp": [
+      "Special Publication",
+      "Service provider"
+    ],
     "trigger": false
   },
   "WEP": {
@@ -1932,5 +1939,502 @@
   },
   "XSS": {
     "exp": "Cross-site scripting"
+  },
+  "AF": {
+    "exp": "Assured Forwarding"
+  },
+  "AH": {
+    "exp": "Authentication Header"
+  },
+  "AP": {
+    "exp": "Access point",
+    "trigger": false
+  },
+  "APIPA": {
+    "exp": "Automatic Private IP Addressing"
+  },
+  "ARO": {
+    "exp": "Annualized rate of occurrence"
+  },
+  "ARP": {
+    "exp": "Address Resolution Protocol"
+  },
+  "ASCII": {
+    "exp": "American Standard Code for Information Interchange"
+  },
+  "BAS": {
+    "exp": "Breach and attack simulation"
+  },
+  "BDR": {
+    "exp": "Backup designated router"
+  },
+  "BGP": {
+    "exp": "Border Gateway Protocol"
+  },
+  "BPDU": {
+    "exp": "Bridge protocol data unit"
+  },
+  "BSSID": {
+    "exp": "Basic service set identifier"
+  },
+  "BYOK": {
+    "exp": "Bring your own key"
+  },
+  "CAPWAP": {
+    "exp": "Control and Provisioning of Wireless Access Points"
+  },
+  "CBC": {
+    "exp": "Cipher block chaining"
+  },
+  "CBWFQ": {
+    "exp": "Class-based weighted fair queuing"
+  },
+  "CCM": {
+    "exp": "Cloud Controls Matrix"
+  },
+  "CCMP": {
+    "exp": "Counter Mode with Cipher Block Chaining Message Authentication Code Protocol"
+  },
+  "CCNA": {
+    "exp": "Cisco Certified Network Associate"
+  },
+  "CDP": {
+    "exp": "Cisco Discovery Protocol"
+  },
+  "CEO": {
+    "exp": "Chief executive officer",
+    "trigger": false
+  },
+  "CER": {
+    "exp": "Crossover error rate"
+  },
+  "CFAA": {
+    "exp": "Computer Fraud and Abuse Act"
+  },
+  "CISSP": {
+    "exp": "Certified Information Systems Security Professional"
+  },
+  "COBIT": {
+    "exp": "Control Objectives for Information and Related Technologies"
+  },
+  "COPPA": {
+    "exp": "Children's Online Privacy Protection Act"
+  },
+  "CRC": {
+    "exp": "Cyclic redundancy check"
+  },
+  "CRUD": {
+    "exp": "Create, read, update, delete"
+  },
+  "CSA": {
+    "exp": "Cloud Security Alliance"
+  },
+  "CTR": {
+    "exp": "Counter (block cipher mode)"
+  },
+  "CoS": {
+    "exp": "Class of service"
+  },
+  "DAI": {
+    "exp": "Dynamic ARP inspection"
+  },
+  "DEK": {
+    "exp": "Data encryption key"
+  },
+  "DNA": {
+    "exp": "Digital Network Architecture"
+  },
+  "DNSSEC": {
+    "exp": "Domain Name System Security Extensions"
+  },
+  "DORA": {
+    "exp": "Discover, Offer, Request, Acknowledge"
+  },
+  "DRM": {
+    "exp": "Digital rights management"
+  },
+  "DSA": {
+    "exp": "Digital signature algorithm"
+  },
+  "DSCP": {
+    "exp": "Differentiated Services Code Point"
+  },
+  "DTP": {
+    "exp": "Dynamic Trunking Protocol"
+  },
+  "DoH": {
+    "exp": "DNS over HTTPS"
+  },
+  "DoT": {
+    "exp": "DNS over TLS"
+  },
+  "ECB": {
+    "exp": "Electronic codebook"
+  },
+  "ECC": {
+    "exp": "Elliptic curve cryptography"
+  },
+  "EDR": {
+    "exp": "Endpoint detection and response"
+  },
+  "EF": {
+    "exp": "Expedited Forwarding"
+  },
+  "EGP": {
+    "exp": "Exterior gateway protocol"
+  },
+  "EIGRP": {
+    "exp": "Enhanced Interior Gateway Routing Protocol"
+  },
+  "EOL": {
+    "exp": "End of life"
+  },
+  "EOS": {
+    "exp": "End of support"
+  },
+  "EUI": {
+    "exp": "Extended Unique Identifier"
+  },
+  "FAR": {
+    "exp": "False acceptance rate"
+  },
+  "FERPA": {
+    "exp": "Family Educational Rights and Privacy Act"
+  },
+  "FHRP": {
+    "exp": "First-hop redundancy protocol"
+  },
+  "FIFO": {
+    "exp": "First in, first out"
+  },
+  "FIN": {
+    "exp": "Finish (TCP flag)"
+  },
+  "FRR": {
+    "exp": "False rejection rate"
+  },
+  "FTPS": {
+    "exp": "File Transfer Protocol Secure (FTP over TLS)"
+  },
+  "GCM": {
+    "exp": "Galois/Counter Mode"
+  },
+  "GLBA": {
+    "exp": "Gramm-Leach-Bliley Act"
+  },
+  "GLBP": {
+    "exp": "Gateway Load Balancing Protocol"
+  },
+  "GRE": {
+    "exp": "Generic Routing Encapsulation"
+  },
+  "HMAC": {
+    "exp": "Hash-based message authentication code"
+  },
+  "HOTP": {
+    "exp": "HMAC-based one-time password"
+  },
+  "HQ": {
+    "exp": "Headquarters"
+  },
+  "HSRP": {
+    "exp": "Hot Standby Router Protocol"
+  },
+  "HYOK": {
+    "exp": "Hold your own key"
+  },
+  "ICS": {
+    "exp": "Industrial control system"
+  },
+  "IEEE": {
+    "exp": "Institute of Electrical and Electronics Engineers"
+  },
+  "IETF": {
+    "exp": "Internet Engineering Task Force"
+  },
+  "IGP": {
+    "exp": "Interior gateway protocol"
+  },
+  "IKE": {
+    "exp": "Internet Key Exchange"
+  },
+  "IOS": {
+    "exp": "Internetwork Operating System (Cisco IOS)"
+  },
+  "IRM": {
+    "exp": "Information rights management"
+  },
+  "ISC2": {
+    "exp": "International Information System Security Certification Consortium"
+  },
+  "IV": {
+    "exp": "Initialization vector",
+    "trigger": false
+  },
+  "IdP": {
+    "exp": "Identity provider"
+  },
+  "KDC": {
+    "exp": "Key Distribution Center"
+  },
+  "KEK": {
+    "exp": "Key encryption key"
+  },
+  "KEM": {
+    "exp": "Key encapsulation mechanism"
+  },
+  "LAG": {
+    "exp": "Link aggregation group"
+  },
+  "LDAPS": {
+    "exp": "Lightweight Directory Access Protocol over TLS"
+  },
+  "LED": {
+    "exp": "Light-emitting diode",
+    "trigger": false
+  },
+  "LLDP": {
+    "exp": "Link Layer Discovery Protocol"
+  },
+  "LLQ": {
+    "exp": "Low-latency queuing"
+  },
+  "LSDB": {
+    "exp": "Link-state database"
+  },
+  "LTE": {
+    "exp": "Long-Term Evolution"
+  },
+  "MD5": {
+    "exp": "Message Digest 5"
+  },
+  "MDIX": {
+    "exp": "Medium-dependent interface crossover (Auto-MDIX)"
+  },
+  "MIB": {
+    "exp": "Management information base"
+  },
+  "NAC": {
+    "exp": "Network access control"
+  },
+  "NAT64": {
+    "exp": "Network address translation between IPv6 and IPv4"
+  },
+  "NETCONF": {
+    "exp": "Network Configuration Protocol"
+  },
+  "NGFW": {
+    "exp": "Next-generation firewall"
+  },
+  "OCSP": {
+    "exp": "Online Certificate Status Protocol"
+  },
+  "OID": {
+    "exp": "Object identifier"
+  },
+  "OSPF": {
+    "exp": "Open Shortest Path First"
+  },
+  "OSPFv2": {
+    "exp": "Open Shortest Path First version 2"
+  },
+  "PAM": {
+    "exp": "Privileged access management"
+  },
+  "PAT": {
+    "exp": "Port address translation"
+  },
+  "PAgP": {
+    "exp": "Port Aggregation Protocol"
+  },
+  "PDU": {
+    "exp": "Protocol data unit"
+  },
+  "PGP": {
+    "exp": "Pretty Good Privacy"
+  },
+  "PSK": {
+    "exp": "Pre-shared key"
+  },
+  "PVST": {
+    "exp": "Per-VLAN Spanning Tree"
+  },
+  "PoE": {
+    "exp": "Power over Ethernet"
+  },
+  "RESTCONF": {
+    "exp": "RESTCONF protocol (REST-style access to YANG data)"
+  },
+  "RFC": {
+    "exp": "Request for Comments",
+    "trigger": false
+  },
+  "RFID": {
+    "exp": "Radio-frequency identification"
+  },
+  "RIP": {
+    "exp": "Routing Information Protocol"
+  },
+  "RST": {
+    "exp": "Reset (TCP flag)"
+  },
+  "RSTP": {
+    "exp": "Rapid Spanning Tree Protocol"
+  },
+  "RUM": {
+    "exp": "Real user monitoring"
+  },
+  "SABSA": {
+    "exp": "Sherwood Applied Business Security Architecture"
+  },
+  "SAE": {
+    "exp": "Simultaneous Authentication of Equals"
+  },
+  "SASE": {
+    "exp": "Secure access service edge"
+  },
+  "SCADA": {
+    "exp": "Supervisory control and data acquisition"
+  },
+  "SCC": {
+    "exp": "Standard contractual clauses"
+  },
+  "SCP": {
+    "exp": "Secure Copy Protocol"
+  },
+  "SD": {
+    "exp": "Software-defined"
+  },
+  "SLAAC": {
+    "exp": "Stateless address autoconfiguration"
+  },
+  "SLH": {
+    "exp": "Stateless hash-based (as in SLH-DSA)"
+  },
+  "SNMPv1": {
+    "exp": "Simple Network Management Protocol version 1"
+  },
+  "SNMPv2c": {
+    "exp": "Simple Network Management Protocol version 2c (community-based)"
+  },
+  "SNMPv3": {
+    "exp": "Simple Network Management Protocol version 3"
+  },
+  "SOHO": {
+    "exp": "Small office/home office"
+  },
+  "SSID": {
+    "exp": "Service set identifier"
+  },
+  "STAR": {
+    "exp": "Security, Trust, Assurance and Risk (Cloud Security Alliance registry)"
+  },
+  "STP": {
+    "exp": "Spanning Tree Protocol"
+  },
+  "SVI": {
+    "exp": "Switch virtual interface"
+  },
+  "SYN": {
+    "exp": "Synchronize (TCP flag)"
+  },
+  "TACACS": {
+    "exp": "Terminal Access Controller Access-Control System (TACACS+ is the Cisco Plus version)"
+  },
+  "TCB": {
+    "exp": "Trusted computing base"
+  },
+  "TFTP": {
+    "exp": "Trivial File Transfer Protocol"
+  },
+  "TGS": {
+    "exp": "Ticket-Granting Service"
+  },
+  "TGT": {
+    "exp": "Ticket-granting ticket"
+  },
+  "TKIP": {
+    "exp": "Temporal Key Integrity Protocol"
+  },
+  "TOTP": {
+    "exp": "Time-based one-time password"
+  },
+  "UTP": {
+    "exp": "Unshielded twisted pair"
+  },
+  "VLSM": {
+    "exp": "Variable-length subnet masking"
+  },
+  "VRF": {
+    "exp": "Virtual routing and forwarding"
+  },
+  "VRRP": {
+    "exp": "Virtual Router Redundancy Protocol"
+  },
+  "VTP": {
+    "exp": "VLAN Trunking Protocol"
+  },
+  "VXLAN": {
+    "exp": "Virtual Extensible LAN"
+  },
+  "VoIP": {
+    "exp": "Voice over Internet Protocol"
+  },
+  "WLAN": {
+    "exp": "Wireless local area network"
+  },
+  "WLC": {
+    "exp": "Wireless LAN controller"
+  },
+  "WPA": {
+    "exp": "Wi-Fi Protected Access"
+  },
+  "WPA2": {
+    "exp": "Wi-Fi Protected Access 2"
+  },
+  "WRED": {
+    "exp": "Weighted random early detection"
+  },
+  "WRT": {
+    "exp": "Work recovery time"
+  },
+  "YANG": {
+    "exp": "Yet Another Next Generation (data modelling language)"
+  },
+  "ZTNA": {
+    "exp": "Zero trust network access"
+  },
+  "CPTED": {
+    "exp": "Crime Prevention Through Environmental Design"
+  },
+  "DOM": {
+    "exp": "Document Object Model"
+  },
+  "MAO": {
+    "exp": "Maximum acceptable outage"
+  },
+  "SCRM": {
+    "exp": "Supply chain risk management"
+  },
+  "AUP": {
+    "exp": "Acceptable use policy"
+  },
+  "CSIRT": {
+    "exp": "Computer security incident response team"
+  },
+  "IOC": {
+    "exp": "Indicator of compromise"
+  },
+  "SSCP": {
+    "exp": "Systems Security Certified Practitioner"
+  },
+  "SoD": {
+    "exp": "Separation of duties"
+  },
+  "UEM": {
+    "exp": "Unified endpoint management"
+  },
+  "WMI": {
+    "exp": "Windows Management Instrumentation"
   }
 }

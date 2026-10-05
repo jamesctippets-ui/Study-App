@@ -552,6 +552,18 @@ where one genuinely fits, vocab/quiz call-outs, and common-traps notes):
   five exam domains, plus full course mode (6 lessons: deployment models &
   virtualization, scaling & resilience, security, deployment strategies,
   operations/governance, and troubleshooting).
+- **CCNA and the ISC2 certifications** — seven tracks added together:
+  **CCNA** (Cisco 200-301, v1.1: 233 flashcards, 201 questions, 14 lessons and
+  45 typed **Cisco IOS** command challenges), **ISC2 CC**, **SSCP**, **CISSP**,
+  **CCSP**, **CGRC** and **CSSLP** (1,161 flashcards and 1,128 questions across the
+  seven, each with a guided Path, games, a cheat sheet and an exam-day strategy
+  section). Each cert states its **work-experience requirement** (for example CISSP
+  5 years, CCSP 5 years, CSSLP 4, CGRC 2, SSCP 1, CC none, CCNA 1 recommended) as a
+  chip on the cert lists, the Path header and the Profile plan, and as a full card on
+  the Exam tab with the waivers and the Associate of ISC2 route. The content was
+  written from search results and general knowledge because ISC2's and Cisco's own
+  pages could not be opened from the build environment; check each outline before
+  you book. ISSAP, ISSEP and ISSMP are not covered.
 - **EHR Integration** — *not a certification.* Epic (the dominant hospital EHR
   vendor) requires employer sponsorship to even take its exams, and its exam
   content is proprietary, so there's no legitimate way to build real cert-prep
@@ -577,6 +589,8 @@ data/
   az900.py      — AZ-900 categories, flashcards, questions, course lessons
   az104.py      — AZ-104 categories, flashcards, questions, course lessons
   cloudplus.py  — CompTIA Cloud+ categories, flashcards, questions, course lessons
+  ccna.py, cissp.py — combine ccna_a/_b and cissp_a/_b (two parts each, written in parallel)
+  isc2cc.py, sscp.py, ccsp.py, cgrc.py, csslp.py — the ISC2 tracks (experience requirements live in tracks.py)
 src/js/
   00_preamble.js        — React hook imports, the COLOR palette
   01_diagrams.jsx        — SVG lesson diagrams
