@@ -51,6 +51,7 @@ function CertStudyApp() {
   const speechSupported = typeof window !== 'undefined' && 'speechSynthesis' in window;
   const { ttsRate, ttsVoiceURI, setTtsRate, setTtsVoiceURI } = useTtsPrefs();
   const [soundOn, setSoundOn] = useSoundPrefs();
+  const [dyslexicFont, setDyslexicFont] = useFontPrefs();
   const [ttsVoices, setTtsVoices] = useState([]);
 
   // Verbal Quiz — a hands-free, audio-only quiz flow (read question, pause
@@ -1643,6 +1644,8 @@ function CertStudyApp() {
           isTestSpeaking={speakingId === '__tts_test__'}
           soundOn={soundOn}
           onSetSoundOn={setSoundOn}
+          dyslexicFont={dyslexicFont}
+          onSetDyslexicFont={setDyslexicFont}
           pathLocking={stats.pathLocking !== false}
           onSetPathLocking={(on) => saveStats({ ...statsRef.current, pathLocking: on })}
         />
@@ -1659,7 +1662,7 @@ function CertStudyApp() {
           </button>
           <div style={{ flex: 1, minWidth: 0 }}>
             {mode === 'home' ? (
-              <div className="itil-display" style={{ fontSize: '20px', lineHeight: 1.1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>Cert Study</div>
+              <div className="itil-display app-title" style={{ fontSize: '20px', lineHeight: 1.1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>Cert Study</div>
             ) : (
               <button
                 onClick={() => setShowTrackSwitcher(true)}
@@ -1667,7 +1670,7 @@ function CertStudyApp() {
                 title="Switch track"
                 style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', textAlign: 'left', background: 'transparent', border: 'none', padding: '4px 0', maxWidth: '100%' }}
               >
-                <span className="itil-display" style={{ fontSize: '22px', lineHeight: 1.1, color: trackAccent(activeTrack) }}>{track.label}</span>
+                <span className="itil-display app-title" style={{ fontSize: '22px', lineHeight: 1.1, color: trackAccent(activeTrack) }}>{track.label}</span>
                 <span style={{ fontSize: '12px', color: COLOR.muted }}>▾</span>
               </button>
             )}

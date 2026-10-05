@@ -272,6 +272,27 @@ function TabIcon({ kind, size = 24 }) {
   }
 }
 
+// Reading font. OpenDyslexic is an opt-in alternative to the default
+// (Nunito); like theme and voice it is a per-device display preference kept in
+// plain localStorage. The <head> also reads it before first paint so the page
+// never flashes the wrong font.
+const FONT_STORAGE_KEY = 'certStudyHub_fontPrefs';
+
+function useFontPrefs() {
+  const [dyslexic, setDyslexicState] = useState(() => {
+    try { return !!JSON.parse(localStorage.getItem(FONT_STORAGE_KEY) || '{}').dyslexic; } catch (e) { return false; }
+  });
+  useEffect(() => {
+    if (dyslexic) document.documentElement.setAttribute('data-font', 'dyslexic');
+    else document.documentElement.removeAttribute('data-font');
+  }, [dyslexic]);
+  const setDyslexic = (on) => {
+    setDyslexicState(on);
+    try { localStorage.setItem(FONT_STORAGE_KEY, JSON.stringify({ dyslexic: on })); } catch (e) { /* ignore */ }
+  };
+  return [dyslexic, setDyslexic];
+}
+
 // Celebration sounds: tiny synthesized arpeggios (Web Audio, no audio files).
 // Off by default, and a per-device preference like theme and voice, so it
 // lives in plain localStorage rather than in synced progress.

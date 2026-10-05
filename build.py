@@ -640,7 +640,20 @@ def sync_service_worker_cache_name(html):
     """
     sw_path = ROOT / "service-worker.js"
     sw_text = sw_path.read_text()
-    content_hash = hashlib.sha256(html.encode()).hexdigest()[:10]
+    # Every image and font file is precached, so a fully offline session shows
+    # the same screenshots and typography as an online one. The list between
+    # the markers is regenerated here from what is actually on disk.
+    assets = sorted(
+        "./" + p.relative_to(ROOT).as_posix()
+        for folder in ("images", "fonts")
+        for p in (ROOT / folder).rglob("*")
+        if p.is_file() and p.suffix.lower() in {".png", ".jpg", ".jpeg", ".svg", ".webp", ".gif", ".woff2"}
+    )
+    block = "  // BEGIN GENERATED ASSETS (build.py)\n" + "".join(f"  '{a}',\n" for a in assets) + "  // END GENERATED ASSETS"
+    sw_text, n_block = re.subn(r"  // BEGIN GENERATED ASSETS.*?// END GENERATED ASSETS", lambda m: block, sw_text, count=1, flags=re.DOTALL)
+    if n_block != 1:
+        raise SystemExit("service-worker.js is missing the GENERATED ASSETS markers")
+    content_hash = hashlib.sha256((html + "\n".join(assets)).encode()).hexdigest()[:10]
     new_line = f"const CACHE_NAME = 'cert-study-hub-{content_hash}';"
     updated, count = re.subn(r"^const CACHE_NAME = '.*';$", new_line, sw_text, count=1, flags=re.MULTILINE)
     if count != 1:

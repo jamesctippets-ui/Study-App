@@ -15,10 +15,8 @@
 <meta name="apple-mobile-web-app-title" content="Cert Study" />
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
 <link rel="icon" href="icons/icon-192.png" />
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link rel="preconnect" href="https://cdnjs.cloudflare.com" />
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@500;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap" />
+<script>try{if(JSON.parse(localStorage.getItem("certStudyHub_fontPrefs")||"{}").dyslexic)document.documentElement.setAttribute("data-font","dyslexic");}catch(e){}</script>
 <style>
   /* Tailwind's Preflight base reset (https://tailwindcss.com/docs/preflight),
      copied verbatim minus its theme() lookups resolved to their default
@@ -111,8 +109,18 @@
   html { scroll-behavior: smooth; }
   html, body { margin: 0; padding: 0; background: var(--color-bg); transition: background-color 0.15s ease; }
   * { box-sizing: border-box; }
-  body, button, textarea { font-family: 'Nunito', 'Inter', sans-serif; }
-  .itil-display { font-family: 'Nunito', 'Inter', sans-serif; font-weight: 800 !important; letter-spacing: -0.01em; }
+  /* Self-hosted fonts (see fonts/README.md for sources and licences). */
+  @font-face { font-family: 'Nunito'; font-style: normal; font-weight: 500 900; font-display: swap; src: url(fonts/nunito-latin.woff2) format('woff2'); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+  @font-face { font-family: 'Nunito'; font-style: normal; font-weight: 500 900; font-display: swap; src: url(fonts/nunito-latin-ext.woff2) format('woff2'); unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF; }
+  @font-face { font-family: 'OpenDyslexic'; font-style: normal; font-weight: 400 500; font-display: swap; src: url(fonts/opendyslexic-400.woff2) format('woff2'); }
+  @font-face { font-family: 'OpenDyslexic'; font-style: normal; font-weight: 600 900; font-display: swap; src: url(fonts/opendyslexic-700.woff2) format('woff2'); }
+  :root { --font-body: 'Nunito', system-ui, -apple-system, 'Segoe UI', sans-serif; }
+  :root[data-font="dyslexic"] { --font-body: 'OpenDyslexic', 'Nunito', system-ui, sans-serif; }
+  body, button, textarea, select, input { font-family: var(--font-body); }
+  .itil-display { font-family: var(--font-body); font-weight: 800 !important; letter-spacing: -0.01em; }
+  :root[data-font="dyslexic"] body { line-height: 1.55; }
+  :root[data-font="dyslexic"] .itil-display { letter-spacing: 0; }
+  :root[data-font="dyslexic"] .app-title { font-size: 16px !important; }
   textarea:focus-visible, button:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 1px; }
   textarea:focus, button:focus { outline: none; }
   button { transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, transform 0.1s ease, opacity 0.15s ease, box-shadow 0.1s ease; cursor: pointer; }
@@ -466,6 +474,27 @@ function TabIcon({ kind, size = 24 }) {
     default:
       return null;
   }
+}
+
+// Reading font. OpenDyslexic is an opt-in alternative to the default
+// (Nunito); like theme and voice it is a per-device display preference kept in
+// plain localStorage. The <head> also reads it before first paint so the page
+// never flashes the wrong font.
+const FONT_STORAGE_KEY = 'certStudyHub_fontPrefs';
+
+function useFontPrefs() {
+  const [dyslexic, setDyslexicState] = useState(() => {
+    try { return !!JSON.parse(localStorage.getItem(FONT_STORAGE_KEY) || '{}').dyslexic; } catch (e) { return false; }
+  });
+  useEffect(() => {
+    if (dyslexic) document.documentElement.setAttribute('data-font', 'dyslexic');
+    else document.documentElement.removeAttribute('data-font');
+  }, [dyslexic]);
+  const setDyslexic = (on) => {
+    setDyslexicState(on);
+    try { localStorage.setItem(FONT_STORAGE_KEY, JSON.stringify({ dyslexic: on })); } catch (e) { /* ignore */ }
+  };
+  return [dyslexic, setDyslexic];
 }
 
 // Celebration sounds: tiny synthesized arpeggios (Web Audio, no audio files).
@@ -4501,7 +4530,7 @@ function AchievementsPanel({ achievements, streak, onClose }) {
 function DataPanel({
   trackLabel, onExport, onImportFile, importMessage, onReset, onClose,
   speechSupported, ttsVoices, ttsRate, ttsVoiceURI, onSetTtsRate, onSetTtsVoiceURI, onTestVoice, isTestSpeaking,
-  soundOn, onSetSoundOn, pathLocking, onSetPathLocking,
+  soundOn, onSetSoundOn, pathLocking, onSetPathLocking, dyslexicFont, onSetDyslexicFont,
 }) {
   useEscapeToClose(onClose);
   const [confirmingReset, setConfirmingReset] = useState(false);
@@ -4540,6 +4569,20 @@ function DataPanel({
         <div className="flex justify-between items-center mb-2">
           <div className="itil-display" style={{ fontSize: '18px', fontWeight: 600 }}>Data & Progress</div>
           <button onClick={onClose} className="btn-flat" style={{ color: COLOR.muted, fontSize: '15px', padding: '4px' }}>✕</button>
+        </div>
+
+        <div style={{ marginTop: '14px', padding: '14px', borderRadius: '14px', background: COLOR.surface, border: `2px solid ${COLOR.border}` }}>
+          <div style={{ fontSize: '13.5px', fontWeight: 600, marginBottom: '4px' }}>Reading</div>
+          <label style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '12px', marginTop: '8px', fontSize: '12.5px' }}>
+            <span>
+              OpenDyslexic font
+              <span style={{ display: 'block', fontSize: '11.5px', color: COLOR.muted, lineHeight: 1.4 }}>A typeface with weighted letter bottoms, designed to make letters easier to tell apart. Applies to the whole app; saved on this device only.</span>
+            </span>
+            <input type="checkbox" checked={!!dyslexicFont} onChange={(e) => onSetDyslexicFont(e.target.checked)} style={{ width: '20px', height: '20px', flexShrink: 0, marginTop: '2px' }} aria-label="OpenDyslexic font" />
+          </label>
+          <div style={{ marginTop: '10px', padding: '10px 12px', borderRadius: '10px', background: COLOR.surfaceRaised, fontSize: '14px', lineHeight: 1.5 }}>
+            Preview: Azure role-based access control (RBAC) assigns permissions at a scope.
+          </div>
         </div>
 
         <div style={{ marginTop: '14px', padding: '14px', borderRadius: '14px', background: COLOR.surface, border: `2px solid ${COLOR.border}` }}>
@@ -9981,6 +10024,7 @@ function CertStudyApp() {
   const speechSupported = typeof window !== 'undefined' && 'speechSynthesis' in window;
   const { ttsRate, ttsVoiceURI, setTtsRate, setTtsVoiceURI } = useTtsPrefs();
   const [soundOn, setSoundOn] = useSoundPrefs();
+  const [dyslexicFont, setDyslexicFont] = useFontPrefs();
   const [ttsVoices, setTtsVoices] = useState([]);
 
   // Verbal Quiz — a hands-free, audio-only quiz flow (read question, pause
@@ -11573,6 +11617,8 @@ function CertStudyApp() {
           isTestSpeaking={speakingId === '__tts_test__'}
           soundOn={soundOn}
           onSetSoundOn={setSoundOn}
+          dyslexicFont={dyslexicFont}
+          onSetDyslexicFont={setDyslexicFont}
           pathLocking={stats.pathLocking !== false}
           onSetPathLocking={(on) => saveStats({ ...statsRef.current, pathLocking: on })}
         />
@@ -11589,7 +11635,7 @@ function CertStudyApp() {
           </button>
           <div style={{ flex: 1, minWidth: 0 }}>
             {mode === 'home' ? (
-              <div className="itil-display" style={{ fontSize: '20px', lineHeight: 1.1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>Cert Study</div>
+              <div className="itil-display app-title" style={{ fontSize: '20px', lineHeight: 1.1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>Cert Study</div>
             ) : (
               <button
                 onClick={() => setShowTrackSwitcher(true)}
@@ -11597,7 +11643,7 @@ function CertStudyApp() {
                 title="Switch track"
                 style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', textAlign: 'left', background: 'transparent', border: 'none', padding: '4px 0', maxWidth: '100%' }}
               >
-                <span className="itil-display" style={{ fontSize: '22px', lineHeight: 1.1, color: trackAccent(activeTrack) }}>{track.label}</span>
+                <span className="itil-display app-title" style={{ fontSize: '22px', lineHeight: 1.1, color: trackAccent(activeTrack) }}>{track.label}</span>
                 <span style={{ fontSize: '12px', color: COLOR.muted }}>▾</span>
               </button>
             )}

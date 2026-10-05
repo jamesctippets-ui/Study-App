@@ -78,7 +78,7 @@ function AchievementsPanel({ achievements, streak, onClose }) {
 function DataPanel({
   trackLabel, onExport, onImportFile, importMessage, onReset, onClose,
   speechSupported, ttsVoices, ttsRate, ttsVoiceURI, onSetTtsRate, onSetTtsVoiceURI, onTestVoice, isTestSpeaking,
-  soundOn, onSetSoundOn, pathLocking, onSetPathLocking,
+  soundOn, onSetSoundOn, pathLocking, onSetPathLocking, dyslexicFont, onSetDyslexicFont,
 }) {
   useEscapeToClose(onClose);
   const [confirmingReset, setConfirmingReset] = useState(false);
@@ -117,6 +117,20 @@ function DataPanel({
         <div className="flex justify-between items-center mb-2">
           <div className="itil-display" style={{ fontSize: '18px', fontWeight: 600 }}>Data & Progress</div>
           <button onClick={onClose} className="btn-flat" style={{ color: COLOR.muted, fontSize: '15px', padding: '4px' }}>✕</button>
+        </div>
+
+        <div style={{ marginTop: '14px', padding: '14px', borderRadius: '14px', background: COLOR.surface, border: `2px solid ${COLOR.border}` }}>
+          <div style={{ fontSize: '13.5px', fontWeight: 600, marginBottom: '4px' }}>Reading</div>
+          <label style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '12px', marginTop: '8px', fontSize: '12.5px' }}>
+            <span>
+              OpenDyslexic font
+              <span style={{ display: 'block', fontSize: '11.5px', color: COLOR.muted, lineHeight: 1.4 }}>A typeface with weighted letter bottoms, designed to make letters easier to tell apart. Applies to the whole app; saved on this device only.</span>
+            </span>
+            <input type="checkbox" checked={!!dyslexicFont} onChange={(e) => onSetDyslexicFont(e.target.checked)} style={{ width: '20px', height: '20px', flexShrink: 0, marginTop: '2px' }} aria-label="OpenDyslexic font" />
+          </label>
+          <div style={{ marginTop: '10px', padding: '10px 12px', borderRadius: '10px', background: COLOR.surfaceRaised, fontSize: '14px', lineHeight: 1.5 }}>
+            Preview: Azure role-based access control (RBAC) assigns permissions at a scope.
+          </div>
         </div>
 
         <div style={{ marginTop: '14px', padding: '14px', borderRadius: '14px', background: COLOR.surface, border: `2px solid ${COLOR.border}` }}>
