@@ -172,8 +172,8 @@ EXAM_CONFIG = {
         'length': 60, 'minutes': 80, 'passPct': 75, 'passLabel': "ISC2 scores this 0-1000 with 700 to pass, not a flat percentage. Treat 75%+ here as a safe buffer, not an exact predictor. The real exam is adaptive (100-125 questions in 2 hours); this mock is shorter.",
         'experience': {
             'level': 'required', 'years': 1,
-            'summary': 'One year of cumulative paid work experience in one or more of the seven SSCP domains.',
-            'waivers': ['A bachelor\'s or master\'s degree in a cybersecurity program (or one on ISC2\'s pre-approved list) can satisfy the one year.'],
+            'summary': 'One year of full-time work experience in one or more of the seven SSCP domains. Part-time work and internships may also count.',
+            'waivers': ['A bachelor\'s or master\'s degree in computer science, information technology or a related field may satisfy up to the one year.'],
             'associate': 'No experience yet? Pass the exam to become an Associate of ISC2, then you have two years to earn the one year of experience.',
         },
         'resources': [
@@ -187,8 +187,8 @@ EXAM_CONFIG = {
         'length': 75, 'minutes': 110, 'passPct': 75, 'passLabel': "ISC2 scores this 0-1000 with 700 to pass, not a flat percentage. Treat 75%+ here as a safe buffer, not an exact predictor. The real exam is adaptive (100-150 questions, up to 3 hours); this mock uses a fixed set of 75.",
         'experience': {
             'level': 'required', 'years': 5,
-            'summary': 'Five years of cumulative paid work experience in two or more of the eight CISSP domains.',
-            'waivers': ['One year can be waived with a four-year degree (or regional equivalent) or an approved credential from ISC2\'s list (cut to about 25 credentials on April 1, 2026; CEH, CISA, CRISC and OSCP were removed). Only one year can be waived.'],
+            'summary': 'Five years of cumulative, full-time work experience in two or more of the eight CISSP domains. Part-time work and internships may also count.',
+            'waivers': ['A bachelor\'s or master\'s degree in computer science, information technology or a related field may satisfy up to one year, or an additional credential from ISC2\'s approved list may satisfy up to one year (the list was cut to about 25 credentials on April 1, 2026; CEH, CISA, CRISC and OSCP were removed).'],
             'associate': 'No experience yet? Pass the exam to become an Associate of ISC2, then you have six years to earn the experience.',
         },
         'resources': [
@@ -201,8 +201,8 @@ EXAM_CONFIG = {
         'length': 65, 'minutes': 100, 'passPct': 75, 'passLabel': "ISC2 scores this 0-1000 with 700 to pass, not a flat percentage. Treat 75%+ here as a safe buffer, not an exact predictor. The real exam is adaptive (up to 150 questions, 3 hours); this mock is shorter. A revised exam outline took effect August 1, 2026.",
         'experience': {
             'level': 'required', 'years': 5,
-            'summary': 'Five years of cumulative paid work experience in information technology, including three in information security and one in one or more of the six CCSP domains.',
-            'waivers': ['Holding the CISSP credential satisfies the whole experience requirement.', 'A relevant degree can cover up to one year, and CSA\'s CCSK certificate can cover one year. Check ISC2 for the current rules.'],
+            'summary': 'Five years of cumulative, full-time experience in information technology, including three in cybersecurity and one in one or more of the six CCSP domains. Part-time work and internships may also count.',
+            'waivers': ['An active CISSP credential may be substituted for the entire experience requirement.', 'A bachelor\'s or master\'s degree in computer science, IT or a related field may satisfy up to one year, and CSA\'s CCSK certificate can substitute for one year. Only one year can be waived.'],
             'associate': 'No experience yet? Pass the exam to become an Associate of ISC2, then you have six years to earn the experience.',
         },
         'resources': [
@@ -218,7 +218,7 @@ EXAM_CONFIG = {
         'length': 60, 'minutes': 90, 'passPct': 75, 'passLabel': "ISC2 scores this 0-1000 with 700 to pass, not a flat percentage. Treat 75%+ here as a safe buffer, not an exact predictor. The real exam has 125 questions in 3 hours; this mock is shorter.",
         'experience': {
             'level': 'required', 'years': 2,
-            'summary': 'Two years of cumulative, paid, full-time work experience in one or more of the seven CGRC domains. Part-time work and internships may also count toward it.',
+            'summary': 'Two years of cumulative work experience in one or more of the seven CGRC domains.',
             'waivers': [],
             'associate': 'No experience yet? Pass the exam to become an Associate of ISC2, then you have three years to earn the experience.',
         },
@@ -235,8 +235,8 @@ EXAM_CONFIG = {
         'length': 60, 'minutes': 90, 'passPct': 75, 'passLabel': "ISC2 scores this 0-1000 with 700 to pass, not a flat percentage. Treat 75%+ here as a safe buffer, not an exact predictor. The real exam has 125 questions in 3 hours; this mock is shorter.",
         'experience': {
             'level': 'required', 'years': 4,
-            'summary': 'Four years of cumulative, paid, full-time work experience in one or more of the eight CSSLP domains.',
-            'waivers': ['One year can be waived with a four-year degree in computer science, IT or a related field. An approved ISC2 credential may also waive a year; check ISC2\'s current list.'],
+            'summary': 'Four years of cumulative, full-time work experience in one or more of the eight CSSLP domains. Part-time work and internships may also count.',
+            'waivers': ['A bachelor\'s or master\'s degree in computer science, information technology or a related field may satisfy up to one year.'],
             'associate': 'No experience yet? Pass the exam to become an Associate of ISC2, then you have five years to earn the experience.',
         },
         'resources': [

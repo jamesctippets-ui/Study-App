@@ -397,9 +397,9 @@
       "experience": {
         "level": "required",
         "years": 1,
-        "summary": "One year of cumulative paid work experience in one or more of the seven SSCP domains.",
+        "summary": "One year of full-time work experience in one or more of the seven SSCP domains. Part-time work and internships may also count.",
         "waivers": [
-          "A bachelor's or master's degree in a cybersecurity program (or one on ISC2's pre-approved list) can satisfy the one year."
+          "A bachelor's or master's degree in computer science, information technology or a related field may satisfy up to the one year."
         ],
         "associate": "No experience yet? Pass the exam to become an Associate of ISC2, then you have two years to earn the one year of experience."
       },
@@ -430,9 +430,9 @@
       "experience": {
         "level": "required",
         "years": 5,
-        "summary": "Five years of cumulative paid work experience in two or more of the eight CISSP domains.",
+        "summary": "Five years of cumulative, full-time work experience in two or more of the eight CISSP domains. Part-time work and internships may also count.",
         "waivers": [
-          "One year can be waived with a four-year degree (or regional equivalent) or an approved credential from ISC2's list (cut to about 25 credentials on April 1, 2026; CEH, CISA, CRISC and OSCP were removed). Only one year can be waived."
+          "A bachelor's or master's degree in computer science, information technology or a related field may satisfy up to one year, or an additional credential from ISC2's approved list may satisfy up to one year (the list was cut to about 25 credentials on April 1, 2026; CEH, CISA, CRISC and OSCP were removed)."
         ],
         "associate": "No experience yet? Pass the exam to become an Associate of ISC2, then you have six years to earn the experience."
       },
@@ -459,10 +459,10 @@
       "experience": {
         "level": "required",
         "years": 5,
-        "summary": "Five years of cumulative paid work experience in information technology, including three in information security and one in one or more of the six CCSP domains.",
+        "summary": "Five years of cumulative, full-time experience in information technology, including three in cybersecurity and one in one or more of the six CCSP domains. Part-time work and internships may also count.",
         "waivers": [
-          "Holding the CISSP credential satisfies the whole experience requirement.",
-          "A relevant degree can cover up to one year, and CSA's CCSK certificate can cover one year. Check ISC2 for the current rules."
+          "An active CISSP credential may be substituted for the entire experience requirement.",
+          "A bachelor's or master's degree in computer science, IT or a related field may satisfy up to one year, and CSA's CCSK certificate can substitute for one year. Only one year can be waived."
         ],
         "associate": "No experience yet? Pass the exam to become an Associate of ISC2, then you have six years to earn the experience."
       },
@@ -501,7 +501,7 @@
       "experience": {
         "level": "required",
         "years": 2,
-        "summary": "Two years of cumulative, paid, full-time work experience in one or more of the seven CGRC domains. Part-time work and internships may also count toward it.",
+        "summary": "Two years of cumulative work experience in one or more of the seven CGRC domains.",
         "waivers": [],
         "associate": "No experience yet? Pass the exam to become an Associate of ISC2, then you have three years to earn the experience."
       },
@@ -540,9 +540,9 @@
       "experience": {
         "level": "required",
         "years": 4,
-        "summary": "Four years of cumulative, paid, full-time work experience in one or more of the eight CSSLP domains.",
+        "summary": "Four years of cumulative, full-time work experience in one or more of the eight CSSLP domains. Part-time work and internships may also count.",
         "waivers": [
-          "One year can be waived with a four-year degree in computer science, IT or a related field. An approved ISC2 credential may also waive a year; check ISC2's current list."
+          "A bachelor's or master's degree in computer science, information technology or a related field may satisfy up to one year."
         ],
         "associate": "No experience yet? Pass the exam to become an Associate of ISC2, then you have five years to earn the experience."
       },
