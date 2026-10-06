@@ -1322,7 +1322,7 @@ LESSONS = [
         'id': 'cloud-foundations-shared-responsibility',
         'title': 'Cloud Foundations and Shared Responsibility',
         'summary': 'What makes something cloud, the service and deployment models, who is responsible for what, and the emerging technologies (AI, confidential computing) the newer outline folds in.',
-        'diagram': None,
+        'diagram': 'cswShared',
         'vocabIds': _vocab(['found'], 9),
         'quizIds': _quiz(['found'], 3, 1, 1, 1),
         'reading': """Cloud computing is a way of renting computing power instead of owning it. The formal definition used by the exam, from NIST, names five essential characteristics: on-demand self-service (you provision resources yourself, without filing a ticket), broad network access, resource pooling, rapid elasticity and measured service. If a vendor hosts a server for you but you must phone them to resize it and pay a flat monthly fee, that is hosting, not cloud. The characteristic that most shapes security is resource pooling, because it produces multi-tenancy: many customers sharing the same physical machines, separated only by software. Isolation between tenants is therefore a cornerstone of cloud security and a favorite exam topic.
@@ -1351,7 +1351,7 @@ The outline also asks how newer technologies change the picture. Artificial inte
         'id': 'data-lifecycle-classification-dlp',
         'title': 'Data Lifecycle, Classification and Loss Prevention',
         'summary': 'Where data lives, how it is classified and handled across the life cycle, and the controls that stop it leaking: discovery, DLP, IRM, masking and secure deletion.',
-        'diagram': None,
+        'diagram': 'cswLifecycle',
         'vocabIds': _vocab(['life'], 9),
         'quizIds': _quiz(['life'], 3, 1, 1, 1),
         'reading': """Data security begins with a simple question that many organizations cannot answer: what data do we have and where is it? The cloud data life cycle gives a structure for the answer. Data is created, stored, used, shared, archived and finally destroyed, and a different control matters most at each stage. At creation you classify the data and assign an owner. While stored it needs encryption and access control. While used it needs monitoring and rights management. When shared, it needs protection that follows it. At the end it needs retention rules, legal holds respected and verified destruction.
@@ -1382,7 +1382,7 @@ Finally, the newer outline adds data lakes and training datasets to the picture.
         'id': 'encryption-keys-tokenization',
         'title': 'Encryption, Key Management and Tokenization',
         'summary': 'Encrypting data at rest, in transit and in use; envelope encryption and KMS; BYOK, HYOK and HSMs; tokenization, hashing, secrets and crypto agility.',
-        'diagram': None,
+        'diagram': 'cswEnvelope',
         'vocabIds': _vocab(['crypto'], 9),
         'quizIds': _quiz(['crypto'], 3, 1, 1, 1),
         'reading': """Encryption in the cloud is easy to switch on and easy to get wrong, because the hard part is not the algorithm but who holds the keys. Start with the three states of data. Data at rest sits in storage and is protected with volume, database or object encryption. Data in transit moves across a network and is protected by Transport Layer Security, with TLS 1.3 the current version and legacy protocols disabled. Data in use is being processed in memory, where traditional encryption cannot reach, and is protected by confidential computing or, in specialized cases, homomorphic encryption. A complete design addresses all three, and exam questions usually ask you to match a control to the state of the data in the stem.
@@ -1411,7 +1411,7 @@ Tokenization and hashing solve different problems. Tokenization replaces a sensi
         'id': 'secure-infrastructure-virtualization',
         'title': 'Securing Cloud Infrastructure, Virtualization and Containers',
         'summary': 'Hypervisors, multi-tenancy, containers and Kubernetes, serverless, virtual networks and micro-segmentation, the management plane, and secure data center design.',
-        'diagram': None,
+        'diagram': 'cswIsolation',
         'vocabIds': _vocab(['infra'], 9),
         'quizIds': _quiz(['infra'], 3, 1, 1, 1),
         'reading': """The cloud is built on virtualization, so the first job of an infrastructure security architect is to understand the isolation boundaries. A hypervisor allows many virtual machines to share one physical host. A bare-metal (Type 1) hypervisor runs directly on the hardware and is what cloud platforms use. Isolation between tenants rests on the hypervisor, and the signature attack is a virtual machine escape, where code in one guest reaches the hypervisor or a neighbor. Shared hardware also leaks through side channels and noisy-neighbor effects. The provider patches and hardens the hypervisor; the customer's levers are choosing dedicated hosts for very sensitive workloads, applying quotas and, where available, using confidential computing so that even the host cannot see memory.
@@ -1440,7 +1440,7 @@ The management plane, meaning the console, command-line tools and programming in
         'id': 'resilience-bcdr-risk',
         'title': 'Resilience, BCDR and Cloud Risk Analysis',
         'summary': 'Business impact analysis, RTO and RPO, availability zones and regions, disaster recovery strategies, backups and testing, and risk analysis for cloud designs.',
-        'diagram': None,
+        'diagram': 'cswBcdr',
         'vocabIds': _vocab(['resil'], 9),
         'quizIds': _quiz(['resil'], 3, 1, 1, 1),
         'reading': """Business continuity and disaster recovery planning answers a plain question: when something goes wrong, how fast must we recover and how much can we afford to lose? Business continuity keeps critical functions running through a disruption; disaster recovery restores information technology systems after a disaster; together they are called BCDR. Everything begins with a business impact analysis. The analysis ranks processes by how much harm their loss does over time and produces two numbers for each. The recovery time objective is how long the service may be down. The recovery point objective is how much data may be lost, measured as time. A bank might need a recovery time of minutes and a recovery point of seconds for payments, and hours and a full day for an internal reporting tool. A third number, the maximum tolerable downtime, is the ceiling beyond which the harm becomes unacceptable, and the recovery time must sit below it.
@@ -1469,7 +1469,7 @@ Risk analysis sits alongside all of this. For a cloud design, identify assets, t
         'id': 'secure-sdlc-apis-iam',
         'title': 'Secure Development, APIs and Identity for Cloud Applications',
         'summary': 'Secure SDLC and DevSecOps, threat modeling, testing types, supply chain and API security, AI application risks, and identity federation, MFA and privileged access.',
-        'diagram': None,
+        'diagram': 'cswApiFlow',
         'vocabIds': _vocab(['app', 'iam'], 9),
         'quizIds': _quiz(['app', 'iam'], 3, 1, 1, 1),
         'reading': """Cloud applications change quickly, so security has to be built into the process that produces them rather than inspected at the end. A secure software development life cycle places security activities in every phase: requirements define security needs, design includes threat modeling, coding follows secure standards, testing includes security tests, and deployment and maintenance include monitoring and patching. DevSecOps carries this into continuous integration and delivery, where automated scans act as gates and policy as code replaces slow manual sign-off. The principle to remember is shifting left: a flaw found in design costs a conversation, and the same flaw in production costs an incident.
@@ -1498,7 +1498,7 @@ Identity ties it all together. Federation lets users authenticate once to an ide
         'id': 'cloud-security-operations-ir',
         'title': 'Cloud Security Operations, Logging, Incident Response and Forensics',
         'summary': 'Logging and SIEM, posture and configuration management, patching, detection and hunting, the incident response life cycle, forensics and evidence handling in the cloud, and AI-related operations.',
-        'diagram': None,
+        'diagram': 'cswIr',
         'vocabIds': _vocab(['ops'], 9),
         'quizIds': _quiz(['ops'], 3, 1, 1, 1),
         'reading': """Security operations is the discipline of keeping the environment secure after it is built. It starts with visibility. Management-plane audit logs record who did what through the console and interfaces; flow logs record network connections; workload, application and identity logs fill in the rest. Send them to a central store that the source systems cannot alter, keep clocks synchronized and retain them long enough for legal and investigative needs. A security information and event management platform correlates those logs and raises alerts, and orchestration and automation tools turn repetitive responses into playbooks. The pairing to remember is that the SIEM detects while orchestration responds, and both are only as good as the data they receive.
@@ -1527,7 +1527,7 @@ The newer outline adds several themes. Machine learning and analytics support th
         'id': 'legal-privacy-risk-audit',
         'title': 'Legal, Privacy, Risk, Audit and Vendor Management',
         'summary': 'GDPR and cross-border transfers, eDiscovery and government access, contracts and SLAs, SOC reports and ISO standards, CSA STAR, risk treatment and third-party management.',
-        'diagram': None,
+        'diagram': 'cswLegal',
         'vocabIds': _vocab(['legal'], 9),
         'quizIds': _quiz(['legal'], 3, 1, 1, 1),
         'reading': """Cloud puts data in other people's buildings, often in other countries, and the law follows the data. Start with the roles. The controller decides why and how personal data is processed and carries primary legal responsibility; the processor acts on its instructions. A cloud customer is usually the controller and the provider the processor, and providers may use sub-processors of their own. Handing processing to a provider outsources work, never accountability. The European General Data Protection Regulation shows the pattern most privacy laws now follow: principles such as lawfulness, minimization and accountability, rights for individuals to access, correct, erase and port their data, breach notification to authorities within 72 hours of becoming aware, and heavy fines. It applies based on whose data you process, not only where you sit.

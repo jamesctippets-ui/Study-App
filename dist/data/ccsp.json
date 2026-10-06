@@ -3705,7 +3705,7 @@
       "id": "cloud-foundations-shared-responsibility",
       "title": "Cloud Foundations and Shared Responsibility",
       "summary": "What makes something cloud, the service and deployment models, who is responsible for what, and the emerging technologies (AI, confidential computing) the newer outline folds in.",
-      "diagram": null,
+      "diagram": "cswShared",
       "vocabIds": [
         "f1",
         "f2",
@@ -3752,7 +3752,7 @@
       "id": "data-lifecycle-classification-dlp",
       "title": "Data Lifecycle, Classification and Loss Prevention",
       "summary": "Where data lives, how it is classified and handled across the life cycle, and the controls that stop it leaking: discovery, DLP, IRM, masking and secure deletion.",
-      "diagram": null,
+      "diagram": "cswLifecycle",
       "vocabIds": [
         "f28",
         "f29",
@@ -3800,7 +3800,7 @@
       "id": "encryption-keys-tokenization",
       "title": "Encryption, Key Management and Tokenization",
       "summary": "Encrypting data at rest, in transit and in use; envelope encryption and KMS; BYOK, HYOK and HSMs; tokenization, hashing, secrets and crypto agility.",
-      "diagram": null,
+      "diagram": "cswEnvelope",
       "vocabIds": [
         "f47",
         "f48",
@@ -3848,7 +3848,7 @@
       "id": "secure-infrastructure-virtualization",
       "title": "Securing Cloud Infrastructure, Virtualization and Containers",
       "summary": "Hypervisors, multi-tenancy, containers and Kubernetes, serverless, virtual networks and micro-segmentation, the management plane, and secure data center design.",
-      "diagram": null,
+      "diagram": "cswIsolation",
       "vocabIds": [
         "f64",
         "f65",
@@ -3896,7 +3896,7 @@
       "id": "resilience-bcdr-risk",
       "title": "Resilience, BCDR and Cloud Risk Analysis",
       "summary": "Business impact analysis, RTO and RPO, availability zones and regions, disaster recovery strategies, backups and testing, and risk analysis for cloud designs.",
-      "diagram": null,
+      "diagram": "cswBcdr",
       "vocabIds": [
         "f83",
         "f84",
@@ -3944,7 +3944,7 @@
       "id": "secure-sdlc-apis-iam",
       "title": "Secure Development, APIs and Identity for Cloud Applications",
       "summary": "Secure SDLC and DevSecOps, threat modeling, testing types, supply chain and API security, AI application risks, and identity federation, MFA and privileged access.",
-      "diagram": null,
+      "diagram": "cswApiFlow",
       "vocabIds": [
         "f94",
         "f95",
@@ -3992,7 +3992,7 @@
       "id": "cloud-security-operations-ir",
       "title": "Cloud Security Operations, Logging, Incident Response and Forensics",
       "summary": "Logging and SIEM, posture and configuration management, patching, detection and hunting, the incident response life cycle, forensics and evidence handling in the cloud, and AI-related operations.",
-      "diagram": null,
+      "diagram": "cswIr",
       "vocabIds": [
         "f122",
         "f123",
@@ -4040,7 +4040,7 @@
       "id": "legal-privacy-risk-audit",
       "title": "Legal, Privacy, Risk, Audit and Vendor Management",
       "summary": "GDPR and cross-border transfers, eDiscovery and government access, contracts and SLAs, SOC reports and ISO standards, CSA STAR, risk treatment and third-party management.",
-      "diagram": null,
+      "diagram": "cswLegal",
       "vocabIds": [
         "f149",
         "f150",
