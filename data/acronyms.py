@@ -861,6 +861,28 @@ ACRONYMS = {
     'UK': {'exp': 'United Kingdom'},
     'WEC': {'exp': 'Windows Event Collector'},
     'DoD': {'exp': 'Department of Defense'},
+    # DP-300 and AZ-802 refresh
+    'BITS': {'exp': 'Background Intelligent Transfer Service'},
+    'CE': {'exp': 'Cardinality estimation'},
+    'DDA': {'exp': 'Discrete Device Assignment'},
+    'DEP': {'exp': 'Data Execution Prevention'},
+    'DFSR': {'exp': 'Distributed File System Replication'},
+    'DOP': {'exp': 'Degree of parallelism'},
+    'ESU': {'exp': 'Extended Security Updates'},
+    'HKLM': {'exp': 'HKEY_LOCAL_MACHINE'},
+    'IOMMU': {'exp': 'Input/Output Memory Management Unit'},
+    'IOV': {'exp': 'Input/output virtualization (as in SR-IOV, Single Root I/O Virtualization)'},
+    'IQP': {'exp': 'Intelligent query processing'},
+    'NSEC': {'exp': 'Next Secure (DNSSEC record)'},
+    'NSEC3': {'exp': 'Next Secure 3 (DNSSEC record)'},
+    'NTDS': {'exp': 'NT Directory Services (the Active Directory database, NTDS.dit)'},
+    'PCIe': {'exp': 'Peripheral Component Interconnect Express'},
+    'RRSIG': {'exp': 'Resource Record Signature (DNSSEC record)'},
+    'SGX': {'exp': 'Software Guard Extensions (Intel SGX)'},
+    'SID': {'exp': 'Security identifier'},
+    'SPN': {'exp': 'Service principal name'},
+    'SYSVOL': {'exp': 'System Volume (the shared folder on domain controllers that holds Group Policy and logon scripts)'},
+    'UDF': {'exp': 'User-defined function'},
 }
 
 IGNORE = {
@@ -921,4 +943,7 @@ IGNORE = {
 
     # AB-650 and SC-500 refresh
     'AcrPull', 'MSOnline', 'MgGraph', 'MgUser', 'OpenVPN',
+
+    # DP-300 and AZ-802 refresh
+    'ALLOW', 'ARCHIVE', 'CHECKDB', 'CHECKSUM', 'COMPRESS', 'ClientId', 'DATA', 'DE', 'DnsName', 'F0', 'F1', 'FS01', 'HOTFIXES', 'LEFT', 'LOSS', 'OSConfig', 'OpenSSH', 'PAGE', 'RANGE', 'READ', 'REPAIR', 'RIGHT', 'ROW', 'SCOPED', 'SERVER', 'ScopeId', 'TABLOCK', 'VMName', 'W32Time', 'WRITE',
 }

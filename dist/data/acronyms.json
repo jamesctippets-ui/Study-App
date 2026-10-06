@@ -2475,5 +2475,68 @@
   },
   "DoD": {
     "exp": "Department of Defense"
+  },
+  "BITS": {
+    "exp": "Background Intelligent Transfer Service"
+  },
+  "CE": {
+    "exp": "Cardinality estimation"
+  },
+  "DDA": {
+    "exp": "Discrete Device Assignment"
+  },
+  "DEP": {
+    "exp": "Data Execution Prevention"
+  },
+  "DFSR": {
+    "exp": "Distributed File System Replication"
+  },
+  "DOP": {
+    "exp": "Degree of parallelism"
+  },
+  "ESU": {
+    "exp": "Extended Security Updates"
+  },
+  "HKLM": {
+    "exp": "HKEY_LOCAL_MACHINE"
+  },
+  "IOMMU": {
+    "exp": "Input/Output Memory Management Unit"
+  },
+  "IOV": {
+    "exp": "Input/output virtualization (as in SR-IOV, Single Root I/O Virtualization)"
+  },
+  "IQP": {
+    "exp": "Intelligent query processing"
+  },
+  "NSEC": {
+    "exp": "Next Secure (DNSSEC record)"
+  },
+  "NSEC3": {
+    "exp": "Next Secure 3 (DNSSEC record)"
+  },
+  "NTDS": {
+    "exp": "NT Directory Services (the Active Directory database, NTDS.dit)"
+  },
+  "PCIe": {
+    "exp": "Peripheral Component Interconnect Express"
+  },
+  "RRSIG": {
+    "exp": "Resource Record Signature (DNSSEC record)"
+  },
+  "SGX": {
+    "exp": "Software Guard Extensions (Intel SGX)"
+  },
+  "SID": {
+    "exp": "Security identifier"
+  },
+  "SPN": {
+    "exp": "Service principal name"
+  },
+  "SYSVOL": {
+    "exp": "System Volume (the shared folder on domain controllers that holds Group Policy and logon scripts)"
+  },
+  "UDF": {
+    "exp": "User-defined function"
   }
 }
