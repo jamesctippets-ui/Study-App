@@ -850,6 +850,17 @@ ACRONYMS = {
     'BLOB': {'exp': 'Binary Large Object'},
     'CQL': {'exp': 'Cassandra Query Language'},
     'KB': {'exp': 'Kilobyte'},
+    # AB-650 and SC-500 refresh
+    'ACR': {'exp': 'Azure Container Registry'},
+    'CIEM': {'exp': 'Cloud Infrastructure Entitlement Management'},
+    'E7': {'exp': 'Microsoft 365 E7 (the plan that includes Microsoft 365 E5, Microsoft Copilot, Agent 365 and Entra Suite)'},
+    'EASM': {'exp': 'External Attack Surface Management'},
+    'GCC': {'exp': 'Government Community Cloud'},
+    'IKEv2': {'exp': 'Internet Key Exchange version 2'},
+    'SAM': {'exp': 'SharePoint Advanced Management'},
+    'UK': {'exp': 'United Kingdom'},
+    'WEC': {'exp': 'Windows Event Collector'},
+    'DoD': {'exp': 'Department of Defense'},
 }
 
 IGNORE = {
@@ -907,4 +918,7 @@ IGNORE = {
 
     # AZ-900 and DP-900 refresh
     'D2s', 'WebJobs',
+
+    # AB-650 and SC-500 refresh
+    'AcrPull', 'MSOnline', 'MgGraph', 'MgUser', 'OpenVPN',
 }

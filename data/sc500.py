@@ -1,19 +1,19 @@
 """Categories, flashcards, and quiz questions for Microsoft SC-500: Implementing End-to-End Security Controls for Cloud and AI Workloads."""
 
 CATEGORIES = [
-    {'key': 'identityAccessGovernance', 'label': 'Identity, Access & Governance', 'marks': 23, 'resources': [
+    {'key': 'identityAccessGovernance', 'label': 'Identity, Access & Governance', 'marks': 24, 'resources': [
         {'label': 'Microsoft Learn: Secure access to resources by using Microsoft Entra', 'url': 'https://learn.microsoft.com/en-us/training/paths/secure-access-resources-entra/'},
         {'label': 'Microsoft Learn: Configure and govern entitlement with Microsoft Entra ID (SC-5008)', 'url': 'https://learn.microsoft.com/en-us/training/paths/configure-manage-entitlement-microsoft-entra-id/'},
     ], 'screenshot': 'rbacConditionCode'},
-    {'key': 'dataNetworkSecurity', 'label': 'Storage, Databases & Networking', 'marks': 27, 'resources': [
+    {'key': 'dataNetworkSecurity', 'label': 'Storage, Databases & Networking', 'marks': 29, 'resources': [
         {'label': 'Microsoft Learn: Implement security for Azure SQL databases for the Cloud and AI Security Engineer', 'url': 'https://learn.microsoft.com/en-us/training/paths/implement-azure-sql-database-security/'},
         {'label': 'Microsoft Learn: Protect network infrastructure in Azure', 'url': 'https://learn.microsoft.com/en-us/training/paths/secure-networking/'},
     ], 'screenshot': 'appGatewayWafConfigure'},
-    {'key': 'aiComputeSecurity', 'label': 'Compute & AI Workload Security', 'marks': 25, 'resources': [
+    {'key': 'aiComputeSecurity', 'label': 'Compute & AI Workload Security', 'marks': 23, 'resources': [
         {'label': 'Microsoft Learn: Implement security for AI', 'url': 'https://learn.microsoft.com/en-us/training/paths/implement-ai-security/'},
         {'label': 'Microsoft Learn: Secure AI identity infrastructure with Microsoft Entra', 'url': 'https://learn.microsoft.com/en-us/training/paths/entra-ai-secure-workloads/'},
     ], 'screenshot': 'aiServicesNetworking'},
-    {'key': 'securityPostureOps', 'label': 'Security Posture & Monitoring', 'marks': 25, 'resources': [
+    {'key': 'securityPostureOps', 'label': 'Security Posture & Monitoring', 'marks': 24, 'resources': [
         {'label': 'Microsoft Learn: Configure SIEM security operations using Microsoft Sentinel (SC-5001)', 'url': 'https://learn.microsoft.com/en-us/training/paths/configure-security-information-event-management-operations-using-microsoft-sentinel/'},
         {'label': 'Microsoft Learn: Secure Azure services and workloads with Microsoft Defender for Cloud regulatory compliance controls (SC-5002)', 'url': 'https://learn.microsoft.com/en-us/training/paths/secure-azure-services-workloads-defender-cloud/'},
     ], 'screenshot': 'logAnalyticsAccessMode'},
@@ -388,7 +388,7 @@ FLASHCARDS = [
         'id': 'f59',
         'cat': 'aiComputeSecurity',
         'front': 'Defender for AI Service',
-        'back': "Defender for AI Services is one of the Microsoft Defender for Cloud plans (also called threat protection for AI services), built specifically for deployed AI workloads and agents, adding runtime threat detection — like flagging an active jailbreak or data-exfiltration attempt — that is separate from and complementary to the guardrails and least-privilege identity scoping an agent is given inside Microsoft Foundry.",
+        'back': "Defender for AI Services is one of the Microsoft Defender for Cloud plans (also called threat protection for AI services), built specifically for deployed AI workloads and agents, adding runtime threat detection (with suspicious prompt evidence, Purview data security integration and AI model security scanning as components) — like flagging an active jailbreak or data-exfiltration attempt — that is separate from and complementary to the guardrails and least-privilege identity scoping an agent is given inside Microsoft Foundry.",
         'detail': "Like every other Defender plan, it is enabled independently per resource type, so deploying Foundry agents without also enabling this plan leaves them without the runtime detection layer even if every other Defender plan is already turned on.",
     },
     {
@@ -479,7 +479,7 @@ FLASHCARDS = [
         'id': 'f72',
         'cat': 'aiComputeSecurity',
         'front': 'Foundry agent guardrails',
-        'back': "Configurable constraints inside Microsoft Foundry that filter and limit an agent's inputs, outputs, and permitted actions while it runs — for example blocking a category of output or preventing a specific tool call — distinct from scoping the agent's identity permissions and from Prompt Shields, which screens content for jailbreak and injection attempts before the agent acts on it at all.",
+        'back': "Configurable constraints inside Microsoft Foundry that filter and limit an agent's inputs, outputs, and permitted actions while it runs — for example blocking a category of output or preventing a specific tool call — distinct from scoping the agent's identity permissions. A guardrail is a named collection of controls with intervention points at user input, tool call, tool response and output, and its risk list includes user prompt attacks and indirect attacks, the detections that Prompt Shields provides.",
         'detail': "Least-privilege identity scoping limits what an agent is technically capable of reaching, while guardrails limit what it is allowed to say or do within that reach — a well-scoped agent can still misbehave within its own permissions unless guardrails also constrain its behavior.",
     },
     {
@@ -612,7 +612,7 @@ FLASHCARDS = [
         'id': 'f91',
         'cat': 'securityPostureOps',
         'front': 'Microsoft Sentinel data retention: interactive vs. long-term (archive) retention',
-        'back': "Interactive retention keeps ingested log data immediately queryable by analytics rules, hunting queries, and workbooks for a configured period. Long-term (archive) retention keeps that same data stored at lower cost beyond that period, but it is not directly queryable without first running a search job or restoring it back to interactive retention.",
+        'back': "Interactive retention keeps ingested log data immediately queryable by analytics rules, hunting queries, and workbooks for a configured period. Long-term (archive) retention keeps that same data stored at lower cost beyond that period (Microsoft's current guidance describes this as the analytics tier, with 90 days of interactive retention by default, plus the Sentinel data lake tier for long-term data), but it is not directly queryable without first running a search job or restoring it back to interactive retention.",
         'detail': "A team planning for years of compliance retention alongside ongoing detection needs to plan for that restore step explicitly — archived data is not instantly queryable the way interactive data is, even though it still technically exists in the workspace.",
     },
     {
@@ -808,7 +808,7 @@ FLASHCARDS = [
         'id': 'f119',
         'cat': 'aiComputeSecurity',
         'front': 'Data Security Posture Management (DSPM) for AI (Microsoft Purview)',
-        'back': "A Purview capability that gives visibility into how users and agents interact with Microsoft 365 Copilot and other generative AI apps, tracking risks such as oversharing, exfiltration, and unusual access, and recommending data protection actions drawing on DLP, labels, and insider risk.",
+        'back': "A Purview capability (now the classic experience, succeeded by the current Data Security Posture Management with AI observability) that gives visibility into how users and agents interact with Microsoft 365 Copilot and other generative AI apps, tracking risks such as oversharing, exfiltration, and unusual access, and recommending data protection actions drawing on DLP, labels, and insider risk.",
         'detail': "It is data-centric posture, whereas AI security posture management in Defender for Cloud is workload-centric. Match the tool to whether the scenario concerns sensitive data or AI infrastructure.",
     },
     {
@@ -881,6 +881,446 @@ FLASHCARDS = [
         'back': "Defender XDR is a unified pre- and post-breach defense suite that correlates signals from Defender for Endpoint, Defender for Office 365, Defender for Identity, Defender for Cloud Apps, and Microsoft Entra ID Protection into single incidents, with automated investigation and response.",
         'detail': "It specializes in Microsoft endpoint, identity, email, and app signals, while Sentinel is the broader SIEM that can ingest those incidents plus logs from everywhere else.",
     },
+    {'id': 'f9001',
+     'cat': 'identityAccessGovernance',
+     'front': 'User consent settings for applications (Microsoft Entra)',
+     'back': 'By default users can consent to apps for permissions that do not require administrator consent. Microsoft recommends limiting user consent '
+             'to apps from verified publishers (for selected low-impact permissions) or disabling it entirely. The setting is under Enterprise apps > '
+             'Consent and permissions > User consent settings, requires at least Privileged Role Administrator (Global Administrator when using the '
+             'admin center), and is enforced through permission grant (app consent) policies.',
+     'detail': 'Apps that require user assignment must always be consented by an administrator, even when user consent is allowed.'},
+    {'id': 'f9002',
+     'cat': 'identityAccessGovernance',
+     'front': 'Admin consent workflow',
+     'back': 'When user consent is restricted, the admin consent workflow lets a user request consent for an app instead of being blocked. Designated '
+             'reviewers get the request, can approve or deny it, and an approval grants tenant-wide admin consent for the requested permissions. Pairing '
+             'the workflow with limited user consent keeps the app catalog under control without leaving users stuck.',
+     'detail': 'Review requests critically: approving grants permissions for every user, so check the publisher and each requested scope.'},
+    {'id': 'f9003',
+     'cat': 'identityAccessGovernance',
+     'front': 'Delegated vs application permissions (OAuth grants)',
+     'back': 'Delegated permissions let an app act on behalf of a signed-in user, limited to what both the app and the user are allowed to do, and some '
+             'can be consented by users. Application permissions let an app act as itself with no user present and always need administrator consent, so '
+             "they are the higher-risk grant. Reviewing an enterprise app's Permissions page shows the admin and user grants, and an administrator can "
+             'revoke them.',
+     'detail': 'A reviewer who sees broad application permissions such as read and write to all files should treat that app as a privileged identity.'},
+    {'id': 'f9004',
+     'cat': 'identityAccessGovernance',
+     'front': 'Key Vault firewall settings',
+     'back': 'A Key Vault firewall can deny public network access by default and then allow selected virtual networks (service endpoints), IP ranges or '
+             'private endpoints, optionally allowing trusted Microsoft services to bypass the firewall. Using a private endpoint with public access '
+             'disabled gives the strongest isolation, and callers still need data-plane permissions through Azure RBAC or access policies on top of '
+             'network access.',
+     'detail': 'Network access and authorization are separate gates: opening the firewall never grants permission, and RBAC never overrides a closed '
+               'firewall.'},
+    {'id': 'f9005',
+     'cat': 'identityAccessGovernance',
+     'front': 'Managing Key Vault keys, secrets and certificates',
+     'back': 'Keys can use a rotation policy that rotates on a schedule or before expiry, secrets should carry expiration dates, and certificates can be '
+             'created from an integrated certificate authority policy with a lifecycle action to auto-renew before expiry. Near-expiry and rotation '
+             'events can be sent through Event Grid. Applications should reference the current version or the versionless identifier so rotation does '
+             'not require redeployment.',
+     'detail': 'Rotation only helps if consumers pick up the new version: a pinned secret version defeats an automated rotation.'},
+    {'id': 'f9006',
+     'cat': 'identityAccessGovernance',
+     'front': 'Defender CSPM secrets scanning',
+     'back': 'Defender for Cloud scans for exposed secrets (passwords, keys, tokens, connection strings) in three ways: agentless machine scanning of VM '
+             'disks (Defender CSPM or Defender for Servers Plan 2), cloud deployment resource scanning of infrastructure-as-code deployment resources '
+             '(Defender CSPM) and code repository scanning in Azure DevOps (Defender CSPM). Findings appear in the asset inventory, as recommendations, '
+             'in cloud security explorer and in attack paths.',
+     'detail': 'Because it is agentless for machines, nothing is installed on the VM, and results can show lateral-movement paths that start from a '
+               'discovered secret.'},
+    {'id': 'f9007',
+     'cat': 'identityAccessGovernance',
+     'front': 'Microsoft Defender for Key Vault',
+     'back': 'Defender for Key Vault is a Defender for Cloud plan, turned on per subscription under Environment settings > Defender plans, that detects '
+             'unusual and potentially harmful attempts to access or exploit Key Vault accounts, such as access from suspicious IP addresses or unusual '
+             'enumeration of secrets. It raises alerts and does not itself restrict access.',
+     'detail': 'It is detection, not prevention: the firewall, RBAC and private endpoint are what prevent access.'},
+    {'id': 'f9008',
+     'cat': 'identityAccessGovernance',
+     'front': 'Azure Backup security controls',
+     'back': 'Azure Backup isolates vaulted data in Microsoft-managed storage, encrypts it at rest with platform-managed keys by default '
+             '(customer-managed keys are optional) and in transit over HTTPS, and offers three built-in roles: Backup Contributor, Backup Operator and '
+             'Backup Reader. Soft delete retains deleted backup data for 14 additional days at no cost, and private endpoints let servers in a VNet back '
+             'up to the vault without public IPs.',
+     'detail': 'Backup Operator can run restores but cannot remove backups or manage policies, which makes it the least-privilege role for operations '
+               'staff.'},
+    {'id': 'f9009',
+     'cat': 'identityAccessGovernance',
+     'front': 'Multi-user authorization and immutability for backups',
+     'back': 'Multi-user authorization (MUA) adds an Azure resource called a Resource Guard that holds protected operations such as disabling soft '
+             'delete or removing protection; a second person with rights on the Resource Guard must approve the operation. Immutable vaults prevent '
+             'backup data from being altered or deleted before its retention period ends. Together they defend against an attacker, or a rogue admin, '
+             'who wipes the backups first.',
+     'detail': 'Place the Resource Guard in a separate subscription or tenant under different administrators; otherwise one compromised admin could '
+               'approve their own request.'},
+    {'id': 'f9010',
+     'cat': 'identityAccessGovernance',
+     'front': 'Finding overprivileged identities with CIEM in Defender CSPM',
+     'back': 'Cloud infrastructure entitlement management (CIEM) in the Defender CSPM plan analyzes permissions across Azure, AWS and GCP and recommends '
+             'removing inactive, guest or blocked accounts that hold access, limiting administrative privileges and right-sizing overprovisioned '
+             'identities based on actual usage. Cloud security explorer maps who can reach sensitive resources, and attack paths show lateral movement '
+             'from over-privileged identities. Microsoft Entra Permissions Management is deprecated, but this capability is not affected.',
+     'detail': 'Pair the findings with remediation in Azure RBAC (remove or narrow the assignment) and PIM (make the remaining access eligible).'},
+    {'id': 'f9011',
+     'cat': 'identityAccessGovernance',
+     'front': 'Custom Azure roles: actions, dataActions and assignable scopes',
+     'back': 'A custom Azure role is a JSON definition with Actions and NotActions for the management plane, DataActions and NotDataActions for the data '
+             'plane, and AssignableScopes that decide where it can be assigned (management group, subscription or resource group). Create one only when '
+             'no built-in role fits, and keep the permission list as narrow as the task allows.',
+     'detail': 'A custom role definition grants nothing by itself; it is useful only once assigned to a principal at a scope listed in its assignable '
+               'scopes.'},
+    {'id': 'f9012',
+     'cat': 'identityAccessGovernance',
+     'front': 'Infrastructure as code security controls',
+     'back': 'Security controls for infrastructure as code include scanning Bicep, ARM, Terraform and CloudFormation templates in pipelines (Defender '
+             'for Cloud DevOps security reports misconfigurations in pull requests), passing secrets as secure parameters or Key Vault references '
+             'instead of literals, enforcing standards with Azure Policy, and using deployment stacks with deny settings so deployed resources cannot be '
+             'altered or deleted outside the stack.',
+     'detail': 'Shifting checks left catches a public storage account in code review, while Azure Policy remains the backstop that blocks it at '
+               'deployment time.'},
+    {'id': 'f9013',
+     'cat': 'identityAccessGovernance',
+     'front': 'Security standards and recommendations in Defender for Cloud',
+     'back': 'Defender for Cloud assigns the Microsoft cloud security benchmark by default and lets admins add regulatory standards (for example ISO '
+             '27001 or PCI DSS) or custom standards under Environment settings > Security policies. Standards map to recommendations, which can be '
+             'exempted, assigned to owners through governance rules and enforced or denied through Azure Policy. Compliance assessment beyond the free '
+             'baseline needs at least one paid Defender plan.',
+     'detail': "A custom standard is the way to measure the organization's own policy set in the same compliance dashboard."},
+    {'id': 'f9020',
+     'cat': 'dataNetworkSecurity',
+     'front': 'Stored access policies for shared access signatures',
+     'back': "A stored access policy defined on a container, file share, queue or table holds a SAS's start time, expiry and permissions on the server "
+             'side. A service SAS that references the policy can be revoked by deleting or editing the policy, whereas a plain ad hoc SAS can only be '
+             'invalidated by rotating the account key. Up to five stored access policies can exist per resource, and user delegation SAS tokens cannot '
+             'use them.',
+     'detail': 'If the requirement is being able to revoke tokens without rotating account keys, choose a stored access policy or a user delegation SAS '
+               'tied to Entra credentials.'},
+    {'id': 'f9021',
+     'cat': 'dataNetworkSecurity',
+     'front': 'Azure SQL platform-level security settings',
+     'back': 'Platform settings for Azure SQL Database include Microsoft Entra-only authentication (disabling SQL authentication), server firewall and '
+             'virtual network rules or a private endpoint with public access denied, transparent data encryption enabled by default, a minimum TLS '
+             'version, and managed identities for auditing storage access. Always Encrypted and dynamic data masking are database-level controls layered '
+             'on top.',
+     'detail': 'Entra-only authentication removes password-based SQL logins entirely, so it is the strongest answer when the requirement is eliminating '
+               'SQL passwords.'},
+    {'id': 'f9022',
+     'cat': 'dataNetworkSecurity',
+     'front': 'Auditing Azure SQL Database and Managed Instance',
+     'back': 'Auditing records database events to an Azure Storage account, a Log Analytics workspace or Event Hubs. On Azure SQL Database it can be set '
+             'at the server level (applying to all databases) or the database level, and for Managed Instance it is configured at the instance level. '
+             'Sending logs to Log Analytics enables queries and Sentinel analytics, while storage suits long retention.',
+     'detail': 'Auditing records activity; Defender for SQL is what analyzes it for threats, so they are complementary.'},
+    {'id': 'f9023',
+     'cat': 'dataNetworkSecurity',
+     'front': 'Defender for Databases plans',
+     'back': 'Defender for Databases is a family of plans: Defender for Azure SQL Databases (with vulnerability assessment and advanced threat '
+             'protection), Defender for SQL servers on machines, Defender for open-source relational databases (Azure Database for PostgreSQL and MySQL '
+             'flexible servers and Amazon RDS) and Defender for Azure Cosmos DB. Each is enabled separately, detects anomalous access and query patterns '
+             'such as brute force, and sends alerts with MITRE ATT&CK mapping.',
+     'detail': 'The open-source plan covers PaaS databases and is not supported for Azure Arc-enabled machines, where the SQL servers on machines plan '
+               'applies.'},
+    {'id': 'f9024',
+     'cat': 'dataNetworkSecurity',
+     'front': 'Azure Virtual Network Manager security admin rules',
+     'back': 'Security admin rules are global network rules (Allow, Always Allow or Deny, with priority, direction and protocol) applied to all virtual '
+             'networks in a network group through a security admin configuration made of rule collections. They are evaluated before NSG rules, so a '
+             'central team can block ports such as 3389 and 22 across many VNets while application teams keep NSGs for their own needs. Only one '
+             'security admin configuration can be deployed per region, so additional rule collections are used instead.',
+     'detail': 'Use security admin rules for organization-wide guardrails, and NSGs for workload-specific filtering.'},
+    {'id': 'f9025',
+     'cat': 'dataNetworkSecurity',
+     'front': 'Securing Azure Virtual WAN with a secured hub',
+     'back': 'A secured hub is a Virtual WAN hub with Azure Firewall deployed in it. An admin converts a hub from the Azure Firewall and Firewall '
+             'Manager item under Security, manages rules through a firewall policy in Azure Firewall Manager and can later upgrade from Standard to '
+             'Premium, which needs a maintenance window. Traffic between branches, VNets and the internet is then routed through the hub firewall.',
+     'detail': 'Availability zones for the hub firewall need to be chosen in the dedicated flow, because the convert wizard does not allow them.'},
+    {'id': 'f9026',
+     'cat': 'dataNetworkSecurity',
+     'front': 'Securing VPN connections: point-to-site authentication and tunnel types',
+     'back': 'Point-to-site VPN supports OpenVPN (TLS, many client platforms), SSTP (Windows only) and IKEv2, with authentication by Azure certificates, '
+             'Microsoft Entra ID or RADIUS and AD DS. Microsoft Entra ID authentication works only with OpenVPN, which is what enables Conditional '
+             'Access and MFA for VPN users. P2S requires a route-based VPN gateway; site-to-site tunnels use IPsec and IKE, and custom IPsec policies '
+             'can set stronger algorithms.',
+     'detail': 'If the requirement is MFA or Conditional Access for VPN, the answer is Entra ID authentication with the OpenVPN tunnel type.'},
+    {'id': 'f9027',
+     'cat': 'dataNetworkSecurity',
+     'front': 'Microsoft Entra Private Access',
+     'back': 'Private Access, part of Global Secure Access, lets users reach private FQDNs and IP ranges without a VPN through the Global Secure Access '
+             'client and an Entra private network connector in the private network. Quick Access defines the primary set of private resources, while '
+             'per-app Global Secure Access apps secure a subset with their own users and Conditional Access policies. Each is represented as an '
+             'enterprise application.',
+     'detail': 'Per-app access is the choice when a few resources need stricter policies than the general Quick Access group.'},
+    {'id': 'f9028',
+     'cat': 'dataNetworkSecurity',
+     'front': 'Network Watcher NSG diagnostics and effective security rules',
+     'back': 'NSG diagnostics simulates a flow by source, destination, protocol and port and reports whether it is allowed or denied and which security '
+             'rule decided it, across the NSGs applied to a VM, network interface, scale set interface or Application Gateway v2. The effective security '
+             'rules view of a network interface combines the subnet-level and NIC-level NSGs into the rule set actually applied.',
+     'detail': 'Use it when connectivity fails despite a seemingly correct NSG: the effective result may be a deny from a rule at the other association '
+               'level.'},
+    {'id': 'f9040',
+     'cat': 'aiComputeSecurity',
+     'front': 'Finding overexposure of data in SharePoint before AI uses it',
+     'back': 'Overexposed SharePoint content is found with Microsoft Purview Data Security Posture Management data risk assessments (for example the '
+             'weekly assessment of the top 100 sites by usage in the classic experience) and SharePoint Advanced Management data access governance '
+             "reports covering permission state, sharing links and 'Everyone except external users' exposure. Findings feed remediation such as site "
+             'access reviews, restricted access control and sensitivity labels.',
+     'detail': 'AI assistants respect existing permissions, so cleaning up oversharing is what reduces AI-driven data exposure.'},
+    {'id': 'f9041',
+     'cat': 'aiComputeSecurity',
+     'front': 'Defender for AI services plan components',
+     'back': 'Threat protection for AI services is enabled per subscription (Environment settings > Defender plans > AI services, Owner or Contributor '
+             'needed) and protects Microsoft Foundry workloads. Its components are suspicious prompt evidence (snippets of prompts and responses in '
+             'alerts, masked if disabled), data security for AI interactions (Microsoft Purview analysis, requires a Purview license) and AI model '
+             'security (scanning models in Azure Machine Learning registries for serialization vulnerabilities and malware).',
+     'detail': 'Turning off prompt evidence does not stop detection; it only masks the content shown in alerts.'},
+    {'id': 'f9042',
+     'cat': 'aiComputeSecurity',
+     'front': 'Data and AI security dashboard in Defender for Cloud',
+     'back': 'The Data and AI security dashboard gives a subscription-level view of storage, managed databases, hosted databases and AI services, '
+             'showing whether each is protected by Defender CSPM, Defender for Storage, Defender for Databases and AI threat protection, along with top '
+             'alerts, recommendations, attack paths, sensitive data findings and internet-exposed data resources. Full use needs those plans, sensitive '
+             'data discovery and the Security explorer role.',
+     'detail': 'It is the monitoring surface for AI security posture: it tells you which AI resources lack protection and where the critical risks are.'},
+    {'id': 'f9043',
+     'cat': 'aiComputeSecurity',
+     'front': 'Foundry guardrails: risks, controls and intervention points',
+     'back': 'A Foundry guardrail is a named collection of controls, each defining a risk to detect, the intervention points to scan and the action to '
+             'take. Intervention points are user input, tool call, tool response and output (tool call and tool response apply to agents only, and agent '
+             'guardrails are in preview). Risks include hate, sexual, self-harm, violence, user prompt attacks, indirect attacks, protected material and '
+             'PII. A guardrail can apply to many models and agents, and creating one needs the Foundry Account Owner role.',
+     'detail': 'Tool call and tool response intervention points are what stop an injected instruction from making an agent call a tool it should not.'},
+    {'id': 'f9044',
+     'cat': 'aiComputeSecurity',
+     'front': 'Configuring AI Gateway for Microsoft Foundry',
+     'back': 'In the Foundry portal, Manage > AI Gateway > Add AI Gateway attaches Azure API Management to a Foundry resource to apply token limits, '
+             'quotas and governance to model deployments. Create new makes a Basic v2 instance for development and testing; an existing instance must be '
+             'a v2 tier in the same Entra tenant and subscription. New projects get the gateway enabled by default and existing projects are added '
+             'manually. For a Foundry resource with public access disabled, the APIM instance must also be private.',
+     'detail': 'Foundry role names changed: Azure AI User, Owner, Account Owner and Project Manager are now Foundry User, Owner, Account Owner and '
+               'Project Manager, with the same permissions.'},
+    {'id': 'f9045',
+     'cat': 'aiComputeSecurity',
+     'front': 'Managing agents in the Microsoft 365 admin center (security view)',
+     'back': 'Security teams govern Microsoft 365 agents from Agents > All agents in the admin center: the registry shows ownerless and unmanaged '
+             'agents, requests are reviewed before publishing, and an agent can be blocked, deleted (30-day recovery) or reassigned. AI Administrator '
+             'can manage agents and Copilot settings, while Security Administrator and Security Reader see the registry and insights without changing '
+             'agents.',
+     'detail': 'Block stops use immediately; the stronger lifecycle control is requiring approval so unreviewed agents never become available.'},
+    {'id': 'f9046',
+     'cat': 'aiComputeSecurity',
+     'front': 'Managing Entra Agent ID access with access packages and sponsors',
+     'back': 'Agent access is granted through entitlement management access packages that bundle group memberships, directory roles and API permissions '
+             'with approval and expiry, and every agent identity needs at least one business sponsor. Owners administer the agent technically. Lifecycle '
+             'Workflows can transfer sponsorship to a manager when a sponsor leaves. Extending Entra protections to agents requires Agent 365 licensing.',
+     'detail': 'Agents should not hold standing permissions granted ad hoc; the access package makes the grant time-bound and reviewable.'},
+    {'id': 'f9047',
+     'cat': 'aiComputeSecurity',
+     'front': 'Real-time protection for Copilot Studio agents with Defender',
+     'back': 'Defender for AI agents, onboarded with Agent 365, enables discovery, posture assessment and threat detection. For Copilot Studio, '
+             'real-time protection is switched on in the Defender portal (Settings > Security for AI > Get started) and finished by a Power Platform '
+             'administrator; it scans agent tool invocations at runtime, blocks suspicious behavior or cross-prompt injection and raises an alert. The '
+             'Microsoft 365 connector is needed for alerts and hunting in the portal.',
+     'detail': 'Runtime blocking works even without the connector, but without it the incident trail does not reach the Defender portal.'},
+    {'id': 'f9048',
+     'cat': 'aiComputeSecurity',
+     'front': 'Trusted launch: Secure Boot, vTPM and integrity monitoring',
+     'back': 'Trusted launch strengthens generation 2 Azure VMs with Secure Boot (verified boot loaders, kernels and drivers), a virtual TPM that holds '
+             'measurements and keys, and boot integrity monitoring through attestation. It defends against bootkits and rootkits and is the default for '
+             "newly created generation 2 VMs and scale sets. The VM's security type setting is Standard, Trusted launch or Confidential.",
+     'detail': 'Existing generation 2 VMs can have it enabled afterward, and generation 1 VMs can be upgraded to generation 2 with Trusted launch.'},
+    {'id': 'f9049',
+     'cat': 'aiComputeSecurity',
+     'front': 'Azure Machine Configuration',
+     'back': 'Machine Configuration, a feature of Azure Policy, audits or configures operating system settings as code on Azure VMs and Azure '
+             'Arc-enabled machines. Assignment modes are Audit, Apply and Monitor, and Apply and Autocorrect, which brings a drifted machine back into '
+             'conformance. Results appear on the Guest assignments page and in Azure Policy compliance.',
+     'detail': 'It enforces what is inside the guest operating system (for example a TLS setting), which ordinary Azure Policy on the resource '
+               'properties cannot reach.'},
+    {'id': 'f9050',
+     'cat': 'aiComputeSecurity',
+     'front': 'Agentless scanning for VMs in Defender for Servers',
+     'back': 'Agentless scanning analyzes snapshots of VM disks without installing anything, covering vulnerability assessment, malware scanning, '
+             'secrets scanning and posture checks. It is part of Defender for Servers Plan 2 (and Defender CSPM), while Plan 1 focuses on the endpoint '
+             'detection and response integration with Defender for Endpoint.',
+     'detail': 'Agentless coverage is useful for machines where an agent cannot be installed, but runtime EDR protection still needs the Defender for '
+               'Endpoint sensor.'},
+    {'id': 'f9051',
+     'cat': 'aiComputeSecurity',
+     'front': 'Defender Vulnerability Management for Azure VMs',
+     'back': 'Defender for Servers includes Microsoft Defender Vulnerability Management as the vulnerability assessment solution, assessing installed '
+             'software and OS vulnerabilities on Azure VMs, Arc-enabled servers and multicloud machines, with the premium capabilities in Plan 2. '
+             "Findings surface as recommendations and in the cloud security graph, and the assessment source can be changed under the plan's settings.",
+     'detail': 'Choose the integrated Defender Vulnerability Management solution unless there is a specific need for a third-party scanner.'},
+    {'id': 'f9052',
+     'cat': 'aiComputeSecurity',
+     'front': 'Azure Container Registry security controls',
+     'back': 'Hardening Azure Container Registry means disabling the admin user and anonymous pull, authenticating with Microsoft Entra identities and '
+             'the AcrPull and AcrPush roles, using the Premium SKU for private endpoints, network rules and customer-managed keys, and scanning images '
+             'with Defender for Containers. Repository-scoped permissions can limit tokens to specific repositories.',
+     'detail': 'Private link and customer-managed keys are Premium features, so a requirement for either changes the SKU choice.'},
+    {'id': 'f9053',
+     'cat': 'aiComputeSecurity',
+     'front': 'Securing Azure Container Instances and Azure Container Apps',
+     'back': 'Container Instances can be deployed into a virtual network subnet without a public IP, use managed identities to reach Key Vault and '
+             'registries, and keep sensitive values in secure environment variables or secret volumes. Container Apps use an internal environment with '
+             'VNet integration for private ingress, built-in authentication with Microsoft Entra, IP restrictions on ingress, managed identity and Key '
+             'Vault secret references.',
+     'detail': 'In both services, prefer managed identity over credentials stored in the container definition.'},
+    {'id': 'f9054',
+     'cat': 'aiComputeSecurity',
+     'front': 'Azure Functions security: authentication and network access',
+     'back': 'For Functions, HTTP trigger authorization levels (anonymous, function or admin keys) are only a coarse gate; App Service authentication '
+             'with Microsoft Entra ID provides real user or app authentication. Network access is restricted with access restrictions or private '
+             'endpoints for inbound traffic and VNet integration for outbound traffic, and managed identity plus Key Vault references avoid secrets in '
+             'app settings. HTTPS-only and the latest TLS should be enforced.',
+     'detail': 'A function key is a shared secret, not an identity: use Entra authentication when you need to know who is calling.'},
+    {'id': 'f9055',
+     'cat': 'aiComputeSecurity',
+     'front': 'Azure Logic Apps security',
+     'back': 'Logic Apps request triggers can be limited by allowed caller IP ranges and by OAuth with Microsoft Entra authorization policies instead of '
+             'relying only on the SAS in the callback URL. Managed identity authenticates connectors without stored credentials, secure inputs and '
+             'outputs hide sensitive values from run history, and Standard logic apps support private endpoints and VNet integration.',
+     'detail': 'Anyone holding the full callback URL with its SAS can invoke a request trigger, so treat it as a secret.'},
+    {'id': 'f9056',
+     'cat': 'aiComputeSecurity',
+     'front': 'API Management policies for back-end API protection',
+     'back': 'API Management protects back ends with inbound policies such as validate-jwt (token validation), ip-filter, rate-limit and quota, along '
+             'with subscription keys and client certificate validation, and backend authentication with managed identity or certificates. Deploying the '
+             'instance in a virtual network and restricting the back end to accept traffic only from API Management stops callers bypassing the gateway.',
+     'detail': 'Subscription keys identify consumers but do not authenticate users; validate-jwt is what enforces Entra authentication.'},
+    {'id': 'f9057',
+     'cat': 'aiComputeSecurity',
+     'front': 'Azure Bastion SKUs',
+     'back': 'Bastion has Developer, Basic, Standard and Premium SKUs. Developer is a free option for connecting to a single VM without a dedicated '
+             'subnet, Basic and Standard are dedicated deployments in the AzureBastionSubnet (Standard adds features such as native client support, '
+             'IP-based connection and scaling), and Premium adds capabilities such as session recording and private-only deployment.',
+     'detail': 'Pick the SKU from the required feature: session recording or private-only access means Premium.'},
+    {'id': 'f9070',
+     'cat': 'securityPostureOps',
+     'front': 'Security Copilot capacity: provisioned and overage SCUs',
+     'back': 'Security Copilot runs on Security Compute Units. Customers outside Microsoft 365 E5 and E7 provision capacity (minimum one SCU, billed '
+             'hourly, refreshed each full clock hour, unused units expire) and can add overage capacity, consumed as used up to a maximum or unlimited. '
+             'Microsoft 365 E5 and E7 customers are auto-provisioned with a default capacity. Capacity provisioning needs an Azure Contributor or Owner '
+             'role and at least Security Administrator in the tenant.',
+     'detail': 'When provisioned SCUs run out, requests stop unless overage capacity is configured.'},
+    {'id': 'f9071',
+     'cat': 'securityPostureOps',
+     'front': 'Security Copilot roles and permissions',
+     'back': 'Security Copilot has two platform roles, owner and contributor, which are not Microsoft Entra roles and grant access only to platform '
+             'features, never to security data. At least two owners are always kept, and Global Administrator, Security Administrator, Billing '
+             'Administrator and some Intune and Purview roles inherit owner access. Plugins use on-behalf-of authentication, so what a user can retrieve '
+             'is limited by their own Entra and Azure RBAC permissions.',
+     'detail': 'Assigning someone the contributor role does not let them read Sentinel data; they also need the Sentinel role.'},
+    {'id': 'f9072',
+     'cat': 'securityPostureOps',
+     'front': 'Security Copilot plugins',
+     'back': 'Plugins extend Security Copilot with data and actions from Microsoft and non-Microsoft products. Owners decide whether contributors can '
+             'add custom plugins for themselves (user scope) or for everyone in the workspace (tenant scope), and can restrict preinstalled plugin '
+             'availability. A plugin only returns data that the signed-in user is permitted to see in the underlying product.',
+     'detail': 'Making a custom plugin available to the organization is an owner-controlled decision, because it extends what Security Copilot can '
+               'reach.'},
+    {'id': 'f9073',
+     'cat': 'securityPostureOps',
+     'front': 'Security Copilot agents and Security Store',
+     'back': 'Security Copilot agents are autonomous or triggered workflows that run for a security task. Microsoft builds agents into Defender, Entra, '
+             'Intune and Purview, partners publish agents, and the Security Store is where agents are discovered. To set up an agent the user chooses an '
+             "identity, preferably a dedicated agent identity, supplies parameters and the agent's required plugins are enabled. Agents consume SCUs "
+             'when they run.',
+     'detail': "An agent identity limits the agent to what it needs, whereas reusing a person's account means the agent inherits all of that person's "
+               'access.'},
+    {'id': 'f9074',
+     'cat': 'securityPostureOps',
+     'front': 'Creating Microsoft Sentinel workspaces and the Defender portal move',
+     'back': 'Microsoft Sentinel is enabled on a Log Analytics workspace, and one workspace or several can be used depending on region, retention and '
+             'access separation needs. Sentinel is generally available in the Microsoft Defender portal, including without Defender XDR, and after March '
+             '31, 2027 it will no longer be supported in the Azure portal. Workspaces connected to Defender manage tiering and retention in the Defender '
+             'portal.',
+     'detail': 'New designs should plan for the Defender portal experience, since the Azure portal experience has a retirement date.'},
+    {'id': 'f9075',
+     'cat': 'securityPostureOps',
+     'front': 'Microsoft Sentinel roles',
+     'back': 'Sentinel uses Azure RBAC: Reader views data and incidents, Responder also manages incidents, Contributor also creates and edits content '
+             'and manages the content hub, Playbook Operator runs playbooks, and Automation Contributor is a service role that lets Sentinel add '
+             'playbooks to automation rules. Authoring playbooks needs Logic App Contributor. Assign roles at the resource group containing the '
+             'workspace for the best coverage; the Sentinel data lake uses Microsoft Entra roles.',
+     'detail': 'Never assign Automation Contributor to people: it exists so Sentinel itself can run playbooks from automation rules.'},
+    {'id': 'f9076',
+     'cat': 'securityPostureOps',
+     'front': 'Content hub solutions in Microsoft Sentinel',
+     'back': 'The content hub is the place to discover and install solutions, which bundle data connectors with related analytics rules, workbooks, '
+             'hunting queries and playbooks, as well as standalone content. Installing a solution gives the connector and content in one step, and '
+             'solutions can be updated or deleted later. Installing and managing content needs the Sentinel Contributor role.',
+     'detail': "Install the product's solution first, then configure the connector it provides."},
+    {'id': 'f9077',
+     'cat': 'securityPostureOps',
+     'front': 'Microsoft data connectors for Azure resources',
+     'back': 'Connectors for Azure and Microsoft sources, such as Microsoft Entra ID, Azure Activity, Microsoft Defender for Cloud and Azure Key Vault, '
+             'bring logs into Sentinel by turning on diagnostic settings or service-to-service connections, often applied at scale through Azure Policy. '
+             "Connecting needs write permission on the workspace plus the source's own permissions.",
+     'detail': 'A connector that appears connected but shows no data usually points to a missing diagnostic setting or role on the source side.'},
+    {'id': 'f9078',
+     'cat': 'securityPostureOps',
+     'front': 'Syslog and Common Event Format collection with Azure Monitor Agent',
+     'back': 'Linux devices and appliances that cannot run an agent send Syslog or CEF messages to a Linux forwarder VM running Azure Monitor Agent, '
+             'which uses a data collection rule to forward them to the workspace. Sentinel provides the Syslog via AMA and Common Event Format via AMA '
+             'connectors, usually installed through the relevant solution in the content hub. Outbound port 443 must be open from the agent.',
+     'detail': 'The appliance sends to the forwarder on port 514; the forwarder, not the appliance, talks to the workspace.'},
+    {'id': 'f9079',
+     'cat': 'securityPostureOps',
+     'front': 'Windows Security events via AMA and data collection rules',
+     'back': 'The Windows Security Events via AMA connector uses data collection rules to choose which events to collect, with presets or custom XPath '
+             'filters that cut ingestion cost at the source. Machines outside Azure need Azure Arc first. Events land in the SecurityEvent table, which '
+             'built-in Windows analytics rules query.',
+     'detail': 'Filtering in the DCR saves money, but dropping an event ID that an analytics rule needs silently disables that detection.'},
+    {'id': 'f9080',
+     'cat': 'securityPostureOps',
+     'front': 'Windows Event Forwarding (WEF) and Windows Forwarded Events',
+     'back': 'For Windows Event Forwarding, source machines send events to a Windows Event Collector (WEC) server that runs Azure Monitor Agent, and the '
+             'Windows Forwarded Events connector ingests them. These events are written to the WindowsEvent table, not SecurityEvent, so built-in rules '
+             'that query SecurityEvent will not match unless they are adapted or the Windows Security Events connector is used.',
+     'detail': 'WEF reduces the number of agents to manage, at the cost of table differences for detection content.'},
+    {'id': 'f9081',
+     'cat': 'securityPostureOps',
+     'front': 'Custom log tables and data collection rule transformations',
+     'back': 'A custom table (name ending in _CL) stores data that no built-in table fits. Data arrives through a data collection rule, either from an '
+             'agent collecting text logs or from the Logs Ingestion API called with an app registration that has rights on the DCR. The DCR can include '
+             'a transformation that reshapes or filters records before they reach the table, and creating the table in the portal creates the DCR for '
+             'you.',
+     'detail': 'Transformations are the cost-control point for custom data: remove noisy columns or rows before ingestion.'},
+    {'id': 'f9082',
+     'cat': 'securityPostureOps',
+     'front': 'Permissions for automation rules and playbooks',
+     'back': 'An automation rule can run a playbook only if Sentinel has permission to the Logic App, granted by giving the Microsoft Sentinel '
+             "Automation Contributor role on the playbook's resource group. The playbook's own connections should use a managed identity with only the "
+             'roles it needs, such as Sentinel Responder to update incidents. Users who run playbooks manually need Playbook Operator.',
+     'detail': 'A rule that silently fails to trigger a playbook is most often a missing Automation Contributor assignment.'},
+    {'id': 'f9083',
+     'cat': 'securityPostureOps',
+     'front': 'Microsoft Sentinel retention: analytics tier and data lake tier',
+     'back': 'Sentinel has an analytics tier for primary security data, with interactive retention of 90 days by default and up to two years, supporting '
+             'analytics rules and unlimited queries, and a data lake tier for high-volume secondary data kept cost-effectively for long periods, queried '
+             'with KQL and summarized into the analytics tier with KQL jobs. Data kept longer in total than the analytics period remains available in '
+             'the data lake tier.',
+     'detail': 'Choose by use: detections and frequent hunting need the analytics tier, while verbose firewall or storage logs belong in the data lake.'},
+    {'id': 'f9084',
+     'cat': 'securityPostureOps',
+     'front': 'Querying Microsoft Purview Audit in Defender XDR',
+     'back': 'Defender XDR and Defender for Endpoint activities, such as isolating a device, creating an indicator, changing security roles or editing a '
+             'custom detection, are recorded in the audit log, which Microsoft Defender reads from the Microsoft Purview auditing solution. Auditing '
+             'must be turned on in Purview, and searching needs the Audit Logs or View-Only Audit Logs role. Search jobs keep running after the browser '
+             'closes.',
+     'detail': 'Audit answers who changed what in the security tooling itself, which is different from hunting for attacker activity.'},
+    {'id': 'f9085',
+     'cat': 'securityPostureOps',
+     'front': 'Defender External Attack Surface Management in Defender CSPM',
+     'back': 'Defender for Cloud integrates Defender External Attack Surface Management at no extra license inside the Defender CSPM plan, running '
+             'outside-in scans that discover internet-facing cloud resources, feeding attack paths that start from internet-exposed IP addresses and '
+             'cloud security explorer queries. Standalone EASM adds discovery of assets across the wider public attack surface.',
+     'detail': 'Inside-out CSPM tells you what is misconfigured; EASM adds what an attacker can see from outside.'},
 ]
 
 QUESTIONS = [
@@ -2590,6 +3030,671 @@ QUESTIONS = [
         'whyTested': "Activity log retention is a standard audit requirement, and the answer is a platform setting rather than a viewer. Questions test whether you know the routing lives in diagnostic settings.",
         'image': 'monitorActivityLog',
     },
+    {'id': 'q9001',
+     'cat': 'identityAccessGovernance',
+     'type': 'mc',
+     'question': "Contoso's users keep granting a third-party calendar app access to their mailboxes. The security team wants users to consent only to "
+                 'apps from verified publishers with low-impact permissions, and wants everything else routed to reviewers instead of blocking users '
+                 'outright. What should be configured?',
+     'options': ['User consent disabled completely for the tenant, so only administrators can ever grant app permissions',
+                 'A weekly access review of every enterprise application assigned to users in the tenant',
+                 'User consent limited to verified publishers for selected permissions, plus the admin consent workflow with designated reviewers',
+                 'A Conditional Access policy that blocks sign-in to all apps that Contoso has not registered in its tenant'],
+     'correct': 2,
+     'explanation': 'Limiting user consent to verified publishers with selected low-impact permissions and enabling the admin consent workflow lets '
+                    'users request anything beyond that, which reviewers can approve or deny. Disabling consent entirely leaves users stuck, since the '
+                    'requirement is routing requests to reviewers. Conditional Access governs sign-in conditions rather than OAuth grants, and weekly '
+                    'access reviews of apps are slow and do not prevent the initial consent.',
+     'whyTested': 'Consent is the usual route by which malicious apps get data. This checks that you pair restricted consent with a review path.'},
+    {'id': 'q9002',
+     'cat': 'identityAccessGovernance',
+     'type': 'mc',
+     'question': 'An app registration has the application permission Files.ReadWrite.All granted with admin consent, and no user ever signs in to it. A '
+                 'reviewer asks what that grant means. Which description is correct?',
+     'options': ['The app can read and write only the files of the one user who originally consented to it',
+                 "The permission only applies to files that have been shared with the app's registered owner",
+                 'The app can read and write all files as itself, without a signed-in user',
+                 'The permission is ignored unless a user signs in to the app and approves the request'],
+     'correct': 2,
+     'explanation': 'Application permissions let an app act as itself with no user present, so Files.ReadWrite.All gives tenant-wide file access and '
+                    "always needs administrator consent. A delegated permission would be limited by the signed-in user's own access. The grant does not "
+                    "depend on user sign-in, and it is not limited to the owner's files.",
+     'whyTested': 'Application permissions are a frequent source of over-privileged identities.'},
+    {'id': 'tf9001',
+     'cat': 'identityAccessGovernance',
+     'type': 'tf',
+     'question': "A Key Vault firewall that allows only a selected virtual network also gives users in that network permission to read the vault's "
+                 'secrets.',
+     'answer': False,
+     'explanation': 'Network access and authorization are separate controls. The firewall only decides who may reach the vault endpoint, and callers '
+                    'still need data-plane permissions through Azure RBAC or access policies to read secrets.'},
+    {'id': 'q9003',
+     'cat': 'identityAccessGovernance',
+     'type': 'mc',
+     'question': 'A certificate stored in Key Vault was issued by an integrated certificate authority and expired last month, causing an outage. Which '
+                 'setting prevents a repeat without manual work?',
+     'options': ['A lifecycle action on the certificate policy that auto-renews it before expiry',
+                 'A soft-delete retention period of 90 days for every key and secret in the vault',
+                 'Purge protection on the vault with the maximum retention period',
+                 'A CanNotDelete resource lock on the vault and its resource group'],
+     'correct': 0,
+     'explanation': 'Certificate policies in Key Vault support lifecycle actions that renew automatically at a set point before expiry when using an '
+                    'integrated CA, which removes the manual step. A resource lock stops deletion of the resource, and purge protection and soft-delete '
+                    'retention protect against deleted objects, not against certificates expiring.'},
+    {'id': 'q9004',
+     'cat': 'identityAccessGovernance',
+     'type': 'mc',
+     'question': 'Contoso wants to know which VMs and deployment resources in Azure, AWS and Google Cloud contain exposed passwords and connection '
+                 'strings, without installing anything on the machines. Which capability does that?',
+     'options': ['Defender for Key Vault alerts',
+                 'Azure Policy audit of Key Vault configuration',
+                 'Defender CSPM secrets scanning, including agentless scanning of VM disks',
+                 'File integrity monitoring on each VM'],
+     'correct': 2,
+     'explanation': 'Defender CSPM provides agentless secrets scanning of multicloud VMs and infrastructure-as-code deployment resources, and surfaces '
+                    'findings in recommendations, security explorer and attack paths. Defender for Key Vault detects suspicious vault access rather than '
+                    'secrets stored elsewhere, a Key Vault Azure Policy checks vault settings, and file integrity monitoring tracks file changes and '
+                    'needs an agent.'},
+    {'id': 'q9005',
+     'cat': 'identityAccessGovernance',
+     'type': 'mc',
+     'question': "An attacker with a stolen administrator credential could disable soft delete and delete Contoso's Azure Backup data. Which feature "
+                 'requires a second approver before such protected operations can happen?',
+     'options': ['Multi-user authorization using a Resource Guard in a separate subscription',
+                 'Soft delete with the default 14-day retention that applies to every deleted backup item',
+                 'The Backup Reader role assigned to every administrator who manages the vault',
+                 'Encryption of the vault with customer-managed keys stored in a separate Key Vault'],
+     'correct': 0,
+     'explanation': 'Multi-user authorization places protected operations behind a Resource Guard whose administrators must approve them, ideally owned '
+                    'by a different team or subscription. Backup Reader is read-only but does not add an approval step, soft delete only retains deleted '
+                    'data, and customer-managed keys control encryption rather than who can disable protections.'},
+    {'id': 'msq9001',
+     'cat': 'identityAccessGovernance',
+     'type': 'ms',
+     'question': 'Operations staff must run restores from Azure Backup but must not be able to delete backups or change policies. Which two statements '
+                 'are correct? (Choose two.)',
+     'options': ['The Backup Operator role fits, because it excludes removing backups and managing policies',
+                 'Backup Reader can run restores and change retention',
+                 'Soft delete keeps deleted backup data for 14 additional days at no extra cost',
+                 'Backup Contributor fits, because it cannot create or manage backups'],
+     'correct': [0, 2],
+     'explanation': 'Backup Operator can do what Contributor does except removing backups and managing policies, which matches the requirement, and soft '
+                    'delete adds a 14-day safety net for deleted backup data. Backup Contributor can create and manage backups, and Backup Reader is '
+                    'view-only.'},
+    {'id': 'q9006',
+     'cat': 'identityAccessGovernance',
+     'type': 'mc',
+     'question': 'Defender for Cloud reports that several service principals and guest accounts hold Contributor on production subscriptions but have '
+                 'not used the access in 90 days. Which feature identifies and recommends right-sizing this access across clouds?',
+     'options': ['Azure Policy with the Audit effect applied to role assignments at subscription scope',
+                 'Microsoft Entra Permissions Management, which analyzes permissions across clouds',
+                 'Cloud infrastructure entitlement management (CIEM) in the Defender CSPM plan',
+                 'Network Watcher effective security rules on each network interface'],
+     'correct': 2,
+     'explanation': 'CIEM in Defender CSPM analyzes effective permissions, flags inactive or overprovisioned identities and recommends removing or '
+                    'narrowing access across Azure, AWS and GCP. Microsoft Entra Permissions Management is deprecated, Azure Policy evaluates resource '
+                    'configuration rather than identity usage, and Network Watcher deals with traffic rules.',
+     'whyTested': 'Overprivileged assignments are an exam skill. This checks the current tool for finding them.'},
+    {'id': 'q9007',
+     'cat': 'identityAccessGovernance',
+     'type': 'mc',
+     'question': 'Contoso needs a role that can read VM configuration and start or stop VMs but nothing else, and no built-in role fits. Where must the '
+                 'custom Azure role be assignable?',
+     'options': ['Only at the tenant root, regardless of what the definition says',
+                 'Only at the management group that defines the policy initiative',
+                 'Only to users, never to groups or service principals',
+                 'At the scopes listed in its AssignableScopes, such as a subscription or resource group'],
+     'correct': 3,
+     'explanation': 'AssignableScopes in the role definition decide where it can be assigned, such as a management group, subscription or resource '
+                    'group, and the role can then be given to users, groups and service principals. It is not limited to the tenant root or to users, '
+                    'and policy initiatives have no bearing on role assignability.'},
+    {'id': 'q9008',
+     'cat': 'identityAccessGovernance',
+     'type': 'mc',
+     'question': 'A team deploys Bicep templates that keep creating storage accounts with public network access enabled. Contoso wants the mistake '
+                 'caught in pull requests and also blocked if it still reaches deployment. Which combination meets both needs?',
+     'options': ['Defender for Storage enabled on every subscription that hosts the storage accounts',
+                 'A ReadOnly resource lock on every resource group that holds storage accounts',
+                 'Weekly access reviews of the service connection that the pipeline uses to deploy',
+                 'Defender for Cloud DevOps security IaC scanning in the pipeline, plus an Azure Policy deny assignment for public access'],
+     'correct': 3,
+     'explanation': 'IaC scanning reports misconfigurations at pull request time, and an Azure Policy with a deny effect is the backstop that blocks a '
+                    'non-compliant deployment. Resource locks protect resources from deletion or modification but do not validate configuration, access '
+                    'reviews do not inspect templates, and Defender for Storage detects threats after deployment.',
+     'whyTested': 'Shift-left plus enforcement is the pattern behind IaC security questions.'},
+    {'id': 'q9009',
+     'cat': 'identityAccessGovernance',
+     'type': 'mc',
+     'question': 'Contoso wants a single dashboard that compares its Azure resources with ISO 27001 and also with its own internal security rules. What '
+                 'should it do in Defender for Cloud?',
+     'options': ['Replace the Microsoft cloud security benchmark with ISO 27001 and drop every other standard',
+                 'Disable all recommendations and track compliance in a spreadsheet instead',
+                 'Create a Sentinel workbook for each standard and chart the incidents by hand',
+                 'Add the ISO 27001 standard and create a custom standard for the internal rules'],
+     'correct': 3,
+     'explanation': 'Defender for Cloud lets admins add regulatory standards and create custom standards, and both appear in the regulatory compliance '
+                    'view. A Sentinel workbook would not assess resources, the benchmark is the default baseline and need not be replaced, and a '
+                    'spreadsheet is not an assessment.'},
+    {'id': 'tf9002',
+     'cat': 'identityAccessGovernance',
+     'type': 'tf',
+     'question': 'Applications that require user assignment can always be consented by users, as long as user consent is allowed for the tenant.',
+     'answer': False,
+     'explanation': 'Apps that require users to be assigned must have their permissions consented by an administrator, even when user consent policies '
+                    'would otherwise let users consent for themselves.'},
+    {'id': 'q9010',
+     'cat': 'dataNetworkSecurity',
+     'type': 'mc',
+     'question': 'A partner receives a service SAS for a blob container. If the token leaks, Contoso wants to cancel it immediately without rotating the '
+                 'storage account keys that other apps use. How should the SAS have been created?',
+     'options': ['As an ad hoc SAS with a one-year expiry',
+                 'As an account SAS with all permissions',
+                 'By referencing a stored access policy on the container',
+                 'By sharing the primary account key instead'],
+     'correct': 2,
+     'explanation': 'A SAS tied to a stored access policy can be revoked by deleting or editing the policy, with no key rotation. An ad hoc SAS can only '
+                    'be invalidated by rotating the key that signed it, which affects other apps. An account SAS is signed with the key and has the same '
+                    'limitation, and sharing the account key is the least safe option.'},
+    {'id': 'q9011',
+     'cat': 'dataNetworkSecurity',
+     'type': 'mc',
+     'question': 'Contoso wants to remove SQL password logins from an Azure SQL logical server and require only Microsoft Entra identities. Which '
+                 'setting does this?',
+     'options': ['Transparent data encryption with a customer-managed key',
+                 'Microsoft Entra-only authentication',
+                 'Dynamic data masking on the sensitive columns',
+                 'The server firewall allow-list'],
+     'correct': 1,
+     'explanation': 'Entra-only authentication disables SQL authentication on the server so only Entra identities can sign in. TDE protects data at '
+                    'rest, masking hides values from query results and the firewall decides which networks can connect; none of them removes SQL logins.'},
+    {'id': 'msq9002',
+     'cat': 'dataNetworkSecurity',
+     'type': 'ms',
+     'question': 'Contoso must keep Azure SQL Managed Instance audit records for seven years and also query recent events for detections. Which two '
+                 'destinations meet this? (Choose two.)',
+     'options': ['A Log Analytics workspace for queries and Sentinel analytics',
+                 'A storage account for long retention',
+                 'The SQL error log on the instance',
+                 'A Key Vault secret holding the audit text'],
+     'correct': [0, 1],
+     'explanation': 'SQL auditing can write to storage for cheap long retention and to Log Analytics for queries and detections (and to Event Hubs for '
+                    'streaming). The SQL error log is not an audit store, and Key Vault is for secrets, not log data.'},
+    {'id': 'q9012',
+     'cat': 'dataNetworkSecurity',
+     'type': 'mc',
+     'question': 'Contoso runs PostgreSQL flexible servers in Azure and on Amazon RDS and wants to detect brute-force attempts and anomalous queries on '
+                 'both. Which Defender for Cloud plan applies?',
+     'options': ['Defender for Storage',
+                 'Defender for open-source relational databases',
+                 'Defender for SQL servers on machines',
+                 'Defender for Azure Cosmos DB'],
+     'correct': 1,
+     'explanation': 'The open-source relational databases plan covers Azure Database for PostgreSQL and MySQL flexible servers and Amazon RDS databases. '
+                    'SQL servers on machines targets SQL Server on VMs, Cosmos DB has its own plan and Defender for Storage protects storage accounts.'},
+    {'id': 'q9013',
+     'cat': 'dataNetworkSecurity',
+     'type': 'mc',
+     'question': 'A central security team must block inbound RDP and SSH on every virtual network in 40 subscriptions, while application teams keep '
+                 'managing their own NSGs. Which service fits?',
+     'options': ['Service endpoint policies attached to each subnet that reaches storage',
+                 'Azure Virtual Network Manager security admin rules',
+                 'Azure Firewall DNAT rules deployed in each regional hub virtual network',
+                 'An NSG on every subnet, with each application team maintaining its own rules'],
+     'correct': 1,
+     'explanation': 'Security admin rules apply organization-wide to the virtual networks in a network group and are evaluated before NSG rules, so the '
+                    'central team can enforce the block while teams keep their NSGs. Per-subnet NSGs are exactly the decentralized model, DNAT rules '
+                    'publish services rather than block ports, and service endpoint policies control storage access.'},
+    {'id': 'tf9003',
+     'cat': 'dataNetworkSecurity',
+     'type': 'tf',
+     'question': 'Azure Virtual Network Manager allows several security admin configurations to be deployed to the same region, each with its own rules.',
+     'answer': False,
+     'explanation': 'Only one security admin configuration can be deployed per region. To organize more rules, add multiple rule collections inside that '
+                    'single configuration.'},
+    {'id': 'q9014',
+     'cat': 'dataNetworkSecurity',
+     'type': 'mc',
+     'question': 'Branch offices and spoke VNets connect through an Azure Virtual WAN hub, and all traffic between them and to the internet must be '
+                 'inspected by a firewall managed centrally. What should be deployed?',
+     'options': ['Azure Firewall in the hub, making it a secured hub managed with Azure Firewall Manager',
+                 'A DDoS protection plan applied to the public IPs, with no firewall at all',
+                 'A network security group attached to every subnet inside the hub',
+                 'An Azure Bastion host deployed in each spoke virtual network'],
+     'correct': 0,
+     'explanation': 'Converting the Virtual WAN hub into a secured hub places Azure Firewall in it, and Firewall Manager policies control the rules '
+                    'centrally. NSGs cannot be applied to hub-managed subnets in this way, Bastion provides remote administration rather than traffic '
+                    'inspection, and DDoS protection does not inspect flows.'},
+    {'id': 'q9015',
+     'cat': 'dataNetworkSecurity',
+     'type': 'mc',
+     'question': 'Remote staff must connect to an Azure VNet by VPN and be subject to Conditional Access and MFA. Which point-to-site configuration '
+                 'supports this?',
+     'options': ['Microsoft Entra ID authentication with the OpenVPN tunnel type',
+                 'A site-to-site IPsec tunnel to each remote worker with a pre-shared key',
+                 'Certificate authentication with the SSTP tunnel type and a root certificate on every client',
+                 'RADIUS authentication against an on-premises server with the IKEv2 tunnel type'],
+     'correct': 0,
+     'explanation': 'Entra ID authentication is supported with OpenVPN, and it brings Conditional Access and MFA to VPN sign-in. Certificates and RADIUS '
+                    'are other authentication types that do not use Entra Conditional Access directly, and a site-to-site tunnel connects networks '
+                    'rather than individual users.'},
+    {'id': 'q9016',
+     'cat': 'dataNetworkSecurity',
+     'type': 'mc',
+     'question': 'Contoso wants to retire its VPN for access to internal web apps and file shares by using Microsoft Entra, with stricter Conditional '
+                 'Access for only the finance servers. How should this be configured?',
+     'options': ['A new Azure Firewall application rule collection for the finance server addresses',
+                 'Azure Bastion deployed in front of each server for the administrators',
+                 'Only Quick Access with every internal server and file share listed in it',
+                 'Entra Private Access with a per-app Global Secure Access app for the finance servers'],
+     'correct': 3,
+     'explanation': 'Private Access uses the Global Secure Access client and a private network connector, and a per-app Global Secure Access app lets '
+                    'the finance servers have their own users and Conditional Access policies, separate from the general Quick Access group. Quick '
+                    'Access alone applies one policy set to everything, Bastion is for admin access to VMs, and a firewall rule collection does not '
+                    'provide per-user private app access.'},
+    {'id': 'q9017',
+     'cat': 'dataNetworkSecurity',
+     'type': 'mc',
+     'question': "Traffic from a VM to a SQL private endpoint is blocked although the VM's NSG allows it. The admin wants a tool that tests a specific "
+                 'flow and names the deciding rule. Which should be used?',
+     'options': ['Azure Monitor metrics for the VM',
+                 'Defender for Cloud secure score',
+                 'Network Watcher topology view',
+                 'Network Watcher NSG diagnostics'],
+     'correct': 3,
+     'explanation': 'NSG diagnostics simulates a flow between a source and destination and reports allowed or denied with the exact rule responsible, '
+                    'including NSGs at different association levels. Topology shows relationships, metrics show performance, and secure score summarizes '
+                    'posture.'},
+    {'id': 'msq9003',
+     'cat': 'aiComputeSecurity',
+     'type': 'ms',
+     'question': 'Contoso wants to find overexposed SharePoint content before AI agents are broadly deployed. Which two capabilities help? (Choose two.)',
+     'options': ['Azure Bastion session recording',
+                 'SharePoint Advanced Management data access governance reports',
+                 'A Microsoft Purview DSPM data risk assessment of SharePoint sites',
+                 'A Network Watcher IP flow verify test'],
+     'correct': [1, 2],
+     'explanation': 'DSPM data risk assessments and SharePoint Advanced Management data access governance reports identify overshared sites and sharing '
+                    'patterns. Bastion recording and IP flow verify concern VM access and network traffic, not content exposure.'},
+    {'id': 'q9018',
+     'cat': 'aiComputeSecurity',
+     'type': 'mc',
+     'question': 'Defender for Cloud alerts on Foundry agents show masked content in the evidence section, so analysts cannot see the suspicious prompt. '
+                 'What should be enabled?',
+     'options': ['AI model security scanning of the models in the Azure Machine Learning registry',
+                 'The user prompt evidence component of the AI services plan',
+                 'Data security for AI interactions, which lets Purview analyze prompts and responses',
+                 'Defender for Key Vault'],
+     'correct': 1,
+     'explanation': 'When prompt evidence is off, detection continues but the prompt and response snippets are masked in alerts; enabling it shows the '
+                    'suspicious portions with sensitive data redacted. Purview integration provides data security analysis, model scanning checks '
+                    'registered models, and Key Vault protection is unrelated.'},
+    {'id': 'msq9004',
+     'cat': 'aiComputeSecurity',
+     'type': 'ms',
+     'question': 'Contoso enables threat protection for AI services on a subscription. Which two statements are correct? (Choose two.)',
+     'options': ['Enabling it requires the Owner or Contributor role on the subscription',
+                 'AI model security scans models registered in Azure Machine Learning registries for issues such as malware and unsafe serialization',
+                 'The Purview data security component is included in the plan at no extra license cost',
+                 'It replaces the need for Foundry guardrails'],
+     'correct': [0, 1],
+     'explanation': 'The plan is turned on at subscription scope by an Owner or Contributor, and AI model security scans models in Azure ML registries. '
+                    'The Purview data security integration needs a separate Purview license, and runtime threat detection complements, but does not '
+                    'replace, guardrails that shape what an agent can say or do.'},
+    {'id': 'q9019',
+     'cat': 'aiComputeSecurity',
+     'type': 'mc',
+     'question': 'A security lead wants one view showing which storage accounts, databases and AI services across subscriptions lack Defender '
+                 'protection, with their critical alerts and internet exposure. Which feature?',
+     'options': ['A custom workbook from the Azure Monitor workbook gallery, built query by query',
+                 'The Data and AI security dashboard in Defender for Cloud',
+                 'The Network Watcher topology view for each virtual network',
+                 'Microsoft Secure Score in the Microsoft 365 Defender portal for the Microsoft 365 tenant'],
+     'correct': 1,
+     'explanation': 'The Data and AI security dashboard summarizes coverage, top issues, sensitive data findings and internet-exposed data and AI '
+                    'resources per subscription. Workbooks, topology and Microsoft 365 Secure Score are not designed for protection coverage of data and '
+                    'AI resources.'},
+    {'id': 'q9020',
+     'cat': 'aiComputeSecurity',
+     'type': 'mc',
+     'question': 'An agent in Foundry reads partner-uploaded documents, and a document contains hidden text telling it to call a tool that exports '
+                 'customer records. Which guardrail intervention point can stop the exploit before the tool runs?',
+     'options': ['Tool call', 'Network egress logging', 'Output', 'User input'],
+     'correct': 0,
+     'explanation': 'The tool call intervention point scans the action and data an agent proposes to send to a tool, so it can block the export. Output '
+                    "scanning happens after the agent already acted, user input covers the direct prompt rather than the document's content, and logging "
+                    'does not prevent anything.',
+     'whyTested': 'Prompt injection through documents is why tool-level checks exist.'},
+    {'id': 'tf9004',
+     'cat': 'aiComputeSecurity',
+     'type': 'tf',
+     'question': "A Foundry guardrail's tool call and tool response intervention points apply to both models and agents.",
+     'answer': False,
+     'explanation': 'Tool call and tool response intervention points apply to agents only. User input and output apply to models and agents.'},
+    {'id': 'q9021',
+     'cat': 'aiComputeSecurity',
+     'type': 'mc',
+     'question': 'A Foundry resource with public network access disabled needs token quotas enforced on model deployments through AI Gateway. What must '
+                 'be true of the API Management instance?',
+     'options': ['It must be in a v2 tier and privately reachable, such as Standard v2 or Premium v2 with a private endpoint',
+                 'It must be placed in a different Entra tenant from the Foundry resource for isolation',
+                 'It must be a Developer tier instance that is exposed through a public IP address',
+                 'It must be a Consumption tier instance, which can live in any subscription'],
+     'correct': 0,
+     'explanation': 'An existing instance for AI Gateway must be a v2 tier in the same tenant and subscription, and with public access disabled it must '
+                    'also be reachable privately, for example Standard v2 or Premium v2 with a private endpoint or a Premium v2 VNet-injected instance. '
+                    'The other options violate the tier, tenant or privacy requirements.'},
+    {'id': 'q9022',
+     'cat': 'aiComputeSecurity',
+     'type': 'mc',
+     'question': 'Contoso wants agents published in Microsoft 365 to be approved before anyone can use them, and ownerless agents to be cleaned up. '
+                 'Which role can govern this without being Global Administrator?',
+     'options': ['Reports Reader', 'Security Reader', 'User Account Administrator', 'AI Administrator'],
+     'correct': 3,
+     'explanation': 'AI Administrator can view the registry and approve, install, block and manage agents. Security Reader, Reports Reader and User '
+                    'Account Administrator have limited visibility but cannot change agent configurations.'},
+    {'id': 'q9023',
+     'cat': 'aiComputeSecurity',
+     'type': 'mc',
+     'question': 'Eighty support agents each need the same OAuth permission and group membership, with approval and a 90-day expiry. Which Entra '
+                 'capability is designed for this?',
+     'options': ['A Conditional Access policy that grants the permission when conditions are met',
+                 'Entitlement management access packages for agent identities',
+                 'A permanent role assignment made to each agent identity one at a time in PIM',
+                 "Consent granted by each agent's developer when the agent is first deployed"],
+     'correct': 1,
+     'explanation': 'Access packages bundle group membership, directory roles and API permissions with approval and expiration, and can be assigned to '
+                    'agent identities at scale. PIM role assignment is for roles rather than API permissions and group bundles, developer consent '
+                    'bypasses governance, and Conditional Access controls token issuance, not grants.'},
+    {'id': 'q9024',
+     'cat': 'aiComputeSecurity',
+     'type': 'mc',
+     'question': "A Copilot Studio agent's tool invocation contains instructions injected from a web page. Contoso wants the action blocked while it is "
+                 'happening and an alert raised in the Defender portal. What should be configured?',
+     'options': ['A DLP policy on Teams chat that blocks sensitive information types',
+                 'Defender real-time protection for Copilot Studio agents, with the Microsoft 365 connector connected',
+                 'Azure Policy for Kubernetes applied to the cluster that hosts the agent',
+                 'A Conditional Access policy that requires MFA for the maker who built the agent'],
+     'correct': 1,
+     'explanation': 'Real-time protection scans tool invocations at runtime, blocks suspicious behavior or cross-prompt injection and raises alerts, and '
+                    "the Microsoft 365 connector makes the alerts and incidents appear in the portal. DLP on chat, Kubernetes policy and a maker's "
+                    'Conditional Access do not inspect agent tool calls.'},
+    {'id': 'q9025',
+     'cat': 'aiComputeSecurity',
+     'type': 'mc',
+     'question': 'A new Azure VM must be protected against bootkits and rootkits and have its boot integrity attested. Which feature set should be used?',
+     'options': ['Encryption at host, so that temporary disks and caches are encrypted',
+                 'A just-in-time access policy that limits when management ports are open',
+                 'Azure Bastion for browser-based access to the machine',
+                 'Trusted launch with Secure Boot and vTPM'],
+     'correct': 3,
+     'explanation': 'Trusted launch provides Secure Boot, a virtual TPM and boot integrity monitoring for generation 2 VMs and is the default for new '
+                    'ones. Encryption at host protects data at rest, JIT limits management ports and Bastion provides remote access.'},
+    {'id': 'q9026',
+     'cat': 'aiComputeSecurity',
+     'type': 'mc',
+     'question': 'Contoso must ensure all Windows and Linux servers, including Arc-enabled ones, have a specific TLS setting, with drift automatically '
+                 'corrected. Which feature fits?',
+     'options': ['Defender for Servers Plan 1 with Defender for Endpoint integration',
+                 'Just-in-time VM access on the management ports of each server',
+                 'Azure Machine Configuration in Apply and Autocorrect mode',
+                 'Azure Policy with the Audit effect on the VM resource properties in the subscription'],
+     'correct': 2,
+     'explanation': 'Machine Configuration configures guest operating system settings on Azure and Arc-enabled machines, and Apply and Autocorrect '
+                    'returns a drifted machine to the required state. An Audit effect only reports and cannot see guest settings, JIT controls ports and '
+                    'Plan 1 provides EDR.',
+     'whyTested': 'Machine Configuration is named in the skills outline; this checks its distinguishing ability, enforcing guest settings.'},
+    {'id': 'q9027',
+     'cat': 'aiComputeSecurity',
+     'type': 'mc',
+     'question': 'Servers in a subscription include some where no agent can be installed. Contoso wants vulnerability, malware and secrets scanning of '
+                 'their disks. Which capability fits?',
+     'options': ['Agentless scanning in Defender for Servers Plan 2',
+                 'Defender for Servers Plan 1 with Defender for Endpoint integration',
+                 'File integrity monitoring, which needs an agent on every server',
+                 'Adaptive network hardening recommendations for the network security groups'],
+     'correct': 0,
+     'explanation': 'Agentless scanning in Plan 2 (or Defender CSPM) analyzes disk snapshots for vulnerabilities, malware and secrets without installing '
+                    'software. Plan 1 focuses on EDR, which needs the sensor, and the other options do not scan disks for these findings.'},
+    {'id': 'q9028',
+     'cat': 'aiComputeSecurity',
+     'type': 'mc',
+     'question': 'Contoso needs Azure Container Registry with private endpoints and customer-managed keys. Which step is required?',
+     'options': ['Allow anonymous pull', 'Use the Premium SKU', 'Enable the admin user', 'Use the Basic SKU with a service endpoint'],
+     'correct': 1,
+     'explanation': 'Private endpoints and customer-managed keys are Premium SKU features. The admin user and anonymous pull weaken security, and Basic '
+                    'does not support these features.'},
+    {'id': 'q9029',
+     'cat': 'aiComputeSecurity',
+     'type': 'mc',
+     'question': "A Container Apps environment must only be reachable from inside Contoso's network, and the app must authenticate users with Microsoft "
+                 'Entra without custom code. What should be configured?',
+     'options': ['An external environment with an IP allow-list only',
+                 'A public environment with function keys',
+                 'An internal environment with VNet integration, and built-in authentication with Microsoft Entra',
+                 'A Basic ACR with admin credentials'],
+     'correct': 2,
+     'explanation': 'An internal environment limits ingress to the VNet, and built-in authentication provides Entra sign-in without custom code. An '
+                    'external environment is internet-facing, function keys belong to Azure Functions, and ACR admin credentials are unrelated.'},
+    {'id': 'q9030',
+     'cat': 'aiComputeSecurity',
+     'type': 'mc',
+     'question': 'An HTTP-triggered Azure Function must only accept calls from authenticated Contoso users, and the admin must know who is calling. '
+                 'Which approach is correct?',
+     'options': ['Turn on App Service authentication with Microsoft Entra ID and require authentication',
+                 'Rely on the function key in the URL',
+                 'Enable HTTPS only and nothing else',
+                 'Set the authorization level to anonymous and hide the URL'],
+     'correct': 0,
+     'explanation': 'Authentication through Entra ID identifies the caller and can be required for all requests. Function keys are shared secrets that '
+                    'do not identify a user, anonymous with a hidden URL is security by obscurity, and HTTPS only protects transport but not who may '
+                    'call.'},
+    {'id': 'q9031',
+     'cat': 'aiComputeSecurity',
+     'type': 'mc',
+     'question': 'A Logic App starts with an HTTP request trigger, and anyone who obtains the callback URL can invoke it. How can Contoso restrict calls '
+                 'to authenticated Entra callers?',
+     'options': ['Configure OAuth authorization policies for the request trigger',
+                 'Turn on run history retention',
+                 'Rename the workflow to hide the URL',
+                 'Add a delay action at the start'],
+     'correct': 0,
+     'explanation': 'Request triggers can require OAuth with Microsoft Entra authorization policies, and IP restrictions can add a network gate. '
+                    'Renaming, run history and delay actions do not control who can call.'},
+    {'id': 'q9032',
+     'cat': 'aiComputeSecurity',
+     'type': 'mc',
+     'question': 'Contoso exposes a back-end API through API Management and wants every call to carry a valid Entra token, with abusive clients '
+                 'throttled. Which policies should be used?',
+     'options': ['validate-jwt and rate-limit', 'log-to-eventhub and send-request', 'set-header and cache-lookup', 'mock-response and forward-request'],
+     'correct': 0,
+     'explanation': 'validate-jwt enforces a valid token and rate-limit throttles clients. The other pairs handle headers and caching, mocking and '
+                    'forwarding or logging and calls, none of which enforce authentication or throttling.'},
+    {'id': 'q9033',
+     'cat': 'aiComputeSecurity',
+     'type': 'mc',
+     'question': 'Administrators need to record RDP and SSH sessions to Azure VMs that have no public IPs, for audit. Which Azure Bastion SKU should be '
+                 'deployed?',
+     'options': ['Developer', 'Standard', 'Basic', 'Premium'],
+     'correct': 3,
+     'explanation': 'The Premium SKU adds session recording and private-only deployment. Developer is a free single-VM option, and Basic and Standard '
+                    'are dedicated SKUs without session recording.'},
+    {'id': 'q9034',
+     'cat': 'securityPostureOps',
+     'type': 'mc',
+     'question': "Contoso's Security Copilot users in a non-E5 tenant get requests rejected during peak incident hours, although their capacity is "
+                 'provisioned. What should be added so peaks are absorbed without hourly provisioning?',
+     'options': ['Contributor access for all analysts',
+                 'More Security Copilot owners',
+                 'A second Log Analytics workspace',
+                 'Overage SCUs, with a maximum limit or unlimited'],
+     'correct': 3,
+     'explanation': 'Overage capacity is consumed as used when provisioned SCUs are depleted and can be capped or unlimited. More owners, another '
+                    'workspace and more contributor rights do not add compute capacity.'},
+    {'id': 'msq9005',
+     'cat': 'securityPostureOps',
+     'type': 'ms',
+     'question': 'An analyst holds the Security Copilot contributor role but cannot retrieve any Sentinel incidents in prompts. Which two statements '
+                 'explain it? (Choose two.)',
+     'options': ['The contributor role is a Microsoft Entra role that automatically includes Sentinel access',
+                 'Plugins use on-behalf-of authentication, so the analyst also needs a Sentinel role such as Reader',
+                 'Security Copilot roles grant platform access only, not security data',
+                 'Sentinel data is never available to Security Copilot'],
+     'correct': [1, 2],
+     'explanation': 'Security Copilot owner and contributor roles are platform roles, not Entra roles, and plugins act on behalf of the user, so the '
+                    'user needs the permissions in the underlying product. The role does not carry Sentinel access, and Sentinel data is available '
+                    'through the plugin when the user has rights.'},
+    {'id': 'q9035',
+     'cat': 'securityPostureOps',
+     'type': 'mc',
+     'question': 'Which statement about Security Copilot capacity for Microsoft 365 E5 customers is correct?',
+     'options': ['They must provision a minimum of 10 SCUs per hour before use',
+                 'Capacity cannot be monitored',
+                 'Eligible tenants are auto-provisioned with a default capacity',
+                 'SCUs are billed per user per month'],
+     'correct': 2,
+     'explanation': 'Microsoft 365 E5 and E7 customers receive an automatically provisioned default capacity. SCUs are a compute unit billed as '
+                    'provisioned capacity or overage, not per user, the minimum for provisioning is one SCU, and usage can be monitored.'},
+    {'id': 'q9036',
+     'cat': 'securityPostureOps',
+     'type': 'mc',
+     'question': 'Who should be able to publish a custom plugin for everyone in the Security Copilot workspace?',
+     'options': ['Anyone with Reader on the subscription',
+                 'Only the people the owners explicitly allow, which can be owners only',
+                 'Only Microsoft',
+                 'Every user in the tenant by default'],
+     'correct': 1,
+     'explanation': 'Owners control whether contributors can add and manage custom plugins at user or organization scope. By default only owners do. '
+                    'Tenant users and subscription Readers have no such right.'},
+    {'id': 'q9037',
+     'cat': 'securityPostureOps',
+     'type': 'mc',
+     'question': 'Contoso starts a new Sentinel deployment in 2026. Which statement should guide the design?',
+     'options': ['Use only the Azure portal because the Defender portal does not support Sentinel without XDR',
+                 'Plan for the Microsoft Defender portal, because Sentinel in the Azure portal is not supported after March 31, 2027',
+                 'Use the Defender portal only if Microsoft 365 E5 is purchased',
+                 'Wait until 2028 for the Defender portal to be available'],
+     'correct': 1,
+     'explanation': 'Sentinel is generally available in the Defender portal, including for customers without Defender XDR or E5, and the Azure portal '
+                    'experience ends on March 31, 2027. The other statements are incorrect.'},
+    {'id': 'q9038',
+     'cat': 'securityPostureOps',
+     'type': 'mc',
+     'question': 'A playbook-based automation rule is not triggering the Logic App. The playbook is in a resource group. Which is the most likely '
+                 'missing permission?',
+     'options': ["Microsoft Sentinel Automation Contributor on the playbook's resource group",
+                 'Global Reader for the analyst',
+                 "Playbook Operator for Sentinel's service account",
+                 'Reader on the subscription'],
+     'correct': 0,
+     'explanation': 'Sentinel needs the Automation Contributor role on the resource group of the playbook to run it from an automation rule. Playbook '
+                    'Operator is for people running playbooks manually, and Global Reader and subscription Reader do not grant that permission.'},
+    {'id': 'q9039',
+     'cat': 'securityPostureOps',
+     'type': 'mc',
+     'question': 'Contoso wants SOC staff to create analytics rules and install solutions from the content hub, but not manage Azure RBAC. Which role '
+                 'fits?',
+     'options': ['Microsoft Sentinel Playbook Operator', 'Microsoft Sentinel Responder', 'Microsoft Sentinel Reader', 'Microsoft Sentinel Contributor'],
+     'correct': 3,
+     'explanation': 'Contributor can create and edit rules and manage the content hub. Responder manages incidents, Reader is view-only and Playbook '
+                    'Operator only runs playbooks.'},
+    {'id': 'q9040',
+     'cat': 'securityPostureOps',
+     'type': 'mc',
+     'question': 'A firewall appliance cannot run an agent and sends CEF messages. Which design collects them in Sentinel?',
+     'options': ['Send the logs to a Key Vault',
+                 'Install the Log Analytics agent on the firewall',
+                 'Send to a Linux forwarder with Azure Monitor Agent and the Common Event Format via AMA connector',
+                 'Enable diagnostic settings on the firewall appliance'],
+     'correct': 2,
+     'explanation': 'Appliances send Syslog or CEF to a Linux forwarder running Azure Monitor Agent, which uses a data collection rule and the connector '
+                    'to forward to the workspace. The legacy Log Analytics agent cannot be installed on the appliance, Key Vault is not a log '
+                    'destination, and diagnostic settings apply to Azure resources.'},
+    {'id': 'q9041',
+     'cat': 'securityPostureOps',
+     'type': 'mc',
+     'question': 'Contoso reduces Windows Security event ingestion cost by collecting only specific event IDs from servers, some of which are '
+                 'on-premises. Which approach is right?',
+     'options': ['Collect all events and delete rows later',
+                 'Windows Security Events via AMA with a data collection rule filter, with Azure Arc enabled on the on-premises servers',
+                 'Use Syslog via AMA',
+                 'Install the legacy Microsoft Monitoring Agent'],
+     'correct': 1,
+     'explanation': 'The AMA-based connector uses a DCR to filter events at the source, and non-Azure machines need Azure Arc first. The legacy agent is '
+                    'retired, collecting everything defeats cost control, and Syslog is for Linux sources.'},
+    {'id': 'q9042',
+     'cat': 'securityPostureOps',
+     'type': 'mc',
+     'question': 'After deploying Windows Event Forwarding to a WEC server running Azure Monitor Agent, built-in Windows Security analytics rules stop '
+                 'matching. Why?',
+     'options': ['The WEC server needs a Log Analytics agent instead',
+                 'The rules only work on Linux',
+                 'Windows Event Forwarding is not supported by Sentinel',
+                 'Forwarded events are written to the WindowsEvent table, not SecurityEvent'],
+     'correct': 3,
+     'explanation': 'Windows Forwarded Events land in WindowsEvent, but many built-in rules query SecurityEvent; rules must be adapted or the Windows '
+                    'Security Events connector used. WEF is supported, rules are not Linux-only, and the agent is AMA.'},
+    {'id': 'q9043',
+     'cat': 'securityPostureOps',
+     'type': 'mc',
+     'question': 'A vendor system posts JSON logs to Azure by REST API, and Contoso needs them in a table with only some fields kept. What should be '
+                 'used?',
+     'options': ['A custom table, the Logs Ingestion API and a DCR transformation',
+                 'A Network Watcher packet capture',
+                 'The Syslog connector',
+                 'A Key Vault secret per log'],
+     'correct': 0,
+     'explanation': 'The Logs Ingestion API sends JSON to a DCR, which can transform and filter the data into a custom table. The Syslog connector, Key '
+                    'Vault and packet captures do not ingest custom REST data.'},
+    {'id': 'q9044',
+     'cat': 'securityPostureOps',
+     'type': 'mc',
+     'question': 'Verbose firewall and storage access logs cost too much in the Sentinel analytics tier and are rarely used. Which approach is right?',
+     'options': ['Delete them after 24 hours',
+                 'Keep everything in the analytics tier for two years',
+                 'Export to a spreadsheet',
+                 'Store them in the data lake tier and summarize with KQL jobs when needed'],
+     'correct': 3,
+     'explanation': 'Secondary, high-volume data belongs in the data lake tier, with KQL jobs summarizing results into the analytics tier. Deleting them '
+                    'loses investigation value, analytics tier for all data is costly, and spreadsheets do not scale.'},
+    {'id': 'tf9005',
+     'cat': 'securityPostureOps',
+     'type': 'tf',
+     'question': 'The analytics tier in Microsoft Sentinel keeps data in interactive retention for 90 days by default and can extend it to two years.',
+     'answer': True,
+     'explanation': 'The analytics tier has 90 days of interactive retention by default and can be extended up to two years; data kept longer overall '
+                    'remains available in the data lake tier.'},
+    {'id': 'q9045',
+     'cat': 'securityPostureOps',
+     'type': 'mc',
+     'question': 'An investigator needs to find who isolated a device and who changed a Defender security role last week. Where is this recorded?',
+     'options': ['In Sentinel hunting queries only',
+                 'In NSG flow logs',
+                 'In the audit log that Microsoft Defender reads from Microsoft Purview auditing',
+                 'In Azure Activity logs'],
+     'correct': 2,
+     'explanation': 'Defender XDR and Defender for Endpoint activities are audited and visible through Purview auditing, requiring auditing to be on and '
+                    'the Audit Logs or View-Only Audit Logs role. Hunting queries find attacker activity, and Azure Activity and flow logs record other '
+                    'planes.'},
+    {'id': 'q9046',
+     'cat': 'securityPostureOps',
+     'type': 'mc',
+     'question': 'Which Defender for Cloud plan provides outside-in discovery of internet-facing resources without a separate EASM license?',
+     'options': ['Defender CSPM', 'Defender for Storage', 'Defender for Servers Plan 1 with Defender for Endpoint integration', 'Defender for Key Vault'],
+     'correct': 0,
+     'explanation': 'The Defender External Attack Surface Management integration is included with Defender CSPM. The other plans protect their own '
+                    'resources and do not run outside-in scans.'},
+    {'id': 'q9047',
+     'cat': 'securityPostureOps',
+     'type': 'mc',
+     'question': 'A new Windows VM was built with Defender for Servers Plan 2 enabled. Contoso wants the vulnerability assessment source to be the '
+                 'integrated Microsoft solution. What is the default?',
+     'options': ['Manual scans with PowerShell',
+                 'Microsoft Defender Vulnerability Management',
+                 'A third-party scanner that must be licensed first',
+                 'Azure Backup'],
+     'correct': 1,
+     'explanation': 'Defender for Servers includes Microsoft Defender Vulnerability Management as the vulnerability assessment solution, with premium '
+                    'capabilities in Plan 2. Third-party scanners are optional, and PowerShell and Backup are not vulnerability scanners.'},
 ]
 
 MADLIBS = [
@@ -2644,6 +3749,24 @@ MADLIBS = [
         ],
         'explanation': "Prevention mode is what makes a WAF policy actually block matching malicious requests; Detection mode only logs matches without stopping any traffic. Azure Firewall (or another network virtual appliance) provides the centralized, rule-and-threat-intelligence-driven inspection this scenario needs — an NSG only filters on basic 5-tuple rules with no deep packet inspection, and service/private endpoints govern access to a PaaS service rather than inspecting VNet-to-VNet traffic.",
     },
+    {'id': 'ml-sc500-9001',
+     'cat': 'securityPostureOps',
+     'scenario': "Security Copilot capacity is measured in {b1}, and the {b2} role is the one that Sentinel itself needs on a playbook's resource group "
+                 'so an automation rule can run it.',
+     'blanks': [{'key': 'b1', 'options': ['Security Compute Units', 'Data Collection Rules', 'Log Analytics tables', 'Defender plans'], 'correct': 0},
+                {'key': 'b2',
+                 'options': ['Microsoft Sentinel Automation Contributor', 'Microsoft Sentinel Reader', 'Playbook Operator', 'Security Copilot owner'],
+                 'correct': 0}],
+     'explanation': 'SCUs are the compute units for Security Copilot, and the Automation Contributor role lets Sentinel add and run playbooks from '
+                    'automation rules. Playbook Operator is for people running a playbook manually.'},
+    {'id': 'ml-sc500-9002',
+     'cat': 'aiComputeSecurity',
+     'scenario': "A Foundry guardrail's {b1} intervention point scans what an agent proposes to send to a tool, while the {b2} intervention point scans "
+                 'the final completion returned to the user.',
+     'blanks': [{'key': 'b1', 'options': ['tool call', 'user input', 'output', 'tool response'], 'correct': 0},
+                {'key': 'b2', 'options': ['tool call', 'user input', 'output', 'tool response'], 'correct': 2}],
+     'explanation': 'Guardrails have four intervention points: user input, tool call, tool response and output. Tool call checks the proposed action and '
+                    'data sent to a tool, and output checks the final completion.'},
 ]
 
 CHEAT_SHEET = [
@@ -2695,6 +3818,7 @@ CHEAT_SHEET = [
     {
         'heading': 'Securing AI workloads (new, high-yield content)',
         'points': [
+            "Foundry guardrails are collections of controls with four intervention points (user input, tool call, tool response, output); tool call and tool response apply to agents only. AI Gateway is Azure API Management in front of Foundry for token limits and governance.",
             'Microsoft Foundry (formerly Azure AI Foundry/Azure AI Studio) is where AI models and agents are hosted and orchestrated.',
             'Microsoft Entra Agent ID gives AI agents their own governable identity, so agents can be covered by Conditional Access and PIM-style controls like any other identity.',
             'Prompt Shields defend against both direct jailbreak prompts and indirect prompt injection hidden in third-party grounding content.',
@@ -2713,7 +3837,8 @@ CHEAT_SHEET = [
     {
         'heading': 'Security posture & monitoring',
         'points': [
-            'Microsoft Sentinel is the SIEM/SOAR layer this exam expects you to integrate both posture and workload signals into.',
+            "Microsoft Sentinel is the SIEM/SOAR layer this exam expects you to integrate both posture and workload signals into; it is generally available in the Defender portal and the Azure portal experience ends on March 31, 2027.",
+            "Security Copilot is billed in Security Compute Units (provisioned plus overage), is auto-provisioned for Microsoft 365 E5 and E7, and its owner and contributor roles are platform roles that do not grant access to security data.",
             'Secure Score is a percentage of implemented recommendations — it is a posture indicator, not a pass/fail compliance certification.',
             "Attack surface reduction rules and exploit protection are endpoint-level hardening controls, distinct from Defender for Cloud's resource-level posture checks.",
         ],
@@ -3094,4 +4219,95 @@ COMPARE = [
         'better': 'A',
         'why': "Archive retention keeps older data at a much lower cost, and a search job or restore brings it back when an audit needs it, which fits a rare-access pattern. Two years of interactive retention is simplest for analysts, but it pays full interactive-tier cost for data that is almost never queried.",
     },
+    {'id': 'cmp-sc500-9001',
+     'cat': 'identityAccessGovernance',
+     'scenario': 'A SAS issued to a partner may need to be cancelled early, but other applications depend on the same storage account key. Which '
+                 'approach is better?',
+     'optionA': 'Issue an ad hoc service SAS with a one-month expiry.',
+     'optionB': 'Issue a service SAS that references a stored access policy.',
+     'better': 'B',
+     'why': 'A SAS tied to a stored access policy can be revoked by changing or deleting the policy without touching the account key. An ad hoc SAS can '
+            'only be invalidated by rotating the signing key, which would break the other applications that rely on it.'},
+    {'id': 'cmp-sc500-9002',
+     'cat': 'dataNetworkSecurity',
+     'scenario': 'A central team wants to block RDP and SSH across all virtual networks in its network manager scope. Which is better?',
+     'optionA': 'Create security admin rules in Azure Virtual Network Manager.',
+     'optionB': 'Ask each application team to add an NSG rule to its own subnet.',
+     'better': 'A',
+     'why': 'Security admin rules apply centrally to every virtual network in the network group and are evaluated before NSG rules, so the block cannot '
+            'be removed by an application team. Per-team NSG rules depend on every team doing it correctly and can be changed locally.'},
+    {'id': 'cmp-sc500-9003',
+     'cat': 'securityPostureOps',
+     'scenario': 'A SOC needs to keep verbose firewall logs for a year for occasional investigations at the lowest cost. Which is better?',
+     'optionA': 'Keep them in the Sentinel analytics tier for a year.',
+     'optionB': 'Store them in the Sentinel data lake tier.',
+     'better': 'B',
+     'why': 'The data lake tier is designed for high-volume secondary data kept cost-effectively for long periods and queried when needed. The analytics '
+            'tier is optimized for detections and frequent hunting, and costs more for data that is rarely queried.'},
+]
+
+
+# ---------------------------------------------------------------------------
+# Content refresh (October 2026): additions aligned to the SC-500 skills
+# outline dated 2026-05-13. Extends the lessons above with the new items.
+# ---------------------------------------------------------------------------
+def _lesson(lesson_id):
+    return next(l for l in LESSONS if l['id'] == lesson_id)
+
+
+_l = _lesson('identity-access-governance')
+_l['vocabIds'] += ['f9001', 'f9002', 'f9003', 'f9006', 'f9010', 'f9011', 'f9012', 'f9013']
+_l['quizIds'] += ['q9001', 'q9002', 'tf9002', 'q9004', 'q9006', 'q9007', 'q9008', 'q9009']
+_l['keyTerms'] += ['user consent settings', 'admin consent workflow', 'application permissions', 'CIEM', 'custom Azure role', 'security standard']
+_l['reading'] += """
+
+Application access is governed by consent. By default users can consent to permissions that do not need an administrator, so tenants usually limit user consent to apps from verified publishers (for selected low-impact permissions) and add the admin consent workflow so users can request the rest. Delegated permissions are limited by the signed-in user, while application permissions let an app act as itself and always need administrator consent, which makes them the grants to review first.
+
+Overprivileged access is found with Cloud infrastructure entitlement management (CIEM) in the Defender CSPM plan, which flags inactive, guest and overprovisioned identities across Azure, AWS and GCP (Microsoft Entra Permissions Management is deprecated). Fixes live in Azure RBAC and PIM. Custom Azure roles define actions, data actions and assignable scopes. Governance is enforced with Azure Policy, Defender for Cloud standards (the Microsoft cloud security benchmark plus regulatory and custom standards), and infrastructure-as-code scanning in the pipeline backed by deny policies. Defender CSPM also scans for exposed secrets on machines, in deployment resources and in Azure DevOps repositories."""
+_l['commonTraps'] += [
+    "Application permissions need no signed-in user and always require admin consent; delegated permissions are capped by what the user can do.",
+]
+
+_l = _lesson('data-secrets-protection')
+_l['vocabIds'] += ['f9004', 'f9005', 'f9007', 'f9008', 'f9009', 'f9020', 'f9021', 'f9022', 'f9023']
+_l['quizIds'] += ['tf9001', 'q9003', 'q9005', 'msq9001', 'q9010', 'q9011', 'msq9002', 'q9012']
+_l['keyTerms'] += ['Key Vault firewall', 'Defender for Key Vault', 'Resource Guard', 'stored access policy', 'Entra-only authentication', 'Defender for Databases']
+_l['reading'] += """
+
+Key Vault needs two independent gates: the firewall (deny by default, selected networks, private endpoint, optional trusted-service bypass) controls who can reach the vault, and Azure RBAC controls what a caller may do. Key rotation policies, secret expiry dates and certificate auto-renewal keep material fresh, but only if consumers use the current or versionless identifier. Defender for Key Vault only detects suspicious access; it does not block it.
+
+Azure Backup isolates and encrypts vaulted data and adds soft delete (14 additional days), immutable vaults and multi-user authorization through a Resource Guard, with Backup Contributor, Operator and Reader roles for separation of duties. For storage, a stored access policy lets a service SAS be revoked without rotating account keys. For Azure SQL, platform settings include Entra-only authentication, firewall or private endpoint access and default TDE, auditing goes to storage, Log Analytics or Event Hubs, and Defender for Databases has separate plans for Azure SQL, SQL servers on machines, open-source relational databases and Cosmos DB."""
+
+_l = _lesson('network-perimeter-security')
+_l['vocabIds'] += ['f9024', 'f9025', 'f9026', 'f9027', 'f9028']
+_l['quizIds'] += ['q9013', 'tf9003', 'q9014', 'q9015', 'q9016', 'q9017']
+_l['keyTerms'] += ['security admin rules', 'secured hub', 'Entra Private Access', 'NSG diagnostics']
+_l['reading'] += """
+
+Azure Virtual Network Manager security admin rules give a central team organization-wide allow, always-allow or deny rules for the virtual networks in a network group, evaluated before NSG rules, with one security admin configuration per region. Virtual WAN is secured by converting hubs into secured hubs with Azure Firewall managed through Firewall Manager policies. For VPN, point-to-site supports OpenVPN, SSTP and IKEv2, and Microsoft Entra authentication (which brings Conditional Access and MFA) works with OpenVPN. Microsoft Entra Private Access replaces a VPN for private apps with the Global Secure Access client, Quick Access for the main set of resources and per-app access for resources that need their own policies. To prove why traffic is allowed or denied, Network Watcher NSG diagnostics simulates a flow and names the deciding rule."""
+
+_l = _lesson('ai-workload-security')
+_l['vocabIds'] += ['f9040', 'f9041', 'f9042', 'f9043', 'f9044', 'f9045', 'f9046', 'f9047', 'f9048', 'f9049', 'f9050', 'f9051', 'f9052', 'f9053', 'f9054', 'f9055', 'f9056', 'f9057']
+_l['quizIds'] += ['msq9003', 'q9018', 'msq9004', 'q9019', 'q9020', 'tf9004', 'q9021', 'q9022', 'q9023', 'q9024', 'q9025', 'q9026', 'q9027', 'q9028', 'q9029', 'q9030', 'q9031', 'q9032', 'q9033']
+_l['keyTerms'] += ['AI services plan', 'Data and AI security dashboard', 'guardrail intervention points', 'AI Gateway', 'Trusted launch', 'Machine Configuration', 'agentless scanning', 'validate-jwt']
+_l['reading'] += """
+
+For AI workloads, the Defender for AI services plan (turned on per subscription) detects threats to Foundry workloads and has three components: suspicious prompt evidence, Purview-backed data security for AI interactions (separately licensed) and AI model security scanning. The Data and AI security dashboard shows which data and AI resources are protected. Foundry guardrails are named collections of controls with four intervention points (user input, tool call, tool response and output), AI Gateway puts Azure API Management in front of Foundry for token limits and governance, and agents get access through Entra Agent ID, access packages and sponsors. Copilot Studio agents get real-time protection that blocks suspicious tool invocations, and agents in the Microsoft 365 admin center are governed through the registry and requests with the AI Administrator role. Before AI is deployed broadly, overexposed SharePoint content is found with DSPM data risk assessments and SharePoint Advanced Management reports.
+
+For servers, Trusted launch gives generation 2 VMs Secure Boot, vTPM and boot integrity monitoring, Azure Machine Configuration enforces guest settings with Audit, Apply and Monitor, or Apply and Autocorrect, and Defender for Servers Plan 2 adds agentless scanning and premium vulnerability management. For application platforms: use the Premium registry SKU for private link and customer-managed keys, put container workloads in virtual networks with managed identity, authenticate Functions with Entra rather than keys, restrict Logic App triggers, protect back ends with API Management policies such as validate-jwt and rate-limit, and choose the Bastion Premium SKU for session recording."""
+_l['commonTraps'] += [
+    "Tool call and tool response guardrail intervention points apply to agents only; prompt evidence off masks alerts but does not stop detection.",
+]
+
+_l = _lesson('security-posture-ops')
+_l['vocabIds'] += ['f9070', 'f9071', 'f9072', 'f9073', 'f9074', 'f9075', 'f9076', 'f9077', 'f9078', 'f9079', 'f9080', 'f9081', 'f9082', 'f9083', 'f9084', 'f9085']
+_l['quizIds'] += ['q9034', 'msq9005', 'q9035', 'q9036', 'q9037', 'q9038', 'q9039', 'q9040', 'q9041', 'q9042', 'q9043', 'q9044', 'tf9005', 'q9045', 'q9046', 'q9047']
+_l['keyTerms'] += ['Security Compute Unit', 'overage capacity', 'Security Copilot owner', 'Automation Contributor', 'data collection rule', 'WindowsEvent table', 'data lake tier', 'content hub']
+_l['reading'] += """
+
+Security Copilot runs on Security Compute Units: provisioned capacity is billed hourly and expires unused, overage capacity absorbs spikes, and Microsoft 365 E5 and E7 tenants are auto-provisioned. Its owner and contributor roles are platform roles, not Entra roles, and plugins act on behalf of the user, so analysts also need roles in the underlying products. Owners decide who can add custom plugins, and agents (including partner agents from the Security Store) should run under their own agent identity.
+
+For Microsoft Sentinel, plan for the Defender portal (the Azure portal experience ends on March 31, 2027). Azure RBAC roles are Reader, Responder, Contributor and Playbook Operator, and Automation Contributor is the service role that lets automation rules run playbooks. Install solutions from the content hub, collect Syslog and CEF through a Linux forwarder with Azure Monitor Agent, collect Windows Security events with a filtering data collection rule (Arc for non-Azure machines), and note that Windows Event Forwarding lands in WindowsEvent, not SecurityEvent. Custom tables take data from agents or the Logs Ingestion API through a DCR with transformation. Primary data stays in the analytics tier (90 days of interactive retention by default, up to two years), while verbose data goes to the data lake tier. Defender and Defender for Endpoint admin activity appears in the Purview-based audit log, and Defender CSPM includes external attack surface management at no extra license."""
+_l['commonTraps'] += [
+    "Without Sentinel Automation Contributor on the playbook's resource group, an automation rule silently fails to run the playbook.",
 ]
