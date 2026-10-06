@@ -4387,7 +4387,7 @@
       "id": "ccna-models-devices-cabling",
       "title": "Network Models, Devices, Cabling and TCP vs UDP",
       "summary": "How data is layered and encapsulated, what each network device does, which cable and topology fits which job, and how TCP and UDP differ.",
-      "diagram": null,
+      "diagram": "ccnaEncapsulation",
       "vocabIds": [
         "f1",
         "f2",
@@ -4437,7 +4437,7 @@
       "id": "ccna-ipv4-subnetting",
       "title": "IPv4 Addressing, Subnetting and VLSM",
       "summary": "Reading masks and prefixes, finding network and broadcast addresses, sizing subnets with VLSM, wildcard masks, and special address ranges.",
-      "diagram": null,
+      "diagram": "ccnaSubnetBlocks",
       "vocabIds": [
         "f27",
         "f28",
@@ -4484,7 +4484,7 @@
       "id": "ccna-ipv6-wireless-virtualization",
       "title": "IPv6, Wireless Basics and Virtualization",
       "summary": "IPv6 notation, address types, EUI-64 and SLAAC, 2.4 GHz channel planning and Wi-Fi security, and the basics of hypervisors, containers and VRFs.",
-      "diagram": null,
+      "diagram": "ccnaIpv6Eui64",
       "vocabIds": [
         "f33",
         "f34",
@@ -4535,7 +4535,7 @@
       "id": "ccna-vlans-trunking-intervlan",
       "title": "VLANs, Trunking and Inter-VLAN Routing",
       "summary": "Why VLANs exist, how access and trunk ports work, 802.1Q tagging and the native VLAN, voice VLANs, and routing between VLANs with router-on-a-stick and SVIs.",
-      "diagram": null,
+      "diagram": "ccnaTrunkDot1q",
       "vocabIds": [
         "f51",
         "f52",
@@ -4583,7 +4583,7 @@
       "id": "ccna-stp-etherchannel-discovery",
       "title": "STP, RSTP, EtherChannel and CDP/LLDP",
       "summary": "How spanning tree elects a root and blocks loops, how RSTP and Rapid PVST+ speed it up, how EtherChannel bundles links, and how CDP and LLDP discover neighbors.",
-      "diagram": null,
+      "diagram": "ccnaStpTriangle",
       "vocabIds": [
         "f62",
         "f64",
@@ -4637,7 +4637,7 @@
       "id": "ccna-wireless-architectures-management",
       "title": "Wireless Architectures and Device Management Access",
       "summary": "Autonomous, controller-based and cloud wireless designs, CAPWAP and AP modes, WLC ports and the GUI, and secure management access with SSH, HTTPS, TACACS+ and RADIUS.",
-      "diagram": null,
+      "diagram": "ccnaWirelessArch",
       "vocabIds": [
         "f79",
         "f80",
@@ -4687,7 +4687,7 @@
       "id": "ccna-automation-rest-sdn",
       "title": "Network Automation, REST, JSON and Controller-Based Networking",
       "summary": "Why automate, the control and data plane split in SDN, overlay and underlay, northbound and southbound APIs, REST and JSON, Ansible and Terraform, and the role of AI in network operations.",
-      "diagram": null,
+      "diagram": "ccnaSdnPlanes",
       "vocabIds": [
         "f97",
         "f99",
@@ -4740,7 +4740,7 @@
       "id": "routing-table-static-routes",
       "title": "The Routing Table, Forwarding Decisions and Static Routes",
       "summary": "How a router reads its routing table, chooses between competing routes (prefix length, administrative distance, metric), and how static, default and floating static routes work.",
-      "diagram": null,
+      "diagram": "ccnaLongestPrefix",
       "vocabIds": [
         "f1001",
         "f1002",
@@ -4788,7 +4788,7 @@
       "id": "ospfv2-single-area",
       "title": "OSPFv2: Single-Area Operation and Configuration",
       "summary": "How OSPF routers discover neighbors, elect a DR and BDR, calculate cost and install routes, with the commands to configure and verify single-area OSPFv2.",
-      "diagram": null,
+      "diagram": "ccnaOspfStates",
       "vocabIds": [
         "f1024",
         "f1026",
@@ -4836,7 +4836,7 @@
       "id": "first-hop-redundancy",
       "title": "First-Hop Redundancy: HSRP, VRRP and GLBP",
       "summary": "How a pair of routers presents one virtual default gateway to hosts, and how HSRP, VRRP and GLBP differ in standards, roles, preemption and load balancing.",
-      "diagram": null,
+      "diagram": "ccnaHsrp",
       "vocabIds": [
         "f1046",
         "f1047",
@@ -4883,7 +4883,7 @@
       "id": "nat-dhcp-dns-ntp",
       "title": "NAT, DHCP, DNS and NTP",
       "summary": "How routers translate private addresses (static NAT, pools, PAT), hand out configuration with DHCP and relay, and how DNS and NTP support everything else.",
-      "diagram": null,
+      "diagram": "ccnaNatPat",
       "vocabIds": [
         "f1056",
         "f1058",
@@ -4931,7 +4931,7 @@
       "id": "snmp-syslog-qos-management",
       "title": "SNMP, Syslog, QoS, SSH and File Transfer",
       "summary": "The management and quality services of an IP network: monitoring with SNMP, logging with syslog, prioritizing traffic with QoS, secure remote access with SSH and moving files with TFTP and FTP.",
-      "diagram": null,
+      "diagram": "ccnaSyslogLevels",
       "vocabIds": [
         "f1073",
         "f1074",
@@ -5027,7 +5027,7 @@
       "id": "acls-layer2-wireless-security",
       "title": "ACLs, Layer 2 Security and Wireless Security",
       "summary": "Writing and placing standard and extended ACLs with wildcard masks, protecting access ports with port security, DHCP snooping and DAI, and choosing wireless security protocols.",
-      "diagram": null,
+      "diagram": "ccnaAclFlow",
       "vocabIds": [
         "f1106",
         "f1107",

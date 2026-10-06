@@ -506,7 +506,7 @@ LESSONS = [
         'id': 'routing-table-static-routes',
         'title': 'The Routing Table, Forwarding Decisions and Static Routes',
         'summary': 'How a router reads its routing table, chooses between competing routes (prefix length, administrative distance, metric), and how static, default and floating static routes work.',
-        'diagram': None,
+        'diagram': 'ccnaLongestPrefix',
         'vocabIds': ['f1001', 'f1002', 'f1003', 'f1004', 'f1006', 'f1007', 'f1008', 'f1009', 'f1010'],
         'quizIds': ['q1001', 'q1003', 'q1004', 'q1009', 'q1029', 'msq1002'],
         'reading': """A router has one job: look at the destination address of each packet and send it toward the next device that is closer. It does this by consulting its routing table, which lists destination prefixes and, for each one, where to send traffic. Every line in show ip route carries the same ingredients: a code letter for how the route was learned (C connected, L local, S static, O OSPF), the destination prefix, a bracket holding [administrative distance/metric], and the next hop or exit interface. When an interface is up and has an address, the router creates the C route for its subnet and the L route for its own address as a /32 automatically. Everything else must be learned from a routing protocol or configured by hand.
@@ -535,7 +535,7 @@ To build a backup path, give a second static route an administrative distance hi
         'id': 'ospfv2-single-area',
         'title': 'OSPFv2: Single-Area Operation and Configuration',
         'summary': 'How OSPF routers discover neighbors, elect a DR and BDR, calculate cost and install routes, with the commands to configure and verify single-area OSPFv2.',
-        'diagram': None,
+        'diagram': 'ccnaOspfStates',
         'vocabIds': ['f1024', 'f1026', 'f1027', 'f1029', 'f1031', 'f1032', 'f1033', 'f1037', 'f1039'],
         'quizIds': ['q1011', 'q1014', 'q1015', 'q1018', 'q1019', 'msq1005'],
         'reading': """OSPF is a link-state routing protocol. Instead of passing along a list of 'distances', every router describes its own links in link-state advertisements, floods them through the area, and stores everything it hears in a link-state database. Because every router in the area ends up with an identical database, each can independently run the shortest path first algorithm and arrive at a loop-free map of the network. In a single-area design every router belongs to area 0, the backbone. OSPF runs directly on IP (protocol 89) and uses the multicast addresses 224.0.0.5 (all OSPF routers) and 224.0.0.6 (the DR and BDR only).
@@ -564,7 +564,7 @@ Configuration is short. Enter router ospf 1, set router-id 1.1.1.1, then use net
         'id': 'first-hop-redundancy',
         'title': 'First-Hop Redundancy: HSRP, VRRP and GLBP',
         'summary': 'How a pair of routers presents one virtual default gateway to hosts, and how HSRP, VRRP and GLBP differ in standards, roles, preemption and load balancing.',
-        'diagram': None,
+        'diagram': 'ccnaHsrp',
         'vocabIds': ['f1046', 'f1047', 'f1048', 'f1049', 'f1050', 'f1051', 'f1052', 'f1054'],
         'quizIds': ['q1024', 'q1025', 'q1026', 'q1027', 'msq1004', 'tf1006'],
         'reading': """A host has exactly one default gateway configured, usually learned through DHCP. If that single router fails, every host on the VLAN loses access beyond its subnet, even though a perfectly good second router sits right next to it. Reconfiguring hundreds of hosts during an outage is not an option. A first-hop redundancy protocol solves this: two or more routers share one virtual IP address and one virtual MAC address, and hosts use the virtual IP as their gateway. Whichever router currently holds the leading role answers ARP requests for that virtual address with the virtual MAC, so when it fails, the other router takes over the same addresses and the hosts notice nothing except perhaps a brief pause.
@@ -593,7 +593,7 @@ When you verify with show standby brief, you read the group, priority, whether p
         'id': 'nat-dhcp-dns-ntp',
         'title': 'NAT, DHCP, DNS and NTP',
         'summary': 'How routers translate private addresses (static NAT, pools, PAT), hand out configuration with DHCP and relay, and how DNS and NTP support everything else.',
-        'diagram': None,
+        'diagram': 'ccnaNatPat',
         'vocabIds': ['f1056', 'f1058', 'f1060', 'f1061', 'f1063', 'f1064', 'f1065', 'f1068', 'f1071'],
         'quizIds': ['q1031', 'q1033', 'q1035', 'q1036', 'q1038', 'msq1008'],
         'reading': """Private IPv4 addresses (10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16) cannot be routed on the Internet, so a router or firewall at the edge performs network address translation. The CCNA uses four terms: the inside local address is the host's real private address, the inside global address is what that host looks like on the Internet, and the outside local and outside global pair describe the remote host. Three flavors matter. Static NAT is a permanent one-to-one mapping, ideal for publishing a server because outside clients can start the connection. Dynamic NAT borrows an address from a configured pool for each inside host and runs out when the pool is empty. PAT, also called overload, lets many inside hosts share one public address by giving each flow a unique source port, which is why almost every home and branch network uses it.
@@ -622,7 +622,7 @@ NTP keeps clocks aligned, using UDP 123. Time sources form a hierarchy of strata
         'id': 'snmp-syslog-qos-management',
         'title': 'SNMP, Syslog, QoS, SSH and File Transfer',
         'summary': 'The management and quality services of an IP network: monitoring with SNMP, logging with syslog, prioritizing traffic with QoS, secure remote access with SSH and moving files with TFTP and FTP.',
-        'diagram': None,
+        'diagram': 'ccnaSyslogLevels',
         'vocabIds': ['f1073', 'f1074', 'f1076', 'f1077', 'f1078', 'f1079', 'f1081', 'f1083', 'f1085'],
         'quizIds': ['q1039', 'q1040', 'q1042', 'q1043', 'msq1010', 'tf1016'],
         'reading': """Networks need to be watched, remembered and kept fair. SNMP covers watching. A network management station polls an SNMP agent on each device, typically on UDP 161, for variables defined in the management information base, each identified by an object identifier. The agent can also volunteer an alert, a trap, to the station on UDP 162; an inform is a trap the manager must acknowledge, so it is resent if lost. SNMPv1 and v2c authenticate with a community string sent in clear text, so treat them as unsafe on untrusted paths. SNMPv3 adds named users, authentication and optional encryption, and authPriv, which does both, is the secure answer on the exam.
@@ -680,7 +680,7 @@ VPNs protect traffic across untrusted networks. A site-to-site VPN, normally IPs
         'id': 'acls-layer2-wireless-security',
         'title': 'ACLs, Layer 2 Security and Wireless Security',
         'summary': 'Writing and placing standard and extended ACLs with wildcard masks, protecting access ports with port security, DHCP snooping and DAI, and choosing wireless security protocols.',
-        'diagram': None,
+        'diagram': 'ccnaAclFlow',
         'vocabIds': ['f1106', 'f1107', 'f1108', 'f1110', 'f1111', 'f1112', 'f1113', 'f1114'],
         'quizIds': ['q1046', 'q1047', 'q1049', 'q1052', 'q1053', 'q1054'],
         'reading': """An access control list is an ordered list of permit and deny rules that a router applies to packets. A standard ACL (numbers 1 to 99 and 1300 to 1999, or a named standard ACL) matches only the source IPv4 address. An extended ACL (100 to 199 and 2000 to 2699, or named) matches protocol, source, destination and, for TCP and UDP, port numbers. Two rules govern every ACL. Entries are checked from top to bottom and the first match decides, so specific entries must come before general ones; and there is an invisible deny any at the very end, so an ACL consisting of only deny lines blocks everything. A line such as permit ip any any placed too early makes all later entries unreachable.

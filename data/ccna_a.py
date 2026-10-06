@@ -762,7 +762,7 @@ LESSONS = [
         'id': 'ccna-models-devices-cabling',
         'title': 'Network Models, Devices, Cabling and TCP vs UDP',
         'summary': 'How data is layered and encapsulated, what each network device does, which cable and topology fits which job, and how TCP and UDP differ.',
-        'diagram': None,
+        'diagram': 'ccnaEncapsulation',
         'vocabIds': ['f1', 'f2', 'f3', 'f4', 'f5', 'f6', 'f19', 'f24', 'f25'],
         'quizIds': ['q1', 'q2', 'q3', 'q8', 'q9', 'tf1'],
         'reading': """Networking is easier once you accept that nothing sends "an email" across a wire. A message is wrapped in layers, and each layer has one narrow job. The OSI model names seven of them: Physical, Data Link, Network, Transport, Session, Presentation and Application. The TCP/IP model that real protocols follow squeezes them into four: Link, Internet, Transport and Application. For the CCNA, remember the layers where the action is: layer 1 is signals on cable, layer 2 is Ethernet frames and MAC addresses, layer 3 is IP packets and routing, and layer 4 is TCP and UDP with port numbers.
@@ -791,7 +791,7 @@ Finally, the two transport protocols. TCP is connection-oriented: a three-way ha
         'id': 'ccna-ipv4-subnetting',
         'title': 'IPv4 Addressing, Subnetting and VLSM',
         'summary': 'Reading masks and prefixes, finding network and broadcast addresses, sizing subnets with VLSM, wildcard masks, and special address ranges.',
-        'diagram': None,
+        'diagram': 'ccnaSubnetBlocks',
         'vocabIds': ['f27', 'f28', 'f29', 'f30', 'f31', 'f32', 'f50'],
         'quizIds': ['q11', 'q12', 'q13', 'q14', 'q15', 'q16'],
         'reading': """An IPv4 address is 32 bits, written as four decimal octets. The subnet mask (or prefix length) says how many of those bits identify the network and how many identify the host. A /24 means 24 network bits, which is 255.255.255.0. Everything in subnetting comes from one observation: with h host bits, a subnet holds 2^h addresses, of which 2^h minus 2 are usable, because the all-zeros host is the network address and the all-ones host is the broadcast address. So a /24 has 254 hosts, a /27 has 30, a /30 has 2.
@@ -820,7 +820,7 @@ Know the special ranges. The three RFC 1918 private blocks are 10.0.0.0/8, 172.1
         'id': 'ccna-ipv6-wireless-virtualization',
         'title': 'IPv6, Wireless Basics and Virtualization',
         'summary': 'IPv6 notation, address types, EUI-64 and SLAAC, 2.4 GHz channel planning and Wi-Fi security, and the basics of hypervisors, containers and VRFs.',
-        'diagram': None,
+        'diagram': 'ccnaIpv6Eui64',
         'vocabIds': ['f33', 'f34', 'f36', 'f37', 'f39', 'f41', 'f43', 'f44', 'f45'],
         'quizIds': ['q18', 'q19', 'q20', 'q21', 'q22', 'q24'],
         'reading': """IPv6 addresses are 128 bits written as eight groups of four hex digits. Two rules shorten them: drop leading zeros in each group, and replace one run of consecutive all-zero groups with a double colon. You may use the double colon only once, otherwise the address becomes ambiguous. So 2001:0DB8:0000:0042:0000:0000:0000:0001 becomes 2001:DB8:0:42::1. A typical global unicast address splits into a 48-bit site prefix, a 16-bit subnet ID, and a 64-bit interface ID, so every LAN is a /64.
@@ -849,7 +849,7 @@ Virtualization closes the fundamentals. A hypervisor runs several virtual machin
         'id': 'ccna-vlans-trunking-intervlan',
         'title': 'VLANs, Trunking and Inter-VLAN Routing',
         'summary': 'Why VLANs exist, how access and trunk ports work, 802.1Q tagging and the native VLAN, voice VLANs, and routing between VLANs with router-on-a-stick and SVIs.',
-        'diagram': None,
+        'diagram': 'ccnaTrunkDot1q',
         'vocabIds': ['f51', 'f52', 'f53', 'f54', 'f55', 'f57', 'f58', 'f59'],
         'quizIds': ['q25', 'q26', 'q27', 'q28', 'q29', 'q31'],
         'reading': """A VLAN is a logical broadcast domain carved out of a switch. Without VLANs, every port on every switch shares one broadcast domain, which gets noisy as it grows and offers no separation between departments. With VLANs, the engineering ports are VLAN 20, the sales ports are VLAN 10, and each VLAN is mapped to its own IP subnet. Broadcasts stay inside a VLAN, and security policy can be applied at the point where VLANs meet. Normal-range VLANs are 1 to 1005 and are stored in the VLAN database; extended-range VLANs are 1006 to 4094.
@@ -881,7 +881,7 @@ LESSONS += [
         'id': 'ccna-stp-etherchannel-discovery',
         'title': 'STP, RSTP, EtherChannel and CDP/LLDP',
         'summary': 'How spanning tree elects a root and blocks loops, how RSTP and Rapid PVST+ speed it up, how EtherChannel bundles links, and how CDP and LLDP discover neighbors.',
-        'diagram': None,
+        'diagram': 'ccnaStpTriangle',
         'vocabIds': ['f62', 'f64', 'f65', 'f66', 'f70', 'f73', 'f74', 'f75', 'f76'],
         'quizIds': ['q33', 'q34', 'q35', 'q37', 'q38', 'msq8'],
         'reading': """Redundant links are good for resilience and terrible for Ethernet, because Ethernet frames have no time-to-live. If two switches are connected by two cables and nothing stops it, a broadcast circles forever, MAC address tables flap between ports, and the network melts down in seconds. Spanning Tree Protocol (STP, IEEE 802.1D) prevents this by electing a root bridge and blocking enough ports that exactly one active path exists to every segment.
@@ -911,7 +911,7 @@ CDP (Cisco-proprietary, on by default) and LLDP (IEEE 802.1AB, for mixed vendors
         'id': 'ccna-wireless-architectures-management',
         'title': 'Wireless Architectures and Device Management Access',
         'summary': 'Autonomous, controller-based and cloud wireless designs, CAPWAP and AP modes, WLC ports and the GUI, and secure management access with SSH, HTTPS, TACACS+ and RADIUS.',
-        'diagram': None,
+        'diagram': 'ccnaWirelessArch',
         'vocabIds': ['f79', 'f80', 'f81', 'f82', 'f83', 'f85', 'f86', 'f87'],
         'quizIds': ['q41', 'q42', 'q43', 'q44', 'q45', 'q47'],
         'reading': """Cisco describes three wireless architectures. Autonomous access points are self-contained: each is configured individually, usually over its own CLI or GUI, and connects to the switch on a trunk or access port. That is fine for a handful of APs and a nightmare at scale. Controller-based (split-MAC) designs use lightweight access points that cannot operate alone. Each AP builds a CAPWAP tunnel to a wireless LAN controller (WLC): one tunnel for control traffic (UDP 5246) and one for data (UDP 5247). The AP handles real-time radio functions, and the controller handles management functions such as authentication, roaming and radio resource management. Cloud-based designs, like Cisco Meraki, move the management plane to a cloud dashboard so there is no controller on premises, and Catalyst access points can also run an embedded wireless controller.
@@ -938,7 +938,7 @@ Managing devices securely is part of Network Access. Console is a local, out-of-
         'id': 'ccna-automation-rest-sdn',
         'title': 'Network Automation, REST, JSON and Controller-Based Networking',
         'summary': 'Why automate, the control and data plane split in SDN, overlay and underlay, northbound and southbound APIs, REST and JSON, Ansible and Terraform, and the role of AI in network operations.',
-        'diagram': None,
+        'diagram': 'ccnaSdnPlanes',
         'vocabIds': ['f97', 'f99', 'f100', 'f101', 'f104', 'f105', 'f108', 'f110', 'f111'],
         'quizIds': ['q49', 'q52', 'q53', 'q55', 'q56', 'q59'],
         'reading': """Traditional networks are managed one box at a time. An engineer logs in to each switch, pastes commands, and hopes every device ends up the same. Over time devices drift apart, changes are hard to audit and rolling out a new VLAN to fifty switches takes an evening. Automation replaces that with repeatable, scripted or template-driven changes: faster, more consistent, with fewer typing errors and a clear record of what was changed.

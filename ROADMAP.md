@@ -1681,9 +1681,11 @@ trading away for shinier but shallower ones.
   and nist.gov were blocked in the build environment, so outlines, weights, formats
   and experience rules rest on search-result snippets and the resource URLs are from
   memory; worker-flagged soft spots include NIST SP 800-63B wording, SOC 2 reporting
-  periods, OSPF `maximum-paths` and QoS voice figures. No lesson diagrams or
-  cross-cert bridges exist for these tracks yet, and ISSAP, ISSEP and ISSMP are not
-  covered.
+  periods, OSPF `maximum-paths` and QoS voice figures. Follow-up: 59 lesson diagrams (CCNA 13, CISSP 14, CCSP 8, CSSLP 7, CC 6,
+  SSCP 6, CGRC 5) in `src/js/01a_diagrams_ccna|cissp|cloudsw|coreisc2.jsx`, registered
+  into `LESSON_DIAGRAMS`; the build now also checks the types of lesson fields (a
+  string `commonTraps` would have crashed the lesson view). No cross-cert bridges
+  exist for these tracks yet, and ISSAP, ISSEP and ISSMP are not covered.
 - [ ] **Open ideas.** Sounds for the verbal quiz and the case-study end screen;
   lesson diagrams (OSI, subnetting, STP, OSPF, RMF) and cross-cert bridges for the new tracks, a Security+ track to sit beside CC and SSCP; sharing a scenario or term list between devices without a full export; a
   step bank that also learns from your own earlier scenarios; the real module

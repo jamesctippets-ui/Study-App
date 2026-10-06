@@ -563,7 +563,9 @@ where one genuinely fits, vocab/quiz call-outs, and common-traps notes):
   the Exam tab with the waivers and the Associate of ISC2 route. The content was
   written from search results and general knowledge because ISC2's and Cisco's own
   pages could not be opened from the build environment; check each outline before
-  you book. ISSAP, ISSEP and ISSMP are not covered.
+  you book. ISSAP, ISSEP and ISSMP are not covered. Most lessons carry a diagram
+  (CCNA 13, CISSP 14, CCSP 8, CSSLP 7, CC 6, SSCP 6, CGRC 5), each in its own
+  `src/js/01a_diagrams_*.jsx` file.
 - **EHR Integration** — *not a certification.* Epic (the dominant hospital EHR
   vendor) requires employer sponsorship to even take its exams, and its exam
   content is proprietary, so there's no legitimate way to build real cert-prep
