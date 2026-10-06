@@ -13,14 +13,14 @@ import random
 
 CATEGORIES = [
     {'key': 'ccspConcepts', 'label': 'Cloud Concepts, Architecture and Design', 'marks': 17, 'resources': [
-        {'label': 'ISC2: CCSP certification exam outline', 'url': 'https://www.isc2.org/certifications/ccsp/ccsp-certification-exam-outline'},
+        {'label': 'ISC2: CCSP certification exam outline', 'url': 'https://www.isc2.org/Certifications/CCSP/Certification-Exam-Outline'},
         {'label': 'NIST SP 800-145: The NIST Definition of Cloud Computing', 'url': 'https://csrc.nist.gov/pubs/sp/800/145/final'},
-        {'label': 'CSA: Security Guidance for Critical Areas of Focus in Cloud Computing', 'url': 'https://cloudsecurityalliance.org/research/guidance'},
+        {'label': 'CSA: Security Guidance for Critical Areas of Focus in Cloud Computing', 'url': 'https://cloudsecurityalliance.org/artifacts/security-guidance-v5'},
     ]},
     {'key': 'ccspData', 'label': 'Cloud Data Security', 'marks': 20, 'resources': [
         {'label': 'NIST SP 800-57 Part 1 Rev. 5: Recommendation for Key Management', 'url': 'https://csrc.nist.gov/pubs/sp/800/57/pt1/r5/final'},
         {'label': 'NIST SP 800-88 Rev. 1: Guidelines for Media Sanitization', 'url': 'https://csrc.nist.gov/pubs/sp/800/88/r1/final'},
-        {'label': 'CSA: Security Guidance (Data Security and Encryption domain)', 'url': 'https://cloudsecurityalliance.org/research/guidance'},
+        {'label': 'CSA: Security Guidance (Data Security and Encryption domain)', 'url': 'https://cloudsecurityalliance.org/artifacts/security-guidance-v5'},
     ]},
     {'key': 'ccspPlatform', 'label': 'Cloud Platform and Infrastructure Security', 'marks': 17, 'resources': [
         {'label': 'NIST SP 800-190: Application Container Security Guide', 'url': 'https://csrc.nist.gov/pubs/sp/800/190/final'},

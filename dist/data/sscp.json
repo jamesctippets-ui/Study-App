@@ -7,7 +7,7 @@
       "resources": [
         {
           "label": "ISC2: SSCP certification exam outline",
-          "url": "https://www.isc2.org/certifications/sscp/sscp-certification-exam-outline"
+          "url": "https://www.isc2.org/Certifications/SSCP/Certification-Exam-Outline"
         },
         {
           "label": "ISC2: Code of Ethics",
@@ -15,7 +15,7 @@
         },
         {
           "label": "NIST SP 800-53 Rev. 5: Security and Privacy Controls",
-          "url": "https://csrc.nist.gov/pubs/sp/800/53/r5/upd1/final"
+          "url": "https://csrc.nist.gov/pubs/sp/800/53/r5/final"
         }
       ]
     },
@@ -129,7 +129,7 @@
         },
         {
           "label": "Cloud Security Alliance: Security Guidance for Critical Areas of Focus in Cloud Computing",
-          "url": "https://cloudsecurityalliance.org/research/guidance"
+          "url": "https://cloudsecurityalliance.org/artifacts/security-guidance-v5"
         }
       ]
     }

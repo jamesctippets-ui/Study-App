@@ -8,9 +8,9 @@ cryptography in use, network controls, endpoint/cloud/virtualization/mobile secu
 
 CATEGORIES = [
     {'key': 'sscpConcepts', 'label': 'Security Concepts and Practices', 'marks': 16, 'resources': [
-        {'label': 'ISC2: SSCP certification exam outline', 'url': 'https://www.isc2.org/certifications/sscp/sscp-certification-exam-outline'},
+        {'label': 'ISC2: SSCP certification exam outline', 'url': 'https://www.isc2.org/Certifications/SSCP/Certification-Exam-Outline'},
         {'label': 'ISC2: Code of Ethics', 'url': 'https://www.isc2.org/ethics'},
-        {'label': 'NIST SP 800-53 Rev. 5: Security and Privacy Controls', 'url': 'https://csrc.nist.gov/pubs/sp/800/53/r5/upd1/final'},
+        {'label': 'NIST SP 800-53 Rev. 5: Security and Privacy Controls', 'url': 'https://csrc.nist.gov/pubs/sp/800/53/r5/final'},
     ]},
     {'key': 'sscpAccess', 'label': 'Access Controls', 'marks': 15, 'resources': [
         {'label': 'NIST SP 800-63 Digital Identity Guidelines (Rev. 4)', 'url': 'https://pages.nist.gov/800-63-4/'},
@@ -40,7 +40,7 @@ CATEGORIES = [
         {'label': 'NIST SP 800-83 Rev. 1: Guide to Malware Incident Prevention and Handling', 'url': 'https://csrc.nist.gov/pubs/sp/800/83/r1/final'},
         {'label': 'CIS Benchmarks (system hardening guidance)', 'url': 'https://www.cisecurity.org/cis-benchmarks'},
         {'label': 'NIST SP 800-125: Guide to Security for Full Virtualization Technologies', 'url': 'https://csrc.nist.gov/pubs/sp/800/125/final'},
-        {'label': 'Cloud Security Alliance: Security Guidance for Critical Areas of Focus in Cloud Computing', 'url': 'https://cloudsecurityalliance.org/research/guidance'},
+        {'label': 'Cloud Security Alliance: Security Guidance for Critical Areas of Focus in Cloud Computing', 'url': 'https://cloudsecurityalliance.org/artifacts/security-guidance-v5'},
     ]},
 ]
 

@@ -15,7 +15,7 @@ CATEGORIES = [
     ]},
     {'key': 'netAccess', 'label': 'Network Access', 'marks': 20, 'resources': [
         _EXAM_TOPICS,
-        {'label': 'Cisco: Catalyst 9300 configuration guides (VLANs, trunking, STP, EtherChannel)', 'url': 'https://www.cisco.com/c/en/us/support/switches/catalyst-9300-series-switches/products-installation-and-configuration-guides-list.html'},
+        {'label': 'Cisco Modeling Labs Free: practise VLANs, trunking, STP and EtherChannel on up to 5 nodes', 'url': 'https://developer.cisco.com/docs/modeling-labs/cml-free/'},
     ]},
     {'key': 'ipConnectivity', 'label': 'IP Connectivity', 'marks': 25, 'resources': [
         _EXAM_TOPICS,
@@ -27,7 +27,7 @@ CATEGORIES = [
     ]},
     {'key': 'secFundamentals', 'label': 'Security Fundamentals', 'marks': 15, 'resources': [
         _EXAM_TOPICS,
-        {'label': 'Cisco: Catalyst 9300 security configuration guides', 'url': 'https://www.cisco.com/c/en/us/support/switches/catalyst-9300-series-switches/products-installation-and-configuration-guides-list.html'},
+        {'label': 'Cisco Networking Academy: free CCNA courses (ITN, SRWE, ENSA) and Packet Tracer', 'url': 'https://www.netacad.com/'},
     ]},
     {'key': 'automation', 'label': 'Automation and Programmability', 'marks': 10, 'resources': [
         _EXAM_TOPICS,

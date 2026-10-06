@@ -1684,8 +1684,17 @@ trading away for shinier but shallower ones.
   periods, OSPF `maximum-paths` and QoS voice figures. Follow-up: 59 lesson diagrams (CCNA 13, CISSP 14, CCSP 8, CSSLP 7, CC 6,
   SSCP 6, CGRC 5) in `src/js/01a_diagrams_ccna|cissp|cloudsw|coreisc2.jsx`, registered
   into `LESSON_DIAGRAMS`; the build now also checks the types of lesson fields (a
-  string `commonTraps` would have crashed the lesson view). No cross-cert bridges
-  exist for these tracks yet, and ISSAP, ISSEP and ISSMP are not covered.
+  string `commonTraps` would have crashed the lesson view). Official resources: each new cert's Exam tab
+  now lists the vendor's own training (ISC2's free Certified in Cybersecurity course and
+  exam, the self-study and exam-outline pages, Cisco's CCNA page, Networking Academy,
+  free Cisco Modeling Labs, CSA guidance and the CCSK, NIST and OWASP documents). The
+  links were confirmed from search results rather than opened, because the build
+  environment's network policy blocks isc2.org, cisco.com, nist.gov and similar hosts
+  (so the official outline PDFs could not be downloaded or read; allow those hosts under
+  the environment's Network access to let a future pass verify every outline and link).
+  ISC2 published a broader Code of Professional Conduct in February 2026 that builds on
+  the Code of Ethics canons; the CC and CISSP cheat sheets mention it. No cross-cert
+  bridges exist for these tracks yet, and ISSAP, ISSEP and ISSMP are not covered.
 - [ ] **Open ideas.** Sounds for the verbal quiz and the case-study end screen;
   lesson diagrams (OSI, subnetting, STP, OSPF, RMF) and cross-cert bridges for the new tracks, a Security+ track to sit beside CC and SSCP; sharing a scenario or term list between devices without a full export; a
   step bank that also learns from your own earlier scenarios; the real module

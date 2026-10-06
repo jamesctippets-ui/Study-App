@@ -7,7 +7,7 @@
       "resources": [
         {
           "label": "ISC2: CCSP certification exam outline",
-          "url": "https://www.isc2.org/certifications/ccsp/ccsp-certification-exam-outline"
+          "url": "https://www.isc2.org/Certifications/CCSP/Certification-Exam-Outline"
         },
         {
           "label": "NIST SP 800-145: The NIST Definition of Cloud Computing",
@@ -15,7 +15,7 @@
         },
         {
           "label": "CSA: Security Guidance for Critical Areas of Focus in Cloud Computing",
-          "url": "https://cloudsecurityalliance.org/research/guidance"
+          "url": "https://cloudsecurityalliance.org/artifacts/security-guidance-v5"
         }
       ]
     },
@@ -34,7 +34,7 @@
         },
         {
           "label": "CSA: Security Guidance (Data Security and Encryption domain)",
-          "url": "https://cloudsecurityalliance.org/research/guidance"
+          "url": "https://cloudsecurityalliance.org/artifacts/security-guidance-v5"
         }
       ]
     },

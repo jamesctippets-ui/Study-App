@@ -7,7 +7,7 @@
       "resources": [
         {
           "label": "ISC2: CSSLP certification exam outline (Domain 1)",
-          "url": "https://www.isc2.org/certifications/csslp/csslp-certification-exam-outline"
+          "url": "https://www.isc2.org/Certifications/csslp/Certification-Exam-Outline"
         },
         {
           "label": "CISA: Secure by Design",
@@ -22,15 +22,15 @@
       "resources": [
         {
           "label": "ISC2: CSSLP certification exam outline (Domain 2)",
-          "url": "https://www.isc2.org/certifications/csslp/csslp-certification-exam-outline"
+          "url": "https://www.isc2.org/Certifications/csslp/Certification-Exam-Outline"
         },
         {
           "label": "NIST: Secure Software Development Framework (SSDF), SP 800-218",
-          "url": "https://csrc.nist.gov/projects/ssdf"
+          "url": "https://csrc.nist.gov/pubs/sp/800/218/final"
         },
         {
           "label": "OWASP: Software Assurance Maturity Model (SAMM)",
-          "url": "https://owaspsamm.org/"
+          "url": "https://owaspsamm.org/about/"
         }
       ]
     },
@@ -41,11 +41,11 @@
       "resources": [
         {
           "label": "ISC2: CSSLP certification exam outline (Domain 3)",
-          "url": "https://www.isc2.org/certifications/csslp/csslp-certification-exam-outline"
+          "url": "https://www.isc2.org/Certifications/csslp/Certification-Exam-Outline"
         },
         {
           "label": "OWASP: Application Security Verification Standard (ASVS)",
-          "url": "https://owasp.org/www-project-application-security-verification-standard/"
+          "url": "https://owasp.org/www-project-asvs/"
         }
       ]
     },
@@ -56,7 +56,7 @@
       "resources": [
         {
           "label": "ISC2: CSSLP certification exam outline (Domain 4)",
-          "url": "https://www.isc2.org/certifications/csslp/csslp-certification-exam-outline"
+          "url": "https://www.isc2.org/Certifications/csslp/Certification-Exam-Outline"
         },
         {
           "label": "OWASP: Threat Modeling",
@@ -75,11 +75,11 @@
       "resources": [
         {
           "label": "ISC2: CSSLP certification exam outline (Domain 5)",
-          "url": "https://www.isc2.org/certifications/csslp/csslp-certification-exam-outline"
+          "url": "https://www.isc2.org/Certifications/csslp/Certification-Exam-Outline"
         },
         {
           "label": "OWASP: Top 10",
-          "url": "https://owasp.org/Top10/"
+          "url": "https://owasp.org/Top10/2025/"
         },
         {
           "label": "OWASP: Cheat Sheet Series",
@@ -94,7 +94,7 @@
       "resources": [
         {
           "label": "ISC2: CSSLP certification exam outline (Domain 6)",
-          "url": "https://www.isc2.org/certifications/csslp/csslp-certification-exam-outline"
+          "url": "https://www.isc2.org/Certifications/csslp/Certification-Exam-Outline"
         },
         {
           "label": "OWASP: Web Security Testing Guide",
@@ -113,7 +113,7 @@
       "resources": [
         {
           "label": "ISC2: CSSLP certification exam outline (Domain 7)",
-          "url": "https://www.isc2.org/certifications/csslp/csslp-certification-exam-outline"
+          "url": "https://www.isc2.org/Certifications/csslp/Certification-Exam-Outline"
         },
         {
           "label": "NIST: Guide to Enterprise Patch Management Planning, SP 800-40 Rev. 4",
@@ -132,7 +132,7 @@
       "resources": [
         {
           "label": "ISC2: CSSLP certification exam outline (Domain 8)",
-          "url": "https://www.isc2.org/certifications/csslp/csslp-certification-exam-outline"
+          "url": "https://www.isc2.org/Certifications/csslp/Certification-Exam-Outline"
         },
         {
           "label": "CISA: Software Bill of Materials (SBOM)",

@@ -7,7 +7,7 @@
       "resources": [
         {
           "label": "ISC2: CISSP exam outline",
-          "url": "https://www.isc2.org/certifications/cissp/cissp-certification-exam-outline"
+          "url": "https://www.isc2.org/Certifications/CISSP/Certification-Exam-Outline"
         },
         {
           "label": "ISC2: Code of Ethics",
@@ -30,7 +30,7 @@
       "resources": [
         {
           "label": "ISC2: CISSP exam outline",
-          "url": "https://www.isc2.org/certifications/cissp/cissp-certification-exam-outline"
+          "url": "https://www.isc2.org/Certifications/CISSP/Certification-Exam-Outline"
         },
         {
           "label": "NIST: Guidelines for Media Sanitization (SP 800-88)",
@@ -49,7 +49,7 @@
       "resources": [
         {
           "label": "ISC2: CISSP exam outline",
-          "url": "https://www.isc2.org/certifications/cissp/cissp-certification-exam-outline"
+          "url": "https://www.isc2.org/Certifications/CISSP/Certification-Exam-Outline"
         },
         {
           "label": "NIST: Zero Trust Architecture (SP 800-207)",
@@ -68,7 +68,7 @@
       "resources": [
         {
           "label": "ISC2: CISSP exam outline",
-          "url": "https://www.isc2.org/certifications/cissp/cissp-certification-exam-outline"
+          "url": "https://www.isc2.org/Certifications/CISSP/Certification-Exam-Outline"
         },
         {
           "label": "IETF: RFC 8446, TLS 1.3",
@@ -91,7 +91,7 @@
       "resources": [
         {
           "label": "ISC2: CISSP exam outline",
-          "url": "https://www.isc2.org/certifications/cissp/cissp-certification-exam-outline"
+          "url": "https://www.isc2.org/Certifications/CISSP/Certification-Exam-Outline"
         },
         {
           "label": "NIST: Digital Identity Guidelines (SP 800-63)",
@@ -106,7 +106,7 @@
       "resources": [
         {
           "label": "ISC2: CISSP exam outline",
-          "url": "https://www.isc2.org/certifications/cissp/cissp-certification-exam-outline"
+          "url": "https://www.isc2.org/Certifications/CISSP/Certification-Exam-Outline"
         },
         {
           "label": "NIST: Technical Guide to Information Security Testing and Assessment (SP 800-115)",
@@ -121,7 +121,7 @@
       "resources": [
         {
           "label": "ISC2: CISSP exam outline",
-          "url": "https://www.isc2.org/certifications/cissp/cissp-certification-exam-outline"
+          "url": "https://www.isc2.org/Certifications/CISSP/Certification-Exam-Outline"
         },
         {
           "label": "NIST: Incident Response Recommendations (SP 800-61)",
@@ -136,7 +136,7 @@
       "resources": [
         {
           "label": "ISC2: CISSP exam outline",
-          "url": "https://www.isc2.org/certifications/cissp/cissp-certification-exam-outline"
+          "url": "https://www.isc2.org/Certifications/CISSP/Certification-Exam-Outline"
         },
         {
           "label": "NIST: Secure Software Development Framework (SP 800-218)",
@@ -144,7 +144,7 @@
         },
         {
           "label": "OWASP: Top Ten",
-          "url": "https://owasp.org/www-project-top-ten/"
+          "url": "https://owasp.org/Top10/2025/"
         }
       ]
     }
@@ -5386,6 +5386,7 @@
       "points": [
         "Security serves the business: governance is set by senior management (top-down), policies are mandatory, standards are mandatory and specific, procedures are step-by-step, guidelines are optional, baselines are minimums.",
         "Due diligence = research and understand the risk; due care = act on it. Failing due care is negligence.",
+        "In February 2026 ISC2 also published a broader Code of Professional Conduct for the whole profession (including AI, quantum and vulnerability reporting). It builds on the Code of Ethics canons, which are still the part the exam tests, so keep learning the four canons and their order.",
         "ISC2 Code of Ethics canons in order: protect society, the common good, public trust and the infrastructure; act honorably, honestly, justly, responsibly and legally; provide diligent and competent service to principals; advance and protect the profession.",
         "GDPR follows the data subject (EU residents) wherever the processor is, with regulator notice within 72 hours; HIPAA = health, GLBA = financial, SOX = public-company reporting, FERPA = students, COPPA = children under 13; PCI DSS is contractual, not a law.",
         "Intellectual property: patent (invention), copyright (expression), trademark (brand), trade secret (kept confidential). Evidence: chain of custody, hash the image, work on copies; civil standard is preponderance, criminal is beyond a reasonable doubt."

@@ -7,7 +7,7 @@
 # goes to Networking and Cloud Security Concepts).
 CATEGORIES = [
     {'key': 'ccPrinciples', 'label': 'Security Principles', 'marks': 24, 'resources': [
-        {'label': 'ISC2: Certified in Cybersecurity exam outline', 'url': 'https://www.isc2.org/certifications/cc/cc-certification-exam-outline'},
+        {'label': 'ISC2: Certified in Cybersecurity exam outline', 'url': 'https://www.isc2.org/Certifications/CC/Certification-Exam-Outline'},
         {'label': 'ISC2: Code of Ethics', 'url': 'https://www.isc2.org/ethics'},
         {'label': 'NIST SP 800-30 Rev. 1: Guide for Conducting Risk Assessments', 'url': 'https://csrc.nist.gov/pubs/sp/800/30/r1/final'},
     ]},
@@ -16,7 +16,7 @@ CATEGORIES = [
         {'label': 'NIST Cybersecurity Framework (CSF) 2.0', 'url': 'https://www.nist.gov/cyberframework'},
     ]},
     {'key': 'ccIam', 'label': 'Identity and Access Management Concepts', 'marks': 20, 'resources': [
-        {'label': 'ISC2: Certified in Cybersecurity exam outline', 'url': 'https://www.isc2.org/certifications/cc/cc-certification-exam-outline'},
+        {'label': 'ISC2: Certified in Cybersecurity exam outline', 'url': 'https://www.isc2.org/Certifications/CC/Certification-Exam-Outline'},
         {'label': 'NIST SP 800-63-4: Digital Identity Guidelines', 'url': 'https://pages.nist.gov/800-63-4/'},
     ]},
     {'key': 'ccNetCloud', 'label': 'Networking and Cloud Security Concepts', 'marks': 22, 'resources': [
@@ -780,6 +780,7 @@ CHEAT_SHEET = [
         'points': [
             'The four canons in priority order: protect society, the common good, public trust and the infrastructure; act honorably, honestly, justly, responsibly and legally; provide diligent and competent service to principals; advance and protect the profession.',
             'When duties conflict, the earlier canon wins: public safety before the employer, employer before the profession.',
+            'ISC2 published a broader Code of Professional Conduct in February 2026. It builds on the Code of Ethics canons (protect society, act honorably, serve principals diligently, advance the profession), which remain the core of what the exam asks about.',
             'Disclose conflicts of interest and report unethical behavior through proper channels.',
         ],
     },

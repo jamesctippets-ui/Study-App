@@ -12,7 +12,7 @@ Management 13, Security Assessment and Testing 12, Security Operations 13,
 Software Development Security 10.
 """
 
-_OUTLINE = {'label': 'ISC2: CISSP exam outline', 'url': 'https://www.isc2.org/certifications/cissp/cissp-certification-exam-outline'}
+_OUTLINE = {'label': 'ISC2: CISSP exam outline', 'url': 'https://www.isc2.org/Certifications/CISSP/Certification-Exam-Outline'}
 
 CATEGORIES = [
     {'key': 'cisspRisk', 'label': 'Security and Risk Management', 'marks': 16, 'resources': [
@@ -52,7 +52,7 @@ CATEGORIES = [
     {'key': 'cisspSdlc', 'label': 'Software Development Security', 'marks': 10, 'resources': [
         _OUTLINE,
         {'label': 'NIST: Secure Software Development Framework (SP 800-218)', 'url': 'https://csrc.nist.gov/pubs/sp/800/218/final'},
-        {'label': 'OWASP: Top Ten', 'url': 'https://owasp.org/www-project-top-ten/'},
+        {'label': 'OWASP: Top Ten', 'url': 'https://owasp.org/Top10/2025/'},
     ]},
 ]
 
@@ -1899,6 +1899,7 @@ CHEAT_SHEET = [
         'points': [
             'Security serves the business: governance is set by senior management (top-down), policies are mandatory, standards are mandatory and specific, procedures are step-by-step, guidelines are optional, baselines are minimums.',
             'Due diligence = research and understand the risk; due care = act on it. Failing due care is negligence.',
+            'In February 2026 ISC2 also published a broader Code of Professional Conduct for the whole profession (including AI, quantum and vulnerability reporting). It builds on the Code of Ethics canons, which are still the part the exam tests, so keep learning the four canons and their order.',
             'ISC2 Code of Ethics canons in order: protect society, the common good, public trust and the infrastructure; act honorably, honestly, justly, responsibly and legally; provide diligent and competent service to principals; advance and protect the profession.',
             'GDPR follows the data subject (EU residents) wherever the processor is, with regulator notice within 72 hours; HIPAA = health, GLBA = financial, SOX = public-company reporting, FERPA = students, COPPA = children under 13; PCI DSS is contractual, not a law.',
             'Intellectual property: patent (invention), copyright (expression), trademark (brand), trade secret (kept confidential). Evidence: chain of custody, hash the image, work on copies; civil standard is preponderance, criminal is beyond a reasonable doubt.',

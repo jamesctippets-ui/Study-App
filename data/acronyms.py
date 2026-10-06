@@ -899,4 +899,5 @@ IGNORE = {
     # SSCP track
     'Argon2', 'SIM',
     'REQUIRED',
+    'Top10',
 }
