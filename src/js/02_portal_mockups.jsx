@@ -698,8 +698,8 @@ const REAL_PORTAL_SCREENSHOTS = {
   },
   agentSharingSettings: {
     src: 'images/m365/agent-sharing-settings.png',
-    alt: 'Real Microsoft 365 admin center screenshot of the agent Sharing settings pane',
-    description: 'The Sharing pane under Agent settings in the Microsoft 365 admin center. It explains that only agents built with Copilot Studio Lite are available for sharing and that users restricted from sharing with the entire organization can still share their agents with individual users. The setting "Choose who has permission to share agents with your entire organization" offers three choices — allow all users, no users (but they can choose who they share agents with), or specific groups of users — with a search box for adding users or groups and a Save button.',
+    alt: 'Real Microsoft 365 admin center screenshot of the agent Sharing settings pane (Agents > Settings)',
+    description: 'The Sharing pane under Agent settings in the Microsoft 365 admin center (Agents > Settings in the left navigation, Contoso Electronics tenant). It explains that you manage who can share agents with anyone in the organization, that agents built with Microsoft 365 Copilot Agent Builder are affected by this setting, and that users restricted from sharing with anyone can still share their agents with individual users and security groups. The setting "Choose who can share agents with anyone in the organization" offers three choices: All users (selected), No users, or Specific users, with a search box for adding users or groups and a Save button (greyed out until a change is made).',
     sourceLabel: 'Microsoft Learn: Agent settings in Microsoft 365 admin center',
     sourceUrl: 'https://learn.microsoft.com/en-us/microsoft-365/admin/manage/agent-settings',
     product: 'Microsoft 365 admin center',
@@ -707,7 +707,7 @@ const REAL_PORTAL_SCREENSHOTS = {
   agentRegistryOverview: {
     src: 'images/m365/agent-registry.png',
     alt: 'Real Microsoft 365 admin center screenshot of the All agents page, Registry tab',
-    description: 'The All agents page in the Microsoft 365 admin center with the Registry tab selected (alongside Map and Requests). Summary tiles show Total agents, Agents without owners and Blocked agents; the toolbar offers Refresh, Export to Excel, Upload custom agent and Manage pinned agents; the filter bar shows Status, an active "Publisher: Microsoft" filter, Channel, Platform and Data source; and the table lists agents with Status, Platform, High Risks, Active users (30 days), Total sessions (30 days) and Date created columns.',
+    description: 'The All agents page (Agent 365) in the Microsoft 365 admin center with the Registry tab selected (tab order is now Registry, Map, Requests). Summary tiles show Total agents (493,802), Agents at risk (21), Agents without owners (2) and Unmanaged agents (12), plus a Registry sync (preview) card with a Manage button, 10 connections and 1 error. The filter bar shows Status, an active "Publisher type: Microsoft" filter, Platform and Channel; the toolbar offers a Search box, Refresh and Export. The table lists agents (Writing Coach, Viva Goals, Career Coach, Idea Coach, Learning Coach, Prompt Coach) with Status, Platform, Risks, Active users, Total sessions and Last updated columns. The left navigation now includes Overview, All agents, Shadow AI, Tools and Settings under Agents.',
     sourceLabel: 'Microsoft Learn: Agent Registry in Microsoft 365 admin center',
     sourceUrl: 'https://learn.microsoft.com/en-us/microsoft-365/admin/manage/agent-registry',
     product: 'Microsoft 365 admin center',
@@ -736,7 +736,7 @@ const REAL_PORTAL_SCREENSHOTS = {
   },
   aiServicesNetworking: {
     src: 'images/azuresec/ai-services-networking.png',
-    alt: 'Real Azure Portal screenshot of the Networking page for an Azure AI services resource, Firewalls and virtual networks tab',
+    alt: 'Real Azure Portal screenshot of the Networking page for an Azure AI services (now called Foundry Tools) resource, Firewalls and virtual networks tab',
     description: "The Networking page (Firewalls and virtual networks tab) of an Azure AI services resource named contoso-custom-vision. The Allow access from selector offers All networks, Selected Networks and Private Endpoints, or Disabled; below it are a Virtual networks table, a Firewall section with an address range box, and a second tab for Private endpoint connections.",
     sourceLabel: 'Microsoft Learn: Configure virtual networks for Foundry Tools',
     sourceUrl: 'https://learn.microsoft.com/en-us/azure/ai-services/cognitive-services-virtual-networks',
