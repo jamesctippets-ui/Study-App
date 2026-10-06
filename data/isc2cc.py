@@ -277,7 +277,7 @@ LESSONS = [
         'id': 'cia-risk-controls-ethics',
         'title': 'Security Principles: CIA, Risk, Controls and Ethics',
         'summary': 'The three goals of security, how risk is judged and treated, the types of controls, and the professional code you are expected to follow.',
-        'diagram': None,
+        'diagram': 'ccCiaControls',
         'vocabIds': ['f1', 'f5', 'f6', 'f13', 'f18', 'f20', 'f21', 'f22', 'f23'],
         'quizIds': ['q1', 'q6', 'q8', 'q9', 'q12', 'tf2'],
         'reading': """Everything in cybersecurity starts from three goals, known as the CIA triad. Confidentiality means only the right people can see information. Integrity means information is accurate and has not been changed by someone who should not change it. Availability means systems and data work when authorized people need them. When you read any scenario, ask which of the three just went wrong. A stolen customer list is a confidentiality failure. A tampered invoice is an integrity failure. A website knocked offline by an attacker, or by a power cut, is an availability failure. Two related ideas show up often: authentication, which proves you are who you claim to be, and non-repudiation, which means a person cannot credibly deny what they did, for example because they signed a message with a digital signature only they control.
@@ -305,7 +305,7 @@ Finally, professionals are held to an ethical standard. The ISC2 Code of Ethics 
         'id': 'governance-policies-compliance',
         'title': 'Security Governance: Policies, Compliance and Culture',
         'summary': 'How organizations direct security through leadership, written rules, laws and frameworks, and how people and measurement make those rules real.',
-        'diagram': None,
+        'diagram': 'ccPolicyLadder',
         'vocabIds': ['f27', 'f28', 'f29', 'f30', 'f31', 'f32', 'f34', 'f36', 'f38'],
         'quizIds': ['q17', 'q20', 'q22', 'q23', 'q24', 'q28'],
         'reading': """Governance answers the question, who decides how security is done and who is accountable when it goes wrong? In a healthy organization senior management sets the direction, approves the rules, provides money and people, and is ultimately accountable. Technical staff carry the rules out, but they do not own the accountability. Many organizations tie this together under governance, risk and compliance, often shortened to GRC: governance gives direction, risk management shows what could go wrong, and compliance shows that legal and internal rules are being met.
@@ -333,7 +333,7 @@ Rules only work if people follow them, so governance also covers culture and awa
         'id': 'identity-access-management',
         'title': 'Identity and Access Management Concepts',
         'summary': 'How systems know who you are, decide what you may do, and limit access with least privilege, roles and good account hygiene.',
-        'diagram': None,
+        'diagram': 'ccAaaChain',
         'vocabIds': ['f46', 'f47', 'f50', 'f51', 'f57', 'f59', 'f61', 'f64', 'f65'],
         'quizIds': ['q29', 'q30', 'q31', 'q32', 'q35', 'q40'],
         'reading': """Identity and access management, usually shortened to IAM, is the discipline of creating digital identities and controlling what each one can reach. It is easiest to learn as a chain of four steps. Identification is claiming an identity, for example by typing a username. Authentication is proving the claim. Authorization is deciding what that proven identity is allowed to do. Accountability, sometimes called accounting, is recording what the identity actually did so people can be held responsible (the last three are AAA). Logging in does not mean you may do anything, and logs create accountability only when every person has a unique account.
@@ -362,7 +362,7 @@ Access must also be managed through its life. Provisioning gives new staff the r
         'id': 'networking-fundamentals',
         'title': 'Networking Fundamentals for Security',
         'summary': 'IP addresses, ports, protocols, the OSI model, and the devices that move and filter traffic.',
-        'diagram': None,
+        'diagram': 'ccOsiPorts',
         'vocabIds': ['f69', 'f71', 'f73', 'f74', 'f75', 'f76', 'f78', 'f79', 'f80'],
         'quizIds': ['q42', 'q43', 'q44', 'q46', 'q47', 'q48'],
         'reading': """A network is simply devices connected so they can exchange data. A local area network, or LAN, links devices in one place such as an office, a wide area network links separate places, and the internet is the global network of networks. Every device needs an address. An IP address identifies a device so data can be routed to it. IPv4 addresses are 32 bits, written like 192.168.1.10, and IPv6 addresses are 128 bits written in hexadecimal; IPv6 exists because IPv4 addresses ran short. Some ranges are private and used only inside organizations: 10.0.0.0, 172.16.0.0 through 172.31.255.255, and 192.168.0.0. Devices with private addresses reach the internet through network address translation, which lets many of them share one public address. The Domain Name System, or DNS, translates names such as example.com into IP addresses, and DHCP automatically hands out addresses to devices when they join.
@@ -391,7 +391,7 @@ Wireless and encrypted channels round out the basics. Wi-Fi should use WPA3 wher
         'id': 'cloud-segmentation-zero-trust',
         'title': 'Cloud Security, Segmentation and Zero Trust',
         'summary': 'Cloud service and deployment models, who is responsible for what, and how segmentation and zero trust limit the damage from a breach.',
-        'diagram': None,
+        'diagram': 'ccZeroTrustSegments',
         'vocabIds': ['f81', 'f82', 'f83', 'f87', 'f88', 'f89', 'f90', 'f91'],
         'quizIds': ['q45', 'q49', 'q51', 'q52', 'q54', 'q55'],
         'reading': """Cloud computing means renting computing resources from a provider over the internet instead of owning them. The official NIST definition lists five essential characteristics: on-demand self-service, where you create resources yourself without calling anyone; broad network access; resource pooling, where many customers share the provider's hardware; rapid elasticity, where capacity grows and shrinks as needed; and measured service, where you pay for what you use. These are what make something genuinely cloud rather than just a hosted server.
@@ -420,7 +420,7 @@ Zero trust ties these ideas together. The old model trusted anything inside the 
         'id': 'operations-malware-incident-response',
         'title': 'Security Operations, Threats and Incident Response',
         'summary': 'Protecting data and systems day to day, recognizing common attacks, responding to incidents, and keeping the business running through disasters.',
-        'diagram': None,
+        'diagram': 'ccIncidentLifecycle',
         'vocabIds': ['f92', 'f94', 'f95', 'f100', 'f101', 'f104', 'f105', 'f108', 'f109'],
         'quizIds': ['q56', 'q60', 'q61', 'q64', 'q65', 'q66'],
         'reading': """Security operations is the daily work of keeping systems safe. It begins with data: classify information by sensitivity, such as public, internal, confidential and restricted, then apply handling rules for storage, sharing and disposal. When data is no longer needed it must be destroyed properly. Deleting files or quick-formatting a drive leaves data recoverable, while shredding, degaussing or approved wiping does not. Systems themselves are kept in a known secure state with configuration baselines, which means removing unneeded services and default passwords, and patch and vulnerability management means scanning for weaknesses and applying vendor fixes promptly. Logs are collected and reviewed, often with a SIEM, which gathers logs from many sources and raises alerts.

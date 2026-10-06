@@ -2774,7 +2774,7 @@
       "id": "governance-risk-program",
       "title": "Governance, Risk Strategy and the RMF",
       "summary": "How organizations govern security and privacy, frame risk, assign roles and use the NIST Risk Management Framework to run the whole life cycle.",
-      "diagram": null,
+      "diagram": "cgrcRmfLoop",
       "vocabIds": [
         "f1",
         "f2",
@@ -2865,7 +2865,7 @@
       "id": "select-tailor",
       "title": "Selecting and Tailoring Controls",
       "summary": "How SP 800-53 Rev. 5 and SP 800-53B baselines are chosen, tailored with overlays and common controls, and documented, including privacy controls and a monitoring strategy.",
-      "diagram": null,
+      "diagram": "cgrcSelectTailor",
       "vocabIds": [
         "f39",
         "f40",
@@ -2960,7 +2960,7 @@
       "id": "assess-controls",
       "title": "Assessing and Auditing Controls",
       "summary": "Planning and conducting control assessments with SP 800-53A, reporting findings in the SAR and tracking weaknesses in a POA&M.",
-      "diagram": null,
+      "diagram": "cgrcAssessMatrix",
       "vocabIds": [
         "f79",
         "f80",
@@ -3008,7 +3008,7 @@
       "id": "authorize-system",
       "title": "Authorization and the Authorizing Official Decision",
       "summary": "Assembling the authorization package, analyzing risk and issuing ATO, ATU or DATO decisions, with FedRAMP and common control authorization.",
-      "diagram": null,
+      "diagram": "cgrcAuthPackage",
       "vocabIds": [
         "f100",
         "f101",
@@ -3055,7 +3055,7 @@
       "id": "maintain-compliance",
       "title": "Keeping the Authorization Alive",
       "summary": "Continuous monitoring, change control, security impact analysis, ongoing risk response, reporting and system disposal under SP 800-137.",
-      "diagram": null,
+      "diagram": "cgrcConMon",
       "vocabIds": [
         "f116",
         "f117",

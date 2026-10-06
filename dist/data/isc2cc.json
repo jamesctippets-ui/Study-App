@@ -2299,7 +2299,7 @@
       "id": "cia-risk-controls-ethics",
       "title": "Security Principles: CIA, Risk, Controls and Ethics",
       "summary": "The three goals of security, how risk is judged and treated, the types of controls, and the professional code you are expected to follow.",
-      "diagram": null,
+      "diagram": "ccCiaControls",
       "vocabIds": [
         "f1",
         "f5",
@@ -2346,7 +2346,7 @@
       "id": "governance-policies-compliance",
       "title": "Security Governance: Policies, Compliance and Culture",
       "summary": "How organizations direct security through leadership, written rules, laws and frameworks, and how people and measurement make those rules real.",
-      "diagram": null,
+      "diagram": "ccPolicyLadder",
       "vocabIds": [
         "f27",
         "f28",
@@ -2393,7 +2393,7 @@
       "id": "identity-access-management",
       "title": "Identity and Access Management Concepts",
       "summary": "How systems know who you are, decide what you may do, and limit access with least privilege, roles and good account hygiene.",
-      "diagram": null,
+      "diagram": "ccAaaChain",
       "vocabIds": [
         "f46",
         "f47",
@@ -2441,7 +2441,7 @@
       "id": "networking-fundamentals",
       "title": "Networking Fundamentals for Security",
       "summary": "IP addresses, ports, protocols, the OSI model, and the devices that move and filter traffic.",
-      "diagram": null,
+      "diagram": "ccOsiPorts",
       "vocabIds": [
         "f69",
         "f71",
@@ -2489,7 +2489,7 @@
       "id": "cloud-segmentation-zero-trust",
       "title": "Cloud Security, Segmentation and Zero Trust",
       "summary": "Cloud service and deployment models, who is responsible for what, and how segmentation and zero trust limit the damage from a breach.",
-      "diagram": null,
+      "diagram": "ccZeroTrustSegments",
       "vocabIds": [
         "f81",
         "f82",
@@ -2535,7 +2535,7 @@
       "id": "operations-malware-incident-response",
       "title": "Security Operations, Threats and Incident Response",
       "summary": "Protecting data and systems day to day, recognizing common attacks, responding to incidents, and keeping the business running through disasters.",
-      "diagram": null,
+      "diagram": "ccIncidentLifecycle",
       "vocabIds": [
         "f92",
         "f94",

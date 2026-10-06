@@ -3179,7 +3179,7 @@
       "id": "access-control-and-identity",
       "title": "Access Control and Identity Management",
       "summary": "How systems decide who you are and what you may do: authentication factors, SSO and federation, access control models and the identity lifecycle.",
-      "diagram": null,
+      "diagram": "sscpAuthProtocols",
       "vocabIds": [
         "f26",
         "f27",
@@ -3226,7 +3226,7 @@
       "id": "risk-and-vulnerability-management",
       "title": "Risk Management and Vulnerability Management",
       "summary": "How practitioners identify, measure and treat risk, run vulnerability scans and penetration tests, and prioritize what to fix.",
-      "diagram": null,
+      "diagram": "sscpVulnCycle",
       "vocabIds": [
         "f49",
         "f50",
@@ -3273,7 +3273,7 @@
       "id": "monitoring-logging-and-siem",
       "title": "Monitoring, Logging and Detection",
       "summary": "How to collect, protect and analyze logs, and how SIEM, intrusion detection, baselines and threat intelligence turn raw data into detections.",
-      "diagram": null,
+      "diagram": "sscpSiemPipeline",
       "vocabIds": [
         "f55",
         "f60",
@@ -3320,7 +3320,7 @@
       "id": "incident-response-forensics-recovery",
       "title": "Incident Response, Forensics and Recovery",
       "summary": "The incident lifecycle, how to collect evidence without destroying it, and how business continuity, disaster recovery and backups restore operations.",
-      "diagram": null,
+      "diagram": "sscpEvidenceCustody",
       "vocabIds": [
         "f71",
         "f74",
@@ -3368,7 +3368,7 @@
       "id": "cryptography-in-practice",
       "title": "Cryptography in Practice",
       "summary": "Symmetric and asymmetric encryption, hashing, signatures, certificates, TLS and the key management habits that decide whether any of it actually protects you.",
-      "diagram": null,
+      "diagram": "sscpCryptoUse",
       "vocabIds": [
         "f91",
         "f92",
@@ -3415,7 +3415,7 @@
       "id": "network-security-controls",
       "title": "Network and Communications Security",
       "summary": "How networks work, how they are attacked, and the segmentation, firewall, VPN, wireless and monitoring controls that defend them.",
-      "diagram": null,
+      "diagram": "sscpNetPlacement",
       "vocabIds": [
         "f105",
         "f106",

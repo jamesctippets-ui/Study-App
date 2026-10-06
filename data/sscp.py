@@ -1528,7 +1528,7 @@ LESSONS = [
         'id': 'access-control-and-identity',
         'title': 'Access Control and Identity Management',
         'summary': 'How systems decide who you are and what you may do: authentication factors, SSO and federation, access control models and the identity lifecycle.',
-        'diagram': None,
+        'diagram': 'sscpAuthProtocols',
         'vocabIds': ['f26', 'f27', 'f28', 'f31', 'f32', 'f35', 'f37', 'f40', 'f41'],
         'quizIds': ['q15', 'q16', 'q20', 'q24', 'q25', 'msq4'],
         'reading': (
@@ -1554,7 +1554,7 @@ LESSONS = [
         'id': 'risk-and-vulnerability-management',
         'title': 'Risk Management and Vulnerability Management',
         'summary': 'How practitioners identify, measure and treat risk, run vulnerability scans and penetration tests, and prioritize what to fix.',
-        'diagram': None,
+        'diagram': 'sscpVulnCycle',
         'vocabIds': ['f49', 'f50', 'f51', 'f54', 'f56', 'f58', 'f59', 'f68', 'f69'],
         'quizIds': ['q29', 'q30', 'q31', 'q34', 'q36', 'tf13'],
         'reading': (
@@ -1580,7 +1580,7 @@ LESSONS = [
         'id': 'monitoring-logging-and-siem',
         'title': 'Monitoring, Logging and Detection',
         'summary': 'How to collect, protect and analyze logs, and how SIEM, intrusion detection, baselines and threat intelligence turn raw data into detections.',
-        'diagram': None,
+        'diagram': 'sscpSiemPipeline',
         'vocabIds': ['f55', 'f60', 'f61', 'f62', 'f63', 'f64', 'f65', 'f66', 'f70'],
         'quizIds': ['q37', 'q38', 'q40', 'msq9', 'tf16', 'tf14'],
         'reading': (
@@ -1609,7 +1609,7 @@ LESSONS += [
         'id': 'incident-response-forensics-recovery',
         'title': 'Incident Response, Forensics and Recovery',
         'summary': 'The incident lifecycle, how to collect evidence without destroying it, and how business continuity, disaster recovery and backups restore operations.',
-        'diagram': None,
+        'diagram': 'sscpEvidenceCustody',
         'vocabIds': ['f71', 'f74', 'f75', 'f78', 'f79', 'f80', 'f83', 'f84', 'f85'],
         'quizIds': ['q41', 'q42', 'q44', 'q46', 'q48', 'q47'],
         'reading': (
@@ -1636,7 +1636,7 @@ LESSONS += [
         'id': 'cryptography-in-practice',
         'title': 'Cryptography in Practice',
         'summary': 'Symmetric and asymmetric encryption, hashing, signatures, certificates, TLS and the key management habits that decide whether any of it actually protects you.',
-        'diagram': None,
+        'diagram': 'sscpCryptoUse',
         'vocabIds': ['f91', 'f92', 'f93', 'f95', 'f96', 'f97', 'f98', 'f100', 'f101'],
         'quizIds': ['q54', 'q55', 'q56', 'q57', 'q59', 'tf26'],
         'reading': (
@@ -1661,7 +1661,7 @@ LESSONS += [
         'id': 'network-security-controls',
         'title': 'Network and Communications Security',
         'summary': 'How networks work, how they are attacked, and the segmentation, firewall, VPN, wireless and monitoring controls that defend them.',
-        'diagram': None,
+        'diagram': 'sscpNetPlacement',
         'vocabIds': ['f105', 'f106', 'f109', 'f110', 'f112', 'f113', 'f115', 'f116', 'f118'],
         'quizIds': ['q63', 'q64', 'q65', 'q66', 'q68', 'q69'],
         'reading': (
