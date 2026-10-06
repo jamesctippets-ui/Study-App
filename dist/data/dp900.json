@@ -15,7 +15,7 @@
     {
       "key": "relational",
       "label": "Relational Data on Azure",
-      "marks": 23,
+      "marks": 24,
       "resources": [
         {
           "label": "Microsoft Learn: Explore relational data in Azure",
@@ -39,7 +39,7 @@
     {
       "key": "analytics",
       "label": "Analytics Workloads on Azure",
-      "marks": 30,
+      "marks": 29,
       "resources": [
         {
           "label": "Microsoft Learn: Explore data analytics in Azure",
@@ -244,7 +244,7 @@
       "cat": "analytics",
       "front": "Azure Synapse Analytics",
       "back": "A unified analytics service combining big data and data warehousing, offering serverless and dedicated SQL pools for querying data, along with built-in Apache Spark pools, in a single workspace.",
-      "detail": "Synapse is the answer whenever a scenario wants one platform that spans data warehousing, big data (Spark), and pipeline orchestration together. It remains supported, though Microsoft now positions Microsoft Fabric as the recommended platform for new analytics projects."
+      "detail": "Synapse is the answer whenever a scenario wants one platform that spans data warehousing, big data (Spark), and pipeline orchestration together. It remains supported, though Microsoft now positions Microsoft Fabric (and Azure Databricks) as the platforms for large-scale analytics, and the current DP-900 study guide names Databricks and Fabric rather than Synapse."
     },
     {
       "id": "f29",
@@ -412,7 +412,7 @@
       "cat": "nonRelational",
       "front": "Azure Cache for Redis",
       "back": "A fully managed, in-memory key-value store built for sub-millisecond caching and session-state lookups, meant to take repeated load off a backend database rather than serve as a durable, long-term primary store the way Azure Cosmos DB or Azure Table Storage does.",
-      "detail": "Whenever a scenario needs the fastest possible repeated read of the same small piece of data, like a session token, and doesn't need it to persist long-term, this is the answer over a full database service. Microsoft has announced that Azure Cache for Redis is being retired in favor of Azure Managed Redis, but the in-memory caching concept being tested is unchanged."
+      "detail": "Whenever a scenario needs the fastest possible repeated read of the same small piece of data, like a session token, and doesn't need it to persist long-term, this is the answer over a full database service. Azure Cache for Redis Basic, Standard, and Premium instances retire on September 30, 2028, and Microsoft recommends moving to Azure Managed Redis, but the in-memory caching concept being tested is unchanged."
     },
     {
       "id": "f53",
@@ -754,7 +754,7 @@
       "id": "f101",
       "cat": "analytics",
       "front": "Real-Time Intelligence in Microsoft Fabric",
-      "back": "The Fabric workload for streaming and event data. Eventstreams capture and route events, an Eventhouse with a KQL database stores and queries time-based data, and real-time dashboards visualize it, with alerts available through Data Activator.",
+      "back": "The Fabric workload for streaming and event data. Eventstreams capture and route events, an Eventhouse with a KQL database stores and queries time-based data, and real-time dashboards visualize it, with alerts and automated actions available through Activator (formerly Data Activator).",
       "detail": "For streaming scenarios in Fabric, this is the Fabric-native counterpart to Azure Event Hubs plus Azure Stream Analytics and Azure Data Explorer."
     },
     {
@@ -805,6 +805,251 @@
       "front": "Lakehouse vs. warehouse in Microsoft Fabric",
       "back": "A Fabric lakehouse stores files and tables in OneLake and is worked on mainly with Spark, with a read-only SQL analytics endpoint for queries. A Fabric warehouse is a full T-SQL data warehouse that supports reads, writes, and transactions.",
       "detail": "Spark-first data engineering and mixed or unstructured data point to a lakehouse. T-SQL-centric reporting with stored procedures and views points to a warehouse."
+    },
+    {
+      "id": "f9001",
+      "cat": "coreData",
+      "front": "Matching Azure data stores to common use cases",
+      "back": "Relational transactional apps: Azure SQL (Database, Managed Instance, or SQL Server on a VM) or Azure Database for PostgreSQL and MySQL. JSON documents at global scale: Azure Cosmos DB for NoSQL. Simple key-value data: Azure Table Storage or Cosmos DB for Table. Images, video, logs, and backups: Blob Storage. A mountable file share: Azure Files. A big-data lake: Data Lake Storage Gen2. A fast in-memory cache: Azure Cache for Redis or its successor, Azure Managed Redis.",
+      "detail": "Read the scenario for the shape of the data and the access pattern first, then the scale. Complex multi-table joins point to a relational engine; massive scale with a flexible schema points to Cosmos DB."
+    },
+    {
+      "id": "f9002",
+      "cat": "coreData",
+      "front": "Delimited text, JSON, XML, and BLOB files",
+      "back": "Delimited text such as CSV, TSV, or fixed-width files stores one record per line with fields split by a delimiter. JSON stores hierarchical objects in braces and collections in brackets, and suits structured and semi-structured data. XML is a tag-based, human-readable format that has largely been superseded by the less verbose JSON. A BLOB (binary large object) is raw binary data such as images, video, audio, and application-specific documents.",
+      "detail": "Human-readable formats are convenient but are not optimized for storage space or processing speed; that is the job of optimized formats such as Parquet and Avro."
+    },
+    {
+      "id": "f9003",
+      "cat": "coreData",
+      "front": "Row-based vs. columnar formats: Avro, Parquet, and Delta Lake",
+      "back": "Avro is a row-based Apache format whose header, stored as JSON, describes the structure of the binary records, which makes it good for compact storage and for moving data over a network. Parquet is a columnar Apache format, the de facto standard for modern lakehouses, that stores each column's data together so queries can read only the columns they need. Delta Lake builds on Parquet with a transaction log for ACID transactions, versioning, and reliable updates.",
+      "detail": "Whole-record reads and streaming favor row-based Avro; analytics over a few columns of a huge dataset favor columnar Parquet; reliable updates on lake files point to Delta Lake."
+    },
+    {
+      "id": "f9004",
+      "cat": "coreData",
+      "front": "Key-value vs. document vs. column-family vs. graph databases",
+      "back": "Key-value databases pair a unique key with a value in any format. Document databases are a specific form of key-value database where the value is a JSON document that the system is optimized to parse and query. Column-family databases store tabular data whose columns are divided into logically related groups called column families. Graph databases store entities as nodes with links, called edges, that define relationships.",
+      "detail": "Nonrelational databases are often called NoSQL even though some support a variant of the SQL language."
+    },
+    {
+      "id": "f9010",
+      "cat": "relational",
+      "front": "Azure SQL Database vs. Managed Instance vs. SQL Server on VMs",
+      "back": "SQL Server on Azure VMs is IaaS: full SQL Server compatibility and full control, but you manage the OS, updates, and backups. SQL Managed Instance is PaaS with near-100 percent SQL Server compatibility, automated updates and backups, and instance pools to share resources across smaller instances. SQL Database is PaaS for new cloud applications, as a single database or an elastic pool, with some instance-level features unavailable.",
+      "detail": "Lift and shift with full control points to the VM; lift and shift with minimal changes and less administration points to Managed Instance; a new app with minimal instance-level dependencies points to SQL Database."
+    },
+    {
+      "id": "f9011",
+      "cat": "relational",
+      "front": "Data Migration Assistant",
+      "back": "A tool you install to analyze your SQL Server databases and report compatibility issues that could block migration, whether the target is Azure SQL Managed Instance or Azure SQL Database. The Azure Database Migration Service then performs the migration for most databases with minimal code changes.",
+      "detail": "Run an assessment before choosing the target: it shows whether an on-premises application depends on features that Azure SQL Database does not offer."
+    },
+    {
+      "id": "f9012",
+      "cat": "relational",
+      "front": "Flexible server for Azure Database for MySQL and PostgreSQL",
+      "back": "The flexible-server deployment option is a fully managed database service that gives more granular control over configuration and management functions, plus cost optimization controls. For MySQL it is the recommended option for new workloads, and with an Azure free account flexible server can be used free for 12 months. Azure Database for MySQL is based on the MySQL Community Edition.",
+      "detail": "MySQL backups keep point-in-time restore for up to 35 days, with 7 days as the default. PostgreSQL adds support for custom data types and extensions, though not every extension is available."
+    },
+    {
+      "id": "f9013",
+      "cat": "relational",
+      "front": "Azure SQL Database security, monitoring, and AI features",
+      "back": "SQL Database encrypts data at rest and in motion, offers advanced threat protection with vulnerability assessments and detection of anomalous activity and SQL injection attempts, writes auditing events to an Azure storage account, and supports point-in-time restore and cross-region replication. It also offers a free offer for new databases and AI assistance that can suggest query optimizations and help troubleshoot performance in natural language.",
+      "detail": "Threat detection and auditing sit on top of the built-in availability guarantees; they do not replace the customer's decisions about permissions and data classification."
+    },
+    {
+      "id": "f9020",
+      "cat": "nonRelational",
+      "front": "Cosmos DB consistency level names",
+      "back": "Strong means every read reflects the most recent write. Bounded staleness lets reads lag by a configurable time or number of versions. Session guarantees consistency within one client session and is the most widely used level, and the recommended starting point for most transactional apps. Consistent prefix never shows out-of-order writes but can be stale. Eventual is the weakest guarantee with the highest availability.",
+      "detail": "Strong at one end and Eventual at the other, with three intermediate levels. A weaker level is a deliberate trade for latency and availability."
+    },
+    {
+      "id": "f9021",
+      "cat": "nonRelational",
+      "front": "Cosmos DB partitions, shared throughput, and serverless limits",
+      "back": "A logical partition can hold up to 20 GB of data, so a partition key with many distinct, evenly used values matters. Throughput can be dedicated to one container or shared at the database level across up to 25 containers. A serverless account is limited to a single Azure region, so global distribution needs provisioned throughput instead.",
+      "detail": "Cosmos DB indexes every property by default and is schema-agnostic: items in one container do not need the same properties."
+    },
+    {
+      "id": "f9022",
+      "cat": "nonRelational",
+      "front": "When to use Cosmos DB, and when not to",
+      "back": "A strong fit for IoT and telemetry ingestion, gaming profiles and leaderboards, retail catalogs and carts, and web and mobile apps that need flexible schema, global reach, and consistent low latency. A poor fit for workloads that depend on complex multi-table joins, where Azure SQL Database is better, and for large-scale historical analytics, where Microsoft Fabric or Azure Synapse Analytics are better.",
+      "detail": "Cosmos DB for NoSQL also supports Fabric mirroring, which replicates operational data into Fabric so analytics does not load the transactional workload."
+    },
+    {
+      "id": "f9023",
+      "cat": "nonRelational",
+      "front": "Cosmos DB for Table and for Apache Cassandra",
+      "back": "Cosmos DB for Table stores key-value pairs with the same programming model as Azure Table Storage, adding greater scalability, global distribution, automatic secondary indexes, and instant autoscale. Cosmos DB for Apache Cassandra suits teams migrating a Cassandra workload, using the CQL query language over column-family tables whose rows need not share the same columns.",
+      "detail": "Azure Table Storage is still available and supported, but Cosmos DB for Table is the recommended choice for new key-value workloads at scale."
+    },
+    {
+      "id": "f9024",
+      "cat": "nonRelational",
+      "front": "Blob tier minimum stays and rehydration",
+      "back": "To avoid early deletion penalties, data should stay in Cool for at least 30 days, Cold for at least 90, and Archive for at least 180. Hot, Cool, and Cold are online and read in milliseconds. Archive blobs are offline: to read one you change its tier to Hot, Cool, or Cold and wait for rehydration, which can take up to 15 hours.",
+      "detail": "Lifecycle management policies can move blobs Hot to Cool to Cold to Archive by days since modification, and delete them when they are outdated."
+    },
+    {
+      "id": "f9025",
+      "cat": "nonRelational",
+      "front": "Azure Files protocols and tiers",
+      "back": "Azure Files offers managed cloud file shares over SMB, which works from Windows, Linux, and macOS, and NFS, which is for Linux. An NFS share needs an SSD-tier storage account plus a virtual network that controls access. A single file can be up to 4 TiB, and shares come in an HDD tier and a faster, costlier SSD tier. Azure File Sync can keep local Windows Server caches in step with a share.",
+      "detail": "Choose Azure Files when applications expect a traditional network file share; choose Blob Storage for object storage accessed through an API."
+    },
+    {
+      "id": "f9026",
+      "cat": "nonRelational",
+      "front": "Data Lake Storage Gen2 hierarchical namespace and ACLs",
+      "back": "Data Lake Storage Gen2 is enabled by turning on the hierarchical namespace option of a storage account, either at creation or by upgrading an existing account, and the upgrade is one-way: it cannot be reverted to a flat namespace. The hierarchy also enables POSIX-compliant access control lists to set read, write, and execute permissions on individual files and folders, separate from Azure RBAC.",
+      "detail": "Microsoft Fabric's OneLake is built on top of Azure Data Lake Storage Gen2, and Azure Databricks can mount a Data Lake Storage Gen2 file system to process huge volumes of data."
+    },
+    {
+      "id": "f9027",
+      "cat": "nonRelational",
+      "front": "Azure Managed Redis",
+      "back": "The successor to Azure Cache for Redis, an in-memory key-value service for caching and session state. All Azure Cache for Redis Basic, Standard, and Premium instances remain available until they retire on September 30, 2028, and Microsoft recommends upgrading them to Azure Managed Redis.",
+      "detail": "The tested concept is unchanged: an in-memory cache offloads repeated reads from a database but is not a durable primary store."
+    },
+    {
+      "id": "f9030",
+      "cat": "analytics",
+      "front": "Large-scale analytics architecture: ingest, store, model, visualize",
+      "back": "Data from transactional stores, files, and real-time streams is ingested and processed with ETL or ELT into an analytical store: a relational data warehouse, a file-based data lake, or a hybrid lakehouse. A data model, today usually a semantic model, makes the data easy to report on, and visualizations such as reports and dashboards sit on top. AI assistance, such as Copilot in Fabric, now helps write DAX, SQL, and summaries.",
+      "detail": "The two leading Azure platforms for this architecture are Microsoft Fabric, a unified SaaS workspace on OneLake, and Azure Databricks, a Spark-based platform on Delta Lake."
+    },
+    {
+      "id": "f9031",
+      "cat": "analytics",
+      "front": "OneLake shortcuts",
+      "back": "A shortcut is a live reference to external storage, such as Azure Data Lake Storage Gen2, Amazon S3, Google Cloud Storage, or another OneLake location, that makes the data appear inside a Fabric lakehouse without copying it. No pipeline, no movement, and no duplication.",
+      "detail": "Use a shortcut when data must stay where it is for compliance or cost reasons but still needs to be queried from Fabric."
+    },
+    {
+      "id": "f9032",
+      "cat": "analytics",
+      "front": "Fabric mirroring",
+      "back": "Mirroring continuously replicates an external database, such as Azure SQL Database, Snowflake, or Azure Cosmos DB, into OneLake in near real time. You configure the source connection once and Fabric handles change tracking, with no pipeline authoring. The data lands in Delta format and can be queried through the lakehouse SQL analytics endpoint.",
+      "detail": "Mirroring is the recommended successor to Azure Synapse Link for running analytics over operational data without loading the source system."
+    },
+    {
+      "id": "f9033",
+      "cat": "analytics",
+      "front": "Fabric Data Factory: pipelines and Dataflows Gen2",
+      "back": "Fabric Data Factory is the recommended starting point for pipeline-based ingestion in Fabric. Pipelines orchestrate multi-step data movement and transformation by chaining activities. Dataflows Gen2 is a low-code, visual way to build reusable transformation logic with Power Query and no code. Azure Data Factory is the standalone service for pipelines outside Fabric, such as to an Azure SQL Database or on-premises sources.",
+      "detail": "Both use the same pipeline model of activities, datasets, and linked services, so skills transfer. Fabric Notebooks, powered by Spark, cover cases where no built-in connector exists."
+    },
+    {
+      "id": "f9034",
+      "cat": "analytics",
+      "front": "Fabric Eventstream",
+      "back": "Eventstream connects to streaming sources such as Azure Event Hubs, Apache Kafka, Azure IoT Hub, and custom endpoints, then routes, filters, and transforms the events before landing them in a Fabric lakehouse, a KQL database, or another Real-Time Intelligence destination.",
+      "detail": "It is the ingestion front door of Real-Time Intelligence, comparable to Event Hubs plus a light transformation step."
+    },
+    {
+      "id": "f9035",
+      "cat": "analytics",
+      "front": "Eventhouse, KQL, Real-Time dashboards, Activator, and the real-time hub",
+      "back": "An Eventhouse is a database optimized for time-series and event data and queried with Kusto Query Language (KQL). Real-Time dashboards visualize live data, Activator triggers automated actions or alerts when streaming data meets conditions, and the real-time hub is a central catalog for discovering and sharing streaming data across the organization.",
+      "detail": "Together with Eventstreams these make up Real-Time Intelligence in Microsoft Fabric. Activator was formerly called Data Activator."
+    },
+    {
+      "id": "f9036",
+      "cat": "analytics",
+      "front": "Spark Structured Streaming",
+      "back": "A library built into Apache Spark that treats a live stream as a table that keeps growing: connect to a streaming source such as Event Hubs, read the events into a dataframe, write a query such as a count per minute or a running average, and write results to a sink. It runs on Azure Databricks and Microsoft Fabric.",
+      "detail": "A good choice when you already use Spark and want to extend it to real-time data. Combined with Delta Lake, one table can be both a streaming sink and a batch source."
+    },
+    {
+      "id": "f9037",
+      "cat": "analytics",
+      "front": "Event Hubs, IoT Hub, and Kafka as stream sources",
+      "back": "Azure Event Hubs ingests very high volumes of events, delivers events within a partition in order, and guarantees at-least-once delivery. Azure IoT Hub is similar but optimized for managing event data from Internet-of-things devices. Apache Kafka is an open-source ingestion solution commonly used with Apache Spark. Data Lake Storage Gen2 can also act as a source.",
+      "detail": "Results are written to sinks such as Event Hubs, Data Lake Storage Gen2, OneLake, Blob storage, Azure SQL Database, Azure Databricks, Fabric, or Power BI."
+    },
+    {
+      "id": "f9038",
+      "cat": "analytics",
+      "front": "Batch vs. streaming: scope, size, latency, and analysis",
+      "back": "Batch processing can work on all the data in a dataset, handles large volumes efficiently, typically has latency of hours, and is used for complex analytics. Streaming typically sees only the most recent data or a rolling time window, processes individual records or micro-batches, has latency of seconds or milliseconds, and is used for simple responses, aggregates, and rolling averages.",
+      "detail": "Many solutions mix both, and an error in one batch input can stop the whole batch run."
+    },
+    {
+      "id": "f9039",
+      "cat": "analytics",
+      "front": "Lambda, delta, and kappa architectures",
+      "back": "Lambda architecture combines a batch path that periodically processes data for historical analysis with a stream path that prepares data for real-time views. Delta architectures also combine batch and streaming processing. Kappa is a simpler alternative that removes the separate batch layer by treating all data as a continuous stream and replaying it when historical reprocessing is needed.",
+      "detail": "Microsoft Fabric and Apache Kafka make kappa-style solutions increasingly practical, but the exam only expects you to recognize these patterns."
+    },
+    {
+      "id": "f9040",
+      "cat": "analytics",
+      "front": "Azure Databricks building blocks: Unity Catalog, SQL, and Genie",
+      "back": "Databricks Lakehouse is a unified storage layer on Delta Lake for SQL analytics and machine learning. Databricks SQL is a serverless SQL warehouse for analytical queries. Notebooks hold collaborative Python, SQL, Scala, and R code. Unity Catalog governs data and AI assets with access control, lineage, and discovery. Genie lets users ask natural-language questions and generates and runs the SQL.",
+      "detail": "Choose Databricks for code-first Spark workflows, multicloud portability, or existing Spark expertise."
+    },
+    {
+      "id": "f9041",
+      "cat": "analytics",
+      "front": "Lakeflow Declarative Pipelines",
+      "back": "A declarative framework in Azure Databricks for building reliable, incrementally updated pipelines on Delta Lake. You define what the output tables should contain, and Databricks handles execution order, dependency tracking, and incremental processing. It is the recommended approach for production, continuously running ingestion pipelines.",
+      "detail": "Databricks Notebooks suit ad-hoc or exploratory ingestion, and can be scheduled as jobs or embedded in a pipeline."
+    },
+    {
+      "id": "f9042",
+      "cat": "analytics",
+      "front": "SQL analytics endpoint",
+      "back": "When you create a Fabric lakehouse, a SQL analytics endpoint is created automatically so the Delta tables in OneLake can be queried with T-SQL. A Fabric warehouse is a fully managed, SQL Server-compatible warehouse that also stores its data in OneLake.",
+      "detail": "A lakehouse suits mixed or semi-structured data and Spark or machine-learning work; a warehouse suits structured data, SQL teams, strong schema enforcement, and many concurrent users."
+    },
+    {
+      "id": "f9043",
+      "cat": "analytics",
+      "front": "Direct Lake mode",
+      "back": "A Power BI storage mode that lets a semantic model query Delta tables in OneLake directly, combining the speed of in-memory analysis with the scale of a data lake, without a separate import step or scheduled refresh.",
+      "detail": "Import copies data into Power BI and needs refreshes; DirectQuery queries the source live on each interaction; Direct Lake reads lake files directly."
+    },
+    {
+      "id": "f9044",
+      "cat": "analytics",
+      "front": "Semantic models, measures, dimensions, and hierarchies",
+      "back": "An analytical model, called a semantic model in Fabric and Power BI, is built from related tables. It defines measures, the numeric values to analyze, and dimensions, the entities used to aggregate them. Hierarchies let users drill up and down, such as year to month to day. Power BI stores the model in a columnar in-memory store using the VertiPaq engine and calculates aggregations at query time.",
+      "detail": "Older cubes pre-aggregated values across dimensions using technologies such as SQL Server Analysis Services Multidimensional; the semantic model is the preferred approach today."
+    },
+    {
+      "id": "f9045",
+      "cat": "analytics",
+      "front": "Star schema vs. snowflake schema",
+      "back": "In a star schema a fact table relates directly to one or more dimension tables. In a snowflake schema the dimension tables relate further to other detail tables, such as a Category table linked to a Product table.",
+      "detail": "Most analytical models also include a Time dimension so measures can be aggregated across periods."
+    },
+    {
+      "id": "f9046",
+      "cat": "analytics",
+      "front": "Power BI Desktop, service, and mobile app",
+      "back": "Power BI Desktop is a Windows application for importing data, building the data model, and creating reports. You publish to the Power BI service, a cloud service where users view and interact with reports, schedule refreshes, and share. The service allows only basic modeling and report editing in a browser, and the Power BI phone app consumes reports, dashboards, and apps.",
+      "detail": "In Fabric, Power BI content lives in workspaces alongside other items, all backed by OneLake."
+    },
+    {
+      "id": "f9047",
+      "cat": "analytics",
+      "front": "Copilot and AI visuals in Power BI",
+      "back": "Copilot in Power BI can summarize a report, create report pages and pick chart types, and generate DAX measures from a natural-language description; it requires Fabric capacity (F2 or higher) or Power BI Premium (P1 or higher). AI visuals include smart narratives, which write a text summary that updates as data changes, the Q&A visual, key influencers, which show the factors that most drive a metric, and the decomposition tree for interactive drill-down.",
+      "detail": "In Azure Databricks the comparable natural-language experience is Genie, which generates and runs SQL over Delta Lake data."
+    },
+    {
+      "id": "f9048",
+      "cat": "analytics",
+      "front": "SQL database and Cosmos DB in Microsoft Fabric",
+      "back": "Fabric includes databases among its integrated capabilities, including a SQL database and Cosmos DB inside Fabric, alongside Fabric Data Factory, the Lakehouse, the Warehouse, data science, Real-Time Intelligence, Power BI, and governance. Fabric IQ is a workload that gives data in OneLake consistent business meaning for people and AI agents, and is currently in preview.",
+      "detail": "Do not confuse these with the Azure PaaS databases: the Fabric versions are delivered as part of the SaaS platform with no servers to manage."
     }
   ],
   "questions": [
@@ -2386,6 +2631,688 @@
       ],
       "explanation": "The Collation box reads SQL_Latin1_General_CP1_CI_AS, the paragraph above it says collation cannot be changed after creation, and the toggle lists None, Backup, and Sample. The Review + create button at the bottom is drawn as a solid, enabled button and the highlighted box in the screenshot points to it as the next action, so it is not disabled.",
       "image": "sqlCreateAdditionalSettings"
+    },
+    {
+      "id": "q9001",
+      "cat": "coreData",
+      "type": "mc",
+      "question": "A data engineering team stores analytics tables as files in a data lake and needs ACID transactions, data versioning, and reliable updates on top of those files, without moving to a separate database engine. Which format adds these capabilities to Parquet files?",
+      "options": [
+        "Avro",
+        "CSV",
+        "XML",
+        "Delta Lake"
+      ],
+      "correct": 3,
+      "explanation": "Delta Lake is an open-source storage format that builds on Parquet by adding a transaction log, which enables ACID transactions, versioning, and reliable updates. Avro is a row-based format with a JSON header describing binary records, but it has no transaction layer. CSV and XML are human-readable text formats with neither transactions nor versioning.",
+      "whyTested": "Lakehouse questions now treat Delta Lake as the standard open table format used by both Fabric and Azure Databricks."
+    },
+    {
+      "id": "q9002",
+      "cat": "coreData",
+      "type": "mc",
+      "question": "A team streams events between systems and wants a compact, row-based binary format in which each file starts with a header, stored as JSON, that describes the structure of the records. Which format fits?",
+      "options": [
+        "Parquet",
+        "Avro",
+        "CSV",
+        "XML"
+      ],
+      "correct": 1,
+      "explanation": "Avro is a row-based format whose header, stored as JSON, describes the binary records that follow, and it is good at minimizing storage and network bandwidth. Parquet is the near miss: it is binary but columnar, built for reading selected columns in analytics. CSV and XML are human-readable text formats rather than compact binary ones."
+    },
+    {
+      "id": "q9003",
+      "cat": "coreData",
+      "type": "mc",
+      "question": "Which statement correctly describes the relationship between document databases and key-value databases?",
+      "options": [
+        "A document database is a specific form of key-value database in which the value is a JSON document that the system is optimized to parse and query",
+        "A document database stores only relational tables whose rows are linked by foreign keys",
+        "A key-value database always requires its values to be stored as JSON documents",
+        "A document database is the same thing as a graph database that models nodes and edges"
+      ],
+      "correct": 0,
+      "explanation": "In a key-value database each record has a unique key and a value in any format. A document database narrows that to JSON documents that the system can parse and query. Document databases do not use relational tables, key-value values are not required to be JSON, and graph databases are a different model built around nodes and edges."
+    },
+    {
+      "id": "q9004",
+      "cat": "coreData",
+      "type": "mc",
+      "question": "A company stores customers' scanned photos and videos, billing records that need joins across many tables, and a social graph of friendships. Which assignment of stores is the best fit for these three kinds of data in order?",
+      "options": [
+        "Azure SQL Database, Blob Storage, Cosmos DB for Apache Gremlin",
+        "Blob Storage, Cosmos DB for Apache Gremlin, Azure SQL Database",
+        "Blob Storage, Azure SQL Database, Cosmos DB for Apache Gremlin",
+        "Azure Files, Azure Table Storage, Azure SQL Database"
+      ],
+      "correct": 2,
+      "explanation": "Photos and videos are unstructured binary objects, which Blob Storage handles. Billing records needing joins across many tables suit a relational database such as Azure SQL Database, and a social graph where relationships matter as much as the entities suits the Gremlin graph API of Cosmos DB. The other orders put relational joins on Blob Storage or graph data on a relational or key-value store."
+    },
+    {
+      "id": "q9005",
+      "cat": "relational",
+      "type": "mc",
+      "question": "Before migrating an on-premises SQL Server database to Azure, a team wants a tool that analyzes their databases and reports compatibility issues that could block the move to Azure SQL Managed Instance or Azure SQL Database. Which tool fits?",
+      "options": [
+        "Data Migration Assistant",
+        "Microsoft Purview",
+        "Azure Data Factory",
+        "SQL Server Integration Services"
+      ],
+      "correct": 0,
+      "explanation": "Data Migration Assistant analyzes SQL Server databases and reports issues that could block migration, such as features a target does not support. Data Factory and SQL Server Integration Services move and transform data but do not assess compatibility, and Purview catalogs and classifies data rather than checking migration readiness."
+    },
+    {
+      "id": "q9006",
+      "cat": "relational",
+      "type": "mc",
+      "question": "A team is starting a new MySQL-based workload on Azure and wants granular control over configuration and management settings, plus cost optimization controls, in a fully managed service. Which deployment option does Microsoft recommend for new MySQL workloads?",
+      "options": [
+        "Azure SQL Managed Instance with an instance pool",
+        "Azure Cosmos DB for Apache Cassandra",
+        "SQL Server on an Azure virtual machine",
+        "Azure Database for MySQL flexible server"
+      ],
+      "correct": 3,
+      "explanation": "The flexible-server deployment option for Azure Database for MySQL is fully managed, gives more granular control over configuration and cost, and is the recommended option for new workloads. Managed Instance and SQL Server on a VM are SQL Server products rather than MySQL, and Cosmos DB for Apache Cassandra is a NoSQL column-family API."
+    },
+    {
+      "id": "q9007",
+      "cat": "relational",
+      "type": "mc",
+      "question": "A script runs CREATE INDEX on the Orders table, then INSERT adds new orders, then GRANT lets an analyst role read the table. In order, which SQL statement categories do these three statements belong to?",
+      "options": [
+        "DML, DDL, DCL",
+        "DDL, DML, DCL",
+        "DCL, DML, DDL",
+        "DDL, DCL, DML"
+      ],
+      "correct": 1,
+      "explanation": "CREATE INDEX changes structure, so it is data definition language, INSERT works with rows, so it is data manipulation language, and GRANT manages permissions, so it is data control language. The other orders swap categories: INSERT is not DDL or DCL, and GRANT is not DML.",
+      "whyTested": "Exams show a keyword or short statement and expect you to name the category, so memorize the verbs for each: CREATE, ALTER, DROP; INSERT, UPDATE, DELETE; GRANT, REVOKE, DENY."
+    },
+    {
+      "id": "q9008",
+      "cat": "relational",
+      "type": "mc",
+      "question": "A DBA wants analysts to query the result of a join across three tables as if it were a single table, exposing only selected columns, without copying the data anywhere. Which database object fits?",
+      "options": [
+        "An index",
+        "A trigger",
+        "A stored procedure",
+        "A view"
+      ],
+      "correct": 3,
+      "explanation": "A view is a saved query that presents the result, such as a join and chosen columns, as a virtual table without storing a separate copy of the data. An index speeds up lookups on a table, a stored procedure is a named, reusable routine you call explicitly, and a trigger runs automatically when a data change event occurs."
+    },
+    {
+      "id": "q9009",
+      "cat": "relational",
+      "type": "mc",
+      "question": "Whenever a row in the Orders table is deleted, the database must automatically write a record to an audit table, without the application having to ask for it. Which object does this?",
+      "options": [
+        "A view",
+        "A foreign key constraint",
+        "A trigger",
+        "A clustered index"
+      ],
+      "correct": 2,
+      "explanation": "A trigger is a routine that fires automatically in response to an event such as an insert, update, or delete. A view only presents data, a foreign key constraint enforces valid relationships rather than performing an action, and an index speeds lookups."
+    },
+    {
+      "id": "q9010",
+      "cat": "nonRelational",
+      "type": "mc",
+      "question": "A shopping app needs each user to always read their own most recent writes within their session, while keeping latency low across a globally distributed Cosmos DB account. Which consistency level is the most widely used and the recommended starting point for most transactional applications?",
+      "options": [
+        "Strong",
+        "Eventual",
+        "Consistent prefix",
+        "Session"
+      ],
+      "correct": 3,
+      "explanation": "Session consistency guarantees consistency within a single client session, so a user always sees their own writes, and it is the most widely used level and the recommended starting point. Strong gives every reader the latest write everywhere but at the cost of latency, consistent prefix prevents out-of-order reads but can be stale, and eventual is the weakest guarantee."
+    },
+    {
+      "id": "q9011",
+      "cat": "nonRelational",
+      "type": "mc",
+      "question": "A team wants a Cosmos DB account that is billed only for the Request Units its operations consume and also replicates data to three Azure regions. What is the problem with this plan?",
+      "options": [
+        "Cosmos DB cannot replicate data to more than one region under any capacity mode",
+        "Serverless accounts are limited to a single Azure region, so global distribution needs provisioned throughput",
+        "Serverless accounts require a minimum of ten containers before regions can be added",
+        "Request Units are only used as a throughput measure with the Table API"
+      ],
+      "correct": 1,
+      "explanation": "A serverless account is limited to one region, so replicating to three regions requires a provisioned throughput account, optionally with autoscale. Cosmos DB does replicate across regions, serverless has no container minimum, and Request Units are the throughput currency for all APIs.",
+      "whyTested": "A tempting pairing is pay-per-use billing with global distribution. Serverless is for intermittent single-region workloads."
+    },
+    {
+      "id": "q9012",
+      "cat": "nonRelational",
+      "type": "mc",
+      "question": "A container uses country as its partition key, but about 95 percent of the items belong to a single country. Cosmos DB limits a logical partition to 20 GB. What is the best fix?",
+      "options": [
+        "Convert the container to use the Table API instead of the NoSQL API",
+        "Lower the account consistency level to Eventual to relax the size limit",
+        "Create a second account in another region and split the traffic",
+        "Switch to a property with many distinct, evenly used values, such as a customer or device identifier"
+      ],
+      "correct": 3,
+      "explanation": "A good partition key has many distinct values and an even spread of data, so storage and throughput spread across partitions instead of concentrating on one hot, size-limited logical partition. Consistency level, extra regions, and the choice of API do not change how data is distributed across partitions."
+    },
+    {
+      "id": "q9013",
+      "cat": "nonRelational",
+      "type": "mc",
+      "question": "A new application needs key-value storage at scale with global distribution and automatic secondary indexes, but the developers already know the Azure Table Storage programming model and want minimal code changes. What should they choose?",
+      "options": [
+        "Azure Table Storage with a larger account",
+        "Azure Cosmos DB for Apache Gremlin",
+        "Azure Cosmos DB for Table",
+        "Azure Files"
+      ],
+      "correct": 2,
+      "explanation": "Cosmos DB for Table uses the same programming model as Table Storage while adding greater scalability, global distribution, automatic secondary indexes, and instant autoscale, and Microsoft recommends it for new key-value workloads at scale. Table Storage remains supported but has none of those extras, Gremlin is for graph data, and Azure Files is a file share."
+    },
+    {
+      "id": "q9014",
+      "cat": "nonRelational",
+      "type": "mc",
+      "question": "A company is migrating an existing Apache Cassandra workload that uses the Cassandra Query Language (CQL) and wants a fully managed Azure service with minimal application changes. Which Cosmos DB API fits?",
+      "options": [
+        "API for Apache Cassandra",
+        "API for MongoDB",
+        "API for Table",
+        "API for NoSQL"
+      ],
+      "correct": 0,
+      "explanation": "Cosmos DB for Apache Cassandra is compatible with Cassandra, uses CQL over column-family tables, and suits teams migrating a Cassandra workload. The MongoDB API targets MongoDB applications, the Table API follows the Table Storage key-value model, and the NoSQL API is the native JSON document API with a SQL-like query language."
+    },
+    {
+      "id": "q9015",
+      "cat": "nonRelational",
+      "type": "mc",
+      "question": "A team plans to mount an NFS Azure file share on its Linux virtual machines. Which statement about NFS Azure file shares is correct?",
+      "options": [
+        "They require no virtual network because access to the share is always public",
+        "They work on HDD-tier accounts and are supported from Windows and macOS clients too",
+        "They require an SSD-tier storage account and a virtual network that controls access, and are for Linux clients",
+        "They are only available when the share is accessed through Azure File Sync"
+      ],
+      "correct": 2,
+      "explanation": "To create an NFS share you must use an SSD-tier storage account and create and configure a virtual network that controls access, and NFS shares are for Linux, not Windows or macOS. SMB is the protocol that works across Windows, Linux, and macOS. NFS shares are not limited to Azure File Sync."
+    },
+    {
+      "id": "q9016",
+      "cat": "nonRelational",
+      "type": "mc",
+      "question": "A team upgrades an existing storage account to support a hierarchical namespace so it can be used for big-data analytics with folder-level permissions. Which statement is accurate?",
+      "options": [
+        "The upgrade can be undone at any time from the portal",
+        "The upgrade is one-way, and the account cannot be reverted to a flat namespace",
+        "Folder-level permissions require Azure SQL Database",
+        "The hierarchical namespace removes the account's blob capabilities"
+      ],
+      "correct": 1,
+      "explanation": "Enabling the hierarchical namespace, whether at creation or by upgrading, turns the account into Data Lake Storage Gen2 capable storage, and upgrading is a one-way process. It also enables POSIX-style access control lists on files and folders. It does not remove blob capabilities, because Data Lake Storage Gen2 is built on Blob Storage."
+    },
+    {
+      "id": "q9017",
+      "cat": "nonRelational",
+      "type": "mc",
+      "question": "Microsoft is retiring the Basic, Standard, and Premium tiers of Azure Cache for Redis on September 30, 2028. Which service does Microsoft recommend moving those instances to?",
+      "options": [
+        "Azure Table Storage",
+        "Azure Files",
+        "Azure Cosmos DB for Table",
+        "Azure Managed Redis"
+      ],
+      "correct": 3,
+      "explanation": "Azure Managed Redis is the successor Microsoft recommends for Azure Cache for Redis instances. Table Storage and Cosmos DB for Table are durable key-value stores rather than in-memory caches, and Azure Files is a file share service."
+    },
+    {
+      "id": "q9018",
+      "cat": "nonRelational",
+      "type": "mc",
+      "question": "Which workload is the poorest fit for Azure Cosmos DB, according to Microsoft's guidance?",
+      "options": [
+        "Ingesting high-frequency IoT device telemetry from many sensors",
+        "An application whose logic depends on complex joins across many related tables",
+        "Player profiles and leaderboards for a global online game",
+        "A product catalog for a busy e-commerce site"
+      ],
+      "correct": 1,
+      "explanation": "Workloads that depend on complex multi-table joins are better suited to a relational database such as Azure SQL Database. Telemetry ingestion, gaming profiles, and retail catalogs are listed as strong fits, because they benefit from a flexible schema, global reach, and low latency."
+    },
+    {
+      "id": "q9019",
+      "cat": "analytics",
+      "type": "mc",
+      "question": "Data must stay in an Amazon S3 bucket for compliance reasons, but analysts want to query it from a Fabric lakehouse without building pipelines or copying it. Which Fabric capability fits?",
+      "options": [
+        "A OneLake shortcut",
+        "Mirroring",
+        "A Dataflows Gen2 refresh",
+        "An Eventstream"
+      ],
+      "correct": 0,
+      "explanation": "A shortcut is a live reference to external storage, including Amazon S3, that makes the data appear in the lakehouse with no movement or duplication. Mirroring replicates databases such as Azure SQL Database or Cosmos DB into OneLake, which copies data, a Dataflows Gen2 refresh moves transformed data, and an Eventstream ingests streaming events."
+    },
+    {
+      "id": "q9020",
+      "cat": "analytics",
+      "type": "mc",
+      "question": "A team wants the contents of an operational Azure SQL Database to appear continuously in OneLake in near real time, in Delta format, with no pipeline authoring. Which capability does this?",
+      "options": [
+        "A OneLake shortcut",
+        "Fabric mirroring",
+        "Lakeflow Declarative Pipelines",
+        "A scheduled Spark notebook"
+      ],
+      "correct": 1,
+      "explanation": "Mirroring continuously replicates an external database into OneLake and handles change tracking automatically, with data landing in Delta format and queryable through the SQL analytics endpoint. A shortcut references external files rather than replicating a database, Lakeflow pipelines are an Azure Databricks feature, and a scheduled notebook would be custom code to maintain."
+    },
+    {
+      "id": "q9021",
+      "cat": "analytics",
+      "type": "mc",
+      "question": "Business analysts who know Power Query want to build reusable, low-code transformation logic in Fabric without writing code. Which tool fits?",
+      "options": [
+        "Spark notebooks",
+        "The real-time hub",
+        "Eventstream",
+        "Dataflows Gen2"
+      ],
+      "correct": 3,
+      "explanation": "Dataflows Gen2 is the low-code, visual experience for building reusable transformation logic with Power Query. Spark notebooks are code-first, an Eventstream ingests streaming events, and the real-time hub is a catalog of streaming data rather than a transformation tool."
+    },
+    {
+      "id": "q9022",
+      "cat": "analytics",
+      "type": "mc",
+      "question": "Events arrive from Azure Event Hubs and Apache Kafka. The team wants to route, filter, and transform them before landing them in a KQL database in Fabric. Which component does this?",
+      "options": [
+        "Activator",
+        "Eventstream",
+        "A Real-Time dashboard",
+        "A OneLake shortcut"
+      ],
+      "correct": 1,
+      "explanation": "Eventstream connects to streaming sources, routes, filters, and transforms events, and lands them in destinations such as a lakehouse or a KQL database. Activator triggers actions when conditions are met, a Real-Time dashboard visualizes data, and a shortcut references existing storage."
+    },
+    {
+      "id": "q9023",
+      "cat": "analytics",
+      "type": "mc",
+      "question": "An operations team wants an automatic alert or action the moment streaming sensor data crosses a defined condition. Which Real-Time Intelligence component provides this?",
+      "options": [
+        "Activator",
+        "Power BI Q&A",
+        "Eventhouse",
+        "Dataflows Gen2"
+      ],
+      "correct": 0,
+      "explanation": "Activator triggers automated actions when streaming data meets conditions you define. An Eventhouse stores and queries time-series data with KQL, Power BI Q&A answers typed questions with charts, and Dataflows Gen2 prepares data with Power Query."
+    },
+    {
+      "id": "q9024",
+      "cat": "analytics",
+      "type": "mc",
+      "question": "A team needs a Fabric store for high-volume time-series telemetry that engineers can explore with Kusto Query Language. Which item fits?",
+      "options": [
+        "A Fabric warehouse",
+        "A Power BI semantic model",
+        "An Eventhouse with a KQL database",
+        "A OneLake shortcut"
+      ],
+      "correct": 2,
+      "explanation": "An Eventhouse is the database optimized for time-series and event data, queried with KQL. A warehouse is a T-SQL relational store for structured analytics, a semantic model is a reporting layer, and a shortcut is a reference to data stored elsewhere."
+    },
+    {
+      "id": "q9025",
+      "cat": "analytics",
+      "type": "mc",
+      "question": "A team already runs Spark in Azure Databricks and now wants to process live event data using the same skills, treating the stream as a table that keeps growing. Which option fits?",
+      "options": [
+        "Spark Structured Streaming",
+        "A weekly Azure Data Factory copy job",
+        "Power BI Import mode",
+        "Azure Files"
+      ],
+      "correct": 0,
+      "explanation": "Spark Structured Streaming is the Spark library for streaming: read the source into a dataframe, run a query such as a count per minute, and write to a sink. A weekly copy job is batch, Import mode is a Power BI storage mode, and Azure Files is file storage."
+    },
+    {
+      "id": "q9026",
+      "cat": "analytics",
+      "type": "mc",
+      "question": "An organization needs a service similar to Azure Event Hubs for ingesting events, but optimized for managing event data from Internet-of-things devices. Which service fits?",
+      "options": [
+        "Azure Stream Analytics",
+        "Azure Data Factory",
+        "Azure Data Lake Storage Gen2",
+        "Azure IoT Hub"
+      ],
+      "correct": 3,
+      "explanation": "IoT Hub is a data ingestion service similar to Event Hubs but optimized to manage event data from IoT devices. Stream Analytics processes streams rather than ingesting from devices, Data Lake Storage Gen2 stores data, and Data Factory orchestrates pipelines."
+    },
+    {
+      "id": "q9027",
+      "cat": "analytics",
+      "type": "mc",
+      "question": "Which statement correctly contrasts the scope of data in batch and stream processing?",
+      "options": [
+        "Stream processing always has access to the full history of the dataset, while batch processing sees only the last 30 seconds",
+        "Batch processing can work on all the data in the dataset, while stream processing typically sees only the most recent data or a rolling time window",
+        "Both always process the same amount of data and differ only in the programming language used",
+        "Batch processing is used for simple rolling averages, while streaming is used for the most complex analytics"
+      ],
+      "correct": 1,
+      "explanation": "Batch processing can analyze everything in the dataset, usually with latency of hours and for complex analytics, while streaming handles individual records or micro-batches within a rolling window with latency of seconds or less, typically for simple aggregates. The other statements reverse or blur those roles."
+    },
+    {
+      "id": "q9028",
+      "cat": "analytics",
+      "type": "mc",
+      "question": "Which architecture removes the separate batch layer by treating all data as a continuous stream and replaying it when historical reprocessing is needed?",
+      "options": [
+        "Lambda architecture",
+        "Medallion architecture",
+        "Star schema",
+        "Kappa architecture"
+      ],
+      "correct": 3,
+      "explanation": "Kappa architecture is a simpler alternative to lambda that treats everything as a stream and replays it when needed, which platforms such as Microsoft Fabric and Apache Kafka make more practical. Lambda keeps both a batch layer and a stream layer, a star schema is a warehouse modeling pattern, and medallion organizes lake zones into bronze, silver, and gold."
+    },
+    {
+      "id": "q9029",
+      "cat": "analytics",
+      "type": "mc",
+      "question": "In Azure Databricks, which capability provides a unified governance layer with fine-grained access control, lineage, and discovery across data and AI assets?",
+      "options": [
+        "Genie",
+        "Databricks Notebooks",
+        "Unity Catalog",
+        "Lakeflow Declarative Pipelines"
+      ],
+      "correct": 2,
+      "explanation": "Unity Catalog is the governance layer for data and AI assets in the workspace. Genie is the natural-language conversational interface, notebooks are collaborative coding documents, and Lakeflow Declarative Pipelines is a framework for building incremental pipelines."
+    },
+    {
+      "id": "q9030",
+      "cat": "analytics",
+      "type": "mc",
+      "question": "A team wants to declare what its output tables should contain and let Azure Databricks handle execution order, dependency tracking, and incremental processing for a continuously running ingestion pipeline. Which framework fits?",
+      "options": [
+        "Databricks Notebooks run by hand",
+        "Unity Catalog",
+        "Genie",
+        "Lakeflow Declarative Pipelines"
+      ],
+      "correct": 3,
+      "explanation": "Lakeflow Declarative Pipelines is a declarative framework: you define the outputs and Databricks manages ordering, dependencies, and incremental processing, and it is recommended for production ingestion. Notebooks are imperative code, Genie is a natural-language query interface, and Unity Catalog governs data rather than building pipelines."
+    },
+    {
+      "id": "q9031",
+      "cat": "analytics",
+      "type": "mc",
+      "question": "Business users want to type questions such as 'what were sales by region last quarter' in plain English and have Azure Databricks generate and run the SQL against Delta Lake data. Which feature provides this?",
+      "options": [
+        "Unity Catalog",
+        "Genie",
+        "Databricks SQL warehouse",
+        "Lakeflow Declarative Pipelines"
+      ],
+      "correct": 1,
+      "explanation": "Genie is the conversational natural-language interface that generates and runs SQL over Delta Lake data. Unity Catalog governs access and lineage, a Databricks SQL warehouse is the engine that executes queries, and Lakeflow pipelines build data pipelines."
+    },
+    {
+      "id": "q9032",
+      "cat": "analytics",
+      "type": "mc",
+      "question": "A Power BI semantic model should read Delta tables in OneLake directly, with in-memory-style speed and without importing data or scheduling refreshes. Which storage mode does this?",
+      "options": [
+        "Import mode",
+        "DirectQuery",
+        "A dataflow refresh",
+        "Direct Lake"
+      ],
+      "correct": 3,
+      "explanation": "Direct Lake reads Delta tables from OneLake directly, combining in-memory-style speed with the scale of a data lake and no separate import or refresh cycle. Import copies data into the model and needs scheduled refreshes, DirectQuery sends live queries to the source on each interaction, and a dataflow refresh prepares data upstream."
+    },
+    {
+      "id": "q9033",
+      "cat": "analytics",
+      "type": "mc",
+      "question": "In a data model, a Product dimension table relates to a separate Category table that holds more detail about each category. What is this design called?",
+      "options": [
+        "Star schema",
+        "A flat file",
+        "Snowflake schema",
+        "A key-value store"
+      ],
+      "correct": 2,
+      "explanation": "When dimension tables relate further to additional detail tables, the design is a snowflake schema. A star schema has fact tables relating directly to dimension tables only. A flat file and a key-value store are not relational modeling patterns of this kind."
+    },
+    {
+      "id": "q9034",
+      "cat": "analytics",
+      "type": "mc",
+      "question": "Which term names the tabular analytical model, which defines measures, relationships, and hierarchies and is built from related tables, that has replaced older cubes as the preferred approach in Power BI and Fabric?",
+      "options": [
+        "Semantic model",
+        "Dataflow",
+        "SQL analytics endpoint",
+        "Real-time hub"
+      ],
+      "correct": 0,
+      "explanation": "A semantic model, formerly called a dataset, defines the measures, dimensions, relationships, and hierarchies that reports are built on. A dataflow is reusable data preparation logic, the SQL analytics endpoint is a T-SQL access point to lakehouse tables, and the real-time hub is a catalog of streaming data."
+    },
+    {
+      "id": "q9035",
+      "cat": "analytics",
+      "type": "mc",
+      "question": "An analyst wants a Power BI visual that identifies which factors most strongly drive a selected metric, such as customer churn. Which visual fits?",
+      "options": [
+        "Smart narrative",
+        "Decomposition tree",
+        "Key influencers",
+        "Card"
+      ],
+      "correct": 2,
+      "explanation": "The key influencers visual shows which factors most strongly drive a selected metric. A decomposition tree supports interactive drill-down across dimensions to see what contributes to a value, a smart narrative writes a text summary, and a card shows a single number."
+    },
+    {
+      "id": "q9036",
+      "cat": "analytics",
+      "type": "mc",
+      "question": "A team has semi-structured files and runs Spark notebooks for data science, but analysts also want to query the same Delta tables with T-SQL without starting a Spark session. Which Fabric item fits best?",
+      "options": [
+        "A Power BI dashboard pinned from several reports",
+        "A Fabric lakehouse, which automatically creates a SQL analytics endpoint",
+        "A Power BI Desktop file with imported tables",
+        "An Eventstream that routes incoming events"
+      ],
+      "correct": 1,
+      "explanation": "A Fabric lakehouse stores Delta tables in OneLake, works well with Spark and mixed or semi-structured data, and automatically creates a SQL analytics endpoint for T-SQL queries. A dashboard, a Desktop file, and an Eventstream do not store and expose Delta tables."
+    },
+    {
+      "id": "tf9001",
+      "cat": "coreData",
+      "type": "tf",
+      "question": "XML has largely replaced JSON as the preferred format for modern web APIs because it is less verbose.",
+      "answer": false,
+      "explanation": "It is the other way around. XML is human-readable and tag-based, was popular in the 1990s and 2000s, and has largely been superseded by the less verbose JSON, although some systems still use it."
+    },
+    {
+      "id": "tf9002",
+      "cat": "nonRelational",
+      "type": "tf",
+      "question": "An Azure Cosmos DB serverless account can replicate its data to multiple Azure regions.",
+      "answer": false,
+      "explanation": "Serverless accounts are limited to a single Azure region. Applications that need global distribution across multiple regions should use a provisioned throughput account instead, optionally with autoscale."
+    },
+    {
+      "id": "tf9003",
+      "cat": "analytics",
+      "type": "tf",
+      "question": "Creating a OneLake shortcut to an Amazon S3 bucket copies the bucket's data into OneLake.",
+      "answer": false,
+      "explanation": "A shortcut is a live reference: the data appears as if it were in the lakehouse but is not copied or duplicated, and no pipeline is needed. Copying data requires pipelines, dataflows, or notebooks, and mirroring replicates databases."
+    },
+    {
+      "id": "tf9004",
+      "cat": "analytics",
+      "type": "tf",
+      "question": "Fabric mirroring requires you to build and schedule a data pipeline to copy changes from the source database.",
+      "answer": false,
+      "explanation": "Mirroring replicates an external database into OneLake in near real time and handles change tracking automatically; you configure the source connection once and no pipeline authoring is needed."
+    },
+    {
+      "id": "tf9005",
+      "cat": "nonRelational",
+      "type": "tf",
+      "question": "Azure Table Storage has been retired, so existing applications must move to Azure Cosmos DB for Table immediately.",
+      "answer": false,
+      "explanation": "Azure Table Storage is still available and supported. Cosmos DB for Table is simply the recommended choice for new workloads that need key-value storage at scale, with greater scalability, global distribution, and automatic secondary indexes."
+    },
+    {
+      "id": "tf9006",
+      "cat": "analytics",
+      "type": "tf",
+      "question": "The same Delta table can serve as a streaming sink, with data written to it in real time, and as a source for batch queries.",
+      "answer": true,
+      "explanation": "That is one of the key benefits of Delta Lake: unified batch and streaming on one table, so separate storage for historical and live data is not needed. Reliability and schema enforcement come along with it."
+    },
+    {
+      "id": "tf9007",
+      "cat": "analytics",
+      "type": "tf",
+      "question": "Azure Event Hubs guarantees exactly-once delivery of every event.",
+      "answer": false,
+      "explanation": "Event Hubs delivers events within a partition in order and guarantees at-least-once delivery, so a consumer can see the same event more than once and downstream processing has to tolerate duplicates."
+    },
+    {
+      "id": "tf9008",
+      "cat": "relational",
+      "type": "tf",
+      "question": "A database trigger runs only when an application explicitly calls it by name, in the same way as a stored procedure.",
+      "answer": false,
+      "explanation": "A stored procedure is called explicitly, usually with parameters. A trigger fires automatically when a defined event, such as an insert, update, or delete, occurs."
+    },
+    {
+      "id": "msq9001",
+      "cat": "coreData",
+      "type": "ms",
+      "question": "Which two pairings of workload and Azure data store are correct? (Choose two.)",
+      "options": [
+        "A mountable shared file share replacing an on-premises file server: Azure Files",
+        "Highly connected social-network relationships: Azure Cosmos DB for Apache Gremlin",
+        "Complex multi-table joins with strict relationships: Azure Cosmos DB",
+        "A raw archive of video files: Azure SQL Database"
+      ],
+      "correct": [
+        0,
+        1
+      ],
+      "explanation": "Azure Files provides mountable file shares and the Gremlin API models relationship-heavy graph data. Complex multi-table joins belong in a relational engine such as Azure SQL Database, and video files are unstructured objects that belong in Blob Storage rather than a relational database."
+    },
+    {
+      "id": "msq9002",
+      "cat": "relational",
+      "type": "ms",
+      "question": "Which two capabilities are described as built into Azure SQL Database? (Choose two.)",
+      "options": [
+        "Advanced threat protection that includes vulnerability assessments and anomalous-activity detection",
+        "Auditing that writes database events to an Azure storage account",
+        "Automatic conversion of tables into Cosmos DB containers",
+        "A guarantee that no data can ever be lost across regions without any configuration"
+      ],
+      "correct": [
+        0,
+        1
+      ],
+      "explanation": "Threat protection and auditing are both described as built-in security and compliance features. Tables are not converted to Cosmos DB containers, and cross-region protection depends on configuring geo-replication or failover groups rather than being automatic and absolute."
+    },
+    {
+      "id": "msq9003",
+      "cat": "analytics",
+      "type": "ms",
+      "question": "Which of the following are components of Real-Time Intelligence in Microsoft Fabric? (Select all that apply.)",
+      "options": [
+        "Eventstreams for ingesting, routing, and transforming streaming data",
+        "An Eventhouse queried with KQL",
+        "Real-Time dashboards for live data",
+        "Activator for triggering actions on conditions",
+        "Dedicated SQL pools in Azure Synapse Analytics"
+      ],
+      "correct": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "explanation": "Real-Time Intelligence combines Eventstreams, an Eventhouse, Real-Time dashboards, and Activator, with the real-time hub as a catalog. Dedicated SQL pools belong to Azure Synapse Analytics rather than being part of Fabric's Real-Time Intelligence."
+    },
+    {
+      "id": "msq9004",
+      "cat": "analytics",
+      "type": "ms",
+      "question": "Which of the following are ways to bring data into OneLake in Microsoft Fabric? (Select all that apply.)",
+      "options": [
+        "Fabric Data Factory pipelines",
+        "OneLake shortcuts to external storage",
+        "Mirroring of an external database",
+        "Eventstream for streaming sources",
+        "Pinning a dashboard tile in Power BI"
+      ],
+      "correct": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "explanation": "Pipelines, shortcuts, mirroring, and Eventstream are the ingestion paths described for Fabric, covering pipeline ETL, zero-copy federation, near-real-time replication, and streaming. Pinning a dashboard tile is a way of arranging visuals, not of ingesting data."
+    },
+    {
+      "id": "msq9005",
+      "cat": "analytics",
+      "type": "ms",
+      "question": "Which three are components of Azure Databricks? (Choose three.)",
+      "options": [
+        "Unity Catalog",
+        "Databricks SQL",
+        "Genie",
+        "OneLake",
+        "Dedicated SQL pool"
+      ],
+      "correct": [
+        0,
+        1,
+        2
+      ],
+      "explanation": "Unity Catalog, Databricks SQL, and Genie are among the core Databricks components. OneLake is the unified data lake of Microsoft Fabric, and a dedicated SQL pool is a provisioned warehouse engine in Azure Synapse Analytics."
+    },
+    {
+      "id": "msq9006",
+      "cat": "nonRelational",
+      "type": "ms",
+      "question": "Which three statements about Azure Cosmos DB are correct? (Choose three.)",
+      "options": [
+        "It automatically indexes all item properties by default",
+        "A logical partition can hold up to 20 GB of data",
+        "Throughput can be shared at the database level across up to 25 containers",
+        "Serverless accounts support global distribution across many regions"
+      ],
+      "correct": [
+        0,
+        1,
+        2
+      ],
+      "explanation": "Cosmos DB indexes every property by default, limits a logical partition to 20 GB, and allows shared throughput across up to 25 containers. Serverless accounts are limited to a single Azure region, so they do not support multi-region distribution."
     }
   ],
   "lessons": [
@@ -2406,16 +3333,26 @@
         "f39",
         "f59",
         "f60",
-        "f61"
+        "f61",
+        "f9001",
+        "f9002",
+        "f9003",
+        "f9004"
       ],
       "quizIds": [
         "q1",
         "q2",
         "q6",
         "q7",
-        "msq1"
+        "msq1",
+        "q9001",
+        "q9002",
+        "q9003",
+        "q9004",
+        "tf9001",
+        "msq9001"
       ],
-      "reading": "Every dataset Azure works with falls into one of three basic shapes. Structured data fits a fixed schema of rows and columns, like a spreadsheet or a relational table \u2014 every record has exactly the same fields. Semi-structured data, like a JSON document, has some organization such as keys or tags, but no schema that every record must follow identically. Unstructured data has no predefined organization at all \u2014 a video file, an image, or a block of free-form text are the classic examples. Recognizing which of the three a described dataset falls into is one of the most frequently tested skills on this exam.\n\nTwo very different kinds of workloads run on top of that data. OLTP (Online Transaction Processing) systems handle many short, fast read/write operations \u2014 inserting an order, updating a customer's address \u2014 the day-to-day engine of a running business. OLAP (Online Analytical Processing) systems instead run complex analytical queries over large volumes of historical data, aggregating years of transactions into a report rather than touching one record at a time. A single order lookup is OLTP; \"total sales by region for the last five years\" is OLAP.\n\nRelational databases store structured data in tables with a fixed schema, enforcing relationships between tables through keys, and are the classic home for OLTP workloads that need strong guarantees. Those guarantees come from ACID: Atomicity (a transaction fully completes or fully fails), Consistency (the database only ever moves between valid states), Isolation (concurrent transactions don't see each other's uncommitted changes), and Durability (a committed change survives a crash). Non-relational databases trade some of these guarantees, and the fixed schema itself, for flexibility and horizontal scale.\n\nLarge, fast-arriving datasets are often described using four characteristics collectively known as big data: Volume (how much data), Velocity (how fast it arrives), Variety (how many different formats it comes in), and Veracity (how trustworthy it actually is). Working with all of this is usually split across a few distinct roles: a Database Administrator provisions, secures, and maintains the databases themselves; a Data Engineer builds the pipelines that move and transform data; and a Data Analyst turns that data into reports and dashboards. A wider practice called data governance ties all of it together \u2014 deciding who is allowed to see which data, keeping it accurate, and tracking where it came from.",
+      "reading": "Every dataset Azure works with falls into one of three basic shapes. Structured data fits a fixed schema of rows and columns, like a spreadsheet or a relational table \u2014 every record has exactly the same fields. Semi-structured data, like a JSON document, has some organization such as keys or tags, but no schema that every record must follow identically. Unstructured data has no predefined organization at all \u2014 a video file, an image, or a block of free-form text are the classic examples. Recognizing which of the three a described dataset falls into is one of the most frequently tested skills on this exam.\n\nTwo very different kinds of workloads run on top of that data. OLTP (Online Transaction Processing) systems handle many short, fast read/write operations \u2014 inserting an order, updating a customer's address \u2014 the day-to-day engine of a running business. OLAP (Online Analytical Processing) systems instead run complex analytical queries over large volumes of historical data, aggregating years of transactions into a report rather than touching one record at a time. A single order lookup is OLTP; \"total sales by region for the last five years\" is OLAP.\n\nRelational databases store structured data in tables with a fixed schema, enforcing relationships between tables through keys, and are the classic home for OLTP workloads that need strong guarantees. Those guarantees come from ACID: Atomicity (a transaction fully completes or fully fails), Consistency (the database only ever moves between valid states), Isolation (concurrent transactions don't see each other's uncommitted changes), and Durability (a committed change survives a crash). Non-relational databases trade some of these guarantees, and the fixed schema itself, for flexibility and horizontal scale.\n\nLarge, fast-arriving datasets are often described using four characteristics collectively known as big data: Volume (how much data), Velocity (how fast it arrives), Variety (how many different formats it comes in), and Veracity (how trustworthy it actually is). Working with all of this is usually split across a few distinct roles: a Database Administrator provisions, secures, and maintains the databases themselves; a Data Engineer builds the pipelines that move and transform data; and a Data Analyst turns that data into reports and dashboards. A wider practice called data governance ties all of it together \u2014 deciding who is allowed to see which data, keeping it accurate, and tracking where it came from.\n\nFile formats matter too. Delimited text such as CSV is the simplest; JSON stores hierarchical objects and suits semi-structured data; XML is tag-based and has largely been superseded by JSON; and a BLOB is raw binary such as images or video. For analytics, Parquet is a columnar format and the de facto standard for lakehouses, Avro is a compact row-based binary format with a JSON header describing its records, and Delta Lake adds a transaction log to Parquet for ACID transactions and versioning. Among nonrelational stores, a document database is a specific form of key-value database whose values are JSON documents the system can query, and the exam expects you to match each kind of data, from files and images to relationships, to the right Azure store.",
       "fundamentalsLabel": "New to OLTP vs. OLAP? See the everyday analogy",
       "fundamentals": "Think of OLTP like a cash register ringing up sales one at a time, all day long \u2014 fast, simple, one transaction after another. OLAP is like the end-of-year accountant going back through every receipt from the whole year to build a report on which products sold best each quarter. Both work with the same underlying sales data, but one is built for speed on tiny individual transactions, and the other is built for crunching a huge pile of history at once.",
       "keyTerms": [
@@ -2429,7 +3366,11 @@
         "Data Engineer",
         "Data Analyst",
         "data governance",
-        "big data"
+        "big data",
+        "BLOB",
+        "Avro",
+        "Parquet",
+        "Delta Lake"
       ],
       "commonTraps": [
         "OLAP is not just 'a bigger OLTP' \u2014 OLAP workloads are typically read-heavy and denormalized for aggregation, not built for fast individual transactional writes.",
@@ -2453,16 +3394,27 @@
         "f16",
         "f17",
         "f18",
-        "f35"
+        "f35",
+        "f9010",
+        "f9011",
+        "f9012",
+        "f9013"
       ],
       "quizIds": [
         "q10",
         "q12",
         "q14",
         "q41",
-        "tf17"
+        "tf17",
+        "q9005",
+        "q9006",
+        "q9007",
+        "q9008",
+        "q9009",
+        "tf9008",
+        "msq9002"
       ],
-      "reading": "A relational database organizes everything into tables, where each row is one record and each column is one attribute shared by every row in that table. A primary key uniquely identifies each row, while a foreign key in one table references the primary key of another, creating an enforced relationship between them \u2014 the mechanism behind referential integrity. Normalization is the process of splitting repeated information into separate related tables to reduce redundancy, and once data is organized this way, indexes let the database find matching rows quickly without scanning the whole table, at the cost of a little extra storage and slightly slower writes.\n\nAzure offers three deployment options for relational SQL workloads, differing mainly in compatibility and management overhead. Azure SQL Database is the simplest, fully managed platform-as-a-service (PaaS) option, built on the SQL Server engine, with automatic patching, backups, and built-in high availability. Azure SQL Managed Instance offers near-complete SQL Server compatibility \u2014 including instance-level features like cross-database queries and SQL Server Agent \u2014 while remaining PaaS-managed, making it the natural fit for a lift-and-shift migration that leans on those features. SQL Server on Azure Virtual Machines is the infrastructure-as-a-service (IaaS) option: full control over the operating system and SQL Server configuration, but the customer is responsible for patching it.\n\nFor teams already standardized on an open-source engine, Azure Database for PostgreSQL and Azure Database for MySQL bring the same fully managed PaaS experience without requiring a switch away from the engine they already use.\n\nAzure SQL Database's cost is set through one of two purchasing models. The DTU model bundles compute, memory, and storage into one fixed performance tier, simple but opaque. The vCore model lets compute and storage scale independently, exposes the underlying hardware generation, and is the only model that supports Azure Hybrid Benefit, letting an existing SQL Server license offset the cost of the move.",
+      "reading": "A relational database organizes everything into tables, where each row is one record and each column is one attribute shared by every row in that table. A primary key uniquely identifies each row, while a foreign key in one table references the primary key of another, creating an enforced relationship between them \u2014 the mechanism behind referential integrity. Normalization is the process of splitting repeated information into separate related tables to reduce redundancy, and once data is organized this way, indexes let the database find matching rows quickly without scanning the whole table, at the cost of a little extra storage and slightly slower writes.\n\nAzure offers three deployment options for relational SQL workloads, differing mainly in compatibility and management overhead. Azure SQL Database is the simplest, fully managed platform-as-a-service (PaaS) option, built on the SQL Server engine, with automatic patching, backups, and built-in high availability. Azure SQL Managed Instance offers near-complete SQL Server compatibility \u2014 including instance-level features like cross-database queries and SQL Server Agent \u2014 while remaining PaaS-managed, making it the natural fit for a lift-and-shift migration that leans on those features. SQL Server on Azure Virtual Machines is the infrastructure-as-a-service (IaaS) option: full control over the operating system and SQL Server configuration, but the customer is responsible for patching it.\n\nFor teams already standardized on an open-source engine, Azure Database for PostgreSQL and Azure Database for MySQL bring the same fully managed PaaS experience without requiring a switch away from the engine they already use.\n\nAzure SQL Database's cost is set through one of two purchasing models. The DTU model bundles compute, memory, and storage into one fixed performance tier, simple but opaque. The vCore model lets compute and storage scale independently, exposes the underlying hardware generation, and is the only model that supports Azure Hybrid Benefit, letting an existing SQL Server license offset the cost of the move.\n\nA few practical points round this out. SQL Managed Instance adds instance pools and near-100 percent SQL Server compatibility, and the Data Migration Assistant checks an on-premises database for compatibility problems before a move to Managed Instance or SQL Database. Azure SQL Database includes encryption, advanced threat protection, auditing, and AI assistance, and the flexible server option is the recommended way to run new MySQL and PostgreSQL workloads. On the SQL side, expect to recognize DDL statements (CREATE, ALTER, DROP), DML statements (INSERT, UPDATE, DELETE, with SELECT often grouped alongside), and DCL statements (GRANT, REVOKE, DENY), plus database objects: a view presents a saved query as a virtual table, an index speeds lookups, a stored procedure is a named routine you call, and a trigger fires automatically on a data change.",
       "fundamentalsLabel": "New to the SQL deployment options? See the everyday analogy",
       "fundamentals": "Think of the three options like renting living space. Azure SQL Database is like renting a furnished studio apartment \u2014 everything's handled for you, but you get exactly the layout on offer. Azure SQL Managed Instance is like renting a full furnished house \u2014 much closer to owning it yourself, with more rooms and features available, while the landlord still handles the roof and plumbing. SQL Server on an Azure VM is like buying the house outright \u2014 total control over every wall and pipe, but you're the one calling the repair company when something breaks.",
       "keyTerms": [
@@ -2475,7 +3427,13 @@
         "PostgreSQL",
         "MySQL",
         "DTU",
-        "vCore"
+        "vCore",
+        "Data Migration Assistant",
+        "flexible server",
+        "DDL",
+        "DML",
+        "DCL",
+        "trigger"
       ],
       "commonTraps": [
         "Azure SQL Managed Instance, not Azure SQL Database, is the one that supports cross-database queries and SQL Server Agent.",
@@ -2497,16 +3455,36 @@
         "f22",
         "f23",
         "f24",
-        "f43"
+        "f43",
+        "f9020",
+        "f9021",
+        "f9022",
+        "f9023",
+        "f9024",
+        "f9025",
+        "f9026",
+        "f9027"
       ],
       "quizIds": [
         "q16",
         "q17",
         "q19",
         "q21",
-        "msq4"
+        "msq4",
+        "q9010",
+        "q9011",
+        "q9012",
+        "q9013",
+        "q9014",
+        "q9015",
+        "q9016",
+        "q9017",
+        "q9018",
+        "tf9002",
+        "tf9005",
+        "msq9006"
       ],
-      "reading": "Azure Cosmos DB is Microsoft's flagship non-relational database: globally distributed, built for low-latency access at massive scale, with multiple tunable consistency levels. Rather than locking you into one data model, Cosmos DB exposes that same distributed engine through several APIs: the API for NoSQL (formerly the Core (SQL) API) for JSON documents, the API for MongoDB for teams already using MongoDB drivers, the API for Apache Gremlin for graph data \u2014 nodes and the relationships between them \u2014 and the API for Table for simple key-value data. Picking the right API is usually less about raw capability and more about what an application or team's existing skills already expect.\n\nAzure Table Storage is a simpler, cheaper key-value store for the same shape of data the Table API models, accessed by a partition key and a row key, without Cosmos DB's global distribution or guaranteed low-latency SLAs. Azure Blob Storage instead holds large amounts of unstructured data \u2014 images, video, log files, backups \u2014 organized into containers, with access tiers to balance storage cost against how quickly the data needs to come back. Azure Files rounds this out with fully managed file shares reachable over the standard SMB or NFS protocols, so it can be mounted like a traditional network drive rather than accessed through an application's storage API.\n\nAzure Data Lake Storage Gen2 builds on top of Blob Storage by adding a hierarchical namespace \u2014 real directories and folders instead of just a flat list of objects \u2014 plus fine-grained permissions on those folders, purpose-built for large-scale big data analytics rather than for general-purpose object storage alone.",
+      "reading": "Azure Cosmos DB is Microsoft's flagship non-relational database: globally distributed, built for low-latency access at massive scale, with multiple tunable consistency levels. Rather than locking you into one data model, Cosmos DB exposes that same distributed engine through several APIs: the API for NoSQL (formerly the Core (SQL) API) for JSON documents, the API for MongoDB for teams already using MongoDB drivers, the API for Apache Cassandra for column-family workloads queried with CQL, the API for Apache Gremlin for graph data \u2014 nodes and the relationships between them \u2014 and the API for Table for simple key-value data. Picking the right API is usually less about raw capability and more about what an application or team's existing skills already expect.\n\nAzure Table Storage is a simpler, cheaper key-value store for the same shape of data the Table API models, accessed by a partition key and a row key, without Cosmos DB's global distribution or guaranteed low-latency SLAs. Azure Blob Storage instead holds large amounts of unstructured data \u2014 images, video, log files, backups \u2014 organized into containers, with access tiers to balance storage cost against how quickly the data needs to come back. Azure Files rounds this out with fully managed file shares reachable over the standard SMB or NFS protocols, so it can be mounted like a traditional network drive rather than accessed through an application's storage API.\n\nAzure Data Lake Storage Gen2 builds on top of Blob Storage by adding a hierarchical namespace \u2014 real directories and folders instead of just a flat list of objects \u2014 plus fine-grained permissions on those folders, purpose-built for large-scale big data analytics rather than for general-purpose object storage alone.\n\nSeveral details are worth knowing. Cosmos DB offers five consistency levels (strong, bounded staleness, session, consistent prefix, and eventual), with session the most common starting point; a logical partition holds up to 20 GB, so partition key choice matters; throughput can be dedicated, shared across up to 25 containers, or serverless, and serverless accounts are single-region. Cosmos DB for Table is now the recommended choice for new key-value workloads at scale, while Azure Table Storage remains supported. Blob tiers carry minimum stays of 30 days for Cool, 90 for Cold, and 180 for Archive, and Archive blobs must be rehydrated, which can take up to 15 hours. NFS Azure file shares need an SSD-tier account and a virtual network, and enabling the hierarchical namespace for Data Lake Storage Gen2 is a one-way change.",
       "fundamentalsLabel": "New to non-relational storage? See the everyday analogy",
       "fundamentals": "Picture a warehouse with different storage systems for different kinds of stuff. Blob Storage is like a shelf of labeled boxes for big miscellaneous items \u2014 you know the box, you grab it, you don't care what's inside until you open it. Table Storage is like a card catalog: fast lookup by a specific reference number, good for lots of small structured entries. Azure Files is like a shared filing cabinet everyone in the office can open the same way they always have. Cosmos DB is like having copies of that whole warehouse in several cities at once, so whichever one is closest to you responds instantly.",
       "keyTerms": [
@@ -2518,7 +3496,11 @@
         "Azure Blob Storage",
         "Azure Files",
         "Azure Data Lake Storage Gen2",
-        "hierarchical namespace"
+        "hierarchical namespace",
+        "API for Apache Cassandra",
+        "Session consistency",
+        "logical partition",
+        "Azure Managed Redis"
       ],
       "commonTraps": [
         "Data Lake Storage Gen2 is Blob Storage plus a hierarchical namespace, not a separate storage product built from scratch.",
@@ -2538,16 +3520,28 @@
         "f26",
         "f27",
         "f29",
-        "f37"
+        "f37",
+        "f9030",
+        "f9033",
+        "f9037",
+        "f9038",
+        "f9039"
       ],
       "quizIds": [
         "q22",
         "q23",
         "q24",
         "tf11",
-        "tf12"
+        "tf12",
+        "q9021",
+        "q9025",
+        "q9026",
+        "q9027",
+        "q9028",
+        "tf9006",
+        "tf9007"
       ],
-      "reading": "A data warehouse stores large volumes of structured, historical data organized specifically for reporting rather than day-to-day transactions. The classic way to organize that data is a star schema: a central fact table holding the numeric, measurable events \u2014 a sales amount, a quantity sold \u2014 surrounded by dimension tables holding the descriptive context used to filter and group those numbers, like product, customer, or date. The fact table is what you aggregate; the dimension tables are what you slice by.\n\nGetting raw data into that warehouse usually follows one of two patterns. ETL (Extract, Transform, Load) transforms the data before loading it into the destination, doing the heavy lifting in a separate processing step. ELT (Extract, Load, Transform) instead loads the raw data into the destination first and transforms it there afterward, taking advantage of the destination's own compute power \u2014 a pattern modern cloud-scale platforms increasingly favor because the destination usually has more processing muscle than a standalone transform step.\n\nHow that data arrives matters too. Batch processing collects data and processes it in large groups on a schedule, like a nightly job crunching an entire day's transactions at once. Streaming, or real-time, processing instead processes each event continuously as it arrives, surfacing results within seconds \u2014 the right choice whenever a scenario needs to react to something happening right now rather than reviewing it the next morning. Azure Data Factory is the service that orchestrates and schedules the actual movement and transformation of data between systems, whichever pattern is chosen \u2014 think of it as the plumbing that feeds the warehouse or lake, not an analysis tool itself.",
+      "reading": "A data warehouse stores large volumes of structured, historical data organized specifically for reporting rather than day-to-day transactions. The classic way to organize that data is a star schema: a central fact table holding the numeric, measurable events \u2014 a sales amount, a quantity sold \u2014 surrounded by dimension tables holding the descriptive context used to filter and group those numbers, like product, customer, or date. The fact table is what you aggregate; the dimension tables are what you slice by.\n\nGetting raw data into that warehouse usually follows one of two patterns. ETL (Extract, Transform, Load) transforms the data before loading it into the destination, doing the heavy lifting in a separate processing step. ELT (Extract, Load, Transform) instead loads the raw data into the destination first and transforms it there afterward, taking advantage of the destination's own compute power \u2014 a pattern modern cloud-scale platforms increasingly favor because the destination usually has more processing muscle than a standalone transform step.\n\nHow that data arrives matters too. Batch processing collects data and processes it in large groups on a schedule, like a nightly job crunching an entire day's transactions at once. Streaming, or real-time, processing instead processes each event continuously as it arrives, surfacing results within seconds \u2014 the right choice whenever a scenario needs to react to something happening right now rather than reviewing it the next morning. Azure Data Factory is the service that orchestrates and schedules the actual movement and transformation of data between systems, whichever pattern is chosen \u2014 think of it as the plumbing that feeds the warehouse or lake, not an analysis tool itself.\n\nThe large-scale analytics pattern has four elements: ingest and process data (ETL or ELT) into an analytical store, which may be a warehouse, a data lake, or a lakehouse; build a data model, today usually a semantic model; and visualize. In Microsoft Fabric, Fabric Data Factory supplies pipelines and low-code Dataflows Gen2, while Azure Data Factory serves pipelines outside Fabric. Batch processing handles all of a dataset with latency of hours, streaming handles the most recent events within a rolling window with latency of seconds, and lambda, delta, and kappa architectures combine or simplify the two. Streams commonly arrive through Azure Event Hubs (at-least-once delivery, ordered within a partition), Azure IoT Hub, or Apache Kafka, and Spark Structured Streaming with Delta Lake can serve one table as both a streaming sink and a batch source.",
       "fundamentalsLabel": "New to data warehousing patterns? See the everyday analogy",
       "fundamentals": "A star schema is like a receipt versus a customer file: the receipt (fact table) has just the numbers \u2014 what was bought, how much it cost \u2014 while a separate customer file (a dimension table) holds the descriptive details, like name and address, that the receipt just references by a customer number instead of repeating every time. Batch vs. streaming is the difference between reading a newspaper once a day and watching a live news ticker scroll by as things happen.",
       "keyTerms": [
@@ -2558,7 +3552,11 @@
         "ELT",
         "Batch processing",
         "Streaming",
-        "Azure Data Factory"
+        "Azure Data Factory",
+        "Dataflows Gen2",
+        "Spark Structured Streaming",
+        "Event Hubs",
+        "kappa"
       ],
       "commonTraps": [
         "A fact table holds the numbers to aggregate; dimension tables hold the descriptive labels to filter by \u2014 this gets reversed constantly on the exam.",
@@ -2581,16 +3579,48 @@
         "f33",
         "f34",
         "f36",
-        "f38"
+        "f38",
+        "f9031",
+        "f9032",
+        "f9034",
+        "f9035",
+        "f9036",
+        "f9040",
+        "f9041",
+        "f9042",
+        "f9043",
+        "f9044",
+        "f9045",
+        "f9046",
+        "f9047",
+        "f9048"
       ],
       "quizIds": [
         "q25",
         "q28",
         "q29",
         "q30",
-        "tf15"
+        "tf15",
+        "q9019",
+        "q9020",
+        "q9022",
+        "q9023",
+        "q9024",
+        "q9029",
+        "q9030",
+        "q9031",
+        "q9032",
+        "q9033",
+        "q9034",
+        "q9035",
+        "q9036",
+        "tf9003",
+        "tf9004",
+        "msq9003",
+        "msq9004",
+        "msq9005"
       ],
-      "reading": "Azure Synapse Analytics is a unified analytics workspace spanning big data and data warehousing in one place. A serverless SQL pool bills per query based on the data it actually scans, with nothing to provision ahead of time \u2014 a good fit for ad hoc, unpredictable exploration. A dedicated SQL pool instead provisions and bills for continuously running compute sized in advance, which becomes the cheaper option once a workload is large and steady. Synapse also includes built-in Apache Spark pools for big-data processing, all inside the same workspace.\n\nTwo more specialized engines round out Azure's analytics lineup. Azure Databricks is an Apache Spark-based platform aimed squarely at large-scale data engineering, data science, and machine learning, distinct from Synapse's broader warehouse-plus-everything scope. Azure Stream Analytics instead focuses specifically on real-time processing, running continuous SQL-like queries directly against a live stream of data, such as IoT telemetry, as it arrives.\n\nMicrosoft Fabric pulls data engineering, data warehousing, data integration, data science, and Power BI together into a single software-as-a-service platform, all built on one shared data lake called OneLake \u2014 so a Spark notebook, a T-SQL query, and a Power BI report can all read the very same copy of the data instead of triplicating it across separate tools. This is the data lakehouse pattern in practice: a data lake's cheap, flexible raw storage combined with a data warehouse's structured, query-optimized layer on top, as one platform instead of two separate systems to keep in sync.\n\nPower BI sits on top of all of this to turn data into interactive reports and dashboards. It connects to a data source in one of two modes: Import mode copies data into Power BI's own fast in-memory model, refreshed on a schedule, favoring raw query speed. DirectQuery instead leaves the data in its source system and queries it live on every interaction, trading some performance for a report that always reflects the current data.",
+      "reading": "Microsoft Fabric pulls data engineering, data warehousing, data integration, data science, real-time analytics, and Power BI together into a single software-as-a-service platform, all built on one shared data lake called OneLake \u2014 so a Spark notebook, a T-SQL query, and a Power BI report can all read the very same copy of the data instead of triplicating it across separate tools. A Fabric lakehouse stores Delta tables in OneLake, works with Spark, and automatically exposes a SQL analytics endpoint; a Fabric warehouse is a fully managed T-SQL warehouse. Data reaches OneLake through pipelines and Dataflows Gen2, through shortcuts that reference external storage such as Amazon S3 without copying it, through mirroring that continuously replicates databases such as Azure SQL Database and Azure Cosmos DB, and through Eventstream for streaming sources. This is the data lakehouse pattern in practice: a data lake's cheap, flexible raw storage combined with a data warehouse's structured, query-optimized layer on top.\n\nAzure Databricks is the other leading platform: an Apache Spark-based service on Delta Lake aimed at large-scale data engineering, data science, and SQL analytics, with Unity Catalog for governance, Lakeflow Declarative Pipelines for incremental pipelines, and Genie for natural-language questions. For real-time work, Fabric Real-Time Intelligence combines Eventstreams, an Eventhouse queried with KQL, Real-Time dashboards, and Activator, while Spark Structured Streaming and Azure Stream Analytics offer streaming engines on Databricks, Fabric, and standalone Azure.\n\nAzure Synapse Analytics, the earlier unified workspace, remains supported. A serverless SQL pool bills per query based on the data it scans, while a dedicated SQL pool provisions and bills for continuously running compute sized in advance, but Microsoft now points new analytics projects to Fabric.\n\nPower BI sits on top of all of this to turn data into interactive reports and dashboards. Authors build a semantic model, which defines measures, dimensions, relationships, and hierarchies, in Power BI Desktop and publish it to the Power BI service. A model connects in Import mode, which copies data into a fast in-memory model refreshed on a schedule; in DirectQuery, which queries the source live on every interaction; or in Direct Lake, which reads Delta tables in OneLake directly without import or refresh. Visuals include bar, line, pie, scatter, and map charts, plus AI visuals such as key influencers, decomposition trees, and smart narratives, and Copilot can summarize reports and generate DAX.",
       "fundamentalsLabel": "New to the modern Azure analytics stack? See the everyday analogy",
       "fundamentals": "Think of Fabric's OneLake like one shared kitchen pantry that every cook in the building draws ingredients from, instead of each cook keeping a separate, duplicated stash in their own room. Import mode in Power BI is like photographing the pantry's contents once and working from that photo until you take a new one; DirectQuery is like walking back into the pantry and looking at the actual shelf every single time you need an answer \u2014 slower, but you can never see stale contents.",
       "keyTerms": [
@@ -2604,7 +3634,16 @@
         "data lakehouse",
         "Power BI",
         "DirectQuery",
-        "Import mode"
+        "Import mode",
+        "OneLake shortcut",
+        "mirroring",
+        "Eventstream",
+        "Eventhouse",
+        "Unity Catalog",
+        "Direct Lake",
+        "semantic model",
+        "Lakeflow Declarative Pipelines",
+        "Activator"
       ],
       "commonTraps": [
         "A serverless SQL pool is billed per query based on data scanned; a dedicated SQL pool bills for continuously provisioned compute regardless of how much you query it.",
@@ -2661,7 +3700,10 @@
         "Azure Synapse Analytics unifies data warehousing (dedicated SQL pools) and big-data processing (serverless SQL pools, Spark pools) in one service.",
         "Azure Data Factory orchestrates ETL/ELT pipelines to move and transform data \u2014 it does not store data itself.",
         "Azure Databricks = an Apache Spark-based analytics platform for big-data processing and machine learning, notebook-driven.",
-        "Microsoft Fabric unifies OneLake (one shared data lake), Power BI, and Data Factory-style pipelines into a single SaaS analytics platform."
+        "Microsoft Fabric unifies OneLake (one shared data lake), Power BI, and Data Factory-style pipelines into a single SaaS analytics platform.",
+        "The current study guide centers on Fabric and Azure Databricks: shortcuts reference external data without copying, mirroring replicates databases into OneLake, Eventstream ingests streams, and Direct Lake lets Power BI read OneLake Delta tables without import.",
+        "Real-Time Intelligence in Fabric = Eventstreams + Eventhouse (KQL) + Real-Time dashboards + Activator. Event Hubs guarantees at-least-once delivery; Spark Structured Streaming runs on Databricks and Fabric.",
+        "Cosmos DB: serverless accounts are single-region; session is the usual starting consistency level; a logical partition holds up to 20 GB; Cosmos DB for Table is the recommended choice for new key-value workloads over Table Storage."
       ]
     },
     {
@@ -2830,6 +3872,82 @@
         }
       ],
       "explanation": "Unstructured data, like video files and PDFs, has no predefined schema at all. Semi-structured data, like JSON documents, carries some organizational structure (keys, tags, nesting) but doesn't require every record to conform to one fixed schema the way structured/relational data does."
+    },
+    {
+      "id": "ml-dp900-9001",
+      "cat": "analytics",
+      "scenario": "Compliance rules keep a company's data in Amazon S3, yet analysts want it to appear in a Fabric lakehouse without copying, which calls for a {b1}. Operational data in Azure Cosmos DB should flow continuously into OneLake with no pipeline authoring, which is {b2}. Events from Event Hubs and Kafka need routing and filtering on the way in, which is the job of {b3}.",
+      "blanks": [
+        {
+          "key": "b1",
+          "options": [
+            "OneLake shortcut",
+            "Dataflow Gen2",
+            "dedicated SQL pool",
+            "Power BI dashboard"
+          ],
+          "correct": 0
+        },
+        {
+          "key": "b2",
+          "options": [
+            "Fabric mirroring",
+            "Azure Table Storage",
+            "a Genie space",
+            "a star schema"
+          ],
+          "correct": 0
+        },
+        {
+          "key": "b3",
+          "options": [
+            "Eventstream",
+            "Unity Catalog",
+            "a semantic model",
+            "Azure Files"
+          ],
+          "correct": 0
+        }
+      ],
+      "explanation": "A shortcut references external storage without copying it. Mirroring replicates databases such as Azure Cosmos DB, Azure SQL Database, and Snowflake into OneLake continuously and without pipelines. Eventstream ingests streaming events from sources like Event Hubs, Kafka, and IoT Hub and can route, filter, and transform them."
+    },
+    {
+      "id": "ml-dp900-9002",
+      "cat": "nonRelational",
+      "scenario": "A Cosmos DB account that must replicate to several regions cannot use {b1} capacity, because it is limited to one region. The recommended starting point for most apps is {b2} consistency, which guarantees reads within a single client session. A single logical partition holds at most {b3}.",
+      "blanks": [
+        {
+          "key": "b1",
+          "options": [
+            "serverless",
+            "provisioned",
+            "autoscale",
+            "shared"
+          ],
+          "correct": 0
+        },
+        {
+          "key": "b2",
+          "options": [
+            "Strong",
+            "Session",
+            "Eventual",
+            "Bounded staleness"
+          ],
+          "correct": 1
+        },
+        {
+          "key": "b3",
+          "options": [
+            "20 GB",
+            "2 GB",
+            "200 TB",
+            "unlimited data"
+          ],
+          "correct": 0
+        }
+      ],
+      "explanation": "Serverless accounts are single-region, so global distribution needs provisioned throughput. Session consistency is the most widely used level and the recommended starting point. A logical partition holds up to 20 GB, which is why a partition key with many evenly used values matters."
     }
   ],
   "caseStudies": [
@@ -2982,6 +4100,24 @@
       "optionB": "Apache Spark pools in an Azure Synapse Analytics workspace, with notebooks alongside SQL pools.",
       "better": "A",
       "why": "Synapse Spark pools run the same engine and are a reasonable choice when a team also wants a warehouse and pipelines in one workspace, which this team explicitly does not. Databricks is built around the data science workflow, with collaborative notebooks, managed MLflow experiment tracking, and ML runtimes preinstalled, so it covers the stated needs directly. Picking Synapse would add warehouse capabilities the team will not use while giving weaker ML tooling."
+    },
+    {
+      "id": "cmp-dp900-9001",
+      "cat": "analytics",
+      "scenario": "Customer data lives in an Azure SQL Database used by a live application. Analysts want it available in OneLake continuously, in near real time, without building pipelines.",
+      "optionA": "Fabric mirroring, which replicates the database into OneLake and handles change tracking automatically.",
+      "optionB": "A OneLake shortcut, which makes external storage appear in the lakehouse without copying.",
+      "better": "A",
+      "why": "A shortcut is a live reference to external files in storage such as Data Lake Storage Gen2 or S3, so it does not replicate a database or track its changes. Mirroring is built for databases like Azure SQL Database, Snowflake, and Cosmos DB, continuously replicating them into OneLake in Delta format."
+    },
+    {
+      "id": "cmp-dp900-9002",
+      "cat": "nonRelational",
+      "scenario": "A brand-new application needs key-value storage at scale with global distribution and automatic secondary indexes, using the Table Storage programming model.",
+      "optionA": "Azure Cosmos DB for Table.",
+      "optionB": "Azure Table Storage.",
+      "better": "A",
+      "why": "Both use the same programming model, and Table Storage is still supported. Cosmos DB for Table adds greater scalability, global distribution, automatic secondary indexes, and instant autoscale, which is why Microsoft recommends it for new workloads that need key-value storage at scale."
     }
   ]
 }

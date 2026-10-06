@@ -846,6 +846,10 @@ ACRONYMS = {
     'SoD': {'exp': 'Separation of duties'},
     'UEM': {'exp': 'Unified endpoint management'},
     'WMI': {'exp': 'Windows Management Instrumentation'},
+    # AZ-900 and DP-900 refresh
+    'BLOB': {'exp': 'Binary Large Object'},
+    'CQL': {'exp': 'Cassandra Query Language'},
+    'KB': {'exp': 'Kilobyte'},
 }
 
 IGNORE = {
@@ -900,4 +904,7 @@ IGNORE = {
     'Argon2', 'SIM',
     'REQUIRED',
     'Top10',
+
+    # AZ-900 and DP-900 refresh
+    'D2s', 'WebJobs',
 }

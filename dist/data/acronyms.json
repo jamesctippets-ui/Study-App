@@ -2436,5 +2436,14 @@
   },
   "WMI": {
     "exp": "Windows Management Instrumentation"
+  },
+  "BLOB": {
+    "exp": "Binary Large Object"
+  },
+  "CQL": {
+    "exp": "Cassandra Query Language"
+  },
+  "KB": {
+    "exp": "Kilobyte"
   }
 }
