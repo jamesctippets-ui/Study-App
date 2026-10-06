@@ -1973,6 +1973,89 @@ specifically (still open).
   single, always-available entry point. `full_smoke.js` extended to
   cover the hamburger opening the panel from both Learn and Home.
 
+## 17. A general IT "playground" (user's idea, not started)
+
+A new top-level area, separate from any one cert, where the learner changes
+something and watches what happens to a small network or system. The cert
+tracks teach and test; the playground lets you *try* it. It is a self-study
+sandbox, not a graded tool: nothing in it touches mastery, results, the daily
+goal or exam readiness (the same rule the Commands and Sequence builder follow).
+
+- [ ] **Scope the first version.** Candidate tools, roughly in build order
+  (cheap and self-contained first):
+  1. **Subnet calculator with explanations.** Enter an IPv4 address and mask
+     or prefix (and later IPv6); see network, broadcast, first/last host,
+     host count, wildcard mask, binary view with the network/host boundary
+     marked, block size and the neighbouring subnets. A **VLSM planner**
+     (give departments and host counts, get the allocation and show the
+     waste) and a "which subnet is this host in / do these two hosts share a
+     subnet?" checker. Every result gets a "show me how" step-by-step so it
+     teaches rather than only answers.
+  2. **IP configuration tester.** Build a few hosts (address, mask, gateway,
+     DNS) on one or two subnets and a router, then "ping" between them and see
+     why it works or fails: wrong mask, wrong gateway, duplicate address,
+     different subnet with no gateway, gateway in another subnet. A
+     plain-language explanation of the first thing that broke.
+  3. **VLAN playground.** A small switch with ports the learner assigns to
+     VLANs, plus a trunk port and allowed-VLAN list, native VLAN mismatch and
+     an optional router-on-a-stick. Send a frame from host A to host B and
+     watch whether it is delivered, flooded, dropped or tagged, with a
+     step-by-step explanation of each decision (access vs trunk, tag added and
+     removed, broadcast domain boundaries).
+  4. **Firewall and port-forwarding tester.** A small ruleset editor (allow or
+     deny by source, destination, protocol and port, top-down first match,
+     implicit deny) and a NAT or port-forward table; the learner fires test
+     connections ("outside host to the web server on 443") and sees which rule
+     matched, what was translated and why a connection was blocked. Includes
+     the classic mistakes: rule order, forgetting the return path, forwarding
+     to the wrong inside address, hairpin NAT.
+  5. **More real-work scenarios** once the engine exists: DHCP scope and
+     lease exhaustion, DNS record changes and caching, a routing table and
+     longest-prefix match with static routes, an ACL placed on the wrong
+     interface or direction, an STP topology with a link failure, a
+     site-to-site VPN that is up but not passing traffic, certificate expiry,
+     a DHCP snooping or port-security lockout, an Azure NSG vs firewall rule
+     comparison.
+- [ ] **How it should feel.** Each tool opens with a one-line goal, a few
+  **guided scenarios** ("this PC can't reach the printer, find out why") and a
+  free sandbox; every action shows its cause and effect in words next to a
+  simple diagram (reuse the `D*` SVG helpers and the colour tokens so it works
+  in both themes). A **Reset** and **Share/export this setup** (a JSON blob,
+  like export and import already does) keep experiments safe and repeatable.
+  Mobile first: large tap targets, no drag-only interactions (tap to select,
+  tap to place), keyboard-friendly inputs with validation messages.
+- [ ] **Where it lives.** A new bottom-bar entry or a Practice-style picker
+  ("Playground") that is not tied to the selected cert; each tool can also be
+  opened from the lessons that teach it (the CCNA subnetting, VLAN and ACL
+  lessons, the CC networking lesson, the CISSP network lessons, AZ-104
+  networking) with a "try it" button that loads a matching scenario. Hash
+  route sketch: `#/playground`, `#/playground/<tool>`.
+- [ ] **Engine.** Pure JavaScript, no server: one small simulation module per
+  tool in the style of the existing pure-logic helpers (`03_helpers.js`), with
+  its state as plain objects so it is easy to test in Node without the UI.
+  Start with exact integer/bit maths for addressing; model a packet as an
+  object and have each device apply its rules in order, recording a trace the
+  UI renders as the explanation. Keep the engine honest: model only what is
+  taught, say what is simplified, and never claim vendor-specific behaviour
+  the simulation does not reproduce (note when something differs between
+  Cisco IOS, Windows, Linux and Azure).
+- [ ] **Content and checks.** Scenarios live as data (`data/playground.py`,
+  validated by `build.py` like other content, with a worked expected outcome
+  per scenario so the build can run each through the engine and fail on a
+  mismatch). Unit tests for the maths (subnetting, VLSM, wildcard, IPv6
+  compression) and for first-match firewall and VLAN delivery; Playwright
+  tests for the tap flows.
+- [ ] **Possible links back into study.** "Quiz me on this setup" turning the
+  current playground state into one or two generated questions; achievements
+  for completing guided scenarios (separate from cert achievements);
+  optional daily-goal credit like the optional sections, off by default.
+- [ ] **Open questions to settle before building.** Whether the playground
+  has its own bottom-bar tab (and what gives way), how far the VLAN and
+  firewall tools should go before they become a full network simulator (and
+  whether linking to Cisco Packet Tracer or Cisco Modeling Labs Free for the
+  deep cases is enough), whether IPv6 is in the first release, and how to keep
+  the scenario content accurate without access to the vendors' own pages.
+
 ---
 
 Not in scope / deliberately not doing: crowd-sourced/disputed answer voting
