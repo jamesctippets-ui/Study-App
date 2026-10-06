@@ -1374,7 +1374,7 @@ LESSONS = [
         'id': 'security-governance-ethics-legal',
         'title': 'Security Governance, Ethics, Compliance and Privacy',
         'summary': 'How security is directed from the top, the ethics every CISSP is held to, and the legal and privacy duties that shape every decision.',
-        'diagram': None,
+        'diagram': 'cisspGovernance',
         'vocabIds': ['f1', 'f3', 'f4', 'f5', 'f6', 'f9', 'f10', 'f15'],
         'quizIds': ['q1', 'q2', 'q3', 'q4', 'q5', 'q18'],
         'reading': """Security governance answers a simple question: who decides what the organization protects, how much risk it will live with, and who is held accountable? The answer is senior management and the board. Governance is the direction and oversight they provide; management then turns that direction into plans, budgets and daily work. This is why the CISSP exam favors a top-down approach. A security program that starts with a technician's good idea but has no executive sponsor has no authority, no budget and no way to enforce anything. Whenever a scenario shows confusion, conflicting rules or cut funding, the best first move is nearly always to get senior-level direction and align security with the business goals.
@@ -1397,7 +1397,7 @@ Finally, security professionals work inside a legal environment. Intellectual pr
         'id': 'risk-management-threat-modeling',
         'title': 'Risk Management, Threat Modeling and Supply Chain Risk',
         'summary': 'How to find, measure and treat risk, model threats before systems are built, and manage the risks that arrive through vendors.',
-        'diagram': None,
+        'diagram': 'cisspRiskLoop',
         'vocabIds': ['f23', 'f25', 'f26', 'f27', 'f28', 'f29', 'f30', 'f31'],
         'quizIds': ['q6', 'q7', 'q8', 'q9', 'q11', 'q12'],
         'reading': """Risk is the chance that something bad happens to something you value, and how bad it would be. Security professionals separate three ingredients. An asset is anything of value, a vulnerability is a weakness, and a threat is anything that could exploit it. Risk exists only when all three line up: a strong vault with no threats is not a risk, and a threat with nothing to exploit is not a risk either. Controls, also called safeguards or countermeasures, reduce risk by closing vulnerabilities or reducing threat impact. Because you can never reach zero, what remains after the controls is called residual risk, and the organization's appetite decides whether that remainder is acceptable.
@@ -1420,7 +1420,7 @@ Today a great deal of risk arrives through other organizations. Supply chain ris
         'id': 'continuity-personnel-security',
         'title': 'Business Continuity, Disaster Recovery and Personnel Security',
         'summary': 'Planning to keep the business running through disruption, recovery targets and sites, and controls that manage the people risk.',
-        'diagram': None,
+        'diagram': 'cisspRecoveryTimeline',
         'vocabIds': ['f33', 'f34', 'f35', 'f36', 'f37', 'f38', 'f32'],
         'quizIds': ['q13', 'q14', 'q15', 'q16', 'q17', 'q34'],
         'reading': """Business continuity planning keeps the critical functions of the organization running through a disruption, and disaster recovery planning is the part that restores IT systems, data and facilities afterwards. Neither starts with technology. They start with the business impact analysis, or BIA, which asks the business owners which processes matter most, what each depends on, and how much it would hurt to lose them over time. Only after the BIA do you choose recovery strategies; skipping it means guessing which systems to save first. Whenever a plan is described, the first priority is always the safety of people.
@@ -1447,7 +1447,7 @@ LESSONS += [
         'id': 'asset-classification-data-lifecycle',
         'title': 'Asset Classification, Data Lifecycle and Privacy Controls',
         'summary': 'Knowing what you have, deciding how sensitive it is, protecting it through its whole life and destroying it properly at the end.',
-        'diagram': None,
+        'diagram': 'cisspDataLifecycle',
         'vocabIds': ['f39', 'f40', 'f41', 'f42', 'f47', 'f50', 'f51', 'f52'],
         'quizIds': ['q35', 'q36', 'q37', 'q38', 'q39', 'q42'],
         'reading': """Asset security begins with a plain idea: you cannot protect what you do not know you have. An accurate inventory of hardware, software, data and services, each with a named owner, is the foundation. Next comes classification, which assigns each information asset a sensitivity level, for example public, internal, confidential and restricted, or the equivalents used by governments. The level matters only because it drives handling rules: how the data is stored, who can see it, how it travels, how long it is kept and how it is destroyed. Classification is a business decision driven by value and legal duty, so the data owner decides, not the administrator.
@@ -1470,7 +1470,7 @@ The last stage is where many organizations fail. Deleting a file or quick-format
         'id': 'security-models-design-principles',
         'title': 'Security Models, Secure Design Principles and Physical Security',
         'summary': 'The formal models and design principles behind secure systems, the trust in hardware and cloud architectures, and the physical layer that underlies it all.',
-        'diagram': None,
+        'diagram': 'cisspBlpBiba',
         'vocabIds': ['f61', 'f62', 'f63', 'f64', 'f67', 'f68', 'f69', 'f71', 'f92'],
         'quizIds': ['q47', 'q48', 'q51', 'q52', 'q53', 'q66'],
         'reading': """Security architecture is the discipline of building protection into a system from the start. The CISSP exam expects you to recognize a handful of design principles and apply them to scenarios. Least privilege gives every subject only the access it needs. Defense in depth layers independent controls so that one failure does not expose everything. Fail securely means that when a control breaks it defaults to a safe state. Secure defaults, separation of duties, economy of mechanism (keep it simple), complete mediation (check every access every time), open design (security should not depend on secrecy of the design) and privacy by design are the others you will see. Zero trust applies the same mindset to networks: no implicit trust because of location, and every request is verified using identity, device posture and context, as described in NIST SP 800-207.
@@ -1493,7 +1493,7 @@ Physical security protects everything above it. Mantraps prevent tailgating, lig
         'id': 'cryptography-pki',
         'title': 'Cryptography and Public Key Infrastructure',
         'summary': 'Symmetric and asymmetric encryption, hashing, signatures, certificates and the key management that makes any of it trustworthy.',
-        'diagram': None,
+        'diagram': 'cisspPkiChain',
         'vocabIds': ['f79', 'f80', 'f81', 'f82', 'f83', 'f85', 'f86', 'f88', 'f87'],
         'quizIds': ['q54', 'q55', 'q56', 'q57', 'q58', 'q59'],
         'reading': """Cryptography transforms information so that only the right people can read it, trust it, or prove who sent it. The CISSP expects you to know the building blocks and, more importantly, which security goal each provides. Symmetric encryption uses one shared secret key, is fast and is used for bulk data; its weakness is distributing that key safely. Asymmetric encryption uses a mathematically linked pair: a public key anyone may have and a private key kept secret. It solves distribution and enables digital signatures, but it is slower. Real protocols combine both: asymmetric methods authenticate and exchange a session key, and a symmetric cipher such as AES protects the data.
@@ -1520,7 +1520,7 @@ LESSONS += [
         'id': 'network-architecture-segmentation',
         'title': 'Secure Network Architecture: OSI, Segmentation and Perimeter Defenses',
         'summary': 'The layered models that describe networks, the devices that operate at each layer, and the designs and tools that contain attackers.',
-        'diagram': None,
+        'diagram': 'cisspNetworkZones',
         'vocabIds': ['f93', 'f94', 'f95', 'f100', 'f101', 'f102', 'f103', 'f104', 'f109'],
         'quizIds': ['q67', 'q69', 'q70', 'q75', 'q79', 'q80'],
         'reading': """Networks are described in layers so that each layer can be understood and secured separately. The OSI model has seven: Physical, Data Link, Network, Transport, Session, Presentation and Application. The TCP/IP model compresses them into four: link, internet, transport and application. What matters for the exam is knowing where devices and attacks sit. Hubs and cables are Layer 1, switches work with MAC addresses at Layer 2, routers forward packets by IP address at Layer 3, and TCP and UDP port numbers live at Layer 4. ARP spoofing is a Layer 2 attack, IP spoofing is Layer 3, and a SYN flood is a Layer 4 attack. When a question names an attack, work out the layer first and the right control usually follows.
@@ -1543,7 +1543,7 @@ Detection complements prevention. An intrusion detection system monitors and ale
         'id': 'secure-communications-wireless',
         'title': 'Secure Communications: Protocols, VPNs, Wireless and Remote Access',
         'summary': 'The encrypted protocols, authentication services and wireless standards that protect data as it moves between people, sites and devices.',
-        'diagram': None,
+        'diagram': 'cisspIpsecModes',
         'vocabIds': ['f96', 'f97', 'f98', 'f99', 'f105', 'f106', 'f110', 'f114', 'f115'],
         'quizIds': ['q68', 'q71', 'q72', 'q74', 'q76', 'q77'],
         'reading': """Data in transit crosses networks you do not control, so the first rule is to use the encrypted version of every protocol. Telnet becomes SSH, FTP becomes SFTP or FTPS, HTTP becomes HTTPS, LDAP becomes LDAPS, and older SNMP becomes SNMPv3. Transport Layer Security protects web traffic and many other applications; version 1.3 removed weak legacy options, requires forward secrecy so that a later key compromise does not expose past sessions, and shortens the handshake. If a scenario shows credentials crossing the network in clear text, the right answer is almost always the encrypted equivalent of the same service, not a stronger password or a different port.
@@ -2000,3 +2000,10 @@ for _ml in MADLIBS:
             _b['options'] = _b['options'][-_k:] + _b['options'][:-_k]
             _b['correct'] = (_b['correct'] + _k) % _n
 del _ml, _b, _n, _k
+
+
+# commonTraps is a list of short traps in the lesson view; these lessons were
+# written as one paragraph each, so show each paragraph as a single trap.
+for _lesson in LESSONS:
+    if isinstance(_lesson.get('commonTraps'), str):
+        _lesson['commonTraps'] = [_lesson['commonTraps']]

@@ -4748,7 +4748,7 @@
       "id": "security-governance-ethics-legal",
       "title": "Security Governance, Ethics, Compliance and Privacy",
       "summary": "How security is directed from the top, the ethics every CISSP is held to, and the legal and privacy duties that shape every decision.",
-      "diagram": null,
+      "diagram": "cisspGovernance",
       "vocabIds": [
         "f1",
         "f3",
@@ -4782,7 +4782,9 @@
         "GDPR",
         "Top-down approach"
       ],
-      "commonTraps": "Mixing up due care (acting) and due diligence (researching) is the most common slip. Another is picking a technical fix when the scenario is really asking about management direction, such as policy approval and business alignment. Do not treat PCI DSS as a law, and do not assume GDPR depends on where your company is located. On ethics questions, remember the canon order: public safety outranks duty to the employer, but the right response is measured escalation, not publicity or silence.",
+      "commonTraps": [
+        "Mixing up due care (acting) and due diligence (researching) is the most common slip. Another is picking a technical fix when the scenario is really asking about management direction, such as policy approval and business alignment. Do not treat PCI DSS as a law, and do not assume GDPR depends on where your company is located. On ethics questions, remember the canon order: public safety outranks duty to the employer, but the right response is measured escalation, not publicity or silence."
+      ],
       "scenario": "A mid-sized insurer's regional offices each maintain their own password rules and incident procedures. After a minor breach, the board asks why a known weakness in the claims portal was documented a year earlier but never fixed. The CISO proposes a company-wide security policy approved by the CEO, a governance committee reporting to the board, and standards and procedures beneath the policy, and notes that the portal's EU customers bring GDPR obligations into scope.",
       "onTheJob": "Get executive sponsorship in writing before you build anything else; a policy signed by the CEO ends many arguments before they start. Translate every security request into business language: impact, regulatory exposure, revenue at risk. Keep a map of which laws apply to which data sets, reviewed with legal counsel, because the question is never just \"are we secure?\" but \"are we compliant, and can we prove it?\". Keep your own ethics file too: write down escalations and decisions, because they protect you as much as the organization."
     },
@@ -4790,7 +4792,7 @@
       "id": "risk-management-threat-modeling",
       "title": "Risk Management, Threat Modeling and Supply Chain Risk",
       "summary": "How to find, measure and treat risk, model threats before systems are built, and manage the risks that arrive through vendors.",
-      "diagram": null,
+      "diagram": "cisspRiskLoop",
       "vocabIds": [
         "f23",
         "f25",
@@ -4824,7 +4826,9 @@
         "STRIDE",
         "Supply chain risk"
       ],
-      "commonTraps": "Insurance is transfer, not elimination. Residual risk is not zero risk, and only management can accept it. Qualitative does not mean worse, only less precise. Do not confuse STRIDE (categories of threats) with DREAD (a scoring scheme). When a safeguard seems expensive, compare its annual cost to the reduction in ALE rather than to the asset's total value. And remember that the authorizing official, not the assessor or administrator, makes the risk-based decision to operate.",
+      "commonTraps": [
+        "Insurance is transfer, not elimination. Residual risk is not zero risk, and only management can accept it. Qualitative does not mean worse, only less precise. Do not confuse STRIDE (categories of threats) with DREAD (a scoring scheme). When a safeguard seems expensive, compare its annual cost to the reduction in ALE rather than to the asset's total value. And remember that the authorizing official, not the assessor or administrator, makes the risk-based decision to operate."
+      ],
       "scenario": "A company evaluates a 30,000 dollar annual web application firewall subscription. The current ALE for web application attacks is 90,000 dollars, and the vendor claims it would fall to 50,000. The CFO also asks whether buying cyber insurance means the project can be dropped, and procurement wants to buy cheaper network devices from an unvetted reseller to save money.",
       "onTheJob": "Keep a living risk register with an owner for each entry, and rerun the numbers whenever the business changes. Do not oversell quantitative precision: your inputs are estimates, so show ranges. Get risk acceptance signed by the person with the budget and authority, with an expiry date, so it is reviewed rather than forgotten. Insert security language into vendor contracts and master agreements early; negotiating after a vendor is entrenched rarely works."
     },
@@ -4832,7 +4836,7 @@
       "id": "continuity-personnel-security",
       "title": "Business Continuity, Disaster Recovery and Personnel Security",
       "summary": "Planning to keep the business running through disruption, recovery targets and sites, and controls that manage the people risk.",
-      "diagram": null,
+      "diagram": "cisspRecoveryTimeline",
       "vocabIds": [
         "f33",
         "f34",
@@ -4865,7 +4869,9 @@
         "Separation of duties",
         "Mandatory vacation"
       ],
-      "commonTraps": "RPO is about data loss, not time to restore; RTO is the opposite. The BIA comes before the strategy, and business owners supply the impact figures. People's safety outranks equipment in every plan. Do not choose the hottest site by reflex: choose the cheapest that satisfies the RTO. A parallel test does not interrupt production, but a full interruption test does. And mandatory vacation is not a perk; it is a detective control for fraud.",
+      "commonTraps": [
+        "RPO is about data loss, not time to restore; RTO is the opposite. The BIA comes before the strategy, and business owners supply the impact figures. People's safety outranks equipment in every plan. Do not choose the hottest site by reflex: choose the cheapest that satisfies the RTO. A parallel test does not interrupt production, but a full interruption test does. And mandatory vacation is not a perk; it is a detective control for fraud."
+      ],
       "scenario": "A regional bank's online platform must be restored within 12 hours and can lose at most 5 minutes of transactions. The disaster recovery lead proposes a warm site with replication every 30 minutes. During the review, an auditor notes that the same administrator creates payees and approves payments and has not taken a vacation in four years.",
       "onTheJob": "Run the BIA with the people who own the processes, not just IT, and write the numbers down in a form executives will sign. Test at least annually and after major changes, and record what failed; the failures are the value. Keep call trees, vendor contacts and recovery credentials available offline. Fix separation of duties conflicts before an auditor or a fraudster finds them, and make offboarding a checklist owned jointly by HR, IT and security."
     },
@@ -4873,7 +4879,7 @@
       "id": "asset-classification-data-lifecycle",
       "title": "Asset Classification, Data Lifecycle and Privacy Controls",
       "summary": "Knowing what you have, deciding how sensitive it is, protecting it through its whole life and destroying it properly at the end.",
-      "diagram": null,
+      "diagram": "cisspDataLifecycle",
       "vocabIds": [
         "f39",
         "f40",
@@ -4907,7 +4913,9 @@
         "Pseudonymization",
         "Legal hold"
       ],
-      "commonTraps": "The owner classifies the data; the custodian does not. Pseudonymized data is still personal data, but anonymized data is not. Degaussing works on magnetic media only, never on SSDs. Quick-formatting and deleting are not sanitization. A legal hold overrides a retention schedule. And masking is for display and testing, tokenization uses a vault, encryption uses a key: do not use the words interchangeably.",
+      "commonTraps": [
+        "The owner classifies the data; the custodian does not. Pseudonymized data is still personal data, but anonymized data is not. Degaussing works on magnetic media only, never on SSDs. Quick-formatting and deleting are not sanitization. A legal hold overrides a retention schedule. And masking is for display and testing, tokenization uses a vault, encryption uses a key: do not use the words interchangeably."
+      ],
       "scenario": "A hospital is replacing a rack of SSDs that held patient records and plans to sell the old drives to a reseller. A research group has asked for patient data to analyze outcomes, and the legal team has just told IT that a malpractice suit involving closed accounts is likely. The data steward asks which data can be released and how the old drives should be handled.",
       "onTheJob": "Start classification with the datasets that matter most, usually regulated data and crown jewels, rather than trying to label everything. Make labels visible to tools so DLP and cloud controls can act on them. Put sanitization requirements into contracts with disposal vendors and demand certificates of destruction. Review retention schedules with legal counsel each year, because keeping data forever is a liability, not a safety net."
     },
@@ -4915,7 +4923,7 @@
       "id": "security-models-design-principles",
       "title": "Security Models, Secure Design Principles and Physical Security",
       "summary": "The formal models and design principles behind secure systems, the trust in hardware and cloud architectures, and the physical layer that underlies it all.",
-      "diagram": null,
+      "diagram": "cisspBlpBiba",
       "vocabIds": [
         "f61",
         "f62",
@@ -4950,7 +4958,9 @@
         "Reference monitor",
         "Common Criteria"
       ],
-      "commonTraps": "Bell-LaPadula protects confidentiality, Biba protects integrity: do not swap them. A higher assurance level does not mean stronger features. Certification is technical; accreditation is management's risk decision. Zero trust is an approach, not a product to buy. Doors fail open for human safety even though that is less secure. In IaaS the customer, not the provider, secures the guest operating system.",
+      "commonTraps": [
+        "Bell-LaPadula protects confidentiality, Biba protects integrity: do not swap them. A higher assurance level does not mean stronger features. Certification is technical; accreditation is management's risk decision. Zero trust is an approach, not a product to buy. Doors fail open for human safety even though that is less secure. In IaaS the customer, not the provider, secures the guest operating system."
+      ],
       "scenario": "A consulting firm is building a system for analysts who serve two competing banks. The architects choose a model that blocks an analyst from viewing the second bank's files after touching the first, require all changes through approved forms, and place the servers in a data center with a mantrap, preaction sprinklers and exit doors that unlock if power fails. A separate team wants to move administrators to a zero trust model.",
       "onTheJob": "When reviewing an architecture, ask what happens when each control fails, and whether any single person or component can defeat the whole design. Insist on threat modeling at design time. Treat vendor assurance claims as evidence to examine, not a guarantee. Walk the physical site yourself: tailgating, propped doors and unattended visitors are found by looking, not by reading policy."
     },
@@ -4958,7 +4968,7 @@
       "id": "cryptography-pki",
       "title": "Cryptography and Public Key Infrastructure",
       "summary": "Symmetric and asymmetric encryption, hashing, signatures, certificates and the key management that makes any of it trustworthy.",
-      "diagram": null,
+      "diagram": "cisspPkiChain",
       "vocabIds": [
         "f79",
         "f80",
@@ -4993,7 +5003,9 @@
         "OCSP",
         "Key management"
       ],
-      "commonTraps": "A hash does not authenticate and a MAC does not give nonrepudiation. A digital signature does not provide confidentiality. Key size is not block size. ECB is never the right mode. Diffie-Hellman without authentication is vulnerable to a man in the middle. After a private key compromise, revoke and reissue rather than waiting. Increasing RSA key length is not a defense against quantum computers.",
+      "commonTraps": [
+        "A hash does not authenticate and a MAC does not give nonrepudiation. A digital signature does not provide confidentiality. Key size is not block size. ECB is never the right mode. Diffie-Hellman without authentication is vulnerable to a man in the middle. After a private key compromise, revoke and reissue rather than waiting. Increasing RSA key length is not a defense against quantum computers."
+      ],
       "scenario": "A payment company needs to send signed, confidential files to a partner, protect its certificate authority's signing key, and fix a breach in which unsalted password hashes were cracked in hours. The architect also notes that the firm holds records that must stay secret for thirty years.",
       "onTheJob": "Use well-reviewed libraries and standard algorithms; never invent your own. Spend your effort on key lifecycle: where keys live, who can touch them, how they rotate, how you recover from compromise. Maintain a cryptographic inventory, since you cannot migrate to newer algorithms or respond to a weak-algorithm advisory without knowing where each one is used."
     },
@@ -5001,7 +5013,7 @@
       "id": "network-architecture-segmentation",
       "title": "Secure Network Architecture: OSI, Segmentation and Perimeter Defenses",
       "summary": "The layered models that describe networks, the devices that operate at each layer, and the designs and tools that contain attackers.",
-      "diagram": null,
+      "diagram": "cisspNetworkZones",
       "vocabIds": [
         "f93",
         "f94",
@@ -5036,7 +5048,9 @@
         "IDS",
         "IPS"
       ],
-      "commonTraps": "Switches are Layer 2 and routers are Layer 3, and a Layer 3 switch routes. A VLAN alone is not a security boundary. Signature-based detection cannot catch a zero-day, and anomaly detection creates more false positives. An IPS is inline and an IDS is not. Distributed denial of service cannot be fixed by blocking one source. Putting public servers on the internal network, or directly on the internet, are both wrong answers when a screened subnet is available.",
+      "commonTraps": [
+        "Switches are Layer 2 and routers are Layer 3, and a Layer 3 switch routes. A VLAN alone is not a security boundary. Signature-based detection cannot catch a zero-day, and anomaly detection creates more false positives. An IPS is inline and an IDS is not. Distributed denial of service cannot be fixed by blocking one source. Putting public servers on the internal network, or directly on the internet, are both wrong answers when a screened subnet is available."
+      ],
       "scenario": "A retailer hosts its storefront on web servers that connect to an internal order database. After an attacker compromised a web server and scanned the internal network, the architect redesigns the network with a screened subnet, separate zones for payment systems and corporate users, and an inline IPS. A holiday flood of traffic from thousands of hosts later takes the site down, even though the firewall rules were correct.",
       "onTheJob": "Draw your network and every trust boundary before you change anything; most surprises come from paths nobody documented. Default-deny between zones, then open only what is justified and owned. Review firewall rule sets quarterly for stale entries. Tune detection tools with your own baselines, and plan for denial-of-service attacks with your provider before the first one arrives."
     },
@@ -5044,7 +5058,7 @@
       "id": "secure-communications-wireless",
       "title": "Secure Communications: Protocols, VPNs, Wireless and Remote Access",
       "summary": "The encrypted protocols, authentication services and wireless standards that protect data as it moves between people, sites and devices.",
-      "diagram": null,
+      "diagram": "cisspIpsecModes",
       "vocabIds": [
         "f96",
         "f97",
@@ -5079,7 +5093,9 @@
         "DMARC",
         "DNSSEC"
       ],
-      "commonTraps": "AH authenticates but does not encrypt; ESP can do both. DNSSEC gives authenticity and integrity, not confidentiality. SPF, DKIM and DMARC fight spoofing but do not encrypt mail. RADIUS encrypts only the password, TACACS+ the whole payload. Hidden SSIDs and MAC filters are weak. WPA2-Personal's shared key does not give per-user accountability. And split tunneling is a trade of visibility for bandwidth.",
+      "commonTraps": [
+        "AH authenticates but does not encrypt; ESP can do both. DNSSEC gives authenticity and integrity, not confidentiality. SPF, DKIM and DMARC fight spoofing but do not encrypt mail. RADIUS encrypts only the password, TACACS+ the whole payload. Hidden SSIDs and MAC filters are weak. WPA2-Personal's shared key does not give per-user accountability. And split tunneling is a trade of visibility for bandwidth."
+      ],
       "scenario": "A professional services firm gives staff full-tunnel VPN access, and administrators log in to switches over Telnet. The office Wi-Fi uses one shared passphrase that a departed employee still knows. Customers have received phishing mail that appears to come from the firm's domain. The architect proposes SSH for management, 802.1X with individual credentials for Wi-Fi, per-application zero trust access for remote staff and SPF, DKIM and DMARC for mail.",
       "onTheJob": "Inventory every clear-text protocol on the network with a capture or flow tool; the list is usually longer than anyone believes. Move wireless to individual credentials early, since changing a shared passphrase is painful after the fact. Roll out DMARC in monitoring mode first, then quarantine, then reject, so you do not block legitimate mail. Keep management interfaces on a separate network and log every administrative session."
     },
@@ -5087,7 +5103,7 @@
       "id": "iam-authentication-access-models",
       "title": "Authentication, Authorization and Access Control Models",
       "summary": "How systems decide who you are and what you may do: factors, biometrics, Kerberos and network access protocols, and the DAC, MAC, RBAC, ABAC family.",
-      "diagram": null,
+      "diagram": "cisspAccessModels",
       "vocabIds": [
         "f1001",
         "f1002",
@@ -5134,7 +5150,7 @@
       "id": "iam-federation-lifecycle-pam",
       "title": "Federation, Single Sign-On, Identity Lifecycle and Privileged Access",
       "summary": "SAML, OAuth and OpenID Connect, what single sign-on really buys you, joiner-mover-leaver, access reviews and managing privileged accounts.",
-      "diagram": null,
+      "diagram": "cisspFederationFlow",
       "vocabIds": [
         "f1021",
         "f1022",
@@ -5180,7 +5196,7 @@
       "id": "assessment-testing-audit",
       "title": "Security Assessment, Testing and Audit",
       "summary": "Designing assessment strategies, choosing between scanning, penetration testing and audits, software testing, metrics and turning results into decisions.",
-      "diagram": null,
+      "diagram": "cisspTestingLadder",
       "vocabIds": [
         "f1033",
         "f1035",
@@ -5227,7 +5243,7 @@
       "id": "ops-monitoring-incident-forensics",
       "title": "Logging, Monitoring, Incident Response and Forensics",
       "summary": "Detecting attacks with logs, SIEM and endpoint tools, running the incident lifecycle, and preserving evidence so it can stand up in court.",
-      "diagram": null,
+      "diagram": "cisspIncidentResponse",
       "vocabIds": [
         "f1057",
         "f1058",
@@ -5274,7 +5290,7 @@
       "id": "ops-resilience-change-physical",
       "title": "Resilience, Recovery, Change and Physical Operations",
       "summary": "Recovery objectives, backups and alternate sites, testing the plan, configuration, patch and change management, and physical and personnel safety in daily operations.",
-      "diagram": null,
+      "diagram": "cisspBackupTypes",
       "vocabIds": [
         "f1076",
         "f1077",
@@ -5320,7 +5336,7 @@
       "id": "sdlc-secure-development",
       "title": "Secure Software Development and Acquired Software",
       "summary": "Building security into development life cycles and DevSecOps, common coding flaws and defenses, application security testing, and trusting software you did not write.",
-      "diagram": null,
+      "diagram": "cisspSecureSdlc",
       "vocabIds": [
         "f1092",
         "f1094",

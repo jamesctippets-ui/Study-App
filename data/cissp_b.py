@@ -1101,7 +1101,7 @@ LESSONS = [
         'id': 'iam-authentication-access-models',
         'title': 'Authentication, Authorization and Access Control Models',
         'summary': 'How systems decide who you are and what you may do: factors, biometrics, Kerberos and network access protocols, and the DAC, MAC, RBAC, ABAC family.',
-        'diagram': None,
+        'diagram': 'cisspAccessModels',
         'vocabIds': ['f1001', 'f1002', 'f1003', 'f1004', 'f1009', 'f1013', 'f1014', 'f1015', 'f1016'],
         'quizIds': ['q1001', 'q1002', 'q1004', 'q1005', 'q1006', 'q1007'],
         'reading': (
@@ -1127,7 +1127,7 @@ LESSONS = [
         'id': 'iam-federation-lifecycle-pam',
         'title': 'Federation, Single Sign-On, Identity Lifecycle and Privileged Access',
         'summary': 'SAML, OAuth and OpenID Connect, what single sign-on really buys you, joiner-mover-leaver, access reviews and managing privileged accounts.',
-        'diagram': None,
+        'diagram': 'cisspFederationFlow',
         'vocabIds': ['f1021', 'f1022', 'f1023', 'f1024', 'f1025', 'f1027', 'f1028', 'f1030'],
         'quizIds': ['q1009', 'q1010', 'q1011', 'q1012', 'q1013', 'q1014'],
         'reading': (
@@ -1153,7 +1153,7 @@ LESSONS = [
         'id': 'assessment-testing-audit',
         'title': 'Security Assessment, Testing and Audit',
         'summary': 'Designing assessment strategies, choosing between scanning, penetration testing and audits, software testing, metrics and turning results into decisions.',
-        'diagram': None,
+        'diagram': 'cisspTestingLadder',
         'vocabIds': ['f1033', 'f1035', 'f1036', 'f1037', 'f1038', 'f1039', 'f1040', 'f1043', 'f1050'],
         'quizIds': ['q1017', 'q1018', 'q1019', 'q1021', 'q1024', 'q1025'],
         'reading': (
@@ -1179,7 +1179,7 @@ LESSONS = [
         'id': 'ops-monitoring-incident-forensics',
         'title': 'Logging, Monitoring, Incident Response and Forensics',
         'summary': 'Detecting attacks with logs, SIEM and endpoint tools, running the incident lifecycle, and preserving evidence so it can stand up in court.',
-        'diagram': None,
+        'diagram': 'cisspIncidentResponse',
         'vocabIds': ['f1057', 'f1058', 'f1059', 'f1063', 'f1064', 'f1071', 'f1072', 'f1074', 'f1075'],
         'quizIds': ['q1031', 'q1033', 'q1034', 'q1035', 'q1037', 'q1039'],
         'reading': (
@@ -1204,7 +1204,7 @@ LESSONS = [
         'id': 'ops-resilience-change-physical',
         'title': 'Resilience, Recovery, Change and Physical Operations',
         'summary': 'Recovery objectives, backups and alternate sites, testing the plan, configuration, patch and change management, and physical and personnel safety in daily operations.',
-        'diagram': None,
+        'diagram': 'cisspBackupTypes',
         'vocabIds': ['f1076', 'f1077', 'f1078', 'f1080', 'f1081', 'f1083', 'f1084', 'f1085'],
         'quizIds': ['q1040', 'q1041', 'q1042', 'q1043', 'q1044', 'q1045'],
         'reading': (
@@ -1230,7 +1230,7 @@ LESSONS = [
         'id': 'sdlc-secure-development',
         'title': 'Secure Software Development and Acquired Software',
         'summary': 'Building security into development life cycles and DevSecOps, common coding flaws and defenses, application security testing, and trusting software you did not write.',
-        'diagram': None,
+        'diagram': 'cisspSecureSdlc',
         'vocabIds': ['f1092', 'f1094', 'f1099', 'f1101', 'f1102', 'f1107', 'f1109', 'f1110', 'f1113'],
         'quizIds': ['q1047', 'q1048', 'q1049', 'q1052', 'q1053', 'q1054'],
         'reading': (

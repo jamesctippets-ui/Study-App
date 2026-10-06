@@ -575,6 +575,13 @@ def validate():
                         errors.append(
                             f"[{key}] lesson '{lesson['id']}' {ref_field} references unknown id '{ref_id}'"
                         )
+            for list_field in ("commonTraps", "keyTerms", "vocabIds", "quizIds"):
+                if list_field in lesson and (not isinstance(lesson[list_field], list)
+                                             or any(not isinstance(x, str) or not x.strip() for x in lesson[list_field])):
+                    errors.append(f"[{key}] lesson '{lesson['id']}' {list_field} must be a list of non-empty strings")
+            for text_field in ("title", "summary", "reading", "fundamentals", "scenario", "onTheJob"):
+                if text_field in lesson and not isinstance(lesson[text_field], str):
+                    errors.append(f"[{key}] lesson '{lesson['id']}' {text_field} must be a string")
             if "onTheJob" in lesson and not lesson["onTheJob"].strip():
                 errors.append(f"[{key}] lesson '{lesson['id']}' has an empty 'onTheJob' field")
 
