@@ -2923,5 +2923,17 @@
   },
   "DH": {
     "exp": "Diffie-Hellman"
+  },
+  "IGA": {
+    "exp": "Identity governance and administration"
+  },
+  "ISAC": {
+    "exp": "Information sharing and analysis center"
+  },
+  "PLC": {
+    "exp": "Programmable logic controller"
+  },
+  "CPRA": {
+    "exp": "California Privacy Rights Act"
   }
 }

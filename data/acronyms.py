@@ -1018,6 +1018,12 @@ ACRONYMS = {
     'UTM': {'exp': 'Unified threat management'},
     # DH (merge fix)
     'DH': {'exp': 'Diffie-Hellman'},
+    # CC verification
+    'IGA': {'exp': 'Identity governance and administration'},
+    'ISAC': {'exp': 'Information sharing and analysis center'},
+    'PLC': {'exp': 'Programmable logic controller'},
+    # CC (merge fix)
+    'CPRA': {'exp': 'California Privacy Rights Act'},
 }
 
 IGNORE = {
@@ -1102,4 +1108,7 @@ IGNORE = {
 
     # SSCP verification
     'GnuPG', 'OpenPGP', 'StartTLS',
+
+    # CC (merge fix)
+    'IG1', 'IG3',
 }
