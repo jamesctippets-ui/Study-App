@@ -4,6 +4,7 @@ function CertStudyApp() {
   const [theme, toggleTheme] = useTheme();
   const [activeTrack, setActiveTrack] = useState('az900');
   const [mode, setMode] = useState('home');
+  const [playgroundTool, setPlaygroundTool] = useState('');
   const [learnView, setLearnView] = useState('study');
   const [quizView, setQuizView] = useState('questions');
   const [activeCat, setActiveCat] = useState('all');
@@ -152,7 +153,7 @@ function CertStudyApp() {
   const pickTrack = (key) => { trackPickedRef.current = true; setActiveTrack(key); };
   const planDefaultTrack = () => studyingTrackKey(visibleTracks, certPlan, results, seenLog, stats);
   const openTab = (m) => {
-    if (m !== 'home' && m !== 'profile' && (mode === 'home' || mode === 'profile') && !trackPickedRef.current) setActiveTrack(planDefaultTrack());
+    if (!isHubMode(m) && isHubMode(mode) && !trackPickedRef.current) setActiveTrack(planDefaultTrack());
     setMode(m);
   };
   // Once saved data has loaded, adopt the plan's cert as the active one.
@@ -315,7 +316,7 @@ function CertStudyApp() {
 
   const goToCertPathTrack = (key) => {
     pickTrack(key);
-    setMode((m) => (m === 'home' || m === 'profile' ? 'path' : m));
+    setMode((m) => (isHubMode(m) ? 'path' : m));
     setShowCertPath(false);
   };
 
@@ -1002,22 +1003,23 @@ function CertStudyApp() {
   // state, which is a same-value no-op that never re-renders and so
   // never gets to reset a "just applied a hash" flag, permanently
   // stalling every navigation after the first.
-  const routeStateRef = useRef({ mode, activeTrack, learnView, quizView });
-  routeStateRef.current = { mode, activeTrack, learnView, quizView };
+  const routeStateRef = useRef({ mode, activeTrack, learnView, quizView, playgroundTool });
+  routeStateRef.current = { mode, activeTrack, learnView, quizView, playgroundTool };
 
   useEffect(() => {
     const validTrackKeys = new Set(visibleTracks.map((t) => t.key));
     function applyHash() {
       const parsed = parseHash(window.location.hash, validTrackKeys);
       const cur = routeStateRef.current;
-      const same = parsed.mode === 'home' || parsed.mode === 'profile'
-        ? cur.mode === parsed.mode
+      const same = isHubMode(parsed.mode)
+        ? cur.mode === parsed.mode && (parsed.mode !== 'playground' || (parsed.tool || '') === cur.playgroundTool)
         : parsed.trackKey === cur.activeTrack && parsed.mode === cur.mode
           && (parsed.mode !== 'learn' || parsed.learnView === cur.learnView)
           && (parsed.mode !== 'quiz' || parsed.quizView === cur.quizView);
       if (same) return;
-      if (parsed.mode === 'home' || parsed.mode === 'profile') {
+      if (isHubMode(parsed.mode)) {
         setMode(parsed.mode);
+        if (parsed.mode === 'playground') setPlaygroundTool(parsed.tool || '');
         return;
       }
       pickTrack(parsed.trackKey);
@@ -1048,9 +1050,9 @@ function CertStudyApp() {
   const routeWriterReady = useRef(false);
   useEffect(() => {
     if (!routeWriterReady.current) { routeWriterReady.current = true; return; }
-    const hash = routeToHash(mode, activeTrack, learnView, quizView);
+    const hash = routeToHash(mode, activeTrack, learnView, quizView, playgroundTool);
     if (window.location.hash !== hash) window.location.hash = hash.replace(/^#/, '');
-  }, [mode, activeTrack, learnView, quizView]);
+  }, [mode, activeTrack, learnView, quizView, playgroundTool]);
 
   const availableQuestions = useMemo(() => {
     const byCat = activeCat === 'all' ? questionsData : questionsData.filter((q) => q.cat === activeCat);
@@ -1118,7 +1120,7 @@ function CertStudyApp() {
   // `stats` closure — runs last and its write isn't the one that gets
   // overwritten.
   useEffect(() => {
-    if (syncMode === 'loading' || mode === 'home' || mode === 'profile') return;
+    if (syncMode === 'loading' || isHubMode(mode)) return;
     const view = mode === 'learn' ? learnView : mode === 'quiz' ? quizView : null;
     // Build on the latest saved stats (the ref), not this render's `stats`:
     // the streak effect can fire in the same commit and must not be overwritten.
@@ -1265,7 +1267,7 @@ function CertStudyApp() {
   // changed today, same self-correcting pattern as the readiness-history
   // effect above.
   useEffect(() => {
-    if (syncMode === 'loading' || mode === 'home' || mode === 'profile') return;
+    if (syncMode === 'loading' || isHubMode(mode)) return;
     const pcts = {};
     categories.forEach((c) => { pcts[c.key] = Math.round((masteryByCategory[c.key] || 0) * 100); });
     const today = todayString();
@@ -1715,8 +1717,8 @@ function CertStudyApp() {
             <IconMenu />
           </button>
           <div style={{ flex: 1, minWidth: 0 }}>
-            {mode === 'home' || mode === 'profile' ? (
-              <div className="itil-display app-title" style={{ fontSize: '20px', lineHeight: 1.1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{mode === 'profile' ? 'Profile' : 'Cert Study'}</div>
+            {isHubMode(mode) ? (
+              <div className="itil-display app-title" style={{ fontSize: '20px', lineHeight: 1.1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{mode === 'profile' ? 'Profile' : mode === 'playground' ? 'IT Playground' : 'Cert Study'}</div>
             ) : (
               <button
                 onClick={() => setShowTrackSwitcher(true)}
@@ -1763,7 +1765,9 @@ function CertStudyApp() {
           </div>
         ) : null}
 
-        {mode === 'profile' ? (
+        {mode === 'playground' ? (
+          <PlaygroundView tool={playgroundTool} onSelectTool={setPlaygroundTool} onExit={() => { setPlaygroundTool(''); setMode('home'); }} />
+        ) : mode === 'profile' ? (
           <ProfileView
             tracks={visibleTracks}
             results={results}
@@ -1807,6 +1811,7 @@ function CertStudyApp() {
             onSelectTrack={(key) => { pickTrack(key); setMode('path'); }}
             onAddToPath={addToCertPath}
             onOpenAbout={() => setShowAbout(true)}
+            onOpenPlayground={() => { setPlaygroundTool(''); setMode('playground'); }}
             onOpenGlossary={() => setShowGlossary(true)}
             onSetGoalTarget={setDailyGoalTarget}
             onAnswerDailyQuestion={answerDailyQuestion}

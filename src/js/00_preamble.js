@@ -87,7 +87,7 @@ const STEP_HUE = {
 const UNIT_HUES = [COLOR.primary, COLOR.blue, COLOR.teal, COLOR.orange, COLOR.pink, COLOR.success, COLOR.gold];
 // The colour of each main area; the bottom tab, the top bar tint and the page
 // accents for that area all draw from it.
-const MODE_HUE = { home: COLOR.blue, path: COLOR.primary, quiz: COLOR.orange, learn: COLOR.teal, exam: COLOR.gold, profile: COLOR.pink };
+const MODE_HUE = { home: COLOR.blue, path: COLOR.primary, quiz: COLOR.orange, learn: COLOR.teal, exam: COLOR.gold, profile: COLOR.pink, playground: COLOR.success };
 function modeHue(mode) { return MODE_HUE[mode] || COLOR.primary; }
 function unitHue(index) { return UNIT_HUES[index % UNIT_HUES.length]; }
 function stepHue(kind) { return STEP_HUE[kind] || COLOR.primary; }

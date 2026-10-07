@@ -624,7 +624,7 @@ function CertPathHomeSection({ pathOrder, results, certPlan, studyingKey, pathPr
 // for that split. Reachable again from any track's Learn/Quiz/Exam view
 // via the header's home icon; the header's hamburger (Manage cert path)
 // is reachable from every mode including this one.
-function HomeView({ tracks, results, seenLog, stats, certPlan, speech, srs, makePathApi, onSetHomePathMode, onSetHomePathOrder, onSetReviewReminder, onReviewStarted, onResume, onSelectTrack, onAddToPath, onOpenAbout, onOpenGlossary, onSetGoalTarget, onAnswerDailyQuestion, onRevealDailyVocab, footerNote }) {
+function HomeView({ tracks, results, seenLog, stats, certPlan, speech, srs, makePathApi, onSetHomePathMode, onSetHomePathOrder, onSetReviewReminder, onReviewStarted, onResume, onSelectTrack, onAddToPath, onOpenAbout, onOpenGlossary, onOpenPlayground, onSetGoalTarget, onAnswerDailyQuestion, onRevealDailyVocab, footerNote }) {
   const masteries = tracks.map((t) => ({ track: t, pct: trackMastery(t.key, results) }));
   const overallAvg = masteries.length ? Math.round(masteries.reduce((s, m) => s + m.pct, 0) / masteries.length) : 0;
   const lastVisited = stats.lastVisited;
@@ -864,6 +864,21 @@ function HomeView({ tracks, results, seenLog, stats, certPlan, speech, srs, make
           label={`Browse all tracks (${tracks.length})`}
         />
       )}
+
+      <button
+        onClick={onOpenPlayground}
+        style={{
+          width: '100%', textAlign: 'left', marginTop: '10px', padding: '12px 14px', borderRadius: '12px',
+          background: tint(COLOR.success, 9), border: `2px solid color-mix(in srgb, ${COLOR.success} 35%, ${COLOR.border})`, boxShadow: SHADOW.card,
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px',
+        }}
+      >
+        <div>
+          <div style={{ fontSize: '13px', fontWeight: 600, color: COLOR.text }}>IT Playground</div>
+          <div style={{ fontSize: '11.5px', color: COLOR.muted, marginTop: '1px', lineHeight: 1.4 }}>Subnet calculator, IP configuration lab: try it, break it, fix it.</div>
+        </div>
+        <div style={{ color: COLOR.muted, fontSize: '15px' }}>›</div>
+      </button>
 
       <button
         onClick={onOpenGlossary}

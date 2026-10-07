@@ -293,12 +293,18 @@ function normalizeSrs(raw) {
 // that keys off them still works; only the user-facing labels and URLs
 // changed (learn -> reference, quiz -> practice). parseHash still accepts
 // the old `learn`/`quiz` URL segments so existing bookmarks keep working.
-function routeToHash(mode, trackKey, learnView, quizView) {
+// Home, Profile and the Playground sit outside any one cert: no track in their URLs.
+function isHubMode(m) { return m === 'home' || m === 'profile' || m === 'playground'; }
+
+const PLAYGROUND_TOOL_KEYS = ['subnet', 'ipconfig', 'vlan', 'firewall'];
+
+function routeToHash(mode, trackKey, learnView, quizView, playgroundTool) {
   if (mode === 'path') return `#/${trackKey}/path`;
   if (mode === 'learn') return `#/${trackKey}/reference/${learnView}`;
   if (mode === 'quiz') return `#/${trackKey}/practice/${quizView}`;
   if (mode === 'exam') return `#/${trackKey}/exam`;
   if (mode === 'profile') return '#/profile';
+  if (mode === 'playground') return playgroundTool ? `#/playground/${playgroundTool}` : '#/playground';
   return '#/home';
 }
 
@@ -313,6 +319,7 @@ function parseHash(hash, validTrackKeys) {
   const parts = path.split('/').filter(Boolean);
   if (!parts.length || parts[0] === 'home') return { mode: 'home' };
   if (parts[0] === 'profile') return { mode: 'profile' };
+  if (parts[0] === 'playground') return { mode: 'playground', tool: PLAYGROUND_TOOL_KEYS.includes(parts[1]) ? parts[1] : '' };
   const [trackKey, mode, sub] = parts;
   if (!validTrackKeys.has(trackKey)) return { mode: 'home' };
   if (mode === 'path') return { mode: 'path', trackKey };

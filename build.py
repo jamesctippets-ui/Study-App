@@ -13,6 +13,8 @@ Usage: python3 build.py
 import hashlib
 import json
 import re
+import shutil
+import subprocess
 import sys
 from pathlib import Path
 
@@ -21,6 +23,7 @@ sys.path.insert(0, str(ROOT))
 
 from data import acronyms as acronyms_data
 from data import bridges as bridges_data
+from data import playground as playground_data
 from data import tracks, itil, az900, ab650, az104, dp900, dp300, az305, az802, az140, md102, sc300, sc200, sc500, cloudplus, ehrintegration, ccna, isc2cc, sscp, cissp, ccsp, cgrc, csslp
 
 TRACK_MODULES = {
@@ -224,6 +227,88 @@ def validate_bridges():
                                   + [(f"angle[{a.get('track')}]", a.get("angle")) for a in appears])
         )
     return errors
+
+
+IPV4_RE = re.compile(r"^(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}$")
+
+
+def validate_playground():
+    """Checks data/playground.py scenarios against the shape documented there.
+    (That each scenario's stated outcomes match the engine is checked by
+    tools/check_playground.js, which main() runs when node is available.)"""
+    errors = []
+    seen = set()
+    for sc in playground_data.IPCONFIG_SCENARIOS:
+        sid = sc.get("id", "?")
+        label = f"[playground:{sid}]"
+        if not sc.get("id") or sc["id"] in seen:
+            errors.append(f"{label} id is missing or not unique")
+        seen.add(sc.get("id"))
+        for field in ("title", "goal", "story", "lesson"):
+            if not isinstance(sc.get(field), str) or not sc[field].strip():
+                errors.append(f"{label} needs a non-empty '{field}'")
+        if sc.get("level") not in ("starter", "core", "stretch"):
+            errors.append(f"{label} level must be starter, core or stretch")
+        topo = sc.get("topology") or {}
+        segs = {x["id"] for x in topo.get("segments", [])}
+        ids = set()
+        for h in topo.get("hosts", []):
+            if h["id"] in ids:
+                errors.append(f"{label} duplicate device id '{h['id']}'")
+            ids.add(h["id"])
+            if h.get("segment") not in segs:
+                errors.append(f"{label} host '{h['id']}' is on unknown segment '{h.get('segment')}'")
+            for f in ("name", "ip", "mask", "gateway"):
+                if not isinstance(h.get(f), str):
+                    errors.append(f"{label} host '{h['id']}' needs a string '{f}'")
+        for r in topo.get("routers", []):
+            if r["id"] in ids:
+                errors.append(f"{label} duplicate device id '{r['id']}'")
+            ids.add(r["id"])
+            for i in r.get("ifaces", []):
+                if i.get("segment") not in segs:
+                    errors.append(f"{label} router '{r['id']}' has an interface on unknown segment '{i.get('segment')}'")
+        if not topo.get("hosts"):
+            errors.append(f"{label} needs at least one host")
+
+        def check_ping(entry, where):
+            if entry.get("from") not in ids:
+                errors.append(f"{label} {where} 'from' is not a device id")
+            if entry.get("to") not in ids and not IPV4_RE.match(str(entry.get("to", ""))):
+                errors.append(f"{label} {where} 'to' is neither a device id nor an IPv4 address")
+
+        check_ping(sc.get("ask") or {}, "ask")
+        if not sc.get("expect"):
+            errors.append(f"{label} needs at least one 'expect' entry")
+        for e in sc.get("expect", []):
+            check_ping(e, "expect")
+            if e.get("verdict") not in ("success", "failed", "unreliable"):
+                errors.append(f"{label} expect verdict must be success, failed or unreliable")
+        for e in sc.get("expectFixed", []):
+            check_ping(e, "expectFixed")
+        if not sc.get("expectFixed") or not sc.get("fix"):
+            errors.append(f"{label} needs 'fix' and 'expectFixed'")
+        for f in sc.get("fix", []):
+            if f.get("device") not in ids:
+                errors.append(f"{label} fix names unknown device '{f.get('device')}'")
+        if not isinstance(sc.get("hints"), list) or not sc["hints"] or any(not isinstance(x, str) or not x.strip() for x in sc["hints"]):
+            errors.append(f"{label} needs a non-empty list of hint strings")
+    return errors
+
+
+def run_playground_checks():
+    """Replays the engine's unit tests and every scenario through node when it
+    is available (the shipped app needs no node; only this check does)."""
+    node = shutil.which("node")
+    if not node:
+        print("  (node not found: skipped tools/check_playground.js)")
+        return
+    result = subprocess.run([node, str(ROOT / "tools" / "check_playground.js")], capture_output=True, text=True)
+    if result.returncode != 0:
+        print("Playground engine check failed:", file=sys.stderr)
+        print(result.stdout + result.stderr, file=sys.stderr)
+        sys.exit(1)
+    print("  " + result.stdout.strip())
 
 
 def validate():
@@ -586,6 +671,7 @@ def validate():
                 errors.append(f"[{key}] lesson '{lesson['id']}' has an empty 'onTheJob' field")
 
     errors.extend(validate_bridges())
+    errors.extend(validate_playground())
     errors.extend(validate_acronyms())
 
     if errors:
@@ -628,6 +714,7 @@ def build_data_json():
             f"const EXAM_CONFIG = {json.dumps(live_exam_config())};",
             f"const DATA = {json.dumps(data)};",
             f"const BRIDGES = {json.dumps(bridges_data.BRIDGES)};",
+            f"const PLAYGROUND = {json.dumps(playground_data.SCENARIOS)};",
             f"const ACRONYMS = {json.dumps(acronyms_data.ACRONYMS)};",
         ]
     )
@@ -653,6 +740,7 @@ def write_track_json_files():
     manifest = {"storageKey": tracks.STORAGE_KEY, "tracks": live_tracks(), "examConfig": live_exam_config()}
     (out_dir / "tracks.json").write_text(json.dumps(manifest, indent=2) + "\n")
     (out_dir / "bridges.json").write_text(json.dumps(bridges_data.BRIDGES, indent=2) + "\n")
+    (out_dir / "playground.json").write_text(json.dumps(playground_data.SCENARIOS, indent=2) + "\n")
     (out_dir / "acronyms.json").write_text(json.dumps(acronyms_data.ACRONYMS, indent=2) + "\n")
     return len(data)
 
@@ -733,6 +821,7 @@ def main():
     out_path.write_text(output)
     sw_updated = sync_service_worker_cache_name(output)
     json_track_count = write_track_json_files()
+    run_playground_checks()
 
     total_flashcards = sum(len(mod.FLASHCARDS) for k, mod in TRACK_MODULES.items() if k not in UNFINISHED_TRACKS)
     total_questions = sum(len(mod.QUESTIONS) for k, mod in TRACK_MODULES.items() if k not in UNFINISHED_TRACKS)

@@ -1,0 +1,328 @@
+"""IT Playground content: guided scenarios for the simulation tools.
+
+The engine that runs them is src/js/03b_playground_engine.js (pure JavaScript,
+no server). A scenario here is *data*: a small network, the problem the learner
+is asked to find, hints, the fix, and the outcome the engine must produce
+before and after the fix. build.py validates the shape, then (when node is on
+the PATH) replays every scenario through the engine via tools/check_playground.js
+and fails the build if the stated outcomes drift from what the engine does.
+
+Shape of one `ipconfig` scenario:
+
+    {
+      'id': 'wrong-gateway',                 # unique slug
+      'title': 'The PC cannot reach the server',
+      'goal': 'One sentence shown on the card.',
+      'story': 'A short paragraph: who is complaining and what they see.',
+      'level': 'starter' | 'core' | 'stretch',
+      'topology': {                           # same shape the engine uses
+        'segments': [{'id': 'a', 'label': 'Office LAN'}],
+        'hosts':    [{'id', 'name', 'segment', 'ip', 'mask', 'gateway'}],
+        'routers':  [{'id', 'name', 'ifaces': [{'segment', 'ip', 'mask'}],
+                      'routes': [{'net', 'mask', 'via'}]}],
+      },
+      'ask': {'from': 'pc', 'to': 'srv'},    # the ping the learner is asked to get working
+      'expect': [{'from', 'to', 'verdict': 'failed'|'success'|'unreliable', 'code': '<diagnosis code>'}],
+      'hints': ['nudge', 'bigger nudge'],     # shown one at a time
+      'fix': [{'device': 'pc', 'field': 'gateway', 'value': '192.168.1.1'}],
+      'expectFixed': [{'from', 'to', 'verdict': 'success'}],   # the goal checklist
+      'lesson': 'What this teaches, shown after the fix works.',
+      'related': ['CCNA: IP addressing', ...],   # optional pointers into the cert tracks
+    }
+
+A fix entry is one of: {'device', 'field', 'value'} (host field),
+{'device', 'iface': <index>, 'field', 'value'} (router interface field),
+{'device', 'route': {...}} (add a static route) or
+{'device', 'routeIndex': <index>, 'field', 'value'} (edit an existing route).
+"""
+
+
+def _office(extra_hosts=None, **over):
+    """The base network most scenarios start from: an office LAN and a server
+    LAN joined by one router."""
+    topo = {
+        'segments': [{'id': 'office', 'label': 'Office LAN'}, {'id': 'servers', 'label': 'Server LAN'}],
+        'hosts': [
+            {'id': 'pc', 'name': 'PC', 'segment': 'office', 'ip': '192.168.1.10', 'mask': '255.255.255.0', 'gateway': '192.168.1.1'},
+            {'id': 'srv', 'name': 'File server', 'segment': 'servers', 'ip': '10.0.0.10', 'mask': '255.255.255.0', 'gateway': '10.0.0.1'},
+        ],
+        'routers': [{
+            'id': 'r1', 'name': 'Router',
+            'ifaces': [
+                {'segment': 'office', 'ip': '192.168.1.1', 'mask': '255.255.255.0'},
+                {'segment': 'servers', 'ip': '10.0.0.1', 'mask': '255.255.255.0'},
+            ],
+            'routes': [],
+        }],
+    }
+    if extra_hosts:
+        topo['hosts'].extend(extra_hosts)
+    for key, edits in over.items():
+        # key like "pc" -> dict of host field edits
+        for h in topo['hosts']:
+            if h['id'] == key:
+                h.update(edits)
+    return topo
+
+
+def _branches(**over):
+    """Two sites joined by a /30 link, one router each."""
+    topo = {
+        'segments': [{'id': 'hq', 'label': 'HQ LAN'}, {'id': 'wan', 'label': 'WAN link'}, {'id': 'branch', 'label': 'Branch LAN'}],
+        'hosts': [
+            {'id': 'hq-pc', 'name': 'HQ PC', 'segment': 'hq', 'ip': '172.16.1.10', 'mask': '255.255.255.0', 'gateway': '172.16.1.1'},
+            {'id': 'br-pc', 'name': 'Branch PC', 'segment': 'branch', 'ip': '172.16.2.10', 'mask': '255.255.255.0', 'gateway': '172.16.2.1'},
+        ],
+        'routers': [
+            {'id': 'r-hq', 'name': 'HQ router',
+             'ifaces': [{'segment': 'hq', 'ip': '172.16.1.1', 'mask': '255.255.255.0'}, {'segment': 'wan', 'ip': '192.0.2.1', 'mask': '255.255.255.252'}],
+             'routes': []},
+            {'id': 'r-br', 'name': 'Branch router',
+             'ifaces': [{'segment': 'wan', 'ip': '192.0.2.2', 'mask': '255.255.255.252'}, {'segment': 'branch', 'ip': '172.16.2.1', 'mask': '255.255.255.0'}],
+             'routes': []},
+        ],
+    }
+    return topo
+
+
+def _lab():
+    """Office LAN plus a lab LAN, both behind one router."""
+    return {
+        'segments': [{'id': 'office', 'label': 'Office LAN'}, {'id': 'lab', 'label': 'Lab LAN'}],
+        'hosts': [
+            {'id': 'pc', 'name': 'PC', 'segment': 'office', 'ip': '192.168.1.10', 'mask': '255.255.255.0', 'gateway': '192.168.1.1'},
+            {'id': 'printer', 'name': 'Lab printer', 'segment': 'lab', 'ip': '192.168.2.20', 'mask': '255.255.255.0', 'gateway': '192.168.2.1'},
+        ],
+        'routers': [{
+            'id': 'r1', 'name': 'Router',
+            'ifaces': [
+                {'segment': 'office', 'ip': '192.168.1.1', 'mask': '255.255.255.0'},
+                {'segment': 'lab', 'ip': '192.168.2.1', 'mask': '255.255.255.0'},
+            ],
+            'routes': [],
+        }],
+    }
+
+
+IPCONFIG_SCENARIOS = []
+
+
+def _add(s):
+    IPCONFIG_SCENARIOS.append(s)
+
+
+_add({
+    'id': 'wrong-gateway',
+    'title': 'The PC cannot reach the file server',
+    'goal': 'The PC can see other office PCs but not the server in the next network.',
+    'level': 'starter',
+    'story': 'A new PC was set up by hand. It reaches the office printer fine but "the server is down", although everyone else can use it. Find what is different about this PC.',
+    'topology': _office(pc={'gateway': '192.168.1.100'}),
+    'ask': {'from': 'pc', 'to': 'srv'},
+    'expect': [{'from': 'pc', 'to': 'srv', 'verdict': 'failed', 'code': 'arp-timeout'}],
+    'hints': [
+        'Ping the server and read the trace: which step is the first to go red?',
+        'The server is on a different network, so the PC must use its default gateway. Compare the gateway with the router\'s address on the Office LAN.',
+    ],
+    'fix': [{'device': 'pc', 'field': 'gateway', 'value': '192.168.1.1'}],
+    'expectFixed': [{'from': 'pc', 'to': 'srv', 'verdict': 'success'}],
+    'lesson': 'To leave its own subnet a host sends the packet to its default gateway, so the gateway must be the router\'s real interface address. A typo there leaves the PC asking "who has 192.168.1.100?" and getting silence, while everything on the local subnet still works.',
+    'related': ['CCNA: IPv4 addressing and the default gateway', 'AZ-104: virtual network routing basics'],
+})
+
+_add({
+    'id': 'no-gateway',
+    'title': 'Local works, everything else times out',
+    'goal': 'A host can ping its neighbour but nothing beyond the router.',
+    'level': 'starter',
+    'story': 'After a static IP was typed in, the PC can reach the PC next to it but not the server. Nothing looks wrong with the address.',
+    'topology': _office(pc={'gateway': ''}),
+    'ask': {'from': 'pc', 'to': 'srv'},
+    'expect': [{'from': 'pc', 'to': 'srv', 'verdict': 'failed', 'code': 'no-gateway'}],
+    'hints': ['Which setting does a host need in order to leave its own subnet?'],
+    'fix': [{'device': 'pc', 'field': 'gateway', 'value': '192.168.1.1'}],
+    'expectFixed': [{'from': 'pc', 'to': 'srv', 'verdict': 'success'}],
+    'lesson': 'Without a default gateway a host only knows its own subnet. DHCP normally supplies the gateway; a hand-typed static address needs it entered too.',
+    'related': ['CCNA: DHCP and static addressing', 'CC: network basics'],
+})
+
+_add({
+    'id': 'mask-too-big',
+    'title': 'The lab printer is "on the same network"',
+    'goal': 'A mask that is too short makes a remote host look local.',
+    'level': 'core',
+    'story': 'The PC was given the mask 255.255.0.0 "to be safe". It can no longer print to the lab printer, but other PCs can.',
+    'topology': {**_lab(), 'hosts': [
+        {'id': 'pc', 'name': 'PC', 'segment': 'office', 'ip': '192.168.1.10', 'mask': '255.255.0.0', 'gateway': '192.168.1.1'},
+        {'id': 'printer', 'name': 'Lab printer', 'segment': 'lab', 'ip': '192.168.2.20', 'mask': '255.255.255.0', 'gateway': '192.168.2.1'},
+    ]},
+    'ask': {'from': 'pc', 'to': 'printer'},
+    'expect': [{'from': 'pc', 'to': 'printer', 'verdict': 'failed', 'code': 'arp-timeout'}],
+    'hints': [
+        'Read the first lines of the trace: does the PC think 192.168.2.20 is inside its own subnet?',
+        'What range does 192.168.1.10 with mask 255.255.0.0 cover? Compare it with the network the printer really lives on.',
+    ],
+    'fix': [{'device': 'pc', 'field': 'mask', 'value': '255.255.255.0'}],
+    'expectFixed': [{'from': 'pc', 'to': 'printer', 'verdict': 'success'}],
+    'lesson': 'A host decides "local or not?" using only its own mask. With /16 it believes 192.168.2.20 is on its own wire, so it ARPs for it directly instead of using the router, and the ARP never gets an answer because the printer is behind the router.',
+    'related': ['CCNA: subnet masks and the local-versus-remote decision', 'SSCP: network addressing'],
+})
+
+_add({
+    'id': 'printer-wrong-subnet',
+    'title': 'The printer works on its own, but nobody can print',
+    'goal': 'A device is plugged into one network but addressed for another.',
+    'level': 'core',
+    'story': 'A printer from the lab was moved to the office and still has its old lab address. It shows "ready" on its own display, but the PC cannot print to it.',
+    'topology': {
+        'segments': [{'id': 'office', 'label': 'Office LAN'}, {'id': 'lab', 'label': 'Lab LAN'}],
+        'hosts': [
+            {'id': 'pc', 'name': 'PC', 'segment': 'office', 'ip': '192.168.1.10', 'mask': '255.255.255.0', 'gateway': '192.168.1.1'},
+            {'id': 'printer', 'name': 'Printer', 'segment': 'office', 'ip': '192.168.2.20', 'mask': '255.255.255.0', 'gateway': '192.168.2.1'},
+        ],
+        'routers': [{'id': 'r1', 'name': 'Router', 'ifaces': [
+            {'segment': 'office', 'ip': '192.168.1.1', 'mask': '255.255.255.0'},
+            {'segment': 'lab', 'ip': '192.168.2.1', 'mask': '255.255.255.0'},
+        ], 'routes': []}],
+    },
+    'ask': {'from': 'pc', 'to': 'printer'},
+    'expect': [{'from': 'pc', 'to': 'printer', 'verdict': 'failed', 'code': 'host-unreachable'}],
+    'hints': [
+        'The PC sends the packet to the router correctly. Where does the trace go wrong afterwards?',
+        'Which network is the printer physically plugged into, and which network does its address belong to?',
+    ],
+    'fix': [
+        {'device': 'printer', 'field': 'ip', 'value': '192.168.1.20'},
+        {'device': 'printer', 'field': 'gateway', 'value': '192.168.1.1'},
+    ],
+    'expectFixed': [{'from': 'pc', 'to': 'printer', 'verdict': 'success'}],
+    'lesson': 'The router found the right network for the destination address and asked there, but the device was on a different wire. Addresses belong to a network segment: moving a device without changing its address (or DHCP lease) leaves it unreachable.',
+    'related': ['CCNA: IP addressing and troubleshooting', 'CC: network devices'],
+})
+
+_add({
+    'id': 'duplicate-ip',
+    'title': 'The ping works... sometimes',
+    'goal': 'Two devices claim the same address.',
+    'level': 'core',
+    'story': 'The helpdesk reports that the finance PC "drops in and out". A colleague set up a new laptop the same afternoon.',
+    'topology': _office(extra_hosts=[
+        {'id': 'laptop', 'name': 'New laptop', 'segment': 'office', 'ip': '192.168.1.10', 'mask': '255.255.255.0', 'gateway': '192.168.1.1'},
+    ]),
+    'ask': {'from': 'srv', 'to': '192.168.1.10'},
+    'expect': [{'from': 'srv', 'to': '192.168.1.10', 'verdict': 'unreliable', 'code': 'duplicate-ip'}],
+    'hints': [
+        'Look for the warning under the ping result. What do the PC and the laptop have in common?',
+        'Every device on a segment needs its own address. Change one of them to a free address in the same subnet.',
+    ],
+    'fix': [{'device': 'laptop', 'field': 'ip', 'value': '192.168.1.11'}],
+    'expectFixed': [{'from': 'srv', 'to': '192.168.1.10', 'verdict': 'success'}, {'from': 'srv', 'to': '192.168.1.11', 'verdict': 'success'}],
+    'lesson': 'When two hosts answer the ARP request for one address, whichever reply arrives last wins, so traffic flips between them. Static addresses outside the DHCP pool, DHCP reservations and DHCP conflict detection all exist to prevent this.',
+    'related': ['CCNA: ARP', 'SSCP: network troubleshooting'],
+})
+
+_add({
+    'id': 'broadcast-address',
+    'title': 'A "valid-looking" address that cannot be used',
+    'goal': 'The last address of a subnet is the broadcast address, not a host.',
+    'level': 'core',
+    'story': 'A technician gave a PC 192.168.1.63 with the mask 255.255.255.192 because "63 is a normal number". It cannot talk to anything.',
+    'topology': _office(pc={'ip': '192.168.1.63', 'mask': '255.255.255.192', 'gateway': '192.168.1.1'}),
+    'ask': {'from': 'pc', 'to': 'srv'},
+    'expect': [{'from': 'pc', 'to': 'srv', 'verdict': 'failed', 'code': 'host-address'}],
+    'hints': [
+        'Work out the subnet that 192.168.1.63 belongs to with a /26 mask. Use the Subnet calculator tool.',
+        'What are the first and last addresses of that subnet? One of them is reserved.',
+    ],
+    'fix': [{'device': 'pc', 'field': 'ip', 'value': '192.168.1.40'}, {'device': 'r1', 'iface': 0, 'field': 'mask', 'value': '255.255.255.192'}],
+    'expectFixed': [{'from': 'pc', 'to': 'srv', 'verdict': 'success'}],
+    'lesson': 'With a /26 the subnet is 192.168.1.0 to 192.168.1.63: .0 is the network address and .63 the broadcast address, so hosts can only use .1 to .62. (The router interface needs the same mask as the hosts it serves.)',
+    'related': ['CCNA: subnetting', 'CC: IP addressing'],
+})
+
+_add({
+    'id': 'gateway-outside-subnet',
+    'title': 'The gateway is "not reachable"',
+    'goal': 'The gateway must sit inside the host\'s own subnet.',
+    'level': 'core',
+    'story': 'A PC was moved to a smaller subnet and given 192.168.1.200 with a /25 mask. The gateway is still the router at 192.168.1.1.',
+    'topology': _office(pc={'ip': '192.168.1.200', 'mask': '255.255.255.128', 'gateway': '192.168.1.1'}),
+    'ask': {'from': 'pc', 'to': 'srv'},
+    'expect': [{'from': 'pc', 'to': 'srv', 'verdict': 'failed', 'code': 'gateway-offsubnet'}],
+    'hints': [
+        'A /25 splits 192.168.1.0/24 into two halves. Which half does .200 fall in, and which half is the gateway in?',
+    ],
+    'fix': [{'device': 'pc', 'field': 'ip', 'value': '192.168.1.100'}, {'device': 'r1', 'iface': 0, 'field': 'mask', 'value': '255.255.255.128'}],
+    'expectFixed': [{'from': 'pc', 'to': 'srv', 'verdict': 'success'}],
+    'lesson': 'The two halves are 192.168.1.0 to .127 and .128 to .255. The PC is in the upper half; the router is in the lower half, so they are in different subnets and cannot talk directly. Hosts and their gateway must share a subnet.',
+    'related': ['CCNA: subnetting and VLSM', 'CC: network design basics'],
+})
+
+_add({
+    'id': 'reply-lost',
+    'title': 'The request arrives, the reply never does',
+    'goal': 'A ping needs a working path in both directions.',
+    'level': 'core',
+    'story': 'The PC can ping out and the server sees the request in its logs, but the PC still gets "request timed out".',
+    'topology': _office(srv={'gateway': '10.0.0.99'}),
+    'ask': {'from': 'pc', 'to': 'srv'},
+    'expect': [{'from': 'pc', 'to': 'srv', 'verdict': 'failed', 'code': 'reply-lost'}],
+    'hints': [
+        'Open both legs of the trace. Which one fails, the echo request or the echo reply?',
+        'The server answers using its own settings. Check its default gateway against the router\'s address on the Server LAN.',
+    ],
+    'fix': [{'device': 'srv', 'field': 'gateway', 'value': '10.0.0.1'}],
+    'expectFixed': [{'from': 'pc', 'to': 'srv', 'verdict': 'success'}],
+    'lesson': 'Troubleshoot both directions. The PC\'s settings were fine, but the server could not route its answer back to another network, so the problem sat at the far end. Packet captures at both ends show exactly this one-way pattern.',
+    'related': ['CCNA: troubleshooting methodology', 'SSCP: network monitoring'],
+})
+
+_add({
+    'id': 'missing-routes',
+    'title': 'Two offices, one link, no connection',
+    'goal': 'Routers only know connected networks until you tell them more.',
+    'level': 'stretch',
+    'story': 'A new branch office was connected to head office over a /30 link. Both routers are up and the link lights are green, but HQ and the branch cannot reach each other.',
+    'topology': _branches(),
+    'ask': {'from': 'hq-pc', 'to': 'br-pc'},
+    'expect': [{'from': 'hq-pc', 'to': 'br-pc', 'verdict': 'failed', 'code': 'no-route'}],
+    'hints': [
+        'Which router drops the packet and why? Look at what that router is directly connected to.',
+        'Add a static route on the HQ router for the branch LAN (172.16.2.0 / 255.255.255.0) via the branch router\'s WAN address 192.0.2.2. Then try again: what happens to the reply?',
+        'The branch router also needs a route back to 172.16.1.0 / 255.255.255.0 via 192.0.2.1.',
+    ],
+    'fix': [
+        {'device': 'r-hq', 'route': {'net': '172.16.2.0', 'mask': '255.255.255.0', 'via': '192.0.2.2'}},
+        {'device': 'r-br', 'route': {'net': '172.16.1.0', 'mask': '255.255.255.0', 'via': '192.0.2.1'}},
+    ],
+    'expectFixed': [{'from': 'hq-pc', 'to': 'br-pc', 'verdict': 'success'}, {'from': 'br-pc', 'to': 'hq-pc', 'verdict': 'success'}],
+    'lesson': 'A router knows its directly connected networks and nothing else. Each end of a link needs a route (static or learned from a routing protocol) for the other side\'s LAN; with only one, the request gets through and the reply is dropped.',
+    'related': ['CCNA: static routing', 'AZ-104: user-defined routes'],
+})
+
+_add({
+    'id': 'bad-next-hop',
+    'title': 'The route is there, but it points at nothing',
+    'goal': 'A static route\'s next hop has to be a real neighbour.',
+    'level': 'stretch',
+    'story': 'Someone added the branch route in a hurry. The route shows up in the table, but traffic to the branch still dies at HQ.',
+    'topology': {**_branches(), 'routers': [
+        {'id': 'r-hq', 'name': 'HQ router',
+         'ifaces': [{'segment': 'hq', 'ip': '172.16.1.1', 'mask': '255.255.255.0'}, {'segment': 'wan', 'ip': '192.0.2.1', 'mask': '255.255.255.252'}],
+         'routes': [{'net': '172.16.2.0', 'mask': '255.255.255.0', 'via': '192.0.2.3'}]},
+        {'id': 'r-br', 'name': 'Branch router',
+         'ifaces': [{'segment': 'wan', 'ip': '192.0.2.2', 'mask': '255.255.255.252'}, {'segment': 'branch', 'ip': '172.16.2.1', 'mask': '255.255.255.0'}],
+         'routes': [{'net': '172.16.1.0', 'mask': '255.255.255.0', 'via': '192.0.2.1'}]},
+    ]},
+    'ask': {'from': 'hq-pc', 'to': 'br-pc'},
+    'expect': [{'from': 'hq-pc', 'to': 'br-pc', 'verdict': 'failed', 'code': 'bad-next-hop'}],
+    'hints': [
+        'The /30 link has only two usable addresses. Which two? Is the route\'s next hop one of them?',
+    ],
+    'fix': [{'device': 'r-hq', 'routeIndex': 0, 'field': 'via', 'value': '192.0.2.2'}],
+    'expectFixed': [{'from': 'hq-pc', 'to': 'br-pc', 'verdict': 'success'}],
+    'lesson': 'A /30 holds the network address, two hosts and the broadcast: 192.0.2.1 and 192.0.2.2 here. A next hop of 192.0.2.3 is the broadcast address of the link, so nothing answers. Edit the route\'s next hop to the neighbour\'s real address; a route that exists but points nowhere is as useless as no route.',
+    'related': ['CCNA: static routes and next hops', 'CCNA: /30 point-to-point links'],
+})
+
+SCENARIOS = {'ipconfig': IPCONFIG_SCENARIOS}
