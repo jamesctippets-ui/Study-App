@@ -909,6 +909,25 @@ ACRONYMS = {
     'MB': {'exp': 'Megabyte', 'trigger': False},
     'MQTT': {'exp': 'Message Queuing Telemetry Transport'},
     'SNI': {'exp': 'Server Name Indication'},
+    # CCSP verification
+    'AICPA': {'exp': 'American Institute of Certified Public Accountants'},
+    'ATASM': {'exp': 'Architecture, Threats, Attack Surfaces and Mitigations'},
+    'CIP': {'exp': 'Critical Infrastructure Protection'},
+    'COSO': {'exp': 'Committee of Sponsoring Organizations of the Treadway Commission'},
+    'DISA': {'exp': 'Defense Information Systems Agency'},
+    'ENISA': {'exp': 'European Union Agency for Cybersecurity'},
+    'GAPP': {'exp': 'Generally Accepted Privacy Principles'},
+    'HITECH': {'exp': 'Health Information Technology for Economic and Clinical Health Act'},
+    'HVAC': {'exp': 'Heating, ventilation and air conditioning'},
+    'ISACA': {'exp': 'Information Systems Audit and Control Association'},
+    'ISAE': {'exp': 'International Standard on Assurance Engagements'},
+    'NERC': {'exp': 'North American Electric Reliability Corporation'},
+    'PIPEDA': {'exp': 'Personal Information Protection and Electronic Documents Act'},
+    'ROI': {'exp': 'Return on investment'},
+    'SAFECode': {'exp': 'Software Assurance Forum for Excellence in Code'},
+    'SANS': {'exp': 'SysAdmin, Audit, Network and Security (SANS Institute)'},
+    'SSAE': {'exp': 'Statement on Standards for Attestation Engagements'},
+    'STIGs': {'exp': 'Security Technical Implementation Guides'},
 }
 
 IGNORE = {
@@ -981,4 +1000,7 @@ IGNORE = {
 
     # AZ-104 and AZ-305 refresh
     'DiskANN', 'FastPath', 'PromQL', 'RG2',
+
+    # CCSP verification
+    'III', 'NEXT',
 }

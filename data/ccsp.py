@@ -19,7 +19,7 @@ CATEGORIES = [
     ]},
     {'key': 'ccspData', 'label': 'Cloud Data Security', 'marks': 20, 'resources': [
         {'label': 'NIST SP 800-57 Part 1 Rev. 5: Recommendation for Key Management', 'url': 'https://csrc.nist.gov/pubs/sp/800/57/pt1/r5/final'},
-        {'label': 'NIST SP 800-88 Rev. 1: Guidelines for Media Sanitization', 'url': 'https://csrc.nist.gov/pubs/sp/800/88/r1/final'},
+        {'label': 'NIST SP 800-88 Rev. 2: Guidelines for Media Sanitization', 'url': 'https://csrc.nist.gov/pubs/sp/800/88/r2/final'},
         {'label': 'CSA: Security Guidance (Data Security and Encryption domain)', 'url': 'https://cloudsecurityalliance.org/artifacts/security-guidance-v5'},
     ]},
     {'key': 'ccspPlatform', 'label': 'Cloud Platform and Infrastructure Security', 'marks': 17, 'resources': [
@@ -988,7 +988,7 @@ f(C5, 'ops', 'Vulnerability scanning and management',
   "Regularly scanning assets, preferably with authenticated scans, then triaging by exploitability and business impact, remediating and verifying the fix.",
   "Scanning finds issues; management is the full cycle. Prioritize by risk, not by raw score alone.")
 f(C5, 'ops', 'Incident response life cycle',
-  "Preparation; detection and analysis; containment, eradication and recovery; and post-incident learning. NIST SP 800-61 Rev. 3 aligns incident response with the functions of the NIST Cybersecurity Framework 2.0.",
+  "The classic four phases are preparation; detection and analysis; containment, eradication and recovery; and post-incident activity (SP 800-61 Rev. 2). Rev. 3 (2025) replaces the phase model by aligning incident response with the functions of the NIST Cybersecurity Framework 2.0.",
   "Preparation (plans, tooling, contacts, logging) is what makes the other phases possible; containment precedes eradication.")
 f(C5, 'ops', 'Cloud incident response challenges',
   "Ephemeral resources vanish quickly, logs may belong to the provider, responsibilities are split and access to evidence depends on contracts, so customers must prepare in advance with logging, snapshots and provider contacts.",
@@ -1291,6 +1291,1232 @@ tf(C6, 'legal', "Data residency and data sovereignty refer to exactly the same c
    "Residency is where data is stored; sovereignty concerns which country's laws govern it.")
 
 # ---------------------------------------------------------------------------------------------------------------
+# REFRESH ADDITIONS (October 2026): items added after auditing the track against the CCSP outline effective August 1,
+# 2026. Their ids start at 9001 so they never collide with the original sequential ids or with saved progress.
+# ---------------------------------------------------------------------------------------------------------------
+_counts.update({'f': 9000, 'q': 9000, 'msq': 9000, 'tf': 9000})
+
+# ---- flashcards added in the August 2026 outline refresh: Domain 1
+f(C1, 'found', 'Regulator and cloud service partner roles',
+  "The regulator is the authority that sets and enforces legal duties on customer and provider (a data protection authority or sector supervisor). A cloud service partner supports either side; ISO/IEC 17788 sub-roles are the service developer, the auditor and the service broker, which can intermediate, aggregate or arbitrage between services.",
+  "Roles describe functions, not companies: one organization can hold several. Accountability stays with the customer whichever partner is involved.")
+f(C1, 'found', 'Cloud building block technologies',
+  "The technologies services are assembled from: virtualization (abstracts hardware), storage (object, volume, file), networking (virtual networks and software-defined control), databases (often multi-tenant managed services) and orchestration (automating provisioning, scaling and lifecycle).",
+  "Each building block adds its own isolation and configuration risk; an architect should be able to say which block a control protects.")
+f(C1, 'found', 'Cloud computing activities',
+  "The actions each role performs in the reference architecture: the customer uses services and administers its tenancy and contract; the provider prepares, operates and secures services and manages the customer relationship; a partner audits, brokers or develops. Mapping an activity to a role shows who must perform a control.",
+  "Useful when a scenario asks who should do something; the activity list is a responsibility checklist.")
+f(C1, 'found', 'Cloud capability types',
+  "ISO/IEC 17788 classifies what the customer gets: infrastructure capabilities (provisioning compute, storage and network), platform capabilities (deploying and running customer code on the provider's runtime) and application capabilities (using the provider's software).",
+  "They resemble IaaS, PaaS and SaaS, but one service can combine capability types, so analyze each capability's responsibility split.")
+f(C1, 'found', 'Other cloud service categories',
+  "Besides IaaS, PaaS and SaaS, ISO/IEC 17788 names Communications as a Service, Compute as a Service, Data Storage as a Service and Network as a Service. Container and function platforms sit between IaaS and PaaS.",
+  "If a category is unfamiliar, place it by asking which layer the provider operates and which the customer still configures.")
+f(C1, 'found', 'Common cloud threats (CSA Top Threats)',
+  "The Cloud Security Alliance Top Threats to Cloud Computing 2024 report lists eleven, led by misconfiguration and inadequate change control, then identity and access management and insecure interfaces and APIs, followed by weak cloud security strategy, insecure third-party resources, insecure software development, accidental disclosure, system vulnerabilities, limited visibility, unauthenticated resource sharing and advanced persistent threats.",
+  "Most are customer-side failures of configuration and identity, not provider breaches; expect scenarios where the answer is governance and change control.")
+f(C1, 'found', 'Cloud security hygiene',
+  "The routine basics that prevent most incidents: patching, secure baselines, hardening, immutable architecture, configuration drift detection, least privilege and removal of unused resources and credentials.",
+  "Exam answers favor automated, repeatable hygiene over one-off heroics.")
+f(C1, 'found', 'Ephemeral computing',
+  "Short-lived resources such as containers, functions and autoscaled instances that are created for a task and destroyed afterwards. Attackers lose persistence and state is cleaned up, but evidence disappears with the resource unless logs and snapshots are shipped out first.",
+  "Pair ephemeral designs with centralized logging and automated forensic capture.")
+f(C1, 'found', 'Geofencing and region restriction',
+  "Controls that limit where resources can be created or from where they can be reached, such as policies allowing only approved regions or blocking access from unapproved countries using IP geolocation.",
+  "Supports residency rules, but IP geolocation can be spoofed, so combine it with identity controls.")
+f(C1, 'found', 'Traffic inspection in the cloud',
+  "Examining packets or flows with firewalls, intrusion detection and prevention, web application firewalls or inspecting proxies, using virtual appliances, traffic mirroring or provider-native services because physical choke points no longer exist.",
+  "Encrypted traffic needs termination at an inspection point or metadata analysis; the choice trades visibility against privacy and latency.")
+f(C1, 'found', 'Cost-benefit analysis and return on investment (ROI)',
+  "Cost-benefit analysis compares the full cost of a control or migration (licenses, labor, risk) with the benefit (loss avoided, savings). ROI is gain minus cost, divided by cost. A safeguard is justified when the annual loss it prevents exceeds its annual cost.",
+  "These numbers feed the business impact analysis and the decision on which recovery or control option to fund.")
+f(C1, 'found', 'Functional security requirements',
+  "Security-related capabilities a cloud design must provide, including portability, interoperability, vendor lock-in limits, encryption, identity integration, logging and the ability to exit, derived from business needs and regulation.",
+  "Write them before choosing a provider so the evaluation tests the requirement rather than the sales pitch.")
+f(C1, 'found', 'Secure design principles and cloud design patterns',
+  "Classic principles such as least privilege, fail-safe defaults, complete mediation, separation of duties, economy of mechanism and defense in depth guide architecture, as taught in SANS and similar guidance. Patterns apply them, for example landing zones, hub-and-spoke networks and private endpoints.",
+  "When a question asks which design is best, pick the one that applies these principles by default instead of relying on later hardening.")
+f(C1, 'found', 'Well-Architected Frameworks',
+  "Provider design guidance organized into pillars. AWS Well-Architected has six: operational excellence, security, reliability, performance efficiency, cost optimization and sustainability. Azure Well-Architected has five and omits sustainability as a pillar.",
+  "Treat them as review checklists; the exam cares that security is one pillar balanced against the others, not the vendor details.")
+f(C1, 'found', 'CSA Enterprise Architecture',
+  "A Cloud Security Alliance reference architecture, methodology and assessment tool for designing and evaluating security architecture across business operations, IT operations, information technology and security and risk management, building on established methods such as SABSA and TOGAF.",
+  "Use it to compare a provider's offering with your own required security capabilities.")
+f(C1, 'found', 'Secure by design and secure by default',
+  "Secure by design builds security into architecture from the start through early threat modeling and a small attack surface. Secure by default ships services with safe settings (private, encrypted, least privilege) so customers need no extra hardening to be safe.",
+  "Public-by-default storage or open management ports are the textbook counterexamples.")
+f(C1, 'found', 'Data science and big data in the cloud',
+  "Analytics and machine learning platforms that gather large datasets from many sources. Risks include aggregating sensitive data in one lake, re-identification by joining datasets, credentials embedded in notebooks and uncontrolled copies of extracts.",
+  "Apply classification, minimization and fine-grained access before data enters the platform, not after.")
+f(C1, 'found', 'Evaluating a cloud service provider',
+  "Verify the provider against defined criteria: certifications and audit reports (ISO/IEC 27001, SOC 2, CSA STAR), control mapping to a framework such as the CCM, data location and residency, key and encryption options, incident transparency, SLA terms, financial viability and exit provisions.",
+  "Define the criteria first, then collect evidence; certificates prove a scope, not suitability for your workload.")
+f(C1, 'found', 'Common Criteria (ISO/IEC 15408)',
+  "An international standard for evaluating the security of IT products against a security target, with results expressed as an evaluation assurance level from EAL1 to EAL7 and recognized across participating countries.",
+  "It evaluates products, so a Common Criteria certified hypervisor does not certify the cloud service built on it.")
+f(C1, 'found', 'FIPS 140-3 and FIPS 140-2',
+  "FIPS 140 sets security requirements for cryptographic modules at four levels. FIPS 140-3 (2019) supersedes 140-2; after September 21, 2026, modules validated under 140-2 move to the Historical list and may be used only in existing systems.",
+  "The outline still names 140-2; know both, and remember that validation applies to a specific module and version.")
+f(C1, 'found', 'AI and ML for cloud threat detection and analysis',
+  "Machine learning models learn normal behavior to flag anomalies in logs, identity activity and network flows, and can cluster alerts and prioritize them. Models need quality training data, tuning for false positives and human review of consequential actions.",
+  "AI augments analysts; an automated block based on an unvalidated model is a risk in its own right.")
+f(C1, 'found', 'Data source validation and verification for AI',
+  "Checking that data feeding a model comes from trusted, authorized sources (validation) and that it is accurate, complete and unaltered (verification), using provenance records, hashes, schema and outlier checks.",
+  "Untrusted or unverified inputs are the entry point for data poisoning.")
+f(C1, 'found', 'Ethical concerns in AI',
+  "Bias and unfair outcomes, lack of transparency and explainability, privacy intrusion, unclear accountability for automated decisions, and misuse such as deepfakes. Controls include diverse and reviewed data, human oversight, documentation and impact assessments.",
+  "A security professional raises these as risks that need an owner, not as abstract philosophy.")
+f(C1, 'found', 'AI regulation and frameworks',
+  "The EU AI Act (Regulation (EU) 2024/1689) takes a risk-based approach with unacceptable, high, limited and minimal risk tiers. The NIST AI Risk Management Framework 1.0 organizes AI risk work into govern, map, measure and manage. ISO/IEC 42001 defines an AI management system.",
+  "Know the structure of each, not the dates; the exam asks which approach fits a scenario.")
+
+# ---- flashcards added in the August 2026 outline refresh: Domain 2
+f(C2, 'life', 'Media sanitization levels: clear, purge and destroy',
+  "NIST SP 800-88 Rev. 2 groups sanitization into clear (logical techniques such as overwriting that defeat simple recovery), purge (makes recovery infeasible even with laboratory techniques, including cryptographic erase) and destroy (physically ruining the media).",
+  "Customers cannot destroy provider hardware, so in the cloud the realistic choices are overwriting where it is verifiable and cryptographic erase.")
+f(C2, 'life', 'Overwriting and its limits in the cloud',
+  "Overwriting writes patterns over stored data. On solid-state drives with wear leveling, and on virtualized or replicated storage, the customer cannot be sure every physical copy was overwritten, so overwriting alone gives weak assurance.",
+  "Cryptographic erase sidesteps the problem, which is why it is the preferred answer for sanitization in shared storage.")
+f(C2, 'life', 'Volume, raw and long-term storage',
+  "Volume (block) storage attaches to an instance as a disk the customer's operating system formats. Raw storage maps a device or logical unit directly to a virtual machine, bypassing the file-system abstraction. Long-term (archive) storage is cheap with slow retrieval and often offers immutability settings. Ephemeral storage vanishes with the instance.",
+  "Match the type to the requirement: durable and shared, high performance, or cheap and rarely read, and encrypt each according to its exposure.")
+f(C2, 'life', 'Threats to cloud storage',
+  "Misconfigured permissions and public buckets, leaked access keys, shared snapshots, data remanence after reallocation, weak or absent encryption, ransomware that deletes versions and backups, insider access at the provider and silent data corruption.",
+  "Controls that map to these: private by default, encryption with customer keys, versioning and object lock, access logging and integrity checks.")
+f(C2, 'life', 'Data security posture management (DSPM)',
+  "Tooling that continuously discovers data stores across cloud accounts, classifies their content, maps who and what can reach them and flags exposure, so data location and risk stay current.",
+  "It automates discovery and the data-location question; it does not replace DLP or encryption.")
+f(C2, 'life', 'Discovery by data type',
+  "Structured data is found through schemas and column scans; unstructured files need content inspection, pattern matching, OCR and machine-learning classifiers; semi-structured formats such as JSON, XML and logs are parsed for keys and values. Location comes from inventory, tags and scans.",
+  "Each type needs a different technique, so one scanner rarely covers an estate.")
+f(C2, 'life', 'Data mapping',
+  "Documenting each data element with its source, systems, owner, purpose, location, recipients and legal basis. It is the foundation for data flow diagrams, residency decisions and the records of processing that privacy law expects.",
+  "Mapping answers where data is; classification answers how sensitive it is; both are needed.")
+f(C2, 'life', 'Data classification policy',
+  "A policy that defines classification levels, who assigns them, the handling rules for each (storage, encryption, sharing, retention and disposal), and when labels are reviewed or downgraded.",
+  "A policy without handling rules per level is only a labeling exercise.")
+f(C2, 'life', 'IRM objectives: rights, provisioning and access models',
+  "Data rights define what a recipient may do (view, edit, print, copy, forward, expire). Provisioning is how rights are issued and bound to users or groups. Access models decide who qualifies, such as roles, attributes or policy conditions like time and location.",
+  "IRM extends access control beyond the first opening of the file.")
+f(C2, 'life', 'IRM tools and challenges',
+  "IRM relies on a policy server, client agents or plug-ins, and certificates or licenses that are issued to authorized users and revoked when access ends. Challenges include slow revocation for offline copies, format support, screen capture and key distribution.",
+  "Revocation only works when the client checks back with the policy server.")
+f(C2, 'life', 'Data obfuscation techniques',
+  "Static masking creates a permanently altered copy; dynamic masking hides values at query time by role. Other techniques are substitution, shuffling, nulling, randomization, generalization and format-preserving tokens. Anonymization combines such steps until individuals cannot be re-identified.",
+  "Pick static masking for test copies and dynamic masking for production views.")
+f(C2, 'life', 'Data archiving procedures and mechanisms',
+  "Archive in formats that remain readable for the whole retention period, plan for media and software obsolescence, protect integrity with hashes or immutable storage, keep decryption keys as long as the data, index for retrieval and test restores.",
+  "An archive whose key was destroyed or whose format cannot be opened is a deletion by accident.")
+f(C2, 'life', 'Data deletion procedures and mechanisms',
+  "Deletion can be logical (marking data removed), overwriting, cryptographic erase or physical destruction by the provider. A real procedure also covers replicas, snapshots and backups, records proof of deletion and respects legal holds.",
+  "Ask the provider for deletion evidence in the contract, because customers cannot witness destruction.")
+f(C2, 'life', 'Legal hold mechanics',
+  "A hold places relevant data in preservation by suspending lifecycle deletion and enabling retention locks, restricts access to authorized custodians, extends to backups and SaaS data, and ends only when counsel releases it.",
+  "Document scope, custodians and release; a hold that silently fails is spoliation.")
+f(C2, 'life', 'Event sources and event attributes',
+  "Data events come from the management plane, identity provider, storage and database access, network flows, applications and endpoints. Useful attributes are who (identity), what action, when (synchronized time), where (IP address, geolocation, resource) and the outcome.",
+  "An event missing identity or reliable time cannot support accountability or forensics.")
+f(C2, 'life', 'Auditability, traceability and accountability',
+  "Auditability is the ability to examine records and controls; traceability is following an action or data item from origin through its handling; accountability is attributing each action to a responsible identity who cannot plausibly deny it.",
+  "They depend on unique identities, protected logs and time synchronization.")
+f(C2, 'life', 'Non-repudiation',
+  "Assurance that an actor cannot credibly deny an action, achieved with digital signatures made by a private key only the actor holds, trusted timestamps, tamper-evident logs, unique accounts and documented chain of custody.",
+  "Shared accounts destroy non-repudiation however good the logging is.")
+f(C2, 'life', 'AI dataset and model privacy',
+  "Protect training data and prompts with minimization, redaction, access control and retention limits. Techniques such as differential privacy and federated learning reduce disclosure; models can memorize data, so membership inference and training-data extraction are privacy risks.",
+  "Personal data used for training stays subject to privacy law even when it ends up inside weights.")
+f(C2, 'life', 'AI dataset and model security',
+  "Validate and verify datasets with provenance records, hashes and outlier checks to catch poisoning, and verify model artifacts with signing and scanning, including for unsafe serialization formats. Restrict the model registry, since weights are valuable intellectual property.",
+  "Treat a model file like executable code from a supply chain.")
+
+# ---- flashcards added in the August 2026 outline refresh: Domain 3
+f(C3, 'infra', 'Cloud infrastructure components',
+  "The physical environment (facilities, power, cooling), network and communications, compute, virtualization, storage and the management plane. Each layer has its own owner and controls, and the management plane governs all the rest.",
+  "A complete risk review walks through all six layers and assigns each to the provider or the customer.")
+f(C3, 'infra', 'Logical data center design: tenant partitioning',
+  "Separating tenants logically with virtual networks, distinct accounts or subscriptions, per-tenant encryption keys and role-based access, so a mistake or compromise in one tenant cannot reach another. Dedicated hosts add physical separation where required.",
+  "Partitioning is the logical answer to multi-tenancy; isolation evidence comes from the provider's audit reports.")
+f(C3, 'infra', 'Physical data center design: location and buy or build',
+  "Site choice weighs natural hazards, power and connectivity, political and legal climate, distance between sites and proximity to users. The buy, build or lease decision trades cost and control against speed and the ability to prove controls to auditors.",
+  "Customers of public cloud rarely choose; they verify through reports and region selection.")
+f(C3, 'infra', 'Environmental design: HVAC, fire suppression and pathways',
+  "Cooling uses hot and cold aisle layouts and sensors, with ASHRAE recommending roughly 18 to 27 degrees Celsius at server inlets. Fire protection uses detection plus clean-agent or pre-action systems. Multi-vendor pathway connectivity means carriers enter by physically separate routes.",
+  "Redundant carriers sharing one trench still share one failure point.")
+f(C3, 'infra', 'Data center tiers',
+  "The Uptime Institute rates sites from Tier I (basic capacity, commonly cited at 99.671 percent availability) through Tier II (99.741), Tier III (concurrently maintainable, 99.982) to Tier IV (fault tolerant, 99.995). Standards such as TIA-942 and ISO/IEC 22237 also describe facility design.",
+  "Higher tiers mean redundant paths for power and cooling and the ability to maintain without downtime.")
+f(C3, 'infra', 'Power and connectivity resilience',
+  "Uninterruptible power supplies bridge outages until generators start; N+1 adds one spare unit, 2N duplicates the whole path. Resilient sites also use multiple carriers, redundant cooling and tested failover.",
+  "Untested generators and shared fuel contracts are classic single points of failure.")
+f(C3, 'resil', 'Quantitative risk analysis: SLE, ARO and ALE',
+  "Single loss expectancy is asset value times exposure factor; annualized rate of occurrence is how often per year; annualized loss expectancy is SLE times ARO. A safeguard is worthwhile when the reduction in ALE exceeds its annual cost.",
+  "Qualitative analysis ranks risks high, medium or low when numbers are unreliable.")
+f(C3, 'resil', 'Qualitative and quantitative risk assessment',
+  "Qualitative assessment rates likelihood and impact on scales and is fast and subjective. Quantitative assessment uses monetary values and probabilities and supports cost-benefit decisions but needs good data. Many programs combine them.",
+  "Choose by the decision: ranking a backlog needs qualitative; funding a control needs numbers.")
+f(C3, 'infra', 'Instance metadata service abuse',
+  "A server-side request forgery flaw can make a workload fetch its own metadata service address and return temporary credentials for its role. Mitigations include the session-token version of the metadata service, least-privilege roles, egress filtering and input validation.",
+  "The attack turns an application bug into cloud account access, so role scope matters.")
+f(C3, 'infra', 'Common attacks on cloud infrastructure',
+  "Account and credential hijacking, cryptojacking of stolen compute, exposed management interfaces, cross-tenant side-channel and escape attempts, volumetric denial of service and denial of wallet, where abuse inflates the metered bill.",
+  "Detection ties to metering and baseline anomalies; prevention to identity and network controls.")
+f(C3, 'infra', 'Physical and environmental protection',
+  "Controls at the facility: perimeter and badge access, mantraps, cameras, visitor logs, locked cages, environmental sensors, fire suppression and secure equipment disposal. In the cloud the provider operates them and customers verify through reports; on-premises components stay the customer's task.",
+  "Hybrid designs leave the customer responsible for the physical controls of its own site.")
+f(C3, 'infra', 'System, storage and communication protection',
+  "Protective controls for the technical stack: hardened and patched hosts, encrypted storage with managed keys, encrypted network paths, segmentation, boundary protection and denial-of-service defense, applied through policy as code.",
+  "Frameworks such as NIST SP 800-53 group these as system and communications protection controls.")
+f(C3, 'infra', 'Audit mechanisms: log collection, correlation and packet capture',
+  "Collect management-plane, identity, flow and workload logs centrally, correlate events across sources to see attack chains, and use traffic mirroring or virtual taps for packet capture when content-level evidence is needed.",
+  "Packet capture is costly and privacy-sensitive; reserve it for targeted investigations.")
+f(C3, 'resil', 'Recovery service level',
+  "The percentage of normal service capacity that must be available during recovery, for example running at half capacity after failover. It lets planners provision a smaller recovery environment.",
+  "RSL complements RTO and RPO as the third recovery requirement from the BIA.")
+f(C3, 'resil', 'BCDR plan testing types',
+  "Read-through or checklist review, tabletop discussion, walkthrough, simulation, parallel test at the recovery site and full interruption test, in increasing realism and risk. Results feed plan updates.",
+  "Full interruption proves recovery best but risks production, so most programs mix types.")
+
+# ---- flashcards added in the August 2026 outline refresh: Domain 4
+f(C4, 'app', 'OWASP Top 10:2025 categories',
+  "In order: broken access control, security misconfiguration, software supply chain failures, cryptographic failures, injection, insecure design, authentication failures, software or data integrity failures, security logging and alerting failures, and mishandling of exceptional conditions.",
+  "The 2025 edition added supply chain failures and exceptional conditions; broken access control stays first. It is an awareness list, not a pass mark.")
+f(C4, 'app', 'OWASP Application Security Verification Standard (ASVS)',
+  "A catalog of verifiable security requirements for web applications and services, grouped by topic and by three assurance levels, used to specify what to build and what to test. Version 5.0 is the current release.",
+  "Use ASVS to turn 'be secure' into testable requirements, and the Top 10 to raise awareness.")
+f(C4, 'app', 'OWASP API Security Top 10 (2023)',
+  "Broken object level authorization, broken authentication, broken object property level authorization, unrestricted resource consumption, broken function level authorization, unrestricted access to sensitive business flows, server-side request forgery, security misconfiguration, improper inventory management and unsafe consumption of APIs.",
+  "Broken object level authorization (changing an identifier to read another user's record) is first and the most common exam scenario.")
+f(C4, 'app', 'OWASP Top 10 for LLM Applications (2025)',
+  "Prompt injection, sensitive information disclosure, supply chain, data and model poisoning, improper output handling, excessive agency, system prompt leakage, vector and embedding weaknesses, misinformation and unbounded consumption.",
+  "Map each to a control: validate output, limit agency and permissions, protect data, vet components and rate-limit.")
+f(C4, 'app', 'CWE Top 25 (SANS/MITRE)',
+  "An annual list of the most dangerous software weakness types such as cross-site scripting, injection and out-of-bounds writes, published by MITRE from vulnerability data and historically presented with the SANS Institute.",
+  "CWE names a weakness class; CVE names a specific flaw in a product.")
+f(C4, 'app', 'Cloud development basics and common pitfalls',
+  "Good cloud practice uses stateless services, configuration outside code, managed identities and infrastructure as code. Common pitfalls are hard-coded secrets, over-permissive roles, public storage, trusting client input, unpatched dependencies and logging sensitive data.",
+  "Training should target these concrete mistakes, because they cause most cloud breaches.")
+f(C4, 'app', 'SDLC phases and business requirements',
+  "Phases typically run requirements, design, coding, testing, deployment and maintenance. Security requirements come from business needs, regulation and data classification, then flow into design decisions and test cases.",
+  "A missing business or regulatory requirement is the cheapest defect to fix and the costliest to find late.")
+f(C4, 'app', 'Waterfall versus agile security',
+  "Waterfall runs phases sequentially with gates and formal reviews; agile delivers in short iterations, so security must be built into stories, definition of done and automated tests. DevOps extends this to continuous delivery.",
+  "Neither is inherently more secure; security fails when it is attached to only one gate or only the end.")
+f(C4, 'app', 'DREAD risk rating',
+  "A scoring model rating threats on damage, reproducibility, exploitability, affected users and discoverability, used to rank threats found by modeling. It is subjective and has been largely replaced by other scoring schemes.",
+  "STRIDE finds threat types; DREAD ranks them.")
+f(C4, 'app', 'ATASM threat modeling',
+  "Architecture, threats, attack surfaces and mitigations: understand the architecture, list credible threats, map where attackers can reach it and choose mitigations for each surface.",
+  "It starts from architecture and attack surface rather than from a list of threat categories.")
+f(C4, 'app', 'PASTA threat modeling',
+  "The Process for Attack Simulation and Threat Analysis is a seven-stage, risk-centric method that links business objectives, technical scope, application decomposition, threat analysis, vulnerability analysis, attack modeling and risk and impact analysis.",
+  "Pick PASTA when the stem stresses business impact and attacker simulation.")
+f(C4, 'app', 'SAFECode secure development practices',
+  "The Software Assurance Forum for Excellence in Code publishes industry practices for secure development, covering design, secure coding, testing, vulnerability response and supply chain integrity.",
+  "It is a practice guide from vendors; ASVS is the requirements catalog.")
+f(C4, 'app', 'Software configuration management and versioning',
+  "Tracking every change to code, configuration, infrastructure templates and dependencies in version control with reviews, branch protection, signed commits and tagged releases, so any build can be reproduced and traced.",
+  "It underpins change control, audit and rollback.")
+f(C4, 'app', 'Cloud-specific application risks',
+  "Shared technology and isolation failures, provider insider threats, lack of visibility and control over the platform, legal and jurisdiction exposure and dependence on provider APIs. Design for them with encryption, logging, portability and clear data location.",
+  "These risks differ from classic on-premises ones mainly in who controls the layers below the application.")
+f(C4, 'app', 'Functional and non-functional testing',
+  "Functional testing checks that features do what requirements say; non-functional testing checks qualities such as performance, availability, scalability and security. Both run in continuous integration and delivery pipelines.",
+  "Security testing is non-functional, so a feature that passes functional tests can still be exploitable.")
+f(C4, 'app', 'Black-box, gray-box and white-box testing',
+  "Black-box testers have no knowledge of internals and attack from outside; white-box testers have source code and design; gray-box testers have partial knowledge such as credentials or an architecture diagram.",
+  "SAST is a white-box technique and DAST is a black-box technique.")
+f(C4, 'app', 'Quality assurance and secure code review',
+  "Quality assurance verifies that software meets requirements before release, including security acceptance criteria. Peer and tool-assisted code review catch flaws early and spread secure coding knowledge.",
+  "QA should include negative tests, not just happy paths.")
+f(C4, 'app', 'Abuse case testing',
+  "Writing and testing scenarios of how an attacker or careless user would misuse a feature, for example enumerating identifiers, replaying a coupon or flooding a reset endpoint, as the counterpart of use cases.",
+  "Abuse cases come from threat modeling and become automated negative tests.")
+f(C4, 'app', 'CI/CD pipeline security',
+  "Pipelines hold powerful credentials and build the code that runs in production. Protect them with least-privilege short-lived credentials, protected branches, isolated build agents, secret scanning, signed artifacts and automated security gates.",
+  "A compromised pipeline defeats every downstream control.")
+f(C4, 'app', 'Third-party software management',
+  "Inventory every external component and service, assess the vendor, review license and support terms, track vulnerabilities, restrict what the component can access and plan for its replacement or withdrawal.",
+  "You inherit the risk of what you integrate; contracts and monitoring must say who fixes what.")
+f(C4, 'app', 'Validated open-source software',
+  "Use open-source components from trusted registries, pin and verify versions and hashes, check maintainer health and license terms, scan with software composition analysis and keep an internal mirror of approved packages.",
+  "Copyleft licenses can impose obligations on your code; legal review belongs in the intake.")
+f(C4, 'app', 'Artifact integrity and provenance',
+  "Signing builds and recording provenance proves what was built, from which source and by which pipeline. Frameworks such as SLSA define levels of build integrity, and verification at deploy time blocks unsigned or tampered artifacts.",
+  "Integrity and authenticity are the two supply chain properties the outline names.")
+f(C4, 'app', 'XML firewall',
+  "A gateway that inspects XML and SOAP traffic, validating schemas and blocking malformed or oversized messages and attacks such as XML external entity injection before they reach the service.",
+  "Think of it as a specialized web application firewall for XML messages.")
+f(C4, 'app', 'API gateway',
+  "A front door for APIs that authenticates callers, enforces authorization, rate limits, validates requests, terminates TLS and logs traffic, giving one place to apply policy and measure use.",
+  "It enforces policy at the edge; the service still needs its own authorization checks.")
+f(C4, 'app', 'Sandboxing',
+  "Running code in a restricted environment, such as a container, virtual machine or language runtime with limited permissions, so a compromise or untrusted file cannot affect the host or other workloads.",
+  "Sandboxes are used for malware analysis, third-party plug-ins and untrusted uploads.")
+f(C4, 'app', 'Application virtualization and orchestration',
+  "Containers package an application with its dependencies; Docker builds and runs them and Kubernetes orchestrates scheduling, scaling and networking. Security work covers image provenance, runtime restrictions, secrets handling, cluster access and network policy.",
+  "The orchestrator's control plane is as sensitive as the management plane of the cloud itself.")
+f(C4, 'app', 'Load balancers and cryptography in application architecture',
+  "Load balancers distribute traffic, hide back-end addresses and often terminate TLS, so certificate and cipher policy live there. Applications should use vetted libraries and managed key services rather than custom cryptography.",
+  "Decide where TLS terminates and whether traffic behind the balancer is re-encrypted.")
+f(C4, 'iam', 'Identity provider and service provider trust',
+  "The identity provider authenticates users and issues signed assertions or tokens; the service provider (the application) trusts the provider's signature through metadata and certificates. Federation moves credentials out of each application.",
+  "Compromise of the identity provider or its signing key compromises every federated application.")
+f(C4, 'iam', 'User, privileged and service access in cloud design',
+  "User access covers workforce and customer identities; privileged access needs stronger controls such as just-in-time elevation and session recording; service access gives workloads their own identities with short-lived credentials.",
+  "Treat the three classes separately: they carry different risk and need different controls.")
+
+# ---- flashcards added in the August 2026 outline refresh: Domain 5
+f(C5, 'buildops', 'Secure by default configuration',
+  "Standing up infrastructure with safe initial settings: deny-by-default networking, encryption on, unneeded services and ports off, default credentials removed and logging enabled, enforced by hardened images and policy.",
+  "Defaults should be the secure state so a forgotten setting never exposes anything.")
+f(C5, 'buildops', 'Hardware security configuration: HSM and TPM',
+  "A hardware security module holds keys and performs cryptography in tamper-resistant hardware, so it needs access policy, firmware control and backup of key material. A trusted platform module anchors measured boot and remote attestation on a host, and must be enabled and provisioned.",
+  "Know which one stores customer keys (HSM) and which one attests host integrity (TPM).")
+f(C5, 'buildops', 'Management plane tools: installation and configuration',
+  "Tools that provision and control the environment (consoles, command-line interfaces, orchestration and automation) need hardened hosts, multi-factor authentication, least-privilege roles, signed and current software and complete audit logging.",
+  "Install them on controlled administrative hosts, never on personal machines.")
+f(C5, 'buildops', 'Virtual hardware security configuration',
+  "Harden virtual networks (segmentation and separate management networks), storage (encryption and access control), memory (no overcommit for sensitive tenants, guarded sharing) and CPU settings, and choose hypervisor type deliberately: Type 1 for production, Type 2 mainly on workstations.",
+  "Disable unused virtual devices such as floppy, serial and clipboard sharing to shrink the attack surface.")
+f(C5, 'buildops', 'Guest operating system virtualization toolsets',
+  "Integration software installed in a guest, such as VMware Tools, Hyper-V integration services or cloud-init agents, improves drivers, time sync, shutdown and monitoring. It runs with high privilege and must be patched, trusted and sourced from the vendor.",
+  "An outdated toolset is an attack path between guest and hypervisor.")
+f(C5, 'buildops', 'Remote access: bastions, jump hosts and consoles',
+  "Administrative access should pass through a hardened bastion or jump host, use SSH keys or certificates and multi-factor authentication, restrict RDP to the bastion, prefer session-managed or console access without open inbound ports, and record sessions.",
+  "Exposing RDP or SSH directly to the internet is the classic finding.")
+f(C5, 'buildops', 'Virtual LAN (VLAN) segmentation',
+  "A VLAN divides one physical network into separate broadcast domains using tags, separating tenants, tiers or management traffic. VLANs are not encryption and misconfigured trunks allow VLAN hopping.",
+  "Combine VLANs with firewall rules and, in clouds, with virtual network constructs.")
+f(C5, 'buildops', 'DHCP security',
+  "Rogue DHCP servers can hand out malicious gateways and resolvers, and clients can exhaust address pools. Controls include DHCP snooping on switches, port security and monitoring of lease logs.",
+  "In public cloud the provider runs address assignment, but virtual networks you build still need the control.")
+f(C5, 'buildops', 'DNS Security Extensions (DNSSEC)',
+  "DNSSEC adds digital signatures to DNS records so resolvers can verify that answers are authentic and unmodified. It gives integrity and origin authentication but not confidentiality.",
+  "It defends against cache poisoning; DNS over HTTPS or TLS provides privacy.")
+f(C5, 'buildops', 'Virtual private networks (VPN)',
+  "A VPN builds an encrypted tunnel across an untrusted network, using IPsec for site-to-site connections or TLS-based clients for remote users. It protects confidentiality in transit but extends the network to the endpoint, which is why zero trust access is replacing broad VPNs.",
+  "A VPN is encrypted but a dedicated private link is not, unless you add encryption.")
+f(C5, 'buildops', 'Honeypots and honeynets',
+  "Decoy systems that look valuable but have no legitimate use, so any contact is suspicious. They reveal attacker techniques and give early warning with few false positives, but must be isolated so they cannot become a pivot.",
+  "A honeypot detects and studies; it does not prevent attacks.")
+f(C5, 'buildops', 'Baselines, CIS Benchmarks and STIGs',
+  "A baseline is the approved secure configuration of a system. Consensus guidance such as the CIS Benchmarks and DISA STIGs provides starting settings for Windows, Linux and hypervisors, which are then monitored for drift and remediated.",
+  "Baseline, monitor, remediate is the cycle the outline names for operating system hardening.")
+f(C5, 'buildops', 'Clustered hosts and high availability',
+  "Hosts joined in a cluster restart virtual machines elsewhere after a failure (high availability), balance load with distributed resource scheduling or dynamic optimization, and enter maintenance mode so workloads migrate before patching.",
+  "Maintenance mode gives patching without downtime; reserved failover capacity makes HA work.")
+f(C5, 'buildops', 'Storage clusters and guest OS availability',
+  "Storage clusters replicate or stripe data across nodes so a disk or node failure causes no loss. Guest availability comes from redundant instances, health checks, autoscaling and monitoring of the operating system and its services.",
+  "Cluster resilience does not replace backups, which protect against deletion and corruption.")
+f(C5, 'buildops', 'Performance and capacity monitoring',
+  "Track network throughput and latency, compute utilization, storage capacity and IOPS and application response time against thresholds and trends, to detect degradation and attacks such as denial of service and plan growth.",
+  "Sudden capacity spikes can signal abuse such as cryptomining on stolen credentials.")
+f(C5, 'buildops', 'Hardware monitoring',
+  "Monitor disk health, processor load, fan speed, temperature and power in the underlying hosts, with alerts that trigger migration or replacement before failure.",
+  "In public cloud the provider does this; in private or hybrid environments it is a customer duty.")
+f(C5, 'buildops', 'Backup and restore configuration for hosts and guests',
+  "Back up host configurations and guest images and data with defined frequency and retention, encrypt and isolate the backups, protect their credentials and test restores against the recovery objectives.",
+  "A backup that has never been restored is unproven.")
+f(C5, 'buildops', 'Management plane operations',
+  "Scheduling, orchestration and maintenance functions, such as automated patch windows, scaling, workload placement and failover, act through privileged automation, so their roles, change approvals and logs need the same care as a human administrator.",
+  "Automation accounts are powerful identities; restrict and monitor them.")
+f(C5, 'buildops', 'NIST frameworks: CSF 2.0, SP 800-53 and the RMF',
+  "The NIST Cybersecurity Framework 2.0 organizes outcomes into govern, identify, protect, detect, respond and recover. SP 800-53 Rev. 5 is the catalog of security and privacy controls, and the Risk Management Framework (SP 800-37) is the process for selecting, implementing and assessing them.",
+  "CSF 2.0 added the Govern function; the framework is voluntary, while 800-53 is the control baseline for US federal systems.")
+f(C5, 'buildops', 'ISO/IEC 27001, 27002 and 20000-1',
+  "ISO/IEC 27001 specifies an information security management system and is certifiable; ISO/IEC 27002:2022 gives 93 controls in four themes (organizational, people, physical, technological); ISO/IEC 20000-1 specifies an IT service management system.",
+  "27001 is the requirement you certify against; 27002 is guidance on the controls.")
+f(C5, 'buildops', 'COBIT 2019',
+  "ISACA's framework for governance and management of enterprise information and technology, using governance objectives and design factors to align IT with business goals and manage risk.",
+  "COBIT governs and manages IT; ISO/IEC 27001 secures information; know which question each answers.")
+f(C5, 'buildops', 'COSO internal control and enterprise risk frameworks',
+  "The Committee of Sponsoring Organizations publishes the Internal Control Integrated Framework, widely used for financial reporting controls under Sarbanes-Oxley, and an Enterprise Risk Management framework linking risk to strategy and performance.",
+  "COSO appears when scenarios mention financial reporting controls and audits.")
+f(C5, 'buildops', 'CIS Critical Security Controls',
+  "A prioritized set of 18 controls, such as inventory, access control, data protection and incident response, each made of specific safeguards and arranged into implementation groups IG1 to IG3 so smaller organizations start with essential hygiene.",
+  "Use implementation groups to scale effort to organization size and risk.")
+f(C5, 'buildops', 'ITIL 4 service management',
+  "A framework of IT service management practices, including incident, problem, change, release, deployment, configuration, service level, availability, capacity and continuity management, built around a service value system and continual improvement.",
+  "ISO/IEC 20000-1 is the certifiable standard that aligns with these practices.")
+f(C5, 'ops', 'Communicating with relevant parties',
+  "Operations needs defined channels and owners for vendors, customers, partners, regulators and other stakeholders, covering status, maintenance, incident and breach notices, with approved wording and contact lists prepared in advance.",
+  "Legal and compliance approve external statements; engineers supply the facts.")
+f(C5, 'ops', 'Forensic data collection methodologies',
+  "Collect by order of volatility, capture memory and then disk, use snapshots, volume images and provider API exports, work on verified copies with write protection, hash every item and record every step.",
+  "In the cloud collection depends on provider cooperation and the service model, so agree the process beforehand.")
+f(C5, 'ops', 'Evidence management',
+  "Identify, label, store and track evidence with unique identifiers, secured storage, access logs and documented transfers, so its integrity and handling can be demonstrated in court or to regulators.",
+  "Admissibility depends on integrity, relevance and an unbroken chain of custody.")
+f(C5, 'ops', 'Incident management versus problem management',
+  "Incident management restores normal service quickly; problem management finds and removes the underlying cause to stop recurrence, often through root cause analysis and a known error record.",
+  "Quick restoration is not the same as a fix; problems prevent repeat incidents.")
+f(C5, 'ops', 'Release and deployment management',
+  "Release management plans, schedules and controls what goes live, with testing and approvals; deployment management moves the approved build into environments, ideally through automated, repeatable and reversible pipelines.",
+  "Both link to change management and need rollback plans.")
+f(C5, 'ops', 'Configuration management and the CMDB',
+  "Maintaining accurate records of configuration items and their relationships in a configuration management database, with controlled changes, so impact analysis, audits and incident response rely on truth rather than memory.",
+  "Cloud assets change constantly, so discovery must feed the record automatically.")
+f(C5, 'ops', 'Service-level management',
+  "Defining, measuring and reporting service targets with customers (service level agreements) and with internal teams or suppliers (operational level agreements and underpinning contracts), and acting when targets are missed.",
+  "Targets must be measurable; unmeasured promises cannot be enforced.")
+f(C5, 'ops', 'Capacity and availability management',
+  "Capacity management matches resources to current and forecast demand at acceptable cost; availability management designs and monitors to meet agreed uptime through redundancy, maintenance planning and fast recovery.",
+  "Elastic scaling automates capacity but still needs budgets and limits to stop runaway cost.")
+f(C5, 'ops', 'Continuity and information security management',
+  "Continuity management ensures services can be restored after disruption using the business impact analysis and tested plans; information security management sets the policies and controls that protect confidentiality, integrity and availability.",
+  "Both are management processes inside the service framework, not one-time projects.")
+
+# ---- flashcards added in the August 2026 outline refresh: Domain 6
+f(C6, 'legal', 'Conflicting international legislation',
+  "A provider or customer operating across borders can face laws that clash, for example a government demand to disclose data that another country's privacy law forbids exporting. Counsel must resolve conflicts, using contracts, data location choices, encryption with customer-held keys and notice rights.",
+  "There is rarely a perfect technical fix; the exam favors minimizing exposure and escalating to legal.")
+f(C6, 'legal', 'Legal risks specific to cloud computing',
+  "Unclear data location, multiple jurisdictions, subprocessors, loss of control over discovery and forensics, provider insolvency, third-party access demands and contracts that disclaim liability. Evaluate each against the data types and regulations involved.",
+  "The customer remains accountable to the regulator for what the provider does with its data.")
+f(C6, 'legal', 'ISO/IEC 27050 and CSA guidance for eDiscovery',
+  "ISO/IEC 27050 is a multi-part standard for electronic discovery covering identification, preservation, collection, processing, review, analysis and production. CSA guidance adds cloud-specific points on provider cooperation, data location and the scope of custody.",
+  "Cloud eDiscovery depends on contract terms that guarantee access and preservation.")
+f(C6, 'legal', 'Forensic standards: ISO/IEC 27037, 27041, 27042 and 27043',
+  "27037 covers identification, collection, acquisition and preservation of digital evidence; 27041 assures that an investigative method is suitable and adequate; 27042 covers analysis and interpretation of evidence; 27043 sets incident investigation principles and processes.",
+  "Order them by the investigation: collect (27037), choose method (27041), analyze (27042), run the process (27043).")
+f(C6, 'legal', 'Contractual versus regulated private data',
+  "Regulated data (for example protected health information or personally identifiable information under law) carries statutory duties and penalties. Contractual data is protected by agreements such as payment card rules or customer confidentiality clauses, and breach brings contractual remedies.",
+  "A single dataset can be both, so meet the stricter requirement.")
+f(C6, 'legal', 'Health privacy: HIPAA and HITECH',
+  "HIPAA's Privacy, Security and Breach Notification Rules protect protected health information held by covered entities and their business associates. The HITECH Act (2009) strengthened enforcement, extended direct liability to business associates and added breach notification; affected individuals must be told without unreasonable delay and within 60 days of discovery.",
+  "A business associate agreement is required before a cloud provider handles PHI.")
+f(C6, 'legal', 'FERPA',
+  "The US Family Educational Rights and Privacy Act protects student education records and gives parents and eligible students rights of access and control over disclosure. Schools using cloud services must keep control through contracts.",
+  "FERPA applies to education records, not to health or payment data.")
+f(C6, 'legal', 'PIPEDA',
+  "Canada's Personal Information Protection and Electronic Documents Act governs how private-sector organizations collect, use and disclose personal information, built on fair information principles such as consent, limiting use and accountability.",
+  "Organizations remain accountable for personal data transferred to a processor, including abroad.")
+f(C6, 'legal', 'India Digital Personal Data Protection Act',
+  "India's Digital Personal Data Protection Act, 2023 governs processing of digital personal data, built on consent and notice, obligations on data fiduciaries and rights for data principals, with a Data Protection Board to enforce it.",
+  "Know the vocabulary: fiduciary corresponds roughly to controller, principal to data subject.")
+f(C6, 'legal', 'Jurisdictional differences in privacy law',
+  "Laws differ in scope, consent rules, transfer limits, breach deadlines and penalties; some apply based on where data subjects live, others on where the organization operates. A global service must map each applicable regime to the data it holds.",
+  "Pick the strictest common denominator when designing controls for multiple regimes.")
+f(C6, 'legal', 'Generally Accepted Privacy Principles (GAPP)',
+  "A privacy framework from the AICPA and CICA built on ten principles: management, notice, choice and consent, collection, use, retention and disposal, access, disclosure to third parties, security for privacy, quality, and monitoring and enforcement.",
+  "GAPP underlies the privacy criteria used in SOC 2 reporting.")
+f(C6, 'legal', 'Privacy impact assessment (PIA)',
+  "A structured review done before launching or changing a system to identify privacy risks to individuals and the controls that reduce them. The GDPR's formal version is the data protection impact assessment, required for high-risk processing.",
+  "Run it at design time; findings change the design.")
+f(C6, 'legal', 'Assurance challenges of virtualization and cloud',
+  "Auditors cannot inspect hypervisors or physical sites, resources are dynamic and shared, scope boundaries between provider and customer blur and evidence comes from logs and provider reports. Assurance relies on contracts, certified reports and continuous monitoring.",
+  "Plan audits around evidence the customer can actually obtain.")
+f(C6, 'legal', 'SSAE 18, ISAE 3402 and ISAE 3000 reports',
+  "SSAE 18 is the US attestation standard behind SOC reports; ISAE 3402 is the international standard for reports on controls relevant to financial reporting, equivalent in role to SOC 1; ISAE 3000 covers other assurance engagements and underlies SOC 2 style reports abroad.",
+  "Match geography and purpose: financial reporting controls or trust criteria.")
+f(C6, 'legal', 'Restrictions of audit scope statements',
+  "A report covers only the services, systems, locations, subservice organizations and period named in the scope statement, and often excludes customer-side controls. Reading the scope and the user-entity controls tells you what is not assured.",
+  "A clean opinion on one service says nothing about another service from the same provider.")
+f(C6, 'legal', 'Gap analysis and risk and control self-assessment',
+  "Gap analysis compares current controls and baselines with a target standard to find shortfalls. Risk and control self-assessment has control owners evaluate their own risks and controls, then validates the results independently.",
+  "Use gap analysis before an audit and self-assessment to keep control ownership close to the business.")
+f(C6, 'legal', 'Internal ISMS and internal control system',
+  "An information security management system is the organization's own set of policies, roles, risk processes and controls under ISO/IEC 27001. A cloud adopter extends its ISMS to cover providers, with internal and external audits testing it.",
+  "Cloud use should appear in the ISMS scope, risk register and statement of applicability.")
+f(C6, 'legal', 'Policies: organizational, functional and cloud computing',
+  "Organizational policies set top-level direction, functional policies address areas such as access control or encryption, and a cloud computing policy governs acceptable services, data classes allowed, approval and exit. Standards and procedures implement them.",
+  "A cloud policy stops shadow IT by defining who may buy what.")
+f(C6, 'legal', 'Identifying and involving stakeholders',
+  "List and engage the parties affected by cloud decisions: business owners, legal, privacy, risk, security, IT, procurement, audit, the provider and regulators, with defined roles for approval and communication.",
+  "Missing the right stakeholder is a typical root cause of compliance surprises.")
+f(C6, 'legal', 'NERC CIP',
+  "North American Electric Reliability Corporation Critical Infrastructure Protection standards set mandatory cybersecurity requirements for entities operating the bulk electric system, covering asset identification, access control, monitoring, incident response and recovery.",
+  "Using cloud for regulated electric-sector systems demands careful scoping and evidence.")
+f(C6, 'legal', 'PCI DSS',
+  "The Payment Card Industry Data Security Standard, currently version 4.0.1, sets twelve requirements for protecting cardholder data, validated by assessors or self-assessment depending on volume. Cloud customers keep PCI duties and need the provider's responsibility matrix.",
+  "Tokenization shrinks scope, but it does not remove the duty to be compliant.")
+f(C6, 'legal', 'Sarbanes-Oxley (SOX)',
+  "A US law requiring public companies to maintain and report on internal controls over financial reporting. Cloud systems that touch financial data fall in scope and often rely on SOC 1 reports from providers.",
+  "SOX is about financial reporting integrity, not general privacy.")
+f(C6, 'legal', 'Impact of distributed IT',
+  "Spreading systems across regions, providers and countries multiplies the legal jurisdictions, time zones, languages and support models involved, complicating residency, incident coordination, audit and contract enforcement.",
+  "Control with a data location policy, regional architecture and a governance model.")
+f(C6, 'legal', 'Cloud impact on enterprise risk management',
+  "Cloud shifts risk from capital to operating, adds provider and concentration risk, changes visibility and control and requires the enterprise risk program to include provider assessments, risk appetite statements for cloud and monitoring of key risk indicators.",
+  "Cloud risk belongs in the enterprise risk register with an owner.")
+f(C6, 'legal', 'Risk frameworks',
+  "Common frameworks include ISO 31000 (principles and process), the NIST Risk Management Framework (SP 800-37), COSO Enterprise Risk Management, ISO/IEC 27005 for information security risk and the ENISA cloud risk assessment guidance.",
+  "Know which is general (ISO 31000) and which is system-focused (NIST RMF).")
+f(C6, 'legal', 'Risk metrics and key risk indicators',
+  "Key risk indicators measure the exposure that predicts trouble, such as the number of public storage buckets, unpatched critical vulnerabilities, overdue access reviews or vendors without current audit reports.",
+  "Good metrics are measurable, tied to risk appetite and trigger action when thresholds are crossed.")
+f(C6, 'legal', 'Assessing the risk environment',
+  "Evaluate risk at several levels: the specific service, the vendor, the supporting infrastructure and the business process it supports, and combine them into a risk profile compared with the organization's appetite.",
+  "A strong vendor can still host a risky service if configured poorly.")
+f(C6, 'legal', 'Risk sharing',
+  "Risk sharing splits the consequence with another party by contract, joint ventures or pooled insurance, whereas transfer moves the financial impact entirely. Both leave accountability with the organization.",
+  "The outline lists avoid, mitigate, transfer, share and accept as separate treatments.")
+f(C6, 'legal', 'Master service agreement and statement of work',
+  "A master service agreement sets the general legal terms between customer and provider; a statement of work defines specific deliverables, scope, timeline and fees under it; the SLA sets measurable service levels and remedies.",
+  "Order of precedence matters when the documents conflict, so state it in the contract.")
+f(C6, 'legal', 'Vendor viability, lock-in and escrow',
+  "Assess a provider's financial health, ownership and dependence on subcontractors. Source code, configuration or data escrow with a neutral party protects the customer if the vendor fails, and exit plans address lock-in.",
+  "Escrow helps for software and custom platforms; for public cloud, data portability matters more.")
+f(C6, 'legal', 'Contract terms: termination, litigation and data ownership',
+  "Cover termination rights and data return and deletion, notice periods, liability caps, litigation and legal hold support, right to audit, data ownership staying with the customer, breach notification, subprocessor control and cyber risk insurance requirements.",
+  "Write exit terms before signing, because leverage disappears after migration.")
+f(C6, 'legal', 'Regulatory transparency requirements',
+  "Duties to disclose, such as breach notification (GDPR within 72 hours to the authority), financial reporting controls under Sarbanes-Oxley and records of processing. Contracts must make the provider supply the facts and timelines needed to meet them.",
+  "The provider's notice period must be shorter than the customer's legal deadline.")
+f(C6, 'legal', 'Assessing a provider risk management program',
+  "Review the provider's risk methodology, control framework, policies, risk profile and appetite, independent audit results and history, and compare them with your own requirements before and during the relationship.",
+  "Due diligence happens before signing; ongoing assessment is due care.")
+
+# ---- questions added in the August 2026 outline refresh: Domain 1
+mc(C1, 'found', "A university wants its agency partners to resell a managed analytics service under their own brand, adding billing and support. The partners contract with the provider but the university's student data flows through the platform. Which statement about accountability is MOST accurate?",
+   "The university remains accountable to regulators for the student data, whatever the reseller adds",
+   ["The reseller becomes the legal owner of the data once it adds billing and support", "Accountability passes to the provider once the reseller contract is signed, because the agency only resells the service", "Accountability is split evenly among the university, the reseller and the provider because each handles the data"],
+   "Brokers and resellers add value or convenience but do not take over the data owner's regulatory accountability. Ownership does not move by reselling, the provider is a processor or custodian rather than the accountable owner, and an even split is not how accountability works.",
+   "Role vocabulary (partner, broker, regulator) is part of the reference architecture and is tested through accountability scenarios.")
+mc(C1, 'found', "A security architect reviews a proposed design and asks, for each activity in the reference architecture, which role performs it, so that every control has an owner. What is the PRIMARY benefit of this exercise?",
+   "It exposes controls that nobody owns before the service goes live",
+   ["It allows the customer to hand the operation of every control to the provider and stop reviewing them", "It proves the provider holds a current ISO certificate", "It removes the need for a written contract, because the activity mapping already records each duty"],
+   "Mapping activities to roles is a responsibility checklist: a control with no owner is a gap. It does not transfer duties to the provider, does not evidence certification and does not replace a contract.")
+mc(C1, 'found', "A company is comparing two designs. Design one uses compute instances the company patches. Design two uses a managed function service where the company supplies only code. Which statement BEST compares the responsibility for operating system patching?",
+   "In the second design the provider patches the host, while the company still owns function permissions and code",
+   ["Both designs leave host patching to the customer, because compute services are always customer-managed in every model", "In the first design the provider patches the guest operating system because it owns the hardware", "Neither design requires any patching by the company, because cloud resources are kept secure by the provider by default"],
+   "Serverless pushes host operating system patching to the provider; the customer keeps permissions, code, dependencies and data. In the first design the guest operating system is the customer's job, and cloud does not remove patching.")
+mc(C1, 'found', "A consultant reviews a company's cloud risk register and notes that most of the 'top threats' it lists concern misconfiguration, weak identity controls and insecure APIs rather than provider breaches. Which conclusion follows MOST directly?",
+   "Governance, change control and identity management on the customer side deserve the most attention",
+   ["The provider's hypervisor is the most likely entry point for attackers", "Encryption of all stored data would remove the listed risks entirely, so no other control needs attention", "Moving to a private cloud eliminates these threat categories, because the listed threats occur only in public clouds"],
+   "Industry threat reports consistently rank misconfiguration, identity and API weaknesses at the top, which are customer-side concerns managed through change control and access governance. The hypervisor is rarely the entry point, encryption does not fix misconfiguration and private clouds still have configuration and identity risk.",
+   "Tests recognition of where real cloud incidents originate.")
+mc(C1, 'found', "A decommissioned virtual disk volume must be sanitized before the cloud account is closed. The team cannot access the provider's hardware and the data is encrypted with a customer-managed key. Which approach gives the HIGHEST assurance?",
+   "Destroy every copy of the key and document the destruction",
+   ["Overwrite the volume once from within the virtual machine", "Delete the volume through the console and trust the status message", "Ask the provider to reformat the volume without evidence"],
+   "Cryptographic erase is the purge-level technique available to customers on shared storage. Overwriting from a guest cannot reach wear-leveled or replicated copies, console deletion is logical, and an unevidenced reformat gives no proof.")
+mc(C1, 'found', "A multinational wants to ensure engineers can only create resources in two approved regions to honor data residency promises. Which control MOST directly enforces this?",
+   "A policy that denies resource creation outside the approved regions at the account level",
+   ["Training engineers on the residency policy at onboarding and trusting them to follow it for each deployment", "An alert that reports resources in other regions after a week", "Encryption of all data with provider-managed keys, which hides content from outsiders but not from the platform"],
+   "A preventive guardrail enforced centrally blocks the violation; training and delayed alerts only detect or hope, and provider-managed encryption does not constrain location.")
+mc(C1, 'found', "A finance director asks whether to buy a new intrusion detection subscription. Expected annual loss from the targeted threat is 80000 and the control would cut it to 30000 for an annual cost of 20000. What is the BEST conclusion?",
+   "Approve it, because the annual loss reduction exceeds its annual cost",
+   ["Reject it, because the residual annual loss is still above zero", "Reject it, because the control costs more than the remaining loss", "Defer it, because a control must remove the whole risk to be worthwhile"],
+   "The reduction of 50000 exceeds the 20000 cost, so the safeguard has positive value. Perfect risk removal is not required, and the cost is compared with the avoided loss, not with the residual loss.",
+   "Applies cost-benefit reasoning from the BIA and risk topics.")
+mc(C1, 'found', "Two cloud providers both offer an acceptable SLA. The architect wants a first-pass evaluation that is objective rather than based on presentations. What should she do FIRST?",
+   "Define the security and compliance criteria, then compare each provider's evidence against them",
+   ["Choose the provider with the larger market share, since popularity indicates that its controls have been proven", "Ask each provider to submit its own ranking of its strengths and choose the highest self-score", "Select the cheaper option and review security after migration"],
+   "Evaluation starts with criteria derived from business and regulatory requirements; evidence such as audit reports and certifications is then compared. Market share, self-ranking and post-migration review do not verify requirements.")
+mc(C1, 'found', "A procurement team notes that a provider's hypervisor holds a Common Criteria certification at a high assurance level. How should the architect interpret this?",
+   "It evaluates that product against a stated security target and does not certify the entire cloud service",
+   ["It proves every customer workload on the platform is secure", "It replaces the need for a SOC 2 report on the service, because both assess the same scope and criteria", "It confirms that the provider meets every privacy regulation applicable to the customer's workloads"],
+   "Common Criteria evaluates products against a security target, so it supports one component's assurance. It cannot vouch for customer workloads, replace service-level audit reports or establish privacy compliance.",
+   "System and product certifications are a named part of provider evaluation.")
+mc(C1, 'found', "A cloud customer requires that cryptographic keys be generated in validated hardware. A vendor presents a certificate for a FIPS 140-2 validated module that was issued in 2019. What is the MOST appropriate next step?",
+   "Confirm the exact module and version are validated, check its status and plan for FIPS 140-3",
+   ["Accept it as sufficient, because FIPS 140 validation applies to a provider as a whole organization", "Reject it outright, because FIPS 140 applies only to software libraries and never to hardware modules", "Ignore the date because validation never changes"],
+   "Validation is specific to a module, version and operating environment, and 140-2 modules moved to the Historical list in September 2026 (usable only in existing systems), so replacement under 140-3 should be planned. FIPS 140 covers hardware and software modules, not whole providers, and status does change.")
+mc(C1, 'found', "A security team deploys a machine learning model that scores sign-in events and automatically blocks accounts above a threshold. Which risk deserves the MOST attention before enabling automatic blocking?",
+   "False positives locking out legitimate users when the model is not validated against real traffic",
+   ["The model cannot be hosted in a cloud environment because training data must stay on premises", "Machine learning cannot analyze identity logs because they contain too little structured information", "Automated blocking decisions are prohibited in every jurisdiction, so the model can only report"],
+   "Unvalidated models cause false positives and false negatives; consequential actions need testing, tuning and human review. Models can run in the cloud, can analyze identity logs and are not generally prohibited.")
+mc(C1, 'found', "A bank trains a fraud model using transaction data pulled from a partner's shared storage. An analyst notices that some records look unusual and cannot say where they came from. Which control would have BEST reduced the risk of poisoned training data?",
+   "Verifying data provenance and integrity before the data enters the training pipeline",
+   ["Increasing the number of training epochs so that the model averages out any bad records", "Encrypting the finished model at rest, which protects the file but not the data it learned from", "Moving training to a larger compute instance so poisoned records are diluted by the extra capacity"],
+   "Provenance and integrity checks catch tampered or untrusted data at the entry point. More training, encrypting the output and bigger instances do nothing about bad inputs.")
+mc(C1, 'found', "An organization plans a customer-facing system that uses a high-risk automated decision about loan eligibility. Which activity is MOST consistent with responsible AI governance?",
+   "Assess bias and impact, document the model's purpose and keep human oversight of decisions",
+   ["Keep the model logic secret from internal risk and compliance teams to protect intellectual property", "Remove all logging to protect customer privacy", "Rely on the provider's published marketing claims of fairness instead of testing outputs for the use case"],
+   "Impact and bias assessment, documentation and human oversight are core to ethical and regulatory expectations such as the EU AI Act's high-risk duties. Secrecy from risk teams, removing logs and trusting marketing undermine accountability.")
+ms(C1, 'found', "Which TWO statements about the NIST AI Risk Management Framework and the EU AI Act are accurate? (Choose two.)",
+   ["The NIST framework organizes AI risk work into govern, map, measure and manage", "The EU AI Act classifies AI systems into risk tiers with stricter duties for higher risk"],
+   ["The EU AI Act applies only to organizations established in the United States", "The NIST framework is a binding law with fines for non-compliance", "Both documents prohibit the use of cloud platforms for AI"],
+   "The NIST framework is voluntary guidance with four functions. The EU AI Act is a regulation with a risk-based structure that can reach providers and deployers outside the EU when systems are used there. Neither bans cloud use.")
+ms(C1, 'found', "Which TWO design measures best support ephemeral computing without losing investigative ability? (Choose two.)",
+   ["Shipping logs to a protected central store before instances terminate", "Automating snapshot capture of a suspect instance before it is replaced"],
+   ["Allowing administrators to patch instances manually in place", "Storing evidence on the instance's local disk", "Disabling logging to reduce cost"],
+   "Short-lived resources disappear with their local state, so evidence has to leave first through central logging and automated capture. Manual in-place changes defeat immutability, local disks vanish and disabled logs leave nothing to investigate.")
+ms(C1, 'found', "Which THREE items are valid inputs when evaluating a cloud service provider against criteria? (Choose three.)",
+   ["Independent audit reports and certifications with their scope statements", "Data location, key management and exit terms in the contract", "The provider's incident history and breach transparency"],
+   ["The number of followers the provider has on social media", "A competitor's opinion of the provider"],
+   "Evaluation depends on verifiable evidence: scoped audit reports, contract terms and incident record. Popularity and competitor opinions are unverified.")
+tf(C1, 'found', "The ISO/IEC 17788 cloud service partner role includes sub-roles such as the service developer, auditor and service broker.", True,
+   "Partners support either customer or provider; the outline lists customer, provider, partner, broker and regulator as the roles to know.")
+tf(C1, 'found', "A Common Criteria certificate for a product proves that a cloud service built on it meets every customer requirement.", False,
+   "It evaluates the product against its security target only, not a whole service or a customer's workload.")
+tf(C1, 'found', "FIPS 140-2 validated modules remain acceptable for new federal systems without limit, because FIPS 140-3 is optional.", False,
+   "FIPS 140-3 supersedes 140-2, and after September 21, 2026 modules validated only under 140-2 are on the Historical list for existing systems.")
+tf(C1, 'found', "The outline expects a CCSP to weigh ethical concerns and regulatory requirements when comparing AI and machine learning options.", True,
+   "AI and ML appear in the outline in cloud design, data protection and operations, including ethics, validation of data sources and regulation.")
+tf(C1, 'found', "Geofencing by IP geolocation is a complete control for data residency because it cannot be bypassed.", False,
+   "Geolocation can be spoofed or routed around; combine regional policies, identity controls and encryption.")
+
+# ---- questions added in the August 2026 outline refresh: Domain 2
+mc(C2, 'life', "A team stores training images for a model in a volume attached to a virtual machine and in an object bucket, and archives older sets to a cold tier. Which pairing of storage type and primary exposure is MOST accurate?",
+   "Object bucket: public access through misconfigured permissions",
+   ["Cold archive tier: high exposure to latency spikes during live queries", "Attached volume: unlimited public exposure through bucket policy", "Object bucket: loss of all data when the instance restarts"],
+   "Object stores are accessed through APIs and policies, so permission mistakes are the classic exposure. Archive tiers trade retrieval speed for cost, volumes have no bucket policy and object data survives instance restarts, unlike ephemeral storage.")
+mc(C2, 'life', "A data protection team must find where regulated records sit across hundreds of cloud accounts, including spreadsheets, a document database and application logs in JSON. Which approach is MOST suitable?",
+   "Use discovery that combines schema scans, content inspection and parsing of semi-structured formats",
+   ["Rely only on column names and table descriptions in the relational database to find sensitive data", "Ask each team to email a list of what it believes it stores and take those lists as complete", "Scan only the file shares because logs never hold personal data"],
+   "Different data types need different techniques, and continuous automated discovery covers the estate. Column names miss content, self-reporting is incomplete and logs often contain personal data.")
+mc(C2, 'life', "A hospital's data map shows a patient portal copying records to an analytics bucket in another country. The privacy officer wants to know the lawful basis and retention for that flow. Which artifact BEST supports this?",
+   "A data map recording sources, owners, purposes, locations and legal basis for each element",
+   ["A network diagram that shows IP address ranges and firewall rules for every environment", "The provider's physical data center audit report, which describes facilities rather than data flows", "A list of users who hold administrator rights across the environments that process the data"],
+   "Data mapping ties each element to its purpose, location and legal basis. Network diagrams, facility reports and administrator lists do not answer lawful basis or retention.")
+mc(C2, 'life', "An engineering firm shares design files with a subcontractor and must be able to stop that subcontractor from printing or forwarding the files and to withdraw access at the end of the contract. Which control fits BEST?",
+   "Information rights management with a policy server that can revoke licenses",
+   ["Data loss prevention at the corporate email gateway, which inspects outbound mail but cannot reach a copied file", "Static data masking applied to the files before sharing, which cannot be undone once the file is out", "A much longer password on the shared folder, given only to the external party"],
+   "IRM protects the file itself, controls actions such as printing and forwarding and can revoke access. DLP governs egress, masking alters content irreversibly and a password does not control use or revocation.")
+mc(C2, 'life', "A company discovers that revoking an IRM license for a contractor did not stop the contractor from opening a copy previously downloaded to a laptop that stays offline. Which limitation does this illustrate?",
+   "Revocation takes effect only when the client next checks with the policy server",
+   ["IRM cannot protect files stored in cloud storage because the policy server must sit in the same network", "IRM licenses can never be revoked once they have been issued to a recipient's device", "IRM works only on files smaller than a megabyte, so large documents need a different control"],
+   "Offline copies can remain usable until the agent contacts the policy server, so use short license lifetimes for sensitive material. IRM does protect cloud-stored files and licenses can be revoked.")
+mc(C2, 'life', "A records manager moves seven-year financial archives to a cold tier encrypted with a key that is rotated and the old versions destroyed after one year. Five years later the archives cannot be opened. What went wrong?",
+   "The key lifecycle was not aligned with the retention period of the data it protects",
+   ["Cold tier storage cannot hold encrypted data, so the files were silently damaged in the move", "Encryption should never be used for archives, because encrypted files cannot be preserved for years", "The files were too old for any cloud service to read, since formats expire after about five years"],
+   "Archive keys must survive as long as the data; destroying old key versions effectively deleted the archive. Encrypted archives are normal, and age alone does not make files unreadable.")
+mc(C2, 'life', "An investigation requires proof that a privileged user in a SaaS tool exported a customer list on a specific date from an unfamiliar country. Which log attributes matter MOST?",
+   "Unique identity, action, synchronized timestamp and source IP address with geolocation",
+   ["Only the name of the application server that wrote the log entry and the log file size", "The color theme and display language configured on the user's account profile", "The total number of log lines written per day and the average line length"],
+   "Accountability needs who, what, when and where, with reliable time. Server names alone, cosmetic settings and counts do not attribute an action.")
+mc(C2, 'life', "A company wants a signed contract approval to be undeniable later. Which combination BEST provides non-repudiation?",
+   "A digital signature using a private key only the signer controls, plus a trusted timestamp",
+   ["A shared team account and a free-text comment field recording who agreed to the change", "A hash of the document, stored in the same folder and readable by every editor", "An email that states the approver's name, kept in the approver's own mailbox"],
+   "Signatures from a private key held solely by the signer with a trusted time prove origin and integrity and resist denial. Shared accounts, an unsigned hash next to the file or a plain email can all be disputed.")
+mc(C2, 'life', "A data science team fine-tunes a language model on customer support emails, and testing shows the model sometimes reproduces customer phone numbers in answers. Which action addresses the root cause MOST directly?",
+   "Redact or minimize personal data in the training set before fine-tuning and test for memorization",
+   ["Increase the model's response length limit so users receive fuller and more varied answers", "Move the model to a different region so that the records are no longer near their source", "Encrypt the training emails in transit only, and then use them unchanged for fine-tuning"],
+   "Memorization of personal data comes from what was trained on, so minimization, redaction and extraction testing are the controls. Response length, region and in-transit encryption do not stop leakage from weights.")
+mc(C2, 'life', "A research group downloads a pre-trained model file from a public registry and loads it directly into a production training pipeline with broad cloud permissions. Which risk is MOST significant?",
+   "The model file may contain malicious code executed on load, so it should be scanned and verified first",
+   ["The model will be unable to use any graphics processors, which makes it too slow to run safely", "The registry will charge a fee for each download", "The model's accuracy will decrease automatically over time, so it must be retrained each month"],
+   "Model artifacts can embed executable code through unsafe serialization and arrive from untrusted sources; verification, scanning and sandboxed loading mitigate it. The other statements are unrelated to the security risk.")
+mc(C2, 'life', "A legal team places a hold on mailbox data in a SaaS platform whose retention policy deletes items after 90 days. What is the MOST important step to make the hold effective?",
+   "Apply a retention lock or hold that overrides the automatic deletion rule for the relevant custodians",
+   ["Export the mailboxes to local drives and turn off logging", "Tell custodians to stop using email until the matter closes, relying on them to keep their messages", "Wait for the deletion job to run, then restore the items from backup if anyone asks for them"],
+   "A hold must suspend automatic deletion at the platform. Local exports without governance, asking users to stop work and relying on restores risk spoliation.")
+ms(C2, 'life', "Which TWO statements about media sanitization in a cloud context are accurate? (Choose two.)",
+   ["Cryptographic erase is a purge-level technique when strong encryption and key destruction are applied", "Overwriting alone gives weak assurance on virtualized and solid-state storage"],
+   ["Customers can physically destroy the provider's disks on request", "Console deletion always proves that every replica was erased", "Clear, purge and destroy all require physical access to media"],
+   "NIST SP 800-88 treats cryptographic erase as a purge technique, while overwriting cannot be verified across replicas and wear-leveled flash. Customers cannot destroy provider hardware, and logical deletion is not proof.")
+ms(C2, 'life', "Which TWO controls MOST directly mitigate the threat of ransomware deleting versions and backups in cloud storage? (Choose two.)",
+   ["Immutable object lock or retention on backup data", "Separate credentials and accounts for the backup repository"],
+   ["Public read access on backup buckets", "A single administrator account shared by production and backup", "Disabling object versioning to save cost"],
+   "Immutability and credential separation keep attackers from erasing recovery points. Public access, shared admin credentials and no versioning make loss easier.")
+ms(C2, 'life', "Which THREE are data rights or provisioning concepts in information rights management? (Choose three.)",
+   ["Permissions such as view, print, copy and forward", "Expiration dates attached to a license", "Binding rights to users or groups through issued certificates"],
+   ["Increasing the file's compression ratio", "Replacing the document with random tokens"],
+   "IRM defines what recipients may do, when rights expire and how they are issued to identities. Compression and tokenization are unrelated mechanisms.")
+tf(C2, 'life', "Data mapping and data classification are the same activity and one can replace the other.", False,
+   "Mapping records where data is, who owns it and how it flows; classification rates its sensitivity. Both are needed.")
+tf(C2, 'life', "Raw device mapping bypasses the hypervisor's file-system abstraction, so data left on reallocated raw devices is a remanence risk.", True,
+   "Raw storage gives direct device access, which is why sanitization and encryption matter before the device is reused.")
+tf(C2, 'life', "A digital signature alone provides confidentiality for the signed document.", False,
+   "Signatures give integrity, authentication and non-repudiation; confidentiality requires encryption.")
+tf(C2, 'life', "Personal data used to train a model is exempt from privacy law once it has been absorbed into the model weights.", False,
+   "Models can memorize and disclose training data, and privacy duties follow personal data through the training process.")
+tf(C2, 'life', "Archive keys should be kept for as long as the archived data must remain readable.", True,
+   "Destroying the key before retention ends makes the archive unreadable, which can breach retention duties.")
+tf(C2, 'life', "Dynamic data masking permanently alters the stored data so the original values cannot be recovered.", False,
+   "Dynamic masking changes only what a query returns by role; the stored values remain. Static masking produces an altered copy.")
+
+# ---- questions added in the August 2026 outline refresh: Domain 3
+mc(C3, 'infra', "A regulated customer wants assurance that two network carriers serving a colocation site would both survive a single construction accident outside the building. Which design feature matters MOST?",
+   "The carriers' cables enter the building by physically separate routes",
+   ["Both carriers terminate on the same patch panel, which simplifies management and cabling", "The carriers share one conduit into the building, which keeps installation costs low", "Both carriers are chosen from the same parent company to simplify contracts and billing"],
+   "Multi-vendor pathway connectivity only adds resilience when the paths are physically diverse. A shared conduit, a shared parent or a single termination point leaves one failure point.")
+mc(C3, 'infra', "A cloud workload is allowed to continue running during a planned power maintenance in the data center without any customer interruption. Which facility characteristic does this describe?",
+   "Concurrent maintainability, as in a Tier III design",
+   ["A single power path with a generator that is tested yearly", "Basic capacity with no redundant components, as in a Tier I design", "A design that tolerates failure only by shutting down the load"],
+   "Concurrently maintainable sites can take components out of service without shutting down IT load. Tier I has no redundancy, and single paths or shutdown-based maintenance interrupt service.")
+mc(C3, 'infra', "A provider's site has two utility feeds, battery systems and generators, and every component has one spare available. Which description fits this redundancy level?",
+   "N+1",
+   ["2N with a fully duplicated independent path", "N with no spare components", "A shared single feed with surge protection"],
+   "N+1 means the required capacity plus one spare component. 2N duplicates the entire path and N has no spare.")
+mc(C3, 'infra', "A company is deciding whether to build its own data center, lease colocation space or use public cloud regions for a new analytics platform that must be live in six weeks. Which factor argues MOST strongly against building?",
+   "The time and capital needed to construct and certify a facility exceed the deadline",
+   ["Colocation space can never support encryption, so regulated data cannot be placed in it at all", "Public cloud prohibits the use of access control, so data requiring control must be hosted privately", "Building always costs less than any other option once depreciation over twenty years is counted"],
+   "Building takes long lead times and capital and requires proving controls to auditors. Colocation and cloud support encryption and access control, and building is rarely cheaper at small scale.")
+mc(C3, 'infra', "A cloud web application has a server-side request forgery flaw. An attacker uses it to query the workload's local metadata address and obtains temporary credentials for the instance role. Which mitigation reduces the impact MOST effectively?",
+   "Use the session-token version of the metadata service and give the role only the permissions it needs",
+   ["Increase the instance size so the workload can absorb the larger number of malicious requests", "Move the application to a different availability zone so the attacker's request is routed elsewhere", "Rotate the application's TLS certificate every day, which changes the identity but not the credentials stolen"],
+   "Token-protected metadata access and least-privilege roles block both the request pattern and the blast radius. Instance size, zone placement and certificate rotation do not address credential theft through SSRF.")
+mc(C3, 'infra', "After an incident the team needs to prove which payload an attacker sent to a database server, but flow logs show only addresses and ports. What would have provided this evidence?",
+   "Targeted packet capture through traffic mirroring on the affected segment",
+   ["A longer retention period for billing records and the cost allocation reports of the account", "More frequent patching of the provider's management console and its client tools", "A larger number of availability zones for the application tier of the workload"],
+   "Packet capture records content-level data that flow logs omit, and traffic mirroring supplies it in virtual networks. Billing retention, console patching and more zones do not capture payloads.")
+mc(C3, 'infra', "An architect must choose between sharing risk and transferring risk for a major outage of a critical vendor. Which action BEST represents risk sharing?",
+   "Contracting a second provider to carry part of the workload with a split of consequences",
+   ["Declining to assess the vendor at all, on the grounds that its certificate covers the risk", "Removing the workload from the business entirely, which is risk avoidance rather than sharing", "Accepting the risk without a recorded decision, owner or review date for the residual exposure"],
+   "Sharing divides the impact with another party by contract or arrangement. Not assessing, removing the workload (avoidance) and silent acceptance are different or unsound treatments.")
+mc(C3, 'resil', "A BIA states that during recovery the order system needs only about half its normal capacity to keep the business viable. What does this requirement describe?",
+   "Recovery service level",
+   ["Recovery point objective", "Maximum tolerable downtime", "Annualized rate of occurrence"],
+   "The recovery service level is the share of normal capacity required while recovering and allows a smaller recovery environment. RPO is about data loss, MTD is about time and ARO is a risk frequency.")
+mc(C3, 'resil', "A team wants to validate its disaster recovery procedures with minimal risk to production, but a document review alone has not exposed any issues. Which next test is MOST appropriate?",
+   "A tabletop exercise where participants walk through a realistic scenario",
+   ["A full interruption of production during business hours, to see whether the recovery procedures hold up", "No further testing, since a thorough document review proves that the procedures will work", "Deleting the primary site in production to prove that the backup works under real conditions"],
+   "A tabletop is a low-risk step up in realism from a document review. A full interruption carries high risk and no testing leaves assumptions unproven.")
+mc(C3, 'resil', "A risk analyst values an application server at 200000, estimates that an outage would destroy 25 percent of that value and expects it twice a year. What is the annualized loss expectancy?",
+   "100000",
+   ["50000", "200000", "400000"],
+   "Single loss expectancy is 200000 times 0.25, giving 50000; multiplied by an annual rate of 2 the annualized loss expectancy is 100000. The other values come from missing one of the steps.")
+mc(C3, 'infra', "A cloud security team must show an auditor how an attacker moved from a stolen developer token to an object store. Which capability is MOST essential?",
+   "Correlation of identity, management-plane and storage access logs across sources",
+   ["Larger log retention on a single local disk attached to each of the application servers", "Encryption of the finished audit report with a key held by the audit committee", "Faster processors on the logging servers so that events are written to disk more quickly"],
+   "Correlating events across identity, control-plane and data-plane logs reveals the chain of actions. Retention on one local disk, report encryption and processor speed do not link events.")
+ms(C3, 'infra', "Which TWO design choices improve the resilience of a cloud data center's environmental systems? (Choose two.)",
+   ["Redundant cooling units with monitored temperature sensors", "Clean-agent or pre-action fire suppression suited to equipment rooms"],
+   ["A single air conditioning unit shared by all halls", "Water-based sprinklers that discharge on every detector alarm", "Locating the generator fuel supply in a single shared tank without monitoring"],
+   "Cooling redundancy with monitoring and equipment-safe fire suppression protect continuity. A single cooling unit, indiscriminate water discharge and an unmonitored single fuel point create failure points.")
+ms(C3, 'infra', "Which TWO controls MOST directly protect the confidentiality of data traveling between workloads in different virtual networks? (Choose two.)",
+   ["Mutual TLS between services", "An IPsec VPN or private link with encryption layered on top"],
+   ["A VLAN tag on the traffic", "A larger instance type for the sending workload", "Disabling flow logs"],
+   "Encryption in transit, whether TLS or IPsec, protects confidentiality. VLAN tags only separate traffic and are not encryption, and instance size or logging settings do not encrypt.")
+ms(C3, 'resil', "Which TWO statements about qualitative and quantitative risk analysis are accurate? (Choose two.)",
+   ["Quantitative analysis supports cost-benefit decisions when reliable data exists", "Qualitative analysis ranks risks on scales and is quicker but more subjective"],
+   ["Quantitative analysis never needs asset values", "Qualitative analysis produces annualized loss expectancy in currency", "The two methods cannot be combined in one program"],
+   "Quantitative uses values and probabilities for cost-benefit; qualitative uses ratings. Many programs combine them.")
+tf(C3, 'infra', "Two carriers entering a data center through the same trench give full protection against a single cable cut.", False,
+   "Physical path diversity is required; carriers sharing one trench share a failure point.")
+tf(C3, 'infra', "The Uptime Institute Tier III classification describes a concurrently maintainable site.", True,
+   "Tier III allows planned maintenance without shutting down IT load; Tier IV adds fault tolerance.")
+tf(C3, 'resil', "Annualized loss expectancy equals single loss expectancy multiplied by the annualized rate of occurrence.", True,
+   "ALE = SLE x ARO; compare the reduction against the annual cost of the safeguard.")
+tf(C3, 'infra', "A VLAN encrypts traffic between its members.", False,
+   "VLANs segment broadcast domains but provide no encryption; misconfigured trunks can even enable VLAN hopping.")
+
+# ---- questions added in the August 2026 outline refresh: Domain 4
+mc(C4, 'app', "A product team wants security requirements that can be verified in testing and that scale with the sensitivity of each application, from low-risk internal tools to payment services. Which resource is MOST appropriate as the basis?",
+   "The OWASP Application Security Verification Standard with its assurance levels",
+   ["The OWASP Top 10 used as a pass or fail certificate", "A single penetration test report from last year", "A list of programming languages approved by the architects and the versions of each they allow"],
+   "ASVS provides testable requirements at graduated levels. The Top 10 is an awareness list rather than a standard to certify against, an old test report is not a requirement set and a language list does not define security.")
+mc(C4, 'app', "A developer team building a customer-facing assistant that calls internal tools wants a risk list tailored to large language model applications. Which source is MOST relevant?",
+   "The OWASP Top 10 for Large Language Model Applications",
+   ["The OWASP Top 10 for web applications alone, since it already covers every application type", "The CWE Top 25 alone, because it is the only list that ranks weaknesses by severity", "A generic list of network ports and the services that traditionally use each of them on servers"],
+   "The LLM list covers prompt injection, excessive agency, output handling and model poisoning that general web lists omit. The web Top 10 and CWE list are useful but not tailored, and port lists are unrelated.")
+mc(C4, 'app', "A new feature lets a user reset a password. In design review a security engineer proposes a list of ways an attacker could misuse it: enumerating accounts, flooding the endpoint and replaying a token. What is this technique?",
+   "Abuse case analysis feeding negative tests",
+   ["Functional regression testing of the happy path", "Capacity planning for the endpoint", "Software composition analysis of dependencies"],
+   "Abuse cases describe malicious use and become negative tests. Happy-path regression checks intended behavior, capacity planning concerns load and composition analysis inspects libraries.")
+mc(C4, 'app', "A threat model produced a long list of threats categorized with STRIDE. The team now needs to rank them so the highest risks are fixed first. Which scoring model is named in the outline for this purpose?",
+   "DREAD",
+   ["PASTA", "SAFECode", "ATASM"],
+   "DREAD scores damage, reproducibility, exploitability, affected users and discoverability. PASTA and ATASM are modeling methods and SAFECode is a body of practice guidance.")
+mc(C4, 'app', "An organization wants a threat modeling approach tied to business objectives that simulates attacker behavior in several defined stages. Which method fits BEST?",
+   "PASTA",
+   ["DREAD", "STRIDE", "CVSS"],
+   "PASTA is a seven-stage, risk-centric process linking business goals to attack simulation. DREAD and CVSS score threats or vulnerabilities and STRIDE categorizes threat types.")
+mc(C4, 'app', "A team sees that its code scanner flags a library problem in release 4.2, but the release cannot be reproduced because the configuration and dependency versions were edited by hand on a server. Which practice would have prevented this?",
+   "Software configuration management with version control and tagged, reproducible builds",
+   ["Disabling the code scanner for older releases so that only new releases generate findings", "Moving the application to a larger virtual machine", "Giving every developer root access to production so that fixes can be applied directly on servers"],
+   "Version-controlled code, configuration and dependencies make any build reproducible and traceable. Turning off scanning, sizing up and widening access make things worse.")
+mc(C4, 'app', "A team can see the source code of a SaaS integration and tests its logic for injection flaws without running it. Which testing category is this?",
+   "White-box testing using static analysis",
+   ["Black-box testing using fuzzing", "Gray-box testing without code access", "Load testing for performance"],
+   "Inspecting source without running it is static, white-box testing. Fuzzing runs the program from outside, gray-box testing has partial knowledge and load testing is non-functional performance work.")
+mc(C4, 'app', "A company relies on an open-source library that a single maintainer abandoned, with a license that requires publishing derived source. What is the MOST appropriate response?",
+   "Review license obligations and maintainer health, then replace or fork under a managed process",
+   ["Keep using it unchanged, because open-source software carries no license or maintenance obligations for the user", "Remove all versioning information to avoid disclosure", "Allow each team to pull whichever copy of the library it prefers from public sources"],
+   "Open-source intake includes license review and health assessment, with a plan to replace or maintain. Ignoring obligations, hiding version data and unrestricted downloads increase risk.")
+mc(C4, 'app', "A build pipeline deploys whatever artifact a developer uploads to a shared registry. An attacker uploads a modified image to the registry. Which control would block it at deployment time?",
+   "Signature verification against trusted keys with provenance checks",
+   ["Increasing the registry's storage capacity and adding mirror copies across regions", "A longer retention period for build logs and the records of every pipeline run", "Renaming the registry repository and publishing the new name to every developer"],
+   "Verifying signatures and provenance before deploy rejects unsigned or tampered artifacts. Storage, log retention and renaming do not authenticate the artifact.")
+mc(C4, 'app', "A legacy partner sends large XML messages to a cloud service, and a malformed message with an external entity reference crashed a parser last month. Which component would BEST filter such traffic before it reaches the application?",
+   "An XML firewall that validates schemas and blocks malformed messages",
+   ["A hardware security module", "A database activity monitor", "A content delivery cache"],
+   "XML firewalls inspect and validate XML and SOAP traffic. HSMs protect keys, activity monitors watch database queries and caches speed delivery.")
+mc(C4, 'app', "A company exposes many internal services as APIs and wants one place to authenticate callers, rate limit and log requests, while each service still checks authorization for its own objects. Which component fits?",
+   "An API gateway in front of the services",
+   ["A file integrity monitor", "A bastion host", "A honeypot"],
+   "A gateway centralizes authentication, throttling and logging at the edge. File integrity monitors, bastions and honeypots do not serve API traffic.")
+mc(C4, 'app', "A team needs to open email attachments from unknown senders to check for malware in the cloud, without any risk to production systems. What is the BEST approach?",
+   "Detonate them in an isolated sandbox with no route to production",
+   ["Open them on a developer's laptop, which has VPN access and a current antivirus tool", "Copy them to the production file share first", "Disable antivirus on a shared server so that the files cannot be quarantined during the test"],
+   "Sandboxes isolate untrusted content with restricted permissions and network access. The other choices expose real systems.")
+mc(C4, 'iam', "A SaaS application trusts sign-in assertions from an external identity provider. The provider's signing key is stolen. What is the MOST significant consequence?",
+   "An attacker can forge assertions and sign in as any user across the federated applications",
+   ["Only the provider's public marketing site is affected, because assertions never reach other applications", "Users must pick much longer passwords for every federated application to stay safe", "Application logs begin to delete themselves automatically, hiding the signs of earlier logins"],
+   "Federation trusts the signed assertion, so a stolen signing key lets an attacker impersonate anyone in every relying application. The other outcomes are unrelated.")
+mc(C4, 'app', "A development team in a regulated company wants to avoid a single failure where both the code review and the build approval are done by the same person. Which principle does this support?",
+   "Separation of duties in the delivery pipeline",
+   ["Security through obscurity", "Weak coupling of services", "Role stacking for efficiency"],
+   "Separating review from approval prevents one person from pushing unreviewed changes. Obscurity, loose coupling and stacking roles do not provide that control.")
+ms(C4, 'app', "Which TWO statements about functional and non-functional testing are accurate? (Choose two.)",
+   ["Security, performance and availability testing are non-functional", "A feature can pass every functional test and still be exploitable"],
+   ["Non-functional testing checks only that features match the requirement document", "Functional testing is the only type that can run in a pipeline", "Security testing is outside the testing lifecycle"],
+   "Functional testing checks behavior against requirements; security and other qualities are non-functional and both can be automated in pipelines.")
+ms(C4, 'app', "Which TWO measures help secure a continuous integration and delivery pipeline? (Choose two.)",
+   ["Short-lived credentials with least privilege for build jobs", "Protected branches with required reviews and signed artifacts"],
+   ["A single long-lived administrator key shared by all jobs", "Allowing build agents to reach any internal network without restriction", "Storing secrets in the repository for easy access"],
+   "Least-privilege short-lived credentials and protected, signed delivery limit what a compromise can do. Shared administrator keys, unrestricted agents and committed secrets are classic pipeline failures.")
+ms(C4, 'app', "Which THREE belong in third-party software management? (Choose three.)",
+   ["An inventory of every external component and service", "Vendor and license review before adoption", "Tracking of vulnerabilities with a plan for replacement or patches"],
+   ["Trusting any package with many downloads without verification", "Letting each developer decide silently which components to use"],
+   "Inventory, vendor and license review and vulnerability tracking are the foundation. Popularity is not verification and ad hoc decisions create blind spots.")
+tf(C4, 'app', "In the OWASP Top 10:2025, broken access control is still listed first.", True,
+   "The 2025 edition keeps broken access control at number one and adds categories for supply chain failures and mishandling of exceptional conditions.")
+tf(C4, 'app', "The ASVS is a certification that an application passes once and keeps permanently.", False,
+   "ASVS is a requirements and verification standard with levels; it is applied per application and revisited as the application changes.")
+tf(C4, 'app', "A white-box test requires access to the source code or design of the application.", True,
+   "White-box testers have internal knowledge; black-box testers have none and gray-box testers have partial knowledge.")
+tf(C4, 'app', "An API gateway removes the need for each service to perform its own authorization checks.", False,
+   "The gateway enforces edge policy, but object-level authorization must still be checked by the service.")
+tf(C4, 'app', "Signed build provenance helps detect that an artifact was not produced by the expected pipeline.", True,
+   "Signature and provenance verification address integrity and authenticity in the supply chain.")
+tf(C4, 'iam', "Compromise of a federated identity provider's signing key affects only one application.", False,
+   "Every relying application that trusts the provider's signature is exposed.")
+
+# ---- questions added in the August 2026 outline refresh: Domain 5
+mc(C5, 'buildops', "A new virtual machine image template exposes remote desktop and secure shell ports to the internet, has a default administrator password and logging disabled. Which principle was MOST clearly ignored?",
+   "Secure by default configuration",
+   ["Elastic scaling of resources", "Resource pooling among tenants", "Broad network access for customers"],
+   "Safe initial settings (closed ports, no default credentials, logging on) define secure by default. Elasticity, pooling and broad access are cloud characteristics, not configuration principles.")
+mc(C5, 'buildops', "Administrators in a cloud environment need to manage servers in private subnets. Which design BEST limits exposure?",
+   "A hardened bastion with multi-factor authentication and recorded sessions as the only entry point",
+   ["Public addresses on every server, protected only by strong passwords that are changed each quarter", "A single shared administrator account protected by a very long password stored in a team vault", "Open inbound access from the whole internet to the management port"],
+   "A controlled jump point reduces exposed surface and adds accountability. Public addresses, shared accounts and open ports increase attack surface.")
+mc(C5, 'buildops', "A hypervisor cluster must apply a firmware patch to one host without causing downtime for hosted applications. Which operational feature makes this possible?",
+   "Placing the host in maintenance mode so workloads migrate to other hosts first",
+   ["Powering off the host immediately and restarting the guests once the update has finished", "Disabling monitoring on the cluster so that the update does not trigger alerts and tickets", "Deleting the guest virtual machines and rebuilding them from templates after the update"],
+   "Maintenance mode evacuates workloads before servicing, relying on cluster capacity. Powering off, disabling monitoring and deleting guests cause avoidable outage or blindness.")
+mc(C5, 'buildops', "A cluster's high availability configuration restarts virtual machines on surviving hosts after a node failure, but during a test several machines failed to restart. What is the MOST likely design flaw?",
+   "Insufficient reserved failover capacity on the remaining hosts",
+   ["The hosts used encrypted storage, which prevents guests from being restarted on another host", "The virtual machines were too small to run their applications once the host recovered", "The network used a VLAN"],
+   "High availability needs spare capacity to absorb failed hosts' workloads. Encryption, small guests or VLANs do not prevent restarts.")
+mc(C5, 'buildops', "A monitoring dashboard shows one host's fan speed dropping and temperature rising. What is the BEST response?",
+   "Migrate workloads away and repair the hardware before it fails",
+   ["Wait until the host crashes to confirm the problem and then rebuild it from a template", "Turn off hardware alerts for the whole fleet to reduce noise and operator fatigue", "Raise the host's utilization to burn off the heat in the processor and the fans"],
+   "Hardware monitoring exists to act before failure. Waiting, silencing alerts and increasing load make failure more likely.")
+mc(C5, 'buildops', "A team sees a sudden, sustained rise in compute usage in an account at night with no deployment scheduled. Which interpretation deserves FIRST attention?",
+   "Possible abuse such as cryptomining through stolen credentials",
+   ["A routine seasonal backup of the monitoring software", "Normal behavior of a scheduled change nobody recorded", "A sign that the provider's service level has improved and fewer instances are needed"],
+   "Unexplained sustained usage is a classic abuse indicator and should be investigated. The other explanations ignore the absence of a recorded change.")
+mc(C5, 'buildops', "A security lead wants operating systems to stay in a known good state: documented settings, automated detection of deviations and prompt correction. Which cycle describes this?",
+   "Baseline, monitor and remediate against an approved configuration",
+   ["Deploy once and archive the image, since a deployed system should never change", "Patch only after an incident has shown that a weakness is exploited", "Allow administrators to change settings freely whenever an application owner requests it"],
+   "Hardening is maintained by baselining, monitoring drift and remediating. One-time deployment, reactive patching and free changes allow drift.")
+mc(C5, 'buildops', "An organization wants a certifiable standard it can use to demonstrate a formal IT service management system, covering incident, change and service level processes. Which should it choose?",
+   "ISO/IEC 20000-1",
+   ["ISO/IEC 27001", "COBIT 2019", "CIS Critical Security Controls"],
+   "ISO/IEC 20000-1 specifies a service management system. ISO/IEC 27001 certifies an information security management system, COBIT is a governance framework and CIS Controls are prioritized safeguards.")
+mc(C5, 'buildops', "A board wants one framework to organize cybersecurity outcomes around govern, identify, protect, detect, respond and recover. Which is it?",
+   "NIST Cybersecurity Framework 2.0",
+   ["ITIL 4", "PCI DSS", "The COSO internal control framework"],
+   "CSF 2.0 organizes outcomes into those six functions, including the new Govern function. ITIL, PCI DSS and COSO have different structures and purposes.")
+mc(C5, 'buildops', "A small company with limited staff wants a prioritized set of safeguards that scales to its size, starting with essential hygiene. Which resource fits BEST?",
+   "CIS Critical Security Controls using implementation groups",
+   ["The full catalog of the NIST SP 800-53 high baseline applied to every system", "A COBIT governance design built for a multinational with a large internal audit team", "A PCI DSS assessment covering all company data, not only payment card data"],
+   "CIS Controls implementation groups let smaller organizations start with essential safeguards. A high baseline catalog, an enterprise governance design and a payment assessment are not sized or targeted for that goal.")
+mc(C5, 'ops', "A cloud provider needs to tell customers about a maintenance window and a security incident affecting several tenants. Which preparation BEST ensures consistent and timely communication?",
+   "Predefined stakeholder lists, channels and approved templates with named owners",
+   ["Letting each engineer email affected customers individually with whatever details he or she has", "Posting only on social media after the incident has already been reported in the press", "Sending nothing to anyone until a regulator or a customer requests an explanation"],
+   "Planned channels, owners and approved wording make communication timely and consistent. Ad hoc emails, delayed posts and silence create legal and trust failures.")
+mc(C5, 'ops', "Service restoration for a failing application succeeded within ten minutes, but the same failure recurred three times that week. Which ITIL-style process should now take over?",
+   "Problem management to find and remove the root cause",
+   ["Release management, which ships more features in each release cycle", "Capacity management, which plans resources and removes unused storage after the incident", "Continuity management, which would relocate the data center to a different region"],
+   "Problem management addresses underlying causes of recurring incidents. Release, capacity and continuity management are separate processes.")
+mc(C5, 'ops', "An investigator must collect evidence from a compromised workload and a cloud storage service whose provider logs sit outside the customer's control. Which preparation would have helped MOST?",
+   "Pre-agreed forensic procedures and log access arrangements in the contract",
+   ["A policy that evidence is gathered only after the incident is closed and approved by management", "A verbal promise from the provider's staff to retain all logs informally for as long as needed", "Disabling logging in the affected accounts to avoid creating evidence that could be requested"],
+   "Forensic readiness depends on agreed procedures and access to provider-side data. Late collection, informal promises and disabled logging weaken or destroy evidence.")
+mc(C5, 'ops', "A configuration management database lists server owners, but a post-incident review finds it was months out of date, slowing impact analysis. What is the BEST improvement?",
+   "Automated discovery that continuously updates configuration items",
+   ["Printing the database every month and filing the report with the auditors", "Restricting updates to a single review at the end of each year to save effort", "Removing owner and status fields from every entry to simplify the records"],
+   "Cloud assets change constantly, so discovery must feed the record. Printing, annual updates and removing fields do not keep it accurate.")
+ms(C5, 'buildops', "Which TWO controls MOST directly harden remote administrative access to cloud virtual machines? (Choose two.)",
+   ["Key- or certificate-based secure shell authentication with multi-factor authentication", "Routing access through a bastion host with session recording"],
+   ["Allowing remote desktop from any internet address", "Sharing one local administrator password among all engineers", "Leaving default accounts enabled"],
+   "Strong authentication and a controlled, recorded entry point reduce risk. Open remote desktop, shared passwords and default accounts raise it.")
+ms(C5, 'buildops', "Which TWO statements about DNSSEC and VPNs are accurate? (Choose two.)",
+   ["DNSSEC signs DNS records so resolvers can verify authenticity and integrity", "A VPN encrypts traffic across an untrusted network but extends the network to the endpoint"],
+   ["DNSSEC encrypts the content of DNS queries for privacy", "A VPN removes the need for authentication on the target systems", "Both provide protection for data at rest"],
+   "DNSSEC gives authenticity and integrity, not confidentiality; VPNs protect data in transit but still require endpoint and identity controls. Neither protects data at rest.")
+ms(C5, 'buildops', "Which THREE belong in operating system hardening for cloud virtual machines? (Choose three.)",
+   ["Applying an approved baseline such as a consensus benchmark", "Monitoring for configuration drift", "Removing unused services, accounts and ports"],
+   ["Leaving vendor default passwords for convenience", "Running every service as an administrator"],
+   "Baselines, drift monitoring and attack surface reduction are core hardening steps. Default passwords and excessive privilege weaken systems.")
+ms(C5, 'ops', "Which TWO activities are part of evidence management? (Choose two.)",
+   ["Assigning unique identifiers and logging every transfer of the item", "Storing items in secured, access-controlled locations with integrity hashes"],
+   ["Editing files on the original evidence drive to annotate them", "Sharing evidence through a public link for convenience"],
+   "Tracking and secure storage preserve admissibility. Altering originals or sharing publicly destroys integrity.")
+tf(C5, 'buildops', "A honeypot is a preventive control that blocks attacks before they reach production.", False,
+   "Honeypots detect and study attackers using decoys; they do not block traffic and must be isolated.")
+tf(C5, 'buildops', "Placing a host in maintenance mode lets its workloads migrate before servicing.", True,
+   "This enables patching without downtime when the cluster has spare capacity.")
+tf(C5, 'buildops', "ISO/IEC 27002:2022 contains 93 controls grouped into four themes.", True,
+   "The themes are organizational, people, physical and technological.")
+tf(C5, 'buildops', "DNSSEC provides confidentiality for DNS queries.", False,
+   "DNSSEC provides authenticity and integrity of DNS data; query privacy needs encrypted DNS transport.")
+tf(C5, 'ops', "Incident management and problem management are the same process with different names.", False,
+   "Incident management restores service; problem management removes underlying causes of recurring incidents.")
+tf(C5, 'buildops', "COBIT 2019 is a governance and management framework for enterprise IT.", True,
+   "COBIT 2019 from ISACA helps align IT with business goals and manage risk.")
+tf(C5, 'buildops', "Cluster resilience such as storage replication removes the need for backups.", False,
+   "Replication copies deletions and corruption too; backups protect against them.")
+
+# ---- questions added in the August 2026 outline refresh: Domain 6
+mc(C6, 'legal', "A multinational stores European customer data in a European region of a US provider. A foreign authority orders the provider to hand over the data, while European law forbids that disclosure without a lawful basis. Which action BEST reduces the customer's exposure to this conflict?",
+   "Hold encryption keys under customer control and involve legal counsel to contest or narrow the demand",
+   ["Disable all logging so that no records exist about the request or its handling", "Move the data to whichever region is cheapest this quarter and review jurisdiction later", "Agree to every request from any authority immediately to avoid penalties and delay"],
+   "Customer-held keys limit what the provider can produce and counsel manages the conflict through legal channels. Disabling logs hides evidence, price-driven region moves ignore law and automatic compliance may breach local law.",
+   "Conflicting legislation is a named topic and the answer is minimizing exposure plus legal escalation.")
+mc(C6, 'legal', "A company needs a defensible method for forensic work after a cloud breach and wants standards covering collection of evidence, the suitability of the investigation method, analysis and the overall process. Which set of standards matches?",
+   "ISO/IEC 27037, 27041, 27042 and 27043",
+   ["ISO/IEC 27001, 27002, 27017 and 27018", "ISO/IEC 22301, 31000, 20000-1 and 9001", "ISO/IEC 15408, 17788, 17789 and 27036"],
+   "The 27037 to 27043 series covers evidence handling, method assurance, analysis and investigation processes. The other sets cover management systems, continuity and risk, or product evaluation and cloud vocabulary and supplier relationships.")
+mc(C6, 'legal', "A learning platform stores student grades and records for a US school district in a cloud service. Which law is MOST directly relevant to this data?",
+   "FERPA",
+   ["HIPAA", "PCI DSS", "NERC CIP"],
+   "FERPA protects student education records. HIPAA covers health information, PCI DSS covers payment cards and NERC CIP covers the bulk electric system.")
+mc(C6, 'legal', "A Canadian retailer uses a cloud analytics provider in another country to process customer purchase histories. Which statement about its accountability is MOST accurate under PIPEDA?",
+   "The retailer remains accountable for personal information it transfers for processing, including abroad",
+   ["Accountability ends once the contract with the processor has been signed and filed", "Only the provider is accountable because it holds the data", "No accountability exists for private-sector data, because privacy law applies only to governments"],
+   "PIPEDA keeps the organization accountable for information in the hands of processors and requires comparable protection. The other statements deny continuing accountability.")
+mc(C6, 'legal', "A company discovers a breach of electronic health records held by a business associate that stores them in the cloud. In which time frame must affected individuals generally be notified under US health privacy rules?",
+   "Without unreasonable delay and no later than 60 days after discovery",
+   ["Within 24 hours of the first alert, whether or not a breach is confirmed", "Within 72 hours to the individuals directly, regardless of the facts of the breach", "Only after the next annual audit"],
+   "The breach notification rule requires notice without unreasonable delay and not later than 60 days after discovery. The 72-hour figure is the GDPR deadline for notifying the authority, not the individuals.")
+mc(C6, 'legal', "A team begins planning a new service that profiles customers' behavior across devices. Which activity BEST identifies privacy risks to individuals and the controls to address them before launch?",
+   "A privacy impact assessment performed during design",
+   ["A penetration test performed shortly after launch by an external team", "A disaster recovery drill performed after launch to rehearse the failover plan", "A cost estimate performed by procurement during vendor selection"],
+   "A privacy impact assessment at design time finds risks to individuals and changes the design. The other activities test security, recovery or cost.")
+mc(C6, 'legal', "An auditor reviewing a SaaS provider's SOC report notes that it covers only the provider's main application and excludes the analytics module the customer actually uses. What should the customer do?",
+   "Treat the analytics module as unassured, ask for scope extension or compensating evidence and apply customer controls",
+   ["Assume the whole provider is covered by the clean opinion, since the auditor signed it", "Ignore the exclusion, because audit reports do not list scope and apply to every service", "Accept the report as it stands, because it was issued by a well-known audit firm"],
+   "Scope statements define what is assured; excluded services need other evidence. A clean opinion on one service does not extend to another, and the firm's reputation does not change scope.")
+mc(C6, 'legal', "A company wants a report on a provider's controls that is relevant to financial reporting and is available under an international standard rather than a US one. Which pairing is MOST accurate?",
+   "ISAE 3402 corresponds to SOC 1 under SSAE 18",
+   ["ISAE 3402 corresponds to a PCI assessment", "SSAE 18 corresponds to ISO/IEC 27018 certification", "ISAE 3000 produces a SOC 1 report only"],
+   "ISAE 3402 is the international standard for reports on controls relevant to financial reporting, equivalent in role to SOC 1 under SSAE 18. The other pairings mismatch standards.")
+mc(C6, 'legal', "A company's security leader wants control owners to evaluate their own risks and controls regularly, with independent validation afterwards, to keep ownership close to the business. Which technique is this?",
+   "Risk and control self-assessment",
+   ["A black-box penetration test", "A disaster recovery full interruption test", "A business impact analysis"],
+   "Risk and control self-assessment lets control owners assess themselves and is then validated independently. Penetration testing, recovery tests and BIAs are different activities.")
+mc(C6, 'legal', "A utility moves a monitoring system for part of the bulk electric system to a cloud service. Which regulatory regime MUST the project consider?",
+   "NERC CIP standards",
+   ["FERPA", "SOX Section 404", "GAPP"],
+   "NERC CIP sets mandatory cybersecurity requirements for bulk electric system entities. FERPA concerns education records, SOX concerns financial reporting and GAPP is a privacy framework.")
+mc(C6, 'legal', "A risk manager must decide how to treat the possibility of a long outage at a critical SaaS vendor. The company agrees to run part of the workload with a second vendor under a contract that divides the consequences. Which treatment is this?",
+   "Risk sharing",
+   ["Risk avoidance", "Risk acceptance", "Risk elimination"],
+   "Sharing divides the consequence with another party. Avoidance stops the activity, acceptance bears it silently and elimination is not a standard treatment.")
+mc(C6, 'legal', "A business rule says that a cloud provider's breach notice must reach the customer faster than the customer's own regulatory deadline. Which place BEST captures this requirement?",
+   "The contract's breach notification clause with a shorter notice period than the regulatory deadline",
+   ["The provider's public marketing page describing how quickly incidents are handled", "An informal email from the account manager promising prompt notice of any incident", "The customer's internal wiki, which describes the provider's duties as the customer understands them"],
+   "Contract terms make notice periods enforceable. Marketing pages, informal emails and internal wikis do not bind the provider.")
+mc(C6, 'legal', "A software company depends on a small vendor for a critical component and fears the vendor may fail financially. Which contractual protection BEST addresses this risk?",
+   "Escrow of source code or configuration with a neutral party, with release conditions",
+   ["A warranty that the vendor will never go out of business, stated in the contract", "A promise to review the vendor annually without access to its materials", "A non-disclosure agreement alone, signed by the vendor and the customer's legal team"],
+   "Escrow gives access to critical assets if the vendor fails. Warranties of permanence, reviews without access and NDAs do not secure continuity.")
+mc(C6, 'legal', "A company's cloud policy states which services may be bought, which data classes they may hold and who approves exceptions. What problem is this policy MOST directly designed to reduce?",
+   "Unsanctioned shadow IT adoption",
+   ["Hardware failure in the provider's data center", "Latency between two cloud regions", "License fees for operating systems"],
+   "A cloud computing policy defines acceptable services, data classes and approvals, which limits shadow IT. The other problems are technical or financial.")
+ms(C6, 'legal', "Which TWO statements about audit scope statements are accurate? (Choose two.)",
+   ["A report assures only the services, locations and period named in its scope", "Customer-side controls are often excluded and must be implemented by the customer"],
+   ["A clean opinion covers all services the provider sells", "Scope statements are written for marketing and can be ignored", "Excluded subservice organizations are automatically assured"],
+   "Scope limits what is assured, and users must supply their own complementary controls. Other statements overstate coverage.")
+ms(C6, 'legal', "Which TWO items appear among the privacy frameworks and standards named for cloud privacy requirements? (Choose two.)",
+   ["ISO/IEC 27018 for protecting personal data in public clouds", "Generally Accepted Privacy Principles with ten principles"],
+   ["ISO/IEC 27036 as a privacy law", "NERC CIP as a data subject rights regulation", "Common Criteria as a privacy framework"],
+   "ISO/IEC 27018 and GAPP are privacy standards or frameworks. ISO/IEC 27036 concerns supplier relationships, NERC CIP is electric sector security and Common Criteria evaluates products.")
+ms(C6, 'legal', "Which THREE items belong in a cloud contract to support exit and accountability? (Choose three.)",
+   ["Data return and deletion terms with evidence of deletion", "Breach notification timelines and subprocessor controls", "Right to audit or access to independent assurance reports"],
+   ["A clause stating the provider owns customer data", "A ban on the customer ever terminating the contract"],
+   "Data return, notification, subprocessor and audit terms support exit and accountability. Provider data ownership and no termination undermine the customer.")
+tf(C6, 'legal', "HIPAA breach notification to individuals may take place up to 60 days after discovery of a breach, but must not be unreasonably delayed.", True,
+   "The rule requires notice without unreasonable delay and in no case later than 60 days.")
+tf(C6, 'legal', "A privacy impact assessment is performed before a system launches so privacy risks to individuals can change the design.", True,
+   "It is a design-time review; the DPIA is the GDPR's formal version for high-risk processing.")
+tf(C6, 'legal', "A SOC report that excludes a subservice organization assures the controls of that subservice organization.", False,
+   "Excluded subservice organizations are not assured by the report; customers need other evidence.")
+tf(C6, 'legal', "A master service agreement sets general terms while a statement of work defines specific deliverables.", True,
+   "The SOW operates under the MSA; the SLA sets measurable service levels.")
+tf(C6, 'legal', "Risk transfer and risk sharing are interchangeable terms in the outline's list of treatments.", False,
+   "The outline lists avoid, mitigate, transfer, share and accept as separate treatments.")
+tf(C6, 'legal', "PCI DSS version 4.0.1 is the current version of the standard.", True,
+   "Version 4.0.1 is the current edition of the PCI Data Security Standard.")
+tf(C6, 'legal', "ISO/IEC 27050 is a standard for electronic discovery.", True,
+   "It is a multi-part standard covering the eDiscovery process from identification to production.")
+
+# ---- second-pass additions (October 2026): items filling the thinnest outline bullets found in the coverage audit
+f(C5, 'ops', 'Vulnerability assessment versus penetration test',
+  "A vulnerability assessment systematically scans assets for known weaknesses and ranks them by severity; it is broad, repeatable and mostly automated. A penetration test is an authorized, scoped attempt to exploit weaknesses to show real impact; it is narrower, manual and periodic. Cloud testing must follow the provider's testing policy.",
+  "Assessments find and rank; penetration tests prove and chain. Written authorization and rules of engagement are required before any test.")
+f(C5, 'ops', 'Intelligent monitoring of security controls',
+  "Continuous monitoring of firewalls, intrusion detection and prevention, honeypots and network security groups, increasingly with machine learning that baselines normal behavior and flags anomalies. It must also confirm that the controls and log sources themselves are active and unchanged.",
+  "Monitoring that cannot notice a disabled rule or a silent log source gives false comfort; analysts validate AI findings and tune out noise.")
+f(C5, 'ops', 'Continual service improvement',
+  "The ITIL practice of measuring service performance, reviewing incidents and audits, and turning lessons into tracked improvements, so operations get better each cycle rather than only repairing failures.",
+  "Evidence of continual improvement is the review, the owner and the measured result, not a one-off fix.")
+f(C6, 'legal', 'Cyber risk insurance',
+  "Insurance that transfers part of the financial impact of an incident, such as response, legal and notification costs and business interruption. Insurers set conditions and exclusions, and require baseline controls before they will cover.",
+  "It transfers some financial loss only; accountability, regulatory duties and reputational damage stay with the organization.")
+
+# ---- second-pass questions: Domain 1
+mc(C1, 'found', "An attacker who gains rights in the orchestration layer of a cloud platform could create, change and delete large numbers of workloads in one operation. Which control BEST protects this building block?",
+   "Strong authentication, least privilege, approvals and full logging on orchestration and management calls",
+   ["Column-level encryption of every database that the orchestrated workloads can reach",
+    "Additional storage replicas in a second region so that deleted workloads can be rebuilt",
+    "Larger virtual machine sizes so the orchestrator has spare capacity during attacks"],
+   "Orchestration acts with broad privilege, so access to it needs the tightest identity controls and auditing. Database encryption, replicas and capacity do not stop a malicious operation from being issued.",
+   "Maps outline objective 1.1 building block technologies to the control that fits each one.")
+mc(C1, 'found', "A provider lets customers upload their own code and runs it on a managed runtime while operating the servers and operating system. Under the ISO/IEC 17788 capability types, what does the customer receive?",
+   "Platform capabilities, because customers deploy and run their own code on the provider's runtime",
+   ["Infrastructure capabilities, because customers provision and manage the virtual machines themselves",
+    "Application capabilities, because the provider supplies the finished software that customers merely use",
+    "None of the three, because managed runtimes fall outside the capability model entirely"],
+   "Deploying customer code on a provider-managed runtime is a platform capability. Infrastructure capabilities leave the operating system to the customer, and application capabilities mean using the provider's own software.",
+   "Tests classification of cloud service capabilities as the outline describes them.")
+mc(C1, 'found', "A product team wants a new managed service to be safe without customers having to tune it: minimal exposed functionality, restrictive settings and secure behavior out of the box. Which design approach describes this?",
+   "Secure by design and secure by default",
+   ["Security through obscurity combined with a detailed configuration hardening guide",
+    "Shift-right testing that finds weaknesses only after customers report them",
+    "Defense by compliance checklist completed shortly before general availability"],
+   "Secure by design builds protection into the architecture and secure by default ships with safe settings, so the customer does not carry the burden. A hardening guide pushes the work to customers, and late testing or checklists add little.",
+   "Covers the outline's secure-by-design cloud design pattern.")
+mc(C1, 'found', "A DevOps team releases many times a day, yet security reviews happen only before quarterly milestones and have become a backlog. What is the BEST way to keep security in step with delivery?",
+   "Build automated security checks into the pipeline and share ownership of findings with developers",
+   ["Cut the release frequency to the number of reviews the security team can handle each quarter",
+    "Move all security staff into a separate gate team that approves every individual change by hand",
+    "Defer security work until after release and fix issues only when customers report them"],
+   "DevSecOps brings checks to where changes happen, such as scanning and policy gates, so feedback is fast and scales. Throttling releases, manual gates and post-release fixing do not scale or are too late.",
+   "Tests the DevOps security bullet of objective 1.4.")
+mc(C1, 'found', "A security team's machine learning model flags unusual network behavior. After the company migrates many workloads to a new architecture, the model begins missing attacks. What is the MOST likely cause and response?",
+   "Model drift on the new traffic patterns, so validate against current data and retrain",
+   ["A flaw in the cloud provider's hypervisor, so open a ticket with the provider and wait for a platform patch to be released",
+    "Excess encryption of network flows, so disable TLS to restore full visibility to the model",
+    "Normal behavior, since models never need review once they pass their first validation"],
+   "A model trained on old traffic degrades when behavior changes; monitoring performance and retraining on validated, representative data restores it. Disabling TLS and waiting for a patch address nothing, and models need ongoing review.",
+   "Covers AI-based cloud threat detection and the need to verify its data sources.")
+mc(C1, 'found', "A hiring tool built on a cloud machine learning service ranks candidates, and an audit finds consistently lower scores for one protected group. Which response BEST addresses the ethical concern?",
+   "Examine the training data for bias, test fairness, document the results and add human oversight",
+   ["Hide the demographic fields from the audit report so the ranking appears neutral to reviewers and the regulator",
+    "Rely on the cloud provider's SOC 2 report as evidence that the model outputs are fair",
+    "Keep the model but encrypt the scoring results so that candidates cannot question them"],
+   "Bias usually comes from data and features, so the fix is analysis, fairness testing, documentation and human review. Hiding fields, citing an infrastructure report or encrypting results leaves the harm in place.",
+   "Tests the ethical concerns bullet of the AI and machine learning objective.")
+mc(C1, 'found', "A security orchestration playbook automatically disables any account that triggers a high-severity alert. Analysts fear false positives will lock out executives and critical service accounts. Which design is BEST?",
+   "Tier the response: automate low-impact actions, add approval for high-impact accounts",
+   ["Remove automation entirely, since SOAR tools should only ever produce reports for analysts",
+    "Exempt all privileged accounts from every alert so the playbook can never cause an outage",
+    "Keep full automation and ask affected executives to open a ticket if they are locked out"],
+   "Risk-based tiers keep the speed of automation while limiting the blast radius of an incorrect action. Removing automation loses the benefit, exempting privileged accounts opens the biggest hole, and ignoring false positives harms the business.",
+   "Checks judgment about SOAR trade-offs between speed and safety.")
+tf(C1, 'found', "Using a managed AI service removes the customer's need to assess regulatory requirements that apply to how the AI output is used.", False,
+   "The customer remains accountable for lawful use, such as high-risk classifications under the EU AI Act, whichever party runs the model.")
+
+# ---- second-pass questions: Domain 2
+mc(C2, 'life', "A provider stores archive objects as erasure-coded fragments spread across several regions so that any subset of fragments can rebuild the object. What is the MOST important consideration for a customer with residency rules?",
+   "Dispersion aids availability and limits single-site exposure, but fragment locations may breach residency rules",
+   ["Dispersion guarantees that the object stays inside one country because fragments are small",
+    "Dispersion removes the need for encryption because no single site holds a complete and usable copy of the object",
+    "Dispersion makes deletion instant because every fragment expires automatically at exactly the same moment everywhere"],
+   "Splitting data improves resilience and reduces what any one location reveals, yet fragments in other regions can still conflict with residency requirements. It does not replace encryption or guarantee jurisdiction.",
+   "Tests data dispersion against data location and residency duties.")
+mc(C2, 'life', "An investigator reviewing storage access logs finds the action and timestamp for each event, but cannot tell who performed it or from where. Which attributes were missing from the event definition?",
+   "Identity of the actor, source IP address and geolocation",
+   ["Disk block size, file system type and data center rack identifier",
+    "Encryption algorithm, key length and certificate expiry date of the object",
+    "Retention period, storage class and billing tag attached to the bucket"],
+   "Auditability needs who, from where and when. Storage mechanics, algorithms and billing metadata do not attribute an action to an actor or a place.",
+   "Covers event sources and required event attributes in objective 2.8.")
+mc(C2, 'life', "A company plans to fine-tune a model on support chats that contain personal data. Which control BEST reduces the risk that the finished model reveals individual records?",
+   "Minimize and de-identify the training data, then test the model for memorization",
+   ["Encrypt the training volume at rest and leave the dataset content unchanged",
+    "Place the model endpoint in a private subnet and keep every record in the dataset",
+    "Increase the number of training epochs so that the model learns each record thoroughly and reliably"],
+   "Leakage comes from what the model memorizes, so reducing and de-identifying data and testing for extraction address it directly. Storage encryption and network placement protect the container, and more training increases memorization.",
+   "Tests dataset and model privacy under objective 2.9.")
+tf(C2, 'life', "Spreading erasure-coded fragments of data across regions can conflict with data residency requirements even though no single region holds the whole object.", True,
+   "Residency rules concern where personal or regulated data is stored or processed, so fragment placement still has to be approved.")
+
+# ---- second-pass questions: Domain 3
+mc(C3, 'infra', "A regional bank is choosing a site for a data center that must stay available through regional disasters. Which factor is MOST relevant to the decision?",
+   "Natural hazard exposure, diversity of power and carriers, and the legal jurisdiction of the site",
+   ["Proximity of the site to the bank's executive offices for easier ceremonial visits",
+    "Whether the building was previously used for light industry rather than for ordinary office space",
+    "The availability of the cheapest rack space regardless of utility diversity"],
+   "Physical design is about hazard exposure, utilities, connectivity and jurisdiction, weighed with buy-or-build economics. Convenience and bargain space do not support resilience.",
+   "Tests the physical design bullet of the secure data center objective.")
+mc(C3, 'infra', "A provider hosts competing retailers on shared hosts. Which logical design measure MOST directly keeps their traffic and data apart?",
+   "Tenant-specific virtual networks, identities and keys with isolation enforced by policy",
+   ["A single flat network where each retailer's workloads are told apart by naming conventions",
+    "One shared administrative account for all tenants, with tags to record who did what",
+    "Host firewalls configured identically on every host so that all tenants share the same rules and rule sets"],
+   "Tenant partitioning relies on separate networks, identities and keys enforced by the platform. Naming, shared accounts and uniform firewalls provide labels rather than isolation.",
+   "Covers logical design and tenant partitioning.")
+mc(C3, 'infra', "A site buys connectivity from two carriers, but both circuits enter the building through the same underground conduit. Which design weakness does this show?",
+   "The pathways are not diverse, so one physical cut or fire could sever both carriers",
+   ["Two carriers are unnecessary because a single provider with a premium contract is always safer",
+    "Dual carriers create a risk of data corruption because packets arrive out of order",
+    "Carrier diversity matters only for voice traffic and has no bearing on data availability"],
+   "Multi-vendor pathway connectivity means carriers use physically separate routes; a shared conduit is a single point of failure. The other statements are incorrect claims about carriers.",
+   "Tests environmental and resilience design for connectivity.")
+mc(C3, 'resil', "During risk assessment of a new cloud platform a team has listed its assets, the threats against them and the vulnerabilities present. What is the NEXT step in analysis?",
+   "Estimate the likelihood and impact of each scenario to rate and rank the risks",
+   ["Accept every risk that has a low purchase price for the corresponding safeguard",
+    "Transfer all identified risks to an insurer before they have been rated",
+    "Select the provider's default controls and treat the assessment as complete"],
+   "Identification is followed by analysis of likelihood and impact, which supports ranking and treatment decisions. Accepting, transferring or defaulting before rating skips the reasoning that treatment depends on.",
+   "Covers risk assessment steps for cloud infrastructure.")
+mc(C3, 'resil', "After a regional failover the standby region delivers only 40 percent of normal capacity for the first day. Which recovery planning concept does this describe?",
+   "Recovery service level, the degree of service delivered after recovery",
+   ["Recovery point objective, the amount of data loss that is tolerable",
+    "Recovery time objective, the time allowed to restore the service",
+    "Mean time between failures, the average time before the next failure"],
+   "Recovery service level states how much functionality or capacity must be available once recovery completes. RPO is about data loss, RTO about time and MTBF about reliability.",
+   "Tests the recovery service level term in objective 3.5.")
+mc(C3, 'infra', "Auditors need to reconstruct a network incident that crossed several cloud accounts. Which audit mechanism set is MOST useful?",
+   "Centralized, time-synchronized log collection with correlation and retained flow logs or captures",
+   ["Separate local logs on each workload that are overwritten after a few hours",
+    "Screenshots of the console taken by administrators when they remember to do so",
+    "Only the provider's annual availability report, which lists uptime by region"],
+   "Central, time-synchronized and correlated logs plus network records allow reconstruction across accounts. Local rotating logs, ad hoc screenshots and an uptime report cannot show who did what.",
+   "Covers audit mechanisms such as log collection, correlation and packet capture.")
+tf(C3, 'infra', "A cloud customer using IaaS remains responsible for physical access controls at the provider's data center.", False,
+   "Physical and environmental protection of the facility is the provider's duty; the customer verifies it through audit reports and contracts.")
+
+# ---- second-pass questions: Domain 4
+mc(C4, 'app', "A team moving from waterfall to agile worries that end-of-project security reviews will block each sprint. What is the BEST approach?",
+   "Put security requirements, threat modeling and automated tests in every iteration and in the definition of done",
+   ["Keep a single security review after the final sprint and treat all earlier work as draft",
+    "Skip threat modeling entirely because agile teams prefer working software over analysis",
+    "Ask the security team to approve every user story before the sprint can start"],
+   "Agile needs security tasks inside each iteration and acceptance criteria, rather than a late gate. A single late review finds problems too late, and per-story approvals do not scale.",
+   "Contrasts waterfall and agile security activities in the secure SDLC objective.")
+mc(C4, 'app', "An authenticated API user changes the invoice number in a request and receives another customer's invoice. Which OWASP API Security Top 10 risk is this?",
+   "Broken object level authorization",
+   ["Unrestricted resource consumption of the invoice service",
+    "Security misconfiguration of the web server headers",
+    "Improper inventory management of retired API versions"],
+   "The API checks who the caller is but not whether they may access that specific object, which is broken object level authorization, the top API risk. The other risks involve load, configuration or old versions.",
+   "Applies the API Security Top 10 named in objective 4.1.")
+tf(C4, 'app', "The CWE Top 25 ranks the most dangerous software weakness types using vulnerability data, and it complements the OWASP Top 10 rather than replacing it.", True,
+   "It lists weakness classes by prevalence and severity, while the OWASP list is an awareness document of web application risk categories.")
+mc(C4, 'app', "A customer's regulated workload runs on shared cloud hardware, and the compliance officer worries about the provider's own administrators. Which treatment fits the cloud-specific risk BEST?",
+   "Use customer-held keys, restrict and log provider access and review the provider's insider controls",
+   ["Accept the risk because provider staff are certified and therefore cannot access any customer data",
+    "Move the workload to a larger instance type that is harder for administrators to see",
+    "Store the encryption keys in the same account as the data for convenience of recovery"],
+   "Customer-held keys, logged access and assurance about provider controls reduce provider insider exposure. Certification does not prevent access, instance size does not hide data and co-locating keys with data weakens separation.",
+   "Tests cloud-specific risks such as CSP insider threats and lack of visibility.")
+mc(C4, 'app', "A QA team's functional tests all pass, yet a user can bypass a payment step by replaying an earlier request. Which testing gap does this reveal?",
+   "Abuse case testing was missing, because functional tests only confirm intended behavior",
+   ["Load testing was missing, because replay attacks only occur under heavy traffic",
+    "Usability testing was missing, because replay depends on a confusing interface",
+    "Compatibility testing was missing, because older browsers do not enforce payment steps"],
+   "Abuse and misuse cases deliberately try to break rules the way an attacker would, while functional tests confirm that expected paths work. The other test types do not look for deliberate bypass.",
+   "Covers abuse case testing and QA in objective 4.4.")
+mc(C4, 'app', "During QA test runs a team wants security findings tied to the exact line of code that handled the request, found by instrumenting the running application. Which technique fits?",
+   "Interactive application security testing",
+   ["Static application security testing alone, because it executes the application in production",
+    "Software composition analysis, because it reports where tainted data flows at runtime",
+    "A tabletop exercise, because it traces requests through the compiled application"],
+   "IAST instruments a running application and reports vulnerabilities with code context. SAST analyzes code without running it, SCA inventories components and a tabletop is a discussion.",
+   "Distinguishes IAST from SAST, DAST and SCA.")
+
+# ---- second-pass questions: Domain 5
+mc(C5, 'ops', "A customer wants a repeatable weekly inventory of known weaknesses across hundreds of virtual machines, ranked by severity. Which activity is the BEST fit?",
+   "An authenticated vulnerability scan with results tracked to remediation",
+   ["An annual penetration test limited to the internet-facing web application of the business",
+    "A red team exercise that attempts to reach executives' mailboxes",
+    "A tabletop exercise on the ransomware response plan"],
+   "Assessments are broad, repeatable and rank known weaknesses; penetration tests and red team exercises are narrower and prove exploitability, and tabletops rehearse response.",
+   "Separates vulnerability assessment from penetration testing in objective 5.6.")
+tf(C5, 'ops', "Before running a penetration test against workloads in a public cloud, the customer should confirm the provider's testing policy and obtain written authorization.", True,
+   "Unauthorized testing can breach contract and law, and scope must avoid attacking the provider's shared infrastructure.")
+mc(C5, 'ops', "A SOC receives thousands of alerts with no context and cannot tell which matter. Which improvement would MOST help prioritization?",
+   "Feeding curated threat intelligence into the SIEM and SOAR tools to enrich alerts with context",
+   ["Extending log retention from ninety days to seven years without changing alert content",
+    "Turning off all low-severity detections so that analysts only see the most severe signals",
+    "Replacing analyst review with a single static firewall rule set for all environments"],
+   "Threat intelligence adds context such as known indicators and adversary behavior, which helps rank alerts. Longer retention, disabled detections and static rules do not give context.",
+   "Covers threat intelligence within log capture and analysis.")
+mc(C5, 'ops', "A machine-learning anomaly detector reports nothing for weeks, until it emerges that an administrator quietly disabled rules on a network security group and turned off flow logging. What was overlooked?",
+   "Monitoring must also verify that controls and log sources are active and alert on changes",
+   ["Anomaly detectors should be replaced by manual review of every packet that crosses the network boundary",
+    "Administrators should hold no privileges at all, which removes the need for monitoring",
+    "The detector should be trained on fewer features so that it generates fewer alerts"],
+   "Intelligent monitoring includes watching the health of the controls and telemetry that feed it, so a silent change is itself an alert. Packet-level manual review and zero privileges are impractical, and fewer features do not fix blind spots.",
+   "Tests intelligent monitoring of security controls.")
+mc(C5, 'ops', "All hosts in a cluster are healthy, but a guest virtual machine has stopped responding because of an operating system fault. Which measure addresses guest OS availability?",
+   "Guest health monitoring with automatic restart and tested guest backups",
+   ["Placing the host in maintenance mode so that the guest migrates to a different server in the cluster",
+    "Adding more physical storage to the cluster to increase raw capacity",
+    "Raising the hypervisor patch level on every host in the cluster"],
+   "Host clustering protects against host failure, so a faulty guest needs its own health checks, restart logic and recoverable backups. Maintenance mode, extra storage and host patching do not fix a guest fault.",
+   "Covers availability of the guest operating system.")
+mc(C5, 'ops', "A cluster automatically moves virtual machines between hosts to balance load and keep response times steady. Which capability is this?",
+   "Distributed resource scheduling or dynamic optimization",
+   ["Maintenance mode used to evacuate a host before servicing",
+    "Storage replication to a secondary site for disaster recovery",
+    "Snapshot scheduling to preserve guest state at fixed times"],
+   "Distributed resource scheduling places and rebalances workloads automatically. Maintenance mode is for planned servicing, replication provides recovery and snapshots preserve state.",
+   "Tests clustered host availability features.")
+mc(C5, 'ops', "After a major outage an organization wants a standing practice that turns incident reviews and audit findings into tracked, measured improvements. Which ITIL practice is this?",
+   "Continual service improvement",
+   ["Release management",
+    "Deployment management",
+    "Capacity management"],
+   "Continual improvement measures service results and converts lessons into owned actions. Release and deployment management control how changes go live, and capacity management plans resource demand.",
+   "Covers the continual service improvement management item of objective 5.6.")
+
+# ---- second-pass questions: Domain 6
+mc(C6, 'legal', "A firm wants a general enterprise risk management standard of principles, framework and process that is not specific to IT. Which should it choose?",
+   "ISO 31000",
+   ["ISO/IEC 27001, which certifies an information security management system",
+    "PCI DSS, which sets requirements for protecting payment card data",
+    "A SOC 2 report, which attests to a service provider's controls"],
+   "ISO 31000 is the general risk management guideline. ISO/IEC 27001 is security-management specific, PCI DSS is a payment standard and a SOC 2 report is an attestation, not a framework to adopt.",
+   "Tests recognition of risk frameworks in objective 6.4.")
+mc(C6, 'legal', "Which indicator would be the MOST useful key risk indicator for the risk of cloud misconfiguration?",
+   "The trend in publicly exposed storage and critical findings open past their deadline",
+   ["The total number of employees who work in the cloud engineering department",
+    "Annual revenue of the business units that use the cloud environment",
+    "The number of cloud provider marketing emails received by the security team"],
+   "A key risk indicator signals rising exposure early and links to the risk, such as exposed resources and overdue findings. Headcount, revenue and marketing volume say nothing about misconfiguration.",
+   "Applies metrics for risk management.")
+mc(C6, 'legal', "A company buys cyber risk insurance and concludes that its security controls can be reduced. Which statement is MOST accurate?",
+   "Insurance transfers part of the financial loss, insurers expect baseline controls and accountability stays",
+   ["Insurance eliminates regulatory fines in every jurisdiction regardless of how the incident arose",
+    "Insurance shifts legal accountability to the cloud provider, so customer controls become optional",
+    "Insurance removes the likelihood of an incident, which makes risk assessment unnecessary"],
+   "Insurance is risk transfer of some financial impact, often conditional on controls and subject to exclusions. It does not remove accountability, likelihood or the need to assess risk.",
+   "Tests risk transfer through contract and insurance.")
+mc(C6, 'legal', "A provider is compelled by a foreign court order to hand over customer data stored in another country, which conflicts with the customer's home-country law. Which treatment BEST reduces this legal risk?",
+   "Hold encryption keys under customer control and require notice and challenge rights",
+   ["Rely on the provider's public statement that it never discloses customer data to any government",
+    "Store the data in a region chosen only for the lowest price per gigabyte",
+    "Remove the data location clause so that the contract is shorter and simpler"],
+   "Customer-held keys limit what the provider can disclose and contract terms for notice and challenge give a response path. Marketing claims, price-driven location and a missing clause increase exposure.",
+   "Covers conflicting legislation and legal risks specific to cloud.")
+tf(C6, 'legal', "When two countries' laws conflict over the handling of data, a contract clause alone resolves the conflict because courts always honor the agreed terms.", False,
+   "Mandatory law and regulators can override contract terms, so conflicts need legal analysis, location choices and technical controls.")
+mc(C6, 'legal', "An auditor must plan an engagement for a SaaS provider with no on-site access. What should the plan define FIRST?",
+   "Scope, objectives and evidence sources such as provider reports, logs and API evidence",
+   ["Whether to skip the plan and perform only a walkthrough of the provider's website",
+    "A list of physical data centers to visit regardless of what the provider allows",
+    "The final audit opinion, so that fieldwork can be limited to supporting it"],
+   "Planning for a cloud audit depends on agreeing scope and objectives and identifying evidence that can actually be obtained remotely. Fixing the opinion first or insisting on site visits is neither possible nor independent.",
+   "Tests audit planning adapted for the cloud.")
+mc(C6, 'legal', "A customer compares a provider's SOC 2 report with its own policy and finds five requirements unmet. What is the BEST next activity?",
+   "Document the gaps and choose a treatment for each, such as compensating controls or contract changes",
+   ["Ignore the gaps, because a SOC 2 report is a certification that the provider can never fail or lose",
+    "Terminate the contract at once, since any gap makes the provider unusable",
+    "Ask the provider to rewrite the report so that it matches the customer's policy"],
+   "A gap analysis ends in documented treatment decisions. Reports cannot be rewritten, ignoring gaps is unsafe and automatic termination is disproportionate.",
+   "Applies gap analysis and control self-assessment.")
+mc(C6, 'legal', "Which role is responsible for the day-to-day quality, definitions and metadata of a dataset, working under the data owner's policy?",
+   "Data steward",
+   ["Data processor",
+    "Data subject",
+    "Regulator"],
+   "A data steward maintains quality and definitions for the owner. A processor handles data for a controller, the subject is the individual the data describes and a regulator supervises compliance.",
+   "Tests the difference between data roles such as owner, controller, custodian, processor and steward.")
+tf(C6, 'legal', "India's Digital Personal Data Protection Act, 2023 refers to organizations that decide the purpose of processing as data fiduciaries and to individuals as data principals.", True,
+   "These are the Act's equivalents of controller and data subject, with a Data Protection Board enforcing the law.")
+
+# ---------------------------------------------------------------------------------------------------------------
 # Export FLASHCARDS and QUESTIONS (topic tags stripped) and helpers for the lessons
 # ---------------------------------------------------------------------------------------------------------------
 FLASHCARDS = [{k: v for k, v in c.items() if k != 'topic'} for c in _FC]
@@ -1333,10 +2559,16 @@ Deployment models describe who owns and shares the environment. A public cloud i
 
 Architects also weigh vendor lock-in. Portability, interoperability and reversibility are the properties that keep an exit possible, and the ISO/IEC 17789 cross-cutting aspects (auditability, availability, governance, privacy, regulatory, resiliency, security, service levels and more) act as a checklist of things to consider before adopting any service.
 
-The outline also asks how newer technologies change the picture. Artificial intelligence and machine learning make training data, models and prompts into assets to classify and protect, and the customer keeps responsibility for them even on a fully managed service. Confidential computing protects data in use by running code inside a hardware-based trusted execution environment. Quantum computing threatens today's public-key algorithms, which is why architects favor crypto agility. Underlying all of this are three design principles to reach for in almost any scenario: defense in depth, least privilege and zero trust, in which identity rather than network location decides who gets in.""",
+The outline also asks how newer technologies change the picture. Artificial intelligence and machine learning make training data, models and prompts into assets to classify and protect, and the customer keeps responsibility for them even on a fully managed service. Confidential computing protects data in use by running code inside a hardware-based trusted execution environment. Quantum computing threatens today's public-key algorithms, which is why architects favor crypto agility. Underlying all of this are three design principles to reach for in almost any scenario: defense in depth, least privilege and zero trust, in which identity rather than network location decides who gets in.
+
+The outline treats the reference architecture as a map of roles and activities. The customer, the provider, the partner (such as an auditor, a service developer or a broker) and the regulator each perform different activities, so a control only works when someone owns it. ISO/IEC 17788 also describes what a customer receives as capability types: infrastructure capabilities (compute, storage and network), platform capabilities (a managed runtime for your code) and application capabilities (finished software). Underneath, every service is assembled from building blocks such as virtualization, storage, networking, databases and orchestration, and each block carries its own isolation and configuration risks.
+
+Secure design draws on classic principles (least privilege, defense in depth, fail-safe defaults, separation of duties, complete mediation) that SANS and similar guidance teach, on provider Well-Architected frameworks, on the CSA Enterprise Architecture and on the idea of secure by design and secure by default. DevOps security means building automated checks and shared ownership into the pipeline rather than reviewing at the end. Business impact analysis, with cost-benefit analysis and return on investment, justifies the spend on continuity and recovery, and the CSA Top Threats report is a useful list of what goes wrong most often: misconfiguration and change control, identity and access, and insecure interfaces lead the 2024 edition.
+
+Evaluating a provider means verifying it against criteria you define, using audit reports, CSA STAR entries and product certifications. Common Criteria (ISO/IEC 15408) evaluates a product against a security target, and FIPS 140 validates cryptographic modules; FIPS 140-3 supersedes 140-2, whose validated modules moved to the Historical list after September 21, 2026. Finally, the outline adds artificial intelligence and machine learning: models can strengthen cloud threat detection and security orchestration, automation and response, but their data sources must be validated and verified, ethical concerns such as bias need oversight, and regulation such as the EU AI Act and frameworks such as the NIST AI Risk Management Framework shape their use.""",
         'fundamentalsLabel': 'New to cloud security? See the everyday analogy',
         'fundamentals': "Think of renting an apartment in a large building. The landlord looks after the structure, the locks on the front door, the elevators and the fire alarms; you decide who gets a key to your flat and what you keep inside. If you leave your door unlocked, the landlord's excellent building security does not help you. The more furnished and serviced the apartment (the move from bare unit to hotel suite), the more the landlord handles, but you never hand over the question of who you let in or what you store. Other tenants share the walls and the plumbing, which is multi-tenancy, so the quality of the soundproofing between units matters. That is the shared responsibility model and the reason isolation is always on the exam.",
-        'keyTerms': ['NIST essential characteristics', 'Multi-tenancy', 'IaaS, PaaS and SaaS', 'Shared responsibility model', 'Hybrid versus multi-cloud', 'Vendor lock-in and reversibility', 'Confidential computing', 'Zero trust'],
+        'keyTerms': ['NIST essential characteristics', 'Multi-tenancy', 'IaaS, PaaS and SaaS', 'Shared responsibility model', 'Hybrid versus multi-cloud', 'Vendor lock-in and reversibility', 'Confidential computing', 'Zero trust', 'Cloud capability types', 'Secure by design and by default', 'Common Criteria and FIPS 140', 'AI threat detection and SOAR'],
         'commonTraps': [
             "Hybrid cloud binds different deployment models together; using two public providers is multi-cloud, and the exam deliberately blurs the two.",
             "Moving up the stack toward SaaS shifts operating duties to the provider but never shifts accountability for data, identities or compliance.",
@@ -1364,10 +2596,16 @@ Not all copies of data need the real values. Masking replaces sensitive fields w
 
 Retention and destruction deserve respect because they are where cloud differs most. Keep data too long and you enlarge breach and discovery exposure; delete too early and you violate regulations or a legal hold, which suspends normal deletion when litigation is likely. In the cloud you cannot degauss or shred the provider's disks, so the accepted answer for guaranteeing deletion is cryptographic erasure: encrypt the data with keys you control and destroy every copy of the key.
 
-Finally, the newer outline adds data lakes and training datasets to the picture. A large central repository of mixed data needs fine-grained access control and lineage records, and a dataset used to train models needs integrity protection too, because a poisoned input quietly corrupts every model built from it. Always map data flows so you know which regions, providers and sub-processors touch the data, since privacy law attaches to those paths.""",
+Finally, the newer outline adds data lakes and training datasets to the picture. A large central repository of mixed data needs fine-grained access control and lineage records, and a dataset used to train models needs integrity protection too, because a poisoned input quietly corrupts every model built from it. Always map data flows so you know which regions, providers and sub-processors touch the data, since privacy law attaches to those paths.
+
+The outline walks through the data topics in a deliberate order. Storage types (long-term, ephemeral, raw, object and volume) each have their own threats: public buckets, leaked keys, shared snapshots, remanence after reallocation and ransomware that deletes versions. Data dispersion spreads erasure-coded fragments across locations to improve availability and limit exposure of any single site, but it can conflict with residency rules, so data flows and data locations must be mapped as well as the stored objects.
+
+Discovery has to work differently for structured data (schemas and columns), semi-structured data (JSON and logs, parsed by key) and unstructured data (documents and images, found by content inspection). Classification then needs a written policy that defines levels, who assigns them and the handling rules, a data map of sources, owners, purposes and locations, and labels or tags that tools can enforce. Information rights management carries rights with the file, with provisioning and certificate issue and revocation as the tools, but revocation depends on the client reaching the policy server.
+
+Retention, archiving and deletion need defined periods, mechanisms that work in the cloud (lifecycle rules, immutability, cryptographic erase) and a legal hold that overrides automatic deletion for the custodians concerned. Auditability depends on defining event sources and attributes (identity, source IP address and geolocation), storing and analyzing logs, and keeping a chain of custody; non-repudiation comes from signatures and trusted timestamps. For AI and machine learning data, protect dataset and model privacy (minimize and de-identify, test for memorization) and security (provenance, validation, signed model artifacts).""",
         'fundamentalsLabel': 'New to data security? See the everyday analogy',
         'fundamentals': "Picture the paper records of a large hospital. Someone has to decide which files are routine and which are highly sensitive, and mark them accordingly; that is classification. Staff walk through the building to find forgotten files in corridors and cupboards; that is discovery. Guards at the exit check bags for stray patient files; that is data loss prevention. A special folder that, once handed to another clinic, can still be locked remotely by the hospital is rights management. Old records follow a schedule for how long they must be kept and are then shredded, unless a lawyer places a hold on them. In the cloud you cannot watch the shredder, so you lock the records in a safe and destroy the only key.",
-        'keyTerms': ['Data life cycle', 'Data classification', 'Data discovery', 'Data owner and custodian', 'DLP', 'IRM', 'Legal hold', 'Crypto-shredding', 'Pseudonymization'],
+        'keyTerms': ['Data life cycle', 'Data classification', 'Data discovery', 'Data owner and custodian', 'DLP', 'IRM', 'Legal hold', 'Crypto-shredding', 'Pseudonymization', 'Data dispersion', 'Discovery by data type', 'Data mapping and classification policy', 'Chain of custody and non-repudiation', 'AI dataset and model protection'],
         'commonTraps': [
             "Discovery comes before classification, and classification comes before DLP rules and encryption choices: the exam punishes answers that skip ahead.",
             "Pseudonymized data is still personal data under privacy law; only effective anonymization takes it out of scope.",
@@ -1393,10 +2631,14 @@ Key custody is where judgement questions live, and it comes in tiers. With provi
 
 A hardware security module is a tamper-resistant device that generates and stores keys and performs operations without exposing them, validated against standards such as FIPS 140. Secrets such as API keys and passwords belong in a secrets manager and are injected at run time, never hard-coded in code or container images.
 
-Tokenization and hashing solve different problems. Tokenization replaces a sensitive value with a random token and keeps the real value in a vault, so systems holding only tokens fall out of compliance scope, which is why it is common for payment card data. Hashing is one-way and verifies integrity; with a private key it becomes a digital signature that proves origin and non-repudiation. Public key infrastructure binds public keys to identities through certificates, whose renewal and revocation must be automated to avoid outages. Finally, plan for crypto agility so algorithms can be replaced without redesign, since quantum computing will eventually weaken today's public-key schemes and adversaries may already be collecting data to decrypt later.""",
+Tokenization and hashing solve different problems. Tokenization replaces a sensitive value with a random token and keeps the real value in a vault, so systems holding only tokens fall out of compliance scope, which is why it is common for payment card data. Hashing is one-way and verifies integrity; with a private key it becomes a digital signature that proves origin and non-repudiation. Public key infrastructure binds public keys to identities through certificates, whose renewal and revocation must be automated to avoid outages. Finally, plan for crypto agility so algorithms can be replaced without redesign, since quantum computing will eventually weaken today's public-key schemes and adversaries may already be collecting data to decrypt later.
+
+Two further topics sit beside encryption in this domain. Sanitization is how data is made unrecoverable when media or resources are released: NIST SP 800-88 Rev. 2 describes clear (logical overwrite), purge (recovery infeasible even in a laboratory, which includes cryptographic erase) and destroy (physical destruction). In the cloud the customer cannot destroy the provider's disks, and overwriting is unreliable across replicas and wear-leveled flash, so cryptographic erase through key destruction is the practical method, which makes key lifecycle and retention alignment important.
+
+Hashing proves integrity but not origin; digital signatures add non-repudiation when the private key is controlled by one signer. Data obfuscation covers masking, anonymization and pseudonymization, and tokenization substitutes a surrogate value while the original sits in a vault. Keys, secrets and certificates each need their own lifecycle: generation, storage in an HSM or managed vault, rotation, revocation and expiry monitoring, with automation to prevent outages from expired certificates.""",
         'fundamentalsLabel': 'New to encryption? See the everyday analogy',
         'fundamentals': "Imagine shipping valuables in a locked box. The box is the encrypted data, and the lock is only as good as the story of who has the key. Provider-managed keys are like leaving the key with the courier. Customer-managed keys are like holding the courier's key log and being able to cancel it. Bring your own key means you cut the key yourself and hand a copy to the courier's safe, keeping the right to demand it back. Hold your own key means the courier never sees a key at all; the box can only be opened in your own office. Envelope encryption is a small key locked inside a master safe, so changing one master lock protects every box at once. Tokenization is swapping the valuables for a numbered ticket that is worthless unless you visit the vault.",
-        'keyTerms': ['Data at rest, in transit and in use', 'Envelope encryption', 'KMS', 'HSM', 'BYOK', 'HYOK', 'Tokenization', 'Key lifecycle', 'Crypto agility'],
+        'keyTerms': ['Data at rest, in transit and in use', 'Envelope encryption', 'KMS', 'HSM', 'BYOK', 'HYOK', 'Tokenization', 'Key lifecycle', 'Crypto agility', 'Clear, purge and destroy', 'Digital signatures and non-repudiation', 'Secrets and certificate lifecycle'],
         'commonTraps': [
             "BYOK is not HYOK: with BYOK the key lives in the provider's service and the provider can use it; only HYOK keeps it out of reach.",
             "TLS protects data in transit only; it does nothing for data at rest or in use.",
@@ -1422,10 +2664,16 @@ Serverless functions remove the servers entirely, so there is no operating syste
 
 Networks in the cloud are software defined and live inside virtual private clouds divided into subnets. Security groups are stateful rules attached to workloads, while network access control lists are stateless rules at the subnet edge. The architecture to prefer puts data stores in private subnets with no internet route, exposes only a load balancer or gateway, and uses micro-segmentation to restrict traffic between tiers so that a compromised host cannot roam. Private links and private endpoints keep service traffic off the public internet, though remember that private does not automatically mean encrypted. For remote users, zero trust network access grants per-application sessions instead of dropping them on the whole network, and distributed denial of service protection absorbs floods.
 
-The management plane, meaning the console, command-line tools and programming interfaces that create and delete resources, is the highest-value target in any account. Protect it with multi-factor authentication, just-in-time privilege and a tamper-resistant audit log. Pair that with immutable infrastructure, where servers are replaced rather than modified, and infrastructure as code that is scanned for misconfiguration before it deploys.""",
+The management plane, meaning the console, command-line tools and programming interfaces that create and delete resources, is the highest-value target in any account. Protect it with multi-factor authentication, just-in-time privilege and a tamper-resistant audit log. Pair that with immutable infrastructure, where servers are replaced rather than modified, and infrastructure as code that is scanned for misconfiguration before it deploys.
+
+A secure data center design has four layers in the outline: logical design (tenant partitioning and access control), physical design (location, hazards, and the buy-or-build decision), environmental design (HVAC, fire suppression and multi-vendor pathway connectivity, meaning carriers enter by physically separate routes) and design resilience (power, cooling and connectivity with N+1 or 2N redundancy). Uptime Institute tiers describe how much redundancy a site has, and customers verify facilities through audit reports because the physical layer belongs to the provider.
+
+Building the environment starts with hardware security (HSM and TPM), secure by default settings, a hardened management plane and virtual hardware settings for network, storage, memory and CPU, with a Type 1 hypervisor for production. Operating it involves access controls for remote administration (a hardened bastion or jump host with multi-factor authentication, SSH keys, restricted RDP and recorded sessions), secure network configuration (VLAN segmentation, TLS, DHCP protections, DNSSEC and VPN), network security controls (firewalls, IDS and IPS, honeypots, network security groups, segmentation and vulnerability assessments), and baselines such as CIS Benchmarks and STIGs applied through monitoring and remediation.
+
+Operational availability comes from patch management, clustered hosts (distributed resource scheduling, maintenance mode and high availability), guest operating system health monitoring, capacity and performance monitoring, hardware monitoring (disk, CPU, fan speed and temperature) and tested backup and restore of hosts and guests.""",
         'fundamentalsLabel': 'New to virtualization? See the everyday analogy',
         'fundamentals': "A large office building rents floors to different companies. Virtual machines are lockable suites on a floor, each with its own walls and door. Containers are open-plan desks on the same floor with partition screens: cheaper and quicker to set up, but a loud neighbor is closer and the partitions are thinner. Serverless is hot-desking by the hour, with nothing to maintain. The building's master control panel, where tenants can request and cancel space, is the management plane; if a thief gets that panel, every floor is at risk. Micro-segmentation is locking the doors between departments rather than trusting that anyone inside the lobby belongs everywhere.",
-        'keyTerms': ['Hypervisor', 'VM escape', 'Container isolation', 'Image scanning', 'Serverless', 'Security groups and ACLs', 'Micro-segmentation', 'ZTNA', 'Management plane'],
+        'keyTerms': ['Hypervisor', 'VM escape', 'Container isolation', 'Image scanning', 'Serverless', 'Security groups and ACLs', 'Micro-segmentation', 'ZTNA', 'Management plane', 'Data center design layers', 'Bastion and jump host access', 'DNSSEC, DHCP and VLAN security', 'Clustered hosts and maintenance mode'],
         'commonTraps': [
             "Containers share a kernel, so they are lighter but less isolated than virtual machines; do not assume equal isolation.",
             "In serverless the provider patches the host, but the customer still owns function permissions, code and dependencies.",
@@ -1451,10 +2699,14 @@ Cloud makes resilience a design choice rather than a purchase. A region is a geo
 
 Backups deserve their own care. Keep copies in a separate account or logical domain from production credentials, make at least some of them immutable so ransomware or an attacker cannot delete them, and test restores regularly. A backup that has never been restored is an assumption.
 
-Risk analysis sits alongside all of this. For a cloud design, identify assets, threats and vulnerabilities, estimate likelihood and impact and choose a treatment. Characteristic cloud risks include loss of governance and visibility, failure of tenant isolation, insecure interfaces, compromise of the management plane and vendor lock-in. The asset owner, not the security team, accepts whatever residual risk remains.""",
+Risk analysis sits alongside all of this. For a cloud design, identify assets, threats and vulnerabilities, estimate likelihood and impact and choose a treatment. Characteristic cloud risks include loss of governance and visibility, failure of tenant isolation, insecure interfaces, compromise of the management plane and vendor lock-in. The asset owner, not the security team, accepts whatever residual risk remains.
+
+Risk assessment follows a fixed order: identify assets, threats and vulnerabilities, analyze likelihood and impact (qualitatively or quantitatively, for example single loss expectancy times annual rate of occurrence gives annualized loss expectancy), and then choose a treatment. The treatments in the outline are avoid, mitigate, transfer, share and accept, and each needs an owner. Cloud adds risks such as management plane compromise, isolation failure, vendor lock-in and loss of governance.
+
+Continuity planning starts with strategy and business requirements: the recovery time objective, the recovery point objective and the recovery service level, which states how much capacity or function must be available after recovery. Plans are created, implemented and tested, with tests rising in realism from a document review and tabletop exercise through walkthroughs and simulations to parallel and full-interruption tests, each with more risk to production.""",
         'fundamentalsLabel': 'New to disaster recovery? See the everyday analogy',
         'fundamentals': "Consider a restaurant planning for a kitchen fire. How long can it stay closed before the owner loses the business is the maximum tolerable downtime. How fast they promise to reopen, perhaps in a rented kitchen across town, is the recovery time. How many orders the system can forget is the recovery point: if orders are written on a pad and photographed every five minutes, up to five minutes of orders could be lost. Having a rented kitchen idle and fully stocked is an active site and costs a lot; having the contract for one but no ingredients is cheaper but slower. And the plan is worthless until the staff has actually practiced cooking there.",
-        'keyTerms': ['BIA', 'RTO', 'RPO', 'Maximum tolerable downtime', 'Availability zone and region', 'Pilot light and warm standby', 'Active-active', 'Immutable backup', 'Cloud risk analysis'],
+        'keyTerms': ['BIA', 'RTO', 'RPO', 'Maximum tolerable downtime', 'Availability zone and region', 'Pilot light and warm standby', 'Active-active', 'Immutable backup', 'Cloud risk analysis', 'Qualitative and quantitative analysis', 'Recovery service level', 'BCDR plan testing types'],
         'commonTraps': [
             "RTO is time to restore service; RPO is acceptable data loss: candidates swap them under pressure.",
             "Pick the cheapest strategy that meets the stated objectives; the most resilient answer is often too costly to be correct.",
@@ -1480,10 +2732,16 @@ Application programming interfaces deserve special attention because they are ho
 
 The newer outline adds the risks of applications built on large language models and other AI. Prompt injection, direct or hidden in retrieved content, can override instructions; defend by treating model output and retrieved text as untrusted, restricting what tools and data the model can reach, filtering inputs and outputs and keeping secrets out of prompts.
 
-Identity ties it all together. Federation lets users authenticate once to an identity provider that issues signed assertions to many services, usually through SAML or OpenID Connect; OAuth 2.0 delegates authorization without sharing passwords and is not an authentication protocol by itself. Use multi-factor authentication, preferring phishing-resistant methods such as hardware keys or passkeys. Choose role-based access control for simplicity or attribute-based control for contextual decisions, remove standing privilege with just-in-time elevation, give workloads short-lived identities rather than static keys, and automate provisioning so leavers lose access everywhere.""",
+Identity ties it all together. Federation lets users authenticate once to an identity provider that issues signed assertions to many services, usually through SAML or OpenID Connect; OAuth 2.0 delegates authorization without sharing passwords and is not an authentication protocol by itself. Use multi-factor authentication, preferring phishing-resistant methods such as hardware keys or passkeys. Choose role-based access control for simplicity or attribute-based control for contextual decisions, remove standing privilege with just-in-time elevation, give workloads short-lived identities rather than static keys, and automate provisioning so leavers lose access everywhere.
+
+Application security training starts with the common lists: the OWASP Top 10 (2025 edition, led by broken access control), the OWASP API Security Top 10 (2023, led by broken object level authorization), the OWASP Top 10 for Large Language Model Applications, the CWE Top 25 and the ASVS, which provides verifiable requirements at three assurance levels. In the secure software development life cycle, security belongs in every phase whether the team uses waterfall or agile, where it must be part of each iteration. Threat modeling methods include STRIDE (threat categories), DREAD (scoring), ATASM and PASTA (a staged, risk-centric method), and secure coding guidance comes from OWASP and SAFECode, with configuration management and versioning making builds reproducible.
+
+Assurance and validation combine functional and non-functional testing in CI/CD, black-box, gray-box and white-box approaches, SAST, DAST, IAST and software composition analysis, quality assurance and abuse case testing. Verified software means securing APIs, managing the supply chain (vendor assessment, integrity, authenticity, licensing), controlling third-party code and validating open source. Cloud application architecture adds supplemental components: a web application firewall, database activity monitoring, XML firewalls, an API gateway and load balancers, plus cryptography, sandboxing and microservices on containers and Kubernetes.
+
+Identity design uses federation, identity providers, single sign-on and multi-factor authentication, a cloud access security broker for visibility and policy over SaaS use, and managed secrets, keys and certificates.""",
         'fundamentalsLabel': 'New to secure development? See the everyday analogy',
         'fundamentals': "Building software is like building a house. An architect who checks the plans for weak points before construction (threat modeling) saves far more than an inspector who finds a missing support beam after the roof is on. Inspecting the bricks and the wood supplier's paperwork is software composition and supply chain checking; walking through the finished house testing the locks is dynamic testing. Identity is the key system: a single front-door key everyone shares is a disaster, so each person gets their own key that can be cancelled, visitors get temporary passes, and the master key is kept in a safe and signed out only when needed.",
-        'keyTerms': ['Secure SDLC', 'STRIDE', 'SAST and DAST', 'SCA and SBOM', 'API authorization', 'Prompt injection', 'Federation and SSO', 'OAuth and OpenID Connect', 'Just-in-time access'],
+        'keyTerms': ['Secure SDLC', 'STRIDE', 'SAST and DAST', 'SCA and SBOM', 'API authorization', 'Prompt injection', 'Federation and SSO', 'OAuth and OpenID Connect', 'Just-in-time access', 'OWASP lists and ASVS', 'DREAD, ATASM and PASTA', 'Abuse case testing', 'API gateway and WAF', 'CASB'],
         'commonTraps': [
             "OAuth 2.0 is authorization; authentication is added by OpenID Connect, and SAML is the enterprise web single sign-on alternative.",
             "A web application firewall is a compensating control, not a substitute for fixing vulnerable code.",
@@ -1509,10 +2767,14 @@ When something does go wrong, incident response follows a life cycle: preparatio
 
 Digital forensics applies the same care to evidence. Collect in order of volatility, with memory and running processes before disks and archived logs, work on copies, hash evidence to prove integrity and keep a chain of custody that records every handler. Without it even a perfect analysis can be inadmissible.
 
-The newer outline adds several themes. Machine learning and analytics support threat hunting, the proactive search for undetected compromise based on a hypothesis. A deployed model whose behavior changes without an approved update should be investigated as a possible poisoning or tampering incident. And operating across several clouds demands a normalized log schema, consistent identity attributes and runbooks that account for each provider's tooling and evidence limits. Measure the operation by outcomes such as mean time to detect and to respond, not by alert volume.""",
+The newer outline adds several themes. Machine learning and analytics support threat hunting, the proactive search for undetected compromise based on a hypothesis. A deployed model whose behavior changes without an approved update should be investigated as a possible poisoning or tampering incident. And operating across several clouds demands a normalized log schema, consistent identity attributes and runbooks that account for each provider's tooling and evidence limits. Measure the operation by outcomes such as mean time to detect and to respond, not by alert volume.
+
+The operations domain is organized around standards, evidence and process. Operational controls draw on NIST (CSF 2.0, SP 800-53 and the RMF), ISO/IEC 27001 and 20000-1, COBIT 2019, the CIS Critical Security Controls, COSO and ITIL. Digital forensics follows evidence handling rules: forensic data collection methodologies, evidence management, and collecting, acquiring and preserving evidence with a documented chain of custody, which is harder in the cloud because resources are shared and ephemeral and the provider controls the layers underneath.
+
+Communication with vendors, customers, partners, regulators and other stakeholders uses pre-agreed lists, channels, templates and owners. Security operations covers the SOC, intelligent monitoring of controls (including AI-assisted detection, with checks that the controls and log sources are still active), log capture and analysis through SIEM and threat intelligence, incident response, vulnerability assessments (broad, repeatable and ranked) versus penetration tests (authorized and exploiting, within the provider's testing policy), and the ITIL-style management processes: change, continuity, information security, continual service improvement, incident, problem, release, deployment, configuration, service level, availability and capacity management.""",
         'fundamentalsLabel': 'New to security operations? See the everyday analogy',
         'fundamentals': "Think of running a large hotel. The security desk watches cameras and logs of every door card swipe (logging and the SIEM), a checklist makes sure every room is set up the same way and flags a lock that was changed without a work order (baselines and change management), and housekeeping fixes things on a schedule (patching). When an alarm sounds, staff contain the problem by closing off the floor and preserving the room exactly as found, not by cleaning it. Photos are taken, items are bagged and every person who handles them signs a form (forensics and chain of custody). The manager, not the night porter, speaks to the press.",
-        'keyTerms': ['Management-plane audit logs', 'SIEM and SOAR', 'CSPM', 'Configuration drift', 'Incident response life cycle', 'Containment', 'Order of volatility', 'Chain of custody', 'Threat hunting'],
+        'keyTerms': ['Management-plane audit logs', 'SIEM and SOAR', 'CSPM', 'Configuration drift', 'Incident response life cycle', 'Containment', 'Order of volatility', 'Chain of custody', 'Threat hunting', 'Operational standards (NIST, ISO, COBIT, CIS, COSO, ITIL)', 'Vulnerability assessment versus penetration test', 'Threat intelligence in the SOC', 'Continual service improvement'],
         'commonTraps': [
             "Terminating or rebooting a compromised instance first destroys volatile evidence; isolate and capture first, then eradicate.",
             "Preparation is the incident response phase that determines cloud outcomes, because evidence is ephemeral and access depends on prior agreements.",
@@ -1538,10 +2800,16 @@ Litigation brings electronic discovery, the identifying, preserving, collecting 
 
 Customers rarely audit a hyperscale provider themselves, so they rely on independent evidence. A SOC 1 report concerns controls over financial reporting; SOC 2 reports on security, availability, processing integrity, confidentiality and privacy, with Type I covering design at a point in time and Type II covering operating effectiveness over a period; SOC 3 is a public summary. ISO/IEC 27001 certifies an information security management system, 27017 adds cloud-specific controls and 27018 covers personal data in public clouds. The Cloud Security Alliance's Cloud Controls Matrix and STAR registry give a public, comparable view, from a self-assessment at Level 1 to third-party audit at Level 2.
 
-Risk management ties it together. Identify assets and threats, assess likelihood and impact, and treat risk by mitigating, transferring, avoiding or accepting it. Vendor risk management applies due diligence before onboarding, contracts for obligations, ongoing monitoring and an exit plan.""",
+Risk management ties it together. Identify assets and threats, assess likelihood and impact, and treat risk by mitigating, transferring, avoiding or accepting it. Vendor risk management applies due diligence before onboarding, contracts for obligations, ongoing monitoring and an exit plan.
+
+Legal analysis begins with the unique cloud risks: conflicting international legislation, government access requests, jurisdiction of the data and of the provider, and the evaluation of legal and regulatory frameworks. Privacy requirements distinguish contractual from regulated personal data (PII and PHI), name country-specific laws (FERPA, PIPEDA, GDPR, HIPAA with HITECH, India's Digital Personal Data Protection Act), recognize jurisdictional differences, and use standard privacy frameworks such as ISO/IEC 27018 and GAPP, with a privacy impact assessment before launch. eDiscovery follows ISO/IEC 27050 and CSA guidance, and forensics requirements follow ISO/IEC 27037, 27041, 27042 and 27043.
+
+Audits in the cloud must be adapted: virtualization and shared responsibility create assurance challenges, report types (SOC 1, 2 and 3 under SSAE 18, and ISAE 3402 or 3000 internationally) have scope statements that limit what they assure, and gap analysis and control self-assessment turn findings into treatments. Enterprise risk management adds data roles (owner, controller, custodian, processor, steward), regulatory transparency duties (breach notification, SOX), risk frameworks (ISO 31000, NIST RMF, COSO, ENISA), metrics such as key risk indicators, and specialized regimes for regulated sectors (NERC CIP, HIPAA and HITECH, PCI DSS).
+
+Contract design ties it together: the master service agreement, statement of work and service-level agreement set the business terms, and vendor management, right to audit, termination, data ownership, escrow, cyber risk insurance, supply-chain standards (ISO/IEC 27036) and assessments of the provider's risk management program protect the customer when things go wrong.""",
         'fundamentalsLabel': 'New to cloud law and risk? See the everyday analogy',
         'fundamentals': "Imagine you store family heirlooms in a bank's safe deposit boxes in several countries. You remain the owner and answer for the heirlooms, even though the bank holds them, and you need a rental contract that says who may open the box, how fast you are told if something happens and what happens when you close it. Different countries have different rules about what officials may demand from a bank, so you might keep the only key yourself. Instead of inspecting every bank vault, you read independent inspection reports and check whether they covered your branch and the right period. And before choosing a bank you investigate it; afterwards you keep watching it.",
-        'keyTerms': ['Controller and processor', 'GDPR', 'Data residency versus sovereignty', 'Standard contractual clauses', 'eDiscovery and legal hold', 'SOC 2 Type II', 'ISO/IEC 27001, 27017, 27018', 'CSA STAR', 'Due diligence and due care'],
+        'keyTerms': ['Controller and processor', 'GDPR', 'Data residency versus sovereignty', 'Standard contractual clauses', 'eDiscovery and legal hold', 'SOC 2 Type II', 'ISO/IEC 27001, 27017, 27018', 'CSA STAR', 'Due diligence and due care', 'Conflicting laws and jurisdiction', 'Privacy laws and frameworks', 'SOC, SSAE and ISAE reports', 'Risk frameworks and metrics', 'Contract terms and vendor management'],
         'commonTraps': [
             "Accountability stays with the controller; signing a processor contract or using a certified provider does not transfer it.",
             "Residency is where data sits; sovereignty is whose law governs it. They are different questions.",
