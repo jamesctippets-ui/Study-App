@@ -1695,6 +1695,30 @@ trading away for shinier but shallower ones.
   ISC2 published a broader Code of Professional Conduct in February 2026 that builds on
   the Code of Ethics canons; the CC and CISSP cheat sheets mention it. No cross-cert
   bridges exist for these tracks yet, and ISSAP, ISSEP and ISSMP are not covered.
+- [x] **Microsoft tracks refreshed against the current Learn study guides and docs (October 2026).**
+  Once the environment allowed `learn.microsoft.com` and the MicrosoftDocs raw files, all 12 Microsoft
+  tracks were audited skill by skill against their current study guides (dated May to October 2026).
+  Results: about 790 new flashcards and 880 new questions (AZ-900 +44/+50, DP-900 +35/+50, AB-650 +67/+52,
+  SC-500 +56/+57, AZ-104 +42/+63, AZ-305 +59/+76, DP-300 +28/+34, AZ-802 +38/+48, AZ-140 +50/+46,
+  MD-102 +37/+45, SC-300 +36/+45, SC-200 +31/+38) plus comparison items, Mad Libs, sequences, four
+  PowerShell challenges (AZ-802), cheat-sheet sections, extended lessons and one new lesson (SC-300 Global
+  Secure Access, a skill group that was missing). Category weights now follow the guides (keys and every
+  existing item id unchanged, so saved progress is safe; DP-300 keeps its six keys with the query-performance
+  category folded under "Monitor, configure, and optimize"). Corrections made against Learn include:
+  Restricted SharePoint Search retired (new enablement blocked since July 31, 2026; Restricted Content
+  Discovery replaces it), Remote Desktop MSI and web clients no longer supported in public cloud since
+  March 27, 2026 (Windows App), Sentinel Livestream retired, Azure AI services now Foundry Tools, Data
+  Activator now Activator, SQL VM Automated Patching now Azure Update Manager, NSG flow logs retiring
+  September 30, 2027, Azure Cache for Redis retirement dates, the Cloud Adoption Framework's seven phases,
+  Intune Suite renamed Advanced capabilities. Exam time limits now match Learn (DP-300, AZ-140 and MD-102
+  100 minutes, SC-500 120). Screenshots: all 63 real images were compared with their current source
+  articles by hash and pixel difference; 61 are unchanged and two M365 admin center images (agent sharing
+  settings, agent registry) were replaced after Microsoft redesigned them, with the four AB-650 questions that
+  use them rewritten. Honest limits: Learn publishes no question counts, so mock lengths are estimates;
+  AB-650 is still a beta exam with no published duration; a few facts were written from general product
+  knowledge (Azure Bastion and JIT licensing, Windows Event Forwarding, Defender for Storage caps) and the
+  workers did not re-review every new item, so about 40 to 50 percent of new multiple-choice questions still
+  have the correct option as the longest.
 - [ ] **Open ideas.** Sounds for the verbal quiz and the case-study end screen;
   lesson diagrams (OSI, subnetting, STP, OSPF, RMF) and cross-cert bridges for the new tracks, a Security+ track to sit beside CC and SSCP; sharing a scenario or term list between devices without a full export; a
   step bank that also learns from your own earlier scenarios; the real module
