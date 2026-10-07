@@ -2565,5 +2565,20 @@
   },
   "RD": {
     "exp": "Remote Desktop"
+  },
+  "CSS": {
+    "exp": "Cascading Style Sheets"
+  },
+  "GQL": {
+    "exp": "Graph Query Language"
+  },
+  "SWG": {
+    "exp": "Secure web gateway"
+  },
+  "SecOps": {
+    "exp": "Security operations"
+  },
+  "TRv2": {
+    "exp": "Tenant restrictions v2"
   }
 }

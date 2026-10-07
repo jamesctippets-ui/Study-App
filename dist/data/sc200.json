@@ -15,7 +15,7 @@
     {
       "key": "respondIncidents",
       "label": "Respond to Security Incidents",
-      "marks": 38,
+      "marks": 36,
       "resources": [
         {
           "label": "Microsoft Learn: Exam readiness - Preparing for SC-200: Manage incident response",
@@ -27,7 +27,7 @@
     {
       "key": "threatHunting",
       "label": "Perform Threat Hunting",
-      "marks": 20,
+      "marks": 22,
       "resources": [
         {
           "label": "Microsoft Learn: SC-200 - Perform threat hunting in Microsoft Sentinel",
@@ -92,7 +92,7 @@
       "cat": "manageSecOps",
       "front": "Microsoft Security Copilot in the SOC workflow",
       "back": "Security Copilot is a generative-AI assistant embedded in Sentinel and Defender XDR that can summarize an incident in plain language, suggest or generate a KQL query from a natural-language prompt, reverse-engineer a suspicious script, and draft an incident report, all grounded in the organization's own connected security data.",
-      "detail": "Copilot accelerates triage and hunting by drafting a starting KQL query or explaining an unfamiliar entity, but an analyst still reviews and validates its output before acting on it, the same as any other analyst-authored finding."
+      "detail": "Copilot accelerates triage and hunting by drafting a starting KQL query or explaining an unfamiliar entity, but an analyst still reviews and validates its output before acting on it, the same as any other analyst-authored finding. Security Copilot also runs agents (triage, threat intelligence briefing, analysis, dynamic detection) that use SCUs, and is included for eligible Microsoft 365 E5 and E7 customers."
     },
     {
       "id": "f9",
@@ -133,7 +133,7 @@
       "id": "f14",
       "cat": "manageSecOps",
       "front": "Threat intelligence indicators in Sentinel",
-      "back": "Threat intelligence indicators (IPs, domains, file hashes, URLs) can be ingested from Microsoft Defender Threat Intelligence, TAXII feeds, or the upload API/UI, stored in the ThreatIntelIndicators and ThreatIntelObjects tables (which replaced the legacy ThreatIntelligenceIndicator table, retired in 2026), and matched against log data automatically by the built-in TI-based analytics rule templates.",
+      "back": "Threat intelligence indicators (IPs, domains, file hashes, URLs) can be ingested from Microsoft Defender Threat Intelligence, TAXII feeds, or the upload API/UI, stored in the ThreatIntelIndicators and ThreatIntelObjects tables (which replaced the legacy ThreatIntelligenceIndicator table, which stopped receiving data after July 31, 2025), and matched against log data automatically by the built-in TI-based analytics rule templates.",
       "detail": "A hunting query can also join directly against the threat intelligence tables to check historical log data for any past match against a newly learned indicator, not only future activity going forward."
     },
     {
@@ -272,9 +272,9 @@
     {
       "id": "f34",
       "cat": "threatHunting",
-      "front": "Livestream in Sentinel",
-      "back": "Livestream runs a KQL query interactively and surfaces new matching results in near real time as they arrive, useful for watching a specific pattern unfold live during an active investigation without waiting for the next scheduled analytics rule run.",
-      "detail": "Livestream is a temporary, session-based watch -- it is not a saved, recurring detection the way an analytics rule is, and it runs only while the session is active (until it is paused or the analyst signs out). Microsoft has announced livestream's retirement from mid-March 2026, pointing to analytics rules and playbooks for persistent notification."
+      "front": "Livestream in Sentinel (retired)",
+      "back": "Livestream was a Sentinel hunting feature that ran a KQL query interactively and surfaced new matches in near real time during a session. It is no longer available: Microsoft recommends KQL jobs, analytics rules, or playbooks for persistent query results and notifications.",
+      "detail": "Older material describes livestream as a temporary, session-based watch that was not a saved, recurring detection. The replacement for ongoing alerting is an analytics rule (scheduled or NRT); the replacement for scheduled long-running queries over lake data is a KQL job."
     },
     {
       "id": "f35",
@@ -476,8 +476,8 @@
       "id": "f63",
       "cat": "threatHunting",
       "front": "Jupyter notebooks in Microsoft Sentinel",
-      "back": "Sentinel notebooks run in an attached Azure Machine Learning workspace and let an analyst combine KQL queries with full Python code -- calling machine learning libraries, external threat intelligence APIs, or custom visualizations -- for hunting scenarios too complex for KQL alone, such as clustering related entities or scoring anomalies with a custom model.",
-      "detail": "This goes further than livestream or a saved hunting query, which are both still fundamentally single-KQL-query tools with no general-purpose programming language layered on top."
+      "back": "Sentinel notebooks run in an attached Azure Machine Learning workspace and let an analyst combine KQL queries with full Python code -- calling machine learning libraries, external threat intelligence APIs, or custom visualizations -- for hunting scenarios too complex for KQL alone, such as clustering related entities or scoring anomalies with a custom model. Notebooks over the Sentinel data lake instead run through the Microsoft Sentinel extension for Visual Studio Code using PySpark on Spark compute.",
+      "detail": "This goes further than a saved hunting query, which is still fundamentally a single-KQL-query tool with no general-purpose programming language layered on top."
     },
     {
       "id": "f64",
@@ -842,6 +842,223 @@
       "front": "AlertInfo and AlertEvidence tables (advanced hunting)",
       "back": "In Defender XDR advanced hunting, AlertInfo holds alert details such as title, severity and category, and AlertEvidence holds the files, IP addresses, URLs, users and devices tied to each alert. Both share an AlertId column for joining.",
       "detail": "Join them on AlertId to list every entity involved in an alert. They cover alerts from all Defender workloads, and they replace the older device-only alerts table."
+    },
+    {
+      "id": "f9201",
+      "cat": "manageSecOps",
+      "front": "Email notifications for incidents in Defender XDR",
+      "back": "Incident notification rules email your staff about new incidents or updates to existing ones. A rule can filter by alert severity, service source (and specific detection source), and device group, and can set a different severity per source, such as Medium and High for endpoint detections but every severity for Defender Experts. You create them in Settings > Microsoft Defender XDR > Email notifications > Incidents tab, and separate notification types exist for response actions and for threat analytics reports.",
+      "detail": "Configuring notifications needs the Manage security settings permission (or Security Administrator with basic permissions management). With RBAC, you can only manage and receive notifications for the device groups you are allowed to manage."
+    },
+    {
+      "id": "f9202",
+      "cat": "manageSecOps",
+      "front": "Alert notifications (Defender for Endpoint email rules)",
+      "back": "Alert notification rules email chosen recipients when new alerts of selected severities appear for selected device groups, with options to include the organization name, a tenant-specific portal link, and device information. They live under Settings > Endpoints > General > Email notifications. Recipients added later only receive alerts triggered after they were added.",
+      "detail": "With RBAC, users can create, edit, or delete only rules limited to the device groups they manage; only a Global Administrator can manage rules that apply to all device groups."
+    },
+    {
+      "id": "f9203",
+      "cat": "manageSecOps",
+      "front": "Alert tuning in Defender XDR (previously alert suppression)",
+      "back": "Alert tuning rules hide or resolve alerts automatically, or convert them to behaviors, when known-benign conditions on the alert's evidence (files, processes, scheduled tasks and so on) are met. Actions are Hide alert (no incident is created, data stays in AlertInfo and AlertEvidence), Resolve alert, and Set as behavior (data stays in BehaviorInfo and BehaviorEntities for hunting). Microsoft also ships built-in alert tuning rules for common benign activity; they do not apply to custom detections or custom threat intelligence alerts.",
+      "detail": "Create rules under Settings > Microsoft Defender XDR > Alert tuning or from an alert's details page. Built-in rules suppress alerts without stopping automated investigations, and a suppressed alert is reactivated if an investigation finds malicious activity."
+    },
+    {
+      "id": "f9204",
+      "cat": "manageSecOps",
+      "front": "Alert correlation and analytics rule correlation settings",
+      "back": "The Defender portal correlates alerts from all sources into incidents and merges incidents as an attack unfolds. For Sentinel analytics rules, you can include or exclude rules from this correlation engine: by default all analytics rules are excluded at the tenant level when you onboard, so incidents are grouped only by each rule's own settings, as they were in Sentinel. You can instead include all rules and exclude specific ones. Managing this needs the Microsoft Sentinel Contributor role.",
+      "detail": "With several Sentinel workspaces, one is configured as the primary workspace whose alerts can be correlated with Defender alerts."
+    },
+    {
+      "id": "f9205",
+      "cat": "manageSecOps",
+      "front": "Defender for Endpoint advanced features",
+      "back": "Settings > Endpoints > Advanced features holds tenant-wide switches, including EDR in block mode (blocks malicious artifacts even when Microsoft Defender Antivirus is passive), automatically resolve alerts, allow or block file, custom network indicators (for IP, domain, and URL indicators, needing network protection), tamper protection, hide potential duplicate device records, and restrict correlation to within scoped device groups.",
+      "detail": "Custom network indicators and allow or block file are what make indicators of compromise enforceable on devices, so an indicator that does nothing often means the matching advanced feature is still off."
+    },
+    {
+      "id": "f9206",
+      "cat": "manageSecOps",
+      "front": "Custom data collection in Defender for Endpoint (preview)",
+      "back": "Custom data collection rules capture endpoint events beyond default telemetry, with filters on properties such as folder paths, process names, and network connections, and store them in a connected Microsoft Sentinel workspace for hunting. They need Defender for Endpoint Plan 2, dynamic tags configured in asset rule management (static tags are not supported), and are limited to one Sentinel workspace per tenant for this feature.",
+      "detail": "Each rule captures up to 75,000 events per device per rolling 24 hours, after which telemetry for that rule stops until the window resets, so use several focused rules and pilot on a small device group first."
+    },
+    {
+      "id": "f9207",
+      "cat": "manageSecOps",
+      "front": "Configuring automatic attack disruption",
+      "back": "Automatic attack disruption is configured by a Global Administrator or Security Administrator and depends on broad deployment of the Defender products, because each detection needs the relevant signals. For Defender for Endpoint, device groups should use the Full remediation level (the recommended setting) and the sensor must meet the minimum version for the Contain user action. You can set exclusions to keep chosen users or devices from being disrupted, and review actions in Incidents and the Action center.",
+      "detail": "Attack disruption actions for external platforms such as Okta and AWS (preview) additionally need a Sentinel workspace connected to the unified portal with the matching connector."
+    },
+    {
+      "id": "f9208",
+      "cat": "manageSecOps",
+      "front": "Data tiers and retention: Analytics, Data lake, and XDR default tiers",
+      "back": "The Analytics tier is hot storage for alerting, hunting, and all Sentinel features, with 30 days of analytics retention by default that can be extended to up to two years. The Data lake tier is low-cost cold storage that supports up to 12 years of total retention, reachable through KQL jobs, notebooks, and summary rules but not real-time detections. Defender XDR tables sit in an XDR default tier with 30 days of analytics retention that can be raised to 90 days with ingestion cost only, and beyond 90 days also incurs storage cost.",
+      "detail": "By default data in the analytics tier is mirrored to the lake for the same period, so you extend only the total retention to keep it longer. Basic Logs tables can be viewed in the Defender portal but managed only in the Log Analytics workspace unless you change the plan to Analytics."
+    },
+    {
+      "id": "f9209",
+      "cat": "manageSecOps",
+      "front": "Sentinel roles: Azure roles for the SIEM, Entra roles for the data lake",
+      "back": "Sentinel SIEM access uses Azure RBAC built-in roles: Reader (view), Responder (also manage incidents), Contributor (also install solutions and create or edit resources), Playbook Operator (run playbooks), and Automation Contributor (lets automation rules run playbooks). The Sentinel data lake instead uses Microsoft Entra roles: Global Reader, Security Reader, Security Operator, and Security Administrator can read across the lake, while Security Operator, Security Administrator, and Global Administrator can write, for example KQL job output to the analytics tier.",
+      "detail": "Assign the Azure roles at resource group level for best results. Creating or editing playbooks also needs Logic App Contributor, and Responder alone does not let someone create automation rules that call playbooks."
+    },
+    {
+      "id": "f9210",
+      "cat": "manageSecOps",
+      "front": "SOAR playbook generator (AI-authored playbooks)",
+      "back": "In the Defender portal, Sentinel customers can describe an automation in natural language and co-author a Python-based playbook with an AI coding agent in an embedded VS Code environment. The result is validated, documented with a flow diagram, and can be tested by supplying a real alert. It does not require a separate Security Copilot license or SCUs.",
+      "detail": "This complements Logic Apps-based playbooks; automation rules still decide when automation starts."
+    },
+    {
+      "id": "f9211",
+      "cat": "manageSecOps",
+      "front": "Windows Event Forwarding (WEF) and the Windows Event Collector",
+      "back": "WEF is a built-in Windows feature in which source computers push chosen events to a central Windows Event Collector (WEC) server through subscriptions. For Sentinel you can install the Azure Monitor Agent on the WEC server and use a data collection rule to send the forwarded events, rather than installing the agent on every source machine, which suits large fleets and servers where an agent is not allowed.",
+      "detail": "Contrast with the Windows Security Events via AMA connector, where the agent runs on each machine and a DCR picks the event sets or XPath filters to collect."
+    },
+    {
+      "id": "f9212",
+      "cat": "manageSecOps",
+      "front": "Collecting Azure activity and resource logs with Azure Policy",
+      "back": "The Azure Activity connector streams subscription-level control-plane events into the AzureActivity table. Azure resource connectors stream resource diagnostic logs by using Azure Policy to apply one log-streaming (diagnostic setting) configuration to all current and future resources of a type within a scope, which needs the Owner role on the policy assignment scope. Resource diagnostic logs usually land in AzureDiagnostics or resource-specific tables.",
+      "detail": "Without Policy you would create a diagnostic setting by hand on every resource; Policy also remediates new resources automatically. These connectors do not support DCR transformations."
+    },
+    {
+      "id": "f9213",
+      "cat": "manageSecOps",
+      "front": "KQL jobs in the Sentinel data lake",
+      "back": "KQL jobs run one-time or scheduled asynchronous queries on data lake tables and federated tables (such as Microsoft Entra ID, Microsoft 365, and Resource Graph data) and are suited to long investigations, historical threat intelligence matching, and joins or unions across many tables. A job can promote results to the analytics tier as a new table (named with a _KQL_CL suffix) or append to an existing one, so you can then hunt and alert on it.",
+      "detail": "Promote only the columns and rows you need because analytics-tier storage costs more than the lake. Use KQL jobs for up to 12 years of data, summary rules for frequent summarization (for example every 20 minutes), and search jobs for archived data or hydrating one big table."
+    },
+    {
+      "id": "f9214",
+      "cat": "manageSecOps",
+      "front": "Summary rule tables (updated detail)",
+      "back": "Summary rules aggregate high-volume data on a schedule into custom summary tables in the analytics tier, so dashboards, hunting, and detections query a small table. They can read from Analytics, Auxiliary, Basic, and data lake tables (but not System tables), run as often as every 20 minutes, and have out-of-the-box templates.",
+      "detail": "They suit workspaces not onboarded to the data lake, such as when the source is on a Basic or Auxiliary plan."
+    },
+    {
+      "id": "f9215",
+      "cat": "manageSecOps",
+      "front": "Security Copilot agents in the Defender portal",
+      "back": "Security Copilot agents automate SOC tasks and are deployed from Security Copilot > Security Store in the Defender portal, then set up from Security Copilot > Agents. In Defender they include the Phishing Triage Agent (extended as the Security Alert Triage Agent), the Threat Intelligence Briefing Agent, the Security Analyst Agent, the Dynamic Threat Detection Agent, and the Threat Hunting Assistant. Agents consume Security Compute Units (SCUs) and authenticate with a dedicated Microsoft Entra Agent ID agent identity or a connected user account.",
+      "detail": "Eligible Microsoft 365 E5 and E7 customers receive Security Copilot with 400 SCUs per month for every 1,000 paid user licenses, up to 10,000 SCUs per month, at no additional cost."
+    },
+    {
+      "id": "f9216",
+      "cat": "manageSecOps",
+      "front": "Sentinel MCP server",
+      "back": "Microsoft Sentinel's Model Context Protocol (MCP) support is a hosted, Entra-authenticated server offering scenario-focused tool collections, so AI clients and agents can query Sentinel data lake and Defender data in natural language without knowing table schemas or writing KQL. Compatible hosts include Visual Studio Code, Security Copilot, Copilot Studio, and other MCP-capable AI clients.",
+      "detail": "In MCP terms the AI application is the host, it runs an MCP client per connection, and the Sentinel server provides the tools. It needs no infrastructure deployment from you."
+    },
+    {
+      "id": "f9217",
+      "cat": "manageSecOps",
+      "front": "Case management in the Defender portal",
+      "back": "Case management manages SecOps work natively in the Defender portal. Incident cases (preview, and the recommended experience for incidents) are created from correlated incident activity and track ownership, severity, status, classification, tasks, comments, activity history, custom fields, and resolution. Generic cases are created manually for other SecOps work. Case templates configure custom fields and SLA policies.",
+      "detail": "Incident case access uses the unified RBAC permissions Security Data Read (view) and Security Data Manage (view and manage), the same model as the legacy incident experience, which remains available during preview."
+    },
+    {
+      "id": "f9220",
+      "cat": "respondIncidents",
+      "front": "Device timeline in Defender for Endpoint",
+      "back": "The Timeline tab of a device page shows a chronological view of the events and associated alerts observed on that device, so an analyst can follow a suspected attack step by step. You can filter by event type, review the MITRE ATT&CK techniques linked to events, open process trees, and flag events for follow-up.",
+      "detail": "The timeline can show activity that is newer than the device page's Last seen value, so trust the timeline when the two disagree."
+    },
+    {
+      "id": "f9221",
+      "cat": "respondIncidents",
+      "front": "Purview Insider Risk Management and DLP alerts in Defender XDR",
+      "back": "Microsoft Purview Insider Risk Management alerts appear in the Defender portal under Incidents & alerts, can be grouped with DLP and Microsoft Entra ID alerts in one incident, can be filtered by service source, and stay synchronized with Purview. Analysts can hunt for all activity tied to the user in the alert. DLP alerts are handled the same way, with remediation in place on users, files, and devices.",
+      "detail": "A built-in alert tuning rule for DLP signals takes effect in early October 2026: it sets them as behaviors, so they stop generating alerts and incidents but remain in BehaviorInfo and BehaviorEntities. Disable the rule under Settings > Microsoft Defender XDR > Alert tuning to keep DLP alerts."
+    },
+    {
+      "id": "f9222",
+      "cat": "respondIncidents",
+      "front": "Microsoft Purview Audit (Standard vs. Premium)",
+      "back": "Purview Audit records user and admin activity in the unified audit log and is enabled by default. Audit (Standard) retains records for 180 days and supports the audit search tool, the Audit Search Graph API, and the Search-UnifiedAuditLog cmdlet. Audit (Premium) includes all of that, keeps records up to one year (ten years with an add-on), and offers audit log retention policies and higher bandwidth access to the Office 365 Management Activity API.",
+      "detail": "For a business email compromise investigation, audit records of mailbox rule changes and sign-ins from the unified audit log often provide the timeline; if the event is older than the retention window it is gone."
+    },
+    {
+      "id": "f9223",
+      "cat": "respondIncidents",
+      "front": "Content search in Purview eDiscovery",
+      "back": "Microsoft Purview eDiscovery lets investigators search Exchange Online mailboxes, SharePoint sites, OneDrive, Teams, Microsoft 365 Groups, and Viva Engage in one search and export results. Classic Content Search, classic eDiscovery (Standard), and classic eDiscovery (Premium) were retired on August 31, 2025 (except for Microsoft 365 operated by 21Vianet); content search features now live in the search experience of the new eDiscovery, including a Content Search case.",
+      "detail": "Access requires membership in the eDiscovery Manager role group in the Purview portal. Content search finds items in place; it does not itself investigate sign-in or API activity, which come from audit and Graph logs."
+    },
+    {
+      "id": "f9224",
+      "cat": "respondIncidents",
+      "front": "Microsoft Graph activity logs",
+      "back": "Microsoft Graph activity logs are an audit trail of every HTTP request the Graph service processes for a tenant, from apps, SDKs, scripts, and Microsoft portals. They are off until a tenant admin enables them with a diagnostic setting that sends them to Log Analytics, storage, or Event Hubs; this needs Microsoft Entra ID P1 or P2 and Security Administrator is the least privileged supported role. In Log Analytics they appear in the MicrosoftGraphActivityLogs table with fields such as AppId, UserId, ServicePrincipalId, IPAddress, RequestUri, and ResponseStatusCode.",
+      "detail": "They show what a stolen token or malicious app actually did through the API, such as mass mailbox reads, which sign-in logs alone do not reveal. Advanced hunting has a related GraphAPIAuditEvents table."
+    },
+    {
+      "id": "f9225",
+      "cat": "respondIncidents",
+      "front": "Investigating incidents with agentic AI",
+      "back": "Embedded Security Copilot and its agents speed up investigations: the Security Analyst Agent runs ready-made or custom analyses (anomaly detection, clustering, risk scoring) on Defender, Sentinel Log Analytics, or data lake data from a prompt or from Analyze with copilot in advanced hunting; the Threat Hunting Assistant turns natural language into KQL and interprets results; the Dynamic Threat Detection Agent raises alerts for gaps it finds with MITRE-mapped explanations. Incident cases can also run agentic playbooks and show agent session output.",
+      "detail": "An analyst remains responsible for validating what an agent concludes before acting. Agents consume SCUs and run under an agent identity or a connected user account."
+    },
+    {
+      "id": "f9226",
+      "cat": "respondIncidents",
+      "front": "Releasing actions taken by automatic attack disruption",
+      "back": "Containment taken by automatic attack disruption, such as a contained user account or an isolated device, appears in the incident and in the Action center. An analyst reviews the incident evidence, and if the detection is judged a false positive, undoes the action from the Action center so the user or device regains access.",
+      "detail": "Excluding a device or user from disruption in the configuration is a preventive control; releasing the action in the Action center is the corrective one after the fact."
+    },
+    {
+      "id": "f9240",
+      "cat": "threatHunting",
+      "front": "Hunting graph in Defender XDR",
+      "back": "The hunting graph renders threat scenarios in advanced hunting as an interactive graph of entities and relationships, so an analyst can trace paths and possible choke points and take actions on results that tabular KQL output might hide. Open it from Investigation & response > Hunting > Advanced hunting using the hunting graph icon. It depends on the Microsoft Sentinel data lake and at least read-only access to Microsoft Security Exposure Management.",
+      "detail": "Use it to see how entities connect (for example a user with privileged access paths to a critical asset), instead of joining many tables by hand."
+    },
+    {
+      "id": "f9241",
+      "cat": "threatHunting",
+      "front": "Blast radius analysis in the incident graph",
+      "back": "Blast radius analysis extends the incident graph in Defender to show the vulnerable paths an attacker could take from a compromised entity to a critical asset, so one consolidated graph shows the current impact of a breach and the possible future impact. It is powered by Microsoft Sentinel graph and is auto-provisioned when you already have the Sentinel data lake.",
+      "detail": "Blast radius is about what could happen next; the hunting graph is the analyst-driven exploration tool. Purview Insider Risk Management has a similar data risk graph for data leak blast radius."
+    },
+    {
+      "id": "f9242",
+      "cat": "threatHunting",
+      "front": "Microsoft Sentinel graph and custom graphs",
+      "back": "Microsoft Sentinel graph models assets, identities, activities, and threat intelligence as nodes and edges, answering questions such as what the blast radius of a compromised account or document is. Custom graphs (preview) are authored in a Jupyter notebook with the Microsoft Sentinel extension for Visual Studio Code, published and materialized by a graph job, and queried with Graph Query Language (GQL) on the Graphs page in the Defender portal.",
+      "detail": "On-demand graph jobs keep a graph for 30 days, while scheduled graph jobs rebuild it on your refresh schedule. Usage is billed under the Sentinel graph meter."
+    },
+    {
+      "id": "f9243",
+      "cat": "threatHunting",
+      "front": "EntraIdSignInEvents (replaces AADSignInEventsBeta)",
+      "back": "EntraIdSignInEvents is the advanced hunting table for Microsoft Entra interactive and non-interactive sign-ins, and EntraIdSpnSignInEvents covers service principal and managed identity sign-ins. The AADSignInEventsBeta table is deprecated on October 19, 2026, when queries that use it are migrated automatically to EntraIdSignInEvents.",
+      "detail": "In a Sentinel workspace the equivalent tables are SigninLogs and the non-interactive and service principal sign-in log tables; the Entra-prefixed tables are the Defender XDR advanced hunting names."
+    },
+    {
+      "id": "f9244",
+      "cat": "threatHunting",
+      "front": "Choosing the right advanced hunting table",
+      "back": "Match the question to the table: UrlClickEvents for Safe Links clicks from email, Teams, and Office apps; EmailEvents, EmailAttachmentInfo, and EmailUrlInfo for messages, attachments, and URLs; DeviceProcessEvents, DeviceFileEvents, DeviceNetworkEvents, and DeviceLogonEvents for endpoint activity; IdentityLogonEvents and IdentityQueryEvents for Active Directory authentication and directory queries; CloudAppEvents for cloud app activity; GraphAPIAuditEvents for Microsoft Graph API requests; AlertInfo and AlertEvidence for alerts.",
+      "detail": "When a case needs both a click and its landing activity, join UrlClickEvents to DeviceNetworkEvents or EmailUrlInfo on the URL or user instead of searching one table broadly."
+    },
+    {
+      "id": "f9245",
+      "cat": "threatHunting",
+      "front": "Hunting with notebooks on the data lake and the Sentinel MCP server",
+      "back": "Notebooks over the Sentinel data lake are Jupyter notebooks run through the Microsoft Sentinel extension for Visual Studio Code using PySpark on Spark compute, suited to low-and-slow attack detection, anomaly and machine learning analysis, and visualization across large data. An MCP client such as VS Code can additionally connect to the Sentinel MCP server so an AI assistant can query the same lake data in natural language.",
+      "detail": "Notebook jobs can be scheduled, and you can promote findings to the analytics tier with a KQL job for alerting."
+    },
+    {
+      "id": "f9246",
+      "cat": "threatHunting",
+      "front": "KQL jobs vs. summary rules vs. search jobs (when to hunt with which)",
+      "back": "Use a KQL job for up to 12 years of lake data with full KQL, joins, and unions, one-time or scheduled. Use a summary rule for frequent aggregation (as often as every 20 minutes) of Analytics, Basic, Auxiliary, or lake data into analytics-tier summary tables. Use a search job for data in the archive tier (or older than your data lake onboarding date) and to hydrate a large volume from a single table into a new table.",
+      "detail": "If the question mentions joins across many tables over years, think KQL job; frequent small aggregates, summary rule; archived or one-table forensic retrieval, search job."
     }
   ],
   "questions": [
@@ -1038,10 +1255,10 @@
         "A playbook for the dashboard, plus an automation rule for the threshold alert",
         "A workbook for the dashboard, plus a scheduled analytics rule over SecurityIncident for the threshold alert",
         "A single workbook that also generates incidents when a tile crosses the threshold",
-        "A hunting query bookmark for the dashboard, plus a livestream session for the threshold alert"
+        "A hunting query bookmark for the dashboard, plus a saved hunting query run each morning for the threshold alert"
       ],
       "correct": 1,
-      "explanation": "Workbooks visualize KQL results for human readers but cannot raise incidents themselves, so the alerting need requires a scheduled analytics rule querying SecurityIncident. A playbook performs actions and does not render dashboards, and an automation rule reacts to incidents rather than measuring a metric. Bookmarks preserve hunting evidence, and livestream is a temporary interactive session, not a persistent alert."
+      "explanation": "Workbooks visualize KQL results for human readers but cannot raise incidents themselves, so the alerting need requires a scheduled analytics rule querying SecurityIncident. A playbook performs actions and does not render dashboards, and an automation rule reacts to incidents rather than measuring a metric. Bookmarks preserve hunting evidence, and a saved hunting query is run by hand and raises no alert on its own."
     },
     {
       "id": "q15",
@@ -1234,25 +1451,25 @@
       "options": [
         "Mark the hunting query as a favorite so it runs with the other favorites",
         "Save the matching rows as a bookmark and add it to a new incident each week",
-        "Start a livestream session from the query and leave it open",
+        "Pin the query to a workbook tile so the team can see the matches",
         "Create a scheduled analytics rule from the query and map the host and IP entities"
       ],
       "correct": 3,
-      "explanation": "Promoting a proven hunting query into a scheduled analytics rule makes detection automatic, and entity mapping attaches the host and IP to the incident. A bookmark preserves one set of results by hand, livestream is a temporary interactive session, and favorites only make queries easier to run manually."
+      "explanation": "Promoting a proven hunting query into a scheduled analytics rule makes detection automatic, and entity mapping attaches the host and IP to the incident. A bookmark preserves one set of results by hand, a workbook tile only displays results without creating incidents, and favorites only make queries easier to run manually."
     },
     {
       "id": "q29",
       "cat": "threatHunting",
       "type": "mc",
-      "question": "During a live investigation, an analyst wants to be notified as new events matching a KQL pattern arrive, for the length of the investigation only. No incidents should be created and no permanent rule should be left behind. Which Sentinel feature fits?",
+      "question": "A SOC analyst used a hunting query to find a suspicious pattern and now wants it to notify the team persistently whenever new matching events arrive, replacing the retired Sentinel livestream feature. Which approach is recommended?",
       "options": [
         "A bookmark on the query's current results",
-        "Livestream",
-        "A near-real-time analytics rule",
-        "A scheduled summary rule"
+        "A scheduled or near-real-time analytics rule, with a playbook for notification",
+        "A watchlist containing the matching events",
+        "A workbook tile that is opened daily"
       ],
       "correct": 1,
-      "explanation": "Livestream runs a query interactively and surfaces new matches as they arrive, without producing a permanent detection. An NRT rule is a persistent detection that generates incidents. A bookmark captures results that already exist, and a summary rule precomputes aggregates rather than notifying anyone."
+      "explanation": "Livestream is no longer available; analytics rules (and playbooks or KQL jobs) provide persistent detection and notification. A bookmark captures results that already exist, a watchlist is reference data rather than a notifier, and a workbook tile must be opened by someone to be seen."
     },
     {
       "id": "q30",
@@ -1542,15 +1759,15 @@
       "question": "Which two statements about hunting features in Sentinel are true? (Choose two.)",
       "options": [
         "A bookmark preserves selected result rows so they can be added to an incident as evidence",
-        "Livestream writes every match into a table and automatically opens an incident",
+        "Livestream remains the primary way to get persistent notifications from a query",
         "A bookmark re-runs its query every five minutes and updates itself",
-        "A livestream session can notify the analyst when new events match its query"
+        "Livestream has been retired, so analytics rules, KQL jobs, or playbooks should be used for persistent notification"
       ],
       "correct": [
         0,
         3
       ],
-      "explanation": "Bookmarks capture evidence from a hunt and can be attached to incidents, and livestream surfaces new matches as they arrive. Livestream is interactive and does not create incidents by itself, and a bookmark is a stored snapshot rather than a recurring query."
+      "explanation": "Bookmarks capture evidence from a hunt and can be attached to incidents, and livestream is no longer available, with analytics rules, KQL jobs, and playbooks as the persistent alternatives. A bookmark is a stored snapshot rather than a recurring query, so it does not re-run."
     },
     {
       "id": "q33",
@@ -2448,6 +2665,461 @@
       "explanation": "With the time bin removed, summarize groups only by UserPrincipalName, so count() totals every failed sign-in for each user over the queried time range in one row. dcount(UserPrincipalName) would count distinct users per group and return 1, flipping the filter to equals zero would count successful sign-ins instead, and distinct returns the users without any count.",
       "whyTested": "Reshaping a query's grouping to serve a slightly different question is routine hunting work. The exam tests choosing the clause that actually changes the grouping instead of an operator that merely sounds related.",
       "image": "sentinelLogsKql"
+    },
+    {
+      "id": "q9201",
+      "cat": "manageSecOps",
+      "type": "mc",
+      "question": "The SOC wants an email only when a High severity endpoint alert appears on servers, and an email for every severity of Defender Experts activity, all tied to new and updated incidents. Where should the analyst create these rules?",
+      "options": [
+        "Settings > Endpoints > General > Email notifications, one rule per alert",
+        "In Sentinel, as an automation rule that runs a playbook to send mail",
+        "Settings > Microsoft Defender XDR > Email notifications, as incident notification rules with severity set per service source",
+        "In Threat analytics, by following each report"
+      ],
+      "correct": 2,
+      "explanation": "Incident notification rules can filter by service source, detection source, and device group and can set the severity separately per source, which matches the request. The Endpoints email notifications are alert-based and cover endpoint alerts only, with no per-source severity and no incident updates. A Sentinel automation rule is a workable build but not the built-in notification feature, and it would not cover Defender Experts incidents without extra work. Following threat analytics reports notifies about reports, not incidents."
+    },
+    {
+      "id": "q9202",
+      "cat": "manageSecOps",
+      "type": "mc",
+      "question": "A backup server runs an approved tool that triggers the same low-value Defender XDR alert daily. The SOC wants matching alerts hidden from the queue with no incident created, but the signal must remain searchable in advanced hunting. What should they create?",
+      "options": [
+        "An alert tuning rule with the Hide alert action, scoped to the alert's evidence conditions",
+        "A device group with the Full automation level for the backup server",
+        "A Sentinel analytics rule with alert suppression for 24 hours",
+        "A custom detection rule that deletes the alert"
+      ],
+      "correct": 0,
+      "explanation": "Alert tuning (formerly alert suppression) rules match conditions on the alert's evidence and can hide the alert so no incident is created while the data stays in AlertInfo and AlertEvidence. Changing the automation level affects remediation, not alert visibility. Analytics rule suppression in Sentinel pauses a single rule's query for a period and does not tune alerts from Defender products. Custom detections create alerts and cannot delete one."
+    },
+    {
+      "id": "q9203",
+      "cat": "manageSecOps",
+      "type": "mc",
+      "question": "After onboarding Sentinel to the Defender portal, a team migrating from standalone Sentinel finds that incidents from its analytics rules are grouped exactly as in the old Sentinel configuration, not merged with other Defender alerts. They now want the Defender correlation engine to also merge incidents from most of their rules. What should they do?",
+      "options": [
+        "Move the workspace to the Basic Logs plan",
+        "Disable alert grouping in every analytics rule",
+        "Create automation rules that merge incidents by owner",
+        "Change the analytics rule correlation setting to include all rules and exclude only specific ones"
+      ],
+      "correct": 3,
+      "explanation": "By default analytics rules are excluded from Defender correlation at the tenant level so incident behavior stays predictable after migration, and the setting can be flipped to include all rules and exclude specific ones. Basic Logs is a table plan and has no effect on correlation. Disabling alert grouping would remove the rule-level grouping rather than invite Defender merging. Merging by owner in an automation rule is not how cross-product correlation works."
+    },
+    {
+      "id": "q9204",
+      "cat": "manageSecOps",
+      "type": "mc",
+      "question": "An analyst created an IP-address indicator to block a command-and-control server in Defender for Endpoint, but connections from a managed laptop still succeed. Network protection is enabled in block mode on the laptop. What is the most likely missing setting?",
+      "options": [
+        "Custom network indicators in Settings > Endpoints > Advanced features",
+        "Hide potential duplicate device records",
+        "Restrict correlation to within scoped device groups",
+        "Automatically resolve alerts"
+      ],
+      "correct": 0,
+      "explanation": "IP, domain, and URL indicators are only enforced on devices when custom network indicators is turned on in the advanced features, together with network protection. The other switches change device list hygiene, alert correlation scope, and alert resolution, none of which stops a connection."
+    },
+    {
+      "id": "q9205",
+      "cat": "manageSecOps",
+      "type": "mc",
+      "question": "A threat hunter wants to capture all PowerShell script executions only from administrator workstations, beyond default endpoint telemetry, and store them in Microsoft Sentinel for hunting without collecting every event on every device. What should you configure?",
+      "options": [
+        "An ASR rule that audits script execution",
+        "A custom data collection rule in Defender for Endpoint scoped to devices with a dynamic tag",
+        "A summary rule that aggregates DeviceProcessEvents",
+        "A Windows Event Forwarding subscription on each workstation"
+      ],
+      "correct": 1,
+      "explanation": "Custom data collection rules add targeted event collection with filters and device scope based on dynamic tags and send the data to a connected Sentinel workspace. An ASR rule audits or blocks behavior but does not create new collected telemetry for hunting. A summary rule aggregates data you already ingest. WEF on every workstation would be an unrelated, heavier mechanism for Windows event logs rather than Defender endpoint telemetry."
+    },
+    {
+      "id": "q9206",
+      "cat": "manageSecOps",
+      "type": "mc",
+      "question": "A company must keep identity sign-in telemetry for seven years for audits, only ever querying it occasionally for investigations, and wants the lowest practical storage cost. Detection rules need only the last 90 days. What should you configure?",
+      "options": [
+        "Keep everything in the Analytics tier with seven years of analytics retention",
+        "Set the table to the Basic Logs plan and write analytics rules against it",
+        "Keep 90 days in the Analytics tier and extend total retention in the data lake tier to seven years",
+        "Export the data monthly to a storage account and delete it from the workspace"
+      ],
+      "correct": 2,
+      "explanation": "Analytics tier data is mirrored to the lake, and total retention in the lake can extend to 12 years at low cost, so detections use the analytics window and audits query the lake with KQL jobs. Analytics retention is capped at two years and is the expensive hot tier. Basic Logs data cannot back analytics rules. A manual storage export loses native querying and adds operational work."
+    },
+    {
+      "id": "q9207",
+      "cat": "manageSecOps",
+      "type": "mc",
+      "question": "A junior analyst needs to run KQL jobs across all workspaces in the Sentinel data lake and write the results to the analytics tier, with the least privilege. Which role should be assigned?",
+      "options": [
+        "Microsoft Sentinel Reader at subscription level",
+        "Microsoft Sentinel Automation Contributor",
+        "Security Reader in Microsoft Entra ID",
+        "Security Operator in Microsoft Entra ID"
+      ],
+      "correct": 3,
+      "explanation": "The data lake uses Microsoft Entra roles, and writing job output to the analytics tier requires Security Operator, Security Administrator, or Global Administrator, Security Operator being the least privileged. Security Reader can read across the lake but not write. Sentinel Reader and Automation Contributor are Azure roles for the SIEM workspace and do not grant lake-wide write access."
+    },
+    {
+      "id": "q9208",
+      "cat": "manageSecOps",
+      "type": "mc",
+      "question": "An organization has a large fleet of servers where the Azure Monitor Agent cannot be installed on each machine, but the servers already forward Windows events to a central collector with subscriptions. How should the security team get these events into Sentinel?",
+      "options": [
+        "Install the Azure Monitor Agent on the Windows Event Collector server and use a data collection rule to send the forwarded events",
+        "Create a diagnostic setting on each server",
+        "Use the Syslog via AMA connector on the collector",
+        "Ingest the events with the Azure Activity connector"
+      ],
+      "correct": 0,
+      "explanation": "Windows Event Forwarding centralizes events on a Windows Event Collector server, so one agent there, with a data collection rule, can ship them. Diagnostic settings apply to Azure resources, not to Windows event logs on servers. Syslog is a Linux and appliance log format. The Azure Activity connector carries Azure control-plane events, not Windows logs."
+    },
+    {
+      "id": "q9209",
+      "cat": "manageSecOps",
+      "type": "mc",
+      "question": "Security wants the diagnostic logs of every new Azure Key Vault and storage account sent to Sentinel automatically as they are created, without configuring a diagnostic setting on each resource. What should the team use?",
+      "options": [
+        "An Azure Policy assignment from the connector that applies the log-streaming configuration at the chosen scope",
+        "A manual diagnostic setting on each resource after creation",
+        "A scheduled analytics rule that queries for new resources",
+        "A Defender for Cloud secure score recommendation"
+      ],
+      "correct": 0,
+      "explanation": "The Azure resource connectors use Azure Policy to apply one log-streaming configuration to existing and future resources of a type within a scope, which needs the Owner role on that scope. Manual settings do not scale to new resources. An analytics rule reads data already ingested and cannot create diagnostic settings. A secure score recommendation is a posture suggestion, not a log pipeline."
+    },
+    {
+      "id": "q9210",
+      "cat": "manageSecOps",
+      "type": "mc",
+      "question": "A KQL job promoted lake data to the analytics tier overnight, and the analyst wants to know what to look for in the workspace. What best describes the result?",
+      "options": [
+        "The data is hidden until an administrator approves it",
+        "A new custom table in the analytics tier whose name ends in _KQL_CL, or rows appended to an existing table",
+        "A new Basic Logs table that cannot be queried with joins",
+        "A summary rule that reruns every 20 minutes"
+      ],
+      "correct": 1,
+      "explanation": "KQL jobs can write to a new analytics-tier table, suffixed _KQL_CL, or append to an existing table, and the analyst can then hunt and alert on it in the advanced hunting editor. There is no approval step. The output is analytics tier, not Basic Logs. A summary rule is a different feature with its own schedule."
+    },
+    {
+      "id": "q9211",
+      "cat": "manageSecOps",
+      "type": "ms",
+      "question": "Which two statements about Defender XDR alert tuning are true? (Choose two.)",
+      "options": [
+        "Hiding an alert prevents incident creation but the data remains in AlertInfo and AlertEvidence",
+        "Set as behavior keeps matching signals out of the alert queue while the data remains available in BehaviorInfo and BehaviorEntities",
+        "Alert tuning rules also suppress alerts raised by custom detection rules",
+        "A built-in alert tuning rule permanently stops any related automated investigation"
+      ],
+      "correct": [
+        0,
+        1
+      ],
+      "explanation": "Hide alert and Set as behavior both remove noise from the queue while keeping data for hunting, in different tables. Built-in tuning rules do not apply to alerts from custom detection rules or custom threat intelligence, so tune the detection itself instead. Built-in rules suppress alerts without stopping automated investigations, and a suppressed alert is reactivated if an investigation finds malicious activity."
+    },
+    {
+      "id": "q9212",
+      "cat": "manageSecOps",
+      "type": "tf",
+      "question": "Any user with the Microsoft Sentinel Responder role can read and write across all tables in the Sentinel data lake.",
+      "answer": false,
+      "explanation": "The Sentinel SIEM uses Azure RBAC roles such as Responder, which manage incidents in the workspace. Lake-wide read and write access comes from Microsoft Entra roles: reads from Global Reader, Security Reader, Security Operator, or Security Administrator, and writes from Security Operator, Security Administrator, or Global Administrator."
+    },
+    {
+      "id": "q9213",
+      "cat": "manageSecOps",
+      "type": "tf",
+      "question": "Custom data collection rules in Defender for Endpoint can target devices using manually applied static tags.",
+      "answer": false,
+      "explanation": "The feature requires dynamic tags configured in asset rule management and run at least once. Manual (static) tags are not supported for scoping the rule."
+    },
+    {
+      "id": "q9214",
+      "cat": "manageSecOps",
+      "type": "mc",
+      "question": "A SOC wants an agent that triages user-reported phishing emails at scale with a natural-language rationale for each verdict, without writing playbooks. Which approach fits, and what does it need?",
+      "options": [
+        "A Logic Apps playbook on the alert trigger, which needs the Playbook Operator role",
+        "The Phishing Triage Agent from the Security Store, which needs Security Copilot capacity (SCUs) and Defender for Office 365 Plan 2",
+        "A Sentinel workbook that scores emails daily",
+        "An ASR rule that blocks Office applications from creating child processes"
+      ],
+      "correct": 1,
+      "explanation": "The Phishing Triage Agent is a Security Copilot agent deployed from the Security Store in the Defender portal, runs autonomously with an agent identity, explains its verdicts, and needs Security Copilot capacity and Defender for Office 365 Plan 2. A playbook would need building and cannot reason about intent. A workbook only visualizes data, and an ASR rule hardens endpoints against child processes rather than triaging reported mail."
+    },
+    {
+      "id": "q9215",
+      "cat": "manageSecOps",
+      "type": "mc",
+      "question": "A developer wants an AI coding client in Visual Studio Code to answer natural-language questions about long-term security data in the Sentinel data lake, with no custom API integration and without the developer knowing the table schemas. What should be used?",
+      "options": [
+        "The Sentinel MCP server's data exploration tools",
+        "A saved hunting query in a workbook",
+        "A Jupyter notebook that the developer maintains",
+        "A scheduled analytics rule that runs hourly"
+      ],
+      "correct": 0,
+      "explanation": "The hosted Sentinel MCP server exposes scenario-focused tool collections that let MCP-capable clients explore data lake data in natural language and handle schema discovery themselves. A workbook or analytics rule is fixed content someone must author. A notebook can query the lake but needs code and schema knowledge from the developer."
+    },
+    {
+      "id": "q9220",
+      "cat": "respondIncidents",
+      "type": "mc",
+      "question": "The SOC wants Purview Insider Risk Management alerts to show up next to related DLP and Microsoft Entra alerts in a single incident, and wants to hunt for everything the flagged user did. Where should analysts work?",
+      "options": [
+        "Only in the Purview portal, because Insider Risk alerts cannot be shown elsewhere",
+        "In the Defender portal under Incidents & alerts, where the alerts are grouped and correlated and updates stay in sync with Purview",
+        "In Sentinel workbooks, after exporting the alerts to CSV",
+        "In Microsoft Entra ID Protection risky users"
+      ],
+      "correct": 1,
+      "explanation": "Insider risk alerts are surfaced in the Defender portal incident and alert queues, correlated with DLP and Entra alerts, with advanced hunting by user and automatic synchronization with Purview. Restricting work to Purview loses the correlation. A CSV export is manual and stale. ID Protection tracks identity risk, not insider data activity."
+    },
+    {
+      "id": "q9221",
+      "cat": "respondIncidents",
+      "type": "mc",
+      "question": "After the built-in alert tuning rule for Purview DLP signals took effect, analysts notice DLP detections no longer create alerts or incidents in Defender XDR, although the SOC wants them. What should be done?",
+      "options": [
+        "Re-onboard the tenant to Defender for Endpoint",
+        "Disable the built-in DLP alert tuning rule under Settings > Microsoft Defender XDR > Alert tuning",
+        "Extend retention of the AlertInfo table",
+        "Create a custom detection rule on SecurityIncident"
+      ],
+      "correct": 1,
+      "explanation": "The built-in rule sets DLP signals as behaviors, which keeps them out of the alert queue and incident queue while leaving the data in BehaviorInfo and BehaviorEntities. Turning the rule off restores alerts. Onboarding and retention settings do not change how signals are classified, and SecurityIncident is a Sentinel table, not the place to bring back suppressed alerts."
+    },
+    {
+      "id": "q9222",
+      "cat": "respondIncidents",
+      "type": "mc",
+      "question": "During an investigation, the team needs unified audit log entries for a mailbox rule created eight months ago. The tenant uses Purview Audit (Standard) and no add-ons. What is the outcome?",
+      "options": [
+        "The records are available because Standard keeps one year",
+        "The records are available for ten years by default",
+        "The records are gone because Standard keeps 180 days; Audit (Premium) would keep up to one year",
+        "The records can be restored from the recycle bin of the audit search tool"
+      ],
+      "correct": 2,
+      "explanation": "Audit (Standard) retains audit records for 180 days, and Audit (Premium) extends this to up to one year, with a ten-year add-on. Eight months is beyond Standard retention. There is no restore feature for expired audit records."
+    },
+    {
+      "id": "q9223",
+      "cat": "respondIncidents",
+      "type": "mc",
+      "question": "An investigator wants to search mailboxes and SharePoint sites for a malicious attachment name in one search and export the hits. Which statement is correct for a commercial (non-21Vianet) tenant today?",
+      "options": [
+        "Use classic Content Search, which remains the supported tool",
+        "Use classic eDiscovery (Premium), which replaced Content Search",
+        "Use the search experience in the new Purview eDiscovery, as a member of the eDiscovery Manager role group",
+        "Use the Microsoft Graph activity logs, which index mailbox content"
+      ],
+      "correct": 2,
+      "explanation": "All classic eDiscovery experiences, including classic Content Search, were retired on August 31, 2025 for these tenants; the same searching now lives in the new eDiscovery experience, and the eDiscovery Manager role group grants access. Graph activity logs record API requests, not mailbox content."
+    },
+    {
+      "id": "q9224",
+      "cat": "respondIncidents",
+      "type": "mc",
+      "question": "An application's service principal is suspected of reading thousands of mailboxes through the Microsoft Graph API with a stolen secret. Microsoft Entra sign-in logs show only the token requests. Which data source reveals the actual API calls?",
+      "options": [
+        "Microsoft Graph activity logs, enabled through a diagnostic setting to Log Analytics",
+        "The Entra audit log for password resets",
+        "Defender for Endpoint device timeline of the admin laptop",
+        "Sentinel UEBA anomalies for the interactive sign-ins"
+      ],
+      "correct": 0,
+      "explanation": "Graph activity logs record each HTTP request to the Graph service with the app, IP address, URI, and response code, which is what shows mass mailbox access, but they only exist if someone enabled the diagnostic setting beforehand. Password reset audit entries, a laptop timeline, or interactive sign-in anomalies do not capture API requests made with an application credential."
+    },
+    {
+      "id": "q9225",
+      "cat": "respondIncidents",
+      "type": "mc",
+      "question": "An analyst must see, in order, every process creation, network connection, and alert on a single compromised server, with ATT&CK techniques and the ability to flag key events. Which view fits?",
+      "options": [
+        "The device timeline in Defender for Endpoint",
+        "Threat analytics report for the campaign",
+        "The Sentinel incident tasks pane",
+        "A Defender for Cloud secure score recommendation list"
+      ],
+      "correct": 0,
+      "explanation": "The device timeline is the chronological per-device view of events and alerts with ATT&CK mapping, process trees, and event flagging. Threat analytics describes a campaign generally, incident tasks track analyst to-dos, and secure score lists posture recommendations."
+    },
+    {
+      "id": "q9226",
+      "cat": "respondIncidents",
+      "type": "tf",
+      "question": "Microsoft Graph activity logs are collected in every tenant by default and can be queried in Log Analytics without any setup.",
+      "answer": false,
+      "explanation": "An administrator must enable them with a diagnostic setting that routes them to a destination such as a Log Analytics workspace. This requires Entra ID P1 or P2, and Security Administrator is the least privileged supported role."
+    },
+    {
+      "id": "q9227",
+      "cat": "respondIncidents",
+      "type": "mc",
+      "question": "From advanced hunting results of unusual sign-ins stored in the Sentinel data lake, an analyst wants clustering and risk scoring without writing code or KQL. Which capability should be used?",
+      "options": [
+        "A summary rule over the sign-in table",
+        "The Security Analyst Agent, started with Analyze with copilot",
+        "A watchlist of risky users",
+        "A Defender for Endpoint indicator"
+      ],
+      "correct": 1,
+      "explanation": "The Security Analyst Agent performs analyses such as anomaly detection, clustering, risk scoring, and forecasting on Defender, Sentinel Log Analytics, or data lake data and can be started from advanced hunting results. A summary rule only aggregates, a watchlist is static reference data, and an endpoint indicator blocks or alerts on artifacts."
+    },
+    {
+      "id": "q9228",
+      "cat": "respondIncidents",
+      "type": "ms",
+      "question": "Which two statements about Purview Audit retention are true? (Choose two.)",
+      "options": [
+        "Audit (Standard) retains audit records for 180 days",
+        "Audit (Premium) keeps records up to one year, with a longer ten-year option available",
+        "Audit must be manually turned on in every tenant before it records anything",
+        "Audit (Standard) cannot be searched with the Search-UnifiedAuditLog cmdlet"
+      ],
+      "correct": [
+        0,
+        1
+      ],
+      "explanation": "Standard retains 180 days; Premium extends this to up to a year with a ten-year retention option. Auditing is enabled by default, and Standard supports the audit search tool, the Search Graph API, and the Search-UnifiedAuditLog cmdlet."
+    },
+    {
+      "id": "q9240",
+      "cat": "threatHunting",
+      "type": "mc",
+      "question": "During a hunt, an analyst wants to visualize how a compromised user account connects to devices and critical assets, find choke points along those paths, and act on the results, rather than writing many joins. Which tool fits?",
+      "options": [
+        "A bookmark on a SigninLogs result set",
+        "The hunting graph in advanced hunting",
+        "A summary rule over IdentityLogonEvents",
+        "A scheduled analytics rule with entity mapping"
+      ],
+      "correct": 1,
+      "explanation": "The hunting graph renders entity relationships interactively so analysts can trace paths and choke points. A bookmark preserves rows, a summary rule pre-aggregates data, and an analytics rule detects patterns on a schedule; none of them visualizes relationships."
+    },
+    {
+      "id": "q9241",
+      "cat": "threatHunting",
+      "type": "mc",
+      "question": "During an active incident, the SOC lead asks which critical assets an attacker could reach from the compromised account, in addition to what is already affected. Which capability answers this most directly?",
+      "options": [
+        "Blast radius analysis in the incident graph",
+        "A UEBA anomaly report",
+        "The Action center history",
+        "A Defender for Cloud secure score recommendation"
+      ],
+      "correct": 0,
+      "explanation": "Blast radius analysis shows the vulnerable paths from a compromised entity to critical assets, combining current impact and possible future impact. UEBA anomalies point at unusual behavior, the Action center lists taken actions, and secure score is a posture rating."
+    },
+    {
+      "id": "q9242",
+      "cat": "threatHunting",
+      "type": "mc",
+      "question": "A hunter must find which users clicked a malicious link delivered by email, including clicks from Teams messages and Office apps, and was told Safe Links is enabled. Which advanced hunting table should the query start from?",
+      "options": [
+        "EmailEvents",
+        "DeviceNetworkEvents",
+        "UrlClickEvents",
+        "IdentityQueryEvents"
+      ],
+      "correct": 2,
+      "explanation": "UrlClickEvents records Safe Links clicks from email, Teams, and Office 365 apps. EmailEvents records message delivery, DeviceNetworkEvents records connections made by devices, and IdentityQueryEvents records Active Directory object queries."
+    },
+    {
+      "id": "q9243",
+      "cat": "threatHunting",
+      "type": "mc",
+      "question": "Existing advanced hunting queries and custom detections reference the AADSignInEventsBeta table. Which statement is correct?",
+      "options": [
+        "The table is permanently kept, and no change is needed",
+        "The table is replaced by SigninLogs in advanced hunting",
+        "The table is deprecated on October 19, 2026 and queries are migrated automatically to EntraIdSignInEvents, which should be used for new queries",
+        "The table is replaced by EntraIdSpnSignInEvents, which holds all user sign-ins"
+      ],
+      "correct": 2,
+      "explanation": "AADSignInEventsBeta is deprecated on October 19, 2026 and replaced by EntraIdSignInEvents, with automatic migration of queries. SigninLogs is the Sentinel workspace table, not the advanced hunting one. EntraIdSpnSignInEvents holds service principal and managed identity sign-ins, not user sign-ins."
+    },
+    {
+      "id": "q9244",
+      "cat": "threatHunting",
+      "type": "mc",
+      "question": "A hunter wants to run machine learning on two years of lake data to find low-and-slow lateral movement, visualizing the results with Python libraries. Which approach fits?",
+      "options": [
+        "A Jupyter notebook run through the Microsoft Sentinel extension for Visual Studio Code on Spark",
+        "A scheduled analytics rule with a 14-day lookback",
+        "A Sentinel workbook tile",
+        "A bookmark on the sign-in table"
+      ],
+      "correct": 0,
+      "explanation": "Data lake notebooks use PySpark and Python libraries over large historical data, which suits machine learning and visualization. A scheduled analytics rule cannot look back two years. Workbooks display results of queries and do not run models. A bookmark only saves rows that were already found."
+    },
+    {
+      "id": "q9245",
+      "cat": "threatHunting",
+      "type": "mc",
+      "question": "For a forensic task, an analyst must pull a large volume of records from a single table, older than the date the workspace was onboarded to the data lake and now in the archive tier, into a queryable table. Which feature fits?",
+      "options": [
+        "A KQL job over the lake tier",
+        "A search job",
+        "A summary rule every 20 minutes",
+        "An automation rule"
+      ],
+      "correct": 1,
+      "explanation": "Search jobs reach archived data (including data older than the lake onboarding date) and hydrate large volumes from one table into a new table. KQL jobs query data from the onboarding date onward in the lake tier. Summary rules aggregate frequently, and automation rules act on incidents."
+    },
+    {
+      "id": "q9246",
+      "cat": "threatHunting",
+      "type": "mc",
+      "question": "Which advanced hunting table records the HTTP requests that apps and users make to the Microsoft Graph API for resources in the tenant?",
+      "options": [
+        "CloudAppEvents",
+        "GraphAPIAuditEvents",
+        "AlertEvidence",
+        "DeviceEvents"
+      ],
+      "correct": 1,
+      "explanation": "GraphAPIAuditEvents holds Microsoft Entra ID API requests made to the Graph API. CloudAppEvents covers activity in cloud apps, AlertEvidence lists entities tied to alerts, and DeviceEvents covers endpoint events."
+    },
+    {
+      "id": "q9247",
+      "cat": "threatHunting",
+      "type": "tf",
+      "question": "Sentinel livestream is still the recommended way to get notified as new events match a hunting query during an investigation.",
+      "answer": false,
+      "explanation": "Livestream is no longer available. To automate queries and notifications, use KQL jobs, analytics rules, or playbooks, which provide persistent results and support messaging platforms."
+    },
+    {
+      "id": "q9248",
+      "cat": "threatHunting",
+      "type": "tf",
+      "question": "Custom graphs in Microsoft Sentinel (preview) are queried with KQL on the Graphs page of the Defender portal.",
+      "answer": false,
+      "explanation": "Custom graphs are published and materialized by a graph job and queried with Graph Query Language (GQL), not KQL, on the Graphs page in the Defender portal."
+    },
+    {
+      "id": "q9249",
+      "cat": "threatHunting",
+      "type": "ms",
+      "question": "Which two statements about the Sentinel data lake and hunting are true? (Choose two.)",
+      "options": [
+        "KQL jobs can promote lake results into an analytics-tier table for further hunting",
+        "Data lake tier data supports real-time analytics rules and hunting exactly like the analytics tier",
+        "Jupyter notebooks over the lake run through the Microsoft Sentinel extension for Visual Studio Code using PySpark",
+        "Summary rules can only read from the data lake tier"
+      ],
+      "correct": [
+        0,
+        2
+      ],
+      "explanation": "KQL jobs can write to the analytics tier, and lake notebooks use the VS Code extension with PySpark. The lake tier is not available for real-time analytics features and hunting. Summary rules can read from Analytics, Auxiliary, Basic, and data lake tables."
     }
   ],
   "lessons": [
@@ -2466,7 +3138,18 @@
         "f13",
         "f15",
         "f39",
-        "f40"
+        "f40",
+        "f9208",
+        "f9209",
+        "f9210",
+        "f9211",
+        "f9212",
+        "f9213",
+        "f9214",
+        "f9205",
+        "f9206",
+        "f9215",
+        "f9216"
       ],
       "quizIds": [
         "q2",
@@ -2474,9 +3157,20 @@
         "q4",
         "q5",
         "q11",
-        "q12"
+        "q12",
+        "q9204",
+        "q9205",
+        "q9206",
+        "q9207",
+        "q9208",
+        "q9209",
+        "q9210",
+        "q9212",
+        "q9213",
+        "q9214",
+        "q9215"
       ],
-      "reading": "Microsoft Sentinel's detections start as analytics rules, and its analytics rule types split into three the exam expects you to tell apart cleanly. A scheduled analytics rule is the default: it runs a KQL query on a defined interval and lookback period, generating an incident whenever the query's results match. A near-real-time (NRT) rule trades that flexibility for speed, running roughly every minute instead, but only against a narrower, specifically supported set of tables -- you reach for NRT specifically when the extra latency of a scheduled rule genuinely matters, not as a default choice. Fusion sits apart from both: it is a machine-learning correlation engine that stitches multiple lower-fidelity anomalies from different sources into one higher-confidence incident automatically, with no analyst writing any KQL for it at all. Rather than authoring every one of these from scratch, an analyst typically installs a packaged solution from the content hub -- bundling data connectors, analytics rule templates, workbooks, hunting queries, and playbooks for a specific product or scenario -- but installing a solution only stages its rule templates for review; each one still has to be explicitly enabled, and usually tuned, before it starts generating a single incident.\n\nNone of that detection logic has anything to query against until data actually lands in the underlying Log Analytics workspace -- the Azure Monitor data store Sentinel is built on top of, and the thing every KQL query, scheduled or ad hoc, ultimately runs against. Sentinel data connectors are the mechanism that gets a log source into that workspace in the first place, whether it's a Microsoft service, a third-party product, or a fully custom source; an analytics rule or hunting query referencing a table with no matching connector enabled will simply return nothing, which is a common early troubleshooting dead end. Ingesting a genuinely custom log source defines a new table, automatically suffixed _CL, whose shape is controlled by a Data Collection Rule -- and a DCR's ingestion-time transformation can filter, parse, or reshape that incoming data before it's ever stored and billed, which is the only point in the pipeline that actually reduces both storage cost and the volume every later query has to scan; filtering later inside an analytics rule's own query still means the full, unfiltered data was ingested and paid for first.\n\nHandling what happens to an incident once it exists is split across two layers. An automation rule is the lightweight, no-code layer: it decides what happens when an incident or alert is created or updated -- assigning an owner, changing severity, adding a tag, closing it outright as a false positive, or invoking one or more playbooks. A playbook is the Logic App that actually does the work a rule might invoke, like calling an API, isolating a device, or posting to Teams -- built on the Microsoft Sentinel incident trigger so it can act on the whole correlated incident -- an automation rule can run only playbooks that start with the same trigger as the rule itself, so a playbook built on the narrower alert trigger needs a rule on the 'When alert is created' trigger instead. When multiple automation rules are scoped to the same analytics rule, they run in a defined numeric order, lowest first, and an earlier rule's actions can change what later rules see, such as closing the incident -- which is why a broad 'assign and notify' rule accidentally ordered ahead of a narrower 'auto-close known-benign pattern' rule wastes a notification and an assignment on an incident that was always going to close automatically anyway. Getting the detections themselves right relies on two further tuning knobs: entity mapping tells Sentinel which query columns represent entities like Account or Host, which is what actually drives whether two alerts about the same compromised account correlate into one incident at all, and alert grouping settings decide whether multiple alerts from one rule within a time window combine into a single incident or stay separate. When a specific, known-noisy source like a vulnerability scanner keeps generating a false positive, excluding that one entity directly inside the analytics rule query is the durable, source-scoped fix -- a world apart from alert suppression, which only pauses the whole rule for a set period and silences every source, not just the noisy one.",
+      "reading": "Microsoft Sentinel's detections start as analytics rules, and its analytics rule types split into three the exam expects you to tell apart cleanly. A scheduled analytics rule is the default: it runs a KQL query on a defined interval and lookback period, generating an incident whenever the query's results match. A near-real-time (NRT) rule trades that flexibility for speed, running roughly every minute instead, but only against a narrower, specifically supported set of tables -- you reach for NRT specifically when the extra latency of a scheduled rule genuinely matters, not as a default choice. Fusion sits apart from both: it is a machine-learning correlation engine that stitches multiple lower-fidelity anomalies from different sources into one higher-confidence incident automatically, with no analyst writing any KQL for it at all. Rather than authoring every one of these from scratch, an analyst typically installs a packaged solution from the content hub -- bundling data connectors, analytics rule templates, workbooks, hunting queries, and playbooks for a specific product or scenario -- but installing a solution only stages its rule templates for review; each one still has to be explicitly enabled, and usually tuned, before it starts generating a single incident.\n\nNone of that detection logic has anything to query against until data actually lands in the underlying Log Analytics workspace -- the Azure Monitor data store Sentinel is built on top of, and the thing every KQL query, scheduled or ad hoc, ultimately runs against. Sentinel data connectors are the mechanism that gets a log source into that workspace in the first place, whether it's a Microsoft service, a third-party product, or a fully custom source; an analytics rule or hunting query referencing a table with no matching connector enabled will simply return nothing, which is a common early troubleshooting dead end. Ingesting a genuinely custom log source defines a new table, automatically suffixed _CL, whose shape is controlled by a Data Collection Rule -- and a DCR's ingestion-time transformation can filter, parse, or reshape that incoming data before it's ever stored and billed, which is the only point in the pipeline that actually reduces both storage cost and the volume every later query has to scan; filtering later inside an analytics rule's own query still means the full, unfiltered data was ingested and paid for first.\n\nHandling what happens to an incident once it exists is split across two layers. An automation rule is the lightweight, no-code layer: it decides what happens when an incident or alert is created or updated -- assigning an owner, changing severity, adding a tag, closing it outright as a false positive, or invoking one or more playbooks. A playbook is the Logic App that actually does the work a rule might invoke, like calling an API, isolating a device, or posting to Teams -- built on the Microsoft Sentinel incident trigger so it can act on the whole correlated incident -- an automation rule can run only playbooks that start with the same trigger as the rule itself, so a playbook built on the narrower alert trigger needs a rule on the 'When alert is created' trigger instead. When multiple automation rules are scoped to the same analytics rule, they run in a defined numeric order, lowest first, and an earlier rule's actions can change what later rules see, such as closing the incident -- which is why a broad 'assign and notify' rule accidentally ordered ahead of a narrower 'auto-close known-benign pattern' rule wastes a notification and an assignment on an incident that was always going to close automatically anyway. Getting the detections themselves right relies on two further tuning knobs: entity mapping tells Sentinel which query columns represent entities like Account or Host, which is what actually drives whether two alerts about the same compromised account correlate into one incident at all, and alert grouping settings decide whether multiple alerts from one rule within a time window combine into a single incident or stay separate. When a specific, known-noisy source like a vulnerability scanner keeps generating a false positive, excluding that one entity directly inside the analytics rule query is the durable, source-scoped fix -- a world apart from alert suppression, which only pauses the whole rule for a set period and silences every source, not just the noisy one.\n\nSeveral platform topics were added to the exam in its most recent update. Retention now spans three tiers: the Analytics tier (hot, 30 days by default, extendable to two years), the Sentinel data lake tier (cold, low cost, up to 12 years of total retention, reached through KQL jobs, notebooks, and summary rules), and the XDR default tier for Defender XDR tables (30 days, extendable to 90 days with ingestion cost only). KQL jobs query lake and federated data on a schedule or once and can promote results to the analytics tier; summary rules aggregate frequently into small tables; search jobs reach archived data. Access follows two models: Azure RBAC roles for the SIEM (Reader, Responder, Contributor, Playbook Operator, Automation Contributor) and Microsoft Entra roles for the lake (Security Reader, Security Operator, Security Administrator and others). AI-authored playbooks can be generated in the Defender portal, and Security Copilot agents deployed from the Security Store take on triage, briefing, analysis, and detection work using SCUs and an agent identity.\n\nIngestion also has new wrinkles. Windows events can come from each machine with the Windows Security Events via AMA connector or from a Windows Event Collector server that receives forwarded events, with the agent installed once on the collector. Azure activity and resource diagnostic logs are collected by assigning Azure Policy that applies the diagnostic configuration to current and future resources, which needs the Owner role on the scope. In Defender for Endpoint, advanced features such as EDR in block mode, allow or block file, and custom network indicators gate whether indicators and protections actually work, and custom data collection rules (preview) add targeted telemetry scoped by dynamic tags and stored in Sentinel.",
       "fundamentalsLabel": "New to Sentinel automation and tuning? See the everyday analogy",
       "fundamentals": "Think of an automation rule as the triage nurse who looks at every new incident and decides who it goes to, how urgent it is, and whether it's worth a doctor's actual involvement -- while a playbook is the specific treatment procedure a doctor actually follows once involved. Entity mapping is like a hospital's patient-matching system correctly recognizing that two separate charts both belong to the same patient, so their history gets combined into one case instead of being treated as two strangers. And excluding a noisy scanner from an analytics rule is like permanently noting in a patient's file that their unusual-but-harmless heart rhythm is just how their heart normally beats, instead of the nurse re-flagging it as an emergency every single visit.",
       "keyTerms": [
@@ -2490,13 +3184,26 @@
         "automation rule",
         "playbook",
         "entity mapping",
-        "alert grouping"
+        "alert grouping",
+        "Sentinel data lake",
+        "KQL jobs",
+        "summary rule",
+        "Analytics tier",
+        "XDR default tier",
+        "Windows Event Forwarding",
+        "Azure Policy log collection",
+        "custom data collection rule",
+        "Security Copilot agents",
+        "Sentinel MCP server"
       ],
       "commonTraps": [
         "Installing a content hub solution only stages its analytics rule templates -- it doesn't enable or tune them for you.",
         "NRT rules trade query flexibility for speed and can only query a narrower, specifically supported set of tables, not every table a scheduled rule can reach.",
         "An automation rule can run only playbooks whose trigger matches the rule's own trigger (incident or alert) -- a playbook built on the other trigger type won't appear as a choice.",
-        "Alert suppression is a temporary, rule-wide snooze; excluding a known-noisy entity inside the analytics rule query is the permanent, source-scoped fix."
+        "Alert suppression is a temporary, rule-wide snooze; excluding a known-noisy entity inside the analytics rule query is the permanent, source-scoped fix.",
+        "Basic Logs and Auxiliary data cannot back analytics rules, and the data lake tier is not for real-time detection; keep alerting data in the Analytics tier.",
+        "Azure RBAC roles (Reader, Responder, Contributor) govern the SIEM; Microsoft Entra roles govern the data lake. Responder does not give lake-wide write.",
+        "Custom data collection rules need dynamic tags, not static tags, and each rule stops collecting after 75,000 events per device per day."
       ],
       "scenario": "A SOC installs a Sentinel solution for a new firewall vendor from the content hub, expecting incidents to start flowing immediately, but nothing appears even though the connector shows data arriving -- because the solution's analytics rule templates were only staged, not enabled. Once enabled, one particular rule starts firing constant false positives from a known vulnerability scanner, so instead of repeatedly suppressing each new incident, the team edits the rule's query to permanently exclude that scanner's IP address. Separately, they configure an automation rule ordered ahead of a broader notify-everyone rule, so incidents matching a known-benign pattern auto-close first and never waste an analyst's notification at all -- and because the auto-close rule needs the full incident context to check every correlated alert at once, it's built on the incident trigger, not the narrower alert trigger.",
       "onTheJob": "A newly installed content hub solution that generates zero incidents is one of the most common 'wait, is this even working' moments a SOC hits, and the fix is almost always the boring one -- the rule templates were staged, not enabled -- rather than anything wrong with the data pipeline. Automation rule ordering is a genuine source of alert fatigue in practice: a broad 'notify everyone' rule that fires ahead of a narrower auto-close rule wastes an analyst's attention on an incident that was always going to close itself, and repeated often enough across a shift, that's exactly how real analysts start tuning out notifications altogether. And permanently excluding a known-noisy source from the query, instead of repeatedly suppressing each new incident it throws, is the difference between a detection an analyst trusts and one they've quietly learned to ignore. This same analytics rule and automation rule/playbook layer isn't unique to SC-200 either -- SC-500 (Cloud & AI Security Engineer) candidates study the identical Sentinel pipeline for their own Security Posture & Monitoring domain, since standing up and tuning Sentinel detections is genuinely one job shared across a security engineer building the platform and an analyst who lives in it day to day."
@@ -2516,7 +3223,13 @@
         "f14",
         "f16",
         "f43",
-        "f45"
+        "f45",
+        "f9201",
+        "f9202",
+        "f9203",
+        "f9204",
+        "f9207",
+        "f9217"
       ],
       "quizIds": [
         "q1",
@@ -2524,9 +3237,13 @@
         "q7",
         "q8",
         "q9",
-        "q14"
+        "q14",
+        "q9201",
+        "q9202",
+        "q9203",
+        "q9211"
       ],
-      "reading": "Microsoft Defender XDR automatically correlates related alerts from Defender for Endpoint, Defender for Office 365, Defender for Identity, and Defender for Cloud Apps into a single incident, so an analyst investigates one correlated case in a unified incident queue instead of chasing separate alerts from each product individually -- all managed from the unified Microsoft Defender portal, alongside each product's own settings and, once onboarded, Sentinel itself. Automated investigation and response builds directly on that correlation: it investigates an alert using the same playbook a human analyst would follow, then either remediates the confirmed threat directly or produces a pending action in the Action Center for an analyst to approve, depending on the configured automation level -- 'Full' takes action with no waiting, while either 'Semi' level leaves some or all remediation pending review. Underneath all of Sentinel's own data sits the Advanced Security Information Model, which normalizes many different connectors' native schemas into a small set of common ones, so a single hunting query or analytics rule already written against a normalized field automatically picks up any new data source mapped to that same schema, with no rule rewritten needed per source.\n\nKnowing what's actually being detected, and what isn't, is its own discipline. Sentinel tags every analytics rule with the MITRE ATT&CK tactics and techniques it detects, and the MITRE ATT&CK coverage view visualizes which techniques currently have active rule coverage, which are covered only by a rule that's currently disabled, and which have no coverage at all -- a gap in coverage for a technique relevant to the organization's own threat model is exactly what should drive which content hub rule template gets enabled next, rather than enabling rules at random. Microsoft Security Copilot layers a generative-AI assistant on top of all of this, embedded directly in both Sentinel and Defender XDR: it can summarize an incident in plain language, draft or suggest a KQL query from a natural-language description, reverse-engineer a suspicious script, or draft an incident report -- all grounded in the organization's own connected data, though an analyst is still expected to review and validate its output before acting on it, the same as any other analyst-authored finding. Sentinel workbooks round out this visibility layer: interactive reports built from KQL, used to visualize trends like incident volume by severity, rule health, connector ingestion latency, or SOC metrics like mean time to triage -- for a human to read and act on, since a workbook never itself generates an incident or takes remediation action.\n\nTwo further capabilities enrich an investigation with context an analytics rule's own query wouldn't otherwise have. A watchlist is analyst-curated reference data -- a list of VIP users, terminated employees, or known-good IP ranges, imported from a CSV -- that a query joins against using the _GetWatchlist() function, capable of turning an otherwise routine sign-in event into a high-priority incident purely because of who the account belongs to. User and Entity Behavior Analytics instead builds its own behavioral baseline per user and entity automatically from connected data, surfacing an anomaly like access to a resource that user has never touched before as enrichment on an investigation, independent of whether any single analytics rule's static condition actually fired -- catching activity that looks individually unremarkable but is anomalous specifically for that one entity's own history. Threat intelligence indicators -- IPs, domains, file hashes, URLs ingested from Microsoft Defender Threat Intelligence, TAXII feeds, or the upload API -- land in the ThreatIntelIndicators and ThreatIntelObjects tables (which replaced the legacy ThreatIntelligenceIndicator table), matched automatically by built-in TI-based analytics rule templates, but also directly joinable from a hunting query checking historical log data for any past match against a newly learned indicator, not only future activity going forward.",
+      "reading": "Microsoft Defender XDR automatically correlates related alerts from Defender for Endpoint, Defender for Office 365, Defender for Identity, and Defender for Cloud Apps into a single incident, so an analyst investigates one correlated case in a unified incident queue instead of chasing separate alerts from each product individually -- all managed from the unified Microsoft Defender portal, alongside each product's own settings and, once onboarded, Sentinel itself. Automated investigation and response builds directly on that correlation: it investigates an alert using the same playbook a human analyst would follow, then either remediates the confirmed threat directly or produces a pending action in the Action Center for an analyst to approve, depending on the configured automation level -- 'Full' takes action with no waiting, while either 'Semi' level leaves some or all remediation pending review. Underneath all of Sentinel's own data sits the Advanced Security Information Model, which normalizes many different connectors' native schemas into a small set of common ones, so a single hunting query or analytics rule already written against a normalized field automatically picks up any new data source mapped to that same schema, with no rule rewritten needed per source.\n\nKnowing what's actually being detected, and what isn't, is its own discipline. Sentinel tags every analytics rule with the MITRE ATT&CK tactics and techniques it detects, and the MITRE ATT&CK coverage view visualizes which techniques currently have active rule coverage, which are covered only by a rule that's currently disabled, and which have no coverage at all -- a gap in coverage for a technique relevant to the organization's own threat model is exactly what should drive which content hub rule template gets enabled next, rather than enabling rules at random. Microsoft Security Copilot layers a generative-AI assistant on top of all of this, embedded directly in both Sentinel and Defender XDR: it can summarize an incident in plain language, draft or suggest a KQL query from a natural-language description, reverse-engineer a suspicious script, or draft an incident report -- all grounded in the organization's own connected data, though an analyst is still expected to review and validate its output before acting on it, the same as any other analyst-authored finding. Sentinel workbooks round out this visibility layer: interactive reports built from KQL, used to visualize trends like incident volume by severity, rule health, connector ingestion latency, or SOC metrics like mean time to triage -- for a human to read and act on, since a workbook never itself generates an incident or takes remediation action.\n\nTwo further capabilities enrich an investigation with context an analytics rule's own query wouldn't otherwise have. A watchlist is analyst-curated reference data -- a list of VIP users, terminated employees, or known-good IP ranges, imported from a CSV -- that a query joins against using the _GetWatchlist() function, capable of turning an otherwise routine sign-in event into a high-priority incident purely because of who the account belongs to. User and Entity Behavior Analytics instead builds its own behavioral baseline per user and entity automatically from connected data, surfacing an anomaly like access to a resource that user has never touched before as enrichment on an investigation, independent of whether any single analytics rule's static condition actually fired -- catching activity that looks individually unremarkable but is anomalous specifically for that one entity's own history. Threat intelligence indicators -- IPs, domains, file hashes, URLs ingested from Microsoft Defender Threat Intelligence, TAXII feeds, or the upload API -- land in the ThreatIntelIndicators and ThreatIntelObjects tables (which replaced the legacy ThreatIntelligenceIndicator table), matched automatically by built-in TI-based analytics rule templates, but also directly joinable from a hunting query checking historical log data for any past match against a newly learned indicator, not only future activity going forward.\n\nDefender XDR operations got more configurable. Incident email notification rules filter by severity, source, and device group, and endpoint alert notifications are configured separately under Endpoints settings. Alert tuning, previously alert suppression, lets you hide or resolve alerts, or convert them to behaviors, when evidence conditions match; built-in tuning rules cut common noise, and neither custom detection alerts nor custom TI alerts are affected. Analytics rules from Sentinel are excluded from Defender correlation by default after onboarding, and an administrator can include them. Case management adds incident cases (preview) with tasks, custom fields, and SLA policies on top of incidents.",
       "fundamentalsLabel": "New to SOC visibility tooling? See the everyday analogy",
       "fundamentals": "The unified Defender portal correlating alerts into one incident is like a hospital's single patient chart pulling together notes from radiology, the lab, and the pharmacy instead of three separate, disconnected folders nobody cross-references. The MITRE ATT&CK coverage view is like a building inspector's checklist showing exactly which fire code items have been verified, which were checked once but the sprinkler's since been shut off, and which were never inspected at all -- telling you exactly where to look next instead of re-inspecting everything at random. UEBA is the security guard who's worked the same building for years and notices instantly that today someone from accounting swiped into the server room for the first time ever, even though nothing about that badge swipe would look unusual to a guard who'd only just started.",
       "keyTerms": [
@@ -2539,13 +3256,19 @@
         "Sentinel workbooks",
         "watchlist",
         "User and Entity Behavior Analytics",
-        "Threat intelligence indicators"
+        "Threat intelligence indicators",
+        "alert tuning",
+        "incident notification rules",
+        "analytics rule correlation",
+        "case management",
+        "incident cases"
       ],
       "commonTraps": [
         "Installing AIR doesn't mean 'no analyst needed' -- only the Full automation level remediates without an approval step; either Semi level still leaves actions pending.",
         "The MITRE ATT&CK coverage view distinguishes a technique with no rule at all from one covered only by a currently disabled rule -- treating both as 'no coverage' misses the disabled-rule case.",
         "Security Copilot output still needs analyst review before acting on it -- being grounded in connected data isn't the same as being verified.",
-        "A workbook only visualizes a trend for a human to read; it never itself generates an incident or takes remediation action."
+        "A workbook only visualizes a trend for a human to read; it never itself generates an incident or takes remediation action.",
+        "Sentinel analytics rule suppression pauses one rule's query; Defender XDR alert tuning matches alert evidence and hides, resolves, or converts the alert."
       ],
       "scenario": "A SOC lead reviews the MITRE ATT&CK coverage view and finds a technique relevant to their threat model shows as covered, but only by a rule an analyst disabled months ago during a noisy period -- a very different finding from 'no coverage at all,' and exactly what tells them which template to re-enable and re-tune next rather than installing something new. During triage, an analyst asks Security Copilot to draft a KQL query summarizing a suspicious pattern in plain language, then reviews and adjusts that draft before running it, rather than trusting it blind. Meanwhile, UEBA flags an account touching a file share it's never accessed before, even though no analytics rule's static condition matched that specific access -- enrichment the analyst pulls directly into the incident from the unified incident queue in the Microsoft Defender portal, alongside a watchlist join confirming the account also happens to belong to a recently terminated employee.",
       "onTheJob": "The MITRE ATT&CK coverage view earns its keep specifically because a technique that used to be covered by a rule someone disabled during a noisy period looks nothing like 'never had coverage' on paper, and conflating the two is how a real gap sits unnoticed for months. Security Copilot's output still has to be double-checked before acting on it, and that review step is exactly where real analysts differ from the tidy exam scenario -- trusting an AI-drafted query blind is how a bad hunt burns an afternoon on a false lead. And UEBA earns genuine analyst trust over time specifically because it catches the 'nothing about this looks wrong on paper' anomaly -- the account touching a resource it's never touched before -- that no static analytics rule was ever going to catch."
@@ -2563,7 +3286,14 @@
         "f23",
         "f24",
         "f27",
-        "f58"
+        "f58",
+        "f9220",
+        "f9221",
+        "f9222",
+        "f9223",
+        "f9224",
+        "f9225",
+        "f9226"
       ],
       "quizIds": [
         "q15",
@@ -2571,9 +3301,18 @@
         "q18",
         "q21",
         "q22",
-        "q25"
+        "q25",
+        "q9220",
+        "q9221",
+        "q9222",
+        "q9223",
+        "q9224",
+        "q9225",
+        "q9226",
+        "q9227",
+        "q9228"
       ],
-      "reading": "When Defender for Endpoint flags a compromised device, the first response decision is usually how completely to cut it off. Device isolation disconnects it from the network while keeping it connected to Defender for Endpoint itself, so an analyst can keep investigating and running response actions on it even though it can no longer reach other systems or exfiltrate anything. Full isolation blocks nearly all communication except to the Defender for Endpoint service itself; selective isolation instead keeps Outlook and Teams (and, in older setups, Skype for Business) connected, useful when a user has to stay on a call or in their mail. Where the newer isolation exclusions feature is enabled, admins can define their own process, IP, or service exclusions for a business-critical service that genuinely can't be cut off. Once isolated, live response gives an analyst a remote, real-time command-line session on that specific device -- to run scripts, collect forensic artifacts, view and kill processes, or delete files directly -- without waiting on a scheduled scan or a full automated investigation to finish first. Any remediation action taken, whether by automated investigation or an analyst directly, shows up in the unified Action Center as either pending (awaiting explicit approval or rejection) or completed (and, where supported, reversible); approving a pending action from automated investigation lets that remediation proceed exactly as determined, while rejecting it stops only that specific action, leaving anything else already done untouched.\n\nBeyond acting on one flagged device at a time, an administrator can pre-emptively block a known-bad artifact tenant-wide by adding a custom indicator of compromise -- a file hash, IP address, URL/domain, or certificate -- with an action of allow, audit, warn, or block and remediate, so a single confirmed-malicious file hash stops running across every onboarded device the moment it's seen, a faster and broader response than isolating devices one at a time as each detection trickles in. For the fastest-moving, highest-confidence attacks -- the kind a human analyst realistically can't triage in time -- automatic attack disruption correlates high-confidence signals across Defender XDR products and contains the attack itself, such as disabling a compromised account or containing a compromised device, at machine speed, deliberately reserved for patterns like human-operated ransomware where every extra minute of manual triage is minutes an attacker gets to spread further.\n\nDefender for Identity contributes two distinctly different kinds of identity-focused signal. A lateral movement path is a proactive, exposure-focused finding: the chain of computers and accounts an attacker could hop through -- often via cached credentials -- to eventually reach a sensitive or highly privileged account, surfaced before any actual attack has happened at all, telling a responder which low-privilege compromise would be most dangerous to leave unaddressed given what it could ultimately reach. A honeytoken account is the opposite kind of signal entirely: a decoy account deliberately left unused in normal operations, configured so that essentially any authentication attempt against it -- since no legitimate user or service has any reason to ever touch it -- can be treated as a high-confidence true positive of malicious reconnaissance or credential-stuffing activity, unlike an alert on a real account, which always carries some chance of a legitimate explanation.",
+      "reading": "When Defender for Endpoint flags a compromised device, the first response decision is usually how completely to cut it off. Device isolation disconnects it from the network while keeping it connected to Defender for Endpoint itself, so an analyst can keep investigating and running response actions on it even though it can no longer reach other systems or exfiltrate anything. Full isolation blocks nearly all communication except to the Defender for Endpoint service itself; selective isolation instead keeps Outlook and Teams (and, in older setups, Skype for Business) connected, useful when a user has to stay on a call or in their mail. Where the newer isolation exclusions feature is enabled, admins can define their own process, IP, or service exclusions for a business-critical service that genuinely can't be cut off. Once isolated, live response gives an analyst a remote, real-time command-line session on that specific device -- to run scripts, collect forensic artifacts, view and kill processes, or delete files directly -- without waiting on a scheduled scan or a full automated investigation to finish first. Any remediation action taken, whether by automated investigation or an analyst directly, shows up in the unified Action Center as either pending (awaiting explicit approval or rejection) or completed (and, where supported, reversible); approving a pending action from automated investigation lets that remediation proceed exactly as determined, while rejecting it stops only that specific action, leaving anything else already done untouched.\n\nBeyond acting on one flagged device at a time, an administrator can pre-emptively block a known-bad artifact tenant-wide by adding a custom indicator of compromise -- a file hash, IP address, URL/domain, or certificate -- with an action of allow, audit, warn, or block and remediate, so a single confirmed-malicious file hash stops running across every onboarded device the moment it's seen, a faster and broader response than isolating devices one at a time as each detection trickles in. For the fastest-moving, highest-confidence attacks -- the kind a human analyst realistically can't triage in time -- automatic attack disruption correlates high-confidence signals across Defender XDR products and contains the attack itself, such as disabling a compromised account or containing a compromised device, at machine speed, deliberately reserved for patterns like human-operated ransomware where every extra minute of manual triage is minutes an attacker gets to spread further.\n\nDefender for Identity contributes two distinctly different kinds of identity-focused signal. A lateral movement path is a proactive, exposure-focused finding: the chain of computers and accounts an attacker could hop through -- often via cached credentials -- to eventually reach a sensitive or highly privileged account, surfaced before any actual attack has happened at all, telling a responder which low-privilege compromise would be most dangerous to leave unaddressed given what it could ultimately reach. A honeytoken account is the opposite kind of signal entirely: a decoy account deliberately left unused in normal operations, configured so that essentially any authentication attempt against it -- since no legitimate user or service has any reason to ever touch it -- can be treated as a high-confidence true positive of malicious reconnaissance or credential-stuffing activity, unlike an alert on a real account, which always carries some chance of a legitimate explanation.\n\nMore investigation sources are now expected. The device timeline gives a chronological view of events and alerts on a device with ATT&CK mapping, process trees, and flagging. Containment from automatic attack disruption shows up in the incident and the Action center, where a false positive can be undone. Beyond Defender products, analysts investigate Microsoft 365 activity with Purview Audit (180-day Standard retention, up to a year in Premium), the new eDiscovery search experience (classic Content Search was retired on August 31, 2025), and Microsoft Graph activity logs, which must be enabled with a diagnostic setting and record every API request. Purview Insider Risk Management and DLP alerts are correlated with other alerts in the Defender portal, and agentic tools such as the Security Analyst Agent and Threat Hunting Assistant accelerate analysis while the analyst validates the output.",
       "fundamentalsLabel": "New to endpoint and identity response? See the everyday analogy",
       "fundamentals": "Full isolation is like locking every door of a building except the one the fire department uses to keep checking on it; selective isolation is the same lockdown but with a few specific phone lines left open on purpose. Live response is the fire department actually walking through that locked building in person, moving things and checking rooms directly, rather than waiting for the automated sprinkler system to finish doing its own thing. A lateral movement path is like a security consultant mapping out, ahead of any actual break-in, exactly which unlocked side door would eventually let someone reach the safe -- useful information whether or not anyone ever tries. And a honeytoken account is a decoy wallet left in plain sight specifically to see who tries to pick it up, since nobody with a legitimate reason to be there would ever touch it in the first place.",
       "keyTerms": [
@@ -2584,13 +3323,21 @@
         "custom indicator of compromise",
         "automatic attack disruption",
         "lateral movement path",
-        "honeytoken account"
+        "honeytoken account",
+        "device timeline",
+        "Purview Audit",
+        "eDiscovery content search",
+        "Microsoft Graph activity logs",
+        "Insider Risk Management alerts",
+        "Security Analyst Agent"
       ],
       "commonTraps": [
         "Full isolation cuts off everything except the Defender for Endpoint connection -- selective isolation is the option that keeps Outlook and Teams reachable, and isolation exclusions (where enabled) are what let admins define their own exceptions.",
         "Approving a pending action lets that one remediation proceed; rejecting it doesn't undo any other action already taken on the same investigation.",
         "A lateral movement path is a proactive exposure finding, not proof an attack is already underway.",
-        "Attack disruption is reserved for very high-confidence, fast-moving patterns -- it isn't triggered on every alert regardless of confidence."
+        "Attack disruption is reserved for very high-confidence, fast-moving patterns -- it isn't triggered on every alert regardless of confidence.",
+        "Graph activity logs are off until enabled; enabling them after an incident does not recover earlier requests.",
+        "Audit (Standard) keeps 180 days; an event from eight months ago needs Audit (Premium) retention that was in place at the time."
       ],
       "scenario": "An analyst confirms a laptop is compromised, but its user must stay on a customer Teams call and keep reading mail in Outlook, so they apply selective isolation rather than full isolation, then open a live response session to pull the malicious script off the device directly and kill its process without waiting for an automated investigation to finish on its own. Once they confirm the file's hash is genuinely malicious, they add it as a custom indicator set to block and remediate, stopping it from ever running again on any other onboarded device tenant-wide rather than waiting to isolate each affected machine one at a time. Separately, Defender for Identity flags a lateral movement path showing that same laptop's cached credentials could eventually reach a Domain Admin account -- a standing exposure worth fixing regardless of this specific incident -- while, unrelated, a sign-in attempt against a honeytoken account elsewhere in the tenant is treated as an immediate, high-confidence true positive with no further corroboration needed.",
       "onTheJob": "Selective isolation exists because a real incident almost never allows the tidy 'just cut the whole machine off' response an exam scenario suggests -- the user is often mid-call or mid-email, and there may be a business-critical service on that same host (the case isolation exclusions are for, where enabled) that legitimately cannot go down, and getting that judgment call wrong either leaves an attacker a foothold or takes down production. The pending-versus-completed Action Center distinction matters because a real analyst approving or rejecting an AIR action under time pressure, mid-incident, is a genuinely different judgment call than reading about it calmly afterward. And a lateral movement path is proactive exposure information a SOC has to prioritize against a stack of active alerts -- in practice it competes for attention against things that are already on fire, which is exactly the kind of triage call a real analyst has to make and an exam question can't fully capture. A common honeytoken misconfiguration in real deployments: a team creates the decoy account but leaves it with a stale, expired password or forgets to exclude it from an unrelated password-hygiene script, so the account itself starts generating benign 'expired credential' noise that erodes the whole point of treating any activity on it as automatically high-confidence."
@@ -2659,7 +3406,14 @@
         "f36",
         "f37",
         "f38",
-        "f41"
+        "f41",
+        "f9240",
+        "f9241",
+        "f9242",
+        "f9243",
+        "f9244",
+        "f9245",
+        "f9246"
       ],
       "quizIds": [
         "q27",
@@ -2667,9 +3421,19 @@
         "q29",
         "q30",
         "q31",
-        "q32"
+        "q32",
+        "q9240",
+        "q9241",
+        "q9242",
+        "q9243",
+        "q9244",
+        "q9245",
+        "q9246",
+        "q9247",
+        "q9248",
+        "q9249"
       ],
-      "reading": "Every KQL query pipeline follows the same shape: start from a table, then pipe left to right through operators that each narrow or reshape the result of the one before -- where to filter rows, project or extend to shape columns, summarize to aggregate. Operator order isn't just style; it's performance, since filtering early with where before an expensive summarize or join means every later operator processes far less data than if the filter came last. Joining two tables together also demands picking the right join type for the actual question being asked: an inner join returns only rows with a matching key present on both sides, useful when correlating two sources where only confirmed matches matter, while a leftouter join instead keeps every row from the left table and fills in nulls where no match exists on the right, and a leftanti join returns only the left rows with no match at all -- leftanti is the direct tool for a negative question like 'which watchlisted accounts had zero sign-ins in the last 7 days,' since an inner join would simply drop every one of those non-matching accounts from the result instead of surfacing them.\n\nReusability matters as much as correctness in a hunting workflow. A let statement assigns a scalar value, a list, or an entire tabular query to a named variable within a query, and saving that as a reusable KQL function lets the exact same logic -- a list of suspicious process names, say -- be called by name across many different hunting queries instead of being retyped, and potentially mistyped, in each one separately. A hunting query itself is something an analyst runs manually to proactively search for evidence of a threat that hasn't triggered any alert yet -- which is a fundamentally different job from an analytics rule, which runs automatically and creates an incident the moment its query condition matches; a hunting query that keeps turning up a genuine finding is exactly the kind of candidate worth promoting into a scheduled analytics rule, so the same pattern gets caught automatically going forward instead of depending on an analyst re-running it by hand. Along the way, a bookmark saves a specific set of interesting results -- the original query plus any analyst notes -- so that evidence can be revisited, shared, or added directly into a new or existing incident's investigation later, while livestream runs a query interactively and surfaces new matches in near real time during an active session, a temporary, session-based watch rather than anything saved or recurring (Microsoft has announced livestream's retirement from mid-March 2026, so treat it as a legacy feature).\n\nA hunt rarely stays confined to one product's own data. Defender XDR's advanced hunting exposes a shared M365D schema across products -- DeviceProcessEvents and DeviceNetworkEvents from Defender for Endpoint, EmailEvents from Defender for Office 365, IdentityLogonEvents from Defender for Identity, CloudAppEvents from Defender for Cloud Apps -- letting a single query join, say, DeviceProcessEvents to EmailEvents on a shared device or user identifier to trace a suspicious process directly back to the phishing email that likely delivered it, without switching between separate per-product consoles. Once Microsoft Entra ID sign-in and audit logs and Microsoft Purview audit data are connected as sources too, the same kind of query can correlate an endpoint or email finding with an identity sign-in pattern or a sensitive data-access event. Reasoning about how far any given intrusion has actually progressed, and what to hunt for at each stage, is where the cyber kill chain comes in: a model of an attack's sequential stages -- reconnaissance, initial access, execution, persistence, lateral movement, and exfiltration/impact -- that roughly maps onto the same progression Sentinel's MITRE ATT&CK coverage tags each analytics rule against, giving every hunt a sense of which stage it's actually looking for evidence of.",
+      "reading": "Every KQL query pipeline follows the same shape: start from a table, then pipe left to right through operators that each narrow or reshape the result of the one before -- where to filter rows, project or extend to shape columns, summarize to aggregate. Operator order isn't just style; it's performance, since filtering early with where before an expensive summarize or join means every later operator processes far less data than if the filter came last. Joining two tables together also demands picking the right join type for the actual question being asked: an inner join returns only rows with a matching key present on both sides, useful when correlating two sources where only confirmed matches matter, while a leftouter join instead keeps every row from the left table and fills in nulls where no match exists on the right, and a leftanti join returns only the left rows with no match at all -- leftanti is the direct tool for a negative question like 'which watchlisted accounts had zero sign-ins in the last 7 days,' since an inner join would simply drop every one of those non-matching accounts from the result instead of surfacing them.\n\nReusability matters as much as correctness in a hunting workflow. A let statement assigns a scalar value, a list, or an entire tabular query to a named variable within a query, and saving that as a reusable KQL function lets the exact same logic -- a list of suspicious process names, say -- be called by name across many different hunting queries instead of being retyped, and potentially mistyped, in each one separately. A hunting query itself is something an analyst runs manually to proactively search for evidence of a threat that hasn't triggered any alert yet -- which is a fundamentally different job from an analytics rule, which runs automatically and creates an incident the moment its query condition matches; a hunting query that keeps turning up a genuine finding is exactly the kind of candidate worth promoting into a scheduled analytics rule, so the same pattern gets caught automatically going forward instead of depending on an analyst re-running it by hand. Along the way, a bookmark saves a specific set of interesting results -- the original query plus any analyst notes -- so that evidence can be revisited, shared, or added directly into a new or existing incident's investigation later, while livestream, which once ran a query interactively during a session, has been retired -- use KQL jobs, analytics rules, or playbooks for persistent query results and notifications.\n\nA hunt rarely stays confined to one product's own data. Defender XDR's advanced hunting exposes a shared M365D schema across products -- DeviceProcessEvents and DeviceNetworkEvents from Defender for Endpoint, EmailEvents from Defender for Office 365, IdentityLogonEvents from Defender for Identity, CloudAppEvents from Defender for Cloud Apps -- letting a single query join, say, DeviceProcessEvents to EmailEvents on a shared device or user identifier to trace a suspicious process directly back to the phishing email that likely delivered it, without switching between separate per-product consoles. Once Microsoft Entra ID sign-in and audit logs and Microsoft Purview audit data are connected as sources too, the same kind of query can correlate an endpoint or email finding with an identity sign-in pattern or a sensitive data-access event. Reasoning about how far any given intrusion has actually progressed, and what to hunt for at each stage, is where the cyber kill chain comes in: a model of an attack's sequential stages -- reconnaissance, initial access, execution, persistence, lateral movement, and exfiltration/impact -- that roughly maps onto the same progression Sentinel's MITRE ATT&CK coverage tags each analytics rule against, giving every hunt a sense of which stage it's actually looking for evidence of.\n\nThe hunting toolset grew with the Sentinel data lake. KQL jobs run one-time or scheduled queries over lake and federated data and can promote results to the analytics tier; summary rules create small aggregate tables for frequent queries; search jobs reach archived data. Notebooks over the lake run in Visual Studio Code with the Microsoft Sentinel extension on Spark, and the Sentinel MCP server lets AI clients query lake data in natural language. For relationship-driven hunting, the hunting graph in advanced hunting and blast radius in the incident graph visualize paths between entities, powered by Sentinel graph, and custom graphs queried with GQL are in preview. Pay attention to table names: EntraIdSignInEvents replaces AADSignInEventsBeta (deprecated October 19, 2026), UrlClickEvents records Safe Links clicks, and GraphAPIAuditEvents records Graph API requests.",
       "fundamentalsLabel": "New to KQL and threat hunting? See the everyday analogy",
       "fundamentals": "A KQL pipeline is like an assembly line where each station only ever narrows or reshapes what the previous station handed it -- putting the quality-control station (where) as early as possible means every later station handles far fewer parts. An inner join is asking 'who showed up to both meetings' -- anyone who only made one meeting simply isn't in the answer -- while a leftouter join is asking 'who was invited to meeting A, and did they also show up to meeting B' (keeping the no-shows with blanks), and a leftanti join asks for just the no-shows directly -- the versions of the question that can actually surface someone who was invited but never came. And promoting a hunting query into a scheduled analytics rule is like turning a detective's personal hunch, confirmed right three weeks running, into standing department policy that gets checked automatically from now on, instead of relying on that one detective to keep remembering to ask the same question by hand.",
       "keyTerms": [
@@ -2682,15 +3446,24 @@
         "Bookmarks",
         "livestream",
         "advanced hunting",
-        "cyber kill chain"
+        "cyber kill chain",
+        "hunting graph",
+        "blast radius",
+        "Sentinel graph",
+        "EntraIdSignInEvents",
+        "UrlClickEvents",
+        "KQL jobs",
+        "search jobs",
+        "Sentinel MCP server"
       ],
       "commonTraps": [
         "An inner join drops exactly the non-matching rows a 'which accounts had zero activity' question needs -- leftanti returns them directly, and leftouter keeps them filled with nulls.",
         "Filtering with where after an expensive summarize or join is too late -- put where as early in the pipeline as possible.",
-        "Livestream is a temporary, session-based watch, not a saved or recurring detection the way a scheduled analytics rule is.",
-        "A hunting query and an analytics rule aren't the same tool -- hunting is manual/proactive search; an analytics rule runs automatically and creates incidents on its own."
+        "Livestream has been retired; persistent notification from a hunting idea comes from an analytics rule, a KQL job, or a playbook, not an interactive session.",
+        "A hunting query and an analytics rule aren't the same tool -- hunting is manual/proactive search; an analytics rule runs automatically and creates incidents on its own.",
+        "Table names are tested: EntraIdSignInEvents (advanced hunting) vs. SigninLogs (Sentinel workspace); the old AADSignInEventsBeta is deprecated."
       ],
-      "scenario": "An analyst defines a reusable list of suspicious process names once as a let statement saved as a function, so every hunting query going forward references it by name instead of retyping (and risking mistyping) the same list each time. Running a leftanti join between a VIP watchlist and SigninLogs, they find two accounts with zero sign-ins in the last seven days -- a result an inner join would have silently dropped. After the same underlying pattern turns up a genuine finding three weeks running, they promote it into a scheduled analytics rule so it fires automatically from now on, and along the way use livestream once to watch a related pattern unfold in real time during an active investigation, bookmarking the clearest evidence directly into the case. Because the hunt spans a phishing email and a suspicious process launch on the recipient's device, the query joins EmailEvents to DeviceProcessEvents directly in Defender XDR's shared advanced hunting schema -- reasoning, per the cyber kill chain, that this represents initial access via phishing followed immediately by execution on the endpoint.",
+      "scenario": "An analyst defines a reusable list of suspicious process names once as a let statement saved as a function, so every hunting query going forward references it by name instead of retyping (and risking mistyping) the same list each time. Running a leftanti join between a VIP watchlist and SigninLogs, they find two accounts with zero sign-ins in the last seven days -- a result an inner join would have silently dropped. After the same underlying pattern turns up a genuine finding three weeks running, they promote it into a scheduled analytics rule so it fires automatically from now on, and along the way bookmark the clearest evidence directly into the case. Because the hunt spans a phishing email and a suspicious process launch on the recipient's device, the query joins EmailEvents to DeviceProcessEvents directly in Defender XDR's shared advanced hunting schema -- reasoning, per the cyber kill chain, that this represents initial access via phishing followed immediately by execution on the endpoint.",
       "onTheJob": "A hunting query that keeps turning up the same genuine finding, week after week, is exactly the kind of thing a busy analyst eventually forgets to re-run manually -- which is the real, practical reason it gets promoted into a scheduled analytics rule rather than staying a recurring task on someone's to-do list. Reaching across Defender XDR's shared schema to join email events to endpoint events is what separates a real investigation from a siloed one, since the tidy exam version of 'which product do I check' rarely matches the reality of a phishing email that only becomes obviously dangerous once you see what it triggered on the endpoint. And the cyber kill chain is less a checklist a real analyst fills out and more a mental model for triage priority -- deciding that a detection at the exfiltration stage deserves faster attention than one still at reconnaissance, when a whole queue is competing for the same ten minutes. A join written the wrong direction is a quiet, recurring source of bad hunting results in practice: reaching for an inner join out of habit silently drops exactly the non-matching rows a negative question depends on, so a hunt for 'accounts with zero sign-ins' can come back empty and get reported as a clean result when the real answer was sitting in the rows an inner join threw away."
     }
   ],
@@ -2750,7 +3523,7 @@
         "Hunting is hypothesis-driven and proactive; incident response is reactive to alerts that already fired.",
         "Hunting queries can be run ad hoc, or promoted into a scheduled analytics rule (or a Defender custom detection rule) so they generate alerts going forward.",
         "Bookmarking a suspicious query result preserves it for later correlation, even before it becomes an incident.",
-        "Livestream lets you test a new detection idea against real-time data before promoting it to a full analytics rule (Microsoft has announced its retirement from mid-March 2026)."
+        "Livestream has been retired; for persistent notification on a hunting idea use KQL jobs, analytics rules, or playbooks."
       ]
     },
     {
@@ -2767,6 +3540,44 @@
         "Manage a security operations environment ~40-45%, Respond to security incidents ~35-40%, Perform threat hunting ~20-25%.",
         "Microsoft scores this exam 0-1000 with 700 to pass.",
         "On \"least effort\" or \"most efficient\" scenario questions, match the tool actually built for that job \u2014 e.g., a playbook for repeatable automated remediation, not a manual step."
+      ]
+    },
+    {
+      "heading": "Data tiers, retention, and Sentinel roles",
+      "points": [
+        "Analytics tier: hot, 30 days by default, extendable up to two years; supports alerting, hunting, workbooks, playbooks. Data lake tier: cold, up to 12 years total retention, queried by KQL jobs, notebooks, summary rules. XDR default tier: 30 days, up to 90 days with ingestion cost only.",
+        "KQL jobs (lake, up to 12 years, joins and unions, one-time or scheduled, can promote to analytics as _KQL_CL); summary rules (frequent aggregation, as often as every 20 minutes); search jobs (archive tier, hydrate one large table).",
+        "SIEM roles are Azure RBAC: Reader, Responder, Contributor, Playbook Operator, Automation Contributor. Data lake roles are Entra roles: Global Reader, Security Reader, Security Operator, Security Administrator read; Security Operator, Security Administrator, Global Administrator write.",
+        "Sentinel in the Azure portal is supported until March 31, 2027, after which it is available only in the Defender portal."
+      ]
+    },
+    {
+      "heading": "Defender XDR configuration quick reference",
+      "points": [
+        "Incident email notifications: Settings > Microsoft Defender XDR > Email notifications (severity, service and detection source, device group). Endpoint alert notifications live under Settings > Endpoints > General > Email notifications.",
+        "Alert tuning (formerly alert suppression) actions: Hide alert, Resolve alert, Set as behavior; not applied to custom detection alerts; built-in rules exist and a reactivated alert returns if an investigation finds malice.",
+        "Analytics rules are excluded from Defender correlation by default after onboarding; include all and exclude specific rules to change it.",
+        "Advanced features to know: EDR in block mode, allow or block file, custom network indicators, tamper protection, automatically resolve alerts, restrict correlation to scoped device groups.",
+        "Custom data collection (preview): Plan 2, Sentinel workspace, dynamic tags only, 75,000 events per device per rule per day.",
+        "Attack disruption: configured by Global Administrator or Security Administrator; Full remediation level on device groups recommended; exclusions available."
+      ]
+    },
+    {
+      "heading": "Investigation data sources",
+      "points": [
+        "Device timeline: chronological events and alerts per device (ATT&CK techniques, process trees, flags). Live response, investigation packages, isolation, and the Action center cover response actions.",
+        "Purview: Insider Risk Management and DLP alerts surface in Defender incidents; Audit (Standard) 180 days, Audit (Premium) up to 1 year (10-year add-on); eDiscovery search is in the new experience since classic experiences retired on August 31, 2025.",
+        "Microsoft Graph activity logs: opt-in via diagnostic settings (Entra P1 or P2, Security Administrator), table MicrosoftGraphActivityLogs; show API calls made with tokens.",
+        "Agentic investigation: Security Analyst Agent, Threat Hunting Assistant, Dynamic Threat Detection Agent, Phishing and Security Alert Triage Agent, all using SCUs and agent identities."
+      ]
+    },
+    {
+      "heading": "Hunting tools added in the latest update",
+      "points": [
+        "Hunting graph (Investigation & response > Hunting > Advanced hunting) visualizes entity relationships and choke points; blast radius in the incident graph shows paths from a compromised entity to critical assets; both rely on Sentinel graph and the data lake.",
+        "Custom Sentinel graphs (preview) are built in a VS Code notebook, materialized by a graph job, and queried with GQL.",
+        "EntraIdSignInEvents replaces AADSignInEventsBeta (deprecated October 19, 2026); EntraIdSpnSignInEvents covers service principals and managed identities; GraphAPIAuditEvents covers Graph API requests; UrlClickEvents covers Safe Links clicks.",
+        "KQL jobs (lake, up to 12 years, joins), summary rules (frequent aggregation), search jobs (archive tier); notebooks run through the VS Code extension on Spark; the Sentinel MCP server lets AI clients query lake data in natural language."
       ]
     }
   ],
@@ -2801,13 +3612,13 @@
           "options": [
             "playbook",
             "bookmark",
-            "livestream query",
+            "summary rule",
             "entity mapping setting"
           ],
           "correct": 0
         }
       ],
-      "explanation": "NRT rules trade query flexibility for roughly per-minute evaluation, faster than any scheduled rule interval; Fusion is ML correlation across signals, not a single fast query. An automation rule is the lightweight, no-code layer that assigns, tags, or otherwise handles an incident (a workbook only visualizes, a watchlist is reference data, a DCR governs ingestion). A playbook is the Logic App that does the actual work, like isolating a device \u2014 a bookmark and livestream are hunting tools, and entity mapping only drives correlation, not remediation."
+      "explanation": "NRT rules trade query flexibility for roughly per-minute evaluation, faster than any scheduled rule interval; Fusion is ML correlation across signals, not a single fast query. An automation rule is the lightweight, no-code layer that assigns, tags, or otherwise handles an incident (a workbook only visualizes, a watchlist is reference data, a DCR governs ingestion). A playbook is the Logic App that does the actual work, like isolating a device \u2014 a bookmark and a summary rule are not remediation tools, and entity mapping only drives correlation, not remediation."
     },
     {
       "id": "ml-sc200-2",
@@ -2877,13 +3688,13 @@
           "options": [
             "promotes",
             "bookmarks",
-            "livestreams",
+            "exports",
             "suppresses"
           ],
           "correct": 0
         }
       ],
-      "explanation": "A let statement, optionally saved as a function, defines reusable KQL logic once for many queries to reference by name. A leftanti join returns only the left (watchlist) rows that have no match on the right, exactly what's needed to surface zero-sign-in accounts directly \u2014 leftouter keeps every left row and would still need a null filter, leftsemi returns the opposite set (accounts that do have a match), and an inner join would drop the non-matching accounts entirely. Promoting a reliable hunting query into a scheduled analytics rule automates the detection going forward; bookmarking only preserves one result set, and livestream is a temporary session-based watch rather than a permanent schedule."
+      "explanation": "A let statement, optionally saved as a function, defines reusable KQL logic once for many queries to reference by name. A leftanti join returns only the left (watchlist) rows that have no match on the right, exactly what's needed to surface zero-sign-in accounts directly \u2014 leftouter keeps every left row and would still need a null filter, leftsemi returns the opposite set (accounts that do have a match), and an inner join would drop the non-matching accounts entirely. Promoting a reliable hunting query into a scheduled analytics rule automates the detection going forward; bookmarking only preserves one result set, and exporting the rows creates no recurring detection."
     },
     {
       "id": "ml-sc200-4",
@@ -2940,6 +3751,110 @@
         }
       ],
       "explanation": "A diagnostic setting is what routes an Azure resource's (or subscription's) platform logs, like Azure Activity Logs, into a Log Analytics workspace \u2014 a DCR instead governs how already-selected data is transformed and routed during ingestion, not the initial subscription-level export decision. A workbook is the dashboard/visualization layer built to show live, refreshing tiles like a rolling incident count; an analytics rule generates alerts rather than rendering a dashboard, and a watchlist is just static reference data."
+    },
+    {
+      "id": "ml-sc200-9001",
+      "cat": "manageSecOps",
+      "scenario": "To keep audit-grade identity logs for years cheaply, a team leaves 90 days in the {b1} tier for detections and extends total retention in the {b2}, querying older data with KQL jobs. Frequent small aggregates for dashboards come from {b3}.",
+      "blanks": [
+        {
+          "key": "b1",
+          "options": [
+            "Analytics",
+            "Archive-only",
+            "Auxiliary",
+            "Search"
+          ],
+          "correct": 0
+        },
+        {
+          "key": "b2",
+          "options": [
+            "Sentinel data lake",
+            "Action center",
+            "watchlist",
+            "Logic App"
+          ],
+          "correct": 0
+        },
+        {
+          "key": "b3",
+          "options": [
+            "summary rules",
+            "bookmarks",
+            "automation rules",
+            "entity pages"
+          ],
+          "correct": 0
+        }
+      ],
+      "explanation": "Detections need the hot Analytics tier. The data lake supports up to 12 years of total retention at low cost and is queried with KQL jobs or notebooks. Summary rules pre-aggregate high-volume data into small tables for dashboards and fast queries."
+    },
+    {
+      "id": "ml-sc200-9002",
+      "cat": "manageSecOps",
+      "scenario": "A SOC hides a known-benign alert so that no incident is created while the evidence stays queryable in {b1} by creating an {b2} rule. To make a Defender for Endpoint indicator for an IP address actually block connections, the {b3} advanced feature must be on.",
+      "blanks": [
+        {
+          "key": "b1",
+          "options": [
+            "AlertInfo and AlertEvidence",
+            "SecurityIncident only",
+            "AzureActivity",
+            "ThreatIntelObjects"
+          ],
+          "correct": 0
+        },
+        {
+          "key": "b2",
+          "options": [
+            "alert tuning",
+            "analytics rule suppression",
+            "data collection",
+            "retention"
+          ],
+          "correct": 0
+        },
+        {
+          "key": "b3",
+          "options": [
+            "custom network indicators",
+            "hide duplicate devices",
+            "EDR in block mode",
+            "resolve alerts automatically"
+          ],
+          "correct": 0
+        }
+      ],
+      "explanation": "The Hide alert action of an alert tuning rule leaves the alert data in AlertInfo and AlertEvidence. Network indicators for IPs, domains, and URLs are enforced only when custom network indicators is enabled."
+    }
+  ],
+  "sequences": [
+    {
+      "id": "seq-sc200-9001",
+      "cat": "manageSecOps",
+      "prompt": "Put these steps in order to set up a custom data collection rule in Defender for Endpoint.",
+      "steps": [
+        "Confirm Defender for Endpoint Plan 2 and a connected Sentinel workspace",
+        "Create a dynamic tag in asset rule management and let it run",
+        "Create the custom data collection rule, selecting the event table",
+        "Add rule conditions to filter the events and scope the rule to the dynamic tag",
+        "Monitor the rule and the per-device event limit, then expand beyond the pilot devices"
+      ],
+      "explanation": "Prerequisites come first, dynamic tags must exist and have run before they can scope a rule, and the rule is then defined, filtered, and scoped. Monitoring and gradual expansion follow because each rule is capped per device per day."
+    },
+    {
+      "id": "seq-sc200-9002",
+      "cat": "manageSecOps",
+      "prompt": "Put these steps in order to move rarely used raw logs into low-cost retention and still hunt them later.",
+      "steps": [
+        "Onboard the workspace to the Sentinel data lake",
+        "Set the table's total retention in the lake to the required period",
+        "Run a KQL job that filters the lake data and promotes only needed columns to the analytics tier",
+        "Hunt on the promoted table in advanced hunting",
+        "Delete or expire the promoted table when the investigation ends"
+      ],
+      "explanation": "The lake must exist before retention or jobs work, retention keeps data cheaply, and a KQL job promotes just what is needed so it can be hunted in the analytics tier, where storage costs more, so it should be cleaned up afterward."
     }
   ],
   "caseStudies": [
@@ -2999,6 +3914,66 @@
           ],
           "correct": 0,
           "explanation": "OfficeActivity carries Exchange/Office mailbox audit events, including inbox rule creation, so it's the correct table for a proactive hunt across every mailbox for that pattern. SecurityAlert only holds alerts a product has already raised (not a raw hunting source for a new pattern), SigninLogs covers authentication events rather than mailbox configuration changes, and IdentityInfo is static profile data with no event history at all."
+        }
+      ]
+    },
+    {
+      "id": "cs-sc200-tailwind-lake",
+      "cat": "manageSecOps",
+      "title": "Tailwind Bank Modernizes Its SOC",
+      "scenario": "Tailwind Bank runs Microsoft Defender XDR and Microsoft Sentinel in the Defender portal. Regulators require seven years of identity and firewall log retention, but detections only need the latest 90 days. Firewall logs are huge and mostly queried during incidents. A backup server runs an approved tool that triggers the same low-value endpoint alert every night, and analysts want it out of the queue while staying searchable. User-reported phishing emails flood the queue. During a recent incident, a service principal read many mailboxes through the Microsoft Graph API, and investigators found no record of the API calls because the relevant logging had never been enabled. The SOC also has Microsoft 365 E5 licenses.",
+      "questions": [
+        {
+          "id": "cs-sc200-tailwind-lake-q1",
+          "type": "mc",
+          "question": "Which retention design meets the regulatory and cost goals for identity and firewall logs?",
+          "options": [
+            "Keep seven years of analytics retention on all tables",
+            "Keep 90 days in the Analytics tier and extend total retention in the Sentinel data lake to seven years, using KQL jobs for investigations on older data",
+            "Move all tables to the Basic Logs plan and write detections against them",
+            "Export logs yearly to a storage account and delete them from the workspace"
+          ],
+          "correct": 1,
+          "explanation": "Analytics data is mirrored to the lake, whose total retention reaches 12 years at low cost, and KQL jobs query it when needed. Analytics retention is capped at two years and costs far more. Basic Logs data cannot back analytics rules. A manual yearly export is hard to query and operationally fragile."
+        },
+        {
+          "id": "cs-sc200-tailwind-lake-q2",
+          "type": "mc",
+          "question": "How should the SOC remove the nightly low-value endpoint alert from the queue while keeping the evidence available for hunting?",
+          "options": [
+            "Create a Defender XDR alert tuning rule with the Hide alert action for that evidence condition",
+            "Lower the device group remediation level to None",
+            "Add alert suppression to a Sentinel analytics rule",
+            "Delete the alert from the Action center"
+          ],
+          "correct": 0,
+          "explanation": "Alert tuning hides matching alerts without creating incidents and leaves the data in AlertInfo and AlertEvidence. Remediation level concerns automated actions, analytics rule suppression applies to a single Sentinel rule, and the Action center lists actions rather than alerts."
+        },
+        {
+          "id": "cs-sc200-tailwind-lake-q3",
+          "type": "mc",
+          "question": "Which capability best reduces the flood of user-reported phishing emails, and what does it use?",
+          "options": [
+            "A Sentinel workbook tile that counts reports",
+            "The Phishing Triage Agent, which uses Security Copilot capacity and Defender for Office 365 Plan 2",
+            "A hunting bookmark per report",
+            "An ASR rule that blocks Office child processes"
+          ],
+          "correct": 1,
+          "explanation": "The Phishing Triage Agent classifies user-reported phishing automatically with explanations and runs on SCUs, which the bank's eligible Microsoft 365 E5 licenses include. A workbook counts but does not triage, a bookmark is manual, and an ASR rule hardens endpoints."
+        },
+        {
+          "id": "cs-sc200-tailwind-lake-q4",
+          "type": "mc",
+          "question": "What should have been in place so investigators could see the service principal's mailbox reads through the Graph API?",
+          "options": [
+            "A watchlist of service principals",
+            "Microsoft Graph activity logs enabled through a diagnostic setting before the incident",
+            "Windows Event Forwarding from every mail server",
+            "Livestream on the sign-in table"
+          ],
+          "correct": 1,
+          "explanation": "Graph activity logs record each API request with app, IP address, and URI, but only once an administrator routes them with a diagnostic setting. A watchlist is reference data, WEF collects Windows events, and livestream no longer exists."
         }
       ]
     }
@@ -3093,6 +4068,24 @@
       "optionB": "SigninLogs | sort by TimeGenerated desc | summarize take_any(*) by UserPrincipalName",
       "better": "A",
       "why": "arg_max returns the entire row with the latest TimeGenerated in each group, deterministically. The sort plus take_any version looks equivalent, but take_any returns an arbitrary row from each group and does not guarantee it respects the earlier sort, so the result can include older sign-ins."
+    },
+    {
+      "id": "cmp-sc200-9001",
+      "cat": "manageSecOps",
+      "scenario": "A known internal scanner triggers the same Defender for Endpoint alert every night. The SOC wants the alert hidden in Defender XDR without creating an incident, but still searchable for hunting.",
+      "optionA": "A Defender XDR alert tuning rule with the Hide alert action.",
+      "optionB": "A Defender for Endpoint device group with a lower remediation level.",
+      "better": "A",
+      "why": "A device group remediation level controls what automated investigations do to a threat, not whether the alert appears or creates an incident. An alert tuning rule hides matching alerts so no incident forms and the evidence remains in AlertInfo and AlertEvidence for hunting."
+    },
+    {
+      "id": "cmp-sc200-9002",
+      "cat": "manageSecOps",
+      "scenario": "A team needs to run a join across three years of firewall and sign-in logs for a one-off investigation, and then schedule a weekly rerun, using data already held cheaply in the Sentinel data lake.",
+      "optionA": "A KQL job on the data lake, scheduled weekly.",
+      "optionB": "A summary rule every 20 minutes on the firewall table.",
+      "better": "A",
+      "why": "KQL jobs query up to 12 years of lake data with full KQL, including joins and unions, and can be one-time or scheduled. Summary rules are designed for frequent aggregation of high-volume data into smaller tables and are not a way to run an ad hoc multi-table join across years."
     }
   ]
 }

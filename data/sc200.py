@@ -2794,3 +2794,1029 @@ COMPARE = [
         'why': "arg_max returns the entire row with the latest TimeGenerated in each group, deterministically. The sort plus take_any version looks equivalent, but take_any returns an arbitrary row from each group and does not guarantee it respects the earlier sort, so the result can include older sign-ins.",
     },
 ]
+
+# >>> MSREFRESH-BEGIN (generated block; do not hand-edit, regenerate from patch files)
+
+
+def _msr_find(coll, key):
+    for it in globals()[coll]:
+        if it.get('id') == key or it.get('heading') == key:
+            return it
+    raise KeyError((coll, key))
+
+
+def _msr_fix(coll, key, field, old, new):
+    it = _msr_find(coll, key)
+    if isinstance(it[field], list):
+        assert old in it[field], (coll, key, field, old)
+        it[field] = [new if x == old else x for x in it[field]]
+    else:
+        assert old in it[field], (coll, key, field, old)
+        it[field] = it[field].replace(old, new)
+
+if 'FLASHCARDS' not in globals():
+    FLASHCARDS = []
+FLASHCARDS.extend([{'id': 'f9201',
+  'cat': 'manageSecOps',
+  'front': 'Email notifications for incidents in Defender XDR',
+  'back': 'Incident notification rules email your staff about new incidents or updates to existing ones. A rule can filter by alert severity, '
+          'service source (and specific detection source), and device group, and can set a different severity per source, such as Medium and High '
+          'for endpoint detections but every severity for Defender Experts. You create them in Settings > Microsoft Defender XDR > Email '
+          'notifications > Incidents tab, and separate notification types exist for response actions and for threat analytics reports.',
+  'detail': 'Configuring notifications needs the Manage security settings permission (or Security Administrator with basic permissions management). '
+            'With RBAC, you can only manage and receive notifications for the device groups you are allowed to manage.'},
+ {'id': 'f9202',
+  'cat': 'manageSecOps',
+  'front': 'Alert notifications (Defender for Endpoint email rules)',
+  'back': 'Alert notification rules email chosen recipients when new alerts of selected severities appear for selected device groups, with options '
+          'to include the organization name, a tenant-specific portal link, and device information. They live under Settings > Endpoints > General > '
+          'Email notifications. Recipients added later only receive alerts triggered after they were added.',
+  'detail': 'With RBAC, users can create, edit, or delete only rules limited to the device groups they manage; only a Global Administrator can '
+            'manage rules that apply to all device groups.'},
+ {'id': 'f9203',
+  'cat': 'manageSecOps',
+  'front': 'Alert tuning in Defender XDR (previously alert suppression)',
+  'back': "Alert tuning rules hide or resolve alerts automatically, or convert them to behaviors, when known-benign conditions on the alert's "
+          'evidence (files, processes, scheduled tasks and so on) are met. Actions are Hide alert (no incident is created, data stays in AlertInfo '
+          'and AlertEvidence), Resolve alert, and Set as behavior (data stays in BehaviorInfo and BehaviorEntities for hunting). Microsoft also '
+          'ships built-in alert tuning rules for common benign activity; they do not apply to custom detections or custom threat intelligence '
+          'alerts.',
+  'detail': "Create rules under Settings > Microsoft Defender XDR > Alert tuning or from an alert's details page. Built-in rules suppress alerts "
+            'without stopping automated investigations, and a suppressed alert is reactivated if an investigation finds malicious activity.'},
+ {'id': 'f9204',
+  'cat': 'manageSecOps',
+  'front': 'Alert correlation and analytics rule correlation settings',
+  'back': 'The Defender portal correlates alerts from all sources into incidents and merges incidents as an attack unfolds. For Sentinel analytics '
+          'rules, you can include or exclude rules from this correlation engine: by default all analytics rules are excluded at the tenant level '
+          "when you onboard, so incidents are grouped only by each rule's own settings, as they were in Sentinel. You can instead include all rules "
+          'and exclude specific ones. Managing this needs the Microsoft Sentinel Contributor role.',
+  'detail': 'With several Sentinel workspaces, one is configured as the primary workspace whose alerts can be correlated with Defender alerts.'},
+ {'id': 'f9205',
+  'cat': 'manageSecOps',
+  'front': 'Defender for Endpoint advanced features',
+  'back': 'Settings > Endpoints > Advanced features holds tenant-wide switches, including EDR in block mode (blocks malicious artifacts even when '
+          'Microsoft Defender Antivirus is passive), automatically resolve alerts, allow or block file, custom network indicators (for IP, domain, '
+          'and URL indicators, needing network protection), tamper protection, hide potential duplicate device records, and restrict correlation to '
+          'within scoped device groups.',
+  'detail': 'Custom network indicators and allow or block file are what make indicators of compromise enforceable on devices, so an indicator that '
+            'does nothing often means the matching advanced feature is still off.'},
+ {'id': 'f9206',
+  'cat': 'manageSecOps',
+  'front': 'Custom data collection in Defender for Endpoint (preview)',
+  'back': 'Custom data collection rules capture endpoint events beyond default telemetry, with filters on properties such as folder paths, process '
+          'names, and network connections, and store them in a connected Microsoft Sentinel workspace for hunting. They need Defender for Endpoint '
+          'Plan 2, dynamic tags configured in asset rule management (static tags are not supported), and are limited to one Sentinel workspace per '
+          'tenant for this feature.',
+  'detail': 'Each rule captures up to 75,000 events per device per rolling 24 hours, after which telemetry for that rule stops until the window '
+            'resets, so use several focused rules and pilot on a small device group first.'},
+ {'id': 'f9207',
+  'cat': 'manageSecOps',
+  'front': 'Configuring automatic attack disruption',
+  'back': 'Automatic attack disruption is configured by a Global Administrator or Security Administrator and depends on broad deployment of the '
+          'Defender products, because each detection needs the relevant signals. For Defender for Endpoint, device groups should use the Full '
+          'remediation level (the recommended setting) and the sensor must meet the minimum version for the Contain user action. You can set '
+          'exclusions to keep chosen users or devices from being disrupted, and review actions in Incidents and the Action center.',
+  'detail': 'Attack disruption actions for external platforms such as Okta and AWS (preview) additionally need a Sentinel workspace connected to the '
+            'unified portal with the matching connector.'},
+ {'id': 'f9208',
+  'cat': 'manageSecOps',
+  'front': 'Data tiers and retention: Analytics, Data lake, and XDR default tiers',
+  'back': 'The Analytics tier is hot storage for alerting, hunting, and all Sentinel features, with 30 days of analytics retention by default that '
+          'can be extended to up to two years. The Data lake tier is low-cost cold storage that supports up to 12 years of total retention, '
+          'reachable through KQL jobs, notebooks, and summary rules but not real-time detections. Defender XDR tables sit in an XDR default tier '
+          'with 30 days of analytics retention that can be raised to 90 days with ingestion cost only, and beyond 90 days also incurs storage cost.',
+  'detail': 'By default data in the analytics tier is mirrored to the lake for the same period, so you extend only the total retention to keep it '
+            'longer. Basic Logs tables can be viewed in the Defender portal but managed only in the Log Analytics workspace unless you change the '
+            'plan to Analytics.'},
+ {'id': 'f9209',
+  'cat': 'manageSecOps',
+  'front': 'Sentinel roles: Azure roles for the SIEM, Entra roles for the data lake',
+  'back': 'Sentinel SIEM access uses Azure RBAC built-in roles: Reader (view), Responder (also manage incidents), Contributor (also install '
+          'solutions and create or edit resources), Playbook Operator (run playbooks), and Automation Contributor (lets automation rules run '
+          'playbooks). The Sentinel data lake instead uses Microsoft Entra roles: Global Reader, Security Reader, Security Operator, and Security '
+          'Administrator can read across the lake, while Security Operator, Security Administrator, and Global Administrator can write, for example '
+          'KQL job output to the analytics tier.',
+  'detail': 'Assign the Azure roles at resource group level for best results. Creating or editing playbooks also needs Logic App Contributor, and '
+            'Responder alone does not let someone create automation rules that call playbooks.'},
+ {'id': 'f9210',
+  'cat': 'manageSecOps',
+  'front': 'SOAR playbook generator (AI-authored playbooks)',
+  'back': 'In the Defender portal, Sentinel customers can describe an automation in natural language and co-author a Python-based playbook with an '
+          'AI coding agent in an embedded VS Code environment. The result is validated, documented with a flow diagram, and can be tested by '
+          'supplying a real alert. It does not require a separate Security Copilot license or SCUs.',
+  'detail': 'This complements Logic Apps-based playbooks; automation rules still decide when automation starts.'},
+ {'id': 'f9211',
+  'cat': 'manageSecOps',
+  'front': 'Windows Event Forwarding (WEF) and the Windows Event Collector',
+  'back': 'WEF is a built-in Windows feature in which source computers push chosen events to a central Windows Event Collector (WEC) server through '
+          'subscriptions. For Sentinel you can install the Azure Monitor Agent on the WEC server and use a data collection rule to send the '
+          'forwarded events, rather than installing the agent on every source machine, which suits large fleets and servers where an agent is not '
+          'allowed.',
+  'detail': 'Contrast with the Windows Security Events via AMA connector, where the agent runs on each machine and a DCR picks the event sets or '
+            'XPath filters to collect.'},
+ {'id': 'f9212',
+  'cat': 'manageSecOps',
+  'front': 'Collecting Azure activity and resource logs with Azure Policy',
+  'back': 'The Azure Activity connector streams subscription-level control-plane events into the AzureActivity table. Azure resource connectors '
+          'stream resource diagnostic logs by using Azure Policy to apply one log-streaming (diagnostic setting) configuration to all current and '
+          'future resources of a type within a scope, which needs the Owner role on the policy assignment scope. Resource diagnostic logs usually '
+          'land in AzureDiagnostics or resource-specific tables.',
+  'detail': 'Without Policy you would create a diagnostic setting by hand on every resource; Policy also remediates new resources automatically. '
+            'These connectors do not support DCR transformations.'},
+ {'id': 'f9213',
+  'cat': 'manageSecOps',
+  'front': 'KQL jobs in the Sentinel data lake',
+  'back': 'KQL jobs run one-time or scheduled asynchronous queries on data lake tables and federated tables (such as Microsoft Entra ID, Microsoft '
+          '365, and Resource Graph data) and are suited to long investigations, historical threat intelligence matching, and joins or unions across '
+          'many tables. A job can promote results to the analytics tier as a new table (named with a _KQL_CL suffix) or append to an existing one, '
+          'so you can then hunt and alert on it.',
+  'detail': 'Promote only the columns and rows you need because analytics-tier storage costs more than the lake. Use KQL jobs for up to 12 years of '
+            'data, summary rules for frequent summarization (for example every 20 minutes), and search jobs for archived data or hydrating one big '
+            'table.'},
+ {'id': 'f9214',
+  'cat': 'manageSecOps',
+  'front': 'Summary rule tables (updated detail)',
+  'back': 'Summary rules aggregate high-volume data on a schedule into custom summary tables in the analytics tier, so dashboards, hunting, and '
+          'detections query a small table. They can read from Analytics, Auxiliary, Basic, and data lake tables (but not System tables), run as '
+          'often as every 20 minutes, and have out-of-the-box templates.',
+  'detail': 'They suit workspaces not onboarded to the data lake, such as when the source is on a Basic or Auxiliary plan.'},
+ {'id': 'f9215',
+  'cat': 'manageSecOps',
+  'front': 'Security Copilot agents in the Defender portal',
+  'back': 'Security Copilot agents automate SOC tasks and are deployed from Security Copilot > Security Store in the Defender portal, then set up '
+          'from Security Copilot > Agents. In Defender they include the Phishing Triage Agent (extended as the Security Alert Triage Agent), the '
+          'Threat Intelligence Briefing Agent, the Security Analyst Agent, the Dynamic Threat Detection Agent, and the Threat Hunting Assistant. '
+          'Agents consume Security Compute Units (SCUs) and authenticate with a dedicated Microsoft Entra Agent ID agent identity or a connected '
+          'user account.',
+  'detail': 'Eligible Microsoft 365 E5 and E7 customers receive Security Copilot with 400 SCUs per month for every 1,000 paid user licenses, up to '
+            '10,000 SCUs per month, at no additional cost.'},
+ {'id': 'f9216',
+  'cat': 'manageSecOps',
+  'front': 'Sentinel MCP server',
+  'back': "Microsoft Sentinel's Model Context Protocol (MCP) support is a hosted, Entra-authenticated server offering scenario-focused tool "
+          'collections, so AI clients and agents can query Sentinel data lake and Defender data in natural language without knowing table schemas or '
+          'writing KQL. Compatible hosts include Visual Studio Code, Security Copilot, Copilot Studio, and other MCP-capable AI clients.',
+  'detail': 'In MCP terms the AI application is the host, it runs an MCP client per connection, and the Sentinel server provides the tools. It needs '
+            'no infrastructure deployment from you.'},
+ {'id': 'f9217',
+  'cat': 'manageSecOps',
+  'front': 'Case management in the Defender portal',
+  'back': 'Case management manages SecOps work natively in the Defender portal. Incident cases (preview, and the recommended experience for '
+          'incidents) are created from correlated incident activity and track ownership, severity, status, classification, tasks, comments, activity '
+          'history, custom fields, and resolution. Generic cases are created manually for other SecOps work. Case templates configure custom fields '
+          'and SLA policies.',
+  'detail': 'Incident case access uses the unified RBAC permissions Security Data Read (view) and Security Data Manage (view and manage), the same '
+            'model as the legacy incident experience, which remains available during preview.'},
+ {'id': 'f9220',
+  'cat': 'respondIncidents',
+  'front': 'Device timeline in Defender for Endpoint',
+  'back': 'The Timeline tab of a device page shows a chronological view of the events and associated alerts observed on that device, so an analyst '
+          'can follow a suspected attack step by step. You can filter by event type, review the MITRE ATT&CK techniques linked to events, open '
+          'process trees, and flag events for follow-up.',
+  'detail': "The timeline can show activity that is newer than the device page's Last seen value, so trust the timeline when the two disagree."},
+ {'id': 'f9221',
+  'cat': 'respondIncidents',
+  'front': 'Purview Insider Risk Management and DLP alerts in Defender XDR',
+  'back': 'Microsoft Purview Insider Risk Management alerts appear in the Defender portal under Incidents & alerts, can be grouped with DLP and '
+          'Microsoft Entra ID alerts in one incident, can be filtered by service source, and stay synchronized with Purview. Analysts can hunt for '
+          'all activity tied to the user in the alert. DLP alerts are handled the same way, with remediation in place on users, files, and devices.',
+  'detail': 'A built-in alert tuning rule for DLP signals takes effect in early October 2026: it sets them as behaviors, so they stop generating '
+            'alerts and incidents but remain in BehaviorInfo and BehaviorEntities. Disable the rule under Settings > Microsoft Defender XDR > Alert '
+            'tuning to keep DLP alerts.'},
+ {'id': 'f9222',
+  'cat': 'respondIncidents',
+  'front': 'Microsoft Purview Audit (Standard vs. Premium)',
+  'back': 'Purview Audit records user and admin activity in the unified audit log and is enabled by default. Audit (Standard) retains records for '
+          '180 days and supports the audit search tool, the Audit Search Graph API, and the Search-UnifiedAuditLog cmdlet. Audit (Premium) includes '
+          'all of that, keeps records up to one year (ten years with an add-on), and offers audit log retention policies and higher bandwidth access '
+          'to the Office 365 Management Activity API.',
+  'detail': 'For a business email compromise investigation, audit records of mailbox rule changes and sign-ins from the unified audit log often '
+            'provide the timeline; if the event is older than the retention window it is gone.'},
+ {'id': 'f9223',
+  'cat': 'respondIncidents',
+  'front': 'Content search in Purview eDiscovery',
+  'back': 'Microsoft Purview eDiscovery lets investigators search Exchange Online mailboxes, SharePoint sites, OneDrive, Teams, Microsoft 365 '
+          'Groups, and Viva Engage in one search and export results. Classic Content Search, classic eDiscovery (Standard), and classic eDiscovery '
+          '(Premium) were retired on August 31, 2025 (except for Microsoft 365 operated by 21Vianet); content search features now live in the search '
+          'experience of the new eDiscovery, including a Content Search case.',
+  'detail': 'Access requires membership in the eDiscovery Manager role group in the Purview portal. Content search finds items in place; it does not '
+            'itself investigate sign-in or API activity, which come from audit and Graph logs.'},
+ {'id': 'f9224',
+  'cat': 'respondIncidents',
+  'front': 'Microsoft Graph activity logs',
+  'back': 'Microsoft Graph activity logs are an audit trail of every HTTP request the Graph service processes for a tenant, from apps, SDKs, '
+          'scripts, and Microsoft portals. They are off until a tenant admin enables them with a diagnostic setting that sends them to Log '
+          'Analytics, storage, or Event Hubs; this needs Microsoft Entra ID P1 or P2 and Security Administrator is the least privileged supported '
+          'role. In Log Analytics they appear in the MicrosoftGraphActivityLogs table with fields such as AppId, UserId, ServicePrincipalId, '
+          'IPAddress, RequestUri, and ResponseStatusCode.',
+  'detail': 'They show what a stolen token or malicious app actually did through the API, such as mass mailbox reads, which sign-in logs alone do '
+            'not reveal. Advanced hunting has a related GraphAPIAuditEvents table.'},
+ {'id': 'f9225',
+  'cat': 'respondIncidents',
+  'front': 'Investigating incidents with agentic AI',
+  'back': 'Embedded Security Copilot and its agents speed up investigations: the Security Analyst Agent runs ready-made or custom analyses (anomaly '
+          'detection, clustering, risk scoring) on Defender, Sentinel Log Analytics, or data lake data from a prompt or from Analyze with copilot in '
+          'advanced hunting; the Threat Hunting Assistant turns natural language into KQL and interprets results; the Dynamic Threat Detection Agent '
+          'raises alerts for gaps it finds with MITRE-mapped explanations. Incident cases can also run agentic playbooks and show agent session '
+          'output.',
+  'detail': 'An analyst remains responsible for validating what an agent concludes before acting. Agents consume SCUs and run under an agent '
+            'identity or a connected user account.'},
+ {'id': 'f9226',
+  'cat': 'respondIncidents',
+  'front': 'Releasing actions taken by automatic attack disruption',
+  'back': 'Containment taken by automatic attack disruption, such as a contained user account or an isolated device, appears in the incident and in '
+          'the Action center. An analyst reviews the incident evidence, and if the detection is judged a false positive, undoes the action from the '
+          'Action center so the user or device regains access.',
+  'detail': 'Excluding a device or user from disruption in the configuration is a preventive control; releasing the action in the Action center is '
+            'the corrective one after the fact.'},
+ {'id': 'f9240',
+  'cat': 'threatHunting',
+  'front': 'Hunting graph in Defender XDR',
+  'back': 'The hunting graph renders threat scenarios in advanced hunting as an interactive graph of entities and relationships, so an analyst can '
+          'trace paths and possible choke points and take actions on results that tabular KQL output might hide. Open it from Investigation & '
+          'response > Hunting > Advanced hunting using the hunting graph icon. It depends on the Microsoft Sentinel data lake and at least read-only '
+          'access to Microsoft Security Exposure Management.',
+  'detail': 'Use it to see how entities connect (for example a user with privileged access paths to a critical asset), instead of joining many '
+            'tables by hand.'},
+ {'id': 'f9241',
+  'cat': 'threatHunting',
+  'front': 'Blast radius analysis in the incident graph',
+  'back': 'Blast radius analysis extends the incident graph in Defender to show the vulnerable paths an attacker could take from a compromised '
+          'entity to a critical asset, so one consolidated graph shows the current impact of a breach and the possible future impact. It is powered '
+          'by Microsoft Sentinel graph and is auto-provisioned when you already have the Sentinel data lake.',
+  'detail': 'Blast radius is about what could happen next; the hunting graph is the analyst-driven exploration tool. Purview Insider Risk Management '
+            'has a similar data risk graph for data leak blast radius.'},
+ {'id': 'f9242',
+  'cat': 'threatHunting',
+  'front': 'Microsoft Sentinel graph and custom graphs',
+  'back': 'Microsoft Sentinel graph models assets, identities, activities, and threat intelligence as nodes and edges, answering questions such as '
+          'what the blast radius of a compromised account or document is. Custom graphs (preview) are authored in a Jupyter notebook with the '
+          'Microsoft Sentinel extension for Visual Studio Code, published and materialized by a graph job, and queried with Graph Query Language '
+          '(GQL) on the Graphs page in the Defender portal.',
+  'detail': 'On-demand graph jobs keep a graph for 30 days, while scheduled graph jobs rebuild it on your refresh schedule. Usage is billed under '
+            'the Sentinel graph meter.'},
+ {'id': 'f9243',
+  'cat': 'threatHunting',
+  'front': 'EntraIdSignInEvents (replaces AADSignInEventsBeta)',
+  'back': 'EntraIdSignInEvents is the advanced hunting table for Microsoft Entra interactive and non-interactive sign-ins, and '
+          'EntraIdSpnSignInEvents covers service principal and managed identity sign-ins. The AADSignInEventsBeta table is deprecated on October 19, '
+          '2026, when queries that use it are migrated automatically to EntraIdSignInEvents.',
+  'detail': 'In a Sentinel workspace the equivalent tables are SigninLogs and the non-interactive and service principal sign-in log tables; the '
+            'Entra-prefixed tables are the Defender XDR advanced hunting names.'},
+ {'id': 'f9244',
+  'cat': 'threatHunting',
+  'front': 'Choosing the right advanced hunting table',
+  'back': 'Match the question to the table: UrlClickEvents for Safe Links clicks from email, Teams, and Office apps; EmailEvents, '
+          'EmailAttachmentInfo, and EmailUrlInfo for messages, attachments, and URLs; DeviceProcessEvents, DeviceFileEvents, DeviceNetworkEvents, '
+          'and DeviceLogonEvents for endpoint activity; IdentityLogonEvents and IdentityQueryEvents for Active Directory authentication and '
+          'directory queries; CloudAppEvents for cloud app activity; GraphAPIAuditEvents for Microsoft Graph API requests; AlertInfo and '
+          'AlertEvidence for alerts.',
+  'detail': 'When a case needs both a click and its landing activity, join UrlClickEvents to DeviceNetworkEvents or EmailUrlInfo on the URL or user '
+            'instead of searching one table broadly.'},
+ {'id': 'f9245',
+  'cat': 'threatHunting',
+  'front': 'Hunting with notebooks on the data lake and the Sentinel MCP server',
+  'back': 'Notebooks over the Sentinel data lake are Jupyter notebooks run through the Microsoft Sentinel extension for Visual Studio Code using '
+          'PySpark on Spark compute, suited to low-and-slow attack detection, anomaly and machine learning analysis, and visualization across large '
+          'data. An MCP client such as VS Code can additionally connect to the Sentinel MCP server so an AI assistant can query the same lake data '
+          'in natural language.',
+  'detail': 'Notebook jobs can be scheduled, and you can promote findings to the analytics tier with a KQL job for alerting.'},
+ {'id': 'f9246',
+  'cat': 'threatHunting',
+  'front': 'KQL jobs vs. summary rules vs. search jobs (when to hunt with which)',
+  'back': 'Use a KQL job for up to 12 years of lake data with full KQL, joins, and unions, one-time or scheduled. Use a summary rule for frequent '
+          'aggregation (as often as every 20 minutes) of Analytics, Basic, Auxiliary, or lake data into analytics-tier summary tables. Use a search '
+          'job for data in the archive tier (or older than your data lake onboarding date) and to hydrate a large volume from a single table into a '
+          'new table.',
+  'detail': 'If the question mentions joins across many tables over years, think KQL job; frequent small aggregates, summary rule; archived or '
+            'one-table forensic retrieval, search job.'}])
+
+if 'QUESTIONS' not in globals():
+    QUESTIONS = []
+QUESTIONS.extend([{'id': 'q9201',
+  'cat': 'manageSecOps',
+  'type': 'mc',
+  'question': 'The SOC wants an email only when a High severity endpoint alert appears on servers, and an email for every severity of Defender '
+              'Experts activity, all tied to new and updated incidents. Where should the analyst create these rules?',
+  'options': ['Settings > Endpoints > General > Email notifications, one rule per alert',
+              'In Sentinel, as an automation rule that runs a playbook to send mail',
+              'Settings > Microsoft Defender XDR > Email notifications, as incident notification rules with severity set per service source',
+              'In Threat analytics, by following each report'],
+  'correct': 2,
+  'explanation': 'Incident notification rules can filter by service source, detection source, and device group and can set the severity separately '
+                 'per source, which matches the request. The Endpoints email notifications are alert-based and cover endpoint alerts only, with no '
+                 'per-source severity and no incident updates. A Sentinel automation rule is a workable build but not the built-in notification '
+                 'feature, and it would not cover Defender Experts incidents without extra work. Following threat analytics reports notifies about '
+                 'reports, not incidents.'},
+ {'id': 'q9202',
+  'cat': 'manageSecOps',
+  'type': 'mc',
+  'question': 'A backup server runs an approved tool that triggers the same low-value Defender XDR alert daily. The SOC wants matching alerts hidden '
+              'from the queue with no incident created, but the signal must remain searchable in advanced hunting. What should they create?',
+  'options': ["An alert tuning rule with the Hide alert action, scoped to the alert's evidence conditions",
+              'A device group with the Full automation level for the backup server',
+              'A Sentinel analytics rule with alert suppression for 24 hours',
+              'A custom detection rule that deletes the alert'],
+  'correct': 0,
+  'explanation': "Alert tuning (formerly alert suppression) rules match conditions on the alert's evidence and can hide the alert so no incident is "
+                 'created while the data stays in AlertInfo and AlertEvidence. Changing the automation level affects remediation, not alert '
+                 "visibility. Analytics rule suppression in Sentinel pauses a single rule's query for a period and does not tune alerts from "
+                 'Defender products. Custom detections create alerts and cannot delete one.'},
+ {'id': 'q9203',
+  'cat': 'manageSecOps',
+  'type': 'mc',
+  'question': 'After onboarding Sentinel to the Defender portal, a team migrating from standalone Sentinel finds that incidents from its analytics '
+              'rules are grouped exactly as in the old Sentinel configuration, not merged with other Defender alerts. They now want the Defender '
+              'correlation engine to also merge incidents from most of their rules. What should they do?',
+  'options': ['Move the workspace to the Basic Logs plan',
+              'Disable alert grouping in every analytics rule',
+              'Create automation rules that merge incidents by owner',
+              'Change the analytics rule correlation setting to include all rules and exclude only specific ones'],
+  'correct': 3,
+  'explanation': 'By default analytics rules are excluded from Defender correlation at the tenant level so incident behavior stays predictable after '
+                 'migration, and the setting can be flipped to include all rules and exclude specific ones. Basic Logs is a table plan and has no '
+                 'effect on correlation. Disabling alert grouping would remove the rule-level grouping rather than invite Defender merging. Merging '
+                 'by owner in an automation rule is not how cross-product correlation works.'},
+ {'id': 'q9204',
+  'cat': 'manageSecOps',
+  'type': 'mc',
+  'question': 'An analyst created an IP-address indicator to block a command-and-control server in Defender for Endpoint, but connections from a '
+              'managed laptop still succeed. Network protection is enabled in block mode on the laptop. What is the most likely missing setting?',
+  'options': ['Custom network indicators in Settings > Endpoints > Advanced features',
+              'Hide potential duplicate device records',
+              'Restrict correlation to within scoped device groups',
+              'Automatically resolve alerts'],
+  'correct': 0,
+  'explanation': 'IP, domain, and URL indicators are only enforced on devices when custom network indicators is turned on in the advanced features, '
+                 'together with network protection. The other switches change device list hygiene, alert correlation scope, and alert resolution, '
+                 'none of which stops a connection.'},
+ {'id': 'q9205',
+  'cat': 'manageSecOps',
+  'type': 'mc',
+  'question': 'A threat hunter wants to capture all PowerShell script executions only from administrator workstations, beyond default endpoint '
+              'telemetry, and store them in Microsoft Sentinel for hunting without collecting every event on every device. What should you '
+              'configure?',
+  'options': ['An ASR rule that audits script execution',
+              'A custom data collection rule in Defender for Endpoint scoped to devices with a dynamic tag',
+              'A summary rule that aggregates DeviceProcessEvents',
+              'A Windows Event Forwarding subscription on each workstation'],
+  'correct': 1,
+  'explanation': 'Custom data collection rules add targeted event collection with filters and device scope based on dynamic tags and send the data '
+                 'to a connected Sentinel workspace. An ASR rule audits or blocks behavior but does not create new collected telemetry for hunting. '
+                 'A summary rule aggregates data you already ingest. WEF on every workstation would be an unrelated, heavier mechanism for Windows '
+                 'event logs rather than Defender endpoint telemetry.'},
+ {'id': 'q9206',
+  'cat': 'manageSecOps',
+  'type': 'mc',
+  'question': 'A company must keep identity sign-in telemetry for seven years for audits, only ever querying it occasionally for investigations, and '
+              'wants the lowest practical storage cost. Detection rules need only the last 90 days. What should you configure?',
+  'options': ['Keep everything in the Analytics tier with seven years of analytics retention',
+              'Set the table to the Basic Logs plan and write analytics rules against it',
+              'Keep 90 days in the Analytics tier and extend total retention in the data lake tier to seven years',
+              'Export the data monthly to a storage account and delete it from the workspace'],
+  'correct': 2,
+  'explanation': 'Analytics tier data is mirrored to the lake, and total retention in the lake can extend to 12 years at low cost, so detections use '
+                 'the analytics window and audits query the lake with KQL jobs. Analytics retention is capped at two years and is the expensive hot '
+                 'tier. Basic Logs data cannot back analytics rules. A manual storage export loses native querying and adds operational work.'},
+ {'id': 'q9207',
+  'cat': 'manageSecOps',
+  'type': 'mc',
+  'question': 'A junior analyst needs to run KQL jobs across all workspaces in the Sentinel data lake and write the results to the analytics tier, '
+              'with the least privilege. Which role should be assigned?',
+  'options': ['Microsoft Sentinel Reader at subscription level',
+              'Microsoft Sentinel Automation Contributor',
+              'Security Reader in Microsoft Entra ID',
+              'Security Operator in Microsoft Entra ID'],
+  'correct': 3,
+  'explanation': 'The data lake uses Microsoft Entra roles, and writing job output to the analytics tier requires Security Operator, Security '
+                 'Administrator, or Global Administrator, Security Operator being the least privileged. Security Reader can read across the lake but '
+                 'not write. Sentinel Reader and Automation Contributor are Azure roles for the SIEM workspace and do not grant lake-wide write '
+                 'access.'},
+ {'id': 'q9208',
+  'cat': 'manageSecOps',
+  'type': 'mc',
+  'question': 'An organization has a large fleet of servers where the Azure Monitor Agent cannot be installed on each machine, but the servers '
+              'already forward Windows events to a central collector with subscriptions. How should the security team get these events into '
+              'Sentinel?',
+  'options': ['Install the Azure Monitor Agent on the Windows Event Collector server and use a data collection rule to send the forwarded events',
+              'Create a diagnostic setting on each server',
+              'Use the Syslog via AMA connector on the collector',
+              'Ingest the events with the Azure Activity connector'],
+  'correct': 0,
+  'explanation': 'Windows Event Forwarding centralizes events on a Windows Event Collector server, so one agent there, with a data collection rule, '
+                 'can ship them. Diagnostic settings apply to Azure resources, not to Windows event logs on servers. Syslog is a Linux and appliance '
+                 'log format. The Azure Activity connector carries Azure control-plane events, not Windows logs.'},
+ {'id': 'q9209',
+  'cat': 'manageSecOps',
+  'type': 'mc',
+  'question': 'Security wants the diagnostic logs of every new Azure Key Vault and storage account sent to Sentinel automatically as they are '
+              'created, without configuring a diagnostic setting on each resource. What should the team use?',
+  'options': ['An Azure Policy assignment from the connector that applies the log-streaming configuration at the chosen scope',
+              'A manual diagnostic setting on each resource after creation',
+              'A scheduled analytics rule that queries for new resources',
+              'A Defender for Cloud secure score recommendation'],
+  'correct': 0,
+  'explanation': 'The Azure resource connectors use Azure Policy to apply one log-streaming configuration to existing and future resources of a type '
+                 'within a scope, which needs the Owner role on that scope. Manual settings do not scale to new resources. An analytics rule reads '
+                 'data already ingested and cannot create diagnostic settings. A secure score recommendation is a posture suggestion, not a log '
+                 'pipeline.'},
+ {'id': 'q9210',
+  'cat': 'manageSecOps',
+  'type': 'mc',
+  'question': 'A KQL job promoted lake data to the analytics tier overnight, and the analyst wants to know what to look for in the workspace. What '
+              'best describes the result?',
+  'options': ['The data is hidden until an administrator approves it',
+              'A new custom table in the analytics tier whose name ends in _KQL_CL, or rows appended to an existing table',
+              'A new Basic Logs table that cannot be queried with joins',
+              'A summary rule that reruns every 20 minutes'],
+  'correct': 1,
+  'explanation': 'KQL jobs can write to a new analytics-tier table, suffixed _KQL_CL, or append to an existing table, and the analyst can then hunt '
+                 'and alert on it in the advanced hunting editor. There is no approval step. The output is analytics tier, not Basic Logs. A summary '
+                 'rule is a different feature with its own schedule.'},
+ {'id': 'q9211',
+  'cat': 'manageSecOps',
+  'type': 'ms',
+  'question': 'Which two statements about Defender XDR alert tuning are true? (Choose two.)',
+  'options': ['Hiding an alert prevents incident creation but the data remains in AlertInfo and AlertEvidence',
+              'Set as behavior keeps matching signals out of the alert queue while the data remains available in BehaviorInfo and BehaviorEntities',
+              'Alert tuning rules also suppress alerts raised by custom detection rules',
+              'A built-in alert tuning rule permanently stops any related automated investigation'],
+  'correct': [0, 1],
+  'explanation': 'Hide alert and Set as behavior both remove noise from the queue while keeping data for hunting, in different tables. Built-in '
+                 'tuning rules do not apply to alerts from custom detection rules or custom threat intelligence, so tune the detection itself '
+                 'instead. Built-in rules suppress alerts without stopping automated investigations, and a suppressed alert is reactivated if an '
+                 'investigation finds malicious activity.'},
+ {'id': 'q9212',
+  'cat': 'manageSecOps',
+  'type': 'tf',
+  'question': 'Any user with the Microsoft Sentinel Responder role can read and write across all tables in the Sentinel data lake.',
+  'answer': False,
+  'explanation': 'The Sentinel SIEM uses Azure RBAC roles such as Responder, which manage incidents in the workspace. Lake-wide read and write '
+                 'access comes from Microsoft Entra roles: reads from Global Reader, Security Reader, Security Operator, or Security Administrator, '
+                 'and writes from Security Operator, Security Administrator, or Global Administrator.'},
+ {'id': 'q9213',
+  'cat': 'manageSecOps',
+  'type': 'tf',
+  'question': 'Custom data collection rules in Defender for Endpoint can target devices using manually applied static tags.',
+  'answer': False,
+  'explanation': 'The feature requires dynamic tags configured in asset rule management and run at least once. Manual (static) tags are not '
+                 'supported for scoping the rule.'},
+ {'id': 'q9214',
+  'cat': 'manageSecOps',
+  'type': 'mc',
+  'question': 'A SOC wants an agent that triages user-reported phishing emails at scale with a natural-language rationale for each verdict, without '
+              'writing playbooks. Which approach fits, and what does it need?',
+  'options': ['A Logic Apps playbook on the alert trigger, which needs the Playbook Operator role',
+              'The Phishing Triage Agent from the Security Store, which needs Security Copilot capacity (SCUs) and Defender for Office 365 Plan 2',
+              'A Sentinel workbook that scores emails daily',
+              'An ASR rule that blocks Office applications from creating child processes'],
+  'correct': 1,
+  'explanation': 'The Phishing Triage Agent is a Security Copilot agent deployed from the Security Store in the Defender portal, runs autonomously '
+                 'with an agent identity, explains its verdicts, and needs Security Copilot capacity and Defender for Office 365 Plan 2. A playbook '
+                 'would need building and cannot reason about intent. A workbook only visualizes data, and an ASR rule hardens endpoints against '
+                 'child processes rather than triaging reported mail.'},
+ {'id': 'q9215',
+  'cat': 'manageSecOps',
+  'type': 'mc',
+  'question': 'A developer wants an AI coding client in Visual Studio Code to answer natural-language questions about long-term security data in the '
+              'Sentinel data lake, with no custom API integration and without the developer knowing the table schemas. What should be used?',
+  'options': ["The Sentinel MCP server's data exploration tools",
+              'A saved hunting query in a workbook',
+              'A Jupyter notebook that the developer maintains',
+              'A scheduled analytics rule that runs hourly'],
+  'correct': 0,
+  'explanation': 'The hosted Sentinel MCP server exposes scenario-focused tool collections that let MCP-capable clients explore data lake data in '
+                 'natural language and handle schema discovery themselves. A workbook or analytics rule is fixed content someone must author. A '
+                 'notebook can query the lake but needs code and schema knowledge from the developer.'},
+ {'id': 'q9220',
+  'cat': 'respondIncidents',
+  'type': 'mc',
+  'question': 'The SOC wants Purview Insider Risk Management alerts to show up next to related DLP and Microsoft Entra alerts in a single incident, '
+              'and wants to hunt for everything the flagged user did. Where should analysts work?',
+  'options': ['Only in the Purview portal, because Insider Risk alerts cannot be shown elsewhere',
+              'In the Defender portal under Incidents & alerts, where the alerts are grouped and correlated and updates stay in sync with Purview',
+              'In Sentinel workbooks, after exporting the alerts to CSV',
+              'In Microsoft Entra ID Protection risky users'],
+  'correct': 1,
+  'explanation': 'Insider risk alerts are surfaced in the Defender portal incident and alert queues, correlated with DLP and Entra alerts, with '
+                 'advanced hunting by user and automatic synchronization with Purview. Restricting work to Purview loses the correlation. A CSV '
+                 'export is manual and stale. ID Protection tracks identity risk, not insider data activity.'},
+ {'id': 'q9221',
+  'cat': 'respondIncidents',
+  'type': 'mc',
+  'question': 'After the built-in alert tuning rule for Purview DLP signals took effect, analysts notice DLP detections no longer create alerts or '
+              'incidents in Defender XDR, although the SOC wants them. What should be done?',
+  'options': ['Re-onboard the tenant to Defender for Endpoint',
+              'Disable the built-in DLP alert tuning rule under Settings > Microsoft Defender XDR > Alert tuning',
+              'Extend retention of the AlertInfo table',
+              'Create a custom detection rule on SecurityIncident'],
+  'correct': 1,
+  'explanation': 'The built-in rule sets DLP signals as behaviors, which keeps them out of the alert queue and incident queue while leaving the data '
+                 'in BehaviorInfo and BehaviorEntities. Turning the rule off restores alerts. Onboarding and retention settings do not change how '
+                 'signals are classified, and SecurityIncident is a Sentinel table, not the place to bring back suppressed alerts.'},
+ {'id': 'q9222',
+  'cat': 'respondIncidents',
+  'type': 'mc',
+  'question': 'During an investigation, the team needs unified audit log entries for a mailbox rule created eight months ago. The tenant uses '
+              'Purview Audit (Standard) and no add-ons. What is the outcome?',
+  'options': ['The records are available because Standard keeps one year',
+              'The records are available for ten years by default',
+              'The records are gone because Standard keeps 180 days; Audit (Premium) would keep up to one year',
+              'The records can be restored from the recycle bin of the audit search tool'],
+  'correct': 2,
+  'explanation': 'Audit (Standard) retains audit records for 180 days, and Audit (Premium) extends this to up to one year, with a ten-year add-on. '
+                 'Eight months is beyond Standard retention. There is no restore feature for expired audit records.'},
+ {'id': 'q9223',
+  'cat': 'respondIncidents',
+  'type': 'mc',
+  'question': 'An investigator wants to search mailboxes and SharePoint sites for a malicious attachment name in one search and export the hits. '
+              'Which statement is correct for a commercial (non-21Vianet) tenant today?',
+  'options': ['Use classic Content Search, which remains the supported tool',
+              'Use classic eDiscovery (Premium), which replaced Content Search',
+              'Use the search experience in the new Purview eDiscovery, as a member of the eDiscovery Manager role group',
+              'Use the Microsoft Graph activity logs, which index mailbox content'],
+  'correct': 2,
+  'explanation': 'All classic eDiscovery experiences, including classic Content Search, were retired on August 31, 2025 for these tenants; the same '
+                 'searching now lives in the new eDiscovery experience, and the eDiscovery Manager role group grants access. Graph activity logs '
+                 'record API requests, not mailbox content.'},
+ {'id': 'q9224',
+  'cat': 'respondIncidents',
+  'type': 'mc',
+  'question': "An application's service principal is suspected of reading thousands of mailboxes through the Microsoft Graph API with a stolen "
+              'secret. Microsoft Entra sign-in logs show only the token requests. Which data source reveals the actual API calls?',
+  'options': ['Microsoft Graph activity logs, enabled through a diagnostic setting to Log Analytics',
+              'The Entra audit log for password resets',
+              'Defender for Endpoint device timeline of the admin laptop',
+              'Sentinel UEBA anomalies for the interactive sign-ins'],
+  'correct': 0,
+  'explanation': 'Graph activity logs record each HTTP request to the Graph service with the app, IP address, URI, and response code, which is what '
+                 'shows mass mailbox access, but they only exist if someone enabled the diagnostic setting beforehand. Password reset audit entries, '
+                 'a laptop timeline, or interactive sign-in anomalies do not capture API requests made with an application credential.'},
+ {'id': 'q9225',
+  'cat': 'respondIncidents',
+  'type': 'mc',
+  'question': 'An analyst must see, in order, every process creation, network connection, and alert on a single compromised server, with ATT&CK '
+              'techniques and the ability to flag key events. Which view fits?',
+  'options': ['The device timeline in Defender for Endpoint',
+              'Threat analytics report for the campaign',
+              'The Sentinel incident tasks pane',
+              'A Defender for Cloud secure score recommendation list'],
+  'correct': 0,
+  'explanation': 'The device timeline is the chronological per-device view of events and alerts with ATT&CK mapping, process trees, and event '
+                 'flagging. Threat analytics describes a campaign generally, incident tasks track analyst to-dos, and secure score lists posture '
+                 'recommendations.'},
+ {'id': 'q9226',
+  'cat': 'respondIncidents',
+  'type': 'tf',
+  'question': 'Microsoft Graph activity logs are collected in every tenant by default and can be queried in Log Analytics without any setup.',
+  'answer': False,
+  'explanation': 'An administrator must enable them with a diagnostic setting that routes them to a destination such as a Log Analytics workspace. '
+                 'This requires Entra ID P1 or P2, and Security Administrator is the least privileged supported role.'},
+ {'id': 'q9227',
+  'cat': 'respondIncidents',
+  'type': 'mc',
+  'question': 'From advanced hunting results of unusual sign-ins stored in the Sentinel data lake, an analyst wants clustering and risk scoring '
+              'without writing code or KQL. Which capability should be used?',
+  'options': ['A summary rule over the sign-in table',
+              'The Security Analyst Agent, started with Analyze with copilot',
+              'A watchlist of risky users',
+              'A Defender for Endpoint indicator'],
+  'correct': 1,
+  'explanation': 'The Security Analyst Agent performs analyses such as anomaly detection, clustering, risk scoring, and forecasting on Defender, '
+                 'Sentinel Log Analytics, or data lake data and can be started from advanced hunting results. A summary rule only aggregates, a '
+                 'watchlist is static reference data, and an endpoint indicator blocks or alerts on artifacts.'},
+ {'id': 'q9228',
+  'cat': 'respondIncidents',
+  'type': 'ms',
+  'question': 'Which two statements about Purview Audit retention are true? (Choose two.)',
+  'options': ['Audit (Standard) retains audit records for 180 days',
+              'Audit (Premium) keeps records up to one year, with a longer ten-year option available',
+              'Audit must be manually turned on in every tenant before it records anything',
+              'Audit (Standard) cannot be searched with the Search-UnifiedAuditLog cmdlet'],
+  'correct': [0, 1],
+  'explanation': 'Standard retains 180 days; Premium extends this to up to a year with a ten-year retention option. Auditing is enabled by default, '
+                 'and Standard supports the audit search tool, the Search Graph API, and the Search-UnifiedAuditLog cmdlet.'},
+ {'id': 'q9240',
+  'cat': 'threatHunting',
+  'type': 'mc',
+  'question': 'During a hunt, an analyst wants to visualize how a compromised user account connects to devices and critical assets, find choke '
+              'points along those paths, and act on the results, rather than writing many joins. Which tool fits?',
+  'options': ['A bookmark on a SigninLogs result set',
+              'The hunting graph in advanced hunting',
+              'A summary rule over IdentityLogonEvents',
+              'A scheduled analytics rule with entity mapping'],
+  'correct': 1,
+  'explanation': 'The hunting graph renders entity relationships interactively so analysts can trace paths and choke points. A bookmark preserves '
+                 'rows, a summary rule pre-aggregates data, and an analytics rule detects patterns on a schedule; none of them visualizes '
+                 'relationships.'},
+ {'id': 'q9241',
+  'cat': 'threatHunting',
+  'type': 'mc',
+  'question': 'During an active incident, the SOC lead asks which critical assets an attacker could reach from the compromised account, in addition '
+              'to what is already affected. Which capability answers this most directly?',
+  'options': ['Blast radius analysis in the incident graph',
+              'A UEBA anomaly report',
+              'The Action center history',
+              'A Defender for Cloud secure score recommendation'],
+  'correct': 0,
+  'explanation': 'Blast radius analysis shows the vulnerable paths from a compromised entity to critical assets, combining current impact and '
+                 'possible future impact. UEBA anomalies point at unusual behavior, the Action center lists taken actions, and secure score is a '
+                 'posture rating.'},
+ {'id': 'q9242',
+  'cat': 'threatHunting',
+  'type': 'mc',
+  'question': 'A hunter must find which users clicked a malicious link delivered by email, including clicks from Teams messages and Office apps, and '
+              'was told Safe Links is enabled. Which advanced hunting table should the query start from?',
+  'options': ['EmailEvents', 'DeviceNetworkEvents', 'UrlClickEvents', 'IdentityQueryEvents'],
+  'correct': 2,
+  'explanation': 'UrlClickEvents records Safe Links clicks from email, Teams, and Office 365 apps. EmailEvents records message delivery, '
+                 'DeviceNetworkEvents records connections made by devices, and IdentityQueryEvents records Active Directory object queries.'},
+ {'id': 'q9243',
+  'cat': 'threatHunting',
+  'type': 'mc',
+  'question': 'Existing advanced hunting queries and custom detections reference the AADSignInEventsBeta table. Which statement is correct?',
+  'options': ['The table is permanently kept, and no change is needed',
+              'The table is replaced by SigninLogs in advanced hunting',
+              'The table is deprecated on October 19, 2026 and queries are migrated automatically to EntraIdSignInEvents, which should be used for '
+              'new queries',
+              'The table is replaced by EntraIdSpnSignInEvents, which holds all user sign-ins'],
+  'correct': 2,
+  'explanation': 'AADSignInEventsBeta is deprecated on October 19, 2026 and replaced by EntraIdSignInEvents, with automatic migration of queries. '
+                 'SigninLogs is the Sentinel workspace table, not the advanced hunting one. EntraIdSpnSignInEvents holds service principal and '
+                 'managed identity sign-ins, not user sign-ins.'},
+ {'id': 'q9244',
+  'cat': 'threatHunting',
+  'type': 'mc',
+  'question': 'A hunter wants to run machine learning on two years of lake data to find low-and-slow lateral movement, visualizing the results with '
+              'Python libraries. Which approach fits?',
+  'options': ['A Jupyter notebook run through the Microsoft Sentinel extension for Visual Studio Code on Spark',
+              'A scheduled analytics rule with a 14-day lookback',
+              'A Sentinel workbook tile',
+              'A bookmark on the sign-in table'],
+  'correct': 0,
+  'explanation': 'Data lake notebooks use PySpark and Python libraries over large historical data, which suits machine learning and visualization. A '
+                 'scheduled analytics rule cannot look back two years. Workbooks display results of queries and do not run models. A bookmark only '
+                 'saves rows that were already found.'},
+ {'id': 'q9245',
+  'cat': 'threatHunting',
+  'type': 'mc',
+  'question': 'For a forensic task, an analyst must pull a large volume of records from a single table, older than the date the workspace was '
+              'onboarded to the data lake and now in the archive tier, into a queryable table. Which feature fits?',
+  'options': ['A KQL job over the lake tier', 'A search job', 'A summary rule every 20 minutes', 'An automation rule'],
+  'correct': 1,
+  'explanation': 'Search jobs reach archived data (including data older than the lake onboarding date) and hydrate large volumes from one table into '
+                 'a new table. KQL jobs query data from the onboarding date onward in the lake tier. Summary rules aggregate frequently, and '
+                 'automation rules act on incidents.'},
+ {'id': 'q9246',
+  'cat': 'threatHunting',
+  'type': 'mc',
+  'question': 'Which advanced hunting table records the HTTP requests that apps and users make to the Microsoft Graph API for resources in the '
+              'tenant?',
+  'options': ['CloudAppEvents', 'GraphAPIAuditEvents', 'AlertEvidence', 'DeviceEvents'],
+  'correct': 1,
+  'explanation': 'GraphAPIAuditEvents holds Microsoft Entra ID API requests made to the Graph API. CloudAppEvents covers activity in cloud apps, '
+                 'AlertEvidence lists entities tied to alerts, and DeviceEvents covers endpoint events.'},
+ {'id': 'q9247',
+  'cat': 'threatHunting',
+  'type': 'tf',
+  'question': 'Sentinel livestream is still the recommended way to get notified as new events match a hunting query during an investigation.',
+  'answer': False,
+  'explanation': 'Livestream is no longer available. To automate queries and notifications, use KQL jobs, analytics rules, or playbooks, which '
+                 'provide persistent results and support messaging platforms.'},
+ {'id': 'q9248',
+  'cat': 'threatHunting',
+  'type': 'tf',
+  'question': 'Custom graphs in Microsoft Sentinel (preview) are queried with KQL on the Graphs page of the Defender portal.',
+  'answer': False,
+  'explanation': 'Custom graphs are published and materialized by a graph job and queried with Graph Query Language (GQL), not KQL, on the Graphs '
+                 'page in the Defender portal.'},
+ {'id': 'q9249',
+  'cat': 'threatHunting',
+  'type': 'ms',
+  'question': 'Which two statements about the Sentinel data lake and hunting are true? (Choose two.)',
+  'options': ['KQL jobs can promote lake results into an analytics-tier table for further hunting',
+              'Data lake tier data supports real-time analytics rules and hunting exactly like the analytics tier',
+              'Jupyter notebooks over the lake run through the Microsoft Sentinel extension for Visual Studio Code using PySpark',
+              'Summary rules can only read from the data lake tier'],
+  'correct': [0, 2],
+  'explanation': 'KQL jobs can write to the analytics tier, and lake notebooks use the VS Code extension with PySpark. The lake tier is not '
+                 'available for real-time analytics features and hunting. Summary rules can read from Analytics, Auxiliary, Basic, and data lake '
+                 'tables.'}])
+
+if 'MADLIBS' not in globals():
+    MADLIBS = []
+MADLIBS.extend([{'id': 'ml-sc200-9001',
+  'cat': 'manageSecOps',
+  'scenario': 'To keep audit-grade identity logs for years cheaply, a team leaves 90 days in the {b1} tier for detections and extends total '
+              'retention in the {b2}, querying older data with KQL jobs. Frequent small aggregates for dashboards come from {b3}.',
+  'blanks': [{'key': 'b1', 'options': ['Analytics', 'Archive-only', 'Auxiliary', 'Search'], 'correct': 0},
+             {'key': 'b2', 'options': ['Sentinel data lake', 'Action center', 'watchlist', 'Logic App'], 'correct': 0},
+             {'key': 'b3', 'options': ['summary rules', 'bookmarks', 'automation rules', 'entity pages'], 'correct': 0}],
+  'explanation': 'Detections need the hot Analytics tier. The data lake supports up to 12 years of total retention at low cost and is queried with '
+                 'KQL jobs or notebooks. Summary rules pre-aggregate high-volume data into small tables for dashboards and fast queries.'},
+ {'id': 'ml-sc200-9002',
+  'cat': 'manageSecOps',
+  'scenario': 'A SOC hides a known-benign alert so that no incident is created while the evidence stays queryable in {b1} by creating an {b2} rule. '
+              'To make a Defender for Endpoint indicator for an IP address actually block connections, the {b3} advanced feature must be on.',
+  'blanks': [{'key': 'b1', 'options': ['AlertInfo and AlertEvidence', 'SecurityIncident only', 'AzureActivity', 'ThreatIntelObjects'], 'correct': 0},
+             {'key': 'b2', 'options': ['alert tuning', 'analytics rule suppression', 'data collection', 'retention'], 'correct': 0},
+             {'key': 'b3',
+              'options': ['custom network indicators', 'hide duplicate devices', 'EDR in block mode', 'resolve alerts automatically'],
+              'correct': 0}],
+  'explanation': 'The Hide alert action of an alert tuning rule leaves the alert data in AlertInfo and AlertEvidence. Network indicators for IPs, '
+                 'domains, and URLs are enforced only when custom network indicators is enabled.'}])
+
+if 'SEQUENCES' not in globals():
+    SEQUENCES = []
+SEQUENCES.extend([{'id': 'seq-sc200-9001',
+  'cat': 'manageSecOps',
+  'prompt': 'Put these steps in order to set up a custom data collection rule in Defender for Endpoint.',
+  'steps': ['Confirm Defender for Endpoint Plan 2 and a connected Sentinel workspace',
+            'Create a dynamic tag in asset rule management and let it run',
+            'Create the custom data collection rule, selecting the event table',
+            'Add rule conditions to filter the events and scope the rule to the dynamic tag',
+            'Monitor the rule and the per-device event limit, then expand beyond the pilot devices'],
+  'explanation': 'Prerequisites come first, dynamic tags must exist and have run before they can scope a rule, and the rule is then defined, '
+                 'filtered, and scoped. Monitoring and gradual expansion follow because each rule is capped per device per day.'},
+ {'id': 'seq-sc200-9002',
+  'cat': 'manageSecOps',
+  'prompt': 'Put these steps in order to move rarely used raw logs into low-cost retention and still hunt them later.',
+  'steps': ['Onboard the workspace to the Sentinel data lake',
+            "Set the table's total retention in the lake to the required period",
+            'Run a KQL job that filters the lake data and promotes only needed columns to the analytics tier',
+            'Hunt on the promoted table in advanced hunting',
+            'Delete or expire the promoted table when the investigation ends'],
+  'explanation': 'The lake must exist before retention or jobs work, retention keeps data cheaply, and a KQL job promotes just what is needed so it '
+                 'can be hunted in the analytics tier, where storage costs more, so it should be cleaned up afterward.'}])
+
+if 'CASE_STUDIES' not in globals():
+    CASE_STUDIES = []
+CASE_STUDIES.extend([{'id': 'cs-sc200-tailwind-lake',
+  'cat': 'manageSecOps',
+  'title': 'Tailwind Bank Modernizes Its SOC',
+  'scenario': 'Tailwind Bank runs Microsoft Defender XDR and Microsoft Sentinel in the Defender portal. Regulators require seven years of identity '
+              'and firewall log retention, but detections only need the latest 90 days. Firewall logs are huge and mostly queried during incidents. '
+              'A backup server runs an approved tool that triggers the same low-value endpoint alert every night, and analysts want it out of the '
+              'queue while staying searchable. User-reported phishing emails flood the queue. During a recent incident, a service principal read '
+              'many mailboxes through the Microsoft Graph API, and investigators found no record of the API calls because the relevant logging had '
+              'never been enabled. The SOC also has Microsoft 365 E5 licenses.',
+  'questions': [{'id': 'cs-sc200-tailwind-lake-q1',
+                 'type': 'mc',
+                 'question': 'Which retention design meets the regulatory and cost goals for identity and firewall logs?',
+                 'options': ['Keep seven years of analytics retention on all tables',
+                             'Keep 90 days in the Analytics tier and extend total retention in the Sentinel data lake to seven years, using KQL jobs '
+                             'for investigations on older data',
+                             'Move all tables to the Basic Logs plan and write detections against them',
+                             'Export logs yearly to a storage account and delete them from the workspace'],
+                 'correct': 1,
+                 'explanation': 'Analytics data is mirrored to the lake, whose total retention reaches 12 years at low cost, and KQL jobs query it '
+                                'when needed. Analytics retention is capped at two years and costs far more. Basic Logs data cannot back analytics '
+                                'rules. A manual yearly export is hard to query and operationally fragile.'},
+                {'id': 'cs-sc200-tailwind-lake-q2',
+                 'type': 'mc',
+                 'question': 'How should the SOC remove the nightly low-value endpoint alert from the queue while keeping the evidence available for '
+                             'hunting?',
+                 'options': ['Create a Defender XDR alert tuning rule with the Hide alert action for that evidence condition',
+                             'Lower the device group remediation level to None',
+                             'Add alert suppression to a Sentinel analytics rule',
+                             'Delete the alert from the Action center'],
+                 'correct': 0,
+                 'explanation': 'Alert tuning hides matching alerts without creating incidents and leaves the data in AlertInfo and AlertEvidence. '
+                                'Remediation level concerns automated actions, analytics rule suppression applies to a single Sentinel rule, and the '
+                                'Action center lists actions rather than alerts.'},
+                {'id': 'cs-sc200-tailwind-lake-q3',
+                 'type': 'mc',
+                 'question': 'Which capability best reduces the flood of user-reported phishing emails, and what does it use?',
+                 'options': ['A Sentinel workbook tile that counts reports',
+                             'The Phishing Triage Agent, which uses Security Copilot capacity and Defender for Office 365 Plan 2',
+                             'A hunting bookmark per report',
+                             'An ASR rule that blocks Office child processes'],
+                 'correct': 1,
+                 'explanation': 'The Phishing Triage Agent classifies user-reported phishing automatically with explanations and runs on SCUs, which '
+                                "the bank's eligible Microsoft 365 E5 licenses include. A workbook counts but does not triage, a bookmark is manual, "
+                                'and an ASR rule hardens endpoints.'},
+                {'id': 'cs-sc200-tailwind-lake-q4',
+                 'type': 'mc',
+                 'question': "What should have been in place so investigators could see the service principal's mailbox reads through the Graph API?",
+                 'options': ['A watchlist of service principals',
+                             'Microsoft Graph activity logs enabled through a diagnostic setting before the incident',
+                             'Windows Event Forwarding from every mail server',
+                             'Livestream on the sign-in table'],
+                 'correct': 1,
+                 'explanation': 'Graph activity logs record each API request with app, IP address, and URI, but only once an administrator routes '
+                                'them with a diagnostic setting. A watchlist is reference data, WEF collects Windows events, and livestream no '
+                                'longer exists.'}]}])
+
+if 'COMPARE' not in globals():
+    COMPARE = []
+COMPARE.extend([{'id': 'cmp-sc200-9001',
+  'cat': 'manageSecOps',
+  'scenario': 'A known internal scanner triggers the same Defender for Endpoint alert every night. The SOC wants the alert hidden in Defender XDR '
+              'without creating an incident, but still searchable for hunting.',
+  'optionA': 'A Defender XDR alert tuning rule with the Hide alert action.',
+  'optionB': 'A Defender for Endpoint device group with a lower remediation level.',
+  'better': 'A',
+  'why': 'A device group remediation level controls what automated investigations do to a threat, not whether the alert appears or creates an '
+         'incident. An alert tuning rule hides matching alerts so no incident forms and the evidence remains in AlertInfo and AlertEvidence for '
+         'hunting.'},
+ {'id': 'cmp-sc200-9002',
+  'cat': 'manageSecOps',
+  'scenario': 'A team needs to run a join across three years of firewall and sign-in logs for a one-off investigation, and then schedule a weekly '
+              'rerun, using data already held cheaply in the Sentinel data lake.',
+  'optionA': 'A KQL job on the data lake, scheduled weekly.',
+  'optionB': 'A summary rule every 20 minutes on the firewall table.',
+  'better': 'A',
+  'why': 'KQL jobs query up to 12 years of lake data with full KQL, including joins and unions, and can be one-time or scheduled. Summary rules are '
+         'designed for frequent aggregation of high-volume data into smaller tables and are not a way to run an ad hoc multi-table join across '
+         'years.'}])
+
+if 'CHEAT_SHEET' not in globals():
+    CHEAT_SHEET = []
+CHEAT_SHEET.extend([{'heading': 'Data tiers, retention, and Sentinel roles',
+  'points': ['Analytics tier: hot, 30 days by default, extendable up to two years; supports alerting, hunting, workbooks, playbooks. Data lake tier: '
+             'cold, up to 12 years total retention, queried by KQL jobs, notebooks, summary rules. XDR default tier: 30 days, up to 90 days with '
+             'ingestion cost only.',
+             'KQL jobs (lake, up to 12 years, joins and unions, one-time or scheduled, can promote to analytics as _KQL_CL); summary rules (frequent '
+             'aggregation, as often as every 20 minutes); search jobs (archive tier, hydrate one large table).',
+             'SIEM roles are Azure RBAC: Reader, Responder, Contributor, Playbook Operator, Automation Contributor. Data lake roles are Entra roles: '
+             'Global Reader, Security Reader, Security Operator, Security Administrator read; Security Operator, Security Administrator, Global '
+             'Administrator write.',
+             'Sentinel in the Azure portal is supported until March 31, 2027, after which it is available only in the Defender portal.']},
+ {'heading': 'Defender XDR configuration quick reference',
+  'points': ['Incident email notifications: Settings > Microsoft Defender XDR > Email notifications (severity, service and detection source, device '
+             'group). Endpoint alert notifications live under Settings > Endpoints > General > Email notifications.',
+             'Alert tuning (formerly alert suppression) actions: Hide alert, Resolve alert, Set as behavior; not applied to custom detection alerts; '
+             'built-in rules exist and a reactivated alert returns if an investigation finds malice.',
+             'Analytics rules are excluded from Defender correlation by default after onboarding; include all and exclude specific rules to change '
+             'it.',
+             'Advanced features to know: EDR in block mode, allow or block file, custom network indicators, tamper protection, automatically resolve '
+             'alerts, restrict correlation to scoped device groups.',
+             'Custom data collection (preview): Plan 2, Sentinel workspace, dynamic tags only, 75,000 events per device per rule per day.',
+             'Attack disruption: configured by Global Administrator or Security Administrator; Full remediation level on device groups recommended; '
+             'exclusions available.']},
+ {'heading': 'Investigation data sources',
+  'points': ['Device timeline: chronological events and alerts per device (ATT&CK techniques, process trees, flags). Live response, investigation '
+             'packages, isolation, and the Action center cover response actions.',
+             'Purview: Insider Risk Management and DLP alerts surface in Defender incidents; Audit (Standard) 180 days, Audit (Premium) up to 1 year '
+             '(10-year add-on); eDiscovery search is in the new experience since classic experiences retired on August 31, 2025.',
+             'Microsoft Graph activity logs: opt-in via diagnostic settings (Entra P1 or P2, Security Administrator), table '
+             'MicrosoftGraphActivityLogs; show API calls made with tokens.',
+             'Agentic investigation: Security Analyst Agent, Threat Hunting Assistant, Dynamic Threat Detection Agent, Phishing and Security Alert '
+             'Triage Agent, all using SCUs and agent identities.']},
+ {'heading': 'Hunting tools added in the latest update',
+  'points': ['Hunting graph (Investigation & response > Hunting > Advanced hunting) visualizes entity relationships and choke points; blast radius '
+             'in the incident graph shows paths from a compromised entity to critical assets; both rely on Sentinel graph and the data lake.',
+             'Custom Sentinel graphs (preview) are built in a VS Code notebook, materialized by a graph job, and queried with GQL.',
+             'EntraIdSignInEvents replaces AADSignInEventsBeta (deprecated October 19, 2026); EntraIdSpnSignInEvents covers service principals and '
+             'managed identities; GraphAPIAuditEvents covers Graph API requests; UrlClickEvents covers Safe Links clicks.',
+             'KQL jobs (lake, up to 12 years, joins), summary rules (frequent aggregation), search jobs (archive tier); notebooks run through the VS '
+             'Code extension on Spark; the Sentinel MCP server lets AI clients query lake data in natural language.']}])
+
+_MSR_LESSON_APPEND = {'sentinel-analytics-automation': {'reading': '\n'
+                                              '\n'
+                                              'Several platform topics were added to the exam in its most recent update. Retention now spans three '
+                                              'tiers: the Analytics tier (hot, 30 days by default, extendable to two years), the Sentinel data lake '
+                                              'tier (cold, low cost, up to 12 years of total retention, reached through KQL jobs, notebooks, and '
+                                              'summary rules), and the XDR default tier for Defender XDR tables (30 days, extendable to 90 days with '
+                                              'ingestion cost only). KQL jobs query lake and federated data on a schedule or once and can promote '
+                                              'results to the analytics tier; summary rules aggregate frequently into small tables; search jobs '
+                                              'reach archived data. Access follows two models: Azure RBAC roles for the SIEM (Reader, Responder, '
+                                              'Contributor, Playbook Operator, Automation Contributor) and Microsoft Entra roles for the lake '
+                                              '(Security Reader, Security Operator, Security Administrator and others). AI-authored playbooks can be '
+                                              'generated in the Defender portal, and Security Copilot agents deployed from the Security Store take '
+                                              'on triage, briefing, analysis, and detection work using SCUs and an agent identity.\n'
+                                              '\n'
+                                              'Ingestion also has new wrinkles. Windows events can come from each machine with the Windows Security '
+                                              'Events via AMA connector or from a Windows Event Collector server that receives forwarded events, '
+                                              'with the agent installed once on the collector. Azure activity and resource diagnostic logs are '
+                                              'collected by assigning Azure Policy that applies the diagnostic configuration to current and future '
+                                              'resources, which needs the Owner role on the scope. In Defender for Endpoint, advanced features such '
+                                              'as EDR in block mode, allow or block file, and custom network indicators gate whether indicators and '
+                                              'protections actually work, and custom data collection rules (preview) add targeted telemetry scoped '
+                                              'by dynamic tags and stored in Sentinel.',
+                                   'keyTerms': ['Sentinel data lake',
+                                                'KQL jobs',
+                                                'summary rule',
+                                                'Analytics tier',
+                                                'XDR default tier',
+                                                'Windows Event Forwarding',
+                                                'Azure Policy log collection',
+                                                'custom data collection rule',
+                                                'Security Copilot agents',
+                                                'Sentinel MCP server'],
+                                   'vocabIds': ['f9208', 'f9209', 'f9210', 'f9211', 'f9212', 'f9213', 'f9214', 'f9205', 'f9206', 'f9215', 'f9216'],
+                                   'quizIds': ['q9204', 'q9205', 'q9206', 'q9207', 'q9208', 'q9209', 'q9210', 'q9212', 'q9213', 'q9214', 'q9215'],
+                                   'commonTraps': ['Basic Logs and Auxiliary data cannot back analytics rules, and the data lake tier is not for '
+                                                   'real-time detection; keep alerting data in the Analytics tier.',
+                                                   'Azure RBAC roles (Reader, Responder, Contributor) govern the SIEM; Microsoft Entra roles govern '
+                                                   'the data lake. Responder does not give lake-wide write.',
+                                                   'Custom data collection rules need dynamic tags, not static tags, and each rule stops collecting '
+                                                   'after 75,000 events per device per day.']},
+ 'xdr-copilot-threat-intel': {'reading': '\n'
+                                         '\n'
+                                         'Defender XDR operations got more configurable. Incident email notification rules filter by severity, '
+                                         'source, and device group, and endpoint alert notifications are configured separately under Endpoints '
+                                         'settings. Alert tuning, previously alert suppression, lets you hide or resolve alerts, or convert them to '
+                                         'behaviors, when evidence conditions match; built-in tuning rules cut common noise, and neither custom '
+                                         'detection alerts nor custom TI alerts are affected. Analytics rules from Sentinel are excluded from '
+                                         'Defender correlation by default after onboarding, and an administrator can include them. Case management '
+                                         'adds incident cases (preview) with tasks, custom fields, and SLA policies on top of incidents.',
+                              'keyTerms': ['alert tuning',
+                                           'incident notification rules',
+                                           'analytics rule correlation',
+                                           'case management',
+                                           'incident cases'],
+                              'vocabIds': ['f9201', 'f9202', 'f9203', 'f9204', 'f9207', 'f9217'],
+                              'quizIds': ['q9201', 'q9202', 'q9203', 'q9211'],
+                              'commonTraps': ["Sentinel analytics rule suppression pauses one rule's query; Defender XDR alert tuning matches alert "
+                                              'evidence and hides, resolves, or converts the alert.']},
+ 'endpoint-identity-response': {'reading': '\n'
+                                           '\n'
+                                           'More investigation sources are now expected. The device timeline gives a chronological view of events '
+                                           'and alerts on a device with ATT&CK mapping, process trees, and flagging. Containment from automatic '
+                                           'attack disruption shows up in the incident and the Action center, where a false positive can be undone. '
+                                           'Beyond Defender products, analysts investigate Microsoft 365 activity with Purview Audit (180-day '
+                                           'Standard retention, up to a year in Premium), the new eDiscovery search experience (classic Content '
+                                           'Search was retired on August 31, 2025), and Microsoft Graph activity logs, which must be enabled with a '
+                                           'diagnostic setting and record every API request. Purview Insider Risk Management and DLP alerts are '
+                                           'correlated with other alerts in the Defender portal, and agentic tools such as the Security Analyst '
+                                           'Agent and Threat Hunting Assistant accelerate analysis while the analyst validates the output.',
+                                'keyTerms': ['device timeline',
+                                             'Purview Audit',
+                                             'eDiscovery content search',
+                                             'Microsoft Graph activity logs',
+                                             'Insider Risk Management alerts',
+                                             'Security Analyst Agent'],
+                                'vocabIds': ['f9220', 'f9221', 'f9222', 'f9223', 'f9224', 'f9225', 'f9226'],
+                                'quizIds': ['q9220', 'q9221', 'q9222', 'q9223', 'q9224', 'q9225', 'q9226', 'q9227', 'q9228'],
+                                'commonTraps': ['Graph activity logs are off until enabled; enabling them after an incident does not recover earlier '
+                                                'requests.',
+                                                'Audit (Standard) keeps 180 days; an event from eight months ago needs Audit (Premium) retention '
+                                                'that was in place at the time.']},
+ 'kql-threat-hunting': {'reading': '\n'
+                                   '\n'
+                                   'The hunting toolset grew with the Sentinel data lake. KQL jobs run one-time or scheduled queries over lake and '
+                                   'federated data and can promote results to the analytics tier; summary rules create small aggregate tables for '
+                                   'frequent queries; search jobs reach archived data. Notebooks over the lake run in Visual Studio Code with the '
+                                   'Microsoft Sentinel extension on Spark, and the Sentinel MCP server lets AI clients query lake data in natural '
+                                   'language. For relationship-driven hunting, the hunting graph in advanced hunting and blast radius in the '
+                                   'incident graph visualize paths between entities, powered by Sentinel graph, and custom graphs queried with GQL '
+                                   'are in preview. Pay attention to table names: EntraIdSignInEvents replaces AADSignInEventsBeta (deprecated '
+                                   'October 19, 2026), UrlClickEvents records Safe Links clicks, and GraphAPIAuditEvents records Graph API requests.',
+                        'keyTerms': ['hunting graph',
+                                     'blast radius',
+                                     'Sentinel graph',
+                                     'EntraIdSignInEvents',
+                                     'UrlClickEvents',
+                                     'KQL jobs',
+                                     'search jobs',
+                                     'Sentinel MCP server'],
+                        'vocabIds': ['f9240', 'f9241', 'f9242', 'f9243', 'f9244', 'f9245', 'f9246'],
+                        'quizIds': ['q9240', 'q9241', 'q9242', 'q9243', 'q9244', 'q9245', 'q9246', 'q9247', 'q9248', 'q9249'],
+                        'commonTraps': ['Table names are tested: EntraIdSignInEvents (advanced hunting) vs. SigninLogs (Sentinel workspace); the old '
+                                        'AADSignInEventsBeta is deprecated.']}}
+for _lid, _d in _MSR_LESSON_APPEND.items():
+    _l = _msr_find('LESSONS', _lid)
+    for _f, _v in _d.items():
+        if isinstance(_v, str):
+            _l[_f] = _l.get(_f, '') + _v
+        else:
+            _l.setdefault(_f, []).extend(x for x in _v if x not in _l.get(_f, []))
+
+_MSR_CAT_UPDATE = {'manageSecOps': {'marks': 42}, 'respondIncidents': {'marks': 36}, 'threatHunting': {'marks': 22}}
+for _c in CATEGORIES:
+    _u = _MSR_CAT_UPDATE.get(_c['key'], {})
+    for _f, _v in _u.items():
+        if _f == 'resources_add':
+            _c['resources'].extend(r for r in _v if r not in _c['resources'])
+        else:
+            _c[_f] = _v
+
+_msr_find('FLASHCARDS', 'f34')['front'] = 'Livestream in Sentinel (retired)'
+_msr_find('FLASHCARDS', 'f34')['back'] = 'Livestream was a Sentinel hunting feature that ran a KQL query interactively and surfaced new matches in near real time during a session. It is no longer available: Microsoft recommends KQL jobs, analytics rules, or playbooks for persistent query results and notifications.'
+_msr_find('FLASHCARDS', 'f34')['detail'] = 'Older material describes livestream as a temporary, session-based watch that was not a saved, recurring detection. The replacement for ongoing alerting is an analytics rule (scheduled or NRT); the replacement for scheduled long-running queries over lake data is a KQL job.'
+_msr_find('FLASHCARDS', 'f63')['detail'] = 'This goes further than a saved hunting query, which is still fundamentally a single-KQL-query tool with no general-purpose programming language layered on top.'
+_msr_fix('FLASHCARDS', 'f63', 'back', 'or scoring anomalies with a custom model.', 'or scoring anomalies with a custom model. Notebooks over the Sentinel data lake instead run through the Microsoft Sentinel extension for Visual Studio Code using PySpark on Spark compute.')
+_msr_fix('FLASHCARDS', 'f14', 'back', '(which replaced the legacy ThreatIntelligenceIndicator table, retired in 2026)', '(which replaced the legacy ThreatIntelligenceIndicator table, which stopped receiving data after July 31, 2025)')
+_msr_fix('FLASHCARDS', 'f8', 'detail', 'the same as any other analyst-authored finding.', 'the same as any other analyst-authored finding. Security Copilot also runs agents (triage, threat intelligence briefing, analysis, dynamic detection) that use SCUs, and is included for eligible Microsoft 365 E5 and E7 customers.')
+_msr_fix('QUESTIONS', 'q14', 'options', 'A hunting query bookmark for the dashboard, plus a livestream session for the threshold alert', 'A hunting query bookmark for the dashboard, plus a saved hunting query run each morning for the threshold alert')
+_msr_fix('QUESTIONS', 'q14', 'explanation', 'and livestream is a temporary interactive session, not a persistent alert.', 'and a saved hunting query is run by hand and raises no alert on its own.')
+_msr_fix('QUESTIONS', 'q28', 'options', 'Start a livestream session from the query and leave it open', 'Pin the query to a workbook tile so the team can see the matches')
+_msr_fix('QUESTIONS', 'q28', 'explanation', 'livestream is a temporary interactive session', 'a workbook tile only displays results without creating incidents')
+_msr_find('QUESTIONS', 'q29')['question'] = 'A SOC analyst used a hunting query to find a suspicious pattern and now wants it to notify the team persistently whenever new matching events arrive, replacing the retired Sentinel livestream feature. Which approach is recommended?'
+_msr_find('QUESTIONS', 'q29')['options'] = ["A bookmark on the query's current results", 'A scheduled or near-real-time analytics rule, with a playbook for notification', 'A watchlist containing the matching events', 'A workbook tile that is opened daily']
+_msr_find('QUESTIONS', 'q29')['correct'] = 1
+_msr_find('QUESTIONS', 'q29')['explanation'] = 'Livestream is no longer available; analytics rules (and playbooks or KQL jobs) provide persistent detection and notification. A bookmark captures results that already exist, a watchlist is reference data rather than a notifier, and a workbook tile must be opened by someone to be seen.'
+_msr_find('QUESTIONS', 'msq8')['question'] = 'Which two statements about hunting features in Sentinel are true? (Choose two.)'
+_msr_find('QUESTIONS', 'msq8')['options'] = ['A bookmark preserves selected result rows so they can be added to an incident as evidence', 'Livestream remains the primary way to get persistent notifications from a query', 'A bookmark re-runs its query every five minutes and updates itself', 'Livestream has been retired, so analytics rules, KQL jobs, or playbooks should be used for persistent notification']
+_msr_find('QUESTIONS', 'msq8')['correct'] = [0, 3]
+_msr_find('QUESTIONS', 'msq8')['explanation'] = 'Bookmarks capture evidence from a hunt and can be attached to incidents, and livestream is no longer available, with analytics rules, KQL jobs, and playbooks as the persistent alternatives. A bookmark is a stored snapshot rather than a recurring query, so it does not re-run.'
+_msr_find('MADLIBS', 'ml-sc200-1')['blanks'] = [{'key': 'b1', 'options': ['near-real-time (NRT)', 'Fusion', 'Microsoft Security', 'hunting'], 'correct': 0}, {'key': 'b2', 'options': ['automation rule', 'workbook', 'watchlist', 'Data Collection Rule'], 'correct': 0}, {'key': 'b3', 'options': ['playbook', 'bookmark', 'summary rule', 'entity mapping setting'], 'correct': 0}]
+_msr_find('MADLIBS', 'ml-sc200-3')['blanks'] = [{'key': 'b1', 'options': ['let statement saved as a function', 'automation rule', 'Data Collection Rule', 'workbook'], 'correct': 0}, {'key': 'b2', 'options': ['leftanti', 'leftouter', 'inner', 'leftsemi'], 'correct': 0}, {'key': 'b3', 'options': ['promotes', 'bookmarks', 'exports', 'suppresses'], 'correct': 0}]
+_msr_fix('MADLIBS', 'ml-sc200-3', 'explanation', 'bookmarking only preserves one result set, and livestream is a temporary session-based watch rather than a permanent schedule.', 'bookmarking only preserves one result set, and exporting the rows creates no recurring detection.')
+_msr_fix('MADLIBS', 'ml-sc200-1', 'explanation', 'a bookmark and livestream are hunting tools, and entity mapping only drives correlation, not remediation.', 'a bookmark and a summary rule are not remediation tools, and entity mapping only drives correlation, not remediation.')
+_msr_fix('LESSONS', 'kql-threat-hunting', 'reading', "while livestream runs a query interactively and surfaces new matches in near real time during an active session, a temporary, session-based watch rather than anything saved or recurring (Microsoft has announced livestream's retirement from mid-March 2026, so treat it as a legacy feature).", 'while livestream, which once ran a query interactively during a session, has been retired -- use KQL jobs, analytics rules, or playbooks for persistent query results and notifications.')
+_msr_fix('LESSONS', 'kql-threat-hunting', 'commonTraps', 'Livestream is a temporary, session-based watch, not a saved or recurring detection the way a scheduled analytics rule is.', 'Livestream has been retired; persistent notification from a hunting idea comes from an analytics rule, a KQL job, or a playbook, not an interactive session.')
+_msr_fix('LESSONS', 'kql-threat-hunting', 'scenario', 'and along the way use livestream once to watch a related pattern unfold in real time during an active investigation, bookmarking the clearest evidence directly into the case', 'and along the way bookmark the clearest evidence directly into the case')
+_msr_fix('CHEAT_SHEET', 'Threat hunting workflow', 'points', 'Livestream lets you test a new detection idea against real-time data before promoting it to a full analytics rule (Microsoft has announced its retirement from mid-March 2026).', 'Livestream has been retired; for persistent notification on a hunting idea use KQL jobs, analytics rules, or playbooks.')
+# <<< MSREFRESH-END

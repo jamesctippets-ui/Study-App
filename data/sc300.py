@@ -2661,3 +2661,1297 @@ COMPARE = [
         'why': 'A time-bound active assignment is better than a permanent one because it eventually ends, but for 90 days the role is usable at any moment, which is standing access. An eligible assignment grants nothing until an engineer activates it with a justification, and each activation expires after four hours.',
     },
 ]
+
+# >>> MSREFRESH-BEGIN (generated block; do not hand-edit, regenerate from patch files)
+
+
+def _msr_find(coll, key):
+    for it in globals()[coll]:
+        if it.get('id') == key or it.get('heading') == key:
+            return it
+    raise KeyError((coll, key))
+
+
+def _msr_fix(coll, key, field, old, new):
+    it = _msr_find(coll, key)
+    if isinstance(it[field], list):
+        assert old in it[field], (coll, key, field, old)
+        it[field] = [new if x == old else x for x in it[field]]
+    else:
+        assert old in it[field], (coll, key, field, old)
+        it[field] = it[field].replace(old, new)
+
+if 'FLASHCARDS' not in globals():
+    FLASHCARDS = []
+FLASHCARDS.extend([{'id': 'f9001',
+  'cat': 'authAccessMgmt',
+  'front': 'Global Secure Access (Microsoft Security Service Edge)',
+  'back': "Global Secure Access is the umbrella name for Microsoft Entra Internet Access and Microsoft Entra Private Access, Microsoft's "
+          'identity-centric Security Service Edge (SSE) solution. It brings network access controls into the Microsoft Entra admin center so that '
+          'network traffic, like a sign-in, can be evaluated with identity, device, location, and risk signals through Conditional Access.',
+  'detail': 'Internet Access secures internet and SaaS traffic as an identity-aware secure web gateway, while Private Access gives users zero-trust '
+            'access to private apps without a VPN. A third, Microsoft-services path (the Microsoft traffic profile) is available with Entra ID P1 or '
+            'P2.'},
+ {'id': 'f9002',
+  'cat': 'authAccessMgmt',
+  'front': 'Traffic forwarding profiles (Microsoft, Private access, Internet access)',
+  'back': 'Traffic forwarding profiles decide which network traffic is tunneled into Global Secure Access. Three exist: the Microsoft traffic '
+          'profile (Microsoft 365 services), the Private access profile (private apps and Quick Access), and the Internet access profile (everything '
+          'else on the internet). Traffic is matched against them in that order, and traffic that matches none is not forwarded.',
+  'detail': 'Each profile can be assigned to chosen users, groups, devices, and device platforms. When several enabled profiles of the same traffic '
+            'type apply to a user, only the one with the highest priority is used by the client.'},
+ {'id': 'f9003',
+  'cat': 'authAccessMgmt',
+  'front': 'Global Secure Access client vs. remote network',
+  'back': 'Traffic reaches Global Secure Access either from the Global Secure Access client installed on a device (Windows, macOS, iOS, Android) or, '
+          'for Microsoft and internet traffic, from a configured remote network such as a branch office. Private Access traffic is acquired only by '
+          'the client. The Windows client acquires traffic with a lightweight filter (LWF) driver instead of acting as a VPN tunnel.',
+  'detail': 'Because it is not a VPN connection, the client can run side by side with a non-Microsoft SSE or VPN client. Remote networks need no '
+            'software on each device, which suits devices that cannot run the client.'},
+ {'id': 'f9004',
+  'cat': 'authAccessMgmt',
+  'front': 'Microsoft traffic profile (forward vs. bypass)',
+  'back': 'The Microsoft traffic profile sends traffic for Microsoft 365 services (Exchange Online, SharePoint Online and OneDrive, Teams, and '
+          'Microsoft 365 common and Office Online endpoints) through Global Secure Access. Each policy group and each rule can be set to Forward or '
+          "Bypass. A bypassed destination is not acquired by the Internet access profile either; it egresses directly over the device's normal "
+          'network path.',
+  'detail': 'The profile requires Microsoft Entra ID P1 or P2. It underpins the compliant network check, source IP restoration, and universal tenant '
+            'restrictions, which is why those features stop working if the profile is disabled.'},
+ {'id': 'f9005',
+  'cat': 'authAccessMgmt',
+  'front': 'Entra Private Access: Quick Access vs. per-app access',
+  'back': 'Quick Access is the single primary Global Secure Access enterprise application holding the FQDNs, IP addresses, and ranges you always '
+          'want tunneled, which is the fast way to replace a VPN. Per-app access creates separate Global Secure Access apps (with their own TCP/UDP '
+          'app segments) so a subset of private resources gets its own assignments and Conditional Access policies.',
+  'detail': 'Quick Access is positioned as a transition state; once the VPN is gone, move to per-app access for application segmentation and per-app '
+            'granular controls. Both are enterprise applications, so users and groups are assigned and Conditional Access is applied to them.'},
+ {'id': 'f9006',
+  'cat': 'authAccessMgmt',
+  'front': 'Private network connector and connector groups',
+  'back': 'A private network connector is a lightweight agent installed on Windows Server inside the network that brokers traffic between Entra '
+          'Private Access (or application proxy) and the private resource. It makes outbound-only connections (ports 80 and 443), so no inbound '
+          'firewall ports are needed. Connectors are placed in connector groups, which act as a unit for load balancing and high availability; use '
+          'at least two per group.',
+  'detail': 'Each Quick Access or per-app app is mapped to a connector group, so location-based groups can keep traffic close to the resources and '
+            'reduce latency for apps in different regions.'},
+ {'id': 'f9007',
+  'cat': 'authAccessMgmt',
+  'front': 'Entra Private DNS',
+  'back': 'Entra Private DNS lets Private Access resolve internal names for remote users. You add DNS suffixes to the Quick Access configuration; '
+          'the client then sends queries for names ending in those suffixes to a DNS proxy at the Global Secure Access edge, which forwards them to '
+          "the connector's local resolver. On Windows, the client creates an NRPT entry for each suffix.",
+  'detail': 'Without a matching suffix, an internal short name such as an intranet hostname fails to resolve for a remote user even though the '
+            'IP-based segment is configured.'},
+ {'id': 'f9008',
+  'cat': 'authAccessMgmt',
+  'front': 'Entra Internet Access web content filtering',
+  'back': 'Web content filtering in Entra Internet Access, the identity-aware secure web gateway, blocks or allows internet destinations by web '
+          'category, URL, or FQDN. Create a web content filtering policy, add it to a security profile, link that security profile to a Conditional '
+          'Access policy for the target users, and make sure those users receive the Internet access traffic forwarding profile.',
+  'detail': 'Secure DNS (DNS over HTTPS) in the browser or OS must be disabled so the client can see the FQDNs it needs to match against the '
+            'forwarding rules.'},
+ {'id': 'f9009',
+  'cat': 'authAccessMgmt',
+  'front': 'Compliant network check (Conditional Access)',
+  'back': "The compliant network check lets a Conditional Access policy require that a request arrives through your organization's Global Secure "
+          'Access tenant, via the client or a remote network, without maintaining lists of egress IP addresses. You first enable Global Secure '
+          'Access signaling for Conditional Access, which creates the "All Compliant Network locations" named location, then reference it in a '
+          'policy.',
+  'detail': 'Enforcement happens at authentication, so a stolen token replayed from outside the compliant network is denied. The check is specific '
+            'to the tenant that configures it. Turning the signaling off while policies depend on it can lock users out.'},
+ {'id': 'f9010',
+  'cat': 'authAccessMgmt',
+  'front': 'Source IP restoration',
+  'back': "Source IP restoration passes the user's original egress IP address to Microsoft Entra ID and Microsoft Graph instead of the Global Secure "
+          'Access proxy address. That keeps IP-based Conditional Access locations working, improves the accuracy of ID Protection risk detections, '
+          'and records the real source IP in sign-in and audit logs. It requires the Microsoft traffic profile to be enabled.',
+  'detail': 'It belongs to the Adaptive Access capability of Entra Internet Access for Microsoft services and can be configured by a Global Secure '
+            'Access Administrator or Global Administrator.'},
+ {'id': 'f9011',
+  'cat': 'authAccessMgmt',
+  'front': 'Universal tenant restrictions',
+  'back': 'Universal tenant restrictions extend a tenant restrictions v2 (TRv2) policy to every device that uses the Global Secure Access client or '
+          'a remote network, without routing traffic through a company-managed proxy. Users on those devices can then sign in only to the external '
+          'tenants and applications your TRv2 policy allows, reducing exfiltration to unauthorized or personal tenants.',
+  'detail': 'It is available with the Microsoft traffic profile (Entra ID P1 or P2). Cross-tenant access settings control collaboration with '
+            'specific tenants; tenant restrictions control which foreign tenants your users may sign in to.'},
+ {'id': 'f9012',
+  'cat': 'authAccessMgmt',
+  'front': 'Global Secure Access licensing and roles',
+  'back': 'Users need Microsoft Entra ID P1 or P2 for any Global Secure Access feature. The Microsoft traffic profile (compliant network, source IP '
+          'restoration, universal tenant restrictions) is covered by P1 or P2, while Entra Internet Access and Entra Private Access are separate '
+          'licenses also included in the Microsoft Entra Suite. The Global Secure Access Administrator role manages the features; policy work also '
+          'needs Conditional Access Administrator.',
+  'detail': 'Remote network connectivity requires a combined minimum of 50 licenses across Entra ID P1 and Entra Internet Access.'},
+ {'id': 'f9020',
+  'cat': 'workloadIdentities',
+  'front': 'Cloud discovery (Defender for Cloud Apps)',
+  'back': 'Cloud discovery analyzes your network traffic logs against the Defender for Cloud Apps cloud app catalog (more than 31,000 apps, each '
+          'scored on more than 90 risk factors) to show which cloud apps and Shadow IT are in use and how risky they are. In the Microsoft Defender '
+          'portal it lives under Cloud apps > Cloud discovery, and it only recognizes apps that exist in the catalog unless you create a custom app.',
+  'detail': 'Discovery data is analyzed and refreshed several times a day, and the results can feed policies that alert on anomalous use.'},
+ {'id': 'f9021',
+  'cat': 'workloadIdentities',
+  'front': 'Snapshot vs. continuous cloud discovery reports',
+  'back': 'Snapshot reports give ad hoc visibility into traffic logs you manually upload from firewalls and proxies. Continuous reports analyze all '
+          'logs forwarded automatically from your network and can flag anomalous use with machine learning anomaly detection or your own policies. '
+          'Continuous reports are fed by Defender for Endpoint integration, log collectors, secure web gateway integrations, or the cloud discovery '
+          'API.',
+  'detail': 'Defender for Endpoint integration is the simplest way to extend discovery beyond the corporate network because every onboarded device '
+            'reports its cloud app use wherever it is.'},
+ {'id': 'f9022',
+  'cat': 'workloadIdentities',
+  'front': 'Cloud app catalog and risk score',
+  'back': "The cloud app catalog is Microsoft's list of discoverable cloud apps, each scored from the weighted subscores of its properties (each "
+          'property scored 0 to 10) across risk categories. By default all risk parameters have equal weight, so an organization that cares more '
+          'about, for example, compliance than hosting can customize the weights to rank apps by its own priorities.',
+  'detail': 'An unscored app usually means its properties are unknown. You can request a risk score update or create a custom app for software '
+            'missing from the catalog.'},
+ {'id': 'f9023',
+  'cat': 'workloadIdentities',
+  'front': 'Sanctioned vs. unsanctioned apps',
+  'back': 'Tagging a discovered app Sanctioned marks it approved; Unsanctioned marks it prohibited. Tagging alone does not block anything. With '
+          'Defender for Endpoint, unsanctioned apps are blocked automatically on onboarded devices (cloud protection and network protection must be '
+          'on), and other integrations or a generated block script can enforce it elsewhere.',
+  'detail': 'Apps connected through an app connector or onboarded to the inline proxy are treated as sanctioned in cloud discovery.'},
+ {'id': 'f9024',
+  'cat': 'workloadIdentities',
+  'front': 'App connectors (connected apps)',
+  'back': "App connectors use a SaaS provider's own APIs to give Defender for Cloud Apps visibility into activities, files, and accounts of "
+          'connected apps such as Microsoft 365, Box, Salesforce, and Google Workspace, plus governance actions like removing sharing. They work out '
+          'of band, after the fact, rather than controlling a live session, and multiple instances of the same app can be connected.',
+  'detail': 'Real-time control of a session needs Conditional Access app control (reverse proxy) instead; many organizations use both for the same '
+            'app.'},
+ {'id': 'f9025',
+  'cat': 'workloadIdentities',
+  'front': 'Access policy vs. session policy (Conditional Access app control)',
+  'back': 'Both policy types require a Microsoft Entra Conditional Access policy that routes the session to Defender for Cloud Apps. An access '
+          'policy allows or blocks access outright, for example blocking Salesforce from unmanaged devices. A session policy allows access but '
+          'monitors and limits what happens in the session, such as blocking download of sensitive files, requiring labeling on download, or '
+          'blocking upload of malware.',
+  'detail': 'Policies are scoped to the app you onboard, not to related resource apps: a policy for Teams or Exchange does not cover SharePoint or '
+            'OneDrive, so create a separate policy for them.'},
+ {'id': 'f9026',
+  'cat': 'workloadIdentities',
+  'front': 'Conditional Access app control mechanics (reverse proxy)',
+  'back': 'Conditional Access app control routes browser sessions through Defender for Cloud Apps acting as a reverse proxy, with nothing installed '
+          'on the device, so it suits unmanaged and partner devices. In Microsoft Edge the protection runs in the browser; other browsers show an '
+          'app URL with an .mcas.ms suffix. Microsoft Entra apps are onboarded automatically while non-Microsoft IdP apps must be onboarded '
+          'manually.',
+  'detail': 'To stop users bypassing it, create an access policy that blocks native clients and allows only browser-based sessions.'},
+ {'id': 'f9027',
+  'cat': 'workloadIdentities',
+  'front': 'Application-enforced restrictions',
+  'back': 'Application-enforced restrictions is a Conditional Access session control that makes Microsoft Entra ID pass device information '
+          '(compliant, domain-joined or not) to a cloud app, which then provides a full or limited experience. It works with Exchange Online and '
+          'SharePoint Online (limited, browser-only access), which must also have their own restriction settings configured, and needs no reverse '
+          'proxy.',
+  'detail': 'It is the lightweight native option; use Defender for Cloud Apps session policies when you need granular real-time controls such as '
+            'labeling or malware scanning.'},
+ {'id': 'f9028',
+  'cat': 'workloadIdentities',
+  'front': 'OAuth app policies (app permission policies)',
+  'back': 'OAuth app policies in Defender for Cloud Apps alert you when an OAuth app meets criteria you define, such as a high permission level '
+          'authorized by more than a set number of users, and let you investigate the permissions an app requested and mark them approved or banned. '
+          'Banning a permission disables the enterprise application associated with that OAuth app. They cover Microsoft 365, Google Workspace, and '
+          'Salesforce apps.',
+  'detail': 'This is detective and corrective, unlike Entra user-consent settings, which prevent consent up front. With app governance enabled, '
+            'policies can be created from the App governance page.'},
+ {'id': 'f9030',
+  'cat': 'workloadIdentities',
+  'front': 'Agent identity (Microsoft Entra Agent ID)',
+  'back': 'An agent identity is a special service principal that represents an AI agent. It has no credentials of its own: its agent identity '
+          'blueprint holds the credentials and acquires tokens on its behalf. It can carry a sponsor, and it can only be issued tokens in the tenant '
+          'where it was created, so it cannot reach resources in other tenants.',
+  'detail': 'Agent identities are not the same as user accounts or traditional service principals, which lack enforced sponsorship, agent-aware '
+            'audit entries, and a blueprint-managed lifecycle.'},
+ {'id': 'f9031',
+  'cat': 'workloadIdentities',
+  'front': 'Agent identity blueprint',
+  'back': 'An agent identity blueprint is the template and authentication foundation for one or more agent identities. It holds the credentials '
+          '(federated identity credentials or client secrets), shared properties such as app roles and permissions, and policies like Conditional '
+          'Access that apply to every agent identity created from it. Disabling the blueprint stops all of its agent identities from authenticating.',
+  'detail': 'A blueprint can do exactly one thing in the tenant: provision or deprovision agent identities, using a special Microsoft Graph '
+            'permission (AgentIdentity.CreateAsManager). Adding a blueprint to a tenant creates an agent identity blueprint principal.'},
+ {'id': 'f9032',
+  'cat': 'workloadIdentities',
+  'front': 'Agent owners, sponsors, and managers',
+  'back': 'Owners are the technical administrators who configure and operate an agent. Sponsors are the human users or groups accountable for the '
+          'agent in a business sense, able to make lifecycle decisions without technical admin rights. Managers are human users designated as the '
+          "hiring manager or operational owner of an agent's user account.",
+  'detail': 'The split keeps technical control and business accountability separate without handing out excess permissions, and the sponsor is who '
+            'gets contacted if there is a security incident.'},
+ {'id': 'f9033',
+  'cat': 'workloadIdentities',
+  'front': "Agent's user account",
+  'back': "An agent's user account is an optional identity that lets an agent act as a user, like a digital worker with a mailbox, chat access, or "
+          'inclusion in HR systems, or that needs APIs and resources reserved for user identities. It should be created only when an agent must act '
+          'as a user, and it lets admins manage the agent with capabilities similar to human users.',
+  'detail': 'Most agents should authenticate as an agent identity instead; assigning ordinary user accounts to agents breaks Conditional Access, ID '
+            'Protection, and governance assumptions built for humans.'},
+ {'id': 'f9034',
+  'cat': 'workloadIdentities',
+  'front': 'Group managed service account (gMSA)',
+  'back': 'A gMSA is an Active Directory domain account for on-premises services, possibly across a server farm, whose 240-byte random password is '
+          'managed and rotated by Windows (every 30 days) so nobody handles the credential. It is the recommended account type for on-premises '
+          'services unless the service, such as failover clustering, does not support it, and it simplifies SPN management.',
+  'detail': 'A gMSA is an on-premises identity. For Azure resources use a managed identity instead; for apps outside Azure use a service principal, '
+            'ideally with workload identity federation.'},
+ {'id': 'f9035',
+  'cat': 'workloadIdentities',
+  'front': 'Application collections in My Apps',
+  'back': 'Collections group related applications on the My Apps portal, for example by job role, task, or project, so users see them organized '
+          'rather than as one long list. An admin creates them in Enterprise apps > App launchers by naming the collection, adding applications, '
+          'owners, and users or groups. They require a Microsoft Entra ID P1 or P2 license and at least the Cloud Application Administrator role.',
+  'detail': 'Admin collections are managed in the Microsoft Entra admin center, not from the My Apps portal itself.'},
+ {'id': 'f9040',
+  'cat': 'userIdentities',
+  'front': 'Custom domains in Microsoft Entra ID',
+  'back': 'Every tenant starts with an initial onmicrosoft.com domain that cannot be changed or deleted. You add your own DNS name as a custom '
+          'domain, prove ownership by creating the TXT or MX record Entra gives you at your registrar, then select Verify, and can make it the '
+          'primary domain used for new user names. A domain name can be verified in only one tenant at a time.',
+  'detail': 'If verification fails, wait for DNS propagation, check the record, and make sure the name is not already verified elsewhere, including '
+            'an unmanaged tenant created by self-service sign-up, which must be taken over.'},
+ {'id': 'f9041',
+  'cat': 'userIdentities',
+  'front': 'Device settings in Microsoft Entra ID',
+  'back': 'Device settings control who may join or register devices and how. "Users may join devices" (default All) and "Users may register their '
+          'devices", a maximum number of devices per user (default 50, up to 100), who becomes local administrator on joined devices, and an '
+          'optional MFA requirement for join or register. Microsoft recommends using the Register or join devices user action in Conditional Access '
+          'for MFA instead of the toggle.',
+  'detail': 'The join and maximum-devices limits do not apply to hybrid joined devices, and the join setting also skips userless joins such as '
+            'Autopilot self-deploying mode.'},
+ {'id': 'f9042',
+  'cat': 'userIdentities',
+  'front': 'Evaluating effective permissions for Entra roles',
+  'back': "A user's effective directory permissions are the union of every role assignment they hold, each limited by its own scope (tenant, "
+          'administrative unit, or an individual application registration). There is no deny assignment: roles only add permissions, so a '
+          'tenant-wide assignment overrides the narrowing intent of an administrative-unit assignment of the same role.',
+  'detail': "To find what a user can really do, list all of the user's assignments (including those through role-assignable groups and PIM eligible "
+            'ones once activated) and compare scope for each, instead of looking at a single role.'},
+ {'id': 'f9043',
+  'cat': 'userIdentities',
+  'front': 'Microsoft Graph PowerShell for Entra administration',
+  'back': 'Microsoft Graph PowerShell is the module to use for automating Microsoft Entra ID tasks. The Azure AD, Azure AD Preview, and MSOnline '
+          'modules are deprecated. Cmdlets use the Mg prefix (Get-AzureADUser becomes Get-MgUser) and you connect with the permission scopes you '
+          'need, which are delegated consent grants rather than directory roles alone.',
+  'detail': 'For bulk work you can also use the admin center CSV templates for bulk create, delete, invite, and download of users, which need at '
+            'least the User Administrator role.'},
+ {'id': 'f9044',
+  'cat': 'userIdentities',
+  'front': 'Company branding (Entra sign-in experience)',
+  'back': 'Company branding customizes the sign-in pages users see: background image or color, banner and header logos, favicon, layout, footer, '
+          'sign-in page title, and a custom CSS file. It needs a Microsoft Entra ID P1 or P2 license, and the minimum role is Organizational '
+          'Branding Administrator. All elements are optional, and branding does not carry over to personal Microsoft account sign-ins.',
+  'detail': 'You set a default experience for the tenant and can add more specific branding per browser language. Azure AD B2C branding is a '
+            'separate, more limited feature.'},
+ {'id': 'f9050',
+  'cat': 'authAccessMgmt',
+  'front': 'Disable accounts and revoke user sessions',
+  'back': 'To cut off a compromised or departing user, disable the account (User Administrator, or Privileged Authentication Administrator for admin '
+          'accounts) and select Revoke sessions on the user, or run Revoke-MgUserSignInSession, which invalidates refresh tokens. An already-issued '
+          'access token still works until it expires (one hour by default) unless the app supports continuous access evaluation.',
+  'detail': 'For a hybrid user, disable the account and reset the password twice in on-premises Active Directory, then revoke sessions in Entra. '
+            'Apps that use their own session cookies must also have the user deprovisioned.'},
+ {'id': 'f9051',
+  'cat': 'authAccessMgmt',
+  'front': 'Microsoft Entra Kerberos for hybrid identities',
+  'back': "Microsoft Entra Kerberos lets Entra ID issue a partial Kerberos ticket-granting ticket (containing only the user's SID) for an "
+          'on-premises AD domain, using a Microsoft Entra Kerberos server object published from AD. The client trades it at a domain controller for '
+          'a full TGT, so users who sign in with FIDO2 keys or Windows Hello for Business cloud Kerberos trust still reach on-premises resources.',
+  'detail': 'Domain controllers keep issuing service tickets and controlling authorization, they must run Windows Server 2016 or later with required '
+            'updates, and setup uses the AzureADHybridAuthenticationManagement module with the Hybrid Identity Administrator role.'},
+ {'id': 'f9052',
+  'cat': 'authAccessMgmt',
+  'front': 'Passkey profiles: device-bound vs. synced passkeys',
+  'back': 'Passkey profiles replace one tenant-wide FIDO2 setting with group-targeted profiles that define the passkey type (device-bound or '
+          'synced), attestation, and allowed AAGUIDs. Device-bound passkeys keep the private key on one device, while synced passkeys sync through a '
+          'cloud passkey provider and do not support attestation, so enforcing attestation limits a profile to device-bound passkeys.',
+  'detail': 'Typical design: attested hardware keys for administrators and synced passkeys for frontline staff. An Authentication Policy '
+            'Administrator configures profiles, and Microsoft Authenticator needs a minimum app version for synced passkeys.'},
+ {'id': 'f9053',
+  'cat': 'authAccessMgmt',
+  'front': 'Analyzing Entra logs with KQL in Log Analytics',
+  'back': 'After you route logs with a Microsoft Entra diagnostic setting (to a Log Analytics workspace, a storage account, or an event hub) you can '
+          'query them with KQL: SigninLogs for interactive sign-ins, AuditLogs for directory changes, AADProvisioningLogs for provisioning. A '
+          'typical query filters by time with where TimeGenerated >= ago(7d) and aggregates with summarize ... by.',
+  'detail': 'Creating the diagnostic setting needs the Security Administrator role for the tenant plus rights on the destination. Workbooks in '
+            'Monitoring & health visualize the same data without writing KQL.'}])
+
+if 'QUESTIONS' not in globals():
+    QUESTIONS = []
+QUESTIONS.extend([{'id': 'q9001',
+  'cat': 'authAccessMgmt',
+  'type': 'mc',
+  'question': 'Employees of Fabrikam work from home and from cafes. Security wants Exchange Online and SharePoint Online reachable only from devices '
+              "running through the organization's own network security service, so a stolen refresh token replayed from an attacker's machine fails. "
+              'The team will not maintain lists of egress IP addresses and will not hairpin traffic through a VPN. What should you configure?',
+  'options': ['A Conditional Access policy that blocks the Microsoft 365 apps except from a named location listing the headquarters firewall IP '
+              'addresses',
+              'Global Secure Access signaling for Conditional Access, the Global Secure Access client with the Microsoft traffic profile, and a '
+              'policy that blocks all resources except from the compliant network location',
+              'A device compliance policy in Intune combined with a grant control that requires a compliant device',
+              'A sign-in frequency session control that forces reauthentication every hour for all users'],
+  'correct': 1,
+  'explanation': "The compliant network check is enforced at authentication, so a replayed token from a machine that is not behind the tenant's "
+                 'Global Secure Access client or remote network is denied, and there are no IP lists to maintain. An IP named location fails for '
+                 'remote users and requires constant upkeep. Device compliance proves the device state, not the network path the request took, so a '
+                 'stolen token on a compliant but unrelated network path is not blocked this way. Shorter sign-in frequency only limits the window a '
+                 'token is useful without stopping replay.'},
+ {'id': 'q9002',
+  'cat': 'authAccessMgmt',
+  'type': 'mc',
+  'question': 'A tenant has both the Microsoft traffic profile and the Internet access profile enabled for all users. An administrator sets the rule '
+              "for *.sharepoint.com to Bypass in the Microsoft traffic profile. How is a user's traffic to a SharePoint Online site handled?",
+  'options': ['It is acquired by the Internet access profile instead, so web content filtering still applies',
+              'It is forwarded to Global Secure Access anyway because the Internet access profile is a catch-all for unmatched traffic',
+              'It is blocked until the rule is changed back to Forward',
+              "It skips Global Secure Access acquisition and egresses over the device's normal network path"],
+  'correct': 3,
+  'explanation': 'Traffic that the Microsoft traffic profile can acquire can only be acquired by that profile, so a Bypass rule means neither '
+                 'profile acquires it and it leaves directly from the device. The Internet access profile does not pick it up, and nothing is '
+                 'blocked, because Bypass only stops acquisition. The practical consequence is that bypassed Microsoft traffic also loses compliant '
+                 'network and source IP benefits.'},
+ {'id': 'q9003',
+  'cat': 'authAccessMgmt',
+  'type': 'mc',
+  'question': 'Contoso must retire its VPN within weeks. Remote users need access to about forty internal servers by FQDN and IP range, over several '
+              'TCP and UDP ports, including non-web protocols. Later, the team wants separate Conditional Access policies per application. What is '
+              'the best plan?',
+  'options': ['Publish each server through Microsoft Entra application proxy, which handles web apps only',
+              'Add the Microsoft traffic profile rules for the internal ranges so users reach them through the client',
+              'Configure Quick Access with a private network connector group now, then move to per-app access for segmentation',
+              'Use the Internet access profile with a web content filtering policy that allows the internal FQDNs'],
+  'correct': 2,
+  'explanation': 'Quick Access is the fast path for tunneling a broad set of FQDNs, IP addresses, and ranges on any port or protocol, and per-app '
+                 'access later splits resources into separate Global Secure Access apps with their own policies. Application proxy publishes web '
+                 'applications and does not cover arbitrary TCP and UDP services. The Microsoft traffic profile is for Microsoft 365 destinations, '
+                 'and the Internet access profile governs public internet traffic, not private resources behind a connector.'},
+ {'id': 'q9004',
+  'cat': 'authAccessMgmt',
+  'type': 'mc',
+  'question': 'The network team refuses to open any inbound firewall ports into the datacenter that hosts the private applications. Which statement '
+              'about deploying private network connectors for Entra Private Access is correct?',
+  'options': ['Connectors only make outbound connections, so outbound ports 80 and 443 to the service are required and no inbound ports are opened',
+              'Connectors must sit in a perimeter network with inbound TCP 443 published to the internet',
+              "Connectors are installed on each user's device and call the datacenter directly",
+              'Connectors need a site-to-site VPN to Azure before they can register'],
+  'correct': 0,
+  'explanation': 'The connector is an agent on Windows Server that dials out to the service, and traffic flows both ways over that established '
+                 'session, so no inbound rule is needed. A perimeter network is allowed but unnecessary, and publishing inbound 443 is exactly what '
+                 'the design avoids. Devices run the Global Secure Access client, not the connector. No VPN is involved, since the whole point is '
+                 'VPN replacement.'},
+ {'id': 'q9005',
+  'cat': 'authAccessMgmt',
+  'type': 'mc',
+  'question': 'An administrator created a web content filtering policy that blocks the Gambling category and added it to a security profile. The '
+              'Internet access forwarding profile is enabled and assigned to all users, yet gambling sites still load. Which step is missing?',
+  'options': ['Add the gambling FQDNs to the Microsoft traffic profile as bypass rules',
+              'Link the security profile to a Conditional Access policy that targets the users',
+              'Enable Global Secure Access signaling for source IP restoration',
+              'Install a private network connector in the same region as the users'],
+  'correct': 1,
+  'explanation': 'A security profile has no effect until it is linked to a Conditional Access policy, because Conditional Access is what applies the '
+                 'profile to the users and conditions you choose. Bypass rules in the Microsoft profile would stop acquisition rather than enforce '
+                 'blocking. Source IP restoration affects which IP address Entra sees, not web filtering. Connectors serve Private Access, not '
+                 'internet filtering.'},
+ {'id': 'q9006',
+  'cat': 'authAccessMgmt',
+  'type': 'mc',
+  'question': 'After rolling out Entra Internet Access, FQDN-based blocking works for some Windows users but not for others whose browsers have '
+              'Secure DNS (DNS over HTTPS) turned on. What should you do?',
+  'options': ['Turn off DNS over HTTPS on those devices so the client can match the FQDN rules',
+              'Move those users to a custom Private Access profile',
+              'Create a second security profile with the same policy',
+              'Raise the priority of the Microsoft traffic profile above the Internet access profile'],
+  'correct': 0,
+  'explanation': 'The client matches queried names against the forwarding rules, and an encrypted DNS lookup made by the browser hides those names, '
+                 'so the traffic is never tunneled for filtering. Disabling DNS over HTTPS restores visibility. A Private Access profile is for '
+                 'private resources. Duplicating a profile changes nothing about what the client sees, and profile order between Microsoft and '
+                 'Internet is fixed rather than something you reprioritize to fix a DNS problem.'},
+ {'id': 'q9007',
+  'cat': 'authAccessMgmt',
+  'type': 'mc',
+  'question': "Since deploying the Global Secure Access client, Microsoft Entra sign-in logs show every user's IP address as the same Microsoft "
+              'egress address. IP-based named locations no longer match and risk detections look less accurate. What fixes this without removing the '
+              'client?',
+  'options': ['Add the Microsoft egress address as a trusted named location',
+              'Disable the Microsoft traffic profile for all users',
+              'Convert the named locations to country-based locations',
+              'Enable source IP restoration, which requires the Microsoft traffic profile'],
+  'correct': 3,
+  'explanation': "Source IP restoration securely passes the user's original egress IP to Entra ID and Microsoft Graph, so location policies, ID "
+                 'Protection, and logs see the real address. Trusting the shared Microsoft address would let any attacker routed through the service '
+                 'satisfy the location. Disabling the profile removes the compliant network benefit and does not restore accuracy in a controlled '
+                 'way. Country-based locations still need a reliable source IP.'},
+ {'id': 'q9008',
+  'cat': 'authAccessMgmt',
+  'type': 'ms',
+  'question': 'Which two statements about the Global Secure Access client are true? (Choose two.)',
+  'options': ['On Windows it acquires traffic with a lightweight filter driver, so it can coexist with a non-Microsoft SSE or VPN client',
+              'It is available for Windows, macOS, iOS, and Android',
+              'It is required for every traffic type, because remote networks can only carry Private Access traffic',
+              'It forwards every packet from the device regardless of the traffic forwarding profiles'],
+  'correct': [0, 1],
+  'explanation': 'The client uses a lightweight filter driver rather than a VPN tunnel, which is why it can run beside other solutions, and clients '
+                 'exist for the four listed platforms. The reverse of the third statement is true: remote networks carry Microsoft and internet '
+                 'traffic from branch locations, while Private Access traffic is acquired by the client. The client forwards only the traffic that '
+                 'matches the enabled traffic forwarding profiles, and unmatched traffic is not forwarded.'},
+ {'id': 'q9009',
+  'cat': 'authAccessMgmt',
+  'type': 'tf',
+  'question': 'A Conditional Access policy can target the Private Access traffic profile directly, the same way it can target the Microsoft traffic '
+              'and Internet access profiles.',
+  'answer': False,
+  'explanation': 'Universal Conditional Access applies to the Microsoft traffic and Internet access tunnels. For Private Access you target the '
+                 'individual Private Access enterprise applications, such as Quick Access or each per-app access application, in the policy.'},
+ {'id': 'q9010',
+  'cat': 'authAccessMgmt',
+  'type': 'tf',
+  'question': 'It is safe to turn off Global Secure Access signaling for Conditional Access while active policies still require the compliant '
+              'network location, because those policies are simply ignored.',
+  'answer': False,
+  'explanation': 'The compliant network location depends on the signaling. Disabling it with policies still in place can block targeted users from '
+                 'the resources they protect, so the policies should be deleted or changed first.'},
+ {'id': 'q9011',
+  'cat': 'authAccessMgmt',
+  'type': 'mc',
+  'question': 'Corporate laptops run the Global Secure Access client. Leadership wants users on those laptops to sign in only to your tenant and two '
+              'named partner tenants, blocking personal accounts and any other organization, without deploying a corporate proxy. Which feature '
+              'meets this?',
+  'options': ['Cross-tenant access settings with inbound B2B collaboration blocked for all other organizations',
+              'Universal tenant restrictions enforcing a tenant restrictions v2 policy',
+              'An outbound-only Conditional Access policy on the guest user type',
+              'A web content filtering policy that blocks login.microsoftonline.com for other tenants'],
+  'correct': 1,
+  'explanation': 'Universal tenant restrictions apply the tenant restrictions v2 policy to devices that use the client or a remote network, so users '
+                 'can authenticate only to the allowed external tenants. Cross-tenant access settings govern B2B collaboration trust between '
+                 'tenants, not what tenants your own users may sign in to from your devices. Guest-focused Conditional Access does not govern your '
+                 'own members signing in elsewhere. Filtering the sign-in endpoint by FQDN cannot distinguish tenants and would break your own '
+                 'sign-in.'},
+ {'id': 'q9012',
+  'cat': 'authAccessMgmt',
+  'type': 'mc',
+  'question': 'Remote users connect through Quick Access and can reach internal servers by IP address, but browsing to the internal name '
+              'intranet.corp.contoso.local fails. What should you configure?',
+  'options': ['A new per-app access app with a Conditional Access policy that requires MFA',
+              'A public DNS record for corp.contoso.local pointing at the connector',
+              'The corp.contoso.local DNS suffix in the Quick Access configuration so Private DNS can resolve it',
+              'A Microsoft traffic profile rule for the internal domain with the Forward action'],
+  'correct': 2,
+  'explanation': 'Private DNS sends queries for names that match the configured suffix to the Global Secure Access DNS proxy, which resolves them '
+                 "through the connector's resolver, so the suffix has to be added to the Quick Access configuration. A per-app app with MFA changes "
+                 'access control, not name resolution. A public record for an internal name would expose it and is not how Private Access resolves '
+                 'names. The Microsoft traffic profile only covers Microsoft services.'},
+ {'id': 'q9013',
+  'cat': 'authAccessMgmt',
+  'type': 'mc',
+  'question': 'A tenant has only Microsoft Entra ID P1 licenses assigned and no Entra Suite or standalone Global Secure Access licenses. Which '
+              'capability can the organization use for its users?',
+  'options': ['Web content filtering by category in Entra Internet Access',
+              'Per-app access to private TCP applications in Entra Private Access',
+              'The compliant network check enabled through the Microsoft traffic profile',
+              'Private DNS name resolution for internal suffixes'],
+  'correct': 2,
+  'explanation': 'The Microsoft traffic profile and the features built on it, including the compliant network check, source IP restoration, and '
+                 'universal tenant restrictions, are included with Microsoft Entra ID P1 or P2. Web content filtering requires the Entra Internet '
+                 'Access license, and per-app access and Private DNS require the Entra Private Access license, both also available in the Microsoft '
+                 'Entra Suite.'},
+ {'id': 'q9014',
+  'cat': 'authAccessMgmt',
+  'type': 'mc',
+  'question': 'A new administrator must enable the Microsoft traffic forwarding profile and then create the Conditional Access policy that requires '
+              'the compliant network. Which role assignment follows least privilege?',
+  'options': ['Global Administrator',
+              'Global Secure Access Administrator and Conditional Access Administrator',
+              'Security Administrator',
+              'Application Administrator and Cloud Application Administrator'],
+  'correct': 1,
+  'explanation': 'The Global Secure Access Administrator role manages the Global Secure Access features and traffic profiles, and the Conditional '
+                 'Access Administrator role creates and manages the Conditional Access policies and named locations. Global Administrator works but '
+                 'is far broader than needed. Security Administrator does not cover either task, and the application administrator roles manage '
+                 'enterprise applications, not traffic profiles or Conditional Access.'},
+ {'id': 'q9101',
+  'cat': 'workloadIdentities',
+  'type': 'mc',
+  'question': "Most of Adatum's employees work remotely, so firewall and proxy logs miss much of their cloud app use. Security wants continuous "
+              'Shadow IT reporting that covers devices wherever they are, without deploying log collectors. What should you use as the cloud '
+              'discovery data source?',
+  'options': ['Defender for Endpoint integration with Defender for Cloud Apps',
+              'A snapshot report built from a weekly manual upload of proxy logs',
+              'An app connector for Microsoft 365',
+              'A session policy for each discovered app'],
+  'correct': 0,
+  'explanation': 'Defender for Endpoint reports cloud app use from every onboarded device, on or off the network, and feeds continuous cloud '
+                 'discovery natively. Snapshot reports only cover the logs you upload and only on the schedule you upload them. App connectors read '
+                 "data from a connected provider's API and do not enumerate every cloud app users reach. Session policies control sessions in an app "
+                 'that is already onboarded; they do not discover unknown apps.'},
+ {'id': 'q9102',
+  'cat': 'workloadIdentities',
+  'type': 'mc',
+  'question': "A legal team asks for a one-time evaluation of the risk of cloud apps seen in last quarter's proxy logs, which are exported files. No "
+              'ongoing monitoring is needed. Which report type fits?',
+  'options': ['Continuous report fed by a log collector over Syslog',
+              'Snapshot report from manually uploaded traffic logs',
+              'Continuous report fed by Defender for Endpoint',
+              'OAuth app policy with a high permission threshold'],
+  'correct': 1,
+  'explanation': 'Snapshot reports give ad hoc visibility into a set of logs you upload by hand, which is exactly a one-time analysis of exported '
+                 'files. Both continuous options are built for ongoing automated ingestion, which the request explicitly does not need. An OAuth app '
+                 'policy governs permissions granted to OAuth apps, not discovered traffic.'},
+ {'id': 'q9103',
+  'cat': 'workloadIdentities',
+  'type': 'mc',
+  'question': 'An analyst marked a file-sharing app as Unsanctioned in Defender for Cloud Apps. The company uses Defender for Endpoint, yet users on '
+              'managed laptops can still open the app. What is the most likely missing configuration?',
+  'options': ['A session policy for the file-sharing app',
+              'An access policy that blocks native clients',
+              'Network protection and cloud protection enabled in Defender for Endpoint',
+              'A new app connector for the file-sharing app'],
+  'correct': 2,
+  'explanation': 'Unsanctioning does not itself block traffic. With Defender for Endpoint, blocking unsanctioned apps relies on cloud protection and '
+                 'network protection being turned on for the devices. Session and access policies apply to apps routed through Conditional Access '
+                 'app control, which a discovered consumer file-sharing site is not. App connectors integrate sanctioned apps through APIs and do '
+                 'not block access.'},
+ {'id': 'q9104',
+  'cat': 'workloadIdentities',
+  'type': 'mc',
+  'question': "Contractors use unmanaged laptops to open the company's Microsoft SharePoint Online sites in a browser. Management wants them able to "
+              'browse and edit online but unable to download files labeled Confidential. Which control meets this with the least disruption?',
+  'options': ['A Conditional Access grant control that requires a compliant device',
+              'A Defender for Cloud Apps session policy that blocks download of labeled files, with a Conditional Access policy routing the session',
+              'A Defender for Cloud Apps access policy that blocks SharePoint Online for unmanaged devices',
+              'An OAuth app policy that bans the SharePoint Online app'],
+  'correct': 1,
+  'explanation': 'Session policies allow access while controlling in-session activity such as downloading labeled files, and they depend on a '
+                 'Conditional Access policy that sends the session through Defender for Cloud Apps. Requiring a compliant device would block '
+                 'contractors completely because their laptops are unmanaged. An access policy also blocks outright rather than limiting activity. '
+                 'An OAuth app policy has nothing to do with browser downloads and banning the app would disable it for everyone.'},
+ {'id': 'q9105',
+  'cat': 'workloadIdentities',
+  'type': 'mc',
+  'question': 'A third-party calendar app has been consented to by more than 80 employees and requests the permission to read and write all mail. '
+              'Security wants an automatic alert on any app like this and the ability to disable offending apps. What should you configure?',
+  'options': ['A session policy that blocks uploads to the calendar app',
+              'A cloud discovery policy for unsanctioned apps',
+              'A user consent setting that requires admin approval for all apps',
+              'An OAuth app policy in Defender for Cloud Apps with a permission level and user count threshold'],
+  'correct': 3,
+  'explanation': "OAuth app policies alert when an app meets criteria such as high permissions authorized by many users, and banning the app's "
+                 'permission disables the associated enterprise application. A session policy applies to a user session in a proxied app, not to '
+                 'OAuth grants. A cloud discovery policy works on traffic logs. Tightening user consent prevents future grants but neither alerts on '
+                 'the existing app nor disables it.'},
+ {'id': 'q9106',
+  'cat': 'workloadIdentities',
+  'type': 'mc',
+  'question': 'The security team needs to scan files already stored in Box, spot overshared content, and remove external sharing links through a '
+              'governance action. Users reach Box in many ways, including native sync clients, and no session routing is wanted. Which capability '
+              'applies?',
+  'options': ['A Conditional Access app control session policy',
+              'The Box app connector in Defender for Cloud Apps',
+              'Application-enforced restrictions for Box',
+              'Universal tenant restrictions in Global Secure Access'],
+  'correct': 1,
+  'explanation': "App connectors use the provider's API to read activities and files and to run governance actions such as removing sharing, "
+                 'regardless of how the user connects. Session policies only see browser sessions routed through the proxy, so they cannot scan '
+                 'stored files or cover native clients. Application-enforced restrictions exist only for Exchange Online and SharePoint Online. '
+                 'Tenant restrictions govern which Microsoft Entra tenants users can sign in to.'},
+ {'id': 'q9107',
+  'cat': 'workloadIdentities',
+  'type': 'mc',
+  'question': 'Unmanaged devices should get browser-only, limited access to SharePoint Online (no download or sync). The team wants a native control '
+              'that needs no reverse proxy and no Defender for Cloud Apps session policies. What should you configure?',
+  'options': ['A Conditional Access session control that uses application-enforced restrictions, with the limited-access setting enabled in '
+              'SharePoint Online',
+              'A sign-in frequency session control set to every time',
+              'A Defender for Cloud Apps session policy that monitors only',
+              'A persistent browser session control set to never persistent'],
+  'correct': 0,
+  'explanation': 'Application-enforced restrictions make Entra ID pass device state to SharePoint Online or Exchange Online, which then deliver a '
+                 'limited experience for unmanaged devices once its own restriction setting is on. Sign-in frequency and persistent browser sessions '
+                 'govern how long a session lasts, not what the session can do. A monitor-only session policy observes activity but blocks nothing, '
+                 'and it needs the proxy.'},
+ {'id': 'q9108',
+  'cat': 'workloadIdentities',
+  'type': 'mc',
+  'question': 'Your organization cares far more about compliance certifications than about vendor hosting details when judging cloud apps. How '
+              'should you make the Defender for Cloud Apps risk score reflect this?',
+  'options': ['Unsanction every app that lacks a compliance certification',
+              'Create a custom app for each discovered app with the desired score',
+              'Customize the weights of the risk categories and factors used in the risk score',
+              'Filter the discovery dashboard by headquarters location'],
+  'correct': 2,
+  'explanation': 'By default every parameter carries equal weight, and you can adjust the weights so the score matches your priorities. '
+                 'Unsanctioning is a governance tag, not a change to scoring. Custom apps are for software missing from the catalog, not for '
+                 'rewriting scores of catalog apps. A location filter changes what you see but not how apps are scored.'},
+ {'id': 'q9109',
+  'cat': 'workloadIdentities',
+  'type': 'ms',
+  'question': 'Which two statements about Conditional Access app control in Defender for Cloud Apps are true? (Choose two.)',
+  'options': ['Microsoft Entra apps are onboarded automatically, while apps behind a non-Microsoft identity provider must be onboarded manually',
+              'Sessions in non-Edge browsers show an app URL with an .mcas.ms suffix because the session is reverse proxied',
+              'It requires an agent installed on every unmanaged device',
+              'Policies for a host app such as Teams automatically also cover SharePoint and OneDrive'],
+  'correct': [0, 1],
+  'explanation': 'Entra ID apps are onboarded automatically and non-Microsoft IdP apps need manual onboarding, and the .mcas.ms suffix is how '
+                 'reverse proxied sessions look in browsers other than Edge. No device agent is needed, which is the reason it suits unmanaged and '
+                 'partner devices. Policies are tied to the app they were created for, so related resource apps need their own policy.'},
+ {'id': 'q9110',
+  'cat': 'workloadIdentities',
+  'type': 'tf',
+  'question': 'An access policy in Defender for Cloud Apps allows the session and monitors what the user does, while a session policy blocks or '
+              'allows access outright.',
+  'answer': False,
+  'explanation': 'The roles are reversed. Access policies allow or block access completely, and session policies allow access while monitoring or '
+                 'limiting activities in the session.'},
+ {'id': 'q9111',
+  'cat': 'workloadIdentities',
+  'type': 'tf',
+  'question': 'Marking an app Unsanctioned in Defender for Cloud Apps blocks it on every device on its own, with no other configuration.',
+  'answer': False,
+  'explanation': 'Unsanctioning flags the app for monitoring and governance. Blocking needs an enforcement path such as Defender for Endpoint (with '
+                 'cloud protection and network protection on), a supported secure web gateway integration, or a generated block script.'},
+ {'id': 'q9120',
+  'cat': 'workloadIdentities',
+  'type': 'mc',
+  'question': 'A company deploys 200 AI agents of the same type. Security requires that none of them stores a secret itself, that Conditional Access '
+              'and permissions be governed in one place, and that all of them can be cut off at once if the type is found vulnerable. What should '
+              'you use?',
+  'options': ['One app registration per agent, each with its own client secret',
+              'A single shared user account used by all agents',
+              'One user-assigned managed identity attached to every agent',
+              'An agent identity blueprint with an agent identity per agent'],
+  'correct': 3,
+  'explanation': 'Agent identities hold no credentials, the blueprint holds them, and Conditional Access and permissions set on the blueprint apply '
+                 'to every agent identity created from it. Disabling the blueprint stops all of them from authenticating. Per-agent app '
+                 'registrations with secrets scatter credentials and policy. A shared user account breaks Conditional Access and ID Protection '
+                 'assumptions and defeats individual auditing. A user-assigned managed identity can only be attached to Azure resources and does not '
+                 'fit agents running elsewhere.'},
+ {'id': 'q9121',
+  'cat': 'workloadIdentities',
+  'type': 'mc',
+  'question': 'Compliance requires that every AI agent have a named person or group accountable for it who can decide to retire it, but who must not '
+              'receive technical administrator rights over the agent. Which assignment should you make?',
+  'options': ['Add the person as a sponsor of the agent identity',
+              'Add the person as an owner of the agent identity',
+              'Assign the person the Application Administrator role',
+              "Assign the person as the manager of the agent's user account"],
+  'correct': 0,
+  'explanation': 'Sponsors provide business accountability and can make lifecycle decisions without technical admin access. Owners are the technical '
+                 'administrators, which is more access than required. Application Administrator is a broad directory role. Managers are designated '
+                 "for an agent's user account, which may not even exist."},
+ {'id': 'q9122',
+  'cat': 'workloadIdentities',
+  'type': 'mc',
+  'question': 'An agent must have its own mailbox, join Teams chats, and appear in the HR system like a team member. Which identity construct is '
+              'intended for this?',
+  'options': ['A system-assigned managed identity on the host VM',
+              "The agent's user account, created in addition to its agent identity",
+              'A guest user invited through B2B collaboration',
+              'A service principal with delegated Mail.Read permission'],
+  'correct': 1,
+  'explanation': "The optional agent's user account is meant for agents that act as digital workers needing user-only resources like mailboxes and "
+                 'chat. A managed identity belongs to an Azure resource and cannot hold a mailbox. A B2B guest is an external person, not an agent. '
+                 'A service principal with a delegated permission still is not a user and cannot be a chat participant.'},
+ {'id': 'q9123',
+  'cat': 'workloadIdentities',
+  'type': 'tf',
+  'question': 'An agent identity can be issued tokens in other Microsoft Entra tenants, so one agent can call APIs across partner tenants.',
+  'answer': False,
+  'explanation': 'Agent identities can only be issued tokens in the tenant where they are created and cannot access resources or APIs in other '
+                 'tenants.'},
+ {'id': 'q9124',
+  'cat': 'workloadIdentities',
+  'type': 'mc',
+  'question': 'An on-premises IIS farm behind a load balancer runs a service under a domain account whose password was set years ago and is shared '
+              'with several administrators. You need a service account on Active Directory that avoids manual password rotation and works across all '
+              'farm servers. What should you use?',
+  'options': ['A system-assigned managed identity for each server',
+              'A standalone managed service account on each server',
+              'A group managed service account',
+              'An app registration with a client secret'],
+  'correct': 2,
+  'explanation': 'A gMSA can be deployed to several servers in a farm, and Windows rotates its long random password automatically, so no one handles '
+                 'it. A standalone managed service account is limited to a single server. A system-assigned managed identity only exists for Azure '
+                 'resources, not for on-premises Windows servers. An app registration secret would add an expiring credential someone must rotate.'},
+ {'id': 'q9125',
+  'cat': 'workloadIdentities',
+  'type': 'mc',
+  'question': 'A department wants its users to see a tidy set of ten finance applications grouped together on the My Apps portal, separately from '
+              'other apps. The tenant has Microsoft Entra ID P1. What should an Application Administrator configure?',
+  'options': ['A custom security attribute on the finance users',
+              'An application management policy for the finance apps',
+              'A dynamic group of finance users assigned the apps',
+              'A collection under Enterprise apps > App launchers with the apps and the finance group assigned'],
+  'correct': 3,
+  'explanation': 'My Apps collections group related applications for chosen users and groups and need P1 or P2. Custom security attributes label '
+                 'objects but do not organize the portal. Application management policies restrict credential settings on apps. A group can grant '
+                 'the apps through assignment, but it does not group them into a collection on the My Apps page.'},
+ {'id': 'q9201',
+  'cat': 'userIdentities',
+  'type': 'mc',
+  'question': 'You added contoso.com as a custom domain and created the TXT record, but verification keeps failing even after waiting several hours '
+              'and confirming the record is correct. A colleague notes that a team once signed up for a Power BI trial with contoso.com addresses. '
+              'What is the most likely cause and fix?',
+  'options': ['The initial onmicrosoft.com domain must be deleted before another domain can be verified',
+              'The domain must be registered as the primary domain before it can be verified',
+              'The domain is already verified in another tenant, possibly an unmanaged one, so it must be removed or taken over there',
+              'TXT records are not supported and the verification must use a CNAME record'],
+  'correct': 2,
+  'explanation': 'A domain name can be verified in only one tenant. Self-service sign-up can create an unmanaged tenant that already holds the name, '
+                 'which has to be taken over (or the name removed from the other directory). The initial domain cannot be deleted at all and is not '
+                 'an obstacle. Primary status is set after verification, not before. TXT or MX records are exactly what Entra asks for.'},
+ {'id': 'q9202',
+  'cat': 'userIdentities',
+  'type': 'tf',
+  'question': 'Setting "Users may join devices to Microsoft Entra ID" to None prevents Microsoft Entra hybrid join of domain-joined Windows '
+              'computers.',
+  'answer': False,
+  'explanation': 'The setting applies to user-driven Microsoft Entra join. Hybrid join, Azure VMs, and Autopilot self-deploying mode work in a '
+                 'userless context and are not governed by it.'},
+ {'id': 'q9203',
+  'cat': 'userIdentities',
+  'type': 'mc',
+  'question': 'A power user receives an error when registering a new tablet with Microsoft Entra ID, having already joined or registered many '
+              'devices. Defaults are unchanged. What is the right adjustment?',
+  'options': ['Raise the maximum number of devices per user in device settings, which defaults to 50 and can go up to 100',
+              'Assign the user the Cloud Device Administrator role',
+              'Remove the user from the "Users may join devices" scope',
+              'Convert the user to a guest to lift device limits'],
+  'correct': 0,
+  'explanation': 'Joined and registered devices count against a per-user maximum that defaults to 50 and can be raised to 100, or set to unlimited '
+                 "subject to other quotas. A device administrator role manages devices but does not change the user's limit. Removing the user from "
+                 'the join scope would block joining instead. Guest status is unrelated.'},
+ {'id': 'q9204',
+  'cat': 'userIdentities',
+  'type': 'mc',
+  'question': 'Ravi holds User Administrator scoped to the Sales administrative unit and Groups Administrator across the whole tenant. Which '
+              'statement about his effective permissions is correct?',
+  'options': ['He can reset passwords for any user in the tenant because the broader assignment wins',
+              'He can manage any group in the tenant but reset passwords only for users in the Sales unit',
+              'He cannot manage groups because the unit-scoped assignment restricts all of his roles',
+              'He can reset passwords for Sales users and manage only the groups inside the Sales unit'],
+  'correct': 1,
+  'explanation': 'Effective permissions are the union of assignments, each limited by its own scope. User Administrator applies only inside Sales, '
+                 'and Groups Administrator is tenant-wide, so he manages all groups but resets passwords only in that unit. Groups Administrator '
+                 'does not grant password reset for users, so a broader assignment does not make him an all-tenant password administrator. Scope '
+                 'belongs to each assignment, not to the person, so a unit-scoped role does not restrict his other roles, and his tenant-wide group '
+                 'role is not limited to the Sales unit.'},
+ {'id': 'q9210',
+  'cat': 'authAccessMgmt',
+  'type': 'mc',
+  'question': 'A synced employee with Exchange Online access is being dismissed today. HR wants access cut as fast as possible. The account is '
+              'mastered in on-premises Active Directory. Which actions should the administrator take?',
+  'options': ['Delete the synced user in the Entra admin center and rely on that to end all access',
+              "Disable the account and reset the password twice in on-premises AD, then revoke the user's sessions in Entra",
+              "Only remove the user's licenses, which immediately invalidates all tokens",
+              'Only enable security defaults for the tenant'],
+  'correct': 1,
+  'explanation': 'For a synced user the source of authority is Active Directory, so disable it there and reset the password twice to blunt '
+                 'pass-the-hash risk, then revoke sessions in Entra to invalidate refresh tokens. A cloud-side delete of a synced object does not '
+                 'hold, because the source of authority is on-premises and the object can be recreated or restored by sync. Removing licenses does '
+                 'not invalidate tokens already issued. Security defaults protect sign-ins in general and do nothing about this specific account.'},
+ {'id': 'q9211',
+  'cat': 'authAccessMgmt',
+  'type': 'mc',
+  'question': 'Users on Microsoft Entra joined Windows laptops sign in with FIDO2 keys but cannot open on-premises file shares without a password '
+              'prompt. Domain controllers run Windows Server 2022. What makes the shares work without passwords?',
+  'options': ['Seamless single sign-on with the AZUREADSSOACC computer account',
+              'Pass-through authentication agents on the domain controllers',
+              'Microsoft Entra Kerberos, where Entra ID issues a partial TGT that a domain controller exchanges for a full TGT',
+              'Password writeback so the FIDO2 key can set an AD password'],
+  'correct': 2,
+  'explanation': "With Entra Kerberos, Entra ID returns a ticket-granting ticket containing only the user's SID alongside the PRT, and the domain "
+                 'controller exchanges it for a full TGT, so on-premises resources are reachable after a passwordless sign-in. Seamless SSO serves '
+                 'domain-joined devices on the corporate network for cloud apps, not this on-premises resource scenario. Pass-through authentication '
+                 'validates passwords and there is none here. Password writeback relates to resets, not Kerberos tickets.'},
+ {'id': 'q9212',
+  'cat': 'authAccessMgmt',
+  'type': 'mc',
+  'question': 'Administrators must register only attested hardware security keys, while frontline staff should be allowed to use synced passkeys on '
+              'their phones. Today there is one tenant-wide FIDO2 setting. What should you do?',
+  'options': ['Use authentication strengths so frontline staff are exempt from phishing-resistant MFA',
+              'Create separate passkey profiles targeted to each group, enforcing attestation for administrators',
+              'Enable attestation tenant-wide and let frontline staff register synced passkeys anyway',
+              'Disable passkeys and require Authenticator push for everyone'],
+  'correct': 1,
+  'explanation': 'Passkey profiles are group-targeted and can differ in passkey type and attestation, which is exactly this split. Enforcing '
+                 'attestation limits a profile to device-bound passkeys because synced passkeys do not support attestation, so a tenant-wide '
+                 'attestation requirement would block the frontline staff. Authentication strengths decide which methods satisfy a policy, not who '
+                 'may register which passkey. Disabling passkeys discards the phishing-resistant option.'},
+ {'id': 'q9213',
+  'cat': 'authAccessMgmt',
+  'type': 'tf',
+  'question': 'Synced passkeys support attestation, so enforcing attestation in a passkey profile still allows them.',
+  'answer': False,
+  'explanation': 'Synced passkeys do not support attestation. With attestation enabled, only device-bound passkeys are allowed, which is why '
+                 'regulated groups often get a separate profile.'},
+ {'id': 'q9214',
+  'cat': 'authAccessMgmt',
+  'type': 'mc',
+  'question': 'Entra sign-in logs are streamed to a Log Analytics workspace. Which KQL query returns the number of interactive sign-ins per '
+              'application over the past seven days?',
+  'options': ['AuditLogs | where TimeGenerated >= ago(7d) | summarize count() by OperationName',
+              'SigninLogs | where CreatedDateTime >= ago(7d) | project AppDisplayName | count',
+              'SigninLogs | where CreatedDateTime >= ago(7d) | summarize signInCount = count() by AppDisplayName',
+              'AADProvisioningLogs | where TimeGenerated >= ago(7d) | summarize count() by AppDisplayName'],
+  'correct': 2,
+  'explanation': 'SigninLogs holds interactive sign-ins, and summarize ... by AppDisplayName produces one count per application. AuditLogs records '
+                 'directory changes grouped here by operation, not sign-ins. The project then count form returns a single total instead of '
+                 'per-application counts. AADProvisioningLogs records provisioning events, not user sign-ins.'},
+ {'id': 'q9215',
+  'cat': 'authAccessMgmt',
+  'type': 'mc',
+  'question': 'A new analyst must create a diagnostic setting that sends Microsoft Entra audit and sign-in logs to an existing Log Analytics '
+              'workspace, with no more Entra privilege than necessary. Which Entra role should be assigned, assuming the workspace permissions are '
+              'handled separately?',
+  'options': ['Global Reader', 'Reports Reader', 'Security Administrator', 'Log Analytics Reader'],
+  'correct': 2,
+  'explanation': 'Creating or editing a Microsoft Entra diagnostic setting requires the Security Administrator role in the tenant, along with rights '
+                 'on the destination. Global Reader and Reports Reader can read reports but not change settings. Log Analytics Reader is an Azure '
+                 'role for reading workspace data and does not create diagnostic settings.'}])
+
+if 'MADLIBS' not in globals():
+    MADLIBS = []
+MADLIBS.extend([{'id': 'ml-sc300-9001',
+  'cat': 'authAccessMgmt',
+  'scenario': "A tenant wants to make Microsoft 365 requests succeed only when they come through the organization's network security service, with "
+              'no egress IP lists to maintain. After enabling Global Secure Access signaling for Conditional Access, an administrator references the '
+              '{b1} location in a policy that blocks everything else. Branch offices without the client can still qualify by connecting through a '
+              '{b2}.',
+  'blanks': [{'key': 'b1',
+              'options': ['All Compliant Network locations', 'All trusted locations', 'MFA trusted IPs', 'Countries and regions'],
+              'correct': 0},
+             {'key': 'b2', 'options': ['remote network', 'connector group', 'security profile', 'registration campaign'], 'correct': 0}],
+  'explanation': 'Enabling signaling creates the All Compliant Network locations named location, which a policy can use to require traffic from the '
+                 "tenant's Global Secure Access. Branch locations without the client qualify by being configured as a remote network."},
+ {'id': 'ml-sc300-9002',
+  'cat': 'authAccessMgmt',
+  'scenario': 'To replace a VPN quickly, a team adds all internal FQDNs and IP ranges to {b1}. Later, one sensitive finance application needs its '
+              'own Conditional Access policy, so the team creates a {b2} for it. Both rely on a private network connector that makes only outbound '
+              'connections.',
+  'blanks': [{'key': 'b1',
+              'options': ['Quick Access', 'the Internet access profile', 'a web content filtering policy', 'the Microsoft traffic profile'],
+              'correct': 0},
+             {'key': 'b2', 'options': ['per-app access application', 'remote network', 'passkey profile', 'named location'], 'correct': 0}],
+  'explanation': 'Quick Access is the primary broad set of private FQDNs and IPs, and per-app access creates separate Global Secure Access '
+                 'applications so a subset of resources can have different assignments and Conditional Access policies.'},
+ {'id': 'ml-sc300-9003',
+  'cat': 'workloadIdentities',
+  'scenario': 'To see which unapproved cloud apps users reach even from home, a security team connects Defender for Endpoint to feed {b1}. When a '
+              'risky app is tagged Unsanctioned, it is actually blocked on devices only if {b2} is turned on in Defender for Endpoint.',
+  'blanks': [{'key': 'b1',
+              'options': ['an app connector report', 'continuous cloud discovery reports', 'a session policy', 'an access policy'],
+              'correct': 1},
+             {'key': 'b2', 'options': ['automated investigation', 'network protection', 'live response', 'tamper protection'], 'correct': 1}],
+  'explanation': 'Defender for Endpoint integration feeds continuous cloud discovery from every onboarded device. Blocking unsanctioned apps through '
+                 'Defender for Endpoint relies on network protection (with cloud protection) being enabled.'},
+ {'id': 'ml-sc300-9004',
+  'cat': 'workloadIdentities',
+  'scenario': 'An AI agent has no credentials of its own. Its {b1} holds the credentials and acquires tokens for it, and the human accountable for '
+              'the agent in a business sense is recorded as its {b2}.',
+  'blanks': [{'key': 'b1',
+              'options': ['agent identity blueprint', 'user-assigned managed identity', 'administrative unit', 'connected organization'],
+              'correct': 0},
+             {'key': 'b2', 'options': ['sponsor', 'access package', 'redirect URI', 'connector group'], 'correct': 0}],
+  'explanation': 'Agent identities rely on their blueprint for credentials and token acquisition, and the sponsor field records the human or group '
+                 'accountable for the agent.'}])
+
+if 'SEQUENCES' not in globals():
+    SEQUENCES = []
+SEQUENCES.extend([{'id': 'seq-sc300-9001',
+  'cat': 'authAccessMgmt',
+  'prompt': 'Put these steps in order to block a web category for a group of users with Entra Internet Access.',
+  'steps': ['Enable the Internet access traffic forwarding profile',
+            'Create a web content filtering policy for the category',
+            'Add the policy to a security profile',
+            'Link the security profile to a Conditional Access policy for the users',
+            'Assign the users or groups to the Internet access traffic forwarding profile'],
+  'explanation': 'The Internet access profile must exist first so traffic can be acquired; the filtering policy defines what to block, the security '
+                 'profile packages policies, the Conditional Access link applies the profile to chosen users, and assignment makes sure those users '
+                 'actually receive the forwarding profile.'},
+ {'id': 'seq-sc300-9002',
+  'cat': 'authAccessMgmt',
+  'prompt': 'Put these steps in order to require a compliant network for Microsoft 365 apps.',
+  'steps': ['Enable the Microsoft traffic forwarding profile',
+            'Enable Global Secure Access signaling for Conditional Access',
+            'Confirm the All Compliant Network locations named location exists',
+            'Create a policy that blocks all resources except the compliant network location, excluding emergency access accounts',
+            'Deploy the Global Secure Access client to users'],
+  'explanation': 'The profile and the signaling setting come first because they create the compliant network location. The policy then references '
+                 'that location and excludes break-glass accounts. Deploy the client before enforcing, or turn the policy on in report-only mode '
+                 'first, so users are not locked out.'},
+ {'id': 'seq-sc300-9003',
+  'cat': 'workloadIdentities',
+  'prompt': 'Put these steps in order to block downloads of sensitive files from SharePoint Online to unmanaged devices with Defender for Cloud '
+            'Apps.',
+  'steps': ['Create a Conditional Access policy that targets the app and uses the Use Conditional Access App Control session control',
+            'Create a session policy that blocks download of the sensitive files',
+            'Test that downloads are blocked on an unmanaged device',
+            'Review the activity in the Defender portal and tune the policy'],
+  'explanation': 'The Conditional Access policy routes the sessions to Defender for Cloud Apps first; the session policy is then created and scoped '
+                 'in Defender for Cloud Apps, after which you test it from an unmanaged device and tune it from the activity log.'}])
+
+if 'CASE_STUDIES' not in globals():
+    CASE_STUDIES = []
+CASE_STUDIES.extend([{'id': 'cs-sc300-northwind-network',
+  'cat': 'authAccessMgmt',
+  'title': 'Northwind Logistics Retires Its VPN',
+  'scenario': 'Northwind Logistics has 4,000 employees who mostly work remotely, plus 300 contractors who use their own unmanaged laptops in a '
+              'browser. The company is retiring its VPN, which currently gives remote staff access to roughly thirty on-premises servers over '
+              'several TCP and UDP ports. The identity team has Microsoft Entra ID P2 and has bought Microsoft Entra Private Access licenses, but '
+              'not Entra Internet Access. Security has three goals. First, Microsoft 365 must only be reachable from devices that connect through '
+              "the company's own network security service, so that a stolen token replayed from elsewhere is refused, without maintaining egress IP "
+              'lists. Second, contractors must be able to view SharePoint Online documents in the browser but not download documents labeled '
+              'Confidential. Third, the payroll application on-premises must have its own stricter Conditional Access policy than the rest of the '
+              'data center. An audit also found a popular consumer file-sharing site in use that nobody approved; devices are onboarded to Microsoft '
+              'Defender for Endpoint.',
+  'questions': [{'id': 'cs-sc300-northwind-network-q1',
+                 'type': 'mc',
+                 'question': 'How should Northwind first replace the VPN for the thirty servers and later give payroll its own policy?',
+                 'options': ['Publish every server with Microsoft Entra application proxy and one policy per server',
+                             'Configure Quick Access for the whole set now, then create a per-app access application for payroll with its own '
+                             'Conditional Access policy',
+                             'Enable the Internet access profile and add the servers to a web content filtering allow list',
+                             'Create a site-to-site VPN between the data center and Azure and use Conditional Access on the VPN gateway'],
+                 'correct': 1,
+                 'explanation': 'Quick Access quickly tunnels the primary FQDN, IP, and port set, and a separate per-app access application lets '
+                                'payroll carry its own assignments and Conditional Access policy. Application proxy covers web apps and would '
+                                'multiply the work for non-web protocols. The Internet access profile is for internet traffic and the company does '
+                                'not own Entra Internet Access licenses. A site-to-site VPN keeps the VPN model the project is retiring.'},
+                {'id': 'cs-sc300-northwind-network-q2',
+                 'type': 'mc',
+                 'question': "Which combination meets the first goal, refusing Microsoft 365 requests from outside the company's network security "
+                             'service?',
+                 'options': ['A Conditional Access policy that blocks all resources except from the corporate office public IP addresses',
+                             'Requiring a compliant device with Intune for all Microsoft 365 apps',
+                             'The Microsoft traffic profile with the Global Secure Access client, Global Secure Access signaling for Conditional '
+                             'Access, and a policy that blocks all resources except the compliant network location',
+                             'Source IP restoration with a trusted named location for the Microsoft egress address'],
+                 'correct': 2,
+                 'explanation': 'The compliant network check is enforced at authentication, so a replayed token from outside the service is denied, '
+                                'and it works with only Entra ID P1 or P2 through the Microsoft traffic profile. Office IP lists fail for remote '
+                                'staff and require upkeep. Device compliance does not tell Entra which network path a request used. Trusting the '
+                                'Microsoft egress address would let anyone routed through the service pass, which is not tenant-specific.'},
+                {'id': 'cs-sc300-northwind-network-q3',
+                 'type': 'mc',
+                 'question': 'How should Northwind let contractors browse SharePoint Online but not download Confidential files?',
+                 'options': ['Block the contractors with an access policy for SharePoint Online',
+                             'Require a compliant device for the contractor group',
+                             'Ban the SharePoint Online OAuth app in an OAuth app policy',
+                             'Route their sessions through Conditional Access app control with a Defender for Cloud Apps session policy that blocks '
+                             'downloads of labeled files'],
+                 'correct': 3,
+                 'explanation': 'A session policy allows the session and limits the activity, which is the stated requirement, and routing is done '
+                                'by a Conditional Access policy. An access policy blocks entirely, a compliant-device requirement fails because the '
+                                'laptops are unmanaged, and banning an OAuth app would disable SharePoint Online for everyone.'},
+                {'id': 'cs-sc300-northwind-network-q4',
+                 'type': 'ms',
+                 'question': 'Which two actions let Northwind block the unapproved consumer file-sharing site on managed laptops? (Choose two.)',
+                 'options': ['Tag the app Unsanctioned in Defender for Cloud Apps',
+                             'Make sure cloud protection and network protection are enabled in Defender for Endpoint',
+                             'Create a session policy for the site in Conditional Access app control',
+                             "Add the app's permissions to an OAuth app policy"],
+                 'correct': [0, 1],
+                 'explanation': 'Unsanctioning marks the app, and with Defender for Endpoint integration the block is applied on devices when cloud '
+                                'protection and network protection are on. A session policy needs the app to be onboarded behind an identity '
+                                'provider, which a consumer site users reach directly is not. OAuth app policies concern permissions granted to '
+                                'OAuth apps, not web browsing.'}]}])
+
+if 'COMPARE' not in globals():
+    COMPARE = []
+COMPARE.extend([{'id': 'cmp-sc300-9001',
+  'cat': 'authAccessMgmt',
+  'scenario': 'Remote engineers must reach about 20 internal servers over RDP, SSH, and SMB without a VPN, using one Conditional Access policy for '
+              'the whole set. Which Private Access configuration fits first?',
+  'optionA': 'Quick Access, one enterprise application holding the FQDNs, IP addresses, and ports.',
+  'optionB': 'Per-app access, one Global Secure Access application per server with its own policy.',
+  'better': 'A',
+  'why': 'Per-app access gives the finest control but means building and assigning many applications up front. Quick Access replaces the VPN fast '
+         'with a single primary set of resources and a single policy, and the team can split out sensitive systems later. The stem asks for one '
+         'policy, which is what Quick Access provides.'},
+ {'id': 'cmp-sc300-9002',
+  'cat': 'authAccessMgmt',
+  'scenario': "A company wants employees on corporate laptops to be unable to sign in to personal or other organizations' Microsoft tenants, and "
+              'wants this enforced even when they are off the corporate network and no proxy exists.',
+  'optionA': 'Universal tenant restrictions through the Global Secure Access client.',
+  'optionB': 'Cross-tenant access settings with outbound access blocked for all organizations.',
+  'better': 'A',
+  'why': 'Outbound cross-tenant access settings control B2B collaboration your users start with other tenants, but they do not stop a user from '
+         'signing in to an unrelated tenant or personal account from a corporate device. Universal tenant restrictions apply the tenant restrictions '
+         'policy wherever the client runs, which covers the off-network case without a proxy.'},
+ {'id': 'cmp-sc300-9003',
+  'cat': 'workloadIdentities',
+  'scenario': 'Executives want contractors on unmanaged devices to open SharePoint Online in the browser but be unable to download, print, or copy '
+              'labeled documents, and want the action logged in real time.',
+  'optionA': 'Application-enforced restrictions, which pass device state to SharePoint Online for a limited experience.',
+  'optionB': 'A Defender for Cloud Apps session policy delivered through Conditional Access app control.',
+  'better': 'B',
+  'why': 'Application-enforced restrictions deliver a coarse full or limited experience that SharePoint Online implements itself, with no per-label '
+         'download blocking, no print or copy control, and no session-level activity policy. Session policies run in the reverse proxy and can block '
+         'download, cut, copy, and print of labeled content and log the activity, which is what the stem needs.'},
+ {'id': 'cmp-sc300-9004',
+  'cat': 'workloadIdentities',
+  'scenario': 'A security team must stop users from reaching a risky consumer file-sharing site that is not integrated with any identity provider, '
+              'and wants it enforced on managed laptops.',
+  'optionA': 'Tag the app Unsanctioned and enforce it through Defender for Endpoint network protection.',
+  'optionB': 'Create an access policy for the app in Conditional Access app control.',
+  'better': 'A',
+  'why': 'Access policies work only for apps onboarded to Conditional Access app control, where the sign-in passes through Microsoft Entra or a '
+         'configured identity provider. A consumer site users reach directly is not in that path. Unsanctioning it and enforcing with Defender for '
+         'Endpoint blocks it at the device network layer.'}])
+
+if 'CHEAT_SHEET' not in globals():
+    CHEAT_SHEET = []
+CHEAT_SHEET.extend([{'heading': 'Global Secure Access at a glance',
+  'points': ['Global Secure Access is Microsoft Entra Internet Access plus Microsoft Entra Private Access (the identity-centric SSE solution), with '
+             'a third Microsoft traffic profile for Microsoft 365 that needs only Entra ID P1 or P2.',
+             'Three traffic forwarding profiles: Microsoft, Private access, Internet access, matched in that order; traffic matching none is not '
+             'forwarded. A Bypass rule in the Microsoft profile also stops the Internet profile from acquiring that traffic.',
+             'The client (Windows, macOS, iOS, Android) acquires traffic with a lightweight filter driver and can coexist with other SSE or VPN '
+             'clients. Remote networks (branches) carry Microsoft and internet traffic only; Private Access needs the client.',
+             'Private Access: Quick Access (broad FQDN, IP, and port set; fast VPN replacement) then per-app access (segmented apps); outbound-only '
+             'private network connectors on Windows Server in connector groups (two or more); Private DNS suffixes for name resolution.',
+             'Conditional Access integration: compliant network check (All Compliant Network locations after enabling signaling), universal '
+             'Conditional Access on the Microsoft and Internet tunnels, and per-application targeting for Private Access apps.',
+             'Also remember source IP restoration (needs Microsoft traffic profile), universal tenant restrictions (TRv2 on the client), web content '
+             'filtering via security profile linked to Conditional Access, and disabling DNS over HTTPS so FQDNs are visible.']},
+ {'heading': 'Defender for Cloud Apps controls',
+  'points': ['Cloud discovery analyzes traffic logs against the cloud app catalog (more than 31,000 apps, more than 90 risk factors, properties '
+             'scored 0 to 10, weights customizable). Snapshot reports are manual uploads; continuous reports come from Defender for Endpoint, log '
+             'collectors, SWG integration, or the API.',
+             'Sanctioned/Unsanctioned is a tag; blocking needs Defender for Endpoint (network protection and cloud protection on), an SWG '
+             'integration, or a block script.',
+             'App connectors use provider APIs for after-the-fact visibility and governance of connected apps; Conditional Access app control is the '
+             'real-time reverse proxy for browser sessions and needs a Conditional Access policy to route the session.',
+             'Access policies allow or block; session policies allow but monitor and limit (block download, require labeling, block malware upload). '
+             'Policies are per app, so Teams policies do not cover SharePoint.',
+             'Application-enforced restrictions is a native Conditional Access session control (Exchange Online and SharePoint Online only) that '
+             'passes device state so the app gives a limited experience.',
+             'OAuth app policies alert on risky consented apps and can ban a permission, which disables the associated enterprise application.']},
+ {'heading': 'Workload identity choices',
+  'points': ['Azure resource calling Entra-protected services: managed identity (system-assigned dies with the resource; user-assigned is shared and '
+             'independent).',
+             'Workload outside Azure (CI/CD, other clouds): app registration or service principal with workload identity federation instead of '
+             'secrets.',
+             'On-premises Windows service: group managed service account (Windows rotates the password; works across a farm); standalone managed '
+             'service account is single-server.',
+             'AI agent: agent identity created from an agent identity blueprint (blueprint holds credentials and shared policy, sponsor records '
+             "accountability, tokens only in the home tenant); the optional agent's user account only when the agent must act as a user."]},
+ {'heading': 'Access revocation and monitoring quick reference',
+  'points': ['Revoke access: disable the account, select Revoke sessions (Revoke-MgUserSignInSession), and for hybrid users disable and reset the '
+             'password twice in AD first. Access tokens last an hour by default unless the app supports continuous access evaluation.',
+             'Entra Kerberos gives passwordless sign-in (FIDO2, Hello for Business cloud Kerberos trust) access to on-premises resources through a '
+             'partial TGT (SID only) exchanged at a domain controller.',
+             'Passkey profiles are group-targeted: device-bound vs. synced, attestation (device-bound only), AAGUID restrictions.',
+             'Custom domains: TXT or MX record to verify, only verifiable in one tenant, initial onmicrosoft.com domain is permanent. Company '
+             'branding needs P1 or P2 and the Organizational Branding Administrator role.',
+             'Device settings: users may join or register, maximum devices (default 50, up to 100), local administrator rules; use the Conditional '
+             'Access Register or join devices action for MFA. None of it affects hybrid joined devices.',
+             'Logs: diagnostic settings (Security Administrator) route SigninLogs, AuditLogs, AADProvisioningLogs and more to Log Analytics, a '
+             'storage account, or an event hub; analyze with KQL or workbooks.']}])
+
+if 'LESSONS' not in globals():
+    LESSONS = []
+LESSONS.extend([{'id': 'global-secure-access',
+  'title': 'Global Secure Access: Internet, Private, and Microsoft Traffic',
+  'summary': 'Microsoft Entra Internet Access, Entra Private Access, traffic forwarding profiles, the client, and Conditional Access integration.',
+  'vocabIds': ['f9001', 'f9002', 'f9003', 'f9004', 'f9005', 'f9006', 'f9007', 'f9008', 'f9009', 'f9010', 'f9011', 'f9012'],
+  'quizIds': ['q9001', 'q9002', 'q9003', 'q9004', 'q9005', 'q9006', 'q9007', 'q9008', 'q9009', 'q9010', 'q9011', 'q9012', 'q9013', 'q9014'],
+  'reading': 'Global Secure Access (GSA) is where Microsoft Entra extends identity-based controls to the network. Microsoft Entra Internet Access '
+             'acts as an identity-aware secure web gateway for internet and SaaS traffic, and Microsoft Entra Private Access replaces a VPN with '
+             "zero-trust access to private apps; together they form Microsoft's Security Service Edge. A third path, the Microsoft traffic profile, "
+             'sends Microsoft 365 traffic (Exchange Online, SharePoint Online and OneDrive, Teams, and Microsoft 365 common endpoints) through the '
+             'service and needs only Entra ID P1 or P2.\n'
+             '\n'
+             'What gets tunneled is decided by traffic forwarding profiles: Microsoft, Private access, and Internet access, evaluated in that order, '
+             'with unmatched traffic left alone. Profiles are assigned to users, groups, devices, and platforms. Traffic arrives from the Global '
+             'Secure Access client (Windows, macOS, iOS, and Android), which uses a lightweight filter driver rather than a VPN tunnel and so can '
+             'coexist with other security clients, or from a remote network such as a branch office for Microsoft and internet traffic. Private '
+             'Access traffic comes only from the client. Setting a rule to Bypass in the Microsoft profile means the Internet profile will not '
+             'acquire that traffic either.\n'
+             '\n'
+             'For Private Access, Quick Access holds the primary set of FQDNs, IP addresses, and ranges you always tunnel, which is the fastest way '
+             'to retire a VPN; per-app access then creates separate applications for finer-grained assignments and Conditional Access. Both are '
+             'enterprise applications backed by private network connectors: lightweight agents on Windows Server that make outbound-only connections '
+             'on ports 80 and 443 and are grouped into connector groups of at least two for availability. Private DNS suffixes added to Quick Access '
+             'let remote users resolve internal names.\n'
+             '\n'
+             'Global Secure Access feeds Conditional Access. After you enable Global Secure Access signaling, the All Compliant Network locations '
+             "named location lets a policy require that requests come through your tenant's service, which defeats replay of stolen tokens from "
+             'elsewhere without maintaining IP lists. Universal Conditional Access can target the Microsoft and Internet tunnels, while Private '
+             'Access apps are targeted individually. Source IP restoration keeps the real client IP visible to Entra ID and logs, universal tenant '
+             'restrictions enforce a tenant restrictions v2 policy on every client device, and Entra Internet Access web content filtering applies '
+             'category, URL, and FQDN policies through a security profile linked to Conditional Access. Administer it with the Global Secure Access '
+             'Administrator role plus Conditional Access Administrator for policy work.',
+  'fundamentalsLabel': 'New to network access controls? See the everyday analogy',
+  'fundamentals': 'Think of an office building with a smart lobby. A VPN is a key to the whole building: once you are in, you can wander. Global '
+                  'Secure Access is a lobby guard who looks at your badge, your device, and where you came from, and walks you only to the room you '
+                  "are allowed in. The traffic forwarding profiles are the guard's sorting rules (company mail, private rooms, public street), the "
+                  'client is the badge reader on your own laptop, and Conditional Access is the building policy the guard checks.',
+  'keyTerms': ['Global Secure Access',
+               'traffic forwarding profile',
+               'Global Secure Access client',
+               'Microsoft traffic profile',
+               'Quick Access',
+               'per-app access',
+               'private network connector',
+               'Private DNS',
+               'web content filtering',
+               'compliant network check',
+               'source IP restoration',
+               'universal tenant restrictions'],
+  'commonTraps': ['Bypassing a destination in the Microsoft traffic profile does not hand it to the Internet access profile; it leaves the device '
+                  'directly and is not secured by the service.',
+                  'Conditional Access cannot target the Private Access tunnel as a whole; target the Quick Access and per-app Private Access '
+                  'enterprise applications individually.',
+                  'The compliant network check is not an IP list and is specific to the tenant that configures it; disabling signaling while '
+                  'policies depend on it can lock users out.',
+                  'Private network connectors are outbound-only; do not open inbound ports and do not put a connector on user devices.'],
+  'scenario': 'A distributed company retires its VPN. It deploys the Global Secure Access client, defines Quick Access for the data-center ranges '
+              'with two connectors, and later splits payroll into its own per-app access application guarded by phishing-resistant MFA. It also '
+              'enables the Microsoft traffic profile and a policy that blocks Microsoft 365 unless requests come from the compliant network, '
+              'excluding break-glass accounts.',
+  'onTheJob': 'Admins pair a report-only Conditional Access policy with a pilot group before enforcing a compliant network requirement, because a '
+              'missing client or a disabled signaling toggle otherwise locks users out of everything the policy covers. They also keep the Microsoft '
+              'Intune endpoints bypassed so devices can still reach remediation when blocked by network or compliance checks.'}])
+
+_MSR_LESSON_APPEND = {'workload-identities-apps': {'reading': '\n'
+                                         '\n'
+                                         'Two more families of identities and controls round out this area. For AI agents, Microsoft Entra Agent ID '
+                                         'adds an agent identity (a special service principal with no credentials of its own) created from an agent '
+                                         'identity blueprint that holds the credentials and the shared policy: Conditional Access or permissions set '
+                                         'on the blueprint apply to every agent identity beneath it, and disabling the blueprint stops them all from '
+                                         'authenticating. Owners administer an agent technically, sponsors are accountable for it in business terms, '
+                                         "and an optional agent's user account exists only for agents that must act as a user. Agent identities only "
+                                         'receive tokens in their home tenant. For on-premises services, a group managed service account lets '
+                                         'Windows rotate a long random password across a whole server farm, replacing a shared user account.\n'
+                                         '\n'
+                                         'Microsoft Defender for Cloud Apps governs how people use apps. Cloud discovery compares traffic logs with '
+                                         'the cloud app catalog (scored on more than 90 risk factors, with weights you can customize) using snapshot '
+                                         'reports from uploaded logs or continuous reports fed by Defender for Endpoint, log collectors, secure web '
+                                         'gateways, or the API; apps can then be tagged sanctioned or unsanctioned, with blocking enforced through '
+                                         'Defender for Endpoint network protection. App connectors use SaaS APIs for after-the-fact visibility and '
+                                         'governance, while Conditional Access app control reverse proxies browser sessions so access policies '
+                                         '(allow or block) and session policies (limit download, require labeling, block malware upload) can act in '
+                                         'real time; both need a Conditional Access policy to route the session. Application-enforced restrictions '
+                                         'is the lightweight native alternative for Exchange Online and SharePoint Online, and OAuth app policies '
+                                         'alert on risky consented apps and can ban them. My Apps collections, created under Enterprise apps > App '
+                                         'launchers, group applications for users.',
+                              'keyTerms': ['cloud discovery',
+                                           'cloud app catalog',
+                                           'app connectors',
+                                           'Conditional Access app control',
+                                           'access policy',
+                                           'session policy',
+                                           'application-enforced restrictions',
+                                           'OAuth app policies',
+                                           'agent identity',
+                                           'agent identity blueprint',
+                                           'group managed service account',
+                                           'My Apps collections'],
+                              'vocabIds': ['f9020',
+                                           'f9021',
+                                           'f9022',
+                                           'f9023',
+                                           'f9024',
+                                           'f9025',
+                                           'f9026',
+                                           'f9027',
+                                           'f9028',
+                                           'f9030',
+                                           'f9031',
+                                           'f9032',
+                                           'f9033',
+                                           'f9034',
+                                           'f9035'],
+                              'quizIds': ['q9101',
+                                          'q9102',
+                                          'q9103',
+                                          'q9104',
+                                          'q9105',
+                                          'q9106',
+                                          'q9107',
+                                          'q9108',
+                                          'q9109',
+                                          'q9110',
+                                          'q9111',
+                                          'q9120',
+                                          'q9121',
+                                          'q9122',
+                                          'q9123',
+                                          'q9124',
+                                          'q9125'],
+                              'commonTraps': ['Tagging an app Unsanctioned does not block it; enforcement needs Defender for Endpoint network '
+                                              'protection, a secure web gateway integration, or a block script.',
+                                              'Access policies allow or block access; session policies allow access but limit what happens in it. '
+                                              'Neither covers a related resource app without its own policy.',
+                                              'An agent identity has no credentials of its own; the blueprint holds them, and the agent identity '
+                                              'cannot be issued tokens in another tenant.']},
+ 'entra-user-identities': {'reading': '\n'
+                                      '\n'
+                                      'A few administration details are tested alongside the core objects. Add a custom domain by creating the TXT '
+                                      'or MX record Entra provides and selecting Verify; the initial onmicrosoft.com domain can never be removed, '
+                                      'and a name can be verified in only one tenant, which is why an unmanaged tenant from self-service sign-up can '
+                                      'block verification. Device settings decide who may join or register devices, the maximum number per user (50 '
+                                      'by default, up to 100), and who becomes a local administrator, while hybrid joined devices ignore most of '
+                                      'them. Company branding customizes sign-in pages and needs P1 or P2 plus the Organizational Branding '
+                                      "Administrator role. A user's effective directory permissions are simply the union of all role assignments, "
+                                      'each bounded by its own scope, with no deny assignments, and automation should use Microsoft Graph PowerShell '
+                                      'because the Azure AD and MSOnline modules are deprecated.',
+                           'keyTerms': ['custom domain',
+                                        'device settings',
+                                        'effective permissions',
+                                        'Microsoft Graph PowerShell',
+                                        'company branding'],
+                           'vocabIds': ['f9040', 'f9041', 'f9042', 'f9043', 'f9044'],
+                           'quizIds': ['q9201', 'q9202', 'q9203', 'q9204']},
+ 'authentication-methods-selfservice': {'reading': '\n'
+                                                   '\n'
+                                                   'Two current topics round out authentication. Passkey profiles let you target different passkey '
+                                                   '(FIDO2) rules at different groups: device-bound passkeys keep the key on one device and can be '
+                                                   'attested, while synced passkeys travel through a cloud passkey provider and cannot be attested, '
+                                                   'so a profile that enforces attestation allows only device-bound passkeys. For hybrid users, '
+                                                   "Microsoft Entra Kerberos lets a passwordless sign-in obtain a partial Kerberos TGT (the user's "
+                                                   'SID only) that a domain controller exchanges for a full one, so on-premises resources stay '
+                                                   "reachable. Finally, ending a user's access means disabling the account and revoking sessions, "
+                                                   'remembering that a still-valid access token lives about an hour unless continuous access '
+                                                   'evaluation applies, and that investigating activity means routing logs with a diagnostic setting '
+                                                   'and querying SigninLogs and AuditLogs in Log Analytics.',
+                                        'keyTerms': ['passkey profiles',
+                                                     'synced passkeys',
+                                                     'Microsoft Entra Kerberos',
+                                                     'revoke sessions',
+                                                     'diagnostic settings'],
+                                        'vocabIds': ['f9050', 'f9051', 'f9052', 'f9053'],
+                                        'quizIds': ['q9210', 'q9211', 'q9212', 'q9213', 'q9214', 'q9215']}}
+for _lid, _d in _MSR_LESSON_APPEND.items():
+    _l = _msr_find('LESSONS', _lid)
+    for _f, _v in _d.items():
+        if isinstance(_v, str):
+            _l[_f] = _l.get(_f, '') + _v
+        else:
+            _l.setdefault(_f, []).extend(x for x in _v if x not in _l.get(_f, []))
+
+_MSR_CAT_UPDATE = {'userIdentities': {'marks': 23},
+ 'authAccessMgmt': {'label': 'Implement Authentication and Access Management (incl. Global Secure Access)',
+                    'marks': 28,
+                    'resources_add': [{'label': 'Microsoft Learn: What is Global Secure Access?',
+                                       'url': 'https://learn.microsoft.com/en-us/entra/global-secure-access/overview-what-is-global-secure-access'}]},
+ 'workloadIdentities': {'label': 'Plan and Implement Workload Identities (apps, agents, Defender for Cloud Apps)',
+                        'marks': 24,
+                        'resources_add': [{'label': 'Microsoft Learn: Microsoft Defender for Cloud Apps documentation',
+                                           'url': 'https://learn.microsoft.com/en-us/defender-cloud-apps/'},
+                                          {'label': 'Microsoft Learn: What is Microsoft Entra Agent ID?',
+                                           'url': 'https://learn.microsoft.com/en-us/entra/agent-id/what-is-microsoft-entra-agent-id'}]},
+ 'identityGovernance': {'marks': 25}}
+for _c in CATEGORIES:
+    _u = _MSR_CAT_UPDATE.get(_c['key'], {})
+    for _f, _v in _u.items():
+        if _f == 'resources_add':
+            _c['resources'].extend(r for r in _v if r not in _c['resources'])
+        else:
+            _c[_f] = _v
+
+_msr_fix('LESSONS', 'conditional-access-risk', 'reading', 'which cloud apps, and under which conditions', 'which target resources (formerly called cloud apps), and under which conditions')
+# <<< MSREFRESH-END

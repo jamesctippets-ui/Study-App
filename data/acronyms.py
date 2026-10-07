@@ -893,6 +893,12 @@ ACRONYMS = {
     'FOTA': {'exp': 'Firmware Over-the-Air'},
     'OTA': {'exp': 'Over-the-Air'},
     'RD': {'exp': 'Remote Desktop'},
+    # SC-300 and SC-200 refresh
+    'CSS': {'exp': 'Cascading Style Sheets'},
+    'GQL': {'exp': 'Graph Query Language'},
+    'SWG': {'exp': 'Secure web gateway'},
+    'SecOps': {'exp': 'Security operations'},
+    'TRv2': {'exp': 'Tenant restrictions v2'},
 }
 
 IGNORE = {
@@ -959,4 +965,7 @@ IGNORE = {
 
     # AZ-140 and MD-102 refresh
     'EXPIRED', 'HoloLens', 'LT', 'MACHINE', 'OSes', 'RAND', 'SERIAL', 'TOKEN',
+
+    # SC-300 and SC-200 refresh
+    'PySpark',
 }
