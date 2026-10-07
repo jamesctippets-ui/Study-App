@@ -1002,6 +1002,22 @@ ACRONYMS = {
     'WPS': {'exp': 'Wi-Fi Protected Setup'},
     # CAIQ (merge fix)
     'CAIQ': {'exp': 'Consensus Assessments Initiative Questionnaire'},
+    # SSCP verification
+    'CYOD': {'exp': 'Choose your own device'},
+    'HIDS': {'exp': 'Host-based intrusion detection system'},
+    'HIPS': {'exp': 'Host-based intrusion prevention system'},
+    'IMAPS': {'exp': 'Internet Message Access Protocol over TLS'},
+    'ISACs': {'exp': 'Information Sharing and Analysis Centers'},
+    'KEV': {'exp': 'Known Exploited Vulnerabilities (CISA catalog)'},
+    'LEAP': {'exp': 'Lightweight Extensible Authentication Protocol'},
+    'PEAP': {'exp': 'Protected Extensible Authentication Protocol'},
+    'POP3': {'exp': 'Post Office Protocol version 3'},
+    'POP3S': {'exp': 'Post Office Protocol version 3 over TLS'},
+    'STARTTLS': {'exp': 'Command that upgrades a plain-text mail connection to TLS'},
+    'TLP': {'exp': 'Traffic Light Protocol'},
+    'UTM': {'exp': 'Unified threat management'},
+    # DH (merge fix)
+    'DH': {'exp': 'Diffie-Hellman'},
 }
 
 IGNORE = {
@@ -1083,4 +1099,7 @@ IGNORE = {
 
     # CISSP verification
     'A04', 'A05', 'A06', 'A07', 'A09', 'A10', 'CO2', 'ChaCha20', 'FM', 'TEMPEST',
+
+    # SSCP verification
+    'GnuPG', 'OpenPGP', 'StartTLS',
 }
