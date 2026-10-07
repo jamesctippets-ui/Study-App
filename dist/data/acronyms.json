@@ -2538,5 +2538,32 @@
   },
   "UDF": {
     "exp": "User-defined function"
+  },
+  "ANC": {
+    "exp": "Azure Network Connection"
+  },
+  "CALs": {
+    "exp": "Client Access Licenses"
+  },
+  "COBO": {
+    "exp": "Corporate-Owned, Business Only (Android Enterprise fully managed)"
+  },
+  "COPE": {
+    "exp": "Corporate-Owned, Personally Enabled (Android Enterprise corporate-owned work profile)"
+  },
+  "COSU": {
+    "exp": "Corporate-Owned, Single Use (Android Enterprise dedicated)"
+  },
+  "F3": {
+    "exp": "Microsoft 365 F3 (frontline worker license)"
+  },
+  "FOTA": {
+    "exp": "Firmware Over-the-Air"
+  },
+  "OTA": {
+    "exp": "Over-the-Air"
+  },
+  "RD": {
+    "exp": "Remote Desktop"
   }
 }

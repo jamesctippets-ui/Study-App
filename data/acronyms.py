@@ -883,6 +883,16 @@ ACRONYMS = {
     'SPN': {'exp': 'Service principal name'},
     'SYSVOL': {'exp': 'System Volume (the shared folder on domain controllers that holds Group Policy and logon scripts)'},
     'UDF': {'exp': 'User-defined function'},
+    # AZ-140 and MD-102 refresh
+    'ANC': {'exp': 'Azure Network Connection'},
+    'CALs': {'exp': 'Client Access Licenses'},
+    'COBO': {'exp': 'Corporate-Owned, Business Only (Android Enterprise fully managed)'},
+    'COPE': {'exp': 'Corporate-Owned, Personally Enabled (Android Enterprise corporate-owned work profile)'},
+    'COSU': {'exp': 'Corporate-Owned, Single Use (Android Enterprise dedicated)'},
+    'F3': {'exp': 'Microsoft 365 F3 (frontline worker license)'},
+    'FOTA': {'exp': 'Firmware Over-the-Air'},
+    'OTA': {'exp': 'Over-the-Air'},
+    'RD': {'exp': 'Remote Desktop'},
 }
 
 IGNORE = {
@@ -946,4 +956,7 @@ IGNORE = {
 
     # DP-300 and AZ-802 refresh
     'ALLOW', 'ARCHIVE', 'CHECKDB', 'CHECKSUM', 'COMPRESS', 'ClientId', 'DATA', 'DE', 'DnsName', 'F0', 'F1', 'FS01', 'HOTFIXES', 'LEFT', 'LOSS', 'OSConfig', 'OpenSSH', 'PAGE', 'RANGE', 'READ', 'REPAIR', 'RIGHT', 'ROW', 'SCOPED', 'SERVER', 'ScopeId', 'TABLOCK', 'VMName', 'W32Time', 'WRITE',
+
+    # AZ-140 and MD-102 refresh
+    'EXPIRED', 'HoloLens', 'LT', 'MACHINE', 'OSes', 'RAND', 'SERIAL', 'TOKEN',
 }
