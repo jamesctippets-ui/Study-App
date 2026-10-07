@@ -555,15 +555,17 @@ where one genuinely fits, vocab/quiz call-outs, and common-traps notes):
 - **CCNA and the ISC2 certifications** — seven tracks added together:
   **CCNA** (Cisco 200-301, v1.1: 233 flashcards, 201 questions, 14 lessons and
   45 typed **Cisco IOS** command challenges), **ISC2 CC**, **SSCP**, **CISSP**,
-  **CCSP**, **CGRC** and **CSSLP** (1,161 flashcards and 1,128 questions across the
+  **CCSP**, **CGRC** and **CSSLP** (about 2,170 flashcards and 2,200 questions across the
   seven, each with a guided Path, games, a cheat sheet and an exam-day strategy
   section). Each cert states its **work-experience requirement** (for example CISSP
   5 years, CCSP 5 years, CSSLP 4, CGRC 2, SSCP 1, CC none, CCNA 1 recommended) as a
   chip on the cert lists, the Path header and the Profile plan, and as a full card on
-  the Exam tab with the waivers and the Associate of ISC2 route. The content was
-  written from search results and general knowledge because ISC2's and Cisco's own
-  pages could not be opened from the build environment; check each outline before
-  you book. ISSAP, ISSEP and ISSMP are not covered. Most lessons carry a diagram
+  the Exam tab with the waivers and the Associate of ISC2 route. Each ISC2 track was then
+  audited objective by objective against the official exam outline (CC effective September 1, 2026;
+  CCSP August 1, 2026; SSCP October 1, 2025; CISSP April 2024; CGRC June 2024; CSSLP September 2023),
+  with the missing objectives filled in, facts corrected (for example NIST SP 800-88 Rev. 2,
+  SP 800-61 Rev. 3, OWASP Top 10:2025) and exam formats fixed; the CCNA topic list could not be
+  checked because Cisco's page is gated, so confirm it before you book. ISSAP, ISSEP and ISSMP are not covered. Most lessons carry a diagram
   (CCNA 13, CISSP 14, CCSP 8, CSSLP 7, CC 6, SSCP 6, CGRC 5), each in its own
   `src/js/01a_diagrams_*.jsx` file.
 - **EHR Integration** — *not a certification.* Epic (the dominant hospital EHR

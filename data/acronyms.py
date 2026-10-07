@@ -89,7 +89,7 @@ ACRONYMS = {
     'BCDR': {'exp': 'Business continuity and disaster recovery'},
     'CAU': {'exp': 'Cluster-Aware Updating'},
     'DR': {'exp': 'Disaster recovery'},
-    'FCI': {'exp': 'Failover Cluster Instance'},
+    'FCI': {'exp': ['Failover Cluster Instance', 'Federal contract information']},
     'HA': {'exp': 'High availability'},
     'HADR': {'exp': 'High availability and disaster recovery'},
     'MTBF': {'exp': 'Mean time between failures'},
@@ -369,7 +369,7 @@ ACRONYMS = {
     'DMARC': {'exp': 'Domain-based Message Authentication, Reporting, and Conformance'},
     'DMZ': {'exp': 'Demilitarized zone'},
     'DSPM': {'exp': 'Data Security Posture Management'},
-    'EDM': {'exp': 'Exact Data Match'},
+    'EDM': {'exp': ['Exact Data Match', 'Evaluate, direct and monitor']},
     'FWaaS': {'exp': 'Firewall as a service'},
     'HSM': {'exp': 'Hardware security module'},
     'IDPS': {'exp': 'Intrusion detection and prevention system'},
@@ -490,7 +490,7 @@ ACRONYMS = {
     # Regulation, compliance and healthcare policy
     'BAA': {'exp': 'Business Associate Agreement'},
     'CFR': {'exp': 'Code of Federal Regulations'},
-    'DSS': {'exp': 'Data Security Standard'},
+    'DSS': {'exp': ['Data Security Standard', 'Deliver, service and support']},
     'EFTA': {'exp': 'European Free Trade Association'},
     'EMEA': {'exp': 'Europe, Middle East, and Africa'},
     'EU': {'exp': 'European Union', 'trigger': False},
@@ -1024,6 +1024,17 @@ ACRONYMS = {
     'PLC': {'exp': 'Programmable logic controller'},
     # CC (merge fix)
     'CPRA': {'exp': 'California Privacy Rights Act'},
+    # CGRC verification
+    'APO': {'exp': 'Align, plan and organize'},
+    'BAI': {'exp': 'Build, acquire and implement'},
+    'C3PAO': {'exp': 'CMMC third-party assessment organization'},
+    'CMMC': {'exp': 'Cybersecurity Maturity Model Certification'},
+    'CPA': {'exp': 'Certified public accountant'},
+    'CUI': {'exp': 'Controlled unclassified information'},
+    'MEA': {'exp': 'Monitor, evaluate and assess'},
+    'PIMS': {'exp': 'Privacy information management system'},
+    'SI': {'exp': 'System and information integrity'},
+    'SPRS': {'exp': 'Supplier Performance Risk System'},
 }
 
 IGNORE = {
@@ -1111,4 +1122,7 @@ IGNORE = {
 
     # CC (merge fix)
     'IG1', 'IG3',
+
+    # CGRC verification
+    'Rev5',
 }

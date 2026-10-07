@@ -150,7 +150,10 @@
     "exp": "Disaster recovery"
   },
   "FCI": {
-    "exp": "Failover Cluster Instance"
+    "exp": [
+      "Failover Cluster Instance",
+      "Federal contract information"
+    ]
   },
   "HA": {
     "exp": "High availability"
@@ -996,7 +999,10 @@
     "exp": "Data Security Posture Management"
   },
   "EDM": {
-    "exp": "Exact Data Match"
+    "exp": [
+      "Exact Data Match",
+      "Evaluate, direct and monitor"
+    ]
   },
   "FWaaS": {
     "exp": "Firewall as a service"
@@ -1354,7 +1360,10 @@
     "exp": "Code of Federal Regulations"
   },
   "DSS": {
-    "exp": "Data Security Standard"
+    "exp": [
+      "Data Security Standard",
+      "Deliver, service and support"
+    ]
   },
   "EFTA": {
     "exp": "European Free Trade Association"
@@ -2935,5 +2944,35 @@
   },
   "CPRA": {
     "exp": "California Privacy Rights Act"
+  },
+  "APO": {
+    "exp": "Align, plan and organize"
+  },
+  "BAI": {
+    "exp": "Build, acquire and implement"
+  },
+  "C3PAO": {
+    "exp": "CMMC third-party assessment organization"
+  },
+  "CMMC": {
+    "exp": "Cybersecurity Maturity Model Certification"
+  },
+  "CPA": {
+    "exp": "Certified public accountant"
+  },
+  "CUI": {
+    "exp": "Controlled unclassified information"
+  },
+  "MEA": {
+    "exp": "Monitor, evaluate and assess"
+  },
+  "PIMS": {
+    "exp": "Privacy information management system"
+  },
+  "SI": {
+    "exp": "System and information integrity"
+  },
+  "SPRS": {
+    "exp": "Supplier Performance Risk System"
   }
 }

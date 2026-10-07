@@ -165,7 +165,7 @@ EXAM_CONFIG = {
             {'label': 'ISC2: free Certified in Cybersecurity training and exam (One Million Certified in Cybersecurity)', 'url': 'https://www.isc2.org/1MCC'},
             {'label': 'ISC2: Certified in Cybersecurity Online Self-Paced Training', 'url': 'https://isc2.org/Training/Courses/entry-level-training-course'},
             {'label': 'ISC2: CC exam outline', 'url': 'https://www.isc2.org/Certifications/CC/Certification-Exam-Outline'},
-            {'label': 'ISC2: Code of Ethics and the 2026 Code of Professional Conduct', 'url': 'https://www.isc2.org/about/Code-of-Professional-Conduct'},
+            {'label': 'ISC2: Code of Ethics and the Code of Professional Conduct', 'url': 'https://www.isc2.org/about/Code-of-Professional-Conduct'},
         ],
     },
     'sscp': {
@@ -180,7 +180,7 @@ EXAM_CONFIG = {
             {'label': 'ISC2: SSCP self-study resources (outline, flashcards, practice tests)', 'url': 'https://www.isc2.org/certifications/sscp/sscp-self-study-resources'},
             {'label': 'ISC2: SSCP training options (self-paced, boot camp, instructor-led)', 'url': 'https://www.isc2.org/training/3-ways-to-train/sscp'},
             {'label': 'ISC2: SSCP exam outline', 'url': 'https://www.isc2.org/Certifications/SSCP/Certification-Exam-Outline'},
-            {'label': 'ISC2: Code of Ethics and the 2026 Code of Professional Conduct', 'url': 'https://www.isc2.org/about/Code-of-Professional-Conduct'},
+            {'label': 'ISC2: Code of Ethics and the Code of Professional Conduct', 'url': 'https://www.isc2.org/about/Code-of-Professional-Conduct'},
         ],
     },
     'cissp': {
@@ -194,7 +194,7 @@ EXAM_CONFIG = {
         'resources': [
             {'label': 'ISC2: CISSP self-study resources (outline, flashcards, study hub)', 'url': 'https://www.isc2.org/certifications/cissp/cissp-self-study-resources'},
             {'label': 'ISC2: CISSP exam outline', 'url': 'https://www.isc2.org/Certifications/CISSP/Certification-Exam-Outline'},
-            {'label': 'ISC2: Code of Ethics and the 2026 Code of Professional Conduct', 'url': 'https://www.isc2.org/about/Code-of-Professional-Conduct'},
+            {'label': 'ISC2: Code of Ethics and the Code of Professional Conduct', 'url': 'https://www.isc2.org/about/Code-of-Professional-Conduct'},
         ],
     },
     'ccsp': {
@@ -211,7 +211,7 @@ EXAM_CONFIG = {
             {'label': 'Cloud Security Alliance: Security Guidance for Critical Areas of Focus in Cloud Computing v5', 'url': 'https://cloudsecurityalliance.org/artifacts/security-guidance-v5'},
             {'label': 'Cloud Security Alliance: Cloud Controls Matrix', 'url': 'https://cloudsecurityalliance.org/research/cloud-controls-matrix'},
             {'label': 'Cloud Security Alliance: CCSK certificate', 'url': 'https://cloudsecurityalliance.org/ccsk'},
-            {'label': 'ISC2: Code of Ethics and the 2026 Code of Professional Conduct', 'url': 'https://www.isc2.org/about/Code-of-Professional-Conduct'},
+            {'label': 'ISC2: Code of Ethics and the Code of Professional Conduct', 'url': 'https://www.isc2.org/about/Code-of-Professional-Conduct'},
         ],
     },
     'cgrc': {
@@ -228,7 +228,7 @@ EXAM_CONFIG = {
             {'label': 'ISC2: CGRC exam update FAQ', 'url': 'https://isc2.org/certifications/cgrc/cgrc-exam-update-faq'},
             {'label': 'NIST: SP 800-37 Rev. 2, Risk Management Framework', 'url': 'https://csrc.nist.gov/publications/detail/sp/800-37/rev-2/final'},
             {'label': 'NIST: SP 800-53 Rev. 5, Security and Privacy Controls', 'url': 'https://csrc.nist.gov/pubs/sp/800/53/r5/final'},
-            {'label': 'ISC2: Code of Ethics and the 2026 Code of Professional Conduct', 'url': 'https://www.isc2.org/about/Code-of-Professional-Conduct'},
+            {'label': 'ISC2: Code of Ethics and the Code of Professional Conduct', 'url': 'https://www.isc2.org/about/Code-of-Professional-Conduct'},
         ],
     },
     'csslp': {
@@ -245,7 +245,7 @@ EXAM_CONFIG = {
             {'label': 'NIST: SP 800-218, Secure Software Development Framework', 'url': 'https://csrc.nist.gov/pubs/sp/800/218/final'},
             {'label': 'OWASP: Top 10 (2025)', 'url': 'https://owasp.org/Top10/2025/'},
             {'label': 'OWASP: Software Assurance Maturity Model (SAMM)', 'url': 'https://owaspsamm.org/about/'},
-            {'label': 'ISC2: Code of Ethics and the 2026 Code of Professional Conduct', 'url': 'https://www.isc2.org/about/Code-of-Professional-Conduct'},
+            {'label': 'ISC2: Code of Ethics and the Code of Professional Conduct', 'url': 'https://www.isc2.org/about/Code-of-Professional-Conduct'},
         ],
     },
 }

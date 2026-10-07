@@ -1695,6 +1695,21 @@ trading away for shinier but shallower ones.
   ISC2 published a broader Code of Professional Conduct in February 2026 that builds on
   the Code of Ethics canons; the CC and CISSP cheat sheets mention it. No cross-cert
   bridges exist for these tracks yet, and ISSAP, ISSEP and ISSMP are not covered.
+- [x] **ISC2 tracks verified against the official exam outlines (October 2026).** Once isc2.org and its
+  document host were reachable, the six outlines were downloaded and every numbered objective and
+  sub-bullet audited against each track: CC (outline effective Sept 1, 2026; +130 cards, +146 questions,
+  a new threat-intel/security-testing lesson, 14-section cheat sheet, marks 25/17/20/21/17), SSCP (Oct 1,
+  2025; +164/+220, domain 7 rebuilt), CISSP (Apr 2024; +298/+185, four new lessons), CCSP (Aug 1, 2026;
+  +157/+172), CGRC (Jun 2024; +117/+155, new frameworks-and-regulations lesson), CSSLP (Sep 2023;
+  +144/+201). Totals are now 240/315/534/329/248/272 flashcards and 256/368/408/357/287/330 questions.
+  Corrections: NIST SP 800-88 Rev. 2 (Rev. 1 withdrawn Sept 2025), SP 800-61 Rev. 3 (CSF 2.0 aligned),
+  OWASP Top 10:2025 order, CVSS v4.0 threat metric group, FIPS 140-2 sunset, exam-format and experience
+  statements rewritten to the outline wording, the unverified "February 2026" Code of Professional
+  Conduct date removed. The correct multiple-choice option was the longest in 40-78% of the earlier
+  drafts and is now about 15-30%. No saved ids or category keys changed. Open items: CCNA's topic list
+  (Cisco page gated), ISO/IEC 27001/27002, COBIT, HIPAA/SOX/GLBA details and PCI DSS cadence are from
+  general knowledge because those sources were blocked; ISSAP/ISSEP/ISSMP not covered; no cross-cert
+  bridges for the new tracks yet.
 - [x] **Microsoft tracks refreshed against the current Learn study guides and docs (October 2026).**
   Once the environment allowed `learn.microsoft.com` and the MicrosoftDocs raw files, all 12 Microsoft
   tracks were audited skill by skill against their current study guides (dated May to October 2026).
