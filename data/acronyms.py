@@ -928,6 +928,15 @@ ACRONYMS = {
     'SANS': {'exp': 'SysAdmin, Audit, Network and Security (SANS Institute)'},
     'SSAE': {'exp': 'Statement on Standards for Attestation Engagements'},
     'STIGs': {'exp': 'Security Technical Implementation Guides'},
+    # CSSLP verification
+    'APT': {'exp': 'Advanced persistent threat'},
+    'CAPTCHA': {'exp': 'Completely Automated Public Turing test to tell Computers and Humans Apart'},
+    'CLR': {'exp': 'Common language runtime'},
+    'EULA': {'exp': 'End-user license agreement'},
+    'OKR': {'exp': 'Objectives and key results'},
+    'OSSTMM': {'exp': 'Open Source Security Testing Methodology Manual'},
+    'SEV': {'exp': 'Secure Encrypted Virtualization'},
+    'SLO': {'exp': 'Service level objective'},
 }
 
 IGNORE = {
@@ -1003,4 +1012,7 @@ IGNORE = {
 
     # CCSP verification
     'III', 'NEXT',
+
+    # CSSLP verification
+    'Base64', 'GraphQL', 'HttpOnly', 'SELinux',
 }
