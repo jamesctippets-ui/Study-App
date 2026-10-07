@@ -899,6 +899,16 @@ ACRONYMS = {
     'SWG': {'exp': 'Secure web gateway'},
     'SecOps': {'exp': 'Security operations'},
     'TRv2': {'exp': 'Tenant restrictions v2'},
+    # AZ-104 and AZ-305 refresh
+    'CNG': {'exp': 'Cryptography API: Next Generation'},
+    'DPM': {'exp': 'Data Protection Manager'},
+    'HANA': {'exp': 'High-performance Analytic Appliance'},
+    'HPC': {'exp': 'High-performance computing'},
+    'ITSM': {'exp': 'IT service management'},
+    'JCA': {'exp': 'Java Cryptography Architecture'},
+    'MB': {'exp': 'Megabyte', 'trigger': False},
+    'MQTT': {'exp': 'Message Queuing Telemetry Transport'},
+    'SNI': {'exp': 'Server Name Indication'},
 }
 
 IGNORE = {
@@ -968,4 +978,7 @@ IGNORE = {
 
     # SC-300 and SC-200 refresh
     'PySpark',
+
+    # AZ-104 and AZ-305 refresh
+    'DiskANN', 'FastPath', 'PromQL', 'RG2',
 }

@@ -2580,5 +2580,33 @@
   },
   "TRv2": {
     "exp": "Tenant restrictions v2"
+  },
+  "CNG": {
+    "exp": "Cryptography API: Next Generation"
+  },
+  "DPM": {
+    "exp": "Data Protection Manager"
+  },
+  "HANA": {
+    "exp": "High-performance Analytic Appliance"
+  },
+  "HPC": {
+    "exp": "High-performance computing"
+  },
+  "ITSM": {
+    "exp": "IT service management"
+  },
+  "JCA": {
+    "exp": "Java Cryptography Architecture"
+  },
+  "MB": {
+    "exp": "Megabyte",
+    "trigger": false
+  },
+  "MQTT": {
+    "exp": "Message Queuing Telemetry Transport"
+  },
+  "SNI": {
+    "exp": "Server Name Indication"
   }
 }

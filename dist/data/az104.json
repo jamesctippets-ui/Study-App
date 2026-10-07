@@ -181,7 +181,7 @@
       "cat": "storage",
       "front": "Migration and transfer tools recap",
       "back": "AzCopy, Azure Storage Explorer, and Azure Migrate/Data Box, first introduced at the AZ-900 level, remain the core tools an administrator configures and runs for moving data into storage accounts.",
-      "detail": "AZ-104 expects you to actually configure and troubleshoot these tools, not just recognize their names."
+      "detail": "AZ-104 expects you to actually configure and troubleshoot these tools, not just recognize their names. Azure Storage Mover is Microsoft's managed service for migrating on-premises file shares into Azure Storage, and is the recommended route for large migrations rather than scripting AzCopy."
     },
     {
       "id": "f19",
@@ -244,7 +244,7 @@
       "cat": "compute",
       "front": "Resizing and moving VMs",
       "back": "Resizing a running VM to a size unavailable on its current hardware cluster typically requires deallocating (stopping) the VM first, then resizing.",
-      "detail": "This trips people up because 'stopped' in the portal isn't the same as 'deallocated' \u2014 only deallocated VMs release their hardware allocation."
+      "detail": "This trips people up because 'stopped' in the portal isn't the same as 'deallocated' \u2014 only deallocated VMs release their hardware allocation. A move to another resource group or subscription never changes the region, and a region change is done with Azure Resource Mover or Site Recovery."
     },
     {
       "id": "f28",
@@ -279,7 +279,7 @@
       "cat": "networking",
       "front": "Public vs. internal Load Balancer",
       "back": "A public Load Balancer distributes internet traffic to backend resources. An internal (private) Load Balancer only distributes traffic within a VNet, never from the public internet.",
-      "detail": "An internal Load Balancer is the answer when a scenario needs load balancing purely between internal tiers, like web servers talking to app servers. A NAT Gateway solves the opposite problem \u2014 stable outbound-only internet access, not inbound distribution."
+      "detail": "An internal Load Balancer is the answer when a scenario needs load balancing purely between internal tiers, like web servers talking to app servers. A NAT Gateway solves the opposite problem \u2014 stable outbound-only internet access, not inbound distribution. Basic Load Balancer was retired on September 30, 2025, so current scenarios assume the Standard SKU."
     },
     {
       "id": "f33",
@@ -328,7 +328,7 @@
       "cat": "monitoring",
       "front": "Recovery Services vault and backup policies",
       "back": "A Recovery Services vault stores backup data and manages backup policies, which define how often backups run and how long they're retained.",
-      "detail": "One vault can hold backup policies for multiple resource types, like VMs and file shares."
+      "detail": "One vault can hold backup policies for multiple resource types, like VMs and file shares. Newer data sources such as Azure Disks and Azure Blobs use a Backup vault instead of a Recovery Services vault."
     },
     {
       "id": "f40",
@@ -854,6 +854,300 @@
       "front": "Cross Region Restore (Azure Backup)",
       "back": "A Recovery Services vault setting for vaults using geo-redundant storage that lets you restore backup data in the paired secondary region, either for a recovery drill or when the primary region is unavailable.",
       "detail": "It must be enabled on a GRS vault, and after enabling it can take up to 48 hours for items to appear in the secondary region. Locally redundant vaults cannot use it."
+    },
+    {
+      "id": "f9001",
+      "cat": "identityGov",
+      "front": "Interpreting access: Check access and Role assignments",
+      "back": "On the Access control (IAM) page of a scope, the Role assignments tab lists the assignments that apply there, and the Check access tab shows what a chosen user, group, service principal, or managed identity holds at that scope. Both views include assignments inherited from parent scopes, such as the subscription or a management group, but they do not list assignments made at child scopes. The Deny assignments tab lists any deny assignments.",
+      "detail": "To explain why a person can or cannot act on a resource, read the assignments at the resource and at every parent scope, plus the groups the person belongs to. An assignment on a child scope will not show up when you look at the parent."
+    },
+    {
+      "id": "f9002",
+      "cat": "identityGov",
+      "front": "Managing user and group properties, bulk operations, and group types",
+      "back": "User properties such as job title, department, manager, and usage location are edited on the user's profile, and the Member or Guest user type can be changed. A usage location must be set before a license can be assigned. Bulk create, bulk invite, and bulk delete take a CSV template. Groups are Security or Microsoft 365; membership is Assigned, Dynamic User, or Dynamic Device. Dynamic membership needs Microsoft Entra ID P1.",
+      "detail": "A license assignment that fails for one user in a licensed group is very often a missing usage location. A group that can be assigned to a Microsoft Entra role must be created as role-assignable, and that setting cannot be changed later."
+    },
+    {
+      "id": "f9003",
+      "cat": "identityGov",
+      "front": "Managing Azure subscriptions: rename, move, transfer, and cancel",
+      "back": "A subscription can be renamed, moved to another management group, have its billing ownership transferred, or be moved to a different Microsoft Entra directory. Changing the directory permanently deletes the subscription's Azure role assignments and custom roles, and managed identities have to be re-created in the target directory. Canceling a subscription stops billing and disables it, but you must delete all of its resources before it can be deleted manually.",
+      "detail": "Moving a subscription between management groups keeps role assignments and policy assignments flowing down from the new parent. Moving it between directories does not carry access over."
+    },
+    {
+      "id": "f9004",
+      "cat": "identityGov",
+      "front": "Moving resources between resource groups and subscriptions",
+      "back": "A move changes only the resource group or subscription: the resource's region does not change and its resource ID does. Both the source and target groups are locked for create, delete, and update operations during the move, for up to four hours, but existing resources keep running. Only the parent resource is named in the request, because children move with it. A read-only lock on the source, the target, or the subscription blocks the move, and the subscriptions must be in the same tenant.",
+      "detail": "Not every resource type can be moved. Use the portal's validation step to see whether the selected resources can be moved. Moving to a different region is a separate task done with Azure Resource Mover or Azure Site Recovery."
+    },
+    {
+      "id": "f9005",
+      "cat": "identityGov",
+      "front": "Budgets and cost alerts",
+      "back": "A budget is created at a management group, subscription, or resource group scope with a monthly, quarterly, or annual reset period. Alert conditions can be based on actual cost or forecasted cost, and notify by email or through an action group. A budget never stops spending or affects resources; to act on a breach, connect an action group that starts an Azure Automation runbook, a Logic App, or a Functions app.",
+      "detail": "Cost data typically arrives 8 to 24 hours late, so budget alerts lag real spending. The other cost alerts are credit alerts, department spending quota alerts, and cost anomaly alerts."
+    },
+    {
+      "id": "f9006",
+      "cat": "identityGov",
+      "front": "Azure Policy compliance evaluation, remediation tasks, and exemptions",
+      "back": "Compliance is evaluated when a policy is assigned or updated, when a resource is created or updated in scope, when an exemption changes, and in a standard cycle once every 24 hours. Remediation tasks bring existing resources that are non-compliant with a deployIfNotExists or modify policy into compliance, using the managed identity of the assignment. An exemption, in the waiver or mitigated category, takes a resource or scope out of evaluation for a policy.",
+      "detail": "Deny and audit effects do not change existing resources: those only show as non-compliant. If a remediation task fails with an authorization error, check the roles granted to the assignment's managed identity."
+    },
+    {
+      "id": "f9007",
+      "cat": "storage",
+      "front": "Storage account encryption: Microsoft-managed vs. customer-managed vs. customer-provided keys",
+      "back": "All data in a storage account is encrypted at rest with 256-bit AES and the encryption cannot be turned off. The default key is Microsoft-managed. A customer-managed key lives in Azure Key Vault or Managed HSM and applies to Blob Storage and Azure Files; the customer is then responsible for rotation. A customer-provided key is sent by the client on each Blob Storage request. Encryption scopes apply a different key to a single container or blob.",
+      "detail": "The vault holding a customer-managed key needs soft delete and purge protection, and the key must be RSA or RSA-HSM. The storage account reaches the vault through a managed identity."
+    },
+    {
+      "id": "f9008",
+      "cat": "storage",
+      "front": "Infrastructure encryption (double encryption)",
+      "back": "An optional second layer of 256-bit AES encryption at the storage infrastructure level, with a different algorithm and key from the service-level layer. Data is encrypted twice, which protects against the compromise of one algorithm or key. It always uses Microsoft-managed keys, and the setting has to be chosen when the storage account (or an encryption scope) is created: it cannot be enabled or disabled afterwards.",
+      "detail": "A scenario that asks to add a second layer to an existing account has no in-place answer: create a new account with infrastructure encryption and copy the data over."
+    },
+    {
+      "id": "f9009",
+      "cat": "storage",
+      "front": "Identity-based access to Azure Files over SMB",
+      "back": "Azure Files authenticates over SMB with Kerberos against one identity source per storage account: on-premises Active Directory Domain Services, Microsoft Entra Domain Services, or Microsoft Entra Kerberos. Share-level access is granted with the Storage File Data SMB Share Reader, Contributor, or Elevated Contributor roles, and directory and file access is then controlled with Windows ACLs. NFS shares do not support identity-based authentication.",
+      "detail": "Entra Kerberos suits Entra-joined clients and clients with no line of sight to a domain controller. With on-premises AD DS, identities must be synced to Microsoft Entra ID so share-level permissions can be assigned."
+    },
+    {
+      "id": "f9010",
+      "cat": "storage",
+      "front": "Azure Files share snapshots and soft delete",
+      "back": "A share snapshot is a read-only, point-in-time, incremental copy of a share; each share supports up to 200 snapshots, retained for up to 10 years, and users can restore individual files from them. Soft delete protects against deleting the whole share: it is on by default for new storage accounts, applies to every share in the account, and keeps a deleted share for 7 days by default, configurable from 1 to 365.",
+      "detail": "Snapshots protect against file-level changes. Soft delete protects against share deletion. Neither replaces a backup, and soft delete for blobs does not protect file shares."
+    },
+    {
+      "id": "f9011",
+      "cat": "storage",
+      "front": "Soft delete for containers and blobs",
+      "back": "Blob soft delete keeps deleted or overwritten blobs and snapshots recoverable for a retention period; container soft delete does the same for a deleted container and the blobs in it. Retention can be set from 1 to 365 days. They are configured separately, in the Data protection settings of the storage account, and work alongside blob versioning and snapshots.",
+      "detail": "Soft delete answers 'someone deleted it'. Versioning answers 'someone overwrote it and I need the previous version'."
+    },
+    {
+      "id": "f9012",
+      "cat": "storage",
+      "front": "Azure Storage Explorer",
+      "back": "A free standalone desktop app for Windows, macOS, and Linux for browsing and managing Blob, File, Queue, and Table data, plus managed disks. You connect by signing in to Azure or by attaching a single resource with a connection string, a SAS URL, an account key, or a Microsoft Entra sign-in. After an Azure sign-in it needs both control-plane (Resource Manager) and data-plane permissions.",
+      "detail": "If a user holds only a data role, such as Storage Blob Data Contributor, attach the resource and choose the Microsoft Entra ID option instead of signing in to the subscription."
+    },
+    {
+      "id": "f9013",
+      "cat": "storage",
+      "front": "AzCopy copy and sync",
+      "back": "A command-line tool for moving data to, from, and between storage accounts. azcopy copy transfers data; azcopy sync is one-way, from a chosen source to a destination, and compares names and last-modified times by default (or MD5 hashes with --compare-hash). --delete-destination removes destination files that no longer exist in the source. You authorize with Microsoft Entra ID (azcopy login) or with a SAS token on the URL.",
+      "detail": "Being the Owner of the storage account does not give data access to AzCopy. Under Microsoft Entra ID the identity needs a data role such as Storage Blob Data Contributor. For large-scale migrations Microsoft points to Azure Storage Mover."
+    },
+    {
+      "id": "f9014",
+      "cat": "storage",
+      "front": "Default access tier and per-blob tiers",
+      "back": "A storage account has a default access tier of Hot or Cool, inherited by blobs that do not set their own. Cold and Archive can be set only on individual blobs, either at upload, with a tier change, or through a lifecycle management rule. Tier changes between online tiers are immediate; leaving Archive requires rehydration. Moving a blob out early incurs an early deletion charge for Cool, Cold, and Archive.",
+      "detail": "If a scenario wants everything in the account to land in Archive by default, the answer is a lifecycle rule or per-blob tier, not the account default."
+    },
+    {
+      "id": "f9020",
+      "cat": "compute",
+      "front": "ARM template structure",
+      "back": "An ARM template is JSON with a $schema and contentVersion, then optional parameters, variables, and functions sections, a required resources array, and an outputs section. Each resource declares its type, apiVersion, name, location, and properties, and can use dependsOn and copy loops. A template can deploy to a resource group, a subscription, a management group, or a tenant, chosen by the deployment command and the schema.",
+      "detail": "Interpreting a template means reading parameters for what the deployer supplies, variables for computed values, and resources for what is created. Complete mode, not the template contents, decides whether undeclared resources are removed."
+    },
+    {
+      "id": "f9021",
+      "cat": "compute",
+      "front": "Reading a Bicep file and previewing with what-if",
+      "back": "A Bicep file declares param, var, resource, module, and output items. A resource has a symbolic name, a type with an API version, and properties, and referencing one resource's property from another creates an implicit dependency. A for expression loops over an array or range, and the existing keyword refers to a resource that is already deployed. Deploy with az deployment group create, and preview with the what-if operation, which reports Create, Modify, Delete, NoChange, Ignore, or Deploy for each resource.",
+      "detail": "Run what-if before any deployment in Complete mode: it shows the resources that would be deleted before anything changes."
+    },
+    {
+      "id": "f9022",
+      "cat": "compute",
+      "front": "Exporting a deployment as a template, and ARM-to-Bicep conversion",
+      "back": "Export from a resource group or resource generates a snapshot of the current state, including manual changes, but it is autogenerated, mostly hard-coded, and might need cleaning; export is not guaranteed to succeed and is capped at 200 resources per group. Save from history returns the exact JSON template used for a deployment, with its parameters. az bicep decompile --file main.json converts JSON to Bicep on a best-effort basis, and az bicep build compiles Bicep back to JSON.",
+      "detail": "Choose export from the resource group to capture drift or resources that were not created from a template. Choose history for a clean, parameterized, reusable copy."
+    },
+    {
+      "id": "f9023",
+      "cat": "compute",
+      "front": "Encryption at host",
+      "back": "A VM option that encrypts temporary disks and disk caches at rest, and encrypts data in flow to the Storage service, with the host server doing the work. It supports platform-managed or customer-managed keys, needs no agent in the guest, and cannot be combined with Azure Disk Encryption. Before use, the EncryptionAtHost feature must be registered for the subscription, and an existing VM must be deallocated to enable it.",
+      "detail": "Server-side encryption of managed disks does not cover the temp disk or cache unless encryption at host is on, though some newer VM sizes encrypt them by default."
+    },
+    {
+      "id": "f9024",
+      "cat": "compute",
+      "front": "Moving a VM between resource groups, subscriptions, and regions",
+      "back": "Moving a VM to another resource group or subscription is a Resource Manager move that keeps the VM in its region and changes its resource ID. Moving it to another region is a different job: Azure Resource Mover validates dependencies such as the network, NICs, and disks, then prepares, initiates, and commits the move, and can discard or clean up afterward. Azure Site Recovery replication is another route for region moves.",
+      "detail": "A request to change the region through the Move blade is a trap: the Move blade changes only the container."
+    },
+    {
+      "id": "f9025",
+      "cat": "compute",
+      "front": "Azure Container Apps environments, revisions, and scaling",
+      "back": "Container apps run in a managed environment, which is the secure boundary and can be placed in a virtual network. A revision is an immutable snapshot of an app version, and replicas are its running instances. Scaling is set by minimum and maximum replica counts and by rules: HTTP (concurrent requests), TCP (connections), or custom, such as CPU, memory, or event sources like Service Bus. The default minimum is 0, so an idle app scales to zero and incurs no usage charges.",
+      "detail": "Set the minimum replicas to 1 or more to avoid cold starts. Adding or editing a scale rule creates a new revision."
+    },
+    {
+      "id": "f9026",
+      "cat": "compute",
+      "front": "Azure Container Instances sizing and restart policy",
+      "back": "CPU and memory are requested per container in a container group, and the group is billed by the second. There is no built-in autoscale: more capacity means more container groups. The restart policy is Always by default, OnFailure restarts only after a nonzero exit code, and Never does not restart after a successful exit. Run-to-completion tasks use OnFailure or Never so that the group stops and billing ends.",
+      "detail": "If a scenario needs built-in scale rules, revisions, or scale to zero on events, the answer is Container Apps rather than Container Instances."
+    },
+    {
+      "id": "f9027",
+      "cat": "compute",
+      "front": "Azure Container Registry authentication and tasks",
+      "back": "Access to a registry uses Microsoft Entra identities: az acr login for a person, a service principal for pipelines, or a managed identity with the AcrPull role for services that pull images. The admin user is for testing only and is disabled by default. ACR Tasks builds and patches images in the cloud with az acr build, and can be triggered by source commits, base image updates, or a timer.",
+      "detail": "A base-image-update trigger is the answer when the question asks how to rebuild images automatically when the operating system image is patched."
+    },
+    {
+      "id": "f9028",
+      "cat": "compute",
+      "front": "Mapping a custom domain to App Service",
+      "back": "A subdomain such as www.contoso.com maps with a CNAME record to the app's default hostname. A root domain maps with an A record to the app's IP address. A TXT record named asuid, holding the app's custom domain verification ID, proves ownership and is strongly recommended to prevent subdomain takeover. A certificate must then be bound to the domain to serve HTTPS.",
+      "detail": "A CNAME on a root domain is invalid DNS, so apex mappings use an A record."
+    },
+    {
+      "id": "f9029",
+      "cat": "compute",
+      "front": "App Service TLS and certificates",
+      "back": "Certificates can be created free as an App Service managed certificate, bought as an App Service certificate, imported from Azure Key Vault, or uploaded as a password-protected PFX. The free managed certificate does not support wildcards, is not exportable, and renews automatically. TLS bindings use SNI SSL or IP-based SSL. Apps accept TLS 1.2 by default, HTTPS Only redirects HTTP requests to HTTPS, and certificates require a Basic, Standard, Premium, or Isolated plan.",
+      "detail": "Public certificates uploaded to an app are for calling remote services, not for securing a custom domain."
+    },
+    {
+      "id": "f9030",
+      "cat": "compute",
+      "front": "App Service backup and restore",
+      "back": "Basic, Standard, Premium, and Isolated plans take automatic backups every hour, kept for 30 days, with no setup and no storage account; they cannot be downloaded. Custom backups are configured against a storage account, can run on demand or on a schedule, keep from 0 to 30 days or indefinitely, and can be downloaded. Restore overwrites an app or goes to a new app or a deployment slot.",
+      "detail": "Restoring stops the target app. To limit downtime, restore into a deployment slot and then swap."
+    },
+    {
+      "id": "f9031",
+      "cat": "compute",
+      "front": "App Service networking: inbound and outbound features",
+      "back": "Inbound access is controlled with access restrictions (IP and service-endpoint allow or deny rules) or a private endpoint for private inbound access. Outbound access uses regional virtual network integration, which sends outbound calls through a delegated subnet and needs a Basic or higher plan. Virtual network integration never gives inbound access. App Service Environment places the whole environment inside your virtual network.",
+      "detail": "Private inbound and private outbound are separate requirements: a private endpoint and VNet integration are often used together."
+    },
+    {
+      "id": "f9032",
+      "cat": "compute",
+      "front": "App Service plan tiers and what each unlocks",
+      "back": "Free and Shared run on shared infrastructure. Basic, Standard, and the Premium tiers run on dedicated VMs. Standard and higher add autoscale and deployment slots; Basic scales out only manually and has no slots. Backups, custom TLS, and virtual network integration need Basic or higher. Isolated v2 runs in an App Service Environment with network isolation. Scaling up changes the tier or size, and scaling out adds instances.",
+      "detail": "If a feature is missing in the portal, check the plan tier first and scale up, since every app in the plan shares it."
+    },
+    {
+      "id": "f9040",
+      "cat": "networking",
+      "front": "Public IP addresses: Standard SKU, static, and secure by default",
+      "back": "Basic SKU public IP addresses were retired on September 30, 2025, so new work uses the Standard SKU. A Standard public IPv4 address uses static allocation, can be zone-redundant or zonal, and is secure by default: it is closed to inbound traffic until a network security group allows it. Addresses can be IPv4 or IPv6, and a public IP prefix reserves a contiguous range.",
+      "detail": "A VM with a new Standard public IP that cannot be reached over RDP or SSH usually has no NSG, or no inbound allow rule, on its NIC or subnet."
+    },
+    {
+      "id": "f9041",
+      "cat": "networking",
+      "front": "Default outbound access and private subnets",
+      "back": "Where a VM has no explicit outbound method, Azure has historically given it an implicit default outbound IP address that Microsoft owns and can change. For virtual networks created with API versions released after March 31, 2026, subnets are private by default, so VMs there need an explicit outbound method such as a NAT gateway, a public IP, a load balancer outbound rule, or a route to a firewall. A subnet can be made private with its defaultOutboundAccess setting.",
+      "detail": "Prefer a NAT gateway for outbound traffic: it gives a stable, shared outbound address and avoids relying on the default IP."
+    },
+    {
+      "id": "f9042",
+      "cat": "networking",
+      "front": "Effective security rules and NSG evaluation order",
+      "back": "The effective security rules of a network interface are the aggregate of the NSG on its subnet and the NSG on the NIC itself. For inbound traffic, the subnet NSG is evaluated first and then the NIC NSG; for outbound traffic the NIC NSG is evaluated first and then the subnet NSG. Traffic must be allowed by both. View the result on the NIC's Effective security rules page, or with the NSG diagnostics and IP flow verify tools in Network Watcher.",
+      "detail": "A deny at either layer blocks the traffic, so an allow rule on the NIC cannot rescue a flow that the subnet NSG denies."
+    },
+    {
+      "id": "f9043",
+      "cat": "networking",
+      "front": "Network Watcher troubleshooting tools: which tool answers which question",
+      "back": "IP flow verify checks whether a packet to or from a VM is allowed or denied and names the NSG rule. Next hop reports the next hop type for traffic to a destination. Effective security rules aggregates the NSG rules on a NIC. Connection troubleshoot tests connectivity from a VM to a destination and reports latency and where the path fails. Packet capture records packets on a VM, and VPN troubleshoot diagnoses gateways and connections.",
+      "detail": "These are one-time diagnostics. For continuous measurement of latency and packet loss, the answer is Connection monitor."
+    },
+    {
+      "id": "f9044",
+      "cat": "networking",
+      "front": "Virtual network flow logs and the retirement of NSG flow logs",
+      "back": "NSG flow logs retire on September 30, 2027, and new NSG flow logs can no longer be created. Their replacement, virtual network flow logs, records IP traffic for the workloads in a virtual network, so logging is enabled at the virtual network and not on each NSG. Logs are stored in a storage account and can be analyzed with Traffic Analytics in a Log Analytics workspace.",
+      "detail": "Any scenario that creates a new flow-logging configuration should name virtual network flow logs, not NSG flow logs."
+    },
+    {
+      "id": "f9045",
+      "cat": "networking",
+      "front": "Troubleshooting Azure Load Balancer: probes and metrics",
+      "back": "Standard Load Balancer publishes the Data Path Availability and Health Probe Status metrics to Azure Monitor. A failing health probe is caused by an unhealthy backend, an application that is not listening on the probe port, or an NSG or guest firewall that blocks the probe. The probe source is 168.63.129.16, which the AzureLoadBalancer service tag represents, and a custom deny rule can override the default allow rule for it.",
+      "detail": "If instances show as unhealthy while the application is running, compare the probe port and protocol with what the application listens on, and then check NSG rules for the AzureLoadBalancer tag."
+    },
+    {
+      "id": "f9046",
+      "cat": "networking",
+      "front": "Azure DNS alias records and zone delegation",
+      "back": "An alias record set points an A, AAAA, or CNAME record directly at an Azure resource, such as a public IP address, a Traffic Manager profile, or a Front Door endpoint, and updates automatically when that resource's address changes. Alias A records work at the zone apex, where a CNAME is not allowed. To make Azure DNS authoritative for a domain, delegate it by setting the registrar's NS records to the four name servers assigned to the zone.",
+      "detail": "A private DNS zone link with auto registration creates records for VMs automatically, and a virtual network can be linked to only one zone with auto registration enabled."
+    },
+    {
+      "id": "f9047",
+      "cat": "networking",
+      "front": "Azure Bastion SKUs",
+      "back": "Developer is a free shared-infrastructure SKU for development and test, for one VM at a time and in select regions, with no dedicated subnet. Basic, Standard, and Premium deploy into the virtual network with an AzureBastionSubnet of /26 or larger and a Standard public IP. Standard adds native client support, shareable links, custom ports, IP-based connections, host scaling, and file transfer. Premium adds session recording and private-only deployment.",
+      "detail": "A Basic host always has two instances. Anything about native SSH or RDP clients or scaling means Standard or higher."
+    },
+    {
+      "id": "f9048",
+      "cat": "monitoring",
+      "front": "Connection monitor",
+      "back": "A Network Watcher feature for continuous connectivity monitoring of Azure and hybrid endpoints with TCP, ICMP, and HTTP checks. It measures latency and packet loss, shows the network path and hop performance, supports sources such as VMs and scale sets and Azure Arc-enabled servers, and sends metrics to Azure Monitor and logs to Log Analytics for alerting. Sources need the Network Watcher extension; destinations do not.",
+      "detail": "Connection monitor (classic) is retired. Connection troubleshoot is the one-time test, Connection monitor is the ongoing one."
+    },
+    {
+      "id": "f9049",
+      "cat": "monitoring",
+      "front": "Alert processing rules",
+      "back": "Alert processing rules change fired alerts rather than create them: they can add action groups to alerts, or suppress action groups, for a scope of resources, a resource group, or a subscription, with filters and an optional schedule. Typical uses are suppressing notifications during planned maintenance and attaching a standard action group to many alerts at once, including alerts from sources that have no action group setting, such as Azure Backup. They do not affect Service Health alerts.",
+      "detail": "Suppression stops the notification actions; the alert still fires and is recorded. Disabling the alert rule instead means nothing fires at all."
+    },
+    {
+      "id": "f9050",
+      "cat": "monitoring",
+      "front": "Recovery Services vault vs. Backup vault",
+      "back": "A Recovery Services vault protects Azure VMs, SQL Server and SAP HANA in Azure VMs, Azure Files shares, and on-premises machines through the MARS agent, Azure Backup Server, or System Center DPM. A Backup vault protects newer data sources, including Azure Disks, Azure Blobs, and Azure Database for PostgreSQL servers. A vault stores backups within one region, and both types support Azure RBAC and managed identities.",
+      "detail": "A subscription that protects VMs and also disks and blobs needs both vault types, created in each region that holds the data."
+    },
+    {
+      "id": "f9051",
+      "cat": "monitoring",
+      "front": "Monitoring Azure Backup: alerts, jobs, and reports",
+      "back": "Azure Backup raises built-in alerts through Azure Monitor, so notifications use alert rules, action groups, and alert processing rules; classic Azure Backup alerts were deprecated on March 31, 2026. Backup jobs are tracked in the vault or in Resiliency (the new name of the Business Continuity Center). Backup reports are built on Azure Monitor logs and workbooks, which means a vault's diagnostic settings must send data to a Log Analytics workspace.",
+      "detail": "Long-range trends, usage, and audit questions point to Backup reports. A single failed job points to alerts."
+    },
+    {
+      "id": "f9052",
+      "cat": "monitoring",
+      "front": "Site Recovery failover options and drills",
+      "back": "When you fail over, you choose a recovery point: Latest processed gives the lowest recovery time because it uses the latest point already processed, Latest processes all data received for the lowest data loss, Latest app-consistent uses the newest application-consistent point, and Custom picks a specific point for a single VM. After a failover you reprotect the VMs to replicate back to the original region. Run a test failover at least every 180 days.",
+      "detail": "A test failover goes to an isolated network and leaves production untouched. Keep recovery plans in order so that multi-tier apps start in the right sequence."
+    },
+    {
+      "id": "f9053",
+      "cat": "monitoring",
+      "front": "Azure Monitor Insights for storage and networks",
+      "back": "Storage insights gives a unified view of capacity, availability, transactions, and latency across Blob, File, Table, and Queue services, for one account or across many from Azure Monitor. Network Insights shows topology, health and metrics for network resources without configuration, and links to Connection monitor, flow logs, Traffic Analytics, and the Network Watcher diagnostic tools. Both are curated experiences on top of Azure Monitor data.",
+      "detail": "Insights are the prebuilt dashboards; the underlying data still comes from metrics, resource logs, and diagnostic settings."
+    },
+    {
+      "id": "f9054",
+      "cat": "monitoring",
+      "front": "Interpreting metrics: aggregation, dimensions, and retention",
+      "back": "Metrics explorer charts platform metrics with an aggregation (average, minimum, maximum, sum, or count), a time granularity, and optional splitting or filtering by dimension, such as instance or API name. Platform metrics are collected automatically and stored for 93 days, while the Activity log is kept for 90 days. Resource logs are not collected until a diagnostic setting routes them to a destination.",
+      "detail": "Choose maximum to catch spikes, average to see sustained load, and sum or count for totals such as transactions."
     }
   ],
   "questions": [
@@ -1237,7 +1531,7 @@
         "A Standard public load balancer with an outbound rule for the spoke subnets"
       ],
       "correct": 0,
-      "explanation": "An HA ports rule (port 0, protocol All) on a Standard internal load balancer forwards every port and protocol to the backend pool, which is exactly the pattern for highly available NVAs. The Basic SKU has no HA ports feature, and one rule per port cannot cover every port anyway. Application Gateway only handles HTTP and HTTPS. An outbound rule provides SNAT for egress; it does not distribute inbound flows to the appliances."
+      "explanation": "An HA ports rule (port 0, protocol All) on a Standard internal load balancer forwards every port and protocol to the backend pool, which is exactly the pattern for highly available NVAs. The Basic SKU has no HA ports feature, and one rule per port cannot cover every port anyway. Application Gateway only handles HTTP and HTTPS. An outbound rule provides SNAT for egress; it does not distribute inbound flows to the appliances. The Basic SKU was also retired on September 30, 2025."
     },
     {
       "id": "q28",
@@ -1307,7 +1601,7 @@
         "An Application Gateway v2 with a private frontend IP address"
       ],
       "correct": 0,
-      "explanation": "Only the Standard SKU supports availability zones, and a zone-redundant frontend is served from every zone so the single private IP survives a zone outage. The Basic SKU is the near-miss: it is internal and private, but it has no zone awareness and goes down with its zone. A public load balancer wrapped in an NSG still has an internet-facing IP. Application Gateway proxies HTTP and HTTPS only, so the UDP port rules it out."
+      "explanation": "Only the Standard SKU supports availability zones, and a zone-redundant frontend is served from every zone so the single private IP survives a zone outage. The Basic SKU is the near-miss: it is internal and private, but it has no zone awareness and goes down with its zone. A public load balancer wrapped in an NSG still has an internet-facing IP. Application Gateway proxies HTTP and HTTPS only, so the UDP port rules it out. The Basic SKU was also retired on September 30, 2025."
     },
     {
       "id": "q33",
@@ -1592,9 +1886,9 @@
       "id": "tf14",
       "cat": "networking",
       "type": "tf",
-      "question": "NSG flow logs, viewed through Traffic Analytics, can show which allowed and denied flows are hitting a network interface without manually correlating raw log files.",
+      "question": "Virtual network flow logs, viewed through Traffic Analytics, can show which allowed and denied flows are hitting resources in a virtual network without manually correlating raw log files. They replace NSG flow logs, which retire on September 30, 2027.",
       "answer": true,
-      "explanation": "Network Watcher's NSG flow logs record allowed and denied traffic per rule, and Traffic Analytics processes those logs in a Log Analytics workspace into visual, queryable insights instead of raw JSON."
+      "explanation": "Network Watcher flow logs record IP traffic, and Traffic Analytics processes them in a Log Analytics workspace into visual, queryable insights instead of raw JSON. NSG flow logs retire on September 30, 2027 and can no longer be created, so virtual network flow logs, enabled at the virtual network, are the current feature."
     },
     {
       "id": "tf15",
@@ -2218,6 +2512,860 @@
         1
       ],
       "explanation": "where narrows the rows to TimeGenerated > ago(24h) and ResultType != 0, and summarize count() by UserPrincipalName produces the per-user totals, which is the complete query. join and union both combine rows from more than one table or query, and only SigninLogs is involved here, so adding either would be unnecessary work at best."
+    },
+    {
+      "id": "q9001",
+      "cat": "identityGov",
+      "type": "mc",
+      "question": "On resource group RG1 you open Access control (IAM) and run Check access for User1. User1 holds Reader on the subscription that contains RG1, Contributor directly on RG1, and Owner on VM1, which is a resource inside RG1. Which assignments does Check access list for User1 at the RG1 scope?",
+      "options": [
+        "Owner on VM1 only, because Check access reports the single most privileged assignment held anywhere below the scope",
+        "Reader, Contributor, and Owner, because Check access always includes assignments made on child scopes below the one you opened",
+        "Contributor on RG1 only, because assignments inherited from the subscription are listed only on the subscription's own page",
+        "Reader inherited from the subscription, and Contributor on RG1"
+      ],
+      "correct": 3,
+      "explanation": "Check access shows the assignments made at the scope and those inherited to it from parents such as the subscription. An assignment made on VM1 is at a child scope, so it is not listed when you look at RG1; open VM1's own IAM page to see it. Inherited assignments are included, which rules out Contributor alone, and the view lists assignments rather than picking the highest-privilege one.",
+      "whyTested": "Interpreting access assignments is an explicit skill: you must know which direction inheritance flows and which scope a view covers."
+    },
+    {
+      "id": "q9002",
+      "cat": "identityGov",
+      "type": "mc",
+      "question": "Your team has a monthly $5,000 budget on subscription Sub1. When actual cost reaches 100 percent, a Logic App must run that deallocates all VMs tagged Environment=Dev. Which configuration meets the requirement?",
+      "options": [
+        "An Azure Policy assignment with the Deny effect that blocks VM start operations once spend exceeds $5,000",
+        "A budget on Sub1 with a 100 percent actual-cost alert that calls an action group running the Logic App",
+        "An Azure Advisor cost recommendation configured to run the Logic App when spending passes the threshold",
+        "A budget on Sub1 configured with the option to automatically stop and deallocate resources once the amount is reached"
+      ],
+      "correct": 1,
+      "explanation": "Budget alerts can call an action group, and an action group can start a Logic App, Automation runbook, or Function, so that is the supported way to react to a breach. A budget by itself only notifies; it has no setting that stops resources. Advisor produces recommendations and does not run actions on cost thresholds. Azure Policy evaluates resource properties and has no visibility of spending."
+    },
+    {
+      "id": "q9003",
+      "cat": "identityGov",
+      "type": "mc",
+      "question": "You move VM1, along with its NIC and managed disk, from resource group rg-dev in West Europe to resource group rg-prod, which was created in North Europe. Both are in the same subscription. Which statement describes the result?",
+      "options": [
+        "The VM stays in West Europe and its resource ID now references rg-prod",
+        "The VM is migrated to North Europe and keeps its original resource ID",
+        "The VM is stopped and redeployed in North Europe, and gets a new resource ID",
+        "The VM keeps its resource ID because only tags and locks are updated"
+      ],
+      "correct": 0,
+      "explanation": "Moving a resource changes only its resource group or subscription. The location of the resource does not change, even if the destination group's own location differs, and the resource ID changes because it contains the resource group name. The VM remains operational during the move. Changing the region is a different operation, performed with Azure Resource Mover or Site Recovery.",
+      "whyTested": "Scenario questions on moving resources test whether you separate the management container from the physical region."
+    },
+    {
+      "id": "q9004",
+      "cat": "identityGov",
+      "type": "mc",
+      "question": "Contoso is changing the Microsoft Entra directory that Sub1 trusts, from the old tenant to a new tenant. After the transfer, an application that runs on a VM in Sub1 with a system-assigned managed identity cannot read secrets, and administrators find that nobody has any Azure role on the subscription. What should you do?",
+      "options": [
+        "Restore the role assignments by running a reprocess on the subscription in the old directory",
+        "Wait for role assignments to replicate from the old directory, which takes up to 24 hours",
+        "Re-create the role assignments, custom roles, and managed identities in the target directory",
+        "Assign the Global Administrator role in the new tenant, which restores all Azure role assignments"
+      ],
+      "correct": 2,
+      "explanation": "When a subscription moves to a different directory, Azure role assignments and custom roles are permanently deleted rather than carried over, and managed identities must be re-created and re-authorized. Nothing replicates later, and the old directory no longer holds the subscription. Global Administrator is a Microsoft Entra role, and it does not recreate Azure RBAC assignments; elevating access is only a way to regain control to make new ones."
+    },
+    {
+      "id": "q9005",
+      "cat": "identityGov",
+      "type": "ms",
+      "question": "A policy definition with the deployIfNotExists effect that enables diagnostic settings was assigned to a subscription last year. Forty existing storage accounts are reported non-compliant. Which two statements about fixing them are true? (Choose two.)",
+      "options": [
+        "A remediation task can deploy the required settings to the existing non-compliant resources",
+        "The remediation task uses the managed identity of the policy assignment, which needs sufficient roles on the resources",
+        "The standard evaluation cycle remediates existing resources automatically within 24 hours",
+        "Changing the effect to Deny remediates existing resources without a task"
+      ],
+      "correct": [
+        0,
+        1
+      ],
+      "explanation": "Remediation tasks are how deployIfNotExists and modify policies reach resources that existed before the policy, and the task deploys with the assignment's managed identity, so the identity must hold roles that allow the deployment. The evaluation cycle only recalculates compliance; it does not change existing resources. Deny blocks new or updated resources that violate a rule and never alters existing ones.",
+      "whyTested": "Remediation tasks and their managed-identity permissions are the usual cause of 'the policy is assigned but nothing happened' scenarios."
+    },
+    {
+      "id": "q9006",
+      "cat": "identityGov",
+      "type": "mc",
+      "question": "A group with dynamic user membership assigns Microsoft 365 licenses. A newly created user is a member of the group, but the license shows an error and the user cannot be licensed. The tenant has enough licenses. What is the most likely cause?",
+      "options": [
+        "The dynamic rule has not been re-evaluated for 24 hours",
+        "The user type is Guest, which blocks all licensing",
+        "The group is a Microsoft 365 group rather than a security group",
+        "The user has no usage location set"
+      ],
+      "correct": 3,
+      "explanation": "A license cannot be assigned to a user until a usage location is set, because some services are not available in every country or region. Group-based licensing can use security groups and Microsoft 365 groups, so the group type is not the cause. Guest accounts can be licensed when the product allows it, and the question states that the user is already in the group, so the rule has evaluated."
+    },
+    {
+      "id": "q9007",
+      "cat": "identityGov",
+      "type": "mc",
+      "question": "An engineer tries to move VM1 from RG1 to RG2 in the same subscription and the operation fails with an error saying the scope is locked. The VM is running and healthy. Which of the following should you check first?",
+      "options": [
+        "Whether the VM size supports accelerated networking on its network interface",
+        "Whether a read-only lock exists on RG1, RG2, or the subscription",
+        "Whether the VM's network security group has an inbound rule allowing port 3389",
+        "Whether the VM's operating system disk uses a Premium SSD rather than a Standard SSD"
+      ],
+      "correct": 1,
+      "explanation": "A move cannot proceed when a read-only lock exists on the source resource group, the target resource group, or the subscription, because the move writes to those scopes. Running VMs can be moved without being stopped, and NSG rules, disk SKU, and VM size features have no bearing on a scope-locked error."
+    },
+    {
+      "id": "q9008",
+      "cat": "identityGov",
+      "type": "tf",
+      "question": "A budget with an alert at 100 percent of actual cost deallocates virtual machines automatically when the amount is reached.",
+      "answer": false,
+      "explanation": "Budgets only generate notifications. To take an action such as deallocating VMs, you attach an action group that triggers automation, such as an Azure Automation runbook or a Logic App. Resources are not affected and spending is not stopped by the budget itself."
+    },
+    {
+      "id": "q9009",
+      "cat": "identityGov",
+      "type": "tf",
+      "question": "Assigning a policy with the Deny effect to a subscription removes existing resources that violate the rule.",
+      "answer": false,
+      "explanation": "Deny blocks new and updated resource requests that violate the rule. Resources that already exist are not deleted or changed; they are reported as non-compliant. Bringing them into compliance needs a remediation task for a deployIfNotExists or modify policy, or manual correction."
+    },
+    {
+      "id": "q9010",
+      "cat": "storage",
+      "type": "mc",
+      "question": "Regulations require that data in storage account st1 is encrypted with a key that your security team controls and rotates, and that the key is held in Azure Key Vault. The account is a general-purpose v2 account that stores blobs and Azure files. Which configuration meets the requirement with the least effort?",
+      "options": [
+        "Turn on Azure Disk Encryption for the storage account from the Encryption blade in the portal",
+        "Enable infrastructure encryption on st1 so that a second layer is applied with a separate key",
+        "Have the client application provide its own encryption key on each Blob Storage request",
+        "Enable customer-managed keys using a key in a vault with soft delete and purge protection"
+      ],
+      "correct": 3,
+      "explanation": "Customer-managed keys are stored in Azure Key Vault or Managed HSM, rotated by the customer, and apply to Blob Storage and Azure Files. The vault must have soft delete and purge protection. Infrastructure encryption adds a second layer but uses Microsoft-managed keys. Customer-provided keys are sent per request and cover only Blob Storage, not files, and they are not held in Key Vault. Azure Disk Encryption is a feature for VM disks, not storage accounts.",
+      "whyTested": "Encryption options questions hinge on who holds the key, which services are covered, and whether the choice can be changed later."
+    },
+    {
+      "id": "q9011",
+      "cat": "storage",
+      "type": "mc",
+      "question": "A storage account was created last month without infrastructure encryption. A new compliance rule demands double encryption for the data it stores. What must you do?",
+      "options": [
+        "Enable customer-managed keys, which switches on infrastructure encryption as a second layer automatically",
+        "Create a new account with infrastructure encryption enabled and copy the data into it",
+        "Enable blob versioning, which applies a second encryption layer to every previous version of a blob",
+        "Enable infrastructure encryption on the existing account from the Encryption blade in the portal"
+      ],
+      "correct": 1,
+      "explanation": "Infrastructure encryption has to be configured when the storage account is created and cannot be enabled afterward, so the data must move to a new account. Customer-managed keys change who controls the service-level key; they do not add a layer. Versioning is a data-protection feature unrelated to encryption layers."
+    },
+    {
+      "id": "q9012",
+      "cat": "storage",
+      "type": "mc",
+      "question": "Several applications store customer files in one storage account, and the security team wants Customer A's blobs encrypted with a different key from Customer B's blobs, so that Customer A's key can be disabled independently. All files stay in the same account. Which feature should you use?",
+      "options": [
+        "Immutable storage with a legal hold",
+        "Infrastructure encryption",
+        "Stored access policies",
+        "Encryption scopes"
+      ],
+      "correct": 3,
+      "explanation": "An encryption scope applies a separate key, Microsoft-managed or customer-managed, to a container or an individual blob, creating a cryptographic boundary between the customers inside one account. Infrastructure encryption is account-wide and always uses Microsoft-managed keys. Stored access policies control SAS parameters, and legal holds block deletion and changes; neither separates keys."
+    },
+    {
+      "id": "q9013",
+      "cat": "storage",
+      "type": "mc",
+      "question": "Cloud-only users on Microsoft Entra-joined Windows 11 devices must open an Azure Files SMB share with their Entra credentials. The devices cannot reach any domain controller and the company has no Active Directory. Which identity source should you enable on the storage account?",
+      "options": [
+        "A shared access signature on the file share",
+        "Shared key authentication through the storage account key",
+        "Microsoft Entra Kerberos",
+        "On-premises Active Directory Domain Services"
+      ],
+      "correct": 2,
+      "explanation": "Microsoft Entra Kerberos lets Entra ID issue Kerberos tickets for cloud-only or hybrid identities, with no need for connectivity to a domain controller. AD DS authentication requires an on-premises domain and clients that can reach its controllers. Account keys and SAS tokens are not identity-based, and they give broad or token-based access instead of per-user permissions.",
+      "whyTested": "The three Azure Files identity sources are distinguished by what the clients and the directory look like."
+    },
+    {
+      "id": "q9014",
+      "cat": "storage",
+      "type": "mc",
+      "question": "Users of an Azure Files share report that a folder was deleted this morning. The share has daily share snapshots enabled. What is the fastest way to bring the folder back with the least effect on other files?",
+      "options": [
+        "Open the latest snapshot taken before the deletion and restore the folder from it",
+        "Fail over the storage account to its secondary region and copy the folder back from there",
+        "Restore the whole storage account from a recovery point held in a Recovery Services vault",
+        "Undelete the file share from the list of soft-deleted shares in the storage account"
+      ],
+      "correct": 0,
+      "explanation": "Share snapshots are point-in-time copies from which a folder or single file can be restored, so only the deleted content is affected. Soft delete applies when the whole file share is deleted, not a folder inside it. Account failover and a vault restore are heavy tools; the storage account has not failed, and nothing in the question says it is backed up to a vault."
+    },
+    {
+      "id": "q9015",
+      "cat": "storage",
+      "type": "ms",
+      "question": "Which two statements about Azure Files soft delete and share snapshots are correct? (Choose two.)",
+      "options": [
+        "A share can hold up to 200 snapshots",
+        "Share snapshots are full independent copies that are billed for the whole size of the share each time",
+        "Soft delete is enabled at the storage account level and covers every share in the account",
+        "Soft delete restores a single file that was deleted from within a share"
+      ],
+      "correct": [
+        0,
+        2
+      ],
+      "explanation": "Soft delete settings apply per storage account to all shares, and a share supports up to 200 snapshots. Soft delete only protects a deleted share, not individual files inside it; snapshots are for that. Snapshots are incremental, so only changes since the previous snapshot are stored and billed."
+    },
+    {
+      "id": "q9016",
+      "cat": "storage",
+      "type": "mc",
+      "question": "An administrator holds the Storage Blob Data Contributor role on container c1 only, with no other role on the subscription or storage account. When she signs in to Azure from Storage Explorer, she cannot see the account's containers. What should she do?",
+      "options": [
+        "Ask for the Owner role on the storage account so that the data role takes effect in the explorer",
+        "Attach the container as a single resource and use the Microsoft Entra ID sign-in option",
+        "Switch to the storage account key for all future access from her desktop machine",
+        "Turn off the storage firewall so that the containers become visible to Storage Explorer"
+      ],
+      "correct": 1,
+      "explanation": "After an Azure sign-in, Storage Explorer needs both management-plane and data-plane permissions to enumerate accounts. A person with only a data role can attach to the specific resource using Microsoft Entra ID instead. Owner on the account would grant management access but is far broader than needed. Turning off the firewall and using the account key remove protections and ignore least privilege."
+    },
+    {
+      "id": "q9017",
+      "cat": "storage",
+      "type": "mc",
+      "question": "You are the Owner of storage account st1 and run azcopy login to copy files into a container. The command fails with an authorization error, although you can see the container in the portal. What is the cause?",
+      "options": [
+        "AzCopy authenticates only with an account key and cannot use Microsoft Entra ID at all",
+        "AzCopy copies only to file shares and does not support blob containers as a destination",
+        "The Owner role must be assigned at the subscription scope before AzCopy can use it",
+        "Owner does not grant data access; you need a data role such as Storage Blob Data Contributor"
+      ],
+      "correct": 3,
+      "explanation": "Control-plane roles such as Owner do not automatically grant data-plane access. With Microsoft Entra authorization, AzCopy needs an identity with a data role like Storage Blob Data Contributor or Storage Blob Data Owner. Alternatively use a SAS token. AzCopy supports Microsoft Entra sign-in, and it works with both blobs and files."
+    },
+    {
+      "id": "q9018",
+      "cat": "storage",
+      "type": "mc",
+      "question": "You must keep an on-premises folder and a blob container synchronized, so that the container always reflects the folder, including files removed locally. Nothing in the container should ever flow back to the folder. Which command fits?",
+      "options": [
+        "azcopy copy with --recursive, using the container as the source and the local folder as the destination",
+        "azcopy sync from the folder to the container with --delete-destination=true",
+        "azcopy login with the --tenant-id switch, which mirrors the folder into the container",
+        "azcopy sync with the container as the source and --delete-destination=true set on the command"
+      ],
+      "correct": 1,
+      "explanation": "azcopy sync is one-way from the source to the destination, and --delete-destination removes destination files that no longer exist in the source, which gives an exact mirror of the folder. azcopy copy only copies and never removes anything at the destination. Reversing the source and destination would overwrite the local folder from the container. azcopy login only authenticates."
+    },
+    {
+      "id": "q9019",
+      "cat": "storage",
+      "type": "tf",
+      "question": "The default access tier of a storage account can be set to Archive so that every new blob is stored in the cheapest tier.",
+      "answer": false,
+      "explanation": "The account-level default access tier can only be Hot or Cool. Cold and Archive are set on individual blobs, either directly or through a lifecycle management rule, and an Archive blob is offline until it is rehydrated."
+    },
+    {
+      "id": "q9020",
+      "cat": "storage",
+      "type": "mc",
+      "question": "A container with 3 million blobs was deleted by mistake yesterday. Blob versioning is enabled and blob soft delete is on, but container soft delete was never configured. Which statement is correct?",
+      "options": [
+        "Blob soft delete recovers the container together with all of the blobs inside it",
+        "It cannot be recovered, because container soft delete is a separate setting that was off",
+        "Blob versioning restores the deleted container automatically from the previous version",
+        "Share snapshots recover the container, because they were enabled on the account"
+      ],
+      "correct": 1,
+      "explanation": "Container soft delete and blob soft delete are configured separately. Blob soft delete protects deleted blobs and snapshots; it does not recover a deleted container, and versions inside a deleted container go with it. Share snapshots are an Azure Files feature and do not apply to blob containers."
+    },
+    {
+      "id": "q9021",
+      "cat": "compute",
+      "type": "mc",
+      "question": "You have an ARM template and must deploy it to resource group RG1 in Complete mode. Before the deployment, the change approver must see exactly which existing resources would be deleted and which would be modified, without changing anything. What should you run?",
+      "options": [
+        "az group export, which lists resources that are not in the template",
+        "az deployment group validate, which lists every resource it would delete",
+        "az bicep build, which compares the template with the live resources",
+        "az deployment group what-if with the template and Complete mode"
+      ],
+      "correct": 3,
+      "explanation": "The what-if operation compares the template with the current state and reports Create, Modify, Delete, and other change types without deploying, and it respects the deployment mode. Validate only checks that the template and parameters are valid and the deployment could start; it does not list changes. Bicep build compiles Bicep to JSON and has no live comparison. Export generates a new template from live resources rather than a diff.",
+      "whyTested": "The exam asks you to deploy and interpret templates, and preview-before-deploy is the safe-change habit."
+    },
+    {
+      "id": "q9022",
+      "cat": "compute",
+      "type": "mc",
+      "question": "Two years ago an engineer deployed a template that created RG-Web. Since then, administrators have changed several settings by hand in the portal. You need a template that reflects the resources exactly as they are today, and you also need to select only some of the resources. What should you do?",
+      "options": [
+        "Run az bicep decompile against the original template file",
+        "Export the template from the resource group, selecting the required resources",
+        "Save the template from the deployment history of the original deployment",
+        "Deploy the original template in Incremental mode to read its current values"
+      ],
+      "correct": 1,
+      "explanation": "Exporting from a resource group or resource produces a snapshot of the current state, includes manual changes, and lets you choose which resources to include. Saving from history returns the exact original template, so later manual changes are missing and you cannot pick a subset. Decompile only converts a template's syntax and has no knowledge of the live environment. A deployment changes the environment instead of reading it."
+    },
+    {
+      "id": "q9023",
+      "cat": "compute",
+      "type": "mc",
+      "question": "A team has a library of ARM JSON templates and wants to adopt Bicep. You need to convert main.json to a Bicep file, accepting that the result may need manual cleanup. Which command should you use?",
+      "options": [
+        "az bicep decompile --file main.json",
+        "az bicep build --file main.json",
+        "az deployment group export --name main",
+        "az bicep upgrade --file main.json"
+      ],
+      "correct": 0,
+      "explanation": "az bicep decompile turns an ARM template into main.bicep, on a best-effort basis that can produce warnings to fix by hand. az bicep build goes the other way, compiling Bicep into JSON. Exporting a deployment retrieves a template and does not convert it, and az bicep upgrade updates the Bicep tooling to the latest version rather than converting any file."
+    },
+    {
+      "id": "q9024",
+      "cat": "compute",
+      "type": "tf",
+      "question": "A template exported from a resource group is guaranteed to deploy unchanged in another subscription, because the export includes every parameter and all dependencies.",
+      "answer": false,
+      "explanation": "Export is not guaranteed to succeed, and the generated template is a snapshot with mostly hard-coded values and often missing parameters, such as some password parameters. It usually needs cleanup before reuse. A template saved from deployment history is the cleaner, parameterized copy."
+    },
+    {
+      "id": "q9025",
+      "cat": "compute",
+      "type": "mc",
+      "question": "A Bicep file contains the following resource declaration: resource st 'Microsoft.Storage/storageAccounts@2023-05-01' = [for i in range(0, 3): { name: 'st${i}${uniqueString(resourceGroup().id)}', location: resourceGroup().location, sku: { name: 'Standard_LRS' }, kind: 'StorageV2' }]. What does a successful deployment of this file to RG1 create?",
+      "options": [
+        "Three storage accounts, with names starting st0, st1, and st2",
+        "No storage accounts, because the loop only defines a variable",
+        "Three storage accounts, with names starting st1, st2, and st3",
+        "One storage account whose name contains a list of three suffixes"
+      ],
+      "correct": 0,
+      "explanation": "range(0, 3) yields 0, 1, and 2, so the for expression creates three resources, and the index is part of each name. Names that start at 1 confuse range with a one-based count. A for expression around a resource declaration deploys one resource per element rather than a single one, and it is a resource loop, not a variable declaration.",
+      "whyTested": "Interpreting a snippet of Bicep or ARM JSON is a typical exam task; read loops, parameters, and dependencies before the properties."
+    },
+    {
+      "id": "q9026",
+      "cat": "compute",
+      "type": "mc",
+      "question": "VM security policy requires that temporary disks and disk caches on new VMs are encrypted at rest and that data flows to storage encrypted, using customer-managed keys. No agent may be installed in the guest operating system. Which solution meets the requirement?",
+      "options": [
+        "Server-side encryption with platform-managed keys, which is on by default",
+        "Azure Disk Encryption with BitLocker for Windows and DM-Crypt for Linux",
+        "Storage account infrastructure encryption on the account holding the disks",
+        "Encryption at host with a disk encryption set that uses customer-managed keys"
+      ],
+      "correct": 3,
+      "explanation": "Encryption at host is performed by the host, covers temp disks and caches, encrypts data flowing to storage, supports customer-managed keys through a disk encryption set, and needs nothing inside the guest. Azure Disk Encryption works inside the guest with BitLocker or DM-Crypt, so it needs a VM extension, and it cannot be combined with encryption at host. Default platform-managed server-side encryption leaves the temp disk and cache uncovered. Infrastructure encryption is a storage account feature, and managed disks are not governed by it."
+    },
+    {
+      "id": "q9027",
+      "cat": "compute",
+      "type": "mc",
+      "question": "You registered the EncryptionAtHost feature for the subscription. VM1 is running and has data on a managed disk. You must turn on encryption at host for VM1. What should you do?",
+      "options": [
+        "Detach all data disks, enable the setting, and then reattach them",
+        "Deallocate VM1, enable encryption at host, and start VM1 again",
+        "Install the Azure Disk Encryption extension first, then enable the setting",
+        "Enable the setting while VM1 is running; it applies at the next hourly sync"
+      ],
+      "correct": 1,
+      "explanation": "Encryption at host is enabled on an existing VM only when the VM is deallocated, then it takes effect when the VM starts again. It is not applied to a running VM, it cannot coexist with Azure Disk Encryption, and the data disks do not need to be detached."
+    },
+    {
+      "id": "q9028",
+      "cat": "compute",
+      "type": "mc",
+      "question": "VM1, its virtual network, NIC, and managed disks are in West Europe. You must move them to North Europe. You want dependencies validated automatically, an option to test the move and discard it, and cleanup of the source after the move. Which service should you use?",
+      "options": [
+        "Azure Backup with a restore to a new VM in the same vault region",
+        "The Move resources option to another resource group",
+        "A resource lock on VM1 followed by a subscription transfer",
+        "Azure Resource Mover"
+      ],
+      "correct": 3,
+      "explanation": "Azure Resource Mover moves VMs and associated resources between regions, resolves dependencies, lets you commit or discard, and can delete the source afterward. Moving to another resource group or subscription changes only the container and leaves the region as it was. A restore into the same vault region does not relocate the workload, and locks and subscription transfers have nothing to do with regions."
+    },
+    {
+      "id": "q9029",
+      "cat": "compute",
+      "type": "mc",
+      "question": "A container app processes web requests. It must scale out when an average of more than 50 concurrent HTTP requests per replica occur, and it must use no compute charges when it receives no traffic for a while. Which configuration meets the requirement?",
+      "options": [
+        "A custom CPU rule set to 50 percent and a minimum of 2 replicas",
+        "A manual replica count of 50 on the container app environment",
+        "An HTTP scale rule with a concurrent request threshold of 50 and a minimum of 0 replicas",
+        "A TCP scale rule set to 50 connections and a minimum of 1 replica"
+      ],
+      "correct": 2,
+      "explanation": "An HTTP scale rule scales on concurrent requests, and a minimum of zero lets the app scale to zero so that no usage charges accrue when idle. A TCP rule counts connections, not requests, and holding one replica always running keeps charges flowing. A CPU rule measures utilization and a minimum of two keeps instances warm all the time. A fixed manual count has no rule and never scales in."
+    },
+    {
+      "id": "q9030",
+      "cat": "compute",
+      "type": "mc",
+      "question": "Users of a container app complain about a long delay on the first request after a quiet night. The app uses an HTTP scale rule and the default replica limits. You must remove the delay while keeping autoscaling. What should you change?",
+      "options": [
+        "Increase the maximum number of replicas to 1,000",
+        "Move the app to Azure Container Instances",
+        "Replace the HTTP rule with a TCP rule",
+        "Set the minimum number of replicas to 1"
+      ],
+      "correct": 3,
+      "explanation": "The default minimum is 0, so the app scales to zero when idle and the first request waits for a replica to start. Setting a minimum of 1 or higher keeps a replica running while the rules continue to add more. A higher maximum only changes the ceiling. A TCP rule scales to zero in the same way, and Container Instances has no autoscaling at all."
+    },
+    {
+      "id": "q9031",
+      "cat": "compute",
+      "type": "mc",
+      "question": "A container runs a data conversion once, then exits with code 0 when finished. If the process fails, it should be retried automatically. You do not want the container group to be started again after a successful run, so that billing stops. Which restart policy should you set for the Azure Container Instances group?",
+      "options": [
+        "Always, with an Automation runbook to stop it",
+        "OnFailure",
+        "Always",
+        "Never, because Never retries failures"
+      ],
+      "correct": 1,
+      "explanation": "OnFailure restarts the containers only if the process ends with a nonzero exit code and lets a successful run stop for good, which ends billing. Always restarts even after a successful exit, which means the group runs forever. Never does not restart after a successful exit, but it is not designed as the retry-on-failure policy the question needs. A runbook to stop an Always group is unnecessary complexity."
+    },
+    {
+      "id": "q9032",
+      "cat": "compute",
+      "type": "mc",
+      "question": "Operations wants the container images in a private Azure Container Registry rebuilt automatically whenever the Microsoft-published base image they use is updated, without a separate build server. Which should you use?",
+      "options": [
+        "A GitHub Actions secret that stores the admin password",
+        "A webhook that deletes old tags nightly",
+        "Geo-replication on a Premium registry",
+        "ACR Tasks with a base image update trigger"
+      ],
+      "correct": 3,
+      "explanation": "ACR Tasks builds images in the cloud and can be triggered by a base image update, a source commit, or a timer, so images are rebuilt and patched automatically. Geo-replication copies registries across regions and does not build anything. Storing the admin password is an authentication choice and not a trigger. Deleting old tags tidies the registry rather than rebuilding images."
+    },
+    {
+      "id": "q9033",
+      "cat": "compute",
+      "type": "mc",
+      "question": "You must map the root domain contoso.com, not a subdomain, to an App Service app and verify domain ownership. Which DNS records should you create?",
+      "options": [
+        "An MX record pointing to the app's default hostname and an NS record delegating the zone",
+        "Two CNAME records, one for contoso.com and one for www.contoso.com, both pointing to the app",
+        "An A record to the app's IP address and a TXT record named asuid with the verification ID",
+        "A CNAME record to the app's default hostname, plus a TXT record named asuid for verification"
+      ],
+      "correct": 2,
+      "explanation": "A root (apex) domain maps with an A record to the app's IP address, and the asuid TXT record carries the custom domain verification ID that proves ownership and prevents subdomain takeover. A CNAME cannot be used at the root of a domain, and MX and NS records have nothing to do with directing web traffic to an app."
+    },
+    {
+      "id": "q9034",
+      "cat": "compute",
+      "type": "mc",
+      "question": "An app at www.contoso.com and its sibling apps need HTTPS for *.contoso.com with a single wildcard certificate that already exists in Azure Key Vault. The apps run in a Standard App Service plan. Which approach should you use?",
+      "options": [
+        "Import the certificate from Key Vault into App Service and create SNI SSL bindings",
+        "Upload the certificate as a public certificate and bind it to the domain",
+        "Scale the plan down to Shared so wildcard certificates are supported",
+        "Create a free App Service managed certificate for the wildcard name"
+      ],
+      "correct": 0,
+      "explanation": "An existing private certificate, including a wildcard, can be imported from Key Vault and bound with SNI SSL. The free managed certificate does not support wildcards. Public certificates are not used to secure custom domains. Certificates require a Basic or higher plan, so the Shared tier would remove support instead of adding it."
+    },
+    {
+      "id": "q9035",
+      "cat": "compute",
+      "type": "mc",
+      "question": "A web app runs in the Shared (D1) pricing tier of an App Service plan. You attempt to add a custom domain TLS binding with a purchased certificate and the option is unavailable. What should you do?",
+      "options": [
+        "Create a deployment slot and bind the certificate there",
+        "Enable HTTPS Only in the app's settings",
+        "Scale the App Service plan up to the Basic tier or higher",
+        "Scale the plan out to two instances"
+      ],
+      "correct": 2,
+      "explanation": "Certificates and TLS bindings need a Basic, Standard, Premium, or Isolated plan, so the plan must be scaled up. Adding instances does not change the tier, slots also depend on higher tiers, and HTTPS Only only redirects traffic and does not provide a certificate."
+    },
+    {
+      "id": "q9036",
+      "cat": "compute",
+      "type": "mc",
+      "question": "Policy requires App Service app backups kept for 90 days that can be downloaded and archived by the security team. The app is in a Standard plan. Which approach meets the requirement?",
+      "options": [
+        "Swap the production slot with a staging slot each week to act as a point-in-time backup",
+        "Configure custom backups to a storage account with long retention and download them",
+        "Rely on automatic backups, which keep 90 days of history when the plan is Standard",
+        "Configure automatic backups in the portal with a 90-day retention period"
+      ],
+      "correct": 1,
+      "explanation": "Custom backups write to a storage account you choose, can be kept from 0 to 30 days or indefinitely, and can be downloaded as blobs. Automatic backups are fixed at 30 days of retention, cannot be configured, and cannot be downloaded. A slot swap exchanges content between slots and is not a backup."
+    },
+    {
+      "id": "q9037",
+      "cat": "compute",
+      "type": "mc",
+      "question": "An engineer restores a backup over the production app during business hours and users see an outage while it runs. For future restores, what should you recommend to minimize downtime?",
+      "options": [
+        "Scale the plan out before restoring so that other instances keep serving users",
+        "Restore only the content, because the configuration restore causes the outage",
+        "Stop the app, restore, then start it, because that is faster",
+        "Restore the backup to a deployment slot, validate it, and swap it into production"
+      ],
+      "correct": 3,
+      "explanation": "App Service stops the target app while a restore is running. Restoring into a staging slot and swapping avoids any downtime for the production slot. Extra instances do not help because the target app is stopped as a whole, and stopping the app manually does not shorten the work."
+    },
+    {
+      "id": "q9038",
+      "cat": "compute",
+      "type": "ms",
+      "question": "An App Service app must call an Azure SQL Managed Instance by its private IP address inside VNet1, and it must be reachable by clients only through the private network. Which two features should you configure? (Choose two.)",
+      "options": [
+        "Regional virtual network integration for outbound calls",
+        "Hybrid connections for traffic to the managed instance",
+        "A private endpoint on the web app for inbound access",
+        "A service tag on the app's public hostname"
+      ],
+      "correct": [
+        0,
+        2
+      ],
+      "explanation": "Virtual network integration provides the outbound path from the app into the VNet, and a private endpoint provides private inbound access, because integration alone never makes an app reachable privately. A service tag is a label used in network rules and does not grant connectivity. Hybrid connections relay traffic to specific endpoints, usually on-premises, and are not needed for a managed instance reachable inside the VNet."
+    },
+    {
+      "id": "q9039",
+      "cat": "compute",
+      "type": "tf",
+      "question": "Enabling regional virtual network integration for an App Service app lets clients in the virtual network reach the app on a private IP address.",
+      "answer": false,
+      "explanation": "Virtual network integration is for outbound calls from the app into the virtual network only. Private inbound access needs a private endpoint, or an App Service Environment for the entire environment."
+    },
+    {
+      "id": "q9040",
+      "cat": "compute",
+      "type": "mc",
+      "question": "An app must accept requests only from the subnet that holds an Application Gateway, and all other callers must be rejected at the App Service front end. Which feature meets the requirement?",
+      "options": [
+        "A deployment slot configured with the public IP address of the Application Gateway",
+        "An access restriction that allows the gateway subnet using a service endpoint",
+        "An NSG on the Application Gateway subnet that denies all outbound traffic to the internet",
+        "Virtual network integration into the Application Gateway subnet for the web app"
+      ],
+      "correct": 1,
+      "explanation": "Access restrictions are inbound allow and deny rules enforced by the App Service front ends, and they can match a subnet through a service endpoint. An NSG on the gateway subnet does not govern what the app accepts, virtual network integration is outbound only, and a slot is a deployment construct rather than a filter."
+    },
+    {
+      "id": "q9041",
+      "cat": "compute",
+      "type": "mc",
+      "question": "A production web app is in a Basic-tier App Service plan. The team wants traffic-driven autoscale rules and a staging slot with swap. What is the minimum change that enables both?",
+      "options": [
+        "Move the app to the Free tier and enable preview features",
+        "Scale out the plan to three instances",
+        "Create a second App Service plan in Basic and use Traffic Manager",
+        "Scale up the plan to the Standard tier"
+      ],
+      "correct": 3,
+      "explanation": "Autoscale and deployment slots begin at the Standard tier, while Basic supports only manual scale-out and has no slots. Adding instances changes the instance count and not the feature set. Free has fewer features than Basic. A second Basic plan with Traffic Manager adds cost and does not provide slots or autoscale."
+    },
+    {
+      "id": "q9042",
+      "cat": "networking",
+      "type": "mc",
+      "question": "You create a Standard SKU public IP address and associate it with the NIC of VM1, which runs Windows. The VM's subnet and NIC have no network security group. An administrator cannot connect over RDP from the internet. What should you do?",
+      "options": [
+        "Add a user-defined route with the next hop type Internet to the subnet",
+        "Create an NSG that allows inbound TCP 3389 and associate it with the NIC or subnet",
+        "Change the public IP address allocation from static to dynamic",
+        "Convert the public IP address to the Basic SKU"
+      ],
+      "correct": 1,
+      "explanation": "Standard SKU public IPs are secure by default, so inbound traffic is blocked until an NSG explicitly allows it; with no NSG, nothing is allowed. Standard addresses are static only, and the Basic SKU was retired on September 30, 2025. A route to the Internet is already the default for outbound and does not open inbound ports."
+    },
+    {
+      "id": "q9043",
+      "cat": "networking",
+      "type": "mc",
+      "question": "Several new subnets are created with the private subnet setting (defaultOutboundAccess disabled). VMs in them must reach the internet to download packages, and the team does not want a public IP on each VM. Which statement is correct, and what should you configure?",
+      "options": [
+        "The VMs have no implicit outbound path, so attach a NAT gateway to the subnets",
+        "Outbound access works once an NSG rule allows outbound traffic to the Internet service tag",
+        "The VMs use the default outbound IP, so no change is required",
+        "Outbound access works only if each VM is given a Basic SKU public IP"
+      ],
+      "correct": 0,
+      "explanation": "In a private subnet, Azure does not provide default outbound access, so VMs need an explicit method, and a NAT gateway shared by the subnet needs no public IP on the VMs. Relying on the default outbound IP is what the private subnet setting removes. The Basic SKU public IP is retired, and an NSG rule filters traffic but does not supply an outbound path."
+    },
+    {
+      "id": "q9044",
+      "cat": "networking",
+      "type": "mc",
+      "question": "VM1 has an NSG on its NIC with an inbound rule allowing TCP 443 from the internet. Clients still cannot connect on 443. The Effective security rules page for the NIC also shows a rule from the subnet's NSG at priority 200 that denies inbound TCP 443 from the internet. Why does the NIC-level allow have no effect?",
+      "options": [
+        "Allow rules in an NSG apply only to outbound traffic",
+        "A NIC NSG is ignored whenever a subnet NSG exists",
+        "Inbound traffic is evaluated by the subnet NSG first, and the deny stops it before the NIC NSG is reached",
+        "The NIC NSG is evaluated first, and its allow is overridden by the higher-priority subnet NSG"
+      ],
+      "correct": 2,
+      "explanation": "For inbound traffic Azure applies the NSG on the subnet first, then the NSG on the NIC, and traffic must pass both. A deny in the subnet NSG ends the flow. The rules of the two NSGs are not merged by priority, a NIC NSG is never ignored, and allow rules apply to inbound traffic as well."
+    },
+    {
+      "id": "q9045",
+      "cat": "networking",
+      "type": "mc",
+      "question": "You need a one-time test from VM1 to a SQL endpoint on TCP 1433 that reports whether the connection works, the latency, and the hop where it fails. You do not need continuous monitoring. Which Network Watcher capability should you use?",
+      "options": [
+        "Connection troubleshoot",
+        "Packet capture",
+        "Connection monitor",
+        "Next hop"
+      ],
+      "correct": 0,
+      "explanation": "Connection troubleshoot runs a one-time connectivity check from a VM to a destination and reports reachability, latency, and the hop that fails. Connection monitor is the continuous, alert-capable service. Packet capture records packets for deeper analysis but does not test the path, and next hop only returns the routing decision for a destination."
+    },
+    {
+      "id": "q9046",
+      "cat": "monitoring",
+      "type": "mc",
+      "question": "You need to measure latency and packet loss every minute between web VMs in Azure and a database server in an on-premises datacenter that has Azure Arc enabled, and to be alerted when latency exceeds 100 ms. Which solution fits?",
+      "options": [
+        "A Service Health alert for the region that hosts the datacenter",
+        "Packet capture running continuously on each of the web VMs",
+        "IP flow verify on each web VM, scheduled with an Automation runbook",
+        "Connection monitor with an alert on its latency metric"
+      ],
+      "correct": 3,
+      "explanation": "Connection monitor provides continuous connectivity monitoring across Azure and hybrid endpoints, supports Arc-enabled servers as sources, measures latency and packet loss, and publishes metrics that can drive alert rules. IP flow verify only evaluates NSG rules for one flow. Packet capture is a short diagnostic recording. Service Health reports Microsoft platform incidents and says nothing about your path latency."
+    },
+    {
+      "id": "q9047",
+      "cat": "networking",
+      "type": "mc",
+      "question": "You must start logging allowed and denied IP traffic for every workload in VNet1 and analyze it with Traffic Analytics. A colleague proposes creating NSG flow logs, but the portal will not allow it. What should you use instead?",
+      "options": [
+        "Azure Advisor network recommendations",
+        "Virtual network flow logs enabled on VNet1",
+        "A packet capture on every VM in the virtual network",
+        "Activity log diagnostic settings on the subscription"
+      ],
+      "correct": 1,
+      "explanation": "NSG flow logs are retiring on September 30, 2027 and can no longer be created, and virtual network flow logs are the replacement, enabled at the virtual network and covering its workloads. The activity log records control-plane operations, not traffic. Packet captures are short, per-VM diagnostics, and Advisor gives recommendations, not traffic logs."
+    },
+    {
+      "id": "q9048",
+      "cat": "networking",
+      "type": "mc",
+      "question": "A Standard internal load balancer has a TCP health probe on port 443. The application on the backend VMs listens on port 8443 only, and the Health Probe Status metric shows 0 percent for all instances although the VMs are running. What should you change?",
+      "options": [
+        "Increase the idle timeout of the load-balancing rule to ten minutes",
+        "Convert the Standard load balancer to the Basic SKU to relax probes",
+        "Add a public IP address to each of the backend VMs for probing",
+        "Change the health probe port to 8443 and align the backend port"
+      ],
+      "correct": 3,
+      "explanation": "A probe fails when nothing listens on the probed port, so the load balancer marks every instance unhealthy and stops sending traffic. Aligning the probe and backend port with the port the application uses fixes it. The Basic SKU is not a fix, backend VMs do not need public IPs for probes, and the idle timeout affects established flows, not health checks."
+    },
+    {
+      "id": "q9049",
+      "cat": "networking",
+      "type": "mc",
+      "question": "After a security review, an administrator adds an NSG rule at priority 4000 that denies all inbound traffic to the backend subnet, except 443 from the internet. Backend VMs for a Standard load balancer are now marked unhealthy even though the application is running and listening. What should you do?",
+      "options": [
+        "Change the load-balancing rule to use floating IP on the backend port",
+        "Disable the health probe so that all backend instances stay in rotation",
+        "Add an inbound allow rule for the AzureLoadBalancer tag below priority 4000",
+        "Delete the default AllowAzureLoadBalancerInBound rule from the NSG so it is recreated"
+      ],
+      "correct": 2,
+      "explanation": "The default rule allowing the AzureLoadBalancer tag has priority 65001, so a custom deny at 4000 is processed first and blocks the probe source 168.63.129.16. An explicit allow with a lower priority number restores probing. Default rules cannot be deleted, floating IP does not affect probes, and disabling probes removes failover protection."
+    },
+    {
+      "id": "q9050",
+      "cat": "networking",
+      "type": "mc",
+      "question": "The root domain contoso.com must resolve to a Standard public IP address, and the address might change if the resource is recreated. A CNAME cannot be used at the zone apex. Which Azure DNS configuration meets the requirement?",
+      "options": [
+        "A CNAME record at the apex that targets the public IP's DNS label",
+        "An A record at the apex holding today's IP address, updated by hand",
+        "An NS record at the apex that points to the public IP address",
+        "An alias A record set at the apex that targets the public IP resource"
+      ],
+      "correct": 3,
+      "explanation": "An alias record set references the Azure resource itself and follows its address changes automatically, and alias A records are allowed at the apex. A CNAME at the apex is not valid DNS, a hand-maintained A record breaks whenever the address changes, and NS records delegate a zone and cannot point to an IP address."
+    },
+    {
+      "id": "q9051",
+      "cat": "networking",
+      "type": "tf",
+      "question": "A virtual network can be linked to several private DNS zones with auto registration enabled, so VMs register their records in all of them.",
+      "answer": false,
+      "explanation": "A virtual network can be linked to only one private DNS zone with auto registration enabled. It can be linked to additional zones with registration disabled, where it can resolve records but does not register VMs automatically."
+    },
+    {
+      "id": "q9052",
+      "cat": "networking",
+      "type": "mc",
+      "question": "A compliance team requires that all RDP and SSH sessions made through Azure Bastion are recorded for later review, and that the host has no public IP address. Which Bastion SKU supports this?",
+      "options": [
+        "Standard",
+        "Developer",
+        "Basic",
+        "Premium"
+      ],
+      "correct": 3,
+      "explanation": "Session recording and private-only deployment are Premium features. Standard adds native client, shareable links, and scaling, but not recording. Basic offers browser access with two instances, and Developer is a free shared offering for one VM at a time."
+    },
+    {
+      "id": "q9053",
+      "cat": "monitoring",
+      "type": "mc",
+      "question": "Maintenance on all VMs in rg-app happens every Sunday from 02:00 to 04:00. Dozens of alert rules cover those VMs, and the on-call team must not be paged during that window, but the alerts should still be recorded. What should you create?",
+      "options": [
+        "A Service Health alert that fires during the maintenance window",
+        "A new, empty action group that replaces the existing groups on every rule",
+        "An alert processing rule on rg-app that suppresses notifications weekly",
+        "A change to each alert rule so that it disables itself on Sunday nights"
+      ],
+      "correct": 2,
+      "explanation": "An alert processing rule can suppress action groups for a scope on a schedule, so alerts still fire and are recorded but notifications are not sent, and one rule covers all alert rules. Disabling rules one by one is slow and means nothing fires or is recorded. Replacing action groups changes every rule's behavior permanently, and a Service Health alert tells you about Azure incidents, not your maintenance."
+    },
+    {
+      "id": "q9054",
+      "cat": "monitoring",
+      "type": "mc",
+      "question": "Azure Backup alerts for all vaults in a subscription must trigger a single action group that opens an incident in the team's ITSM tool. Backup alerts do not offer an action group setting of their own. What should you configure?",
+      "options": [
+        "An alert processing rule that adds the action group in this subscription",
+        "Classic Azure Backup alert email settings configured on each vault",
+        "A new metric alert rule created on each of the Recovery Services vaults",
+        "A budget alert on the subscription that notifies the same action group"
+      ],
+      "correct": 0,
+      "explanation": "Alert processing rules can add an action group to alert types that have no action group setting of their own, such as Azure Backup alerts. A metric alert rule creates different alerts instead of routing the built-in ones, budget alerts track cost, and classic Azure Backup alerts were deprecated on March 31, 2026."
+    },
+    {
+      "id": "q9055",
+      "cat": "monitoring",
+      "type": "tf",
+      "question": "An alert processing rule that suppresses notifications prevents the alert from being created, so the alert does not appear in the alerts list.",
+      "answer": false,
+      "explanation": "Alert processing rules modify alerts as they fire. Suppression removes the action groups, so no notification is sent, but the alert still fires and is recorded and visible in the alerts view. Disabling the alert rule is what prevents alerts from being generated."
+    },
+    {
+      "id": "q9056",
+      "cat": "monitoring",
+      "type": "mc",
+      "question": "Your company must protect Azure VMs, an Azure Files share, several Azure managed disks, and blobs in a storage account using Azure Backup in the same region. How many vault types do you need?",
+      "options": [
+        "A Backup vault for VMs and files, and a Recovery Services vault for disks and blobs",
+        "A Recovery Services vault for VMs and files, and a Backup vault for disks and blobs",
+        "A single Backup vault that holds the backups for all four data sources",
+        "A single Recovery Services vault that holds the backups for all four data sources"
+      ],
+      "correct": 1,
+      "explanation": "Recovery Services vaults hold VMs, Azure Files, and on-premises workloads, while Backup vaults hold newer data sources such as Azure Disks and Azure Blobs, so both types are needed. No single vault type covers all four, and the pairing that puts VMs and files in a Backup vault reverses which vault holds what.",
+      "whyTested": "Choosing the right vault for the data source is a core step in implementing backup."
+    },
+    {
+      "id": "q9057",
+      "cat": "monitoring",
+      "type": "mc",
+      "question": "A backup administrator needs reports that show backup usage trends, job success, and storage consumed across 12 Recovery Services vaults in 3 subscriptions over the last 6 months. What must be configured to get them?",
+      "options": [
+        "A Cost analysis view filtered to the vaults and grouped by resource group",
+        "An Azure Advisor recommendation enabled on each of the vaults with weekly emails",
+        "A resource lock on each vault, combined with an activity log alert on it",
+        "Diagnostic settings sending vault data to a Log Analytics workspace, then Backup reports"
+      ],
+      "correct": 3,
+      "explanation": "Backup reports use Azure Monitor logs and workbooks, so each vault's diagnostic settings must send data to a Log Analytics workspace, which can collect from vaults across subscriptions. Advisor gives recommendations, Cost analysis reports spending rather than job success, and a lock protects the vault but does not collect data."
+    },
+    {
+      "id": "q9058",
+      "cat": "monitoring",
+      "type": "mc",
+      "question": "VMs in the primary region failed over to the secondary region using Azure Site Recovery. The primary region is available again, and you want the VMs in the secondary region to start replicating back to the primary region so you can fail back later. What should you do?",
+      "options": [
+        "Run a failover using the Custom recovery point",
+        "Reprotect the failed-over VMs",
+        "Delete the replicated items and enable replication again from scratch",
+        "Run a test failover on the failed-over VMs"
+      ],
+      "correct": 1,
+      "explanation": "After a failover, reprotecting the VMs makes them replicate from the secondary region back toward the original region, which prepares a failback. A test failover creates a copy in an isolated network and starts nothing in reverse. Deleting items loses the replication relationship, and another failover is the wrong direction."
+    },
+    {
+      "id": "q9059",
+      "cat": "monitoring",
+      "type": "mc",
+      "question": "An application tier is replicated with Azure Site Recovery. During a drill, the business says it can accept no more than a few seconds of data loss, even if recovery takes several minutes longer. Which recovery point should you choose when failing over?",
+      "options": [
+        "Latest",
+        "Latest app-consistent",
+        "Latest processed",
+        "Custom"
+      ],
+      "correct": 0,
+      "explanation": "Latest processes all data already sent to Site Recovery before creating the VM, so it gives the lowest recovery point objective at the price of more time. Latest processed fails over immediately using the newest processed point, giving the lowest recovery time but possibly more data loss. App-consistent points are taken less often, and Custom is a manual choice for one VM."
+    },
+    {
+      "id": "q9060",
+      "cat": "monitoring",
+      "type": "tf",
+      "question": "Azure Site Recovery raises a health issue when no successful test failover has been run for a protected VM in the last 180 days.",
+      "answer": true,
+      "explanation": "Site Recovery expects a successful test failover at least once every 180 days and raises a failover-readiness health issue if none exists or the latest one is older. Regular drills confirm that failover will work before an outage."
+    },
+    {
+      "id": "q9061",
+      "cat": "monitoring",
+      "type": "mc",
+      "question": "You need one view that shows capacity, transactions, availability, and latency across 30 storage accounts in several resource groups, with the ability to drill into a hotspot. Which tool should you use?",
+      "options": [
+        "VM insights in Azure Monitor",
+        "Azure Service Health",
+        "Network Insights in Azure Monitor",
+        "Storage insights in Azure Monitor"
+      ],
+      "correct": 3,
+      "explanation": "Storage insights gives a unified at-scale view of Azure Storage accounts, including capacity, availability, transactions, and latency, with drill-down. Network Insights covers network resources, VM insights covers the performance and dependencies of VMs, and Service Health reports on Azure platform incidents."
+    },
+    {
+      "id": "q9062",
+      "cat": "monitoring",
+      "type": "ms",
+      "question": "Which two statements about retention of Azure Monitor data are correct? (Choose two.)",
+      "options": [
+        "The Activity log is kept for 90 days",
+        "Platform metrics are stored for 93 days with no configuration needed",
+        "Resource logs are collected automatically and kept for 93 days",
+        "Platform metrics are kept for 30 days unless a workspace is attached"
+      ],
+      "correct": [
+        0,
+        1
+      ],
+      "explanation": "Platform metrics are collected automatically and stored for 93 days, and the Activity log is retained for 90 days. Resource logs are not collected until a diagnostic setting sends them to a destination, and metrics do not depend on a workspace for their standard retention."
+    },
+    {
+      "id": "q9063",
+      "cat": "monitoring",
+      "type": "mc",
+      "question": "The following KQL query is run against a Log Analytics workspace: Heartbeat | where TimeGenerated > ago(15m) | summarize count() by Computer. What does it return?",
+      "options": [
+        "Each computer that sent a heartbeat in the last 15 minutes, with its heartbeat count",
+        "A time chart showing heartbeat counts per computer in 15-minute bins",
+        "Every computer that has ever sent a heartbeat, with the total count since onboarding",
+        "Only the computers that missed every heartbeat in the last 15 minutes"
+      ],
+      "correct": 0,
+      "explanation": "where filters the rows to the last 15 minutes, and summarize count() by Computer returns one row per computer with the number of heartbeats in that window. It does not look at older data, it cannot list computers with no rows because they do not appear in the table, and without bin() or render it does not produce time bins or a chart."
     }
   ],
   "lessons": [
@@ -2231,7 +3379,8 @@
         "f1",
         "f2",
         "f3",
-        "f4"
+        "f4",
+        "f9002"
       ],
       "quizIds": [
         "q1",
@@ -2239,9 +3388,10 @@
         "q3",
         "q4",
         "tf1",
-        "tf2"
+        "tf2",
+        "q9006"
       ],
-      "reading": "As an administrator, you'll create and manage the users and groups that make up an organization's identity. Security groups hold manually-managed membership, while dynamic groups automatically add or remove members based on rules matching attributes like department or job title \u2014 useful for keeping large, frequently-changing teams in sync without manual upkeep.\n\nLicensing follows the same logic: rather than assigning a Microsoft 365 license to each person individually, group-based licensing lets you assign it once to a group, and every current and future member picks it up automatically.\n\nFor people outside your organization, like contractors or partners, external B2B users let them sign in with their own existing identity rather than you creating them a new internal account. And for your own users, self-service password reset removes the help desk from the equation entirely for the most common request there is.",
+      "reading": "As an administrator, you'll create and manage the users and groups that make up an organization's identity. Security groups hold manually-managed membership, while dynamic groups automatically add or remove members based on rules matching attributes like department or job title \u2014 useful for keeping large, frequently-changing teams in sync without manual upkeep.\n\nLicensing follows the same logic: rather than assigning a Microsoft 365 license to each person individually, group-based licensing lets you assign it once to a group, and every current and future member picks it up automatically.\n\nFor people outside your organization, like contractors or partners, external B2B users let them sign in with their own existing identity rather than you creating them a new internal account. And for your own users, self-service password reset removes the help desk from the equation entirely for the most common request there is.\n\nUser and group administration is mostly properties and membership rules. A user's profile holds job title, department, manager, and usage location, and the usage location must be set before any license can be assigned. Users can be created, invited, or deleted in bulk with a CSV template. Groups are either Security or Microsoft 365 groups, and membership is Assigned, Dynamic User, or Dynamic Device; dynamic membership needs Microsoft Entra ID P1. A group that will hold Microsoft Entra role assignments must be created as role-assignable, and that cannot be changed later.",
       "fundamentalsLabel": "New to identity administration? See the everyday analogy",
       "fundamentals": "A dynamic group is like an email distribution list that updates itself based on someone's job title, instead of someone manually adding and removing names every time staff changes. Group-based licensing is like a company handing out badges by department rather than issuing one individually to every new hire \u2014 join the department, get the badge automatically.",
       "keyTerms": [
@@ -2249,12 +3399,17 @@
         "dynamic groups",
         "group-based licensing",
         "B2B",
-        "self-service password reset"
+        "self-service password reset",
+        "usage location",
+        "bulk operations",
+        "dynamic membership",
+        "role-assignable group"
       ],
       "commonTraps": [
         "A dynamic group updates its membership automatically \u2014 a security group requires manual changes.",
         "Group-based licensing still requires someone to be a group member; adding the license alone doesn't add them.",
-        "External B2B users authenticate with their own identity \u2014 you don't create them a normal internal account."
+        "External B2B users authenticate with their own identity \u2014 you don't create them a normal internal account.",
+        "A license that fails to assign to a group member is most often a missing usage location, not a group type or tenant problem."
       ],
       "scenario": "A hospital's radiology department grows from 8 to 30 staff over a year. Rather than manually adding each new hire to a group and assigning a license individually, an administrator sets up a dynamic group based on department, with a license attached to that group \u2014 every new radiology hire is automatically added and licensed the moment their account is created, with zero manual steps.",
       "onTheJob": "In a real tenant, dynamic groups and group-based licensing are what save an admin from a Friday afternoon of manually re-provisioning accounts every time a reorg happens, but they also mean a misconfigured rule can silently strip a whole department's license overnight with no one noticing until support tickets pile up. SSPR is usually the single biggest reduction in help-desk ticket volume an admin can point to when justifying their own workload to management, since password resets are consistently the most common ticket type any service desk handles. A dynamic group's membership rule also takes a few minutes to fully evaluate after a bulk attribute change, like an HR import updating hundreds of department fields at once, so an admin who expects instant membership updates right after a mass edit is usually just watching normal processing lag, not a broken rule."
@@ -2269,16 +3424,29 @@
         "f6",
         "f7",
         "f8",
-        "f9"
+        "f9",
+        "f9001",
+        "f9003",
+        "f9004",
+        "f9005",
+        "f9006"
       ],
       "quizIds": [
         "q5",
         "q6",
         "q7",
         "q8",
-        "tf3"
+        "tf3",
+        "q9001",
+        "q9002",
+        "q9003",
+        "q9004",
+        "q9005",
+        "q9007",
+        "q9008",
+        "q9009"
       ],
-      "reading": "As an administrator, RBAC role assignments are additive across scopes \u2014 if someone has Reader at a subscription and Contributor at one resource group within it, they effectively have Contributor there and Reader everywhere else in that subscription. The built-in roles worth knowing well: Owner can manage resources and grant access to others; Contributor can manage resources but cannot grant access; Reader is view-only; and User Access Administrator can manage who has access without touching the resources themselves.\n\nAzure Policy enforces configuration rules, and when several related policies need to be assigned together, like a full tagging standard, they can be bundled into a single initiative rather than assigned one by one.\n\nDay to day, this ties back to cost: budgets with alert thresholds, and Cost Analysis, let you see where spending is actually going, broken down by resource, tag, or service.",
+      "reading": "As an administrator, RBAC role assignments are additive across scopes \u2014 if someone has Reader at a subscription and Contributor at one resource group within it, they effectively have Contributor there and Reader everywhere else in that subscription. The built-in roles worth knowing well: Owner can manage resources and grant access to others; Contributor can manage resources but cannot grant access; Reader is view-only; and User Access Administrator can manage who has access without touching the resources themselves.\n\nAzure Policy enforces configuration rules, and when several related policies need to be assigned together, like a full tagging standard, they can be bundled into a single initiative rather than assigned one by one.\n\nDay to day, this ties back to cost: budgets with alert thresholds, and Cost Analysis, let you see where spending is actually going, broken down by resource, tag, or service.\n\nTo interpret access, open Access control (IAM) at the scope in question: the Role assignments tab lists what applies there, including inherited assignments, and Check access shows what a chosen user, group, or identity holds. An assignment made on a child scope will not appear at the parent. For subscriptions, you can rename them, move them between management groups, transfer billing ownership, or change their directory; a directory change deletes role assignments and custom roles, so they must be re-created. Moving resources between resource groups or subscriptions locks both groups for writes while it runs, changes the resource ID, and leaves the region alone.\n\nCost control starts with budgets at a management group, subscription, or resource group scope. Alerts can use actual or forecasted cost, and an action group can start automation, because the budget itself never stops anything. Azure Policy is evaluated when an assignment changes, when resources are created or updated, and once every 24 hours; existing resources that fail a deployIfNotExists or modify policy are corrected with a remediation task that runs under the assignment's managed identity, and an exemption removes a resource or scope from a policy.",
       "fundamentalsLabel": "New to RBAC in practice? See the everyday analogy",
       "fundamentals": "Think of RBAC assignments like keys handed out at different levels of a building. A master key at the building level, plus an extra key to one specific supply closet, means you effectively have full access to that closet even if your master key alone wouldn't normally reach it \u2014 the more specific, more permissive key wins in that one room.",
       "keyTerms": [
@@ -2289,12 +3457,21 @@
         "User Access Administrator",
         "Azure Policy",
         "initiative",
-        "budgets"
+        "budgets",
+        "Check access",
+        "budget",
+        "remediation task",
+        "exemption",
+        "resource move",
+        "directory transfer"
       ],
       "commonTraps": [
         "Contributor can manage all resources but CANNOT assign roles to others \u2014 only Owner and User Access Administrator can.",
         "RBAC is additive: the most permissive assignment across all applicable scopes wins, not the most restrictive.",
-        "An initiative is a bundle of policies assigned together \u2014 it isn't a single rule by itself."
+        "An initiative is a bundle of policies assigned together \u2014 it isn't a single rule by itself.",
+        "Check access and Role assignments show assignments at the scope and inherited from parents, never from child scopes.",
+        "A budget never stops spending; to react to a breach an action group must start automation.",
+        "Moving a resource changes its resource group or subscription and its resource ID, not its region."
       ],
       "portalMockup": "roleAssignment",
       "scenario": "A company wants a lead engineer to manage all resources in a specific resource group AND decide which teammates can access it, without giving them company-wide Owner rights. Assigning Owner at just that one resource group achieves this \u2014 Owner both manages resources and grants access, but scoped to that resource group alone, leaving the rest of the subscription untouched.",
@@ -2314,7 +3491,15 @@
         "f15",
         "f16",
         "f17",
-        "f18"
+        "f18",
+        "f9007",
+        "f9008",
+        "f9009",
+        "f9010",
+        "f9011",
+        "f9012",
+        "f9013",
+        "f9014"
       ],
       "quizIds": [
         "q9",
@@ -2324,9 +3509,20 @@
         "q13",
         "tf4",
         "tf5",
-        "tf6"
+        "tf6",
+        "q9010",
+        "q9011",
+        "q9012",
+        "q9013",
+        "q9014",
+        "q9015",
+        "q9016",
+        "q9017",
+        "q9018",
+        "q9019",
+        "q9020"
       ],
-      "reading": "Managing storage at the administrator level means configuring the account itself, not just knowing what it holds. General-purpose v2 is the standard account type and uses Standard (HDD-backed) performance, while Premium (SSD-backed) performance comes from premium account types (block blob, file share, page blob), chosen by how demanding the workload is.\n\nFor access, a storage account access key grants full, unrestricted control over the whole account \u2014 risky to hand out. A Shared Access Signature (SAS) instead grants limited, time-boxed access to specific resources, without ever exposing that key. A storage firewall adds a network-level layer on top, restricting access to specific VNets or IP ranges regardless of what credentials someone has.\n\nOngoing management includes lifecycle policies, which automatically move aging blobs to cheaper tiers or delete them outright, and choosing the right protection for accidental changes: blob versioning keeps every prior version automatically, while soft delete keeps deleted (and, with versioning off, overwritten) data recoverable for a retention window.",
+      "reading": "Managing storage at the administrator level means configuring the account itself, not just knowing what it holds. General-purpose v2 is the standard account type and uses Standard (HDD-backed) performance, while Premium (SSD-backed) performance comes from premium account types (block blob, file share, page blob), chosen by how demanding the workload is.\n\nFor access, a storage account access key grants full, unrestricted control over the whole account \u2014 risky to hand out. A Shared Access Signature (SAS) instead grants limited, time-boxed access to specific resources, without ever exposing that key. A storage firewall adds a network-level layer on top, restricting access to specific VNets or IP ranges regardless of what credentials someone has.\n\nOngoing management includes lifecycle policies, which automatically move aging blobs to cheaper tiers or delete them outright, and choosing the right protection for accidental changes: blob versioning keeps every prior version automatically, while soft delete keeps deleted (and, with versioning off, overwritten) data recoverable for a retention window.\n\nStorage encryption is always on and uses Microsoft-managed keys by default. To control the key yourself, use a customer-managed key held in Azure Key Vault or Managed HSM, which needs soft delete and purge protection; encryption scopes apply a different key to a container or blob, and infrastructure encryption adds a second layer but has to be chosen when the account is created. Azure Files can authenticate users over SMB with Kerberos against on-premises AD DS, Microsoft Entra Domain Services, or Microsoft Entra Kerberos, with Azure roles for share-level access and Windows ACLs below that. Share snapshots recover files and folders, while soft delete recovers a deleted share.\n\nFor moving data, Azure Storage Explorer is a desktop app for browsing and managing storage, and AzCopy is the command-line tool for copying and one-way syncing. Both authorize with Microsoft Entra ID or a SAS; owning the account does not give data access, so an identity needs a data role such as Storage Blob Data Contributor. The default access tier of an account is Hot or Cool, and Cold or Archive are set per blob or by a lifecycle rule.",
       "fundamentalsLabel": "New to storage account administration? See the everyday analogy",
       "fundamentals": "An access key is like a master key to an entire building \u2014 powerful, and dangerous to hand out casually. A SAS is like a visitor badge that only opens one door, only works for a limited window of time, and can be revoked without changing the master key at all.",
       "keyTerms": [
@@ -2339,12 +3535,22 @@
         "storage firewall",
         "lifecycle",
         "versioning",
-        "soft delete"
+        "soft delete",
+        "customer-managed key",
+        "infrastructure encryption",
+        "encryption scope",
+        "Kerberos",
+        "share snapshot",
+        "Storage Explorer",
+        "AzCopy"
       ],
       "commonTraps": [
         "An access key grants full account access \u2014 always prefer a scoped, time-limited SAS when sharing access externally.",
         "Soft delete is about retention windows; versioning is the fuller answer for keeping every prior version of an overwritten blob.",
-        "A storage firewall is a network-level control \u2014 separate from, and in addition to, who has valid credentials."
+        "A storage firewall is a network-level control \u2014 separate from, and in addition to, who has valid credentials.",
+        "Infrastructure encryption cannot be turned on after the storage account exists.",
+        "Owner on a storage account does not give data access to AzCopy or Storage Explorer; a data role or a SAS is needed.",
+        "Container soft delete and blob soft delete are separate settings, and soft delete for blobs does not protect Azure file shares."
       ],
       "portalMockup": "storageAccount",
       "scenario": "A marketing agency needs to let an external contractor upload files to one specific container for 48 hours, then lose access automatically. Issuing a SAS scoped to that container, valid for 48 hours, does exactly this \u2014 no account key changes hands, and access expires on its own without anyone having to remember to revoke it.",
@@ -2360,16 +3566,21 @@
         "f20",
         "f21",
         "f22",
-        "f27"
+        "f27",
+        "f9023",
+        "f9024"
       ],
       "quizIds": [
         "q16",
         "q17",
         "q22",
         "q23",
-        "tf7"
+        "tf7",
+        "q9026",
+        "q9027",
+        "q9028"
       ],
-      "reading": "Choosing a VM means balancing size against workload: the size determines CPU, memory, and disk throughput, while the series, B, D, F, and others, is tuned for different needs \u2014 B-series is cheap and burstable, D-series is general purpose, F-series is compute-optimized. Underneath, managed disks come in four performance tiers, Standard HDD, Standard SSD, Premium SSD, and Ultra Disk, from cheapest to fastest.\n\nFor resilience, availability sets spread VMs across separate hardware within one datacenter, availability zones go further by using physically separate datacenters within a region, and VM Scale Sets automatically add or remove instances based on demand or a schedule.\n\nDay-to-day operations include extensions, small agents that run post-deployment tasks like the Custom Script Extension, and resizing, which may require deallocating a running VM first if the target size isn't available on its current hardware.",
+      "reading": "Choosing a VM means balancing size against workload: the size determines CPU, memory, and disk throughput, while the series, B, D, F, and others, is tuned for different needs \u2014 B-series is cheap and burstable, D-series is general purpose, F-series is compute-optimized. Underneath, managed disks come in four performance tiers, Standard HDD, Standard SSD, Premium SSD, and Ultra Disk, from cheapest to fastest.\n\nFor resilience, availability sets spread VMs across separate hardware within one datacenter, availability zones go further by using physically separate datacenters within a region, and VM Scale Sets automatically add or remove instances based on demand or a schedule.\n\nDay-to-day operations include extensions, small agents that run post-deployment tasks like the Custom Script Extension, and resizing, which may require deallocating a running VM first if the target size isn't available on its current hardware.\n\nEncryption at host extends server-side disk encryption to temporary disks and caches and encrypts data as it flows to storage, with no agent in the guest. It needs the EncryptionAtHost feature registered on the subscription, and an existing VM must be deallocated to turn it on. Moving a VM is two different tasks: a move to another resource group or subscription keeps the region and changes the resource ID, while a move to another region uses Azure Resource Mover, which validates dependencies and lets you commit or discard the move.",
       "fundamentalsLabel": "New to VM sizing and resilience? See the everyday analogy",
       "fundamentals": "Choosing a VM series is like choosing a vehicle for a job: a compact car (B-series) is cheap and fine for occasional errands, a pickup truck (D-series) handles general hauling, and a race car (F-series) is built for one specific kind of performance. Availability sets and zones are about not parking every vehicle in the same garage \u2014 spreading them out so one disaster doesn't take out the whole fleet at once.",
       "keyTerms": [
@@ -2385,12 +3596,15 @@
         "VM Scale Sets",
         "extensions",
         "Custom Script Extension",
-        "deallocating"
+        "deallocating",
+        "encryption at host",
+        "Azure Resource Mover"
       ],
       "commonTraps": [
         "A B-series VM is burstable and cheap, but throttles under sustained heavy CPU load \u2014 the wrong pick for a constantly busy server.",
         "Resizing a running VM may require deallocating it first if the new size isn't available on its current hardware.",
-        "Ultra Disk lets you configure performance independently of size \u2014 the highest, most consistent tier available."
+        "Ultra Disk lets you configure performance independently of size \u2014 the highest, most consistent tier available.",
+        "Encryption at host covers temp disks and caches and cannot be combined with Azure Disk Encryption."
       ],
       "portalMockup": "vmSize",
       "scenario": "A team runs a database VM that needs consistent, high IOPS around the clock, plus a batch of short-lived web front-ends that spike unpredictably during business hours. The database gets a larger D-series or F-series VM with a Premium SSD or Ultra Disk. The front-ends go into a VM Scale Set, which adds instances automatically during the spikes and scales back down overnight, rather than running a fixed, oversized fleet all day.",
@@ -2406,7 +3620,18 @@
         "f23",
         "f24",
         "f25",
-        "f26"
+        "f26",
+        "f9020",
+        "f9021",
+        "f9022",
+        "f9025",
+        "f9026",
+        "f9027",
+        "f9028",
+        "f9029",
+        "f9030",
+        "f9031",
+        "f9032"
       ],
       "quizIds": [
         "q18",
@@ -2414,9 +3639,27 @@
         "q20",
         "q21",
         "tf8",
-        "tf9"
+        "tf9",
+        "q9021",
+        "q9022",
+        "q9023",
+        "q9024",
+        "q9025",
+        "q9029",
+        "q9030",
+        "q9031",
+        "q9032",
+        "q9033",
+        "q9034",
+        "q9035",
+        "q9036",
+        "q9037",
+        "q9038",
+        "q9039",
+        "q9040",
+        "q9041"
       ],
-      "reading": "An App Service plan defines the compute tier and region for one or more web apps \u2014 scaling up changes the plan's size, scaling out adds more instances of it. Deployment slots give you a separate, swappable environment, like staging, to validate a new version before swapping it into production with minimal downtime.\n\nFor containers, the right choice depends on how much orchestration you need: Container Instances run a single container with none, Container Apps add serverless, HTTP-based autoscaling without managing a cluster, and AKS gives full Kubernetes control when you need it.\n\nFor repeatable deployments, ARM templates are Azure's native JSON Infrastructure as Code format, and Bicep is a newer, more concise language that compiles down to the same ARM JSON \u2014 functionally identical, just easier to write and read.",
+      "reading": "An App Service plan defines the compute tier and region for one or more web apps \u2014 scaling up changes the plan's size, scaling out adds more instances of it. Deployment slots give you a separate, swappable environment, like staging, to validate a new version before swapping it into production with minimal downtime.\n\nFor containers, the right choice depends on how much orchestration you need: Container Instances run a single container with none, Container Apps add serverless, HTTP-based autoscaling without managing a cluster, and AKS gives full Kubernetes control when you need it.\n\nFor repeatable deployments, ARM templates are Azure's native JSON Infrastructure as Code format, and Bicep is a newer, more concise language that compiles down to the same ARM JSON \u2014 functionally identical, just easier to write and read.\n\nInfrastructure as code questions ask you to read, change, and deploy templates. An ARM template has parameters, variables, resources, and outputs; a Bicep file declares param, var, resource, module, and output items, and a reference to another resource creates a dependency. The what-if operation previews creates, modifications, and deletions before a deployment, which matters most in Complete mode. A deployment can be exported from the resource group as a snapshot of current state, or saved from history as the exact original template, and az bicep decompile converts ARM JSON into Bicep.\n\nContainers split by need. Container Apps runs revisions and replicas that scale on HTTP, TCP, or custom rules and can scale to zero, while Container Instances runs container groups with a restart policy and no autoscale. Azure Container Registry holds the images, authenticates with Microsoft Entra identities, and can rebuild them with ACR Tasks. For App Service, map a root domain with an A record and a subdomain with a CNAME, add a TXT record with the verification ID, and secure the domain with a managed, imported, or uploaded certificate. Backups are automatic and hourly on Basic and higher plans, or custom to a storage account; networking splits into access restrictions and private endpoints for inbound, and virtual network integration for outbound.",
       "fundamentalsLabel": "New to app hosting and IaC? See the everyday analogy",
       "fundamentals": "A deployment slot is like a dress rehearsal before opening night \u2014 you run the full show in a separate space first, then swap it into the real venue once it's ready, instead of testing changes directly in front of the audience. Infrastructure as Code is like a recipe instead of a memory of how you cooked something once: written down, repeatable, and shareable, rather than trusting yourself to click through the same steps identically every time.",
       "keyTerms": [
@@ -2426,12 +3669,24 @@
         "Container Apps",
         "AKS",
         "ARM templates",
-        "Bicep"
+        "Bicep",
+        "what-if",
+        "decompile",
+        "revision",
+        "replica",
+        "restart policy",
+        "ACR Tasks",
+        "custom domain",
+        "managed certificate",
+        "virtual network integration"
       ],
       "commonTraps": [
         "Scaling up changes the App Service plan's tier or size; scaling out adds more instances of the same tier.",
         "Container Instances run a single container with no orchestration \u2014 that's what AKS is for.",
-        "Bicep is not a different deployment mechanism \u2014 it compiles down to the same ARM JSON underneath."
+        "Bicep is not a different deployment mechanism \u2014 it compiles down to the same ARM JSON underneath.",
+        "Export from a resource group is a snapshot that needs cleanup, and Save from history is the exact original template.",
+        "A CNAME cannot be used at the root of a domain; map the root with an A record.",
+        "Virtual network integration is for outbound traffic only; private inbound access needs a private endpoint."
       ],
       "scenario": "A team wants to test a major update to their web app without any risk to the live site, then cut over quickly once it checks out. They deploy the new version to a staging slot, run their validation there against production-like settings, and swap it into the production slot in seconds once satisfied \u2014 with the previous version now sitting in the staging slot in case a fast rollback is ever needed.",
       "onTheJob": "Deployment slots are the thing that actually lets a team sleep at night before a release, since a bad swap can be reversed in seconds by swapping back \u2014 teams that skip slots and deploy straight to production are usually the ones with the worst on-call stories. Bicep versus raw ARM JSON is mostly a team-preference and readability argument in practice, not a functional one, so a manager standardizing on one over the other is usually optimizing for how fast a new hire can read the templates, not for what Azure actually does with them."
@@ -2451,7 +3706,15 @@
         "f33",
         "f34",
         "f35",
-        "f36"
+        "f36",
+        "f9040",
+        "f9041",
+        "f9042",
+        "f9043",
+        "f9044",
+        "f9045",
+        "f9046",
+        "f9047"
       ],
       "quizIds": [
         "q24",
@@ -2461,9 +3724,19 @@
         "q27",
         "tf10",
         "tf11",
-        "tf12"
+        "tf12",
+        "q9042",
+        "q9043",
+        "q9044",
+        "q9045",
+        "q9047",
+        "q9048",
+        "q9049",
+        "q9050",
+        "q9051",
+        "q9052"
       ],
-      "reading": "As an administrator, you size VNets and subnets with real CIDR math in mind \u2014 Azure reserves 5 addresses in every subnet regardless of its size. Network Security Groups filter traffic with rules that have a priority; the lowest priority number is evaluated first and wins if rules conflict.\n\nVNet peering connects two VNets directly, even across regions, but it isn't transitive \u2014 peering A to B and B to C doesn't let A and C talk without their own direct peering. For distributing traffic, Azure Load Balancer works at layer 4 by IP and port alone, while Application Gateway works at layer 7 and can route by URL path and terminate SSL.\n\nFor secure remote access, Azure Bastion provides RDP or SSH through the portal without exposing a VM's public IP, and Network Watcher's tools, like IP flow verify, help diagnose exactly where a connectivity problem is coming from.",
+      "reading": "As an administrator, you size VNets and subnets with real CIDR math in mind \u2014 Azure reserves 5 addresses in every subnet regardless of its size. Network Security Groups filter traffic with rules that have a priority; the lowest priority number is evaluated first and wins if rules conflict.\n\nVNet peering connects two VNets directly, even across regions, but it isn't transitive \u2014 peering A to B and B to C doesn't let A and C talk without their own direct peering. For distributing traffic, Azure Load Balancer works at layer 4 by IP and port alone, while Application Gateway works at layer 7 and can route by URL path and terminate SSL.\n\nFor secure remote access, Azure Bastion provides RDP or SSH through the portal without exposing a VM's public IP, and Network Watcher's tools, like IP flow verify, help diagnose exactly where a connectivity problem is coming from.\n\nPublic IP addresses now mean the Standard SKU: static, zone-capable, and closed to inbound traffic until a network security group allows it. Basic public IPs and Basic Load Balancer were retired on September 30, 2025, and virtual networks created with recent API versions default to private subnets, so VMs there need an explicit outbound method such as a NAT gateway. To see why a flow is blocked, view the effective security rules of the NIC: inbound traffic meets the subnet NSG first, then the NIC NSG, and both must allow it.\n\nThe Network Watcher toolkit answers specific questions: IP flow verify names the rule that decides a flow, next hop shows the route, connection troubleshoot tests a path, and packet capture records traffic. Flow logging is moving from NSG flow logs, retiring September 30, 2027, to virtual network flow logs. For load balancers, a failing health probe means the wrong port, an unhealthy backend, or an NSG that blocks the AzureLoadBalancer tag. Azure DNS alias records point an apex name at a resource, and Azure Bastion comes in Developer, Basic, Standard, and Premium SKUs.",
       "fundamentalsLabel": "New to network administration? See the everyday analogy",
       "fundamentals": "An NSG rule priority works like a bouncer checking a list in order \u2014 the first matching rule they hit decides the outcome, and they stop checking after that, even if a later rule on the list would have said something different. VNet peering not being transitive is like two people each having a direct phone line to a shared friend, but no line to each other \u2014 being friends with the same person doesn't connect you to each other automatically.",
       "keyTerms": [
@@ -2474,12 +3747,21 @@
         "Azure Load Balancer",
         "Application Gateway",
         "Azure Bastion",
-        "Network Watcher"
+        "Network Watcher",
+        "Standard SKU",
+        "default outbound access",
+        "effective security rules",
+        "flow logs",
+        "alias record",
+        "AzureBastionSubnet"
       ],
       "commonTraps": [
         "A lower NSG rule priority number wins \u2014 100 is evaluated before 200, regardless of allow or deny.",
         "VNet peering is not transitive: A-B and B-C peered does not mean A and C can talk.",
-        "Application Gateway can route by URL path; Azure Load Balancer only sees IP and port, not HTTP content."
+        "Application Gateway can route by URL path; Azure Load Balancer only sees IP and port, not HTTP content.",
+        "A Standard public IP is closed to inbound traffic until an NSG allows it.",
+        "NSG flow logs are retiring; use virtual network flow logs for anything new.",
+        "Inbound traffic goes through the subnet NSG first and then the NIC NSG, and it must be allowed by both."
       ],
       "scenario": "An administrator needs to block a specific IP range from reaching a subnet while still allowing normal traffic through. They add a Deny rule at a lower priority number than the general Allow rule, so it's evaluated first \u2014 since NSGs stop at the first matching rule, that blocked range never reaches the broader allow rule beneath it.",
       "onTheJob": "NSG rule priority is one of the most common sources of a self-inflicted outage page \u2014 someone adds a new rule without checking what priority number is already in use, and a lower-priority rule silently wins before the new one is ever evaluated. Change control around networking tends to be the strictest in a real Azure environment, precisely because a subnet or peering misconfiguration can quietly take down connectivity for teams who had nothing to do with the change that caused it."
@@ -2496,15 +3778,34 @@
         "f39",
         "f40",
         "f41",
-        "f42"
+        "f42",
+        "f9048",
+        "f9049",
+        "f9050",
+        "f9051",
+        "f9052",
+        "f9053",
+        "f9054"
       ],
       "quizIds": [
         "q33",
         "q34",
         "q35",
-        "q36"
+        "q36",
+        "q9046",
+        "q9053",
+        "q9054",
+        "q9055",
+        "q9056",
+        "q9057",
+        "q9058",
+        "q9059",
+        "q9060",
+        "q9061",
+        "q9062",
+        "q9063"
       ],
-      "reading": "Azure Monitor is the umbrella for keeping an eye on your own resources: metrics are lightweight numerical time-series data, like CPU percentage, while logs are detailed, queryable records stored in a Log Analytics workspace and searched with KQL. An alert rule defines the trigger condition, and a separate action group defines what happens next, like an email or an automated runbook.\n\nFor disaster protection, the distinction that matters most is scope: Azure Backup, through a Recovery Services vault, restores a VM or file to an earlier point in time, protecting against data loss or corruption. Azure Site Recovery goes further, replicating an entire workload to a secondary region so it can fail over and keep running if the primary region goes down entirely.",
+      "reading": "Azure Monitor is the umbrella for keeping an eye on your own resources: metrics are lightweight numerical time-series data, like CPU percentage, while logs are detailed, queryable records stored in a Log Analytics workspace and searched with KQL. An alert rule defines the trigger condition, and a separate action group defines what happens next, like an email or an automated runbook.\n\nFor disaster protection, the distinction that matters most is scope: Azure Backup, through a Recovery Services vault, restores a VM or file to an earlier point in time, protecting against data loss or corruption. Azure Site Recovery goes further, replicating an entire workload to a secondary region so it can fail over and keep running if the primary region goes down entirely.\n\nAlert processing rules sit between a fired alert and its notifications: they can add an action group to alerts that have none, including Azure Backup alerts, or suppress notifications for a scope on a schedule, such as a maintenance window, while the alert itself still fires and is recorded. For connectivity, Connection monitor tests TCP, ICMP, and HTTP paths continuously across Azure and hybrid endpoints and reports latency and packet loss. Insights are curated Azure Monitor dashboards; Storage insights covers capacity, transactions, and latency across many accounts, and Network Insights shows topology, health, and metrics.\n\nAzure Backup uses two vault types. A Recovery Services vault protects VMs, SQL Server and SAP HANA in VMs, Azure Files, and on-premises machines; a Backup vault protects Azure Disks, Azure Blobs, and PostgreSQL. Backup alerts run through Azure Monitor, and Backup reports are built on Log Analytics, so vault diagnostic settings must send data to a workspace. In Site Recovery, you choose a recovery point at failover (Latest for the least data loss, Latest processed for the fastest recovery), reprotect the VMs afterward to replicate back, and run a test failover at least every 180 days.",
       "fundamentalsLabel": "New to monitoring and disaster recovery? See the everyday analogy",
       "fundamentals": "Backup is like keeping dated copies of an important document, so you can go back to yesterday's version if today's got corrupted. Site Recovery is more like having a fully-equipped second office ready to open immediately if your main building becomes unusable \u2014 not just a copy of your files, but a whole working replacement environment standing by.",
       "keyTerms": [
@@ -2517,12 +3818,21 @@
         "action group",
         "Azure Backup",
         "Recovery Services vault",
-        "Azure Site Recovery"
+        "Azure Site Recovery",
+        "alert processing rule",
+        "Connection monitor",
+        "Backup vault",
+        "Backup reports",
+        "reprotect",
+        "Storage insights"
       ],
       "commonTraps": [
         "Metrics are lightweight numerical data; use Logs and KQL for detailed, queryable event investigation.",
         "An alert rule is the trigger condition \u2014 the action group is the separate response it sets off.",
-        "Backup restores a point-in-time copy; Site Recovery fails over a whole workload to another region."
+        "Backup restores a point-in-time copy; Site Recovery fails over a whole workload to another region.",
+        "Suppressing notifications with an alert processing rule does not stop the alert from firing or being recorded.",
+        "Disks and blobs are protected by a Backup vault; VMs and Azure Files are protected by a Recovery Services vault.",
+        "Platform metrics are kept for 93 days; the Activity log for 90 days; resource logs are not collected until a diagnostic setting exists."
       ],
       "scenario": "A company's production database VM gets corrupted by a bad script at 2pm. They restore it from that morning's backup in the Recovery Services vault, losing a few hours of data but recovering quickly. Separately, that same company has Site Recovery configured for their whole application tier, so if their primary region ever goes down entirely, the application can fail over and keep serving customers from a secondary region within minutes.",
       "onTheJob": "In practice, alert rules that aren't tied to a real action group are the alerts everyone learns to ignore \u2014 a mailbox full of unread threshold emails is a bigger operational risk than having no monitoring at all, since it trains the team to tune out the one alert that actually mattered. Backup and Site Recovery configurations also tend to only get tested for real during an actual incident, which is exactly the wrong time to discover a Recovery Services vault was never actually backing up the resource everyone assumed it was. This same Azure Monitor metrics vs. logs distinction is exactly what AZ-305 architects have to choose between when designing a monitoring solution, deciding whether a workload's health signal belongs in a lightweight metric alert or a deeper Log Analytics query."
@@ -2545,7 +3855,9 @@
         "Owner = full access plus can assign roles to others. Contributor = full access but cannot assign roles. Reader = view only. User Access Administrator = can manage user access without touching the resources themselves.",
         "RBAC scope inherits downward: Management Group \u2192 Subscription \u2192 Resource Group \u2192 Resource; a role assigned higher up applies to everything below it.",
         "RBAC permissions are additive across assignments, but an explicit deny assignment always overrides any allow.",
-        "Azure Policy controls WHAT configurations are allowed/compliant (an effect like deny/audit); RBAC controls WHO can perform WHICH actions \u2014 they answer different questions and are not substitutes for each other."
+        "Azure Policy controls WHAT configurations are allowed/compliant (an effect like deny/audit); RBAC controls WHO can perform WHICH actions \u2014 they answer different questions and are not substitutes for each other.",
+        "On Access control (IAM), Role assignments and Check access list what applies at that scope plus what is inherited from parent scopes. Assignments made at child scopes are not shown.",
+        "A user needs a usage location before a license can be assigned. Dynamic group membership needs Microsoft Entra ID P1."
       ]
     },
     {
@@ -2554,7 +3866,10 @@
         "LRS = 3 sync copies in one datacenter (cheapest, least durable). ZRS = sync copies across zones in one region. GRS = async copy to a paired region (not readable). RA-GRS = same as GRS but the secondary is readable.",
         "GZRS/RA-GZRS combine zone redundancy in the primary region with geo-replication to the paired region \u2014 the highest-durability options.",
         "Blob access tiers (Hot/Cool/Cold/Archive) trade storage cost against access cost and retrieval latency; Archive requires rehydration before a blob can be read.",
-        "Only general-purpose v2 (StorageV2) accounts support the full feature set (all access tiers, lifecycle management); legacy v1 accounts don't."
+        "Only general-purpose v2 (StorageV2) accounts support the full feature set (all access tiers, lifecycle management); legacy v1 accounts don't.",
+        "All storage data is encrypted at rest and cannot be turned off. Customer-managed keys live in Key Vault (soft delete and purge protection required); infrastructure encryption (double encryption) can only be chosen when the account is created.",
+        "Azure Files identity-based access uses Kerberos with AD DS, Microsoft Entra Domain Services, or Microsoft Entra Kerberos (one per account). Share snapshots (up to 200 per share) protect files; soft delete (7 days by default) protects a deleted share.",
+        "AzCopy needs a data role (for example Storage Blob Data Contributor) or a SAS, because Owner does not grant data access. azcopy sync is one-way. Storage Mover is the managed service for large migrations."
       ]
     },
     {
@@ -2564,7 +3879,11 @@
         "Availability Zone = physically separate datacenters within a region, each with independent power/cooling/network \u2014 protects against a datacenter-level outage.",
         "A VM scale set can span multiple availability zones and automatically scales identical VM instances in/out based on load or a schedule.",
         "Managed disks: Standard HDD/SSD for dev/test or infrequent access, Premium SSD for production workloads needing consistent low latency, Ultra Disk for the highest IOPS/throughput, latency-sensitive workloads (e.g. SAP HANA, SQL).",
-        "Azure Hybrid Benefit lets you apply existing on-premises Windows Server or SQL Server licenses to Azure VMs to cut compute cost."
+        "Azure Hybrid Benefit lets you apply existing on-premises Windows Server or SQL Server licenses to Azure VMs to cut compute cost.",
+        "Encryption at host encrypts temp disks and caches, needs the feature registered and the VM deallocated, and cannot be combined with Azure Disk Encryption. Moving a VM across resource groups or subscriptions never changes its region; use Resource Mover for a region move.",
+        "Export from a resource group is a snapshot that needs cleanup, while Save from history is the exact original template. az bicep decompile converts ARM JSON to Bicep, and what-if previews a deployment.",
+        "App Service: backups need Basic or higher, with hourly automatic backups kept 30 days; autoscale and slots start at Standard; certificates need Basic or higher, and the free managed certificate has no wildcard support. VNet integration is outbound only, and a private endpoint is for inbound.",
+        "Container Apps scales to zero by default (minimum replicas 0) with HTTP, TCP, or custom rules. Container Instances has no autoscale, and its restart policy is Always by default."
       ]
     },
     {
@@ -2574,7 +3893,10 @@
         "An NSG can be attached to a subnet, a NIC, or both; if both are in play, traffic must be allowed by BOTH to get through.",
         "VNet peering is non-transitive: if VNet A peers with B, and B peers with C, A cannot reach C through B without its own direct peering (or a hub with routing).",
         "Private Endpoint = a private IP address for a PaaS service inside your VNet (traffic never leaves the Microsoft backbone). Service Endpoint = an optimized route to the service over the Azure backbone, but the service still has a public IP.",
-        "Load Balancer = regional Layer 4 (TCP/UDP). Application Gateway = regional Layer 7 (HTTP, URL routing, WAF). Traffic Manager = global DNS-based routing (protocol-agnostic). Front Door = global Layer 7 with WAF + CDN."
+        "Load Balancer = regional Layer 4 (TCP/UDP). Application Gateway = regional Layer 7 (HTTP, URL routing, WAF). Traffic Manager = global DNS-based routing (protocol-agnostic). Front Door = global Layer 7 with WAF + CDN.",
+        "Standard public IPs are static and closed to inbound traffic until an NSG allows it; Basic public IPs and Basic Load Balancer were retired on September 30, 2025. NSG flow logs retire on September 30, 2027, so use virtual network flow logs.",
+        "Inbound traffic is checked by the subnet NSG first and then the NIC NSG (reverse for outbound). Effective security rules shows the combined result. A failing load balancer probe usually means the wrong port or an NSG blocking the AzureLoadBalancer tag.",
+        "Bastion SKUs: Developer (free, shared, one VM), Basic, Standard (native client, scaling), Premium (session recording, private-only). The AzureBastionSubnet must be /26 or larger."
       ]
     },
     {
@@ -2583,7 +3905,10 @@
         "Azure Monitor Metrics = lightweight numerical time-series data. Azure Monitor Logs = detailed queryable records in a Log Analytics workspace, searched with KQL.",
         "An alert rule defines the trigger condition; a separate action group defines the response (email, SMS, webhook, runbook).",
         "Azure Backup (Recovery Services vault) restores a VM/file to an earlier point in time. Azure Site Recovery replicates and fails over a whole workload to a secondary region \u2014 different scope, don't mix them up.",
-        "A backup policy sets the schedule and retention; for Azure VM backups, changing the retention of an existing category applies to already-taken recovery points as well as new ones (so shortening it can expire older points), while a newly added retention category applies only going forward."
+        "A backup policy sets the schedule and retention; for Azure VM backups, changing the retention of an existing category applies to already-taken recovery points as well as new ones (so shortening it can expire older points), while a newly added retention category applies only going forward.",
+        "Recovery Services vaults protect VMs, SQL and SAP HANA in VMs, Azure Files, and on-premises servers. Backup vaults protect Azure Disks, Azure Blobs, and PostgreSQL. Backup alerts are Azure Monitor alerts; backup reports need diagnostic settings to a Log Analytics workspace.",
+        "Alert processing rules add or suppress action groups for a scope and schedule, but suppressed alerts still fire. Connection monitor is the continuous check; Connection troubleshoot is the one-time test.",
+        "Platform metrics are kept 93 days and the Activity log 90 days. In Site Recovery, Latest gives the lowest data loss, Latest processed the lowest recovery time, and a test failover should be run at least every 180 days."
       ]
     },
     {
@@ -2592,13 +3917,15 @@
         "Resource lock CanNotDelete allows read/modify but blocks deletion. ReadOnly blocks modify AND delete (locks down the resource entirely, which can break scaling or extensions unexpectedly).",
         "Locks apply to everything below their scope in the hierarchy and can only be removed by someone with the right permission (Microsoft.Authorization/locks/delete), even an Owner needs that explicit permission.",
         "Azure Policy initiatives group multiple related policy definitions together; policy effects include Deny, Audit, Append, Modify, and DeployIfNotExists.",
-        "Tags are not automatically inherited by child resources \u2014 a policy with the Modify or Append effect is needed to enforce/propagate tags automatically."
+        "Tags are not automatically inherited by child resources \u2014 a policy with the Modify or Append effect is needed to enforce/propagate tags automatically.",
+        "A budget notifies on actual or forecasted cost but never stops resources; use an action group to run automation. Policy remediation tasks fix existing resources for deployIfNotExists and modify policies, and use the assignment's managed identity.",
+        "Moving resources locks the source and target groups for writes (up to four hours) and changes the resource ID, not the region. A read-only lock blocks a move. Changing a subscription's directory deletes its role assignments and custom roles."
       ]
     },
     {
       "heading": "Exam-day reminders",
       "points": [
-        "This exam is heavily scenario-based and tests practical, portal-style tasks (the live-lab format is no longer used), so expect more than just recall.",
+        "This exam is heavily scenario-based and tests practical, portal-style tasks. Per Microsoft Learn it can include interactive components, so expect more than just recall.",
         "Watch for wording like \"least administrative effort\" or \"most cost-effective\" \u2014 pick the best fit among several technically-correct-sounding options.",
         "If a question says the connection \"doesn't use the public internet,\" that's ExpressRoute, not a VPN Gateway.",
         "\"Protect from a single datacenter failure\" points to Availability Zones; \"protect from a single rack/host failure\" points to Availability Sets."
@@ -2935,6 +4262,44 @@
         }
       ],
       "explanation": "A CanNotDelete lock still allows reads and modifications, it only blocks deletion. A ReadOnly lock is stricter: it blocks both modification and deletion, freezing the resource entirely. Resource locks are a separate governance mechanism from RBAC roles like Contributor and Owner, which control who can act rather than what actions are blocked outright."
+    },
+    {
+      "id": "ml-az104-9001",
+      "cat": "networking",
+      "scenario": "A Standard SKU public IP address is {b1} by default, which means traffic from the internet is dropped until a {b2} rule explicitly allows it. For a root domain that must follow a resource's address, create an {b3} record set rather than a CNAME.",
+      "blanks": [
+        {
+          "key": "b1",
+          "options": [
+            "closed to inbound traffic",
+            "open to all inbound traffic",
+            "zone-pinned",
+            "dynamic"
+          ],
+          "correct": 0
+        },
+        {
+          "key": "b2",
+          "options": [
+            "network security group",
+            "route table",
+            "Azure Policy",
+            "resource lock"
+          ],
+          "correct": 0
+        },
+        {
+          "key": "b3",
+          "options": [
+            "alias",
+            "MX",
+            "TXT",
+            "SOA"
+          ],
+          "correct": 0
+        }
+      ],
+      "explanation": "Standard public IPs are secure by default and need an NSG allow rule. An alias record set tracks the resource and is allowed at the apex, where a CNAME is not."
     }
   ],
   "sequences": [
@@ -2976,6 +4341,20 @@
         "Trigger the restore and monitor the job until it completes"
       ],
       "explanation": "You have to locate the vault and the specific backup item before you can pick a recovery point, and the restore configuration (new VM vs. disks-only) has to be chosen before the restore job can actually be kicked off."
+    },
+    {
+      "id": "seq-az104-9001",
+      "cat": "compute",
+      "prompt": "Put these Azure Resource Mover steps in order for moving a virtual machine and its network resources to another region.",
+      "steps": [
+        "Select the resources and the target region",
+        "Validate and add the dependencies",
+        "Prepare the resources for the move",
+        "Initiate the move",
+        "Commit the move (or discard it)",
+        "Delete the resources in the source region"
+      ],
+      "explanation": "The dependency check comes right after adding resources, so the VM, NIC, and network move together. Prepare readies the move, initiate creates the resources in the target region, and committing completes the move; discarding instead returns to the source. Deleting the source resources is optional cleanup and comes last."
     }
   ],
   "caseStudies": [
@@ -3128,6 +4507,24 @@
       "optionB": "Azure Backup with a daily policy in a Recovery Services vault, with soft delete enabled.",
       "better": "B",
       "why": "Site Recovery offers a much tighter RPO and RTO, but it continuously replicates to another region, which costs more and solves a regional outage that the business did not ask to be protected from; a corrupted disk would also replicate faithfully. Daily backups meet the stated 24-hour RPO and 8-hour RTO at far lower cost and restore to a point before the corruption or deletion."
+    },
+    {
+      "id": "cmp-az104-9001",
+      "cat": "storage",
+      "scenario": "A company stores customer documents in one storage account. A new rule says each customer's data must be encrypted under a key that can be disabled for that customer alone, without touching other customers' data. Which approach is better?",
+      "optionA": "Create one storage account for the whole company, enable customer-managed keys for the account, and rotate the key when a customer leaves.",
+      "optionB": "Create an encryption scope for each customer, backed by a customer-managed key, and assign each customer's container to its own scope.",
+      "better": "B",
+      "why": "A single account-level key covers every customer, so disabling it would lock everyone out, and rotating it does not isolate one customer. Encryption scopes apply their own key to a container or blob inside the same account, which is the construct built for per-customer cryptographic boundaries."
+    },
+    {
+      "id": "cmp-az104-9002",
+      "cat": "monitoring",
+      "scenario": "Alert rules for 40 VMs notify an on-call team. Every Saturday night the VMs are patched and the team must not be paged, but alert history must stay complete. Which approach is better?",
+      "optionA": "Disable each of the alert rules on Saturday evening and re-enable them on Sunday morning, using an automation runbook.",
+      "optionB": "Create one alert processing rule that suppresses the action groups for the scope on a weekly schedule.",
+      "better": "B",
+      "why": "Disabling rules means no alerts fire at all, which leaves gaps in the alert history and also hides real problems with the VMs. It also needs automation to manage 40 rules. A scheduled alert processing rule lets alerts fire and be recorded while only the notifications are suppressed, and it covers every rule in the scope."
     }
   ]
 }
