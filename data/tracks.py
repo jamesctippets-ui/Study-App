@@ -75,7 +75,7 @@ EXAM_CONFIG = {
         ],
     },
     'dp300': {
-        'length': 52, 'minutes': 120, 'passPct': 70, 'passLabel': 'Microsoft scores this 0-1000 with 700 to pass, not a flat percentage. Treat 70%+ here as a safe buffer, not an exact predictor.',
+        'length': 52, 'minutes': 100, 'passPct': 70, 'passLabel': 'Microsoft scores this 0-1000 with 700 to pass, not a flat percentage. Treat 70%+ here as a safe buffer, not an exact predictor.',
         'resources': [
             {'label': 'Microsoft Learn: official DP-300 study guide', 'url': 'https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/dp-300'},
         ],
@@ -95,13 +95,13 @@ EXAM_CONFIG = {
         ],
     },
     'az140': {
-        'length': 50, 'minutes': 120, 'passPct': 70, 'passLabel': 'Microsoft scores this 0-1000 with 700 to pass, not a flat percentage. Treat 70%+ here as a safe buffer, not an exact predictor. This Specialty certification must be renewed annually via a free online assessment.',
+        'length': 50, 'minutes': 100, 'passPct': 70, 'passLabel': 'Microsoft scores this 0-1000 with 700 to pass, not a flat percentage. Treat 70%+ here as a safe buffer, not an exact predictor. This Specialty certification must be renewed annually via a free online assessment.',
         'resources': [
             {'label': 'Microsoft Learn: official AZ-140 study guide', 'url': 'https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/az-140'},
         ],
     },
     'md102': {
-        'length': 55, 'minutes': 120, 'passPct': 70, 'passLabel': 'Microsoft scores this 0-1000 with 700 to pass, not a flat percentage. Treat 70%+ here as a safe buffer, not an exact predictor.',
+        'length': 55, 'minutes': 100, 'passPct': 70, 'passLabel': 'Microsoft scores this 0-1000 with 700 to pass, not a flat percentage. Treat 70%+ here as a safe buffer, not an exact predictor.',
         'resources': [
             {'label': 'Microsoft Learn: official MD-102 study guide', 'url': 'https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/md-102'},
             {'label': 'Microsoft Learn: Endpoint Administrator Associate certification', 'url': 'https://learn.microsoft.com/en-us/credentials/certifications/modern-desktop/'},
@@ -121,7 +121,7 @@ EXAM_CONFIG = {
         ],
     },
     'sc500': {
-        'length': 70, 'minutes': 110, 'passPct': 70, 'passLabel': 'Microsoft scores this 0-1000 with 700 to pass, not a flat percentage. Treat 70%+ here as a safe buffer, not an exact predictor.',
+        'length': 70, 'minutes': 120, 'passPct': 70, 'passLabel': 'Microsoft scores this 0-1000 with 700 to pass, not a flat percentage. Treat 70%+ here as a safe buffer, not an exact predictor.',
         'resources': [
             {'label': 'Microsoft Learn: official SC-500 study guide', 'url': 'https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/sc-500'},
             {'label': 'Microsoft Learn: Cloud and AI Security Engineer Associate certification', 'url': 'https://learn.microsoft.com/en-us/credentials/certifications/cloud-and-ai-security-engineer-associate/'},

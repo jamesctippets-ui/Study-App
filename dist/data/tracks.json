@@ -187,7 +187,7 @@
     },
     "dp300": {
       "length": 52,
-      "minutes": 120,
+      "minutes": 100,
       "passPct": 70,
       "passLabel": "Microsoft scores this 0-1000 with 700 to pass, not a flat percentage. Treat 70%+ here as a safe buffer, not an exact predictor.",
       "resources": [
@@ -231,7 +231,7 @@
     },
     "az140": {
       "length": 50,
-      "minutes": 120,
+      "minutes": 100,
       "passPct": 70,
       "passLabel": "Microsoft scores this 0-1000 with 700 to pass, not a flat percentage. Treat 70%+ here as a safe buffer, not an exact predictor. This Specialty certification must be renewed annually via a free online assessment.",
       "resources": [
@@ -243,7 +243,7 @@
     },
     "md102": {
       "length": 55,
-      "minutes": 120,
+      "minutes": 100,
       "passPct": 70,
       "passLabel": "Microsoft scores this 0-1000 with 700 to pass, not a flat percentage. Treat 70%+ here as a safe buffer, not an exact predictor.",
       "resources": [
@@ -287,7 +287,7 @@
     },
     "sc500": {
       "length": 70,
-      "minutes": 110,
+      "minutes": 120,
       "passPct": 70,
       "passLabel": "Microsoft scores this 0-1000 with 700 to pass, not a flat percentage. Treat 70%+ here as a safe buffer, not an exact predictor.",
       "resources": [
