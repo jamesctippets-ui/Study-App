@@ -862,6 +862,8 @@ function LessonApplySections({ lesson, categories, lessonCatKeys, flashcardsData
           </div>
         </div>
       )}
+
+      <PlaygroundLessonLink lesson={lesson} />
     </React.Fragment>
   );
 }

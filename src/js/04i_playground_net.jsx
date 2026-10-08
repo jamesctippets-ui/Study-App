@@ -19,7 +19,6 @@ const PG_SANDBOX = {
   }],
 };
 
-const PG_LEVEL_LABEL = { starter: 'Starter', core: 'Core', stretch: 'Stretch' };
 
 // Segments in a row, routers above joining them, hosts under each segment bar.
 function PgTopologyDiagram({ topo, fromId, toId, failId }) {
@@ -144,14 +143,7 @@ function PgPingResult({ result }) {
         <span style={{ fontWeight: 900, color: ink(hue), fontSize: '16px' }}>{mark}</span>
         <span style={{ fontWeight: 800, fontSize: '13.5px', lineHeight: 1.4 }}>{result.summary}</span>
       </div>
-      {result.diagnosis && (
-        <div style={{ padding: '10px 12px', borderRadius: '12px', background: COLOR.surface, border: `1.5px solid ${COLOR.border}`, marginBottom: '10px', fontSize: '13px', lineHeight: 1.5 }}>
-          <div style={{ fontSize: '10.5px', fontWeight: 800, letterSpacing: '0.05em', textTransform: 'uppercase', color: COLOR.muted }}>First thing that is wrong</div>
-          <div style={{ fontWeight: 800, margin: '2px 0' }}>{result.diagnosis.title}</div>
-          <div>{result.diagnosis.text}</div>
-          <div style={{ marginTop: '4px' }}><strong>Try:</strong> {result.diagnosis.fix}</div>
-        </div>
-      )}
+      <PgDiagnosis diagnosis={result.diagnosis} />
       {result.warnings.length > 0 && (
         <div style={{ padding: '8px 12px', borderRadius: '12px', background: tint(COLOR.orange, 12), border: `1.5px solid ${COLOR.orange}`, marginBottom: '10px', fontSize: '12.5px', lineHeight: 1.5 }}>
           {result.warnings.map((w) => <div key={w}>⚠ {w}</div>)}
@@ -162,19 +154,29 @@ function PgPingResult({ result }) {
           <div style={{ fontSize: '11px', fontWeight: 800, letterSpacing: '0.05em', textTransform: 'uppercase', color: leg.delivered ? ink(COLOR.success) : ink(COLOR.red), marginBottom: '4px' }}>
             {leg.label}: {leg.delivered ? 'delivered' : 'not delivered'}
           </div>
-          <ol style={{ margin: 0, paddingLeft: 0, listStyle: 'none', fontSize: '12.5px', lineHeight: 1.5 }}>
-            {leg.steps.map((st, j) => (
-              <li key={j} style={{ display: 'flex', gap: '6px', marginBottom: '3px', color: st.ok ? COLOR.text : ink(COLOR.red), fontWeight: st.ok ? 400 : 700 }}>
-                <span aria-hidden="true" style={{ flexShrink: 0, width: '14px', color: st.ok ? ink(COLOR.success) : ink(COLOR.red) }}>{st.ok ? '✓' : '✕'}</span>
-                <span>{st.text}</span>
-              </li>
-            ))}
-          </ol>
+          <PgSteps steps={leg.steps} />
         </div>
       ))}
     </div>
   );
 }
+
+const PG_IP_CAUSES = {
+  'bad-ip': 'A device has an invalid IP address',
+  'bad-mask': 'A device has an invalid subnet mask',
+  'host-address': 'A host uses the network or broadcast address of its subnet',
+  'no-gateway': 'The host has no default gateway',
+  'bad-gateway': 'The default gateway setting is not usable',
+  'gateway-offsubnet': 'The gateway is outside the host\'s own subnet',
+  'arp-timeout': 'Nobody answers for the next-hop address (wrong gateway, wrong mask or wrong network)',
+  'not-a-router': 'The "gateway" is an ordinary host, not a router',
+  'no-route': 'A router has no route to the destination network',
+  'host-unreachable': 'The router reaches the right network but nothing there owns the address',
+  'bad-next-hop': 'A static route points at a next hop that does not exist',
+  'reply-lost': 'The request arrives but the reply cannot get back',
+  'duplicate-ip': 'Two devices share one IP address',
+  loop: 'A routing loop',
+};
 
 // The shared lab: topology editor, diagram, ping panel. `goals` (optional) are
 // the scenario's success checks, re-evaluated live against the current setup.
@@ -223,7 +225,7 @@ function PgLab({ topo, setTopo, goals, sandbox, defaultAsk }) {
         </PgCard>
       )}
 
-      <PgCard title="Devices" hue={COLOR.blue}>
+      <PgCard title="Devices" hue={COLOR.blue} collapsible>
         <div style={{ fontSize: '12px', color: COLOR.muted, marginBottom: '2px' }}>Edit any field, then ping. Masks can be written as /24 or 255.255.255.0.</div>
         {topo.segments.map((s) => (
           <div key={s.id} style={{ marginTop: '10px' }}>
@@ -242,167 +244,52 @@ function PgLab({ topo, setTopo, goals, sandbox, defaultAsk }) {
 
       <PgCard title="Ping" hue={COLOR.success}>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '10px', marginBottom: '10px' }}>
-          <label style={{ display: 'block' }}>
-            <span style={{ display: 'block', fontSize: '11px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.04em', color: COLOR.muted, marginBottom: '3px' }}>From</span>
-            <select value={fromId} onChange={(e) => { setFromId(e.target.value); setResult(null); }} style={{ ...pgInputStyle(false), fontFamily: 'inherit' }}>
-              {devices.map((d) => <option key={d.id} value={d.id}>{d.name}</option>)}
-            </select>
-          </label>
-          <label style={{ display: 'block' }}>
-            <span style={{ display: 'block', fontSize: '11px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.04em', color: COLOR.muted, marginBottom: '3px' }}>To</span>
-            <select value={toId} onChange={(e) => { setToId(e.target.value); setResult(null); }} style={{ ...pgInputStyle(false), fontFamily: 'inherit' }}>
-              {devices.map((d) => <option key={d.id} value={d.id}>{d.name}</option>)}
-            </select>
-          </label>
+          <PgSelect label="From" value={fromId} onChange={(v) => { setFromId(v); setResult(null); }} options={devices.map((d) => ({ value: d.id, label: d.name }))} />
+          <PgSelect label="To" value={toId} onChange={(v) => { setToId(v); setResult(null); }} options={devices.map((d) => ({ value: d.id, label: d.name }))} />
         </div>
-        <button className="btn-3d" onClick={ping}
-          style={{ width: '100%', padding: '11px', borderRadius: '10px', background: COLOR.primary, color: COLOR.onAccent, fontSize: '14px', fontWeight: 700, marginBottom: '12px' }}>
-          Ping {nameOf(toId)} from {nameOf(fromId)}
-        </button>
+        <PgPredict compute={() => pgPing(topo, fromId, toId)} causes={PG_IP_CAUSES} buttonLabel={`Ping ${nameOf(toId)} from ${nameOf(fromId)}`} onResult={setResult} resetKey={JSON.stringify([topo, fromId, toId])} />
         <PgPingResult result={result} />
       </PgCard>
     </div>
   );
 }
 
-function IpScenario({ scenario, onBack }) {
-  const [topo, setTopo] = useState(() => pgClone(scenario.topology));
-  const [hintsShown, setHintsShown] = useState(0);
-  const [showFix, setShowFix] = useState(false);
-  const solved = scenario.expectFixed.every((g) => pgPing(topo, g.from, g.to).verdict === g.verdict);
-  const reset = () => { setTopo(pgClone(scenario.topology)); setHintsShown(0); setShowFix(false); };
-  const nameOf = (id) => [...scenario.topology.hosts, ...scenario.topology.routers].find((d) => d.id === id)?.name || id;
-  const describeFix = (f) => {
-    const who = nameOf(f.device);
-    if (f.route) return `Add a route on ${who}: network ${f.route.net}, mask ${f.route.mask}, next hop ${f.route.via}.`;
-    if (f.routeIndex !== undefined) return `On ${who}, change the next hop of route ${f.routeIndex + 1} to ${f.value}.`;
-    if (f.iface !== undefined) return `On ${who}, set the ${f.field} of port ${f.iface + 1} to ${f.value}.`;
-    return `Set ${who}'s ${f.field === 'ip' ? 'IP address' : f.field} to ${f.value || 'none'}.`;
-  };
-  return (
-    <div>
-      <button className="btn-flat" onClick={onBack} style={{ fontSize: '13px', fontWeight: 800, color: COLOR.muted, padding: '2px 0 10px' }}>‹ All scenarios</button>
-      <PgCard title={scenario.title} hue={COLOR.gold} right={<span style={{ fontSize: '10.5px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.05em', color: COLOR.muted }}>{PG_LEVEL_LABEL[scenario.level]}</span>}>
-        <div style={{ fontSize: '13px', lineHeight: 1.55 }}>{scenario.story}</div>
-        <div style={{ fontSize: '12.5px', color: COLOR.muted, marginTop: '6px' }}>Your job: find out what is wrong and fix it so the goal below turns green.</div>
-      </PgCard>
-
-      <PgLab topo={topo} setTopo={setTopo} goals={scenario.expectFixed} defaultAsk={scenario.ask} />
-
-      {solved && (
-        <PgCard title="Fixed!" hue={COLOR.success}>
-          <div style={{ fontSize: '13px', lineHeight: 1.55 }}>{scenario.lesson}</div>
-          {scenario.related && scenario.related.length > 0 && (
-            <div style={{ fontSize: '12px', color: COLOR.muted, marginTop: '8px' }}>Related study: {scenario.related.join(' · ')}</div>
-          )}
-        </PgCard>
-      )}
-
-      <PgCard title="Stuck?" hue={COLOR.orange}>
-        {scenario.hints.slice(0, hintsShown).map((h, i) => (
-          <div key={i} style={{ fontSize: '13px', lineHeight: 1.5, marginBottom: '8px' }}><strong>Hint {i + 1}:</strong> {h}</div>
-        ))}
-        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-          {hintsShown < scenario.hints.length && (
-            <button className="btn-flat" onClick={() => setHintsShown(hintsShown + 1)} style={{ fontSize: '12.5px', fontWeight: 800, padding: '6px 12px', borderRadius: '999px', border: `2px solid ${COLOR.orange}`, color: ink(COLOR.orange) }}>
-              {hintsShown ? 'Another hint' : 'Give me a hint'}
-            </button>
-          )}
-          <button className="btn-flat" onClick={() => setShowFix(!showFix)} style={{ fontSize: '12.5px', fontWeight: 800, padding: '6px 12px', borderRadius: '999px', border: `2px solid ${COLOR.border}`, color: COLOR.muted }}>
-            {showFix ? 'Hide the answer' : 'Show the fix'}
-          </button>
-          <button className="btn-flat" onClick={reset} style={{ fontSize: '12.5px', fontWeight: 800, padding: '6px 12px', borderRadius: '999px', border: `2px solid ${COLOR.border}`, color: COLOR.muted }}>Reset scenario</button>
-        </div>
-        {showFix && (
-          <ul style={{ margin: '10px 0 0', paddingLeft: '18px', fontSize: '13px', lineHeight: 1.55 }}>
-            {scenario.fix.map((f, i) => <li key={i}>{describeFix(f)}</li>)}
-          </ul>
-        )}
-      </PgCard>
-    </div>
-  );
+function pgIpDescribeFix(scenario, f) {
+  const find = (id) => [...scenario.topology.hosts, ...scenario.topology.routers].find((d) => d.id === id);
+  const who = (find(f.device) || { name: f.device }).name;
+  if (f.route) return `Add a route on ${who}: network ${f.route.net}, mask ${f.route.mask}, next hop ${f.route.via}.`;
+  if (f.routeIndex !== undefined) return `On ${who}, change the next hop of route ${f.routeIndex + 1} to ${f.value}.`;
+  if (f.iface !== undefined) return `On ${who}, set the ${f.field} of port ${f.iface + 1} to ${f.value}.`;
+  return `Set ${who}'s ${f.field === 'ip' ? 'IP address' : f.field} to ${f.value || 'none'}.`;
 }
 
-function IpSandbox({ onBack }) {
-  const [topo, setTopo] = useState(() => pgClone(PG_SANDBOX));
-  const [share, setShare] = useState(false);
-  const [text, setText] = useState('');
-  const [msg, setMsg] = useState('');
-  const exportJson = () => { setText(JSON.stringify(topo, null, 2)); setShare(true); setMsg(''); };
-  const importJson = () => {
-    try {
-      const t = JSON.parse(text);
-      const okShape = t && Array.isArray(t.segments) && Array.isArray(t.hosts) && Array.isArray(t.routers) && t.hosts.length >= 2
-        && t.hosts.every((h) => typeof h.id === 'string' && typeof h.name === 'string' && t.segments.some((s) => s.id === h.segment))
-        && t.routers.every((r) => typeof r.id === 'string' && Array.isArray(r.ifaces) && r.ifaces.every((f) => t.segments.some((s) => s.id === f.segment)));
-      if (!okShape) { setMsg('That does not look like an exported setup.'); return; }
-      t.routers.forEach((r) => { r.routes = Array.isArray(r.routes) ? r.routes : []; });
-      t.hosts.forEach((h) => { h.gateway = h.gateway || ''; h.ip = h.ip || ''; h.mask = h.mask || '/24'; });
-      setTopo(t);
-      setMsg('Loaded.');
-    } catch (e) { setMsg('That is not valid JSON.'); }
-  };
-  return (
-    <div>
-      <button className="btn-flat" onClick={onBack} style={{ fontSize: '13px', fontWeight: 800, color: COLOR.muted, padding: '2px 0 10px' }}>‹ All scenarios</button>
-      <PgCard title="Free sandbox" hue={COLOR.gold}>
-        <div style={{ fontSize: '13px', lineHeight: 1.55 }}>
-          Break it on purpose. Give two hosts the same address, shrink a mask, remove a gateway, or add a route, then ping and read the explanation.
-        </div>
-      </PgCard>
-      <PgLab topo={topo} setTopo={setTopo} sandbox />
-      <PgCard title="Reset and share" hue={COLOR.pink}>
-        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-          <button className="btn-flat" onClick={() => { setTopo(pgClone(PG_SANDBOX)); setMsg('Back to the starting network.'); }} style={{ fontSize: '12.5px', fontWeight: 800, padding: '6px 12px', borderRadius: '999px', border: `2px solid ${COLOR.border}`, color: COLOR.muted }}>Reset</button>
-          <button className="btn-flat" onClick={exportJson} style={{ fontSize: '12.5px', fontWeight: 800, padding: '6px 12px', borderRadius: '999px', border: `2px solid ${COLOR.border}`, color: COLOR.muted }}>Export this setup</button>
-          <button className="btn-flat" onClick={() => { setShare(true); setText(''); setMsg(''); }} style={{ fontSize: '12.5px', fontWeight: 800, padding: '6px 12px', borderRadius: '999px', border: `2px solid ${COLOR.border}`, color: COLOR.muted }}>Import a setup</button>
-        </div>
-        {share && (
-          <div style={{ marginTop: '10px' }}>
-            <textarea value={text} onChange={(e) => setText(e.target.value)} aria-label="Setup JSON" rows={8} spellCheck={false}
-              style={{ ...pgInputStyle(false), fontSize: '12px', resize: 'vertical' }} placeholder="Paste a setup here, then Load it." />
-            <button className="btn-flat" onClick={importJson} style={{ marginTop: '6px', fontSize: '12.5px', fontWeight: 800, color: ink(COLOR.pink) }}>Load this setup</button>
-          </div>
-        )}
-        {msg ? <div style={{ fontSize: '12.5px', color: COLOR.muted, marginTop: '6px' }}>{msg}</div> : null}
-      </PgCard>
-    </div>
-  );
+function pgIpValidTopo(t) {
+  return !!t && Array.isArray(t.segments) && Array.isArray(t.hosts) && Array.isArray(t.routers) && t.hosts.length >= 2
+    && t.hosts.every((h) => typeof h.id === 'string' && typeof h.name === 'string' && typeof h.ip === 'string' && typeof h.mask === 'string' && t.segments.some((s) => s.id === h.segment))
+    && t.routers.every((r) => typeof r.id === 'string' && Array.isArray(r.ifaces) && Array.isArray(r.routes) && r.ifaces.every((f) => t.segments.some((s) => s.id === f.segment)));
 }
 
-function IpConfigTool() {
-  const scenarios = (typeof PLAYGROUND !== 'undefined' && PLAYGROUND.ipconfig) || [];
-  const [pick, setPick] = useState(null);       // scenario id, or 'sandbox'
+function IpConfigTool({ pick, onPick }) {
+  const scenarios = pgScenarios('ipconfig');
   const scenario = scenarios.find((s) => s.id === pick);
-  if (pick === 'sandbox') return <IpSandbox onBack={() => setPick(null)} />;
-  if (scenario) return <IpScenario key={scenario.id} scenario={scenario} onBack={() => setPick(null)} />;
-  const levelHue = { starter: COLOR.success, core: COLOR.blue, stretch: COLOR.orange };
+  if (pick === 'sandbox') {
+    return (
+      <PgSandboxShell tool="ipconfig" makeDefault={() => pgClone(PG_SANDBOX)} validate={pgIpValidTopo} onBack={() => onPick('')}
+        blurb="Break it on purpose. Give two hosts the same address, shrink a mask, remove a gateway, or add a route, then ping and read the explanation. Add hosts to any network."
+        renderLab={(topo, setTopo) => <PgLab topo={topo} setTopo={setTopo} sandbox />} />
+    );
+  }
+  if (scenario) {
+    return (
+      <PgScenarioShell key={scenario.id} tool="ipconfig" scenario={scenario} onBack={() => onPick('')}
+        isSolved={(topo) => scenario.expectFixed.every((g) => pgPing(topo, g.from, g.to).verdict === g.verdict)}
+        fixLines={(sc) => sc.fix.map((f) => pgIpDescribeFix(sc, f))}
+        renderLab={(topo, setTopo, sc) => <PgLab topo={topo} setTopo={setTopo} goals={sc.expectFixed} defaultAsk={sc.ask} />} />
+    );
+  }
   return (
-    <div>
-      <div style={{ fontSize: '13px', color: COLOR.muted, lineHeight: 1.55, marginBottom: '12px' }}>
-        Each scenario is a small network with something wrong. Ping to see the symptom, read the trace to find the first thing that breaks, change the setting, and ping again.
-      </div>
-      <button className="btn-flat" onClick={() => setPick('sandbox')}
-        style={{ display: 'block', width: '100%', textAlign: 'left', marginBottom: '12px', padding: '14px 16px', borderRadius: '16px', background: tint(COLOR.gold, 10), border: `2px solid color-mix(in srgb, ${COLOR.gold} 45%, ${COLOR.border})`, color: COLOR.text, boxShadow: SHADOW.card }}>
-        <div className="itil-display" style={{ fontSize: '15px', color: ink(COLOR.gold) }}>Free sandbox</div>
-        <div style={{ fontSize: '12.5px', color: COLOR.muted, marginTop: '3px' }}>A working network to break and fix however you like. Add hosts, export and import your setup.</div>
-      </button>
-      {['starter', 'core', 'stretch'].map((lv) => {
-        const list = scenarios.filter((s) => s.level === lv);
-        if (!list.length) return null;
-        return (
-          <div key={lv} style={{ marginBottom: '8px' }}>
-            <div style={{ fontSize: '11px', fontWeight: 800, letterSpacing: '0.06em', textTransform: 'uppercase', color: ink(levelHue[lv]), margin: '10px 0 6px' }}>{PG_LEVEL_LABEL[lv]}</div>
-            {list.map((s) => (
-              <button key={s.id} className="btn-flat" onClick={() => setPick(s.id)}
-                style={{ display: 'block', width: '100%', textAlign: 'left', marginBottom: '8px', padding: '12px 14px', borderRadius: '14px', background: tint(levelHue[lv], 8), border: `2px solid color-mix(in srgb, ${levelHue[lv]} 38%, ${COLOR.border})`, color: COLOR.text }}>
-                <div style={{ fontSize: '14px', fontWeight: 800 }}>{s.title}</div>
-                <div style={{ fontSize: '12.5px', color: COLOR.muted, marginTop: '2px', lineHeight: 1.45 }}>{s.goal}</div>
-              </button>
-            ))}
-          </div>
-        );
-      })}
-    </div>
+    <PgScenarioPicker tool="ipconfig" scenarios={scenarios} onPick={onPick}
+      intro="Each scenario is a small network with something wrong. Ping to see the symptom, read the trace to find the first thing that breaks, change the setting, and ping again."
+      sandboxText="A working network to break and fix however you like. Add hosts, export and import your setup." />
   );
 }

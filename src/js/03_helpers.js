@@ -296,15 +296,14 @@ function normalizeSrs(raw) {
 // Home, Profile and the Playground sit outside any one cert: no track in their URLs.
 function isHubMode(m) { return m === 'home' || m === 'profile' || m === 'playground'; }
 
-const PLAYGROUND_TOOL_KEYS = ['subnet', 'ipconfig', 'vlan', 'firewall'];
-
-function routeToHash(mode, trackKey, learnView, quizView, playgroundTool) {
+// The Playground's tools register themselves (see 04h_playground_ui.jsx); pgToolKeys() lists them.
+function routeToHash(mode, trackKey, learnView, quizView, playgroundTool, playgroundPick) {
   if (mode === 'path') return `#/${trackKey}/path`;
   if (mode === 'learn') return `#/${trackKey}/reference/${learnView}`;
   if (mode === 'quiz') return `#/${trackKey}/practice/${quizView}`;
   if (mode === 'exam') return `#/${trackKey}/exam`;
   if (mode === 'profile') return '#/profile';
-  if (mode === 'playground') return playgroundTool ? `#/playground/${playgroundTool}` : '#/playground';
+  if (mode === 'playground') return playgroundTool ? `#/playground/${playgroundTool}${playgroundPick ? `/${playgroundPick}` : ''}` : '#/playground';
   return '#/home';
 }
 
@@ -319,7 +318,10 @@ function parseHash(hash, validTrackKeys) {
   const parts = path.split('/').filter(Boolean);
   if (!parts.length || parts[0] === 'home') return { mode: 'home' };
   if (parts[0] === 'profile') return { mode: 'profile' };
-  if (parts[0] === 'playground') return { mode: 'playground', tool: PLAYGROUND_TOOL_KEYS.includes(parts[1]) ? parts[1] : '' };
+  if (parts[0] === 'playground') {
+    const tool = pgToolKeys().includes(parts[1]) ? parts[1] : '';
+    return { mode: 'playground', tool, pick: tool && /^[a-z0-9-]+$/.test(parts[2] || '') ? parts[2] : '' };
+  }
   const [trackKey, mode, sub] = parts;
   if (!validTrackKeys.has(trackKey)) return { mode: 'home' };
   if (mode === 'path') return { mode: 'path', trackKey };

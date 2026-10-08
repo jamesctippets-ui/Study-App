@@ -327,6 +327,79 @@ _add({
 
 
 
+def _internet_site(r1_routes):
+    """HQ, a branch behind a /30 and an ISP, to show default and more-specific routes."""
+    return {
+        'segments': [{'id': 'lan', 'label': 'HQ LAN'}, {'id': 'wan', 'label': 'Branch link'}, {'id': 'isp', 'label': 'ISP link'},
+                     {'id': 'branch', 'label': 'Branch LAN'}, {'id': 'inet', 'label': 'Internet'}],
+        'hosts': [
+            {'id': 'pc', 'name': 'HQ PC', 'segment': 'lan', 'ip': '10.10.0.10', 'mask': '255.255.255.0', 'gateway': '10.10.0.1'},
+            {'id': 'bpc', 'name': 'Branch PC', 'segment': 'branch', 'ip': '10.20.0.10', 'mask': '255.255.255.0', 'gateway': '10.20.0.1'},
+            {'id': 'web', 'name': 'Web site', 'segment': 'inet', 'ip': '198.51.100.10', 'mask': '255.255.255.0', 'gateway': '198.51.100.1'},
+        ],
+        'routers': [
+            {'id': 'r1', 'name': 'HQ router',
+             'ifaces': [{'segment': 'lan', 'ip': '10.10.0.1', 'mask': '255.255.255.0'}, {'segment': 'wan', 'ip': '192.0.2.1', 'mask': '255.255.255.252'},
+                        {'segment': 'isp', 'ip': '203.0.113.2', 'mask': '255.255.255.252'}],
+             'routes': r1_routes},
+            {'id': 'r2', 'name': 'Branch router',
+             'ifaces': [{'segment': 'wan', 'ip': '192.0.2.2', 'mask': '255.255.255.252'}, {'segment': 'branch', 'ip': '10.20.0.1', 'mask': '255.255.255.0'}],
+             'routes': [{'net': '0.0.0.0', 'mask': '0.0.0.0', 'via': '192.0.2.1'}]},
+            {'id': 'isp1', 'name': 'ISP router',
+             'ifaces': [{'segment': 'isp', 'ip': '203.0.113.1', 'mask': '255.255.255.252'}, {'segment': 'inet', 'ip': '198.51.100.1', 'mask': '255.255.255.0'}],
+             'routes': [{'net': '10.0.0.0', 'mask': '255.0.0.0', 'via': '203.0.113.2'}]},
+        ],
+    }
+
+
+_DEFAULT_ROUTE = {'net': '0.0.0.0', 'mask': '0.0.0.0', 'via': '203.0.113.1'}
+
+_add({
+    'id': 'longest-prefix',
+    'title': 'The branch is unreachable, but the internet works',
+    'goal': 'The most specific route wins, even when it is the broken one.',
+    'level': 'stretch',
+    'story': 'HQ has a default route to the ISP and a route for the branch network. HQ can browse the internet, but nobody at HQ can reach the branch office. "Just fall back to the default route" does not happen.',
+    'topology': _internet_site([_DEFAULT_ROUTE, {'net': '10.20.0.0', 'mask': '255.255.0.0', 'via': '192.0.2.9'}]),
+    'ask': {'from': 'pc', 'to': 'bpc'},
+    'expect': [
+        {'from': 'pc', 'to': 'web', 'verdict': 'success'},
+        {'from': 'pc', 'to': 'bpc', 'verdict': 'failed', 'code': 'bad-next-hop'},
+    ],
+    'hints': [
+        'Two routes match the branch address: the default route (/0) and the branch route (/16). Which one does the router pick?',
+        'Check the next hop of the branch route against the addresses on the 192.0.2.0/30 link.',
+    ],
+    'fix': [{'device': 'r1', 'routeIndex': 1, 'field': 'via', 'value': '192.0.2.2'}],
+    'expectFixed': [
+        {'from': 'pc', 'to': 'bpc', 'verdict': 'success'},
+        {'from': 'bpc', 'to': 'pc', 'verdict': 'success'},
+        {'from': 'pc', 'to': 'web', 'verdict': 'success'},
+    ],
+    'lesson': 'A router always uses the longest matching prefix. The /16 route to the branch beats the /0 default, so traffic never falls back to the default just because the specific route is broken. Fix the specific route; the default keeps serving everything else.',
+    'related': ['CCNA: routing table and longest-prefix match', 'AZ-104: effective routes and user-defined routes'],
+})
+
+_add({
+    'id': 'default-route',
+    'title': 'Everything internal works, nothing external does',
+    'goal': 'A default route is the way out for destinations the router does not know.',
+    'level': 'core',
+    'story': 'After a router swap the HQ and branch networks talk to each other fine, but no one can reach the internet. The router can ping the ISP.',
+    'topology': _internet_site([{'net': '10.20.0.0', 'mask': '255.255.255.0', 'via': '192.0.2.2'}]),
+    'ask': {'from': 'pc', 'to': 'web'},
+    'expect': [
+        {'from': 'pc', 'to': 'bpc', 'verdict': 'success'},
+        {'from': 'pc', 'to': 'web', 'verdict': 'failed', 'code': 'no-route'},
+    ],
+    'hints': ['Which route would match 198.51.100.10 on the HQ router today?'],
+    'fix': [{'device': 'r1', 'route': {'net': '0.0.0.0', 'mask': '0.0.0.0', 'via': '203.0.113.1'}}],
+    'expectFixed': [{'from': 'pc', 'to': 'web', 'verdict': 'success'}, {'from': 'pc', 'to': 'bpc', 'verdict': 'success'}],
+    'lesson': 'A route to 0.0.0.0/0 (the default route) matches everything that nothing more specific matches, which is how a site reaches the whole internet with one line. Without it the router has no idea where to send unfamiliar destinations and drops them.',
+    'related': ['CCNA: default routes', 'CC: routers and gateways'],
+})
+
+
 # ---------------------------------------------------------------------------
 # VLAN playground scenarios. Same fields as the ipconfig ones, with a switched
 # topology: {'switches': [{'id','name','vlans','ports': [{'id','mode',
@@ -531,6 +604,33 @@ _vadd({
     'expectFixed': [{'from': 'pc1', 'to': 'pc3', 'verdict': 'success'}],
     'lesson': 'A router on a stick uses one physical link and one 802.1Q sub-interface per VLAN. The tag is what tells the router which VLAN a frame came from, so the switch port must be a trunk, not an access port. Traffic between VLANs always goes through a layer 3 device.',
     'related': ['CCNA: inter-VLAN routing (router on a stick)', 'AZ-104: routing between subnets'],
+})
+
+def _e_portsec(t):
+    for s in t['switches']:
+        if s['id'] == 'sw1':
+            for p in s['ports']:
+                if p['id'] == 'Fa0/2':
+                    p['secure'] = {'max': 1, 'allowed': ['AA:99'], 'violation': 'shutdown'}
+
+
+_vadd({
+    'id': 'vlan-port-security',
+    'title': 'The new PC never connects on the old desk port',
+    'goal': 'Port security trusts specific MAC addresses; a swapped device is a violation.',
+    'level': 'core',
+    'story': 'PC2 was replaced over the weekend and plugged into the same wall socket. It has link, a correct address and the right VLAN, but it cannot reach anything. The network team says "that port is locked down".',
+    'topology': _vlan(_e_portsec),
+    'ask': {'from': 'pc1', 'to': 'pc2'},
+    'expect': [{'from': 'pc1', 'to': 'pc2', 'verdict': 'failed', 'code': 'port-security'}],
+    'hints': [
+        'Everything about PC2 looks right. What does the switch port itself do with frames from an unfamiliar device?',
+        'Compare the MAC addresses the port trusts with the MAC address PC2 sends from.',
+    ],
+    'fix': [{'device': 'sw1', 'port': 'Fa0/2', 'field': 'secure', 'value': {'max': 1, 'allowed': ['AA:02'], 'violation': 'shutdown'}}],
+    'expectFixed': [{'from': 'pc1', 'to': 'pc2', 'verdict': 'success'}],
+    'lesson': 'Port security limits which MAC addresses may use a switch port (statically configured, or learned and "stuck" up to a maximum). A frame from any other address is a violation: shutdown puts the port into err-disabled, restrict and protect drop the frames but keep the port up. After a legitimate hardware swap the trusted address list has to be updated, and an err-disabled port has to be re-enabled by an administrator.',
+    'related': ['CCNA: port security', 'SSCP: network access control', 'CC: physical and network access controls'],
 })
 
 _vadd({
@@ -780,6 +880,35 @@ _fadd({
     'related': ['CCNA: NAT behaviour', 'SSCP: network design'],
 })
 
+# ---------------------------------------------------------------------------
+# Lesson "try it" links: a lesson that a Playground tool illustrates gets a
+# button at its end. 'pick' is a scenario id, 'sandbox', or (for the subnet
+# tool) a tab: calc, same, vlsm, drill, ipv6. build.py checks the lesson exists.
+# ---------------------------------------------------------------------------
+
+LESSON_LINKS = [
+    {'track': 'ccna', 'lesson': 'ccna-ipv4-subnetting', 'tool': 'subnet', 'pick': 'calc', 'label': 'Subnet calculator and VLSM planner', 'blurb': 'Work out network, broadcast and host range, then plan a VLSM split, with the steps shown.'},
+    {'track': 'ccna', 'lesson': 'ccna-ipv4-subnetting', 'tool': 'subnet', 'pick': 'drill', 'label': 'Subnetting drill', 'blurb': 'Random problems with the working explained after each answer.'},
+    {'track': 'ccna', 'lesson': 'ccna-ipv4-subnetting', 'tool': 'ipconfig', 'pick': 'wrong-gateway', 'label': 'Fix a PC that cannot leave its subnet', 'blurb': 'A wrong default gateway, found by reading the ping trace.'},
+    {'track': 'ccna', 'lesson': 'ccna-vlans-trunking-intervlan', 'tool': 'vlan', 'pick': 'vlan-trunk-allowed', 'label': 'A VLAN that will not cross the trunk', 'blurb': 'Allowed VLAN lists on both ends of a trunk.'},
+    {'track': 'ccna', 'lesson': 'ccna-vlans-trunking-intervlan', 'tool': 'vlan', 'pick': 'inter-vlan-trunk', 'label': 'Router on a stick that never works', 'blurb': 'Why the switch port facing the router must be a trunk.'},
+    {'track': 'ccna', 'lesson': 'routing-table-static-routes', 'tool': 'ipconfig', 'pick': 'missing-routes', 'label': 'Two offices, one link, no connection', 'blurb': 'Static routes in both directions.'},
+    {'track': 'ccna', 'lesson': 'routing-table-static-routes', 'tool': 'ipconfig', 'pick': 'longest-prefix', 'label': 'The more specific route wins', 'blurb': 'Longest-prefix match with a default route.'},
+    {'track': 'ccna', 'lesson': 'acls-layer2-wireless-security', 'tool': 'firewall', 'pick': 'fw-rule-order', 'label': 'A deny above an allow', 'blurb': 'Rule order and the implicit deny.'},
+    {'track': 'ccna', 'lesson': 'nat-dhcp-dns-ntp', 'tool': 'firewall', 'pick': 'fw-no-nat', 'label': 'No internet without source NAT', 'blurb': 'Why private addresses need PAT to reach the internet.'},
+    {'track': 'isc2cc', 'lesson': 'networking-fundamentals', 'tool': 'subnet', 'pick': 'calc', 'label': 'Subnet calculator', 'blurb': 'See what an address and mask actually mean.'},
+    {'track': 'isc2cc', 'lesson': 'networking-fundamentals', 'tool': 'firewall', 'pick': 'sandbox', 'label': 'A firewall to experiment with', 'blurb': 'Rules, NAT and port forwarding in a small network.'},
+    {'track': 'isc2cc', 'lesson': 'cloud-segmentation-zero-trust', 'tool': 'vlan', 'pick': 'vlan-wrong-port', 'label': 'Segmentation with VLANs', 'blurb': 'Two PCs side by side that cannot talk because they are in different VLANs.'},
+    {'track': 'sscp', 'lesson': 'network-security-controls', 'tool': 'firewall', 'pick': 'fw-stateless', 'label': 'Stateful versus stateless filtering', 'blurb': 'Outbound allowed, replies dropped.'},
+    {'track': 'cissp', 'lesson': 'network-architecture-segmentation', 'tool': 'vlan', 'pick': 'vlan-native-mismatch', 'label': 'Native VLAN mismatch', 'blurb': 'Untagged traffic that lands in the wrong VLAN.'},
+    {'track': 'cissp', 'lesson': 'network-transport-edge-operations', 'tool': 'firewall', 'pick': 'sandbox', 'label': 'Firewall rules and NAT', 'blurb': 'Rule order, zones and port forwarding in a small network.'},
+    {'track': 'az104', 'lesson': 'az104-networking', 'tool': 'subnet', 'pick': 'vlsm', 'label': 'Plan the address space for a virtual network', 'blurb': 'Carve a VNet range into subnets without waste.'},
+    {'track': 'az104', 'lesson': 'az104-networking', 'tool': 'ipconfig', 'pick': 'missing-routes', 'label': 'User-defined routes in miniature', 'blurb': 'What a route table does when the next hop is wrong or missing.'},
+    {'track': 'az900', 'lesson': 'networking', 'tool': 'subnet', 'pick': 'calc', 'label': 'Subnet calculator', 'blurb': 'Address spaces and subnets, worked out.'},
+    {'track': 'sc500', 'lesson': 'network-perimeter-security', 'tool': 'firewall', 'pick': 'fw-implicit-deny', 'label': 'The implicit deny', 'blurb': 'A port forward without an allow rule.'},
+    {'track': 'az305', 'lesson': 'compute-networking-architecture', 'tool': 'subnet', 'pick': 'vlsm', 'label': 'VLSM planner', 'blurb': 'Design subnets for tiers of different sizes.'},
+]
+
 SCENARIOS = {
     'ipconfig': IPCONFIG_SCENARIOS,
     'vlan': VLAN_SCENARIOS,
@@ -787,3 +916,20 @@ SCENARIOS = {
     'firewall': FIREWALL_SCENARIOS,
     'firewallSandbox': _fw_base(),
 }
+
+# Extra tools live in data/playground_<tool>.py. Each exports TOOL_KEY, SCENARIOS,
+# SANDBOX and (optionally) LESSON_LINKS and validate() -> list of error strings.
+import importlib as _importlib
+import pkgutil as _pkgutil
+from pathlib import Path as _Path
+
+EXTRA_MODULES = []
+for _info in sorted(_pkgutil.iter_modules([str(_Path(__file__).parent)]), key=lambda m: m.name):
+    if _info.name.startswith('playground_'):
+        _mod = _importlib.import_module(f'data.{_info.name}')
+        EXTRA_MODULES.append(_mod)
+        SCENARIOS[_mod.TOOL_KEY] = _mod.SCENARIOS
+        SCENARIOS[_mod.TOOL_KEY + 'Sandbox'] = _mod.SANDBOX
+        LESSON_LINKS.extend(getattr(_mod, 'LESSON_LINKS', []))
+
+SCENARIOS['lessonLinks'] = LESSON_LINKS

@@ -569,6 +569,18 @@ function pgVlanDeliver(topo, state, sender, dstMac, steps, notes) {
   const startSw = pgVlanSwitch(topo, dev.switch);
   const startPort = pgVlanPort(startSw, dev.port);
   if (!startSw || !startPort) { steps.push({ ok: false, text: `${dev.name} is not plugged into a switch port.` }); return receivers; }
+  if (sender.kind === 'host' && startPort.mode === 'access' && startPort.secure) {
+    const sec = startPort.secure;
+    const allowed = sec.allowed || [];
+    if (!allowed.includes(srcMac) && !(allowed.length < Number(sec.max || 1))) {
+      const mode = sec.violation || 'shutdown';
+      const effect = mode === 'shutdown' ? 'the port goes into the err-disabled state and stays down until an administrator re-enables it'
+        : mode === 'restrict' ? 'the offending frames are dropped and a log message is raised, but the port stays up' : 'the offending frames are silently dropped and the port stays up';
+      steps.push({ ok: false, text: `Port security on ${startSw.name} ${startPort.id} only allows ${allowed.length ? allowed.join(', ') : 'learned addresses up to its limit'}, but this frame comes from ${srcMac}. That is a violation; with violation mode "${mode}" ${effect}.` });
+      drops.push({ code: 'port-security', switchId: startSw.id, portId: startPort.id, field: 'secure', title: `Port security is blocking ${dev.name} on ${startSw.name} ${startPort.id}`, text: `The port only accepts frames from the MAC addresses it was told to trust (${allowed.join(', ') || 'none yet'}). ${dev.name} uses ${srcMac}, which is not one of them, so its frames are discarded.`, fix: `If ${dev.name} is legitimate, add ${srcMac} to the allowed addresses on ${startSw.name} ${startPort.id} (or raise the maximum). If it is not, the port is doing its job.` });
+      return [];
+    }
+  }
   queue.push({ sw: startSw, port: startPort, tag: sender.kind === 'router' ? sender.vlan : null, from: dev.name });
   const seen = {};
   while (queue.length) {
@@ -994,4 +1006,133 @@ function pgFwApplyFixes(topo, fixes) {
     else if (f.field) t.fw[f.field] = f.value;
   });
   return t;
+}
+
+/* ---- IPv6 (BigInt arithmetic: an address is a 128-bit integer) ---- */
+
+function pgParseIPv6(text) {
+  const s = String(text == null ? '' : text).trim().toLowerCase();
+  if (!s || /[^0-9a-f:.]/.test(s) || s.includes(':::')) return null;
+  const halves = s.split('::');
+  if (halves.length > 2) return null;
+  const toGroups = (part) => {
+    if (part === '') return [];
+    const groups = part.split(':');
+    const out = [];
+    for (let i = 0; i < groups.length; i += 1) {
+      const g = groups[i];
+      if (g.includes('.')) {
+        if (i !== groups.length - 1) return null;
+        const v4 = pgParseIPv4(g);
+        if (v4 === null) return null;
+        out.push((v4 >>> 16).toString(16), (v4 & 0xFFFF).toString(16));
+      } else {
+        if (!/^[0-9a-f]{1,4}$/.test(g)) return null;
+        out.push(g);
+      }
+    }
+    return out;
+  };
+  const head = toGroups(halves[0]);
+  const tail = halves.length === 2 ? toGroups(halves[1]) : [];
+  if (head === null || tail === null) return null;
+  let groups;
+  if (halves.length === 2) {
+    const missing = 8 - head.length - tail.length;
+    if (missing < 1) return null;
+    groups = head.concat(new Array(missing).fill('0'), tail);
+  } else {
+    if (head.length !== 8) return null;
+    groups = head;
+  }
+  let n = 0n;
+  groups.forEach((g) => { n = (n << 16n) | BigInt(parseInt(g, 16)); });
+  return n;
+}
+
+function pgIPv6Groups(n) {
+  const out = [];
+  for (let i = 7; i >= 0; i -= 1) out.push(Number((n >> BigInt(i * 16)) & 0xFFFFn));
+  return out;
+}
+
+function pgIPv6Expand(n) { return pgIPv6Groups(n).map((g) => g.toString(16).padStart(4, '0')).join(':'); }
+
+// RFC 5952: lower case, no leading zeros, the longest run of two or more zero groups becomes "::".
+function pgIPv6Compress(n) {
+  const g = pgIPv6Groups(n);
+  let best = { start: -1, len: 0 };
+  for (let i = 0; i < 8;) {
+    if (g[i] !== 0) { i += 1; continue; }
+    let j = i;
+    while (j < 8 && g[j] === 0) j += 1;
+    if (j - i > best.len) best = { start: i, len: j - i };
+    i = j;
+  }
+  const hex = g.map((x) => x.toString(16));
+  if (best.len < 2) return hex.join(':');
+  const left = hex.slice(0, best.start).join(':');
+  const right = hex.slice(best.start + best.len).join(':');
+  return `${left}::${right}`;
+}
+
+function pgV6Mask(prefix) {
+  if (prefix <= 0) return 0n;
+  return ((1n << BigInt(prefix)) - 1n) << BigInt(128 - prefix);
+}
+
+function pgV6Kind(n) {
+  const top = (bits, len) => n >> BigInt(128 - len) === BigInt(bits);
+  if (n === 0n) return { key: 'unspecified', label: 'The unspecified address (::), used before a host has an address' };
+  if (n === 1n) return { key: 'loopback', label: 'Loopback (::1), the device talking to itself' };
+  if (top(0xFFFF, 96) || (n >> 32n) === 0xFFFFn) return { key: 'mapped', label: 'IPv4-mapped address (::ffff:0:0/96), an IPv4 address carried in IPv6 form' };
+  if (top(0xFE80 >> 6, 10)) return { key: 'linklocal', label: 'Link-local (fe80::/10): valid only on one link, never routed; used for neighbour discovery and next hops' };
+  if (top(0xFC >> 1, 7)) return { key: 'ula', label: 'Unique local address (fc00::/7), the IPv6 counterpart of private addresses' };
+  if (top(0xFF, 8)) return { key: 'multicast', label: 'Multicast (ff00::/8). IPv6 has no broadcast; multicast does that job' };
+  if (n >> 96n === 0x20010db8n) return { key: 'documentation', label: 'Documentation range (2001:db8::/32), reserved for examples' };
+  if (top(0x2000 >> 13, 3)) return { key: 'global', label: 'Global unicast (2000::/3), routable on the internet' };
+  return { key: 'reserved', label: 'Reserved or not yet allocated' };
+}
+
+function pgV6Info(ip, prefix) {
+  const mask = pgV6Mask(prefix);
+  const network = ip & mask;
+  const last = network | ((~mask) & ((1n << 128n) - 1n));
+  const hostBits = 128 - prefix;
+  return {
+    ip, prefix, network, last, hostBits, kind: pgV6Kind(ip),
+    expanded: pgIPv6Expand(ip), compressed: pgIPv6Compress(ip),
+    networkText: pgIPv6Compress(network), lastText: pgIPv6Compress(last),
+    subnets64: prefix <= 64 ? (1n << BigInt(64 - prefix)) : null,
+    addresses: 1n << BigInt(hostBits),
+    interfaceId: ip & ((1n << 64n) - 1n),
+  };
+}
+
+// The modified EUI-64 interface identifier for a MAC address, or null if the MAC is not valid.
+function pgEui64(mac) {
+  const hex = String(mac || '').trim().replace(/[:\-.]/g, '').toLowerCase();
+  if (!/^[0-9a-f]{12}$/.test(hex)) return null;
+  const b = [];
+  for (let i = 0; i < 12; i += 2) b.push(parseInt(hex.slice(i, i + 2), 16));
+  b[0] ^= 0x02; // flip the universal/local bit
+  const bytes = [b[0], b[1], b[2], 0xFF, 0xFE, b[3], b[4], b[5]];
+  let n = 0n;
+  bytes.forEach((x) => { n = (n << 8n) | BigInt(x); });
+  return n;
+}
+
+function pgV6Subnets(ip, prefix, newPrefix, limit) {
+  const out = [];
+  if (newPrefix < prefix || newPrefix > 128) return out;
+  const step = 1n << BigInt(128 - newPrefix);
+  const base = ip & pgV6Mask(prefix);
+  const count = 1n << BigInt(newPrefix - prefix);
+  for (let i = 0n; i < count && i < BigInt(limit || 8); i += 1n) out.push({ network: base + i * step, prefix: newPrefix, text: `${pgIPv6Compress(base + i * step)}/${newPrefix}` });
+  return out;
+}
+
+function pgFormatBig(n) {
+  const s = n.toString();
+  return s.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 }

@@ -5,6 +5,7 @@ function CertStudyApp() {
   const [activeTrack, setActiveTrack] = useState('az900');
   const [mode, setMode] = useState('home');
   const [playgroundTool, setPlaygroundTool] = useState('');
+  const [playgroundPick, setPlaygroundPick] = useState('');
   const [learnView, setLearnView] = useState('study');
   const [quizView, setQuizView] = useState('questions');
   const [activeCat, setActiveCat] = useState('all');
@@ -1003,8 +1004,8 @@ function CertStudyApp() {
   // state, which is a same-value no-op that never re-renders and so
   // never gets to reset a "just applied a hash" flag, permanently
   // stalling every navigation after the first.
-  const routeStateRef = useRef({ mode, activeTrack, learnView, quizView, playgroundTool });
-  routeStateRef.current = { mode, activeTrack, learnView, quizView, playgroundTool };
+  const routeStateRef = useRef({ mode, activeTrack, learnView, quizView, playgroundTool, playgroundPick });
+  routeStateRef.current = { mode, activeTrack, learnView, quizView, playgroundTool, playgroundPick };
 
   useEffect(() => {
     const validTrackKeys = new Set(visibleTracks.map((t) => t.key));
@@ -1012,14 +1013,14 @@ function CertStudyApp() {
       const parsed = parseHash(window.location.hash, validTrackKeys);
       const cur = routeStateRef.current;
       const same = isHubMode(parsed.mode)
-        ? cur.mode === parsed.mode && (parsed.mode !== 'playground' || (parsed.tool || '') === cur.playgroundTool)
+        ? cur.mode === parsed.mode && (parsed.mode !== 'playground' || ((parsed.tool || '') === cur.playgroundTool && (parsed.pick || '') === cur.playgroundPick))
         : parsed.trackKey === cur.activeTrack && parsed.mode === cur.mode
           && (parsed.mode !== 'learn' || parsed.learnView === cur.learnView)
           && (parsed.mode !== 'quiz' || parsed.quizView === cur.quizView);
       if (same) return;
       if (isHubMode(parsed.mode)) {
         setMode(parsed.mode);
-        if (parsed.mode === 'playground') setPlaygroundTool(parsed.tool || '');
+        if (parsed.mode === 'playground') { setPlaygroundTool(parsed.tool || ''); setPlaygroundPick(parsed.pick || ''); }
         return;
       }
       pickTrack(parsed.trackKey);
@@ -1050,9 +1051,9 @@ function CertStudyApp() {
   const routeWriterReady = useRef(false);
   useEffect(() => {
     if (!routeWriterReady.current) { routeWriterReady.current = true; return; }
-    const hash = routeToHash(mode, activeTrack, learnView, quizView, playgroundTool);
+    const hash = routeToHash(mode, activeTrack, learnView, quizView, playgroundTool, playgroundPick);
     if (window.location.hash !== hash) window.location.hash = hash.replace(/^#/, '');
-  }, [mode, activeTrack, learnView, quizView, playgroundTool]);
+  }, [mode, activeTrack, learnView, quizView, playgroundTool, playgroundPick]);
 
   const availableQuestions = useMemo(() => {
     const byCat = activeCat === 'all' ? questionsData : questionsData.filter((q) => q.cat === activeCat);
@@ -1766,7 +1767,7 @@ function CertStudyApp() {
         ) : null}
 
         {mode === 'playground' ? (
-          <PlaygroundView tool={playgroundTool} onSelectTool={setPlaygroundTool} onExit={() => { setPlaygroundTool(''); setMode('home'); }} />
+          <PlaygroundView tool={playgroundTool} pick={playgroundPick} onSelect={(t, p) => { setPlaygroundTool(t || ''); setPlaygroundPick(p || ''); }} onExit={() => { setPlaygroundTool(''); setPlaygroundPick(''); setMode('home'); }} />
         ) : mode === 'profile' ? (
           <ProfileView
             tracks={visibleTracks}
@@ -1811,7 +1812,7 @@ function CertStudyApp() {
             onSelectTrack={(key) => { pickTrack(key); setMode('path'); }}
             onAddToPath={addToCertPath}
             onOpenAbout={() => setShowAbout(true)}
-            onOpenPlayground={() => { setPlaygroundTool(''); setMode('playground'); }}
+            onOpenPlayground={() => { setPlaygroundTool(''); setPlaygroundPick(''); setMode('playground'); }}
             onOpenGlossary={() => setShowGlossary(true)}
             onSetGoalTarget={setDailyGoalTarget}
             onAnswerDailyQuestion={answerDailyQuestion}

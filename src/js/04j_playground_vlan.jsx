@@ -5,6 +5,23 @@
 // forward, tag, or drop. The simulation is pgVlanPing in 03b_playground_engine.js;
 // guided scenarios come from data/playground.py (PLAYGROUND.vlan).
 
+const PG_VLAN_CAUSES = {
+  'vlan-mismatch': 'The two devices are in different VLANs',
+  'vlan-not-allowed': 'A trunk does not allow the VLAN',
+  'vlan-missing': 'The VLAN does not exist on a switch',
+  'native-mismatch': 'The two ends of a trunk disagree on the native VLAN',
+  'router-untagged': 'The port facing the router is not a trunk',
+  'access-tagged': 'A tagged frame reached an access port',
+  'port-security': 'Port security blocks an untrusted MAC address',
+  'no-gateway': 'The host has no default gateway',
+  'gateway-offsubnet': 'The gateway is outside the host\'s subnet',
+  'arp-timeout': 'Nothing answers for the address (wrong address or gateway)',
+  'no-route': 'The router has no sub-interface for the destination VLAN',
+  'host-unreachable': 'The router cannot find the destination host in its VLAN',
+  'reply-lost': 'The request arrives but the reply cannot get back',
+  'bad-ip': 'A host has an invalid IP configuration',
+};
+
 const PG_VLAN_HUES = { 1: null, 10: 'blue', 20: 'orange', 30: 'pink', 40: 'teal', 99: 'gold' };
 
 function pgVlanColor(v) {
@@ -110,8 +127,21 @@ function PgSwitchEditor({ sw, topo, onChange, where, canEditVlans }) {
               </select>
             </div>
             {p.mode === 'access' ? (
-              <div style={{ maxWidth: '130px' }}>
-                <PgField label="VLAN" value={String(p.vlan)} onChange={(v) => setPort(p.id, { vlan: /^\d+$/.test(v) ? Number(v) : v })} error={Number.isInteger(p.vlan) ? null : 'Number'} inputMode="numeric" />
+              <div>
+                <div style={{ maxWidth: '130px' }}>
+                  <PgField label="VLAN" value={String(p.vlan)} onChange={(v) => setPort(p.id, { vlan: /^\d+$/.test(v) ? Number(v) : v })} error={Number.isInteger(p.vlan) ? null : 'Number'} inputMode="numeric" />
+                </div>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12.5px', fontWeight: 700, marginTop: '8px' }}>
+                  <input type="checkbox" checked={!!p.secure} onChange={(e) => setPort(p.id, { secure: e.target.checked ? { max: 1, allowed: host ? [host.mac] : [], violation: 'shutdown' } : undefined })} style={{ width: '18px', height: '18px', accentColor: COLOR.primary }} />
+                  Port security
+                </label>
+                {p.secure && (
+                  <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 2fr) minmax(0, 0.8fr) minmax(0, 1.4fr)', gap: '8px', marginTop: '6px' }}>
+                    <PgField label="Trusted MACs" value={(p.secure.allowed || []).join(',')} onChange={(v) => setPort(p.id, { secure: { ...p.secure, allowed: v.split(',').map((x) => x.trim()).filter(Boolean) } })} placeholder="AA:01,AA:02" />
+                    <PgField label="Max" value={String(p.secure.max)} onChange={(v) => setPort(p.id, { secure: { ...p.secure, max: /^\d+$/.test(v) ? Number(v) : 1 } })} inputMode="numeric" />
+                    <PgSelect label="Violation" value={p.secure.violation || 'shutdown'} onChange={(v) => setPort(p.id, { secure: { ...p.secure, violation: v } })} options={[{ value: 'shutdown', label: 'shutdown' }, { value: 'restrict', label: 'restrict' }, { value: 'protect', label: 'protect' }]} />
+                  </div>
+                )}
               </div>
             ) : (
               <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 2fr) minmax(0, 1fr)', gap: '8px' }}>
@@ -167,7 +197,7 @@ function PgMacTables({ topo, state, onClear }) {
     }));
   });
   return (
-    <PgCard title="MAC address tables" hue={COLOR.pink} right={rows.length ? <button className="btn-flat" onClick={onClear} style={{ fontSize: '12px', fontWeight: 800, color: ink(COLOR.pink) }}>Clear</button> : null}>
+    <PgCard title="MAC address tables" hue={COLOR.pink} collapsible right={rows.length ? <button className="btn-flat" onClick={onClear} style={{ fontSize: '12px', fontWeight: 800, color: ink(COLOR.pink) }}>Clear</button> : null}>
       {rows.length === 0 ? (
         <div style={{ fontSize: '12.5px', color: COLOR.muted, lineHeight: 1.5 }}>Empty. Switches learn which port a device is behind from the source address of each frame they see. Until then they flood. Ping to fill the tables, then ping again and watch the second pass go straight to one port.</div>
       ) : (
@@ -214,28 +244,21 @@ function PgVlanLab({ topo, setTopo, goals, defaultAsk }) {
           ))}
         </PgCard>
       )}
-      <PgCard title="Switches and ports" hue={COLOR.blue}>
+      <PgCard title="Switches and ports" hue={COLOR.blue} collapsible>
         <div style={{ fontSize: '12px', color: COLOR.muted, marginBottom: '2px' }}>Access ports carry one VLAN, untagged. Trunk ports carry several, tagged, except the native VLAN, which travels untagged.</div>
         {topo.switches.map((s) => <PgSwitchEditor key={s.id} sw={s} topo={topo} onChange={(p) => updSwitch(s.id, p)} where={where} />)}
       </PgCard>
-      <PgCard title="Hosts and router" hue={COLOR.teal}>
+      <PgCard title="Hosts and router" hue={COLOR.teal} collapsible>
         {topo.hosts.map((h) => <PgVlanHostEditor key={h.id} host={h} onChange={(p) => updHost(h.id, p)} hot={failHost === h.id} />)}
         {topo.routers.map((r) => <PgRouterSubifs key={r.id} router={r} onChange={(p) => updRouter(r.id, p)} hot={failHost === r.id} />)}
       </PgCard>
       <PgCard title="Ping" hue={COLOR.success}>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '10px', marginBottom: '10px' }}>
-          {[['From', fromId, setFromId], ['To', toId, setToId]].map(([lab, val, set]) => (
-            <label key={lab} style={{ display: 'block' }}>
-              <span style={{ display: 'block', fontSize: '11px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.04em', color: COLOR.muted, marginBottom: '3px' }}>{lab}</span>
-              <select value={val} onChange={(e) => { set(e.target.value); setResult(null); }} style={{ ...pgInputStyle(false), fontFamily: 'inherit' }}>
-                {topo.hosts.map((h) => <option key={h.id} value={h.id}>{h.name}</option>)}
-              </select>
-            </label>
-          ))}
+          <PgSelect label="From" value={fromId} onChange={(v) => { setFromId(v); setResult(null); }} options={topo.hosts.map((h) => ({ value: h.id, label: h.name }))} />
+          <PgSelect label="To" value={toId} onChange={(v) => { setToId(v); setResult(null); }} options={topo.hosts.map((h) => ({ value: h.id, label: h.name }))} />
         </div>
-        <button className="btn-3d" onClick={ping} style={{ width: '100%', padding: '11px', borderRadius: '10px', background: COLOR.primary, color: COLOR.onAccent, fontSize: '14px', fontWeight: 700, marginBottom: '12px' }}>
-          Ping {nameOf(toId)} from {nameOf(fromId)}
-        </button>
+        <PgPredict compute={() => pgVlanPing(topo, state, fromId, toId)} causes={PG_VLAN_CAUSES} buttonLabel={`Ping ${nameOf(toId)} from ${nameOf(fromId)}`}
+          onResult={(r) => { setState(r.state); setResult(r); }} resetKey={JSON.stringify([topo, fromId, toId])} />
         <PgPingResult result={result} />
       </PgCard>
       <PgMacTables topo={topo} state={state} onClear={() => setState(pgVlanNewState())} />
@@ -243,99 +266,47 @@ function PgVlanLab({ topo, setTopo, goals, defaultAsk }) {
   );
 }
 
-function VlanScenario({ scenario, onBack }) {
-  const [topo, setTopo] = useState(() => pgClone(scenario.topology));
-  const [hintsShown, setHintsShown] = useState(0);
-  const [showFix, setShowFix] = useState(false);
-  const solved = scenario.expectFixed.every((g) => pgVlanPing(topo, pgVlanNewState(), g.from, g.to).verdict === g.verdict);
-  const reset = () => { setTopo(pgClone(scenario.topology)); setHintsShown(0); setShowFix(false); };
-  const nameOf = (id) => [...scenario.topology.switches, ...scenario.topology.hosts, ...scenario.topology.routers].find((d) => d.id === id)?.name || id;
-  const describeFix = (f) => {
-    const who = nameOf(f.device);
-    if (f.subif) return `Add a sub-interface on ${who}: VLAN ${f.subif.vlan}, address ${f.subif.ip}, mask ${f.subif.mask}.`;
-    if (f.port) {
-      const label = { vlan: 'VLAN', mode: 'mode', allowed: 'allowed VLAN list', native: 'native VLAN' }[f.field] || f.field;
-      return `On ${who} ${f.port}, set the ${label} to ${Array.isArray(f.value) ? f.value.join(', ') : f.value}.`;
-    }
-    if (f.field === 'vlans') return `Create the missing VLANs on ${who} (it should have ${f.value.join(', ')}).`;
-    return `Set ${who}'s ${f.field === 'ip' ? 'IP address' : f.field} to ${f.value || 'none'}.`;
-  };
-  return (
-    <div>
-      <button className="btn-flat" onClick={onBack} style={{ fontSize: '13px', fontWeight: 800, color: COLOR.muted, padding: '2px 0 10px' }}>‹ All scenarios</button>
-      <PgCard title={scenario.title} hue={COLOR.gold} right={<span style={{ fontSize: '10.5px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.05em', color: COLOR.muted }}>{PG_LEVEL_LABEL[scenario.level]}</span>}>
-        <div style={{ fontSize: '13px', lineHeight: 1.55 }}>{scenario.story}</div>
-        <div style={{ fontSize: '12.5px', color: COLOR.muted, marginTop: '6px' }}>Your job: find out what is wrong and fix it so the goal below turns green.</div>
-      </PgCard>
-      <PgVlanLab topo={topo} setTopo={setTopo} goals={scenario.expectFixed} defaultAsk={scenario.ask} />
-      {solved && (
-        <PgCard title="Fixed!" hue={COLOR.success}>
-          <div style={{ fontSize: '13px', lineHeight: 1.55 }}>{scenario.lesson}</div>
-          {scenario.related && scenario.related.length > 0 && <div style={{ fontSize: '12px', color: COLOR.muted, marginTop: '8px' }}>Related study: {scenario.related.join(' · ')}</div>}
-        </PgCard>
-      )}
-      <PgCard title="Stuck?" hue={COLOR.orange}>
-        {scenario.hints.slice(0, hintsShown).map((h, i) => <div key={i} style={{ fontSize: '13px', lineHeight: 1.5, marginBottom: '8px' }}><strong>Hint {i + 1}:</strong> {h}</div>)}
-        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-          {hintsShown < scenario.hints.length && <button className="btn-flat" onClick={() => setHintsShown(hintsShown + 1)} style={{ fontSize: '12.5px', fontWeight: 800, padding: '6px 12px', borderRadius: '999px', border: `2px solid ${COLOR.orange}`, color: ink(COLOR.orange) }}>{hintsShown ? 'Another hint' : 'Give me a hint'}</button>}
-          <button className="btn-flat" onClick={() => setShowFix(!showFix)} style={{ fontSize: '12.5px', fontWeight: 800, padding: '6px 12px', borderRadius: '999px', border: `2px solid ${COLOR.border}`, color: COLOR.muted }}>{showFix ? 'Hide the answer' : 'Show the fix'}</button>
-          <button className="btn-flat" onClick={reset} style={{ fontSize: '12.5px', fontWeight: 800, padding: '6px 12px', borderRadius: '999px', border: `2px solid ${COLOR.border}`, color: COLOR.muted }}>Reset scenario</button>
-        </div>
-        {showFix && <ul style={{ margin: '10px 0 0', paddingLeft: '18px', fontSize: '13px', lineHeight: 1.55 }}>{scenario.fix.map((f, i) => <li key={i}>{describeFix(f)}</li>)}</ul>}
-      </PgCard>
-    </div>
-  );
+function pgVlanDescribeFix(scenario, f) {
+  const find = (id) => [...scenario.topology.switches, ...scenario.topology.hosts, ...scenario.topology.routers].find((d) => d.id === id);
+  const who = (find(f.device) || { name: f.device }).name;
+  if (f.subif) return `Add a sub-interface on ${who}: VLAN ${f.subif.vlan}, address ${f.subif.ip}, mask ${f.subif.mask}.`;
+  if (f.port) {
+    const label = { vlan: 'VLAN', mode: 'mode', allowed: 'allowed VLAN list', native: 'native VLAN', secure: 'port security settings' }[f.field] || f.field;
+    const v = f.field === 'secure' ? `trust ${(f.value.allowed || []).join(', ')} (max ${f.value.max}, violation ${f.value.violation})` : Array.isArray(f.value) ? f.value.join(', ') : f.value;
+    return `On ${who} ${f.port}, ${f.field === 'secure' ? v : `set the ${label} to ${v}`}.`;
+  }
+  if (f.field === 'vlans') return `Create the missing VLANs on ${who} (it should have ${f.value.join(', ')}).`;
+  return `Set ${who}'s ${f.field === 'ip' ? 'IP address' : f.field} to ${f.value || 'none'}.`;
 }
 
-function VlanSandbox({ onBack }) {
-  const base = (typeof PLAYGROUND !== 'undefined' && PLAYGROUND.vlanSandbox) || null;
-  const [topo, setTopo] = useState(() => pgClone(base));
-  if (!base) return null;
-  return (
-    <div>
-      <button className="btn-flat" onClick={onBack} style={{ fontSize: '13px', fontWeight: 800, color: COLOR.muted, padding: '2px 0 10px' }}>‹ All scenarios</button>
-      <PgCard title="Free sandbox" hue={COLOR.gold}>
-        <div style={{ fontSize: '13px', lineHeight: 1.55 }}>A working two-switch network with two VLANs and a router on a stick. Move a port to another VLAN, trim a trunk's allowed list, change a native VLAN or turn the router port into an access port, then ping and read what each switch does.</div>
-        <button className="btn-flat" onClick={() => setTopo(pgClone(base))} style={{ marginTop: '8px', fontSize: '12.5px', fontWeight: 800, padding: '6px 12px', borderRadius: '999px', border: `2px solid ${COLOR.border}`, color: COLOR.muted }}>Reset to the working network</button>
-      </PgCard>
-      <PgVlanLab topo={topo} setTopo={setTopo} />
-    </div>
-  );
+function pgVlanValidTopo(t) {
+  return !!t && Array.isArray(t.switches) && Array.isArray(t.hosts) && Array.isArray(t.routers) && Array.isArray(t.links) && t.hosts.length >= 2
+    && t.switches.every((sw) => typeof sw.id === 'string' && Array.isArray(sw.vlans) && Array.isArray(sw.ports) && sw.ports.every((p) => p.mode === 'access' || (p.mode === 'trunk' && Array.isArray(p.allowed))))
+    && t.hosts.every((h) => typeof h.id === 'string' && typeof h.mac === 'string' && !!pgVlanPort(pgVlanSwitch(t, h.switch), h.port))
+    && t.routers.every((r) => Array.isArray(r.subifs));
 }
 
-function VlanTool() {
-  const scenarios = (typeof PLAYGROUND !== 'undefined' && PLAYGROUND.vlan) || [];
-  const [pick, setPick] = useState(null);
+function VlanTool({ pick, onPick }) {
+  const scenarios = pgScenarios('vlan');
   const scenario = scenarios.find((s) => s.id === pick);
-  if (pick === 'sandbox') return <VlanSandbox onBack={() => setPick(null)} />;
-  if (scenario) return <VlanScenario key={scenario.id} scenario={scenario} onBack={() => setPick(null)} />;
-  const levelHue = { starter: COLOR.success, core: COLOR.blue, stretch: COLOR.orange };
+  if (pick === 'sandbox') {
+    return (
+      <PgSandboxShell tool="vlan" makeDefault={() => pgClone(pgData().vlanSandbox)} validate={pgVlanValidTopo} onBack={() => onPick('')}
+        blurb="A working two-switch network with two VLANs and a router on a stick. Move a port to another VLAN, trim a trunk's allowed list, change a native VLAN, lock a port to one MAC address or turn the router port into an access port, then ping and read what each switch does."
+        renderLab={(topo, setTopo) => <PgVlanLab topo={topo} setTopo={setTopo} />} />
+    );
+  }
+  if (scenario) {
+    return (
+      <PgScenarioShell key={scenario.id} tool="vlan" scenario={scenario} onBack={() => onPick('')}
+        isSolved={(topo) => scenario.expectFixed.every((g) => pgVlanPing(topo, pgVlanNewState(), g.from, g.to).verdict === g.verdict)}
+        fixLines={(sc) => sc.fix.map((f) => pgVlanDescribeFix(sc, f))}
+        renderLab={(topo, setTopo, sc) => <PgVlanLab topo={topo} setTopo={setTopo} goals={sc.expectFixed} defaultAsk={sc.ask} />} />
+    );
+  }
   return (
-    <div>
-      <div style={{ fontSize: '13px', color: COLOR.muted, lineHeight: 1.55, marginBottom: '12px' }}>
-        Switches keep each VLAN in its own broadcast domain. Ping across the network and read how every switch treats the frame: learn the sender, flood or forward, add or remove the tag, or drop it and say why.
-      </div>
-      <button className="btn-flat" onClick={() => setPick('sandbox')}
-        style={{ display: 'block', width: '100%', textAlign: 'left', marginBottom: '12px', padding: '14px 16px', borderRadius: '16px', background: tint(COLOR.gold, 10), border: `2px solid color-mix(in srgb, ${COLOR.gold} 45%, ${COLOR.border})`, color: COLOR.text, boxShadow: SHADOW.card }}>
-        <div className="itil-display" style={{ fontSize: '15px', color: ink(COLOR.gold) }}>Free sandbox</div>
-        <div style={{ fontSize: '12.5px', color: COLOR.muted, marginTop: '3px' }}>A working network with two switches, a trunk, two VLANs and a router on a stick, with MAC address tables you can watch fill.</div>
-      </button>
-      {['starter', 'core', 'stretch'].map((lv) => {
-        const list = scenarios.filter((s) => s.level === lv);
-        if (!list.length) return null;
-        return (
-          <div key={lv} style={{ marginBottom: '8px' }}>
-            <div style={{ fontSize: '11px', fontWeight: 800, letterSpacing: '0.06em', textTransform: 'uppercase', color: ink(levelHue[lv]), margin: '10px 0 6px' }}>{PG_LEVEL_LABEL[lv]}</div>
-            {list.map((s) => (
-              <button key={s.id} className="btn-flat" onClick={() => setPick(s.id)}
-                style={{ display: 'block', width: '100%', textAlign: 'left', marginBottom: '8px', padding: '12px 14px', borderRadius: '14px', background: tint(levelHue[lv], 8), border: `2px solid color-mix(in srgb, ${levelHue[lv]} 38%, ${COLOR.border})`, color: COLOR.text }}>
-                <div style={{ fontSize: '14px', fontWeight: 800 }}>{s.title}</div>
-                <div style={{ fontSize: '12.5px', color: COLOR.muted, marginTop: '2px', lineHeight: 1.45 }}>{s.goal}</div>
-              </button>
-            ))}
-          </div>
-        );
-      })}
-    </div>
+    <PgScenarioPicker tool="vlan" scenarios={scenarios} onPick={onPick}
+      intro="Switches keep each VLAN in its own broadcast domain. Ping across the network and read how every switch treats the frame: learn the sender, flood or forward, add or remove the tag, or drop it and say why."
+      sandboxText="A working network with two switches, a trunk, two VLANs and a router on a stick, with MAC address tables you can watch fill." />
   );
 }

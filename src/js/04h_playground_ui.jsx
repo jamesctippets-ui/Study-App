@@ -3,88 +3,7 @@
 // A self-study sandbox that is not tied to any cert. Nothing in it touches
 // mastery, results, the daily goal or exam readiness. The maths and the
 // simulation live in 03b_playground_engine.js; this file is only the screens.
-// The IP configuration tester is in 04i_playground_net.jsx.
-
-const PLAYGROUND_TOOLS = [
-  { key: 'subnet', label: 'Subnet calculator', hue: COLOR.blue, ready: true,
-    blurb: 'Network, broadcast and host range for any address and mask, with the working shown. Plus VLSM planning, a same-subnet checker and a subnetting drill.' },
-  { key: 'ipconfig', label: 'IP configuration lab', hue: COLOR.teal, ready: true,
-    blurb: 'Hosts, a gateway and routers. Change an address, mask or route and ping to see exactly why traffic works or fails. Includes guided troubleshooting scenarios.' },
-  { key: 'vlan', label: 'VLAN playground', hue: COLOR.orange, ready: true,
-    blurb: 'Two switches, access and trunk ports, native VLANs and a router on a stick. Ping across the network and watch each switch learn, flood, tag or drop the frame, with guided troubleshooting scenarios.' },
-  { key: 'firewall', label: 'Firewall and port forwarding', hue: COLOR.pink, ready: true,
-    blurb: 'Ordered allow and deny rules with an implicit deny, port forwards, NAT and stateful inspection. Fire test connections and see which rule matched and why one was blocked.' },
-];
-
-function pgInputStyle(invalid) {
-  return {
-    width: '100%', padding: '9px 8px', borderRadius: '10px', fontSize: '13.5px', minWidth: 0,
-    border: `2px solid ${invalid ? COLOR.red : COLOR.border}`, background: COLOR.surface, color: COLOR.text,
-    fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace',
-  };
-}
-
-function PgCard({ title, hue, right, children, style }) {
-  return (
-    <div style={{ boxShadow: SHADOW.card, background: tint(hue, 7), border: `2px solid color-mix(in srgb, ${hue} 38%, ${COLOR.border})`, borderRadius: '16px', padding: '14px 16px', marginBottom: '14px', ...style }}>
-      {(title || right) && (
-        <div className="flex justify-between items-baseline" style={{ marginBottom: '10px', gap: '8px' }}>
-          <div className="itil-display" style={{ fontSize: '16px', color: ink(hue) }}>{title}</div>
-          {right}
-        </div>
-      )}
-      {children}
-    </div>
-  );
-}
-
-function PgField({ label, value, onChange, error, placeholder, hint, inputMode }) {
-  return (
-    <label style={{ display: 'block', minWidth: 0 }}>
-      <span style={{ display: 'block', fontSize: '11px', fontWeight: 800, letterSpacing: '0.04em', textTransform: 'uppercase', color: COLOR.muted, marginBottom: '3px' }}>{label}</span>
-      <input
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        placeholder={placeholder}
-        inputMode={inputMode}
-        autoCapitalize="off"
-        autoCorrect="off"
-        spellCheck={false}
-        aria-label={label}
-        aria-invalid={error ? 'true' : undefined}
-        style={pgInputStyle(!!error)}
-      />
-      {error ? <span style={{ display: 'block', fontSize: '11.5px', color: COLOR.red, marginTop: '3px' }}>{error}</span> : null}
-      {!error && hint ? <span style={{ display: 'block', fontSize: '11.5px', color: COLOR.muted, marginTop: '3px' }}>{hint}</span> : null}
-    </label>
-  );
-}
-
-function PgSegmented({ options, value, onChange, hue }) {
-  return (
-    <div role="tablist" style={{ display: 'flex', gap: '4px', marginBottom: '14px', flexWrap: 'wrap' }}>
-      {options.map((o) => {
-        const active = o.key === value;
-        return (
-          <button
-            key={o.key}
-            role="tab"
-            aria-selected={active}
-            onClick={() => onChange(o.key)}
-            className="btn-flat"
-            style={{
-              flex: '1 1 0', minWidth: '72px', padding: '8px 6px', borderRadius: '10px', fontSize: '12.5px', fontWeight: 800,
-              border: `2px solid ${active ? hue : COLOR.border}`, background: active ? tint(hue, 20) : 'transparent',
-              color: active ? ink(hue) : COLOR.muted,
-            }}
-          >
-            {o.label}
-          </button>
-        );
-      })}
-    </div>
-  );
-}
+// Shared parts are in 04g_playground_core.jsx; the IP lab, VLAN lab and firewall tester are in 04i, 04j and 04k.
 
 // 32 bits as four octets; network bits are coloured, host bits muted.
 function PgBinary({ bits, hue, label }) {
@@ -433,31 +352,162 @@ function SubnetDrill() {
   );
 }
 
+/* ---------- IPv6 ---------- */
+
+function pgV6Read(addrText, prefixText) {
+  let addr = String(addrText || '').trim();
+  let prefix = String(prefixText || '').trim();
+  const slash = addr.indexOf('/');
+  if (slash >= 0) { prefix = addr.slice(slash + 1); addr = addr.slice(0, slash); }
+  const ip = pgParseIPv6(addr);
+  const p = /^\/?(\d{1,3})$/.exec(prefix);
+  const n = p ? Number(p[1]) : null;
+  return {
+    ip, prefix: n !== null && n >= 0 && n <= 128 ? n : null,
+    ipError: ip === null ? (addr ? 'Not a valid IPv6 address. Groups of 1 to 4 hex digits, with at most one ::.' : 'Enter an IPv6 address.') : null,
+    prefixError: n === null || n > 128 ? 'A prefix length is between /0 and /128.' : null,
+  };
+}
+
+function Ipv6Tool() {
+  const [addr, setAddr] = useState('2001:db8:abcd:12::5');
+  const [prefix, setPrefix] = useState('/48');
+  const [splitTo, setSplitTo] = useState(0);
+  const [mac, setMac] = useState('00:1A:2B:3C:4D:5E');
+  const r = pgV6Read(addr, prefix);
+  const info = r.ip !== null && r.prefix !== null ? pgV6Info(r.ip, r.prefix) : null;
+  const hue = COLOR.blue;
+  const eui = pgEui64(mac);
+  const llAddr = eui === null ? null : pgIPv6Compress((0xFE80n << 112n) | eui);
+  const splitOptions = info ? [4, 8, 12, 16].map((d) => info.prefix + d).filter((x) => x <= 128).concat(info.prefix <= 64 ? [64] : []).filter((x, i, a) => a.indexOf(x) === i && x > info.prefix) : [];
+  const splitPrefix = splitOptions.includes(splitTo) ? splitTo : 0;
+  const examples = [['2001:db8:abcd:12::5', '/48'], ['fe80::1', '/64'], ['fd12:3456:789a::10', '/48'], ['2001:0db8:0000:0000:0000:ff00:0042:8329', '/64']];
+  return (
+    <div>
+      <PgCard title="IPv6 address and prefix" hue={hue}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 3fr) minmax(0, 1.2fr)', gap: '10px' }}>
+          <PgField label="IPv6 address" value={addr} onChange={setAddr} error={r.ipError} placeholder="2001:db8::1" />
+          <PgField label="Prefix" value={prefix} onChange={setPrefix} error={r.prefixError} placeholder="/64" />
+        </div>
+        <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginTop: '10px' }}>
+          {examples.map(([a, p]) => (
+            <button key={a} className="btn-flat" onClick={() => { setAddr(a); setPrefix(p); }}
+              style={{ fontSize: '11.5px', padding: '4px 9px', borderRadius: '999px', border: `1.5px solid ${COLOR.border}`, color: COLOR.muted }}>{a.length > 22 ? `${a.slice(0, 20)}…` : a}{p}</button>
+          ))}
+        </div>
+      </PgCard>
+      {info && (
+        <>
+          <PgCard title="Result" hue={hue}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', gap: '8px' }}>
+              <PgResult label="Compressed" value={info.compressed} hue={hue} />
+              <PgResult label="Fully expanded" value={info.expanded} hue={hue} />
+              <PgResult label="Network (prefix)" value={`${info.networkText}/${info.prefix}`} hue={COLOR.success} />
+              <PgResult label="Last address in the network" value={info.lastText} hue={COLOR.success} />
+              <PgResult label="Addresses in the network" value={info.hostBits === 0 ? '1' : `2^${info.hostBits} = ${pgFormatBig(info.addresses)}`} sub={info.subnets64 !== null ? `${pgFormatBig(info.subnets64)} possible /64 subnets inside it` : 'Longer than /64: smaller than a normal subnet'} hue={COLOR.orange} />
+            </div>
+            <div style={{ fontSize: '12.5px', color: COLOR.muted, marginTop: '10px', lineHeight: 1.5 }}>
+              <div>{info.kind.label}.</div>
+              <div>The first {info.prefix} bits are the network prefix; the last {info.hostBits} bits identify the interface. A normal LAN uses a /64, so the interface ID is 64 bits.</div>
+              <div>IPv6 has no broadcast address and no "network address" you cannot use; ARP is replaced by neighbour discovery.</div>
+            </div>
+          </PgCard>
+          <PgCard title="Split into smaller networks" hue={COLOR.pink}>
+            {splitOptions.length ? (
+              <>
+                <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginBottom: '10px' }}>
+                  {splitOptions.map((x) => (
+                    <button key={x} className="btn-flat" onClick={() => setSplitTo(splitPrefix === x ? 0 : x)}
+                      style={{ fontSize: '12px', fontWeight: 800, padding: '5px 10px', borderRadius: '999px', border: `2px solid ${splitPrefix === x ? COLOR.pink : COLOR.border}`, background: splitPrefix === x ? tint(COLOR.pink, 20) : 'transparent', color: splitPrefix === x ? ink(COLOR.pink) : COLOR.muted }}>/{x}</button>
+                  ))}
+                </div>
+                {splitPrefix ? (
+                  <div>
+                    <div style={{ fontSize: '12.5px', color: COLOR.muted, marginBottom: '6px' }}>{pgFormatBig(1n << BigInt(splitPrefix - info.prefix))} networks of /{splitPrefix}. First 8:</div>
+                    {pgV6Subnets(info.ip, info.prefix, splitPrefix, 8).map((x) => (
+                      <div key={x.text} style={{ fontSize: '12.5px', padding: '4px 0', borderTop: `1px solid ${COLOR.border}`, fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace', fontWeight: 800 }}>{x.text}</div>
+                    ))}
+                  </div>
+                ) : <div style={{ fontSize: '12.5px', color: COLOR.muted }}>Pick a longer prefix. IPv6 subnetting is easiest on nibble (4-bit) boundaries: each extra hex digit multiplies the count by 16.</div>}
+              </>
+            ) : <div style={{ fontSize: '12.5px', color: COLOR.muted }}>Nothing smaller to split into.</div>}
+          </PgCard>
+        </>
+      )}
+      <PgCard title="EUI-64 and link-local address from a MAC" hue={COLOR.teal}>
+        <PgField label="MAC address" value={mac} onChange={setMac} error={eui === null ? 'Six bytes in hex, such as 00:1A:2B:3C:4D:5E' : null} />
+        {eui !== null && (
+          <div style={{ marginTop: '10px', fontSize: '12.5px', lineHeight: 1.55 }}>
+            <PgResult label="Interface ID (modified EUI-64)" value={pgIPv6Compress(eui).replace(/^::/, '')} hue={COLOR.teal} />
+            <div style={{ height: '8px' }} />
+            <PgResult label="Link-local address" value={llAddr} hue={COLOR.teal} />
+            <div style={{ color: COLOR.muted, marginTop: '8px' }}>Insert ff:fe in the middle of the MAC and flip the seventh bit of the first byte (the universal/local bit): 00 becomes 02. Many systems now use random interface IDs instead, for privacy.</div>
+          </div>
+        )}
+      </PgCard>
+    </div>
+  );
+}
+
 const SUBNET_TABS = [
   { key: 'calc', label: 'Calculator' },
   { key: 'same', label: 'Same subnet?' },
   { key: 'vlsm', label: 'VLSM' },
   { key: 'drill', label: 'Drill' },
+  { key: 'ipv6', label: 'IPv6' },
 ];
 
-function SubnetTool() {
-  const [tab, setTab] = useState('calc');
+function SubnetTool({ pick, onPick }) {
+  const tab = SUBNET_TABS.some((t) => t.key === pick) ? pick : 'calc';
   return (
     <div>
-      <PgSegmented options={SUBNET_TABS} value={tab} onChange={setTab} hue={COLOR.blue} />
+      <PgSegmented options={SUBNET_TABS} value={tab} onChange={onPick} hue={COLOR.blue} />
       {tab === 'calc' && <SubnetCalculator />}
       {tab === 'same' && <SubnetCompare />}
       {tab === 'vlsm' && <VlsmPlanner />}
       {tab === 'drill' && <SubnetDrill />}
+      {tab === 'ipv6' && <Ipv6Tool />}
     </div>
   );
 }
 
 /* ---------- Shell ---------- */
 
-function PlaygroundView({ tool, onSelectTool, onExit }) {
-  const current = PLAYGROUND_TOOLS.find((t) => t.key === tool && t.ready);
-  useEffect(() => { window.scrollTo(0, 0); }, [tool]);
+const PG_CORE_COMPONENTS = {
+  subnet: () => SubnetTool,
+  ipconfig: () => IpConfigTool,
+  vlan: () => VlanTool,
+  firewall: () => FirewallTool,
+};
+
+function PgProgressCard() {
+  const p = pgProgress();
+  if (!p.total) return null;
+  const got = PG_MILESTONES.filter((m) => m.test(p));
+  return (
+    <PgCard title="Your Playground" hue={COLOR.gold} right={<span style={{ fontSize: '12px', color: COLOR.muted }}>{p.solved} / {p.total} scenarios fixed</span>}>
+      <div style={{ height: '8px', borderRadius: '999px', background: COLOR.surfaceRaised, overflow: 'hidden', marginBottom: '10px' }}>
+        <div style={{ width: `${Math.round((p.solved / p.total) * 100)}%`, height: '100%', background: COLOR.success }} />
+      </div>
+      <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+        {PG_MILESTONES.map((m) => {
+          const earned = got.includes(m);
+          return (
+            <span key={m.key} title={earned ? 'Earned' : 'Not yet'} style={{ fontSize: '11.5px', fontWeight: 800, padding: '4px 9px', borderRadius: '999px', border: `1.5px solid ${earned ? COLOR.gold : COLOR.border}`, background: earned ? tint(COLOR.gold, 18) : 'transparent', color: earned ? COLOR.text : COLOR.muted, opacity: earned ? 1 : 0.7 }}>
+              <span aria-hidden="true" style={{ filter: earned ? 'none' : 'grayscale(1)' }}>{m.icon}</span> {m.label}
+            </span>
+          );
+        })}
+      </div>
+      <div style={{ fontSize: '11px', color: COLOR.muted, marginTop: '8px' }}>Kept on this device only; separate from your cert achievements.</div>
+    </PgCard>
+  );
+}
+
+function PlaygroundView({ tool, pick, onSelect, onExit }) {
+  const tools = pgAllTools();
+  const current = tools.find((t) => t.key === tool && t.ready);
+  useEffect(() => { window.scrollTo(0, 0); }, [tool, pick]);
   if (!current) {
     return (
       <div>
@@ -467,12 +517,13 @@ function PlaygroundView({ tool, onSelectTool, onExit }) {
             Change something and watch what happens. The cert tracks teach and test; this is where you try it. It is a sandbox, not a graded tool: nothing here touches your mastery, results, daily goal or readiness.
           </div>
         </div>
-        {PLAYGROUND_TOOLS.map((t) => (
+        <PgProgressCard />
+        {tools.map((t) => (
           <button
             key={t.key}
             className="btn-flat"
             disabled={!t.ready}
-            onClick={() => t.ready && onSelectTool(t.key)}
+            onClick={() => t.ready && onSelect(t.key, '')}
             style={{
               display: 'block', width: '100%', textAlign: 'left', marginBottom: '12px', padding: '14px 16px', borderRadius: '16px',
               background: tint(t.hue, t.ready ? 10 : 4), border: `2px solid color-mix(in srgb, ${t.hue} ${t.ready ? 45 : 20}%, ${COLOR.border})`,
@@ -481,28 +532,26 @@ function PlaygroundView({ tool, onSelectTool, onExit }) {
           >
             <div className="flex justify-between items-baseline">
               <span className="itil-display" style={{ fontSize: '16px', color: ink(t.hue) }}>{t.label}</span>
-              {!t.ready && <span style={{ fontSize: '10.5px', fontWeight: 800, letterSpacing: '0.05em', textTransform: 'uppercase', color: COLOR.muted }}>Coming soon</span>}
+              {pgScenarios(t.key).length > 0 && <span style={{ fontSize: '11.5px', color: COLOR.muted }}>{pgScenarios(t.key).filter((s) => pgIsSolved(t.key, s.id)).length} / {pgScenarios(t.key).length} fixed</span>}
             </div>
             <div style={{ fontSize: '12.5px', color: COLOR.muted, lineHeight: 1.5, marginTop: '4px' }}>{t.blurb}</div>
           </button>
         ))}
         <div style={{ fontSize: '11.5px', color: COLOR.muted, lineHeight: 1.5, marginTop: '6px' }}>
-          The simulations are simplified on purpose: they model what the certifications teach, not any one vendor's exact behaviour. IPv6 is not included yet.
+          The simulations are simplified on purpose: they model what the certifications teach, not any one vendor's exact behaviour.
         </div>
         <button className="btn-flat" onClick={onExit} style={{ marginTop: '14px', fontSize: '13px', fontWeight: 800, color: COLOR.muted }}>‹ Back to Home</button>
       </div>
     );
   }
+  const Component = current.Component || (PG_CORE_COMPONENTS[current.key] && PG_CORE_COMPONENTS[current.key]());
   return (
     <div>
       <div className="flex items-center" style={{ gap: '8px', marginBottom: '12px' }}>
-        <button className="btn-flat" onClick={() => onSelectTool('')} aria-label="Back to the playground" style={{ fontSize: '13px', fontWeight: 800, color: COLOR.muted, padding: '4px 0' }}>‹ Playground</button>
+        <button className="btn-flat" onClick={() => onSelect('', '')} aria-label="Back to the playground" style={{ fontSize: '13px', fontWeight: 800, color: COLOR.muted, padding: '4px 0' }}>‹ Playground</button>
         <div className="itil-display" style={{ fontSize: '18px', color: ink(current.hue), marginLeft: 'auto' }}>{current.label}</div>
       </div>
-      {current.key === 'subnet' && <SubnetTool />}
-      {current.key === 'ipconfig' && <IpConfigTool />}
-      {current.key === 'vlan' && <VlanTool />}
-      {current.key === 'firewall' && <FirewallTool />}
+      {Component ? <Component pick={pick} onPick={(p) => onSelect(current.key, p || '')} /> : null}
     </div>
   );
 }

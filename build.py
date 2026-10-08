@@ -418,6 +418,65 @@ def validate_firewall_scenarios():
     return errors
 
 
+CORE_PLAYGROUND_TOOLS = {"subnet": ("calc", "same", "vlsm", "drill", "ipv6"), "ipconfig": None, "vlan": None, "firewall": None}
+
+
+def validate_playground_extras():
+    """Extra Playground tools (data/playground_<tool>.py) and the lesson links."""
+    errors = []
+    tool_picks = {k: v for k, v in CORE_PLAYGROUND_TOOLS.items()}
+    core_scenarios = {
+        "ipconfig": [s["id"] for s in playground_data.IPCONFIG_SCENARIOS],
+        "vlan": [s["id"] for s in playground_data.VLAN_SCENARIOS],
+        "firewall": [s["id"] for s in playground_data.FIREWALL_SCENARIOS],
+    }
+    for mod in playground_data.EXTRA_MODULES:
+        key = getattr(mod, "TOOL_KEY", None)
+        label = f"[playground:{key}]"
+        if not key or not re.match(r"^[a-z][a-z0-9]*$", key) or key in tool_picks:
+            errors.append(f"{label} TOOL_KEY must be a new lowercase alphanumeric key")
+            continue
+        tool_picks[key] = None
+        ids = set()
+        for sc in mod.SCENARIOS:
+            sl = f"{label} scenario '{sc.get('id')}'"
+            if not sc.get("id") or sc["id"] in ids or not re.match(r"^[a-z0-9-]+$", sc["id"]):
+                errors.append(f"{sl}: id is missing, not unique or not a lowercase slug")
+            ids.add(sc.get("id"))
+            for field in ("title", "goal", "story", "lesson"):
+                if not isinstance(sc.get(field), str) or not sc[field].strip():
+                    errors.append(f"{sl}: needs a non-empty '{field}'")
+            if sc.get("level") not in ("starter", "core", "stretch"):
+                errors.append(f"{sl}: level must be starter, core or stretch")
+            for field in ("hints", "fixText", "expect", "expectFixed"):
+                if not isinstance(sc.get(field), list) or not sc[field]:
+                    errors.append(f"{sl}: needs a non-empty list '{field}'")
+            if not isinstance(sc.get("topology"), dict):
+                errors.append(f"{sl}: needs a 'topology' dict")
+        core_scenarios[key] = list(ids)
+        if not isinstance(mod.SANDBOX, dict):
+            errors.append(f"{label} SANDBOX must be a dict")
+        if hasattr(mod, "validate"):
+            errors.extend(f"{label} {e}" for e in mod.validate())
+    lessons = {k: {l["id"] for l in getattr(m, "LESSONS", [])} for k, m in TRACK_MODULES.items()}
+    for link in playground_data.LESSON_LINKS:
+        ll = f"[playground-link:{link.get('track')}/{link.get('lesson')}]"
+        if link.get("lesson") not in lessons.get(link.get("track"), set()):
+            errors.append(f"{ll} names a lesson that does not exist")
+        tool = link.get("tool")
+        if tool not in tool_picks:
+            errors.append(f"{ll} names unknown tool '{tool}'")
+            continue
+        pick = link.get("pick", "")
+        allowed = set(core_scenarios.get(tool, [])) | {"sandbox", ""} | set(tool_picks[tool] or ())
+        if pick not in allowed:
+            errors.append(f"{ll} pick '{pick}' is not a scenario, sandbox or tab of {tool}")
+        for f in ("label",):
+            if not link.get(f):
+                errors.append(f"{ll} needs a '{f}'")
+    return errors
+
+
 def run_playground_checks():
     """Replays the engine's unit tests and every scenario through node when it
     is available (the shipped app needs no node; only this check does)."""
@@ -796,6 +855,7 @@ def validate():
     errors.extend(validate_playground())
     errors.extend(validate_vlan_scenarios())
     errors.extend(validate_firewall_scenarios())
+    errors.extend(validate_playground_extras())
     errors.extend(validate_acronyms())
 
     if errors:

@@ -53,17 +53,6 @@ function PgToggle({ label, hint, value, onChange, hot }) {
   );
 }
 
-function PgSelect({ label, value, onChange, options }) {
-  return (
-    <label style={{ display: 'block', minWidth: 0 }}>
-      <span style={{ display: 'block', fontSize: '11px', fontWeight: 800, letterSpacing: '0.04em', textTransform: 'uppercase', color: COLOR.muted, marginBottom: '3px' }}>{label}</span>
-      <select value={value} onChange={(e) => onChange(e.target.value)} aria-label={label} style={{ ...pgInputStyle(false), fontFamily: 'inherit' }}>
-        {options.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
-      </select>
-    </label>
-  );
-}
-
 const PG_ZONE_OPTS = [{ value: 'any', label: 'any' }, { value: 'inside', label: 'inside' }, { value: 'dmz', label: 'dmz' }, { value: 'outside', label: 'outside' }];
 const PG_PROTO_OPTS = [{ value: 'any', label: 'any' }, { value: 'tcp', label: 'TCP' }, { value: 'udp', label: 'UDP' }, { value: 'icmp', label: 'ICMP' }];
 
@@ -143,25 +132,25 @@ function PgFwResult({ result }) {
         <span style={{ fontWeight: 900, color: ink(hue), fontSize: '16px' }}>{ok ? '✓' : '✕'}</span>
         <span style={{ fontWeight: 800, fontSize: '13.5px', lineHeight: 1.4 }}>{result.summary}</span>
       </div>
-      {result.diagnosis && (
-        <div style={{ padding: '10px 12px', borderRadius: '12px', background: COLOR.surface, border: `1.5px solid ${COLOR.border}`, marginBottom: '10px', fontSize: '13px', lineHeight: 1.5 }}>
-          <div style={{ fontSize: '10.5px', fontWeight: 800, letterSpacing: '0.05em', textTransform: 'uppercase', color: COLOR.muted }}>Why it failed</div>
-          <div style={{ fontWeight: 800, margin: '2px 0' }}>{result.diagnosis.title}</div>
-          <div>{result.diagnosis.text}</div>
-          <div style={{ marginTop: '4px' }}><strong>Try:</strong> {result.diagnosis.fix}</div>
-        </div>
-      )}
-      <ol style={{ margin: 0, paddingLeft: 0, listStyle: 'none', fontSize: '12.5px', lineHeight: 1.5 }}>
-        {result.steps.map((st, j) => (
-          <li key={j} style={{ display: 'flex', gap: '6px', marginBottom: '3px', color: st.ok ? COLOR.text : ink(COLOR.red), fontWeight: st.ok ? 400 : 700 }}>
-            <span aria-hidden="true" style={{ flexShrink: 0, width: '14px', color: st.ok ? ink(COLOR.success) : ink(COLOR.red) }}>{st.ok ? '✓' : '✕'}</span>
-            <span>{st.text}</span>
-          </li>
-        ))}
-      </ol>
+      <PgDiagnosis diagnosis={result.diagnosis} heading="Why it failed" />
+      <PgSteps steps={result.steps} />
     </div>
   );
 }
+
+const PG_FW_CAUSES = {
+  'no-forward': 'No port forward exists for that public port',
+  'forward-target-missing': 'A port forward points at an address where nothing lives',
+  hairpin: 'Hairpin NAT is missing for an inside client using the public address',
+  'private-unroutable': 'An outside client aimed at a private address',
+  'implicit-deny': 'No rule allows the traffic (implicit deny)',
+  'rule-denied': 'A deny rule matches first',
+  'return-blocked': 'The reply is blocked by a stateless filter',
+  'no-nat': 'Source NAT is off for private addresses',
+  refused: 'The host is not listening on that port',
+  'no-host': 'No device has that address',
+  'bad-port': 'The port number is not valid',
+};
 
 function PgFwLab({ topo, setTopo, goals, defaultAsk }) {
   const fw = topo.fw;
@@ -170,7 +159,6 @@ function PgFwLab({ topo, setTopo, goals, defaultAsk }) {
   const [conn, setConn] = useState(defaultAsk || { from: topo.hosts[0].id, to: 'fw-public', proto: 'tcp', port: 443 });
   const [result, setResult] = useState(null);
   const setFw = (patch) => { setTopo({ ...topo, fw: { ...fw, ...patch } }); setResult(null); };
-  const run = () => setResult(pgFwTest(topo, conn));
   const nameOf = (id) => (id === 'fw-public' ? 'the public address' : (topo.hosts.find((h) => h.id === id) || { name: id }).name);
   const goalStates = (goals || []).map((g) => ({ g, r: pgFwTest(topo, g) }));
   const diag = result && result.diagnosis;
@@ -197,10 +185,10 @@ function PgFwLab({ topo, setTopo, goals, defaultAsk }) {
         <PgToggle label="Source NAT (masquerade)" hint="Rewrite inside private addresses to the public address on the way out." value={fw.masquerade} onChange={(v) => setFw({ masquerade: v })} hot={diag && diag.field === 'masquerade'} />
         <PgToggle label="Hairpin NAT (NAT reflection)" hint="Let inside clients reach an inside server through the public address." value={fw.hairpin} onChange={(v) => setFw({ hairpin: v })} hot={diag && diag.field === 'hairpin'} />
       </PgCard>
-      <PgCard title="Rules" hue={COLOR.blue}>
+      <PgCard title="Rules" hue={COLOR.blue} collapsible>
         <PgFwRules fw={fw} onChange={(rules) => setFw({ rules })} matchedId={result ? result.matched : null} hotRule={diag ? diag.ruleId : null} />
       </PgCard>
-      <PgCard title="Port forwards" hue={COLOR.pink}>
+      <PgCard title="Port forwards" hue={COLOR.pink} collapsible>
         <PgFwForwards fw={fw} onChange={(forwards) => setFw({ forwards })} hot={diag && diag.field === 'forwards'} />
       </PgCard>
       <PgCard title="Test a connection" hue={COLOR.success}>
@@ -210,100 +198,40 @@ function PgFwLab({ topo, setTopo, goals, defaultAsk }) {
           <PgSelect label="Protocol" value={conn.proto} onChange={(v) => { setConn({ ...conn, proto: v }); setResult(null); }} options={[{ value: 'tcp', label: 'TCP' }, { value: 'udp', label: 'UDP' }, { value: 'icmp', label: 'ICMP (ping)' }]} />
           {conn.proto !== 'icmp' && <PgField label="Port" value={String(conn.port)} onChange={(v) => { setConn({ ...conn, port: v }); setResult(null); }} inputMode="numeric" />}
         </div>
-        <button className="btn-3d" onClick={run} style={{ width: '100%', padding: '11px', borderRadius: '10px', background: COLOR.primary, color: COLOR.onAccent, fontSize: '14px', fontWeight: 700, marginBottom: '12px' }}>
-          Try the connection
-        </button>
+        <PgPredict compute={() => pgFwTest(topo, conn)} causes={PG_FW_CAUSES} buttonLabel="Try the connection" onResult={setResult} resetKey={JSON.stringify([topo, conn])} />
         <PgFwResult result={result} />
       </PgCard>
     </div>
   );
 }
 
-function FirewallScenario({ scenario, onBack }) {
-  const [topo, setTopo] = useState(() => pgClone(scenario.topology));
-  const [hintsShown, setHintsShown] = useState(0);
-  const [showFix, setShowFix] = useState(false);
-  const solved = scenario.expectFixed.every((g) => pgFwTest(topo, g).verdict === g.verdict);
-  const reset = () => { setTopo(pgClone(scenario.topology)); setHintsShown(0); setShowFix(false); };
-  return (
-    <div>
-      <button className="btn-flat" onClick={onBack} style={{ fontSize: '13px', fontWeight: 800, color: COLOR.muted, padding: '2px 0 10px' }}>‹ All scenarios</button>
-      <PgCard title={scenario.title} hue={COLOR.gold} right={<span style={{ fontSize: '10.5px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.05em', color: COLOR.muted }}>{PG_LEVEL_LABEL[scenario.level]}</span>}>
-        <div style={{ fontSize: '13px', lineHeight: 1.55 }}>{scenario.story}</div>
-        <div style={{ fontSize: '12.5px', color: COLOR.muted, marginTop: '6px' }}>Your job: find out what is wrong and fix it so the goal below turns green.</div>
-      </PgCard>
-      <PgFwLab topo={topo} setTopo={setTopo} goals={scenario.expectFixed} defaultAsk={scenario.ask} />
-      {solved && (
-        <PgCard title="Fixed!" hue={COLOR.success}>
-          <div style={{ fontSize: '13px', lineHeight: 1.55 }}>{scenario.lesson}</div>
-          {scenario.related && scenario.related.length > 0 && <div style={{ fontSize: '12px', color: COLOR.muted, marginTop: '8px' }}>Related study: {scenario.related.join(' · ')}</div>}
-        </PgCard>
-      )}
-      <PgCard title="Stuck?" hue={COLOR.orange}>
-        {scenario.hints.slice(0, hintsShown).map((h, i) => <div key={i} style={{ fontSize: '13px', lineHeight: 1.5, marginBottom: '8px' }}><strong>Hint {i + 1}:</strong> {h}</div>)}
-        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-          {hintsShown < scenario.hints.length && <button className="btn-flat" onClick={() => setHintsShown(hintsShown + 1)} style={{ fontSize: '12.5px', fontWeight: 800, padding: '6px 12px', borderRadius: '999px', border: `2px solid ${COLOR.orange}`, color: ink(COLOR.orange) }}>{hintsShown ? 'Another hint' : 'Give me a hint'}</button>}
-          <button className="btn-flat" onClick={() => setShowFix(!showFix)} style={{ fontSize: '12.5px', fontWeight: 800, padding: '6px 12px', borderRadius: '999px', border: `2px solid ${COLOR.border}`, color: COLOR.muted }}>{showFix ? 'Hide the answer' : 'Show the fix'}</button>
-          <button className="btn-flat" onClick={reset} style={{ fontSize: '12.5px', fontWeight: 800, padding: '6px 12px', borderRadius: '999px', border: `2px solid ${COLOR.border}`, color: COLOR.muted }}>Reset scenario</button>
-        </div>
-        {showFix && <ul style={{ margin: '10px 0 0', paddingLeft: '18px', fontSize: '13px', lineHeight: 1.55 }}>{scenario.fixText.map((t, i) => <li key={i}>{t}</li>)}</ul>}
-      </PgCard>
-    </div>
-  );
+function pgFwValidTopo(t) {
+  return !!t && !!t.fw && Array.isArray(t.fw.rules) && Array.isArray(t.fw.forwards) && Array.isArray(t.fw.ifaces) && Array.isArray(t.hosts) && t.hosts.length >= 2
+    && t.hosts.every((h) => typeof h.id === 'string' && ['inside', 'dmz', 'outside'].includes(h.zone) && typeof h.ip === 'string');
 }
 
-function FirewallSandbox({ onBack }) {
-  const base = (typeof PLAYGROUND !== 'undefined' && PLAYGROUND.firewallSandbox) || null;
-  const [topo, setTopo] = useState(() => pgClone(base));
-  if (!base) return null;
-  return (
-    <div>
-      <button className="btn-flat" onClick={onBack} style={{ fontSize: '13px', fontWeight: 800, color: COLOR.muted, padding: '2px 0 10px' }}>‹ All scenarios</button>
-      <PgCard title="Free sandbox" hue={COLOR.gold}>
-        <div style={{ fontSize: '13px', lineHeight: 1.55 }}>A working firewall with an inside network, a DMZ web server and the internet. Reorder or add rules, switch stateful inspection or NAT off, change a forward, then test connections and read which rule matched.</div>
-        <button className="btn-flat" onClick={() => setTopo(pgClone(base))} style={{ marginTop: '8px', fontSize: '12.5px', fontWeight: 800, padding: '6px 12px', borderRadius: '999px', border: `2px solid ${COLOR.border}`, color: COLOR.muted }}>Reset to the working setup</button>
-      </PgCard>
-      <PgFwLab topo={topo} setTopo={setTopo} />
-    </div>
-  );
-}
-
-function FirewallTool() {
-  const scenarios = (typeof PLAYGROUND !== 'undefined' && PLAYGROUND.firewall) || [];
-  const [pick, setPick] = useState(null);
+function FirewallTool({ pick, onPick }) {
+  const scenarios = pgScenarios('firewall');
   const scenario = scenarios.find((s) => s.id === pick);
-  if (pick === 'sandbox') return <FirewallSandbox onBack={() => setPick(null)} />;
-  if (scenario) return <FirewallScenario key={scenario.id} scenario={scenario} onBack={() => setPick(null)} />;
-  const levelHue = { starter: COLOR.success, core: COLOR.blue, stretch: COLOR.orange };
+  if (pick === 'sandbox') {
+    return (
+      <PgSandboxShell tool="firewall" makeDefault={() => pgClone(pgData().firewallSandbox)} validate={pgFwValidTopo} onBack={() => onPick('')}
+        blurb="A working firewall with an inside network, a DMZ web server and the internet. Reorder or add rules, switch stateful inspection or NAT off, change a forward, then test connections and read which rule matched."
+        renderLab={(topo, setTopo) => <PgFwLab topo={topo} setTopo={setTopo} />} />
+    );
+  }
+  if (scenario) {
+    return (
+      <PgScenarioShell key={scenario.id} tool="firewall" scenario={scenario} onBack={() => onPick('')}
+        isSolved={(topo) => scenario.expectFixed.every((g) => pgFwTest(topo, g).verdict === g.verdict)}
+        fixLines={(sc) => sc.fixText}
+        renderLab={(topo, setTopo, sc) => <PgFwLab topo={topo} setTopo={setTopo} goals={sc.expectFixed} defaultAsk={sc.ask} />} />
+    );
+  }
   return (
-    <div>
-      <div style={{ fontSize: '13px', color: COLOR.muted, lineHeight: 1.55, marginBottom: '8px' }}>
-        A firewall decides, rule by rule, what may cross between zones, and NAT decides which address a packet carries. Fire a connection and read how the firewall handled it.
-      </div>
-      <div style={{ fontSize: '11.5px', color: COLOR.muted, lineHeight: 1.5, marginBottom: '12px' }}>
-        Simplified on purpose: rules are matched against the address and port after port-forward translation, traffic inside one zone never reaches the firewall, and vendors differ in details such as where an ACL is applied.
-      </div>
-      <button className="btn-flat" onClick={() => setPick('sandbox')}
-        style={{ display: 'block', width: '100%', textAlign: 'left', marginBottom: '12px', padding: '14px 16px', borderRadius: '16px', background: tint(COLOR.gold, 10), border: `2px solid color-mix(in srgb, ${COLOR.gold} 45%, ${COLOR.border})`, color: COLOR.text, boxShadow: SHADOW.card }}>
-        <div className="itil-display" style={{ fontSize: '15px', color: ink(COLOR.gold) }}>Free sandbox</div>
-        <div style={{ fontSize: '12.5px', color: COLOR.muted, marginTop: '3px' }}>A working three-zone firewall to rearrange, break and test.</div>
-      </button>
-      {['starter', 'core', 'stretch'].map((lv) => {
-        const list = scenarios.filter((s) => s.level === lv);
-        if (!list.length) return null;
-        return (
-          <div key={lv} style={{ marginBottom: '8px' }}>
-            <div style={{ fontSize: '11px', fontWeight: 800, letterSpacing: '0.06em', textTransform: 'uppercase', color: ink(levelHue[lv]), margin: '10px 0 6px' }}>{PG_LEVEL_LABEL[lv]}</div>
-            {list.map((s) => (
-              <button key={s.id} className="btn-flat" onClick={() => setPick(s.id)}
-                style={{ display: 'block', width: '100%', textAlign: 'left', marginBottom: '8px', padding: '12px 14px', borderRadius: '14px', background: tint(levelHue[lv], 8), border: `2px solid color-mix(in srgb, ${levelHue[lv]} 38%, ${COLOR.border})`, color: COLOR.text }}>
-                <div style={{ fontSize: '14px', fontWeight: 800 }}>{s.title}</div>
-                <div style={{ fontSize: '12.5px', color: COLOR.muted, marginTop: '2px', lineHeight: 1.45 }}>{s.goal}</div>
-              </button>
-            ))}
-          </div>
-        );
-      })}
-    </div>
+    <PgScenarioPicker tool="firewall" scenarios={scenarios} onPick={onPick}
+      intro="A firewall decides, rule by rule, what may cross between zones, and NAT decides which address a packet carries. Fire a connection and read how the firewall handled it."
+      note="Simplified on purpose: rules are matched against the address and port after port-forward translation, traffic inside one zone never reaches the firewall, and vendors differ in details such as where an ACL is applied."
+      sandboxText="A working three-zone firewall to rearrange, break and test." />
   );
 }

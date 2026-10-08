@@ -8,7 +8,9 @@
 const fs = require('fs');
 const path = require('path');
 const root = path.join(__dirname, '..');
-const src = fs.readFileSync(path.join(root, 'src/js/03b_playground_engine.js'), 'utf8');
+// The engine is 03b_playground_engine.js plus one 03c_pg_<tool>.js per extra tool; they share one scope.
+const engineFiles = ['03b_playground_engine.js'].concat(fs.readdirSync(path.join(root, 'src/js')).filter((f) => /^03c_pg_.*\.js$/.test(f)).sort());
+const src = engineFiles.map((f) => fs.readFileSync(path.join(root, 'src/js', f), 'utf8')).join('\n');
 const names = [...src.matchAll(/^function (pg\w+)/gm)].map((m) => m[1]);
 // eslint-disable-next-line no-new-func
 const E = new Function(`${src}\nreturn { ${names.join(', ')} };`)();
@@ -194,6 +196,13 @@ const nativeTopo = (n2) => vlanTopo((t) => {
 eq(vp(nativeTopo(1), 'pc2', 'pc4').verdict, 'success', 'native vlan agrees');
 let nr = vp(nativeTopo(99), 'pc2', 'pc4');
 eq([nr.verdict, nr.diagnosis.code], ['failed', 'native-mismatch'], 'native vlan mismatch');
+// port security
+const secTopo = (sec) => vlanTopo((t) => { t.switches[0].ports[1].secure = sec; return t; });
+eq(vp(secTopo({ max: 1, allowed: ['AA:02'], violation: 'shutdown' }), 'pc1', 'pc2').verdict, 'success', 'port security allows the trusted MAC');
+eq(vp(secTopo({ max: 1, allowed: ['AA:99'], violation: 'shutdown' }), 'pc1', 'pc2').diagnosis.code, 'port-security', 'port security blocks an untrusted MAC');
+eq(vp(secTopo({ max: 2, allowed: ['AA:99'], violation: 'restrict' }), 'pc1', 'pc2').verdict, 'success', 'room under the maximum lets a new MAC in');
+eq(/err-disabled/.test(JSON.stringify(vp(secTopo({ max: 1, allowed: ['AA:99'], violation: 'shutdown' }), 'pc1', 'pc2').legs)), true, 'shutdown mode is explained');
+eq(/stays up/.test(JSON.stringify(vp(secTopo({ max: 1, allowed: ['AA:99'], violation: 'protect' }), 'pc1', 'pc2').legs)), true, 'protect mode is explained');
 // MAC learning: the first frame floods, then the table is used
 const first = vp(vlanTopo(), 'pc1', 'pc2');
 eq(first.state.mac.sw1[10]['AA:01'], 'Fa0/1', 'switch learns the sender');
@@ -201,6 +210,32 @@ eq(first.state.mac.sw1[10]['AA:02'], 'Fa0/2', 'switch learns the replier');
 const second = E.pgVlanPing(vlanTopo(), first.state, 'pc1', 'pc2');
 eq(second.legs.some((l) => l.steps.some((x) => /unicast/.test(x.text))), true, 'second ping uses the MAC table');
 eq(first.legs.some((l) => l.steps.some((x) => /floods the frame/.test(x.text))), false, 'a known-broadcast ARP is flooded, but the data frame only floods when unknown');
+
+/* ---- IPv6 ---- */
+const v6 = (t) => E.pgParseIPv6(t);
+eq(E.pgIPv6Compress(v6('2001:0db8:0000:0000:0000:ff00:0042:8329')), '2001:db8::ff00:42:8329', 'compress example');
+eq(E.pgIPv6Expand(v6('2001:db8::ff00:42:8329')), '2001:0db8:0000:0000:0000:ff00:0042:8329', 'expand example');
+eq(E.pgIPv6Compress(v6('::1')), '::1', 'loopback');
+eq(E.pgIPv6Compress(v6('::')), '::', 'unspecified');
+eq(E.pgIPv6Compress(v6('fe80:0:0:0:1:0:0:1')), 'fe80::1:0:0:1', 'longest run wins, first on a tie');
+eq(E.pgIPv6Compress(v6('2001:db8:0:1:1:1:1:1')), '2001:db8:0:1:1:1:1:1', 'a single zero group is not compressed');
+eq(v6('2001:db8::1::2'), null, 'two :: rejected');
+eq(v6('2001:db8:1'), null, 'too short without ::');
+eq(v6('12345::1'), null, 'group too long');
+eq(v6('g::1'), null, 'bad hex digit');
+eq(E.pgIPv6Compress(v6('::ffff:192.0.2.1')), '::ffff:c000:201', 'embedded IPv4');
+eq(E.pgV6Kind(v6('fe80::1')).key, 'linklocal', 'link-local');
+eq(E.pgV6Kind(v6('fd12:3456:789a::1')).key, 'ula', 'unique local');
+eq(E.pgV6Kind(v6('ff02::1')).key, 'multicast', 'multicast');
+eq(E.pgV6Kind(v6('2001:db8::1')).key, 'documentation', 'documentation');
+eq(E.pgV6Kind(v6('2606:4700::1111')).key, 'global', 'global');
+eq(E.pgV6Kind(v6('::ffff:1.2.3.4')).key, 'mapped', 'mapped');
+const i6 = E.pgV6Info(v6('2001:db8:abcd:12::5'), 48);
+eq([i6.networkText, i6.lastText, String(i6.subnets64), String(i6.addresses)], ['2001:db8:abcd::', '2001:db8:abcd:ffff:ffff:ffff:ffff:ffff', '65536', '1208925819614629174706176'], '/48 info');
+eq(E.pgIPv6Compress(E.pgEui64('00:1A:2B:3C:4D:5E')), '::21a:2bff:fe3c:4d5e', 'EUI-64');
+eq(E.pgEui64('nonsense'), null, 'bad MAC');
+eq(E.pgV6Subnets(v6('2001:db8:abcd::'), 48, 52, 3).map((x) => x.text), ['2001:db8:abcd::/52', '2001:db8:abcd:1000::/52', '2001:db8:abcd:2000::/52'], 'split a /48 into /52s');
+eq(E.pgFormatBig(65536n), '65,536', 'BigInt formatting');
 
 /* ---- scenarios replay (if the data exists) ---- */
 const scenFile = path.join(root, 'dist/data/playground.json');
@@ -301,6 +336,16 @@ if (fs.existsSync(scenFile)) {
     eq(E.pgFwTest(data.firewallSandbox, { from: 'pc', to: 'site', proto: 'tcp', port: 443 }).verdict, 'success', 'firewall sandbox outbound works');
   }
   if (data.vlanSandbox) eq(E.pgVlanPing(data.vlanSandbox, E.pgVlanNewState(), 'pc1', 'srv').verdict, 'success', 'vlan sandbox starts working');
+}
+
+/* ---- per-tool checks for extra tools: tools/checks/<tool>.js exports ({ E, eq, data, root }) => void ---- */
+const checksDir = path.join(__dirname, 'checks');
+if (fs.existsSync(checksDir)) {
+  const all = fs.existsSync(scenFile) ? JSON.parse(fs.readFileSync(scenFile, 'utf8')) : {};
+  fs.readdirSync(checksDir).filter((f) => f.endsWith('.js')).sort().forEach((f) => {
+    // eslint-disable-next-line global-require, import/no-dynamic-require
+    require(path.join(checksDir, f))({ E, eq, data: all, root });
+  });
 }
 
 if (failures) { console.error(`\n${failures} of ${checks} playground checks failed`); process.exit(1); }
