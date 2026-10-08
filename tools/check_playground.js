@@ -150,6 +150,58 @@ eq(v(tr, 'h1', 'h2').verdict, 'success', 'default route works');
 tr = twoRouters(); tr.routers[1].routes = [{ net: '172.16.2.0', mask: '/24', via: '192.0.2.1' }]; tr.hosts[1].segment = 'zzz';
 eq(v(tr, 'h1', '172.16.2.10').diagnosis.code !== undefined, true, 'loop case yields a diagnosis');
 
+/* ---- VLAN switching ---- */
+function vlanTopo(over) {
+  const t = {
+    switches: [
+      { id: 'sw1', name: 'SW1', vlans: [10, 20], ports: [
+        { id: 'Fa0/1', mode: 'access', vlan: 10 }, { id: 'Fa0/2', mode: 'access', vlan: 10 }, { id: 'Fa0/3', mode: 'access', vlan: 20 },
+        { id: 'Fa0/24', mode: 'trunk', allowed: [1, 10, 20], native: 1 }, { id: 'Gi0/1', mode: 'trunk', allowed: [1, 10, 20], native: 1 } ] },
+      { id: 'sw2', name: 'SW2', vlans: [10, 20], ports: [
+        { id: 'Fa0/1', mode: 'access', vlan: 10 }, { id: 'Fa0/2', mode: 'access', vlan: 20 }, { id: 'Gi0/1', mode: 'trunk', allowed: [1, 10, 20], native: 1 } ] },
+    ],
+    links: [{ a: { switch: 'sw1', port: 'Gi0/1' }, b: { switch: 'sw2', port: 'Gi0/1' } }],
+    hosts: [
+      { id: 'pc1', name: 'PC1', switch: 'sw1', port: 'Fa0/1', mac: 'AA:01', ip: '192.168.10.11', mask: '/24', gateway: '192.168.10.1' },
+      { id: 'pc2', name: 'PC2', switch: 'sw1', port: 'Fa0/2', mac: 'AA:02', ip: '192.168.10.12', mask: '/24', gateway: '192.168.10.1' },
+      { id: 'pc3', name: 'PC3', switch: 'sw1', port: 'Fa0/3', mac: 'AA:03', ip: '192.168.20.11', mask: '/24', gateway: '192.168.20.1' },
+      { id: 'pc4', name: 'PC4', switch: 'sw2', port: 'Fa0/1', mac: 'AA:04', ip: '192.168.10.13', mask: '/24', gateway: '192.168.10.1' },
+      { id: 'srv', name: 'Server', switch: 'sw2', port: 'Fa0/2', mac: 'AA:05', ip: '192.168.20.10', mask: '/24', gateway: '192.168.20.1' },
+    ],
+    routers: [{ id: 'r1', name: 'Router', switch: 'sw1', port: 'Fa0/24', mac: 'BB:01', subifs: [{ vlan: 10, ip: '192.168.10.1', mask: '/24' }, { vlan: 20, ip: '192.168.20.1', mask: '/24' }] }],
+  };
+  return over ? over(t) : t;
+}
+const vp = (t, a, b, st) => E.pgVlanPing(t, st || E.pgVlanNewState(), a, b);
+eq(vp(vlanTopo(), 'pc1', 'pc2').verdict, 'success', 'same vlan same switch');
+eq(vp(vlanTopo(), 'pc1', 'pc4').verdict, 'success', 'same vlan across trunk');
+eq(vp(vlanTopo(), 'pc3', 'srv').verdict, 'success', 'vlan 20 across trunk');
+eq(vp(vlanTopo(), 'pc1', 'pc3').verdict, 'success', 'inter-vlan through router on a stick');
+eq(vp(vlanTopo(), 'pc1', 'srv').verdict, 'success', 'inter-vlan across the trunk');
+eq(vp(vlanTopo((t) => { t.switches[0].ports[1].vlan = 20; return t; }), 'pc1', 'pc2').diagnosis.code, 'vlan-mismatch', 'port in wrong vlan');
+eq(vp(vlanTopo((t) => { t.switches[0].ports[4].allowed = [1, 10]; return t; }), 'pc3', 'srv').diagnosis.code, 'vlan-not-allowed', 'vlan not allowed on trunk');
+eq(vp(vlanTopo((t) => { t.switches[1].vlans = [10]; return t; }), 'pc3', 'srv').diagnosis.code, 'vlan-missing', 'vlan missing on switch');
+eq(vp(vlanTopo((t) => { t.switches[0].ports[3] = { id: 'Fa0/24', mode: 'access', vlan: 10 }; return t; }), 'pc1', 'pc3').diagnosis.code, 'router-untagged', 'router port is access');
+eq(vp(vlanTopo((t) => { t.routers = []; return t; }), 'pc1', 'pc3').diagnosis.code, 'arp-timeout', 'no router, gateway unreachable');
+eq(vp(vlanTopo((t) => { t.hosts[0].gateway = ''; return t; }), 'pc1', 'pc3').diagnosis.code, 'no-gateway', 'host without gateway');
+eq(vp(vlanTopo((t) => { t.routers[0].subifs.pop(); return t; }), 'pc1', 'pc3').diagnosis.code, 'no-route', 'router lacks the sub-interface');
+// native VLAN mismatch with hosts in the native VLAN
+const nativeTopo = (n2) => vlanTopo((t) => {
+  t.switches[0].ports[1].vlan = 1; t.switches[1].ports[0].vlan = 1; t.switches[1].ports[2].native = n2;
+  t.hosts[1].ip = '192.168.1.12'; t.hosts[1].gateway = ''; t.hosts[3].ip = '192.168.1.13'; t.hosts[3].gateway = '';
+  return t;
+});
+eq(vp(nativeTopo(1), 'pc2', 'pc4').verdict, 'success', 'native vlan agrees');
+let nr = vp(nativeTopo(99), 'pc2', 'pc4');
+eq([nr.verdict, nr.diagnosis.code], ['failed', 'native-mismatch'], 'native vlan mismatch');
+// MAC learning: the first frame floods, then the table is used
+const first = vp(vlanTopo(), 'pc1', 'pc2');
+eq(first.state.mac.sw1[10]['AA:01'], 'Fa0/1', 'switch learns the sender');
+eq(first.state.mac.sw1[10]['AA:02'], 'Fa0/2', 'switch learns the replier');
+const second = E.pgVlanPing(vlanTopo(), first.state, 'pc1', 'pc2');
+eq(second.legs.some((l) => l.steps.some((x) => /unicast/.test(x.text))), true, 'second ping uses the MAC table');
+eq(first.legs.some((l) => l.steps.some((x) => /floods the frame/.test(x.text))), false, 'a known-broadcast ARP is flooded, but the data frame only floods when unknown');
+
 /* ---- scenarios replay (if the data exists) ---- */
 const scenFile = path.join(root, 'dist/data/playground.json');
 if (fs.existsSync(scenFile)) {
@@ -168,6 +220,87 @@ if (fs.existsSync(scenFile)) {
       });
     }
   });
+}
+
+if (fs.existsSync(scenFile)) {
+  const data = JSON.parse(fs.readFileSync(scenFile, 'utf8'));
+  (data.vlan || []).forEach((sc) => {
+    (sc.expect || []).forEach((ex, n) => {
+      const r = E.pgVlanPing(sc.topology, E.pgVlanNewState(), ex.from, ex.to);
+      eq(r.verdict, ex.verdict, `vlan scenario ${sc.id} check ${n + 1} verdict`);
+      if (ex.code) eq(r.diagnosis && r.diagnosis.code, ex.code, `vlan scenario ${sc.id} check ${n + 1} code`);
+    });
+    const t = E.pgVlanApplyFixes(sc.topology, sc.fix);
+    sc.expectFixed.forEach((ex, n) => {
+      eq(E.pgVlanPing(t, E.pgVlanNewState(), ex.from, ex.to).verdict, ex.verdict, `vlan scenario ${sc.id} fixed check ${n + 1}`);
+    });
+  });
+}
+
+/* ---- firewall ---- */
+function fwTopo(over) {
+  const t = {
+    fw: { name: 'FW', stateful: true, masquerade: true, hairpin: false,
+      ifaces: [{ zone: 'inside', ip: '192.168.1.1', mask: '/24' }, { zone: 'dmz', ip: '172.16.0.1', mask: '/24' }, { zone: 'outside', ip: '203.0.113.2', mask: '/29' }],
+      rules: [
+        { id: 'r1', action: 'allow', fromZone: 'inside', toZone: 'outside', proto: 'any', src: 'any', dst: 'any', port: 'any' },
+        { id: 'r3', action: 'allow', fromZone: 'outside', toZone: 'dmz', proto: 'tcp', src: 'any', dst: '172.16.0.10', port: '443' },
+      ],
+      forwards: [{ id: 'f1', proto: 'tcp', extPort: 443, toIp: '172.16.0.10', toPort: 443 }] },
+    hosts: [
+      { id: 'pc', name: 'PC', zone: 'inside', ip: '192.168.1.10', services: [] },
+      { id: 'pc2', name: 'PC2', zone: 'inside', ip: '192.168.1.11', services: [{ proto: 'tcp', port: 22 }] },
+      { id: 'web', name: 'Web', zone: 'dmz', ip: '172.16.0.10', services: [{ proto: 'tcp', port: 443 }] },
+      { id: 'vis', name: 'Visitor', zone: 'outside', ip: '198.51.100.50', services: [] },
+      { id: 'site', name: 'Site', zone: 'outside', ip: '93.184.216.34', services: [{ proto: 'tcp', port: 443 }] },
+    ],
+  };
+  return over ? over(t) : t;
+}
+const ft = (t, from, to, proto, port) => E.pgFwTest(t, { from, to, proto, port });
+eq(ft(fwTopo(), 'vis', 'fw-public', 'tcp', 443).verdict, 'success', 'published web server');
+eq(ft(fwTopo(), 'vis', '203.0.113.2', 'tcp', 443).verdict, 'success', 'public address typed as an IP');
+eq(ft(fwTopo(), 'vis', 'fw-public', 'tcp', 80).diagnosis.code, 'no-forward', 'port with no forward');
+eq(ft(fwTopo(), 'vis', 'fw-public', 'udp', 443).diagnosis.code, 'no-forward', 'forward is TCP only');
+eq(ft(fwTopo(), 'vis', 'web', 'tcp', 443).diagnosis.code, 'private-unroutable', 'private address from outside');
+eq(ft(fwTopo(), 'pc', 'site', 'tcp', 443).verdict, 'success', 'outbound with NAT');
+eq(ft(fwTopo(), 'pc', 'site', 'tcp', 8080).diagnosis.code, 'refused', 'service not listening');
+eq(ft(fwTopo(), 'pc', 'pc2', 'tcp', 22).verdict, 'success', 'same zone bypasses the firewall');
+eq(ft(fwTopo(), 'pc', 'web', 'tcp', 443).diagnosis.code, 'implicit-deny', 'no inside to dmz rule');
+eq(ft(fwTopo((t) => { t.fw.masquerade = false; return t; }), 'pc', 'site', 'tcp', 443).diagnosis.code, 'no-nat', 'no source NAT');
+eq(ft(fwTopo((t) => { t.fw.stateful = false; return t; }), 'pc', 'site', 'tcp', 443).diagnosis.code, 'return-blocked', 'stateless without return rule');
+eq(ft(fwTopo((t) => { t.fw.stateful = false; t.fw.rules.push({ id: 'r9', action: 'allow', fromZone: 'outside', toZone: 'inside', proto: 'tcp', src: 'any', dst: 'any', port: '1024-65535' }); return t; }), 'pc', 'site', 'tcp', 443).verdict, 'success', 'stateless with a return rule');
+eq(ft(fwTopo((t) => { t.fw.rules.unshift({ id: 'r0', action: 'deny', fromZone: 'outside', toZone: 'dmz', proto: 'any', src: 'any', dst: 'any', port: 'any' }); return t; }), 'vis', 'fw-public', 'tcp', 443).diagnosis.code, 'rule-denied', 'deny above allow');
+eq(ft(fwTopo((t) => { t.fw.rules.unshift({ id: 'r0', action: 'deny', fromZone: 'outside', toZone: 'dmz', proto: 'any', src: 'any', dst: 'any', port: 'any' }); return t; }), 'vis', 'fw-public', 'tcp', 443).orderProblem, true, 'order problem is flagged');
+eq(ft(fwTopo((t) => { t.fw.rules.unshift({ id: 'r0', action: 'deny', fromZone: 'any', toZone: 'any', proto: 'tcp', src: '198.51.100.0/24', dst: 'any', port: 'any' }); return t; }), 'vis', 'fw-public', 'tcp', 443).diagnosis.code, 'rule-denied', 'source range deny');
+eq(ft(fwTopo((t) => { t.fw.forwards[0].toIp = '172.16.0.99'; return t; }), 'vis', 'fw-public', 'tcp', 443).diagnosis.code, 'forward-target-missing', 'forward to nothing');
+eq(ft(fwTopo((t) => { t.fw.forwards[0].toPort = 8443; t.fw.rules[1].port = 'any'; return t; }), 'vis', 'fw-public', 'tcp', 443).diagnosis.code, 'refused', 'forward to the wrong port (rule allows it, service absent)');
+eq(ft(fwTopo((t) => { t.fw.forwards[0].toPort = 8443; return t; }), 'vis', 'fw-public', 'tcp', 443).diagnosis.code, 'implicit-deny', 'rules match the translated port');
+eq(ft(fwTopo(), 'pc', 'site', 'icmp', null).verdict, 'success', 'ping through NAT');
+eq(ft(fwTopo(), 'pc', 'site', 'tcp', 'abc').diagnosis.code, 'bad-port', 'bad port');
+// hairpin
+const hp = (hair) => fwTopo((t) => { t.fw.forwards = [{ id: 'f1', proto: 'tcp', extPort: 22, toIp: '192.168.1.11', toPort: 22 }]; t.fw.hairpin = hair; return t; });
+eq(ft(hp(false), 'pc', 'fw-public', 'tcp', 22).diagnosis.code, 'hairpin', 'hairpin missing');
+eq(ft(hp(true), 'pc', 'fw-public', 'tcp', 22).verdict, 'success', 'hairpin enabled');
+eq(E.pgFwEvaluate({ rules: [{ id: 'x', action: 'allow', fromZone: 'any', toZone: 'any', proto: 'tcp', src: '10.0.0.0/8', dst: 'any', port: '80-90' }] }, { proto: 'tcp', srcIp: E.pgParseIPv4('10.1.1.1'), srcZone: 'a', dstIp: 1, dstZone: 'b', dstPort: 85 }).index, 0, 'rule matching with cidr and range');
+eq(E.pgFwEvaluate({ rules: [{ id: 'x', action: 'allow', fromZone: 'any', toZone: 'any', proto: 'tcp', src: '10.0.0.0/8', dst: 'any', port: '80-90' }] }, { proto: 'tcp', srcIp: E.pgParseIPv4('11.1.1.1'), srcZone: 'a', dstIp: 1, dstZone: 'b', dstPort: 85 }), null, 'rule not matching outside cidr');
+
+if (fs.existsSync(scenFile)) {
+  const data = JSON.parse(fs.readFileSync(scenFile, 'utf8'));
+  (data.firewall || []).forEach((sc) => {
+    (sc.expect || []).forEach((ex, n) => {
+      const r = E.pgFwTest(sc.topology, ex);
+      eq(r.verdict, ex.verdict, `firewall scenario ${sc.id} check ${n + 1} verdict`);
+      if (ex.code) eq(r.diagnosis && r.diagnosis.code, ex.code, `firewall scenario ${sc.id} check ${n + 1} code`);
+    });
+    const t = E.pgFwApplyFixes(sc.topology, sc.fix);
+    sc.expectFixed.forEach((ex, n) => eq(E.pgFwTest(t, ex).verdict, ex.verdict, `firewall scenario ${sc.id} fixed check ${n + 1}`));
+  });
+  if (data.firewallSandbox) {
+    eq(E.pgFwTest(data.firewallSandbox, { from: 'visitor', to: 'fw-public', proto: 'tcp', port: 443 }).verdict, 'success', 'firewall sandbox starts working');
+    eq(E.pgFwTest(data.firewallSandbox, { from: 'pc', to: 'site', proto: 'tcp', port: 443 }).verdict, 'success', 'firewall sandbox outbound works');
+  }
+  if (data.vlanSandbox) eq(E.pgVlanPing(data.vlanSandbox, E.pgVlanNewState(), 'pc1', 'srv').verdict, 'success', 'vlan sandbox starts working');
 }
 
 if (failures) { console.error(`\n${failures} of ${checks} playground checks failed`); process.exit(1); }

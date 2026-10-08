@@ -296,6 +296,128 @@ def validate_playground():
     return errors
 
 
+def validate_vlan_scenarios():
+    errors = []
+    seen = set()
+    for sc in playground_data.VLAN_SCENARIOS:
+        sid = sc.get("id", "?")
+        label = f"[playground-vlan:{sid}]"
+        if not sc.get("id") or sc["id"] in seen:
+            errors.append(f"{label} id is missing or not unique")
+        seen.add(sc.get("id"))
+        for field in ("title", "goal", "story", "lesson"):
+            if not isinstance(sc.get(field), str) or not sc[field].strip():
+                errors.append(f"{label} needs a non-empty '{field}'")
+        if sc.get("level") not in ("starter", "core", "stretch"):
+            errors.append(f"{label} level must be starter, core or stretch")
+        topo = sc.get("topology") or {}
+        ports = {}
+        for sw in topo.get("switches", []):
+            if sw["id"] in ports:
+                errors.append(f"{label} duplicate switch id '{sw['id']}'")
+            ports[sw["id"]] = {}
+            for p in sw.get("ports", []):
+                if p.get("mode") not in ("access", "trunk"):
+                    errors.append(f"{label} port '{p.get('id')}' mode must be access or trunk")
+                if p.get("mode") == "access" and not isinstance(p.get("vlan"), int):
+                    errors.append(f"{label} access port '{p.get('id')}' needs an integer vlan")
+                if p.get("mode") == "trunk" and (not isinstance(p.get("allowed"), list) or not isinstance(p.get("native"), int)):
+                    errors.append(f"{label} trunk port '{p.get('id')}' needs 'allowed' and 'native'")
+                ports[sw["id"]][p["id"]] = p
+        ids = set()
+        for h in topo.get("hosts", []):
+            if h["id"] in ids:
+                errors.append(f"{label} duplicate device id '{h['id']}'")
+            ids.add(h["id"])
+            if h.get("port") not in ports.get(h.get("switch"), {}):
+                errors.append(f"{label} host '{h['id']}' is plugged into a port that does not exist")
+        for r in topo.get("routers", []):
+            ids.add(r["id"])
+            if r.get("port") not in ports.get(r.get("switch"), {}):
+                errors.append(f"{label} router '{r['id']}' is plugged into a port that does not exist")
+        for l in topo.get("links", []):
+            for end in (l["a"], l["b"]):
+                if end["port"] not in ports.get(end["switch"], {}):
+                    errors.append(f"{label} link names a port that does not exist")
+        host_ids = {h["id"] for h in topo.get("hosts", [])}
+        for group in ("ask",):
+            e = sc.get(group) or {}
+            if e.get("from") not in host_ids or e.get("to") not in host_ids:
+                errors.append(f"{label} ask must name two hosts")
+        for e in sc.get("expect", []) + sc.get("expectFixed", []):
+            if e.get("from") not in host_ids or e.get("to") not in host_ids:
+                errors.append(f"{label} expectation must name two hosts")
+            if e.get("verdict") not in ("success", "failed"):
+                errors.append(f"{label} verdict must be success or failed")
+        if not sc.get("expect") or not sc.get("expectFixed") or not sc.get("fix"):
+            errors.append(f"{label} needs expect, fix and expectFixed")
+        for f in sc.get("fix", []):
+            if f.get("device") not in ids and f.get("device") not in ports:
+                errors.append(f"{label} fix names unknown device '{f.get('device')}'")
+        if not isinstance(sc.get("hints"), list) or not sc["hints"]:
+            errors.append(f"{label} needs hints")
+    return errors
+
+
+def validate_firewall_scenarios():
+    errors = []
+    seen = set()
+    zones = ("inside", "dmz", "outside")
+    for sc in playground_data.FIREWALL_SCENARIOS + [{"id": "(sandbox)", **{"topology": playground_data.SCENARIOS["firewallSandbox"]}, "_sandbox": True}]:
+        sid = sc.get("id", "?")
+        label = f"[playground-firewall:{sid}]"
+        if not sc.get("_sandbox"):
+            if not sc.get("id") or sc["id"] in seen:
+                errors.append(f"{label} id is missing or not unique")
+            seen.add(sc.get("id"))
+            for field in ("title", "goal", "story", "lesson"):
+                if not isinstance(sc.get(field), str) or not sc[field].strip():
+                    errors.append(f"{label} needs a non-empty '{field}'")
+            if sc.get("level") not in ("starter", "core", "stretch"):
+                errors.append(f"{label} level must be starter, core or stretch")
+            if not isinstance(sc.get("fixText"), list) or not sc["fixText"]:
+                errors.append(f"{label} needs 'fixText' (a list of strings)")
+            if not isinstance(sc.get("hints"), list) or not sc["hints"]:
+                errors.append(f"{label} needs hints")
+        topo = sc["topology"]
+        fw = topo.get("fw", {})
+        rule_ids = set()
+        for r in fw.get("rules", []):
+            if r.get("id") in rule_ids:
+                errors.append(f"{label} duplicate rule id '{r.get('id')}'")
+            rule_ids.add(r.get("id"))
+            if r.get("action") not in ("allow", "deny"):
+                errors.append(f"{label} rule '{r.get('id')}' action must be allow or deny")
+            if r.get("fromZone") not in zones + ("any",) or r.get("toZone") not in zones + ("any",):
+                errors.append(f"{label} rule '{r.get('id')}' has an unknown zone")
+            if r.get("proto") not in ("any", "tcp", "udp", "icmp"):
+                errors.append(f"{label} rule '{r.get('id')}' has an unknown protocol")
+        host_ids = set()
+        for h in topo.get("hosts", []):
+            if h["id"] in host_ids:
+                errors.append(f"{label} duplicate host id '{h['id']}'")
+            host_ids.add(h["id"])
+            if h.get("zone") not in zones:
+                errors.append(f"{label} host '{h['id']}' has an unknown zone")
+            if not IPV4_RE.match(h.get("ip", "")):
+                errors.append(f"{label} host '{h['id']}' needs a valid ip")
+        if not any(i.get("zone") == "outside" for i in fw.get("ifaces", [])):
+            errors.append(f"{label} the firewall needs an outside interface")
+        if sc.get("_sandbox"):
+            continue
+        for e in [sc.get("ask") or {}] + sc.get("expect", []) + sc.get("expectFixed", []):
+            if e.get("from") not in host_ids or (e.get("to") not in host_ids and e.get("to") != "fw-public"):
+                errors.append(f"{label} a test names an unknown host")
+            if e.get("proto") not in ("tcp", "udp", "icmp"):
+                errors.append(f"{label} a test has an unknown protocol")
+        for e in sc.get("expect", []) + sc.get("expectFixed", []):
+            if e.get("verdict") not in ("success", "failed"):
+                errors.append(f"{label} verdict must be success or failed")
+        if not sc.get("expect") or not sc.get("expectFixed") or not sc.get("fix"):
+            errors.append(f"{label} needs expect, fix and expectFixed")
+    return errors
+
+
 def run_playground_checks():
     """Replays the engine's unit tests and every scenario through node when it
     is available (the shipped app needs no node; only this check does)."""
@@ -672,6 +794,8 @@ def validate():
 
     errors.extend(validate_bridges())
     errors.extend(validate_playground())
+    errors.extend(validate_vlan_scenarios())
+    errors.extend(validate_firewall_scenarios())
     errors.extend(validate_acronyms())
 
     if errors:

@@ -568,6 +568,23 @@ where one genuinely fits, vocab/quiz call-outs, and common-traps notes):
   checked because Cisco's page is gated, so confirm it before you book. ISSAP, ISSEP and ISSMP are not covered. Most lessons carry a diagram
   (CCNA 13, CISSP 14, CCSP 8, CSSLP 7, CC 6, SSCP 6, CGRC 5), each in its own
   `src/js/01a_diagrams_*.jsx` file.
+- **IT Playground** (`#/playground`) — a sandbox outside any cert, reached from a card
+  on Home. Four tools, each with a free sandbox and guided troubleshooting scenarios
+  (starter, core, stretch): a **subnet calculator** (network, broadcast, host range,
+  wildcard, binary view with the network/host boundary, step-by-step working, split a
+  network, same-subnet checker, **VLSM** planner and a subnetting drill); an **IP
+  configuration lab** (hosts, default gateways, masks and static routes; ping and read
+  the trace that names the first thing that breaks, including duplicate addresses,
+  masks, gateways, missing routes and one-way replies); a **VLAN playground** (two
+  switches, access and trunk ports, allowed lists, native VLANs, a router on a stick,
+  and MAC address tables that fill as switches learn and flood); and a **firewall and
+  port-forwarding tester** (ordered rules with implicit deny, port forwards, source NAT,
+  stateful versus stateless, hairpin NAT). Nothing in the Playground touches mastery,
+  results, the daily goal or readiness. The simulations are deliberately simplified (no
+  IPv6 yet, no vendor-exact behaviour); the engine is pure JavaScript
+  (`src/js/03b_playground_engine.js`) and `tools/check_playground.js` runs its unit
+  tests and replays every scenario in `data/playground.py` (build.py does this when node
+  is installed).
 - **EHR Integration** — *not a certification.* Epic (the dominant hospital EHR
   vendor) requires employer sponsorship to even take its exams, and its exam
   content is proprietary, so there's no legitimate way to build real cert-prep
@@ -595,6 +612,9 @@ data/
   cloudplus.py  — CompTIA Cloud+ categories, flashcards, questions, course lessons
   ccna.py, cissp.py — combine ccna_a/_b and cissp_a/_b (two parts each, written in parallel)
   isc2cc.py, sscp.py, ccsp.py, cgrc.py, csslp.py — the ISC2 tracks (experience requirements live in tracks.py)
+  playground.py — guided scenarios for the IT Playground (validated by build.py, replayed through the engine)
+tools/
+  check_playground.js — unit tests for the Playground engine plus a replay of every scenario
 src/js/
   00_preamble.js        — React hook imports, the COLOR palette
   01_diagrams.jsx        — SVG lesson diagrams
@@ -605,6 +625,8 @@ src/js/
   04c_lesson_ui.jsx      — flashcards, Study, cheat sheet, Match game, lesson/course view
   04d_quiz_ui.jsx        — practice tool picker, quiz setup, Verbal Quiz, CLI practice, Mad Libs, Sequence, Compare, Case Study, QuestionView/QuizSummary
   04e_path_ui.jsx        — the guided Path tab: unit map, step runners, test-out, weak-spot review
+  03b_playground_engine.js — pure-JS simulation engine for the IT Playground (subnet maths, ping, VLAN switching, firewall)
+  04h_playground_ui.jsx  — Playground shell and subnet tools; 04i (IP lab), 04j (VLANs), 04k (firewall) hold the other tools
   05_final_exam_ui.jsx   — timed exam intro/runner/results (practice exam + proctored-style Final Mock)
   06_app.jsx             — CertStudyApp, the top-level component
 

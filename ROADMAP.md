@@ -1695,6 +1695,22 @@ trading away for shinier but shallower ones.
   ISC2 published a broader Code of Professional Conduct in February 2026 that builds on
   the Code of Ethics canons; the CC and CISSP cheat sheets mention it. No cross-cert
   bridges exist for these tracks yet, and ISSAP, ISSEP and ISSMP are not covered.
+- [x] **IT Playground v1 (the sandbox, ROADMAP §17).** A new area outside any cert at `#/playground`
+  (`#/playground/<subnet|ipconfig|vlan|firewall>`), entered from a card on Home. `src/js/03b_playground_engine.js`
+  holds a pure-JavaScript engine (no React, no DOM): exact 32-bit subnet maths, VLSM allocation, a host/gateway/
+  router ping model (ARP, default gateway, longest-prefix match, static routes, duplicate addresses), VLAN switching
+  (access/trunk ports, 802.1Q tagging, native VLANs, MAC learning and flooding, router on a stick) and a first-match
+  firewall with implicit deny, port forwards, source NAT, stateful/stateless modes and hairpin NAT. Each simulation
+  returns a plain-language trace plus the first thing that is wrong. Screens: `04h` (shell, subnet calculator with
+  binary view and steps, same-subnet checker, VLSM planner, drill), `04i` (IP lab), `04j` (VLAN lab), `04k`
+  (firewall). Content: `data/playground.py` has 10 IP, 6 VLAN and 8 firewall troubleshooting scenarios plus three
+  sandboxes; `build.py` validates their shape and, when node is on the PATH, runs `tools/check_playground.js`
+  (about 195 unit checks, then every scenario's broken and fixed outcomes through the engine) so a drifting scenario
+  fails the build. Not graded: nothing touches mastery, results, daily goal or readiness. Open items: IPv6; a "try it"
+  button from the CCNA subnetting/VLAN/ACL lessons that loads the matching scenario; "quiz me on this setup";
+  playground achievements; STP, DHCP, DNS, ACL-on-an-interface, VPN and Azure NSG scenarios (§17 item 5); persisted
+  sandbox setups and export/import for the VLAN and firewall tools (the IP lab already has export/import); making the
+  tall editor cards collapsible.
 - [x] **ISC2 tracks verified against the official exam outlines (October 2026).** Once isc2.org and its
   document host were reachable, the six outlines were downloaded and every numbered objective and
   sub-bullet audited against each track: CC (outline effective Sept 1, 2026; +130 cards, +146 questions,
@@ -2012,7 +2028,7 @@ specifically (still open).
   single, always-available entry point. `full_smoke.js` extended to
   cover the hamburger opening the panel from both Learn and Home.
 
-## 17. A general IT "playground" (user's idea, not started)
+## 17. A general IT "playground" (user's idea, v1 built; see the Done list)
 
 A new top-level area, separate from any one cert, where the learner changes
 something and watches what happens to a small network or system. The cert
@@ -2020,7 +2036,14 @@ tracks teach and test; the playground lets you *try* it. It is a self-study
 sandbox, not a graded tool: nothing in it touches mastery, results, the daily
 goal or exam readiness (the same rule the Commands and Sequence builder follow).
 
-- [ ] **Scope the first version.** Candidate tools, roughly in build order
+**Status (v1 built).** Tools 1 to 4 below exist (subnet calculator with VLSM, IP configuration lab, VLAN
+playground, firewall and port-forwarding tester), reached from a Home card and `#/playground[/<tool>]`
+(no bottom-bar tab: it stays off the tab bar so the six existing tabs keep their room). The engine is pure
+JavaScript, scenarios are data in `data/playground.py` and are replayed through the engine by `build.py`
+(when node is available). Still open: item 5 (more scenarios), IPv6, "try it" links from lessons, quiz and
+achievement links, persisted sandboxes. The checklist below is kept as the original design.
+
+- [x] **Scope the first version (1 to 4 built, 5 open).** Candidate tools, roughly in build order
   (cheap and self-contained first):
   1. **Subnet calculator with explanations.** Enter an IPv4 address and mask
      or prefix (and later IPv6); see network, broadcast, first/last host,
@@ -2055,7 +2078,7 @@ goal or exam readiness (the same rule the Commands and Sequence builder follow).
      site-to-site VPN that is up but not passing traffic, certificate expiry,
      a DHCP snooping or port-security lockout, an Azure NSG vs firewall rule
      comparison.
-- [ ] **How it should feel.** Each tool opens with a one-line goal, a few
+- [x] **How it should feel.** Each tool opens with a one-line goal, a few
   **guided scenarios** ("this PC can't reach the printer, find out why") and a
   free sandbox; every action shows its cause and effect in words next to a
   simple diagram (reuse the `D*` SVG helpers and the colour tokens so it works
@@ -2063,13 +2086,13 @@ goal or exam readiness (the same rule the Commands and Sequence builder follow).
   like export and import already does) keep experiments safe and repeatable.
   Mobile first: large tap targets, no drag-only interactions (tap to select,
   tap to place), keyboard-friendly inputs with validation messages.
-- [ ] **Where it lives.** A new bottom-bar entry or a Practice-style picker
+- [x] **Where it lives (Home card and route; lesson links still open).** A new bottom-bar entry or a Practice-style picker
   ("Playground") that is not tied to the selected cert; each tool can also be
   opened from the lessons that teach it (the CCNA subnetting, VLAN and ACL
   lessons, the CC networking lesson, the CISSP network lessons, AZ-104
   networking) with a "try it" button that loads a matching scenario. Hash
   route sketch: `#/playground`, `#/playground/<tool>`.
-- [ ] **Engine.** Pure JavaScript, no server: one small simulation module per
+- [x] **Engine.** Pure JavaScript, no server: one small simulation module per
   tool in the style of the existing pure-logic helpers (`03_helpers.js`), with
   its state as plain objects so it is easy to test in Node without the UI.
   Start with exact integer/bit maths for addressing; model a packet as an
@@ -2078,7 +2101,7 @@ goal or exam readiness (the same rule the Commands and Sequence builder follow).
   taught, say what is simplified, and never claim vendor-specific behaviour
   the simulation does not reproduce (note when something differs between
   Cisco IOS, Windows, Linux and Azure).
-- [ ] **Content and checks.** Scenarios live as data (`data/playground.py`,
+- [x] **Content and checks (Playwright tests live in the scratchpad, not the repo).** Scenarios live as data (`data/playground.py`,
   validated by `build.py` like other content, with a worked expected outcome
   per scenario so the build can run each through the engine and fail on a
   mismatch). Unit tests for the maths (subnetting, VLSM, wildcard, IPv6

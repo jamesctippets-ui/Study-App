@@ -875,7 +875,7 @@ function HomeView({ tracks, results, seenLog, stats, certPlan, speech, srs, make
       >
         <div>
           <div style={{ fontSize: '13px', fontWeight: 600, color: COLOR.text }}>IT Playground</div>
-          <div style={{ fontSize: '11.5px', color: COLOR.muted, marginTop: '1px', lineHeight: 1.4 }}>Subnet calculator, IP configuration lab: try it, break it, fix it.</div>
+          <div style={{ fontSize: '11.5px', color: COLOR.muted, marginTop: '1px', lineHeight: 1.4 }}>Subnet calculator, IP lab, VLANs and firewalls: try it, break it, fix it.</div>
         </div>
         <div style={{ color: COLOR.muted, fontSize: '15px' }}>›</div>
       </button>

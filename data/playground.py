@@ -325,4 +325,465 @@ _add({
     'related': ['CCNA: static routes and next hops', 'CCNA: /30 point-to-point links'],
 })
 
-SCENARIOS = {'ipconfig': IPCONFIG_SCENARIOS}
+
+
+# ---------------------------------------------------------------------------
+# VLAN playground scenarios. Same fields as the ipconfig ones, with a switched
+# topology: {'switches': [{'id','name','vlans','ports': [{'id','mode',
+# 'vlan'|'allowed'+'native'}]}], 'hosts': [{'id','name','switch','port','mac',
+# 'ip','mask','gateway'}], 'links': [{'a': {'switch','port'}, 'b': {...}}],
+# 'routers': [{'id','name','switch','port','mac','subifs': [{'vlan','ip','mask'}]}]}.
+# Fix entries: {'device': <switch|host|router id>, 'port': <port id>, 'field', 'value'}
+# for a switch port, {'device': <switch id>, 'field': 'vlans', 'value': [...]},
+# {'device': <host|router id>, 'field', 'value'}, or
+# {'device': <router id>, 'subif': {'vlan','ip','mask'}} to add a sub-interface.
+# ---------------------------------------------------------------------------
+
+VLAN_SCENARIOS = []
+
+
+def _vlan_base():
+    """Two switches joined by a trunk, VLAN 10 (Sales) and VLAN 20 (Servers),
+    and a router on a stick on SW1's Fa0/24."""
+    return {
+        'switches': [
+            {'id': 'sw1', 'name': 'SW1', 'vlans': [10, 20], 'ports': [
+                {'id': 'Fa0/1', 'mode': 'access', 'vlan': 10},
+                {'id': 'Fa0/2', 'mode': 'access', 'vlan': 10},
+                {'id': 'Fa0/3', 'mode': 'access', 'vlan': 20},
+                {'id': 'Fa0/24', 'mode': 'trunk', 'allowed': [1, 10, 20], 'native': 1},
+                {'id': 'Gi0/1', 'mode': 'trunk', 'allowed': [1, 10, 20], 'native': 1},
+            ]},
+            {'id': 'sw2', 'name': 'SW2', 'vlans': [10, 20], 'ports': [
+                {'id': 'Fa0/1', 'mode': 'access', 'vlan': 10},
+                {'id': 'Fa0/2', 'mode': 'access', 'vlan': 20},
+                {'id': 'Gi0/1', 'mode': 'trunk', 'allowed': [1, 10, 20], 'native': 1},
+            ]},
+        ],
+        'links': [{'a': {'switch': 'sw1', 'port': 'Gi0/1'}, 'b': {'switch': 'sw2', 'port': 'Gi0/1'}}],
+        'hosts': [
+            {'id': 'pc1', 'name': 'PC1', 'switch': 'sw1', 'port': 'Fa0/1', 'mac': 'AA:01', 'ip': '192.168.10.11', 'mask': '255.255.255.0', 'gateway': '192.168.10.1'},
+            {'id': 'pc2', 'name': 'PC2', 'switch': 'sw1', 'port': 'Fa0/2', 'mac': 'AA:02', 'ip': '192.168.10.12', 'mask': '255.255.255.0', 'gateway': '192.168.10.1'},
+            {'id': 'pc3', 'name': 'PC3', 'switch': 'sw1', 'port': 'Fa0/3', 'mac': 'AA:03', 'ip': '192.168.20.11', 'mask': '255.255.255.0', 'gateway': '192.168.20.1'},
+            {'id': 'pc4', 'name': 'PC4', 'switch': 'sw2', 'port': 'Fa0/1', 'mac': 'AA:04', 'ip': '192.168.10.13', 'mask': '255.255.255.0', 'gateway': '192.168.10.1'},
+            {'id': 'srv', 'name': 'Server', 'switch': 'sw2', 'port': 'Fa0/2', 'mac': 'AA:05', 'ip': '192.168.20.10', 'mask': '255.255.255.0', 'gateway': '192.168.20.1'},
+        ],
+        'routers': [{'id': 'r1', 'name': 'Router', 'switch': 'sw1', 'port': 'Fa0/24', 'mac': 'BB:01', 'subifs': [
+            {'vlan': 10, 'ip': '192.168.10.1', 'mask': '255.255.255.0'},
+            {'vlan': 20, 'ip': '192.168.20.1', 'mask': '255.255.255.0'},
+        ]}],
+    }
+
+
+def _vlan(edit):
+    topo = _vlan_base()
+    edit(topo)
+    return topo
+
+
+def _port(topo, sw, port):
+    for s in topo['switches']:
+        if s['id'] == sw:
+            for p in s['ports']:
+                if p['id'] == port:
+                    return p
+    raise KeyError((sw, port))
+
+
+def _vadd(s):
+    VLAN_SCENARIOS.append(s)
+
+
+def _e_wrong_port(t):
+    _port(t, 'sw1', 'Fa0/2')['vlan'] = 20
+
+
+_vadd({
+    'id': 'vlan-wrong-port',
+    'title': 'Two PCs side by side cannot see each other',
+    'goal': 'Same subnet, same switch, still no connection.',
+    'level': 'starter',
+    'story': 'PC1 and PC2 sit on the same switch and both have 192.168.10.x addresses, but PC1 cannot ping PC2. Their cables are fine and both ports show link.',
+    'topology': _vlan(_e_wrong_port),
+    'ask': {'from': 'pc1', 'to': 'pc2'},
+    'expect': [{'from': 'pc1', 'to': 'pc2', 'verdict': 'failed', 'code': 'vlan-mismatch'}],
+    'hints': [
+        'Read the first failing step: does the ARP broadcast from PC1 ever reach PC2?',
+        'Look at which VLAN each port is assigned to. Broadcasts stay inside one VLAN.',
+    ],
+    'fix': [{'device': 'sw1', 'port': 'Fa0/2', 'field': 'vlan', 'value': 10}],
+    'expectFixed': [{'from': 'pc1', 'to': 'pc2', 'verdict': 'success'}],
+    'lesson': 'Each VLAN is a separate broadcast domain. A host in VLAN 20 never hears an ARP broadcast sent in VLAN 10, so two hosts that are physically next to each other can be completely isolated. When same-subnet hosts cannot ping, check the access-port VLAN assignments first.',
+    'related': ['CCNA: VLANs and access ports', 'CC: network segmentation'],
+})
+
+
+def _e_allowed(t):
+    _port(t, 'sw1', 'Gi0/1')['allowed'] = [1, 10]
+    _port(t, 'sw2', 'Gi0/1')['allowed'] = [1, 10]
+
+
+_vadd({
+    'id': 'vlan-trunk-allowed',
+    'title': 'The server in the other room is unreachable',
+    'goal': 'A trunk only carries the VLANs it is allowed to carry.',
+    'level': 'core',
+    'story': 'PC3 (VLAN 20) cannot reach the server (VLAN 20) on the second switch. VLAN 10 traffic crosses the same trunk without any trouble.',
+    'topology': _vlan(_e_allowed),
+    'ask': {'from': 'pc3', 'to': 'srv'},
+    'expect': [{'from': 'pc3', 'to': 'srv', 'verdict': 'failed', 'code': 'vlan-not-allowed'}],
+    'hints': [
+        'Compare the working VLAN 10 path with the failing VLAN 20 path. What differs on the trunk?',
+        'Check the allowed VLAN list on the trunk port of both switches.',
+    ],
+    'fix': [
+        {'device': 'sw1', 'port': 'Gi0/1', 'field': 'allowed', 'value': [1, 10, 20]},
+        {'device': 'sw2', 'port': 'Gi0/1', 'field': 'allowed', 'value': [1, 10, 20]},
+    ],
+    'expectFixed': [{'from': 'pc3', 'to': 'srv', 'verdict': 'success'}],
+    'lesson': 'A trunk carries many VLANs but only the ones in its allowed list. A new VLAN must be added on both ends of every trunk it crosses (or the list left at "all"). This is the classic "I made the VLAN but nobody can reach it" fault.',
+    'related': ['CCNA: 802.1Q trunking and allowed VLANs'],
+})
+
+
+def _e_native(t):
+    _port(t, 'sw1', 'Fa0/2')['vlan'] = 1
+    _port(t, 'sw2', 'Fa0/1')['vlan'] = 1
+    for h in t['hosts']:
+        if h['id'] == 'pc2':
+            h.update({'ip': '192.168.1.12', 'gateway': ''})
+        if h['id'] == 'pc4':
+            h.update({'ip': '192.168.1.13', 'gateway': ''})
+    p = _port(t, 'sw2', 'Gi0/1')
+    p['native'] = 99
+    p['allowed'] = [1, 10, 20, 99]
+
+
+_vadd({
+    'id': 'vlan-native-mismatch',
+    'title': 'Management traffic vanishes across the trunk',
+    'goal': 'Both ends of a trunk must agree on the native VLAN.',
+    'level': 'stretch',
+    'story': 'Two management PCs share the default VLAN 1 on different switches. Tagged VLANs cross the trunk without trouble, but these two cannot ping each other. The switch log mentions a native VLAN mismatch.',
+    'topology': _vlan(_e_native),
+    'ask': {'from': 'pc2', 'to': 'pc4'},
+    'expect': [{'from': 'pc2', 'to': 'pc4', 'verdict': 'failed', 'code': 'native-mismatch'}],
+    'hints': [
+        'Only one VLAN crosses a trunk untagged. Which VLAN is that on each switch?',
+        'Compare the native VLAN setting on Gi0/1 of SW1 with the one on SW2.',
+    ],
+    'fix': [{'device': 'sw2', 'port': 'Gi0/1', 'field': 'native', 'value': 1}],
+    'expectFixed': [{'from': 'pc2', 'to': 'pc4', 'verdict': 'success'}],
+    'lesson': 'Frames in the native VLAN cross a trunk without a tag, so the receiving switch decides which VLAN they belong to by its own native VLAN setting. If the two ends disagree, untagged traffic is put into the wrong VLAN (which also opens VLAN-hopping tricks). Set the same native VLAN on both ends, and prefer an unused one.',
+    'related': ['CCNA: native VLAN', 'SSCP: network segmentation and VLAN hopping'],
+})
+
+
+def _e_missing_vlan(t):
+    for s in t['switches']:
+        if s['id'] == 'sw2':
+            s['vlans'] = [10]
+
+
+_vadd({
+    'id': 'vlan-missing',
+    'title': 'The new switch ignores VLAN 20',
+    'goal': 'A VLAN has to exist on every switch that carries it.',
+    'level': 'core',
+    'story': 'The second switch was added last week. VLAN 10 works there, but the server on VLAN 20 never answers anyone, and its port has link.',
+    'topology': _vlan(_e_missing_vlan),
+    'ask': {'from': 'pc3', 'to': 'srv'},
+    'expect': [{'from': 'pc3', 'to': 'srv', 'verdict': 'failed', 'code': 'vlan-missing'}],
+    'hints': ['Check which VLANs exist in the database of the switch the server is plugged into.'],
+    'fix': [{'device': 'sw2', 'field': 'vlans', 'value': [10, 20]}],
+    'expectFixed': [{'from': 'pc3', 'to': 'srv', 'verdict': 'success'}],
+    'lesson': 'A switch only forwards VLANs it knows about. Assigning a port to a VLAN that was never created leaves that port unusable. Creating VLANs by hand on each switch is error-prone, which is what VTP (or configuration management) tries to help with.',
+    'related': ['CCNA: creating VLANs', 'CCNA: VTP concepts'],
+})
+
+
+def _e_access_router(t):
+    for s in t['switches']:
+        if s['id'] == 'sw1':
+            for i, p in enumerate(s['ports']):
+                if p['id'] == 'Fa0/24':
+                    s['ports'][i] = {'id': 'Fa0/24', 'mode': 'access', 'vlan': 10}
+
+
+_vadd({
+    'id': 'inter-vlan-trunk',
+    'title': 'Different VLANs cannot talk, even with a router',
+    'goal': 'Router-on-a-stick needs a trunk toward the router.',
+    'level': 'core',
+    'story': 'PC1 (VLAN 10) should reach PC3 (VLAN 20) through the router, which has a sub-interface for each VLAN. It never works. The router port on the switch shows link.',
+    'topology': _vlan(_e_access_router),
+    'ask': {'from': 'pc1', 'to': 'pc3'},
+    'expect': [{'from': 'pc1', 'to': 'pc3', 'verdict': 'failed', 'code': 'router-untagged'}],
+    'hints': [
+        'The PC does its job: it ARPs for its gateway. Does the router ever see that ARP?',
+        "How do the router's sub-interfaces tell VLANs apart? What must the switch port facing the router do to keep that information?",
+    ],
+    'fix': [
+        {'device': 'sw1', 'port': 'Fa0/24', 'field': 'mode', 'value': 'trunk'},
+        {'device': 'sw1', 'port': 'Fa0/24', 'field': 'allowed', 'value': [1, 10, 20]},
+        {'device': 'sw1', 'port': 'Fa0/24', 'field': 'native', 'value': 1},
+    ],
+    'expectFixed': [{'from': 'pc1', 'to': 'pc3', 'verdict': 'success'}],
+    'lesson': 'A router on a stick uses one physical link and one 802.1Q sub-interface per VLAN. The tag is what tells the router which VLAN a frame came from, so the switch port must be a trunk, not an access port. Traffic between VLANs always goes through a layer 3 device.',
+    'related': ['CCNA: inter-VLAN routing (router on a stick)', 'AZ-104: routing between subnets'],
+})
+
+_vadd({
+    'id': 'inter-vlan-gateway',
+    'title': 'The PC reaches its neighbours but nothing else',
+    'goal': 'To leave its VLAN a host needs the router as its default gateway.',
+    'level': 'starter',
+    'story': 'PC1 can talk to everything in VLAN 10 but cannot reach the server in VLAN 20, though the router is configured correctly.',
+    'topology': _vlan(lambda t: [h.update({'gateway': ''}) for h in t['hosts'] if h['id'] == 'pc1']),
+    'ask': {'from': 'pc1', 'to': 'srv'},
+    'expect': [{'from': 'pc1', 'to': 'srv', 'verdict': 'failed', 'code': 'no-gateway'}],
+    'hints': ['What does a host need in order to send traffic to another subnet?'],
+    'fix': [{'device': 'pc1', 'field': 'gateway', 'value': '192.168.10.1'}],
+    'expectFixed': [{'from': 'pc1', 'to': 'srv', 'verdict': 'success'}],
+    'lesson': 'Different VLANs are different subnets. A host reaches another VLAN only by sending to its default gateway, the router\'s address in the host\'s own VLAN (192.168.10.1 here, not the address in the destination VLAN).',
+    'related': ['CCNA: inter-VLAN routing', 'CC: network devices'],
+})
+
+
+def _e_missing_subif(t):
+    for r in t['routers']:
+        r['subifs'] = [x for x in r['subifs'] if x['vlan'] != 20]
+
+
+_vadd({
+    'id': 'inter-vlan-subif',
+    'title': 'One VLAN was never given a gateway',
+    'goal': 'The router needs a sub-interface in every VLAN it routes.',
+    'level': 'core',
+    'story': 'PC1 reaches PC4 and the router, but not the server in VLAN 20. A new VLAN was added to the switches last month.',
+    'topology': _vlan(_e_missing_subif),
+    'ask': {'from': 'pc1', 'to': 'srv'},
+    'expect': [{'from': 'pc1', 'to': 'srv', 'verdict': 'failed', 'code': 'no-route'}],
+    'hints': ['Look at the list of sub-interfaces on the router. Which VLANs have one?'],
+    'fix': [{'device': 'r1', 'subif': {'vlan': 20, 'ip': '192.168.20.1', 'mask': '255.255.255.0'}}],
+    'expectFixed': [{'from': 'pc1', 'to': 'srv', 'verdict': 'success'}],
+    'lesson': 'A router only knows the networks it has an interface in. Each VLAN that needs routing needs its own sub-interface (with the gateway address for that VLAN) or an SVI on a layer 3 switch.',
+    'related': ['CCNA: sub-interfaces and SVIs'],
+})
+
+
+
+# ---------------------------------------------------------------------------
+# Firewall and port-forwarding scenarios. Topology:
+#   {'fw': {'name', 'stateful', 'masquerade', 'hairpin',
+#           'ifaces': [{'zone': 'inside'|'dmz'|'outside', 'ip', 'mask'}],
+#           'rules': [{'id', 'action', 'fromZone', 'toZone', 'proto', 'src', 'dst', 'port'}],
+#           'forwards': [{'id', 'proto', 'extPort', 'toIp', 'toPort'}]},
+#    'hosts': [{'id', 'name', 'zone', 'ip', 'services': [{'proto', 'port'}]}]}
+# A connection test is {'from': host id, 'to': host id | 'fw-public', 'proto', 'port'}.
+# Fix entries: {'rules': [...]} replaces the rule list; {'addRule': {...}};
+# {'addForward': {...}}; {'forward': id, 'field', 'value'}; {'field': 'stateful'|'masquerade'|'hairpin', 'value'}.
+# 'fixText' is the human wording of the fix shown under "Show the fix".
+# ---------------------------------------------------------------------------
+
+FIREWALL_SCENARIOS = []
+
+
+def _fw_rules():
+    return [
+        {'id': 'r1', 'action': 'allow', 'fromZone': 'inside', 'toZone': 'outside', 'proto': 'any', 'src': 'any', 'dst': 'any', 'port': 'any'},
+        {'id': 'r2', 'action': 'allow', 'fromZone': 'inside', 'toZone': 'dmz', 'proto': 'any', 'src': 'any', 'dst': 'any', 'port': 'any'},
+        {'id': 'r3', 'action': 'allow', 'fromZone': 'outside', 'toZone': 'dmz', 'proto': 'tcp', 'src': 'any', 'dst': '172.16.0.10', 'port': '443'},
+    ]
+
+
+def _fw_base():
+    return {
+        'fw': {
+            'name': 'Firewall', 'stateful': True, 'masquerade': True, 'hairpin': False,
+            'ifaces': [
+                {'zone': 'inside', 'ip': '192.168.1.1', 'mask': '255.255.255.0'},
+                {'zone': 'dmz', 'ip': '172.16.0.1', 'mask': '255.255.255.0'},
+                {'zone': 'outside', 'ip': '203.0.113.2', 'mask': '255.255.255.248'},
+            ],
+            'rules': _fw_rules(),
+            'forwards': [{'id': 'f1', 'proto': 'tcp', 'extPort': 443, 'toIp': '172.16.0.10', 'toPort': 443}],
+        },
+        'hosts': [
+            {'id': 'pc', 'name': 'Office PC', 'zone': 'inside', 'ip': '192.168.1.10', 'services': []},
+            {'id': 'wiki', 'name': 'Intranet wiki', 'zone': 'inside', 'ip': '192.168.1.30', 'services': [{'proto': 'tcp', 'port': 80}]},
+            {'id': 'web', 'name': 'Web server', 'zone': 'dmz', 'ip': '172.16.0.10', 'services': [{'proto': 'tcp', 'port': 80}, {'proto': 'tcp', 'port': 443}]},
+            {'id': 'visitor', 'name': 'Visitor (internet)', 'zone': 'outside', 'ip': '198.51.100.50', 'services': []},
+            {'id': 'site', 'name': 'Public website', 'zone': 'outside', 'ip': '93.184.216.34', 'services': [{'proto': 'tcp', 'port': 443}]},
+        ],
+    }
+
+
+def _fw(edit):
+    t = _fw_base()
+    edit(t)
+    return t
+
+
+def _fadd(s):
+    FIREWALL_SCENARIOS.append(s)
+
+
+_visitor_web = {'from': 'visitor', 'to': 'fw-public', 'proto': 'tcp', 'port': 443}
+_visitor_ok = {**_visitor_web, 'verdict': 'success'}
+
+_fadd({
+    'id': 'fw-rule-order',
+    'title': 'The website is allowed, yet blocked',
+    'goal': 'Rules are read top to bottom and the first match wins.',
+    'level': 'starter',
+    'story': 'Someone added a "block everything from the internet to the DMZ" rule during an incident and left it at the top. The allow rule for the website is still in the list, but visitors cannot connect.',
+    'topology': _fw(lambda t: t['fw']['rules'].insert(0, {'id': 'r0', 'action': 'deny', 'fromZone': 'outside', 'toZone': 'dmz', 'proto': 'any', 'src': 'any', 'dst': 'any', 'port': 'any'})),
+    'ask': _visitor_web,
+    'expect': [{**_visitor_web, 'verdict': 'failed', 'code': 'rule-denied'}],
+    'hints': ['Read the trace: which rule number matches first, and is it the one you expected?', 'Is the allow rule in the list at all? What comes before it?'],
+    'fix': [{'rules': _fw_rules()}],
+    'fixText': ['Remove the broad deny rule at the top (or move the specific allow rule above it). The implicit deny at the end already blocks everything not allowed.'],
+    'expectFixed': [_visitor_ok],
+    'lesson': 'Firewalls evaluate rules in order and stop at the first match, so a broad deny placed above a specific allow makes the allow unreachable. Put specific rules first and general ones last; the implicit deny at the bottom makes a catch-all deny unnecessary.',
+    'related': ['CCNA: access control lists (order matters)', 'SC-500: network security rules', 'SSCP: firewall rule bases'],
+})
+
+_fadd({
+    'id': 'fw-implicit-deny',
+    'title': 'The forward is there, but nothing gets through',
+    'goal': 'Anything not explicitly allowed is denied.',
+    'level': 'starter',
+    'story': 'The port forward for the website was configured yesterday and tested from the server room. Visitors from the internet still time out.',
+    'topology': _fw(lambda t: t['fw'].update({'rules': [r for r in t['fw']['rules'] if r['id'] != 'r3']})),
+    'ask': _visitor_web,
+    'expect': [{**_visitor_web, 'verdict': 'failed', 'code': 'implicit-deny'}],
+    'hints': ['The forward translated the address. What comes next in the trace?'],
+    'fix': [{'addRule': _fw_rules()[2]}],
+    'fixText': ['Add an allow rule: TCP port 443 from outside to the web server 172.16.0.10 (in the DMZ).'],
+    'expectFixed': [_visitor_ok],
+    'lesson': 'A port forward only translates the address; it does not permit the traffic. The firewall still needs an allow rule, and without one the implicit deny at the end of the list drops the connection.',
+    'related': ['CCNA: ACLs and implicit deny', 'CC: firewalls'],
+})
+
+_fadd({
+    'id': 'fw-no-forward',
+    'title': 'Visitors reach the firewall but not the server',
+    'goal': 'The public address only reaches an inside server through a port forward.',
+    'level': 'starter',
+    'story': 'The rule allowing HTTPS to the web server exists, but visitors connecting to the company\'s public address get nowhere.',
+    'topology': _fw(lambda t: t['fw'].update({'forwards': []})),
+    'ask': _visitor_web,
+    'expect': [{**_visitor_web, 'verdict': 'failed', 'code': 'no-forward'}],
+    'hints': ['Inside servers have private addresses. What tells the firewall where to send traffic that arrives for its one public address?'],
+    'fix': [{'addForward': {'id': 'f1', 'proto': 'tcp', 'extPort': 443, 'toIp': '172.16.0.10', 'toPort': 443}}],
+    'fixText': ['Add a port forward: TCP 443 on the public address to 172.16.0.10 port 443.'],
+    'expectFixed': [_visitor_ok],
+    'lesson': 'One public address serves many inside servers. The port-forward (destination NAT) table says which port on the public address belongs to which inside server. With no entry the firewall has nothing to translate to and the connection goes nowhere.',
+    'related': ['CCNA: static NAT and port forwarding', 'CC: network address translation'],
+})
+
+_fadd({
+    'id': 'fw-wrong-target',
+    'title': 'The forward points at the wrong address',
+    'goal': 'A typo in the "forward to" address sends traffic nowhere.',
+    'level': 'core',
+    'story': 'After the web server was moved to a new subnet, the forward was edited. Rules look right, visitors still cannot connect.',
+    'topology': _fw(lambda t: t['fw']['forwards'][0].update({'toIp': '172.16.0.100'})),
+    'ask': _visitor_web,
+    'expect': [{**_visitor_web, 'verdict': 'failed', 'code': 'forward-target-missing'}],
+    'hints': ['Compare the address in the forward with the web server\'s real address.'],
+    'fix': [{'forward': 'f1', 'field': 'toIp', 'value': '172.16.0.10'}],
+    'fixText': ['Change the forward\'s inside address from 172.16.0.100 to 172.16.0.10.'],
+    'expectFixed': [_visitor_ok],
+    'lesson': 'Rules and forwards are separate settings and must agree on the inside address. When a server is renumbered, update the forward, the allow rule and DNS together.',
+    'related': ['CCNA: NAT troubleshooting'],
+})
+
+_fadd({
+    'id': 'fw-wrong-port',
+    'title': 'Connection refused, not timed out',
+    'goal': 'A refused connection means the packet arrived; the service is not on that port.',
+    'level': 'core',
+    'story': 'The forward and the allow rule (any port to the web server) both look fine, but the browser says "connection refused" immediately instead of hanging.',
+    'topology': _fw(lambda t: (t['fw']['forwards'][0].update({'toPort': 8443}), t['fw']['rules'][2].update({'port': 'any'}))),
+    'ask': _visitor_web,
+    'expect': [{**_visitor_web, 'verdict': 'failed', 'code': 'refused'}],
+    'hints': ['An instant refusal is different from a timeout. What does each one tell you about where the packet got to?', 'Which port does the web server actually listen on?'],
+    'fix': [{'forward': 'f1', 'field': 'toPort', 'value': 443}],
+    'fixText': ['Change the forward\'s inside port from 8443 to 443, the port the web server listens on.'],
+    'expectFixed': [_visitor_ok],
+    'lesson': 'A timeout usually means a firewall dropped the packet. An immediate "refused" means the packet reached the host and nothing was listening, so look at the forward\'s inside port and the service, not at the rules.',
+    'related': ['CCNA: troubleshooting NAT and ACLs', 'SSCP: network troubleshooting'],
+})
+
+_fadd({
+    'id': 'fw-no-nat',
+    'title': 'The office has no internet',
+    'goal': 'Private addresses need source NAT to reach the internet.',
+    'level': 'core',
+    'story': 'The outbound firewall rule is in place, but nobody in the office can reach any website since the firewall was replaced.',
+    'topology': _fw(lambda t: t['fw'].update({'masquerade': False})),
+    'ask': {'from': 'pc', 'to': 'site', 'proto': 'tcp', 'port': 443},
+    'expect': [{'from': 'pc', 'to': 'site', 'proto': 'tcp', 'port': 443, 'verdict': 'failed', 'code': 'no-nat'}],
+    'hints': ['The rule allows the traffic. What address does the packet carry when it leaves the building?'],
+    'fix': [{'field': 'masquerade', 'value': True}],
+    'fixText': ['Turn on source NAT (masquerade / PAT) for traffic going out to the internet.'],
+    'expectFixed': [{'from': 'pc', 'to': 'site', 'proto': 'tcp', 'port': 443, 'verdict': 'success'}],
+    'lesson': 'Private (RFC 1918) addresses are not routable on the internet. Source NAT (PAT) rewrites the private source to the firewall\'s public address so replies come back to it, and the firewall maps them to the right inside host.',
+    'related': ['CCNA: PAT / NAT overload', 'CC: network address translation'],
+})
+
+_fadd({
+    'id': 'fw-stateless',
+    'title': 'Outbound is allowed; replies are not',
+    'goal': 'A stateless filter treats the reply as a brand-new packet.',
+    'level': 'stretch',
+    'story': 'An older packet filter was put in front of the office. The outbound rule allows web browsing, but pages never load.',
+    'topology': _fw(lambda t: t['fw'].update({'stateful': False})),
+    'ask': {'from': 'pc', 'to': 'site', 'proto': 'tcp', 'port': 443},
+    'expect': [{'from': 'pc', 'to': 'site', 'proto': 'tcp', 'port': 443, 'verdict': 'failed', 'code': 'return-blocked'}],
+    'hints': ['Read the line after the matching rule: how is the reply treated?'],
+    'fix': [{'field': 'stateful', 'value': True}],
+    'fixText': ['Use a stateful firewall (connection tracking). On a stateless ACL you would instead add a rule allowing the replies (established / high ports) back in.'],
+    'expectFixed': [{'from': 'pc', 'to': 'site', 'proto': 'tcp', 'port': 443, 'verdict': 'success'}],
+    'lesson': 'A stateless filter judges every packet alone, so the reply from the server (coming from port 443 to a high port) needs its own allow rule. A stateful firewall remembers the outbound connection and permits its replies automatically, which is why modern firewalls are stateful.',
+    'related': ['CCNA: ACLs are stateless', 'CC: stateful vs stateless filtering', 'SSCP: firewall types'],
+})
+
+
+def _e_hairpin(t):
+    t['fw']['forwards'] = [{'id': 'f1', 'proto': 'tcp', 'extPort': 80, 'toIp': '192.168.1.30', 'toPort': 80}]
+    t['fw']['rules'].append({'id': 'r4', 'action': 'allow', 'fromZone': 'outside', 'toZone': 'inside', 'proto': 'tcp', 'src': 'any', 'dst': '192.168.1.30', 'port': '80'})
+
+
+_fadd({
+    'id': 'fw-hairpin',
+    'title': 'It works from home but not from the office',
+    'goal': 'Inside clients using the public address of an inside server need hairpin NAT.',
+    'level': 'stretch',
+    'story': 'The intranet wiki is published to the internet through a port forward. Remote staff can use it fine, but office PCs that type the public name time out.',
+    'topology': _fw(_e_hairpin),
+    'ask': {'from': 'pc', 'to': 'fw-public', 'proto': 'tcp', 'port': 80},
+    'expect': [
+        {'from': 'visitor', 'to': 'fw-public', 'proto': 'tcp', 'port': 80, 'verdict': 'success'},
+        {'from': 'pc', 'to': 'fw-public', 'proto': 'tcp', 'port': 80, 'verdict': 'failed', 'code': 'hairpin'},
+    ],
+    'hints': ['Compare the two clients: where is each one relative to the server, and which path does the reply take?'],
+    'fix': [{'field': 'hairpin', 'value': True}],
+    'fixText': ['Turn on hairpin NAT (NAT reflection) on the firewall, or give inside clients the wiki\'s inside address through split DNS.'],
+    'expectFixed': [
+        {'from': 'visitor', 'to': 'fw-public', 'proto': 'tcp', 'port': 80, 'verdict': 'success'},
+        {'from': 'pc', 'to': 'fw-public', 'proto': 'tcp', 'port': 80, 'verdict': 'success'},
+    ],
+    'lesson': 'When an inside client and an inside server talk through the public address, the firewall rewrites only the destination, so the server replies straight back to the client instead of through the firewall. The client rejects a reply from an address it never contacted. Hairpin NAT also rewrites the source; split-horizon DNS avoids the problem entirely.',
+    'related': ['CCNA: NAT behaviour', 'SSCP: network design'],
+})
+
+SCENARIOS = {
+    'ipconfig': IPCONFIG_SCENARIOS,
+    'vlan': VLAN_SCENARIOS,
+    'vlanSandbox': _vlan_base(),
+    'firewall': FIREWALL_SCENARIOS,
+    'firewallSandbox': _fw_base(),
+}

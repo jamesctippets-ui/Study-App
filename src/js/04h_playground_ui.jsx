@@ -10,10 +10,10 @@ const PLAYGROUND_TOOLS = [
     blurb: 'Network, broadcast and host range for any address and mask, with the working shown. Plus VLSM planning, a same-subnet checker and a subnetting drill.' },
   { key: 'ipconfig', label: 'IP configuration lab', hue: COLOR.teal, ready: true,
     blurb: 'Hosts, a gateway and routers. Change an address, mask or route and ping to see exactly why traffic works or fails. Includes guided troubleshooting scenarios.' },
-  { key: 'vlan', label: 'VLAN playground', hue: COLOR.orange, ready: false,
-    blurb: 'Assign switch ports to VLANs, set up a trunk, send a frame and watch it delivered, flooded, tagged or dropped. Coming next.' },
-  { key: 'firewall', label: 'Firewall and port forwarding', hue: COLOR.pink, ready: false,
-    blurb: 'Write allow and deny rules, add a port forward, fire test connections and see which rule matched. Coming next.' },
+  { key: 'vlan', label: 'VLAN playground', hue: COLOR.orange, ready: true,
+    blurb: 'Two switches, access and trunk ports, native VLANs and a router on a stick. Ping across the network and watch each switch learn, flood, tag or drop the frame, with guided troubleshooting scenarios.' },
+  { key: 'firewall', label: 'Firewall and port forwarding', hue: COLOR.pink, ready: true,
+    blurb: 'Ordered allow and deny rules with an implicit deny, port forwards, NAT and stateful inspection. Fire test connections and see which rule matched and why one was blocked.' },
 ];
 
 function pgInputStyle(invalid) {
@@ -501,6 +501,8 @@ function PlaygroundView({ tool, onSelectTool, onExit }) {
       </div>
       {current.key === 'subnet' && <SubnetTool />}
       {current.key === 'ipconfig' && <IpConfigTool />}
+      {current.key === 'vlan' && <VlanTool />}
+      {current.key === 'firewall' && <FirewallTool />}
     </div>
   );
 }
