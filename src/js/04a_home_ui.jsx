@@ -317,8 +317,8 @@ function TodayHero({ dailyGoal, onSetTarget, streak, readiness, focusLabel, note
         </div>
         <button onClick={() => setEditing((e) => !e)} className="btn-flat" title="Tap to adjust your daily goal" style={{ ...cellStyle, borderLeft: `1px solid ${COLOR.border}` }}>
           <span style={{ fontSize: '10.5px', textTransform: 'uppercase', color: COLOR.muted }}>Daily goal</span>
-          <span style={{ ...big, color: met ? COLOR.primary : COLOR.text }}>{count}<span style={unit}>/{target}</span></span>
-          <TickBar value={count} total={target} ticks={10} height={6} label={`${count} of ${target} today`} />
+          <span style={{ ...big, color: met ? COLOR.success : COLOR.text }}>{count}<span style={unit}>/{target}</span></span>
+          <TickBar value={count} total={target} ticks={10} hue={met ? COLOR.success : COLOR.primary} height={6} label={`${count} of ${target} today`} />
         </button>
         <div style={{ ...cellStyle, borderLeft: `1px solid ${COLOR.border}` }}>
           <span style={{ fontSize: '10.5px', textTransform: 'uppercase', color: COLOR.muted }}>Readiness</span>
@@ -364,8 +364,8 @@ function TrackListDropdown({ tracks, masteries, certPlan, onSelectTrack, onAddTo
         onClick={() => setOpen((o) => !o)}
         style={{
           width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-          padding: '12px 14px', borderRadius: 'var(--r-card)', background: COLOR.surface,
-          border: `1px solid ${COLOR.border}`,
+          padding: '12px 14px', borderRadius: 'var(--r-card)', background: tint(COLOR.blue, 9),
+          border: `1px solid color-mix(in srgb, ${COLOR.blue} 35%, ${COLOR.border})`,
         }}
       >
         <span style={{ fontSize: '13px', fontWeight: 600, color: COLOR.text }}>{label || `All tracks (${tracks.length})`}</span>
@@ -387,9 +387,8 @@ function TrackListDropdown({ tracks, masteries, certPlan, onSelectTrack, onAddTo
                   background: COLOR.surface, border: `1px solid ${COLOR.border}`,
                 }}
               >
-                <span aria-hidden="true" style={{ width: '8px', height: '8px', background: accent, flexShrink: 0 }} />
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <div className="mono" style={{ fontSize: '13.5px', fontWeight: 700, color: COLOR.text }}>{t.label}</div>
+                  <div className="mono" style={{ fontSize: '13.5px', fontWeight: 700, color: ink(accent) }}>{t.label}</div>
                   <div style={{ fontSize: '11px', color: COLOR.muted, marginTop: '2px' }}>{t.subtitle}</div>
                   <ExperienceChip trackKey={t.key} style={{ marginTop: '4px' }} />
                 </div>
@@ -469,7 +468,7 @@ function DailyQuestionCard({ q, trackLabel, stored, onAnswer }) {
         aria-expanded={open}
         style={{
           width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px', textAlign: 'left',
-          padding: '12px 14px', borderRadius: 'var(--r-card)', background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderLeft: `3px solid ${COLOR.gold}`, boxShadow: SHADOW.card,
+          padding: '12px 14px', borderRadius: 'var(--r-card)', background: tint(COLOR.gold, 11), border: `1px solid color-mix(in srgb, ${COLOR.gold} 40%, ${COLOR.border})`, borderLeft: `3px solid ${COLOR.gold}`, boxShadow: SHADOW.card,
         }}
       >
         <span style={{ minWidth: 0 }}>
@@ -520,12 +519,12 @@ function DailyVocabCard({ card, trackLabel, revealed, onReveal, pool }) {
       <div
         onClick={() => { if (!revealed) onReveal(); }}
         style={{
-          background: COLOR.surface,
-          border: `1px solid ${COLOR.border}`, borderLeft: `3px solid ${COLOR.primary}`, borderRadius: 'var(--r-card)', padding: '12px 14px',
+          background: tint(COLOR.teal, revealed ? 16 : 10),
+          border: `1px solid color-mix(in srgb, ${COLOR.teal} 35%, ${COLOR.border})`, borderLeft: `3px solid ${COLOR.teal}`, borderRadius: 'var(--r-card)', padding: '12px 14px',
           cursor: revealed ? 'default' : 'pointer',
         }}
       >
-        <div style={{ fontSize: '10.5px', color: COLOR.primary, textTransform: 'uppercase' }}>
+        <div style={{ fontSize: '10.5px', color: COLOR.teal, textTransform: 'uppercase' }}>
           Vocab of the day · {trackLabel}
         </div>
         <div className="itil-display" style={{ fontSize: '17px', fontWeight: 600, marginTop: '4px' }}>{card.front}</div>
@@ -577,13 +576,13 @@ function CertPathHomeSection({ pathOrder, results, certPlan, studyingKey, pathPr
             style={{
               width: '100%', textAlign: 'left', display: 'flex', alignItems: 'center', gap: '10px',
               padding: '10px 14px', borderRadius: 'var(--r-card)', marginBottom: i === pathOrder.length - 1 ? 0 : '6px',
-              background: studying ? `color-mix(in srgb, ${accent} 8%, ${COLOR.surface})` : COLOR.surface, border: `1px solid ${COLOR.border}`, borderLeft: `3px solid ${accent}`,
+              background: studying ? tint(accent, 20) : tint(accent, 7), border: `1px solid ${studying ? accent : `color-mix(in srgb, ${accent} 30%, ${COLOR.border})`}`, borderLeft: `3px solid ${accent}`,
             }}
           >
             <div style={{ fontSize: '11px', color: COLOR.muted, width: '14px', flexShrink: 0, textAlign: 'center' }}>{i + 1}</div>
             <div style={{ flex: 1, minWidth: 0 }}>
               <div className="flex items-center gap-2" style={{ display: 'flex' }}>
-                <span className="mono" style={{ fontSize: '13.5px', fontWeight: 700, color: COLOR.text }}>{t.label}</span>
+                <span className="mono" style={{ fontSize: '13.5px', fontWeight: 700, color: ink(accent) }}>{t.label}</span>
                 {studying && <span style={{ fontSize: '10px', color: ink(accent), textTransform: 'uppercase' }}>Studying now</span>}
               </div>
               <div style={{ fontSize: '11.5px', color: COLOR.muted, marginTop: '1px' }}>
@@ -868,7 +867,7 @@ function HomeView({ tracks, results, seenLog, stats, certPlan, speech, srs, make
         onClick={onOpenPlayground}
         style={{
           width: '100%', textAlign: 'left', marginTop: '10px', padding: '12px 14px', borderRadius: 'var(--r-card)',
-          background: COLOR.surface, border: `1px solid ${COLOR.border}`, boxShadow: SHADOW.card,
+          background: tint(COLOR.success, 9), border: `1px solid color-mix(in srgb, ${COLOR.success} 35%, ${COLOR.border})`, boxShadow: SHADOW.card,
           display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px',
         }}
       >
@@ -883,7 +882,7 @@ function HomeView({ tracks, results, seenLog, stats, certPlan, speech, srs, make
         onClick={onOpenGlossary}
         style={{
           width: '100%', textAlign: 'left', marginTop: '10px', padding: '12px 14px', borderRadius: 'var(--r-card)',
-          background: COLOR.surface, border: `1px solid ${COLOR.border}`, boxShadow: SHADOW.card,
+          background: tint(COLOR.pink, 9), border: `1px solid color-mix(in srgb, ${COLOR.pink} 35%, ${COLOR.border})`, boxShadow: SHADOW.card,
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
         }}
       >
@@ -933,7 +932,7 @@ function TrackSwitcherSheet({ tracks, results, certPlan, activeTrack, onSelect, 
       >
         {rank && <div style={{ fontSize: '11px', color: COLOR.muted, width: '14px', flexShrink: 0, textAlign: 'center' }}>{rank}</div>}
         <div style={{ flex: 1, minWidth: 0 }}>
-          <div className="mono" style={{ fontSize: '13.5px', fontWeight: 700, color: COLOR.text, display: 'flex', alignItems: 'center', gap: '8px' }}><span aria-hidden="true" style={{ width: '8px', height: '8px', background: accent, flexShrink: 0 }} />{t.label}{isActive && <span style={{ color: COLOR.muted, fontWeight: 400 }}> · current</span>}</div>
+          <div className="mono" style={{ fontSize: '13.5px', fontWeight: 700, color: ink(accent) }}>{t.label}{isActive && <span style={{ color: COLOR.muted, fontWeight: 400 }}> · current</span>}</div>
           <div style={{ fontSize: '11px', color: COLOR.muted, marginTop: '2px' }}>{t.subtitle}</div>
           <ExperienceChip trackKey={t.key} style={{ marginTop: '4px' }} />
         </div>
@@ -1079,7 +1078,7 @@ function CertPathPanel({ tracks, certPlan, onAddTrack, onRemoveTrack, onMove, on
               <div key={key} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 12px', borderRadius: 'var(--r-card)', background: COLOR.surface, border: `1px solid ${COLOR.border}` }}>
                 <div style={{ fontSize: '12px', color: COLOR.muted, width: '14px', flexShrink: 0, textAlign: 'center' }}>{i + 1}</div>
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <div className="mono" style={{ fontSize: '13px', fontWeight: 700, color: COLOR.text, display: 'flex', alignItems: 'center', gap: '8px' }}><span aria-hidden="true" style={{ width: '8px', height: '8px', background: accent, flexShrink: 0 }} />{t.label}</div>
+                  <div className="mono" style={{ fontSize: '13px', fontWeight: 700, color: ink(accent) }}>{t.label}</div>
                   <input
                     type="date"
                     value={scheduledDate || ''}

@@ -254,8 +254,8 @@ function HomeStudyPath({ tracks, remaining, progress, optionalProgress, mode, on
             className="trail-node"
             style={{
               width: '100%', textAlign: 'left', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px',
-              padding: '14px', borderRadius: 'var(--r-ctl)', border: firstOptional ? `1px dashed ${COLOR.primary}` : 'none',
-              background: firstOptional ? 'transparent' : COLOR.primary, color: firstOptional ? COLOR.primary : COLOR.onAccent,
+              padding: '14px', borderRadius: 'var(--r-ctl)', border: firstOptional ? `1px dashed ${accent}` : 'none',
+              background: firstOptional ? 'transparent' : accent, color: firstOptional ? ink(accent) : COLOR.onAccent,
             }}
           >
             <span style={{ minWidth: 0 }}>
@@ -280,7 +280,7 @@ function HomeStudyPath({ tracks, remaining, progress, optionalProgress, mode, on
             <button
               onClick={() => onOpenCert(firstTrack.key)}
               className="btn-flat"
-              style={{ background: 'transparent', color: COLOR.primary, fontSize: '12px', fontWeight: 700, padding: '10px 2px 0' }}
+              style={{ background: 'transparent', color: ink(accent), fontSize: '12px', fontWeight: 700, padding: '10px 2px 0' }}
             >
               Go deeper in {firstTrack.label} ›
             </button>
@@ -315,6 +315,7 @@ function HomeStudyPath({ tracks, remaining, progress, optionalProgress, mode, on
                     detail={e.step.kind === 'bridge' ? e.step.meta : e.unit.title}
                     kind={e.step.kind}
                     optional={!!e.step.optional}
+                    hue={t ? trackAccent(t.key) : undefined}
                     rightPad={e.step.optional ? 92 : 8}
                     right={e.step.optional ? <span /> : undefined}
                     onOpen={() => onStart(e)}
@@ -452,7 +453,7 @@ function HomeReviewCard({ weakTotal, toughTotal, gamesTotal, casesTotal, reminde
     gamesTotal > 0 && tile('Missed games', gamesTotal, `${gamesTotal} item${gamesTotal === 1 ? '' : 's'} to redo`, 'games', COLOR.primary),
   ].filter(Boolean);
   return (
-    <div style={{ boxShadow: SHADOW.card, background: soft(COLOR.primary, 8), border: `1px solid ${COLOR.border}`, borderLeft: `3px solid ${COLOR.primary}`, borderRadius: 'var(--r-card)', padding: '14px 16px', marginBottom: '14px' }}>
+    <div style={{ boxShadow: SHADOW.card, background: tint(COLOR.primary, 8), border: `1px solid color-mix(in srgb, ${COLOR.primary} 38%, ${COLOR.border})`, borderLeft: `3px solid ${COLOR.primary}`, borderRadius: 'var(--r-card)', padding: '14px 16px', marginBottom: '14px' }}>
       <div className="flex justify-between items-baseline">
         <div className="itil-display" style={{ fontSize: '16px', fontWeight: 600 }}>Review across your certs</div>
         <div style={{ fontSize: '12px', color: nudge.due ? COLOR.gold : COLOR.muted, fontWeight: nudge.due ? 700 : 400 }}>{waiting} waiting</div>

@@ -6,7 +6,7 @@
 // losing points in, and a button that turns the ranking into a path in priority order.
 // Steps run through the same PathStepRunner as the course path.
 
-const WEAK_TIER_HUE = { critical: COLOR.red, high: COLOR.gold, watch: COLOR.blue };
+const WEAK_TIER_HUE = { critical: COLOR.red, high: COLOR.orange, watch: COLOR.gold };
 
 function PathPanelSwitch({ panel, onPanel, weakCount }) {
   if (!onPanel) return null;
@@ -22,7 +22,7 @@ function WeakTierChip({ tier }) {
 
 // Cards are neutral; a tier shows as a coloured edge on the left.
 function weakCardStyle(hue) {
-  return { background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderLeft: hue ? `3px solid ${hue}` : `1px solid ${COLOR.border}`, borderRadius: 'var(--r-card)', padding: '14px 16px', marginBottom: '12px' };
+  return { background: hue ? tint(hue, 6) : COLOR.surface, border: `1px solid ${hue ? `color-mix(in srgb, ${hue} 35%, ${COLOR.border})` : COLOR.border}`, borderLeft: hue ? `3px solid ${hue}` : `1px solid ${COLOR.border}`, borderRadius: 'var(--r-card)', padding: '14px 16px', marginBottom: '12px' };
 }
 
 const weakPill = { fontSize: '12.5px', fontWeight: 700, padding: '7px 12px', borderRadius: 'var(--r-ctl)', border: `1px solid ${COLOR.border}`, color: COLOR.muted, background: 'transparent' };
@@ -207,7 +207,7 @@ function WeakSubjectsView({ track, trackKey, results, seenLog, srs, missLog, sav
                     const isDone = pathStepIsDone(done, st.id);
                     return (
                       <button key={st.id} className="btn-flat" onClick={() => startStep(u, st)} aria-label={`${st.label}${isDone ? ', done' : ''}`}
-                        style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', fontSize: '12px', fontWeight: 700, padding: '5px 10px', borderRadius: 'var(--r-pill)', border: `1px solid ${isDone ? COLOR.success : COLOR.border}`, color: isDone ? ink(COLOR.success) : COLOR.text, background: isDone ? soft(COLOR.success, 12) : 'transparent' }}>
+                        style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', fontSize: '12px', fontWeight: 700, padding: '5px 10px', borderRadius: 'var(--r-pill)', border: `1px solid ${isDone ? COLOR.success : COLOR.border}`, color: isDone ? ink(COLOR.success) : COLOR.text, background: isDone ? tint(COLOR.success, 12) : 'transparent' }}>
                         <PathIcon kind={isDone ? 'check' : st.kind} size={14} /> {st.label}
                       </button>
                     );
@@ -222,7 +222,7 @@ function WeakSubjectsView({ track, trackKey, results, seenLog, srs, missLog, sav
               {hasProgress ? 'Continue' : 'Start'}: {nextStep.step.label}
             </button>
           ) : (
-            <div style={{ padding: '10px 12px', borderRadius: 'var(--r-card)', background: soft(COLOR.success, 14), border: `1px solid ${COLOR.success}`, fontSize: '13.5px', fontWeight: 800, marginTop: '4px' }}>
+            <div style={{ padding: '10px 12px', borderRadius: 'var(--r-card)', background: tint(COLOR.success, 14), border: `1px solid ${COLOR.success}`, fontSize: '13.5px', fontWeight: 800, marginTop: '4px' }}>
               Path complete{outcome && outcome.baseline ? `: ${outcome.fixed} of ${outcome.baseline} missed questions are now answered correctly` : ''}. Rebuild to see what still needs work.
             </div>
           )}
@@ -290,7 +290,7 @@ function WeakSubjectsView({ track, trackKey, results, seenLog, srs, missLog, sav
 function HomeWeakSpotsCard({ summaries, trackLabel, onOpen }) {
   if (!summaries.length) return null;
   return (
-    <div style={{ boxShadow: SHADOW.card, background: soft(COLOR.red, 7), border: `1px solid ${COLOR.border}`, borderLeft: `3px solid ${COLOR.red}`, borderRadius: 'var(--r-card)', padding: '14px 16px', marginBottom: '14px' }}>
+    <div style={{ boxShadow: SHADOW.card, background: tint(COLOR.red, 7), border: `1px solid color-mix(in srgb, ${COLOR.red} 35%, ${COLOR.border})`, borderLeft: `3px solid ${COLOR.red}`, borderRadius: 'var(--r-card)', padding: '14px 16px', marginBottom: '14px' }}>
       <div className="itil-display" style={{ fontSize: '16px', fontWeight: 600, color: ink(COLOR.red), marginBottom: '4px' }}>Weak subjects</div>
       <div style={{ fontSize: '12.5px', color: COLOR.muted, lineHeight: 1.5, marginBottom: '10px' }}>Lessons your wrong answers point back at, with a path that studies them in priority order.</div>
       {summaries.slice(0, 3).map((s) => (

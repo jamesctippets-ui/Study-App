@@ -44,20 +44,31 @@ const COLOR = {
   onAccent: 'var(--color-on-accent)',
 };
 
-// A track's accent is its vendor family's colour (not one hue per cert), so
-// the colour says who runs the exam: Azure blue, Microsoft security violet,
-// Microsoft 365 / workplace cyan, Cisco teal, ISC2 amber, CompTIA coral, ITIL
-// orchid. Used as a small dot or code colour, not for correctness.
-const FAMILY_ACCENTS = { azure: '#5AA2FF', security: '#A78BFA', workplace: '#38BDF8', cisco: '#2DD4BF', isc2: '#F5A524', comptia: '#FF7A6B', itil: '#D08BFF', other: '#94A3B8' };
+// One distinct accent color per track, for quick visual recognition in the
+// track menu panel — not used for correctness.
 const TRACK_ACCENTS = {
-  itil: FAMILY_ACCENTS.itil,
-  az900: FAMILY_ACCENTS.azure, az104: FAMILY_ACCENTS.azure, dp900: FAMILY_ACCENTS.azure, dp300: FAMILY_ACCENTS.azure, az305: FAMILY_ACCENTS.azure,
-  az802: FAMILY_ACCENTS.workplace, az140: FAMILY_ACCENTS.workplace, md102: FAMILY_ACCENTS.workplace, ab650: FAMILY_ACCENTS.workplace,
-  sc300: FAMILY_ACCENTS.security, sc200: FAMILY_ACCENTS.security, sc500: FAMILY_ACCENTS.security,
-  cloudplus: FAMILY_ACCENTS.comptia,
-  ehrintegration: FAMILY_ACCENTS.other,
-  ccna: FAMILY_ACCENTS.cisco,
-  isc2cc: FAMILY_ACCENTS.isc2, sscp: FAMILY_ACCENTS.isc2, cissp: FAMILY_ACCENTS.isc2, ccsp: FAMILY_ACCENTS.isc2, cgrc: FAMILY_ACCENTS.isc2, csslp: FAMILY_ACCENTS.isc2,
+  itil: '#60A5FA',
+  az900: '#38BDF8',
+  az104: '#22D3EE',
+  dp900: '#2DD4BF',
+  dp300: '#818CF8',
+  az305: '#A78BFA',
+  az802: '#C084FC',
+  az140: '#E879F9',
+  md102: '#D946EF',
+  sc300: '#F472B6',
+  sc200: '#FB7185',
+  sc500: '#FB923C',
+  cloudplus: '#FACC15',
+  ehrintegration: '#94A3B8',
+  ab650: '#F59E0B',
+  ccna: '#10B981',
+  isc2cc: '#A3E635',
+  sscp: '#14B8A6',
+  cissp: '#EF4444',
+  ccsp: '#8B5CF6',
+  cgrc: '#F97316',
+  csslp: '#3B82F6',
 };
 
 // A soft tint of an accent over the card surface, so sections can carry their
@@ -66,26 +77,17 @@ function tint(color, pct) {
   return `color-mix(in srgb, ${color} ${pct == null ? 12 : pct}%, ${COLOR.surface})`;
 }
 
-// A much fainter tint: the Console look keeps cards neutral, so a section's hue
-// only whispers (about 45% of tint's strength).
-function soft(color, pct) {
-  return tint(color, Math.round((pct == null ? 12 : pct) * 0.45));
-}
-
-// Colour carries meaning here, not decoration. The signature accent (green)
-// marks "you are here / do this next"; blue is information, amber is a task
-// that needs attention, red is a problem. Path step kinds map onto those four
-// so a trail reads as a route, not a rainbow.
+// One hue per kind of path step, and a rotating hue per unit, so a trail reads
+// as a varied road instead of a single purple line.
 const STEP_HUE = {
-  read: COLOR.primary, cards: COLOR.blue, cards2: COLOR.blue, quiz: COLOR.gold, quiz2: COLOR.gold,
-  game: COLOR.pink, match: COLOR.pink, quick: COLOR.gold, apply: COLOR.primary, checkpoint: COLOR.gold,
-  testout: COLOR.gold, review: COLOR.red, deep: COLOR.primary, bridge: COLOR.blue, bonus: COLOR.pink,
+  read: COLOR.teal, cards: COLOR.blue, cards2: COLOR.blue, quiz: COLOR.orange, quiz2: COLOR.orange,
+  game: COLOR.pink, match: COLOR.pink, quick: COLOR.orange, apply: COLOR.success, checkpoint: COLOR.gold,
+  testout: COLOR.gold, review: COLOR.red, deep: COLOR.teal, bridge: COLOR.blue, bonus: COLOR.pink,
 };
-const UNIT_HUES = [COLOR.primary];
-// One accent for every main area (the tab bar, header and page accents all draw
-// from it); the page you are on is shown by position and a top indicator, not by
-// a different colour per tab.
-const MODE_HUE = { home: COLOR.primary, path: COLOR.primary, quiz: COLOR.primary, learn: COLOR.primary, exam: COLOR.primary, profile: COLOR.primary, playground: COLOR.primary };
+const UNIT_HUES = [COLOR.primary, COLOR.blue, COLOR.teal, COLOR.orange, COLOR.pink, COLOR.success, COLOR.gold];
+// The colour of each main area; the bottom tab, the top bar tint and the page
+// accents for that area all draw from it.
+const MODE_HUE = { home: COLOR.blue, path: COLOR.primary, quiz: COLOR.orange, learn: COLOR.teal, exam: COLOR.gold, profile: COLOR.pink, playground: COLOR.success };
 function modeHue(mode) { return MODE_HUE[mode] || COLOR.primary; }
 function unitHue(index) { return UNIT_HUES[index % UNIT_HUES.length]; }
 function stepHue(kind) { return STEP_HUE[kind] || COLOR.primary; }

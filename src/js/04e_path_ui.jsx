@@ -614,6 +614,7 @@ function PathTrailNode({ unit, step, index, done, isNext, entry, onOpen }) {
       done={done}
       isNext={isNext}
       stars={showStars ? <PathStars pct={entry.pct} /> : null}
+      hue={unitHue(unit.index)}
       onOpen={onOpen}
     />
   );
@@ -760,7 +761,7 @@ function PathView({ track, trackKey, doneMap, unlockedMap, pathLocking, results,
         {next ? (
           <button
             onClick={() => startStep(next.unit, next.step)}
-            style={{ width: '100%', padding: '12px 14px', borderRadius: 'var(--r-ctl)', border: 'none', background: COLOR.primary, color: COLOR.onAccent, textAlign: 'left', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px' }}
+            style={{ width: '100%', padding: '12px 14px', borderRadius: 'var(--r-ctl)', border: 'none', background: stepHue(next.step.kind), color: COLOR.onAccent, textAlign: 'left', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px' }}
           >
             <span style={{ minWidth: 0 }}>
               <span style={{ display: 'block', fontSize: '10.5px', textTransform: 'uppercase', opacity: 0.8 }}>
@@ -821,15 +822,15 @@ function PathView({ track, trackKey, doneMap, unlockedMap, pathLocking, results,
                 width: '100%', textAlign: 'left', display: 'flex', alignItems: 'center', gap: '12px',
                 borderRadius: 'var(--r-card)', padding: '12px 14px',
                 background: COLOR.surface, color: locked ? COLOR.muted : COLOR.text,
-                border: `1px solid ${COLOR.border}`, borderLeft: `3px solid ${locked ? COLOR.border : COLOR.primary}`,
+                border: `1px solid ${COLOR.border}`, borderLeft: `3px solid ${locked ? COLOR.border : prog.complete ? COLOR.success : unitHue(unit.index)}`,
               }}
             >
               <span style={{ flex: 1, minWidth: 0 }}>
-                <span style={{ display: 'block', fontSize: '10.5px', textTransform: 'uppercase', color: prog.complete ? COLOR.primary : COLOR.muted }}>
+                <span style={{ display: 'block', fontSize: '10.5px', textTransform: 'uppercase', color: prog.complete ? COLOR.success : locked ? COLOR.muted : ink(unitHue(unit.index)) }}>
                   Unit {unit.index + 1} · {locked ? 'Locked' : prog.complete ? 'Complete' : `${prog.done}/${prog.total}`}
                 </span>
                 <span style={{ display: 'block', fontSize: '16px', fontWeight: 700, lineHeight: 1.25, margin: '3px 0 0' }}>{unit.title}</span>
-                {!locked && <span style={{ display: 'block', marginTop: '9px' }}><TickBar value={prog.done} total={prog.total} ticks={Math.min(prog.total, 12)} height={5} label={`${prog.done} of ${prog.total} steps`} /></span>}
+                {!locked && <span style={{ display: 'block', marginTop: '9px' }}><TickBar value={prog.done} total={prog.total} ticks={Math.min(prog.total, 12)} hue={prog.complete ? COLOR.success : unitHue(unit.index)} height={5} label={`${prog.done} of ${prog.total} steps`} /></span>}
               </span>
               <span style={{ flexShrink: 0, display: 'flex', alignItems: 'center', color: COLOR.muted, fontSize: '12px' }}>
                 {locked ? <PathIcon kind="lock" size={18} /> : open ? '▴' : '▾'}

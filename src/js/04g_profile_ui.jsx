@@ -16,9 +16,9 @@ const DAY_LABELS = ['Mon', '', 'Wed', '', 'Fri', '', 'Sun'];
 
 function ProfileSection({ title, hue, right, children }) {
   return (
-    <div style={{ background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderRadius: 'var(--r-card)', padding: '14px 16px', marginBottom: '14px' }}>
+    <div style={{ background: tint(hue, 7), border: `1px solid color-mix(in srgb, ${hue} 38%, ${COLOR.border})`, borderLeft: `3px solid ${hue}`, borderRadius: 'var(--r-card)', padding: '14px 16px', marginBottom: '14px' }}>
       <div className="flex justify-between items-baseline" style={{ marginBottom: '12px' }}>
-        <div className="itil-display" style={{ fontSize: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}><span aria-hidden="true" style={{ width: '8px', height: '8px', background: hue, flexShrink: 0 }} />{title}</div>
+        <div className="itil-display" style={{ fontSize: '16px', color: ink(hue) }}>{title}</div>
         {right}
       </div>
       {children}
@@ -28,8 +28,8 @@ function ProfileSection({ title, hue, right, children }) {
 
 function StatTile({ label, value, sub, hue }) {
   return (
-    <div style={{ minWidth: 0, background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderRadius: 'var(--r-card)', padding: '12px' }}>
-      <div style={{ fontSize: '10.5px', textTransform: 'uppercase', color: COLOR.muted, display: 'flex', alignItems: 'center', gap: '6px' }}><span aria-hidden="true" style={{ width: '6px', height: '6px', background: hue, flexShrink: 0 }} />{label}</div>
+    <div style={{ minWidth: 0, background: tint(hue, 13), border: `1px solid color-mix(in srgb, ${hue} 40%, ${COLOR.border})`, borderRadius: 'var(--r-card)', padding: '12px' }}>
+      <div style={{ fontSize: '10.5px', textTransform: 'uppercase', color: ink(hue) }}>{label}</div>
       <div className="mono" style={{ fontSize: '24px', fontWeight: 700, lineHeight: 1.15, marginTop: '8px', letterSpacing: '-0.02em' }}>{value}</div>
       {sub && <div style={{ fontSize: '11.5px', color: COLOR.muted, marginTop: '1px' }}>{sub}</div>}
     </div>
@@ -47,7 +47,7 @@ function ActivityMap({ log }) {
     cells.push({ date, count: date > today ? null : (log[date] || 0) });
   }
   const level = (n) => (n >= 30 ? 4 : n >= 15 ? 3 : n >= 5 ? 2 : n >= 1 ? 1 : 0);
-  const bg = (n) => (n === null ? 'transparent' : n === 0 ? COLOR.surfaceRaised : `color-mix(in srgb, ${COLOR.primary} ${[0, 28, 52, 76, 100][level(n)]}%, ${COLOR.surfaceRaised})`);
+  const bg = (n) => (n === null ? 'transparent' : n === 0 ? COLOR.surfaceRaised : `color-mix(in srgb, ${COLOR.success} ${[0, 28, 52, 76, 100][level(n)]}%, ${COLOR.surfaceRaised})`);
   return (
     <div style={{ display: 'flex', gap: '6px' }} role="img" aria-label={`Study activity over the last ${HEATMAP_WEEKS} weeks`}>
       <div style={{ display: 'grid', gridTemplateRows: 'repeat(7, 1fr)', gap: '3px', fontSize: '9.5px', color: COLOR.muted, paddingTop: '1px' }}>
@@ -74,7 +74,7 @@ function ProfileHeader({ profile, level, totalActions, firstDay, onSave }) {
   const initial = (profile.name || 'You').trim().charAt(0).toUpperCase();
   const save = () => { onSave({ name: name.trim().slice(0, PROFILE_NAME_MAX), hue }); setEditing(false); };
   return (
-    <div style={{ background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderRadius: 'var(--r-card)', padding: '16px', marginBottom: '14px' }}>
+    <div style={{ background: tint(color, 12), border: `1px solid color-mix(in srgb, ${color} 40%, ${COLOR.border})`, borderRadius: 'var(--r-card)', padding: '16px', marginBottom: '14px' }}>
       <div className="flex items-center" style={{ gap: '14px' }}>
         <div aria-hidden="true" className="mono" style={{ width: '56px', height: '56px', borderRadius: 'var(--r-card)', background: color, color: COLOR.onAccent, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '26px', fontWeight: 700, flexShrink: 0 }}>{initial}</div>
         <div style={{ flex: 1, minWidth: 0 }}>
@@ -99,7 +99,7 @@ function ProfileHeader({ profile, level, totalActions, firstDay, onSave }) {
       )}
       <div style={{ marginTop: '14px' }}>
         <div className="flex justify-between" style={{ fontSize: '12px', fontWeight: 700, marginBottom: '7px' }}>
-          <span className="mono" style={{ color: COLOR.text }}>Level {level.level}</span>
+          <span className="mono" style={{ color: ink(color) }}>Level {level.level}</span>
           <span className="mono" style={{ color: COLOR.muted, fontWeight: 500 }}>{level.into} / {level.span} to level {level.level + 1}</span>
         </div>
         <TickBar value={level.into} total={level.span} ticks={10} hue={color} label={`${Math.round((level.into / level.span) * 100)}% to the next level`} />
@@ -178,10 +178,10 @@ function ProfileView({ tracks, results, seenLog, srs, stats, certPlan, achieveme
               const t = trackByKey.get(k);
               const accent = trackAccent(k);
               return (
-                <div key={k} className="flex items-center" style={{ gap: '12px', padding: '10px 12px', borderRadius: 'var(--r-card)', background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderLeft: `3px solid ${accent}` }}>
+                <div key={k} className="flex items-center" style={{ gap: '12px', padding: '10px 12px', borderRadius: 'var(--r-card)', background: tint(accent, 14), border: `1px solid ${accent}`, borderLeft: `3px solid ${accent}` }}>
                   <span aria-hidden="true" style={{ width: '34px', height: '34px', borderRadius: 'var(--r-ctl)', background: accent, color: COLOR.onAccent, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}><TabIcon kind="exam" size={20} /></span>
                   <span style={{ flex: 1, minWidth: 0 }}>
-                    <span className="mono" style={{ display: 'block', fontSize: '13.5px', fontWeight: 700 }}>{t.label} · Passed</span>
+                    <span className="mono" style={{ display: 'block', fontSize: '13.5px', fontWeight: 700, color: ink(accent) }}>{t.label} · Passed</span>
                     <span style={{ display: 'block', fontSize: '12px', color: COLOR.muted }}>{t.subtitle} · {formatDateShort(certPlan.completed[k])}</span>
                   </span>
                   <button onClick={() => onToggleCompleted(k)} className="btn-flat" style={{ background: 'transparent', color: COLOR.muted, fontSize: '11.5px', fontWeight: 700, padding: 0 }}>Undo</button>
@@ -206,9 +206,9 @@ function ProfileView({ tracks, results, seenLog, srs, stats, certPlan, achieveme
               const sched = certPlan.scheduled[k];
               const days = sched ? daysBetween(today, sched) : null;
               return (
-                <div key={k} style={{ padding: '10px 12px', borderRadius: 'var(--r-card)', background: k === studyingKey ? `color-mix(in srgb, ${accent} 8%, ${COLOR.surface})` : COLOR.surface, border: `1px solid ${COLOR.border}`, borderLeft: `3px solid ${accent}` }}>
+                <div key={k} style={{ padding: '10px 12px', borderRadius: 'var(--r-card)', background: tint(accent, k === studyingKey ? 16 : 8), border: `1px solid ${k === studyingKey ? accent : `color-mix(in srgb, ${accent} 30%, ${COLOR.border})`}`, borderLeft: `3px solid ${accent}` }}>
                   <div className="flex justify-between items-baseline" style={{ gap: '8px' }}>
-                    <button onClick={() => onSelectTrack(k)} className="btn-flat" style={{ background: 'transparent', padding: 0, textAlign: 'left', fontSize: '13.5px', fontWeight: 700, color: COLOR.text, fontFamily: 'var(--font-mono)' }}>{t.label}{k === studyingKey ? <span style={{ fontSize: '10px', marginLeft: '8px', textTransform: 'uppercase', color: ink(accent) }}>Studying now</span> : null}</button>
+                    <button onClick={() => onSelectTrack(k)} className="btn-flat" style={{ background: 'transparent', padding: 0, textAlign: 'left', fontSize: '13.5px', fontWeight: 700, color: ink(accent), fontFamily: 'var(--font-mono)' }}>{t.label}{k === studyingKey ? <span style={{ fontSize: '10px', marginLeft: '8px', textTransform: 'uppercase', color: ink(accent) }}>Studying now</span> : null}</button>
                     <span className="mono" style={{ fontSize: '12.5px', fontWeight: 700 }}>{info.mastery}%</span>
                   </div>
                   <div style={{ fontSize: '12px', color: COLOR.muted, marginTop: '1px' }}>{t.subtitle}</div>
@@ -245,7 +245,7 @@ function ProfileView({ tracks, results, seenLog, srs, stats, certPlan, achieveme
         <div style={{ fontSize: '12.5px', color: COLOR.muted, marginBottom: '8px' }}>{unlocked.length} of {achievements.length} unlocked</div>
         <div className="flex gap-2" style={{ flexWrap: 'wrap' }}>
           {achievements.map((a) => (
-            <span key={a.id} title={`${a.title}: ${a.description}`} style={{ width: '38px', height: '38px', borderRadius: 'var(--r-card)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: '19px', background: a.unlocked ? soft(COLOR.pink, 18) : COLOR.surfaceRaised, border: `1px solid ${a.unlocked ? COLOR.pink : COLOR.border}`, filter: a.unlocked ? 'none' : 'grayscale(1)', opacity: a.unlocked ? 1 : 0.45 }}>{a.icon}</span>
+            <span key={a.id} title={`${a.title}: ${a.description}`} style={{ width: '38px', height: '38px', borderRadius: 'var(--r-card)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: '19px', background: a.unlocked ? tint(COLOR.pink, 18) : COLOR.surfaceRaised, border: `1px solid ${a.unlocked ? COLOR.pink : COLOR.border}`, filter: a.unlocked ? 'none' : 'grayscale(1)', opacity: a.unlocked ? 1 : 0.45 }}>{a.icon}</span>
           ))}
         </div>
       </ProfileSection>

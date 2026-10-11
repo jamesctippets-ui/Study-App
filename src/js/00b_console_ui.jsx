@@ -10,7 +10,7 @@ function TickBar({ value = 0, total = 10, ticks = 10, hue, height = 7, label }) 
   const n = Math.max(1, Math.min(ticks, total > 0 ? total : ticks));
   const ratio = total > 0 ? Math.min(1, value / total) : 0;
   const filled = ratio >= 1 ? n : ratio > 0 ? Math.max(1, Math.floor(ratio * n)) : 0;
-  const on = hue || COLOR.primary;
+  const on = hue || COLOR.success;
   return (
     <span role="img" aria-label={label || `${Math.round(ratio * 100)}%`} style={{ display: 'flex', gap: '3px', width: '100%' }}>
       {Array.from({ length: n }, (_, i) => (
@@ -76,8 +76,9 @@ function RouteList({ children, style }) {
   );
 }
 
-function RouteStep({ id, title, detail, kind, done, isNext, optional, locked, stars, right, rightPad, onOpen, label }) {
+function RouteStep({ id, title, detail, kind, done, isNext, optional, locked, stars, right, rightPad, hue: nodeHue, onOpen, label }) {
   const hue = stepHue(kind);
+  const on = nodeHue || COLOR.primary;
   return (
     <button
       onClick={onOpen}
@@ -85,7 +86,7 @@ function RouteStep({ id, title, detail, kind, done, isNext, optional, locked, st
       aria-label={label || `${title}, ${done ? 'completed' : 'not completed'}`}
       style={{
         position: 'relative', display: 'flex', alignItems: 'flex-start', gap: '14px', width: '100%', textAlign: 'left',
-        background: isNext ? `color-mix(in srgb, ${COLOR.primary} 7%, transparent)` : 'transparent', color: COLOR.text,
+        background: isNext ? `color-mix(in srgb, ${on} 8%, transparent)` : 'transparent', color: COLOR.text,
         padding: `10px ${rightPad == null ? 8 : rightPad}px 10px 0`, border: 'none', borderRadius: 'var(--r-ctl)', opacity: !done && !isNext && locked ? 0.55 : 1,
       }}
     >
@@ -95,9 +96,9 @@ function RouteStep({ id, title, detail, kind, done, isNext, optional, locked, st
         style={{
           position: 'relative', zIndex: 1, flexShrink: 0, width: '16px', height: '16px', marginTop: '2px', marginLeft: '2px', borderRadius: '50%', boxSizing: 'border-box',
           display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-          background: done ? COLOR.primary : COLOR.bg,
-          border: `2px ${optional && !done ? 'dashed' : 'solid'} ${done || isNext ? COLOR.primary : COLOR.border}`,
-          boxShadow: isNext ? `0 0 0 4px color-mix(in srgb, ${COLOR.primary} 22%, transparent)` : 'none',
+          background: done ? on : COLOR.bg,
+          border: `2px ${optional && !done ? 'dashed' : 'solid'} ${done || isNext ? on : COLOR.border}`,
+          boxShadow: isNext ? `0 0 0 4px color-mix(in srgb, ${on} 22%, transparent)` : 'none',
           color: COLOR.onAccent,
         }}
       >
@@ -106,7 +107,7 @@ function RouteStep({ id, title, detail, kind, done, isNext, optional, locked, st
         )}
       </span>
       <span style={{ flex: 1, minWidth: 0 }}>
-        {id && <span className="mono" style={{ display: 'block', fontSize: '10.5px', fontWeight: 600, letterSpacing: '0.08em', color: isNext ? COLOR.primary : COLOR.muted, marginBottom: '2px' }}>{id}</span>}
+        {id && <span className="mono" style={{ display: 'block', fontSize: '10.5px', fontWeight: 600, letterSpacing: '0.08em', color: isNext ? ink(on) : COLOR.muted, marginBottom: '2px' }}>{id}</span>}
         <span style={{ display: 'block', fontSize: '15px', fontWeight: isNext ? 700 : 600, lineHeight: 1.3, color: done ? COLOR.muted : COLOR.text }}>{title}</span>
         {detail && <span style={{ display: 'block', fontSize: '12px', color: COLOR.muted, marginTop: '2px', lineHeight: 1.35 }}>{detail}</span>}
         {stars}
@@ -150,7 +151,7 @@ function QuizOption({ index, text, state = 'idle', disabled, onClick }) {
       >
         {state === 'correct' ? '✓' : state === 'wrong' ? '✕' : String.fromCharCode(65 + index)}
       </span>
-      <span style={{ flex: 1, minWidth: 0 }}>{text}</span>
+      <span style={{ flex: 1, minWidth: 0, overflowWrap: 'anywhere' }}>{text}</span>
       {state === 'missed' && <span className="mono" style={{ fontSize: '10px', color: COLOR.success, textTransform: 'uppercase', flexShrink: 0 }}>missed</span>}
     </button>
   );

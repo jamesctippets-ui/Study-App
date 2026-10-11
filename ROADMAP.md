@@ -1731,22 +1731,22 @@ trading away for shinier but shallower ones.
   playground achievements; STP, DHCP, DNS, ACL-on-an-interface, VPN and Azure NSG scenarios (§17 item 5); persisted
   sandbox setups and export/import for the VLAN and firewall tools (the IP lab already has export/import); making the
   tall editor cards collapsible.
-- [x] **"Console" redesign, phase 1 (look and feel).** The app moved from a rounded, rainbow, chunky-3D look to a
-  quieter IT-ops identity (direction chosen from three mockups). Foundation: new theme tokens (graphite-blue dark,
-  paper light, one signature green) and three radius tokens (`--r-card/ctl/pill`, set once in the template; a codemod
-  moved every `borderRadius` and 256 two-pixel borders onto them), flat cards with hairline borders, flat buttons, Inter
-  for text and JetBrains Mono for labels, numbers and status chips (both self-hosted and precached; Nunito removed;
-  every `textTransform: 'uppercase'` micro-label is mono via one CSS rule). Colour now carries meaning: green = you
-  are here / do this next, blue = information, amber = needs attention, red = a problem; a cert's colour is its vendor
-  family (Azure, Microsoft security, Microsoft 365, Cisco, ISC2, CompTIA, ITIL) and appears only as a dot or edge. New
-  shared parts in `src/js/00b_console_ui.jsx`: `TickBar` (segmented progress), `SectionLabel`, `SegmentedControl`,
-  `RouteList`/`RouteStep` (a trail drawn as a route: dashed line, nodes, step ids like U3.02) and `QuizOption` (lettered
-  answers that swap the letter for a mark so results never depend on colour alone). Screens converted: header and tab
-  bar, Home (streak / daily goal / readiness hero, next-hop button, route ahead), the Path map and unit cards, weak
-  subjects, Practice and exam question views, flashcards, Profile. Not yet converted (they inherit the new tokens and
-  look consistent but keep their old layout): the Playground tools, lesson body sections, Mad Libs, Match, sequence and
-  compare games, glossary, About and Data panels. Playwright tests were updated for the new title text
-  (`cert-study`) and the tab roles on the mode switches.
+- [x] **"Console" redesign, phase 1 (layout, type and components; original colours kept).** The app moved from a rounded,
+  chunky-3D look to a quieter IT-ops layout (direction chosen from three mockups), keeping the app's existing colours: the
+  grey and purple theme tokens, one hue per area (the tab bar and header tint), per step kind and per unit, and one
+  colour per cert. Foundation: three radius tokens (`--r-card/ctl/pill`, set once in the template; a codemod moved every
+  `borderRadius` and 256 two-pixel borders onto them), flat cards with hairline borders (plus a 3px coloured left edge
+  where a card has a hue), flat buttons, Inter for text and JetBrains Mono for labels, numbers and status chips (both
+  self-hosted and precached; Nunito removed; every `textTransform: 'uppercase'` micro-label is mono via one CSS rule).
+  New shared parts in `src/js/00b_console_ui.jsx`: `TickBar` (segmented progress), `SectionLabel`, `SegmentedControl`,
+  `RouteList`/`RouteStep` (a trail drawn as a route: dashed line, nodes in the unit's or cert's colour, step ids like
+  U3.02) and `QuizOption` (lettered answers that swap the letter for a mark so results never depend on colour alone).
+  Screens converted: header and tab bar, Home (streak / daily goal / readiness hero, next-hop button, route ahead), the
+  Path map and unit cards, weak subjects, Practice and exam question views, flashcards, Profile. Not yet converted (they
+  inherit the new tokens and look consistent but keep their old layout): the Playground tools, lesson body sections,
+  Mad Libs, Match, sequence and compare games, glossary, About and Data panels. Playwright tests were updated for the
+  new title text (`cert-study`) and the tab roles on the mode switches. A first pass used a new green-on-near-black
+  palette; it was reverted at the owner's request to keep the current colours.
 - [x] **Definition flyouts rebuilt: open left near the right edge, never widen the page.** Reported on a phone: a
   flyout from a word near the right edge made the page resize. Root cause: the flyout was `position: absolute` inside
   the text, so an overflowing box widened the page, and mobile browsers then report an inflated `window.innerWidth`

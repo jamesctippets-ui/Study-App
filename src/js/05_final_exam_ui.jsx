@@ -61,7 +61,7 @@ function ExamIntro({ track, config, readiness, onStart, onStartFinal }) {
       >
         Start Practice Exam
       </button>
-      <div style={{ marginTop: '14px', padding: '14px', borderRadius: 'var(--r-card)', border: `1px solid ${COLOR.border}`, borderLeft: `3px solid ${COLOR.gold}`, background: COLOR.surface }}>
+      <div style={{ marginTop: '14px', padding: '14px', borderRadius: 'var(--r-card)', border: `1px solid ${COLOR.gold}`, borderLeft: `3px solid ${COLOR.gold}`, background: `${COLOR.gold}14` }}>
         <div style={{ fontSize: '11px', fontWeight: 700, color: COLOR.gold, textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: '6px' }}>
           Final Mock — proctored-style
         </div>
@@ -84,7 +84,7 @@ function ExamQuestionView({ q, selectedIdx, onSelect }) {
   return (
     <div>
       <div style={{ background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderRadius: 'var(--r-card)', padding: '18px 18px 16px' }}>
-        <div style={{ fontSize: '16px', lineHeight: 1.5, fontWeight: 600 }}>{q.question}</div>
+        <div style={{ fontSize: '16px', lineHeight: 1.5, fontWeight: 600, overflowWrap: 'anywhere' }}>{q.question}</div>
         {q.image && REAL_PORTAL_SCREENSHOTS[q.image] && (
           <div style={{ marginTop: '12px' }}>
             <RealPortalScreenshot shot={REAL_PORTAL_SCREENSHOTS[q.image]} hideDescription />

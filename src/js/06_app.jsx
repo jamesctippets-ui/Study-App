@@ -1733,7 +1733,7 @@ function CertStudyApp() {
           onSetPathLocking={(on) => saveStats({ ...statsRef.current, pathLocking: on })}
         />
       )}
-      <div style={{ background: `color-mix(in srgb, ${COLOR.bg} 92%, transparent)`, backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)', borderBottom: `1px solid ${COLOR.border}`, position: 'sticky', top: 0, zIndex: 30 }}>
+      <div style={{ background: `color-mix(in srgb, ${modeHue(mode)} 9%, ${COLOR.navBar})`, borderBottom: `1px solid color-mix(in srgb, ${modeHue(mode)} 45%, ${COLOR.border})`, position: 'sticky', top: 0, zIndex: 30, transition: 'background-color 0.2s ease' }}>
         <div className="max-w-md mx-auto px-4 flex items-center" style={{ height: `${APP_HEADER_HEIGHT}px`, gap: '8px' }}>
           <button
             onClick={() => setShowCertPath(true)}
@@ -1746,7 +1746,7 @@ function CertStudyApp() {
           <div style={{ flex: 1, minWidth: 0 }}>
             {isHubMode(mode) ? (
               <div className="app-title mono" style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px', fontWeight: 700, lineHeight: 1.1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                <span style={{ width: '9px', height: '9px', background: COLOR.primary, flexShrink: 0 }} />
+                <span style={{ width: '9px', height: '9px', background: modeHue(mode), flexShrink: 0 }} />
                 {mode === 'profile' ? 'profile' : mode === 'playground' ? 'playground' : 'cert-study'}
               </div>
             ) : (
@@ -1757,7 +1757,7 @@ function CertStudyApp() {
                 style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', textAlign: 'left', background: 'transparent', border: 'none', padding: '4px 0', maxWidth: '100%' }}
               >
                 <span style={{ width: '9px', height: '9px', background: trackAccent(activeTrack), flexShrink: 0 }} />
-                <span className="app-title mono" style={{ fontSize: '14px', fontWeight: 700, lineHeight: 1.1, color: COLOR.text, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{track.label}</span>
+                <span className="app-title mono" style={{ fontSize: '14px', fontWeight: 700, lineHeight: 1.1, color: ink(trackAccent(activeTrack)), whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{track.label}</span>
                 <span style={{ fontSize: '10px', color: COLOR.muted }}>▾</span>
               </button>
             )}
@@ -1766,7 +1766,7 @@ function CertStudyApp() {
             <div
               className="mono"
               title={stats.streak.current > 0 ? `${stats.streak.current}-day streak` : 'Study today to start a streak'}
-              style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', fontSize: '12px', fontWeight: 700, height: '28px', padding: '0 8px', borderRadius: 'var(--r-ctl)', border: `1px solid ${COLOR.border}`, background: COLOR.surface, color: stats.streak.current > 0 ? COLOR.gold : COLOR.muted }}
+              style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', fontSize: '12px', fontWeight: 700, height: '28px', padding: '0 8px', borderRadius: 'var(--r-ctl)', border: `1px solid ${COLOR.border}`, background: COLOR.surface, color: stats.streak.current > 0 ? COLOR.orange : COLOR.muted }}
             >
               <IconFlame size={14} />{stats.streak.current}
             </div>
@@ -1775,7 +1775,7 @@ function CertStudyApp() {
               onClick={() => setShowAchievements(true)}
               className="btn-flat mono"
               title="Achievements"
-              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px', height: '28px', padding: '0 8px', borderRadius: 'var(--r-ctl)', border: `1px solid ${COLOR.border}`, background: COLOR.surface, color: COLOR.text, fontSize: '12px', fontWeight: 700 }}
+              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px', height: '28px', padding: '0 8px', borderRadius: 'var(--r-ctl)', border: `1px solid ${COLOR.border}`, background: COLOR.surface, color: COLOR.gold, fontSize: '12px', fontWeight: 700 }}
             >
               <IconTrophy size={14} /> {stats.unlocked.length}
             </button>

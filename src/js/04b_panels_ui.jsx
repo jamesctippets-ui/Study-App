@@ -530,14 +530,14 @@ function BottomTabBar({ mode, onChange }) {
     <nav
       aria-label="Main"
       style={{
-        position: 'fixed', left: 0, right: 0, bottom: 0, zIndex: 40, background: `color-mix(in srgb, ${COLOR.bg} 94%, transparent)`,
-        backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)',
+        position: 'fixed', left: 0, right: 0, bottom: 0, zIndex: 40, background: COLOR.navBar,
         borderTop: `1px solid ${COLOR.border}`, paddingBottom: 'env(safe-area-inset-bottom)',
       }}
     >
       <div className="max-w-md mx-auto flex" style={{ height: `${TAB_BAR_HEIGHT}px`, padding: '0 4px' }}>
         {TAB_BAR_ITEMS.map((t) => {
           const active = mode === t.m;
+          const hue = modeHue(t.m);
           return (
             <button
               key={t.m}
@@ -547,10 +547,11 @@ function BottomTabBar({ mode, onChange }) {
               className="btn-flat flex-1"
               style={{
                 position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '4px',
-                background: 'transparent', border: 'none', borderRadius: 0, color: active ? COLOR.primary : COLOR.muted, minWidth: 0, padding: '6px 0 4px',
+                background: active ? `color-mix(in srgb, ${hue} 12%, transparent)` : 'transparent', border: 'none', borderRadius: 0,
+                color: active ? hue : `color-mix(in srgb, ${hue} 55%, ${COLOR.muted})`, minWidth: 0, padding: '6px 0 4px',
               }}
             >
-              {active && <span style={{ position: 'absolute', top: 0, left: '22%', right: '22%', height: '2px', background: COLOR.primary }} />}
+              {active && <span style={{ position: 'absolute', top: 0, left: '16%', right: '16%', height: '2px', background: hue }} />}
               <TabIcon kind={t.icon} size={22} />
               <span style={{ fontFamily: 'var(--font-mono)', fontSize: '9.5px', fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase' }}>{t.label}</span>
             </button>
@@ -568,7 +569,7 @@ function ExperienceChip({ trackKey, style }) {
   if (!exp) return null;
   const hue = exp.level === 'required' ? COLOR.orange : exp.level === 'recommended' ? COLOR.blue : COLOR.success;
   return (
-    <span title={exp.summary} style={{ display: 'inline-block', fontSize: '10.5px', fontWeight: 800, letterSpacing: '0.02em', padding: '2px 8px', borderRadius: 'var(--r-pill)', background: soft(hue, 16), color: ink(hue), border: `1px solid color-mix(in srgb, ${hue} 40%, transparent)`, whiteSpace: 'nowrap', ...style }}>
+    <span title={exp.summary} style={{ display: 'inline-block', fontSize: '10.5px', fontWeight: 800, letterSpacing: '0.02em', padding: '2px 8px', borderRadius: 'var(--r-pill)', background: tint(hue, 16), color: ink(hue), border: `1px solid color-mix(in srgb, ${hue} 40%, transparent)`, whiteSpace: 'nowrap', ...style }}>
       {experienceShort(exp)}
     </span>
   );
@@ -581,7 +582,7 @@ function ExperienceCard({ trackKey }) {
   if (!exp) return null;
   const hue = exp.level === 'required' ? COLOR.orange : exp.level === 'recommended' ? COLOR.blue : COLOR.success;
   return (
-    <div style={{ marginBottom: '16px', padding: '12px 14px', borderRadius: 'var(--r-card)', background: soft(hue, 10), border: `1px solid color-mix(in srgb, ${hue} 16%, ${COLOR.border})` }}>
+    <div style={{ marginBottom: '16px', padding: '12px 14px', borderRadius: 'var(--r-card)', background: tint(hue, 10), border: `1px solid color-mix(in srgb, ${hue} 35%, ${COLOR.border})` }}>
       <div style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.04em', textTransform: 'uppercase', color: ink(hue), marginBottom: '6px' }}>
         Experience · {experienceShort(exp)}
       </div>

@@ -851,7 +851,7 @@ function QuestionView({ q, selected, onChoose, onNext, index, total, categoryLab
         </div>
       )}
       <div style={{ background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderRadius: 'var(--r-card)', padding: '18px 18px 16px' }}>
-        <div style={{ fontSize: '17px', lineHeight: 1.5, fontWeight: 600 }}>
+        <div style={{ fontSize: '17px', lineHeight: 1.5, fontWeight: 600, overflowWrap: 'anywhere' }}>
           {/* Terms in the question itself are tappable for a definition (practice only;
               the timed exams use their own question view with no help). */}
           {flashcardsData ? autoHighlightTerms(q.question, flashcardsData, activeTermKey, setActiveTermKey, 2, 'qstem-' + q.id) : q.question}
@@ -933,8 +933,8 @@ function QuestionView({ q, selected, onChoose, onNext, index, total, categoryLab
       )}
 
       {selected !== null && q.whyTested && (
-        <div style={{ marginTop: '10px', padding: '12px 14px', borderRadius: 'var(--r-card)', background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderLeft: `3px solid ${COLOR.blue}`, fontSize: '13px', lineHeight: 1.55, color: COLOR.text }}>
-          <div style={{ fontSize: '10.5px', color: COLOR.blue, textTransform: 'uppercase', marginBottom: '4px' }}>Why this is tested</div>
+        <div style={{ marginTop: '10px', padding: '12px 14px', borderRadius: 'var(--r-card)', background: `${COLOR.teal}14`, border: `1px solid ${COLOR.teal}`, borderLeft: `3px solid ${COLOR.teal}`, fontSize: '13px', lineHeight: 1.55, color: COLOR.text }}>
+          <div style={{ fontSize: '10.5px', color: COLOR.teal, textTransform: 'uppercase', marginBottom: '4px' }}>Why this is tested</div>
           {q.whyTested}
         </div>
       )}
