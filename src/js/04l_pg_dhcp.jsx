@@ -339,7 +339,7 @@ function PgDhcpClock({ topo, st, onAdvance, onReset }) {
       <div style={{ fontSize: '11px', fontWeight: 800, letterSpacing: '0.05em', textTransform: 'uppercase', color: COLOR.muted, margin: '12px 0 4px' }}>Leases the server holds</div>
       {leases.length === 0 ? <div style={{ fontSize: '12.5px', color: COLOR.muted }}>None yet. Ask for addresses first.</div> : leases.map((ip) => (
         <div key={ip} style={{ fontSize: '12.5px', padding: '2px 0', display: 'flex', justifyContent: 'space-between', gap: '8px', flexWrap: 'wrap' }}>
-          <span><strong style={{ fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace' }}>{ip}</strong> <span style={{ color: COLOR.muted }}>{nameOfMac(st.leases[ip])}</span></span>
+          <span><strong style={{ fontFamily: 'var(--font-mono)' }}>{ip}</strong> <span style={{ color: COLOR.muted }}>{nameOfMac(st.leases[ip])}</span></span>
           <span style={{ color: COLOR.muted }}>{pgDhcpDuration(st.leases[ip].end - st.now)} left</span>
         </div>
       ))}

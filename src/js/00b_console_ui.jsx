@@ -32,7 +32,8 @@ function SectionLabel({ children, count, first, style }) {
 
 // Two or three options in one square row (mode switches and tab strips). The active
 // option is marked by the accent colour and a line under it.
-function SegmentedControl({ options, value, onChange, style }) {
+function SegmentedControl({ options, value, onChange, hue, fit, style }) {
+  const on = hue || COLOR.primary;
   return (
     <div role="tablist" style={{ display: 'flex', border: `1px solid ${COLOR.border}`, borderRadius: 'var(--r-ctl)', background: COLOR.surface, overflow: 'hidden', ...style }}>
       {options.map((o, i) => {
@@ -44,17 +45,17 @@ function SegmentedControl({ options, value, onChange, style }) {
             aria-selected={active}
             onClick={() => onChange(o.key)}
             title={o.title}
-            className="btn-flat flex-1"
+            className="btn-flat"
             style={{
-              position: 'relative', padding: '9px 4px', border: 'none', borderRadius: 0, minWidth: 0,
+              flex: fit ? '1 1 auto' : '1 1 0%', position: 'relative', padding: '9px 6px', border: 'none', borderRadius: 0, minWidth: 0, lineHeight: 1.25,
               borderLeft: i ? `1px solid ${COLOR.border}` : 'none',
-              background: active ? `color-mix(in srgb, ${COLOR.primary} 10%, ${COLOR.surface})` : 'transparent',
-              color: active ? COLOR.primary : COLOR.muted, fontSize: '12.5px', fontWeight: active ? 700 : 600,
+              background: active ? `color-mix(in srgb, ${on} 10%, ${COLOR.surface})` : 'transparent',
+              color: active ? ink(on) : COLOR.muted, fontSize: '12.5px', fontWeight: active ? 700 : 600,
             }}
           >
             {o.label}
-            {o.badge != null && o.badge !== '' && <span className="mono" style={{ marginLeft: '6px', fontSize: '11px', color: active ? COLOR.primary : COLOR.muted }}>{o.badge}</span>}
-            {active && <span style={{ position: 'absolute', left: '18%', right: '18%', bottom: 0, height: '2px', background: COLOR.primary }} />}
+            {o.badge != null && o.badge !== '' && <span className="mono" style={{ marginLeft: '6px', fontSize: '11px', color: active ? ink(on) : COLOR.muted }}>{o.badge}</span>}
+            {active && <span style={{ position: 'absolute', left: '18%', right: '18%', bottom: 0, height: '2px', background: on }} />}
           </button>
         );
       })}

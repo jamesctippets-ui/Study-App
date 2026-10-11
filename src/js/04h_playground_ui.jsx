@@ -10,7 +10,7 @@ function PgBinary({ bits, hue, label }) {
   return (
     <div style={{ marginBottom: '6px' }}>
       <div style={{ fontSize: '10.5px', fontWeight: 800, letterSpacing: '0.04em', textTransform: 'uppercase', color: COLOR.muted, marginBottom: '2px' }}>{label}</div>
-      <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace', fontSize: '13.5px', letterSpacing: '0.04em' }}>
+      <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', fontFamily: 'var(--font-mono)', fontSize: '13.5px', letterSpacing: '0.04em' }}>
         {[0, 1, 2, 3].map((o) => (
           <span key={o}>
             {bits.slice(o * 8, o * 8 + 8).map((b, i) => (
@@ -27,7 +27,7 @@ function PgResult({ label, value, sub, hue }) {
   return (
     <div style={{ minWidth: 0, background: tint(hue, 13), border: `1px solid color-mix(in srgb, ${hue} 40%, ${COLOR.border})`, borderRadius: 'var(--r-card)', padding: '8px 10px' }}>
       <div style={{ fontSize: '10.5px', fontWeight: 800, letterSpacing: '0.05em', textTransform: 'uppercase', color: ink(hue) }}>{label}</div>
-      <div style={{ fontSize: '13px', fontWeight: 800, lineHeight: 1.25, marginTop: '1px', overflowWrap: 'anywhere', letterSpacing: '-0.01em', fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace' }}>{value}</div>
+      <div style={{ fontSize: '13px', fontWeight: 800, lineHeight: 1.25, marginTop: '1px', overflowWrap: 'anywhere', letterSpacing: '-0.01em', fontFamily: 'var(--font-mono)' }}>{value}</div>
       {sub ? <div style={{ fontSize: '11px', color: COLOR.muted, marginTop: '1px' }}>{sub}</div> : null}
     </div>
   );
@@ -139,7 +139,7 @@ function SubnetCalculator() {
                       {Math.pow(2, splitPrefix - info.prefix)} subnets of {Math.pow(2, 32 - splitPrefix).toLocaleString()} addresses each ({Math.max(0, Math.pow(2, 32 - splitPrefix) - 2).toLocaleString()} usable).
                     </div>
                     {pgSplitSubnets(info.network, info.prefix, splitPrefix, 16).map((s) => (
-                      <div key={s.network} style={{ display: 'flex', justifyContent: 'space-between', gap: '8px', fontSize: '12.5px', padding: '4px 0', borderTop: `1px solid ${COLOR.border}`, fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace' }}>
+                      <div key={s.network} style={{ display: 'flex', justifyContent: 'space-between', gap: '8px', fontSize: '12.5px', padding: '4px 0', borderTop: `1px solid ${COLOR.border}`, fontFamily: 'var(--font-mono)' }}>
                         <span style={{ fontWeight: 800 }}>{s.networkText}/{s.prefix}</span>
                         <span style={{ color: COLOR.muted }}>{s.firstText} – {s.lastText}</span>
                       </div>
@@ -250,7 +250,7 @@ function VlsmPlanner() {
             <div key={a.name + a.info.network} style={{ borderTop: `1px solid ${COLOR.border}`, padding: '8px 0' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', gap: '8px', flexWrap: 'wrap' }}>
                 <strong style={{ fontSize: '13.5px' }}>{a.name}</strong>
-                <span style={{ fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace', fontWeight: 800, color: ink(COLOR.success), fontSize: '13.5px' }}>{a.info.networkText}/{a.prefix}</span>
+                <span style={{ fontFamily: 'var(--font-mono)', fontWeight: 800, color: ink(COLOR.success), fontSize: '13.5px' }}>{a.info.networkText}/{a.prefix}</span>
               </div>
               <div style={{ fontSize: '12px', color: COLOR.muted, lineHeight: 1.5 }}>
                 needs {a.hosts} host{a.hosts === 1 ? '' : 's'}; gets {a.info.usable} usable ({a.info.firstText} – {a.info.lastText}), mask {a.info.maskText}; {a.spare} spare.
@@ -425,7 +425,7 @@ function Ipv6Tool() {
                   <div>
                     <div style={{ fontSize: '12.5px', color: COLOR.muted, marginBottom: '6px' }}>{pgFormatBig(1n << BigInt(splitPrefix - info.prefix))} networks of /{splitPrefix}. First 8:</div>
                     {pgV6Subnets(info.ip, info.prefix, splitPrefix, 8).map((x) => (
-                      <div key={x.text} style={{ fontSize: '12.5px', padding: '4px 0', borderTop: `1px solid ${COLOR.border}`, fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace', fontWeight: 800 }}>{x.text}</div>
+                      <div key={x.text} style={{ fontSize: '12.5px', padding: '4px 0', borderTop: `1px solid ${COLOR.border}`, fontFamily: 'var(--font-mono)', fontWeight: 800 }}>{x.text}</div>
                     ))}
                   </div>
                 ) : <div style={{ fontSize: '12.5px', color: COLOR.muted }}>Pick a longer prefix. IPv6 subnetting is easiest on nibble (4-bit) boundaries: each extra hex digit multiplies the count by 16.</div>}
@@ -485,21 +485,19 @@ function PgProgressCard() {
   if (!p.total) return null;
   const got = PG_MILESTONES.filter((m) => m.test(p));
   return (
-    <PgCard title="Your Playground" hue={COLOR.gold} right={<span style={{ fontSize: '12px', color: COLOR.muted }}>{p.solved} / {p.total} scenarios fixed</span>}>
-      <div style={{ height: '8px', borderRadius: 'var(--r-pill)', background: COLOR.surfaceRaised, overflow: 'hidden', marginBottom: '10px' }}>
-        <div style={{ width: `${Math.round((p.solved / p.total) * 100)}%`, height: '100%', background: COLOR.success }} />
-      </div>
+    <PgCard title="Your Playground" hue={COLOR.gold} right={<span className="mono" style={{ fontSize: '12px', color: COLOR.muted }}>{p.solved} / {p.total} scenarios fixed</span>}>
+      <div style={{ marginBottom: '12px' }}><TickBar value={p.solved} total={p.total} ticks={15} hue={COLOR.success} label={`${p.solved} of ${p.total} scenarios fixed`} /></div>
       <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
         {PG_MILESTONES.map((m) => {
           const earned = got.includes(m);
           return (
-            <span key={m.key} title={earned ? 'Earned' : 'Not yet'} style={{ fontSize: '11.5px', fontWeight: 800, padding: '4px 9px', borderRadius: 'var(--r-pill)', border: `1px solid ${earned ? COLOR.gold : COLOR.border}`, background: earned ? tint(COLOR.gold, 18) : 'transparent', color: earned ? COLOR.text : COLOR.muted, opacity: earned ? 1 : 0.7 }}>
+            <span key={m.key} title={earned ? 'Earned' : 'Not yet'} style={{ fontSize: '11.5px', fontWeight: 700, padding: '4px 9px', borderRadius: 'var(--r-pill)', border: `1px solid ${earned ? COLOR.gold : COLOR.border}`, background: earned ? tint(COLOR.gold, 18) : 'transparent', color: earned ? COLOR.text : COLOR.muted, opacity: earned ? 1 : 0.7 }}>
               <span aria-hidden="true" style={{ filter: earned ? 'none' : 'grayscale(1)' }}>{m.icon}</span> {m.label}
             </span>
           );
         })}
       </div>
-      <div style={{ fontSize: '11px', color: COLOR.muted, marginTop: '8px' }}>Kept on this device only; separate from your cert achievements.</div>
+      <div style={{ fontSize: '11px', color: COLOR.muted, marginTop: '10px' }}>Kept on this device only; separate from your cert achievements.</div>
     </PgCard>
   );
 }
@@ -525,16 +523,19 @@ function PlaygroundView({ tool, pick, onSelect, onExit }) {
             disabled={!t.ready}
             onClick={() => t.ready && onSelect(t.key, '')}
             style={{
-              display: 'block', width: '100%', textAlign: 'left', marginBottom: '12px', padding: '14px 16px', borderRadius: 'var(--r-card)',
-              background: tint(t.hue, t.ready ? 10 : 4), border: `1px solid color-mix(in srgb, ${t.hue} ${t.ready ? 45 : 20}%, ${COLOR.border})`,
-              opacity: t.ready ? 1 : 0.7, color: COLOR.text, boxShadow: t.ready ? SHADOW.card : 'none',
+              display: 'block', width: '100%', textAlign: 'left', marginBottom: '10px', padding: '14px 16px', borderRadius: 'var(--r-card)',
+              background: tint(t.hue, t.ready ? 8 : 4), border: `1px solid color-mix(in srgb, ${t.hue} ${t.ready ? 38 : 20}%, ${COLOR.border})`, borderLeft: `3px solid ${t.hue}`,
+              opacity: t.ready ? 1 : 0.7, color: COLOR.text,
             }}
           >
-            <div className="flex justify-between items-baseline">
+            <div className="flex justify-between items-baseline" style={{ gap: '8px' }}>
               <span className="itil-display" style={{ fontSize: '16px', color: ink(t.hue) }}>{t.label}</span>
-              {pgScenarios(t.key).length > 0 && <span style={{ fontSize: '11.5px', color: COLOR.muted }}>{pgScenarios(t.key).filter((s) => pgIsSolved(t.key, s.id)).length} / {pgScenarios(t.key).length} fixed</span>}
+              {pgScenarios(t.key).length > 0 && <span className="mono" style={{ fontSize: '11.5px', color: COLOR.muted, flexShrink: 0 }}>{pgScenarios(t.key).filter((s) => pgIsSolved(t.key, s.id)).length} / {pgScenarios(t.key).length}</span>}
             </div>
             <div style={{ fontSize: '12.5px', color: COLOR.muted, lineHeight: 1.5, marginTop: '4px' }}>{t.blurb}</div>
+            {pgScenarios(t.key).length > 0 && (
+              <div style={{ marginTop: '10px' }}><TickBar value={pgScenarios(t.key).filter((s) => pgIsSolved(t.key, s.id)).length} total={pgScenarios(t.key).length} ticks={pgScenarios(t.key).length} hue={t.hue} height={5} label={`${t.label}: scenarios fixed`} /></div>
+            )}
           </button>
         ))}
         <div style={{ fontSize: '11.5px', color: COLOR.muted, lineHeight: 1.5, marginTop: '6px' }}>
@@ -548,7 +549,7 @@ function PlaygroundView({ tool, pick, onSelect, onExit }) {
   return (
     <div>
       <div className="flex items-center" style={{ gap: '8px', marginBottom: '12px' }}>
-        <button className="btn-flat" onClick={() => onSelect('', '')} aria-label="Back to the playground" style={{ fontSize: '13px', fontWeight: 800, color: COLOR.muted, padding: '4px 0' }}>‹ Playground</button>
+        <button className="btn-flat" onClick={() => onSelect('', '')} aria-label="Back to the playground" style={{ fontSize: '12.5px', fontWeight: 700, color: COLOR.muted, padding: '4px 0' }}>‹ Playground</button>
         <div className="itil-display" style={{ fontSize: '18px', color: ink(current.hue), marginLeft: 'auto' }}>{current.label}</div>
       </div>
       {Component ? <Component pick={pick} onPick={(p) => onSelect(current.key, p || '')} /> : null}

@@ -1743,10 +1743,17 @@ trading away for shinier but shallower ones.
   U3.02) and `QuizOption` (lettered answers that swap the letter for a mark so results never depend on colour alone).
   Screens converted: header and tab bar, Home (streak / daily goal / readiness hero, next-hop button, route ahead), the
   Path map and unit cards, weak subjects, Practice and exam question views, flashcards, Profile. Not yet converted (they
-  inherit the new tokens and look consistent but keep their old layout): the Playground tools, lesson body sections,
-  Mad Libs, Match, sequence and compare games, glossary, About and Data panels. Playwright tests were updated for the
+  inherit the new tokens and look consistent but keep their old layout): lesson body sections, Mad Libs, Match,
+  sequence and compare games, glossary, About and Data panels. (The Playground was converted in phase 2, below.) Playwright tests were updated for the
   new title text (`cert-study`) and the tab roles on the mode switches. A first pass used a new green-on-near-black
   palette; it was reverted at the owner's request to keep the current colours.
+- [x] **"Console" redesign, phase 2: the Playground.** Converted through its shared core (`04g_playground_core.jsx`) so all ten
+  tools changed together: cards are tinted with a coloured left edge, the tool tabs are the shared `SegmentedControl`
+  (sized to their labels so "Same subnet?" stays on one line), every ping/lookup/test trace is drawn as a route (a
+  dashed line with a green tick or red cross node per hop) instead of a bullet list, scenario pickers show a segmented
+  "scenarios fixed" meter and level tags, and the Playground home shows a meter per tool plus the milestone chips.
+  Inputs, binary views and result tiles use JetBrains Mono. Original colours kept. Checked in dark and light with a
+  scripted pass over the first scenario of every tool after a run.
 - [x] **Definition flyouts rebuilt: open left near the right edge, never widen the page.** Reported on a phone: a
   flyout from a word near the right edge made the page resize. Root cause: the flyout was `position: absolute` inside
   the text, so an overflowing box widened the page, and mobile browsers then report an inflated `window.innerWidth`

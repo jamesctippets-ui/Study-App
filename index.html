@@ -706,7 +706,8 @@ function SectionLabel({ children, count, first, style }) {
 
 // Two or three options in one square row (mode switches and tab strips). The active
 // option is marked by the accent colour and a line under it.
-function SegmentedControl({ options, value, onChange, style }) {
+function SegmentedControl({ options, value, onChange, hue, fit, style }) {
+  const on = hue || COLOR.primary;
   return (
     <div role="tablist" style={{ display: 'flex', border: `1px solid ${COLOR.border}`, borderRadius: 'var(--r-ctl)', background: COLOR.surface, overflow: 'hidden', ...style }}>
       {options.map((o, i) => {
@@ -718,17 +719,17 @@ function SegmentedControl({ options, value, onChange, style }) {
             aria-selected={active}
             onClick={() => onChange(o.key)}
             title={o.title}
-            className="btn-flat flex-1"
+            className="btn-flat"
             style={{
-              position: 'relative', padding: '9px 4px', border: 'none', borderRadius: 0, minWidth: 0,
+              flex: fit ? '1 1 auto' : '1 1 0%', position: 'relative', padding: '9px 6px', border: 'none', borderRadius: 0, minWidth: 0, lineHeight: 1.25,
               borderLeft: i ? `1px solid ${COLOR.border}` : 'none',
-              background: active ? `color-mix(in srgb, ${COLOR.primary} 10%, ${COLOR.surface})` : 'transparent',
-              color: active ? COLOR.primary : COLOR.muted, fontSize: '12.5px', fontWeight: active ? 700 : 600,
+              background: active ? `color-mix(in srgb, ${on} 10%, ${COLOR.surface})` : 'transparent',
+              color: active ? ink(on) : COLOR.muted, fontSize: '12.5px', fontWeight: active ? 700 : 600,
             }}
           >
             {o.label}
-            {o.badge != null && o.badge !== '' && <span className="mono" style={{ marginLeft: '6px', fontSize: '11px', color: active ? COLOR.primary : COLOR.muted }}>{o.badge}</span>}
-            {active && <span style={{ position: 'absolute', left: '18%', right: '18%', bottom: 0, height: '2px', background: COLOR.primary }} />}
+            {o.badge != null && o.badge !== '' && <span className="mono" style={{ marginLeft: '6px', fontSize: '11px', color: active ? ink(on) : COLOR.muted }}>{o.badge}</span>}
+            {active && <span style={{ position: 'absolute', left: '18%', right: '18%', bottom: 0, height: '2px', background: on }} />}
           </button>
         );
       })}
@@ -18146,7 +18147,7 @@ function pgInputStyle(invalid) {
   return {
     width: '100%', padding: '9px 8px', borderRadius: 'var(--r-ctl)', fontSize: '13.5px', minWidth: 0,
     border: `1px solid ${invalid ? COLOR.red : COLOR.border}`, background: COLOR.surface, color: COLOR.text,
-    fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace',
+    fontFamily: 'var(--font-mono)',
   };
 }
 
@@ -18156,17 +18157,17 @@ function PgCard({ title, hue, right, children, style, collapsible, defaultOpen }
   const [open, setOpen] = useState(defaultOpen !== false);
   const showBody = !collapsible || open;
   return (
-    <div style={{ boxShadow: SHADOW.card, background: tint(hue, 7), border: `1px solid color-mix(in srgb, ${hue} 38%, ${COLOR.border})`, borderRadius: 'var(--r-card)', padding: '14px 16px', marginBottom: '14px', ...style }}>
+    <div style={{ background: tint(hue, 6), border: `1px solid color-mix(in srgb, ${hue} 35%, ${COLOR.border})`, borderLeft: `3px solid ${hue}`, borderRadius: 'var(--r-card)', padding: '14px 16px', marginBottom: '12px', ...style }}>
       {(title || right) && (
         <div className="flex justify-between items-baseline" style={{ marginBottom: showBody ? '10px' : 0, gap: '8px' }}>
           {collapsible ? (
             <button className="btn-flat" onClick={() => setOpen(!open)} aria-expanded={open} aria-label={`${title}, ${open ? 'collapse' : 'expand'}`}
               style={{ display: 'flex', alignItems: 'baseline', gap: '6px', padding: 0, textAlign: 'left', background: 'transparent', border: 'none' }}>
-              <span className="itil-display" style={{ fontSize: '16px', color: ink(hue) }}>{title}</span>
-              <span aria-hidden="true" style={{ fontSize: '12px', color: COLOR.muted }}>{open ? '▾' : '▸'}</span>
+              <span className="itil-display" style={{ fontSize: '15.5px', color: ink(hue) }}>{title}</span>
+              <span aria-hidden="true" style={{ fontSize: '11px', color: COLOR.muted }}>{open ? '▾' : '▸'}</span>
             </button>
           ) : (
-            <div className="itil-display" style={{ fontSize: '16px', color: ink(hue) }}>{title}</div>
+            <div className="itil-display" style={{ fontSize: '15.5px', color: ink(hue) }}>{title}</div>
           )}
           {right}
         </div>
@@ -18210,42 +18211,21 @@ function PgSelect({ label, value, onChange, options }) {
 }
 
 function PgSegmented({ options, value, onChange, hue }) {
-  return (
-    <div role="tablist" style={{ display: 'flex', gap: '4px', marginBottom: '14px', flexWrap: 'wrap' }}>
-      {options.map((o) => {
-        const active = o.key === value;
-        return (
-          <button
-            key={o.key}
-            role="tab"
-            aria-selected={active}
-            onClick={() => onChange(o.key)}
-            className="btn-flat"
-            style={{
-              flex: '1 1 0', minWidth: '72px', padding: '8px 6px', borderRadius: 'var(--r-ctl)', fontSize: '12.5px', fontWeight: 800,
-              border: `1px solid ${active ? hue : COLOR.border}`, background: active ? tint(hue, 20) : 'transparent',
-              color: active ? ink(hue) : COLOR.muted,
-            }}
-          >
-            {o.label}
-          </button>
-        );
-      })}
-    </div>
-  );
+  return <SegmentedControl fit options={options} value={value} onChange={onChange} hue={hue} style={{ marginBottom: '14px' }} />;
 }
 
-const pgPillStyle = { fontSize: '12.5px', fontWeight: 800, padding: '6px 12px', borderRadius: 'var(--r-pill)', border: `1px solid ${COLOR.border}`, color: COLOR.muted };
+const pgPillStyle = { fontSize: '12.5px', fontWeight: 700, padding: '7px 12px', borderRadius: 'var(--r-ctl)', border: `1px solid ${COLOR.border}`, color: COLOR.muted };
 
 /* ---------- ping/test result steps shared by every tool ---------- */
 
 function PgSteps({ steps }) {
   return (
-    <ol style={{ margin: 0, paddingLeft: 0, listStyle: 'none', fontSize: '12.5px', lineHeight: 1.5 }}>
+    <ol style={{ position: 'relative', margin: 0, paddingLeft: 0, listStyle: 'none', fontSize: '12.5px', lineHeight: 1.5 }}>
+      <span aria-hidden="true" style={{ position: 'absolute', left: '6px', top: '9px', bottom: '9px', borderLeft: `1px dashed ${COLOR.border}` }} />
       {steps.map((st, j) => (
-        <li key={j} style={{ display: 'flex', gap: '6px', marginBottom: '3px', color: st.ok ? COLOR.text : ink(COLOR.red), fontWeight: st.ok ? 400 : 700 }}>
-          <span aria-hidden="true" style={{ flexShrink: 0, width: '14px', color: st.ok ? ink(COLOR.success) : ink(COLOR.red) }}>{st.ok ? '✓' : '✕'}</span>
-          <span>{st.text}</span>
+        <li key={j} style={{ position: 'relative', display: 'flex', gap: '10px', marginBottom: '4px', color: st.ok ? COLOR.text : ink(COLOR.red), fontWeight: st.ok ? 400 : 700 }}>
+          <span aria-hidden="true" style={{ position: 'relative', zIndex: 1, flexShrink: 0, width: '14px', height: '14px', marginTop: '3px', borderRadius: '50%', background: st.ok ? COLOR.success : COLOR.red, color: COLOR.onAccent, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: '8.5px', fontWeight: 900 }}>{st.ok ? '✓' : '✕'}</span>
+          <span style={{ minWidth: 0, overflowWrap: 'anywhere' }}>{st.text}</span>
         </li>
       ))}
     </ol>
@@ -18255,8 +18235,8 @@ function PgSteps({ steps }) {
 function PgDiagnosis({ diagnosis, heading }) {
   if (!diagnosis) return null;
   return (
-    <div style={{ padding: '10px 12px', borderRadius: 'var(--r-card)', background: COLOR.surface, border: `1px solid ${COLOR.border}`, marginBottom: '10px', fontSize: '13px', lineHeight: 1.5 }}>
-      <div style={{ fontSize: '10.5px', fontWeight: 800, letterSpacing: '0.05em', textTransform: 'uppercase', color: COLOR.muted }}>{heading || 'First thing that is wrong'}</div>
+    <div style={{ padding: '10px 12px', borderRadius: 'var(--r-card)', background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderLeft: `3px solid ${COLOR.red}`, marginBottom: '10px', fontSize: '13px', lineHeight: 1.5 }}>
+      <div style={{ fontSize: '10.5px', textTransform: 'uppercase', color: COLOR.muted }}>{heading || 'First thing that is wrong'}</div>
       <div style={{ fontWeight: 800, margin: '2px 0' }}>{diagnosis.title}</div>
       <div>{diagnosis.text}</div>
       <div style={{ marginTop: '4px' }}><strong>Try:</strong> {diagnosis.fix}</div>
@@ -18333,8 +18313,8 @@ function PgPredict({ compute, causes, buttonLabel, onResult, resetKey }) {
           <div style={{ fontSize: '11.5px', color: COLOR.muted, marginTop: '6px' }}>Prediction score on this device: {store.right} / {store.total}</div>
         </div>
       )}
-      <button className="btn-3d" disabled={!ready} onClick={run}
-        style={{ width: '100%', padding: '11px', borderRadius: 'var(--r-ctl)', background: COLOR.primary, color: COLOR.onAccent, fontSize: '14px', fontWeight: 700, marginBottom: '12px', opacity: ready ? 1 : 0.5 }}>
+      <button disabled={!ready} onClick={run}
+        style={{ width: '100%', padding: '12px', borderRadius: 'var(--r-ctl)', border: 'none', background: COLOR.primary, color: COLOR.onAccent, fontSize: '14px', fontWeight: 700, marginBottom: '12px', opacity: ready ? 1 : 0.5 }}>
         {buttonLabel}
       </button>
       {feedback && (
@@ -18384,12 +18364,22 @@ function PgSharePanel({ topo, setTopo, reset, validate }) {
 /* ---------- the scenario picker and shell every guided tool uses ---------- */
 
 function PgScenarioPicker({ tool, scenarios, onPick, intro, note, sandboxText }) {
+  const solvedCount = scenarios.filter((s) => pgIsSolved(tool, s.id)).length;
   return (
     <div>
       <div style={{ fontSize: '13px', color: COLOR.muted, lineHeight: 1.55, marginBottom: note ? '8px' : '12px' }}>{intro}</div>
       {note ? <div style={{ fontSize: '11.5px', color: COLOR.muted, lineHeight: 1.5, marginBottom: '12px' }}>{note}</div> : null}
+      {scenarios.length > 0 && (
+        <div style={{ margin: '0 0 14px' }}>
+          <div className="flex justify-between" style={{ fontSize: '10.5px', textTransform: 'uppercase', color: COLOR.muted, marginBottom: '6px' }}>
+            <span>Scenarios fixed</span>
+            <span style={{ color: COLOR.text }}>{solvedCount} / {scenarios.length}</span>
+          </div>
+          <TickBar value={solvedCount} total={scenarios.length} ticks={scenarios.length} height={6} label={`${solvedCount} of ${scenarios.length} scenarios fixed`} />
+        </div>
+      )}
       <button className="btn-flat" onClick={() => onPick('sandbox')}
-        style={{ display: 'block', width: '100%', textAlign: 'left', marginBottom: '12px', padding: '14px 16px', borderRadius: 'var(--r-card)', background: tint(COLOR.gold, 10), border: `1px solid color-mix(in srgb, ${COLOR.gold} 45%, ${COLOR.border})`, color: COLOR.text, boxShadow: SHADOW.card }}>
+        style={{ display: 'block', width: '100%', textAlign: 'left', marginBottom: '12px', padding: '14px 16px', borderRadius: 'var(--r-card)', background: tint(COLOR.gold, 10), border: `1px solid color-mix(in srgb, ${COLOR.gold} 45%, ${COLOR.border})`, borderLeft: `3px solid ${COLOR.gold}`, color: COLOR.text }}>
         <div className="itil-display" style={{ fontSize: '15px', color: ink(COLOR.gold) }}>Free sandbox</div>
         <div style={{ fontSize: '12.5px', color: COLOR.muted, marginTop: '3px' }}>{sandboxText}</div>
       </button>
@@ -18398,15 +18388,15 @@ function PgScenarioPicker({ tool, scenarios, onPick, intro, note, sandboxText })
         if (!list.length) return null;
         return (
           <div key={lv} style={{ marginBottom: '8px' }}>
-            <div style={{ fontSize: '11px', fontWeight: 800, letterSpacing: '0.06em', textTransform: 'uppercase', color: ink(PG_LEVEL_HUE[lv]), margin: '10px 0 6px' }}>{PG_LEVEL_LABEL[lv]}</div>
+            <div style={{ fontSize: '10.5px', textTransform: 'uppercase', color: ink(PG_LEVEL_HUE[lv]), margin: '14px 2px 8px' }}>{PG_LEVEL_LABEL[lv]}</div>
             {list.map((s) => {
               const done = pgIsSolved(tool, s.id);
               return (
                 <button key={s.id} className="btn-flat" onClick={() => onPick(s.id)}
-                  style={{ display: 'block', width: '100%', textAlign: 'left', marginBottom: '8px', padding: '12px 14px', borderRadius: 'var(--r-card)', background: tint(PG_LEVEL_HUE[lv], 8), border: `1px solid color-mix(in srgb, ${PG_LEVEL_HUE[lv]} 38%, ${COLOR.border})`, color: COLOR.text }}>
-                  <div style={{ fontSize: '14px', fontWeight: 800, display: 'flex', justifyContent: 'space-between', gap: '8px' }}>
+                  style={{ display: 'block', width: '100%', textAlign: 'left', marginBottom: '8px', padding: '12px 14px', borderRadius: 'var(--r-card)', background: tint(PG_LEVEL_HUE[lv], 8), border: `1px solid color-mix(in srgb, ${PG_LEVEL_HUE[lv]} 35%, ${COLOR.border})`, borderLeft: `3px solid ${PG_LEVEL_HUE[lv]}`, color: COLOR.text }}>
+                  <div style={{ fontSize: '14px', fontWeight: 700, display: 'flex', justifyContent: 'space-between', gap: '8px' }}>
                     <span>{s.title}</span>
-                    {done && <span aria-label="Solved" style={{ color: ink(COLOR.success), flexShrink: 0 }}>✓ solved</span>}
+                    {done && <span aria-label="Solved" style={{ color: ink(COLOR.success), flexShrink: 0, fontSize: '10.5px', textTransform: 'uppercase' }}>✓ solved</span>}
                   </div>
                   <div style={{ fontSize: '12.5px', color: COLOR.muted, marginTop: '2px', lineHeight: 1.45 }}>{s.goal}</div>
                 </button>
@@ -18430,8 +18420,8 @@ function PgScenarioShell({ tool, scenario, onBack, renderLab, isSolved, fixLines
   const reset = () => { setTopo(pgClone(scenario.topology)); setHintsShown(0); setShowFix(false); };
   return (
     <div>
-      <button className="btn-flat" onClick={onBack} style={{ fontSize: '13px', fontWeight: 800, color: COLOR.muted, padding: '2px 0 10px' }}>‹ All scenarios</button>
-      <PgCard title={scenario.title} hue={COLOR.gold} right={<span style={{ fontSize: '10.5px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.05em', color: COLOR.muted }}>{PG_LEVEL_LABEL[scenario.level]}</span>}>
+      <button className="btn-flat" onClick={onBack} style={{ fontSize: '12.5px', fontWeight: 700, color: COLOR.muted, padding: '2px 0 12px' }}>‹ All scenarios</button>
+      <PgCard title={scenario.title} hue={COLOR.gold} right={<span style={{ fontSize: '10.5px', textTransform: 'uppercase', color: ink(PG_LEVEL_HUE[scenario.level]) }}>{PG_LEVEL_LABEL[scenario.level]}</span>}>
         <div style={{ fontSize: '13px', lineHeight: 1.55 }}>{scenario.story}</div>
         <div style={{ fontSize: '12.5px', color: COLOR.muted, marginTop: '6px' }}>Your job: find out what is wrong and fix it so the goal below turns green.</div>
       </PgCard>
@@ -18460,7 +18450,7 @@ function PgSandboxShell({ tool, makeDefault, validate, onBack, renderLab, blurb 
   const [topo, setTopo, reset] = usePgSandbox(tool, makeDefault, validate);
   return (
     <div>
-      <button className="btn-flat" onClick={onBack} style={{ fontSize: '13px', fontWeight: 800, color: COLOR.muted, padding: '2px 0 10px' }}>‹ All scenarios</button>
+      <button className="btn-flat" onClick={onBack} style={{ fontSize: '12.5px', fontWeight: 700, color: COLOR.muted, padding: '2px 0 12px' }}>‹ All scenarios</button>
       <PgCard title="Free sandbox" hue={COLOR.gold}>
         <div style={{ fontSize: '13px', lineHeight: 1.55 }}>{blurb}</div>
       </PgCard>
@@ -18484,8 +18474,8 @@ function PlaygroundLessonLink({ lesson }) {
       {links.map((l) => (
         <button key={`${l.tool}/${l.pick || ''}`} className="btn-flat"
           onClick={() => { window.location.hash = `/playground/${l.tool}${l.pick ? `/${l.pick}` : ''}`; }}
-          style={{ display: 'block', width: '100%', textAlign: 'left', marginBottom: '8px', padding: '12px 14px', borderRadius: 'var(--r-card)', background: tint(COLOR.success, 10), border: `1px solid color-mix(in srgb, ${COLOR.success} 40%, ${COLOR.border})`, color: COLOR.text }}>
-          <div style={{ fontSize: '11px', fontWeight: 800, letterSpacing: '0.05em', textTransform: 'uppercase', color: ink(COLOR.success) }}>Try it in the Playground</div>
+          style={{ display: 'block', width: '100%', textAlign: 'left', marginBottom: '8px', padding: '12px 14px', borderRadius: 'var(--r-card)', background: tint(COLOR.success, 10), border: `1px solid color-mix(in srgb, ${COLOR.success} 40%, ${COLOR.border})`, borderLeft: `3px solid ${COLOR.success}`, color: COLOR.text }}>
+          <div style={{ fontSize: '10.5px', textTransform: 'uppercase', color: ink(COLOR.success) }}>Try it in the Playground</div>
           <div style={{ fontSize: '14px', fontWeight: 800, marginTop: '1px' }}>{l.label}</div>
           {l.blurb ? <div style={{ fontSize: '12.5px', color: COLOR.muted, marginTop: '2px', lineHeight: 1.45 }}>{l.blurb}</div> : null}
         </button>
@@ -18766,7 +18756,7 @@ function PgBinary({ bits, hue, label }) {
   return (
     <div style={{ marginBottom: '6px' }}>
       <div style={{ fontSize: '10.5px', fontWeight: 800, letterSpacing: '0.04em', textTransform: 'uppercase', color: COLOR.muted, marginBottom: '2px' }}>{label}</div>
-      <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace', fontSize: '13.5px', letterSpacing: '0.04em' }}>
+      <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', fontFamily: 'var(--font-mono)', fontSize: '13.5px', letterSpacing: '0.04em' }}>
         {[0, 1, 2, 3].map((o) => (
           <span key={o}>
             {bits.slice(o * 8, o * 8 + 8).map((b, i) => (
@@ -18783,7 +18773,7 @@ function PgResult({ label, value, sub, hue }) {
   return (
     <div style={{ minWidth: 0, background: tint(hue, 13), border: `1px solid color-mix(in srgb, ${hue} 40%, ${COLOR.border})`, borderRadius: 'var(--r-card)', padding: '8px 10px' }}>
       <div style={{ fontSize: '10.5px', fontWeight: 800, letterSpacing: '0.05em', textTransform: 'uppercase', color: ink(hue) }}>{label}</div>
-      <div style={{ fontSize: '13px', fontWeight: 800, lineHeight: 1.25, marginTop: '1px', overflowWrap: 'anywhere', letterSpacing: '-0.01em', fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace' }}>{value}</div>
+      <div style={{ fontSize: '13px', fontWeight: 800, lineHeight: 1.25, marginTop: '1px', overflowWrap: 'anywhere', letterSpacing: '-0.01em', fontFamily: 'var(--font-mono)' }}>{value}</div>
       {sub ? <div style={{ fontSize: '11px', color: COLOR.muted, marginTop: '1px' }}>{sub}</div> : null}
     </div>
   );
@@ -18895,7 +18885,7 @@ function SubnetCalculator() {
                       {Math.pow(2, splitPrefix - info.prefix)} subnets of {Math.pow(2, 32 - splitPrefix).toLocaleString()} addresses each ({Math.max(0, Math.pow(2, 32 - splitPrefix) - 2).toLocaleString()} usable).
                     </div>
                     {pgSplitSubnets(info.network, info.prefix, splitPrefix, 16).map((s) => (
-                      <div key={s.network} style={{ display: 'flex', justifyContent: 'space-between', gap: '8px', fontSize: '12.5px', padding: '4px 0', borderTop: `1px solid ${COLOR.border}`, fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace' }}>
+                      <div key={s.network} style={{ display: 'flex', justifyContent: 'space-between', gap: '8px', fontSize: '12.5px', padding: '4px 0', borderTop: `1px solid ${COLOR.border}`, fontFamily: 'var(--font-mono)' }}>
                         <span style={{ fontWeight: 800 }}>{s.networkText}/{s.prefix}</span>
                         <span style={{ color: COLOR.muted }}>{s.firstText} – {s.lastText}</span>
                       </div>
@@ -19006,7 +18996,7 @@ function VlsmPlanner() {
             <div key={a.name + a.info.network} style={{ borderTop: `1px solid ${COLOR.border}`, padding: '8px 0' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', gap: '8px', flexWrap: 'wrap' }}>
                 <strong style={{ fontSize: '13.5px' }}>{a.name}</strong>
-                <span style={{ fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace', fontWeight: 800, color: ink(COLOR.success), fontSize: '13.5px' }}>{a.info.networkText}/{a.prefix}</span>
+                <span style={{ fontFamily: 'var(--font-mono)', fontWeight: 800, color: ink(COLOR.success), fontSize: '13.5px' }}>{a.info.networkText}/{a.prefix}</span>
               </div>
               <div style={{ fontSize: '12px', color: COLOR.muted, lineHeight: 1.5 }}>
                 needs {a.hosts} host{a.hosts === 1 ? '' : 's'}; gets {a.info.usable} usable ({a.info.firstText} – {a.info.lastText}), mask {a.info.maskText}; {a.spare} spare.
@@ -19181,7 +19171,7 @@ function Ipv6Tool() {
                   <div>
                     <div style={{ fontSize: '12.5px', color: COLOR.muted, marginBottom: '6px' }}>{pgFormatBig(1n << BigInt(splitPrefix - info.prefix))} networks of /{splitPrefix}. First 8:</div>
                     {pgV6Subnets(info.ip, info.prefix, splitPrefix, 8).map((x) => (
-                      <div key={x.text} style={{ fontSize: '12.5px', padding: '4px 0', borderTop: `1px solid ${COLOR.border}`, fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace', fontWeight: 800 }}>{x.text}</div>
+                      <div key={x.text} style={{ fontSize: '12.5px', padding: '4px 0', borderTop: `1px solid ${COLOR.border}`, fontFamily: 'var(--font-mono)', fontWeight: 800 }}>{x.text}</div>
                     ))}
                   </div>
                 ) : <div style={{ fontSize: '12.5px', color: COLOR.muted }}>Pick a longer prefix. IPv6 subnetting is easiest on nibble (4-bit) boundaries: each extra hex digit multiplies the count by 16.</div>}
@@ -19241,21 +19231,19 @@ function PgProgressCard() {
   if (!p.total) return null;
   const got = PG_MILESTONES.filter((m) => m.test(p));
   return (
-    <PgCard title="Your Playground" hue={COLOR.gold} right={<span style={{ fontSize: '12px', color: COLOR.muted }}>{p.solved} / {p.total} scenarios fixed</span>}>
-      <div style={{ height: '8px', borderRadius: 'var(--r-pill)', background: COLOR.surfaceRaised, overflow: 'hidden', marginBottom: '10px' }}>
-        <div style={{ width: `${Math.round((p.solved / p.total) * 100)}%`, height: '100%', background: COLOR.success }} />
-      </div>
+    <PgCard title="Your Playground" hue={COLOR.gold} right={<span className="mono" style={{ fontSize: '12px', color: COLOR.muted }}>{p.solved} / {p.total} scenarios fixed</span>}>
+      <div style={{ marginBottom: '12px' }}><TickBar value={p.solved} total={p.total} ticks={15} hue={COLOR.success} label={`${p.solved} of ${p.total} scenarios fixed`} /></div>
       <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
         {PG_MILESTONES.map((m) => {
           const earned = got.includes(m);
           return (
-            <span key={m.key} title={earned ? 'Earned' : 'Not yet'} style={{ fontSize: '11.5px', fontWeight: 800, padding: '4px 9px', borderRadius: 'var(--r-pill)', border: `1px solid ${earned ? COLOR.gold : COLOR.border}`, background: earned ? tint(COLOR.gold, 18) : 'transparent', color: earned ? COLOR.text : COLOR.muted, opacity: earned ? 1 : 0.7 }}>
+            <span key={m.key} title={earned ? 'Earned' : 'Not yet'} style={{ fontSize: '11.5px', fontWeight: 700, padding: '4px 9px', borderRadius: 'var(--r-pill)', border: `1px solid ${earned ? COLOR.gold : COLOR.border}`, background: earned ? tint(COLOR.gold, 18) : 'transparent', color: earned ? COLOR.text : COLOR.muted, opacity: earned ? 1 : 0.7 }}>
               <span aria-hidden="true" style={{ filter: earned ? 'none' : 'grayscale(1)' }}>{m.icon}</span> {m.label}
             </span>
           );
         })}
       </div>
-      <div style={{ fontSize: '11px', color: COLOR.muted, marginTop: '8px' }}>Kept on this device only; separate from your cert achievements.</div>
+      <div style={{ fontSize: '11px', color: COLOR.muted, marginTop: '10px' }}>Kept on this device only; separate from your cert achievements.</div>
     </PgCard>
   );
 }
@@ -19281,16 +19269,19 @@ function PlaygroundView({ tool, pick, onSelect, onExit }) {
             disabled={!t.ready}
             onClick={() => t.ready && onSelect(t.key, '')}
             style={{
-              display: 'block', width: '100%', textAlign: 'left', marginBottom: '12px', padding: '14px 16px', borderRadius: 'var(--r-card)',
-              background: tint(t.hue, t.ready ? 10 : 4), border: `1px solid color-mix(in srgb, ${t.hue} ${t.ready ? 45 : 20}%, ${COLOR.border})`,
-              opacity: t.ready ? 1 : 0.7, color: COLOR.text, boxShadow: t.ready ? SHADOW.card : 'none',
+              display: 'block', width: '100%', textAlign: 'left', marginBottom: '10px', padding: '14px 16px', borderRadius: 'var(--r-card)',
+              background: tint(t.hue, t.ready ? 8 : 4), border: `1px solid color-mix(in srgb, ${t.hue} ${t.ready ? 38 : 20}%, ${COLOR.border})`, borderLeft: `3px solid ${t.hue}`,
+              opacity: t.ready ? 1 : 0.7, color: COLOR.text,
             }}
           >
-            <div className="flex justify-between items-baseline">
+            <div className="flex justify-between items-baseline" style={{ gap: '8px' }}>
               <span className="itil-display" style={{ fontSize: '16px', color: ink(t.hue) }}>{t.label}</span>
-              {pgScenarios(t.key).length > 0 && <span style={{ fontSize: '11.5px', color: COLOR.muted }}>{pgScenarios(t.key).filter((s) => pgIsSolved(t.key, s.id)).length} / {pgScenarios(t.key).length} fixed</span>}
+              {pgScenarios(t.key).length > 0 && <span className="mono" style={{ fontSize: '11.5px', color: COLOR.muted, flexShrink: 0 }}>{pgScenarios(t.key).filter((s) => pgIsSolved(t.key, s.id)).length} / {pgScenarios(t.key).length}</span>}
             </div>
             <div style={{ fontSize: '12.5px', color: COLOR.muted, lineHeight: 1.5, marginTop: '4px' }}>{t.blurb}</div>
+            {pgScenarios(t.key).length > 0 && (
+              <div style={{ marginTop: '10px' }}><TickBar value={pgScenarios(t.key).filter((s) => pgIsSolved(t.key, s.id)).length} total={pgScenarios(t.key).length} ticks={pgScenarios(t.key).length} hue={t.hue} height={5} label={`${t.label}: scenarios fixed`} /></div>
+            )}
           </button>
         ))}
         <div style={{ fontSize: '11.5px', color: COLOR.muted, lineHeight: 1.5, marginTop: '6px' }}>
@@ -19304,7 +19295,7 @@ function PlaygroundView({ tool, pick, onSelect, onExit }) {
   return (
     <div>
       <div className="flex items-center" style={{ gap: '8px', marginBottom: '12px' }}>
-        <button className="btn-flat" onClick={() => onSelect('', '')} aria-label="Back to the playground" style={{ fontSize: '13px', fontWeight: 800, color: COLOR.muted, padding: '4px 0' }}>‹ Playground</button>
+        <button className="btn-flat" onClick={() => onSelect('', '')} aria-label="Back to the playground" style={{ fontSize: '12.5px', fontWeight: 700, color: COLOR.muted, padding: '4px 0' }}>‹ Playground</button>
         <div className="itil-display" style={{ fontSize: '18px', color: ink(current.hue), marginLeft: 'auto' }}>{current.label}</div>
       </div>
       {Component ? <Component pick={pick} onPick={(p) => onSelect(current.key, p || '')} /> : null}
@@ -19811,7 +19802,7 @@ function PgMacTables({ topo, state, onClear }) {
       {rows.length === 0 ? (
         <div style={{ fontSize: '12.5px', color: COLOR.muted, lineHeight: 1.5 }}>Empty. Switches learn which port a device is behind from the source address of each frame they see. Until then they flood. Ping to fill the tables, then ping again and watch the second pass go straight to one port.</div>
       ) : (
-        <div style={{ fontSize: '12px', fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace' }}>
+        <div style={{ fontSize: '12px', fontFamily: 'var(--font-mono)' }}>
           <div style={{ display: 'grid', gridTemplateColumns: '0.9fr 0.7fr 1fr 1fr', gap: '4px', color: COLOR.muted, fontWeight: 800, paddingBottom: '3px' }}><span>Switch</span><span>VLAN</span><span>MAC</span><span>Port</span></div>
           {rows.map((r, i) => (
             <div key={i} style={{ display: 'grid', gridTemplateColumns: '0.9fr 0.7fr 1fr 1fr', gap: '4px', padding: '2px 0', borderTop: `1px solid ${COLOR.border}` }}>
@@ -20928,7 +20919,7 @@ function PgDhcpClock({ topo, st, onAdvance, onReset }) {
       <div style={{ fontSize: '11px', fontWeight: 800, letterSpacing: '0.05em', textTransform: 'uppercase', color: COLOR.muted, margin: '12px 0 4px' }}>Leases the server holds</div>
       {leases.length === 0 ? <div style={{ fontSize: '12.5px', color: COLOR.muted }}>None yet. Ask for addresses first.</div> : leases.map((ip) => (
         <div key={ip} style={{ fontSize: '12.5px', padding: '2px 0', display: 'flex', justifyContent: 'space-between', gap: '8px', flexWrap: 'wrap' }}>
-          <span><strong style={{ fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace' }}>{ip}</strong> <span style={{ color: COLOR.muted }}>{nameOfMac(st.leases[ip])}</span></span>
+          <span><strong style={{ fontFamily: 'var(--font-mono)' }}>{ip}</strong> <span style={{ color: COLOR.muted }}>{nameOfMac(st.leases[ip])}</span></span>
           <span style={{ color: COLOR.muted }}>{pgDhcpDuration(st.leases[ip].end - st.now)} left</span>
         </div>
       ))}
@@ -21077,7 +21068,7 @@ const PG_DNS_ADVANCES = [{ label: '+1 minute', sec: 60 }, { label: '+10 minutes'
 
 const pgDnsAddBtn = { fontSize: '12.5px', fontWeight: 800, color: ink(COLOR.blue), padding: '6px 0', minHeight: '36px' };
 const pgDnsDelBtn = { width: '36px', height: '36px', color: COLOR.muted, flexShrink: 0 };
-const pgDnsMono = { fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace' };
+const pgDnsMono = { fontFamily: 'var(--font-mono)' };
 
 function pgDnsClip(s, k) { const t = String(s == null ? '' : s); return t.length > k ? `${t.slice(0, k - 1)}…` : t; }
 function pgDnsSplitList(v) { return String(v || '').split(',').map((x) => x.trim()).filter(Boolean); }
@@ -21660,7 +21651,7 @@ PLAYGROUND_EXTRA_TOOLS.push({
 
 const PG_NSG_UI_HUE = { allowed: COLOR.success, blocked: COLOR.red, notreached: COLOR.muted, none: COLOR.muted };
 const PG_NSG_UI_MARK = { allowed: '✓', blocked: '✕', notreached: '○', none: '–' };
-const PG_NSG_UI_MONO = 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace';
+const PG_NSG_UI_MONO = 'var(--font-mono)';
 const PG_NSG_UI_PORTS = ['22', '80', '443', '1433', '3389', '8080'];
 const PG_NSG_UI_NSG_HUES = [COLOR.blue, COLOR.pink, COLOR.orange, COLOR.teal];
 

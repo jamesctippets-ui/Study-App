@@ -97,7 +97,7 @@ function pgInputStyle(invalid) {
   return {
     width: '100%', padding: '9px 8px', borderRadius: 'var(--r-ctl)', fontSize: '13.5px', minWidth: 0,
     border: `1px solid ${invalid ? COLOR.red : COLOR.border}`, background: COLOR.surface, color: COLOR.text,
-    fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace',
+    fontFamily: 'var(--font-mono)',
   };
 }
 
@@ -107,17 +107,17 @@ function PgCard({ title, hue, right, children, style, collapsible, defaultOpen }
   const [open, setOpen] = useState(defaultOpen !== false);
   const showBody = !collapsible || open;
   return (
-    <div style={{ boxShadow: SHADOW.card, background: tint(hue, 7), border: `1px solid color-mix(in srgb, ${hue} 38%, ${COLOR.border})`, borderRadius: 'var(--r-card)', padding: '14px 16px', marginBottom: '14px', ...style }}>
+    <div style={{ background: tint(hue, 6), border: `1px solid color-mix(in srgb, ${hue} 35%, ${COLOR.border})`, borderLeft: `3px solid ${hue}`, borderRadius: 'var(--r-card)', padding: '14px 16px', marginBottom: '12px', ...style }}>
       {(title || right) && (
         <div className="flex justify-between items-baseline" style={{ marginBottom: showBody ? '10px' : 0, gap: '8px' }}>
           {collapsible ? (
             <button className="btn-flat" onClick={() => setOpen(!open)} aria-expanded={open} aria-label={`${title}, ${open ? 'collapse' : 'expand'}`}
               style={{ display: 'flex', alignItems: 'baseline', gap: '6px', padding: 0, textAlign: 'left', background: 'transparent', border: 'none' }}>
-              <span className="itil-display" style={{ fontSize: '16px', color: ink(hue) }}>{title}</span>
-              <span aria-hidden="true" style={{ fontSize: '12px', color: COLOR.muted }}>{open ? '▾' : '▸'}</span>
+              <span className="itil-display" style={{ fontSize: '15.5px', color: ink(hue) }}>{title}</span>
+              <span aria-hidden="true" style={{ fontSize: '11px', color: COLOR.muted }}>{open ? '▾' : '▸'}</span>
             </button>
           ) : (
-            <div className="itil-display" style={{ fontSize: '16px', color: ink(hue) }}>{title}</div>
+            <div className="itil-display" style={{ fontSize: '15.5px', color: ink(hue) }}>{title}</div>
           )}
           {right}
         </div>
@@ -161,42 +161,21 @@ function PgSelect({ label, value, onChange, options }) {
 }
 
 function PgSegmented({ options, value, onChange, hue }) {
-  return (
-    <div role="tablist" style={{ display: 'flex', gap: '4px', marginBottom: '14px', flexWrap: 'wrap' }}>
-      {options.map((o) => {
-        const active = o.key === value;
-        return (
-          <button
-            key={o.key}
-            role="tab"
-            aria-selected={active}
-            onClick={() => onChange(o.key)}
-            className="btn-flat"
-            style={{
-              flex: '1 1 0', minWidth: '72px', padding: '8px 6px', borderRadius: 'var(--r-ctl)', fontSize: '12.5px', fontWeight: 800,
-              border: `1px solid ${active ? hue : COLOR.border}`, background: active ? tint(hue, 20) : 'transparent',
-              color: active ? ink(hue) : COLOR.muted,
-            }}
-          >
-            {o.label}
-          </button>
-        );
-      })}
-    </div>
-  );
+  return <SegmentedControl fit options={options} value={value} onChange={onChange} hue={hue} style={{ marginBottom: '14px' }} />;
 }
 
-const pgPillStyle = { fontSize: '12.5px', fontWeight: 800, padding: '6px 12px', borderRadius: 'var(--r-pill)', border: `1px solid ${COLOR.border}`, color: COLOR.muted };
+const pgPillStyle = { fontSize: '12.5px', fontWeight: 700, padding: '7px 12px', borderRadius: 'var(--r-ctl)', border: `1px solid ${COLOR.border}`, color: COLOR.muted };
 
 /* ---------- ping/test result steps shared by every tool ---------- */
 
 function PgSteps({ steps }) {
   return (
-    <ol style={{ margin: 0, paddingLeft: 0, listStyle: 'none', fontSize: '12.5px', lineHeight: 1.5 }}>
+    <ol style={{ position: 'relative', margin: 0, paddingLeft: 0, listStyle: 'none', fontSize: '12.5px', lineHeight: 1.5 }}>
+      <span aria-hidden="true" style={{ position: 'absolute', left: '6px', top: '9px', bottom: '9px', borderLeft: `1px dashed ${COLOR.border}` }} />
       {steps.map((st, j) => (
-        <li key={j} style={{ display: 'flex', gap: '6px', marginBottom: '3px', color: st.ok ? COLOR.text : ink(COLOR.red), fontWeight: st.ok ? 400 : 700 }}>
-          <span aria-hidden="true" style={{ flexShrink: 0, width: '14px', color: st.ok ? ink(COLOR.success) : ink(COLOR.red) }}>{st.ok ? '✓' : '✕'}</span>
-          <span>{st.text}</span>
+        <li key={j} style={{ position: 'relative', display: 'flex', gap: '10px', marginBottom: '4px', color: st.ok ? COLOR.text : ink(COLOR.red), fontWeight: st.ok ? 400 : 700 }}>
+          <span aria-hidden="true" style={{ position: 'relative', zIndex: 1, flexShrink: 0, width: '14px', height: '14px', marginTop: '3px', borderRadius: '50%', background: st.ok ? COLOR.success : COLOR.red, color: COLOR.onAccent, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: '8.5px', fontWeight: 900 }}>{st.ok ? '✓' : '✕'}</span>
+          <span style={{ minWidth: 0, overflowWrap: 'anywhere' }}>{st.text}</span>
         </li>
       ))}
     </ol>
@@ -206,8 +185,8 @@ function PgSteps({ steps }) {
 function PgDiagnosis({ diagnosis, heading }) {
   if (!diagnosis) return null;
   return (
-    <div style={{ padding: '10px 12px', borderRadius: 'var(--r-card)', background: COLOR.surface, border: `1px solid ${COLOR.border}`, marginBottom: '10px', fontSize: '13px', lineHeight: 1.5 }}>
-      <div style={{ fontSize: '10.5px', fontWeight: 800, letterSpacing: '0.05em', textTransform: 'uppercase', color: COLOR.muted }}>{heading || 'First thing that is wrong'}</div>
+    <div style={{ padding: '10px 12px', borderRadius: 'var(--r-card)', background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderLeft: `3px solid ${COLOR.red}`, marginBottom: '10px', fontSize: '13px', lineHeight: 1.5 }}>
+      <div style={{ fontSize: '10.5px', textTransform: 'uppercase', color: COLOR.muted }}>{heading || 'First thing that is wrong'}</div>
       <div style={{ fontWeight: 800, margin: '2px 0' }}>{diagnosis.title}</div>
       <div>{diagnosis.text}</div>
       <div style={{ marginTop: '4px' }}><strong>Try:</strong> {diagnosis.fix}</div>
@@ -284,8 +263,8 @@ function PgPredict({ compute, causes, buttonLabel, onResult, resetKey }) {
           <div style={{ fontSize: '11.5px', color: COLOR.muted, marginTop: '6px' }}>Prediction score on this device: {store.right} / {store.total}</div>
         </div>
       )}
-      <button className="btn-3d" disabled={!ready} onClick={run}
-        style={{ width: '100%', padding: '11px', borderRadius: 'var(--r-ctl)', background: COLOR.primary, color: COLOR.onAccent, fontSize: '14px', fontWeight: 700, marginBottom: '12px', opacity: ready ? 1 : 0.5 }}>
+      <button disabled={!ready} onClick={run}
+        style={{ width: '100%', padding: '12px', borderRadius: 'var(--r-ctl)', border: 'none', background: COLOR.primary, color: COLOR.onAccent, fontSize: '14px', fontWeight: 700, marginBottom: '12px', opacity: ready ? 1 : 0.5 }}>
         {buttonLabel}
       </button>
       {feedback && (
@@ -335,12 +314,22 @@ function PgSharePanel({ topo, setTopo, reset, validate }) {
 /* ---------- the scenario picker and shell every guided tool uses ---------- */
 
 function PgScenarioPicker({ tool, scenarios, onPick, intro, note, sandboxText }) {
+  const solvedCount = scenarios.filter((s) => pgIsSolved(tool, s.id)).length;
   return (
     <div>
       <div style={{ fontSize: '13px', color: COLOR.muted, lineHeight: 1.55, marginBottom: note ? '8px' : '12px' }}>{intro}</div>
       {note ? <div style={{ fontSize: '11.5px', color: COLOR.muted, lineHeight: 1.5, marginBottom: '12px' }}>{note}</div> : null}
+      {scenarios.length > 0 && (
+        <div style={{ margin: '0 0 14px' }}>
+          <div className="flex justify-between" style={{ fontSize: '10.5px', textTransform: 'uppercase', color: COLOR.muted, marginBottom: '6px' }}>
+            <span>Scenarios fixed</span>
+            <span style={{ color: COLOR.text }}>{solvedCount} / {scenarios.length}</span>
+          </div>
+          <TickBar value={solvedCount} total={scenarios.length} ticks={scenarios.length} height={6} label={`${solvedCount} of ${scenarios.length} scenarios fixed`} />
+        </div>
+      )}
       <button className="btn-flat" onClick={() => onPick('sandbox')}
-        style={{ display: 'block', width: '100%', textAlign: 'left', marginBottom: '12px', padding: '14px 16px', borderRadius: 'var(--r-card)', background: tint(COLOR.gold, 10), border: `1px solid color-mix(in srgb, ${COLOR.gold} 45%, ${COLOR.border})`, color: COLOR.text, boxShadow: SHADOW.card }}>
+        style={{ display: 'block', width: '100%', textAlign: 'left', marginBottom: '12px', padding: '14px 16px', borderRadius: 'var(--r-card)', background: tint(COLOR.gold, 10), border: `1px solid color-mix(in srgb, ${COLOR.gold} 45%, ${COLOR.border})`, borderLeft: `3px solid ${COLOR.gold}`, color: COLOR.text }}>
         <div className="itil-display" style={{ fontSize: '15px', color: ink(COLOR.gold) }}>Free sandbox</div>
         <div style={{ fontSize: '12.5px', color: COLOR.muted, marginTop: '3px' }}>{sandboxText}</div>
       </button>
@@ -349,15 +338,15 @@ function PgScenarioPicker({ tool, scenarios, onPick, intro, note, sandboxText })
         if (!list.length) return null;
         return (
           <div key={lv} style={{ marginBottom: '8px' }}>
-            <div style={{ fontSize: '11px', fontWeight: 800, letterSpacing: '0.06em', textTransform: 'uppercase', color: ink(PG_LEVEL_HUE[lv]), margin: '10px 0 6px' }}>{PG_LEVEL_LABEL[lv]}</div>
+            <div style={{ fontSize: '10.5px', textTransform: 'uppercase', color: ink(PG_LEVEL_HUE[lv]), margin: '14px 2px 8px' }}>{PG_LEVEL_LABEL[lv]}</div>
             {list.map((s) => {
               const done = pgIsSolved(tool, s.id);
               return (
                 <button key={s.id} className="btn-flat" onClick={() => onPick(s.id)}
-                  style={{ display: 'block', width: '100%', textAlign: 'left', marginBottom: '8px', padding: '12px 14px', borderRadius: 'var(--r-card)', background: tint(PG_LEVEL_HUE[lv], 8), border: `1px solid color-mix(in srgb, ${PG_LEVEL_HUE[lv]} 38%, ${COLOR.border})`, color: COLOR.text }}>
-                  <div style={{ fontSize: '14px', fontWeight: 800, display: 'flex', justifyContent: 'space-between', gap: '8px' }}>
+                  style={{ display: 'block', width: '100%', textAlign: 'left', marginBottom: '8px', padding: '12px 14px', borderRadius: 'var(--r-card)', background: tint(PG_LEVEL_HUE[lv], 8), border: `1px solid color-mix(in srgb, ${PG_LEVEL_HUE[lv]} 35%, ${COLOR.border})`, borderLeft: `3px solid ${PG_LEVEL_HUE[lv]}`, color: COLOR.text }}>
+                  <div style={{ fontSize: '14px', fontWeight: 700, display: 'flex', justifyContent: 'space-between', gap: '8px' }}>
                     <span>{s.title}</span>
-                    {done && <span aria-label="Solved" style={{ color: ink(COLOR.success), flexShrink: 0 }}>✓ solved</span>}
+                    {done && <span aria-label="Solved" style={{ color: ink(COLOR.success), flexShrink: 0, fontSize: '10.5px', textTransform: 'uppercase' }}>✓ solved</span>}
                   </div>
                   <div style={{ fontSize: '12.5px', color: COLOR.muted, marginTop: '2px', lineHeight: 1.45 }}>{s.goal}</div>
                 </button>
@@ -381,8 +370,8 @@ function PgScenarioShell({ tool, scenario, onBack, renderLab, isSolved, fixLines
   const reset = () => { setTopo(pgClone(scenario.topology)); setHintsShown(0); setShowFix(false); };
   return (
     <div>
-      <button className="btn-flat" onClick={onBack} style={{ fontSize: '13px', fontWeight: 800, color: COLOR.muted, padding: '2px 0 10px' }}>‹ All scenarios</button>
-      <PgCard title={scenario.title} hue={COLOR.gold} right={<span style={{ fontSize: '10.5px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.05em', color: COLOR.muted }}>{PG_LEVEL_LABEL[scenario.level]}</span>}>
+      <button className="btn-flat" onClick={onBack} style={{ fontSize: '12.5px', fontWeight: 700, color: COLOR.muted, padding: '2px 0 12px' }}>‹ All scenarios</button>
+      <PgCard title={scenario.title} hue={COLOR.gold} right={<span style={{ fontSize: '10.5px', textTransform: 'uppercase', color: ink(PG_LEVEL_HUE[scenario.level]) }}>{PG_LEVEL_LABEL[scenario.level]}</span>}>
         <div style={{ fontSize: '13px', lineHeight: 1.55 }}>{scenario.story}</div>
         <div style={{ fontSize: '12.5px', color: COLOR.muted, marginTop: '6px' }}>Your job: find out what is wrong and fix it so the goal below turns green.</div>
       </PgCard>
@@ -411,7 +400,7 @@ function PgSandboxShell({ tool, makeDefault, validate, onBack, renderLab, blurb 
   const [topo, setTopo, reset] = usePgSandbox(tool, makeDefault, validate);
   return (
     <div>
-      <button className="btn-flat" onClick={onBack} style={{ fontSize: '13px', fontWeight: 800, color: COLOR.muted, padding: '2px 0 10px' }}>‹ All scenarios</button>
+      <button className="btn-flat" onClick={onBack} style={{ fontSize: '12.5px', fontWeight: 700, color: COLOR.muted, padding: '2px 0 12px' }}>‹ All scenarios</button>
       <PgCard title="Free sandbox" hue={COLOR.gold}>
         <div style={{ fontSize: '13px', lineHeight: 1.55 }}>{blurb}</div>
       </PgCard>
@@ -435,8 +424,8 @@ function PlaygroundLessonLink({ lesson }) {
       {links.map((l) => (
         <button key={`${l.tool}/${l.pick || ''}`} className="btn-flat"
           onClick={() => { window.location.hash = `/playground/${l.tool}${l.pick ? `/${l.pick}` : ''}`; }}
-          style={{ display: 'block', width: '100%', textAlign: 'left', marginBottom: '8px', padding: '12px 14px', borderRadius: 'var(--r-card)', background: tint(COLOR.success, 10), border: `1px solid color-mix(in srgb, ${COLOR.success} 40%, ${COLOR.border})`, color: COLOR.text }}>
-          <div style={{ fontSize: '11px', fontWeight: 800, letterSpacing: '0.05em', textTransform: 'uppercase', color: ink(COLOR.success) }}>Try it in the Playground</div>
+          style={{ display: 'block', width: '100%', textAlign: 'left', marginBottom: '8px', padding: '12px 14px', borderRadius: 'var(--r-card)', background: tint(COLOR.success, 10), border: `1px solid color-mix(in srgb, ${COLOR.success} 40%, ${COLOR.border})`, borderLeft: `3px solid ${COLOR.success}`, color: COLOR.text }}>
+          <div style={{ fontSize: '10.5px', textTransform: 'uppercase', color: ink(COLOR.success) }}>Try it in the Playground</div>
           <div style={{ fontSize: '14px', fontWeight: 800, marginTop: '1px' }}>{l.label}</div>
           {l.blurb ? <div style={{ fontSize: '12.5px', color: COLOR.muted, marginTop: '2px', lineHeight: 1.45 }}>{l.blurb}</div> : null}
         </button>

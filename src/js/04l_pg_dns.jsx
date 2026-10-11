@@ -30,7 +30,7 @@ const PG_DNS_ADVANCES = [{ label: '+1 minute', sec: 60 }, { label: '+10 minutes'
 
 const pgDnsAddBtn = { fontSize: '12.5px', fontWeight: 800, color: ink(COLOR.blue), padding: '6px 0', minHeight: '36px' };
 const pgDnsDelBtn = { width: '36px', height: '36px', color: COLOR.muted, flexShrink: 0 };
-const pgDnsMono = { fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace' };
+const pgDnsMono = { fontFamily: 'var(--font-mono)' };
 
 function pgDnsClip(s, k) { const t = String(s == null ? '' : s); return t.length > k ? `${t.slice(0, k - 1)}…` : t; }
 function pgDnsSplitList(v) { return String(v || '').split(',').map((x) => x.trim()).filter(Boolean); }

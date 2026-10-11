@@ -201,7 +201,7 @@ function PgMacTables({ topo, state, onClear }) {
       {rows.length === 0 ? (
         <div style={{ fontSize: '12.5px', color: COLOR.muted, lineHeight: 1.5 }}>Empty. Switches learn which port a device is behind from the source address of each frame they see. Until then they flood. Ping to fill the tables, then ping again and watch the second pass go straight to one port.</div>
       ) : (
-        <div style={{ fontSize: '12px', fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace' }}>
+        <div style={{ fontSize: '12px', fontFamily: 'var(--font-mono)' }}>
           <div style={{ display: 'grid', gridTemplateColumns: '0.9fr 0.7fr 1fr 1fr', gap: '4px', color: COLOR.muted, fontWeight: 800, paddingBottom: '3px' }}><span>Switch</span><span>VLAN</span><span>MAC</span><span>Port</span></div>
           {rows.map((r, i) => (
             <div key={i} style={{ display: 'grid', gridTemplateColumns: '0.9fr 0.7fr 1fr 1fr', gap: '4px', padding: '2px 0', borderTop: `1px solid ${COLOR.border}` }}>

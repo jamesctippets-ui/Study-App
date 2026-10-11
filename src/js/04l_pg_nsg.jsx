@@ -10,7 +10,7 @@
 
 const PG_NSG_UI_HUE = { allowed: COLOR.success, blocked: COLOR.red, notreached: COLOR.muted, none: COLOR.muted };
 const PG_NSG_UI_MARK = { allowed: '✓', blocked: '✕', notreached: '○', none: '–' };
-const PG_NSG_UI_MONO = 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace';
+const PG_NSG_UI_MONO = 'var(--font-mono)';
 const PG_NSG_UI_PORTS = ['22', '80', '443', '1433', '3389', '8080'];
 const PG_NSG_UI_NSG_HUES = [COLOR.blue, COLOR.pink, COLOR.orange, COLOR.teal];
 
