@@ -5958,8 +5958,8 @@ function normalizeSrs(raw) {
 function isHubMode(m) { return m === 'home' || m === 'profile' || m === 'playground'; }
 
 // The Playground's tools register themselves (see 04h_playground_ui.jsx); pgToolKeys() lists them.
-function routeToHash(mode, trackKey, learnView, quizView, playgroundTool, playgroundPick) {
-  if (mode === 'path') return `#/${trackKey}/path`;
+function routeToHash(mode, trackKey, learnView, quizView, playgroundTool, playgroundPick, pathPanel) {
+  if (mode === 'path') return pathPanel === 'weak' ? `#/${trackKey}/path/weak` : `#/${trackKey}/path`;
   if (mode === 'learn') return `#/${trackKey}/reference/${learnView}`;
   if (mode === 'quiz') return `#/${trackKey}/practice/${quizView}`;
   if (mode === 'exam') return `#/${trackKey}/exam`;
@@ -5985,7 +5985,7 @@ function parseHash(hash, validTrackKeys) {
   }
   const [trackKey, mode, sub] = parts;
   if (!validTrackKeys.has(trackKey)) return { mode: 'home' };
-  if (mode === 'path') return { mode: 'path', trackKey };
+  if (mode === 'path') return { mode: 'path', trackKey, panel: sub === 'weak' ? 'weak' : 'course' };
   if (mode === 'reference' || mode === 'learn') return { mode: 'learn', trackKey, learnView: ['cards', 'study', 'sheet'].includes(sub) ? sub : 'study' };
   if (mode === 'practice' || mode === 'quiz') return { mode: 'quiz', trackKey, quizView: ['questions', 'match', 'verbal', 'commands', 'madlibs', 'sequence', 'casestudy', 'compare'].includes(sub) ? sub : 'questions' };
   if (mode === 'exam') return { mode: 'exam', trackKey };
@@ -6224,6 +6224,8 @@ function emptyStats() {
     pathVersion: PATH_PROGRESS_VERSION,
     activityLog: {},
     profile: { name: '', hue: 'primary' },
+    missLog: {},
+    weakPath: {},
   };
 }
 
@@ -6257,6 +6259,8 @@ function normalizeStats(raw) {
     pathVersion: Number.isFinite(raw.pathVersion) ? raw.pathVersion : 0,
     activityLog: normalizeActivityLog(raw.activityLog),
     profile: normalizeProfile(raw.profile),
+    missLog: normalizeMissLog(raw.missLog),
+    weakPath: normalizeWeakPath(raw.weakPath),
   };
 }
 
@@ -10319,6 +10323,393 @@ function pgVpnApplyFixes(topo, fixes) {
   return t;
 }
 
+/* ---------------- weak subjects: what to review, and in what order ---------------- */
+
+// Pure logic (no React, no DOM; tested in Node by tools/check_weak_path.js).
+//
+// The app only keeps the LAST outcome of each question in `results`, which says
+// "you got it wrong" but not "you keep getting it wrong". `stats.missLog` adds the
+// missing history for items that have ever been missed: how many times, how many
+// correct answers since, and the date of the last miss. From those two sources
+// (plus tough flashcards from spaced repetition) weakAnalyze() decides which
+// LESSONS need another pass, ranks them, and says why. A snapshot of that ranking
+// becomes the learner's "weak subjects" path: for each weak lesson a re-read,
+// targeted flashcards, a quiz built around the misses, and a retest, in priority
+// order instead of course order.
+
+const WEAK_MAX_UNITS = 6;
+const WEAK_MIN_SCORE = 0.9;          // below this a lesson is not worth a detour
+const WEAK_CARDS_PER_UNIT = 8;
+const WEAK_FIX_QUESTIONS = 10;
+const WEAK_FRESH_QUESTIONS = 3;      // new questions mixed in with the misses
+const WEAK_RETEST_QUESTIONS = 6;
+const WEAK_PASS_PCT = 70;
+const WEAK_TIERS = ['critical', 'high', 'watch'];
+const WEAK_TIER_LABEL = { critical: 'Top priority', high: 'Needs work', watch: 'Keep an eye on' };
+
+/* ---- the miss log ---- */
+
+// { [trackKey]: { [itemId]: { m: times missed, c: correct answers since, l: 'YYYY-MM-DD' of the last miss } } }
+function normalizeMissLog(raw) {
+  const out = {};
+  if (!raw || typeof raw !== 'object') return out;
+  Object.keys(raw).forEach((tk) => {
+    const t = raw[tk];
+    if (!t || typeof t !== 'object') return;
+    const clean = {};
+    Object.keys(t).forEach((id) => {
+      const e = t[id];
+      if (e && Number.isFinite(e.m) && e.m > 0) {
+        clean[id] = { m: Math.min(Math.floor(e.m), 99), c: Number.isFinite(e.c) && e.c > 0 ? Math.min(Math.floor(e.c), 99) : 0, l: typeof e.l === 'string' ? e.l : null };
+      }
+    });
+    if (Object.keys(clean).length) out[tk] = clean;
+  });
+  return out;
+}
+
+// Items never missed leave no entry, so the log stays as small as the set of things
+// you have actually struggled with.
+function recordMissLog(log, trackKey, id, outcome, today) {
+  const base = log || {};
+  const track = base[trackKey] || {};
+  const e = track[id];
+  if (outcome === 'incorrect') {
+    const next = { m: Math.min(((e && e.m) || 0) + 1, 99), c: (e && e.c) || 0, l: today };
+    return { ...base, [trackKey]: { ...track, [id]: next } };
+  }
+  if (outcome === 'correct' && e) {
+    return { ...base, [trackKey]: { ...track, [id]: { ...e, c: Math.min(e.c + 1, 99) } } };
+  }
+  return base;
+}
+
+/* ---- relevance of a flashcard to the questions you missed ---- */
+
+const WEAK_STOP = new Set(['the', 'and', 'for', 'are', 'that', 'this', 'with', 'from', 'not', 'when', 'how', 'what', 'which', 'you', 'your', 'can', 'will', 'its', 'has', 'have', 'into', 'than', 'then', 'they', 'them', 'was', 'were', 'but', 'all', 'any', 'one', 'use', 'used', 'using']);
+
+function weakTokens(text) {
+  return (String(text || '').toLowerCase().match(/[a-z0-9][a-z0-9+#.\-]*/g) || []).filter((t) => t.length > 2 && !WEAK_STOP.has(t));
+}
+
+function weakQuestionText(q) {
+  return [q.question, ...(q.options || []), q.explanation || ''].join(' ');
+}
+
+function weakCardRelevance(card, tokenSet, haystack) {
+  const front = String(card.front || '').toLowerCase().replace(/\s*\([^)]*\)\s*/g, ' ').trim();
+  let s = 0;
+  if (front.length > 2 && haystack.includes(front)) s += 4;
+  const ft = weakTokens(front);
+  if (ft.length) s += (3 * ft.filter((t) => tokenSet.has(t)).length) / ft.length;
+  const abbr = (String(card.front || '').match(/\(([A-Za-z0-9]{2,8})\)/) || [])[1];
+  if (abbr && haystack.includes(abbr.toLowerCase())) s += 2;
+  return s;
+}
+
+/* ---- the analysis ---- */
+
+function weakTierFor(priority, max, rate, missed) {
+  const rel = priority >= 0.66 * max ? 'critical' : priority >= 0.33 * max ? 'high' : 'watch';
+  const abs = priority >= 2.2 ? 'critical' : priority >= 1.2 ? 'high' : 'watch';
+  let tier = WEAK_TIERS[Math.max(WEAK_TIERS.indexOf(rel), WEAK_TIERS.indexOf(abs))];
+  if (rate >= 0.5 && missed >= 3) tier = 'critical';
+  return tier;
+}
+
+function weakReason(row) {
+  const parts = [];
+  if (row.missed.length) {
+    parts.push(row.attempted > row.missed.length
+      ? `You missed ${row.missed.length} of the ${row.attempted} questions you have answered here`
+      : `You missed ${row.missed.length} question${row.missed.length === 1 ? '' : 's'} here`);
+  }
+  const recent = row.missed.filter((m) => m.days !== null && m.days <= 14).length;
+  const repeat = row.missed.filter((m) => m.misses >= 2).length;
+  const extras = [];
+  if (recent && recent !== row.missed.length) extras.push(`${recent} in the last two weeks`);
+  if (repeat) extras.push(`${repeat} more than once`);
+  if (extras.length && parts.length) parts[0] += ` (${extras.join(', ')})`;
+  if (row.tough.length) parts.push(`${row.tough.length} flashcard${row.tough.length === 1 ? '' : 's'} you rated as tough`);
+  if (row.games.length) parts.push(`${row.games.length} mini-game${row.games.length === 1 ? '' : 's'} you got wrong`);
+  if (row.cases) parts.push(`${row.cases} case-study question${row.cases === 1 ? '' : 's'} missed`);
+  let text = parts.join('; ');
+  if (!text) text = 'Flagged from earlier misses';
+  if (row.marks) text += `. This area is about ${Math.round(row.marks)}% of the exam`;
+  return `${text}.`;
+}
+
+// Everything the "weak spots" screens need for one cert.
+function weakAnalyze(trackKey, results, seenLog, srs, missLog, today) {
+  const mod = DATA[trackKey];
+  const empty = { trackKey, hasData: false, attempted: 0, units: [], categories: [], totals: { missed: 0, recovered: 0, tough: 0 } };
+  if (!mod) return empty;
+  const tr = results || {};
+  const ml = (missLog && missLog[trackKey]) || {};
+  const units = buildPathUnits(trackKey);
+  const catByKey = new Map((mod.categories || []).map((c) => [c.key, c]));
+  const nCats = (mod.categories || []).length || 1;
+
+  const unitOfId = new Map();
+  units.forEach((u) => {
+    u.poolIds.forEach((id) => { if (!unitOfId.has(id)) unitOfId.set(id, u.index); });
+    u.games.forEach((g) => { if (g.id && !unitOfId.has(g.id)) unitOfId.set(g.id, u.index); });
+  });
+  const unitOfCard = new Map();
+  units.forEach((u) => [...u.coreCardIds, ...u.extraCardIds].forEach((id) => { if (!unitOfCard.has(id)) unitOfCard.set(id, u.index); }));
+  const unitByCat = (cat) => { const u = units.find((x) => x.cats.includes(cat)); return u ? u.index : -1; };
+
+  const rows = units.map((u) => ({ unit: u, score: 0, attempted: 0, missed: [], recovered: [], games: [], tough: [], cases: 0 }));
+  const cats = {};
+  const catRow = (k) => (cats[k] = cats[k] || { key: k, attempted: 0, missed: 0, score: 0 });
+  let attempted = 0;
+  let recovered = 0;
+
+  mod.questions.forEach((q) => {
+    const r = tr[q.id];
+    if (!r) return;
+    attempted += 1;
+    const idx = unitOfId.has(q.id) ? unitOfId.get(q.id) : unitByCat(q.cat);
+    const c = catRow(q.cat);
+    c.attempted += 1;
+    if (idx >= 0) rows[idx].attempted += 1;
+    const e = ml[q.id];
+    if (r === 'incorrect') {
+      const days = e && e.l ? Math.max(0, daysBetween(e.l, today)) : null;
+      const recency = days === null ? 0.85 : days <= 7 ? 1 : days <= 14 ? 0.9 : days <= 30 ? 0.8 : 0.65;
+      const repeat = e ? Math.max(0, Math.min(e.m, 4) - 1) : 0;
+      const score = (1 + 0.25 * repeat) * recency;
+      c.missed += 1;
+      c.score += score;
+      if (idx >= 0) { rows[idx].score += score; rows[idx].missed.push({ q, misses: e ? e.m : 1, lastMiss: e ? e.l : null, days, score }); }
+    } else if (r === 'correct' && e && e.m > 0) {
+      recovered += 1;
+      if (idx >= 0) { rows[idx].score += 0.1 * Math.min(e.m, 3); rows[idx].recovered.push({ q, misses: e.m }); }
+    }
+  });
+
+  // Flashcards you rated as tough (spaced repetition) or last answered wrongly.
+  const toughSet = new Set(toughCardIds((srs && srs[trackKey]) || {}, mod.flashcards));
+  let toughTotal = 0;
+  mod.flashcards.forEach((card) => {
+    if (!(toughSet.has(card.id) || tr[card.id] === 'incorrect')) return;
+    toughTotal += 1;
+    const idx = unitOfCard.has(card.id) ? unitOfCard.get(card.id) : unitByCat(card.cat);
+    if (idx < 0 || rows[idx].tough.length >= 6) return;
+    rows[idx].score += 0.35;
+    rows[idx].tough.push(card);
+    catRow(card.cat).score += 0.2;
+  });
+
+  // Mini-games and case studies you got wrong.
+  [['madlib', mod.madlibs], ['sequence', mod.sequences], ['compare', mod.compare]].forEach(([kind, list]) => {
+    (list || []).forEach((g) => {
+      if (tr[g.id] !== 'incorrect') return;
+      const idx = unitOfId.has(g.id) ? unitOfId.get(g.id) : unitByCat(g.cat);
+      if (idx < 0) return;
+      rows[idx].score += 0.6;
+      rows[idx].games.push({ kind, id: g.id, cat: g.cat });
+      catRow(g.cat).score += 0.4;
+    });
+  });
+  (mod.caseStudies || []).forEach((cs) => {
+    const n = cs.questions.filter((q) => tr[q.id] === 'incorrect').length;
+    if (!n) return;
+    const idx = unitByCat(cs.cat);
+    if (idx < 0) return;
+    rows[idx].score += 0.6 * n;
+    rows[idx].cases += n;
+    catRow(cs.cat).score += 0.4 * n;
+  });
+
+  const clamp = (x, lo, hi) => Math.max(lo, Math.min(hi, x));
+  const total = rows.length || 1;
+  const ranked = rows
+    .map((row) => {
+      const marksList = row.unit.cats.map((k) => (catByKey.get(k) || {}).marks).filter((m) => Number.isFinite(m));
+      const marks = marksList.length ? marksList.reduce((s, m) => s + m, 0) / marksList.length : 0;
+      const weight = marks ? clamp(marks / (100 / nCats), 0.7, 1.5) : 1;
+      const rate = row.attempted ? Math.min(1, row.missed.length / row.attempted) : 0;
+      const priority = row.score * (0.6 + 0.8 * rate) * weight;
+      const order = priority * (1 + (0.04 * (total - row.unit.index)) / total); // earlier lessons win ties
+      return { ...row, marks, weight, rate, priority, order };
+    })
+    .filter((row) => row.score >= WEAK_MIN_SCORE)
+    .sort((a, b) => b.order - a.order);
+
+  const max = ranked.length ? ranked[0].priority : 0;
+  ranked.forEach((row) => {
+    row.tier = weakTierFor(row.priority, max, row.rate, row.missed.length);
+    row.reason = weakReason(row);
+    // Cards to review: the ones that match the missed questions, tough ones first.
+    const missedText = row.missed.map((m) => weakQuestionText(m.q)).join(' ').toLowerCase();
+    const tokenSet = new Set(weakTokens(missedText));
+    const toughIds = new Set(row.tough.map((c) => c.id));
+    const byId = new Map(mod.flashcards.map((c) => [c.id, c]));
+    const pool = [...row.unit.coreCardIds, ...row.unit.extraCardIds, ...row.tough.map((c) => c.id)]
+      .filter((id, i, a) => a.indexOf(id) === i)
+      .map((id) => byId.get(id))
+      .filter(Boolean);
+    const scored = pool
+      .map((card) => ({ card, s: weakCardRelevance(card, tokenSet, missedText) + (toughIds.has(card.id) ? 3 : 0) }))
+      .sort((a, b) => b.s - a.s);
+    let picks = scored.filter((x) => x.s > 0.9).map((x) => x.card);
+    if (picks.length < 4) picks = picks.concat(row.unit.coreCardIds.map((id) => byId.get(id)).filter((c) => c && !picks.includes(c)));
+    row.cards = picks.slice(0, WEAK_CARDS_PER_UNIT);
+    // Readings: the lesson itself, plus official resources of the weakest categories.
+    const resources = [];
+    row.unit.cats.forEach((k) => ((catByKey.get(k) || {}).resources || []).forEach((r) => { if (resources.length < 3 && !resources.some((x) => x.url === r.url)) resources.push(r); }));
+    row.readings = { lesson: row.unit.lesson, minutes: estimateReadMinutes(row.unit.lesson.reading), resources };
+  });
+
+  const categories = Object.values(cats)
+    .filter((c) => c.score > 0)
+    .map((c) => {
+      const cat = catByKey.get(c.key) || {};
+      return { key: c.key, label: cat.label || c.key, marks: cat.marks || 0, attempted: c.attempted, missed: c.missed, score: c.score, pctMissed: c.attempted ? Math.round((c.missed / c.attempted) * 100) : 0 };
+    })
+    .sort((a, b) => b.score * (b.marks || 1) - a.score * (a.marks || 1));
+
+  return {
+    trackKey, hasData: attempted > 0, attempted, units: ranked, categories,
+    totals: { missed: ranked.reduce((n, r) => n + r.missed.length, 0), recovered, tough: toughTotal },
+  };
+}
+
+/* ---- the weak subjects path ---- */
+
+// A stable snapshot of the ranking: the learner works through this list even as
+// their results change, and rebuilds it when they want a fresh look.
+function buildWeakSnapshot(analysis, today, limit) {
+  const picks = analysis.units.slice(0, limit || WEAK_MAX_UNITS);
+  return {
+    created: today,
+    units: picks.map((r) => ({
+      lessonId: r.unit.id,
+      tier: r.tier,
+      priority: Math.round(r.priority * 100) / 100,
+      why: r.reason,
+      missedIds: r.missed.map((m) => m.q.id),
+      cardIds: r.cards.map((c) => c.id),
+      games: r.games.slice(0, 2).map((g) => ({ kind: g.kind, id: g.id, cat: g.cat })),
+      baselineMissed: r.missed.length,
+      baselineAttempted: r.attempted,
+    })),
+  };
+}
+
+function normalizeWeakPath(raw) {
+  const out = {};
+  if (!raw || typeof raw !== 'object') return out;
+  Object.keys(raw).forEach((tk) => {
+    const e = raw[tk];
+    const snap = e && e.snapshot;
+    if (!snap || typeof snap !== 'object' || !Array.isArray(snap.units) || !snap.units.length) return;
+    const strs = (a) => (Array.isArray(a) ? a.filter((x) => typeof x === 'string').slice(0, 60) : []);
+    const units = snap.units.slice(0, 12).filter((u) => u && typeof u.lessonId === 'string').map((u) => ({
+      lessonId: u.lessonId,
+      tier: WEAK_TIERS.includes(u.tier) ? u.tier : 'high',
+      priority: Number.isFinite(u.priority) ? u.priority : 0,
+      why: typeof u.why === 'string' ? u.why.slice(0, 400) : '',
+      missedIds: strs(u.missedIds),
+      cardIds: strs(u.cardIds),
+      games: (Array.isArray(u.games) ? u.games : []).filter((g) => g && typeof g.id === 'string' && ['madlib', 'sequence', 'compare'].includes(g.kind)).slice(0, 2).map((g) => ({ kind: g.kind, id: g.id, cat: g.cat })),
+      baselineMissed: Number.isFinite(u.baselineMissed) ? u.baselineMissed : 0,
+      baselineAttempted: Number.isFinite(u.baselineAttempted) ? u.baselineAttempted : 0,
+    }));
+    if (!units.length) return;
+    const done = {};
+    const rawDone = e.done && typeof e.done === 'object' ? e.done : {};
+    Object.keys(rawDone).forEach((id) => {
+      const d = rawDone[id];
+      if (d && typeof d === 'object') done[id] = { at: typeof d.at === 'string' ? d.at : null, pct: Number.isFinite(d.pct) ? d.pct : null, via: null };
+    });
+    out[tk] = { snapshot: { created: typeof snap.created === 'string' ? snap.created : null, units }, done };
+  });
+  return out;
+}
+
+function createWeakPath(weakPath, trackKey, snapshot) {
+  return { ...(weakPath || {}), [trackKey]: { snapshot, done: {} } };
+}
+
+function markWeakStepDone(weakPath, trackKey, stepId, pct, today) {
+  const base = weakPath || {};
+  const cur = base[trackKey];
+  if (!cur) return base;
+  return { ...base, [trackKey]: { ...cur, done: { ...cur.done, [stepId]: { at: today, pct: Number.isFinite(pct) ? pct : null, via: null } } } };
+}
+
+function clearWeakPath(weakPath, trackKey) {
+  const base = { ...(weakPath || {}) };
+  delete base[trackKey];
+  return base;
+}
+
+// Turns a snapshot into units the Path step runner understands (see buildPathUnits):
+// re-read, targeted flashcards, a quiz built around the misses, an optional game,
+// and a retest. Ids are prefixed so they can never collide with the course path's.
+function buildWeakUnits(trackKey, snapshot) {
+  const mod = DATA[trackKey];
+  if (!mod || !snapshot) return [];
+  const base = new Map(buildPathUnits(trackKey).map((u) => [u.id, u]));
+  const qIds = new Set(mod.questions.map((q) => q.id));
+  const cardIds = new Set(mod.flashcards.map((c) => c.id));
+  const out = [];
+  snapshot.units.forEach((su) => {
+    const b = base.get(su.lessonId);
+    if (!b) return;
+    const lesson = b.lesson;
+    const missed = su.missedIds.filter((id) => qIds.has(id));
+    const cards = su.cardIds.filter((id) => cardIds.has(id));
+    const fixPool = [...missed, ...b.poolIds.filter((id) => !missed.includes(id))];
+    const steps = [];
+    const add = (kind, spec) => steps.push({ id: `weak::${lesson.id}::${kind}`, kind, ...spec });
+    if (lesson.reading) add('read', { label: 'Re-read the lesson', meta: `${estimateReadMinutes(lesson.reading)} min read` });
+    if (cards.length) add('cards', { label: 'Targeted flashcards', meta: `${cards.length} cards`, cardIds: cards });
+    if (missed.length) {
+      const count = Math.min(WEAK_FIX_QUESTIONS, missed.length + WEAK_FRESH_QUESTIONS);
+      add('weakquiz', { label: 'Fix your misses', meta: `${count} questions`, missedIds: missed, poolIds: fixPool, count });
+    }
+    const game = (su.games || [])[0];
+    if (game) add('game', { label: PATH_GAME_LABELS[game.kind] || 'Mini-game', meta: 'Mini-game', game });
+    if (b.poolIds.length) add('retest', { label: 'Retest', meta: `${Math.min(WEAK_RETEST_QUESTIONS, b.poolIds.length)} questions · ${WEAK_PASS_PCT}% to pass`, poolIds: b.poolIds, count: WEAK_RETEST_QUESTIONS });
+    if (!steps.length) return;
+    out.push({
+      id: lesson.id, index: out.length, weak: true, tier: su.tier, priority: su.priority, why: su.why,
+      lesson, title: lesson.title, summary: lesson.summary, cats: b.cats, poolIds: b.poolIds, steps,
+      baselineMissed: su.baselineMissed, baselineAttempted: su.baselineAttempted,
+      coreCardIds: b.coreCardIds, extraCardIds: [], extraQuestionIds: [], games: [], coreGame: null,
+    });
+  });
+  return out;
+}
+
+// How much of what the path set out to fix is actually fixed now.
+function weakPathOutcome(snapshot, results) {
+  const tr = results || {};
+  const units = snapshot.units.map((su) => {
+    const now = su.missedIds.filter((id) => tr[id] === 'incorrect').length;
+    return { lessonId: su.lessonId, baseline: su.missedIds.length, now, fixed: Math.max(0, su.missedIds.length - now) };
+  });
+  return {
+    units,
+    baseline: units.reduce((n, u) => n + u.baseline, 0),
+    now: units.reduce((n, u) => n + u.now, 0),
+    fixed: units.reduce((n, u) => n + u.fixed, 0),
+  };
+}
+
+// For the Home card: the top weak lessons of each cert in the plan.
+function weakSummaryForTracks(trackKeys, results, seenLog, srs, missLog, today) {
+  return trackKeys
+    .map((key) => {
+      const a = weakAnalyze(key, (results && results[key]) || {}, (seenLog && seenLog[key]) || {}, srs, missLog, today);
+      return { trackKey: key, units: a.units, totals: a.totals, hasData: a.hasData };
+    })
+    .filter((s) => s.units.length);
+}
+
 /* ---------------- shared UI: home & cert path ---------------- */
 
 function AchievementToast({ achievement }) {
@@ -10945,7 +11336,7 @@ function CertPathHomeSection({ pathOrder, results, certPlan, studyingKey, pathPr
 // for that split. Reachable again from any track's Learn/Quiz/Exam view
 // via the header's home icon; the header's hamburger (Manage cert path)
 // is reachable from every mode including this one.
-function HomeView({ tracks, results, seenLog, stats, certPlan, speech, srs, makePathApi, onSetHomePathMode, onSetHomePathOrder, onSetReviewReminder, onReviewStarted, onResume, onSelectTrack, onAddToPath, onOpenAbout, onOpenGlossary, onOpenPlayground, onSetGoalTarget, onAnswerDailyQuestion, onRevealDailyVocab, footerNote }) {
+function HomeView({ tracks, results, seenLog, stats, certPlan, speech, srs, makePathApi, onSetHomePathMode, onSetHomePathOrder, onSetReviewReminder, onReviewStarted, onResume, onSelectTrack, onAddToPath, onOpenAbout, onOpenGlossary, onOpenPlayground, onOpenWeak, onSetGoalTarget, onAnswerDailyQuestion, onRevealDailyVocab, footerNote }) {
   const masteries = tracks.map((t) => ({ track: t, pct: trackMastery(t.key, results) }));
   const overallAvg = masteries.length ? Math.round(masteries.reduce((s, m) => s + m.pct, 0) / masteries.length) : 0;
   const lastVisited = stats.lastVisited;
@@ -11014,6 +11405,11 @@ function HomeView({ tracks, results, seenLog, stats, certPlan, speech, srs, make
   const [homeRun, setHomeRun] = useState(null);
   const startHomeRun = (e) => setHomeRun({ kind: 'step', trackKey: e.trackKey, doneKey: e.doneKey, unit: e.unit, step: e.step, nonce: Date.now() });
   const skipHomeStep = (e) => makePathApi(e.doneKey || e.trackKey).skipStep(e.step.id);
+  const weakSummaries = useMemo(
+    () => weakSummaryForTracks(pathKeys, results, seenLog, srs, stats.missLog, todayString()),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [pathKeys.join(','), results, srs, stats.missLog],
+  );
 
   if (homeRun && homeRun.kind !== 'step') {
     return (
@@ -11087,6 +11483,10 @@ function HomeView({ tracks, results, seenLog, stats, certPlan, speech, srs, make
           onSetReminder={onSetReviewReminder}
           onStartReview={(kind) => { onReviewStarted(); setHomeRun({ kind, nonce: Date.now() }); }}
         />
+      )}
+
+      {pathOrder.length > 0 && weakSummaries.length > 0 && (
+        <HomeWeakSpotsCard summaries={weakSummaries} trackLabel={(k) => (tracks.find((t) => t.key === k) || { label: k }).label} onOpen={onOpenWeak} />
       )}
 
       {/* The path hero already shows the up-next track's own readiness, so
@@ -14300,6 +14700,7 @@ function PathIcon({ kind, size = 20 }) {
       return <svg {...common}><polygon points="12 2 2 7 12 12 22 7 12 2" /><polyline points="2 17 12 22 22 17" /><polyline points="2 12 12 17 22 12" /></svg>;
     case 'quiz':
     case 'quiz2':
+    case 'weakquiz':
       return <svg {...common}><circle cx="12" cy="12" r="10" /><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" /><line x1="12" y1="17" x2="12.01" y2="17" /></svg>;
     case 'game':
     case 'game2':
@@ -14311,6 +14712,7 @@ function PathIcon({ kind, size = 20 }) {
     case 'apply':
       return <svg {...common}><rect x="2" y="7" width="20" height="14" rx="2" ry="2" /><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" /></svg>;
     case 'checkpoint':
+    case 'retest':
       return <svg {...common}><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z" /><line x1="4" y1="22" x2="4" y2="15" /></svg>;
     case 'lock':
       return <svg {...common}><rect x="4" y="11" width="16" height="10" rx="2" /><path d="M8 11V7a4 4 0 0 1 8 0v4" /></svg>;
@@ -14647,7 +15049,7 @@ function PathStepComplete({ unit, step, pct, unitComplete, testedOut, next, onNe
   const { streak, goalCount, goalTarget } = React.useContext(ProgressSummaryContext);
   const hasScore = pct !== null && pct !== undefined;
   const stars = !hasScore ? 0 : pct >= 90 ? 3 : pct >= 70 ? 2 : 1;
-  const eyebrow = unitComplete ? 'Unit conquered!' : testedOut ? 'Skipped ahead!'
+  const eyebrow = unitComplete ? (unit.weak ? 'Weak spot reviewed!' : 'Unit conquered!') : testedOut ? 'Skipped ahead!'
     : !hasScore ? 'Nice work!' : pct >= 90 ? 'Perfect!' : pct >= 70 ? 'Great work!' : 'Keep going!';
   const confetti = unitComplete ? 34 : testedOut ? 22 : stars === 3 ? 18 : 0;
   useEffect(() => {
@@ -14665,7 +15067,7 @@ function PathStepComplete({ unit, step, pct, unitComplete, testedOut, next, onNe
         </div>
         <div className="rise-in" style={{ animationDelay: '0.15s', fontSize: '13px', fontWeight: 900, letterSpacing: '0.08em', textTransform: 'uppercase', color: unitComplete ? COLOR.gold : COLOR.success, marginTop: '16px' }}>{eyebrow}</div>
         <div className="itil-display rise-in" style={{ animationDelay: '0.2s', fontSize: '24px', marginTop: '2px' }}>
-          {testedOut ? 'Tested out' : unitComplete ? 'Unit complete' : 'Step complete'}
+          {testedOut ? 'Tested out' : unitComplete ? (unit.weak ? 'Weak spot reviewed' : 'Unit complete') : 'Step complete'}
         </div>
         <div className="rise-in" style={{ animationDelay: '0.25s', fontSize: '14px', color: COLOR.muted, marginTop: '6px', lineHeight: 1.5 }}>
           {testedOut ? `You tested out of ${unit.title} at ${pct}%.` : unitComplete ? `You've finished every step of ${unit.title}.` : step.label}
@@ -14739,7 +15141,17 @@ function buildStepPayload(trackKey, units, results, seenLog, api, unit, step) {
     case 'quick':
     case 'testout':
     case 'review':
+    case 'retest':
       return { questions: preparedQuestions(poolQuestions(step.poolIds), step.count) };
+    case 'weakquiz': {
+      // The questions you missed come first; fresh ones from the same lesson fill the rest.
+      const missedQs = poolQuestions(step.missedIds || []).slice(0, step.count);
+      const fresh = poolQuestions(step.poolIds.filter((id) => !(step.missedIds || []).includes(id)));
+      const extra = pickRotated(fresh, Math.min(Math.max(0, step.count - missedQs.length), fresh.length), seenLog);
+      const prepared = shuffleArray([...missedQs, ...extra]).map(prepareQuestion);
+      api.markSeen(prepared.map((q) => q.id));
+      return { questions: prepared };
+    }
     case 'match':
       return { kind: 'match', cards: step.cardIds.map((id) => flashById.get(id)).filter(Boolean) };
     case 'checkpoint': {
@@ -14799,7 +15211,7 @@ function PathStepRunner({ trackKey, units, unit, step, results, seenLog, categor
         continueLabel="Continue ›"
       />
     );
-  } else if (step.kind === 'quiz' || step.kind === 'quiz2' || step.kind === 'quick' || step.kind === 'checkpoint' || step.kind === 'testout' || step.kind === 'review') {
+  } else if (step.kind === 'quiz' || step.kind === 'quiz2' || step.kind === 'quick' || step.kind === 'checkpoint' || step.kind === 'testout' || step.kind === 'review' || step.kind === 'weakquiz' || step.kind === 'retest') {
     runner = (
       <PathQuizStep
         key={runnerKey}
@@ -14846,7 +15258,7 @@ function PathStepRunner({ trackKey, units, unit, step, results, seenLog, categor
       </button>
       <div style={{ marginBottom: '14px' }}>
         <div style={{ fontSize: '11.5px', color: COLOR.muted, textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 600 }}>
-          {step.kind === 'review' ? 'Spaced review' : step.kind === 'bridge' ? 'Optional · Cross-cert bridge' : `${certLabel ? certLabel + ' · ' : ''}Unit ${unit.index + 1} · ${unit.title}${step.optional ? ' · Optional' : ''}`}
+          {step.kind === 'review' ? 'Spaced review' : step.kind === 'bridge' ? 'Optional · Cross-cert bridge' : `${certLabel ? certLabel + ' · ' : ''}${unit.weak ? 'Weak spot' : 'Unit'} ${unit.index + 1} · ${unit.title}${step.optional ? ' · Optional' : ''}`}
         </div>
         <div className="itil-display" style={{ fontSize: '18px', fontWeight: 600, marginTop: '2px' }}>{step.label}</div>
       </div>
@@ -14913,8 +15325,9 @@ function PathTrailNode({ step, index, done, isNext, entry, onOpen }) {
   );
 }
 
-function PathView({ track, trackKey, doneMap, unlockedMap, pathLocking, results, seenLog, categories, speech, api, toughCount, autoStart, onAutoStarted }) {
+function PathView({ track, trackKey, doneMap, unlockedMap, pathLocking, results, seenLog, categories, speech, api, toughCount, autoStart, onAutoStarted, panel, onPanel, srs, missLog, weakSaved }) {
   const units = useMemo(() => buildPathUnits(trackKey), [trackKey]);
+  const weakCount = useMemo(() => weakAnalyze(trackKey, results, seenLog, srs, missLog, todayString()).units.length, [trackKey, results, srs, missLog]);
   const [session, setSession] = useState(null);
   const [completion, setCompletion] = useState(null);
   const [expanded, setExpanded] = useState(() => {
@@ -14944,6 +15357,14 @@ function PathView({ track, trackKey, doneMap, unlockedMap, pathLocking, results,
     );
   }
 
+  if (panel === 'weak') {
+    return (
+      <WeakSubjectsView
+        track={track} trackKey={trackKey} results={results} seenLog={seenLog} srs={srs} missLog={missLog} saved={weakSaved}
+        categories={categories} speech={speech} api={api} panel={panel} onPanel={onPanel}
+      />
+    );
+  }
   const overall = pathOverallProgress(units, doneMap);
   const next = pathNextStep(units, doneMap);
   const reviewIds = pathReviewQuestionIds(units, doneMap, results, seenLog);
@@ -15031,6 +15452,7 @@ function PathView({ track, trackKey, doneMap, unlockedMap, pathLocking, results,
   /* ---- the map ---- */
   return (
     <div>
+      <PathPanelSwitch panel={panel || 'course'} onPanel={onPanel} weakCount={weakCount} />
       <div style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `2px solid ${COLOR.border}`, borderRadius: '16px', padding: '16px', marginBottom: '14px' }}>
         <div className="flex justify-between items-baseline" style={{ marginBottom: '8px' }}>
           <div className="itil-display" style={{ fontSize: '17px', fontWeight: 600 }}>{track.label} path</div>
@@ -19553,6 +19975,325 @@ PLAYGROUND_EXTRA_TOOLS.push({
   Component: VpnTool,
 });
 
+/* ---------------- weak subjects: report, study order and the path built from it ---------------- */
+
+// The screens for src/js/03d_weak_path.js. On a cert's Path tab a switch flips between the
+// course path and "Weak spots": a report of which lessons your missed questions point at
+// (with the readings, flashcards and questions to go back to), the exam areas you are
+// losing points in, and a button that turns the ranking into a path in priority order.
+// Steps run through the same PathStepRunner as the course path.
+
+const WEAK_TIER_HUE = { critical: COLOR.red, high: COLOR.orange, watch: COLOR.gold };
+
+function PathPanelSwitch({ panel, onPanel, weakCount }) {
+  if (!onPanel) return null;
+  const items = [{ key: 'course', label: 'Course path' }, { key: 'weak', label: weakCount ? `Weak spots · ${weakCount}` : 'Weak spots' }];
+  return (
+    <div role="tablist" aria-label="Path view" style={{ display: 'flex', gap: '4px', marginBottom: '14px' }}>
+      {items.map((it) => {
+        const active = it.key === panel;
+        const hue = it.key === 'weak' ? COLOR.red : COLOR.primary;
+        return (
+          <button key={it.key} role="tab" aria-selected={active} onClick={() => onPanel(it.key)} className="btn-flat"
+            style={{ flex: 1, padding: '9px 6px', borderRadius: '12px', fontSize: '13px', fontWeight: 800, border: `2px solid ${active ? hue : COLOR.border}`, background: active ? tint(hue, 16) : 'transparent', color: active ? ink(hue) : COLOR.muted }}>
+            {it.label}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+function WeakTierChip({ tier }) {
+  const hue = WEAK_TIER_HUE[tier] || COLOR.gold;
+  return <span style={{ fontSize: '10.5px', fontWeight: 800, letterSpacing: '0.04em', textTransform: 'uppercase', padding: '2px 8px', borderRadius: '999px', background: tint(hue, 18), color: ink(hue), whiteSpace: 'nowrap' }}>{WEAK_TIER_LABEL[tier] || tier}</span>;
+}
+
+function weakCardStyle(hue) {
+  return { boxShadow: SHADOW.card, background: hue ? tint(hue, 6) : COLOR.surface, border: `2px solid ${hue ? `color-mix(in srgb, ${hue} 35%, ${COLOR.border})` : COLOR.border}`, borderRadius: '16px', padding: '14px 16px', marginBottom: '14px' };
+}
+
+const weakPill = { fontSize: '12.5px', fontWeight: 800, padding: '7px 12px', borderRadius: '999px', border: `2px solid ${COLOR.border}`, color: COLOR.muted, background: 'transparent' };
+
+// One weak lesson: why it is flagged and what to go back to.
+function WeakUnitCard({ row, rank, open, onToggle, onRun, inPath }) {
+  const hue = WEAK_TIER_HUE[row.tier] || COLOR.gold;
+  const rd = row.readings;
+  return (
+    <div style={weakCardStyle(hue)}>
+      <button onClick={onToggle} aria-expanded={open} className="btn-flat" style={{ display: 'block', width: '100%', textAlign: 'left', background: 'transparent', border: 'none', padding: 0 }}>
+        <div style={{ display: 'flex', gap: '10px', alignItems: 'flex-start' }}>
+          <div aria-hidden="true" style={{ flexShrink: 0, width: '30px', height: '30px', borderRadius: '50%', background: hue, color: COLOR.onAccent, fontWeight: 900, fontSize: '14px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{rank}</div>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap', marginBottom: '2px' }}>
+              <span style={{ fontSize: '15px', fontWeight: 800, lineHeight: 1.3 }}>{row.unit.title}</span>
+              <WeakTierChip tier={row.tier} />
+              {inPath && <span style={{ fontSize: '10.5px', fontWeight: 800, color: ink(COLOR.success) }}>✓ in your path</span>}
+            </div>
+            <div style={{ fontSize: '12.5px', color: COLOR.muted, lineHeight: 1.45 }}>{row.reason}</div>
+          </div>
+          <span aria-hidden="true" style={{ color: COLOR.muted, fontSize: '12px', paddingTop: '4px' }}>{open ? '▾' : '▸'}</span>
+        </div>
+      </button>
+      {open && (
+        <div style={{ marginTop: '12px', paddingTop: '12px', borderTop: `1px solid ${COLOR.border}` }}>
+          <div style={{ fontSize: '11px', fontWeight: 800, letterSpacing: '0.06em', textTransform: 'uppercase', color: COLOR.muted, marginBottom: '6px' }}>1 · Reading</div>
+          <div style={{ fontSize: '13px', lineHeight: 1.5, marginBottom: '6px' }}>Re-read <strong>{rd.lesson.title}</strong> ({rd.minutes} min).</div>
+          <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '8px' }}>
+            <button className="btn-flat" onClick={() => onRun('read')} style={weakPill}>Open the lesson</button>
+          </div>
+          {rd.resources.length > 0 && (
+            <div style={{ fontSize: '12.5px', lineHeight: 1.6, marginBottom: '12px' }}>
+              <span style={{ color: COLOR.muted }}>Official reading: </span>
+              {rd.resources.map((r, i) => (
+                <span key={r.url}>{i ? ' · ' : ''}<a href={r.url} target="_blank" rel="noopener noreferrer" style={{ color: ink(COLOR.primary), fontWeight: 700 }}>{r.label} ↗</a></span>
+              ))}
+            </div>
+          )}
+          <div style={{ fontSize: '11px', fontWeight: 800, letterSpacing: '0.06em', textTransform: 'uppercase', color: COLOR.muted, margin: '8px 0 6px' }}>2 · Flashcards</div>
+          {row.cards.length > 0 ? (
+            <>
+              <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginBottom: '8px' }}>
+                {row.cards.map((c) => (
+                  <span key={c.id} style={{ fontSize: '12px', padding: '3px 9px', borderRadius: '999px', border: `1.5px solid ${row.tough.some((t) => t.id === c.id) ? COLOR.orange : COLOR.border}`, color: COLOR.text }}>{c.front}</span>
+                ))}
+              </div>
+              <button className="btn-flat" onClick={() => onRun('cards')} style={weakPill}>Review these {row.cards.length} cards</button>
+            </>
+          ) : <div style={{ fontSize: '12.5px', color: COLOR.muted }}>No flashcards map to this lesson.</div>}
+          <div style={{ fontSize: '11px', fontWeight: 800, letterSpacing: '0.06em', textTransform: 'uppercase', color: COLOR.muted, margin: '14px 0 6px' }}>3 · Questions you missed</div>
+          {row.missed.length > 0 ? (
+            <>
+              <ul style={{ margin: '0 0 8px', paddingLeft: '18px', listStyle: 'disc', fontSize: '12.5px', lineHeight: 1.5 }}>
+                {row.missed.slice(0, 4).map((m) => (
+                  <li key={m.q.id} style={{ marginBottom: '3px' }}>
+                    {m.q.question.length > 110 ? `${m.q.question.slice(0, 108)}…` : m.q.question}
+                    <span style={{ color: COLOR.muted }}>{m.misses > 1 ? ` · missed ${m.misses} times` : ''}</span>
+                  </li>
+                ))}
+                {row.missed.length > 4 && <li style={{ color: COLOR.muted, listStyle: 'none', marginLeft: '-18px' }}>+ {row.missed.length - 4} more</li>}
+              </ul>
+              <button className="btn-flat" onClick={() => onRun('weakquiz')} style={weakPill}>Redo these {Math.min(row.missed.length, WEAK_FIX_QUESTIONS)}</button>
+            </>
+          ) : <div style={{ fontSize: '12.5px', color: COLOR.muted }}>No missed questions here: this lesson was flagged by flashcards or games.</div>}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function WeakSubjectsView({ track, trackKey, results, seenLog, srs, missLog, saved, categories, speech, api, panel, onPanel }) {
+  const today = todayString();
+  const analysis = useMemo(() => weakAnalyze(trackKey, results, seenLog, srs, missLog, today), [trackKey, results, srs, missLog]);
+  const weakUnits = useMemo(() => (saved ? buildWeakUnits(trackKey, saved.snapshot) : []), [trackKey, saved]);
+  const done = (saved && saved.done) || {};
+  const [session, setSession] = useState(null);
+  const [completion, setCompletion] = useState(null);
+  const [openKey, setOpenKey] = useState(() => (analysis.units[0] ? analysis.units[0].unit.id : null));
+  const [confirmRebuild, setConfirmRebuild] = useState(false);
+
+  const startStep = (unit, step, adhoc) => { setCompletion(null); setSession({ unit, step, adhoc: !!adhoc, nonce: Date.now() }); window.scrollTo({ top: 0, behavior: 'instant' }); };
+  const rowUnit = (row) => buildWeakUnits(trackKey, { units: buildWeakSnapshot({ units: [row] }, today, 1).units })[0];
+  const runForRow = (row, kind) => {
+    const unit = rowUnit(row);
+    const step = unit && unit.steps.find((s) => s.kind === kind);
+    if (step) startStep(unit, step, true);
+  };
+  const finishStep = (pct) => {
+    const { unit, step, adhoc } = session;
+    window.scrollTo({ top: 0, behavior: 'instant' });
+    if (adhoc) { setSession(null); return; }
+    api.completeWeakStep(step.id, pct);
+    setCompletion({ unit, step, pct });
+    setSession(null);
+  };
+
+  if (session) {
+    return (
+      <PathStepRunner
+        key={session.step.id + '-' + session.nonce}
+        trackKey={trackKey} units={session.adhoc ? [session.unit] : weakUnits} unit={session.unit} step={session.step}
+        results={results} seenLog={seenLog} categories={categories} speech={speech} api={api}
+        onDone={finishStep} onExit={() => setSession(null)} exitLabel="‹ Back to weak spots"
+      />
+    );
+  }
+  if (completion) {
+    const doneNow = { ...done, [completion.step.id]: true };
+    const unitComplete = pathUnitProgress(completion.unit, doneNow).complete;
+    const nextNow = pathNextStep(weakUnits, doneNow);
+    return (
+      <PathStepComplete
+        unit={completion.unit} step={completion.step} pct={completion.pct} unitComplete={unitComplete} testedOut={false}
+        next={nextNow} onNext={() => startStep(nextNow.unit, nextNow.step)} onBack={() => setCompletion(null)} backLabel="Back to weak spots"
+      />
+    );
+  }
+
+  const overall = pathOverallProgress(weakUnits, done);
+  const nextStep = pathNextStep(weakUnits, done);
+  const outcome = saved ? weakPathOutcome(saved.snapshot, results) : null;
+  const inPath = new Set(saved ? saved.snapshot.units.map((u) => u.lessonId) : []);
+  const build = () => { api.createWeakPath(buildWeakSnapshot(analysis, today)); setConfirmRebuild(false); setOpenKey(null); };
+  const hasProgress = overall.done > 0;
+  const plan = analysis.units.slice(0, WEAK_MAX_UNITS);
+
+  return (
+    <div>
+      <PathPanelSwitch panel={panel} onPanel={onPanel} weakCount={analysis.units.length} />
+
+      <div style={weakCardStyle(COLOR.red)}>
+        <div className="itil-display" style={{ fontSize: '17px', fontWeight: 600, marginBottom: '4px' }}>{track.label} weak spots</div>
+        <div style={{ fontSize: '13px', color: COLOR.muted, lineHeight: 1.55 }}>
+          Your missed questions, repeat misses and flashcards you rated as tough point back at the lessons below. Re-reading, the right flashcards and a quiz built around your misses, in the order that matters most.
+        </div>
+        {analysis.hasData && (
+          <div style={{ display: 'flex', gap: '8px', marginTop: '10px', flexWrap: 'wrap' }}>
+            {[[analysis.totals.missed, 'questions missed'], [analysis.units.length, 'weak lessons'], [analysis.totals.tough, 'tough cards']].map(([n, l]) => (
+              <div key={l} style={{ flex: '1 1 0', minWidth: '90px', border: `2px solid ${COLOR.border}`, borderRadius: '12px', padding: '6px 10px', background: COLOR.surface }}>
+                <div style={{ fontSize: '19px', fontWeight: 900 }}>{n}</div>
+                <div style={{ fontSize: '11px', color: COLOR.muted }}>{l}</div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {!analysis.hasData && (
+        <div style={weakCardStyle()}>
+          <div style={{ fontSize: '14px', fontWeight: 800, marginBottom: '4px' }}>Nothing to analyse yet</div>
+          <div style={{ fontSize: '13px', color: COLOR.muted, lineHeight: 1.55 }}>Answer some questions in the course path or in Practice first. Every miss teaches this view where to send you.</div>
+        </div>
+      )}
+      {analysis.hasData && analysis.units.length === 0 && !saved && (
+        <div style={weakCardStyle(COLOR.success)}>
+          <div style={{ fontSize: '14px', fontWeight: 800, marginBottom: '4px' }}>No weak spots right now</div>
+          <div style={{ fontSize: '13px', color: COLOR.muted, lineHeight: 1.55 }}>You have answered {analysis.attempted} questions and nothing stands out as a problem. Keep going; this view will flag a lesson as soon as the misses pile up.</div>
+        </div>
+      )}
+
+      {saved ? (
+        <div style={weakCardStyle(COLOR.primary)}>
+          <div className="flex justify-between items-baseline" style={{ marginBottom: '6px', gap: '8px' }}>
+            <div className="itil-display" style={{ fontSize: '16px', fontWeight: 600 }}>Your weak-subjects path</div>
+            <div style={{ fontSize: '12px', color: COLOR.muted }}>built {formatDateShort(saved.snapshot.created) || saved.snapshot.created}</div>
+          </div>
+          <div style={{ height: '6px', borderRadius: '3px', background: COLOR.surfaceRaised, overflow: 'hidden', marginBottom: '6px' }}>
+            <div style={{ height: '100%', width: `${overall.pct}%`, background: COLOR.success }} />
+          </div>
+          <div style={{ fontSize: '12px', color: COLOR.muted, marginBottom: '8px' }}>{overall.done} of {overall.total} steps · {overall.unitsComplete} of {overall.unitCount} lessons done{outcome && outcome.baseline ? ` · ${outcome.fixed} of ${outcome.baseline} missed questions fixed so far` : ''}</div>
+          {weakUnits.map((u) => {
+            const p = pathUnitProgress(u, done);
+            return (
+              <div key={u.id} style={{ border: `2px solid ${p.complete ? COLOR.success : COLOR.border}`, borderRadius: '12px', padding: '10px 12px', marginBottom: '8px', background: COLOR.surface }}>
+                <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
+                  <span style={{ fontSize: '13.5px', fontWeight: 800 }}>{u.index + 1}. {u.title}</span>
+                  <WeakTierChip tier={u.tier} />
+                </div>
+                <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginTop: '6px' }}>
+                  {u.steps.map((st) => {
+                    const isDone = pathStepIsDone(done, st.id);
+                    return (
+                      <button key={st.id} className="btn-flat" onClick={() => startStep(u, st)} aria-label={`${st.label}${isDone ? ', done' : ''}`}
+                        style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', fontSize: '12px', fontWeight: 700, padding: '5px 10px', borderRadius: '999px', border: `2px solid ${isDone ? COLOR.success : COLOR.border}`, color: isDone ? ink(COLOR.success) : COLOR.text, background: isDone ? tint(COLOR.success, 12) : 'transparent' }}>
+                        <PathIcon kind={isDone ? 'check' : st.kind} size={14} /> {st.label}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            );
+          })}
+          {nextStep ? (
+            <button className="btn-3d" onClick={() => startStep(nextStep.unit, nextStep.step)}
+              style={{ width: '100%', padding: '12px', borderRadius: '12px', background: COLOR.primary, color: COLOR.onAccent, fontSize: '14px', fontWeight: 800, marginTop: '4px' }}>
+              {hasProgress ? 'Continue' : 'Start'}: {nextStep.step.label}
+            </button>
+          ) : (
+            <div style={{ padding: '10px 12px', borderRadius: '12px', background: tint(COLOR.success, 14), border: `2px solid ${COLOR.success}`, fontSize: '13.5px', fontWeight: 800, marginTop: '4px' }}>
+              Path complete{outcome && outcome.baseline ? `: ${outcome.fixed} of ${outcome.baseline} missed questions are now answered correctly` : ''}. Rebuild to see what still needs work.
+            </div>
+          )}
+          <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginTop: '10px' }}>
+            {confirmRebuild ? (
+              <>
+                <span style={{ fontSize: '12.5px', color: COLOR.muted, alignSelf: 'center' }}>Replace this path and its progress?</span>
+                <button className="btn-flat" onClick={build} style={{ ...weakPill, color: ink(COLOR.red), border: `2px solid ${COLOR.red}` }}>Yes, rebuild</button>
+                <button className="btn-flat" onClick={() => setConfirmRebuild(false)} style={weakPill}>Cancel</button>
+              </>
+            ) : (
+              <>
+                <button className="btn-flat" onClick={() => (hasProgress && nextStep ? setConfirmRebuild(true) : build())} disabled={!analysis.units.length} style={{ ...weakPill, opacity: analysis.units.length ? 1 : 0.5 }}>Rebuild from my latest results</button>
+                <button className="btn-flat" onClick={api.clearWeakPath} style={weakPill}>Remove path</button>
+              </>
+            )}
+          </div>
+        </div>
+      ) : analysis.units.length > 0 && (
+        <div style={weakCardStyle(COLOR.primary)}>
+          <div className="itil-display" style={{ fontSize: '16px', fontWeight: 600, marginBottom: '4px' }}>A new study order</div>
+          <div style={{ fontSize: '13px', color: COLOR.muted, lineHeight: 1.55, marginBottom: '10px' }}>
+            Instead of course order, work through these lessons from the most urgent down. Each one gets a re-read, targeted flashcards, a quiz built around your misses and a retest.
+          </div>
+          <ol style={{ margin: '0 0 12px', paddingLeft: '20px', listStyle: 'decimal', fontSize: '13px', lineHeight: 1.6 }}>
+            {plan.map((r) => <li key={r.unit.id}><strong>{r.unit.title}</strong> <WeakTierChip tier={r.tier} /></li>)}
+          </ol>
+          <button className="btn-3d" onClick={build} style={{ width: '100%', padding: '12px', borderRadius: '12px', background: COLOR.primary, color: COLOR.onAccent, fontSize: '14px', fontWeight: 800 }}>
+            Build my weak-subjects path ({plan.length} lesson{plan.length === 1 ? '' : 's'})
+          </button>
+        </div>
+      )}
+
+      {analysis.categories.length > 0 && (
+        <div style={weakCardStyle()}>
+          <div className="itil-display" style={{ fontSize: '16px', fontWeight: 600, marginBottom: '8px' }}>Where the exam points are leaking</div>
+          {analysis.categories.slice(0, 5).map((c) => (
+            <div key={c.key} style={{ marginBottom: '9px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', gap: '8px', fontSize: '12.5px', marginBottom: '3px' }}>
+                <span style={{ fontWeight: 700 }}>{c.label}</span>
+                <span style={{ color: COLOR.muted, whiteSpace: 'nowrap' }}>{c.missed} of {c.attempted} missed{c.marks ? ` · ${c.marks}% of exam` : ''}</span>
+              </div>
+              <div style={{ height: '6px', borderRadius: '3px', background: COLOR.surfaceRaised, overflow: 'hidden' }}>
+                <div style={{ height: '100%', width: `${Math.max(4, c.pctMissed)}%`, background: c.pctMissed >= 50 ? COLOR.red : c.pctMissed >= 25 ? COLOR.orange : COLOR.gold }} />
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {analysis.units.length > 0 && (
+        <div>
+          <div className="itil-display" style={{ fontSize: '16px', fontWeight: 600, margin: '4px 0 8px' }}>What to review, most urgent first</div>
+          {analysis.units.map((row, i) => (
+            <WeakUnitCard key={row.unit.id} row={row} rank={i + 1} open={openKey === row.unit.id} inPath={inPath.has(row.unit.id)}
+              onToggle={() => setOpenKey(openKey === row.unit.id ? null : row.unit.id)} onRun={(kind) => runForRow(row, kind)} />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// A card on Home: the cert(s) in the plan that have weak lessons, and a way in.
+function HomeWeakSpotsCard({ summaries, trackLabel, onOpen }) {
+  if (!summaries.length) return null;
+  return (
+    <div style={{ boxShadow: SHADOW.card, background: tint(COLOR.red, 7), border: `2px solid color-mix(in srgb, ${COLOR.red} 35%, ${COLOR.border})`, borderRadius: '16px', padding: '14px 16px', marginBottom: '14px' }}>
+      <div className="itil-display" style={{ fontSize: '16px', fontWeight: 600, color: ink(COLOR.red), marginBottom: '4px' }}>Weak subjects</div>
+      <div style={{ fontSize: '12.5px', color: COLOR.muted, lineHeight: 1.5, marginBottom: '10px' }}>Lessons your wrong answers point back at, with a path that studies them in priority order.</div>
+      {summaries.slice(0, 3).map((s) => (
+        <div key={s.trackKey} style={{ border: `2px solid ${COLOR.border}`, borderRadius: '12px', padding: '10px 12px', marginBottom: '8px', background: COLOR.surface }}>
+          <div style={{ fontSize: '12px', fontWeight: 800, color: COLOR.muted, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{trackLabel(s.trackKey)}</div>
+          <div style={{ fontSize: '13.5px', fontWeight: 700, margin: '3px 0 6px', lineHeight: 1.45 }}>
+            {s.units.slice(0, 2).map((u) => u.unit.title).join(' · ')}{s.units.length > 2 ? ` · +${s.units.length - 2} more` : ''}
+          </div>
+          <button className="btn-flat" onClick={() => onOpen(s.trackKey)} style={{ ...weakPill, color: ink(COLOR.red), border: `2px solid ${COLOR.red}` }}>Open the weak-subjects path ›</button>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 /* ---------------- final exam UI ---------------- */
 
 const READINESS_COLOR = {
@@ -19720,7 +20461,7 @@ function ExamQuestionView({ q, selectedIdx, onSelect }) {
 
 const REVIEW_PREVIEW_COUNT = 5;
 
-function ExamResults({ result, config, track, categories, onRestart, variant, flashcardsData }) {
+function ExamResults({ result, config, track, categories, onRestart, onWeakSpots, variant, flashcardsData }) {
   const [showAllMissed, setShowAllMissed] = useState(false);
   const pct = result.total ? Math.round((result.correct / result.total) * 100) : 0;
   const missed = result.items.filter((i) => !i.correct);
@@ -19817,6 +20558,14 @@ function ExamResults({ result, config, track, categories, onRestart, variant, fl
           )}
         </div>
       )}
+      {missed.length > 0 && onWeakSpots && (
+        <button className="btn-3d"
+          onClick={onWeakSpots}
+          style={{ width: '100%', marginTop: '16px', padding: '12px', borderRadius: '12px', background: COLOR.red, color: COLOR.onAccent, fontSize: '14px', fontWeight: 700 }}
+        >
+          Study my weak spots from this exam ›
+        </button>
+      )}
       <button className="btn-3d"
         onClick={onRestart}
         style={{ width: '100%', marginTop: '16px', padding: '12px', borderRadius: '12px', background: COLOR.primary, color: COLOR.onAccent, fontSize: '14px', fontWeight: 600 }}
@@ -19836,6 +20585,7 @@ function CertStudyApp() {
   const [mode, setMode] = useState('home');
   const [playgroundTool, setPlaygroundTool] = useState('');
   const [playgroundPick, setPlaygroundPick] = useState('');
+  const [pathPanel, setPathPanel] = useState('course');
   const [learnView, setLearnView] = useState('study');
   const [quizView, setQuizView] = useState('questions');
   const [activeCat, setActiveCat] = useState('all');
@@ -20182,6 +20932,10 @@ function CertStudyApp() {
 
   const recordResultFor = (trackKey, id, outcome) => {
     saveResults({ ...resultsRef.current, [trackKey]: { ...(resultsRef.current[trackKey] || {}), [id]: outcome } });
+    // Keep a little history for the weak-subjects analysis (how often an item is missed).
+    const cur = statsRef.current;
+    const nextLog = recordMissLog(cur.missLog, trackKey, id, outcome, todayString());
+    if (nextLog !== cur.missLog) saveStats({ ...cur, missLog: nextLog });
   };
 
   const markSeen = (ids) => markSeenFor(activeTrack, ids);
@@ -20834,8 +21588,8 @@ function CertStudyApp() {
   // state, which is a same-value no-op that never re-renders and so
   // never gets to reset a "just applied a hash" flag, permanently
   // stalling every navigation after the first.
-  const routeStateRef = useRef({ mode, activeTrack, learnView, quizView, playgroundTool, playgroundPick });
-  routeStateRef.current = { mode, activeTrack, learnView, quizView, playgroundTool, playgroundPick };
+  const routeStateRef = useRef({ mode, activeTrack, learnView, quizView, playgroundTool, playgroundPick, pathPanel });
+  routeStateRef.current = { mode, activeTrack, learnView, quizView, playgroundTool, playgroundPick, pathPanel };
 
   useEffect(() => {
     const validTrackKeys = new Set(visibleTracks.map((t) => t.key));
@@ -20845,6 +21599,7 @@ function CertStudyApp() {
       const same = isHubMode(parsed.mode)
         ? cur.mode === parsed.mode && (parsed.mode !== 'playground' || ((parsed.tool || '') === cur.playgroundTool && (parsed.pick || '') === cur.playgroundPick))
         : parsed.trackKey === cur.activeTrack && parsed.mode === cur.mode
+          && (parsed.mode !== 'path' || (parsed.panel || 'course') === cur.pathPanel)
           && (parsed.mode !== 'learn' || parsed.learnView === cur.learnView)
           && (parsed.mode !== 'quiz' || parsed.quizView === cur.quizView);
       if (same) return;
@@ -20855,6 +21610,7 @@ function CertStudyApp() {
       }
       pickTrack(parsed.trackKey);
       setMode(parsed.mode);
+      if (parsed.mode === 'path') setPathPanel(parsed.panel || 'course');
       if (parsed.mode === 'learn') setLearnView(parsed.learnView);
       if (parsed.mode === 'quiz') setQuizView(parsed.quizView);
     }
@@ -20881,9 +21637,9 @@ function CertStudyApp() {
   const routeWriterReady = useRef(false);
   useEffect(() => {
     if (!routeWriterReady.current) { routeWriterReady.current = true; return; }
-    const hash = routeToHash(mode, activeTrack, learnView, quizView, playgroundTool, playgroundPick);
+    const hash = routeToHash(mode, activeTrack, learnView, quizView, playgroundTool, playgroundPick, pathPanel);
     if (window.location.hash !== hash) window.location.hash = hash.replace(/^#/, '');
-  }, [mode, activeTrack, learnView, quizView, playgroundTool, playgroundPick]);
+  }, [mode, activeTrack, learnView, quizView, playgroundTool, playgroundPick, pathPanel]);
 
   const availableQuestions = useMemo(() => {
     const byCat = activeCat === 'all' ? questionsData : questionsData.filter((q) => q.cat === activeCat);
@@ -21259,6 +22015,19 @@ function CertStudyApp() {
       const cur = statsRef.current;
       saveStats({ ...cur, path: markPathStepsDone(cur.path, trackKey, stepIds, pct, todayString(), via) });
     },
+    // The weak-subjects path keeps its own snapshot and progress (stats.weakPath).
+    createWeakPath: (snapshot) => {
+      const cur = statsRef.current;
+      saveStats({ ...cur, weakPath: createWeakPath(cur.weakPath, trackKey, snapshot) });
+    },
+    completeWeakStep: (stepId, pct) => {
+      const cur = statsRef.current;
+      saveStats({ ...cur, weakPath: markWeakStepDone(cur.weakPath, trackKey, stepId, pct, todayString()) });
+    },
+    clearWeakPath: () => {
+      const cur = statsRef.current;
+      saveStats({ ...cur, weakPath: clearWeakPath(cur.weakPath, trackKey) });
+    },
   });
 
   const pathApi = {
@@ -21304,6 +22073,10 @@ function CertStudyApp() {
   const doReset = () => {
     saveResults({ ...results, [activeTrack]: {} });
     saveSrs({ ...srs, [activeTrack]: {} });
+    const cur = statsRef.current;
+    const missLog = { ...(cur.missLog || {}) };
+    delete missLog[activeTrack];
+    saveStats({ ...cur, missLog, weakPath: clearWeakPath(cur.weakPath, activeTrack) });
   };
 
   // Triggers a browser download of `data` as a formatted JSON file. Lives
@@ -21436,7 +22209,9 @@ function CertStudyApp() {
         },
       }
       : stats;
-    const nextStats = withActivity(statsWithExam, answeredCount);
+    let examMissLog = statsWithExam.missLog;
+    items.forEach((it) => { examMissLog = recordMissLog(examMissLog, trackKey, it.id, it.correct ? 'correct' : 'incorrect', todayString()); });
+    const nextStats = { ...withActivity(statsWithExam, answeredCount), missLog: examMissLog };
     resultsRef.current = nextResults;
     statsRef.current = nextStats;
     setResults(nextResults);
@@ -21643,6 +22418,7 @@ function CertStudyApp() {
             onAddToPath={addToCertPath}
             onOpenAbout={() => setShowAbout(true)}
             onOpenPlayground={() => { setPlaygroundTool(''); setPlaygroundPick(''); setMode('playground'); }}
+            onOpenWeak={(key) => { pickTrack(key); setPathPanel('weak'); setMode('path'); }}
             onOpenGlossary={() => setShowGlossary(true)}
             onSetGoalTarget={setDailyGoalTarget}
             onAnswerDailyQuestion={answerDailyQuestion}
@@ -21765,6 +22541,11 @@ function CertStudyApp() {
             toughCount={toughCount}
             autoStart={pathAutoStart}
             onAutoStarted={() => setPathAutoStart(false)}
+            panel={pathPanel}
+            onPanel={setPathPanel}
+            srs={srs}
+            missLog={stats.missLog}
+            weakSaved={(stats.weakPath || {})[activeTrack] || null}
           />
         )}
 
@@ -22060,6 +22841,7 @@ function CertStudyApp() {
                 categories={DATA[examTrack || activeTrack].categories}
                 flashcardsData={DATA[examTrack || activeTrack].flashcards}
                 variant={examVariant}
+                onWeakSpots={() => { pickTrack(examTrack || activeTrack); setPathPanel('weak'); setMode('path'); }}
                 onRestart={() => setExamPhase('intro')}
               />
             )

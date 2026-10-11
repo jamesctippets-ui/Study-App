@@ -165,7 +165,7 @@ function ExamQuestionView({ q, selectedIdx, onSelect }) {
 
 const REVIEW_PREVIEW_COUNT = 5;
 
-function ExamResults({ result, config, track, categories, onRestart, variant, flashcardsData }) {
+function ExamResults({ result, config, track, categories, onRestart, onWeakSpots, variant, flashcardsData }) {
   const [showAllMissed, setShowAllMissed] = useState(false);
   const pct = result.total ? Math.round((result.correct / result.total) * 100) : 0;
   const missed = result.items.filter((i) => !i.correct);
@@ -261,6 +261,14 @@ function ExamResults({ result, config, track, categories, onRestart, variant, fl
             </button>
           )}
         </div>
+      )}
+      {missed.length > 0 && onWeakSpots && (
+        <button className="btn-3d"
+          onClick={onWeakSpots}
+          style={{ width: '100%', marginTop: '16px', padding: '12px', borderRadius: '12px', background: COLOR.red, color: COLOR.onAccent, fontSize: '14px', fontWeight: 700 }}
+        >
+          Study my weak spots from this exam ›
+        </button>
       )}
       <button className="btn-3d"
         onClick={onRestart}

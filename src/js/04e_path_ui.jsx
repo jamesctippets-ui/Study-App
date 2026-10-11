@@ -19,6 +19,7 @@ function PathIcon({ kind, size = 20 }) {
       return <svg {...common}><polygon points="12 2 2 7 12 12 22 7 12 2" /><polyline points="2 17 12 22 22 17" /><polyline points="2 12 12 17 22 12" /></svg>;
     case 'quiz':
     case 'quiz2':
+    case 'weakquiz':
       return <svg {...common}><circle cx="12" cy="12" r="10" /><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" /><line x1="12" y1="17" x2="12.01" y2="17" /></svg>;
     case 'game':
     case 'game2':
@@ -30,6 +31,7 @@ function PathIcon({ kind, size = 20 }) {
     case 'apply':
       return <svg {...common}><rect x="2" y="7" width="20" height="14" rx="2" ry="2" /><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" /></svg>;
     case 'checkpoint':
+    case 'retest':
       return <svg {...common}><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z" /><line x1="4" y1="22" x2="4" y2="15" /></svg>;
     case 'lock':
       return <svg {...common}><rect x="4" y="11" width="16" height="10" rx="2" /><path d="M8 11V7a4 4 0 0 1 8 0v4" /></svg>;
@@ -366,7 +368,7 @@ function PathStepComplete({ unit, step, pct, unitComplete, testedOut, next, onNe
   const { streak, goalCount, goalTarget } = React.useContext(ProgressSummaryContext);
   const hasScore = pct !== null && pct !== undefined;
   const stars = !hasScore ? 0 : pct >= 90 ? 3 : pct >= 70 ? 2 : 1;
-  const eyebrow = unitComplete ? 'Unit conquered!' : testedOut ? 'Skipped ahead!'
+  const eyebrow = unitComplete ? (unit.weak ? 'Weak spot reviewed!' : 'Unit conquered!') : testedOut ? 'Skipped ahead!'
     : !hasScore ? 'Nice work!' : pct >= 90 ? 'Perfect!' : pct >= 70 ? 'Great work!' : 'Keep going!';
   const confetti = unitComplete ? 34 : testedOut ? 22 : stars === 3 ? 18 : 0;
   useEffect(() => {
@@ -384,7 +386,7 @@ function PathStepComplete({ unit, step, pct, unitComplete, testedOut, next, onNe
         </div>
         <div className="rise-in" style={{ animationDelay: '0.15s', fontSize: '13px', fontWeight: 900, letterSpacing: '0.08em', textTransform: 'uppercase', color: unitComplete ? COLOR.gold : COLOR.success, marginTop: '16px' }}>{eyebrow}</div>
         <div className="itil-display rise-in" style={{ animationDelay: '0.2s', fontSize: '24px', marginTop: '2px' }}>
-          {testedOut ? 'Tested out' : unitComplete ? 'Unit complete' : 'Step complete'}
+          {testedOut ? 'Tested out' : unitComplete ? (unit.weak ? 'Weak spot reviewed' : 'Unit complete') : 'Step complete'}
         </div>
         <div className="rise-in" style={{ animationDelay: '0.25s', fontSize: '14px', color: COLOR.muted, marginTop: '6px', lineHeight: 1.5 }}>
           {testedOut ? `You tested out of ${unit.title} at ${pct}%.` : unitComplete ? `You've finished every step of ${unit.title}.` : step.label}
@@ -458,7 +460,17 @@ function buildStepPayload(trackKey, units, results, seenLog, api, unit, step) {
     case 'quick':
     case 'testout':
     case 'review':
+    case 'retest':
       return { questions: preparedQuestions(poolQuestions(step.poolIds), step.count) };
+    case 'weakquiz': {
+      // The questions you missed come first; fresh ones from the same lesson fill the rest.
+      const missedQs = poolQuestions(step.missedIds || []).slice(0, step.count);
+      const fresh = poolQuestions(step.poolIds.filter((id) => !(step.missedIds || []).includes(id)));
+      const extra = pickRotated(fresh, Math.min(Math.max(0, step.count - missedQs.length), fresh.length), seenLog);
+      const prepared = shuffleArray([...missedQs, ...extra]).map(prepareQuestion);
+      api.markSeen(prepared.map((q) => q.id));
+      return { questions: prepared };
+    }
     case 'match':
       return { kind: 'match', cards: step.cardIds.map((id) => flashById.get(id)).filter(Boolean) };
     case 'checkpoint': {
@@ -518,7 +530,7 @@ function PathStepRunner({ trackKey, units, unit, step, results, seenLog, categor
         continueLabel="Continue ›"
       />
     );
-  } else if (step.kind === 'quiz' || step.kind === 'quiz2' || step.kind === 'quick' || step.kind === 'checkpoint' || step.kind === 'testout' || step.kind === 'review') {
+  } else if (step.kind === 'quiz' || step.kind === 'quiz2' || step.kind === 'quick' || step.kind === 'checkpoint' || step.kind === 'testout' || step.kind === 'review' || step.kind === 'weakquiz' || step.kind === 'retest') {
     runner = (
       <PathQuizStep
         key={runnerKey}
@@ -565,7 +577,7 @@ function PathStepRunner({ trackKey, units, unit, step, results, seenLog, categor
       </button>
       <div style={{ marginBottom: '14px' }}>
         <div style={{ fontSize: '11.5px', color: COLOR.muted, textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 600 }}>
-          {step.kind === 'review' ? 'Spaced review' : step.kind === 'bridge' ? 'Optional · Cross-cert bridge' : `${certLabel ? certLabel + ' · ' : ''}Unit ${unit.index + 1} · ${unit.title}${step.optional ? ' · Optional' : ''}`}
+          {step.kind === 'review' ? 'Spaced review' : step.kind === 'bridge' ? 'Optional · Cross-cert bridge' : `${certLabel ? certLabel + ' · ' : ''}${unit.weak ? 'Weak spot' : 'Unit'} ${unit.index + 1} · ${unit.title}${step.optional ? ' · Optional' : ''}`}
         </div>
         <div className="itil-display" style={{ fontSize: '18px', fontWeight: 600, marginTop: '2px' }}>{step.label}</div>
       </div>
@@ -632,8 +644,9 @@ function PathTrailNode({ step, index, done, isNext, entry, onOpen }) {
   );
 }
 
-function PathView({ track, trackKey, doneMap, unlockedMap, pathLocking, results, seenLog, categories, speech, api, toughCount, autoStart, onAutoStarted }) {
+function PathView({ track, trackKey, doneMap, unlockedMap, pathLocking, results, seenLog, categories, speech, api, toughCount, autoStart, onAutoStarted, panel, onPanel, srs, missLog, weakSaved }) {
   const units = useMemo(() => buildPathUnits(trackKey), [trackKey]);
+  const weakCount = useMemo(() => weakAnalyze(trackKey, results, seenLog, srs, missLog, todayString()).units.length, [trackKey, results, srs, missLog]);
   const [session, setSession] = useState(null);
   const [completion, setCompletion] = useState(null);
   const [expanded, setExpanded] = useState(() => {
@@ -663,6 +676,14 @@ function PathView({ track, trackKey, doneMap, unlockedMap, pathLocking, results,
     );
   }
 
+  if (panel === 'weak') {
+    return (
+      <WeakSubjectsView
+        track={track} trackKey={trackKey} results={results} seenLog={seenLog} srs={srs} missLog={missLog} saved={weakSaved}
+        categories={categories} speech={speech} api={api} panel={panel} onPanel={onPanel}
+      />
+    );
+  }
   const overall = pathOverallProgress(units, doneMap);
   const next = pathNextStep(units, doneMap);
   const reviewIds = pathReviewQuestionIds(units, doneMap, results, seenLog);
@@ -750,6 +771,7 @@ function PathView({ track, trackKey, doneMap, unlockedMap, pathLocking, results,
   /* ---- the map ---- */
   return (
     <div>
+      <PathPanelSwitch panel={panel || 'course'} onPanel={onPanel} weakCount={weakCount} />
       <div style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `2px solid ${COLOR.border}`, borderRadius: '16px', padding: '16px', marginBottom: '14px' }}>
         <div className="flex justify-between items-baseline" style={{ marginBottom: '8px' }}>
           <div className="itil-display" style={{ fontSize: '17px', fontWeight: 600 }}>{track.label} path</div>

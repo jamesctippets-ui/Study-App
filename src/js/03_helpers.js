@@ -297,8 +297,8 @@ function normalizeSrs(raw) {
 function isHubMode(m) { return m === 'home' || m === 'profile' || m === 'playground'; }
 
 // The Playground's tools register themselves (see 04h_playground_ui.jsx); pgToolKeys() lists them.
-function routeToHash(mode, trackKey, learnView, quizView, playgroundTool, playgroundPick) {
-  if (mode === 'path') return `#/${trackKey}/path`;
+function routeToHash(mode, trackKey, learnView, quizView, playgroundTool, playgroundPick, pathPanel) {
+  if (mode === 'path') return pathPanel === 'weak' ? `#/${trackKey}/path/weak` : `#/${trackKey}/path`;
   if (mode === 'learn') return `#/${trackKey}/reference/${learnView}`;
   if (mode === 'quiz') return `#/${trackKey}/practice/${quizView}`;
   if (mode === 'exam') return `#/${trackKey}/exam`;
@@ -324,7 +324,7 @@ function parseHash(hash, validTrackKeys) {
   }
   const [trackKey, mode, sub] = parts;
   if (!validTrackKeys.has(trackKey)) return { mode: 'home' };
-  if (mode === 'path') return { mode: 'path', trackKey };
+  if (mode === 'path') return { mode: 'path', trackKey, panel: sub === 'weak' ? 'weak' : 'course' };
   if (mode === 'reference' || mode === 'learn') return { mode: 'learn', trackKey, learnView: ['cards', 'study', 'sheet'].includes(sub) ? sub : 'study' };
   if (mode === 'practice' || mode === 'quiz') return { mode: 'quiz', trackKey, quizView: ['questions', 'match', 'verbal', 'commands', 'madlibs', 'sequence', 'casestudy', 'compare'].includes(sub) ? sub : 'questions' };
   if (mode === 'exam') return { mode: 'exam', trackKey };
@@ -563,6 +563,8 @@ function emptyStats() {
     pathVersion: PATH_PROGRESS_VERSION,
     activityLog: {},
     profile: { name: '', hue: 'primary' },
+    missLog: {},
+    weakPath: {},
   };
 }
 
@@ -596,6 +598,8 @@ function normalizeStats(raw) {
     pathVersion: Number.isFinite(raw.pathVersion) ? raw.pathVersion : 0,
     activityLog: normalizeActivityLog(raw.activityLog),
     profile: normalizeProfile(raw.profile),
+    missLog: normalizeMissLog(raw.missLog),
+    weakPath: normalizeWeakPath(raw.weakPath),
   };
 }
 

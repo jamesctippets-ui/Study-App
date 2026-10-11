@@ -478,18 +478,19 @@ def validate_playground_extras():
 
 
 def run_playground_checks():
-    """Replays the engine's unit tests and every scenario through node when it
-    is available (the shipped app needs no node; only this check does)."""
+    """Replays the Playground engine's unit tests (and every scenario) and the weak-subjects
+    engine's tests through node when it is available (the shipped app needs no node)."""
     node = shutil.which("node")
     if not node:
-        print("  (node not found: skipped tools/check_playground.js)")
+        print("  (node not found: skipped tools/check_playground.js and tools/check_weak_path.js)")
         return
-    result = subprocess.run([node, str(ROOT / "tools" / "check_playground.js")], capture_output=True, text=True)
-    if result.returncode != 0:
-        print("Playground engine check failed:", file=sys.stderr)
-        print(result.stdout + result.stderr, file=sys.stderr)
-        sys.exit(1)
-    print("  " + result.stdout.strip())
+    for script in ("check_playground.js", "check_weak_path.js"):
+        result = subprocess.run([node, str(ROOT / "tools" / script)], capture_output=True, text=True)
+        if result.returncode != 0:
+            print(f"{script} failed:", file=sys.stderr)
+            print(result.stdout + result.stderr, file=sys.stderr)
+            sys.exit(1)
+        print("  " + result.stdout.strip())
 
 
 def validate():

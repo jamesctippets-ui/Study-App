@@ -6,6 +6,7 @@ function CertStudyApp() {
   const [mode, setMode] = useState('home');
   const [playgroundTool, setPlaygroundTool] = useState('');
   const [playgroundPick, setPlaygroundPick] = useState('');
+  const [pathPanel, setPathPanel] = useState('course');
   const [learnView, setLearnView] = useState('study');
   const [quizView, setQuizView] = useState('questions');
   const [activeCat, setActiveCat] = useState('all');
@@ -352,6 +353,10 @@ function CertStudyApp() {
 
   const recordResultFor = (trackKey, id, outcome) => {
     saveResults({ ...resultsRef.current, [trackKey]: { ...(resultsRef.current[trackKey] || {}), [id]: outcome } });
+    // Keep a little history for the weak-subjects analysis (how often an item is missed).
+    const cur = statsRef.current;
+    const nextLog = recordMissLog(cur.missLog, trackKey, id, outcome, todayString());
+    if (nextLog !== cur.missLog) saveStats({ ...cur, missLog: nextLog });
   };
 
   const markSeen = (ids) => markSeenFor(activeTrack, ids);
@@ -1004,8 +1009,8 @@ function CertStudyApp() {
   // state, which is a same-value no-op that never re-renders and so
   // never gets to reset a "just applied a hash" flag, permanently
   // stalling every navigation after the first.
-  const routeStateRef = useRef({ mode, activeTrack, learnView, quizView, playgroundTool, playgroundPick });
-  routeStateRef.current = { mode, activeTrack, learnView, quizView, playgroundTool, playgroundPick };
+  const routeStateRef = useRef({ mode, activeTrack, learnView, quizView, playgroundTool, playgroundPick, pathPanel });
+  routeStateRef.current = { mode, activeTrack, learnView, quizView, playgroundTool, playgroundPick, pathPanel };
 
   useEffect(() => {
     const validTrackKeys = new Set(visibleTracks.map((t) => t.key));
@@ -1015,6 +1020,7 @@ function CertStudyApp() {
       const same = isHubMode(parsed.mode)
         ? cur.mode === parsed.mode && (parsed.mode !== 'playground' || ((parsed.tool || '') === cur.playgroundTool && (parsed.pick || '') === cur.playgroundPick))
         : parsed.trackKey === cur.activeTrack && parsed.mode === cur.mode
+          && (parsed.mode !== 'path' || (parsed.panel || 'course') === cur.pathPanel)
           && (parsed.mode !== 'learn' || parsed.learnView === cur.learnView)
           && (parsed.mode !== 'quiz' || parsed.quizView === cur.quizView);
       if (same) return;
@@ -1025,6 +1031,7 @@ function CertStudyApp() {
       }
       pickTrack(parsed.trackKey);
       setMode(parsed.mode);
+      if (parsed.mode === 'path') setPathPanel(parsed.panel || 'course');
       if (parsed.mode === 'learn') setLearnView(parsed.learnView);
       if (parsed.mode === 'quiz') setQuizView(parsed.quizView);
     }
@@ -1051,9 +1058,9 @@ function CertStudyApp() {
   const routeWriterReady = useRef(false);
   useEffect(() => {
     if (!routeWriterReady.current) { routeWriterReady.current = true; return; }
-    const hash = routeToHash(mode, activeTrack, learnView, quizView, playgroundTool, playgroundPick);
+    const hash = routeToHash(mode, activeTrack, learnView, quizView, playgroundTool, playgroundPick, pathPanel);
     if (window.location.hash !== hash) window.location.hash = hash.replace(/^#/, '');
-  }, [mode, activeTrack, learnView, quizView, playgroundTool, playgroundPick]);
+  }, [mode, activeTrack, learnView, quizView, playgroundTool, playgroundPick, pathPanel]);
 
   const availableQuestions = useMemo(() => {
     const byCat = activeCat === 'all' ? questionsData : questionsData.filter((q) => q.cat === activeCat);
@@ -1429,6 +1436,19 @@ function CertStudyApp() {
       const cur = statsRef.current;
       saveStats({ ...cur, path: markPathStepsDone(cur.path, trackKey, stepIds, pct, todayString(), via) });
     },
+    // The weak-subjects path keeps its own snapshot and progress (stats.weakPath).
+    createWeakPath: (snapshot) => {
+      const cur = statsRef.current;
+      saveStats({ ...cur, weakPath: createWeakPath(cur.weakPath, trackKey, snapshot) });
+    },
+    completeWeakStep: (stepId, pct) => {
+      const cur = statsRef.current;
+      saveStats({ ...cur, weakPath: markWeakStepDone(cur.weakPath, trackKey, stepId, pct, todayString()) });
+    },
+    clearWeakPath: () => {
+      const cur = statsRef.current;
+      saveStats({ ...cur, weakPath: clearWeakPath(cur.weakPath, trackKey) });
+    },
   });
 
   const pathApi = {
@@ -1474,6 +1494,10 @@ function CertStudyApp() {
   const doReset = () => {
     saveResults({ ...results, [activeTrack]: {} });
     saveSrs({ ...srs, [activeTrack]: {} });
+    const cur = statsRef.current;
+    const missLog = { ...(cur.missLog || {}) };
+    delete missLog[activeTrack];
+    saveStats({ ...cur, missLog, weakPath: clearWeakPath(cur.weakPath, activeTrack) });
   };
 
   // Triggers a browser download of `data` as a formatted JSON file. Lives
@@ -1606,7 +1630,9 @@ function CertStudyApp() {
         },
       }
       : stats;
-    const nextStats = withActivity(statsWithExam, answeredCount);
+    let examMissLog = statsWithExam.missLog;
+    items.forEach((it) => { examMissLog = recordMissLog(examMissLog, trackKey, it.id, it.correct ? 'correct' : 'incorrect', todayString()); });
+    const nextStats = { ...withActivity(statsWithExam, answeredCount), missLog: examMissLog };
     resultsRef.current = nextResults;
     statsRef.current = nextStats;
     setResults(nextResults);
@@ -1813,6 +1839,7 @@ function CertStudyApp() {
             onAddToPath={addToCertPath}
             onOpenAbout={() => setShowAbout(true)}
             onOpenPlayground={() => { setPlaygroundTool(''); setPlaygroundPick(''); setMode('playground'); }}
+            onOpenWeak={(key) => { pickTrack(key); setPathPanel('weak'); setMode('path'); }}
             onOpenGlossary={() => setShowGlossary(true)}
             onSetGoalTarget={setDailyGoalTarget}
             onAnswerDailyQuestion={answerDailyQuestion}
@@ -1935,6 +1962,11 @@ function CertStudyApp() {
             toughCount={toughCount}
             autoStart={pathAutoStart}
             onAutoStarted={() => setPathAutoStart(false)}
+            panel={pathPanel}
+            onPanel={setPathPanel}
+            srs={srs}
+            missLog={stats.missLog}
+            weakSaved={(stats.weakPath || {})[activeTrack] || null}
           />
         )}
 
@@ -2230,6 +2262,7 @@ function CertStudyApp() {
                 categories={DATA[examTrack || activeTrack].categories}
                 flashcardsData={DATA[examTrack || activeTrack].flashcards}
                 variant={examVariant}
+                onWeakSpots={() => { pickTrack(examTrack || activeTrack); setPathPanel('weak'); setMode('path'); }}
                 onRestart={() => setExamPhase('intro')}
               />
             )

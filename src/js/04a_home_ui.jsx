@@ -624,7 +624,7 @@ function CertPathHomeSection({ pathOrder, results, certPlan, studyingKey, pathPr
 // for that split. Reachable again from any track's Learn/Quiz/Exam view
 // via the header's home icon; the header's hamburger (Manage cert path)
 // is reachable from every mode including this one.
-function HomeView({ tracks, results, seenLog, stats, certPlan, speech, srs, makePathApi, onSetHomePathMode, onSetHomePathOrder, onSetReviewReminder, onReviewStarted, onResume, onSelectTrack, onAddToPath, onOpenAbout, onOpenGlossary, onOpenPlayground, onSetGoalTarget, onAnswerDailyQuestion, onRevealDailyVocab, footerNote }) {
+function HomeView({ tracks, results, seenLog, stats, certPlan, speech, srs, makePathApi, onSetHomePathMode, onSetHomePathOrder, onSetReviewReminder, onReviewStarted, onResume, onSelectTrack, onAddToPath, onOpenAbout, onOpenGlossary, onOpenPlayground, onOpenWeak, onSetGoalTarget, onAnswerDailyQuestion, onRevealDailyVocab, footerNote }) {
   const masteries = tracks.map((t) => ({ track: t, pct: trackMastery(t.key, results) }));
   const overallAvg = masteries.length ? Math.round(masteries.reduce((s, m) => s + m.pct, 0) / masteries.length) : 0;
   const lastVisited = stats.lastVisited;
@@ -693,6 +693,11 @@ function HomeView({ tracks, results, seenLog, stats, certPlan, speech, srs, make
   const [homeRun, setHomeRun] = useState(null);
   const startHomeRun = (e) => setHomeRun({ kind: 'step', trackKey: e.trackKey, doneKey: e.doneKey, unit: e.unit, step: e.step, nonce: Date.now() });
   const skipHomeStep = (e) => makePathApi(e.doneKey || e.trackKey).skipStep(e.step.id);
+  const weakSummaries = useMemo(
+    () => weakSummaryForTracks(pathKeys, results, seenLog, srs, stats.missLog, todayString()),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [pathKeys.join(','), results, srs, stats.missLog],
+  );
 
   if (homeRun && homeRun.kind !== 'step') {
     return (
@@ -766,6 +771,10 @@ function HomeView({ tracks, results, seenLog, stats, certPlan, speech, srs, make
           onSetReminder={onSetReviewReminder}
           onStartReview={(kind) => { onReviewStarted(); setHomeRun({ kind, nonce: Date.now() }); }}
         />
+      )}
+
+      {pathOrder.length > 0 && weakSummaries.length > 0 && (
+        <HomeWeakSpotsCard summaries={weakSummaries} trackLabel={(k) => (tracks.find((t) => t.key === k) || { label: k }).label} onOpen={onOpenWeak} />
       )}
 
       {/* The path hero already shows the up-next track's own readiness, so
