@@ -73,19 +73,19 @@ function PgHostEditor({ host, topo, onChange, onRemove, failField, canRemove, hi
   const gwErr = v.gatewayText && v.gwN === null ? 'Not a valid address' : null;
   const bad = (f) => failField === f;
   return (
-    <div style={{ borderTop: `1px solid ${COLOR.border}`, padding: '10px 0', outline: highlight ? `2px solid ${COLOR.red}` : 'none', outlineOffset: '2px', borderRadius: highlight ? '8px' : 0 }}>
+    <div style={{ borderTop: `1px solid ${COLOR.border}`, padding: '10px 0', outline: highlight ? `1px solid ${COLOR.red}` : 'none', outlineOffset: '2px', borderRadius: highlight ? '8px' : 0 }}>
       <div className="flex justify-between items-center" style={{ marginBottom: '6px' }}>
         <strong style={{ fontSize: '13.5px' }}>{host.name}</strong>
         {canRemove && <button className="btn-flat" onClick={onRemove} aria-label={`Remove ${host.name}`} style={{ fontSize: '12px', color: COLOR.muted }}>Remove</button>}
       </div>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '8px' }}>
-        <div style={bad('ip') ? { outline: `2px solid ${COLOR.red}`, borderRadius: '10px', padding: '2px' } : undefined}>
+        <div style={bad('ip') ? { outline: `1px solid ${COLOR.red}`, borderRadius: 'var(--r-ctl)', padding: '2px' } : undefined}>
           <PgField label="IP address" value={host.ip} onChange={(val) => onChange({ ip: val })} error={ipErr} inputMode="decimal" />
         </div>
-        <div style={bad('mask') ? { outline: `2px solid ${COLOR.red}`, borderRadius: '10px', padding: '2px' } : undefined}>
+        <div style={bad('mask') ? { outline: `1px solid ${COLOR.red}`, borderRadius: 'var(--r-ctl)', padding: '2px' } : undefined}>
           <PgField label="Mask" value={host.mask} onChange={(val) => onChange({ mask: val })} error={maskErr ? 'Invalid' : null} inputMode="decimal" />
         </div>
-        <div style={bad('gateway') ? { outline: `2px solid ${COLOR.red}`, borderRadius: '10px', padding: '2px' } : undefined}>
+        <div style={bad('gateway') ? { outline: `1px solid ${COLOR.red}`, borderRadius: 'var(--r-ctl)', padding: '2px' } : undefined}>
           <PgField label="Gateway" value={host.gateway} onChange={(val) => onChange({ gateway: val })} error={gwErr} placeholder="none" inputMode="decimal" />
         </div>
       </div>
@@ -98,7 +98,7 @@ function PgRouterEditor({ router, topo, onChange, highlight, failField }) {
   const setIface = (i, patch) => onChange({ ifaces: router.ifaces.map((f, j) => (j === i ? { ...f, ...patch } : f)) });
   const setRoute = (i, patch) => onChange({ routes: router.routes.map((r, j) => (j === i ? { ...r, ...patch } : r)) });
   return (
-    <div style={{ borderTop: `1px solid ${COLOR.border}`, padding: '10px 0', outline: highlight ? `2px solid ${COLOR.red}` : 'none', outlineOffset: '2px', borderRadius: highlight ? '8px' : 0 }}>
+    <div style={{ borderTop: `1px solid ${COLOR.border}`, padding: '10px 0', outline: highlight ? `1px solid ${COLOR.red}` : 'none', outlineOffset: '2px', borderRadius: highlight ? '8px' : 0 }}>
       <strong style={{ fontSize: '13.5px' }}>{router.name}</strong>
       {router.ifaces.map((f, i) => {
         const ipN = pgParseIPv4(f.ip);
@@ -113,7 +113,7 @@ function PgRouterEditor({ router, topo, onChange, highlight, failField }) {
           </div>
         );
       })}
-      <div style={{ marginTop: '10px', padding: failField === 'routes' ? '6px' : 0, outline: failField === 'routes' ? `2px solid ${COLOR.red}` : 'none', borderRadius: '10px' }}>
+      <div style={{ marginTop: '10px', padding: failField === 'routes' ? '6px' : 0, outline: failField === 'routes' ? `1px solid ${COLOR.red}` : 'none', borderRadius: 'var(--r-ctl)' }}>
         <div style={{ fontSize: '11px', fontWeight: 800, letterSpacing: '0.04em', textTransform: 'uppercase', color: COLOR.muted, marginBottom: '4px' }}>Static routes</div>
         {router.routes.length === 0 && <div style={{ fontSize: '12px', color: COLOR.muted, marginBottom: '4px' }}>None. The router only knows its directly connected networks.</div>}
         {router.routes.map((r, i) => (
@@ -139,13 +139,13 @@ function PgPingResult({ result }) {
   const mark = result.verdict === 'success' ? '✓' : result.verdict === 'unreliable' ? '!' : '✕';
   return (
     <div>
-      <div style={{ padding: '10px 12px', borderRadius: '12px', background: tint(hue, 16), border: `2px solid ${hue}`, marginBottom: '10px', display: 'flex', gap: '8px', alignItems: 'baseline' }}>
+      <div style={{ padding: '10px 12px', borderRadius: 'var(--r-card)', background: tint(hue, 16), border: `1px solid ${hue}`, marginBottom: '10px', display: 'flex', gap: '8px', alignItems: 'baseline' }}>
         <span style={{ fontWeight: 900, color: ink(hue), fontSize: '16px' }}>{mark}</span>
         <span style={{ fontWeight: 800, fontSize: '13.5px', lineHeight: 1.4 }}>{result.summary}</span>
       </div>
       <PgDiagnosis diagnosis={result.diagnosis} />
       {result.warnings.length > 0 && (
-        <div style={{ padding: '8px 12px', borderRadius: '12px', background: tint(COLOR.orange, 12), border: `1.5px solid ${COLOR.orange}`, marginBottom: '10px', fontSize: '12.5px', lineHeight: 1.5 }}>
+        <div style={{ padding: '8px 12px', borderRadius: 'var(--r-card)', background: tint(COLOR.orange, 12), border: `1px solid ${COLOR.orange}`, marginBottom: '10px', fontSize: '12.5px', lineHeight: 1.5 }}>
           {result.warnings.map((w) => <div key={w}>⚠ {w}</div>)}
         </div>
       )}

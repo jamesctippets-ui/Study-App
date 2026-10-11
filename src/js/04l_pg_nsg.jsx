@@ -133,7 +133,7 @@ function PgNsgSection({ id, title, hue, summary, open, setOpen, hot, children })
   const isOpen = !!open[id];
   return (
     <div id={`pgnsg-${String(id).replace(/[^\w-]/g, '-')}`}>
-      <PgCard title={title} hue={hue} style={hot ? { outline: `2px solid ${COLOR.red}`, outlineOffset: '2px' } : undefined}
+      <PgCard title={title} hue={hue} style={hot ? { outline: `1px solid ${COLOR.red}`, outlineOffset: '2px' } : undefined}
         right={<button className="btn-flat" aria-label={`${title}: ${isOpen ? 'hide' : 'show'}`} aria-expanded={isOpen} onClick={() => setOpen({ ...open, [id]: !isOpen })}
           style={{ ...pgPillStyle, padding: '5px 12px', minHeight: '36px' }}>{isOpen ? 'Hide' : 'Show'}</button>}>
         {isOpen ? children : <div style={{ fontSize: '12px', color: COLOR.muted, lineHeight: 1.5 }}>{summary}</div>}
@@ -150,7 +150,7 @@ function PgNsgRule({ rule, errs, hot, hops, onChange, onDelete }) {
   const hue = rule.action === 'Allow' ? COLOR.success : COLOR.red;
   const decided = hops.length ? hops[0] : null;
   return (
-    <div data-pg="nsg-rule" style={{ marginBottom: '10px', padding: '8px 10px', borderRadius: '12px', background: tint(hue, decided || hot ? 18 : 6), border: `2px solid ${hot ? COLOR.red : decided ? hue : `color-mix(in srgb, ${hue} 30%, ${COLOR.border})`}` }}>
+    <div data-pg="nsg-rule" style={{ marginBottom: '10px', padding: '8px 10px', borderRadius: 'var(--r-card)', background: tint(hue, decided || hot ? 18 : 6), border: `1px solid ${hot ? COLOR.red : decided ? hue : `color-mix(in srgb, ${hue} 30%, ${COLOR.border})`}` }}>
       <div className="flex justify-between items-center" style={{ marginBottom: '6px', gap: '8px' }}>
         <strong style={{ fontSize: '12.5px', color: ink(hue), minWidth: 0, overflowWrap: 'anywhere' }}>
           {rule.name || 'Unnamed rule'} · priority {String(rule.priority)} · {rule.action}{decided ? ` · decided at ${decided.label.toLowerCase()}` : ''}
@@ -184,7 +184,7 @@ function PgNsgOrder({ nsg, dir, hops, hotRuleId }) {
         const where = hops.filter((h) => h.dir === dir && h.nsg === nsg.id && h.ruleId === r.id);
         const hot = hotRuleId === r.id;
         return (
-          <div key={r.id} data-pg="nsg-order-row" style={{ display: 'grid', gridTemplateColumns: '52px minmax(0, 1fr) auto', gap: '6px', alignItems: 'baseline', padding: '5px 8px', marginBottom: '3px', borderRadius: '8px', fontSize: '12px', background: r.builtin ? tint(COLOR.muted, 7) : tint(hue, 8), border: `1.5px solid ${hot ? COLOR.red : where.length ? hue : 'transparent'}` }}>
+          <div key={r.id} data-pg="nsg-order-row" style={{ display: 'grid', gridTemplateColumns: '52px minmax(0, 1fr) auto', gap: '6px', alignItems: 'baseline', padding: '5px 8px', marginBottom: '3px', borderRadius: 'var(--r-ctl)', fontSize: '12px', background: r.builtin ? tint(COLOR.muted, 7) : tint(hue, 8), border: `1px solid ${hot ? COLOR.red : where.length ? hue : 'transparent'}` }}>
             <strong style={{ fontFamily: PG_NSG_UI_MONO }}>{r.priority}</strong>
             <span style={{ minWidth: 0, overflowWrap: 'anywhere' }}>
               <strong>{r.name}</strong>{r.builtin && <span style={{ color: COLOR.muted }}> · built-in</span>}
@@ -268,7 +268,7 @@ function PgNsgAssoc({ topo, setTopo, diag, open, setOpen }) {
       <div style={{ fontSize: '12px', color: COLOR.muted, lineHeight: 1.5, marginBottom: '8px' }}>An NSG does nothing until it is associated with a subnet, a VM's network interface (NIC) or both, and traffic must be allowed at every level that has one. A VM also needs a public IP address to be reached from the internet (leave the field empty for none).</div>
       <div style={g2}>
         {topo.subnets.map((s) => (
-          <div key={s.id} style={{ outline: subnetHot && diag.field === `subnet.${s.id}` ? `2px solid ${COLOR.red}` : 'none', outlineOffset: '3px', borderRadius: '10px', minWidth: 0 }}>
+          <div key={s.id} style={{ outline: subnetHot && diag.field === `subnet.${s.id}` ? `1px solid ${COLOR.red}` : 'none', outlineOffset: '3px', borderRadius: 'var(--r-ctl)', minWidth: 0 }}>
             <PgSelect label={`Subnet ${s.name}`} value={s.nsg || ''} onChange={(v) => setSubnetNsg(s, v)} options={opts} />
           </div>
         ))}
@@ -278,10 +278,10 @@ function PgNsgAssoc({ topo, setTopo, diag, open, setOpen }) {
         const badIp = v.publicIp && pgParseIPv4(v.publicIp) === null;
         const hot = !!diag && diag.deviceId === v.id && (diag.field === 'assoc' || diag.field === 'publicIp');
         return (
-          <div key={v.id} style={{ marginTop: '10px', padding: '8px 10px', borderRadius: '12px', border: `2px solid ${hot ? COLOR.red : COLOR.border}`, background: COLOR.surface }}>
+          <div key={v.id} style={{ marginTop: '10px', padding: '8px 10px', borderRadius: 'var(--r-card)', border: `1px solid ${hot ? COLOR.red : COLOR.border}`, background: COLOR.surface }}>
             <div style={{ fontSize: '12.5px', marginBottom: '6px' }}><strong>{v.name}</strong><span style={{ color: COLOR.muted }}> · {v.ip}{sub ? ` in ${sub.name}` : ''}</span></div>
             <div style={g2}>
-              <div style={{ outline: fieldHot('assoc') && diag.deviceId === v.id ? `2px solid ${COLOR.red}` : 'none', outlineOffset: '3px', borderRadius: '10px', minWidth: 0 }}>
+              <div style={{ outline: fieldHot('assoc') && diag.deviceId === v.id ? `1px solid ${COLOR.red}` : 'none', outlineOffset: '3px', borderRadius: 'var(--r-ctl)', minWidth: 0 }}>
                 <PgSelect label={`NIC of ${v.name}`} value={(v.nic && v.nic.nsg) || ''} onChange={(val) => setVm(v.id, (x) => ({ ...x, nic: { ...x.nic, nsg: val || null } }))} options={opts} />
               </div>
               <PgField label={`Public IP of ${v.name}`} value={v.publicIp || ''} onChange={(val) => setVm(v.id, (x) => ({ ...x, publicIp: val.trim() }))} error={badIp ? 'Use an IPv4 address such as 20.50.60.70, or leave empty.' : undefined} placeholder="none" inputMode="decimal" />
@@ -310,7 +310,7 @@ function PgNsgHops({ hops }) {
           ? `${h.nsgName}: ${h.rule} (priority ${h.priority}${h.builtin ? ', built-in' : ''}) → ${h.action}`
           : h.state === 'notreached' ? 'Not reached: an earlier level already stopped the traffic.' : 'No NSG here, so nothing is filtered at this level.';
         return (
-          <div key={h.key} data-pg="nsg-hop" style={{ display: 'flex', gap: '8px', alignItems: 'baseline', padding: '6px 10px', marginBottom: '4px', borderRadius: '10px', background: tint(hue, live ? 12 : 4), border: `1.5px solid color-mix(in srgb, ${hue} 50%, ${COLOR.border})` }}>
+          <div key={h.key} data-pg="nsg-hop" style={{ display: 'flex', gap: '8px', alignItems: 'baseline', padding: '6px 10px', marginBottom: '4px', borderRadius: 'var(--r-ctl)', background: tint(hue, live ? 12 : 4), border: `1px solid color-mix(in srgb, ${hue} 50%, ${COLOR.border})` }}>
             <span aria-hidden="true" style={{ fontWeight: 900, width: '14px', flexShrink: 0, color: live ? ink(hue) : COLOR.muted }}>{PG_NSG_UI_MARK[h.state]}</span>
             <span style={{ minWidth: 0, fontSize: '12.5px', lineHeight: 1.4 }}>
               <strong>{i + 1}. {h.label}</strong><span style={{ color: COLOR.muted }}> · {h.where}</span>
@@ -342,12 +342,12 @@ function PgNsgResult({ result, onWhere }) {
   const canShow = !!d && !!(d.deviceId && d.field);
   return (
     <div>
-      <div style={{ padding: '10px 12px', borderRadius: '12px', background: tint(hue, 16), border: `2px solid ${hue}`, marginBottom: '10px', display: 'flex', gap: '8px', alignItems: 'baseline' }}>
+      <div style={{ padding: '10px 12px', borderRadius: 'var(--r-card)', background: tint(hue, 16), border: `1px solid ${hue}`, marginBottom: '10px', display: 'flex', gap: '8px', alignItems: 'baseline' }}>
         <span style={{ fontWeight: 900, color: ink(hue), fontSize: '16px' }}>{ok ? '✓' : '✕'}</span>
         <span style={{ fontWeight: 800, fontSize: '13.5px', lineHeight: 1.4 }}>{result.summary}</span>
       </div>
       {result.warnings.map((w) => (
-        <div key={w.code} style={{ padding: '10px 12px', borderRadius: '12px', background: tint(COLOR.orange, 12), border: `2px solid ${COLOR.orange}`, marginBottom: '10px', fontSize: '13px', lineHeight: 1.5 }}>
+        <div key={w.code} style={{ padding: '10px 12px', borderRadius: 'var(--r-card)', background: tint(COLOR.orange, 12), border: `1px solid ${COLOR.orange}`, marginBottom: '10px', fontSize: '13px', lineHeight: 1.5 }}>
           <div style={{ fontSize: '10.5px', fontWeight: 800, letterSpacing: '0.05em', textTransform: 'uppercase', color: ink(COLOR.orange) }}>Allowed, but look twice</div>
           <div style={{ fontWeight: 800, margin: '2px 0' }}>{w.title}</div>
           <div>{w.text}</div>
@@ -355,7 +355,7 @@ function PgNsgResult({ result, onWhere }) {
       ))}
       <PgDiagnosis diagnosis={d} heading="First thing that is wrong" />
       {canShow && (
-        <button className="btn-flat" onClick={() => onWhere(d)} style={{ ...pgPillStyle, marginBottom: '10px', minHeight: '36px', border: `2px solid ${COLOR.primary}`, color: ink(COLOR.primary) }}>Show me where</button>
+        <button className="btn-flat" onClick={() => onWhere(d)} style={{ ...pgPillStyle, marginBottom: '10px', minHeight: '36px', border: `1px solid ${COLOR.primary}`, color: ink(COLOR.primary) }}>Show me where</button>
       )}
       <PgNsgHops hops={result.hops} />
       <PgSteps steps={result.steps} />
@@ -443,7 +443,7 @@ function PgNsgLab({ topo, setTopo, goals, defaultAsk }) {
             <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginBottom: '10px' }} role="group" aria-label="Common ports">
               {PG_NSG_UI_PORTS.map((p) => (
                 <button key={p} className="btn-flat" onClick={() => setConnField({ port: p })} aria-label={`Use port ${p}`}
-                  style={{ ...pgPillStyle, padding: '4px 10px', minHeight: '36px', fontFamily: PG_NSG_UI_MONO, border: `2px solid ${String(conn.port) === p ? COLOR.primary : COLOR.border}`, color: String(conn.port) === p ? ink(COLOR.primary) : COLOR.muted }}>{p}</button>
+                  style={{ ...pgPillStyle, padding: '4px 10px', minHeight: '36px', fontFamily: PG_NSG_UI_MONO, border: `1px solid ${String(conn.port) === p ? COLOR.primary : COLOR.border}`, color: String(conn.port) === p ? ink(COLOR.primary) : COLOR.muted }}>{p}</button>
               ))}
             </div>
           ) : (

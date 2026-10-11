@@ -59,7 +59,7 @@ function PathReadStep({ unit, flashcardsData, speech, onDone }) {
   return (
     <div>
       {DiagramComp && (
-        <div style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `2px solid ${COLOR.border}`, borderRadius: '14px', padding: '14px', marginBottom: '16px' }}>
+        <div style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderRadius: 'var(--r-card)', padding: '14px', marginBottom: '16px' }}>
           <DiagramComp />
         </div>
       )}
@@ -82,7 +82,7 @@ function PathReadStep({ unit, flashcardsData, speech, onDone }) {
           <button
             onClick={() => setPage((n) => n - 1)}
             className="flex-1"
-            style={{ padding: '12px', borderRadius: '12px', border: `2px solid ${COLOR.border}`, background: 'transparent', color: COLOR.text, fontSize: '13px', fontWeight: 600 }}
+            style={{ padding: '12px', borderRadius: 'var(--r-card)', border: `1px solid ${COLOR.border}`, background: 'transparent', color: COLOR.text, fontSize: '13px', fontWeight: 600 }}
           >
             ‹ Back
           </button>
@@ -90,7 +90,7 @@ function PathReadStep({ unit, flashcardsData, speech, onDone }) {
         <button
           onClick={() => (isLast ? onDone(null) : setPage((n) => n + 1))}
           className="flex-1"
-          style={{ padding: '12px', borderRadius: '12px', background: COLOR.primary, color: COLOR.onAccent, fontSize: '14px', fontWeight: 600 }}
+          style={{ padding: '12px', borderRadius: 'var(--r-card)', background: COLOR.primary, color: COLOR.onAccent, fontSize: '14px', fontWeight: 600 }}
         >
           {isLast ? 'Done reading' : 'Next ›'}
         </button>
@@ -179,8 +179,8 @@ function PathQuizStep({ questions, passPct, label, categories, flashcardsData, o
     return (
       <div>
         <div style={{
-          marginBottom: '14px', padding: '14px', borderRadius: '14px', textAlign: 'center',
-          border: `1px solid ${passed ? COLOR.success : COLOR.gold}`, background: passed ? 'rgba(52,211,153,0.10)' : `${COLOR.gold}14`,
+          marginBottom: '14px', padding: '14px', borderRadius: 'var(--r-card)', textAlign: 'center',
+          border: `1px solid ${passed ? COLOR.success : COLOR.gold}`, background: passed ? 'color-mix(in srgb, var(--color-success) 10%, transparent)' : `${COLOR.gold}14`,
         }}>
           <div style={{ fontSize: '15px', fontWeight: 700, color: passed ? COLOR.success : COLOR.gold }}>
             {passed ? (reviewOnly ? `${label} done` : `${label} passed`) : `Not quite yet — ${passPct}% to pass`}
@@ -193,7 +193,7 @@ function PathQuizStep({ questions, passPct, label, categories, flashcardsData, o
           {passed && (
             <button
               onClick={() => onPass(pct)}
-              style={{ width: '100%', marginTop: '12px', padding: '12px', borderRadius: '12px', background: COLOR.success, color: COLOR.onAccent, fontSize: '14px', fontWeight: 700 }}
+              style={{ width: '100%', marginTop: '12px', padding: '12px', borderRadius: 'var(--r-card)', background: COLOR.success, color: COLOR.onAccent, fontSize: '14px', fontWeight: 700 }}
             >
               {reviewOnly ? (continueLabel || 'Back to the path ›') : 'Continue ›'}
             </button>
@@ -335,7 +335,7 @@ function PathApplyStep({ unit, categories, flashcardsData, onDone }) {
       <LessonApplySections lesson={unit.lesson} categories={categories} lessonCatKeys={unit.cats} flashcardsData={flashcardsData} />
       <button
         onClick={() => onDone(null)}
-        style={{ width: '100%', padding: '12px', borderRadius: '12px', background: COLOR.primary, color: COLOR.onAccent, fontSize: '14px', fontWeight: 600 }}
+        style={{ width: '100%', padding: '12px', borderRadius: 'var(--r-card)', background: COLOR.primary, color: COLOR.onAccent, fontSize: '14px', fontWeight: 600 }}
       >
         Got it
       </button>
@@ -378,7 +378,7 @@ function PathStepComplete({ unit, step, pct, unitComplete, testedOut, next, onNe
   const goalMet = goalTarget > 0 && goalCount >= goalTarget;
   const goalPct = goalTarget > 0 ? Math.min(100, Math.round((goalCount / goalTarget) * 100)) : 0;
   return (
-    <div style={{ position: 'relative', boxShadow: SHADOW.card, background: COLOR.surface, border: `2px solid ${COLOR.border}`, borderRadius: '20px', padding: '30px 22px 22px', textAlign: 'center', overflow: 'hidden' }}>
+    <div style={{ position: 'relative', boxShadow: SHADOW.card, background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderRadius: 'var(--r-card)', padding: '30px 22px 22px', textAlign: 'center', overflow: 'hidden' }}>
       {confetti > 0 && <Confetti count={confetti} />}
       <div style={{ position: 'relative' }}>
         <div className="pop-in" style={{ width: '84px', height: '84px', borderRadius: '50%', background: unitComplete ? COLOR.gold : COLOR.success, color: COLOR.onAccent, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 6px 0 rgba(0,0,0,0.3)' }}>
@@ -402,11 +402,11 @@ function PathStepComplete({ unit, step, pct, unitComplete, testedOut, next, onNe
           </div>
         )}
         <div className="rise-in" style={{ animationDelay: '0.5s', display: 'flex', gap: '8px', marginTop: '18px', textAlign: 'left' }}>
-          <div style={{ flex: 1, minWidth: 0, border: `2px solid ${COLOR.border}`, borderRadius: '14px', padding: '8px 12px' }}>
+          <div style={{ flex: 1, minWidth: 0, border: `1px solid ${COLOR.border}`, borderRadius: 'var(--r-card)', padding: '8px 12px' }}>
             <div style={{ fontSize: '11px', fontWeight: 800, letterSpacing: '0.06em', textTransform: 'uppercase', color: '#FF9A3D' }}>Streak</div>
             <div style={{ fontSize: '18px', fontWeight: 800 }}>🔥 {streak} day{streak === 1 ? '' : 's'}</div>
           </div>
-          <div style={{ flex: 1, minWidth: 0, border: `2px solid ${goalMet ? COLOR.success : COLOR.border}`, borderRadius: '14px', padding: '8px 12px' }}>
+          <div style={{ flex: 1, minWidth: 0, border: `1px solid ${goalMet ? COLOR.success : COLOR.border}`, borderRadius: 'var(--r-card)', padding: '8px 12px' }}>
             <div style={{ fontSize: '11px', fontWeight: 800, letterSpacing: '0.06em', textTransform: 'uppercase', color: goalMet ? COLOR.success : COLOR.primary }}>{goalMet ? 'Goal met' : 'Daily goal'}</div>
             <div style={{ fontSize: '18px', fontWeight: 800 }}>{goalMet ? '✓ ' : ''}{goalCount} / {goalTarget}</div>
             <div style={{ height: '5px', borderRadius: '3px', background: COLOR.surfaceRaised, marginTop: '4px', overflow: 'hidden' }}>
@@ -418,7 +418,7 @@ function PathStepComplete({ unit, step, pct, unitComplete, testedOut, next, onNe
           <button
             onClick={onNext}
             className="btn-3d"
-            style={{ width: '100%', marginTop: '20px', padding: '14px', borderRadius: '14px', background: COLOR.primary, color: COLOR.onAccent, fontSize: '15px', fontWeight: 800 }}
+            style={{ width: '100%', marginTop: '20px', padding: '14px', borderRadius: 'var(--r-card)', background: COLOR.primary, color: COLOR.onAccent, fontSize: '15px', fontWeight: 800 }}
           >
             {nextLabel || (next.unit.index !== unit.index ? `Next unit: ${next.unit.title}` : `Next: ${next.step.label}`)}
           </button>
@@ -427,7 +427,7 @@ function PathStepComplete({ unit, step, pct, unitComplete, testedOut, next, onNe
         )}
         <button
           onClick={onBack}
-          style={{ width: '100%', marginTop: '12px', padding: '12px', borderRadius: '14px', border: `2px solid ${COLOR.border}`, background: 'transparent', color: COLOR.text, fontSize: '14px', fontWeight: 700 }}
+          style={{ width: '100%', marginTop: '12px', padding: '12px', borderRadius: 'var(--r-card)', border: `1px solid ${COLOR.border}`, background: 'transparent', color: COLOR.text, fontSize: '14px', fontWeight: 700 }}
         >
           {backLabel || 'Back to the path'}
         </button>
@@ -587,8 +587,6 @@ function PathStepRunner({ trackKey, units, unit, step, results, seenLog, categor
 }
 
 // Horizontal wiggle of the trail, in px from centre, cycling per node.
-const PATH_WAVE = [0, 44, 68, 44, 0, -44, -68, -44];
-
 function PathStars({ pct }) {
   const n = pct >= 90 ? 3 : pct >= 70 ? 2 : 1;
   return (
@@ -602,45 +600,22 @@ function PathStars({ pct }) {
   );
 }
 
-// One stop on the trail: a big round "3D" node with its label. The whole
-// thing is a single button; the face sinks when pressed.
-function PathTrailNode({ step, index, done, isNext, entry, onOpen }) {
-  const checkpoint = step.kind === 'checkpoint';
-  const size = isNext ? 78 : 68;
-  const hue = stepHue(step.kind);
-  const bg = done ? COLOR.success : isNext || checkpoint ? hue : tint(hue, 16);
-  const fg = done || isNext || checkpoint ? COLOR.onAccent : hue;
+// One stop on the route: the shared RouteStep, with the step's id (U3.02), its detail
+// line and, for scored steps that are done, the star rating.
+function PathTrailNode({ unit, step, index, done, isNext, entry, onOpen }) {
   const starKinds = ['quiz', 'quiz2', 'quick', 'game', 'game2', 'checkpoint'];
   const showStars = done && entry && typeof entry.pct === 'number' && starKinds.includes(step.kind);
   return (
-    <button
-      onClick={onOpen}
-      className="btn-flat trail-node"
-      aria-label={`${step.label}, ${done ? 'completed' : 'not completed'}`}
-      style={{
-        display: 'flex', flexDirection: 'column', alignItems: 'center', background: 'transparent', color: COLOR.text, padding: 0,
-        transform: `translateX(${PATH_WAVE[index % PATH_WAVE.length]}px)`, marginBottom: '22px', width: '170px',
-      }}
-    >
-      {isNext && (
-        <span className="bob" style={{ fontSize: '12px', fontWeight: 900, letterSpacing: '0.08em', color: hue, background: COLOR.surface, border: `2px solid ${hue}`, borderRadius: '10px', padding: '3px 10px', marginBottom: '8px', position: 'relative', animation: 'bob 1.4s ease-in-out infinite' }}>
-          START
-        </span>
-      )}
-      <span
-        className={`node-face${isNext ? ' pulse' : ''}`}
-        style={{
-          width: `${size}px`, height: `${size}px`, borderRadius: '50%', display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-          background: bg, color: fg, border: !done && !isNext && !checkpoint ? `2px solid color-mix(in srgb, ${hue} 55%, ${COLOR.border})` : 'none', ['--ring']: `color-mix(in srgb, ${hue} 55%, transparent)`,
-          animation: isNext ? 'pulseRing 1.6s ease-out infinite' : 'none',
-        }}
-      >
-        <PathIcon kind={done ? 'check' : step.kind} size={isNext ? 34 : 30} />
-      </span>
-      {showStars && <PathStars pct={entry.pct} />}
-      <span style={{ marginTop: showStars ? '4px' : '10px', fontSize: '13px', fontWeight: isNext ? 800 : 700, color: done ? COLOR.muted : COLOR.text, textAlign: 'center', lineHeight: 1.25 }}>{step.label}</span>
-      {isNext && step.meta && <span style={{ fontSize: '12px', color: COLOR.muted, marginTop: '1px' }}>{step.meta}</span>}
-    </button>
+    <RouteStep
+      id={`U${unit.index + 1}.${String(index + 1).padStart(2, '0')}`}
+      title={step.label}
+      detail={step.meta}
+      kind={step.kind}
+      done={done}
+      isNext={isNext}
+      stars={showStars ? <PathStars pct={entry.pct} /> : null}
+      onOpen={onOpen}
+    />
   );
 }
 
@@ -667,7 +642,7 @@ function PathView({ track, trackKey, doneMap, unlockedMap, pathLocking, results,
 
   if (!units.length) {
     return (
-      <div style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `2px solid ${COLOR.border}`, borderRadius: '18px', padding: '22px', textAlign: 'center' }}>
+      <div style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderRadius: 'var(--r-card)', padding: '22px', textAlign: 'center' }}>
         <div className="itil-display" style={{ fontSize: '17px', fontWeight: 600, marginBottom: '6px' }}>No guided path yet</div>
         <div style={{ fontSize: '12.5px', color: COLOR.muted, lineHeight: 1.5 }}>
           {track.label} doesn't have lessons to build a path from. Use Practice for quizzes and games, or Reference for the study notes.
@@ -772,34 +747,31 @@ function PathView({ track, trackKey, doneMap, unlockedMap, pathLocking, results,
   return (
     <div>
       <PathPanelSwitch panel={panel || 'course'} onPanel={onPanel} weakCount={weakCount} />
-      <div style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `2px solid ${COLOR.border}`, borderRadius: '16px', padding: '16px', marginBottom: '14px' }}>
-        <div className="flex justify-between items-baseline" style={{ marginBottom: '8px' }}>
-          <div className="itil-display" style={{ fontSize: '17px', fontWeight: 600 }}>{track.label} path</div>
-          <div style={{ fontSize: '12px', color: COLOR.muted }}>{overall.unitsComplete} of {overall.unitCount} units</div>
+      <div style={{ background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderRadius: 'var(--r-card)', padding: '16px', marginBottom: '14px' }}>
+        <div className="flex justify-between items-baseline" style={{ marginBottom: '10px' }}>
+          <div className="itil-display" style={{ fontSize: '17px' }}>{track.label} path</div>
+          <div className="mono" style={{ fontSize: '12px', color: COLOR.muted }}>{overall.unitsComplete} of {overall.unitCount} units</div>
         </div>
-        <ExperienceChip trackKey={trackKey} style={{ marginBottom: '8px' }} />
-        <div style={{ height: '6px', borderRadius: '3px', background: COLOR.surfaceRaised, overflow: 'hidden', marginBottom: '6px' }}>
-          <div style={{ height: '100%', width: `${overall.pct}%`, background: COLOR.success, borderRadius: '3px' }} />
-        </div>
-        <div style={{ fontSize: '12px', color: COLOR.muted, marginBottom: '12px' }}>
+        <ExperienceChip trackKey={trackKey} style={{ marginBottom: '10px' }} />
+        <TickBar value={overall.done} total={overall.total} ticks={12} label={`${overall.pct}% of steps done`} />
+        <div className="mono" style={{ fontSize: '11.5px', color: COLOR.muted, margin: '8px 0 14px' }}>
           {overall.done} of {overall.total} steps done
         </div>
         {next ? (
           <button
             onClick={() => startStep(next.unit, next.step)}
-            className="btn-3d"
-            style={{ width: '100%', padding: '13px', borderRadius: '14px', background: stepHue(next.step.kind), color: COLOR.onAccent, fontSize: '14px', fontWeight: 700, textAlign: 'left', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px' }}
+            style={{ width: '100%', padding: '12px 14px', borderRadius: 'var(--r-ctl)', border: 'none', background: COLOR.primary, color: COLOR.onAccent, textAlign: 'left', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px' }}
           >
             <span style={{ minWidth: 0 }}>
-              <span style={{ display: 'block', fontSize: '11px', opacity: 0.8, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+              <span style={{ display: 'block', fontSize: '10.5px', textTransform: 'uppercase', opacity: 0.8 }}>
                 {overall.done === 0 ? 'Start' : 'Continue'} · Unit {next.unit.index + 1}
               </span>
-              <span style={{ display: 'block' }}>{next.step.label}</span>
+              <span style={{ display: 'block', fontSize: '15px', fontWeight: 700, marginTop: '2px' }}>{next.step.label}</span>
             </span>
-            <span style={{ fontSize: '18px' }}>›</span>
+            <span style={{ fontSize: '18px' }}>→</span>
           </button>
         ) : (
-          <div style={{ fontSize: '13px', fontWeight: 600, color: COLOR.success, textAlign: 'center' }}>
+          <div style={{ fontSize: '13px', fontWeight: 600, color: COLOR.primary, textAlign: 'center' }}>
             Path complete — open any step below to review it.
           </div>
         )}
@@ -811,7 +783,7 @@ function PathView({ track, trackKey, doneMap, unlockedMap, pathLocking, results,
             <button
               onClick={startReview}
               className="btn-flat"
-              style={{ padding: '10px 12px', borderRadius: '14px', textAlign: 'left', border: `2px solid ${COLOR.red}`, background: 'rgba(181,87,74,0.1)', color: COLOR.red, minWidth: 0 }}
+              style={{ padding: '10px 12px', borderRadius: 'var(--r-card)', textAlign: 'left', border: `1px solid ${COLOR.red}`, background: 'color-mix(in srgb, var(--color-red) 10%, transparent)', color: COLOR.red, minWidth: 0 }}
             >
               <span style={{ display: 'block', fontSize: '13px', fontWeight: 800 }}>Review weak spots</span>
               <span style={{ display: 'block', fontSize: '11.5px', fontWeight: 600, opacity: 0.9 }}>
@@ -823,7 +795,7 @@ function PathView({ track, trackKey, doneMap, unlockedMap, pathLocking, results,
             <button
               onClick={api.openToughTerms}
               className="btn-flat"
-              style={{ padding: '10px 12px', borderRadius: '14px', textAlign: 'left', border: `2px solid ${COLOR.gold}`, background: 'rgba(200,160,60,0.1)', color: COLOR.gold, minWidth: 0 }}
+              style={{ padding: '10px 12px', borderRadius: 'var(--r-card)', textAlign: 'left', border: `1px solid ${COLOR.gold}`, background: 'color-mix(in srgb, var(--color-gold) 10%, transparent)', color: COLOR.gold, minWidth: 0 }}
             >
               <span style={{ display: 'block', fontSize: '13px', fontWeight: 800 }}>Tough terms</span>
               <span style={{ display: 'block', fontSize: '11.5px', fontWeight: 600, opacity: 0.9 }}>
@@ -840,27 +812,27 @@ function PathView({ track, trackKey, doneMap, unlockedMap, pathLocking, results,
         const locked = isPathUnitLocked(units, unit, doneMap, unlockedMap, pathLocking);
         const blocker = locked ? units.find((u) => u.index < unit.index && !pathUnitProgress(u, doneMap).complete) : null;
         return (
-          <div key={unit.id} style={{ marginBottom: '14px' }}>
-            <div style={{ position: 'sticky', top: `${APP_HEADER_HEIGHT}px`, zIndex: 20, background: COLOR.bg, padding: '10px 0 8px' }}>
+          <div key={unit.id} style={{ marginBottom: '10px' }}>
+            <div style={{ position: 'sticky', top: `${APP_HEADER_HEIGHT}px`, zIndex: 20, background: COLOR.bg, padding: '8px 0' }}>
             <button
               onClick={() => setExpanded((e) => ({ ...e, [unit.index]: !e[unit.index] }))}
-              className="btn-3d"
               aria-expanded={open}
               style={{
-                width: '100%', textAlign: 'left', display: 'flex', alignItems: 'stretch',
-                borderRadius: '18px', padding: 0, overflow: 'hidden',
-                background: locked ? COLOR.surfaceRaised : prog.complete ? COLOR.success : unitHue(unit.index), color: locked ? COLOR.muted : COLOR.onAccent,
-                border: locked ? `2px solid ${COLOR.border}` : 'none',
+                width: '100%', textAlign: 'left', display: 'flex', alignItems: 'center', gap: '12px',
+                borderRadius: 'var(--r-card)', padding: '12px 14px',
+                background: COLOR.surface, color: locked ? COLOR.muted : COLOR.text,
+                border: `1px solid ${COLOR.border}`, borderLeft: `3px solid ${locked ? COLOR.border : COLOR.primary}`,
               }}
             >
-              <span style={{ flex: 1, minWidth: 0, padding: '12px 16px' }}>
-                <span style={{ display: 'block', fontSize: '12px', fontWeight: 800, letterSpacing: '0.06em', textTransform: 'uppercase', opacity: 0.85 }}>
-                  Unit {unit.index + 1} · {locked ? 'Locked' : `${prog.done}/${prog.total}`}
+              <span style={{ flex: 1, minWidth: 0 }}>
+                <span style={{ display: 'block', fontSize: '10.5px', textTransform: 'uppercase', color: prog.complete ? COLOR.primary : COLOR.muted }}>
+                  Unit {unit.index + 1} · {locked ? 'Locked' : prog.complete ? 'Complete' : `${prog.done}/${prog.total}`}
                 </span>
-                <span style={{ display: 'block', fontSize: '18px', fontWeight: 800, lineHeight: 1.2 }}>{unit.title}</span>
+                <span style={{ display: 'block', fontSize: '16px', fontWeight: 700, lineHeight: 1.25, margin: '3px 0 0' }}>{unit.title}</span>
+                {!locked && <span style={{ display: 'block', marginTop: '9px' }}><TickBar value={prog.done} total={prog.total} ticks={Math.min(prog.total, 12)} height={5} label={`${prog.done} of ${prog.total} steps`} /></span>}
               </span>
-              <span style={{ width: '52px', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', borderLeft: '2px solid rgba(0,0,0,0.18)', fontSize: '14px' }}>
-                {locked ? <PathIcon kind="lock" size={20} /> : open ? '▴' : '▾'}
+              <span style={{ flexShrink: 0, display: 'flex', alignItems: 'center', color: COLOR.muted, fontSize: '12px' }}>
+                {locked ? <PathIcon kind="lock" size={18} /> : open ? '▴' : '▾'}
               </span>
             </button>
             </div>
@@ -872,37 +844,40 @@ function PathView({ track, trackKey, doneMap, unlockedMap, pathLocking, results,
                 <button
                   onClick={() => api.unlockUnit(unit.id)}
                   className="btn-flat"
-                  style={{ marginTop: '12px', padding: '10px 18px', borderRadius: '14px', border: `2px solid ${COLOR.primary}`, background: 'transparent', color: COLOR.primary, fontSize: '13px', fontWeight: 800 }}
+                  style={{ marginTop: '12px', padding: '10px 18px', borderRadius: 'var(--r-ctl)', border: `1px solid ${COLOR.primary}`, background: 'transparent', color: COLOR.primary, fontSize: '13px', fontWeight: 700 }}
                 >
                   Unlock anyway
                 </button>
               </div>
             ) : open ? (
-              <div style={{ padding: '20px 0 4px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                <div style={{ fontSize: '13px', color: COLOR.muted, textAlign: 'center', maxWidth: '300px', lineHeight: 1.45, marginBottom: '22px' }}>{unit.summary}</div>
-                {unit.steps.map((step, i) => (
-                  <PathTrailNode
-                    key={step.id}
-                    step={step}
-                    index={i}
-                    done={pathStepIsDone(doneMap, step.id)}
-                    isNext={!!next && next.step.id === step.id}
-                    entry={doneMap[step.id]}
-                    onOpen={() => startStep(unit, step)}
-                  />
-                ))}
+              <div style={{ padding: '8px 0 4px' }}>
+                {unit.summary && <div style={{ fontSize: '13px', color: COLOR.muted, lineHeight: 1.5, margin: '0 2px 10px' }}>{unit.summary}</div>}
+                <RouteList>
+                  {unit.steps.map((step, i) => (
+                    <PathTrailNode
+                      key={step.id}
+                      unit={unit}
+                      step={step}
+                      index={i}
+                      done={pathStepIsDone(doneMap, step.id)}
+                      isNext={!!next && next.step.id === step.id}
+                      entry={doneMap[step.id]}
+                      onOpen={() => startStep(unit, step)}
+                    />
+                  ))}
+                </RouteList>
                 {!prog.complete && (
                   <button
                     onClick={() => startStep(unit, pathTestOutStep(unit))}
                     className="btn-flat"
-                    style={{ padding: '10px 18px', borderRadius: '14px', border: `2px solid ${COLOR.border}`, background: 'transparent', color: COLOR.muted, fontSize: '13px', fontWeight: 800 }}
+                    style={{ marginTop: '8px', padding: '10px 14px', borderRadius: 'var(--r-ctl)', border: `1px solid ${COLOR.border}`, background: 'transparent', color: COLOR.muted, fontSize: '13px', fontWeight: 600 }}
                   >
                     Already know this? Test out ›
                   </button>
                 )}
               </div>
             ) : (
-              unit.summary && <div style={{ fontSize: '12.5px', color: COLOR.muted, padding: '10px 6px 0', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{unit.summary}</div>
+              unit.summary && <div style={{ fontSize: '12.5px', color: COLOR.muted, padding: '2px 6px 0', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{unit.summary}</div>
             )}
           </div>
         );

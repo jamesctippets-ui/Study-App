@@ -14,7 +14,7 @@ function PgBinary({ bits, hue, label }) {
         {[0, 1, 2, 3].map((o) => (
           <span key={o}>
             {bits.slice(o * 8, o * 8 + 8).map((b, i) => (
-              <span key={i} style={{ color: b.net ? ink(hue) : COLOR.muted, fontWeight: b.net ? 800 : 500, borderLeft: b.net === false && o * 8 + i > 0 && bits[o * 8 + i - 1].net ? `2px solid ${COLOR.gold}` : 'none', paddingLeft: b.net === false && o * 8 + i > 0 && bits[o * 8 + i - 1].net ? '1px' : 0 }}>{b.bit}</span>
+              <span key={i} style={{ color: b.net ? ink(hue) : COLOR.muted, fontWeight: b.net ? 800 : 500, borderLeft: b.net === false && o * 8 + i > 0 && bits[o * 8 + i - 1].net ? `1px solid ${COLOR.gold}` : 'none', paddingLeft: b.net === false && o * 8 + i > 0 && bits[o * 8 + i - 1].net ? '1px' : 0 }}>{b.bit}</span>
             ))}
           </span>
         ))}
@@ -25,7 +25,7 @@ function PgBinary({ bits, hue, label }) {
 
 function PgResult({ label, value, sub, hue }) {
   return (
-    <div style={{ minWidth: 0, background: tint(hue, 13), border: `2px solid color-mix(in srgb, ${hue} 40%, ${COLOR.border})`, borderRadius: '12px', padding: '8px 10px' }}>
+    <div style={{ minWidth: 0, background: tint(hue, 13), border: `1px solid color-mix(in srgb, ${hue} 40%, ${COLOR.border})`, borderRadius: 'var(--r-card)', padding: '8px 10px' }}>
       <div style={{ fontSize: '10.5px', fontWeight: 800, letterSpacing: '0.05em', textTransform: 'uppercase', color: ink(hue) }}>{label}</div>
       <div style={{ fontSize: '13px', fontWeight: 800, lineHeight: 1.25, marginTop: '1px', overflowWrap: 'anywhere', letterSpacing: '-0.01em', fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace' }}>{value}</div>
       {sub ? <div style={{ fontSize: '11px', color: COLOR.muted, marginTop: '1px' }}>{sub}</div> : null}
@@ -72,7 +72,7 @@ function SubnetCalculator() {
         <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginTop: '10px' }}>
           {examples.map(([a, m]) => (
             <button key={a + m} className="btn-flat" onClick={() => { setAddr(a); setMask(m); }}
-              style={{ fontSize: '11.5px', padding: '4px 9px', borderRadius: '999px', border: `1.5px solid ${COLOR.border}`, color: COLOR.muted }}>
+              style={{ fontSize: '11.5px', padding: '4px 9px', borderRadius: 'var(--r-pill)', border: `1px solid ${COLOR.border}`, color: COLOR.muted }}>
               {a}{m.startsWith('/') ? m : ` ${m}`}
             </button>
           ))}
@@ -128,7 +128,7 @@ function SubnetCalculator() {
                 <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginBottom: '10px' }}>
                   {splitOptions.map((p) => (
                     <button key={p} className="btn-flat" onClick={() => setSplitTo(splitPrefix === p ? 0 : p)}
-                      style={{ fontSize: '12px', fontWeight: 800, padding: '5px 10px', borderRadius: '999px', border: `2px solid ${splitPrefix === p ? COLOR.pink : COLOR.border}`, background: splitPrefix === p ? tint(COLOR.pink, 20) : 'transparent', color: splitPrefix === p ? ink(COLOR.pink) : COLOR.muted }}>
+                      style={{ fontSize: '12px', fontWeight: 800, padding: '5px 10px', borderRadius: 'var(--r-pill)', border: `1px solid ${splitPrefix === p ? COLOR.pink : COLOR.border}`, background: splitPrefix === p ? tint(COLOR.pink, 20) : 'transparent', color: splitPrefix === p ? ink(COLOR.pink) : COLOR.muted }}>
                       /{p}
                     </button>
                   ))}
@@ -179,7 +179,7 @@ function SubnetCompare() {
         : { text: 'The masks disagree: one host believes the other is local and the other does not. Expect odd, one-way failures.', hue: COLOR.orange };
     body = (
       <>
-        <div style={{ padding: '10px 12px', borderRadius: '12px', fontWeight: 800, fontSize: '13.5px', background: tint(verdict.hue, 16), border: `2px solid ${verdict.hue}`, color: ink(verdict.hue), marginBottom: '10px' }}>{verdict.text}</div>
+        <div style={{ padding: '10px 12px', borderRadius: 'var(--r-card)', fontWeight: 800, fontSize: '13.5px', background: tint(verdict.hue, 16), border: `1px solid ${verdict.hue}`, color: ink(verdict.hue), marginBottom: '10px' }}>{verdict.text}</div>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '8px' }}>
           <PgResult label="Host A is in" value={`${ia.networkText}/${ia.prefix}`} sub={`${ia.firstText} – ${ia.lastText}`} hue={COLOR.blue} />
           <PgResult label="Host B is in" value={`${ib.networkText}/${ib.prefix}`} sub={`${ib.firstText} – ${ib.lastText}`} hue={COLOR.teal} />
@@ -258,7 +258,7 @@ function VlsmPlanner() {
             </div>
           ))}
           {plan.unplaced.length > 0 && (
-            <div style={{ marginTop: '8px', padding: '8px 10px', borderRadius: '10px', background: tint(COLOR.red, 14), border: `2px solid ${COLOR.red}`, fontSize: '12.5px' }}>
+            <div style={{ marginTop: '8px', padding: '8px 10px', borderRadius: 'var(--r-ctl)', background: tint(COLOR.red, 14), border: `1px solid ${COLOR.red}`, fontSize: '12.5px' }}>
               <strong>Does not fit:</strong> {plan.unplaced.map((u) => `${u.name} (${u.hosts} hosts, needs a /${u.prefix})`).join('; ')}. Use a shorter prefix for the whole network or reduce the requirements.
             </div>
           )}
@@ -331,16 +331,16 @@ function SubnetDrill() {
       <div style={{ display: 'flex', gap: '8px', marginTop: '10px' }}>
         {!checked ? (
           <button className="btn-3d" disabled={!answer.trim()} onClick={check}
-            style={{ flex: 1, padding: '10px', borderRadius: '10px', background: COLOR.primary, color: COLOR.onAccent, fontSize: '13px', fontWeight: 700, opacity: answer.trim() ? 1 : 0.5 }}>Check</button>
+            style={{ flex: 1, padding: '10px', borderRadius: 'var(--r-ctl)', background: COLOR.primary, color: COLOR.onAccent, fontSize: '13px', fontWeight: 700, opacity: answer.trim() ? 1 : 0.5 }}>Check</button>
         ) : (
           <button className="btn-3d" onClick={() => next()}
-            style={{ flex: 1, padding: '10px', borderRadius: '10px', background: COLOR.primary, color: COLOR.onAccent, fontSize: '13px', fontWeight: 700 }}>Next question</button>
+            style={{ flex: 1, padding: '10px', borderRadius: 'var(--r-ctl)', background: COLOR.primary, color: COLOR.onAccent, fontSize: '13px', fontWeight: 700 }}>Next question</button>
         )}
         {!checked && <button className="btn-flat" onClick={() => setChecked({ right: false, gaveUp: true })} style={{ fontSize: '12.5px', color: COLOR.muted, padding: '0 8px' }}>Show answer</button>}
       </div>
       {checked && (
         <div style={{ marginTop: '12px' }}>
-          <div style={{ padding: '8px 10px', borderRadius: '10px', fontWeight: 800, fontSize: '13px', background: tint(checked.right ? COLOR.success : COLOR.red, 16), border: `2px solid ${checked.right ? COLOR.success : COLOR.red}`, marginBottom: '8px' }}>
+          <div style={{ padding: '8px 10px', borderRadius: 'var(--r-ctl)', fontWeight: 800, fontSize: '13px', background: tint(checked.right ? COLOR.success : COLOR.red, 16), border: `1px solid ${checked.right ? COLOR.success : COLOR.red}`, marginBottom: '8px' }}>
             {checked.right ? 'Correct.' : `The answer is ${expected}.`}
           </div>
           <ol style={{ margin: 0, paddingLeft: '20px', listStyle: 'decimal', fontSize: '12.5px', lineHeight: 1.55 }}>
@@ -392,7 +392,7 @@ function Ipv6Tool() {
         <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginTop: '10px' }}>
           {examples.map(([a, p]) => (
             <button key={a} className="btn-flat" onClick={() => { setAddr(a); setPrefix(p); }}
-              style={{ fontSize: '11.5px', padding: '4px 9px', borderRadius: '999px', border: `1.5px solid ${COLOR.border}`, color: COLOR.muted }}>{a.length > 22 ? `${a.slice(0, 20)}…` : a}{p}</button>
+              style={{ fontSize: '11.5px', padding: '4px 9px', borderRadius: 'var(--r-pill)', border: `1px solid ${COLOR.border}`, color: COLOR.muted }}>{a.length > 22 ? `${a.slice(0, 20)}…` : a}{p}</button>
           ))}
         </div>
       </PgCard>
@@ -418,7 +418,7 @@ function Ipv6Tool() {
                 <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginBottom: '10px' }}>
                   {splitOptions.map((x) => (
                     <button key={x} className="btn-flat" onClick={() => setSplitTo(splitPrefix === x ? 0 : x)}
-                      style={{ fontSize: '12px', fontWeight: 800, padding: '5px 10px', borderRadius: '999px', border: `2px solid ${splitPrefix === x ? COLOR.pink : COLOR.border}`, background: splitPrefix === x ? tint(COLOR.pink, 20) : 'transparent', color: splitPrefix === x ? ink(COLOR.pink) : COLOR.muted }}>/{x}</button>
+                      style={{ fontSize: '12px', fontWeight: 800, padding: '5px 10px', borderRadius: 'var(--r-pill)', border: `1px solid ${splitPrefix === x ? COLOR.pink : COLOR.border}`, background: splitPrefix === x ? tint(COLOR.pink, 20) : 'transparent', color: splitPrefix === x ? ink(COLOR.pink) : COLOR.muted }}>/{x}</button>
                   ))}
                 </div>
                 {splitPrefix ? (
@@ -486,14 +486,14 @@ function PgProgressCard() {
   const got = PG_MILESTONES.filter((m) => m.test(p));
   return (
     <PgCard title="Your Playground" hue={COLOR.gold} right={<span style={{ fontSize: '12px', color: COLOR.muted }}>{p.solved} / {p.total} scenarios fixed</span>}>
-      <div style={{ height: '8px', borderRadius: '999px', background: COLOR.surfaceRaised, overflow: 'hidden', marginBottom: '10px' }}>
+      <div style={{ height: '8px', borderRadius: 'var(--r-pill)', background: COLOR.surfaceRaised, overflow: 'hidden', marginBottom: '10px' }}>
         <div style={{ width: `${Math.round((p.solved / p.total) * 100)}%`, height: '100%', background: COLOR.success }} />
       </div>
       <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
         {PG_MILESTONES.map((m) => {
           const earned = got.includes(m);
           return (
-            <span key={m.key} title={earned ? 'Earned' : 'Not yet'} style={{ fontSize: '11.5px', fontWeight: 800, padding: '4px 9px', borderRadius: '999px', border: `1.5px solid ${earned ? COLOR.gold : COLOR.border}`, background: earned ? tint(COLOR.gold, 18) : 'transparent', color: earned ? COLOR.text : COLOR.muted, opacity: earned ? 1 : 0.7 }}>
+            <span key={m.key} title={earned ? 'Earned' : 'Not yet'} style={{ fontSize: '11.5px', fontWeight: 800, padding: '4px 9px', borderRadius: 'var(--r-pill)', border: `1px solid ${earned ? COLOR.gold : COLOR.border}`, background: earned ? tint(COLOR.gold, 18) : 'transparent', color: earned ? COLOR.text : COLOR.muted, opacity: earned ? 1 : 0.7 }}>
               <span aria-hidden="true" style={{ filter: earned ? 'none' : 'grayscale(1)' }}>{m.icon}</span> {m.label}
             </span>
           );
@@ -525,8 +525,8 @@ function PlaygroundView({ tool, pick, onSelect, onExit }) {
             disabled={!t.ready}
             onClick={() => t.ready && onSelect(t.key, '')}
             style={{
-              display: 'block', width: '100%', textAlign: 'left', marginBottom: '12px', padding: '14px 16px', borderRadius: '16px',
-              background: tint(t.hue, t.ready ? 10 : 4), border: `2px solid color-mix(in srgb, ${t.hue} ${t.ready ? 45 : 20}%, ${COLOR.border})`,
+              display: 'block', width: '100%', textAlign: 'left', marginBottom: '12px', padding: '14px 16px', borderRadius: 'var(--r-card)',
+              background: tint(t.hue, t.ready ? 10 : 4), border: `1px solid color-mix(in srgb, ${t.hue} ${t.ready ? 45 : 20}%, ${COLOR.border})`,
               opacity: t.ready ? 1 : 0.7, color: COLOR.text, boxShadow: t.ready ? SHADOW.card : 'none',
             }}
           >

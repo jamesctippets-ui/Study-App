@@ -652,7 +652,8 @@ tools/
   check_flyout.js     — unit tests for the flyout placement maths
   checks/<tool>.js    — per-tool checks for the extra Playground tools (loaded by check_playground.js)
 src/js/
-  00_preamble.js        — React hook imports, the COLOR palette
+  00_preamble.js        — React hook imports, the COLOR palette, hues, theme and icon helpers
+  00b_console_ui.jsx    — Console look building blocks: TickBar, SectionLabel, SegmentedControl, RouteList/RouteStep, QuizOption
   01_diagrams.jsx        — SVG lesson diagrams
   02_portal_mockups.jsx  — fake Azure Portal screenshots used in lessons; the term-flyout engine (alias matching, acronym lookup, GlossText)
   03_helpers.js          — shuffling, storage, question-prep helpers

@@ -19,7 +19,7 @@ function MockField({ x, y, w, h, label, value, highlight }) {
   return (
     <g>
       <text x={x} y={y - 3} fill={COLOR.muted} fontSize="7">{label}</text>
-      <rect x={x} y={y} width={w} height={h} rx="4" fill={highlight ? 'rgba(167,139,250,0.14)' : COLOR.surface} stroke={highlight ? COLOR.primary : COLOR.border} strokeWidth="1" />
+      <rect x={x} y={y} width={w} height={h} rx="4" fill={highlight ? 'color-mix(in srgb, var(--color-primary) 14%, transparent)' : COLOR.surface} stroke={highlight ? COLOR.primary : COLOR.border} strokeWidth="1" />
       {value && <text x={x + 6} y={y + h / 2 + 3} fill={highlight ? COLOR.primary : COLOR.text} fontSize="8">{value}</text>}
     </g>
   );
@@ -43,7 +43,7 @@ function MockupStorageAccount() {
       <text x={12} y={40} fill={COLOR.text} fontSize="9" fontWeight="700">Create a storage account</text>
       <MockField x={12} y={52} w={296} h={18} label="Storage account name" value="stmyappdata001" />
       <text x={12} y={86} fill={COLOR.muted} fontSize="7">Performance</text>
-      <rect x={12} y={90} width="90" height="18" rx="4" fill="rgba(167,139,250,0.14)" stroke={COLOR.primary} strokeWidth="1" />
+      <rect x={12} y={90} width="90" height="18" rx="4" fill="color-mix(in srgb, var(--color-primary) 14%, transparent)" stroke={COLOR.primary} strokeWidth="1" />
       <text x={57} y={102} textAnchor="middle" fill={COLOR.primary} fontSize="7.5">● Standard</text>
       <rect x={110} y={90} width="90" height="18" rx="4" fill={COLOR.surface} stroke={COLOR.border} strokeWidth="1" />
       <text x={155} y={102} textAnchor="middle" fill={COLOR.muted} fontSize="7.5">○ Premium</text>
@@ -59,7 +59,7 @@ function MockupVmSize() {
       <text x={18} y={54} fill={COLOR.muted} fontSize="7">Size</text>
       <text x={200} y={54} fill={COLOR.muted} fontSize="7">vCPUs</text>
       <text x={250} y={54} fill={COLOR.muted} fontSize="7">RAM</text>
-      <rect x={12} y={60} width="296" height="20" rx="4" fill="rgba(167,139,250,0.14)" stroke={COLOR.primary} strokeWidth="1" />
+      <rect x={12} y={60} width="296" height="20" rx="4" fill="color-mix(in srgb, var(--color-primary) 14%, transparent)" stroke={COLOR.primary} strokeWidth="1" />
       <text x={18} y={73} fill={COLOR.primary} fontSize="7.5">Standard_D2s_v5</text>
       <text x={205} y={73} fill={COLOR.primary} fontSize="7.5">2</text>
       <text x={252} y={73} fill={COLOR.primary} fontSize="7.5">8 GiB</text>
@@ -82,7 +82,7 @@ function MockupRoleAssignment() {
       <MockField x={12} y={52} w={296} h={18} label="Role" value="Contributor" highlight />
       <MockField x={12} y={86} w={296} h={18} label="Scope" value="Subscription  >  rg-production" />
       <text x={12} y={122} fill={COLOR.muted} fontSize="7">Assign access to</text>
-      <rect x={12} y={126} width="140" height="18" rx="4" fill="rgba(167,139,250,0.14)" stroke={COLOR.primary} strokeWidth="1" />
+      <rect x={12} y={126} width="140" height="18" rx="4" fill="color-mix(in srgb, var(--color-primary) 14%, transparent)" stroke={COLOR.primary} strokeWidth="1" />
       <text x={82} y={138} textAnchor="middle" fill={COLOR.primary} fontSize="7.5">● User, group</text>
       <rect x={160} y={126} width="148" height="18" rx="4" fill={COLOR.surface} stroke={COLOR.border} strokeWidth="1" />
       <text x={234} y={138} textAnchor="middle" fill={COLOR.muted} fontSize="7.5">○ Managed identity</text>
@@ -125,7 +125,7 @@ function MockupNsgRule() {
       <MockField x={12} y={52} w={140} h={18} label="Source" value="Any" />
       <MockField x={160} y={52} w={148} h={18} label="Destination port ranges" value="8080" highlight />
       <text x={12} y={86} fill={COLOR.muted} fontSize="7">Action</text>
-      <rect x={12} y={90} width="70" height="18" rx="4" fill="rgba(52,211,153,0.14)" stroke={COLOR.success} strokeWidth="1" />
+      <rect x={12} y={90} width="70" height="18" rx="4" fill="color-mix(in srgb, var(--color-success) 14%, transparent)" stroke={COLOR.success} strokeWidth="1" />
       <text x={47} y={102} textAnchor="middle" fill={COLOR.success} fontSize="7.5">● Allow</text>
       <rect x={90} y={90} width="70" height="18" rx="4" fill={COLOR.surface} stroke={COLOR.border} strokeWidth="1" />
       <text x={125} y={102} textAnchor="middle" fill={COLOR.muted} fontSize="7.5">○ Deny</text>
@@ -159,7 +159,7 @@ function MockupBackupVault() {
       <text x={12} y={58} fill={COLOR.muted} fontSize="7">Storage replication type</text>
       <rect x={12} y={64} width="140" height="18" rx="4" fill={COLOR.surface} stroke={COLOR.border} strokeWidth="1" />
       <text x={82} y={76} textAnchor="middle" fill={COLOR.muted} fontSize="7.5">○ Locally-redundant</text>
-      <rect x={160} y={64} width="148" height="18" rx="4" fill="rgba(167,139,250,0.14)" stroke={COLOR.primary} strokeWidth="1" />
+      <rect x={160} y={64} width="148" height="18" rx="4" fill="color-mix(in srgb, var(--color-primary) 14%, transparent)" stroke={COLOR.primary} strokeWidth="1" />
       <text x={234} y={76} textAnchor="middle" fill={COLOR.primary} fontSize="7.5">● Geo-redundant</text>
       <MockField x={12} y={98} w={296} h={18} label="Cross Region Restore" value="Disabled" />
       <rect x={230} y={126} width="78" height="18" rx="4" fill={COLOR.primary} />
@@ -258,7 +258,7 @@ const PORTAL_WALKTHROUGHS = {
             <text x={18} y={54} fill={COLOR.muted} fontSize="7">Size</text>
             <text x={200} y={54} fill={COLOR.muted} fontSize="7">vCPUs</text>
             <text x={250} y={54} fill={COLOR.muted} fontSize="7">RAM</text>
-            <rect x={12} y={60} width="296" height="20" rx="4" fill="rgba(167,139,250,0.14)" stroke={COLOR.primary} strokeWidth="1" />
+            <rect x={12} y={60} width="296" height="20" rx="4" fill="color-mix(in srgb, var(--color-primary) 14%, transparent)" stroke={COLOR.primary} strokeWidth="1" />
             <text x={18} y={73} fill={COLOR.primary} fontSize="7.5">Standard_D2s_v5</text>
             <text x={205} y={73} fill={COLOR.primary} fontSize="7.5">2</text>
             <text x={252} y={73} fill={COLOR.primary} fontSize="7.5">8 GiB</text>
@@ -276,7 +276,7 @@ const PORTAL_WALKTHROUGHS = {
             <text x={12} y={40} fill={COLOR.text} fontSize="9" fontWeight="700">Networking — inbound ports</text>
             <MockField x={12} y={52} w={296} h={18} label="Virtual network" value="vnet-prod" />
             <text x={12} y={90} fill={COLOR.muted} fontSize="7">Public inbound ports</text>
-            <rect x={12} y={94} width="140" height="18" rx="4" fill="rgba(167,139,250,0.14)" stroke={COLOR.primary} strokeWidth="1" />
+            <rect x={12} y={94} width="140" height="18" rx="4" fill="color-mix(in srgb, var(--color-primary) 14%, transparent)" stroke={COLOR.primary} strokeWidth="1" />
             <text x={82} y={106} textAnchor="middle" fill={COLOR.primary} fontSize="7.5">● Allow selected</text>
             <MockField x={12} y={120} w={296} h={18} label="Select inbound ports" value="HTTPS (443)" highlight />
           </WalkthroughStep>
@@ -328,7 +328,7 @@ function PortalWalkthroughPlayer({ walkthrough }) {
           {steps.map((_, i) => (
             <div
               key={i}
-              style={{ width: '6px', height: '6px', borderRadius: '999px', background: i <= step ? COLOR.primary : COLOR.border }}
+              style={{ width: '6px', height: '6px', borderRadius: '50%', background: i <= step ? COLOR.primary : COLOR.border }}
             />
           ))}
         </div>
@@ -341,7 +341,7 @@ function PortalWalkthroughPlayer({ walkthrough }) {
           disabled={step === 0}
           className="flex-1"
           style={{
-            padding: '10px', borderRadius: '10px', border: `1px solid ${COLOR.border}`, background: 'transparent',
+            padding: '10px', borderRadius: 'var(--r-ctl)', border: `1px solid ${COLOR.border}`, background: 'transparent',
             color: step === 0 ? COLOR.border : COLOR.text, fontSize: '12.5px', fontWeight: 600,
           }}
         >
@@ -352,7 +352,7 @@ function PortalWalkthroughPlayer({ walkthrough }) {
           disabled={isLast}
           className="flex-1"
           style={{
-            padding: '10px', borderRadius: '10px', background: isLast ? COLOR.surfaceRaised : COLOR.primary,
+            padding: '10px', borderRadius: 'var(--r-ctl)', background: isLast ? COLOR.surfaceRaised : COLOR.primary,
             color: isLast ? COLOR.success : COLOR.onAccent, fontSize: '12.5px', fontWeight: 600,
           }}
         >
@@ -904,8 +904,8 @@ const REAL_PORTAL_SCREENSHOTS = {
 function RealPortalScreenshot({ shot, hideDescription }) {
   if (!shot) return null;
   return (
-    <div style={{ boxShadow: SHADOW.card, background: '#fff', border: `1px solid ${COLOR.border}`, borderRadius: '14px', padding: '8px', marginTop: '10px' }}>
-      <img src={shot.src} alt={shot.alt} style={{ width: '100%', height: 'auto', display: 'block', borderRadius: '8px' }} />
+    <div style={{ boxShadow: SHADOW.card, background: '#fff', border: `1px solid ${COLOR.border}`, borderRadius: 'var(--r-card)', padding: '8px', marginTop: '10px' }}>
+      <img src={shot.src} alt={shot.alt} style={{ width: '100%', height: 'auto', display: 'block', borderRadius: 'var(--r-ctl)' }} />
       {shot.description && !hideDescription && (
         <div style={{ fontSize: '11.5px', color: '#3A3140', marginTop: '8px', lineHeight: 1.5, padding: '0 4px' }}>
           {shot.description}

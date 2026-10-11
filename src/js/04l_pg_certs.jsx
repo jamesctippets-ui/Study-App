@@ -114,7 +114,7 @@ function PgCertsDate({ label, value, onChange, error, hot, steps }) {
       style={{ ...pgPillStyle, padding: '4px 10px', minHeight: '36px', minWidth: '44px', opacity: valid ? 1 : 0.4 }}>{text}</button>
   );
   return (
-    <div style={{ outline: hot ? `2px solid ${COLOR.red}` : 'none', outlineOffset: '3px', borderRadius: '10px', minWidth: 0 }}>
+    <div style={{ outline: hot ? `1px solid ${COLOR.red}` : 'none', outlineOffset: '3px', borderRadius: 'var(--r-ctl)', minWidth: 0 }}>
       <label style={{ display: 'block', minWidth: 0 }}>
         <span style={{ display: 'block', fontSize: '11px', fontWeight: 800, letterSpacing: '0.04em', textTransform: 'uppercase', color: COLOR.muted, marginBottom: '3px' }}>{label}</span>
         <input type="date" value={value} onChange={(e) => onChange(e.target.value)} aria-label={label} aria-invalid={error ? 'true' : undefined} style={{ ...pgInputStyle(!!error), fontFamily: 'inherit', minHeight: '40px' }} />
@@ -135,14 +135,14 @@ function PgCertsDate({ label, value, onChange, error, hot, steps }) {
 }
 
 function PgCertsHot({ hot, children }) {
-  return <div style={{ outline: hot ? `2px solid ${COLOR.red}` : 'none', outlineOffset: '3px', borderRadius: '10px', minWidth: 0 }}>{children}</div>;
+  return <div style={{ outline: hot ? `1px solid ${COLOR.red}` : 'none', outlineOffset: '3px', borderRadius: 'var(--r-ctl)', minWidth: 0 }}>{children}</div>;
 }
 
 function PgCertsSection({ id, open, setOpen, hue, hotCard, summary, children }) {
   const isOpen = !!open[id];
   const title = PG_CERTS_CARD_TITLES[id];
   return (
-    <PgCard title={title} hue={hue} style={hotCard ? { outline: `2px solid ${COLOR.red}`, outlineOffset: '2px' } : undefined}
+    <PgCard title={title} hue={hue} style={hotCard ? { outline: `1px solid ${COLOR.red}`, outlineOffset: '2px' } : undefined}
       right={<button className="btn-flat" aria-label={`${title}: ${isOpen ? 'hide' : 'show'}`} aria-expanded={isOpen} onClick={() => setOpen({ ...open, [id]: !isOpen })}
         style={{ ...pgPillStyle, padding: '5px 12px', minHeight: '36px' }}>{isOpen ? 'Hide' : 'Show'}</button>}>
       {isOpen ? children : <div style={{ fontSize: '12px', color: COLOR.muted, overflowWrap: 'anywhere' }}>{summary || 'Tap Show to edit.'}</div>}
@@ -255,7 +255,7 @@ function PgCertsStatus({ stages }) {
     <div style={{ marginBottom: '10px' }}>
       <div style={{ fontSize: '10.5px', fontWeight: 800, letterSpacing: '0.05em', textTransform: 'uppercase', color: COLOR.muted, marginBottom: '4px' }}>The checks, in order</div>
       {stages.map((s) => (
-        <div key={s.key} style={{ display: 'flex', gap: '8px', alignItems: 'baseline', padding: '6px 10px', marginBottom: '4px', borderRadius: '10px', background: tint(PG_CERTS_STATE_HUE[s.state], s.state === 'skip' ? 4 : 12), border: `1.5px solid color-mix(in srgb, ${PG_CERTS_STATE_HUE[s.state]} 50%, ${COLOR.border})` }}>
+        <div key={s.key} style={{ display: 'flex', gap: '8px', alignItems: 'baseline', padding: '6px 10px', marginBottom: '4px', borderRadius: 'var(--r-ctl)', background: tint(PG_CERTS_STATE_HUE[s.state], s.state === 'skip' ? 4 : 12), border: `1px solid color-mix(in srgb, ${PG_CERTS_STATE_HUE[s.state]} 50%, ${COLOR.border})` }}>
           <span aria-hidden="true" style={{ fontWeight: 900, width: '14px', flexShrink: 0, color: s.state === 'skip' ? COLOR.muted : ink(PG_CERTS_STATE_HUE[s.state]) }}>{PG_CERTS_STATE_MARK[s.state]}</span>
           <span style={{ minWidth: 0, fontSize: '12.5px', lineHeight: 1.4 }}><strong>{s.label}</strong><span style={{ color: COLOR.muted }}> {'·'} {s.state === 'ok' ? `passed: ${s.text}` : s.state === 'fail' ? `failed: ${s.text}` : s.text}</span></span>
         </div>
@@ -283,19 +283,19 @@ function PgCertsResult({ result, onWhere }) {
   const card = d ? pgCertsCardFor(d.deviceId, d.field) : 'test';
   return (
     <div>
-      <div style={{ padding: '10px 12px', borderRadius: '12px', background: tint(hue, 16), border: `2px solid ${hue}`, marginBottom: '10px', display: 'flex', gap: '8px', alignItems: 'baseline' }}>
+      <div style={{ padding: '10px 12px', borderRadius: 'var(--r-card)', background: tint(hue, 16), border: `1px solid ${hue}`, marginBottom: '10px', display: 'flex', gap: '8px', alignItems: 'baseline' }}>
         <span style={{ fontWeight: 900, color: ink(hue), fontSize: '16px' }}>{ok ? '✓' : '✕'}</span>
         <span style={{ fontWeight: 800, fontSize: '13.5px', lineHeight: 1.4 }}>{result.summary}</span>
       </div>
       {result.notes && result.notes.length > 0 && (
-        <div style={{ padding: '10px 12px', borderRadius: '12px', background: tint(COLOR.orange, 12), border: `2px solid color-mix(in srgb, ${COLOR.orange} 55%, ${COLOR.border})`, marginBottom: '10px', fontSize: '12.5px', lineHeight: 1.5 }}>
+        <div style={{ padding: '10px 12px', borderRadius: 'var(--r-card)', background: tint(COLOR.orange, 12), border: `1px solid color-mix(in srgb, ${COLOR.orange} 55%, ${COLOR.border})`, marginBottom: '10px', fontSize: '12.5px', lineHeight: 1.5 }}>
           <strong>Worth knowing:</strong> {result.notes.join(' ')}
         </div>
       )}
       <PgCertsStatus stages={result.stages} />
       <PgDiagnosis diagnosis={d} heading="First thing that is wrong" />
       {d && d.deviceId && card !== 'test' && (
-        <button className="btn-flat" onClick={() => onWhere(d)} style={{ ...pgPillStyle, marginBottom: '10px', minHeight: '36px', border: `2px solid ${COLOR.primary}`, color: ink(COLOR.primary) }}>Show me where</button>
+        <button className="btn-flat" onClick={() => onWhere(d)} style={{ ...pgPillStyle, marginBottom: '10px', minHeight: '36px', border: `1px solid ${COLOR.primary}`, color: ink(COLOR.primary) }}>Show me where</button>
       )}
       <PgSteps steps={result.steps} />
     </div>
@@ -310,7 +310,7 @@ function PgCertsClients({ topo }) {
       {rows.map((c) => {
         const ok = c.result.verdict === 'success';
         return (
-          <div key={c.kind} style={{ display: 'flex', gap: '8px', alignItems: 'baseline', padding: '6px 10px', marginBottom: '4px', borderRadius: '10px', background: tint(ok ? COLOR.success : COLOR.red, 10), border: `1.5px solid color-mix(in srgb, ${ok ? COLOR.success : COLOR.red} 50%, ${COLOR.border})`, fontSize: '12.5px', lineHeight: 1.4 }}>
+          <div key={c.kind} style={{ display: 'flex', gap: '8px', alignItems: 'baseline', padding: '6px 10px', marginBottom: '4px', borderRadius: 'var(--r-ctl)', background: tint(ok ? COLOR.success : COLOR.red, 10), border: `1px solid color-mix(in srgb, ${ok ? COLOR.success : COLOR.red} 50%, ${COLOR.border})`, fontSize: '12.5px', lineHeight: 1.4 }}>
             <span aria-hidden="true" style={{ fontWeight: 900, width: '14px', flexShrink: 0, color: ink(ok ? COLOR.success : COLOR.red) }}>{ok ? '✓' : '✕'}</span>
             <span style={{ minWidth: 0 }}><strong>{c.label}</strong>{' · '}{ok ? (c.result.notes.length ? 'trusted, but only because it repairs the chain' : 'trusted') : c.result.diagnosis.title}</span>
           </div>

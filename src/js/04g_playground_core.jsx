@@ -95,8 +95,8 @@ function usePgSandbox(toolKey, makeDefault, validate) {
 
 function pgInputStyle(invalid) {
   return {
-    width: '100%', padding: '9px 8px', borderRadius: '10px', fontSize: '13.5px', minWidth: 0,
-    border: `2px solid ${invalid ? COLOR.red : COLOR.border}`, background: COLOR.surface, color: COLOR.text,
+    width: '100%', padding: '9px 8px', borderRadius: 'var(--r-ctl)', fontSize: '13.5px', minWidth: 0,
+    border: `1px solid ${invalid ? COLOR.red : COLOR.border}`, background: COLOR.surface, color: COLOR.text,
     fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace',
   };
 }
@@ -107,7 +107,7 @@ function PgCard({ title, hue, right, children, style, collapsible, defaultOpen }
   const [open, setOpen] = useState(defaultOpen !== false);
   const showBody = !collapsible || open;
   return (
-    <div style={{ boxShadow: SHADOW.card, background: tint(hue, 7), border: `2px solid color-mix(in srgb, ${hue} 38%, ${COLOR.border})`, borderRadius: '16px', padding: '14px 16px', marginBottom: '14px', ...style }}>
+    <div style={{ boxShadow: SHADOW.card, background: tint(hue, 7), border: `1px solid color-mix(in srgb, ${hue} 38%, ${COLOR.border})`, borderRadius: 'var(--r-card)', padding: '14px 16px', marginBottom: '14px', ...style }}>
       {(title || right) && (
         <div className="flex justify-between items-baseline" style={{ marginBottom: showBody ? '10px' : 0, gap: '8px' }}>
           {collapsible ? (
@@ -173,8 +173,8 @@ function PgSegmented({ options, value, onChange, hue }) {
             onClick={() => onChange(o.key)}
             className="btn-flat"
             style={{
-              flex: '1 1 0', minWidth: '72px', padding: '8px 6px', borderRadius: '10px', fontSize: '12.5px', fontWeight: 800,
-              border: `2px solid ${active ? hue : COLOR.border}`, background: active ? tint(hue, 20) : 'transparent',
+              flex: '1 1 0', minWidth: '72px', padding: '8px 6px', borderRadius: 'var(--r-ctl)', fontSize: '12.5px', fontWeight: 800,
+              border: `1px solid ${active ? hue : COLOR.border}`, background: active ? tint(hue, 20) : 'transparent',
               color: active ? ink(hue) : COLOR.muted,
             }}
           >
@@ -186,7 +186,7 @@ function PgSegmented({ options, value, onChange, hue }) {
   );
 }
 
-const pgPillStyle = { fontSize: '12.5px', fontWeight: 800, padding: '6px 12px', borderRadius: '999px', border: `2px solid ${COLOR.border}`, color: COLOR.muted };
+const pgPillStyle = { fontSize: '12.5px', fontWeight: 800, padding: '6px 12px', borderRadius: 'var(--r-pill)', border: `1px solid ${COLOR.border}`, color: COLOR.muted };
 
 /* ---------- ping/test result steps shared by every tool ---------- */
 
@@ -206,7 +206,7 @@ function PgSteps({ steps }) {
 function PgDiagnosis({ diagnosis, heading }) {
   if (!diagnosis) return null;
   return (
-    <div style={{ padding: '10px 12px', borderRadius: '12px', background: COLOR.surface, border: `1.5px solid ${COLOR.border}`, marginBottom: '10px', fontSize: '13px', lineHeight: 1.5 }}>
+    <div style={{ padding: '10px 12px', borderRadius: 'var(--r-card)', background: COLOR.surface, border: `1px solid ${COLOR.border}`, marginBottom: '10px', fontSize: '13px', lineHeight: 1.5 }}>
       <div style={{ fontSize: '10.5px', fontWeight: 800, letterSpacing: '0.05em', textTransform: 'uppercase', color: COLOR.muted }}>{heading || 'First thing that is wrong'}</div>
       <div style={{ fontWeight: 800, margin: '2px 0' }}>{diagnosis.title}</div>
       <div>{diagnosis.text}</div>
@@ -264,12 +264,12 @@ function PgPredict({ compute, causes, buttonLabel, onResult, resetKey }) {
         Predict first <span style={{ fontWeight: 500, color: COLOR.muted }}>(guess the outcome, then run it)</span>
       </label>
       {on && (
-        <div style={{ marginBottom: '10px', padding: '10px 12px', borderRadius: '12px', background: tint(COLOR.gold, 10), border: `1.5px solid ${COLOR.border}` }}>
+        <div style={{ marginBottom: '10px', padding: '10px 12px', borderRadius: 'var(--r-card)', background: tint(COLOR.gold, 10), border: `1px solid ${COLOR.border}` }}>
           <div style={{ fontSize: '13px', fontWeight: 800, marginBottom: '6px' }}>What will happen?</div>
           <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
             {[['works', 'It will work'], ['fails', 'It will fail']].map(([k, l]) => (
               <button key={k} className="btn-flat" onClick={() => chooseGuess(k)}
-                style={{ ...pgPillStyle, border: `2px solid ${guess === k ? COLOR.primary : COLOR.border}`, background: guess === k ? tint(COLOR.primary, 18) : 'transparent', color: guess === k ? ink(COLOR.primary) : COLOR.muted }}>{l}</button>
+                style={{ ...pgPillStyle, border: `1px solid ${guess === k ? COLOR.primary : COLOR.border}`, background: guess === k ? tint(COLOR.primary, 18) : 'transparent', color: guess === k ? ink(COLOR.primary) : COLOR.muted }}>{l}</button>
             ))}
           </div>
           {guess === 'fails' && (
@@ -277,7 +277,7 @@ function PgPredict({ compute, causes, buttonLabel, onResult, resetKey }) {
               <div style={{ fontSize: '13px', fontWeight: 800, marginBottom: '6px' }}>Why?</div>
               {options.map((c) => (
                 <button key={c} className="btn-flat" onClick={() => setCause(c)}
-                  style={{ display: 'block', width: '100%', textAlign: 'left', marginBottom: '6px', padding: '8px 10px', borderRadius: '10px', fontSize: '12.5px', border: `2px solid ${cause === c ? COLOR.primary : COLOR.border}`, background: cause === c ? tint(COLOR.primary, 14) : 'transparent', color: COLOR.text }}>{causes[c]}</button>
+                  style={{ display: 'block', width: '100%', textAlign: 'left', marginBottom: '6px', padding: '8px 10px', borderRadius: 'var(--r-ctl)', fontSize: '12.5px', border: `1px solid ${cause === c ? COLOR.primary : COLOR.border}`, background: cause === c ? tint(COLOR.primary, 14) : 'transparent', color: COLOR.text }}>{causes[c]}</button>
               ))}
             </div>
           )}
@@ -285,11 +285,11 @@ function PgPredict({ compute, causes, buttonLabel, onResult, resetKey }) {
         </div>
       )}
       <button className="btn-3d" disabled={!ready} onClick={run}
-        style={{ width: '100%', padding: '11px', borderRadius: '10px', background: COLOR.primary, color: COLOR.onAccent, fontSize: '14px', fontWeight: 700, marginBottom: '12px', opacity: ready ? 1 : 0.5 }}>
+        style={{ width: '100%', padding: '11px', borderRadius: 'var(--r-ctl)', background: COLOR.primary, color: COLOR.onAccent, fontSize: '14px', fontWeight: 700, marginBottom: '12px', opacity: ready ? 1 : 0.5 }}>
         {buttonLabel}
       </button>
       {feedback && (
-        <div style={{ padding: '8px 12px', borderRadius: '12px', marginBottom: '10px', fontSize: '13px', fontWeight: 700, lineHeight: 1.45, background: tint(feedback.right ? COLOR.success : COLOR.orange, 14), border: `2px solid ${feedback.right ? COLOR.success : COLOR.orange}` }}>
+        <div style={{ padding: '8px 12px', borderRadius: 'var(--r-card)', marginBottom: '10px', fontSize: '13px', fontWeight: 700, lineHeight: 1.45, background: tint(feedback.right ? COLOR.success : COLOR.orange, 14), border: `1px solid ${feedback.right ? COLOR.success : COLOR.orange}` }}>
           {feedback.right ? 'Good call: you predicted it exactly.'
             : feedback.verdictRight ? `You were right that it fails, but the cause was: ${causes[feedback.realCode] || 'something else'}.`
               : feedback.fails ? `Not quite: it fails${feedback.realCode && causes[feedback.realCode] ? ` (${causes[feedback.realCode]})` : ''}.` : 'Not quite: it actually works.'}
@@ -340,7 +340,7 @@ function PgScenarioPicker({ tool, scenarios, onPick, intro, note, sandboxText })
       <div style={{ fontSize: '13px', color: COLOR.muted, lineHeight: 1.55, marginBottom: note ? '8px' : '12px' }}>{intro}</div>
       {note ? <div style={{ fontSize: '11.5px', color: COLOR.muted, lineHeight: 1.5, marginBottom: '12px' }}>{note}</div> : null}
       <button className="btn-flat" onClick={() => onPick('sandbox')}
-        style={{ display: 'block', width: '100%', textAlign: 'left', marginBottom: '12px', padding: '14px 16px', borderRadius: '16px', background: tint(COLOR.gold, 10), border: `2px solid color-mix(in srgb, ${COLOR.gold} 45%, ${COLOR.border})`, color: COLOR.text, boxShadow: SHADOW.card }}>
+        style={{ display: 'block', width: '100%', textAlign: 'left', marginBottom: '12px', padding: '14px 16px', borderRadius: 'var(--r-card)', background: tint(COLOR.gold, 10), border: `1px solid color-mix(in srgb, ${COLOR.gold} 45%, ${COLOR.border})`, color: COLOR.text, boxShadow: SHADOW.card }}>
         <div className="itil-display" style={{ fontSize: '15px', color: ink(COLOR.gold) }}>Free sandbox</div>
         <div style={{ fontSize: '12.5px', color: COLOR.muted, marginTop: '3px' }}>{sandboxText}</div>
       </button>
@@ -354,7 +354,7 @@ function PgScenarioPicker({ tool, scenarios, onPick, intro, note, sandboxText })
               const done = pgIsSolved(tool, s.id);
               return (
                 <button key={s.id} className="btn-flat" onClick={() => onPick(s.id)}
-                  style={{ display: 'block', width: '100%', textAlign: 'left', marginBottom: '8px', padding: '12px 14px', borderRadius: '14px', background: tint(PG_LEVEL_HUE[lv], 8), border: `2px solid color-mix(in srgb, ${PG_LEVEL_HUE[lv]} 38%, ${COLOR.border})`, color: COLOR.text }}>
+                  style={{ display: 'block', width: '100%', textAlign: 'left', marginBottom: '8px', padding: '12px 14px', borderRadius: 'var(--r-card)', background: tint(PG_LEVEL_HUE[lv], 8), border: `1px solid color-mix(in srgb, ${PG_LEVEL_HUE[lv]} 38%, ${COLOR.border})`, color: COLOR.text }}>
                   <div style={{ fontSize: '14px', fontWeight: 800, display: 'flex', justifyContent: 'space-between', gap: '8px' }}>
                     <span>{s.title}</span>
                     {done && <span aria-label="Solved" style={{ color: ink(COLOR.success), flexShrink: 0 }}>✓ solved</span>}
@@ -396,7 +396,7 @@ function PgScenarioShell({ tool, scenario, onBack, renderLab, isSolved, fixLines
       <PgCard title="Stuck?" hue={COLOR.orange}>
         {scenario.hints.slice(0, hintsShown).map((h, i) => <div key={i} style={{ fontSize: '13px', lineHeight: 1.5, marginBottom: '8px' }}><strong>Hint {i + 1}:</strong> {h}</div>)}
         <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-          {hintsShown < scenario.hints.length && <button className="btn-flat" onClick={() => setHintsShown(hintsShown + 1)} style={{ ...pgPillStyle, border: `2px solid ${COLOR.orange}`, color: ink(COLOR.orange) }}>{hintsShown ? 'Another hint' : 'Give me a hint'}</button>}
+          {hintsShown < scenario.hints.length && <button className="btn-flat" onClick={() => setHintsShown(hintsShown + 1)} style={{ ...pgPillStyle, border: `1px solid ${COLOR.orange}`, color: ink(COLOR.orange) }}>{hintsShown ? 'Another hint' : 'Give me a hint'}</button>}
           <button className="btn-flat" onClick={() => setShowFix(!showFix)} style={pgPillStyle}>{showFix ? 'Hide the answer' : 'Show the fix'}</button>
           <button className="btn-flat" onClick={reset} style={pgPillStyle}>Reset scenario</button>
         </div>
@@ -435,7 +435,7 @@ function PlaygroundLessonLink({ lesson }) {
       {links.map((l) => (
         <button key={`${l.tool}/${l.pick || ''}`} className="btn-flat"
           onClick={() => { window.location.hash = `/playground/${l.tool}${l.pick ? `/${l.pick}` : ''}`; }}
-          style={{ display: 'block', width: '100%', textAlign: 'left', marginBottom: '8px', padding: '12px 14px', borderRadius: '14px', background: tint(COLOR.success, 10), border: `2px solid color-mix(in srgb, ${COLOR.success} 40%, ${COLOR.border})`, color: COLOR.text }}>
+          style={{ display: 'block', width: '100%', textAlign: 'left', marginBottom: '8px', padding: '12px 14px', borderRadius: 'var(--r-card)', background: tint(COLOR.success, 10), border: `1px solid color-mix(in srgb, ${COLOR.success} 40%, ${COLOR.border})`, color: COLOR.text }}>
           <div style={{ fontSize: '11px', fontWeight: 800, letterSpacing: '0.05em', textTransform: 'uppercase', color: ink(COLOR.success) }}>Try it in the Playground</div>
           <div style={{ fontSize: '14px', fontWeight: 800, marginTop: '1px' }}>{l.label}</div>
           {l.blurb ? <div style={{ fontSize: '12.5px', color: COLOR.muted, marginTop: '2px', lineHeight: 1.45 }}>{l.blurb}</div> : null}

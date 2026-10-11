@@ -187,7 +187,7 @@ function PgStpLegend() {
 
 function PgStpToggle({ label, hint, value, onChange, hot }) {
   return (
-    <label style={{ display: 'flex', gap: '10px', alignItems: 'flex-start', padding: '8px 0', borderTop: `1px solid ${COLOR.border}`, outline: hot ? `2px solid ${COLOR.red}` : 'none', outlineOffset: '2px', borderRadius: '8px', minHeight: '36px' }}>
+    <label style={{ display: 'flex', gap: '10px', alignItems: 'flex-start', padding: '8px 0', borderTop: `1px solid ${COLOR.border}`, outline: hot ? `1px solid ${COLOR.red}` : 'none', outlineOffset: '2px', borderRadius: 'var(--r-ctl)', minHeight: '36px' }}>
       <input type="checkbox" checked={!!value} onChange={(e) => onChange(e.target.checked)} style={{ width: '20px', height: '20px', marginTop: '2px', accentColor: COLOR.primary, flexShrink: 0 }} />
       <span><span style={{ fontSize: '13.5px', fontWeight: 800, display: 'block' }}>{label}</span>{hint ? <span style={{ fontSize: '12px', color: COLOR.muted, lineHeight: 1.45 }}>{hint}</span> : null}</span>
     </label>
@@ -195,7 +195,7 @@ function PgStpToggle({ label, hint, value, onChange, hot }) {
 }
 
 function PgStpChip({ hue, children }) {
-  return <span style={{ display: 'inline-block', fontSize: '11.5px', fontWeight: 800, padding: '2px 9px', borderRadius: '999px', background: tint(hue, 16), border: `1.5px solid color-mix(in srgb, ${hue} 55%, ${COLOR.border})`, color: COLOR.text }}>{children}</span>;
+  return <span style={{ display: 'inline-block', fontSize: '11.5px', fontWeight: 800, padding: '2px 9px', borderRadius: 'var(--r-pill)', background: tint(hue, 16), border: `1px solid color-mix(in srgb, ${hue} 55%, ${COLOR.border})`, color: COLOR.text }}>{children}</span>;
 }
 
 /* ---------- the live result: roles and states of every port ---------- */
@@ -209,7 +209,7 @@ function PgStpPortRow({ res, p }) {
   const stateHue = p.state === 'forwarding' ? COLOR.success : p.state === 'discarding' ? COLOR.orange : COLOR.muted;
   return (
     <button className="btn-flat" onClick={() => setOpen(!open)} aria-expanded={open}
-      style={{ display: 'block', width: '100%', textAlign: 'left', padding: '8px 10px', margin: '0 0 6px', borderRadius: '10px', background: COLOR.surface, border: `1.5px solid ${COLOR.border}`, color: COLOR.text, minHeight: '36px' }}>
+      style={{ display: 'block', width: '100%', textAlign: 'left', padding: '8px 10px', margin: '0 0 6px', borderRadius: 'var(--r-ctl)', background: COLOR.surface, border: `1px solid ${COLOR.border}`, color: COLOR.text, minHeight: '36px' }}>
       <div style={{ fontSize: '12.5px', lineHeight: 1.4 }}>
         <strong>{p.name}</strong> to {self ? `${other.name} on the same switch` : `${peerName} ${other.name}`} <span style={{ color: COLOR.muted }}>· {PG_STP_SPEED_SHORT[lk.speed]} · cost {p.cost}{p.manualCost ? ' (manual)' : ''}</span>
       </div>
@@ -236,7 +236,7 @@ function PgStpResult({ topo, res }) {
   const root = res.nodes.find((n) => n.id === res.root);
   return (
     <div>
-      <div style={{ padding: '10px 12px', borderRadius: '12px', background: tint(res.loop ? COLOR.red : COLOR.gold, 14), border: `2px solid ${res.loop ? COLOR.red : COLOR.gold}`, marginBottom: '10px', fontSize: '13.5px', lineHeight: 1.45 }}>
+      <div style={{ padding: '10px 12px', borderRadius: 'var(--r-card)', background: tint(res.loop ? COLOR.red : COLOR.gold, 14), border: `1px solid ${res.loop ? COLOR.red : COLOR.gold}`, marginBottom: '10px', fontSize: '13.5px', lineHeight: 1.45 }}>
         {root ? (
           <div><strong>Root bridge: {root.name}</strong> <span style={{ color: COLOR.muted }}>(priority {root.priority}, MAC {root.mac})</span></div>
         ) : <div><strong>No switch is running STP.</strong></div>}
@@ -329,14 +329,14 @@ function PgStpSwitches({ topo, change, res, diag }) {
       {topo.switches.map((s, i) => {
         const hot = diag && diag.deviceId === s.id;
         return (
-          <div key={s.id} style={{ marginBottom: '10px', padding: '8px 10px', borderRadius: '12px', border: `2px solid ${hot ? COLOR.red : COLOR.border}`, background: COLOR.surface }}>
+          <div key={s.id} style={{ marginBottom: '10px', padding: '8px 10px', borderRadius: 'var(--r-card)', border: `1px solid ${hot ? COLOR.red : COLOR.border}`, background: COLOR.surface }}>
             <div className="flex justify-between items-center" style={{ marginBottom: '6px' }}>
               <strong style={{ fontSize: '12.5px' }}>{s.name || s.id}{res.errors.length === 0 && res.root === s.id ? ' · root' : ''}</strong>
               {topo.switches.length > 3 && <button className="btn-flat" onClick={() => removeSwitch(i)} aria-label={`Remove ${s.name}`} style={{ width: '36px', height: '32px', color: COLOR.muted }}>✕</button>}
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '8px' }}>
               <PgField label="Name" value={s.name} onChange={(v) => setSw(i, { name: v.slice(0, 12) })} error={s.name.trim() ? '' : 'Needs a name'} />
-              <div style={{ outline: hot && diag.field === 'priority' ? `2px solid ${COLOR.red}` : 'none', outlineOffset: '3px', borderRadius: '8px' }}>
+              <div style={{ outline: hot && diag.field === 'priority' ? `1px solid ${COLOR.red}` : 'none', outlineOffset: '3px', borderRadius: 'var(--r-ctl)' }}>
                 <PgSelect label="Bridge priority" value={String(s.priority)} onChange={(v) => setSw(i, { priority: Number(v) })} options={PG_STP_PRIOS} />
               </div>
             </div>
@@ -388,7 +388,7 @@ function PgStpLinks({ topo, change, res, diag }) {
         const lr = res.errors.length === 0 ? res.links.find((x) => x.id === l.id) : null;
         const hotDown = diag && diag.field === 'disabled' && l.disabled;
         return (
-          <div key={l.id} style={{ marginBottom: '10px', padding: '8px 10px', borderRadius: '12px', border: `2px solid ${l.disabled ? COLOR.red : COLOR.border}`, background: COLOR.surface }}>
+          <div key={l.id} style={{ marginBottom: '10px', padding: '8px 10px', borderRadius: 'var(--r-card)', border: `1px solid ${l.disabled ? COLOR.red : COLOR.border}`, background: COLOR.surface }}>
             <div className="flex justify-between items-center" style={{ marginBottom: '6px', gap: '6px' }}>
               <strong style={{ fontSize: '12.5px', lineHeight: 1.35 }}>{swName(l.a.sw)} {l.a.port} ↔ {swName(l.b.sw)} {l.b.port}{lr ? ` · ${lr.status}` : ''}</strong>
               <button className="btn-flat" onClick={() => edit((t) => t.links.splice(i, 1))} aria-label={`Remove the cable ${swName(l.a.sw)} to ${swName(l.b.sw)}`} style={{ width: '36px', height: '32px', color: COLOR.muted, flexShrink: 0 }}>✕</button>
@@ -403,7 +403,7 @@ function PgStpLinks({ topo, change, res, diag }) {
                 return (
                   <div key={side} style={{ minWidth: 0 }}>
                     <div style={{ fontSize: '11px', fontWeight: 800, color: COLOR.muted, marginBottom: '4px' }}>{swName(e.sw)} {e.port}</div>
-                    <div style={{ outline: hot ? `2px solid ${COLOR.red}` : 'none', outlineOffset: '3px', borderRadius: '8px' }}>
+                    <div style={{ outline: hot ? `1px solid ${COLOR.red}` : 'none', outlineOffset: '3px', borderRadius: 'var(--r-ctl)' }}>
                       <PgField label="Cost" value={e.cost == null ? '' : String(e.cost)} placeholder={`auto (${auto})`} inputMode="numeric"
                         onChange={(v) => { const d = v.replace(/[^0-9]/g, '').slice(0, 9); setEnd(i, side, { cost: d === '' ? null : Number(d) }); }}
                         error={e.cost != null && !(e.cost >= 1 && e.cost <= 200000000) ? 'Use 1 or more' : ''} />
@@ -419,7 +419,7 @@ function PgStpLinks({ topo, change, res, diag }) {
         );
       })}
       {topo.links.length < 10 && (
-        <div style={{ padding: '8px 10px', borderRadius: '12px', border: `2px dashed ${COLOR.border}` }}>
+        <div style={{ padding: '8px 10px', borderRadius: 'var(--r-card)', border: `1px dashed ${COLOR.border}` }}>
           <div style={{ fontSize: '12.5px', fontWeight: 800, marginBottom: '6px' }}>Add a cable</div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: '8px', marginBottom: '8px' }}>
             <PgSelect label="From" value={addA} onChange={setAddA} options={swOpts} />
@@ -464,7 +464,7 @@ function PgStpEdges({ topo, change, diag }) {
       {edges.map((e, i) => {
         const hot = diag && diag.deviceId === e.id;
         return (
-          <div key={e.id} style={{ marginBottom: '10px', padding: '8px 10px', borderRadius: '12px', border: `2px solid ${hot ? COLOR.red : COLOR.border}`, background: COLOR.surface }}>
+          <div key={e.id} style={{ marginBottom: '10px', padding: '8px 10px', borderRadius: 'var(--r-card)', border: `1px solid ${hot ? COLOR.red : COLOR.border}`, background: COLOR.surface }}>
             <div className="flex justify-between items-center" style={{ marginBottom: '6px' }}>
               <strong style={{ fontSize: '12.5px' }}>{pgStpName(topo, e.sw)} {e.port}</strong>
               <button className="btn-flat" onClick={() => edit((t) => t.edges.splice(i, 1))} aria-label={`Remove edge port ${e.port}`} style={{ width: '36px', height: '32px', color: COLOR.muted }}>✕</button>
@@ -532,7 +532,7 @@ function PgStpOutcomeView({ result }) {
   const hue = ok ? COLOR.success : COLOR.red;
   return (
     <div>
-      <div style={{ padding: '10px 12px', borderRadius: '12px', background: tint(hue, 16), border: `2px solid ${hue}`, marginBottom: '10px', display: 'flex', gap: '8px', alignItems: 'baseline' }}>
+      <div style={{ padding: '10px 12px', borderRadius: 'var(--r-card)', background: tint(hue, 16), border: `1px solid ${hue}`, marginBottom: '10px', display: 'flex', gap: '8px', alignItems: 'baseline' }}>
         <span style={{ fontWeight: 900, color: ink(hue), fontSize: '16px' }}>{ok ? '✓' : '✕'}</span>
         <span style={{ fontWeight: 800, fontSize: '13.5px', lineHeight: 1.4 }}>{result.summary}</span>
       </div>
@@ -596,7 +596,7 @@ function PgStpLab({ topo, setTopo, goals, defaultAsk }) {
         <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
           {topo.links.map((l) => (
             <button key={l.id} className="btn-flat" aria-pressed={!!l.disabled} onClick={() => toggleCut(l.id)}
-              style={{ ...pgPillStyle, minHeight: '36px', fontSize: '12px', padding: '6px 10px', border: `2px solid ${l.disabled ? COLOR.red : COLOR.border}`, background: l.disabled ? tint(COLOR.red, 16) : 'transparent', color: l.disabled ? ink(COLOR.red) : COLOR.text }}>
+              style={{ ...pgPillStyle, minHeight: '36px', fontSize: '12px', padding: '6px 10px', border: `1px solid ${l.disabled ? COLOR.red : COLOR.border}`, background: l.disabled ? tint(COLOR.red, 16) : 'transparent', color: l.disabled ? ink(COLOR.red) : COLOR.text }}>
               {l.disabled ? '✕ ' : '✂ '}{cutLabel(l)}
             </button>
           ))}

@@ -20,9 +20,9 @@ function FlashcardView({ card, flipped, setFlipped, onRate, index, total, catego
   const otherCards = flashcardsData && flashcardsData.filter((c) => c.id !== card.id);
   return (
     <div>
-      <div className="flex justify-between items-center mb-2" style={{ fontSize: '11px', color: COLOR.muted }}>
+      <div className="flex justify-between items-center mb-2" style={{ fontSize: '10.5px', textTransform: 'uppercase', color: COLOR.muted }}>
         <span>{categoryLabel}</span>
-        <span>{index + 1} / {total}</span>
+        <span style={{ color: COLOR.text }}>{String(index + 1).padStart(2, '0')} / {String(total).padStart(2, '0')}</span>
       </div>
       {speechSupported && (
         <div style={{ textAlign: 'right', marginBottom: '6px' }}>
@@ -32,11 +32,13 @@ function FlashcardView({ card, flipped, setFlipped, onRate, index, total, catego
       <div
         onClick={() => setFlipped((f) => !f)}
         style={{
+          position: 'relative',
           background: flipped ? COLOR.surfaceRaised : COLOR.surface,
-          border: `2px solid ${COLOR.border}`,
-          borderRadius: '18px',
-          padding: '28px 20px',
-          minHeight: '190px',
+          border: `1px solid ${COLOR.border}`,
+          borderTop: `3px solid ${flipped ? COLOR.blue : COLOR.primary}`,
+          borderRadius: 'var(--r-card)',
+          padding: '34px 20px 26px',
+          minHeight: '210px',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -44,8 +46,9 @@ function FlashcardView({ card, flipped, setFlipped, onRate, index, total, catego
           cursor: 'pointer',
         }}
       >
+        <span style={{ position: 'absolute', top: '10px', left: '14px', fontSize: '10px', textTransform: 'uppercase', color: flipped ? COLOR.blue : COLOR.primary }}>{flipped ? 'Definition' : 'Term'}</span>
         {!flipped ? (
-          <div className="itil-display" style={{ fontSize: '21px', fontWeight: 500, lineHeight: 1.35 }}>{card.front}</div>
+          <div className="itil-display" style={{ fontSize: '22px', lineHeight: 1.3 }}>{card.front}</div>
         ) : (
           <div style={{ fontSize: '16px', lineHeight: 1.6 }}>{autoHighlightTerms(card.back, otherCards, activeTermKey, setActiveTermKey, 2)}</div>
         )}
@@ -63,7 +66,7 @@ function FlashcardView({ card, flipped, setFlipped, onRate, index, total, catego
             onClick={() => onRate(n)}
             className="flex-1"
             style={{
-              padding: '9px 2px', borderRadius: '10px', border: `1px solid ${color}`, color, background: 'transparent',
+              padding: '9px 2px', borderRadius: 'var(--r-ctl)', border: `1px solid ${color}`, color, background: 'transparent',
               fontSize: '11px', fontWeight: 600, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2px',
             }}
           >
@@ -82,13 +85,13 @@ function StudyEntry({ item, allFlashcards }) {
   useClickOutsideToClose(!!activeTermKey, () => setActiveTermKey(null));
   const otherCards = allFlashcards && allFlashcards.filter((c) => c.id !== item.id);
   return (
-    <div style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `2px solid ${COLOR.border}`, borderRadius: '14px', padding: '14px 16px' }}>
+    <div style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderRadius: 'var(--r-card)', padding: '14px 16px' }}>
       <div className="itil-display" style={{ fontSize: '16px', fontWeight: 600, marginBottom: '4px' }}>{item.front}</div>
       <div style={{ fontSize: '14px', lineHeight: 1.55, color: COLOR.text, marginBottom: item.detail ? '8px' : 0 }}>
         {autoHighlightTerms(item.back, otherCards, activeTermKey, setActiveTermKey, 2)}
       </div>
       {item.detail && (
-        <div style={{ fontSize: '13px', lineHeight: 1.55, color: COLOR.muted, borderLeft: `2px solid ${COLOR.primary}`, paddingLeft: '10px' }}>
+        <div style={{ fontSize: '13px', lineHeight: 1.55, color: COLOR.muted, borderLeft: `1px solid ${COLOR.primary}`, paddingLeft: '10px' }}>
           {item.detail}
         </div>
       )}
@@ -152,7 +155,7 @@ function QuizSectionButton({ label, count, onClick }) {
     <button className="btn-3d"
       onClick={onClick}
       style={{
-        width: '100%', padding: '12px', borderRadius: '12px', background: COLOR.gold, color: COLOR.onAccent,
+        width: '100%', padding: '12px', borderRadius: 'var(--r-card)', background: COLOR.gold, color: COLOR.onAccent,
         fontSize: '13px', fontWeight: 600, marginBottom: '18px',
       }}
     >
@@ -221,7 +224,7 @@ function StudyView({ activeCat, categories, flashcards, questionsData, onQuizCat
           disabled={isFirst}
           className="flex-1"
           style={{
-            padding: '12px', borderRadius: '12px', border: `2px solid ${COLOR.border}`, background: 'transparent',
+            padding: '12px', borderRadius: 'var(--r-card)', border: `1px solid ${COLOR.border}`, background: 'transparent',
             color: isFirst ? COLOR.muted : COLOR.text, fontSize: '13px', fontWeight: 600, opacity: isFirst ? 0.5 : 1,
           }}
         >
@@ -232,7 +235,7 @@ function StudyView({ activeCat, categories, flashcards, questionsData, onQuizCat
           disabled={isLast}
           className="flex-1"
           style={{
-            padding: '12px', borderRadius: '12px',
+            padding: '12px', borderRadius: 'var(--r-card)',
             background: isLast ? COLOR.surfaceRaised : COLOR.primary, color: isLast ? COLOR.muted : COLOR.onAccent,
             fontSize: '13px', fontWeight: 600,
           }}
@@ -266,7 +269,7 @@ function CheatSheetView({ trackLabel, sections, resources, flashcardsData }) {
         className="cheat-sheet-print-btn"
         style={{
           display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '16px', padding: '9px 14px',
-          borderRadius: '10px', border: `1px solid ${COLOR.primary}`, background: 'transparent', color: COLOR.primary,
+          borderRadius: 'var(--r-ctl)', border: `1px solid ${COLOR.primary}`, background: 'transparent', color: COLOR.primary,
           fontSize: '13px', fontWeight: 600,
         }}
       >
@@ -279,7 +282,7 @@ function CheatSheetView({ trackLabel, sections, resources, flashcardsData }) {
         {sections.map((section, i) => (
           <div
             key={i}
-            style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `2px solid ${COLOR.border}`, borderRadius: '14px', padding: '14px 16px' }}
+            style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderRadius: 'var(--r-card)', padding: '14px 16px' }}
           >
             <div className="itil-display" style={{ fontSize: '14.5px', fontWeight: 600, color: COLOR.gold, marginBottom: '8px' }}>
               {section.heading}
@@ -491,14 +494,14 @@ function MatchGame({ flashcards, roundSize, onContinue, onRoundComplete, continu
         <div className="flex gap-2" style={{ justifyContent: 'center' }}>
           <button
             onClick={newRound}
-            style={{ background: COLOR.surfaceRaised, border: `2px solid ${COLOR.border}`, color: COLOR.text, borderRadius: '10px', padding: '10px 20px', fontSize: '13px', fontWeight: 600 }}
+            style={{ background: COLOR.surfaceRaised, border: `1px solid ${COLOR.border}`, color: COLOR.text, borderRadius: 'var(--r-ctl)', padding: '10px 20px', fontSize: '13px', fontWeight: 600 }}
           >
             New round
           </button>
           {onContinue && (
             <button className="btn-3d"
               onClick={onContinue}
-              style={{ background: COLOR.primary, color: COLOR.onAccent, borderRadius: '10px', padding: '10px 20px', fontSize: '13px', fontWeight: 600 }}
+              style={{ background: COLOR.primary, color: COLOR.onAccent, borderRadius: 'var(--r-ctl)', padding: '10px 20px', fontSize: '13px', fontWeight: 600 }}
             >
               {continueLabel || 'Continue reading →'}
             </button>
@@ -524,11 +527,11 @@ function MatchGame({ flashcards, roundSize, onContinue, onRoundComplete, continu
   };
 
   const stateStyle = (state) => {
-    if (state === 'matched') return { background: 'rgba(52,211,153,0.12)', border: `1px solid ${COLOR.success}`, color: COLOR.muted, opacity: 0.55 };
-    if (state === 'wrong') return { background: 'rgba(181,87,74,0.16)', border: `1px solid ${COLOR.red}`, color: COLOR.text };
-    if (state === 'hover') return { background: 'rgba(167,139,250,0.2)', border: `2px solid ${COLOR.primary}`, color: COLOR.text };
-    if (state === 'selected') return { background: 'rgba(211,164,101,0.14)', border: `1px solid ${COLOR.gold}`, color: COLOR.text };
-    return { background: COLOR.surface, border: `2px solid ${COLOR.border}`, color: COLOR.text };
+    if (state === 'matched') return { background: 'color-mix(in srgb, var(--color-success) 12%, transparent)', border: `1px solid ${COLOR.success}`, color: COLOR.muted, opacity: 0.55 };
+    if (state === 'wrong') return { background: 'color-mix(in srgb, var(--color-red) 16%, transparent)', border: `1px solid ${COLOR.red}`, color: COLOR.text };
+    if (state === 'hover') return { background: 'color-mix(in srgb, var(--color-primary) 20%, transparent)', border: `1px solid ${COLOR.primary}`, color: COLOR.text };
+    if (state === 'selected') return { background: 'color-mix(in srgb, var(--color-gold) 14%, transparent)', border: `1px solid ${COLOR.gold}`, color: COLOR.text };
+    return { background: COLOR.surface, border: `1px solid ${COLOR.border}`, color: COLOR.text };
   };
 
   // Longer compound terms (e.g. "AzCopy vs. Storage Explorer vs. Azure
@@ -551,7 +554,7 @@ function MatchGame({ flashcards, roundSize, onContinue, onRoundComplete, continu
       style={{
         position: 'absolute', top: '-7px', left: '-7px', width: '20px', height: '20px', borderRadius: '50%',
         display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '11.5px', fontWeight: 700,
-        background: COLOR.surfaceRaised, border: `2px solid ${COLOR.border}`, color: COLOR.muted,
+        background: COLOR.surfaceRaised, border: `1px solid ${COLOR.border}`, color: COLOR.muted,
       }}
     >
       {n}
@@ -611,7 +614,7 @@ function MatchGame({ flashcards, roundSize, onContinue, onRoundComplete, continu
               disabled={state === 'matched'}
               style={{
                 ...stateStyle(state),
-                position: 'relative', borderRadius: '10px', padding: '10px 14px', fontSize: termFontSize(card.front),
+                position: 'relative', borderRadius: 'var(--r-ctl)', padding: '10px 14px', fontSize: termFontSize(card.front),
                 fontWeight: 600, lineHeight: 1.3, textAlign: 'center', maxWidth: '170px', touchAction: 'none',
                 transition: 'background 0.15s, border-color 0.15s',
               }}
@@ -635,7 +638,7 @@ function MatchGame({ flashcards, roundSize, onContinue, onRoundComplete, continu
               disabled={state === 'matched'}
               style={{
                 ...stateStyle(state),
-                borderRadius: '10px', padding: '12px 14px', fontSize: '14.5px', lineHeight: 1.5, textAlign: 'left',
+                borderRadius: 'var(--r-ctl)', padding: '12px 14px', fontSize: '14.5px', lineHeight: 1.5, textAlign: 'left',
                 transition: 'background 0.15s, border-color 0.15s',
               }}
             >
@@ -654,9 +657,9 @@ function SpeakButton({ id, text, speakingId, onSpeak }) {
     <button
       onClick={() => onSpeak(id, text)}
       style={{
-        fontSize: '11px', padding: '5px 10px', borderRadius: '8px',
+        fontSize: '11px', padding: '5px 10px', borderRadius: 'var(--r-ctl)',
         border: `1px solid ${isSpeaking ? COLOR.primary : COLOR.border}`,
-        background: isSpeaking ? 'rgba(167,139,250,0.14)' : 'transparent',
+        background: isSpeaking ? 'color-mix(in srgb, var(--color-primary) 14%, transparent)' : 'transparent',
         color: isSpeaking ? COLOR.primary : COLOR.muted, fontWeight: 600,
       }}
     >
@@ -669,7 +672,7 @@ function LessonCard({ lesson, mastery, onOpen }) {
   return (
     <button
       onClick={onOpen}
-      style={{ width: '100%', textAlign: 'left', background: COLOR.surface, border: `2px solid ${COLOR.border}`, borderRadius: '14px', padding: '14px 16px', marginBottom: '10px' }}
+      style={{ width: '100%', textAlign: 'left', background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderRadius: 'var(--r-card)', padding: '14px 16px', marginBottom: '10px' }}
     >
       <div className="flex justify-between items-start">
         <div className="itil-display" style={{ fontSize: '15px', fontWeight: 600 }}>{lesson.title}</div>
@@ -784,8 +787,8 @@ function LessonApplySections({ lesson, categories, lessonCatKeys, flashcardsData
           onClick={() => setPortalOpen((o) => !o)}
           aria-expanded={portalOpen}
           style={{
-            width: '100%', marginBottom: portalOpen ? '10px' : '16px', padding: '11px 14px', borderRadius: '12px', textAlign: 'left',
-            background: COLOR.surface, border: `2px solid ${COLOR.border}`, boxShadow: SHADOW.card,
+            width: '100%', marginBottom: portalOpen ? '10px' : '16px', padding: '11px 14px', borderRadius: 'var(--r-card)', textAlign: 'left',
+            background: COLOR.surface, border: `1px solid ${COLOR.border}`, boxShadow: SHADOW.card,
             display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px',
           }}
         >
@@ -808,7 +811,7 @@ function LessonApplySections({ lesson, categories, lessonCatKeys, flashcardsData
               ? 'A click-through illustration of the real flow, not an exact screenshot — the real portal may look slightly different.'
               : 'An illustration of the layout, not an exact screenshot — the real portal may look slightly different.'}
           </div>
-          <div style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `2px solid ${COLOR.border}`, borderRadius: '14px', padding: '14px' }}>
+          <div style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderRadius: 'var(--r-card)', padding: '14px' }}>
             {walkthrough ? <PortalWalkthroughPlayer walkthrough={walkthrough} /> : <MockupComp />}
           </div>
           {realShot && (
@@ -832,7 +835,7 @@ function LessonApplySections({ lesson, categories, lessonCatKeys, flashcardsData
       {lesson.scenario && (
         <div style={{ marginBottom: '16px' }}>
           <div style={{ fontSize: '13px', fontWeight: 600, color: COLOR.gold, marginBottom: '8px' }}>Worked scenario</div>
-          <div style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `2px solid ${COLOR.border}`, borderLeft: `3px solid ${COLOR.primary}`, borderRadius: '10px', padding: '12px 14px' }}>
+          <div style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderLeft: `3px solid ${COLOR.primary}`, borderRadius: 'var(--r-ctl)', padding: '12px 14px' }}>
             <p style={{ fontSize: '14px', lineHeight: 1.65, color: COLOR.text }}><GlossText text={lesson.scenario} pool={flashcardsData} max={3} blockId="scn" /></p>
           </div>
         </div>
@@ -845,7 +848,7 @@ function LessonApplySections({ lesson, categories, lessonCatKeys, flashcardsData
             {lesson.commonTraps.map((t, i) => (
               <div
                 key={i}
-                style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `2px solid ${COLOR.border}`, borderLeft: `3px solid ${COLOR.red}`, borderRadius: '10px', padding: '10px 12px', fontSize: '13.5px', lineHeight: 1.55, color: COLOR.text }}
+                style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderLeft: `3px solid ${COLOR.red}`, borderRadius: 'var(--r-ctl)', padding: '10px 12px', fontSize: '13.5px', lineHeight: 1.55, color: COLOR.text }}
               >
                 <GlossText text={t} pool={flashcardsData} max={2} blockId={'trap' + i} />
               </div>
@@ -857,7 +860,7 @@ function LessonApplySections({ lesson, categories, lessonCatKeys, flashcardsData
       {lesson.onTheJob && (
         <div style={{ marginBottom: '16px' }}>
           <div style={{ fontSize: '13px', fontWeight: 600, color: COLOR.teal, marginBottom: '8px' }}>On the job</div>
-          <div style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `2px solid ${COLOR.border}`, borderLeft: `3px solid ${COLOR.teal}`, borderRadius: '10px', padding: '12px 14px' }}>
+          <div style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderLeft: `3px solid ${COLOR.teal}`, borderRadius: 'var(--r-ctl)', padding: '12px 14px' }}>
             <p style={{ fontSize: '13.5px', lineHeight: 1.6, color: COLOR.text }}><GlossText text={lesson.onTheJob} pool={flashcardsData} max={3} blockId="otj" /></p>
           </div>
         </div>
@@ -926,7 +929,7 @@ function LessonDetail({ lesson, flashcardsData, questionsData, categories, onBac
       <ResourceLinksRow resources={vocabResources} label="Learn more" />
 
       {DiagramComp && (
-        <div style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `2px solid ${COLOR.border}`, borderRadius: '14px', padding: '14px', marginBottom: '16px' }}>
+        <div style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderRadius: 'var(--r-card)', padding: '14px', marginBottom: '16px' }}>
           <DiagramComp />
         </div>
       )}
@@ -965,14 +968,14 @@ function LessonDetail({ lesson, flashcardsData, questionsData, categories, onBac
         {!isLastReadingPage && readingPage < unlockedPages - 1 && (
           <button
             onClick={() => setReadingPage((p) => p + 1)}
-            style={{ width: '100%', padding: '12px', borderRadius: '12px', background: COLOR.surfaceRaised, border: `2px solid ${COLOR.border}`, color: COLOR.text, fontSize: '13px', fontWeight: 600 }}
+            style={{ width: '100%', padding: '12px', borderRadius: 'var(--r-card)', background: COLOR.surfaceRaised, border: `1px solid ${COLOR.border}`, color: COLOR.text, fontSize: '13px', fontWeight: 600 }}
           >
             Next page →
           </button>
         )}
 
         {needsGate && (
-          <div style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `2px solid ${COLOR.border}`, borderRadius: '14px', padding: '16px' }}>
+          <div style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderRadius: 'var(--r-card)', padding: '16px' }}>
             <div style={{ fontSize: '12px', color: COLOR.muted, marginBottom: '10px', textAlign: 'center' }}>
               {useMatchGateHere ? 'Match a few terms to unlock the next page.' : 'Answer this to unlock the next page.'}
             </div>
@@ -982,7 +985,7 @@ function LessonDetail({ lesson, flashcardsData, questionsData, categories, onBac
               ) : (
                 <button className="btn-3d"
                   onClick={advancePastGate}
-                  style={{ width: '100%', padding: '12px', borderRadius: '12px', background: COLOR.primary, color: COLOR.onAccent, fontSize: '14px', fontWeight: 600 }}
+                  style={{ width: '100%', padding: '12px', borderRadius: 'var(--r-card)', background: COLOR.primary, color: COLOR.onAccent, fontSize: '14px', fontWeight: 600 }}
                 >
                   Continue reading →
                 </button>
@@ -992,7 +995,7 @@ function LessonDetail({ lesson, flashcardsData, questionsData, categories, onBac
             ) : (
               <button className="btn-3d"
                 onClick={advancePastGate}
-                style={{ width: '100%', padding: '12px', borderRadius: '12px', background: COLOR.primary, color: COLOR.onAccent, fontSize: '14px', fontWeight: 600 }}
+                style={{ width: '100%', padding: '12px', borderRadius: 'var(--r-card)', background: COLOR.primary, color: COLOR.onAccent, fontSize: '14px', fontWeight: 600 }}
               >
                 Continue reading →
               </button>
@@ -1005,12 +1008,12 @@ function LessonDetail({ lesson, flashcardsData, questionsData, categories, onBac
 
       <button
         onClick={() => setShowFundamentals((s) => !s)}
-        style={{ width: '100%', textAlign: 'left', background: COLOR.surfaceRaised, border: `2px solid ${COLOR.border}`, borderRadius: '12px', padding: '12px', marginBottom: showFundamentals ? '0' : '16px', fontSize: '12px', color: COLOR.primary, fontWeight: 600 }}
+        style={{ width: '100%', textAlign: 'left', background: COLOR.surfaceRaised, border: `1px solid ${COLOR.border}`, borderRadius: 'var(--r-card)', padding: '12px', marginBottom: showFundamentals ? '0' : '16px', fontSize: '12px', color: COLOR.primary, fontWeight: 600 }}
       >
         {showFundamentals ? '▾ ' : '▸ '}{lesson.fundamentalsLabel}
       </button>
       {showFundamentals && (
-        <div style={{ boxShadow: SHADOW.card, background: COLOR.surfaceRaised, borderRadius: '0 0 12px 12px', padding: '14px', marginBottom: '16px', borderLeft: `1px solid ${COLOR.border}`, borderRight: `1px solid ${COLOR.border}`, borderBottom: `1px solid ${COLOR.border}` }}>
+        <div style={{ boxShadow: SHADOW.card, background: COLOR.surfaceRaised, borderRadius: '0 0 var(--r-card) var(--r-card)', padding: '14px', marginBottom: '16px', borderLeft: `1px solid ${COLOR.border}`, borderRight: `1px solid ${COLOR.border}`, borderBottom: `1px solid ${COLOR.border}` }}>
           {speechSupported && (
             <div className="flex justify-end" style={{ marginBottom: '8px' }}>
               <SpeakButton id={'fund-' + lesson.id} text={lesson.fundamentals.replace(/\n+/g, ' ')} speakingId={speakingId} onSpeak={onSpeak} />
@@ -1024,12 +1027,12 @@ function LessonDetail({ lesson, flashcardsData, questionsData, categories, onBac
 
       <button
         onClick={() => setShowVocabulary((s) => !s)}
-        style={{ width: '100%', textAlign: 'left', background: COLOR.surfaceRaised, border: `2px solid ${COLOR.border}`, borderRadius: '12px', padding: '12px', marginBottom: showVocabulary ? '0' : '16px', fontSize: '12px', color: COLOR.primary, fontWeight: 600 }}
+        style={{ width: '100%', textAlign: 'left', background: COLOR.surfaceRaised, border: `1px solid ${COLOR.border}`, borderRadius: 'var(--r-card)', padding: '12px', marginBottom: showVocabulary ? '0' : '16px', fontSize: '12px', color: COLOR.primary, fontWeight: 600 }}
       >
         {showVocabulary ? '▾ ' : '▸ '}Vocabulary ({vocabItems.length} term{vocabItems.length === 1 ? '' : 's'})
       </button>
       {showVocabulary && (
-        <div style={{ boxShadow: SHADOW.card, background: COLOR.surfaceRaised, borderRadius: '0 0 12px 12px', padding: '14px', marginBottom: '16px', borderLeft: `1px solid ${COLOR.border}`, borderRight: `1px solid ${COLOR.border}`, borderBottom: `1px solid ${COLOR.border}` }}>
+        <div style={{ boxShadow: SHADOW.card, background: COLOR.surfaceRaised, borderRadius: '0 0 var(--r-card) var(--r-card)', padding: '14px', marginBottom: '16px', borderLeft: `1px solid ${COLOR.border}`, borderRight: `1px solid ${COLOR.border}`, borderBottom: `1px solid ${COLOR.border}` }}>
           <div className="flex flex-col gap-2">
             {vocabItems.map((item) => <StudyEntry key={item.id} item={item} />)}
           </div>
@@ -1045,7 +1048,7 @@ function LessonDetail({ lesson, flashcardsData, questionsData, categories, onBac
             disabled={isFirstLesson}
             className="flex-1"
             style={{
-              padding: '12px', borderRadius: '12px', border: `2px solid ${COLOR.border}`, background: 'transparent',
+              padding: '12px', borderRadius: 'var(--r-card)', border: `1px solid ${COLOR.border}`, background: 'transparent',
               color: isFirstLesson ? COLOR.muted : COLOR.text, fontSize: '13px', fontWeight: 600, opacity: isFirstLesson ? 0.5 : 1,
             }}
           >
@@ -1056,7 +1059,7 @@ function LessonDetail({ lesson, flashcardsData, questionsData, categories, onBac
             disabled={isLastLesson}
             className="flex-1"
             style={{
-              padding: '12px', borderRadius: '12px',
+              padding: '12px', borderRadius: 'var(--r-card)',
               background: isLastLesson ? COLOR.surfaceRaised : COLOR.primary, color: isLastLesson ? COLOR.muted : COLOR.onAccent,
               fontSize: '13px', fontWeight: 600,
             }}
@@ -1104,7 +1107,7 @@ function CourseView({ lessons, flashcardsData, questionsData, categories, onQuiz
   const avgMastery = lessons.length ? lessons.reduce((sum, l) => sum + masteryFn(l), 0) / lessons.length : 0;
   return (
     <div>
-      <div style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `2px solid ${COLOR.border}`, borderRadius: '14px', padding: '14px 16px', marginBottom: '14px' }}>
+      <div style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderRadius: 'var(--r-card)', padding: '14px 16px', marginBottom: '14px' }}>
         <div className="flex justify-between items-center" style={{ marginBottom: '8px' }}>
           <div style={{ fontSize: '12px', color: COLOR.muted }}>Course progress</div>
           <div style={{ fontSize: '12px', fontWeight: 600, color: masteredCount === lessons.length ? COLOR.success : COLOR.text }}>

@@ -46,7 +46,7 @@ function PgFwDiagram({ topo, fromId, toId, failZone }) {
 
 function PgToggle({ label, hint, value, onChange, hot }) {
   return (
-    <label style={{ display: 'flex', gap: '10px', alignItems: 'flex-start', padding: '8px 0', borderTop: `1px solid ${COLOR.border}`, outline: hot ? `2px solid ${COLOR.red}` : 'none', outlineOffset: '2px', borderRadius: '8px' }}>
+    <label style={{ display: 'flex', gap: '10px', alignItems: 'flex-start', padding: '8px 0', borderTop: `1px solid ${COLOR.border}`, outline: hot ? `1px solid ${COLOR.red}` : 'none', outlineOffset: '2px', borderRadius: 'var(--r-ctl)' }}>
       <input type="checkbox" checked={!!value} onChange={(e) => onChange(e.target.checked)} style={{ width: '20px', height: '20px', marginTop: '2px', accentColor: COLOR.primary, flexShrink: 0 }} />
       <span><span style={{ fontSize: '13.5px', fontWeight: 800, display: 'block' }}>{label}</span><span style={{ fontSize: '12px', color: COLOR.muted, lineHeight: 1.45 }}>{hint}</span></span>
     </label>
@@ -67,7 +67,7 @@ function PgFwRules({ fw, onChange, matchedId, hotRule }) {
         const hue = r.action === 'allow' ? COLOR.success : COLOR.red;
         const hot = hotRule === r.id;
         return (
-          <div key={r.id} style={{ marginBottom: '10px', padding: '8px 10px', borderRadius: '12px', background: tint(hue, hot || matchedId === r.id ? 18 : 6), border: `2px solid ${hot ? COLOR.red : matchedId === r.id ? hue : `color-mix(in srgb, ${hue} 30%, ${COLOR.border})`}` }}>
+          <div key={r.id} style={{ marginBottom: '10px', padding: '8px 10px', borderRadius: 'var(--r-card)', background: tint(hue, hot || matchedId === r.id ? 18 : 6), border: `1px solid ${hot ? COLOR.red : matchedId === r.id ? hue : `color-mix(in srgb, ${hue} 30%, ${COLOR.border})`}` }}>
             <div className="flex justify-between items-center" style={{ marginBottom: '6px' }}>
               <strong style={{ fontSize: '12.5px', color: ink(hue) }}>Rule {i + 1}{matchedId === r.id ? ' · matched' : ''}</strong>
               <span style={{ display: 'flex', gap: '2px' }}>
@@ -99,11 +99,11 @@ function PgFwForwards({ fw, onChange, hot }) {
   const set = (i, patch) => onChange(fw.forwards.map((f, j) => (j === i ? { ...f, ...patch } : f)));
   const nextId = () => { let n = fw.forwards.length + 1; while (fw.forwards.some((f) => f.id === `f${n}`)) n += 1; return `f${n}`; };
   return (
-    <div style={{ outline: hot ? `2px solid ${COLOR.red}` : 'none', outlineOffset: '3px', borderRadius: '10px' }}>
+    <div style={{ outline: hot ? `1px solid ${COLOR.red}` : 'none', outlineOffset: '3px', borderRadius: 'var(--r-ctl)' }}>
       <div style={{ fontSize: '12px', color: COLOR.muted, lineHeight: 1.5, marginBottom: '6px' }}>Traffic to the firewall's public address on a given port is passed on to an inside server (destination NAT).</div>
       {fw.forwards.length === 0 && <div style={{ fontSize: '12.5px', color: COLOR.muted, marginBottom: '6px' }}>No port forwards.</div>}
       {fw.forwards.map((f, i) => (
-        <div key={f.id} style={{ marginBottom: '10px', padding: '8px 10px', borderRadius: '12px', border: `2px solid ${COLOR.border}`, background: COLOR.surface }}>
+        <div key={f.id} style={{ marginBottom: '10px', padding: '8px 10px', borderRadius: 'var(--r-card)', border: `1px solid ${COLOR.border}`, background: COLOR.surface }}>
           <div className="flex justify-between items-center" style={{ marginBottom: '6px' }}>
             <strong style={{ fontSize: '12.5px' }}>Forward {i + 1}</strong>
             <button className="btn-flat" onClick={() => onChange(fw.forwards.filter((_, j) => j !== i))} aria-label={`Delete forward ${i + 1}`} style={{ width: '30px', height: '28px', color: COLOR.muted }}>✕</button>
@@ -128,7 +128,7 @@ function PgFwResult({ result }) {
   const hue = ok ? COLOR.success : COLOR.red;
   return (
     <div>
-      <div style={{ padding: '10px 12px', borderRadius: '12px', background: tint(hue, 16), border: `2px solid ${hue}`, marginBottom: '10px', display: 'flex', gap: '8px', alignItems: 'baseline' }}>
+      <div style={{ padding: '10px 12px', borderRadius: 'var(--r-card)', background: tint(hue, 16), border: `1px solid ${hue}`, marginBottom: '10px', display: 'flex', gap: '8px', alignItems: 'baseline' }}>
         <span style={{ fontWeight: 900, color: ink(hue), fontSize: '16px' }}>{ok ? '✓' : '✕'}</span>
         <span style={{ fontWeight: 800, fontSize: '13.5px', lineHeight: 1.4 }}>{result.summary}</span>
       </div>

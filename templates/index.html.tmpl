@@ -8,7 +8,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <title>Cert Study Hub</title>
 <link rel="manifest" href="manifest.json" />
-<meta name="theme-color" content="#1E1828" />
+<meta name="theme-color" content="#0A0D12" />
 <meta name="mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
@@ -76,41 +76,44 @@
      light text when accents themselves invert. */
   :root {
     color-scheme: dark;
-    --color-bg: #1C1C1E;
-    --color-surface: #252528;
-    --color-surface-raised: #303033;
-    --color-nav-bar: #2A2A2D;
-    --color-border: #434347;
-    --color-text: #EDEDED;
-    --color-muted: #9C9C9F;
-    --color-primary: #A78BFA;
-    --color-success: #34D399;
-    --color-red: #F87171;
-    --color-gold: #E3B274;
-    --color-teal: #2DD4BF;
-    --color-blue: #60A5FA;
-    --color-orange: #FB923C;
-    --color-pink: #F472B6;
-    --color-on-accent: #2B1620;
+    --color-bg: #0A0D12;
+    --color-surface: #10151C;
+    --color-surface-raised: #161C25;
+    --color-nav-bar: #0D1117;
+    --color-border: #232C3A;
+    --color-text: #DCE3EC;
+    --color-muted: #7F8B9C;
+    --color-primary: #3EE6A5;
+    --color-success: #4ADE80;
+    --color-red: #FF6B6B;
+    --color-gold: #FFB454;
+    --color-teal: #3EE6A5;
+    --color-blue: #6AA8FF;
+    --color-orange: #FFB454;
+    --color-pink: #C4A7FF;
+    --color-on-accent: #04130D;
     --accent-darken: 0%;
+    --r-card: 6px;
+    --r-ctl: 4px;
+    --r-pill: 3px;
   }
   :root[data-theme="light"] {
     color-scheme: light;
-    --color-bg: #FAF9F7;
-    --color-surface: #FFFFFF;
-    --color-surface-raised: #F1F0ED;
-    --color-nav-bar: #F1F0ED;
-    --color-border: #DDDAD5;
-    --color-text: #1E1E1E;
-    --color-muted: #67676A;
-    --color-primary: #7C3AED;
-    --color-success: #059669;
-    --color-red: #DC2626;
+    --color-bg: #F2F0EA;
+    --color-surface: #FBFAF6;
+    --color-surface-raised: #EAE7DF;
+    --color-nav-bar: #F6F4EE;
+    --color-border: #D5D1C6;
+    --color-text: #14181F;
+    --color-muted: #5F6772;
+    --color-primary: #0A7A52;
+    --color-success: #15803D;
+    --color-red: #C73A3A;
     --color-gold: #B45309;
-    --color-teal: #0F766E;
-    --color-blue: #1D4ED8;
-    --color-orange: #C2410C;
-    --color-pink: #BE185D;
+    --color-teal: #0A7A52;
+    --color-blue: #2457C5;
+    --color-orange: #B45309;
+    --color-pink: #6D3FC9;
     --color-on-accent: #FFFFFF;
     --accent-darken: 42%;
   }
@@ -118,23 +121,29 @@
   html, body { margin: 0; padding: 0; background: var(--color-bg); transition: background-color 0.15s ease; }
   * { box-sizing: border-box; }
   /* Self-hosted fonts (see fonts/README.md for sources and licences). */
-  @font-face { font-family: 'Nunito'; font-style: normal; font-weight: 500 900; font-display: swap; src: url(fonts/nunito-latin.woff2) format('woff2'); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
-  @font-face { font-family: 'Nunito'; font-style: normal; font-weight: 500 900; font-display: swap; src: url(fonts/nunito-latin-ext.woff2) format('woff2'); unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF; }
+  @font-face { font-family: 'Inter'; font-style: normal; font-weight: 100 900; font-display: swap; src: url(fonts/inter-latin.woff2) format('woff2'); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+  @font-face { font-family: 'Inter'; font-style: normal; font-weight: 100 900; font-display: swap; src: url(fonts/inter-latin-ext.woff2) format('woff2'); unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF; }
+  @font-face { font-family: 'JetBrains Mono'; font-style: normal; font-weight: 100 800; font-display: swap; src: url(fonts/jetbrains-mono-latin.woff2) format('woff2'); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
   @font-face { font-family: 'OpenDyslexic'; font-style: normal; font-weight: 400 500; font-display: swap; src: url(fonts/opendyslexic-400.woff2) format('woff2'); }
   @font-face { font-family: 'OpenDyslexic'; font-style: normal; font-weight: 600 900; font-display: swap; src: url(fonts/opendyslexic-700.woff2) format('woff2'); }
-  :root { --font-body: 'Nunito', system-ui, -apple-system, 'Segoe UI', sans-serif; }
-  :root[data-font="dyslexic"] { --font-body: 'OpenDyslexic', 'Nunito', system-ui, sans-serif; }
+  :root { --font-body: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif; --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+  :root[data-font="dyslexic"] { --font-body: 'OpenDyslexic', 'Inter', system-ui, sans-serif; --font-mono: 'OpenDyslexic', 'Inter', system-ui, sans-serif; }
   body, button, textarea, select, input { font-family: var(--font-body); }
-  .itil-display { font-family: var(--font-body); font-weight: 800 !important; letter-spacing: -0.01em; }
-  :root[data-font="dyslexic"] body { line-height: 1.55; }
+  body { font-feature-settings: 'cv11', 'ss03'; -webkit-font-smoothing: antialiased; }
+  .itil-display { font-family: var(--font-body); font-weight: 700 !important; letter-spacing: -0.015em; }
+  /* The Console look: every uppercase micro-label in the app is a mono label (set in code as
+     textTransform: 'uppercase'), and .mono marks numbers and codes. */
+  [style*="text-transform: uppercase"], .mono { font-family: var(--font-mono) !important; }
+  [style*="text-transform: uppercase"] { letter-spacing: 0.1em !important; font-weight: 600 !important; }
+  .mono { font-variant-numeric: tabular-nums; letter-spacing: -0.01em; }
+  :root[data-font="dyslexic"] body { line-height: 1.55; font-feature-settings: normal; }
   :root[data-font="dyslexic"] .itil-display { letter-spacing: 0; }
   :root[data-font="dyslexic"] .app-title { font-size: 16px !important; }
   textarea:focus-visible, button:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 1px; }
   textarea:focus, button:focus { outline: none; }
   button { transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, transform 0.1s ease, opacity 0.15s ease, box-shadow 0.1s ease; cursor: pointer; }
-  button:not(.btn-flat) { box-shadow: 0 2px 5px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.06), inset 0 -1px 0 rgba(0,0,0,0.12); }
-  button:not(.btn-flat):active { box-shadow: inset 0 2px 4px rgba(0,0,0,0.35); }
-  button:active { transform: scale(0.97); }
+  button:not(.btn-flat):active { box-shadow: none; }
+  button:active { transform: scale(0.985); }
   button:disabled { cursor: default; box-shadow: none; }
   button:disabled:active { transform: none; }
   * { -webkit-tap-highlight-color: transparent; }
@@ -142,14 +151,14 @@
   /* Chunky, pressable "3D" controls: a solid darker edge under the control
      that collapses when it is pressed. rgba black darkens whatever fill the
      control has, so one rule works for every accent and both themes. */
-  button.btn-3d { box-shadow: 0 4px 0 rgba(0,0,0,0.28); }
-  button.btn-3d:active { transform: translateY(3px); box-shadow: 0 1px 0 rgba(0,0,0,0.28); }
+  button.btn-3d { box-shadow: none; }
+  button.btn-3d:active { transform: translateY(1px); box-shadow: none; }
   button.btn-3d:disabled { box-shadow: none; }
-  .node-face { box-shadow: 0 6px 0 rgba(0,0,0,0.30); transition: transform 0.08s ease, box-shadow 0.08s ease; }
-  .trail-node:active .node-face { transform: translateY(4px); box-shadow: 0 2px 0 rgba(0,0,0,0.30); }
+  .node-face { box-shadow: none; transition: transform 0.08s ease; }
+  .trail-node:active .node-face { transform: scale(0.96); }
   .trail-node:active { transform: none !important; }
   @keyframes bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
-  @keyframes pulseRing { 0% { box-shadow: 0 6px 0 rgba(0,0,0,0.30), 0 0 0 0 var(--ring, rgba(167,139,250,0.55)); } 100% { box-shadow: 0 6px 0 rgba(0,0,0,0.30), 0 0 0 14px rgba(167,139,250,0); } }
+  @keyframes pulseRing { 0% { box-shadow: 0 0 0 0 var(--ring, rgba(62,230,165,0.5)); } 100% { box-shadow: 0 0 0 12px rgba(62,230,165,0); } }
   @keyframes popIn { 0% { transform: scale(0.3); opacity: 0; } 60% { transform: scale(1.15); opacity: 1; } 100% { transform: scale(1); opacity: 1; } }
   @keyframes riseIn { from { transform: translateY(14px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
   @keyframes confettiFall { 0% { transform: translateY(-24px) rotate(0deg); opacity: 1; } 85% { opacity: 1; } 100% { transform: translateY(320px) rotate(600deg); opacity: 0; } }

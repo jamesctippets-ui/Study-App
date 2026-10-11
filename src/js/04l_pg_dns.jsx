@@ -123,12 +123,12 @@ function PgDnsDiagram({ topo, st, selected, result, hotId }) {
 /* ---------- small controls ---------- */
 
 function PgDnsHot({ on, children }) {
-  return <div style={{ outline: on ? `2px solid ${COLOR.red}` : 'none', outlineOffset: '2px', borderRadius: '10px', minWidth: 0 }}>{children}</div>;
+  return <div style={{ outline: on ? `1px solid ${COLOR.red}` : 'none', outlineOffset: '2px', borderRadius: 'var(--r-ctl)', minWidth: 0 }}>{children}</div>;
 }
 
 function PgDnsToggle({ label, hint, value, onChange, hot }) {
   return (
-    <label style={{ display: 'flex', gap: '10px', alignItems: 'flex-start', padding: '8px 0', borderTop: `1px solid ${COLOR.border}`, outline: hot ? `2px solid ${COLOR.red}` : 'none', outlineOffset: '2px', borderRadius: '8px', minHeight: '36px' }}>
+    <label style={{ display: 'flex', gap: '10px', alignItems: 'flex-start', padding: '8px 0', borderTop: `1px solid ${COLOR.border}`, outline: hot ? `1px solid ${COLOR.red}` : 'none', outlineOffset: '2px', borderRadius: 'var(--r-ctl)', minHeight: '36px' }}>
       <input type="checkbox" checked={!!value} onChange={(e) => onChange(e.target.checked)} style={{ width: '20px', height: '20px', marginTop: '2px', accentColor: COLOR.primary, flexShrink: 0 }} />
       <span><span style={{ fontSize: '13.5px', fontWeight: 800, display: 'block' }}>{label}</span><span style={{ fontSize: '12px', color: COLOR.muted, lineHeight: 1.45 }}>{hint}</span></span>
     </label>
@@ -184,7 +184,7 @@ function PgDnsRecords({ topo, edit, listKey, diag, hotIds }) {
   return (
     <div>
       {issues.length > 0 && (
-        <div style={{ padding: '8px 10px', borderRadius: '10px', border: `2px solid ${COLOR.red}`, background: tint(COLOR.red, 10), fontSize: '12.5px', lineHeight: 1.5, marginBottom: '10px' }}>
+        <div style={{ padding: '8px 10px', borderRadius: 'var(--r-ctl)', border: `1px solid ${COLOR.red}`, background: tint(COLOR.red, 10), fontSize: '12.5px', lineHeight: 1.5, marginBottom: '10px' }}>
           <strong>The zone server would refuse this zone.</strong> {issues[0].text}
         </div>
       )}
@@ -195,7 +195,7 @@ function PgDnsRecords({ topo, edit, listKey, diag, hotIds }) {
         const ttl = pgDnsParseTtl(r.ttl);
         const ownerIssue = issues.find((x) => x.recordId === r.id);
         return (
-          <div key={r.id} style={{ marginBottom: '10px', padding: '8px 10px', borderRadius: '12px', border: `2px solid ${hot || ownerIssue ? COLOR.red : COLOR.border}`, background: COLOR.surface }}>
+          <div key={r.id} style={{ marginBottom: '10px', padding: '8px 10px', borderRadius: 'var(--r-card)', border: `1px solid ${hot || ownerIssue ? COLOR.red : COLOR.border}`, background: COLOR.surface }}>
             <div className="flex justify-between items-center" style={{ marginBottom: '6px', gap: '8px' }}>
               <strong style={{ fontSize: '12.5px', ...pgDnsMono }}>{pgDnsClip(`${pgDnsShort(zoneName, pgDnsOwner(r.name, zoneName))} ${r.type}`, 30)}</strong>
               <button className="btn-flat" onClick={() => setList(list.filter((_, j) => j !== i))} aria-label={`Delete the ${r.name || 'blank'} ${r.type} record`} style={pgDnsDelBtn}>✕</button>
@@ -260,7 +260,7 @@ function PgDnsResolvers({ topo, edit, diag }) {
       {list.map((rs, i) => {
         const hot = !!diag && diag.deviceId === rs.id;
         return (
-          <div key={rs.id} style={{ marginBottom: '10px', padding: '8px 10px', borderRadius: '12px', border: `2px solid ${hot ? COLOR.red : COLOR.border}`, background: COLOR.surface }}>
+          <div key={rs.id} style={{ marginBottom: '10px', padding: '8px 10px', borderRadius: 'var(--r-card)', border: `1px solid ${hot ? COLOR.red : COLOR.border}`, background: COLOR.surface }}>
             <div className="flex justify-between items-center" style={{ marginBottom: '6px', gap: '8px' }}>
               <strong style={{ fontSize: '12.5px' }}>{pgDnsClip(rs.name || 'Resolver', 26)}</strong>
               <button className="btn-flat" onClick={() => setList(list.filter((_, j) => j !== i))} aria-label={`Remove ${rs.name}`} style={pgDnsDelBtn}>✕</button>
@@ -297,7 +297,7 @@ function PgDnsClients({ topo, edit, diag }) {
         const hosts = c.hosts || [];
         const setHosts = (h) => setCl(i, { hosts: h });
         return (
-          <div key={c.id} style={{ marginBottom: '10px', padding: '8px 10px', borderRadius: '12px', border: `2px solid ${hot ? COLOR.red : COLOR.border}`, background: COLOR.surface }}>
+          <div key={c.id} style={{ marginBottom: '10px', padding: '8px 10px', borderRadius: 'var(--r-card)', border: `1px solid ${hot ? COLOR.red : COLOR.border}`, background: COLOR.surface }}>
             <div className="flex justify-between items-center" style={{ marginBottom: '6px', gap: '8px' }}>
               <strong style={{ fontSize: '12.5px' }}>{pgDnsClip(c.name || 'Client', 26)}</strong>
               <button className="btn-flat" onClick={() => setList(list.filter((_, j) => j !== i))} aria-label={`Remove ${c.name}`} style={pgDnsDelBtn}>✕</button>
@@ -341,7 +341,7 @@ function PgDnsMachines({ topo, edit }) {
     <div>
       <PgDnsNote>The real servers behind the addresses. DNS only hands out an address: whether that address belongs to the right machine is up to the record. List what a machine serves to make a wrong address visible.</PgDnsNote>
       {list.map((m, i) => (
-        <div key={m.id} style={{ marginBottom: '10px', padding: '8px 10px', borderRadius: '12px', border: `2px solid ${COLOR.border}`, background: COLOR.surface }}>
+        <div key={m.id} style={{ marginBottom: '10px', padding: '8px 10px', borderRadius: 'var(--r-card)', border: `1px solid ${COLOR.border}`, background: COLOR.surface }}>
           <div className="flex justify-between items-center" style={{ marginBottom: '6px', gap: '8px' }}>
             <strong style={{ fontSize: '12.5px' }}>{pgDnsClip(m.name || 'Server', 26)}</strong>
             <button className="btn-flat" onClick={() => setList(list.filter((_, j) => j !== i))} aria-label={`Remove ${m.name}`} style={pgDnsDelBtn}>✕</button>
@@ -371,20 +371,20 @@ function PgDnsResult({ result, topo, onFlushRetry }) {
   const warn = result.warning && (!result.diagnosis || result.warning.code !== result.diagnosis.code) ? result.warning : null;
   return (
     <div>
-      <div style={{ padding: '10px 12px', borderRadius: '12px', background: tint(hue, 16), border: `2px solid ${hue}`, marginBottom: '10px', display: 'flex', gap: '8px', alignItems: 'baseline' }}>
+      <div style={{ padding: '10px 12px', borderRadius: 'var(--r-card)', background: tint(hue, 16), border: `1px solid ${hue}`, marginBottom: '10px', display: 'flex', gap: '8px', alignItems: 'baseline' }}>
         <span style={{ fontWeight: 900, color: ink(hue), fontSize: '16px' }}>{ok ? '✓' : '✕'}</span>
         <span style={{ fontWeight: 800, fontSize: '13.5px', lineHeight: 1.4, flex: 1, minWidth: 0 }}>{result.summary}</span>
-        {result.rcode && <span style={{ fontWeight: 800, fontSize: '10.5px', padding: '2px 7px', borderRadius: '999px', border: `1.5px solid ${hue}`, color: ink(hue), flexShrink: 0 }}>{result.rcode}</span>}
+        {result.rcode && <span style={{ fontWeight: 800, fontSize: '10.5px', padding: '2px 7px', borderRadius: 'var(--r-pill)', border: `1px solid ${hue}`, color: ink(hue), flexShrink: 0 }}>{result.rcode}</span>}
       </div>
       <PgDiagnosis diagnosis={result.diagnosis} heading="First thing that is wrong" />
       {result.diagnosis && ['stale-cache', 'negative-cache'].includes(result.diagnosis.code) && onFlushRetry && (
-        <button className="btn-flat" onClick={() => onFlushRetry(result.diagnosis.deviceId)} style={{ ...pgPillStyle, minHeight: '38px', marginBottom: '10px', border: `2px solid ${COLOR.teal}`, color: ink(COLOR.teal) }}>
+        <button className="btn-flat" onClick={() => onFlushRetry(result.diagnosis.deviceId)} style={{ ...pgPillStyle, minHeight: '38px', marginBottom: '10px', border: `1px solid ${COLOR.teal}`, color: ink(COLOR.teal) }}>
           Flush {pgDnsClip(((topo.resolvers || []).find((x) => x.id === result.diagnosis.deviceId) || { name: 'the cache' }).name, 22)} and look again
         </button>
       )}
       <PgDiagnosis diagnosis={warn} heading="Warning: it worked, but not cleanly" />
       {result.answers && result.answers.length > 0 && (
-        <div style={{ marginBottom: '10px', padding: '8px 10px', borderRadius: '12px', border: `1.5px solid ${COLOR.border}`, background: COLOR.surface }}>
+        <div style={{ marginBottom: '10px', padding: '8px 10px', borderRadius: 'var(--r-card)', border: `1px solid ${COLOR.border}`, background: COLOR.surface }}>
           <div style={{ fontSize: '10.5px', fontWeight: 800, letterSpacing: '0.05em', textTransform: 'uppercase', color: COLOR.muted, marginBottom: '4px' }}>The answer</div>
           {result.answers.map((a, i) => (
             <div key={i} style={{ fontSize: '12px', lineHeight: 1.5, wordBreak: 'break-word', ...pgDnsMono }}>
@@ -409,7 +409,7 @@ function PgDnsClock({ topo, st, onAdvance, onFlush, onReset }) {
       </PgDnsNote>
       <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '10px' }}>
         {PG_DNS_ADVANCES.map((a) => (
-          <button key={a.label} className="btn-flat" onClick={() => onAdvance(a.sec)} style={{ ...pgPillStyle, minHeight: '38px', border: `2px solid ${COLOR.teal}`, color: ink(COLOR.teal) }}>{a.label}</button>
+          <button key={a.label} className="btn-flat" onClick={() => onAdvance(a.sec)} style={{ ...pgPillStyle, minHeight: '38px', border: `1px solid ${COLOR.teal}`, color: ink(COLOR.teal) }}>{a.label}</button>
         ))}
         <button className="btn-flat" onClick={onReset} style={{ ...pgPillStyle, minHeight: '38px' }}>Start over</button>
       </div>

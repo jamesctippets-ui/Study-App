@@ -44,31 +44,20 @@ const COLOR = {
   onAccent: 'var(--color-on-accent)',
 };
 
-// One distinct accent color per track, for quick visual recognition in the
-// track menu panel — not used for correctness.
+// A track's accent is its vendor family's colour (not one hue per cert), so
+// the colour says who runs the exam: Azure blue, Microsoft security violet,
+// Microsoft 365 / workplace cyan, Cisco teal, ISC2 amber, CompTIA coral, ITIL
+// orchid. Used as a small dot or code colour, not for correctness.
+const FAMILY_ACCENTS = { azure: '#5AA2FF', security: '#A78BFA', workplace: '#38BDF8', cisco: '#2DD4BF', isc2: '#F5A524', comptia: '#FF7A6B', itil: '#D08BFF', other: '#94A3B8' };
 const TRACK_ACCENTS = {
-  itil: '#60A5FA',
-  az900: '#38BDF8',
-  az104: '#22D3EE',
-  dp900: '#2DD4BF',
-  dp300: '#818CF8',
-  az305: '#A78BFA',
-  az802: '#C084FC',
-  az140: '#E879F9',
-  md102: '#D946EF',
-  sc300: '#F472B6',
-  sc200: '#FB7185',
-  sc500: '#FB923C',
-  cloudplus: '#FACC15',
-  ehrintegration: '#94A3B8',
-  ab650: '#F59E0B',
-  ccna: '#10B981',
-  isc2cc: '#A3E635',
-  sscp: '#14B8A6',
-  cissp: '#EF4444',
-  ccsp: '#8B5CF6',
-  cgrc: '#F97316',
-  csslp: '#3B82F6',
+  itil: FAMILY_ACCENTS.itil,
+  az900: FAMILY_ACCENTS.azure, az104: FAMILY_ACCENTS.azure, dp900: FAMILY_ACCENTS.azure, dp300: FAMILY_ACCENTS.azure, az305: FAMILY_ACCENTS.azure,
+  az802: FAMILY_ACCENTS.workplace, az140: FAMILY_ACCENTS.workplace, md102: FAMILY_ACCENTS.workplace, ab650: FAMILY_ACCENTS.workplace,
+  sc300: FAMILY_ACCENTS.security, sc200: FAMILY_ACCENTS.security, sc500: FAMILY_ACCENTS.security,
+  cloudplus: FAMILY_ACCENTS.comptia,
+  ehrintegration: FAMILY_ACCENTS.other,
+  ccna: FAMILY_ACCENTS.cisco,
+  isc2cc: FAMILY_ACCENTS.isc2, sscp: FAMILY_ACCENTS.isc2, cissp: FAMILY_ACCENTS.isc2, ccsp: FAMILY_ACCENTS.isc2, cgrc: FAMILY_ACCENTS.isc2, csslp: FAMILY_ACCENTS.isc2,
 };
 
 // A soft tint of an accent over the card surface, so sections can carry their
@@ -77,17 +66,26 @@ function tint(color, pct) {
   return `color-mix(in srgb, ${color} ${pct == null ? 12 : pct}%, ${COLOR.surface})`;
 }
 
-// One hue per kind of path step, and a rotating hue per unit, so a trail reads
-// as a varied road instead of a single purple line.
+// A much fainter tint: the Console look keeps cards neutral, so a section's hue
+// only whispers (about 45% of tint's strength).
+function soft(color, pct) {
+  return tint(color, Math.round((pct == null ? 12 : pct) * 0.45));
+}
+
+// Colour carries meaning here, not decoration. The signature accent (green)
+// marks "you are here / do this next"; blue is information, amber is a task
+// that needs attention, red is a problem. Path step kinds map onto those four
+// so a trail reads as a route, not a rainbow.
 const STEP_HUE = {
-  read: COLOR.teal, cards: COLOR.blue, cards2: COLOR.blue, quiz: COLOR.orange, quiz2: COLOR.orange,
-  game: COLOR.pink, match: COLOR.pink, quick: COLOR.orange, apply: COLOR.success, checkpoint: COLOR.gold,
-  testout: COLOR.gold, review: COLOR.red, deep: COLOR.teal, bridge: COLOR.blue, bonus: COLOR.pink,
+  read: COLOR.primary, cards: COLOR.blue, cards2: COLOR.blue, quiz: COLOR.gold, quiz2: COLOR.gold,
+  game: COLOR.pink, match: COLOR.pink, quick: COLOR.gold, apply: COLOR.primary, checkpoint: COLOR.gold,
+  testout: COLOR.gold, review: COLOR.red, deep: COLOR.primary, bridge: COLOR.blue, bonus: COLOR.pink,
 };
-const UNIT_HUES = [COLOR.primary, COLOR.blue, COLOR.teal, COLOR.orange, COLOR.pink, COLOR.success, COLOR.gold];
-// The colour of each main area; the bottom tab, the top bar tint and the page
-// accents for that area all draw from it.
-const MODE_HUE = { home: COLOR.blue, path: COLOR.primary, quiz: COLOR.orange, learn: COLOR.teal, exam: COLOR.gold, profile: COLOR.pink, playground: COLOR.success };
+const UNIT_HUES = [COLOR.primary];
+// One accent for every main area (the tab bar, header and page accents all draw
+// from it); the page you are on is shown by position and a top indicator, not by
+// a different colour per tab.
+const MODE_HUE = { home: COLOR.primary, path: COLOR.primary, quiz: COLOR.primary, learn: COLOR.primary, exam: COLOR.primary, profile: COLOR.primary, playground: COLOR.primary };
 function modeHue(mode) { return MODE_HUE[mode] || COLOR.primary; }
 function unitHue(index) { return UNIT_HUES[index % UNIT_HUES.length]; }
 function stepHue(kind) { return STEP_HUE[kind] || COLOR.primary; }
@@ -157,9 +155,8 @@ const APP_HEADER_HEIGHT = 56;
 const TAB_BAR_HEIGHT = 68;
 
 const SHADOW = {
-  // A flat, solid edge under each card (the same "raised" cue the 3D buttons
-  // use) instead of a blurry drop shadow.
-  card: '0 3px 0 rgba(0,0,0,0.22)',
+  // Cards are flat with a hairline border (the Console look): no shadow.
+  card: 'none',
 };
 
 // Wireframe/line-art icons for header and menu chrome (Feather-icons style)
@@ -172,6 +169,14 @@ function IconMenu({ size = 18 }) {
       <line x1="3" y1="6" x2="21" y2="6" />
       <line x1="3" y1="12" x2="21" y2="12" />
       <line x1="3" y1="18" x2="21" y2="18" />
+    </svg>
+  );
+}
+
+function IconFlame({ size = 16 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M12 22c4 0 7-3 7-7 0-3-2-5-3-8-2 1-3 3-3 4-1-3-3-5-3-9-4 3-6 7-6 12 0 4 3 8 8 8z" />
     </svg>
   );
 }
@@ -249,7 +254,7 @@ function useTheme() {
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
     const meta = document.querySelector('meta[name="theme-color"]');
-    if (meta) meta.setAttribute('content', theme === 'light' ? '#FAF9F7' : '#1C1C1E');
+    if (meta) meta.setAttribute('content', theme === 'light' ? '#F2F0EA' : '#0A0D12');
     try { localStorage.setItem(THEME_STORAGE_KEY, theme); } catch (e) { /* ignore */ }
   }, [theme]);
 
@@ -289,7 +294,7 @@ function useTtsPrefs() {
 
 // Icons for the bottom tab bar (Home, Path, Practice, Reference, Exam).
 function TabIcon({ kind, size = 24 }) {
-  const c = { width: size, height: size, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 2.2, strokeLinecap: 'round', strokeLinejoin: 'round' };
+  const c = { width: size, height: size, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 1.8, strokeLinecap: 'round', strokeLinejoin: 'round' };
   switch (kind) {
     case 'home':
       return <svg {...c}><path d="M3 11.5 12 4l9 7.5" /><path d="M5.5 10v9.5h13V10" /><path d="M10 19.5v-5h4v5" /></svg>;
@@ -309,7 +314,7 @@ function TabIcon({ kind, size = 24 }) {
 }
 
 // Reading font. OpenDyslexic is an opt-in alternative to the default
-// (Nunito); like theme and voice it is a per-device display preference kept in
+// (Inter); like theme and voice it is a per-device display preference kept in
 // plain localStorage. The <head> also reads it before first paint so the page
 // never flashes the wrong font.
 const FONT_STORAGE_KEY = 'certStudyHub_fontPrefs';
@@ -426,20 +431,19 @@ function ThemeToggle({ theme, onToggle }) {
       title={isLight ? 'Switch to dark mode' : 'Switch to light mode'}
       aria-label={isLight ? 'Switch to dark mode' : 'Switch to light mode'}
       style={{
-        position: 'relative', width: '44px', height: '24px', borderRadius: '999px', flexShrink: 0,
+        position: 'relative', width: '44px', height: '24px', borderRadius: 'var(--r-ctl)', flexShrink: 0,
         background: COLOR.surface, border: `1px solid ${COLOR.border}`, padding: '2px',
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
       }}
     >
-      <span style={{ color: isLight ? COLOR.gold : COLOR.muted, display: 'flex', marginLeft: '2px' }}><IconSun /></span>
-      <span style={{ color: isLight ? COLOR.muted : COLOR.primary, display: 'flex', marginRight: '2px' }}><IconMoon /></span>
       <span
         style={{
-          position: 'absolute', top: '2px', left: isLight ? '22px' : '2px', width: '18px', height: '18px',
-          borderRadius: '50%', background: isLight ? COLOR.gold : COLOR.primary,
-          transition: 'left 0.15s ease', boxShadow: '0 1px 3px rgba(0,0,0,0.4)',
+          position: 'absolute', top: '2px', left: isLight ? '2px' : '22px', width: '18px', height: '18px',
+          borderRadius: '2px', background: COLOR.primary, transition: 'left 0.15s ease',
         }}
       />
+      <span style={{ color: isLight ? COLOR.onAccent : COLOR.muted, display: 'flex', marginLeft: '3px', position: 'relative' }}><IconSun /></span>
+      <span style={{ color: isLight ? COLOR.muted : COLOR.onAccent, display: 'flex', marginRight: '3px', position: 'relative' }}><IconMoon /></span>
     </button>
   );
 }

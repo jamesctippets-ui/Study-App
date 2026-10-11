@@ -15,12 +15,12 @@ function AboutSection({ title, defaultOpen, children }) {
     <div style={{ marginBottom: '10px' }}>
       <button
         onClick={() => setOpen((o) => !o)}
-        style={{ width: '100%', textAlign: 'left', background: COLOR.surfaceRaised, border: `2px solid ${COLOR.border}`, borderRadius: '12px', padding: '12px', fontSize: '13px', color: COLOR.text, fontWeight: 600 }}
+        style={{ width: '100%', textAlign: 'left', background: COLOR.surfaceRaised, border: `1px solid ${COLOR.border}`, borderRadius: 'var(--r-card)', padding: '12px', fontSize: '13px', color: COLOR.text, fontWeight: 600 }}
       >
         {open ? '▾ ' : '▸ '}{title}
       </button>
       {open && (
-        <div style={{ background: COLOR.surface, border: `2px solid ${COLOR.border}`, borderTop: 'none', borderRadius: '0 0 12px 12px', padding: '14px', fontSize: '12.5px', lineHeight: 1.6, color: COLOR.muted }}>
+        <div style={{ background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderTop: 'none', borderRadius: '0 0 var(--r-card) var(--r-card)', padding: '14px', fontSize: '12.5px', lineHeight: 1.6, color: COLOR.muted }}>
           {children}
         </div>
       )}
@@ -46,16 +46,16 @@ function MyTermsEditor({ customTerms, onSave, onDelete }) {
     reset();
   };
   const edit = (t) => { setKind(t.kind); setFront(t.front); setBack(t.back); setTrack(t.track || 'all'); setEditingId(t.id); setError(null); };
-  const input = { width: '100%', padding: '9px 11px', borderRadius: '10px', border: `2px solid ${COLOR.border}`, background: COLOR.surface, color: COLOR.text, fontSize: '13px' };
+  const input = { width: '100%', padding: '9px 11px', borderRadius: 'var(--r-ctl)', border: `1px solid ${COLOR.border}`, background: COLOR.surface, color: COLOR.text, fontSize: '13px' };
   return (
     <div>
       <div style={{ fontSize: '11.5px', color: COLOR.muted, marginBottom: '10px', lineHeight: 1.45 }}>
         Add terms or acronyms from your own work or notes. They show up in definition flyouts wherever the text mentions them, and stay on this device with your progress.
       </div>
-      <div className="flex gap-1" style={{ background: COLOR.surface, padding: '3px', borderRadius: '10px', border: `2px solid ${COLOR.border}`, marginBottom: '8px' }}>
+      <div className="flex gap-1" style={{ background: COLOR.surface, padding: '3px', borderRadius: 'var(--r-ctl)', border: `1px solid ${COLOR.border}`, marginBottom: '8px' }}>
         {[['term', 'Term'], ['acronym', 'Acronym']].map(([k, label]) => (
           <button key={k} onClick={() => { setKind(k); setError(null); }} className="flex-1 btn-flat" aria-pressed={kind === k}
-            style={{ padding: '6px 2px', borderRadius: '8px', fontSize: '12px', fontWeight: 700, background: kind === k ? COLOR.surfaceRaised : 'transparent', color: kind === k ? COLOR.text : COLOR.muted }}>
+            style={{ padding: '6px 2px', borderRadius: 'var(--r-ctl)', fontSize: '12px', fontWeight: 700, background: kind === k ? COLOR.surfaceRaised : 'transparent', color: kind === k ? COLOR.text : COLOR.muted }}>
             {label}
           </button>
         ))}
@@ -71,16 +71,16 @@ function MyTermsEditor({ customTerms, onSave, onDelete }) {
       </label>
       {error && <div role="alert" style={{ fontSize: '12px', color: COLOR.red, marginBottom: '8px', lineHeight: 1.4 }}>{error}</div>}
       <div className="flex gap-2" style={{ marginBottom: '14px' }}>
-        <button onClick={submit} className="btn-3d flex-1" style={{ padding: '10px', borderRadius: '12px', background: COLOR.primary, color: COLOR.onAccent, fontSize: '13px', fontWeight: 800 }}>
+        <button onClick={submit} className="btn-3d flex-1" style={{ padding: '10px', borderRadius: 'var(--r-card)', background: COLOR.primary, color: COLOR.onAccent, fontSize: '13px', fontWeight: 800 }}>
           {editingId ? 'Save changes' : kind === 'acronym' ? 'Add acronym' : 'Add term'}
         </button>
         {editingId && (
-          <button onClick={reset} className="btn-flat" style={{ padding: '10px 14px', borderRadius: '12px', border: `2px solid ${COLOR.border}`, background: 'transparent', color: COLOR.text, fontSize: '13px', fontWeight: 700 }}>Cancel</button>
+          <button onClick={reset} className="btn-flat" style={{ padding: '10px 14px', borderRadius: 'var(--r-card)', border: `1px solid ${COLOR.border}`, background: 'transparent', color: COLOR.text, fontSize: '13px', fontWeight: 700 }}>Cancel</button>
         )}
       </div>
       <div className="flex flex-col gap-2">
         {customTerms.map((t) => (
-          <div key={t.id} style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `2px solid ${COLOR.border}`, borderRadius: '12px', padding: '10px 12px' }}>
+          <div key={t.id} style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderRadius: 'var(--r-card)', padding: '10px 12px' }}>
             <div className="flex justify-between items-baseline" style={{ gap: '8px' }}>
               <span style={{ fontSize: '14px', fontWeight: 700, color: t.kind === 'acronym' ? COLOR.gold : COLOR.text }}>{t.front}</span>
               <span style={{ fontSize: '10.5px', fontWeight: 700, color: COLOR.muted, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{t.kind} · {t.track && t.track !== 'all' ? (TRACKS.find((x) => x.key === t.track) || { label: t.track }).label : 'All certs'}</span>
@@ -141,7 +141,7 @@ function GlossaryPanel({ onClose, customTerms, onSaveCustomTerm, onDeleteCustomT
       <div
         onClick={(e) => e.stopPropagation()}
         style={{
-          background: COLOR.bg, borderTop: `1px solid ${COLOR.border}`, borderRadius: '20px 20px 0 0',
+          background: COLOR.bg, borderTop: `1px solid ${COLOR.border}`, borderRadius: 'var(--r-card) var(--r-card) 0 0',
           maxWidth: '28rem', width: '100%', maxHeight: '82vh', overflowY: 'auto', padding: '18px 18px 28px',
           boxShadow: SHADOW.card,
         }}
@@ -154,13 +154,13 @@ function GlossaryPanel({ onClose, customTerms, onSaveCustomTerm, onDeleteCustomT
           Every term across all {TRACKS.filter((t) => !t.hidden).length} tracks, in one searchable list — a term
           explained once here shows every track that uses it, not just whichever one you're currently in.
         </div>
-        <div className="flex gap-1" style={{ background: COLOR.surface, padding: '3px', borderRadius: '10px', border: `2px solid ${COLOR.border}`, marginBottom: '10px' }}>
+        <div className="flex gap-1" style={{ background: COLOR.surface, padding: '3px', borderRadius: 'var(--r-ctl)', border: `1px solid ${COLOR.border}`, marginBottom: '10px' }}>
           {[['terms', `Terms (${entries.length})`], ['acronyms', `Acronyms (${acronymEntries.length})`], ['mine', `Mine (${(customTerms || []).length})`]].map(([k, label]) => (
             <button
               key={k}
               onClick={() => { setTab(k); setExpandedKey(null); }}
               className="flex-1 btn-flat"
-              style={{ padding: '6px 2px', borderRadius: '8px', fontSize: '11.5px', fontWeight: 600, background: tab === k ? COLOR.surfaceRaised : 'transparent', color: tab === k ? COLOR.text : COLOR.muted }}
+              style={{ padding: '6px 2px', borderRadius: 'var(--r-ctl)', fontSize: '11.5px', fontWeight: 600, background: tab === k ? COLOR.surfaceRaised : 'transparent', color: tab === k ? COLOR.text : COLOR.muted }}
             >
               {label}
             </button>
@@ -174,7 +174,7 @@ function GlossaryPanel({ onClose, customTerms, onSaveCustomTerm, onDeleteCustomT
           onChange={(e) => setQuery(e.target.value)}
           placeholder={tab === 'terms' ? 'Search terms…' : 'Search acronyms or what they stand for…'}
           style={{
-            width: '100%', padding: '10px 12px', borderRadius: '10px', border: `2px solid ${COLOR.border}`,
+            width: '100%', padding: '10px 12px', borderRadius: 'var(--r-ctl)', border: `1px solid ${COLOR.border}`,
             background: COLOR.surface, color: COLOR.text, fontSize: '13px', marginBottom: '10px',
           }}
         />}
@@ -186,9 +186,9 @@ function GlossaryPanel({ onClose, customTerms, onSaveCustomTerm, onDeleteCustomT
         {tab === 'acronyms' && (
           <div className="flex flex-col gap-2">
             {filteredAcronyms.map((a) => (
-              <div key={a.key} style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `2px solid ${COLOR.border}`, borderRadius: '12px', padding: '9px 12px', display: 'flex', gap: '10px', alignItems: 'baseline' }}>
+              <div key={a.key} style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderRadius: 'var(--r-card)', padding: '9px 12px', display: 'flex', gap: '10px', alignItems: 'baseline' }}>
                 <span className="itil-display" style={{ fontSize: '14px', fontWeight: 700, color: COLOR.gold, minWidth: '56px' }}>{a.key}</span>
-                <span style={{ fontSize: '13px', color: COLOR.text, lineHeight: 1.45 }}>{a.exps.join(' / ')}{a.mine && <span style={{ marginLeft: '6px', fontSize: '10.5px', fontWeight: 700, color: COLOR.primary, border: `1px solid ${COLOR.primary}`, borderRadius: '999px', padding: '0 6px' }}>Mine</span>}</span>
+                <span style={{ fontSize: '13px', color: COLOR.text, lineHeight: 1.45 }}>{a.exps.join(' / ')}{a.mine && <span style={{ marginLeft: '6px', fontSize: '10.5px', fontWeight: 700, color: COLOR.primary, border: `1px solid ${COLOR.primary}`, borderRadius: 'var(--r-pill)', padding: '0 6px' }}>Mine</span>}</span>
               </div>
             ))}
             {!filteredAcronyms.length && (
@@ -201,7 +201,7 @@ function GlossaryPanel({ onClose, customTerms, onSaveCustomTerm, onDeleteCustomT
             const key = entry.front.toLowerCase();
             const open = expandedKey === key;
             return (
-              <div key={key} style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `2px solid ${COLOR.border}`, borderRadius: '12px', padding: '10px 12px' }}>
+              <div key={key} style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderRadius: 'var(--r-card)', padding: '10px 12px' }}>
                 <button
                   onClick={() => setExpandedKey(open ? null : key)}
                   className="btn-flat"
@@ -209,14 +209,14 @@ function GlossaryPanel({ onClose, customTerms, onSaveCustomTerm, onDeleteCustomT
                 >
                   <div style={{ fontSize: '14px', fontWeight: 600, color: COLOR.text }}>{entry.front}</div>
                   <div className="flex gap-1" style={{ marginTop: '4px', flexWrap: 'wrap' }}>
-                    {entry.mine && <span style={{ fontSize: '10.5px', fontWeight: 700, color: COLOR.primary, border: `1px solid ${COLOR.primary}`, borderRadius: '999px', padding: '1px 6px' }}>Mine</span>}
+                    {entry.mine && <span style={{ fontSize: '10.5px', fontWeight: 700, color: COLOR.primary, border: `1px solid ${COLOR.primary}`, borderRadius: 'var(--r-pill)', padding: '1px 6px' }}>Mine</span>}
                     {entry.tracks.map((tk) => {
                       const t = TRACKS.find((tt) => tt.key === tk);
                       const accent = trackAccent(tk);
                       return (
                         <span
                           key={tk}
-                          style={{ fontSize: '10px', fontWeight: 700, color: ink(accent), border: `1px solid ${accent}`, borderRadius: '999px', padding: '1px 6px' }}
+                          style={{ fontSize: '10px', fontWeight: 700, color: ink(accent), border: `1px solid ${accent}`, borderRadius: 'var(--r-pill)', padding: '1px 6px' }}
                         >
                           {t ? t.label : tk}
                         </span>
@@ -262,7 +262,7 @@ function AboutLegalPanel({ onClose }) {
       <div
         onClick={(e) => e.stopPropagation()}
         style={{
-          background: COLOR.bg, borderTop: `1px solid ${COLOR.border}`, borderRadius: '20px 20px 0 0',
+          background: COLOR.bg, borderTop: `1px solid ${COLOR.border}`, borderRadius: 'var(--r-card) var(--r-card) 0 0',
           maxWidth: '28rem', width: '100%', maxHeight: '82vh', overflowY: 'auto', padding: '18px 18px 28px',
           boxShadow: SHADOW.card,
         }}
@@ -420,7 +420,7 @@ function TermFlyout({ term, triggerText, context, scope, onClose, getAnchor }) {
         // invisible for the one render before it has been measured (and while its word is scrolled out of view)
         visibility: !place || place.hidden ? 'hidden' : 'visible',
         display: 'block', width: 'max-content', maxWidth: 'min(280px, calc(100vw - 20px))', boxSizing: 'border-box',
-        background: COLOR.surfaceRaised, border: `1px solid ${COLOR.primary}`, borderRadius: '12px',
+        background: COLOR.surfaceRaised, border: `1px solid ${COLOR.primary}`, borderRadius: 'var(--r-card)',
         padding: '10px 12px', boxShadow: SHADOW.card, textAlign: 'left', whiteSpace: 'normal',
         fontWeight: 400, fontStyle: 'normal',
       }}
@@ -459,7 +459,7 @@ function TermFlyout({ term, triggerText, context, scope, onClose, getAnchor }) {
       {term.custom && <span style={{ display: 'block', fontSize: '10.5px', fontWeight: 700, letterSpacing: '0.05em', textTransform: 'uppercase', color: COLOR.primary, marginBottom: '2px', position: 'relative' }}>Your term</span>}
       {term.back && <span style={{ display: 'block', fontSize: '12.5px', lineHeight: 1.5, color: COLOR.text, position: 'relative' }}>{term.back}</span>}
       {term.detail && (
-        <span style={{ display: 'block', fontSize: '11.5px', lineHeight: 1.5, color: COLOR.muted, marginTop: '6px', borderLeft: `2px solid ${COLOR.primary}`, paddingLeft: '8px', position: 'relative' }}>
+        <span style={{ display: 'block', fontSize: '11.5px', lineHeight: 1.5, color: COLOR.muted, marginTop: '6px', borderLeft: `1px solid ${COLOR.primary}`, paddingLeft: '8px', position: 'relative' }}>
           {term.detail}
         </span>
       )}
@@ -468,7 +468,7 @@ function TermFlyout({ term, triggerText, context, scope, onClose, getAnchor }) {
           onClick={(e) => { e.stopPropagation(); if (!alreadySaved) customCtx.save(saveCandidate); }}
           disabled={alreadySaved}
           className="btn-flat"
-          style={{ display: 'block', marginTop: '8px', padding: '4px 10px', borderRadius: '8px', border: `1px solid ${alreadySaved ? COLOR.success : COLOR.primary}`, background: 'transparent', color: alreadySaved ? COLOR.success : COLOR.primary, fontSize: '11.5px', fontWeight: 700, position: 'relative' }}
+          style={{ display: 'block', marginTop: '8px', padding: '4px 10px', borderRadius: 'var(--r-ctl)', border: `1px solid ${alreadySaved ? COLOR.success : COLOR.primary}`, background: 'transparent', color: alreadySaved ? COLOR.success : COLOR.primary, fontSize: '11.5px', fontWeight: 700, position: 'relative' }}
         >
           {alreadySaved ? 'Saved to My terms ✓' : '+ Save to my terms'}
         </button>
@@ -499,8 +499,8 @@ function CategoryFilterSelect({ categories, activeCat, onChange, masteryByCatego
       value={activeCat}
       onChange={(e) => onChange(e.target.value)}
       style={{
-        width: '100%', marginBottom: '18px', padding: '10px 12px', borderRadius: '10px', fontSize: '13px', fontWeight: 600,
-        border: `1px solid ${COLOR.primary}`, background: 'rgba(167,139,250,0.14)', color: COLOR.primary,
+        width: '100%', marginBottom: '18px', padding: '10px 12px', borderRadius: 'var(--r-ctl)', fontSize: '13px', fontWeight: 600,
+        border: `1px solid ${COLOR.border}`, background: COLOR.surface, color: COLOR.text,
       }}
     >
       <option value="all">All categories</option>
@@ -530,14 +530,14 @@ function BottomTabBar({ mode, onChange }) {
     <nav
       aria-label="Main"
       style={{
-        position: 'fixed', left: 0, right: 0, bottom: 0, zIndex: 40, background: COLOR.navBar,
-        borderTop: `2px solid ${COLOR.border}`, paddingBottom: 'env(safe-area-inset-bottom)',
+        position: 'fixed', left: 0, right: 0, bottom: 0, zIndex: 40, background: `color-mix(in srgb, ${COLOR.bg} 94%, transparent)`,
+        backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)',
+        borderTop: `1px solid ${COLOR.border}`, paddingBottom: 'env(safe-area-inset-bottom)',
       }}
     >
-      <div className="max-w-md mx-auto flex" style={{ height: `${TAB_BAR_HEIGHT}px`, padding: '6px 6px', gap: '2px' }}>
+      <div className="max-w-md mx-auto flex" style={{ height: `${TAB_BAR_HEIGHT}px`, padding: '0 4px' }}>
         {TAB_BAR_ITEMS.map((t) => {
           const active = mode === t.m;
-          const hue = modeHue(t.m);
           return (
             <button
               key={t.m}
@@ -546,14 +546,13 @@ function BottomTabBar({ mode, onChange }) {
               aria-current={active ? 'page' : undefined}
               className="btn-flat flex-1"
               style={{
-                display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '2px',
-                borderRadius: '14px', background: active ? `color-mix(in srgb, ${hue} 18%, transparent)` : 'transparent',
-                border: `2px solid ${active ? hue : 'transparent'}`, color: active ? hue : `color-mix(in srgb, ${hue} 55%, ${COLOR.muted})`, minWidth: 0,
-                fontSize: '10.5px', fontWeight: 800, letterSpacing: 0,
+                position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '4px',
+                background: 'transparent', border: 'none', borderRadius: 0, color: active ? COLOR.primary : COLOR.muted, minWidth: 0, padding: '6px 0 4px',
               }}
             >
-              <TabIcon kind={t.icon} size={24} />
-              {t.label}
+              {active && <span style={{ position: 'absolute', top: 0, left: '22%', right: '22%', height: '2px', background: COLOR.primary }} />}
+              <TabIcon kind={t.icon} size={22} />
+              <span style={{ fontFamily: 'var(--font-mono)', fontSize: '9.5px', fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase' }}>{t.label}</span>
             </button>
           );
         })}
@@ -569,7 +568,7 @@ function ExperienceChip({ trackKey, style }) {
   if (!exp) return null;
   const hue = exp.level === 'required' ? COLOR.orange : exp.level === 'recommended' ? COLOR.blue : COLOR.success;
   return (
-    <span title={exp.summary} style={{ display: 'inline-block', fontSize: '10.5px', fontWeight: 800, letterSpacing: '0.02em', padding: '2px 8px', borderRadius: '999px', background: tint(hue, 16), color: ink(hue), border: `1px solid color-mix(in srgb, ${hue} 40%, transparent)`, whiteSpace: 'nowrap', ...style }}>
+    <span title={exp.summary} style={{ display: 'inline-block', fontSize: '10.5px', fontWeight: 800, letterSpacing: '0.02em', padding: '2px 8px', borderRadius: 'var(--r-pill)', background: soft(hue, 16), color: ink(hue), border: `1px solid color-mix(in srgb, ${hue} 40%, transparent)`, whiteSpace: 'nowrap', ...style }}>
       {experienceShort(exp)}
     </span>
   );
@@ -582,7 +581,7 @@ function ExperienceCard({ trackKey }) {
   if (!exp) return null;
   const hue = exp.level === 'required' ? COLOR.orange : exp.level === 'recommended' ? COLOR.blue : COLOR.success;
   return (
-    <div style={{ marginBottom: '16px', padding: '12px 14px', borderRadius: '12px', background: tint(hue, 10), border: `2px solid color-mix(in srgb, ${hue} 35%, ${COLOR.border})` }}>
+    <div style={{ marginBottom: '16px', padding: '12px 14px', borderRadius: 'var(--r-card)', background: soft(hue, 10), border: `1px solid color-mix(in srgb, ${hue} 16%, ${COLOR.border})` }}>
       <div style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.04em', textTransform: 'uppercase', color: ink(hue), marginBottom: '6px' }}>
         Experience · {experienceShort(exp)}
       </div>

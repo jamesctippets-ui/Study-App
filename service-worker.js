@@ -1,4 +1,4 @@
-const CACHE_NAME = 'cert-study-hub-504f930139';
+const CACHE_NAME = 'cert-study-hub-690f68ad08';
 
 const CORE_ASSETS = [
   './',
@@ -8,8 +8,9 @@ const CORE_ASSETS = [
   './icons/icon-512.png',
   './icons/icon-maskable-512.png',
   // BEGIN GENERATED ASSETS (build.py)
-  './fonts/nunito-latin-ext.woff2',
-  './fonts/nunito-latin.woff2',
+  './fonts/inter-latin-ext.woff2',
+  './fonts/inter-latin.woff2',
+  './fonts/jetbrains-mono-latin.woff2',
   './fonts/opendyslexic-400.woff2',
   './fonts/opendyslexic-700.woff2',
   './images/avd/azure-files-entra-kerberos.png',

@@ -14,7 +14,7 @@ function QuizSetup({ length, setLength, types, toggleType, onReroll, poolSize, m
       {missedCount > 0 && (
         <button
           onClick={onReviewMissed}
-          style={{ width: '100%', marginBottom: '10px', padding: '10px', borderRadius: '12px', border: `1px solid ${COLOR.red}`, background: 'rgba(181,87,74,0.1)', color: COLOR.red, fontSize: '13px', fontWeight: 600 }}
+          style={{ width: '100%', marginBottom: '10px', padding: '10px', borderRadius: 'var(--r-card)', border: `1px solid ${COLOR.red}`, background: 'color-mix(in srgb, var(--color-red) 10%, transparent)', color: COLOR.red, fontSize: '13px', fontWeight: 600 }}
         >
           Review {missedCount} missed question{missedCount === 1 ? '' : 's'}
         </button>
@@ -25,12 +25,12 @@ function QuizSetup({ length, setLength, types, toggleType, onReroll, poolSize, m
         </div>
         <button
           onClick={onReroll}
-          style={{ fontSize: '11px', color: COLOR.primary, background: 'transparent', padding: '4px 8px', borderRadius: '8px', border: `1px solid ${COLOR.primary}`, flexShrink: 0 }}
+          style={{ fontSize: '11px', color: COLOR.primary, background: 'transparent', padding: '4px 8px', borderRadius: 'var(--r-ctl)', border: `1px solid ${COLOR.primary}`, flexShrink: 0 }}
         >
           New quiz
         </button>
       </div>
-      <div style={{ border: `2px solid ${COLOR.border}`, borderRadius: '12px', background: COLOR.surface, overflow: 'hidden' }}>
+      <div style={{ border: `1px solid ${COLOR.border}`, borderRadius: 'var(--r-card)', background: COLOR.surface, overflow: 'hidden' }}>
         <button
           onClick={() => setOptionsOpen((o) => !o)}
           className="btn-flat"
@@ -51,8 +51,8 @@ function QuizSetup({ length, setLength, types, toggleType, onReroll, poolSize, m
                 value={length}
                 onChange={(e) => setLength(Number(e.target.value))}
                 style={{
-                  padding: '6px 10px', borderRadius: '9px', fontSize: '12.5px', fontWeight: 600,
-                  border: `1px solid ${COLOR.primary}`, background: 'rgba(167,139,250,0.14)', color: COLOR.primary,
+                  padding: '6px 10px', borderRadius: 'var(--r-ctl)', fontSize: '12.5px', fontWeight: 600,
+                  border: `1px solid ${COLOR.border}`, background: COLOR.surface, color: COLOR.text,
                 }}
               >
                 {lengths.map((n) => <option key={n} value={n}>{n} questions</option>)}
@@ -64,9 +64,9 @@ function QuizSetup({ length, setLength, types, toggleType, onReroll, poolSize, m
                   key={key}
                   onClick={() => toggleType(key)}
                   style={{
-                    flexShrink: 0, padding: '6px 12px', borderRadius: '999px', fontSize: '12px', fontWeight: 500,
+                    flexShrink: 0, padding: '6px 12px', borderRadius: 'var(--r-pill)', fontSize: '12px', fontWeight: 500,
                     border: `1px solid ${types[key] ? COLOR.gold : COLOR.border}`,
-                    background: types[key] ? 'rgba(211,164,101,0.14)' : COLOR.surface,
+                    background: types[key] ? 'color-mix(in srgb, var(--color-gold) 14%, transparent)' : COLOR.surface,
                     color: types[key] ? COLOR.gold : COLOR.muted,
                   }}
                 >
@@ -101,7 +101,7 @@ function VerbalQuizPanel({
   if (phase === 'setup') {
     const lengths = [5, 10, 15, 25];
     return (
-      <div style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `2px solid ${COLOR.border}`, borderRadius: '18px', padding: '20px' }}>
+      <div style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderRadius: 'var(--r-card)', padding: '20px' }}>
         <div className="itil-display" style={{ fontSize: '16px', fontWeight: 600, marginBottom: '8px' }}>🔊 Verbal Quiz</div>
         <div style={{ fontSize: '12.5px', color: COLOR.muted, lineHeight: 1.5, marginBottom: '16px' }}>
           Hands-free, audio-only studying — reads each question aloud, pauses so you can think, then reads
@@ -115,7 +115,7 @@ function VerbalQuizPanel({
             id="verbal-length-select"
             value={length}
             onChange={(e) => setLength(Number(e.target.value))}
-            style={{ padding: '6px 10px', borderRadius: '9px', fontSize: '12.5px', fontWeight: 600, border: `1px solid ${COLOR.primary}`, background: 'rgba(167,139,250,0.14)', color: COLOR.primary }}
+            style={{ padding: '6px 10px', borderRadius: 'var(--r-ctl)', fontSize: '12.5px', fontWeight: 600, border: `1px solid ${COLOR.border}`, background: COLOR.surface, color: COLOR.text }}
           >
             {lengths.map((n) => <option key={n} value={n}>{n} questions</option>)}
           </select>
@@ -126,7 +126,7 @@ function VerbalQuizPanel({
             id="verbal-pause-select"
             value={pauseSec}
             onChange={(e) => setPauseSec(Number(e.target.value))}
-            style={{ padding: '6px 10px', borderRadius: '9px', fontSize: '12.5px', fontWeight: 600, border: `2px solid ${COLOR.border}`, background: COLOR.surfaceRaised, color: COLOR.text }}
+            style={{ padding: '6px 10px', borderRadius: 'var(--r-ctl)', fontSize: '12.5px', fontWeight: 600, border: `1px solid ${COLOR.border}`, background: COLOR.surfaceRaised, color: COLOR.text }}
           >
             {[4, 6, 8, 10, 15].map((n) => <option key={n} value={n}>{n} seconds</option>)}
           </select>
@@ -140,7 +140,7 @@ function VerbalQuizPanel({
         <button
           onClick={onStart}
           disabled={poolSize === 0}
-          style={{ width: '100%', padding: '12px', borderRadius: '12px', background: poolSize === 0 ? COLOR.border : COLOR.primary, color: COLOR.onAccent, fontSize: '14px', fontWeight: 600 }}
+          style={{ width: '100%', padding: '12px', borderRadius: 'var(--r-card)', background: poolSize === 0 ? COLOR.border : COLOR.primary, color: COLOR.onAccent, fontSize: '14px', fontWeight: 600 }}
         >
           ▶ Start Verbal Quiz
         </button>
@@ -157,7 +157,7 @@ function VerbalQuizPanel({
           Read through {session.length} question{session.length === 1 ? '' : 's'}. Nothing was scored —
           start another round whenever you're ready.
         </div>
-        <button className="btn-3d" onClick={onRestart} style={{ padding: '10px 20px', borderRadius: '12px', background: COLOR.primary, color: COLOR.onAccent, fontSize: '13px', fontWeight: 600 }}>
+        <button className="btn-3d" onClick={onRestart} style={{ padding: '10px 20px', borderRadius: 'var(--r-card)', background: COLOR.primary, color: COLOR.onAccent, fontSize: '13px', fontWeight: 600 }}>
           Back to setup
         </button>
       </div>
@@ -174,10 +174,10 @@ function VerbalQuizPanel({
         <span>{categoryLabel}</span>
         <span>{index + 1} / {session.length}</span>
       </div>
-      <div style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `2px solid ${COLOR.border}`, borderRadius: '18px', padding: '24px', textAlign: 'center' }}>
+      <div style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderRadius: 'var(--r-card)', padding: '24px', textAlign: 'center' }}>
         <div style={{
-          display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '4px 12px', borderRadius: '999px',
-          background: phase === 'paused' ? COLOR.surfaceRaised : 'rgba(167,139,250,0.14)',
+          display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '4px 12px', borderRadius: 'var(--r-pill)',
+          background: phase === 'paused' ? COLOR.surfaceRaised : 'color-mix(in srgb, var(--color-primary) 14%, transparent)',
           color: phase === 'paused' ? COLOR.muted : COLOR.primary, fontSize: '11px', fontWeight: 600, marginBottom: '18px',
         }}>
           {phase === 'paused' ? '⏸ Paused' : `🔊 ${stepLabels[step] || ''}`}
@@ -196,14 +196,14 @@ function VerbalQuizPanel({
         <button
           onClick={onTogglePause}
           className="flex-1 btn-3d"
-          style={{ padding: '16px', borderRadius: '14px', background: COLOR.primary, color: COLOR.onAccent, fontSize: '15px', fontWeight: 600 }}
+          style={{ padding: '16px', borderRadius: 'var(--r-card)', background: COLOR.primary, color: COLOR.onAccent, fontSize: '15px', fontWeight: 600 }}
         >
           {phase === 'paused' ? '▶ Play' : '⏸ Pause'}
         </button>
         <button
           onClick={onSkip}
           className="flex-1"
-          style={{ padding: '16px', borderRadius: '14px', border: `2px solid ${COLOR.border}`, background: 'transparent', color: COLOR.text, fontSize: '15px', fontWeight: 600 }}
+          style={{ padding: '16px', borderRadius: 'var(--r-card)', border: `1px solid ${COLOR.border}`, background: 'transparent', color: COLOR.text, fontSize: '15px', fontWeight: 600 }}
         >
           Skip ⏭
         </button>
@@ -240,7 +240,7 @@ function CommandPracticeView({ session, index, score, categories, input, setInpu
         <div style={{ fontSize: '12.5px', color: COLOR.muted, marginBottom: '18px' }}>
           {score.correct} / {score.total} correct (exact or structurally right — see each answer's canonical form for the precise syntax).
         </div>
-        <button className="btn-3d" onClick={onRestart} style={{ padding: '10px 20px', borderRadius: '12px', background: COLOR.primary, color: COLOR.onAccent, fontSize: '13px', fontWeight: 600 }}>
+        <button className="btn-3d" onClick={onRestart} style={{ padding: '10px 20px', borderRadius: 'var(--r-card)', background: COLOR.primary, color: COLOR.onAccent, fontSize: '13px', fontWeight: 600 }}>
           New set
         </button>
       </div>
@@ -256,7 +256,7 @@ function CommandPracticeView({ session, index, score, categories, input, setInpu
         <span>{categoryLabel}</span>
         <span>{index + 1} / {total}</span>
       </div>
-      <div style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `2px solid ${COLOR.border}`, borderRadius: '18px', padding: '20px' }}>
+      <div style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderRadius: 'var(--r-card)', padding: '20px' }}>
         <div style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.04em', color: COLOR.gold, marginBottom: '8px', textTransform: 'uppercase' }}>
           {challenge.tool === 'powershell' ? 'PowerShell' : challenge.tool === 'ios' ? 'Cisco IOS' : 'Azure CLI'}
         </div>
@@ -272,7 +272,7 @@ function CommandPracticeView({ session, index, score, categories, input, setInpu
           onKeyDown={(e) => { if (e.key === 'Enter' && !submitted && input.trim()) onSubmit(); }}
           placeholder="Type the command…"
           style={{
-            width: '100%', padding: '12px 14px', borderRadius: '12px', fontFamily: 'monospace', fontSize: '13.5px',
+            width: '100%', padding: '12px 14px', borderRadius: 'var(--r-card)', fontFamily: 'monospace', fontSize: '13.5px',
             border: `1px solid ${submitted ? (result === 'incorrect' ? COLOR.red : COLOR.success) : COLOR.border}`,
             background: COLOR.surfaceRaised, color: COLOR.text,
           }}
@@ -281,7 +281,7 @@ function CommandPracticeView({ session, index, score, categories, input, setInpu
           <button
             onClick={onSubmit}
             disabled={!input.trim()}
-            style={{ width: '100%', marginTop: '12px', padding: '10px', borderRadius: '10px', background: input.trim() ? COLOR.primary : COLOR.border, color: COLOR.onAccent, fontSize: '13px', fontWeight: 600 }}
+            style={{ width: '100%', marginTop: '12px', padding: '10px', borderRadius: 'var(--r-ctl)', background: input.trim() ? COLOR.primary : COLOR.border, color: COLOR.onAccent, fontSize: '13px', fontWeight: 600 }}
           >
             Check
           </button>
@@ -294,7 +294,7 @@ function CommandPracticeView({ session, index, score, categories, input, setInpu
               {result === 'exact' ? '✓ Exactly right' : result === 'close' ? '✓ Right idea — close enough' : '✕ Not quite'}
             </div>
             <div style={{ fontSize: '11px', color: COLOR.muted, marginBottom: '4px' }}>Canonical answer:</div>
-            <div style={{ fontFamily: 'monospace', fontSize: '12.5px', padding: '10px 12px', borderRadius: '10px', background: COLOR.surfaceRaised, color: COLOR.text, marginBottom: '12px', wordBreak: 'break-word' }}>
+            <div style={{ fontFamily: 'monospace', fontSize: '12.5px', padding: '10px 12px', borderRadius: 'var(--r-ctl)', background: COLOR.surfaceRaised, color: COLOR.text, marginBottom: '12px', wordBreak: 'break-word' }}>
               {challenge.command}
             </div>
             <div style={{ fontSize: '12.5px', color: COLOR.muted, lineHeight: 1.5 }}>{challenge.explanation}</div>
@@ -304,7 +304,7 @@ function CommandPracticeView({ session, index, score, categories, input, setInpu
       {submitted && (
         <button className="btn-3d"
           onClick={onNext}
-          style={{ width: '100%', marginTop: '14px', padding: '12px', borderRadius: '12px', background: COLOR.primary, color: COLOR.onAccent, fontSize: '14px', fontWeight: 600 }}
+          style={{ width: '100%', marginTop: '14px', padding: '12px', borderRadius: 'var(--r-card)', background: COLOR.primary, color: COLOR.onAccent, fontSize: '14px', fontWeight: 600 }}
         >
           {index + 1 >= total ? 'Finish' : 'Next'}
         </button>
@@ -344,7 +344,7 @@ function MadLibsView({ session, index, score, categories, answers, onSetBlank, s
         <div style={{ fontSize: '12.5px', color: COLOR.muted, marginBottom: '18px' }}>
           {score.correct} / {score.total} scenario{score.total === 1 ? '' : 's'} fully correct.
         </div>
-        <button className="btn-3d" onClick={onRestart} style={{ padding: '10px 20px', borderRadius: '12px', background: COLOR.primary, color: COLOR.onAccent, fontSize: '13px', fontWeight: 600 }}>
+        <button className="btn-3d" onClick={onRestart} style={{ padding: '10px 20px', borderRadius: 'var(--r-card)', background: COLOR.primary, color: COLOR.onAccent, fontSize: '13px', fontWeight: 600 }}>
           New set
         </button>
       </div>
@@ -365,7 +365,7 @@ function MadLibsView({ session, index, score, categories, answers, onSetBlank, s
         <span>{categoryLabel}</span>
         <span>{index + 1} / {total}</span>
       </div>
-      <div style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `2px solid ${COLOR.border}`, borderRadius: '18px', padding: '20px' }}>
+      <div style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderRadius: 'var(--r-card)', padding: '20px' }}>
         <div style={{ fontSize: '15.5px', lineHeight: 2 }}>
           {parts.map((part, i) => {
             if (i % 2 === 0) {
@@ -386,9 +386,9 @@ function MadLibsView({ session, index, score, categories, answers, onSetBlank, s
                 disabled={submitted}
                 onChange={(e) => onSetBlank(part, Number(e.target.value))}
                 style={{
-                  margin: '0 3px', padding: '4px 8px', borderRadius: '8px', fontSize: '14px', fontWeight: 600,
-                  border: `1.5px solid ${submitted ? (isCorrectSel ? COLOR.success : COLOR.red) : COLOR.primary}`,
-                  background: submitted ? (isCorrectSel ? 'rgba(52,211,153,0.15)' : 'rgba(181,87,74,0.15)') : 'rgba(167,139,250,0.14)',
+                  margin: '0 3px', padding: '4px 8px', borderRadius: 'var(--r-ctl)', fontSize: '14px', fontWeight: 600,
+                  border: `1px solid ${submitted ? (isCorrectSel ? COLOR.success : COLOR.red) : COLOR.primary}`,
+                  background: submitted ? (isCorrectSel ? 'color-mix(in srgb, var(--color-success) 15%, transparent)' : 'color-mix(in srgb, var(--color-red) 15%, transparent)') : 'color-mix(in srgb, var(--color-primary) 14%, transparent)',
                   color: submitted ? (isCorrectSel ? COLOR.success : COLOR.red) : COLOR.primary,
                 }}
               >
@@ -415,14 +415,14 @@ function MadLibsView({ session, index, score, categories, answers, onSetBlank, s
         <button
           onClick={onSubmit}
           disabled={!allAnswered}
-          style={{ width: '100%', marginTop: '14px', padding: '12px', borderRadius: '12px', background: allAnswered ? COLOR.primary : COLOR.border, color: COLOR.onAccent, fontSize: '14px', fontWeight: 600 }}
+          style={{ width: '100%', marginTop: '14px', padding: '12px', borderRadius: 'var(--r-card)', background: allAnswered ? COLOR.primary : COLOR.border, color: COLOR.onAccent, fontSize: '14px', fontWeight: 600 }}
         >
           Check
         </button>
       ) : (
         <button className="btn-3d"
           onClick={onNext}
-          style={{ width: '100%', marginTop: '14px', padding: '12px', borderRadius: '12px', background: COLOR.primary, color: COLOR.onAccent, fontSize: '14px', fontWeight: 600 }}
+          style={{ width: '100%', marginTop: '14px', padding: '12px', borderRadius: 'var(--r-card)', background: COLOR.primary, color: COLOR.onAccent, fontSize: '14px', fontWeight: 600 }}
         >
           {index + 1 >= total ? 'Finish' : 'Next'}
         </button>
@@ -461,9 +461,9 @@ function ScenarioBuilder({ trackKey, bankSteps, scenarios, onSave, onDelete, onP
     reset();
   };
   const edit = (x) => { setTitle(x.title); setSteps([...x.steps]); setNote(x.note || ''); setEditingId(x.id); setError(null); window.scrollTo({ top: 0, behavior: 'instant' }); };
-  const field = { width: '100%', padding: '9px 11px', borderRadius: '10px', border: `2px solid ${COLOR.border}`, background: COLOR.surface, color: COLOR.text, fontSize: '13px' };
+  const field = { width: '100%', padding: '9px 11px', borderRadius: 'var(--r-ctl)', border: `1px solid ${COLOR.border}`, background: COLOR.surface, color: COLOR.text, fontSize: '13px' };
   const bank = (bankSteps || []).filter((x) => !bankQuery.trim() || x.toLowerCase().includes(bankQuery.trim().toLowerCase())).slice(0, 40);
-  const small = { padding: '4px 8px', borderRadius: '8px', border: `2px solid ${COLOR.border}`, background: 'transparent', color: COLOR.muted, fontSize: '12px', fontWeight: 700 };
+  const small = { padding: '4px 8px', borderRadius: 'var(--r-ctl)', border: `1px solid ${COLOR.border}`, background: 'transparent', color: COLOR.muted, fontSize: '12px', fontWeight: 700 };
   return (
     <div>
       <div className="flex justify-between items-center" style={{ marginBottom: '8px' }}>
@@ -493,12 +493,12 @@ function ScenarioBuilder({ trackKey, bankSteps, scenarios, onSave, onDelete, onP
         )}
       </div>
       {bankOpen && (
-        <div style={{ border: `2px solid ${COLOR.border}`, borderRadius: '12px', padding: '10px', marginBottom: '10px', background: COLOR.surface }}>
+        <div style={{ border: `1px solid ${COLOR.border}`, borderRadius: 'var(--r-card)', padding: '10px', marginBottom: '10px', background: COLOR.surface }}>
           <div style={{ fontSize: '11.5px', color: COLOR.muted, marginBottom: '6px' }}>Steps from this cert's built-in challenges. Tap one to add it to your scenario, then reorder.</div>
           <input value={bankQuery} onChange={(e) => setBankQuery(e.target.value)} placeholder="Search the bank…" aria-label="Search the step bank" style={{ ...field, marginBottom: '8px' }} />
           <div className="flex flex-col gap-1" style={{ maxHeight: '220px', overflowY: 'auto' }}>
             {bank.map((x) => (
-              <button key={x} onClick={() => addFromBank(x)} className="btn-flat" style={{ textAlign: 'left', padding: '7px 10px', borderRadius: '8px', border: `1px solid ${COLOR.border}`, background: COLOR.surfaceRaised, color: COLOR.text, fontSize: '12px', lineHeight: 1.4 }}>+ {x}</button>
+              <button key={x} onClick={() => addFromBank(x)} className="btn-flat" style={{ textAlign: 'left', padding: '7px 10px', borderRadius: 'var(--r-ctl)', border: `1px solid ${COLOR.border}`, background: COLOR.surfaceRaised, color: COLOR.text, fontSize: '12px', lineHeight: 1.4 }}>+ {x}</button>
             ))}
             {!bank.length && <div style={{ fontSize: '12px', color: COLOR.muted, padding: '6px' }}>No steps match.</div>}
           </div>
@@ -507,8 +507,8 @@ function ScenarioBuilder({ trackKey, bankSteps, scenarios, onSave, onDelete, onP
       <textarea value={note} onChange={(e) => setNote(e.target.value)} placeholder="Optional: why this order? (shown after you answer)" aria-label="Note" rows={2} maxLength={SCENARIO_NOTE_MAX} style={{ ...field, marginBottom: '8px', resize: 'vertical' }} />
       {error && <div role="alert" style={{ fontSize: '12px', color: COLOR.red, marginBottom: '8px', lineHeight: 1.4 }}>{error}</div>}
       <div className="flex gap-2" style={{ marginBottom: '18px' }}>
-        <button onClick={submit} className="btn-3d flex-1" style={{ padding: '10px', borderRadius: '12px', background: COLOR.primary, color: COLOR.onAccent, fontSize: '13px', fontWeight: 800 }}>{editingId ? 'Save changes' : 'Save scenario'}</button>
-        {editingId && <button onClick={reset} className="btn-flat" style={{ padding: '10px 14px', borderRadius: '12px', border: `2px solid ${COLOR.border}`, background: 'transparent', color: COLOR.text, fontSize: '13px', fontWeight: 700 }}>Cancel</button>}
+        <button onClick={submit} className="btn-3d flex-1" style={{ padding: '10px', borderRadius: 'var(--r-card)', background: COLOR.primary, color: COLOR.onAccent, fontSize: '13px', fontWeight: 800 }}>{editingId ? 'Save changes' : 'Save scenario'}</button>
+        {editingId && <button onClick={reset} className="btn-flat" style={{ padding: '10px 14px', borderRadius: 'var(--r-card)', border: `1px solid ${COLOR.border}`, background: 'transparent', color: COLOR.text, fontSize: '13px', fontWeight: 700 }}>Cancel</button>}
       </div>
       <div className="flex justify-between items-center" style={{ marginBottom: '8px' }}>
         <div style={{ fontSize: '13px', fontWeight: 800 }}>My scenarios ({mine.length})</div>
@@ -516,7 +516,7 @@ function ScenarioBuilder({ trackKey, bankSteps, scenarios, onSave, onDelete, onP
       </div>
       <div className="flex flex-col gap-2">
         {mine.map((x) => (
-          <div key={x.id} style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `2px solid ${COLOR.border}`, borderRadius: '12px', padding: '10px 12px' }}>
+          <div key={x.id} style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderRadius: 'var(--r-card)', padding: '10px 12px' }}>
             <div style={{ fontSize: '14px', fontWeight: 700 }}>{x.title}</div>
             <div style={{ fontSize: '12px', color: COLOR.muted, marginTop: '2px' }}>{x.steps.length} steps</div>
             <div className="flex gap-3" style={{ marginTop: '6px' }}>
@@ -562,7 +562,7 @@ function SequenceView({ session, index, score, categories, workingOrder, onMove,
         <div style={{ fontSize: '12.5px', color: COLOR.muted, marginBottom: '18px' }}>
           {score.correct} / {score.total} sequence{score.total === 1 ? '' : 's'} in the exact right order.
         </div>
-        <button className="btn-3d" onClick={onRestart} style={{ padding: '10px 20px', borderRadius: '12px', background: COLOR.primary, color: COLOR.onAccent, fontSize: '13px', fontWeight: 600 }}>
+        <button className="btn-3d" onClick={onRestart} style={{ padding: '10px 20px', borderRadius: 'var(--r-card)', background: COLOR.primary, color: COLOR.onAccent, fontSize: '13px', fontWeight: 600 }}>
           New set
         </button>
       </div>
@@ -579,7 +579,7 @@ function SequenceView({ session, index, score, categories, workingOrder, onMove,
         <span>{categoryLabel}</span>
         <span>{index + 1} / {total}</span>
       </div>
-      <div style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `2px solid ${COLOR.border}`, borderRadius: '18px', padding: '20px' }}>
+      <div style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderRadius: 'var(--r-card)', padding: '20px' }}>
         <div style={{ fontSize: '15px', lineHeight: 1.5, fontWeight: 500, marginBottom: '16px' }}>
           {autoHighlightTerms(item.prompt, flashcardsData, activeTermKey, setActiveTermKey, 2, 'seq-prompt-' + item.id)}
         </div>
@@ -590,9 +590,9 @@ function SequenceView({ session, index, score, categories, workingOrder, onMove,
               <div
                 key={originalIdx}
                 style={{
-                  display: 'flex', alignItems: 'center', gap: '10px', padding: '10px 12px', borderRadius: '12px',
+                  display: 'flex', alignItems: 'center', gap: '10px', padding: '10px 12px', borderRadius: 'var(--r-card)',
                   border: `1px solid ${submitted ? (isRight ? COLOR.success : COLOR.red) : COLOR.border}`,
-                  background: submitted ? (isRight ? 'rgba(52,211,153,0.12)' : 'rgba(181,87,74,0.12)') : COLOR.surfaceRaised,
+                  background: submitted ? (isRight ? 'color-mix(in srgb, var(--color-success) 12%, transparent)' : 'color-mix(in srgb, var(--color-red) 12%, transparent)') : COLOR.surfaceRaised,
                 }}
               >
                 <span style={{ fontSize: '11px', fontWeight: 700, color: COLOR.muted, minWidth: '16px' }}>{pos + 1}.</span>
@@ -604,14 +604,14 @@ function SequenceView({ session, index, score, categories, workingOrder, onMove,
                     <button
                       onClick={() => onMove(pos, -1)}
                       disabled={pos === 0}
-                      style={{ width: '30px', height: '30px', borderRadius: '8px', border: `2px solid ${COLOR.border}`, background: 'transparent', color: pos === 0 ? COLOR.border : COLOR.primary, fontSize: '13px' }}
+                      style={{ width: '30px', height: '30px', borderRadius: 'var(--r-ctl)', border: `1px solid ${COLOR.border}`, background: 'transparent', color: pos === 0 ? COLOR.border : COLOR.primary, fontSize: '13px' }}
                     >
                       ▲
                     </button>
                     <button
                       onClick={() => onMove(pos, 1)}
                       disabled={pos === workingOrder.length - 1}
-                      style={{ width: '30px', height: '30px', borderRadius: '8px', border: `2px solid ${COLOR.border}`, background: 'transparent', color: pos === workingOrder.length - 1 ? COLOR.border : COLOR.primary, fontSize: '13px' }}
+                      style={{ width: '30px', height: '30px', borderRadius: 'var(--r-ctl)', border: `1px solid ${COLOR.border}`, background: 'transparent', color: pos === workingOrder.length - 1 ? COLOR.border : COLOR.primary, fontSize: '13px' }}
                     >
                       ▼
                     </button>
@@ -637,14 +637,14 @@ function SequenceView({ session, index, score, categories, workingOrder, onMove,
       {!submitted ? (
         <button className="btn-3d"
           onClick={onSubmit}
-          style={{ width: '100%', marginTop: '14px', padding: '12px', borderRadius: '12px', background: COLOR.primary, color: COLOR.onAccent, fontSize: '14px', fontWeight: 600 }}
+          style={{ width: '100%', marginTop: '14px', padding: '12px', borderRadius: 'var(--r-card)', background: COLOR.primary, color: COLOR.onAccent, fontSize: '14px', fontWeight: 600 }}
         >
           Check
         </button>
       ) : (
         <button className="btn-3d"
           onClick={onNext}
-          style={{ width: '100%', marginTop: '14px', padding: '12px', borderRadius: '12px', background: COLOR.primary, color: COLOR.onAccent, fontSize: '14px', fontWeight: 600 }}
+          style={{ width: '100%', marginTop: '14px', padding: '12px', borderRadius: 'var(--r-card)', background: COLOR.primary, color: COLOR.onAccent, fontSize: '14px', fontWeight: 600 }}
         >
           {index + 1 >= total ? 'Finish' : 'Next'}
         </button>
@@ -683,8 +683,8 @@ function PracticeToolPicker({ quizView, available, onSelect }) {
       <button
         onClick={() => setOpen((o) => !o)}
         style={{
-          width: '100%', textAlign: 'left', padding: '10px 14px', borderRadius: '12px',
-          border: `2px solid ${COLOR.border}`, background: COLOR.surface, color: COLOR.text,
+          width: '100%', textAlign: 'left', padding: '10px 14px', borderRadius: 'var(--r-card)',
+          border: `1px solid ${COLOR.border}`, background: COLOR.surface, color: COLOR.text,
           display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px',
         }}
       >
@@ -696,7 +696,7 @@ function PracticeToolPicker({ quizView, available, onSelect }) {
         <span style={{ fontSize: '12px', color: COLOR.muted, flexShrink: 0 }}>{open ? '▴' : '▾'}</span>
       </button>
       {open && (
-        <div style={{ boxShadow: SHADOW.card, marginTop: '6px', background: COLOR.surface, border: `2px solid ${COLOR.border}`, borderRadius: '12px', overflow: 'hidden' }}>
+        <div style={{ boxShadow: SHADOW.card, marginTop: '6px', background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderRadius: 'var(--r-card)', overflow: 'hidden' }}>
           {groups.map((g, gi) => (
             <div key={g.name} style={{ borderTop: gi === 0 ? 'none' : `1px solid ${COLOR.border}` }}>
               <div style={{ padding: '8px 14px 4px', fontSize: '11px', fontWeight: 700, color: COLOR.muted, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{g.name}</div>
@@ -749,7 +749,7 @@ function CompareView({ session, index, score, categories, choice, onChoose, onNe
         <div style={{ fontSize: '12.5px', color: COLOR.muted, marginBottom: '18px' }}>
           {score.correct} / {score.total} time{score.total === 1 ? '' : 's'} you picked the better answer.
         </div>
-        <button className="btn-3d" onClick={onRestart} style={{ padding: '10px 20px', borderRadius: '12px', background: COLOR.primary, color: COLOR.onAccent, fontSize: '13px', fontWeight: 600 }}>
+        <button className="btn-3d" onClick={onRestart} style={{ padding: '10px 20px', borderRadius: 'var(--r-card)', background: COLOR.primary, color: COLOR.onAccent, fontSize: '13px', fontWeight: 600 }}>
           New set
         </button>
       </div>
@@ -767,7 +767,7 @@ function CompareView({ session, index, score, categories, choice, onChoose, onNe
         <span>{categoryLabel}</span>
         <span>{index + 1} / {total}</span>
       </div>
-      <div style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `2px solid ${COLOR.border}`, borderRadius: '18px', padding: '20px' }}>
+      <div style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderRadius: 'var(--r-card)', padding: '20px' }}>
         <div style={{ fontSize: '11px', color: COLOR.gold, marginBottom: '8px', fontWeight: 600 }}>
           Both options are plausible — which is the better answer?
         </div>
@@ -780,8 +780,8 @@ function CompareView({ session, index, score, categories, choice, onChoose, onNe
             const isChosen = i === choice;
             let bg = COLOR.surfaceRaised, border = COLOR.border, color = COLOR.text;
             if (submitted) {
-              if (isBetter) { bg = 'rgba(52,211,153,0.15)'; border = COLOR.success; color = COLOR.success; }
-              else if (isChosen) { bg = 'rgba(181,87,74,0.15)'; border = COLOR.red; color = COLOR.red; }
+              if (isBetter) { bg = 'color-mix(in srgb, var(--color-success) 15%, transparent)'; border = COLOR.success; color = COLOR.success; }
+              else if (isChosen) { bg = 'color-mix(in srgb, var(--color-red) 15%, transparent)'; border = COLOR.red; color = COLOR.red; }
             }
             return (
               <button
@@ -789,7 +789,7 @@ function CompareView({ session, index, score, categories, choice, onChoose, onNe
                 disabled={submitted}
                 onClick={() => onChoose(i)}
                 style={{
-                  textAlign: 'left', padding: '12px 14px', borderRadius: '12px',
+                  textAlign: 'left', padding: '12px 14px', borderRadius: 'var(--r-card)',
                   border: `1px solid ${border}`, background: bg, color, fontSize: '14px', lineHeight: 1.45,
                   display: 'flex', alignItems: 'flex-start', gap: '10px',
                   cursor: submitted ? 'default' : 'pointer',
@@ -817,7 +817,7 @@ function CompareView({ session, index, score, categories, choice, onChoose, onNe
       {submitted && (
         <button className="btn-3d"
           onClick={onNext}
-          style={{ width: '100%', marginTop: '14px', padding: '12px', borderRadius: '12px', background: COLOR.primary, color: COLOR.onAccent, fontSize: '14px', fontWeight: 600 }}
+          style={{ width: '100%', marginTop: '14px', padding: '12px', borderRadius: 'var(--r-card)', background: COLOR.primary, color: COLOR.onAccent, fontSize: '14px', fontWeight: 600 }}
         >
           {index + 1 >= total ? 'Finish' : 'Next'}
         </button>
@@ -845,145 +845,104 @@ function QuestionView({ q, selected, onChoose, onNext, index, total, categoryLab
   return (
     <div>
       {!hideMeta && (
-        <div className="flex justify-between items-center mb-2" style={{ fontSize: '11px', color: COLOR.muted }}>
+        <div className="flex justify-between items-center mb-2" style={{ fontSize: '10.5px', textTransform: 'uppercase', color: COLOR.muted }}>
           <span>{badgeLabel ? badgeLabel + ' · ' : ''}{categoryLabel}</span>
-          <span>{index + 1} / {total}</span>
+          <span style={{ color: COLOR.text }}>{String(index + 1).padStart(2, '0')} / {String(total).padStart(2, '0')}</span>
         </div>
       )}
-      <div style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `2px solid ${COLOR.border}`, borderRadius: '18px', padding: '20px' }}>
-        <div style={{ fontSize: '17px', lineHeight: 1.45, fontWeight: 500, marginBottom: q.image ? '10px' : '16px' }}>
+      <div style={{ background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderRadius: 'var(--r-card)', padding: '18px 18px 16px' }}>
+        <div style={{ fontSize: '17px', lineHeight: 1.5, fontWeight: 600 }}>
           {/* Terms in the question itself are tappable for a definition (practice only;
               the timed exams use their own question view with no help). */}
           {flashcardsData ? autoHighlightTerms(q.question, flashcardsData, activeTermKey, setActiveTermKey, 2, 'qstem-' + q.id) : q.question}
         </div>
         {q.image && REAL_PORTAL_SCREENSHOTS[q.image] && (
-          <div style={{ marginBottom: '16px' }}>
+          <div style={{ marginTop: '12px' }}>
             <RealPortalScreenshot shot={REAL_PORTAL_SCREENSHOTS[q.image]} hideDescription />
-          </div>
-        )}
-
-        {q.type === 'mc' && (
-          <div className="flex flex-col gap-2">
-            {q.options.map((opt, i) => {
-              const isCorrect = i === q.correct;
-              const isSelected = i === selected;
-              let bg = COLOR.surfaceRaised, border = COLOR.border, color = COLOR.text;
-              if (selected !== null) {
-                if (isCorrect) { bg = 'rgba(52,211,153,0.15)'; border = COLOR.success; color = COLOR.success; }
-                else if (isSelected) { bg = 'rgba(181,87,74,0.15)'; border = COLOR.red; color = COLOR.red; }
-              }
-              return (
-                <button
-                  key={i}
-                  disabled={selected !== null}
-                  onClick={() => onChoose(i)}
-                  style={{
-                    textAlign: 'left', padding: '12px 14px', borderRadius: '12px',
-                    border: `1px solid ${border}`, background: bg, color, fontSize: '15px', lineHeight: 1.45,
-                    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                    cursor: selected !== null ? 'default' : 'pointer',
-                  }}
-                >
-                  <span>{opt}</span>
-                  {selected !== null && isCorrect && <span>✓</span>}
-                  {selected !== null && isSelected && !isCorrect && <span>✕</span>}
-                </button>
-              );
-            })}
-          </div>
-        )}
-
-        {q.type === 'tf' && (
-          <div className="flex gap-2">
-            {['True', 'False'].map((label, i) => {
-              const isRight = (i === 0) === q.answer;
-              const isSelected = i === selected;
-              let bg = COLOR.surfaceRaised, border = COLOR.border, color = COLOR.text;
-              if (selected !== null) {
-                if (isRight) { bg = 'rgba(52,211,153,0.15)'; border = COLOR.success; color = COLOR.success; }
-                else if (isSelected) { bg = 'rgba(181,87,74,0.15)'; border = COLOR.red; color = COLOR.red; }
-              }
-              return (
-                <button
-                  key={i}
-                  disabled={selected !== null}
-                  onClick={() => onChoose(i)}
-                  className="flex-1"
-                  style={{ padding: '16px', borderRadius: '12px', border: `1px solid ${border}`, background: bg, color, fontSize: '16px', fontWeight: 600, cursor: selected !== null ? 'default' : 'pointer' }}
-                >
-                  {label}
-                </button>
-              );
-            })}
-          </div>
-        )}
-
-        {q.type === 'ms' && (
-          <div>
-            <div style={{ fontSize: '11px', color: COLOR.gold, marginBottom: '8px', fontWeight: 600 }}>Select all that apply</div>
-            <div className="flex flex-col gap-2">
-              {q.options.map((opt, i) => {
-                const isCorrectOpt = q.correct.includes(i);
-                const wasSelected = selected !== null ? selected.includes(i) : msPending.includes(i);
-                let bg = COLOR.surfaceRaised, border = COLOR.border, color = COLOR.text;
-                if (selected !== null) {
-                  if (isCorrectOpt && wasSelected) { bg = 'rgba(52,211,153,0.15)'; border = COLOR.success; color = COLOR.success; }
-                  else if (isCorrectOpt && !wasSelected) { border = COLOR.success; color = COLOR.success; }
-                  else if (!isCorrectOpt && wasSelected) { bg = 'rgba(181,87,74,0.15)'; border = COLOR.red; color = COLOR.red; }
-                } else if (wasSelected) {
-                  bg = 'rgba(167,139,250,0.10)'; border = COLOR.primary; color = COLOR.primary;
-                }
-                return (
-                  <button
-                    key={i}
-                    disabled={selected !== null}
-                    onClick={() => onToggleMs(i)}
-                    style={{
-                      textAlign: 'left', padding: '12px 14px', borderRadius: '12px',
-                      border: `1px solid ${border}`, background: bg, color, fontSize: '15px', lineHeight: 1.45,
-                      display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                      cursor: selected !== null ? 'default' : 'pointer',
-                    }}
-                  >
-                    <span>{opt}</span>
-                    {selected !== null && isCorrectOpt && wasSelected && <span>✓</span>}
-                    {selected !== null && isCorrectOpt && !wasSelected && <span style={{ fontSize: '10px' }}>missed</span>}
-                    {selected !== null && !isCorrectOpt && wasSelected && <span>✕</span>}
-                    {selected === null && wasSelected && <span>●</span>}
-                  </button>
-                );
-              })}
-            </div>
-            {selected === null && (
-              <button
-                onClick={onSubmitMs}
-                disabled={msPending.length === 0}
-                style={{ width: '100%', marginTop: '10px', padding: '11px', borderRadius: '12px', background: msPending.length ? COLOR.primary : COLOR.surfaceRaised, color: msPending.length ? COLOR.onAccent : COLOR.muted, fontSize: '14px', fontWeight: 600 }}
-              >
-                Submit answer
-              </button>
-            )}
-          </div>
-        )}
-
-        {selected !== null && q.explanation && (
-          <div style={{ boxShadow: SHADOW.card, marginTop: '14px', padding: '12px', borderRadius: '10px', background: COLOR.surfaceRaised, fontSize: '14px', lineHeight: 1.55, color: COLOR.muted }}>
-            {autoHighlightTerms(q.explanation, flashcardsData, activeTermKey, setActiveTermKey)}
-          </div>
-        )}
-
-        {selected !== null && q.whyTested && (
-          <div style={{ marginTop: '10px', padding: '12px', borderRadius: '10px', background: `${COLOR.teal}14`, border: `1px solid ${COLOR.teal}`, fontSize: '12.5px', lineHeight: 1.5, color: COLOR.text }}>
-            <div style={{ fontSize: '11.5px', fontWeight: 700, color: COLOR.teal, textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: '4px' }}>Why this is tested</div>
-            {q.whyTested}
           </div>
         )}
       </div>
 
+      {q.type === 'mc' && (
+        <div>
+          {q.options.map((opt, i) => {
+            const isCorrect = i === q.correct;
+            const isSelected = i === selected;
+            const state = selected === null ? 'idle' : isCorrect ? 'correct' : isSelected ? 'wrong' : 'idle';
+            return <QuizOption key={i} index={i} text={opt} state={state} disabled={selected !== null} onClick={() => onChoose(i)} />;
+          })}
+        </div>
+      )}
+
+      {q.type === 'tf' && (
+        <div className="flex gap-2" style={{ marginTop: '8px' }}>
+          {['True', 'False'].map((label, i) => {
+            const isRight = (i === 0) === q.answer;
+            const isSelected = i === selected;
+            let bg = COLOR.surface, border = COLOR.border, color = COLOR.text;
+            if (selected !== null) {
+              if (isRight) { bg = 'color-mix(in srgb, var(--color-success) 11%, var(--color-surface))'; border = COLOR.success; color = COLOR.success; }
+              else if (isSelected) { bg = 'color-mix(in srgb, var(--color-red) 11%, var(--color-surface))'; border = COLOR.red; color = COLOR.red; }
+            }
+            return (
+              <button
+                key={i}
+                disabled={selected !== null}
+                onClick={() => onChoose(i)}
+                className="flex-1"
+                style={{ padding: '16px', borderRadius: 'var(--r-card)', border: `1px solid ${border}`, background: bg, color, fontSize: '16px', fontWeight: 600, cursor: selected !== null ? 'default' : 'pointer' }}
+              >
+                {selected !== null && isRight ? '✓ ' : selected !== null && isSelected ? '✕ ' : ''}{label}
+              </button>
+            );
+          })}
+        </div>
+      )}
+
+      {q.type === 'ms' && (
+        <div>
+          <div style={{ fontSize: '10.5px', color: COLOR.gold, margin: '12px 2px 0', textTransform: 'uppercase' }}>Select all that apply</div>
+          {q.options.map((opt, i) => {
+            const isCorrectOpt = q.correct.includes(i);
+            const wasSelected = selected !== null ? selected.includes(i) : msPending.includes(i);
+            let state = 'idle';
+            if (selected !== null) {
+              if (isCorrectOpt && wasSelected) state = 'correct';
+              else if (isCorrectOpt && !wasSelected) state = 'missed';
+              else if (!isCorrectOpt && wasSelected) state = 'wrong';
+            } else if (wasSelected) state = 'picked';
+            return <QuizOption key={i} index={i} text={opt} state={state} disabled={selected !== null} onClick={() => onToggleMs(i)} />;
+          })}
+          {selected === null && (
+            <button
+              onClick={onSubmitMs}
+              disabled={msPending.length === 0}
+              style={{ width: '100%', marginTop: '12px', padding: '12px', borderRadius: 'var(--r-ctl)', border: 'none', background: msPending.length ? COLOR.primary : COLOR.surfaceRaised, color: msPending.length ? COLOR.onAccent : COLOR.muted, fontSize: '14px', fontWeight: 700 }}
+            >
+              Submit answer
+            </button>
+          )}
+        </div>
+      )}
+
+      {selected !== null && q.explanation && (
+        <div style={{ marginTop: '12px', padding: '14px', borderRadius: 'var(--r-card)', background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderLeft: `3px solid ${COLOR.primary}`, fontSize: '14px', lineHeight: 1.6, color: COLOR.text }}>
+          <div style={{ fontSize: '10.5px', color: COLOR.primary, textTransform: 'uppercase', marginBottom: '6px' }}>Why</div>
+          {autoHighlightTerms(q.explanation, flashcardsData, activeTermKey, setActiveTermKey)}
+        </div>
+      )}
+
+      {selected !== null && q.whyTested && (
+        <div style={{ marginTop: '10px', padding: '12px 14px', borderRadius: 'var(--r-card)', background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderLeft: `3px solid ${COLOR.blue}`, fontSize: '13px', lineHeight: 1.55, color: COLOR.text }}>
+          <div style={{ fontSize: '10.5px', color: COLOR.blue, textTransform: 'uppercase', marginBottom: '4px' }}>Why this is tested</div>
+          {q.whyTested}
+        </div>
+      )}
+
       {selected !== null && !hideNext && (
-        <button className="btn-3d"
+        <button
           onClick={onNext}
-          style={{ width: '100%', marginTop: '12px', padding: '12px', borderRadius: '12px', background: COLOR.primary, color: COLOR.onAccent, fontSize: '14px', fontWeight: 600 }}
+          style={{ width: '100%', marginTop: '12px', padding: '13px', borderRadius: 'var(--r-ctl)', border: 'none', background: COLOR.primary, color: COLOR.onAccent, fontSize: '14px', fontWeight: 700 }}
         >
           {nextLabel || (isLast ? 'See results' : 'Next question')}
         </button>
@@ -1012,7 +971,7 @@ function QuizSummary({ score, answers, categories, onRestart, restartLabel }) {
   };
   return (
     <div>
-      <div style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `2px solid ${COLOR.border}`, borderRadius: '18px', padding: '24px', textAlign: 'center' }}>
+      <div style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderRadius: 'var(--r-card)', padding: '24px', textAlign: 'center' }}>
         <div className="itil-display" style={{ fontSize: '28px', fontWeight: 600, color: COLOR.success }}>{score.correct} / {score.total}</div>
         <div style={{ fontSize: '13px', color: COLOR.muted, marginTop: '4px' }}>correct this round</div>
       </div>
@@ -1021,7 +980,7 @@ function QuizSummary({ score, answers, categories, onRestart, restartLabel }) {
           <div style={{ fontSize: '12px', color: COLOR.muted, marginBottom: '8px' }}>Worth another look:</div>
           <div className="flex flex-col gap-2">
             {missed.map((m, i) => (
-              <div key={i} style={{ boxShadow: SHADOW.card, background: COLOR.surfaceRaised, borderRadius: '10px', padding: '10px 12px', fontSize: '13px' }}>
+              <div key={i} style={{ boxShadow: SHADOW.card, background: COLOR.surfaceRaised, borderRadius: 'var(--r-ctl)', padding: '10px 12px', fontSize: '13px' }}>
                 <div style={{ fontSize: '11px', color: COLOR.muted, marginBottom: '2px' }}>{categoryLabelFor(m)}</div>
                 <div>{m.prompt}</div>
                 {m.explanation && (
@@ -1030,7 +989,7 @@ function QuizSummary({ score, answers, categories, onRestart, restartLabel }) {
                   </div>
                 )}
                 {m.whyTested && (
-                  <div style={{ marginTop: '6px', padding: '8px 10px', borderRadius: '8px', background: `${COLOR.teal}14`, border: `1px solid ${COLOR.teal}`, fontSize: '11.5px', lineHeight: 1.5, color: COLOR.text }}>
+                  <div style={{ marginTop: '6px', padding: '8px 10px', borderRadius: 'var(--r-ctl)', background: `${COLOR.teal}14`, border: `1px solid ${COLOR.teal}`, fontSize: '11.5px', lineHeight: 1.5, color: COLOR.text }}>
                     <div style={{ fontSize: '10.5px', fontWeight: 700, color: COLOR.teal, textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: '3px' }}>Why this is tested</div>
                     {m.whyTested}
                   </div>
@@ -1042,7 +1001,7 @@ function QuizSummary({ score, answers, categories, onRestart, restartLabel }) {
       )}
       <button className="btn-3d"
         onClick={onRestart}
-        style={{ width: '100%', marginTop: '16px', padding: '12px', borderRadius: '12px', background: COLOR.primary, color: COLOR.onAccent, fontSize: '14px', fontWeight: 600 }}
+        style={{ width: '100%', marginTop: '16px', padding: '12px', borderRadius: 'var(--r-card)', background: COLOR.primary, color: COLOR.onAccent, fontSize: '14px', fontWeight: 600 }}
       >
         {restartLabel || 'New quiz'}
       </button>
@@ -1076,8 +1035,8 @@ function CaseStudySetup({ list, onStart, categories }) {
             key={cs.id}
             onClick={() => onStart(i)}
             style={{
-              textAlign: 'left', padding: '14px 16px', borderRadius: '14px',
-              background: COLOR.surface, border: `2px solid ${COLOR.border}`, boxShadow: SHADOW.card,
+              textAlign: 'left', padding: '14px 16px', borderRadius: 'var(--r-card)',
+              background: COLOR.surface, border: `1px solid ${COLOR.border}`, boxShadow: SHADOW.card,
             }}
           >
             <div style={{ fontSize: '11px', color: COLOR.muted, marginBottom: '4px' }}>{catLabel}</div>
@@ -1113,7 +1072,7 @@ function CaseStudyView({ list, activeIndex, onStart, onExit, categories, questio
       <button onClick={onExit} className="btn-flat" style={{ color: COLOR.muted, fontSize: '11.5px', marginBottom: '10px', padding: '2px' }}>
         ‹ All case studies
       </button>
-      <div style={{ boxShadow: SHADOW.card, background: COLOR.surfaceRaised, border: `2px solid ${COLOR.border}`, borderRadius: '14px', padding: '14px 16px', marginBottom: '14px' }}>
+      <div style={{ boxShadow: SHADOW.card, background: COLOR.surfaceRaised, border: `1px solid ${COLOR.border}`, borderRadius: 'var(--r-card)', padding: '14px 16px', marginBottom: '14px' }}>
         <div style={{ fontSize: '11.5px', color: COLOR.muted, textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: '4px' }}>{catLabel} · {cs.title}</div>
         <div style={{ fontSize: '13.5px', lineHeight: 1.55, color: COLOR.text }}><GlossText text={cs.scenario} pool={flashcardsData} max={3} blockId="cs-scn" /></div>
       </div>

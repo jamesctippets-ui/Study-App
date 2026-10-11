@@ -1733,61 +1733,66 @@ function CertStudyApp() {
           onSetPathLocking={(on) => saveStats({ ...statsRef.current, pathLocking: on })}
         />
       )}
-      <div style={{ background: `color-mix(in srgb, ${modeHue(mode)} 9%, ${COLOR.navBar})`, borderBottom: `2px solid color-mix(in srgb, ${modeHue(mode)} 45%, ${COLOR.border})`, position: 'sticky', top: 0, zIndex: 30, transition: 'background-color 0.2s ease' }}>
+      <div style={{ background: `color-mix(in srgb, ${COLOR.bg} 92%, transparent)`, backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)', borderBottom: `1px solid ${COLOR.border}`, position: 'sticky', top: 0, zIndex: 30 }}>
         <div className="max-w-md mx-auto px-4 flex items-center" style={{ height: `${APP_HEADER_HEIGHT}px`, gap: '8px' }}>
           <button
             onClick={() => setShowCertPath(true)}
             className="btn-flat"
             title="Manage cert path"
-            style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: '34px', height: '34px', borderRadius: '10px', border: 'none', background: 'transparent', color: COLOR.muted, padding: 0, flexShrink: 0 }}
+            style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: '34px', height: '34px', borderRadius: 'var(--r-ctl)', border: 'none', background: 'transparent', color: COLOR.muted, padding: 0, flexShrink: 0, marginLeft: '-6px' }}
           >
             <IconMenu />
           </button>
           <div style={{ flex: 1, minWidth: 0 }}>
             {isHubMode(mode) ? (
-              <div className="itil-display app-title" style={{ fontSize: '20px', lineHeight: 1.1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{mode === 'profile' ? 'Profile' : mode === 'playground' ? 'IT Playground' : 'Cert Study'}</div>
+              <div className="app-title mono" style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px', fontWeight: 700, lineHeight: 1.1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                <span style={{ width: '9px', height: '9px', background: COLOR.primary, flexShrink: 0 }} />
+                {mode === 'profile' ? 'profile' : mode === 'playground' ? 'playground' : 'cert-study'}
+              </div>
             ) : (
               <button
                 onClick={() => setShowTrackSwitcher(true)}
                 className="btn-flat"
                 title="Switch track"
-                style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', textAlign: 'left', background: 'transparent', border: 'none', padding: '4px 0', maxWidth: '100%' }}
+                style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', textAlign: 'left', background: 'transparent', border: 'none', padding: '4px 0', maxWidth: '100%' }}
               >
-                <span className="itil-display app-title" style={{ fontSize: '22px', lineHeight: 1.1, color: ink(trackAccent(activeTrack)) }}>{track.label}</span>
-                <span style={{ fontSize: '12px', color: COLOR.muted }}>▾</span>
+                <span style={{ width: '9px', height: '9px', background: trackAccent(activeTrack), flexShrink: 0 }} />
+                <span className="app-title mono" style={{ fontSize: '14px', fontWeight: 700, lineHeight: 1.1, color: COLOR.text, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{track.label}</span>
+                <span style={{ fontSize: '10px', color: COLOR.muted }}>▾</span>
               </button>
             )}
           </div>
-          <div className="flex items-center" style={{ gap: '8px', flexShrink: 0 }}>
+          <div className="flex items-center" style={{ gap: '6px', flexShrink: 0 }}>
             <div
+              className="mono"
               title={stats.streak.current > 0 ? `${stats.streak.current}-day streak` : 'Study today to start a streak'}
-              style={{ display: 'inline-flex', alignItems: 'center', gap: '3px', fontSize: '15px', fontWeight: 800, color: stats.streak.current > 0 ? '#FF9A3D' : COLOR.muted }}
+              style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', fontSize: '12px', fontWeight: 700, height: '28px', padding: '0 8px', borderRadius: 'var(--r-ctl)', border: `1px solid ${COLOR.border}`, background: COLOR.surface, color: stats.streak.current > 0 ? COLOR.gold : COLOR.muted }}
             >
-              <span style={{ fontSize: '17px', filter: stats.streak.current > 0 ? 'none' : 'grayscale(1)', opacity: stats.streak.current > 0 ? 1 : 0.7 }}>🔥</span>{stats.streak.current}
+              <IconFlame size={14} />{stats.streak.current}
             </div>
             <ThemeToggle theme={theme} onToggle={toggleTheme} />
             <button
               onClick={() => setShowAchievements(true)}
-              className="btn-flat"
+              className="btn-flat mono"
               title="Achievements"
-              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '3px', minWidth: '34px', height: '34px', padding: '0 4px', borderRadius: '10px', border: 'none', background: 'transparent', color: COLOR.gold, fontSize: '13px', fontWeight: 800 }}
+              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px', height: '28px', padding: '0 8px', borderRadius: 'var(--r-ctl)', border: `1px solid ${COLOR.border}`, background: COLOR.surface, color: COLOR.text, fontSize: '12px', fontWeight: 700 }}
             >
-              <IconTrophy /> {stats.unlocked.length}
+              <IconTrophy size={14} /> {stats.unlocked.length}
             </button>
             <button
               onClick={() => { setImportMessage(null); setShowData(true); }}
               className="btn-flat"
               title="Data & progress"
-              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '34px', height: '34px', padding: 0, borderRadius: '10px', border: 'none', background: 'transparent', color: COLOR.muted }}
+              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '30px', height: '30px', padding: 0, borderRadius: 'var(--r-ctl)', border: 'none', background: 'transparent', color: COLOR.muted, marginRight: '-4px' }}
             >
-              <IconSettings />
+              <IconSettings size={20} />
             </button>
           </div>
         </div>
       </div>
       <div className="max-w-md mx-auto px-4 py-5" style={{ paddingBottom: `calc(${TAB_BAR_HEIGHT + 24}px + env(safe-area-inset-bottom))` }}>
         {saveError ? (
-          <div style={{ fontSize: '11.5px', color: COLOR.red, marginBottom: '12px', padding: '8px 10px', borderRadius: '8px', border: `1px solid ${COLOR.red}`, background: 'rgba(181,87,74,0.1)' }}>
+          <div style={{ fontSize: '11.5px', color: COLOR.red, marginBottom: '12px', padding: '8px 10px', borderRadius: 'var(--r-ctl)', border: `1px solid ${COLOR.red}`, background: 'color-mix(in srgb, var(--color-red) 10%, transparent)' }}>
             Your last save didn't go through — your browser's storage may be full. Try Data &amp; Progress → Export to back up what you have, then free up some space.
           </div>
         ) : null}
@@ -1849,29 +1854,12 @@ function CertStudyApp() {
         ) : (
         <React.Fragment>
         {mode === 'learn' && (
-          <div className="flex gap-1 mb-4" style={{ background: COLOR.bg, padding: '3px', borderRadius: '10px', border: `2px solid ${COLOR.border}` }}>
-            <button
-              onClick={() => setLearnView('cards')}
-              className="flex-1 btn-flat"
-              style={{ padding: '6px 2px', borderRadius: '8px', fontSize: '11.5px', fontWeight: 600, background: learnView === 'cards' ? COLOR.surfaceRaised : 'transparent', color: learnView === 'cards' ? COLOR.text : COLOR.muted }}
-            >
-              Cards
-            </button>
-            <button
-              onClick={() => setLearnView('study')}
-              className="flex-1 btn-flat"
-              style={{ padding: '6px 2px', borderRadius: '8px', fontSize: '11.5px', fontWeight: 600, background: learnView === 'study' ? COLOR.surfaceRaised : 'transparent', color: learnView === 'study' ? COLOR.text : COLOR.muted }}
-            >
-              Study
-            </button>
-            <button
-              onClick={() => setLearnView('sheet')}
-              className="flex-1 btn-flat"
-              style={{ padding: '6px 2px', borderRadius: '8px', fontSize: '11.5px', fontWeight: 600, background: learnView === 'sheet' ? COLOR.surfaceRaised : 'transparent', color: learnView === 'sheet' ? COLOR.text : COLOR.muted }}
-            >
-              Sheet
-            </button>
-          </div>
+          <SegmentedControl
+            options={[{ key: 'cards', label: 'Cards' }, { key: 'study', label: 'Study' }, { key: 'sheet', label: 'Sheet' }]}
+            value={learnView}
+            onChange={setLearnView}
+            style={{ marginBottom: '16px' }}
+          />
         )}
 
         {mode === 'quiz' && (
@@ -1898,13 +1886,13 @@ function CertStudyApp() {
         )}
 
         {mode === 'learn' && learnView === 'cards' && (toughCount > 0 || cardDeck === 'tough') && (
-          <div className="flex gap-1 mb-3" style={{ background: COLOR.bg, padding: '3px', borderRadius: '10px', border: `2px solid ${COLOR.border}` }}>
+          <div className="flex gap-1 mb-3" style={{ background: COLOR.bg, padding: '3px', borderRadius: 'var(--r-ctl)', border: `1px solid ${COLOR.border}` }}>
             {[['all', 'All cards'], ['tough', `Tough terms (${cardDeck === 'tough' ? toughIds.length : toughCount})`]].map(([key, label]) => (
               <button
                 key={key}
                 onClick={() => openCardDeck(key)}
                 className="flex-1 btn-flat"
-                style={{ padding: '6px 2px', borderRadius: '8px', fontSize: '11.5px', fontWeight: 600, background: cardDeck === key ? COLOR.surfaceRaised : 'transparent', color: cardDeck === key ? COLOR.text : COLOR.muted }}
+                style={{ padding: '6px 2px', borderRadius: 'var(--r-ctl)', fontSize: '11.5px', fontWeight: 600, background: cardDeck === key ? COLOR.surfaceRaised : 'transparent', color: cardDeck === key ? COLOR.text : COLOR.muted }}
               >
                 {label}
               </button>
@@ -1922,12 +1910,12 @@ function CertStudyApp() {
           </div>
         )}
         {mode === 'learn' && learnView === 'cards' && cardDeck === 'tough' && filteredFlashcards.length === 0 && (
-          <div style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `2px solid ${COLOR.border}`, borderRadius: '14px', padding: '22px 16px', textAlign: 'center' }}>
+          <div style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderRadius: 'var(--r-card)', padding: '22px 16px', textAlign: 'center' }}>
             <div className="itil-display" style={{ fontSize: '17px', fontWeight: 600, marginBottom: '6px' }}>Tough terms cleared</div>
             <div style={{ fontSize: '13px', color: COLOR.muted, lineHeight: 1.5, marginBottom: '12px' }}>
               {activeCat === 'all' ? 'Nothing left in this deck.' : 'No tough terms in this category.'} Cards show up here whenever you rate them OK or lower.
             </div>
-            <button onClick={() => openCardDeck('all')} className="btn-flat" style={{ padding: '8px 14px', borderRadius: '10px', fontSize: '12px', fontWeight: 600, border: `2px solid ${COLOR.border}`, color: COLOR.text }}>Back to all cards</button>
+            <button onClick={() => openCardDeck('all')} className="btn-flat" style={{ padding: '8px 14px', borderRadius: 'var(--r-ctl)', fontSize: '12px', fontWeight: 600, border: `1px solid ${COLOR.border}`, color: COLOR.text }}>Back to all cards</button>
           </div>
         )}
         {mode === 'learn' && learnView === 'cards' && !(cardDeck === 'tough' && filteredFlashcards.length === 0) && (
@@ -2091,7 +2079,7 @@ function CertStudyApp() {
               <button
                 onClick={() => setSeqBuilderOpen(true)}
                 className="btn-flat"
-                style={{ width: '100%', marginBottom: '12px', padding: '10px 14px', borderRadius: '12px', border: `2px dashed ${COLOR.primary}`, background: 'transparent', color: COLOR.primary, fontSize: '13px', fontWeight: 800, textAlign: 'left' }}
+                style={{ width: '100%', marginBottom: '12px', padding: '10px 14px', borderRadius: 'var(--r-card)', border: `1px dashed ${COLOR.primary}`, background: 'transparent', color: COLOR.primary, fontSize: '13px', fontWeight: 800, textAlign: 'left' }}
               >
                 + Build your own scenario{mySequences.length ? ` (${mySequences.length} saved)` : ''}
               </button>
@@ -2218,7 +2206,7 @@ function CertStudyApp() {
                     disabled={examIndex === 0}
                     onClick={() => setExamIndex((i) => Math.max(0, i - 1))}
                     className="flex-1"
-                    style={{ padding: '12px', borderRadius: '12px', border: `2px solid ${COLOR.border}`, background: 'transparent', color: examIndex === 0 ? COLOR.border : COLOR.text, fontSize: '14px', fontWeight: 600 }}
+                    style={{ padding: '12px', borderRadius: 'var(--r-card)', border: `1px solid ${COLOR.border}`, background: 'transparent', color: examIndex === 0 ? COLOR.border : COLOR.text, fontSize: '14px', fontWeight: 600 }}
                   >
                     Previous
                   </button>
@@ -2228,7 +2216,7 @@ function CertStudyApp() {
                     disabled={isFinalMock && !examCurrentAnswered}
                     onClick={() => setExamIndex((i) => i + 1)}
                     className="flex-1"
-                    style={{ padding: '12px', borderRadius: '12px', background: isFinalMock && !examCurrentAnswered ? COLOR.surfaceRaised : COLOR.primary, color: isFinalMock && !examCurrentAnswered ? COLOR.muted : COLOR.onAccent, fontSize: '14px', fontWeight: 600 }}
+                    style={{ padding: '12px', borderRadius: 'var(--r-card)', background: isFinalMock && !examCurrentAnswered ? COLOR.surfaceRaised : COLOR.primary, color: isFinalMock && !examCurrentAnswered ? COLOR.muted : COLOR.onAccent, fontSize: '14px', fontWeight: 600 }}
                   >
                     {isFinalMock ? 'Lock in & next' : 'Next'}
                   </button>
@@ -2237,7 +2225,7 @@ function CertStudyApp() {
                     disabled={isFinalMock && !examCurrentAnswered}
                     onClick={() => setExamPhase('complete')}
                     className="flex-1"
-                    style={{ padding: '12px', borderRadius: '12px', background: isFinalMock && !examCurrentAnswered ? COLOR.surfaceRaised : COLOR.gold, color: isFinalMock && !examCurrentAnswered ? COLOR.muted : COLOR.onAccent, fontSize: '14px', fontWeight: 700 }}
+                    style={{ padding: '12px', borderRadius: 'var(--r-card)', background: isFinalMock && !examCurrentAnswered ? COLOR.surfaceRaised : COLOR.gold, color: isFinalMock && !examCurrentAnswered ? COLOR.muted : COLOR.onAccent, fontSize: '14px', fontWeight: 700 }}
                   >
                     Submit Exam
                   </button>

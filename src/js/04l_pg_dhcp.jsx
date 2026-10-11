@@ -111,12 +111,12 @@ function PgDhcpDiagram({ topo, st, selected, hotId }) {
 }
 
 function PgDhcpHot({ on, children }) {
-  return <div style={{ outline: on ? `2px solid ${COLOR.red}` : 'none', outlineOffset: '2px', borderRadius: '10px', minWidth: 0 }}>{children}</div>;
+  return <div style={{ outline: on ? `1px solid ${COLOR.red}` : 'none', outlineOffset: '2px', borderRadius: 'var(--r-ctl)', minWidth: 0 }}>{children}</div>;
 }
 
 function PgDhcpToggle({ label, hint, value, onChange, hot }) {
   return (
-    <label style={{ display: 'flex', gap: '10px', alignItems: 'flex-start', padding: '8px 0', borderTop: `1px solid ${COLOR.border}`, outline: hot ? `2px solid ${COLOR.red}` : 'none', outlineOffset: '2px', borderRadius: '8px', minHeight: '36px' }}>
+    <label style={{ display: 'flex', gap: '10px', alignItems: 'flex-start', padding: '8px 0', borderTop: `1px solid ${COLOR.border}`, outline: hot ? `1px solid ${COLOR.red}` : 'none', outlineOffset: '2px', borderRadius: 'var(--r-ctl)', minHeight: '36px' }}>
       <input type="checkbox" checked={!!value} onChange={(e) => onChange(e.target.checked)} style={{ width: '20px', height: '20px', marginTop: '2px', accentColor: COLOR.primary, flexShrink: 0 }} />
       <span><span style={{ fontSize: '13.5px', fontWeight: 800, display: 'block' }}>{label}</span><span style={{ fontSize: '12px', color: COLOR.muted, lineHeight: 1.45 }}>{hint}</span></span>
     </label>
@@ -174,7 +174,7 @@ function PgDhcpScopes({ topo, edit, diag }) {
         const size = pgDhcpPoolSize(parsed);
         const hotAny = !!diag && diag.scopeId === sc.id;
         return (
-          <div key={sc.id} style={{ marginBottom: '10px', padding: '8px 10px', borderRadius: '12px', border: `2px solid ${hotAny ? COLOR.red : COLOR.border}`, background: COLOR.surface }}>
+          <div key={sc.id} style={{ marginBottom: '10px', padding: '8px 10px', borderRadius: 'var(--r-card)', border: `1px solid ${hotAny ? COLOR.red : COLOR.border}`, background: COLOR.surface }}>
             <div className="flex justify-between items-center" style={{ marginBottom: '6px', gap: '8px' }}>
               <strong style={{ fontSize: '12.5px' }}>Scope {i + 1}: {pgDhcpClip(sc.name || 'unnamed', 22)}</strong>
               <button className="btn-flat" onClick={() => setScopes(scopes.filter((_, j) => j !== i))} aria-label={`Delete scope ${i + 1}`} style={pgDhcpDelBtn}>✕</button>
@@ -213,7 +213,7 @@ function PgDhcpRouterEditor({ topo, edit, diag }) {
       {ifaces.map((f, i) => {
         const hot = !!diag && diag.field === 'helper' && (!diag.segment || diag.segment === f.segment);
         return (
-          <div key={f.segment} style={{ marginBottom: '10px', padding: '8px 10px', borderRadius: '12px', border: `2px solid ${hot ? COLOR.red : COLOR.border}`, background: COLOR.surface }}>
+          <div key={f.segment} style={{ marginBottom: '10px', padding: '8px 10px', borderRadius: 'var(--r-card)', border: `1px solid ${hot ? COLOR.red : COLOR.border}`, background: COLOR.surface }}>
             <strong style={{ fontSize: '12.5px', display: 'block', marginBottom: '6px' }}>Interface facing {pgDhcpSegLabel(topo, f.segment)}</strong>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '8px' }}>
               <PgDhcpIp label="Interface address" value={f.ip} onChange={(v) => setIface(i, { ip: v })} />
@@ -241,7 +241,7 @@ function PgDhcpHostsEditor({ topo, edit }) {
     <div>
       <div style={{ fontSize: '12px', color: COLOR.muted, lineHeight: 1.5, marginBottom: '8px' }}>DHCP clients ask the server for an address. Static devices have their address typed in by hand, which is how conflicts with the pool happen. A client that does not probe with ARP cannot notice a clash.</div>
       {hosts.map((h, i) => (
-        <div key={h.id} style={{ marginBottom: '10px', padding: '8px 10px', borderRadius: '12px', border: `2px solid ${COLOR.border}`, background: COLOR.surface }}>
+        <div key={h.id} style={{ marginBottom: '10px', padding: '8px 10px', borderRadius: 'var(--r-card)', border: `1px solid ${COLOR.border}`, background: COLOR.surface }}>
           <div className="flex justify-between items-center" style={{ marginBottom: '6px', gap: '8px' }}>
             <strong style={{ fontSize: '12.5px' }}>{pgDhcpClip(h.name, 24)}</strong>
             <button className="btn-flat" onClick={() => setHosts(hosts.filter((_, j) => j !== i))} aria-label={`Remove ${h.name}`} style={pgDhcpDelBtn}>✕</button>
@@ -280,7 +280,7 @@ function PgDhcpResult({ result }) {
   const warn = result.warning && result.warning !== result.diagnosis ? result.warning : null;
   return (
     <div>
-      <div style={{ padding: '10px 12px', borderRadius: '12px', background: tint(hue, 16), border: `2px solid ${hue}`, marginBottom: '10px', display: 'flex', gap: '8px', alignItems: 'baseline' }}>
+      <div style={{ padding: '10px 12px', borderRadius: 'var(--r-card)', background: tint(hue, 16), border: `1px solid ${hue}`, marginBottom: '10px', display: 'flex', gap: '8px', alignItems: 'baseline' }}>
         <span style={{ fontWeight: 900, color: ink(hue), fontSize: '16px' }}>{ok ? '✓' : '✕'}</span>
         <span style={{ fontWeight: 800, fontSize: '13.5px', lineHeight: 1.4 }}>{result.summary}</span>
       </div>
@@ -289,7 +289,7 @@ function PgDhcpResult({ result }) {
       {result.parts ? (
         <div>
           {result.parts.map((p) => (
-            <div key={p.id} style={{ marginBottom: '6px', borderRadius: '10px', border: `1.5px solid ${COLOR.border}`, background: COLOR.surface }}>
+            <div key={p.id} style={{ marginBottom: '6px', borderRadius: 'var(--r-ctl)', border: `1px solid ${COLOR.border}`, background: COLOR.surface }}>
               <button className="btn-flat" onClick={() => setOpen({ ...open, [p.id]: !open[p.id] })} aria-expanded={!!open[p.id]}
                 style={{ display: 'flex', width: '100%', gap: '8px', textAlign: 'left', padding: '8px 10px', minHeight: '36px', alignItems: 'baseline', color: COLOR.text }}>
                 <span aria-hidden="true" style={{ fontWeight: 900, color: p.verdict === 'success' ? ink(COLOR.success) : ink(COLOR.red) }}>{p.verdict === 'success' ? '✓' : '✕'}</span>
@@ -319,7 +319,7 @@ function PgDhcpClock({ topo, st, onAdvance, onReset }) {
       </div>
       <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '10px' }}>
         {PG_DHCP_ADVANCES.map((a) => (
-          <button key={a.label} className="btn-flat" onClick={() => onAdvance(a.sec)} style={{ ...pgPillStyle, minHeight: '38px', border: `2px solid ${COLOR.teal}`, color: ink(COLOR.teal) }}>{a.label}</button>
+          <button key={a.label} className="btn-flat" onClick={() => onAdvance(a.sec)} style={{ ...pgPillStyle, minHeight: '38px', border: `1px solid ${COLOR.teal}`, color: ink(COLOR.teal) }}>{a.label}</button>
         ))}
         <button className="btn-flat" onClick={onReset} style={{ ...pgPillStyle, minHeight: '38px' }}>Start over</button>
       </div>
@@ -329,7 +329,7 @@ function PgDhcpClock({ topo, st, onAdvance, onReset }) {
         return (
           <div key={h.id} style={{ display: 'flex', gap: '8px', alignItems: 'baseline', justifyContent: 'space-between', flexWrap: 'wrap', padding: '6px 0', borderTop: `1px solid ${COLOR.border}`, fontSize: '12.5px' }}>
             <span style={{ minWidth: 0 }}><strong>{h.name}</strong> <span style={{ color: COLOR.muted }}>{s.lease ? s.text : s.phase === 'idle' ? '' : 'no address'}</span></span>
-            <span style={{ fontWeight: 800, fontSize: '11.5px', padding: '2px 8px', borderRadius: '999px', border: `1.5px solid ${hue}`, color: ink(hue) }}>
+            <span style={{ fontWeight: 800, fontSize: '11.5px', padding: '2px 8px', borderRadius: 'var(--r-pill)', border: `1px solid ${hue}`, color: ink(hue) }}>
               {PG_DHCP_PHASE_LABEL[s.phase] || s.phase}{s.lease && s.verdict === 'failed' ? ' · settings fail' : ''}
             </span>
             {s.lease && <span style={{ flexBasis: '100%', color: COLOR.muted, fontSize: '11.5px' }}>{s.nextKind} in {pgDhcpDuration(s.nextIn)} · lease ends in {pgDhcpDuration(s.expiresIn)}</span>}

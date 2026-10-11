@@ -104,7 +104,7 @@ function PgListInput({ label, value, onChange }) {
 function PgSwitchEditor({ sw, topo, onChange, where, canEditVlans }) {
   const setPort = (id, patch) => onChange({ ports: sw.ports.map((p) => (p.id === id ? { ...p, ...patch } : p)) });
   return (
-    <div style={{ borderTop: `1px solid ${COLOR.border}`, padding: '10px 0', outline: where && where.switchId === sw.id ? `2px solid ${COLOR.red}` : 'none', outlineOffset: '2px', borderRadius: '8px' }}>
+    <div style={{ borderTop: `1px solid ${COLOR.border}`, padding: '10px 0', outline: where && where.switchId === sw.id ? `1px solid ${COLOR.red}` : 'none', outlineOffset: '2px', borderRadius: 'var(--r-ctl)' }}>
       <strong style={{ fontSize: '13.5px' }}>{sw.name}</strong>
       <div style={{ marginTop: '6px', maxWidth: '260px' }}>
         <PgListInput label="VLANs created on this switch" value={sw.vlans} onChange={(v) => onChange({ vlans: v })} />
@@ -116,7 +116,7 @@ function PgSwitchEditor({ sw, topo, onChange, where, canEditVlans }) {
         const attached = host ? host.name : router ? router.name : far ? `${pgVlanSwitch(topo, far.switch).name} ${far.port}` : 'nothing';
         const hot = where && where.switchId === sw.id && where.portId === p.id;
         return (
-          <div key={p.id} style={{ marginTop: '10px', padding: '8px', borderRadius: '10px', border: `2px solid ${hot ? COLOR.red : COLOR.border}`, background: hot ? tint(COLOR.red, 8) : COLOR.surface }}>
+          <div key={p.id} style={{ marginTop: '10px', padding: '8px', borderRadius: 'var(--r-ctl)', border: `1px solid ${hot ? COLOR.red : COLOR.border}`, background: hot ? tint(COLOR.red, 8) : COLOR.surface }}>
             <div className="flex justify-between items-center" style={{ gap: '8px', marginBottom: '6px' }}>
               <span style={{ fontSize: '13px', fontWeight: 800 }}>{p.id} <span style={{ fontWeight: 500, color: COLOR.muted }}>→ {attached}</span></span>
               <select value={p.mode} aria-label={`${sw.name} ${p.id} mode`}
@@ -158,7 +158,7 @@ function PgSwitchEditor({ sw, topo, onChange, where, canEditVlans }) {
 
 function PgVlanHostEditor({ host, onChange, hot }) {
   return (
-    <div style={{ borderTop: `1px solid ${COLOR.border}`, padding: '8px 0', outline: hot ? `2px solid ${COLOR.red}` : 'none', outlineOffset: '2px', borderRadius: '8px' }}>
+    <div style={{ borderTop: `1px solid ${COLOR.border}`, padding: '8px 0', outline: hot ? `1px solid ${COLOR.red}` : 'none', outlineOffset: '2px', borderRadius: 'var(--r-ctl)' }}>
       <strong style={{ fontSize: '13px' }}>{host.name}</strong> <span style={{ fontSize: '11.5px', color: COLOR.muted }}>on {host.switch.toUpperCase()} {host.port} · MAC {host.mac}</span>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '8px', marginTop: '4px' }}>
         <PgField label="IP address" value={host.ip} onChange={(v) => onChange({ ip: v })} error={pgParseIPv4(host.ip) === null ? 'Invalid' : null} inputMode="decimal" />
@@ -172,7 +172,7 @@ function PgVlanHostEditor({ host, onChange, hot }) {
 function PgRouterSubifs({ router, onChange, hot }) {
   const set = (i, patch) => onChange({ subifs: router.subifs.map((s, j) => (j === i ? { ...s, ...patch } : s)) });
   return (
-    <div style={{ borderTop: `1px solid ${COLOR.border}`, padding: '10px 0', outline: hot ? `2px solid ${COLOR.red}` : 'none', outlineOffset: '2px', borderRadius: '8px' }}>
+    <div style={{ borderTop: `1px solid ${COLOR.border}`, padding: '10px 0', outline: hot ? `1px solid ${COLOR.red}` : 'none', outlineOffset: '2px', borderRadius: 'var(--r-ctl)' }}>
       <strong style={{ fontSize: '13.5px' }}>{router.name}</strong> <span style={{ fontSize: '11.5px', color: COLOR.muted }}>on {router.switch.toUpperCase()} {router.port}</span>
       {router.subifs.map((s, i) => (
         <div key={i} style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 0.8fr) minmax(0, 1.6fr) minmax(0, 1.4fr) auto', gap: '6px', alignItems: 'end', marginTop: '6px' }}>

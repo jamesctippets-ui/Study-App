@@ -84,14 +84,14 @@ function PgVpnDiagram({ topo, fromId, toId, result }) {
 }
 
 function PgVpnHot({ hot, children }) {
-  return <div style={{ outline: hot ? `2px solid ${COLOR.red}` : 'none', outlineOffset: '3px', borderRadius: '10px', minWidth: 0 }}>{children}</div>;
+  return <div style={{ outline: hot ? `1px solid ${COLOR.red}` : 'none', outlineOffset: '3px', borderRadius: 'var(--r-ctl)', minWidth: 0 }}>{children}</div>;
 }
 
 function PgVpnSection({ id, siteId, open, setOpen, hue, hotCard, children }) {
   const isOpen = !!open[`${siteId}:${id}`];
   const title = PG_VPN_CARD_TITLES[id];
   return (
-    <PgCard title={title} hue={hue} style={hotCard ? { outline: `2px solid ${COLOR.red}`, outlineOffset: '2px' } : undefined}
+    <PgCard title={title} hue={hue} style={hotCard ? { outline: `1px solid ${COLOR.red}`, outlineOffset: '2px' } : undefined}
       right={<button className="btn-flat" aria-label={`${title}: ${isOpen ? 'hide' : 'show'}`} aria-expanded={isOpen} onClick={() => setOpen({ ...open, [`${siteId}:${id}`]: !isOpen })}
         style={{ ...pgPillStyle, padding: '5px 12px', minHeight: '36px' }}>{isOpen ? 'Hide' : 'Show'}</button>}>
       {isOpen ? children : <div style={{ fontSize: '12px', color: COLOR.muted }}>Tap Show to edit.</div>}
@@ -164,7 +164,7 @@ function PgVpnSiteEditor({ topo, site, setSite, diag, open, setOpen }) {
           <div style={{ fontSize: '12px', color: COLOR.muted, lineHeight: 1.5, marginBottom: '6px' }}>Which source and destination networks this end protects. Each selector here needs a mirror image at the other end: this end's local is the other end's remote.</div>
           {site.selectors.length === 0 && <div style={{ fontSize: '12.5px', color: COLOR.muted, marginBottom: '6px' }}>No selectors: nothing is protected.</div>}
           {site.selectors.map((x, i) => (
-            <div key={x.id} style={{ marginBottom: '10px', padding: '8px 10px', borderRadius: '12px', border: `2px solid ${COLOR.border}`, background: COLOR.surface }}>
+            <div key={x.id} style={{ marginBottom: '10px', padding: '8px 10px', borderRadius: 'var(--r-card)', border: `1px solid ${COLOR.border}`, background: COLOR.surface }}>
               <div className="flex justify-between items-center" style={{ marginBottom: '6px' }}>
                 <strong style={{ fontSize: '12.5px' }}>Selector {i + 1}</strong>
                 <button className="btn-flat" onClick={() => put('selectors', site.selectors.filter((y) => y.id !== x.id))} aria-label={`Delete selector ${i + 1}`} style={{ width: '36px', height: '36px', color: COLOR.muted }}>{'✕'}</button>
@@ -218,7 +218,7 @@ function PgVpnStatus({ stages }) {
     <div style={{ marginBottom: '10px' }}>
       <div style={{ fontSize: '10.5px', fontWeight: 800, letterSpacing: '0.05em', textTransform: 'uppercase', color: COLOR.muted, marginBottom: '4px' }}>Tunnel status</div>
       {stages.map((s) => (
-        <div key={s.key} style={{ display: 'flex', gap: '8px', alignItems: 'baseline', padding: '6px 10px', marginBottom: '4px', borderRadius: '10px', background: tint(PG_VPN_STATE_HUE[s.state], s.state === 'skip' ? 4 : 12), border: `1.5px solid color-mix(in srgb, ${PG_VPN_STATE_HUE[s.state]} 50%, ${COLOR.border})` }}>
+        <div key={s.key} style={{ display: 'flex', gap: '8px', alignItems: 'baseline', padding: '6px 10px', marginBottom: '4px', borderRadius: 'var(--r-ctl)', background: tint(PG_VPN_STATE_HUE[s.state], s.state === 'skip' ? 4 : 12), border: `1px solid color-mix(in srgb, ${PG_VPN_STATE_HUE[s.state]} 50%, ${COLOR.border})` }}>
           <span aria-hidden="true" style={{ fontWeight: 900, width: '14px', flexShrink: 0, color: s.state === 'skip' ? COLOR.muted : ink(PG_VPN_STATE_HUE[s.state]) }}>{PG_VPN_STATE_MARK[s.state]}</span>
           <span style={{ minWidth: 0, fontSize: '12.5px', lineHeight: 1.4 }}><strong>{s.label}</strong><span style={{ color: COLOR.muted }}> {'·'} {s.state === 'skip' ? 'not reached' : s.state === 'partial' ? `partly up: ${s.text}` : s.state === 'ok' ? `up: ${s.text}` : `down: ${s.text}`}</span></span>
         </div>
@@ -272,14 +272,14 @@ function PgVpnResult({ result, onWhere }) {
   const d = result.diagnosis;
   return (
     <div>
-      <div style={{ padding: '10px 12px', borderRadius: '12px', background: tint(hue, 16), border: `2px solid ${hue}`, marginBottom: '10px', display: 'flex', gap: '8px', alignItems: 'baseline' }}>
+      <div style={{ padding: '10px 12px', borderRadius: 'var(--r-card)', background: tint(hue, 16), border: `1px solid ${hue}`, marginBottom: '10px', display: 'flex', gap: '8px', alignItems: 'baseline' }}>
         <span style={{ fontWeight: 900, color: ink(hue), fontSize: '16px' }}>{ok ? '✓' : '✕'}</span>
         <span style={{ fontWeight: 800, fontSize: '13.5px', lineHeight: 1.4 }}>{result.summary}</span>
       </div>
       <PgVpnStatus stages={result.stages} />
       <PgDiagnosis diagnosis={d} heading="First thing that is wrong" />
       {d && d.field && (
-        <button className="btn-flat" onClick={() => onWhere(d)} style={{ ...pgPillStyle, marginBottom: '10px', minHeight: '36px', border: `2px solid ${COLOR.primary}`, color: ink(COLOR.primary) }}>Show me where</button>
+        <button className="btn-flat" onClick={() => onWhere(d)} style={{ ...pgPillStyle, marginBottom: '10px', minHeight: '36px', border: `1px solid ${COLOR.primary}`, color: ink(COLOR.primary) }}>Show me where</button>
       )}
       <PgSteps steps={result.steps} />
     </div>
