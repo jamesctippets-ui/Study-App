@@ -568,6 +568,20 @@ where one genuinely fits, vocab/quiz call-outs, and common-traps notes):
   checked because Cisco's page is gated, so confirm it before you book. ISSAP, ISSEP and ISSMP are not covered. Most lessons carry a diagram
   (CCNA 13, CISSP 14, CCSP 8, CSSLP 7, CC 6, SSCP 6, CGRC 5), each in its own
   `src/js/01a_diagrams_*.jsx` file.
+- **Weak subjects** (Path tab → "Weak spots", `#/<cert>/path/weak`) — turns what you got wrong
+  into a study plan. Each answer already updated "last outcome"; a new **miss log** adds how
+  often and how recently an item was missed. For every cert the app ranks the *lessons* your
+  misses point back at (repeat and recent misses weigh more, tough flashcards, mini-game and
+  case-study misses count, and areas worth more of the exam rank higher), says why in one line,
+  and lists what to review: the reading (with the official links for that area), the flashcards
+  that match the questions you missed, and the missed questions themselves, each one tap away.
+  One button turns the ranking into a **weak-subjects path** in a new study order (most urgent
+  first): re-read, targeted flashcards, a quiz built around your misses with a few fresh
+  questions, an optional game and a retest. It runs on the same step runner as the course path,
+  keeps its own progress, shows how many of the original misses are fixed, and can be rebuilt
+  from your latest results. Entry points: the Path tab switch, a Home card and the exam results
+  screen. The ranking is pure logic (`src/js/03d_weak_path.js`, 38 checks in
+  `tools/check_weak_path.js`, run by build.py when node is installed).
 - **IT Playground** (`#/playground`) — a sandbox outside any cert, reached from a card
   on Home. Four tools, each with a free sandbox and guided troubleshooting scenarios
   (starter, core, stretch): a **subnet calculator** (network, broadcast, host range,
@@ -614,6 +628,7 @@ data/
   isc2cc.py, sscp.py, ccsp.py, cgrc.py, csslp.py — the ISC2 tracks (experience requirements live in tracks.py)
   playground.py — guided scenarios for the IT Playground (validated by build.py, replayed through the engine)
 tools/
+  check_weak_path.js  — unit tests for the weak-subjects engine against the real content
   check_playground.js — unit tests for the Playground engine plus a replay of every scenario
 src/js/
   00_preamble.js        — React hook imports, the COLOR palette
@@ -625,6 +640,8 @@ src/js/
   04c_lesson_ui.jsx      — flashcards, Study, cheat sheet, Match game, lesson/course view
   04d_quiz_ui.jsx        — practice tool picker, quiz setup, Verbal Quiz, CLI practice, Mad Libs, Sequence, Compare, Case Study, QuestionView/QuizSummary
   04e_path_ui.jsx        — the guided Path tab: unit map, step runners, test-out, weak-spot review
+  03d_weak_path.js        — weak-subjects engine: miss log, lesson ranking, snapshot path (pure logic)
+  04m_weak_path_ui.jsx    — the Weak spots panel, path progress and the Home card
   03b_playground_engine.js — pure-JS simulation engine for the IT Playground (subnet maths, ping, VLAN switching, firewall)
   04h_playground_ui.jsx  — Playground shell and subnet tools; 04i (IP lab), 04j (VLANs), 04k (firewall) hold the other tools
   05_final_exam_ui.jsx   — timed exam intro/runner/results (practice exam + proctored-style Final Mock)

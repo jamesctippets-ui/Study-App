@@ -1695,6 +1695,26 @@ trading away for shinier but shallower ones.
   ISC2 published a broader Code of Professional Conduct in February 2026 that builds on
   the Code of Ethics canons; the CC and CISSP cheat sheets mention it. No cross-cert
   bridges exist for these tracks yet, and ISSAP, ISSEP and ISSMP are not covered.
+- [x] **Weak subjects: evaluate misses and build a priority study path (October 2026).** The app only kept the
+  last outcome per item, so `stats.missLog` (`{track: {id: {m misses, c correct since, l last-miss date}}}`) now records
+  history for anything ever missed (written by `recordResultFor` and the exam results; cleared with a track reset;
+  exported and imported with stats). `weakAnalyze` (`src/js/03d_weak_path.js`, pure) maps every missed question, tough
+  flashcard (spaced repetition), missed mini-game and case-study question to its lesson (via the Path units) and scores
+  each lesson: 1 per miss, 1.25 to 1.75 for repeat misses, 0.65 to 1 by recency (miss within a week = full weight), 0.1
+  for a recovered item, 0.35 per tough card, 0.6 per missed game or case question; priority = score x (0.6 + 0.8 x miss
+  rate) x exam weight (category marks relative to an even split, clamped 0.7 to 1.5), earlier lessons winning ties.
+  Lessons need a score of at least 0.9 to count; tiers (Top priority / Needs work / Keep an eye on) combine relative and
+  absolute thresholds. For each it picks the cards that match the missed questions' text (tough ones first), the lesson
+  reading and the category's official resources. `buildWeakSnapshot` freezes the top six as a path stored in
+  `stats.weakPath[track]` (snapshot plus its own progress map); `buildWeakUnits` turns it into units for the existing
+  `PathStepRunner` (new step kinds `weakquiz`, which puts the missed questions first, and `retest`). UI: `04m_weak_path_ui.jsx`
+  (a Course path / Weak spots switch on the Path tab with its own route, `#/<cert>/path/weak`; a report with totals, the
+  study order, exam areas losing points and a per-lesson review card; the path with progress and a "missed questions fixed"
+  count; a Home card; a button on the exam results). 38 engine checks in `tools/check_weak_path.js` (miss log, ranking on
+  real CCNA content, recency, repeats, exam weight, tough cards, snapshot, units, outcome, normalization), run by build.py.
+  Open items: one cross-cert weak path on Home (today each cert has its own), per-lesson "mastered" detection that
+  retires a weak lesson automatically mid-path, weak-spot reminders, and counting question *type* (scenario versus
+  recall) in the weighting.
 - [x] **IT Playground v1 (the sandbox, ROADMAP §17).** A new area outside any cert at `#/playground`
   (`#/playground/<subnet|ipconfig|vlan|firewall>`), entered from a card on Home. `src/js/03b_playground_engine.js`
   holds a pure-JavaScript engine (no React, no DOM): exact 32-bit subnet maths, VLSM allocation, a host/gateway/
