@@ -1731,6 +1731,20 @@ trading away for shinier but shallower ones.
   playground achievements; STP, DHCP, DNS, ACL-on-an-interface, VPN and Azure NSG scenarios (§17 item 5); persisted
   sandbox setups and export/import for the VLAN and firewall tools (the IP lab already has export/import); making the
   tall editor cards collapsible.
+- [x] **IT Playground v2 (shared core, six more tools, IPv6, lesson links).** The Playground now has ten tools and
+  75 guided scenarios (IP lab 12, VLAN 8, firewall 8, DHCP 8, DNS 8, STP 7, VPN 8, Azure NSG 8, certificates 8; the
+  subnet calculator has no scenarios). Shared building blocks live in `src/js/04g_playground_core.jsx`
+  (collapsible cards, fields, segmented controls, predict-first, scenario picker and shell, sandbox shell with
+  persistence/reset/export/import, tool registry and the on-device store `cert-study-hub-playground-v1`). Features:
+  **predict-first** on every lab (pick the likely cause before running; score kept on the device), **saved
+  sandboxes** for every tool, **solved-scenario tracking and milestones** on a progress card, **41 "Try it" links**
+  from real lessons (`LESSON_LINKS`, validated against the actual lessons by build.py), **IPv6** in the calculator
+  (compression/expansion, address types, EUI-64, /64 subnetting; BigInt), **port security** in the VLAN lab, and
+  two more VLAN, firewall and IP scenarios. New tools live in four new files each (`03c_pg_<k>.js` engine,
+  `04l_pg_<k>.jsx` screens, `data/playground_<k>.py` data, `tools/checks/<k>.js` checks) and are auto-discovered, so
+  adding one touches no shared file; `tools/check_playground.js` now runs about 1,835 checks. Open items: ACL-on-an-
+  interface scenarios, a routing table / longest-prefix-match lab beyond the IP lab, DHCP snooping, "quiz me on this
+  setup", and optional daily-goal credit.
 - [x] **ISC2 tracks verified against the official exam outlines (October 2026).** Once isc2.org and its
   document host were reachable, the six outlines were downloaded and every numbered objective and
   sub-bullet audited against each track: CC (outline effective Sept 1, 2026; +130 cards, +146 questions,
@@ -2048,7 +2062,7 @@ specifically (still open).
   single, always-available entry point. `full_smoke.js` extended to
   cover the hamburger opening the panel from both Learn and Home.
 
-## 17. A general IT "playground" (user's idea, v1 built; see the Done list)
+## 17. A general IT "playground" (user's idea, v2 built; see the Done list)
 
 A new top-level area, separate from any one cert, where the learner changes
 something and watches what happens to a small network or system. The cert
@@ -2056,14 +2070,16 @@ tracks teach and test; the playground lets you *try* it. It is a self-study
 sandbox, not a graded tool: nothing in it touches mastery, results, the daily
 goal or exam readiness (the same rule the Commands and Sequence builder follow).
 
-**Status (v1 built).** Tools 1 to 4 below exist (subnet calculator with VLSM, IP configuration lab, VLAN
-playground, firewall and port-forwarding tester), reached from a Home card and `#/playground[/<tool>]`
-(no bottom-bar tab: it stays off the tab bar so the six existing tabs keep their room). The engine is pure
-JavaScript, scenarios are data in `data/playground.py` and are replayed through the engine by `build.py`
-(when node is available). Still open: item 5 (more scenarios), IPv6, "try it" links from lessons, quiz and
-achievement links, persisted sandboxes. The checklist below is kept as the original design.
+**Status (v2 built).** Items 1 to 4 below exist (subnet calculator with VLSM and IPv6, IP configuration lab, VLAN
+playground with port security, firewall and port-forwarding tester) and item 5 is mostly done: DHCP, DNS, STP,
+site-to-site VPN, Azure NSG and certificate scenarios each have their own tool. It is reached from a Home card and
+`#/playground[/<tool>[/<scenario>]]` (no bottom-bar tab: it stays off the tab bar so the six existing tabs keep their
+room). The engines are pure JavaScript, scenarios are data (`data/playground*.py`) and are replayed through the
+engines by `build.py` (when node is available). Lessons link in with "Try it" buttons; labs have predict-first,
+saved setups and a progress card. Still open: ACL-on-an-interface and DHCP-snooping scenarios, a "quiz me on this
+setup" link back into study, optional daily-goal credit. The checklist below is kept as the original design.
 
-- [x] **Scope the first version (1 to 4 built, 5 open).** Candidate tools, roughly in build order
+- [x] **Scope the first version (1 to 4 built, 5 mostly built).** Candidate tools, roughly in build order
   (cheap and self-contained first):
   1. **Subnet calculator with explanations.** Enter an IPv4 address and mask
      or prefix (and later IPv6); see network, broadcast, first/last host,
@@ -2106,7 +2122,7 @@ achievement links, persisted sandboxes. The checklist below is kept as the origi
   like export and import already does) keep experiments safe and repeatable.
   Mobile first: large tap targets, no drag-only interactions (tap to select,
   tap to place), keyboard-friendly inputs with validation messages.
-- [x] **Where it lives (Home card and route; lesson links still open).** A new bottom-bar entry or a Practice-style picker
+- [x] **Where it lives (Home card, route and lesson "Try it" links).** A new bottom-bar entry or a Practice-style picker
   ("Playground") that is not tied to the selected cert; each tool can also be
   opened from the lessons that teach it (the CCNA subnetting, VLAN and ACL
   lessons, the CC networking lesson, the CISSP network lessons, AZ-104
@@ -2127,10 +2143,10 @@ achievement links, persisted sandboxes. The checklist below is kept as the origi
   mismatch). Unit tests for the maths (subnetting, VLSM, wildcard, IPv6
   compression) and for first-match firewall and VLAN delivery; Playwright
   tests for the tap flows.
-- [ ] **Possible links back into study.** "Quiz me on this setup" turning the
-  current playground state into one or two generated questions; achievements
-  for completing guided scenarios (separate from cert achievements);
-  optional daily-goal credit like the optional sections, off by default.
+- [ ] **Possible links back into study (milestones done, the rest open).** "Quiz me on this setup" turning the
+  current playground state into one or two generated questions; optional daily-goal credit like the optional
+  sections, off by default. (Playground milestones for completing guided scenarios exist, separate from cert
+  achievements.)
 - [ ] **Open questions to settle before building.** Whether the playground
   has its own bottom-bar tab (and what gives way), how far the VLAN and
   firewall tools should go before they become a full network simulator (and

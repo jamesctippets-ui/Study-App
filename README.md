@@ -583,22 +583,36 @@ where one genuinely fits, vocab/quiz call-outs, and common-traps notes):
   screen. The ranking is pure logic (`src/js/03d_weak_path.js`, 104 checks in
   `tools/check_weak_path.js`, run by build.py when node is installed).
 - **IT Playground** (`#/playground`) — a sandbox outside any cert, reached from a card
-  on Home. Four tools, each with a free sandbox and guided troubleshooting scenarios
-  (starter, core, stretch): a **subnet calculator** (network, broadcast, host range,
-  wildcard, binary view with the network/host boundary, step-by-step working, split a
-  network, same-subnet checker, **VLSM** planner and a subnetting drill); an **IP
-  configuration lab** (hosts, default gateways, masks and static routes; ping and read
-  the trace that names the first thing that breaks, including duplicate addresses,
-  masks, gateways, missing routes and one-way replies); a **VLAN playground** (two
-  switches, access and trunk ports, allowed lists, native VLANs, a router on a stick,
-  and MAC address tables that fill as switches learn and flood); and a **firewall and
-  port-forwarding tester** (ordered rules with implicit deny, port forwards, source NAT,
-  stateful versus stateless, hairpin NAT). Nothing in the Playground touches mastery,
-  results, the daily goal or readiness. The simulations are deliberately simplified (no
-  IPv6 yet, no vendor-exact behaviour); the engine is pure JavaScript
-  (`src/js/03b_playground_engine.js`) and `tools/check_playground.js` runs its unit
-  tests and replays every scenario in `data/playground.py` (build.py does this when node
-  is installed).
+  on Home. Ten tools; all but the calculator have a free sandbox and guided troubleshooting
+  scenarios (starter, core, stretch; 75 in all): a **subnet calculator** (network, broadcast,
+  host range, wildcard, binary view with the network/host boundary, step-by-step working,
+  split a network, same-subnet checker, **VLSM** planner, a subnetting drill and an **IPv6**
+  tab: compression, expansion, address types, EUI-64 and /64 subnetting); an **IP
+  configuration lab** (hosts, default gateways, masks and static routes; ping and read the
+  trace that names the first thing that breaks); a **VLAN playground** (two switches, access
+  and trunk ports, allowed lists, native VLANs, router on a stick, MAC address tables that
+  fill as switches learn and flood, and port security with sticky MACs and violation modes);
+  a **firewall and port-forwarding tester** (ordered rules with implicit deny, port forwards,
+  source NAT, stateful versus stateless, hairpin NAT); a **DHCP lab** (scopes, exclusions,
+  relay, lease exhaustion); a **DNS lab** (records, caching, TTLs, resolvers); a **spanning
+  tree** lab (root election, port roles, link failures); a **site-to-site VPN** tester
+  (tunnel up but no traffic: selectors, routes, NAT exemption); an **Azure NSG** tester
+  (priorities, default rules, subnet versus NIC level) and a **certificate checker**
+  (expiry, name match, chain, trust). Every lab can **predict first** (guess the cause
+  before running; the score is kept on the device), saves its sandbox setup on the device
+  with reset and export/import, and collapses its tall editors. A progress card tracks
+  scenarios fixed and a few milestones. 41 lessons that teach a tool (CCNA, CC, SSCP, CISSP, SC-500 and the Azure tracks)
+  show a "Try it in the Playground" link that opens the matching tool or scenario. Nothing in the
+  Playground touches mastery, results, the daily goal or readiness. The simulations are
+  deliberately simplified (no vendor-exact behaviour; each tool says what it leaves out).
+  The engines are pure JavaScript (`src/js/03b_playground_engine.js` for the core tools and
+  one `03c_pg_<tool>.js` per extra tool); `tools/check_playground.js` (about 1,800 checks)
+  unit-tests them and replays every scenario's broken and fixed outcomes, and build.py runs
+  it when node is installed. **Adding a tool** needs four new files and no shared edits:
+  `src/js/03c_pg_<k>.js` (engine), `src/js/04l_pg_<k>.jsx` (screens, ending with a
+  `PLAYGROUND_EXTRA_TOOLS.push({...})`), `data/playground_<k>.py` (`SCENARIOS`, `SANDBOX`,
+  optional `LESSON_LINKS`, `validate()`) and `tools/checks/<k>.js`; build.py discovers and
+  validates them.
 - **EHR Integration** — *not a certification.* Epic (the dominant hospital EHR
   vendor) requires employer sponsorship to even take its exams, and its exam
   content is proprietary, so there's no legitimate way to build real cert-prep
@@ -627,9 +641,11 @@ data/
   ccna.py, cissp.py — combine ccna_a/_b and cissp_a/_b (two parts each, written in parallel)
   isc2cc.py, sscp.py, ccsp.py, cgrc.py, csslp.py — the ISC2 tracks (experience requirements live in tracks.py)
   playground.py — guided scenarios for the IT Playground (validated by build.py, replayed through the engine)
+  playground_<tool>.py — one file per extra Playground tool (dhcp, dns, stp, vpn, nsg, certs), auto-discovered
 tools/
   check_weak_path.js  — unit tests for the weak-subjects engine against the real content
-  check_playground.js — unit tests for the Playground engine plus a replay of every scenario
+  check_playground.js — unit tests for the Playground engines plus a replay of every scenario
+  checks/<tool>.js    — per-tool checks for the extra Playground tools (loaded by check_playground.js)
 src/js/
   00_preamble.js        — React hook imports, the COLOR palette
   01_diagrams.jsx        — SVG lesson diagrams
@@ -642,8 +658,10 @@ src/js/
   04e_path_ui.jsx        — the guided Path tab: unit map, step runners, test-out, weak-spot review
   03d_weak_path.js        — weak-subjects engine: miss log, lesson ranking, snapshot path (pure logic)
   04m_weak_path_ui.jsx    — the Weak spots panel, path progress and the Home card
-  03b_playground_engine.js — pure-JS simulation engine for the IT Playground (subnet maths, ping, VLAN switching, firewall)
-  04h_playground_ui.jsx  — Playground shell and subnet tools; 04i (IP lab), 04j (VLANs), 04k (firewall) hold the other tools
+  03b_playground_engine.js — pure-JS simulation engine for the IT Playground (subnet maths incl. IPv6, ping, VLAN switching, firewall)
+  03c_pg_<tool>.js       — engines for the extra Playground tools (dhcp, dns, stp, vpn, nsg, certs)
+  04g_playground_core.jsx — shared Playground parts: cards, fields, predict-first, scenario shell, sandbox store, tool registry
+  04h_playground_ui.jsx  — Playground shell and subnet tools; 04i (IP lab), 04j (VLANs), 04k (firewall), 04l_pg_<tool> (extra tools) hold the others
   05_final_exam_ui.jsx   — timed exam intro/runner/results (practice exam + proctored-style Final Mock)
   06_app.jsx             — CertStudyApp, the top-level component
 

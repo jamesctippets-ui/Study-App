@@ -4787,6 +4787,650 @@
       }
     ]
   },
+  "certs": [
+    {
+      "id": "certs-expired",
+      "title": "Everyone gets a warning on Monday morning",
+      "goal": "The certificate must be inside its validity period on the day the client connects.",
+      "level": "starter",
+      "story": "At 8:05 on Monday every customer of the booking site sees a full-page security warning. Nobody changed anything over the weekend, the web server is up, and the page itself loads fine once you click through the warning.",
+      "topology": {
+        "server": {
+          "cn": "www.example.com",
+          "sans": "example.com, *.example.com",
+          "notBefore": "2026-07-12",
+          "notAfter": "2026-10-10",
+          "issuedBy": "intermediate",
+          "sendsIntermediate": true,
+          "eku": "server",
+          "sigAlg": "sha256rsa",
+          "revoked": false
+        },
+        "inter": {
+          "name": "Example Issuing CA 1",
+          "notBefore": "2024-03-13",
+          "notAfter": "2034-03-11",
+          "sigAlg": "sha256rsa",
+          "revoked": false
+        },
+        "root": {
+          "id": "pub"
+        },
+        "client": {
+          "kind": "browser",
+          "hostname": "www.example.com",
+          "date": "2026-10-11",
+          "trusted": [
+            "pub",
+            "other"
+          ],
+          "checkRevocation": true
+        }
+      },
+      "expect": [
+        {
+          "verdict": "failed",
+          "code": "expired"
+        }
+      ],
+      "hints": [
+        "Look at which check turned red first, and read the two dates in the message.",
+        "Compare the certificate's not-after date with the client's clock. Which is earlier, and by how many days?",
+        "A certificate cannot be stretched; in real life you get a new one. In the lab, give the server certificate a new validity period that includes the client's date."
+      ],
+      "fix": [
+        {
+          "path": "server.notBefore",
+          "value": "2026-10-11"
+        },
+        {
+          "path": "server.notAfter",
+          "value": "2027-01-09"
+        }
+      ],
+      "fixText": [
+        "Renew the certificate: request a new one from the CA and install it. Here that means a new validity period such as 2026-10-11 to 2027-01-09 (90 days).",
+        "Then make renewal automatic. Public CAs may now issue certificates valid for at most 200 days (since 15 March 2026, falling to 100 days in March 2027 and 47 days in March 2029), so manual calendar reminders do not scale."
+      ],
+      "expectFixed": [
+        {
+          "verdict": "success",
+          "date": "2026-10-11"
+        }
+      ],
+      "lesson": "A certificate is only trusted between its not-before and not-after dates (the last day counts). The name, chain and signature can all be perfect and an expired certificate is still rejected. The cause is almost always a missed renewal, which is why renewals are automated and monitored, and why public certificate lifetimes keep getting shorter.",
+      "related": [
+        "CISSP: Cryptography and PKI",
+        "SSCP: certificate lifecycle"
+      ]
+    },
+    {
+      "id": "certs-cn-only",
+      "title": "The right name, in the wrong place",
+      "goal": "The name the client types must appear in the certificate's subject alternative names (SAN).",
+      "level": "starter",
+      "story": "The new staff intranet answers at intranet.example.com. Its certificate came from the company CA through an old request template that only fills in the subject line, CN=intranet.example.com. The administrator can read that exact name in the certificate, yet the browsers rolled out this week show a name error.",
+      "topology": {
+        "server": {
+          "cn": "intranet.example.com",
+          "sans": "",
+          "notBefore": "2026-09-12",
+          "notAfter": "2026-12-11",
+          "issuedBy": "intermediate",
+          "sendsIntermediate": true,
+          "eku": "server",
+          "sigAlg": "sha256rsa",
+          "revoked": false
+        },
+        "inter": {
+          "name": "Corp Issuing CA",
+          "notBefore": "2024-03-13",
+          "notAfter": "2034-03-11",
+          "sigAlg": "sha256rsa",
+          "revoked": false
+        },
+        "root": {
+          "id": "corp"
+        },
+        "client": {
+          "kind": "browser",
+          "hostname": "intranet.example.com",
+          "date": "2026-10-11",
+          "trusted": [
+            "pub",
+            "other",
+            "corp"
+          ],
+          "checkRevocation": true
+        }
+      },
+      "expect": [
+        {
+          "verdict": "failed",
+          "code": "name-mismatch"
+        }
+      ],
+      "hints": [
+        "The CN and the typed name are identical. So which part of the certificate is the client actually reading?",
+        "Open the server certificate and look at the subject alternative names. What does the message say about the SAN list?"
+      ],
+      "fix": [
+        {
+          "path": "server.sans",
+          "value": "intranet.example.com"
+        }
+      ],
+      "fixText": [
+        "Reissue the certificate with intranet.example.com in the subject alternative names. Fix the request template so every future certificate carries its names as SAN entries; the CN may stay for humans to read."
+      ],
+      "expectFixed": [
+        {
+          "verdict": "success",
+          "host": "intranet.example.com"
+        }
+      ],
+      "lesson": "Modern clients match the host name against the subject alternative names only. The common name is not used, however perfectly it matches (RFC 9525; Chrome stopped using it in version 58). Public CAs must put the names in the SAN anyway, so this problem mostly hides in old private-CA templates and hand-made certificates.",
+      "related": [
+        "CISSP: Cryptography and PKI",
+        "SSCP: PKI and certificates"
+      ]
+    },
+    {
+      "id": "certs-clock",
+      "title": "Only the warehouse kiosk complains",
+      "goal": "The client's own clock must fall inside the certificate's validity period.",
+      "level": "core",
+      "story": "After a power cut, the touch-screen kiosk in the warehouse reports that the company portal is \"not valid yet\". Every other device in the building opens the same portal without a warning, and the certificate was renewed three weeks ago.",
+      "topology": {
+        "server": {
+          "cn": "www.example.com",
+          "sans": "example.com, *.example.com",
+          "notBefore": "2026-09-12",
+          "notAfter": "2026-12-11",
+          "issuedBy": "intermediate",
+          "sendsIntermediate": true,
+          "eku": "server",
+          "sigAlg": "sha256rsa",
+          "revoked": false
+        },
+        "inter": {
+          "name": "Example Issuing CA 1",
+          "notBefore": "2024-03-13",
+          "notAfter": "2034-03-11",
+          "sigAlg": "sha256rsa",
+          "revoked": false
+        },
+        "root": {
+          "id": "pub"
+        },
+        "client": {
+          "kind": "browser",
+          "hostname": "www.example.com",
+          "date": "2019-01-01",
+          "trusted": [
+            "pub",
+            "other"
+          ],
+          "checkRevocation": true
+        }
+      },
+      "expect": [
+        {
+          "verdict": "failed",
+          "code": "not-yet-valid"
+        }
+      ],
+      "hints": [
+        "The problem follows the kiosk, not the server. What does the kiosk know that the other devices do not get wrong?",
+        "Compare the client's date with the certificate's not-before date."
+      ],
+      "fix": [
+        {
+          "path": "client.date",
+          "value": "2026-10-11"
+        }
+      ],
+      "fixText": [
+        "Set the kiosk's clock to the right date and keep it right with time synchronization (NTP). The certificate and the server are fine; do not touch them."
+      ],
+      "expectFixed": [
+        {
+          "verdict": "success"
+        }
+      ],
+      "keep": [
+        "server.notBefore",
+        "server.notAfter"
+      ],
+      "lesson": "Validity is judged against the client's clock, so a wrong clock breaks certificate checks in either direction: a clock in the past makes good certificates \"not yet valid\", a clock in the future makes them \"expired\". When one device fails and the rest do not, or when every site fails on one device, check its date and time before blaming the certificate.",
+      "related": [
+        "CISSP: Cryptography and PKI",
+        "CCNA: NTP"
+      ]
+    },
+    {
+      "id": "certs-wildcard",
+      "title": "The wildcard that does not cover everything",
+      "goal": "Every name people use must be covered by an entry in the SAN list.",
+      "level": "core",
+      "story": "Marketing bought a wildcard certificate for *.example.com and believes it now covers anything under the company domain. shop.example.com works. The bare example.com on the business cards and the new api.eu.example.com both show a name error.",
+      "topology": {
+        "server": {
+          "cn": "*.example.com",
+          "sans": "*.example.com",
+          "notBefore": "2026-09-12",
+          "notAfter": "2026-12-11",
+          "issuedBy": "intermediate",
+          "sendsIntermediate": true,
+          "eku": "server",
+          "sigAlg": "sha256rsa",
+          "revoked": false
+        },
+        "inter": {
+          "name": "Example Issuing CA 1",
+          "notBefore": "2024-03-13",
+          "notAfter": "2034-03-11",
+          "sigAlg": "sha256rsa",
+          "revoked": false
+        },
+        "root": {
+          "id": "pub"
+        },
+        "client": {
+          "kind": "browser",
+          "hostname": "example.com",
+          "date": "2026-10-11",
+          "trusted": [
+            "pub",
+            "other"
+          ],
+          "checkRevocation": true
+        }
+      },
+      "ask": {
+        "host": "example.com"
+      },
+      "expect": [
+        {
+          "host": "shop.example.com",
+          "verdict": "success"
+        },
+        {
+          "host": "example.com",
+          "verdict": "failed",
+          "code": "name-mismatch"
+        },
+        {
+          "host": "api.eu.example.com",
+          "verdict": "failed",
+          "code": "name-mismatch"
+        }
+      ],
+      "hints": [
+        "A wildcard stands for something in one position. Count the labels in *.example.com, then in example.com and in api.eu.example.com.",
+        "Try each of the three names in the hostname box. The message names which kind of mistake each one is.",
+        "Each name that no entry covers needs its own entry: the bare domain, and a wildcard one level lower for the eu names."
+      ],
+      "fix": [
+        {
+          "path": "server.sans",
+          "value": "*.example.com, example.com, *.eu.example.com"
+        }
+      ],
+      "fixText": [
+        "Add example.com as its own SAN entry: *.example.com does not cover the bare domain.",
+        "Add *.eu.example.com (or the exact name api.eu.example.com): a wildcard covers exactly one label, so it does not reach api.eu.example.com."
+      ],
+      "expectFixed": [
+        {
+          "host": "shop.example.com",
+          "verdict": "success"
+        },
+        {
+          "host": "example.com",
+          "verdict": "success"
+        },
+        {
+          "host": "api.eu.example.com",
+          "verdict": "success"
+        }
+      ],
+      "lesson": "In a certificate, * is allowed only as the whole left-most label and stands for exactly one label (RFC 9525). So *.example.com covers www.example.com and shop.example.com, but not example.com (no label there) and not a.b.example.com (two labels). Wildcards also cannot be partial, such as w*.example.com.",
+      "related": [
+        "CISSP: Cryptography and PKI",
+        "SSCP: PKI and certificates"
+      ]
+    },
+    {
+      "id": "certs-private-ca",
+      "title": "The company wiki and the contractor's laptop",
+      "goal": "The client must trust the root that the server's chain ends at.",
+      "level": "core",
+      "story": "IT put the internal wiki behind a certificate issued by the company's own CA. Company laptops open it without a prompt. A contractor on a personal laptop gets \"your connection is not private\", and was told to just click Advanced and carry on.",
+      "topology": {
+        "server": {
+          "cn": "wiki.corp.example.com",
+          "sans": "wiki.corp.example.com",
+          "notBefore": "2026-09-12",
+          "notAfter": "2026-12-11",
+          "issuedBy": "intermediate",
+          "sendsIntermediate": true,
+          "eku": "server",
+          "sigAlg": "sha256rsa",
+          "revoked": false
+        },
+        "inter": {
+          "name": "Corp Issuing CA",
+          "notBefore": "2024-03-13",
+          "notAfter": "2034-03-11",
+          "sigAlg": "sha256rsa",
+          "revoked": false
+        },
+        "root": {
+          "id": "corp"
+        },
+        "client": {
+          "kind": "browser",
+          "hostname": "wiki.corp.example.com",
+          "date": "2026-10-11",
+          "trusted": [
+            "pub",
+            "other"
+          ],
+          "checkRevocation": true
+        }
+      },
+      "expect": [
+        {
+          "verdict": "failed",
+          "code": "untrusted-root"
+        }
+      ],
+      "hints": [
+        "The name, dates and chain checks pass. Read the failing check: whose root is at the top of the chain?",
+        "Open the client's trust store. Which roots does this laptop trust?",
+        "Company laptops trust the private root because IT put it there. Somebody has to decide that on this client too."
+      ],
+      "fix": [
+        {
+          "path": "client.trusted",
+          "add": "corp"
+        }
+      ],
+      "fixText": [
+        "Install the Corp Internal Root CA in the client's trust store. Company laptops get it from group policy or device management; for a contractor, hand over the root file through a trusted channel and let them check its fingerprint first.",
+        "Not a fix: sending the root with the server's chain (clients ignore it for trust) or telling users to click through the warning."
+      ],
+      "expectFixed": [
+        {
+          "verdict": "success"
+        }
+      ],
+      "lesson": "A client trusts a chain only if it ends at a root the client already holds. Public roots ship in operating systems and browsers; a private CA's root is trusted only by the machines that were configured to. Installing a root is a security decision: a trusted root can vouch for any name. Self-signed certificates fail the same way, because nothing the client trusts has signed them.",
+      "related": [
+        "CISSP: Cryptography and PKI",
+        "CISSP: certificate authorities"
+      ]
+    },
+    {
+      "id": "certs-missing-intermediate",
+      "title": "Works in the browser, fails in the batch job",
+      "goal": "The server must send every certificate a client needs to reach a root it trusts, not only its own.",
+      "level": "stretch",
+      "story": "The partner portal opens in every browser the developers try. The nightly Python job and the partner's curl command both fail with \"unable to get local issuer certificate\". The certificate is new, the name is right, and the trust stores are up to date.",
+      "topology": {
+        "server": {
+          "cn": "www.example.com",
+          "sans": "example.com, *.example.com",
+          "notBefore": "2026-09-12",
+          "notAfter": "2026-12-11",
+          "issuedBy": "intermediate",
+          "sendsIntermediate": false,
+          "eku": "server",
+          "sigAlg": "sha256rsa",
+          "revoked": false
+        },
+        "inter": {
+          "name": "Example Issuing CA 1",
+          "notBefore": "2024-03-13",
+          "notAfter": "2034-03-11",
+          "sigAlg": "sha256rsa",
+          "revoked": false
+        },
+        "root": {
+          "id": "pub"
+        },
+        "client": {
+          "kind": "api",
+          "hostname": "www.example.com",
+          "date": "2026-10-11",
+          "trusted": [
+            "pub",
+            "other"
+          ],
+          "checkRevocation": true
+        }
+      },
+      "ask": {
+        "kind": "api"
+      },
+      "expect": [
+        {
+          "kind": "browser",
+          "verdict": "success"
+        },
+        {
+          "kind": "api",
+          "verdict": "failed",
+          "code": "missing-intermediate"
+        }
+      ],
+      "hints": [
+        "Switch the client between \"Web browser\" and \"API client or script\" and run both. What differs?",
+        "The server certificate was issued by an intermediate CA, not by the root. Who is supposed to hand the client that intermediate?",
+        "Look at what the server sends. Which setting in the server's settings controls that?"
+      ],
+      "fix": [
+        {
+          "path": "server.sendsIntermediate",
+          "value": true
+        }
+      ],
+      "fixText": [
+        "Configure the web server to send the full chain: its own certificate followed by the intermediate (for example the \"fullchain\" file the CA or ACME client provides, instead of the certificate-only file)."
+      ],
+      "expectFixed": [
+        {
+          "kind": "browser",
+          "verdict": "success"
+        },
+        {
+          "kind": "api",
+          "verdict": "success"
+        }
+      ],
+      "lesson": "A server should send its certificate and the intermediates, so the client can build a path to a root it trusts (RFC 8446 section 4.4.2). Browsers often paper over a missing intermediate by using one cached from another site or downloading it from the certificate's Authority Information Access address. Libraries and scripts usually do not, so \"it works in my browser\" proves nothing; test the chain with a tool that does not repair it.",
+      "related": [
+        "CISSP: Cryptography and PKI",
+        "SSCP: PKI and certificates"
+      ]
+    },
+    {
+      "id": "certs-revoked",
+      "title": "The key turned up in a public repository",
+      "goal": "A certificate the CA has revoked must be replaced by a new one.",
+      "level": "stretch",
+      "story": "Yesterday the security team found the web server's private key in a public code repository and had the CA revoke the certificate. Today every managed laptop refuses the intranet site. The dates are fine and nothing else was changed.",
+      "topology": {
+        "server": {
+          "cn": "www.example.com",
+          "sans": "example.com, *.example.com",
+          "notBefore": "2026-09-12",
+          "notAfter": "2026-12-11",
+          "issuedBy": "intermediate",
+          "sendsIntermediate": true,
+          "eku": "server",
+          "sigAlg": "sha256rsa",
+          "revoked": true
+        },
+        "inter": {
+          "name": "Example Issuing CA 1",
+          "notBefore": "2024-03-13",
+          "notAfter": "2034-03-11",
+          "sigAlg": "sha256rsa",
+          "revoked": false
+        },
+        "root": {
+          "id": "pub"
+        },
+        "client": {
+          "kind": "browser",
+          "hostname": "www.example.com",
+          "date": "2026-10-11",
+          "trusted": [
+            "pub",
+            "other"
+          ],
+          "checkRevocation": true
+        }
+      },
+      "expect": [
+        {
+          "verdict": "failed",
+          "code": "revoked"
+        }
+      ],
+      "hints": [
+        "All the earlier checks pass, so the problem is about the certificate's status, not its content.",
+        "The client asks the CA whether the certificate is still good. What can the CA answer other than \"good\"?",
+        "Revocation is permanent: you do not undo it. Look for the server certificate setting that stands for the CA's answer."
+      ],
+      "fix": [
+        {
+          "path": "server.revoked",
+          "value": false
+        }
+      ],
+      "fixText": [
+        "Generate a new key pair, request a new certificate (it gets a new serial number) and install it. In the lab, clearing the \"revoked\" box stands for installing that replacement.",
+        "Treat the leaked key as compromised everywhere it was used, and find out how it escaped."
+      ],
+      "expectFixed": [
+        {
+          "verdict": "success",
+          "revocation": true
+        }
+      ],
+      "lesson": "A CA revokes a certificate before its expiry date when the key may be compromised or the certificate was wrongly issued, and publishes that in a certificate revocation list (CRL) or answers it live over OCSP. A revoked certificate stays revoked. Only clients that actually check revocation notice, so revocation is a safety net, not a guarantee.",
+      "related": [
+        "CISSP: Cryptography and PKI",
+        "CISSP: OCSP and CRL"
+      ]
+    },
+    {
+      "id": "certs-wrong-eku",
+      "title": "Name, dates and chain are all fine",
+      "goal": "A certificate for a web server must be allowed to serve as a web server (extended key usage serverAuth).",
+      "level": "stretch",
+      "story": "The new reporting site's certificate came from the company CA, and the administrator checked everything: the name is in the SAN, the dates are good, the chain is complete and the root is trusted. Browsers still refuse it. Someone remembers picking the first template in the request form.",
+      "topology": {
+        "server": {
+          "cn": "reports.corp.example.com",
+          "sans": "reports.corp.example.com",
+          "notBefore": "2026-09-12",
+          "notAfter": "2026-12-11",
+          "issuedBy": "intermediate",
+          "sendsIntermediate": true,
+          "eku": "client",
+          "sigAlg": "sha256rsa",
+          "revoked": false
+        },
+        "inter": {
+          "name": "Corp Issuing CA",
+          "notBefore": "2024-03-13",
+          "notAfter": "2034-03-11",
+          "sigAlg": "sha256rsa",
+          "revoked": false
+        },
+        "root": {
+          "id": "corp"
+        },
+        "client": {
+          "kind": "browser",
+          "hostname": "reports.corp.example.com",
+          "date": "2026-10-11",
+          "trusted": [
+            "pub",
+            "other",
+            "corp"
+          ],
+          "checkRevocation": true
+        }
+      },
+      "expect": [
+        {
+          "verdict": "failed",
+          "code": "wrong-eku"
+        }
+      ],
+      "hints": [
+        "Four checks pass and the fifth fails. Read its message: what is the certificate allowed to be used for?",
+        "Open \"Usage, signature and revocation\" on the server certificate and compare the extended key usage with what a web server needs."
+      ],
+      "fix": [
+        {
+          "path": "server.eku",
+          "value": "server"
+        }
+      ],
+      "fixText": [
+        "Request a new certificate from the \"web server\" template (extended key usage serverAuth) and install it. The EKU is part of the signed certificate, so it cannot be edited afterwards; in the lab, change the EKU to stand for the reissue."
+      ],
+      "expectFixed": [
+        {
+          "verdict": "success"
+        }
+      ],
+      "lesson": "The extended key usage says what a certificate may be used for. When the extension is present, a client must only use the certificate for the listed purposes (RFC 5280), and a TLS client looking at a web server requires serverAuth. A certificate made for client authentication, code signing or email is therefore refused as a server certificate, however good its name, dates and chain.",
+      "related": [
+        "CISSP: Cryptography and PKI",
+        "SSCP: PKI and certificates"
+      ]
+    }
+  ],
+  "certsSandbox": {
+    "server": {
+      "cn": "www.example.com",
+      "sans": "example.com, *.example.com",
+      "notBefore": "2026-09-12",
+      "notAfter": "2026-12-11",
+      "issuedBy": "intermediate",
+      "sendsIntermediate": true,
+      "eku": "server",
+      "sigAlg": "sha256rsa",
+      "revoked": false
+    },
+    "inter": {
+      "name": "Example Issuing CA 1",
+      "notBefore": "2024-03-13",
+      "notAfter": "2034-03-11",
+      "sigAlg": "sha256rsa",
+      "revoked": false
+    },
+    "root": {
+      "id": "pub"
+    },
+    "client": {
+      "kind": "browser",
+      "hostname": "www.example.com",
+      "date": "2026-10-11",
+      "trusted": [
+        "pub",
+        "other"
+      ],
+      "checkRevocation": true
+    }
+  },
   "dhcp": [
     {
       "id": "pool-too-small",
@@ -6212,6 +6856,1495 @@
         "gateway": ""
       }
     ]
+  },
+  "dns": [
+    {
+      "id": "wrong-record",
+      "title": "The intranet opens the printer page",
+      "goal": "Make intranet.example.com open the intranet server.",
+      "level": "starter",
+      "story": "Everyone can type intranet.example.com and the page starts to load, but it is the login page of the print server, not the intranet. Nothing is wrong with the network: the name resolves and the connection works. Somebody edited the DNS record last week.",
+      "topology": {
+        "zone": {
+          "name": "example.com",
+          "negativeTtl": 300,
+          "records": [
+            {
+              "id": "intranet",
+              "name": "intranet",
+              "type": "A",
+              "value": "10.0.1.21",
+              "ttl": 3600
+            },
+            {
+              "id": "files",
+              "name": "files",
+              "type": "A",
+              "value": "10.0.1.30",
+              "ttl": 3600
+            },
+            {
+              "id": "mail",
+              "name": "mail",
+              "type": "A",
+              "value": "10.0.1.25",
+              "ttl": 3600
+            },
+            {
+              "id": "mx",
+              "name": "@",
+              "type": "MX",
+              "value": "mail",
+              "ttl": 3600,
+              "pref": 10
+            }
+          ],
+          "internal": []
+        },
+        "auth": {
+          "name": "Zone server",
+          "ip": "10.0.0.54",
+          "online": true,
+          "splitHorizon": false
+        },
+        "resolvers": [
+          {
+            "id": "res",
+            "name": "Office resolver",
+            "ip": "10.0.0.53",
+            "online": true,
+            "upstream": "auth",
+            "network": "internal"
+          }
+        ],
+        "clients": [
+          {
+            "id": "ana",
+            "name": "Ana laptop",
+            "network": "internal",
+            "dns": "10.0.0.53",
+            "hosts": []
+          },
+          {
+            "id": "ben",
+            "name": "Ben desktop",
+            "network": "internal",
+            "dns": "10.0.0.53",
+            "hosts": []
+          }
+        ],
+        "machines": [
+          {
+            "id": "intranet",
+            "name": "Intranet server",
+            "ips": [
+              "10.0.1.20"
+            ],
+            "serves": [
+              "intranet.example.com"
+            ]
+          },
+          {
+            "id": "print",
+            "name": "Print server",
+            "ips": [
+              "10.0.1.21"
+            ],
+            "serves": []
+          },
+          {
+            "id": "files",
+            "name": "File server",
+            "ips": [
+              "10.0.1.30"
+            ],
+            "serves": [
+              "files.example.com"
+            ]
+          },
+          {
+            "id": "mail",
+            "name": "Mail server",
+            "ips": [
+              "10.0.1.25"
+            ],
+            "serves": [
+              "mail.example.com"
+            ]
+          }
+        ],
+        "hairpin": false
+      },
+      "expect": [
+        {
+          "client": "ana",
+          "name": "intranet.example.com",
+          "verdict": "failed",
+          "label": "Ana reaches the wrong machine",
+          "code": "wrong-record"
+        }
+      ],
+      "hints": [
+        "Run the lookup and read the trace: the name does resolve, so DNS answered. Ask yourself what is at the address it gave.",
+        "Compare the address in the intranet record with the addresses in the list of servers. The record has to hold the address of the machine that really serves the intranet.",
+        "Change the value of the intranet A record from 10.0.1.21 to 10.0.1.20, the intranet server. If the next lookup still shows the old address, the resolver has cached it: use \"Flush and look again\" under the result."
+      ],
+      "fix": [
+        {
+          "path": "zone.records.#intranet.value",
+          "value": "10.0.1.20"
+        }
+      ],
+      "fixText": [
+        "In the zone, change the value of the intranet A record from 10.0.1.21 (the print server) to 10.0.1.20 (the intranet server)."
+      ],
+      "expectFixed": [
+        {
+          "client": "ana",
+          "name": "intranet.example.com",
+          "verdict": "success",
+          "label": "Ana reaches the intranet server",
+          "answer": [
+            "10.0.1.20"
+          ]
+        },
+        {
+          "client": "ben",
+          "name": "intranet.example.com",
+          "verdict": "success",
+          "label": "Ben reaches the intranet server",
+          "answer": [
+            "10.0.1.20"
+          ]
+        },
+        {
+          "client": "ana",
+          "name": "files.example.com",
+          "verdict": "success",
+          "label": "The file server still works"
+        }
+      ],
+      "lesson": "A record is only a statement that a name maps to an address; DNS never checks that the address belongs to the right machine. So \"the name resolves\" and \"the name goes to the right place\" are two different questions. When a name gives the wrong site or a timeout, compare the value in the record with the real address of the server before you blame the network.",
+      "related": [
+        "CCNA: DNS"
+      ]
+    },
+    {
+      "id": "wrong-dns-server",
+      "title": "Ben can ping addresses but not names",
+      "goal": "Make every laptop able to look up names.",
+      "level": "starter",
+      "story": "Ben says \"the internet is down\", yet he can ping 10.0.1.20 and 10.0.1.30 by address. Ana, next to him, opens www.example.com and files.example.com without problems. The resolver and the zone are fine.",
+      "topology": {
+        "zone": {
+          "name": "example.com",
+          "negativeTtl": 300,
+          "records": [
+            {
+              "id": "www",
+              "name": "www",
+              "type": "A",
+              "value": "10.0.1.20",
+              "ttl": 3600
+            },
+            {
+              "id": "files",
+              "name": "files",
+              "type": "A",
+              "value": "10.0.1.30",
+              "ttl": 3600
+            }
+          ],
+          "internal": []
+        },
+        "auth": {
+          "name": "Zone server",
+          "ip": "10.0.0.54",
+          "online": true,
+          "splitHorizon": false
+        },
+        "resolvers": [
+          {
+            "id": "res",
+            "name": "Office resolver",
+            "ip": "10.0.0.53",
+            "online": true,
+            "upstream": "auth",
+            "network": "internal"
+          }
+        ],
+        "clients": [
+          {
+            "id": "ana",
+            "name": "Ana laptop",
+            "network": "internal",
+            "dns": "10.0.0.53",
+            "hosts": []
+          },
+          {
+            "id": "ben",
+            "name": "Ben laptop",
+            "network": "internal",
+            "dns": "10.0.0.35",
+            "hosts": []
+          }
+        ],
+        "machines": [
+          {
+            "id": "web",
+            "name": "Web server",
+            "ips": [
+              "10.0.1.20"
+            ],
+            "serves": [
+              "www.example.com"
+            ]
+          },
+          {
+            "id": "files",
+            "name": "File server",
+            "ips": [
+              "10.0.1.30"
+            ],
+            "serves": [
+              "files.example.com"
+            ]
+          }
+        ],
+        "hairpin": false
+      },
+      "expect": [
+        {
+          "client": "ben",
+          "name": "www.example.com",
+          "verdict": "failed",
+          "label": "Ben cannot look up names",
+          "code": "wrong-dns-server"
+        },
+        {
+          "client": "ana",
+          "name": "www.example.com",
+          "verdict": "success",
+          "label": "Ana can look up names"
+        }
+      ],
+      "hints": [
+        "Only one laptop is affected, and pinging an address works. So the network is fine; something in this laptop's own settings is different from Ana's.",
+        "Open the Clients editor and compare the DNS server address of the two laptops with the address of the resolver.",
+        "Ben's DNS server is 10.0.0.35, a typing mistake. Set it to the resolver's address, 10.0.0.53."
+      ],
+      "fix": [
+        {
+          "path": "clients.#ben.dns",
+          "value": "10.0.0.53"
+        }
+      ],
+      "fixText": [
+        "In the Clients editor, change Ben laptop's DNS server from 10.0.0.35 to 10.0.0.53, the address of the Office resolver."
+      ],
+      "expectFixed": [
+        {
+          "client": "ben",
+          "name": "www.example.com",
+          "verdict": "success",
+          "label": "Ben can look up www.example.com"
+        },
+        {
+          "client": "ben",
+          "name": "files.example.com",
+          "verdict": "success",
+          "label": "Ben can look up files.example.com"
+        },
+        {
+          "client": "ana",
+          "name": "www.example.com",
+          "verdict": "success",
+          "label": "Ana can still look up names"
+        }
+      ],
+      "lesson": "A client sends every DNS query to the DNS server in its own IP settings (usually handed out by DHCP together with the address, mask and gateway). If that address is wrong, or nothing answers there, every lookup waits and then times out, although traffic to IP addresses works. \"I can ping the address but not the name\" points at DNS settings; nslookup or dig against the intended server shows whether it answers.",
+      "related": [
+        "CCNA: DNS",
+        "CCNA: DHCP"
+      ]
+    },
+    {
+      "id": "nxdomain",
+      "title": "Helpdesk: server not found",
+      "goal": "Make helpdesk.example.com resolve for everyone.",
+      "level": "core",
+      "story": "The helpdesk team moved their ticket system to a new server and added a DNS record for it. Now everybody gets \"server not found\" for helpdesk.example.com. The server itself is up and answers on 10.0.1.40.",
+      "topology": {
+        "zone": {
+          "name": "example.com",
+          "negativeTtl": 300,
+          "records": [
+            {
+              "id": "helpdesk",
+              "name": "helpdsk",
+              "type": "A",
+              "value": "10.0.1.40",
+              "ttl": 3600
+            },
+            {
+              "id": "www",
+              "name": "www",
+              "type": "A",
+              "value": "10.0.1.20",
+              "ttl": 3600
+            }
+          ],
+          "internal": []
+        },
+        "auth": {
+          "name": "Zone server",
+          "ip": "10.0.0.54",
+          "online": true,
+          "splitHorizon": false
+        },
+        "resolvers": [
+          {
+            "id": "res",
+            "name": "Office resolver",
+            "ip": "10.0.0.53",
+            "online": true,
+            "upstream": "auth",
+            "network": "internal"
+          }
+        ],
+        "clients": [
+          {
+            "id": "ana",
+            "name": "Ana laptop",
+            "network": "internal",
+            "dns": "10.0.0.53",
+            "hosts": []
+          },
+          {
+            "id": "ben",
+            "name": "Ben desktop",
+            "network": "internal",
+            "dns": "10.0.0.53",
+            "hosts": []
+          }
+        ],
+        "machines": [
+          {
+            "id": "helpdesk",
+            "name": "Helpdesk server",
+            "ips": [
+              "10.0.1.40"
+            ],
+            "serves": [
+              "helpdesk.example.com"
+            ]
+          },
+          {
+            "id": "web",
+            "name": "Web server",
+            "ips": [
+              "10.0.1.20"
+            ],
+            "serves": [
+              "www.example.com"
+            ]
+          }
+        ],
+        "hairpin": false
+      },
+      "expect": [
+        {
+          "client": "ana",
+          "name": "helpdesk.example.com",
+          "verdict": "failed",
+          "label": "The name does not exist",
+          "code": "nxdomain"
+        }
+      ],
+      "hints": [
+        "Read the result: the zone server answers NXDOMAIN, which means \"no record of that name exists\". It is not a problem of the server being down.",
+        "Compare the name that is asked for, helpdesk.example.com, with the names of the records in the zone, letter by letter.",
+        "The record is called helpdsk. Rename it to helpdesk. If it still fails afterwards, the resolver may have remembered the failure: flush its cache or move the clock forward 5 minutes."
+      ],
+      "fix": [
+        {
+          "path": "zone.records.#helpdesk.name",
+          "value": "helpdesk"
+        }
+      ],
+      "fixText": [
+        "In the zone, rename the record helpdsk to helpdesk (the value 10.0.1.40 is right).",
+        "If the resolver still answers \"no such name\", it cached the failure (negative caching): flush its cache or advance the clock by 5 minutes."
+      ],
+      "expectFixed": [
+        {
+          "client": "ana",
+          "name": "helpdesk.example.com",
+          "verdict": "success",
+          "label": "Ana reaches the helpdesk server",
+          "answer": [
+            "10.0.1.40"
+          ]
+        },
+        {
+          "client": "ben",
+          "name": "helpdesk.example.com",
+          "verdict": "success",
+          "label": "Ben reaches the helpdesk server",
+          "answer": [
+            "10.0.1.40"
+          ]
+        },
+        {
+          "client": "ana",
+          "name": "www.example.com",
+          "verdict": "success",
+          "label": "www still works"
+        }
+      ],
+      "lesson": "NXDOMAIN (\"non-existent domain\") means the server is sure the name does not exist: usually a typo in the record name or in the name being looked up, or a record that was never created. Resolvers cache that negative answer too, for the zone's negative TTL (RFC 2308), so after you fix the zone a resolver may keep answering \"no such name\" for a few more minutes. Fixing the zone does not clear a cached answer.",
+      "related": [
+        "CCNA: DNS"
+      ]
+    },
+    {
+      "id": "cname-loop",
+      "title": "Two aliases chase each other",
+      "goal": "Make www.example.com resolve to the web server.",
+      "level": "core",
+      "story": "Someone tidied the zone and turned the web server's name into an alias, \"so there is only one place to change the address\". Since then www.example.com fails for everyone with a server failure, while files.example.com still works.",
+      "topology": {
+        "zone": {
+          "name": "example.com",
+          "negativeTtl": 300,
+          "records": [
+            {
+              "id": "www",
+              "name": "www",
+              "type": "CNAME",
+              "value": "web",
+              "ttl": 3600
+            },
+            {
+              "id": "web",
+              "name": "web",
+              "type": "CNAME",
+              "value": "www",
+              "ttl": 3600
+            },
+            {
+              "id": "files",
+              "name": "files",
+              "type": "A",
+              "value": "10.0.1.30",
+              "ttl": 3600
+            }
+          ],
+          "internal": []
+        },
+        "auth": {
+          "name": "Zone server",
+          "ip": "10.0.0.54",
+          "online": true,
+          "splitHorizon": false
+        },
+        "resolvers": [
+          {
+            "id": "res",
+            "name": "Office resolver",
+            "ip": "10.0.0.53",
+            "online": true,
+            "upstream": "auth",
+            "network": "internal"
+          }
+        ],
+        "clients": [
+          {
+            "id": "ana",
+            "name": "Ana laptop",
+            "network": "internal",
+            "dns": "10.0.0.53",
+            "hosts": []
+          },
+          {
+            "id": "ben",
+            "name": "Ben desktop",
+            "network": "internal",
+            "dns": "10.0.0.53",
+            "hosts": []
+          }
+        ],
+        "machines": [
+          {
+            "id": "web",
+            "name": "Web server",
+            "ips": [
+              "10.0.1.20"
+            ],
+            "serves": [
+              "www.example.com",
+              "web.example.com"
+            ]
+          },
+          {
+            "id": "files",
+            "name": "File server",
+            "ips": [
+              "10.0.1.30"
+            ],
+            "serves": [
+              "files.example.com"
+            ]
+          }
+        ],
+        "hairpin": false
+      },
+      "expect": [
+        {
+          "client": "ana",
+          "name": "www.example.com",
+          "verdict": "failed",
+          "label": "The aliases never reach an address",
+          "code": "cname-loop"
+        },
+        {
+          "client": "ana",
+          "name": "files.example.com",
+          "verdict": "success",
+          "label": "files still works"
+        }
+      ],
+      "hints": [
+        "A CNAME record says \"this name is another name for that one\". Follow the chain starting at www, one record at a time, and write down every name you visit.",
+        "www points at web and web points at www. An alias chain has to end at a name that holds an address (an A record).",
+        "Turn the web record into an A record with the web server's address, 10.0.1.20. Then www is an alias of web, and web has an address. The resolver may have cached the loop: flush it and look again."
+      ],
+      "fix": [
+        {
+          "path": "zone.records.#web.type",
+          "value": "A"
+        },
+        {
+          "path": "zone.records.#web.value",
+          "value": "10.0.1.20"
+        }
+      ],
+      "fixText": [
+        "In the zone, change the web record from a CNAME to an A record with the value 10.0.1.20.",
+        "The www record can stay an alias of web."
+      ],
+      "expectFixed": [
+        {
+          "client": "ana",
+          "name": "www.example.com",
+          "verdict": "success",
+          "label": "Ana reaches the web server through the alias",
+          "answer": [
+            "10.0.1.20"
+          ]
+        },
+        {
+          "client": "ben",
+          "name": "www.example.com",
+          "verdict": "success",
+          "label": "Ben reaches the web server",
+          "answer": [
+            "10.0.1.20"
+          ]
+        },
+        {
+          "client": "ana",
+          "name": "web.example.com",
+          "verdict": "success",
+          "label": "web.example.com resolves too",
+          "answer": [
+            "10.0.1.20"
+          ]
+        }
+      ],
+      "lesson": "A CNAME makes one name an alias of another; the resolver restarts the lookup at the target and repeats until it meets a name with the wanted record type. If aliases form a circle it never reaches an address, so the resolver gives up (typically with SERVFAIL) and every lookup of those names fails. Chains also cost one extra lookup per alias, so keep them short, and end every chain at an A or AAAA record.",
+      "related": [
+        "CCNA: DNS"
+      ]
+    },
+    {
+      "id": "hosts-override",
+      "title": "Only Dave still sees the old intranet",
+      "goal": "Make Dave's PC reach the same intranet server as everybody else.",
+      "level": "core",
+      "story": "The intranet moved to a new server last month and DNS was updated at once. Everyone reaches it, except Dave, whose browser says the connection timed out. His colleague at the next desk has no trouble. Dave's PC is the oldest in the office.",
+      "topology": {
+        "zone": {
+          "name": "example.com",
+          "negativeTtl": 300,
+          "records": [
+            {
+              "id": "intranet",
+              "name": "intranet",
+              "type": "A",
+              "value": "10.0.1.20",
+              "ttl": 3600
+            },
+            {
+              "id": "files",
+              "name": "files",
+              "type": "A",
+              "value": "10.0.1.30",
+              "ttl": 3600
+            }
+          ],
+          "internal": []
+        },
+        "auth": {
+          "name": "Zone server",
+          "ip": "10.0.0.54",
+          "online": true,
+          "splitHorizon": false
+        },
+        "resolvers": [
+          {
+            "id": "res",
+            "name": "Office resolver",
+            "ip": "10.0.0.53",
+            "online": true,
+            "upstream": "auth",
+            "network": "internal"
+          }
+        ],
+        "clients": [
+          {
+            "id": "ana",
+            "name": "Ana laptop",
+            "network": "internal",
+            "dns": "10.0.0.53",
+            "hosts": []
+          },
+          {
+            "id": "dave",
+            "name": "Dave's PC",
+            "network": "internal",
+            "dns": "10.0.0.53",
+            "hosts": [
+              {
+                "name": "intranet.example.com",
+                "ip": "10.0.1.19"
+              }
+            ]
+          }
+        ],
+        "machines": [
+          {
+            "id": "intranet",
+            "name": "Intranet server",
+            "ips": [
+              "10.0.1.20"
+            ],
+            "serves": [
+              "intranet.example.com"
+            ]
+          },
+          {
+            "id": "files",
+            "name": "File server",
+            "ips": [
+              "10.0.1.30"
+            ],
+            "serves": [
+              "files.example.com"
+            ]
+          }
+        ],
+        "hairpin": false
+      },
+      "expect": [
+        {
+          "client": "dave",
+          "name": "intranet.example.com",
+          "verdict": "failed",
+          "label": "Dave still goes to the old address",
+          "code": "hosts-override"
+        },
+        {
+          "client": "ana",
+          "name": "intranet.example.com",
+          "verdict": "success",
+          "label": "Ana reaches the intranet"
+        }
+      ],
+      "hints": [
+        "DNS is fine for everyone else, so look for something that is different on this one PC. Read the first steps of its trace.",
+        "Most systems read a local hosts file (a list of name-to-address lines) before they ask a DNS server, and a line there wins. Open the Clients editor and look at Dave's hosts file.",
+        "Delete the line that maps intranet.example.com to 10.0.1.19 from Dave's hosts file."
+      ],
+      "fix": [
+        {
+          "remove": "clients.#dave.hosts.0"
+        }
+      ],
+      "fixText": [
+        "In the Clients editor, delete the hosts file line intranet.example.com 10.0.1.19 from Dave's PC."
+      ],
+      "expectFixed": [
+        {
+          "client": "dave",
+          "name": "intranet.example.com",
+          "verdict": "success",
+          "label": "Dave reaches the intranet server",
+          "answer": [
+            "10.0.1.20"
+          ]
+        },
+        {
+          "client": "ana",
+          "name": "intranet.example.com",
+          "verdict": "success",
+          "label": "Ana still reaches the intranet",
+          "answer": [
+            "10.0.1.20"
+          ]
+        }
+      ],
+      "lesson": "Before a computer asks a DNS server, it normally checks its local hosts file, and a matching line wins. That is handy for testing, but forgotten lines outlive the servers they pointed to, and they affect only that one machine, so changing DNS never helps it. When one device disagrees with all the others, check its hosts file and its DNS cache before touching the zone.",
+      "related": [
+        "CCNA: DNS"
+      ]
+    },
+    {
+      "id": "stale-cache",
+      "title": "Half the office still reaches the old web server",
+      "goal": "Make a web server move show up for everyone within ten minutes.",
+      "level": "stretch",
+      "story": "The company moved www.example.com to a new server (10.0.1.30) and changed the A record immediately. An hour later some people still land on the old server (10.0.1.20) and others do not. The record says 10.0.1.30 and its TTL is one day. Use \"Replay the story\" to watch the cache.",
+      "topology": {
+        "zone": {
+          "name": "example.com",
+          "negativeTtl": 300,
+          "records": [
+            {
+              "id": "www",
+              "name": "www",
+              "type": "A",
+              "value": "10.0.1.30",
+              "ttl": "1d"
+            },
+            {
+              "id": "mail",
+              "name": "mail",
+              "type": "A",
+              "value": "10.0.1.25",
+              "ttl": 3600
+            }
+          ],
+          "internal": []
+        },
+        "auth": {
+          "name": "Zone server",
+          "ip": "10.0.0.54",
+          "online": true,
+          "splitHorizon": false
+        },
+        "resolvers": [
+          {
+            "id": "res",
+            "name": "Office resolver",
+            "ip": "10.0.0.53",
+            "online": true,
+            "upstream": "auth",
+            "network": "internal"
+          }
+        ],
+        "clients": [
+          {
+            "id": "ana",
+            "name": "Ana laptop",
+            "network": "internal",
+            "dns": "10.0.0.53",
+            "hosts": []
+          },
+          {
+            "id": "ben",
+            "name": "Ben desktop",
+            "network": "internal",
+            "dns": "10.0.0.53",
+            "hosts": []
+          }
+        ],
+        "machines": [
+          {
+            "id": "old",
+            "name": "Old web server",
+            "ips": [
+              "10.0.1.20"
+            ],
+            "serves": []
+          },
+          {
+            "id": "new",
+            "name": "New web server",
+            "ips": [
+              "10.0.1.30"
+            ],
+            "serves": [
+              "www.example.com"
+            ]
+          },
+          {
+            "id": "mail",
+            "name": "Mail server",
+            "ips": [
+              "10.0.1.25"
+            ],
+            "serves": [
+              "mail.example.com"
+            ]
+          }
+        ],
+        "hairpin": false
+      },
+      "expect": [
+        {
+          "client": "ana",
+          "name": "www.example.com",
+          "verdict": "failed",
+          "label": "Ten minutes after the move Ana still gets the old address",
+          "code": "stale-cache",
+          "script": [
+            {
+              "do": "edit",
+              "path": "zone.records.#www.value",
+              "value": "10.0.1.20"
+            },
+            {
+              "do": "query"
+            },
+            {
+              "do": "edit",
+              "path": "zone.records.#www.value",
+              "value": "10.0.1.30"
+            },
+            {
+              "do": "advance",
+              "minutes": 10
+            }
+          ]
+        }
+      ],
+      "hints": [
+        "Replay the story and look at the cache table: the resolver kept the old answer, and it will keep it until the TTL runs out. Changing the zone does not reach into a cache.",
+        "The only thing the zone owner controls is how long resolvers may keep a record: the TTL. The goal says that ten minutes after the move the new address must be seen.",
+        "Set the TTL of the www record to 300 seconds (5 min) or anything up to 10 minutes. In real life you lower the TTL one old TTL before the move, change the record, and raise the TTL afterwards."
+      ],
+      "fix": [
+        {
+          "path": "zone.records.#www.ttl",
+          "value": 300
+        }
+      ],
+      "fixText": [
+        "Set the TTL of the www record to 300 (5 minutes). The replay assumes the lower TTL was already in place before the move.",
+        "In real life, lower the TTL at least one old TTL (here a day) before the change, change the record, and raise the TTL again once everything works."
+      ],
+      "expectFixed": [
+        {
+          "client": "ana",
+          "name": "www.example.com",
+          "verdict": "success",
+          "label": "Ten minutes after the move Ana gets the new address",
+          "script": [
+            {
+              "do": "edit",
+              "path": "zone.records.#www.value",
+              "value": "10.0.1.20"
+            },
+            {
+              "do": "query"
+            },
+            {
+              "do": "edit",
+              "path": "zone.records.#www.value",
+              "value": "10.0.1.30"
+            },
+            {
+              "do": "advance",
+              "minutes": 10
+            }
+          ],
+          "answer": [
+            "10.0.1.30"
+          ]
+        },
+        {
+          "client": "ben",
+          "name": "www.example.com",
+          "verdict": "success",
+          "label": "Ten minutes after the move Ben gets the new address",
+          "script": [
+            {
+              "do": "edit",
+              "path": "zone.records.#www.value",
+              "value": "10.0.1.20"
+            },
+            {
+              "do": "query"
+            },
+            {
+              "do": "edit",
+              "path": "zone.records.#www.value",
+              "value": "10.0.1.30"
+            },
+            {
+              "do": "advance",
+              "minutes": 10
+            }
+          ],
+          "answer": [
+            "10.0.1.30"
+          ]
+        }
+      ],
+      "lesson": "A resolver keeps each record for its TTL and does not ask again until that runs out, so a change in the zone reaches clients only as the cached copies expire: up to one full TTL later. The cached copy keeps the TTL it had when it was stored, so lowering the TTL after a change does not help. Lower it ahead of a planned change (at least one old TTL earlier), make the change, then raise it again. Low TTLs mean more queries to your server, which is why they are not the default.",
+      "related": [
+        "CCNA: DNS"
+      ]
+    },
+    {
+      "id": "cname-apex",
+      "title": "The whole domain stopped working",
+      "goal": "Make example.com, www and the mail records resolve again.",
+      "level": "stretch",
+      "story": "The owner wanted people who type just example.com (no www) to reach the website, so the admin added a CNAME for the bare domain pointing at www. Within minutes web and mail were both down: every lookup of the domain fails with a server failure.",
+      "topology": {
+        "zone": {
+          "name": "example.com",
+          "negativeTtl": 300,
+          "records": [
+            {
+              "id": "apex",
+              "name": "@",
+              "type": "CNAME",
+              "value": "www",
+              "ttl": 3600
+            },
+            {
+              "id": "mx",
+              "name": "@",
+              "type": "MX",
+              "value": "mail",
+              "ttl": 3600,
+              "pref": 10
+            },
+            {
+              "id": "www",
+              "name": "www",
+              "type": "A",
+              "value": "10.0.1.20",
+              "ttl": 3600
+            },
+            {
+              "id": "mail",
+              "name": "mail",
+              "type": "A",
+              "value": "10.0.1.25",
+              "ttl": 3600
+            }
+          ],
+          "internal": []
+        },
+        "auth": {
+          "name": "Zone server",
+          "ip": "10.0.0.54",
+          "online": true,
+          "splitHorizon": false
+        },
+        "resolvers": [
+          {
+            "id": "res",
+            "name": "Office resolver",
+            "ip": "10.0.0.53",
+            "online": true,
+            "upstream": "auth",
+            "network": "internal"
+          }
+        ],
+        "clients": [
+          {
+            "id": "ana",
+            "name": "Ana laptop",
+            "network": "internal",
+            "dns": "10.0.0.53",
+            "hosts": []
+          }
+        ],
+        "machines": [
+          {
+            "id": "web",
+            "name": "Web server",
+            "ips": [
+              "10.0.1.20"
+            ],
+            "serves": [
+              "www.example.com",
+              "example.com"
+            ]
+          },
+          {
+            "id": "mail",
+            "name": "Mail server",
+            "ips": [
+              "10.0.1.25"
+            ],
+            "serves": [
+              "mail.example.com"
+            ]
+          }
+        ],
+        "hairpin": false
+      },
+      "expect": [
+        {
+          "client": "ana",
+          "name": "example.com",
+          "verdict": "failed",
+          "label": "The zone is refused because of the apex CNAME",
+          "code": "cname-apex"
+        },
+        {
+          "client": "ana",
+          "name": "www.example.com",
+          "verdict": "failed",
+          "label": "Even www fails",
+          "code": "cname-apex"
+        }
+      ],
+      "hints": [
+        "Read the diagnosis: it names the record that makes the whole zone invalid. Look at which name that record belongs to.",
+        "The bare domain (the zone apex, written @) already holds other records, such as the MX record for mail. A CNAME means \"this name has no data of its own\", so it cannot share a name with any other record.",
+        "Change the apex record from a CNAME to an A record with the web server's address, 10.0.1.20."
+      ],
+      "fix": [
+        {
+          "path": "zone.records.#apex.type",
+          "value": "A"
+        },
+        {
+          "path": "zone.records.#apex.value",
+          "value": "10.0.1.20"
+        }
+      ],
+      "fixText": [
+        "Change the record for @ from a CNAME to an A record with the value 10.0.1.20.",
+        "Some DNS providers offer an \"alias\" or \"flattening\" record for this case, but that is a provider feature, not standard DNS."
+      ],
+      "expectFixed": [
+        {
+          "client": "ana",
+          "name": "example.com",
+          "verdict": "success",
+          "label": "example.com resolves to the web server",
+          "answer": [
+            "10.0.1.20"
+          ]
+        },
+        {
+          "client": "ana",
+          "name": "www.example.com",
+          "verdict": "success",
+          "label": "www.example.com resolves too",
+          "answer": [
+            "10.0.1.20"
+          ]
+        },
+        {
+          "client": "ana",
+          "name": "example.com",
+          "verdict": "success",
+          "label": "The mail exchanger is found",
+          "type": "MX",
+          "answer": [
+            "10 mail.example.com"
+          ]
+        }
+      ],
+      "lesson": "A CNAME says \"this name is only an alias\" and the name can hold no other data (RFC 1034 section 3.6.2, RFC 2181 section 10.1). The zone apex always holds the zone's SOA and NS records, and usually MX records too, so a CNAME there is not allowed. Servers differ in how they react (refusing the record, or refusing the whole zone as in this lab), but the safe answer is always an A or AAAA record at the apex.",
+      "related": [
+        "CCNA: DNS"
+      ]
+    },
+    {
+      "id": "split-horizon",
+      "title": "Inside the office the website is unreachable",
+      "goal": "Give inside clients the inside addresses and keep the public addresses for the outside.",
+      "level": "stretch",
+      "story": "The web and mail servers are in the office and reachable from the Internet through public addresses (203.0.113.10 and .25). The remote worker has no problems. Inside the office www.example.com times out: DNS hands out the public address, and the firewall does not send inside traffic out and back in.",
+      "topology": {
+        "zone": {
+          "name": "example.com",
+          "negativeTtl": 300,
+          "records": [
+            {
+              "id": "www",
+              "name": "www",
+              "type": "A",
+              "value": "203.0.113.10",
+              "ttl": 3600
+            },
+            {
+              "id": "mail",
+              "name": "mail",
+              "type": "A",
+              "value": "203.0.113.25",
+              "ttl": 3600
+            }
+          ],
+          "internal": []
+        },
+        "auth": {
+          "name": "Zone server",
+          "ip": "10.0.0.54",
+          "online": true,
+          "splitHorizon": false
+        },
+        "resolvers": [
+          {
+            "id": "res",
+            "name": "Office resolver",
+            "ip": "10.0.0.53",
+            "online": true,
+            "upstream": "auth",
+            "network": "internal"
+          },
+          {
+            "id": "isp",
+            "name": "ISP resolver",
+            "ip": "198.51.100.53",
+            "online": true,
+            "upstream": "auth",
+            "network": "external"
+          }
+        ],
+        "clients": [
+          {
+            "id": "ana",
+            "name": "Ana laptop",
+            "network": "internal",
+            "dns": "10.0.0.53",
+            "hosts": []
+          },
+          {
+            "id": "remote",
+            "name": "Remote worker",
+            "network": "external",
+            "dns": "198.51.100.53",
+            "hosts": []
+          }
+        ],
+        "machines": [
+          {
+            "id": "web",
+            "name": "Web server",
+            "ips": [
+              "10.0.1.20",
+              "203.0.113.10"
+            ],
+            "serves": [
+              "www.example.com"
+            ]
+          },
+          {
+            "id": "mail",
+            "name": "Mail server",
+            "ips": [
+              "10.0.1.25",
+              "203.0.113.25"
+            ],
+            "serves": [
+              "mail.example.com"
+            ]
+          }
+        ],
+        "hairpin": false
+      },
+      "expect": [
+        {
+          "client": "ana",
+          "name": "www.example.com",
+          "verdict": "failed",
+          "label": "Ana gets the public address and cannot connect",
+          "code": "split-horizon"
+        },
+        {
+          "client": "remote",
+          "name": "www.example.com",
+          "verdict": "success",
+          "label": "The remote worker reaches www",
+          "answer": [
+            "203.0.113.10"
+          ]
+        }
+      ],
+      "hints": [
+        "Compare the addresses: the outside world needs the public address, but a computer in the office should talk to the server directly with its inside address.",
+        "Split-horizon DNS answers the same name differently for inside and outside. Turn it on in the Zone server settings, then look at the internal view: what goes in it?",
+        "Turn on split-horizon, then add www (10.0.1.20) and mail (10.0.1.25) to the internal records. An internal view has to contain every name the inside needs, or those names do not exist for the inside. If the old public answer is still cached, flush the resolver and look again."
+      ],
+      "fix": [
+        {
+          "path": "auth.splitHorizon",
+          "value": true
+        },
+        {
+          "push": "zone.internal",
+          "value": {
+            "id": "i-www",
+            "name": "www",
+            "type": "A",
+            "value": "10.0.1.20",
+            "ttl": 3600
+          }
+        },
+        {
+          "push": "zone.internal",
+          "value": {
+            "id": "i-mail",
+            "name": "mail",
+            "type": "A",
+            "value": "10.0.1.25",
+            "ttl": 3600
+          }
+        }
+      ],
+      "fixText": [
+        "Turn on split-horizon DNS on the zone server.",
+        "In the internal records add www A 10.0.1.20 and mail A 10.0.1.25.",
+        "The public records stay as they are, so the remote worker keeps the public addresses.",
+        "Turning on hairpin NAT in the firewall would also let inside clients use the public address, but this goal asks for the inside addresses."
+      ],
+      "expectFixed": [
+        {
+          "client": "ana",
+          "name": "www.example.com",
+          "verdict": "success",
+          "label": "Ana gets the inside address of www",
+          "answer": [
+            "10.0.1.20"
+          ]
+        },
+        {
+          "client": "ana",
+          "name": "mail.example.com",
+          "verdict": "success",
+          "label": "Ana gets the inside address of mail",
+          "answer": [
+            "10.0.1.25"
+          ]
+        },
+        {
+          "client": "remote",
+          "name": "www.example.com",
+          "verdict": "success",
+          "label": "The remote worker still gets the public address",
+          "answer": [
+            "203.0.113.10"
+          ]
+        }
+      ],
+      "lesson": "With split-horizon DNS (also called split-brain DNS) one server answers the same name differently depending on who asks: the inside view gives inside addresses, the public view gives public ones. It avoids hairpin NAT and keeps private addresses out of public DNS. The trap is that the internal view is a separate zone: every name the inside needs must be in it, or inside clients get NXDOMAIN for names that exist outside.",
+      "related": [
+        "CCNA: DNS",
+        "CCNA: NAT"
+      ]
+    }
+  ],
+  "dnsSandbox": {
+    "zone": {
+      "name": "example.com",
+      "negativeTtl": 300,
+      "records": [
+        {
+          "id": "www",
+          "name": "www",
+          "type": "A",
+          "value": "203.0.113.10",
+          "ttl": 300
+        },
+        {
+          "id": "apex",
+          "name": "@",
+          "type": "A",
+          "value": "203.0.113.10",
+          "ttl": 300
+        },
+        {
+          "id": "mail",
+          "name": "mail",
+          "type": "A",
+          "value": "203.0.113.25",
+          "ttl": 3600
+        },
+        {
+          "id": "mx",
+          "name": "@",
+          "type": "MX",
+          "value": "mail",
+          "ttl": 3600,
+          "pref": 10
+        }
+      ],
+      "internal": [
+        {
+          "id": "i-www",
+          "name": "www",
+          "type": "A",
+          "value": "10.0.1.20",
+          "ttl": 300
+        },
+        {
+          "id": "i-apex",
+          "name": "@",
+          "type": "A",
+          "value": "10.0.1.20",
+          "ttl": 300
+        },
+        {
+          "id": "i-mail",
+          "name": "mail",
+          "type": "A",
+          "value": "10.0.1.25",
+          "ttl": 3600
+        },
+        {
+          "id": "i-mx",
+          "name": "@",
+          "type": "MX",
+          "value": "mail",
+          "ttl": 3600,
+          "pref": 10
+        },
+        {
+          "id": "i-intranet",
+          "name": "intranet",
+          "type": "CNAME",
+          "value": "www",
+          "ttl": 3600
+        },
+        {
+          "id": "i-files",
+          "name": "files",
+          "type": "A",
+          "value": "10.0.1.30",
+          "ttl": 3600
+        },
+        {
+          "id": "i-helpdesk",
+          "name": "helpdesk",
+          "type": "A",
+          "value": "10.0.1.40",
+          "ttl": 3600
+        }
+      ]
+    },
+    "auth": {
+      "name": "Zone server",
+      "ip": "10.0.0.54",
+      "online": true,
+      "splitHorizon": true
+    },
+    "resolvers": [
+      {
+        "id": "res",
+        "name": "Office resolver",
+        "ip": "10.0.0.53",
+        "online": true,
+        "upstream": "auth",
+        "network": "internal"
+      },
+      {
+        "id": "isp",
+        "name": "ISP resolver",
+        "ip": "198.51.100.53",
+        "online": true,
+        "upstream": "auth",
+        "network": "external"
+      }
+    ],
+    "clients": [
+      {
+        "id": "ana",
+        "name": "Ana laptop",
+        "network": "internal",
+        "dns": "10.0.0.53",
+        "hosts": []
+      },
+      {
+        "id": "ben",
+        "name": "Ben desktop",
+        "network": "internal",
+        "dns": "10.0.0.53",
+        "hosts": []
+      },
+      {
+        "id": "remote",
+        "name": "Remote worker",
+        "network": "external",
+        "dns": "198.51.100.53",
+        "hosts": []
+      }
+    ],
+    "machines": [
+      {
+        "id": "web",
+        "name": "Web server",
+        "ips": [
+          "10.0.1.20",
+          "203.0.113.10"
+        ],
+        "serves": [
+          "www.example.com",
+          "example.com",
+          "intranet.example.com"
+        ]
+      },
+      {
+        "id": "mail",
+        "name": "Mail server",
+        "ips": [
+          "10.0.1.25",
+          "203.0.113.25"
+        ],
+        "serves": [
+          "mail.example.com"
+        ]
+      },
+      {
+        "id": "files",
+        "name": "File server",
+        "ips": [
+          "10.0.1.30"
+        ],
+        "serves": [
+          "files.example.com"
+        ]
+      },
+      {
+        "id": "helpdesk",
+        "name": "Helpdesk server",
+        "ips": [
+          "10.0.1.40"
+        ],
+        "serves": [
+          "helpdesk.example.com"
+        ]
+      },
+      {
+        "id": "print",
+        "name": "Print server",
+        "ips": [
+          "10.0.1.21"
+        ],
+        "serves": []
+      }
+    ],
+    "hairpin": false
   },
   "nsg": [
     {
@@ -11344,6 +13477,22 @@
       "blurb": "Design subnets for tiers of different sizes."
     },
     {
+      "track": "cissp",
+      "lesson": "cryptography-pki",
+      "tool": "certs",
+      "pick": "certs-private-ca",
+      "label": "Why does the browser not trust this certificate?",
+      "blurb": "A private CA the client has never been told to trust: the chain, the root and the trust store."
+    },
+    {
+      "track": "cissp",
+      "lesson": "cryptography-pki",
+      "tool": "certs",
+      "pick": "sandbox",
+      "label": "Build and break a certificate chain",
+      "blurb": "Names and wildcards, validity dates, the intermediate, trusted roots, key usage, revocation and SHA-1, with the first failure named."
+    },
+    {
       "track": "ccna",
       "lesson": "nat-dhcp-dns-ntp",
       "tool": "dhcp",
@@ -11366,6 +13515,38 @@
       "pick": "sandbox",
       "label": "A DHCP lab to experiment with",
       "blurb": "Scopes, exclusions, relays and leases in a small network."
+    },
+    {
+      "track": "ccna",
+      "lesson": "nat-dhcp-dns-ntp",
+      "tool": "dns",
+      "pick": "wrong-dns-server",
+      "label": "Pings work, names do not",
+      "blurb": "Why a wrong DNS server address breaks every lookup."
+    },
+    {
+      "track": "ccna",
+      "lesson": "nat-dhcp-dns-ntp",
+      "tool": "dns",
+      "pick": "nxdomain",
+      "label": "NXDOMAIN and negative caching",
+      "blurb": "A typo in a record name, and why a resolver remembers the failure."
+    },
+    {
+      "track": "ccna",
+      "lesson": "nat-dhcp-dns-ntp",
+      "tool": "dns",
+      "pick": "stale-cache",
+      "label": "TTL and cached records on a virtual clock",
+      "blurb": "Why a changed record takes up to a full TTL to reach everyone."
+    },
+    {
+      "track": "ccna",
+      "lesson": "nat-dhcp-dns-ntp",
+      "tool": "dns",
+      "pick": "sandbox",
+      "label": "A DNS lab to experiment with",
+      "blurb": "Records, resolvers, caches, hosts files and split-horizon DNS in a small company network."
     },
     {
       "track": "az104",
