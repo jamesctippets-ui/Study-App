@@ -1731,6 +1731,17 @@ trading away for shinier but shallower ones.
   playground achievements; STP, DHCP, DNS, ACL-on-an-interface, VPN and Azure NSG scenarios (§17 item 5); persisted
   sandbox setups and export/import for the VLAN and firewall tools (the IP lab already has export/import); making the
   tall editor cards collapsible.
+- [x] **Definition flyouts rebuilt: open left near the right edge, never widen the page.** Reported on a phone: a
+  flyout from a word near the right edge made the page resize. Root cause: the flyout was `position: absolute` inside
+  the text, so an overflowing box widened the page, and mobile browsers then report an inflated `window.innerWidth`
+  (474 on a 390px screen), which the earlier "measure and nudge" fix compared against, so it nudged by almost nothing.
+  Now `TermFlyout` is a `position: fixed` box in a portal on `<body>` (it cannot widen the page or be clipped by a
+  card) placed by the pure `flyoutPlacement` in `src/js/03e_flyout_place.js` from the word's on-screen rectangle and
+  `documentElement.clientWidth`: opens rightwards, or leftwards (right edges lined up) near the right edge, below the
+  word or above it when there is no room, tall boxes cap and scroll inside, and the arrow points at the word. It
+  re-places on scroll, resize and size change, hides while its word is scrolled out of the visible band, and closes on
+  Escape. `tools/check_flyout.js` (2,325 checks) runs in build.py; Playwright runs clicked every trigger on a cheat
+  sheet at 390px, 320px and desktop widths with no overflow.
 - [x] **IT Playground v2 (shared core, six more tools, IPv6, lesson links).** The Playground now has ten tools and
   75 guided scenarios (IP lab 12, VLAN 8, firewall 8, DHCP 8, DNS 8, STP 7, VPN 8, Azure NSG 8, certificates 8; the
   subnet calculator has no scenarios). Shared building blocks live in `src/js/04g_playground_core.jsx`

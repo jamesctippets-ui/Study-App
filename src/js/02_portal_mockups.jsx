@@ -942,46 +942,39 @@ function findTermCard(term, vocabPool) {
 }
 
 // Renders one highlighted term: a clickable word plus, when it's the
-// active one, a flyout anchored directly under it (not appended after the
-// whole paragraph/card) — the wrapping span's `position: relative` is what
-// makes the flyout's `position: absolute` land right under this specific
-// word instead of the block's bottom edge.
+// active one, its definition flyout. The flyout is drawn by TermFlyout as a
+// fixed-position box in a portal (so it can never widen the page or be
+// clipped by a card) and positioned from this word's on-screen rectangle:
+// below it, opening to the right, or opening to the LEFT when the word is
+// near the right edge (see flyoutPlacement in 03e_flyout_place.js).
 function TermTrigger({ text, card, isActive, onToggle, context, scope }) {
-  const wrapperRef = useRef(null);
-  // Anchored under the trigger word via `left: 0` by default (see
-  // TermFlyout), which overflows off the right edge of the screen for any
-  // term close enough to the right margin — forcing a horizontal scroll to
-  // read the rest of it. A simple left/right flip isn't enough on a narrow
-  // phone screen, where a 280px-wide flyout can overflow the *other* edge
-  // instead if the word sits mid-screen — so this measures the flyout's
-  // actual rendered position and nudges it (via transform, not by
-  // re-anchoring) by just enough to stay fully on screen, then moves the
-  // little arrow the opposite amount so it still points at the real word
-  // instead of drifting with the shifted box. Runs in useLayoutEffect
-  // (before paint, not after) so the shift is never visible as a flash of
-  // the wrong position first.
-  const [pos, setPos] = useState({ shift: 0, arrowLeft: 14 });
-  useLayoutEffect(() => {
-    if (!isActive || !wrapperRef.current) return;
-    const flyoutEl = wrapperRef.current.querySelector('.term-flyout');
-    if (!flyoutEl) return;
-    const MARGIN = 10;
-    const rect = flyoutEl.getBoundingClientRect();
-    let shift = 0;
-    if (rect.right > window.innerWidth - MARGIN) {
-      shift = (window.innerWidth - MARGIN) - rect.right;
-    } else if (rect.left < MARGIN) {
-      shift = MARGIN - rect.left;
+  const btnRef = useRef(null);
+  // A word that wraps over two lines has one rectangle per line; remember
+  // which line was tapped so the flyout hangs under that one.
+  const lineRef = useRef(0);
+  const getAnchor = useCallback(() => {
+    const el = btnRef.current;
+    if (!el) return null;
+    const rects = el.getClientRects();
+    const r = rects[Math.min(lineRef.current, rects.length - 1)] || el.getBoundingClientRect();
+    return { left: r.left, right: r.right, top: r.top, bottom: r.bottom };
+  }, []);
+  const onTap = (e) => {
+    e.stopPropagation();
+    const rects = btnRef.current ? btnRef.current.getClientRects() : [];
+    lineRef.current = 0;
+    for (let i = 0; i < rects.length; i++) {
+      if (e.clientY >= rects[i].top - 1 && e.clientY <= rects[i].bottom + 1) { lineRef.current = i; break; }
     }
-    const arrowLeft = Math.max(8, Math.min(14 - shift, rect.width - 18));
-    setPos({ shift, arrowLeft });
-  }, [isActive]);
+    onToggle();
+  };
 
   return (
-    <span ref={wrapperRef} style={{ position: 'relative', display: 'inline-block' }}>
+    <span style={{ display: 'inline-block' }}>
       <button
+        ref={btnRef}
         className="btn-flat term-trigger"
-        onClick={(e) => { e.stopPropagation(); onToggle(); }}
+        onClick={onTap}
         style={{
           color: COLOR.gold, fontWeight: 700, background: 'transparent', padding: 0,
           borderBottom: `1px dotted ${COLOR.gold}`, cursor: 'pointer', font: 'inherit',
@@ -989,7 +982,7 @@ function TermTrigger({ text, card, isActive, onToggle, context, scope }) {
       >
         {text}
       </button>
-      {isActive && <TermFlyout term={card} triggerText={text} context={context} scope={scope} onClose={onToggle} shift={pos.shift} arrowLeft={pos.arrowLeft} />}
+      {isActive && <TermFlyout term={card} triggerText={text} context={context} scope={scope} onClose={onToggle} getAnchor={getAnchor} />}
     </span>
   );
 }

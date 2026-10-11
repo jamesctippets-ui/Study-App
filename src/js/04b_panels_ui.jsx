@@ -332,17 +332,62 @@ function AboutLegalPanel({ onClose }) {
   );
 }
 
-// A small flyout anchored directly under the term that was clicked (see
-// TermTrigger in 02_portal_mockups.jsx, which renders this as the absolute-
-// positioned child of the specific word's own relatively-positioned
-// wrapper) — not a block appended below the whole paragraph/card. The
+// The definition flyout for the term that was clicked (rendered by
+// TermTrigger in 02_portal_mockups.jsx). It is a position: fixed box in a
+// portal on <body>, placed from the word's on-screen rectangle by
+// flyoutPlacement (03e_flyout_place.js): under the word, opening to the right
+// or, near the right edge, to the LEFT; above the word when there is no room
+// below. Being fixed it never adds to the page's scroll width (the old
+// absolutely-positioned box did, and phones then zoomed the page out), and
+// it is re-placed on scroll, resize and when its own size changes. The
 // `term-flyout` class is what useClickOutsideToClose looks for to know a
 // click landed inside it rather than outside.
-function TermFlyout({ term, triggerText, context, scope, onClose, shift, arrowLeft }) {
+function TermFlyout({ term, triggerText, context, scope, onClose, getAnchor }) {
+  const boxRef = useRef(null);
+  const bodyRef = useRef(null);
+  const [place, setPlace] = useState(null);
+  const closeRef = useRef(onClose);
+  closeRef.current = onClose;
+  const measure = useCallback(() => {
+    const box = boxRef.current;
+    const body = bodyRef.current;
+    const anchor = getAnchor && getAnchor();
+    if (!box || !body || !anchor) return;
+    const root = document.documentElement;
+    // clientWidth, not innerWidth: phones report a wider innerWidth once a page overflows sideways
+    const view = { width: root.clientWidth, height: root.clientHeight };
+    // the body's full height (it may be scrolling inside a capped box) plus the box's padding and border
+    const size = { width: box.offsetWidth, height: body.scrollHeight + FLYOUT_CHROME };
+    const next = flyoutPlacement(anchor, size, view, { top: APP_HEADER_HEIGHT, bottom: TAB_BAR_HEIGHT });
+    // keep the old placement when nothing moved by more than a pixel (so a re-measure can never loop)
+    setPlace((cur) => (cur && cur.vertical === next.vertical && cur.hidden === next.hidden && cur.maxHeight === next.maxHeight
+      && Math.abs(cur.left - next.left) <= 1 && Math.abs(cur.top - next.top) <= 1 && Math.abs(cur.arrowLeft - next.arrowLeft) <= 1 ? cur : next));
+  }, [getAnchor]);
+  // After every render (the content can change size), before the browser paints
+  useLayoutEffect(() => { measure(); });
+  useEffect(() => {
+    let raf = 0;
+    const again = () => { if (!raf) raf = requestAnimationFrame(() => { raf = 0; measure(); }); };
+    const onKey = (e) => { if (e.key === 'Escape') closeRef.current(); };
+    window.addEventListener('scroll', again, true);
+    window.addEventListener('resize', again);
+    window.addEventListener('keydown', onKey);
+    const vv = window.visualViewport;
+    if (vv) vv.addEventListener('resize', again);
+    const ro = window.ResizeObserver && boxRef.current ? new ResizeObserver(again) : null;
+    if (ro) ro.observe(boxRef.current);
+    return () => {
+      if (raf) cancelAnimationFrame(raf);
+      window.removeEventListener('scroll', again, true);
+      window.removeEventListener('resize', again);
+      window.removeEventListener('keydown', onKey);
+      if (vv) vv.removeEventListener('resize', again);
+      if (ro) ro.disconnect();
+    };
+  }, [measure]);
   const customCtx = React.useContext(CustomTermsContext);
   if (!term) return null;
   if (scope) SCOPE.active = scope;
-  const s = shift || 0;
   const acr = flyoutAcronyms(term, triggerText);
   const ctx = `${context || ''} ${term.front || ''} ${term.back || ''} ${term.detail || ''}`;
   // The best-fitting meaning for this context first; any others are shown
@@ -361,26 +406,41 @@ function TermFlyout({ term, triggerText, context, scope, onClose, shift, arrowLe
     if (saveCandidate && validateCustomTerm(saveCandidate.kind, saveCandidate.front, saveCandidate.back, [], null)) saveCandidate = null;
   }
   const alreadySaved = !!saveCandidate && (customCtx.terms || []).some((t) => t.kind === saveCandidate.kind && t.front.toLowerCase() === saveCandidate.front.toLowerCase() && (t.track || 'all') === saveCandidate.track && t.back === saveCandidate.back);
-  return (
+  const above = !!place && place.vertical === 'above';
+  const capped = !!place && place.maxHeight != null;
+  return ReactDOM.createPortal(
     <span
+      ref={boxRef}
       className="term-flyout"
+      role="dialog"
+      aria-label={term.front}
       onClick={(e) => e.stopPropagation()}
       style={{
-        position: 'absolute', top: 'calc(100% + 8px)', left: 0, zIndex: 30,
-        transform: s ? `translateX(${s}px)` : undefined,
-        display: 'block', width: 'max-content', maxWidth: 'min(280px, 78vw)',
+        position: 'fixed', left: place ? place.left : 0, top: place ? place.top : 0, zIndex: 70,
+        // invisible for the one render before it has been measured (and while its word is scrolled out of view)
+        visibility: !place || place.hidden ? 'hidden' : 'visible',
+        display: 'block', width: 'max-content', maxWidth: 'min(280px, calc(100vw - 20px))', boxSizing: 'border-box',
         background: COLOR.surfaceRaised, border: `1px solid ${COLOR.primary}`, borderRadius: '12px',
         padding: '10px 12px', boxShadow: SHADOW.card, textAlign: 'left', whiteSpace: 'normal',
         fontWeight: 400, fontStyle: 'normal',
       }}
     >
+      {place && (
+        <span
+          style={{
+            position: 'absolute', left: `${place.arrowLeft}px`, width: '9px', height: '9px',
+            background: COLOR.surfaceRaised, transform: 'rotate(45deg)',
+            ...(above
+              ? { bottom: '-5px', borderRight: `1px solid ${COLOR.primary}`, borderBottom: `1px solid ${COLOR.primary}` }
+              : { top: '-5px', borderLeft: `1px solid ${COLOR.primary}`, borderTop: `1px solid ${COLOR.primary}` }),
+          }}
+        />
+      )}
+      {/* the arrow sits on the box itself; only this body scrolls when the box is capped */}
       <span
-        style={{
-          position: 'absolute', top: '-5px', left: `${arrowLeft != null ? arrowLeft : 14}px`, width: '9px', height: '9px',
-          background: COLOR.surfaceRaised, borderLeft: `1px solid ${COLOR.primary}`, borderTop: `1px solid ${COLOR.primary}`,
-          transform: 'rotate(45deg)',
-        }}
-      />
+        ref={bodyRef}
+        style={{ display: 'block', position: 'relative', maxHeight: capped ? place.maxHeight - FLYOUT_CHROME : undefined, overflowY: capped ? 'auto' : undefined }}
+      >
       <span className="flex justify-between items-start" style={{ display: 'flex', marginBottom: '4px', position: 'relative' }}>
         <span className="itil-display" style={{ fontSize: '13px', fontWeight: 600, color: COLOR.primary }}>{term.front}</span>
         <button onClick={onClose} className="btn-flat" style={{ background: 'transparent', color: COLOR.muted, padding: '0 0 0 8px', fontSize: '12px' }}>✕</button>
@@ -420,7 +480,9 @@ function TermFlyout({ term, triggerText, context, scope, onClose, shift, arrowLe
           ))}
         </span>
       )}
-    </span>
+      </span>
+    </span>,
+    document.body,
   );
 }
 

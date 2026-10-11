@@ -135,10 +135,14 @@ open — and the question card, its category badge, and the post-quiz
 
 Key terms aren't just highlighted in lesson readings — every track gets this
 now, in quiz explanations and flashcard backs too. Tapping a highlighted term
-opens a small flyout anchored directly under that word (front/back/detail,
+opens a small flyout anchored to that word (front/back/detail,
 sourced from that track's own flashcards), not a block appended below the
 whole paragraph or card — it closes on a second tap, on Escape, or on tapping
-anywhere else. Curated tracks (AZ-900, AZ-104) use a hand-picked term list;
+anywhere else. The flyout is a fixed-position box that always stays fully on
+screen: it opens to the right of a word, to the **left** when the word is near
+the right edge, and above the word when there is no room below; it follows the
+word while you scroll and never makes the page wider (tall definitions scroll
+inside the box). Curated tracks (AZ-900, AZ-104) use a hand-picked term list;
 every other track auto-detects terms by matching flashcard fronts against
 the surrounding text, so coverage scales to new content with no
 per-question authoring needed.
@@ -645,6 +649,7 @@ data/
 tools/
   check_weak_path.js  — unit tests for the weak-subjects engine against the real content
   check_playground.js — unit tests for the Playground engines plus a replay of every scenario
+  check_flyout.js     — unit tests for the flyout placement maths
   checks/<tool>.js    — per-tool checks for the extra Playground tools (loaded by check_playground.js)
 src/js/
   00_preamble.js        — React hook imports, the COLOR palette
@@ -657,6 +662,7 @@ src/js/
   04d_quiz_ui.jsx        — practice tool picker, quiz setup, Verbal Quiz, CLI practice, Mad Libs, Sequence, Compare, Case Study, QuestionView/QuizSummary
   04e_path_ui.jsx        — the guided Path tab: unit map, step runners, test-out, weak-spot review
   03d_weak_path.js        — weak-subjects engine: miss log, lesson ranking, snapshot path (pure logic)
+  03e_flyout_place.js     — where a definition flyout goes (open left/right, above/below, clamped to the screen; pure geometry)
   04m_weak_path_ui.jsx    — the Weak spots panel, path progress and the Home card
   03b_playground_engine.js — pure-JS simulation engine for the IT Playground (subnet maths incl. IPv6, ping, VLAN switching, firewall)
   03c_pg_<tool>.js       — engines for the extra Playground tools (dhcp, dns, stp, vpn, nsg, certs)
