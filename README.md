@@ -580,7 +580,7 @@ where one genuinely fits, vocab/quiz call-outs, and common-traps notes):
   questions, an optional game and a retest. It runs on the same step runner as the course path,
   keeps its own progress, shows how many of the original misses are fixed, and can be rebuilt
   from your latest results. Entry points: the Path tab switch, a Home card and the exam results
-  screen. The ranking is pure logic (`src/js/03d_weak_path.js`, 38 checks in
+  screen. The ranking is pure logic (`src/js/03d_weak_path.js`, 104 checks in
   `tools/check_weak_path.js`, run by build.py when node is installed).
 - **IT Playground** (`#/playground`) — a sandbox outside any cert, reached from a card
   on Home. Four tools, each with a free sandbox and guided troubleshooting scenarios

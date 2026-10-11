@@ -1710,7 +1710,7 @@ trading away for shinier but shallower ones.
   `PathStepRunner` (new step kinds `weakquiz`, which puts the missed questions first, and `retest`). UI: `04m_weak_path_ui.jsx`
   (a Course path / Weak spots switch on the Path tab with its own route, `#/<cert>/path/weak`; a report with totals, the
   study order, exam areas losing points and a per-lesson review card; the path with progress and a "missed questions fixed"
-  count; a Home card; a button on the exam results). 38 engine checks in `tools/check_weak_path.js` (miss log, ranking on
+  count; a Home card; a button on the exam results). 104 engine checks in `tools/check_weak_path.js` (every cert analyses and builds a path; miss log, ranking on
   real CCNA content, recency, repeats, exam weight, tough cards, snapshot, units, outcome, normalization), run by build.py.
   Open items: one cross-cert weak path on Home (today each cert has its own), per-lesson "mastered" detection that
   retires a weak lesson automatically mid-path, weak-spot reminders, and counting question *type* (scenario versus

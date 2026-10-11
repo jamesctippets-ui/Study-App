@@ -144,5 +144,22 @@ eq([E.emptyStats().missLog, E.emptyStats().weakPath], [{}, {}], 'fresh stats sta
 const sum = E.weakSummaryForTracks([track, 'cissp'], { [track]: results, cissp: {} }, {}, {}, missLog, TODAY);
 eq([sum.length, sum[0].trackKey], [1, track], 'Home summary lists only certs with weak spots');
 
+/* ---- every cert: a pattern of misses must analyse, snapshot and build units without errors ---- */
+manifest.tracks.forEach((t) => {
+  const mod = DATA[t.key];
+  const res = {};
+  const lg = { [t.key]: {} };
+  mod.questions.forEach((x, i) => { if (i % 3 === 0) { res[x.id] = 'incorrect'; lg[t.key][x.id] = { m: 1 + (i % 4), c: 0, l: '2026-10-05' }; } else if (i % 3 === 1) res[x.id] = 'correct'; });
+  mod.flashcards.forEach((c, i) => { if (i % 11 === 0) res[c.id] = 'incorrect'; });
+  let an;
+  try { an = E.weakAnalyze(t.key, res, {}, {}, lg, TODAY); } catch (e) { an = null; console.error(`weakAnalyze threw for ${t.key}: ${e.message}`); }
+  ok(an && an.hasData && an.units.length > 0, `${t.key}: weak lessons found`);
+  if (!an) return;
+  const sn = E.buildWeakSnapshot(an, TODAY);
+  const wu = E.buildWeakUnits(t.key, sn);
+  ok(wu.length === sn.units.length && wu.every((u) => u.steps.length >= 2), `${t.key}: weak path builds`);
+  ok(an.units.every((r) => r.cards.length <= E.WEAK_CARDS_PER_UNIT && r.reason.length > 10), `${t.key}: every row has cards and a reason`);
+});
+
 if (failures) { console.error(`\n${failures} of ${checks} weak-path checks failed`); process.exit(1); }
 console.log(`weak-subjects engine: ${checks} checks passed`);
