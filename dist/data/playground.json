@@ -4787,6 +4787,4536 @@
       }
     ]
   },
+  "dhcp": [
+    {
+      "id": "pool-too-small",
+      "title": "Only three devices get an address",
+      "goal": "Make every device in the office receive a working address.",
+      "level": "starter",
+      "story": "A small office has five devices set to DHCP. The first three get online, but the tablet and the visitor phone say \"no internet\" and show an address starting with 169.254. The DHCP server is running and nothing else changed.",
+      "topology": {
+        "segments": [
+          {
+            "id": "lan",
+            "label": "Office LAN"
+          }
+        ],
+        "router": {
+          "name": "Router",
+          "ifaces": [
+            {
+              "segment": "lan",
+              "ip": "192.168.10.1",
+              "mask": "255.255.255.0",
+              "helper": ""
+            }
+          ]
+        },
+        "server": {
+          "name": "DHCP server",
+          "segment": "lan",
+          "ip": "192.168.10.5",
+          "mask": "255.255.255.0",
+          "online": true,
+          "conflictDetection": false,
+          "scopes": [
+            {
+              "id": "office",
+              "name": "Office",
+              "network": "192.168.10.0",
+              "mask": "255.255.255.0",
+              "start": "192.168.10.100",
+              "end": "192.168.10.102",
+              "excluded": "",
+              "gateway": "192.168.10.1",
+              "dns": "192.168.10.5",
+              "leaseHours": 192
+            }
+          ]
+        },
+        "dns": [
+          "192.168.10.5"
+        ],
+        "hosts": [
+          {
+            "id": "front",
+            "name": "Front desk PC",
+            "segment": "lan",
+            "mode": "dhcp",
+            "mac": "aa:00:00:00:00:01",
+            "probe": true,
+            "ip": "",
+            "mask": "",
+            "gateway": ""
+          },
+          {
+            "id": "ana",
+            "name": "Laptop Ana",
+            "segment": "lan",
+            "mode": "dhcp",
+            "mac": "aa:00:00:00:00:02",
+            "probe": true,
+            "ip": "",
+            "mask": "",
+            "gateway": ""
+          },
+          {
+            "id": "ben",
+            "name": "Laptop Ben",
+            "segment": "lan",
+            "mode": "dhcp",
+            "mac": "aa:00:00:00:00:03",
+            "probe": true,
+            "ip": "",
+            "mask": "",
+            "gateway": ""
+          },
+          {
+            "id": "tablet",
+            "name": "Tablet",
+            "segment": "lan",
+            "mode": "dhcp",
+            "mac": "aa:00:00:00:00:04",
+            "probe": true,
+            "ip": "",
+            "mask": "",
+            "gateway": ""
+          },
+          {
+            "id": "phone",
+            "name": "Visitor phone",
+            "segment": "lan",
+            "mode": "dhcp",
+            "mac": "aa:00:00:00:00:05",
+            "probe": true,
+            "ip": "",
+            "mask": "",
+            "gateway": ""
+          }
+        ]
+      },
+      "expect": [
+        {
+          "client": "front",
+          "verdict": "success",
+          "label": "Front desk PC works"
+        },
+        {
+          "client": "tablet",
+          "verdict": "failed",
+          "label": "Tablet has no address",
+          "code": "pool-exhausted"
+        },
+        {
+          "client": "phone",
+          "verdict": "failed",
+          "label": "Visitor phone has no address",
+          "code": "pool-exhausted"
+        }
+      ],
+      "hints": [
+        "Run \"Everyone asks\" and read the trace of a client that failed: it says what the server did with the request.",
+        "The pool is the range of addresses the server may hand out. Count how many addresses the range holds, then count the devices.",
+        "Move the end address of the pool up so that the range holds at least five addresses."
+      ],
+      "fix": [
+        {
+          "path": "server.scopes.0.end",
+          "value": "192.168.10.150"
+        }
+      ],
+      "fixText": [
+        "In the Office scope, set the pool end to 192.168.10.150 (any end address that leaves room for at least five devices works)."
+      ],
+      "expectFixed": [
+        {
+          "client": "front",
+          "verdict": "success",
+          "label": "Front desk PC gets a working address"
+        },
+        {
+          "client": "ana",
+          "verdict": "success",
+          "label": "Laptop Ana gets a working address"
+        },
+        {
+          "client": "ben",
+          "verdict": "success",
+          "label": "Laptop Ben gets a working address"
+        },
+        {
+          "client": "tablet",
+          "verdict": "success",
+          "label": "Tablet gets a working address"
+        },
+        {
+          "client": "phone",
+          "verdict": "success",
+          "label": "Visitor phone gets a working address"
+        }
+      ],
+      "lesson": "A DHCP pool is a finite list of addresses. Every active lease occupies one until it expires or is released, so the pool must hold more addresses than the devices you expect, with room to grow. When it runs dry the server simply stays silent, and a client with no answer falls back to a 169.254.x.x link-local address (RFC 3927). A bigger pool fixes a real shortage; a shorter lease only helps when devices come and go.",
+      "related": [
+        "CCNA: DHCP"
+      ]
+    },
+    {
+      "id": "needs-relay",
+      "title": "The server is on another subnet",
+      "goal": "Make the office laptops get their addresses from the server on the Server LAN.",
+      "level": "starter",
+      "story": "The DHCP server now sits in the server room (10.0.0.0/24) and has a correct scope for the office (192.168.10.0/24). Since the move every office laptop ends up with a 169.254 address. The server is online and the router is up.",
+      "topology": {
+        "segments": [
+          {
+            "id": "lan",
+            "label": "Office"
+          },
+          {
+            "id": "srv",
+            "label": "Server LAN"
+          }
+        ],
+        "router": {
+          "name": "Router",
+          "ifaces": [
+            {
+              "segment": "lan",
+              "ip": "192.168.10.1",
+              "mask": "255.255.255.0",
+              "helper": ""
+            },
+            {
+              "segment": "srv",
+              "ip": "10.0.0.1",
+              "mask": "255.255.255.0",
+              "helper": ""
+            }
+          ]
+        },
+        "server": {
+          "name": "DHCP server",
+          "segment": "srv",
+          "ip": "10.0.0.5",
+          "mask": "255.255.255.0",
+          "online": true,
+          "conflictDetection": false,
+          "scopes": [
+            {
+              "id": "office",
+              "name": "Office",
+              "network": "192.168.10.0",
+              "mask": "255.255.255.0",
+              "start": "192.168.10.100",
+              "end": "192.168.10.150",
+              "excluded": "",
+              "gateway": "192.168.10.1",
+              "dns": "10.0.0.53",
+              "leaseHours": 8
+            }
+          ]
+        },
+        "dns": [
+          "10.0.0.53"
+        ],
+        "hosts": [
+          {
+            "id": "dns",
+            "name": "DNS server",
+            "segment": "srv",
+            "mode": "static",
+            "mac": "",
+            "probe": true,
+            "ip": "10.0.0.53",
+            "mask": "255.255.255.0",
+            "gateway": "10.0.0.1"
+          },
+          {
+            "id": "ana",
+            "name": "Laptop Ana",
+            "segment": "lan",
+            "mode": "dhcp",
+            "mac": "aa:00:00:00:00:01",
+            "probe": true,
+            "ip": "",
+            "mask": "",
+            "gateway": ""
+          },
+          {
+            "id": "ben",
+            "name": "Laptop Ben",
+            "segment": "lan",
+            "mode": "dhcp",
+            "mac": "aa:00:00:00:00:02",
+            "probe": true,
+            "ip": "",
+            "mask": "",
+            "gateway": ""
+          }
+        ]
+      },
+      "expect": [
+        {
+          "client": "ana",
+          "verdict": "failed",
+          "label": "Laptop Ana has no address",
+          "code": "no-relay"
+        },
+        {
+          "client": "ben",
+          "verdict": "failed",
+          "label": "Laptop Ben has no address",
+          "code": "no-relay"
+        }
+      ],
+      "hints": [
+        "A client without an address starts with a broadcast. Follow that broadcast: where does it stop?",
+        "A router does not forward broadcasts. To pass DHCP requests on, a router interface needs a relay (on Cisco devices: ip helper-address). It belongs on the interface the clients are connected to.",
+        "Set the helper address of the router interface facing the Office to the DHCP server, 10.0.0.5."
+      ],
+      "fix": [
+        {
+          "path": "router.ifaces.0.helper",
+          "value": "10.0.0.5"
+        }
+      ],
+      "fixText": [
+        "On the router interface facing the Office (192.168.10.1), set the helper address to the DHCP server, 10.0.0.5."
+      ],
+      "expectFixed": [
+        {
+          "client": "ana",
+          "verdict": "success",
+          "label": "Laptop Ana gets a working address"
+        },
+        {
+          "client": "ben",
+          "verdict": "success",
+          "label": "Laptop Ben gets a working address"
+        }
+      ],
+      "lesson": "DHCPDISCOVER is a broadcast, and a router never forwards broadcasts, so a server on another subnet hears nothing. A relay agent (on Cisco routers, ip helper-address) on the client-facing interface turns the broadcast into a unicast to the server and writes its own interface address into the giaddr field. The server uses giaddr to pick the scope for the client's subnet (RFC 2131).",
+      "related": [
+        "CCNA: DHCP relay"
+      ]
+    },
+    {
+      "id": "relay-wrong-address",
+      "title": "The relay forwards to the wrong machine",
+      "goal": "Make the office laptops get addresses again after the DHCP server moved.",
+      "level": "core",
+      "story": "Last month the DHCP service moved to a new server, 10.0.0.5. The office laptops now get no address, although the router still has a helper address configured and the new server is up.",
+      "topology": {
+        "segments": [
+          {
+            "id": "lan",
+            "label": "Office"
+          },
+          {
+            "id": "srv",
+            "label": "Server LAN"
+          }
+        ],
+        "router": {
+          "name": "Router",
+          "ifaces": [
+            {
+              "segment": "lan",
+              "ip": "192.168.10.1",
+              "mask": "255.255.255.0",
+              "helper": "10.0.0.20"
+            },
+            {
+              "segment": "srv",
+              "ip": "10.0.0.1",
+              "mask": "255.255.255.0",
+              "helper": ""
+            }
+          ]
+        },
+        "server": {
+          "name": "DHCP server",
+          "segment": "srv",
+          "ip": "10.0.0.5",
+          "mask": "255.255.255.0",
+          "online": true,
+          "conflictDetection": false,
+          "scopes": [
+            {
+              "id": "office",
+              "name": "Office",
+              "network": "192.168.10.0",
+              "mask": "255.255.255.0",
+              "start": "192.168.10.100",
+              "end": "192.168.10.150",
+              "excluded": "",
+              "gateway": "192.168.10.1",
+              "dns": "10.0.0.53",
+              "leaseHours": 8
+            }
+          ]
+        },
+        "dns": [
+          "10.0.0.53"
+        ],
+        "hosts": [
+          {
+            "id": "dns",
+            "name": "DNS server",
+            "segment": "srv",
+            "mode": "static",
+            "mac": "",
+            "probe": true,
+            "ip": "10.0.0.53",
+            "mask": "255.255.255.0",
+            "gateway": "10.0.0.1"
+          },
+          {
+            "id": "files",
+            "name": "File server",
+            "segment": "srv",
+            "mode": "static",
+            "mac": "",
+            "probe": true,
+            "ip": "10.0.0.20",
+            "mask": "255.255.255.0",
+            "gateway": "10.0.0.1"
+          },
+          {
+            "id": "ana",
+            "name": "Laptop Ana",
+            "segment": "lan",
+            "mode": "dhcp",
+            "mac": "aa:00:00:00:00:01",
+            "probe": true,
+            "ip": "",
+            "mask": "",
+            "gateway": ""
+          },
+          {
+            "id": "ben",
+            "name": "Laptop Ben",
+            "segment": "lan",
+            "mode": "dhcp",
+            "mac": "aa:00:00:00:00:02",
+            "probe": true,
+            "ip": "",
+            "mask": "",
+            "gateway": ""
+          }
+        ]
+      },
+      "expect": [
+        {
+          "client": "ana",
+          "verdict": "failed",
+          "label": "Laptop Ana has no address",
+          "code": "relay-wrong-server"
+        },
+        {
+          "client": "ben",
+          "verdict": "failed",
+          "label": "Laptop Ben has no address",
+          "code": "relay-wrong-server"
+        }
+      ],
+      "hints": [
+        "The relay is configured, so read the trace: where does it say the relayed request ends up?",
+        "The helper address must be the address of a machine that actually runs the DHCP server.",
+        "Change the helper address on the Office interface from the old address to the new DHCP server, 10.0.0.5."
+      ],
+      "fix": [
+        {
+          "path": "router.ifaces.0.helper",
+          "value": "10.0.0.5"
+        }
+      ],
+      "fixText": [
+        "Change the helper address on the router interface facing the Office from 10.0.0.20 (now the file server) to 10.0.0.5, the DHCP server."
+      ],
+      "expectFixed": [
+        {
+          "client": "ana",
+          "verdict": "success",
+          "label": "Laptop Ana gets a working address"
+        },
+        {
+          "client": "ben",
+          "verdict": "success",
+          "label": "Laptop Ben gets a working address"
+        }
+      ],
+      "lesson": "A relay agent forwards the request as a unicast to whatever address you configured, and it does not check that a DHCP server lives there. If the target is a machine that does not listen on UDP port 67 (or nothing at all), the request is silently lost, so after a server migration every helper address on every router needs updating.",
+      "related": [
+        "CCNA: DHCP relay"
+      ]
+    },
+    {
+      "id": "wrong-gateway",
+      "title": "Sales PCs cannot leave their subnet",
+      "goal": "Make the Sales PCs able to reach beyond their own network.",
+      "level": "core",
+      "story": "The company added a Sales network (192.168.20.0/24). Its DHCP scope was made by copying the Office scope and changing the address range. Sales PCs get an address, yet they cannot browse and cannot even reach the server room.",
+      "topology": {
+        "segments": [
+          {
+            "id": "lan",
+            "label": "Office"
+          },
+          {
+            "id": "sales",
+            "label": "Sales"
+          },
+          {
+            "id": "srv",
+            "label": "Server LAN"
+          }
+        ],
+        "router": {
+          "name": "Router",
+          "ifaces": [
+            {
+              "segment": "lan",
+              "ip": "192.168.10.1",
+              "mask": "255.255.255.0",
+              "helper": "10.0.0.5"
+            },
+            {
+              "segment": "sales",
+              "ip": "192.168.20.1",
+              "mask": "255.255.255.0",
+              "helper": "10.0.0.5"
+            },
+            {
+              "segment": "srv",
+              "ip": "10.0.0.1",
+              "mask": "255.255.255.0",
+              "helper": ""
+            }
+          ]
+        },
+        "server": {
+          "name": "DHCP server",
+          "segment": "srv",
+          "ip": "10.0.0.5",
+          "mask": "255.255.255.0",
+          "online": true,
+          "conflictDetection": false,
+          "scopes": [
+            {
+              "id": "office",
+              "name": "Office",
+              "network": "192.168.10.0",
+              "mask": "255.255.255.0",
+              "start": "192.168.10.100",
+              "end": "192.168.10.150",
+              "excluded": "",
+              "gateway": "192.168.10.1",
+              "dns": "10.0.0.53",
+              "leaseHours": 8
+            },
+            {
+              "id": "sales",
+              "name": "Sales",
+              "network": "192.168.20.0",
+              "mask": "255.255.255.0",
+              "start": "192.168.20.100",
+              "end": "192.168.20.150",
+              "excluded": "",
+              "gateway": "192.168.10.1",
+              "dns": "10.0.0.53",
+              "leaseHours": 8
+            }
+          ]
+        },
+        "dns": [
+          "10.0.0.53"
+        ],
+        "hosts": [
+          {
+            "id": "dns",
+            "name": "DNS server",
+            "segment": "srv",
+            "mode": "static",
+            "mac": "",
+            "probe": true,
+            "ip": "10.0.0.53",
+            "mask": "255.255.255.0",
+            "gateway": "10.0.0.1"
+          },
+          {
+            "id": "staff",
+            "name": "Office PC",
+            "segment": "lan",
+            "mode": "dhcp",
+            "mac": "aa:00:00:00:00:01",
+            "probe": true,
+            "ip": "",
+            "mask": "",
+            "gateway": ""
+          },
+          {
+            "id": "sales1",
+            "name": "Sales PC 1",
+            "segment": "sales",
+            "mode": "dhcp",
+            "mac": "aa:00:00:00:00:02",
+            "probe": true,
+            "ip": "",
+            "mask": "",
+            "gateway": ""
+          },
+          {
+            "id": "sales2",
+            "name": "Sales PC 2",
+            "segment": "sales",
+            "mode": "dhcp",
+            "mac": "aa:00:00:00:00:03",
+            "probe": true,
+            "ip": "",
+            "mask": "",
+            "gateway": ""
+          }
+        ]
+      },
+      "expect": [
+        {
+          "client": "staff",
+          "verdict": "success",
+          "label": "Office PC works"
+        },
+        {
+          "client": "sales1",
+          "verdict": "failed",
+          "label": "Sales PC 1 has a bad gateway",
+          "code": "bad-gateway-option"
+        },
+        {
+          "client": "sales2",
+          "verdict": "failed",
+          "label": "Sales PC 2 has a bad gateway",
+          "code": "bad-gateway-option"
+        }
+      ],
+      "hints": [
+        "The Sales PCs do get an address. Read the settings the trace lists for one of them and compare the gateway with the Sales network.",
+        "A client can only use a gateway that is inside its own subnet. Which address does the router have on the Sales network?",
+        "Set the default gateway option of the Sales scope to the router's Sales address, 192.168.20.1."
+      ],
+      "fix": [
+        {
+          "path": "server.scopes.1.gateway",
+          "value": "192.168.20.1"
+        }
+      ],
+      "fixText": [
+        "In the Sales scope, change the default gateway from 192.168.10.1 (copied from the Office scope) to 192.168.20.1, the router's address on the Sales network."
+      ],
+      "expectFixed": [
+        {
+          "client": "staff",
+          "verdict": "success",
+          "label": "Office PC still works"
+        },
+        {
+          "client": "sales1",
+          "verdict": "success",
+          "label": "Sales PC 1 can leave its subnet"
+        },
+        {
+          "client": "sales2",
+          "verdict": "success",
+          "label": "Sales PC 2 can leave its subnet"
+        }
+      ],
+      "lesson": "The default gateway is a DHCP option, so it belongs to the scope, and every scope needs the router address of its own subnet. Copying a scope and forgetting the gateway is a classic mistake: the client gets a valid address but a gateway it cannot reach directly, so it can talk to its own subnet and nothing else.",
+      "related": [
+        "CCNA: DHCP options"
+      ]
+    },
+    {
+      "id": "static-in-pool",
+      "title": "Two devices share one address",
+      "goal": "Stop the pool from handing out addresses that are set by hand.",
+      "level": "core",
+      "story": "A printer (192.168.10.20) and a NAS (192.168.10.22) were given fixed addresses long ago. The DHCP pool starts at 192.168.10.20. Users report that the printer drops off, that the NAS is unreliable, and that one laptop sometimes shows an \"address conflict\" warning.",
+      "topology": {
+        "segments": [
+          {
+            "id": "lan",
+            "label": "Office LAN"
+          }
+        ],
+        "router": {
+          "name": "Router",
+          "ifaces": [
+            {
+              "segment": "lan",
+              "ip": "192.168.10.1",
+              "mask": "255.255.255.0",
+              "helper": ""
+            }
+          ]
+        },
+        "server": {
+          "name": "DHCP server",
+          "segment": "lan",
+          "ip": "192.168.10.5",
+          "mask": "255.255.255.0",
+          "online": true,
+          "conflictDetection": false,
+          "scopes": [
+            {
+              "id": "office",
+              "name": "Office",
+              "network": "192.168.10.0",
+              "mask": "255.255.255.0",
+              "start": "192.168.10.20",
+              "end": "192.168.10.40",
+              "excluded": "",
+              "gateway": "192.168.10.1",
+              "dns": "192.168.10.5",
+              "leaseHours": 8
+            }
+          ]
+        },
+        "dns": [
+          "192.168.10.5"
+        ],
+        "hosts": [
+          {
+            "id": "printer",
+            "name": "Printer",
+            "segment": "lan",
+            "mode": "static",
+            "mac": "",
+            "probe": true,
+            "ip": "192.168.10.20",
+            "mask": "255.255.255.0",
+            "gateway": "192.168.10.1"
+          },
+          {
+            "id": "nas",
+            "name": "NAS",
+            "segment": "lan",
+            "mode": "static",
+            "mac": "",
+            "probe": true,
+            "ip": "192.168.10.22",
+            "mask": "255.255.255.0",
+            "gateway": "192.168.10.1"
+          },
+          {
+            "id": "laptop",
+            "name": "Laptop",
+            "segment": "lan",
+            "mode": "dhcp",
+            "mac": "aa:00:00:00:00:01",
+            "probe": true,
+            "ip": "",
+            "mask": "",
+            "gateway": ""
+          },
+          {
+            "id": "camera",
+            "name": "Camera",
+            "segment": "lan",
+            "mode": "dhcp",
+            "mac": "aa:00:00:00:00:02",
+            "probe": false,
+            "ip": "",
+            "mask": "",
+            "gateway": ""
+          }
+        ]
+      },
+      "expect": [
+        {
+          "client": "laptop",
+          "verdict": "failed",
+          "label": "Laptop hits a conflict first",
+          "code": "address-conflict",
+          "clean": true
+        },
+        {
+          "client": "camera",
+          "verdict": "failed",
+          "label": "Camera shares an address with the NAS",
+          "code": "address-conflict"
+        }
+      ],
+      "hints": [
+        "Run \"Everyone asks\" and read both traces. Which addresses did the server offer, and who already used them?",
+        "The server does not know about devices configured by hand unless you tell it: addresses that must never be offered are excluded from the scope.",
+        "Exclude the range 192.168.10.20 to 192.168.10.29 in the scope. (Conflict detection only reacts to a clash, it does not prevent the pool from covering fixed addresses.)"
+      ],
+      "fix": [
+        {
+          "path": "server.scopes.0.excluded",
+          "value": "192.168.10.20-192.168.10.29"
+        }
+      ],
+      "fixText": [
+        "Add the excluded range 192.168.10.20-192.168.10.29 to the Office scope (or move the pool start above the statics) so the server never offers the printer's or the NAS's address."
+      ],
+      "expectFixed": [
+        {
+          "client": "laptop",
+          "verdict": "success",
+          "label": "Laptop gets an address with no conflict at all",
+          "clean": true
+        },
+        {
+          "client": "camera",
+          "verdict": "success",
+          "label": "Camera gets an address with no conflict at all",
+          "clean": true
+        }
+      ],
+      "lesson": "A server only knows about its own leases. Any device configured by hand inside the pool range will eventually collide with a lease. A client that probes with ARP notices, sends DHCPDECLINE and asks again (the server marks that address as bad); a client or device that does not probe ends up sharing the address. The clean fix is to exclude fixed addresses from the pool; conflict detection and DECLINE are only the safety net.",
+      "related": [
+        "CCNA: DHCP",
+        "RFC 2131: DHCPDECLINE"
+      ]
+    },
+    {
+      "id": "scope-wrong-subnet",
+      "title": "The server hears the relay but stays silent",
+      "goal": "Make the Office devices get an address; the Guest network already works.",
+      "level": "stretch",
+      "story": "The Office and Guest networks both relay to the same DHCP server. Guest devices are fine. Office devices get nothing, even though the relay is configured and the server is online.",
+      "topology": {
+        "segments": [
+          {
+            "id": "lan",
+            "label": "Office"
+          },
+          {
+            "id": "guest",
+            "label": "Guest"
+          },
+          {
+            "id": "srv",
+            "label": "Server LAN"
+          }
+        ],
+        "router": {
+          "name": "Router",
+          "ifaces": [
+            {
+              "segment": "lan",
+              "ip": "192.168.10.1",
+              "mask": "255.255.255.0",
+              "helper": "10.0.0.5"
+            },
+            {
+              "segment": "guest",
+              "ip": "192.168.30.1",
+              "mask": "255.255.255.0",
+              "helper": "10.0.0.5"
+            },
+            {
+              "segment": "srv",
+              "ip": "10.0.0.1",
+              "mask": "255.255.255.0",
+              "helper": ""
+            }
+          ]
+        },
+        "server": {
+          "name": "DHCP server",
+          "segment": "srv",
+          "ip": "10.0.0.5",
+          "mask": "255.255.255.0",
+          "online": true,
+          "conflictDetection": false,
+          "scopes": [
+            {
+              "id": "office",
+              "name": "Office",
+              "network": "192.168.1.0",
+              "mask": "255.255.255.0",
+              "start": "192.168.10.100",
+              "end": "192.168.10.150",
+              "excluded": "",
+              "gateway": "192.168.10.1",
+              "dns": "10.0.0.53",
+              "leaseHours": 8
+            },
+            {
+              "id": "guest",
+              "name": "Guest",
+              "network": "192.168.30.0",
+              "mask": "255.255.255.0",
+              "start": "192.168.30.100",
+              "end": "192.168.30.150",
+              "excluded": "",
+              "gateway": "192.168.30.1",
+              "dns": "10.0.0.53",
+              "leaseHours": 2
+            }
+          ]
+        },
+        "dns": [
+          "10.0.0.53"
+        ],
+        "hosts": [
+          {
+            "id": "dns",
+            "name": "DNS server",
+            "segment": "srv",
+            "mode": "static",
+            "mac": "",
+            "probe": true,
+            "ip": "10.0.0.53",
+            "mask": "255.255.255.0",
+            "gateway": "10.0.0.1"
+          },
+          {
+            "id": "office1",
+            "name": "Office PC",
+            "segment": "lan",
+            "mode": "dhcp",
+            "mac": "aa:00:00:00:00:01",
+            "probe": true,
+            "ip": "",
+            "mask": "",
+            "gateway": ""
+          },
+          {
+            "id": "guest1",
+            "name": "Guest phone",
+            "segment": "guest",
+            "mode": "dhcp",
+            "mac": "aa:00:00:00:00:02",
+            "probe": true,
+            "ip": "",
+            "mask": "",
+            "gateway": ""
+          }
+        ]
+      },
+      "expect": [
+        {
+          "client": "office1",
+          "verdict": "failed",
+          "label": "Office PC has no address",
+          "code": "no-scope"
+        },
+        {
+          "client": "guest1",
+          "verdict": "success",
+          "label": "Guest phone works"
+        }
+      ],
+      "hints": [
+        "The relay works (the Guest network proves it). Read how the server chooses a scope for a relayed request.",
+        "With a relay, the server picks the scope that contains the giaddr, the address of the router interface the request came through. Compare it with the network of each scope.",
+        "The Office scope's network is 192.168.1.0, but the Office is 192.168.10.0. Correct the scope network."
+      ],
+      "fix": [
+        {
+          "path": "server.scopes.0.network",
+          "value": "192.168.10.0"
+        }
+      ],
+      "fixText": [
+        "Change the network of the Office scope from 192.168.1.0 to 192.168.10.0, so that the giaddr 192.168.10.1 falls inside a scope."
+      ],
+      "expectFixed": [
+        {
+          "client": "office1",
+          "verdict": "success",
+          "label": "Office PC gets a working address"
+        },
+        {
+          "client": "guest1",
+          "verdict": "success",
+          "label": "Guest phone still works"
+        }
+      ],
+      "lesson": "A DHCP server serving several subnets chooses the scope from the giaddr of a relayed request (or from the receiving interface for a local one). No scope containing that address means no offer, and no error is sent to the client: the server simply stays quiet. When a relay seems to work for one network and not another, compare the router interface address with each scope's network.",
+      "related": [
+        "CCNA: DHCP relay",
+        "RFC 2131 section 4.3.1"
+      ]
+    },
+    {
+      "id": "wrong-mask",
+      "title": "Office PCs cannot reach Sales",
+      "goal": "Make the Office PCs treat Sales as a different network.",
+      "level": "stretch",
+      "story": "Office PCs browse the internet and reach the servers, but they cannot reach any PC in the Sales network (192.168.20.0/24). Routing on the router is fine and the Sales PCs work.",
+      "topology": {
+        "segments": [
+          {
+            "id": "lan",
+            "label": "Office"
+          },
+          {
+            "id": "sales",
+            "label": "Sales"
+          },
+          {
+            "id": "srv",
+            "label": "Server LAN"
+          }
+        ],
+        "router": {
+          "name": "Router",
+          "ifaces": [
+            {
+              "segment": "lan",
+              "ip": "192.168.10.1",
+              "mask": "255.255.255.0",
+              "helper": "10.0.0.5"
+            },
+            {
+              "segment": "sales",
+              "ip": "192.168.20.1",
+              "mask": "255.255.255.0",
+              "helper": "10.0.0.5"
+            },
+            {
+              "segment": "srv",
+              "ip": "10.0.0.1",
+              "mask": "255.255.255.0",
+              "helper": ""
+            }
+          ]
+        },
+        "server": {
+          "name": "DHCP server",
+          "segment": "srv",
+          "ip": "10.0.0.5",
+          "mask": "255.255.255.0",
+          "online": true,
+          "conflictDetection": false,
+          "scopes": [
+            {
+              "id": "office",
+              "name": "Office",
+              "network": "192.168.10.0",
+              "mask": "255.255.0.0",
+              "start": "192.168.10.100",
+              "end": "192.168.10.150",
+              "excluded": "",
+              "gateway": "192.168.10.1",
+              "dns": "10.0.0.53",
+              "leaseHours": 8
+            },
+            {
+              "id": "sales",
+              "name": "Sales",
+              "network": "192.168.20.0",
+              "mask": "255.255.255.0",
+              "start": "192.168.20.100",
+              "end": "192.168.20.150",
+              "excluded": "",
+              "gateway": "192.168.20.1",
+              "dns": "10.0.0.53",
+              "leaseHours": 8
+            }
+          ]
+        },
+        "dns": [
+          "10.0.0.53"
+        ],
+        "hosts": [
+          {
+            "id": "dns",
+            "name": "DNS server",
+            "segment": "srv",
+            "mode": "static",
+            "mac": "",
+            "probe": true,
+            "ip": "10.0.0.53",
+            "mask": "255.255.255.0",
+            "gateway": "10.0.0.1"
+          },
+          {
+            "id": "office1",
+            "name": "Office PC",
+            "segment": "lan",
+            "mode": "dhcp",
+            "mac": "aa:00:00:00:00:01",
+            "probe": true,
+            "ip": "",
+            "mask": "",
+            "gateway": ""
+          },
+          {
+            "id": "sales1",
+            "name": "Sales PC",
+            "segment": "sales",
+            "mode": "dhcp",
+            "mac": "aa:00:00:00:00:02",
+            "probe": true,
+            "ip": "",
+            "mask": "",
+            "gateway": ""
+          }
+        ]
+      },
+      "expect": [
+        {
+          "client": "office1",
+          "verdict": "failed",
+          "label": "Office PC has the wrong mask",
+          "code": "wrong-mask"
+        },
+        {
+          "client": "sales1",
+          "verdict": "success",
+          "label": "Sales PC works"
+        }
+      ],
+      "hints": [
+        "Compare the mask the Office PC received with the mask on the router's Office interface.",
+        "A host decides what is \"on my own wire\" with its mask. Which addresses does 192.168.0.0/16 cover, and does that include the Sales network?",
+        "Set the Office scope's mask to 255.255.255.0, the same as the router interface."
+      ],
+      "fix": [
+        {
+          "path": "server.scopes.0.mask",
+          "value": "255.255.255.0"
+        }
+      ],
+      "fixText": [
+        "Change the mask of the Office scope from 255.255.0.0 to 255.255.255.0 so it matches the router interface."
+      ],
+      "expectFixed": [
+        {
+          "client": "office1",
+          "verdict": "success",
+          "label": "Office PC gets the right mask and works"
+        },
+        {
+          "client": "sales1",
+          "verdict": "success",
+          "label": "Sales PC still works"
+        }
+      ],
+      "lesson": "The mask in the scope is what every client believes about its own subnet. A mask that is too short makes a client treat other networks as local: it ARPs for them directly instead of using the gateway, and nobody answers. A mask that is too long hides parts of the real subnet. The scope mask must match the router interface mask on that segment.",
+      "related": [
+        "CCNA: IPv4 subnetting",
+        "CCNA: DHCP options"
+      ]
+    },
+    {
+      "id": "lease-outage",
+      "title": "Everyone lost the network overnight",
+      "goal": "Make clients keep working through an eight-hour DHCP server outage.",
+      "level": "stretch",
+      "story": "The DHCP server was switched off for about eight hours of maintenance. The server came back fine, but laptops that stayed on all night had lost their network settings. Try it: press \"Everyone asks\", switch the server off, move the clock forward eight hours and look at the leases.",
+      "topology": {
+        "segments": [
+          {
+            "id": "lan",
+            "label": "Office LAN"
+          }
+        ],
+        "router": {
+          "name": "Router",
+          "ifaces": [
+            {
+              "segment": "lan",
+              "ip": "192.168.10.1",
+              "mask": "255.255.255.0",
+              "helper": ""
+            }
+          ]
+        },
+        "server": {
+          "name": "DHCP server",
+          "segment": "lan",
+          "ip": "192.168.10.5",
+          "mask": "255.255.255.0",
+          "online": true,
+          "conflictDetection": false,
+          "scopes": [
+            {
+              "id": "office",
+              "name": "Office",
+              "network": "192.168.10.0",
+              "mask": "255.255.255.0",
+              "start": "192.168.10.100",
+              "end": "192.168.10.150",
+              "excluded": "",
+              "gateway": "192.168.10.1",
+              "dns": "192.168.10.5",
+              "leaseHours": 2
+            }
+          ]
+        },
+        "dns": [
+          "192.168.10.5"
+        ],
+        "hosts": [
+          {
+            "id": "ana",
+            "name": "Laptop Ana",
+            "segment": "lan",
+            "mode": "dhcp",
+            "mac": "aa:00:00:00:00:01",
+            "probe": true,
+            "ip": "",
+            "mask": "",
+            "gateway": ""
+          },
+          {
+            "id": "ben",
+            "name": "Laptop Ben",
+            "segment": "lan",
+            "mode": "dhcp",
+            "mac": "aa:00:00:00:00:02",
+            "probe": true,
+            "ip": "",
+            "mask": "",
+            "gateway": ""
+          }
+        ]
+      },
+      "expect": [
+        {
+          "client": "ana",
+          "verdict": "failed",
+          "label": "Laptop Ana loses its address during the outage",
+          "code": "lease-expired",
+          "setup": [
+            {
+              "path": "server.online",
+              "value": true
+            }
+          ],
+          "script": [
+            {
+              "do": "edit",
+              "path": "server.online",
+              "value": false
+            },
+            {
+              "do": "advance",
+              "minutes": 480
+            }
+          ]
+        }
+      ],
+      "hints": [
+        "Watch the lease timers while the clock advances: when does Laptop Ana try to renew, and what happens when the server does not answer?",
+        "A client keeps using its address until the lease runs out. The lease time must be longer than the longest outage you want to survive.",
+        "Raise the lease time of the Office scope from 2 hours to 24 hours (anything above eight hours passes this test)."
+      ],
+      "fix": [
+        {
+          "path": "server.scopes.0.leaseHours",
+          "value": 24
+        }
+      ],
+      "fixText": [
+        "Raise the lease time in the Office scope from 2 hours to 24 hours, so a lease outlives the eight-hour outage."
+      ],
+      "expectFixed": [
+        {
+          "client": "ana",
+          "verdict": "success",
+          "label": "Laptop Ana still has a working address after the outage",
+          "setup": [
+            {
+              "path": "server.online",
+              "value": true
+            }
+          ],
+          "script": [
+            {
+              "do": "edit",
+              "path": "server.online",
+              "value": false
+            },
+            {
+              "do": "advance",
+              "minutes": 480
+            }
+          ]
+        },
+        {
+          "client": "ben",
+          "verdict": "success",
+          "label": "Laptop Ben still has a working address after the outage",
+          "setup": [
+            {
+              "path": "server.online",
+              "value": true
+            }
+          ],
+          "script": [
+            {
+              "do": "edit",
+              "path": "server.online",
+              "value": false
+            },
+            {
+              "do": "advance",
+              "minutes": 480
+            }
+          ]
+        }
+      ],
+      "lesson": "A lease is a loan. At T1 (50% of the lease) the client asks its server to renew by unicast; if that fails it broadcasts a request at T2 (87.5%); if nobody answers by the end of the lease it must stop using the address. Clients ride out a server outage only while their lease lasts, so lease times should be longer than the outages you must survive (and shorter than the time you are willing to wait for freed addresses).",
+      "related": [
+        "CCNA: DHCP",
+        "RFC 2131 section 4.4.5"
+      ]
+    }
+  ],
+  "dhcpSandbox": {
+    "segments": [
+      {
+        "id": "lan",
+        "label": "Office"
+      },
+      {
+        "id": "sales",
+        "label": "Sales"
+      },
+      {
+        "id": "srv",
+        "label": "Server LAN"
+      }
+    ],
+    "router": {
+      "name": "Router",
+      "ifaces": [
+        {
+          "segment": "lan",
+          "ip": "192.168.10.1",
+          "mask": "255.255.255.0",
+          "helper": "10.0.0.5"
+        },
+        {
+          "segment": "sales",
+          "ip": "192.168.20.1",
+          "mask": "255.255.255.0",
+          "helper": "10.0.0.5"
+        },
+        {
+          "segment": "srv",
+          "ip": "10.0.0.1",
+          "mask": "255.255.255.0",
+          "helper": ""
+        }
+      ]
+    },
+    "server": {
+      "name": "DHCP server",
+      "segment": "srv",
+      "ip": "10.0.0.5",
+      "mask": "255.255.255.0",
+      "online": true,
+      "conflictDetection": true,
+      "scopes": [
+        {
+          "id": "office",
+          "name": "Office",
+          "network": "192.168.10.0",
+          "mask": "255.255.255.0",
+          "start": "192.168.10.100",
+          "end": "192.168.10.200",
+          "excluded": "192.168.10.150-192.168.10.160",
+          "gateway": "192.168.10.1",
+          "dns": "10.0.0.53",
+          "leaseHours": 8
+        },
+        {
+          "id": "sales",
+          "name": "Sales",
+          "network": "192.168.20.0",
+          "mask": "255.255.255.0",
+          "start": "192.168.20.100",
+          "end": "192.168.20.200",
+          "excluded": "",
+          "gateway": "192.168.20.1",
+          "dns": "10.0.0.53",
+          "leaseHours": 24
+        }
+      ]
+    },
+    "dns": [
+      "10.0.0.53"
+    ],
+    "hosts": [
+      {
+        "id": "dns",
+        "name": "DNS server",
+        "segment": "srv",
+        "mode": "static",
+        "mac": "",
+        "probe": true,
+        "ip": "10.0.0.53",
+        "mask": "255.255.255.0",
+        "gateway": "10.0.0.1"
+      },
+      {
+        "id": "printer",
+        "name": "Printer",
+        "segment": "lan",
+        "mode": "static",
+        "mac": "",
+        "probe": true,
+        "ip": "192.168.10.20",
+        "mask": "255.255.255.0",
+        "gateway": "192.168.10.1"
+      },
+      {
+        "id": "ana",
+        "name": "Office laptop A",
+        "segment": "lan",
+        "mode": "dhcp",
+        "mac": "aa:00:00:00:00:01",
+        "probe": true,
+        "ip": "",
+        "mask": "",
+        "gateway": ""
+      },
+      {
+        "id": "ben",
+        "name": "Office laptop B",
+        "segment": "lan",
+        "mode": "dhcp",
+        "mac": "aa:00:00:00:00:02",
+        "probe": true,
+        "ip": "",
+        "mask": "",
+        "gateway": ""
+      },
+      {
+        "id": "sam",
+        "name": "Sales PC A",
+        "segment": "sales",
+        "mode": "dhcp",
+        "mac": "aa:00:00:00:00:03",
+        "probe": true,
+        "ip": "",
+        "mask": "",
+        "gateway": ""
+      },
+      {
+        "id": "sue",
+        "name": "Sales PC B",
+        "segment": "sales",
+        "mode": "dhcp",
+        "mac": "aa:00:00:00:00:04",
+        "probe": true,
+        "ip": "",
+        "mask": "",
+        "gateway": ""
+      }
+    ]
+  },
+  "stp": [
+    {
+      "id": "stp-default-priorities",
+      "title": "Nobody set a priority",
+      "goal": "Make the core switch the root bridge instead of leaving it to the MAC addresses.",
+      "level": "starter",
+      "story": "A new three-switch block was cabled up and spanning tree was left on its defaults. The 10 Gbps link between Core-1 and Dist-1 shows as blocked, and traffic between those two switches goes the long way round through the access switch on 1 Gbps links.",
+      "topology": {
+        "costTable": "short",
+        "switches": [
+          {
+            "id": "core1",
+            "name": "Core-1",
+            "priority": 32768,
+            "mac": "7a:10:00:00:00:01",
+            "stp": true,
+            "pos": [
+              160,
+              40
+            ]
+          },
+          {
+            "id": "dist1",
+            "name": "Dist-1",
+            "priority": 32768,
+            "mac": "7a:10:00:00:00:02",
+            "stp": true,
+            "pos": [
+              64,
+              150
+            ]
+          },
+          {
+            "id": "acc1",
+            "name": "Acc-1",
+            "priority": 32768,
+            "mac": "00:00:5e:00:53:07",
+            "stp": true,
+            "pos": [
+              256,
+              150
+            ]
+          }
+        ],
+        "links": [
+          {
+            "id": "cd",
+            "speed": 10000,
+            "disabled": false,
+            "a": {
+              "sw": "core1",
+              "port": "Te0/1",
+              "cost": null,
+              "prio": null
+            },
+            "b": {
+              "sw": "dist1",
+              "port": "Te0/1",
+              "cost": null,
+              "prio": null
+            }
+          },
+          {
+            "id": "ca",
+            "speed": 1000,
+            "disabled": false,
+            "a": {
+              "sw": "core1",
+              "port": "Gi0/2",
+              "cost": null,
+              "prio": null
+            },
+            "b": {
+              "sw": "acc1",
+              "port": "Gi0/1",
+              "cost": null,
+              "prio": null
+            }
+          },
+          {
+            "id": "da",
+            "speed": 1000,
+            "disabled": false,
+            "a": {
+              "sw": "dist1",
+              "port": "Gi0/2",
+              "cost": null,
+              "prio": null
+            },
+            "b": {
+              "sw": "acc1",
+              "port": "Gi0/2",
+              "cost": null,
+              "prio": null
+            }
+          }
+        ],
+        "edges": []
+      },
+      "ask": {
+        "check": "root",
+        "switch": "core1"
+      },
+      "expect": [
+        {
+          "check": "root",
+          "switch": "core1",
+          "verdict": "failed",
+          "code": "wrong-root"
+        },
+        {
+          "check": "path",
+          "from": "dist1",
+          "to": "core1",
+          "via": "cd",
+          "verdict": "failed",
+          "code": "suboptimal-path"
+        }
+      ],
+      "hints": [
+        "Read the election in the result: how many switches share the lowest priority, and what decides between them?",
+        "With equal priorities the lowest MAC address wins, and Acc-1 has the lowest MAC. Nothing in the network says the core should be the root.",
+        "Open the switch settings and give Core-1 a bridge priority lower than 32768 (4096 is the usual choice)."
+      ],
+      "fix": [
+        {
+          "switch": "core1",
+          "field": "priority",
+          "value": 4096
+        }
+      ],
+      "fixText": [
+        "Set Core-1 to bridge priority 4096. It now wins on priority, before MAC addresses are compared, so the 10 Gbps core link forwards and the Dist-1 to Acc-1 cable becomes the standby (alternate) path."
+      ],
+      "expectFixed": [
+        {
+          "check": "root",
+          "switch": "core1",
+          "verdict": "success"
+        },
+        {
+          "check": "path",
+          "from": "dist1",
+          "to": "core1",
+          "via": "cd",
+          "verdict": "success"
+        }
+      ],
+      "lesson": "The root bridge is the switch with the lowest bridge ID: the priority first (default 32768), then the MAC address. If nobody sets a priority, the lowest MAC address wins, which is usually just the oldest switch and can sit anywhere in the building. Set a low priority on the switch you want at the centre of the tree, so the design decides and not the hardware.",
+      "related": [
+        "CCNA: STP, RSTP, EtherChannel and CDP/LLDP"
+      ]
+    },
+    {
+      "id": "stp-disabled-loop",
+      "title": "Spanning tree switched off on one switch",
+      "goal": "Stop the broadcast storm without giving up the redundant cables.",
+      "level": "starter",
+      "story": "Acc-2 kept reporting port changes, so someone turned spanning tree off on it. Since then the whole floor is crawling, the switch CPUs are maxed out and users see random disconnects.",
+      "topology": {
+        "costTable": "short",
+        "switches": [
+          {
+            "id": "core1",
+            "name": "Core-1",
+            "priority": 4096,
+            "mac": "7a:10:00:00:00:01",
+            "stp": true,
+            "pos": [
+              76,
+              40
+            ]
+          },
+          {
+            "id": "core2",
+            "name": "Core-2",
+            "priority": 8192,
+            "mac": "7a:10:00:00:00:02",
+            "stp": true,
+            "pos": [
+              244,
+              40
+            ]
+          },
+          {
+            "id": "acc1",
+            "name": "Acc-1",
+            "priority": 32768,
+            "mac": "7a:20:00:00:00:01",
+            "stp": true,
+            "pos": [
+              76,
+              150
+            ]
+          },
+          {
+            "id": "acc2",
+            "name": "Acc-2",
+            "priority": 32768,
+            "mac": "7a:20:00:00:00:02",
+            "stp": false,
+            "pos": [
+              244,
+              150
+            ]
+          }
+        ],
+        "links": [
+          {
+            "id": "cc",
+            "speed": 10000,
+            "disabled": false,
+            "a": {
+              "sw": "core1",
+              "port": "Te0/1",
+              "cost": null,
+              "prio": null
+            },
+            "b": {
+              "sw": "core2",
+              "port": "Te0/1",
+              "cost": null,
+              "prio": null
+            }
+          },
+          {
+            "id": "a1c1",
+            "speed": 1000,
+            "disabled": false,
+            "a": {
+              "sw": "core1",
+              "port": "Gi0/2",
+              "cost": null,
+              "prio": null
+            },
+            "b": {
+              "sw": "acc1",
+              "port": "Gi0/1",
+              "cost": null,
+              "prio": null
+            }
+          },
+          {
+            "id": "a1c2",
+            "speed": 1000,
+            "disabled": false,
+            "a": {
+              "sw": "core2",
+              "port": "Gi0/2",
+              "cost": null,
+              "prio": null
+            },
+            "b": {
+              "sw": "acc1",
+              "port": "Gi0/2",
+              "cost": null,
+              "prio": null
+            }
+          },
+          {
+            "id": "a2c1",
+            "speed": 1000,
+            "disabled": false,
+            "a": {
+              "sw": "core1",
+              "port": "Gi0/3",
+              "cost": null,
+              "prio": null
+            },
+            "b": {
+              "sw": "acc2",
+              "port": "Gi0/1",
+              "cost": null,
+              "prio": null
+            }
+          },
+          {
+            "id": "a2c2",
+            "speed": 1000,
+            "disabled": false,
+            "a": {
+              "sw": "core2",
+              "port": "Gi0/3",
+              "cost": null,
+              "prio": null
+            },
+            "b": {
+              "sw": "acc2",
+              "port": "Gi0/2",
+              "cost": null,
+              "prio": null
+            }
+          }
+        ],
+        "edges": []
+      },
+      "ask": {
+        "check": "no-loop"
+      },
+      "expect": [
+        {
+          "check": "no-loop",
+          "verdict": "failed",
+          "code": "loop-no-stp"
+        },
+        {
+          "check": "redundant",
+          "verdict": "success"
+        }
+      ],
+      "hints": [
+        "Look at the Acc-2 card: what is its STP setting? What does a switch do with its ports when STP is off?",
+        "A switch with STP off forwards on every port. Core-1, Core-2 and Acc-2 now form a closed ring of forwarding links.",
+        "Turn STP back on for Acc-2 so one port in the ring is blocked. Cutting a cable would also stop the loop, but then a single cable failure would cut a switch off, and the goal rules that out."
+      ],
+      "fix": [
+        {
+          "switch": "acc2",
+          "field": "stp",
+          "value": true
+        }
+      ],
+      "fixText": [
+        "Turn STP on for Acc-2. Its link to Core-2 becomes an alternate port and discards, so there is no loop, and the cable stays in place as the standby path."
+      ],
+      "expectFixed": [
+        {
+          "check": "no-loop",
+          "verdict": "success"
+        },
+        {
+          "check": "redundant",
+          "verdict": "success"
+        }
+      ],
+      "lesson": "Redundant cables only work because STP blocks one port in every ring. A switch with STP off keeps all its ports forwarding and the ring is closed. Ethernet frames carry no time-to-live, so a broadcast circulates until the links or CPUs are saturated: a broadcast storm. If STP seems to cause trouble, find the cause (for example, put PortFast on edge ports) instead of switching it off.",
+      "related": [
+        "CCNA: STP, RSTP, EtherChannel and CDP/LLDP"
+      ]
+    },
+    {
+      "id": "stp-old-low-mac",
+      "title": "An old closet switch is the root",
+      "goal": "Move the root bridge back to Core-1 and get the core link forwarding again.",
+      "level": "core",
+      "story": "The core was refreshed over the weekend and the new switches arrived on factory defaults. On Monday the 10 Gbps link between the cores is blocked, and traffic between them goes through the old print-room switch over its 100 Mbps uplinks.",
+      "topology": {
+        "costTable": "short",
+        "switches": [
+          {
+            "id": "core1",
+            "name": "Core-1",
+            "priority": 32768,
+            "mac": "7a:10:00:00:00:01",
+            "stp": true,
+            "pos": [
+              86,
+              38
+            ]
+          },
+          {
+            "id": "core2",
+            "name": "Core-2",
+            "priority": 32768,
+            "mac": "7a:10:00:00:00:02",
+            "stp": true,
+            "pos": [
+              234,
+              38
+            ]
+          },
+          {
+            "id": "acc1",
+            "name": "Acc-1",
+            "priority": 32768,
+            "mac": "7a:20:00:00:00:01",
+            "stp": true,
+            "pos": [
+              44,
+              150
+            ]
+          },
+          {
+            "id": "old",
+            "name": "Acc-Old",
+            "priority": 32768,
+            "mac": "00:00:5e:00:53:07",
+            "stp": true,
+            "pos": [
+              160,
+              150
+            ]
+          },
+          {
+            "id": "acc2",
+            "name": "Acc-2",
+            "priority": 32768,
+            "mac": "7a:20:00:00:00:02",
+            "stp": true,
+            "pos": [
+              276,
+              150
+            ]
+          }
+        ],
+        "links": [
+          {
+            "id": "cc",
+            "speed": 10000,
+            "disabled": false,
+            "a": {
+              "sw": "core1",
+              "port": "Te0/1",
+              "cost": null,
+              "prio": null
+            },
+            "b": {
+              "sw": "core2",
+              "port": "Te0/1",
+              "cost": null,
+              "prio": null
+            }
+          },
+          {
+            "id": "a1c1",
+            "speed": 1000,
+            "disabled": false,
+            "a": {
+              "sw": "core1",
+              "port": "Gi0/2",
+              "cost": null,
+              "prio": null
+            },
+            "b": {
+              "sw": "acc1",
+              "port": "Gi0/1",
+              "cost": null,
+              "prio": null
+            }
+          },
+          {
+            "id": "a1c2",
+            "speed": 1000,
+            "disabled": false,
+            "a": {
+              "sw": "core2",
+              "port": "Gi0/2",
+              "cost": null,
+              "prio": null
+            },
+            "b": {
+              "sw": "acc1",
+              "port": "Gi0/2",
+              "cost": null,
+              "prio": null
+            }
+          },
+          {
+            "id": "a2c1",
+            "speed": 1000,
+            "disabled": false,
+            "a": {
+              "sw": "core1",
+              "port": "Gi0/3",
+              "cost": null,
+              "prio": null
+            },
+            "b": {
+              "sw": "acc2",
+              "port": "Gi0/1",
+              "cost": null,
+              "prio": null
+            }
+          },
+          {
+            "id": "a2c2",
+            "speed": 1000,
+            "disabled": false,
+            "a": {
+              "sw": "core2",
+              "port": "Gi0/3",
+              "cost": null,
+              "prio": null
+            },
+            "b": {
+              "sw": "acc2",
+              "port": "Gi0/2",
+              "cost": null,
+              "prio": null
+            }
+          },
+          {
+            "id": "oc1",
+            "speed": 100,
+            "disabled": false,
+            "a": {
+              "sw": "core1",
+              "port": "Fa0/4",
+              "cost": null,
+              "prio": null
+            },
+            "b": {
+              "sw": "old",
+              "port": "Fa0/1",
+              "cost": null,
+              "prio": null
+            }
+          },
+          {
+            "id": "oc2",
+            "speed": 100,
+            "disabled": false,
+            "a": {
+              "sw": "core2",
+              "port": "Fa0/4",
+              "cost": null,
+              "prio": null
+            },
+            "b": {
+              "sw": "old",
+              "port": "Fa0/2",
+              "cost": null,
+              "prio": null
+            }
+          }
+        ],
+        "edges": []
+      },
+      "ask": {
+        "check": "root",
+        "switch": "core1"
+      },
+      "expect": [
+        {
+          "check": "root",
+          "switch": "core1",
+          "verdict": "failed",
+          "code": "wrong-root"
+        },
+        {
+          "check": "forwarding",
+          "link": "cc",
+          "verdict": "failed",
+          "code": "suboptimal-path"
+        }
+      ],
+      "hints": [
+        "Find the root bridge in the result. Is it one of the cores?",
+        "Every priority is 32768, so the MAC address decides. Compare the MAC of Acc-Old with the cores: which one is lowest, comparing byte by byte from the left?",
+        "A MAC address cannot be changed, so change the priority: lower Core-1 (4096), or raise Acc-Old so it can never win."
+      ],
+      "fix": [
+        {
+          "switch": "core1",
+          "field": "priority",
+          "value": 4096
+        }
+      ],
+      "fixText": [
+        "Set Core-1 to bridge priority 4096 so it wins on priority. (Giving Acc-Old a high number such as 61440 also keeps it from winning, but setting the root you want is the better habit.)"
+      ],
+      "expectFixed": [
+        {
+          "check": "root",
+          "switch": "core1",
+          "verdict": "success"
+        },
+        {
+          "check": "forwarding",
+          "link": "cc",
+          "verdict": "success"
+        }
+      ],
+      "lesson": "When priorities tie, the lowest MAC address wins, and old equipment tends to have low MAC addresses. Replacing a core switch with a factory-default one quietly moves the root to whatever old switch has the lowest MAC. Every root and backup root should have an explicit priority configured, so that a hardware swap cannot change the design.",
+      "related": [
+        "CCNA: STP, RSTP, EtherChannel and CDP/LLDP"
+      ]
+    },
+    {
+      "id": "stp-manual-cost",
+      "title": "The 10 Gbps uplink sits idle",
+      "goal": "Make Acc-1 use its direct 10 Gbps uplink to the root.",
+      "level": "core",
+      "story": "Acc-1 has a 10 Gbps uplink to Core-1 and a 1 Gbps uplink to Core-2. The link is up and error-free, yet all of Acc-1's traffic crawls over the 1 Gbps cable and the 10 Gbps one shows almost no traffic.",
+      "topology": {
+        "costTable": "short",
+        "switches": [
+          {
+            "id": "core1",
+            "name": "Core-1",
+            "priority": 4096,
+            "mac": "7a:10:00:00:00:01",
+            "stp": true,
+            "pos": [
+              76,
+              40
+            ]
+          },
+          {
+            "id": "core2",
+            "name": "Core-2",
+            "priority": 8192,
+            "mac": "7a:10:00:00:00:02",
+            "stp": true,
+            "pos": [
+              244,
+              40
+            ]
+          },
+          {
+            "id": "acc1",
+            "name": "Acc-1",
+            "priority": 32768,
+            "mac": "7a:20:00:00:00:01",
+            "stp": true,
+            "pos": [
+              160,
+              150
+            ]
+          }
+        ],
+        "links": [
+          {
+            "id": "cc",
+            "speed": 10000,
+            "disabled": false,
+            "a": {
+              "sw": "core1",
+              "port": "Te0/1",
+              "cost": null,
+              "prio": null
+            },
+            "b": {
+              "sw": "core2",
+              "port": "Te0/1",
+              "cost": null,
+              "prio": null
+            }
+          },
+          {
+            "id": "a1c1",
+            "speed": 10000,
+            "disabled": false,
+            "a": {
+              "sw": "core1",
+              "port": "Te0/2",
+              "cost": null,
+              "prio": null
+            },
+            "b": {
+              "sw": "acc1",
+              "port": "Te0/1",
+              "cost": 100,
+              "prio": null
+            }
+          },
+          {
+            "id": "a1c2",
+            "speed": 1000,
+            "disabled": false,
+            "a": {
+              "sw": "core2",
+              "port": "Gi0/2",
+              "cost": null,
+              "prio": null
+            },
+            "b": {
+              "sw": "acc1",
+              "port": "Gi0/2",
+              "cost": null,
+              "prio": null
+            }
+          }
+        ],
+        "edges": []
+      },
+      "ask": {
+        "check": "path",
+        "from": "acc1",
+        "to": "core1",
+        "via": "a1c1"
+      },
+      "expect": [
+        {
+          "check": "path",
+          "from": "acc1",
+          "to": "core1",
+          "via": "a1c1",
+          "verdict": "failed",
+          "code": "suboptimal-path"
+        }
+      ],
+      "hints": [
+        "Is the 10 Gbps link forwarding or blocked? Read the role and the reason shown for Acc-1's port on it.",
+        "A switch adds the cost of the port a BPDU arrives on. Look at the cost shown for Acc-1's port towards Core-1: is it what a 10 Gbps link should have?",
+        "Open the link settings and clear the manual cost on Acc-1's end of the Core-1 link, so it is automatic again."
+      ],
+      "fix": [
+        {
+          "link": "a1c1",
+          "end": "b",
+          "field": "cost",
+          "value": null
+        }
+      ],
+      "fixText": [
+        "Clear the manual cost (100) on Acc-1's port towards Core-1. With automatic costs the direct 10 Gbps path costs 2, which beats the 1 Gbps detour through Core-2 (4 + 2 = 6), so the direct link becomes the root port."
+      ],
+      "expectFixed": [
+        {
+          "check": "path",
+          "from": "acc1",
+          "to": "core1",
+          "via": "a1c1",
+          "verdict": "success"
+        }
+      ],
+      "lesson": "STP chooses the path with the lowest total cost to the root, not the one that looks fastest on the wiring diagram. Each switch adds the cost of the port a BPDU arrives on, so a forgotten manual cost on one port can make the best link a blocked standby. Automatic costs follow the link speed; if you set a cost by hand, document why, and check it again when the cable or the speed changes.",
+      "related": [
+        "CCNA: STP, RSTP, EtherChannel and CDP/LLDP"
+      ]
+    },
+    {
+      "id": "stp-standby-disabled",
+      "title": "The \"unused\" uplink was shut down",
+      "goal": "Give Acc-1 a standby path, so losing the cable to Core-1 does not cut it off.",
+      "level": "core",
+      "story": "Acc-1 has two uplinks, but one of its ports showed as blocking, so someone shut that link down to tidy up. This morning a contractor cut the cable between Acc-1 and Core-1, and the whole floor went dark.",
+      "topology": {
+        "costTable": "short",
+        "switches": [
+          {
+            "id": "core1",
+            "name": "Core-1",
+            "priority": 4096,
+            "mac": "7a:10:00:00:00:01",
+            "stp": true,
+            "pos": [
+              76,
+              40
+            ]
+          },
+          {
+            "id": "core2",
+            "name": "Core-2",
+            "priority": 8192,
+            "mac": "7a:10:00:00:00:02",
+            "stp": true,
+            "pos": [
+              244,
+              40
+            ]
+          },
+          {
+            "id": "acc1",
+            "name": "Acc-1",
+            "priority": 32768,
+            "mac": "7a:20:00:00:00:01",
+            "stp": true,
+            "pos": [
+              76,
+              150
+            ]
+          },
+          {
+            "id": "acc2",
+            "name": "Acc-2",
+            "priority": 32768,
+            "mac": "7a:20:00:00:00:02",
+            "stp": true,
+            "pos": [
+              244,
+              150
+            ]
+          }
+        ],
+        "links": [
+          {
+            "id": "cc",
+            "speed": 10000,
+            "disabled": false,
+            "a": {
+              "sw": "core1",
+              "port": "Te0/1",
+              "cost": null,
+              "prio": null
+            },
+            "b": {
+              "sw": "core2",
+              "port": "Te0/1",
+              "cost": null,
+              "prio": null
+            }
+          },
+          {
+            "id": "a1c1",
+            "speed": 1000,
+            "disabled": false,
+            "a": {
+              "sw": "core1",
+              "port": "Gi0/2",
+              "cost": null,
+              "prio": null
+            },
+            "b": {
+              "sw": "acc1",
+              "port": "Gi0/1",
+              "cost": null,
+              "prio": null
+            }
+          },
+          {
+            "id": "a1c2",
+            "speed": 1000,
+            "disabled": true,
+            "a": {
+              "sw": "core2",
+              "port": "Gi0/2",
+              "cost": null,
+              "prio": null
+            },
+            "b": {
+              "sw": "acc1",
+              "port": "Gi0/2",
+              "cost": null,
+              "prio": null
+            }
+          },
+          {
+            "id": "a2c1",
+            "speed": 1000,
+            "disabled": false,
+            "a": {
+              "sw": "core1",
+              "port": "Gi0/3",
+              "cost": null,
+              "prio": null
+            },
+            "b": {
+              "sw": "acc2",
+              "port": "Gi0/1",
+              "cost": null,
+              "prio": null
+            }
+          },
+          {
+            "id": "a2c2",
+            "speed": 1000,
+            "disabled": false,
+            "a": {
+              "sw": "core2",
+              "port": "Gi0/3",
+              "cost": null,
+              "prio": null
+            },
+            "b": {
+              "sw": "acc2",
+              "port": "Gi0/2",
+              "cost": null,
+              "prio": null
+            }
+          }
+        ],
+        "edges": []
+      },
+      "ask": {
+        "check": "survive",
+        "link": "a1c1"
+      },
+      "expect": [
+        {
+          "check": "survive",
+          "link": "a1c1",
+          "verdict": "failed",
+          "code": "no-redundancy"
+        }
+      ],
+      "hints": [
+        "Look at the links: which of Acc-1's cables is down, and what does that leave Acc-1 with if its other cable fails?",
+        "A blocked (alternate) port is not a fault. It is the standby path that STP keeps ready, and disabling it removes the redundancy.",
+        "Bring the Acc-1 to Core-2 link back up, then use the cable-cut buttons on the diagram to cut the Core-1 cable and watch which port takes over."
+      ],
+      "fix": [
+        {
+          "link": "a1c2",
+          "field": "disabled",
+          "value": false
+        }
+      ],
+      "fixText": [
+        "Bring the Acc-1 to Core-2 link back up. STP keeps its Acc-1 end as an alternate port (blocking in classic STP, discarding in RSTP). When the Core-1 cable is cut, that alternate port becomes the root port and starts forwarding."
+      ],
+      "expectFixed": [
+        {
+          "check": "survive",
+          "link": "a1c1",
+          "verdict": "success"
+        },
+        {
+          "check": "health",
+          "verdict": "success"
+        }
+      ],
+      "lesson": "A port that STP keeps in the discarding state (classic STP: blocking) is doing its job: it is the alternate path, ready to take over. Shutting it down throws the redundancy away. After a failure classic STP needs about 30 seconds (listening 15 s plus learning 15 s with default timers) for a directly detected failure, and up to about 50 seconds when the max age timer has to expire first; RSTP lets an alternate port take over much faster, typically in about a second on point-to-point links.",
+      "related": [
+        "CCNA: STP, RSTP, EtherChannel and CDP/LLDP"
+      ]
+    },
+    {
+      "id": "stp-root-and-backup",
+      "title": "Set a root and a backup root",
+      "goal": "Core-1 is the root, and Core-2 takes over if Core-1 dies.",
+      "level": "stretch",
+      "story": "The design says Core-1 is the root and Core-2 the backup. To make both cores \"preferred\", the engineer set priority 4096 on each. Now Core-2 is the root, and nobody is sure what happens when it fails.",
+      "topology": {
+        "costTable": "short",
+        "switches": [
+          {
+            "id": "core1",
+            "name": "Core-1",
+            "priority": 4096,
+            "mac": "7a:10:00:00:00:09",
+            "stp": true,
+            "pos": [
+              76,
+              40
+            ]
+          },
+          {
+            "id": "core2",
+            "name": "Core-2",
+            "priority": 4096,
+            "mac": "7a:10:00:00:00:03",
+            "stp": true,
+            "pos": [
+              244,
+              40
+            ]
+          },
+          {
+            "id": "acc1",
+            "name": "Acc-1",
+            "priority": 32768,
+            "mac": "7a:20:00:00:00:01",
+            "stp": true,
+            "pos": [
+              76,
+              150
+            ]
+          },
+          {
+            "id": "acc2",
+            "name": "Acc-2",
+            "priority": 32768,
+            "mac": "7a:20:00:00:00:02",
+            "stp": true,
+            "pos": [
+              244,
+              150
+            ]
+          }
+        ],
+        "links": [
+          {
+            "id": "cc",
+            "speed": 10000,
+            "disabled": false,
+            "a": {
+              "sw": "core1",
+              "port": "Te0/1",
+              "cost": null,
+              "prio": null
+            },
+            "b": {
+              "sw": "core2",
+              "port": "Te0/1",
+              "cost": null,
+              "prio": null
+            }
+          },
+          {
+            "id": "a1c1",
+            "speed": 1000,
+            "disabled": false,
+            "a": {
+              "sw": "core1",
+              "port": "Gi0/2",
+              "cost": null,
+              "prio": null
+            },
+            "b": {
+              "sw": "acc1",
+              "port": "Gi0/1",
+              "cost": null,
+              "prio": null
+            }
+          },
+          {
+            "id": "a1c2",
+            "speed": 1000,
+            "disabled": false,
+            "a": {
+              "sw": "core2",
+              "port": "Gi0/2",
+              "cost": null,
+              "prio": null
+            },
+            "b": {
+              "sw": "acc1",
+              "port": "Gi0/2",
+              "cost": null,
+              "prio": null
+            }
+          },
+          {
+            "id": "a2c1",
+            "speed": 1000,
+            "disabled": false,
+            "a": {
+              "sw": "core1",
+              "port": "Gi0/3",
+              "cost": null,
+              "prio": null
+            },
+            "b": {
+              "sw": "acc2",
+              "port": "Gi0/1",
+              "cost": null,
+              "prio": null
+            }
+          },
+          {
+            "id": "a2c2",
+            "speed": 1000,
+            "disabled": false,
+            "a": {
+              "sw": "core2",
+              "port": "Gi0/3",
+              "cost": null,
+              "prio": null
+            },
+            "b": {
+              "sw": "acc2",
+              "port": "Gi0/2",
+              "cost": null,
+              "prio": null
+            }
+          }
+        ],
+        "edges": []
+      },
+      "ask": {
+        "check": "root",
+        "switch": "core1"
+      },
+      "expect": [
+        {
+          "check": "root",
+          "switch": "core1",
+          "verdict": "failed",
+          "code": "wrong-root"
+        },
+        {
+          "check": "backup-root",
+          "switch": "core2",
+          "verdict": "failed",
+          "code": "no-backup-root"
+        }
+      ],
+      "hints": [
+        "Who is the root now, and why? Both cores have the same priority, so what is the tie-break?",
+        "The lowest MAC address decides when priorities are equal, and Core-2's MAC is lower than Core-1's. A root and a backup need different priorities.",
+        "Keep Core-1 at 4096 and give Core-2 a slightly worse (higher) priority such as 8192, which is still better than any access switch."
+      ],
+      "fix": [
+        {
+          "switch": "core2",
+          "field": "priority",
+          "value": 8192
+        }
+      ],
+      "fixText": [
+        "Leave Core-1 at 4096 and set Core-2 to 8192. Core-1 now wins outright; if it fails, Core-2 (8192) beats every access switch (32768), so it becomes the root."
+      ],
+      "expectFixed": [
+        {
+          "check": "root",
+          "switch": "core1",
+          "verdict": "success"
+        },
+        {
+          "check": "backup-root",
+          "switch": "core2",
+          "verdict": "success"
+        }
+      ],
+      "lesson": "Primary and backup roots need different, deliberate priorities. Equal priorities hand the decision back to the MAC address, so the \"backup\" can end up as the root. A common pattern is a low priority such as 4096 on the root and the next step, 8192, on the backup, with everything else left at 32768. Then if the root fails, the backup wins the next election, not whichever access switch has the lowest MAC.",
+      "related": [
+        "CCNA: STP, RSTP, EtherChannel and CDP/LLDP"
+      ]
+    },
+    {
+      "id": "stp-rogue-switch",
+      "title": "A wall-socket switch took over as root",
+      "goal": "Keep a switch plugged into an access port from taking part in the election.",
+      "level": "stretch",
+      "story": "Since Tuesday the network has been slow, and traffic between floors passes through wall socket 12 on Acc-2. A technician plugged in a switch from the test lab, and its old configuration still says bridge priority 0.",
+      "topology": {
+        "costTable": "short",
+        "switches": [
+          {
+            "id": "core1",
+            "name": "Core-1",
+            "priority": 4096,
+            "mac": "7a:10:00:00:00:01",
+            "stp": true,
+            "pos": [
+              76,
+              40
+            ]
+          },
+          {
+            "id": "core2",
+            "name": "Core-2",
+            "priority": 8192,
+            "mac": "7a:10:00:00:00:02",
+            "stp": true,
+            "pos": [
+              244,
+              40
+            ]
+          },
+          {
+            "id": "acc1",
+            "name": "Acc-1",
+            "priority": 32768,
+            "mac": "7a:20:00:00:00:01",
+            "stp": true,
+            "pos": [
+              76,
+              150
+            ]
+          },
+          {
+            "id": "acc2",
+            "name": "Acc-2",
+            "priority": 32768,
+            "mac": "7a:20:00:00:00:02",
+            "stp": true,
+            "pos": [
+              244,
+              150
+            ]
+          }
+        ],
+        "links": [
+          {
+            "id": "cc",
+            "speed": 10000,
+            "disabled": false,
+            "a": {
+              "sw": "core1",
+              "port": "Te0/1",
+              "cost": null,
+              "prio": null
+            },
+            "b": {
+              "sw": "core2",
+              "port": "Te0/1",
+              "cost": null,
+              "prio": null
+            }
+          },
+          {
+            "id": "a1c1",
+            "speed": 1000,
+            "disabled": false,
+            "a": {
+              "sw": "core1",
+              "port": "Gi0/2",
+              "cost": null,
+              "prio": null
+            },
+            "b": {
+              "sw": "acc1",
+              "port": "Gi0/1",
+              "cost": null,
+              "prio": null
+            }
+          },
+          {
+            "id": "a1c2",
+            "speed": 1000,
+            "disabled": false,
+            "a": {
+              "sw": "core2",
+              "port": "Gi0/2",
+              "cost": null,
+              "prio": null
+            },
+            "b": {
+              "sw": "acc1",
+              "port": "Gi0/2",
+              "cost": null,
+              "prio": null
+            }
+          },
+          {
+            "id": "a2c1",
+            "speed": 1000,
+            "disabled": false,
+            "a": {
+              "sw": "core1",
+              "port": "Gi0/3",
+              "cost": null,
+              "prio": null
+            },
+            "b": {
+              "sw": "acc2",
+              "port": "Gi0/1",
+              "cost": null,
+              "prio": null
+            }
+          },
+          {
+            "id": "a2c2",
+            "speed": 1000,
+            "disabled": false,
+            "a": {
+              "sw": "core2",
+              "port": "Gi0/3",
+              "cost": null,
+              "prio": null
+            },
+            "b": {
+              "sw": "acc2",
+              "port": "Gi0/2",
+              "cost": null,
+              "prio": null
+            }
+          }
+        ],
+        "edges": [
+          {
+            "id": "e1",
+            "sw": "acc1",
+            "port": "Fa0/10",
+            "name": "Office PC",
+            "device": "pc",
+            "portfast": true,
+            "bpduGuard": true,
+            "rogue": {
+              "priority": 32768,
+              "mac": "00:00:5e:00:53:99"
+            }
+          },
+          {
+            "id": "e2",
+            "sw": "acc2",
+            "port": "Fa0/10",
+            "name": "Lab switch",
+            "device": "switch",
+            "portfast": true,
+            "bpduGuard": false,
+            "rogue": {
+              "priority": 0,
+              "mac": "00:00:5e:00:53:63"
+            }
+          }
+        ]
+      },
+      "ask": {
+        "check": "root",
+        "switch": "core1"
+      },
+      "expect": [
+        {
+          "check": "root",
+          "switch": "core1",
+          "verdict": "failed",
+          "code": "rogue-root"
+        }
+      ],
+      "hints": [
+        "Which switch is the root now? Is it one of the four switches in your list?",
+        "The root is a device on an edge port of Acc-2. Nothing stops a switch plugged into a wall socket from sending BPDUs and joining the election.",
+        "Open the edge ports and turn on BPDU Guard for that port. A port that should only face end devices is shut down the moment a BPDU arrives."
+      ],
+      "fix": [
+        {
+          "edge": "e2",
+          "field": "bpduGuard",
+          "value": true
+        }
+      ],
+      "fixText": [
+        "Enable BPDU Guard on Acc-2's wall-socket port. When the lab switch sends a BPDU the port is shut down (error-disabled), so its priority-0 bridge ID never reaches the election and Core-1 is the root again."
+      ],
+      "expectFixed": [
+        {
+          "check": "root",
+          "switch": "core1",
+          "verdict": "success"
+        },
+        {
+          "check": "health",
+          "verdict": "success"
+        }
+      ],
+      "lesson": "Any switch that can send a BPDU into the network can join the root election, and a low priority wins it. PortFast makes an access port forward immediately, and BPDU Guard shuts that port down if a BPDU ever arrives, which is exactly what should happen when someone plugs in a switch. Use PortFast with BPDU Guard on access ports only. (Root guard, which protects ports that face other switches, is a related feature that this lab does not model.)",
+      "related": [
+        "CCNA: STP, RSTP, EtherChannel and CDP/LLDP",
+        "CISSP: network security"
+      ]
+    }
+  ],
+  "stpSandbox": {
+    "costTable": "short",
+    "switches": [
+      {
+        "id": "core1",
+        "name": "Core-1",
+        "priority": 4096,
+        "mac": "7a:10:00:00:00:01",
+        "stp": true,
+        "pos": [
+          76,
+          40
+        ]
+      },
+      {
+        "id": "core2",
+        "name": "Core-2",
+        "priority": 8192,
+        "mac": "7a:10:00:00:00:02",
+        "stp": true,
+        "pos": [
+          244,
+          40
+        ]
+      },
+      {
+        "id": "acc1",
+        "name": "Acc-1",
+        "priority": 32768,
+        "mac": "7a:20:00:00:00:01",
+        "stp": true,
+        "pos": [
+          76,
+          150
+        ]
+      },
+      {
+        "id": "acc2",
+        "name": "Acc-2",
+        "priority": 32768,
+        "mac": "7a:20:00:00:00:02",
+        "stp": true,
+        "pos": [
+          244,
+          150
+        ]
+      }
+    ],
+    "links": [
+      {
+        "id": "cc",
+        "speed": 10000,
+        "disabled": false,
+        "a": {
+          "sw": "core1",
+          "port": "Te0/1",
+          "cost": null,
+          "prio": null
+        },
+        "b": {
+          "sw": "core2",
+          "port": "Te0/1",
+          "cost": null,
+          "prio": null
+        }
+      },
+      {
+        "id": "a1c1",
+        "speed": 1000,
+        "disabled": false,
+        "a": {
+          "sw": "core1",
+          "port": "Gi0/2",
+          "cost": null,
+          "prio": null
+        },
+        "b": {
+          "sw": "acc1",
+          "port": "Gi0/1",
+          "cost": null,
+          "prio": null
+        }
+      },
+      {
+        "id": "a1c2",
+        "speed": 1000,
+        "disabled": false,
+        "a": {
+          "sw": "core2",
+          "port": "Gi0/2",
+          "cost": null,
+          "prio": null
+        },
+        "b": {
+          "sw": "acc1",
+          "port": "Gi0/2",
+          "cost": null,
+          "prio": null
+        }
+      },
+      {
+        "id": "a2c1",
+        "speed": 1000,
+        "disabled": false,
+        "a": {
+          "sw": "core1",
+          "port": "Gi0/3",
+          "cost": null,
+          "prio": null
+        },
+        "b": {
+          "sw": "acc2",
+          "port": "Gi0/1",
+          "cost": null,
+          "prio": null
+        }
+      },
+      {
+        "id": "a2c2",
+        "speed": 1000,
+        "disabled": false,
+        "a": {
+          "sw": "core2",
+          "port": "Gi0/3",
+          "cost": null,
+          "prio": null
+        },
+        "b": {
+          "sw": "acc2",
+          "port": "Gi0/2",
+          "cost": null,
+          "prio": null
+        }
+      }
+    ],
+    "edges": [
+      {
+        "id": "e1",
+        "sw": "acc1",
+        "port": "Fa0/10",
+        "name": "Office PC",
+        "device": "pc",
+        "portfast": true,
+        "bpduGuard": true,
+        "rogue": {
+          "priority": 32768,
+          "mac": "00:00:5e:00:53:99"
+        }
+      },
+      {
+        "id": "e2",
+        "sw": "acc2",
+        "port": "Fa0/10",
+        "name": "Wall socket 12",
+        "device": "pc",
+        "portfast": false,
+        "bpduGuard": false,
+        "rogue": {
+          "priority": 32768,
+          "mac": "00:00:5e:00:53:99"
+        }
+      }
+    ]
+  },
+  "vpn": [
+    {
+      "id": "vpn-psk",
+      "title": "The key was rotated and the tunnel died",
+      "goal": "Both gateways must hold the identical pre-shared key.",
+      "level": "starter",
+      "story": "The branch gateway was re-keyed after a security review. Since then the branch cannot reach head office, and the head office team says the algorithms on both ends have not changed.",
+      "topology": {
+        "sites": [
+          {
+            "id": "a",
+            "name": "Head office",
+            "gwPublic": "203.0.113.10",
+            "peerIp": "198.51.100.20",
+            "behindNat": false,
+            "natT": true,
+            "fw": {
+              "udp500": true,
+              "udp4500": true,
+              "esp": true
+            },
+            "snat": true,
+            "natExempt": "10.2.0.0/24",
+            "mode": "route",
+            "routes": [
+              {
+                "id": "a-r1",
+                "dest": "10.2.0.0/24"
+              }
+            ],
+            "subnets": [
+              {
+                "id": "a1",
+                "name": "Office LAN",
+                "cidr": "10.1.0.0/24",
+                "host": {
+                  "id": "pc-a",
+                  "name": "PC-A",
+                  "ip": "10.1.0.50"
+                }
+              },
+              {
+                "id": "a2",
+                "name": "Server LAN",
+                "cidr": "10.1.1.0/24",
+                "host": {
+                  "id": "srv-a",
+                  "name": "Server-A",
+                  "ip": "10.1.1.20"
+                }
+              }
+            ],
+            "ike": {
+              "version": "ikev2",
+              "enc": "aes256",
+              "hash": "sha256",
+              "dh": 14,
+              "psk": "Maple-Harbor-42",
+              "lifetime": 28800
+            },
+            "child": {
+              "enc": "aes256",
+              "hash": "sha256",
+              "pfs": 14,
+              "lifetime": 3600
+            },
+            "selectors": [
+              {
+                "id": "a-s1",
+                "local": "10.1.0.0/24",
+                "remote": "10.2.0.0/24"
+              },
+              {
+                "id": "a-s2",
+                "local": "10.1.1.0/24",
+                "remote": "10.2.0.0/24"
+              }
+            ]
+          },
+          {
+            "id": "b",
+            "name": "Branch",
+            "gwPublic": "198.51.100.20",
+            "peerIp": "203.0.113.10",
+            "behindNat": false,
+            "natT": true,
+            "fw": {
+              "udp500": true,
+              "udp4500": true,
+              "esp": true
+            },
+            "snat": true,
+            "natExempt": "10.1.0.0/24, 10.1.1.0/24",
+            "mode": "route",
+            "routes": [
+              {
+                "id": "b-r1",
+                "dest": "10.1.0.0/24"
+              },
+              {
+                "id": "b-r2",
+                "dest": "10.1.1.0/24"
+              }
+            ],
+            "subnets": [
+              {
+                "id": "b1",
+                "name": "Branch LAN",
+                "cidr": "10.2.0.0/24",
+                "host": {
+                  "id": "pc-b",
+                  "name": "PC-B",
+                  "ip": "10.2.0.60"
+                }
+              }
+            ],
+            "ike": {
+              "version": "ikev2",
+              "enc": "aes256",
+              "hash": "sha256",
+              "dh": 14,
+              "psk": "Maple-Harbor-24",
+              "lifetime": 28800
+            },
+            "child": {
+              "enc": "aes256",
+              "hash": "sha256",
+              "pfs": 14,
+              "lifetime": 3600
+            },
+            "selectors": [
+              {
+                "id": "b-s1",
+                "local": "10.2.0.0/24",
+                "remote": "10.1.0.0/24"
+              },
+              {
+                "id": "b-s2",
+                "local": "10.2.0.0/24",
+                "remote": "10.1.1.0/24"
+              }
+            ]
+          }
+        ]
+      },
+      "ask": {
+        "from": "pc-a",
+        "to": "pc-b"
+      },
+      "expect": [
+        {
+          "from": "pc-a",
+          "to": "pc-b",
+          "verdict": "failed",
+          "code": "psk-mismatch"
+        }
+      ],
+      "hints": [
+        "Look at the tunnel status: which stage is the first one that fails?",
+        "The algorithms agreed (the trace says so). What else does each gateway prove to the other during phase 1?",
+        "Compare the two pre-shared keys character by character, including digits and case."
+      ],
+      "fix": [
+        {
+          "site": "b",
+          "path": "ike.psk",
+          "value": "Maple-Harbor-42"
+        }
+      ],
+      "fixText": [
+        "Set the Branch pre-shared key to Maple-Harbor-42, exactly as at Head office (the digits were swapped)."
+      ],
+      "expectFixed": [
+        {
+          "from": "pc-a",
+          "to": "pc-b",
+          "verdict": "success"
+        }
+      ],
+      "lesson": "With pre-shared-key authentication both gateways must hold exactly the same secret. The proposal can match perfectly and the Diffie-Hellman exchange can succeed, and authentication still fails when one character differs (keys are case-sensitive). Phase 1 never completes, so there is no tunnel at all.",
+      "related": [
+        "CCNA: IPsec site-to-site VPN",
+        "AZ-802: shared key on a site-to-site connection"
+      ]
+    },
+    {
+      "id": "vpn-ike-version",
+      "title": "Old branch firewall, new head office",
+      "goal": "Both ends must run the same IKE version.",
+      "level": "starter",
+      "story": "Head office moved its VPN gateway to IKEv2 during an upgrade. The branch device was left alone and the tunnel has been down since the maintenance window.",
+      "topology": {
+        "sites": [
+          {
+            "id": "a",
+            "name": "Head office",
+            "gwPublic": "203.0.113.10",
+            "peerIp": "198.51.100.20",
+            "behindNat": false,
+            "natT": true,
+            "fw": {
+              "udp500": true,
+              "udp4500": true,
+              "esp": true
+            },
+            "snat": true,
+            "natExempt": "10.2.0.0/24",
+            "mode": "route",
+            "routes": [
+              {
+                "id": "a-r1",
+                "dest": "10.2.0.0/24"
+              }
+            ],
+            "subnets": [
+              {
+                "id": "a1",
+                "name": "Office LAN",
+                "cidr": "10.1.0.0/24",
+                "host": {
+                  "id": "pc-a",
+                  "name": "PC-A",
+                  "ip": "10.1.0.50"
+                }
+              },
+              {
+                "id": "a2",
+                "name": "Server LAN",
+                "cidr": "10.1.1.0/24",
+                "host": {
+                  "id": "srv-a",
+                  "name": "Server-A",
+                  "ip": "10.1.1.20"
+                }
+              }
+            ],
+            "ike": {
+              "version": "ikev2",
+              "enc": "aes256",
+              "hash": "sha256",
+              "dh": 14,
+              "psk": "Maple-Harbor-42",
+              "lifetime": 28800
+            },
+            "child": {
+              "enc": "aes256",
+              "hash": "sha256",
+              "pfs": 14,
+              "lifetime": 3600
+            },
+            "selectors": [
+              {
+                "id": "a-s1",
+                "local": "10.1.0.0/24",
+                "remote": "10.2.0.0/24"
+              },
+              {
+                "id": "a-s2",
+                "local": "10.1.1.0/24",
+                "remote": "10.2.0.0/24"
+              }
+            ]
+          },
+          {
+            "id": "b",
+            "name": "Branch",
+            "gwPublic": "198.51.100.20",
+            "peerIp": "203.0.113.10",
+            "behindNat": false,
+            "natT": true,
+            "fw": {
+              "udp500": true,
+              "udp4500": true,
+              "esp": true
+            },
+            "snat": true,
+            "natExempt": "10.1.0.0/24, 10.1.1.0/24",
+            "mode": "route",
+            "routes": [
+              {
+                "id": "b-r1",
+                "dest": "10.1.0.0/24"
+              },
+              {
+                "id": "b-r2",
+                "dest": "10.1.1.0/24"
+              }
+            ],
+            "subnets": [
+              {
+                "id": "b1",
+                "name": "Branch LAN",
+                "cidr": "10.2.0.0/24",
+                "host": {
+                  "id": "pc-b",
+                  "name": "PC-B",
+                  "ip": "10.2.0.60"
+                }
+              }
+            ],
+            "ike": {
+              "version": "ikev1",
+              "enc": "aes256",
+              "hash": "sha256",
+              "dh": 14,
+              "psk": "Maple-Harbor-42",
+              "lifetime": 28800
+            },
+            "child": {
+              "enc": "aes256",
+              "hash": "sha256",
+              "pfs": 14,
+              "lifetime": 3600
+            },
+            "selectors": [
+              {
+                "id": "b-s1",
+                "local": "10.2.0.0/24",
+                "remote": "10.1.0.0/24"
+              },
+              {
+                "id": "b-s2",
+                "local": "10.2.0.0/24",
+                "remote": "10.1.1.0/24"
+              }
+            ]
+          }
+        ]
+      },
+      "ask": {
+        "from": "pc-a",
+        "to": "pc-b"
+      },
+      "expect": [
+        {
+          "from": "pc-a",
+          "to": "pc-b",
+          "verdict": "failed",
+          "code": "ike-version-mismatch"
+        }
+      ],
+      "hints": [
+        "The firewall rules are fine and the peers reach each other. Which phase fails?",
+        "Compare the IKE version on the two ends, in the table at the top of the settings."
+      ],
+      "fix": [
+        {
+          "site": "b",
+          "path": "ike.version",
+          "value": "ikev2"
+        }
+      ],
+      "fixText": [
+        "Set the Branch gateway to IKEv2 as well (or, if it truly cannot do IKEv2, set Head office back to IKEv1). The two ends have to match."
+      ],
+      "expectFixed": [
+        {
+          "from": "pc-a",
+          "to": "pc-b",
+          "verdict": "success"
+        }
+      ],
+      "lesson": "IKEv1 and IKEv2 are different protocols with different message exchanges, not two settings of the same one, so a gateway cannot negotiate with a peer that speaks the other. The fix is to agree on one version; IKEv2 is the newer one and should be preferred where both ends support it.",
+      "related": [
+        "CCNA: IPsec site-to-site VPN",
+        "SC-500: VPN gateways"
+      ]
+    },
+    {
+      "id": "vpn-firewall",
+      "title": "A new firewall in front of the branch gateway",
+      "goal": "The firewall must let IKE in (UDP 500) and the encrypted data in (ESP, IP protocol 50).",
+      "level": "core",
+      "story": "Branch IT put a new firewall in front of the VPN gateway. It allows web traffic and nothing else. Head office cannot reach the branch, and the logs show IKE packets leaving but no replies.",
+      "topology": {
+        "sites": [
+          {
+            "id": "a",
+            "name": "Head office",
+            "gwPublic": "203.0.113.10",
+            "peerIp": "198.51.100.20",
+            "behindNat": false,
+            "natT": true,
+            "fw": {
+              "udp500": true,
+              "udp4500": true,
+              "esp": true
+            },
+            "snat": true,
+            "natExempt": "10.2.0.0/24",
+            "mode": "route",
+            "routes": [
+              {
+                "id": "a-r1",
+                "dest": "10.2.0.0/24"
+              }
+            ],
+            "subnets": [
+              {
+                "id": "a1",
+                "name": "Office LAN",
+                "cidr": "10.1.0.0/24",
+                "host": {
+                  "id": "pc-a",
+                  "name": "PC-A",
+                  "ip": "10.1.0.50"
+                }
+              },
+              {
+                "id": "a2",
+                "name": "Server LAN",
+                "cidr": "10.1.1.0/24",
+                "host": {
+                  "id": "srv-a",
+                  "name": "Server-A",
+                  "ip": "10.1.1.20"
+                }
+              }
+            ],
+            "ike": {
+              "version": "ikev2",
+              "enc": "aes256",
+              "hash": "sha256",
+              "dh": 14,
+              "psk": "Maple-Harbor-42",
+              "lifetime": 28800
+            },
+            "child": {
+              "enc": "aes256",
+              "hash": "sha256",
+              "pfs": 14,
+              "lifetime": 3600
+            },
+            "selectors": [
+              {
+                "id": "a-s1",
+                "local": "10.1.0.0/24",
+                "remote": "10.2.0.0/24"
+              },
+              {
+                "id": "a-s2",
+                "local": "10.1.1.0/24",
+                "remote": "10.2.0.0/24"
+              }
+            ]
+          },
+          {
+            "id": "b",
+            "name": "Branch",
+            "gwPublic": "198.51.100.20",
+            "peerIp": "203.0.113.10",
+            "behindNat": false,
+            "natT": true,
+            "fw": {
+              "udp500": false,
+              "udp4500": false,
+              "esp": false
+            },
+            "snat": true,
+            "natExempt": "10.1.0.0/24, 10.1.1.0/24",
+            "mode": "route",
+            "routes": [
+              {
+                "id": "b-r1",
+                "dest": "10.1.0.0/24"
+              },
+              {
+                "id": "b-r2",
+                "dest": "10.1.1.0/24"
+              }
+            ],
+            "subnets": [
+              {
+                "id": "b1",
+                "name": "Branch LAN",
+                "cidr": "10.2.0.0/24",
+                "host": {
+                  "id": "pc-b",
+                  "name": "PC-B",
+                  "ip": "10.2.0.60"
+                }
+              }
+            ],
+            "ike": {
+              "version": "ikev2",
+              "enc": "aes256",
+              "hash": "sha256",
+              "dh": 14,
+              "psk": "Maple-Harbor-42",
+              "lifetime": 28800
+            },
+            "child": {
+              "enc": "aes256",
+              "hash": "sha256",
+              "pfs": 14,
+              "lifetime": 3600
+            },
+            "selectors": [
+              {
+                "id": "b-s1",
+                "local": "10.2.0.0/24",
+                "remote": "10.1.0.0/24"
+              },
+              {
+                "id": "b-s2",
+                "local": "10.2.0.0/24",
+                "remote": "10.1.1.0/24"
+              }
+            ]
+          }
+        ]
+      },
+      "ask": {
+        "from": "pc-a",
+        "to": "pc-b"
+      },
+      "expect": [
+        {
+          "from": "pc-a",
+          "to": "pc-b",
+          "verdict": "failed",
+          "code": "firewall-blocks-ike"
+        }
+      ],
+      "hints": [
+        "Read the status stages: the first one is red, so nothing else has even been tried.",
+        "IKE negotiation uses a UDP port. Which firewall switches control it?",
+        "Fix the first problem and run it again. A second one can be hiding behind it: the encrypted data is a different protocol from IKE."
+      ],
+      "fix": [
+        {
+          "site": "b",
+          "path": "fw.udp500",
+          "value": true
+        },
+        {
+          "site": "b",
+          "path": "fw.esp",
+          "value": true
+        }
+      ],
+      "fixText": [
+        "Allow inbound UDP 500 (IKE) to the Branch gateway.",
+        "Then allow inbound IP protocol 50 (ESP). Without it phase 1 and phase 2 come up, but every encrypted packet is dropped.",
+        "UDP 4500 is only needed when a NAT device sits in the path (NAT traversal); there is none here."
+      ],
+      "expectFixed": [
+        {
+          "from": "pc-a",
+          "to": "pc-b",
+          "verdict": "success"
+        }
+      ],
+      "lesson": "A VPN needs the firewall to allow two different things: IKE (UDP 500, plus UDP 4500 when NAT traversal is in use) to build the tunnel, and ESP (IP protocol 50, which has no ports) to carry the data. Allowing only UDP 500 gives the classic \"tunnel is up, nothing passes\".",
+      "related": [
+        "CCNA: IPsec site-to-site VPN",
+        "SC-500: network perimeter security"
+      ]
+    },
+    {
+      "id": "vpn-proposal",
+      "title": "Different ideas about \"secure enough\"",
+      "goal": "Phase 1 needs one set of IKE algorithms that both ends accept.",
+      "level": "core",
+      "story": "Head office tightened its VPN policy to SHA-256 and a 2048-bit Diffie-Hellman group. The branch gateway is older and still uses what the vendor shipped. The tunnel will not come up and the pre-shared key was checked twice.",
+      "topology": {
+        "sites": [
+          {
+            "id": "a",
+            "name": "Head office",
+            "gwPublic": "203.0.113.10",
+            "peerIp": "198.51.100.20",
+            "behindNat": false,
+            "natT": true,
+            "fw": {
+              "udp500": true,
+              "udp4500": true,
+              "esp": true
+            },
+            "snat": true,
+            "natExempt": "10.2.0.0/24",
+            "mode": "route",
+            "routes": [
+              {
+                "id": "a-r1",
+                "dest": "10.2.0.0/24"
+              }
+            ],
+            "subnets": [
+              {
+                "id": "a1",
+                "name": "Office LAN",
+                "cidr": "10.1.0.0/24",
+                "host": {
+                  "id": "pc-a",
+                  "name": "PC-A",
+                  "ip": "10.1.0.50"
+                }
+              },
+              {
+                "id": "a2",
+                "name": "Server LAN",
+                "cidr": "10.1.1.0/24",
+                "host": {
+                  "id": "srv-a",
+                  "name": "Server-A",
+                  "ip": "10.1.1.20"
+                }
+              }
+            ],
+            "ike": {
+              "version": "ikev2",
+              "enc": "aes256",
+              "hash": "sha256",
+              "dh": 14,
+              "psk": "Maple-Harbor-42",
+              "lifetime": 28800
+            },
+            "child": {
+              "enc": "aes256",
+              "hash": "sha256",
+              "pfs": 14,
+              "lifetime": 3600
+            },
+            "selectors": [
+              {
+                "id": "a-s1",
+                "local": "10.1.0.0/24",
+                "remote": "10.2.0.0/24"
+              },
+              {
+                "id": "a-s2",
+                "local": "10.1.1.0/24",
+                "remote": "10.2.0.0/24"
+              }
+            ]
+          },
+          {
+            "id": "b",
+            "name": "Branch",
+            "gwPublic": "198.51.100.20",
+            "peerIp": "203.0.113.10",
+            "behindNat": false,
+            "natT": true,
+            "fw": {
+              "udp500": true,
+              "udp4500": true,
+              "esp": true
+            },
+            "snat": true,
+            "natExempt": "10.1.0.0/24, 10.1.1.0/24",
+            "mode": "route",
+            "routes": [
+              {
+                "id": "b-r1",
+                "dest": "10.1.0.0/24"
+              },
+              {
+                "id": "b-r2",
+                "dest": "10.1.1.0/24"
+              }
+            ],
+            "subnets": [
+              {
+                "id": "b1",
+                "name": "Branch LAN",
+                "cidr": "10.2.0.0/24",
+                "host": {
+                  "id": "pc-b",
+                  "name": "PC-B",
+                  "ip": "10.2.0.60"
+                }
+              }
+            ],
+            "ike": {
+              "version": "ikev2",
+              "enc": "aes256",
+              "hash": "sha1",
+              "dh": 2,
+              "psk": "Maple-Harbor-42",
+              "lifetime": 28800
+            },
+            "child": {
+              "enc": "aes256",
+              "hash": "sha256",
+              "pfs": 14,
+              "lifetime": 3600
+            },
+            "selectors": [
+              {
+                "id": "b-s1",
+                "local": "10.2.0.0/24",
+                "remote": "10.1.0.0/24"
+              },
+              {
+                "id": "b-s2",
+                "local": "10.2.0.0/24",
+                "remote": "10.1.1.0/24"
+              }
+            ]
+          }
+        ]
+      },
+      "ask": {
+        "from": "pc-a",
+        "to": "pc-b"
+      },
+      "expect": [
+        {
+          "from": "pc-a",
+          "to": "pc-b",
+          "verdict": "failed",
+          "code": "proposal-mismatch"
+        }
+      ],
+      "hints": [
+        "The trace names the settings that differ. Read it, and do not touch the key.",
+        "Compare the phase 1 rows of the comparison table: more than one value is different."
+      ],
+      "fix": [
+        {
+          "site": "b",
+          "path": "ike.hash",
+          "value": "sha256"
+        },
+        {
+          "site": "b",
+          "path": "ike.dh",
+          "value": 14
+        }
+      ],
+      "fixText": [
+        "Set the Branch phase 1 integrity to SHA-256 and the DH group to 14, to match Head office (or lower Head office to SHA-1 and group 2, which is the weaker choice)."
+      ],
+      "expectFixed": [
+        {
+          "from": "pc-a",
+          "to": "pc-b",
+          "verdict": "success"
+        }
+      ],
+      "lesson": "Phase 1 begins with the two gateways agreeing on encryption, integrity and a Diffie-Hellman group. If they have no combination in common, the responder rejects the exchange before any key is checked. Real gateways usually offer a list, so a mismatch means the lists do not overlap at all.",
+      "related": [
+        "CCNA: IPsec site-to-site VPN",
+        "SC-500: VPN gateways"
+      ]
+    },
+    {
+      "id": "vpn-pfs",
+      "title": "Phase 1 is up, phase 2 is not",
+      "goal": "Both ends must agree on whether to use perfect forward secrecy, and on the group.",
+      "level": "core",
+      "story": "Head office turned on PFS to satisfy an audit finding. The tunnel status shows the IKE connection as established, yet the branch cannot reach anything and no child tunnel appears.",
+      "topology": {
+        "sites": [
+          {
+            "id": "a",
+            "name": "Head office",
+            "gwPublic": "203.0.113.10",
+            "peerIp": "198.51.100.20",
+            "behindNat": false,
+            "natT": true,
+            "fw": {
+              "udp500": true,
+              "udp4500": true,
+              "esp": true
+            },
+            "snat": true,
+            "natExempt": "10.2.0.0/24",
+            "mode": "route",
+            "routes": [
+              {
+                "id": "a-r1",
+                "dest": "10.2.0.0/24"
+              }
+            ],
+            "subnets": [
+              {
+                "id": "a1",
+                "name": "Office LAN",
+                "cidr": "10.1.0.0/24",
+                "host": {
+                  "id": "pc-a",
+                  "name": "PC-A",
+                  "ip": "10.1.0.50"
+                }
+              },
+              {
+                "id": "a2",
+                "name": "Server LAN",
+                "cidr": "10.1.1.0/24",
+                "host": {
+                  "id": "srv-a",
+                  "name": "Server-A",
+                  "ip": "10.1.1.20"
+                }
+              }
+            ],
+            "ike": {
+              "version": "ikev2",
+              "enc": "aes256",
+              "hash": "sha256",
+              "dh": 14,
+              "psk": "Maple-Harbor-42",
+              "lifetime": 28800
+            },
+            "child": {
+              "enc": "aes256",
+              "hash": "sha256",
+              "pfs": 14,
+              "lifetime": 3600
+            },
+            "selectors": [
+              {
+                "id": "a-s1",
+                "local": "10.1.0.0/24",
+                "remote": "10.2.0.0/24"
+              },
+              {
+                "id": "a-s2",
+                "local": "10.1.1.0/24",
+                "remote": "10.2.0.0/24"
+              }
+            ]
+          },
+          {
+            "id": "b",
+            "name": "Branch",
+            "gwPublic": "198.51.100.20",
+            "peerIp": "203.0.113.10",
+            "behindNat": false,
+            "natT": true,
+            "fw": {
+              "udp500": true,
+              "udp4500": true,
+              "esp": true
+            },
+            "snat": true,
+            "natExempt": "10.1.0.0/24, 10.1.1.0/24",
+            "mode": "route",
+            "routes": [
+              {
+                "id": "b-r1",
+                "dest": "10.1.0.0/24"
+              },
+              {
+                "id": "b-r2",
+                "dest": "10.1.1.0/24"
+              }
+            ],
+            "subnets": [
+              {
+                "id": "b1",
+                "name": "Branch LAN",
+                "cidr": "10.2.0.0/24",
+                "host": {
+                  "id": "pc-b",
+                  "name": "PC-B",
+                  "ip": "10.2.0.60"
+                }
+              }
+            ],
+            "ike": {
+              "version": "ikev2",
+              "enc": "aes256",
+              "hash": "sha256",
+              "dh": 14,
+              "psk": "Maple-Harbor-42",
+              "lifetime": 28800
+            },
+            "child": {
+              "enc": "aes256",
+              "hash": "sha256",
+              "pfs": "none",
+              "lifetime": 3600
+            },
+            "selectors": [
+              {
+                "id": "b-s1",
+                "local": "10.2.0.0/24",
+                "remote": "10.1.0.0/24"
+              },
+              {
+                "id": "b-s2",
+                "local": "10.2.0.0/24",
+                "remote": "10.1.1.0/24"
+              }
+            ]
+          }
+        ]
+      },
+      "ask": {
+        "from": "pc-a",
+        "to": "pc-b"
+      },
+      "expect": [
+        {
+          "from": "pc-a",
+          "to": "pc-b",
+          "verdict": "failed",
+          "code": "pfs-mismatch"
+        }
+      ],
+      "hints": [
+        "Phase 1 is green and phase 2 is red. Which phase 2 setting is about fresh Diffie-Hellman keys?",
+        "Look at the PFS row in the comparison table."
+      ],
+      "fix": [
+        {
+          "site": "b",
+          "path": "child.pfs",
+          "value": 14
+        }
+      ],
+      "fixText": [
+        "Set PFS to group 14 on the Branch gateway as well (or turn PFS off on both ends; matching matters more than the choice)."
+      ],
+      "expectFixed": [
+        {
+          "from": "pc-a",
+          "to": "pc-b",
+          "verdict": "success"
+        }
+      ],
+      "lesson": "Perfect forward secrecy makes each child SA derive its keys from a fresh Diffie-Hellman exchange, so a later key compromise does not expose old traffic. Both ends must ask for the same thing: PFS on one end only, or two different groups, causes the child SA to be rejected even though phase 1 is healthy.",
+      "related": [
+        "CCNA: IPsec site-to-site VPN",
+        "AZ-802: IPsec/IKE policy"
+      ]
+    },
+    {
+      "id": "vpn-selectors",
+      "title": "The tunnel is up, but only one LAN works",
+      "goal": "Each end's selectors must be mirror images, for every subnet you want to protect.",
+      "level": "stretch",
+      "story": "The VPN dashboard shows the tunnel as up. Users on the head office Office LAN can reach the branch, but the file server on the Server LAN gets no answer from the branch at all.",
+      "topology": {
+        "sites": [
+          {
+            "id": "a",
+            "name": "Head office",
+            "gwPublic": "203.0.113.10",
+            "peerIp": "198.51.100.20",
+            "behindNat": false,
+            "natT": true,
+            "fw": {
+              "udp500": true,
+              "udp4500": true,
+              "esp": true
+            },
+            "snat": true,
+            "natExempt": "10.2.0.0/24",
+            "mode": "route",
+            "routes": [
+              {
+                "id": "a-r1",
+                "dest": "10.2.0.0/24"
+              }
+            ],
+            "subnets": [
+              {
+                "id": "a1",
+                "name": "Office LAN",
+                "cidr": "10.1.0.0/24",
+                "host": {
+                  "id": "pc-a",
+                  "name": "PC-A",
+                  "ip": "10.1.0.50"
+                }
+              },
+              {
+                "id": "a2",
+                "name": "Server LAN",
+                "cidr": "10.1.1.0/24",
+                "host": {
+                  "id": "srv-a",
+                  "name": "Server-A",
+                  "ip": "10.1.1.20"
+                }
+              }
+            ],
+            "ike": {
+              "version": "ikev2",
+              "enc": "aes256",
+              "hash": "sha256",
+              "dh": 14,
+              "psk": "Maple-Harbor-42",
+              "lifetime": 28800
+            },
+            "child": {
+              "enc": "aes256",
+              "hash": "sha256",
+              "pfs": 14,
+              "lifetime": 3600
+            },
+            "selectors": [
+              {
+                "id": "a-s1",
+                "local": "10.1.0.0/24",
+                "remote": "10.2.0.0/24"
+              },
+              {
+                "id": "a-s2",
+                "local": "10.1.1.0/24",
+                "remote": "10.2.0.0/24"
+              }
+            ]
+          },
+          {
+            "id": "b",
+            "name": "Branch",
+            "gwPublic": "198.51.100.20",
+            "peerIp": "203.0.113.10",
+            "behindNat": false,
+            "natT": true,
+            "fw": {
+              "udp500": true,
+              "udp4500": true,
+              "esp": true
+            },
+            "snat": true,
+            "natExempt": "10.1.0.0/24, 10.1.1.0/24",
+            "mode": "route",
+            "routes": [
+              {
+                "id": "b-r1",
+                "dest": "10.1.0.0/24"
+              },
+              {
+                "id": "b-r2",
+                "dest": "10.1.1.0/24"
+              }
+            ],
+            "subnets": [
+              {
+                "id": "b1",
+                "name": "Branch LAN",
+                "cidr": "10.2.0.0/24",
+                "host": {
+                  "id": "pc-b",
+                  "name": "PC-B",
+                  "ip": "10.2.0.60"
+                }
+              }
+            ],
+            "ike": {
+              "version": "ikev2",
+              "enc": "aes256",
+              "hash": "sha256",
+              "dh": 14,
+              "psk": "Maple-Harbor-42",
+              "lifetime": 28800
+            },
+            "child": {
+              "enc": "aes256",
+              "hash": "sha256",
+              "pfs": 14,
+              "lifetime": 3600
+            },
+            "selectors": [
+              {
+                "id": "b-s1",
+                "local": "10.2.0.0/24",
+                "remote": "10.1.0.0/24"
+              }
+            ]
+          }
+        ]
+      },
+      "ask": {
+        "from": "srv-a",
+        "to": "pc-b"
+      },
+      "expect": [
+        {
+          "from": "pc-a",
+          "to": "pc-b",
+          "verdict": "success"
+        },
+        {
+          "from": "srv-a",
+          "to": "pc-b",
+          "verdict": "failed",
+          "code": "selector-mismatch"
+        }
+      ],
+      "hints": [
+        "Run the test from PC-A, then from Server-A. What is different about the two?",
+        "Phase 2 shows how many selector pairs came up. Does the Branch list every network Head office offers?",
+        "Whatever Head office lists as local, the Branch must list as remote, and the other way round."
+      ],
+      "fix": [
+        {
+          "site": "b",
+          "addSelector": {
+            "id": "b-s2",
+            "local": "10.2.0.0/24",
+            "remote": "10.1.1.0/24"
+          }
+        }
+      ],
+      "fixText": [
+        "Add the missing selector on the Branch: local 10.2.0.0/24, remote 10.1.1.0/24 (the mirror image of Head office's Server LAN selector). The route and the NAT exemption for that LAN already exist."
+      ],
+      "expectFixed": [
+        {
+          "from": "pc-a",
+          "to": "pc-b",
+          "verdict": "success"
+        },
+        {
+          "from": "srv-a",
+          "to": "pc-b",
+          "verdict": "success"
+        }
+      ],
+      "lesson": "Traffic selectors say which networks the child SA protects, and each end's local and remote must mirror the other's. When some pairs match and others do not, the tunnel is genuinely up, but only for the pairs both sides agreed on; traffic for the rest is not protected and goes nowhere. Check the selector pairs, not just the green light.",
+      "related": [
+        "CCNA: IPsec site-to-site VPN",
+        "AZ-802: address prefixes for the on-premises network"
+      ]
+    },
+    {
+      "id": "vpn-no-route",
+      "title": "Everything is green and nothing passes",
+      "goal": "A route-based gateway sends traffic into the tunnel only if a route says so.",
+      "level": "stretch",
+      "story": "Both phases are up on both gateways, the firewall rules were checked and the selectors match. Still, PC-A in head office gets no reply from PC-B at the branch.",
+      "topology": {
+        "sites": [
+          {
+            "id": "a",
+            "name": "Head office",
+            "gwPublic": "203.0.113.10",
+            "peerIp": "198.51.100.20",
+            "behindNat": false,
+            "natT": true,
+            "fw": {
+              "udp500": true,
+              "udp4500": true,
+              "esp": true
+            },
+            "snat": true,
+            "natExempt": "10.2.0.0/24",
+            "mode": "route",
+            "routes": [],
+            "subnets": [
+              {
+                "id": "a1",
+                "name": "Office LAN",
+                "cidr": "10.1.0.0/24",
+                "host": {
+                  "id": "pc-a",
+                  "name": "PC-A",
+                  "ip": "10.1.0.50"
+                }
+              },
+              {
+                "id": "a2",
+                "name": "Server LAN",
+                "cidr": "10.1.1.0/24",
+                "host": {
+                  "id": "srv-a",
+                  "name": "Server-A",
+                  "ip": "10.1.1.20"
+                }
+              }
+            ],
+            "ike": {
+              "version": "ikev2",
+              "enc": "aes256",
+              "hash": "sha256",
+              "dh": 14,
+              "psk": "Maple-Harbor-42",
+              "lifetime": 28800
+            },
+            "child": {
+              "enc": "aes256",
+              "hash": "sha256",
+              "pfs": 14,
+              "lifetime": 3600
+            },
+            "selectors": [
+              {
+                "id": "a-s1",
+                "local": "10.1.0.0/24",
+                "remote": "10.2.0.0/24"
+              },
+              {
+                "id": "a-s2",
+                "local": "10.1.1.0/24",
+                "remote": "10.2.0.0/24"
+              }
+            ]
+          },
+          {
+            "id": "b",
+            "name": "Branch",
+            "gwPublic": "198.51.100.20",
+            "peerIp": "203.0.113.10",
+            "behindNat": false,
+            "natT": true,
+            "fw": {
+              "udp500": true,
+              "udp4500": true,
+              "esp": true
+            },
+            "snat": true,
+            "natExempt": "10.1.0.0/24, 10.1.1.0/24",
+            "mode": "route",
+            "routes": [
+              {
+                "id": "b-r1",
+                "dest": "10.1.0.0/24"
+              },
+              {
+                "id": "b-r2",
+                "dest": "10.1.1.0/24"
+              }
+            ],
+            "subnets": [
+              {
+                "id": "b1",
+                "name": "Branch LAN",
+                "cidr": "10.2.0.0/24",
+                "host": {
+                  "id": "pc-b",
+                  "name": "PC-B",
+                  "ip": "10.2.0.60"
+                }
+              }
+            ],
+            "ike": {
+              "version": "ikev2",
+              "enc": "aes256",
+              "hash": "sha256",
+              "dh": 14,
+              "psk": "Maple-Harbor-42",
+              "lifetime": 28800
+            },
+            "child": {
+              "enc": "aes256",
+              "hash": "sha256",
+              "pfs": 14,
+              "lifetime": 3600
+            },
+            "selectors": [
+              {
+                "id": "b-s1",
+                "local": "10.2.0.0/24",
+                "remote": "10.1.0.0/24"
+              },
+              {
+                "id": "b-s2",
+                "local": "10.2.0.0/24",
+                "remote": "10.1.1.0/24"
+              }
+            ]
+          }
+        ]
+      },
+      "ask": {
+        "from": "pc-a",
+        "to": "pc-b"
+      },
+      "expect": [
+        {
+          "from": "pc-a",
+          "to": "pc-b",
+          "verdict": "failed",
+          "code": "no-route-to-tunnel"
+        }
+      ],
+      "hints": [
+        "The status stages for the tunnel are green. Read the traffic test trace line by line.",
+        "Where does Head office send a packet for 10.2.0.60, and what happens to it there?"
+      ],
+      "fix": [
+        {
+          "site": "a",
+          "addRoute": {
+            "id": "a-r1",
+            "dest": "10.2.0.0/24"
+          }
+        }
+      ],
+      "fixText": [
+        "Add a static route at Head office: destination 10.2.0.0/24, next hop the VPN tunnel. (A policy-based setup would not need the route; the selectors would steer the traffic.)"
+      ],
+      "expectFixed": [
+        {
+          "from": "pc-a",
+          "to": "pc-b",
+          "verdict": "success"
+        }
+      ],
+      "lesson": "The tunnel and the routing are separate things. A route-based gateway moves traffic into the tunnel only when a route (static, or learned by a routing protocol) for the remote network points at it; without one the packets follow the default route to the ISP, which drops private destinations. \"Tunnel up\" never means \"traffic routed\".",
+      "related": [
+        "CCNA: static routes",
+        "AZ-802: routing between on-premises and Azure"
+      ]
+    },
+    {
+      "id": "vpn-nat-exempt",
+      "title": "The request arrives, the reply never does",
+      "goal": "Traffic for the other site must not be source-NATed before it is encrypted.",
+      "level": "stretch",
+      "story": "PC-A pings PC-B. The packet capture at the branch shows the ping arriving, but PC-A never sees an answer. The branch router also provides internet access with NAT, and the head office side is configured correctly.",
+      "topology": {
+        "sites": [
+          {
+            "id": "a",
+            "name": "Head office",
+            "gwPublic": "203.0.113.10",
+            "peerIp": "198.51.100.20",
+            "behindNat": false,
+            "natT": true,
+            "fw": {
+              "udp500": true,
+              "udp4500": true,
+              "esp": true
+            },
+            "snat": true,
+            "natExempt": "10.2.0.0/24",
+            "mode": "route",
+            "routes": [
+              {
+                "id": "a-r1",
+                "dest": "10.2.0.0/24"
+              }
+            ],
+            "subnets": [
+              {
+                "id": "a1",
+                "name": "Office LAN",
+                "cidr": "10.1.0.0/24",
+                "host": {
+                  "id": "pc-a",
+                  "name": "PC-A",
+                  "ip": "10.1.0.50"
+                }
+              },
+              {
+                "id": "a2",
+                "name": "Server LAN",
+                "cidr": "10.1.1.0/24",
+                "host": {
+                  "id": "srv-a",
+                  "name": "Server-A",
+                  "ip": "10.1.1.20"
+                }
+              }
+            ],
+            "ike": {
+              "version": "ikev2",
+              "enc": "aes256",
+              "hash": "sha256",
+              "dh": 14,
+              "psk": "Maple-Harbor-42",
+              "lifetime": 28800
+            },
+            "child": {
+              "enc": "aes256",
+              "hash": "sha256",
+              "pfs": 14,
+              "lifetime": 3600
+            },
+            "selectors": [
+              {
+                "id": "a-s1",
+                "local": "10.1.0.0/24",
+                "remote": "10.2.0.0/24"
+              },
+              {
+                "id": "a-s2",
+                "local": "10.1.1.0/24",
+                "remote": "10.2.0.0/24"
+              }
+            ]
+          },
+          {
+            "id": "b",
+            "name": "Branch",
+            "gwPublic": "198.51.100.20",
+            "peerIp": "203.0.113.10",
+            "behindNat": false,
+            "natT": true,
+            "fw": {
+              "udp500": true,
+              "udp4500": true,
+              "esp": true
+            },
+            "snat": true,
+            "natExempt": "",
+            "mode": "route",
+            "routes": [
+              {
+                "id": "b-r1",
+                "dest": "10.1.0.0/24"
+              },
+              {
+                "id": "b-r2",
+                "dest": "10.1.1.0/24"
+              }
+            ],
+            "subnets": [
+              {
+                "id": "b1",
+                "name": "Branch LAN",
+                "cidr": "10.2.0.0/24",
+                "host": {
+                  "id": "pc-b",
+                  "name": "PC-B",
+                  "ip": "10.2.0.60"
+                }
+              }
+            ],
+            "ike": {
+              "version": "ikev2",
+              "enc": "aes256",
+              "hash": "sha256",
+              "dh": 14,
+              "psk": "Maple-Harbor-42",
+              "lifetime": 28800
+            },
+            "child": {
+              "enc": "aes256",
+              "hash": "sha256",
+              "pfs": 14,
+              "lifetime": 3600
+            },
+            "selectors": [
+              {
+                "id": "b-s1",
+                "local": "10.2.0.0/24",
+                "remote": "10.1.0.0/24"
+              },
+              {
+                "id": "b-s2",
+                "local": "10.2.0.0/24",
+                "remote": "10.1.1.0/24"
+              }
+            ]
+          }
+        ]
+      },
+      "ask": {
+        "from": "pc-a",
+        "to": "pc-b"
+      },
+      "expect": [
+        {
+          "from": "pc-a",
+          "to": "pc-b",
+          "verdict": "failed",
+          "code": "nat-not-exempt"
+        }
+      ],
+      "hints": [
+        "The request makes it to PC-B. Follow the reply back through the Branch gateway.",
+        "Internet access needs source NAT. Should traffic for 10.1.0.0/24 and 10.1.1.0/24 get the same treatment?"
+      ],
+      "fix": [
+        {
+          "site": "b",
+          "path": "natExempt",
+          "value": "10.1.0.0/24, 10.1.1.0/24"
+        }
+      ],
+      "fixText": [
+        "At the Branch, exempt the head office networks (10.1.0.0/24 and 10.1.1.0/24) from source NAT, so replies keep their private source address and match the tunnel selectors."
+      ],
+      "expectFixed": [
+        {
+          "from": "pc-a",
+          "to": "pc-b",
+          "verdict": "success"
+        }
+      ],
+      "lesson": "Source NAT for internet access rewrites the source address of everything that leaves the LAN. If traffic for the other site is translated too, it no longer matches the tunnel's selector (which expects the private address), so it bypasses the tunnel. Add a NAT exemption for the remote networks; the name and syntax differ between platforms, the principle does not.",
+      "related": [
+        "CCNA: NAT and PAT",
+        "SSCP: VPN and NAT interaction"
+      ]
+    }
+  ],
+  "vpnSandbox": {
+    "sites": [
+      {
+        "id": "a",
+        "name": "Head office",
+        "gwPublic": "203.0.113.10",
+        "peerIp": "198.51.100.20",
+        "behindNat": false,
+        "natT": true,
+        "fw": {
+          "udp500": true,
+          "udp4500": true,
+          "esp": true
+        },
+        "snat": true,
+        "natExempt": "10.2.0.0/24",
+        "mode": "route",
+        "routes": [
+          {
+            "id": "a-r1",
+            "dest": "10.2.0.0/24"
+          }
+        ],
+        "subnets": [
+          {
+            "id": "a1",
+            "name": "Office LAN",
+            "cidr": "10.1.0.0/24",
+            "host": {
+              "id": "pc-a",
+              "name": "PC-A",
+              "ip": "10.1.0.50"
+            }
+          },
+          {
+            "id": "a2",
+            "name": "Server LAN",
+            "cidr": "10.1.1.0/24",
+            "host": {
+              "id": "srv-a",
+              "name": "Server-A",
+              "ip": "10.1.1.20"
+            }
+          }
+        ],
+        "ike": {
+          "version": "ikev2",
+          "enc": "aes256",
+          "hash": "sha256",
+          "dh": 14,
+          "psk": "Maple-Harbor-42",
+          "lifetime": 28800
+        },
+        "child": {
+          "enc": "aes256",
+          "hash": "sha256",
+          "pfs": 14,
+          "lifetime": 3600
+        },
+        "selectors": [
+          {
+            "id": "a-s1",
+            "local": "10.1.0.0/24",
+            "remote": "10.2.0.0/24"
+          },
+          {
+            "id": "a-s2",
+            "local": "10.1.1.0/24",
+            "remote": "10.2.0.0/24"
+          }
+        ]
+      },
+      {
+        "id": "b",
+        "name": "Branch",
+        "gwPublic": "198.51.100.20",
+        "peerIp": "203.0.113.10",
+        "behindNat": false,
+        "natT": true,
+        "fw": {
+          "udp500": true,
+          "udp4500": true,
+          "esp": true
+        },
+        "snat": true,
+        "natExempt": "10.1.0.0/24, 10.1.1.0/24",
+        "mode": "route",
+        "routes": [
+          {
+            "id": "b-r1",
+            "dest": "10.1.0.0/24"
+          },
+          {
+            "id": "b-r2",
+            "dest": "10.1.1.0/24"
+          }
+        ],
+        "subnets": [
+          {
+            "id": "b1",
+            "name": "Branch LAN",
+            "cidr": "10.2.0.0/24",
+            "host": {
+              "id": "pc-b",
+              "name": "PC-B",
+              "ip": "10.2.0.60"
+            }
+          }
+        ],
+        "ike": {
+          "version": "ikev2",
+          "enc": "aes256",
+          "hash": "sha256",
+          "dh": 14,
+          "psk": "Maple-Harbor-42",
+          "lifetime": 28800
+        },
+        "child": {
+          "enc": "aes256",
+          "hash": "sha256",
+          "pfs": 14,
+          "lifetime": 3600
+        },
+        "selectors": [
+          {
+            "id": "b-s1",
+            "local": "10.2.0.0/24",
+            "remote": "10.1.0.0/24"
+          },
+          {
+            "id": "b-s2",
+            "local": "10.2.0.0/24",
+            "remote": "10.1.1.0/24"
+          }
+        ]
+      }
+    ]
+  },
   "lessonLinks": [
     {
       "track": "ccna",
@@ -4947,6 +9477,86 @@
       "pick": "vlsm",
       "label": "VLSM planner",
       "blurb": "Design subnets for tiers of different sizes."
+    },
+    {
+      "track": "ccna",
+      "lesson": "nat-dhcp-dns-ntp",
+      "tool": "dhcp",
+      "pick": "needs-relay",
+      "label": "DHCP across a router",
+      "blurb": "Why a broadcast needs a relay (ip helper-address) to reach a server on another subnet."
+    },
+    {
+      "track": "ccna",
+      "lesson": "nat-dhcp-dns-ntp",
+      "tool": "dhcp",
+      "pick": "lease-outage",
+      "label": "Lease timers and a server outage",
+      "blurb": "Watch T1, T2 and expiry on a virtual clock."
+    },
+    {
+      "track": "ccna",
+      "lesson": "nat-dhcp-dns-ntp",
+      "tool": "dhcp",
+      "pick": "sandbox",
+      "label": "A DHCP lab to experiment with",
+      "blurb": "Scopes, exclusions, relays and leases in a small network."
+    },
+    {
+      "track": "ccna",
+      "lesson": "ccna-stp-etherchannel-discovery",
+      "tool": "stp",
+      "pick": "stp-default-priorities",
+      "label": "Who wins the root bridge election?",
+      "blurb": "Default priorities, MAC addresses and why the root should be set by hand."
+    },
+    {
+      "track": "ccna",
+      "lesson": "ccna-stp-etherchannel-discovery",
+      "tool": "stp",
+      "pick": "stp-standby-disabled",
+      "label": "A blocked port is the standby path",
+      "blurb": "Cut a cable and watch the alternate port take over."
+    },
+    {
+      "track": "ccna",
+      "lesson": "ccna-stp-etherchannel-discovery",
+      "tool": "stp",
+      "pick": "stp-disabled-loop",
+      "label": "What a broadcast storm looks like",
+      "blurb": "Spanning tree switched off on one switch closes the ring."
+    },
+    {
+      "track": "ccna",
+      "lesson": "ccna-stp-etherchannel-discovery",
+      "tool": "stp",
+      "pick": "sandbox",
+      "label": "Spanning tree sandbox",
+      "blurb": "Change priorities, costs and cables, then read the roles of every port."
+    },
+    {
+      "track": "ccna",
+      "lesson": "security-concepts-aaa-vpn",
+      "tool": "vpn",
+      "pick": "vpn-psk",
+      "label": "Build and break a site-to-site IPsec tunnel",
+      "blurb": "Phase 1, phase 2, selectors, routes and NAT exemption, with the first failure named."
+    },
+    {
+      "track": "ccna",
+      "lesson": "security-concepts-aaa-vpn",
+      "tool": "vpn",
+      "pick": "vpn-selectors",
+      "label": "The tunnel is up but only one LAN works",
+      "blurb": "Mirror-image traffic selectors."
+    },
+    {
+      "track": "az802",
+      "lesson": "on-premises-hybrid-networking",
+      "tool": "vpn",
+      "pick": "sandbox",
+      "label": "The on-premises half of a site-to-site VPN",
+      "blurb": "Shared key, IKE and IPsec settings, address prefixes and routes: the same pieces a hybrid link needs on both sides."
     }
   ]
 }
