@@ -6213,6 +6213,1871 @@
       }
     ]
   },
+  "nsg": [
+    {
+      "id": "nsg-default-deny",
+      "title": "The website does not answer",
+      "goal": "No rule allows it, so the built-in deny wins: allow HTTPS in, and nothing else.",
+      "level": "starter",
+      "story": "The web server in the web subnet is running and has a public IP address. Visitors on the internet get no answer on port 443. Nobody remembers writing a deny rule.",
+      "topology": {
+        "vnet": {
+          "name": "vnet-prod",
+          "space": "10.0.0.0/16"
+        },
+        "subnets": [
+          {
+            "id": "web",
+            "name": "snet-web",
+            "cidr": "10.0.1.0/24",
+            "nsg": "nsg-web"
+          },
+          {
+            "id": "data",
+            "name": "snet-data",
+            "cidr": "10.0.2.0/24",
+            "nsg": "nsg-data"
+          }
+        ],
+        "vms": [
+          {
+            "id": "web1",
+            "name": "vm-web",
+            "subnet": "web",
+            "ip": "10.0.1.4",
+            "publicIp": "20.50.60.70",
+            "nic": {
+              "nsg": null
+            }
+          },
+          {
+            "id": "tool1",
+            "name": "vm-test",
+            "subnet": "web",
+            "ip": "10.0.1.5",
+            "publicIp": "",
+            "nic": {
+              "nsg": null
+            }
+          },
+          {
+            "id": "db1",
+            "name": "vm-db",
+            "subnet": "data",
+            "ip": "10.0.2.4",
+            "publicIp": "",
+            "nic": {
+              "nsg": null
+            }
+          }
+        ],
+        "nsgs": [
+          {
+            "id": "nsg-web",
+            "name": "nsg-web",
+            "inbound": [
+              {
+                "id": "r-rdp",
+                "name": "Allow-RDP-Office",
+                "priority": 110,
+                "source": "198.51.100.20",
+                "srcPort": "*",
+                "dest": "*",
+                "destPort": "3389",
+                "proto": "Tcp",
+                "action": "Allow"
+              }
+            ],
+            "outbound": []
+          },
+          {
+            "id": "nsg-data",
+            "name": "nsg-data",
+            "inbound": [
+              {
+                "id": "r-sql",
+                "name": "Allow-SQL-Web",
+                "priority": 100,
+                "source": "10.0.1.4",
+                "srcPort": "*",
+                "dest": "*",
+                "destPort": "1433",
+                "proto": "Tcp",
+                "action": "Allow"
+              },
+              {
+                "id": "r-vnet-deny",
+                "name": "Deny-VNet-Other",
+                "priority": 4000,
+                "source": "VirtualNetwork",
+                "srcPort": "*",
+                "dest": "*",
+                "destPort": "*",
+                "proto": "Any",
+                "action": "Deny"
+              }
+            ],
+            "outbound": []
+          }
+        ],
+        "externals": [
+          {
+            "id": "visitor",
+            "name": "Visitor (internet)",
+            "ip": "203.0.113.50",
+            "kind": "internet",
+            "role": "client"
+          },
+          {
+            "id": "office",
+            "name": "Office admin",
+            "ip": "198.51.100.20",
+            "kind": "internet",
+            "role": "client"
+          },
+          {
+            "id": "probe",
+            "name": "Azure load balancer probe",
+            "ip": "168.63.129.16",
+            "kind": "probe",
+            "role": "probe"
+          },
+          {
+            "id": "site",
+            "name": "Public website",
+            "ip": "93.184.216.34",
+            "kind": "internet",
+            "role": "server"
+          }
+        ]
+      },
+      "ask": {
+        "from": "visitor",
+        "to": "web1",
+        "proto": "Tcp",
+        "port": 443,
+        "verdict": "success"
+      },
+      "expect": [
+        {
+          "from": "visitor",
+          "to": "web1",
+          "proto": "Tcp",
+          "port": 443,
+          "verdict": "failed",
+          "code": "default-deny"
+        }
+      ],
+      "hints": [
+        "Read the path: which level stops the traffic, and which rule was the first match?",
+        "You did not write that rule. Every NSG has built-in rules you cannot delete: which one denies inbound traffic that nobody allowed?",
+        "Add an Allow rule for TCP 443 from the internet. Give it a number below 65000."
+      ],
+      "fix": [
+        {
+          "addRule": {
+            "nsg": "nsg-web",
+            "dir": "inbound",
+            "rule": {
+              "id": "r-https",
+              "name": "Allow-HTTPS",
+              "priority": 100,
+              "source": "Internet",
+              "srcPort": "*",
+              "dest": "*",
+              "destPort": "443",
+              "proto": "Tcp",
+              "action": "Allow"
+            }
+          }
+        }
+      ],
+      "fixText": [
+        "In nsg-web, add an inbound rule: source Internet, destination any, destination port 443, protocol TCP, action Allow, priority 100."
+      ],
+      "expectFixed": [
+        {
+          "from": "visitor",
+          "to": "web1",
+          "proto": "Tcp",
+          "port": 443,
+          "verdict": "success"
+        },
+        {
+          "from": "visitor",
+          "to": "web1",
+          "proto": "Tcp",
+          "port": 3389,
+          "verdict": "failed"
+        }
+      ],
+      "lesson": "Every NSG ends with built-in rules (65000, 65001 and 65500) that you cannot delete. DenyAllInBound at 65500 drops anything from the internet that no rule of yours allows, so a web server needs an explicit Allow for its port. Your rules use numbers from 100 to 4096, which always come before the defaults.",
+      "related": [
+        "AZ-104: network security groups",
+        "AZ-900: Azure networking"
+      ]
+    },
+    {
+      "id": "nsg-rdp-exposed",
+      "title": "Remote Desktop is open to everyone",
+      "goal": "Keep RDP working for the office only, not for the whole internet.",
+      "level": "starter",
+      "story": "A security scan flagged the web VM: port 3389 answers to anybody. The admin who needed remote access last year created a rule with the source set to \"any\" and never changed it back.",
+      "topology": {
+        "vnet": {
+          "name": "vnet-prod",
+          "space": "10.0.0.0/16"
+        },
+        "subnets": [
+          {
+            "id": "web",
+            "name": "snet-web",
+            "cidr": "10.0.1.0/24",
+            "nsg": "nsg-web"
+          },
+          {
+            "id": "data",
+            "name": "snet-data",
+            "cidr": "10.0.2.0/24",
+            "nsg": "nsg-data"
+          }
+        ],
+        "vms": [
+          {
+            "id": "web1",
+            "name": "vm-web",
+            "subnet": "web",
+            "ip": "10.0.1.4",
+            "publicIp": "20.50.60.70",
+            "nic": {
+              "nsg": null
+            }
+          },
+          {
+            "id": "tool1",
+            "name": "vm-test",
+            "subnet": "web",
+            "ip": "10.0.1.5",
+            "publicIp": "",
+            "nic": {
+              "nsg": null
+            }
+          },
+          {
+            "id": "db1",
+            "name": "vm-db",
+            "subnet": "data",
+            "ip": "10.0.2.4",
+            "publicIp": "",
+            "nic": {
+              "nsg": null
+            }
+          }
+        ],
+        "nsgs": [
+          {
+            "id": "nsg-web",
+            "name": "nsg-web",
+            "inbound": [
+              {
+                "id": "r-https",
+                "name": "Allow-HTTPS",
+                "priority": 100,
+                "source": "Internet",
+                "srcPort": "*",
+                "dest": "*",
+                "destPort": "443",
+                "proto": "Tcp",
+                "action": "Allow"
+              },
+              {
+                "id": "r-rdp",
+                "name": "Allow-RDP-Any",
+                "priority": 110,
+                "source": "*",
+                "srcPort": "*",
+                "dest": "*",
+                "destPort": "3389",
+                "proto": "Tcp",
+                "action": "Allow"
+              }
+            ],
+            "outbound": []
+          },
+          {
+            "id": "nsg-data",
+            "name": "nsg-data",
+            "inbound": [
+              {
+                "id": "r-sql",
+                "name": "Allow-SQL-Web",
+                "priority": 100,
+                "source": "10.0.1.4",
+                "srcPort": "*",
+                "dest": "*",
+                "destPort": "1433",
+                "proto": "Tcp",
+                "action": "Allow"
+              },
+              {
+                "id": "r-vnet-deny",
+                "name": "Deny-VNet-Other",
+                "priority": 4000,
+                "source": "VirtualNetwork",
+                "srcPort": "*",
+                "dest": "*",
+                "destPort": "*",
+                "proto": "Any",
+                "action": "Deny"
+              }
+            ],
+            "outbound": []
+          }
+        ],
+        "externals": [
+          {
+            "id": "visitor",
+            "name": "Visitor (internet)",
+            "ip": "203.0.113.50",
+            "kind": "internet",
+            "role": "client"
+          },
+          {
+            "id": "office",
+            "name": "Office admin",
+            "ip": "198.51.100.20",
+            "kind": "internet",
+            "role": "client"
+          },
+          {
+            "id": "probe",
+            "name": "Azure load balancer probe",
+            "ip": "168.63.129.16",
+            "kind": "probe",
+            "role": "probe"
+          },
+          {
+            "id": "site",
+            "name": "Public website",
+            "ip": "93.184.216.34",
+            "kind": "internet",
+            "role": "server"
+          }
+        ]
+      },
+      "ask": {
+        "from": "visitor",
+        "to": "web1",
+        "proto": "Tcp",
+        "port": 3389,
+        "verdict": "success"
+      },
+      "expect": [
+        {
+          "from": "visitor",
+          "to": "web1",
+          "proto": "Tcp",
+          "port": 3389,
+          "verdict": "success",
+          "warn": "management-port-exposed"
+        }
+      ],
+      "hints": [
+        "Run the test from a visitor. It is allowed, which is exactly the problem: read the warning.",
+        "The rule is fine except for one field. Who should be able to reach port 3389?"
+      ],
+      "fix": [
+        {
+          "setRule": {
+            "nsg": "nsg-web",
+            "dir": "inbound",
+            "id": "r-rdp",
+            "patch": {
+              "name": "Allow-RDP-Office",
+              "source": "198.51.100.20"
+            }
+          }
+        }
+      ],
+      "fixText": [
+        "Change the source of the RDP rule from * to the office address 198.51.100.20 (a /32, or the office range). Better still, remove the rule and use Azure Bastion or a VPN."
+      ],
+      "expectFixed": [
+        {
+          "from": "visitor",
+          "to": "web1",
+          "proto": "Tcp",
+          "port": 3389,
+          "verdict": "failed"
+        },
+        {
+          "from": "office",
+          "to": "web1",
+          "proto": "Tcp",
+          "port": 3389,
+          "verdict": "success"
+        }
+      ],
+      "lesson": "A rule that allows a management port (3389 for RDP, 22 for SSH) from any source exposes the VM to every scanner on the internet. Limit the source to the addresses that really need it. The rule keeps working for them, and everyone else falls through to the default deny.",
+      "related": [
+        "AZ-104: network security groups",
+        "SC-500: network perimeter security"
+      ]
+    },
+    {
+      "id": "nsg-priority-order",
+      "title": "The allow rule is there, and ignored",
+      "goal": "A LOWER priority number is read first, so the allow needs a lower number than the deny.",
+      "level": "core",
+      "story": "The team added a rule to deny all inbound traffic from the internet, then added an allow for HTTPS. The allow rule is listed, enabled and correct, yet visitors cannot reach the site.",
+      "topology": {
+        "vnet": {
+          "name": "vnet-prod",
+          "space": "10.0.0.0/16"
+        },
+        "subnets": [
+          {
+            "id": "web",
+            "name": "snet-web",
+            "cidr": "10.0.1.0/24",
+            "nsg": "nsg-web"
+          },
+          {
+            "id": "data",
+            "name": "snet-data",
+            "cidr": "10.0.2.0/24",
+            "nsg": "nsg-data"
+          }
+        ],
+        "vms": [
+          {
+            "id": "web1",
+            "name": "vm-web",
+            "subnet": "web",
+            "ip": "10.0.1.4",
+            "publicIp": "20.50.60.70",
+            "nic": {
+              "nsg": null
+            }
+          },
+          {
+            "id": "tool1",
+            "name": "vm-test",
+            "subnet": "web",
+            "ip": "10.0.1.5",
+            "publicIp": "",
+            "nic": {
+              "nsg": null
+            }
+          },
+          {
+            "id": "db1",
+            "name": "vm-db",
+            "subnet": "data",
+            "ip": "10.0.2.4",
+            "publicIp": "",
+            "nic": {
+              "nsg": null
+            }
+          }
+        ],
+        "nsgs": [
+          {
+            "id": "nsg-web",
+            "name": "nsg-web",
+            "inbound": [
+              {
+                "id": "r-rdp",
+                "name": "Allow-RDP-Office",
+                "priority": 110,
+                "source": "198.51.100.20",
+                "srcPort": "*",
+                "dest": "*",
+                "destPort": "3389",
+                "proto": "Tcp",
+                "action": "Allow"
+              },
+              {
+                "id": "r-deny",
+                "name": "Deny-Internet-Inbound",
+                "priority": 300,
+                "source": "Internet",
+                "srcPort": "*",
+                "dest": "*",
+                "destPort": "*",
+                "proto": "Any",
+                "action": "Deny"
+              },
+              {
+                "id": "r-https",
+                "name": "Allow-HTTPS",
+                "priority": 400,
+                "source": "Internet",
+                "srcPort": "*",
+                "dest": "*",
+                "destPort": "443",
+                "proto": "Tcp",
+                "action": "Allow"
+              }
+            ],
+            "outbound": []
+          },
+          {
+            "id": "nsg-data",
+            "name": "nsg-data",
+            "inbound": [
+              {
+                "id": "r-sql",
+                "name": "Allow-SQL-Web",
+                "priority": 100,
+                "source": "10.0.1.4",
+                "srcPort": "*",
+                "dest": "*",
+                "destPort": "1433",
+                "proto": "Tcp",
+                "action": "Allow"
+              },
+              {
+                "id": "r-vnet-deny",
+                "name": "Deny-VNet-Other",
+                "priority": 4000,
+                "source": "VirtualNetwork",
+                "srcPort": "*",
+                "dest": "*",
+                "destPort": "*",
+                "proto": "Any",
+                "action": "Deny"
+              }
+            ],
+            "outbound": []
+          }
+        ],
+        "externals": [
+          {
+            "id": "visitor",
+            "name": "Visitor (internet)",
+            "ip": "203.0.113.50",
+            "kind": "internet",
+            "role": "client"
+          },
+          {
+            "id": "office",
+            "name": "Office admin",
+            "ip": "198.51.100.20",
+            "kind": "internet",
+            "role": "client"
+          },
+          {
+            "id": "probe",
+            "name": "Azure load balancer probe",
+            "ip": "168.63.129.16",
+            "kind": "probe",
+            "role": "probe"
+          },
+          {
+            "id": "site",
+            "name": "Public website",
+            "ip": "93.184.216.34",
+            "kind": "internet",
+            "role": "server"
+          }
+        ]
+      },
+      "ask": {
+        "from": "visitor",
+        "to": "web1",
+        "proto": "Tcp",
+        "port": 443,
+        "verdict": "success"
+      },
+      "expect": [
+        {
+          "from": "visitor",
+          "to": "web1",
+          "proto": "Tcp",
+          "port": 443,
+          "verdict": "failed",
+          "code": "lower-priority-loses"
+        }
+      ],
+      "hints": [
+        "Look at the two priority numbers. Which rule is read first?",
+        "In an NSG the first rule that matches stops the search, and the rule with the LOWER number is read first. The firewall tool counted by list position; here only the number counts."
+      ],
+      "fix": [
+        {
+          "setRule": {
+            "nsg": "nsg-web",
+            "dir": "inbound",
+            "id": "r-https",
+            "patch": {
+              "priority": 200
+            }
+          }
+        }
+      ],
+      "fixText": [
+        "Give Allow-HTTPS a number below 300 (for example 200) so it is read before the deny. Keep the deny: it still blocks every other port from the internet."
+      ],
+      "expectFixed": [
+        {
+          "from": "visitor",
+          "to": "web1",
+          "proto": "Tcp",
+          "port": 443,
+          "verdict": "success"
+        },
+        {
+          "from": "visitor",
+          "to": "web1",
+          "proto": "Tcp",
+          "port": 8080,
+          "verdict": "failed"
+        }
+      ],
+      "lesson": "NSG rules are ordered by their priority number, lowest first, not by where they sit in a list, and the first match wins. A specific allow must have a lower number than the broader deny it is meant to override. Leaving gaps between numbers (100, 200, 300) makes room to insert rules later.",
+      "related": [
+        "AZ-104: NSG rule priority",
+        "AZ-900: Azure networking"
+      ]
+    },
+    {
+      "id": "nsg-nic-forgotten",
+      "title": "Allowed on the subnet, blocked anyway",
+      "goal": "Traffic must be allowed at every level that has an NSG, including the NIC.",
+      "level": "core",
+      "story": "The subnet NSG allows HTTPS from the internet, and it has done so for months. After a rebuild, visitors cannot reach the web VM. Nobody changed the subnet rules.",
+      "topology": {
+        "vnet": {
+          "name": "vnet-prod",
+          "space": "10.0.0.0/16"
+        },
+        "subnets": [
+          {
+            "id": "web",
+            "name": "snet-web",
+            "cidr": "10.0.1.0/24",
+            "nsg": "nsg-web"
+          },
+          {
+            "id": "data",
+            "name": "snet-data",
+            "cidr": "10.0.2.0/24",
+            "nsg": "nsg-data"
+          }
+        ],
+        "vms": [
+          {
+            "id": "web1",
+            "name": "vm-web",
+            "subnet": "web",
+            "ip": "10.0.1.4",
+            "publicIp": "20.50.60.70",
+            "nic": {
+              "nsg": "nsg-vm-old"
+            }
+          },
+          {
+            "id": "tool1",
+            "name": "vm-test",
+            "subnet": "web",
+            "ip": "10.0.1.5",
+            "publicIp": "",
+            "nic": {
+              "nsg": null
+            }
+          },
+          {
+            "id": "db1",
+            "name": "vm-db",
+            "subnet": "data",
+            "ip": "10.0.2.4",
+            "publicIp": "",
+            "nic": {
+              "nsg": null
+            }
+          }
+        ],
+        "nsgs": [
+          {
+            "id": "nsg-web",
+            "name": "nsg-web",
+            "inbound": [
+              {
+                "id": "r-https",
+                "name": "Allow-HTTPS",
+                "priority": 100,
+                "source": "Internet",
+                "srcPort": "*",
+                "dest": "*",
+                "destPort": "443",
+                "proto": "Tcp",
+                "action": "Allow"
+              },
+              {
+                "id": "r-rdp",
+                "name": "Allow-RDP-Office",
+                "priority": 110,
+                "source": "198.51.100.20",
+                "srcPort": "*",
+                "dest": "*",
+                "destPort": "3389",
+                "proto": "Tcp",
+                "action": "Allow"
+              }
+            ],
+            "outbound": []
+          },
+          {
+            "id": "nsg-data",
+            "name": "nsg-data",
+            "inbound": [
+              {
+                "id": "r-sql",
+                "name": "Allow-SQL-Web",
+                "priority": 100,
+                "source": "10.0.1.4",
+                "srcPort": "*",
+                "dest": "*",
+                "destPort": "1433",
+                "proto": "Tcp",
+                "action": "Allow"
+              },
+              {
+                "id": "r-vnet-deny",
+                "name": "Deny-VNet-Other",
+                "priority": 4000,
+                "source": "VirtualNetwork",
+                "srcPort": "*",
+                "dest": "*",
+                "destPort": "*",
+                "proto": "Any",
+                "action": "Deny"
+              }
+            ],
+            "outbound": []
+          },
+          {
+            "id": "nsg-vm-old",
+            "name": "nsg-vm-web-old",
+            "inbound": [
+              {
+                "id": "r-ssh",
+                "name": "Allow-SSH-Admin",
+                "priority": 100,
+                "source": "198.51.100.20",
+                "srcPort": "*",
+                "dest": "*",
+                "destPort": "22",
+                "proto": "Tcp",
+                "action": "Allow"
+              }
+            ],
+            "outbound": []
+          }
+        ],
+        "externals": [
+          {
+            "id": "visitor",
+            "name": "Visitor (internet)",
+            "ip": "203.0.113.50",
+            "kind": "internet",
+            "role": "client"
+          },
+          {
+            "id": "office",
+            "name": "Office admin",
+            "ip": "198.51.100.20",
+            "kind": "internet",
+            "role": "client"
+          },
+          {
+            "id": "probe",
+            "name": "Azure load balancer probe",
+            "ip": "168.63.129.16",
+            "kind": "probe",
+            "role": "probe"
+          },
+          {
+            "id": "site",
+            "name": "Public website",
+            "ip": "93.184.216.34",
+            "kind": "internet",
+            "role": "server"
+          }
+        ]
+      },
+      "ask": {
+        "from": "visitor",
+        "to": "web1",
+        "proto": "Tcp",
+        "port": 443,
+        "verdict": "success"
+      },
+      "expect": [
+        {
+          "from": "visitor",
+          "to": "web1",
+          "proto": "Tcp",
+          "port": 443,
+          "verdict": "failed",
+          "code": "nic-nsg-blocks"
+        }
+      ],
+      "hints": [
+        "The path shows two inbound levels for this VM. Which one blocks?",
+        "Where else can an NSG be attached besides the subnet? Look at the associations of the VM."
+      ],
+      "fix": [
+        {
+          "associate": {
+            "target": "nic",
+            "id": "web1",
+            "nsg": null
+          }
+        }
+      ],
+      "fixText": [
+        "Dissociate the leftover NSG nsg-vm-web-old from the VM's network interface (or add an allow rule for TCP 443 to it). One level of NSG is easier to reason about than two."
+      ],
+      "expectFixed": [
+        {
+          "from": "visitor",
+          "to": "web1",
+          "proto": "Tcp",
+          "port": 443,
+          "verdict": "success"
+        }
+      ],
+      "lesson": "An NSG can sit on the subnet, on the network interface, or on both. Inbound traffic meets the subnet NSG first and the NIC NSG second, and it needs an allow at every level that has one. A forgotten NIC-level NSG silently overrides a perfectly good subnet rule; Microsoft advises choosing one level.",
+      "related": [
+        "AZ-104: NSG association",
+        "SC-500: network perimeter security"
+      ]
+    },
+    {
+      "id": "nsg-outbound-blocked",
+      "title": "The VM cannot reach the internet",
+      "goal": "Allow outbound HTTPS only, ahead of the deny that is already there.",
+      "level": "core",
+      "story": "Security hardened the web subnet by denying outbound internet traffic. Now the VM cannot download updates or call the payment provider over HTTPS. Mail relay on port 25 must stay blocked.",
+      "topology": {
+        "vnet": {
+          "name": "vnet-prod",
+          "space": "10.0.0.0/16"
+        },
+        "subnets": [
+          {
+            "id": "web",
+            "name": "snet-web",
+            "cidr": "10.0.1.0/24",
+            "nsg": "nsg-web"
+          },
+          {
+            "id": "data",
+            "name": "snet-data",
+            "cidr": "10.0.2.0/24",
+            "nsg": "nsg-data"
+          }
+        ],
+        "vms": [
+          {
+            "id": "web1",
+            "name": "vm-web",
+            "subnet": "web",
+            "ip": "10.0.1.4",
+            "publicIp": "20.50.60.70",
+            "nic": {
+              "nsg": null
+            }
+          },
+          {
+            "id": "tool1",
+            "name": "vm-test",
+            "subnet": "web",
+            "ip": "10.0.1.5",
+            "publicIp": "",
+            "nic": {
+              "nsg": null
+            }
+          },
+          {
+            "id": "db1",
+            "name": "vm-db",
+            "subnet": "data",
+            "ip": "10.0.2.4",
+            "publicIp": "",
+            "nic": {
+              "nsg": null
+            }
+          }
+        ],
+        "nsgs": [
+          {
+            "id": "nsg-web",
+            "name": "nsg-web",
+            "inbound": [
+              {
+                "id": "r-https",
+                "name": "Allow-HTTPS",
+                "priority": 100,
+                "source": "Internet",
+                "srcPort": "*",
+                "dest": "*",
+                "destPort": "443",
+                "proto": "Tcp",
+                "action": "Allow"
+              },
+              {
+                "id": "r-rdp",
+                "name": "Allow-RDP-Office",
+                "priority": 110,
+                "source": "198.51.100.20",
+                "srcPort": "*",
+                "dest": "*",
+                "destPort": "3389",
+                "proto": "Tcp",
+                "action": "Allow"
+              }
+            ],
+            "outbound": [
+              {
+                "id": "r-out-deny",
+                "name": "Deny-Internet-Out",
+                "priority": 200,
+                "source": "*",
+                "srcPort": "*",
+                "dest": "Internet",
+                "destPort": "*",
+                "proto": "Any",
+                "action": "Deny"
+              }
+            ]
+          },
+          {
+            "id": "nsg-data",
+            "name": "nsg-data",
+            "inbound": [
+              {
+                "id": "r-sql",
+                "name": "Allow-SQL-Web",
+                "priority": 100,
+                "source": "10.0.1.4",
+                "srcPort": "*",
+                "dest": "*",
+                "destPort": "1433",
+                "proto": "Tcp",
+                "action": "Allow"
+              },
+              {
+                "id": "r-vnet-deny",
+                "name": "Deny-VNet-Other",
+                "priority": 4000,
+                "source": "VirtualNetwork",
+                "srcPort": "*",
+                "dest": "*",
+                "destPort": "*",
+                "proto": "Any",
+                "action": "Deny"
+              }
+            ],
+            "outbound": []
+          }
+        ],
+        "externals": [
+          {
+            "id": "visitor",
+            "name": "Visitor (internet)",
+            "ip": "203.0.113.50",
+            "kind": "internet",
+            "role": "client"
+          },
+          {
+            "id": "office",
+            "name": "Office admin",
+            "ip": "198.51.100.20",
+            "kind": "internet",
+            "role": "client"
+          },
+          {
+            "id": "probe",
+            "name": "Azure load balancer probe",
+            "ip": "168.63.129.16",
+            "kind": "probe",
+            "role": "probe"
+          },
+          {
+            "id": "site",
+            "name": "Public website",
+            "ip": "93.184.216.34",
+            "kind": "internet",
+            "role": "server"
+          }
+        ]
+      },
+      "ask": {
+        "from": "web1",
+        "to": "site",
+        "proto": "Tcp",
+        "port": 443,
+        "verdict": "success"
+      },
+      "expect": [
+        {
+          "from": "web1",
+          "to": "site",
+          "proto": "Tcp",
+          "port": 443,
+          "verdict": "failed",
+          "code": "denied-by-rule"
+        }
+      ],
+      "hints": [
+        "Outbound traffic has default rules too. Which rule matched first this time?",
+        "You need an outbound Allow for TCP 443 to the internet. Mind its number against the deny."
+      ],
+      "fix": [
+        {
+          "addRule": {
+            "nsg": "nsg-web",
+            "dir": "outbound",
+            "rule": {
+              "id": "r-out-https",
+              "name": "Allow-HTTPS-Out",
+              "priority": 100,
+              "source": "*",
+              "srcPort": "*",
+              "dest": "Internet",
+              "destPort": "443",
+              "proto": "Tcp",
+              "action": "Allow"
+            }
+          }
+        }
+      ],
+      "fixText": [
+        "Add an outbound rule to nsg-web: destination Internet, destination port 443, TCP, Allow, with a number lower than the deny (for example 100)."
+      ],
+      "expectFixed": [
+        {
+          "from": "web1",
+          "to": "site",
+          "proto": "Tcp",
+          "port": 443,
+          "verdict": "success"
+        },
+        {
+          "from": "web1",
+          "to": "site",
+          "proto": "Tcp",
+          "port": 25,
+          "verdict": "failed"
+        }
+      ],
+      "lesson": "Outbound traffic is filtered too. By default AllowInternetOutBound (65001) lets VMs reach the internet, and a custom Deny with a lower number overrides it. To permit just one port you add an Allow with an even lower number; the replies to allowed connections need no rule, because NSGs are stateful.",
+      "related": [
+        "AZ-104: NSG outbound rules",
+        "SC-500: network perimeter security"
+      ]
+    },
+    {
+      "id": "nsg-subnet-blocks",
+      "title": "I opened port 8080 and it is still closed",
+      "goal": "Open the port at the subnet level too: both NSGs have to allow it.",
+      "level": "stretch",
+      "story": "A developer added a rule for port 8080 to the NSG on the VM's network interface, tested it, and still cannot connect from the internet. HTTPS on 443 works.",
+      "topology": {
+        "vnet": {
+          "name": "vnet-prod",
+          "space": "10.0.0.0/16"
+        },
+        "subnets": [
+          {
+            "id": "web",
+            "name": "snet-web",
+            "cidr": "10.0.1.0/24",
+            "nsg": "nsg-web"
+          },
+          {
+            "id": "data",
+            "name": "snet-data",
+            "cidr": "10.0.2.0/24",
+            "nsg": "nsg-data"
+          }
+        ],
+        "vms": [
+          {
+            "id": "web1",
+            "name": "vm-web",
+            "subnet": "web",
+            "ip": "10.0.1.4",
+            "publicIp": "20.50.60.70",
+            "nic": {
+              "nsg": "nsg-vm-app"
+            }
+          },
+          {
+            "id": "tool1",
+            "name": "vm-test",
+            "subnet": "web",
+            "ip": "10.0.1.5",
+            "publicIp": "",
+            "nic": {
+              "nsg": null
+            }
+          },
+          {
+            "id": "db1",
+            "name": "vm-db",
+            "subnet": "data",
+            "ip": "10.0.2.4",
+            "publicIp": "",
+            "nic": {
+              "nsg": null
+            }
+          }
+        ],
+        "nsgs": [
+          {
+            "id": "nsg-web",
+            "name": "nsg-web",
+            "inbound": [
+              {
+                "id": "r-https",
+                "name": "Allow-HTTPS",
+                "priority": 100,
+                "source": "Internet",
+                "srcPort": "*",
+                "dest": "*",
+                "destPort": "443",
+                "proto": "Tcp",
+                "action": "Allow"
+              },
+              {
+                "id": "r-rdp",
+                "name": "Allow-RDP-Office",
+                "priority": 110,
+                "source": "198.51.100.20",
+                "srcPort": "*",
+                "dest": "*",
+                "destPort": "3389",
+                "proto": "Tcp",
+                "action": "Allow"
+              }
+            ],
+            "outbound": []
+          },
+          {
+            "id": "nsg-data",
+            "name": "nsg-data",
+            "inbound": [
+              {
+                "id": "r-sql",
+                "name": "Allow-SQL-Web",
+                "priority": 100,
+                "source": "10.0.1.4",
+                "srcPort": "*",
+                "dest": "*",
+                "destPort": "1433",
+                "proto": "Tcp",
+                "action": "Allow"
+              },
+              {
+                "id": "r-vnet-deny",
+                "name": "Deny-VNet-Other",
+                "priority": 4000,
+                "source": "VirtualNetwork",
+                "srcPort": "*",
+                "dest": "*",
+                "destPort": "*",
+                "proto": "Any",
+                "action": "Deny"
+              }
+            ],
+            "outbound": []
+          },
+          {
+            "id": "nsg-vm-app",
+            "name": "nsg-vm-web",
+            "inbound": [
+              {
+                "id": "r-app-https",
+                "name": "Allow-HTTPS",
+                "priority": 100,
+                "source": "Internet",
+                "srcPort": "*",
+                "dest": "*",
+                "destPort": "443",
+                "proto": "Tcp",
+                "action": "Allow"
+              },
+              {
+                "id": "r-app-8080",
+                "name": "Allow-8080",
+                "priority": 110,
+                "source": "Internet",
+                "srcPort": "*",
+                "dest": "*",
+                "destPort": "8080",
+                "proto": "Tcp",
+                "action": "Allow"
+              }
+            ],
+            "outbound": []
+          }
+        ],
+        "externals": [
+          {
+            "id": "visitor",
+            "name": "Visitor (internet)",
+            "ip": "203.0.113.50",
+            "kind": "internet",
+            "role": "client"
+          },
+          {
+            "id": "office",
+            "name": "Office admin",
+            "ip": "198.51.100.20",
+            "kind": "internet",
+            "role": "client"
+          },
+          {
+            "id": "probe",
+            "name": "Azure load balancer probe",
+            "ip": "168.63.129.16",
+            "kind": "probe",
+            "role": "probe"
+          },
+          {
+            "id": "site",
+            "name": "Public website",
+            "ip": "93.184.216.34",
+            "kind": "internet",
+            "role": "server"
+          }
+        ]
+      },
+      "ask": {
+        "from": "visitor",
+        "to": "web1",
+        "proto": "Tcp",
+        "port": 8080,
+        "verdict": "success"
+      },
+      "expect": [
+        {
+          "from": "visitor",
+          "to": "web1",
+          "proto": "Tcp",
+          "port": 8080,
+          "verdict": "failed",
+          "code": "subnet-nsg-blocks"
+        },
+        {
+          "from": "visitor",
+          "to": "web1",
+          "proto": "Tcp",
+          "port": 443,
+          "verdict": "success"
+        }
+      ],
+      "hints": [
+        "The NIC-level NSG has the rule. Does the path ever get that far?",
+        "Inbound traffic meets the subnet NSG first. What does it say about port 8080?"
+      ],
+      "fix": [
+        {
+          "addRule": {
+            "nsg": "nsg-web",
+            "dir": "inbound",
+            "rule": {
+              "id": "r-8080",
+              "name": "Allow-8080",
+              "priority": 120,
+              "source": "Internet",
+              "srcPort": "*",
+              "dest": "*",
+              "destPort": "8080",
+              "proto": "Tcp",
+              "action": "Allow"
+            }
+          }
+        }
+      ],
+      "fixText": [
+        "Add an inbound Allow rule for TCP 8080 from the internet to the subnet NSG nsg-web as well (it already has one for 443). Now both levels allow it."
+      ],
+      "expectFixed": [
+        {
+          "from": "visitor",
+          "to": "web1",
+          "proto": "Tcp",
+          "port": 8080,
+          "verdict": "success"
+        },
+        {
+          "from": "visitor",
+          "to": "web1",
+          "proto": "Tcp",
+          "port": 443,
+          "verdict": "success"
+        }
+      ],
+      "lesson": "When a subnet and a NIC both carry an NSG, a packet must pass both: inbound the subnet NSG first, outbound the NIC NSG first. Opening a port at only one level changes nothing, and the level that blocks is the one to read in the path. Put your rules at one level where you can.",
+      "related": [
+        "AZ-104: NSG association",
+        "AZ-104: effective security rules"
+      ]
+    },
+    {
+      "id": "nsg-vnet-surprise",
+      "title": "The database answers a machine it should not",
+      "goal": "Only the web server may reach the database. The default AllowVnetInBound also lets every other VM in.",
+      "level": "stretch",
+      "story": "The data subnet NSG has one rule: SQL (1433) from the web server. The team assumed that meant nobody else could connect. A test VM in the web subnet connects to the database on SQL and on SSH.",
+      "topology": {
+        "vnet": {
+          "name": "vnet-prod",
+          "space": "10.0.0.0/16"
+        },
+        "subnets": [
+          {
+            "id": "web",
+            "name": "snet-web",
+            "cidr": "10.0.1.0/24",
+            "nsg": "nsg-web"
+          },
+          {
+            "id": "data",
+            "name": "snet-data",
+            "cidr": "10.0.2.0/24",
+            "nsg": "nsg-data"
+          }
+        ],
+        "vms": [
+          {
+            "id": "web1",
+            "name": "vm-web",
+            "subnet": "web",
+            "ip": "10.0.1.4",
+            "publicIp": "20.50.60.70",
+            "nic": {
+              "nsg": null
+            }
+          },
+          {
+            "id": "tool1",
+            "name": "vm-test",
+            "subnet": "web",
+            "ip": "10.0.1.5",
+            "publicIp": "",
+            "nic": {
+              "nsg": null
+            }
+          },
+          {
+            "id": "db1",
+            "name": "vm-db",
+            "subnet": "data",
+            "ip": "10.0.2.4",
+            "publicIp": "",
+            "nic": {
+              "nsg": null
+            }
+          }
+        ],
+        "nsgs": [
+          {
+            "id": "nsg-web",
+            "name": "nsg-web",
+            "inbound": [
+              {
+                "id": "r-https",
+                "name": "Allow-HTTPS",
+                "priority": 100,
+                "source": "Internet",
+                "srcPort": "*",
+                "dest": "*",
+                "destPort": "443",
+                "proto": "Tcp",
+                "action": "Allow"
+              },
+              {
+                "id": "r-rdp",
+                "name": "Allow-RDP-Office",
+                "priority": 110,
+                "source": "198.51.100.20",
+                "srcPort": "*",
+                "dest": "*",
+                "destPort": "3389",
+                "proto": "Tcp",
+                "action": "Allow"
+              }
+            ],
+            "outbound": []
+          },
+          {
+            "id": "nsg-data",
+            "name": "nsg-data",
+            "inbound": [
+              {
+                "id": "r-sql",
+                "name": "Allow-SQL-Web",
+                "priority": 100,
+                "source": "10.0.1.4",
+                "srcPort": "*",
+                "dest": "*",
+                "destPort": "1433",
+                "proto": "Tcp",
+                "action": "Allow"
+              }
+            ],
+            "outbound": []
+          }
+        ],
+        "externals": [
+          {
+            "id": "visitor",
+            "name": "Visitor (internet)",
+            "ip": "203.0.113.50",
+            "kind": "internet",
+            "role": "client"
+          },
+          {
+            "id": "office",
+            "name": "Office admin",
+            "ip": "198.51.100.20",
+            "kind": "internet",
+            "role": "client"
+          },
+          {
+            "id": "probe",
+            "name": "Azure load balancer probe",
+            "ip": "168.63.129.16",
+            "kind": "probe",
+            "role": "probe"
+          },
+          {
+            "id": "site",
+            "name": "Public website",
+            "ip": "93.184.216.34",
+            "kind": "internet",
+            "role": "server"
+          }
+        ]
+      },
+      "ask": {
+        "from": "tool1",
+        "to": "db1",
+        "proto": "Tcp",
+        "port": 1433,
+        "verdict": "success"
+      },
+      "expect": [
+        {
+          "from": "tool1",
+          "to": "db1",
+          "proto": "Tcp",
+          "port": 1433,
+          "verdict": "success",
+          "warn": "vnet-default-allow"
+        }
+      ],
+      "hints": [
+        "Read the matched rule at the data subnet. Is it one you wrote?",
+        "The built-in AllowVnetInBound (65000) allows traffic from anywhere in the virtual network. To shut it out you need a Deny of your own, with a number below 65000 and above your allow rules."
+      ],
+      "fix": [
+        {
+          "addRule": {
+            "nsg": "nsg-data",
+            "dir": "inbound",
+            "rule": {
+              "id": "r-vnet-deny",
+              "name": "Deny-VNet-Other",
+              "priority": 4000,
+              "source": "VirtualNetwork",
+              "srcPort": "*",
+              "dest": "*",
+              "destPort": "*",
+              "proto": "Any",
+              "action": "Deny"
+            }
+          }
+        }
+      ],
+      "fixText": [
+        "In nsg-data add an inbound rule: source VirtualNetwork, any port, any protocol, action Deny, priority 4000. The allow for the web server (priority 100) is read first and keeps working."
+      ],
+      "expectFixed": [
+        {
+          "from": "web1",
+          "to": "db1",
+          "proto": "Tcp",
+          "port": 1433,
+          "verdict": "success"
+        },
+        {
+          "from": "tool1",
+          "to": "db1",
+          "proto": "Tcp",
+          "port": 1433,
+          "verdict": "failed"
+        },
+        {
+          "from": "tool1",
+          "to": "db1",
+          "proto": "Tcp",
+          "port": 22,
+          "verdict": "failed"
+        }
+      ],
+      "lesson": "The default AllowVnetInBound rule means every VM in the virtual network (and in peered or connected networks) can reach every other VM on every port unless you say otherwise. Allow rules alone do not isolate a tier; you add a Deny from VirtualNetwork with a number between your allows and 65000.",
+      "related": [
+        "AZ-104: default security rules",
+        "SC-500: network perimeter security",
+        "AZ-900: Azure networking"
+      ]
+    },
+    {
+      "id": "nsg-no-nsg-public-ip",
+      "title": "A public IP and no NSG: closed",
+      "goal": "A VM with a Standard public IP only accepts internet traffic once an NSG allows it.",
+      "level": "stretch",
+      "story": "A new VM has a public IP address and a web server. An NSG named nsg-web with the right HTTPS rule was created for it. From the internet, nothing answers, although the NSG exists and the rule is right.",
+      "topology": {
+        "vnet": {
+          "name": "vnet-prod",
+          "space": "10.0.0.0/16"
+        },
+        "subnets": [
+          {
+            "id": "web",
+            "name": "snet-web",
+            "cidr": "10.0.1.0/24",
+            "nsg": null
+          },
+          {
+            "id": "data",
+            "name": "snet-data",
+            "cidr": "10.0.2.0/24",
+            "nsg": "nsg-data"
+          }
+        ],
+        "vms": [
+          {
+            "id": "web1",
+            "name": "vm-web",
+            "subnet": "web",
+            "ip": "10.0.1.4",
+            "publicIp": "20.50.60.70",
+            "nic": {
+              "nsg": null
+            }
+          },
+          {
+            "id": "tool1",
+            "name": "vm-test",
+            "subnet": "web",
+            "ip": "10.0.1.5",
+            "publicIp": "",
+            "nic": {
+              "nsg": null
+            }
+          },
+          {
+            "id": "db1",
+            "name": "vm-db",
+            "subnet": "data",
+            "ip": "10.0.2.4",
+            "publicIp": "",
+            "nic": {
+              "nsg": null
+            }
+          }
+        ],
+        "nsgs": [
+          {
+            "id": "nsg-web",
+            "name": "nsg-web",
+            "inbound": [
+              {
+                "id": "r-https",
+                "name": "Allow-HTTPS",
+                "priority": 100,
+                "source": "Internet",
+                "srcPort": "*",
+                "dest": "*",
+                "destPort": "443",
+                "proto": "Tcp",
+                "action": "Allow"
+              },
+              {
+                "id": "r-rdp",
+                "name": "Allow-RDP-Office",
+                "priority": 110,
+                "source": "198.51.100.20",
+                "srcPort": "*",
+                "dest": "*",
+                "destPort": "3389",
+                "proto": "Tcp",
+                "action": "Allow"
+              }
+            ],
+            "outbound": []
+          },
+          {
+            "id": "nsg-data",
+            "name": "nsg-data",
+            "inbound": [
+              {
+                "id": "r-sql",
+                "name": "Allow-SQL-Web",
+                "priority": 100,
+                "source": "10.0.1.4",
+                "srcPort": "*",
+                "dest": "*",
+                "destPort": "1433",
+                "proto": "Tcp",
+                "action": "Allow"
+              },
+              {
+                "id": "r-vnet-deny",
+                "name": "Deny-VNet-Other",
+                "priority": 4000,
+                "source": "VirtualNetwork",
+                "srcPort": "*",
+                "dest": "*",
+                "destPort": "*",
+                "proto": "Any",
+                "action": "Deny"
+              }
+            ],
+            "outbound": []
+          }
+        ],
+        "externals": [
+          {
+            "id": "visitor",
+            "name": "Visitor (internet)",
+            "ip": "203.0.113.50",
+            "kind": "internet",
+            "role": "client"
+          },
+          {
+            "id": "office",
+            "name": "Office admin",
+            "ip": "198.51.100.20",
+            "kind": "internet",
+            "role": "client"
+          },
+          {
+            "id": "probe",
+            "name": "Azure load balancer probe",
+            "ip": "168.63.129.16",
+            "kind": "probe",
+            "role": "probe"
+          },
+          {
+            "id": "site",
+            "name": "Public website",
+            "ip": "93.184.216.34",
+            "kind": "internet",
+            "role": "server"
+          }
+        ]
+      },
+      "ask": {
+        "from": "visitor",
+        "to": "web1",
+        "proto": "Tcp",
+        "port": 443,
+        "verdict": "success"
+      },
+      "expect": [
+        {
+          "from": "visitor",
+          "to": "web1",
+          "proto": "Tcp",
+          "port": 443,
+          "verdict": "failed",
+          "code": "no-nsg-public-ip"
+        }
+      ],
+      "hints": [
+        "The path shows no NSG at either level for the VM. Is the NSG that was created attached to anything?",
+        "Find the association settings for the subnet and the NIC."
+      ],
+      "fix": [
+        {
+          "associate": {
+            "target": "subnet",
+            "id": "web",
+            "nsg": "nsg-web"
+          }
+        }
+      ],
+      "fixText": [
+        "Associate nsg-web with the subnet snet-web (or with the VM's NIC). Creating an NSG does nothing until it is associated."
+      ],
+      "expectFixed": [
+        {
+          "from": "visitor",
+          "to": "web1",
+          "proto": "Tcp",
+          "port": 443,
+          "verdict": "success"
+        }
+      ],
+      "lesson": "An NSG only filters traffic once it is associated with a subnet or a network interface. A VM with a Standard SKU public IP address is closed to inbound traffic by default, so with no NSG at all nothing from the internet gets in: you need an NSG that allows it. Where a level has no NSG, that level simply does not filter.",
+      "related": [
+        "AZ-104: NSG association",
+        "AZ-900: Azure networking"
+      ]
+    }
+  ],
+  "nsgSandbox": {
+    "vnet": {
+      "name": "vnet-prod",
+      "space": "10.0.0.0/16"
+    },
+    "subnets": [
+      {
+        "id": "web",
+        "name": "snet-web",
+        "cidr": "10.0.1.0/24",
+        "nsg": "nsg-web"
+      },
+      {
+        "id": "data",
+        "name": "snet-data",
+        "cidr": "10.0.2.0/24",
+        "nsg": "nsg-data"
+      }
+    ],
+    "vms": [
+      {
+        "id": "web1",
+        "name": "vm-web",
+        "subnet": "web",
+        "ip": "10.0.1.4",
+        "publicIp": "20.50.60.70",
+        "nic": {
+          "nsg": null
+        }
+      },
+      {
+        "id": "tool1",
+        "name": "vm-test",
+        "subnet": "web",
+        "ip": "10.0.1.5",
+        "publicIp": "",
+        "nic": {
+          "nsg": null
+        }
+      },
+      {
+        "id": "db1",
+        "name": "vm-db",
+        "subnet": "data",
+        "ip": "10.0.2.4",
+        "publicIp": "",
+        "nic": {
+          "nsg": null
+        }
+      }
+    ],
+    "nsgs": [
+      {
+        "id": "nsg-web",
+        "name": "nsg-web",
+        "inbound": [
+          {
+            "id": "r-https",
+            "name": "Allow-HTTPS",
+            "priority": 100,
+            "source": "Internet",
+            "srcPort": "*",
+            "dest": "*",
+            "destPort": "443",
+            "proto": "Tcp",
+            "action": "Allow"
+          },
+          {
+            "id": "r-rdp",
+            "name": "Allow-RDP-Office",
+            "priority": 110,
+            "source": "198.51.100.20",
+            "srcPort": "*",
+            "dest": "*",
+            "destPort": "3389",
+            "proto": "Tcp",
+            "action": "Allow"
+          }
+        ],
+        "outbound": []
+      },
+      {
+        "id": "nsg-data",
+        "name": "nsg-data",
+        "inbound": [
+          {
+            "id": "r-sql",
+            "name": "Allow-SQL-Web",
+            "priority": 100,
+            "source": "10.0.1.4",
+            "srcPort": "*",
+            "dest": "*",
+            "destPort": "1433",
+            "proto": "Tcp",
+            "action": "Allow"
+          },
+          {
+            "id": "r-vnet-deny",
+            "name": "Deny-VNet-Other",
+            "priority": 4000,
+            "source": "VirtualNetwork",
+            "srcPort": "*",
+            "dest": "*",
+            "destPort": "*",
+            "proto": "Any",
+            "action": "Deny"
+          }
+        ],
+        "outbound": []
+      }
+    ],
+    "externals": [
+      {
+        "id": "visitor",
+        "name": "Visitor (internet)",
+        "ip": "203.0.113.50",
+        "kind": "internet",
+        "role": "client"
+      },
+      {
+        "id": "office",
+        "name": "Office admin",
+        "ip": "198.51.100.20",
+        "kind": "internet",
+        "role": "client"
+      },
+      {
+        "id": "probe",
+        "name": "Azure load balancer probe",
+        "ip": "168.63.129.16",
+        "kind": "probe",
+        "role": "probe"
+      },
+      {
+        "id": "site",
+        "name": "Public website",
+        "ip": "93.184.216.34",
+        "kind": "internet",
+        "role": "server"
+      }
+    ]
+  },
   "stp": [
     {
       "id": "stp-default-priorities",
@@ -9501,6 +11366,46 @@
       "pick": "sandbox",
       "label": "A DHCP lab to experiment with",
       "blurb": "Scopes, exclusions, relays and leases in a small network."
+    },
+    {
+      "track": "az104",
+      "lesson": "az104-networking",
+      "tool": "nsg",
+      "pick": "nsg-priority-order",
+      "label": "NSG rules: the lower number wins",
+      "blurb": "An allow that loses to a deny because of its priority number."
+    },
+    {
+      "track": "az104",
+      "lesson": "az104-networking",
+      "tool": "nsg",
+      "pick": "nsg-nic-forgotten",
+      "label": "Subnet NSG and NIC NSG together",
+      "blurb": "Why a forgotten NIC-level NSG blocks traffic the subnet allows."
+    },
+    {
+      "track": "sc500",
+      "lesson": "network-perimeter-security",
+      "tool": "nsg",
+      "pick": "nsg-vnet-surprise",
+      "label": "The default rule that lets the whole VNet in",
+      "blurb": "AllowVnetInBound and how to isolate a tier."
+    },
+    {
+      "track": "sc500",
+      "lesson": "network-perimeter-security",
+      "tool": "nsg",
+      "pick": "nsg-rdp-exposed",
+      "label": "RDP open to the internet",
+      "blurb": "Spot and fix an overly broad management-port rule."
+    },
+    {
+      "track": "az900",
+      "lesson": "networking",
+      "tool": "nsg",
+      "pick": "nsg-default-deny",
+      "label": "Why a public VM does not answer",
+      "blurb": "The built-in deny and the Allow rule that opens a port."
     },
     {
       "track": "ccna",
