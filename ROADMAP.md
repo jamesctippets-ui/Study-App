@@ -1799,7 +1799,9 @@ trading away for shinier but shallower ones.
   folded Daily card with two tabs; Playground, Glossary and About became a three-up row; "continue where you left off" is a
   slim row; the review-reminder dropdown moved to Data & Progress, whose export and import cards are now one "Back up &
   restore" card; Practice's tool picker is one line and the quiz options and "New quiz" share one row; the Path's review
-  buttons are compact chips and locked units drop their summary line; Profile's stat tiles sit three to a row, the activity
+  buttons are compact chips and locked units drop their summary line; the Exam intro shows the title, the experience chip,
+  readiness, the question count and clock and both start buttons on one screen (1,422 px down to 844), with the pass mark,
+  experience details, format note and official links in an "About this exam" disclosure; Profile's stat tiles sit three to a row, the activity
   map is folded and the empty "Earned certifications" card is gone. Rule for later work: put a new control in an existing
   block, behind a `Disclosure`, or in Data & Progress.
 - [x] **IT Playground v2 (shared core, six more tools, IPv6, lesson links).** The Playground now has ten tools and

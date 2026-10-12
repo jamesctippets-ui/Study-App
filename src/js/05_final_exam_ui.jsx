@@ -10,71 +10,71 @@ const READINESS_COLOR = {
 
 function ExamIntro({ track, config, readiness, onStart, onStartFinal }) {
   const readinessColor = READINESS_COLOR[readiness.label] || COLOR.muted;
+  const started = readiness.label !== 'Not started';
   return (
     <div style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderRadius: 'var(--r-card)', padding: '22px' }}>
-      <div className="itil-display" style={{ fontSize: '19px', fontWeight: 600, marginBottom: '12px' }}>{track.label} Final Exam</div>
-      {readiness.label !== 'Not started' && (
-        <div style={{
-          marginBottom: '16px', padding: '12px 14px', borderRadius: 'var(--r-card)',
-          background: `${readinessColor}1F`, border: `1px solid ${readinessColor}`,
-        }}>
-          <div className="flex justify-between items-center" style={{ marginBottom: '2px' }}>
-            <span style={{ fontSize: '11px', color: COLOR.muted, textTransform: 'uppercase', letterSpacing: '0.04em' }}>Exam readiness</span>
-            <span style={{ fontSize: '15px', fontWeight: 700, color: readinessColor }}>{readiness.score}%</span>
-          </div>
-          <div style={{ fontSize: '13px', fontWeight: 600, color: readinessColor }}>{readiness.label}</div>
-          <div style={{ fontSize: '11.5px', color: COLOR.muted, marginTop: '4px', lineHeight: 1.4 }}>
-            {readiness.mastery}% lifetime mastery{readiness.freshness < 0.99 ? ', discounted for how long it\'s been since you last practiced' : ''} — not just a flat percentage that never decays.
-          </div>
+      <div className="itil-display" style={{ fontSize: '19px', fontWeight: 600, marginBottom: '8px' }}>{track.label} Final Exam</div>
+      <ExperienceChip trackKey={track.key} style={{ marginBottom: '10px' }} />
+      {started && (
+        <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: '8px', marginBottom: '10px', padding: '9px 12px', borderRadius: 'var(--r-ctl)', background: `${readinessColor}1F`, border: `1px solid ${readinessColor}` }}>
+          <span style={{ fontSize: '10.5px', textTransform: 'uppercase', color: COLOR.muted }}>Exam readiness · <span style={{ color: readinessColor, fontWeight: 700 }}>{readiness.label}</span></span>
+          <span className="mono" style={{ fontSize: '15px', fontWeight: 700, color: readinessColor }}>{readiness.score}%</span>
         </div>
       )}
-      <div style={{ fontSize: '13px', color: COLOR.text, marginBottom: '4px' }}>{config.length} questions</div>
-      <div style={{ fontSize: '13px', color: COLOR.text, marginBottom: '4px' }}>{config.minutes}-minute time limit</div>
-      <div style={{ fontSize: '12px', color: COLOR.muted, marginBottom: '16px', lineHeight: 1.5 }}>{config.passLabel}</div>
-      <ExperienceCard trackKey={track.key} />
-      <div style={{ fontSize: '12px', color: COLOR.muted, lineHeight: 1.6, marginBottom: '18px' }}>
-        Multiple choice, true/false, and multi-select only, pulled from every category regardless of the current filter. No feedback until you submit, just like the real thing. Questions and order change each attempt.
-      </div>
-      {Array.isArray(config.resources) && config.resources.length > 0 && (
-        <div style={{ marginBottom: '18px', padding: '12px 14px', borderRadius: 'var(--r-card)', background: COLOR.surfaceRaised, border: `1px solid ${COLOR.border}` }}>
-          <div style={{ fontSize: '11px', color: COLOR.muted, fontWeight: 600, marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-            Official study resources
-          </div>
-          <div className="flex flex-col gap-1">
-            {config.resources.map((r, i) => (
-              <a
-                key={i}
-                href={r.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                style={{ fontSize: '13px', color: COLOR.primary, textDecoration: 'none', borderBottom: `1px dotted ${COLOR.primary}`, width: 'fit-content' }}
-              >
-                {r.label} ↗
-              </a>
-            ))}
-          </div>
-        </div>
-      )}
+      <div style={{ fontSize: '13px', color: COLOR.text, marginBottom: '14px' }}>{config.length} questions · {config.minutes}-minute time limit</div>
       <button
         onClick={onStart}
         style={{ width: '100%', padding: '13px', borderRadius: 'var(--r-card)', background: COLOR.gold, color: COLOR.onAccent, fontSize: '14px', fontWeight: 700 }}
       >
         Start Practice Exam
       </button>
-      <div style={{ marginTop: '14px', padding: '14px', borderRadius: 'var(--r-card)', border: `1px solid ${COLOR.gold}`, borderLeft: `3px solid ${COLOR.gold}`, background: `${COLOR.gold}14` }}>
-        <div style={{ fontSize: '11px', fontWeight: 700, color: COLOR.gold, textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: '6px' }}>
+      <div style={{ marginTop: '14px', padding: '12px 14px', borderRadius: 'var(--r-card)', border: `1px solid ${COLOR.gold}`, borderLeft: `3px solid ${COLOR.gold}`, background: `${COLOR.gold}14` }}>
+        <div style={{ fontSize: '11px', fontWeight: 700, color: COLOR.gold, textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: '4px' }}>
           Final Mock — proctored-style
         </div>
-        <div style={{ fontSize: '12px', color: COLOR.text, lineHeight: 1.6, marginBottom: '12px' }}>
-          Same {config.length} questions and {config.minutes}-minute clock, stricter rules: each answer locks the moment you move on, there's no going back and no submitting early, and you see nothing — not even a running count — until the end. Scored as a straight pass/fail at the real pass mark, with a per-area breakdown like a real score report.
+        <div style={{ fontSize: '12px', color: COLOR.text, lineHeight: 1.55, marginBottom: '10px' }}>
+          Same questions and clock, stricter rules: each answer locks as you move on, no going back, no submitting early and nothing shown until the end. Scored pass/fail at the real pass mark, with a per-area breakdown.
         </div>
         <button
           onClick={onStartFinal}
-          style={{ width: '100%', padding: '12px', borderRadius: 'var(--r-card)', border: `1px solid ${COLOR.gold}`, background: 'transparent', color: COLOR.gold, fontSize: '14px', fontWeight: 700 }}
+          style={{ width: '100%', padding: '11px', borderRadius: 'var(--r-card)', border: `1px solid ${COLOR.gold}`, background: 'transparent', color: COLOR.gold, fontSize: '14px', fontWeight: 700 }}
         >
           Start Final Mock
         </button>
       </div>
+      {/* The reading (pass mark, experience, format, readiness, official links) is folded away. */}
+      <Disclosure label="About this exam" summary="pass mark, format, resources" style={{ marginTop: '14px', marginBottom: 0 }}>
+        <div style={{ fontSize: '12px', color: COLOR.muted, marginBottom: '12px', lineHeight: 1.5 }}>{config.passLabel}</div>
+        <ExperienceCard trackKey={track.key} />
+        <div style={{ fontSize: '12px', color: COLOR.muted, lineHeight: 1.6, marginBottom: started || (Array.isArray(config.resources) && config.resources.length > 0) ? '14px' : 0 }}>
+          Multiple choice, true/false, and multi-select only, pulled from every category regardless of the current filter. No feedback until you submit, just like the real thing. Questions and order change each attempt.
+        </div>
+        {started && (
+          <div style={{ fontSize: '11.5px', color: COLOR.muted, lineHeight: 1.45, marginBottom: Array.isArray(config.resources) && config.resources.length > 0 ? '14px' : 0 }}>
+            Readiness is {readiness.mastery}% lifetime mastery{readiness.freshness < 0.99 ? ', discounted for how long it\'s been since you last practiced' : ''}, not just a flat percentage that never decays.
+          </div>
+        )}
+        {Array.isArray(config.resources) && config.resources.length > 0 && (
+          <div>
+            <div style={{ fontSize: '11px', color: COLOR.muted, fontWeight: 600, marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+              Official study resources
+            </div>
+            <div className="flex flex-col gap-1">
+              {config.resources.map((r, i) => (
+                <a
+                  key={i}
+                  href={r.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{ fontSize: '13px', color: COLOR.primary, textDecoration: 'none', borderBottom: `1px dotted ${COLOR.primary}`, width: 'fit-content' }}
+                >
+                  {r.label} ↗
+                </a>
+              ))}
+            </div>
+          </div>
+        )}
+      </Disclosure>
     </div>
   );
 }
