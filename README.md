@@ -298,6 +298,13 @@ bottom:
   (across every track, Today's Mix and the daily question/vocab below
   included), turns solid green once you hit it, and can be adjusted with
   a tap-to-reveal +/- 5 stepper.
+- **Home stays short on purpose.** From top to bottom: the streak / goal / readiness strip, the study path (its mode and
+  order switches fold behind one "Options" line), one **review card** (the quick reviews plus a Weak subjects row), a slim
+  "continue where you left off" row, your certs with "Browse all tracks" folded underneath, one folded **Daily** card that
+  holds the question and the vocab of the day, and a three-up row for Playground, Glossary and About. New features join an
+  existing block or fold behind a disclosure (`Disclosure` in `src/js/00b_console_ui.jsx`) instead of adding a card. The
+  review reminder dropdown moved to Data & Progress; Practice's controls are one row; Profile's stat tiles sit three to a
+  row with the activity map folded.
 - **If you have an active cert path, Home leads with it** —
   `CertPathHomeSection` in 04a_home_ui.jsx, not a card linking out to a
   separate panel. The first not-yet-passed cert gets a full "up next"
@@ -388,9 +395,9 @@ chips), and moving to the next question scrolls back to the top.
 On a cert's Path tab, a unit stays locked until the one before it is finished (or
 you tap "Unlock anyway"; units you've started never lock), and a chime can play
 on step completion. Both are switches under Data & Progress → Path & sounds.
-Your own terms can be limited to one cert and saved straight from a flyout, and Practice > Sequence lets you build your own step-ordering scenarios (with a step bank) alongside the built-in ones. Answer sounds also cover the Match, Compare, Mad Libs, Sequence and command games.
+Your own terms can be limited to one cert and saved straight from a flyout, and Practice > Sequence lets you build your own step-ordering scenarios alongside the built-in ones. The scenario builder's **step bank** lists your own steps first (marked "yours") and, after each step you write, suggests what usually came next in your earlier scenarios and the built-in ones. **Share between devices** (Glossary > Mine) turns your terms, acronyms and scenarios into a short `CSH1.` text code to copy and paste onto another device, validated and de-duplicated on import, with nothing uploaded. Answer sounds also cover the Match, Compare, Mad Libs, Sequence and command games.
 Every cert accent, unit banner and tab has its own hue in both themes. The **Profile** tab (`#/profile`, `04g_profile_ui.jsx`) shows a study level, stat tiles (streak, days studied, questions, cards, path steps, exams), a 12-week activity map, earned certifications you can mark or undo, your plan with exam dates, and achievements. Path units now have 11 steps, with a Match round, a Quick-fire true or false set and a second game woven in (saves from earlier versions are migrated once). Practice question stems carry tappable definitions, and there are about 550 more flashcards (1,736 in all) and 507 acronym expansions.
-Fonts are self-hosted (`fonts/`) with an OpenDyslexic option, every image and font is precached for offline use, and the Glossary has a **Mine** tab for your own terms and acronyms, which then appear in flyouts. Sounds (celebration chimes and right/wrong answer tones) are opt-in in Data & Progress.
+Fonts are self-hosted (`fonts/`) with an OpenDyslexic option, every image and font is precached for offline use, and the Glossary has a **Mine** tab for your own terms and acronyms, which then appear in flyouts. Sounds (celebration chimes, which also mark the end of a case study and the start and end of a Verbal Quiz, and right/wrong answer tones) are opt-in in Data & Progress.
 Call-to-action buttons use `.btn-3d` (a solid pressable edge), and the font is
 Nunito, loaded from Google Fonts, with Inter as the fallback.
 Navigation is also real client-side routing, not
@@ -577,23 +584,25 @@ where one genuinely fits, vocab/quiz call-outs, and common-traps notes):
   checked because Cisco's page is gated, so confirm it before you book. ISSAP, ISSEP and ISSMP are not covered. Most lessons carry a diagram
   (CCNA 13, CISSP 14, CCSP 8, CSSLP 7, CC 6, SSCP 6, CGRC 5), each in its own
   `src/js/01a_diagrams_*.jsx` file.
-- **Weak subjects** (Path tab → "Weak spots", `#/<cert>/path/weak`) — turns what you got wrong
-  into a study plan. Each answer already updated "last outcome"; a new **miss log** adds how
-  often and how recently an item was missed. For every cert the app ranks the *lessons* your
-  misses point back at (repeat and recent misses weigh more, tough flashcards, mini-game and
-  case-study misses count, and areas worth more of the exam rank higher), says why in one line,
-  and lists what to review: the reading (with the official links for that area), the flashcards
-  that match the questions you missed, and the missed questions themselves, each one tap away.
-  One button turns the ranking into a **weak-subjects path** in a new study order (most urgent
-  first): re-read, targeted flashcards, a quiz built around your misses with a few fresh
-  questions, an optional game and a retest. It runs on the same step runner as the course path,
-  keeps its own progress, shows how many of the original misses are fixed, and can be rebuilt
-  from your latest results. Entry points: the Path tab switch, a Home card and the exam results
-  screen. The ranking is pure logic (`src/js/03d_weak_path.js`, 104 checks in
-  `tools/check_weak_path.js`, run by build.py when node is installed).
+- **Weak subjects** (Path tab → "Weak spots", `#/<cert>/path/weak`, or the Weak subjects row of Home's review card for
+  every cert in your plan) — turns what you got wrong into a study plan. Each answer already updated "last outcome"; a
+  **miss log** adds how often and how recently an item was missed. The app ranks the *lessons* your misses point back at
+  (repeat and recent misses weigh more, scenario questions a little more than short recall ones, tough flashcards,
+  mini-game and case-study misses count, and areas worth more of the exam rank higher), says why in one line, and lists
+  what to review: the reading (with the official links), the flashcards that match the questions you missed, and the
+  missed questions themselves. One page, one next action: the header builds the path (or continues it), the lessons are
+  compact rows that open on demand, and two folded sections hold the exam areas losing points and the **missed-question
+  history** (still wrong / fixed / all, the right answer and why, and a retry quiz). The **weak-subjects path** studies
+  the lessons in priority order: re-read, targeted flashcards, a quiz built around your misses with a few fresh
+  questions, an optional game and a retest. It runs on the course path's step runner, keeps its own progress, shows
+  how many of the original misses are fixed, and a lesson **retires itself as "Mastered"** once every question that put it
+  on the list is answered correctly again anywhere in the app. With two or more certs in your plan the path is
+  **cross-cert** (`stats.weakPath.mix`, at most three lessons per cert); with one it lives on that cert's Path tab. The
+  ranking is pure logic (`src/js/03d_weak_path.js`, 135 checks in `tools/check_weak_path.js`, run by build.py when node
+  is installed).
 - **IT Playground** (`#/playground`) — a sandbox outside any cert, reached from a card
-  on Home. Ten tools; all but the calculator have a free sandbox and guided troubleshooting
-  scenarios (starter, core, stretch; 75 in all): a **subnet calculator** (network, broadcast,
+  on Home. Eleven tools; all but the calculator have a free sandbox and guided troubleshooting
+  scenarios (starter, core, stretch; 83 in all): a **subnet calculator** (network, broadcast,
   host range, wildcard, binary view with the network/host boundary, step-by-step working,
   split a network, same-subnet checker, **VLSM** planner, a subnetting drill and an **IPv6**
   tab: compression, expansion, address types, EUI-64 and /64 subnetting); an **IP
@@ -607,15 +616,21 @@ where one genuinely fits, vocab/quiz call-outs, and common-traps notes):
   tree** lab (root election, port roles, link failures); a **site-to-site VPN** tester
   (tunnel up but no traffic: selectors, routes, NAT exemption); an **Azure NSG** tester
   (priorities, default rules, subnet versus NIC level) and a **certificate checker**
-  (expiry, name match, chain, trust). Every lab can **predict first** (guess the cause
+  (expiry, name match, chain, trust) and an **ACL lab** (Cisco-style standard and extended access lists with wildcard
+  masks, sequence numbers, the implicit deny, `ip access-group in|out`, stateless replies and `established`; a test
+  packet is traced through routing and then the inbound and outbound ACLs). Every lab can **predict first** (guess the cause
   before running; the score is kept on the device), saves its sandbox setup on the device
   with reset and export/import, and collapses its tall editors. A progress card tracks
   scenarios fixed and a few milestones. 41 lessons that teach a tool (CCNA, CC, SSCP, CISSP, SC-500 and the Azure tracks)
   show a "Try it in the Playground" link that opens the matching tool or scenario. Nothing in the
-  Playground touches mastery, results, the daily goal or readiness. The simulations are
+  Playground touches mastery, results or readiness, and it counts toward the daily goal only if you switch that on in Data &
+  Progress (off by default: +3 for a scenario solved for the first time, +1 per right answer below). After a sandbox
+  setup, or a solved scenario, **Quiz me on this setup** asks five questions generated from the network on screen (will this
+  ping work, which is the network address, which rule or ACL entry decides this connection...); every answer comes from the same engine
+  calls the lab runs (`src/js/03c_pg_quizme.js`, checked against every scenario in `tools/checks/quizme.js`). The simulations are
   deliberately simplified (no vendor-exact behaviour; each tool says what it leaves out).
   The engines are pure JavaScript (`src/js/03b_playground_engine.js` for the core tools and
-  one `03c_pg_<tool>.js` per extra tool); `tools/check_playground.js` (about 1,800 checks)
+  one `03c_pg_<tool>.js` per extra tool); `tools/check_playground.js` (about 3,300 checks)
   unit-tests them and replays every scenario's broken and fixed outcomes, and build.py runs
   it when node is installed. **Adding a tool** needs four new files and no shared edits:
   `src/js/03c_pg_<k>.js` (engine), `src/js/04l_pg_<k>.jsx` (screens, ending with a
@@ -650,7 +665,7 @@ data/
   ccna.py, cissp.py — combine ccna_a/_b and cissp_a/_b (two parts each, written in parallel)
   isc2cc.py, sscp.py, ccsp.py, cgrc.py, csslp.py — the ISC2 tracks (experience requirements live in tracks.py)
   playground.py — guided scenarios for the IT Playground (validated by build.py, replayed through the engine)
-  playground_<tool>.py — one file per extra Playground tool (dhcp, dns, stp, vpn, nsg, certs), auto-discovered
+  playground_<tool>.py — one file per extra Playground tool (dhcp, dns, stp, vpn, nsg, certs, acl), auto-discovered
 tools/
   check_weak_path.js  — unit tests for the weak-subjects engine against the real content
   check_playground.js — unit tests for the Playground engines plus a replay of every scenario
@@ -659,7 +674,7 @@ tools/
   checks/<tool>.js    — per-tool checks for the extra Playground tools (loaded by check_playground.js)
 src/js/
   00_preamble.js        — React hook imports, the COLOR palette, hues, theme and icon helpers
-  00b_console_ui.jsx    — Console look building blocks: TickBar, SectionLabel, SegmentedControl, RouteList/RouteStep, QuizOption
+  00b_console_ui.jsx    — Console look building blocks: TickBar, SectionLabel, SegmentedControl, Disclosure, RouteList/RouteStep, QuizOption
   01_diagrams.jsx        — SVG lesson diagrams
   02_portal_mockups.jsx  — fake Azure Portal screenshots used in lessons; the term-flyout engine (alias matching, acronym lookup, GlossText)
   03_helpers.js          — shuffling, storage, question-prep helpers
@@ -670,9 +685,10 @@ src/js/
   04e_path_ui.jsx        — the guided Path tab: unit map, step runners, test-out, weak-spot review
   03d_weak_path.js        — weak-subjects engine: miss log, lesson ranking, snapshot path (pure logic)
   03e_flyout_place.js     — where a definition flyout goes (open left/right, above/below, clamped to the screen; pure geometry)
-  04m_weak_path_ui.jsx    — the Weak spots panel, path progress and the Home card
+  04m_weak_path_ui.jsx    — the Weak spots view (one page for a cert or for every cert), path progress, missed-question history
+  03f_share_bank.js       — share code for your own terms and scenarios, step-bank suggestions (pure logic; tools/check_share.js)
   03b_playground_engine.js — pure-JS simulation engine for the IT Playground (subnet maths incl. IPv6, ping, VLAN switching, firewall)
-  03c_pg_<tool>.js       — engines for the extra Playground tools (dhcp, dns, stp, vpn, nsg, certs)
+  03c_pg_<tool>.js       — engines for the extra Playground tools (dhcp, dns, stp, vpn, nsg, certs); 03c_pg_quizme.js builds the "Quiz me on this setup" rounds
   04g_playground_core.jsx — shared Playground parts: cards, fields, predict-first, scenario shell, sandbox store, tool registry
   04h_playground_ui.jsx  — Playground shell and subnet tools; 04i (IP lab), 04j (VLANs), 04k (firewall), 04l_pg_<tool> (extra tools) hold the others
   05_final_exam_ui.jsx   — timed exam intro/runner/results (practice exam + proctored-style Final Mock)

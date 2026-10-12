@@ -6,13 +6,14 @@ const path = require('path');
 module.exports = ({ E, eq, data, root }) => {
   const read = (f) => fs.readFileSync(path.join(root, 'src/js', f), 'utf8');
   const causes = (file, name) => { const m = new RegExp(`const ${name} = (\\{[\\s\\S]*?\\n\\});`).exec(read(file)); return m ? new Function(`return ${m[1]}`)() : {}; };
-  const CAUSES = { vlan: causes('04j_playground_vlan.jsx', 'PG_VLAN_CAUSES'), ipconfig: causes('04i_playground_net.jsx', 'PG_IP_CAUSES'), firewall: causes('04k_playground_firewall.jsx', 'PG_FW_CAUSES') };
+  const CAUSES = { vlan: causes('04j_playground_vlan.jsx', 'PG_VLAN_CAUSES'), ipconfig: causes('04i_playground_net.jsx', 'PG_IP_CAUSES'), firewall: causes('04k_playground_firewall.jsx', 'PG_FW_CAUSES'), acl: {} };
   eq(Object.keys(CAUSES.vlan).length > 5, true, 'quizme: the VLAN cause map was found in the screens');
 
   const sets = {
     ipconfig: (data.ipconfig || []).map((s) => s.topology),
     vlan: (data.vlan || []).map((s) => s.topology).concat([data.vlanSandbox]),
     firewall: (data.firewall || []).map((s) => s.topology).concat([data.firewallSandbox]),
+    acl: (data.acl || []).map((s) => s.topology).concat(data.aclSandbox ? [data.aclSandbox] : []),
   };
   // The IP lab's sandbox lives in the screens, so its two-subnet default is rebuilt here.
   sets.ipconfig.push({
@@ -72,4 +73,20 @@ module.exports = ({ E, eq, data, root }) => {
     const r = E.pgFwTest(data.firewallSandbox, { from: m[1], to: m[2], proto: m[3], port: Number(m[4]) });
     eq(q.correct === 0, r.verdict === 'success', `quizme: ${q.id} agrees with pgFwTest`);
   });
+  if (data.aclSandbox) {
+    eq(E.pgQuizBuild('acl', data.aclSandbox, { seed: 6 }).length >= 3, true, 'quizme: the ACL sandbox gives a full round');
+    const aq = E.pgQuizBuild('acl', data.aclSandbox, { seed: 8, count: 30 }).filter((q) => /^acl-conn-/.test(q.id));
+    eq(aq.length > 0, true, 'quizme: the ACL sandbox yields connection questions to spot-check');
+    aq.forEach((q) => {
+      const m = /^acl-conn-(.+)-(.+)-(tcp|udp|icmp)-(\d+|null)$/.exec(q.id);
+      const hosts = data.aclSandbox.hosts.map((h) => h.id);
+      // ids may contain dashes: split by matching known host ids
+      const from = hosts.find((h) => q.id.startsWith(`acl-conn-${h}-`));
+      const rest = q.id.slice(`acl-conn-${from}-`.length);
+      const to = hosts.find((h) => rest.startsWith(`${h}-`));
+      const [proto, port] = rest.slice(to.length + 1).split('-');
+      const r = E.pgAclTest(data.aclSandbox, { from, to, proto, port: port === 'null' ? undefined : Number(port) });
+      eq(q.correct === 0, r.verdict === 'success', `quizme: ${q.id} agrees with pgAclTest`);
+    });
+  }
 };

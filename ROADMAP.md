@@ -1712,9 +1712,20 @@ trading away for shinier but shallower ones.
   study order, exam areas losing points and a per-lesson review card; the path with progress and a "missed questions fixed"
   count; a Home card; a button on the exam results). 104 engine checks in `tools/check_weak_path.js` (every cert analyses and builds a path; miss log, ranking on
   real CCNA content, recency, repeats, exam weight, tough cards, snapshot, units, outcome, normalization), run by build.py.
-  Open items: one cross-cert weak path on Home (today each cert has its own), per-lesson "mastered" detection that
-  retires a weak lesson automatically mid-path, weak-spot reminders, and counting question *type* (scenario versus
-  recall) in the weighting.
+  **Upgrades (October 2026, all four open items done):** (1) *Cross-cert path:* with two or more certs in the plan, Home's
+  review card opens one weak path across them (`stats.weakPath.mix`; `weakAnalyzeMany` re-tiers the lessons against the
+  strongest of the whole set; `buildWeakSnapshot` takes at most three per cert and eight in all; unit and step ids are
+  prefixed with the cert so two certs never collide; each step still records to its own cert). With one cert the path stays on
+  that cert's Path tab. (2) *Auto-retire:* `weakEffectiveDone` counts every step of a lesson as done ("Mastered") once each
+  question that put it on the list is answered correctly again, wherever it was answered; lessons flagged only by cards or
+  games never retire this way. (3) *Weak-spot nudge:* the Weak subjects row on Home's review card says how many lessons need
+  work and how many are top priority (and how far through the path you are), next to the existing review-reminder line.
+  (4) *Question kind:* scenario questions weigh 1.15 and short recall ones 0.85, and the reason line says when the misses are
+  mostly of one kind. Also new: a **missed-question history** (`missedHistory`: still wrong / fixed / all, newest first, each
+  with its right answer and explanation, plus a retry quiz over what is listed; wrong answers that predate the miss log
+  still show as one undated miss). The page itself got shorter: one header card with the single next action, compact lesson
+  rows that open on demand, and folded sections (the old screen was 2,360 px tall at 390 px wide, the new one is 990).
+  135 engine checks.
 - [x] **IT Playground v1 (the sandbox, ROADMAP §17).** A new area outside any cert at `#/playground`
   (`#/playground/<subnet|ipconfig|vlan|firewall>`), entered from a card on Home. `src/js/03b_playground_engine.js`
   holds a pure-JavaScript engine (no React, no DOM): exact 32-bit subnet maths, VLSM allocation, a host/gateway/
@@ -1779,6 +1790,18 @@ trading away for shinier but shallower ones.
   re-places on scroll, resize and size change, hides while its word is scrolled out of the visible band, and closes on
   Escape. `tools/check_flyout.js` (2,325 checks) runs in build.py; Playwright runs clicked every trigger on a cheat
   sheet at 390px, 320px and desktop widths with no overflow.
+- [x] **Declutter pass (October 2026): new features join a block or fold, they never add a card.** Reported: "we are
+  probably a bit too cluttered". Measured at 390px wide before and after: Home 2,315 to 1,521 px, the weak-subjects page
+  2,360 to 990, Profile 1,792 to 1,307; Practice now shows the first question (and its answers) on one screen. What
+  changed: a shared `Disclosure` (00b_console_ui.jsx: a mono label, a one-line summary, folds its body away); Home's review
+  card and its separate Weak subjects card became one `HomeReviewHub`; the study path's mode and order switches sit behind
+  one "Options" line; "Your certs" and "Browse all tracks" are one block; Question of the Day and Vocab of the Day share one
+  folded Daily card with two tabs; Playground, Glossary and About became a three-up row; "continue where you left off" is a
+  slim row; the review-reminder dropdown moved to Data & Progress, whose export and import cards are now one "Back up &
+  restore" card; Practice's tool picker is one line and the quiz options and "New quiz" share one row; the Path's review
+  buttons are compact chips and locked units drop their summary line; Profile's stat tiles sit three to a row, the activity
+  map is folded and the empty "Earned certifications" card is gone. Rule for later work: put a new control in an existing
+  block, behind a `Disclosure`, or in Data & Progress.
 - [x] **IT Playground v2 (shared core, six more tools, IPv6, lesson links).** The Playground now has ten tools and
   75 guided scenarios (IP lab 12, VLAN 8, firewall 8, DHCP 8, DNS 8, STP 7, VPN 8, Azure NSG 8, certificates 8; the
   subnet calculator has no scenarios). Shared building blocks live in `src/js/04g_playground_core.jsx`
@@ -1790,9 +1813,32 @@ trading away for shinier but shallower ones.
   (compression/expansion, address types, EUI-64, /64 subnetting; BigInt), **port security** in the VLAN lab, and
   two more VLAN, firewall and IP scenarios. New tools live in four new files each (`03c_pg_<k>.js` engine,
   `04l_pg_<k>.jsx` screens, `data/playground_<k>.py` data, `tools/checks/<k>.js` checks) and are auto-discovered, so
-  adding one touches no shared file; `tools/check_playground.js` now runs about 1,835 checks. Open items: ACL-on-an-
-  interface scenarios, a routing table / longest-prefix-match lab beyond the IP lab, DHCP snooping, "quiz me on this
-  setup", and optional daily-goal credit.
+  adding one touches no shared file; `tools/check_playground.js` now runs about 1,835 checks. Open items (a routing table /
+  longest-prefix-match lab beyond the IP lab); ACL-on-an-interface, "quiz me on this setup" and the optional
+  daily-goal credit are built (see the entries below).
+- [x] **Playground: ACL lab (October 2026).** An eleventh tool (`acl`; four new files, no shared edits): `03c_pg_acl.js`
+  traces a test packet through routing (connected, longest prefix, default route), the inbound ACL, the outbound ACL, then the
+  reply as a separate packet, and returns the first thing that breaks. Modelled: standard and extended ACLs, wildcard masks
+  (and a warning when a subnet mask is typed instead), `host` and `any`, sequence numbers, the invisible `deny ip any any`,
+  `established`, ICMP echo and echo-reply, `ip access-group in|out`, and outbound ACLs skipping router-made packets. Left out
+  and said so in the tool's note: IPv6, object groups, time-based, reflexive and CBAC, logging, NAT, fragments, host
+  firewalls. Eight scenarios (`acl-not-applied`, `acl-wrong-direction`, `acl-missing-permit`, `acl-wrong-interface`,
+  `acl-order`, `acl-wildcard`, `acl-standard-placement`, `acl-stateless-return`), a sandbox, four lesson links (CCNA
+  `acls-layer2-wireless-security`, CISSP `network-transport-edge-operations`) and 324 checks. Unverified facts the author
+  flagged: an empty ACL permits everything on IOS (modelled that way), the accepted port names (`www`, `telnet`, `ftp`,
+  `ftp-data`, `smtp`, `domain`, `pop3`), and editing numbered ACLs by sequence number. Quiz me on this setup works here too
+  (will it work, and which entry decides it).
+- [x] **Playground: "Quiz me on this setup" and optional daily-goal credit (October 2026).** `src/js/03c_pg_quizme.js`
+  (pure) builds a five-question round from the topology on screen: for the ACL lab will-it-work and which-entry-decides-it; for the IP lab will-this-ping, network address,
+  broadcast address, usable hosts and first host; for the VLAN lab will-this-ping, why it fails (the first problem the trace
+  reports), which VLAN a port is in and whether a trunk carries a VLAN; for the firewall will-this-connection-work and which
+  rule decides it. Every answer comes from the same engine calls the labs use (`pgPing`, `pgVlanPing`, `pgFwTest`,
+  `pgSubnetInfo`), so a question cannot disagree with the lab; `tools/checks/quizme.js` (about 1,900 checks) builds rounds
+  for every scenario and sandbox, checks each question is well-formed and spot-checks answers against the engine. The card
+  (`PgQuizMe` in `04g_playground_core.jsx`) is folded under each sandbox and appears under a scenario once it is solved, and
+  resets whenever the setup changes. `stats.playgroundGoal` (default false; Data & Progress > Habits & sounds) makes a
+  first-time scenario solve add 3 and each right quiz answer add 1 to the daily goal, through a `cert-study-pg-credit`
+  window event; it never touches mastery, results or readiness.
 - [x] **ISC2 tracks verified against the official exam outlines (October 2026).** Once isc2.org and its
   document host were reachable, the six outlines were downloaded and every numbered objective and
   sub-bullet audited against each track: CC (outline effective Sept 1, 2026; +130 cards, +146 questions,
@@ -1832,10 +1878,14 @@ trading away for shinier but shallower ones.
   knowledge (Azure Bastion and JIT licensing, Windows Event Forwarding, Defender for Storage caps) and the
   workers did not re-review every new item, so about 40 to 50 percent of new multiple-choice questions still
   have the correct option as the longest.
-- [ ] **Open ideas.** Sounds for the verbal quiz and the case-study end screen;
-  lesson diagrams (OSI, subnetting, STP, OSPF, RMF) and cross-cert bridges for the new tracks, a Security+ track to sit beside CC and SSCP; sharing a scenario or term list between devices without a full export; a
-  step bank that also learns from your own earlier scenarios; the real module
-  build, the new tracks and the screenshot gaps listed above.
+- [ ] **Open ideas.** Lesson diagrams (OSI, subnetting, STP, OSPF, RMF) and cross-cert bridges for the new tracks, a
+  Security+ track to sit beside CC and SSCP; the real module build, the new tracks and the screenshot gaps listed above.
+  *Done (October 2026):* opt-in sounds for the Verbal Quiz (a start and an end cue) and the case-study end screen, under the
+  existing celebration-sound switch (`playCueSound`, `useCelebrateWhen`); a **share code** for your own terms, acronyms and
+  step-ordering scenarios (Glossary > Mine > Share between devices: a `CSH1.` text code, validated and de-duplicated on
+  import, nothing uploaded; `src/js/03f_share_bank.js`); and a **step bank that learns**: your own steps first (marked
+  "yours"), plus "what usually comes next" suggestions drawn from your earlier scenarios and the built-in ones.
+  `tools/check_share.js` has 27 checks.
 
 - [x] **Tough terms flashcard deck.** Each `srs` entry now also stores the
   raw 1-5 rating it was last given (`last`). A card is "tough" when that
@@ -2124,8 +2174,9 @@ site-to-site VPN, Azure NSG and certificate scenarios each have their own tool. 
 `#/playground[/<tool>[/<scenario>]]` (no bottom-bar tab: it stays off the tab bar so the six existing tabs keep their
 room). The engines are pure JavaScript, scenarios are data (`data/playground*.py`) and are replayed through the
 engines by `build.py` (when node is available). Lessons link in with "Try it" buttons; labs have predict-first,
-saved setups and a progress card. Still open: ACL-on-an-interface and DHCP-snooping scenarios, a "quiz me on this
-setup" link back into study, optional daily-goal credit. The checklist below is kept as the original design.
+saved setups and a progress card. Since then: "quiz me on this setup" and the optional daily-goal credit are built (see
+the Done list); ACL-on-an-interface and DHCP-snooping scenarios are noted there too. The checklist below is kept as the
+original design.
 
 - [x] **Scope the first version (1 to 4 built, 5 mostly built).** Candidate tools, roughly in build order
   (cheap and self-contained first):
@@ -2191,10 +2242,10 @@ setup" link back into study, optional daily-goal credit. The checklist below is 
   mismatch). Unit tests for the maths (subnetting, VLSM, wildcard, IPv6
   compression) and for first-match firewall and VLAN delivery; Playwright
   tests for the tap flows.
-- [ ] **Possible links back into study (milestones done, the rest open).** "Quiz me on this setup" turning the
-  current playground state into one or two generated questions; optional daily-goal credit like the optional
-  sections, off by default. (Playground milestones for completing guided scenarios exist, separate from cert
-  achievements.)
+- [x] **Links back into study.** "Quiz me on this setup" turns the network on screen into a five-question round (IP,
+  VLAN and firewall labs; `src/js/03c_pg_quizme.js`), and Data & Progress has an optional daily-goal credit, off by
+  default (+3 for a scenario solved for the first time, +1 per right answer; never mastery). (Playground milestones for
+  completing guided scenarios exist, separate from cert achievements.)
 - [ ] **Open questions to settle before building.** Whether the playground
   has its own bottom-bar tab (and what gives way), how far the VLAN and
   firewall tools should go before they become a full network simulator (and

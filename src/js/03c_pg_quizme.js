@@ -6,7 +6,7 @@
 // disagree with what the lab would show.
 //
 // A question is { id, kind, prompt, options: [text], correct: index, explain }.
-// kind 'ipconfig' | 'vlan' | 'firewall'. `opts` = { count (default 5), seed, causes } where `causes`
+// kind 'ipconfig' | 'vlan' | 'firewall' | 'acl'. `opts` = { count (default 5), seed, causes } where `causes`
 // is the lab's own diagnosis-code -> plain-language-cause map (PG_IP_CAUSES and friends).
 
 const PG_QUIZ_COUNT = 5;
@@ -206,6 +206,68 @@ function pgQuizBuildFw(topo, rnd, count) {
   return out;
 }
 
+/* ---- ACL lab ---- */
+
+const PG_QUIZ_ACL_OPTIONS = [
+  'Yes, it works in both directions',
+  'No: an ACL drops the request',
+  'No: the request passes but an ACL drops the reply',
+  'No: routing, not an ACL, stops it',
+];
+
+function pgQuizAclChoice(verdict, code) {
+  if (verdict === 'success') return 0;
+  if (code === 'reply-blocked') return 2;
+  if (['explicit-deny', 'implicit-deny', 'shadowed-permit', 'standard-acl-broad'].indexOf(code) >= 0) return 1;
+  return 3;
+}
+
+function pgQuizAclConnections(topo) {
+  const hosts = topo.hosts || [];
+  const out = [];
+  pgQuizPairs(hosts, hosts).forEach(([a, b]) => {
+    [['icmp', null], ['tcp', 80], ['tcp', 443], ['tcp', 22], ['udp', 53]].forEach(([proto, port]) => out.push({ from: a.id, to: b.id, proto, port, src: a, dst: b }));
+  });
+  return out;
+}
+
+function pgQuizBuildAcl(topo, rnd, count) {
+  const out = [];
+  const word = (c) => (c.proto === 'icmp' ? 'a ping' : `${c.proto.toUpperCase()} ${c.port}`);
+  const conns = pgQuizShuffle(pgQuizAclConnections(topo), rnd);
+  const tested = conns.map((c) => ({ c, r: pgAclTest(topo, { from: c.from, to: c.to, proto: c.proto, port: c.port }) })).filter((x) => !(x.r.diagnosis && (x.r.diagnosis.code === 'bad-config' || x.r.diagnosis.code === 'bad-pair' || x.r.diagnosis.code === 'bad-port')));
+  tested.slice(0, 2).forEach(({ c, r }) => {
+    out.push({
+      id: `acl-conn-${c.from}-${c.to}-${c.proto}-${c.port}`, kind: 'acl',
+      prompt: `Will ${word(c)} from ${c.src.name} to ${c.dst.name} work, with its reply?`,
+      options: PG_QUIZ_ACL_OPTIONS.slice(), correct: pgQuizAclChoice(r.verdict, r.diagnosis && r.diagnosis.code),
+      explain: `${r.summary}${r.diagnosis ? ` ${r.diagnosis.text}` : ''}`,
+    });
+  });
+  // Which entry of the first ACL the request meets decides it?
+  tested.slice(2).forEach(({ c, r }) => {
+    if (out.length >= count) return;
+    const hit = r.consulted.find((x) => x.leg === 'request' && x.acl && x.action !== 'skipped' && !x.empty);
+    if (!hit) return;
+    const found = pgAclIfaceById(topo, hit.iface);
+    const acl = found && pgAclFind(found.router, hit.acl);
+    if (!acl) return;
+    const entry = hit.entryId ? acl.entries.find((e) => e.id === hit.entryId) : null;
+    if (!entry && !hit.implicit) return;
+    const seqs = pgAclSorted(acl).map((e) => `Entry ${e.seq}`);
+    const noneText = 'None: the invisible deny at the end drops it';
+    const right = entry ? `Entry ${entry.seq}` : noneText;
+    const ch = pgQuizChoices(right, seqs.concat([noneText]), rnd);
+    out.push({
+      id: `acl-entry-${c.from}-${c.to}-${c.proto}-${c.port}`, kind: 'acl',
+      prompt: `${word(c)[0].toUpperCase()}${word(c).slice(1)} from ${c.src.name} to ${c.dst.name} reaches ${found.router.name} ${found.iface.name}, where ACL ${hit.acl} is applied ${hit.dir === 'in' ? 'inbound' : 'outbound'}. Which entry decides it?`,
+      options: ch.options, correct: ch.correct,
+      explain: entry ? `Entries are read lowest number first and the first match decides. Entry ${entry.seq} matches, so it ${hit.action === 'permit' ? 'permits' : 'denies'} the packet.` : 'No entry matches, so the invisible deny ip any any at the end of every ACL drops the packet.',
+    });
+  });
+  return out;
+}
+
 /* ---- entry point ---- */
 
 // A round of up to `count` questions about this topology (fewer when the network is too small).
@@ -215,6 +277,7 @@ function pgQuizBuild(kind, topo, opts) {
   const rnd = pgQuizRng(o.seed === undefined ? 1 : o.seed);
   const list = kind === 'vlan' ? pgQuizBuildVlan(topo, rnd, count, o.causes)
     : kind === 'firewall' ? pgQuizBuildFw(topo, rnd, count)
-      : pgQuizBuildIp(topo, rnd, count);
+      : kind === 'acl' ? pgQuizBuildAcl(topo, rnd, count)
+        : pgQuizBuildIp(topo, rnd, count);
   return pgQuizShuffle(list, rnd).slice(0, count);
 }
