@@ -125,7 +125,7 @@ function RouteStep({ id, title, detail, kind, done, isNext, optional, locked, st
 // multi-select choice not yet submitted), correct, wrong or missed (a correct option the
 // learner left out); the answered states also swap the letter for a mark (✓ or ✕) so
 // the result never depends on colour alone.
-function QuizOption({ index, text, state = 'idle', disabled, onClick }) {
+function QuizOption({ index, text, state = 'idle', disabled, onClick, tag }) {
   const hue = state === 'correct' ? COLOR.success : state === 'wrong' ? COLOR.red : state === 'picked' ? COLOR.primary : state === 'missed' ? COLOR.success : null;
   const filled = state === 'correct' || state === 'wrong';
   return (
@@ -154,6 +154,7 @@ function QuizOption({ index, text, state = 'idle', disabled, onClick }) {
       </span>
       <span style={{ flex: 1, minWidth: 0, overflowWrap: 'anywhere' }}>{text}</span>
       {state === 'missed' && <span className="mono" style={{ fontSize: '10px', color: COLOR.success, textTransform: 'uppercase', flexShrink: 0 }}>missed</span>}
+      {tag && <span className="mono" style={{ fontSize: '10px', color: hue || COLOR.muted, textTransform: 'uppercase', flexShrink: 0, paddingTop: '4px' }}>{tag}</span>}
     </button>
   );
 }

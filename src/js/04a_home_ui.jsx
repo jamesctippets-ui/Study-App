@@ -75,6 +75,24 @@ function AchievementsPanel({ achievements, streak, onClose }) {
   );
 }
 
+// Flashcards: which side shows first. Lives in Data & Progress because it is a per-device preference.
+function CardDirectionSetting() {
+  const { direction, setDirection } = React.useContext(CardPrefsContext);
+  return (
+    <div style={{ marginTop: '14px', padding: '14px', borderRadius: 'var(--r-card)', background: COLOR.surface, border: `1px solid ${COLOR.border}` }}>
+      <div style={{ fontSize: '13.5px', fontWeight: 600, marginBottom: '4px' }}>Flashcards</div>
+      <div style={{ fontSize: '11.5px', color: COLOR.muted, lineHeight: 1.4, marginBottom: '10px' }}>
+        Which side comes first. Seeing the definition and recalling the term is the harder, stronger way to learn it. Saved on this device only.
+      </div>
+      <SegmentedControl
+        options={[{ key: 'definition', label: 'Definition first' }, { key: 'term', label: 'Term first' }]}
+        value={direction}
+        onChange={setDirection}
+      />
+    </div>
+  );
+}
+
 function DataPanel({
   trackLabel, onExport, onImportFile, importMessage, onReset, onClose,
   speechSupported, ttsVoices, ttsRate, ttsVoiceURI, onSetTtsRate, onSetTtsVoiceURI, onTestVoice, isTestSpeaking,
@@ -132,6 +150,8 @@ function DataPanel({
             Preview: Azure role-based access control (RBAC) assigns permissions at a scope.
           </div>
         </div>
+
+        <CardDirectionSetting />
 
         <div style={{ marginTop: '14px', padding: '14px', borderRadius: 'var(--r-card)', background: COLOR.surface, border: `1px solid ${COLOR.border}` }}>
           <div style={{ fontSize: '13.5px', fontWeight: 600, marginBottom: '4px' }}>Path &amp; sounds</div>
@@ -223,7 +243,7 @@ function DataPanel({
           <div style={{ fontSize: '11.5px', color: COLOR.muted, marginBottom: '10px', lineHeight: 1.4 }}>
             Download every track's quiz/exam history, flashcard mastery, streak, and achievements as a JSON file — a backup, or a way to move progress to a new device.
           </div>
-          <button className="btn-3d"
+          <button
             onClick={onExport}
             style={{ width: '100%', padding: '10px', borderRadius: 'var(--r-ctl)', background: COLOR.primary, color: COLOR.onAccent, fontSize: '13px', fontWeight: 600 }}
           >
@@ -514,6 +534,9 @@ function DailyQuestionCard({ q, trackLabel, stored, onAnswer }) {
 // counts toward the daily goal ring (it's real study time), just not
 // toward mastery/SRS scheduling the way an actual rating would.
 function DailyVocabCard({ card, trackLabel, revealed, onReveal, pool }) {
+  const { direction } = React.useContext(CardPrefsContext);
+  const defFirst = direction !== 'term';
+  const prompt = useMemo(() => flashcardPrompt(card), [card]);
   return (
     <div className="mb-4">
       <div
@@ -527,10 +550,22 @@ function DailyVocabCard({ card, trackLabel, revealed, onReveal, pool }) {
         <div style={{ fontSize: '10.5px', color: COLOR.teal, textTransform: 'uppercase' }}>
           Vocab of the day · {trackLabel}
         </div>
-        <div className="itil-display" style={{ fontSize: '17px', fontWeight: 600, marginTop: '4px' }}>{card.front}</div>
-        {revealed
-          ? <div style={{ fontSize: '14px', lineHeight: 1.55, color: COLOR.muted, marginTop: '8px' }}><GlossText text={card.back} pool={pool} max={2} blockId="dv" /></div>
-          : <div style={{ fontSize: '12.5px', color: COLOR.muted, marginTop: '2px' }}>Tap to reveal the definition</div>}
+        {defFirst ? (
+          <div>
+            {revealed && <div className="itil-display" style={{ fontSize: '17px', fontWeight: 600, marginTop: '4px', overflowWrap: 'anywhere' }}>{card.front}</div>}
+            <div style={{ fontSize: '14px', lineHeight: 1.55, color: revealed ? COLOR.muted : COLOR.text, marginTop: revealed ? '6px' : '6px', overflowWrap: 'anywhere' }}>
+              {revealed ? <GlossText text={card.back} pool={pool} max={2} blockId="dv" /> : prompt.text}
+            </div>
+            {!revealed && <div style={{ fontSize: '12.5px', color: COLOR.muted, marginTop: '6px' }}>What is the term? Tap to reveal it.</div>}
+          </div>
+        ) : (
+          <div>
+            <div className="itil-display" style={{ fontSize: '17px', fontWeight: 600, marginTop: '4px' }}>{card.front}</div>
+            {revealed
+              ? <div style={{ fontSize: '14px', lineHeight: 1.55, color: COLOR.muted, marginTop: '8px' }}><GlossText text={card.back} pool={pool} max={2} blockId="dv" /></div>
+              : <div style={{ fontSize: '12.5px', color: COLOR.muted, marginTop: '2px' }}>Tap to reveal the definition</div>}
+          </div>
+        )}
         {revealed && <div style={{ fontSize: '11.5px', color: COLOR.muted, marginTop: '8px' }}>New term tomorrow.</div>}
       </div>
     </div>

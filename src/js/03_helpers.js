@@ -1673,3 +1673,41 @@ function categoryMasteryTrend(history, trackKey, categoryKey) {
   return { delta, days };
 }
 
+
+/* ---------------- definition-first flashcards ---------------- */
+
+// A card's term without its bracketed acronym: "Role-based access control (RBAC)" -> "Role-based access control".
+function flashcardCore(front) {
+  return String(front || '').replace(/\s*\([^)]*\)/g, '').replace(/\s+/g, ' ').trim();
+}
+
+// What the learner sees first when a card shows the definition and asks for the term. The term
+// (and its bracketed acronym) is blanked out wherever the definition spells it, otherwise the
+// answer would be sitting in the question. `masked` says whether anything was blanked, `speech`
+// is the same text read aloud ("blank" instead of underscores) and `hint` is what the Hint button
+// reveals: how many words the term has and its first letter.
+function flashcardPrompt(card) {
+  const core = flashcardCore(card.front);
+  const acronyms = [];
+  // Only bracketed ACRONYMS are blanked (one token with two or more capitals, such as RBAC or RU/s); a bracket
+  // that lists examples, like "(Audit, Deny, Modify)", is left readable.
+  String(card.front || '').replace(/\(([^)]+)\)/g, (m, inner) => { inner.split(/[;,]/).forEach((a) => { const t = a.trim(); if (/^[A-Za-z0-9/&+.\-]{2,}$/.test(t) && (t.match(/[A-Z]/g) || []).length >= 2) acronyms.push(t); }); return m; });
+  const esc = (t) => t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const names = [];
+  if (core.length >= 3) names.push({ text: core, flags: 'gi' });
+  acronyms.forEach((a) => names.push({ text: a, flags: 'g' }));
+  names.sort((a, b) => b.text.length - a.text.length);
+  let text = String(card.back || '');
+  let masked = false;
+  names.forEach((n) => {
+    const re = new RegExp(`(^|[^A-Za-z0-9])${esc(n.text)}(?:s|es)?(?![A-Za-z0-9])`, n.flags);
+    text = text.replace(re, (m, lead) => { masked = true; return `${lead}_____`; });
+  });
+  const words = core ? core.split(' ').length : 1;
+  const initial = core ? core.charAt(0).toUpperCase() : '';
+  return {
+    text, masked,
+    speech: text.replace(/_{3,}/g, 'blank'),
+    hint: { words, initial, text: `${words} word${words === 1 ? '' : 's'}, starts with "${initial}"` },
+  };
+}

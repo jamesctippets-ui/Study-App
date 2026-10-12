@@ -217,8 +217,8 @@ function WeakSubjectsView({ track, trackKey, results, seenLog, srs, missLog, sav
             );
           })}
           {nextStep ? (
-            <button className="btn-3d" onClick={() => startStep(nextStep.unit, nextStep.step)}
-              style={{ width: '100%', padding: '12px', borderRadius: 'var(--r-card)', background: COLOR.primary, color: COLOR.onAccent, fontSize: '14px', fontWeight: 800, marginTop: '4px' }}>
+            <button onClick={() => startStep(nextStep.unit, nextStep.step)}
+              style={{ width: '100%', padding: '12px', borderRadius: 'var(--r-ctl)', border: 'none', background: COLOR.primary, color: COLOR.onAccent, fontSize: '14px', fontWeight: 800, marginTop: '4px' }}>
               {hasProgress ? 'Continue' : 'Start'}: {nextStep.step.label}
             </button>
           ) : (
@@ -250,7 +250,7 @@ function WeakSubjectsView({ track, trackKey, results, seenLog, srs, missLog, sav
           <ol style={{ margin: '0 0 12px', paddingLeft: '20px', listStyle: 'decimal', fontSize: '13px', lineHeight: 1.6 }}>
             {plan.map((r) => <li key={r.unit.id}><strong>{r.unit.title}</strong> <WeakTierChip tier={r.tier} /></li>)}
           </ol>
-          <button className="btn-3d" onClick={build} style={{ width: '100%', padding: '12px', borderRadius: 'var(--r-card)', background: COLOR.primary, color: COLOR.onAccent, fontSize: '14px', fontWeight: 800 }}>
+          <button onClick={build} style={{ width: '100%', padding: '12px', borderRadius: 'var(--r-ctl)', border: 'none', background: COLOR.primary, color: COLOR.onAccent, fontSize: '14px', fontWeight: 800 }}>
             Build my weak-subjects path ({plan.length} lesson{plan.length === 1 ? '' : 's'})
           </button>
         </div>

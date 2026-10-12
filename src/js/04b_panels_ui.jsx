@@ -71,7 +71,7 @@ function MyTermsEditor({ customTerms, onSave, onDelete }) {
       </label>
       {error && <div role="alert" style={{ fontSize: '12px', color: COLOR.red, marginBottom: '8px', lineHeight: 1.4 }}>{error}</div>}
       <div className="flex gap-2" style={{ marginBottom: '14px' }}>
-        <button onClick={submit} className="btn-3d flex-1" style={{ padding: '10px', borderRadius: 'var(--r-card)', background: COLOR.primary, color: COLOR.onAccent, fontSize: '13px', fontWeight: 800 }}>
+        <button onClick={submit} className="btn-3d flex-1" style={{ padding: '10px', borderRadius: 'var(--r-ctl)', border: 'none', background: COLOR.primary, color: COLOR.onAccent, fontSize: '13px', fontWeight: 800 }}>
           {editingId ? 'Save changes' : kind === 'acronym' ? 'Add acronym' : 'Add term'}
         </button>
         {editingId && (

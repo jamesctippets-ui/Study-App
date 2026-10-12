@@ -55,7 +55,7 @@ function ExamIntro({ track, config, readiness, onStart, onStartFinal }) {
           </div>
         </div>
       )}
-      <button className="btn-3d"
+      <button
         onClick={onStart}
         style={{ width: '100%', padding: '13px', borderRadius: 'var(--r-card)', background: COLOR.gold, color: COLOR.onAccent, fontSize: '14px', fontWeight: 700 }}
       >
@@ -235,16 +235,16 @@ function ExamResults({ result, config, track, categories, onRestart, onWeakSpots
         </div>
       )}
       {missed.length > 0 && onWeakSpots && (
-        <button className="btn-3d"
+        <button
           onClick={onWeakSpots}
           style={{ width: '100%', marginTop: '16px', padding: '12px', borderRadius: 'var(--r-card)', background: COLOR.red, color: COLOR.onAccent, fontSize: '14px', fontWeight: 700 }}
         >
           Study my weak spots from this exam ›
         </button>
       )}
-      <button className="btn-3d"
+      <button
         onClick={onRestart}
-        style={{ width: '100%', marginTop: '16px', padding: '12px', borderRadius: 'var(--r-card)', background: COLOR.primary, color: COLOR.onAccent, fontSize: '14px', fontWeight: 600 }}
+        style={{ width: '100%', marginTop: '16px', padding: '12px', borderRadius: 'var(--r-ctl)', border: 'none', background: COLOR.primary, color: COLOR.onAccent, fontSize: '14px', fontWeight: 600 }}
       >
         {isFinal ? 'Back to exam options' : 'Take another exam'}
       </button>

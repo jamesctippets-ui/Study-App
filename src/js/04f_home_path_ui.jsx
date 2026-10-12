@@ -82,7 +82,7 @@ function PathDeepStep({ cards, questions, categories, flashcardsData, api, onRet
           <button
             onClick={() => (last ? setPhase('quiz') : setPage((n) => n + 1))}
             className="flex-1"
-            style={{ padding: '12px', borderRadius: 'var(--r-card)', background: COLOR.primary, color: COLOR.onAccent, fontSize: '14px', fontWeight: 600 }}
+            style={{ padding: '12px', borderRadius: 'var(--r-ctl)', border: 'none', background: COLOR.primary, color: COLOR.onAccent, fontSize: '14px', fontWeight: 600 }}
           >
             {last ? (questions.length ? 'Test it ›' : 'Done') : 'Next ›'}
           </button>
@@ -169,7 +169,7 @@ function PathBridgeStep({ bridge, questions, planKeys, api, onRetry, onDone, onO
       </div>
       <button
         onClick={() => (questions.length ? setPhase('quiz') : onDone(null))}
-        style={{ width: '100%', marginTop: '14px', padding: '12px', borderRadius: 'var(--r-card)', background: COLOR.primary, color: COLOR.onAccent, fontSize: '14px', fontWeight: 600 }}
+        style={{ width: '100%', marginTop: '14px', padding: '12px', borderRadius: 'var(--r-ctl)', border: 'none', background: COLOR.primary, color: COLOR.onAccent, fontSize: '14px', fontWeight: 600 }}
       >
         {questions.length ? 'Check your understanding ›' : 'Done'}
       </button>
@@ -310,19 +310,30 @@ function HomeStudyPath({ tracks, remaining, progress, optionalProgress, mode, on
               return (
                 <div key={e.doneKey + e.step.id} style={{ position: 'relative' }}>
                   <RouteStep
-                    id={`${t ? t.label : ''} · U${e.unit.index + 1}`}
+                    id={`Unit ${e.unit.index + 1}`}
                     title={e.step.label}
                     detail={e.step.kind === 'bridge' ? e.step.meta : e.unit.title}
                     kind={e.step.kind}
                     optional={!!e.step.optional}
                     hue={t ? trackAccent(t.key) : undefined}
-                    rightPad={e.step.optional ? 92 : 8}
-                    right={e.step.optional ? <span /> : undefined}
+                    rightPad={e.step.optional ? 150 : 84}
+                    right={<span />}
                     onOpen={() => onStart(e)}
                   />
-                  {e.step.optional && (
-                    <span style={{ position: 'absolute', right: '8px', top: '10px', display: 'flex', alignItems: 'center', gap: '6px' }}><OptionalTag /></span>
-                  )}
+                  <span style={{ position: 'absolute', right: '6px', top: '9px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    {e.step.optional && <OptionalTag />}
+                    {t && (
+                      <button
+                        onClick={() => onOpenCert(e.trackKey)}
+                        className="btn-flat"
+                        title={`Go deeper in ${t.label}`}
+                        aria-label={`Open ${t.label}`}
+                        style={{ background: 'transparent', padding: 0 }}
+                      >
+                        <HomePathCertChip track={t} />
+                      </button>
+                    )}
+                  </span>
                 </div>
               );
             })}
@@ -467,7 +478,7 @@ function HomeReviewCard({ weakTotal, toughTotal, gamesTotal, casesTotal, reminde
       {available > 1 && (
         <button
           onClick={() => onStartReview('mixed')}
-          style={{ width: '100%', marginTop: '10px', padding: '12px', borderRadius: 'var(--r-card)', background: COLOR.primary, color: COLOR.onAccent, fontSize: '14px', fontWeight: 700, textAlign: 'left', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
+          style={{ width: '100%', marginTop: '10px', padding: '12px', borderRadius: 'var(--r-ctl)', border: 'none', background: COLOR.primary, color: COLOR.onAccent, fontSize: '14px', fontWeight: 700, textAlign: 'left', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
         >
           <span>
             Review everything due
@@ -575,7 +586,7 @@ function HomeReviewRun({ kind, trackKeys, results, seenLog, srs, speech, makeApi
         <div style={{ fontSize: '12.5px', color: COLOR.muted, marginTop: '6px', lineHeight: 1.5 }}>
           Anything you got right is recorded to its own cert, and flashcards rated Good or Easy have left the Tough terms deck. What's still weak stays for next time.
         </div>
-        <button className="btn-3d" onClick={retry} style={{ width: '100%', marginTop: '16px', padding: '12px', borderRadius: 'var(--r-card)', background: COLOR.primary, color: COLOR.onAccent, fontSize: '14px', fontWeight: 700 }}>Another round</button>
+        <button onClick={retry} style={{ width: '100%', marginTop: '16px', padding: '12px', borderRadius: 'var(--r-ctl)', border: 'none', background: COLOR.primary, color: COLOR.onAccent, fontSize: '14px', fontWeight: 700 }}>Another round</button>
         <button onClick={onExit} style={{ width: '100%', marginTop: '8px', padding: '11px', borderRadius: 'var(--r-card)', border: `1px solid ${COLOR.border}`, background: 'transparent', color: COLOR.text, fontSize: '13px', fontWeight: 600 }}>Back to Home</button>
       </div>
     );

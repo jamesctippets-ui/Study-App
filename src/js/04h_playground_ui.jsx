@@ -330,10 +330,10 @@ function SubnetDrill() {
       />
       <div style={{ display: 'flex', gap: '8px', marginTop: '10px' }}>
         {!checked ? (
-          <button className="btn-3d" disabled={!answer.trim()} onClick={check}
+          <button disabled={!answer.trim()} onClick={check}
             style={{ flex: 1, padding: '10px', borderRadius: 'var(--r-ctl)', background: COLOR.primary, color: COLOR.onAccent, fontSize: '13px', fontWeight: 700, opacity: answer.trim() ? 1 : 0.5 }}>Check</button>
         ) : (
-          <button className="btn-3d" onClick={() => next()}
+          <button onClick={() => next()}
             style={{ flex: 1, padding: '10px', borderRadius: 'var(--r-ctl)', background: COLOR.primary, color: COLOR.onAccent, fontSize: '13px', fontWeight: 700 }}>Next question</button>
         )}
         {!checked && <button className="btn-flat" onClick={() => setChecked({ right: false, gaveUp: true })} style={{ fontSize: '12.5px', color: COLOR.muted, padding: '0 8px' }}>Show answer</button>}

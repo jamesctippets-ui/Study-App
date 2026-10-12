@@ -55,6 +55,7 @@ function CertStudyApp() {
   const { ttsRate, ttsVoiceURI, setTtsRate, setTtsVoiceURI } = useTtsPrefs();
   const { soundOn, setSoundOn, answerSoundOn, setAnswerSoundOn } = useSoundPrefs();
   const [dyslexicFont, setDyslexicFont] = useFontPrefs();
+  const cardPrefs = useCardPrefs();
   // Fold the learner's own terms/acronyms into the flyout engine before any
   // child renders (stats.customTerms changes only when they add, edit or delete).
   useMemo(() => syncCustomTerms(stats.customTerms), [stats.customTerms]);
@@ -1661,6 +1662,7 @@ function CertStudyApp() {
 
   return (
     <ProgressSummaryContext.Provider value={progressSummary}>
+    <CardPrefsContext.Provider value={cardPrefs}>
     <CustomTermsContext.Provider value={{ terms: stats.customTerms || [], save: saveCustomTerm }}>
     <div
       style={{
@@ -2322,6 +2324,7 @@ function CertStudyApp() {
       <BottomTabBar mode={mode} onChange={openTab} />
     </div>
     </CustomTermsContext.Provider>
+    </CardPrefsContext.Provider>
     </ProgressSummaryContext.Provider>
   );
 }

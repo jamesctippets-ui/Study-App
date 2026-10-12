@@ -157,7 +157,7 @@ function VerbalQuizPanel({
           Read through {session.length} question{session.length === 1 ? '' : 's'}. Nothing was scored —
           start another round whenever you're ready.
         </div>
-        <button className="btn-3d" onClick={onRestart} style={{ padding: '10px 20px', borderRadius: 'var(--r-card)', background: COLOR.primary, color: COLOR.onAccent, fontSize: '13px', fontWeight: 600 }}>
+        <button onClick={onRestart} style={{ padding: '10px 20px', borderRadius: 'var(--r-ctl)', border: 'none', background: COLOR.primary, color: COLOR.onAccent, fontSize: '13px', fontWeight: 600 }}>
           Back to setup
         </button>
       </div>
@@ -196,7 +196,7 @@ function VerbalQuizPanel({
         <button
           onClick={onTogglePause}
           className="flex-1 btn-3d"
-          style={{ padding: '16px', borderRadius: 'var(--r-card)', background: COLOR.primary, color: COLOR.onAccent, fontSize: '15px', fontWeight: 600 }}
+          style={{ padding: '16px', borderRadius: 'var(--r-ctl)', border: 'none', background: COLOR.primary, color: COLOR.onAccent, fontSize: '15px', fontWeight: 600 }}
         >
           {phase === 'paused' ? '▶ Play' : '⏸ Pause'}
         </button>
@@ -240,7 +240,7 @@ function CommandPracticeView({ session, index, score, categories, input, setInpu
         <div style={{ fontSize: '12.5px', color: COLOR.muted, marginBottom: '18px' }}>
           {score.correct} / {score.total} correct (exact or structurally right — see each answer's canonical form for the precise syntax).
         </div>
-        <button className="btn-3d" onClick={onRestart} style={{ padding: '10px 20px', borderRadius: 'var(--r-card)', background: COLOR.primary, color: COLOR.onAccent, fontSize: '13px', fontWeight: 600 }}>
+        <button onClick={onRestart} style={{ padding: '10px 20px', borderRadius: 'var(--r-ctl)', border: 'none', background: COLOR.primary, color: COLOR.onAccent, fontSize: '13px', fontWeight: 600 }}>
           New set
         </button>
       </div>
@@ -252,9 +252,9 @@ function CommandPracticeView({ session, index, score, categories, input, setInpu
   const submitted = result !== null;
   return (
     <div>
-      <div className="flex justify-between items-center mb-2" style={{ fontSize: '11px', color: COLOR.muted }}>
+      <div className="flex justify-between items-center mb-2" style={{ fontSize: '10.5px', textTransform: 'uppercase', color: COLOR.muted }}>
         <span>{categoryLabel}</span>
-        <span>{index + 1} / {total}</span>
+        <span style={{ color: COLOR.text }}>{String(index + 1).padStart(2, '0')} / {String(total).padStart(2, '0')}</span>
       </div>
       <div style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderRadius: 'var(--r-card)', padding: '20px' }}>
         <div style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.04em', color: COLOR.gold, marginBottom: '8px', textTransform: 'uppercase' }}>
@@ -302,9 +302,9 @@ function CommandPracticeView({ session, index, score, categories, input, setInpu
         )}
       </div>
       {submitted && (
-        <button className="btn-3d"
+        <button
           onClick={onNext}
-          style={{ width: '100%', marginTop: '14px', padding: '12px', borderRadius: 'var(--r-card)', background: COLOR.primary, color: COLOR.onAccent, fontSize: '14px', fontWeight: 600 }}
+          style={{ width: '100%', marginTop: '14px', padding: '12px', borderRadius: 'var(--r-ctl)', border: 'none', background: COLOR.primary, color: COLOR.onAccent, fontSize: '14px', fontWeight: 600 }}
         >
           {index + 1 >= total ? 'Finish' : 'Next'}
         </button>
@@ -344,7 +344,7 @@ function MadLibsView({ session, index, score, categories, answers, onSetBlank, s
         <div style={{ fontSize: '12.5px', color: COLOR.muted, marginBottom: '18px' }}>
           {score.correct} / {score.total} scenario{score.total === 1 ? '' : 's'} fully correct.
         </div>
-        <button className="btn-3d" onClick={onRestart} style={{ padding: '10px 20px', borderRadius: 'var(--r-card)', background: COLOR.primary, color: COLOR.onAccent, fontSize: '13px', fontWeight: 600 }}>
+        <button onClick={onRestart} style={{ padding: '10px 20px', borderRadius: 'var(--r-ctl)', border: 'none', background: COLOR.primary, color: COLOR.onAccent, fontSize: '13px', fontWeight: 600 }}>
           New set
         </button>
       </div>
@@ -361,9 +361,9 @@ function MadLibsView({ session, index, score, categories, answers, onSetBlank, s
 
   return (
     <div>
-      <div className="flex justify-between items-center mb-2" style={{ fontSize: '11px', color: COLOR.muted }}>
+      <div className="flex justify-between items-center mb-2" style={{ fontSize: '10.5px', textTransform: 'uppercase', color: COLOR.muted }}>
         <span>{categoryLabel}</span>
-        <span>{index + 1} / {total}</span>
+        <span style={{ color: COLOR.text }}>{String(index + 1).padStart(2, '0')} / {String(total).padStart(2, '0')}</span>
       </div>
       <div style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderRadius: 'var(--r-card)', padding: '20px' }}>
         <div style={{ fontSize: '15.5px', lineHeight: 2 }}>
@@ -420,9 +420,9 @@ function MadLibsView({ session, index, score, categories, answers, onSetBlank, s
           Check
         </button>
       ) : (
-        <button className="btn-3d"
+        <button
           onClick={onNext}
-          style={{ width: '100%', marginTop: '14px', padding: '12px', borderRadius: 'var(--r-card)', background: COLOR.primary, color: COLOR.onAccent, fontSize: '14px', fontWeight: 600 }}
+          style={{ width: '100%', marginTop: '14px', padding: '12px', borderRadius: 'var(--r-ctl)', border: 'none', background: COLOR.primary, color: COLOR.onAccent, fontSize: '14px', fontWeight: 600 }}
         >
           {index + 1 >= total ? 'Finish' : 'Next'}
         </button>
@@ -507,7 +507,7 @@ function ScenarioBuilder({ trackKey, bankSteps, scenarios, onSave, onDelete, onP
       <textarea value={note} onChange={(e) => setNote(e.target.value)} placeholder="Optional: why this order? (shown after you answer)" aria-label="Note" rows={2} maxLength={SCENARIO_NOTE_MAX} style={{ ...field, marginBottom: '8px', resize: 'vertical' }} />
       {error && <div role="alert" style={{ fontSize: '12px', color: COLOR.red, marginBottom: '8px', lineHeight: 1.4 }}>{error}</div>}
       <div className="flex gap-2" style={{ marginBottom: '18px' }}>
-        <button onClick={submit} className="btn-3d flex-1" style={{ padding: '10px', borderRadius: 'var(--r-card)', background: COLOR.primary, color: COLOR.onAccent, fontSize: '13px', fontWeight: 800 }}>{editingId ? 'Save changes' : 'Save scenario'}</button>
+        <button onClick={submit} className="btn-3d flex-1" style={{ padding: '10px', borderRadius: 'var(--r-ctl)', border: 'none', background: COLOR.primary, color: COLOR.onAccent, fontSize: '13px', fontWeight: 800 }}>{editingId ? 'Save changes' : 'Save scenario'}</button>
         {editingId && <button onClick={reset} className="btn-flat" style={{ padding: '10px 14px', borderRadius: 'var(--r-card)', border: `1px solid ${COLOR.border}`, background: 'transparent', color: COLOR.text, fontSize: '13px', fontWeight: 700 }}>Cancel</button>}
       </div>
       <div className="flex justify-between items-center" style={{ marginBottom: '8px' }}>
@@ -562,7 +562,7 @@ function SequenceView({ session, index, score, categories, workingOrder, onMove,
         <div style={{ fontSize: '12.5px', color: COLOR.muted, marginBottom: '18px' }}>
           {score.correct} / {score.total} sequence{score.total === 1 ? '' : 's'} in the exact right order.
         </div>
-        <button className="btn-3d" onClick={onRestart} style={{ padding: '10px 20px', borderRadius: 'var(--r-card)', background: COLOR.primary, color: COLOR.onAccent, fontSize: '13px', fontWeight: 600 }}>
+        <button onClick={onRestart} style={{ padding: '10px 20px', borderRadius: 'var(--r-ctl)', border: 'none', background: COLOR.primary, color: COLOR.onAccent, fontSize: '13px', fontWeight: 600 }}>
           New set
         </button>
       </div>
@@ -575,9 +575,9 @@ function SequenceView({ session, index, score, categories, workingOrder, onMove,
 
   return (
     <div>
-      <div className="flex justify-between items-center mb-2" style={{ fontSize: '11px', color: COLOR.muted }}>
+      <div className="flex justify-between items-center mb-2" style={{ fontSize: '10.5px', textTransform: 'uppercase', color: COLOR.muted }}>
         <span>{categoryLabel}</span>
-        <span>{index + 1} / {total}</span>
+        <span style={{ color: COLOR.text }}>{String(index + 1).padStart(2, '0')} / {String(total).padStart(2, '0')}</span>
       </div>
       <div style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderRadius: 'var(--r-card)', padding: '20px' }}>
         <div style={{ fontSize: '15px', lineHeight: 1.5, fontWeight: 500, marginBottom: '16px' }}>
@@ -635,16 +635,16 @@ function SequenceView({ session, index, score, categories, workingOrder, onMove,
         )}
       </div>
       {!submitted ? (
-        <button className="btn-3d"
+        <button
           onClick={onSubmit}
-          style={{ width: '100%', marginTop: '14px', padding: '12px', borderRadius: 'var(--r-card)', background: COLOR.primary, color: COLOR.onAccent, fontSize: '14px', fontWeight: 600 }}
+          style={{ width: '100%', marginTop: '14px', padding: '12px', borderRadius: 'var(--r-ctl)', border: 'none', background: COLOR.primary, color: COLOR.onAccent, fontSize: '14px', fontWeight: 600 }}
         >
           Check
         </button>
       ) : (
-        <button className="btn-3d"
+        <button
           onClick={onNext}
-          style={{ width: '100%', marginTop: '14px', padding: '12px', borderRadius: 'var(--r-card)', background: COLOR.primary, color: COLOR.onAccent, fontSize: '14px', fontWeight: 600 }}
+          style={{ width: '100%', marginTop: '14px', padding: '12px', borderRadius: 'var(--r-ctl)', border: 'none', background: COLOR.primary, color: COLOR.onAccent, fontSize: '14px', fontWeight: 600 }}
         >
           {index + 1 >= total ? 'Finish' : 'Next'}
         </button>
@@ -749,7 +749,7 @@ function CompareView({ session, index, score, categories, choice, onChoose, onNe
         <div style={{ fontSize: '12.5px', color: COLOR.muted, marginBottom: '18px' }}>
           {score.correct} / {score.total} time{score.total === 1 ? '' : 's'} you picked the better answer.
         </div>
-        <button className="btn-3d" onClick={onRestart} style={{ padding: '10px 20px', borderRadius: 'var(--r-card)', background: COLOR.primary, color: COLOR.onAccent, fontSize: '13px', fontWeight: 600 }}>
+        <button onClick={onRestart} style={{ padding: '10px 20px', borderRadius: 'var(--r-ctl)', border: 'none', background: COLOR.primary, color: COLOR.onAccent, fontSize: '13px', fontWeight: 600 }}>
           New set
         </button>
       </div>
@@ -763,61 +763,41 @@ function CompareView({ session, index, score, categories, choice, onChoose, onNe
 
   return (
     <div>
-      <div className="flex justify-between items-center mb-2" style={{ fontSize: '11px', color: COLOR.muted }}>
+      <div className="flex justify-between items-center mb-2" style={{ fontSize: '10.5px', textTransform: 'uppercase', color: COLOR.muted }}>
         <span>{categoryLabel}</span>
-        <span>{index + 1} / {total}</span>
+        <span style={{ color: COLOR.text }}>{String(index + 1).padStart(2, '0')} / {String(total).padStart(2, '0')}</span>
       </div>
-      <div style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderRadius: 'var(--r-card)', padding: '20px' }}>
-        <div style={{ fontSize: '11px', color: COLOR.gold, marginBottom: '8px', fontWeight: 600 }}>
+      <div style={{ background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderRadius: 'var(--r-card)', padding: '18px 18px 16px' }}>
+        <div style={{ fontSize: '10.5px', color: COLOR.gold, marginBottom: '8px', textTransform: 'uppercase' }}>
           Both options are plausible — which is the better answer?
         </div>
-        <div style={{ fontSize: '15px', lineHeight: 1.5, fontWeight: 500, marginBottom: '16px' }}>
+        <div style={{ fontSize: '15.5px', lineHeight: 1.55, fontWeight: 600, overflowWrap: 'anywhere' }}>
           {autoHighlightTerms(item.scenario, flashcardsData, activeTermKey, setActiveTermKey, 2, 'cmp-scn-' + item.id)}
         </div>
-        <div className="flex flex-col gap-2">
-          {item.options.map((opt, i) => {
-            const isBetter = i === item.betterIdx;
-            const isChosen = i === choice;
-            let bg = COLOR.surfaceRaised, border = COLOR.border, color = COLOR.text;
-            if (submitted) {
-              if (isBetter) { bg = 'color-mix(in srgb, var(--color-success) 15%, transparent)'; border = COLOR.success; color = COLOR.success; }
-              else if (isChosen) { bg = 'color-mix(in srgb, var(--color-red) 15%, transparent)'; border = COLOR.red; color = COLOR.red; }
-            }
-            return (
-              <button
-                key={i}
-                disabled={submitted}
-                onClick={() => onChoose(i)}
-                style={{
-                  textAlign: 'left', padding: '12px 14px', borderRadius: 'var(--r-card)',
-                  border: `1px solid ${border}`, background: bg, color, fontSize: '14px', lineHeight: 1.45,
-                  display: 'flex', alignItems: 'flex-start', gap: '10px',
-                  cursor: submitted ? 'default' : 'pointer',
-                }}
-              >
-                <span style={{ fontSize: '11px', fontWeight: 700, color: submitted ? color : COLOR.muted, minWidth: '14px', paddingTop: '2px' }}>{i === 0 ? 'A' : 'B'}</span>
-                <span style={{ flex: 1 }}>{opt}</span>
-                {submitted && isBetter && <span style={{ fontSize: '11px', fontWeight: 700, whiteSpace: 'nowrap', paddingTop: '3px' }}>BETTER</span>}
-                {submitted && isChosen && !isBetter && <span style={{ fontSize: '11px', fontWeight: 700, whiteSpace: 'nowrap', paddingTop: '3px' }}>RUNNER-UP</span>}
-              </button>
-            );
-          })}
-        </div>
-        {submitted && (
-          <div style={{ marginTop: '14px', paddingTop: '14px', borderTop: `1px solid ${COLOR.border}` }}>
-            <div style={{ fontSize: '12px', fontWeight: 700, color: gotIt ? COLOR.success : COLOR.red, marginBottom: '6px' }}>
-              {gotIt ? 'Right call.' : 'Close — but the other one is the better fit.'}
-            </div>
-            <div style={{ fontSize: '12.5px', color: COLOR.muted, lineHeight: 1.55 }}>
-              {autoHighlightTerms(item.why, flashcardsData, activeTermKey, setActiveTermKey, 3, 'cmp-why-' + item.id)}
-            </div>
-          </div>
-        )}
+      </div>
+      <div>
+        {item.options.map((opt, i) => {
+          const isBetter = i === item.betterIdx;
+          const isChosen = i === choice;
+          const state = !submitted ? 'idle' : isBetter ? 'correct' : isChosen ? 'wrong' : 'idle';
+          const tag = submitted ? (isBetter ? 'Better' : isChosen ? 'Runner-up' : null) : null;
+          return <QuizOption key={i} index={i} text={opt} state={state} tag={tag} disabled={submitted} onClick={() => onChoose(i)} />;
+        })}
       </div>
       {submitted && (
-        <button className="btn-3d"
+        <div style={{ marginTop: '12px', padding: '14px', borderRadius: 'var(--r-card)', background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderLeft: `3px solid ${gotIt ? COLOR.success : COLOR.red}` }}>
+          <div style={{ fontSize: '12.5px', fontWeight: 700, color: gotIt ? COLOR.success : COLOR.red, marginBottom: '6px' }}>
+            {gotIt ? 'Right call.' : 'Close — but the other one is the better fit.'}
+          </div>
+          <div style={{ fontSize: '13px', color: COLOR.muted, lineHeight: 1.6 }}>
+            {autoHighlightTerms(item.why, flashcardsData, activeTermKey, setActiveTermKey, 3, 'cmp-why-' + item.id)}
+          </div>
+        </div>
+      )}
+      {submitted && (
+        <button
           onClick={onNext}
-          style={{ width: '100%', marginTop: '14px', padding: '12px', borderRadius: 'var(--r-card)', background: COLOR.primary, color: COLOR.onAccent, fontSize: '14px', fontWeight: 600 }}
+          style={{ width: '100%', marginTop: '12px', padding: '13px', borderRadius: 'var(--r-ctl)', border: 'none', background: COLOR.primary, color: COLOR.onAccent, fontSize: '14px', fontWeight: 700 }}
         >
           {index + 1 >= total ? 'Finish' : 'Next'}
         </button>
@@ -999,9 +979,9 @@ function QuizSummary({ score, answers, categories, onRestart, restartLabel }) {
           </div>
         </div>
       )}
-      <button className="btn-3d"
+      <button
         onClick={onRestart}
-        style={{ width: '100%', marginTop: '16px', padding: '12px', borderRadius: 'var(--r-card)', background: COLOR.primary, color: COLOR.onAccent, fontSize: '14px', fontWeight: 600 }}
+        style={{ width: '100%', marginTop: '16px', padding: '12px', borderRadius: 'var(--r-ctl)', border: 'none', background: COLOR.primary, color: COLOR.onAccent, fontSize: '14px', fontWeight: 600 }}
       >
         {restartLabel || 'New quiz'}
       </button>

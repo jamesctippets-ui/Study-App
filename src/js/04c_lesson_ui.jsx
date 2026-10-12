@@ -12,12 +12,21 @@ const RATING_SCALE = [
 ];
 
 function FlashcardView({ card, flipped, setFlipped, onRate, index, total, categoryLabel, speakingId, onSpeak, speechSupported, flashcardsData }) {
+  const { direction } = React.useContext(CardPrefsContext);
+  const defFirst = direction !== 'term';
   const [activeTermKey, setActiveTermKey] = useState(null);
-  useEffect(() => { setActiveTermKey(null); }, [card && card.id]);
+  const [hintShown, setHintShown] = useState(false);
+  useEffect(() => { setActiveTermKey(null); setHintShown(false); }, [card && card.id]);
   useEscapeToClose(() => setActiveTermKey(null));
   useClickOutsideToClose(!!activeTermKey, () => setActiveTermKey(null));
+  const prompt = useMemo(() => (card ? flashcardPrompt(card) : null), [card]);
   if (!card) return null;
   const otherCards = flashcardsData && flashcardsData.filter((c) => c.id !== card.id);
+  const showDefinition = defFirst ? true : flipped;        // is the definition on screen
+  const showTerm = defFirst ? flipped : !flipped;          // is the term on screen
+  const speakText = defFirst ? (flipped ? `${card.front}. ${card.back}` : prompt.speech) : (flipped ? card.back : card.front);
+  const tag = (text, hue) => <span style={{ fontSize: '10px', textTransform: 'uppercase', color: hue }}>{text}</span>;
+  const accent = defFirst && !flipped ? COLOR.primary : COLOR.blue;
   return (
     <div>
       <div className="flex justify-between items-center mb-2" style={{ fontSize: '10.5px', textTransform: 'uppercase', color: COLOR.muted }}>
@@ -26,38 +35,72 @@ function FlashcardView({ card, flipped, setFlipped, onRate, index, total, catego
       </div>
       {speechSupported && (
         <div style={{ textAlign: 'right', marginBottom: '6px' }}>
-          <SpeakButton id={'card-' + card.id} text={flipped ? card.back : card.front} speakingId={speakingId} onSpeak={onSpeak} />
+          <SpeakButton id={'card-' + card.id} text={speakText} speakingId={speakingId} onSpeak={onSpeak} />
         </div>
       )}
       <div
         onClick={() => setFlipped((f) => !f)}
         style={{
-          position: 'relative',
           background: flipped ? COLOR.surfaceRaised : COLOR.surface,
           border: `1px solid ${COLOR.border}`,
-          borderTop: `3px solid ${flipped ? COLOR.blue : COLOR.primary}`,
+          borderTop: `3px solid ${accent}`,
           borderRadius: 'var(--r-card)',
-          padding: '34px 20px 26px',
+          padding: '16px 20px 22px',
           minHeight: '210px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          textAlign: 'center',
           cursor: 'pointer',
         }}
       >
-        <span style={{ position: 'absolute', top: '10px', left: '14px', fontSize: '10px', textTransform: 'uppercase', color: flipped ? COLOR.blue : COLOR.primary }}>{flipped ? 'Definition' : 'Term'}</span>
-        {!flipped ? (
-          <div className="itil-display" style={{ fontSize: '22px', lineHeight: 1.3 }}>{card.front}</div>
+        {defFirst ? (
+          <div>
+            {flipped && (
+              <div style={{ textAlign: 'center', paddingBottom: '14px', marginBottom: '14px', borderBottom: `1px solid ${COLOR.border}` }}>
+                <div style={{ marginBottom: '6px' }}>{tag('Term', COLOR.primary)}</div>
+                <div className="itil-display" style={{ fontSize: '23px', lineHeight: 1.3, overflowWrap: 'anywhere' }}>{card.front}</div>
+              </div>
+            )}
+            <div style={{ marginBottom: '8px' }}>{tag(flipped ? 'Definition' : 'Definition · what is the term?', flipped ? COLOR.blue : COLOR.primary)}</div>
+            <div style={{ fontSize: flipped ? '15px' : '17px', lineHeight: 1.6, overflowWrap: 'anywhere' }}>
+              {autoHighlightTerms(flipped ? card.back : prompt.text, otherCards, activeTermKey, setActiveTermKey, 2)}
+            </div>
+          </div>
         ) : (
-          <div style={{ fontSize: '16px', lineHeight: 1.6 }}>{autoHighlightTerms(card.back, otherCards, activeTermKey, setActiveTermKey, 2)}</div>
+          <div style={{ minHeight: '170px', display: 'flex', flexDirection: 'column', justifyContent: 'center', textAlign: 'center' }}>
+            {!flipped ? (
+              <div className="itil-display" style={{ fontSize: '22px', lineHeight: 1.35, fontWeight: 500 }}>{card.front}</div>
+            ) : (
+              <div style={{ fontSize: '16px', lineHeight: 1.6, textAlign: 'left' }}>{autoHighlightTerms(card.back, otherCards, activeTermKey, setActiveTermKey, 2)}</div>
+            )}
+          </div>
         )}
       </div>
-      <div style={{ fontSize: '11px', color: COLOR.muted, textAlign: 'center', marginTop: '8px' }}>
-        {flipped ? 'Tap to see the term again' : 'Tap the card to reveal the definition'}
+      {defFirst && !flipped && (
+        <div style={{ marginTop: '10px' }}>
+          {hintShown && <div className="mono" style={{ fontSize: '12px', color: COLOR.gold, marginBottom: '8px' }}>Hint · {prompt.hint.text}</div>}
+          <div style={{ display: 'flex', gap: '8px' }}>
+            <button
+              onClick={() => setHintShown(true)}
+              disabled={hintShown}
+              className="btn-flat"
+              style={{ padding: '10px 14px', borderRadius: 'var(--r-ctl)', border: `1px solid ${COLOR.border}`, background: 'transparent', color: hintShown ? COLOR.muted : COLOR.text, fontSize: '13px', fontWeight: 600, flexShrink: 0, opacity: hintShown ? 0.6 : 1 }}
+            >
+              Show a hint
+            </button>
+            <button
+              onClick={() => setFlipped(true)}
+              style={{ flex: 1, padding: '10px 14px', borderRadius: 'var(--r-ctl)', border: 'none', background: COLOR.primary, color: COLOR.onAccent, fontSize: '13px', fontWeight: 700 }}
+            >
+              Show the term
+            </button>
+          </div>
+        </div>
+      )}
+      <div style={{ fontSize: '11px', color: COLOR.muted, textAlign: 'center', marginTop: '10px' }}>
+        {defFirst
+          ? (flipped ? 'Tap the card to hide the term again' : 'Tap the card to reveal the term')
+          : (flipped ? 'Tap to see the term again' : 'Tap the card to reveal the definition')}
       </div>
       <div style={{ fontSize: '11.5px', color: COLOR.muted, textAlign: 'center', marginBottom: '6px' }}>
-        How well did you know it?
+        {defFirst && !flipped ? 'Think of the term, then check. How well did you know it?' : 'How well did you know it?'}
       </div>
       <div className="flex gap-1">
         {RATING_SCALE.map(({ n, label, color }) => (
@@ -152,7 +195,7 @@ function CategoryScreenshot({ screenshotKey }) {
 function QuizSectionButton({ label, count, onClick }) {
   if (!count) return null;
   return (
-    <button className="btn-3d"
+    <button
       onClick={onClick}
       style={{
         width: '100%', padding: '12px', borderRadius: 'var(--r-card)', background: COLOR.gold, color: COLOR.onAccent,
@@ -499,7 +542,7 @@ function MatchGame({ flashcards, roundSize, onContinue, onRoundComplete, continu
             New round
           </button>
           {onContinue && (
-            <button className="btn-3d"
+            <button
               onClick={onContinue}
               style={{ background: COLOR.primary, color: COLOR.onAccent, borderRadius: 'var(--r-ctl)', padding: '10px 20px', fontSize: '13px', fontWeight: 600 }}
             >
@@ -642,7 +685,7 @@ function MatchGame({ flashcards, roundSize, onContinue, onRoundComplete, continu
                 transition: 'background 0.15s, border-color 0.15s',
               }}
             >
-              <strong style={{ color: COLOR.muted }}>{String.fromCharCode(65 + i)}.</strong> {card.back}
+              <strong className="mono" style={{ color: COLOR.muted, marginRight: '8px' }}>{String.fromCharCode(65 + i)}</strong>{card.back}
             </button>
           );
         })}
@@ -983,9 +1026,9 @@ function LessonDetail({ lesson, flashcardsData, questionsData, categories, onBac
               gateVocabPool.length >= 2 ? (
                 <MatchGame flashcards={gateVocabPool} roundSize={3} onContinue={advancePastGate} />
               ) : (
-                <button className="btn-3d"
+                <button
                   onClick={advancePastGate}
-                  style={{ width: '100%', padding: '12px', borderRadius: 'var(--r-card)', background: COLOR.primary, color: COLOR.onAccent, fontSize: '14px', fontWeight: 600 }}
+                  style={{ width: '100%', padding: '12px', borderRadius: 'var(--r-ctl)', border: 'none', background: COLOR.primary, color: COLOR.onAccent, fontSize: '14px', fontWeight: 600 }}
                 >
                   Continue reading →
                 </button>
@@ -993,9 +1036,9 @@ function LessonDetail({ lesson, flashcardsData, questionsData, categories, onBac
             ) : gateQuestion ? (
               <ReadingCheckGate question={gateQuestion} onPassed={advancePastGate} />
             ) : (
-              <button className="btn-3d"
+              <button
                 onClick={advancePastGate}
-                style={{ width: '100%', padding: '12px', borderRadius: 'var(--r-card)', background: COLOR.primary, color: COLOR.onAccent, fontSize: '14px', fontWeight: 600 }}
+                style={{ width: '100%', padding: '12px', borderRadius: 'var(--r-ctl)', border: 'none', background: COLOR.primary, color: COLOR.onAccent, fontSize: '14px', fontWeight: 600 }}
               >
                 Continue reading →
               </button>

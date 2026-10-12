@@ -14,7 +14,12 @@ schedule and rated on the same 1-5 confidence scale SM-2 was originally
 designed around — 1 "Blank" through 5 "Easy" — rather than a binary
 right/wrong; a 3+ resurfaces the card later by a growing interval, under
 3 resets it sooner. The order is computed fresh each time you enter a
-category/track rather than reshuffling mid-session; once any card has been rated 3 or lower a
+category/track rather than reshuffling mid-session. **Cards show the definition first** and ask you to name
+the term: the term is blanked out wherever the definition spells it (and its bracketed acronym), a hint
+button gives the word count and first letter, and "Show the term" reveals the answer before you rate it. A
+per-device setting in Data & Progress switches back to term-first; Home's Vocab of the Day follows the same
+direction (the blanking logic is `flashcardPrompt` in `03_helpers.js`, checked against all 4,430 cards by
+`tools/check_cards.js`); once any card has been rated 3 or lower a
 "Tough terms" deck appears beside All cards — the cards you last rated OK or below, hardest first,
 where a 4 or 5 graduates a card out — and the Path map links to it too) and Study
 (for tracks without a course, a flashcard list paginated one category/section
@@ -650,6 +655,7 @@ tools/
   check_weak_path.js  — unit tests for the weak-subjects engine against the real content
   check_playground.js — unit tests for the Playground engines plus a replay of every scenario
   check_flyout.js     — unit tests for the flyout placement maths
+  check_cards.js      — checks that the definition-first flashcard prompt never shows its own term (all cards)
   checks/<tool>.js    — per-tool checks for the extra Playground tools (loaded by check_playground.js)
 src/js/
   00_preamble.js        — React hook imports, the COLOR palette, hues, theme and icon helpers

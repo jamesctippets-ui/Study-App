@@ -336,6 +336,23 @@ function useFontPrefs() {
   return [dyslexic, setDyslexic];
 }
 
+// Which side of a flashcard comes first. The default is the DEFINITION, so you recall the
+// term; "term" is the classic direction. A per-device display preference like the font.
+const CARD_PREFS_KEY = 'certStudyHub_cardPrefs';
+const CardPrefsContext = React.createContext({ direction: 'definition', setDirection: () => {} });
+
+function useCardPrefs() {
+  const [direction, setDirectionState] = useState(() => {
+    try { return JSON.parse(localStorage.getItem(CARD_PREFS_KEY) || '{}').direction === 'term' ? 'term' : 'definition'; } catch (e) { return 'definition'; }
+  });
+  const setDirection = (d) => {
+    const next = d === 'term' ? 'term' : 'definition';
+    setDirectionState(next);
+    try { localStorage.setItem(CARD_PREFS_KEY, JSON.stringify({ direction: next })); } catch (e) { /* ignore */ }
+  };
+  return { direction, setDirection };
+}
+
 // Sounds: tiny synthesized tones (Web Audio, no audio files). Two separate,
 // opt-in switches, both off by default: celebration chimes when a step or unit
 // finishes, and a short right/wrong tone when a practice question is answered.

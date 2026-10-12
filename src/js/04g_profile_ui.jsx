@@ -231,7 +231,7 @@ function ProfileView({ tracks, results, seenLog, srs, stats, certPlan, achieveme
         ) : (
           <div style={{ fontSize: '12.5px', color: COLOR.muted, lineHeight: 1.5 }}>
             Your plan is empty. Add the certs you are working toward from the menu and they show up here with progress and exam countdowns.
-            <button onClick={onOpenCertPath} className="btn-3d" style={{ display: 'block', width: '100%', marginTop: '10px', padding: '10px', borderRadius: 'var(--r-card)', background: COLOR.primary, color: COLOR.onAccent, fontSize: '13px', fontWeight: 800 }}>Build my plan</button>
+            <button onClick={onOpenCertPath} style={{ display: 'block', width: '100%', marginTop: '10px', padding: '10px', borderRadius: 'var(--r-ctl)', border: 'none', background: COLOR.primary, color: COLOR.onAccent, fontSize: '13px', fontWeight: 800 }}>Build my plan</button>
           </div>
         )}
         {upcoming.length > 0 && (

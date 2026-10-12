@@ -90,7 +90,7 @@ function PathReadStep({ unit, flashcardsData, speech, onDone }) {
         <button
           onClick={() => (isLast ? onDone(null) : setPage((n) => n + 1))}
           className="flex-1"
-          style={{ padding: '12px', borderRadius: 'var(--r-card)', background: COLOR.primary, color: COLOR.onAccent, fontSize: '14px', fontWeight: 600 }}
+          style={{ padding: '12px', borderRadius: 'var(--r-ctl)', border: 'none', background: COLOR.primary, color: COLOR.onAccent, fontSize: '14px', fontWeight: 600 }}
         >
           {isLast ? 'Done reading' : 'Next ›'}
         </button>
@@ -335,7 +335,7 @@ function PathApplyStep({ unit, categories, flashcardsData, onDone }) {
       <LessonApplySections lesson={unit.lesson} categories={categories} lessonCatKeys={unit.cats} flashcardsData={flashcardsData} />
       <button
         onClick={() => onDone(null)}
-        style={{ width: '100%', padding: '12px', borderRadius: 'var(--r-card)', background: COLOR.primary, color: COLOR.onAccent, fontSize: '14px', fontWeight: 600 }}
+        style={{ width: '100%', padding: '12px', borderRadius: 'var(--r-ctl)', border: 'none', background: COLOR.primary, color: COLOR.onAccent, fontSize: '14px', fontWeight: 600 }}
       >
         Got it
       </button>
@@ -417,8 +417,8 @@ function PathStepComplete({ unit, step, pct, unitComplete, testedOut, next, onNe
         {next ? (
           <button
             onClick={onNext}
-            className="btn-3d"
-            style={{ width: '100%', marginTop: '20px', padding: '14px', borderRadius: 'var(--r-card)', background: COLOR.primary, color: COLOR.onAccent, fontSize: '15px', fontWeight: 800 }}
+           
+            style={{ width: '100%', marginTop: '20px', padding: '14px', borderRadius: 'var(--r-ctl)', border: 'none', background: COLOR.primary, color: COLOR.onAccent, fontSize: '15px', fontWeight: 800 }}
           >
             {nextLabel || (next.unit.index !== unit.index ? `Next unit: ${next.unit.title}` : `Next: ${next.step.label}`)}
           </button>

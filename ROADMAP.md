@@ -1747,6 +1747,15 @@ trading away for shinier but shallower ones.
   sequence and compare games, glossary, About and Data panels. (The Playground was converted in phase 2, below.) Playwright tests were updated for the
   new title text (`cert-study`) and the tab roles on the mode switches. A first pass used a new green-on-near-black
   palette; it was reverted at the owner's request to keep the current colours.
+- [x] **Flashcards reversed: the definition comes first.** Cards now show the definition and ask for the term (the stronger
+  recall direction). `flashcardPrompt` (03_helpers.js) blanks the term wherever the definition spells it, including its
+  plural and a bracketed single-token acronym such as `(RBAC)` or `(RU/s)`; a bracket of examples like
+  `(Audit, Deny, Modify)` is left readable. 502 of 4,430 definitions needed blanking, and `tools/check_cards.js` (13,301
+  checks, run by build.py) proves no card's own term is readable in its prompt. The card has a Hint button (word count
+  and first letter), a "Show the term" button, and the confidence rating (1-5) is unchanged; text-to-speech reads the
+  definition with "blank" for the gap and the term plus definition after the reveal. Home's Vocab of the Day follows the
+  same direction. A per-device switch in Data & Progress (`CardPrefsContext`, key `certStudyHub_cardPrefs`) restores
+  the old term-first direction. Also fixed on the way: Home's route rows had lost the per-row "open this cert" shortcut.
 - [x] **"Console" redesign, phase 2: the Playground.** Converted through its shared core (`04g_playground_core.jsx`) so all ten
   tools changed together: cards are tinted with a coloured left edge, the tool tabs are the shared `SegmentedControl`
   (sized to their labels so "Same subnet?" stays on one line), every ping/lookup/test trace is drawn as a route (a
@@ -1754,6 +1763,12 @@ trading away for shinier but shallower ones.
   "scenarios fixed" meter and level tags, and the Playground home shows a meter per tool plus the milestone chips.
   Inputs, binary views and result tiles use JetBrains Mono. Original colours kept. Checked in dark and light with a
   scripted pass over the first scenario of every tool after a run.
+- [x] **"Console" redesign, phase 3: the remaining screens.** Compare joined Practice and the exams on lettered answer rows
+  (with Better / Runner-up tags and a coloured-edge explanation), every game's header row is now a mono "04 / 12" counter,
+  primary action buttons use the control radius and are flat, Match's lettered definitions use the mono letter, and the
+  last `btn-3d` classes are gone. Lessons, Mad Libs, Sequence, Case study, Commands, Verbal, Glossary, About, Achievements,
+  Data and the cert-path panel were reviewed in dark and light and already follow the new tokens, so they needed no
+  layout change. Original colours kept throughout.
 - [x] **Definition flyouts rebuilt: open left near the right edge, never widen the page.** Reported on a phone: a
   flyout from a word near the right edge made the page resize. Root cause: the flyout was `position: absolute` inside
   the text, so an overflowing box widened the page, and mobile browsers then report an inflated `window.innerWidth`
