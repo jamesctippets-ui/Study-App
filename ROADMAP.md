@@ -1099,7 +1099,7 @@ doesn't (and why it's still waiting).
   they all write into the same `results[trackKey]` map), valid
   categories, non-empty prompt/explanation, and a `steps` list of at
   least 3 unique, non-empty entries.
-- [ ] **Stretch, lower priority — build-your-own-scenario.** Instead of only
+- [x] **Stretch, lower priority — build-your-own-scenario (built: Practice > Sequence > "Build your own scenario", saved per cert).** Instead of only
   solving developer-authored sequences, let the user assemble their own
   scenario from a bank of steps as a self-test/review tool. Since the app
   has no accounts or backend, an authored scenario would need to persist
@@ -1742,9 +1742,8 @@ trading away for shinier but shallower ones.
   `RouteList`/`RouteStep` (a trail drawn as a route: dashed line, nodes in the unit's or cert's colour, step ids like
   U3.02) and `QuizOption` (lettered answers that swap the letter for a mark so results never depend on colour alone).
   Screens converted: header and tab bar, Home (streak / daily goal / readiness hero, next-hop button, route ahead), the
-  Path map and unit cards, weak subjects, Practice and exam question views, flashcards, Profile. Not yet converted (they
-  inherit the new tokens and look consistent but keep their old layout): lesson body sections, Mad Libs, Match,
-  sequence and compare games, glossary, About and Data panels. (The Playground was converted in phase 2, below.) Playwright tests were updated for the
+  Path map and unit cards, weak subjects, Practice and exam question views, flashcards, Profile. The Playground
+  (phase 2) and the remaining screens (phase 3) followed, so every screen now uses the new layout. Playwright tests were updated for the
   new title text (`cert-study`) and the tab roles on the mode switches. A first pass used a new green-on-near-black
   palette; it was reverted at the owner's request to keep the current colours.
 - [x] **Flashcards reversed: the definition comes first.** Cards now show the definition and ask for the term (the stronger
@@ -1879,7 +1878,7 @@ fixed 0.95 rate, no voice picker, no auto-advance — you tap it once per item
 and it reads that one thing (`speak()` in `06_app.jsx`). Two asks here: make
 that existing TTS more capable (done — see below), and build an entirely new
 mode on top of it for studying hands-free — the driving use case
-specifically (still open).
+specifically (built: see the Verbal Quiz entries below).
 
 - [x] **TTS revamp.** Shipped as a new "Voice & speech" section in the
   Data & Progress panel (`DataPanel` in 04_shared_ui.jsx): a rate slider
