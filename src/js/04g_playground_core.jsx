@@ -359,14 +359,78 @@ function PgScenarioPicker({ tool, scenarios, onPick, intro, note, sandboxText })
   );
 }
 
+/* ---------- quiz me on this setup ---------- */
+
+// Optional credit toward the daily goal. The app listens for this and counts it only when the learner
+// switched "Count Playground work toward the daily goal" on (off by default).
+function pgCredit(n) {
+  try { window.dispatchEvent(new CustomEvent('cert-study-pg-credit', { detail: { n } })); } catch (e) { /* no window events: nothing to credit */ }
+}
+
+// A short quiz made from the setup on screen (src/js/03c_pg_quizme.js). Folded away until asked for, and
+// reset whenever the setup changes so its questions always match what the lab shows.
+function PgQuizMe({ kind, topo, causes, hue }) {
+  const on = hue || COLOR.primary;
+  const [qs, setQs] = useState(null);
+  const [i, setI] = useState(0);
+  const [picked, setPicked] = useState(null);
+  const [score, setScore] = useState(0);
+  const sig = JSON.stringify(topo);
+  useEffect(() => { setQs(null); setI(0); setPicked(null); setScore(0); }, [sig]);
+  const start = () => { setQs(pgQuizBuild(kind, topo, { seed: (Date.now() % 1000000) + 1, causes })); setI(0); setPicked(null); setScore(0); };
+  const q = qs && qs[i];
+  const finished = !!qs && qs.length > 0 && i >= qs.length;
+  const answer = (idx) => {
+    if (picked !== null || !q) return;
+    setPicked(idx);
+    if (idx === q.correct) { setScore((n) => n + 1); pgCredit(1); }
+  };
+  const next = () => { setPicked(null); setI(i + 1);  };
+  return (
+    <PgCard title="Quiz me on this setup" hue={on} collapsible defaultOpen={false}>
+      {!qs && (
+        <div>
+          <div style={{ fontSize: '13px', lineHeight: 1.55, color: COLOR.muted, marginBottom: '10px' }}>Five questions about the network above, made from your current settings. Change something and the questions change with it.</div>
+          <button onClick={start} style={{ padding: '10px 16px', borderRadius: 'var(--r-ctl)', border: 'none', background: on, color: COLOR.onAccent, fontSize: '13.5px', fontWeight: 800 }}>Start the quiz</button>
+        </div>
+      )}
+      {qs && qs.length === 0 && <div style={{ fontSize: '13px', color: COLOR.muted }}>This setup is too small to ask about. Add a host or a rule and try again.</div>}
+      {q && (
+        <div>
+          <div className="mono" style={{ fontSize: '10.5px', color: COLOR.muted, marginBottom: '6px' }}>Question {i + 1} of {qs.length}</div>
+          <div style={{ fontSize: '14.5px', fontWeight: 700, lineHeight: 1.5 }}>{q.prompt}</div>
+          {q.options.map((text, idx) => (
+            <QuizOption key={idx} index={idx} text={text} disabled={picked !== null}
+              state={picked === null ? 'idle' : idx === q.correct ? 'correct' : idx === picked ? 'wrong' : 'idle'}
+              onClick={() => answer(idx)} />
+          ))}
+          {picked !== null && (
+            <div style={{ marginTop: '10px' }}>
+              <div style={{ fontSize: '12.5px', lineHeight: 1.55, color: COLOR.muted }}><strong style={{ color: picked === q.correct ? ink(COLOR.success) : ink(COLOR.red) }}>{picked === q.correct ? 'Right. ' : 'Not quite. '}</strong>{q.explain}</div>
+              <button onClick={next} style={{ marginTop: '10px', padding: '9px 16px', borderRadius: 'var(--r-ctl)', border: 'none', background: on, color: COLOR.onAccent, fontSize: '13px', fontWeight: 800 }}>{i + 1 < qs.length ? 'Next question' : 'See my score'}</button>
+            </div>
+          )}
+        </div>
+      )}
+      {finished && (
+        <div>
+          <div className="itil-display" style={{ fontSize: '17px', fontWeight: 600 }}>{score} of {qs.length} right</div>
+          <div style={{ fontSize: '12.5px', color: COLOR.muted, margin: '4px 0 10px' }}>{score === qs.length ? 'You read this setup like a pro.' : 'Run the lab on the ones you missed, then try a fresh round.'}</div>
+          <button onClick={start} style={{ padding: '10px 16px', borderRadius: 'var(--r-ctl)', border: `1px solid ${on}`, background: 'transparent', color: ink(on), fontSize: '13.5px', fontWeight: 800 }}>New round</button>
+        </div>
+      )}
+    </PgCard>
+  );
+}
+
 // A guided scenario: story, the lab (renderLab), goal tracking, hints, the fix, the lesson.
 // isSolved(topo) is the scenario's goal; fixLines is the wording shown under "Show the fix".
-function PgScenarioShell({ tool, scenario, onBack, renderLab, isSolved, fixLines }) {
+function PgScenarioShell({ tool, scenario, onBack, renderLab, isSolved, fixLines, quiz }) {
   const [topo, setTopo] = useState(() => pgClone(scenario.topology));
   const [hintsShown, setHintsShown] = useState(0);
   const [showFix, setShowFix] = useState(false);
   const solved = isSolved(topo);
-  useEffect(() => { if (solved) pgMarkSolved(tool, scenario.id); }, [solved]);
+  useEffect(() => { if (solved && pgMarkSolved(tool, scenario.id)) pgCredit(3); }, [solved]);
   const reset = () => { setTopo(pgClone(scenario.topology)); setHintsShown(0); setShowFix(false); };
   return (
     <div>
@@ -382,6 +446,7 @@ function PgScenarioShell({ tool, scenario, onBack, renderLab, isSolved, fixLines
           {scenario.related && scenario.related.length > 0 && <div style={{ fontSize: '12px', color: COLOR.muted, marginTop: '8px' }}>Related study: {scenario.related.join(' · ')}</div>}
         </PgCard>
       )}
+      {solved && quiz && <PgQuizMe kind={quiz.kind} causes={quiz.causes} topo={topo} hue={COLOR.success} />}
       <PgCard title="Stuck?" hue={COLOR.orange}>
         {scenario.hints.slice(0, hintsShown).map((h, i) => <div key={i} style={{ fontSize: '13px', lineHeight: 1.5, marginBottom: '8px' }}><strong>Hint {i + 1}:</strong> {h}</div>)}
         <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
@@ -396,7 +461,7 @@ function PgScenarioShell({ tool, scenario, onBack, renderLab, isSolved, fixLines
 }
 
 // The free sandbox: a remembered setup plus reset and share.
-function PgSandboxShell({ tool, makeDefault, validate, onBack, renderLab, blurb }) {
+function PgSandboxShell({ tool, makeDefault, validate, onBack, renderLab, blurb, quiz }) {
   const [topo, setTopo, reset] = usePgSandbox(tool, makeDefault, validate);
   return (
     <div>
@@ -405,6 +470,7 @@ function PgSandboxShell({ tool, makeDefault, validate, onBack, renderLab, blurb 
         <div style={{ fontSize: '13px', lineHeight: 1.55 }}>{blurb}</div>
       </PgCard>
       {renderLab(topo, setTopo)}
+      {quiz && <PgQuizMe kind={quiz.kind} causes={quiz.causes} topo={topo} hue={COLOR.primary} />}
       <PgSharePanel topo={topo} setTopo={setTopo} reset={reset} validate={validate} />
     </div>
   );

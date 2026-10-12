@@ -97,6 +97,7 @@ function DataPanel({
   trackLabel, onExport, onImportFile, importMessage, onReset, onClose,
   speechSupported, ttsVoices, ttsRate, ttsVoiceURI, onSetTtsRate, onSetTtsVoiceURI, onTestVoice, isTestSpeaking,
   soundOn, onSetSoundOn, pathLocking, onSetPathLocking, dyslexicFont, onSetDyslexicFont, answerSoundOn, onSetAnswerSoundOn,
+  reviewReminderDays, onSetReviewReminder, playgroundGoal, onSetPlaygroundGoal,
 }) {
   useEscapeToClose(onClose);
   const [confirmingReset, setConfirmingReset] = useState(false);
@@ -154,7 +155,7 @@ function DataPanel({
         <CardDirectionSetting />
 
         <div style={{ marginTop: '14px', padding: '14px', borderRadius: 'var(--r-card)', background: COLOR.surface, border: `1px solid ${COLOR.border}` }}>
-          <div style={{ fontSize: '13.5px', fontWeight: 600, marginBottom: '4px' }}>Path &amp; sounds</div>
+          <div style={{ fontSize: '13.5px', fontWeight: 600, marginBottom: '4px' }}>Habits &amp; sounds</div>
           <label style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '12px', marginTop: '8px', fontSize: '12.5px' }}>
             <span>
               Lock later units
@@ -162,10 +163,31 @@ function DataPanel({
             </span>
             <input type="checkbox" checked={!!pathLocking} onChange={(e) => onSetPathLocking(e.target.checked)} style={{ width: '20px', height: '20px', flexShrink: 0, marginTop: '2px' }} aria-label="Lock later units" />
           </label>
+          <label style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', marginTop: '12px', fontSize: '12.5px' }}>
+            <span>
+              Remind me to review
+              <span style={{ display: 'block', fontSize: '11.5px', color: COLOR.muted, lineHeight: 1.4 }}>Home nudges you when it has been this long since your last review.</span>
+            </span>
+            <select
+              value={reviewReminderDays}
+              onChange={(e) => onSetReviewReminder(Number(e.target.value))}
+              aria-label="Remind me to review"
+              style={{ padding: '6px 8px', borderRadius: 'var(--r-ctl)', fontSize: '12px', border: `1px solid ${COLOR.border}`, background: COLOR.surfaceRaised, color: COLOR.text, flexShrink: 0 }}
+            >
+              {REVIEW_REMINDER_OPTIONS.map((o) => <option key={o.days} value={o.days}>{o.label}</option>)}
+            </select>
+          </label>
+          <label style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '12px', marginTop: '12px', fontSize: '12.5px' }}>
+            <span>
+              Playground counts toward the daily goal
+              <span style={{ display: 'block', fontSize: '11.5px', color: COLOR.muted, lineHeight: 1.4 }}>Off by default, because the Playground is a sandbox. When on, solving a scenario for the first time adds 3 and each right answer in "Quiz me on this setup" adds 1. It never changes your mastery.</span>
+            </span>
+            <input type="checkbox" checked={!!playgroundGoal} onChange={(e) => onSetPlaygroundGoal(e.target.checked)} style={{ width: '20px', height: '20px', flexShrink: 0, marginTop: '2px' }} aria-label="Playground counts toward the daily goal" />
+          </label>
           <label style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '12px', marginTop: '12px', fontSize: '12.5px' }}>
             <span>
               Celebration sounds
-              <span style={{ display: 'block', fontSize: '11.5px', color: COLOR.muted, lineHeight: 1.4 }}>A short chime when you finish a step or a unit. Off by default; saved on this device only.</span>
+              <span style={{ display: 'block', fontSize: '11.5px', color: COLOR.muted, lineHeight: 1.4 }}>A short chime when you finish a step, a unit or a case study, plus a start and end cue for Verbal Quiz. Off by default; saved on this device only.</span>
             </span>
             <input type="checkbox" checked={!!soundOn} onChange={(e) => onSetSoundOn(e.target.checked)} style={{ width: '20px', height: '20px', flexShrink: 0, marginTop: '2px' }} aria-label="Celebration sounds" />
           </label>
@@ -239,22 +261,9 @@ function DataPanel({
         )}
 
         <div style={{ marginTop: '14px', padding: '14px', borderRadius: 'var(--r-card)', background: COLOR.surface, border: `1px solid ${COLOR.border}` }}>
-          <div style={{ fontSize: '13.5px', fontWeight: 600, marginBottom: '4px' }}>Export progress</div>
+          <div style={{ fontSize: '13.5px', fontWeight: 600, marginBottom: '4px' }}>Back up &amp; restore</div>
           <div style={{ fontSize: '11.5px', color: COLOR.muted, marginBottom: '10px', lineHeight: 1.4 }}>
-            Download every track's quiz/exam history, flashcard mastery, streak, and achievements as a JSON file — a backup, or a way to move progress to a new device.
-          </div>
-          <button
-            onClick={onExport}
-            style={{ width: '100%', padding: '10px', borderRadius: 'var(--r-ctl)', background: COLOR.primary, color: COLOR.onAccent, fontSize: '13px', fontWeight: 600 }}
-          >
-            ⬇ Export progress
-          </button>
-        </div>
-
-        <div style={{ marginTop: '12px', padding: '14px', borderRadius: 'var(--r-card)', background: COLOR.surface, border: `1px solid ${COLOR.border}` }}>
-          <div style={{ fontSize: '13.5px', fontWeight: 600, marginBottom: '4px' }}>Import progress</div>
-          <div style={{ fontSize: '11.5px', color: COLOR.muted, marginBottom: '10px', lineHeight: 1.4 }}>
-            Restore from a previously exported file. This replaces all progress currently saved in this browser.
+            Export every track's quiz/exam history, flashcard mastery, streak and achievements as a JSON file: a backup, or a way to move to a new device. Importing replaces all progress saved in this browser.
           </div>
           <input
             ref={fileInputRef}
@@ -267,12 +276,20 @@ function DataPanel({
               e.target.value = '';
             }}
           />
-          <button
-            onClick={() => fileInputRef.current && fileInputRef.current.click()}
-            style={{ width: '100%', padding: '10px', borderRadius: 'var(--r-ctl)', background: 'transparent', border: `1px solid ${COLOR.primary}`, color: COLOR.primary, fontSize: '13px', fontWeight: 600 }}
-          >
-            ⬆ Import progress
-          </button>
+          <div style={{ display: 'flex', gap: '8px' }}>
+            <button
+              onClick={onExport}
+              style={{ flex: 1, padding: '10px', borderRadius: 'var(--r-ctl)', background: COLOR.primary, color: COLOR.onAccent, fontSize: '13px', fontWeight: 600 }}
+            >
+              ⬇ Export progress
+            </button>
+            <button
+              onClick={() => fileInputRef.current && fileInputRef.current.click()}
+              style={{ flex: 1, padding: '10px', borderRadius: 'var(--r-ctl)', background: 'transparent', border: `1px solid ${COLOR.primary}`, color: COLOR.primary, fontSize: '13px', fontWeight: 600 }}
+            >
+              ⬆ Import progress
+            </button>
+          </div>
           {importMessage && (
             <div style={{ marginTop: '8px', fontSize: '11.5px', color: importMessage.ok ? COLOR.success : COLOR.red, lineHeight: 1.4 }}>
               {importMessage.text}
@@ -376,19 +393,21 @@ function TodayHero({ dailyGoal, onSetTarget, streak, readiness, focusLabel, note
 // old hamburger bottom-sheet menu showed, just tucked behind a single
 // summary row instead of always taking up the whole page, since Home now
 // has several other widgets competing for the same space.
-function TrackListDropdown({ tracks, masteries, certPlan, onSelectTrack, onAddToPath, defaultOpen, label }) {
+function TrackListDropdown({ tracks, masteries, certPlan, onSelectTrack, onAddToPath, defaultOpen, label, quiet }) {
   const [open, setOpen] = useState(!!defaultOpen);
   return (
-    <div className="mb-4">
+    <div className={quiet ? undefined : 'mb-4'} style={quiet ? { marginTop: '10px' } : undefined}>
       <button
         onClick={() => setOpen((o) => !o)}
+        aria-expanded={open}
+        className={quiet ? 'btn-flat' : undefined}
         style={{
           width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-          padding: '12px 14px', borderRadius: 'var(--r-card)', background: tint(COLOR.blue, 9),
-          border: `1px solid color-mix(in srgb, ${COLOR.blue} 35%, ${COLOR.border})`,
+          padding: quiet ? '8px 2px' : '12px 14px', borderRadius: 'var(--r-card)', background: quiet ? 'transparent' : tint(COLOR.blue, 9),
+          border: quiet ? 'none' : `1px solid color-mix(in srgb, ${COLOR.blue} 35%, ${COLOR.border})`,
         }}
       >
-        <span style={{ fontSize: '13px', fontWeight: 600, color: COLOR.text }}>{label || `All tracks (${tracks.length})`}</span>
+        <span style={{ fontSize: quiet ? '12px' : '13px', fontWeight: 600, color: quiet ? COLOR.muted : COLOR.text }}>{label || `All tracks (${tracks.length})`}</span>
         <span style={{ fontSize: '11px', color: COLOR.muted, transform: open ? 'rotate(180deg)' : 'none', transition: 'transform 0.15s ease' }}>▾</span>
       </button>
       {open && (
@@ -451,11 +470,10 @@ function TrackListDropdown({ tracks, masteries, certPlan, onSelectTrack, onAddTo
 // in the app instead of a bespoke look. `stored` is the persisted
 // {selected, correct} from stats.dailyChallenge if today's question was
 // already answered (e.g. on a revisit later the same day); otherwise the
-// question starts unanswered.
-function DailyQuestionCard({ q, trackLabel, stored, onAnswer }) {
+// question starts unanswered. Shown inside HomeDailyCard.
+function DailyQuestionBody({ q, stored, onAnswer }) {
   const [selected, setSelected] = useState(stored ? stored.selected : null);
   const [msPending, setMsPending] = useState([]);
-  const [open, setOpen] = useState(false);
   useEffect(() => { setSelected(stored ? stored.selected : null); setMsPending([]); }, [q.id, stored]);
 
   const choose = (idx) => {
@@ -480,48 +498,25 @@ function DailyQuestionCard({ q, trackLabel, stored, onAnswer }) {
     onAnswer(isCorrect, picked);
   };
 
-  const answered = selected !== null;
   return (
-    <div className="mb-4">
-      <button
-        onClick={() => setOpen((o) => !o)}
-        aria-expanded={open}
-        style={{
-          width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px', textAlign: 'left',
-          padding: '12px 14px', borderRadius: 'var(--r-card)', background: tint(COLOR.gold, 11), border: `1px solid color-mix(in srgb, ${COLOR.gold} 40%, ${COLOR.border})`, borderLeft: `3px solid ${COLOR.gold}`, boxShadow: SHADOW.card,
-        }}
-      >
-        <span style={{ minWidth: 0 }}>
-          <span style={{ display: 'block', fontSize: '11px', color: COLOR.gold, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-            Question of the day · {trackLabel}
-          </span>
-          <span style={{ display: 'block', fontSize: '12.5px', color: COLOR.muted, marginTop: '2px' }}>
-            {answered ? 'Answered · tap to review' : 'One question, about a minute'}
-          </span>
-        </span>
-        <span style={{ fontSize: '11px', color: COLOR.muted, transform: open ? 'rotate(180deg)' : 'none', transition: 'transform 0.15s ease' }}>▾</span>
-      </button>
-      {open && (
-        <div style={{ marginTop: '8px' }}>
-          <QuestionView
-            q={q}
-            selected={selected}
-            onChoose={choose}
-            onNext={() => {}}
-            index={0}
-            total={1}
-            hideMeta
-            hideNext
-            msPending={msPending}
-            onToggleMs={toggleMs}
-            onSubmitMs={submitMs}
-            flashcardsData={DATA[q.__homeTrack]?.flashcards}
-          />
-          {answered && (
-            <div style={{ fontSize: '11.5px', color: COLOR.muted, textAlign: 'center', marginTop: '6px' }}>
-              New question tomorrow.
-            </div>
-          )}
+    <div>
+      <QuestionView
+        q={q}
+        selected={selected}
+        onChoose={choose}
+        onNext={() => {}}
+        index={0}
+        total={1}
+        hideMeta
+        hideNext
+        msPending={msPending}
+        onToggleMs={toggleMs}
+        onSubmitMs={submitMs}
+        flashcardsData={DATA[q.__homeTrack]?.flashcards}
+      />
+      {selected !== null && (
+        <div style={{ fontSize: '11.5px', color: COLOR.muted, textAlign: 'center', marginTop: '6px' }}>
+          New question tomorrow.
         </div>
       )}
     </div>
@@ -533,42 +528,56 @@ function DailyQuestionCard({ q, trackLabel, stored, onAnswer }) {
 // fast glance rather than another SRS-scored rep. Revealing it still
 // counts toward the daily goal ring (it's real study time), just not
 // toward mastery/SRS scheduling the way an actual rating would.
-function DailyVocabCard({ card, trackLabel, revealed, onReveal, pool }) {
+function DailyVocabBody({ card, revealed, onReveal, pool }) {
   const { direction } = React.useContext(CardPrefsContext);
   const defFirst = direction !== 'term';
   const prompt = useMemo(() => flashcardPrompt(card), [card]);
   return (
-    <div className="mb-4">
-      <div
-        onClick={() => { if (!revealed) onReveal(); }}
-        style={{
-          background: tint(COLOR.teal, revealed ? 16 : 10),
-          border: `1px solid color-mix(in srgb, ${COLOR.teal} 35%, ${COLOR.border})`, borderLeft: `3px solid ${COLOR.teal}`, borderRadius: 'var(--r-card)', padding: '12px 14px',
-          cursor: revealed ? 'default' : 'pointer',
-        }}
-      >
-        <div style={{ fontSize: '10.5px', color: COLOR.teal, textTransform: 'uppercase' }}>
-          Vocab of the day · {trackLabel}
+    <div
+      onClick={() => { if (!revealed) onReveal(); }}
+      style={{
+        background: tint(COLOR.teal, revealed ? 16 : 10),
+        border: `1px solid color-mix(in srgb, ${COLOR.teal} 35%, ${COLOR.border})`, borderLeft: `3px solid ${COLOR.teal}`, borderRadius: 'var(--r-card)', padding: '12px 14px',
+        cursor: revealed ? 'default' : 'pointer',
+      }}
+    >
+      {defFirst ? (
+        <div>
+          {revealed && <div className="itil-display" style={{ fontSize: '17px', fontWeight: 600, overflowWrap: 'anywhere' }}>{card.front}</div>}
+          <div style={{ fontSize: '14px', lineHeight: 1.55, color: revealed ? COLOR.muted : COLOR.text, marginTop: revealed ? '6px' : 0, overflowWrap: 'anywhere' }}>
+            {revealed ? <GlossText text={card.back} pool={pool} max={2} blockId="dv" /> : prompt.text}
+          </div>
+          {!revealed && <div style={{ fontSize: '12.5px', color: COLOR.muted, marginTop: '6px' }}>What is the term? Tap to reveal it.</div>}
         </div>
-        {defFirst ? (
-          <div>
-            {revealed && <div className="itil-display" style={{ fontSize: '17px', fontWeight: 600, marginTop: '4px', overflowWrap: 'anywhere' }}>{card.front}</div>}
-            <div style={{ fontSize: '14px', lineHeight: 1.55, color: revealed ? COLOR.muted : COLOR.text, marginTop: revealed ? '6px' : '6px', overflowWrap: 'anywhere' }}>
-              {revealed ? <GlossText text={card.back} pool={pool} max={2} blockId="dv" /> : prompt.text}
-            </div>
-            {!revealed && <div style={{ fontSize: '12.5px', color: COLOR.muted, marginTop: '6px' }}>What is the term? Tap to reveal it.</div>}
-          </div>
-        ) : (
-          <div>
-            <div className="itil-display" style={{ fontSize: '17px', fontWeight: 600, marginTop: '4px' }}>{card.front}</div>
-            {revealed
-              ? <div style={{ fontSize: '14px', lineHeight: 1.55, color: COLOR.muted, marginTop: '8px' }}><GlossText text={card.back} pool={pool} max={2} blockId="dv" /></div>
-              : <div style={{ fontSize: '12.5px', color: COLOR.muted, marginTop: '2px' }}>Tap to reveal the definition</div>}
-          </div>
-        )}
-        {revealed && <div style={{ fontSize: '11.5px', color: COLOR.muted, marginTop: '8px' }}>New term tomorrow.</div>}
-      </div>
+      ) : (
+        <div>
+          <div className="itil-display" style={{ fontSize: '17px', fontWeight: 600 }}>{card.front}</div>
+          {revealed
+            ? <div style={{ fontSize: '14px', lineHeight: 1.55, color: COLOR.muted, marginTop: '8px' }}><GlossText text={card.back} pool={pool} max={2} blockId="dv" /></div>
+            : <div style={{ fontSize: '12.5px', color: COLOR.muted, marginTop: '2px' }}>Tap to reveal the definition</div>}
+        </div>
+      )}
+      {revealed && <div style={{ fontSize: '11.5px', color: COLOR.muted, marginTop: '8px' }}>New term tomorrow.</div>}
     </div>
+  );
+}
+
+// The two daily items (question of the day, vocab of the day) share one folded card, so Home
+// carries one line for them instead of two blocks. `question` = { q, stored, onAnswer } and
+// `vocab` = { card, revealed, onReveal, pool }; either may be missing.
+function HomeDailyCard({ trackLabel, question, vocab }) {
+  const [tab, setTab] = useState(question ? 'question' : 'vocab');
+  const total = (question ? 1 : 0) + (vocab ? 1 : 0);
+  const done = (question && question.stored ? 1 : 0) + (vocab && vocab.revealed ? 1 : 0);
+  if (!total) return null;
+  const tabs = [question && { key: 'question', label: 'Question of the day', badge: question.stored ? '✓' : '' }, vocab && { key: 'vocab', label: 'Vocab of the day', badge: vocab.revealed ? '✓' : '' }].filter(Boolean);
+  return (
+    <Disclosure label={`Daily · ${trackLabel}`} summary={done === total ? 'all done today' : `${done} of ${total} done`} hue={COLOR.gold} style={{ marginBottom: '14px' }}>
+      {tabs.length > 1 && <SegmentedControl options={tabs} value={tab} onChange={setTab} hue={COLOR.gold} style={{ marginBottom: '12px' }} />}
+      {tab === 'question' && question
+        ? <DailyQuestionBody q={question.q} stored={question.stored} onAnswer={question.onAnswer} />
+        : <DailyVocabBody card={vocab.card} revealed={vocab.revealed} onReveal={vocab.onReveal} pool={vocab.pool} />}
+    </Disclosure>
   );
 }
 
@@ -593,7 +602,7 @@ function readinessProjectionMessage(projection, trackLabel) {
 // — opened from the header's hamburger button now (available from any
 // mode, not just Home) rather than duplicated inline here — this view is
 // for seeing and jumping, not editing.
-function CertPathHomeSection({ pathOrder, results, certPlan, studyingKey, pathProgressByTrack, onSelectTrack }) {
+function CertPathHomeSection({ pathOrder, results, certPlan, studyingKey, pathProgressByTrack, onSelectTrack, browse }) {
   return (
     <div className="mb-4">
       <div style={{ fontSize: '12px', color: COLOR.muted, fontWeight: 600, marginBottom: '8px' }}>Your certs ({pathOrder.length})</div>
@@ -636,6 +645,17 @@ function CertPathHomeSection({ pathOrder, results, certPlan, studyingKey, pathPr
           </button>
         );
       })}
+      {browse && (
+        <TrackListDropdown
+          quiet
+          tracks={browse.tracks}
+          masteries={browse.masteries}
+          certPlan={certPlan}
+          onSelectTrack={onSelectTrack}
+          onAddToPath={browse.onAddToPath}
+          label={`Browse all tracks (${browse.tracks.length})`}
+        />
+      )}
     </div>
   );
 }
@@ -648,7 +668,7 @@ function CertPathHomeSection({ pathOrder, results, certPlan, studyingKey, pathPr
 // for that split. Reachable again from any track's Learn/Quiz/Exam view
 // via the header's home icon; the header's hamburger (Manage cert path)
 // is reachable from every mode including this one.
-function HomeView({ tracks, results, seenLog, stats, certPlan, speech, srs, makePathApi, onSetHomePathMode, onSetHomePathOrder, onSetReviewReminder, onReviewStarted, onResume, onSelectTrack, onAddToPath, onOpenAbout, onOpenGlossary, onOpenPlayground, onOpenWeak, onSetGoalTarget, onAnswerDailyQuestion, onRevealDailyVocab, footerNote }) {
+function HomeView({ tracks, results, seenLog, stats, certPlan, speech, srs, makePathApi, onSetHomePathMode, onSetHomePathOrder, onReviewStarted, onResume, onSelectTrack, onAddToPath, onOpenAbout, onOpenGlossary, onOpenPlayground, onOpenWeak, onSetGoalTarget, onAnswerDailyQuestion, onRevealDailyVocab, footerNote }) {
   const masteries = tracks.map((t) => ({ track: t, pct: trackMastery(t.key, results) }));
   const overallAvg = masteries.length ? Math.round(masteries.reduce((s, m) => s + m.pct, 0) / masteries.length) : 0;
   const lastVisited = stats.lastVisited;
@@ -717,12 +737,51 @@ function HomeView({ tracks, results, seenLog, stats, certPlan, speech, srs, make
   const [homeRun, setHomeRun] = useState(null);
   const startHomeRun = (e) => setHomeRun({ kind: 'step', trackKey: e.trackKey, doneKey: e.doneKey, unit: e.unit, step: e.step, nonce: Date.now() });
   const skipHomeStep = (e) => makePathApi(e.doneKey || e.trackKey).skipStep(e.step.id);
-  const weakSummaries = useMemo(
-    () => weakSummaryForTracks(pathKeys, results, seenLog, srs, stats.missLog, todayString()),
+  const weakAll = useMemo(
+    () => weakAnalyzeMany(pathKeys, results, seenLog, srs, stats.missLog, todayString()),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [pathKeys.join(','), results, srs, stats.missLog],
   );
+  // One cert in the plan: its own Path tab holds the weak path. Several: one cross-cert path lives here.
+  const weakScope = pathKeys.length > 1 ? 'mix' : (pathKeys[0] || null);
+  const weakSaved = weakScope ? ((stats.weakPath || {})[weakScope] || null) : null;
+  const weakInfo = useMemo(() => {
+    const certs = [];
+    weakAll.units.forEach((r) => {
+      const label = (tracks.find((t) => t.key === r.trackKey) || { label: r.trackKey }).label;
+      if (!certs.includes(label)) certs.push(label);
+    });
+    let path = null;
+    if (weakSaved) {
+      const wu = buildWeakUnitsFor(weakScope, weakSaved.snapshot);
+      const eff = weakEffectiveDone(wu, weakSaved.snapshot, results, weakScope, weakSaved.done, todayString());
+      const prog = pathOverallProgress(wu, eff.done);
+      if (prog.total) path = { done: prog.done, total: prog.total };
+    }
+    return { lessons: weakAll.units.length, critical: weakAll.units.filter((r) => r.tier === 'critical').length, certs, path };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [weakAll, weakSaved, results]);
 
+  if (homeRun && homeRun.kind === 'weakpath') {
+    return (
+      <WeakSubjectsView
+        key={homeRun.nonce}
+        scopeKey="mix"
+        trackKeys={pathKeys}
+        title="Your certs"
+        resultsAll={results}
+        seenLogAll={seenLog}
+        srs={srs}
+        missLog={stats.missLog}
+        saved={(stats.weakPath || {}).mix || null}
+        speech={speech}
+        api={makePathApi('mix')}
+        makeApi={makePathApi}
+        onExit={() => setHomeRun(null)}
+        exitLabel="‹ Back to Home"
+      />
+    );
+  }
   if (homeRun && homeRun.kind !== 'step') {
     return (
       <HomeReviewRun
@@ -786,19 +845,16 @@ function HomeView({ tracks, results, seenLog, stats, certPlan, speech, srs, make
       )}
 
       {pathOrder.length > 0 && (
-        <HomeReviewCard
+        <HomeReviewHub
           weakTotal={weakTotal}
           toughTotal={toughTotal}
           gamesTotal={gamesTotal}
           casesTotal={casesTotal}
           reminder={stats.reviewReminder}
-          onSetReminder={onSetReviewReminder}
+          weakInfo={weakInfo}
           onStartReview={(kind) => { onReviewStarted(); setHomeRun({ kind, nonce: Date.now() }); }}
+          onOpenWeak={() => (pathKeys.length > 1 ? setHomeRun({ kind: 'weakpath', nonce: Date.now() }) : onOpenWeak(pathKeys[0]))}
         />
-      )}
-
-      {pathOrder.length > 0 && weakSummaries.length > 0 && (
-        <HomeWeakSpotsCard summaries={weakSummaries} trackLabel={(k) => (tracks.find((t) => t.key === k) || { label: k }).label} onOpen={onOpenWeak} />
       )}
 
       {/* The path hero already shows the up-next track's own readiness, so
@@ -821,6 +877,31 @@ function HomeView({ tracks, results, seenLog, stats, certPlan, speech, srs, make
         </div>
       )}
 
+      {resumeTrack && (
+        <button
+          onClick={onResume}
+          className="btn-flat"
+          style={{
+            width: '100%', textAlign: 'left', marginBottom: '14px', padding: '10px 14px', borderRadius: 'var(--r-card)',
+            background: 'transparent', border: `1px solid ${COLOR.border}`, borderLeft: `3px solid ${trackAccent(resumeTrack.key)}`,
+            display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px',
+          }}
+        >
+          <span style={{ minWidth: 0 }}>
+            <span style={{ display: 'block', fontSize: '11px', color: COLOR.muted }}>Continue where you left off</span>
+            <span style={{ display: 'block', fontSize: '14px', fontWeight: 600, color: ink(trackAccent(resumeTrack.key)), marginTop: '1px' }}>
+              {resumeTrack.label} · {MODE_LABELS[lastVisited.mode] || 'Path'}{resumeViewLabel ? ` · ${resumeViewLabel}` : ''}
+            </span>
+            {resumeStep && (
+              <span style={{ display: 'block', fontSize: '11.5px', color: COLOR.muted, marginTop: '2px' }}>
+                Next up: Unit {resumeStep.unit.index + 1} · {resumeStep.step.label}
+              </span>
+            )}
+          </span>
+          <span style={{ color: COLOR.muted, fontSize: '16px', flexShrink: 0 }}>›</span>
+        </button>
+      )}
+
       {pathOrder.length > 0 ? (
         <CertPathHomeSection
           pathOrder={pathOrder}
@@ -829,6 +910,7 @@ function HomeView({ tracks, results, seenLog, stats, certPlan, speech, srs, make
           studyingKey={studyingKey}
           pathProgressByTrack={pathProgressByTrack}
           onSelectTrack={onSelectTrack}
+          browse={{ tracks, masteries, onAddToPath }}
         />
       ) : (
         <div className="mb-4">
@@ -847,91 +929,41 @@ function HomeView({ tracks, results, seenLog, stats, certPlan, speech, srs, make
         </div>
       )}
 
-      {resumeTrack && (
-        <button
-          onClick={onResume}
-          style={{
-            width: '100%', textAlign: 'left', marginBottom: '14px', padding: '14px 16px', borderRadius: 'var(--r-card)',
-            background: `${trackAccent(resumeTrack.key)}1F`, border: `1px solid ${trackAccent(resumeTrack.key)}`,
-            boxShadow: SHADOW.card,
-          }}
-        >
-          <div style={{ fontSize: '11px', color: COLOR.muted, marginBottom: '2px' }}>Continue where you left off</div>
-          <div style={{ fontSize: '15px', fontWeight: 600, color: ink(trackAccent(resumeTrack.key)) }}>
-            {resumeTrack.label} · {MODE_LABELS[lastVisited.mode] || 'Path'}{resumeViewLabel ? ` · ${resumeViewLabel}` : ''}
-          </div>
-          {resumeStep && (
-            <div style={{ fontSize: '12px', color: COLOR.muted, marginTop: '3px' }}>
-              Next up: Unit {resumeStep.unit.index + 1} · {resumeStep.step.label}
-            </div>
-          )}
-        </button>
-      )}
+      <HomeDailyCard
+        trackLabel={focusLabel}
+        question={dailyQuestion ? {
+          q: dailyQuestion,
+          stored: storedQuestion,
+          onAnswer: (isCorrect, selected) => onAnswerDailyQuestion(focusKey, dailyQuestion, isCorrect, selected),
+        } : null}
+        vocab={dailyVocab ? {
+          card: dailyVocab,
+          revealed: vocabRevealed,
+          pool: vPool.filter((v) => v.id !== dailyVocab.id),
+          onReveal: () => onRevealDailyVocab(dailyVocab),
+        } : null}
+      />
 
-      {dailyQuestion && (
-        <DailyQuestionCard
-          q={dailyQuestion}
-          trackLabel={focusLabel}
-          stored={storedQuestion}
-          onAnswer={(isCorrect, selected) => onAnswerDailyQuestion(focusKey, dailyQuestion, isCorrect, selected)}
-        />
-      )}
-
-      {dailyVocab && (
-        <DailyVocabCard
-          card={dailyVocab}
-          trackLabel={focusLabel}
-          revealed={vocabRevealed}
-          pool={vPool.filter((v) => v.id !== dailyVocab.id)}
-          onReveal={() => onRevealDailyVocab(dailyVocab)}
-        />
-      )}
-
-      {pathOrder.length > 0 && (
-        <TrackListDropdown
-          tracks={tracks}
-          masteries={masteries}
-          certPlan={certPlan}
-          onSelectTrack={onSelectTrack}
-          onAddToPath={onAddToPath}
-          label={`Browse all tracks (${tracks.length})`}
-        />
-      )}
-
-      <button
-        onClick={onOpenPlayground}
-        style={{
-          width: '100%', textAlign: 'left', marginTop: '10px', padding: '12px 14px', borderRadius: 'var(--r-card)',
-          background: tint(COLOR.success, 9), border: `1px solid color-mix(in srgb, ${COLOR.success} 35%, ${COLOR.border})`, boxShadow: SHADOW.card,
-          display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px',
-        }}
-      >
-        <div>
-          <div style={{ fontSize: '13px', fontWeight: 600, color: COLOR.text }}>IT Playground</div>
-          <div style={{ fontSize: '11.5px', color: COLOR.muted, marginTop: '1px', lineHeight: 1.4 }}>Subnet calculator, IP lab, VLANs and firewalls: try it, break it, fix it.</div>
-        </div>
-        <div style={{ color: COLOR.muted, fontSize: '15px' }}>›</div>
-      </button>
-
-      <button
-        onClick={onOpenGlossary}
-        style={{
-          width: '100%', textAlign: 'left', marginTop: '10px', padding: '12px 14px', borderRadius: 'var(--r-card)',
-          background: tint(COLOR.pink, 9), border: `1px solid color-mix(in srgb, ${COLOR.pink} 35%, ${COLOR.border})`, boxShadow: SHADOW.card,
-          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-        }}
-      >
-        <div style={{ fontSize: '13px', fontWeight: 600, color: COLOR.text }}>Glossary</div>
-        <div style={{ color: COLOR.muted, fontSize: '15px' }}>›</div>
-      </button>
-
-      <button
-        onClick={onOpenAbout}
-        className="btn-flat"
-        style={{ width: '100%', textAlign: 'center', marginTop: '10px', padding: '8px', fontSize: '11.5px', color: COLOR.muted, background: 'transparent' }}
-      >
-        About & Legal
-      </button>
+      {/* Tools and info sit in one quiet row instead of three full-width cards. */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: '8px' }}>
+        {[
+          { label: 'Playground', sub: 'Try it out', hue: COLOR.success, onClick: onOpenPlayground },
+          { label: 'Glossary', sub: 'Look it up', hue: COLOR.pink, onClick: onOpenGlossary },
+          { label: 'About', sub: 'Legal, info', hue: COLOR.muted, onClick: onOpenAbout },
+        ].map((t) => (
+          <button
+            key={t.label}
+            onClick={t.onClick}
+            className="btn-flat"
+            aria-label={t.label === 'About' ? 'About & Legal' : t.label}
+            style={{ textAlign: 'left', padding: '10px 12px', borderRadius: 'var(--r-card)', background: tint(t.hue, 7), border: `1px solid color-mix(in srgb, ${t.hue} 30%, ${COLOR.border})`, borderTop: `2px solid ${t.hue}`, minWidth: 0 }}
+          >
+            <span style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: COLOR.text }}>{t.label}</span>
+            <span style={{ display: 'block', fontSize: '11px', color: COLOR.muted, marginTop: '1px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{t.sub}</span>
+          </button>
+        ))}
+      </div>
+      <div style={{ height: '12px' }} />
       {footerNote && <div style={{ fontSize: '11.5px', color: COLOR.muted, textAlign: 'center', lineHeight: 1.45, padding: '0 8px' }}>{footerNote}</div>}
     </div>
   );

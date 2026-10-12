@@ -623,6 +623,8 @@ function PathTrailNode({ unit, step, index, done, isNext, entry, onOpen }) {
 function PathView({ track, trackKey, doneMap, unlockedMap, pathLocking, results, seenLog, categories, speech, api, toughCount, autoStart, onAutoStarted, panel, onPanel, srs, missLog, weakSaved }) {
   const units = useMemo(() => buildPathUnits(trackKey), [trackKey]);
   const weakCount = useMemo(() => weakAnalyze(trackKey, results, seenLog, srs, missLog, todayString()).units.length, [trackKey, results, srs, missLog]);
+  const resultsAll = useMemo(() => ({ [trackKey]: results }), [trackKey, results]);
+  const seenLogAll = useMemo(() => ({ [trackKey]: seenLog }), [trackKey, seenLog]);
   const [session, setSession] = useState(null);
   const [completion, setCompletion] = useState(null);
   const [expanded, setExpanded] = useState(() => {
@@ -655,8 +657,8 @@ function PathView({ track, trackKey, doneMap, unlockedMap, pathLocking, results,
   if (panel === 'weak') {
     return (
       <WeakSubjectsView
-        track={track} trackKey={trackKey} results={results} seenLog={seenLog} srs={srs} missLog={missLog} saved={weakSaved}
-        categories={categories} speech={speech} api={api} panel={panel} onPanel={onPanel}
+        scopeKey={trackKey} trackKeys={[trackKey]} title={track.label} resultsAll={resultsAll} seenLogAll={seenLogAll} srs={srs} missLog={missLog} saved={weakSaved}
+        speech={speech} api={api} makeApi={() => api} panel={panel} onPanel={onPanel}
       />
     );
   }
@@ -779,29 +781,23 @@ function PathView({ track, trackKey, doneMap, unlockedMap, pathLocking, results,
       </div>
 
       {(reviewIds.length > 0 || toughCount > 0) && (
-        <div style={{ display: 'grid', gridTemplateColumns: reviewIds.length > 0 && toughCount > 0 ? 'repeat(2, minmax(0, 1fr))' : '1fr', gap: '8px', marginBottom: '16px' }}>
+        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '12px' }}>
           {reviewIds.length > 0 && (
             <button
               onClick={startReview}
               className="btn-flat"
-              style={{ padding: '10px 12px', borderRadius: 'var(--r-card)', textAlign: 'left', border: `1px solid ${COLOR.red}`, background: 'color-mix(in srgb, var(--color-red) 10%, transparent)', color: COLOR.red, minWidth: 0 }}
+              style={{ padding: '7px 12px', borderRadius: 'var(--r-ctl)', border: `1px solid ${COLOR.red}`, background: 'color-mix(in srgb, var(--color-red) 8%, transparent)', color: COLOR.red, fontSize: '12.5px', fontWeight: 700 }}
             >
-              <span style={{ display: 'block', fontSize: '13px', fontWeight: 800 }}>Review weak spots</span>
-              <span style={{ display: 'block', fontSize: '11.5px', fontWeight: 600, opacity: 0.9 }}>
-                {reviewIds.length} question{reviewIds.length === 1 ? '' : 's'} missed
-              </span>
+              Review weak spots · {reviewIds.length}
             </button>
           )}
           {toughCount > 0 && (
             <button
               onClick={api.openToughTerms}
               className="btn-flat"
-              style={{ padding: '10px 12px', borderRadius: 'var(--r-card)', textAlign: 'left', border: `1px solid ${COLOR.gold}`, background: 'color-mix(in srgb, var(--color-gold) 10%, transparent)', color: COLOR.gold, minWidth: 0 }}
+              style={{ padding: '7px 12px', borderRadius: 'var(--r-ctl)', border: `1px solid ${COLOR.gold}`, background: 'color-mix(in srgb, var(--color-gold) 8%, transparent)', color: COLOR.gold, fontSize: '12.5px', fontWeight: 700 }}
             >
-              <span style={{ display: 'block', fontSize: '13px', fontWeight: 800 }}>Tough terms</span>
-              <span style={{ display: 'block', fontSize: '11.5px', fontWeight: 600, opacity: 0.9 }}>
-                {toughCount} flashcard{toughCount === 1 ? '' : 's'} to revisit
-              </span>
+              Tough terms · {toughCount}
             </button>
           )}
         </div>
@@ -878,7 +874,7 @@ function PathView({ track, trackKey, doneMap, unlockedMap, pathLocking, results,
                 )}
               </div>
             ) : (
-              unit.summary && <div style={{ fontSize: '12.5px', color: COLOR.muted, padding: '2px 6px 0', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{unit.summary}</div>
+              unit.summary && !locked && <div style={{ fontSize: '12.5px', color: COLOR.muted, padding: '2px 6px 0', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{unit.summary}</div>
             )}
           </div>
         );

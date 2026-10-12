@@ -11,72 +11,72 @@ function QuizSetup({ length, setLength, types, toggleType, onReroll, poolSize, m
   const typeSummary = typeNames.length === 3 ? 'all types' : typeNames.join(', ');
   return (
     <div style={{ marginBottom: '14px' }}>
-      {missedCount > 0 && (
+      {/* One control row (the options summary and "New quiz"); the detail opens on demand. */}
+      <div style={{ display: 'flex', gap: '8px', alignItems: 'stretch' }}>
         <button
-          onClick={onReviewMissed}
-          style={{ width: '100%', marginBottom: '10px', padding: '10px', borderRadius: 'var(--r-card)', border: `1px solid ${COLOR.red}`, background: 'color-mix(in srgb, var(--color-red) 10%, transparent)', color: COLOR.red, fontSize: '13px', fontWeight: 600 }}
+          onClick={() => setOptionsOpen((o) => !o)}
+          aria-expanded={optionsOpen}
+          className="btn-flat"
+          style={{ flex: 1, minWidth: 0, textAlign: 'left', padding: '8px 12px', border: `1px solid ${COLOR.border}`, borderRadius: 'var(--r-ctl)', background: COLOR.surface, color: COLOR.text, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px' }}
         >
-          Review {missedCount} missed question{missedCount === 1 ? '' : 's'}
+          <span style={{ fontSize: '12px', minWidth: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+            <span style={{ color: COLOR.muted }}>Options: </span>
+            <span style={{ fontWeight: 600 }}>{length} questions · {typeSummary}</span>
+          </span>
+          <span style={{ fontSize: '11px', color: COLOR.muted, flexShrink: 0 }}>{optionsOpen ? '▴' : '▾'}</span>
         </button>
-      )}
-      <div className="flex justify-between items-center mb-2">
-        <div style={{ fontSize: '11px', color: COLOR.muted }}>
-          {poolSize} questions{isMixed ? ' · mixed across every category on purpose' : ''}
-        </div>
         <button
           onClick={onReroll}
-          style={{ fontSize: '11px', color: COLOR.primary, background: 'transparent', padding: '4px 8px', borderRadius: 'var(--r-ctl)', border: `1px solid ${COLOR.primary}`, flexShrink: 0 }}
+          style={{ fontSize: '12px', fontWeight: 600, color: COLOR.primary, background: 'transparent', padding: '0 12px', borderRadius: 'var(--r-ctl)', border: `1px solid ${COLOR.primary}`, flexShrink: 0 }}
         >
           New quiz
         </button>
       </div>
-      <div style={{ border: `1px solid ${COLOR.border}`, borderRadius: 'var(--r-card)', background: COLOR.surface, overflow: 'hidden' }}>
-        <button
-          onClick={() => setOptionsOpen((o) => !o)}
-          className="btn-flat"
-          style={{ width: '100%', textAlign: 'left', padding: '9px 12px', background: 'transparent', color: COLOR.text, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px' }}
-        >
-          <span style={{ fontSize: '12px' }}>
-            <span style={{ color: COLOR.muted }}>Options: </span>
-            <span style={{ fontWeight: 600 }}>{length} questions · {typeSummary}</span>
-          </span>
-          <span style={{ fontSize: '11px', color: COLOR.muted }}>{optionsOpen ? '▴' : '▾'}</span>
-        </button>
-        {optionsOpen && (
-          <div style={{ padding: '4px 12px 12px', borderTop: `1px solid ${COLOR.border}` }}>
-            <div className="flex items-center gap-2" style={{ margin: '10px 0' }}>
-              <label htmlFor="quiz-length-select" style={{ fontSize: '11px', color: COLOR.muted }}>Length</label>
-              <select
-                id="quiz-length-select"
-                value={length}
-                onChange={(e) => setLength(Number(e.target.value))}
+      {optionsOpen && (
+        <div style={{ marginTop: '8px', padding: '4px 12px 12px', border: `1px solid ${COLOR.border}`, borderRadius: 'var(--r-card)', background: COLOR.surface }}>
+          <div style={{ fontSize: '11px', color: COLOR.muted, margin: '8px 0 0' }}>
+            {poolSize} questions in this pool{isMixed ? ' · mixed across every category on purpose' : ''}
+          </div>
+          <div className="flex items-center gap-2" style={{ margin: '10px 0' }}>
+            <label htmlFor="quiz-length-select" style={{ fontSize: '11px', color: COLOR.muted }}>Length</label>
+            <select
+              id="quiz-length-select"
+              value={length}
+              onChange={(e) => setLength(Number(e.target.value))}
+              style={{
+                padding: '6px 10px', borderRadius: 'var(--r-ctl)', fontSize: '12.5px', fontWeight: 600,
+                border: `1px solid ${COLOR.border}`, background: COLOR.surface, color: COLOR.text,
+              }}
+            >
+              {lengths.map((n) => <option key={n} value={n}>{n} questions</option>)}
+            </select>
+          </div>
+          <div className="flex gap-2" style={{ flexWrap: 'wrap' }}>
+            {[['mc', 'Multiple choice'], ['ms', 'Multi-select'], ['tf', 'True / False']].map(([key, label]) => (
+              <button
+                key={key}
+                onClick={() => toggleType(key)}
                 style={{
-                  padding: '6px 10px', borderRadius: 'var(--r-ctl)', fontSize: '12.5px', fontWeight: 600,
-                  border: `1px solid ${COLOR.border}`, background: COLOR.surface, color: COLOR.text,
+                  flexShrink: 0, padding: '6px 12px', borderRadius: 'var(--r-pill)', fontSize: '12px', fontWeight: 500,
+                  border: `1px solid ${types[key] ? COLOR.gold : COLOR.border}`,
+                  background: types[key] ? 'color-mix(in srgb, var(--color-gold) 14%, transparent)' : COLOR.surface,
+                  color: types[key] ? COLOR.gold : COLOR.muted,
                 }}
               >
-                {lengths.map((n) => <option key={n} value={n}>{n} questions</option>)}
-              </select>
-            </div>
-            <div className="flex gap-2" style={{ flexWrap: 'wrap' }}>
-              {[['mc', 'Multiple choice'], ['ms', 'Multi-select'], ['tf', 'True / False']].map(([key, label]) => (
-                <button
-                  key={key}
-                  onClick={() => toggleType(key)}
-                  style={{
-                    flexShrink: 0, padding: '6px 12px', borderRadius: 'var(--r-pill)', fontSize: '12px', fontWeight: 500,
-                    border: `1px solid ${types[key] ? COLOR.gold : COLOR.border}`,
-                    background: types[key] ? 'color-mix(in srgb, var(--color-gold) 14%, transparent)' : COLOR.surface,
-                    color: types[key] ? COLOR.gold : COLOR.muted,
-                  }}
-                >
-                  {label}
-                </button>
-              ))}
-            </div>
+                {label}
+              </button>
+            ))}
           </div>
-        )}
-      </div>
+        </div>
+      )}
+      {missedCount > 0 && (
+        <button
+          onClick={onReviewMissed}
+          style={{ width: '100%', marginTop: '8px', padding: '7px 10px', borderRadius: 'var(--r-ctl)', border: `1px solid ${COLOR.red}`, background: 'color-mix(in srgb, var(--color-red) 8%, transparent)', color: COLOR.red, fontSize: '12.5px', fontWeight: 600 }}
+        >
+          Review {missedCount} missed question{missedCount === 1 ? '' : 's'}
+        </button>
+      )}
     </div>
   );
 }
@@ -90,6 +90,13 @@ function VerbalQuizPanel({
   speechSupported, phase, session, index, step, length, setLength, pauseSec, setPauseSec,
   poolSize, categories, onStart, onTogglePause, onSkip, onRestart,
 }) {
+  // A cue as the session starts and as it ends (celebration sounds, off by default).
+  const prevPhase = useRef(phase);
+  useEffect(() => {
+    if (prevPhase.current === 'setup' && phase !== 'setup' && phase !== 'complete') playCueSound('start');
+    if (prevPhase.current !== 'complete' && phase === 'complete') playCueSound('end');
+    prevPhase.current = phase;
+  }, [phase]);
   if (!speechSupported) {
     return (
       <div style={{ textAlign: 'center', color: COLOR.muted, fontSize: '13px', padding: '30px 10px' }}>
@@ -435,7 +442,7 @@ function MadLibsView({ session, index, score, categories, answers, onSetBlank, s
 // steps in the correct order yourself (type them, or tap suggestions from the
 // step bank drawn from this cert's own challenges). Saved per cert and played
 // alongside the built-in challenges; see validateScenario in 03_helpers.js.
-function ScenarioBuilder({ trackKey, bankSteps, scenarios, onSave, onDelete, onPractice, onClose }) {
+function ScenarioBuilder({ trackKey, stepLists, scenarios, onSave, onDelete, onPractice, onClose }) {
   const [title, setTitle] = useState('');
   const [steps, setSteps] = useState(['', '', '']);
   const [note, setNote] = useState('');
@@ -462,7 +469,11 @@ function ScenarioBuilder({ trackKey, bankSteps, scenarios, onSave, onDelete, onP
   };
   const edit = (x) => { setTitle(x.title); setSteps([...x.steps]); setNote(x.note || ''); setEditingId(x.id); setError(null); window.scrollTo({ top: 0, behavior: 'instant' }); };
   const field = { width: '100%', padding: '9px 11px', borderRadius: 'var(--r-ctl)', border: `1px solid ${COLOR.border}`, background: COLOR.surface, color: COLOR.text, fontSize: '13px' };
-  const bank = (bankSteps || []).filter((x) => !bankQuery.trim() || x.toLowerCase().includes(bankQuery.trim().toLowerCase())).slice(0, 40);
+  // The bank holds the learner's own steps first, then the cert's built-in ones; after each step typed,
+  // "ideas" offers what usually came next in the scenarios already known.
+  const bankSteps = useMemo(() => buildStepBank(stepLists, trackKey), [stepLists, trackKey]);
+  const bank = bankSteps.filter((x) => !bankQuery.trim() || x.text.toLowerCase().includes(bankQuery.trim().toLowerCase())).slice(0, 40);
+  const ideas = suggestNextSteps(steps, stepLists, 3);
   const small = { padding: '4px 8px', borderRadius: 'var(--r-ctl)', border: `1px solid ${COLOR.border}`, background: 'transparent', color: COLOR.muted, fontSize: '12px', fontWeight: 700 };
   return (
     <div>
@@ -492,13 +503,23 @@ function ScenarioBuilder({ trackKey, bankSteps, scenarios, onSave, onDelete, onP
           <button onClick={() => setBankOpen((o) => !o)} aria-expanded={bankOpen} className="btn-flat" style={small}>{bankOpen ? 'Hide step bank ▴' : `Step bank (${bankSteps.length}) ▾`}</button>
         )}
       </div>
+      {ideas.length > 0 && (
+        <div style={{ marginBottom: '10px' }}>
+          <div style={{ fontSize: '11px', color: COLOR.muted, marginBottom: '5px' }}>What usually comes next</div>
+          <div className="flex gap-2" style={{ flexWrap: 'wrap' }}>
+            {ideas.map((x) => (
+              <button key={x.text} onClick={() => addFromBank(x.text)} className="btn-flat" style={{ textAlign: 'left', padding: '6px 10px', borderRadius: 'var(--r-pill)', border: `1px solid ${x.mine ? COLOR.primary : COLOR.border}`, background: x.mine ? tint(COLOR.primary, 8) : COLOR.surfaceRaised, color: COLOR.text, fontSize: '12px', lineHeight: 1.35 }}>+ {x.text}</button>
+            ))}
+          </div>
+        </div>
+      )}
       {bankOpen && (
         <div style={{ border: `1px solid ${COLOR.border}`, borderRadius: 'var(--r-card)', padding: '10px', marginBottom: '10px', background: COLOR.surface }}>
-          <div style={{ fontSize: '11.5px', color: COLOR.muted, marginBottom: '6px' }}>Steps from this cert's built-in challenges. Tap one to add it to your scenario, then reorder.</div>
+          <div style={{ fontSize: '11.5px', color: COLOR.muted, marginBottom: '6px' }}>Steps from your own scenarios first, then this cert's built-in challenges. Tap one to add it to your scenario, then reorder.</div>
           <input value={bankQuery} onChange={(e) => setBankQuery(e.target.value)} placeholder="Search the bank…" aria-label="Search the step bank" style={{ ...field, marginBottom: '8px' }} />
           <div className="flex flex-col gap-1" style={{ maxHeight: '220px', overflowY: 'auto' }}>
             {bank.map((x) => (
-              <button key={x} onClick={() => addFromBank(x)} className="btn-flat" style={{ textAlign: 'left', padding: '7px 10px', borderRadius: 'var(--r-ctl)', border: `1px solid ${COLOR.border}`, background: COLOR.surfaceRaised, color: COLOR.text, fontSize: '12px', lineHeight: 1.4 }}>+ {x}</button>
+              <button key={x.text} onClick={() => addFromBank(x.text)} className="btn-flat" style={{ textAlign: 'left', padding: '7px 10px', borderRadius: 'var(--r-ctl)', border: `1px solid ${x.mine ? COLOR.primary : COLOR.border}`, background: COLOR.surfaceRaised, color: COLOR.text, fontSize: '12px', lineHeight: 1.4 }}>+ {x.text}{x.mine && <span className="mono" style={{ marginLeft: '6px', fontSize: '10px', color: ink(COLOR.primary) }}>yours</span>}</button>
             ))}
             {!bank.length && <div style={{ fontSize: '12px', color: COLOR.muted, padding: '6px' }}>No steps match.</div>}
           </div>
@@ -679,19 +700,18 @@ function PracticeToolPicker({ quizView, available, onSelect }) {
     g.items.push(t);
   });
   return (
-    <div style={{ marginBottom: '14px', position: 'relative' }}>
+    <div style={{ marginBottom: '10px', position: 'relative' }}>
       <button
         onClick={() => setOpen((o) => !o)}
         style={{
-          width: '100%', textAlign: 'left', padding: '10px 14px', borderRadius: 'var(--r-card)',
+          width: '100%', textAlign: 'left', padding: '9px 14px', borderRadius: 'var(--r-card)',
           border: `1px solid ${COLOR.border}`, background: COLOR.surface, color: COLOR.text,
           display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px',
         }}
       >
-        <span style={{ minWidth: 0 }}>
-          <span style={{ display: 'block', fontSize: '11px', color: COLOR.muted, textTransform: 'uppercase', letterSpacing: '0.04em', fontWeight: 600 }}>Practice tool</span>
-          <span style={{ display: 'block', fontSize: '14.5px', fontWeight: 600 }}>{current.label}</span>
-          <span style={{ display: 'block', fontSize: '11.5px', color: COLOR.muted, marginTop: '1px' }}>{current.desc}</span>
+        <span style={{ minWidth: 0, display: 'flex', alignItems: 'baseline', gap: '10px' }} title={current.desc}>
+          <span style={{ fontSize: '10.5px', color: COLOR.muted, textTransform: 'uppercase', flexShrink: 0 }}>Practice tool</span>
+          <span style={{ fontSize: '14.5px', fontWeight: 600 }}>{current.label}</span>
         </span>
         <span style={{ fontSize: '12px', color: COLOR.muted, flexShrink: 0 }}>{open ? '▴' : '▾'}</span>
       </button>
@@ -1031,6 +1051,7 @@ function CaseStudySetup({ list, onStart, categories }) {
 
 function CaseStudyView({ list, activeIndex, onStart, onExit, categories, question, qIndex, selected, onChoose, msPending, onToggleMs, onSubmitMs, onNext, phase, score, answers, flashcardsData }) {
   useScrollTopOnChange(qIndex);
+  useCelebrateWhen(activeIndex !== null && phase === 'complete', () => (score && score.total > 0 && score.correct === score.total ? 'great' : 'ok'));
   if (activeIndex === null) {
     return <CaseStudySetup list={list} onStart={onStart} categories={categories} />;
   }

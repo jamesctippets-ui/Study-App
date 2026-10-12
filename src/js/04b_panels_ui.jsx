@@ -31,6 +31,53 @@ function AboutSection({ title, defaultOpen, children }) {
 // "Mine" tab of the Glossary: add, edit and delete your own terms and
 // acronyms. They appear in flyouts, the Terms and Acronyms tabs, and are saved
 // (and exported) with the rest of your progress.
+// Moves the learner's own terms and scenarios to another device as a short text code (see
+// 03f_share_bank.js): copy it here, paste it there. Folded away until asked for.
+function ShareCodePanel({ terms, scenarios, onImport }) {
+  const [code, setCode] = useState('');
+  const [msg, setMsg] = useState(null);
+  const [copied, setCopied] = useState(false);
+  const total = (terms || []).length + (scenarios || []).length;
+  const myCode = useMemo(() => (total ? encodeShareCode(terms, scenarios) : ''), [terms, scenarios]);
+  const copy = () => {
+    try {
+      navigator.clipboard.writeText(myCode).then(() => { setCopied(true); setTimeout(() => setCopied(false), 1800); }, () => setCopied(false));
+    } catch (e) { setCopied(false); }
+  };
+  const importCode = () => {
+    const dec = decodeShareCode(code);
+    if (dec.error) { setMsg({ ok: false, text: dec.error }); return; }
+    if (!dec.terms.length && !dec.scenarios.length) { setMsg({ ok: false, text: 'That code has nothing valid in it.' }); return; }
+    const res = onImport(dec);
+    const parts = [];
+    if (res.added.terms) parts.push(`${res.added.terms} term${res.added.terms === 1 ? '' : 's'}`);
+    if (res.added.scenarios) parts.push(`${res.added.scenarios} scenario${res.added.scenarios === 1 ? '' : 's'}`);
+    const skipped = res.skipped.terms + res.skipped.scenarios + dec.invalid;
+    setMsg({ ok: parts.length > 0, text: `${parts.length ? `Added ${parts.join(' and ')}.` : 'Nothing new to add.'}${skipped ? ` Skipped ${skipped} (already there, or not valid).` : ''}` });
+    if (parts.length) setCode('');
+  };
+  const field = { width: '100%', padding: '8px 10px', borderRadius: 'var(--r-ctl)', border: `1px solid ${COLOR.border}`, background: COLOR.surface, color: COLOR.text, fontSize: '12px', fontFamily: 'var(--font-mono)', resize: 'vertical' };
+  const btn = { padding: '8px 14px', borderRadius: 'var(--r-ctl)', border: `1px solid ${COLOR.primary}`, background: 'transparent', color: COLOR.primary, fontSize: '12.5px', fontWeight: 700 };
+  return (
+    <Disclosure label="Share between devices" summary={total ? `${(terms || []).length} terms, ${(scenarios || []).length} scenarios` : 'nothing to share yet'} style={{ marginTop: '14px', marginBottom: 0 }}>
+      <div style={{ fontSize: '11.5px', color: COLOR.muted, lineHeight: 1.45, marginBottom: '10px' }}>
+        Copy a code on this device and paste it on another to bring your own terms, acronyms and step-ordering scenarios along, without exporting all your progress. Nothing is uploaded: the code is just your items written as text.
+      </div>
+      <div style={{ fontSize: '12px', fontWeight: 700, marginBottom: '4px' }}>Your code</div>
+      {total ? (
+        <>
+          <textarea readOnly value={myCode} rows={3} aria-label="Your share code" onFocus={(e) => e.target.select()} style={field} />
+          <button onClick={copy} className="btn-flat" style={{ ...btn, marginTop: '6px' }}>{copied ? 'Copied ✓' : 'Copy code'}</button>
+        </>
+      ) : <div style={{ fontSize: '12px', color: COLOR.muted }}>Add a term or build a scenario first, then your code shows up here.</div>}
+      <div style={{ fontSize: '12px', fontWeight: 700, margin: '14px 0 4px' }}>Paste a code from another device</div>
+      <textarea value={code} onChange={(e) => { setCode(e.target.value); setMsg(null); }} rows={3} placeholder="CSH1.…" aria-label="Paste a share code" style={field} />
+      <button onClick={importCode} disabled={!code.trim()} className="btn-flat" style={{ ...btn, marginTop: '6px', opacity: code.trim() ? 1 : 0.5 }}>Add to my terms and scenarios</button>
+      {msg && <div role="status" style={{ marginTop: '8px', fontSize: '12px', color: msg.ok ? COLOR.success : COLOR.red, lineHeight: 1.4 }}>{msg.text}</div>}
+    </Disclosure>
+  );
+}
+
 function MyTermsEditor({ customTerms, onSave, onDelete }) {
   const [kind, setKind] = useState('term');
   const [front, setFront] = useState('');
@@ -104,7 +151,7 @@ function MyTermsEditor({ customTerms, onSave, onDelete }) {
 // doesn't require guessing which track it lives in. Computed once per
 // panel open (flashcards don't change mid-session) rather than on every
 // keystroke; the search itself just filters that fixed list.
-function GlossaryPanel({ onClose, customTerms, onSaveCustomTerm, onDeleteCustomTerm }) {
+function GlossaryPanel({ onClose, customTerms, customScenarios, onSaveCustomTerm, onDeleteCustomTerm, onImportShared }) {
   useEscapeToClose(onClose);
   SCOPE.active = '*';   // the Glossary shows everything, whichever cert it belongs to
   const [query, setQuery] = useState('');
@@ -167,7 +214,10 @@ function GlossaryPanel({ onClose, customTerms, onSaveCustomTerm, onDeleteCustomT
           ))}
         </div>
         {tab === 'mine' && (
-          <MyTermsEditor customTerms={customTerms || []} onSave={onSaveCustomTerm} onDelete={onDeleteCustomTerm} />
+          <>
+            <MyTermsEditor customTerms={customTerms || []} onSave={onSaveCustomTerm} onDelete={onDeleteCustomTerm} />
+            <ShareCodePanel terms={customTerms || []} scenarios={customScenarios || []} onImport={onImportShared} />
+          </>
         )}
         {tab !== 'mine' && <input
           value={query}
@@ -499,7 +549,7 @@ function CategoryFilterSelect({ categories, activeCat, onChange, masteryByCatego
       value={activeCat}
       onChange={(e) => onChange(e.target.value)}
       style={{
-        width: '100%', marginBottom: '18px', padding: '10px 12px', borderRadius: 'var(--r-ctl)', fontSize: '13px', fontWeight: 600,
+        width: '100%', marginBottom: '12px', padding: '9px 12px', borderRadius: 'var(--r-ctl)', fontSize: '13px', fontWeight: 600,
         border: `1px solid ${COLOR.border}`, background: COLOR.surface, color: COLOR.text,
       }}
     >

@@ -215,14 +215,14 @@ function FirewallTool({ pick, onPick }) {
   const scenario = scenarios.find((s) => s.id === pick);
   if (pick === 'sandbox') {
     return (
-      <PgSandboxShell tool="firewall" makeDefault={() => pgClone(pgData().firewallSandbox)} validate={pgFwValidTopo} onBack={() => onPick('')}
+      <PgSandboxShell tool="firewall" quiz={{ kind: 'firewall', causes: PG_FW_CAUSES }} makeDefault={() => pgClone(pgData().firewallSandbox)} validate={pgFwValidTopo} onBack={() => onPick('')}
         blurb="A working firewall with an inside network, a DMZ web server and the internet. Reorder or add rules, switch stateful inspection or NAT off, change a forward, then test connections and read which rule matched."
         renderLab={(topo, setTopo) => <PgFwLab topo={topo} setTopo={setTopo} />} />
     );
   }
   if (scenario) {
     return (
-      <PgScenarioShell key={scenario.id} tool="firewall" scenario={scenario} onBack={() => onPick('')}
+      <PgScenarioShell key={scenario.id} tool="firewall" quiz={{ kind: 'firewall', causes: PG_FW_CAUSES }} scenario={scenario} onBack={() => onPick('')}
         isSolved={(topo) => scenario.expectFixed.every((g) => pgFwTest(topo, g).verdict === g.verdict)}
         fixLines={(sc) => sc.fixText}
         renderLab={(topo, setTopo, sc) => <PgFwLab topo={topo} setTopo={setTopo} goals={sc.expectFixed} defaultAsk={sc.ask} />} />

@@ -380,6 +380,19 @@ function CertStudyApp() {
     saveStats(withActivity(current, n));
   };
 
+  // The Playground reports work worth a few daily-goal points (a scenario solved for the first time, a
+  // right answer in "Quiz me on this setup"). It counts only when switched on in Data & Progress.
+  const bumpGoalRef = useRef(null);
+  bumpGoalRef.current = bumpDailyGoal;
+  useEffect(() => {
+    const onCredit = (e) => {
+      const n = e && e.detail ? Number(e.detail.n) : 0;
+      if (statsRef.current.playgroundGoal && Number.isFinite(n) && n > 0 && bumpGoalRef.current) bumpGoalRef.current(n);
+    };
+    window.addEventListener('cert-study-pg-credit', onCredit);
+    return () => window.removeEventListener('cert-study-pg-credit', onCredit);
+  }, []);
+
   const setDailyGoalTarget = (target) => {
     const current = statsRef.current;
     saveStats({ ...current, dailyGoal: { ...current.dailyGoal, target } });
@@ -713,6 +726,13 @@ function CertStudyApp() {
       ? list.map((x) => (x.id === item.id ? { ...x, title: item.title, steps: item.steps, note: item.note } : x))
       : [...list, { id: 'sc' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6), track: item.track, title: item.title, steps: item.steps, note: item.note, at: todayString() }];
     saveStats({ ...cur, customScenarios: next });
+  };
+  // Items arriving from a share code (see 03f_share_bank.js): validated, deduplicated and merged.
+  const importSharedItems = (decoded) => {
+    const cur = statsRef.current;
+    const res = mergeSharedItems(cur.customTerms || [], cur.customScenarios || [], decoded, (prefix) => prefix + Date.now().toString(36) + Math.random().toString(36).slice(2, 6), todayString());
+    saveStats({ ...cur, customTerms: res.terms, customScenarios: res.scenarios });
+    return res;
   };
   const deleteScenario = (id) => {
     const cur = statsRef.current;
@@ -1684,7 +1704,7 @@ function CertStudyApp() {
         />
       )}
       {showAbout && <AboutLegalPanel onClose={() => setShowAbout(false)} />}
-      {showGlossary && <GlossaryPanel onClose={() => setShowGlossary(false)} customTerms={stats.customTerms || []} onSaveCustomTerm={saveCustomTerm} onDeleteCustomTerm={deleteCustomTerm} />}
+      {showGlossary && <GlossaryPanel onClose={() => setShowGlossary(false)} customTerms={stats.customTerms || []} customScenarios={stats.customScenarios || []} onSaveCustomTerm={saveCustomTerm} onDeleteCustomTerm={deleteCustomTerm} onImportShared={importSharedItems} />}
       {showCertPath && (
         <CertPathPanel
           tracks={visibleTracks}
@@ -1733,6 +1753,10 @@ function CertStudyApp() {
           onSetDyslexicFont={setDyslexicFont}
           pathLocking={stats.pathLocking !== false}
           onSetPathLocking={(on) => saveStats({ ...statsRef.current, pathLocking: on })}
+          playgroundGoal={stats.playgroundGoal === true}
+          onSetPlaygroundGoal={(on) => saveStats({ ...statsRef.current, playgroundGoal: on })}
+          reviewReminderDays={stats.reviewReminder ? stats.reviewReminder.days : REVIEW_REMINDER_DEFAULT_DAYS}
+          onSetReviewReminder={setReviewReminderDays}
         />
       )}
       <div style={{ background: `color-mix(in srgb, ${modeHue(mode)} 9%, ${COLOR.navBar})`, borderBottom: `1px solid color-mix(in srgb, ${modeHue(mode)} 45%, ${COLOR.border})`, position: 'sticky', top: 0, zIndex: 30, transition: 'background-color 0.2s ease' }}>
@@ -1830,7 +1854,6 @@ function CertStudyApp() {
             srs={srs}
             onSetHomePathMode={setHomePathMode}
             onSetHomePathOrder={setHomePathOrder}
-            onSetReviewReminder={setReviewReminderDays}
             onReviewStarted={markReviewStarted}
             onResume={() => {
               const lv = stats.lastVisited;
@@ -2089,7 +2112,7 @@ function CertStudyApp() {
             {seqBuilderOpen ? (
               <ScenarioBuilder
                 trackKey={activeTrack}
-                bankSteps={[...new Set(sequencesData.flatMap((x) => x.steps))]}
+                stepLists={[...sequencesData.map((x) => ({ steps: x.steps, mine: false, track: activeTrack })), ...(stats.customScenarios || []).map((x) => ({ steps: x.steps, mine: true, track: x.track }))]}
                 scenarios={stats.customScenarios || []}
                 onSave={saveScenario}
                 onDelete={deleteScenario}

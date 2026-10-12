@@ -483,9 +483,9 @@ def run_playground_checks():
     shipped app needs no node)."""
     node = shutil.which("node")
     if not node:
-        print("  (node not found: skipped tools/check_playground.js, check_weak_path.js, check_flyout.js and check_cards.js)")
+        print("  (node not found: skipped tools/check_playground.js, check_weak_path.js, check_flyout.js, check_cards.js and check_share.js)")
         return
-    for script in ("check_playground.js", "check_weak_path.js", "check_flyout.js", "check_cards.js"):
+    for script in ("check_playground.js", "check_weak_path.js", "check_flyout.js", "check_cards.js", "check_share.js"):
         result = subprocess.run([node, str(ROOT / "tools" / script)], capture_output=True, text=True)
         if result.returncode != 0:
             print(f"{script} failed:", file=sys.stderr)

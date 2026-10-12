@@ -291,14 +291,14 @@ function VlanTool({ pick, onPick }) {
   const scenario = scenarios.find((s) => s.id === pick);
   if (pick === 'sandbox') {
     return (
-      <PgSandboxShell tool="vlan" makeDefault={() => pgClone(pgData().vlanSandbox)} validate={pgVlanValidTopo} onBack={() => onPick('')}
+      <PgSandboxShell tool="vlan" quiz={{ kind: 'vlan', causes: PG_VLAN_CAUSES }} makeDefault={() => pgClone(pgData().vlanSandbox)} validate={pgVlanValidTopo} onBack={() => onPick('')}
         blurb="A working two-switch network with two VLANs and a router on a stick. Move a port to another VLAN, trim a trunk's allowed list, change a native VLAN, lock a port to one MAC address or turn the router port into an access port, then ping and read what each switch does."
         renderLab={(topo, setTopo) => <PgVlanLab topo={topo} setTopo={setTopo} />} />
     );
   }
   if (scenario) {
     return (
-      <PgScenarioShell key={scenario.id} tool="vlan" scenario={scenario} onBack={() => onPick('')}
+      <PgScenarioShell key={scenario.id} tool="vlan" quiz={{ kind: 'vlan', causes: PG_VLAN_CAUSES }} scenario={scenario} onBack={() => onPick('')}
         isSolved={(topo) => scenario.expectFixed.every((g) => pgVlanPing(topo, pgVlanNewState(), g.from, g.to).verdict === g.verdict)}
         fixLines={(sc) => sc.fix.map((f) => pgVlanDescribeFix(sc, f))}
         renderLab={(topo, setTopo, sc) => <PgVlanLab topo={topo} setTopo={setTopo} goals={sc.expectFixed} defaultAsk={sc.ask} />} />

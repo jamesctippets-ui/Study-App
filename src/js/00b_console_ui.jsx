@@ -30,6 +30,32 @@ function SectionLabel({ children, count, first, style }) {
   );
 }
 
+// A quiet collapsible section: a small mono label (with an optional count and a one-line
+// summary on the right) that folds its content away until asked for. This is the default way to
+// keep second-level controls and long lists from crowding a page: the page shows one line, the
+// detail opens on demand.
+function Disclosure({ label, count, summary, defaultOpen, hue, children, style, bodyStyle, onToggle }) {
+  const [open, setOpen] = useState(!!defaultOpen);
+  const on = hue || COLOR.primary;
+  const flip = () => { setOpen((o) => { if (onToggle) onToggle(!o); return !o; }); };
+  return (
+    <div style={{ border: `1px solid ${COLOR.border}`, borderRadius: 'var(--r-card)', background: COLOR.surface, marginBottom: '12px', ...style }}>
+      <button
+        onClick={flip}
+        aria-expanded={open}
+        className="btn-flat"
+        style={{ width: '100%', display: 'flex', alignItems: 'center', gap: '10px', padding: '11px 14px', background: 'transparent', border: 'none', borderRadius: 'var(--r-card)', textAlign: 'left', color: COLOR.text }}
+      >
+        <span style={{ fontSize: '10.5px', textTransform: 'uppercase', color: COLOR.muted, flexShrink: 0 }}>{label}</span>
+        {count != null && <span className="mono" style={{ fontSize: '11px', fontWeight: 700, color: ink(on), flexShrink: 0 }}>{count}</span>}
+        <span style={{ flex: 1, minWidth: 0, textAlign: 'right', fontSize: '11.5px', color: COLOR.muted, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{summary}</span>
+        <span aria-hidden="true" style={{ flexShrink: 0, fontSize: '11px', color: COLOR.muted, transform: open ? 'rotate(180deg)' : 'none', transition: 'transform 0.15s ease' }}>▾</span>
+      </button>
+      {open && <div style={{ padding: '12px 14px 14px', borderTop: `1px solid ${COLOR.border}`, ...bodyStyle }}>{children}</div>}
+    </div>
+  );
+}
+
 // Two or three options in one square row (mode switches and tab strips). The active
 // option is marked by the accent colour and a line under it.
 function SegmentedControl({ options, value, onChange, hue, fit, style }) {

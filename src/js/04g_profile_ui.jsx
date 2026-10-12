@@ -28,10 +28,10 @@ function ProfileSection({ title, hue, right, children }) {
 
 function StatTile({ label, value, sub, hue }) {
   return (
-    <div style={{ minWidth: 0, background: tint(hue, 13), border: `1px solid color-mix(in srgb, ${hue} 40%, ${COLOR.border})`, borderRadius: 'var(--r-card)', padding: '12px' }}>
-      <div style={{ fontSize: '10.5px', textTransform: 'uppercase', color: ink(hue) }}>{label}</div>
-      <div className="mono" style={{ fontSize: '24px', fontWeight: 700, lineHeight: 1.15, marginTop: '8px', letterSpacing: '-0.02em' }}>{value}</div>
-      {sub && <div style={{ fontSize: '11.5px', color: COLOR.muted, marginTop: '1px' }}>{sub}</div>}
+    <div style={{ minWidth: 0, background: tint(hue, 13), border: `1px solid color-mix(in srgb, ${hue} 40%, ${COLOR.border})`, borderRadius: 'var(--r-card)', padding: '10px' }}>
+      <div style={{ fontSize: '10px', textTransform: 'uppercase', color: ink(hue), whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{label}</div>
+      <div className="mono" style={{ fontSize: '21px', fontWeight: 700, lineHeight: 1.15, marginTop: '6px', letterSpacing: '-0.02em' }}>{value}</div>
+      {sub && <div style={{ fontSize: '11px', color: COLOR.muted, marginTop: '1px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{sub}</div>}
     </div>
   );
 }
@@ -153,25 +153,25 @@ function ProfileView({ tracks, results, seenLog, srs, stats, certPlan, achieveme
     <div>
       <ProfileHeader profile={stats.profile || { name: '', hue: 'primary' }} level={level} totalActions={totalActions} firstDay={runs.first} onSave={onSaveProfile} />
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '10px', marginBottom: '14px' }}>
-        <StatTile label="Day streak" value={`🔥 ${stats.streak.current}`} sub={`Best: ${Math.max(stats.streak.longest, stats.streak.current)} days`} hue={COLOR.orange} />
-        <StatTile label="Days studied" value={runs.days} sub={`${week} actions this week`} hue={COLOR.success} />
-        <StatTile label="Questions" value={attempted} sub={attempted ? `${Math.round((correct / attempted) * 100)}% last answered right` : 'Answer one to start'} hue={COLOR.blue} />
-        <StatTile label="Cards reviewed" value={cards} sub="in spaced repetition" hue={COLOR.teal} />
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: '8px', marginBottom: '14px' }}>
+        <StatTile label="Day streak" value={`🔥 ${stats.streak.current}`} sub={`best ${Math.max(stats.streak.longest, stats.streak.current)}d`} hue={COLOR.orange} />
+        <StatTile label="Days studied" value={runs.days} sub={`${week} this week`} hue={COLOR.success} />
+        <StatTile label="Questions" value={attempted} sub={attempted ? `${Math.round((correct / attempted) * 100)}% right` : 'none yet'} hue={COLOR.blue} />
+        <StatTile label="Cards" value={cards} sub="in review" hue={COLOR.teal} />
         <StatTile label="Path steps" value={steps} sub={`${stats.counts.matchRoundsCompleted} match rounds`} hue={COLOR.primary} />
-        <StatTile label="Exams passed" value={stats.counts.examsPassed + stats.counts.finalMocksPassed} sub={`${stats.counts.perfectQuizzes} perfect quizzes`} hue={COLOR.gold} />
+        <StatTile label="Exams passed" value={stats.counts.examsPassed + stats.counts.finalMocksPassed} sub={`${stats.counts.perfectQuizzes} perfect`} hue={COLOR.gold} />
       </div>
 
-      <ProfileSection title="Activity" hue={COLOR.success} right={<span style={{ fontSize: '11.5px', color: COLOR.muted }}>Best day: {bestDay}</span>}>
+      <Disclosure label="Activity" summary={`best day ${bestDay}`} hue={COLOR.success} style={{ marginBottom: '14px' }}>
         <ActivityMap log={log} />
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '4px', fontSize: '10.5px', color: COLOR.muted, marginTop: '8px' }}>
           Less
           {[0, 28, 52, 76, 100].map((p) => <span key={p} style={{ width: '11px', height: '11px', borderRadius: '3px', background: p === 0 ? COLOR.surfaceRaised : `color-mix(in srgb, ${COLOR.success} ${p}%, ${COLOR.surfaceRaised})` }} />)}
           More
         </div>
-      </ProfileSection>
+      </Disclosure>
 
-      <ProfileSection title="Earned certifications" hue={COLOR.gold} right={<span style={{ fontSize: '11.5px', color: COLOR.muted }}>{earned.length} earned</span>}>
+      {earned.length > 0 && <ProfileSection title="Earned certifications" hue={COLOR.gold} right={<span style={{ fontSize: '11.5px', color: COLOR.muted }}>{earned.length} earned</span>}>
         {earned.length ? (
           <div className="flex flex-col gap-2">
             {earned.map((k) => {
@@ -189,12 +189,8 @@ function ProfileView({ tracks, results, seenLog, srs, stats, certPlan, achieveme
               );
             })}
           </div>
-        ) : (
-          <div style={{ fontSize: '12.5px', color: COLOR.muted, lineHeight: 1.5 }}>
-            Passed an exam? Tap <strong>Mark as passed</strong> on a cert in your plan below and it appears here as an earned certification.
-          </div>
-        )}
-      </ProfileSection>
+        ) : null}
+      </ProfileSection>}
 
       <ProfileSection title="My plan" hue={COLOR.primary} right={<button onClick={onOpenCertPath} className="btn-flat" style={{ background: 'transparent', color: ink(COLOR.primary), fontSize: '12px', fontWeight: 800, padding: 0 }}>Manage ›</button>}>
         {active.length ? (

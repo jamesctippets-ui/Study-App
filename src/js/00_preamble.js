@@ -430,6 +430,25 @@ function playCelebrationSound(kind, force) {
   playTones(notes, kind === 'unit' ? 0.11 : 0.13, 0.55, 0.16);
 }
 
+// A short cue that marks the start or the end of the hands-free Verbal Quiz (nobody is looking at
+// the screen then). Under the celebration-sound switch like the other chimes.
+function playCueSound(kind, force) {
+  if (!force && !SOUND_STATE.enabled) return;
+  if (kind === 'start') playTones([523.25, 783.99], 0.12, 0.35, 0.14);
+  else playTones([783.99, 659.25, 523.25], 0.13, 0.5, 0.14);
+}
+
+// Plays a celebration chime once, the moment `done` turns true (never for something already done on
+// mount). `kind` is 'ok' | 'great' | 'unit', or a function returning one, read at that moment.
+function useCelebrateWhen(done, kind) {
+  const prev = useRef(done);
+  useEffect(() => {
+    if (!prev.current && done) playCelebrationSound(typeof kind === 'function' ? kind() : kind);
+    prev.current = done;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [done]);
+}
+
 // A right answer is two quick rising notes; a wrong one is a single soft,
 // low, falling tone. Deliberately quiet and brief, since it plays on every
 // answered question. `force` is for the settings test button.

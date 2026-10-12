@@ -161,5 +161,89 @@ manifest.tracks.forEach((t) => {
   ok(an.units.every((r) => r.cards.length <= E.WEAK_CARDS_PER_UNIT && r.reason.length > 10), `${t.key}: every row has cards and a reason`);
 });
 
+/* ---- scenario versus recall ---- */
+eq(E.weakQuestionKind({ question: 'What does STP stand for?' }), 'recall', 'a short stem is recall');
+eq(E.weakQuestionKind({ question: 'A technician captures traffic from a switch port and sees source and destination MAC addresses plus an EtherType field at the start of each unit. At which OSI layer is this PDU?' }), 'scenario', 'a long situation is scenario');
+eq(E.weakQuestionKind({ question: 'Your team runs a small office network with two switches and one router; which cable do you need between the switches?' }), 'scenario', 'a medium stem that talks about "your team" is scenario');
+{
+  const mk = (kind) => ({ id: `qq-${kind}`, kind });
+  const short = DATA.ccna.questions.find((x) => E.weakQuestionKind(x) === 'recall');
+  const long = DATA.ccna.questions.find((x) => E.weakQuestionKind(x) === 'scenario');
+  ok(short && long, 'real content has both kinds');
+  const lessonOf = (qq) => units.find((u) => u.poolIds.includes(qq.id));
+  const ra = E.weakAnalyze(track, { [short.id]: 'incorrect' }, {}, {}, { [track]: { [short.id]: { m: 1, c: 0, l: TODAY } } }, TODAY);
+  const rb = E.weakAnalyze(track, { [long.id]: 'incorrect' }, {}, {}, { [track]: { [long.id]: { m: 1, c: 0, l: TODAY } } }, TODAY);
+  const rowOf = (an, qq) => (an.units.find((u) => u.unit.id === (lessonOf(qq) || {}).id) || { score: 0 });
+  ok(rowOf(rb, long).score > rowOf(ra, short).score || rowOf(rb, long).score === 0, 'a missed scenario question weighs more than a missed recall one');
+}
+
+/* ---- the same analysis across certs ---- */
+{
+  const resAll = { ccna: results, cissp: {} };
+  const cissp = DATA.cissp;
+  const lg = { ccna: missLog.ccna, cissp: {} };
+  cissp.questions.slice(0, 12).forEach((x, i) => { resAll.cissp[x.id] = 'incorrect'; lg.cissp[x.id] = { m: 1 + (i % 3), c: 0, l: '2026-10-08' }; });
+  const many = E.weakAnalyzeMany(['ccna', 'cissp'], resAll, {}, {}, lg, TODAY);
+  ok(many.hasData && many.units.length >= 2, 'both certs contribute weak lessons');
+  ok(many.units.every((r) => r.trackKey === 'ccna' || r.trackKey === 'cissp'), 'every weak lesson says which cert it is from');
+  ok(many.units.every((r, i, arr) => i === 0 || arr[i - 1].order >= r.order), 'ranked together, most urgent first');
+  eq(many.units[0].tier, 'critical', 'the strongest lesson of the whole set is top priority');
+  eq(many.totals.missed, many.units.reduce((n, r) => n + r.missed.length, 0), 'totals add up');
+  const one = E.weakAnalyzeMany(['ccna'], { ccna: results }, {}, {}, missLog, TODAY);
+  eq(one.units.map((r) => r.unit.id), E.weakAnalyze('ccna', results, {}, {}, missLog, TODAY).units.map((r) => r.unit.id), 'one cert gives the same ranking as the single-cert analysis');
+  // a mixed snapshot spreads across certs
+  const sn = E.buildWeakSnapshot(many, TODAY, 6, 2);
+  ok(sn.units.length >= 2 && sn.units.every((u) => typeof u.trackKey === 'string'), 'mixed snapshot units carry their cert');
+  ok(['ccna', 'cissp'].every((k) => sn.units.filter((u) => u.trackKey === k).length <= 2), 'no cert takes more than the cap');
+  const wp = E.createWeakPath({}, 'mix', sn);
+  const norm = E.normalizeWeakPath(JSON.parse(JSON.stringify(wp)));
+  eq(norm.mix.snapshot.units.map((u) => u.trackKey), sn.units.map((u) => u.trackKey), 'normalize keeps each unit\'s cert');
+  eq(Object.keys(E.normalizeWeakPath({ mix: { snapshot: { created: TODAY, units: [{ lessonId: 'x', missedIds: [] }] }, done: {} } })), [], 'a mixed path without certs on its units is dropped');
+  // legacy single-cert snapshots (no trackKey) still load, and gain the cert from their key
+  const legacy = E.normalizeWeakPath({ ccna: { snapshot: { created: TODAY, units: [{ lessonId: units[3].id, missedIds: [] }] }, done: {} } });
+  eq(legacy.ccna.snapshot.units[0].trackKey, 'ccna', 'legacy snapshots take their cert from the key');
+  const mu = E.buildWeakUnitsFor('mix', sn);
+  ok(mu.length === sn.units.length && mu.every((u, i) => u.index === i && u.id.startsWith(`${u.trackKey}::`) && u.steps.every((st) => st.id.startsWith(`weak::${u.trackKey}::`))), 'mixed units and steps are prefixed with their cert');
+  const su = E.buildWeakUnitsFor('ccna', E.buildWeakSnapshot(a, TODAY));
+  ok(su.every((u) => u.steps.every((st) => /^weak::[^:]+::[a-z]+$/.test(st.id))), 'single-cert step ids keep their old shape (saved progress still matches)');
+  // outcome across certs
+  const outMix = E.weakPathOutcome(sn, resAll, 'mix');
+  ok(outMix.baseline > 0 && outMix.fixed === 0, 'nothing is fixed yet in a mixed path');
+}
+
+/* ---- a weak lesson retires itself once its misses are answered correctly ---- */
+{
+  const sn = E.buildWeakSnapshot(E.weakAnalyze(track, results, {}, {}, missLog, TODAY), TODAY);
+  const wu = E.buildWeakUnitsFor(track, sn);
+  const before = E.weakEffectiveDone(wu, sn, { [track]: results }, track, {}, TODAY);
+  eq(before.retired.size, 0, 'nothing retires while the misses are still wrong');
+  const fixed = { ...results };
+  sn.units[0].missedIds.forEach((id) => { fixed[id] = 'correct'; });
+  const after = E.weakEffectiveDone(wu, sn, { [track]: fixed }, track, {}, TODAY);
+  ok(after.retired.has(wu[0].id), 'the lesson whose misses are all correct now retires');
+  ok(wu[0].steps.every((st) => after.done[st.id] && after.done[st.id].via === 'mastered'), 'all its steps count as done (mastered)');
+  const half = { ...results };
+  half[sn.units[0].missedIds[0]] = 'correct';
+  eq(E.weakEffectiveDone(wu, sn, { [track]: half }, track, {}, TODAY).retired.has(wu[0].id), false, 'one fixed question is not enough');
+  const keep = E.weakEffectiveDone(wu, sn, { [track]: fixed }, track, { [wu[0].steps[0].id]: { at: '2026-10-01', pct: 80, via: null } }, TODAY);
+  eq(keep.done[wu[0].steps[0].id].pct, 80, 'a step you already did keeps its own record');
+  const cardsOnly = { created: TODAY, units: [{ ...sn.units[0], missedIds: [] }] };
+  eq(E.weakEffectiveDone(E.buildWeakUnitsFor(track, cardsOnly), cardsOnly, { [track]: fixed }, track, {}, TODAY).retired.size, 0, 'lessons flagged only by cards or games never retire this way');
+}
+
+/* ---- the missed-question history ---- */
+{
+  const ids = q(lessonA).slice(0, 4);
+  const log = { [track]: { [ids[0]]: { m: 2, c: 0, l: '2026-10-09' }, [ids[1]]: { m: 1, c: 1, l: '2026-10-05' }, [ids[2]]: { m: 3, c: 0, l: '2026-10-09' }, gone: { m: 1, c: 0, l: '2026-10-01' } } };
+  const res = { [ids[0]]: 'incorrect', [ids[1]]: 'correct', [ids[3]]: 'incorrect' };
+  const h = E.missedHistory([track], { [track]: res }, log);
+  eq(h.length, 4, 'questions that no longer exist are dropped');
+  eq(h.map((x) => x.q.id), [ids[2], ids[0], ids[1], ids[3]], 'newest miss first, ties by how often it was missed, undated last');
+  eq(h.map((x) => x.state), ['wrong', 'wrong', 'fixed', 'wrong'], 'wrong until answered correctly; unanswered counts as wrong');
+  eq([h[3].misses, h[3].last], [1, null], 'a wrong answer from before the miss log still counts, as one undated miss');
+  eq(E.missedHistory(['cissp'], {}, log), [], 'only the asked-for certs are listed');
+  eq(E.missedHistory([track], {}, {}), [], 'an empty log gives an empty history');
+}
+
 if (failures) { console.error(`\n${failures} of ${checks} weak-path checks failed`); process.exit(1); }
 console.log(`weak-subjects engine: ${checks} checks passed`);

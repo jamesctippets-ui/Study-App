@@ -19,6 +19,9 @@ const WEAK_FIX_QUESTIONS = 10;
 const WEAK_FRESH_QUESTIONS = 3;      // new questions mixed in with the misses
 const WEAK_RETEST_QUESTIONS = 6;
 const WEAK_PASS_PCT = 70;
+// Scenario questions (a situation, then "what should you do") are worth a little more than short recall
+// ones: missing them says the idea did not transfer. The weights are small on purpose.
+const WEAK_KIND_WEIGHT = { scenario: 1.15, recall: 0.85 };
 const WEAK_TIERS = ['critical', 'high', 'watch'];
 const WEAK_TIER_LABEL = { critical: 'Top priority', high: 'Needs work', watch: 'Keep an eye on' };
 
@@ -82,6 +85,15 @@ function weakCardRelevance(card, tokenSet, haystack) {
   return s;
 }
 
+/* ---- scenario or recall ---- */
+
+function weakQuestionKind(q) {
+  const stem = String((q && q.question) || '');
+  if (stem.length >= 170) return 'scenario';
+  if (stem.length >= 110 && /\b(you|your|team|company|organization|administrator|engineer|technician|analyst|developer|users?|customer)\b/i.test(stem)) return 'scenario';
+  return 'recall';
+}
+
 /* ---- the analysis ---- */
 
 function weakTierFor(priority, max, rate, missed) {
@@ -104,6 +116,9 @@ function weakReason(row) {
   const extras = [];
   if (recent && recent !== row.missed.length) extras.push(`${recent} in the last two weeks`);
   if (repeat) extras.push(`${repeat} more than once`);
+  const scen = row.missed.filter((m) => m.kind === 'scenario').length;
+  if (row.missed.length >= 3 && scen / row.missed.length >= 0.67) extras.push('mostly scenario questions');
+  else if (row.missed.length >= 3 && (row.missed.length - scen) / row.missed.length >= 0.67) extras.push('mostly recall questions');
   if (extras.length && parts.length) parts[0] += ` (${extras.join(', ')})`;
   if (row.tough.length) parts.push(`${row.tough.length} flashcard${row.tough.length === 1 ? '' : 's'} you rated as tough`);
   if (row.games.length) parts.push(`${row.games.length} mini-game${row.games.length === 1 ? '' : 's'} you got wrong`);
@@ -153,10 +168,11 @@ function weakAnalyze(trackKey, results, seenLog, srs, missLog, today) {
       const days = e && e.l ? Math.max(0, daysBetween(e.l, today)) : null;
       const recency = days === null ? 0.85 : days <= 7 ? 1 : days <= 14 ? 0.9 : days <= 30 ? 0.8 : 0.65;
       const repeat = e ? Math.max(0, Math.min(e.m, 4) - 1) : 0;
-      const score = (1 + 0.25 * repeat) * recency;
+      const kind = weakQuestionKind(q);
+      const score = (1 + 0.25 * repeat) * recency * WEAK_KIND_WEIGHT[kind];
       c.missed += 1;
       c.score += score;
-      if (idx >= 0) { rows[idx].score += score; rows[idx].missed.push({ q, misses: e ? e.m : 1, lastMiss: e ? e.l : null, days, score }); }
+      if (idx >= 0) { rows[idx].score += score; rows[idx].missed.push({ q, misses: e ? e.m : 1, lastMiss: e ? e.l : null, days, score, kind }); }
     } else if (r === 'correct' && e && e.m > 0) {
       recovered += 1;
       if (idx >= 0) { rows[idx].score += 0.1 * Math.min(e.m, 3); rows[idx].recovered.push({ q, misses: e.m }); }
@@ -251,15 +267,53 @@ function weakAnalyze(trackKey, results, seenLog, srs, missLog, today) {
   };
 }
 
+// The same analysis across several certs at once: every weak lesson carries its trackKey and the
+// list is ranked together (priority is already scaled by each area's share of its own exam), so
+// "what should I work on across my certs" has one answer. Tiers are recomputed against the
+// strongest lesson of the whole set.
+function weakAnalyzeMany(trackKeys, resultsAll, seenLogAll, srs, missLog, today) {
+  const parts = trackKeys.map((k) => weakAnalyze(k, (resultsAll && resultsAll[k]) || {}, (seenLogAll && seenLogAll[k]) || {}, srs, missLog, today));
+  const units = [];
+  const categories = [];
+  parts.forEach((a) => {
+    a.units.forEach((r) => units.push({ ...r, trackKey: a.trackKey }));
+    a.categories.forEach((c) => categories.push({ ...c, trackKey: a.trackKey }));
+  });
+  units.sort((a, b) => b.order - a.order);
+  const max = units.length ? units[0].priority : 0;
+  units.forEach((r) => { r.tier = weakTierFor(r.priority, max, r.rate, r.missed.length); });
+  categories.sort((a, b) => b.score * (b.marks || 1) - a.score * (a.marks || 1));
+  return {
+    trackKeys: trackKeys.slice(),
+    hasData: parts.some((a) => a.hasData),
+    attempted: parts.reduce((n, a) => n + a.attempted, 0),
+    units, categories,
+    totals: {
+      missed: parts.reduce((n, a) => n + a.totals.missed, 0),
+      recovered: parts.reduce((n, a) => n + a.totals.recovered, 0),
+      tough: parts.reduce((n, a) => n + a.totals.tough, 0),
+    },
+  };
+}
+
 /* ---- the weak subjects path ---- */
 
 // A stable snapshot of the ranking: the learner works through this list even as
 // their results change, and rebuilds it when they want a fresh look.
-function buildWeakSnapshot(analysis, today, limit) {
-  const picks = analysis.units.slice(0, limit || WEAK_MAX_UNITS);
+function buildWeakSnapshot(analysis, today, limit, perTrackCap) {
+  const taken = {};
+  const picks = [];
+  analysis.units.forEach((r) => {
+    if (picks.length >= (limit || WEAK_MAX_UNITS)) return;
+    const tk = r.trackKey || analysis.trackKey;
+    if (perTrackCap && (taken[tk] || 0) >= perTrackCap) return;
+    taken[tk] = (taken[tk] || 0) + 1;
+    picks.push(r);
+  });
   return {
     created: today,
     units: picks.map((r) => ({
+      trackKey: r.trackKey || analysis.trackKey,
       lessonId: r.unit.id,
       tier: r.tier,
       priority: Math.round(r.priority * 100) / 100,
@@ -281,7 +335,8 @@ function normalizeWeakPath(raw) {
     const snap = e && e.snapshot;
     if (!snap || typeof snap !== 'object' || !Array.isArray(snap.units) || !snap.units.length) return;
     const strs = (a) => (Array.isArray(a) ? a.filter((x) => typeof x === 'string').slice(0, 60) : []);
-    const units = snap.units.slice(0, 12).filter((u) => u && typeof u.lessonId === 'string').map((u) => ({
+    const units = snap.units.slice(0, 12).filter((u) => u && typeof u.lessonId === 'string' && (tk !== 'mix' || typeof u.trackKey === 'string')).map((u) => ({
+      trackKey: typeof u.trackKey === 'string' ? u.trackKey : tk,
       lessonId: u.lessonId,
       tier: WEAK_TIERS.includes(u.tier) ? u.tier : 'high',
       priority: Number.isFinite(u.priority) ? u.priority : 0,
@@ -360,11 +415,56 @@ function buildWeakUnits(trackKey, snapshot) {
   return out;
 }
 
+// Like buildWeakUnits, for a path that may span several certs (scope 'mix'). Each unit
+// remembers its trackKey and lessonId; in a mixed path the unit and step ids are prefixed with
+// the cert so two certs' lessons can never collide.
+function buildWeakUnitsFor(scopeKey, snapshot) {
+  if (!snapshot) return [];
+  const multi = scopeKey === 'mix';
+  const out = [];
+  snapshot.units.forEach((su) => {
+    const tk = su.trackKey || scopeKey;
+    const built = buildWeakUnits(tk, { units: [su] })[0];
+    if (!built) return;
+    out.push({
+      ...built,
+      id: multi ? `${tk}::${built.id}` : built.id,
+      lessonId: built.id,
+      trackKey: tk,
+      index: out.length,
+      steps: built.steps.map((st) => ({ ...st, id: multi ? st.id.replace('weak::', `weak::${tk}::`) : st.id, trackKey: tk })),
+    });
+  });
+  return out;
+}
+
+// A weak lesson retires itself once every question that put it on the list is answered correctly
+// again (answered anywhere: Practice, the course path, an exam), so the path never makes you redo a
+// lesson you have already fixed. Lessons flagged only by flashcards or games never retire this way.
+// Returns the effective progress map: your own `done` plus every step of a retired lesson.
+function weakEffectiveDone(units, snapshot, resultsAll, scopeKey, done, today) {
+  const retired = new Set();
+  const merged = { ...(done || {}) };
+  if (!snapshot) return { done: merged, retired };
+  const byLesson = new Map(snapshot.units.map((su) => [`${su.trackKey || scopeKey}::${su.lessonId}`, su]));
+  units.forEach((u) => {
+    const su = byLesson.get(`${u.trackKey}::${u.lessonId}`);
+    if (!su || !su.missedIds.length) return;
+    const tr = (resultsAll && resultsAll[u.trackKey]) || {};
+    if (!su.missedIds.every((id) => tr[id] === 'correct')) return;
+    retired.add(u.id);
+    u.steps.forEach((st) => { if (!merged[st.id]) merged[st.id] = { at: today || null, pct: null, via: 'mastered' }; });
+  });
+  return { done: merged, retired };
+}
+
 // How much of what the path set out to fix is actually fixed now.
-function weakPathOutcome(snapshot, results) {
-  const tr = results || {};
+function weakPathOutcome(snapshot, results, scopeKey) {
+  // `results` is one cert's results, or (for a mixed path) the results of every cert keyed by trackKey.
+  const trOf = (su) => (scopeKey === 'mix' ? ((results && results[su.trackKey]) || {}) : (results || {}));
   const units = snapshot.units.map((su) => {
-    const now = su.missedIds.filter((id) => tr[id] === 'incorrect').length;
+    const tr = trOf(su);
+    const now = su.missedIds.filter((id) => tr[id] !== 'correct').length;
     return { lessonId: su.lessonId, baseline: su.missedIds.length, now, fixed: Math.max(0, su.missedIds.length - now) };
   });
   return {
@@ -373,6 +473,31 @@ function weakPathOutcome(snapshot, results) {
     now: units.reduce((n, u) => n + u.now, 0),
     fixed: units.reduce((n, u) => n + u.fixed, 0),
   };
+}
+
+// Every question you have missed in these certs, newest miss first. `state` is 'wrong' while your
+// latest answer is still wrong (or the question has not been answered since) and 'fixed' once it
+// is correct again. A question whose latest answer is wrong but that predates the miss log still
+// counts (as one miss, with no date). Entries whose question no longer exists are dropped.
+function missedHistory(trackKeys, resultsAll, missLog) {
+  const out = [];
+  trackKeys.forEach((tk) => {
+    const mod = DATA[tk];
+    const log = (missLog && missLog[tk]) || {};
+    if (!mod) return;
+    const byId = new Map(mod.questions.map((q) => [q.id, q]));
+    const tr = (resultsAll && resultsAll[tk]) || {};
+    const ids = new Set(Object.keys(log));
+    Object.keys(tr).forEach((id) => { if (tr[id] === 'incorrect') ids.add(id); });
+    ids.forEach((id) => {
+      const q = byId.get(id);
+      const e = log[id];
+      if (!q) return;
+      out.push({ trackKey: tk, q, misses: e && e.m ? e.m : 1, correct: e ? e.c || 0 : 0, last: e ? e.l || null : null, state: tr[id] === 'correct' ? 'fixed' : 'wrong' });
+    });
+  });
+  out.sort((a, b) => (b.last || '').localeCompare(a.last || '') || b.misses - a.misses || (a.q.id < b.q.id ? -1 : 1));
+  return out;
 }
 
 // For the Home card: the top weak lessons of each cert in the plan.

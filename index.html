@@ -652,6 +652,25 @@ function playCelebrationSound(kind, force) {
   playTones(notes, kind === 'unit' ? 0.11 : 0.13, 0.55, 0.16);
 }
 
+// A short cue that marks the start or the end of the hands-free Verbal Quiz (nobody is looking at
+// the screen then). Under the celebration-sound switch like the other chimes.
+function playCueSound(kind, force) {
+  if (!force && !SOUND_STATE.enabled) return;
+  if (kind === 'start') playTones([523.25, 783.99], 0.12, 0.35, 0.14);
+  else playTones([783.99, 659.25, 523.25], 0.13, 0.5, 0.14);
+}
+
+// Plays a celebration chime once, the moment `done` turns true (never for something already done on
+// mount). `kind` is 'ok' | 'great' | 'unit', or a function returning one, read at that moment.
+function useCelebrateWhen(done, kind) {
+  const prev = useRef(done);
+  useEffect(() => {
+    if (!prev.current && done) playCelebrationSound(typeof kind === 'function' ? kind() : kind);
+    prev.current = done;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [done]);
+}
+
 // A right answer is two quick rising notes; a wrong one is a single soft,
 // low, falling tone. Deliberately quiet and brief, since it plays on every
 // answered question. `force` is for the settings test button.
@@ -717,6 +736,32 @@ function SectionLabel({ children, count, first, style }) {
     <div style={{ fontSize: '10.5px', textTransform: 'uppercase', color: COLOR.muted, margin: first ? '2px 2px 9px' : '22px 2px 9px', display: 'flex', alignItems: 'center', gap: '8px', ...style }}>
       <span>{children}</span>
       {count != null && <span style={{ color: COLOR.primary }}>{count}</span>}
+    </div>
+  );
+}
+
+// A quiet collapsible section: a small mono label (with an optional count and a one-line
+// summary on the right) that folds its content away until asked for. This is the default way to
+// keep second-level controls and long lists from crowding a page: the page shows one line, the
+// detail opens on demand.
+function Disclosure({ label, count, summary, defaultOpen, hue, children, style, bodyStyle, onToggle }) {
+  const [open, setOpen] = useState(!!defaultOpen);
+  const on = hue || COLOR.primary;
+  const flip = () => { setOpen((o) => { if (onToggle) onToggle(!o); return !o; }); };
+  return (
+    <div style={{ border: `1px solid ${COLOR.border}`, borderRadius: 'var(--r-card)', background: COLOR.surface, marginBottom: '12px', ...style }}>
+      <button
+        onClick={flip}
+        aria-expanded={open}
+        className="btn-flat"
+        style={{ width: '100%', display: 'flex', alignItems: 'center', gap: '10px', padding: '11px 14px', background: 'transparent', border: 'none', borderRadius: 'var(--r-card)', textAlign: 'left', color: COLOR.text }}
+      >
+        <span style={{ fontSize: '10.5px', textTransform: 'uppercase', color: COLOR.muted, flexShrink: 0 }}>{label}</span>
+        {count != null && <span className="mono" style={{ fontSize: '11px', fontWeight: 700, color: ink(on), flexShrink: 0 }}>{count}</span>}
+        <span style={{ flex: 1, minWidth: 0, textAlign: 'right', fontSize: '11.5px', color: COLOR.muted, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{summary}</span>
+        <span aria-hidden="true" style={{ flexShrink: 0, fontSize: '11px', color: COLOR.muted, transform: open ? 'rotate(180deg)' : 'none', transition: 'transform 0.15s ease' }}>▾</span>
+      </button>
+      {open && <div style={{ padding: '12px 14px 14px', borderTop: `1px solid ${COLOR.border}`, ...bodyStyle }}>{children}</div>}
     </div>
   );
 }
@@ -6405,6 +6450,7 @@ function emptyStats() {
     categoryMasteryHistory: {},
     path: {},
     pathLocking: true,
+    playgroundGoal: false,
     customTerms: [],
     customScenarios: [],
     pathVersion: PATH_PROGRESS_VERSION,
@@ -6440,6 +6486,7 @@ function normalizeStats(raw) {
     categoryMasteryHistory: raw.categoryMasteryHistory && typeof raw.categoryMasteryHistory === 'object' ? raw.categoryMasteryHistory : {},
     path: normalizePathStats(raw.path),
     pathLocking: raw.pathLocking !== false,
+    playgroundGoal: raw.playgroundGoal === true,
     customTerms: normalizeCustomTerms(raw.customTerms),
     customScenarios: normalizeCustomScenarios(raw.customScenarios),
     pathVersion: Number.isFinite(raw.pathVersion) ? raw.pathVersion : 0,
@@ -10948,6 +10995,227 @@ function pgNsgApplyFixes(topo, fixes) {
   return t;
 }
 
+/* ---------------- IT Playground: "Quiz me on this setup" ---------------- */
+
+// Pure (no React, no DOM; tested in Node by tools/checks/quizme.js). Builds a short multiple-choice
+// quiz from the network the learner has on screen. Every answer comes from the same engine calls the
+// labs themselves use (pgPing, pgVlanPing, pgFwTest, pgSubnetInfo ...), so a question can never
+// disagree with what the lab would show.
+//
+// A question is { id, kind, prompt, options: [text], correct: index, explain }.
+// kind 'ipconfig' | 'vlan' | 'firewall'. `opts` = { count (default 5), seed, causes } where `causes`
+// is the lab's own diagnosis-code -> plain-language-cause map (PG_IP_CAUSES and friends).
+
+const PG_QUIZ_COUNT = 5;
+
+// A small seeded random generator (mulberry32) so a round is repeatable in tests.
+function pgQuizRng(seed) {
+  let a = (seed >>> 0) || 1;
+  return () => {
+    a = (a + 0x6D2B79F5) >>> 0;
+    let t = a;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+function pgQuizShuffle(list, rnd) {
+  const a = list.slice();
+  for (let i = a.length - 1; i > 0; i -= 1) {
+    const j = Math.floor(rnd() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+// The correct answer plus up to three different wrong ones, in a random order.
+function pgQuizChoices(correct, wrongs, rnd) {
+  const seen = new Set([String(correct)]);
+  const picked = [];
+  pgQuizShuffle(wrongs, rnd).forEach((w) => {
+    const s = String(w);
+    if (!seen.has(s) && picked.length < 3) { seen.add(s); picked.push(s); }
+  });
+  const options = pgQuizShuffle([String(correct)].concat(picked), rnd);
+  return { options, correct: options.indexOf(String(correct)) };
+}
+
+// Every ordered pair [a, b] from two lists, a !== b.
+function pgQuizPairs(from, to) {
+  const out = [];
+  from.forEach((a) => to.forEach((b) => { if (a.id !== b.id) out.push([a, b]); }));
+  return out;
+}
+
+/* ---- IP configuration lab ---- */
+
+const PG_QUIZ_PING_OPTIONS = [
+  'Yes, it works in both directions',
+  'No: the request never reaches it',
+  'No: the request arrives but the reply cannot get back',
+  'Only some of the time (two devices share an address)',
+];
+
+function pgQuizPingChoice(verdict, code) {
+  if (verdict === 'success') return 0;
+  if (verdict === 'unreliable') return 3;
+  return code === 'reply-lost' ? 2 : 1;
+}
+
+function pgQuizBuildIp(topo, rnd, count) {
+  const hosts = topo.hosts || [];
+  const devs = hosts.concat(topo.routers || []);
+  const out = [];
+  // Ping questions: up to two, from different pairs.
+  pgQuizShuffle(pgQuizPairs(hosts, devs), rnd).slice(0, 2).forEach(([a, b]) => {
+    const r = pgPing(topo, a.id, b.id);
+    out.push({
+      id: `ip-ping-${a.id}-${b.id}`, kind: 'ipconfig',
+      prompt: `Will a ping from ${a.name} reach ${b.name}?`,
+      options: PG_QUIZ_PING_OPTIONS.slice(), correct: pgQuizPingChoice(r.verdict, r.diagnosis && r.diagnosis.code),
+      explain: `${r.summary}${r.diagnosis ? ` ${r.diagnosis.text}` : ''}`,
+    });
+  });
+  // Subnet questions: one host each, only for valid addresses.
+  const usable = pgQuizShuffle(hosts.filter((h) => { const v = pgDeviceView(h, false)[0]; return v.ipN !== null && v.prefix !== null && v.prefix <= 30; }), rnd);
+  const makers = [
+    (h, info) => ({ tag: 'net', prompt: `${h.name} has ${h.ip} with mask ${h.mask}. What is the network address of its subnet?`, right: info.networkText, wrong: [info.broadcastText, info.firstText, info.lastText], explain: `Writing the address and the mask in binary and keeping only the network bits gives ${info.networkText}. ${info.broadcastText} is the broadcast address (all host bits 1).` }),
+    (h, info) => ({ tag: 'bc', prompt: `${h.name} has ${h.ip} with mask ${h.mask}. What is the broadcast address of its subnet?`, right: info.broadcastText, wrong: [info.networkText, info.firstText, info.lastText], explain: `The broadcast address sets every host bit to 1: ${info.broadcastText}. ${info.networkText} is the network address (all host bits 0).` }),
+    (h, info) => ({ tag: 'hosts', prompt: `How many usable host addresses does ${h.name}'s subnet (${info.networkText}/${info.prefix}) have?`, right: String(info.usable), wrong: [String(info.usable + 2), String(Math.max(1, info.usable - 1)), String(info.usable * 2 + 2), String(info.usable + 1)], explain: `${info.total} addresses in the block, minus the network and broadcast addresses, leaves ${info.usable} usable hosts.` }),
+    (h, info) => ({ tag: 'first', prompt: `What is the first usable host address in ${h.name}'s subnet (${info.networkText}/${info.prefix})?`, right: info.firstText, wrong: [info.networkText, info.lastText, info.broadcastText], explain: `The first usable host is one above the network address: ${info.firstText}.` }),
+  ];
+  usable.forEach((h, i) => {
+    if (out.length >= count) return;
+    const v = pgDeviceView(h, false)[0];
+    const info = pgSubnetInfo(v.ipN, v.prefix);
+    const q = makers[(i + Math.floor(rnd() * makers.length)) % makers.length](h, { ...info, prefix: v.prefix });
+    const c = pgQuizChoices(q.right, q.wrong, rnd);
+    out.push({ id: `ip-${q.tag}-${h.id}`, kind: 'ipconfig', prompt: q.prompt, options: c.options, correct: c.correct, explain: q.explain });
+  });
+  return out;
+}
+
+/* ---- VLAN playground ---- */
+
+const PG_QUIZ_VLAN_PING_OPTIONS = [
+  'Yes, it works in both directions',
+  'No: the request never reaches it',
+  'No: the request arrives but the reply cannot get back',
+];
+
+function pgQuizBuildVlan(topo, rnd, count, causes) {
+  const hosts = topo.hosts || [];
+  const out = [];
+  const state = pgVlanNewState();
+  pgQuizShuffle(pgQuizPairs(hosts, hosts), rnd).slice(0, 2).forEach(([a, b]) => {
+    const r = pgVlanPing(topo, state, a.id, b.id);
+    const code = r.diagnosis && r.diagnosis.code;
+    out.push({
+      id: `vlan-ping-${a.id}-${b.id}`, kind: 'vlan',
+      prompt: `Will a ping from ${a.name} reach ${b.name}?`,
+      options: PG_QUIZ_VLAN_PING_OPTIONS.slice(), correct: r.verdict === 'success' ? 0 : code === 'reply-lost' ? 2 : 1,
+      explain: `${r.summary}${r.diagnosis ? ` ${r.diagnosis.text}` : ''}`,
+    });
+    // For a failure with a known cause, ask for that cause too (the first problem the trace reports).
+    if (r.verdict !== 'success' && code && causes && causes[code] && out.length < count) {
+      const wrong = Object.keys(causes).filter((c) => c !== code).map((c) => causes[c]);
+      const c = pgQuizChoices(causes[code], wrong, rnd);
+      out.push({ id: `vlan-why-${a.id}-${b.id}`, kind: 'vlan', prompt: `The ping from ${a.name} to ${b.name} fails. Which problem does the lab's trace report first?`, options: c.options, correct: c.correct, explain: `${r.diagnosis.title}. ${r.diagnosis.text}` });
+    }
+  });
+  // Which VLAN is a host's access port in?
+  pgQuizShuffle(hosts, rnd).forEach((h) => {
+    if (out.length >= count) return;
+    const v = pgVlanOf(topo, h);
+    if (v === null || Number.isNaN(v)) return;
+    const vlans = [];
+    (topo.switches || []).forEach((s) => (s.vlans || []).concat([1]).forEach((x) => { if (!vlans.includes(x)) vlans.push(x); }));
+    const c = pgQuizChoices(`VLAN ${v}`, vlans.map((x) => `VLAN ${x}`).concat([`VLAN ${v + 10}`, `VLAN ${v + 20}`]), rnd);
+    out.push({ id: `vlan-of-${h.id}`, kind: 'vlan', prompt: `${h.name} is plugged into ${h.switch} port ${h.port}. Which VLAN is it in?`, options: c.options, correct: c.correct, explain: `Port ${h.port} on ${h.switch} is configured for VLAN ${v}, so ${h.name}'s frames belong to VLAN ${v}.` });
+  });
+  // Does a trunk allow a VLAN?
+  const trunks = [];
+  (topo.switches || []).forEach((s) => s.ports.forEach((p) => { if (p.mode === 'trunk') trunks.push({ s, p }); }));
+  pgQuizShuffle(trunks, rnd).forEach(({ s, p }) => {
+    if (out.length >= count) return;
+    const known = [];
+    (topo.switches || []).forEach((x) => (x.vlans || []).forEach((v) => { if (!known.includes(v)) known.push(v); }));
+    if (!known.length) return;
+    const v = known[Math.floor(rnd() * known.length)];
+    const allowed = pgVlanCarries(p, v);
+    out.push({
+      id: `vlan-trunk-${s.id}-${p.id}-${v}`, kind: 'vlan', prompt: `Trunk port ${p.id} on ${s.name || s.id}: does it carry VLAN ${v}?`,
+      options: ['Yes, VLAN ' + v + ' is allowed on this trunk', 'No, VLAN ' + v + ' is not in the trunk\'s allowed list'], correct: allowed ? 0 : 1,
+      explain: allowed ? `VLAN ${v} is in the allowed list, so its frames cross the trunk.` : `VLAN ${v} is not in the allowed list, so its frames are not sent across this trunk.`,
+    });
+  });
+  return out;
+}
+
+/* ---- firewall tester ---- */
+
+const PG_QUIZ_FW_OPTIONS = [
+  'Yes, the connection works',
+  'No: a rule denies it',
+  'No: no rule allows it (the implicit deny)',
+  'No: the firewall lets it through but nothing is listening',
+  'No: something else stops it (translation, return traffic, routing)',
+];
+
+function pgQuizFwConnections(topo) {
+  const hosts = topo.hosts || [];
+  const out = [];
+  hosts.forEach((src) => {
+    hosts.forEach((dst) => {
+      if (src.id === dst.id) return;
+      (dst.services || []).forEach((s) => out.push({ from: src.id, to: dst.id, proto: s.proto, port: s.port, src, dst }));
+    });
+    // The firewall's public address with a port-forward.
+    ((topo.fw && topo.fw.forwards) || []).forEach((f) => out.push({ from: src.id, to: 'fw-public', proto: f.proto, port: f.extPort, src, dst: { name: 'the firewall\'s public address' } }));
+  });
+  return out;
+}
+
+function pgQuizBuildFw(topo, rnd, count) {
+  const out = [];
+  const conns = pgQuizShuffle(pgQuizFwConnections(topo), rnd);
+  const label = (c) => `${c.src.name} to ${c.dst.name} on ${c.proto.toUpperCase()} ${c.port}`;
+  conns.slice(0, 2).forEach((c) => {
+    const r = pgFwTest(topo, { from: c.from, to: c.to, proto: c.proto, port: c.port });
+    const code = r.diagnosis && r.diagnosis.code;
+    const correct = r.verdict === 'success' ? 0 : code === 'rule-denied' ? 1 : code === 'implicit-deny' ? 2 : code === 'refused' ? 3 : 4;
+    out.push({ id: `fw-conn-${c.from}-${c.to}-${c.proto}-${c.port}`, kind: 'firewall', prompt: `Will this connection work: ${label(c)}?`, options: PG_QUIZ_FW_OPTIONS.slice(), correct, explain: r.summary + (r.diagnosis ? ` ${r.diagnosis.text}` : '') });
+  });
+  // Which rule decides it? Only for traffic that really goes through the rule list.
+  const ruleCount = ((topo.fw && topo.fw.rules) || []).length;
+  conns.slice(2).forEach((c) => {
+    if (out.length >= count || ruleCount < 2) return;
+    const r = pgFwTest(topo, { from: c.from, to: c.to, proto: c.proto, port: c.port });
+    const code = r.diagnosis && r.diagnosis.code;
+    const idx = r.matched ? topo.fw.rules.findIndex((x) => x.id === r.matched) : -1;
+    if (!(idx >= 0 || code === 'implicit-deny')) return;
+    const names = topo.fw.rules.slice(0, 6).map((_, i) => `Rule ${i + 1}`).concat(['None: the implicit deny drops it']);
+    const right = idx >= 0 ? `Rule ${idx + 1}` : 'None: the implicit deny drops it';
+    const c2 = pgQuizChoices(right, names, rnd);
+    out.push({ id: `fw-rule-${c.from}-${c.to}-${c.proto}-${c.port}`, kind: 'firewall', prompt: `Which rule decides this connection: ${label(c)}?`, options: c2.options, correct: c2.correct, explain: r.steps.filter((s) => /^Rule \d|Rules, top to bottom/.test(s.text)).map((s) => s.text).join(' ') || r.summary });
+  });
+  return out;
+}
+
+/* ---- entry point ---- */
+
+// A round of up to `count` questions about this topology (fewer when the network is too small).
+function pgQuizBuild(kind, topo, opts) {
+  const o = opts || {};
+  const count = o.count || PG_QUIZ_COUNT;
+  const rnd = pgQuizRng(o.seed === undefined ? 1 : o.seed);
+  const list = kind === 'vlan' ? pgQuizBuildVlan(topo, rnd, count, o.causes)
+    : kind === 'firewall' ? pgQuizBuildFw(topo, rnd, count)
+      : pgQuizBuildIp(topo, rnd, count);
+  return pgQuizShuffle(list, rnd).slice(0, count);
+}
+
 /* ---------------- Spanning Tree lab (Playground tool key: stp) ---------------- */
 
 // topo = {
@@ -12144,6 +12412,9 @@ const WEAK_FIX_QUESTIONS = 10;
 const WEAK_FRESH_QUESTIONS = 3;      // new questions mixed in with the misses
 const WEAK_RETEST_QUESTIONS = 6;
 const WEAK_PASS_PCT = 70;
+// Scenario questions (a situation, then "what should you do") are worth a little more than short recall
+// ones: missing them says the idea did not transfer. The weights are small on purpose.
+const WEAK_KIND_WEIGHT = { scenario: 1.15, recall: 0.85 };
 const WEAK_TIERS = ['critical', 'high', 'watch'];
 const WEAK_TIER_LABEL = { critical: 'Top priority', high: 'Needs work', watch: 'Keep an eye on' };
 
@@ -12207,6 +12478,15 @@ function weakCardRelevance(card, tokenSet, haystack) {
   return s;
 }
 
+/* ---- scenario or recall ---- */
+
+function weakQuestionKind(q) {
+  const stem = String((q && q.question) || '');
+  if (stem.length >= 170) return 'scenario';
+  if (stem.length >= 110 && /\b(you|your|team|company|organization|administrator|engineer|technician|analyst|developer|users?|customer)\b/i.test(stem)) return 'scenario';
+  return 'recall';
+}
+
 /* ---- the analysis ---- */
 
 function weakTierFor(priority, max, rate, missed) {
@@ -12229,6 +12509,9 @@ function weakReason(row) {
   const extras = [];
   if (recent && recent !== row.missed.length) extras.push(`${recent} in the last two weeks`);
   if (repeat) extras.push(`${repeat} more than once`);
+  const scen = row.missed.filter((m) => m.kind === 'scenario').length;
+  if (row.missed.length >= 3 && scen / row.missed.length >= 0.67) extras.push('mostly scenario questions');
+  else if (row.missed.length >= 3 && (row.missed.length - scen) / row.missed.length >= 0.67) extras.push('mostly recall questions');
   if (extras.length && parts.length) parts[0] += ` (${extras.join(', ')})`;
   if (row.tough.length) parts.push(`${row.tough.length} flashcard${row.tough.length === 1 ? '' : 's'} you rated as tough`);
   if (row.games.length) parts.push(`${row.games.length} mini-game${row.games.length === 1 ? '' : 's'} you got wrong`);
@@ -12278,10 +12561,11 @@ function weakAnalyze(trackKey, results, seenLog, srs, missLog, today) {
       const days = e && e.l ? Math.max(0, daysBetween(e.l, today)) : null;
       const recency = days === null ? 0.85 : days <= 7 ? 1 : days <= 14 ? 0.9 : days <= 30 ? 0.8 : 0.65;
       const repeat = e ? Math.max(0, Math.min(e.m, 4) - 1) : 0;
-      const score = (1 + 0.25 * repeat) * recency;
+      const kind = weakQuestionKind(q);
+      const score = (1 + 0.25 * repeat) * recency * WEAK_KIND_WEIGHT[kind];
       c.missed += 1;
       c.score += score;
-      if (idx >= 0) { rows[idx].score += score; rows[idx].missed.push({ q, misses: e ? e.m : 1, lastMiss: e ? e.l : null, days, score }); }
+      if (idx >= 0) { rows[idx].score += score; rows[idx].missed.push({ q, misses: e ? e.m : 1, lastMiss: e ? e.l : null, days, score, kind }); }
     } else if (r === 'correct' && e && e.m > 0) {
       recovered += 1;
       if (idx >= 0) { rows[idx].score += 0.1 * Math.min(e.m, 3); rows[idx].recovered.push({ q, misses: e.m }); }
@@ -12376,15 +12660,53 @@ function weakAnalyze(trackKey, results, seenLog, srs, missLog, today) {
   };
 }
 
+// The same analysis across several certs at once: every weak lesson carries its trackKey and the
+// list is ranked together (priority is already scaled by each area's share of its own exam), so
+// "what should I work on across my certs" has one answer. Tiers are recomputed against the
+// strongest lesson of the whole set.
+function weakAnalyzeMany(trackKeys, resultsAll, seenLogAll, srs, missLog, today) {
+  const parts = trackKeys.map((k) => weakAnalyze(k, (resultsAll && resultsAll[k]) || {}, (seenLogAll && seenLogAll[k]) || {}, srs, missLog, today));
+  const units = [];
+  const categories = [];
+  parts.forEach((a) => {
+    a.units.forEach((r) => units.push({ ...r, trackKey: a.trackKey }));
+    a.categories.forEach((c) => categories.push({ ...c, trackKey: a.trackKey }));
+  });
+  units.sort((a, b) => b.order - a.order);
+  const max = units.length ? units[0].priority : 0;
+  units.forEach((r) => { r.tier = weakTierFor(r.priority, max, r.rate, r.missed.length); });
+  categories.sort((a, b) => b.score * (b.marks || 1) - a.score * (a.marks || 1));
+  return {
+    trackKeys: trackKeys.slice(),
+    hasData: parts.some((a) => a.hasData),
+    attempted: parts.reduce((n, a) => n + a.attempted, 0),
+    units, categories,
+    totals: {
+      missed: parts.reduce((n, a) => n + a.totals.missed, 0),
+      recovered: parts.reduce((n, a) => n + a.totals.recovered, 0),
+      tough: parts.reduce((n, a) => n + a.totals.tough, 0),
+    },
+  };
+}
+
 /* ---- the weak subjects path ---- */
 
 // A stable snapshot of the ranking: the learner works through this list even as
 // their results change, and rebuilds it when they want a fresh look.
-function buildWeakSnapshot(analysis, today, limit) {
-  const picks = analysis.units.slice(0, limit || WEAK_MAX_UNITS);
+function buildWeakSnapshot(analysis, today, limit, perTrackCap) {
+  const taken = {};
+  const picks = [];
+  analysis.units.forEach((r) => {
+    if (picks.length >= (limit || WEAK_MAX_UNITS)) return;
+    const tk = r.trackKey || analysis.trackKey;
+    if (perTrackCap && (taken[tk] || 0) >= perTrackCap) return;
+    taken[tk] = (taken[tk] || 0) + 1;
+    picks.push(r);
+  });
   return {
     created: today,
     units: picks.map((r) => ({
+      trackKey: r.trackKey || analysis.trackKey,
       lessonId: r.unit.id,
       tier: r.tier,
       priority: Math.round(r.priority * 100) / 100,
@@ -12406,7 +12728,8 @@ function normalizeWeakPath(raw) {
     const snap = e && e.snapshot;
     if (!snap || typeof snap !== 'object' || !Array.isArray(snap.units) || !snap.units.length) return;
     const strs = (a) => (Array.isArray(a) ? a.filter((x) => typeof x === 'string').slice(0, 60) : []);
-    const units = snap.units.slice(0, 12).filter((u) => u && typeof u.lessonId === 'string').map((u) => ({
+    const units = snap.units.slice(0, 12).filter((u) => u && typeof u.lessonId === 'string' && (tk !== 'mix' || typeof u.trackKey === 'string')).map((u) => ({
+      trackKey: typeof u.trackKey === 'string' ? u.trackKey : tk,
       lessonId: u.lessonId,
       tier: WEAK_TIERS.includes(u.tier) ? u.tier : 'high',
       priority: Number.isFinite(u.priority) ? u.priority : 0,
@@ -12485,11 +12808,56 @@ function buildWeakUnits(trackKey, snapshot) {
   return out;
 }
 
+// Like buildWeakUnits, for a path that may span several certs (scope 'mix'). Each unit
+// remembers its trackKey and lessonId; in a mixed path the unit and step ids are prefixed with
+// the cert so two certs' lessons can never collide.
+function buildWeakUnitsFor(scopeKey, snapshot) {
+  if (!snapshot) return [];
+  const multi = scopeKey === 'mix';
+  const out = [];
+  snapshot.units.forEach((su) => {
+    const tk = su.trackKey || scopeKey;
+    const built = buildWeakUnits(tk, { units: [su] })[0];
+    if (!built) return;
+    out.push({
+      ...built,
+      id: multi ? `${tk}::${built.id}` : built.id,
+      lessonId: built.id,
+      trackKey: tk,
+      index: out.length,
+      steps: built.steps.map((st) => ({ ...st, id: multi ? st.id.replace('weak::', `weak::${tk}::`) : st.id, trackKey: tk })),
+    });
+  });
+  return out;
+}
+
+// A weak lesson retires itself once every question that put it on the list is answered correctly
+// again (answered anywhere: Practice, the course path, an exam), so the path never makes you redo a
+// lesson you have already fixed. Lessons flagged only by flashcards or games never retire this way.
+// Returns the effective progress map: your own `done` plus every step of a retired lesson.
+function weakEffectiveDone(units, snapshot, resultsAll, scopeKey, done, today) {
+  const retired = new Set();
+  const merged = { ...(done || {}) };
+  if (!snapshot) return { done: merged, retired };
+  const byLesson = new Map(snapshot.units.map((su) => [`${su.trackKey || scopeKey}::${su.lessonId}`, su]));
+  units.forEach((u) => {
+    const su = byLesson.get(`${u.trackKey}::${u.lessonId}`);
+    if (!su || !su.missedIds.length) return;
+    const tr = (resultsAll && resultsAll[u.trackKey]) || {};
+    if (!su.missedIds.every((id) => tr[id] === 'correct')) return;
+    retired.add(u.id);
+    u.steps.forEach((st) => { if (!merged[st.id]) merged[st.id] = { at: today || null, pct: null, via: 'mastered' }; });
+  });
+  return { done: merged, retired };
+}
+
 // How much of what the path set out to fix is actually fixed now.
-function weakPathOutcome(snapshot, results) {
-  const tr = results || {};
+function weakPathOutcome(snapshot, results, scopeKey) {
+  // `results` is one cert's results, or (for a mixed path) the results of every cert keyed by trackKey.
+  const trOf = (su) => (scopeKey === 'mix' ? ((results && results[su.trackKey]) || {}) : (results || {}));
   const units = snapshot.units.map((su) => {
-    const now = su.missedIds.filter((id) => tr[id] === 'incorrect').length;
+    const tr = trOf(su);
+    const now = su.missedIds.filter((id) => tr[id] !== 'correct').length;
     return { lessonId: su.lessonId, baseline: su.missedIds.length, now, fixed: Math.max(0, su.missedIds.length - now) };
   });
   return {
@@ -12498,6 +12866,31 @@ function weakPathOutcome(snapshot, results) {
     now: units.reduce((n, u) => n + u.now, 0),
     fixed: units.reduce((n, u) => n + u.fixed, 0),
   };
+}
+
+// Every question you have missed in these certs, newest miss first. `state` is 'wrong' while your
+// latest answer is still wrong (or the question has not been answered since) and 'fixed' once it
+// is correct again. A question whose latest answer is wrong but that predates the miss log still
+// counts (as one miss, with no date). Entries whose question no longer exists are dropped.
+function missedHistory(trackKeys, resultsAll, missLog) {
+  const out = [];
+  trackKeys.forEach((tk) => {
+    const mod = DATA[tk];
+    const log = (missLog && missLog[tk]) || {};
+    if (!mod) return;
+    const byId = new Map(mod.questions.map((q) => [q.id, q]));
+    const tr = (resultsAll && resultsAll[tk]) || {};
+    const ids = new Set(Object.keys(log));
+    Object.keys(tr).forEach((id) => { if (tr[id] === 'incorrect') ids.add(id); });
+    ids.forEach((id) => {
+      const q = byId.get(id);
+      const e = log[id];
+      if (!q) return;
+      out.push({ trackKey: tk, q, misses: e && e.m ? e.m : 1, correct: e ? e.c || 0 : 0, last: e ? e.l || null : null, state: tr[id] === 'correct' ? 'fixed' : 'wrong' });
+    });
+  });
+  out.sort((a, b) => (b.last || '').localeCompare(a.last || '') || b.misses - a.misses || (a.q.id < b.q.id ? -1 : 1));
+  return out;
 }
 
 // For the Home card: the top weak lessons of each cert in the plan.
@@ -12566,6 +12959,132 @@ function flyoutPlacement(anchor, size, view, inset) {
 
   const hidden = anchor.bottom < ins.top || anchor.top > view.height - ins.bottom;
   return { left: Math.round(left), top: Math.round(top), width: Math.round(width), maxHeight, side, vertical, arrowLeft, hidden };
+}
+
+/* ---------------- share code and step bank (pure; tested in Node by tools/check_share.js) ---------------- */
+
+// A share code carries the learner's own terms, acronyms and step-ordering scenarios from one
+// device to another without a full progress export: copy a short text, paste it on the other
+// device. The code is just base64url of a small JSON document behind a "CSH1." prefix; nothing
+// leaves the device unless the learner copies it. Importing validates every item with the same
+// rules as typing it in, and skips duplicates and anything over the limits.
+
+const SHARE_PREFIX = 'CSH1.';
+
+function shareToB64(str) {
+  return btoa(unescape(encodeURIComponent(str))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+}
+
+function shareFromB64(text) {
+  let b = text.replace(/-/g, '+').replace(/_/g, '/');
+  while (b.length % 4) b += '=';
+  return decodeURIComponent(escape(atob(b)));
+}
+
+function encodeShareCode(terms, scenarios) {
+  const t = (terms || []).map((x) => [x.kind === 'acronym' ? 'a' : 't', x.front, x.back, x.track && x.track !== 'all' ? x.track : '']);
+  const s = (scenarios || []).map((x) => [x.track, x.title, x.steps, x.note || '']);
+  return SHARE_PREFIX + shareToB64(JSON.stringify({ v: 1, t, s }));
+}
+
+// -> { terms: [{kind, front, back, track}], scenarios: [{track, title, steps, note}], error }
+// Items that fail the normal rules are dropped and counted in `invalid`.
+function decodeShareCode(code) {
+  const none = { terms: [], scenarios: [], invalid: 0 };
+  const text = String(code == null ? '' : code).replace(/\s+/g, '');
+  if (!text.startsWith(SHARE_PREFIX)) return { ...none, error: `That does not look like a share code. A share code starts with ${SHARE_PREFIX}` };
+  let doc;
+  try { doc = JSON.parse(shareFromB64(text.slice(SHARE_PREFIX.length))); } catch (e) { return { ...none, error: 'That code could not be read. Make sure you copied all of it.' }; }
+  if (!doc || typeof doc !== 'object' || doc.v !== 1 || !Array.isArray(doc.t) || !Array.isArray(doc.s)) return { ...none, error: 'That code is not one this version understands.' };
+  let invalid = 0;
+  const terms = [];
+  doc.t.forEach((x) => {
+    if (!Array.isArray(x)) { invalid += 1; return; }
+    const kind = x[0] === 'a' ? 'acronym' : x[0] === 't' ? 'term' : null;
+    const front = typeof x[1] === 'string' ? x[1].trim() : '';
+    const back = typeof x[2] === 'string' ? x[2].trim() : '';
+    const track = typeof x[3] === 'string' && x[3] && DATA[x[3]] ? x[3] : 'all';
+    if (!kind || validateCustomTerm(kind, front, back, [], null, track)) { invalid += 1; return; }
+    terms.push({ kind, front, back, track });
+  });
+  const scenarios = [];
+  doc.s.forEach((x) => {
+    if (!Array.isArray(x)) { invalid += 1; return; }
+    const track = typeof x[0] === 'string' && DATA[x[0]] ? x[0] : null;
+    const title = typeof x[1] === 'string' ? x[1].trim() : '';
+    const steps = Array.isArray(x[2]) ? x[2].filter((st) => typeof st === 'string').map((st) => st.trim()).filter(Boolean) : [];
+    const note = typeof x[3] === 'string' ? x[3].trim() : '';
+    if (!track || validateScenario(title, steps, note, [], null, track)) { invalid += 1; return; }
+    scenarios.push({ track, title, steps, note });
+  });
+  return { terms, scenarios, invalid, error: null };
+}
+
+// Adds the decoded items to what the learner already has. Duplicates and anything past the limits
+// are skipped. `makeId(prefix)` gives each new item an id. -> { terms, scenarios, added, skipped }
+function mergeSharedItems(existingTerms, existingScenarios, decoded, makeId, today) {
+  const terms = (existingTerms || []).slice();
+  const scenarios = (existingScenarios || []).slice();
+  const added = { terms: 0, scenarios: 0 };
+  const skipped = { terms: 0, scenarios: 0 };
+  decoded.terms.forEach((t) => {
+    if (validateCustomTerm(t.kind, t.front, t.back, terms, null, t.track)) { skipped.terms += 1; return; }
+    terms.push({ id: makeId('ct'), kind: t.kind, front: t.front, back: t.back, track: t.track, at: today || null });
+    added.terms += 1;
+  });
+  decoded.scenarios.forEach((s) => {
+    if (validateScenario(s.title, s.steps, s.note, scenarios, null, s.track)) { skipped.scenarios += 1; return; }
+    scenarios.push({ id: makeId('sc'), track: s.track, title: s.title, steps: s.steps, note: s.note, at: today || null });
+    added.scenarios += 1;
+  });
+  return { terms, scenarios, added, skipped };
+}
+
+/* ---- the step bank ---- */
+
+// The steps offered while building a scenario, from the learner's own saved scenarios as well as the
+// cert's built-in challenges. `lists` = [{ steps: [text], mine: boolean, track }]. The learner's own
+// steps for this cert come first, then their steps from other certs, then the built-in ones; the
+// same wording appears once.
+function buildStepBank(lists, trackKey) {
+  const rank = (l) => (l.mine && l.track === trackKey ? 0 : l.mine ? 1 : 2);
+  const seen = new Set();
+  const out = [];
+  (lists || []).slice().sort((a, b) => rank(a) - rank(b)).forEach((l) => {
+    (l.steps || []).forEach((text) => {
+      const key = String(text).trim().toLowerCase().replace(/\s+/g, ' ');
+      if (!key || seen.has(key)) return;
+      seen.add(key);
+      out.push({ text: String(text).trim(), mine: !!l.mine });
+    });
+  });
+  return out;
+}
+
+// After the step you just wrote, what usually comes next? Looks the last filled-in step up in every
+// known ordered list (the learner's own scenarios count double) and suggests the steps that
+// followed it, skipping any already used. -> [{ text, mine }], best first.
+function suggestNextSteps(current, lists, max) {
+  const norm = (x) => String(x).trim().toLowerCase().replace(/\s+/g, ' ');
+  const filled = (current || []).map((x) => String(x || '').trim()).filter(Boolean);
+  if (!filled.length) return [];
+  const last = norm(filled[filled.length - 1]);
+  const used = new Set(filled.map(norm));
+  const score = new Map();
+  (lists || []).forEach((l) => {
+    const steps = l.steps || [];
+    for (let i = 0; i < steps.length - 1; i += 1) {
+      if (norm(steps[i]) !== last) continue;
+      const next = String(steps[i + 1]).trim();
+      const key = norm(next);
+      if (!key || used.has(key)) continue;
+      const e = score.get(key) || { text: next, score: 0, mine: false };
+      e.score += l.mine ? 2 : 1;
+      e.mine = e.mine || !!l.mine;
+      score.set(key, e);
+    }
+  });
+  return [...score.values()].sort((a, b) => b.score - a.score || (a.text < b.text ? -1 : 1)).slice(0, max || 3).map((e) => ({ text: e.text, mine: e.mine }));
 }
 
 /* ---------------- shared UI: home & cert path ---------------- */
@@ -12667,6 +13186,7 @@ function DataPanel({
   trackLabel, onExport, onImportFile, importMessage, onReset, onClose,
   speechSupported, ttsVoices, ttsRate, ttsVoiceURI, onSetTtsRate, onSetTtsVoiceURI, onTestVoice, isTestSpeaking,
   soundOn, onSetSoundOn, pathLocking, onSetPathLocking, dyslexicFont, onSetDyslexicFont, answerSoundOn, onSetAnswerSoundOn,
+  reviewReminderDays, onSetReviewReminder, playgroundGoal, onSetPlaygroundGoal,
 }) {
   useEscapeToClose(onClose);
   const [confirmingReset, setConfirmingReset] = useState(false);
@@ -12724,7 +13244,7 @@ function DataPanel({
         <CardDirectionSetting />
 
         <div style={{ marginTop: '14px', padding: '14px', borderRadius: 'var(--r-card)', background: COLOR.surface, border: `1px solid ${COLOR.border}` }}>
-          <div style={{ fontSize: '13.5px', fontWeight: 600, marginBottom: '4px' }}>Path &amp; sounds</div>
+          <div style={{ fontSize: '13.5px', fontWeight: 600, marginBottom: '4px' }}>Habits &amp; sounds</div>
           <label style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '12px', marginTop: '8px', fontSize: '12.5px' }}>
             <span>
               Lock later units
@@ -12732,10 +13252,31 @@ function DataPanel({
             </span>
             <input type="checkbox" checked={!!pathLocking} onChange={(e) => onSetPathLocking(e.target.checked)} style={{ width: '20px', height: '20px', flexShrink: 0, marginTop: '2px' }} aria-label="Lock later units" />
           </label>
+          <label style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', marginTop: '12px', fontSize: '12.5px' }}>
+            <span>
+              Remind me to review
+              <span style={{ display: 'block', fontSize: '11.5px', color: COLOR.muted, lineHeight: 1.4 }}>Home nudges you when it has been this long since your last review.</span>
+            </span>
+            <select
+              value={reviewReminderDays}
+              onChange={(e) => onSetReviewReminder(Number(e.target.value))}
+              aria-label="Remind me to review"
+              style={{ padding: '6px 8px', borderRadius: 'var(--r-ctl)', fontSize: '12px', border: `1px solid ${COLOR.border}`, background: COLOR.surfaceRaised, color: COLOR.text, flexShrink: 0 }}
+            >
+              {REVIEW_REMINDER_OPTIONS.map((o) => <option key={o.days} value={o.days}>{o.label}</option>)}
+            </select>
+          </label>
+          <label style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '12px', marginTop: '12px', fontSize: '12.5px' }}>
+            <span>
+              Playground counts toward the daily goal
+              <span style={{ display: 'block', fontSize: '11.5px', color: COLOR.muted, lineHeight: 1.4 }}>Off by default, because the Playground is a sandbox. When on, solving a scenario for the first time adds 3 and each right answer in "Quiz me on this setup" adds 1. It never changes your mastery.</span>
+            </span>
+            <input type="checkbox" checked={!!playgroundGoal} onChange={(e) => onSetPlaygroundGoal(e.target.checked)} style={{ width: '20px', height: '20px', flexShrink: 0, marginTop: '2px' }} aria-label="Playground counts toward the daily goal" />
+          </label>
           <label style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '12px', marginTop: '12px', fontSize: '12.5px' }}>
             <span>
               Celebration sounds
-              <span style={{ display: 'block', fontSize: '11.5px', color: COLOR.muted, lineHeight: 1.4 }}>A short chime when you finish a step or a unit. Off by default; saved on this device only.</span>
+              <span style={{ display: 'block', fontSize: '11.5px', color: COLOR.muted, lineHeight: 1.4 }}>A short chime when you finish a step, a unit or a case study, plus a start and end cue for Verbal Quiz. Off by default; saved on this device only.</span>
             </span>
             <input type="checkbox" checked={!!soundOn} onChange={(e) => onSetSoundOn(e.target.checked)} style={{ width: '20px', height: '20px', flexShrink: 0, marginTop: '2px' }} aria-label="Celebration sounds" />
           </label>
@@ -12809,22 +13350,9 @@ function DataPanel({
         )}
 
         <div style={{ marginTop: '14px', padding: '14px', borderRadius: 'var(--r-card)', background: COLOR.surface, border: `1px solid ${COLOR.border}` }}>
-          <div style={{ fontSize: '13.5px', fontWeight: 600, marginBottom: '4px' }}>Export progress</div>
+          <div style={{ fontSize: '13.5px', fontWeight: 600, marginBottom: '4px' }}>Back up &amp; restore</div>
           <div style={{ fontSize: '11.5px', color: COLOR.muted, marginBottom: '10px', lineHeight: 1.4 }}>
-            Download every track's quiz/exam history, flashcard mastery, streak, and achievements as a JSON file — a backup, or a way to move progress to a new device.
-          </div>
-          <button
-            onClick={onExport}
-            style={{ width: '100%', padding: '10px', borderRadius: 'var(--r-ctl)', background: COLOR.primary, color: COLOR.onAccent, fontSize: '13px', fontWeight: 600 }}
-          >
-            ⬇ Export progress
-          </button>
-        </div>
-
-        <div style={{ marginTop: '12px', padding: '14px', borderRadius: 'var(--r-card)', background: COLOR.surface, border: `1px solid ${COLOR.border}` }}>
-          <div style={{ fontSize: '13.5px', fontWeight: 600, marginBottom: '4px' }}>Import progress</div>
-          <div style={{ fontSize: '11.5px', color: COLOR.muted, marginBottom: '10px', lineHeight: 1.4 }}>
-            Restore from a previously exported file. This replaces all progress currently saved in this browser.
+            Export every track's quiz/exam history, flashcard mastery, streak and achievements as a JSON file: a backup, or a way to move to a new device. Importing replaces all progress saved in this browser.
           </div>
           <input
             ref={fileInputRef}
@@ -12837,12 +13365,20 @@ function DataPanel({
               e.target.value = '';
             }}
           />
-          <button
-            onClick={() => fileInputRef.current && fileInputRef.current.click()}
-            style={{ width: '100%', padding: '10px', borderRadius: 'var(--r-ctl)', background: 'transparent', border: `1px solid ${COLOR.primary}`, color: COLOR.primary, fontSize: '13px', fontWeight: 600 }}
-          >
-            ⬆ Import progress
-          </button>
+          <div style={{ display: 'flex', gap: '8px' }}>
+            <button
+              onClick={onExport}
+              style={{ flex: 1, padding: '10px', borderRadius: 'var(--r-ctl)', background: COLOR.primary, color: COLOR.onAccent, fontSize: '13px', fontWeight: 600 }}
+            >
+              ⬇ Export progress
+            </button>
+            <button
+              onClick={() => fileInputRef.current && fileInputRef.current.click()}
+              style={{ flex: 1, padding: '10px', borderRadius: 'var(--r-ctl)', background: 'transparent', border: `1px solid ${COLOR.primary}`, color: COLOR.primary, fontSize: '13px', fontWeight: 600 }}
+            >
+              ⬆ Import progress
+            </button>
+          </div>
           {importMessage && (
             <div style={{ marginTop: '8px', fontSize: '11.5px', color: importMessage.ok ? COLOR.success : COLOR.red, lineHeight: 1.4 }}>
               {importMessage.text}
@@ -12946,19 +13482,21 @@ function TodayHero({ dailyGoal, onSetTarget, streak, readiness, focusLabel, note
 // old hamburger bottom-sheet menu showed, just tucked behind a single
 // summary row instead of always taking up the whole page, since Home now
 // has several other widgets competing for the same space.
-function TrackListDropdown({ tracks, masteries, certPlan, onSelectTrack, onAddToPath, defaultOpen, label }) {
+function TrackListDropdown({ tracks, masteries, certPlan, onSelectTrack, onAddToPath, defaultOpen, label, quiet }) {
   const [open, setOpen] = useState(!!defaultOpen);
   return (
-    <div className="mb-4">
+    <div className={quiet ? undefined : 'mb-4'} style={quiet ? { marginTop: '10px' } : undefined}>
       <button
         onClick={() => setOpen((o) => !o)}
+        aria-expanded={open}
+        className={quiet ? 'btn-flat' : undefined}
         style={{
           width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-          padding: '12px 14px', borderRadius: 'var(--r-card)', background: tint(COLOR.blue, 9),
-          border: `1px solid color-mix(in srgb, ${COLOR.blue} 35%, ${COLOR.border})`,
+          padding: quiet ? '8px 2px' : '12px 14px', borderRadius: 'var(--r-card)', background: quiet ? 'transparent' : tint(COLOR.blue, 9),
+          border: quiet ? 'none' : `1px solid color-mix(in srgb, ${COLOR.blue} 35%, ${COLOR.border})`,
         }}
       >
-        <span style={{ fontSize: '13px', fontWeight: 600, color: COLOR.text }}>{label || `All tracks (${tracks.length})`}</span>
+        <span style={{ fontSize: quiet ? '12px' : '13px', fontWeight: 600, color: quiet ? COLOR.muted : COLOR.text }}>{label || `All tracks (${tracks.length})`}</span>
         <span style={{ fontSize: '11px', color: COLOR.muted, transform: open ? 'rotate(180deg)' : 'none', transition: 'transform 0.15s ease' }}>▾</span>
       </button>
       {open && (
@@ -13021,11 +13559,10 @@ function TrackListDropdown({ tracks, masteries, certPlan, onSelectTrack, onAddTo
 // in the app instead of a bespoke look. `stored` is the persisted
 // {selected, correct} from stats.dailyChallenge if today's question was
 // already answered (e.g. on a revisit later the same day); otherwise the
-// question starts unanswered.
-function DailyQuestionCard({ q, trackLabel, stored, onAnswer }) {
+// question starts unanswered. Shown inside HomeDailyCard.
+function DailyQuestionBody({ q, stored, onAnswer }) {
   const [selected, setSelected] = useState(stored ? stored.selected : null);
   const [msPending, setMsPending] = useState([]);
-  const [open, setOpen] = useState(false);
   useEffect(() => { setSelected(stored ? stored.selected : null); setMsPending([]); }, [q.id, stored]);
 
   const choose = (idx) => {
@@ -13050,48 +13587,25 @@ function DailyQuestionCard({ q, trackLabel, stored, onAnswer }) {
     onAnswer(isCorrect, picked);
   };
 
-  const answered = selected !== null;
   return (
-    <div className="mb-4">
-      <button
-        onClick={() => setOpen((o) => !o)}
-        aria-expanded={open}
-        style={{
-          width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px', textAlign: 'left',
-          padding: '12px 14px', borderRadius: 'var(--r-card)', background: tint(COLOR.gold, 11), border: `1px solid color-mix(in srgb, ${COLOR.gold} 40%, ${COLOR.border})`, borderLeft: `3px solid ${COLOR.gold}`, boxShadow: SHADOW.card,
-        }}
-      >
-        <span style={{ minWidth: 0 }}>
-          <span style={{ display: 'block', fontSize: '11px', color: COLOR.gold, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-            Question of the day · {trackLabel}
-          </span>
-          <span style={{ display: 'block', fontSize: '12.5px', color: COLOR.muted, marginTop: '2px' }}>
-            {answered ? 'Answered · tap to review' : 'One question, about a minute'}
-          </span>
-        </span>
-        <span style={{ fontSize: '11px', color: COLOR.muted, transform: open ? 'rotate(180deg)' : 'none', transition: 'transform 0.15s ease' }}>▾</span>
-      </button>
-      {open && (
-        <div style={{ marginTop: '8px' }}>
-          <QuestionView
-            q={q}
-            selected={selected}
-            onChoose={choose}
-            onNext={() => {}}
-            index={0}
-            total={1}
-            hideMeta
-            hideNext
-            msPending={msPending}
-            onToggleMs={toggleMs}
-            onSubmitMs={submitMs}
-            flashcardsData={DATA[q.__homeTrack]?.flashcards}
-          />
-          {answered && (
-            <div style={{ fontSize: '11.5px', color: COLOR.muted, textAlign: 'center', marginTop: '6px' }}>
-              New question tomorrow.
-            </div>
-          )}
+    <div>
+      <QuestionView
+        q={q}
+        selected={selected}
+        onChoose={choose}
+        onNext={() => {}}
+        index={0}
+        total={1}
+        hideMeta
+        hideNext
+        msPending={msPending}
+        onToggleMs={toggleMs}
+        onSubmitMs={submitMs}
+        flashcardsData={DATA[q.__homeTrack]?.flashcards}
+      />
+      {selected !== null && (
+        <div style={{ fontSize: '11.5px', color: COLOR.muted, textAlign: 'center', marginTop: '6px' }}>
+          New question tomorrow.
         </div>
       )}
     </div>
@@ -13103,42 +13617,56 @@ function DailyQuestionCard({ q, trackLabel, stored, onAnswer }) {
 // fast glance rather than another SRS-scored rep. Revealing it still
 // counts toward the daily goal ring (it's real study time), just not
 // toward mastery/SRS scheduling the way an actual rating would.
-function DailyVocabCard({ card, trackLabel, revealed, onReveal, pool }) {
+function DailyVocabBody({ card, revealed, onReveal, pool }) {
   const { direction } = React.useContext(CardPrefsContext);
   const defFirst = direction !== 'term';
   const prompt = useMemo(() => flashcardPrompt(card), [card]);
   return (
-    <div className="mb-4">
-      <div
-        onClick={() => { if (!revealed) onReveal(); }}
-        style={{
-          background: tint(COLOR.teal, revealed ? 16 : 10),
-          border: `1px solid color-mix(in srgb, ${COLOR.teal} 35%, ${COLOR.border})`, borderLeft: `3px solid ${COLOR.teal}`, borderRadius: 'var(--r-card)', padding: '12px 14px',
-          cursor: revealed ? 'default' : 'pointer',
-        }}
-      >
-        <div style={{ fontSize: '10.5px', color: COLOR.teal, textTransform: 'uppercase' }}>
-          Vocab of the day · {trackLabel}
+    <div
+      onClick={() => { if (!revealed) onReveal(); }}
+      style={{
+        background: tint(COLOR.teal, revealed ? 16 : 10),
+        border: `1px solid color-mix(in srgb, ${COLOR.teal} 35%, ${COLOR.border})`, borderLeft: `3px solid ${COLOR.teal}`, borderRadius: 'var(--r-card)', padding: '12px 14px',
+        cursor: revealed ? 'default' : 'pointer',
+      }}
+    >
+      {defFirst ? (
+        <div>
+          {revealed && <div className="itil-display" style={{ fontSize: '17px', fontWeight: 600, overflowWrap: 'anywhere' }}>{card.front}</div>}
+          <div style={{ fontSize: '14px', lineHeight: 1.55, color: revealed ? COLOR.muted : COLOR.text, marginTop: revealed ? '6px' : 0, overflowWrap: 'anywhere' }}>
+            {revealed ? <GlossText text={card.back} pool={pool} max={2} blockId="dv" /> : prompt.text}
+          </div>
+          {!revealed && <div style={{ fontSize: '12.5px', color: COLOR.muted, marginTop: '6px' }}>What is the term? Tap to reveal it.</div>}
         </div>
-        {defFirst ? (
-          <div>
-            {revealed && <div className="itil-display" style={{ fontSize: '17px', fontWeight: 600, marginTop: '4px', overflowWrap: 'anywhere' }}>{card.front}</div>}
-            <div style={{ fontSize: '14px', lineHeight: 1.55, color: revealed ? COLOR.muted : COLOR.text, marginTop: revealed ? '6px' : '6px', overflowWrap: 'anywhere' }}>
-              {revealed ? <GlossText text={card.back} pool={pool} max={2} blockId="dv" /> : prompt.text}
-            </div>
-            {!revealed && <div style={{ fontSize: '12.5px', color: COLOR.muted, marginTop: '6px' }}>What is the term? Tap to reveal it.</div>}
-          </div>
-        ) : (
-          <div>
-            <div className="itil-display" style={{ fontSize: '17px', fontWeight: 600, marginTop: '4px' }}>{card.front}</div>
-            {revealed
-              ? <div style={{ fontSize: '14px', lineHeight: 1.55, color: COLOR.muted, marginTop: '8px' }}><GlossText text={card.back} pool={pool} max={2} blockId="dv" /></div>
-              : <div style={{ fontSize: '12.5px', color: COLOR.muted, marginTop: '2px' }}>Tap to reveal the definition</div>}
-          </div>
-        )}
-        {revealed && <div style={{ fontSize: '11.5px', color: COLOR.muted, marginTop: '8px' }}>New term tomorrow.</div>}
-      </div>
+      ) : (
+        <div>
+          <div className="itil-display" style={{ fontSize: '17px', fontWeight: 600 }}>{card.front}</div>
+          {revealed
+            ? <div style={{ fontSize: '14px', lineHeight: 1.55, color: COLOR.muted, marginTop: '8px' }}><GlossText text={card.back} pool={pool} max={2} blockId="dv" /></div>
+            : <div style={{ fontSize: '12.5px', color: COLOR.muted, marginTop: '2px' }}>Tap to reveal the definition</div>}
+        </div>
+      )}
+      {revealed && <div style={{ fontSize: '11.5px', color: COLOR.muted, marginTop: '8px' }}>New term tomorrow.</div>}
     </div>
+  );
+}
+
+// The two daily items (question of the day, vocab of the day) share one folded card, so Home
+// carries one line for them instead of two blocks. `question` = { q, stored, onAnswer } and
+// `vocab` = { card, revealed, onReveal, pool }; either may be missing.
+function HomeDailyCard({ trackLabel, question, vocab }) {
+  const [tab, setTab] = useState(question ? 'question' : 'vocab');
+  const total = (question ? 1 : 0) + (vocab ? 1 : 0);
+  const done = (question && question.stored ? 1 : 0) + (vocab && vocab.revealed ? 1 : 0);
+  if (!total) return null;
+  const tabs = [question && { key: 'question', label: 'Question of the day', badge: question.stored ? '✓' : '' }, vocab && { key: 'vocab', label: 'Vocab of the day', badge: vocab.revealed ? '✓' : '' }].filter(Boolean);
+  return (
+    <Disclosure label={`Daily · ${trackLabel}`} summary={done === total ? 'all done today' : `${done} of ${total} done`} hue={COLOR.gold} style={{ marginBottom: '14px' }}>
+      {tabs.length > 1 && <SegmentedControl options={tabs} value={tab} onChange={setTab} hue={COLOR.gold} style={{ marginBottom: '12px' }} />}
+      {tab === 'question' && question
+        ? <DailyQuestionBody q={question.q} stored={question.stored} onAnswer={question.onAnswer} />
+        : <DailyVocabBody card={vocab.card} revealed={vocab.revealed} onReveal={vocab.onReveal} pool={vocab.pool} />}
+    </Disclosure>
   );
 }
 
@@ -13163,7 +13691,7 @@ function readinessProjectionMessage(projection, trackLabel) {
 // — opened from the header's hamburger button now (available from any
 // mode, not just Home) rather than duplicated inline here — this view is
 // for seeing and jumping, not editing.
-function CertPathHomeSection({ pathOrder, results, certPlan, studyingKey, pathProgressByTrack, onSelectTrack }) {
+function CertPathHomeSection({ pathOrder, results, certPlan, studyingKey, pathProgressByTrack, onSelectTrack, browse }) {
   return (
     <div className="mb-4">
       <div style={{ fontSize: '12px', color: COLOR.muted, fontWeight: 600, marginBottom: '8px' }}>Your certs ({pathOrder.length})</div>
@@ -13206,6 +13734,17 @@ function CertPathHomeSection({ pathOrder, results, certPlan, studyingKey, pathPr
           </button>
         );
       })}
+      {browse && (
+        <TrackListDropdown
+          quiet
+          tracks={browse.tracks}
+          masteries={browse.masteries}
+          certPlan={certPlan}
+          onSelectTrack={onSelectTrack}
+          onAddToPath={browse.onAddToPath}
+          label={`Browse all tracks (${browse.tracks.length})`}
+        />
+      )}
     </div>
   );
 }
@@ -13218,7 +13757,7 @@ function CertPathHomeSection({ pathOrder, results, certPlan, studyingKey, pathPr
 // for that split. Reachable again from any track's Learn/Quiz/Exam view
 // via the header's home icon; the header's hamburger (Manage cert path)
 // is reachable from every mode including this one.
-function HomeView({ tracks, results, seenLog, stats, certPlan, speech, srs, makePathApi, onSetHomePathMode, onSetHomePathOrder, onSetReviewReminder, onReviewStarted, onResume, onSelectTrack, onAddToPath, onOpenAbout, onOpenGlossary, onOpenPlayground, onOpenWeak, onSetGoalTarget, onAnswerDailyQuestion, onRevealDailyVocab, footerNote }) {
+function HomeView({ tracks, results, seenLog, stats, certPlan, speech, srs, makePathApi, onSetHomePathMode, onSetHomePathOrder, onReviewStarted, onResume, onSelectTrack, onAddToPath, onOpenAbout, onOpenGlossary, onOpenPlayground, onOpenWeak, onSetGoalTarget, onAnswerDailyQuestion, onRevealDailyVocab, footerNote }) {
   const masteries = tracks.map((t) => ({ track: t, pct: trackMastery(t.key, results) }));
   const overallAvg = masteries.length ? Math.round(masteries.reduce((s, m) => s + m.pct, 0) / masteries.length) : 0;
   const lastVisited = stats.lastVisited;
@@ -13287,12 +13826,51 @@ function HomeView({ tracks, results, seenLog, stats, certPlan, speech, srs, make
   const [homeRun, setHomeRun] = useState(null);
   const startHomeRun = (e) => setHomeRun({ kind: 'step', trackKey: e.trackKey, doneKey: e.doneKey, unit: e.unit, step: e.step, nonce: Date.now() });
   const skipHomeStep = (e) => makePathApi(e.doneKey || e.trackKey).skipStep(e.step.id);
-  const weakSummaries = useMemo(
-    () => weakSummaryForTracks(pathKeys, results, seenLog, srs, stats.missLog, todayString()),
+  const weakAll = useMemo(
+    () => weakAnalyzeMany(pathKeys, results, seenLog, srs, stats.missLog, todayString()),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [pathKeys.join(','), results, srs, stats.missLog],
   );
+  // One cert in the plan: its own Path tab holds the weak path. Several: one cross-cert path lives here.
+  const weakScope = pathKeys.length > 1 ? 'mix' : (pathKeys[0] || null);
+  const weakSaved = weakScope ? ((stats.weakPath || {})[weakScope] || null) : null;
+  const weakInfo = useMemo(() => {
+    const certs = [];
+    weakAll.units.forEach((r) => {
+      const label = (tracks.find((t) => t.key === r.trackKey) || { label: r.trackKey }).label;
+      if (!certs.includes(label)) certs.push(label);
+    });
+    let path = null;
+    if (weakSaved) {
+      const wu = buildWeakUnitsFor(weakScope, weakSaved.snapshot);
+      const eff = weakEffectiveDone(wu, weakSaved.snapshot, results, weakScope, weakSaved.done, todayString());
+      const prog = pathOverallProgress(wu, eff.done);
+      if (prog.total) path = { done: prog.done, total: prog.total };
+    }
+    return { lessons: weakAll.units.length, critical: weakAll.units.filter((r) => r.tier === 'critical').length, certs, path };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [weakAll, weakSaved, results]);
 
+  if (homeRun && homeRun.kind === 'weakpath') {
+    return (
+      <WeakSubjectsView
+        key={homeRun.nonce}
+        scopeKey="mix"
+        trackKeys={pathKeys}
+        title="Your certs"
+        resultsAll={results}
+        seenLogAll={seenLog}
+        srs={srs}
+        missLog={stats.missLog}
+        saved={(stats.weakPath || {}).mix || null}
+        speech={speech}
+        api={makePathApi('mix')}
+        makeApi={makePathApi}
+        onExit={() => setHomeRun(null)}
+        exitLabel="‹ Back to Home"
+      />
+    );
+  }
   if (homeRun && homeRun.kind !== 'step') {
     return (
       <HomeReviewRun
@@ -13356,19 +13934,16 @@ function HomeView({ tracks, results, seenLog, stats, certPlan, speech, srs, make
       )}
 
       {pathOrder.length > 0 && (
-        <HomeReviewCard
+        <HomeReviewHub
           weakTotal={weakTotal}
           toughTotal={toughTotal}
           gamesTotal={gamesTotal}
           casesTotal={casesTotal}
           reminder={stats.reviewReminder}
-          onSetReminder={onSetReviewReminder}
+          weakInfo={weakInfo}
           onStartReview={(kind) => { onReviewStarted(); setHomeRun({ kind, nonce: Date.now() }); }}
+          onOpenWeak={() => (pathKeys.length > 1 ? setHomeRun({ kind: 'weakpath', nonce: Date.now() }) : onOpenWeak(pathKeys[0]))}
         />
-      )}
-
-      {pathOrder.length > 0 && weakSummaries.length > 0 && (
-        <HomeWeakSpotsCard summaries={weakSummaries} trackLabel={(k) => (tracks.find((t) => t.key === k) || { label: k }).label} onOpen={onOpenWeak} />
       )}
 
       {/* The path hero already shows the up-next track's own readiness, so
@@ -13391,6 +13966,31 @@ function HomeView({ tracks, results, seenLog, stats, certPlan, speech, srs, make
         </div>
       )}
 
+      {resumeTrack && (
+        <button
+          onClick={onResume}
+          className="btn-flat"
+          style={{
+            width: '100%', textAlign: 'left', marginBottom: '14px', padding: '10px 14px', borderRadius: 'var(--r-card)',
+            background: 'transparent', border: `1px solid ${COLOR.border}`, borderLeft: `3px solid ${trackAccent(resumeTrack.key)}`,
+            display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px',
+          }}
+        >
+          <span style={{ minWidth: 0 }}>
+            <span style={{ display: 'block', fontSize: '11px', color: COLOR.muted }}>Continue where you left off</span>
+            <span style={{ display: 'block', fontSize: '14px', fontWeight: 600, color: ink(trackAccent(resumeTrack.key)), marginTop: '1px' }}>
+              {resumeTrack.label} · {MODE_LABELS[lastVisited.mode] || 'Path'}{resumeViewLabel ? ` · ${resumeViewLabel}` : ''}
+            </span>
+            {resumeStep && (
+              <span style={{ display: 'block', fontSize: '11.5px', color: COLOR.muted, marginTop: '2px' }}>
+                Next up: Unit {resumeStep.unit.index + 1} · {resumeStep.step.label}
+              </span>
+            )}
+          </span>
+          <span style={{ color: COLOR.muted, fontSize: '16px', flexShrink: 0 }}>›</span>
+        </button>
+      )}
+
       {pathOrder.length > 0 ? (
         <CertPathHomeSection
           pathOrder={pathOrder}
@@ -13399,6 +13999,7 @@ function HomeView({ tracks, results, seenLog, stats, certPlan, speech, srs, make
           studyingKey={studyingKey}
           pathProgressByTrack={pathProgressByTrack}
           onSelectTrack={onSelectTrack}
+          browse={{ tracks, masteries, onAddToPath }}
         />
       ) : (
         <div className="mb-4">
@@ -13417,91 +14018,41 @@ function HomeView({ tracks, results, seenLog, stats, certPlan, speech, srs, make
         </div>
       )}
 
-      {resumeTrack && (
-        <button
-          onClick={onResume}
-          style={{
-            width: '100%', textAlign: 'left', marginBottom: '14px', padding: '14px 16px', borderRadius: 'var(--r-card)',
-            background: `${trackAccent(resumeTrack.key)}1F`, border: `1px solid ${trackAccent(resumeTrack.key)}`,
-            boxShadow: SHADOW.card,
-          }}
-        >
-          <div style={{ fontSize: '11px', color: COLOR.muted, marginBottom: '2px' }}>Continue where you left off</div>
-          <div style={{ fontSize: '15px', fontWeight: 600, color: ink(trackAccent(resumeTrack.key)) }}>
-            {resumeTrack.label} · {MODE_LABELS[lastVisited.mode] || 'Path'}{resumeViewLabel ? ` · ${resumeViewLabel}` : ''}
-          </div>
-          {resumeStep && (
-            <div style={{ fontSize: '12px', color: COLOR.muted, marginTop: '3px' }}>
-              Next up: Unit {resumeStep.unit.index + 1} · {resumeStep.step.label}
-            </div>
-          )}
-        </button>
-      )}
+      <HomeDailyCard
+        trackLabel={focusLabel}
+        question={dailyQuestion ? {
+          q: dailyQuestion,
+          stored: storedQuestion,
+          onAnswer: (isCorrect, selected) => onAnswerDailyQuestion(focusKey, dailyQuestion, isCorrect, selected),
+        } : null}
+        vocab={dailyVocab ? {
+          card: dailyVocab,
+          revealed: vocabRevealed,
+          pool: vPool.filter((v) => v.id !== dailyVocab.id),
+          onReveal: () => onRevealDailyVocab(dailyVocab),
+        } : null}
+      />
 
-      {dailyQuestion && (
-        <DailyQuestionCard
-          q={dailyQuestion}
-          trackLabel={focusLabel}
-          stored={storedQuestion}
-          onAnswer={(isCorrect, selected) => onAnswerDailyQuestion(focusKey, dailyQuestion, isCorrect, selected)}
-        />
-      )}
-
-      {dailyVocab && (
-        <DailyVocabCard
-          card={dailyVocab}
-          trackLabel={focusLabel}
-          revealed={vocabRevealed}
-          pool={vPool.filter((v) => v.id !== dailyVocab.id)}
-          onReveal={() => onRevealDailyVocab(dailyVocab)}
-        />
-      )}
-
-      {pathOrder.length > 0 && (
-        <TrackListDropdown
-          tracks={tracks}
-          masteries={masteries}
-          certPlan={certPlan}
-          onSelectTrack={onSelectTrack}
-          onAddToPath={onAddToPath}
-          label={`Browse all tracks (${tracks.length})`}
-        />
-      )}
-
-      <button
-        onClick={onOpenPlayground}
-        style={{
-          width: '100%', textAlign: 'left', marginTop: '10px', padding: '12px 14px', borderRadius: 'var(--r-card)',
-          background: tint(COLOR.success, 9), border: `1px solid color-mix(in srgb, ${COLOR.success} 35%, ${COLOR.border})`, boxShadow: SHADOW.card,
-          display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px',
-        }}
-      >
-        <div>
-          <div style={{ fontSize: '13px', fontWeight: 600, color: COLOR.text }}>IT Playground</div>
-          <div style={{ fontSize: '11.5px', color: COLOR.muted, marginTop: '1px', lineHeight: 1.4 }}>Subnet calculator, IP lab, VLANs and firewalls: try it, break it, fix it.</div>
-        </div>
-        <div style={{ color: COLOR.muted, fontSize: '15px' }}>›</div>
-      </button>
-
-      <button
-        onClick={onOpenGlossary}
-        style={{
-          width: '100%', textAlign: 'left', marginTop: '10px', padding: '12px 14px', borderRadius: 'var(--r-card)',
-          background: tint(COLOR.pink, 9), border: `1px solid color-mix(in srgb, ${COLOR.pink} 35%, ${COLOR.border})`, boxShadow: SHADOW.card,
-          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-        }}
-      >
-        <div style={{ fontSize: '13px', fontWeight: 600, color: COLOR.text }}>Glossary</div>
-        <div style={{ color: COLOR.muted, fontSize: '15px' }}>›</div>
-      </button>
-
-      <button
-        onClick={onOpenAbout}
-        className="btn-flat"
-        style={{ width: '100%', textAlign: 'center', marginTop: '10px', padding: '8px', fontSize: '11.5px', color: COLOR.muted, background: 'transparent' }}
-      >
-        About & Legal
-      </button>
+      {/* Tools and info sit in one quiet row instead of three full-width cards. */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: '8px' }}>
+        {[
+          { label: 'Playground', sub: 'Try it out', hue: COLOR.success, onClick: onOpenPlayground },
+          { label: 'Glossary', sub: 'Look it up', hue: COLOR.pink, onClick: onOpenGlossary },
+          { label: 'About', sub: 'Legal, info', hue: COLOR.muted, onClick: onOpenAbout },
+        ].map((t) => (
+          <button
+            key={t.label}
+            onClick={t.onClick}
+            className="btn-flat"
+            aria-label={t.label === 'About' ? 'About & Legal' : t.label}
+            style={{ textAlign: 'left', padding: '10px 12px', borderRadius: 'var(--r-card)', background: tint(t.hue, 7), border: `1px solid color-mix(in srgb, ${t.hue} 30%, ${COLOR.border})`, borderTop: `2px solid ${t.hue}`, minWidth: 0 }}
+          >
+            <span style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: COLOR.text }}>{t.label}</span>
+            <span style={{ display: 'block', fontSize: '11px', color: COLOR.muted, marginTop: '1px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{t.sub}</span>
+          </button>
+        ))}
+      </div>
+      <div style={{ height: '12px' }} />
       {footerNote && <div style={{ fontSize: '11.5px', color: COLOR.muted, textAlign: 'center', lineHeight: 1.45, padding: '0 8px' }}>{footerNote}</div>}
     </div>
   );
@@ -13797,6 +14348,53 @@ function AboutSection({ title, defaultOpen, children }) {
 // "Mine" tab of the Glossary: add, edit and delete your own terms and
 // acronyms. They appear in flyouts, the Terms and Acronyms tabs, and are saved
 // (and exported) with the rest of your progress.
+// Moves the learner's own terms and scenarios to another device as a short text code (see
+// 03f_share_bank.js): copy it here, paste it there. Folded away until asked for.
+function ShareCodePanel({ terms, scenarios, onImport }) {
+  const [code, setCode] = useState('');
+  const [msg, setMsg] = useState(null);
+  const [copied, setCopied] = useState(false);
+  const total = (terms || []).length + (scenarios || []).length;
+  const myCode = useMemo(() => (total ? encodeShareCode(terms, scenarios) : ''), [terms, scenarios]);
+  const copy = () => {
+    try {
+      navigator.clipboard.writeText(myCode).then(() => { setCopied(true); setTimeout(() => setCopied(false), 1800); }, () => setCopied(false));
+    } catch (e) { setCopied(false); }
+  };
+  const importCode = () => {
+    const dec = decodeShareCode(code);
+    if (dec.error) { setMsg({ ok: false, text: dec.error }); return; }
+    if (!dec.terms.length && !dec.scenarios.length) { setMsg({ ok: false, text: 'That code has nothing valid in it.' }); return; }
+    const res = onImport(dec);
+    const parts = [];
+    if (res.added.terms) parts.push(`${res.added.terms} term${res.added.terms === 1 ? '' : 's'}`);
+    if (res.added.scenarios) parts.push(`${res.added.scenarios} scenario${res.added.scenarios === 1 ? '' : 's'}`);
+    const skipped = res.skipped.terms + res.skipped.scenarios + dec.invalid;
+    setMsg({ ok: parts.length > 0, text: `${parts.length ? `Added ${parts.join(' and ')}.` : 'Nothing new to add.'}${skipped ? ` Skipped ${skipped} (already there, or not valid).` : ''}` });
+    if (parts.length) setCode('');
+  };
+  const field = { width: '100%', padding: '8px 10px', borderRadius: 'var(--r-ctl)', border: `1px solid ${COLOR.border}`, background: COLOR.surface, color: COLOR.text, fontSize: '12px', fontFamily: 'var(--font-mono)', resize: 'vertical' };
+  const btn = { padding: '8px 14px', borderRadius: 'var(--r-ctl)', border: `1px solid ${COLOR.primary}`, background: 'transparent', color: COLOR.primary, fontSize: '12.5px', fontWeight: 700 };
+  return (
+    <Disclosure label="Share between devices" summary={total ? `${(terms || []).length} terms, ${(scenarios || []).length} scenarios` : 'nothing to share yet'} style={{ marginTop: '14px', marginBottom: 0 }}>
+      <div style={{ fontSize: '11.5px', color: COLOR.muted, lineHeight: 1.45, marginBottom: '10px' }}>
+        Copy a code on this device and paste it on another to bring your own terms, acronyms and step-ordering scenarios along, without exporting all your progress. Nothing is uploaded: the code is just your items written as text.
+      </div>
+      <div style={{ fontSize: '12px', fontWeight: 700, marginBottom: '4px' }}>Your code</div>
+      {total ? (
+        <>
+          <textarea readOnly value={myCode} rows={3} aria-label="Your share code" onFocus={(e) => e.target.select()} style={field} />
+          <button onClick={copy} className="btn-flat" style={{ ...btn, marginTop: '6px' }}>{copied ? 'Copied ✓' : 'Copy code'}</button>
+        </>
+      ) : <div style={{ fontSize: '12px', color: COLOR.muted }}>Add a term or build a scenario first, then your code shows up here.</div>}
+      <div style={{ fontSize: '12px', fontWeight: 700, margin: '14px 0 4px' }}>Paste a code from another device</div>
+      <textarea value={code} onChange={(e) => { setCode(e.target.value); setMsg(null); }} rows={3} placeholder="CSH1.…" aria-label="Paste a share code" style={field} />
+      <button onClick={importCode} disabled={!code.trim()} className="btn-flat" style={{ ...btn, marginTop: '6px', opacity: code.trim() ? 1 : 0.5 }}>Add to my terms and scenarios</button>
+      {msg && <div role="status" style={{ marginTop: '8px', fontSize: '12px', color: msg.ok ? COLOR.success : COLOR.red, lineHeight: 1.4 }}>{msg.text}</div>}
+    </Disclosure>
+  );
+}
+
 function MyTermsEditor({ customTerms, onSave, onDelete }) {
   const [kind, setKind] = useState('term');
   const [front, setFront] = useState('');
@@ -13870,7 +14468,7 @@ function MyTermsEditor({ customTerms, onSave, onDelete }) {
 // doesn't require guessing which track it lives in. Computed once per
 // panel open (flashcards don't change mid-session) rather than on every
 // keystroke; the search itself just filters that fixed list.
-function GlossaryPanel({ onClose, customTerms, onSaveCustomTerm, onDeleteCustomTerm }) {
+function GlossaryPanel({ onClose, customTerms, customScenarios, onSaveCustomTerm, onDeleteCustomTerm, onImportShared }) {
   useEscapeToClose(onClose);
   SCOPE.active = '*';   // the Glossary shows everything, whichever cert it belongs to
   const [query, setQuery] = useState('');
@@ -13933,7 +14531,10 @@ function GlossaryPanel({ onClose, customTerms, onSaveCustomTerm, onDeleteCustomT
           ))}
         </div>
         {tab === 'mine' && (
-          <MyTermsEditor customTerms={customTerms || []} onSave={onSaveCustomTerm} onDelete={onDeleteCustomTerm} />
+          <>
+            <MyTermsEditor customTerms={customTerms || []} onSave={onSaveCustomTerm} onDelete={onDeleteCustomTerm} />
+            <ShareCodePanel terms={customTerms || []} scenarios={customScenarios || []} onImport={onImportShared} />
+          </>
         )}
         {tab !== 'mine' && <input
           value={query}
@@ -14265,7 +14866,7 @@ function CategoryFilterSelect({ categories, activeCat, onChange, masteryByCatego
       value={activeCat}
       onChange={(e) => onChange(e.target.value)}
       style={{
-        width: '100%', marginBottom: '18px', padding: '10px 12px', borderRadius: 'var(--r-ctl)', fontSize: '13px', fontWeight: 600,
+        width: '100%', marginBottom: '12px', padding: '9px 12px', borderRadius: 'var(--r-ctl)', fontSize: '13px', fontWeight: 600,
         border: `1px solid ${COLOR.border}`, background: COLOR.surface, color: COLOR.text,
       }}
     >
@@ -15543,72 +16144,72 @@ function QuizSetup({ length, setLength, types, toggleType, onReroll, poolSize, m
   const typeSummary = typeNames.length === 3 ? 'all types' : typeNames.join(', ');
   return (
     <div style={{ marginBottom: '14px' }}>
-      {missedCount > 0 && (
+      {/* One control row (the options summary and "New quiz"); the detail opens on demand. */}
+      <div style={{ display: 'flex', gap: '8px', alignItems: 'stretch' }}>
         <button
-          onClick={onReviewMissed}
-          style={{ width: '100%', marginBottom: '10px', padding: '10px', borderRadius: 'var(--r-card)', border: `1px solid ${COLOR.red}`, background: 'color-mix(in srgb, var(--color-red) 10%, transparent)', color: COLOR.red, fontSize: '13px', fontWeight: 600 }}
+          onClick={() => setOptionsOpen((o) => !o)}
+          aria-expanded={optionsOpen}
+          className="btn-flat"
+          style={{ flex: 1, minWidth: 0, textAlign: 'left', padding: '8px 12px', border: `1px solid ${COLOR.border}`, borderRadius: 'var(--r-ctl)', background: COLOR.surface, color: COLOR.text, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px' }}
         >
-          Review {missedCount} missed question{missedCount === 1 ? '' : 's'}
+          <span style={{ fontSize: '12px', minWidth: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+            <span style={{ color: COLOR.muted }}>Options: </span>
+            <span style={{ fontWeight: 600 }}>{length} questions · {typeSummary}</span>
+          </span>
+          <span style={{ fontSize: '11px', color: COLOR.muted, flexShrink: 0 }}>{optionsOpen ? '▴' : '▾'}</span>
         </button>
-      )}
-      <div className="flex justify-between items-center mb-2">
-        <div style={{ fontSize: '11px', color: COLOR.muted }}>
-          {poolSize} questions{isMixed ? ' · mixed across every category on purpose' : ''}
-        </div>
         <button
           onClick={onReroll}
-          style={{ fontSize: '11px', color: COLOR.primary, background: 'transparent', padding: '4px 8px', borderRadius: 'var(--r-ctl)', border: `1px solid ${COLOR.primary}`, flexShrink: 0 }}
+          style={{ fontSize: '12px', fontWeight: 600, color: COLOR.primary, background: 'transparent', padding: '0 12px', borderRadius: 'var(--r-ctl)', border: `1px solid ${COLOR.primary}`, flexShrink: 0 }}
         >
           New quiz
         </button>
       </div>
-      <div style={{ border: `1px solid ${COLOR.border}`, borderRadius: 'var(--r-card)', background: COLOR.surface, overflow: 'hidden' }}>
-        <button
-          onClick={() => setOptionsOpen((o) => !o)}
-          className="btn-flat"
-          style={{ width: '100%', textAlign: 'left', padding: '9px 12px', background: 'transparent', color: COLOR.text, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px' }}
-        >
-          <span style={{ fontSize: '12px' }}>
-            <span style={{ color: COLOR.muted }}>Options: </span>
-            <span style={{ fontWeight: 600 }}>{length} questions · {typeSummary}</span>
-          </span>
-          <span style={{ fontSize: '11px', color: COLOR.muted }}>{optionsOpen ? '▴' : '▾'}</span>
-        </button>
-        {optionsOpen && (
-          <div style={{ padding: '4px 12px 12px', borderTop: `1px solid ${COLOR.border}` }}>
-            <div className="flex items-center gap-2" style={{ margin: '10px 0' }}>
-              <label htmlFor="quiz-length-select" style={{ fontSize: '11px', color: COLOR.muted }}>Length</label>
-              <select
-                id="quiz-length-select"
-                value={length}
-                onChange={(e) => setLength(Number(e.target.value))}
+      {optionsOpen && (
+        <div style={{ marginTop: '8px', padding: '4px 12px 12px', border: `1px solid ${COLOR.border}`, borderRadius: 'var(--r-card)', background: COLOR.surface }}>
+          <div style={{ fontSize: '11px', color: COLOR.muted, margin: '8px 0 0' }}>
+            {poolSize} questions in this pool{isMixed ? ' · mixed across every category on purpose' : ''}
+          </div>
+          <div className="flex items-center gap-2" style={{ margin: '10px 0' }}>
+            <label htmlFor="quiz-length-select" style={{ fontSize: '11px', color: COLOR.muted }}>Length</label>
+            <select
+              id="quiz-length-select"
+              value={length}
+              onChange={(e) => setLength(Number(e.target.value))}
+              style={{
+                padding: '6px 10px', borderRadius: 'var(--r-ctl)', fontSize: '12.5px', fontWeight: 600,
+                border: `1px solid ${COLOR.border}`, background: COLOR.surface, color: COLOR.text,
+              }}
+            >
+              {lengths.map((n) => <option key={n} value={n}>{n} questions</option>)}
+            </select>
+          </div>
+          <div className="flex gap-2" style={{ flexWrap: 'wrap' }}>
+            {[['mc', 'Multiple choice'], ['ms', 'Multi-select'], ['tf', 'True / False']].map(([key, label]) => (
+              <button
+                key={key}
+                onClick={() => toggleType(key)}
                 style={{
-                  padding: '6px 10px', borderRadius: 'var(--r-ctl)', fontSize: '12.5px', fontWeight: 600,
-                  border: `1px solid ${COLOR.border}`, background: COLOR.surface, color: COLOR.text,
+                  flexShrink: 0, padding: '6px 12px', borderRadius: 'var(--r-pill)', fontSize: '12px', fontWeight: 500,
+                  border: `1px solid ${types[key] ? COLOR.gold : COLOR.border}`,
+                  background: types[key] ? 'color-mix(in srgb, var(--color-gold) 14%, transparent)' : COLOR.surface,
+                  color: types[key] ? COLOR.gold : COLOR.muted,
                 }}
               >
-                {lengths.map((n) => <option key={n} value={n}>{n} questions</option>)}
-              </select>
-            </div>
-            <div className="flex gap-2" style={{ flexWrap: 'wrap' }}>
-              {[['mc', 'Multiple choice'], ['ms', 'Multi-select'], ['tf', 'True / False']].map(([key, label]) => (
-                <button
-                  key={key}
-                  onClick={() => toggleType(key)}
-                  style={{
-                    flexShrink: 0, padding: '6px 12px', borderRadius: 'var(--r-pill)', fontSize: '12px', fontWeight: 500,
-                    border: `1px solid ${types[key] ? COLOR.gold : COLOR.border}`,
-                    background: types[key] ? 'color-mix(in srgb, var(--color-gold) 14%, transparent)' : COLOR.surface,
-                    color: types[key] ? COLOR.gold : COLOR.muted,
-                  }}
-                >
-                  {label}
-                </button>
-              ))}
-            </div>
+                {label}
+              </button>
+            ))}
           </div>
-        )}
-      </div>
+        </div>
+      )}
+      {missedCount > 0 && (
+        <button
+          onClick={onReviewMissed}
+          style={{ width: '100%', marginTop: '8px', padding: '7px 10px', borderRadius: 'var(--r-ctl)', border: `1px solid ${COLOR.red}`, background: 'color-mix(in srgb, var(--color-red) 8%, transparent)', color: COLOR.red, fontSize: '12.5px', fontWeight: 600 }}
+        >
+          Review {missedCount} missed question{missedCount === 1 ? '' : 's'}
+        </button>
+      )}
     </div>
   );
 }
@@ -15622,6 +16223,13 @@ function VerbalQuizPanel({
   speechSupported, phase, session, index, step, length, setLength, pauseSec, setPauseSec,
   poolSize, categories, onStart, onTogglePause, onSkip, onRestart,
 }) {
+  // A cue as the session starts and as it ends (celebration sounds, off by default).
+  const prevPhase = useRef(phase);
+  useEffect(() => {
+    if (prevPhase.current === 'setup' && phase !== 'setup' && phase !== 'complete') playCueSound('start');
+    if (prevPhase.current !== 'complete' && phase === 'complete') playCueSound('end');
+    prevPhase.current = phase;
+  }, [phase]);
   if (!speechSupported) {
     return (
       <div style={{ textAlign: 'center', color: COLOR.muted, fontSize: '13px', padding: '30px 10px' }}>
@@ -15967,7 +16575,7 @@ function MadLibsView({ session, index, score, categories, answers, onSetBlank, s
 // steps in the correct order yourself (type them, or tap suggestions from the
 // step bank drawn from this cert's own challenges). Saved per cert and played
 // alongside the built-in challenges; see validateScenario in 03_helpers.js.
-function ScenarioBuilder({ trackKey, bankSteps, scenarios, onSave, onDelete, onPractice, onClose }) {
+function ScenarioBuilder({ trackKey, stepLists, scenarios, onSave, onDelete, onPractice, onClose }) {
   const [title, setTitle] = useState('');
   const [steps, setSteps] = useState(['', '', '']);
   const [note, setNote] = useState('');
@@ -15994,7 +16602,11 @@ function ScenarioBuilder({ trackKey, bankSteps, scenarios, onSave, onDelete, onP
   };
   const edit = (x) => { setTitle(x.title); setSteps([...x.steps]); setNote(x.note || ''); setEditingId(x.id); setError(null); window.scrollTo({ top: 0, behavior: 'instant' }); };
   const field = { width: '100%', padding: '9px 11px', borderRadius: 'var(--r-ctl)', border: `1px solid ${COLOR.border}`, background: COLOR.surface, color: COLOR.text, fontSize: '13px' };
-  const bank = (bankSteps || []).filter((x) => !bankQuery.trim() || x.toLowerCase().includes(bankQuery.trim().toLowerCase())).slice(0, 40);
+  // The bank holds the learner's own steps first, then the cert's built-in ones; after each step typed,
+  // "ideas" offers what usually came next in the scenarios already known.
+  const bankSteps = useMemo(() => buildStepBank(stepLists, trackKey), [stepLists, trackKey]);
+  const bank = bankSteps.filter((x) => !bankQuery.trim() || x.text.toLowerCase().includes(bankQuery.trim().toLowerCase())).slice(0, 40);
+  const ideas = suggestNextSteps(steps, stepLists, 3);
   const small = { padding: '4px 8px', borderRadius: 'var(--r-ctl)', border: `1px solid ${COLOR.border}`, background: 'transparent', color: COLOR.muted, fontSize: '12px', fontWeight: 700 };
   return (
     <div>
@@ -16024,13 +16636,23 @@ function ScenarioBuilder({ trackKey, bankSteps, scenarios, onSave, onDelete, onP
           <button onClick={() => setBankOpen((o) => !o)} aria-expanded={bankOpen} className="btn-flat" style={small}>{bankOpen ? 'Hide step bank ▴' : `Step bank (${bankSteps.length}) ▾`}</button>
         )}
       </div>
+      {ideas.length > 0 && (
+        <div style={{ marginBottom: '10px' }}>
+          <div style={{ fontSize: '11px', color: COLOR.muted, marginBottom: '5px' }}>What usually comes next</div>
+          <div className="flex gap-2" style={{ flexWrap: 'wrap' }}>
+            {ideas.map((x) => (
+              <button key={x.text} onClick={() => addFromBank(x.text)} className="btn-flat" style={{ textAlign: 'left', padding: '6px 10px', borderRadius: 'var(--r-pill)', border: `1px solid ${x.mine ? COLOR.primary : COLOR.border}`, background: x.mine ? tint(COLOR.primary, 8) : COLOR.surfaceRaised, color: COLOR.text, fontSize: '12px', lineHeight: 1.35 }}>+ {x.text}</button>
+            ))}
+          </div>
+        </div>
+      )}
       {bankOpen && (
         <div style={{ border: `1px solid ${COLOR.border}`, borderRadius: 'var(--r-card)', padding: '10px', marginBottom: '10px', background: COLOR.surface }}>
-          <div style={{ fontSize: '11.5px', color: COLOR.muted, marginBottom: '6px' }}>Steps from this cert's built-in challenges. Tap one to add it to your scenario, then reorder.</div>
+          <div style={{ fontSize: '11.5px', color: COLOR.muted, marginBottom: '6px' }}>Steps from your own scenarios first, then this cert's built-in challenges. Tap one to add it to your scenario, then reorder.</div>
           <input value={bankQuery} onChange={(e) => setBankQuery(e.target.value)} placeholder="Search the bank…" aria-label="Search the step bank" style={{ ...field, marginBottom: '8px' }} />
           <div className="flex flex-col gap-1" style={{ maxHeight: '220px', overflowY: 'auto' }}>
             {bank.map((x) => (
-              <button key={x} onClick={() => addFromBank(x)} className="btn-flat" style={{ textAlign: 'left', padding: '7px 10px', borderRadius: 'var(--r-ctl)', border: `1px solid ${COLOR.border}`, background: COLOR.surfaceRaised, color: COLOR.text, fontSize: '12px', lineHeight: 1.4 }}>+ {x}</button>
+              <button key={x.text} onClick={() => addFromBank(x.text)} className="btn-flat" style={{ textAlign: 'left', padding: '7px 10px', borderRadius: 'var(--r-ctl)', border: `1px solid ${x.mine ? COLOR.primary : COLOR.border}`, background: COLOR.surfaceRaised, color: COLOR.text, fontSize: '12px', lineHeight: 1.4 }}>+ {x.text}{x.mine && <span className="mono" style={{ marginLeft: '6px', fontSize: '10px', color: ink(COLOR.primary) }}>yours</span>}</button>
             ))}
             {!bank.length && <div style={{ fontSize: '12px', color: COLOR.muted, padding: '6px' }}>No steps match.</div>}
           </div>
@@ -16211,19 +16833,18 @@ function PracticeToolPicker({ quizView, available, onSelect }) {
     g.items.push(t);
   });
   return (
-    <div style={{ marginBottom: '14px', position: 'relative' }}>
+    <div style={{ marginBottom: '10px', position: 'relative' }}>
       <button
         onClick={() => setOpen((o) => !o)}
         style={{
-          width: '100%', textAlign: 'left', padding: '10px 14px', borderRadius: 'var(--r-card)',
+          width: '100%', textAlign: 'left', padding: '9px 14px', borderRadius: 'var(--r-card)',
           border: `1px solid ${COLOR.border}`, background: COLOR.surface, color: COLOR.text,
           display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px',
         }}
       >
-        <span style={{ minWidth: 0 }}>
-          <span style={{ display: 'block', fontSize: '11px', color: COLOR.muted, textTransform: 'uppercase', letterSpacing: '0.04em', fontWeight: 600 }}>Practice tool</span>
-          <span style={{ display: 'block', fontSize: '14.5px', fontWeight: 600 }}>{current.label}</span>
-          <span style={{ display: 'block', fontSize: '11.5px', color: COLOR.muted, marginTop: '1px' }}>{current.desc}</span>
+        <span style={{ minWidth: 0, display: 'flex', alignItems: 'baseline', gap: '10px' }} title={current.desc}>
+          <span style={{ fontSize: '10.5px', color: COLOR.muted, textTransform: 'uppercase', flexShrink: 0 }}>Practice tool</span>
+          <span style={{ fontSize: '14.5px', fontWeight: 600 }}>{current.label}</span>
         </span>
         <span style={{ fontSize: '12px', color: COLOR.muted, flexShrink: 0 }}>{open ? '▴' : '▾'}</span>
       </button>
@@ -16563,6 +17184,7 @@ function CaseStudySetup({ list, onStart, categories }) {
 
 function CaseStudyView({ list, activeIndex, onStart, onExit, categories, question, qIndex, selected, onChoose, msPending, onToggleMs, onSubmitMs, onNext, phase, score, answers, flashcardsData }) {
   useScrollTopOnChange(qIndex);
+  useCelebrateWhen(activeIndex !== null && phase === 'complete', () => (score && score.total > 0 && score.correct === score.total ? 'great' : 'ok'));
   if (activeIndex === null) {
     return <CaseStudySetup list={list} onStart={onStart} categories={categories} />;
   }
@@ -17233,6 +17855,8 @@ function PathTrailNode({ unit, step, index, done, isNext, entry, onOpen }) {
 function PathView({ track, trackKey, doneMap, unlockedMap, pathLocking, results, seenLog, categories, speech, api, toughCount, autoStart, onAutoStarted, panel, onPanel, srs, missLog, weakSaved }) {
   const units = useMemo(() => buildPathUnits(trackKey), [trackKey]);
   const weakCount = useMemo(() => weakAnalyze(trackKey, results, seenLog, srs, missLog, todayString()).units.length, [trackKey, results, srs, missLog]);
+  const resultsAll = useMemo(() => ({ [trackKey]: results }), [trackKey, results]);
+  const seenLogAll = useMemo(() => ({ [trackKey]: seenLog }), [trackKey, seenLog]);
   const [session, setSession] = useState(null);
   const [completion, setCompletion] = useState(null);
   const [expanded, setExpanded] = useState(() => {
@@ -17265,8 +17889,8 @@ function PathView({ track, trackKey, doneMap, unlockedMap, pathLocking, results,
   if (panel === 'weak') {
     return (
       <WeakSubjectsView
-        track={track} trackKey={trackKey} results={results} seenLog={seenLog} srs={srs} missLog={missLog} saved={weakSaved}
-        categories={categories} speech={speech} api={api} panel={panel} onPanel={onPanel}
+        scopeKey={trackKey} trackKeys={[trackKey]} title={track.label} resultsAll={resultsAll} seenLogAll={seenLogAll} srs={srs} missLog={missLog} saved={weakSaved}
+        speech={speech} api={api} makeApi={() => api} panel={panel} onPanel={onPanel}
       />
     );
   }
@@ -17389,29 +18013,23 @@ function PathView({ track, trackKey, doneMap, unlockedMap, pathLocking, results,
       </div>
 
       {(reviewIds.length > 0 || toughCount > 0) && (
-        <div style={{ display: 'grid', gridTemplateColumns: reviewIds.length > 0 && toughCount > 0 ? 'repeat(2, minmax(0, 1fr))' : '1fr', gap: '8px', marginBottom: '16px' }}>
+        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '12px' }}>
           {reviewIds.length > 0 && (
             <button
               onClick={startReview}
               className="btn-flat"
-              style={{ padding: '10px 12px', borderRadius: 'var(--r-card)', textAlign: 'left', border: `1px solid ${COLOR.red}`, background: 'color-mix(in srgb, var(--color-red) 10%, transparent)', color: COLOR.red, minWidth: 0 }}
+              style={{ padding: '7px 12px', borderRadius: 'var(--r-ctl)', border: `1px solid ${COLOR.red}`, background: 'color-mix(in srgb, var(--color-red) 8%, transparent)', color: COLOR.red, fontSize: '12.5px', fontWeight: 700 }}
             >
-              <span style={{ display: 'block', fontSize: '13px', fontWeight: 800 }}>Review weak spots</span>
-              <span style={{ display: 'block', fontSize: '11.5px', fontWeight: 600, opacity: 0.9 }}>
-                {reviewIds.length} question{reviewIds.length === 1 ? '' : 's'} missed
-              </span>
+              Review weak spots · {reviewIds.length}
             </button>
           )}
           {toughCount > 0 && (
             <button
               onClick={api.openToughTerms}
               className="btn-flat"
-              style={{ padding: '10px 12px', borderRadius: 'var(--r-card)', textAlign: 'left', border: `1px solid ${COLOR.gold}`, background: 'color-mix(in srgb, var(--color-gold) 10%, transparent)', color: COLOR.gold, minWidth: 0 }}
+              style={{ padding: '7px 12px', borderRadius: 'var(--r-ctl)', border: `1px solid ${COLOR.gold}`, background: 'color-mix(in srgb, var(--color-gold) 8%, transparent)', color: COLOR.gold, fontSize: '12.5px', fontWeight: 700 }}
             >
-              <span style={{ display: 'block', fontSize: '13px', fontWeight: 800 }}>Tough terms</span>
-              <span style={{ display: 'block', fontSize: '11.5px', fontWeight: 600, opacity: 0.9 }}>
-                {toughCount} flashcard{toughCount === 1 ? '' : 's'} to revisit
-              </span>
+              Tough terms · {toughCount}
             </button>
           )}
         </div>
@@ -17488,7 +18106,7 @@ function PathView({ track, trackKey, doneMap, unlockedMap, pathLocking, results,
                 )}
               </div>
             ) : (
-              unit.summary && <div style={{ fontSize: '12.5px', color: COLOR.muted, padding: '2px 6px 0', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{unit.summary}</div>
+              unit.summary && !locked && <div style={{ fontSize: '12.5px', color: COLOR.muted, padding: '2px 6px 0', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{unit.summary}</div>
             )}
           </div>
         );
@@ -17680,7 +18298,7 @@ function PathBridgeStep({ bridge, questions, planKeys, api, onRetry, onDone, onO
 
 function HomeStudyPath({ tracks, remaining, progress, optionalProgress, mode, onSetMode, order, onSetOrder, certCount, onStart, onTestOut, onSkip, onOpenCert, certPlan, results, seenLog }) {
   const [shown, setShown] = useState(HOME_PATH_UPCOMING);
-  const [showOrder, setShowOrder] = useState(false);
+  const [showOptions, setShowOptions] = useState(false);
   const trackByKey = new Map(tracks.map((t) => [t.key, t]));
   const [first, ...rest] = remaining;
   const upcoming = rest.slice(0, shown);
@@ -17712,35 +18330,39 @@ function HomeStudyPath({ tracks, remaining, progress, optionalProgress, mode, on
         <div className="mono" style={{ fontSize: '12px', color: COLOR.muted }}>{progress.done} of {progress.total} steps</div>
       </div>
       <TickBar value={progress.done} total={progress.total} ticks={12} label={`${progress.pct}% of steps done`} />
-      <SegmentedControl
-        options={HOME_PATH_MODES.map((m) => ({ key: m, label: HOME_PATH_MODE_LABELS[m], title: HOME_PATH_MODE_HINTS[m] }))}
-        value={mode}
-        onChange={onSetMode}
-        style={{ margin: '14px 0 8px' }}
-      />
-      {/* The order switch and the explanatory hints are second-level options:
-          one quiet line until the learner asks for them. */}
-      <div className="flex items-center justify-between" style={{ display: 'flex', gap: '8px', marginBottom: '12px', minHeight: '20px' }}>
+      {/* The mode and order switches are second-level options: one quiet summary line
+          (with the optional-section count) until the learner opens them. */}
+      <div className="flex items-center justify-between" style={{ display: 'flex', gap: '8px', margin: '12px 0', minHeight: '20px' }}>
         <div style={{ fontSize: '11.5px', color: COLOR.muted, lineHeight: 1.4, minWidth: 0 }}>
           {mode === 'extended'
-            ? (optionalProgress.total > 0 ? `${optionalProgress.done} of ${optionalProgress.total} optional sections done` : 'Optional sections included')
+            ? `Extended learning${optionalProgress.total > 0 ? ` · ${optionalProgress.done}/${optionalProgress.total} optional done` : ''}`
             : 'Core steps only'}
+          {certCount > 1 ? ` · ${HOME_PATH_ORDER_LABELS[order]}` : ''}
         </div>
-        {certCount > 1 && (
-          <button
-            onClick={() => setShowOrder((v) => !v)}
-            aria-expanded={showOrder}
-            className="btn-flat"
-            style={{ background: 'transparent', color: COLOR.muted, fontSize: '11.5px', fontWeight: 600, padding: 0, whiteSpace: 'nowrap' }}
-          >
-            Order: {HOME_PATH_ORDER_LABELS[order]} {showOrder ? '▴' : '▾'}
-          </button>
-        )}
+        <button
+          onClick={() => setShowOptions((v) => !v)}
+          aria-expanded={showOptions}
+          className="btn-flat"
+          style={{ background: 'transparent', color: COLOR.muted, fontSize: '11.5px', fontWeight: 600, padding: 0, whiteSpace: 'nowrap' }}
+        >
+          Options {showOptions ? '▴' : '▾'}
+        </button>
       </div>
-      {certCount > 1 && showOrder && (
+      {showOptions && (
         <div style={{ marginTop: '-4px', marginBottom: '12px' }}>
-          <SegmentedControl options={HOME_PATH_ORDERS.map((o) => ({ key: o, label: HOME_PATH_ORDER_LABELS[o] }))} value={order} onChange={onSetOrder} style={{ marginBottom: '6px' }} />
-          <div style={{ fontSize: '11.5px', color: COLOR.muted, lineHeight: 1.45 }}>{HOME_PATH_ORDER_HINTS[order]}</div>
+          <SegmentedControl
+            options={HOME_PATH_MODES.map((m) => ({ key: m, label: HOME_PATH_MODE_LABELS[m], title: HOME_PATH_MODE_HINTS[m] }))}
+            value={mode}
+            onChange={onSetMode}
+            style={{ marginBottom: '6px' }}
+          />
+          <div style={{ fontSize: '11.5px', color: COLOR.muted, lineHeight: 1.45, marginBottom: certCount > 1 ? '12px' : 0 }}>{HOME_PATH_MODE_HINTS[mode]}</div>
+          {certCount > 1 && (
+            <>
+              <SegmentedControl options={HOME_PATH_ORDERS.map((o) => ({ key: o, label: HOME_PATH_ORDER_LABELS[o] }))} value={order} onChange={onSetOrder} style={{ marginBottom: '6px' }} />
+              <div style={{ fontSize: '11.5px', color: COLOR.muted, lineHeight: 1.45 }}>{HOME_PATH_ORDER_HINTS[order]}</div>
+            </>
+          )}
         </div>
       )}
 
@@ -17931,15 +18553,15 @@ function HomePathRun({ run, tracks, unitsByTrack, trackKeys, doneByTrack, mode, 
 
 /* ---- cross-cert reviews ---- */
 
-// Home card offering the reviews that span every cert in the plan: questions
-// you last missed, flashcards you rated OK or lower, and Mad Libs / Sequence /
-// Compare items you got wrong — or, when more than one has something waiting,
-// a single mixed round of all of them.
+// One Home card for everything to go back over, across every cert in the plan: the quick reviews
+// (questions you last missed, flashcards rated OK or lower, Mad Libs / Sequence / Compare items and
+// case studies you got wrong, or one mixed round of all of them) and, at the bottom of the same
+// card, a single line into the weak-subjects path. `weakInfo` = { lessons, critical, certs, path }.
 const REVIEW_MIXED = { weak: 6, tough: 8, games: 2, cases: 1 };
 
-function HomeReviewCard({ weakTotal, toughTotal, gamesTotal, casesTotal, reminder, onSetReminder, onStartReview }) {
+function HomeReviewHub({ weakTotal, toughTotal, gamesTotal, casesTotal, reminder, weakInfo, onStartReview, onOpenWeak }) {
   const available = [weakTotal, toughTotal, gamesTotal, casesTotal].filter((n) => n > 0).length;
-  if (!available) return null;
+  if (!available && !weakInfo.lessons) return null;
   const waiting = weakTotal + toughTotal + gamesTotal + casesTotal;
   const nudge = reviewReminderStatus(reminder, waiting, todayString());
   // Tiles sit two to a row so four review types don't stack into a wall of
@@ -17962,11 +18584,15 @@ function HomeReviewCard({ weakTotal, toughTotal, gamesTotal, casesTotal, reminde
     casesTotal > 0 && tile('Case studies', casesTotal, `${casesTotal} with a miss`, 'cases', COLOR.primary),
     gamesTotal > 0 && tile('Missed games', gamesTotal, `${gamesTotal} item${gamesTotal === 1 ? '' : 's'} to redo`, 'games', COLOR.primary),
   ].filter(Boolean);
+  const weakSub = [
+    `${weakInfo.lessons} lesson${weakInfo.lessons === 1 ? '' : 's'} need work${weakInfo.critical ? ` · ${weakInfo.critical} top priority` : ''}`,
+    weakInfo.path ? `path ${weakInfo.path.done}/${weakInfo.path.total} steps` : weakInfo.certs.join(', '),
+  ].filter(Boolean).join(' · ');
   return (
     <div style={{ boxShadow: SHADOW.card, background: tint(COLOR.primary, 8), border: `1px solid color-mix(in srgb, ${COLOR.primary} 38%, ${COLOR.border})`, borderLeft: `3px solid ${COLOR.primary}`, borderRadius: 'var(--r-card)', padding: '14px 16px', marginBottom: '14px' }}>
       <div className="flex justify-between items-baseline">
         <div className="itil-display" style={{ fontSize: '16px', fontWeight: 600 }}>Review across your certs</div>
-        <div style={{ fontSize: '12px', color: nudge.due ? COLOR.gold : COLOR.muted, fontWeight: nudge.due ? 700 : 400 }}>{waiting} waiting</div>
+        {waiting > 0 && <div style={{ fontSize: '12px', color: nudge.due ? COLOR.gold : COLOR.muted, fontWeight: nudge.due ? 700 : 400 }}>{waiting} waiting</div>}
       </div>
       {nudge.due && (
         <div style={{ fontSize: '12px', lineHeight: 1.45, color: COLOR.muted, marginTop: '4px' }}>
@@ -17986,17 +18612,21 @@ function HomeReviewCard({ weakTotal, toughTotal, gamesTotal, casesTotal, reminde
           <span style={{ fontSize: '16px' }}>›</span>
         </button>
       )}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '8px', marginTop: '8px' }}>{tiles}</div>
-      <label className="flex items-center justify-between" style={{ display: 'flex', marginTop: '12px', fontSize: '12px', color: COLOR.muted }}>
-        <span>Remind me to review</span>
-        <select
-          value={reminder ? reminder.days : REVIEW_REMINDER_DEFAULT_DAYS}
-          onChange={(e) => onSetReminder(Number(e.target.value))}
-          style={{ padding: '4px 8px', borderRadius: 'var(--r-ctl)', fontSize: '12px', border: `1px solid ${COLOR.border}`, background: COLOR.surfaceRaised, color: COLOR.text }}
+      {available > 0 && <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '8px', marginTop: '8px' }}>{tiles}</div>}
+      {weakInfo.lessons > 0 && (
+        <button
+          onClick={onOpenWeak}
+          aria-label="Open the weak-subjects path"
+          className="btn-flat"
+          style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px', width: '100%', textAlign: 'left', marginTop: available > 0 ? '12px' : '8px', padding: '10px 2px 0', background: 'transparent', border: 'none', borderTop: `1px solid ${COLOR.border}`, borderRadius: 0, color: COLOR.text }}
         >
-          {REVIEW_REMINDER_OPTIONS.map((o) => <option key={o.days} value={o.days}>{o.label}</option>)}
-        </select>
-      </label>
+          <span style={{ minWidth: 0 }}>
+            <span style={{ display: 'block', fontSize: '13px', fontWeight: 700, color: ink(COLOR.red) }}>Weak subjects</span>
+            <span style={{ display: 'block', fontSize: '11.5px', color: COLOR.muted, marginTop: '1px', lineHeight: 1.4 }}>{weakSub}</span>
+          </span>
+          <span style={{ fontSize: '16px', color: COLOR.muted, flexShrink: 0 }}>›</span>
+        </button>
+      )}
     </div>
   );
 }
@@ -18534,14 +19164,78 @@ function PgScenarioPicker({ tool, scenarios, onPick, intro, note, sandboxText })
   );
 }
 
+/* ---------- quiz me on this setup ---------- */
+
+// Optional credit toward the daily goal. The app listens for this and counts it only when the learner
+// switched "Count Playground work toward the daily goal" on (off by default).
+function pgCredit(n) {
+  try { window.dispatchEvent(new CustomEvent('cert-study-pg-credit', { detail: { n } })); } catch (e) { /* no window events: nothing to credit */ }
+}
+
+// A short quiz made from the setup on screen (src/js/03c_pg_quizme.js). Folded away until asked for, and
+// reset whenever the setup changes so its questions always match what the lab shows.
+function PgQuizMe({ kind, topo, causes, hue }) {
+  const on = hue || COLOR.primary;
+  const [qs, setQs] = useState(null);
+  const [i, setI] = useState(0);
+  const [picked, setPicked] = useState(null);
+  const [score, setScore] = useState(0);
+  const sig = JSON.stringify(topo);
+  useEffect(() => { setQs(null); setI(0); setPicked(null); setScore(0); }, [sig]);
+  const start = () => { setQs(pgQuizBuild(kind, topo, { seed: (Date.now() % 1000000) + 1, causes })); setI(0); setPicked(null); setScore(0); };
+  const q = qs && qs[i];
+  const finished = !!qs && qs.length > 0 && i >= qs.length;
+  const answer = (idx) => {
+    if (picked !== null || !q) return;
+    setPicked(idx);
+    if (idx === q.correct) { setScore((n) => n + 1); pgCredit(1); }
+  };
+  const next = () => { setPicked(null); setI(i + 1);  };
+  return (
+    <PgCard title="Quiz me on this setup" hue={on} collapsible defaultOpen={false}>
+      {!qs && (
+        <div>
+          <div style={{ fontSize: '13px', lineHeight: 1.55, color: COLOR.muted, marginBottom: '10px' }}>Five questions about the network above, made from your current settings. Change something and the questions change with it.</div>
+          <button onClick={start} style={{ padding: '10px 16px', borderRadius: 'var(--r-ctl)', border: 'none', background: on, color: COLOR.onAccent, fontSize: '13.5px', fontWeight: 800 }}>Start the quiz</button>
+        </div>
+      )}
+      {qs && qs.length === 0 && <div style={{ fontSize: '13px', color: COLOR.muted }}>This setup is too small to ask about. Add a host or a rule and try again.</div>}
+      {q && (
+        <div>
+          <div className="mono" style={{ fontSize: '10.5px', color: COLOR.muted, marginBottom: '6px' }}>Question {i + 1} of {qs.length}</div>
+          <div style={{ fontSize: '14.5px', fontWeight: 700, lineHeight: 1.5 }}>{q.prompt}</div>
+          {q.options.map((text, idx) => (
+            <QuizOption key={idx} index={idx} text={text} disabled={picked !== null}
+              state={picked === null ? 'idle' : idx === q.correct ? 'correct' : idx === picked ? 'wrong' : 'idle'}
+              onClick={() => answer(idx)} />
+          ))}
+          {picked !== null && (
+            <div style={{ marginTop: '10px' }}>
+              <div style={{ fontSize: '12.5px', lineHeight: 1.55, color: COLOR.muted }}><strong style={{ color: picked === q.correct ? ink(COLOR.success) : ink(COLOR.red) }}>{picked === q.correct ? 'Right. ' : 'Not quite. '}</strong>{q.explain}</div>
+              <button onClick={next} style={{ marginTop: '10px', padding: '9px 16px', borderRadius: 'var(--r-ctl)', border: 'none', background: on, color: COLOR.onAccent, fontSize: '13px', fontWeight: 800 }}>{i + 1 < qs.length ? 'Next question' : 'See my score'}</button>
+            </div>
+          )}
+        </div>
+      )}
+      {finished && (
+        <div>
+          <div className="itil-display" style={{ fontSize: '17px', fontWeight: 600 }}>{score} of {qs.length} right</div>
+          <div style={{ fontSize: '12.5px', color: COLOR.muted, margin: '4px 0 10px' }}>{score === qs.length ? 'You read this setup like a pro.' : 'Run the lab on the ones you missed, then try a fresh round.'}</div>
+          <button onClick={start} style={{ padding: '10px 16px', borderRadius: 'var(--r-ctl)', border: `1px solid ${on}`, background: 'transparent', color: ink(on), fontSize: '13.5px', fontWeight: 800 }}>New round</button>
+        </div>
+      )}
+    </PgCard>
+  );
+}
+
 // A guided scenario: story, the lab (renderLab), goal tracking, hints, the fix, the lesson.
 // isSolved(topo) is the scenario's goal; fixLines is the wording shown under "Show the fix".
-function PgScenarioShell({ tool, scenario, onBack, renderLab, isSolved, fixLines }) {
+function PgScenarioShell({ tool, scenario, onBack, renderLab, isSolved, fixLines, quiz }) {
   const [topo, setTopo] = useState(() => pgClone(scenario.topology));
   const [hintsShown, setHintsShown] = useState(0);
   const [showFix, setShowFix] = useState(false);
   const solved = isSolved(topo);
-  useEffect(() => { if (solved) pgMarkSolved(tool, scenario.id); }, [solved]);
+  useEffect(() => { if (solved && pgMarkSolved(tool, scenario.id)) pgCredit(3); }, [solved]);
   const reset = () => { setTopo(pgClone(scenario.topology)); setHintsShown(0); setShowFix(false); };
   return (
     <div>
@@ -18557,6 +19251,7 @@ function PgScenarioShell({ tool, scenario, onBack, renderLab, isSolved, fixLines
           {scenario.related && scenario.related.length > 0 && <div style={{ fontSize: '12px', color: COLOR.muted, marginTop: '8px' }}>Related study: {scenario.related.join(' · ')}</div>}
         </PgCard>
       )}
+      {solved && quiz && <PgQuizMe kind={quiz.kind} causes={quiz.causes} topo={topo} hue={COLOR.success} />}
       <PgCard title="Stuck?" hue={COLOR.orange}>
         {scenario.hints.slice(0, hintsShown).map((h, i) => <div key={i} style={{ fontSize: '13px', lineHeight: 1.5, marginBottom: '8px' }}><strong>Hint {i + 1}:</strong> {h}</div>)}
         <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
@@ -18571,7 +19266,7 @@ function PgScenarioShell({ tool, scenario, onBack, renderLab, isSolved, fixLines
 }
 
 // The free sandbox: a remembered setup plus reset and share.
-function PgSandboxShell({ tool, makeDefault, validate, onBack, renderLab, blurb }) {
+function PgSandboxShell({ tool, makeDefault, validate, onBack, renderLab, blurb, quiz }) {
   const [topo, setTopo, reset] = usePgSandbox(tool, makeDefault, validate);
   return (
     <div>
@@ -18580,6 +19275,7 @@ function PgSandboxShell({ tool, makeDefault, validate, onBack, renderLab, blurb 
         <div style={{ fontSize: '13px', lineHeight: 1.55 }}>{blurb}</div>
       </PgCard>
       {renderLab(topo, setTopo)}
+      {quiz && <PgQuizMe kind={quiz.kind} causes={quiz.causes} topo={topo} hue={COLOR.primary} />}
       <PgSharePanel topo={topo} setTopo={setTopo} reset={reset} validate={validate} />
     </div>
   );
@@ -18639,10 +19335,10 @@ function ProfileSection({ title, hue, right, children }) {
 
 function StatTile({ label, value, sub, hue }) {
   return (
-    <div style={{ minWidth: 0, background: tint(hue, 13), border: `1px solid color-mix(in srgb, ${hue} 40%, ${COLOR.border})`, borderRadius: 'var(--r-card)', padding: '12px' }}>
-      <div style={{ fontSize: '10.5px', textTransform: 'uppercase', color: ink(hue) }}>{label}</div>
-      <div className="mono" style={{ fontSize: '24px', fontWeight: 700, lineHeight: 1.15, marginTop: '8px', letterSpacing: '-0.02em' }}>{value}</div>
-      {sub && <div style={{ fontSize: '11.5px', color: COLOR.muted, marginTop: '1px' }}>{sub}</div>}
+    <div style={{ minWidth: 0, background: tint(hue, 13), border: `1px solid color-mix(in srgb, ${hue} 40%, ${COLOR.border})`, borderRadius: 'var(--r-card)', padding: '10px' }}>
+      <div style={{ fontSize: '10px', textTransform: 'uppercase', color: ink(hue), whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{label}</div>
+      <div className="mono" style={{ fontSize: '21px', fontWeight: 700, lineHeight: 1.15, marginTop: '6px', letterSpacing: '-0.02em' }}>{value}</div>
+      {sub && <div style={{ fontSize: '11px', color: COLOR.muted, marginTop: '1px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{sub}</div>}
     </div>
   );
 }
@@ -18764,25 +19460,25 @@ function ProfileView({ tracks, results, seenLog, srs, stats, certPlan, achieveme
     <div>
       <ProfileHeader profile={stats.profile || { name: '', hue: 'primary' }} level={level} totalActions={totalActions} firstDay={runs.first} onSave={onSaveProfile} />
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '10px', marginBottom: '14px' }}>
-        <StatTile label="Day streak" value={`🔥 ${stats.streak.current}`} sub={`Best: ${Math.max(stats.streak.longest, stats.streak.current)} days`} hue={COLOR.orange} />
-        <StatTile label="Days studied" value={runs.days} sub={`${week} actions this week`} hue={COLOR.success} />
-        <StatTile label="Questions" value={attempted} sub={attempted ? `${Math.round((correct / attempted) * 100)}% last answered right` : 'Answer one to start'} hue={COLOR.blue} />
-        <StatTile label="Cards reviewed" value={cards} sub="in spaced repetition" hue={COLOR.teal} />
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: '8px', marginBottom: '14px' }}>
+        <StatTile label="Day streak" value={`🔥 ${stats.streak.current}`} sub={`best ${Math.max(stats.streak.longest, stats.streak.current)}d`} hue={COLOR.orange} />
+        <StatTile label="Days studied" value={runs.days} sub={`${week} this week`} hue={COLOR.success} />
+        <StatTile label="Questions" value={attempted} sub={attempted ? `${Math.round((correct / attempted) * 100)}% right` : 'none yet'} hue={COLOR.blue} />
+        <StatTile label="Cards" value={cards} sub="in review" hue={COLOR.teal} />
         <StatTile label="Path steps" value={steps} sub={`${stats.counts.matchRoundsCompleted} match rounds`} hue={COLOR.primary} />
-        <StatTile label="Exams passed" value={stats.counts.examsPassed + stats.counts.finalMocksPassed} sub={`${stats.counts.perfectQuizzes} perfect quizzes`} hue={COLOR.gold} />
+        <StatTile label="Exams passed" value={stats.counts.examsPassed + stats.counts.finalMocksPassed} sub={`${stats.counts.perfectQuizzes} perfect`} hue={COLOR.gold} />
       </div>
 
-      <ProfileSection title="Activity" hue={COLOR.success} right={<span style={{ fontSize: '11.5px', color: COLOR.muted }}>Best day: {bestDay}</span>}>
+      <Disclosure label="Activity" summary={`best day ${bestDay}`} hue={COLOR.success} style={{ marginBottom: '14px' }}>
         <ActivityMap log={log} />
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '4px', fontSize: '10.5px', color: COLOR.muted, marginTop: '8px' }}>
           Less
           {[0, 28, 52, 76, 100].map((p) => <span key={p} style={{ width: '11px', height: '11px', borderRadius: '3px', background: p === 0 ? COLOR.surfaceRaised : `color-mix(in srgb, ${COLOR.success} ${p}%, ${COLOR.surfaceRaised})` }} />)}
           More
         </div>
-      </ProfileSection>
+      </Disclosure>
 
-      <ProfileSection title="Earned certifications" hue={COLOR.gold} right={<span style={{ fontSize: '11.5px', color: COLOR.muted }}>{earned.length} earned</span>}>
+      {earned.length > 0 && <ProfileSection title="Earned certifications" hue={COLOR.gold} right={<span style={{ fontSize: '11.5px', color: COLOR.muted }}>{earned.length} earned</span>}>
         {earned.length ? (
           <div className="flex flex-col gap-2">
             {earned.map((k) => {
@@ -18800,12 +19496,8 @@ function ProfileView({ tracks, results, seenLog, srs, stats, certPlan, achieveme
               );
             })}
           </div>
-        ) : (
-          <div style={{ fontSize: '12.5px', color: COLOR.muted, lineHeight: 1.5 }}>
-            Passed an exam? Tap <strong>Mark as passed</strong> on a cert in your plan below and it appears here as an earned certification.
-          </div>
-        )}
-      </ProfileSection>
+        ) : null}
+      </ProfileSection>}
 
       <ProfileSection title="My plan" hue={COLOR.primary} right={<button onClick={onOpenCertPath} className="btn-flat" style={{ background: 'transparent', color: ink(COLOR.primary), fontSize: '12px', fontWeight: 800, padding: 0 }}>Manage ›</button>}>
         {active.length ? (
@@ -19704,14 +20396,14 @@ function IpConfigTool({ pick, onPick }) {
   const scenario = scenarios.find((s) => s.id === pick);
   if (pick === 'sandbox') {
     return (
-      <PgSandboxShell tool="ipconfig" makeDefault={() => pgClone(PG_SANDBOX)} validate={pgIpValidTopo} onBack={() => onPick('')}
+      <PgSandboxShell tool="ipconfig" quiz={{ kind: 'ipconfig', causes: PG_IP_CAUSES }} makeDefault={() => pgClone(PG_SANDBOX)} validate={pgIpValidTopo} onBack={() => onPick('')}
         blurb="Break it on purpose. Give two hosts the same address, shrink a mask, remove a gateway, or add a route, then ping and read the explanation. Add hosts to any network."
         renderLab={(topo, setTopo) => <PgLab topo={topo} setTopo={setTopo} sandbox />} />
     );
   }
   if (scenario) {
     return (
-      <PgScenarioShell key={scenario.id} tool="ipconfig" scenario={scenario} onBack={() => onPick('')}
+      <PgScenarioShell key={scenario.id} tool="ipconfig" quiz={{ kind: 'ipconfig', causes: PG_IP_CAUSES }} scenario={scenario} onBack={() => onPick('')}
         isSolved={(topo) => scenario.expectFixed.every((g) => pgPing(topo, g.from, g.to).verdict === g.verdict)}
         fixLines={(sc) => sc.fix.map((f) => pgIpDescribeFix(sc, f))}
         renderLab={(topo, setTopo, sc) => <PgLab topo={topo} setTopo={setTopo} goals={sc.expectFixed} defaultAsk={sc.ask} />} />
@@ -20017,14 +20709,14 @@ function VlanTool({ pick, onPick }) {
   const scenario = scenarios.find((s) => s.id === pick);
   if (pick === 'sandbox') {
     return (
-      <PgSandboxShell tool="vlan" makeDefault={() => pgClone(pgData().vlanSandbox)} validate={pgVlanValidTopo} onBack={() => onPick('')}
+      <PgSandboxShell tool="vlan" quiz={{ kind: 'vlan', causes: PG_VLAN_CAUSES }} makeDefault={() => pgClone(pgData().vlanSandbox)} validate={pgVlanValidTopo} onBack={() => onPick('')}
         blurb="A working two-switch network with two VLANs and a router on a stick. Move a port to another VLAN, trim a trunk's allowed list, change a native VLAN, lock a port to one MAC address or turn the router port into an access port, then ping and read what each switch does."
         renderLab={(topo, setTopo) => <PgVlanLab topo={topo} setTopo={setTopo} />} />
     );
   }
   if (scenario) {
     return (
-      <PgScenarioShell key={scenario.id} tool="vlan" scenario={scenario} onBack={() => onPick('')}
+      <PgScenarioShell key={scenario.id} tool="vlan" quiz={{ kind: 'vlan', causes: PG_VLAN_CAUSES }} scenario={scenario} onBack={() => onPick('')}
         isSolved={(topo) => scenario.expectFixed.every((g) => pgVlanPing(topo, pgVlanNewState(), g.from, g.to).verdict === g.verdict)}
         fixLines={(sc) => sc.fix.map((f) => pgVlanDescribeFix(sc, f))}
         renderLab={(topo, setTopo, sc) => <PgVlanLab topo={topo} setTopo={setTopo} goals={sc.expectFixed} defaultAsk={sc.ask} />} />
@@ -20254,14 +20946,14 @@ function FirewallTool({ pick, onPick }) {
   const scenario = scenarios.find((s) => s.id === pick);
   if (pick === 'sandbox') {
     return (
-      <PgSandboxShell tool="firewall" makeDefault={() => pgClone(pgData().firewallSandbox)} validate={pgFwValidTopo} onBack={() => onPick('')}
+      <PgSandboxShell tool="firewall" quiz={{ kind: 'firewall', causes: PG_FW_CAUSES }} makeDefault={() => pgClone(pgData().firewallSandbox)} validate={pgFwValidTopo} onBack={() => onPick('')}
         blurb="A working firewall with an inside network, a DMZ web server and the internet. Reorder or add rules, switch stateful inspection or NAT off, change a forward, then test connections and read which rule matched."
         renderLab={(topo, setTopo) => <PgFwLab topo={topo} setTopo={setTopo} />} />
     );
   }
   if (scenario) {
     return (
-      <PgScenarioShell key={scenario.id} tool="firewall" scenario={scenario} onBack={() => onPick('')}
+      <PgScenarioShell key={scenario.id} tool="firewall" quiz={{ kind: 'firewall', causes: PG_FW_CAUSES }} scenario={scenario} onBack={() => onPick('')}
         isSolved={(topo) => scenario.expectFixed.every((g) => pgFwTest(topo, g).verdict === g.verdict)}
         fixLines={(sc) => sc.fixText}
         renderLab={(topo, setTopo, sc) => <PgFwLab topo={topo} setTopo={setTopo} goals={sc.expectFixed} defaultAsk={sc.ask} />} />
@@ -23365,13 +24057,17 @@ PLAYGROUND_EXTRA_TOOLS.push({
 
 /* ---------------- weak subjects: report, study order and the path built from it ---------------- */
 
-// The screens for src/js/03d_weak_path.js. On a cert's Path tab a switch flips between the
-// course path and "Weak spots": a report of which lessons your missed questions point at
-// (with the readings, flashcards and questions to go back to), the exam areas you are
-// losing points in, and a button that turns the ranking into a path in priority order.
-// Steps run through the same PathStepRunner as the course path.
+// The screens for src/js/03d_weak_path.js. The same view serves two scopes: one cert (its Path tab,
+// scope = the cert's key) and every cert in the plan (opened from Home, scope = 'mix'). It is one
+// short page: a header that holds the single next action (build the path, or continue it), the
+// weak lessons as compact rows that open on demand, and two folded sections (the exam areas losing
+// points, and the history of missed questions). Steps run through the same PathStepRunner as the
+// course path.
 
 const WEAK_TIER_HUE = { critical: COLOR.red, high: COLOR.orange, watch: COLOR.gold };
+const WEAK_MIX_PER_CERT = 3;
+const WEAK_MIX_LESSONS = 8;
+const WEAK_HISTORY_PAGE = 8;
 
 function PathPanelSwitch({ panel, onPanel, weakCount }) {
   if (!onPanel) return null;
@@ -23391,90 +24087,196 @@ function weakCardStyle(hue) {
 }
 
 const weakPill = { fontSize: '12.5px', fontWeight: 700, padding: '7px 12px', borderRadius: 'var(--r-ctl)', border: `1px solid ${COLOR.border}`, color: COLOR.muted, background: 'transparent' };
+const weakMiniLabel = { fontSize: '10.5px', textTransform: 'uppercase', color: COLOR.muted, margin: '12px 0 6px' };
 
-// One weak lesson: why it is flagged and what to go back to.
-function WeakUnitCard({ row, rank, open, onToggle, onRun, inPath }) {
-  const hue = WEAK_TIER_HUE[row.tier] || COLOR.gold;
-  const rd = row.readings;
+function weakTag(text, hue) {
+  return <span className="mono" style={{ fontSize: '10px', fontWeight: 700, color: ink(hue), padding: '2px 6px', borderRadius: 'var(--r-pill)', border: `1px solid color-mix(in srgb, ${hue} 45%, transparent)`, whiteSpace: 'nowrap' }}>{text}</span>;
+}
+
+// The correct answer of a question, as one line of text.
+function questionAnswerText(q) {
+  if (q.type === 'tf') return q.answer ? 'True' : 'False';
+  if (q.type === 'ms') return (q.correct || []).map((i) => (q.options || [])[i]).filter(Boolean).join(' · ');
+  return (q.options || [])[q.correct] || '';
+}
+
+const clampText = (s, n) => (s.length > n ? `${s.slice(0, n - 2)}…` : s);
+
+// One weak lesson as a compact row. Closed it shows the title, a tier tag and the reason in two
+// lines; open it shows the path steps (if the lesson is in the path) and what to go back to.
+function WeakLessonRow({ item, rank, open, onToggle, certLabel, done, onStep, onRun }) {
+  const hue = item.retired ? COLOR.success : (WEAK_TIER_HUE[item.tier] || COLOR.gold);
+  const row = item.row;
+  const prog = item.unit ? pathUnitProgress(item.unit, done) : null;
+  const reason = item.retired ? 'Every question that put this lesson here is answered correctly now, so its steps count as done.' : item.reason;
   return (
-    <div style={weakCardStyle(hue)}>
-      <button onClick={onToggle} aria-expanded={open} className="btn-flat" style={{ display: 'block', width: '100%', textAlign: 'left', background: 'transparent', border: 'none', padding: 0 }}>
-        <div style={{ display: 'flex', gap: '10px', alignItems: 'flex-start' }}>
-          <div aria-hidden="true" style={{ flexShrink: 0, width: '30px', height: '30px', borderRadius: '50%', background: hue, color: COLOR.onAccent, fontWeight: 900, fontSize: '14px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{rank}</div>
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap', marginBottom: '2px' }}>
-              <span style={{ fontSize: '15px', fontWeight: 800, lineHeight: 1.3 }}>{row.unit.title}</span>
-              <WeakTierChip tier={row.tier} />
-              {inPath && <span style={{ fontSize: '10.5px', fontWeight: 800, color: ink(COLOR.success) }}>✓ in your path</span>}
-            </div>
-            <div style={{ fontSize: '12.5px', color: COLOR.muted, lineHeight: 1.45 }}>{row.reason}</div>
-          </div>
-          <span aria-hidden="true" style={{ color: COLOR.muted, fontSize: '12px', paddingTop: '4px' }}>{open ? '▾' : '▸'}</span>
-        </div>
+    <div style={{ background: tint(hue, 5), border: `1px solid color-mix(in srgb, ${hue} 30%, ${COLOR.border})`, borderLeft: `3px solid ${hue}`, borderRadius: 'var(--r-card)', marginBottom: '8px' }}>
+      <button onClick={onToggle} aria-expanded={open} className="btn-flat" style={{ display: 'flex', gap: '10px', alignItems: 'flex-start', width: '100%', textAlign: 'left', background: 'transparent', border: 'none', borderRadius: 'var(--r-card)', padding: '11px 12px', color: COLOR.text }}>
+        <span aria-hidden="true" className="mono" style={{ flexShrink: 0, minWidth: '20px', fontSize: '12px', fontWeight: 700, color: ink(hue), paddingTop: '2px' }}>{String(rank).padStart(2, '0')}</span>
+        <span style={{ flex: 1, minWidth: 0 }}>
+          <span style={{ display: 'block', fontSize: '14.5px', fontWeight: 700, lineHeight: 1.3 }}>{item.title}</span>
+          <span style={{ display: 'flex', gap: '6px', alignItems: 'center', flexWrap: 'wrap', marginTop: '5px' }}>
+            {certLabel && <span className="mono" style={{ fontSize: '10px', fontWeight: 700, color: COLOR.muted, padding: '2px 6px', borderRadius: 'var(--r-pill)', border: `1px solid ${COLOR.border}` }}>{certLabel}</span>}
+            {item.retired ? weakTag('Mastered', COLOR.success) : <WeakTierChip tier={item.tier} />}
+            {prog && !item.retired && <span className="mono" style={{ fontSize: '10.5px', color: COLOR.muted }}>{prog.done}/{prog.total} steps</span>}
+          </span>
+          <span style={{ display: 'block', fontSize: '12px', color: COLOR.muted, lineHeight: 1.45, marginTop: '5px', ...(open ? {} : { display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }) }}>{reason}</span>
+        </span>
+        <span aria-hidden="true" style={{ flexShrink: 0, fontSize: '11px', color: COLOR.muted, paddingTop: '3px', transform: open ? 'rotate(180deg)' : 'none' }}>▾</span>
       </button>
       {open && (
-        <div style={{ marginTop: '12px', paddingTop: '12px', borderTop: `1px solid ${COLOR.border}` }}>
-          <div style={{ fontSize: '11px', fontWeight: 800, letterSpacing: '0.06em', textTransform: 'uppercase', color: COLOR.muted, marginBottom: '6px' }}>1 · Reading</div>
-          <div style={{ fontSize: '13px', lineHeight: 1.5, marginBottom: '6px' }}>Re-read <strong>{rd.lesson.title}</strong> ({rd.minutes} min).</div>
-          <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '8px' }}>
-            <button className="btn-flat" onClick={() => onRun('read')} style={weakPill}>Open the lesson</button>
-          </div>
-          {rd.resources.length > 0 && (
-            <div style={{ fontSize: '12.5px', lineHeight: 1.6, marginBottom: '12px' }}>
-              <span style={{ color: COLOR.muted }}>Official reading: </span>
-              {rd.resources.map((r, i) => (
-                <span key={r.url}>{i ? ' · ' : ''}<a href={r.url} target="_blank" rel="noopener noreferrer" style={{ color: ink(COLOR.primary), fontWeight: 700 }}>{r.label} ↗</a></span>
-              ))}
-            </div>
-          )}
-          <div style={{ fontSize: '11px', fontWeight: 800, letterSpacing: '0.06em', textTransform: 'uppercase', color: COLOR.muted, margin: '8px 0 6px' }}>2 · Flashcards</div>
-          {row.cards.length > 0 ? (
+        <div style={{ margin: '0 12px', padding: '4px 0 12px', borderTop: `1px solid ${COLOR.border}` }}>
+          {item.unit && (
             <>
-              <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginBottom: '8px' }}>
-                {row.cards.map((c) => (
-                  <span key={c.id} style={{ fontSize: '12px', padding: '3px 9px', borderRadius: 'var(--r-pill)', border: `1px solid ${row.tough.some((t) => t.id === c.id) ? COLOR.orange : COLOR.border}`, color: COLOR.text }}>{c.front}</span>
-                ))}
+              <div style={weakMiniLabel}>Path steps</div>
+              <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+                {item.unit.steps.map((st) => {
+                  const isDone = pathStepIsDone(done, st.id);
+                  return (
+                    <button key={st.id} className="btn-flat" onClick={() => onStep(item.unit, st)} aria-label={`${st.label}${isDone ? ', done' : ''}`}
+                      style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', fontSize: '12px', fontWeight: 700, padding: '5px 10px', borderRadius: 'var(--r-pill)', border: `1px solid ${isDone ? COLOR.success : COLOR.border}`, color: isDone ? ink(COLOR.success) : COLOR.text, background: isDone ? tint(COLOR.success, 12) : 'transparent' }}>
+                      <PathIcon kind={isDone ? 'check' : st.kind} size={14} /> {st.label}
+                    </button>
+                  );
+                })}
               </div>
-              <button className="btn-flat" onClick={() => onRun('cards')} style={weakPill}>Review these {row.cards.length} cards</button>
             </>
-          ) : <div style={{ fontSize: '12.5px', color: COLOR.muted }}>No flashcards map to this lesson.</div>}
-          <div style={{ fontSize: '11px', fontWeight: 800, letterSpacing: '0.06em', textTransform: 'uppercase', color: COLOR.muted, margin: '14px 0 6px' }}>3 · Questions you missed</div>
-          {row.missed.length > 0 ? (
+          )}
+          {row ? (
             <>
-              <ul style={{ margin: '0 0 8px', paddingLeft: '18px', listStyle: 'disc', fontSize: '12.5px', lineHeight: 1.5 }}>
-                {row.missed.slice(0, 4).map((m) => (
-                  <li key={m.q.id} style={{ marginBottom: '3px' }}>
-                    {m.q.question.length > 110 ? `${m.q.question.slice(0, 108)}…` : m.q.question}
-                    <span style={{ color: COLOR.muted }}>{m.misses > 1 ? ` · missed ${m.misses} times` : ''}</span>
-                  </li>
-                ))}
-                {row.missed.length > 4 && <li style={{ color: COLOR.muted, listStyle: 'none', marginLeft: '-18px' }}>+ {row.missed.length - 4} more</li>}
-              </ul>
-              <button className="btn-flat" onClick={() => onRun('weakquiz')} style={weakPill}>Redo these {Math.min(row.missed.length, WEAK_FIX_QUESTIONS)}</button>
+              <div style={weakMiniLabel}>Reading</div>
+              <div style={{ fontSize: '13px', lineHeight: 1.5, marginBottom: '6px' }}>Re-read <strong>{row.readings.lesson.title}</strong> ({row.readings.minutes} min).</div>
+              <button className="btn-flat" onClick={() => onRun(row, 'read')} style={weakPill}>Open the lesson</button>
+              {row.readings.resources.length > 0 && (
+                <div style={{ fontSize: '12.5px', lineHeight: 1.6, marginTop: '8px' }}>
+                  <span style={{ color: COLOR.muted }}>Official reading: </span>
+                  {row.readings.resources.map((r, i) => (
+                    <span key={r.url}>{i ? ' · ' : ''}<a href={r.url} target="_blank" rel="noopener noreferrer" style={{ color: ink(COLOR.primary), fontWeight: 700 }}>{r.label} ↗</a></span>
+                  ))}
+                </div>
+              )}
+              <div style={weakMiniLabel}>Flashcards</div>
+              {row.cards.length > 0 ? (
+                <>
+                  <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginBottom: '8px' }}>
+                    {row.cards.slice(0, 6).map((c) => (
+                      <span key={c.id} style={{ fontSize: '12px', padding: '3px 9px', borderRadius: 'var(--r-pill)', border: `1px solid ${row.tough.some((t) => t.id === c.id) ? COLOR.orange : COLOR.border}`, color: COLOR.text }}>{c.front}</span>
+                    ))}
+                    {row.cards.length > 6 && <span style={{ fontSize: '12px', color: COLOR.muted, padding: '3px 2px' }}>+ {row.cards.length - 6} more</span>}
+                  </div>
+                  <button className="btn-flat" onClick={() => onRun(row, 'cards')} style={weakPill}>Review these {row.cards.length} cards</button>
+                </>
+              ) : <div style={{ fontSize: '12.5px', color: COLOR.muted }}>No flashcards map to this lesson.</div>}
+              <div style={weakMiniLabel}>Questions you missed</div>
+              {row.missed.length > 0 ? (
+                <>
+                  <ul style={{ margin: '0 0 8px', paddingLeft: '18px', listStyle: 'disc', fontSize: '12.5px', lineHeight: 1.5 }}>
+                    {row.missed.slice(0, 3).map((m) => (
+                      <li key={m.q.id} style={{ marginBottom: '3px' }}>
+                        {clampText(m.q.question, 110)}
+                        <span style={{ color: COLOR.muted }}>{m.misses > 1 ? ` · missed ${m.misses} times` : ''}</span>
+                      </li>
+                    ))}
+                    {row.missed.length > 3 && <li style={{ color: COLOR.muted, listStyle: 'none', marginLeft: '-18px' }}>+ {row.missed.length - 3} more</li>}
+                  </ul>
+                  <button className="btn-flat" onClick={() => onRun(row, 'weakquiz')} style={weakPill}>Redo these {Math.min(row.missed.length, WEAK_FIX_QUESTIONS)}</button>
+                </>
+              ) : <div style={{ fontSize: '12.5px', color: COLOR.muted }}>No missed questions here: this lesson was flagged by flashcards or games.</div>}
             </>
-          ) : <div style={{ fontSize: '12.5px', color: COLOR.muted }}>No missed questions here: this lesson was flagged by flashcards or games.</div>}
+          ) : (
+            <div style={{ fontSize: '12.5px', color: COLOR.muted, marginTop: '10px' }}>This lesson is no longer flagged by your latest results.</div>
+          )}
         </div>
       )}
     </div>
   );
 }
 
-function WeakSubjectsView({ track, trackKey, results, seenLog, srs, missLog, saved, categories, speech, api, panel, onPanel }) {
+// The questions you have missed, newest first. Open a row to see the right answer and why; the
+// button runs a short retry quiz over what is listed.
+function MissedHistoryBody({ history, certLabelOf, multi, onRetry }) {
+  const wrong = history.filter((h) => h.state === 'wrong').length;
+  const [filter, setFilter] = useState(wrong ? 'wrong' : 'all');
+  const [shown, setShown] = useState(WEAK_HISTORY_PAGE);
+  const [openId, setOpenId] = useState(null);
+  const list = history.filter((h) => filter === 'all' || h.state === filter);
+  const visible = list.slice(0, shown);
+  const first = visible[0];
+  const retryList = first ? visible.filter((h) => h.trackKey === first.trackKey).slice(0, WEAK_FIX_QUESTIONS) : [];
+  const idKey = (h) => `${h.trackKey}::${h.q.id}`;
+  return (
+    <div>
+      <SegmentedControl
+        options={[{ key: 'wrong', label: 'Still wrong', badge: wrong }, { key: 'fixed', label: 'Fixed', badge: history.length - wrong }, { key: 'all', label: 'All', badge: history.length }]}
+        value={filter}
+        onChange={(k) => { setFilter(k); setShown(WEAK_HISTORY_PAGE); setOpenId(null); }}
+        style={{ marginBottom: '10px' }}
+      />
+      {list.length === 0 && <div style={{ fontSize: '12.5px', color: COLOR.muted, padding: '6px 2px' }}>{filter === 'wrong' ? 'Nothing is still wrong. Nice.' : 'Nothing here yet.'}</div>}
+      {visible.map((h) => {
+        const open = openId === idKey(h);
+        const stateHue = h.state === 'fixed' ? COLOR.success : COLOR.red;
+        return (
+          <div key={idKey(h)} style={{ borderTop: `1px solid ${COLOR.border}` }}>
+            <button onClick={() => setOpenId(open ? null : idKey(h))} aria-expanded={open} className="btn-flat" style={{ display: 'block', width: '100%', textAlign: 'left', background: 'transparent', border: 'none', borderRadius: 0, padding: '10px 2px', color: COLOR.text }}>
+              <span style={{ display: 'block', fontSize: '13px', lineHeight: 1.45, ...(open ? {} : { display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }) }}>{h.q.question}</span>
+              <span className="mono" style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'center', fontSize: '10.5px', color: COLOR.muted, marginTop: '4px' }}>
+                <span style={{ color: ink(stateHue), fontWeight: 700 }}>{h.state === 'fixed' ? '✓ fixed' : '✕ still wrong'}</span>
+                <span>missed {h.misses}×</span>
+                {h.last && <span>last {formatDateShort(h.last)}</span>}
+                {multi && <span>{certLabelOf(h.trackKey)}</span>}
+              </span>
+            </button>
+            {open && (
+              <div style={{ padding: '0 2px 12px', fontSize: '12.5px', lineHeight: 1.55 }}>
+                <div><span style={{ color: COLOR.muted }}>Answer: </span><strong>{questionAnswerText(h.q)}</strong></div>
+                {h.q.explanation && <div style={{ color: COLOR.muted, marginTop: '4px' }}>{h.q.explanation}</div>}
+              </div>
+            )}
+          </div>
+        );
+      })}
+      <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginTop: '10px' }}>
+        {retryList.length > 0 && (
+          <button className="btn-flat" onClick={() => onRetry(retryList)} style={{ ...weakPill, color: ink(COLOR.primary), border: `1px solid ${COLOR.primary}` }}>
+            Retry {retryList.length} question{retryList.length === 1 ? '' : 's'}{multi && first ? ` from ${certLabelOf(first.trackKey)}` : ''}
+          </button>
+        )}
+        {list.length > shown && <button className="btn-flat" onClick={() => setShown((n) => n + WEAK_HISTORY_PAGE)} style={weakPill}>Show more ({list.length - shown} left)</button>}
+      </div>
+    </div>
+  );
+}
+
+// props: scopeKey ('ccna', or 'mix' for every cert in the plan), trackKeys, title, resultsAll /
+// seenLogAll (keyed by cert), srs, missLog, saved (this scope's stored path), api (storage for this
+// scope: createWeakPath / completeWeakStep / clearWeakPath), makeApi(trackKey) (the handlers a step
+// records through), and either panel/onPanel (a cert's Path tab) or onExit (opened from Home).
+function WeakSubjectsView({ scopeKey, trackKeys, title, resultsAll, seenLogAll, srs, missLog, saved, speech, api, makeApi, panel, onPanel, onExit, exitLabel }) {
   const today = todayString();
-  const analysis = useMemo(() => weakAnalyze(trackKey, results, seenLog, srs, missLog, today), [trackKey, results, srs, missLog]);
-  const weakUnits = useMemo(() => (saved ? buildWeakUnits(trackKey, saved.snapshot) : []), [trackKey, saved]);
-  const done = (saved && saved.done) || {};
+  const multi = scopeKey === 'mix';
+  const certLabelOf = (k) => (TRACKS.find((t) => t.key === k) || { label: k }).label;
+  const analysis = useMemo(() => weakAnalyzeMany(trackKeys, resultsAll, seenLogAll, srs, missLog, today), [trackKeys.join(','), resultsAll, srs, missLog]);
+  const weakUnits = useMemo(() => (saved ? buildWeakUnitsFor(scopeKey, saved.snapshot) : []), [scopeKey, saved]);
+  const eff = useMemo(() => weakEffectiveDone(weakUnits, saved ? saved.snapshot : null, resultsAll, scopeKey, saved ? saved.done : {}, today), [weakUnits, saved, resultsAll]);
+  const done = eff.done;
+  const history = useMemo(() => missedHistory(trackKeys, resultsAll, missLog), [trackKeys.join(','), resultsAll, missLog]);
   const [session, setSession] = useState(null);
   const [completion, setCompletion] = useState(null);
-  const [openKey, setOpenKey] = useState(() => (analysis.units[0] ? analysis.units[0].unit.id : null));
+  const [openKey, setOpenKey] = useState(null);
   const [confirmRebuild, setConfirmRebuild] = useState(false);
 
   const startStep = (unit, step, adhoc) => { setCompletion(null); setSession({ unit, step, adhoc: !!adhoc, nonce: Date.now() }); window.scrollTo({ top: 0, behavior: 'instant' }); };
-  const rowUnit = (row) => buildWeakUnits(trackKey, { units: buildWeakSnapshot({ units: [row] }, today, 1).units })[0];
   const runForRow = (row, kind) => {
-    const unit = rowUnit(row);
+    const unit = buildWeakUnits(row.trackKey, { units: buildWeakSnapshot({ units: [row] }, today, 1).units })[0];
     const step = unit && unit.steps.find((s) => s.kind === kind);
-    if (step) startStep(unit, step, true);
+    if (step) startStep({ ...unit, trackKey: row.trackKey }, step, true);
+  };
+  const retryHistory = (list) => {
+    const tk = list[0].trackKey;
+    const ids = list.map((h) => h.q.id);
+    const unit = { id: 'history', index: 0, weak: true, trackKey: tk, title: 'Missed questions', lesson: { id: 'history', title: 'Missed questions' }, poolIds: ids, steps: [] };
+    startStep(unit, { id: 'weak::history::retry', kind: 'weakquiz', label: 'Retry your misses', missedIds: ids, poolIds: ids, count: ids.length }, true);
   };
   const finishStep = (pct) => {
     const { unit, step, adhoc } = session;
@@ -23486,11 +24288,13 @@ function WeakSubjectsView({ track, trackKey, results, seenLog, srs, missLog, sav
   };
 
   if (session) {
+    const tk = session.unit.trackKey || trackKeys[0];
     return (
       <PathStepRunner
         key={session.step.id + '-' + session.nonce}
-        trackKey={trackKey} units={session.adhoc ? [session.unit] : weakUnits} unit={session.unit} step={session.step}
-        results={results} seenLog={seenLog} categories={categories} speech={speech} api={api}
+        trackKey={tk} units={session.adhoc ? [session.unit] : weakUnits} unit={session.unit} step={session.step}
+        results={(resultsAll && resultsAll[tk]) || {}} seenLog={(seenLogAll && seenLogAll[tk]) || {}} categories={DATA[tk].categories} speech={speech} api={makeApi(tk)}
+        certLabel={multi ? certLabelOf(tk) : null}
         onDone={finishStep} onExit={() => setSession(null)} exitLabel="‹ Back to weak spots"
       />
     );
@@ -23509,164 +24313,128 @@ function WeakSubjectsView({ track, trackKey, results, seenLog, srs, missLog, sav
 
   const overall = pathOverallProgress(weakUnits, done);
   const nextStep = pathNextStep(weakUnits, done);
-  const outcome = saved ? weakPathOutcome(saved.snapshot, results) : null;
-  const inPath = new Set(saved ? saved.snapshot.units.map((u) => u.lessonId) : []);
-  const build = () => { api.createWeakPath(buildWeakSnapshot(analysis, today)); setConfirmRebuild(false); setOpenKey(null); };
+  const outcome = saved ? weakPathOutcome(saved.snapshot, multi ? resultsAll : (resultsAll && resultsAll[trackKeys[0]]) || {}, scopeKey) : null;
+  const build = () => { api.createWeakPath(buildWeakSnapshot(analysis, today, multi ? WEAK_MIX_LESSONS : undefined, multi ? WEAK_MIX_PER_CERT : undefined)); setConfirmRebuild(false); setOpenKey(null); };
   const hasProgress = overall.done > 0;
-  const plan = analysis.units.slice(0, WEAK_MAX_UNITS);
+  const planCount = Math.min(analysis.units.length, multi ? WEAK_MIX_LESSONS : WEAK_MAX_UNITS);
+
+  // One list: the lessons in the saved path first (in path order), then the other weak lessons.
+  const rowKey = (r) => `${r.trackKey}::${r.unit.id}`;
+  const byKey = new Map(analysis.units.map((r) => [rowKey(r), r]));
+  const inPathKeys = new Set();
+  const items = weakUnits.map((u) => {
+    const k = `${u.trackKey}::${u.lessonId}`;
+    inPathKeys.add(k);
+    const row = byKey.get(k) || null;
+    return { key: u.id, unit: u, row, tier: u.tier, title: u.title, reason: row ? row.reason : u.why, trackKey: u.trackKey, retired: eff.retired.has(u.id) };
+  });
+  const others = analysis.units.filter((r) => !inPathKeys.has(rowKey(r))).map((r) => ({ key: rowKey(r), unit: null, row: r, tier: r.tier, title: r.unit.title, reason: r.reason, trackKey: r.trackKey, retired: false }));
+  const renderRow = (item, i) => (
+    <WeakLessonRow key={item.key} item={item} rank={i + 1} open={openKey === item.key} certLabel={multi ? certLabelOf(item.trackKey) : null} done={done}
+      onToggle={() => setOpenKey(openKey === item.key ? null : item.key)} onStep={startStep} onRun={runForRow} />
+  );
+  const statLine = `${analysis.totals.missed} missed · ${analysis.units.length} weak lesson${analysis.units.length === 1 ? '' : 's'} · ${analysis.totals.tough} tough card${analysis.totals.tough === 1 ? '' : 's'}`;
+  const areas = analysis.categories.slice(0, 5);
 
   return (
     <div>
-      <PathPanelSwitch panel={panel} onPanel={onPanel} weakCount={analysis.units.length} />
+      {onExit
+        ? <button onClick={onExit} className="btn-flat" style={{ fontSize: '12px', color: COLOR.primary, background: 'transparent', marginBottom: '10px', padding: 0 }}>{exitLabel || '‹ Back'}</button>
+        : <PathPanelSwitch panel={panel} onPanel={onPanel} weakCount={analysis.units.length} />}
 
-      <div style={weakCardStyle(COLOR.red)}>
-        <div className="itil-display" style={{ fontSize: '17px', fontWeight: 600, marginBottom: '4px' }}>{track.label} weak spots</div>
-        <div style={{ fontSize: '13px', color: COLOR.muted, lineHeight: 1.55 }}>
-          Your missed questions, repeat misses and flashcards you rated as tough point back at the lessons below. Re-reading, the right flashcards and a quiz built around your misses, in the order that matters most.
+      <div style={weakCardStyle(saved || analysis.units.length ? COLOR.red : analysis.hasData ? COLOR.success : null)}>
+        <div className="flex justify-between items-baseline" style={{ gap: '8px', flexWrap: 'wrap' }}>
+          <div className="itil-display" style={{ fontSize: '17px', fontWeight: 600 }}>{title} weak spots</div>
+          {analysis.hasData && <div className="mono" style={{ fontSize: '11px', color: COLOR.muted }}>{statLine}</div>}
         </div>
-        {analysis.hasData && (
-          <div style={{ display: 'flex', gap: '8px', marginTop: '10px', flexWrap: 'wrap' }}>
-            {[[analysis.totals.missed, 'questions missed'], [analysis.units.length, 'weak lessons'], [analysis.totals.tough, 'tough cards']].map(([n, l]) => (
-              <div key={l} style={{ flex: '1 1 0', minWidth: '90px', border: `1px solid ${COLOR.border}`, borderRadius: 'var(--r-card)', padding: '6px 10px', background: COLOR.surface }}>
-                <div style={{ fontSize: '19px', fontWeight: 900 }}>{n}</div>
-                <div style={{ fontSize: '11px', color: COLOR.muted }}>{l}</div>
+
+        {!analysis.hasData && !saved && (
+          <div style={{ fontSize: '13px', color: COLOR.muted, lineHeight: 1.55, marginTop: '6px' }}>Nothing to analyse yet. Answer some questions in the course path or in Practice first; every miss teaches this page where to send you.</div>
+        )}
+        {analysis.hasData && analysis.units.length === 0 && !saved && (
+          <div style={{ fontSize: '13px', color: COLOR.muted, lineHeight: 1.55, marginTop: '6px' }}>No weak spots right now. You have answered {analysis.attempted} questions and nothing stands out. This page flags a lesson as soon as the misses pile up.</div>
+        )}
+
+        {!saved && analysis.units.length > 0 && (
+          <>
+            <div style={{ fontSize: '13px', color: COLOR.muted, lineHeight: 1.55, margin: '6px 0 12px' }}>
+              Work through the lessons below from the most urgent down: a re-read, targeted flashcards, a quiz built around your misses and a retest.
+            </div>
+            <button onClick={build} style={{ width: '100%', padding: '12px', borderRadius: 'var(--r-ctl)', border: 'none', background: COLOR.primary, color: COLOR.onAccent, fontSize: '14px', fontWeight: 800 }}>
+              Build my weak-subjects path ({planCount} lesson{planCount === 1 ? '' : 's'})
+            </button>
+          </>
+        )}
+
+        {saved && (
+          <>
+            <div style={{ margin: '10px 0 6px' }}><TickBar value={overall.done} total={overall.total} ticks={12} label={`${overall.pct}% of the weak-subjects path`} /></div>
+            <div className="mono" style={{ fontSize: '11px', color: COLOR.muted, marginBottom: '12px' }}>
+              {overall.done} of {overall.total} steps · {overall.unitsComplete} of {overall.unitCount} lessons done
+              {eff.retired.size ? ` · ${eff.retired.size} mastered` : ''}
+              {outcome && outcome.baseline ? ` · ${outcome.fixed} of ${outcome.baseline} misses fixed` : ''}
+            </div>
+            {nextStep ? (
+              <button onClick={() => startStep(nextStep.unit, nextStep.step)}
+                style={{ width: '100%', padding: '12px', borderRadius: 'var(--r-ctl)', border: 'none', background: COLOR.primary, color: COLOR.onAccent, fontSize: '14px', fontWeight: 800 }}>
+                {hasProgress ? 'Continue' : 'Start'}: {nextStep.step.label}
+              </button>
+            ) : (
+              <div style={{ padding: '10px 12px', borderRadius: 'var(--r-card)', background: tint(COLOR.success, 14), border: `1px solid ${COLOR.success}`, fontSize: '13.5px', fontWeight: 800 }}>
+                Path complete{outcome && outcome.baseline ? `: ${outcome.fixed} of ${outcome.baseline} missed questions are now answered correctly` : ''}. Rebuild to see what still needs work.
               </div>
-            ))}
-          </div>
+            )}
+            <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginTop: '10px', alignItems: 'center' }}>
+              {confirmRebuild ? (
+                <>
+                  <span style={{ fontSize: '12.5px', color: COLOR.muted }}>Replace this path and its progress?</span>
+                  <button className="btn-flat" onClick={build} style={{ ...weakPill, color: ink(COLOR.red), border: `1px solid ${COLOR.red}` }}>Yes, rebuild</button>
+                  <button className="btn-flat" onClick={() => setConfirmRebuild(false)} style={weakPill}>Cancel</button>
+                </>
+              ) : (
+                <>
+                  <button className="btn-flat" onClick={() => (hasProgress && nextStep ? setConfirmRebuild(true) : build())} disabled={!analysis.units.length} style={{ ...weakPill, opacity: analysis.units.length ? 1 : 0.5 }}>Rebuild from my latest results</button>
+                  <button className="btn-flat" onClick={api.clearWeakPath} style={weakPill}>Remove path</button>
+                  <span className="mono" style={{ fontSize: '10.5px', color: COLOR.muted }}>built {formatDateShort(saved.snapshot.created) || saved.snapshot.created}</span>
+                </>
+              )}
+            </div>
+          </>
         )}
       </div>
 
-      {!analysis.hasData && (
-        <div style={weakCardStyle()}>
-          <div style={{ fontSize: '14px', fontWeight: 800, marginBottom: '4px' }}>Nothing to analyse yet</div>
-          <div style={{ fontSize: '13px', color: COLOR.muted, lineHeight: 1.55 }}>Answer some questions in the course path or in Practice first. Every miss teaches this view where to send you.</div>
-        </div>
+      {items.length > 0 && (
+        <>
+          <SectionLabel first count={items.length}>In your path</SectionLabel>
+          {items.map((it, i) => renderRow(it, i))}
+        </>
       )}
-      {analysis.hasData && analysis.units.length === 0 && !saved && (
-        <div style={weakCardStyle(COLOR.success)}>
-          <div style={{ fontSize: '14px', fontWeight: 800, marginBottom: '4px' }}>No weak spots right now</div>
-          <div style={{ fontSize: '13px', color: COLOR.muted, lineHeight: 1.55 }}>You have answered {analysis.attempted} questions and nothing stands out as a problem. Keep going; this view will flag a lesson as soon as the misses pile up.</div>
-        </div>
-      )}
-
-      {saved ? (
-        <div style={weakCardStyle(COLOR.primary)}>
-          <div className="flex justify-between items-baseline" style={{ marginBottom: '6px', gap: '8px' }}>
-            <div className="itil-display" style={{ fontSize: '16px', fontWeight: 600 }}>Your weak-subjects path</div>
-            <div style={{ fontSize: '12px', color: COLOR.muted }}>built {formatDateShort(saved.snapshot.created) || saved.snapshot.created}</div>
-          </div>
-          <div style={{ height: '6px', borderRadius: '3px', background: COLOR.surfaceRaised, overflow: 'hidden', marginBottom: '6px' }}>
-            <div style={{ height: '100%', width: `${overall.pct}%`, background: COLOR.success }} />
-          </div>
-          <div style={{ fontSize: '12px', color: COLOR.muted, marginBottom: '8px' }}>{overall.done} of {overall.total} steps · {overall.unitsComplete} of {overall.unitCount} lessons done{outcome && outcome.baseline ? ` · ${outcome.fixed} of ${outcome.baseline} missed questions fixed so far` : ''}</div>
-          {weakUnits.map((u) => {
-            const p = pathUnitProgress(u, done);
-            return (
-              <div key={u.id} style={{ border: `1px solid ${p.complete ? COLOR.success : COLOR.border}`, borderRadius: 'var(--r-card)', padding: '10px 12px', marginBottom: '8px', background: COLOR.surface }}>
-                <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
-                  <span style={{ fontSize: '13.5px', fontWeight: 800 }}>{u.index + 1}. {u.title}</span>
-                  <WeakTierChip tier={u.tier} />
-                </div>
-                <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginTop: '6px' }}>
-                  {u.steps.map((st) => {
-                    const isDone = pathStepIsDone(done, st.id);
-                    return (
-                      <button key={st.id} className="btn-flat" onClick={() => startStep(u, st)} aria-label={`${st.label}${isDone ? ', done' : ''}`}
-                        style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', fontSize: '12px', fontWeight: 700, padding: '5px 10px', borderRadius: 'var(--r-pill)', border: `1px solid ${isDone ? COLOR.success : COLOR.border}`, color: isDone ? ink(COLOR.success) : COLOR.text, background: isDone ? tint(COLOR.success, 12) : 'transparent' }}>
-                        <PathIcon kind={isDone ? 'check' : st.kind} size={14} /> {st.label}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-            );
-          })}
-          {nextStep ? (
-            <button onClick={() => startStep(nextStep.unit, nextStep.step)}
-              style={{ width: '100%', padding: '12px', borderRadius: 'var(--r-ctl)', border: 'none', background: COLOR.primary, color: COLOR.onAccent, fontSize: '14px', fontWeight: 800, marginTop: '4px' }}>
-              {hasProgress ? 'Continue' : 'Start'}: {nextStep.step.label}
-            </button>
-          ) : (
-            <div style={{ padding: '10px 12px', borderRadius: 'var(--r-card)', background: tint(COLOR.success, 14), border: `1px solid ${COLOR.success}`, fontSize: '13.5px', fontWeight: 800, marginTop: '4px' }}>
-              Path complete{outcome && outcome.baseline ? `: ${outcome.fixed} of ${outcome.baseline} missed questions are now answered correctly` : ''}. Rebuild to see what still needs work.
-            </div>
-          )}
-          <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginTop: '10px' }}>
-            {confirmRebuild ? (
-              <>
-                <span style={{ fontSize: '12.5px', color: COLOR.muted, alignSelf: 'center' }}>Replace this path and its progress?</span>
-                <button className="btn-flat" onClick={build} style={{ ...weakPill, color: ink(COLOR.red), border: `1px solid ${COLOR.red}` }}>Yes, rebuild</button>
-                <button className="btn-flat" onClick={() => setConfirmRebuild(false)} style={weakPill}>Cancel</button>
-              </>
-            ) : (
-              <>
-                <button className="btn-flat" onClick={() => (hasProgress && nextStep ? setConfirmRebuild(true) : build())} disabled={!analysis.units.length} style={{ ...weakPill, opacity: analysis.units.length ? 1 : 0.5 }}>Rebuild from my latest results</button>
-                <button className="btn-flat" onClick={api.clearWeakPath} style={weakPill}>Remove path</button>
-              </>
-            )}
-          </div>
-        </div>
-      ) : analysis.units.length > 0 && (
-        <div style={weakCardStyle(COLOR.primary)}>
-          <div className="itil-display" style={{ fontSize: '16px', fontWeight: 600, marginBottom: '4px' }}>A new study order</div>
-          <div style={{ fontSize: '13px', color: COLOR.muted, lineHeight: 1.55, marginBottom: '10px' }}>
-            Instead of course order, work through these lessons from the most urgent down. Each one gets a re-read, targeted flashcards, a quiz built around your misses and a retest.
-          </div>
-          <ol style={{ margin: '0 0 12px', paddingLeft: '20px', listStyle: 'decimal', fontSize: '13px', lineHeight: 1.6 }}>
-            {plan.map((r) => <li key={r.unit.id}><strong>{r.unit.title}</strong> <WeakTierChip tier={r.tier} /></li>)}
-          </ol>
-          <button onClick={build} style={{ width: '100%', padding: '12px', borderRadius: 'var(--r-ctl)', border: 'none', background: COLOR.primary, color: COLOR.onAccent, fontSize: '14px', fontWeight: 800 }}>
-            Build my weak-subjects path ({plan.length} lesson{plan.length === 1 ? '' : 's'})
-          </button>
-        </div>
+      {others.length > 0 && (
+        <>
+          <SectionLabel first={!items.length} count={others.length}>{items.length ? 'Also weak, not in your path' : 'Weak lessons, most urgent first'}</SectionLabel>
+          {others.map((it, i) => renderRow(it, items.length + i))}
+        </>
       )}
 
-      {analysis.categories.length > 0 && (
-        <div style={weakCardStyle()}>
-          <div className="itil-display" style={{ fontSize: '16px', fontWeight: 600, marginBottom: '8px' }}>Where the exam points are leaking</div>
-          {analysis.categories.slice(0, 5).map((c) => (
-            <div key={c.key} style={{ marginBottom: '9px' }}>
+      {areas.length > 0 && (
+        <Disclosure label="Exam areas losing points" count={areas.length} summary={`${multi ? `${certLabelOf(areas[0].trackKey)} · ` : ''}${areas[0].label}`} style={{ marginTop: '14px' }}>
+          {areas.map((c) => (
+            <div key={`${c.trackKey}:${c.key}`} style={{ marginBottom: '9px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', gap: '8px', fontSize: '12.5px', marginBottom: '3px' }}>
-                <span style={{ fontWeight: 700 }}>{c.label}</span>
+                <span style={{ fontWeight: 700 }}>{multi ? `${certLabelOf(c.trackKey)} · ` : ''}{c.label}</span>
                 <span style={{ color: COLOR.muted, whiteSpace: 'nowrap' }}>{c.missed} of {c.attempted} missed{c.marks ? ` · ${c.marks}% of exam` : ''}</span>
               </div>
-              <div style={{ height: '6px', borderRadius: '3px', background: COLOR.surfaceRaised, overflow: 'hidden' }}>
-                <div style={{ height: '100%', width: `${Math.max(4, c.pctMissed)}%`, background: c.pctMissed >= 50 ? COLOR.red : c.pctMissed >= 25 ? COLOR.orange : COLOR.gold }} />
-              </div>
+              <TickBar value={c.missed} total={Math.max(1, c.attempted)} ticks={10} height={6} hue={c.pctMissed >= 50 ? COLOR.red : c.pctMissed >= 25 ? COLOR.orange : COLOR.gold} label={`${c.pctMissed}% missed`} />
             </div>
           ))}
-        </div>
+        </Disclosure>
       )}
 
-      {analysis.units.length > 0 && (
-        <div>
-          <div className="itil-display" style={{ fontSize: '16px', fontWeight: 600, margin: '4px 0 8px' }}>What to review, most urgent first</div>
-          {analysis.units.map((row, i) => (
-            <WeakUnitCard key={row.unit.id} row={row} rank={i + 1} open={openKey === row.unit.id} inPath={inPath.has(row.unit.id)}
-              onToggle={() => setOpenKey(openKey === row.unit.id ? null : row.unit.id)} onRun={(kind) => runForRow(row, kind)} />
-          ))}
-        </div>
+      {history.length > 0 && (
+        <Disclosure label="Missed questions" count={history.length} summary={`${history.filter((h) => h.state === 'wrong').length} still wrong`} style={areas.length ? undefined : { marginTop: '14px' }}>
+          <MissedHistoryBody history={history} multi={multi} certLabelOf={certLabelOf} onRetry={retryHistory} />
+        </Disclosure>
       )}
-    </div>
-  );
-}
-
-// A card on Home: the cert(s) in the plan that have weak lessons, and a way in.
-function HomeWeakSpotsCard({ summaries, trackLabel, onOpen }) {
-  if (!summaries.length) return null;
-  return (
-    <div style={{ boxShadow: SHADOW.card, background: tint(COLOR.red, 7), border: `1px solid color-mix(in srgb, ${COLOR.red} 35%, ${COLOR.border})`, borderLeft: `3px solid ${COLOR.red}`, borderRadius: 'var(--r-card)', padding: '14px 16px', marginBottom: '14px' }}>
-      <div className="itil-display" style={{ fontSize: '16px', fontWeight: 600, color: ink(COLOR.red), marginBottom: '4px' }}>Weak subjects</div>
-      <div style={{ fontSize: '12.5px', color: COLOR.muted, lineHeight: 1.5, marginBottom: '10px' }}>Lessons your wrong answers point back at, with a path that studies them in priority order.</div>
-      {summaries.slice(0, 3).map((s) => (
-        <div key={s.trackKey} style={{ border: `1px solid ${COLOR.border}`, borderRadius: 'var(--r-card)', padding: '10px 12px', marginBottom: '8px', background: COLOR.surface }}>
-          <div style={{ fontSize: '12px', fontWeight: 800, color: COLOR.muted, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{trackLabel(s.trackKey)}</div>
-          <div style={{ fontSize: '13.5px', fontWeight: 700, margin: '3px 0 6px', lineHeight: 1.45 }}>
-            {s.units.slice(0, 2).map((u) => u.unit.title).join(' · ')}{s.units.length > 2 ? ` · +${s.units.length - 2} more` : ''}
-          </div>
-          <button className="btn-flat" onClick={() => onOpen(s.trackKey)} style={{ ...weakPill, color: ink(COLOR.red), border: `1px solid ${COLOR.red}` }}>Open the weak-subjects path ›</button>
-        </div>
-      ))}
     </div>
   );
 }
@@ -24308,6 +25076,19 @@ function CertStudyApp() {
     saveStats(withActivity(current, n));
   };
 
+  // The Playground reports work worth a few daily-goal points (a scenario solved for the first time, a
+  // right answer in "Quiz me on this setup"). It counts only when switched on in Data & Progress.
+  const bumpGoalRef = useRef(null);
+  bumpGoalRef.current = bumpDailyGoal;
+  useEffect(() => {
+    const onCredit = (e) => {
+      const n = e && e.detail ? Number(e.detail.n) : 0;
+      if (statsRef.current.playgroundGoal && Number.isFinite(n) && n > 0 && bumpGoalRef.current) bumpGoalRef.current(n);
+    };
+    window.addEventListener('cert-study-pg-credit', onCredit);
+    return () => window.removeEventListener('cert-study-pg-credit', onCredit);
+  }, []);
+
   const setDailyGoalTarget = (target) => {
     const current = statsRef.current;
     saveStats({ ...current, dailyGoal: { ...current.dailyGoal, target } });
@@ -24641,6 +25422,13 @@ function CertStudyApp() {
       ? list.map((x) => (x.id === item.id ? { ...x, title: item.title, steps: item.steps, note: item.note } : x))
       : [...list, { id: 'sc' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6), track: item.track, title: item.title, steps: item.steps, note: item.note, at: todayString() }];
     saveStats({ ...cur, customScenarios: next });
+  };
+  // Items arriving from a share code (see 03f_share_bank.js): validated, deduplicated and merged.
+  const importSharedItems = (decoded) => {
+    const cur = statsRef.current;
+    const res = mergeSharedItems(cur.customTerms || [], cur.customScenarios || [], decoded, (prefix) => prefix + Date.now().toString(36) + Math.random().toString(36).slice(2, 6), todayString());
+    saveStats({ ...cur, customTerms: res.terms, customScenarios: res.scenarios });
+    return res;
   };
   const deleteScenario = (id) => {
     const cur = statsRef.current;
@@ -25612,7 +26400,7 @@ function CertStudyApp() {
         />
       )}
       {showAbout && <AboutLegalPanel onClose={() => setShowAbout(false)} />}
-      {showGlossary && <GlossaryPanel onClose={() => setShowGlossary(false)} customTerms={stats.customTerms || []} onSaveCustomTerm={saveCustomTerm} onDeleteCustomTerm={deleteCustomTerm} />}
+      {showGlossary && <GlossaryPanel onClose={() => setShowGlossary(false)} customTerms={stats.customTerms || []} customScenarios={stats.customScenarios || []} onSaveCustomTerm={saveCustomTerm} onDeleteCustomTerm={deleteCustomTerm} onImportShared={importSharedItems} />}
       {showCertPath && (
         <CertPathPanel
           tracks={visibleTracks}
@@ -25661,6 +26449,10 @@ function CertStudyApp() {
           onSetDyslexicFont={setDyslexicFont}
           pathLocking={stats.pathLocking !== false}
           onSetPathLocking={(on) => saveStats({ ...statsRef.current, pathLocking: on })}
+          playgroundGoal={stats.playgroundGoal === true}
+          onSetPlaygroundGoal={(on) => saveStats({ ...statsRef.current, playgroundGoal: on })}
+          reviewReminderDays={stats.reviewReminder ? stats.reviewReminder.days : REVIEW_REMINDER_DEFAULT_DAYS}
+          onSetReviewReminder={setReviewReminderDays}
         />
       )}
       <div style={{ background: `color-mix(in srgb, ${modeHue(mode)} 9%, ${COLOR.navBar})`, borderBottom: `1px solid color-mix(in srgb, ${modeHue(mode)} 45%, ${COLOR.border})`, position: 'sticky', top: 0, zIndex: 30, transition: 'background-color 0.2s ease' }}>
@@ -25758,7 +26550,6 @@ function CertStudyApp() {
             srs={srs}
             onSetHomePathMode={setHomePathMode}
             onSetHomePathOrder={setHomePathOrder}
-            onSetReviewReminder={setReviewReminderDays}
             onReviewStarted={markReviewStarted}
             onResume={() => {
               const lv = stats.lastVisited;
@@ -26017,7 +26808,7 @@ function CertStudyApp() {
             {seqBuilderOpen ? (
               <ScenarioBuilder
                 trackKey={activeTrack}
-                bankSteps={[...new Set(sequencesData.flatMap((x) => x.steps))]}
+                stepLists={[...sequencesData.map((x) => ({ steps: x.steps, mine: false, track: activeTrack })), ...(stats.customScenarios || []).map((x) => ({ steps: x.steps, mine: true, track: x.track }))]}
                 scenarios={stats.customScenarios || []}
                 onSave={saveScenario}
                 onDelete={deleteScenario}

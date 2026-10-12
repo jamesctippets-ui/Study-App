@@ -181,7 +181,7 @@ function PathBridgeStep({ bridge, questions, planKeys, api, onRetry, onDone, onO
 
 function HomeStudyPath({ tracks, remaining, progress, optionalProgress, mode, onSetMode, order, onSetOrder, certCount, onStart, onTestOut, onSkip, onOpenCert, certPlan, results, seenLog }) {
   const [shown, setShown] = useState(HOME_PATH_UPCOMING);
-  const [showOrder, setShowOrder] = useState(false);
+  const [showOptions, setShowOptions] = useState(false);
   const trackByKey = new Map(tracks.map((t) => [t.key, t]));
   const [first, ...rest] = remaining;
   const upcoming = rest.slice(0, shown);
@@ -213,35 +213,39 @@ function HomeStudyPath({ tracks, remaining, progress, optionalProgress, mode, on
         <div className="mono" style={{ fontSize: '12px', color: COLOR.muted }}>{progress.done} of {progress.total} steps</div>
       </div>
       <TickBar value={progress.done} total={progress.total} ticks={12} label={`${progress.pct}% of steps done`} />
-      <SegmentedControl
-        options={HOME_PATH_MODES.map((m) => ({ key: m, label: HOME_PATH_MODE_LABELS[m], title: HOME_PATH_MODE_HINTS[m] }))}
-        value={mode}
-        onChange={onSetMode}
-        style={{ margin: '14px 0 8px' }}
-      />
-      {/* The order switch and the explanatory hints are second-level options:
-          one quiet line until the learner asks for them. */}
-      <div className="flex items-center justify-between" style={{ display: 'flex', gap: '8px', marginBottom: '12px', minHeight: '20px' }}>
+      {/* The mode and order switches are second-level options: one quiet summary line
+          (with the optional-section count) until the learner opens them. */}
+      <div className="flex items-center justify-between" style={{ display: 'flex', gap: '8px', margin: '12px 0', minHeight: '20px' }}>
         <div style={{ fontSize: '11.5px', color: COLOR.muted, lineHeight: 1.4, minWidth: 0 }}>
           {mode === 'extended'
-            ? (optionalProgress.total > 0 ? `${optionalProgress.done} of ${optionalProgress.total} optional sections done` : 'Optional sections included')
+            ? `Extended learning${optionalProgress.total > 0 ? ` · ${optionalProgress.done}/${optionalProgress.total} optional done` : ''}`
             : 'Core steps only'}
+          {certCount > 1 ? ` · ${HOME_PATH_ORDER_LABELS[order]}` : ''}
         </div>
-        {certCount > 1 && (
-          <button
-            onClick={() => setShowOrder((v) => !v)}
-            aria-expanded={showOrder}
-            className="btn-flat"
-            style={{ background: 'transparent', color: COLOR.muted, fontSize: '11.5px', fontWeight: 600, padding: 0, whiteSpace: 'nowrap' }}
-          >
-            Order: {HOME_PATH_ORDER_LABELS[order]} {showOrder ? '▴' : '▾'}
-          </button>
-        )}
+        <button
+          onClick={() => setShowOptions((v) => !v)}
+          aria-expanded={showOptions}
+          className="btn-flat"
+          style={{ background: 'transparent', color: COLOR.muted, fontSize: '11.5px', fontWeight: 600, padding: 0, whiteSpace: 'nowrap' }}
+        >
+          Options {showOptions ? '▴' : '▾'}
+        </button>
       </div>
-      {certCount > 1 && showOrder && (
+      {showOptions && (
         <div style={{ marginTop: '-4px', marginBottom: '12px' }}>
-          <SegmentedControl options={HOME_PATH_ORDERS.map((o) => ({ key: o, label: HOME_PATH_ORDER_LABELS[o] }))} value={order} onChange={onSetOrder} style={{ marginBottom: '6px' }} />
-          <div style={{ fontSize: '11.5px', color: COLOR.muted, lineHeight: 1.45 }}>{HOME_PATH_ORDER_HINTS[order]}</div>
+          <SegmentedControl
+            options={HOME_PATH_MODES.map((m) => ({ key: m, label: HOME_PATH_MODE_LABELS[m], title: HOME_PATH_MODE_HINTS[m] }))}
+            value={mode}
+            onChange={onSetMode}
+            style={{ marginBottom: '6px' }}
+          />
+          <div style={{ fontSize: '11.5px', color: COLOR.muted, lineHeight: 1.45, marginBottom: certCount > 1 ? '12px' : 0 }}>{HOME_PATH_MODE_HINTS[mode]}</div>
+          {certCount > 1 && (
+            <>
+              <SegmentedControl options={HOME_PATH_ORDERS.map((o) => ({ key: o, label: HOME_PATH_ORDER_LABELS[o] }))} value={order} onChange={onSetOrder} style={{ marginBottom: '6px' }} />
+              <div style={{ fontSize: '11.5px', color: COLOR.muted, lineHeight: 1.45 }}>{HOME_PATH_ORDER_HINTS[order]}</div>
+            </>
+          )}
         </div>
       )}
 
@@ -432,15 +436,15 @@ function HomePathRun({ run, tracks, unitsByTrack, trackKeys, doneByTrack, mode, 
 
 /* ---- cross-cert reviews ---- */
 
-// Home card offering the reviews that span every cert in the plan: questions
-// you last missed, flashcards you rated OK or lower, and Mad Libs / Sequence /
-// Compare items you got wrong — or, when more than one has something waiting,
-// a single mixed round of all of them.
+// One Home card for everything to go back over, across every cert in the plan: the quick reviews
+// (questions you last missed, flashcards rated OK or lower, Mad Libs / Sequence / Compare items and
+// case studies you got wrong, or one mixed round of all of them) and, at the bottom of the same
+// card, a single line into the weak-subjects path. `weakInfo` = { lessons, critical, certs, path }.
 const REVIEW_MIXED = { weak: 6, tough: 8, games: 2, cases: 1 };
 
-function HomeReviewCard({ weakTotal, toughTotal, gamesTotal, casesTotal, reminder, onSetReminder, onStartReview }) {
+function HomeReviewHub({ weakTotal, toughTotal, gamesTotal, casesTotal, reminder, weakInfo, onStartReview, onOpenWeak }) {
   const available = [weakTotal, toughTotal, gamesTotal, casesTotal].filter((n) => n > 0).length;
-  if (!available) return null;
+  if (!available && !weakInfo.lessons) return null;
   const waiting = weakTotal + toughTotal + gamesTotal + casesTotal;
   const nudge = reviewReminderStatus(reminder, waiting, todayString());
   // Tiles sit two to a row so four review types don't stack into a wall of
@@ -463,11 +467,15 @@ function HomeReviewCard({ weakTotal, toughTotal, gamesTotal, casesTotal, reminde
     casesTotal > 0 && tile('Case studies', casesTotal, `${casesTotal} with a miss`, 'cases', COLOR.primary),
     gamesTotal > 0 && tile('Missed games', gamesTotal, `${gamesTotal} item${gamesTotal === 1 ? '' : 's'} to redo`, 'games', COLOR.primary),
   ].filter(Boolean);
+  const weakSub = [
+    `${weakInfo.lessons} lesson${weakInfo.lessons === 1 ? '' : 's'} need work${weakInfo.critical ? ` · ${weakInfo.critical} top priority` : ''}`,
+    weakInfo.path ? `path ${weakInfo.path.done}/${weakInfo.path.total} steps` : weakInfo.certs.join(', '),
+  ].filter(Boolean).join(' · ');
   return (
     <div style={{ boxShadow: SHADOW.card, background: tint(COLOR.primary, 8), border: `1px solid color-mix(in srgb, ${COLOR.primary} 38%, ${COLOR.border})`, borderLeft: `3px solid ${COLOR.primary}`, borderRadius: 'var(--r-card)', padding: '14px 16px', marginBottom: '14px' }}>
       <div className="flex justify-between items-baseline">
         <div className="itil-display" style={{ fontSize: '16px', fontWeight: 600 }}>Review across your certs</div>
-        <div style={{ fontSize: '12px', color: nudge.due ? COLOR.gold : COLOR.muted, fontWeight: nudge.due ? 700 : 400 }}>{waiting} waiting</div>
+        {waiting > 0 && <div style={{ fontSize: '12px', color: nudge.due ? COLOR.gold : COLOR.muted, fontWeight: nudge.due ? 700 : 400 }}>{waiting} waiting</div>}
       </div>
       {nudge.due && (
         <div style={{ fontSize: '12px', lineHeight: 1.45, color: COLOR.muted, marginTop: '4px' }}>
@@ -487,17 +495,21 @@ function HomeReviewCard({ weakTotal, toughTotal, gamesTotal, casesTotal, reminde
           <span style={{ fontSize: '16px' }}>›</span>
         </button>
       )}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '8px', marginTop: '8px' }}>{tiles}</div>
-      <label className="flex items-center justify-between" style={{ display: 'flex', marginTop: '12px', fontSize: '12px', color: COLOR.muted }}>
-        <span>Remind me to review</span>
-        <select
-          value={reminder ? reminder.days : REVIEW_REMINDER_DEFAULT_DAYS}
-          onChange={(e) => onSetReminder(Number(e.target.value))}
-          style={{ padding: '4px 8px', borderRadius: 'var(--r-ctl)', fontSize: '12px', border: `1px solid ${COLOR.border}`, background: COLOR.surfaceRaised, color: COLOR.text }}
+      {available > 0 && <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '8px', marginTop: '8px' }}>{tiles}</div>}
+      {weakInfo.lessons > 0 && (
+        <button
+          onClick={onOpenWeak}
+          aria-label="Open the weak-subjects path"
+          className="btn-flat"
+          style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px', width: '100%', textAlign: 'left', marginTop: available > 0 ? '12px' : '8px', padding: '10px 2px 0', background: 'transparent', border: 'none', borderTop: `1px solid ${COLOR.border}`, borderRadius: 0, color: COLOR.text }}
         >
-          {REVIEW_REMINDER_OPTIONS.map((o) => <option key={o.days} value={o.days}>{o.label}</option>)}
-        </select>
-      </label>
+          <span style={{ minWidth: 0 }}>
+            <span style={{ display: 'block', fontSize: '13px', fontWeight: 700, color: ink(COLOR.red) }}>Weak subjects</span>
+            <span style={{ display: 'block', fontSize: '11.5px', color: COLOR.muted, marginTop: '1px', lineHeight: 1.4 }}>{weakSub}</span>
+          </span>
+          <span style={{ fontSize: '16px', color: COLOR.muted, flexShrink: 0 }}>›</span>
+        </button>
+      )}
     </div>
   );
 }

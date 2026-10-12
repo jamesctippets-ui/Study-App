@@ -274,14 +274,14 @@ function IpConfigTool({ pick, onPick }) {
   const scenario = scenarios.find((s) => s.id === pick);
   if (pick === 'sandbox') {
     return (
-      <PgSandboxShell tool="ipconfig" makeDefault={() => pgClone(PG_SANDBOX)} validate={pgIpValidTopo} onBack={() => onPick('')}
+      <PgSandboxShell tool="ipconfig" quiz={{ kind: 'ipconfig', causes: PG_IP_CAUSES }} makeDefault={() => pgClone(PG_SANDBOX)} validate={pgIpValidTopo} onBack={() => onPick('')}
         blurb="Break it on purpose. Give two hosts the same address, shrink a mask, remove a gateway, or add a route, then ping and read the explanation. Add hosts to any network."
         renderLab={(topo, setTopo) => <PgLab topo={topo} setTopo={setTopo} sandbox />} />
     );
   }
   if (scenario) {
     return (
-      <PgScenarioShell key={scenario.id} tool="ipconfig" scenario={scenario} onBack={() => onPick('')}
+      <PgScenarioShell key={scenario.id} tool="ipconfig" quiz={{ kind: 'ipconfig', causes: PG_IP_CAUSES }} scenario={scenario} onBack={() => onPick('')}
         isSolved={(topo) => scenario.expectFixed.every((g) => pgPing(topo, g.from, g.to).verdict === g.verdict)}
         fixLines={(sc) => sc.fix.map((f) => pgIpDescribeFix(sc, f))}
         renderLab={(topo, setTopo, sc) => <PgLab topo={topo} setTopo={setTopo} goals={sc.expectFixed} defaultAsk={sc.ask} />} />
