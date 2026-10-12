@@ -6,6 +6,10 @@ Topology shape (see the header of the engine for the full description):
   server:   {name, segment, ip, mask, online, conflictDetection, scopes: [{id, name, network, mask, start, end, excluded, gateway, dns, leaseHours}]}
   dns:      [addresses that really answer DNS]
   hosts:    [{id, name, segment, mode: 'dhcp'|'static', mac, probe, ip, mask, gateway}]
+  optional (a topology without them behaves exactly as before; each one adds its own editor card to the lab):
+  rogue:    {name, segment, enabled, answersFirst, ip, mask, start, end, gateway, dns}   a DHCP server nobody authorised
+  snooping: {enabled, vlans: [segment ids], trustServer, trustUplink, trustClients, rateLimit}   the access switch
+  flood:    {enabled, segment, perSecond}   a starvation attack: DISCOVERs with made-up MAC addresses
 
 A goal (an entry of expect / expectFixed) is {client, verdict: 'success'|'failed', code?, clean?, script?, label?}:
 the engine applies the optional setup edits ([{path, value}], e.g. the server running), boots every DHCP client on a fresh server, runs the optional script
@@ -17,6 +21,7 @@ A fix is a list of {path, value} (set a field), {push, value} (append to a list)
 TOOL_KEY = 'dhcp'
 
 TOPOLOGY_KEYS = ('segments', 'router', 'server', 'dns', 'hosts')
+OPTIONAL_TOPOLOGY_KEYS = ('rogue', 'snooping', 'flood')
 
 
 def _scope(sid, name, network, start, end, gateway, dns, lease, mask='255.255.255.0', excluded=''):
@@ -88,6 +93,42 @@ def _goal(client, label, verdict='success', **kw):
     g = {'client': client, 'verdict': verdict, 'label': label}
     g.update(kw)
     return g
+
+
+def _rogue(segment='lan', enabled=True, answers_first=True, **kw):
+    """A home router with DHCP switched on, plugged into a wall jack: its own network, gateway and DNS."""
+    r = {'name': 'Home router', 'segment': segment, 'enabled': enabled, 'answersFirst': answers_first,
+         'ip': '192.168.1.1', 'mask': '255.255.255.0', 'start': '192.168.1.100', 'end': '192.168.1.150',
+         'gateway': '192.168.1.1', 'dns': '192.168.1.1'}
+    r.update(kw)
+    return r
+
+
+def _snooping(enabled=False, vlans=None, trust_server=False, trust_uplink=False, trust_clients=False, rate_limit=0):
+    """The access switch: ip dhcp snooping, ip dhcp snooping vlan, ip dhcp snooping trust, ip dhcp snooping limit rate."""
+    return {'enabled': enabled, 'vlans': list(vlans or []), 'trustServer': trust_server, 'trustUplink': trust_uplink,
+            'trustClients': trust_clients, 'rateLimit': rate_limit}
+
+
+def _flood(enabled=False, segment='lan', per_second=100):
+    return {'enabled': enabled, 'segment': segment, 'perSecond': per_second}
+
+
+# Goals of the security scenarios keep the intruder in place (the learner may not simply unplug it).
+_ROGUE_SETUP = [{'path': 'rogue.enabled', 'value': True}, {'path': 'rogue.answersFirst', 'value': True}]
+_FLOOD_SETUP = [{'path': 'flood.enabled', 'value': True}, {'path': 'flood.perSecond', 'value': 100}]
+
+
+def _secure_flat(snooping, rogue=None, flood=None, end='192.168.10.129'):
+    """The office LAN with the switch in the middle: desks, DHCP server and router all plug into it."""
+    t = _flat(_scope('office', 'Office', '192.168.10.0', '192.168.10.100', end, '192.168.10.1', '192.168.10.5', 8),
+              [_client('ana', 'Laptop Ana', 'lan', 1), _client('ben', 'Laptop Ben', 'lan', 2), _client('desk', 'Reception PC', 'lan', 3)])
+    if rogue is not None:
+        t['rogue'] = rogue
+    t['snooping'] = snooping
+    if flood is not None:
+        t['flood'] = flood
+    return t
 
 
 # ---------------------------------------------------------------- scenario 1: the pool is too small
@@ -331,6 +372,151 @@ SCENARIOS = [
         'lesson': 'A lease is a loan. At T1 (50% of the lease) the client asks its server to renew by unicast; if that fails it broadcasts a request at T2 (87.5%); if nobody answers by the end of the lease it must stop using the address. Clients ride out a server outage only while their lease lasts, so lease times should be longer than the outages you must survive (and shorter than the time you are willing to wait for freed addresses).',
         'related': ['CCNA: DHCP', 'RFC 2131 section 4.4.5'],
     },
+    {
+        'id': 'rogue-router',
+        'title': 'A wall-jack router hands out the wrong gateway',
+        'goal': 'Make the PCs keep the office\'s own settings even though the stray router is still plugged in.',
+        'level': 'starter',
+        'story': 'A small office has one managed switch: the desks, the DHCP server (192.168.10.5) and the router (192.168.10.1) all plug into it. Last week someone in marketing plugged a Wi-Fi router into a wall jack to get better coverage. Since then PCs that restart show an address starting with 192.168.1 and have no internet and no file server. The real DHCP server is running and its scope has not changed.',
+        'topology': _secure_flat(_snooping(False, ['lan']), _rogue()),
+        'expect': [
+            _goal('ana', 'Laptop Ana gets the stray router\'s settings', 'failed', code='rogue-server', setup=_ROGUE_SETUP),
+            _goal('ben', 'Laptop Ben gets the stray router\'s settings', 'failed', code='rogue-server', setup=_ROGUE_SETUP),
+            _goal('desk', 'Reception PC gets the stray router\'s settings', 'failed', code='rogue-server', setup=_ROGUE_SETUP),
+        ],
+        'hints': [
+            'Run "Everyone asks" and read the trace of one PC: which device answered its DISCOVER first, and how do its address, gateway and DNS server differ from this network\'s?',
+            'The switch can decide which port a DHCP server may sit behind. With DHCP snooping on, it drops DHCPOFFER, DHCPACK and DHCPNAK that come in on untrusted ports, and every port is untrusted until you trust it. So think about which port the real server is plugged into.',
+            'Switch DHCP snooping on, keep the Office LAN in the snooped VLANs and mark the port facing the DHCP server as trusted. Leave the client ports untrusted: the stray router is on one of them.',
+        ],
+        'fix': [{'path': 'snooping.enabled', 'value': True}, {'path': 'snooping.trustServer', 'value': True}],
+        'fixText': [
+            'On the switch, turn DHCP snooping on (ip dhcp snooping) and make sure the Office LAN VLAN is in the snooped list (ip dhcp snooping vlan).',
+            'Mark the port facing the DHCP server as trusted (ip dhcp snooping trust). Leave the client ports untrusted, so the stray router\'s offers are dropped. (Then find the router and unplug it.)',
+        ],
+        'expectFixed': [
+            _goal('ana', 'Laptop Ana gets the office\'s own settings, with the stray router still plugged in', setup=_ROGUE_SETUP),
+            _goal('ben', 'Laptop Ben gets the office\'s own settings, with the stray router still plugged in', setup=_ROGUE_SETUP),
+            _goal('desk', 'Reception PC gets the office\'s own settings, with the stray router still plugged in', setup=_ROGUE_SETUP),
+        ],
+        'lesson': 'A DHCP client cannot tell a legitimate server from a stranger: it takes an offer from whichever server it hears, so a home router or an attacker\'s laptop is enough to hand out a wrong gateway or a hostile DNS server. DHCP snooping turns the switch into the gatekeeper. Every port is untrusted by default and drops server messages (DHCPOFFER, DHCPACK, DHCPNAK) that arrive on it, while clients may still send DISCOVER and REQUEST. Only the port toward the real server, or the uplink toward it, is marked ip dhcp snooping trust. In real life the race between the two servers has no fixed winner; the lab assumes the rogue answers first so you can see the effect.',
+        'related': ['CCNA: DHCP snooping', 'CCNA: Layer 2 security'],
+    },
+    {
+        'id': 'snooping-no-trust',
+        'title': 'Snooping is on and nobody gets an address',
+        'goal': 'Make the PCs get an address again, with snooping still on and the stray router still plugged in.',
+        'level': 'core',
+        'story': 'To stop stray routers, the network admin switched on DHCP snooping for the Office VLAN on Friday evening and then went home. On Monday every PC that restarts shows a 169.254 address and says there is no network. The DHCP server is running and its scope looks fine. The stray Wi-Fi router is still plugged into a wall jack in marketing.',
+        'topology': _secure_flat(_snooping(True, ['lan']), _rogue()),
+        'expect': [
+            _goal('ana', 'Laptop Ana hears no server at all', 'failed', code='snoop-blocks-server', setup=_ROGUE_SETUP),
+            _goal('ben', 'Laptop Ben hears no server at all', 'failed', code='snoop-blocks-server', setup=_ROGUE_SETUP),
+            _goal('desk', 'Reception PC hears no server at all', 'failed', code='snoop-blocks-server', setup=_ROGUE_SETUP),
+        ],
+        'hints': [
+            'Read the trace of one PC. The real server does make an offer; follow the OFFER and see where it ends up.',
+            'Snooping drops DHCPOFFER, DHCPACK and DHCPNAK that arrive on untrusted ports, and every port starts untrusted. Which port does the real server\'s OFFER arrive on?',
+            'Mark the port facing the DHCP server as trusted. Keep the client ports untrusted, so the stray router stays silent.',
+        ],
+        'fix': [{'path': 'snooping.trustServer', 'value': True}],
+        'fixText': ['On the switch, mark the port facing the DHCP server as trusted (ip dhcp snooping trust). The client ports stay untrusted, so the stray router is still silenced.'],
+        'expectFixed': [
+            _goal('ana', 'Laptop Ana gets the office\'s own settings, with snooping on and the stray router plugged in', setup=_ROGUE_SETUP),
+            _goal('ben', 'Laptop Ben gets the office\'s own settings, with snooping on and the stray router plugged in', setup=_ROGUE_SETUP),
+            _goal('desk', 'Reception PC gets the office\'s own settings, with snooping on and the stray router plugged in', setup=_ROGUE_SETUP),
+        ],
+        'lesson': 'Turning snooping on without telling it where the real server is silences everyone: all ports are untrusted until you trust one, so the legitimate server\'s OFFER is dropped just like the rogue\'s. The switch is not broken, it is doing exactly what it was told. After enabling snooping, always trust the port toward the DHCP server (or the uplink toward it) and test with a client that has to ask for a new address.',
+        'related': ['CCNA: DHCP snooping', 'CCNA: Layer 2 security'],
+    },
+    {
+        'id': 'snooping-vlan-missing',
+        'title': 'Snooping is on, but Sales is not protected',
+        'goal': 'Stop the stray router in Sales from handing out settings, without touching the trusted uplink.',
+        'level': 'core',
+        'story': 'Snooping was rolled out last quarter, and the Office is fine. In Sales, PCs that restart sometimes get an address starting with 192.168.1 and no internet. A colleague checks the switch and reports "DHCP snooping is enabled", so everyone assumed the problem could not be DHCP. Somebody did plug a Wi-Fi router into a wall jack in Sales.',
+        'topology': dict(_relay([_office_scope(), _sales_scope()],
+                                [_office_iface('10.0.0.5'), dict(SALES_IFACE), dict(SRV_IFACE)],
+                                [_client('staff', 'Office PC', 'lan', 1), _client('sales1', 'Sales PC 1', 'sales', 2), _client('sales2', 'Sales PC 2', 'sales', 3)],
+                                extra_hosts=[DNS_HOST], segments=THREE_SEGMENTS),
+                         rogue=_rogue('sales'), snooping=_snooping(True, ['lan'], trust_uplink=True)),
+        'expect': [
+            _goal('staff', 'Office PC works', setup=_ROGUE_SETUP),
+            _goal('sales1', 'Sales PC 1 gets the stray router\'s settings', 'failed', code='rogue-server', setup=_ROGUE_SETUP),
+            _goal('sales2', 'Sales PC 2 gets the stray router\'s settings', 'failed', code='rogue-server', setup=_ROGUE_SETUP),
+        ],
+        'hints': [
+            'The Office is fine and Sales is not, although snooping is on. What does the trace of a Sales PC say about snooping on its network?',
+            'Snooping is enabled globally and then for specific VLANs. A VLAN that is not in the list is not inspected at all, whatever the global switch says (show ip dhcp snooping lists the VLANs it is configured on).',
+            'Add Sales to the snooped VLANs and keep Office in the list. The uplink toward the router stays trusted, because the relayed replies come in over it.',
+        ],
+        'fix': [{'path': 'snooping.vlans', 'value': ['lan', 'sales']}],
+        'fixText': ['Add the Sales VLAN to the snooped VLANs (ip dhcp snooping vlan), keeping the Office VLAN in the list. The uplink to the router stays trusted, because the server\'s replies come back over it.'],
+        'expectFixed': [
+            _goal('staff', 'Office PC still works', setup=_ROGUE_SETUP),
+            _goal('sales1', 'Sales PC 1 gets the Sales network\'s own settings, with the stray router plugged in', setup=_ROGUE_SETUP),
+            _goal('sales2', 'Sales PC 2 gets the Sales network\'s own settings, with the stray router plugged in', setup=_ROGUE_SETUP),
+        ],
+        'lesson': 'DHCP snooping must be enabled globally and then for each VLAN you want to protect. A VLAN that is missing from the list is simply not inspected, so a rogue server there is forwarded like any other device, while the Office next door looks perfectly healthy. When a rogue appears despite snooping, check which VLANs snooping is configured on before suspecting anything else.',
+        'related': ['CCNA: DHCP snooping', 'CCNA: Layer 2 security'],
+    },
+    {
+        'id': 'snooping-wrong-port-trusted',
+        'title': 'The wrong port was trusted',
+        'goal': 'Make the Office PCs get the real server\'s settings, with the stray router still plugged in.',
+        'level': 'stretch',
+        'story': 'The DHCP server lives in the server room, behind the router, and relays carry the Office PCs\' requests to it. After snooping was switched on, nobody in the Office got an address, so a junior admin trusted the PCs\' wall-jack ports "to make DHCP work". PCs now get addresses again, but with a gateway and a DNS server nobody recognises. A stray Wi-Fi router sits on one of the wall jacks.',
+        'topology': dict(_relay([_office_scope()], [_office_iface('10.0.0.5'), dict(SRV_IFACE)],
+                                [_client('ana', 'Laptop Ana', 'lan', 1), _client('ben', 'Laptop Ben', 'lan', 2)], extra_hosts=[DNS_HOST]),
+                         rogue=_rogue('lan'), snooping=_snooping(True, ['lan'], trust_clients=True)),
+        'expect': [
+            _goal('ana', 'Laptop Ana gets the stray router\'s settings', 'failed', code='rogue-server', setup=_ROGUE_SETUP),
+            _goal('ben', 'Laptop Ben gets the stray router\'s settings', 'failed', code='rogue-server', setup=_ROGUE_SETUP),
+        ],
+        'hints': [
+            'Read the trace: snooping is on for the Office, yet the stray router\'s OFFER was forwarded. Which ports are marked trusted?',
+            'A rogue plugs into a client port, so trusting client ports lets it through. The real server is not on this switch at all: its replies come back through the router\'s relay, over the uplink.',
+            'Make the client ports untrusted again and mark the uplink toward the router as trusted. Check the trace again: with the uplink untrusted, the real server\'s offers would be dropped too.',
+        ],
+        'fix': [{'path': 'snooping.trustClients', 'value': False}, {'path': 'snooping.trustUplink', 'value': True}],
+        'fixText': [
+            'Remove the trust from the client ports (no ip dhcp snooping trust): that is where the stray router plugs in.',
+            'Trust the uplink toward the router instead (ip dhcp snooping trust): the relayed replies from the real server come in over it. The port "facing the DHCP server" is the uplink here, because the server is not on this switch.',
+        ],
+        'expectFixed': [
+            _goal('ana', 'Laptop Ana gets the Office\'s own settings, with the stray router plugged in', setup=_ROGUE_SETUP),
+            _goal('ben', 'Laptop Ben gets the Office\'s own settings, with the stray router plugged in', setup=_ROGUE_SETUP),
+        ],
+        'lesson': 'The trusted port is the one the legitimate DHCP replies arrive on. If the server is behind a router and a relay (ip helper-address) does the forwarding, the replies come in over the uplink, so the uplink is the port to trust, never the client ports. Trusting everything "to make it work" turns snooping off in all but name. Trust as few ports as possible: the uplink or the server port, and nothing a user can plug a device into.',
+        'related': ['CCNA: DHCP snooping', 'CCNA: DHCP relay'],
+    },
+    {
+        'id': 'dhcp-starvation',
+        'title': 'A flood uses up the whole pool',
+        'goal': 'Keep the pool usable for real devices even while a flood of fake requests arrives.',
+        'level': 'stretch',
+        'story': 'A visitor\'s laptop in a meeting room starts a program that sends DHCPDISCOVER after DHCPDISCOVER, each with a different made-up MAC address. Within seconds the Office pool (30 addresses, for three PCs) is empty, and every device that restarts shows a 169.254 address. DHCP snooping is on, the DHCP server\'s port is trusted, and the server itself is fine.',
+        'topology': _secure_flat(_snooping(True, ['lan'], trust_server=True), flood=_flood(True)),
+        'expect': [
+            _goal('ana', 'Laptop Ana finds the pool empty', 'failed', code='starvation', setup=_FLOOD_SETUP),
+            _goal('ben', 'Laptop Ben finds the pool empty', 'failed', code='starvation', setup=_FLOOD_SETUP),
+            _goal('desk', 'Reception PC finds the pool empty', 'failed', code='starvation', setup=_FLOOD_SETUP),
+        ],
+        'hints': [
+            'Read the trace and the leases: who holds the addresses of the pool? Compare the MAC addresses with the real devices.',
+            'The flood consists of ordinary client messages, which an untrusted port may send, so snooping alone lets it through. The switch can also limit how many DHCP packets per second a port may deliver, and shut down a port that exceeds it.',
+            'Set a rate limit on the untrusted ports (ip dhcp snooping limit rate), for example 15 packets per second. A normal client sends only a few DHCP packets, so the flooding port is cut off after a handful of addresses.',
+        ],
+        'fix': [{'path': 'snooping.rateLimit', 'value': 15}],
+        'fixText': ['On the switch, limit the DHCP packet rate on the untrusted ports (ip dhcp snooping limit rate 15). The flooding port exceeds it within the first second and is put in the error-disabled state, after taking only about 15 addresses. Port security (a maximum number of MAC addresses per port) helps too, but the lab only models the rate limit.'],
+        'expectFixed': [
+            _goal('ana', 'Laptop Ana gets an address, with the flood still running', setup=_FLOOD_SETUP),
+            _goal('ben', 'Laptop Ben gets an address, with the flood still running', setup=_FLOOD_SETUP),
+            _goal('desk', 'Reception PC gets an address, with the flood still running', setup=_FLOOD_SETUP),
+        ],
+        'lesson': 'In a DHCP starvation attack the attacker asks for addresses with made-up MAC addresses until the pool is empty; real clients then get no offer, and attackers often follow up by running a rogue server. Snooping alone does not stop it, because the flood is made of ordinary client messages. A rate limit on the untrusted ports (ip dhcp snooping limit rate) shuts down a port that sends too many DHCP packets, and port security, which limits the MAC addresses per port, also helps. A smarter attacker may stay under the limit, so the limit only reduces the damage.',
+        'related': ['CCNA: DHCP snooping', 'CCNA: Layer 2 security'],
+    },
 ]
 
 
@@ -348,6 +534,10 @@ def _sandbox():
         segments=THREE_SEGMENTS,
     )
     topo['server']['conflictDetection'] = True
+    # Protected from the start: the uplink is trusted, client ports are not. Plug the rogue in or start the flood to test it.
+    topo['rogue'] = _rogue('lan', enabled=False)
+    topo['snooping'] = _snooping(True, ['lan', 'sales'], trust_uplink=True, rate_limit=15)
+    topo['flood'] = _flood(False, 'lan', 100)
     return topo
 
 
@@ -357,6 +547,9 @@ LESSON_LINKS = [
     {'track': 'ccna', 'lesson': 'nat-dhcp-dns-ntp', 'tool': 'dhcp', 'pick': 'needs-relay', 'label': 'DHCP across a router', 'blurb': 'Why a broadcast needs a relay (ip helper-address) to reach a server on another subnet.'},
     {'track': 'ccna', 'lesson': 'nat-dhcp-dns-ntp', 'tool': 'dhcp', 'pick': 'lease-outage', 'label': 'Lease timers and a server outage', 'blurb': 'Watch T1, T2 and expiry on a virtual clock.'},
     {'track': 'ccna', 'lesson': 'nat-dhcp-dns-ntp', 'tool': 'dhcp', 'pick': 'sandbox', 'label': 'A DHCP lab to experiment with', 'blurb': 'Scopes, exclusions, relays and leases in a small network.'},
+    {'track': 'ccna', 'lesson': 'acls-layer2-wireless-security', 'tool': 'dhcp', 'pick': 'rogue-router', 'label': 'A rogue DHCP server and DHCP snooping', 'blurb': 'A stray router hands out the wrong gateway; turn on snooping and trust the right port.'},
+    {'track': 'ccna', 'lesson': 'acls-layer2-wireless-security', 'tool': 'dhcp', 'pick': 'snooping-no-trust', 'label': 'Why snooping needs a trusted port', 'blurb': 'Snooping is on and nobody gets an address: every port starts untrusted.'},
+    {'track': 'ccna', 'lesson': 'acls-layer2-wireless-security', 'tool': 'dhcp', 'pick': 'snooping-vlan-missing', 'label': 'Snooping per VLAN', 'blurb': 'Snooping is on globally but a VLAN is missing from the list.'},
 ]
 
 
@@ -422,6 +615,48 @@ def validate():
                     errors.append(f'{label}: dhcp host {h.get("id")} needs a mac')
         if not clients:
             errors.append(f'{label}: needs at least one DHCP client')
+        if 'rogue' in topo:
+            ro = topo['rogue']
+            if not isinstance(ro, dict):
+                errors.append(f'{label}: rogue must be an object')
+            else:
+                for k in ('name', 'segment', 'ip', 'mask', 'start', 'end', 'gateway', 'dns'):
+                    if not isinstance(ro.get(k), str):
+                        errors.append(f'{label}: rogue needs a string {k}')
+                if ro.get('segment') not in segs:
+                    errors.append(f'{label}: rogue is on an unknown segment {ro.get("segment")}')
+                for k in ('ip', 'start', 'end'):
+                    if not is_ip(ro.get(k)):
+                        errors.append(f'{label}: rogue {k} must be an IPv4 address')
+                for k in ('enabled', 'answersFirst'):
+                    if not isinstance(ro.get(k), bool):
+                        errors.append(f'{label}: rogue {k} must be a boolean')
+        if 'snooping' in topo:
+            sn = topo['snooping']
+            if not isinstance(sn, dict):
+                errors.append(f'{label}: snooping must be an object')
+            else:
+                for k in ('enabled', 'trustServer', 'trustUplink', 'trustClients'):
+                    if not isinstance(sn.get(k), bool):
+                        errors.append(f'{label}: snooping {k} must be a boolean')
+                vl = sn.get('vlans')
+                if not isinstance(vl, list) or any(v not in segs for v in vl):
+                    errors.append(f'{label}: snooping vlans must be a list of segment ids')
+                rl = sn.get('rateLimit')
+                if isinstance(rl, bool) or not (isinstance(rl, int) and 0 <= rl <= 2048):
+                    errors.append(f'{label}: snooping rateLimit must be a whole number from 0 (none) to 2048')
+        if 'flood' in topo:
+            fl = topo['flood']
+            if not isinstance(fl, dict):
+                errors.append(f'{label}: flood must be an object')
+            else:
+                if not isinstance(fl.get('enabled'), bool):
+                    errors.append(f'{label}: flood enabled must be a boolean')
+                if fl.get('segment') not in segs:
+                    errors.append(f'{label}: flood is on an unknown segment {fl.get("segment")}')
+                ps = fl.get('perSecond')
+                if isinstance(ps, bool) or not (isinstance(ps, int) and 1 <= ps <= 10000):
+                    errors.append(f'{label}: flood perSecond must be a whole number from 1 to 10000')
         return clients
 
     def check_goals(goals, clients, label, need_label):
@@ -437,6 +672,8 @@ def validate():
             for st in g.get('setup') or []:
                 if 'path' not in st or 'value' not in st:
                     errors.append(f'{label}: a setup step needs path and value')
+                elif str(st['path']).split('.')[0] not in TOPOLOGY_KEYS + OPTIONAL_TOPOLOGY_KEYS:
+                    errors.append(f'{label}: setup path {st["path"]} must start with a topology key')
             for st in g.get('script') or []:
                 if st.get('do') not in ('advance', 'edit', 'dora'):
                     errors.append(f'{label}: unknown script step {st}')
@@ -456,8 +693,10 @@ def validate():
             if not (('path' in f and 'value' in f) or ('push' in f and 'value' in f) or 'remove' in f):
                 errors.append(f'{label}: a fix entry needs path+value, push+value or remove')
             target = f.get('path') or f.get('push') or f.get('remove') or ''
-            if target.split('.')[0] not in TOPOLOGY_KEYS:
+            if target.split('.')[0] not in TOPOLOGY_KEYS + OPTIONAL_TOPOLOGY_KEYS:
                 errors.append(f'{label}: fix path {target} must start with a topology key')
+            elif target.split('.')[0] in OPTIONAL_TOPOLOGY_KEYS and target.split('.')[0] not in sc['topology']:
+                errors.append(f'{label}: fix path {target} names an optional section the topology does not have')
         if not 1 <= len(sc['hints']) <= 3:
             errors.append(f'{label}: needs 1 to 3 hints')
     levels = [s['level'] for s in SCENARIOS]

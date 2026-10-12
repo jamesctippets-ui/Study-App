@@ -1,5 +1,6 @@
-/* Checks for the DHCP lab: engine unit tests (src/js/03c_pg_dhcp.js), a replay of every scenario in
- * data/playground_dhcp.py (the broken outcome and the fixed outcome) and the sandbox. */
+/* Checks for the DHCP lab: engine unit tests (src/js/03c_pg_dhcp.js, including DHCP snooping, a rogue server and a
+ * starvation flood), a replay of every scenario in data/playground_dhcp.py (the broken outcome and the fixed outcome)
+ * and the sandbox. */
 module.exports = ({ E, eq, data }) => {
   const has = (text, re) => re.test(text || '');
   const code = (r) => (r.diagnosis ? r.diagnosis.code : null);
@@ -377,9 +378,236 @@ module.exports = ({ E, eq, data }) => {
   eq(E.pgDhcpApplyFixes(base, [{ path: 'nothing.here.at.all', value: 1 }]).hosts.length, 2, 'apply fixes: a bad path is ignored');
   eq(E.pgDhcpApplyFixes(base, null).hosts.length, 2, 'apply fixes: nothing to do');
 
+  /* ---- DHCP snooping, a rogue server and a starvation flood ---- */
+  const rogueDef = (extra) => Object.assign({ name: 'Home router', segment: 'lan', enabled: true, answersFirst: true, ip: '192.168.1.1', mask: '255.255.255.0', start: '192.168.1.100', end: '192.168.1.150', gateway: '192.168.1.1', dns: '192.168.1.1' }, extra || {});
+  const snoopDef = (extra) => Object.assign({ enabled: true, vlans: ['lan'], trustServer: false, trustUplink: false, trustClients: false, rateLimit: 0 }, extra || {});
+  const floodDef = (extra) => Object.assign({ enabled: true, segment: 'lan', perSecond: 100 }, extra || {});
+  const secure = (t, sec) => Object.assign(JSON.parse(JSON.stringify(t)), JSON.parse(JSON.stringify(sec)));
+  const lanHosts = () => [client('c1', 1), client('c2', 2), client('c3', 3)];
+
+  // helpers
+  eq([E.pgDhcpRate('15'), E.pgDhcpRate(15), E.pgDhcpRate(''), E.pgDhcpRate('0'), E.pgDhcpRate('2049'), E.pgDhcpRate('1.5'), E.pgDhcpRate('abc'), E.pgDhcpRate(2048), E.pgDhcpRate(1)], [15, 15, 0, 0, 0, 0, 0, 2048, 1], 'snooping rate limit parse');
+  eq([E.pgDhcpSnoopOn(secure(flat(), { snooping: snoopDef() }), 'lan'), E.pgDhcpSnoopOn(secure(flat(), { snooping: snoopDef({ enabled: false }) }), 'lan'), E.pgDhcpSnoopOn(secure(flat(), { snooping: snoopDef({ vlans: [] }) }), 'lan'), E.pgDhcpSnoopOn(flat(), 'lan')], [true, false, false, false], 'snooping is on only when enabled globally and listed for the VLAN');
+  eq([E.pgDhcpEntryPort(flat(), 'lan'), E.pgDhcpEntryPort(relay(), 'lan'), E.pgDhcpEntryPort(relay(), 'srv')], ['server', 'uplink', 'server'], 'replies enter on the server port or on the uplink');
+  eq([E.pgDhcpPortTrusted(flat(), 'server'), E.pgDhcpPortTrusted(secure(flat(), { snooping: snoopDef({ trustServer: true }) }), 'server'), E.pgDhcpPortTrusted(secure(flat(), { snooping: snoopDef({ trustUplink: true }) }), 'uplink'), E.pgDhcpPortTrusted(secure(flat(), { snooping: snoopDef({ trustClients: true }) }), 'clients')], [false, true, true, true], 'every port is untrusted until it is trusted');
+  eq([E.pgDhcpPortName(flat(lanHosts()), 'lan', 'host', 'c2'), E.pgDhcpPortName(flat(lanHosts()), 'lan', 'rogue'), E.pgDhcpPortName(flat(lanHosts()), 'lan', 'flood')], ['Fa0/2', 'Fa0/4', 'Fa0/5'], 'switch port labels');
+  eq(E.pgDhcpRogueView(rogueDef()).errors, [], 'a valid rogue has no errors');
+  eq(E.pgDhcpRogueView(rogueDef({ ip: 'x' })).errors, ['ip'], 'rogue: bad address');
+  eq(E.pgDhcpRogueView(rogueDef({ mask: '255.0.255.0' })).errors, ['mask'], 'rogue: bad mask');
+  eq(E.pgDhcpRogueView(rogueDef({ start: '192.168.2.5' })).errors, ['pool'], 'rogue: pool outside its own network');
+  eq(E.pgDhcpRogueView(rogueDef({ start: '192.168.1.200', end: '192.168.1.100' })).errors, ['pool'], 'rogue: backwards pool');
+  eq(E.pgDhcpRogueView(null), null, 'no rogue, no view');
+
+  // a topology with the new fields switched off behaves exactly like one without them
+  const dormant = secure(flat(lanHosts()), { rogue: rogueDef({ enabled: false }), snooping: snoopDef({ enabled: false }), flood: floodDef({ enabled: false }) });
+  const plainRun = E.pgDhcpRunAll(flat(lanHosts()));
+  const dormantRun = E.pgDhcpRunAll(dormant);
+  eq(JSON.stringify(dormantRun.parts), JSON.stringify(plainRun.parts), 'dormant security fields: identical traces and leases');
+  eq(JSON.stringify(dormantRun.state), JSON.stringify(plainRun.state), 'dormant security fields: identical state');
+  eq(E.pgDhcpBindings(flat(lanHosts()), plainRun.state), [], 'no snooping: no binding table');
+  eq(Object.keys(plainRun.state).sort(), ['bad', 'clients', 'leases', 'log', 'now'], 'old topologies never get the new state fields');
+  const oldRelay = E.pgDhcpRunAll(relay(undefined, [client('c1', 1), client('c2', 2)]));
+  const oldRelayDormant = E.pgDhcpRunAll(secure(relay(undefined, [client('c1', 1), client('c2', 2)]), { rogue: rogueDef({ enabled: false }), snooping: snoopDef({ enabled: false, vlans: ['lan'] }) }));
+  eq(JSON.stringify(oldRelayDormant.parts), JSON.stringify(oldRelay.parts), 'dormant security fields behind a relay: identical');
+
+  // a rogue with nothing in its way wins
+  const rogueFlat = secure(flat(lanHosts()), { rogue: rogueDef() });
+  r = E.pgDhcpDora(rogueFlat, null, 'c1');
+  eq([r.verdict, code(r), r.diagnosis.deviceId, r.diagnosis.field, r.diagnosis.segment], ['failed', 'rogue-server', 'rogue', 'snoop-enabled', 'lan'], 'rogue, no snooping: the client takes its offer');
+  eq([r.lease.ip, r.lease.gateway, r.lease.dns, r.lease.source, r.lease.hours], ['192.168.1.100', '192.168.1.1', '192.168.1.1', 'rogue', 24], 'rogue: the lease carries the rogue\'s settings');
+  eq(has(text(r), /nobody authorised/) && has(text(r), /DHCPOFFER/) && has(text(r), /DHCPACK/) && has(text(r), /first OFFER/), true, 'rogue: the trace shows its offer, the race and the ACK');
+  eq(has(r.diagnosis.text, /not an address of this network/) && has(r.diagnosis.text, /not the router/) && has(r.diagnosis.text, /DNS server 192\.168\.1\.1/), true, 'rogue: the diagnosis says what is wrong with the settings');
+  eq(has(r.diagnosis.fix, /snooping/) && has(r.diagnosis.fix, /trusted/), true, 'rogue: the fix names snooping and the trusted port');
+  eq(has(text(r), /Assumption in this lab: the rogue answers first/), true, 'rogue: the race assumption is labelled in the trace');
+  eq(E.pgDhcpStatus(rogueFlat, r.state, 'c1').diagnosis.code, 'rogue-server', 'rogue: status keeps showing the problem');
+  all = E.pgDhcpRunAll(rogueFlat);
+  eq([all.verdict, all.parts.map((p) => p.lease.ip)], ['failed', ['192.168.1.100', '192.168.1.101', '192.168.1.102']], 'rogue: every client is served by it, in order');
+  eq(E.pgDhcpDora(rogueFlat, all.state, 'c1').lease.ip, '192.168.1.100', 'rogue: a returning client keeps its rogue address');
+  eq(Object.keys(all.state.rogueLeases).length, 3, 'rogue: it keeps its own lease table');
+  eq(Object.keys(all.state.leases).length, 0, 'rogue: the real server hands out nothing');
+  eq(E.pgDhcpGoal(rogueFlat, { client: 'c1', verdict: 'failed' }).diagnosis.code, 'rogue-server', 'rogue: goal sees the diagnosis');
+  // it is not the winner when it is not first, not on the segment, not switched on or not valid
+  r = E.pgDhcpDora(set(rogueFlat, 'rogue.answersFirst', false), null, 'c1');
+  eq([r.verdict, r.lease.ip, has(text(r), /arrives second/), has(text(r), /Assumption in this lab: the real server answers first/)], ['success', '192.168.10.100', true, true], 'rogue second: the real server wins and the trace says why');
+  eq(E.pgDhcpDora(set(rogueFlat, 'rogue.enabled', false), null, 'c1').verdict, 'success', 'rogue switched off: nothing happens');
+  const rogueOther = relay(undefined, [client('c1', 1)]);
+  rogueOther.rogue = rogueDef({ segment: 'srv' });
+  eq(E.pgDhcpDora(rogueOther, null, 'c1').verdict, 'success', 'a rogue on another segment never hears the broadcast');
+  r = E.pgDhcpDora(set(rogueFlat, 'rogue.ip', 'nope'), null, 'c1');
+  eq([r.verdict, has(text(r), /its own settings are not valid/)], ['success', true], 'an invalid rogue stays quiet');
+  const smallRogue = set(rogueFlat, 'rogue.end', '192.168.1.100');
+  all = E.pgDhcpRunAll(smallRogue);
+  eq(all.parts.map((p) => p.verdict), ['failed', 'success', 'success'], 'a rogue with one address serves one client; the real server answers the rest');
+  eq(has(all.parts[1].steps.map((s) => s.text).join(' '), /no free address left in its own pool/), true, 'rogue pool used up: said in the trace');
+  // the rogue is the only offer when the real server cannot answer
+  const rogueNoRelay = relay('', [client('c1', 1)]);
+  rogueNoRelay.rogue = rogueDef({ answersFirst: false });
+  r = E.pgDhcpDora(rogueNoRelay, null, 'c1');
+  eq([code(r), has(text(r), /only one it hears/), has(text(r), /does not forward/)], ['rogue-server', true, true], 'the real server cannot be reached: even a second rogue gets the client');
+  const rogueFull = set(set(rogueFlat, 'rogue.answersFirst', false), 'server.scopes.0.end', '192.168.10.100');
+  all = E.pgDhcpRunAll(rogueFull);
+  eq(all.parts.map((p) => p.verdict), ['success', 'failed', 'failed'], 'the real pool runs dry: the second-place rogue serves the rest');
+  eq(code({ diagnosis: all.parts[1].diagnosis }), 'rogue-server', 'pool exhausted plus a rogue: rogue-server');
+  const rogueOwner = secure(flat(lanHosts()), { rogue: rogueDef({ answersFirst: false, ip: '192.168.10.100', start: '192.168.10.200', end: '192.168.10.210' }) });
+  r = E.pgDhcpDora(rogueOwner, null, 'c1');
+  eq([r.verdict, r.conflicts.length && r.conflicts[0].by, r.lease.ip], ['success', 'Home router', '192.168.10.101'], 'the rogue answers ARP for its own address, so a client declines it');
+
+  // snooping drops the real server's replies when its port is not trusted
+  const noTrust = secure(flat(lanHosts()), { rogue: rogueDef(), snooping: snoopDef() });
+  r = E.pgDhcpDora(noTrust, null, 'c1');
+  eq([r.verdict, code(r), r.diagnosis.deviceId, r.diagnosis.field, r.diagnosis.segment], ['failed', 'snoop-blocks-server', 'switch', 'snoop-trust-server', 'lan'], 'snooping with nothing trusted: the real server is silenced');
+  eq(r.lease, null, 'snooping with nothing trusted: no lease at all');
+  eq(has(r.diagnosis.title, /^C1 never hears the real server/), true, 'snooping with nothing trusted: the title names the client (the result list shows only titles)');
+  eq(has(text(r), /untrusted/) && has(text(r), /drops it/) && has(text(r), /rogue/) && has(text(r), /never hears the rogue/), true, 'snooping with nothing trusted: the trace shows both offers dropped');
+  eq(has(r.diagnosis.fix, /ip dhcp snooping trust/), true, 'snooping with nothing trusted: the fix names the trust command');
+  eq(code(E.pgDhcpDora(secure(flat(lanHosts()), { snooping: snoopDef() }), null, 'c1')), 'snoop-blocks-server', 'snooping with nothing trusted and no rogue: the real server is silenced too');
+  eq(code(E.pgDhcpDora(set(noTrust, 'snooping.trustUplink', true), null, 'c1')), 'snoop-blocks-server', 'the uplink is not the right port when the server is on the same segment');
+  eq(code(E.pgDhcpDora(set(noTrust, 'snooping.trustClients', true), null, 'c1')), 'rogue-server', 'trusting the client ports lets the rogue through');
+  // ... and when the right port is trusted, the real server works and the rogue is silenced
+  const guarded = set(noTrust, 'snooping.trustServer', true);
+  r = E.pgDhcpDora(guarded, null, 'c1');
+  eq([r.verdict, r.lease.ip, r.diagnosis], ['success', '192.168.10.100', null], 'snooping with the server port trusted: the real server wins');
+  eq(has(text(r), /never hears the rogue/) && has(text(r), /port facing the DHCP server, which is trusted/) && has(text(r), /binding table/), true, 'trusted server port: the trace silences the rogue and mentions the binding table');
+  all = E.pgDhcpRunAll(guarded);
+  eq([all.verdict, all.state.rogueLeases], ['success', undefined], 'guarded: all clients are served by the real server and the rogue gave out nothing');
+  const bind = E.pgDhcpBindings(guarded, all.state);
+  eq(bind.length, 3, 'binding table: one entry per ACK that was let through');
+  eq([bind[0].mac, bind[0].ip, bind[0].vlan, bind[0].port, bind[0].left, bind[0].name], ['aa:00:00:00:00:01', '192.168.10.100', 'Office LAN', 'Fa0/1', 28800, 'C1'], 'binding table: MAC, IP, VLAN, port and lease time');
+  eq(E.pgDhcpBindings(guarded, E.pgDhcpAdvance(guarded, all.state, 8 * 3600 + 1).state).length >= 0, true, 'binding table: readable after the clock moves');
+  eq(E.pgDhcpBindings(guarded, null), [], 'binding table: no state, no entries');
+  // snooping must be enabled globally and for the VLAN
+  r = E.pgDhcpDora(set(noTrust, 'snooping.vlans', []), null, 'c1');
+  eq([code(r), r.diagnosis.field, has(r.diagnosis.text, /not in the list of snooped VLANs/)], ['rogue-server', 'snoop-vlan', true], 'snooping on globally but the VLAN is not listed: the rogue still wins');
+  r = E.pgDhcpDora(set(noTrust, 'snooping.enabled', false), null, 'c1');
+  eq([code(r), r.diagnosis.field], ['rogue-server', 'snoop-enabled'], 'VLAN listed but snooping off globally: the rogue still wins');
+  eq(E.pgDhcpBindings(set(noTrust, 'snooping.vlans', []), E.pgDhcpRunAll(set(noTrust, 'snooping.vlans', [])).state), [], 'an unprotected VLAN has no binding table');
+  r = E.pgDhcpDora(set(set(noTrust, 'snooping.trustClients', true), 'snooping.trustServer', true), null, 'c1');
+  eq([code(r), r.diagnosis.field, has(text(r), /binding table/) && has(text(r), /cannot tell a rogue/)], ['rogue-server', 'snoop-trust-clients', true], 'trusted client ports: the rogue wins and snooping records its binding');
+  eq(E.pgDhcpBindings(set(set(noTrust, 'snooping.trustClients', true), 'snooping.trustServer', true), E.pgDhcpRunAll(set(set(noTrust, 'snooping.trustClients', true), 'snooping.trustServer', true)).state)[0].ip, '192.168.1.100', 'a rogue\'s ACK on a trusted port lands in the binding table');
+  // the same behind a relay: the uplink is the port to trust
+  const relayRogue = (sn, helper) => { const t = relay(helper, [client('c1', 1), client('c2', 2)]); t.rogue = rogueDef(); t.snooping = sn; return t; };
+  r = E.pgDhcpDora(relayRogue(snoopDef({ trustServer: true })), null, 'c1');
+  eq([code(r), r.diagnosis.field, has(r.diagnosis.text, /uplink/)], ['snoop-blocks-server', 'snoop-trust-uplink', true], 'behind a relay the replies come over the uplink: trusting the server port does nothing');
+  eq(has(text(r), /relay/), true, 'behind a relay: the trace mentions the relay');
+  r = E.pgDhcpDora(relayRogue(snoopDef({ trustUplink: true })), null, 'c1');
+  eq([r.verdict, r.lease.ip, has(text(r), /uplink toward the router/)], ['success', '192.168.10.100', true], 'behind a relay with the uplink trusted: the real server wins, the rogue is silenced');
+  r = E.pgDhcpDora(relayRogue(snoopDef({ trustClients: true })), null, 'c1');
+  eq([code(r), r.diagnosis.field, has(text(r), /would not have got through either/)], ['rogue-server', 'snoop-trust-clients', true], 'wrong port trusted behind a relay: the rogue wins and the trace notes the uplink problem');
+  eq(code(E.pgDhcpDora(relayRogue(snoopDef({ trustUplink: true }), ''), null, 'c1')), 'no-relay', 'snooping does not hide a missing relay');
+  eq(code(E.pgDhcpDora(set(relayRogue(snoopDef({ trustUplink: true })), 'server.online', false), null, 'c1')), 'server-down', 'snooping does not hide a stopped server');
+  eq(code(E.pgDhcpDora(set(relayRogue(snoopDef({ trustUplink: true })), 'server.scopes.0.network', '192.168.1.0'), null, 'c1')), 'no-scope', 'snooping does not hide a missing scope');
+  // another segment without snooping next door is unaffected
+  const threeSeg = relay(undefined, [client('c1', 1), client('c2', 2, { segment: 'sales' })]);
+  threeSeg.segments.push({ id: 'sales', label: 'Sales' });
+  threeSeg.router.ifaces.push({ segment: 'sales', ip: '192.168.20.1', mask: '255.255.255.0', helper: '10.0.0.5' });
+  threeSeg.server.scopes.push(scope({ id: 's2', name: 'Sales', network: '192.168.20.0', start: '192.168.20.100', end: '192.168.20.110', gateway: '192.168.20.1', dns: '10.0.0.53' }));
+  threeSeg.rogue = rogueDef({ segment: 'sales' });
+  threeSeg.snooping = snoopDef({ trustUplink: true });
+  all = E.pgDhcpRunAll(threeSeg);
+  eq([all.parts[0].verdict, all.parts[1].verdict, code({ diagnosis: all.parts[1].diagnosis })], ['success', 'failed', 'rogue-server'], 'snooping on Office only: the Office is fine and the rogue in Sales wins');
+  eq(has(all.parts[0].steps.map((s) => s.text).join(' '), /snooping/i), true, 'the snooped client segment mentions snooping in its trace');
+  threeSeg.snooping.vlans = ['lan', 'sales'];
+  eq(E.pgDhcpRunAll(threeSeg).verdict, 'success', 'snooping on both VLANs with the uplink trusted: everything works and the rogue is silenced');
+
+  // the clock: renewals pass through the switch too
+  const guardedRun = E.pgDhcpRunAll(guarded);
+  adv = E.pgDhcpAdvance(guarded, guardedRun.state, 14400);
+  eq([adv.state.clients.c1.phase, adv.events[0].ok, E.pgDhcpBindings(guarded, adv.state)[0].left], ['bound', true, 28800], 'T1 under snooping: renewed, and the binding is refreshed');
+  adv = E.pgDhcpAdvance(set(guarded, 'snooping.trustServer', false), guardedRun.state, 14400);
+  eq([adv.state.clients.c1.phase, adv.events[0].ok, has(adv.events[0].text, /DHCP snooping drops its reply/)], ['renewing', false, true], 'T1 after the server port lost its trust: the ACK is dropped and the client keeps its address');
+  adv = E.pgDhcpAdvance(set(guarded, 'snooping.trustServer', false), guardedRun.state, 28800);
+  eq([adv.state.clients.c1.phase, code({ diagnosis: adv.state.clients.c1.lastFailure })], ['expired', 'lease-expired'], 'a server port that stays untrusted ends in an expired lease');
+  const rogueBooted = E.pgDhcpRunAll(rogueFlat).state;
+  adv = E.pgDhcpAdvance(rogueFlat, rogueBooted, 12 * 3600);
+  eq([adv.state.clients.c1.phase, adv.state.clients.c1.lease.source, adv.state.clients.c1.lease.start, has(adv.events[0].text, /rogue answers DHCPACK/)], ['bound', 'rogue', 43200, true], 'a rogue lease is renewed by the rogue (24 h lease, T1 at 12 h)');
+  eq(E.pgDhcpStatus(rogueFlat, adv.state, 'c1').diagnosis.code, 'rogue-server', 'a renewed rogue lease is still a problem');
+  const rogueGone = set(rogueFlat, 'rogue.enabled', false);
+  adv = E.pgDhcpAdvance(rogueGone, rogueBooted, 12 * 3600);
+  eq([adv.state.clients.c1.phase, has(adv.events[0].text, /rogue server is gone/)], ['renewing', true], 'the rogue unplugged: its clients cannot renew');
+  adv = E.pgDhcpAdvance(rogueGone, rogueBooted, 24 * 3600);
+  eq([adv.state.clients.c1.phase, adv.state.clients.c1.lease.ip, adv.state.clients.c1.lease.source], ['bound', '192.168.10.100', undefined], 'the rogue unplugged: after the lease ends the client gets a real address');
+  eq(has(E.pgDhcpStatus(rogueGone, rogueBooted, 'c1').diagnosis.text, /no longer on the network/), true, 'a rogue lease outlives the rogue: the diagnosis says so');
+  const lateSnoop = set(set(rogueFlat, 'snooping', snoopDef({ trustServer: true })), 'rogue.answersFirst', true);
+  eq([E.pgDhcpStatus(lateSnoop, rogueBooted, 'c1').diagnosis.field, has(E.pgDhcpStatus(lateSnoop, rogueBooted, 'c1').diagnosis.text, /still holds the lease it received earlier/)], [null, true], 'snooping fixed after the client got a rogue lease: the diagnosis says the lease is old');
+  adv = E.pgDhcpAdvance(lateSnoop, rogueBooted, 12 * 3600);
+  eq([adv.state.clients.c1.phase, has(adv.events[0].text, /snooping now drops its DHCPACK/)], ['renewing', true], 'snooping switched on later: the rogue\'s renewal ACK is dropped');
+  adv = E.pgDhcpAdvance(lateSnoop, rogueBooted, 24 * 3600);
+  eq([adv.state.clients.c1.lease.ip, adv.state.clients.c1.lease.source, E.pgDhcpStatus(lateSnoop, adv.state, 'c1').verdict], ['192.168.10.100', undefined, 'success'], 'snooping switched on later: the next fresh DORA heals the client');
+
+  // a starvation flood
+  const flooded = (sn, fl, end) => secure(flat(lanHosts(), { end: end || '192.168.10.129' }), { snooping: sn, flood: fl || floodDef() });
+  const starved = flooded(snoopDef({ trustServer: true }));
+  all = E.pgDhcpRunAll(starved);
+  eq([all.verdict, all.parts.map((p) => code({ diagnosis: p.diagnosis }))], ['failed', ['starvation', 'starvation', 'starvation']], 'flood with snooping alone: the pool is gone');
+  eq([all.state.flood.taken, all.state.flood.attempted, all.state.flood.limited], [30, 3000, false], 'flood: it takes the whole pool of 30');
+  eq(Object.keys(all.state.leases).filter((k) => all.state.leases[k].client === 'attacker').length, 30, 'flood: thirty fake leases');
+  eq([all.diagnosis.deviceId, all.diagnosis.field, has(all.diagnosis.fix, /limit rate/), has(all.diagnosis.fix, /Snooping alone does not stop the flood/)], ['flood', 'snoop-rate', true, true], 'flood: the diagnosis points at the rate limit and says snooping alone is not enough');
+  eq(has(all.parts[0].steps.map((s) => s.text).join(' '), /100 DHCPDISCOVERs per second.*made-up MAC.*30 seconds/), true, 'flood: the assumption (30 seconds) is in the trace');
+  eq(has(all.parts[0].steps.map((s) => s.text).join(' '), /held by the attacker/), true, 'flood: the pool step names the attacker');
+  eq(has(all.parts[0].diagnosis.title, /^C1 finds no address/), true, 'flood: the title names the client');
+  eq(E.pgDhcpBindings(starved, all.state).length, 30, 'flood with snooping: the binding table fills with made-up MACs');
+  r = E.pgDhcpDora(starved, all.state, 'c1');
+  eq(code(r), 'starvation', 'flood: asking again does not help');
+  eq(E.pgDhcpDora(starved, all.state, 'c1').state.flood.taken, 30, 'flood: it runs once per state');
+  const limited = secure(starved, { snooping: snoopDef({ trustServer: true, rateLimit: 15 }) });
+  all = E.pgDhcpRunAll(limited);
+  eq([all.verdict, all.state.flood.taken, all.state.flood.limited, all.state.flood.limit], ['success', 15, true, 15], 'rate limit 15: the flood is cut off after 15 addresses and the clients are served');
+  eq(has(E.pgDhcpFloodText(limited, all.state), /error-disabled/), true, 'rate limit: the text names the err-disabled port');
+  eq(has(all.parts[0].steps.map((s) => s.text).join(' '), /error-disabled/), true, 'rate limit: the trace names the err-disabled port');
+  eq(all.parts.map((p) => p.lease.ip), ['192.168.10.115', '192.168.10.116', '192.168.10.117'], 'rate limit: real clients get the next addresses');
+  eq(E.pgDhcpBindings(limited, all.state).length, 18, 'rate limit: 15 fake bindings plus 3 real ones');
+  eq(E.pgDhcpRunAll(secure(limited, { snooping: snoopDef({ trustServer: true, rateLimit: '15' }) })).verdict, 'success', 'rate limit typed as text works');
+  eq(code(E.pgDhcpRunAll(secure(limited, { snooping: snoopDef({ trustServer: true, rateLimit: '2049' }) }))), 'starvation', 'rate limit out of range is ignored (the flood runs)');
+  r = E.pgDhcpRunAll(secure(limited, { snooping: snoopDef({ trustServer: true, rateLimit: 200 }) }));
+  eq([r.verdict, r.state.flood.limited, has(r.diagnosis.fix, /higher than the attack rate/)], ['failed', false, true], 'a rate limit above the attack rate never trips');
+  r = E.pgDhcpRunAll(secure(limited, { snooping: snoopDef({ enabled: false, trustServer: true, rateLimit: 15 }) }));
+  eq([r.verdict, has(r.diagnosis.fix, /Turn DHCP snooping on/)], ['failed', true], 'a rate limit does nothing while snooping is off');
+  eq(E.pgDhcpRunAll(secure(limited, { snooping: snoopDef({ vlans: [], trustServer: true, rateLimit: 15 }) })).verdict, 'failed', 'a rate limit does nothing on a VLAN that is not snooped');
+  eq(E.pgDhcpRunAll(secure(limited, { snooping: snoopDef({ trustServer: true, trustClients: true, rateLimit: 15 }) })).verdict, 'failed', 'a rate limit is not applied to trusted ports');
+  r = E.pgDhcpRunAll(secure(limited, { snooping: snoopDef({ rateLimit: 15 }) }));
+  eq([r.state.flood.why, r.state.flood.taken, code(r)], ['dropped', 0, 'snoop-blocks-server'], 'flood and an untrusted server port: the attacker gets no offers and nobody else does either');
+  eq(has(E.pgDhcpFloodText(secure(limited, { snooping: snoopDef({ rateLimit: 15 }) }), r.state), /never completes a lease/), true, 'flood text: dropped offers');
+  r = E.pgDhcpRunAll(secure(starved, { flood: floodDef({ perSecond: 1 }) }));
+  eq([r.state.flood.attempted, r.state.flood.taken, r.verdict], [30, 30, 'failed'], 'one request per second for 30 seconds is still enough for a pool of 30');
+  r = E.pgDhcpRunAll(secure(starved, { flood: floodDef({ perSecond: 0 }) }));
+  eq([r.verdict, r.state.flood.taken, E.pgDhcpFloodText(starved, r.state)], ['success', 0, null], 'a flood of nothing does nothing and is not mentioned');
+  r = E.pgDhcpRunAll(secure(starved, { flood: floodDef({ enabled: false }) }));
+  eq([r.verdict, r.state.flood], ['success', undefined], 'a switched-off flood leaves no trace');
+  const noRelayFlood = relay('', [client('c1', 1)]);
+  noRelayFlood.flood = floodDef();
+  r = E.pgDhcpRunAll(noRelayFlood);
+  eq([r.state.flood.why, r.state.flood.taken, code(r)], ['unreachable', 0, 'no-relay'], 'a flood that cannot reach the server does nothing');
+  const exclFlood = flooded(snoopDef({ trustServer: true }), floodDef(), '192.168.10.129');
+  exclFlood.server.scopes[0].excluded = '192.168.10.100-192.168.10.119';
+  r = E.pgDhcpRunAll(exclFlood);
+  eq([r.state.flood.taken, Object.keys(r.state.leases).every((k) => E.pgParseIPv4(k) >= E.pgParseIPv4('192.168.10.120'))], [10, true], 'a flood never takes excluded addresses');
+  const before = JSON.stringify(starved);
+  E.pgDhcpRunAll(starved);
+  eq(JSON.stringify(starved), before, 'the flood never mutates the topology');
+  const keeps = E.pgDhcpRunAll(flat(lanHosts()));
+  const afterBoot = secure(flat(lanHosts()), { flood: floodDef() });
+  r = E.pgDhcpDora(afterBoot, keeps.state, 'c2');
+  eq(r.lease.ip, '192.168.10.101', 'a client that already holds a lease keeps it when a flood starts later');
+  const flood2 = secure(flat(lanHosts()), { flood: floodDef() });
+  flood2.server.scopes.push(scope({ id: 'other', name: 'Other', network: '192.168.50.0', start: '192.168.50.10', end: '192.168.50.20' }));
+  eq(code(E.pgDhcpRunAll(flood2)), 'starvation', 'flood on a flat network: starvation without snooping at all');
+
+  // the sandbox is a protected network the learner can attack
+  if (data.dhcpSandbox) {
+    const sbx = data.dhcpSandbox;
+    eq([!!sbx.rogue, !!sbx.snooping, !!sbx.flood], [true, true, true], 'dhcp sandbox: has a rogue, a snooping switch and a flood to switch on');
+    eq([sbx.rogue.enabled, sbx.flood.enabled, sbx.snooping.enabled, sbx.snooping.trustUplink, sbx.snooping.trustClients], [false, false, true, true, false], 'dhcp sandbox: protected, nothing attacking yet');
+    eq(E.pgDhcpRunAll(set(sbx, 'rogue.enabled', true)).verdict, 'success', 'dhcp sandbox: a rogue plugged in is silenced');
+    eq(E.pgDhcpRunAll(set(set(sbx, 'rogue.enabled', true), 'snooping.enabled', false)).parts.filter((p) => p.verdict === 'failed').map((p) => p.id), ['ana', 'ben'], 'dhcp sandbox: without snooping the rogue captures the Office clients only');
+    eq(E.pgDhcpRunAll(set(sbx, 'flood.enabled', true)).verdict, 'success', 'dhcp sandbox: a flood against the rate limit is survived');
+    r = E.pgDhcpRunAll(set(set(sbx, 'flood.enabled', true), 'snooping.rateLimit', 0));
+    eq(r.parts.map((p) => p.verdict), ['failed', 'failed', 'success', 'success'], 'dhcp sandbox: without the rate limit the Office pool is gone and Sales is not affected');
+  }
+
   /* ---- every scenario: the broken outcome and the fixed outcome ---- */
   const scenarios = data.dhcp || [];
-  eq(scenarios.length >= 7 && scenarios.length <= 8, true, 'dhcp: seven or eight scenarios');
+  eq(scenarios.length >= 12 && scenarios.length <= 13, true, 'dhcp: twelve or thirteen scenarios');
+  ['rogue-router', 'snooping-no-trust', 'snooping-vlan-missing', 'snooping-wrong-port-trusted', 'dhcp-starvation'].forEach((id) => eq(scenarios.some((sc) => sc.id === id), true, `dhcp: scenario ${id} exists`));
   eq(['starter', 'core', 'stretch'].every((lv) => scenarios.some((sc) => sc.level === lv)), true, 'dhcp: all three levels are used');
   const seenCodes = new Set();
   scenarios.forEach((sc) => {
@@ -401,11 +629,18 @@ module.exports = ({ E, eq, data }) => {
     const firstFail = sc.expect.find((g) => g.verdict === 'failed');
     const d = E.pgDhcpGoal(sc.topology, firstFail).diagnosis;
     eq(typeof d.title === 'string' && d.title.length > 0 && typeof d.fix === 'string' && d.fix.length > 0, true, `dhcp ${sc.id}: diagnosis has a title and a fix`);
+    // an intruder cannot be "fixed" by unplugging it or by tuning its behaviour: the goals keep it in place
+    if (sc.topology.rogue || sc.topology.flood) {
+      let cheat = set(set(set(set(sc.topology, 'rogue.enabled', false), 'rogue.answersFirst', false), 'flood.enabled', false), 'flood.perSecond', 1);
+      cheat = E.pgDhcpApplyFixes(cheat, []);
+      eq(sc.expectFixed.some((g) => E.pgDhcpGoal(cheat, g).verdict !== g.verdict), true, `dhcp ${sc.id}: unplugging the intruder does not solve it`);
+      eq(sc.expectFixed.every((g) => Array.isArray(g.setup) && g.setup.length > 0), true, `dhcp ${sc.id}: every goal keeps the intruder in place`);
+    }
     // the fix is minimal: undoing the last fix entry breaks it again
     const lastUndone = E.pgDhcpApplyFixes(sc.topology, sc.fix.slice(0, -1));
     eq(sc.expectFixed.some((g) => E.pgDhcpGoal(lastUndone, g).verdict !== g.verdict), true, `dhcp ${sc.id}: the last fix entry is needed`);
   });
-  ['pool-exhausted', 'no-relay', 'relay-wrong-server', 'bad-gateway-option', 'address-conflict', 'no-scope', 'wrong-mask', 'lease-expired'].forEach((c) => eq(seenCodes.has(c), true, `dhcp: some scenario shows ${c}`));
+  ['pool-exhausted', 'no-relay', 'relay-wrong-server', 'bad-gateway-option', 'address-conflict', 'no-scope', 'wrong-mask', 'lease-expired', 'rogue-server', 'snoop-blocks-server', 'starvation'].forEach((c) => eq(seenCodes.has(c), true, `dhcp: some scenario shows ${c}`));
 
   /* ---- the sandbox ---- */
   const sb = data.dhcpSandbox;

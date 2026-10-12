@@ -2,8 +2,11 @@
 
 // One router, one DHCP server with scopes, optional relay (ip helper-address),
 // clients that run DORA, conflict detection and DECLINE, and lease timers on a
-// virtual clock. The simulation is src/js/03c_pg_dhcp.js; guided scenarios come
-// from data/playground_dhcp.py (PLAYGROUND.dhcp).
+// virtual clock. Optionally a rogue DHCP server, a snooping access switch (trusted
+// and untrusted ports, per-VLAN enabling, binding table, rate limit) and a
+// starvation flood: each has its own card, shown only when the topology has it.
+// The simulation is src/js/03c_pg_dhcp.js; guided scenarios come from
+// data/playground_dhcp.py (PLAYGROUND.dhcp).
 
 const PG_DHCP_CAUSES = {
   'pool-exhausted': 'The address pool has no free address left',
@@ -17,6 +20,9 @@ const PG_DHCP_CAUSES = {
   'wrong-mask': 'The scope hands out the wrong subnet mask',
   'lease-expired': 'The lease ran out while the server could not be reached',
   'bad-config': 'A scope or server setting is not a valid value',
+  'rogue-server': 'A rogue DHCP server answered and nothing on the switch stopped it',
+  'snoop-blocks-server': 'DHCP snooping drops the real server\'s replies (its port is not trusted)',
+  'starvation': 'A flood of fake requests used up the address pool',
 };
 
 const PG_DHCP_PHASE_LABEL = { bound: 'Bound', renewing: 'Renewing', rebinding: 'Rebinding', expired: 'Expired', none: 'No lease', idle: 'Not asked yet', static: 'Static' };
@@ -30,13 +36,25 @@ const PG_DHCP_FIELDS = {
 
 function pgDhcpClip(s, k) { const t = String(s == null ? '' : s); return t.length > k ? `${t.slice(0, k - 1)}…` : t; }
 
-function PgDhcpDiagram({ topo, st, selected, hotId }) {
+// A small T / U tag for a switch port: T = trusted (ip dhcp snooping trust), U = untrusted (the default).
+function PgDhcpPortTag({ x, y, trusted, hot }) {
+  const hue = trusted ? COLOR.blue : COLOR.muted;
+  return (
+    <g>
+      <rect x={x - 8} y={y - 6} width={16} height={12} rx={6} fill={trusted ? tint(COLOR.blue, 24) : COLOR.surfaceRaised} stroke={hot ? COLOR.red : hue} strokeWidth={hot ? 2.4 : 1.1} />
+      <text x={x} y={y + 3} textAnchor="middle" fill={trusted ? ink(COLOR.blue) : COLOR.muted} fontSize="8" fontWeight="800">{trusted ? 'T' : 'U'}</text>
+    </g>
+  );
+}
+
+function PgDhcpDiagram({ topo, st, selected, hotId, hotSeg, hotField }) {
   const W = 320;
   const segs = topo.segments;
   const n = Math.max(1, segs.length);
   const colW = W / n;
   const cx = (i) => (i + 0.5) * colW;
   const srv = topo.server;
+  const sn = topo.snooping || null;
   const perRow = n === 1 ? 3 : 1;
   const pad = 8;
   const gap = 6;
@@ -46,10 +64,12 @@ function PgDhcpDiagram({ topo, st, selected, hotId }) {
     const list = [];
     if (srv.segment === segId) list.push({ id: 'server', kind: 'server' });
     topo.hosts.filter((h) => h.segment === segId).forEach((h) => list.push({ id: h.id, kind: 'host', host: h }));
+    if (topo.rogue && topo.rogue.enabled && topo.rogue.segment === segId) list.push({ id: 'rogue', kind: 'rogue' });
+    if (topo.flood && topo.flood.enabled && topo.flood.segment === segId) list.push({ id: 'flood', kind: 'flood' });
     return list;
   };
   const rows = Math.max(1, ...segs.map((s) => Math.ceil(devicesOf(s.id).length / perRow)));
-  const top = 108;
+  const top = sn ? 120 : 108;
   const H = top + rows * 38 + 2;
   const routerHot = hotId === 'router';
   return (
@@ -64,24 +84,50 @@ function PgDhcpDiagram({ topo, st, selected, hotId }) {
         const helper = iface ? String(iface.helper || '').trim() : '';
         const relayText = s.id === srv.segment ? 'DHCP server here' : !iface ? 'no router' : helper ? `relay → ${helper}` : 'no relay';
         const devs = devicesOf(s.id);
+        const snoopHere = pgDhcpSnoopOn(topo, s.id);
+        const entry = pgDhcpEntryPort(topo, s.id);
+        const hotHere = hotId === 'switch' && hotSeg === s.id;
+        const showSnoop = !!sn && (snoopHere || (Array.isArray(sn.vlans) && sn.vlans.includes(s.id)) || topo.hosts.some((h) => h.mode === 'dhcp' && h.segment === s.id));
+        const snoopText = !showSnoop ? '' : snoopHere ? 'snooping on' : sn.enabled ? 'VLAN not snooped' : 'snooping off';
+        const snoopInk = snoopHere ? ink(COLOR.blue) : sn && sn.enabled ? ink(COLOR.orange) : COLOR.muted;
         return (
           <g key={s.id}>
             <line x1={160} y1={36} x2={cx(i)} y2={58} stroke={hue} strokeWidth="1.6" />
+            {snoopHere && entry === 'uplink' && <PgDhcpPortTag x={(160 + cx(i)) / 2} y={47} trusted={!!sn.trustUplink} hot={hotHere && hotField === 'snoop-trust-uplink'} />}
             <rect x={i * colW + 3} y={58} width={colW - 6} height={H - 62} rx="10" fill={tint(hue, 8)} stroke={hue} strokeWidth="1.2" strokeDasharray="4 3" />
             <text x={cx(i)} y={72} textAnchor="middle" fill={ink(hue)} fontSize="9.5" fontWeight="800">{pgDhcpClip(s.label.toUpperCase(), Math.floor((colW - 10) / 5.6))}</text>
             <text x={cx(i)} y={83} textAnchor="middle" fill={COLOR.muted} fontSize="8.5">{iface ? `${iface.ip}${prefix !== undefined ? `/${prefix}` : ''}` : 'no router link'}</text>
             <text x={cx(i)} y={94} textAnchor="middle" fill={COLOR.muted} fontSize="8.5">{pgDhcpClip(relayText, Math.floor((colW - 10) / 4.6))}</text>
+            {showSnoop && <text x={cx(i)} y={105} textAnchor="middle" fill={snoopInk} fontSize="8.5" fontWeight="700">{pgDhcpClip(snoopText, Math.floor((colW - 10) / 4.6))}</text>}
             {devs.map((d, k) => {
               const col = k % perRow;
               const row = Math.floor(k / perRow);
               const x = i * colW + pad + col * (boxW + gap);
               const y = top + row * 38;
-              let name; let sub; let fill = COLOR.surfaceRaised; let stroke = COLOR.border; let sw = 1.2;
+              let name; let sub; let fill = COLOR.surfaceRaised; let stroke = COLOR.border; let sw = 1.2; let dash;
+              let tag = null;
               if (d.kind === 'server') {
                 name = srv.name || 'DHCP server';
                 sub = srv.online ? srv.ip : `${srv.ip} · off`;
                 stroke = srv.online ? COLOR.gold : COLOR.red;
                 sw = 2;
+                if (snoopHere && entry === 'server') tag = { trusted: !!sn.trustServer, hot: hotHere && hotField === 'snoop-trust-server' };
+              } else if (d.kind === 'rogue') {
+                name = topo.rogue.name || 'Rogue DHCP server';
+                sub = topo.rogue.ip;
+                fill = tint(COLOR.red, 10);
+                stroke = COLOR.red;
+                dash = '3 2';
+                sw = 1.6;
+                if (snoopHere) tag = { trusted: !!sn.trustClients, hot: false };
+              } else if (d.kind === 'flood') {
+                name = 'Attacker';
+                sub = `${topo.flood.perSecond}/s fake MACs`;
+                fill = tint(COLOR.red, 10);
+                stroke = COLOR.red;
+                dash = '3 2';
+                sw = 1.6;
+                if (snoopHere) tag = { trusted: !!sn.trustClients, hot: false };
               } else {
                 const h = d.host;
                 name = h.name;
@@ -97,9 +143,10 @@ function PgDhcpDiagram({ topo, st, selected, hotId }) {
               if (hotId === d.id) { stroke = COLOR.red; sw = 2.6; }
               return (
                 <g key={d.id}>
-                  <rect x={x} y={y} width={boxW} height={34} rx="7" fill={fill} stroke={stroke} strokeWidth={sw} />
+                  <rect x={x} y={y} width={boxW} height={34} rx="7" fill={fill} stroke={stroke} strokeWidth={sw} strokeDasharray={dash} />
                   <text x={x + boxW / 2} y={y + 14} textAnchor="middle" fill={COLOR.text} fontSize="9" fontWeight="700">{pgDhcpClip(name, chars)}</text>
                   <text x={x + boxW / 2} y={y + 26} textAnchor="middle" fill={COLOR.muted} fontSize="8.5">{pgDhcpClip(sub, chars + 2)}</text>
+                  {tag && <PgDhcpPortTag x={x + boxW - 6} y={y} trusted={tag.trusted} hot={tag.hot} />}
                 </g>
               );
             })}
@@ -272,6 +319,108 @@ function PgDhcpHostsEditor({ topo, edit }) {
   );
 }
 
+// The segments that have DHCP clients (the VLANs a snooping switch would be asked to protect).
+function pgDhcpClientSegments(topo) {
+  const listed = (topo.snooping && Array.isArray(topo.snooping.vlans)) ? topo.snooping.vlans : [];
+  return topo.segments.filter((s) => topo.hosts.some((h) => h.mode === 'dhcp' && h.segment === s.id) || listed.includes(s.id));
+}
+
+function PgDhcpSnoopEditor({ topo, edit, diag }) {
+  const sn = topo.snooping;
+  const setSn = (patch) => edit({ ...topo, snooping: { ...sn, ...patch } });
+  const segs = pgDhcpClientSegments(topo);
+  const vlans = Array.isArray(sn.vlans) ? sn.vlans : [];
+  const serverHere = segs.some((s) => s.id === topo.server.segment);
+  const uplinkUsed = segs.some((s) => s.id !== topo.server.segment);
+  const hotField = diag ? diag.field : null;
+  const rateText = String(sn.rateLimit == null ? '' : sn.rateLimit);
+  const rateBad = rateText.trim() !== '' && rateText.trim() !== '0' && pgDhcpRate(rateText) === 0;
+  return (
+    <div>
+      <div style={{ fontSize: '12px', color: COLOR.muted, lineHeight: 1.5, marginBottom: '8px' }}>
+        DHCP snooping runs on the access switch the clients plug into (the lab uses one switch for all client VLANs, with one uplink to the router). Every port is <strong>untrusted</strong> until you mark it trusted. On an untrusted port the switch drops server messages (DHCPOFFER, DHCPACK, DHCPNAK); clients may still send DISCOVER and REQUEST there.
+      </div>
+      <PgDhcpToggle label="Snooping is on (ip dhcp snooping)" hint="The global switch. It protects nothing until you also list the VLANs below." value={sn.enabled} onChange={(v) => setSn({ enabled: v })} hot={hotField === 'snoop-enabled'} />
+      <div style={{ fontSize: '11px', fontWeight: 800, letterSpacing: '0.05em', textTransform: 'uppercase', color: COLOR.muted, margin: '10px 0 2px' }}>VLANs to protect (ip dhcp snooping vlan)</div>
+      {segs.map((s) => (
+        <PgDhcpToggle key={s.id} label={s.label} hint={vlans.includes(s.id) ? 'Snooping inspects DHCP traffic in this VLAN.' : 'Not in the list: DHCP traffic in this VLAN is not inspected.'}
+          value={vlans.includes(s.id)} onChange={(v) => setSn({ vlans: v ? vlans.concat([s.id]) : vlans.filter((x) => x !== s.id) })}
+          hot={hotField === 'snoop-vlan' && (!diag.segment || diag.segment === s.id)} />
+      ))}
+      <div style={{ fontSize: '11px', fontWeight: 800, letterSpacing: '0.05em', textTransform: 'uppercase', color: COLOR.muted, margin: '10px 0 2px' }}>Trusted ports (ip dhcp snooping trust)</div>
+      {serverHere && <PgDhcpToggle label="Port facing the DHCP server" hint="The real server is plugged into this switch, so its OFFER and ACK come in on this port." value={sn.trustServer} onChange={(v) => setSn({ trustServer: v })} hot={hotField === 'snoop-trust-server'} />}
+      {uplinkUsed && <PgDhcpToggle label="Uplink to the router" hint="When the server is elsewhere, the router's relay sends its replies down this link." value={sn.trustUplink} onChange={(v) => setSn({ trustUplink: v })} hot={hotField === 'snoop-trust-uplink'} />}
+      <PgDhcpToggle label="Client ports (the wall jacks)" hint="Normally untrusted. Anything plugged in here, including a rogue, could then send server messages." value={sn.trustClients} onChange={(v) => setSn({ trustClients: v })} hot={hotField === 'snoop-trust-clients'} />
+      <div style={{ marginTop: '10px' }}>
+        <PgDhcpHot on={hotField === 'snoop-rate'}>
+          <PgField label="Rate limit on untrusted ports (packets per second)" value={rateText} onChange={(v) => setSn({ rateLimit: v })} inputMode="numeric" placeholder="none"
+            error={rateBad ? 'Use a whole number from 1 to 2048, or leave empty for no limit' : undefined}
+            hint="ip dhcp snooping limit rate. A port that sends more DHCP packets than this per second is put in the error-disabled state." />
+        </PgDhcpHot>
+      </div>
+      <div style={{ fontSize: '11.5px', color: COLOR.muted, lineHeight: 1.5, marginTop: '8px' }}>Not simulated: relay information (option 82), the source-MAC check, port security, Dynamic ARP Inspection and IP Source Guard.</div>
+    </div>
+  );
+}
+
+function PgDhcpRogueEditor({ topo, edit }) {
+  const ro = topo.rogue;
+  const setRo = (patch) => edit({ ...topo, rogue: { ...ro, ...patch } });
+  const segOpts = topo.segments.map((s) => ({ value: s.id, label: s.label }));
+  return (
+    <div>
+      <div style={{ fontSize: '12px', color: COLOR.muted, lineHeight: 1.5, marginBottom: '8px' }}>
+        A rogue DHCP server is a device nobody authorised that answers DHCP requests: an unmanaged home router plugged into a wall jack, or an attacker's laptop. It hears the broadcast of its own segment and answers with its own settings.
+      </div>
+      <PgDhcpToggle label="The rogue is plugged in and running" hint="Switch it off to unplug it." value={ro.enabled} onChange={(v) => setRo({ enabled: v })} />
+      <PgDhcpToggle label="The rogue answers first" hint="A lab assumption. In real life either server may win the race, and many clients take the first OFFER they receive. Here the rogue is a neighbour on the same segment, so it is first by default; switch off to let the real server win."
+        value={ro.answersFirst !== false} onChange={(v) => setRo({ answersFirst: v })} />
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '8px', marginTop: '8px' }}>
+        <PgSelect label="Plugged in on" value={ro.segment} onChange={(v) => setRo({ segment: v })} options={segOpts} />
+        <PgField label="Name" value={ro.name} onChange={(v) => setRo({ name: v })} />
+        <PgDhcpIp label="Its own address" value={ro.ip} onChange={(v) => setRo({ ip: v })} />
+        <PgDhcpMask label="Mask" value={ro.mask} onChange={(v) => setRo({ mask: v })} />
+        <PgDhcpIp label="Pool start" value={ro.start} onChange={(v) => setRo({ start: v })} />
+        <PgDhcpIp label="Pool end" value={ro.end} onChange={(v) => setRo({ end: v })} />
+        <PgDhcpIp label="Gateway it hands out" value={ro.gateway} onChange={(v) => setRo({ gateway: v })} />
+        <PgDhcpIp label="DNS it hands out" value={ro.dns} onChange={(v) => setRo({ dns: v })} />
+      </div>
+      <div style={{ fontSize: '11.5px', color: COLOR.muted, lineHeight: 1.5, marginTop: '8px' }}>The rogue's leases last 24 hours in this lab. Its pool must lie inside its own network, or it stays quiet.</div>
+    </div>
+  );
+}
+
+function PgDhcpFloodEditor({ topo, edit, diag }) {
+  const fl = topo.flood;
+  const setFl = (patch) => edit({ ...topo, flood: { ...fl, ...patch } });
+  const segOpts = topo.segments.map((s) => ({ value: s.id, label: s.label }));
+  const perText = String(fl.perSecond == null ? '' : fl.perSecond);
+  const perBad = perText.trim() !== '' && !(Number.isInteger(Number(perText)) && Number(perText) >= 1 && Number(perText) <= 10000);
+  return (
+    <div>
+      <div style={{ fontSize: '12px', color: COLOR.muted, lineHeight: 1.5, marginBottom: '8px' }}>
+        A starvation attack: a device sends DHCPDISCOVER after DHCPDISCOVER, each with a made-up MAC address, so the server hands the whole pool to fake clients. The lab assumes 30 seconds of flooding before the real clients ask.
+      </div>
+      <PgDhcpToggle label="The attacker is flooding" hint="Starts when you press the run button; one run per fresh start." value={fl.enabled} onChange={(v) => setFl({ enabled: v })} hot={diag && diag.deviceId === 'flood'} />
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '8px', marginTop: '8px' }}>
+        <PgSelect label="Plugged in on" value={fl.segment} onChange={(v) => setFl({ segment: v })} options={segOpts} />
+        <PgField label="Requests per second" value={perText} onChange={(v) => setFl({ perSecond: v === '' ? v : (Number.isInteger(Number(v)) ? Number(v) : v) })} inputMode="numeric" error={perBad ? 'Use a whole number from 1 to 10000' : undefined} />
+      </div>
+    </div>
+  );
+}
+
+// Adds the optional security parts (a rogue, a snooping switch, a flood) to a topology that has none, for the sandbox.
+function pgDhcpWithSecurity(topo) {
+  const client = topo.segments.find((s) => s.id !== topo.server.segment && topo.hosts.some((h) => h.mode === 'dhcp' && h.segment === s.id)) || topo.segments[0];
+  return {
+    ...topo,
+    rogue: topo.rogue || { name: 'Home router', segment: client.id, enabled: false, answersFirst: true, ip: '192.168.1.1', mask: '255.255.255.0', start: '192.168.1.100', end: '192.168.1.150', gateway: '192.168.1.1', dns: '192.168.1.1' },
+    snooping: topo.snooping || { enabled: false, vlans: [client.id], trustServer: false, trustUplink: false, trustClients: false, rateLimit: 0 },
+    flood: topo.flood || { enabled: false, segment: client.id, perSecond: 100 },
+  };
+}
+
 function PgDhcpResult({ result }) {
   const [open, setOpen] = useState({});
   if (!result) return null;
@@ -308,10 +457,35 @@ function PgDhcpResult({ result }) {
 
 const PG_DHCP_ADVANCES = [{ label: '+10 min', sec: 600 }, { label: '+1 hour', sec: 3600 }, { label: '+8 hours', sec: 8 * 3600 }, { label: '+1 day', sec: 86400 }];
 
+// What the access switch has learned from the ACKs it let through (only on snooped VLANs).
+function PgDhcpBindingTable({ topo, st }) {
+  const rows = pgDhcpBindings(topo, st);
+  return (
+    <div style={{ marginTop: '12px' }}>
+      <div style={{ fontSize: '11px', fontWeight: 800, letterSpacing: '0.05em', textTransform: 'uppercase', color: COLOR.muted, marginBottom: '4px' }}>Switch binding table (DHCP snooping)</div>
+      {rows.length === 0 ? <div style={{ fontSize: '12.5px', color: COLOR.muted }}>Empty. The switch fills it with MAC, IP address, VLAN, port and lease time from the ACKs it lets through on a snooped VLAN.</div> : (
+        <div>
+          {rows.slice(0, 8).map((b) => (
+            <div key={b.mac} style={{ fontSize: '12.5px', padding: '3px 0', borderTop: `1px solid ${COLOR.border}` }}>
+              <strong style={{ fontFamily: 'var(--font-mono)' }}>{b.ip}</strong> <span style={{ color: COLOR.muted, fontFamily: 'var(--font-mono)', fontSize: '11.5px' }}>{b.mac}</span>
+              <div style={{ color: COLOR.muted, fontSize: '11.5px' }}>{b.name} · {b.vlan} · port {b.port} · {pgDhcpDuration(b.left)} left</div>
+            </div>
+          ))}
+          {rows.length > 8 && <div style={{ fontSize: '11.5px', color: COLOR.muted, paddingTop: '4px' }}>... and {rows.length - 8} more entries.</div>}
+        </div>
+      )}
+    </div>
+  );
+}
+
 function PgDhcpClock({ topo, st, onAdvance, onReset }) {
   const clients = topo.hosts.filter((h) => h.mode === 'dhcp');
   const leases = Object.keys(st.leases).filter((ip) => st.leases[ip].end > st.now).sort((a, b) => pgParseIPv4(a) - pgParseIPv4(b));
   const nameOfMac = (l) => { const h = pgDhcpHost(topo, l.client); return h ? h.name : l.client; };
+  const fakeLeases = leases.filter((ip) => st.leases[ip].client === 'attacker');
+  const realLeases = leases.filter((ip) => st.leases[ip].client !== 'attacker');
+  const rogueLeases = Object.keys(st.rogueLeases || {}).filter((ip) => st.rogueLeases[ip].end > st.now).sort((a, b) => pgParseIPv4(a) - pgParseIPv4(b));
+  const floodText = pgDhcpFloodText(topo, st);
   return (
     <div>
       <div style={{ fontSize: '12px', color: COLOR.muted, lineHeight: 1.5, marginBottom: '8px' }}>
@@ -337,12 +511,26 @@ function PgDhcpClock({ topo, st, onAdvance, onReset }) {
         );
       })}
       <div style={{ fontSize: '11px', fontWeight: 800, letterSpacing: '0.05em', textTransform: 'uppercase', color: COLOR.muted, margin: '12px 0 4px' }}>Leases the server holds</div>
-      {leases.length === 0 ? <div style={{ fontSize: '12.5px', color: COLOR.muted }}>None yet. Ask for addresses first.</div> : leases.map((ip) => (
+      {leases.length === 0 ? <div style={{ fontSize: '12.5px', color: COLOR.muted }}>{Object.keys(st.clients).length ? 'None: the real server has not given out an address.' : 'None yet. Ask for addresses first.'}</div> : realLeases.map((ip) => (
         <div key={ip} style={{ fontSize: '12.5px', padding: '2px 0', display: 'flex', justifyContent: 'space-between', gap: '8px', flexWrap: 'wrap' }}>
           <span><strong style={{ fontFamily: 'var(--font-mono)' }}>{ip}</strong> <span style={{ color: COLOR.muted }}>{nameOfMac(st.leases[ip])}</span></span>
           <span style={{ color: COLOR.muted }}>{pgDhcpDuration(st.leases[ip].end - st.now)} left</span>
         </div>
       ))}
+      {fakeLeases.length > 0 && <div style={{ fontSize: '12.5px', padding: '2px 0', color: ink(COLOR.red) }}><strong>{fakeLeases.length} address{fakeLeases.length === 1 ? '' : 'es'}</strong> held by the attacker's made-up MAC addresses</div>}
+      {floodText && <div style={{ fontSize: '11.5px', color: COLOR.muted, lineHeight: 1.5, marginTop: '6px' }}>{floodText}</div>}
+      {rogueLeases.length > 0 && (
+        <div style={{ marginTop: '8px' }}>
+          <div style={{ fontSize: '11px', fontWeight: 800, letterSpacing: '0.05em', textTransform: 'uppercase', color: COLOR.muted, marginBottom: '2px' }}>Leases the rogue holds</div>
+          {rogueLeases.map((ip) => (
+            <div key={ip} style={{ fontSize: '12.5px', padding: '2px 0', display: 'flex', justifyContent: 'space-between', gap: '8px', flexWrap: 'wrap' }}>
+              <span><strong style={{ fontFamily: 'var(--font-mono)' }}>{ip}</strong> <span style={{ color: COLOR.muted }}>{nameOfMac(st.rogueLeases[ip])}</span></span>
+              <span style={{ color: COLOR.muted }}>{pgDhcpDuration(st.rogueLeases[ip].end - st.now)} left</span>
+            </div>
+          ))}
+        </div>
+      )}
+      {topo.snooping && <PgDhcpBindingTable topo={topo} st={st} />}
       {st.log.length > 0 && (
         <div style={{ marginTop: '12px' }}>
           <div style={{ fontSize: '11px', fontWeight: 800, letterSpacing: '0.05em', textTransform: 'uppercase', color: COLOR.muted, marginBottom: '4px' }}>What happened on the clock</div>
@@ -353,7 +541,7 @@ function PgDhcpClock({ topo, st, onAdvance, onReset }) {
   );
 }
 
-function PgDhcpLab({ topo, setTopo, goals }) {
+function PgDhcpLab({ topo, setTopo, goals, sandbox }) {
   const [st, setSt] = useState(() => pgDhcpNewState());
   const [result, setResult] = useState(null);
   const [selected, setSelected] = useState('__all');
@@ -369,9 +557,11 @@ function PgDhcpLab({ topo, setTopo, goals }) {
   return (
     <div>
       <PgCard title="The network" hue={COLOR.teal}>
-        <PgDhcpDiagram topo={topo} st={st} selected={pickedId} hotId={hotId} />
+        <PgDhcpDiagram topo={topo} st={st} selected={pickedId} hotId={hotId} hotSeg={diag ? diag.segment : null} hotField={diag ? diag.field : null} />
         <div style={{ fontSize: '11.5px', color: COLOR.muted, textAlign: 'center', marginTop: '4px' }}>
           <span style={{ color: ink(COLOR.blue) }}>blue = selected client</span> · <span style={{ color: ink(COLOR.success) }}>green = working lease</span> · <span style={{ color: ink(COLOR.red) }}>red = problem</span>
+          {topo.snooping && <span> · <span style={{ color: ink(COLOR.blue) }}>T</span>/U = trusted/untrusted switch port</span>}
+          {((topo.rogue && topo.rogue.enabled) || (topo.flood && topo.flood.enabled)) && <span> · <span style={{ color: ink(COLOR.red) }}>dashed = intruder</span></span>}
         </div>
       </PgCard>
       {goals && goals.length > 0 && (
@@ -396,6 +586,27 @@ function PgDhcpLab({ topo, setTopo, goals }) {
       <PgCard title="Router and relay" hue={COLOR.orange} collapsible>
         <PgDhcpRouterEditor topo={topo} edit={edit} diag={diag} />
       </PgCard>
+      {topo.snooping && (
+        <PgCard title="Switch: DHCP snooping" hue={COLOR.blue} collapsible>
+          <PgDhcpSnoopEditor topo={topo} edit={edit} diag={diag} />
+        </PgCard>
+      )}
+      {topo.rogue && (
+        <PgCard title="Rogue DHCP server" hue={COLOR.red} collapsible defaultOpen={false}>
+          <PgDhcpRogueEditor topo={topo} edit={edit} />
+        </PgCard>
+      )}
+      {topo.flood && (
+        <PgCard title="Address flood (starvation)" hue={COLOR.red} collapsible defaultOpen={false}>
+          <PgDhcpFloodEditor topo={topo} edit={edit} diag={diag} />
+        </PgCard>
+      )}
+      {sandbox && !topo.snooping && !topo.rogue && !topo.flood && (
+        <PgCard title="Switch security (optional)" hue={COLOR.blue}>
+          <div style={{ fontSize: '12px', color: COLOR.muted, lineHeight: 1.5, marginBottom: '8px' }}>Add a rogue DHCP server, a DHCP snooping switch and a starvation flood to this lab, all switched off to begin with.</div>
+          <button className="btn-flat" style={pgDhcpAddBtn} onClick={() => edit(pgDhcpWithSecurity(topo))}>+ Add snooping, a rogue server and a flood</button>
+        </PgCard>
+      )}
       <PgCard title="Devices" hue={COLOR.pink} collapsible defaultOpen={false}>
         <PgDhcpHostsEditor topo={topo} edit={edit} />
       </PgCard>
@@ -420,7 +631,10 @@ function pgDhcpValidTopo(t) {
       && !!t.server && typeof t.server.ip === 'string' && typeof t.server.segment === 'string' && Array.isArray(t.server.scopes)
       && t.server.scopes.every((s) => typeof s.id === 'string' && typeof s.network === 'string' && typeof s.mask === 'string')
       && Array.isArray(t.hosts) && t.hosts.every((h) => typeof h.id === 'string' && typeof h.name === 'string' && (h.mode === 'dhcp' || h.mode === 'static') && t.segments.some((s) => s.id === h.segment))
-      && t.segments.some((s) => s.id === t.server.segment);
+      && t.segments.some((s) => s.id === t.server.segment)
+      && (t.rogue === undefined || (!!t.rogue && typeof t.rogue.segment === 'string' && typeof t.rogue.ip === 'string' && typeof t.rogue.mask === 'string' && typeof t.rogue.start === 'string' && typeof t.rogue.end === 'string' && t.segments.some((s) => s.id === t.rogue.segment)))
+      && (t.snooping === undefined || (!!t.snooping && Array.isArray(t.snooping.vlans)))
+      && (t.flood === undefined || (!!t.flood && typeof t.flood.segment === 'string' && t.segments.some((s) => s.id === t.flood.segment)));
   } catch (e) { return false; }
 }
 
@@ -430,8 +644,8 @@ function DhcpTool({ pick, onPick }) {
   if (pick === 'sandbox') {
     return (
       <PgSandboxShell tool="dhcp" makeDefault={() => pgClone(pgData().dhcpSandbox)} validate={pgDhcpValidTopo} onBack={() => onPick('')}
-        blurb="A working network: Office and Sales relay to a DHCP server on the Server LAN. Break a scope, move a relay, put a static device in the pool, switch the server off and move the clock, then read the DORA traces."
-        renderLab={(topo, setTopo) => <PgDhcpLab topo={topo} setTopo={setTopo} />} />
+        blurb="A working, protected network: Office and Sales relay to a DHCP server on the Server LAN, and the access switch runs DHCP snooping. Break a scope, move a relay, put a static device in the pool, switch the server off and move the clock, plug in a rogue server or start a flood, then turn snooping off and read the DORA traces."
+        renderLab={(topo, setTopo) => <PgDhcpLab topo={topo} setTopo={setTopo} sandbox />} />
     );
   }
   if (scenario) {
@@ -444,14 +658,14 @@ function DhcpTool({ pick, onPick }) {
   }
   return (
     <PgScenarioPicker tool="dhcp" scenarios={scenarios} onPick={onPick}
-      intro="DHCP gives a device its address, mask, gateway and DNS server for a limited time. Make clients ask (Discover, Offer, Request, Acknowledge), read what the server decided and why, and move a virtual clock to watch leases renew and expire."
-      note="Simplified on purpose: one router and one DHCP server (no failover, no snooping, no IPv6), only the mask, gateway, DNS and lease-time options, one attempt stands for the retries, the pause after a DECLINE is not simulated, and servers differ in details such as whether conflict detection is on by default."
-      sandboxText="A working DHCP network with a relay, two scopes and a virtual clock." />
+      intro="DHCP gives a device its address, mask, gateway and DNS server for a limited time. Make clients ask (Discover, Offer, Request, Acknowledge), read what the server decided and why, and move a virtual clock to watch leases renew and expire. The security scenarios add a rogue DHCP server, the switch feature that stops it (DHCP snooping) and a flood that uses up the pool."
+      note="Simplified on purpose: one router and one real DHCP server (no failover, no IPv6), only the mask, gateway, DNS and lease-time options, one attempt stands for the retries, the pause after a DECLINE is not simulated, and servers differ in details such as whether conflict detection is on by default. Snooping is modelled in Cisco IOS terms on one access switch that carries every client VLAN and has one uplink to the router: untrusted ports by default, trust per port, enabling per VLAN, the binding table and the rate limit, but not option 82, port security, the source-MAC check, Dynamic ARP Inspection or IP Source Guard. Who wins the race between the real server and a rogue is not fixed in real life, so the lab lets you choose (by default the rogue answers first), and the flood is assumed to run for 30 seconds before the clients ask."
+      sandboxText="A working, protected DHCP network with a relay, two scopes, a snooping switch, a rogue server and flood to switch on, and a virtual clock." />
   );
 }
 
 PLAYGROUND_EXTRA_TOOLS.push({
   key: 'dhcp', label: 'DHCP lab', hue: COLOR.teal,
-  blurb: 'Scopes, exclusions, relays (ip helper-address), the Discover/Offer/Request/Acknowledge exchange and lease timers on a virtual clock. Make clients ask for addresses and read why a server answered or stayed silent.',
+  blurb: 'Scopes, exclusions, relays (ip helper-address), the Discover/Offer/Request/Acknowledge exchange, lease timers on a virtual clock, rogue servers and DHCP snooping. Make clients ask for addresses and read why a server answered or stayed silent.',
   Component: DhcpTool,
 });

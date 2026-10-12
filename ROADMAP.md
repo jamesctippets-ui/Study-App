@@ -1816,8 +1816,22 @@ trading away for shinier but shallower ones.
   two more VLAN, firewall and IP scenarios. New tools live in four new files each (`03c_pg_<k>.js` engine,
   `04l_pg_<k>.jsx` screens, `data/playground_<k>.py` data, `tools/checks/<k>.js` checks) and are auto-discovered, so
   adding one touches no shared file; `tools/check_playground.js` now runs about 1,835 checks. Open items (a routing table /
-  longest-prefix-match lab beyond the IP lab); ACL-on-an-interface, "quiz me on this setup" and the optional
+  longest-prefix-match lab beyond the IP lab); ACL-on-an-interface, DHCP snooping, "quiz me on this setup" and the optional
   daily-goal credit are built (see the entries below).
+- [x] **Playground: DHCP snooping, rogue server and starvation (October 2026).** The DHCP lab gained five scenarios
+  (`rogue-router` starter; `snooping-no-trust` and `snooping-vlan-missing` core; `snooping-wrong-port-trusted` and
+  `dhcp-starvation` stretch; 13 in all) by extending its four files, with old topologies behaving exactly as before.
+  Engine (`03c_pg_dhcp.js`): an optional rogue server with its own pool, gateway and DNS and an "answers first" switch;
+  an optional access switch with global snooping plus a per-VLAN list, every port untrusted by default, trust settable on the
+  server port, the uplink and the client ports, untrusted ports dropping OFFER, ACK and NAK, a binding table built from the
+  ACKs let through and renewals judged the same way; and an optional starvation flood (fake-MAC DISCOVERs) cut off by
+  `ip dhcp snooping limit rate`. New diagnosis codes `rogue-server`, `snoop-blocks-server`, `starvation`. Screens: the
+  diagram shows trusted/untrusted port tags and dashed rogue boxes, with three collapsible cards and the binding table;
+  saved sandboxes get an "add snooping, rogue, flood" button; three new lesson links on the CCNA ACL/layer-2 lesson.
+  Stated simplifications: who wins the race is an explicit assumption (rogue first by default, changeable), the flood lasts
+  30 s, one switch with one uplink, 24 h rogue leases; not modelled: option 82, port security, the source-MAC check, DAI and
+  err-disable timing. Unverified from memory: the 1 to 2048 range of `limit rate` and that exceeding it err-disables the
+  port. 4,276 playground checks pass in total.
 - [x] **Playground: ACL lab (October 2026).** An eleventh tool (`acl`; four new files, no shared edits): `03c_pg_acl.js`
   traces a test packet through routing (connected, longest prefix, default route), the inbound ACL, the outbound ACL, then the
   reply as a separate packet, and returns the first thing that breaks. Modelled: standard and extended ACLs, wildcard masks

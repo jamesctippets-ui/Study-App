@@ -8,13 +8,35 @@
 // client's ARP probe followed by DHCPDECLINE), and lease timers T1 (50%, renew
 // by unicast), T2 (87.5%, rebind by broadcast) and expiry on a virtual clock.
 //
+// It also models three optional threats and the switch feature that answers
+// them, in the simplified form a first course needs:
+//  * a rogue DHCP server (an attacker, or an unmanaged home router plugged into
+//    a wall jack) that answers a client's DISCOVER with its own OFFER;
+//  * DHCP snooping on the access switch (Cisco IOS terms): enabled globally and
+//    then per VLAN (here: per segment), every port untrusted until it is marked
+//    `ip dhcp snooping trust`; on an untrusted port the switch drops the
+//    server-to-client messages DHCPOFFER, DHCPACK and DHCPNAK, while clients on
+//    untrusted ports may still send DISCOVER and REQUEST; the switch builds a
+//    binding table (MAC, IP, VLAN, port, lease time) from the ACKs it lets through;
+//  * a DHCP starvation flood (DISCOVERs with made-up MAC addresses that use up
+//    the pool), which `ip dhcp snooping limit rate` on the untrusted port cuts off.
+//
 // Left out on purpose: DHCP options other than mask, gateway, DNS and lease
-// time; INIT-REBOOT; several servers, failover or split scopes; DHCP snooping;
-// IPv6; retransmission timers (one attempt stands for the retries); the
-// ten-second pause a client takes after DHCPDECLINE (the clock does not move);
-// and overlapping scopes (the most specific scope simply wins here, while some
-// real servers refuse to create them). Vendors differ in details such as
-// whether conflict detection is on by default.
+// time; INIT-REBOOT; several legitimate servers, failover or split scopes; IPv6;
+// retransmission timers (one attempt stands for the retries); the ten-second
+// pause a client takes after DHCPDECLINE (the clock does not move); and
+// overlapping scopes (the most specific scope simply wins here, while some real
+// servers refuse to create them). For snooping: relay information (option 82),
+// the source-MAC check, port security, Dynamic ARP Inspection, IP Source Guard,
+// DHCPRELEASE/DECLINE handling in the binding table and the exact err-disable
+// timing are not simulated. Vendors differ in details such as whether conflict
+// detection is on by default.
+//
+// Two assumptions are labelled in the traces: who wins a race between the real
+// server and a rogue is not fixed in real life, so the topology says it
+// (rogue.answersFirst, default true: the rogue sits on the client's own segment
+// and many clients take the first OFFER they hear); and the flood is assumed to
+// run for 30 seconds before the clients ask.
 //
 // topo = {
 //   segments: [{ id, label }],
@@ -23,9 +45,20 @@
 //               scopes: [{ id, name, network, mask, start, end, excluded, gateway, dns, leaseHours }] },
 //   dns:      ['10.0.0.53'],                                              // addresses that really answer DNS
 //   hosts:    [{ id, name, segment, mode: 'dhcp'|'static', mac, probe, ip, mask, gateway }],
+//   // optional (a topology without these fields behaves exactly as before):
+//   rogue:    { name, segment, enabled, answersFirst, ip, mask, start, end, gateway, dns },
+//   snooping: { enabled, vlans: [segmentId], trustServer, trustUplink, trustClients, rateLimit },
+//   flood:    { enabled, segment, perSecond },
 // }
+// snooping.enabled is `ip dhcp snooping`; snooping.vlans is `ip dhcp snooping vlan` (a segment is protected only
+// when both say so). trustServer = the port facing the DHCP server (used when the server is on that segment),
+// trustUplink = the uplink toward the router (relayed replies arrive there), trustClients = the wall-jack ports
+// (a mistake: that is where a rogue plugs in). rateLimit = `ip dhcp snooping limit rate` in packets per second on
+// the untrusted ports ('' or 0 = none).
 // state = { now (seconds), leases: { <ip>: { mac, client, start, end } }, bad: { <ip>: true },
-//           clients: { <id>: { phase, lease, duplicate, warnings, lastFailure, lastSteps } }, log: [] }
+//           clients: { <id>: { phase, lease, duplicate, warnings, lastFailure, lastSteps } }, log: [],
+//           // created only when needed: bindings: { <mac>: { mac, ip, segment, port, client, start, end } },
+//           // rogueLeases: { <ip>: { mac, client, start, end } }, flooded: true, flood: { ... } }
 
 const PG_DHCP_MAX_ATTEMPTS = 6;
 
@@ -137,6 +170,8 @@ function pgDhcpOwner(topo, st, segId, ipN, exceptId) {
   if ((r.ifaces || []).some((f) => f.segment === segId && pgParseIPv4(f.ip) === ipN)) return { name: r.name || 'Router', kind: 'router', deviceId: 'router' };
   const s = topo.server || {};
   if (s.segment === segId && pgParseIPv4(s.ip) === ipN) return { name: s.name || 'DHCP server', kind: 'server', deviceId: 'server' };
+  const ro = topo.rogue;
+  if (ro && ro.enabled && ro.segment === segId && pgParseIPv4(ro.ip) === ipN) return { name: ro.name || 'Rogue DHCP server', kind: 'rogue', deviceId: 'rogue' };
   const hit = (topo.hosts || []).find((h) => {
     if (h.id === exceptId || h.segment !== segId) return false;
     if (h.mode === 'static' && pgParseIPv4(h.ip) === ipN) return true;
@@ -223,6 +258,237 @@ function pgDhcpOwnerAnywhere(topo, n) {
   return h ? h.name : null;
 }
 
+/* ---- DHCP snooping, a rogue server and a starvation flood ---- */
+
+const PG_DHCP_FLOOD_SECONDS = 30;
+const PG_DHCP_FLOOD_CAP = 5000;
+const PG_DHCP_ROGUE_HOURS = 24;
+
+// Is `ip dhcp snooping` on globally AND listed for this segment's VLAN? (Snooping inspects only the VLANs you list.)
+function pgDhcpSnoopOn(topo, segId) {
+  const sn = topo.snooping;
+  return !!(sn && sn.enabled && Array.isArray(sn.vlans) && sn.vlans.includes(segId));
+}
+
+// Where the real server's replies enter the client's switch: on the port facing the server when the server is on
+// that segment, otherwise on the uplink (the router's relay agent sits behind it).
+function pgDhcpEntryPort(topo, segId) { return (topo.server || {}).segment === segId ? 'server' : 'uplink'; }
+
+// Is the port marked `ip dhcp snooping trust`? port = 'server' | 'uplink' | 'clients'. Every port is untrusted by default.
+function pgDhcpPortTrusted(topo, port) {
+  const sn = topo.snooping || {};
+  return port === 'server' ? !!sn.trustServer : port === 'uplink' ? !!sn.trustUplink : !!sn.trustClients;
+}
+
+function pgDhcpPortText(port) {
+  return port === 'server' ? 'the port facing the DHCP server' : port === 'uplink' ? 'the uplink toward the router (where relayed replies come in)' : 'the client ports (the wall jacks)';
+}
+
+// `ip dhcp snooping limit rate`: whole packets per second between 1 and 2048, otherwise 0 (no limit).
+function pgDhcpRate(v) {
+  const n = Number(String(v == null ? '' : v).trim());
+  return Number.isInteger(n) && n >= 1 && n <= 2048 ? n : 0;
+}
+
+// A label for the switch port a device is plugged into (clients in list order, then the rogue, then the flood source).
+function pgDhcpPortName(topo, segId, kind, hostId) {
+  const here = (topo.hosts || []).filter((h) => h.segment === segId);
+  if (kind === 'host') return `Fa0/${Math.max(0, here.findIndex((h) => h.id === hostId)) + 1}`;
+  return `Fa0/${here.length + (kind === 'rogue' ? 1 : 2)}`;
+}
+
+// The rogue server's own settings, parsed. Invalid settings make it silent.
+function pgDhcpRogueView(r) {
+  if (!r) return null;
+  const ipN = pgParseIPv4(r.ip);
+  const m = pgParseMask(r.mask);
+  const startN = pgParseIPv4(r.start);
+  const endN = pgParseIPv4(r.end);
+  const errors = [];
+  if (ipN === null) errors.push('ip');
+  if (m.prefix === undefined) errors.push('mask');
+  if (startN === null) errors.push('start');
+  if (endN === null) errors.push('end');
+  if (!errors.length && (endN < startN || !pgSameSubnet(ipN, m.prefix, startN) || !pgSameSubnet(ipN, m.prefix, endN))) errors.push('pool');
+  const info = ipN !== null && m.prefix !== undefined ? pgSubnetInfo(ipN, m.prefix) : null;
+  return { rogue: r, ipN, prefix: m.prefix === undefined ? null : m.prefix, info, startN, endN, errors, name: r.name || 'Rogue DHCP server' };
+}
+
+// The rogue that can hear a broadcast on this segment (it must be switched on and on that segment), or null.
+function pgDhcpRogueFor(topo, segId) {
+  const r = topo.rogue;
+  if (!r || !r.enabled || r.segment !== segId) return null;
+  return pgDhcpRogueView(r);
+}
+
+// What the rogue would answer this client: null (no rogue here), { rv, silent } or { rv, ipN, passes, first }.
+// passes = the switch forwards the rogue's OFFER; first = the lab's assumption that it beats the real server.
+function pgDhcpRogueOffer(topo, st, host) {
+  const rv = pgDhcpRogueFor(topo, host.segment);
+  if (!rv) return null;
+  if (rv.errors.length) return { rv, silent: `${rv.name} is switched on, but its own settings are not valid (${rv.errors.join(', ')}), so it stays quiet.` };
+  const mac = pgDhcpMac(host);
+  const leases = st.rogueLeases || {};
+  let ipN = null;
+  const mine = Object.keys(leases).find((k) => leases[k].mac === mac && pgParseIPv4(k) >= rv.startN && pgParseIPv4(k) <= rv.endN);
+  if (mine) ipN = pgParseIPv4(mine);
+  for (let n = rv.startN; ipN === null && n <= rv.endN; n += 1) {
+    const l = leases[pgIpToString(n)];
+    if (!(l && l.end > st.now && l.mac !== mac)) ipN = n;
+  }
+  if (ipN === null) return { rv, silent: `${rv.name} has no free address left in its own pool, so it stays quiet.` };
+  const passes = !pgDhcpSnoopOn(topo, host.segment) || pgDhcpPortTrusted(topo, 'clients');
+  return { rv, ipN, passes, first: topo.rogue.answersFirst !== false };
+}
+
+function pgDhcpMakeRogueLease(topo, st, rv, host, ipN) {
+  const dur = PG_DHCP_ROGUE_HOURS * 3600;
+  const mac = pgDhcpMac(host);
+  st.rogueLeases = st.rogueLeases || {};
+  Object.keys(st.rogueLeases).forEach((k) => { if (st.rogueLeases[k].mac === mac) delete st.rogueLeases[k]; });
+  st.rogueLeases[pgIpToString(ipN)] = { mac, client: host.id, start: st.now, end: st.now + dur };
+  return {
+    ip: pgIpToString(ipN), mask: rv.info.maskText, prefix: rv.prefix,
+    gateway: String(rv.rogue.gateway == null ? '' : rv.rogue.gateway).trim(), dns: String(rv.rogue.dns == null ? '' : rv.rogue.dns).trim(),
+    hours: PG_DHCP_ROGUE_HOURS, dur, start: st.now, t1: st.now + dur * 0.5, t2: st.now + dur * 0.875, end: st.now + dur,
+    scopeId: 'rogue', scopeName: rv.name, segment: host.segment, server: rv.rogue.ip, source: 'rogue',
+  };
+}
+
+// The switch writes a binding (MAC, IP, VLAN, port, lease time) for every ACK it lets through on a snooped VLAN.
+function pgDhcpBind(topo, st, host, lease) {
+  if (!pgDhcpSnoopOn(topo, host.segment)) return;
+  const mac = pgDhcpMac(host);
+  st.bindings = st.bindings || {};
+  st.bindings[mac] = { mac, ip: lease.ip, segment: host.segment, port: pgDhcpPortName(topo, host.segment, 'host', host.id), client: host.id, name: host.name, start: lease.start, end: lease.end };
+}
+
+// The binding table as the switch would show it: live entries, sorted by address.
+function pgDhcpBindings(topo, st) {
+  const b = (st && st.bindings) || {};
+  const now = st ? st.now : 0;
+  return Object.keys(b).map((k) => b[k]).filter((x) => x.end > now)
+    .map((x) => Object.assign({}, x, { vlan: pgDhcpSegLabel(topo, x.segment), left: x.end - now }))
+    .sort((a, c) => pgParseIPv4(a.ip) - pgParseIPv4(c.ip));
+}
+
+// Why does snooping not silence this segment's rogue? { field, why, fix } for the diagnosis.
+function pgDhcpRogueCause(topo, segId) {
+  const sn = topo.snooping;
+  const segLabel = pgDhcpSegLabel(topo, segId);
+  const entry = pgDhcpEntryPort(topo, segId);
+  const trustPort = entry === 'server' ? 'the port facing the DHCP server' : 'the uplink toward the router';
+  const how = `Turn DHCP snooping on (ip dhcp snooping, then ip dhcp snooping vlan for ${segLabel}), mark only ${trustPort} as trusted (ip dhcp snooping trust) and leave the client ports untrusted. Then find the rogue device and unplug it.`;
+  const ro = topo.rogue;
+  // The lease is older than the current settings: the rogue was unplugged or snooping was fixed after the client got it.
+  if (!ro || !ro.enabled || ro.segment !== segId) return { field: null, why: 'The rogue is no longer on the network, but this client still holds the lease it got from it.', fix: 'Ask this client for an address again, or wait for its lease to run out.' };
+  if (!sn || !sn.enabled) return { field: 'snoop-enabled', why: 'DHCP snooping is switched off, so the access switch forwards the rogue\'s offers like any other frame.', fix: how };
+  if (!Array.isArray(sn.vlans) || !sn.vlans.includes(segId)) return { field: 'snoop-vlan', why: `DHCP snooping is on globally, but ${segLabel} is not in the list of snooped VLANs, and snooping only inspects the VLANs you list. This VLAN is unprotected.`, fix: `Add ${segLabel} to the snooped VLANs (ip dhcp snooping vlan), keep ${trustPort} trusted and the client ports untrusted. Then find the rogue device and unplug it.` };
+  if (sn.trustClients) return { field: 'snoop-trust-clients', why: 'The client ports are marked trusted, so the switch treats the rogue\'s server messages as legitimate. A rogue plugs into exactly such a port.', fix: `Make the client ports untrusted again (no ip dhcp snooping trust) and trust only ${trustPort}. Then find the rogue device and unplug it.` };
+  return { field: null, why: 'DHCP snooping would silence the rogue now, but this client still holds the lease it received earlier.', fix: 'Ask this client for an address again (or wait for its lease to run out): the rogue\'s offers are dropped now.' };
+}
+
+// The settings a rogue handed out, and what they would do to the client.
+function pgDhcpRogueHealth(topo, host, c, steps) {
+  const L = c.lease;
+  const iface = pgDhcpIface(topo, host.segment);
+  const segLabel = pgDhcpSegLabel(topo, host.segment);
+  const ipN = pgParseIPv4(L.ip);
+  const routerN = iface ? pgParseIPv4(iface.ip) : null;
+  const realPrefix = iface ? pgParseMask(iface.mask).prefix : undefined;
+  const gwN = pgParseIPv4(L.gateway);
+  const dnsN = pgParseIPv4(L.dns);
+  const known = Array.isArray(topo.dns) ? topo.dns.map((d) => pgParseIPv4(d)) : null;
+  const effects = [];
+  if (routerN !== null && realPrefix !== undefined && !pgSameSubnet(routerN, realPrefix, ipN)) effects.push(`${L.ip} is not an address of this network (${pgIpToString(pgSubnetInfo(routerN, realPrefix).network)}/${realPrefix}), so ${host.name} cannot talk to anything on ${segLabel}`);
+  if (!L.gateway || gwN === null) effects.push('it got no usable default gateway, so it cannot leave its subnet');
+  else if (routerN !== null && gwN !== routerN) effects.push(`its default gateway ${L.gateway} is not the router (${iface.ip}): traffic sent there is lost, or, if the rogue is an attacker's machine, read or changed on its way`);
+  if (!L.dns || dnsN === null) effects.push('it got no usable DNS server');
+  else if (known && !known.includes(dnsN)) effects.push(`its DNS server ${L.dns} is not one of this network's (${topo.dns.join(', ')}): names fail to resolve, or resolve to whatever the rogue wants`);
+  if (!effects.length) effects.push('the settings even look plausible, which is what makes a rogue dangerous: whoever runs it decides where this client\'s traffic and name lookups go');
+  const cause = pgDhcpRogueCause(topo, host.segment);
+  steps.push({ ok: false, text: `${host.name} now uses ${L.ip}, mask ${L.mask} (/${L.prefix}), gateway ${L.gateway || 'none'}, DNS ${L.dns || 'none'}, all handed out by ${L.scopeName}, a DHCP server nobody authorised. Checking what that does...` });
+  steps.push({ ok: false, text: `Because ${effects.join('; ')}. (The lab counts any lease from an unauthorised server as a failure, even if the settings happened to work.)` });
+  steps.push({ ok: false, text: `Why snooping did not prevent it: ${cause.why}` });
+  return pgDhcpWith(pgFail('rogue-server', `${host.name} got its settings from a rogue DHCP server`, `${host.name} accepted an offer from ${L.scopeName} (${L.server}), which is not the DHCP server of this network. It now has ${L.ip} with gateway ${L.gateway || 'none'} and DNS ${L.dns || 'none'}. Because ${effects.join('; ')}. ${cause.why}`, cause.fix, 'rogue', cause.field), { segment: host.segment });
+}
+
+// The real server's replies are dropped by snooping: the port they enter on is not trusted.
+function pgDhcpSnoopBlockDiag(topo, host, entry) {
+  const segLabel = pgDhcpSegLabel(topo, host.segment);
+  const field = entry === 'server' ? 'snoop-trust-server' : 'snoop-trust-uplink';
+  const portText = pgDhcpPortText(entry);
+  return pgDhcpWith(pgFail('snoop-blocks-server', `${host.name} never hears the real server: snooping drops its replies`, `The access switch has DHCP snooping on for ${segLabel}, and ${portText} is untrusted (every port is untrusted until it is marked ip dhcp snooping trust). On an untrusted port the switch drops server messages (DHCPOFFER, DHCPACK, DHCPNAK), so ${host.name} never hears the real server. Snooping is doing its job; it has simply not been told which port the real server is behind.`, `Mark ${portText} as trusted (ip dhcp snooping trust). Keep the client ports untrusted.`, 'switch', field), { segment: host.segment });
+}
+
+// The starvation flood, once per state: DISCOVERs with made-up MAC addresses, each of which takes an address from the pool.
+// The flood is assumed to run for 30 seconds before the real clients ask.
+function pgDhcpFloodInto(topo, st) {
+  const f = topo.flood;
+  if (!f || !f.enabled || st.flooded) return;
+  st.flooded = true;
+  const seg = f.segment;
+  const per = Math.max(0, Math.floor(Number(f.perSecond)) || 0);
+  const info = { segment: seg, perSecond: per, attempted: per * PG_DHCP_FLOOD_SECONDS, taken: 0, limited: false, limit: 0, why: '', scopeId: null, scopeName: '' };
+  st.flood = info;
+  const reach = pgDhcpReachServer(topo, seg, 'DHCPDISCOVER', 'The attacker');
+  if (!reach.ok) { info.why = 'unreachable'; return; }
+  const found = pgDhcpFindScope(topo, reach.selectorN);
+  if (!found.match || found.match.errors.length) { info.why = 'no-scope'; return; }
+  const sc = found.match;
+  info.scopeId = sc.scope.id;
+  info.scopeName = sc.name;
+  const snoopOn = pgDhcpSnoopOn(topo, seg);
+  if (snoopOn && !pgDhcpPortTrusted(topo, pgDhcpEntryPort(topo, seg))) { info.why = 'dropped'; return; }
+  let deliver = Math.min(info.attempted, PG_DHCP_FLOOD_CAP);
+  const lim = snoopOn ? pgDhcpRate((topo.snooping || {}).rateLimit) : 0;
+  info.limit = lim;
+  if (lim && !pgDhcpPortTrusted(topo, 'clients') && per > lim) { deliver = Math.min(deliver, lim); info.limited = true; }
+  const range = pgDhcpPoolRange(sc);
+  if (!range) { info.why = 'empty-pool'; return; }
+  const dur = Math.round(sc.hours * 3600);
+  const hex = (n) => (n < 16 ? '0' : '') + n.toString(16);
+  for (let n = range.lo; n <= range.hi && info.taken < deliver; n += 1) {
+    const ex = sc.excluded.find((e) => n >= e.lo && n <= e.hi);
+    if (ex) { n = ex.hi; continue; }
+    const t = pgIpToString(n);
+    const l = st.leases[t];
+    if (st.bad[t] || (l && l.end > st.now)) continue;
+    const i = info.taken;
+    const mac = `02:00:00:00:${hex((i >> 8) & 255)}:${hex(i & 255)}`;
+    st.leases[t] = { mac, client: 'attacker', start: st.now, end: st.now + dur, scope: sc.scope.id };
+    info.taken += 1;
+    if (snoopOn) {
+      st.bindings = st.bindings || {};
+      st.bindings[mac] = { mac, ip: t, segment: seg, port: pgDhcpPortName(topo, seg, 'flood'), client: 'attacker', name: 'Attacker (made-up MAC)', start: st.now, end: st.now + dur };
+    }
+  }
+}
+
+// One plain sentence about what the flood did (null when there was none).
+function pgDhcpFloodText(topo, st) {
+  const f = st && st.flood;
+  if (!f || f.attempted === 0) return null;
+  const seg = pgDhcpSegLabel(topo, f.segment);
+  const head = `An attacker on ${seg} sends ${f.perSecond} DHCPDISCOVER${f.perSecond === 1 ? '' : 's'} per second, each with a made-up MAC address (the lab assumes ${PG_DHCP_FLOOD_SECONDS} seconds of this before the real clients ask).`;
+  if (f.why === 'unreachable') return `${head} Its broadcasts never reach the DHCP server, so the flood does nothing.`;
+  if (f.why === 'no-scope') return `${head} The server has no scope for that segment, so it answers none of them.`;
+  if (f.why === 'dropped') return `${head} But DHCP snooping drops the server's OFFERs on an untrusted port, so the attacker never completes a lease: it takes no addresses.`;
+  if (f.why === 'empty-pool') return `${head} The pool has no usable address, so there is nothing to take.`;
+  if (f.limited) return `${head} The rate limit on the untrusted ports (${f.limit} packets per second) trips in the first second: the switch puts the port in the error-disabled state and the flood stops after ${f.taken} address${f.taken === 1 ? '' : 'es'}.`;
+  const lim = f.limit ? ` A rate limit of ${f.limit} per second is set, but the attack is not faster than that, so the port is never shut down.` : '';
+  return `${head} The switch forwards every one of them (snooping does not count or limit DISCOVERs unless you set a rate limit), so the fake clients took ${f.taken} address${f.taken === 1 ? '' : 'es'} before the pool ran dry.${lim}`;
+}
+
+// What would stop a flood that has used up the pool? One short piece of advice for the diagnosis.
+function pgDhcpFloodAdvice(topo) {
+  const f = topo.flood || {};
+  const sn = pgDhcpSnoopOn(topo, f.segment);
+  if (!sn) return 'Turn DHCP snooping on for the VLAN, then set a rate limit on the untrusted ports (ip dhcp snooping limit rate, for example 15 packets per second), which shuts down a port that floods. Port security (a maximum number of MAC addresses per port) helps too.';
+  if (!pgDhcpRate((topo.snooping || {}).rateLimit)) return 'Set a rate limit on the untrusted ports (ip dhcp snooping limit rate, for example 15 packets per second). Snooping alone does not stop the flood: it forwards client DISCOVERs on untrusted ports. Port security (a maximum number of MAC addresses per port) helps too.';
+  return 'The rate limit is higher than the attack rate, so the port is never shut down. Lower the limit (a normal client sends only a few DHCP packets per second at most).';
+}
+
 /* ---- the lease the client ends up with, and whether its settings make sense ---- */
 
 function pgDhcpMakeLease(topo, st, sc, ipN, segId) {
@@ -238,6 +504,7 @@ function pgDhcpMakeLease(topo, st, sc, ipN, segId) {
 // Do the settings the client received let it work? Pushes plain steps; returns a diagnosis or null.
 function pgDhcpHealth(topo, host, c, steps) {
   const L = c.lease;
+  if (L.source === 'rogue') return pgDhcpRogueHealth(topo, host, c, steps);
   const ipN = pgParseIPv4(L.ip);
   const iface = pgDhcpIface(topo, host.segment);
   const segLabel = pgDhcpSegLabel(topo, host.segment);
@@ -307,11 +574,46 @@ function pgDhcpDoraInto(topo, st, clientId) {
     return { verdict: 'failed', steps, diagnosis: pgFail('not-dhcp', 'This device does not use DHCP', 'Only clients set to DHCP ask a server for an address.', 'Pick a DHCP client.', clientId, null), warning: null, summary: 'This device does not use DHCP', lease: null, client: clientId, conflicts, attempts };
   }
   const mac = pgDhcpMac(host);
+  pgDhcpFloodInto(topo, st); // does nothing unless the topology has an active flood
   // A client that starts DORA has no address any more; the server may still remember it.
   record({ phase: 'none' });
+  const segLabel = pgDhcpSegLabel(topo, host.segment);
+  const snoopOn = pgDhcpSnoopOn(topo, host.segment);
+  const entry = pgDhcpEntryPort(topo, host.segment);
+  const rogue = pgDhcpRogueOffer(topo, st, host); // null unless a rogue is switched on in this client's segment
+  // The client takes the rogue's offer: either it was first (the lab's assumption) or the real server gave no offer.
+  const takeRogue = (legitDiag) => {
+    const rv = rogue.rv;
+    const ipText = pgIpToString(rogue.ipN);
+    steps.push({ ok: false, text: legitDiag ? `The real server's answer never reaches ${host.name} (${legitDiag.title}), so the rogue's OFFER is the only one it hears.` : `${host.name} takes the first OFFER it hears: the rogue's.` });
+    steps.push({ ok: false, text: `DHCPREQUEST: ${host.name} broadcasts its request for ${ipText} and names ${rv.name} as the server it chose. A real server that had also made an offer would see that its offer was not taken.` });
+    steps.push({ ok: false, text: `DHCPACK: ${rv.name} confirms the lease of ${ipText} for ${PG_DHCP_ROGUE_HOURS} h.${snoopOn ? ` DHCP snooping sees this ACK arrive on a port it trusts, so it forwards it and records ${mac} with ${ipText} in its binding table. It cannot tell a rogue's ACK from a real one on a trusted port.` : ''}` });
+    const lease = pgDhcpMakeRogueLease(topo, st, rv, host, rogue.ipN);
+    record({ phase: 'bound', lease, duplicate: null, warnings: [], lastSteps: steps });
+    pgDhcpBind(topo, st, host, lease);
+    const health = pgDhcpHealth(topo, host, st.clients[clientId], steps);
+    st.clients[clientId].lastSteps = steps;
+    st.clients[clientId].lastFailure = health;
+    return { verdict: 'failed', steps, diagnosis: health, warning: null, summary: health.title, lease, client: clientId, conflicts, attempts: attempts || 1 };
+  };
+  const legitFail = (diagnosis) => (rogue && rogue.passes ? takeRogue(diagnosis) : finishFail(diagnosis));
   const reach = pgDhcpReachServer(topo, host.segment, 'DHCPDISCOVER', host.name);
   reach.steps.forEach((s) => steps.push(s));
-  if (!reach.ok) return finishFail(reach.diagnosis);
+  if (rogue && rogue.silent) steps.push({ ok: true, text: rogue.silent });
+  else if (rogue) {
+    const rv = rogue.rv;
+    steps.push({ ok: false, text: `${rv.name} hears the same broadcast. It is a DHCP server nobody authorised, plugged into a wall jack on ${segLabel}, and it answers with its own DHCPOFFER: ${pgIpToString(rogue.ipN)}, mask ${rv.info.maskText}, gateway ${rv.rogue.gateway || 'none'}, DNS ${rv.rogue.dns || 'none'}.` });
+    if (!rogue.passes) steps.push({ ok: true, text: `DHCP snooping is on for ${segLabel}, and the rogue's OFFER comes in on a client port, which is untrusted (every port is untrusted until it is marked ip dhcp snooping trust). The switch drops DHCPOFFER, DHCPACK and DHCPNAK from untrusted ports, so ${host.name} never hears the rogue. (Clients may still send DISCOVER and REQUEST from those ports.)` });
+    else {
+      steps.push({ ok: false, text: snoopOn ? `DHCP snooping is on for ${segLabel}, but the client ports are marked trusted, so the switch forwards the rogue's OFFER.` : `Nothing stops it: DHCP snooping is not protecting ${segLabel}, so the switch forwards the OFFER like any other frame.` });
+      if (reach.ok) steps.push({ ok: !rogue.first, text: `If the real server offers too, ${host.name} has to choose. Many clients take the first OFFER they receive, and in real life either server may be first. Assumption in this lab: ${rogue.first ? 'the rogue answers first (it is a neighbour on the same segment)' : 'the real server answers first'}; the rogue's setting "answers first" changes it.` });
+    }
+  }
+  if (!reach.ok) return legitFail(reach.diagnosis);
+  if (rogue && rogue.passes && rogue.first) {
+    if (snoopOn && !pgDhcpPortTrusted(topo, entry)) steps.push({ ok: false, text: `Note: the real server's reply would not have got through either. ${pgDhcpPortText(entry)} is untrusted, so snooping would drop the real OFFER.` });
+    return takeRogue(null);
+  }
   const iface = pgDhcpIface(topo, host.segment);
   const scopes = pgDhcpFindScope(topo, reach.selectorN);
   const selectorText = pgIpToString(reach.selectorN);
@@ -319,13 +621,17 @@ function pgDhcpDoraInto(topo, st, clientId) {
     const list = scopes.all.length ? scopes.all.map((s) => `${pgDhcpScopeText(s)}: no`).join('; ') : 'the server has no scopes at all';
     steps.push({ ok: false, text: `The server picks a scope by ${reach.via === 'relay' ? `the giaddr field (${selectorText})` : `the address of the interface the request came in on (${selectorText})`}. It compares it with its scopes: ${list}. No scope covers the client's subnet, so the server stays silent. (The client would retry and, after a while, give itself a 169.254.x.x address.)`, });
     const subnetText = iface ? `${pgIpToString(pgSubnetInfo(pgParseIPv4(iface.ip) || 0, pgParseMask(iface.mask).prefix || 0).network)}/${pgParseMask(iface.mask).prefix}` : selectorText;
-    return finishFail(pgDhcpWith(pgFail('no-scope', 'The server has no scope for this subnet', `${host.name} is on ${subnetText} (${reach.via === 'relay' ? 'giaddr ' : 'server interface '}${selectorText}), but none of the server's scopes covers that subnet, so the server ignores the request. ${scopes.all.length ? `Scopes it has: ${scopes.all.map(pgDhcpScopeText).join(', ')}.` : ''}`, `Create or correct a scope whose network matches ${subnetText}.`, 'server', 'scope-network'), { segment: host.segment }));
+    return legitFail(pgDhcpWith(pgFail('no-scope', 'The server has no scope for this subnet', `${host.name} is on ${subnetText} (${reach.via === 'relay' ? 'giaddr ' : 'server interface '}${selectorText}), but none of the server's scopes covers that subnet, so the server ignores the request. ${scopes.all.length ? `Scopes it has: ${scopes.all.map(pgDhcpScopeText).join(', ')}.` : ''}`, `Create or correct a scope whose network matches ${subnetText}.`, 'server', 'scope-network'), { segment: host.segment }));
   }
   const sc = scopes.match;
   steps.push({ ok: true, text: `The server picks a scope by ${reach.via === 'relay' ? `the giaddr field (${selectorText})` : `the interface the request came in on (${selectorText})`}: scope ${pgDhcpScopeText(sc)} matches.` });
+  if (st.flood && st.flood.scopeId === sc.scope.id) {
+    const floodText = pgDhcpFloodText(topo, st);
+    if (floodText) steps.push({ ok: st.flood.taken === 0 || st.flood.limited, text: floodText });
+  }
   if (sc.errors.length) {
     steps.push({ ok: false, text: `The scope ${sc.name} has invalid settings (${sc.errors.join(', ')}), so the server cannot use it.` });
-    return finishFail(pgDhcpWith(pgFail('bad-config', `Scope ${sc.name} has an invalid setting`, `One of the scope's settings (${sc.errors.join(', ')}) is not valid, so the server cannot offer from it.`, 'Fix the highlighted field in the scope.', 'server', `scope-${sc.errors[0]}`), { scopeId: sc.scope.id }));
+    return legitFail(pgDhcpWith(pgFail('bad-config', `Scope ${sc.name} has an invalid setting`, `One of the scope's settings (${sc.errors.join(', ')}) is not valid, so the server cannot offer from it.`, 'Fix the highlighted field in the scope.', 'server', `scope-${sc.errors[0]}`), { scopeId: sc.scope.id }));
   }
   const range = pgDhcpPoolRange(sc);
   const poolSize = pgDhcpPoolSize(sc);
@@ -375,19 +681,33 @@ function pgDhcpDoraInto(topo, st, clientId) {
     if (!chosen) {
       const leasedNow = Object.keys(st.leases).filter((k) => st.leases[k].end > st.now && range && pgParseIPv4(k) >= range.lo && pgParseIPv4(k) <= range.hi);
       const badNow = Object.keys(st.bad).filter((k) => range && pgParseIPv4(k) >= range.lo && pgParseIPv4(k) <= range.hi);
+      const held = leasedNow.filter((k) => st.leases[k].client === 'attacker');
+      if (held.length) {
+        const real = leasedNow.length - held.length;
+        const detail = `The pool ${sc.scope.start} to ${sc.scope.end} has ${poolSize} usable address${poolSize === 1 ? '' : 'es'}. ${held.length} of them are held by the attacker's made-up MAC addresses${real ? ` and ${real} by real clients` : ''}. Nothing is free.`;
+        steps.push({ ok: false, text: `${detail} The server has nothing to offer, so ${host.name} gets no answer.` });
+        return legitFail(pgDhcpWith(pgFail('starvation', `${host.name} finds no address: a flood of fake clients used up the pool`, `${detail} The fake clients will never use these addresses, but the server keeps each one reserved for the length of its lease. A real client that finds no free address gets no offer, and after a while it gives itself a 169.254.x.x address.`, pgDhcpFloodAdvice(topo), 'flood', 'snoop-rate'), { scopeId: sc.scope.id }));
+      }
       const who = leasedNow.map((k) => { const l = st.leases[k]; const h = pgDhcpHost(topo, l.client); return `${k} (${h ? h.name : l.client})`; });
       const detail = poolSize === 0
         ? `The pool ${sc.scope.start} to ${sc.scope.end} contains no usable address (it must lie inside ${sc.info.networkText}/${sc.prefix} and not be fully excluded).`
         : `The pool ${sc.scope.start} to ${sc.scope.end} has ${poolSize} usable address${poolSize === 1 ? '' : 'es'}${sc.excluded.length ? ' after exclusions' : ''}. ${leasedNow.length ? `Leased: ${who.join(', ')}. ` : ''}${badNow.length ? `Marked in conflict: ${badNow.join(', ')}. ` : ''}Nothing is free.`;
       steps.push({ ok: false, text: `${detail} The server has nothing to offer, so ${host.name} gets no answer.` });
-      return finishFail(pgDhcpWith(pgFail('pool-exhausted', poolSize === 0 ? 'The pool has no usable addresses' : 'The address pool is used up', `${detail} A client that finds no free address gets no offer; after a while it gives itself a 169.254.x.x address.`, poolSize === 0 ? 'Make the pool start and end lie inside the scope network, and check the exclusions.' : 'Make the pool bigger (move the end address), shorten the lease time so old leases free up sooner, or use a bigger subnet.', 'server', 'scope-pool'), { scopeId: sc.scope.id }));
+      return legitFail(pgDhcpWith(pgFail('pool-exhausted', poolSize === 0 ? 'The pool has no usable addresses' : 'The address pool is used up', `${detail} A client that finds no free address gets no offer; after a while it gives itself a 169.254.x.x address.`, poolSize === 0 ? 'Make the pool start and end lie inside the scope network, and check the exclusions.' : 'Make the pool bigger (move the end address), shorten the lease time so old leases free up sooner, or use a bigger subnet.', 'server', 'scope-pool'), { scopeId: sc.scope.id }));
     }
     const chosenText = pgIpToString(chosen);
     // Offer, Request, Acknowledge
     const opts = `mask ${sc.info.maskText}, gateway ${sc.scope.gateway || 'none'}, DNS ${sc.scope.dns || 'none'}, lease ${sc.hours} h`;
+    if (snoopOn && !pgDhcpPortTrusted(topo, entry)) {
+      steps.push({ ok: true, text: `DHCPOFFER: the server proposes ${chosenText} with ${opts}${reach.via === 'relay' ? ', sent back through the relay' : ''}.` });
+      steps.push({ ok: false, text: `DHCP snooping is on for ${segLabel}. The OFFER reaches the access switch on ${pgDhcpPortText(entry)}, which is untrusted (every port is untrusted until it is marked ip dhcp snooping trust), so the switch drops it. ${host.name} never hears the real server.` });
+      return legitFail(pgDhcpSnoopBlockDiag(topo, host, entry));
+    }
     steps.push({ ok: true, text: `DHCPOFFER: the server proposes ${chosenText}${reused ? ' (the address it already remembers for this client)' : ''} with ${opts}${reach.via === 'relay' ? ', sent back through the relay' : ''}.` });
+    if (rogue && rogue.passes) steps.push({ ok: true, text: `${rogue.rv.name}'s OFFER arrives second, so ${host.name} ignores it (this is the lab's assumption about the race).` });
     steps.push({ ok: true, text: `DHCPREQUEST: ${host.name} accepts the offer. It broadcasts the request, so any other DHCP server would learn its offer was not chosen.` });
     steps.push({ ok: true, text: `DHCPACK: the server confirms the lease of ${chosenText} for ${pgDhcpDuration(Math.round(sc.hours * 3600))} and records it against ${host.name}'s MAC address.` });
+    if (snoopOn) steps.push({ ok: true, text: `DHCP snooping (${segLabel}): the OFFER and the ACK come in on ${pgDhcpPortText(entry)}, which is trusted, so the switch forwards them. From the ACK it learns MAC, IP address, VLAN, port and lease time for its binding table.` });
     Object.keys(st.leases).forEach((k) => { if (st.leases[k].mac === mac && k !== chosenText) delete st.leases[k]; });
     st.leases[chosenText] = { mac, client: host.id, start: st.now, end: st.now + Math.round(sc.hours * 3600), scope: sc.scope.id };
     // the client's final check
@@ -410,10 +730,11 @@ function pgDhcpDoraInto(topo, st, clientId) {
       steps.push({ ok: true, text: `${host.name} is set not to ARP-probe the address; here nobody else has ${chosenText}, so that is fine.` });
     }
     lease = pgDhcpMakeLease(topo, st, sc, chosen, host.segment);
+    pgDhcpBind(topo, st, host, lease);
   }
   if (!lease) {
     steps.push({ ok: false, text: `After ${attempts} tries every address offered was already in use (${declined.join(', ')}). ${host.name} gives up for now.` });
-    return finishFail(pgDhcpWith(pgFail('address-conflict', 'Every address offered was already in use', `The pool keeps offering addresses that other devices already use (${declined.join(', ')}). Each time the client declines and starts over.`, 'Exclude the addresses that are assigned by hand from the pool, or move the pool to a range nobody uses.', 'server', 'excluded'), { scopeId: sc.scope.id }));
+    return legitFail(pgDhcpWith(pgFail('address-conflict', 'Every address offered was already in use', `The pool keeps offering addresses that other devices already use (${declined.join(', ')}). Each time the client declines and starts over.`, 'Exclude the addresses that are assigned by hand from the pool, or move the pool to a range nobody uses.', 'server', 'excluded'), { scopeId: sc.scope.id }));
   }
   record({ phase: 'bound', lease, duplicate, warnings: [], lastSteps: steps });
   const c = st.clients[clientId];
@@ -484,10 +805,34 @@ function pgDhcpEvent(st, events, host, ok, text) {
   if (st.log.length > 200) st.log.splice(0, st.log.length - 200);
 }
 
+// T1 or T2 for a lease the rogue gave out: the client asks the rogue (the lab does not let the real server answer for it).
+function pgDhcpRogueTimer(topo, st, host, kind, events) {
+  const c = st.clients[host.id];
+  const L = c.lease;
+  const label = kind === 'renew' ? 'T1 (50% of the lease)' : 'T2 (87.5% of the lease)';
+  const nextPhase = kind === 'renew' ? 'renewing' : 'rebinding';
+  const nextEvent = kind === 'renew' ? 'It keeps its address and will try again by broadcast at T2 (87.5%).' : 'It keeps its address until the lease runs out.';
+  const rv = pgDhcpRogueFor(topo, host.segment);
+  let blocked = null;
+  if (!rv || rv.errors.length) blocked = 'The rogue server is gone (switched off, unplugged or out of order), so nobody answers.';
+  else if (pgDhcpSnoopOn(topo, host.segment) && !pgDhcpPortTrusted(topo, 'clients')) blocked = 'The rogue answers, but DHCP snooping now drops its DHCPACK (it comes in on an untrusted client port).';
+  if (blocked) {
+    c.phase = nextPhase;
+    pgDhcpEvent(st, events, host, false, `${label}: ${host.name} asks ${L.scopeName} to ${kind === 'renew' ? 'renew' : 'rebind'} ${L.ip}. ${blocked} ${nextEvent}`);
+    return;
+  }
+  const nl = pgDhcpMakeRogueLease(topo, st, rv, host, pgParseIPv4(L.ip));
+  c.lease = nl;
+  c.phase = 'bound';
+  pgDhcpBind(topo, st, host, nl);
+  pgDhcpEvent(st, events, host, false, `${label}: ${host.name} asks ${L.scopeName} to ${kind === 'renew' ? 'renew' : 'rebind'} ${L.ip} and the rogue answers DHCPACK. The client is still on a rogue's lease for another ${pgDhcpDuration(nl.dur)}.`);
+}
+
 // T1 (kind 'renew') or T2 (kind 'rebind') reached for this client.
 function pgDhcpTimerAttempt(topo, st, host, kind, events) {
   const c = st.clients[host.id];
   const L = c.lease;
+  if (L.source === 'rogue') { pgDhcpRogueTimer(topo, st, host, kind, events); return; }
   const srv = topo.server || {};
   const label = kind === 'renew' ? 'T1 (50% of the lease)' : 'T2 (87.5% of the lease)';
   const nextPhase = kind === 'renew' ? 'renewing' : 'rebinding';
@@ -506,6 +851,7 @@ function pgDhcpTimerAttempt(topo, st, host, kind, events) {
     }
   }
   if (!blocked && !srv.online) blocked = `${srv.name || 'The DHCP server'} is offline, so nobody answers.`;
+  if (!blocked && pgDhcpSnoopOn(topo, host.segment) && !pgDhcpPortTrusted(topo, pgDhcpEntryPort(topo, host.segment))) blocked = `The server answers, but DHCP snooping drops its reply on ${pgDhcpPortText(pgDhcpEntryPort(topo, host.segment))}, which is untrusted, so ${host.name} hears nothing.`;
   if (blocked) {
     c.phase = nextPhase;
     pgDhcpEvent(st, events, host, false, `${label}: ${host.name} asks to ${kind === 'renew' ? 'renew' : 'rebind'} ${L.ip}. ${blocked} ${nextEvent}`);
@@ -516,6 +862,7 @@ function pgDhcpTimerAttempt(topo, st, host, kind, events) {
     const sc = verdict.sc;
     const nl = pgDhcpMakeLease(topo, st, sc, pgParseIPv4(L.ip), host.segment);
     st.leases[L.ip] = { mac: pgDhcpMac(host), client: host.id, start: st.now, end: nl.end, scope: sc.scope.id };
+    pgDhcpBind(topo, st, host, nl);
     const changed = [];
     if (nl.gateway !== L.gateway) changed.push(`gateway ${L.gateway || 'none'} to ${nl.gateway || 'none'}`);
     if (nl.dns !== L.dns) changed.push(`DNS ${L.dns || 'none'} to ${nl.dns || 'none'}`);

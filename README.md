@@ -602,7 +602,7 @@ where one genuinely fits, vocab/quiz call-outs, and common-traps notes):
   is installed).
 - **IT Playground** (`#/playground`) — a sandbox outside any cert, reached from a card
   on Home. Eleven tools; all but the calculator have a free sandbox and guided troubleshooting
-  scenarios (starter, core, stretch; 83 in all): a **subnet calculator** (network, broadcast,
+  scenarios (starter, core, stretch; 88 in all): a **subnet calculator** (network, broadcast,
   host range, wildcard, binary view with the network/host boundary, step-by-step working,
   split a network, same-subnet checker, **VLSM** planner, a subnetting drill and an **IPv6**
   tab: compression, expansion, address types, EUI-64 and /64 subnetting); an **IP
@@ -612,7 +612,8 @@ where one genuinely fits, vocab/quiz call-outs, and common-traps notes):
   fill as switches learn and flood, and port security with sticky MACs and violation modes);
   a **firewall and port-forwarding tester** (ordered rules with implicit deny, port forwards,
   source NAT, stateful versus stateless, hairpin NAT); a **DHCP lab** (scopes, exclusions,
-  relay, lease exhaustion); a **DNS lab** (records, caching, TTLs, resolvers); a **spanning
+  relay, lease exhaustion, and **DHCP snooping**: a rogue server that answers first, a switch with trusted and untrusted
+  ports and a per-VLAN list, a binding table, and a starvation flood stopped by a rate limit); a **DNS lab** (records, caching, TTLs, resolvers); a **spanning
   tree** lab (root election, port roles, link failures); a **site-to-site VPN** tester
   (tunnel up but no traffic: selectors, routes, NAT exemption); an **Azure NSG** tester
   (priorities, default rules, subnet versus NIC level) and a **certificate checker**
@@ -630,7 +631,7 @@ where one genuinely fits, vocab/quiz call-outs, and common-traps notes):
   calls the lab runs (`src/js/03c_pg_quizme.js`, checked against every scenario in `tools/checks/quizme.js`). The simulations are
   deliberately simplified (no vendor-exact behaviour; each tool says what it leaves out).
   The engines are pure JavaScript (`src/js/03b_playground_engine.js` for the core tools and
-  one `03c_pg_<tool>.js` per extra tool); `tools/check_playground.js` (about 3,300 checks)
+  one `03c_pg_<tool>.js` per extra tool); `tools/check_playground.js` (about 4,300 checks)
   unit-tests them and replays every scenario's broken and fixed outcomes, and build.py runs
   it when node is installed. **Adding a tool** needs four new files and no shared edits:
   `src/js/03c_pg_<k>.js` (engine), `src/js/04l_pg_<k>.jsx` (screens, ending with a
