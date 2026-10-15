@@ -408,6 +408,7 @@ function trackExperience(trackKey) {
 function experienceShort(exp) {
   if (!exp) return '';
   if (exp.level === 'none') return 'No experience required';
+  if (exp.short) return exp.short;
   const yrs = `${exp.years} ${exp.years === 1 ? 'yr' : 'yrs'}`;
   return exp.level === 'recommended' ? `${yrs} experience recommended` : `${yrs} experience required`;
 }

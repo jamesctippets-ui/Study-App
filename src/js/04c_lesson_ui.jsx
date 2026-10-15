@@ -306,7 +306,13 @@ function CheatSheetView({ trackLabel, sections, resources, flashcardsData }) {
           flashcards/quiz, just a fast pre-exam refresher.
         </div>
       </div>
-      <ResourceLinksRow resources={resources} label="Official resources for this track" />
+      {resources && resources.length > 5
+        ? (
+          <Disclosure label="Official resources" count={resources.length} summary="exam pages and docs">
+            <ResourceLinksRow resources={resources} />
+          </Disclosure>
+        )
+        : <ResourceLinksRow resources={resources} label="Official resources for this track" />}
       <button
         onClick={() => window.print()}
         className="cheat-sheet-print-btn"

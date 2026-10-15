@@ -94,6 +94,7 @@ MADLIBS = [x for p in _PARTS for x in p.MADLIBS]
 SEQUENCES = [x for p in _PARTS for x in p.SEQUENCES]
 CASE_STUDIES = [x for p in _PARTS for x in p.CASE_STUDIES]
 COMPARE = [x for p in _PARTS for x in p.COMPARE]
+CLI_CHALLENGES = [x for p in _PARTS for x in getattr(p, 'CLI_CHALLENGES', [])]
 
 
 def _ordered_cheat_sheet():

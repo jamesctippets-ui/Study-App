@@ -265,7 +265,7 @@ function CommandPracticeView({ session, index, score, categories, input, setInpu
       </div>
       <div style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderRadius: 'var(--r-card)', padding: '20px' }}>
         <div style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.04em', color: COLOR.gold, marginBottom: '8px', textTransform: 'uppercase' }}>
-          {challenge.tool === 'powershell' ? 'PowerShell' : challenge.tool === 'ios' ? 'Cisco IOS' : 'Azure CLI'}
+          {challenge.tool === 'powershell' ? 'PowerShell' : challenge.tool === 'ios' ? 'Cisco IOS' : challenge.tool === 'claude' ? 'Claude Code CLI' : 'Azure CLI'}
         </div>
         <div style={{ fontSize: '16px', lineHeight: 1.45, fontWeight: 500, marginBottom: '14px' }}>{challenge.prompt}</div>
         <input

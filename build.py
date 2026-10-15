@@ -535,6 +535,8 @@ def validate():
         for field in ("waivers",):
             if field in exp and (not isinstance(exp[field], list) or any(not isinstance(w, str) or not w.strip() for w in exp[field])):
                 errors.append(f"[{key}] experience.{field} must be a list of non-empty strings")
+        if "short" in exp and (not isinstance(exp["short"], str) or not exp["short"].strip()):
+            errors.append(f"[{key}] experience.short must be a non-empty string")
         if "associate" in exp and (not isinstance(exp["associate"], str) or not exp["associate"].strip()):
             errors.append(f"[{key}] experience.associate must be a non-empty string")
 
@@ -824,8 +826,8 @@ def validate():
                 cli_ids_seen.add(cid)
             if c.get("cat") not in cat_keys:
                 errors.append(f"[{key}] CLI_CHALLENGES '{cid}' references unknown category '{c.get('cat')}'")
-            if c.get("tool") not in ("az", "powershell", "ios"):
-                errors.append(f"[{key}] CLI_CHALLENGES '{cid}' has unknown 'tool' {c.get('tool')!r} (expected 'az', 'powershell' or 'ios')")
+            if c.get("tool") not in ("az", "powershell", "ios", "claude"):
+                errors.append(f"[{key}] CLI_CHALLENGES '{cid}' has unknown 'tool' {c.get('tool')!r} (expected 'az', 'powershell', 'ios' or 'claude')")
             for field in ("prompt", "verb", "command", "explanation"):
                 if not c.get(field, "").strip():
                     errors.append(f"[{key}] CLI_CHALLENGES '{cid}' is missing a non-empty '{field}'")

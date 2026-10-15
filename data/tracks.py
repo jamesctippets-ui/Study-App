@@ -7,6 +7,7 @@ header, the Exam tab and the Profile plan):
     'experience': {
         'level': 'required' | 'recommended' | 'none',
         'years': 5,                       # headline number of years (0 for none)
+        'short': '6+ months experience recommended',   # optional: replaces the generated "N yrs experience ..." pill text
         'summary': 'One sentence on what the years must be spent doing',
         'waivers': ['Ways the requirement can be reduced', ...],   # optional
         'associate': 'What happens if you pass without the experience',  # optional
@@ -270,6 +271,7 @@ EXAM_CONFIG = {
         'length': 53, 'minutes': 120, 'passPct': 75, 'passLabel': 'Anthropic scores this on a 100-1,000 scale with 720 to pass, not a flat percentage; the score report shows percent correct by domain. Treat 75%+ here as a safe buffer, not an exact predictor. The real exam has 53 multiple-choice and multiple-response items in 120 minutes, delivered by Pearson VUE (online or at a test center), and the credential is valid for 12 months. Domain weights here are rounded to whole numbers; the official guide lists decimals.',
         'experience': {
             'level': 'recommended', 'years': 1,
+            'short': '1+ yr experience recommended',
             'summary': 'No prerequisites. Anthropic recommends one to five years of software engineering experience plus at least six months of hands-on work with Claude or comparable LLM-based systems.',
             'waivers': [],
         },
@@ -284,6 +286,7 @@ EXAM_CONFIG = {
         'length': 60, 'minutes': 120, 'passPct': 75, 'passLabel': 'Anthropic scores this on a 100-1,000 scale with 720 to pass, not a flat percentage; the score report shows percent correct by domain. Treat 75%+ here as a safe buffer, not an exact predictor. The real exam has 60 multiple-choice and multiple-response items in 120 minutes, built around four scenarios drawn from a pool of six, delivered by Pearson VUE (online or at a test center). The credential is valid for 12 months.',
         'experience': {
             'level': 'recommended', 'years': 1,
+            'short': '6+ months experience recommended',
             'summary': 'No prerequisites. Anthropic recommends about six months or more of practical experience building with the Claude API, the Agent SDK, Claude Code and MCP on production applications.',
             'waivers': [],
         },
@@ -298,6 +301,7 @@ EXAM_CONFIG = {
         'length': 63, 'minutes': 120, 'passPct': 75, 'passLabel': 'Anthropic scores this on a 100-1,000 scale with 720 to pass, not a flat percentage; the score report shows percent correct by domain. Treat 75%+ here as a safe buffer, not an exact predictor. The real exam has 63 multiple-choice and multiple-response items in 120 minutes, delivered by Pearson VUE (online or at a test center), and the credential is valid for 12 months.',
         'experience': {
             'level': 'recommended', 'years': 3,
+            'short': '3+ yrs experience recommended',
             'summary': 'No prerequisites. Anthropic recommends three or more years in systems architecture or platform engineering, plus at least six months of hands-on production experience with Claude or comparable LLM systems and end-to-end delivery from discovery to operation.',
             'waivers': [],
         },
