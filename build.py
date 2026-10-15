@@ -24,7 +24,7 @@ sys.path.insert(0, str(ROOT))
 from data import acronyms as acronyms_data
 from data import bridges as bridges_data
 from data import playground as playground_data
-from data import tracks, itil, az900, ab650, az104, dp900, dp300, az305, az802, az140, md102, sc300, sc200, sc500, cloudplus, ehrintegration, ccna, isc2cc, sscp, cissp, ccsp, cgrc, csslp
+from data import tracks, itil, az900, ab650, az104, dp900, dp300, az305, az802, az140, md102, sc300, sc200, sc500, cloudplus, ehrintegration, ccna, isc2cc, sscp, cissp, ccsp, cgrc, csslp, ccao, ccdv, ccarf, ccarp
 
 TRACK_MODULES = {
     "itil": itil,
@@ -49,13 +49,17 @@ TRACK_MODULES = {
     "ccsp": ccsp,
     "cgrc": cgrc,
     "csslp": csslp,
+    "ccao": ccao,
+    "ccdv": ccdv,
+    "ccarf": ccarf,
+    "ccarp": ccarp,
 }
 
 
 # Tracks whose data modules are still placeholders (content in progress). They
 # are registered and validated like any other, but left out of everything the
 # app ships (TRACKS, EXAM_CONFIG, DATA, dist/data) until removed from this set.
-UNFINISHED_TRACKS = set()
+UNFINISHED_TRACKS = {'ccao', 'ccdv', 'ccarf', 'ccarp'}  # Claude certification courses, content in progress
 
 
 def live_tracks():

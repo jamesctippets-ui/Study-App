@@ -1125,4 +1125,7 @@ IGNORE = {
 
     # CGRC verification
     'Rev5',
+
+    # Claude certification tracks
+    'CLAUDE',
 }

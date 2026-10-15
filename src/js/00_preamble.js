@@ -69,6 +69,10 @@ const TRACK_ACCENTS = {
   ccsp: '#8B5CF6',
   cgrc: '#F97316',
   csslp: '#3B82F6',
+  ccao: '#E8B27A',
+  ccdv: '#D97757',
+  ccarf: '#F08A5D',
+  ccarp: '#C2410C',
 };
 
 // A soft tint of an accent over the card surface, so sections can carry their
