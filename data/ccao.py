@@ -5,8 +5,11 @@ verified against the current Claude, Claude Code, Agent SDK and MCP documentatio
 The track is split into two content parts so two writers can work in parallel; this
 module owns CATEGORIES and combines the parts (see data/cissp.py for the same pattern).
 IDs stay unique between the parts by range (part A uses 1-999, part B uses 1001+).
+Part B is written by two writers: B1 (flashcards and questions) and B2 (lessons, games, case studies, cheat sheet).
 """
-from . import ccao_a as _a, ccao_b as _b
+from . import ccao_a as _a, ccao_b1 as _b1, ccao_b2 as _b2
+
+_PARTS = [_a, _b1, _b2]
 
 CATEGORIES = [{'key': 'prompting',
   'label': 'Prompting and Task Execution',
@@ -73,18 +76,18 @@ CATEGORIES = [{'key': 'prompting',
                 {'label': 'Claude Help Center: upload files to Claude',
                  'url': 'https://support.claude.com/en/articles/8241126-upload-files-to-claude'}]}]
 
-FLASHCARDS = _a.FLASHCARDS + _b.FLASHCARDS
-QUESTIONS = _a.QUESTIONS + _b.QUESTIONS
-LESSONS = _a.LESSONS + _b.LESSONS
-MADLIBS = _a.MADLIBS + _b.MADLIBS
-SEQUENCES = _a.SEQUENCES + _b.SEQUENCES
-CASE_STUDIES = _a.CASE_STUDIES + _b.CASE_STUDIES
-COMPARE = _a.COMPARE + _b.COMPARE
+FLASHCARDS = [x for p in _PARTS for x in p.FLASHCARDS]
+QUESTIONS = [x for p in _PARTS for x in p.QUESTIONS]
+LESSONS = [x for p in _PARTS for x in p.LESSONS]
+MADLIBS = [x for p in _PARTS for x in p.MADLIBS]
+SEQUENCES = [x for p in _PARTS for x in p.SEQUENCES]
+CASE_STUDIES = [x for p in _PARTS for x in p.CASE_STUDIES]
+COMPARE = [x for p in _PARTS for x in p.COMPARE]
 
 
 def _ordered_cheat_sheet():
-    """Part A then part B, with the exam-day strategy section moved to the end."""
-    sections = _a.CHEAT_SHEET + _b.CHEAT_SHEET
+    """Parts in order, with the exam-day strategy section moved to the end."""
+    sections = [s for p in _PARTS for s in p.CHEAT_SHEET if not s['heading'].startswith('Placeholder')]
     last = [s for s in sections if s['heading'].lower().startswith('exam-day strategy')]
     return [s for s in sections if s not in last] + last
 

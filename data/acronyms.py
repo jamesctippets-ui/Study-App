@@ -390,7 +390,7 @@ ACRONYMS = {
     'SOC': {'exp': ['Security operations center', 'System and Organization Controls']},
     'SPF': {'exp': 'Sender Policy Framework'},
     'SPM': {'exp': 'Security posture management'},
-    'SSE': {'exp': 'Server-side encryption'},
+    'SSE': {'exp': ['Server-side encryption', 'Server-sent events']},
     'TAXII': {'exp': 'Trusted Automated eXchange of Intelligence Information'},
     'TDE': {'exp': 'Transparent Data Encryption'},
     'TI': {'exp': 'Threat intelligence'},
@@ -1035,6 +1035,29 @@ ACRONYMS = {
     'PIMS': {'exp': 'Privacy information management system'},
     'SI': {'exp': 'System and information integrity'},
     'SPRS': {'exp': 'Supplier Performance Risk System'},
+    # Claude certification tracks, part A
+    'BM25': {'exp': 'Best Matching 25 (lexical ranking function)'},
+    'CoT': {'exp': 'Chain-of-thought'},
+    'FAQ': {'exp': 'Frequently asked questions'},
+    'GIF': {'exp': 'Graphics Interchange Format'},
+    'IDF': {'exp': 'Inverse document frequency'},
+    'IL4': {'exp': 'Impact Level 4 (US Department of Defense cloud security level)'},
+    'IL5': {'exp': 'Impact Level 5 (US Department of Defense cloud security level)'},
+    'ITPM': {'exp': 'Input tokens per minute'},
+    'JPEG': {'exp': 'Joint Photographic Experts Group'},
+    'MRTR': {'exp': 'Multi round-trip requests'},
+    'OTPM': {'exp': 'Output tokens per minute'},
+    'PKCE': {'exp': 'Proof Key for Code Exchange'},
+    'PNG': {'exp': 'Portable Network Graphics'},
+    'RAG': {'exp': 'Retrieval-augmented generation'},
+    'RPC': {'exp': 'Remote procedure call'},
+    'RPM': {'exp': 'Requests per minute'},
+    'SigV4': {'exp': 'AWS Signature Version 4'},
+    'TF': {'exp': 'Term frequency'},
+    'TTFT': {'exp': 'Time to first token'},
+    'USD': {'exp': 'United States dollar', 'trigger': False},
+    'WIF': {'exp': 'Workload Identity Federation'},
+    'ZDR': {'exp': 'Zero data retention'},
 }
 
 IGNORE = {
@@ -1128,4 +1151,7 @@ IGNORE = {
 
     # Claude certification tracks
     'CLAUDE',
+
+    # Claude certification tracks, part A
+    'ALWAYS', 'DD', 'END', 'GITHUB', 'JIRA', 'MAJOR', 'MINOR', 'MM', 'MUST', 'NEVER', 'SKILL', 'VAR', 'WWW', 'WebP',
 }

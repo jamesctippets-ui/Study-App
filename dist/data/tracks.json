@@ -110,6 +110,26 @@
       "key": "csslp",
       "label": "CSSLP",
       "subtitle": "ISC2 Certified Secure Software Lifecycle Professional"
+    },
+    {
+      "key": "ccao",
+      "label": "CCAO-F",
+      "subtitle": "Claude Certified Associate \u2013 Foundations"
+    },
+    {
+      "key": "ccdv",
+      "label": "CCDV-F",
+      "subtitle": "Claude Certified Developer \u2013 Foundations"
+    },
+    {
+      "key": "ccarf",
+      "label": "CCAR-F",
+      "subtitle": "Claude Certified Architect \u2013 Foundations"
+    },
+    {
+      "key": "ccarp",
+      "label": "CCAR-P",
+      "subtitle": "Claude Certified Architect \u2013 Professional"
     }
   ],
   "examConfig": {
@@ -570,6 +590,126 @@
         {
           "label": "ISC2: Code of Ethics and the Code of Professional Conduct",
           "url": "https://www.isc2.org/about/Code-of-Professional-Conduct"
+        }
+      ]
+    },
+    "ccao": {
+      "length": 60,
+      "minutes": 120,
+      "passPct": 75,
+      "passLabel": "Anthropic scores this on a 100-1,000 scale with 720 to pass, not a flat percentage; the score report shows percent correct by domain. Treat 75%+ here as a safe buffer, not an exact predictor. The real exam has 60 multiple-choice and multiple-response items in 120 minutes, delivered by Pearson VUE (online or at a test center), and the credential is valid for 12 months.",
+      "experience": {
+        "level": "none",
+        "years": 0,
+        "summary": "No prerequisites and no software or API experience needed. Anthropic recommends regular hands-on use of Claude in a professional setting (for example in operations, project management, analysis or content roles).",
+        "waivers": []
+      },
+      "resources": [
+        {
+          "label": "Anthropic Skilljar: Claude Certified Associate - Foundations",
+          "url": "https://anthropic-partners.skilljar.com/claude-certified-associate-foundations-certification"
+        },
+        {
+          "label": "Anthropic Skilljar: partner certifications",
+          "url": "https://anthropic-partners.skilljar.com/page/partner-certifications"
+        },
+        {
+          "label": "Pearson VUE: Anthropic exams",
+          "url": "https://www.pearsonvue.com/us/en/anthropic.html"
+        },
+        {
+          "label": "Anthropic: Claude Partner Network",
+          "url": "https://www.anthropic.com/news/claude-partner-network"
+        }
+      ]
+    },
+    "ccdv": {
+      "length": 53,
+      "minutes": 120,
+      "passPct": 75,
+      "passLabel": "Anthropic scores this on a 100-1,000 scale with 720 to pass, not a flat percentage; the score report shows percent correct by domain. Treat 75%+ here as a safe buffer, not an exact predictor. The real exam has 53 multiple-choice and multiple-response items in 120 minutes, delivered by Pearson VUE (online or at a test center), and the credential is valid for 12 months. Domain weights here are rounded to whole numbers; the official guide lists decimals.",
+      "experience": {
+        "level": "recommended",
+        "years": 1,
+        "summary": "No prerequisites. Anthropic recommends one to five years of software engineering experience plus at least six months of hands-on work with Claude or comparable LLM-based systems.",
+        "waivers": []
+      },
+      "resources": [
+        {
+          "label": "Anthropic Skilljar: Claude Certified Developer - Foundations",
+          "url": "https://anthropic-partners.skilljar.com/claude-certified-developer-foundations-certification"
+        },
+        {
+          "label": "Anthropic Skilljar: partner certifications",
+          "url": "https://anthropic-partners.skilljar.com/page/partner-certifications"
+        },
+        {
+          "label": "Pearson VUE: Anthropic exams",
+          "url": "https://www.pearsonvue.com/us/en/anthropic.html"
+        },
+        {
+          "label": "Claude docs: intro and quickstart",
+          "url": "https://platform.claude.com/docs/en/intro"
+        }
+      ]
+    },
+    "ccarf": {
+      "length": 60,
+      "minutes": 120,
+      "passPct": 75,
+      "passLabel": "Anthropic scores this on a 100-1,000 scale with 720 to pass, not a flat percentage; the score report shows percent correct by domain. Treat 75%+ here as a safe buffer, not an exact predictor. The real exam has 60 multiple-choice and multiple-response items in 120 minutes, built around four scenarios drawn from a pool of six, delivered by Pearson VUE (online or at a test center). The credential is valid for 12 months.",
+      "experience": {
+        "level": "recommended",
+        "years": 1,
+        "summary": "No prerequisites. Anthropic recommends about six months or more of practical experience building with the Claude API, the Agent SDK, Claude Code and MCP on production applications.",
+        "waivers": []
+      },
+      "resources": [
+        {
+          "label": "Anthropic Skilljar: Claude Certified Architect - Foundations",
+          "url": "https://anthropic-partners.skilljar.com/claude-certified-architect-foundations-certification"
+        },
+        {
+          "label": "Anthropic Skilljar: partner certifications",
+          "url": "https://anthropic-partners.skilljar.com/page/partner-certifications"
+        },
+        {
+          "label": "Pearson VUE: Anthropic exams",
+          "url": "https://www.pearsonvue.com/us/en/anthropic.html"
+        },
+        {
+          "label": "Claude Code documentation",
+          "url": "https://code.claude.com/docs/en/overview"
+        }
+      ]
+    },
+    "ccarp": {
+      "length": 63,
+      "minutes": 120,
+      "passPct": 75,
+      "passLabel": "Anthropic scores this on a 100-1,000 scale with 720 to pass, not a flat percentage; the score report shows percent correct by domain. Treat 75%+ here as a safe buffer, not an exact predictor. The real exam has 63 multiple-choice and multiple-response items in 120 minutes, delivered by Pearson VUE (online or at a test center), and the credential is valid for 12 months.",
+      "experience": {
+        "level": "recommended",
+        "years": 3,
+        "summary": "No prerequisites. Anthropic recommends three or more years in systems architecture or platform engineering, plus at least six months of hands-on production experience with Claude or comparable LLM systems and end-to-end delivery from discovery to operation.",
+        "waivers": []
+      },
+      "resources": [
+        {
+          "label": "Anthropic Skilljar: Claude Certified Architect - Professional",
+          "url": "https://anthropic-partners.skilljar.com/claude-certified-architect-professional-certification"
+        },
+        {
+          "label": "Anthropic Skilljar: partner certifications",
+          "url": "https://anthropic-partners.skilljar.com/page/partner-certifications"
+        },
+        {
+          "label": "Pearson VUE: Anthropic exams",
+          "url": "https://www.pearsonvue.com/us/en/anthropic.html"
+        },
+        {
+          "label": "Claude docs: intro and quickstart",
+          "url": "https://platform.claude.com/docs/en/intro"
         }
       ]
     }
