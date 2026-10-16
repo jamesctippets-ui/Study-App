@@ -1060,6 +1060,8 @@ ACRONYMS = {
     'ZDR': {'exp': 'Zero data retention'},
     # Claude certification tracks, part B1
     'DPA': {'exp': 'Data Processing Addendum'},
+    # Claude certification tracks, CCAR-F group 1
+    'PR': {'exp': 'Pull request'},
 }
 
 IGNORE = {
