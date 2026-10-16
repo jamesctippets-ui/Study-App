@@ -1107,6 +1107,671 @@
       "front": "Claude Code surfaces",
       "back": "The places Claude Code runs: the terminal, IDE extensions, the desktop app and the browser. The local ones read the same settings files on one machine, but a cloud session does not load the plugins in your local settings.",
       "detail": "A plugin installed at user scope in the terminal also appears in the desktop app's local sessions and the VS Code extension on that computer, but not in a cloud session."
+    },
+    {
+      "id": "f1001",
+      "cat": "models",
+      "front": "Token (and tokenizer)",
+      "back": "The small chunk of text, often a word fragment, that a model reads and writes; context limits, prices and rate limits are all measured in this unit, and the count for identical text depends on the model generation's text-splitting scheme.",
+      "detail": "Budgets, max_tokens and cost estimates all use it. On older models one unit is about 3.5 English characters; Claude 4.7 and later models produce roughly 30 percent more units for the same text."
+    },
+    {
+      "id": "f1002",
+      "cat": "models",
+      "front": "Context window",
+      "back": "The maximum material a model can hold in view for one request: the system prompt, every message, tool definitions and results, images and documents, plus the reply it generates, thinking included. It works like working memory, and filling it is not automatically better.",
+      "detail": "All current Claude models offer 1M tokens (Haiku 5.5 charges more above 100,000). Accuracy and recall can degrade as the window fills, so curate what goes in."
+    },
+    {
+      "id": "f1003",
+      "cat": "models",
+      "front": "Next-token generation (autoregressive decoding)",
+      "back": "How a language model writes text: given everything so far it scores every possible continuation, selects one small piece, appends it and repeats, so a reply is built one unit at a time and each earlier choice shapes the later ones.",
+      "detail": "This is why long replies take longer and cost more, why a reply can be cut off mid-sentence, and why early wording choices can steer everything after them."
+    },
+    {
+      "id": "f1004",
+      "cat": "models",
+      "front": "Sampling parameters (temperature, top_p, top_k)",
+      "back": "Request settings that control how randomly the next piece of text is picked from the model's probability scores: one reshapes the distribution, another keeps only the most probable options up to a cumulative share, a third keeps a fixed number of top options. The newest Claude models reject any non-default value with a 400 error.",
+      "detail": "On Opus 5.5, Sonnet 5.5, Haiku 5.5 and Fable 5.1 do not send them; steer behavior with prompts, examples, effort and structured outputs. Old advice to set temperature to 0 no longer applies."
+    },
+    {
+      "id": "f1005",
+      "cat": "models",
+      "front": "Non-determinism (LLM outputs)",
+      "back": "The property that identical requests can return different replies from one call to the next; reducing randomness settings does not make output fully repeatable, so tests and pipelines must tolerate variation instead of expecting byte-identical text.",
+      "detail": "Grade with rubrics, thresholds or schema checks rather than string equality, and validate outputs in code. Anthropic notes that even temperature 0 is not fully deterministic."
+    },
+    {
+      "id": "f1006",
+      "cat": "models",
+      "front": "Zero-shot prompting",
+      "back": "Asking the model to perform a task from instructions alone, with no worked examples included in the prompt.",
+      "detail": "Often enough for clear tasks on current models. Add examples when the output format or edge-case handling keeps going wrong."
+    },
+    {
+      "id": "f1007",
+      "cat": "models",
+      "front": "Single-shot (one-shot) prompting",
+      "back": "Including exactly one demonstration of an input and its desired output in the prompt, to show the expected format or style before the real input is given.",
+      "detail": "One example can fix format, but the model may copy its quirks. If answers come in several shapes, vary the examples."
+    },
+    {
+      "id": "f1008",
+      "cat": "models",
+      "front": "Multi-shot (few-shot) prompting",
+      "back": "Supplying several varied, relevant demonstrations, typically three to five, of an input and its ideal output, each wrapped in its own tags, so the model infers the pattern, format and edge-case handling.",
+      "detail": "One of the most reliable ways to steer format, tone and structure. The examples must be diverse, otherwise the model picks up accidental patterns."
+    },
+    {
+      "id": "f1009",
+      "cat": "models",
+      "front": "Adaptive thinking",
+      "back": "A mode in which the model itself decides whether and for how long to reason before answering, based on how hard the request is and on the effort setting. On the newest Opus and Fable models it is always on and cannot be turned off.",
+      "detail": "It replaced manual budgets. Control depth with effort; thinking is billed as output. Sending thinking type disabled returns 400 on Opus 5.5 and Fable 5.1."
+    },
+    {
+      "id": "f1010",
+      "cat": "models",
+      "front": "Extended thinking (manual budget)",
+      "back": "The older way to enable reasoning, where a request sets thinking type enabled with a fixed budget_tokens allowance. It is deprecated on the 4.6 generation and rejected with a 400 error on current models, which use the adaptive approach instead.",
+      "detail": "Migration trap: code that sends budget_tokens fails after a model upgrade. Remove it, choose an effort level, and use max_tokens as the hard ceiling."
+    },
+    {
+      "id": "f1011",
+      "cat": "models",
+      "front": "Effort parameter (output_config.effort)",
+      "back": "A request setting with five levels from low to max that scales how much work the model puts into the whole reply, including its reasoning, the number and verbosity of tool calls and the answer text. It is a behavioral signal, not a hard token limit.",
+      "detail": "Default is high on most models and medium on Opus 5.5 and Haiku 5.5. Tuning it is often a better lever than switching models; changing it mid-conversation invalidates the prompt cache."
+    },
+    {
+      "id": "f1012",
+      "cat": "models",
+      "front": "Thinking token accounting",
+      "back": "The rule that reasoning produced before the answer is billed as output, counts against the response ceiling and takes up context space, even when the reasoning text is hidden from the application.",
+      "detail": "Leave room in max_tokens at higher effort levels. A stop_reason of max_tokens with a short visible answer usually means thinking used up the budget."
+    },
+    {
+      "id": "f1013",
+      "cat": "models",
+      "front": "Fast mode",
+      "back": "A research-preview option on some Opus models that serves the same model weights with a faster inference setup, giving up to about 2.5 times the output speed at premium pricing; it speeds up generation, not the wait before the first output appears.",
+      "detail": "Set speed to fast with the beta header. It is not available with the Batch API or on partner clouds, and switching speeds invalidates the prompt cache."
+    },
+    {
+      "id": "f1014",
+      "cat": "models",
+      "front": "Time to first token (TTFT)",
+      "back": "The delay between sending a request and receiving the first piece of generated output; the measure that makes streaming interfaces feel responsive, driven by prompt length, model choice and any up-front reasoning.",
+      "detail": "Long prompts raise it; shorter prompts and prompt caching lower it; fast mode does not. Total time is roughly this delay plus output length divided by generation speed."
+    },
+    {
+      "id": "f1015",
+      "cat": "models",
+      "front": "Claude Haiku tier",
+      "back": "Anthropic's lowest-latency, lowest-price model tier, aimed at high-volume work such as classification, extraction, routing and sub-agent tasks where speed and cost dominate but reasoning quality still matters.",
+      "detail": "The natural starting point for efficiency-first selection. Haiku 5.5 defaults to medium effort; confirm on your own evals before trusting it with harder steps."
+    },
+    {
+      "id": "f1016",
+      "cat": "models",
+      "front": "Claude Sonnet tier",
+      "back": "The balanced model tier: fast and capable enough for everyday coding, data analysis, content creation and agentic tool use, priced well below the top tiers, and a common default for production workloads.",
+      "detail": "Pick it when the small tier falls short but the highest capability is not needed. Sonnet 5.5 defaults to high effort."
+    },
+    {
+      "id": "f1017",
+      "cat": "models",
+      "front": "Claude Opus tier",
+      "back": "The tier built for complex, long-running agentic coding and knowledge work, and the documentation's suggested starting point for most workloads; moderate latency, with higher capability and cost than the balanced tier.",
+      "detail": "Opus 5.5 always uses adaptive thinking and defaults to medium effort; fast mode is offered on some Opus models."
+    },
+    {
+      "id": "f1018",
+      "cat": "models",
+      "front": "Claude Fable tier",
+      "back": "The highest-capability tier open to all customers, meant for demanding reasoning and long-horizon agentic work such as multi-hour agent sessions and deep research; it is slower and the most expensive, and it is a Covered Model that requires 30-day data retention.",
+      "detail": "Move up to it when evals on Opus at xhigh or max effort still fall short. A sibling model with the same capabilities is limited to verified organizations."
+    },
+    {
+      "id": "f1019",
+      "cat": "models",
+      "front": "Efficiency-first model selection",
+      "back": "Starting with the smallest, cheapest tier that might work, testing it thoroughly on your own tasks, and moving up a tier only for the capability gaps those tests expose.",
+      "detail": "Best for prototypes, tight latency and high-volume straightforward work. The opposite approach is capability-first."
+    },
+    {
+      "id": "f1020",
+      "cat": "models",
+      "front": "Capability-first model selection",
+      "back": "Starting with a strong model so the task is solved at all, tuning prompts for it, then trading down in effort or tier for as long as the evals still pass.",
+      "detail": "Best for complex reasoning, high-stakes accuracy and long-horizon agents: the savings come after you know what quality is achievable."
+    },
+    {
+      "id": "f1021",
+      "cat": "models",
+      "front": "Cost per completed task",
+      "back": "The comparison measure that divides total spend, including retries, extra turns and verbose output, by the number of tasks actually solved, instead of comparing per-million-token prices.",
+      "detail": "A pricier model can be cheaper if it finishes in fewer turns, and a tokenizer change makes per-token comparisons misleading."
+    },
+    {
+      "id": "f1022",
+      "cat": "models",
+      "front": "Advisor strategy",
+      "back": "A multi-model pattern in which a smaller executor model runs the loop and consults a stronger model through an advisor tool only at hard decisions; it helps only when the executor actually asks for advice.",
+      "detail": "Measure the consult rate and compare against simply raising effort. The advisor tool definition itself adds roughly a thousand prompt tokens to every request."
+    },
+    {
+      "id": "f1023",
+      "cat": "models",
+      "front": "Model migration breaking change",
+      "back": "A difference between model generations that makes unchanged code fail or behave differently, such as removed parameters, new defaults or a different tokenizer, found by reading the migration guide and re-running your evals before switching.",
+      "detail": "Examples: sampling parameters, prefill, manual thinking budgets and forced tool_choice are rejected on newer models, and the default effort changed on Opus 5.5."
+    },
+    {
+      "id": "f1024",
+      "cat": "models",
+      "front": "Tokenizer change (Claude 4.7 and later)",
+      "back": "The shift in which Claude 4.7 and later models split the same text into roughly 30 percent more pieces than earlier models, so counts, limits and bills measured on an older model must be re-baselined for the target model.",
+      "detail": "Recount with the token counting endpoint and the new model ID; revisit max_tokens, compaction triggers and any client-side size estimates."
+    },
+    {
+      "id": "f1025",
+      "cat": "models",
+      "front": "Models API (capability lookup)",
+      "back": "A listing endpoint that returns each available model's id, maximum input and output sizes and a capabilities object, so code can check support, such as whether thinking may be disabled, instead of hard-coding assumptions.",
+      "detail": "Read capabilities rather than inferring them from a model name. It also reports which line a model belongs to, useful for model pickers."
+    },
+    {
+      "id": "f1026",
+      "cat": "models",
+      "front": "Covered Model data retention",
+      "back": "The designation for the most capable model families (Fable and Mythos) that require 30-day data retention, which means zero data retention is not available for them unless Anthropic expressly authorizes it.",
+      "detail": "A model-selection constraint for regulated workloads: an organization without the required retention setting can have requests rejected with a 400 error. Check it before choosing the top tier."
+    },
+    {
+      "id": "f1027",
+      "cat": "models",
+      "front": "Prompt caching economics",
+      "back": "The pricing shape of caching: writing a prefix costs more than ordinary input (about 1.25 times for the five-minute lifetime, 2 times for one hour), while later reads cost only a small fraction (a tenth or less), so it pays off when a prefix is reused soon and often.",
+      "detail": "At the standard read rate break-even is one read for the five-minute lifetime and two for the one-hour lifetime. Output pricing is unaffected, and batch discounts stack with it."
+    },
+    {
+      "id": "f1028",
+      "cat": "models",
+      "front": "Cache time-to-live (TTL)",
+      "back": "How long a cached prefix stays available: five minutes by default, refreshed at no charge each time it is read, or one hour at a higher write price. Pick it from the gaps between requests in a conversation.",
+      "detail": "Turns seconds apart suit the default; a person pausing between five minutes and an hour suits the longer lifetime. A miss rewrites the whole prefix at the write price."
+    },
+    {
+      "id": "f1029",
+      "cat": "models",
+      "front": "Cache checkpointing",
+      "back": "Placing breakpoints at the end of each stable section (tool definitions, system instructions, a large reference document, the conversation so far) so each part is reused independently; up to four, each on the last block that is identical across requests.",
+      "detail": "Never mark a block that changes per request, such as a timestamp or the newest user message. Because the lookback is 20 blocks, long conversations may need an extra checkpoint."
+    },
+    {
+      "id": "f1030",
+      "cat": "models",
+      "front": "Cache invalidation",
+      "back": "What happens when anything at or before a breakpoint changes: the prefix no longer matches, so the next request misses and pays the write price again. Editing tool definitions clears everything; editing the system prompt clears it and later messages; changes to tool_choice, images, thinking or effort clear the message layer.",
+      "detail": "Keep volatile data after the last breakpoint, and make unavoidable changes at natural breaks, such as right after a compaction."
+    },
+    {
+      "id": "f1031",
+      "cat": "models",
+      "front": "Minimum cacheable prompt length",
+      "back": "The shortest prefix the API will cache (512 tokens on the current models, more on older ones). Shorter prompts are processed normally with no error and no caching, which shows up as zero in both cache fields of the usage object.",
+      "detail": "If a prompt sits just under the minimum, adding stable content to reach it can lower cost. Always confirm caching happened by reading the usage fields."
+    },
+    {
+      "id": "f1032",
+      "cat": "models",
+      "front": "Output token premium",
+      "back": "The pricing asymmetry in which generated text costs several times more per unit than input text (five times on the current models), and in an agent loop each generated unit is re-read as input on later turns, so concise replies save more than shorter prompts.",
+      "detail": "Ask for the answer you will read, not the one that looks thorough: in one measured agent a long memo format cost far more than a one-line answer with no gain in accuracy."
+    },
+    {
+      "id": "f1033",
+      "cat": "models",
+      "front": "Token budgeting",
+      "back": "Deciding in advance how much each request, agent turn or session may consume across input, reasoning, tool results and output, and enforcing it with ceilings and alerts rather than hoping usage stays reasonable.",
+      "detail": "Tools include max_tokens per response, effort, task budgets, session budgets in Managed Agents, and workspace spend limits as the final backstop."
+    },
+    {
+      "id": "f1034",
+      "cat": "models",
+      "front": "Task budget (task_budget)",
+      "back": "A beta output setting that gives the model an advisory total allowance for a whole agentic loop, shown to it as a running countdown so it paces itself and wraps up gracefully; unlike a hard ceiling, the model can see it.",
+      "detail": "It complements effort (thoroughness per step) and max_tokens (a hard cap on one response). The API does not report the remaining amount back to you."
+    },
+    {
+      "id": "f1035",
+      "cat": "models",
+      "front": "Cost modeling",
+      "back": "Estimating spend before launch by multiplying expected request volume by input, output and reasoning volumes at their different prices, then adjusting for cache hits, batch discounts and tool overhead, and validating the estimate against real usage data.",
+      "detail": "Include the resent conversation history, tool definitions and thinking, and recount tokens for the target model."
+    },
+    {
+      "id": "f1036",
+      "cat": "models",
+      "front": "Usage and Cost API",
+      "back": "An administrative reporting interface that returns token usage and cost in time buckets, filterable and groupable by model, workspace, API key, service tier and more, for attribution, chargeback and cache-efficiency analysis; it needs an Admin-level credential, not a workspace key.",
+      "detail": "Data appears within minutes, and the Console shows similar Usage and Cost pages. Separate workspaces per feature or environment make attribution simple."
+    },
+    {
+      "id": "f1037",
+      "cat": "models",
+      "front": "Client SDK (REST wrapper)",
+      "back": "A language library that wraps the HTTP interface so code calls typed functions instead of crafting requests by hand, adding authentication, required headers, retries, timeouts, streaming helpers and error classes.",
+      "detail": "Official SDKs exist for Python, TypeScript, C#, Go, Java, PHP and Ruby, and read ANTHROPIC_API_KEY from the environment. Hand-written HTTP must send the version header and implement retries itself."
+    },
+    {
+      "id": "f1038",
+      "cat": "models",
+      "front": "WebSocket",
+      "back": "A protocol that upgrades an HTTP connection into a persistent two-way channel, unlike a plain request/response call or a one-way event stream; Claude's streaming replies do not use it.",
+      "detail": "The Messages API streams over server-sent events. A WebSocket can still make sense between your own backend and a browser when the user must send messages while a reply streams, but that layer is yours, not the API's."
+    },
+    {
+      "id": "f1039",
+      "cat": "prompting",
+      "front": "Clear and direct instructions",
+      "back": "Stating the task, audience, success criteria, format and constraints explicitly, as if briefing a capable new colleague who has no background, because the model cannot infer unstated norms or intentions.",
+      "detail": "Golden-rule test: if a colleague with minimal context would be confused by the prompt, the model will be too. \"Above and beyond\" behavior has to be requested, not assumed."
+    },
+    {
+      "id": "f1040",
+      "cat": "prompting",
+      "front": "Instruction motivation",
+      "back": "Adding the purpose behind a rule, for example that the text will be read aloud by a speech engine, so the model can apply the intent to cases the rule never listed instead of obeying a bare prohibition mechanically.",
+      "detail": "A bare \"never use ellipses\" is weaker than saying why. Explanations generalize; shouting in capitals does not."
+    },
+    {
+      "id": "f1041",
+      "cat": "prompting",
+      "front": "XML tag structuring",
+      "back": "Wrapping each kind of prompt content (instructions, context, examples, variable input, documents) in its own consistently named tags, nested when the content is hierarchical, so the model separates them without ambiguity.",
+      "detail": "It also works for output: ask for the answer inside a named tag so code can extract it reliably."
+    },
+    {
+      "id": "f1042",
+      "cat": "prompting",
+      "front": "Example curation",
+      "back": "Choosing demonstrations that are relevant to the real task, diverse enough to cover edge cases and every label without teaching accidental patterns, and enclosed in their own tags so they are not mistaken for instructions.",
+      "detail": "Three to five is a good range. A set of all-positive examples biases a classifier; near-duplicates add nothing."
+    },
+    {
+      "id": "f1043",
+      "cat": "prompting",
+      "front": "Role prompting",
+      "back": "Setting a persona or area of expertise in the system prompt, even in a single sentence, to focus the model's tone, vocabulary and behavior for the application.",
+      "detail": "A system prompt works best as a role plus durable policies; per-request data belongs in the user turn."
+    },
+    {
+      "id": "f1044",
+      "cat": "prompting",
+      "front": "System versus user placement",
+      "back": "The rule of thumb for where text goes: the stable role, policies and output rules that apply to every turn live in the system prompt, while the specific task and the data to work on arrive in the user turn.",
+      "detail": "Untrusted material does not belong in the system prompt, which carries the highest authority. Long documents go in the user turn, ahead of the question."
+    },
+    {
+      "id": "f1045",
+      "cat": "prompting",
+      "front": "Documents-first ordering",
+      "back": "Placing long reference material, tens of thousands of units and more, near the top of the prompt and the question or instructions after it, which tests showed can raise answer quality, especially with many documents.",
+      "detail": "Wrap each document with its source in tags, and consider asking for relevant quotes before the answer."
+    },
+    {
+      "id": "f1046",
+      "cat": "prompting",
+      "front": "Quote-first grounding",
+      "back": "Asking the model to extract word-for-word quotes from the supplied documents first and then answer using only those quotes, which focuses it on the relevant passages and cuts down on invented claims.",
+      "detail": "Pair it with permission to say the answer is not in the documents. A claim with no supporting quote should be withdrawn."
+    },
+    {
+      "id": "f1047",
+      "cat": "prompting",
+      "front": "Positive instruction framing",
+      "back": "Phrasing guidance as the behavior you want (write in flowing paragraphs) rather than the behavior you forbid (do not use lists), which steers more reliably and avoids drawing attention to the unwanted pattern.",
+      "detail": "Match the prompt's own style to the desired output: a prompt full of markdown tends to produce markdown."
+    },
+    {
+      "id": "f1048",
+      "cat": "prompting",
+      "front": "Output constraints",
+      "back": "Explicit limits on the shape of a reply: required format or schema, structure, tone and length. For length, sentence or paragraph limits work better than word counts, because the model works in pieces of text rather than words.",
+      "detail": "A hard max_tokens cut-off truncates mid-sentence, so treat it as a safety net rather than the length control. Use structured outputs when the shape must be guaranteed."
+    },
+    {
+      "id": "f1049",
+      "cat": "prompting",
+      "front": "Iterative prompt refinement",
+      "back": "A disciplined loop: write a first prompt, run it against a fixed set of test cases, inspect the failures, change one thing, re-run everything and repeat until the criteria are met, instead of tuning on the latest complaint.",
+      "detail": "Keep the test set and record each revision. Fixing three anecdotes can silently break others."
+    },
+    {
+      "id": "f1050",
+      "cat": "prompting",
+      "front": "Prompt audit",
+      "back": "Re-reading existing prompts, tool descriptions and instruction files after a model change and deleting text written for an older model, such as emphatic warnings, \"verify twice\" rules and hand-built scratchpads, because newer models obey such text literally.",
+      "detail": "Over-obeyed instructions cost money through extra tool rounds; stale settings and contradictions cost accuracy. Claude Code offers /doctor prompt-audit for a first pass."
+    },
+    {
+      "id": "f1051",
+      "cat": "prompting",
+      "front": "Emphasis dial-back",
+      "back": "Replacing shouted wording such as CRITICAL or MUST ALWAYS with ordinary phrasing like \"use this tool when...\", because newer models respond strongly to the system prompt and tend to over-apply rules that are emphasized.",
+      "detail": "Symptom: a tool or skill that used to under-trigger is now called constantly. Fix the prompt before reaching for lower effort."
+    },
+    {
+      "id": "f1052",
+      "cat": "prompting",
+      "front": "Input sanitization",
+      "back": "Cleaning and bounding untrusted text before it enters a prompt: escaping or removing delimiter sequences that could close your data section, limiting length, normalizing encoding and rejecting inputs that match known attack patterns.",
+      "detail": "A first line of defense, not a complete one; combine it with structural separation, least privilege and output checks."
+    },
+    {
+      "id": "f1053",
+      "cat": "prompting",
+      "front": "Instruction placement across components",
+      "back": "Choosing the layer that should hold each instruction: the system prompt for durable role and policy, the user turn for the task and its data, a tool description for per-tool usage, CLAUDE.md for always-on project facts, a skill for occasional procedures, and a hook or code for rules that must never be missed.",
+      "detail": "The wrong layer is a common root cause: a must-always rule in a prompt is a wish, and a rare procedure in an always-loaded file is waste."
+    },
+    {
+      "id": "f1054",
+      "cat": "prompting",
+      "front": "Context rot",
+      "back": "The decline in accuracy and recall as a context fills with more material, which is why a huge window does not remove the need to choose carefully what goes into it.",
+      "detail": "Curate: retrieve only what is relevant, trim stale tool output, summarize, or delegate side work."
+    },
+    {
+      "id": "f1055",
+      "cat": "prompting",
+      "front": "Context drift",
+      "back": "The gradual loss of early goals, constraints or decisions in a long session, as newer material crowds them out or older turns are summarized away, so the model starts ignoring rules it followed earlier.",
+      "detail": "Counter with durable instructions in the system prompt or CLAUDE.md, periodic restatement, state files and fresh sessions between unrelated tasks."
+    },
+    {
+      "id": "f1056",
+      "cat": "prompting",
+      "front": "Compaction",
+      "back": "Replacing the older turns of a long conversation with a model-written summary so work can continue inside the window; recent turns can be kept verbatim, but detail from the summarized part may be lost.",
+      "detail": "Server-side compaction is the primary strategy for long agent runs. Rules that must persist belong in the system prompt or CLAUDE.md, not only in early messages."
+    },
+    {
+      "id": "f1057",
+      "cat": "prompting",
+      "front": "Context editing",
+      "back": "An API feature (beta) that applies rules to the history before the prompt reaches the model, such as clearing the oldest tool results or earlier thinking blocks once a threshold is passed and leaving a placeholder behind.",
+      "detail": "Use it for tool-heavy loops where old results no longer matter. Unlike compaction it deletes by rule instead of summarizing."
+    },
+    {
+      "id": "f1058",
+      "cat": "prompting",
+      "front": "Tool output pruning",
+      "back": "Keeping tool results small: returning only the fields the next step needs, truncating or paginating large payloads, and replacing stale bulky results with a one-line extract at task boundaries.",
+      "detail": "The cheapest context lever is not producing the bulk in the first place; tool search and programmatic tool calling attack other sources of bloat."
+    },
+    {
+      "id": "f1059",
+      "cat": "prompting",
+      "front": "Just-in-time context retrieval",
+      "back": "Giving the agent lightweight handles such as file paths, queries or links, plus tools to open them, so it loads detail only when needed instead of stuffing everything into the prompt up front.",
+      "detail": "It keeps the window focused and lets an agent explore a huge repository or knowledge base."
+    },
+    {
+      "id": "f1060",
+      "cat": "prompting",
+      "front": "Context isolation",
+      "back": "Keeping noisy side work out of the main conversation by giving it its own window, through a delegated subagent or a separate fresh model call in a multi-step workflow, and carrying forward only the conclusions.",
+      "detail": "Pass structured results, not transcripts, between steps. It also stops one step's chatter from steering the next."
+    },
+    {
+      "id": "f1061",
+      "cat": "prompting",
+      "front": "Multi-window state files",
+      "back": "Durable artifacts that let a fresh context window resume long work: a structured status file such as tests.json, free-form progress notes and the git history, which the new session reads before continuing.",
+      "detail": "When a task spans many windows, starting fresh and reading these files is often better than relying on a lossy summary."
+    },
+    {
+      "id": "f1062",
+      "cat": "prompting",
+      "front": "Retrieval-augmented generation (RAG)",
+      "back": "Pulling relevant passages from an external knowledge base at question time and placing them in the prompt, so answers rest on current, specific evidence rather than on what the model memorized; quality depends on the quality of the retrieval.",
+      "detail": "Choose it when knowledge is large or changes often. Cite the sources and let the model say when nothing relevant was found."
+    },
+    {
+      "id": "f1063",
+      "cat": "prompting",
+      "front": "Hallucination",
+      "back": "Plausible-sounding output that is wrong or unsupported by the supplied sources, produced because the model predicts likely text rather than looking facts up.",
+      "detail": "Reduce it with permission to say \"I do not know\", quote-first grounding, citations, restriction to the provided documents and external checks. It can be lowered, never eliminated."
+    },
+    {
+      "id": "f1064",
+      "cat": "prompting",
+      "front": "Skepticism toward confident output",
+      "back": "The engineering habit of treating a fluent, assured answer as unverified until it is checked against a source, a test, a schema or a second opinion, particularly before the output triggers an action or reaches users.",
+      "detail": "Confidence in tone is not evidence. Scale verification to the stakes: tests for code, citations for facts, human review for irreversible actions."
+    },
+    {
+      "id": "f1065",
+      "cat": "prompting",
+      "front": "Validate-and-retry loop",
+      "back": "Checking each reply in code against the schema and business rules and, on failure, re-prompting with the specific error for a bounded number of attempts before escalating to a fallback or a person.",
+      "detail": "Feeding the exact violation back usually fixes it, while unbounded retries burn money. Constrained decoding reduces, but does not remove, the need."
+    },
+    {
+      "id": "f1066",
+      "cat": "prompting",
+      "front": "Best-of-N consistency check",
+      "back": "Running the same prompt several times and comparing the answers; disagreement between runs flags content that is likely unreliable and worth verifying.",
+      "detail": "A cheap signal for factual claims, but agreement does not prove correctness, and it costs N times as much."
+    },
+    {
+      "id": "f1067",
+      "cat": "prompting",
+      "front": "Citations (source grounding)",
+      "back": "An API option on document blocks that returns, alongside the text, pointers to the exact passages in your supplied sources that support each claim, making answers auditable instead of relying on the model's own account of where facts came from.",
+      "detail": "More dependable than asking in the prompt for sources. Cache the document block; the option cannot be combined with structured outputs."
+    },
+    {
+      "id": "f1068",
+      "cat": "tools",
+      "front": "Tool description",
+      "back": "The detailed plain-language text attached to a tool definition that tells the model what the tool does, when to use it and when not to, what each parameter means and what the result contains; the biggest single factor in whether tools are chosen and called correctly.",
+      "detail": "Aim for several sentences, not a phrase. Differentiate similar tools by WHEN to use each one, not only by what they do."
+    },
+    {
+      "id": "f1069",
+      "cat": "tools",
+      "front": "Tool input examples (input_examples)",
+      "back": "An optional list of sample argument objects, each valid against the schema, shipped with a tool definition to show how complex, nested or format-sensitive inputs should look; invalid samples are rejected and each adds a little prompt cost.",
+      "detail": "Use it when the description alone leaves optional fields or formats ambiguous. Not supported on server-executed tools."
+    },
+    {
+      "id": "f1070",
+      "cat": "tools",
+      "front": "tool_choice parameter",
+      "back": "A request field that governs whether the model may or must call tools: automatic choice, any one tool, one named tool, or none. The forcing options are rejected on the newest models, which expect automatic choice plus strict schemas.",
+      "detail": "Changing it between requests invalidates cached message content. A forced call skips thinking and suppresses preamble text."
+    },
+    {
+      "id": "f1071",
+      "cat": "tools",
+      "front": "Tool consolidation",
+      "back": "Merging closely related operations into one tool with an action argument, rather than exposing many near-identical tools, so the model faces fewer, clearer choices and the tool list stays short.",
+      "detail": "The trade-off is that a merged tool needs a precise description of every action. Pair it with namespacing."
+    },
+    {
+      "id": "f1072",
+      "cat": "tools",
+      "front": "Tool namespacing",
+      "back": "Prefixing tool names with the service or resource they belong to, such as github_list_prs or slack_send_message, so similar tools from different systems stay unambiguous as the catalog grows.",
+      "detail": "It matters most with tool search and with several MCP servers; clients that aggregate servers should prefix names to avoid collisions."
+    },
+    {
+      "id": "f1073",
+      "cat": "tools",
+      "front": "High-signal tool responses",
+      "back": "Designing tool results to return only the fields the next decision needs, with stable, meaningful identifiers instead of opaque internal references, and keeping payloads small, because bulky results waste context and bury what matters.",
+      "detail": "Paginate or summarize large lists. Bloated results are a main source of context rot in agents."
+    },
+    {
+      "id": "f1074",
+      "cat": "tools",
+      "front": "Instructive tool errors",
+      "back": "Failure results returned with is_error set whose message states what went wrong and what to try next, so the model can fix a parameter or wait and retry instead of guessing.",
+      "detail": "\"failed\" teaches nothing; \"date must be in the future, today is 2026-10-15\" does. An invalid call is normally retried by the model two or three times."
+    },
+    {
+      "id": "f1075",
+      "cat": "tools",
+      "front": "Client-executed tool",
+      "back": "Any tool whose code runs inside your own application: the model emits a request, your harness runs it and returns a result block. It covers your own functions and Anthropic-schema tools such as bash, text editor, memory and computer use.",
+      "detail": "You own execution, permissions, logging and the loop. The contrast is a tool that Anthropic runs for you."
+    },
+    {
+      "id": "f1076",
+      "cat": "tools",
+      "front": "Server-executed tool",
+      "back": "A tool that Anthropic runs on your behalf, such as web search, web fetch, code execution or tool search; you enable it and read the results instead of building a result block, except when the loop pauses or a client tool is called alongside it.",
+      "detail": "Look for server_tool_use blocks. If the iteration limit is hit the stop reason is pause_turn, and you re-send the conversation to continue."
+    },
+    {
+      "id": "f1077",
+      "cat": "tools",
+      "front": "Anthropic-schema tool",
+      "back": "A tool whose definition Anthropic publishes and the models were trained on, such as bash, text editor, memory, computer or browser use; Claude calls it more reliably than a home-made equivalent, but your application still executes it.",
+      "detail": "Choose these for standard developer operations and define your own for business logic."
+    },
+    {
+      "id": "f1078",
+      "cat": "tools",
+      "front": "Tool dispatcher",
+      "back": "The harness code that maps each incoming tool request's name to a handler, validates the arguments, runs it with the right permissions, and returns a result, or an error result, for every request id.",
+      "detail": "The right place for authorization, input validation, rate limits, logging and approval checks, because it runs no matter what the model decides."
+    },
+    {
+      "id": "f1079",
+      "cat": "tools",
+      "front": "Tool search (deferred loading)",
+      "back": "A server-side tool that lets the model search a large catalog and load only the definitions it needs; tools marked defer_loading stay out of the prompt until discovered, cutting context cost and improving selection among dozens of tools.",
+      "detail": "About 55k tokens of definitions in a five-server setup shrink by over 85 percent. Consider it past roughly 20 tools; the search tool itself is never deferred."
+    },
+    {
+      "id": "f1080",
+      "cat": "tools",
+      "front": "Programmatic tool calling",
+      "back": "Letting the model write code that runs in the code execution sandbox and calls your tools from there, so loops and filtering happen in code and only the final, trimmed result enters the conversation.",
+      "detail": "Good for many repetitive lookups, such as checking 20 employees with one script instead of 20 round trips. The tool must allow code execution as a caller."
+    },
+    {
+      "id": "f1081",
+      "cat": "tools",
+      "front": "Model Context Protocol (MCP)",
+      "back": "An open standard, built on JSON-RPC, for connecting AI applications to external tools and data through one common interface, so a capability built once can be used by many compliant clients; often compared to a USB-C port for AI.",
+      "detail": "It is not Claude-specific. The current specification, dated 2026-07-28, uses stateless, self-contained requests with capabilities negotiated on each request."
+    },
+    {
+      "id": "f1082",
+      "cat": "tools",
+      "front": "MCP server",
+      "back": "A program that exposes tools, resources and prompts over the protocol so any compliant client can use them, built, deployed and maintained independently of the applications that connect to it.",
+      "detail": "Local servers usually run as subprocesses; shared or remote ones run over HTTP. Treat third-party servers as untrusted code."
+    },
+    {
+      "id": "f1083",
+      "cat": "tools",
+      "front": "MCP host and client",
+      "back": "The consuming-side roles: the host is the AI application that starts connections and talks to the model, and a client is the connector inside the host that maintains the link to exactly one server.",
+      "detail": "Claude Code and Claude Desktop are hosts; each configured server gets its own client connection."
+    },
+    {
+      "id": "f1084",
+      "cat": "tools",
+      "front": "MCP tools (model-controlled)",
+      "back": "The server primitive for functions the model itself decides to call to take actions or fetch information, each described by a name, a description and an input schema; execution failures are reported inside the result so the model can adapt.",
+      "detail": "Discovered with a list request and invoked with a call request. A human should be able to approve invocations."
+    },
+    {
+      "id": "f1085",
+      "cat": "tools",
+      "front": "MCP resources (application-controlled)",
+      "back": "The server primitive for read-only context, such as file contents, schemas or records identified by a URI, which the host application chooses to attach to the conversation rather than the model deciding to call it.",
+      "detail": "Think data to read, as opposed to functions that act. The Messages API connector supports tool calls only."
+    },
+    {
+      "id": "f1086",
+      "cat": "tools",
+      "front": "MCP prompts (user-controlled)",
+      "back": "The server primitive for reusable, parameterized prompt templates that a person picks deliberately, for example through a slash command or a menu entry.",
+      "detail": "Control hierarchy to remember: prompts are chosen by the user, resources by the application, tools by the model. In Claude Code, server prompts appear as commands."
+    },
+    {
+      "id": "f1087",
+      "cat": "tools",
+      "front": "stdio transport",
+      "back": "The local transport in which the client launches the server as a subprocess and they exchange newline-delimited JSON-RPC messages over the process's standard input and output; nothing else may be written to standard output, and logs go to standard error.",
+      "detail": "Typical for single-user local tools. A stray print() to standard output corrupts the protocol stream."
+    },
+    {
+      "id": "f1088",
+      "cat": "tools",
+      "front": "Streamable HTTP transport",
+      "back": "The standard remote transport in which every client message is an HTTP POST to a single endpoint and the server answers with plain JSON or a per-request event stream; servers must validate the Origin header and, when local, bind to localhost only.",
+      "detail": "It replaced the older HTTP+SSE transport, now deprecated. Authenticate every connection."
+    },
+    {
+      "id": "f1089",
+      "cat": "tools",
+      "front": "MCP connector",
+      "back": "A beta Messages API feature that connects Claude to remote servers directly from a request, by listing the servers and a toolset to enable, without building a client of your own; it supports tool calls only and needs publicly reachable HTTP endpoints.",
+      "detail": "A local subprocess server cannot be attached this way; use Claude Code, the Agent SDK or client-side helpers instead."
+    },
+    {
+      "id": "f1090",
+      "cat": "tools",
+      "front": "MCP configuration scopes",
+      "back": "The three places Claude Code stores server definitions: local (private to you in one project, the default), project (a .mcp.json file committed for the team, which needs approval) and user (private across all your projects).",
+      "detail": "When a name is defined in several places the more specific scope wins. Project scope is how a team shares one setup."
+    },
+    {
+      "id": "f1091",
+      "cat": "tools",
+      "front": "MCP tool execution error",
+      "back": "A failure inside a tool call, such as bad input or an API outage, reported in the normal result with the error flag set and an actionable message, as opposed to a protocol-level error for malformed or unknown requests.",
+      "detail": "Return execution errors the model can act on, saying what to fix, so it self-corrects. Protocol errors are unlikely to be recoverable by the model."
+    },
+    {
+      "id": "f1092",
+      "cat": "tools",
+      "front": "Agent Skill",
+      "back": "A folder containing a SKILL.md file with a name and a description of what it does and when to use it, plus optional scripts and reference files; only the short description is always in context, the body loads when the task matches, and extra files load on demand.",
+      "detail": "This progressive disclosure keeps many skills nearly free. Skills teach how and when; an MCP server provides the connection."
+    },
+    {
+      "id": "f1093",
+      "cat": "tools",
+      "front": "Built-in tool",
+      "back": "A capability that ships with the product or API and needs enabling rather than building, such as Claude Code's file and shell tools or the API's web search and code execution tools.",
+      "detail": "Prefer them for standard operations. They do not reach arbitrary internal systems, which is where custom tools or MCP servers come in."
+    },
+    {
+      "id": "f1094",
+      "cat": "tools",
+      "front": "Custom tool (user-defined)",
+      "back": "A tool you specify with a name, a description and an input schema whose handler is your own code, used for business logic and internal systems that no built-in tool covers.",
+      "detail": "The cheapest option for one application. If several applications need the same capability, an MCP server avoids duplicating handlers."
+    },
+    {
+      "id": "f1095",
+      "cat": "tools",
+      "front": "Extension mechanism selection",
+      "back": "Choosing among built-in tools, custom tools, skills and servers for a need: standard operations use built-ins, app-specific logic uses a custom tool, reusable procedures and know-how use a skill, and shared access to external systems uses a protocol server.",
+      "detail": "They combine: a server provides the connection and a skill teaches the team's way of using it. Rules that must always hold belong in hooks."
     }
   ],
   "questions": [
@@ -3471,6 +4136,7 @@
       ]
     }
   ],
+  "cliChallenges": [],
   "madlibs": [
     {
       "id": "ml-ccdv-1",

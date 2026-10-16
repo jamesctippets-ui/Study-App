@@ -5,11 +5,12 @@ verified against the current Claude, Claude Code, Agent SDK and MCP documentatio
 The track is split into two content parts so two writers can work in parallel; this
 module owns CATEGORIES and combines the parts (see data/cissp.py for the same pattern).
 IDs stay unique between the parts by range (part A uses 1-999, part B uses 1001+).
-Part B is written by two writers: B1 (flashcards and questions) and B2 (lessons, games, case studies, cheat sheet).
+Part B is written as B1 (flashcards, and the questions written with them) plus group files g1..gN (everything else for
+the categories each group owns).
 """
-from . import ccao_a as _a, ccao_b1 as _b1, ccao_b2 as _b2
+from . import ccao_a as _a, ccao_b1 as _b1, ccao_g1 as _g1, ccao_g2 as _g2
 
-_PARTS = [_a, _b1, _b2]
+_PARTS = [_a, _b1, _g1, _g2]
 
 CATEGORIES = [{'key': 'prompting',
   'label': 'Prompting and Task Execution',
@@ -83,6 +84,7 @@ MADLIBS = [x for p in _PARTS for x in p.MADLIBS]
 SEQUENCES = [x for p in _PARTS for x in p.SEQUENCES]
 CASE_STUDIES = [x for p in _PARTS for x in p.CASE_STUDIES]
 COMPARE = [x for p in _PARTS for x in p.COMPARE]
+CLI_CHALLENGES = [x for p in _PARTS for x in getattr(p, 'CLI_CHALLENGES', [])]
 
 
 def _ordered_cheat_sheet():

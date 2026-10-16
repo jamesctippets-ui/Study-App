@@ -3044,5 +3044,8 @@
   },
   "ZDR": {
     "exp": "Zero data retention"
+  },
+  "DPA": {
+    "exp": "Data Processing Addendum"
   }
 }

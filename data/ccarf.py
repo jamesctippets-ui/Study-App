@@ -5,11 +5,12 @@ verified against the current Claude, Claude Code, Agent SDK and MCP documentatio
 The track is split into two content parts so two writers can work in parallel; this
 module owns CATEGORIES and combines the parts (see data/cissp.py for the same pattern).
 IDs stay unique between the parts by range (part A uses 1-999, part B uses 1001+).
-Part B is written by two writers: B1 (flashcards and questions) and B2 (lessons, games, case studies, cheat sheet).
+Part B is written as B1 (flashcards, and the questions written with them) plus group files g1..gN (everything else for
+the categories each group owns).
 """
-from . import ccarf_a as _a, ccarf_b1 as _b1, ccarf_b2 as _b2
+from . import ccarf_a as _a, ccarf_b1 as _b1, ccarf_g1 as _g1, ccarf_g2 as _g2, ccarf_g3 as _g3
 
-_PARTS = [_a, _b1, _b2]
+_PARTS = [_a, _b1, _g1, _g2, _g3]
 
 CATEGORIES = [{'key': 'agentic',
   'label': 'Agentic Architecture and Orchestration',

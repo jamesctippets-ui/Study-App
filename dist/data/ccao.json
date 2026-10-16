@@ -891,6 +891,895 @@
       "front": "Latency",
       "back": "How long you wait for a response, which grows with larger models, higher effort, extended thinking and research.",
       "detail": "Speed-sensitive, high-volume tasks should use lighter settings; deep analysis can afford to wait."
+    },
+    {
+      "id": "f1001",
+      "cat": "workflow",
+      "front": "Requirements analysis",
+      "back": "The work of establishing what a solution must do and within which limits, by reading stakeholder input such as interview notes, emails and tickets and separating firm needs from wishes, conflicts and gaps. Claude can organize and probe the input, but the people who own the need confirm the result.",
+      "detail": "Ask Claude to name the source of each requirement and list the assumptions it made. A stakeholder still signs off."
+    },
+    {
+      "id": "f1002",
+      "cat": "workflow",
+      "front": "Ambiguity check",
+      "back": "Asking Claude to scan a brief or requirements document for statements that are vague, unmeasurable or open to more than one reading, such as 'fast' or 'user-friendly', and to propose measurable wording for people to confirm.",
+      "detail": "Catching vague wording before work starts costs far less than discovering after a build that two teams read the same line differently."
+    },
+    {
+      "id": "f1003",
+      "cat": "workflow",
+      "front": "Assumption log",
+      "back": "A running list of the things a plan treats as true without proof, such as an expected volume or a system's availability, each with an owner who will confirm or challenge it.",
+      "detail": "Claude can draft the list from a plan and ask what would change if each item proved false. People verify the items."
+    },
+    {
+      "id": "f1004",
+      "cat": "workflow",
+      "front": "User story",
+      "back": "A one-sentence requirement written from the viewpoint of the person who needs it, in the pattern 'as a [role], I want [capability] so that [benefit]'.",
+      "detail": "Claude can turn interview notes into draft stories quickly. The requester should read them back to confirm they say what was meant."
+    },
+    {
+      "id": "f1005",
+      "cat": "workflow",
+      "front": "Gap analysis",
+      "back": "A comparison of how a process or capability works today against how it needs to work, listing what is missing between the two states.",
+      "detail": "Give Claude both descriptions. It can only find gaps in what it has been told, so incomplete input produces an incomplete list."
+    },
+    {
+      "id": "f1006",
+      "cat": "workflow",
+      "front": "Use-case fit",
+      "back": "The judgment of whether a task suits Claude, weighing how often it recurs, how much time it takes, how structured its inputs are, how costly an error would be and what data it touches.",
+      "detail": "Frequent, text-heavy, checkable and low-consequence work is a strong fit. High-stakes decisions about people and tasks needing restricted data are not."
+    },
+    {
+      "id": "f1007",
+      "cat": "workflow",
+      "front": "Impact-effort prioritization",
+      "back": "Ranking candidate improvements by the benefit each promises against the work, risk and cost to deliver it, so that high-benefit, low-effort items go first.",
+      "detail": "Claude can score a long idea list against criteria you supply. The team, not Claude, sets the weights and makes the call."
+    },
+    {
+      "id": "f1008",
+      "cat": "workflow",
+      "front": "Process mapping",
+      "back": "Writing out how work actually flows, step by step, with the owner, input and output of each step, so that delays, handoffs and rework become visible.",
+      "detail": "Claude can turn a rambling description into a numbered step list or a diagram. Check it against how the work really happens."
+    },
+    {
+      "id": "f1009",
+      "cat": "workflow",
+      "front": "Bottleneck",
+      "back": "The step in a process that limits how much work can finish in a given time, because items queue up in front of it.",
+      "detail": "Speeding up any other step does not raise output. Claude can suggest candidates from a description, but timing data confirms which step it really is."
+    },
+    {
+      "id": "f1010",
+      "cat": "workflow",
+      "front": "Process optimization",
+      "back": "Improving a process by removing waiting time, rework, duplicate entry and needless approvals, with Claude proposing changes from a description and people testing them in practice.",
+      "detail": "Target the measured constraint, change one step at a time and compare against the baseline."
+    },
+    {
+      "id": "f1011",
+      "cat": "workflow",
+      "front": "Work breakdown structure (WBS)",
+      "back": "A tree that splits a project into deliverables and then into tasks small enough to assign and estimate. Claude can propose a first version from a goal and constraints.",
+      "detail": "Check for missing tasks and wrong dependencies. Claude does not know your team's real capacity unless you say so."
+    },
+    {
+      "id": "f1012",
+      "cat": "workflow",
+      "front": "Risk register",
+      "back": "A log of what could go wrong with a project or rollout, each entry carrying a likelihood, an impact, an owner and a planned response.",
+      "detail": "Claude is good at brainstorming risks across categories. People rate them and own the responses."
+    },
+    {
+      "id": "f1013",
+      "cat": "workflow",
+      "front": "Pre-mortem",
+      "back": "A planning exercise in which the team assumes a project has already failed and works backward to list the reasons, so weaknesses surface before launch.",
+      "detail": "Ask Claude to imagine the failure and generate causes by category. The team then ranks them and plans mitigations."
+    },
+    {
+      "id": "f1014",
+      "cat": "workflow",
+      "front": "Decision matrix",
+      "back": "A table that scores each option against weighted criteria so the choice between them can be traced and explained.",
+      "detail": "Claude can suggest criteria and draft scores, but the weights express the organization's priorities and must be set by people."
+    },
+    {
+      "id": "f1015",
+      "cat": "workflow",
+      "front": "Prototype",
+      "back": "A rough, working version of a tool, document or workflow built quickly so users can react to it before anyone invests in a full solution. In Claude it is often an interactive artifact.",
+      "detail": "Build one to learn what users need. Anything that must connect to company systems or run at scale moves to specialists."
+    },
+    {
+      "id": "f1016",
+      "cat": "workflow",
+      "front": "Feedback loop",
+      "back": "The cycle of putting a draft or workflow in front of its users, collecting what worked and what did not, and building that into the next version.",
+      "detail": "Short loops with real users beat long design phases. Record each round's changes so you can see what improved results."
+    },
+    {
+      "id": "f1017",
+      "cat": "workflow",
+      "front": "Augmentation mode",
+      "back": "A way of working in which a person and Claude collaborate as thinking partners, going back and forth while the person keeps direction and judgment. It is one of three modes of AI interaction in Anthropic's AI Fluency framework.",
+      "detail": "Most Associate-level work looks like this: brainstorming, drafting, analysis and review, with a human deciding."
+    },
+    {
+      "id": "f1018",
+      "cat": "workflow",
+      "front": "Automation mode",
+      "back": "A way of working in which Claude carries out a specific, well-defined task exactly as a person instructs, such as reformatting a stack of records the same way. It is one of three modes of AI interaction in Anthropic's AI Fluency framework.",
+      "detail": "The person specifies the task and Claude executes it. Suits repetitive, rule-like work whose output is easy to check."
+    },
+    {
+      "id": "f1019",
+      "cat": "workflow",
+      "front": "Agency mode",
+      "back": "A way of working in which a person configures Claude in advance to carry out future tasks independently on their behalf. It is one of three modes of AI interaction in Anthropic's AI Fluency framework and calls for the clearest limits, permissions and oversight.",
+      "detail": "More independence means more setup: define what it may do, what needs approval and how its work will be reviewed."
+    },
+    {
+      "id": "f1020",
+      "cat": "workflow",
+      "front": "Delegation (AI Fluency)",
+      "back": "The competency of setting goals and deciding whether, when and how to bring AI into a piece of work, based on the task, the tool's strengths and the risks involved.",
+      "detail": "Anthropic's framework pairs it with Description, Discernment and Diligence. Good delegation starts before any prompt is written."
+    },
+    {
+      "id": "f1021",
+      "cat": "workflow",
+      "front": "Workflow redesign",
+      "back": "Rethinking the order, handoffs and roles in a process so that Claude's strengths are built in from the start, instead of adding Claude as an extra step on top of the old design.",
+      "detail": "Choose it when the old process exists only because of old limits, such as retyping notes by hand. Otherwise a lighter addition carries less risk."
+    },
+    {
+      "id": "f1022",
+      "cat": "workflow",
+      "front": "Integration point",
+      "back": "The exact step in an existing process where Claude is inserted, defined by what goes in, what comes out and who receives the result.",
+      "detail": "Pick a step that is repetitive, text-heavy and easy to check, and keep a person where errors would be costly."
+    },
+    {
+      "id": "f1023",
+      "cat": "workflow",
+      "front": "Draft-review-approve pattern",
+      "back": "A three-stage workflow in which Claude produces a first version, a responsible person edits and checks it, and only then is it approved and released.",
+      "detail": "The standard shape of an augmented workflow. The review stage is where accuracy, tone and policy are enforced; skipping it turns assistance into unchecked automation."
+    },
+    {
+      "id": "f1024",
+      "cat": "workflow",
+      "front": "Standard operating procedure (SOP)",
+      "back": "A written, step-by-step description of how a recurring task is done, which for a Claude-assisted task states the inputs, the instructions or template used, who reviews the output and what to do when something fails.",
+      "detail": "Writing it down lets colleagues repeat the workflow and keeps it alive when its builder moves on."
+    },
+    {
+      "id": "f1025",
+      "cat": "workflow",
+      "front": "Pilot",
+      "back": "A small, time-limited trial of a new Claude workflow with a limited group, run to measure results and find problems before a wider rollout.",
+      "detail": "Agree the success measures before it starts and compare against the baseline you recorded."
+    },
+    {
+      "id": "f1026",
+      "cat": "workflow",
+      "front": "Baseline measurement",
+      "back": "Recording how long a task takes, what it costs and how often it needs correction before Claude is introduced, so that any improvement can be shown with evidence.",
+      "detail": "Without one, 'it feels faster' is the only claim available, and stakeholders discount it."
+    },
+    {
+      "id": "f1027",
+      "cat": "workflow",
+      "front": "Value case",
+      "back": "A short, evidence-backed argument to stakeholders for using Claude on a process, stating the measured benefit, the cost, the known limits and the human review that remains.",
+      "detail": "Lead with measured pilot results. Including the limitations builds credibility instead of weakening the case."
+    },
+    {
+      "id": "f1028",
+      "cat": "workflow",
+      "front": "Expectation setting",
+      "back": "Telling stakeholders in advance what Claude does well, where it makes mistakes and which checks stay with people, so nobody treats its output as automatically correct.",
+      "detail": "Overpromising is the fastest route to lost trust after the first visible error."
+    },
+    {
+      "id": "f1029",
+      "cat": "workflow",
+      "front": "Adoption risk",
+      "back": "The chance that a workflow gets built but not used, because staff distrust its output, lack training, or find it slower or more awkward than their old method.",
+      "detail": "Technical success does not guarantee use. Ask users what is blocking them and fix training or workflow before adding features."
+    },
+    {
+      "id": "f1030",
+      "cat": "workflow",
+      "front": "Change management",
+      "back": "The planned work of preparing people for a new way of working: communication, training, support channels, feedback and a named owner.",
+      "detail": "Rolling out Claude is as much about people as tools. Plan it alongside the technical setup."
+    },
+    {
+      "id": "f1031",
+      "cat": "workflow",
+      "front": "Gradual release",
+      "back": "Widening the scope and independence given to an AI helper in stages as it proves reliable, instead of granting broad freedom on day one. It is named as one of four principles in Anthropic's course material on human-agent teams.",
+      "detail": "Start with one team and tightly reviewed outputs. Relax checks only where results justify it."
+    },
+    {
+      "id": "f1032",
+      "cat": "workflow",
+      "front": "Escalation of technical work",
+      "back": "Handing a request to Claude Developers or Architects when it needs system integration, custom code, automation at scale, security design or an enterprise rollout, which Associates are not expected to design themselves.",
+      "detail": "Recognizing the limit of your own scope is itself a tested skill. Bring specialists a clear problem statement, the data involved and your prototype."
+    },
+    {
+      "id": "f1033",
+      "cat": "knowledge",
+      "front": "Project knowledge",
+      "back": "The files, documents and text stored in a Project that Claude can draw on in every chat inside that Project, so the background does not have to be pasted again.",
+      "detail": "It supplies facts and reference material. Rules about behavior belong in instructions. On paid plans a very large collection switches on retrieval automatically."
+    },
+    {
+      "id": "f1034",
+      "cat": "knowledge",
+      "front": "Project instructions",
+      "back": "Standing directions saved in a Project that apply to every chat in that Project and to no other, such as role, audience, tone, output format and what to do when information is missing.",
+      "detail": "Use them for how Claude should behave. They do not follow you into chats outside the Project; account-wide instructions do that."
+    },
+    {
+      "id": "f1035",
+      "cat": "knowledge",
+      "front": "Account-wide instructions",
+      "back": "A setting, labeled 'Instructions for Claude' in the account's Settings, where general guidance such as preferred terminology and communication style is saved so that it is applied to all of a person's conversations.",
+      "detail": "Keep it to preferences that are true everywhere. Client- or task-specific rules belong in a Project or a skill."
+    },
+    {
+      "id": "f1036",
+      "cat": "knowledge",
+      "front": "Instructions versus knowledge",
+      "back": "The split inside a Project between guidance on how Claude should behave and the reference material it should draw on: rules of conduct are saved in one place, documents and facts in the other.",
+      "detail": "Burying rules inside a long document, or pasting documents into the rules, makes both harder to maintain and to find."
+    },
+    {
+      "id": "f1037",
+      "cat": "knowledge",
+      "front": "System prompt",
+      "back": "Standing instructions placed ahead of the conversation that define Claude's role, tone, rules and limits for everything that follows. In the Claude apps, the closest everyday equivalent is Project instructions.",
+      "detail": "The blueprint's 'system-level instructions' refers to this standing layer, as opposed to the individual messages a person types."
+    },
+    {
+      "id": "f1038",
+      "cat": "knowledge",
+      "front": "Role and audience statement",
+      "back": "The part of an instruction set that says what Claude is acting as, who will read its output and what that reader already knows, so that tone and depth are pitched correctly.",
+      "detail": "A concrete statement ('you draft replies for retail customers who are not technical') beats a grand job title."
+    },
+    {
+      "id": "f1039",
+      "cat": "knowledge",
+      "front": "Fallback instruction",
+      "back": "An instruction that says what Claude should do when it cannot complete a task as specified, for example when the knowledge does not hold the answer: say so plainly, ask a question, or route the request to a named person.",
+      "detail": "Without one, Claude may fill the gap with a plausible guess. Pair it with a rule to quote the source whenever an answer exists."
+    },
+    {
+      "id": "f1040",
+      "cat": "knowledge",
+      "front": "Single source of truth",
+      "back": "One designated, maintained version of each piece of reference information, so that people and Claude never draw on conflicting copies.",
+      "detail": "Before uploading a policy, confirm it is the current approved version and retire older copies from the Project."
+    },
+    {
+      "id": "f1041",
+      "cat": "knowledge",
+      "front": "Stale knowledge",
+      "back": "Outdated documents left in a Project or connected source that Claude may still quote as though they were current.",
+      "detail": "A Project does not expire its files. Someone has to remove or replace them when policies, prices or procedures change."
+    },
+    {
+      "id": "f1042",
+      "cat": "knowledge",
+      "front": "Descriptive file naming",
+      "back": "Giving each uploaded file a clear name that states its content and, where relevant, its date or version, such as 'Refund policy 2026-07', which helps Claude pick the right file and helps people spot outdated ones.",
+      "detail": "The Help Center advises clear, descriptive filenames for retrieval. Names like 'final_v2_REAL' invite mix-ups."
+    },
+    {
+      "id": "f1043",
+      "cat": "knowledge",
+      "front": "Retrieval-augmented generation (RAG)",
+      "back": "A technique in which Claude searches a large body of material for the passages that matter to each question and answers from those, instead of holding everything in view at once. In Projects on paid plans it switches on automatically as stored knowledge nears the context limit and allows up to ten times more material.",
+      "detail": "A visual indicator shows when it is active. Naming the specific document in your question and using clear filenames helps it find the right passages."
+    },
+    {
+      "id": "f1044",
+      "cat": "knowledge",
+      "front": "Connector",
+      "back": "A link between Claude and an outside app or service, such as Google Drive, Gmail or Slack, through which Claude can search, read and in some cases act on that service for a person, within that person's permissions.",
+      "detail": "Connectors are for live data and actions. They differ from uploaded files, which are static copies, and from skills, which carry procedures."
+    },
+    {
+      "id": "f1045",
+      "cat": "knowledge",
+      "front": "Google Drive connector",
+      "back": "The connector that lets Claude search a person's Drive, read the Docs, Sheets, Slides and PDFs it finds there, and add selected Google Docs to chats and Projects. It reads text only, so images inside documents are not seen.",
+      "detail": "Documents added this way stay in step with the live file. Adding them to a Project is limited to private Projects."
+    },
+    {
+      "id": "f1046",
+      "cat": "knowledge",
+      "front": "Gmail connector",
+      "back": "The connector that lets Claude search a person's email and answer questions from what it finds, citing the messages it used. It sees only the connected account's mail that the person can already open, and any action beyond reading is subject to that person's approval.",
+      "detail": "Claude retrieves only the minimum needed for the request. Images embedded in emails and attachment contents are not read."
+    },
+    {
+      "id": "f1047",
+      "cat": "knowledge",
+      "front": "Permission inheritance",
+      "back": "The rule that a connected service limits Claude to what the signed-in person can already see or do there; Claude cannot reach files, mailboxes or folders its user cannot open.",
+      "detail": "If Claude cannot find a file, check the person's own access first. A custom connector that uses a shared credential is the exception: it reaches whatever that credential can."
+    },
+    {
+      "id": "f1048",
+      "cat": "knowledge",
+      "front": "Action approval",
+      "back": "The confirmation prompt that asks a person to approve before Claude carries out an action in a connected service, such as sending, sharing, moving or deleting something.",
+      "detail": "Read what is about to happen before approving. Owners on Team and Enterprise plans decide whether members may let such actions run without asking each time."
+    },
+    {
+      "id": "f1049",
+      "cat": "knowledge",
+      "front": "Organization-level enablement",
+      "back": "The administrator step on Team and Enterprise plans in which an Owner adds a connector for the whole organization. It makes the connector available but does not by itself give anyone access to data.",
+      "detail": "Each person must still sign in to the service with their own account, so access stays tied to individual permissions."
+    },
+    {
+      "id": "f1050",
+      "cat": "knowledge",
+      "front": "Connector permission levels",
+      "back": "Owner-set controls that decide, for each category of connector action, whether Claude may act without asking, must ask first, or is blocked altogether. They can only narrow what the source system already allows.",
+      "detail": "A typical split is reading allowed, writing and deleting needing approval. Restricting an action never grants more access than the service gives."
+    },
+    {
+      "id": "f1051",
+      "cat": "knowledge",
+      "front": "Skill",
+      "back": "A packaged set of instructions, with optional scripts and reference files, that Claude loads on demand when a request matches it, giving repeatable procedures such as applying brand guidelines or a fixed report layout.",
+      "detail": "Skills need code execution switched on and work across chats and Projects. Build one when you keep re-explaining the same format, tone and example."
+    },
+    {
+      "id": "f1052",
+      "cat": "knowledge",
+      "front": "Progressive disclosure",
+      "back": "The loading pattern in which Claude first sees only a skill's short name and description, and reads the full instructions and files only if the task needs them, which saves room in the context window.",
+      "detail": "It is why many skills can be installed without crowding every conversation, and why the description decides whether a skill is used."
+    },
+    {
+      "id": "f1053",
+      "cat": "knowledge",
+      "front": "Skill description",
+      "back": "The short text in a skill that says what it does and when to use it, which Claude relies on to decide whether to load the skill for a given request.",
+      "detail": "A vague one means the skill is ignored or fires at the wrong time. If a skill does not trigger, sharpen this first."
+    },
+    {
+      "id": "f1054",
+      "cat": "knowledge",
+      "front": "Plugin",
+      "back": "A single installable bundle that packages skills, connectors and related components for a role or team, so that people get a ready setup without configuring each piece.",
+      "detail": "Organization Owners can distribute plugins to members. Install only from sources you trust."
+    },
+    {
+      "id": "f1055",
+      "cat": "knowledge",
+      "front": "Trusted-source rule",
+      "back": "The practice of adding skills, plugins and connectors only from publishers you trust and have reviewed, because they can carry instructions or code that put data at risk.",
+      "detail": "The Help Center names prompt injection and data exfiltration as the main risks of an untrusted skill. Review bundled files first."
+    },
+    {
+      "id": "f1056",
+      "cat": "knowledge",
+      "front": "Access review",
+      "back": "A periodic check of who and what has access, such as removing connectors that are no longer needed and ending shares of Projects that no longer need them.",
+      "detail": "Access granted for a task tends to outlive the task unless someone looks. Disconnect services you no longer use."
+    },
+    {
+      "id": "f1057",
+      "cat": "knowledge",
+      "front": "Project sharing permissions",
+      "back": "The Team and Enterprise settings that decide whether a person added to a shared Project can only read it and chat in it, or can also change its instructions and knowledge.",
+      "detail": "Give edit rights only to the people who maintain the Project; everyone else works from a stable configuration."
+    },
+    {
+      "id": "f1058",
+      "cat": "knowledge",
+      "front": "Configuration owner",
+      "back": "The named person accountable for a shared Project's or skill's instructions and files, who approves changes, reviews them on a schedule and tells users what changed.",
+      "detail": "Shared configurations without an owner drift: files go stale, rules accumulate and nobody knows who may change them."
+    },
+    {
+      "id": "f1059",
+      "cat": "knowledge",
+      "front": "Configuration change log",
+      "back": "A simple record of each change made to a Project's instructions or files: what changed, who changed it, when and why.",
+      "detail": "When behavior suddenly shifts, the log shows what changed so it can be reversed."
+    },
+    {
+      "id": "f1060",
+      "cat": "knowledge",
+      "front": "Regression test set",
+      "back": "A small fixed collection of representative requests, with notes on what good answers look like, that is rerun after every change to instructions or knowledge to confirm that results did not get worse.",
+      "detail": "A change that fixes one problem can quietly break another. Include a few tricky cases, not only easy ones."
+    },
+    {
+      "id": "f1061",
+      "cat": "knowledge",
+      "front": "Enterprise search",
+      "back": "A pre-configured project on Team and Enterprise plans, set up by an Owner, that searches an organization's connected tools such as documents, chat and email in one place and shows each person only what they are permitted to see.",
+      "detail": "Results are permission-aware. Owners choose the connectors and each member signs in to their own accounts."
+    },
+    {
+      "id": "f1062",
+      "cat": "knowledge",
+      "front": "Synced Google Doc",
+      "back": "A Google Doc added to a chat or Project from Drive that remains linked to the live document, so Claude works from its current version rather than from a one-time copy.",
+      "detail": "Editing the source changes what Claude sees. A file uploaded from disk is a static copy that someone must replace by hand."
+    },
+    {
+      "id": "f1063",
+      "cat": "governance",
+      "front": "Assistive use case",
+      "back": "A use of Claude that supports a person's own work, such as drafting, summarizing, brainstorming or analysis, where a human reviews the result and an imperfect output does little harm.",
+      "detail": "The safest and most common place to start. Risk rises as output moves from informing a person to deciding about one."
+    },
+    {
+      "id": "f1064",
+      "cat": "governance",
+      "front": "High-risk use case",
+      "back": "A use in which Claude's output feeds advice or decisions that can significantly affect a person's rights, health, money or opportunities, such as legal, medical, credit, insurance, housing or employment matters.",
+      "detail": "Anthropic's Usage Policy attaches extra requirements: a qualified person must meaningfully review the output, and the affected person must be told that AI was involved."
+    },
+    {
+      "id": "f1065",
+      "cat": "governance",
+      "front": "Meaningful human review",
+      "back": "Examination of an AI recommendation by a qualified person who has the time, knowledge and authority to change or reject it, as opposed to a quick click-through that approves whatever appears.",
+      "detail": "Anthropic's Usage Policy asks for review of this kind for high-risk recommendations, and the reviewer stays responsible for the outcome."
+    },
+    {
+      "id": "f1066",
+      "cat": "governance",
+      "front": "Automated decision-making",
+      "back": "Reaching a decision about an individual, such as whether to hire, lend or grant a benefit, mainly from a system's output with little or no human judgment applied.",
+      "detail": "Many laws and Anthropic's Usage Policy require human review and notice in these cases. Claude may inform the decision; a qualified person makes it."
+    },
+    {
+      "id": "f1067",
+      "cat": "governance",
+      "front": "AI disclosure",
+      "back": "Telling the people who receive or are affected by work, such as customers, applicants, patients or readers, that AI helped produce it.",
+      "detail": "Anthropic's Usage Policy requires it for high-risk advice and for consumer-facing chatbots, and many employers and contracts add their own duty."
+    },
+    {
+      "id": "f1068",
+      "cat": "governance",
+      "front": "Deceptive content",
+      "back": "Material designed to mislead people about who produced it or whether it is genuine, such as fake reviews, invented testimonials, undisclosed fake personas or a bot posing as a human.",
+      "detail": "Anthropic's Usage Policy prohibits these uses, and so do most corporate policies, however accurate the underlying claims might be."
+    },
+    {
+      "id": "f1069",
+      "cat": "governance",
+      "front": "Anthropic Usage Policy",
+      "back": "Anthropic's published rules on what its products may not be used for and on the extra safeguards required for high-risk uses; it applies to everyone who uses Claude, on any plan.",
+      "detail": "It sets the outer limit. An organization's own AI policy can be stricter, and cannot make a prohibited use acceptable."
+    },
+    {
+      "id": "f1070",
+      "cat": "governance",
+      "front": "Professional-advice boundary",
+      "back": "The limit that Claude's answers on legal, medical, tax or investment questions are information to take to a qualified professional, not advice a person can rely on alone when deciding.",
+      "detail": "Claude can help you prepare questions, summarize documents and explain terms. A licensed professional gives the advice and carries the responsibility."
+    },
+    {
+      "id": "f1071",
+      "cat": "governance",
+      "front": "Data classification",
+      "back": "Sorting information into tiers, such as public, internal, confidential and restricted, with rules for each tier about where and how it may be processed, including whether it may be given to an AI tool.",
+      "detail": "Check the label before pasting or uploading. Policies usually allow public and some internal data in approved tools and forbid restricted data."
+    },
+    {
+      "id": "f1072",
+      "cat": "governance",
+      "front": "Personally identifiable information (PII)",
+      "back": "Information that identifies a specific person, alone or in combination, such as a name, email address, government ID number, account number or precise location.",
+      "detail": "Remove, mask or replace it before sending data to Claude unless your policy and account explicitly allow it."
+    },
+    {
+      "id": "f1073",
+      "cat": "governance",
+      "front": "Protected health information (PHI)",
+      "back": "Health information tied to an identifiable individual that is handled by healthcare providers, insurers and their business partners and regulated in the United States under HIPAA.",
+      "detail": "It may be processed only in tools covered by an appropriate agreement. Anthropic offers a Business Associate Agreement for HIPAA-ready commercial services, not for consumer plans."
+    },
+    {
+      "id": "f1074",
+      "cat": "governance",
+      "front": "Confidential business information",
+      "back": "Non-public information a company has a duty to protect, such as unreleased financials, strategy, source code, client data and trade secrets.",
+      "detail": "Client contracts and employment agreements often limit where it may go. When unsure, treat it as restricted and ask."
+    },
+    {
+      "id": "f1075",
+      "cat": "governance",
+      "front": "Credentials and secrets",
+      "back": "Passwords, API keys, access tokens and similar values that unlock systems; they should never be typed into prompts, Project instructions, knowledge files or skills.",
+      "detail": "The Help Center warns against hardcoding API keys or passwords in a skill. Use properly authenticated connections instead."
+    },
+    {
+      "id": "f1076",
+      "cat": "governance",
+      "front": "Data minimization",
+      "back": "Giving Claude only the fields and records a task actually needs, and leaving out everything else, so that less sensitive data is exposed.",
+      "detail": "To analyze overtime by department, send department and hours, not names and employee numbers."
+    },
+    {
+      "id": "f1077",
+      "cat": "governance",
+      "front": "Redaction",
+      "back": "Removing or blacking out sensitive details, such as names, numbers and addresses, from a document before it is shared with a tool.",
+      "detail": "Check the result. Identifiers hide in headers, filenames, comments and tracked changes."
+    },
+    {
+      "id": "f1078",
+      "cat": "governance",
+      "front": "Anonymization",
+      "back": "Stripping identifiers from data so thoroughly that individuals can no longer be identified, even by combining it with other information.",
+      "detail": "Removing names is not always enough. Rare job titles, dates and locations can still point to a person."
+    },
+    {
+      "id": "f1079",
+      "cat": "governance",
+      "front": "Pseudonymization",
+      "back": "Replacing identifiers with consistent codes or placeholders so that records can still be matched and analyzed, while the key linking codes back to people is kept separately and protected.",
+      "detail": "It lowers risk, but the data may still count as personal data because the key allows re-identification."
+    },
+    {
+      "id": "f1080",
+      "cat": "governance",
+      "front": "Approved tool list",
+      "back": "The set of AI tools, plans and accounts that an organization has vetted for work use; anything outside it is not cleared for company data.",
+      "detail": "Using Claude through the approved workspace rather than a personal account is often the difference between compliant and non-compliant use."
+    },
+    {
+      "id": "f1081",
+      "cat": "governance",
+      "front": "Shadow AI",
+      "back": "Use of AI tools or personal accounts for work without the knowledge or approval of IT, security or management, so company data flows where nobody has assessed the terms.",
+      "detail": "Convenience is the usual cause. The remedy is to use approved tools or ask for the tool to be assessed, not to work around the policy."
+    },
+    {
+      "id": "f1082",
+      "cat": "governance",
+      "front": "Consumer versus commercial terms",
+      "back": "The distinction between individual plans (Free, Pro, Max), where a model-improvement setting governs whether chats may be used to train models, and organizational plans and the API (Team, Enterprise, API), where inputs and outputs are not used for training by default.",
+      "detail": "Know which applies to the account you are using before pasting anything sensitive. Company policies usually point to the organizational terms."
+    },
+    {
+      "id": "f1083",
+      "cat": "governance",
+      "front": "Model improvement setting",
+      "back": "A privacy setting on individual Claude plans by which a person chooses whether their chats may be used to improve models. When it is on, data may be kept de-identified for up to five years; turning it off does not undo training that has already happened.",
+      "detail": "Incognito chats are excluded even when it is on. The setting does not replace company policy on what data may be shared."
+    },
+    {
+      "id": "f1084",
+      "cat": "governance",
+      "front": "Incognito chat",
+      "back": "A conversation that is not saved to chat history or memory and is not used to improve Claude, even when the model-improvement setting is on.",
+      "detail": "It does not change what an employer's policy allows, and on Team and Enterprise plans such chats still follow organizational retention."
+    },
+    {
+      "id": "f1085",
+      "cat": "governance",
+      "front": "Data retention period",
+      "back": "How long conversations and files are kept before deletion, determined by plan, contract and administrator settings.",
+      "detail": "Deleting a chat removes it from history at once, but deletion from back-end storage follows on a delay, so deleting is no way to undo sharing sensitive data. Enterprise Owners can set a custom period."
+    },
+    {
+      "id": "f1086",
+      "cat": "governance",
+      "front": "Data Processing Addendum (DPA)",
+      "back": "A contract that sets how a vendor may handle personal data on a customer's behalf. For Anthropic's commercial products it is incorporated automatically into the Commercial Terms.",
+      "detail": "Privacy and legal teams look for one when assessing a vendor."
+    },
+    {
+      "id": "f1087",
+      "cat": "governance",
+      "front": "Business Associate Agreement (BAA)",
+      "back": "A contract that US health-privacy rules require before a vendor handles protected health information for a healthcare organization. Anthropic offers one for HIPAA-ready commercial services; consumer plans are not covered.",
+      "detail": "Signing is necessary but not sufficient: use only the covered configuration and keep health data out of features marked as not covered."
+    },
+    {
+      "id": "f1088",
+      "cat": "governance",
+      "front": "General Data Protection Regulation (GDPR)",
+      "back": "The European Union law that governs how personal data of people in the EU is collected, used, stored and transferred, with duties such as a lawful basis, data minimization and honoring individuals' rights.",
+      "detail": "Ask the privacy team before putting EU personal data into any new tool. A vendor's certifications do not make your own use lawful automatically."
+    },
+    {
+      "id": "f1089",
+      "cat": "governance",
+      "front": "SOC 2 Type II report",
+      "back": "An independent auditor's report on whether a service provider's security-related controls worked effectively over a period of time, often requested during vendor reviews.",
+      "detail": "Anthropic lists SOC 2 Type I and Type II among its compliance credentials. A report supports a vendor review but does not decide your own regulatory obligations."
+    },
+    {
+      "id": "f1090",
+      "cat": "governance",
+      "front": "ISO/IEC 42001",
+      "back": "An international standard for an AI management system: the policies, roles and processes an organization uses to govern AI responsibly.",
+      "detail": "Anthropic lists ISO/IEC 42001:2023 among its credentials. Read it as evidence of governance processes, not as a guarantee about any single output."
+    },
+    {
+      "id": "f1091",
+      "cat": "governance",
+      "front": "Vendor risk assessment",
+      "back": "A structured review of a supplier's security, privacy, contract terms and track record before it is approved to handle company data.",
+      "detail": "New AI add-ons, plugins and connectors may need one. Trying a tool with real data first is the wrong order."
+    },
+    {
+      "id": "f1092",
+      "cat": "governance",
+      "front": "AI acceptable use policy",
+      "back": "A company document stating which AI tools, tasks and kinds of data staff may use, and what review, disclosure and record-keeping rules apply.",
+      "detail": "When it conflicts with convenience, it wins. When it is silent on a situation, ask its owner instead of assuming permission."
+    },
+    {
+      "id": "f1093",
+      "cat": "governance",
+      "front": "Escalation path",
+      "back": "The defined route for raising a concern about AI output, data exposure or a policy doubt to the right person, such as a manager, the privacy team or security, instead of handling it alone.",
+      "detail": "Report promptly. A data mistake reported the same day is far easier to contain than one discovered later."
+    },
+    {
+      "id": "f1094",
+      "cat": "governance",
+      "front": "AI governance",
+      "back": "The roles, policies, approval steps and records through which an organization decides how AI may be used and checks that those decisions are followed.",
+      "detail": "Associates meet it as rules about approved tools, data handling, review and disclosure, plus someone to ask."
+    },
+    {
+      "id": "f1095",
+      "cat": "governance",
+      "front": "Audit trail",
+      "back": "A record of how AI contributed to a piece of work: which tool and account, when, for what purpose, who reviewed it and what was changed.",
+      "detail": "Regulated teams often need it to explain a decision later. A short log entry now saves a reconstruction effort then."
+    },
+    {
+      "id": "f1096",
+      "cat": "governance",
+      "front": "Prompt injection",
+      "back": "A hidden or planted instruction inside a document, web page or message that tries to make Claude do something its user did not ask for, such as revealing information or taking an action.",
+      "detail": "Treat files and pages from unknown sources with caution, keep sensitive connections out of such chats and stop Claude if it starts doing something unexpected."
+    },
+    {
+      "id": "f1097",
+      "cat": "governance",
+      "front": "Chat sharing link",
+      "back": "A link that lets anyone who holds it read a snapshot of a conversation as it stood when shared; on Team and Enterprise plans it works only for members of the organization.",
+      "detail": "Review the text before sharing, because the whole conversation is visible. Unsharing revokes the link."
+    },
+    {
+      "id": "f1098",
+      "cat": "governance",
+      "front": "Least privilege",
+      "back": "Granting each person, connector or tool only the access it needs for the task, and no more.",
+      "detail": "It applies to Project sharing, connector permissions and the data given to Claude, and it limits the damage from mistakes and misuse."
+    },
+    {
+      "id": "f1099",
+      "cat": "governance",
+      "front": "AI-generated content marking",
+      "back": "Machine-readable signals that can be added to what Claude produces, such as an invisible watermark in text and signed provenance metadata on supported files, so others can tell that Claude processed it.",
+      "detail": "A detected mark is a signal, not proof, and a missing mark proves nothing: editing or conversion can remove marks, so 'no mark' never means 'written by a human'."
+    },
+    {
+      "id": "f1100",
+      "cat": "governance",
+      "front": "Diligence (AI Fluency)",
+      "back": "The competency of taking responsibility for what you do with AI and how you do it: choosing tools thoughtfully, being open about AI's role, and verifying work before it is shared.",
+      "detail": "It is the responsible-use leg of Anthropic's framework, alongside Delegation, Description and Discernment."
+    },
+    {
+      "id": "f1101",
+      "cat": "governance",
+      "front": "Disparate impact",
+      "back": "A pattern in which a rule or tool that looks neutral still disadvantages people in a protected group, such as screening criteria that systematically filter out older or female applicants.",
+      "detail": "AI-assisted screening and scoring can produce it without anyone intending bias. Compare outcomes by group and involve HR or legal before relying on it."
+    },
+    {
+      "id": "f1102",
+      "cat": "troubleshooting",
+      "front": "Prompt diagnosis",
+      "back": "Working backward from what went wrong in an output, such as a bland answer, a wrong format or invented facts, to the most likely missing or faulty ingredient in the request or setup, before changing anything.",
+      "detail": "Name the symptom, guess the cause, change one thing, retest. Random rewording wastes time."
+    },
+    {
+      "id": "f1103",
+      "cat": "troubleshooting",
+      "front": "Generic output",
+      "back": "A response that is technically on topic but bland and one-size-fits-all; the usual cause is missing context about the audience, the purpose, the situation and the standard of quality.",
+      "detail": "Fix the request, not the reader: say who it is for, what it is for, and show an example of the voice you want."
+    },
+    {
+      "id": "f1104",
+      "cat": "troubleshooting",
+      "front": "Off-format output",
+      "back": "A response whose shape is not what was needed, such as prose where a table was wanted; the usual cause is that no format was specified or that an example pointed somewhere else.",
+      "detail": "State the format positively and show the layout, with named columns or a sample, rather than only forbidding the wrong one."
+    },
+    {
+      "id": "f1105",
+      "cat": "troubleshooting",
+      "front": "Ignored instruction",
+      "back": "A requirement that Claude appears to have skipped, typically because it was buried in a long prompt, phrased only as a prohibition, or in conflict with another instruction.",
+      "detail": "Make it prominent, state it positively, give the reason and check for contradictions before concluding that Claude 'won't listen'."
+    },
+    {
+      "id": "f1106",
+      "cat": "troubleshooting",
+      "front": "Conflicting instructions",
+      "back": "Two or more rules in the same prompt or instruction set that cannot both be satisfied, such as 'keep every answer to two sentences' alongside 'explain your reasoning in full'.",
+      "detail": "Claude has to pick one, so results vary. Rewrite with priorities, for example brief by default and detailed on request."
+    },
+    {
+      "id": "f1107",
+      "cat": "troubleshooting",
+      "front": "Inconsistent results",
+      "back": "Noticeably different outputs from repeated runs of the same request, most often because the request leaves format, definitions or criteria open for Claude to interpret.",
+      "detail": "Stabilize with a fixed output layout, defined terms and a few examples. Structure matters more than clever wording."
+    },
+    {
+      "id": "f1108",
+      "cat": "troubleshooting",
+      "front": "Knowledge gap",
+      "back": "A failure caused by Claude lacking the facts, such as private company data or events after its training cutoff, rather than by poor wording; rewording cannot fix it.",
+      "detail": "Supply the material by attaching, connecting or searching, and ask Claude to answer only from it."
+    },
+    {
+      "id": "f1109",
+      "cat": "troubleshooting",
+      "front": "Instruction drift",
+      "back": "In a long conversation, the gradual slide away from rules or formats set early on, as newer material crowds them out.",
+      "detail": "Restate the key rules, restart with a clean summary, or move standing rules into Project instructions so they apply to every chat."
+    },
+    {
+      "id": "f1110",
+      "cat": "troubleshooting",
+      "front": "Continuing a cut-off response",
+      "back": "Asking Claude to carry on a reply that stopped partway by supplying the original request and the part already produced, so it can pick up where it left off.",
+      "detail": "The Help Center recommends giving Claude the previous prompt and response. Asking for the rest in sections avoids hitting the limit again."
+    },
+    {
+      "id": "f1111",
+      "cat": "troubleshooting",
+      "front": "Length limit error",
+      "back": "The notice 'Your message will exceed the length limit for this chat', which means the input is too large for the conversation. The fixes are to split it, summarize key sections, have Claude identify the relevant parts, or start a new chat.",
+      "detail": "On paid plans with code execution, older messages are summarized automatically, so this is rare. Retrying the same message changes nothing."
+    },
+    {
+      "id": "f1112",
+      "cat": "troubleshooting",
+      "front": "Chunking a large document",
+      "back": "Cutting a long file into sections that fit within limits, processing each separately and then combining the results.",
+      "detail": "Standard advice for 'file too large' problems. Ask Claude to keep a running list so nothing is lost between parts."
+    },
+    {
+      "id": "f1113",
+      "cat": "troubleshooting",
+      "front": "Declined request",
+      "back": "A reply in which Claude refuses or hedges. If the request was simply misread, stating the legitimate purpose and audience can help; if it conflicts with a policy, it is a limit to respect and not a puzzle to get around.",
+      "detail": "Never disguise a request to slip past a boundary. Restate it plainly with context, or take the need to someone who can authorize it."
+    },
+    {
+      "id": "f1114",
+      "cat": "troubleshooting",
+      "front": "Reconnecting a connector",
+      "back": "Disconnecting a connected service under Customize > Connectors and signing in to it again, to clear an access or authentication error such as a prompt to reconnect to Google Drive.",
+      "detail": "If it still fails, the person's own access may have changed, or an administrator may need to approve the app."
+    },
+    {
+      "id": "f1115",
+      "cat": "troubleshooting",
+      "front": "Service status check",
+      "back": "Consulting Anthropic's public status page when Claude is erroring or unavailable for many users, to see whether a confirmed incident explains it before changing prompts or settings.",
+      "detail": "A temporary 'capacity constraints' message reflects heavy demand, not a fault in your request: wait a few minutes and retry."
+    },
+    {
+      "id": "f1116",
+      "cat": "troubleshooting",
+      "front": "Root cause",
+      "back": "The underlying reason a problem occurs, as opposed to its visible symptom. Fixing it prevents repeats, whereas treating the symptom only hides it.",
+      "detail": "Wrong totals may be a symptom; the cause may be a missing source file or an unclear definition. 'Be more careful' is rarely a fix."
+    },
+    {
+      "id": "f1117",
+      "cat": "troubleshooting",
+      "front": "Prompt A/B comparison",
+      "back": "Running two versions of a prompt on the same set of inputs and judging both against the same criteria, so the better one is chosen on evidence.",
+      "detail": "Use identical inputs. Otherwise differences may come from the data and not from the wording."
+    },
+    {
+      "id": "f1118",
+      "cat": "troubleshooting",
+      "front": "Edge case testing",
+      "back": "Trying a prompt or workflow on unusual inputs, such as empty fields, odd formats, very long text or conflicting data, to find where it breaks before real use.",
+      "detail": "A workflow that passes only on tidy samples will fail on the first messy file."
+    },
+    {
+      "id": "f1119",
+      "cat": "troubleshooting",
+      "front": "Prompt versioning",
+      "back": "Keeping dated copies of each prompt or instruction version, with a note on what changed and how results moved, so that a version that worked can be restored.",
+      "detail": "Without it, a 'fix' that made things worse cannot be undone with confidence."
+    },
+    {
+      "id": "f1120",
+      "cat": "troubleshooting",
+      "front": "Capturing a working prompt",
+      "back": "Saving a prompt that finally produced the right result as a reusable template, Project instruction or skill, so that the success is repeatable by others.",
+      "detail": "Do it at once, because the winning wording is easily lost in a long chat. Keep a sample of good output with it."
+    },
+    {
+      "id": "f1121",
+      "cat": "troubleshooting",
+      "front": "Approach switch",
+      "back": "Replacing a failing method with a different one, such as another feature, a smaller step or a different source, after repeated tweaks to the same prompt have not helped.",
+      "detail": "Examples: use web search for current facts, a Project for recurring context, or a human reviewer for judgment calls."
+    },
+    {
+      "id": "f1122",
+      "cat": "troubleshooting",
+      "front": "Diminishing returns",
+      "back": "The point at which further tweaks to a prompt bring little or no improvement, signaling that the obstacle lies elsewhere, such as missing data, an unsuitable task or a need for technical help.",
+      "detail": "Set a limit on iterations. When you reach it, change approach or escalate."
+    },
+    {
+      "id": "f1123",
+      "cat": "troubleshooting",
+      "front": "Batching related requests",
+      "back": "Grouping related questions or tasks into a single well-organized message instead of sending them one at a time, which saves usage and gives Claude the full picture.",
+      "detail": "The Help Center lists it as a usage best practice. Do not mix unrelated topics, which muddles the answer."
+    },
+    {
+      "id": "f1124",
+      "cat": "troubleshooting",
+      "front": "Cached project content",
+      "back": "Reused Project material that counts for less against usage limits while it is fresh, so many questions about the same documents cost fewer allowances; after a long break it counts in full again.",
+      "detail": "A reason to keep recurring documents in a Project and to ask related questions together."
+    },
+    {
+      "id": "f1125",
+      "cat": "troubleshooting",
+      "front": "Rework rate",
+      "back": "The share of Claude-assisted outputs that need substantial correction before they can be used, a measure of a workflow's quality.",
+      "detail": "Time saved is only real if rework stays low. Track it alongside cycle time."
+    },
+    {
+      "id": "f1126",
+      "cat": "troubleshooting",
+      "front": "Cycle time",
+      "back": "The elapsed time from starting a task to finishing it, including waiting and review, used to compare a workflow before and after Claude.",
+      "detail": "Measure the whole loop. A fast draft followed by a long fix-up is not an improvement."
+    },
+    {
+      "id": "f1127",
+      "cat": "troubleshooting",
+      "front": "Over-automation",
+      "back": "Removing human review or approval steps to gain speed, so that errors travel further before anyone sees them.",
+      "detail": "Keep checkpoints where mistakes would be costly or hard to reverse. Relax them only where results justify it."
     }
   ],
   "questions": [
@@ -2621,6 +3510,554 @@
       "question": "Memory for a particular chat can still be switched off after the conversation is already underway.",
       "answer": false,
       "explanation": "The per-chat memory setting must be chosen before the first message and cannot be changed once the chat starts."
+    },
+    {
+      "id": "q1001",
+      "cat": "workflow",
+      "type": "mc",
+      "question": "An operations manager has pasted rough notes from interviews with three department heads and wants a requirements list for a new intake process. What is the best use of Claude here?",
+      "options": [
+        "Ask Claude to write the final requirements document and circulate it to the three departments as approved",
+        "Ask Claude to list each requirement with its source, flagging conflicts and assumptions for the interviewees to confirm",
+        "Ask Claude to keep only the requirements that all three department heads mentioned and discard the rest",
+        "Ask Claude to treat the most senior department head's notes as the baseline and ignore the differences"
+      ],
+      "correct": 1,
+      "explanation": "Claude is good at organizing messy input and surfacing conflicts, but requirements must be confirmed by the people who own the need, and naming sources and assumptions makes that review quick. Circulating an unreviewed document, keeping only the overlap, or deferring to seniority each hides real needs or disagreements."
+    },
+    {
+      "id": "q1002",
+      "cat": "workflow",
+      "type": "mc",
+      "question": "A project manager's draft requirements include the line 'The new portal must be fast and easy to use.' What should she ask Claude to do with it?",
+      "options": [
+        "Rewrite the line in stronger wording so that it reads as more convincing to the sponsors",
+        "Delete the line, because a requirement that has no numbers in it cannot be tested",
+        "Replace the line with typical industry figures that Claude chooses and treats as agreed",
+        "Propose measurable versions, such as a target page-load time and a task-completion rate, for the stakeholders to confirm"
+      ],
+      "correct": 3,
+      "explanation": "Words like 'fast' and 'easy' mean different things to different readers, so an ambiguity check turns them into measurable proposals that stakeholders then accept or adjust. Stronger wording adds no precision, deleting the line loses a real need, and figures that Claude picks and declares agreed skip the people who must agree."
+    },
+    {
+      "id": "q1003",
+      "cat": "workflow",
+      "type": "mc",
+      "question": "A team is choosing its first use case for Claude. Which candidate is the best fit?",
+      "options": [
+        "Sorting and summarizing 300 weekly customer emails into themes for the team's own trend review",
+        "Deciding which of 40 applicants to reject and sending the rejection emails automatically",
+        "Calculating payroll deductions for all employees and paying out the figures straight from Claude's answer",
+        "Analyzing a folder of restricted client contracts through a personal account to save time"
+      ],
+      "correct": 0,
+      "explanation": "A good first use case is frequent, text-heavy, easy to check and low in consequence, and the email-themes task has all four. Automatic rejections are high-risk decisions about people, payroll figures must be exact and verified, and restricted contracts must not be handled through a personal account."
+    },
+    {
+      "id": "q1004",
+      "cat": "workflow",
+      "type": "mc",
+      "question": "A team has a list of 12 ideas for using Claude and wants to decide where to start. What is the most appropriate way to use Claude?",
+      "options": [
+        "Ask Claude to pick the single best idea and treat its choice as the decision",
+        "Start with whichever idea is the most exciting and score the others later if time allows",
+        "Give Claude the scoring criteria, such as time saved, effort, data risk and ease of checking, and review its scores together",
+        "Ask Claude to build prototypes of all twelve at once so that nothing is lost by choosing"
+      ],
+      "correct": 2,
+      "explanation": "Claude can score and sort a long list quickly once it has explicit criteria, but the criteria and the decision itself belong to the team, who know the real constraints. Letting Claude decide, following excitement, or building everything skips prioritization."
+    },
+    {
+      "id": "q1005",
+      "cat": "workflow",
+      "type": "mc",
+      "question": "A project manager asks Claude, 'Make me a launch plan,' and gets a generic checklist. Which follow-up request is most likely to produce something she can use?",
+      "options": [
+        "Ask for a longer checklist of at least 50 items so that nothing is missed",
+        "Ask Claude to use a more confident tone so that the plan can be shared with the team straight away",
+        "Supply the goal, launch date, team size, known dependencies and constraints, and ask for a work breakdown with risks",
+        "Ask Claude to repeat the same plan as a table, since structure is what makes a plan specific"
+      ],
+      "correct": 2,
+      "explanation": "A plan is only as specific as the facts it is built from. Giving Claude the goal, date, capacity, dependencies and constraints lets it produce a tailored breakdown and surface risks, which the manager then checks with the team. More items, a different tone or a table change the packaging, not the content."
+    },
+    {
+      "id": "q1006",
+      "cat": "workflow",
+      "type": "mc",
+      "question": "A finance team describes its invoice-approval process and asks Claude for improvements. Which plan makes the best use of Claude's suggestions?",
+      "options": [
+        "Have Claude map the steps and flag delays and rework, then pilot the most promising change and compare it with current timings",
+        "Adopt all of Claude's suggestions together, because Claude has considered the whole process",
+        "Ask Claude to redesign the process from scratch without referring to today's steps, then switch over at month end",
+        "Choose the suggestions that Claude states most confidently, since confidence reflects how well the evidence supports them"
+      ],
+      "correct": 0,
+      "explanation": "Claude sees only the process as described, so its suggestions are hypotheses. Piloting the most promising change and measuring it against current timings turns a suggestion into evidence. Adopting everything at once makes results impossible to attribute, a from-scratch redesign ignores constraints Claude may not know, and confidence is not evidence."
+    },
+    {
+      "id": "q1007",
+      "cat": "workflow",
+      "type": "mc",
+      "question": "From a written description of a hiring process, Claude names interview scheduling as the likely bottleneck. What should the team do before redesigning anything?",
+      "options": [
+        "Redesign the scheduling step straight away, since Claude has identified it",
+        "Ask Claude to rate its own confidence and go ahead if the rating is high",
+        "Automate the scheduling step first and then see whether the process speeds up",
+        "Check actual timings for each step, because Claude can judge only from the description it was given"
+      ],
+      "correct": 3,
+      "explanation": "A bottleneck is a measurable constraint. Claude reasoned from a description that may leave out delays or exaggerate others, so timing data should confirm the diagnosis before work begins. Self-rated confidence is not evidence, and acting first and measuring later risks fixing the wrong step."
+    },
+    {
+      "id": "q1008",
+      "cat": "workflow",
+      "type": "mc",
+      "question": "A team is about to launch a Claude-assisted workflow and wants to anticipate what could go wrong. Which request to Claude is most useful?",
+      "options": [
+        "Estimate the percentage chance that the launch will succeed, and report that number to the sponsor",
+        "Assume the launch failed six months from now and list likely causes by category, then have the team rank them and plan responses",
+        "Confirm that the plan is sound so that the team can go ahead with confidence",
+        "List the risks that earlier projects in the company recorded, and ignore anything new"
+      ],
+      "correct": 1,
+      "explanation": "A pre-mortem assumes failure and works backward, which surfaces weaknesses that optimism hides. Claude can brainstorm broadly; the team ranks the causes and owns the mitigations. A success percentage has no sound basis, asking for confirmation invites agreement, and limiting the list to past risks misses new ones."
+    },
+    {
+      "id": "q1009",
+      "cat": "workflow",
+      "type": "mc",
+      "question": "Two software tools could support a team's reporting, and a manager wants a defensible comparison. What is the best way to involve Claude?",
+      "options": [
+        "Ask which tool is better and follow its answer, since it can weigh more factors than a person can",
+        "Let Claude invent the criteria and weights, then present them to leadership as objective",
+        "Agree the criteria and weights with stakeholders, then have Claude draft a scored comparison that people check against vendor documentation",
+        "Ask Claude to summarize each vendor's marketing page and treat the stronger-sounding summary as the better tool"
+      ],
+      "correct": 2,
+      "explanation": "A decision matrix is only as good as its criteria and weights, which express the organization's priorities and have to come from people. Claude can draft scores and organize evidence, and people verify it against vendor documentation. Asking for a verdict, inventing weights or comparing marketing copy skips that groundwork."
+    },
+    {
+      "id": "q1010",
+      "cat": "workflow",
+      "type": "mc",
+      "question": "An operations lead wants to try out an idea for a shift-coverage calculator with her team before involving IT. What is the most appropriate first step?",
+      "options": [
+        "Ask IT to build a production version first, so the team tests the real thing",
+        "Write a detailed specification and have the team review it for a month before building anything",
+        "Have Claude generate a spreadsheet version and roll it out to every site immediately",
+        "Ask Claude to build a working prototype as an artifact, let the team try it, and refine it from their feedback"
+      ],
+      "correct": 3,
+      "explanation": "A quick prototype gives users something real to react to, which clarifies needs cheaply. IT is brought in once the idea is validated and needs company-system integration or scale. A production build or a long specification front-loads cost before learning, and an immediate roll-out skips testing."
+    },
+    {
+      "id": "q1011",
+      "cat": "workflow",
+      "type": "mc",
+      "question": "After a two-week pilot, users report that Claude's meeting summaries often leave out who owns each action item. What is the best response?",
+      "options": [
+        "Tell users to add the missing owners by hand after each summary",
+        "Switch every user to the most capable model, since a stronger model will not leave things out",
+        "Update the template or instructions to require an owner for every action item, then rerun a set of past meetings and compare the results",
+        "Rebuild the workflow from scratch with new instructions, since the pilot has clearly failed"
+      ],
+      "correct": 2,
+      "explanation": "The pilot found a specific, fixable gap. Updating the instructions and replaying past meetings shows whether the change worked without disrupting users. Manual patching leaves the cause in place, a bigger model does not guarantee following a rule that was never stated, and starting over discards what already works."
+    },
+    {
+      "id": "q1012",
+      "cat": "workflow",
+      "type": "mc",
+      "question": "A marketing operations specialist wants every new lead in the company's customer-management system to trigger a drafted email from Claude automatically, with nobody pasting anything. How should she proceed?",
+      "options": [
+        "Describe the goal, the data involved and the volume, and take it to Claude Developers or Architects to design the integration",
+        "Connect the system herself by copying an access key into a Project's instructions so that Claude can read the leads",
+        "Ask Claude to explain how to build the integration, then deploy whatever code it produces",
+        "Paste each new lead into a chat by hand and describe the process as automated"
+      ],
+      "correct": 0,
+      "explanation": "Automatic triggering from a company system is an integration with authentication, reliability and security concerns, which goes beyond Associate scope and belongs with Developers and Architects. Her contribution is a clear problem statement. Secrets never belong in instructions, unreviewed generated code should not go live, and manual pasting is not automation."
+    },
+    {
+      "id": "q1013",
+      "cat": "workflow",
+      "type": "mc",
+      "question": "A support team writes every customer reply from scratch, and agents lose time searching old tickets for similar cases. Refund disputes are common. What is the lowest-risk way to bring Claude into this workflow?",
+      "options": [
+        "Let Claude send replies directly to customers, with agents handling only complaints",
+        "Have Claude draft replies from the ticket and a set of approved answers, with the agent editing and sending each one",
+        "Replace the ticket system with a chat in which customers discuss refunds directly with Claude",
+        "Leave the process unchanged, because customer replies are too sensitive for any AI assistance"
+      ],
+      "correct": 1,
+      "explanation": "Drafting with an agent in the loop removes the search-and-write effort while a person still checks refund commitments before anything is sent. Sending directly or routing customers to Claude removes review where errors are costly, and refusing all assistance gives up a safe gain."
+    },
+    {
+      "id": "q1014",
+      "cat": "workflow",
+      "type": "mc",
+      "question": "A team's monthly report runs through these steps: collect figures, check them, write the narrative, review, publish. Which step is the best first integration point for Claude?",
+      "options": [
+        "The review step, so that Claude approves the report instead of a manager",
+        "The publish step, so that the report goes out without waiting on anyone",
+        "The figure-checking step, with Claude's recalculations accepted as final",
+        "The narrative step, drafting text from the checked figures for a person to edit"
+      ],
+      "correct": 3,
+      "explanation": "Drafting prose from verified numbers is repetitive, text-heavy and easy to review, and a manager still approves the result. Handing review or publication to Claude removes human accountability, and accepting its recalculations as final skips independent verification."
+    },
+    {
+      "id": "q1015",
+      "cat": "workflow",
+      "type": "mc",
+      "question": "Staff retype handwritten site-visit notes into a form, and a coordinator then rewrites them as a client summary. Which change is a redesign of the workflow, rather than just adding Claude to it?",
+      "options": [
+        "Staff photograph the notes, Claude drafts the client summary directly, and the coordinator reviews it, so the retyping and rewriting steps disappear",
+        "Staff keep retyping the notes, and the coordinator asks Claude to polish the wording of the finished summary",
+        "The coordinator uses Claude to check spelling in the form after staff finish typing it",
+        "Staff retype the notes into a chat message instead of a form, and the coordinator rewrites them as before"
+      ],
+      "correct": 0,
+      "explanation": "A redesign rebuilds the sequence so that Claude's strengths remove steps altogether. The other options leave the old structure intact and bolt Claude on, or swap one container for another, so the same retyping and rewriting remain."
+    },
+    {
+      "id": "q1016",
+      "cat": "workflow",
+      "type": "mc",
+      "question": "Three months after launch, few staff use a Claude-assisted workflow that the team built. What should the workflow owner do first?",
+      "options": [
+        "Make use mandatory and track who has not logged in",
+        "Add more features, since the current ones are evidently not attractive enough",
+        "Ask users what stops them, such as trust in the output, training or extra effort, and fix the workflow or support accordingly",
+        "Wait another quarter, since adoption normally grows on its own"
+      ],
+      "correct": 2,
+      "explanation": "Low use is an adoption problem, and the cause stays unknown until users are asked. Distrust, missing training and a clumsy step each need a different remedy. Mandates breed workarounds, extra features may not touch the barrier, and waiting assumes the problem will resolve itself."
+    },
+    {
+      "id": "q1017",
+      "cat": "workflow",
+      "type": "mc",
+      "question": "A department head wants Claude's first-draft contract summaries available to 200 staff next week. What is the most prudent rollout?",
+      "options": [
+        "Launch to all 200 staff at once, so that everyone benefits and feedback arrives quickly",
+        "Run a pilot with a small team, measure accuracy and time saved, fix problems, then widen access in stages",
+        "Give access only to the most senior staff, who will not need training or guidance",
+        "Launch to all 200 staff but drop the review step, to encourage adoption"
+      ],
+      "correct": 1,
+      "explanation": "A staged rollout limits the damage from early problems and produces the evidence needed to expand with confidence. Launching to everyone at once or removing review multiplies the risk, and restricting access to senior staff does nothing about training or accuracy."
+    },
+    {
+      "id": "q1018",
+      "cat": "workflow",
+      "type": "mc",
+      "question": "An executive asks, 'Can Claude replace our analysts?' Which answer is the most accurate and useful?",
+      "options": [
+        "Yes, current models are accurate enough for analysts' work to be handed over to them entirely",
+        "No, AI output is too unreliable to be used in analysis at all",
+        "That is a question for the developers, who understand the technology better than analysts do",
+        "Claude speeds up drafting and first-pass analysis, but its output still needs checking, so the pilot data shows where it supports analysts instead"
+      ],
+      "correct": 3,
+      "explanation": "A balanced answer states both the value and the limits and points to pilot evidence. Claiming replacement overstates reliability, dismissing Claude ignores real gains, and deflecting avoids the stakeholder's actual decision."
+    },
+    {
+      "id": "q1019",
+      "cat": "workflow",
+      "type": "mc",
+      "question": "A team lead is preparing the results slide for a six-week Claude pilot. Which set of measures will be the most credible to the finance team?",
+      "options": [
+        "Time per report and rework rate before and after the pilot, plus the issues found and how they were handled",
+        "The number of prompts sent each week and the number of staff who logged in",
+        "Quotes from three enthusiastic users and the best example of Claude's output",
+        "Claude's own estimate of how much time it saved the team"
+      ],
+      "correct": 0,
+      "explanation": "Credible evidence compares measured outcomes with a baseline and is candid about problems. Activity counts show use, not value; testimonials and a single best example are selective; and Claude cannot know how long the team's work really took."
+    },
+    {
+      "id": "q1020",
+      "cat": "workflow",
+      "type": "mc",
+      "question": "A sponsor believes Claude 'never makes mistakes' and plans to skip review in the new workflow. How should the team lead respond?",
+      "options": [
+        "Agree, to avoid dampening enthusiasm, and mention limitations only if problems appear later",
+        "Explain that AI is generally unreliable and recommend not using it for any important work",
+        "Describe typical failure modes, such as inaccurate specifics and outdated information, with examples from the pilot, and show the review steps built into the workflow",
+        "Hand the sponsor a long legal disclaimer to sign and continue as planned"
+      ],
+      "correct": 2,
+      "explanation": "Honest expectations backed by concrete examples keep trust when errors occur and protect the workflow's review steps. Agreeing creates false confidence, blanket negativity discards real value, and a disclaimer does not change how the output is used."
+    },
+    {
+      "id": "q1021",
+      "cat": "workflow",
+      "type": "mc",
+      "question": "Sales sends a business analyst a vague request: 'We need better lead tracking.' She wants to understand the underlying need before proposing anything. What should she ask Claude to do?",
+      "options": [
+        "Propose three software products that would solve lead tracking",
+        "Draft interview questions about the sales team's current process, pain points and desired outcomes, and sketch a few possible use cases to test with them",
+        "Write a full specification for a lead-tracking system based on typical industry practice",
+        "Estimate a budget for a lead-tracking solution, since leadership will ask about cost first"
+      ],
+      "correct": 1,
+      "explanation": "When the need is unclear, the first job is to understand it. Claude can prepare interview questions and sketch candidate use cases, but the answers must come from sales. Jumping to products, a specification or a budget builds on a guess."
+    },
+    {
+      "id": "q1022",
+      "cat": "workflow",
+      "type": "mc",
+      "question": "A director wants to think through options for restructuring a team. She asks Claude to propose approaches and challenge each one, going back and forth before she decides herself. Which mode of AI interaction does this describe?",
+      "options": [
+        "Automation, in which Claude executes a precisely defined task and the person supplies every instruction",
+        "Agency, in which Claude is set up in advance to act on her behalf without being asked each time",
+        "Augmentation, in which she and Claude work back and forth as thinking partners while she keeps the judgment",
+        "Full delegation, in which Claude's recommendation becomes the outcome without further review"
+      ],
+      "correct": 2,
+      "explanation": "Anthropic's AI Fluency framework names three modes. Working back and forth as thinking partners while the person decides is augmentation. Automation is Claude carrying out a defined task on instruction, agency is configuring Claude to act independently on future tasks, and handing the decision to Claude is not a mode at all and would remove human accountability."
+    },
+    {
+      "id": "q1023",
+      "cat": "workflow",
+      "type": "mc",
+      "question": "A coordinator has built a Claude-assisted weekly update that only she knows how to run. Which action best makes the workflow sustainable?",
+      "options": [
+        "Write a short procedure covering the inputs, the template or instructions used, who reviews the output, where it goes and what to do if it fails",
+        "Save the best chat so far and tell colleagues to search for it whenever they need it",
+        "Leave it informal, because documentation slows down a small workflow",
+        "Ask Claude to remember the process so that any colleague can ask it to run the workflow"
+      ],
+      "correct": 0,
+      "explanation": "A written procedure lets colleagues repeat the workflow and keeps it running when its builder is away. A single saved chat is a poor template, leaving it undocumented concentrates knowledge in one person, and Claude's memory is personal rather than a shared record of a team process."
+    },
+    {
+      "id": "q1024",
+      "cat": "workflow",
+      "type": "mc",
+      "question": "A manager is planning the move from a manual onboarding process to a Claude-assisted one and wants a gap analysis. What does Claude need from her to make the analysis useful?",
+      "options": [
+        "Only a description of the target state, since Claude can infer how the current process works",
+        "A description of today's steps, owners and timings along with the target outcomes, which she then checks with the people involved",
+        "Only a description of the current process, since Claude knows what an ideal process looks like",
+        "Nothing, because Claude will fill in typical benchmarks from its own training data"
+      ],
+      "correct": 1,
+      "explanation": "A gap analysis compares two states, and Claude can only compare what it has been given. Real steps, owners and timings plus clear target outcomes let it list the gaps, and the people involved confirm them. Generic benchmarks or one-sided input produce a list that may not describe this organization."
+    },
+    {
+      "id": "q1025",
+      "cat": "workflow",
+      "type": "mc",
+      "question": "Before presenting a proposed workflow change, a manager wants to find objections early. Which use of Claude is the most helpful?",
+      "options": [
+        "Ask Claude whether anyone will object, and present the proposal only if it says no",
+        "Ask Claude to predict exactly how each executive will vote",
+        "Skip this step, because Claude has no insight into how people react to change",
+        "Ask Claude to review the proposal from the viewpoint of each affected group, such as end users, finance and security, and list likely objections, then test them with real people"
+      ],
+      "correct": 3,
+      "explanation": "Claude can generate plausible objections and questions from several viewpoints, which prepares the presenter and exposes weak points. They are hypotheses to test with the real stakeholders. A yes-or-no check invites reassurance, predicting votes is guesswork, and ignoring the technique wastes a cheap rehearsal."
+    },
+    {
+      "id": "msq1001",
+      "cat": "workflow",
+      "type": "ms",
+      "question": "A coordinator wants Claude to turn interview notes from four stakeholders into a requirements list. Which TWO additions to her request help most? (Choose two.)",
+      "options": [
+        "Label whose notes are whose, so that each requirement can be traced to its source",
+        "Ask Claude to flag contradictions between stakeholders and to list any assumptions it had to make",
+        "Ask Claude to produce as many requirements as possible, so that nothing is missed",
+        "Tell Claude to resolve any conflicts itself and present only a final merged list",
+        "Remove the stakeholders' names, so that Claude is not influenced by who said what"
+      ],
+      "correct": [
+        0,
+        1
+      ],
+      "explanation": "Traceability, and visible conflicts and assumptions, let people review the output efficiently and confirm it with the right stakeholder. Volume is not quality, silent conflict resolution hides decisions that belong to stakeholders, and anonymizing removes the traceability needed to check each item."
+    },
+    {
+      "id": "msq1002",
+      "cat": "workflow",
+      "type": "ms",
+      "question": "Which THREE characteristics make a task a good first Claude pilot? (Choose three.)",
+      "options": [
+        "It recurs often enough that the time savings add up",
+        "Its inputs are text and reasonably well structured",
+        "A person who knows the subject can check the output quickly",
+        "A mistake would directly affect an individual's employment or credit",
+        "It needs restricted data that policy does not allow in the tool"
+      ],
+      "correct": [
+        0,
+        1,
+        2
+      ],
+      "explanation": "Frequent, text-based and easily checked work shows value quickly and safely. Decisions that affect a person's job or credit are high-risk, and a task that requires data the tool is not approved for is not a pilot candidate until the data question is solved."
+    },
+    {
+      "id": "msq1003",
+      "cat": "workflow",
+      "type": "ms",
+      "question": "Which TWO requests should be escalated to Claude Developers or Architects rather than built by an Associate alone? (Choose two.)",
+      "options": [
+        "Process every incoming order email overnight and write the results straight into the company database",
+        "Connect Claude to an internal system that needs custom authentication and holds sensitive customer records",
+        "Create a Project holding the team's style guide and sample reports",
+        "Build an artifact prototype of a simple budget calculator to test with colleagues",
+        "Write a reusable prompt template for weekly status summaries"
+      ],
+      "correct": [
+        0,
+        1
+      ],
+      "explanation": "Scheduled processing that writes into company systems, and integrations with authentication and sensitive records, are technical implementations beyond Associate scope. Projects, artifact prototypes and prompt templates are everyday tasks that an Associate can build and refine."
+    },
+    {
+      "id": "msq1004",
+      "cat": "workflow",
+      "type": "ms",
+      "question": "Which THREE items belong in the written procedure for a Claude-assisted workflow? (Choose three.)",
+      "options": [
+        "The inputs required and where they come from",
+        "The instructions or template used, and who maintains them",
+        "Who reviews the output, and what happens when the review fails",
+        "A transcript of every chat in which the workflow was tested",
+        "A statement promising that Claude's output will be correct"
+      ],
+      "correct": [
+        0,
+        1,
+        2
+      ],
+      "explanation": "A procedure that names the inputs, the instructions and owner, and the review step lets someone else run and maintain the workflow. Test transcripts are clutter, and no procedure can promise that the output will be correct, which is why the review step exists."
+    },
+    {
+      "id": "msq1005",
+      "cat": "workflow",
+      "type": "ms",
+      "question": "Which TWO statements describe a sound value case for a Claude workflow? (Choose two.)",
+      "options": [
+        "It compares measured results with a baseline recorded before the pilot",
+        "It states the known limitations and the review that stays with people",
+        "It relies on the model's own estimate of the hours saved",
+        "It leaves out costs so that the benefit looks larger",
+        "It rests on one impressive example of Claude's output"
+      ],
+      "correct": [
+        0,
+        1
+      ],
+      "explanation": "A credible value case rests on measured change against a baseline and is open about limits and remaining human checks. A self-estimate, hidden costs and a cherry-picked example all weaken trust when they are noticed."
+    },
+    {
+      "id": "msq1006",
+      "cat": "workflow",
+      "type": "ms",
+      "question": "Which TWO signs show that a process step should stay under human control rather than be handed to Claude? (Choose two.)",
+      "options": [
+        "The output decides whether an individual gets a job, a loan or a benefit",
+        "A mistake would be costly or hard to reverse once it is sent",
+        "The step is repetitive and easy to check afterwards",
+        "The inputs are plain text",
+        "The step takes a lot of staff time today"
+      ],
+      "correct": [
+        0,
+        1
+      ],
+      "explanation": "Decisions about individuals and errors that cannot easily be undone call for people in control, with Claude at most assisting. Repetition, text inputs and time cost are reasons to consider Claude, not reasons to keep it out."
+    },
+    {
+      "id": "tf1001",
+      "cat": "workflow",
+      "type": "tf",
+      "question": "A requirements list that Claude drafted from interview notes still needs to be confirmed with the stakeholders who own the need.",
+      "answer": true,
+      "explanation": "Claude can organize and probe the notes, but only the stakeholders can confirm that the list says what they need."
+    },
+    {
+      "id": "tf1002",
+      "cat": "workflow",
+      "type": "tf",
+      "question": "In a pre-mortem, the team imagines that a project has already failed and works backward to list the reasons, and Claude can help brainstorm them.",
+      "answer": true,
+      "explanation": "Assuming failure frees people to name weaknesses they would otherwise play down. Claude can generate causes by category, and the team ranks them and plans responses."
+    },
+    {
+      "id": "tf1003",
+      "cat": "workflow",
+      "type": "tf",
+      "question": "In the augmentation mode of AI interaction, Claude acts as a thinking partner while the person keeps direction and judgment.",
+      "answer": true,
+      "explanation": "Anthropic's AI Fluency framework describes augmentation as humans and AI collaborating as thinking partners, as opposed to automation, where Claude executes a defined task, and agency, where Claude acts independently on future tasks."
+    },
+    {
+      "id": "tf1004",
+      "cat": "workflow",
+      "type": "tf",
+      "question": "Once a Claude-assisted workflow has produced good results for a week, its review steps should be removed to save time.",
+      "answer": false,
+      "explanation": "One good week is a thin basis for removing review. Controls are relaxed in stages, only where results over a longer period justify it, and never where errors would be costly."
+    },
+    {
+      "id": "tf1005",
+      "cat": "workflow",
+      "type": "tf",
+      "question": "Recording how long a task takes before Claude is introduced makes it possible to show later whether the workflow improved.",
+      "answer": true,
+      "explanation": "A baseline gives the comparison that turns 'it feels faster' into evidence stakeholders can trust."
+    },
+    {
+      "id": "tf1006",
+      "cat": "workflow",
+      "type": "tf",
+      "question": "Leaving Claude's limitations out of a stakeholder presentation is a good way to build lasting support.",
+      "answer": false,
+      "explanation": "Support built on an overstated picture collapses at the first visible error. Presenting limits alongside benefits and controls builds credibility."
+    },
+    {
+      "id": "tf1007",
+      "cat": "workflow",
+      "type": "tf",
+      "question": "When Claude analyzes a process from a written description, it can miss delays or problems that the description left out.",
+      "answer": true,
+      "explanation": "Claude works from what it has been told. Timing data and conversations with the people who do the work fill the gaps."
+    },
+    {
+      "id": "tf1008",
+      "cat": "workflow",
+      "type": "tf",
+      "question": "Associates are expected to design enterprise-scale integrations and custom connectors on their own.",
+      "answer": false,
+      "explanation": "The exam guide places enterprise-scale designs and technical integrations with Claude Architects and Developers, to whom Associates escalate more complex work."
+    },
+    {
+      "id": "tf1009",
+      "cat": "workflow",
+      "type": "tf",
+      "question": "A quick prototype built as an artifact can help a team learn what users need before a full solution is built.",
+      "answer": true,
+      "explanation": "Putting something real in front of users surfaces needs and objections cheaply, before anyone commits to a larger build."
+    },
+    {
+      "id": "tf1010",
+      "cat": "workflow",
+      "type": "tf",
+      "question": "Piloting a new Claude workflow with a small group first reduces the risk of spreading early problems.",
+      "answer": true,
+      "explanation": "A pilot limits the damage from early flaws and produces measured results that justify wider rollout."
+    },
+    {
+      "id": "tf1011",
+      "cat": "workflow",
+      "type": "tf",
+      "question": "A decision matrix is trustworthy only when Claude, not the stakeholders, sets the weights for the criteria.",
+      "answer": false,
+      "explanation": "Weights express the organization's priorities, so stakeholders must set them. Claude can suggest criteria and draft scores that people then check."
     }
   ],
   "lessons": [
@@ -2932,6 +4369,7 @@
       ]
     }
   ],
+  "cliChallenges": [],
   "madlibs": [
     {
       "id": "ml-ccao-1",

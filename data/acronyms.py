@@ -1058,6 +1058,8 @@ ACRONYMS = {
     'USD': {'exp': 'United States dollar', 'trigger': False},
     'WIF': {'exp': 'Workload Identity Federation'},
     'ZDR': {'exp': 'Zero data retention'},
+    # Claude certification tracks, part B1
+    'DPA': {'exp': 'Data Processing Addendum'},
 }
 
 IGNORE = {
@@ -1154,4 +1156,7 @@ IGNORE = {
 
     # Claude certification tracks, part A
     'ALWAYS', 'DD', 'END', 'GITHUB', 'JIRA', 'MAJOR', 'MINOR', 'MM', 'MUST', 'NEVER', 'SKILL', 'VAR', 'WWW', 'WebP',
+
+    # Claude certification tracks, part B1
+    'README',
 }
