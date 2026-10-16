@@ -1177,4 +1177,7 @@ IGNORE = {
 
     # Claude certification tracks, CCDV-F group 2
     'CRITICAL', 'WHEN',
+
+    # Claude certification tracks, CCDV-F group 2 (shouted-prompt example)
+    'BE',
 }
