@@ -2063,7 +2063,10 @@
     "exp": "Domain Name System Security Extensions"
   },
   "DORA": {
-    "exp": "Discover, Offer, Request, Acknowledge"
+    "exp": [
+      "Discover, Offer, Request, Acknowledge",
+      "DevOps Research and Assessment"
+    ]
   },
   "DRM": {
     "exp": "Digital rights management"
@@ -3058,5 +3061,8 @@
   "GBP": {
     "exp": "Pound sterling",
     "trigger": false
+  },
+  "HKCU": {
+    "exp": "HKEY_CURRENT_USER"
   }
 }

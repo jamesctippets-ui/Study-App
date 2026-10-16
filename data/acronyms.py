@@ -716,7 +716,7 @@ ACRONYMS = {
     'DEK': {'exp': 'Data encryption key'},
     'DNA': {'exp': 'Digital Network Architecture'},
     'DNSSEC': {'exp': 'Domain Name System Security Extensions'},
-    'DORA': {'exp': 'Discover, Offer, Request, Acknowledge'},
+    'DORA': {'exp': ['Discover, Offer, Request, Acknowledge', 'DevOps Research and Assessment']},
     'DRM': {'exp': 'Digital rights management'},
     'DSA': {'exp': 'Digital signature algorithm'},
     'DSCP': {'exp': 'Differentiated Services Code Point'},
@@ -1065,6 +1065,8 @@ ACRONYMS = {
     # Claude certification tracks, CCAR-F group 2
     'EUR': {'exp': 'Euro', 'trigger': False},
     'GBP': {'exp': 'Pound sterling', 'trigger': False},
+    # Claude certification tracks, CCAR-P group 1
+    'HKCU': {'exp': 'HKEY_CURRENT_USER'},
 }
 
 IGNORE = {
@@ -1164,4 +1166,7 @@ IGNORE = {
 
     # Claude certification tracks, part B1
     'README',
+
+    # Claude certification tracks, CCAR-P group 1
+    'WebFetch',
 }
