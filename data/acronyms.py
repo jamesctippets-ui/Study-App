@@ -1171,4 +1171,7 @@ IGNORE = {
 
     # Claude certification tracks, CCAR-P group 1
     'WebFetch',
+
+    # Claude certification tracks, CCDV-F group 1
+    'BIGGEST', 'BILL', 'NO',
 }
