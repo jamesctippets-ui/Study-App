@@ -4058,6 +4058,1295 @@
       "question": "A decision matrix is trustworthy only when Claude, not the stakeholders, sets the weights for the criteria.",
       "answer": false,
       "explanation": "Weights express the organization's priorities, so stakeholders must set them. Claude can suggest criteria and draft scores that people then check."
+    },
+    {
+      "id": "q1101",
+      "cat": "knowledge",
+      "type": "mc",
+      "question": "A customer-care lead is setting up a Project for her agents. She has a 20-page refund policy, and she wants every draft reply to open with an apology, stay under 150 words and quote the policy section it relies on. How should she set it up?",
+      "options": [
+        "Paste the refund policy and the three drafting rules together into the project instructions, so that everything Claude needs is in one place",
+        "Upload the refund policy as project knowledge and write the three drafting rules into the project description, where the whole team can read them",
+        "Upload the refund policy as project knowledge and write the three drafting rules into the project instructions",
+        "Upload the refund policy as project knowledge and ask each agent to type the three drafting rules at the start of every new chat"
+      ],
+      "correct": 2,
+      "explanation": "Rules about how to draft belong in the project instructions, which apply to every chat in the Project, while the policy is reference material that belongs in project knowledge. Merging both into the instructions mixes facts with rules and makes the policy hard to update. Claude cannot see a Project's description, so rules placed there are never applied. Retyping the rules in every chat is exactly what standing instructions are meant to avoid, and it invites drift between agents."
+    },
+    {
+      "id": "q1102",
+      "cat": "knowledge",
+      "type": "mc",
+      "question": "An HR specialist types 'Always cite the policy section and never promise exceptions' into the description field of her new Project. Claude's replies ignore the rule. What is the best explanation and fix?",
+      "options": [
+        "Claude cannot see a Project's name or description, so the rule belongs in the project instructions",
+        "Claude cannot see the description, so she should repeat the rule at the start of every chat in the Project",
+        "Claude reads the description only after the Project is shared with colleagues, so she should invite one to unlock it",
+        "The rule needs its reasons spelled out, so she should extend the description with a paragraph on why exceptions are risky"
+      ],
+      "correct": 0,
+      "explanation": "The Help Center states that Claude has no access to a Project's name and description; they are labels for people. Standing rules go in the project instructions, which apply to every chat in the Project. Repeating the rule in each chat has the right diagnosis but depends on every user remembering it. Sharing the Project changes who can see it, not what Claude reads, and giving reasons helps Claude apply a rule only when Claude can see the rule in the first place."
+    },
+    {
+      "id": "q1103",
+      "cat": "knowledge",
+      "type": "mc",
+      "question": "In one chat inside a team's Project, an analyst tells Claude to report revenue in thousands of euros. In a new chat in the same Project the next day, Claude reports in plain euros. What is the most reliable way to make the preference apply to everyone who uses the Project?",
+      "options": [
+        "Ask Claude at the end of each chat to remember the preference for the next chat in the Project",
+        "Ask each analyst to add the preference to their own account-wide instructions as a standing rule",
+        "Continue all revenue analysis in the original chat so that the preference stays in view",
+        "Add the preference to the project instructions so that every chat in the Project applies it"
+      ],
+      "correct": 3,
+      "explanation": "Context from one chat is not shared with the other chats in a Project unless it is added to the Project's knowledge or instructions, so a standing rule belongs in the project instructions. Asking Claude to remember is personal and unreliable rather than a shared configuration. Account-wide instructions would apply to all of that analyst's conversations, including unrelated work, and depend on every person doing it. One endless chat grows unwieldy and leaves everyone else out."
+    },
+    {
+      "id": "q1104",
+      "cat": "knowledge",
+      "type": "mc",
+      "question": "A freelance consultant works for two clients. Client A wants formal British English; Client B wants a casual American tone. She also wants every answer, for either client, to define acronyms on first use. Where should she save these rules?",
+      "options": [
+        "Each client's style rules in that client's own Project, and the acronym rule in her account-wide instructions",
+        "All three rules in her account-wide instructions, each labeled with the client it applies to",
+        "Both clients' style rules in one Project, with a line telling Claude which client is being discussed",
+        "All three rules as documents in a single Project's knowledge, so that Claude can look up whichever one applies"
+      ],
+      "correct": 0,
+      "explanation": "Account-wide instructions apply to every conversation, so they suit only preferences that hold everywhere, such as defining acronyms. Client-specific rules belong in that client's Project, whose instructions apply to its chats alone. Putting conflicting style rules in one place makes Claude guess which applies and lets one client's tone leak into the other's work. Instructions describe behavior while knowledge is reference material, so rules saved as documents are not applied as standing instructions."
+    },
+    {
+      "id": "q1105",
+      "cat": "knowledge",
+      "type": "mc",
+      "question": "A policy team's Project now holds several hundred documents, and an indicator shows that Claude is searching the material rather than reading all of it at once. Answers sometimes draw on the wrong policy. Which habit helps most?",
+      "options": [
+        "Combine all of the documents into one large file so that Claude has a single document to search",
+        "Copy the most important policies into the project instructions so that they are always in view",
+        "Name the specific document in each question, and keep clear, descriptive file names",
+        "Ask Claude to read every file in full before it answers each question"
+      ],
+      "correct": 2,
+      "explanation": "When knowledge is large, retrieval pulls out the passages that matter instead of loading everything, so precise pointers steer it best: naming the document and using descriptive file names. One merged file removes the structure that tells one policy from another. Copying policies into the instructions creates second copies that go stale and crowds the standing context. Reading every file in full is the opposite of how retrieval handles volume."
+    },
+    {
+      "id": "q1106",
+      "cat": "knowledge",
+      "type": "mc",
+      "question": "A benefits Project still contains last year's leave policy alongside the updated policy that was added in the spring. Staff report that Claude sometimes quotes the old entitlements. What is the best fix?",
+      "options": [
+        "Add an instruction telling Claude to prefer the most recent information whenever documents disagree",
+        "Put the word 'OLD' at the start of the previous policy's file name and leave it in the Project",
+        "Ask staff to compare any entitlement Claude quotes with the current policy before relying on it",
+        "Remove the outdated policy so that the Project holds one current, clearly named version"
+      ],
+      "correct": 3,
+      "explanation": "A Project keeps whatever it is given and Claude cannot tell by itself that a file is outdated, so the reliable fix is a single source of truth. An instruction to prefer newer information depends on Claude judging which document is newer and leaves two conflicting copies in place. A renamed file can still be retrieved and quoted. Asking staff to double-check treats the symptom and puts the burden on every user."
+    },
+    {
+      "id": "q1107",
+      "cat": "knowledge",
+      "type": "mc",
+      "question": "An analyst who uses the Google Drive connector asks Claude to summarize the 'Q3 board pack' folder. Claude cannot find it, although a colleague can open the folder. What is the best first step?",
+      "options": [
+        "Ask an administrator to give Claude its own account with access to the folder",
+        "Check whether her own Google account has been given access to that folder",
+        "Ask the colleague to export the folder's documents and upload them to the chat",
+        "Disconnect and reconnect the connector until the folder appears"
+      ],
+      "correct": 1,
+      "explanation": "Claude inherits the signed-in person's permissions, so it can see only what her own account can open. If a colleague can see the folder and she cannot, the gap is probably her access, which the folder's owner or an administrator can fix. Claude has no separate account to authorize. Passing files around by hand works around the missing permission instead of resolving it and may sidestep the access decision the owner made. Reconnecting does not change what her account is allowed to open."
+    },
+    {
+      "id": "q1108",
+      "cat": "knowledge",
+      "type": "mc",
+      "question": "An Owner on a Team plan enables the Google Drive connector for the whole organization. A week later, several members say that Claude still cannot see any of their documents. What is the most likely reason?",
+      "options": [
+        "Claude needs several days to process the organization's files after enablement, so members should simply wait",
+        "The Owner must first copy each member's documents into a shared Project before they can be read",
+        "Enabling made the connector available, but each member still has to sign in to Google with their own account",
+        "Only Owners can use connectors, so members must be promoted before they can connect their accounts"
+      ],
+      "correct": 2,
+      "explanation": "On Team and Enterprise plans, enablement makes a connector available to the organization but grants nobody access to data. Each person normally authenticates individually, which keeps Claude within that person's own permissions. Waiting changes nothing because no step is pending, no copying into Projects is involved, and members do not need the Owner role to connect their own accounts."
+    },
+    {
+      "id": "q1109",
+      "cat": "knowledge",
+      "type": "mc",
+      "question": "An Owner wants staff to let Claude search and read documents in a connected service freely, but wants any change or deletion to need a person's confirmation. What should the Owner do?",
+      "options": [
+        "Block the connector for everyone and ask staff to upload the files they need into their chats instead",
+        "Allow every action on the connector and train staff to watch closely for unwanted changes",
+        "Replace individual sign-in with one shared read-only login so that nobody can change anything",
+        "Let reading actions run without asking, and set writing and deleting actions to need approval"
+      ],
+      "correct": 3,
+      "explanation": "Owners can set a connector's actions to run freely, need approval or be blocked, and these settings only narrow what the service already permits. Blocking everything throws away the live access that makes the connector useful. Allowing everything and relying on vigilance replaces a configured control with hope. A shared login removes the link to each person's own permissions and can reach whatever that credential can, which widens exposure instead of limiting it."
+    },
+    {
+      "id": "q1110",
+      "cat": "knowledge",
+      "type": "mc",
+      "question": "A team member finds a custom connector on a public forum that promises to link Claude to the company's project-tracking tool. She is tempted to add it, reasoning that a connector can only see what she can already open. What is the best course of action?",
+      "options": [
+        "Add it to a private Project first, since a Project keeps any problems contained to that workspace",
+        "Ask the Owner or IT to review the source first, since Anthropic does not verify custom connectors",
+        "Add it, since a connector can only see what she can already open and the risk is therefore removed",
+        "Add it for now and remove it later if the team does not find it useful or runs into trouble"
+      ],
+      "correct": 1,
+      "explanation": "Anthropic does not verify custom connectors, and the connected service handles data under its own terms, so trust in the publisher has to be checked before anything is connected. Permission inheritance limits what Claude can reach for a person, but an unknown party's connector still handles the data it touches, and one built on a shared credential reaches whatever that credential allows. Making a Project private changes who sees the Project, not what a connector can do, and trying it first exposes data in the meantime."
+    },
+    {
+      "id": "q1111",
+      "cat": "knowledge",
+      "type": "mc",
+      "question": "A procurement team is writing the standing, system-level instructions for a Project that drafts replies to supplier queries. Which approach is most likely to give consistent, useful replies?",
+      "options": [
+        "Describe Claude as a world-class procurement expert and tell it to be thorough, accurate and professional in every reply, whatever the question",
+        "Paste the entire supplier handbook into the instructions so that the rules and the facts they rely on sit together in one place",
+        "Name the reader and the tone, set a length and layout, point to the file to quote, and say what to do when the answer is missing",
+        "Write short commands in capital letters, such as NEVER GUESS and ALWAYS BE ACCURATE, so that no rule can be overlooked"
+      ],
+      "correct": 2,
+      "explanation": "Effective standing instructions are specific: the audience and tone, the format, the source to rely on and a fallback for missing information. A grand title and general virtues give Claude nothing to act on. The handbook is reference material that belongs in knowledge, where it can be updated without touching the rules. Anthropic's guidance for current models is to use normal, clear wording rather than shouted commands, which can lead Claude to over-apply a rule."
+    },
+    {
+      "id": "q1112",
+      "cat": "knowledge",
+      "type": "mc",
+      "question": "A legal-operations Project answers staff questions from an uploaded contract playbook. Now and then Claude gives confident guidance on a question that the playbook does not cover. Which change to the instructions best reduces this?",
+      "options": [
+        "Tell Claude to answer only from the playbook, cite the section it used, and say when the playbook is silent and who to ask",
+        "Tell Claude to be extra careful and to double-check every answer before it replies to a staff member",
+        "Tell Claude to refuse any question whose topic is not listed in the playbook's table of contents",
+        "Add the most common out-of-scope questions, with model answers written by the team, to the instructions"
+      ],
+      "correct": 0,
+      "explanation": "A fallback instruction removes the pressure to fill gaps with plausible guesses: it grounds answers in the supplied document, asks for the source, and says what to do when the document does not answer, such as route the question to a named person. 'Be careful' gives Claude nothing concrete to do. Refusing by table of contents blocks questions that the body of the playbook does answer. A growing list of model answers chases examples instead of fixing the rule, and it goes stale."
+    },
+    {
+      "id": "q1113",
+      "cat": "knowledge",
+      "type": "mc",
+      "question": "The instructions of a shared reporting Project have grown to forty rules added by different people over a year. They include 'keep every answer under 100 words' and 'always give a full step-by-step explanation'. Replies are now erratic. What is the best fix?",
+      "options": [
+        "Add a final rule saying that the most recent rule wins whenever two rules in the list disagree with each other",
+        "Review the whole set, merge duplicates, resolve conflicts and explain the reason for each remaining rule",
+        "Put the most important rules in capital letters so that they outweigh the others in the list",
+        "Delete the instructions entirely and rely on the uploaded files to guide how Claude replies"
+      ],
+      "correct": 1,
+      "explanation": "Rules that pull in opposite directions leave Claude to guess, so the cure is to edit the set into one consistent, explained list and then test it. A 'latest rule wins' line assumes Claude can tell which rule is latest, and capitals add pressure without resolving the contradiction. Deleting everything throws away the rules that were working, and uploaded files supply facts, not behavior."
+    },
+    {
+      "id": "q1114",
+      "cat": "knowledge",
+      "type": "mc",
+      "question": "A communications team's Project instructions include this month's product prices and promotion end dates, so someone has to rewrite the instructions every month, and an old figure occasionally survives. What is the better design?",
+      "options": [
+        "Keep the figures in the instructions but have Claude ask for the current prices at the start of each chat",
+        "Move the figures into a named knowledge file that is replaced each month, and have the instructions say to quote it",
+        "Move the prices and dates into the account-wide instructions, since they are needed in every conversation",
+        "Remove the figures from the Project altogether and ask each writer to paste the current ones into every request"
+      ],
+      "correct": 1,
+      "explanation": "Instructions should hold stable behavior; facts that change belong in one knowledge file that can be swapped without touching the rules, with the instructions telling Claude to quote it. Having Claude ask for prices or having writers paste them reintroduces manual steps and errors. Account-wide instructions would push this month's promotions into every unrelated conversation."
+    },
+    {
+      "id": "q1115",
+      "cat": "knowledge",
+      "type": "mc",
+      "question": "The owner of a shared Project wants to change its instructions to fix a tone problem. How should she make the change so that she does not break behavior that works today?",
+      "options": [
+        "Make the change in the live Project, then watch for complaints over the next week",
+        "Make this change together with the other improvements she has in mind, to save the team repeated updates",
+        "Ask Claude whether the new instructions look better and keep them if it agrees",
+        "Run a small fixed set of representative requests before and after the change, and compare the results"
+      ],
+      "correct": 3,
+      "explanation": "A regression test set shows whether the change fixed the tone and whether anything else got worse, because the same requests, including a few tricky ones, are used each time. Waiting for complaints makes the users the test. Bundling several changes hides which one caused a problem. Claude's opinion of its own instructions is not evidence of how the outputs actually change."
+    },
+    {
+      "id": "q1116",
+      "cat": "knowledge",
+      "type": "mc",
+      "question": "Thirty people share a Project. Several of them add their own files and adjust the instructions, and answers have become inconsistent. What should the Project's owner do?",
+      "options": [
+        "Post a message asking everyone to stop editing the Project, and trust the team to follow it",
+        "Let everyone keep editing but ask them to leave a note in the chat explaining each change they make",
+        "Delete the shared Project and have each person maintain a private Project of their own instead",
+        "Limit edit rights to a few named maintainers and give everyone else access to view and chat"
+      ],
+      "correct": 3,
+      "explanation": "Sharing offers Can view and Can edit roles, so a configuration can be protected by permissions rather than by good intentions: only maintainers who understand the Project's purpose change its instructions and files. A request to stop relies on compliance. Notes in chats are scattered and do not prevent a bad edit. Personal Projects multiply the versions, so each person's answers drift further apart."
+    },
+    {
+      "id": "q1117",
+      "cat": "knowledge",
+      "type": "mc",
+      "question": "After a policy update, a Project owner replaced two knowledge files and rewrote part of the instructions. Two days later, staff complain that answers have 'changed without warning', and nobody can say what was altered. What would have prevented this?",
+      "options": [
+        "Keeping a change log of what was changed, by whom and why, and telling users about the update",
+        "Making all edits outside working hours so that fewer people notice a difference in the answers",
+        "Telling Claude to announce at the start of each chat that the Project's settings have been updated",
+        "Holding policy updates until the next quarterly review so that changes arrive in one batch"
+      ],
+      "correct": 0,
+      "explanation": "A change log records what changed so that a shift in behavior can be traced and reversed, and a short notice tells users what to expect. Editing in quiet hours hides the change instead of explaining it. Claude has no way of knowing what was edited, so an announcement instruction cannot work. Holding a policy update for a quarter leaves stale knowledge in use."
+    },
+    {
+      "id": "q1118",
+      "cat": "knowledge",
+      "type": "mc",
+      "question": "A team installed a custom skill for formatting expense summaries, but Claude rarely uses it when someone asks for an expense summary. What is the best first fix?",
+      "options": [
+        "Paste the skill's full instructions into every expense request so that Claude always sees them",
+        "Rewrite the skill's description to say what it does and when to use it, then retest it with sample requests",
+        "Add more reference files to the skill so that it looks more substantial and complete to Claude",
+        "Move the skill's instructions into the account-wide instructions so they apply to every conversation"
+      ],
+      "correct": 1,
+      "explanation": "Claude first sees only a skill's name and description and decides from them whether to load the rest, so a vague description means the skill is ignored or fires at the wrong time. Sharpening it and retesting with sample requests fixes the cause. Pasting the instructions defeats the purpose of a skill, extra files do not change how a skill is selected, and account-wide instructions would apply the formatting to every conversation, expenses or not."
+    },
+    {
+      "id": "q1119",
+      "cat": "knowledge",
+      "type": "mc",
+      "question": "A colleague forwards a skill file from a public website that promises to 'polish any report automatically'. It includes scripts. What should happen before anyone installs it?",
+      "options": [
+        "Install it in a personal account first, since a skill can only change how a report looks and cannot reach anything else",
+        "Install it and try it on non-sensitive documents only, which removes any risk from an unknown publisher",
+        "Have someone who manages the organization's tools review the publisher and scripts first, and add it only if trusted",
+        "Install it for the whole team at once so that any problems show up quickly and can be fixed together"
+      ],
+      "correct": 2,
+      "explanation": "A skill can carry instructions and code, and the Help Center warns that untrusted skills can expose data through prompt injection or data exfiltration, so skills should come only from trusted sources and be reviewed first. A skill is not limited to appearance. Test data limits the damage but does not make an unknown publisher trustworthy, and rolling it out to everyone multiplies the exposure."
+    },
+    {
+      "id": "msq1101",
+      "cat": "knowledge",
+      "type": "ms",
+      "question": "A support team is dividing its material between a Project's instructions and its knowledge. Which TWO items belong in the instructions? (Choose two.)",
+      "options": [
+        "Who will read the replies and the tone they should have",
+        "The full text of the current returns policy",
+        "What Claude should do when the knowledge does not contain the answer",
+        "Last quarter's customer-satisfaction survey results",
+        "The product catalogue with this month's prices"
+      ],
+      "correct": [
+        0,
+        2
+      ],
+      "explanation": "Instructions hold standing guidance about behavior: the audience and tone, and a fallback for questions the knowledge cannot answer. The returns policy, the survey results and the price list are reference material, which belongs in project knowledge, where it can be replaced when it changes without touching the rules."
+    },
+    {
+      "id": "msq1102",
+      "cat": "knowledge",
+      "type": "ms",
+      "question": "A shared Project's knowledge has become unreliable because old and new documents are mixed together. Which THREE practices keep uploaded knowledge trustworthy? (Choose three.)",
+      "options": [
+        "Upload every draft as well, in case someone wants to compare versions",
+        "Keep one approved version of each document and retire superseded copies",
+        "Rely on Claude to notice which documents are out of date and ignore them",
+        "Give each file a descriptive name that includes its date or version",
+        "Review the files on a schedule and replace any that no longer match current policy"
+      ],
+      "correct": [
+        1,
+        3,
+        4
+      ],
+      "explanation": "A single source of truth, descriptive names with dates or versions, and a regular review keep a Project current and let both people and retrieval pick the right file. Extra drafts add conflicting copies, and Claude cannot reliably tell that a file is outdated: it quotes what it is given."
+    },
+    {
+      "id": "msq1103",
+      "cat": "knowledge",
+      "type": "ms",
+      "question": "Which TWO statements about connecting Claude to services such as Google Drive and Gmail are accurate? (Choose two.)",
+      "options": [
+        "Claude can reach only the files and messages that the signed-in person could already open",
+        "An Owner's permission settings can give Claude more access than the connected service itself allows",
+        "On a Team plan, once an Owner enables a connector, each person still signs in with their own account",
+        "Claude reads charts and pictures embedded in a Google Doc in the same way as the text",
+        "Enabling a connector lets Claude search every employee's mailbox for the Owner"
+      ],
+      "correct": [
+        0,
+        2
+      ],
+      "explanation": "Claude inherits each person's own permissions, and on Team and Enterprise plans enablement makes a connector available without granting access, so members normally authenticate individually. Owner settings can only narrow what a service allows, never widen it. The Drive connector reads text only, so images inside documents are not seen, and the Gmail connector works within the mail the connected person can already open."
+    },
+    {
+      "id": "msq1104",
+      "cat": "knowledge",
+      "type": "ms",
+      "question": "The owner of a shared Project has just edited its instructions. Which TWO steps best protect the people who rely on it? (Choose two.)",
+      "options": [
+        "Rerun a fixed set of representative requests and compare the answers with notes on what good looks like",
+        "Delete the old chats so that nobody sees answers produced under the earlier instructions",
+        "Ask Claude to confirm that the new instructions are an improvement",
+        "Record what changed, who changed it and why, and tell users what is different",
+        "Wait for users to report problems before checking anything"
+      ],
+      "correct": [
+        0,
+        3
+      ],
+      "explanation": "Rerunning the same test requests shows whether anything got worse, and a change log plus a short notice lets users and colleagues trace and understand shifts in behavior. Deleting chats hides evidence without fixing anything, Claude's agreement is not a measurement of output quality, and waiting for complaints turns users into testers."
+    },
+    {
+      "id": "msq1105",
+      "cat": "knowledge",
+      "type": "ms",
+      "question": "Which TWO situations call for building a skill rather than adding more text to a Project's instructions? (Choose two.)",
+      "options": [
+        "A fixed report layout must be applied across many chats and Projects, but only when someone asks for that report",
+        "The team's current price list must be available to every chat in one shared Project, whoever starts it",
+        "A procedure with a template file and a script should be loaded only when a matching request comes up",
+        "A personal preference for British spelling should apply to every conversation the person has",
+        "A reminder that this quarter's priority is the product launch should shape every reply in one Project"
+      ],
+      "correct": [
+        0,
+        2
+      ],
+      "explanation": "A skill packages a procedure that Claude loads on demand when a request matches, and it works across chats and Projects, which fits a recurring report layout and a procedure with its own template and script. A price list is project knowledge, a preference for every conversation is an account-wide instruction, and a standing priority for one Project's replies is a project instruction."
+    },
+    {
+      "id": "tf1101",
+      "cat": "knowledge",
+      "type": "tf",
+      "question": "Claude can read a Project's name and description, so standing rules can safely be written in the description field.",
+      "answer": false,
+      "explanation": "The Help Center says Claude does not have access to a Project's name or description; they are labels for people. Standing rules belong in the project instructions."
+    },
+    {
+      "id": "tf1102",
+      "cat": "knowledge",
+      "type": "tf",
+      "question": "Instructions saved in a Project apply to every chat inside that Project, but not to the person's chats outside it.",
+      "answer": true,
+      "explanation": "Project instructions are scoped to their own Project. The account-wide setting is the one that follows a person into every conversation."
+    },
+    {
+      "id": "tf1103",
+      "cat": "knowledge",
+      "type": "tf",
+      "question": "An Owner's permission settings on a connector can give Claude more access than the connected service itself allows.",
+      "answer": false,
+      "explanation": "Owner settings such as always allow, needs approval and blocked only narrow what the source system already permits. They never grant more access than the service gives."
+    },
+    {
+      "id": "tf1104",
+      "cat": "knowledge",
+      "type": "tf",
+      "question": "With the Gmail connector, Claude works only within the mail that the connected person can already open.",
+      "answer": true,
+      "explanation": "Claude inherits the signed-in person's permissions in the connected service, so it cannot see other people's mailboxes. When something cannot be found, the first check is the person's own access."
+    },
+    {
+      "id": "tf1105",
+      "cat": "knowledge",
+      "type": "tf",
+      "question": "A Google Doc added to a Project from Drive stays linked to the live document, whereas a file uploaded from a computer remains a static copy.",
+      "answer": true,
+      "explanation": "Docs added from Drive stay in step with the source, so Claude works from the current version. An uploaded file changes only when someone replaces it, which is why uploads of frequently changing documents go stale."
+    },
+    {
+      "id": "tf1106",
+      "cat": "knowledge",
+      "type": "tf",
+      "question": "Telling Claude what to do when the knowledge does not contain an answer, for example to say so and name who to ask, reduces confident guessing.",
+      "answer": true,
+      "explanation": "A fallback instruction gives Claude a sanctioned alternative to inventing a plausible answer, and it works best when paired with a rule to quote the source whenever an answer does exist."
+    },
+    {
+      "id": "tf1107",
+      "cat": "knowledge",
+      "type": "tf",
+      "question": "An instruction telling Claude to ignore an old policy file is just as reliable as removing that file from the Project.",
+      "answer": false,
+      "explanation": "The file stays available and can still be retrieved and quoted. Instructions guide behavior but do not guarantee a document is never used, whereas removing the file leaves a single source of truth."
+    },
+    {
+      "id": "tf1108",
+      "cat": "knowledge",
+      "type": "tf",
+      "question": "Claude loads the full contents of every installed skill at the start of each conversation.",
+      "answer": false,
+      "explanation": "Skills use progressive disclosure: Claude first sees only each skill's name and description and reads the rest only when a request matches, which stops many skills from crowding the context window."
+    },
+    {
+      "id": "q1201",
+      "cat": "governance",
+      "type": "mc",
+      "question": "An HR coordinator proposes having Claude score every incoming application and automatically reject anyone below a cutoff, so recruiters only see the top candidates. What is the most appropriate response?",
+      "options": [
+        "Approve it, because applying the same standard to every application is fair by design and removes recruiter inconsistency",
+        "Approve it only for scores far below the cutoff, where the risk of wrongly rejecting a strong candidate is small",
+        "Use Claude to summarize applications, with a recruiter deciding each outcome and applicants told that AI is involved",
+        "Prohibit all use of Claude anywhere in hiring, including drafting job adverts and interview questions for recruiters"
+      ],
+      "correct": 2,
+      "explanation": "Hiring is a high-risk area because the output would decide about individuals. Anthropic's Usage Policy asks for a qualified person who can change the outcome to review such recommendations, and for the affected people to be told that AI was used. Claude can still summarize and organize applications. A consistent standard is not the same as a fair one, since a scoring rule can carry hidden bias; limiting automation to low scorers still rejects people without review; and banning every use gives up low-risk help such as drafting job adverts."
+    },
+    {
+      "id": "q1202",
+      "cat": "governance",
+      "type": "mc",
+      "question": "A payroll specialist asks Claude whether freelance designers can be treated as independent contractors, and Claude gives a confident, detailed answer. She plans to apply it to every freelancer in the company. What is the best way to proceed?",
+      "options": [
+        "Use it to prepare questions, then have HR or legal confirm the classification before it is applied",
+        "Apply the answer to all freelancers, since the reasoning was detailed and the question was a general one",
+        "Ask Claude to repeat the analysis three times and apply whichever conclusion comes up most often",
+        "Ask Claude to cite the relevant law, and apply the answer once the citation looks plausible and complete"
+      ],
+      "correct": 0,
+      "explanation": "Worker classification is a legal question where a mistake affects people's rights and the company's exposure. Claude can explain the concepts and help prepare questions, but a qualified person makes the call. Detail and confidence are not credentials, agreement across repeated runs shows consistency rather than correctness, and a plausible-looking citation can still be invented, so it has to be checked against the real text by someone competent to read it."
+    },
+    {
+      "id": "q1203",
+      "cat": "governance",
+      "type": "mc",
+      "question": "Two weeks before a product launch, a marketing lead asks Claude to write thirty five-star customer reviews 'in different voices' to publish on the product page. What is the best response?",
+      "options": [
+        "Generate them, provided that every claim in them matches the product specification and none overstates it",
+        "Generate them, but publish them under the names of colleagues who have genuinely tried the product",
+        "Generate them, and label the section 'sample content' in small print at the bottom of the page",
+        "Decline to invent reviews; use Claude to draft requests for real customer feedback instead"
+      ],
+      "correct": 3,
+      "explanation": "A review is supposed to be a real customer's opinion. Inventing reviews, or attributing them to people who did not write them, is deceptive content, which Anthropic's Usage Policy prohibits (fake reviews and astroturfing) and which most company policies forbid even when every claim is accurate. Claude can legitimately help gather and summarize genuine feedback. Small print does not make a fabricated review honest."
+    },
+    {
+      "id": "q1204",
+      "cat": "governance",
+      "type": "mc",
+      "question": "A customer-service lead is writing requirements for a website chat assistant that developers will build on Claude. To make it feel personal, she wants it to introduce itself as a human agent named Maya. What is the best guidance?",
+      "options": [
+        "Proceed, because the answers will be accurate and customers get the help they need either way",
+        "Keep the friendly name, but have the assistant say at the start that it is an AI assistant",
+        "Proceed, but have the assistant admit to being an AI only when a customer asks directly",
+        "Proceed, and mention the use of AI in the terms of service rather than in the chat itself"
+      ],
+      "correct": 1,
+      "explanation": "Anthropic's Usage Policy requires consumer-facing chatbots to tell users that they are talking to AI. A name and a warm tone are fine; pretending to be a person is deception, however accurate the answers are. Admitting it only when asked still misleads everyone who does not ask, and a note buried in the terms is not a clear notice at the point of conversation."
+    },
+    {
+      "id": "q1205",
+      "cat": "governance",
+      "type": "mc",
+      "question": "An HR team lists four ideas for Claude and wants to start with the one that carries the least governance risk. Which should it pick?",
+      "options": [
+        "Scoring employees to decide who receives a promotion",
+        "Drafting a first version of the monthly staff newsletter for an editor to revise",
+        "Choosing which applicants are invited to interview, with no recruiter review",
+        "Writing the final message to an employee whose leave request is declined, sent without review"
+      ],
+      "correct": 1,
+      "explanation": "Drafting internal content that a person edits is an assistive use: Claude supports someone's own work and an imperfect draft does little harm. The other ideas move from informing a person to deciding about one (promotion, hiring, leave) or to communicating a decision with no review. Those are the high-risk uses that call for qualified human review and notice to the people affected."
+    },
+    {
+      "id": "q1206",
+      "cat": "governance",
+      "type": "mc",
+      "question": "A recruiter wants Claude to read candidates' public social-media posts and infer their religion, health conditions and family plans, in order to predict who will stay with the company. How should she proceed?",
+      "options": [
+        "Go ahead, because the posts are public and Claude would only analyze what candidates chose to share",
+        "Go ahead after removing the candidates' names from the posts, which makes the analysis anonymous",
+        "Go ahead, but ask Claude to describe the traits indirectly instead of naming the characteristics",
+        "Do not do it: inferring protected characteristics for hiring is discriminatory; use job-related criteria"
+      ],
+      "correct": 3,
+      "explanation": "Using protected attributes, or inferences about them, to screen candidates is discrimination, which Anthropic's Usage Policy prohibits and employment law restricts. That the posts are public does not change this, removing names does not remove the characteristics, and describing them indirectly produces the same proxy. Documented, job-related criteria assessed by people, with Claude helping to summarize the evidence, are the appropriate route."
+    },
+    {
+      "id": "q1207",
+      "cat": "governance",
+      "type": "mc",
+      "question": "An HR analyst wants to find which departments have the highest overtime. The export she was given has names, home addresses, national ID numbers, department and weekly hours for 4,000 staff, and company policy restricts personal data in AI tools. What is the best approach?",
+      "options": [
+        "Upload only the department and weekly-hours columns, since the question needs nothing that identifies a person",
+        "Upload the full export to a Project and ask Claude not to mention any names or addresses in its analysis",
+        "Replace the names with nicknames and upload the rest, so that Claude can still check individual rows by address",
+        "Paste the export into a personal account, where the company's restrictions on personal data do not reach"
+      ],
+      "correct": 0,
+      "explanation": "Data minimization means giving Claude only what the task needs. Department and hours answer the question, so the identifying columns never have to leave the file. Asking Claude not to mention names does not stop the data being shared, nicknames leave addresses and ID numbers in place, and a personal account is outside the approved tools, so using it moves the problem instead of solving it."
+    },
+    {
+      "id": "q1208",
+      "cat": "governance",
+      "type": "mc",
+      "question": "A coordinator replaced customer names with 'Customer A', 'Customer B' and so on in the body of a Word report. Before uploading it to Claude under a policy that bars customer identities, which check matters most?",
+      "options": [
+        "Confirm the report is within the upload size limit so that the upload does not fail halfway through",
+        "Convert the report to PDF, which removes comments, tracked changes and anything else hidden in the Word file",
+        "Look for names left in the file name, headers, comments, tracked changes and document properties",
+        "Upload it and ask Claude to confirm that the document contains no customer names or other identities"
+      ],
+      "correct": 2,
+      "explanation": "Redaction is only as good as its coverage. Identifiers hide in places that are easy to forget, such as the file name, headers, comments, tracked changes and properties, so these are checked before the file leaves your control. A size check addresses a different problem, converting the format does not by itself remove identifiers, and uploading the file to ask Claude is circular because the data would already have been shared."
+    },
+    {
+      "id": "q1209",
+      "cat": "governance",
+      "type": "mc",
+      "question": "A consultant is up against a deadline. Her firm's approved Claude workspace has a queue for new access requests, while her personal Claude account is available immediately. She wants to paste a client's unreleased deal terms into the personal account. What is the best course?",
+      "options": [
+        "Use the personal account after switching off its model-improvement setting so that nothing is used for training",
+        "Use the personal account in an incognito chat, so that nothing is saved to her history or memory",
+        "Use the personal account but replace the client's name with 'Client X' throughout the terms",
+        "Ask her manager or IT to expedite approved access, and keep the terms out of her personal account"
+      ],
+      "correct": 3,
+      "explanation": "Unreleased deal terms are confidential business information, and company data belongs in the approved tool. Privacy settings on a personal account, including incognito mode and the model-improvement toggle, do not turn it into an approved tool, and the terms can identify the deal even without the client's name. Convenience is how shadow AI starts; the compliant route is to ask for access or an exception."
+    },
+    {
+      "id": "q1210",
+      "cat": "governance",
+      "type": "mc",
+      "question": "A clinic's office manager wants Claude to summarize patient intake notes so that scheduling is faster. Staff would use their own individual Claude accounts, and the clinic has no agreement with Anthropic. What is the most appropriate next step?",
+      "options": [
+        "Begin now, after deleting the patients' names from every note, since the remaining details are not identifying",
+        "Raise it first with the clinic's privacy or compliance officer, since patient data needs a covered service",
+        "Begin now, because the summaries stay inside the clinic and are used only for scheduling, never shared",
+        "Begin now, after getting each patient's verbal agreement to an AI assistant helping with their notes"
+      ],
+      "correct": 1,
+      "explanation": "Patient notes are protected health information. In the United States a healthcare organization needs a business associate agreement, and a covered configuration, before a vendor handles it; Anthropic offers that agreement for HIPAA-ready commercial services, not for individual consumer plans. Removing names does not de-identify notes that still hold dates, places and details; internal use is still use; and informal consent does not replace the required agreement and safeguards. The privacy officer decides the compliant route."
+    },
+    {
+      "id": "q1211",
+      "cat": "governance",
+      "type": "mc",
+      "question": "A team lead tells her staff, 'Our company uses a Claude Team plan, and those plans don't train on our chats by default, so you can paste anything into it.' What is the flaw in this reasoning?",
+      "options": [
+        "Team plans do train on chats by default, so her statement is simply wrong about how the plan works",
+        "Commercial terms apply only to API customers, so Team plan users are treated like individual users",
+        "The training default covers Anthropic's use of data; it does not decide what company rules allow staff to paste",
+        "A provider that does not train on chats does not keep them either, so only the wording of the contract needs checking"
+      ],
+      "correct": 2,
+      "explanation": "By default, Anthropic's commercial products (Team, Enterprise and the API) do not use inputs and outputs for model training, so her premise is true. But what the vendor does with data is a different question from what the company allows staff to share. Data classification, client contracts and regulation still decide what may be pasted. The other statements are factually wrong: commercial terms are not limited to the API, and data is retained for a period regardless of training."
+    },
+    {
+      "id": "q1212",
+      "cat": "governance",
+      "type": "mc",
+      "question": "A colleague wants to put the shared login for the finance portal into a Project's instructions so that Claude can sign in and pull reports automatically. What is the best advice?",
+      "options": [
+        "Keep credentials out of prompts, instructions and files; use an approved authenticated connection instead",
+        "That is acceptable as long as the Project is kept private to the finance team and its members are trusted",
+        "Put the password in a knowledge file instead of the instructions, where it is less visible to casual readers",
+        "Split the password across two knowledge files so that neither file reveals it on its own to a reader"
+      ],
+      "correct": 0,
+      "explanation": "Passwords, keys and tokens do not belong in prompts, Project instructions or knowledge files, where they are stored as plain text, visible to everyone with access to the Project and easy to copy elsewhere. Anthropic's skills guidance likewise warns against hard-coding keys or passwords. A private Project, a different file, or a split password all still leave the secret in text that Claude and Project members can read. Properly authenticated connections or a person doing the sign-in avoid storing it."
+    },
+    {
+      "id": "q1213",
+      "cat": "governance",
+      "type": "mc",
+      "question": "An employee realizes he pasted a spreadsheet of client account numbers into a personal Claude account, against company policy. He is tempted to delete the chat and say nothing. What should he do?",
+      "options": [
+        "Report it promptly through the escalation path, so that security and privacy can contain it",
+        "Delete the chat and carry on with the work, since deleting a chat removes the data everywhere at once",
+        "Ask Claude to forget the spreadsheet and confirm that it has done so, then continue in the same chat",
+        "Wait a week to see whether anyone notices the mistake, and report it only if someone does"
+      ],
+      "correct": 0,
+      "explanation": "A data mistake reported the same day is far easier to contain. Deleting a chat removes it from your history immediately, but deletion from back-end storage follows later, and Claude has no 'forget' control that undoes a disclosure. Staying silent leaves the company unable to assess its obligations, which may include informing clients or regulators. The escalation path exists for exactly this situation."
+    },
+    {
+      "id": "q1214",
+      "cat": "governance",
+      "type": "mc",
+      "question": "While Claude reads a supplier's web page for an analyst, it suddenly starts searching her connected Drive and asks her to approve sending a file to an address outside the company. She never requested this. What should she do?",
+      "options": [
+        "Approve the action, since Claude would not ask unless it had a good reason to",
+        "Ask Claude to explain, and approve the action if the explanation sounds reasonable",
+        "Stop the task, decline the action, and report the page as a possible prompt injection",
+        "Let the task finish, then delete the chat to remove the file from the conversation"
+      ],
+      "correct": 2,
+      "explanation": "Web pages and files can contain hidden instructions written to hijack Claude, called prompt injection. Anthropic's guidance warns that Claude can be tricked into sending information from its context and tells people to watch for unexpected behavior and stop it. She never asked for the search or the transfer, so she should stop, decline, and tell the people responsible for security. An explanation produced by a hijacked session is not a safeguard, and deleting the chat afterwards cannot recall anything already sent."
+    },
+    {
+      "id": "q1215",
+      "cat": "governance",
+      "type": "mc",
+      "question": "A project lead wants to show a colleague in another department how she built a client analysis in Claude, and plans to post the chat's share link in a team channel. What should she do first?",
+      "options": [
+        "Post the link first and ask readers to report anything confidential that they happen to notice",
+        "Read the whole conversation for client details first, because everyone who opens the link sees all of it",
+        "Ask Claude to hide the sensitive parts of the conversation from anyone who opens the shared link",
+        "Share the link, since it shows only the finished analysis and not the messages that led up to it"
+      ],
+      "correct": 1,
+      "explanation": "A chat share link is a snapshot of the conversation as it stood when shared, so readers see everything said in it, including client details; on Team and Enterprise plans it works only for members of the organization. She should review the text first and can unshare later to revoke the link. Posting first and asking readers to report problems exposes the content before anyone has checked it; Claude cannot selectively hide parts of a shared conversation; and the link does not show only the most recent reply."
+    },
+    {
+      "id": "q1216",
+      "cat": "governance",
+      "type": "mc",
+      "question": "A communications manager wants to record internal meetings and have Claude transcribe and summarize them. Her company's AI policy lists approved tools and covers customer data but says nothing about meeting recordings. What should she do?",
+      "options": [
+        "Go ahead, because the policy forbids only the things it names and recordings are not among them",
+        "Go ahead, but only with meetings that she personally judges to be non-sensitive and low in risk",
+        "Use a personal account for the transcripts, since the policy does not mention meeting recordings at all",
+        "Ask the policy owner, such as IT or compliance, before starting, and stay within approved tools meanwhile"
+      ],
+      "correct": 3,
+      "explanation": "When policy is silent, the answer is to ask, not to assume permission. Recordings can contain personal data, confidential discussions and consent obligations, and only the policy owner can say how the policy applies. Judging sensitivity alone, or moving to a personal account, bypasses the people accountable for the answer."
+    },
+    {
+      "id": "q1217",
+      "cat": "governance",
+      "type": "mc",
+      "question": "A team finds a third-party plugin that connects Claude to its project-management tool. A teammate suggests trying it on a live project with real data first and requesting a formal review only if it proves useful. What is the best approach?",
+      "options": [
+        "Try it on live data first, since a review is worth the effort only for tools that prove useful",
+        "Request the vendor risk assessment first, and test only with non-sensitive sample data until approved",
+        "Install it under a personal account so that the company workspace is not affected by the trial",
+        "Install it, relying on its popularity with other companies as proof that it is safe to use"
+      ],
+      "correct": 1,
+      "explanation": "A plugin or connector can reach company data and may be maintained by a third party. A vendor risk assessment of security, privacy and terms belongs before real data is exposed, not after; sample data lets the team judge usefulness in the meantime. A personal account is shadow AI, and popularity is not a review of your own risks. Anthropic's guidance is to install plugins and skills only from sources you trust."
+    },
+    {
+      "id": "q1218",
+      "cat": "governance",
+      "type": "mc",
+      "question": "Anthropic's Usage Policy permits a certain internal use of Claude, but the company's own AI acceptable use policy forbids it. An employee asks which rule governs her work. What is the right answer?",
+      "options": [
+        "The company's policy, because an employer may be stricter with its staff than the vendor is",
+        "The Usage Policy, because the vendor sets the rules for its own product and customers must follow them",
+        "Whichever of the two is more permissive, since a use that either one allows is acceptable",
+        "Neither, because she may decide for herself whether to proceed when the risk seems low to her"
+      ],
+      "correct": 0,
+      "explanation": "Anthropic's Usage Policy sets the outer limit for everyone, but an employer can be stricter for its own staff, for example because of client contracts or regulation, and employees follow the stricter rule. Being allowed by the vendor does not make a use allowed by your employer, and the more permissive choice is never the safe one."
+    },
+    {
+      "id": "q1219",
+      "cat": "governance",
+      "type": "mc",
+      "question": "Months from now, a bank's compliance team may need to explain how an AI-assisted credit memo was prepared. Which habit best supports that?",
+      "options": [
+        "Save every chat in a personal account, so that the history is available if anyone asks about it later",
+        "Rely on Claude's memory feature to recall how it helped with the memo when the question comes up",
+        "Ask Claude, when the question arises, to write down how it contributed to the memo months earlier",
+        "Keep a short record of the tool and account used, the date, the purpose, the reviewer and the edits made"
+      ],
+      "correct": 3,
+      "explanation": "An audit trail is a record the organization controls of how AI contributed and who took responsibility: tool, account, date, purpose, reviewer and edits. A personal account's chat history is not an organizational record, Claude's memory stores notes about a person's work rather than a log, and a later account from Claude would be a reconstruction of events it cannot reliably recall."
+    },
+    {
+      "id": "q1220",
+      "cat": "governance",
+      "type": "mc",
+      "question": "A consultant keeps files for several clients in one shared Project. A draft report for Client A includes figures that belong to Client B. What is the best response?",
+      "options": [
+        "Delete the other client's figures from the draft and send it on time, since the error has been fixed",
+        "Add an instruction to the Project telling Claude to keep each client's data apart, then carry on",
+        "Hold the report, raise it through the escalation path, and give each client a separate Project with its own access",
+        "Ask Claude to promise that it will not mix up clients in any future drafts, and keep the Project as it is"
+      ],
+      "correct": 2,
+      "explanation": "The mix-up shows that one client's confidential data was available where it should not have been, which is both a possible incident to report and a design problem to fix. Least privilege means separating clients by Project and access, not asking the model to keep them apart. Deleting the figures hides the symptom, an instruction relies on wording where an access boundary is needed, and a promise from Claude is not a control."
+    },
+    {
+      "id": "q1221",
+      "cat": "governance",
+      "type": "mc",
+      "question": "After three months of using Claude to shortlist applicants, an HR team notices that far fewer applicants over fifty reach the shortlist than before. The criteria given to Claude include 'recent graduates' fluency with new technology'. What is the best response?",
+      "options": [
+        "Keep the process unchanged, since the criteria never mention age and so cannot be discriminatory",
+        "Add an instruction asking Claude to be unbiased and to treat all age groups fairly in the next round",
+        "Pause the shortlisting, compare outcomes by group and review the criteria with HR and legal",
+        "Remove birth dates from the applications and continue, since that settles the issue of age bias"
+      ],
+      "correct": 2,
+      "explanation": "A rule that looks neutral can still disadvantage a protected group (disparate impact), and a phrase such as 'recent graduates' acts as a proxy for age. The response is to measure outcomes by group, fix the criteria with HR and legal input, and keep human accountability. The absence of the word 'age' proves nothing, an instruction to be unbiased does not change the criteria, and removing birth dates leaves proxies such as graduation years in place."
+    },
+    {
+      "id": "q1222",
+      "cat": "governance",
+      "type": "mc",
+      "question": "A loan team uses Claude to draft decision summaries. Reviewers get about ten seconds per case, see only the AI's summary, and cannot change the recommendation. Which change would make the review meaningful?",
+      "options": [
+        "Add a second Claude chat that rechecks the summaries written by the first one, before review",
+        "Ask reviewers to confirm each approval with a second click, so that every approval is recorded",
+        "Raise the number of cases each reviewer handles per hour so that the backlog shrinks",
+        "Give reviewers the time, the source files and the authority to override a recommendation"
+      ],
+      "correct": 3,
+      "explanation": "Meaningful human review needs a qualified person with the time, the information and the authority to change the outcome; otherwise the human is a rubber stamp and automation bias takes over. A second AI check is not independent human judgment, an extra click adds friction but not scrutiny, and more cases per hour removes even more time."
+    },
+    {
+      "id": "q1223",
+      "cat": "governance",
+      "type": "mc",
+      "question": "A manager sets up an AI assistant to send routine replies to clients on her behalf. One reply promises a refund that she never approved. Who is accountable for that reply?",
+      "options": [
+        "The manager, who configured the assistant and allowed it to act for her",
+        "Anthropic, because its model wrote the reply that contained the promise",
+        "The client, who should have checked the promise before relying on it",
+        "Nobody, because an AI's autonomous action cannot be attributed to a person"
+      ],
+      "correct": 0,
+      "explanation": "People remain responsible for what they do with AI, and Anthropic's Usage Policy makes users responsible for agents they build or deploy. The manager chose the scope of the assistant's authority and should have kept an approval step for commitments such as refunds. Responsibility does not pass to the model, the vendor or the client."
+    },
+    {
+      "id": "q1224",
+      "cat": "governance",
+      "type": "mc",
+      "question": "A housing agency uses Claude to review applications and propose a decision with reasons. A caseworker reviews each proposal, and the agency then sends the decision letter. Following the principle that people affected by high-risk decisions are told when AI was used, what should the letter do?",
+      "options": [
+        "Omit any mention, since the caseworker's review makes the decision a human one",
+        "Say clearly that AI helped prepare the decision and that a caseworker reviewed it",
+        "Mention AI only if an applicant asks how the decision was reached",
+        "State the use of AI once in the agency's website footer instead of in the letters"
+      ],
+      "correct": 1,
+      "explanation": "Housing and public benefits are high-risk areas in Anthropic's Usage Policy, which asks that a qualified person meaningfully review AI recommendations and that the affected individual be clearly told that AI was used. The caseworker's review satisfies the first duty but does not cancel the second, and disclosure on request or in a footer is not a clear notice to the person affected."
+    },
+    {
+      "id": "msq1201",
+      "cat": "governance",
+      "type": "ms",
+      "question": "Which TWO of these uses of Claude call for review by a qualified person before the output reaches the people affected? (Choose two.)",
+      "options": [
+        "Summarizing the team's own meeting notes for an internal wiki",
+        "Recommending whether a customer's insurance claim should be paid",
+        "Brainstorming names for an internal project",
+        "Proposing which applicants should be approved for a rental home",
+        "Rewording the introduction of the team's own newsletter article"
+      ],
+      "correct": [
+        1,
+        3
+      ],
+      "explanation": "Insurance and housing are high-risk areas: the output would feed a decision that significantly affects a person's money or home. Anthropic's Usage Policy asks for meaningful review by a qualified person with authority to change the result, and for the affected person to be told that AI was involved. The other three are assistive tasks in which a person uses the output for their own work."
+    },
+    {
+      "id": "msq1202",
+      "cat": "governance",
+      "type": "ms",
+      "question": "A team wants Claude to find themes in a customer-feedback export that has names, email addresses, phone numbers, account IDs, region and comment text. Which TWO steps best reduce privacy risk before uploading? (Choose two.)",
+      "options": [
+        "Drop the columns the analysis does not need, such as email addresses, phone numbers and account IDs",
+        "Name the file 'anonymous_feedback' so that reviewers know it is safe",
+        "Tell Claude in the prompt to ignore any personal details it sees",
+        "Replace the remaining customer names with consistent codes and keep the lookup table out of the upload",
+        "Upload the export to a personal account whose model-improvement setting is switched off"
+      ],
+      "correct": [
+        0,
+        3
+      ],
+      "explanation": "Minimize first by leaving out what the task does not need, then pseudonymize what remains so that rows stay distinguishable while the key stays elsewhere. A file name changes nothing about the content, an instruction to ignore details does not stop them being shared, and a personal account is outside the approved tools whatever its settings."
+    },
+    {
+      "id": "msq1203",
+      "cat": "governance",
+      "type": "ms",
+      "question": "A team wants to use Claude on personal data about customers in the European Union. Which TWO actions are most appropriate? (Choose two.)",
+      "options": [
+        "Treat the vendor's security certifications as proof that the use is lawful",
+        "Ask the privacy or legal team whether there is a lawful basis and whether the account and terms in use are approved for personal data",
+        "Ask Claude whether the use complies with the law and follow its answer",
+        "Use an incognito chat so that the data is not stored",
+        "Send only the fields the task needs and leave out other personal details"
+      ],
+      "correct": [
+        1,
+        4
+      ],
+      "explanation": "The GDPR requires a lawful basis, data minimization and respect for individuals' rights, and the privacy team decides whether the use meets them, including whether the vendor terms (such as a data processing addendum) are approved. Certifications support a vendor review but do not make your own use lawful, Claude can explain concepts but is not the compliance decision-maker, and incognito changes how Claude stores a chat, not whether the sharing was permitted."
+    },
+    {
+      "id": "msq1204",
+      "cat": "governance",
+      "type": "ms",
+      "question": "A company is rolling out Claude to its marketing team. Which TWO elements belong in a sound AI acceptable use policy? (Choose two.)",
+      "options": [
+        "Which AI tools and accounts are approved, and which classes of data may be used with them",
+        "A statement that Claude's outputs are accurate enough that human review is optional",
+        "Who to contact with questions, and how to report a problem with AI output or data",
+        "A rule that staff should avoid telling clients when AI contributed to a deliverable",
+        "A ban on using Claude for any task that touches customer information"
+      ],
+      "correct": [
+        0,
+        2
+      ],
+      "explanation": "A workable policy names the approved tools, the data allowed in each, the review and disclosure expectations, and an escalation route. Claiming that review is optional contradicts the need for verification, hiding AI use from clients runs against the transparency duties that many contracts and laws add, and a blanket ban on customer-related work is unnecessary when approved tools and data rules can manage the risk."
+    },
+    {
+      "id": "msq1205",
+      "cat": "governance",
+      "type": "ms",
+      "question": "A team shares a Claude Project that contains salary data for an HR review. Which TWO choices follow the principle of least privilege? (Choose two.)",
+      "options": [
+        "Share the Project organization-wide so that anyone can find it when needed",
+        "Give everyone edit access so that mistakes can be fixed quickly",
+        "Share it only with the HR staff who need the data, with view-only access for those who do not edit",
+        "Enable every available connector in case one proves useful later",
+        "Leave out of the Project's knowledge any files the review does not need"
+      ],
+      "correct": [
+        2,
+        4
+      ],
+      "explanation": "Least privilege gives each person and tool only the access the task needs: the smallest group, view-only where editing is not required, and no unneeded sensitive files in the knowledge. Organization-wide sharing, blanket edit rights and enabling every connector all widen access beyond what the work requires."
+    },
+    {
+      "id": "msq1206",
+      "cat": "governance",
+      "type": "ms",
+      "question": "A consultant is about to send a client a report that Claude helped draft. Which TWO actions reflect responsible, transparent use? (Choose two.)",
+      "options": [
+        "Check the report's facts and figures against the sources, and take responsibility for what is sent",
+        "Remove any trace of AI involvement so that the client's trust in the report is not shaken",
+        "Ask Claude to certify that the report contains no errors, then send it",
+        "Send it as it is, because the draft was built from the firm's own documents",
+        "Follow the contract's and the firm's rules on telling clients when AI has contributed"
+      ],
+      "correct": [
+        0,
+        4
+      ],
+      "explanation": "Diligence means verifying work before it is shared and being open about AI's role where contracts, policies or law call for it; the sender remains accountable. Concealing AI use, accepting Claude's own certification, or assuming that good sources guarantee a correct draft each skip part of that responsibility."
+    },
+    {
+      "id": "tf1201",
+      "cat": "governance",
+      "type": "tf",
+      "question": "Using Claude to draft an email that an executive reviews, edits and sends under her own name counts as the impersonation that Anthropic's Usage Policy prohibits.",
+      "answer": false,
+      "explanation": "Prohibited impersonation means posing as a real person or organization, or creating fake personas, in order to mislead others. Drafting help for someone who reviews the message and sends it as their own is ordinary assistance. The policy targets deception about who is really speaking."
+    },
+    {
+      "id": "tf1202",
+      "cat": "governance",
+      "type": "tf",
+      "question": "A consumer-facing chatbot built on Claude must tell users that they are interacting with an AI.",
+      "answer": true,
+      "explanation": "Anthropic's Usage Policy requires AI disclosure to users, at least at the start of a chat session or in the product interface. The chatbot may have a friendly name and persona, but it must not pretend to be human."
+    },
+    {
+      "id": "tf1203",
+      "cat": "governance",
+      "type": "tf",
+      "question": "Claude can help you prepare questions and summarize documents for a meeting with a lawyer, but the lawyer, not Claude, gives the advice you rely on.",
+      "answer": true,
+      "explanation": "This is the professional-advice boundary. Claude's answers on legal, medical, tax or investment questions are information to take to a qualified professional, who gives the advice and carries the responsibility. Using Claude to prepare for that conversation is a sensible, low-risk use."
+    },
+    {
+      "id": "tf1204",
+      "cat": "governance",
+      "type": "tf",
+      "question": "Replacing employee names with codes while keeping a separate table that links each code to a person makes the data anonymous.",
+      "answer": false,
+      "explanation": "This is pseudonymization. Because the linking key still exists, people can be re-identified, so the data can still count as personal data and needs protection. Anonymization has to prevent identification even when the data is combined with other information."
+    },
+    {
+      "id": "tf1205",
+      "cat": "governance",
+      "type": "tf",
+      "question": "Because incognito chats are not saved to history or memory, a company's rules about which data may be shared with AI tools do not apply to them.",
+      "answer": false,
+      "explanation": "Incognito changes how Claude stores and uses the conversation, not what an employer allows its staff to share. The rule about what may be pasted into an AI tool applies in every kind of chat, and on Team and Enterprise plans incognito chats still follow organizational retention."
+    },
+    {
+      "id": "tf1206",
+      "cat": "governance",
+      "type": "tf",
+      "question": "A vendor's SOC 2 report and ISO certifications can support a vendor risk review, but they do not by themselves settle whether your own use of the tool is lawful and allowed.",
+      "answer": true,
+      "explanation": "Certifications and audit reports are evidence about the vendor's controls and governance processes. Whether your own use is lawful and permitted depends on your data, your contracts, your regulators and your policy, which the privacy, legal and security teams assess."
+    },
+    {
+      "id": "tf1207",
+      "cat": "governance",
+      "type": "tf",
+      "question": "On Anthropic's individual plans, whether conversations may be used to improve models depends on a privacy setting that the account holder controls.",
+      "answer": true,
+      "explanation": "The individual plans (Free, Pro and Max) have a model-improvement setting, and incognito chats are excluded even when it is on. Anthropic's commercial products (Team, Enterprise and the API) do not use inputs and outputs for training by default. Knowing which terms apply to the account you are using is part of handling sensitive data."
+    },
+    {
+      "id": "tf1208",
+      "cat": "governance",
+      "type": "tf",
+      "question": "If a company's AI policy says nothing about a particular situation, employees can assume the situation is permitted.",
+      "answer": false,
+      "explanation": "Silence is not permission. When the policy does not cover a situation, the right step is to ask the policy owner, such as IT, security or compliance, and to stay within approved tools and data rules until they answer."
+    },
+    {
+      "id": "tf1209",
+      "cat": "governance",
+      "type": "tf",
+      "question": "When a person connects her own Google Drive to Claude, Claude can read only the files that she is already permitted to open.",
+      "answer": true,
+      "explanation": "Connectors work through the signed-in person's own permissions and never grant more access than the source system allows; administrators can narrow what is available but not widen it. This is why access reviews and least privilege on the source system matter."
+    },
+    {
+      "id": "tf1210",
+      "cat": "governance",
+      "type": "tf",
+      "question": "If a piece of text carries no AI watermark, that shows it was written by a person.",
+      "answer": false,
+      "explanation": "Marks are added only to output from supported models and can be lost through editing or conversion. A detected mark is a signal, not proof, and a missing mark proves nothing, so the absence of a mark never means that a person wrote the text."
+    },
+    {
+      "id": "q1225",
+      "cat": "troubleshooting",
+      "type": "mc",
+      "question": "A team keeps a troubleshooting sheet that pairs a common symptom of weak Claude output with a first fix to try. Which pairing on the sheet is correct?",
+      "options": [
+        "Plausible figures that match nothing in the attached files: ask for a more formal tone",
+        "A different layout on every run: describe the layout and show a sample to copy",
+        "A reply that stops partway through: shrink the files attached to the chat",
+        "A rule near the end of a long prompt that is skipped: repeat it in capital letters five times"
+      ],
+      "correct": 1,
+      "explanation": "Match the fix to the cause. A layout that changes between runs comes from leaving the format open, so describe it and show a sample. Figures that match no file point to missing or unused source material, so tone is irrelevant; the fix is to supply the material and let Claude say when something is not in it. A reply cut off partway is continued by giving Claude the original request and the part already written and asking for the rest in sections. A skipped rule is fixed by making it prominent, positive and free of conflicts, not by shouting."
+    },
+    {
+      "id": "q1226",
+      "cat": "troubleshooting",
+      "type": "mc",
+      "question": "A trainer asks Claude for 'a detailed outline for a safety workshop' and gets five terse bullets. She wants something she can teach from. What is the most effective fix?",
+      "options": [
+        "Resend the same request several times and keep whichever reply happens to be the longest",
+        "Add 'try harder' and 'make it much longer' to the end of the request and send it again",
+        "Split the outline into five separate requests, each asking for a single bullet on one topic",
+        "Define 'detailed': the sections wanted, the amount for each, the audience, and a sample of the depth"
+      ],
+      "correct": 3,
+      "explanation": "Replies come back thin when the request leaves depth to Claude's judgment. Naming the sections, the amount for each, the audience and an example of the depth wanted gives Claude a target. Resending the same request only resamples the same gap, vague pressure such as 'try harder' adds no information, and splitting the outline into fragments loses its overall structure."
+    },
+    {
+      "id": "q1227",
+      "cat": "troubleshooting",
+      "type": "mc",
+      "question": "A team's Project instructions say 'Keep every answer to two sentences' near the top and 'Always explain your reasoning in full detail' lower down. Staff complain that answers are sometimes terse and sometimes long. What is the best fix?",
+      "options": [
+        "Rewrite the instructions with a priority, such as brief by default and detailed only when asked",
+        "Add 'follow all instructions exactly' at the top of the Project instructions and keep both rules",
+        "Delete the Project's knowledge files in case the documents are what is causing the variation",
+        "Ask staff to keep regenerating any answer whose length they dislike until one of them fits"
+      ],
+      "correct": 0,
+      "explanation": "The two rules cannot both be satisfied, so Claude has to choose, and the choice varies from conversation to conversation. Resolving the conflict with an explicit priority removes the variation at its cause. A general demand to follow everything cannot satisfy rules that contradict each other, the knowledge files are not the source of the inconsistency, and regenerating pushes the burden onto every user."
+    },
+    {
+      "id": "q1228",
+      "cat": "troubleshooting",
+      "type": "mc",
+      "question": "Forty messages into a long analysis chat, Claude stops using the table layout and citation style that the analyst set up at the beginning. What is the best way to get back on track?",
+      "options": [
+        "Keep going in the same chat and repeat 'follow the format' each time it slips, as often as needed",
+        "Ask Claude to rate how well it remembers the original instructions, and continue if the rating is high",
+        "Start a new chat with a short summary and the key rules, and move standing rules into Project instructions",
+        "Switch to the smallest available model, since smaller models follow formatting rules more closely"
+      ],
+      "correct": 2,
+      "explanation": "In long conversations early instructions are gradually crowded out by newer material, which is called instruction drift. A fresh chat that begins with a concise, checked summary and the key rules restores focus, and placing standing rules in Project instructions makes them apply from the first message of every chat. Nagging treats each slip separately, a self-rating is not a fix, and a smaller model does nothing about rules fading from a long conversation."
+    },
+    {
+      "id": "q1229",
+      "cat": "troubleshooting",
+      "type": "mc",
+      "question": "Two analysts give Claude the same request to label support tickets 'urgent' or 'routine' and get noticeably different splits. What is the most likely cause and the best fix?",
+      "options": [
+        "Claude is malfunctioning; report the difference as a product bug and wait for the fix before using it",
+        "The model is too small; move to the largest model available and keep the request exactly the same",
+        "The labels are undefined; define each one with criteria, add borderline examples and fix the output layout",
+        "Each analyst should run the request three times and keep the label that appears most often per ticket"
+      ],
+      "correct": 2,
+      "explanation": "Variation usually comes from open questions that Claude has to interpret: what counts as urgent, how to treat borderline tickets, what the answer should look like. Defining the labels, showing examples of tricky tickets and fixing the layout make results repeatable. It is not a malfunction, a larger model still has to guess at undefined labels, and voting across runs hides the underlying ambiguity instead of removing it."
+    },
+    {
+      "id": "q1230",
+      "cat": "troubleshooting",
+      "type": "mc",
+      "question": "A finance analyst asks Claude for her company's third-quarter headcount by region and receives a confident table that does not match HR's records. Rewording the question produces different numbers each time. What is the real problem, and what is the best fix?",
+      "options": [
+        "Claude lacks the company's data; supply the HR export, or connect the source, and have it answer only from that",
+        "The prompt lacks emphasis; add 'be accurate' and 'double-check every number' as the first lines of the request",
+        "Reasoning depth is too low; switch on extended thinking and ask the same question again so that it works harder",
+        "The question is too short; ask it in five different ways and use the numbers that come up most often"
+      ],
+      "correct": 0,
+      "explanation": "Headcount is private company data that Claude cannot know, so any numbers it produces are invented, which is why they change with each rewording. This is a knowledge gap that wording cannot fix; the remedy is to supply the material (attach it, connect it or search) and restrict the answer to it, allowing 'not in the data' as an answer. Extra emphasis, deeper reasoning and repeated asking do not add facts."
+    },
+    {
+      "id": "q1231",
+      "cat": "troubleshooting",
+      "type": "mc",
+      "question": "An associate pastes a very long report into a chat and sees 'Your message will exceed the length limit for this chat.' What is the best next step?",
+      "options": [
+        "Send the same message again after a few minutes, in case the limit was only a temporary glitch",
+        "Tell Claude to keep its answers short, so that more of the report fits into the conversation",
+        "Sign out, sign back in and paste the report again, which resets the length limit for the chat",
+        "Split the report into sections or select the relevant parts, then combine the results afterwards"
+      ],
+      "correct": 3,
+      "explanation": "The notice means the input is too large for the conversation, so the fix is to reduce or divide it: split the document, summarize or select the relevant sections, or start a new chat with the parts that matter, keeping a running list so that nothing is lost between parts. Retrying the same message changes nothing, the limit concerns what is sent rather than the length of Claude's reply, and signing in again has no effect on message size."
+    },
+    {
+      "id": "q1232",
+      "cat": "troubleshooting",
+      "type": "mc",
+      "question": "Claude declines two requests. A teacher asked for a one-page overview of a historical atrocity for a lesson, and the reply seems to have misread her purpose. A marketing manager asked for fake customer testimonials. How should each be handled?",
+      "options": [
+        "Rewrite both requests in different words, again and again, until Claude agrees to produce the content",
+        "Add the teacher's purpose and audience and ask again; accept the limit on testimonials and gather real ones instead",
+        "Accept both refusals without comment and drop both tasks, since a refusal means the task is unsuitable",
+        "Switch to another model for both requests, since a different model may be more willing to comply"
+      ],
+      "correct": 1,
+      "explanation": "When a request was probably misread, stating the legitimate purpose and audience can resolve it. When a request conflicts with usage policy, as fake testimonials do, it is a boundary to respect and not a puzzle to solve by rewording or switching tools; the useful move is to ask for a legitimate alternative. Treating both the same way would either disguise a prohibited use or abandon a legitimate one."
+    },
+    {
+      "id": "q1233",
+      "cat": "troubleshooting",
+      "type": "mc",
+      "question": "A team improved a contract-summary prompt by changing six things at once: role, format, length, tone, examples and order. Results got better, but nobody knows which change helped, and the next contract type broke it. What should the team do next time?",
+      "options": [
+        "Make even more changes at once next time, so that the team moves faster toward a perfect prompt",
+        "Undo all six changes, return to the original prompt and stop work on this prompt for good",
+        "Ask Claude which of the six changes made the difference and take its answer as the explanation",
+        "Change one element at a time and rerun the same test contracts, to see each change's effect"
+      ],
+      "correct": 3,
+      "explanation": "Changing one thing at a time against the same test inputs isolates cause and effect, so the team keeps what helps and drops what does not. Bundling changes hides which one worked, more bundled changes make it worse, giving up discards a real improvement, and Claude cannot reliably say which edit mattered; comparing runs is what shows it."
+    },
+    {
+      "id": "q1234",
+      "cat": "troubleshooting",
+      "type": "mc",
+      "question": "A team has rewritten a prompt ten times to reconcile invoice totals across three systems that store data in different formats, but the last six edits barely changed the results. The job needs exact matching across thousands of rows. What is the best next step?",
+      "options": [
+        "Keep refining the wording, since a sufficiently clear prompt will eventually produce exact matches",
+        "Stop rewording and hand the matching to a technical colleague, keeping Claude for the rules and samples",
+        "Switch to a larger model and resend the latest version of the prompt unchanged, to see if it copes",
+        "Ask each analyst to write a personal version of the prompt and use the one with the highest total"
+      ],
+      "correct": 1,
+      "explanation": "Several edits with little gain are a sign of diminishing returns: the obstacle is not the wording. Exact matching at scale is technical work for a developer or analyst with proper tooling, while Claude can still help define the rules and review samples. More polishing, a bigger model or competing prompts repeat the same approach."
+    },
+    {
+      "id": "q1235",
+      "cat": "troubleshooting",
+      "type": "mc",
+      "question": "After a month, a team finds that Claude-drafted answers to billing questions are used unedited about 90% of the time, but answers to technical product questions only about 30% of the time. How should the team adjust its approach?",
+      "options": [
+        "Apply the billing prompt to every question type, since it clearly works well and is already in use",
+        "Stop using Claude for the help desk altogether, since the technical answers fall short of the goal",
+        "Keep using Claude for billing; for technical questions add product documents and route drafts to a specialist",
+        "Add 'be accurate and thorough' to the technical prompt and measure the results again next quarter"
+      ],
+      "correct": 2,
+      "explanation": "Results should shape the approach: keep what works and adapt what does not. The technical gap is probably missing source material and a need for expert review, so supplying documentation and routing drafts to a specialist addresses the cause. Treating all question types alike ignores the data, abandoning the tool discards a proven use, and an exhortation to be accurate adds no information."
+    },
+    {
+      "id": "q1236",
+      "cat": "troubleshooting",
+      "type": "mc",
+      "question": "A communications team wants to know whether a new version of its press-summary prompt really beats the current one. Which method gives the most trustworthy answer?",
+      "options": [
+        "Run both versions on the same set of past releases and score the results against the same criteria",
+        "Run the new version on this week's easy release and the current version on last year's complicated one",
+        "Ask Claude which of the two prompts is better and adopt its choice",
+        "Adopt whichever version the most senior person prefers after reading one output of each"
+      ],
+      "correct": 0,
+      "explanation": "A fair comparison holds the inputs and the scoring criteria constant, so any difference comes from the prompt. Different inputs confound the result, Claude's opinion about prompts is not evidence of how they perform on your documents, and one output judged by seniority is an anecdote."
+    },
+    {
+      "id": "q1237",
+      "cat": "troubleshooting",
+      "type": "mc",
+      "question": "An analyst sends Claude twelve short, related questions about the same survey one at a time and reaches her usage limit by mid-afternoon. Which change most reduces usage without lowering the quality of the answers?",
+      "options": [
+        "Group the related questions into one organized message, with the survey attached once",
+        "Ask for shorter answers and keep sending the twelve questions one by one as they occur",
+        "Open a new chat for each question and re-attach the survey file each time it is needed",
+        "Switch to the most capable model for every question, so that fewer follow-ups are needed"
+      ],
+      "correct": 0,
+      "explanation": "Anthropic's usage guidance recommends batching related requests into one message and not repeating material. Grouping gives Claude the full picture and avoids re-sending context. Fresh chats that re-attach the survey repeat the cost, shorter answers trim only part of it, and model choice is one of the factors that use the allowance faster, so the most capable model is not the economical default."
+    },
+    {
+      "id": "q1238",
+      "cat": "troubleshooting",
+      "type": "mc",
+      "question": "After a long chat, a product manager finally gets Claude to write release notes in exactly the right voice. Two weeks later she cannot reproduce the result in a new chat. What should she have done?",
+      "options": [
+        "Kept that chat open indefinitely and written every new set of release notes inside that chat",
+        "Asked Claude to remember that the voice was right and to apply it to every future set of notes",
+        "Saved the winning prompt, with a sample of good output, as a reusable template or Project instruction",
+        "Taken a screenshot of the final output and pasted the image into each new chat as a model to copy"
+      ],
+      "correct": 2,
+      "explanation": "A prompt that finally works is easily lost in a long chat. Capturing it at once, with an example of good output, makes the success repeatable and shareable, and a Project instruction or skill carries it into new chats. A chat kept open grows unwieldy and drifts, memory holds short notes about you rather than a dependable recipe, and a screenshot shows one result but not the instructions that produced it."
+    },
+    {
+      "id": "q1239",
+      "cat": "troubleshooting",
+      "type": "mc",
+      "question": "A team's Claude-drafted client emails now take 40% less time to produce, but reviewers rewrite about half of them before sending. What does this suggest?",
+      "options": [
+        "The workflow is a clear success, because first drafts now arrive much faster than they did before",
+        "The real gain may be small; the team should find why drafts need so much rework and improve the prompt",
+        "The team should add more reviewers so that the rewriting is shared and each person has less to do",
+        "The team should remove the review step to save time, since reviewers are rewriting the drafts anyway"
+      ],
+      "correct": 1,
+      "explanation": "Efficiency is the time to a usable result, not the time to a first draft. A high rework rate eats the saving, so the team should diagnose the cause, such as missing context, an unclear style or conflicting instructions, and fix it. Declaring success measures the wrong thing, more reviewers spread the cost instead of lowering it, and removing review would let the flawed drafts go out."
+    },
+    {
+      "id": "q1240",
+      "cat": "troubleshooting",
+      "type": "mc",
+      "question": "A team's Claude-assisted proposals are drafted in five minutes, yet each one still takes three days to reach the client because it waits in a queue for a single manager's approval. Where should the team focus its optimization effort?",
+      "options": [
+        "On making the draft even faster than five minutes, since drafting is the step Claude supports",
+        "On removing the approval step entirely, so that proposals are sent out as soon as they are drafted",
+        "On trying other models to see whether one produces drafts that get the manager to approve sooner",
+        "On the approval step, for example with clear criteria, a backup approver or pre-checked drafts"
+      ],
+      "correct": 3,
+      "explanation": "A process moves only as fast as its bottleneck, which here is the approval queue; speeding up drafting further changes almost nothing about the total time. Clear criteria, a backup approver or pre-checked drafts shorten the wait while keeping the checkpoint. Dropping approval altogether sacrifices control, and the choice of model has no influence on the manager's availability."
+    },
+    {
+      "id": "msq1207",
+      "cat": "troubleshooting",
+      "type": "ms",
+      "question": "Analysts run the same prompt every day and get correct content, but the layout changes from run to run. Which TWO changes are most likely to make the results consistent? (Choose two.)",
+      "options": [
+        "Describe the layout explicitly, with named sections or columns",
+        "Add a sentence asking Claude to be consistent",
+        "Include one or two examples of the exact output wanted",
+        "Run it three times and use the middle result",
+        "Ask for a more creative answer"
+      ],
+      "correct": [
+        0,
+        2
+      ],
+      "explanation": "Consistency comes from structure: a defined layout and examples to copy remove the open choices that Claude would otherwise make differently each time. 'Be consistent' states a wish without saying what to be consistent with, picking a middle result accepts the variation instead of removing it, and asking for creativity pulls the other way."
+    },
+    {
+      "id": "msq1208",
+      "cat": "troubleshooting",
+      "type": "ms",
+      "question": "Claude can no longer open a Google Drive file that it read last week, and prompts the user to reconnect. Which TWO are sensible first steps? (Choose two.)",
+      "options": [
+        "Rewrite the prompt with more background about the file",
+        "Disconnect and sign in again to the Drive connector in the connector settings",
+        "Move the file into a different Project",
+        "Check whether the person's own access to the file has changed, or whether an administrator has to approve the app",
+        "Tell Claude to ignore the access error and answer without the file"
+      ],
+      "correct": [
+        1,
+        3
+      ],
+      "explanation": "A reconnect prompt points to an access or authentication problem, not a wording problem. Signing in again often clears it, and because a connector sees only what the signed-in person can open, her own permissions or an administrator's approval may be the cause. Rewriting the prompt treats a problem that is not there, moving the file does not repair authentication, and answering without the file invites invented content."
+    },
+    {
+      "id": "msq1209",
+      "cat": "troubleshooting",
+      "type": "ms",
+      "question": "A team has been tweaking a prompt for a report on competitors' pricing. Which TWO signs show that it is time to change approach rather than keep rewording? (Choose two.)",
+      "options": [
+        "The initial reply was good except for one awkward sentence",
+        "The output is slightly longer than the team prefers",
+        "Several rounds of edits have produced almost no improvement",
+        "A reviewer asked for a different heading style",
+        "The report needs current competitor prices that Claude has never been given"
+      ],
+      "correct": [
+        2,
+        4
+      ],
+      "explanation": "Little gain after repeated edits is diminishing returns, and missing facts are a knowledge gap that wording cannot close; both call for a different approach, such as supplying sources, using web search or involving a person who has the data. An awkward sentence, a slightly long output and a heading preference are small, targeted fixes within the same approach."
+    },
+    {
+      "id": "msq1210",
+      "cat": "troubleshooting",
+      "type": "ms",
+      "question": "A team wants to reduce rework on a weekly report that Claude drafts. Which TWO actions are most likely to help? (Choose two.)",
+      "options": [
+        "Ask reviewers to accept the first draft unless it is far off",
+        "Keep the report template and a sample of an approved report in a Project, so that every draft starts from them",
+        "Switch to a different prompt each week to keep the results fresh",
+        "Remove the review step once the drafts look good",
+        "Track the corrections reviewers make, and update the instructions to prevent the most common ones"
+      ],
+      "correct": [
+        1,
+        4
+      ],
+      "explanation": "Rework falls when drafts start from the right template and examples and when recurring corrections feed back into the instructions. Lowering the bar for review pushes errors downstream, changing the prompt every week prevents the team from learning what works, and dropping review is over-automation."
+    },
+    {
+      "id": "tf1211",
+      "cat": "troubleshooting",
+      "type": "tf",
+      "question": "When Claude lacks facts it needs, such as private company figures, rewording the request will not help; the material has to be supplied.",
+      "answer": true,
+      "explanation": "A knowledge gap is not a wording problem. Attach the document, connect the source or use search, and ask Claude to answer only from that material and to say when something is not in it. Without the material, Claude can only produce plausible-sounding guesses."
+    },
+    {
+      "id": "tf1212",
+      "cat": "troubleshooting",
+      "type": "tf",
+      "question": "If Claude declines a request because it conflicts with Anthropic's usage policies, rephrasing the request to hide its purpose is an acceptable troubleshooting step.",
+      "answer": false,
+      "explanation": "A policy boundary is a limit to respect, not a puzzle to get around. If the request was simply misread, restate the legitimate purpose and audience plainly; if it really conflicts with policy, look for a legitimate alternative or take the need to someone who can authorize it."
+    },
+    {
+      "id": "tf1213",
+      "cat": "troubleshooting",
+      "type": "tf",
+      "question": "A message saying that Claude is temporarily limited by capacity constraints means the prompt is too long, so the fix is to shorten the request.",
+      "answer": false,
+      "explanation": "A capacity message reflects heavy demand on the service, not a defect in the request, so rewriting the prompt does not help; wait a few minutes and retry, and check Anthropic's status page if errors persist. A request that is too long produces a different notice, that the message will exceed the length limit for the chat."
+    },
+    {
+      "id": "tf1214",
+      "cat": "troubleshooting",
+      "type": "tf",
+      "question": "A prompt that gave good results on a handful of tidy sample documents can be assumed to work on every kind of real document.",
+      "answer": false,
+      "explanation": "Tidy samples hide failures. Testing with unusual inputs, such as empty fields, odd formats, very long text and conflicting data, finds where a prompt or workflow breaks before real use."
+    },
+    {
+      "id": "tf1215",
+      "cat": "troubleshooting",
+      "type": "tf",
+      "question": "Keeping dated copies of each prompt version, with a note of what changed, lets a team restore a version that worked if a later 'improvement' makes results worse.",
+      "answer": true,
+      "explanation": "Without versions, a change that made things worse cannot be undone with confidence. A short note on what changed and how results moved also shows which edits are worth keeping."
+    },
+    {
+      "id": "tf1216",
+      "cat": "troubleshooting",
+      "type": "tf",
+      "question": "Documents kept in a Project count less against usage limits when they are reused, although that benefit lapses after a period of inactivity.",
+      "answer": true,
+      "explanation": "Anthropic's usage guidance says that cached content counts less when it is reused and that the cache expires after inactivity. That is a reason to keep recurring documents in a Project and to ask related questions together."
     }
   ],
   "lessons": [
@@ -4298,6 +5587,246 @@
       ],
       "scenario": "An operations team uses Claude for three jobs. Each night it tags 800 expense lines by category on a small, fast model at low effort, checked by sampling. Each Monday it writes a candidate update from the same rubric and job descriptions, which live in a Project so nobody re-pastes them. Once a quarter an analyst compares four vendors using public information and internal documents from a connected drive, so she turns on research mode with web search enabled and accepts the wait. When a long vendor chat gets cluttered, she asks for a handoff summary, corrects it and starts fresh.",
       "onTheJob": "Keep a one-page decision guide for your team: task type, feature, model tier, effort. Revisit it when a new model ships, because the lineup and settings change. Watch usage: if limits run out early, look for routine tasks running at heavy settings. Check what your plan and administrators allow before promising a stakeholder a workflow that depends on research or retrieval. When a result disappoints, ask whether the cause is the model or the prompt; improving the request is usually cheaper than moving up a tier."
+    },
+    {
+      "id": "workflow-design-integrate-communicate",
+      "title": "Designing, Integrating and Explaining Claude-Assisted Workflows",
+      "summary": "How to use Claude to analyze requirements and use cases, support research, planning and process improvement, prototype and iterate on solutions, fit Claude into an existing workflow by augmenting or redesigning it, and explain its value and limits to stakeholders (Domain 4).",
+      "diagram": null,
+      "vocabIds": [
+        "f1001",
+        "f1006",
+        "f1009",
+        "f1015",
+        "f1017",
+        "f1023",
+        "f1026",
+        "f1027",
+        "f1032"
+      ],
+      "quizIds": [
+        "q1001",
+        "q1003",
+        "q1006",
+        "q1010",
+        "q1015",
+        "q1019"
+      ],
+      "reading": "A workflow is a repeatable chain of steps that turns an input into a result: interview notes into a requirements list, customer emails into replies, figures into a report. Start with analysis. When sales asks for 'better lead tracking', paste in your interview notes and have Claude list each requirement with its source, flag conflicts and assumptions, and rewrite vague words such as 'fast' as measurable proposals. The people who own the need still confirm the result. Then judge use-case fit: work that recurs often, is text-heavy, can be checked quickly and costs little if wrong makes a strong first pilot, while decisions about individuals, exact payroll figures and restricted data do not.\n\nClaude can also support research, planning and process improvement, but it knows only what you tell it. For research, state the decision the findings feed and the sources allowed, ask for findings in a table by source and date, then open the sources yourself. Describe how a process really runs, with steps, owners and timings, and ask for a process map and the likely bottleneck, the step where work queues up. Speeding up any other step does not raise output, and Claude's candidate comes from your description, so confirm it with timing data. For plans, give the goal, deadline, team capacity and constraints and ask for a work breakdown structure and a risk register, and run a pre-mortem: assume the launch failed and list why. Compare options in a decision matrix whose weights your stakeholders set.\n\nFor solution design, build something small and let people react. Ask Claude for a working prototype as an artifact, such as a shift-coverage calculator, let three colleagues try it and revise where they stumble. Each round is a feedback loop. Anything that must connect to company systems, handle sensitive records or run at scale is a technical implementation: describe the problem, the data and your prototype, and escalate it to Claude Developers or Architects.\n\nTo integrate Claude, choose an integration point, one step with a defined input, output and receiver. Anthropic's AI Fluency framework names three modes: automation, where Claude carries out a task you define; augmentation, where you and Claude work as thinking partners and you decide; and agency, where Claude is set up in advance to act for you and needs the clearest limits. Most Associate work follows the draft-review-approve pattern: Claude drafts a reply from the ticket and approved answers, the agent edits it, and only then is it sent. If a step exists only because of an old limit, such as retyping handwritten notes, redesign the workflow rather than bolting Claude on. Record a short standard operating procedure: inputs, instructions, reviewer, destination and failure handling.\n\nStakeholders will ask whether it works, so bring evidence. Record a baseline first, such as minutes per report and corrections needed, run a pilot with a small group and compare. A value case states the measured gain, the cost, the known limits and the review that stays with people. Set expectations early: Claude can state inaccurate specifics and knows only what you tell it. Widen access in stages (gradual release) and plan for adoption with training, a named owner and a place to report problems.",
+      "fundamentalsLabel": "New to workflow design? See the everyday analogy",
+      "fundamentals": "Think of a busy restaurant kitchen that hires a fast, tireless prep cook who has never seen your menu. You would not hand over the whole dinner service on day one. You would decide which station suits the newcomer, write down the recipe, taste each dish before it leaves the pass, try them on one quiet shift and compare the numbers with the week before. Adding Claude to a team process works the same way: pick the step, give clear instructions, keep a person checking the result, pilot it small and measure against what you had.",
+      "keyTerms": [
+        "Requirements analysis",
+        "Use-case fit",
+        "Bottleneck",
+        "Prototype",
+        "Augmentation, automation and agency",
+        "Draft-review-approve",
+        "Baseline measurement",
+        "Value case",
+        "Escalation to specialists"
+      ],
+      "commonTraps": [
+        "Claude's lists of requirements, bottlenecks and risks are hypotheses built from what you told it, so stakeholders and real data must confirm them.",
+        "Speeding up a step that is not the bottleneck changes little, and changing several things at once makes it impossible to tell what helped.",
+        "Dropping the review stage after a good first week turns assistance into unchecked automation; relax controls in stages and never where errors are costly.",
+        "Connections to company systems, authentication, sensitive records or scale are for Claude Developers and Architects, who need your clear problem statement rather than a finished build.",
+        "A value case resting on Claude's own time estimate, one impressive example or login counts is weaker than measured results against a baseline recorded before the pilot."
+      ],
+      "scenario": "An operations analyst at a regional retail chain spends two days each month turning store managers' emails into a performance summary for executives. She asks Claude to turn a sample of the emails into a table of each store's issue, the evidence given and the owner, flagging gaps. She maps the current process, notices that chasing late emails takes longer than the writing, and has Claude draft a reminder template. After a four-week pilot in two regions she shows the executives the time per summary and the corrections needed before and after, plus two errors that review caught and how they were fixed.",
+      "onTheJob": "Start small and keep score. Pick one step, write down today's numbers before you change anything, and keep a short log of what you changed and what happened. Ask Claude for hypotheses, then go and check them with the people who do the work. When you present, lead with measured results and say plainly where Claude needed correcting and which reviews stay with people; that candor keeps a sponsor's trust after the first visible mistake. When a request involves company systems, credentials or customer records at scale, stop prototyping and hand specialists a one-page problem statement with your evidence."
+    },
+    {
+      "id": "knowledge-projects-instructions-connectors",
+      "title": "Configuring Projects, Instructions and Connected Knowledge",
+      "summary": "How to configure Projects with instructions and knowledge sources, write effective standing instructions, manage uploaded files and connectors such as Google Drive and Gmail, and keep configurations current, tested and trusted (Domain 5).",
+      "diagram": null,
+      "vocabIds": [
+        "f1033",
+        "f1034",
+        "f1035",
+        "f1039",
+        "f1041",
+        "f1043",
+        "f1047",
+        "f1051",
+        "f1060"
+      ],
+      "quizIds": [
+        "q1102",
+        "q1104",
+        "q1106",
+        "q1107",
+        "q1112",
+        "q1115"
+      ],
+      "reading": "Claude offers several places to store what it should know and how it should behave. Account-wide instructions (Settings, 'Instructions for Claude') apply to every conversation, so keep them for preferences true everywhere, such as defining acronyms. A Project is a workspace with its own chats, instructions and knowledge: project instructions apply to every chat in that Project and nowhere else, and project knowledge is the files and text Claude can draw on in each of those chats. A skill is a procedure Claude loads on demand. Two traps: Claude cannot see a Project's name or description, so a rule typed there is ignored, and one chat's context is not shared with the others unless it goes into the instructions or knowledge.\n\nKeep behavior and reference material apart: instructions say how to act, while knowledge says what is true and can be replaced without touching the rules. A support team's instructions might read: 'You draft replies for non-technical retail customers. Keep them under 150 words and quote the relevant section of the refund policy file. If the policy does not cover the question, say so and suggest asking a team lead.' The last sentence is a fallback instruction: it stops Claude guessing when the knowledge is silent. Keep rules consistent, say what to do as well as what to avoid, explain why, skip the shouting, and never put passwords or API keys in instructions.\n\nClaude cannot tell that a file is outdated, so if last year's and this year's leave policy both sit in the Project, it may quote either. Keep a single source of truth: one approved version of each document, replaced when it changes, with a descriptive name such as 'Leave policy 2026-07'. On paid plans, when stored knowledge nears the context limit, retrieval switches on automatically and an indicator appears: Claude searches for the relevant passages instead of holding everything in view, and clear file names and naming the document in your question help it. A Google Doc added from Drive stays synced with the live file; an uploaded file is a static copy.\n\nA connector links Claude to a service such as Google Drive or Gmail. Claude inherits the signed-in person's permissions, so it cannot open a folder you cannot open; if it cannot find a file, check your own access first. On Team and Enterprise plans an Owner enables a connector for the organization, which makes it available but grants nobody access: each person normally signs in with their own account. Owners can set actions to run freely, need approval or be blocked, which only narrows what the service allows; read what Claude proposes before approving a send or share. Custom connectors are not verified by Anthropic, so add connectors, skills and plugins only from sources you trust, since a bad one can expose data.\n\nName an owner for each shared Project or skill, give Can edit only to maintainers and Can view to everyone else, and keep a change log of what changed, who changed it, when and why. Before editing instructions, keep a regression test set, a handful of representative and tricky requests with notes on good answers, and run it before and after, changing one thing at a time. Tell users what changed, and review on a schedule, retiring stale files and unneeded connectors and shares.",
+      "fundamentalsLabel": "New to Projects and connectors? See the everyday analogy",
+      "fundamentals": "Imagine hiring a temp for a department. The briefing you give on day one ('our customers are retailers, keep replies short, pass refund disputes to a team lead') is the instructions. The binder of policies on the desk is the knowledge. The temp's building badge decides which rooms they can enter, which is how a connector works: it opens only the doors the signed-in person is allowed through. If the binder holds last year's policy next to this year's, the temp may follow either, so someone has to keep the binder current and tell the temp what changed.",
+      "keyTerms": [
+        "Project instructions",
+        "Project knowledge",
+        "Account-wide instructions",
+        "Fallback instruction",
+        "Single source of truth",
+        "Retrieval (RAG)",
+        "Permission inheritance",
+        "Skill",
+        "Regression test set"
+      ],
+      "commonTraps": [
+        "A Project's name and description are not visible to Claude, so standing rules written there are never applied; they belong in the project instructions.",
+        "Account-wide instructions apply to every conversation, so client- or task-specific rules placed there leak into unrelated work.",
+        "Enabling a connector for the organization grants no one access, and no setting can give Claude more than the signed-in person can already open.",
+        "Leaving old and new versions of a document in a Project invites Claude to quote either; an instruction to prefer the newest does not replace removing the stale copy.",
+        "Changing several rules at once, with no test requests and no log, makes it impossible to tell which change caused a problem."
+      ],
+      "scenario": "A training manager sets up a Project for her team of eight to draft answers to client questions about the company's services. She uploads the current service guide and pricing sheet as knowledge, and writes instructions that name the readers, set a 150-word limit, require a quote from the service guide, and tell Claude to say so and route the question to her when the guide is silent. She gives two colleagues Can edit and everyone else Can view. When prices change in the spring, she replaces the pricing file instead of adding a second copy, reruns ten saved test questions, notes the change in a log and posts a two-line update to the team.",
+      "onTheJob": "Treat a shared Project like a small product with an owner. Keep a page that states the Project's purpose, a list of the files with their dates, and about ten test questions, including two that the knowledge cannot answer. When behavior shifts, check the log first. Try changes in a private test Project where you can. Before connecting a new service or installing a skill, ask who published it, what it can reach and whether the Owner has approved it, and remove access when the task ends. If a rule keeps being ignored, it is usually in the wrong place, vague, or contradicted by another rule."
+    },
+    {
+      "id": "governance-data-privacy-regulated",
+      "title": "Protecting Sensitive Data: Privacy, Regulation and Approved Tools",
+      "summary": "How to decide what may go into Claude and in what form: data classification, personal and regulated information, approved tools and accounts, minimization and masking, privacy terms and agreements, and what to do when something goes wrong. Covers Domain 6, applying data sensitivity, regulatory and privacy considerations.",
+      "diagram": null,
+      "vocabIds": [
+        "f1071",
+        "f1072",
+        "f1073",
+        "f1076",
+        "f1077",
+        "f1078",
+        "f1079",
+        "f1080",
+        "f1082"
+      ],
+      "quizIds": [
+        "q1207",
+        "q1208",
+        "q1209",
+        "q1210",
+        "q1213",
+        "msq1202"
+      ],
+      "reading": "Claude only sees what you give it, and what happens to that data depends on the account, the plan, the settings and your employer's rules. So ask first: what kind of data is this? Organizations sort information into tiers, called data classification: public, internal, confidential and restricted. A press release is public; unreleased financials, client contracts and source code are confidential. Some data needs extra care: personally identifiable information (PII), such as a name with an ID or account number; protected health information (PHI), health data tied to a person and regulated in the United States under HIPAA; and credentials such as passwords and API keys, which never belong in a prompt, Project instructions or a knowledge file.\n\nNext ask: which tool and which account? An approved tool list names the tools and plans vetted for work data. Using a personal account for work, called shadow AI, is a problem even with good intentions: nobody has vetted its terms. On individual plans (Free, Pro and Max) a model-improvement setting controls whether chats may be used to improve Claude, and incognito chats are excluded. On Team, Enterprise and the API, inputs and outputs are not used for training by default. None of this decides what you may share: a vendor's training promise is not permission under your own rules or a client contract, and incognito does not switch your policy off.\n\nThen shrink the exposure. Data minimization means sending only what the task needs: to find which departments log the most overtime, send only department and weekly hours and leave names and ID numbers behind. Redaction blacks out details in a document, but identifiers can survive in file names, headers, comments and tracked changes, so check them. Pseudonymization swaps identifiers for consistent codes (E-017 instead of a name) so rows still match while the key is kept elsewhere; because the key allows re-identification, the data may still count as personal data. Anonymization is stricter: nobody can be identified even by combining the data with other facts, which fails when rare titles, dates or places remain.\n\nRegulation and contracts add rules. The EU's GDPR requires a lawful basis, data minimization and respect for individuals' rights. HIPAA requires a business associate agreement (BAA) and a covered setup before a vendor handles PHI; Anthropic offers a BAA for HIPAA-ready commercial services, not for individual plans. A data processing addendum (DPA) governs how a vendor handles personal data for you and is part of Anthropic's commercial terms. Certifications such as SOC 2 Type II, ISO 27001 and ISO/IEC 42001 are useful evidence in a vendor risk assessment but do not make your own use lawful. Your privacy or legal team decides.\n\nPlan for mistakes. Deleting a chat clears it from your history at once, but back-end deletion follows later, so it does not undo a disclosure: report it promptly through your escalation path. Connectors work through your own permissions, and a chat share link shows the whole conversation, so read it before sharing. Files and web pages from unknown sources can hide instructions meant to hijack Claude (prompt injection): keep sensitive connections out of such chats and stop Claude if it does something you did not ask for.",
+      "fundamentalsLabel": "New to data protection? See the everyday analogy",
+      "fundamentals": "Think of Claude as a capable contractor you invite into a room. You would not hand over the whole filing cabinet; you would bring only the folders the job needs, with names covered if they are not needed, and you would use the contractor your company has already vetted, not one a friend recommended. If a folder went in by mistake, you would tell your manager the same day instead of hoping nobody noticed.",
+      "keyTerms": [
+        "Data classification",
+        "Personally identifiable information (PII)",
+        "Protected health information (PHI)",
+        "Data minimization",
+        "Redaction",
+        "Pseudonymization",
+        "Approved tool list",
+        "Shadow AI",
+        "Business Associate Agreement (BAA)"
+      ],
+      "commonTraps": [
+        "A vendor's promise not to train on your data is not permission to share it; company rules and client contracts still decide what may be pasted.",
+        "Removing names is not anonymization: coded data with a key is only pseudonymized, and rare titles, dates and places can still identify people.",
+        "Incognito chats and the model-improvement setting change how Claude stores or uses a chat, not what your employer allows you to share.",
+        "Telling Claude to ignore or forget data does not undo sharing it; minimize before sending and report mistakes.",
+        "Certifications such as SOC 2 or ISO support a vendor review but do not make your own use of a tool lawful."
+      ],
+      "scenario": "A people-analytics coordinator is asked which departments log the most overtime. The payroll export has names, home addresses, national ID numbers, department and weekly hours. She checks the AI policy, which restricts personal data in AI tools, opens the company's approved Claude workspace and keeps only the department and hours columns. Before uploading she checks the file name and the spreadsheet's other tabs for stray identifiers, and afterwards she notes in the team log what she used and who reviewed the result.",
+      "onTheJob": "Build the habit of asking three questions before every upload: what is this data, is this the approved place for it, and what is the least I can send? Keep a short list of safe patterns, such as department-level summaries or coded IDs, so colleagues do not reinvent them. Never fix a privacy slip quietly: a same-day report to the privacy or security team is almost always the cheapest outcome. When your policy is silent, ask its owner instead of guessing."
+    },
+    {
+      "id": "governance-use-cases-policy-ethics",
+      "title": "Appropriate Use, Company Policy and Responsible Practice",
+      "summary": "How to judge whether a use of Claude is appropriate, what Anthropic's Usage Policy and an organization's AI policy require, and how bias, transparency, accountability and human oversight apply to everyday work. Covers Domain 6: appropriate and inappropriate use cases, organizational AI policies and governance standards, and the ethical implications of AI use.",
+      "diagram": null,
+      "vocabIds": [
+        "f1063",
+        "f1064",
+        "f1065",
+        "f1067",
+        "f1068",
+        "f1069",
+        "f1092",
+        "f1093",
+        "f1101"
+      ],
+      "quizIds": [
+        "q1201",
+        "q1203",
+        "q1216",
+        "q1218",
+        "q1221",
+        "msq1201"
+      ],
+      "reading": "Not every use of Claude carries the same risk, and the first skill is sorting them. An assistive use supports your own work, such as drafting, summarizing, brainstorming or analyzing while a person reads the result, and an imperfect output does little harm. A high-risk use feeds advice or decisions that can significantly affect someone's rights, health, money or opportunities. Anthropic's Usage Policy names areas such as legal, medical, finance, credit, insurance, housing, employment, education and public benefits. For these it asks that a qualified person meaningfully review the recommendation, with authority to change it, and that the affected person be clearly told that AI was used. Risk grows as output moves from informing a person to deciding about one.\n\n'Meaningful' is the key word. A reviewer with ten seconds, who sees only the AI's summary and cannot overrule it, is a rubber stamp, and automation bias, the habit of trusting a machine's answer, does the rest. Real review needs time, the source documents and authority. The same logic gives the professional-advice boundary: Claude can explain a clause or prepare your questions, but a lawyer, doctor or accountant gives the advice you act on. Some uses are simply out of bounds. The Usage Policy prohibits deceptive content such as fake reviews, invented testimonials, undisclosed fake personas and bots that claim to be human, along with discrimination on protected attributes. Consumer-facing chatbots must say they are AI, and people who deploy agents answer for what those agents do.\n\nEthics shows up in ordinary choices. Bias can enter through criteria that look neutral: a shortlist rule favoring 'recent graduates' can screen out older candidates without ever mentioning age, a pattern called disparate impact. The remedy is to compare outcomes by group, involve HR or legal and keep a person accountable, not to ask Claude to be fair. Transparency means telling clients, customers and applicants where AI helped when contracts, policy or law expect it. A watermark can signal that Claude produced text, but editing can remove it, so a missing mark never proves that a person wrote it. Accountability stays with you; Anthropic's AI Fluency framework calls it Diligence: take responsibility for what you do with AI, be open about its role and verify before you share.\n\nYour organization's AI acceptable use policy turns these principles into rules: approved tools and accounts, which data is allowed where, which tasks need review or disclosure, and whom to ask. Anthropic's Usage Policy is the outer limit. Your employer may be stricter, and then the stricter rule applies to you. When the policy is silent, ask its owner; silence is not permission. A new plugin or connector gets a vendor risk assessment before real data touches it. Apply least privilege to Project sharing and connectors, keep an audit trail (tool, date, purpose, reviewer, edits) where work is regulated, and use the escalation path quickly when output looks wrong, data went somewhere it should not, or a rule is unclear.",
+      "fundamentalsLabel": "New to responsible AI use? See the everyday analogy",
+      "fundamentals": "Consider how a hospital treats a new assistant. Taking notes and preparing a draft summary is fine; deciding who receives treatment is not, and every decision that affects a patient is checked by a licensed clinician who can overrule the assistant and who tells the patient what happened. The hospital also has rules about which systems may hold patient files and a person to call when something looks wrong. Responsible use of Claude follows the same pattern: help freely with the preparing, keep qualified people in charge of the deciding, tell people when it matters, and know whom to ask.",
+      "keyTerms": [
+        "Assistive use case",
+        "High-risk use case",
+        "Meaningful human review",
+        "Automation bias",
+        "AI disclosure",
+        "Deceptive content",
+        "Anthropic Usage Policy",
+        "AI acceptable use policy",
+        "Escalation path"
+      ],
+      "commonTraps": [
+        "Seeing a person click 'approve' is not meaningful review; the reviewer needs time, information and the authority to change the result.",
+        "A neutral-sounding criterion can still discriminate through proxies, so removing one field or asking Claude to be unbiased does not settle bias.",
+        "A use that Anthropic's Usage Policy allows may still be forbidden by your employer, and silence in your policy is not permission.",
+        "A friendly persona is fine, but a consumer-facing chatbot that claims to be human, or reviews written by no customer, is deceptive.",
+        "A missing AI watermark does not show that a person wrote the text."
+      ],
+      "scenario": "A hiring manager wants Claude to rank 400 applications and send automatic rejections to the bottom half. The HR lead explains that employment is a high-risk area, so Claude is used only to summarize each application against the posted requirements. Recruiters read the summaries and the originals and make every decision themselves, and the application form tells candidates that AI supports screening. After the first round the team compares the shortlist by age group and gender, finds a gap, rewrites one criterion and logs the change.",
+      "onTheJob": "Treat the policy as a starting point, not a hurdle. Learn where your organization's AI policy lives and who owns it before you need it. When you design a workflow, mark each step as assistive or decision-making, and give the second kind a named reviewer with the authority to overrule. Keep a one-line log of what AI contributed. If something might harm a person, or is something you would not want to explain to a customer or regulator, escalate before you proceed."
+    },
+    {
+      "id": "troubleshooting-diagnose-iterate-optimize",
+      "title": "Fixing Weak Outputs and Optimizing Your Workflow",
+      "summary": "A method for diagnosing why Claude's output falls short, changing one thing at a time, knowing when to switch approach or escalate, and tuning a workflow for speed, cost and quality. Covers Domain 7: diagnosing and resolving underperforming prompts and poor outputs, adjusting approach from feedback and results, and optimizing workflows.",
+      "diagram": null,
+      "vocabIds": [
+        "f1102",
+        "f1103",
+        "f1106",
+        "f1108",
+        "f1109",
+        "f1117",
+        "f1121",
+        "f1123",
+        "f1125"
+      ],
+      "quizIds": [
+        "q1227",
+        "q1228",
+        "q1230",
+        "q1233",
+        "q1234",
+        "q1239"
+      ],
+      "reading": "When an output disappoints, resist rewording at random. Work backwards: name the symptom, guess the likeliest cause, change one thing, retest. A generic answer means missing context: the audience, the purpose, the quality bar and an example of the voice you want. The wrong shape means the format was never specified, so describe the layout positively and show a sample. A rule that gets skipped is often buried in a long prompt, phrased only as a prohibition, or in conflict with another rule, such as 'keep every answer to two sentences' beside 'explain your reasoning in full'. Different results on each run usually mean the request leaves terms and layout open: define the labels, fix the layout and add examples.\n\nSome problems are not about wording. If Claude lacks the facts, such as your company's headcount or news after its training cutoff, no rewording helps: attach or connect the material, or use search, and have Claude answer only from it. In a long chat early rules drift out of focus, so restate them, or start a fresh chat from a short checked summary and move standing rules into Project instructions. A reply cut off midway can be continued by giving Claude the original request and the part so far. Product messages have their own remedies: 'Your message will exceed the length limit' means split the document or select the relevant parts, a capacity message means wait a few minutes and retry, and a reconnect prompt on a connector means sign in again and check your access. If Claude declines a request it misread, state your legitimate purpose and audience; if the request conflicts with policy, respect the limit and ask for a legitimate alternative.\n\nIterate with evidence. Keep a small test set of real examples, including messy ones with empty fields and odd formats. Change one element, rerun the same examples and compare against the same criteria; change six at once and you will not know what worked. To compare two prompts, give both the same inputs. Keep dated versions with a note on what changed, so a 'fix' that made things worse can be undone, and save the winning prompt as a template, Project instruction or skill right away. Watch for diminishing returns: when several rounds barely move the result, the obstacle lies elsewhere. Change approach: search for current facts, a Project for recurring context, a smaller step or a person; hand technical work, such as exact matching across thousands of rows, to a developer.\n\nOptimizing a workflow means effectiveness as well as speed. Measure cycle time (the whole loop, including review) and rework rate against a baseline from before Claude: a draft that is rewritten half the time saves little. Find the bottleneck; if drafting takes five minutes and approval takes three days, faster drafting changes little. Feed reviewers' corrections back into the instructions so the same fix is not made by hand every week. To stretch your usage, batch related questions in one message, refer back to earlier material instead of repeating it, keep recurring documents in a Project (reused content counts less while it is fresh) and match the model and effort to the task. Keep human checkpoints where mistakes would be costly or hard to undo; removing them for speed is over-automation.",
+      "fundamentalsLabel": "New to troubleshooting AI output? See the everyday analogy",
+      "fundamentals": "Imagine a recipe that keeps coming out wrong. A good cook does not throw in random new ingredients. They notice the symptom (too dry), think of the likeliest cause (oven too hot), change one thing and taste again, then write the winning version on a card. If the dish needs an ingredient the kitchen does not have, no amount of stirring helps, and if it needs a pastry chef's skill, they call one. Fixing Claude's output works the same way.",
+      "keyTerms": [
+        "Prompt diagnosis",
+        "Generic output",
+        "Conflicting instructions",
+        "Knowledge gap",
+        "Instruction drift",
+        "Prompt A/B comparison",
+        "Diminishing returns",
+        "Approach switch",
+        "Rework rate"
+      ],
+      "commonTraps": [
+        "Rewording cannot supply facts Claude does not have; a knowledge gap needs the material, not a cleverer prompt.",
+        "Changing many things at once, or asking Claude which edit helped, hides the cause; change one thing and rerun the same test examples.",
+        "Retrying an oversized message, or rewriting a prompt after a capacity message, treats the wrong problem; match the fix to the message.",
+        "A faster first draft is not a better workflow if reviewers rewrite most of it; measure cycle time and rework rate against a baseline.",
+        "A declined request that truly conflicts with policy is a limit, not a puzzle; disguising it is never troubleshooting."
+      ],
+      "scenario": "A support team's saved prompt drafts replies to customers. Agents report that the drafts sound cold with upset customers and that the layout differs from agent to agent. The team collects ten real examples, adds a short sample reply for upset customers and a fixed three-part layout, and reruns the same ten examples to compare the results. The warmer drafts now need fewer edits. Billing replies are accepted unchanged most of the time, while technical replies still miss details, so the team adds the product guides to its Project and routes technical drafts to a specialist.",
+      "onTheJob": "Keep a troubleshooting log: symptom, suspected cause, change made, result. After a few weeks it becomes your own playbook. Set a limit on iterations, say three or four rounds, and when you reach it change approach or ask for help instead of polishing wording. Save every prompt that works, with a sample of good output, where teammates can find it. And measure what matters: if the review step is where the time goes, fix that step."
     }
   ],
   "cheatSheet": [
@@ -4354,6 +5883,78 @@
         "The context window is working memory counted in tokens; more is not better (context rot). Paid plans with code execution on summarize long chats automatically; restart with a corrected handoff summary when a thread drifts.",
         "Keep stable material in a Project, where retrieval brings in relevant parts when knowledge is large. Chat memory saves editable topics (Settings > Memory) and each Project has its own; switch memory off before the first message of a sensitive or unrelated chat, and edit or delete a topic rather than reset everything.",
         "Plan and administrator settings decide what you have (research needs a paid plan and web search on), so check before designing a workflow around a feature."
+      ]
+    },
+    {
+      "heading": "Workflow integration and solution design (Domain 4)",
+      "points": [
+        "Analyze before you build: give Claude interview notes and ask for requirements with sources, conflicts and assumptions, plus an ambiguity check that turns words like 'fast' into measurable targets. Stakeholders confirm; Claude only drafts.",
+        "Use-case fit: frequent, text-heavy, easy-to-check, low-consequence work with data you may share is a strong first pilot. Decisions about individuals, exact payroll or legal figures and restricted data are poor fits. Rank ideas by impact versus effort, using criteria the team sets.",
+        "Process work: map the real steps (owner, input, output), find the bottleneck, confirm it with timing data, change one thing at a time and compare with the baseline. Speeding up a step that is not the bottleneck changes little.",
+        "Planning aids Claude can draft from facts you supply: work breakdown structure, risk register, pre-mortem (assume failure, list the causes), assumption log, gap analysis (needs both today's state and the target state) and decision matrix (people set the weights).",
+        "Prototype in an artifact, let users try it and iterate on their feedback. Anything needing company-system integration, authentication, sensitive records or scale is escalated to Claude Developers or Architects with a clear problem statement.",
+        "Modes (AI Fluency): automation = Claude executes a task you define; augmentation = thinking partners, the person decides; agency = configured in advance to act independently, which needs the clearest limits. Most Associate work is augmentation.",
+        "Integrate at one integration point with a defined input, output and receiver. Draft-review-approve keeps a person accountable. Redesign, not an add-on, when a step exists only because of an old limit such as retyping notes. Write an SOP: inputs, instructions or template, reviewer, destination and failure handling.",
+        "Prove and explain value: record a baseline, run a pilot, compare, then present a value case with measured gain, cost, limits and the review that stays. Avoid Claude's own estimates, one best example and activity counts. Set expectations early, release gradually and plan for adoption (training, an owner, a feedback channel)."
+      ]
+    },
+    {
+      "heading": "Projects, instructions and knowledge (Domain 5)",
+      "points": [
+        "Where things live: account-wide instructions ('Instructions for Claude' in Settings) apply to every conversation; project instructions apply to all chats in that Project only; project knowledge is reference material for every chat in that Project; skills load on demand when a request matches.",
+        "Claude cannot see a Project's name or description, so rules written there are ignored. Context from one chat is not shared with the other chats in a Project unless it is added to the knowledge or instructions.",
+        "Instructions = behavior (role and audience, tone, format, source rule, fallback). Knowledge = facts and documents. Do not paste documents into instructions or bury rules in a document; keep volatile facts such as prices in a replaceable knowledge file.",
+        "Effective instructions are specific and consistent, explain why, say what to do, name the audience, require a quote from the source and include a fallback for missing information (say so, name who to ask). Use normal wording rather than shouting, and never include passwords or API keys.",
+        "Knowledge hygiene: a single source of truth, one approved version per document, descriptive names with dates or versions, superseded files retired, and a scheduled review. Claude cannot tell that a file is outdated, and an instruction to 'prefer the newest' does not replace removing the stale copy.",
+        "Retrieval (RAG) on paid plans switches on automatically as knowledge nears the context limit, with a visual indicator, so a Project can hold far more material. Help it with descriptive names, related files kept together, and the document named in the question.",
+        "Sharing (Team and Enterprise): Can view lets members read the Project and chat in it; Can edit lets them change its instructions and knowledge. Give edit rights only to the maintainers."
+      ]
+    },
+    {
+      "heading": "Connectors, skills and keeping configurations healthy (Domain 5)",
+      "points": [
+        "Connectors link Claude to services such as Google Drive and Gmail. Claude inherits the signed-in person's permissions and cannot reach what that person cannot open; if a file is missing, check the person's own access first.",
+        "On Team and Enterprise plans an Owner enables a connector (available, but no one gets access by that step) and each person normally signs in with their own account. Owner permission levels (allow, needs approval, blocked) can only narrow access. Read each proposed action before approving it.",
+        "A Google Doc added from Drive stays synced with the live file; an uploaded file is a static copy. The Drive connector reads text only, so images inside documents are not seen. Enterprise search is a permission-aware project that searches connected tools for each person.",
+        "Skills are folders of instructions, scripts and resources loaded by progressive disclosure: name and description first, full content only when relevant, so the description decides whether a skill is used. Try several sample prompts and sharpen the description if it does not trigger. Build one when you keep re-explaining the same format. A plugin bundles skills and connectors.",
+        "Trusted-source rule: add connectors, skills and plugins only from sources you trust and need. Custom connectors are not verified by Anthropic, and untrusted skills risk prompt injection and data exfiltration, so review the contents first.",
+        "Maintain: a named configuration owner; edit rights for maintainers only; a change log (what, who, when, why); a regression test set run before and after each change, one change at a time; tell users what changed; and an access review that removes unused connectors and shares."
+      ]
+    },
+    {
+      "heading": "Appropriate use and responsible practice (Domain 6)",
+      "points": [
+        "Assistive uses (drafting, summarizing, brainstorming, analysis for your own work, with a person reading the result) are the safe place to start. Risk rises as output moves from informing a person to deciding about one.",
+        "High-risk areas include legal, medical, finance, credit, insurance, housing, employment, education and public benefits. Anthropic's Usage Policy asks for meaningful review by a qualified person who can change the result, and for affected people to be clearly told that AI was used.",
+        "Meaningful review needs time, the source documents and authority to overrule. A rubber stamp is not review, and automation bias is the habit of trusting a machine's answer.",
+        "Out of bounds under the Usage Policy: deceptive content (fake reviews, invented testimonials, undisclosed personas, bots claiming to be human), discrimination on protected attributes, and collecting sensitive data without permission. Consumer-facing chatbots must say they are AI, and users answer for agents they deploy.",
+        "Professional-advice boundary: Claude explains and prepares; a licensed professional advises and carries the responsibility.",
+        "Bias and disparate impact: neutral-looking criteria can act as proxies. Compare outcomes by group, involve HR or legal and keep a person accountable; asking Claude to be fair is not a control.",
+        "Transparency and accountability (AI Fluency: Diligence): be open about AI's role where policy, contracts or law expect it, verify before you share, and own what you send. A watermark is a signal, and a missing mark never proves human authorship."
+      ]
+    },
+    {
+      "heading": "Data sensitivity, privacy and company policy (Domain 6)",
+      "points": [
+        "Three questions before any upload: what is the data (public, internal, confidential or restricted; PII, PHI, credentials), is this the approved tool and account, and what is the least I can send?",
+        "Minimize first, then redact or pseudonymize. Check the file name, headers, comments, tracked changes and properties. Coded data with a key is only pseudonymized and may still be personal data; anonymized data cannot be traced back even when combined with other facts.",
+        "Credentials never go into prompts, Project instructions, knowledge files or skills.",
+        "Individual plans (Free, Pro, Max) have a model-improvement setting; on Team, Enterprise and the API, inputs and outputs are not used for training by default. Incognito chats are excluded from improvement. None of this replaces company rules, and a personal account used for work is shadow AI.",
+        "Agreements and standards: a DPA covers processing of personal data; a BAA covers PHI (HIPAA-ready commercial services only, not individual plans); GDPR governs EU personal data and the privacy team decides. SOC 2 Type II, ISO 27001 and ISO/IEC 42001 support a vendor risk assessment but do not make your use lawful.",
+        "The AI acceptable use policy (approved tools, data, review, disclosure) can be stricter than the Usage Policy, and silence is not permission: ask its owner. Vendor risk assessment before new plugins or connectors; least privilege for sharing and connectors; audit trail for regulated work.",
+        "When it goes wrong: deleting a chat clears your history at once but back-end deletion lags, so report promptly through the escalation path. Untrusted files and pages can hide instructions (prompt injection), so stop unexpected actions. Read a chat's whole conversation before sharing its link."
+      ]
+    },
+    {
+      "heading": "Troubleshooting and optimization (Domain 7)",
+      "points": [
+        "Diagnose before changing: name the symptom, find the likeliest cause, change one thing, retest on the same examples.",
+        "Symptom to cause: generic means missing context; wrong shape means no format shown; a skipped rule is buried, negative or conflicting; varying results mean undefined terms and an open layout; invented facts mean a knowledge gap; early rules fading in a long chat is drift; too brief means undefined depth.",
+        "Fixes: supply the material and answer only from it; show the layout and examples; settle conflicts with a priority; restart from a short checked summary and keep standing rules in Project instructions; define the depth wanted; continue a cut-off reply by giving the original request and the part so far.",
+        "Not always the prompt: a length-limit notice means split the file or select parts; a capacity message means wait and retry, and check the status page if it persists; a reconnect prompt means sign in again and check access. A misread refusal needs the purpose stated; a real policy conflict is a limit, never to be disguised.",
+        "Iterate with evidence: a test set with messy cases, the same inputs for A/B comparisons, dated prompt versions, and winners saved as templates, Project instructions or skills. Diminishing returns means change approach (another feature or source, a smaller step, a person) or escalate technical work.",
+        "Optimize the whole loop: compare cycle time and rework rate with a baseline, fix the bottleneck, feed reviewer corrections back into the instructions, batch related questions, refer back instead of repeating, keep recurring documents in a Project (reused content counts less while fresh), and match model and effort to the task.",
+        "Keep human checkpoints where errors are costly or hard to reverse; removing them for speed is over-automation."
       ]
     },
     {
@@ -4589,6 +6190,216 @@
         }
       ],
       "explanation": "Haiku is the fastest and cheapest tier, Sonnet balances speed and intelligence, and Opus is for demanding work. A handoff summary carries the decisions and open questions into a clean new chat."
+    },
+    {
+      "id": "ml-ccao-101",
+      "cat": "workflow",
+      "scenario": "Before a team pilots Claude on its weekly client report, the coordinator records how long the report takes and how many corrections it needs; this is a {b1}. In the new workflow Claude writes the first version, an account manager checks and edits it, and only then is it sent, a pattern called {b2}. After the pilot she presents the measured gain, the cost, the known limits and the review that stays with people, which together form the {b3}.",
+      "blanks": [
+        {
+          "key": "b1",
+          "options": [
+            "regression test set",
+            "baseline measurement",
+            "risk register"
+          ],
+          "correct": 1
+        },
+        {
+          "key": "b2",
+          "options": [
+            "draft-review-approve",
+            "gradual release",
+            "impact-effort prioritization"
+          ],
+          "correct": 0
+        },
+        {
+          "key": "b3",
+          "options": [
+            "assumption log",
+            "decision matrix",
+            "value case"
+          ],
+          "correct": 2
+        }
+      ],
+      "explanation": "Recording how long the work takes and how many corrections it needs before Claude is involved gives a baseline measurement, the only fair yardstick for the pilot. Claude drafts, a responsible person reviews, and only then is the work released: the draft-review-approve pattern, whereas gradual release means widening Claude's scope in stages. The measured gain, cost, limits and remaining review form a value case; a decision matrix scores options and an assumption log tracks unproven beliefs."
+    },
+    {
+      "id": "ml-ccao-102",
+      "cat": "knowledge",
+      "scenario": "For one team's reply-drafting Project, the audience, the tone and what to do when the answer is missing are standing rules, so they go in {b1}. The current refund policy is reference material, so it goes in {b2}. A preference that should hold in every conversation a person has, such as spelling out acronyms on first use, belongs in {b3}.",
+      "blanks": [
+        {
+          "key": "b1",
+          "options": [
+            "the project description",
+            "project instructions",
+            "project knowledge"
+          ],
+          "correct": 1
+        },
+        {
+          "key": "b2",
+          "options": [
+            "project instructions",
+            "account-wide instructions",
+            "project knowledge"
+          ],
+          "correct": 2
+        },
+        {
+          "key": "b3",
+          "options": [
+            "account-wide instructions",
+            "project knowledge",
+            "a skill"
+          ],
+          "correct": 0
+        }
+      ],
+      "explanation": "Standing rules about audience, tone and fallback behavior belong in the project instructions; Claude cannot see a Project's description. Reference documents such as a policy belong in project knowledge, where they can be replaced without touching the rules. A preference that is true in every conversation is what account-wide instructions are for, while a skill loads only when a request matches it."
+    },
+    {
+      "id": "ml-ccao-103",
+      "cat": "knowledge",
+      "scenario": "When the leave policy changes, the Project owner replaces the old file instead of adding a second copy, so that the Project keeps a {b1}. The new file is named 'Leave policy 2026-07', a {b2} that helps both people and retrieval pick the right document. Before editing the instructions, she runs a {b3}, a fixed set of representative requests, so that she can see whether answers got worse.",
+      "blanks": [
+        {
+          "key": "b1",
+          "options": [
+            "single source of truth",
+            "separate copy for each team",
+            "backup of every earlier version"
+          ],
+          "correct": 0
+        },
+        {
+          "key": "b2",
+          "options": [
+            "fallback instruction",
+            "descriptive file name",
+            "skill description"
+          ],
+          "correct": 1
+        },
+        {
+          "key": "b3",
+          "options": [
+            "pre-mortem",
+            "gap analysis",
+            "regression test set"
+          ],
+          "correct": 2
+        }
+      ],
+      "explanation": "Replacing the old file rather than adding a copy leaves one approved version, a single source of truth. A name that states the content and date is a descriptive file name. A fixed set of requests rerun before and after a change is a regression test set; a pre-mortem and a gap analysis are planning tools for other jobs."
+    },
+    {
+      "id": "ml-ccao-201",
+      "cat": "governance",
+      "scenario": "A project manager wants Claude to find which departments log the most overtime from an export that also holds names and ID numbers. Sending only the columns the task needs is called {b1}. If she swapped the names for consistent codes and stored the key in a separate protected file, the data would be {b2}, which can still count as personal data. Before choosing any tool she should check the company's {b3} to see which AI tools are cleared for work data.",
+      "blanks": [
+        {
+          "key": "b1",
+          "options": [
+            "data classification",
+            "data minimization",
+            "pseudonymization"
+          ],
+          "correct": 1
+        },
+        {
+          "key": "b2",
+          "options": [
+            "pseudonymized",
+            "anonymized",
+            "declassified"
+          ],
+          "correct": 0
+        },
+        {
+          "key": "b3",
+          "options": [
+            "audit trail",
+            "model release notes",
+            "approved tool list"
+          ],
+          "correct": 2
+        }
+      ],
+      "explanation": "Giving Claude only what the task needs is data minimization; classification is the sorting of data into tiers, and pseudonymization is the swapping of identifiers for codes. Coded data whose key still exists is pseudonymized, not anonymized, so re-identification remains possible and it may still be personal data. The approved tool list shows which tools and plans are cleared for work data; an audit trail records how AI was used and release notes describe model changes."
+    },
+    {
+      "id": "ml-ccao-202",
+      "cat": "governance",
+      "scenario": "An insurer proposes letting Claude recommend which claims to pay. Because the output would feed a decision about a person's money, this is a {b1} use case, so a qualified person must {b2} each recommendation with the authority to change it, and the affected customer must be {b3}.",
+      "blanks": [
+        {
+          "key": "b1",
+          "options": [
+            "high-risk",
+            "assistive",
+            "unrestricted"
+          ],
+          "correct": 0
+        },
+        {
+          "key": "b2",
+          "options": [
+            "rubber-stamp",
+            "wait for a complaint about",
+            "meaningfully review"
+          ],
+          "correct": 2
+        },
+        {
+          "key": "b3",
+          "options": [
+            "shown the full chat transcript",
+            "told that AI was used",
+            "asked to consent to model training"
+          ],
+          "correct": 1
+        }
+      ],
+      "explanation": "Insurance is one of the high-risk areas in Anthropic's Usage Policy because the output would significantly affect a person's money. Such uses call for meaningful review by a qualified person who can change the result, and for the affected person to be clearly told that AI was used. Assistive uses support your own work; rubber-stamping and reacting to complaints are not review; and a transcript or a training consent is not what the policy asks for."
+    },
+    {
+      "id": "ml-ccao-203",
+      "cat": "troubleshooting",
+      "scenario": "A team that changes six things at once cannot tell which change helped, so it should change {b1} per round and rerun the same {b2}. When several rounds of edits stop improving the results, it has reached {b3}, so it should change approach or ask a specialist instead of rewording again.",
+      "blanks": [
+        {
+          "key": "b1",
+          "options": [
+            "every element",
+            "one element",
+            "the model and the rules"
+          ],
+          "correct": 1
+        },
+        {
+          "key": "b2",
+          "options": [
+            "prompt wording",
+            "reviewers",
+            "test examples"
+          ],
+          "correct": 2
+        },
+        {
+          "key": "b3",
+          "options": [
+            "diminishing returns",
+            "instruction drift",
+            "a knowledge gap"
+          ],
+          "correct": 0
+        }
+      ],
+      "explanation": "Changing one element per round and rerunning the same test examples isolates what each change does; the wording is the thing being changed, so it cannot be the constant. When several rounds stop paying off the team has hit diminishing returns, which signals that the obstacle is not the wording. Instruction drift describes rules sliding out of focus in a long chat, and a knowledge gap is a cause of poor output, not the name for a plateau."
     }
   ],
   "sequences": [
@@ -4661,6 +6472,63 @@
         "Standardize on the lightest setting that meets the bar"
       ],
       "explanation": "Efficiency-first selection starts light and moves up only where the test shows a gap. Re-testing on the same sample makes the comparison fair, and the final choice is the lightest setting that still meets the criteria."
+    },
+    {
+      "id": "seq-ccao-101",
+      "cat": "workflow",
+      "prompt": "Put the steps for bringing Claude into an existing team process in the order they are usually done.",
+      "steps": [
+        "Map how the process works today, with its steps, owners and handoffs",
+        "Choose one step that suits Claude and define what goes in, what comes out and who receives it",
+        "Record a baseline for that step: the time it takes and how often the output needs correction",
+        "Write the instructions or template and decide who reviews the output",
+        "Pilot with a small group for a fixed period",
+        "Compare the pilot with the baseline, gather feedback and fix what went wrong",
+        "Document the procedure and widen access in stages"
+      ],
+      "explanation": "You cannot pick a good integration point until you understand the process. The baseline measures the step you chose, so it follows that choice and must be taken before Claude changes anything. Instructions and the review step are settled before users try the workflow, the pilot is judged against the baseline, and documentation and staged release come last, once the workflow has earned them."
+    },
+    {
+      "id": "seq-ccao-102",
+      "cat": "knowledge",
+      "prompt": "Put the steps for safely changing the instructions of a shared Project in the order they should happen.",
+      "steps": [
+        "Describe the problem and save a copy of the current instructions",
+        "Run the fixed set of test requests on the current version and note the results",
+        "Make one change to the instructions",
+        "Rerun the same test requests and compare the answers with the notes on good output",
+        "Keep the change if results improved and nothing got worse; otherwise revert it",
+        "Record the change in the change log and tell users what is different"
+      ],
+      "explanation": "Saving the current version first makes reverting easy, and a run before the change gives you something to compare with. Making one change at a time shows what caused any difference. The decision to keep or revert follows the comparison, and the log entry and user notice come last so that they describe what is actually live."
+    },
+    {
+      "id": "seq-ccao-201",
+      "cat": "governance",
+      "prompt": "Put the steps for preparing a work file that contains personal data for Claude in the order they usually occur.",
+      "steps": [
+        "Check the data's classification and what your policy allows for it, including which tool and account to use",
+        "Remove the columns and records the task does not need",
+        "Replace or mask the identifiers that remain, keeping any key separate",
+        "Inspect the file name, other sheets, comments and properties for leftover identifiers",
+        "Upload the cleaned file in the approved tool and run the task",
+        "Review the output before it is shared and record how AI was used"
+      ],
+      "explanation": "Policy comes first because it decides whether the data may be used at all and where. Minimizing before masking leaves less to mask, and the inspection catches identifiers hiding in file names, other tabs and properties before anything leaves your control. Only then is the file uploaded to the approved tool, and the result is reviewed and logged before it is shared."
+    },
+    {
+      "id": "seq-ccao-202",
+      "cat": "troubleshooting",
+      "prompt": "Order the steps for fixing a weak Claude output in a workflow you use every week.",
+      "steps": [
+        "Describe the symptom precisely, for example 'the layout changes on every run'",
+        "Form a hypothesis about the cause, such as an undefined format",
+        "Change one thing to address that cause",
+        "Rerun the same test examples and compare the results with the earlier ones",
+        "Keep the change if it helped, or revert it and try the next hypothesis",
+        "Record the winning version, with a note of what changed, as the new template"
+      ],
+      "explanation": "A precise symptom lets you form a hypothesis, and changing one thing at a time makes the effect visible. Rerunning the same examples keeps the comparison fair, the keep-or-revert decision follows from the evidence, and the winning version is recorded last so the improvement can be repeated and any later change undone."
     }
   ],
   "caseStudies": [
@@ -4712,6 +6580,108 @@
             1
           ],
           "explanation": "Content that will be quoted to a regulator is high-stakes, so qualified human review is expected before it leaves the building. A substantial document that will be edited and commented on suits an artifact. Drafting from sources does not remove the need for review, a chat reply is hard to edit and share, and Claude confirming its own legal soundness is not a substitute for counsel."
+        }
+      ]
+    },
+    {
+      "id": "cs-ccao-harbour-street-quotes",
+      "cat": "workflow",
+      "title": "Harbour Street Conferences: Faster Quotes with Claude",
+      "scenario": "Harbour Street Conferences manages meeting venues. Its events team of eight coordinators receives booking requests by email, retypes the details into a tracking sheet and drafts a quote from a price list, and a senior planner checks every quote before it goes to the client. The planner is the only person who knows which discounts are allowed. Coordinators estimate that a quote takes about two hours, and the planner sends roughly one in six back because of pricing mistakes. Lena, the operations lead, has a paid Claude plan and wants quotes produced faster without more errors. The price list is a spreadsheet that finance updates each quarter. The managing director wants a proposal by the end of the month and has asked what Claude can and cannot be trusted with. A senior executive suggests connecting Claude to the booking database so that quotes are generated and emailed to clients the moment a request arrives. Lena has no technical background, and the IT team is small and busy. She has two weeks and four coordinators who are willing to try a new approach.",
+      "questions": [
+        {
+          "id": "cs-ccao-harbour-street-quotes-q1",
+          "type": "mc",
+          "question": "Which design best fits Lena's situation?",
+          "options": [
+            "Claude drafts each quote and emails it straight to the client, and the planner reviews a sample of sent quotes each week",
+            "Claude drafts and double-checks each quote itself, so that the planner's review can be dropped to save time",
+            "Claude drafts each quote from the request and the price list, a coordinator edits it, and the planner approves it before it is sent",
+            "Claude designs a new booking process from scratch and all eight coordinators switch to it at the start of next month"
+          ],
+          "correct": 2,
+          "explanation": "The draft-review-approve pattern removes the retyping and drafting effort while the planner's check stays where pricing errors are costly. Emailing quotes directly or dropping the planner's review removes the control that now catches roughly one error in six, and Claude cannot know which discounts are allowed. Switching all coordinators to a redesigned process at once skips the pilot that would show whether it works."
+        },
+        {
+          "id": "cs-ccao-harbour-street-quotes-q2",
+          "type": "ms",
+          "question": "Which TWO steps will most strengthen Lena's proposal to the managing director? (Choose two.)",
+          "options": [
+            "Ask Claude to estimate the hours the whole team would save and present that figure as the expected result",
+            "Time a sample of current quotes and count the returns before the pilot, so that there is a baseline to compare with",
+            "Show the three best quotes Claude produced and leave out the ones that needed corrections, to keep the message simple",
+            "Pilot with the four coordinators, then report measured time and returns, Claude's mistakes and the checks that stay with people",
+            "State that Claude is accurate enough that the planner's review can be dropped once the pilot ends"
+          ],
+          "correct": [
+            1,
+            3
+          ],
+          "explanation": "The coordinators' two-hour figure is an estimate, not a measurement, so timing a sample and counting returns first creates the baseline that makes any improvement visible. A pilot report that includes Claude's mistakes and the review that remains is what builds credibility. Claude's own savings estimate, hand-picked best examples and a promise that review can be dropped are claims the managing director has no reason to trust."
+        },
+        {
+          "id": "cs-ccao-harbour-street-quotes-q3",
+          "type": "mc",
+          "question": "How should Lena respond to the executive's suggestion to connect Claude to the booking database and email quotes automatically?",
+          "options": [
+            "Ask the executive for the database login so that Claude can connect to the booking system during the pilot",
+            "Write up the goal, the data involved and the pilot results, and take it to IT or Claude Developers and Architects to design",
+            "Decline the idea outright, because Claude cannot be used with the company's booking data in any form",
+            "Have Claude write the connection code and put it into use if it runs without errors in testing"
+          ],
+          "correct": 1,
+          "explanation": "Generating quotes straight from a company database and emailing clients automatically is a technical integration involving authentication, security and reliability, which is beyond Associate scope and belongs with Developers and Architects. Lena's contribution is a clear problem statement and evidence from the pilot. Handing out credentials or deploying untested generated code creates security risk, and refusing outright ignores a legitimate need that specialists can address safely."
+        }
+      ]
+    },
+    {
+      "id": "cs-ccao-larkspur-credit-union",
+      "cat": "governance",
+      "title": "Larkspur Credit Union: Three AI Requests in One Week",
+      "scenario": "Larkspur is a regional credit union with about 40,000 members. It has rolled out a company-managed Claude workspace on a commercial plan. Its AI acceptable use policy lists the approved tools, bans account numbers and national ID numbers from any AI tool, and names the compliance office as the contact for questions. Three requests arrive in one week. First, the member-services team wants Claude to find common themes in 2,000 complaint emails, which contain member names, account numbers and free-text descriptions. Second, the lending team proposes that Claude read each hardship-loan application, which includes income and debts, and recommend approve or decline, with loan officers receiving only the recommendation and a one-line reason. Third, a junior analyst, rushed before a board meeting, pasted a list of member account numbers into her personal Claude account to build a chart, then deleted the chat when she remembered the policy. She has told nobody and plans to finish the chart in that account tonight. The compliance office has asked every team to record how Claude was used and who reviewed the results.",
+      "questions": [
+        {
+          "id": "cs-ccao-larkspur-credit-union-q1",
+          "type": "mc",
+          "question": "How should the member-services team prepare the complaint emails for analysis?",
+          "options": [
+            "Upload the emails unchanged, because a company-managed plan does not train on chats by default",
+            "Paste a sample of fifty emails into a personal account, since a small sample is low risk",
+            "Remove the account numbers, replace names with codes, and work in the approved workspace",
+            "Upload the emails unchanged and ask Claude to leave identifying details out of its summary"
+          ],
+          "correct": 2,
+          "explanation": "The policy bans account numbers from any AI tool, so they come out before the upload, and replacing names with codes lowers the exposure further while the themes can still be found. The approved workspace is the right place, but its training default does not override the policy. A personal account is outside the approved tools whatever the sample size, and asking Claude to leave details out of its summary does not stop them being shared."
+        },
+        {
+          "id": "cs-ccao-larkspur-credit-union-q2",
+          "type": "mc",
+          "question": "Which design is most appropriate for the hardship-loan proposal?",
+          "options": [
+            "Claude declines applications automatically when it flags a risk, and officers review only the approvals that remain",
+            "Claude approves routine applications automatically, and officers audit a monthly sample of those approvals",
+            "Officers receive only the recommendation and a one-line reason, and applicants are not told how it was produced",
+            "Officers see the full application, can override the recommendation, and decide each case; applicants are told that AI assists"
+          ],
+          "correct": 3,
+          "explanation": "Credit is a high-risk area. A qualified person needs the time, the information and the authority to change the outcome, so seeing only a one-line reason is not enough, and the affected applicants must be clearly told that AI was used. Automatic declines or approvals remove that review, and withholding the AI role from applicants breaches the disclosure principle."
+        },
+        {
+          "id": "cs-ccao-larkspur-credit-union-q3",
+          "type": "ms",
+          "question": "What should the junior analyst do now? (Choose two.)",
+          "options": [
+            "Tell the compliance office promptly through the escalation route",
+            "Say nothing, because deleting the chat removed the account numbers everywhere",
+            "Rebuild the chart in the approved workspace, using masked or coded identifiers",
+            "Ask Claude to confirm that it has forgotten the account numbers",
+            "Wait until after the board meeting to decide whether to raise it"
+          ],
+          "correct": [
+            0,
+            2
+          ],
+          "explanation": "The disclosure should be reported at once so that compliance can assess and contain it; deleting a chat clears it from your history immediately, but back-end removal follows later, and Claude has no 'forget' control that undoes a disclosure. The chart itself can be finished properly in the approved workspace with masked identifiers. Staying silent, asking Claude for confirmation or delaying the report all leave the company unable to act."
         }
       ]
     }
@@ -4779,6 +6749,69 @@
       "optionB": "Research mode, with web search turned on and the drive connected to the chat.",
       "better": "B",
       "why": "Research mode runs many searches that build on each other across the web and the enabled integrations and returns a cited report, which suits a multi-source review. Web search is the tempting runner-up because it also cites sources and is quicker, but it handles one or two searches at a time and does not combine internal files into a single synthesis."
+    },
+    {
+      "id": "cmp-ccao-101",
+      "cat": "workflow",
+      "scenario": "An operations team's timing data show that purchase requests wait about three days for a budget check by the approving manager, while keying a request into the system takes ten minutes. The team lead wants Claude to speed things up. Which plan is better?",
+      "optionA": "Have Claude draft the text entered with each request, because data entry is the most repetitive, text-heavy step.",
+      "optionB": "Have Claude assemble the budget lines, prior spend and policy flags into a one-page brief for the approving manager, who still decides.",
+      "better": "B",
+      "why": "Output is limited by the step where work queues up, so improving a step that is not the constraint changes little: shaving minutes off a ten-minute task will not shorten a three-day wait. Preparing the brief targets the measured bottleneck while the manager keeps the decision. Data entry is the tempting runner-up because it looks like the easiest, most text-heavy win."
+    },
+    {
+      "id": "cmp-ccao-102",
+      "cat": "workflow",
+      "scenario": "A team has built a Claude-assisted workflow for weekly status summaries and now wants colleagues to use it. Which launch plan is better?",
+      "optionA": "Email the written procedure and a recorded demo to everyone, ask them to start next Monday, and review usage figures after a quarter.",
+      "optionB": "Run a short hands-on session where staff try the workflow on their own reports, name a go-to person for questions and collect feedback after two weeks.",
+      "better": "B",
+      "why": "Adoption depends on trust, skills and support, which a hands-on session, a named contact and an early feedback check provide, and problems surface while they are cheap to fix. The email-and-demo launch is the tempting runner-up because it is cheap and documented, but passive material leaves people stuck at the first awkward step, and a quarterly review finds out far too late."
+    },
+    {
+      "id": "cmp-ccao-103",
+      "cat": "knowledge",
+      "scenario": "Finance updates a forecast spreadsheet in the company's shared drive every morning, and an analyst wants Claude's answers to reflect the latest figures. Her Owner has enabled the Google Drive connector and she can open the file. Which approach is better?",
+      "optionA": "Upload a fresh copy of the spreadsheet to the chat each morning before asking questions.",
+      "optionB": "Use the Google Drive connector so that Claude reads the live file within her own permissions.",
+      "better": "B",
+      "why": "A connector reaches the live file on demand within her permissions, so answers follow the daily updates without a manual step to forget. Uploading is the tempting runner-up because it gives her control over exactly what Claude sees, but every upload is a static copy that is out of date the moment finance edits the original, and a missed upload quietly produces stale answers."
+    },
+    {
+      "id": "cmp-ccao-201",
+      "cat": "governance",
+      "scenario": "A finance analyst wants Claude to find spending trends in an export of 6,000 customer transactions that includes customer names and card-account numbers. Company policy restricts personal data in AI tools. Which approach is better?",
+      "optionA": "Upload the full export in the approved workspace, with a note telling Claude to ignore the names and account numbers.",
+      "optionB": "Upload an export that keeps only date, amount, category and region, after checking the file for hidden identifiers.",
+      "better": "B",
+      "why": "Sending only what the task needs removes the personal data before it is shared, which is what the policy asks for, and the file check covers identifiers hiding in properties or other sheets. The full upload is the tempting runner-up because the workspace is approved and the note sounds careful, but telling Claude to ignore data does not stop the data being shared."
+    },
+    {
+      "id": "cmp-ccao-202",
+      "cat": "governance",
+      "scenario": "A recruiter has 400 applications for an analyst role and wants to save time with Claude. Which use is better?",
+      "optionA": "Have Claude summarize each application against the posted requirements, while the recruiter decides who advances and applicants are told AI supports screening.",
+      "optionB": "Have Claude rank all the applicants and send automatic rejection emails to the bottom half, so that recruiters see only the best.",
+      "better": "A",
+      "why": "Hiring is a high-risk area, so a qualified person must be able to review and change every outcome and the affected people should be told that AI is used; summaries keep most of the time saving without Claude making the decision. Automatic ranking and rejection is the tempting runner-up because it saves the most time, but it removes meaningful human review and risks hidden bias such as disparate impact."
+    },
+    {
+      "id": "cmp-ccao-203",
+      "cat": "troubleshooting",
+      "scenario": "A procurement team's Claude prompt for comparing supplier quotes worked well on six tidy sample quotes, and the team plans to roll it out to all buyers next week. Which plan is better?",
+      "optionA": "Roll it out to all buyers now, because six successful samples show that the prompt is ready for real use.",
+      "optionB": "First run it on messy real quotes, such as missing prices, odd currencies and scanned pages, fix what breaks, and then roll it out in stages.",
+      "better": "B",
+      "why": "Tidy samples hide failures. Unusual inputs show where the prompt breaks before buyers depend on it, and a staged rollout limits the damage from whatever remains. Rolling out at once is the tempting runner-up because the early results look good, but six clean examples say little about real quotes."
+    },
+    {
+      "id": "cmp-ccao-204",
+      "cat": "troubleshooting",
+      "scenario": "A team keeps reaching its usage limit while preparing weekly client briefings. Which change is better?",
+      "optionA": "Keep recurring reference documents in a Project, group related questions into single messages, and save high effort for the hardest briefings.",
+      "optionB": "Move every briefing task to the smallest, cheapest model, whatever the difficulty of the briefing, to stay under the limit.",
+      "better": "A",
+      "why": "The first change removes waste, such as repeated pasting, one-question-at-a-time messages and effort the task does not need, without lowering quality where it matters. Downgrading every task is the tempting runner-up because it saves allowance quickly, but complex briefings may suffer, and the team would pay for it in rework."
     }
   ]
 }

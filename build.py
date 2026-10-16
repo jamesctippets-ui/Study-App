@@ -59,7 +59,7 @@ TRACK_MODULES = {
 # Tracks whose data modules are still placeholders (content in progress). They
 # are registered and validated like any other, but left out of everything the
 # app ships (TRACKS, EXAM_CONFIG, DATA, dist/data) until removed from this set.
-UNFINISHED_TRACKS = {'ccao', 'ccdv', 'ccarf', 'ccarp'}  # Claude certification courses, content in progress
+UNFINISHED_TRACKS = set()
 
 
 def live_tracks():
