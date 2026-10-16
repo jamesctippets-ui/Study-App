@@ -3047,5 +3047,8 @@
   },
   "DPA": {
     "exp": "Data Processing Addendum"
+  },
+  "PR": {
+    "exp": "Pull request"
   }
 }
