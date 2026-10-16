@@ -1069,6 +1069,12 @@ ACRONYMS = {
     'HKCU': {'exp': 'HKEY_CURRENT_USER'},
     # Claude certification tracks, CCAO-F group 1
     'SOP': {'exp': 'Standard operating procedure'},
+    # Claude certification tracks, CCAR-P group 2
+    'ADR': {'exp': 'Architecture decision record'},
+    'CMEK': {'exp': 'Customer-managed encryption key'},
+    'COO': {'exp': 'Chief operating officer', 'trigger': False},
+    'RACI': {'exp': 'Responsible, Accountable, Consulted, Informed'},
+    'UTC': {'exp': 'Coordinated Universal Time', 'trigger': False},
 }
 
 IGNORE = {

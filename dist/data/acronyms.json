@@ -3067,5 +3067,22 @@
   },
   "SOP": {
     "exp": "Standard operating procedure"
+  },
+  "ADR": {
+    "exp": "Architecture decision record"
+  },
+  "CMEK": {
+    "exp": "Customer-managed encryption key"
+  },
+  "COO": {
+    "exp": "Chief operating officer",
+    "trigger": false
+  },
+  "RACI": {
+    "exp": "Responsible, Accountable, Consulted, Informed"
+  },
+  "UTC": {
+    "exp": "Coordinated Universal Time",
+    "trigger": false
   }
 }
