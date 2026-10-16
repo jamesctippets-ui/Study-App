@@ -1067,6 +1067,8 @@ ACRONYMS = {
     'GBP': {'exp': 'Pound sterling', 'trigger': False},
     # Claude certification tracks, CCAR-P group 1
     'HKCU': {'exp': 'HKEY_CURRENT_USER'},
+    # Claude certification tracks, CCAO-F group 1
+    'SOP': {'exp': 'Standard operating procedure'},
 }
 
 IGNORE = {
