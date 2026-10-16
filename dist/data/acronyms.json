@@ -3050,5 +3050,13 @@
   },
   "PR": {
     "exp": "Pull request"
+  },
+  "EUR": {
+    "exp": "Euro",
+    "trigger": false
+  },
+  "GBP": {
+    "exp": "Pound sterling",
+    "trigger": false
   }
 }

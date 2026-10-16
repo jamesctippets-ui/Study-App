@@ -381,7 +381,7 @@ FLASHCARDS.extend([
         'Tool-driven loops belong on the synchronous API. The guide states this as no multi-turn tool calling in a batch request.'),
     _fc('f1107', _PR, 'Batch status polling',
         "Checking a batch's processing status until it reports that processing has ended, and only then retrieving results.",
-        'Polling works because there is no push notification and no guaranteed completion time.'),
+        'You poll because a batch has no guaranteed completion time (most finish within an hour, the maximum is 24 hours), so check its status periodically instead of assuming it is done.'),
     _fc('f1108', _PR, 'Self-review limitation',
         'The tendency of a model to defend its own work when it reviews it in the same session, because it still holds the reasoning that produced the work.',
         'Telling the same session to be more critical does not remove the bias.'),

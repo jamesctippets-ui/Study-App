@@ -1062,6 +1062,9 @@ ACRONYMS = {
     'DPA': {'exp': 'Data Processing Addendum'},
     # Claude certification tracks, CCAR-F group 1
     'PR': {'exp': 'Pull request'},
+    # Claude certification tracks, CCAR-F group 2
+    'EUR': {'exp': 'Euro', 'trigger': False},
+    'GBP': {'exp': 'Pound sterling', 'trigger': False},
 }
 
 IGNORE = {
