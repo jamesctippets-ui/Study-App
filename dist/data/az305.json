@@ -92,7 +92,7 @@
       "id": "f7",
       "cat": "identityGovernance",
       "front": "Azure landing zones",
-      "back": "A landing zone is a pre-provisioned environment \u2014 management group hierarchy, policy, identity, and hub networking \u2014 built on the Cloud Adoption Framework, so every new subscription starts from a consistent, governed baseline instead of each team configuring governance independently.",
+      "back": "A pre-provisioned, governed Azure environment \u2014 management group hierarchy, policy, identity, and hub networking \u2014 built on the Cloud Adoption Framework, so every new subscription starts from a consistent baseline instead of each team configuring governance independently.",
       "detail": "Landing zones are the recommended starting point for any new enterprise Azure environment on the exam, not just a nice-to-have."
     },
     {
@@ -142,7 +142,7 @@
       "cat": "dataStorage",
       "front": "Access tiers: Hot, Cool, Cold, and Archive",
       "back": "Hot suits frequently accessed data at the highest storage cost and lowest access cost. Cool and Cold suit infrequently accessed data, with lower storage cost but higher access cost and longer minimum retention. Archive is the cheapest tier for rarely accessed data, but blobs must be rehydrated (a process that can take hours) before they can be read.",
-      "detail": "A cost-first requirement with an acceptable multi-hour retrieval delay is the signal for Archive; needing the data readable at any moment rules Archive out even if it's rarely accessed."
+      "detail": "A cost-first requirement with an acceptable multi-hour retrieval delay is the signal for Archive; needing the data readable at any moment rules Archive out even if it's rarely accessed. Archive is also unavailable on ZRS, GZRS, and RA-GZRS accounts."
     },
     {
       "id": "f15",
@@ -189,15 +189,15 @@
     {
       "id": "f21",
       "cat": "businessContinuity",
-      "front": "RTO and RPO drive the architecture, not the other way around",
-      "back": "Business requirements set the maximum tolerable downtime (RTO) and data loss (RPO) first. The backup frequency, replication approach, and failover automation are then designed to meet those numbers, rather than being chosen first and having the numbers backfilled to match.",
+      "front": "Designing from RTO and RPO targets",
+      "back": "Business requirements set the maximum tolerable downtime and the maximum tolerable data loss first. The backup frequency, replication approach, and failover automation are then designed to meet those targets, rather than being chosen first and having the numbers backfilled to match.",
       "detail": "A design question that states specific RTO/RPO numbers is really asking you to pick the cheapest architecture that still satisfies both, not the most impressive-sounding one."
     },
     {
       "id": "f22",
       "cat": "businessContinuity",
       "front": "Recovery Services vault",
-      "back": "The container that stores Azure Backup data and Azure Site Recovery replication configuration and metadata. A single vault can hold both backup and Site Recovery items, and the vault's own storage redundancy setting (locally redundant, geo-redundant, or zone-redundant) determines whether it survives a regional loss, and only geo-redundant storage keeps a copy in another region.",
+      "back": "The container that stores Azure Backup data and Azure Site Recovery replication configuration and metadata. A single vault can hold both backup and Site Recovery items. The vault's own storage redundancy setting (locally redundant, geo-redundant, or zone-redundant) determines whether it survives a regional loss: only geo-redundant storage keeps a copy in another region.",
       "detail": "It's easy to assume backups automatically survive a regional outage \u2014 that depends entirely on the vault's own storage redundancy setting, which is worth checking explicitly."
     },
     {
@@ -246,8 +246,8 @@
       "id": "f29",
       "cat": "infrastructure",
       "front": "Azure Migrate",
-      "back": "The hub service for discovering on-premises servers and workloads, assessing them (right-sizing, readiness, cost estimation), and coordinating the actual migration tools, all before any workload is moved.",
-      "detail": "Azure Migrate is the answer for the discovery-and-assessment phase; the actual data move is often handed off to a more specialized tool like Azure Database Migration Service."
+      "back": "The hub service for discovering on-premises servers and workloads and assessing them (right-sizing, readiness, cost estimation) before any workload is moved, and for coordinating the migration tools that then carry out the move.",
+      "detail": "Azure Migrate is the answer for the discovery-and-assessment phase; the actual move is done by its integrated migration tools or handed off to a more specialized tool like Azure Database Migration Service."
     },
     {
       "id": "f30",
@@ -329,7 +329,7 @@
     {
       "id": "f41",
       "cat": "identityGovernance",
-      "front": "Bicep and ARM templates for landing zone deployment",
+      "front": "Landing zones as code",
       "back": "Enterprise-scale landing zones are deployed and updated as infrastructure as code \u2014 Bicep or ARM templates, sometimes Terraform \u2014 rather than clicked together in the portal, so the same governed baseline can be redeployed consistently across subscriptions and re-applied whenever the reference architecture changes.",
       "detail": "Treating a landing zone's own definition as IaC means a change to policy or hub networking gets tested and versioned like any other code change, instead of being a one-off manual edit to a subscription that already exists."
     },
@@ -399,7 +399,7 @@
     {
       "id": "f51",
       "cat": "dataStorage",
-      "front": "Cosmos DB APIs: Core (SQL), MongoDB, Cassandra, Gremlin, and Table",
+      "front": "Cosmos DB APIs: NoSQL, MongoDB, Cassandra, Gremlin, and Table",
       "back": "Cosmos DB is a multi-model service, and the API chosen determines the data model and drivers an application uses: Core (SQL), now branded the API for NoSQL, for native JSON documents with SQL-like queries, MongoDB for wire-protocol compatibility with existing MongoDB apps, Cassandra for existing Cassandra workloads, Gremlin for graph data and traversal queries, and Table for a premium, higher-scale replacement for Azure Table storage. Consistency levels and partition key design apply the same way no matter which API is chosen.",
       "detail": "Picking the API isn't just a syntax preference \u2014 it's what lets an existing MongoDB or Cassandra application move to Cosmos DB with minimal code changes, since the wire protocol stays compatible."
     },
@@ -484,7 +484,7 @@
       "id": "f63",
       "cat": "dataStorage",
       "front": "Azure SQL Database purchasing models: DTU vs. vCore, and Hyperscale",
-      "back": "The DTU-based model bundles compute, memory, and storage I/O into a single blended unit, simple to budget but hard to scale any one dimension independently. The vCore model prices compute and storage separately, maps directly to physical cores and memory (easing on-premises core-license comparisons), and is the only model that offers the Hyperscale service tier, which can scale storage into the tens of terabytes with near-instant backups and fast scale-out using read replicas.",
+      "back": "The DTU-based model bundles compute, memory, and storage I/O into a single blended unit, simple to budget but hard to scale any one dimension independently. The vCore model prices compute and storage separately, maps directly to physical cores and memory (easing on-premises core-license comparisons), and is the only model that offers the Hyperscale service tier, which can scale storage up to 128 TB with near-instant backups and fast scale-out using read replicas.",
       "detail": "Hyperscale decouples storage growth from compute size entirely, which is the detail that matters when a scenario describes a database that needs to grow far beyond what a fixed DTU tier or a General Purpose/Business Critical vCore tier can comfortably hold."
     },
     {
@@ -827,7 +827,7 @@
       "id": "f112",
       "cat": "infrastructure",
       "front": "Azure Firewall Premium",
-      "back": "The Premium SKU of Azure Firewall adds TLS inspection, a signature-based intrusion detection and prevention system (IDPS), URL filtering that considers the full path, and web categories. It targets sensitive or regulated workloads that must inspect encrypted traffic.",
+      "back": "The top SKU of the managed Azure network firewall, above Standard and Basic, adds TLS inspection, a signature-based intrusion detection and prevention system (IDPS), URL filtering that considers the full path, and web categories. It targets sensitive or regulated workloads that must inspect encrypted traffic.",
       "detail": "Standard filters on FQDNs, network rules, and threat intelligence but cannot look inside encrypted payloads. A requirement for TLS decryption plus IDPS in the hub means Premium."
     },
     {
@@ -926,7 +926,7 @@
       "cat": "identityGovernance",
       "front": "Choosing a key management service",
       "back": "Azure Key Vault Standard stores software-protected secrets, keys, and certificates, and Premium adds HSM-backed keys. Managed HSM is a fully managed, single-tenant, highly available HSM service using FIPS 140-3 Level 3 validated HSMs, for key sovereignty and strict compliance. Azure Cloud HSM is a single-tenant service for lift-and-shift applications that need PKCS#11, JCA, or CNG. Azure Payment HSM supports payment PIN processing.",
-      "detail": "Customer-managed key scenarios use Key Vault Premium as a minimum. 'Single tenant' plus 'full control of keys' leads to Managed HSM."
+      "detail": "Customer-managed key scenarios work with Key Vault Standard (software-protected keys); Premium is needed only when the requirement says HSM-protected keys. 'Single tenant' plus 'full control of keys' leads to Managed HSM."
     },
     {
       "id": "f9011",
@@ -2138,7 +2138,7 @@
       "id": "q39",
       "cat": "infrastructure",
       "type": "mc",
-      "question": "In the hub-spoke diagram shown, the two nonproduction spoke virtual networks are connected only by a dotted line labeled \"peered or directly connected,\" while every spoke's solid line runs to the hub. What does this indicate about the topology's default behavior?",
+      "question": "In the hub-spoke diagram shown, the two nonproduction spoke virtual networks are joined by their own dotted line labeled \"peered or directly connected virtual networks,\" in addition to each spoke's link to the hub. What does this indicate about the topology's default behavior?",
       "options": [
         "Spokes automatically gain full connectivity to every other spoke the moment they're peered to the hub, since peering is transitive across a shared hub",
         "Spokes are isolated from each other by default; any spoke-to-spoke path has to be configured separately, on top of the hub peering",
@@ -2146,14 +2146,14 @@
         "The dotted line means those two networks require a full mesh of direct peerings before any traffic between them is possible"
       ],
       "correct": 1,
-      "explanation": "VNet peering is non-transitive, so peering each spoke to the hub does not by itself let two spokes reach each other \u2014 that's exactly why the diagram draws spoke-to-spoke connectivity as a separate dotted line rather than as part of the solid hub peering. Any direct or routed spoke-to-spoke path has to be added deliberately.",
+      "explanation": "VNet peering is non-transitive, so peering each spoke to the hub does not by itself let two spokes reach each other \u2014 that's exactly why the diagram draws spoke-to-spoke connectivity as a separate dotted line rather than as part of the hub connections. Any direct or routed spoke-to-spoke path has to be added deliberately.",
       "image": "hubSpokeTopology"
     },
     {
       "id": "q40",
       "cat": "identityGovernance",
       "type": "mc",
-      "question": "This real Azure Architecture Center diagram shows a VM workload deployed into an Azure landing zone, split into an \"Azure application landing zone subscription\" and an \"Azure platform landing zone subscription.\" According to the diagram, who owns the hub virtual network, Azure Firewall, and Azure Bastion shown in the platform landing zone subscription?",
+      "question": "This real Azure Architecture Center diagram shows a VM workload deployed into an Azure landing zone, split into an \"Azure application landing zone subscription\" and an \"Azure platform landing zone subscription.\" In the landing zone model this diagram follows, who owns the hub virtual network, Azure Firewall, and Azure Bastion shown in the platform landing zone subscription?",
       "options": [
         "The same workload team that owns the application landing zone subscription, so one team controls every subscription",
         "A central platform team, separate from the workload team that owns the application landing zone subscription",
@@ -2183,7 +2183,7 @@
       "id": "q42",
       "cat": "infrastructure",
       "type": "mc",
-      "question": "This real Azure Architecture Center decision-tree diagram helps choose an Azure compute service. According to the flowchart, a workload being newly built (not migrated) that can be containerized, needs full-fledged orchestration, and isn't using Azure Red Hat OpenShift is directed to which service?",
+      "question": "This real Azure Architecture Center decision-tree diagram helps choose an Azure compute service. According to the flowchart, a workload being newly built (not migrated) that needs full-fledged orchestration from a managed service, needs access to all Kubernetes capabilities, and isn't using Azure Red Hat OpenShift is directed to which service?",
       "options": [
         "Azure Kubernetes Service (AKS)",
         "Azure Functions",
@@ -2191,7 +2191,7 @@
         "Azure Virtual Machines"
       ],
       "correct": 0,
-      "explanation": "Following that exact path through the flowchart \u2014 new build, containerizable, needs full orchestration, not OpenShift \u2014 lands on Azure Kubernetes Service. Functions and Batch sit on different branches for event-driven or high-performance-computing workloads, and plain VMs are the answer only when full OS control is required, earlier in the tree.",
+      "explanation": "Following that exact path through the flowchart \u2014 new build, full-fledged orchestration, a managed service, not OpenShift, all Kubernetes capabilities needed \u2014 lands on Azure Kubernetes Service; answering no to that last question leads to Container Apps instead. Functions and Batch sit on different branches for event-driven or high-performance-computing workloads, and plain VMs are the answer only when full OS control is required, earlier in the tree.",
       "image": "computeDecisionTree"
     },
     {
@@ -2236,7 +2236,7 @@
         "Azure API Management"
       ],
       "correct": 0,
-      "explanation": "The flowchart's \"passthrough load balancer\" branch for internal clients leads to Azure Load Balancer, labeled on the diagram as supporting TCP and UDP protocols. Application Gateway sits on the neighboring \"terminating load balancer\" branch for TCP/TLS traffic instead, and Front Door and API Management appear only on the internet-facing branches.",
+      "explanation": "The flowchart's \"passthrough load balancer\" branch for internal clients leads to Azure Load Balancer, labeled on the diagram as supporting TCP and UDP protocols. Application Gateway sits on the neighboring \"terminating load balancer\" branch for TCP/TLS traffic instead, Front Door appears only on the internet-facing branches, and API Management is offered only on the Layer 7 branch for API-only backends.",
       "image": "loadBalancingDecisionTree"
     },
     {
@@ -2669,15 +2669,15 @@
       "id": "q67",
       "cat": "dataStorage",
       "type": "mc",
-      "question": "A transactional Azure SQL Database is expected to grow to 60 TB. Backups must not slow the workload, several read replicas must be addable quickly for reporting, and the app must keep using T-SQL unchanged. Which service tier should you recommend?",
+      "question": "A transactional Azure SQL Database of about 1.5 TB must stay available through the loss of a datacenter, with automatic failover and no data loss inside the region. The team also wants a read-only replica for reporting that is included without paying for extra compute. Which service tier should you recommend?",
       "options": [
-        "SQL Managed Instance Business Critical",
-        "The DTU model's Premium tier",
-        "The vCore model's Business Critical service tier",
-        "The vCore model's Hyperscale service tier"
+        "The vCore model's General Purpose service tier, with zone redundancy",
+        "The DTU model's Premium tier, without zone redundancy",
+        "The vCore model's Business Critical service tier, with zone redundancy",
+        "The vCore model's Hyperscale service tier, with a named replica for reporting"
       ],
-      "correct": 3,
-      "explanation": "Hyperscale separates compute from storage: it supports databases far larger than the other options, takes backups from storage snapshots that do not burden compute, and scales reads out with replicas quickly. Business Critical, Managed Instance, and DTU Premium all top out well below 60 TB, and their backups and replicas are tied to the compute tier."
+      "correct": 2,
+      "explanation": "Business Critical keeps several synchronously committed replicas on local SSD, and with zone redundancy they are spread across availability zones, so losing a datacenter fails over automatically with no data loss; one of those replicas is readable for reporting at no extra charge. General Purpose with zone redundancy also survives a zone loss, but it has no built-in readable replica, so reporting would need extra compute. A Hyperscale named replica is separate compute billed on top of the primary. A Premium database without zone redundancy keeps all its replicas in one datacenter, so losing that datacenter takes it down."
     },
     {
       "id": "q68",
@@ -2793,13 +2793,13 @@
       "type": "mc",
       "question": "An organization wants to apply the same Azure Policy assignments, RBAC roles, and Azure Monitor collection it uses for its Azure VMs to servers that will stay in its own datacenter indefinitely, on hardware it already owns. Which service should it use?",
       "options": [
-        "Azure Stack HCI clusters in the datacenter",
+        "Azure Local clusters in the datacenter",
         "Azure Arc-enabled servers",
         "Azure Migrate with an on-premises appliance",
         "Azure Lighthouse delegated resource management"
       ],
       "correct": 1,
-      "explanation": "Arc-enabled servers project non-Azure machines as Azure resources, so Policy, RBAC, and Monitor apply without moving the workload or replacing the hardware. Azure Stack HCI is a hosting platform that runs on validated hardware, not a management layer for existing servers. Azure Migrate prepares workloads to move to Azure, which is not the plan. Lighthouse delegates management across Azure tenants and does not extend Azure management to machines outside Azure."
+      "explanation": "Arc-enabled servers project non-Azure machines as Azure resources, so Policy, RBAC, and Monitor apply without moving the workload or replacing the hardware. Azure Local (formerly Azure Stack HCI) is a hosting platform that runs on validated hardware, not a management layer for existing servers. Azure Migrate prepares workloads to move to Azure, which is not the plan. Lighthouse delegates management across Azure tenants and does not extend Azure management to machines outside Azure."
     },
     {
       "id": "q73",
@@ -3288,9 +3288,9 @@
       "type": "mc",
       "question": "A company will store about 200 TB of hot block blob data for the next three years, with a steady footprint. It wants to lower the cost per terabyte without changing the application or the redundancy. What should you do?",
       "options": [
-        "Switch the account from LRS to GRS",
-        "Enable blob versioning with a retention rule",
-        "Move all of the data to the Archive tier",
+        "Switch the account's redundancy setting from LRS to GRS",
+        "Enable blob versioning with a retention rule for older versions",
+        "Move all of the data to the Archive tier with a lifecycle rule",
         "Purchase Azure Storage reserved capacity for a three-year term"
       ],
       "correct": 3,
@@ -3446,15 +3446,15 @@
       "id": "q9047",
       "cat": "businessContinuity",
       "type": "mc",
-      "question": "An Azure Database for PostgreSQL flexible server must tolerate the failure of its availability zone with automatic failover and zero data loss for committed transactions. Which setting provides this?",
+      "question": "An Azure Database for PostgreSQL flexible server already uses zone-redundant high availability. The business now requires that if the entire primary region is lost, the database can be writable in another region within minutes, and losing a few minutes of recent data is acceptable. What should you add?",
       "options": [
-        "Geo-redundant backup with an automatic restore job",
-        "Zone-redundant high availability with a synchronously replicated standby",
-        "Same-zone high availability with a nightly backup",
-        "A read replica in the same zone that is promoted by a script"
+        "A cross-region read replica that is promoted to a standalone server during a regional outage",
+        "Geo-redundant backup storage, with a geo-restore into the paired region after an outage",
+        "Nothing further, because zone-redundant high availability also fails over to the paired region",
+        "A longer point-in-time restore retention period, so the database can be rebuilt after the outage"
       ],
-      "correct": 1,
-      "explanation": "Zone-redundant high availability keeps a standby in another zone, replicates synchronously, and fails over automatically. A read replica is asynchronous and promotion is manual, same-zone HA does not survive the loss of that zone, and geo-redundant backups restore with data loss and delay."
+      "correct": 0,
+      "explanation": "A cross-region read replica is updated asynchronously, typically within seconds to a few minutes of the primary, and can be promoted to a standalone read-write server in another region, which fits a recovery in minutes with a small data-loss window. Geo-restore from geo-redundant backups also works after a regional loss, but it rebuilds the server from backups, which takes far longer, and the data can be up to an hour old. Zone-redundant high availability keeps its standby in the same region, so a regional outage takes it down too, and a longer retention period only extends how far back a restore can reach, not where the copies are held."
     },
     {
       "id": "q9048",
@@ -3619,15 +3619,15 @@
       "id": "q9066",
       "cat": "infrastructure",
       "type": "mc",
-      "question": "An order-processing system must deliver messages in strict first-in-first-out order per customer, detect duplicate submissions automatically, and move poison messages to a dead-letter queue. Which messaging service should you recommend?",
+      "question": "After each promotion, an order API receives bursts of about 20,000 requests per minute for roughly two minutes, while the order processor handles about 2,000 per minute and takes several minutes to scale out. No order may be lost, and the processor must not be overloaded. Which design should you use?",
       "options": [
-        "Azure Event Hubs with several partitions",
-        "Azure Event Grid custom topics",
-        "Azure Storage queues",
-        "Azure Service Bus queues with sessions"
+        "The API writes each order to a Service Bus queue, and the processor reads from it at its own pace",
+        "The API calls the processor directly and retries with exponential backoff whenever it responds with an error",
+        "Autoscale rules that add processor instances when its CPU rises during a burst",
+        "A Front Door rate-limit rule that rejects requests above 2,000 per minute"
       ],
-      "correct": 3,
-      "explanation": "Service Bus provides ordered delivery with sessions, duplicate detection, and dead-letter queues. Storage queues do not guarantee ordering or offer duplicate detection or a built-in dead-letter queue, Event Grid delivers discrete events with retries, and Event Hubs preserves order only within a partition and is a streaming service."
+      "correct": 0,
+      "explanation": "A queue between the API and the processor levels the load: the API accepts the whole burst, and the orders wait durably in the queue while the processor works through them at its steady rate, so nothing is lost and the processor is never overloaded. Direct calls with retries keep hitting a processor that is already saturated and push the waiting onto callers, who can give up and lose orders. Autoscale rules react only after the burst has started, and the processor needs minutes to add capacity, so a burst this short is over before it helps. A rate limit protects the processor by rejecting the excess requests, which loses orders. This is the Queue-Based Load Leveling pattern."
     },
     {
       "id": "q9067",
@@ -3693,8 +3693,8 @@
       "options": [
         "A personal access token of the lead developer stored in the pipeline",
         "A federated credential on a managed identity or app registration using OpenID Connect",
-        "A storage account key stored as a repository secret",
-        "A service principal secret rotated manually every year"
+        "A storage account key stored as an encrypted repository secret",
+        "A service principal secret stored in the repository and rotated every year"
       ],
       "correct": 1,
       "explanation": "Workload identity federation lets the workflow obtain tokens through OpenID Connect without stored secrets. A rotated service principal secret is still a stored secret, and account keys and personal tokens are broad, long-lived credentials tied to people or accounts."
@@ -3717,15 +3717,15 @@
       "id": "q9073",
       "cat": "infrastructure",
       "type": "mc",
-      "question": "Before migrating 600 on-premises servers, a company wants to discover them, map application dependencies, size the target VMs, and estimate Azure costs, without installing agents on VMware guests. What should you use?",
+      "question": "A company has assessed 600 VMware VMs and decided to rehost them on Azure VMs. It wants to replicate the VMs while they keep running, run a test migration without affecting production, and cut over each group with a short outage, without installing agents on the guests. What should it use?",
       "options": [
         "Azure Arc-enabled servers",
-        "Azure Site Recovery replication appliance",
         "Azure Migrate discovery and assessment with the appliance",
-        "Azure Backup Server"
+        "Azure Migrate: Server Migration with agentless replication",
+        "Azure Data Box with exported VM disk images"
       ],
       "correct": 2,
-      "explanation": "Azure Migrate discovery and assessment uses an appliance to discover servers, supports agentless dependency analysis for VMware, and produces sizing and cost estimates. Site Recovery replicates for DR or migration but does not assess, Azure Backup Server backs up, and Arc projects servers into Azure for management."
+      "explanation": "Server Migration replicates running VMware VMs to Azure through the Azure Migrate appliance without agents on the guests, supports a test migration, and cuts over after a final delta sync, so the outage is short. Discovery and assessment sizes and prices the move but replicates nothing, and Arc-enabled servers projects machines into Azure for management without moving them. Shipping exported disk images offline gives no continuous replication and a long outage at cutover."
     },
     {
       "id": "q9074",
@@ -3831,9 +3831,9 @@
       "type": "mc",
       "question": "Latency-sensitive VMs in one region exchange many small packets and show jitter. The team wants to reduce latency and CPU overhead for networking without changing the application. What should you enable?",
       "options": [
-        "A NAT gateway on the subnet",
-        "Azure Front Door in front of the VMs",
-        "A larger NSG with more rules",
+        "A NAT gateway on the subnet that hosts the VMs",
+        "Azure Front Door with an origin group that contains the VMs",
+        "A network security group with extra allow rules for the traffic",
         "Accelerated networking on the VM network interfaces"
       ],
       "correct": 3,
@@ -4096,7 +4096,7 @@
         "q9035",
         "q9036"
       ],
-      "reading": "Designing where a relational workload actually lives comes down to how much of the SQL Server engine you need versus how little you want to manage. Azure SQL Database, a single database, is fully managed platform-as-a-service with the least administrative overhead, but it doesn't expose every instance-level SQL Server feature. SQL Managed Instance sits in between: near-complete SQL Server engine compatibility, including SQL Agent jobs, cross-database queries, and linked servers, while staying fully managed PaaS. SQL Server running on a virtual machine gives full operating system and engine control for maximum compatibility, at the cost of patching and managing that OS yourself. A migration that depends on SQL Agent jobs or cross-database queries, but still wants to avoid managing the OS, points squarely at Managed Instance rather than Azure SQL Database.\n\nFor non-relational, globally distributed data, Cosmos DB exposes five consistency levels along a single spectrum, from Strong (no staleness, but the highest latency and lowest availability) down to Eventual (the lowest latency and highest availability, with no ordering guarantee at all) \u2014 Session, the default, fits most single-user scenarios where someone needs to see their own writes immediately, while Eventual fits read-heavy, shared workloads that can tolerate a few seconds of staleness for speed. Just as important as consistency is partition key design: a good partition key has high cardinality and spreads requests and storage evenly across physical partitions, while a low-cardinality key concentrates traffic onto a small number of partitions, creating a hot partition that throttles throughput no matter how much RU/s is provisioned. The fix for a hot partition is redesigning the partition key itself \u2014 raising the consistency level or adding more provisioned throughput doesn't touch the real problem.\n\nStorage redundancy answers a different question: how many copies of your data exist, and how far apart are they? Locally-redundant storage (LRS) keeps three synchronous copies within one datacenter \u2014 the cheapest option, but it only survives a hardware-level failure. Zone-redundant storage (ZRS) spreads those synchronous copies across availability zones within the same region instead, surviving the loss of an entire datacenter without the cost or latency of replicating to a second region. Geo-redundant storage (GRS) asynchronously replicates to a paired secondary region, without any zone redundancy in the primary region itself, while geo-zone-redundant storage (GZRS) combines both \u2014 zone redundancy at home and geo-replication to a second region \u2014 for the strongest protection available. Only the read-access (\"RA-\") variants of GRS or GZRS actually let an application read from that secondary region before a real failover ever happens.\n\nEveryday storage management layers a few more decisions on top. Access tiers trade storage cost against retrieval cost and speed: Hot suits data you touch constantly, at the highest storage cost and cheapest access; Cool and Cold suit infrequently accessed data; and Archive is the cheapest tier of all, but blobs have to be rehydrated, a process that can take hours, before they can be read again \u2014 the right pick when cost matters more than instant access, never when data needs to be readable at a moment's notice. For large-scale analytics, Azure Data Lake Storage Gen2 is Blob storage with a hierarchical namespace turned on, giving engines like Synapse or Databricks POSIX-like access control and efficient directory-level operations instead of flat object storage. When it's time to actually migrate a database, the work splits into assessment and movement. The assessment step checks an on-premises database for compatibility issues before anything moves \u2014 historically the job of Data Migration Assistant (DMA), which Microsoft retired on 16 July 2025, with Azure Migrate and the SSMS migration component now covering that ground. Azure Database Migration Service (DMS) then performs the real migration, online or offline, once you're ready \u2014 assessment answers \"will this break after we move it,\" and DMS is the service that actually moves it. And for reaching a PaaS data service privately, a private endpoint gives it a private IP address inside your VNet, reachable even from on-premises networks over ExpressRoute or a VPN, while a service endpoint keeps the public IP in place and only optimizes and restricts routing for traffic that already starts inside the VNet \u2014 only a private endpoint reaches a PaaS service privately from on-premises.\n\nProtecting relational data means matching the feature to the threat: transparent data encryption for stolen files, Always Encrypted for an untrusted administrator, dynamic data masking for what users see, row-level security for which rows they see, and ledger for tamper evidence. For scale, elastic pools share resources across many databases, Hyperscale reaches 128 TB with up to 30 named replicas, serverless compute bills per second, and the Managed Instance link replicates in near real time from SQL Server. Cosmos DB for NoSQL can hold vector embeddings beside documents.\n\nFor unstructured and file data, choose between Blob and Data Lake Storage, Azure Files, Azure NetApp Files for enterprise file performance, and Elastic SAN for pooled iSCSI block storage. Analytics centers on Microsoft Fabric and OneLake, with Azure Databricks for Spark-heavy teams and Stream Analytics for continuous queries over event streams. Cost levers include tiers, lifecycle rules, and reserved capacity, and durability grows from at least 11 nines for LRS to 16 for geo-redundant options.",
+      "reading": "Designing where a relational workload actually lives comes down to how much of the SQL Server engine you need versus how little you want to manage. Azure SQL Database, a single database, is fully managed platform-as-a-service with the least administrative overhead, but it doesn't expose every instance-level SQL Server feature. SQL Managed Instance sits in between: near-complete SQL Server engine compatibility, including SQL Agent jobs, cross-database queries, and linked servers, while staying fully managed PaaS. SQL Server running on a virtual machine gives full operating system and engine control for maximum compatibility, at the cost of patching and managing that OS yourself. A migration that depends on SQL Agent jobs or cross-database queries, but still wants to avoid managing the OS, points squarely at Managed Instance rather than Azure SQL Database.\n\nFor non-relational, globally distributed data, Cosmos DB exposes five consistency levels along a single spectrum, from Strong (no staleness, but the highest latency and lowest availability) down to Eventual (the lowest latency and highest availability, with no ordering guarantee at all) \u2014 Session, the default, fits most single-user scenarios where someone needs to see their own writes immediately, while Eventual fits read-heavy, shared workloads that can tolerate a few seconds of staleness for speed. Just as important as consistency is partition key design: a good partition key has high cardinality and spreads requests and storage evenly across physical partitions, while a low-cardinality key concentrates traffic onto a small number of partitions, creating a hot partition that throttles throughput no matter how much RU/s is provisioned. The fix for a hot partition is redesigning the partition key itself \u2014 raising the consistency level or adding more provisioned throughput doesn't touch the real problem.\n\nStorage redundancy answers a different question: how many copies of your data exist, and how far apart are they? Locally-redundant storage (LRS) keeps three synchronous copies within one datacenter \u2014 the cheapest option, but it only survives a hardware-level failure. Zone-redundant storage (ZRS) spreads those synchronous copies across availability zones within the same region instead, surviving the loss of an entire datacenter without the cost or latency of replicating to a second region. Geo-redundant storage (GRS) asynchronously replicates to a paired secondary region, without any zone redundancy in the primary region itself, while geo-zone-redundant storage (GZRS) combines both \u2014 zone redundancy at home and geo-replication to a second region \u2014 for the strongest protection available. Only the read-access (\"RA-\") variants of GRS or GZRS actually let an application read from that secondary region before a real failover ever happens.\n\nEveryday storage management layers a few more decisions on top. Access tiers trade storage cost against retrieval cost and speed: Hot suits data you touch constantly, at the highest storage cost and cheapest access; Cool and Cold suit infrequently accessed data; and Archive is the cheapest tier of all, but blobs have to be rehydrated, a process that can take hours, before they can be read again \u2014 the right pick when cost matters more than instant access, never when data needs to be readable at a moment's notice. It also isn't available on ZRS, GZRS, or RA-GZRS accounts. For large-scale analytics, Azure Data Lake Storage Gen2 is Blob storage with a hierarchical namespace turned on, giving engines like Synapse or Databricks POSIX-like access control and efficient directory-level operations instead of flat object storage. When it's time to actually migrate a database, the work splits into assessment and movement. The assessment step checks an on-premises database for compatibility issues before anything moves \u2014 historically the job of Data Migration Assistant (DMA), which Microsoft retired on 16 July 2025, with Azure Migrate and the SSMS migration component now covering that ground. Azure Database Migration Service (DMS) then performs the real migration, online or offline, once you're ready \u2014 assessment answers \"will this break after we move it,\" and DMS is the service that actually moves it. And for reaching a PaaS data service privately, a private endpoint gives it a private IP address inside your VNet, reachable even from on-premises networks over ExpressRoute or a VPN, while a service endpoint keeps the public IP in place and only optimizes and restricts routing for traffic that already starts inside the VNet \u2014 only a private endpoint reaches a PaaS service privately from on-premises.\n\nProtecting relational data means matching the feature to the threat: transparent data encryption for stolen files, Always Encrypted for an untrusted administrator, dynamic data masking for what users see, row-level security for which rows they see, and ledger for tamper evidence. For scale and resilience, elastic pools share resources across many databases, Business Critical keeps replicas on local SSD with one readable replica included, Hyperscale reaches 128 TB with up to 30 named replicas, serverless compute bills per second, and the Managed Instance link replicates in near real time from SQL Server. Cosmos DB for NoSQL can hold vector embeddings beside documents.\n\nFor unstructured and file data, choose between Blob and Data Lake Storage, Azure Files, Azure NetApp Files for enterprise file performance, and Elastic SAN for pooled iSCSI block storage. Analytics centers on Microsoft Fabric and OneLake, with Azure Databricks for Spark-heavy teams and Stream Analytics for continuous queries over event streams. Cost levers include tiers, lifecycle rules, and reserved capacity, and durability grows from at least 11 nines for LRS to 16 for geo-redundant options.",
       "fundamentalsLabel": "New to Azure data platform trade-offs? See the everyday analogy",
       "fundamentals": "Choosing between Azure SQL Database, Managed Instance, and SQL Server on a VM is like choosing an apartment, a townhouse, or a standalone house: the apartment (Azure SQL Database) has the least upkeep but the least customization; the townhouse (Managed Instance) gives you more of your own space and rules while someone else still handles the roof and the plumbing; the house (a VM) gives total control, but you're the one calling a repair person, or being one, for every single thing that breaks. Storage redundancy is like deciding how many copies of your family photos to keep, and how far apart: one copy in a drawer (LRS) protects against a spill, copies split across two rooms of the same house (ZRS) protect against a room flooding, and a copy at a relative's house in another city (GRS/GZRS) is the only thing that survives the whole house burning down.",
       "keyTerms": [
@@ -4135,8 +4135,8 @@
         "Transparent data encryption does not hide data from a database administrator; Always Encrypted does.",
         "Hyperscale exists only in the vCore purchasing model."
       ],
-      "scenario": "A healthcare analytics company is migrating an on-premises SQL Server database that relies on SQL Agent jobs and needs its Data Lake Storage Gen2 account reachable privately from its on-premises network over ExpressRoute. It runs a compatibility assessment first (through Azure Migrate), then targets SQL Managed Instance rather than Azure SQL Database, since Managed Instance supports SQL Agent jobs while still avoiding OS management, and uses Azure Database Migration Service for the actual online migration. For its Cosmos DB telemetry store, it redesigns a low-cardinality partition key that was creating a hot partition, and keeps Session consistency since each device needs to see its own latest writes immediately. Its storage account is configured for GZRS, protecting both against a single datacenter's loss and a full regional outage, with a lifecycle policy moving telemetry older than a year into Archive tier, and a private endpoint \u2014 not a service endpoint \u2014 providing the required private, on-premises reachability.",
-      "onTheJob": "Choosing Managed Instance over Azure SQL Database because of SQL Agent jobs is a decision an architect often has to defend twice \u2014 once to a DBA team attached to its legacy tooling, and again to a finance stakeholder who sees the bigger line item and assumes it's over-engineering. GZRS and an Archive-tier lifecycle policy look great in a cost-optimization slide until a client remembers that rehydrating archived data takes hours, at which point the real conversation becomes what data can actually tolerate that delay versus what the business insists it can't. Partition key redesign for Cosmos DB is the kind of fix that's cheap on a whiteboard and genuinely painful in production, since it usually means a data migration the client didn't budget for when they signed off on the original design. A compatibility assessment that comes back clean is also not the same thing as a guaranteed-compatible migration \u2014 CLR assemblies, specific SQL Agent proxy accounts, and other instance-level quirks that assessment tools may not fully evaluate are exactly why a real proof-of-concept restore into a non-production Managed Instance is worth doing even after a spotless assessment."
+      "scenario": "A healthcare analytics company is migrating an on-premises SQL Server database that relies on SQL Agent jobs and needs its Data Lake Storage Gen2 account reachable privately from its on-premises network over ExpressRoute. It runs a compatibility assessment first (through Azure Migrate), then targets SQL Managed Instance rather than Azure SQL Database, since Managed Instance supports SQL Agent jobs while still avoiding OS management, and uses Azure Database Migration Service for the actual online migration. For its Cosmos DB telemetry store, it redesigns a low-cardinality partition key that was creating a hot partition, and keeps Session consistency since each device needs to see its own latest writes immediately. Its storage account is configured for GRS, protecting against the loss of the whole primary region (GZRS would add zone redundancy, but zone-redundant accounts can't use the Archive tier), with a lifecycle policy moving telemetry older than a year into Archive tier, and a private endpoint \u2014 not a service endpoint \u2014 providing the required private, on-premises reachability.",
+      "onTheJob": "Choosing Managed Instance over Azure SQL Database because of SQL Agent jobs is a decision an architect often has to defend twice \u2014 once to a DBA team attached to its legacy tooling, and again to a finance stakeholder who sees the bigger line item and assumes it's over-engineering. Geo-redundant storage and an Archive-tier lifecycle policy look great in a cost-optimization slide until a client remembers that rehydrating archived data takes hours, at which point the real conversation becomes what data can actually tolerate that delay versus what the business insists it can't. Partition key redesign for Cosmos DB is the kind of fix that's cheap on a whiteboard and genuinely painful in production, since it usually means a data migration the client didn't budget for when they signed off on the original design. A compatibility assessment that comes back clean is also not the same thing as a guaranteed-compatible migration \u2014 CLR assemblies, specific SQL Agent proxy accounts, and other instance-level quirks that assessment tools may not fully evaluate are exactly why a real proof-of-concept restore into a non-production Managed Instance is worth doing even after a spotless assessment."
     },
     {
       "id": "business-continuity",
@@ -4187,7 +4187,7 @@
         "q9052",
         "q9053"
       ],
-      "reading": "Every business continuity design should start from two numbers the business sets, not the other way around: RTO (recovery time objective), the maximum tolerable downtime, and RPO (recovery point objective), the maximum tolerable data loss. Only once those numbers are known does it make sense to pick a backup frequency, a replication approach, and how much failover automation to build \u2014 a design question that states specific RTO/RPO numbers is really asking for the cheapest architecture that still satisfies both, not the most impressive-sounding one available.\n\nTwo Azure services get confused constantly because they sound similar but protect against entirely different things. Azure Backup protects data: it restores a file, a VM, or a database to an earlier point in time, which is exactly what you want after accidental deletion or corruption. Azure Site Recovery protects availability instead, replicating an entire VM or workload to a secondary region or zone so it can fail over and keep running through an outage. A request to recover an accidentally deleted file points to Backup; a request to keep an application running after a whole region goes down points to Site Recovery. Both actually live inside the same Recovery Services vault, which stores backup data as well as Site Recovery's replication configuration and metadata \u2014 and it's easy to assume backups automatically survive a regional outage, when that actually depends entirely on the vault's own redundancy setting (LRS, GRS, or zone-redundant), which is worth checking explicitly rather than assuming.\n\nTwo different failure scopes call for two different tools working together, not one replacing the other. Availability zones give synchronous, low-latency redundancy across physically separate datacenters within a single region, protecting against the loss of one datacenter. A secondary region \u2014 paired with the primary \u2014 provides asynchronous disaster-recovery redundancy against a full regional disaster instead, at the cost of higher replication latency \u2014 a well-designed solution frequently uses both together rather than choosing one over the other. How a multi-region design actually behaves during a failure comes down to active-active versus active-passive: active-active runs full production traffic in two or more regions at once, giving the fastest possible recovery at the highest cost and complexity, including handling conflicting writes made in two places at once; active-passive keeps a warm or cold standby region that only takes over after a failover, cheaper but slower to recover. \"Zero perceptible downtime during a regional failure\" is the signal phrase for active-active; any standby that has to be activated first, warm or cold, is active-passive.\n\nSome Azure services build failover automation in directly. Azure SQL Database auto-failover groups replicate one or more databases on a logical server to a secondary region and expose stable read-write and read-only listener endpoints that automatically redirect after a failover \u2014 so an application's connection string never has to change. That same read-only listener can actually serve reads from the secondary region even before any failover occurs, not only afterward, which is a detail worth remembering since it's easy to assume the secondary sits completely idle until disaster strikes.\n\nRecovery design follows the data. Azure SQL Database has point-in-time restore (7 days by default, up to 35) and long-term retention up to 10 years, Cosmos DB has continuous backup in 7-, 30-, and 35-day tiers, and blobs have operational backup that stays in the account or vaulted backup that copies data to a Backup vault. Backups need their own protection: a locked immutable vault, enhanced soft delete, and multi-user authorization with a Resource Guard owned by a separate team. Site Recovery covers Azure, VMware, Hyper-V, and physical servers with recovery plans.\n\nFor high availability, two or more VMs across zones give a 99.99 percent SLA, and zone-redundant databases, flexible servers with zone-redundant HA, ZRS or GZRS storage, and multi-region Cosmos DB cover the data. The global tier of Azure Load Balancer fronts regional load balancers for TCP and UDP, and Resiliency in Azure shows protection across the estate.",
+      "reading": "Every business continuity design should start from two numbers the business sets, not the other way around: RTO (recovery time objective), the maximum tolerable downtime, and RPO (recovery point objective), the maximum tolerable data loss. Only once those numbers are known does it make sense to pick a backup frequency, a replication approach, and how much failover automation to build \u2014 a design question that states specific RTO/RPO numbers is really asking for the cheapest architecture that still satisfies both, not the most impressive-sounding one available.\n\nTwo Azure services get confused constantly because they sound similar but protect against entirely different things. Azure Backup protects data: it restores a file, a VM, or a database to an earlier point in time, which is exactly what you want after accidental deletion or corruption. Azure Site Recovery protects availability instead, replicating an entire VM or workload to a secondary region or zone so it can fail over and keep running through an outage. A request to recover an accidentally deleted file points to Backup; a request to keep an application running after a whole region goes down points to Site Recovery. Both actually live inside the same Recovery Services vault, which stores backup data as well as Site Recovery's replication configuration and metadata \u2014 and it's easy to assume backups automatically survive a regional outage, when that actually depends entirely on the vault's own redundancy setting (LRS, GRS, or zone-redundant), which is worth checking explicitly rather than assuming.\n\nTwo different failure scopes call for two different tools working together, not one replacing the other. Availability zones give synchronous, low-latency redundancy across physically separate datacenters within a single region, protecting against the loss of one datacenter. A secondary region \u2014 paired with the primary \u2014 provides asynchronous disaster-recovery redundancy against a full regional disaster instead, at the cost of higher replication latency \u2014 a well-designed solution frequently uses both together rather than choosing one over the other. How a multi-region design actually behaves during a failure comes down to active-active versus active-passive: active-active runs full production traffic in two or more regions at once, giving the fastest possible recovery at the highest cost and complexity, including handling conflicting writes made in two places at once; active-passive keeps a warm or cold standby region that only takes over after a failover, cheaper but slower to recover. \"Zero perceptible downtime during a regional failure\" is the signal phrase for active-active; any standby that has to be activated first, warm or cold, is active-passive.\n\nSome Azure services build failover automation in directly. Azure SQL Database auto-failover groups replicate one or more databases on a logical server to a secondary region and expose stable read-write and read-only listener endpoints that automatically redirect after a failover \u2014 so an application's connection string never has to change. That same read-only listener can actually serve reads from the secondary region even before any failover occurs, not only afterward, which is a detail worth remembering since it's easy to assume the secondary sits completely idle until disaster strikes.\n\nRecovery design follows the data. Azure SQL Database has point-in-time restore (7 days by default, up to 35) and long-term retention up to 10 years, Cosmos DB has continuous backup in 7-, 30-, and 35-day tiers, and blobs have operational backup that stays in the account or vaulted backup that copies data to a Backup vault. Backups need their own protection: a locked immutable vault, enhanced soft delete, and multi-user authorization with a Resource Guard owned by a separate team. Site Recovery covers Azure, VMware, Hyper-V, and physical servers with recovery plans.\n\nFor high availability, two or more VMs across zones give a 99.99 percent SLA, and zone-redundant databases, flexible servers with zone-redundant HA (plus a cross-region read replica for a regional outage), ZRS or GZRS storage, and multi-region Cosmos DB cover the data. The global tier of Azure Load Balancer fronts regional load balancers for TCP and UDP, and Resiliency in Azure shows protection across the estate.",
       "fundamentalsLabel": "New to business continuity design? See the everyday analogy",
       "fundamentals": "Backup is like keeping dated copies of an important document, so you can go back to yesterday's version if today's got corrupted or deleted \u2014 it fixes a data problem. Site Recovery is like having a fully-equipped second office ready to open immediately if your main building becomes unusable \u2014 not just a copy of your files, but an entire working replacement environment standing by, ready to actually run the business. Active-active is like already having both offices open and staffed every single day, so losing one changes nothing for customers; active-passive is like keeping the second office's lights off and unstaffed until the day you actually need to open its doors.",
       "keyTerms": [
@@ -4220,7 +4220,7 @@
         "Operational backup, soft delete, and versioning keep data in the source account, so deleting the account removes them too.",
         "Zone redundancy handles a datacenter failure inside a region; a failover group or geo-replication handles the loss of a region."
       ],
-      "scenario": "A payments company sets its RTO at under two minutes and its RPO at near-zero for its core transaction database, and is willing to pay for the infrastructure that meets those numbers. It deploys Azure SQL Database with auto-failover groups across two regions in an active-active-leaning design, so the application's connection string never has to change during a failover, and configures its VM tier with availability zones for datacenter-level resilience plus Azure Site Recovery for full regional failover. Its nightly backups go to a Recovery Services vault explicitly configured for geo-redundant storage, since the original LRS default vault setting would have meant those backups couldn't survive the very regional outage the design is meant to withstand.",
+      "scenario": "A payments company sets its RTO at under two minutes and its RPO at near-zero for its core transaction database, and is willing to pay for the infrastructure that meets those numbers. It deploys Azure SQL Database with auto-failover groups across two regions with a readable secondary, so the application's connection string never has to change during a failover, and configures its VM tier with availability zones for datacenter-level resilience plus Azure Site Recovery for full regional failover. Its nightly backups go to a Recovery Services vault explicitly configured for geo-redundant storage, since the original LRS default vault setting would have meant those backups couldn't survive the very regional outage the design is meant to withstand.",
       "onTheJob": "RTO and RPO numbers a client states in a workshop are often aspirational rather than actually costed out, so a real part of the job is translating 'we need near-zero downtime' into the dollar figure active-active multi-region actually costs, and watching how fast that appetite changes once the client sees it. Backup and Site Recovery get bundled into one line item in budget conversations even though they solve different problems, and the closest calls to a real incident are almost always the ones where a team assumed backups already survived a regional outage without ever checking the vault's own redundancy setting. Active-passive gets sold as basically the same as active-active for a fraction of the cost, which is true right up until an actual regional failure, when the failover time nobody stress-tested becomes the client's first real data point. Auto-failover groups also get quietly undermined by a shortcut: a developer who hardcodes the primary server's own connection string instead of the read-write listener endpoint will see everything work fine for months, right up until a real failover happens and that hardcoded string stops resolving to anything live."
     },
     {
@@ -4359,7 +4359,7 @@
         "q9084",
         "q9085"
       ],
-      "reading": "Before any large migration begins, Azure Migrate serves as the hub for discovery and assessment \u2014 finding on-premises servers and workloads, right-sizing them, checking readiness, and estimating cost, all before a single workload actually moves. The real data migration itself is often handed off afterward to a more specialized tool, like Database Migration Service for a database, once Azure Migrate's assessment says a workload is actually ready to go.\n\nOnce workloads are in Azure, connecting them together calls for the right messaging or eventing service, and these three get mixed up constantly. Service Bus is a message broker built for ordered, transactional, point-to-point or publish/subscribe messaging with guaranteed delivery \u2014 the right choice when an order has to be processed exactly once, in order. Event Grid is a lightweight, reactive eventing service for discrete event notifications with push-based routing, suited to reacting to something like \"a blob was created\" rather than processing a queue of work. Event Hubs is built for high-throughput streaming and telemetry ingestion at a massive scale, the pick when the requirement is high-volume data ingestion rather than reliable, ordered processing.\n\nExposing and orchestrating that backend often needs its own layer, too. Azure API Management is a facade placed in front of backend APIs regardless of how or where they're actually hosted \u2014 VMs, App Service, anything \u2014 adding one consistent gateway for authentication, rate limiting, versioning, and a developer portal, so API consumers are decoupled from the underlying implementation. For integration logic itself, Logic Apps is a low-code, designer-driven workflow orchestrator with hundreds of prebuilt connectors, well suited to integrating SaaS and enterprise systems in a way business analysts, not just developers, can follow and adjust. Azure Functions is code-first, event-triggered compute instead, better suited when custom logic or fine-grained execution control is the real priority.\n\nAt the largest scale, Azure Virtual WAN automates hub-and-spoke connectivity \u2014 branch offices, VPN and ExpressRoute connections, hubs, and routing \u2014 across many regions at once, instead of hand-building and peering each regional hub yourself. Day to day, once a network is actually built, Network Watcher provides the diagnostic tools to troubleshoot it: IP flow verify checks whether a specific rule is allowing or blocking a given flow, flow logs record the traffic moving through the network (NSG flow logs are being retired on 30 September 2027 in favor of virtual network flow logs), and Connection Troubleshoot runs an end-to-end reachability test \u2014 these are diagnostics for a network that already exists, not design-time governance controls. And for secure administrative access into that network, Azure Bastion provides RDP or SSH through the portal itself, without ever exposing a VM's public IP address \u2014 a detail worth remembering whenever a scenario asks for remote access without any public IP exposure at all.\n\nApplication architecture questions pair a requirement with a service or pattern. Service Bus brings ordering with sessions, duplicate detection, and dead-letter queues, where Storage queues stay simple; Event Hubs ingests streams with a Kafka endpoint and Capture; Event Grid routes discrete events. Design patterns name common failure modes: Circuit Breaker, Retry, Bulkhead, Queue-Based Load Leveling, Competing Consumers, Claim Check, and Cache-Aside. Azure Managed Redis is the cache to design with, since Azure Cache for Redis Basic, Standard, and Premium retire on September 30, 2028, and pipelines should use workload identity federation instead of stored secrets.\n\nFor migration, Azure Migrate discovers and assesses before anything moves. SQL Server targets are chosen by feature need, with the Database Migration Service or the Managed Instance link for minimal downtime. Unstructured data moves online with Storage Mover or AzCopy, and offline with Data Box when the data is large and the network is slow.",
+      "reading": "Before any large migration begins, Azure Migrate serves as the hub for discovery and assessment \u2014 finding on-premises servers and workloads, right-sizing them, checking readiness, and estimating cost, all before a single workload actually moves. The move itself is then carried out by Azure Migrate's own migration tools, such as Server Migration, or handed off to a more specialized tool, like Database Migration Service for a database, once the assessment says a workload is actually ready to go.\n\nOnce workloads are in Azure, connecting them together calls for the right messaging or eventing service, and these three get mixed up constantly. Service Bus is a message broker built for ordered, transactional, point-to-point or publish/subscribe messaging with guaranteed delivery \u2014 the right choice when an order has to be processed exactly once, in order. Event Grid is a lightweight, reactive eventing service for discrete event notifications with push-based routing, suited to reacting to something like \"a blob was created\" rather than processing a queue of work. Event Hubs is built for high-throughput streaming and telemetry ingestion at a massive scale, the pick when the requirement is high-volume data ingestion rather than reliable, ordered processing.\n\nExposing and orchestrating that backend often needs its own layer, too. Azure API Management is a facade placed in front of backend APIs regardless of how or where they're actually hosted \u2014 VMs, App Service, anything \u2014 adding one consistent gateway for authentication, rate limiting, versioning, and a developer portal, so API consumers are decoupled from the underlying implementation. For integration logic itself, Logic Apps is a low-code, designer-driven workflow orchestrator with hundreds of prebuilt connectors, well suited to integrating SaaS and enterprise systems in a way business analysts, not just developers, can follow and adjust. Azure Functions is code-first, event-triggered compute instead, better suited when custom logic or fine-grained execution control is the real priority.\n\nAt the largest scale, Azure Virtual WAN automates hub-and-spoke connectivity \u2014 branch offices, VPN and ExpressRoute connections, hubs, and routing \u2014 across many regions at once, instead of hand-building and peering each regional hub yourself. Day to day, once a network is actually built, Network Watcher provides the diagnostic tools to troubleshoot it: IP flow verify checks whether a specific rule is allowing or blocking a given flow, flow logs record the traffic moving through the network (NSG flow logs are being retired on 30 September 2027 in favor of virtual network flow logs), and Connection Troubleshoot runs an end-to-end reachability test \u2014 these are diagnostics for a network that already exists, not design-time governance controls. And for secure administrative access into that network, Azure Bastion provides RDP or SSH through the portal itself, without ever exposing a VM's public IP address \u2014 a detail worth remembering whenever a scenario asks for remote access without any public IP exposure at all.\n\nApplication architecture questions pair a requirement with a service or pattern. Service Bus brings ordering with sessions, duplicate detection, and dead-letter queues, where Storage queues stay simple; Event Hubs ingests streams with a Kafka endpoint and Capture; Event Grid routes discrete events. Design patterns name common failure modes: Circuit Breaker, Retry, Bulkhead, Queue-Based Load Leveling, Competing Consumers, Claim Check, and Cache-Aside. Azure Managed Redis is the cache to design with, since Azure Cache for Redis Basic, Standard, and Premium retire on September 30, 2028, and pipelines should use workload identity federation instead of stored secrets.\n\nFor migration, Azure Migrate discovers and assesses before anything moves, and its Server Migration tool then replicates VMs, with a test migration before cutover. SQL Server targets are chosen by feature need, with the Database Migration Service or the Managed Instance link for minimal downtime. Unstructured data moves online with Storage Mover or AzCopy, and offline with Data Box when the data is large and the network is slow.",
       "fundamentalsLabel": "New to Azure integration and eventing? See the everyday analogy",
       "fundamentals": "Service Bus, Event Grid, and Event Hubs are like three different ways a business handles incoming information. Service Bus is like a certified mail queue \u2014 every item gets processed, in order, exactly once, with a signature confirming delivery. Event Grid is like a text alert telling a manager the instant something specific happens, with no ongoing queue to process. Event Hubs is like a firehose of sensor readings pouring in continuously \u2014 the goal isn't to process each drop individually, it's to capture and analyze the whole stream at massive volume.",
       "keyTerms": [
@@ -4381,7 +4381,7 @@
         "Data Box"
       ],
       "commonTraps": [
-        "Azure Migrate is for discovery and assessment before a move \u2014 the actual migration is usually carried out by a more specialized tool like Database Migration Service.",
+        "Azure Migrate starts with discovery and assessment before a move \u2014 the migration itself is then run by its integrated tools (Server Migration for VMs) or by a more specialized tool like Database Migration Service.",
         "Event Grid reacts to discrete events like a resource being created; Service Bus is for reliable, ordered message processing; Event Hubs is for high-throughput streaming ingestion \u2014 picking the wrong one for the requirement is the most common trap here.",
         "Logic Apps and Azure Functions both do integration work, but a requirement that non-developers understand and adjust the flow points to Logic Apps, not hand-written Functions code.",
         "Network Watcher's tools troubleshoot a network that's already built \u2014 they don't govern or restrict how it gets built in the first place.",
@@ -4428,7 +4428,7 @@
       "heading": "Compute design tradeoffs",
       "points": [
         "Control vs. management overhead spectrum: VMs/VMSS (most control, most overhead) \u2192 AKS (full orchestration control, real ops burden) \u2192 Container Apps (serverless containers, less to manage) \u2192 App Service (PaaS web apps, least infrastructure to manage) \u2192 Functions (event-driven serverless, pay-per-execution).",
-        "Choose AKS when you need deep Kubernetes-level control (custom schedulers, service mesh, multi-container pods); choose Container Apps or App Service when you just need to run containers/web apps without managing a cluster.",
+        "Choose AKS when you need deep Kubernetes-level control (custom operators, DaemonSets, service mesh); choose Container Apps or App Service when you just need to run containers/web apps without managing a cluster.",
         "Azure Functions Consumption plan scales to zero and bills per execution; Premium/Dedicated plans trade some of that elasticity for pre-warmed instances and VNet integration.",
         "Batch for parallel jobs (Spot VMs cut cost), Dedicated Host for single-tenant servers, confidential VMs for data in use, Azure VMware Solution for a fast VMware exit, App Service Environment for single-tenant web hosting, Logic Apps Standard for single-tenant workflows.",
         "Azure Deployment Environments retires on 22 February 2027, and Azure Cache for Redis Basic, Standard, and Premium retire on September 30, 2028 (Enterprise tiers March 31, 2027), so use Azure Managed Redis for new designs."
@@ -4438,7 +4438,7 @@
       "heading": "Storage design tradeoffs",
       "points": [
         "Redundancy choice should be driven by required durability and DR scope: LRS/ZRS protect within a region (datacenter vs. zone failure); GRS/RA-GRS/GZRS/RA-GZRS add protection against a full regional outage, with the RA- variants also allowing reads from the secondary.",
-        "Blob access tiers (Hot/Cool/Cold/Archive) are a cost-vs-access-latency design lever, not just an operational setting \u2014 Archive needs rehydration before it can be read, so it's wrong for anything needing fast recovery.",
+        "Blob access tiers (Hot/Cool/Cold/Archive) are a cost-vs-access-latency design lever, not just an operational setting \u2014 Archive needs rehydration before it can be read, so it's wrong for anything needing fast recovery, and it isn't available on ZRS, GZRS, or RA-GZRS accounts.",
         "Premium SSD or Ultra Disk for latency-sensitive, high-IOPS workloads (databases); Standard tiers for dev/test or infrequently accessed data.",
         "Azure SQL protection: TDE for stolen files, Always Encrypted for untrusted administrators, dynamic data masking for display, ledger for tamper evidence. Hyperscale: up to 128 TB and up to 30 named replicas; serverless compute bills per second and can auto-pause in General Purpose.",
         "Unstructured data: Blob and Data Lake for objects, Azure Files for shares, NetApp Files for enterprise file performance, Elastic SAN for pooled iSCSI block storage. Microsoft Fabric with OneLake is the unified analytics platform; Stream Analytics runs continuous queries on streams.",
@@ -4450,7 +4450,7 @@
       "points": [
         "Hub-and-spoke topology centralizes shared services (firewall, VPN/ExpressRoute gateway, DNS) in a hub VNet, with workload VNets as spokes peered to it \u2014 spokes don't automatically talk to each other through the hub without explicit routing (peering is non-transitive).",
         "Azure Virtual WAN automates hub-and-spoke connectivity at large/global scale, replacing manually-managed hubs when you have many regions/sites.",
-        "Front Door = global Layer 7 load balancing with WAF + CDN (best for global-scale web apps). Traffic Manager = global DNS-based routing, protocol-agnostic (works for non-HTTP too). Application Gateway = regional Layer 7 with WAF. Load Balancer = regional/zonal Layer 4 \u2014 pick based on required scope AND protocol, not just \"global vs. regional.\"",
+        "Front Door = global Layer 7 load balancing with WAF + CDN (best for global-scale web apps). Traffic Manager = global DNS-based routing, protocol-agnostic (works for non-HTTP too). Application Gateway = regional Layer 7 with WAF. Load Balancer = Layer 4, regional or zonal (its global tier can front regional load balancers) \u2014 pick based on required scope AND protocol, not just \"global vs. regional.\"",
         "DDoS Network Protection adds rapid response, cost protection, and WAF discounts over IP Protection. Route Server exchanges routes with NVAs by BGP. A network security perimeter controls public access to PaaS resources; Virtual Network Manager security admin rules are evaluated before NSG rules.",
         "Front Door Premium adds Private Link origins and bot protection. Accelerated networking and proximity placement groups cut latency inside a region; Azure CDN Standard from Microsoft (classic) retires on September 30, 2027."
       ]
@@ -4572,15 +4572,15 @@
     {
       "id": "ml-az305-9001",
       "cat": "identityGovernance",
-      "scenario": "A security team must stream platform resource logs to an external SIEM, so the diagnostic setting should target an {b1}. For keys that need single-tenant hardware with full customer control, the recommended service is {b2}, while settings and feature flags shared by many microservices belong in {b3}.",
+      "scenario": "A security team must stream platform resource logs to an external SIEM, so the diagnostic setting should target {b1}. For keys that need single-tenant hardware with full customer control, the recommended service is {b2}, while settings and feature flags shared by many microservices belong in {b3}.",
       "blanks": [
         {
           "key": "b1",
           "options": [
-            "event hub",
-            "storage account",
-            "Log Analytics workspace",
-            "Azure Advisor"
+            "an event hub",
+            "a storage account",
+            "a Log Analytics workspace",
+            "Azure Monitor Agent"
           ],
           "correct": 0
         },
@@ -4620,7 +4620,7 @@
         "Peer the spoke VNet to the hub (not to other spokes)",
         "Apply NSGs and route tables to enforce the isolation boundary"
       ],
-      "explanation": "The topology decision comes first since it shapes everything after it; the hub has to exist before a spoke can peer to it, and peering spoke-to-hub only (never spoke-to-spoke) is exactly what keeps workloads isolated from each other by default."
+      "explanation": "The topology decision comes first since it shapes everything after it; the hub is built before any spoke because it carries the shared services every spoke will use, and the peering step needs both VNets to exist. Peering spoke-to-hub only (never spoke-to-spoke) is exactly what keeps workloads isolated from each other by default."
     },
     {
       "id": "seq-az305-2",
@@ -4633,7 +4633,7 @@
         "Test failover regularly without impacting production",
         "Document and rehearse the actual failover/failback runbook"
       ],
-      "explanation": "You can't choose a DR pattern until you know the actual RTO/RPO targets it needs to hit \u2014 designing the technical solution before agreeing the requirement is a common real-world (and exam) trap. Regular testing and a written runbook come last since they validate the solution already built."
+      "explanation": "You can't choose a DR pattern until you know the actual RTO/RPO targets it needs to hit \u2014 designing the technical solution before agreeing the requirement is a common real-world (and exam) trap. Regular testing and a written runbook come last since they validate the solution already built: a test failover shows what the runbook must contain, and the finished runbook is then rehearsed."
     },
     {
       "id": "seq-az305-3",
@@ -4669,7 +4669,7 @@
       "id": "cs-az305-contoso-retail",
       "cat": "infrastructure",
       "title": "Contoso Retail's Global Storefront Migration",
-      "scenario": "Contoso Retail runs its e-commerce storefront from a single datacenter in Chicago. The storefront is a containerized .NET application that the team already packages as Docker images, and traffic is heavily seasonal \u2014 Black Friday weekend sees 20x normal load, while most of the year the app runs well below capacity. The database tier is a SQL Server instance holding the product catalog and order history; the business requires it to remain available even if an entire Azure region goes offline. Contoso's platform team is small and does not want to manage Kubernetes control planes or patch VM operating systems by hand. Customers are located across North America, Europe, and Asia, and Contoso wants a single application endpoint that automatically routes each customer to their nearest healthy deployment.",
+      "scenario": "Contoso Retail runs its e-commerce storefront from a single datacenter in Chicago. The storefront is a containerized .NET application that the team already packages as Docker images, and traffic is heavily seasonal \u2014 Black Friday weekend sees 20x normal load, while most of the year the app runs well below capacity. The database tier is a SQL Server instance holding the product catalog and order history; the business requires its data to survive even if an entire Azure region goes offline. Contoso's platform team is small and does not want to manage Kubernetes control planes or patch VM operating systems by hand. Customers are located across North America, Europe, and Asia, and Contoso wants a single application endpoint that automatically routes each customer to their nearest healthy deployment.",
       "questions": [
         {
           "id": "cs-az305-contoso-retail-q1",
@@ -4700,15 +4700,15 @@
         {
           "id": "cs-az305-contoso-retail-q3",
           "type": "mc",
-          "question": "Which storage redundancy option should be recommended for the SQL Server database given the requirement that it survive an entire regional outage?",
+          "question": "Which storage redundancy option should be recommended for the SQL Server database given the requirement that its data survive an entire regional outage?",
           "options": [
             "Locally-redundant storage (LRS)",
             "Zone-redundant storage (ZRS)",
             "Geo-redundant storage (GRS) or geo-zone-redundant storage (GZRS)",
-            "Read-access geo-redundant storage is unnecessary if backups run nightly"
+            "A second storage account in the same region, synchronized nightly"
           ],
           "correct": 2,
-          "explanation": "Only GRS/GZRS replicate data to a secondary Azure region, which is what surviving a full regional outage requires. LRS and ZRS both replicate only within the primary region (ZRS across availability zones, but still one region), so neither protects against that region going offline entirely. Nightly backups alone would still mean a real recovery-time gap and don't by themselves place a copy of the data in another region.",
+          "explanation": "Only GRS/GZRS replicate data to a secondary Azure region, which is what surviving a full regional outage requires. LRS and ZRS both replicate only within the primary region (ZRS across availability zones, but still one region), so neither protects against that region going offline entirely. A second account in the same region, synchronized nightly, sits in the failed region too and still leaves a gap of up to a day of data.",
           "whyTested": "AZ-305 case studies frequently bury the real requirement (\"survive a regional outage\") inside a paragraph of unrelated detail \u2014 recognizing that single sentence as the one that rules out every region-local redundancy option is the actual skill being tested, not memorizing the redundancy tiers in isolation."
         },
         {
@@ -4743,7 +4743,7 @@
             "A manually-triggered geo-restore from backup"
           ],
           "correct": 0,
-          "explanation": "Auto-failover groups keep a continuously synchronized secondary replica and can fail over automatically within roughly a minute, meeting both the aggressive RPO and RTO. Nightly backups and geo-restore both imply recovery measured in potentially hours with data loss back to the last backup, not seconds. GRS protects the storage layer, not a live, queryable database replica, and doesn't by itself deliver an application-consistent database failover."
+          "explanation": "Auto-failover groups keep a continuously synchronized secondary replica, and a customer-initiated failover typically completes in under a minute, so they are the option that can meet both the aggressive RPO and RTO. Nightly backups and geo-restore both imply recovery measured in potentially hours with data loss back to the last backup, not seconds. GRS protects the storage layer, not a live, queryable database replica, and doesn't by itself deliver an application-consistent database failover."
         },
         {
           "id": "cs-az305-fabrikam-claims-q2",
@@ -4755,7 +4755,7 @@
         {
           "id": "cs-az305-fabrikam-claims-q3",
           "type": "ms",
-          "question": "Which of the following are true about meeting the compliance team's requirement to rehearse failover without impacting production? (Select all that apply.)",
+          "question": "Which of the following are true about meeting the compliance team's requirement to rehearse failover without impacting production? (Choose three.)",
           "options": [
             "Azure Site Recovery supports test failover into an isolated network, leaving the production VMs and replication untouched",
             "A test failover validates the replicated copy is recoverable without triggering an actual failover of production traffic",
