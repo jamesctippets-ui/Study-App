@@ -274,7 +274,7 @@
       "id": "f23",
       "cat": "ccspConcepts",
       "front": "Quantum computing risk and post-quantum cryptography",
-      "back": "A large-scale quantum computer could break public-key algorithms such as RSA and elliptic-curve schemes, so data that must stay secret for years is exposed to harvest-now, decrypt-later collection. Post-quantum algorithms are being standardized as the answer.",
+      "back": "A large-scale quantum computer could break public-key algorithms such as RSA and elliptic-curve schemes, so data that must stay secret for years is exposed to harvest-now, decrypt-later collection. NIST has standardized post-quantum algorithms (ML-KEM, ML-DSA and SLH-DSA in FIPS 203, 204 and 205) as the answer.",
       "detail": "Architects plan crypto agility: the ability to swap algorithms without redesigning systems."
     },
     {
@@ -771,7 +771,7 @@
       "id": "f94",
       "cat": "ccspApp",
       "front": "Secure software development life cycle (SDLC)",
-      "back": "Building security activities into every phase of development: requirements, design, coding, testing, deployment and maintenance, rather than testing for security only at the end.",
+      "back": "Building security activities into every phase of development (threat modeling in design, secure coding and review, security testing before release, patching and monitoring afterwards) rather than testing for security only at the end.",
       "detail": "The earlier a defect is found the cheaper it is to fix; 'shift left' is the standard exam answer."
     },
     {
@@ -791,9 +791,9 @@
     {
       "id": "f97",
       "cat": "ccspApp",
-      "front": "PASTA and attack trees",
-      "back": "PASTA is a risk-centric, seven-stage threat modeling process tied to business impact; attack trees decompose an attacker's goal into the steps needed to reach it.",
-      "detail": "Other models alongside STRIDE; the exam asks you to match method to purpose, not to run them in detail."
+      "front": "Attack trees",
+      "back": "A threat modeling technique that puts the attacker's goal at the root of a tree and decomposes it into the sub-goals and steps (joined by AND or OR logic) needed to reach it, so defenders can see the cheapest or likeliest attack paths.",
+      "detail": "Another model alongside STRIDE and PASTA; the exam asks you to match method to purpose, not to run them in detail."
     },
     {
       "id": "f98",
@@ -1261,7 +1261,7 @@
       "id": "f164",
       "cat": "ccspLegal",
       "front": "Risk management process and treatment options",
-      "back": "Identify assets and threats, assess likelihood and impact, then treat the risk by mitigating, transferring (for example insurance or contract), avoiding or accepting it, tracking the rest in a risk register.",
+      "back": "Identify assets and threats, assess likelihood and impact, then treat the risk by mitigating, transferring (for example insurance or contract), sharing, avoiding or accepting it, tracking the rest in a risk register.",
       "detail": "Risk is accepted by the business owner, not by the security team; cloud adoption transfers some duties but never accountability."
     },
     {
@@ -1309,9 +1309,9 @@
     {
       "id": "f171",
       "cat": "ccspLegal",
-      "front": "Cyber insurance and risk transfer",
-      "back": "Insurance transfers part of the financial impact of an incident but not the legal accountability or the reputational damage, and insurers often require baseline controls.",
-      "detail": "A treatment option, never a substitute for controls."
+      "front": "Risk transfer",
+      "back": "The treatment option that moves the financial consequence of a risk to a third party, usually through insurance or contract terms such as indemnification and liability clauses, while legal accountability and reputational damage stay with the organization.",
+      "detail": "Buying cyber insurance is the classic case; it is a treatment option, never a substitute for controls."
     },
     {
       "id": "f172",
@@ -1394,7 +1394,7 @@
       "id": "f9011",
       "cat": "ccspConcepts",
       "front": "Cost-benefit analysis and return on investment (ROI)",
-      "back": "Cost-benefit analysis compares the full cost of a control or migration (licenses, labor, risk) with the benefit (loss avoided, savings). ROI is gain minus cost, divided by cost. A safeguard is justified when the annual loss it prevents exceeds its annual cost.",
+      "back": "Weighing the full cost of a control or migration (licenses, labor, risk) against its benefit (loss avoided, savings). The ROI is gain minus cost, divided by cost. A safeguard is justified when the annual loss it prevents exceeds its annual cost.",
       "detail": "These numbers feed the business impact analysis and the decision on which recovery or control option to fund."
     },
     {
@@ -2353,7 +2353,7 @@
       "id": "f9148",
       "cat": "ccspLegal",
       "front": "Risk sharing",
-      "back": "Risk sharing splits the consequence with another party by contract, joint ventures or pooled insurance, whereas transfer moves the financial impact entirely. Both leave accountability with the organization.",
+      "back": "Risk sharing splits the consequence with another party by contract, joint ventures or pooled insurance, whereas transfer shifts the financial impact to another party, for example through insurance or an indemnity clause. Both leave accountability with the organization.",
       "detail": "The outline lists avoid, mitigate, transfer, share and accept as separate treatments."
     },
     {
@@ -2458,7 +2458,7 @@
       "options": [
         "Hybrid cloud, because several organizations contribute infrastructure",
         "Private cloud, because access is restricted to named organizations",
-        "Community cloud",
+        "Community cloud, because the participants have the same regulatory needs",
         "Multi-cloud, because multiple customers participate"
       ],
       "correct": 2,
@@ -2541,9 +2541,9 @@
       "type": "mc",
       "question": "A team stores purchase records on a managed distributed ledger and later receives a lawful erasure request from a customer. What is the MOST significant design problem this reveals?",
       "options": [
-        "Ledgers require the provider to hold every participant's private key",
-        "Ledgers cannot be replicated across regions for resilience",
-        "Ledgers cannot be encrypted when the data is at rest",
+        "Ledgers require the provider to hold every participant's private key in order to validate entries",
+        "Ledgers cannot be replicated across regions, so a regional outage loses the whole record",
+        "Ledgers cannot be encrypted when the data is at rest, so every stored purchase record is exposed",
         "Immutable ledger entries cannot be removed, which conflicts with deletion obligations for personal data"
       ],
       "correct": 3,
@@ -2553,7 +2553,7 @@
       "id": "q10",
       "cat": "ccspConcepts",
       "type": "mc",
-      "question": "Why is the roadmap for post-quantum cryptography a concern today for data that must remain confidential for twenty years?",
+      "question": "Why should an organization start planning its move to post-quantum cryptography today for data that must remain confidential for twenty years?",
       "options": [
         "Quantum computers will make all symmetric hashing completely unusable as soon as they exist",
         "Adversaries can collect encrypted traffic now and decrypt it once quantum capability exists",
@@ -2613,11 +2613,11 @@
       "options": [
         "Maintenance and versioning",
         "Reversibility",
-        "Elasticity",
+        "Availability",
         "Performance"
       ],
       "correct": 1,
-      "explanation": "Reversibility concerns retrieving customer assets and having remaining copies deleted on exit. Elasticity, maintenance and performance are separate aspects and do not address exit."
+      "explanation": "Reversibility concerns retrieving customer assets and having remaining copies deleted on exit. Availability, maintenance and versioning, and performance are separate aspects and do not address exit."
     },
     {
       "id": "q15",
@@ -2760,7 +2760,7 @@
       "id": "tf5",
       "cat": "ccspConcepts",
       "type": "tf",
-      "question": "Containers and serverless functions are examples of technologies the CCSP treats as part of the cloud reference architecture's impact of related technologies.",
+      "question": "The CCSP outline expects candidates to consider how related technologies such as containers, serverless functions, edge computing and AI affect cloud architecture and security.",
       "answer": true,
       "explanation": "The outline asks you to consider how containers, edge, confidential computing, AI and similar technologies affect architecture and security."
     },
@@ -3179,10 +3179,10 @@
       "type": "mc",
       "question": "An architect's design relies on encrypting data with a key kept in the same storage account as the data. What is the PRIMARY weakness?",
       "options": [
-        "The encryption algorithm will run too slowly",
+        "Reading the key from the same account makes the encryption run too slowly to be usable",
         "Anyone who gains access to the account can obtain both data and key, defeating the encryption",
-        "Keys cannot legally be stored in cloud storage",
-        "The data cannot be backed up while encrypted"
+        "Regulations prohibit storing cryptographic keys in any cloud storage service at all",
+        "Encrypted data cannot be backed up or replicated while its key sits in the same account"
       ],
       "correct": 1,
       "explanation": "Key separation is a basic principle: compromise of the account should not hand over both parts. Keys can be stored in cloud services, backups work fine and performance is not the issue."
@@ -3395,7 +3395,7 @@
       "options": [
         "A full-tunnel VPN placing contractors on the corporate network",
         "Sharing a common account protected by a long password",
-        "Zero trust network access granting per-application sessions after verifying device",
+        "Zero trust network access granting per-application sessions after verifying user and device",
         "Whitelisting the contractors' home IP addresses permanently on the application firewall"
       ],
       "correct": 2,
@@ -3613,10 +3613,10 @@
       "type": "mc",
       "question": "A bank needs near-zero data loss and failover in seconds for a payment platform, while accepting higher cost. Which design is MOST appropriate?",
       "options": [
-        "A single zone with a larger instance type",
-        "Weekly backups to cold storage",
+        "A single zone with a larger instance type and frequent snapshots",
+        "Weekly full backups copied to cold storage in another region",
         "Active-active deployment across availability zones with synchronous replication",
-        "Pilot light with asynchronous replication"
+        "A pilot light environment with asynchronous replication to a second region"
       ],
       "correct": 2,
       "explanation": "Only active-active with synchronous replication supports near-zero RPO and fast failover. Backups and pilot light have longer recovery, and a single zone is a single failure domain."
@@ -4192,10 +4192,10 @@
       "type": "mc",
       "question": "Which item should be collected FIRST in a live cloud forensic investigation, according to the order of volatility?",
       "options": [
-        "Printed network diagrams",
-        "Archived backup media",
+        "Printed network diagrams stored in the facility",
+        "Archived backup media held at an offsite storage facility",
         "Memory contents and running process information",
-        "Remote log archives"
+        "Remote log archives held in a central collection service"
       ],
       "correct": 2,
       "explanation": "Memory is the most volatile and is lost on stop or reboot. Backups and archived logs persist, and diagrams are documentation."
@@ -4260,15 +4260,15 @@
       "id": "q86",
       "cat": "ccspOps",
       "type": "mc",
-      "question": "A configuration scan shows that several servers no longer match the approved baseline after emergency fixes. Which practice BEST reduces recurrence?",
+      "question": "An engineer restored a failed service by editing a production server directly, outside the normal change process. Which follow-up BEST keeps change control intact?",
       "options": [
-        "Allow all engineers to modify servers directly whenever they judge a change necessary to restore service quickly",
-        "Delete the baseline and rely on memory",
-        "Detect drift automatically and enforce changes through version-controlled templates",
-        "Disable the scans to reduce noise"
+        "Leave it undocumented because emergency changes are exempt from change management",
+        "Require a full change board meeting before any future fix, even while a service is down",
+        "Record it as an emergency change, review it afterwards and fold a valid fix into the baseline and templates",
+        "Roll the server back to the baseline at once, even if the failure returns"
       ],
       "correct": 2,
-      "explanation": "Drift detection plus templates keeps configurations governed. Free manual changes create drift and removing the baseline removes the standard."
+      "explanation": "Emergency changes are expedited, not exempt: they are recorded, reviewed afterwards and, if valid, built into the baseline so the system does not drift. Skipping the record breaks accountability, demanding a full board during an outage defeats the purpose of the emergency path, and a blind rollback restores the failure."
     },
     {
       "id": "q87",
@@ -4291,13 +4291,13 @@
       "type": "mc",
       "question": "Which statement about incident response in the cloud is MOST accurate?",
       "options": [
-        "The provider alone investigates all incidents on the customer's behalf",
-        "Incident response begins when the incident is declared closed",
-        "Logs can always be reconstructed after the fact",
+        "The provider alone investigates all incidents on the customer's behalf, so the customer needs no readiness of its own",
+        "Incident response should begin only after the provider has formally confirmed that a breach occurred",
+        "Logs from ephemeral resources can always be recovered from the provider later, even if logging was never enabled",
         "Preparation, including logging and provider contacts, must be done before an incident because evidence may be ephemeral"
       ],
       "correct": 3,
-      "explanation": "Because resources are ephemeral and access depends on contracts, readiness comes first. The provider does not run the customer's response and logs not collected may be gone."
+      "explanation": "Because resources are ephemeral and access depends on contracts, readiness comes first. The provider does not run the customer's response, waiting for its confirmation delays containment, and logs not collected may be gone."
     },
     {
       "id": "q89",
@@ -4545,7 +4545,7 @@
       "id": "q96",
       "cat": "ccspLegal",
       "type": "mc",
-      "question": "A processor of US health data is hosting records in the cloud. Which contractual document is typically REQUIRED between the covered entity and the provider?",
+      "question": "A US healthcare organization that is a HIPAA covered entity wants to host patient records with a cloud provider. Which contractual document is typically REQUIRED between the two?",
       "options": [
         "A non-compete agreement",
         "A marketing co-branding agreement",
@@ -4553,7 +4553,7 @@
         "A software escrow agreement only"
       ],
       "correct": 2,
-      "explanation": "Under HIPAA, providers handling protected health information as business associates must sign such an agreement. The other documents do not satisfy the requirement."
+      "explanation": "Under HIPAA, a cloud provider that handles protected health information is a business associate and must sign such an agreement with the covered entity. The other documents do not satisfy the requirement."
     },
     {
       "id": "q97",
@@ -4561,19 +4561,19 @@
       "type": "mc",
       "question": "A court order requires a company to produce emails stored in a cloud service. Which cloud-specific consideration is MOST important in the eDiscovery plan?",
       "options": [
-        "The provider's number of employees",
-        "The color scheme of the admin console",
-        "Whether the provider's marketing website has been redesigned in the last year",
+        "Whether the provider's data centers hold a current ISO/IEC 27001 certificate",
+        "How many regions the provider operates around the world",
+        "The provider's published uptime percentage for its email service during the last year",
         "Knowing where the data is held, how a legal hold is applied and what the provider will support"
       ],
       "correct": 3,
-      "explanation": "Location, hold mechanisms and provider support determine whether the company can preserve and produce data. The other facts are irrelevant."
+      "explanation": "Location, hold mechanisms and provider support determine whether the company can preserve and produce data. Uptime, regional footprint and certification matter for availability and assurance but do not decide whether data can be preserved and produced."
     },
     {
       "id": "q98",
       "cat": "ccspLegal",
       "type": "mc",
-      "question": "Management decides to buy cyber insurance to cover part of the financial loss from a major breach. How does this risk treatment BEST classify?",
+      "question": "Management decides to buy cyber insurance to cover part of the financial loss from a major breach. How is this risk treatment BEST classified?",
       "options": [
         "Risk acceptance, because no action is taken",
         "Risk transfer, which does not remove accountability or the need for controls",
@@ -4860,15 +4860,15 @@
       "id": "q9005",
       "cat": "ccspConcepts",
       "type": "mc",
-      "question": "A decommissioned virtual disk volume must be sanitized before the cloud account is closed. The team cannot access the provider's hardware and the data is encrypted with a customer-managed key. Which approach gives the HIGHEST assurance?",
+      "question": "A customer retired an encrypted volume by destroying its key and must now give an auditor assurance that the data is unrecoverable. Which evidence is MOST convincing?",
       "options": [
-        "Destroy every copy of the key and document the destruction",
-        "Overwrite the volume once from within the virtual machine",
-        "Delete the volume through the console and trust the status message",
-        "Ask the provider to reformat the volume without evidence"
+        "Key management records proving every copy of the key was destroyed, including backups and escrow",
+        "A console screenshot showing the volume with a deleted status and a timestamp",
+        "The provider's marketing statement that deleted customer data is always unrecoverable",
+        "A report showing that the guest operating system overwrote the volume once before release"
       ],
       "correct": 0,
-      "explanation": "Cryptographic erase is the purge-level technique available to customers on shared storage. Overwriting from a guest cannot reach wear-leveled or replicated copies, console deletion is logical, and an unevidenced reformat gives no proof."
+      "explanation": "Cryptographic erasure is only as strong as the key destruction, so the convincing evidence is the key lifecycle record and proof that no copy survives in backups or escrow. A console status shows only logical deletion, a marketing claim cannot be verified, and a guest-level overwrite may not reach replicas or wear-leveled blocks."
     },
     {
       "id": "q9006",
@@ -5125,15 +5125,15 @@
       "id": "q9017",
       "cat": "ccspData",
       "type": "mc",
-      "question": "An engineering firm shares design files with a subcontractor and must be able to stop that subcontractor from printing or forwarding the files and to withdraw access at the end of the contract. Which control fits BEST?",
+      "question": "A company wants every document labeled Confidential to be encrypted automatically and to carry restrictions on external sharing and copying, wherever the file is later stored. Which approach achieves this?",
       "options": [
-        "Data loss prevention at the corporate email gateway, which inspects outbound mail but cannot reach a copied file",
-        "Static data masking applied to the files before sharing, which cannot be undone once the file is out",
-        "Information rights management with a policy server that can revoke licenses",
-        "A much longer password on the shared folder, given only to the external party"
+        "A perimeter firewall rule that blocks any file whose name contains the word Confidential",
+        "Static masking of Confidential files before they are written to cloud storage",
+        "Classification labels that automatically apply rights management protection to the file",
+        "Folder permissions that the file server administrator sets once for each department"
       ],
       "correct": 2,
-      "explanation": "IRM protects the file itself, controls actions such as printing and forwarding and can revoke access. DLP governs egress, masking alters content irreversibly and a password does not control use or revocation."
+      "explanation": "A label that triggers rights management attaches encryption and usage restrictions to the file itself, so the protection follows it. Name-based firewall rules and folder permissions stay behind when the file moves, and masking alters the content rather than controlling its use."
     },
     {
       "id": "q9018",
@@ -5594,7 +5594,7 @@
       "id": "q9037",
       "cat": "ccspApp",
       "type": "mc",
-      "question": "A developer team building a customer-facing assistant that calls internal tools wants a risk list tailored to large language model applications. Which source is MOST relevant?",
+      "question": "A developer team is building a customer-facing assistant on a generative AI model that can call internal tools and wants a published risk list tailored to this kind of system. Which source is MOST relevant?",
       "options": [
         "The OWASP Top 10 for Large Language Model Applications",
         "A generic list of network ports and the services that traditionally use each of them on servers",
@@ -5692,15 +5692,15 @@
       "id": "q9044",
       "cat": "ccspApp",
       "type": "mc",
-      "question": "A build pipeline deploys whatever artifact a developer uploads to a shared registry. An attacker uploads a modified image to the registry. Which control would block it at deployment time?",
+      "question": "A deployment manifest references a container image only by the tag latest. An attacker with push rights to the registry overwrites that tag with a modified image, and the next rollout pulls it. Which practice BEST prevents this?",
       "options": [
-        "Signature verification against trusted keys with provenance checks",
-        "A longer retention period for build logs and the records of every pipeline run",
-        "Renaming the registry repository and publishing the new name to every developer",
-        "Increasing the registry's storage capacity and adding mirror copies across regions"
+        "Reference images by immutable digest and enable tag immutability in the registry",
+        "Rotate the registry's TLS certificate every week and require TLS 1.3 for all pulls",
+        "Add registry replicas in other regions so that pulls keep working during an outage",
+        "Scan the image once at build time and then trust the tag from that point on"
       ],
       "correct": 0,
-      "explanation": "Verifying signatures and provenance before deploy rejects unsigned or tampered artifacts. Storage, log retention and renaming do not authenticate the artifact."
+      "explanation": "A digest identifies the exact image content and an immutable tag cannot be silently overwritten, so a rollout pulls only what was reviewed. A one-time scan does not stop the tag being replaced later, certificate rotation does not authenticate content, and replicas improve availability only."
     },
     {
       "id": "q9045",
@@ -5708,10 +5708,10 @@
       "type": "mc",
       "question": "A legacy partner sends large XML messages to a cloud service, and a malformed message with an external entity reference crashed a parser last month. Which component would BEST filter such traffic before it reaches the application?",
       "options": [
-        "A hardware security module",
-        "A database activity monitor",
+        "A hardware security module that protects the signing keys",
+        "A database activity monitor that records privileged queries",
         "An XML firewall that validates schemas and blocks malformed messages",
-        "A content delivery cache"
+        "A content delivery cache that serves partner responses from the edge"
       ],
       "correct": 2,
       "explanation": "XML firewalls inspect and validate XML and SOAP traffic. HSMs protect keys, activity monitors watch database queries and caches speed delivery."
@@ -5722,10 +5722,10 @@
       "type": "mc",
       "question": "A company exposes many internal services as APIs and wants one place to authenticate callers, rate limit and log requests, while each service still checks authorization for its own objects. Which component fits?",
       "options": [
-        "A honeypot",
+        "A honeypot that lures attackers away from production",
         "An API gateway in front of the services",
-        "A file integrity monitor",
-        "A bastion host"
+        "A file integrity monitor on each service host",
+        "A bastion host for administrator access"
       ],
       "correct": 1,
       "explanation": "A gateway centralizes authentication, throttling and logging at the edge. File integrity monitors, bastions and honeypots do not serve API traffic."
@@ -5764,10 +5764,10 @@
       "type": "mc",
       "question": "A development team in a regulated company wants to avoid a single failure where both the code review and the build approval are done by the same person. Which principle does this support?",
       "options": [
-        "Weak coupling of services",
-        "Role stacking for efficiency",
+        "Loose coupling of services across the pipeline",
+        "Role stacking to make the pipeline more efficient",
         "Separation of duties in the delivery pipeline",
-        "Security through obscurity"
+        "Security through obscurity of the pipeline"
       ],
       "correct": 2,
       "explanation": "Separating review from approval prevents one person from pushing unreviewed changes. Obscurity, loose coupling and stacking roles do not provide that control."
@@ -6203,16 +6203,16 @@
       "id": "q9064",
       "cat": "ccspLegal",
       "type": "mc",
-      "question": "A multinational stores European customer data in a European region of a US provider. A foreign authority orders the provider to hand over the data, while European law forbids that disclosure without a lawful basis. Which action BEST reduces the customer's exposure to this conflict?",
+      "question": "A European retailer contracts with a US-headquartered cloud provider that stores the retailer's data in a Frankfurt region. Which US law can still be used to compel that provider to produce the data?",
       "options": [
-        "Hold encryption keys under customer control and involve legal counsel to contest or narrow the demand",
-        "Move the data to whichever region is cheapest this quarter and review jurisdiction later",
-        "Disable all logging so that no records exist about the request or its handling",
-        "Agree to every request from any authority immediately to avoid penalties and delay"
+        "The CLOUD Act",
+        "The Sarbanes-Oxley Act",
+        "FERPA",
+        "NERC CIP standards"
       ],
       "correct": 0,
-      "explanation": "Customer-held keys limit what the provider can produce and counsel manages the conflict through legal channels. Disabling logs hides evidence, price-driven region moves ignore law and automatic compliance may breach local law.",
-      "whyTested": "Conflicting legislation is a named topic and the answer is minimizing exposure plus legal escalation."
+      "explanation": "The CLOUD Act lets US authorities compel a US provider to produce data in its possession, custody or control wherever it is stored, which is why customer-held keys and contract terms matter for European data. FERPA covers education records, Sarbanes-Oxley covers financial reporting controls and NERC CIP covers the bulk electric system.",
+      "whyTested": "Conflicting legislation is a named topic; the CLOUD Act is the standard example of extraterritorial government access."
     },
     {
       "id": "q9065",
@@ -6344,15 +6344,15 @@
       "id": "q9074",
       "cat": "ccspLegal",
       "type": "mc",
-      "question": "A risk manager must decide how to treat the possibility of a long outage at a critical SaaS vendor. The company agrees to run part of the workload with a second vendor under a contract that divides the consequences. Which treatment is this?",
+      "question": "Analysis shows a company cannot meet a country's data residency law for a planned cloud analytics feature, and management cancels the feature rather than launch it. Which risk treatment is this?",
       "options": [
-        "Risk elimination",
-        "Risk sharing",
+        "Risk transfer",
         "Risk avoidance",
+        "Risk sharing",
         "Risk acceptance"
       ],
       "correct": 1,
-      "explanation": "Sharing divides the consequence with another party. Avoidance stops the activity, acceptance bears it silently and elimination is not a standard treatment."
+      "explanation": "Avoidance removes the risk by not starting, or by stopping, the activity that creates it. Sharing and transfer divide or move the consequence to another party, and acceptance knowingly keeps the risk."
     },
     {
       "id": "q9075",
@@ -6639,31 +6639,31 @@
       "id": "q9086",
       "cat": "ccspData",
       "type": "mc",
-      "question": "An investigator reviewing storage access logs finds the action and timestamp for each event, but cannot tell who performed it or from where. Which attributes were missing from the event definition?",
+      "question": "A team enabled management-plane audit logging for its cloud account, but an investigation cannot show who downloaded specific objects from a storage bucket. What was missing?",
       "options": [
-        "Encryption algorithm, key length and certificate expiry date of the object",
-        "Retention period, storage class and billing tag attached to the bucket",
-        "Disk block size, file system type and data center rack identifier",
-        "Identity of the actor, source IP address and geolocation"
+        "Multi-factor authentication on the cloud console",
+        "A second copy of the audit log stored in another region",
+        "A longer retention period for the management-plane audit log",
+        "Object-level data event logging for the storage service"
       ],
       "correct": 3,
-      "explanation": "Auditability needs who, from where and when. Storage mechanics, algorithms and billing metadata do not attribute an action to an actor or a place.",
-      "whyTested": "Covers event sources and required event attributes in objective 2.8."
+      "explanation": "Management-plane logs record control actions such as creating buckets or changing policies, while reads and writes of individual objects are data events that usually have to be enabled separately. Retention, extra copies and console MFA do not create events that were never recorded.",
+      "whyTested": "Covers event sources in objective 2.8."
     },
     {
       "id": "q9087",
       "cat": "ccspData",
       "type": "mc",
-      "question": "A company plans to fine-tune a model on support chats that contain personal data. Which control BEST reduces the risk that the finished model reveals individual records?",
+      "question": "A company builds an internal assistant that answers employee questions from a vector index of all its documents, including HR files and board papers. Which control BEST ensures that each employee only receives content they are already entitled to see?",
       "options": [
-        "Encrypt the training volume at rest and leave the dataset content unchanged",
-        "Place the model endpoint in a private subnet and keep every record in the dataset",
-        "Minimize and de-identify the training data, then test the model for memorization",
-        "Increase the number of training epochs so that the model learns each record thoroughly and reliably"
+        "Encrypt the vector index at rest with a customer-managed key and leave retrieval open to the assistant",
+        "Tell the model in its system prompt never to reveal restricted documents to unauthorized users",
+        "Enforce the source documents' access permissions at retrieval time by filtering results for the signed-in user",
+        "Limit the chat interface to the corporate network so that only employees can reach it"
       ],
       "correct": 2,
-      "explanation": "Leakage comes from what the model memorizes, so reducing and de-identifying data and testing for extraction address it directly. Storage encryption and network placement protect the container, and more training increases memorization.",
-      "whyTested": "Tests dataset and model privacy under objective 2.9."
+      "explanation": "Filtering at retrieval keeps restricted content out of the model's context in the first place. Encryption at rest does not decide who may read results, a prompt instruction can be bypassed by injection, and network location does not tell one employee from another.",
+      "whyTested": "Tests access control for AI data under objective 2.9."
     },
     {
       "id": "tf9037",
@@ -6707,16 +6707,16 @@
       "id": "q9090",
       "cat": "ccspPlatform",
       "type": "mc",
-      "question": "A site buys connectivity from two carriers, but both circuits enter the building through the same underground conduit. Which design weakness does this show?",
+      "question": "When utility power fails at a data center, which component carries the load during the seconds before the standby generators start and take over?",
       "options": [
-        "Carrier diversity matters only for voice traffic and has no bearing on data availability",
-        "Dual carriers create a risk of data corruption because packets arrive out of order",
-        "Two carriers are unnecessary because a single provider with a premium contract is always safer",
-        "The pathways are not diverse, so one physical cut or fire could sever both carriers"
+        "A large fuel tank sized for several days of generator running",
+        "A surge protector on each rack's power strip",
+        "A power distribution unit that spreads the load across racks",
+        "An uninterruptible power supply using batteries or flywheels"
       ],
       "correct": 3,
-      "explanation": "Multi-vendor pathway connectivity means carriers use physically separate routes; a shared conduit is a single point of failure. The other statements are incorrect claims about carriers.",
-      "whyTested": "Tests environmental and resilience design for connectivity."
+      "explanation": "An uninterruptible power supply bridges the gap until the generators reach speed and the transfer completes. A power distribution unit only distributes power, a surge protector only clamps spikes, and fuel keeps generators running but cannot supply power in the first seconds.",
+      "whyTested": "Tests environmental and resilience design for power."
     },
     {
       "id": "q9091",
@@ -6737,31 +6737,31 @@
       "id": "q9092",
       "cat": "ccspPlatform",
       "type": "mc",
-      "question": "After a regional failover the standby region delivers only 40 percent of normal capacity for the first day. Which recovery planning concept does this describe?",
+      "question": "A customer database is snapshotted every six hours, but the business impact analysis allows at most fifteen minutes of data loss. Which change closes the gap?",
       "options": [
-        "Recovery point objective, the amount of data loss that is tolerable",
-        "Recovery time objective, the time allowed to restore the service",
-        "Recovery service level, the degree of service delivered after recovery",
-        "Mean time between failures, the average time before the next failure"
+        "Add standby servers so that restoration takes less than fifteen minutes",
+        "Keep the six-hourly snapshots for ten years instead of ninety days",
+        "Replicate changes continuously or back up at least every fifteen minutes",
+        "Move the snapshots to a cheaper storage tier in the same region"
       ],
       "correct": 2,
-      "explanation": "Recovery service level states how much functionality or capacity must be available once recovery completes. RPO is about data loss, RTO about time and MTBF about reliability.",
-      "whyTested": "Tests the recovery service level term in objective 3.5."
+      "explanation": "Tolerable data loss is the recovery point objective, so recoverable copies must be no more than fifteen minutes apart. Standby servers shorten restoration time, longer retention only changes how far back a restore can go, and a cheaper tier lowers cost without improving the recovery point.",
+      "whyTested": "Tests how the recovery point objective drives backup design in objective 3.5."
     },
     {
       "id": "q9093",
       "cat": "ccspPlatform",
       "type": "mc",
-      "question": "Auditors need to reconstruct a network incident that crossed several cloud accounts. Which audit mechanism set is MOST useful?",
+      "question": "Auditors reconstructing an incident across several cloud accounts find that events from different services appear in impossible orders. Which fix addresses the root cause?",
       "options": [
-        "Screenshots of the console taken by administrators when they remember to do so",
-        "Centralized, time-synchronized log collection with correlation and retained flow logs or captures",
-        "Only the provider's annual availability report, which lists uptime by region",
-        "Separate local logs on each workload that are overwritten after a few hours"
+        "Encrypt the logs in transit to the central collector using mutually authenticated TLS",
+        "Synchronize every system to a trusted time source and log timestamps in UTC",
+        "Turn on debug-level logging in every service so that more detail is recorded",
+        "Extend log retention from ninety days to one year so that the events can be sorted out later"
       ],
       "correct": 1,
-      "explanation": "Central, time-synchronized and correlated logs plus network records allow reconstruction across accounts. Local rotating logs, ad hoc screenshots and an uptime report cannot show who did what.",
-      "whyTested": "Covers audit mechanisms such as log collection, correlation and packet capture."
+      "explanation": "Correlation depends on consistent time, and unsynchronized clocks or mixed time zones make the event order unreliable. Longer retention, transport encryption and more verbose logging do not correct timestamps.",
+      "whyTested": "Covers audit mechanisms and the time synchronization that log correlation depends on."
     },
     {
       "id": "tf9038",
@@ -6790,15 +6790,15 @@
       "id": "q9095",
       "cat": "ccspApp",
       "type": "mc",
-      "question": "An authenticated API user changes the invoice number in a request and receives another customer's invoice. Which OWASP API Security Top 10 risk is this?",
+      "question": "A profile-update API copies every field in the submitted JSON onto the stored user record, so an ordinary user who adds an extra role field set to administrator becomes an administrator. Which OWASP API Security Top 10 risk is this?",
       "options": [
-        "Broken object level authorization",
-        "Unrestricted resource consumption of the invoice service",
+        "Broken object property level authorization",
+        "Unrestricted resource consumption of the profile service",
         "Improper inventory management of retired API versions",
         "Security misconfiguration of the web server headers"
       ],
       "correct": 0,
-      "explanation": "The API checks who the caller is but not whether they may access that specific object, which is broken object level authorization, the top API risk. The other risks involve load, configuration or old versions.",
+      "explanation": "The API lets the caller write a property they are not allowed to change, which is broken object property level authorization (mass assignment). The other risks involve load, configuration or old versions.",
       "whyTested": "Applies the API Security Top 10 named in objective 4.1."
     },
     {
@@ -7001,15 +7001,15 @@
       "id": "q9108",
       "cat": "ccspLegal",
       "type": "mc",
-      "question": "A provider is compelled by a foreign court order to hand over customer data stored in another country, which conflicts with the customer's home-country law. Which treatment BEST reduces this legal risk?",
+      "question": "A customer worries that a foreign authority could demand its data from the provider without the customer ever finding out. Which contract term helps MOST?",
       "options": [
-        "Rely on the provider's public statement that it never discloses customer data to any government",
-        "Remove the data location clause so that the contract is shorter and simpler",
-        "Hold encryption keys under customer control and require notice and challenge rights",
-        "Store the data in a region chosen only for the lowest price per gigabyte"
+        "A service level credit that is paid whenever the provider discloses customer data",
+        "A clause that lets the provider decide at its own discretion whether customers are informed",
+        "A commitment to notify the customer of government requests where the law allows and to challenge overbroad ones",
+        "A right to inspect the provider's data center after any disclosure has taken place"
       ],
       "correct": 2,
-      "explanation": "Customer-held keys limit what the provider can disclose and contract terms for notice and challenge give a response path. Marketing claims, price-driven location and a missing clause increase exposure.",
+      "explanation": "Notice and challenge commitments let the customer learn of a demand, object or seek protective orders, and keep control of the legal response. A credit compensates only after the fact, an inspection reveals nothing about the demand, and provider discretion removes the customer's visibility.",
       "whyTested": "Covers conflicting legislation and legal risks specific to cloud."
     },
     {
@@ -7462,7 +7462,7 @@
         "tf47",
         "q9111"
       ],
-      "reading": "Cloud puts data in other people's buildings, often in other countries, and the law follows the data. Start with the roles. The controller decides why and how personal data is processed and carries primary legal responsibility; the processor acts on its instructions. A cloud customer is usually the controller and the provider the processor, and providers may use sub-processors of their own. Handing processing to a provider outsources work, never accountability. The European General Data Protection Regulation shows the pattern most privacy laws now follow: principles such as lawfulness, minimization and accountability, rights for individuals to access, correct, erase and port their data, breach notification to authorities within 72 hours of becoming aware, and heavy fines. It applies based on whose data you process, not only where you sit.\n\nWhere data is stored and who can reach it are separate legal questions. Residency is the physical location. Sovereignty is the principle that data is subject to the laws of the country where it sits or where its controller is based. Transfers of personal data out of the European Union need a lawful mechanism, such as an adequacy decision, standard contractual clauses or binding corporate rules, usually supported by an assessment of the destination country's laws. Foreign government access, for example through the US CLOUD Act, which can compel US providers to produce data wherever it is stored, creates conflict. Sector rules add their own layers: HIPAA for US health data with business associate agreements, the Payment Card Industry standard for card data and Sarbanes-Oxley for financial reporting controls.\n\nLitigation brings electronic discovery, the identifying, preserving, collecting and producing of electronic data. In the cloud you must know where data is held, how a legal hold is applied so that deletion stops, what the provider will support and at what cost. Contracts are the customer's main instrument for turning promises into obligations. Look for service levels, data ownership and location, security obligations, breach notification timelines, audit rights, subprocessor controls, termination assistance and verified deletion.\n\nCustomers rarely audit a hyperscale provider themselves, so they rely on independent evidence. A SOC 1 report concerns controls over financial reporting; SOC 2 reports on security, availability, processing integrity, confidentiality and privacy, with Type I covering design at a point in time and Type II covering operating effectiveness over a period; SOC 3 is a public summary. ISO/IEC 27001 certifies an information security management system, 27017 adds cloud-specific controls and 27018 covers personal data in public clouds. The Cloud Security Alliance's Cloud Controls Matrix and STAR registry give a public, comparable view, from a self-assessment at Level 1 to third-party audit at Level 2.\n\nRisk management ties it together. Identify assets and threats, assess likelihood and impact, and treat risk by mitigating, transferring, avoiding or accepting it. Vendor risk management applies due diligence before onboarding, contracts for obligations, ongoing monitoring and an exit plan.\n\nLegal analysis begins with the unique cloud risks: conflicting international legislation, government access requests, jurisdiction of the data and of the provider, and the evaluation of legal and regulatory frameworks. Privacy requirements distinguish contractual from regulated personal data (PII and PHI), name country-specific laws (FERPA, PIPEDA, GDPR, HIPAA with HITECH, India's Digital Personal Data Protection Act), recognize jurisdictional differences, and use standard privacy frameworks such as ISO/IEC 27018 and GAPP, with a privacy impact assessment before launch. eDiscovery follows ISO/IEC 27050 and CSA guidance, and forensics requirements follow ISO/IEC 27037, 27041, 27042 and 27043.\n\nAudits in the cloud must be adapted: virtualization and shared responsibility create assurance challenges, report types (SOC 1, 2 and 3 under SSAE 18, and ISAE 3402 or 3000 internationally) have scope statements that limit what they assure, and gap analysis and control self-assessment turn findings into treatments. Enterprise risk management adds data roles (owner, controller, custodian, processor, steward), regulatory transparency duties (breach notification, SOX), risk frameworks (ISO 31000, NIST RMF, COSO, ENISA), metrics such as key risk indicators, and specialized regimes for regulated sectors (NERC CIP, HIPAA and HITECH, PCI DSS).\n\nContract design ties it together: the master service agreement, statement of work and service-level agreement set the business terms, and vendor management, right to audit, termination, data ownership, escrow, cyber risk insurance, supply-chain standards (ISO/IEC 27036) and assessments of the provider's risk management program protect the customer when things go wrong.",
+      "reading": "Cloud puts data in other people's buildings, often in other countries, and the law follows the data. Start with the roles. The controller decides why and how personal data is processed and carries primary legal responsibility; the processor acts on its instructions. A cloud customer is usually the controller and the provider the processor, and providers may use sub-processors of their own. Handing processing to a provider outsources work, never accountability. The European General Data Protection Regulation shows the pattern most privacy laws now follow: principles such as lawfulness, minimization and accountability, rights for individuals to access, correct, erase and port their data, breach notification to authorities within 72 hours of becoming aware, and heavy fines. It applies based on whose data you process, not only where you sit.\n\nWhere data is stored and who can reach it are separate legal questions. Residency is the physical location. Sovereignty is the principle that data is subject to the laws of the country where it sits or where its controller is based. Transfers of personal data out of the European Union need a lawful mechanism, such as an adequacy decision, standard contractual clauses or binding corporate rules, usually supported by an assessment of the destination country's laws. Foreign government access, for example through the US CLOUD Act, which can compel US providers to produce data wherever it is stored, creates conflict. Sector rules add their own layers: HIPAA for US health data with business associate agreements, the Payment Card Industry standard for card data and Sarbanes-Oxley for financial reporting controls.\n\nLitigation brings electronic discovery, the identifying, preserving, collecting and producing of electronic data. In the cloud you must know where data is held, how a legal hold is applied so that deletion stops, what the provider will support and at what cost. Contracts are the customer's main instrument for turning promises into obligations. Look for service levels, data ownership and location, security obligations, breach notification timelines, audit rights, subprocessor controls, termination assistance and verified deletion.\n\nCustomers rarely audit a hyperscale provider themselves, so they rely on independent evidence. A SOC 1 report concerns controls over financial reporting; SOC 2 reports on security, availability, processing integrity, confidentiality and privacy, with Type I covering design at a point in time and Type II covering operating effectiveness over a period; SOC 3 is a public summary. ISO/IEC 27001 certifies an information security management system, 27017 adds cloud-specific controls and 27018 covers personal data in public clouds. The Cloud Security Alliance's Cloud Controls Matrix and STAR registry give a public, comparable view, from a self-assessment at Level 1 to third-party audit at Level 2.\n\nRisk management ties it together. Identify assets and threats, assess likelihood and impact, and treat risk by mitigating, transferring, sharing, avoiding or accepting it. Vendor risk management applies due diligence before onboarding, contracts for obligations, ongoing monitoring and an exit plan.\n\nLegal analysis begins with the unique cloud risks: conflicting international legislation, government access requests, jurisdiction of the data and of the provider, and the evaluation of legal and regulatory frameworks. Privacy requirements distinguish contractual from regulated personal data (PII and PHI), name country-specific laws (FERPA, PIPEDA, GDPR, HIPAA with HITECH, India's Digital Personal Data Protection Act), recognize jurisdictional differences, and use standard privacy frameworks such as ISO/IEC 27018 and GAPP, with a privacy impact assessment before launch. eDiscovery follows ISO/IEC 27050 and CSA guidance, and forensics requirements follow ISO/IEC 27037, 27041, 27042 and 27043.\n\nAudits in the cloud must be adapted: virtualization and shared responsibility create assurance challenges, report types (SOC 1, 2 and 3 under SSAE 18, and ISAE 3402 or 3000 internationally) have scope statements that limit what they assure, and gap analysis and control self-assessment turn findings into treatments. Enterprise risk management adds data roles (owner, controller, custodian, processor, steward), regulatory transparency duties (breach notification, SOX), risk frameworks (ISO 31000, NIST RMF, COSO, ENISA), metrics such as key risk indicators, and specialized regimes for regulated sectors (NERC CIP, HIPAA and HITECH, PCI DSS).\n\nContract design ties it together: the master service agreement, statement of work and service-level agreement set the business terms, and vendor management, right to audit, termination, data ownership, escrow, cyber risk insurance, supply-chain standards (ISO/IEC 27036) and assessments of the provider's risk management program protect the customer when things go wrong.",
       "fundamentalsLabel": "New to cloud law and risk? See the everyday analogy",
       "fundamentals": "Imagine you store family heirlooms in a bank's safe deposit boxes in several countries. You remain the owner and answer for the heirlooms, even though the bank holds them, and you need a rental contract that says who may open the box, how fast you are told if something happens and what happens when you close it. Different countries have different rules about what officials may demand from a bank, so you might keep the only key yourself. Instead of inspecting every bank vault, you read independent inspection reports and check whether they covered your branch and the right period. And before choosing a bank you investigate it; afterwards you keep watching it.",
       "keyTerms": [
@@ -7572,7 +7572,7 @@
         "Residency (where stored) differs from sovereignty (whose law applies). Transfers need adequacy, SCCs or BCRs. The CLOUD Act can reach data held by US providers anywhere.",
         "eDiscovery: identify, preserve, collect, review, produce (ISO/IEC 27050). Legal holds suspend deletion. HIPAA needs a business associate agreement.",
         "SOC 1 financial controls; SOC 2 trust criteria (Type II is the strong evidence); SOC 3 public summary. ISO/IEC 27001 certifies an ISMS, 27017 cloud controls, 27018 PII in clouds.",
-        "CSA CCM and STAR: Level 1 self-assessment, Level 2 third-party. Risk treatments: mitigate, transfer, avoid, accept; insurance never transfers accountability.",
+        "CSA CCM and STAR: Level 1 self-assessment, Level 2 third-party. Risk treatments: mitigate, transfer, share, avoid, accept; insurance never transfers accountability.",
         "Vendor management: due diligence before, due care after, contract for audit, breach notice, subprocessors and exit."
       ]
     },
@@ -7671,7 +7671,7 @@
     {
       "id": "ml-ccsp-4",
       "cat": "ccspPlatform",
-      "scenario": "A BIA states a payment platform can be down for at most five minutes and can lose at most one second of transactions. The first figure is the {b1} and the second is the {b2}.",
+      "scenario": "A payment platform's recovery plan commits to restoring service within five minutes of an outage and accepts losing at most one second of transactions. The first figure is the {b1} and the second is the {b2}.",
       "blanks": [
         {
           "key": "b1",

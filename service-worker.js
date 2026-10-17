@@ -1,4 +1,4 @@
-const CACHE_NAME = 'cert-study-hub-93b04116a8';
+const CACHE_NAME = 'cert-study-hub-c325b9965a';
 
 const CORE_ASSETS = [
   './',

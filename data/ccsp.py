@@ -160,7 +160,7 @@ f(C1, 'found', 'Edge computing',
   "Processing data near where it is produced (devices, branches or local nodes) rather than in a central cloud region, to reduce latency and bandwidth.",
   "It widens the attack surface with many physically exposed nodes that need identity, patching and remote attestation.")
 f(C1, 'found', 'Quantum computing risk and post-quantum cryptography',
-  "A large-scale quantum computer could break public-key algorithms such as RSA and elliptic-curve schemes, so data that must stay secret for years is exposed to harvest-now, decrypt-later collection. Post-quantum algorithms are being standardized as the answer.",
+  "A large-scale quantum computer could break public-key algorithms such as RSA and elliptic-curve schemes, so data that must stay secret for years is exposed to harvest-now, decrypt-later collection. NIST has standardized post-quantum algorithms (ML-KEM, ML-DSA and SLH-DSA in FIPS 203, 204 and 205) as the answer.",
   "Architects plan crypto agility: the ability to swap algorithms without redesigning systems.")
 f(C1, 'found', 'Blockchain and distributed ledger',
   "A tamper-evident ledger replicated across many parties, with entries chained by cryptographic hashes. Cloud providers offer it as a managed service.",
@@ -186,7 +186,7 @@ mc(C1, 'found', "A team moves a batch-processing application from servers it man
    ["Classification and protection of the sensitive data that the application stores and processes on the platform", "Writing and testing the application's authentication logic", "Defining which staff may deploy new application versions"],
    "Managed platforms move the lower layers (host OS, runtime, orchestration) to the provider. Data classification, application logic and deployment authorization remain with the customer at every service model, which is why they are tempting but wrong.")
 mc(C1, 'found', "A regional hospital group, a university and a public health agency jointly fund one cloud environment built to a common research-compliance standard and open only to those organizations. Which deployment model is this?",
-   "Community cloud",
+   "Community cloud, because the participants have the same regulatory needs",
    ["Private cloud, because access is restricted to named organizations", "Hybrid cloud, because several organizations contribute infrastructure", "Multi-cloud, because multiple customers participate"],
    "A community cloud is shared by organizations with a common concern, here the same compliance standard. Private cloud serves one organization. Hybrid joins different deployment models, and multi-cloud means several providers; neither is described.")
 mc(C1, 'found', "An architect is asked why a workload that scales out automatically at peak and releases servers overnight is described as elastic rather than merely scalable. What is the BEST answer?",
@@ -212,9 +212,9 @@ mc(C1, 'found', "Which architectural principle BEST reflects the move from perim
    "Zero trust treats identity and context as the control point because there is no trusted network edge in cloud. Flat internal trust and a single subnet recreate the perimeter fallacy, and physical security does not replace logical access control.")
 mc(C1, 'found', "A team stores purchase records on a managed distributed ledger and later receives a lawful erasure request from a customer. What is the MOST significant design problem this reveals?",
    "Immutable ledger entries cannot be removed, which conflicts with deletion obligations for personal data",
-   ["Ledgers cannot be encrypted when the data is at rest", "Ledgers cannot be replicated across regions for resilience", "Ledgers require the provider to hold every participant's private key"],
+   ["Ledgers cannot be encrypted when the data is at rest, so every stored purchase record is exposed", "Ledgers cannot be replicated across regions, so a regional outage loses the whole record", "Ledgers require the provider to hold every participant's private key in order to validate entries"],
    "Immutability is a feature for integrity and a defect for erasure rights, so personal data should stay off-chain with only references or hashes on it. Ledgers can be encrypted and replicated, and participants keep their own keys.")
-mc(C1, 'found', "Why is the roadmap for post-quantum cryptography a concern today for data that must remain confidential for twenty years?",
+mc(C1, 'found', "Why should an organization start planning its move to post-quantum cryptography today for data that must remain confidential for twenty years?",
    "Adversaries can collect encrypted traffic now and decrypt it once quantum capability exists",
    ["Quantum computers will make all symmetric hashing completely unusable as soon as they exist", "Cloud providers will stop supporting current TLS versions this year", "Quantum computing can erase data from encrypted storage remotely"],
    "Harvest-now, decrypt-later makes long-lived secrets vulnerable well before capable quantum computers arrive, motivating crypto agility and migration planning. The other statements overstate or invent effects.")
@@ -232,8 +232,8 @@ mc(C1, 'found', "Which activity is MOST clearly the cloud customer's responsibil
    "Data governance and access decisions always rest with the customer. Hypervisors, data-center access and hardware maintenance are provider duties in all service models.")
 mc(C1, 'found', "An architect reviews a design against ISO/IEC 17789 cross-cutting aspects and finds no plan for leaving the provider. Which aspect has been overlooked?",
    "Reversibility",
-   ["Elasticity", "Maintenance and versioning", "Performance"],
-   "Reversibility concerns retrieving customer assets and having remaining copies deleted on exit. Elasticity, maintenance and performance are separate aspects and do not address exit.")
+   ["Availability", "Maintenance and versioning", "Performance"],
+   "Reversibility concerns retrieving customer assets and having remaining copies deleted on exit. Availability, maintenance and versioning, and performance are separate aspects and do not address exit.")
 mc(C1, 'found', "A data science team wants to fine-tune a hosted foundation model with customer support transcripts. Under shared responsibility, which duty stays with the customer?",
    "Classifying and protecting the training data and access to the tuned model",
    ["Securing the physical GPU servers that run the training job", "Patching the underlying operating system of the managed training service's hosts", "Operating the provider's model-serving network"],
@@ -269,7 +269,7 @@ tf(C1, 'found', "Measured service means the provider monitors resource use so it
    "Metering underlies pay-per-use billing, quotas and cost anomaly detection.")
 tf(C1, 'found', "Multi-tenancy is a risk the customer can eliminate by choosing any reputable provider.", False,
    "It is inherent to pooled cloud resources; customers manage the risk through isolation choices, encryption and dedicated options, not by eliminating it.")
-tf(C1, 'found', "Containers and serverless functions are examples of technologies the CCSP treats as part of the cloud reference architecture's impact of related technologies.", True,
+tf(C1, 'found', "The CCSP outline expects candidates to consider how related technologies such as containers, serverless functions, edge computing and AI affect cloud architecture and security.", True,
    "The outline asks you to consider how containers, edge, confidential computing, AI and similar technologies affect architecture and security.")
 tf(C1, 'found', "Reversibility means the customer can retrieve their data and have the provider delete the remaining copies when the relationship ends.", True,
    "It is one of the cross-cutting aspects and should be backed by contract terms and verified deletion.")
@@ -502,7 +502,7 @@ mc(C2, 'crypto', "Two parties who have never met need to exchange a symmetric se
    "Asymmetric methods or key agreement solve the key distribution problem. Email is plaintext, a hash of a key does not convey it and a printed shared secret cannot be rotated or scaled.")
 mc(C2, 'crypto', "An architect's design relies on encrypting data with a key kept in the same storage account as the data. What is the PRIMARY weakness?",
    "Anyone who gains access to the account can obtain both data and key, defeating the encryption",
-   ["Keys cannot legally be stored in cloud storage", "The data cannot be backed up while encrypted", "The encryption algorithm will run too slowly"],
+   ["Regulations prohibit storing cryptographic keys in any cloud storage service at all", "Encrypted data cannot be backed up or replicated while its key sits in the same account", "Reading the key from the same account makes the encryption run too slowly to be usable"],
    "Key separation is a basic principle: compromise of the account should not hand over both parts. Keys can be stored in cloud services, backups work fine and performance is not the issue.")
 mc(C2, 'crypto', "A company discovers its TLS certificate expired and a customer-facing service went down. Which practice would MOST directly prevent a recurrence?",
    "Automate certificate issuance and renewal and monitor expiry dates",
@@ -653,7 +653,7 @@ mc(C3, 'infra', "A serverless function that resizes images was given an access r
    ["Keep the existing role but add detailed logging and alerts for all function invocations and errors", "Increase the function timeout to reduce errors", "Move the function to a larger memory configuration"],
    "Over-privileged execution roles are the main serverless risk; fix by least privilege. Logging detects but does not reduce blast radius and timeouts or memory are unrelated.")
 mc(C3, 'infra', "Remote contractors need access to one internal web application only. Which approach BEST follows zero trust principles?",
-   "Zero trust network access granting per-application sessions after verifying device",
+   "Zero trust network access granting per-application sessions after verifying user and device",
    ["A full-tunnel VPN placing contractors on the corporate network", "Sharing a common account protected by a long password", "Whitelisting the contractors' home IP addresses permanently on the application firewall"],
    "ZTNA grants access to one application per verified session. A VPN gives broad network reach, a shared account destroys accountability and static IP addresses are unreliable and over-broad.")
 mc(C3, 'infra', "Which statement about security groups and network ACLs in a virtual private cloud is MOST accurate?",
@@ -714,7 +714,7 @@ mc(C3, 'resil', "A company has an RTO of four hours and an RPO of 24 hours for a
    "The relaxed targets are met by daily backups and manual rebuild. The other options meet far stricter objectives at much higher cost.")
 mc(C3, 'resil', "A bank needs near-zero data loss and failover in seconds for a payment platform, while accepting higher cost. Which design is MOST appropriate?",
    "Active-active deployment across availability zones with synchronous replication",
-   ["Weekly backups to cold storage", "Pilot light with asynchronous replication", "A single zone with a larger instance type"],
+   ["Weekly full backups copied to cold storage in another region", "A pilot light environment with asynchronous replication to a second region", "A single zone with a larger instance type and frequent snapshots"],
    "Only active-active with synchronous replication supports near-zero RPO and fast failover. Backups and pilot light have longer recovery, and a single zone is a single failure domain.")
 mc(C3, 'resil', "A planner proposes selecting a disaster recovery technology before the business impact analysis is complete. What is the BEST response?",
    "Complete the BIA first, because recovery objectives come from business criticality",
@@ -757,7 +757,7 @@ tf(C3, 'resil', "Recovery objectives for a system should be derived from the bus
 # DOMAIN 4: Cloud Application Security (topic tags: app, iam)
 # ---------------------------------------------------------------------------------------------------------------
 f(C4, 'app', 'Secure software development life cycle (SDLC)',
-  "Building security activities into every phase of development: requirements, design, coding, testing, deployment and maintenance, rather than testing for security only at the end.",
+  "Building security activities into every phase of development (threat modeling in design, secure coding and review, security testing before release, patching and monitoring afterwards) rather than testing for security only at the end.",
   "The earlier a defect is found the cheaper it is to fix; 'shift left' is the standard exam answer.")
 f(C4, 'app', 'DevSecOps',
   "Integrating security checks, automation and shared ownership into continuous integration and delivery pipelines so security keeps pace with frequent releases.",
@@ -765,9 +765,9 @@ f(C4, 'app', 'DevSecOps',
 f(C4, 'app', 'Threat modeling and STRIDE',
   "A structured method to find threats during design. STRIDE categorizes them as Spoofing, Tampering, Repudiation, Information disclosure, Denial of service and Elevation of privilege.",
   "Do it at design time, using data flow diagrams and trust boundaries; know which STRIDE category matches which attack.")
-f(C4, 'app', 'PASTA and attack trees',
-  "PASTA is a risk-centric, seven-stage threat modeling process tied to business impact; attack trees decompose an attacker's goal into the steps needed to reach it.",
-  "Other models alongside STRIDE; the exam asks you to match method to purpose, not to run them in detail.")
+f(C4, 'app', 'Attack trees',
+  "A threat modeling technique that puts the attacker's goal at the root of a tree and decomposes it into the sub-goals and steps (joined by AND or OR logic) needed to reach it, so defenders can see the cheapest or likeliest attack paths.",
+  "Another model alongside STRIDE and PASTA; the exam asks you to match method to purpose, not to run them in detail.")
 f(C4, 'app', 'OWASP Top 10',
   "A regularly updated awareness list of the most critical web application security risks, such as broken access control, injection and cryptographic failures.",
   "It is a list of risk categories, not a standard to certify against; broken access control tops recent editions.")
@@ -1051,7 +1051,7 @@ mc(C5, 'ops', "A team collected disk images from a compromised server but did no
    "Chain of custody documents handling and proves integrity. The other concerns are technical details unrelated to admissibility.")
 mc(C5, 'ops', "Which item should be collected FIRST in a live cloud forensic investigation, according to the order of volatility?",
    "Memory contents and running process information",
-   ["Archived backup media", "Remote log archives", "Printed network diagrams"],
+   ["Archived backup media held at an offsite storage facility", "Remote log archives held in a central collection service", "Printed network diagrams stored in the facility"],
    "Memory is the most volatile and is lost on stop or reboot. Backups and archived logs persist, and diagrams are documentation.")
 mc(C5, 'ops', "A company runs workloads in three cloud providers and each provider's logs use a different format, so analysts miss related alerts. Which action BEST improves detection?",
    "Centralize logs in a SIEM with a normalized schema and consistent identity data",
@@ -1069,10 +1069,10 @@ mc(C5, 'ops', "Which activity is the cloud customer's responsibility for a virtu
    "Patching the guest operating system",
    ["Patching the hypervisor", "Maintaining the provider's physical data center", "Updating the provider's storage firmware"],
    "In IaaS the customer manages everything above the virtualization layer. The other tasks belong to the provider.")
-mc(C5, 'ops', "A configuration scan shows that several servers no longer match the approved baseline after emergency fixes. Which practice BEST reduces recurrence?",
-   "Detect drift automatically and enforce changes through version-controlled templates",
-   ["Allow all engineers to modify servers directly whenever they judge a change necessary to restore service quickly", "Delete the baseline and rely on memory", "Disable the scans to reduce noise"],
-   "Drift detection plus templates keeps configurations governed. Free manual changes create drift and removing the baseline removes the standard.")
+mc(C5, 'ops', "An engineer restored a failed service by editing a production server directly, outside the normal change process. Which follow-up BEST keeps change control intact?",
+   "Record it as an emergency change, review it afterwards and fold a valid fix into the baseline and templates",
+   ["Leave it undocumented because emergency changes are exempt from change management", "Require a full change board meeting before any future fix, even while a service is down", "Roll the server back to the baseline at once, even if the failure returns"],
+   "Emergency changes are expedited, not exempt: they are recorded, reviewed afterwards and, if valid, built into the baseline so the system does not drift. Skipping the record breaks accountability, demanding a full board during an outage defeats the purpose of the emergency path, and a blind rollback restores the failure.")
 mc(C5, 'ops', "A machine learning model that approves transactions begins behaving differently without any approved update, and recent training data included unreviewed external sources. How should the security team treat this?",
    "As a potential security incident involving tampering or poisoning, to be investigated",
    ["As normal variation that needs no action", "As evidence that one of the provider's data centers has suffered a hardware failure", "As a licensing issue for the vendor to resolve"],
@@ -1080,8 +1080,8 @@ mc(C5, 'ops', "A machine learning model that approves transactions begins behavi
    "Model drift as a security incident is called out in the revised outline.")
 mc(C5, 'ops', "Which statement about incident response in the cloud is MOST accurate?",
    "Preparation, including logging and provider contacts, must be done before an incident because evidence may be ephemeral",
-   ["The provider alone investigates all incidents on the customer's behalf", "Incident response begins when the incident is declared closed", "Logs can always be reconstructed after the fact"],
-   "Because resources are ephemeral and access depends on contracts, readiness comes first. The provider does not run the customer's response and logs not collected may be gone.")
+   ["The provider alone investigates all incidents on the customer's behalf, so the customer needs no readiness of its own", "Incident response should begin only after the provider has formally confirmed that a breach occurred", "Logs from ephemeral resources can always be recovered from the provider later, even if logging was never enabled"],
+   "Because resources are ephemeral and access depends on contracts, readiness comes first. The provider does not run the customer's response, waiting for its confirmation delays containment, and logs not collected may be gone.")
 mc(C5, 'ops', "A regulator will be notified of a breach affecting customers. Who should decide the exact content and timing of the external statement?",
    "Legal and compliance leadership with incident command input",
    ["The on-call engineer who found the issue and has the most technical detail", "The marketing team alone", "The cloud provider's help desk"],
@@ -1178,7 +1178,7 @@ f(C6, 'legal', 'CSA STAR and Cloud Controls Matrix',
   "The Cloud Security Alliance Cloud Controls Matrix is a framework of cloud security controls; STAR is a public registry in which providers publish assurance, from a self-assessment (Level 1) to third-party audit or certification (Level 2).",
   "STAR gives a comparable, vendor-neutral way to review a provider before purchase.")
 f(C6, 'legal', 'Risk management process and treatment options',
-  "Identify assets and threats, assess likelihood and impact, then treat the risk by mitigating, transferring (for example insurance or contract), avoiding or accepting it, tracking the rest in a risk register.",
+  "Identify assets and threats, assess likelihood and impact, then treat the risk by mitigating, transferring (for example insurance or contract), sharing, avoiding or accepting it, tracking the rest in a risk register.",
   "Risk is accepted by the business owner, not by the security team; cloud adoption transfers some duties but never accountability.")
 f(C6, 'legal', 'Risk appetite and tolerance',
   "Appetite is the amount and type of risk an organization is willing to pursue; tolerance is the acceptable variation around objectives.",
@@ -1198,9 +1198,9 @@ f(C6, 'legal', 'Audit planning and cloud-specific audit challenges',
 f(C6, 'legal', 'Privacy by design and by default',
   "Building privacy protections into systems from the start and defaulting to the most privacy-protective settings with minimal collection.",
   "A GDPR principle; the exam favors answers that embed controls early over bolting them on later.")
-f(C6, 'legal', 'Cyber insurance and risk transfer',
-  "Insurance transfers part of the financial impact of an incident but not the legal accountability or the reputational damage, and insurers often require baseline controls.",
-  "A treatment option, never a substitute for controls.")
+f(C6, 'legal', 'Risk transfer',
+  "The treatment option that moves the financial consequence of a risk to a third party, usually through insurance or contract terms such as indemnification and liability clauses, while legal accountability and reputational damage stay with the organization.",
+  "Buying cyber insurance is the classic case; it is a treatment option, never a substitute for controls.")
 f(C6, 'legal', 'Supply chain and subprocessors',
   "A provider may depend on other companies to deliver the service. Customers need visibility of subprocessors, the right to object to changes and flow-down of security and privacy obligations; ISO/IEC 27036 addresses supplier relationships.",
   "Under GDPR the processor needs the controller's authorization to engage a subprocessor.")
@@ -1222,15 +1222,15 @@ mc(C6, 'legal', "A customer wants a comparable public view of a provider's assur
    "The CSA STAR registry entries for each provider",
    ["The providers' social media accounts", "A competitor's sales brochure comparing the two providers", "An internal list of preferred vendors"],
    "STAR is a public registry with self-assessments and third-party attestations aligned to the Cloud Controls Matrix. Social media and brochures are unaudited and internal preference lists do not provide evidence.")
-mc(C6, 'legal', "A processor of US health data is hosting records in the cloud. Which contractual document is typically REQUIRED between the covered entity and the provider?",
+mc(C6, 'legal', "A US healthcare organization that is a HIPAA covered entity wants to host patient records with a cloud provider. Which contractual document is typically REQUIRED between the two?",
    "A business associate agreement",
    ["A non-compete agreement", "A software escrow agreement only", "A marketing co-branding agreement"],
-   "Under HIPAA, providers handling protected health information as business associates must sign such an agreement. The other documents do not satisfy the requirement.")
+   "Under HIPAA, a cloud provider that handles protected health information is a business associate and must sign such an agreement with the covered entity. The other documents do not satisfy the requirement.")
 mc(C6, 'legal', "A court order requires a company to produce emails stored in a cloud service. Which cloud-specific consideration is MOST important in the eDiscovery plan?",
    "Knowing where the data is held, how a legal hold is applied and what the provider will support",
-   ["Whether the provider's marketing website has been redesigned in the last year", "The color scheme of the admin console", "The provider's number of employees"],
-   "Location, hold mechanisms and provider support determine whether the company can preserve and produce data. The other facts are irrelevant.")
-mc(C6, 'legal', "Management decides to buy cyber insurance to cover part of the financial loss from a major breach. How does this risk treatment BEST classify?",
+   ["The provider's published uptime percentage for its email service during the last year", "How many regions the provider operates around the world", "Whether the provider's data centers hold a current ISO/IEC 27001 certificate"],
+   "Location, hold mechanisms and provider support determine whether the company can preserve and produce data. Uptime, regional footprint and certification matter for availability and assurance but do not decide whether data can be preserved and produced.")
+mc(C6, 'legal', "Management decides to buy cyber insurance to cover part of the financial loss from a major breach. How is this risk treatment BEST classified?",
    "Risk transfer, which does not remove accountability or the need for controls",
    ["Risk avoidance, because the risk no longer exists", "Risk acceptance, because no action is taken", "Risk mitigation, because the likelihood of a breach is reduced by the insurer"],
    "Insurance moves part of the financial impact to another party but leaves likelihood and legal accountability. Avoidance means stopping the activity, acceptance means retaining the risk and mitigation reduces likelihood or impact through controls.")
@@ -1328,7 +1328,7 @@ f(C1, 'found', 'Traffic inspection in the cloud',
   "Examining packets or flows with firewalls, intrusion detection and prevention, web application firewalls or inspecting proxies, using virtual appliances, traffic mirroring or provider-native services because physical choke points no longer exist.",
   "Encrypted traffic needs termination at an inspection point or metadata analysis; the choice trades visibility against privacy and latency.")
 f(C1, 'found', 'Cost-benefit analysis and return on investment (ROI)',
-  "Cost-benefit analysis compares the full cost of a control or migration (licenses, labor, risk) with the benefit (loss avoided, savings). ROI is gain minus cost, divided by cost. A safeguard is justified when the annual loss it prevents exceeds its annual cost.",
+  "Weighing the full cost of a control or migration (licenses, labor, risk) against its benefit (loss avoided, savings). The ROI is gain minus cost, divided by cost. A safeguard is justified when the annual loss it prevents exceeds its annual cost.",
   "These numbers feed the business impact analysis and the decision on which recovery or control option to fund.")
 f(C1, 'found', 'Functional security requirements',
   "Security-related capabilities a cloud design must provide, including portability, interoperability, vendor lock-in limits, encryption, identity integration, logging and the ability to exit, derived from business needs and regulation.",
@@ -1749,7 +1749,7 @@ f(C6, 'legal', 'Assessing the risk environment',
   "Evaluate risk at several levels: the specific service, the vendor, the supporting infrastructure and the business process it supports, and combine them into a risk profile compared with the organization's appetite.",
   "A strong vendor can still host a risky service if configured poorly.")
 f(C6, 'legal', 'Risk sharing',
-  "Risk sharing splits the consequence with another party by contract, joint ventures or pooled insurance, whereas transfer moves the financial impact entirely. Both leave accountability with the organization.",
+  "Risk sharing splits the consequence with another party by contract, joint ventures or pooled insurance, whereas transfer shifts the financial impact to another party, for example through insurance or an indemnity clause. Both leave accountability with the organization.",
   "The outline lists avoid, mitigate, transfer, share and accept as separate treatments.")
 f(C6, 'legal', 'Master service agreement and statement of work',
   "A master service agreement sets the general legal terms between customer and provider; a statement of work defines specific deliverables, scope, timeline and fees under it; the SLA sets measurable service levels and remedies.",
@@ -1786,10 +1786,10 @@ mc(C1, 'found', "A consultant reviews a company's cloud risk register and notes 
    ["The provider's hypervisor is the most likely entry point for attackers", "Encryption of all stored data would remove the listed risks entirely, so no other control needs attention", "Moving to a private cloud eliminates these threat categories, because the listed threats occur only in public clouds"],
    "Industry threat reports consistently rank misconfiguration, identity and API weaknesses at the top, which are customer-side concerns managed through change control and access governance. The hypervisor is rarely the entry point, encryption does not fix misconfiguration and private clouds still have configuration and identity risk.",
    "Tests recognition of where real cloud incidents originate.")
-mc(C1, 'found', "A decommissioned virtual disk volume must be sanitized before the cloud account is closed. The team cannot access the provider's hardware and the data is encrypted with a customer-managed key. Which approach gives the HIGHEST assurance?",
-   "Destroy every copy of the key and document the destruction",
-   ["Overwrite the volume once from within the virtual machine", "Delete the volume through the console and trust the status message", "Ask the provider to reformat the volume without evidence"],
-   "Cryptographic erase is the purge-level technique available to customers on shared storage. Overwriting from a guest cannot reach wear-leveled or replicated copies, console deletion is logical, and an unevidenced reformat gives no proof.")
+mc(C1, 'found', "A customer retired an encrypted volume by destroying its key and must now give an auditor assurance that the data is unrecoverable. Which evidence is MOST convincing?",
+   "Key management records proving every copy of the key was destroyed, including backups and escrow",
+   ["A console screenshot showing the volume with a deleted status and a timestamp", "The provider's marketing statement that deleted customer data is always unrecoverable", "A report showing that the guest operating system overwrote the volume once before release"],
+   "Cryptographic erasure is only as strong as the key destruction, so the convincing evidence is the key lifecycle record and proof that no copy survives in backups or escrow. A console status shows only logical deletion, a marketing claim cannot be verified, and a guest-level overwrite may not reach replicas or wear-leveled blocks.")
 mc(C1, 'found', "A multinational wants to ensure engineers can only create resources in two approved regions to honor data residency promises. Which control MOST directly enforces this?",
    "A policy that denies resource creation outside the approved regions at the account level",
    ["Training engineers on the residency policy at onboarding and trusting them to follow it for each deployment", "An alert that reports resources in other regions after a week", "Encryption of all data with provider-managed keys, which hides content from outsiders but not from the platform"],
@@ -1860,10 +1860,10 @@ mc(C2, 'life', "A hospital's data map shows a patient portal copying records to 
    "A data map recording sources, owners, purposes, locations and legal basis for each element",
    ["A network diagram that shows IP address ranges and firewall rules for every environment", "The provider's physical data center audit report, which describes facilities rather than data flows", "A list of users who hold administrator rights across the environments that process the data"],
    "Data mapping ties each element to its purpose, location and legal basis. Network diagrams, facility reports and administrator lists do not answer lawful basis or retention.")
-mc(C2, 'life', "An engineering firm shares design files with a subcontractor and must be able to stop that subcontractor from printing or forwarding the files and to withdraw access at the end of the contract. Which control fits BEST?",
-   "Information rights management with a policy server that can revoke licenses",
-   ["Data loss prevention at the corporate email gateway, which inspects outbound mail but cannot reach a copied file", "Static data masking applied to the files before sharing, which cannot be undone once the file is out", "A much longer password on the shared folder, given only to the external party"],
-   "IRM protects the file itself, controls actions such as printing and forwarding and can revoke access. DLP governs egress, masking alters content irreversibly and a password does not control use or revocation.")
+mc(C2, 'life', "A company wants every document labeled Confidential to be encrypted automatically and to carry restrictions on external sharing and copying, wherever the file is later stored. Which approach achieves this?",
+   "Classification labels that automatically apply rights management protection to the file",
+   ["A perimeter firewall rule that blocks any file whose name contains the word Confidential", "Static masking of Confidential files before they are written to cloud storage", "Folder permissions that the file server administrator sets once for each department"],
+   "A label that triggers rights management attaches encryption and usage restrictions to the file itself, so the protection follows it. Name-based firewall rules and folder permissions stay behind when the file moves, and masking alters the content rather than controlling its use.")
 mc(C2, 'life', "A company discovers that revoking an IRM license for a contractor did not stop the contractor from opening a copy previously downloaded to a laptop that stays offline. Which limitation does this illustrate?",
    "Revocation takes effect only when the client next checks with the policy server",
    ["IRM cannot protect files stored in cloud storage because the policy server must sit in the same network", "IRM licenses can never be revoked once they have been issued to a recipient's device", "IRM works only on files smaller than a megabyte, so large documents need a different control"],
@@ -1988,7 +1988,7 @@ mc(C4, 'app', "A product team wants security requirements that can be verified i
    "The OWASP Application Security Verification Standard with its assurance levels",
    ["The OWASP Top 10 used as a pass or fail certificate", "A single penetration test report from last year", "A list of programming languages approved by the architects and the versions of each they allow"],
    "ASVS provides testable requirements at graduated levels. The Top 10 is an awareness list rather than a standard to certify against, an old test report is not a requirement set and a language list does not define security.")
-mc(C4, 'app', "A developer team building a customer-facing assistant that calls internal tools wants a risk list tailored to large language model applications. Which source is MOST relevant?",
+mc(C4, 'app', "A developer team is building a customer-facing assistant on a generative AI model that can call internal tools and wants a published risk list tailored to this kind of system. Which source is MOST relevant?",
    "The OWASP Top 10 for Large Language Model Applications",
    ["The OWASP Top 10 for web applications alone, since it already covers every application type", "The CWE Top 25 alone, because it is the only list that ranks weaknesses by severity", "A generic list of network ports and the services that traditionally use each of them on servers"],
    "The LLM list covers prompt injection, excessive agency, output handling and model poisoning that general web lists omit. The web Top 10 and CWE list are useful but not tailored, and port lists are unrelated.")
@@ -2016,17 +2016,17 @@ mc(C4, 'app', "A company relies on an open-source library that a single maintain
    "Review license obligations and maintainer health, then replace or fork under a managed process",
    ["Keep using it unchanged, because open-source software carries no license or maintenance obligations for the user", "Remove all versioning information to avoid disclosure", "Allow each team to pull whichever copy of the library it prefers from public sources"],
    "Open-source intake includes license review and health assessment, with a plan to replace or maintain. Ignoring obligations, hiding version data and unrestricted downloads increase risk.")
-mc(C4, 'app', "A build pipeline deploys whatever artifact a developer uploads to a shared registry. An attacker uploads a modified image to the registry. Which control would block it at deployment time?",
-   "Signature verification against trusted keys with provenance checks",
-   ["Increasing the registry's storage capacity and adding mirror copies across regions", "A longer retention period for build logs and the records of every pipeline run", "Renaming the registry repository and publishing the new name to every developer"],
-   "Verifying signatures and provenance before deploy rejects unsigned or tampered artifacts. Storage, log retention and renaming do not authenticate the artifact.")
+mc(C4, 'app', "A deployment manifest references a container image only by the tag latest. An attacker with push rights to the registry overwrites that tag with a modified image, and the next rollout pulls it. Which practice BEST prevents this?",
+   "Reference images by immutable digest and enable tag immutability in the registry",
+   ["Scan the image once at build time and then trust the tag from that point on", "Rotate the registry's TLS certificate every week and require TLS 1.3 for all pulls", "Add registry replicas in other regions so that pulls keep working during an outage"],
+   "A digest identifies the exact image content and an immutable tag cannot be silently overwritten, so a rollout pulls only what was reviewed. A one-time scan does not stop the tag being replaced later, certificate rotation does not authenticate content, and replicas improve availability only.")
 mc(C4, 'app', "A legacy partner sends large XML messages to a cloud service, and a malformed message with an external entity reference crashed a parser last month. Which component would BEST filter such traffic before it reaches the application?",
    "An XML firewall that validates schemas and blocks malformed messages",
-   ["A hardware security module", "A database activity monitor", "A content delivery cache"],
+   ["A hardware security module that protects the signing keys", "A database activity monitor that records privileged queries", "A content delivery cache that serves partner responses from the edge"],
    "XML firewalls inspect and validate XML and SOAP traffic. HSMs protect keys, activity monitors watch database queries and caches speed delivery.")
 mc(C4, 'app', "A company exposes many internal services as APIs and wants one place to authenticate callers, rate limit and log requests, while each service still checks authorization for its own objects. Which component fits?",
    "An API gateway in front of the services",
-   ["A file integrity monitor", "A bastion host", "A honeypot"],
+   ["A file integrity monitor on each service host", "A bastion host for administrator access", "A honeypot that lures attackers away from production"],
    "A gateway centralizes authentication, throttling and logging at the edge. File integrity monitors, bastions and honeypots do not serve API traffic.")
 mc(C4, 'app', "A team needs to open email attachments from unknown senders to check for malware in the cloud, without any risk to production systems. What is the BEST approach?",
    "Detonate them in an isolated sandbox with no route to production",
@@ -2038,7 +2038,7 @@ mc(C4, 'iam', "A SaaS application trusts sign-in assertions from an external ide
    "Federation trusts the signed assertion, so a stolen signing key lets an attacker impersonate anyone in every relying application. The other outcomes are unrelated.")
 mc(C4, 'app', "A development team in a regulated company wants to avoid a single failure where both the code review and the build approval are done by the same person. Which principle does this support?",
    "Separation of duties in the delivery pipeline",
-   ["Security through obscurity", "Weak coupling of services", "Role stacking for efficiency"],
+   ["Security through obscurity of the pipeline", "Loose coupling of services across the pipeline", "Role stacking to make the pipeline more efficient"],
    "Separating review from approval prevents one person from pushing unreviewed changes. Obscurity, loose coupling and stacking roles do not provide that control.")
 ms(C4, 'app', "Which TWO statements about functional and non-functional testing are accurate? (Choose two.)",
    ["Security, performance and availability testing are non-functional", "A feature can pass every functional test and still be exploitable"],
@@ -2154,11 +2154,11 @@ tf(C5, 'buildops', "Cluster resilience such as storage replication removes the n
    "Replication copies deletions and corruption too; backups protect against them.")
 
 # ---- questions added in the August 2026 outline refresh: Domain 6
-mc(C6, 'legal', "A multinational stores European customer data in a European region of a US provider. A foreign authority orders the provider to hand over the data, while European law forbids that disclosure without a lawful basis. Which action BEST reduces the customer's exposure to this conflict?",
-   "Hold encryption keys under customer control and involve legal counsel to contest or narrow the demand",
-   ["Disable all logging so that no records exist about the request or its handling", "Move the data to whichever region is cheapest this quarter and review jurisdiction later", "Agree to every request from any authority immediately to avoid penalties and delay"],
-   "Customer-held keys limit what the provider can produce and counsel manages the conflict through legal channels. Disabling logs hides evidence, price-driven region moves ignore law and automatic compliance may breach local law.",
-   "Conflicting legislation is a named topic and the answer is minimizing exposure plus legal escalation.")
+mc(C6, 'legal', "A European retailer contracts with a US-headquartered cloud provider that stores the retailer's data in a Frankfurt region. Which US law can still be used to compel that provider to produce the data?",
+   "The CLOUD Act",
+   ["FERPA", "The Sarbanes-Oxley Act", "NERC CIP standards"],
+   "The CLOUD Act lets US authorities compel a US provider to produce data in its possession, custody or control wherever it is stored, which is why customer-held keys and contract terms matter for European data. FERPA covers education records, Sarbanes-Oxley covers financial reporting controls and NERC CIP covers the bulk electric system.",
+   "Conflicting legislation is a named topic; the CLOUD Act is the standard example of extraterritorial government access.")
 mc(C6, 'legal', "A company needs a defensible method for forensic work after a cloud breach and wants standards covering collection of evidence, the suitability of the investigation method, analysis and the overall process. Which set of standards matches?",
    "ISO/IEC 27037, 27041, 27042 and 27043",
    ["ISO/IEC 27001, 27002, 27017 and 27018", "ISO/IEC 22301, 31000, 20000-1 and 9001", "ISO/IEC 15408, 17788, 17789 and 27036"],
@@ -2195,10 +2195,10 @@ mc(C6, 'legal', "A utility moves a monitoring system for part of the bulk electr
    "NERC CIP standards",
    ["FERPA", "SOX Section 404", "GAPP"],
    "NERC CIP sets mandatory cybersecurity requirements for bulk electric system entities. FERPA concerns education records, SOX concerns financial reporting and GAPP is a privacy framework.")
-mc(C6, 'legal', "A risk manager must decide how to treat the possibility of a long outage at a critical SaaS vendor. The company agrees to run part of the workload with a second vendor under a contract that divides the consequences. Which treatment is this?",
-   "Risk sharing",
-   ["Risk avoidance", "Risk acceptance", "Risk elimination"],
-   "Sharing divides the consequence with another party. Avoidance stops the activity, acceptance bears it silently and elimination is not a standard treatment.")
+mc(C6, 'legal', "Analysis shows a company cannot meet a country's data residency law for a planned cloud analytics feature, and management cancels the feature rather than launch it. Which risk treatment is this?",
+   "Risk avoidance",
+   ["Risk sharing", "Risk acceptance", "Risk transfer"],
+   "Avoidance removes the risk by not starting, or by stopping, the activity that creates it. Sharing and transfer divide or move the consequence to another party, and acceptance knowingly keeps the risk.")
 mc(C6, 'legal', "A business rule says that a cloud provider's breach notice must reach the customer faster than the customer's own regulatory deadline. Which place BEST captures this requirement?",
    "The contract's breach notification clause with a shorter notice period than the regulatory deadline",
    ["The provider's public marketing page describing how quickly incidents are handled", "An informal email from the account manager promising prompt notice of any incident", "The customer's internal wiki, which describes the provider's duties as the customer understands them"],
@@ -2313,20 +2313,20 @@ mc(C2, 'life', "A provider stores archive objects as erasure-coded fragments spr
     "Dispersion makes deletion instant because every fragment expires automatically at exactly the same moment everywhere"],
    "Splitting data improves resilience and reduces what any one location reveals, yet fragments in other regions can still conflict with residency requirements. It does not replace encryption or guarantee jurisdiction.",
    "Tests data dispersion against data location and residency duties.")
-mc(C2, 'life', "An investigator reviewing storage access logs finds the action and timestamp for each event, but cannot tell who performed it or from where. Which attributes were missing from the event definition?",
-   "Identity of the actor, source IP address and geolocation",
-   ["Disk block size, file system type and data center rack identifier",
-    "Encryption algorithm, key length and certificate expiry date of the object",
-    "Retention period, storage class and billing tag attached to the bucket"],
-   "Auditability needs who, from where and when. Storage mechanics, algorithms and billing metadata do not attribute an action to an actor or a place.",
-   "Covers event sources and required event attributes in objective 2.8.")
-mc(C2, 'life', "A company plans to fine-tune a model on support chats that contain personal data. Which control BEST reduces the risk that the finished model reveals individual records?",
-   "Minimize and de-identify the training data, then test the model for memorization",
-   ["Encrypt the training volume at rest and leave the dataset content unchanged",
-    "Place the model endpoint in a private subnet and keep every record in the dataset",
-    "Increase the number of training epochs so that the model learns each record thoroughly and reliably"],
-   "Leakage comes from what the model memorizes, so reducing and de-identifying data and testing for extraction address it directly. Storage encryption and network placement protect the container, and more training increases memorization.",
-   "Tests dataset and model privacy under objective 2.9.")
+mc(C2, 'life', "A team enabled management-plane audit logging for its cloud account, but an investigation cannot show who downloaded specific objects from a storage bucket. What was missing?",
+   "Object-level data event logging for the storage service",
+   ["A longer retention period for the management-plane audit log",
+    "Multi-factor authentication on the cloud console",
+    "A second copy of the audit log stored in another region"],
+   "Management-plane logs record control actions such as creating buckets or changing policies, while reads and writes of individual objects are data events that usually have to be enabled separately. Retention, extra copies and console MFA do not create events that were never recorded.",
+   "Covers event sources in objective 2.8.")
+mc(C2, 'life', "A company builds an internal assistant that answers employee questions from a vector index of all its documents, including HR files and board papers. Which control BEST ensures that each employee only receives content they are already entitled to see?",
+   "Enforce the source documents' access permissions at retrieval time by filtering results for the signed-in user",
+   ["Encrypt the vector index at rest with a customer-managed key and leave retrieval open to the assistant",
+    "Tell the model in its system prompt never to reveal restricted documents to unauthorized users",
+    "Limit the chat interface to the corporate network so that only employees can reach it"],
+   "Filtering at retrieval keeps restricted content out of the model's context in the first place. Encryption at rest does not decide who may read results, a prompt instruction can be bypassed by injection, and network location does not tell one employee from another.",
+   "Tests access control for AI data under objective 2.9.")
 tf(C2, 'life', "Spreading erasure-coded fragments of data across regions can conflict with data residency requirements even though no single region holds the whole object.", True,
    "Residency rules concern where personal or regulated data is stored or processed, so fragment placement still has to be approved.")
 
@@ -2345,13 +2345,13 @@ mc(C3, 'infra', "A provider hosts competing retailers on shared hosts. Which log
     "Host firewalls configured identically on every host so that all tenants share the same rules and rule sets"],
    "Tenant partitioning relies on separate networks, identities and keys enforced by the platform. Naming, shared accounts and uniform firewalls provide labels rather than isolation.",
    "Covers logical design and tenant partitioning.")
-mc(C3, 'infra', "A site buys connectivity from two carriers, but both circuits enter the building through the same underground conduit. Which design weakness does this show?",
-   "The pathways are not diverse, so one physical cut or fire could sever both carriers",
-   ["Two carriers are unnecessary because a single provider with a premium contract is always safer",
-    "Dual carriers create a risk of data corruption because packets arrive out of order",
-    "Carrier diversity matters only for voice traffic and has no bearing on data availability"],
-   "Multi-vendor pathway connectivity means carriers use physically separate routes; a shared conduit is a single point of failure. The other statements are incorrect claims about carriers.",
-   "Tests environmental and resilience design for connectivity.")
+mc(C3, 'infra', "When utility power fails at a data center, which component carries the load during the seconds before the standby generators start and take over?",
+   "An uninterruptible power supply using batteries or flywheels",
+   ["A power distribution unit that spreads the load across racks",
+    "A surge protector on each rack's power strip",
+    "A large fuel tank sized for several days of generator running"],
+   "An uninterruptible power supply bridges the gap until the generators reach speed and the transfer completes. A power distribution unit only distributes power, a surge protector only clamps spikes, and fuel keeps generators running but cannot supply power in the first seconds.",
+   "Tests environmental and resilience design for power.")
 mc(C3, 'resil', "During risk assessment of a new cloud platform a team has listed its assets, the threats against them and the vulnerabilities present. What is the NEXT step in analysis?",
    "Estimate the likelihood and impact of each scenario to rate and rank the risks",
    ["Accept every risk that has a low purchase price for the corresponding safeguard",
@@ -2359,20 +2359,20 @@ mc(C3, 'resil', "During risk assessment of a new cloud platform a team has liste
     "Select the provider's default controls and treat the assessment as complete"],
    "Identification is followed by analysis of likelihood and impact, which supports ranking and treatment decisions. Accepting, transferring or defaulting before rating skips the reasoning that treatment depends on.",
    "Covers risk assessment steps for cloud infrastructure.")
-mc(C3, 'resil', "After a regional failover the standby region delivers only 40 percent of normal capacity for the first day. Which recovery planning concept does this describe?",
-   "Recovery service level, the degree of service delivered after recovery",
-   ["Recovery point objective, the amount of data loss that is tolerable",
-    "Recovery time objective, the time allowed to restore the service",
-    "Mean time between failures, the average time before the next failure"],
-   "Recovery service level states how much functionality or capacity must be available once recovery completes. RPO is about data loss, RTO about time and MTBF about reliability.",
-   "Tests the recovery service level term in objective 3.5.")
-mc(C3, 'infra', "Auditors need to reconstruct a network incident that crossed several cloud accounts. Which audit mechanism set is MOST useful?",
-   "Centralized, time-synchronized log collection with correlation and retained flow logs or captures",
-   ["Separate local logs on each workload that are overwritten after a few hours",
-    "Screenshots of the console taken by administrators when they remember to do so",
-    "Only the provider's annual availability report, which lists uptime by region"],
-   "Central, time-synchronized and correlated logs plus network records allow reconstruction across accounts. Local rotating logs, ad hoc screenshots and an uptime report cannot show who did what.",
-   "Covers audit mechanisms such as log collection, correlation and packet capture.")
+mc(C3, 'resil', "A customer database is snapshotted every six hours, but the business impact analysis allows at most fifteen minutes of data loss. Which change closes the gap?",
+   "Replicate changes continuously or back up at least every fifteen minutes",
+   ["Add standby servers so that restoration takes less than fifteen minutes",
+    "Keep the six-hourly snapshots for ten years instead of ninety days",
+    "Move the snapshots to a cheaper storage tier in the same region"],
+   "Tolerable data loss is the recovery point objective, so recoverable copies must be no more than fifteen minutes apart. Standby servers shorten restoration time, longer retention only changes how far back a restore can go, and a cheaper tier lowers cost without improving the recovery point.",
+   "Tests how the recovery point objective drives backup design in objective 3.5.")
+mc(C3, 'infra', "Auditors reconstructing an incident across several cloud accounts find that events from different services appear in impossible orders. Which fix addresses the root cause?",
+   "Synchronize every system to a trusted time source and log timestamps in UTC",
+   ["Extend log retention from ninety days to one year so that the events can be sorted out later",
+    "Encrypt the logs in transit to the central collector using mutually authenticated TLS",
+    "Turn on debug-level logging in every service so that more detail is recorded"],
+   "Correlation depends on consistent time, and unsynchronized clocks or mixed time zones make the event order unreliable. Longer retention, transport encryption and more verbose logging do not correct timestamps.",
+   "Covers audit mechanisms and the time synchronization that log correlation depends on.")
 tf(C3, 'infra', "A cloud customer using IaaS remains responsible for physical access controls at the provider's data center.", False,
    "Physical and environmental protection of the facility is the provider's duty; the customer verifies it through audit reports and contracts.")
 
@@ -2384,12 +2384,12 @@ mc(C4, 'app', "A team moving from waterfall to agile worries that end-of-project
     "Ask the security team to approve every user story before the sprint can start"],
    "Agile needs security tasks inside each iteration and acceptance criteria, rather than a late gate. A single late review finds problems too late, and per-story approvals do not scale.",
    "Contrasts waterfall and agile security activities in the secure SDLC objective.")
-mc(C4, 'app', "An authenticated API user changes the invoice number in a request and receives another customer's invoice. Which OWASP API Security Top 10 risk is this?",
-   "Broken object level authorization",
-   ["Unrestricted resource consumption of the invoice service",
+mc(C4, 'app', "A profile-update API copies every field in the submitted JSON onto the stored user record, so an ordinary user who adds an extra role field set to administrator becomes an administrator. Which OWASP API Security Top 10 risk is this?",
+   "Broken object property level authorization",
+   ["Unrestricted resource consumption of the profile service",
     "Security misconfiguration of the web server headers",
     "Improper inventory management of retired API versions"],
-   "The API checks who the caller is but not whether they may access that specific object, which is broken object level authorization, the top API risk. The other risks involve load, configuration or old versions.",
+   "The API lets the caller write a property they are not allowed to change, which is broken object property level authorization (mass assignment). The other risks involve load, configuration or old versions.",
    "Applies the API Security Top 10 named in objective 4.1.")
 tf(C4, 'app', "The CWE Top 25 ranks the most dangerous software weakness types using vulnerability data, and it complements the OWASP Top 10 rather than replacing it.", True,
    "It lists weakness classes by prevalence and severity, while the OWASP list is an awareness document of web application risk categories.")
@@ -2483,12 +2483,12 @@ mc(C6, 'legal', "A company buys cyber risk insurance and concludes that its secu
     "Insurance removes the likelihood of an incident, which makes risk assessment unnecessary"],
    "Insurance is risk transfer of some financial impact, often conditional on controls and subject to exclusions. It does not remove accountability, likelihood or the need to assess risk.",
    "Tests risk transfer through contract and insurance.")
-mc(C6, 'legal', "A provider is compelled by a foreign court order to hand over customer data stored in another country, which conflicts with the customer's home-country law. Which treatment BEST reduces this legal risk?",
-   "Hold encryption keys under customer control and require notice and challenge rights",
-   ["Rely on the provider's public statement that it never discloses customer data to any government",
-    "Store the data in a region chosen only for the lowest price per gigabyte",
-    "Remove the data location clause so that the contract is shorter and simpler"],
-   "Customer-held keys limit what the provider can disclose and contract terms for notice and challenge give a response path. Marketing claims, price-driven location and a missing clause increase exposure.",
+mc(C6, 'legal', "A customer worries that a foreign authority could demand its data from the provider without the customer ever finding out. Which contract term helps MOST?",
+   "A commitment to notify the customer of government requests where the law allows and to challenge overbroad ones",
+   ["A service level credit that is paid whenever the provider discloses customer data",
+    "A right to inspect the provider's data center after any disclosure has taken place",
+    "A clause that lets the provider decide at its own discretion whether customers are informed"],
+   "Notice and challenge commitments let the customer learn of a demand, object or seek protective orders, and keep control of the legal response. A credit compensates only after the fact, an inspection reveals nothing about the demand, and provider discretion removes the customer's visibility.",
    "Covers conflicting legislation and legal risks specific to cloud.")
 tf(C6, 'legal', "When two countries' laws conflict over the handling of data, a contract clause alone resolves the conflict because courts always honor the agreed terms.", False,
    "Mandatory law and regulators can override contract terms, so conflicts need legal analysis, location choices and technical controls.")
@@ -2800,7 +2800,7 @@ Litigation brings electronic discovery, the identifying, preserving, collecting 
 
 Customers rarely audit a hyperscale provider themselves, so they rely on independent evidence. A SOC 1 report concerns controls over financial reporting; SOC 2 reports on security, availability, processing integrity, confidentiality and privacy, with Type I covering design at a point in time and Type II covering operating effectiveness over a period; SOC 3 is a public summary. ISO/IEC 27001 certifies an information security management system, 27017 adds cloud-specific controls and 27018 covers personal data in public clouds. The Cloud Security Alliance's Cloud Controls Matrix and STAR registry give a public, comparable view, from a self-assessment at Level 1 to third-party audit at Level 2.
 
-Risk management ties it together. Identify assets and threats, assess likelihood and impact, and treat risk by mitigating, transferring, avoiding or accepting it. Vendor risk management applies due diligence before onboarding, contracts for obligations, ongoing monitoring and an exit plan.
+Risk management ties it together. Identify assets and threats, assess likelihood and impact, and treat risk by mitigating, transferring, sharing, avoiding or accepting it. Vendor risk management applies due diligence before onboarding, contracts for obligations, ongoing monitoring and an exit plan.
 
 Legal analysis begins with the unique cloud risks: conflicting international legislation, government access requests, jurisdiction of the data and of the provider, and the evaluation of legal and regulatory frameworks. Privacy requirements distinguish contractual from regulated personal data (PII and PHI), name country-specific laws (FERPA, PIPEDA, GDPR, HIPAA with HITECH, India's Digital Personal Data Protection Act), recognize jurisdictional differences, and use standard privacy frameworks such as ISO/IEC 27018 and GAPP, with a privacy impact assessment before launch. eDiscovery follows ISO/IEC 27050 and CSA guidance, and forensics requirements follow ISO/IEC 27037, 27041, 27042 and 27043.
 
@@ -2852,7 +2852,7 @@ MADLIBS = [
     },
     {
         'id': 'ml-ccsp-4', 'cat': C3,
-        'scenario': "A BIA states a payment platform can be down for at most five minutes and can lose at most one second of transactions. The first figure is the {b1} and the second is the {b2}.",
+        'scenario': "A payment platform's recovery plan commits to restoring service within five minutes of an outage and accepts losing at most one second of transactions. The first figure is the {b1} and the second is the {b2}.",
         'blanks': [
             {'key': 'b1', 'options': ['recovery time objective', 'recovery point objective', 'maximum tolerable downtime'], 'correct': 0},
             {'key': 'b2', 'options': ['recovery point objective', 'recovery time objective', 'service level agreement'], 'correct': 0},
@@ -3317,7 +3317,7 @@ CHEAT_SHEET = [
             "Residency (where stored) differs from sovereignty (whose law applies). Transfers need adequacy, SCCs or BCRs. The CLOUD Act can reach data held by US providers anywhere.",
             "eDiscovery: identify, preserve, collect, review, produce (ISO/IEC 27050). Legal holds suspend deletion. HIPAA needs a business associate agreement.",
             "SOC 1 financial controls; SOC 2 trust criteria (Type II is the strong evidence); SOC 3 public summary. ISO/IEC 27001 certifies an ISMS, 27017 cloud controls, 27018 PII in clouds.",
-            "CSA CCM and STAR: Level 1 self-assessment, Level 2 third-party. Risk treatments: mitigate, transfer, avoid, accept; insurance never transfers accountability.",
+            "CSA CCM and STAR: Level 1 self-assessment, Level 2 third-party. Risk treatments: mitigate, transfer, share, avoid, accept; insurance never transfers accountability.",
             "Vendor management: due diligence before, due care after, contract for audit, breach notice, subprocessors and exit.",
         ],
     },
