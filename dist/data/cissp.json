@@ -216,7 +216,7 @@
     {
       "id": "f10",
       "cat": "cisspRisk",
-      "front": "Security control frameworks (NIST, ISO/IEC 27001, COBIT, SABSA)",
+      "front": "Security control frameworks",
       "back": "Frameworks give structure for choosing and organizing controls: NIST CSF and SP 800-53 (US-origin control catalogs), ISO/IEC 27001 and 27002 (an international ISMS standard and control guidance), COBIT (IT governance), and SABSA (business-driven security architecture).",
       "detail": "You need to recognise each at a management level and know that ISO/IEC 27001 is the one organizations get certified against."
     },
@@ -273,7 +273,7 @@
       "id": "f18",
       "cat": "cisspRisk",
       "front": "Cross-border data transfer",
-      "back": "Moving personal data between jurisdictions is restricted by laws such as GDPR unless a mechanism applies, such as an adequacy decision, standard contractual clauses or binding corporate rules.",
+      "back": "Moving personal data to, or allowing access to it from, another country. Many laws restrict this: the GDPR limits transfers outside the EU unless a legal mechanism applies, and some countries require certain data to stay in-country (data localization).",
       "detail": "Before choosing a cloud region or an offshore support vendor, check where the data will be stored, processed and accessed from."
     },
     {
@@ -713,7 +713,7 @@
     {
       "id": "f81",
       "cat": "cisspArch",
-      "front": "Block cipher modes of operation (ECB, CBC, CTR, GCM)",
+      "front": "Block cipher modes of operation: ECB, CBC, CTR and GCM",
       "back": "ECB encrypts each block independently and reveals patterns, CBC chains blocks with an initialization vector, CTR turns a block cipher into a stream cipher, and GCM adds integrity and authentication (an authenticated encryption mode).",
       "detail": "Prefer an authenticated mode such as GCM; never reuse an IV or nonce with the same key."
     },
@@ -777,7 +777,7 @@
       "id": "f90",
       "cat": "cisspArch",
       "front": "Cryptanalytic attacks (birthday, known plaintext, chosen ciphertext, rainbow table)",
-      "back": "The birthday attack exploits hash collision probability, known and chosen plaintext attacks use samples of plaintext and ciphertext, and rainbow tables are precomputed hash lookups defeated by salting passwords.",
+      "back": "The birthday attack exploits hash collision probability, a known-plaintext attack works from matching plaintext and ciphertext samples, a chosen-ciphertext attack lets the attacker obtain decryptions of ciphertext of their choosing, and rainbow tables are precomputed hash lookups defeated by salting passwords.",
       "detail": "Salt makes each password hash unique, destroying the value of precomputed tables."
     },
     {
@@ -1308,7 +1308,7 @@
     {
       "id": "f9046",
       "cat": "cisspRisk",
-      "front": "Emerging technology in awareness content (AI, cryptocurrency, blockchain)",
+      "front": "Emerging technology in awareness content",
       "back": "Awareness material should be refreshed for new risks: deepfakes and AI-written phishing, staff pasting confidential data into public AI tools (shadow AI), cryptocurrency scams and ransom payments, and blockchain or smart-contract fraud. Periodic content review keeps training aligned with current threats.",
       "detail": "Treat generative AI like any external service: classify what may be shared with it and approve tools through procurement."
     },
@@ -1413,7 +1413,7 @@
     {
       "id": "f9061",
       "cat": "cisspAsset",
-      "front": "Standards selection and baselines (CIS Benchmarks, STIGs)",
+      "front": "Standards selection and baselines: CIS Benchmarks and STIGs",
       "back": "Choose standards from legal and regulatory duties, contracts, risk and business needs, then tailor them. Hardening standards such as CIS Benchmarks and DISA STIGs give concrete configuration baselines, while NIST SP 800-53, ISO/IEC 27001 and PCI DSS give control requirements.",
       "detail": "Record why a standard was selected and why any control was tailored out; auditors ask for the rationale."
     },
@@ -1484,8 +1484,8 @@
       "id": "f9071",
       "cat": "cisspArch",
       "front": "Zero trust architecture components (NIST SP 800-207)",
-      "back": "A policy decision point (a policy engine plus policy administrator) decides whether a subject may reach a resource, and a policy enforcement point opens or closes the connection. Decisions use identity, device health and other context, with least privilege per session. Resources are treated as untrusted-network resources and access is continuously reevaluated.",
-      "detail": "Zero trust moves the perimeter to the resource. \"Trust but verify\" in the outline contrasts with \"never trust, always verify\"."
+      "back": "A policy decision point (a policy engine plus policy administrator) decides whether a subject may reach a resource, and a policy enforcement point opens or closes the connection. Decisions use identity, device health and other context, with least privilege per session. No resource is trusted merely because of its network location, and access is continuously reevaluated.",
+      "detail": "Zero trust moves the perimeter to the resource. \"Trust but verify\" in the exam outline contrasts with \"never trust, always verify\"."
     },
     {
       "id": "f9072",
@@ -1632,7 +1632,7 @@
       "cat": "cisspArch",
       "front": "Serverless security",
       "back": "In serverless computing the provider runs functions on demand and the customer owns only code, configuration and data. Risks include event-data injection, over-permissive function roles, vulnerable dependencies and secrets in code or environment variables; there is no server to patch but also less visibility. Give each function its own least-privilege role.",
-      "detail": "Shared responsibility is at its narrowest for the provider here: the customer still owns identity, code and data."
+      "detail": "The customer's share of responsibility is at its narrowest here, but not zero: the customer still owns identity, code and data."
     },
     {
       "id": "f9093",
@@ -1693,7 +1693,7 @@
     {
       "id": "f9101",
       "cat": "cisspArch",
-      "front": "Password hashing and key stretching (bcrypt, scrypt, Argon2, PBKDF2)",
+      "front": "Password hashing and key stretching: bcrypt, scrypt, Argon2 and PBKDF2",
       "back": "Password storage should use deliberately slow, salted algorithms. PBKDF2 repeats a hash many times, bcrypt adapts a slow cipher setup, scrypt and Argon2 also demand large amounts of memory, which blunts GPU cracking. A pepper is an additional secret held outside the database.",
       "detail": "A fast general hash such as SHA-256 is the wrong tool for passwords, even when salted."
     },
@@ -1701,7 +1701,7 @@
       "id": "f9102",
       "cat": "cisspArch",
       "front": "Digital signature algorithms: RSA, DSA and ECDSA",
-      "back": "Digital signatures can be built on RSA, DSA (in the Digital Signature Standard) or ECDSA, each of which hashes the message and signs the digest with the signer's private key. Verification uses the public key and proves integrity, origin and nonrepudiation if the private key was kept secret.",
+      "back": "Digital signatures can be built on RSA, ECDSA or the older DSA (in the Digital Signature Standard, no longer approved for creating new signatures since FIPS 186-5 in 2023), each of which hashes the message and signs the digest with the signer's private key. Verification uses the public key and proves integrity, origin and nonrepudiation if the private key was kept secret.",
       "detail": "Key protection is the weak point: a signature proves a private key was used, so a stolen key breaks nonrepudiation."
     },
     {
@@ -1742,7 +1742,7 @@
     {
       "id": "f9108",
       "cat": "cisspArch",
-      "front": "Certificate types and validation (DV, OV, EV, wildcard, SAN)",
+      "front": "Certificate types and validation: DV, OV, EV, wildcard and SAN",
       "back": "Domain validation (DV) proves control of a domain, organization validation (OV) adds verified organization details, and extended validation (EV) applies stricter vetting. Wildcard certificates cover all subdomains of one level, and subject alternative names (SAN) list several hostnames. Code-signing and email (S/MIME) certificates serve other purposes.",
       "detail": "Stricter validation proves who runs the site, not that the site is safe. A wildcard private key exposed means every subdomain is affected."
     },
@@ -1896,7 +1896,7 @@
     {
       "id": "f9130",
       "cat": "cisspArch",
-      "front": "Gaseous fire suppressants (clean agents, CO2, halon)",
+      "front": "Gaseous fire suppressants: clean agents, CO2 and halon",
       "back": "Clean agents such as FM-200 (HFC-227ea) and Novec 1230 interrupt the chemical reaction and leave no residue, and inert gases reduce oxygen to a level that stops fire but is safe for short exposure. CO2 displaces oxygen and is dangerous to people, so it needs pre-discharge alarms and delays. Halon is banned under the Montreal Protocol for ozone damage.",
       "detail": "Life safety first: any gas system needs evacuation alarms, abort switches and exit-first procedures. Water mist is another low-damage option."
     },
@@ -2253,7 +2253,7 @@
     {
       "id": "f1004",
       "cat": "cisspIam",
-      "front": "Biometric error rates (FAR, FRR, CER)",
+      "front": "Biometric error rates: FAR, FRR and CER",
       "back": "False acceptance rate (FAR) is how often an impostor is wrongly admitted. False rejection rate (FRR) is how often a legitimate user is wrongly refused. The crossover error rate (CER) is where FAR and FRR are equal and is the best single number for comparing devices; a lower CER is more accurate.",
       "detail": "FAR is a Type II error (security failure) and FRR is a Type I error (usability failure). High-security sites tune toward a low FAR and accept more false rejections."
     },
@@ -2295,16 +2295,16 @@
     {
       "id": "f1010",
       "cat": "cisspIam",
-      "front": "Kerberos components (KDC, AS, TGS, TGT)",
+      "front": "Kerberos components: KDC, AS, TGS and TGT",
       "back": "The KDC contains the Authentication Service (AS), which issues the ticket-granting ticket (TGT) after the user proves identity, and the Ticket-Granting Service (TGS), which exchanges a TGT for a service ticket for a specific resource.",
       "detail": "Remember the order: AS then TGT, then TGS then service ticket. A \"golden ticket\" attack forges a TGT using the stolen key of the KRBTGT account."
     },
     {
       "id": "f1011",
       "cat": "cisspIam",
-      "front": "RADIUS vs. TACACS+ vs. Diameter",
-      "back": "RADIUS (UDP) provides centralized authentication, authorization and accounting for network access and encrypts only the password. TACACS+ (TCP) separates authentication, authorization and accounting and encrypts the whole payload, so it suits device administration. Diameter is the successor to RADIUS.",
-      "detail": "Network device administration with per-command authorization points to TACACS+; Wi-Fi, VPN and 802.1X network access points to RADIUS."
+      "front": "Diameter (the successor to RADIUS)",
+      "back": "An authentication, authorization and accounting protocol designed to improve on RADIUS. It runs over reliable transport (TCP or SCTP) with IPsec or TLS protection, supports server-initiated messages, failover and a larger attribute space, and is widely used in mobile and telecom networks.",
+      "detail": "Diameter is the answer when a question asks for the successor to RADIUS. For device administration with per-command authorization think TACACS+; for Wi-Fi, VPN and 802.1X access think RADIUS."
     },
     {
       "id": "f1012",
@@ -2365,8 +2365,8 @@
     {
       "id": "f1020",
       "cat": "cisspIam",
-      "front": "Separation of duties, dual control and split knowledge",
-      "back": "Separation of duties divides a critical task among different people so no one can complete a fraud alone. Dual control requires two people to act together. Split knowledge gives each person only part of a secret, such as half of a key.",
+      "front": "Dual control and split knowledge",
+      "back": "Dual control requires two people to act together to complete a sensitive operation, each performing a separate step or presenting a separate credential. Split knowledge gives each person only part of a secret, such as half of a key, so that no one person holds the whole thing. Both apply separation of duties to the most sensitive tasks, such as key custody.",
       "detail": "Collusion is the residual risk. Split knowledge is about knowing a partial secret; dual control is about two people performing the action."
     },
     {
@@ -2631,8 +2631,8 @@
     {
       "id": "f1058",
       "cat": "cisspOps",
-      "front": "Chain of custody for operational evidence",
-      "back": "The documented record of who collected, handled, transferred and stored a piece of evidence, with dates, times and reasons, from collection to court. Any gap can make the evidence inadmissible.",
+      "front": "Evidence integrity and hash verification",
+      "back": "A cryptographic hash (such as SHA-256) is computed for the original media and for each forensic copy, and matching values prove the copy is bit-for-bit identical and unchanged since collection. Hashes are recorded in the evidence log and recomputed whenever an item changes hands or is analyzed.",
       "detail": "Hash values prove integrity; chain of custody proves accountability for handling. You need both."
     },
     {
@@ -2652,16 +2652,16 @@
     {
       "id": "f1061",
       "cat": "cisspOps",
-      "front": "Types of investigations and standards of proof",
-      "back": "Administrative investigations support internal policy decisions. Criminal investigations need proof beyond a reasonable doubt. Civil cases use the lower preponderance of evidence standard. Regulatory investigations are driven by compliance rules.",
-      "detail": "The standard of proof drives how rigorous evidence handling must be. Criminal cases demand the strictest handling."
+      "front": "Administrative (internal) investigation",
+      "back": "An internal inquiry into a policy violation, misconduct or an operational problem, run by management, HR, internal audit or security with legal counsel rather than by the police. The standard of proof is lower than in criminal cases and the outcome is discipline or a process change, but evidence should still be handled as though the case might reach court.",
+      "detail": "A case that starts as an HR matter can become a civil or criminal one, so keep the same forensic discipline from the start. Involve legal counsel and HR early and limit who is told."
     },
     {
       "id": "f1062",
       "cat": "cisspOps",
-      "front": "Legal hold and eDiscovery",
-      "back": "A legal hold is an instruction to preserve potentially relevant records and suspend routine deletion when litigation is reasonably anticipated. eDiscovery is the process of identifying, collecting and producing electronic information for a legal matter.",
-      "detail": "Auto-delete schedules must be suspended once a hold applies. Destroying data after a hold is spoliation."
+      "front": "eDiscovery (electronic discovery)",
+      "back": "The process of identifying, preserving, collecting, reviewing and producing electronically stored information (email, documents, chat, logs) as evidence for litigation or an investigation. It follows the legal hold, and a documented, defensible process matters more than speed.",
+      "detail": "Retention schedules and data maps make eDiscovery faster and cheaper. Deleting data that is under a hold, or failing to produce it, can lead to court sanctions."
     },
     {
       "id": "f1063",
@@ -2680,9 +2680,9 @@
     {
       "id": "f1065",
       "cat": "cisspOps",
-      "front": "IDS vs. IPS (network and host-based)",
-      "back": "An intrusion detection system (IDS) monitors and alerts; an intrusion prevention system (IPS) sits in line and can block. Detection can be signature-based, anomaly-based or behavior-based, on a network (NIDS/NIPS) or host (HIDS/HIPS).",
-      "detail": "Signature-based detection misses novel attacks; anomaly-based detection catches them but produces more false positives. Inline placement is what makes an IPS able to block."
+      "front": "Network-based vs. host-based intrusion detection",
+      "back": "A network-based sensor (NIDS/NIPS) watches traffic crossing a segment, from a tap, a mirror port or inline, so one sensor covers many hosts, but it cannot read encrypted payloads. A host-based sensor (HIDS/HIPS) runs as an agent on one endpoint and watches its logs, files, processes and decrypted activity, but covers only that host.",
+      "detail": "Use both: network sensors give breadth across a segment, host sensors give depth on critical servers. Traffic inside TLS is invisible to a network sensor but plain to a host agent."
     },
     {
       "id": "f1066",
@@ -2785,9 +2785,9 @@
     {
       "id": "f1080",
       "cat": "cisspOps",
-      "front": "RTO, RPO, MTD and WRT",
-      "back": "Recovery time objective (RTO) is the target time to restore a service. Recovery point objective (RPO) is the maximum tolerable data loss measured in time. Maximum tolerable downtime (MTD, also MAO) is the longest an outage can last before the business is threatened. Work recovery time (WRT) is time to verify and resume work after the system is back.",
-      "detail": "RTO plus WRT must fit within MTD. The RPO decides backup or replication frequency, and the RTO decides the type of recovery site."
+      "front": "Recovery point vs. recovery time objectives (RPO and RTO)",
+      "back": "The recovery point objective looks backward: how much recent data, measured in time, the business can afford to lose, which sets how often data is backed up or replicated. The recovery time objective looks forward: how long restoring a service may take, which sets the type of recovery site and the redundancy needed.",
+      "detail": "Nightly backups mean up to 24 hours of data loss, so a one-hour recovery point objective needs replication or frequent backups, and a four-hour recovery time objective rules out a cold site. The recovery time plus the work recovery time must fit inside the maximum tolerable downtime."
     },
     {
       "id": "f1081",
@@ -2806,23 +2806,23 @@
     {
       "id": "f1083",
       "cat": "cisspOps",
-      "front": "Alternate processing sites (hot, warm, cold, mobile, reciprocal)",
-      "back": "A hot site is fully equipped and current, ready in minutes to hours. A warm site has hardware and connectivity but needs data restored. A cold site has only space and power. Mobile sites are portable, and reciprocal agreements with other organizations are cheap but unreliable.",
-      "detail": "Choose the site by the RTO and budget: the shorter the RTO, the higher the cost. Reciprocal agreements fail when both parties are affected or capacity is lacking."
+      "front": "Reciprocal (mutual aid) agreements",
+      "back": "An arrangement in which two organizations agree to host each other's processing after a disaster. It is cheap, but capacity, software compatibility and confidentiality are uncertain, it is hard to enforce, and it fails if both parties are hit by the same event. A contracted service bureau or cloud recovery service is the dependable alternative.",
+      "detail": "A reciprocal agreement is cheap but the least dependable recovery option. Compare it with hot, warm and cold sites, where the shorter the RTO, the higher the cost."
     },
     {
       "id": "f1084",
       "cat": "cisspOps",
-      "front": "Disaster recovery test types",
-      "back": "From least to most disruptive: read-through (checklist review), walkthrough or tabletop (talk through the scenario), simulation (role-play with a scenario), parallel (recover at the alternate site while production continues) and full interruption (production is actually switched).",
-      "detail": "Parallel tests do not disrupt production; full interruption does and is the riskiest. Results must be documented and fed back into the plan."
+      "front": "Parallel vs. full-interruption recovery tests",
+      "back": "In a parallel test the recovery systems are brought up at the alternate site and processing runs there alongside production, which carries on unaffected. In a full-interruption test production is actually shut down and operations are switched to the recovery site, which gives the most realistic proof and the greatest risk of a real outage.",
+      "detail": "Run a parallel test first. Run a full-interruption test only with senior-management approval and a rollback plan, and feed the documented results back into the plan."
     },
     {
       "id": "f1085",
       "cat": "cisspOps",
-      "front": "Business continuity plan vs. disaster recovery plan",
-      "back": "The business continuity plan (BCP) keeps critical business functions running through any disruption and is driven by a business impact analysis. The disaster recovery plan (DRP) is the IT-focused subset that restores technology and data after a disaster.",
-      "detail": "BCP is about the business process, DRP is about the systems. The BIA sets priorities and recovery objectives for both."
+      "front": "Disaster recovery plan (DRP)",
+      "back": "The IT-focused plan for restoring technology, data and facilities after a disaster. It sets the recovery order from the business impact analysis and the RTO and RPO targets, names the recovery team and call tree, and spells out the backup, alternate-site and restoration steps through to returning to the primary site.",
+      "detail": "The most critical systems come back first, as ranked by the BIA. The DRP sits inside the wider business continuity plan, which also covers people, premises and manual workarounds."
     },
     {
       "id": "f1086",
@@ -2848,9 +2848,9 @@
     {
       "id": "f1089",
       "cat": "cisspOps",
-      "front": "Fire detection and suppression",
-      "back": "Wet pipe sprinklers hold water in the pipes and are the simplest and most common. Dry pipe holds air until triggered, which suits cold areas. Pre-action requires two events before water flows and is favored for data centers. Clean-agent gas systems suppress fire without water damage but must account for human safety.",
-      "detail": "Pre-action is the usual best answer for a data center because accidental discharge is less likely. Halon is banned; modern agents replace it."
+      "front": "Pre-action sprinkler system",
+      "back": "A sprinkler system with a two-step trigger: the pipes normally hold air, a smoke or heat detector must first confirm a fire and open the valve to fill them, and water is discharged only when a sprinkler head also fuses from the heat. The second condition makes accidental discharge unlikely, which is why it is the usual choice for data centers and archives.",
+      "detail": "A damaged pipe or a single knocked-off head does not flood the room, which is why pre-action beats wet pipe for data centers. Gas systems avoid water entirely but need life-safety measures."
     },
     {
       "id": "f1090",
@@ -2926,7 +2926,7 @@
       "id": "f1100",
       "cat": "cisspSdlc",
       "front": "OWASP Top 10",
-      "back": "A regularly updated awareness list of the most critical web application security risks. The 2025 edition runs from A01 broken access control, A02 security misconfiguration, A03 software supply chain failures, A04 cryptographic failures and A05 injection to A06 insecure design, A07 authentication failures, A08 software or data integrity failures, A09 security logging and alerting failures and A10 mishandling of exceptional conditions. It is a starting point for training and testing, not a complete standard.",
+      "back": "A regularly updated awareness list of the most critical web application security risks, compiled from vulnerability data and a community survey. It names risk categories rather than individual bugs and is a starting point for training, requirements and testing, not a complete standard or a compliance checklist.",
       "detail": "Broken access control leads the list. Use it to prioritize secure coding training, and remember that it is a list of risk categories, not a compliance standard."
     },
     {
@@ -3065,9 +3065,9 @@
     {
       "id": "f9181",
       "cat": "cisspIam",
-      "front": "Authentication, authorization and accounting (AAA)",
-      "back": "Authentication proves who a subject is, authorization decides what that subject may do, and accounting records what they did (logins, commands, resources used and time). AAA services such as RADIUS, TACACS+ and Diameter centralize all three for network access. Accounting supplies the audit trail that supports accountability and investigation.",
-      "detail": "Without accounting there is no accountability: identification alone does not prove who performed an action."
+      "front": "Centralized AAA services",
+      "back": "A central server that authenticates users and devices, authorizes what they may do and records what they did for many network access points, switches and VPN gateways, so policy and logs live in one place instead of on each device. RADIUS, TACACS+ and Diameter are the usual protocols, and the accounting records feed audit trails and investigations.",
+      "detail": "One place to remove a leaver's access and one log source for the SIEM; the AAA server then becomes a high-value target and a single point of failure, so deploy it redundantly."
     },
     {
       "id": "f9182",
@@ -3212,9 +3212,9 @@
     {
       "id": "f9202",
       "cat": "cisspIam",
-      "front": "Access control lists, capabilities and the access matrix",
-      "back": "An access control matrix has subjects on one axis and objects on the other. Reading a column gives an access control list (who may use this object); reading a row gives capabilities (what this subject may use). ACLs suit objects with many users, and capabilities suit subjects that hold unforgeable tokens of authority.",
-      "detail": "ACLs are checked at the object, while capability systems let the subject present proof, which is the idea behind many access tokens."
+      "front": "Capabilities (capability-based access)",
+      "back": "An unforgeable token or ticket held by a subject that names an object and the rights the holder has over it. Presenting it is the proof of authority, so the object does not look the subject up in a list. It is the row view of the access control matrix, the mirror image of an ACL, which is stored with the object.",
+      "detail": "Capabilities make delegation easy and revocation hard, because tokens already handed out must be found and invalidated. Many access tokens and tickets work this way."
     },
     {
       "id": "f9203",
@@ -3312,7 +3312,7 @@
       "cat": "cisspAssessment",
       "front": "Account management as security process data",
       "back": "Account management data shows whether identities are controlled: counts of dormant, orphaned and privileged accounts, time to disable leavers, results of access reviews, shared-account use and exceptions. Sampling accounts against HR records and recertification outcomes verifies that the process works, not merely that it exists.",
-      "detail": "This is evidence for 6.3 and links back to Domain 5. Look for orphaned accounts first."
+      "detail": "This is the security process data an assessor collects (objective 6.3 of the exam outline) and it links back to identity and access management in Domain 5. Look for orphaned accounts first."
     },
     {
       "id": "f9217",
@@ -3324,8 +3324,8 @@
     {
       "id": "f9218",
       "cat": "cisspAssessment",
-      "front": "Training and awareness metrics",
-      "back": "Measure behavior and outcomes, not attendance: phishing simulation click and report rates, time to report, repeat offenders, incident trends tied to human error, completion rates and the results of role-based training. Use findings to adjust content and to target groups with higher risk.",
+      "front": "Training completion and coverage metrics",
+      "back": "The process data that shows a training control operates: the share of staff trained within the required period, completion by role (privileged users, developers, executives), overdue and new-joiner training, and policy acknowledgements. These measure coverage and activity, so pair them with outcome measures such as phishing report rates and incident trends.",
       "detail": "A high completion rate with an unchanged click rate means the training is not working."
     },
     {
@@ -3485,16 +3485,16 @@
     {
       "id": "f9241",
       "cat": "cisspOps",
-      "front": "Protecting data at rest and in transit in operations",
-      "back": "Data at rest is protected by disk, file or database encryption with strong key management, access control and backup protection. Data in transit uses TLS (1.2 or 1.3), IPsec or SSH, and encrypted backups for transported media. Operations must also protect keys, certificates and the endpoints where data is decrypted.",
+      "front": "Protecting backups, keys and endpoints in operations",
+      "back": "Day-to-day protection of encrypted data depends on more than the cipher: backups and transported media are encrypted with their own managed keys, keys and certificates are stored apart from the data and rotated, revoked and renewed on schedule, TLS (1.2 or 1.3), IPsec or SSH protect data in transit, and the endpoints where data is decrypted are hardened and monitored.",
       "detail": "Encryption protects against lost media and interception, not against an authorized user or malware running on the unlocked system."
     },
     {
       "id": "f9242",
       "cat": "cisspOps",
       "front": "Incident reporting, communications and legal notification",
-      "back": "Report internally by a defined escalation path with a single spokesperson, and externally as laws and contracts require: under the GDPR a controller notifies the authority within 72 hours of becoming aware, the US SEC expects a Form 8-K within four business days of determining that an incident is material, and the HIPAA rule requires notice without unreasonable delay and within 60 days. Involve legal counsel and keep statements factual.",
-      "detail": "Notification clocks differ by regime, so the incident plan should map which apply and who decides."
+      "back": "Report internally by a defined escalation path with a single spokesperson, and externally as laws and contracts require to regulators, affected individuals, customers and law enforcement. Notification duties and clocks differ by regime (the GDPR's 72 hours is one example), so the plan should map which apply and who decides. Involve legal counsel and keep statements factual.",
+      "detail": "Decide in advance who may speak for the organization; inconsistent or speculative statements create legal and reputational risk."
     },
     {
       "id": "f9243",
@@ -3527,8 +3527,8 @@
     {
       "id": "f9247",
       "cat": "cisspOps",
-      "front": "Honeypots: enticement and entrapment",
-      "back": "A honeypot or honeynet is a decoy system that attracts attackers so their methods can be observed and early warning gained. Enticement (making a target available) is generally acceptable, while entrapment (inducing someone to commit a crime they would not otherwise commit) is not. Isolate honeypots so they cannot be used to attack others.",
+      "front": "Enticement vs. entrapment",
+      "back": "Enticement makes a target or lure available to someone who is already inclined to attack, and is generally acceptable. Entrapment induces someone to commit a crime they would not otherwise have committed, and is not acceptable because it can undermine a prosecution. The distinction matters when deploying honeypots and other deception technology.",
       "detail": "Legal review is advised before deploying deception technology, especially if data about attackers is shared."
     },
     {
@@ -3597,9 +3597,9 @@
     {
       "id": "f9257",
       "cat": "cisspOps",
-      "front": "Perimeter security controls",
-      "back": "Perimeter controls deter, delay, detect and respond: fences (about 3 to 4 feet deters casual intruders, 6 to 7 feet is hard to climb, 8 feet with outriggers deters determined ones), bollards, gates, lighting, guards and dogs, CCTV and signage. They are most effective when layered and monitored so that something detects and someone responds.",
-      "detail": "A fence only delays. Detection and response turn it into protection."
+      "front": "Deter, delay, detect and respond",
+      "back": "The four functions a physical perimeter must provide: deterrence discourages an attempt (signage, lighting, visible guards), delay slows the intruder (fences, gates, bollards, locks), detection notices the attempt (CCTV, sensors, patrols) and response acts on it (guards, dogs, police). Controls work best when layered and monitored, so that something detects and someone responds.",
+      "detail": "A fence only delays. Detection and response turn it into protection, and the delay the barriers buy must be longer than the time the responders need to arrive."
     },
     {
       "id": "f9258",
@@ -3611,9 +3611,9 @@
     {
       "id": "f9259",
       "cat": "cisspOps",
-      "front": "Physical intrusion detection and surveillance",
-      "back": "Detection uses door contacts, motion, glass-break and vibration sensors, and CCTV (fixed or pan-tilt-zoom, with analytics). Alarms need monitoring and a defined response time, and recordings should be kept for a defined period and protected from tampering. Guards complement systems with judgment.",
-      "detail": "A camera that nobody monitors or retains only helps after the incident."
+      "front": "CCTV and video surveillance",
+      "back": "Cameras (fixed or pan-tilt-zoom, often with analytics) deter, detect and record evidence. Place them to cover entrances, perimeters and key assets with adequate lighting, monitor live views or alerts with a defined response time, keep recordings for a defined period and protect them from tampering. Guards complement cameras with judgment.",
+      "detail": "A camera that nobody monitors only helps after the incident, and only if its recordings were kept."
     },
     {
       "id": "f9260",
@@ -3842,8 +3842,8 @@
     {
       "id": "f9292",
       "cat": "cisspSdlc",
-      "front": "Managed services and cloud services (SaaS, PaaS, IaaS) in software acquisition",
-      "back": "With managed services and enterprise applications the provider runs the platform but the customer still owns configuration, identities, data and customizations. Responsibility shifts by model: in SaaS the customer configures and governs access, in PaaS it also secures its code and data, and in IaaS it also secures operating systems and middleware. Assess with SOC 2 or ISO reports and contract terms.",
+      "front": "Managed services and cloud services in software acquisition",
+      "back": "With managed services and enterprise applications the provider runs the platform, but the customer still owns configuration, identities, data and customizations, whether the service is SaaS, PaaS or IaaS. Before buying, assess the provider with SOC 2 or ISO reports and contract terms such as security duties, breach notification, audit rights, data location and exit.",
       "detail": "Customizations and integrations (custom code, APIs, connectors) are the customer's security responsibility even in SaaS."
     },
     {
@@ -3857,7 +3857,7 @@
       "id": "f9294",
       "cat": "cisspSdlc",
       "front": "NIST Secure Software Development Framework (SSDF, SP 800-218)",
-      "back": "The SSDF organizes secure development practices into four groups: Prepare the Organization (people, processes, tools), Protect the Software (code and build integrity), Produce Well-Secured Software (design, review, testing, secure defaults) and Respond to Vulnerabilities (find, fix, and learn). Version 1.1 is the current release and underpins US federal supplier attestation.",
+      "back": "The SSDF organizes secure development practices into four groups: Prepare the Organization (people, processes, tools), Protect the Software (code and build integrity), Produce Well-Secured Software (design, review, testing, secure defaults) and Respond to Vulnerabilities (find, fix, and learn). Version 1.1 is the current final release (a version 1.2 draft was issued for comment in December 2025) and underpins US federal supplier attestation.",
       "detail": "The four groups are PO, PS, PW and RV; know the verbs: prepare, protect, produce, respond."
     },
     {
@@ -4832,7 +4832,7 @@
       "id": "q52",
       "cat": "cisspArch",
       "type": "mc",
-      "question": "A data center designer must choose how the doors on emergency exits behave if the badge system loses power. Which design is BEST aligned with security governance?",
+      "question": "A data center designer must choose how the doors on emergency exits behave if the badge system loses power. Which design is BEST?",
       "options": [
         "Doors unlock so people can evacuate, with alarms and guards compensating for security",
         "Doors stay locked to protect the equipment, with an alarm sounding to warn staff inside the room",
@@ -5567,16 +5567,16 @@
       "id": "q9004",
       "cat": "cisspRisk",
       "type": "mc",
-      "question": "A retailer's board asks whether PCI DSS is a law under which the company can be prosecuted if it is not compliant. What is the MOST accurate answer?",
+      "question": "A hosting company never keeps card numbers on disk, but payment card details pass through its servers while it forwards transactions for merchant customers. Which statement about PCI DSS is MOST accurate?",
       "options": [
-        "It is a contractual industry standard enforced through the card brands and the acquiring bank",
-        "It is an international treaty administered by the International Organization for Standardization",
-        "It is a federal statute enforced by the Department of Justice against all merchants that accept cards",
-        "It is a state law that applies only where the card holders live and is enforced by attorneys general"
+        "PCI DSS applies because the company processes or transmits cardholder data, even without storing it",
+        "PCI DSS applies only if the company handles more than one million card transactions a year",
+        "PCI DSS applies only to organizations that permanently store full card numbers in their own databases",
+        "PCI DSS applies only to banks and card brands, and hosting companies are outside its scope"
       ],
       "correct": 0,
-      "explanation": "PCI DSS comes from the PCI Security Standards Council and binds merchants through contracts with their acquirer and the card brands, so the consequences are fines, higher fees or loss of card acceptance. It is not federal or state statute, and it is not an ISO treaty. Other laws, however, may separately apply to the same breach.",
-      "whyTested": "Knowing whether a requirement is law, regulation, contract or standard determines who enforces it and how."
+      "explanation": "PCI DSS covers any entity that stores, processes or transmits cardholder data, or that can affect the security of the environment that does, so a service provider handling card data in transit is in scope. Transaction volume affects how compliance is validated (self-assessment or a qualified assessor), not whether the standard applies, and the standard is not limited to banks or to stored data.",
+      "whyTested": "PCI DSS scope follows the cardholder data, not the business type or whether data is stored, which is why tokenization and segmentation reduce scope."
     },
     {
       "id": "tf9001",
@@ -5804,9 +5804,9 @@
       "id": "tf9002",
       "cat": "cisspAsset",
       "type": "tf",
-      "question": "Degaussing is an effective way to sanitize a solid-state drive that held restricted data.",
+      "question": "Overwriting an entire solid-state drive once with zeros reliably removes the data from every flash cell, including over-provisioned and remapped areas.",
       "answer": false,
-      "explanation": "Degaussing disrupts magnetic fields and does not affect flash memory. For SSDs use the manufacturer's secure erase, cryptographic erase on a self-encrypting drive, or physical destruction, in line with NIST SP 800-88."
+      "explanation": "Wear leveling, over-provisioning and remapped blocks mean a host-level overwrite cannot reach every cell of flash media. For sensitive data use a purge method such as the manufacturer's secure erase or cryptographic erase, or physical destruction, in line with NIST SP 800-88."
     },
     {
       "id": "q9018",
@@ -6492,9 +6492,9 @@
       "question": "A cloud team puts a database in a virtual private cloud. Which design is BEST to keep it from being reachable directly from the internet while still allowing the web tier to query it?",
       "options": [
         "Place the database in a private subnet and allow only the web tier's security group to reach its port",
-        "Place the database in a public subnet and rely on a complex database password",
-        "Attach an internet gateway and a public address to the database for easy updates",
-        "Open the database port to all addresses and enable flow logs to detect abuse"
+        "Place the database in a public subnet and rely on a long, complex database password that is rotated regularly",
+        "Attach an internet gateway and a public address to the database so that the vendor can reach it for easy updates",
+        "Open the database port to all addresses and enable flow logs to detect any abuse after it happens"
       ],
       "correct": 0,
       "explanation": "A private subnet with a source-restricted security group gives least-privilege reachability. Public subnets and public addresses expose the system, and flow logs detect but do not prevent access.",
@@ -6902,15 +6902,15 @@
       "id": "q1015",
       "cat": "cisspIam",
       "type": "mc",
-      "question": "A company is deploying a badge-controlled server room. An audit finds that employees routinely hold the door open for colleagues behind them. Which physical control BEST prevents this?",
+      "question": "A visitor signs in at reception for a meeting and is given a badge that opens the same doors as an employee badge. An audit later finds the visitor spent time on the finance floor unescorted. Which change BEST addresses this?",
       "options": [
-        "A mantrap admitting one person at a time",
-        "A more visible sign reminding staff to badge in individually at every door",
-        "Brighter lighting in the corridor outside the server room door",
-        "A longer retention period for badge reader logs and door sensor data"
+        "Issue visibly different visitor badges limited to the meeting area, expiring the same day, and require an escort",
+        "Ask every visitor to sign a longer confidentiality agreement at reception before they are admitted",
+        "Ask visitors to leave their phones and bags at the reception desk for the whole length of the visit",
+        "Keep the paper visitor log for several years so that it can be consulted if an investigation is needed"
       ],
       "correct": 0,
-      "explanation": "A mantrap physically enforces single entry and defeats tailgating and piggybacking. Signs and lighting are deterrents that rely on behavior, and longer log retention helps investigations after the fact but does not prevent unauthorized entry."
+      "explanation": "Visitors should receive credentials that look different from employee badges, open only what the visit needs, expire automatically and come with an escort, so physical access follows least privilege and a wandering visitor is obvious. A longer confidentiality agreement does not stop movement, leaving phones and bags at reception addresses a different risk, and a retained log only helps after the event."
     },
     {
       "id": "q1016",
@@ -7002,17 +7002,17 @@
       "id": "tf1001",
       "cat": "cisspIam",
       "type": "tf",
-      "question": "A user who must enter a password and the answer to a personal security question has been authenticated with two factors.",
-      "answer": false,
-      "explanation": "Both items are knowledge factors, so this is single-factor authentication used twice. Real multi-factor authentication needs at least two different categories, such as a password and a hardware token."
+      "question": "A password combined with a code from a hardware token counts as multi-factor authentication because the two checks come from different categories.",
+      "answer": true,
+      "explanation": "A password is something you know and a hardware token is something you have. Multi-factor authentication needs at least two different categories, not merely two steps."
     },
     {
       "id": "tf1002",
       "cat": "cisspIam",
       "type": "tf",
-      "question": "A lower crossover error rate (CER) indicates a more accurate biometric system.",
+      "question": "Tuning a biometric system to a very low false acceptance rate generally increases its false rejection rate.",
       "answer": true,
-      "explanation": "The CER is where FAR and FRR are equal, so a lower value means the device makes fewer errors of both kinds at its balanced setting. It is the usual single number for comparing biometric products."
+      "explanation": "FAR and FRR trade off against each other as the sensitivity threshold moves: a stricter setting admits fewer impostors but refuses more legitimate users. High-security sites accept the extra rejections."
     },
     {
       "id": "tf1003",
@@ -7332,9 +7332,9 @@
       "id": "tf1011",
       "cat": "cisspAssessment",
       "type": "tf",
-      "question": "Code coverage of 100 percent guarantees that an application has no security vulnerabilities.",
+      "question": "A clean static analysis report proves that an application has no security vulnerabilities.",
       "answer": false,
-      "explanation": "Coverage only shows how much code the tests executed, not whether they checked security properties or covered unexpected inputs and logic flaws."
+      "explanation": "Static analysis reads code without running it, so it misses runtime, configuration and many logic problems, and it can produce false negatives. It complements dynamic testing, reviews and penetration tests rather than proving security."
     },
     {
       "id": "tf1012",
@@ -7362,15 +7362,15 @@
       "id": "q1032",
       "cat": "cisspOps",
       "type": "mc",
-      "question": "A forensic analyst copies the contents of a suspect's hard drive for analysis. Which approach is BEST for preserving evidentiary value?",
+      "question": "After a suspected data theft, investigators want to know exactly which files an attacker copied out of the network, but the organization keeps only flow records (source, destination, ports and byte counts). What is the main limitation of this evidence?",
       "options": [
-        "Drag and drop the user's folders to an external drive for later review",
-        "Use a write blocker to make a bit-for-bit image and verify hash values",
-        "Boot the original machine and run a search for suspicious files and tools",
-        "Compress the entire drive and email the archive to the analyst"
+        "Flow records show who talked to whom, when and how much, but not the content that was transferred",
+        "Flow records cannot be matched with time stamps from other systems even when the clocks are synchronized",
+        "Flow records are inadmissible in any court because the network devices generate them automatically",
+        "Flow records are rewritten by the network devices whenever the traffic they describe is encrypted"
       ],
-      "correct": 1,
-      "explanation": "A write blocker prevents any change to the original, and a bit-for-bit image with matching hashes captures deleted and hidden data and proves the copy is faithful. File copies miss slack and deleted space, booting the original changes it, and emailing an archive breaks custody control."
+      "correct": 0,
+      "explanation": "Flow data is metadata: it shows who communicated with whom, when and in what volume, which helps spot unusual destinations, but it cannot show file contents. Content needs full packet capture or host and application logs, and encrypted payloads may stay unreadable. Flow records can be correlated using synchronized time, are accepted as evidence when collected and protected properly, and are not changed by encryption."
     },
     {
       "id": "q1033",
@@ -7439,7 +7439,7 @@
         "Update the incident response plan to reflect the new threat",
         "Contain the affected system while preserving evidence"
       ],
-      "correct": 0,
+      "correct": 3,
       "explanation": "After detection and analysis confirm an incident, containment limits damage while evidence is preserved. Rebuilding first destroys evidence and may leave the root cause unknown, press statements go through the communications process, and plan updates come in lessons learned."
     },
     {
@@ -7530,43 +7530,43 @@
       "id": "q1044",
       "cat": "cisspOps",
       "type": "mc",
-      "question": "A company wants to test its disaster recovery plan without risk to production operations, but wants real recovery at the alternate site. Which test type should they use?",
+      "question": "After successful parallel tests, management wants proof that the alternate site can carry the live workload and accepts the risk of a short outage in exchange. Which test type gives the MOST realistic evidence?",
       "options": [
         "Full interruption test",
         "Parallel test",
         "Read-through test",
         "Tabletop discussion"
       ],
-      "correct": 1,
-      "explanation": "A parallel test brings up the alternate site and processes data while production continues, so recovery is real and production is protected. A full interruption test shuts down production and is the riskiest. A read-through and a tabletop discussion do not exercise actual recovery."
+      "correct": 0,
+      "explanation": "A full interruption test actually shuts down production and runs operations from the alternate site, which makes it the most realistic proof and also the riskiest, so it needs management approval and a rollback plan. A parallel test runs recovery alongside production without proving the site can carry the load alone, and a read-through and a tabletop discussion do not exercise real recovery."
     },
     {
       "id": "q1045",
       "cat": "cisspOps",
       "type": "mc",
-      "question": "A data center needs fire suppression that minimizes the chance of accidental water discharge over expensive equipment. Which is the BEST choice?",
+      "question": "A technician finds a small fire in an energized server rack in the data center. Which type of portable extinguisher is appropriate?",
       "options": [
-        "A wet pipe sprinkler system",
-        "A dry pipe sprinkler with no detection",
-        "A pre-action system",
-        "Portable extinguishers only"
+        "A water extinguisher, because water absorbs the most heat from the equipment",
+        "A carbon dioxide or clean-agent extinguisher rated for electrical fires",
+        "A wet chemical extinguisher, because it is designed for cooking oils and fats",
+        "A foam extinguisher, because foam smothers every type of fire"
       ],
-      "correct": 2,
-      "explanation": "Pre-action systems need both a detection event and sprinkler head activation before water flows, reducing accidental discharge. Wet pipe holds water in pipes and can leak or discharge accidentally. Dry pipe alone lacks the added detection trigger, and portable extinguishers are not a suppression system."
+      "correct": 1,
+      "explanation": "Energized electrical equipment is a Class C fire, and carbon dioxide and clean-agent extinguishers do not conduct electricity and leave little or no residue. Water and foam conduct current and risk shock and equipment damage, and wet chemical agents are designed for Class K cooking fires."
     },
     {
       "id": "q1046",
       "cat": "cisspOps",
       "type": "mc",
-      "question": "An employee in a sensitive role has never taken more than two days off in five years. Which control would BEST help detect possible fraud?",
+      "question": "In a small finance team one clerk has handled the same payment process for years and nobody else understands it. This lets hidden fraud continue and leaves no backup when the clerk is absent. Which control BEST addresses both problems?",
       "options": [
-        "A longer password policy",
-        "A larger firewall",
-        "Additional antivirus software",
-        "A mandatory vacation policy"
+        "A longer password policy for finance staff",
+        "A larger firewall at the network perimeter",
+        "Additional antivirus software on finance workstations",
+        "Job rotation with cross-training between team members"
       ],
       "correct": 3,
-      "explanation": "Mandatory vacation puts another person in the role for a period so irregularities may surface, making it a detective control against fraud. Passwords, firewalls and antivirus do not address insider fraud concealed by continuous presence."
+      "explanation": "Rotating people through roles lets a second person see the process, so irregularities surface, and cross-training provides coverage during absences. Passwords, firewalls and antivirus do not address insider fraud that stays hidden because one person always controls a process."
     },
     {
       "id": "msq1008",
@@ -7644,7 +7644,7 @@
       "id": "tf1013",
       "cat": "cisspOps",
       "type": "tf",
-      "question": "An incident is an observable occurrence in a system, and every event should be treated as an incident.",
+      "question": "An event is any observable occurrence in a system, and every event should be treated as an incident.",
       "answer": false,
       "explanation": "An event is any observable occurrence, and only those that actually or potentially violate policy or threaten confidentiality, integrity or availability are incidents. Triage separates the two."
     },
@@ -7684,9 +7684,9 @@
       "id": "tf1018",
       "cat": "cisspOps",
       "type": "tf",
-      "question": "Once litigation is reasonably anticipated, routine deletion schedules for potentially relevant records should be suspended through a legal hold.",
+      "question": "Destroying records that are under a legal hold can be spoliation of evidence even if the destruction followed the normal retention schedule.",
       "answer": true,
-      "explanation": "Destroying relevant data after a hold applies is spoliation and can lead to sanctions, so preservation duties override normal retention deletion."
+      "explanation": "Once litigation is reasonably anticipated, the duty to preserve overrides the retention schedule. Destroying relevant records afterwards, even through an automatic deletion job, can lead to court sanctions."
     },
     {
       "id": "tf1019",
@@ -7868,15 +7868,15 @@
       "id": "q1059",
       "cat": "cisspSdlc",
       "type": "mc",
-      "question": "A security architect wants to classify design-stage threats such as impersonation, data alteration and denial of service systematically. Which technique is BEST?",
+      "question": "During threat modeling of an order service, a team notes that an attacker could alter the price field in a request while it travels from the browser to the server. Which STRIDE category does this threat belong to?",
       "options": [
-        "CVSS scoring",
-        "STRIDE threat modeling",
-        "Fuzzing",
-        "Regression testing"
+        "Spoofing, because the attacker pretends to be another user",
+        "Tampering, because the data is modified in transit",
+        "Repudiation, because the user could later deny placing the order",
+        "Elevation of privilege, because the attacker gains rights that were never granted"
       ],
       "correct": 1,
-      "explanation": "STRIDE walks through a design looking for spoofing, tampering, repudiation, information disclosure, denial of service and elevation of privilege. CVSS scores known vulnerabilities, fuzzing and regression testing operate on built software."
+      "explanation": "Changing data that the system relies on is tampering, a violation of integrity. Spoofing is impersonation, repudiation is denying an action when nothing proves otherwise, and elevation of privilege is gaining rights that were not granted; none describes modifying the price field."
     },
     {
       "id": "q1060",
@@ -8031,7 +8031,7 @@
       "id": "q9068",
       "cat": "cisspIam",
       "type": "mc",
-      "question": "A security analyst sees a VPN login from the account of an employee who badged into the office building twenty minutes earlier. What does this combination MOST likely indicate?",
+      "question": "A security analyst sees a VPN login from an external internet address on the account of an employee who badged into the office building twenty minutes earlier. What does this combination MOST likely indicate?",
       "options": [
         "A possible stolen credential, because the person cannot be in two places at once",
         "Normal behavior, since employees often use VPN while in the office",
@@ -8121,16 +8121,16 @@
       "id": "q9074",
       "cat": "cisspIam",
       "type": "mc",
-      "question": "A company has 200 shared administrator passwords kept in a spreadsheet. The security manager wants central storage, approval-based checkout, session logging and automatic rotation. Which solution BEST fits?",
+      "question": "A security manager wants administrators to hold no standing privileges, receiving elevated rights only for an approved task and only for a limited time, after which the rights expire automatically. Which approach fits BEST?",
       "options": [
-        "A longer password policy and encryption of the spreadsheet with a shared password",
-        "An email reminder to administrators to change passwords every quarter",
-        "Giving every administrator permanent domain admin rights to avoid the shared passwords",
-        "A privileged credential vault integrated with the directory and a rotation policy"
+        "A longer password policy for administrator accounts",
+        "Quarterly recertification of the administrator group by the line managers",
+        "A second permanent account for each administrator, with domain admin rights",
+        "Just-in-time privileged access with approval and automatic expiry of the elevated rights"
       ],
       "correct": 3,
-      "explanation": "A vault meets all four needs: storage, checkout approvals, logging and rotation. An encrypted spreadsheet still has a shared secret and no accountability, reminders do not enforce anything and standing domain admin rights greatly increase risk.",
-      "whyTested": "Credential management systems such as password vaults are named in 5.2/5.3."
+      "explanation": "Just-in-time elevation grants privileges on request for a limited window and removes them afterwards, which eliminates standing privilege. Password length does not change what an account may do, recertification is periodic and leaves rights in place between reviews, and a second permanent privileged account is still standing privilege.",
+      "whyTested": "Limiting standing privilege through just-in-time elevation supports least privilege in 5.5."
     },
     {
       "id": "q9075",
@@ -8166,15 +8166,15 @@
       "id": "q9077",
       "cat": "cisspIam",
       "type": "mc",
-      "question": "In an access control architecture, the component that receives a request, evaluates it against policy using attributes and returns permit or deny is the:",
+      "question": "In an access control architecture, the component that supplies attribute values, such as a user's department or a device's health, to the decision point is the:",
       "options": [
+        "Policy information point",
         "Policy decision point",
         "Policy enforcement point",
-        "Policy administration point",
-        "Policy information point"
+        "Policy administration point"
       ],
       "correct": 0,
-      "explanation": "The decision point evaluates the request. The enforcement point applies the decision at the resource, the administration point is where policies are authored and the information point supplies attribute values to the decision point.",
+      "explanation": "The information point supplies the attributes that the decision point needs. The decision point evaluates the request, the enforcement point applies the decision at the resource and the administration point is where policies are authored.",
       "whyTested": "Access policy enforcement with decision and enforcement points is named in 5.4."
     },
     {
@@ -8226,16 +8226,16 @@
       "id": "q9081",
       "cat": "cisspIam",
       "type": "mc",
-      "question": "An engineer moves from the payments team to the reporting team. HR records the change, but a review a year later shows the engineer can still approve payments and also run reports. What is the BEST process change?",
+      "question": "An identity provider outage locks every administrator out of the cloud console during an incident. The team wants a way in that works when single sign-on does not, without leaving a standing back door. Which design fits BEST?",
       "options": [
-        "Wait for the next annual review before changing any access",
-        "Treat a role change as a mover event that removes the old role access and grants only the new one",
-        "Give all engineers the same access so that moves do not matter",
-        "Ask the engineer to remove the permissions they no longer need and confirm by email once they believe that everything has been cleaned up"
+        "Turning off multi-factor authentication for all administrators for the duration of any outage",
+        "A break-glass account with a vaulted credential, alerts on every use, approval and a review afterwards",
+        "A shared administrator password written on a card kept in a locked drawer in the server room",
+        "Permanent local administrator accounts on every system, used by the whole team for daily work"
       ],
       "correct": 1,
-      "explanation": "Mover events should be linked to HR changes and should remove old access, which prevents privilege creep and separation of duties conflicts. Giving everyone the same access violates least privilege, relying on the user is unreliable and waiting a year leaves the risk open.",
-      "whyTested": "Role definition and transition is in 5.5."
+      "explanation": "Break-glass accounts are tightly controlled emergency accounts: the credential is vaulted or sealed, every use raises an alert and needs approval, and the use is reviewed and the credential rotated afterwards. A shared password on a card and permanent daily-use local accounts are standing exposures without accountability, and switching off MFA widens the attack surface exactly when the organization is under stress.",
+      "whyTested": "Emergency (break-glass) accounts are part of privileged account management in 5.5."
     },
     {
       "id": "q9082",
@@ -8328,9 +8328,9 @@
       "type": "mc",
       "question": "A new security manager must plan assessments for the coming year. Which approach BEST forms the basis of the strategy?",
       "options": [
-        "Test the easiest systems first so the coverage percentage looks high",
-        "Repeat last year's tests exactly, to give comparable results",
-        "Test only systems that have failed audits in the past",
+        "Test the easiest systems first so that the coverage percentage looks high in the annual report",
+        "Repeat last year's tests exactly, to give comparable results from one year to the next",
+        "Test only the systems that have failed audits in the past and ignore everything else",
         "Prioritize testing by risk and requirements, and validate that results drive remediation"
       ],
       "correct": 3,
@@ -8464,8 +8464,8 @@
       "question": "An application owner cannot patch a legacy system for six months because of a vendor dependency. Which handling is BEST?",
       "options": [
         "Close the finding without further action since patching is not possible",
-        "Hide the system from the scanner so the finding disappears",
-        "Accept the risk permanently in an email from the system administrator",
+        "Hide the system from the scanner so the finding disappears from the weekly report",
+        "Accept the risk permanently in an email from the system administrator to the help desk",
         "Record a time-limited exception with compensating controls, owner approval and a review date"
       ],
       "correct": 3,
@@ -8529,9 +8529,9 @@
       "id": "tf9016",
       "cat": "cisspAssessment",
       "type": "tf",
-      "question": "Coordinated vulnerability disclosure involves reporting the issue privately to the vendor and agreeing on a time before details are published.",
+      "question": "A security.txt file published on a website tells researchers where and how to report vulnerabilities.",
       "answer": true,
-      "explanation": "This protects users while a fix is prepared, and policies such as safe harbor and security.txt make reporting easier."
+      "explanation": "security.txt (RFC 9116) is served from the /.well-known/ path and lists contact details and the disclosure policy, which makes coordinated disclosure easier. It is a convenience and not a legal safe harbor."
     },
     {
       "id": "tf9017",
@@ -8669,9 +8669,9 @@
       "question": "A SOC adopts a machine-learning tool that automatically isolates hosts it considers suspicious. After a model update it isolates a payroll server during pay run. What is the BEST lesson?",
       "options": [
         "Keep human approval for impactful actions, validate models after changes and monitor for drift",
-        "Never use machine learning because it always causes outages",
+        "Never use machine learning in the SOC again because automation always causes outages",
         "Allow the tool to act without review since it is more accurate than people",
-        "Disable logging of the tool's decisions to reduce noise"
+        "Disable logging of the tool's decisions to reduce noise and storage costs for the SOC"
       ],
       "correct": 0,
       "explanation": "AI tools need validation, drift monitoring and human oversight for high-impact actions. Rejecting them entirely forgoes value, unreviewed automation causes outages and removing logs removes the ability to learn and audit.",
@@ -8801,15 +8801,15 @@
       "id": "q9110",
       "cat": "cisspOps",
       "type": "mc",
-      "question": "A production database server fails at 2 a.m. and a fix requires a configuration change that would normally take a week of approvals. What is the BEST way to handle it?",
+      "question": "A change to a production database was approved and implemented in the maintenance window, but it caused errors and the system must be returned to its earlier state quickly. Which part of the change request should have been prepared in advance?",
       "options": [
-        "Follow the emergency change procedure with expedited approval, a rollback plan and after-the-fact documentation",
-        "Make the change quietly during the night and delete the record afterwards to avoid questions from auditors and the change advisory board",
-        "Wait until the next change advisory board meeting in a week",
-        "Delegate the change to a contractor outside the process"
+        "A documented and tested rollback (back-out) plan",
+        "An updated business impact analysis for the database",
+        "Additional logging on the database server",
+        "A larger change advisory board"
       ],
       "correct": 0,
-      "explanation": "Emergency procedures allow speed while keeping control and records. Silent changes bypass governance, waiting a week harms availability and delegating outside the process removes oversight.",
+      "explanation": "A change request should say how to back out if the change fails: a documented and ideally tested rollback plan returns the system to its last known-good state quickly. An updated impact analysis, extra logging and a larger board may help with other things but do not restore service.",
       "whyTested": "Change management is 7.9."
     },
     {
@@ -8876,15 +8876,15 @@
       "id": "q9115",
       "cat": "cisspOps",
       "type": "mc",
-      "question": "A company wants to test its recovery plan by recovering at the alternate site while production continues unaffected. Which test is this, and what must be done before it starts?",
+      "question": "A disaster recovery test at the alternate site has just finished. Most systems met their recovery objectives but two did not. Which activity MUST follow?",
       "options": [
-        "A tabletop test; no approvals are needed because there is no technical activity",
-        "A full interruption test; shut down production at once",
-        "A read-through test; send the plan by email to a single person",
-        "A parallel test; define objectives, obtain approvals and notify stakeholders"
+        "Archive the plan unchanged, because most of the systems passed",
+        "Wait for next year's test before changing anything in the plan",
+        "Delete the test data and logs so that the results cannot be misused",
+        "Document the results and lessons learned, and update the plan to close the gaps"
       ],
       "correct": 3,
-      "explanation": "Recovering at the alternate site while production runs is a parallel test, which still requires clear objectives, approval and communication. A tabletop is discussion, a full interruption disrupts production and a read-through is a document review.",
+      "explanation": "A test is only useful if its results are documented, the failures analyzed and the plan corrected, so the next test or a real event goes better. Leaving the plan unchanged repeats the failures, waiting a year leaves the gaps open, and deleting records removes the evidence needed for improvement and for auditors.",
       "whyTested": "Testing DR plans and communicating test status are in 7.12."
     },
     {
@@ -8908,10 +8908,10 @@
       "type": "mc",
       "question": "A manager is traveling to a country with a high risk of device theft and surveillance. Which action BEST reduces the risk to company data?",
       "options": [
-        "Leave the laptop unattended in the hotel room with a cable lock",
+        "Leave the laptop unattended in the hotel room, secured with a cable lock",
         "Carry a clean loaner device with minimal data, full-disk encryption and VPN access",
-        "Bring the primary laptop with all files and rely on a hotel safe",
-        "Use free public Wi-Fi and charging kiosks to save cost"
+        "Bring the primary laptop with all files on it and rely on the hotel safe at night",
+        "Use free public Wi-Fi and public charging kiosks to save on roaming and battery costs"
       ],
       "correct": 1,
       "explanation": "A clean, encrypted device limits what can be lost or compromised. A full-data laptop, public Wi-Fi and kiosks, and an unattended laptop all create exposure.",
@@ -8944,9 +8944,9 @@
       "id": "tf9020",
       "cat": "cisspOps",
       "type": "tf",
-      "question": "Allow listing blocks everything except approved items, which makes it stronger against unknown threats than deny listing but needs more maintenance.",
-      "answer": true,
-      "explanation": "Allow lists are default-deny and resist new malware, but must be kept current. Deny lists only stop what is already known."
+      "question": "An application allow list that identifies programs only by file name is as strong as one that uses cryptographic hashes or signed publisher certificates.",
+      "answer": false,
+      "explanation": "File names are easily changed or copied by malware, so a name-based rule is trivially bypassed. Strong allow lists identify software by hash, publisher certificate or a protected install path."
     },
     {
       "id": "tf9021",
@@ -9078,16 +9078,16 @@
       "id": "q9122",
       "cat": "cisspSdlc",
       "type": "mc",
-      "question": "A company wants a roadmap that lists what a mature software security program should do across governance, design, implementation, verification and operations. Which resource is the BEST fit?",
+      "question": "A company wants to compare its software security program with what many real organizations actually do, rather than follow a prescribed roadmap. Which resource is the BEST fit?",
       "options": [
-        "The CVSS specification, which describes program practices",
-        "OWASP SAMM, a prescriptive maturity model",
-        "BSIMM only, because it prescribes exactly what to do",
-        "The CWE list, which scores a company's maturity"
+        "The CVSS specification, which scores the severity of vulnerabilities",
+        "BSIMM, which records observed practices across many software security programs",
+        "OWASP SAMM, a prescriptive roadmap of practices and maturity levels to adopt",
+        "The CWE list, which catalogs types of software weakness"
       ],
       "correct": 1,
-      "explanation": "SAMM provides a prescriptive roadmap across five business functions. BSIMM describes what other organizations do rather than prescribing, CWE is a catalog of weakness types and CVSS scores vulnerability severity.",
-      "whyTested": "Maturity models such as CMM and SAMM are in 8.1."
+      "explanation": "BSIMM is descriptive: it reports what many real organizations do, which suits benchmarking. SAMM is the prescriptive roadmap, CWE is a catalog of weakness types and CVSS scores vulnerability severity.",
+      "whyTested": "Maturity models are in 8.1; know that SAMM prescribes and BSIMM describes."
     },
     {
       "id": "q9123",
@@ -9125,10 +9125,10 @@
       "type": "mc",
       "question": "Security staff are consulted only after the design is complete, and they identify problems that would require a redesign. Which organizational approach BEST fixes this?",
       "options": [
-        "A policy that bans security from the design stage to avoid delays",
-        "A contract clause that blames the developers for flaws",
+        "A policy that bans security staff from the design stage to avoid delays to the schedule",
+        "A contract clause that blames the developers for any flaws found after release",
         "An integrated product team in which security participates from requirements onward",
-        "A separate review board that meets after release"
+        "A separate review board that meets after release to look at what was built"
       ],
       "correct": 2,
       "explanation": "An integrated product team gives security a seat from the start, reducing late surprises. Post-release boards, banning security from design and blame clauses do not find problems early.",
@@ -9168,16 +9168,16 @@
       "id": "q9128",
       "cat": "cisspSdlc",
       "type": "mc",
-      "question": "A login service throws an unhandled exception when its database is unavailable, and the exception handler treats the request as authenticated. Which principle was violated?",
+      "question": "A document service checks a user's permission when the document list is first loaded and then serves later requests for the same document without checking again, even after that user's access has been revoked. Which secure design principle is violated?",
       "options": [
-        "Defense in depth: use fewer layers of protection",
-        "Complete mediation: allow caching of the first decision",
-        "Least privilege: grant default administrator rights",
-        "Fail secure: when a check errors, deny access"
+        "Fail secure: when a check cannot be completed or errors, access is denied",
+        "Defense in depth: several independent layers of protection stand between attacker and asset",
+        "Least privilege: each user is given only the rights needed for the task",
+        "Complete mediation: every access to every object is checked against current authorization"
       ],
       "correct": 3,
-      "explanation": "On error the system should fail closed. Defense in depth means adding layers, complete mediation means checking each access every time and least privilege limits rights, none of which describes treating an error as success.",
-      "whyTested": "Secure coding practices, including error handling, are in 8.5."
+      "explanation": "Complete mediation requires every access to be checked against current authorization, so a cached or one-time decision lets a revoked user keep reading. Fail secure concerns what happens when a check errors, defense in depth adds layers and least privilege limits the rights granted; none of them describes skipping later checks.",
+      "whyTested": "Secure design principles such as complete mediation are covered with secure coding in 8.5."
     },
     {
       "id": "q9129",
@@ -10014,7 +10014,7 @@
         "tf9003",
         "tf9005"
       ],
-      "reading": "Cryptography transforms information so that only the right people can read it, trust it, or prove who sent it. The CISSP expects you to know the building blocks and, more importantly, which security goal each provides. Symmetric encryption uses one shared secret key, is fast and is used for bulk data; its weakness is distributing that key safely. Asymmetric encryption uses a mathematically linked pair: a public key anyone may have and a private key kept secret. It solves distribution and enables digital signatures, but it is slower. Real protocols combine both: asymmetric methods authenticate and exchange a session key, and a symmetric cipher such as AES protects the data.\n\nAES is the current symmetric standard, with a 128-bit block and keys of 128, 192 or 256 bits; DES and 3DES are obsolete or deprecated. How a block cipher is used matters as much as the cipher: ECB mode encrypts identical blocks identically and reveals patterns, CBC chains blocks using an initialization vector, CTR turns the cipher into a stream, and GCM adds authentication so tampering is detected. Never reuse an IV or nonce with the same key. Among asymmetric algorithms, RSA relies on the difficulty of factoring, Diffie-Hellman lets two parties agree on a shared secret across an open channel (but needs authentication to stop a man in the middle), and elliptic curve cryptography gives equivalent strength with much shorter keys, which suits mobile and embedded devices.\n\nA hash function turns data into a fixed-size digest and is one-way. It provides integrity checking, because any change alters the digest, but not authentication, because anyone can compute it. MD5 and SHA-1 are broken for collision resistance; SHA-2 and SHA-3 are current. Adding a secret key gives a message authentication code such as HMAC, which proves integrity and that the sender knew the key. A digital signature goes further: the sender encrypts the message hash with a private key, and anyone can verify it with the public key, giving integrity, authentication and nonrepudiation but not confidentiality. For passwords, use a slow, salted hash with a unique salt per password, which defeats rainbow tables.\n\nA public key infrastructure provides trust in public keys. A certificate authority signs X.509 certificates that bind a public key to an identity; a registration authority validates requests; and revocation is published through certificate revocation lists or answered per certificate by OCSP. Trust flows from a root authority that must be kept offline and protected. If a private key is exposed, revoke the certificate and issue a new key pair; waiting for expiry leaves you open to impersonation.\n\nFinally, key management is where cryptography usually fails. Keys must be generated with good randomness, protected in hardware security modules where the stakes are high, rotated, backed up or escrowed under split custody, and destroyed at the end. Dual control and split knowledge ensure that no single person holds a complete key. Looking ahead, quantum computers threaten RSA and elliptic curve algorithms, and NIST has standardized post-quantum algorithms, so organizations with long-lived secrets should inventory their cryptography and plan for agility.\n\nKnow the algorithms by status. DES is broken, 3DES is deprecated, AES is the standard, RC4 must not be used, and ChaCha20 is a modern stream cipher. MD5 and SHA-1 are broken for collision resistance; SHA-2 and SHA-3 are current. Passwords need slow, salted, memory-hard hashing such as Argon2, scrypt, bcrypt or PBKDF2, never a fast hash. Key strength is compared by security bits (AES-128 is roughly RSA 3072 or 256-bit ECC). Forward secrecy uses ephemeral Diffie-Hellman so a stolen server key cannot open recorded sessions, which also matters against harvest-now-decrypt-later collection ahead of quantum computers; QKD is only a key distribution method.\n\nManage the lifecycle: choose standard algorithms, generate keys in hardware, wrap data keys with a key encryption key (envelope encryption), rotate on a schedule, archive and destroy. PKI trust can be hierarchical, cross-certified or a web of trust, and certificate lifetimes are shrinking, so automate renewal. Cryptanalysis questions test which attack fits: brute force and dictionary attacks guess; frequency analysis breaks classical ciphers from ciphertext only; known and chosen plaintext or ciphertext give the attacker more; timing, power and fault injection attack the implementation; man-in-the-middle defeats unauthenticated exchanges; pass the hash and Kerberos golden or silver tickets abuse credentials; and ransomware is beaten by tested, offline or immutable backups.",
+      "reading": "Cryptography transforms information so that only the right people can read it, trust it, or prove who sent it. The CISSP expects you to know the building blocks and, more importantly, which security goal each provides. Symmetric encryption uses one shared secret key, is fast and is used for bulk data; its weakness is distributing that key safely. Asymmetric encryption uses a mathematically linked pair: a public key anyone may have and a private key kept secret. It solves distribution and enables digital signatures, but it is slower. Real protocols combine both: asymmetric methods authenticate and exchange a session key, and a symmetric cipher such as AES protects the data.\n\nAES is the current symmetric standard, with a 128-bit block and keys of 128, 192 or 256 bits; DES and 3DES are obsolete or deprecated. How a block cipher is used matters as much as the cipher: ECB mode encrypts identical blocks identically and reveals patterns, CBC chains blocks using an initialization vector, CTR turns the cipher into a stream, and GCM adds authentication so tampering is detected. Never reuse an IV or nonce with the same key. Among asymmetric algorithms, RSA relies on the difficulty of factoring, Diffie-Hellman lets two parties agree on a shared secret across an open channel (but needs authentication to stop a man in the middle), and elliptic curve cryptography gives equivalent strength with much shorter keys, which suits mobile and embedded devices.\n\nA hash function turns data into a fixed-size digest and is one-way. It provides integrity checking, because any change alters the digest, but not authentication, because anyone can compute it. MD5 and SHA-1 are broken for collision resistance; SHA-2 and SHA-3 are current. Adding a secret key gives a message authentication code such as HMAC, which proves integrity and that the sender knew the key. A digital signature goes further: the sender encrypts the message hash with a private key, and anyone can verify it with the public key, giving integrity, authentication and nonrepudiation but not confidentiality. For passwords, use a slow, salted hash with a unique salt per password, which defeats rainbow tables.\n\nA public key infrastructure provides trust in public keys. A certificate authority signs X.509 certificates that bind a public key to an identity; a registration authority validates requests; and revocation is published through certificate revocation lists or answered per certificate by OCSP. Trust flows from a root authority that must be kept offline and protected. If a private key is exposed, revoke the certificate and issue a new key pair; waiting for expiry leaves you open to impersonation.\n\nFinally, key management is where cryptography usually fails. Keys must be generated with good randomness, protected in hardware security modules where the stakes are high, rotated, backed up or escrowed under split custody, and destroyed at the end. Dual control and split knowledge ensure that no single person holds a complete key. Looking ahead, quantum computers threaten RSA and elliptic curve algorithms, and NIST has standardized post-quantum algorithms, so organizations with long-lived secrets should inventory their cryptography and plan for agility.\n\nKnow the algorithms by status. DES is broken, 3DES is deprecated, AES is the standard, RC4 must not be used, and ChaCha20 is a modern stream cipher. MD5 and SHA-1 are broken for collision resistance; SHA-2 and SHA-3 are current. Passwords need slow, salted hashing such as Argon2, scrypt, bcrypt or PBKDF2 (Argon2 and scrypt are also memory-hard), never a fast hash. Key strength is compared by security bits (AES-128 is roughly RSA 3072 or 256-bit ECC). Forward secrecy uses ephemeral Diffie-Hellman so a stolen server key cannot open recorded sessions, which also matters against harvest-now-decrypt-later collection ahead of quantum computers; QKD is only a key distribution method.\n\nManage the lifecycle: choose standard algorithms, generate keys in hardware, wrap data keys with a key encryption key (envelope encryption), rotate on a schedule, archive and destroy. PKI trust can be hierarchical, cross-certified or a web of trust, and certificate lifetimes are shrinking, so automate renewal. Cryptanalysis questions test which attack fits: brute force and dictionary attacks guess; frequency analysis breaks classical ciphers from ciphertext only; known and chosen plaintext or ciphertext give the attacker more; timing, power and fault injection attack the implementation; man-in-the-middle defeats unauthenticated exchanges; pass the hash and Kerberos golden or silver tickets abuse credentials; and ransomware is beaten by tested, offline or immutable backups.",
       "fundamentalsLabel": "New to cryptography? See the everyday analogy",
       "fundamentals": "Symmetric encryption is like a padlocked box where sender and receiver both hold identical keys; fast, but how did you get the second key to your friend safely? Asymmetric encryption is like a public mailbox slot: anyone can drop a letter in (the public key), but only the owner has the key to open it (the private key). A digital signature works the other way round, like a wax seal only you could have made, which anyone can recognize. A certificate authority is the notary who confirms that this particular seal really belongs to this particular person, and the revocation list is the notary's list of seals that were stolen.",
       "keyTerms": [
@@ -12087,7 +12087,7 @@
     {
       "id": "cmp-cissp-106",
       "cat": "cisspOps",
-      "scenario": "A file server is restored every Sunday from a full backup. The team wants the fastest possible restore on any other day while keeping each daily backup reasonably small. Which scheme is the better choice?",
+      "scenario": "A file server gets a full backup every Sunday. The team wants the fastest possible restore on any other day while keeping each daily backup reasonably small. Which scheme is the better choice?",
       "optionA": "Daily differential backups after the Sunday full backup.",
       "optionB": "Daily incremental backups after the Sunday full backup.",
       "better": "A",
