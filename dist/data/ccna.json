@@ -181,7 +181,7 @@
       "id": "f12",
       "cat": "netFundamentals",
       "front": "Cisco Catalyst Center (formerly Cisco DNA Center)",
-      "back": "Cisco's controller for campus wired and wireless networks, providing automation, policy, and assurance through a GUI and REST APIs. The exam outline still uses the older DNA Center name.",
+      "back": "Cisco's controller for campus wired and wireless networks, providing automation, policy, and assurance through a GUI and REST APIs. Older study material still calls it Cisco DNA Center.",
       "detail": "Know it as the controller-based alternative to configuring devices one at a time over the CLI."
     },
     {
@@ -314,7 +314,7 @@
       "id": "f31",
       "cat": "netFundamentals",
       "front": "Wildcard mask",
-      "back": "The bitwise inverse of a subnet mask, used by OSPF network statements and access lists: 0 bits must match, 1 bits are ignored. The wildcard for 255.255.255.192 is 0.0.0.63.",
+      "back": "The bitwise inverse of a subnet mask, used by OSPF network statements and access lists: 0 bits must match, 1 bits are ignored. For the mask 255.255.255.192 it is 0.0.0.63.",
       "detail": "Wildcard equals 255.255.255.255 minus the subnet mask. A mask of /24 gives 0.0.0.255."
     },
     {
@@ -397,8 +397,8 @@
     {
       "id": "f43",
       "cat": "netFundamentals",
-      "front": "Wi-Fi encryption and WPA generations",
-      "back": "WPA2 encrypts with AES-CCMP; WPA3 improves it with SAE (a stronger password handshake that resists offline guessing) and mandatory protected management frames. WEP and TKIP are obsolete.",
+      "front": "Wi-Fi encryption ciphers",
+      "back": "The cipher that scrambles frames over the air: WEP used the RC4 stream cipher with weak keys, WPA's TKIP patched WEP on old hardware but still ran on RC4, and WPA2 uses the AES block cipher in CCMP mode, which WPA3 keeps. Only AES-based modes are acceptable today.",
       "detail": "Choose WPA3 where clients support it, WPA2 with AES otherwise; never WEP."
     },
     {
@@ -691,22 +691,22 @@
     {
       "id": "f85",
       "cat": "netAccess",
-      "front": "Device management access (console, SSH, Telnet, HTTPS)",
+      "front": "Device management access methods",
       "back": "Console is out-of-band and local. Telnet (TCP 23) sends everything, including passwords, in clear text; SSH (TCP 22) encrypts the session; HTTP is clear text and HTTPS (TCP 443) is encrypted for GUI management.",
       "detail": "Always prefer SSH and HTTPS and disable Telnet and HTTP on production gear."
     },
     {
       "id": "f86",
       "cat": "netAccess",
-      "front": "TACACS+ vs RADIUS",
-      "back": "Both provide AAA to centralise device and network logins. TACACS+ is Cisco's protocol on TCP 49, encrypts the whole payload and separates authentication, authorization and accounting. RADIUS is an open standard on UDP 1812 and 1813 that encrypts only the password and combines authentication with authorization.",
-      "detail": "TACACS+ is the usual pick for device administration and per-command authorization; RADIUS for network access such as Wi-Fi and 802.1X."
+      "front": "TACACS+ and RADIUS for management access",
+      "back": "Central AAA servers let administrators log in to switches, APs and WLCs with their own accounts instead of shared local passwords, and keep a record of who did what. TACACS+ (TCP 49, Cisco) can authorize each command an administrator types; RADIUS (UDP 1812 and 1813, open standard) is the usual choice for network access such as Wi-Fi and 802.1X.",
+      "detail": "If a question asks which protocol controls the commands an engineer may run on a device, the answer is TACACS+."
     },
     {
       "id": "f87",
       "cat": "netAccess",
       "front": "WLAN security options (WPA2/WPA3 Personal vs Enterprise)",
-      "back": "Personal modes use a pre-shared key for everyone. Enterprise modes use 802.1X with a RADIUS server so each user authenticates individually. WPA3 adds SAE for Personal and stronger ciphers for Enterprise.",
+      "back": "A WLAN can be open (no authentication), Personal (one pre-shared key for everyone) or Enterprise (802.1X with a RADIUS server, so each user authenticates individually). Enterprise is the usual choice for staff networks, Personal for homes and small offices.",
       "detail": "On a WLC the SSID, security mode, VLAN mapping and QoS profile are all set in the WLAN configuration."
     },
     {
@@ -747,7 +747,7 @@
     {
       "id": "f93",
       "cat": "netAccess",
-      "front": "Switch port security basics (access-edge hardening)",
+      "front": "Access-edge port hardening",
       "back": "Unused switch ports should be shut down and placed in an unused VLAN; edge ports should be hard-coded as access ports with DTP off, PortFast and BPDU Guard applied.",
       "detail": "These controls tie Network Access to Security Fundamentals; expect them as the answer to a hardening scenario."
     },
@@ -965,7 +965,7 @@
       "id": "f1006",
       "cat": "ipConnectivity",
       "front": "Gateway of last resort",
-      "back": "The default route the router uses when no more specific route matches, shown in show ip route as 'Gateway of last resort is x.x.x.x to network 0.0.0.0' with the route flagged by an asterisk (S* or O*).",
+      "back": "The fallback next hop a router uses when no more specific route matches, learned from a default route and shown in show ip route as 'Gateway of last resort is x.x.x.x to network 0.0.0.0' with the route flagged by an asterisk (S* or O*).",
       "detail": "If it says 'not set' and no route matches, the packet is dropped and the router returns an ICMP destination unreachable."
     },
     {
@@ -1098,7 +1098,7 @@
       "id": "f1025",
       "cat": "ipConnectivity",
       "front": "OSPF single-area design (Area 0)",
-      "back": "All routers sit in one area, which must be area 0 (the backbone). Every router holds an identical link-state database and runs SPF against it.",
+      "back": "All routers sit in one area, which should be area 0 (the backbone). Every router holds an identical link-state database and runs SPF against it.",
       "detail": "The CCNA scope is single area; multi-area adds area border routers and inter-area (O IA) routes."
     },
     {
@@ -1147,7 +1147,7 @@
       "id": "f1032",
       "cat": "ipConnectivity",
       "front": "Designated router (DR) and backup (BDR)",
-      "back": "On a multi-access broadcast segment, OSPF elects a DR to collect and flood LSAs and a BDR to take over if the DR fails. Other routers (DROther) send updates only to the DR and BDR at 224.0.0.6.",
+      "back": "On a multi-access broadcast segment, OSPF elects a DR to collect and flood LSAs and a BDR to take over if it fails. Other routers (DROther) send their updates only to those two, at 224.0.0.6.",
       "detail": "This cuts the number of adjacencies from n(n-1)/2 to about 2n on a LAN segment."
     },
     {
@@ -1196,8 +1196,8 @@
       "id": "f1039",
       "cat": "ipConnectivity",
       "front": "Passive interface",
-      "back": "passive-interface interface (or passive-interface default) stops OSPF from sending Hellos out an interface while still advertising its subnet. It prevents adjacencies from forming toward user LANs.",
-      "detail": "Best practice on every edge interface; accidentally making a core link passive drops that neighbor."
+      "back": "An OSPF setting that stops the router from sending Hellos out an interface while still advertising that interface's subnet, so no adjacency can form toward user LANs. It can be applied to chosen interfaces or, with the default keyword, to all of them.",
+      "detail": "Configured under router ospf as passive-interface followed by an interface name, or passive-interface default. Best practice on every edge interface; accidentally making a core link passive drops that neighbor."
     },
     {
       "id": "f1040",
@@ -1209,7 +1209,7 @@
     {
       "id": "f1041",
       "cat": "ipConnectivity",
-      "front": "default-information originate (OSPF)",
+      "front": "OSPF default-information originate",
       "back": "An OSPF router-mode command that advertises a default route to the other OSPF routers, normally from the router that has a static default to the Internet. It appears on neighbors as an O*E2 route.",
       "detail": "Without 'always', the originating router advertises it only while it actually has a default route itself."
     },
@@ -1280,7 +1280,7 @@
       "id": "f1051",
       "cat": "ipConnectivity",
       "front": "FHRP preemption",
-      "back": "Preemption lets a router with a higher priority take back the active (or master) role from a lower-priority router that took over during an outage. In HSRP it must be enabled with standby preempt; in VRRP it is on by default.",
+      "back": "A setting that lets a router with a higher priority take back the active (or master) role from a lower-priority router that took over during an outage. In HSRP it must be enabled with standby preempt; in VRRP it is on by default.",
       "detail": "Without HSRP preempt, the recovered primary stays standby until the current active router fails."
     },
     {
@@ -1405,7 +1405,7 @@
     {
       "id": "f1069",
       "cat": "ipServices",
-      "front": "DNS record types (A, AAAA, CNAME, MX, NS, PTR)",
+      "front": "DNS record types",
       "back": "A maps a name to an IPv4 address and AAAA to an IPv6 address. CNAME is an alias to another name, MX names a domain's mail server, NS names its authoritative name servers, and PTR maps an address back to a name (reverse lookup).",
       "detail": "Recognition questions pair the record with its purpose; AAAA is four times the size of A."
     },
@@ -1427,7 +1427,7 @@
       "id": "f1072",
       "cat": "ipServices",
       "front": "NTP stratum",
-      "back": "The distance from the authoritative time source. Stratum 0 is the reference clock itself, a stratum 1 server connects directly to it, and each hop adds one. Stratum 16 means unsynchronized.",
+      "back": "The distance, in hops, from the authoritative time source. Level 0 is the reference clock itself, a level 1 server connects directly to it, and each hop adds one. A level of 16 means unsynchronized.",
       "detail": "Lower is better; a router using ntp master 5 serves time as stratum 5 without an upstream source."
     },
     {
@@ -1638,7 +1638,7 @@
       "cat": "secFundamentals",
       "front": "IEEE 802.1X",
       "back": "Port-based network access control: a device (supplicant) must authenticate through the switch or access point (authenticator) to an authentication server, normally RADIUS, before it gets network access.",
-      "detail": "Used for WPA2/WPA3-Enterprise Wi-Fi and wired port security."
+      "detail": "Used for WPA2/WPA3-Enterprise Wi-Fi and for wired switch-port access control."
     },
     {
       "id": "f1103",
@@ -1679,7 +1679,7 @@
       "id": "f1108",
       "cat": "secFundamentals",
       "front": "Wildcard masks in ACLs",
-      "back": "The inverse of a subnet mask used in ACLs and OSPF network statements: 0 bits must match, 1 bits are ignored. A /24 is 0.0.0.255 and a /26 is 0.0.0.63. host x.x.x.x equals wildcard 0.0.0.0, and any equals 255.255.255.255.",
+      "back": "In an ACL entry, the inverse mask after the address says which bits may differ. host x.x.x.x is shorthand for 0.0.0.0 (exact match) and any for 255.255.255.255 (every address). Common ranges: a /24 is 0.0.0.255, a /26 is 0.0.0.63 and a /27 is 0.0.0.31.",
       "detail": "Compute it as 255.255.255.255 minus the subnet mask in each octet."
     },
     {
@@ -1720,7 +1720,7 @@
     {
       "id": "f1114",
       "cat": "secFundamentals",
-      "front": "Wireless security protocols (WEP, WPA, WPA2, WPA3)",
+      "front": "Wireless security protocols",
       "back": "WEP (RC4) is broken. WPA used TKIP as a stopgap. WPA2 uses AES-CCMP and is the mainstream standard. WPA3 adds SAE in place of the pre-shared-key handshake, mandatory protected management frames and stronger enterprise options.",
       "detail": "WPA3 resists offline password-guessing; Personal modes use a passphrase, Enterprise uses 802.1X with RADIUS."
     },
@@ -3977,15 +3977,15 @@
       "id": "q1044",
       "cat": "secFundamentals",
       "type": "mc",
-      "question": "An ACL entry must match every host in 192.168.10.64/27. Which wildcard mask is correct in permit 192.168.10.64 ___ ?",
+      "question": "An ACL entry must match every host in 192.168.10.64/26. Which wildcard mask is correct in permit 192.168.10.64 ___ ?",
       "options": [
-        "0.0.0.15",
-        "0.0.0.63",
-        "0.0.0.32",
-        "0.0.0.31"
+        "0.0.0.31",
+        "0.0.0.127",
+        "0.0.0.64",
+        "0.0.0.63"
       ],
       "correct": 3,
-      "explanation": "A /27 mask is 255.255.255.224, so the wildcard is 255 minus 224 = 31 in the last octet: 0.0.0.31 covers .64 through .95. 0.0.0.15 would cover only a /28 and 0.0.0.63 a /26. 0.0.0.32 is the block size, not a valid contiguous wildcard.",
+      "explanation": "A /26 mask is 255.255.255.192, so the wildcard is 255 minus 192 = 63 in the last octet: 0.0.0.63 covers .64 through .127. 0.0.0.31 would cover only a /27 and 0.0.0.127 a /25. 0.0.0.64 is the block size, not a wildcard for the whole range.",
       "whyTested": "Wildcard masks are computed as the inverse of the subnet mask, and the mistake of using the block size is common."
     },
     {
@@ -4133,15 +4133,15 @@
       "id": "q1055",
       "cat": "secFundamentals",
       "type": "mc",
-      "question": "A company wants to control which individual commands each network engineer may run on routers, and log every command, using a central server. Which choice is best?",
+      "question": "After logging in, a junior engineer may run show commands on the routers but must be refused every configuration command. Which AAA function enforces that limit?",
       "options": [
-        "Local usernames on each router, all with privilege level 15",
-        "RADIUS, because it encrypts the entire packet payload",
-        "TACACS+, because it separates authorization and supports per-command control",
-        "SNMPv3 with authPriv on every device in the network"
+        "Authentication, which proves who the engineer is",
+        "Accounting, which records what the engineer did",
+        "Authorization, which decides what the engineer may do",
+        "Availability, which keeps the router reachable"
       ],
       "correct": 2,
-      "explanation": "TACACS+ keeps authentication, authorization and accounting separate, which is what makes command-by-command authorization and accounting possible. Local usernames are not central, RADIUS combines authentication and authorization and encrypts only the password, and SNMPv3 is a monitoring protocol, not an AAA service."
+      "explanation": "Authorization applies permissions to a user who has already proved who they are: here it allows show commands and refuses configuration commands. Authentication only proves identity, accounting records what the user did afterwards, and availability belongs to the CIA triad rather than AAA."
     },
     {
       "id": "q1056",
@@ -4407,7 +4407,7 @@
         "q9",
         "tf1"
       ],
-      "reading": "Networking is easier once you accept that nothing sends \"an email\" across a wire. A message is wrapped in layers, and each layer has one narrow job. The OSI model names seven of them: Physical, Data Link, Network, Transport, Session, Presentation and Application. The TCP/IP model that real protocols follow squeezes them into four: Link, Internet, Transport and Application. For the CCNA, remember the layers where the action is: layer 1 is signals on cable, layer 2 is Ethernet frames and MAC addresses, layer 3 is IP packets and routing, and layer 4 is TCP and UDP with port numbers.\n\nAs data goes down the stack on the sender, each layer adds its own header, which is called encapsulation. The application data becomes a segment when TCP or UDP adds ports, a packet when IP adds source and destination addresses, a frame when Ethernet adds MAC addresses and a trailer, and finally bits on the medium. The receiver reverses the process, stripping one header per layer (decapsulation). The PDU names matter because exam questions use them precisely: a switch forwards frames, a router forwards packets.\n\nThat is exactly why the devices differ. A layer 2 switch reads the destination MAC address and forwards frames inside one broadcast domain. A router reads the destination IP address and forwards packets between networks, rewriting the frame header at every hop while the IP addresses stay end to end. A layer 3 switch does both in hardware. A next-generation firewall inspects applications and users as well as ports, and an IPS sits inline so it can actively block attacks. Access points bridge Wi-Fi onto Ethernet, and a wireless controller manages many APs together. Cisco Catalyst Center (the exam still says DNA Center) manages the wired and wireless campus as a whole.\nThe physical layer deserves respect because many \"mystery\" outages are cabling. Copper UTP runs to 100 metres per segment. Fibre goes further and is immune to electrical interference: multimode (larger core, cheap optics) for buildings and campuses, single-mode (tiny core, laser) for kilometres. Power over Ethernet (802.3af about 15.4 W, 802.3at about 30 W, 802.3bt up to 60 or 90 W) carries power to phones and access points on the same cable, so an AP that will not boot may have too small a power budget. CRC errors, runts and late collisions usually mean a bad cable or a duplex mismatch.\n\nTopology follows scale. Small and medium campuses often use two tiers (access plus a collapsed core and distribution). Large campuses use three tiers: access for endpoints, distribution for aggregation and policy, core for fast transport. Data centres use spine-leaf, where every leaf connects to every spine so east-west traffic always takes the same number of hops.\nFinally, the two transport protocols. TCP is connection-oriented: a three-way handshake (SYN, SYN-ACK, ACK), sequence numbers, acknowledgements, retransmission and windowing give reliability at the cost of overhead. UDP is connectionless and just sends, which is why voice, streaming and DNS queries prefer it. Know the common ports: SSH 22, Telnet 23, SMTP 25, DNS 53, DHCP 67 and 68, HTTP 80, NTP 123, SNMP 161 and HTTPS 443.",
+      "reading": "Networking is easier once you accept that nothing sends \"an email\" across a wire. A message is wrapped in layers, and each layer has one narrow job. The OSI model names seven of them: Physical, Data Link, Network, Transport, Session, Presentation and Application. The TCP/IP model that real protocols follow squeezes them into four: Link, Internet, Transport and Application. For the CCNA, remember the layers where the action is: layer 1 is signals on cable, layer 2 is Ethernet frames and MAC addresses, layer 3 is IP packets and routing, and layer 4 is TCP and UDP with port numbers.\n\nAs data goes down the stack on the sender, each layer adds its own header, which is called encapsulation. The application data becomes a segment when TCP or UDP adds ports, a packet when IP adds source and destination addresses, a frame when Ethernet adds MAC addresses and a trailer, and finally bits on the medium. The receiver reverses the process, stripping one header per layer (decapsulation). The PDU names matter because exam questions use them precisely: a switch forwards frames, a router forwards packets.\n\nThat is exactly why the devices differ. A layer 2 switch reads the destination MAC address and forwards frames inside one broadcast domain. A router reads the destination IP address and forwards packets between networks, rewriting the frame header at every hop while the IP addresses stay end to end. A layer 3 switch does both in hardware. A next-generation firewall inspects applications and users as well as ports, and an IPS sits inline so it can actively block attacks. Access points bridge Wi-Fi onto Ethernet, and a wireless controller manages many APs together. Cisco Catalyst Center (formerly Cisco DNA Center) manages the wired and wireless campus as a whole.\nThe physical layer deserves respect because many \"mystery\" outages are cabling. Copper UTP runs to 100 metres per segment. Fibre goes further and is immune to electrical interference: multimode (larger core, cheap optics) for buildings and campuses, single-mode (tiny core, laser) for kilometres. Power over Ethernet (802.3af about 15.4 W, 802.3at about 30 W, 802.3bt up to 60 or 90 W) carries power to phones and access points on the same cable, so an AP that will not boot may have too small a power budget. CRC errors, runts and late collisions usually mean a bad cable or a duplex mismatch.\n\nTopology follows scale. Small and medium campuses often use two tiers (access plus a collapsed core and distribution). Large campuses use three tiers: access for endpoints, distribution for aggregation and policy, core for fast transport. Data centres use spine-leaf, where every leaf connects to every spine so east-west traffic always takes the same number of hops.\nFinally, the two transport protocols. TCP is connection-oriented: a three-way handshake (SYN, SYN-ACK, ACK), sequence numbers, acknowledgements, retransmission and windowing give reliability at the cost of overhead. UDP is connectionless and just sends, which is why voice, streaming and DNS queries prefer it. Know the common ports: SSH 22, Telnet 23, SMTP 25, DNS 53, DHCP 67 and 68, HTTP 80, NTP 123, SNMP 161 and HTTPS 443.",
       "fundamentalsLabel": "New to network layers? See the everyday analogy",
       "fundamentals": "Think of sending a parcel overseas. You put a letter (data) in an envelope with the recipient's department (the port number), put that envelope in a box labelled with the street address (the IP address), and the courier puts the box on a truck marked with only the next depot's name (the MAC address). At each depot the truck changes, but the street address on the box never does. The receiving company unwraps everything in reverse. Each wrapper has one job, which is exactly what the layers are, and a switch is like a depot clerk who only reads the truck label while a router reads the street address.",
       "keyTerms": [
@@ -5239,8 +5239,7 @@
       "altCommands": [
         "sh vlan brief",
         "show vlan br",
-        "sh vlan br",
-        "show vlan"
+        "sh vlan br"
       ],
       "requiredFlags": [
         "brief"
@@ -5302,6 +5301,9 @@
       "prompt": "In interface configuration mode on a trunk port, restrict the trunk so it carries only VLANs 10 and 20.",
       "verb": "switchport trunk allowed vlan",
       "command": "switchport trunk allowed vlan 10,20",
+      "altCommands": [
+        "switchport trunk allowed vlan 20,10"
+      ],
       "requiredFlags": [
         "10,20"
       ],
@@ -5621,6 +5623,11 @@
       "prompt": "In privileged EXEC mode, display the OSPF neighbors with their state, role and interface.",
       "verb": "show ip ospf neighbor",
       "command": "show ip ospf neighbor",
+      "altCommands": [
+        "sh ip ospf neighbor",
+        "show ip ospf nei",
+        "sh ip ospf nei"
+      ],
       "requiredFlags": [
         "neighbor"
       ],
@@ -5633,6 +5640,9 @@
       "prompt": "In privileged EXEC mode, display only the routes in the routing table that were learned through OSPF.",
       "verb": "show ip route",
       "command": "show ip route ospf",
+      "altCommands": [
+        "sh ip route ospf"
+      ],
       "requiredFlags": [
         "ospf"
       ],
@@ -5646,7 +5656,7 @@
       "verb": "ip ospf priority",
       "command": "ip ospf priority 0",
       "requiredFlags": [
-        "0"
+        "priority 0"
       ],
       "explanation": "An OSPF interface priority of 0 removes the router from the DR and BDR election. The default priority is 1 and the highest value wins."
     },
@@ -5658,7 +5668,7 @@
       "verb": "standby",
       "command": "standby 10 ip 10.10.10.1",
       "requiredFlags": [
-        "10",
+        "10 ip",
         "10.10.10.1"
       ],
       "explanation": "standby group ip virtual-address configures HSRP. Hosts then use the virtual IP as their default gateway; add standby 10 priority and standby 10 preempt to control which router is active."
@@ -5786,13 +5796,13 @@
       "id": "cli-ios-122",
       "cat": "secFundamentals",
       "tool": "ios",
-      "prompt": "In line configuration mode for the vty lines, allow only SSH for incoming remote management sessions.",
-      "verb": "transport input",
-      "command": "transport input ssh",
+      "prompt": "In line configuration mode for the vty lines, make the router ask for a username and check it against the locally configured user accounts.",
+      "verb": "login local",
+      "command": "login local",
       "requiredFlags": [
-        "ssh"
+        "local"
       ],
-      "explanation": "transport input ssh refuses Telnet and other protocols on the vty lines. It must be combined with an RSA key, a domain name and login local with a local user."
+      "explanation": "login local makes the line authenticate against the username entries on the device instead of one shared line password. SSH needs it, together with an RSA key, a domain name and transport input ssh."
     },
     {
       "id": "cli-ios-123",
@@ -5807,7 +5817,7 @@
       "requiredFlags": [
         "deny tcp",
         "10.1.1.0 0.0.0.255",
-        "host 192.168.5.10"
+        "host 192.168.5.10 eq"
       ],
       "explanation": "Extended ACL syntax is protocol, source and wildcard, destination, then the port operator. Telnet is TCP port 23, and a permit ip any any is usually needed after the deny so other traffic still passes."
     },
@@ -5819,8 +5829,7 @@
       "verb": "ip access-group",
       "command": "ip access-group 101 in",
       "requiredFlags": [
-        "101",
-        "in"
+        "101 in"
       ],
       "explanation": "ip access-group number-or-name in|out binds the ACL to an interface and direction. Extended ACLs are normally applied inbound close to the source of the traffic."
     },
@@ -6023,7 +6032,7 @@
     {
       "id": "ml-ccna-101",
       "cat": "ipConnectivity",
-      "scenario": "Four routers share one Ethernet segment. R1 has priority 100 and router ID 1.1.1.1; R2 has priority 1 and router ID 9.9.9.9. The DR will be {b1}, because {b2} is compared before the router ID. A router configured with priority {b3} can never become DR or BDR.",
+      "scenario": "Two routers share one Ethernet segment. R1 has priority 100 and router ID 1.1.1.1; R2 has priority 1 and router ID 9.9.9.9. The DR will be {b1}, because {b2} is compared before the router ID. A router configured with priority {b3} can never become DR or BDR.",
       "blanks": [
         {
           "key": "b1",
@@ -6492,7 +6501,7 @@
           "options": [
             "Dynamic ARP inspection enabled without DHCP snooping",
             "Port security with a maximum of 5 MAC addresses per port",
-            "DHCP snooping with access ports untrusted and the uplink to the real server trusted",
+            "DHCP snooping, with the uplink to the real server trusted",
             "Static NAT on the edge router for the guest network"
           ],
           "correct": 2,

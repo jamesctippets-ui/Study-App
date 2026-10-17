@@ -101,7 +101,7 @@ FLASHCARDS = [
         "A central controller that configures, manages and monitors lightweight access points, handling roaming, radio resource management and security policy for the whole wireless network.",
         "A WLC manages APs from one place so settings stay consistent; it is the core of the split-MAC architecture."),
     _fc('f12', NF, "Cisco Catalyst Center (formerly Cisco DNA Center)",
-        "Cisco's controller for campus wired and wireless networks, providing automation, policy, and assurance through a GUI and REST APIs. The exam outline still uses the older DNA Center name.",
+        "Cisco's controller for campus wired and wireless networks, providing automation, policy, and assurance through a GUI and REST APIs. Older study material still calls it Cisco DNA Center.",
         "Know it as the controller-based alternative to configuring devices one at a time over the CLI."),
     _fc('f13', NF, "Endpoints and servers",
         "Endpoints are the devices that consume the network (laptops, phones, IP cameras, printers); servers provide services such as DHCP, DNS, web and file sharing. Both ultimately attach through access-layer ports.",
@@ -158,7 +158,7 @@ FLASHCARDS = [
         "Using different prefix lengths within the same address space so each subnet is sized to its need. Allocate the largest subnets first, then carve smaller ones from what remains.",
         "Typical task: fit LANs of 100, 50 and 20 hosts plus point-to-point links into one block without overlap."),
     _fc('f31', NF, "Wildcard mask",
-        "The bitwise inverse of a subnet mask, used by OSPF network statements and access lists: 0 bits must match, 1 bits are ignored. The wildcard for 255.255.255.192 is 0.0.0.63.",
+        "The bitwise inverse of a subnet mask, used by OSPF network statements and access lists: 0 bits must match, 1 bits are ignored. For the mask 255.255.255.192 it is 0.0.0.63.",
         "Wildcard equals 255.255.255.255 minus the subnet mask. A mask of /24 gives 0.0.0.255."),
     _fc('f32', NF, "APIPA (169.254.0.0/16) and loopback (127.0.0.0/8)",
         "A host that cannot find a DHCP server may assign itself an address from the 169.254.0.0/16 link-local range (APIPA). 127.0.0.0/8 is loopback, used to test a host's own network stack, usually 127.0.0.1.",
@@ -193,8 +193,8 @@ FLASHCARDS = [
     _fc('f42', NF, "SSID and BSSID",
         "The SSID is the human-readable name of a wireless network. The BSSID identifies one specific radio of one AP and is that radio's MAC address. Several APs can share one SSID in an extended service set.",
         "Roaming moves a client between BSSIDs while it keeps the same SSID."),
-    _fc('f43', NF, "Wi-Fi encryption and WPA generations",
-        "WPA2 encrypts with AES-CCMP; WPA3 improves it with SAE (a stronger password handshake that resists offline guessing) and mandatory protected management frames. WEP and TKIP are obsolete.",
+    _fc('f43', NF, "Wi-Fi encryption ciphers",
+        "The cipher that scrambles frames over the air: WEP used the RC4 stream cipher with weak keys, WPA's TKIP patched WEP on old hardware but still ran on RC4, and WPA2 uses the AES block cipher in CCMP mode, which WPA3 keeps. Only AES-based modes are acceptable today.",
         "Choose WPA3 where clients support it, WPA2 with AES otherwise; never WEP."),
     _fc('f44', NF, "Server virtualization and hypervisors",
         "Virtualization runs several virtual machines on one physical host, each with its own operating system. A Type 1 hypervisor runs directly on hardware; a Type 2 hypervisor runs as an application on a host operating system.",
@@ -322,14 +322,14 @@ FLASHCARDS += [
     _fc('f84', NA, "WLC link aggregation (LAG)",
         "Several distribution system ports on a WLC can be bundled into a single logical LAG, which on the switch side is a static EtherChannel (mode on, not LACP or PAgP) carrying a trunk.",
         "Mismatching the switch bundling mode with the WLC LAG is a classic reason for no connectivity."),
-    _fc('f85', NA, "Device management access (console, SSH, Telnet, HTTPS)",
+    _fc('f85', NA, "Device management access methods",
         "Console is out-of-band and local. Telnet (TCP 23) sends everything, including passwords, in clear text; SSH (TCP 22) encrypts the session; HTTP is clear text and HTTPS (TCP 443) is encrypted for GUI management.",
         "Always prefer SSH and HTTPS and disable Telnet and HTTP on production gear."),
-    _fc('f86', NA, "TACACS+ vs RADIUS",
-        "Both provide AAA to centralise device and network logins. TACACS+ is Cisco's protocol on TCP 49, encrypts the whole payload and separates authentication, authorization and accounting. RADIUS is an open standard on UDP 1812 and 1813 that encrypts only the password and combines authentication with authorization.",
-        "TACACS+ is the usual pick for device administration and per-command authorization; RADIUS for network access such as Wi-Fi and 802.1X."),
+    _fc('f86', NA, "TACACS+ and RADIUS for management access",
+        "Central AAA servers let administrators log in to switches, APs and WLCs with their own accounts instead of shared local passwords, and keep a record of who did what. TACACS+ (TCP 49, Cisco) can authorize each command an administrator types; RADIUS (UDP 1812 and 1813, open standard) is the usual choice for network access such as Wi-Fi and 802.1X.",
+        "If a question asks which protocol controls the commands an engineer may run on a device, the answer is TACACS+."),
     _fc('f87', NA, "WLAN security options (WPA2/WPA3 Personal vs Enterprise)",
-        "Personal modes use a pre-shared key for everyone. Enterprise modes use 802.1X with a RADIUS server so each user authenticates individually. WPA3 adds SAE for Personal and stronger ciphers for Enterprise.",
+        "A WLAN can be open (no authentication), Personal (one pre-shared key for everyone) or Enterprise (802.1X with a RADIUS server, so each user authenticates individually). Enterprise is the usual choice for staff networks, Personal for homes and small offices.",
         "On a WLC the SSID, security mode, VLAN mapping and QoS profile are all set in the WLAN configuration."),
     _fc('f88', NA, "WLC GUI configuration of a WLAN",
         "Creating a wireless network on a WLC means defining the WLAN profile and SSID, choosing the security (layer 2 and authentication) settings, attaching a dynamic interface or VLAN, and optionally setting QoS and advanced options before enabling it.",
@@ -346,7 +346,7 @@ FLASHCARDS += [
     _fc('f92', NA, "STP verification",
         "show spanning-tree (per VLAN) displays the root bridge ID, local bridge ID, port roles (Root, Desg, Altn), states and costs. If This bridge is the root appears, the local switch is the root for that VLAN.",
         "Use it to answer which switch is root and why a given port is blocking."),
-    _fc('f93', NA, "Switch port security basics (access-edge hardening)",
+    _fc('f93', NA, "Access-edge port hardening",
         "Unused switch ports should be shut down and placed in an unused VLAN; edge ports should be hard-coded as access ports with DTP off, PortFast and BPDU Guard applied.",
         "These controls tie Network Access to Security Fundamentals; expect them as the answer to a hardening scenario."),
     _fc('f94', NA, "Layer 2 loop symptoms",
@@ -769,7 +769,7 @@ LESSONS = [
 
 As data goes down the stack on the sender, each layer adds its own header, which is called encapsulation. The application data becomes a segment when TCP or UDP adds ports, a packet when IP adds source and destination addresses, a frame when Ethernet adds MAC addresses and a trailer, and finally bits on the medium. The receiver reverses the process, stripping one header per layer (decapsulation). The PDU names matter because exam questions use them precisely: a switch forwards frames, a router forwards packets.
 
-That is exactly why the devices differ. A layer 2 switch reads the destination MAC address and forwards frames inside one broadcast domain. A router reads the destination IP address and forwards packets between networks, rewriting the frame header at every hop while the IP addresses stay end to end. A layer 3 switch does both in hardware. A next-generation firewall inspects applications and users as well as ports, and an IPS sits inline so it can actively block attacks. Access points bridge Wi-Fi onto Ethernet, and a wireless controller manages many APs together. Cisco Catalyst Center (the exam still says DNA Center) manages the wired and wireless campus as a whole.
+That is exactly why the devices differ. A layer 2 switch reads the destination MAC address and forwards frames inside one broadcast domain. A router reads the destination IP address and forwards packets between networks, rewriting the frame header at every hop while the IP addresses stay end to end. A layer 3 switch does both in hardware. A next-generation firewall inspects applications and users as well as ports, and an IPS sits inline so it can actively block attacks. Access points bridge Wi-Fi onto Ethernet, and a wireless controller manages many APs together. Cisco Catalyst Center (formerly Cisco DNA Center) manages the wired and wireless campus as a whole.
 The physical layer deserves respect because many "mystery" outages are cabling. Copper UTP runs to 100 metres per segment. Fibre goes further and is immune to electrical interference: multimode (larger core, cheap optics) for buildings and campuses, single-mode (tiny core, laser) for kilometres. Power over Ethernet (802.3af about 15.4 W, 802.3at about 30 W, 802.3bt up to 60 or 90 W) carries power to phones and access points on the same cable, so an AP that will not boot may have too small a power budget. CRC errors, runts and late collisions usually mean a bad cable or a duplex mismatch.
 
 Topology follows scale. Small and medium campuses often use two tiers (access plus a collapsed core and distribution). Large campuses use three tiers: access for endpoints, distribution for aggregation and policy, core for fast transport. Data centres use spine-leaf, where every leaf connects to every spine so east-west traffic always takes the same number of hops.
@@ -1333,7 +1333,7 @@ CLI_CHALLENGES = [
         'id': 'cli-ios-1', 'cat': NA, 'tool': 'ios',
         'prompt': "In privileged EXEC mode on a switch, display a brief list of the VLANs and the access ports assigned to each.",
         'verb': 'show vlan', 'command': 'show vlan brief',
-        'altCommands': ['sh vlan brief', 'show vlan br', 'sh vlan br', 'show vlan'],
+        'altCommands': ['sh vlan brief', 'show vlan br', 'sh vlan br'],
         'requiredFlags': ['brief'],
         'explanation': "show vlan brief lists each VLAN, its name, status and the access ports in it. Trunk ports do not appear in the list, so use show interfaces trunk for those.",
     },
@@ -1369,6 +1369,7 @@ CLI_CHALLENGES = [
         'id': 'cli-ios-6', 'cat': NA, 'tool': 'ios',
         'prompt': "In interface configuration mode on a trunk port, restrict the trunk so it carries only VLANs 10 and 20.",
         'verb': 'switchport trunk allowed vlan', 'command': 'switchport trunk allowed vlan 10,20',
+        'altCommands': ['switchport trunk allowed vlan 20,10'],
         'requiredFlags': ['10,20'],
         'explanation': "switchport trunk allowed vlan sets the allowed list, replacing any previous list. Use the add keyword to append a VLAN to an existing list instead.",
     },
