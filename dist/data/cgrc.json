@@ -197,7 +197,7 @@
       "id": "f3",
       "cat": "cgrcProgram",
       "front": "Prepare (RMF step)",
-      "back": "The step that establishes the context and priorities for managing risk, at both the organization level and the system level. Tasks include assigning risk management roles, setting a risk management strategy, identifying common controls and defining the authorization boundary candidates.",
+      "back": "The step that establishes the context and priorities for managing risk, at both the organization level and the system level. Tasks include assigning risk management roles, setting a risk management strategy, identifying common controls and determining the authorization boundary of the system.",
       "detail": "Prepare is the only step with tasks at two levels. If a scenario asks what groundwork should exist before a single system is categorized, the answer sits here."
     },
     {
@@ -288,7 +288,7 @@
       "id": "f16",
       "cat": "cgrcProgram",
       "front": "ISSO and ISSM",
-      "back": "The information system security officer (ISSO) handles day-to-day security for a specific system; the information system security manager (ISSM) oversees security across a program or site and supervises ISSOs. Titles vary by organization.",
+      "back": "The information system security officer handles day-to-day security for a specific system; the information system security manager oversees security across a program or site and supervises the officers. Titles vary by organization.",
       "detail": "Both are management and operations roles, not independent assessors. An ISSO who tests their own system's controls does not satisfy assessor independence."
     },
     {
@@ -694,7 +694,7 @@
       "id": "f74",
       "cat": "cgrcImplement",
       "front": "PII processing and transparency (PT)",
-      "back": "The PT family covers authority to process PII, purposes, consent, notice, data subject access and redress, and limits on use. It was added in Revision 5 to put privacy requirements in the main catalog.",
+      "back": "The PT family covers authority to process PII, processing purposes, consent, privacy notices, system of records notices, specific categories of PII and computer matching requirements. It was added in Revision 5 to put privacy requirements in the main catalog.",
       "detail": "PT is about whether and how PII may be processed. The confidentiality of PII is still covered by security families such as AC and SC."
     },
     {
@@ -869,7 +869,7 @@
       "id": "f99",
       "cat": "cgrcAssess",
       "front": "Assessing inherited controls",
-      "back": "The assessment of controls that come from a provider can rely on the provider's current assessment results and authorization, supplemented by checks of how the customer uses them.",
+      "back": "An assessment of provider-supplied controls can rely on the provider's current assessment results and authorization, supplemented by checks of how the customer uses them.",
       "detail": "Reuse saves effort but must be current. Relying on stale provider results is a gap."
     },
     {
@@ -883,7 +883,7 @@
       "id": "f101",
       "cat": "cgrcCompliance",
       "front": "Risk analysis and determination",
-      "back": "The step in which the organization analyzes the package and weighs the residual risk against its risk tolerance, to determine the overall risk to operations, assets, individuals and other organizations.",
+      "back": "The Authorize task in which the organization analyzes the package and weighs the residual risk against its risk tolerance, to determine the overall risk to operations, assets, individuals and other organizations.",
       "detail": "Determination comes before the decision. Skipping straight to approval because the schedule demands it is the wrong answer."
     },
     {
@@ -974,7 +974,7 @@
       "id": "f114",
       "cat": "cgrcCompliance",
       "front": "Privacy Act of 1974 and SORN",
-      "back": "The U.S. law governing how federal agencies handle records about individuals retrieved by personal identifier. Agencies publish a system of records notice (SORN) describing what is collected and why.",
+      "back": "The U.S. law governing how federal agencies handle records about individuals retrieved by personal identifier. Agencies publish a system of records notice describing what is collected and why.",
       "detail": "A SORN is a public notice, not a security control. It is one of the privacy compliance artifacts expected before PII is used."
     },
     {
@@ -1016,7 +1016,7 @@
       "id": "f120",
       "cat": "cgrcMaintain",
       "front": "Configuration change control and CCB",
-      "back": "A formal process, often with a configuration control board (CCB), for requesting, reviewing, approving, implementing and recording changes. It keeps the baseline accurate and changes traceable.",
+      "back": "A formal process, often with a configuration control board, for requesting, reviewing, approving, implementing and recording changes. It keeps the baseline accurate and changes traceable.",
       "detail": "Emergency changes still need review afterward. Undocumented changes make the SSP inaccurate."
     },
     {
@@ -1114,14 +1114,14 @@
       "id": "f9003",
       "cat": "cgrcProgram",
       "front": "ISO/IEC 27001:2022 and 27002:2022",
-      "back": "ISO/IEC 27001 sets the requirements for an information security management system, and organizations are certified against it. ISO/IEC 27002 is guidance on controls. The 2022 edition of both groups the controls into four themes (organizational, people, physical and technological) and lists 93 controls, replacing the 114 controls in 14 domains of the 2013 edition.",
+      "back": "The 2022 editions of the ISO standard that sets the requirements for an information security management system (the one organizations are certified against) and of its companion guidance on controls. Both group the controls into four themes (organizational, people, physical and technological) and list 93 controls, replacing the 114 controls in 14 domains of the 2013 edition.",
       "detail": "Only ISO/IEC 27001 is certifiable; 27002 is guidance. The Statement of Applicability must be updated to the control set of the edition the organization is certified against."
     },
     {
       "id": "f9004",
       "cat": "cgrcProgram",
       "front": "ISO/IEC 27701 (privacy information management)",
-      "back": "The ISO standard that specifies a privacy information management system (PIMS) for organizations that act as controllers or processors of personal data. It is the ISO route to show systematic privacy management and is designed to sit alongside an information security management system.",
+      "back": "The ISO standard that specifies a privacy information management system (PIMS) for organizations that act as controllers or processors of personal data. It is the ISO route to show systematic privacy management; the 2025 edition can be certified on its own and can also be integrated with an information security management system.",
       "detail": "Privacy management is a management system of its own; a certified ISMS does not by itself show that personal data is handled lawfully."
     },
     {
@@ -3695,7 +3695,7 @@
       "id": "q9005",
       "cat": "cgrcProgram",
       "type": "mc",
-      "question": "A contractor self-assesses against CMMC Level 2 and scores 92 of 110. The three unmet requirements are each worth one point and none is in the excluded group. What can it do?",
+      "question": "A contractor self-assesses against CMMC Level 2 and scores 92 of 110. The unmet requirements are each worth one point and none is in the excluded group. What can it do?",
       "options": [
         "Claim a final status and keep the POA&M open for the full three-year cycle",
         "Claim nothing, since every requirement must be met before any status",
@@ -6674,7 +6674,7 @@
         "Identify the information types the system handles",
         "Rate confidentiality, integrity and availability impact for each type",
         "Apply the high-water mark to set the overall system category",
-        "Review and approve the categorization and register the system"
+        "Review and approve the documented categorization"
       ],
       "explanation": "You must know what the system is before you can list its information, rate impact, determine the overall level and have the result approved and recorded."
     },

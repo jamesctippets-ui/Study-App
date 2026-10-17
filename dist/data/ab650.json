@@ -112,7 +112,7 @@
       "id": "f11",
       "cat": "governSecure",
       "front": "Conditional Access grant controls vs. session controls",
-      "back": "Grant controls decide whether access is allowed at all, and under what conditions (require MFA, require a compliant device, require a hybrid Microsoft Entra joined device, block access). Session controls apply restrictions during an already-granted session (like Microsoft Defender for Cloud Apps app enforced restrictions or limiting sign-in frequency).",
+      "back": "Grant controls decide whether access is allowed at all, and under what conditions (require MFA, require a compliant device, require a hybrid Microsoft Entra joined device, block access). Session controls apply restrictions during an already-granted session (like Conditional Access App Control through Microsoft Defender for Cloud Apps, app enforced restrictions, or limiting sign-in frequency).",
       "detail": "A policy can combine both: grant access only if MFA is satisfied (a grant control), then also restrict that session to browser-only, no-download access (a session control) for an unmanaged device."
     },
     {
@@ -161,7 +161,7 @@
       "id": "f18",
       "cat": "governSecure",
       "front": "Insider Risk Management",
-      "back": "Insider Risk Management uses signals (like unusual file downloads, mass deletions, or data exfiltration to personal accounts) combined with HR data (such as resignation or termination events) to surface and score potentially risky internal user activity, without exposing individual reviewers to unnecessary personal detail via pseudonymization.",
+      "back": "Insider Risk Management uses signals (like unusual file downloads, mass deletions, or data exfiltration to personal accounts) combined with HR data (such as resignation or termination events) to surface and score potentially risky internal user activity, while pseudonymization keeps reviewers from seeing unnecessary personal detail.",
       "detail": "Pseudonymization of user identities in case alerts, until an investigator explicitly needs to reveal them, is a specific control meant to balance risk detection against employee privacy during the review process."
     },
     {
@@ -252,7 +252,7 @@
       "id": "f31",
       "cat": "aiServices",
       "front": "Copilot Control System",
-      "back": "The Copilot Control System (documented as Copilot controls) is the umbrella set of admin capabilities (in the Microsoft 365 admin center, Power Platform admin center, Copilot Studio and Purview) for governing Copilot and AI agents across the tenant, in three pillars: Security and governance, Management controls, and Measurement and reporting.",
+      "back": "The Copilot Control System (documented as Copilot controls) is the umbrella set of admin capabilities (in the Microsoft 365 admin center, Power Platform admin center, Copilot Studio and Purview) for governing Copilot and AI agents across the tenant, covering Copilot, Copilot Chat, prebuilt agents and Copilot Studio agents published to Microsoft 365 channels.",
       "detail": "It is a governance framework spanning multiple admin surfaces rather than a single console \u2014 an exam question describing where to manage Copilot readiness, agent oversight, and usage reporting together is describing this system conceptually, even though the actual settings live across the Microsoft 365 admin center and Purview portal."
     },
     {
@@ -265,7 +265,7 @@
     {
       "id": "f33",
       "cat": "aiServices",
-      "front": "Agent identity in Microsoft Entra Agent ID",
+      "front": "Microsoft Entra Agent ID",
       "back": "Microsoft Entra Agent ID gives AI agents their own identity objects in Microsoft Entra ID (agent identities created from an agent identity blueprint, optionally with an agent's user account), so agents can be discovered, governed through sponsors, access packages and Conditional Access, and monitored like any other identity rather than being invisible to identity governance.",
       "detail": "Giving agents first-class identities is what lets admins apply the same governance patterns to them as to human and application identities \u2014 access reviews, lifecycle policies, and Conditional Access-style oversight, rather than agents being an ungoverned blind spot."
     },
@@ -379,7 +379,7 @@
       "cat": "tenantConfig",
       "front": "Least-privilege delegation with built-in Microsoft 365 admin roles",
       "back": "Built-in roles like Helpdesk Administrator, User Administrator, License Administrator, and Exchange Administrator grant narrower, task-specific rights than Global Administrator, letting front-line staff perform routine actions (like resetting a non-admin user's password) without tenant-wide control. Custom Microsoft Entra roles can narrow permissions even further when no built-in role fits exactly.",
-      "detail": "Helpdesk Administrator cannot reset passwords for users who themselves hold admin roles \u2014 a scenario asking who can reset a Global Administrator's forgotten password is pointing at a higher-privilege role or the affected admin's own recovery options, not Helpdesk Administrator."
+      "detail": "Helpdesk Administrator can reset passwords only for non-administrators and other Helpdesk Administrators \u2014 a scenario asking who can reset a Global Administrator's forgotten password is pointing at a higher-privilege role or the affected admin's own recovery options, not Helpdesk Administrator."
     },
     {
       "id": "f50",
@@ -504,8 +504,8 @@
       "id": "f67",
       "cat": "tenantConfig",
       "front": "Usage location on a user account",
-      "back": "Usage location is a required attribute on a user's profile that determines which licenses and services can legally be assigned to them, since some countries and regions have service availability restrictions. A license cannot be assigned to a profile with no usage location set.",
-      "detail": "Group-based licensing doesn't bypass this requirement \u2014 a group member with no usage location set is skipped and flagged as a licensing error instead of silently receiving the license."
+      "back": "Usage location is a required attribute on a user's profile that determines which licenses and services can legally be assigned to them, since some countries and regions have service availability restrictions. A license cannot be assigned directly to a user whose profile has no usage location set.",
+      "detail": "Group-based licensing is more forgiving but not a safe shortcut: a group member with no usage location inherits the location of the tenant, so services could be assigned for the wrong country. Set usage location when the user is created."
     },
     {
       "id": "f68",
@@ -538,7 +538,7 @@
     {
       "id": "f72",
       "cat": "governSecure",
-      "front": "Entra ID Governance entitlement management (access packages)",
+      "front": "Entitlement management (access packages)",
       "back": "Entitlement management lets admins bundle resources \u2014 group membership, a Team, a SharePoint site, an app \u2014 into an access package that users can request through a self-service catalog, with built-in approval workflows and automatic expiration, instead of an admin manually granting each resource one at a time.",
       "detail": "An access package's automatic expiration already builds in the recertification that an access review would otherwise have to be scheduled separately to provide for a group or role assignment created outside entitlement management."
     },
@@ -560,7 +560,7 @@
       "id": "f75",
       "cat": "governSecure",
       "front": "Preservation Lock on a retention policy",
-      "back": "Preservation Lock on a Microsoft Purview retention policy prevents anyone, including a Global Administrator, from turning the policy off or shortening its retention period once locked, until the locked duration itself expires, guaranteeing a regulatory retention commitment can't quietly be weakened later.",
+      "back": "Preservation Lock on a Microsoft Purview retention policy prevents anyone, including a Global Administrator, from turning the policy off, deleting it or shortening its retention period once locked (it can only be extended or have locations added), guaranteeing a regulatory retention commitment can't quietly be weakened later.",
       "detail": "Without Preservation Lock, an ordinary retention policy can still be edited or disabled by an administrator at any time \u2014 this feature exists specifically to close that gap for regulatory retention commitments."
     },
     {
@@ -622,7 +622,7 @@
     {
       "id": "f84",
       "cat": "aiServices",
-      "front": "Copilot Pages",
+      "front": "Copilot Page",
       "back": "A Copilot Page is a persistent, shareable canvas that Microsoft 365 Copilot Chat can generate from a conversation, letting a user move an AI-generated draft out of a one-off chat response into a document multiple people can keep open, edit, and co-author together.",
       "detail": "Because a Page is a durable artifact rather than a disappearing chat reply, the same governance surfaces that apply to other Copilot output \u2014 such as auditing and eDiscovery \u2014 extend to what gets written into a Page as well."
     },
@@ -671,14 +671,14 @@
     {
       "id": "f91",
       "cat": "governSecure",
-      "front": "Exact Data Match (EDM) sensitive information types",
-      "back": "A standard sensitive information type matches a pattern, like a string of digits shaped like a credit card number, so it can flag something that merely looks sensitive. An Exact Data Match (EDM) sensitive information type instead checks content against an actual, uploaded dataset of real values \u2014 like a company's genuine employee ID list \u2014 catching only true matches and sharply cutting down false positives.",
+      "front": "Exact Data Match (EDM)",
+      "back": "A standard sensitive information type matches a pattern, like a string of digits shaped like a credit card number, so it can flag something that merely looks sensitive. An EDM-based sensitive information type instead checks content against an actual, uploaded dataset of real values \u2014 like a company's genuine employee ID list \u2014 catching only true matches and sharply cutting down false positives.",
       "detail": "EDM is the right answer whenever a scenario specifically says a DLP or auto-labeling policy keeps flagging content that merely resembles sensitive data, rather than real, current records."
     },
     {
       "id": "f92",
       "cat": "governSecure",
-      "front": "Mandatory (default) sensitivity labeling policies",
+      "front": "Mandatory labeling policy",
       "back": "A mandatory labeling policy requires a user to apply some sensitivity label before they can save a document or send an email, rather than only recommending a label or relying on auto-labeling to catch it afterward. It is commonly paired with a separate default label setting, so the user starts with a label already selected and cannot remove it entirely.",
       "detail": "This closes a gap that auto-labeling alone leaves open: auto-labeling can take time to apply retroactively, while a mandatory policy stops an unlabeled item from ever being saved or sent in the first place."
     },

@@ -151,7 +151,7 @@
       "id": "f3",
       "cat": "ccPrinciples",
       "front": "Integrity",
-      "back": "Making sure data and systems are accurate, complete and have not been changed in an unauthorized way. Hashing, digital signatures, change control and file integrity monitoring support it.",
+      "back": "Making sure data and systems are accurate, complete and have not been changed in an unauthorized way. Hashing, digital signatures, change control and file-change monitoring support it.",
       "detail": "Integrity is about trust in the content, not secrecy: a changed invoice amount is an integrity problem even if nobody outside ever saw it."
     },
     {
@@ -201,7 +201,7 @@
       "cat": "ccPrinciples",
       "front": "Threat, vulnerability and asset",
       "back": "An asset is anything of value to the organization. A vulnerability is a weakness in it, and a threat is something that could exploit that weakness to cause harm.",
-      "detail": "Example: the asset is a customer database, the vulnerability is an unpatched server, and the threat is an attacker or malware."
+      "detail": "The asset is a customer database, the vulnerability is an unpatched server, and the threat is an attacker or malware."
     },
     {
       "id": "f11",
@@ -733,7 +733,7 @@
       "cat": "ccNetCloud",
       "front": "Transport Layer Security (TLS) and HTTPS",
       "back": "TLS encrypts data moving between a client and a server and verifies the server's identity with a certificate. HTTPS is HTTP carried over TLS, on port 443.",
-      "detail": "The padlock means the connection is encrypted, not that the website is trustworthy; phishing sites can use HTTPS too. TLS 1.3 is the current version and TLS 1.2 is still acceptable. SSL and TLS 1.0 and 1.1 are deprecated (RFC 8996)."
+      "detail": "The padlock means the connection is encrypted, not that the website is trustworthy; phishing sites can use HTTPS too. TLS 1.3 is the current version and TLS 1.2 is still acceptable. SSL and TLS 1.0 and 1.1 are deprecated (RFC 7568 and RFC 8996)."
     },
     {
       "id": "f87",
@@ -1202,7 +1202,7 @@
       "cat": "ccIam",
       "front": "Identity governance and administration (IGA)",
       "back": "Tools and processes that automate the identity life cycle: onboarding, access requests, approvals, periodic reviews and compliance reporting. They connect to HR sources and applications so access stays current.",
-      "detail": "IGA is a tool category in the outline's frameworks and tools bullet. Its main value is making joiner, mover and leaver steps consistent and provable."
+      "detail": "Its main value is making joiner, mover and leaver steps consistent and provable."
     },
     {
       "id": "f9044",
@@ -1579,7 +1579,7 @@
       "id": "f9097",
       "cat": "ccSecOps",
       "front": "Information sharing (ISACs and threat feeds)",
-      "back": "Communities such as information sharing and analysis centers (ISACs), and threat feeds, let organizations share indicators and warnings so one victim's discovery protects others. Shared intelligence still needs to be checked for relevance and accuracy.",
+      "back": "Industry-based communities called ISACs, and threat feeds, let organizations share indicators and warnings so one victim's discovery protects others. Shared intelligence still needs to be checked for relevance and accuracy.",
       "detail": "Sharing works best when it is timely, trusted and acted on."
     },
     {
@@ -3713,7 +3713,7 @@
         "Let teams try it first and write a policy afterward once problems appear"
       ],
       "correct": 1,
-      "explanation": "New technology should pass a documented approval that considers the data involved, which applies existing governance to AI. Policy after the fact leaves a gap, permanent bans ignore business needs, and a thank-you note is not a control."
+      "explanation": "New technology should pass a documented approval that considers the data involved, which applies existing governance to AI. Policy after the fact leaves a gap, permanent bans ignore business needs, and a vendor's promise letter is not a control."
     },
     {
       "id": "msq9004",
@@ -4243,13 +4243,13 @@
       "type": "mc",
       "question": "Which of the following is a valid IPv6 address?",
       "options": [
-        "2001:db8:::1",
+        "2001:db8::1::5",
         "2001:db8::1",
         "192.168.1.256",
         "0xFF.10.1.1"
       ],
       "correct": 1,
-      "explanation": "IPv6 uses groups of hexadecimal digits separated by colons, and a double colon may replace one run of zero groups. The first and third are malformed IPv4-style values, and the second uses a triple colon, which is not allowed."
+      "explanation": "IPv6 uses groups of hexadecimal digits separated by colons, and a double colon may replace one run of zero groups, but only once per address. 2001:db8::1::5 uses two double colons, so it is not valid. The two dotted values are IPv4-style and malformed, because an octet cannot exceed 255 and 0xFF is not decimal."
     },
     {
       "id": "q9054",
@@ -5598,7 +5598,7 @@
         "q9073",
         "q9083"
       ],
-      "reading": "Security operations is the daily work of keeping systems safe. It begins with data: classify information by sensitivity, such as public, internal, confidential and restricted, then apply handling rules for storage, sharing and disposal. When data is no longer needed it must be destroyed properly. Deleting files or quick-formatting a drive leaves data recoverable, while shredding, degaussing or approved wiping does not. Systems themselves are kept in a known secure state with configuration baselines, which means removing unneeded services and default passwords, and patch and vulnerability management means scanning for weaknesses and applying vendor fixes promptly. Logs are collected and reviewed, often with a SIEM, which gathers logs from many sources and raises alerts.\n\nMonitoring is only useful if alerts are handled well. Security event triage validates an alert, adds context, sets a priority from severity, asset criticality and data sensitivity, and escalates or closes it. Correlation links events from several sources, such as a failed VPN login, a new device and a large upload, into one story. Detection use cases define the scenarios worth catching, and a security operations center works through them. Know the four outcomes: a false positive is harmless activity wrongly flagged, and a false negative is a real attack that was missed, which is the dangerous one.\n\nCryptography protects data in operation. Symmetric encryption uses one shared key and is fast, so it handles bulk data, with AES as the standard example. Asymmetric encryption uses a public and private key pair, is slower, and solves the problem of sharing keys safely; it also enables digital signatures, which prove who signed and that the content was not altered. Hashing is different from both: it is a one-way function that produces a fixed fingerprint, so any change to the data changes the hash, which makes it ideal for checking integrity. A hash has no key and cannot be reversed.\n\nData security goes further than classification. Labels and markings carry the classification with the data. Masking replaces sensitive values with realistic fake or partial ones, as when a support screen shows only the last four digits of a card, and tokenization swaps a value for a random token while the real value stays in a protected vault. Data needs protection in three states: at rest with encryption and access control, in transit with TLS or a VPN, and in use, which is the hardest. Data loss prevention tools block sensitive data from leaving, and key management keeps keys apart from the data they protect. Sanitization before disposal follows NIST's levels: clear overwrites the data, purge uses stronger methods such as cryptographic erase, and destroy physically destroys the media. Large quantum computers could one day break RSA and elliptic-curve cryptography, and attackers can already record encrypted data to decrypt later, so NIST published quantum-resistant standards in August 2024: FIPS 203 (ML-KEM) for key establishment and FIPS 204 and FIPS 205 for digital signatures.\n\nDefenders must recognize the main threats. Malware includes viruses that attach to files, worms that spread by themselves across networks, trojans that pretend to be useful, spyware that watches in secret, and ransomware that locks data until payment. Social engineering attacks people rather than machines: phishing uses email, vishing uses phone calls, smishing uses text messages, and pretexting uses an invented story, while tailgating follows someone through a secure door. Other common attacks include denial-of-service, which floods a system to make it unavailable, on-path attacks that secretly sit between two parties, brute force password guessing, and credential stuffing, which reuses passwords leaked from other sites.\n\nWhen something goes wrong, an event is any observable occurrence, an incident is an event that harms or threatens confidentiality, integrity or availability, and a breach is an incident where data is exposed without authorization. A prepared team follows the incident response lifecycle: preparation, detection and analysis, containment, eradication and recovery, and finally post-incident activity, where lessons learned improve the next response. Containment, such as isolating an infected laptop, comes before eradication, which removes the cause. Evidence is handled with a documented chain of custody, working from verified copies.\n\nIncident response relies on the data handling policy, so evidence and records are classified, shared on a need-to-know basis and kept as law and policy require. Incidents are given a severity that decides escalation and communication, and the plan names who speaks for the organization. Plans are exercised: tabletop exercises discuss a scenario without touching systems, while functional and full-scale exercises use real systems and people. After recovery, a blameless lessons-learned review turns the findings into improvements. NIST SP 800-61 Revision 3, published in 2025, links incident response to the functions of the Cybersecurity Framework 2.0.",
+      "reading": "Security operations is the daily work of keeping systems safe. It begins with data: classify information by sensitivity, such as public, internal, confidential and restricted, then apply handling rules for storage, sharing and disposal. When data is no longer needed it must be destroyed properly. Deleting files or quick-formatting a drive leaves data recoverable, while shredding, degaussing or approved wiping does not. Systems themselves are kept in a known secure state with configuration baselines, which means removing unneeded services and default passwords, and patch and vulnerability management means scanning for weaknesses and applying vendor fixes promptly. Logs are collected and reviewed, often with a SIEM, which gathers logs from many sources and raises alerts.\n\nMonitoring is only useful if alerts are handled well. Security event triage validates an alert, adds context, sets a priority from severity, asset criticality and data sensitivity, and escalates or closes it. Correlation links events from several sources, such as a failed VPN login, a new device and a large upload, into one story. Detection use cases define the scenarios worth catching, and a security operations center works through them. Know the four outcomes: a false positive is harmless activity wrongly flagged, and a false negative is a real attack that was missed, which is the dangerous one.\n\nCryptography protects data in everyday operations. Symmetric encryption uses one shared key and is fast, so it handles bulk data, with AES as the standard example. Asymmetric encryption uses a public and private key pair, is slower, and solves the problem of sharing keys safely; it also enables digital signatures, which prove who signed and that the content was not altered. Hashing is different from both: it is a one-way function that produces a fixed fingerprint, so any change to the data changes the hash, which makes it ideal for checking integrity. A hash has no key and cannot be reversed.\n\nData security goes further than classification. Labels and markings carry the classification with the data. Masking replaces sensitive values with realistic fake or partial ones, as when a support screen shows only the last four digits of a card, and tokenization swaps a value for a random token while the real value stays in a protected vault. Data needs protection in three states: at rest with encryption and access control, in transit with TLS or a VPN, and in use, which is the hardest. Data loss prevention tools block sensitive data from leaving, and key management keeps keys apart from the data they protect. Sanitization before disposal follows NIST's levels: clear overwrites the data, purge uses stronger methods such as cryptographic erase, and destroy physically destroys the media. Large quantum computers could one day break RSA and elliptic-curve cryptography, and attackers can already record encrypted data to decrypt later, so NIST published quantum-resistant standards in August 2024: FIPS 203 (ML-KEM) for key establishment and FIPS 204 and FIPS 205 for digital signatures.\n\nDefenders must recognize the main threats. Malware includes viruses that attach to files, worms that spread by themselves across networks, trojans that pretend to be useful, spyware that watches in secret, and ransomware that locks data until payment. Social engineering attacks people rather than machines: phishing uses email, vishing uses phone calls, smishing uses text messages, and pretexting uses an invented story, while tailgating follows someone through a secure door. Other common attacks include denial-of-service, which floods a system to make it unavailable, on-path attacks that secretly sit between two parties, brute force password guessing, and credential stuffing, which reuses passwords leaked from other sites.\n\nWhen something goes wrong, an event is any observable occurrence, an incident is an event that harms or threatens confidentiality, integrity or availability, and a breach is an incident where data is exposed without authorization. A prepared team follows the incident response lifecycle: preparation, detection and analysis, containment, eradication and recovery, and finally post-incident activity, where lessons learned improve the next response. Containment, such as isolating an infected laptop, comes before eradication, which removes the cause. Evidence is handled with a documented chain of custody, working from verified copies.\n\nIncident response relies on the data handling policy, so evidence and records are classified, shared on a need-to-know basis and kept as law and policy require. Incidents are given a severity that decides escalation and communication, and the plan names who speaks for the organization. Plans are exercised: tabletop exercises discuss a scenario without touching systems, while functional and full-scale exercises use real systems and people. After recovery, a blameless lessons-learned review turns the findings into improvements. NIST SP 800-61 Revision 3, published in 2025, links incident response to the functions of the Cybersecurity Framework 2.0.",
       "fundamentalsLabel": "New to security operations? See the everyday analogy",
       "fundamentals": "Running security operations is like running a small hospital's emergency readiness. Day to day you label supplies, lock the medicine cabinet, keep equipment maintained and check cameras (classification, configuration, patching, monitoring). When a fire alarm rings, a written plan decides who raises the alert, who shuts the doors to contain the fire, who puts it out, and who restores wards afterward. The next day everyone meets to talk about what to improve.",
       "keyTerms": [
@@ -5941,7 +5941,7 @@
     {
       "id": "ml-isc2cc-4",
       "cat": "ccIam",
-      "scenario": "Signing in with a password plus a fingerprint combines something you {b1} with something you {b2}, which is multi-factor authentication. Giving each account only the access its job requires is the principle of {b3}.",
+      "scenario": "Signing in with a password plus a fingerprint combines the password, something you {b1}, with the fingerprint, something you {b2}, which is multi-factor authentication. Giving each account only the access its job requires is the principle of {b3}.",
       "blanks": [
         {
           "key": "b1",
@@ -6046,7 +6046,7 @@
     {
       "id": "ml-isc2cc-9001",
       "cat": "ccGovernance",
-      "scenario": "A full backup copies everything. An {b1} backup copies only what changed since the last backup of any kind, while a {b2} backup copies everything changed since the last full backup. To restore from the second type you need the last full backup plus the {b3}.",
+      "scenario": "A full backup copies everything. The {b1} backup copies only what changed since the last backup of any kind, while the {b2} backup copies everything changed since the last full backup. To restore from the second type you need the last full backup plus the {b3}.",
       "blanks": [
         {
           "key": "b1",
@@ -6116,7 +6116,7 @@
     {
       "id": "ml-isc2cc-9003",
       "cat": "ccNetCloud",
-      "scenario": "A fake wireless network that copies a real network's name is an {b1}. An unauthorized access point plugged into the company network is a {b2} access point. In an industrial control system, the top priorities are safety and {b3}.",
+      "scenario": "The term for a fake wireless network that copies a real network's name is {b1}. An unauthorized access point plugged into the company network is a {b2} access point. In an industrial control system, the top priorities are safety and {b3}.",
       "blanks": [
         {
           "key": "b1",
@@ -6141,7 +6141,7 @@
           "options": [
             "availability",
             "confidentiality",
-            "novelty"
+            "frequent patching"
           ],
           "correct": 0
         }
