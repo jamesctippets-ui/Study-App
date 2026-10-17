@@ -254,10 +254,10 @@ tracks collapse into one entry with both tracks' badges, while genuinely
 different phrasing per track stays separate), searchable, with
 expand/collapse per entry.
 
-A trophy header button opens **Achievements** — 17 milestone badges (mastery,
+**Profile › Achievements** (See all) opens **Achievements** — 17 milestone badges (mastery,
 streaks, quiz/exam/match/case-study counts, course completion) plus a daily streak
 counter, all computed from progress already being tracked, no new data
-entry required. A gear **Data & progress** button opens export/import
+entry required. **Profile › Settings & data** opens **Data & progress** — a short list of folded sections, each showing its current value, with export/import
 (download all progress as a JSON file, or restore from one — the only
 backup/device-migration option, since the app has no accounts) alongside
 the existing per-track reset and a **Voice & speech** section — a rate
@@ -384,8 +384,8 @@ it.
 
 Navigation follows a gamified-learning-app layout. A slim, sticky top bar
 holds a ☰ button (titled "Manage cert path", always opens `CertPathPanel`),
-the track chip (tap to switch tracks), your streak, the theme switch,
-achievements, and settings. A fixed bottom tab bar (`BottomTabBar` in
+the track chip (tap to switch tracks), your streak and the theme switch
+(Achievements and Settings & data live on the Profile tab, which already shows them; the header used to repeat both). A fixed bottom tab bar (`BottomTabBar` in
 04b_panels_ui.jsx) holds Home / Path / Practice / Reference / Exam; Home is the
 cross-cert dashboard (its tab button is titled "Home"), and the other four act on
 the track named in the top bar. The Path tab draws each unit as a sticky banner
@@ -587,6 +587,20 @@ where one genuinely fits, vocab/quiz call-outs, and common-traps notes):
   checked because Cisco's page is gated, so confirm it before you book. ISSAP, ISSEP and ISSMP are not covered. Most lessons carry a diagram
   (CCNA 13, CISSP 14, CCSP 8, CSSLP 7, CC 6, SSCP 6, CGRC 5), each in its own
   `src/js/01a_diagrams_*.jsx` file.
+- **The four Claude certifications** — Anthropic's proctored exams, each a full track: **CCAO-F** (Claude Certified
+  Associate – Foundations), **CCDV-F** (Developer – Foundations), **CCAR-F** (Architect – Foundations) and **CCAR-P**
+  (Architect – Professional). Together 1,034 flashcards, 1,177 questions, 44 lessons, 49 Mad Libs, 42 Sequence
+  challenges, 60 Compare items, 15 case studies (six of them the CCAR-F production scenarios), 49 cheat-sheet sections and
+  10 typed **Claude Code CLI** commands (CCAR-F), each track with a guided Path, an exam-day strategy section and a
+  practice exam of 60, 53, 60 and 63 questions in 120 minutes (the real exams are scored on a 100 to 1,000 scale with 720 to pass,
+  delivered by Pearson VUE, and valid for 12 months). Categories and their sizes follow each official exam guide's domains
+  and weights; every question is original (no official sample question is reproduced). The content was written from the
+  guides and Anthropic's current documentation (platform docs, Claude Code docs, Help Center, the MCP specification),
+  and then every sentence that names a number, model, parameter, command, file, feature or date was checked again against the
+  live pages, which corrected about two dozen details (for example, fast mode on Opus 5.5 is no longer a research
+  preview). Worth re-checking before you book: Anthropic's Usage Policy page is dated November 12, 2026; the guides' own
+  `${GITHUB_TOKEN}` example and "two or three" examples are kept as the guides give them, although the docs differ slightly;
+  Managed Agents is still a beta. Lesson diagrams for these four tracks are not drawn yet.
 - **Weak subjects** (Path tab → "Weak spots", `#/<cert>/path/weak`, or the Weak subjects row of Home's review card for
   every cert in your plan) — turns what you got wrong into a study plan. Each answer already updated "last outcome"; a
   **miss log** adds how often and how recently an item was missed. The app ranks the *lessons* your misses point back at
@@ -668,6 +682,7 @@ data/
   cloudplus.py  — CompTIA Cloud+ categories, flashcards, questions, course lessons
   ccna.py, cissp.py — combine ccna_a/_b and cissp_a/_b (two parts each, written in parallel)
   isc2cc.py, sscp.py, ccsp.py, cgrc.py, csslp.py — the ISC2 tracks (experience requirements live in tracks.py)
+  ccao.py, ccdv.py, ccarf.py, ccarp.py — the four Claude certifications; each combines small parts (<key>_a, _b1, _g1, _g2, ...) written in groups
   playground.py — guided scenarios for the IT Playground (validated by build.py, replayed through the engine)
   playground_<tool>.py — one file per extra Playground tool (dhcp, dns, stp, vpn, nsg, certs, acl), auto-discovered
 tools/

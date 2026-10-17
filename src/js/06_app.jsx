@@ -1327,6 +1327,9 @@ function CertStudyApp() {
   const currentQ = quizSession[sessionIndex];
   // Focus mode: with a card on screen, Reference > Cards drops everything but the deck itself.
   const cardsFocus = mode === 'learn' && learnView === 'cards' && !!currentCard;
+  // The category filter and the mastery strip (its visual twin: tap a segment to filter) show together,
+  // and only where a category can be chosen.
+  const showCategoryFilter = !cardsFocus && (mode === 'quiz' || (mode === 'learn' && learnView !== 'sheet' && (learnView !== 'study' || !DATA[activeTrack].lessons)));
 
   // `quality` is the rating FlashcardView collects: CARD_GOT_IT (4) or
   // CARD_MISSED (1), both on the SM-2 scale. SRS scheduling uses the raw
@@ -1799,22 +1802,6 @@ function CertStudyApp() {
               <IconFlame size={14} />{stats.streak.current}
             </div>
             <ThemeToggle theme={theme} onToggle={toggleTheme} />
-            <button
-              onClick={() => setShowAchievements(true)}
-              className="btn-flat mono"
-              title="Achievements"
-              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px', height: '28px', padding: '0 8px', borderRadius: 'var(--r-ctl)', border: `1px solid ${COLOR.border}`, background: COLOR.surface, color: COLOR.gold, fontSize: '12px', fontWeight: 700 }}
-            >
-              <IconTrophy size={14} /> {stats.unlocked.length}
-            </button>
-            <button
-              onClick={() => { setImportMessage(null); setShowData(true); }}
-              className="btn-flat"
-              title="Data & progress"
-              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '30px', height: '30px', padding: 0, borderRadius: 'var(--r-ctl)', border: 'none', background: 'transparent', color: COLOR.muted, marginRight: '-4px' }}
-            >
-              <IconSettings size={20} />
-            </button>
           </div>
         </div>
       </div>
@@ -1900,10 +1887,11 @@ function CertStudyApp() {
               commands: !!DATA[activeTrack].cliChallenges,
             }}
             onSelect={setQuizView}
+            trailing={<CategoryFilterSelect compact categories={categories} activeCat={activeCat} onChange={setActiveCat} masteryByCategory={masteryByCategory} />}
           />
         )}
 
-        {!cardsFocus && (mode === 'quiz' || (mode === 'learn' && learnView !== 'sheet' && (learnView !== 'study' || !DATA[activeTrack].lessons))) && (
+        {showCategoryFilter && mode !== 'quiz' && (
           <CategoryFilterSelect
             categories={categories}
             activeCat={activeCat}
@@ -2273,6 +2261,7 @@ function CertStudyApp() {
           )
         )}
 
+        {showCategoryFilter && (
         <div className="mt-6" data-chrome="mastery">
           <button
             onClick={() => setShowMasteryDetail((v) => !v)}
@@ -2332,6 +2321,7 @@ function CertStudyApp() {
           </div>
           )}
         </div>
+        )}
         </React.Fragment>
         )}
       </div>

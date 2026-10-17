@@ -3256,7 +3256,7 @@
         "Force extract_metadata on every request, including the enrichment steps"
       ],
       "correct": 1,
-      "explanation": "Forcing the named tool for the first call guarantees that step happens first, and later turns return to automatic choice so the model can pick enrichment tools from the result. Requiring any tool does not fix the order, a prompt instruction is probabilistic, and forcing it every time would block the enrichment steps."
+      "explanation": "Forcing the named tool for the first call guarantees that step happens first, and later turns return to automatic choice so the model can pick enrichment tools from the result. Requiring any tool does not fix the order, a prompt instruction is probabilistic, and forcing it every time would block the enrichment steps. On models that reject forced tool choice, run extract_metadata in application code first, or use automatic choice and check that the call came back."
     },
     {
       "id": "q79",
@@ -5137,7 +5137,7 @@
       "question": "Which two statements about running Claude Code in a pipeline are correct? (Choose two.)",
       "options": [
         "The --ci flag switches Claude Code to the Message Batches API at half price",
-        "When no terminal is attached, permission prompts are answered automatically with the safest option",
+        "When no terminal is attached, permission prompts are approved automatically so that the run can finish",
         "Setting CLAUDE_NONINTERACTIVE=1 is the documented way to avoid hangs",
         "With --output-format json and --json-schema, the structured result is returned in the structured_output field",
         "The -p flag runs a single prompt non-interactively, prints the result and exits"
@@ -5146,7 +5146,7 @@
         3,
         4
       ],
-      "explanation": "Print mode and the structured-output flags are documented, parseable pipeline features. The other three describe things that do not exist or that Claude Code does not do: there is no such flag or variable, and permission requests nobody can answer are denied, or must be pre-approved, rather than auto-answered."
+      "explanation": "Print mode and the structured-output flags are documented, parseable pipeline features. The other three describe things that do not exist or that Claude Code does not do: there is no such flag or variable, and a permission request nobody can answer is denied unless it was pre-approved, never approved automatically."
     },
     {
       "id": "tf1014",
@@ -7331,7 +7331,7 @@
         "Obligations with money, identity or security consequences need programmatic enforcement (prerequisite gates, hooks). Prompts, few-shot examples and capital letters are probabilistic.",
         "PreToolUse hook: allow, deny, ask or defer via permissionDecision; updatedInput rewrites arguments. Deny beats defer, which beats ask, which beats allow. Put the redirect in the denial reason, such as \"escalate to a human\".",
         "PostToolUse hook: runs after the tool and can add context or replace the result, for example normalizing Unix timestamps, ISO 8601 dates and numeric status codes. It cannot undo a side effect.",
-        "Matchers match tool names (Write|Edit, an mcp__server__ prefix), not arguments: inspect the tool input inside the callback. Hooks run outside the context window.",
+        "Matchers match tool names (Write|Edit, mcp__server__.* for one MCP server), not arguments: inspect the tool input inside the callback. Hooks run outside the context window.",
         "Human handoff when the human cannot see the transcript: customer id, root cause, amounts, actions taken, recommended next step. Make them required fields of the escalation tool.",
         "Multi-concern message: split into distinct items, investigate in parallel with the same verified context, and synthesize one reply.",
         "Sessions store the conversation, not files. claude -n or /rename names a session, claude --resume <name> reopens it, claude --continue reopens the most recent; the SDK uses resume with an id and fork_session to branch.",
@@ -7398,7 +7398,7 @@
         "Interacting problems go in one detailed message; independent problems are fixed one after another. After about two failed corrections, clear the session and restart with a better prompt.",
         "Non-interactive mode: claude -p \"prompt\" (or --print) processes the prompt, prints the result and exits; a non-zero exit code means failure. Without -p a pipeline step can hang waiting for input. Piped stdin is capped at 10 MB.",
         "Structured output: --output-format text, json or stream-json. json returns the result with session id and usage; add --json-schema (print mode only) to get validated data in the structured_output field, which a script can post as inline pull-request comments.",
-        "Context for CI: CLAUDE.md (testing standards, fixtures, review criteria) loads in a plain claude -p run. --bare skips CLAUDE.md, hooks, skills, MCP servers and auto memory for reproducibility, so pass guidance with --append-system-prompt-file or --settings.",
+        "Context for CI: CLAUDE.md (testing standards, fixtures, review criteria) loads in a plain claude -p run. --bare skips CLAUDE.md, hooks, skills, MCP servers and auto memory for reproducibility, so pass guidance with --append-system-prompt-file and settings with --settings.",
         "Permissions in CI: --allowedTools \"Bash(git diff *),Read\" pre-approves (it does not restrict); --permission-mode dontAsk denies whatever is not pre-approved. GitHub Action: anthropics/claude-code-action@v1. With a prompt input it runs automatically; without one it answers @claude mentions. Keep keys in GitHub Secrets.",
         "Quality rules: review in a fresh, independent instance, not the session that wrote the code; on reruns include prior findings and ask for only new or unaddressed issues; include existing tests when generating tests; document test standards and fixtures in CLAUDE.md."
       ]

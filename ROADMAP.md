@@ -831,7 +831,7 @@ doesn't (and why it's still waiting).
     complements AB-650/MD-102 without much overlap.
   - **PL-300** (Power BI Data Analyst) — adjacent to the DP-900/DP-300 data
     cluster, useful if reporting/analytics work comes up.
-  - (**CCNA** and the six main **ISC2** certs have shipped — see section 14.)
+  - (**CCNA** and the six main **ISC2** certs, and the four **Claude** certifications, have shipped — see section 14.)
   - **CompTIA Security+** — pairs with the existing Cloud+ track the same
     way AZ-900 pairs with AZ-104, and is a common next step after Cloud+.
   - A **second healthcare-interoperability track** (e.g. content aligned with
@@ -1696,6 +1696,27 @@ trading away for shinier but shallower ones.
   ISC2 published a broader Code of Professional Conduct in February 2026 that builds on
   the Code of Ethics canons; the CC and CISSP cheat sheets mention it. No cross-cert
   bridges exist for these tracks yet, and ISSAP, ISSEP and ISSMP are not covered.
+- [x] **The four Claude certifications (October 2026; 26 tracks now).** New tracks `ccao` (CCAO-F), `ccdv` (CCDV-F), `ccarf`
+  (CCAR-F) and `ccarp` (CCAR-P): 1,034 flashcards, 1,177 questions, 44 lessons, 49 Mad Libs, 42 Sequence, 60 Compare, 15 case
+  studies (six CCAR-F scenarios), 49 cheat-sheet sections and 10 Claude Code CLI challenges, with 7, 8, 5 and 7 categories
+  weighted as in each exam guide (CCAO-F 14/21/12/16/12/15/10; CCDV-F about 15/33/3/3/17/11/8/10; CCAR-F 27/18/20/20/15; CCAR-P
+  17/13/19/16/14/14/7). (1) *Build:* each track is a combiner (`data/<key>.py`) over small parts (`_a`, `_b1`, `_g1`, `_g2`, `_g3`),
+  written in groups so no single file had to hold a whole track; `build.py` registers them (`TRACK_MODULES`, `TRACKS`,
+  `EXAM_CONFIG`), `UNFINISHED_TRACKS` is empty again, and 60/53/60/63-question practice exams run 120 minutes with a 75%
+  buffer over the real 720/1,000 pass mark. (2) *Small features the tracks needed:* an optional `experience.short` string
+  overrides the generated chip text; the Commands practice mode gains a `claude` tool ("Claude Code CLI", the same verb-and-flag
+  check as the Azure, PowerShell and Cisco IOS ones); a cheat sheet with more than five official links folds them behind a
+  `Disclosure`. (3) *Sources and limits:* the four exam guides (v1.0) plus Anthropic's own pages (platform, Claude Code, Help
+  Center, MCP specification 2026-07-28); the guides' sample questions were used for scope only, never copied. Every sentence
+  with a number, model, parameter, command, file, feature or date (about 1,400) was then checked again by a second pass against
+  the live pages: 14 fixes plus four small follow-ups (fast mode on Opus 5.5 is no longer a research preview; forced
+  `tool_choice` is rejected on all current models except Haiku 5.5; a speed change also clears the system cache; Managed Agents has
+  no PreToolUse hooks or turn limit; one reversed Workload Identity Federation sentence). Left as the guides give them: the
+  `${GITHUB_TOKEN}` example (the docs say credential-looking variables read as empty in remote server headers) and "two or three"
+  input/output examples (the prompting guide says three to five). Time-sensitive: the Usage Policy page is headed "Effective
+  November 12, 2026"; Managed Agents and the Projects rollout are beta. (4) *Not done yet:* lesson diagrams (none of the 44 lessons has
+  one), cross-cert bridges, and the balance of "the correct option is the longest" (30 to 37% of multiple-choice items, so
+  longer-is-right is a weak tell worth evening out). `tools/audit_content.py` finds 0 errors in all four.
 - [x] **Weak subjects: evaluate misses and build a priority study path (October 2026).** The app only kept the
   last outcome per item, so `stats.missLog` (`{track: {id: {m misses, c correct since, l last-miss date}}}`) now records
   history for anything ever missed (written by `recordResultFor` and the exam results; cleared with a track reset;
@@ -1818,8 +1839,23 @@ trading away for shinier but shallower ones.
   same SM-2 scale, so `nextSrsEntry`, `ratingToOutcome` (3+ is correct for mastery) and the Tough-deck rule
   (`TOUGH_MAX_RATING` = 3) are unchanged, and progress saved with the old five-point ratings keeps working (an old 2 or 3
   stays tough until the card is next marked Got it). Clearing the Tough deck ends the focus mode with the "Tough terms
-  cleared" panel. Playwright check: `focus_test.js` in the scratchpad (not in the repo). Step 2 of this request is the audit
-  of the rest of the app for redundant blocks.
+  cleared" panel. Playwright check: `focus_test.js` in the scratchpad (not in the repo).
+- [x] **Declutter step 2: remove repeats, fold settings (October 2026).** Audit method: a block inventory of every main screen at
+  390 px (a script lists each top-level block's height and first words, with a seeded learner), then removing what a screen repeats
+  from another one. Changes: (1) the header lost its trophy chip and gear, which duplicated Profile's Achievements card and its
+  Settings & data button, leaving the menu, the track chip, the streak and the theme switch; (2) the "Mastery by exam area" strip
+  shows only where a category can be chosen (Practice and the flat Study view, next to the category filter it mirrors), no longer
+  at the foot of Path, Exam, Sheet and the weak-subjects page; (3) Practice puts the tool picker and the category filter on one
+  row (the tool's popover still opens full width), and "Review N missed questions" is a slim link instead of a full-width button
+  (the options row and New quiz are unchanged); (4) Home drops the "average mastery across your tracks" line under the stat tiles
+  and the experience chip on its cert rows (both remain on Profile and the Exam tab); (5) Data & Progress opens as a short list: Back
+  up & restore (open), then Reading, Flashcards, Habits & sounds, Voice & speech and Reset progress, each folded into a `Disclosure` that
+  shows its current value (the panel went from 1,553 px to one screen); (6) the "Tap a highlighted term" hint shows on a
+  lesson's first page only, the Final Mock blurb is shorter, and the Profile level card's helper line shows only at level 1.
+  Measured at 390 px with the seeded learner: Home 1,521 to 1,470 px, Practice's controls 4 rows to 2, every per-track screen
+  lost a 34 px strip. Open ideas, not done: a focus mode for quiz questions and for lesson reading (the flashcard one is
+  `useFocusMode`, so it is a few lines to reuse), folding Home's "Your certs" list (it repeats Profile's My plan), and Path's
+  "continue" card, which repeats the first node below it.
 - [x] **IT Playground v2 (shared core, six more tools, IPv6, lesson links).** The Playground now has ten tools and
   75 guided scenarios (IP lab 12, VLAN 8, firewall 8, DHCP 8, DNS 8, STP 7, VPN 8, Azure NSG 8, certificates 8; the
   subnet calculator has no scenarios). Shared building blocks live in `src/js/04g_playground_core.jsx`

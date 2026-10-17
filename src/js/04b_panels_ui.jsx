@@ -361,7 +361,7 @@ function AboutLegalPanel({ onClose }) {
             <li>No accounts, no sign-up, and no personal information is collected by this app.</li>
             <li>Your progress (flashcard/quiz/exam results, streak, achievements) is stored either in this browser's local storage, on this device only, or — if you opened this inside a Claude artifact — synced through your own Claude account. It is never sent to a separate server run by this app.</li>
             <li>No cookies, no third-party analytics, and no ad tracking are used today. If that ever changes, this policy will be updated first, before it happens.</li>
-            <li>You can download a full copy of your progress, or clear it, anytime from the ⚙ Data & Progress panel.</li>
+            <li>You can download a full copy of your progress, or clear it, anytime from Profile › Settings &amp; data.</li>
             <li>If this app ever adds its own accounts or its own cloud sync, this policy will be rewritten to describe exactly what's collected, how long it's kept, and how to delete it.</li>
           </ul>
         </AboutSection>

@@ -454,7 +454,7 @@
       "cat": "models",
       "front": "Claude Opus 5.5",
       "back": "The current model Anthropic suggests starting with for most workloads. It is built for long-running agentic coding and knowledge work, with adaptive thinking always on and medium as its default effort.",
-      "detail": "It supports fast mode as a research preview. Its prompt-cache reads are discounted more steeply than most earlier models."
+      "detail": "It supports fast mode, now without a beta header or access request. Its prompt-cache reads are discounted more steeply than most earlier models."
     },
     {
       "id": "f40",
@@ -481,7 +481,7 @@
       "id": "f43",
       "cat": "models",
       "front": "Fast mode",
-      "back": "A research-preview option on selected Opus models that raises output speed, by up to about 2.5 times, at premium pricing. It lowers generation latency without changing which model answers.",
+      "back": "An option on selected Opus models, open on Opus 5.5 without an access request, that raises output speed, by up to about 2.5 times, at premium pricing. It lowers generation latency without changing which model answers.",
       "detail": "Switching speed settings invalidates cached system and message prefixes, and it is not available inside batches."
     },
     {
@@ -2506,7 +2506,7 @@
       "id": "q29",
       "cat": "models",
       "type": "mc",
-      "question": "Analysts query a research assistant that carries a 60,000-token reference prefix. In a typical session, nearly every question follows a pause of 8 to 20 minutes while the analyst reads and thinks. Which caching setup is most cost-effective?",
+      "question": "Analysts query a research assistant, built on Claude Opus 5.5, that carries a 60,000-token reference prefix. In a typical session, nearly every question follows a pause of 8 to 20 minutes while the analyst reads and thinks. Which caching setup is most cost-effective?",
       "options": [
         "The default five-minute lifetime, because every cache read refreshes the entry at no charge",
         "The one-hour cache lifetime on the prefix, written once and reused across the session's pauses",
@@ -2514,7 +2514,7 @@
         "No caching, because pauses of this length make cache reads unlikely to be worth the write premium"
       ],
       "correct": 1,
-      "explanation": "Gaps longer than five minutes expire the default cache, so each question would pay the write price again. The one-hour lifetime costs more to write but survives the pauses, so most turns read the prefix cheaply. Keep-alive requests were measured to cost more than the one-hour option when pauses come before nearly every turn and run long, and skipping caching gives up the discount entirely."
+      "explanation": "Gaps longer than five minutes expire the default cache, so each question would pay the write price again. The one-hour lifetime costs more to write but survives the pauses, so most turns read the prefix cheaply. On Claude Opus 5.5 and Claude Sonnet 5.5, keep-alive requests were measured to cost more than the one-hour option when pauses come before nearly every turn and run long, and skipping caching gives up the discount entirely."
     },
     {
       "id": "q30",
@@ -6186,7 +6186,7 @@
         "MCP and plugins: allowedMcpServers, deniedMcpServers and allowManagedMcpServersOnly; managed-mcp.json gives exclusive control but is a file, not deliverable through server-managed settings; strictKnownMarketplaces and blockedMarketplaces for plugin sources; strictPluginOnlyCustomization.",
         "Workflow habits: give Claude a verification target (tests, build, linter; a Stop hook to enforce it); plan mode for uncertain or multi-file work; keep CLAUDE.md short (/init to start); /clear between tasks and after two failed corrections; subagents for investigation; checkpoints do not track Bash changes.",
         "Automation and operations: claude -p with --allowedTools, a turn limit, --output-format json (and --json-schema), secrets in the pipeline store and --bare for repeatable CI; the GitHub Action takes the key as a secret plus claude_args. Debug by filtering logs first, giving the stack trace and reproduction, and asking for a failing test.",
-        "Adoption and visibility: champions (about 40 minutes a week, a 30-day playbook, weekly show-and-tell, pair on a first task). The analytics dashboard (claude.ai/analytics/claude-code) shows adoption, and with the GitHub app merged pull requests containing Claude-assisted code; it is conservative and unavailable with zero data retention. Cloud-provider usage needs OpenTelemetry or a gateway, and switching telemetry off stops dashboard data. Anthropic's cost guide cites roughly $13 per developer per active day; baseline your own in a pilot."
+        "Adoption and visibility: champions (about 40 minutes a week, a 30-day playbook, weekly show-and-tell, pair on a first task). The analytics dashboard (claude.ai/analytics/claude-code) shows adoption, and with the GitHub app merged pull requests containing Claude-assisted code; that count is conservative and unavailable with zero data retention. Cloud-provider usage needs OpenTelemetry or a gateway, and switching telemetry off stops dashboard data. Anthropic's cost guide cites roughly $13 per developer per active day; baseline your own in a pilot."
       ]
     },
     {

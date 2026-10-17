@@ -103,7 +103,7 @@ function ProfileHeader({ profile, level, totalActions, firstDay, onSave }) {
           <span className="mono" style={{ color: COLOR.muted, fontWeight: 500 }}>{level.into} / {level.span} to level {level.level + 1}</span>
         </div>
         <TickBar value={level.into} total={level.span} ticks={10} hue={color} label={`${Math.round((level.into / level.span) * 100)}% to the next level`} />
-        <div style={{ fontSize: '11.5px', color: COLOR.muted, marginTop: '4px' }}>{totalActions} study actions so far: every answer, card, game and step counts.</div>
+        {level.level === 1 && <div style={{ fontSize: '11.5px', color: COLOR.muted, marginTop: '4px' }}>{totalActions} study actions so far: every answer, card, game and step counts.</div>}
       </div>
     </div>
   );

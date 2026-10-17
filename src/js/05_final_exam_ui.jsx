@@ -33,7 +33,7 @@ function ExamIntro({ track, config, readiness, onStart, onStartFinal }) {
           Final Mock — proctored-style
         </div>
         <div style={{ fontSize: '12px', color: COLOR.text, lineHeight: 1.55, marginBottom: '10px' }}>
-          Same questions and clock, stricter rules: each answer locks as you move on, no going back, no submitting early and nothing shown until the end. Scored pass/fail at the real pass mark, with a per-area breakdown.
+          Same questions and clock, stricter rules: answers lock as you move on, with no going back and no early submit. Results come only at the end, scored at the real pass mark with a per-area breakdown.
         </div>
         <button
           onClick={onStartFinal}

@@ -79,8 +79,7 @@ function AchievementsPanel({ achievements, streak, onClose }) {
 function CardDirectionSetting() {
   const { direction, setDirection } = React.useContext(CardPrefsContext);
   return (
-    <div style={{ marginTop: '14px', padding: '14px', borderRadius: 'var(--r-card)', background: COLOR.surface, border: `1px solid ${COLOR.border}` }}>
-      <div style={{ fontSize: '13.5px', fontWeight: 600, marginBottom: '4px' }}>Flashcards</div>
+    <Disclosure label="Flashcards" summary={direction === 'term' ? 'term first' : 'definition first'} style={{ marginBottom: '10px' }}>
       <div style={{ fontSize: '11.5px', color: COLOR.muted, lineHeight: 1.4, marginBottom: '10px' }}>
         Which side comes first. Seeing the definition and recalling the term is the harder, stronger way to learn it. Saved on this device only.
       </div>
@@ -89,7 +88,7 @@ function CardDirectionSetting() {
         value={direction}
         onChange={setDirection}
       />
-    </div>
+    </Disclosure>
   );
 }
 
@@ -138,25 +137,62 @@ function DataPanel({
           <button onClick={onClose} className="btn-flat" style={{ color: COLOR.muted, fontSize: '15px', padding: '4px' }}>✕</button>
         </div>
 
-        <div style={{ marginTop: '14px', padding: '14px', borderRadius: 'var(--r-card)', background: COLOR.surface, border: `1px solid ${COLOR.border}` }}>
-          <div style={{ fontSize: '13.5px', fontWeight: 600, marginBottom: '4px' }}>Reading</div>
-          <label style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '12px', marginTop: '8px', fontSize: '12.5px' }}>
+        {/* Each group of settings folds to one line that shows its current value, so the panel opens as a short list
+            (back up first, since that is the one people come here for). */}
+        <div style={{ marginTop: '12px' }}>
+          <Disclosure label="Back up &amp; restore" summary="export or import" defaultOpen style={{ marginBottom: '10px' }}>
+          <div style={{ fontSize: '11.5px', color: COLOR.muted, marginBottom: '10px', lineHeight: 1.4 }}>
+            Export every track's quiz/exam history, flashcard mastery, streak and achievements as a JSON file: a backup, or a way to move to a new device. Importing replaces all progress saved in this browser.
+          </div>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="application/json"
+            style={{ display: 'none' }}
+            onChange={(e) => {
+              const file = e.target.files && e.target.files[0];
+              if (file) onImportFile(file);
+              e.target.value = '';
+            }}
+          />
+          <div style={{ display: 'flex', gap: '8px' }}>
+            <button
+              onClick={onExport}
+              style={{ flex: 1, padding: '10px', borderRadius: 'var(--r-ctl)', background: COLOR.primary, color: COLOR.onAccent, fontSize: '13px', fontWeight: 600 }}
+            >
+              ⬇ Export progress
+            </button>
+            <button
+              onClick={() => fileInputRef.current && fileInputRef.current.click()}
+              style={{ flex: 1, padding: '10px', borderRadius: 'var(--r-ctl)', background: 'transparent', border: `1px solid ${COLOR.primary}`, color: COLOR.primary, fontSize: '13px', fontWeight: 600 }}
+            >
+              ⬆ Import progress
+            </button>
+          </div>
+          {importMessage && (
+            <div style={{ marginTop: '8px', fontSize: '11.5px', color: importMessage.ok ? COLOR.success : COLOR.red, lineHeight: 1.4 }}>
+              {importMessage.text}
+            </div>
+          )}
+          </Disclosure>
+
+          <Disclosure label="Reading" summary={dyslexicFont ? 'OpenDyslexic on' : 'OpenDyslexic off'} style={{ marginBottom: '10px' }}>
+          <label style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '12px', marginTop: 0, fontSize: '12.5px' }}>
             <span>
               OpenDyslexic font
-              <span style={{ display: 'block', fontSize: '11.5px', color: COLOR.muted, lineHeight: 1.4 }}>A typeface with weighted letter bottoms, designed to make letters easier to tell apart. Applies to the whole app; saved on this device only.</span>
+              <span style={{ display: 'block', fontSize: '11.5px', color: COLOR.muted, lineHeight: 1.4 }}>A typeface designed to make letters easier to tell apart. Applies to the whole app; saved on this device only.</span>
             </span>
             <input type="checkbox" checked={!!dyslexicFont} onChange={(e) => onSetDyslexicFont(e.target.checked)} style={{ width: '20px', height: '20px', flexShrink: 0, marginTop: '2px' }} aria-label="OpenDyslexic font" />
           </label>
           <div style={{ marginTop: '10px', padding: '10px 12px', borderRadius: 'var(--r-ctl)', background: COLOR.surfaceRaised, fontSize: '14px', lineHeight: 1.5 }}>
             Preview: Azure role-based access control (RBAC) assigns permissions at a scope.
           </div>
-        </div>
+          </Disclosure>
 
-        <CardDirectionSetting />
+          <CardDirectionSetting />
 
-        <div style={{ marginTop: '14px', padding: '14px', borderRadius: 'var(--r-card)', background: COLOR.surface, border: `1px solid ${COLOR.border}` }}>
-          <div style={{ fontSize: '13.5px', fontWeight: 600, marginBottom: '4px' }}>Habits &amp; sounds</div>
-          <label style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '12px', marginTop: '8px', fontSize: '12.5px' }}>
+          <Disclosure label="Habits &amp; sounds" summary={`${(soundOn || answerSoundOn) ? 'sounds on' : 'sounds off'} · remind ${String((REVIEW_REMINDER_OPTIONS.find((o) => o.days === reviewReminderDays) || { label: 'off' }).label).toLowerCase()}`} style={{ marginBottom: '10px' }}>
+          <label style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '12px', marginTop: 0, fontSize: '12.5px' }}>
             <span>
               Lock later units
               <span style={{ display: 'block', fontSize: '11.5px', color: COLOR.muted, lineHeight: 1.4 }}>A unit opens once the one before it is finished, or when you tap "Unlock anyway". Units you've started never lock.</span>
@@ -214,11 +250,10 @@ function DataPanel({
               Test answer sounds
             </button>
           </div>
-        </div>
+          </Disclosure>
 
-        {speechSupported && (
-          <div style={{ marginTop: '14px', padding: '14px', borderRadius: 'var(--r-card)', background: COLOR.surface, border: `1px solid ${COLOR.border}` }}>
-            <div style={{ fontSize: '13.5px', fontWeight: 600, marginBottom: '4px' }}>Voice &amp; speech</div>
+          {speechSupported && (
+            <Disclosure label="Voice &amp; speech" summary={`${ttsRate.toFixed(2)}× · ${ttsVoiceURI ? 'chosen voice' : 'auto voice'}`} style={{ marginBottom: '10px' }}>
             <div style={{ fontSize: '11.5px', color: COLOR.muted, marginBottom: '10px', lineHeight: 1.4 }}>
               Controls every 🔊 Listen button, plus Verbal Quiz mode. Saved on this device only.
             </div>
@@ -257,48 +292,10 @@ function DataPanel({
             >
               {isTestSpeaking ? '⏸ Stop' : '▶ Test voice'}
             </button>
-          </div>
-        )}
-
-        <div style={{ marginTop: '14px', padding: '14px', borderRadius: 'var(--r-card)', background: COLOR.surface, border: `1px solid ${COLOR.border}` }}>
-          <div style={{ fontSize: '13.5px', fontWeight: 600, marginBottom: '4px' }}>Back up &amp; restore</div>
-          <div style={{ fontSize: '11.5px', color: COLOR.muted, marginBottom: '10px', lineHeight: 1.4 }}>
-            Export every track's quiz/exam history, flashcard mastery, streak and achievements as a JSON file: a backup, or a way to move to a new device. Importing replaces all progress saved in this browser.
-          </div>
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="application/json"
-            style={{ display: 'none' }}
-            onChange={(e) => {
-              const file = e.target.files && e.target.files[0];
-              if (file) onImportFile(file);
-              e.target.value = '';
-            }}
-          />
-          <div style={{ display: 'flex', gap: '8px' }}>
-            <button
-              onClick={onExport}
-              style={{ flex: 1, padding: '10px', borderRadius: 'var(--r-ctl)', background: COLOR.primary, color: COLOR.onAccent, fontSize: '13px', fontWeight: 600 }}
-            >
-              ⬇ Export progress
-            </button>
-            <button
-              onClick={() => fileInputRef.current && fileInputRef.current.click()}
-              style={{ flex: 1, padding: '10px', borderRadius: 'var(--r-ctl)', background: 'transparent', border: `1px solid ${COLOR.primary}`, color: COLOR.primary, fontSize: '13px', fontWeight: 600 }}
-            >
-              ⬆ Import progress
-            </button>
-          </div>
-          {importMessage && (
-            <div style={{ marginTop: '8px', fontSize: '11.5px', color: importMessage.ok ? COLOR.success : COLOR.red, lineHeight: 1.4 }}>
-              {importMessage.text}
-            </div>
+            </Disclosure>
           )}
-        </div>
 
-        <div style={{ marginTop: '12px', padding: '14px', borderRadius: 'var(--r-card)', background: COLOR.surface, border: `1px solid ${COLOR.border}` }}>
-          <div style={{ fontSize: '13.5px', fontWeight: 600, marginBottom: '4px' }}>Reset progress</div>
+          <Disclosure label="Reset progress" summary={`${trackLabel} only`} style={{ marginBottom: '10px' }}>
           {!confirmingReset ? (
             <>
               <div style={{ fontSize: '11.5px', color: COLOR.muted, marginBottom: '10px', lineHeight: 1.4 }}>
@@ -320,6 +317,7 @@ function DataPanel({
               </div>
             </div>
           )}
+          </Disclosure>
         </div>
       </div>
     </div>
@@ -632,7 +630,6 @@ function CertPathHomeSection({ pathOrder, results, certPlan, studyingKey, pathPr
               <div style={{ fontSize: '11.5px', color: COLOR.muted, marginTop: '1px' }}>
                 {t.subtitle}{prog && prog.total ? ` · path ${prog.pct}%` : ''}
               </div>
-              <ExperienceChip trackKey={t.key} style={{ marginTop: '3px' }} />
             </div>
             <div style={{ flexShrink: 0, textAlign: 'right', whiteSpace: 'nowrap' }}>
               {scheduledDate && (
@@ -670,7 +667,6 @@ function CertPathHomeSection({ pathOrder, results, certPlan, studyingKey, pathPr
 // is reachable from every mode including this one.
 function HomeView({ tracks, results, seenLog, stats, certPlan, speech, srs, makePathApi, onSetHomePathMode, onSetHomePathOrder, onReviewStarted, onResume, onSelectTrack, onAddToPath, onOpenAbout, onOpenGlossary, onOpenPlayground, onOpenWeak, onSetGoalTarget, onAnswerDailyQuestion, onRevealDailyVocab, footerNote }) {
   const masteries = tracks.map((t) => ({ track: t, pct: trackMastery(t.key, results) }));
-  const overallAvg = masteries.length ? Math.round(masteries.reduce((s, m) => s + m.pct, 0) / masteries.length) : 0;
   const lastVisited = stats.lastVisited;
   const resumeTrack = lastVisited ? tracks.find((t) => t.key === lastVisited.track) : null;
   // For a Path resume, name the exact step the button will open.
@@ -821,7 +817,7 @@ function HomeView({ tracks, results, seenLog, stats, certPlan, speech, srs, make
 
   return (
     <div>
-      <TodayHero dailyGoal={stats.dailyGoal} onSetTarget={onSetGoalTarget} streak={stats.streak} readiness={readiness} focusLabel={focusLabel} note={`${overallAvg}% average mastery across your tracks`} />
+      <TodayHero dailyGoal={stats.dailyGoal} onSetTarget={onSetGoalTarget} streak={stats.streak} readiness={readiness} focusLabel={focusLabel} />
 
       {hasHomePath && (
         <HomeStudyPath

@@ -71,7 +71,7 @@ function PathReadStep({ unit, flashcardsData, speech, onDone }) {
           <SpeakButton id={'path-read-' + lesson.id + '-' + page} text={pages[page].join(' ')} speakingId={speech.speakingId} onSpeak={speech.onSpeak} />
         )}
       </div>
-      <div style={{ fontSize: '11px', color: COLOR.muted, marginBottom: '8px' }}>Tap a highlighted term for its definition.</div>
+      {page === 0 && <div style={{ fontSize: '11px', color: COLOR.muted, marginBottom: '8px' }}>Tap a highlighted term for its definition.</div>}
       {pages[page].map((p, i) => (
         <p key={i} style={{ fontSize: '14px', lineHeight: 1.65, color: COLOR.text, marginBottom: '10px' }}>
           {highlightTerms(p, lesson.keyTerms, flashcardsData, activeTermKey, setActiveTermKey, 'pp' + i)}

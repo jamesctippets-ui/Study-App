@@ -72,9 +72,10 @@ function QuizSetup({ length, setLength, types, toggleType, onReroll, poolSize, m
       {missedCount > 0 && (
         <button
           onClick={onReviewMissed}
-          style={{ width: '100%', marginTop: '8px', padding: '7px 10px', borderRadius: 'var(--r-ctl)', border: `1px solid ${COLOR.red}`, background: 'color-mix(in srgb, var(--color-red) 8%, transparent)', color: COLOR.red, fontSize: '12.5px', fontWeight: 600 }}
+          className="btn-flat"
+          style={{ display: 'block', marginTop: '2px', padding: '6px 2px', background: 'transparent', border: 'none', color: COLOR.red, fontSize: '12px', fontWeight: 600, textAlign: 'left' }}
         >
-          Review {missedCount} missed question{missedCount === 1 ? '' : 's'}
+          Review {missedCount} missed question{missedCount === 1 ? '' : 's'} ›
         </button>
       )}
     </div>
@@ -688,7 +689,7 @@ const PRACTICE_TOOLS = [
   { key: 'verbal', group: 'Hands-free', label: 'Verbal', desc: 'Audio-only quiz for driving or walking' },
 ];
 
-function PracticeToolPicker({ quizView, available, onSelect }) {
+function PracticeToolPicker({ quizView, available, onSelect, trailing }) {
   const [open, setOpen] = useState(false);
   useEscapeToClose(() => setOpen(false));
   const tools = PRACTICE_TOOLS.filter((t) => !t.requires || available[t.requires]);
@@ -701,20 +702,27 @@ function PracticeToolPicker({ quizView, available, onSelect }) {
   });
   return (
     <div style={{ marginBottom: '10px', position: 'relative' }}>
+      {/* With a `trailing` control (the category filter) the picker shrinks to its label and shares the row. */}
+      <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
       <button
         onClick={() => setOpen((o) => !o)}
+        aria-label={`Practice tool: ${current.label}`}
+        aria-expanded={open}
         style={{
-          width: '100%', textAlign: 'left', padding: '9px 14px', borderRadius: 'var(--r-card)',
+          width: trailing ? 'auto' : '100%', flex: trailing ? '0 0 auto' : undefined, height: trailing ? '38px' : undefined,
+          textAlign: 'left', padding: trailing ? '0 12px' : '9px 14px', borderRadius: trailing ? 'var(--r-ctl)' : 'var(--r-card)',
           border: `1px solid ${COLOR.border}`, background: COLOR.surface, color: COLOR.text,
-          display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px',
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: trailing ? '8px' : '10px',
         }}
       >
-        <span style={{ minWidth: 0, display: 'flex', alignItems: 'baseline', gap: '10px' }} title={current.desc}>
-          <span style={{ fontSize: '10.5px', color: COLOR.muted, textTransform: 'uppercase', flexShrink: 0 }}>Practice tool</span>
-          <span style={{ fontSize: '14.5px', fontWeight: 600 }}>{current.label}</span>
+        <span style={{ minWidth: 0, display: 'flex', alignItems: 'baseline', gap: trailing ? '8px' : '10px' }} title={current.desc}>
+          <span style={{ fontSize: '10.5px', color: COLOR.muted, textTransform: 'uppercase', flexShrink: 0 }}>{trailing ? 'Tool' : 'Practice tool'}</span>
+          <span style={{ fontSize: trailing ? '13px' : '14.5px', fontWeight: 600 }}>{current.label}</span>
         </span>
         <span style={{ fontSize: '12px', color: COLOR.muted, flexShrink: 0 }}>{open ? '▴' : '▾'}</span>
       </button>
+      {trailing}
+      </div>
       {open && (
         <div style={{ boxShadow: SHADOW.card, marginTop: '6px', background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderRadius: 'var(--r-card)', overflow: 'hidden' }}>
           {groups.map((g, gi) => (

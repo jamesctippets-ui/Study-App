@@ -1014,7 +1014,7 @@ function LessonDetail({ lesson, flashcardsData, questionsData, categories, onBac
             />
           )}
         </div>
-        <div style={{ fontSize: '11px', color: COLOR.muted, marginBottom: '8px' }}>Tap a highlighted term for its definition.</div>
+        {readingPage === 0 && <div style={{ fontSize: '11px', color: COLOR.muted, marginBottom: '8px' }}>Tap a highlighted term for its definition.</div>}
         {readingPages[readingPage].map((p, i) => (
           <p key={i} style={{ fontSize: '14px', lineHeight: 1.65, color: COLOR.text, marginBottom: '10px' }}>
             {highlightTerms(p, lesson.keyTerms, flashcardsData, activeTermKey, setActiveTermKey, 'p' + i)}
