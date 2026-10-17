@@ -1,17 +1,10 @@
 /* ---------------- shared UI: lesson & study views ---------------- */
 
-// The SM-2 quality scale flashcards are rated on — 1 (total blank) through
-// 5 (instant, no hesitation). A 3+ counts as a pass for both SRS growth and
-// the app's binary mastery signal (see ratingToOutcome in 03_helpers.js).
-const RATING_SCALE = [
-  { n: 1, label: 'Blank', color: COLOR.red },
-  { n: 2, label: 'Hard', color: COLOR.red },
-  { n: 3, label: 'OK', color: COLOR.gold },
-  { n: 4, label: 'Good', color: COLOR.success },
-  { n: 5, label: 'Easy', color: COLOR.success },
-];
+// Flashcards are rated with two buttons: "Got it" is recorded as CARD_GOT_IT (a 4) and
+// "Don't got it" as CARD_MISSED (a 1), both on the SM-2 scale (see 03_helpers.js). A
+// pass counts as correct for the app's binary mastery signal (ratingToOutcome).
 
-function FlashcardView({ card, flipped, setFlipped, onRate, index, total, categoryLabel, speakingId, onSpeak, speechSupported, flashcardsData }) {
+function FlashcardView({ card, flipped, setFlipped, onRate, index, total, categoryLabel, speakingId, onSpeak, speechSupported, flashcardsData, hideCategory }) {
   const { direction } = React.useContext(CardPrefsContext);
   const defFirst = direction !== 'term';
   const [activeTermKey, setActiveTermKey] = useState(null);
@@ -19,6 +12,7 @@ function FlashcardView({ card, flipped, setFlipped, onRate, index, total, catego
   useEffect(() => { setActiveTermKey(null); setHintShown(false); }, [card && card.id]);
   useEscapeToClose(() => setActiveTermKey(null));
   useClickOutsideToClose(!!activeTermKey, () => setActiveTermKey(null));
+  useFocusMode(!!card);
   const prompt = useMemo(() => (card ? flashcardPrompt(card) : null), [card]);
   if (!card) return null;
   const otherCards = flashcardsData && flashcardsData.filter((c) => c.id !== card.id);
@@ -29,15 +23,11 @@ function FlashcardView({ card, flipped, setFlipped, onRate, index, total, catego
   const accent = defFirst && !flipped ? COLOR.primary : COLOR.blue;
   return (
     <div>
-      <div className="flex justify-between items-center mb-2" style={{ fontSize: '10.5px', textTransform: 'uppercase', color: COLOR.muted }}>
-        <span>{categoryLabel}</span>
-        <span style={{ color: COLOR.text }}>{String(index + 1).padStart(2, '0')} / {String(total).padStart(2, '0')}</span>
+      <div className="flex items-center" style={{ gap: '8px', marginBottom: '8px' }}>
+        <span style={{ flex: 1, minWidth: 0, fontSize: '10.5px', textTransform: 'uppercase', color: COLOR.muted, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{hideCategory ? '' : categoryLabel}</span>
+        <span className="mono" style={{ fontSize: '11px', color: COLOR.text, flexShrink: 0 }}>{index + 1} / {total}</span>
+        {speechSupported && <SpeakButton id={'card-' + card.id} text={speakText} speakingId={speakingId} onSpeak={onSpeak} />}
       </div>
-      {speechSupported && (
-        <div style={{ textAlign: 'right', marginBottom: '6px' }}>
-          <SpeakButton id={'card-' + card.id} text={speakText} speakingId={speakingId} onSpeak={onSpeak} />
-        </div>
-      )}
       <div
         onClick={() => setFlipped((f) => !f)}
         style={{
@@ -62,6 +52,7 @@ function FlashcardView({ card, flipped, setFlipped, onRate, index, total, catego
             <div style={{ fontSize: flipped ? '15px' : '17px', lineHeight: 1.6, overflowWrap: 'anywhere' }}>
               {autoHighlightTerms(flipped ? card.back : prompt.text, otherCards, activeTermKey, setActiveTermKey, 2)}
             </div>
+            {!flipped && hintShown && <div className="mono" style={{ fontSize: '12px', color: COLOR.gold, marginTop: '12px' }}>Hint · {prompt.hint.text}</div>}
           </div>
         ) : (
           <div style={{ minHeight: '170px', display: 'flex', flexDirection: 'column', justifyContent: 'center', textAlign: 'center' }}>
@@ -73,51 +64,77 @@ function FlashcardView({ card, flipped, setFlipped, onRate, index, total, catego
           </div>
         )}
       </div>
-      {defFirst && !flipped && (
-        <div style={{ marginTop: '10px' }}>
-          {hintShown && <div className="mono" style={{ fontSize: '12px', color: COLOR.gold, marginBottom: '8px' }}>Hint · {prompt.hint.text}</div>}
-          <div style={{ display: 'flex', gap: '8px' }}>
-            <button
-              onClick={() => setHintShown(true)}
-              disabled={hintShown}
-              className="btn-flat"
-              style={{ padding: '10px 14px', borderRadius: 'var(--r-ctl)', border: `1px solid ${COLOR.border}`, background: 'transparent', color: hintShown ? COLOR.muted : COLOR.text, fontSize: '13px', fontWeight: 600, flexShrink: 0, opacity: hintShown ? 0.6 : 1 }}
-            >
-              Show a hint
-            </button>
-            <button
-              onClick={() => setFlipped(true)}
-              style={{ flex: 1, padding: '10px 14px', borderRadius: 'var(--r-ctl)', border: 'none', background: COLOR.primary, color: COLOR.onAccent, fontSize: '13px', fontWeight: 700 }}
-            >
-              Show the term
-            </button>
-          </div>
+      {/* The reveal and rating buttons are pinned to the bottom of the screen, where the tab bar normally sits
+          (hidden in focus mode), so they stay under the thumb whether or not the card has been flipped. */}
+      <div style={{ position: 'fixed', left: 0, right: 0, bottom: 0, zIndex: 40, background: COLOR.navBar, borderTop: `1px solid ${COLOR.border}`, paddingBottom: 'env(safe-area-inset-bottom)' }}>
+        <div className="max-w-md mx-auto" style={{ display: 'flex', gap: '10px', padding: '10px 16px' }}>
+          {!flipped ? (
+            <React.Fragment>
+              {defFirst && (
+                <button
+                  onClick={() => setHintShown(true)}
+                  disabled={hintShown}
+                  className="btn-flat"
+                  style={{ padding: '14px 14px', borderRadius: 'var(--r-ctl)', border: `1px solid ${COLOR.border}`, background: 'transparent', color: hintShown ? COLOR.muted : COLOR.text, fontSize: '13px', fontWeight: 600, flexShrink: 0, opacity: hintShown ? 0.6 : 1 }}
+                >
+                  Show a hint
+                </button>
+              )}
+              <button
+                onClick={() => setFlipped(true)}
+                style={{ flex: 1, padding: '14px 14px', borderRadius: 'var(--r-ctl)', border: 'none', background: COLOR.primary, color: COLOR.onAccent, fontSize: '14px', fontWeight: 700 }}
+              >
+                {defFirst ? 'Show the term' : 'Show the definition'}
+              </button>
+            </React.Fragment>
+          ) : (
+            <React.Fragment>
+              <button
+                onClick={() => onRate(CARD_MISSED)}
+                style={{ flex: 1, padding: '14px 10px', borderRadius: 'var(--r-ctl)', border: `1px solid ${COLOR.red}`, background: 'transparent', color: COLOR.red, fontSize: '14px', fontWeight: 700 }}
+              >
+                Don't got it
+              </button>
+              <button
+                onClick={() => onRate(CARD_GOT_IT)}
+                style={{ flex: 1, padding: '14px 10px', borderRadius: 'var(--r-ctl)', border: 'none', background: COLOR.success, color: COLOR.onAccent, fontSize: '14px', fontWeight: 700 }}
+              >
+                Got it
+              </button>
+            </React.Fragment>
+          )}
         </div>
+      </div>
+    </div>
+  );
+}
+
+// The one slim row above a flashcard deck in focus mode: a way out, the category
+// filter and the tough-terms switch. Everything else on the page steps aside.
+function CardsFocusBar({ onExit, categories, activeCat, onChangeCat, masteryByCategory, toughCount, toughDeck, onToggleTough }) {
+  return (
+    <div className="flex items-center" style={{ gap: '8px', marginBottom: '12px' }}>
+      <button
+        onClick={onExit}
+        className="btn-flat"
+        title="Leave flashcards"
+        aria-label="Leave flashcards"
+        style={{ width: '38px', height: '38px', flexShrink: 0, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', borderRadius: 'var(--r-ctl)', border: `1px solid ${COLOR.border}`, background: COLOR.surface, color: COLOR.muted, padding: 0 }}
+      >
+        <IconClose size={18} />
+      </button>
+      <CategoryFilterSelect compact categories={categories} activeCat={activeCat} onChange={onChangeCat} masteryByCategory={masteryByCategory} />
+      {(toughCount > 0 || toughDeck) && (
+        <button
+          onClick={onToggleTough}
+          aria-pressed={!!toughDeck}
+          title={toughDeck ? 'Back to all cards' : 'Study the cards you marked "Don\'t got it"'}
+          className="btn-flat"
+          style={{ flexShrink: 0, height: '38px', padding: '0 10px', borderRadius: 'var(--r-ctl)', fontSize: '12px', fontWeight: 700, border: `1px solid ${toughDeck ? COLOR.gold : COLOR.border}`, background: toughDeck ? tint(COLOR.gold, 14) : COLOR.surface, color: toughDeck ? ink(COLOR.gold) : COLOR.muted }}
+        >
+          Tough · {toughCount}
+        </button>
       )}
-      <div style={{ fontSize: '11px', color: COLOR.muted, textAlign: 'center', marginTop: '10px' }}>
-        {defFirst
-          ? (flipped ? 'Tap the card to hide the term again' : 'Tap the card to reveal the term')
-          : (flipped ? 'Tap to see the term again' : 'Tap the card to reveal the definition')}
-      </div>
-      <div style={{ fontSize: '11.5px', color: COLOR.muted, textAlign: 'center', marginBottom: '6px' }}>
-        {defFirst && !flipped ? 'Think of the term, then check. How well did you know it?' : 'How well did you know it?'}
-      </div>
-      <div className="flex gap-1">
-        {RATING_SCALE.map(({ n, label, color }) => (
-          <button
-            key={n}
-            onClick={() => onRate(n)}
-            className="flex-1"
-            style={{
-              padding: '9px 2px', borderRadius: 'var(--r-ctl)', border: `1px solid ${color}`, color, background: 'transparent',
-              fontSize: '11px', fontWeight: 600, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2px',
-            }}
-          >
-            <span style={{ fontSize: '14px', fontWeight: 700 }}>{n}</span>
-            <span>{label}</span>
-          </button>
-        ))}
-      </div>
     </div>
   );
 }

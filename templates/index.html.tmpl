@@ -130,6 +130,10 @@
   :root[data-font="dyslexic"] { --font-body: 'OpenDyslexic', 'Inter', system-ui, sans-serif; --font-mono: 'OpenDyslexic', 'Inter', system-ui, sans-serif; }
   body, button, textarea, select, input { font-family: var(--font-body); }
   body { font-feature-settings: 'cv11', 'ss03'; -webkit-font-smoothing: antialiased; }
+  /* Focus mode (useFocusMode in 00_preamble.js): while a flashcard deck is open, the top bar and bottom tabs
+     step aside and the page gives its space back to the card. */
+  body[data-focus] [data-chrome] { display: none !important; }
+  body[data-focus] [data-chrome-pad] { padding-top: 14px !important; padding-bottom: calc(96px + env(safe-area-inset-bottom)) !important; }
   .itil-display { font-family: var(--font-body); font-weight: 700 !important; letter-spacing: -0.015em; }
   /* The Console look: every uppercase micro-label in the app is a mono label (set in code as
      textTransform: 'uppercase'), and .mono marks numbers and codes. */

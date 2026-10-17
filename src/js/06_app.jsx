@@ -1325,12 +1325,14 @@ function CertStudyApp() {
 
   const currentCard = filteredFlashcards[fIndex];
   const currentQ = quizSession[sessionIndex];
+  // Focus mode: with a card on screen, Reference > Cards drops everything but the deck itself.
+  const cardsFocus = mode === 'learn' && learnView === 'cards' && !!currentCard;
 
-  // `quality` is the 1-5 confidence rating FlashcardView collects. SRS
-  // scheduling uses the raw rating (real SM-2 quality scale); mastery %
-  // stays on the binary signal the rest of the app already assumes, via
-  // ratingToOutcome's 3+-counts-as-correct rule — see its comment in
-  // 03_helpers.js for why that seam exists.
+  // `quality` is the rating FlashcardView collects: CARD_GOT_IT (4) or
+  // CARD_MISSED (1), both on the SM-2 scale. SRS scheduling uses the raw
+  // rating; mastery % stays on the binary signal the rest of the app
+  // already assumes, via ratingToOutcome's 3+-counts-as-correct rule —
+  // see its comment in 03_helpers.js for why that seam exists.
   const nextCard = (quality) => {
     if (currentCard) {
       recordResult(currentCard.id, ratingToOutcome(quality));
@@ -1759,7 +1761,7 @@ function CertStudyApp() {
           onSetReviewReminder={setReviewReminderDays}
         />
       )}
-      <div style={{ background: `color-mix(in srgb, ${modeHue(mode)} 9%, ${COLOR.navBar})`, borderBottom: `1px solid color-mix(in srgb, ${modeHue(mode)} 45%, ${COLOR.border})`, position: 'sticky', top: 0, zIndex: 30, transition: 'background-color 0.2s ease' }}>
+      <div data-chrome="top" style={{ background: `color-mix(in srgb, ${modeHue(mode)} 9%, ${COLOR.navBar})`, borderBottom: `1px solid color-mix(in srgb, ${modeHue(mode)} 45%, ${COLOR.border})`, position: 'sticky', top: 0, zIndex: 30, transition: 'background-color 0.2s ease' }}>
         <div className="max-w-md mx-auto px-4 flex items-center" style={{ height: `${APP_HEADER_HEIGHT}px`, gap: '8px' }}>
           <button
             onClick={() => setShowCertPath(true)}
@@ -1816,7 +1818,7 @@ function CertStudyApp() {
           </div>
         </div>
       </div>
-      <div className="max-w-md mx-auto px-4 py-5" style={{ paddingBottom: `calc(${TAB_BAR_HEIGHT + 24}px + env(safe-area-inset-bottom))` }}>
+      <div className="max-w-md mx-auto px-4 py-5" data-chrome-pad="1" style={{ paddingBottom: `calc(${TAB_BAR_HEIGHT + 24}px + env(safe-area-inset-bottom))` }}>
         {saveError ? (
           <div style={{ fontSize: '11.5px', color: COLOR.red, marginBottom: '12px', padding: '8px 10px', borderRadius: 'var(--r-ctl)', border: `1px solid ${COLOR.red}`, background: 'color-mix(in srgb, var(--color-red) 10%, transparent)' }}>
             Your last save didn't go through — your browser's storage may be full. Try Data &amp; Progress → Export to back up what you have, then free up some space.
@@ -1878,7 +1880,7 @@ function CertStudyApp() {
           />
         ) : (
         <React.Fragment>
-        {mode === 'learn' && (
+        {mode === 'learn' && !cardsFocus && (
           <SegmentedControl
             options={[{ key: 'cards', label: 'Cards' }, { key: 'study', label: 'Study' }, { key: 'sheet', label: 'Sheet' }]}
             value={learnView}
@@ -1901,7 +1903,7 @@ function CertStudyApp() {
           />
         )}
 
-        {(mode === 'quiz' || (mode === 'learn' && learnView !== 'sheet' && (learnView !== 'study' || !DATA[activeTrack].lessons))) && (
+        {!cardsFocus && (mode === 'quiz' || (mode === 'learn' && learnView !== 'sheet' && (learnView !== 'study' || !DATA[activeTrack].lessons))) && (
           <CategoryFilterSelect
             categories={categories}
             activeCat={activeCat}
@@ -1910,38 +1912,26 @@ function CertStudyApp() {
           />
         )}
 
-        {mode === 'learn' && learnView === 'cards' && (toughCount > 0 || cardDeck === 'tough') && (
-          <div className="flex gap-1 mb-3" style={{ background: COLOR.bg, padding: '3px', borderRadius: 'var(--r-ctl)', border: `1px solid ${COLOR.border}` }}>
-            {[['all', 'All cards'], ['tough', `Tough terms (${cardDeck === 'tough' ? toughIds.length : toughCount})`]].map(([key, label]) => (
-              <button
-                key={key}
-                onClick={() => openCardDeck(key)}
-                className="flex-1 btn-flat"
-                style={{ padding: '6px 2px', borderRadius: 'var(--r-ctl)', fontSize: '11.5px', fontWeight: 600, background: cardDeck === key ? COLOR.surfaceRaised : 'transparent', color: cardDeck === key ? COLOR.text : COLOR.muted }}
-              >
-                {label}
-              </button>
-            ))}
-          </div>
-        )}
-        {mode === 'learn' && learnView === 'cards' && cardDeck === 'all' && Object.keys(srs[activeTrack] || {}).length > 0 && (
-          <div style={{ fontSize: '11.5px', color: COLOR.muted, marginBottom: '8px', textAlign: 'center' }}>
-            Cards you're overdue to review come first.
-          </div>
-        )}
-        {mode === 'learn' && learnView === 'cards' && cardDeck === 'tough' && (
-          <div style={{ fontSize: '11.5px', color: COLOR.muted, marginBottom: '8px', textAlign: 'center' }}>
-            Cards you last rated OK or lower, hardest first. Rate one Good or Easy and it leaves this deck.
-          </div>
-        )}
         {mode === 'learn' && learnView === 'cards' && cardDeck === 'tough' && filteredFlashcards.length === 0 && (
           <div style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderRadius: 'var(--r-card)', padding: '22px 16px', textAlign: 'center' }}>
             <div className="itil-display" style={{ fontSize: '17px', fontWeight: 600, marginBottom: '6px' }}>Tough terms cleared</div>
             <div style={{ fontSize: '13px', color: COLOR.muted, lineHeight: 1.5, marginBottom: '12px' }}>
-              {activeCat === 'all' ? 'Nothing left in this deck.' : 'No tough terms in this category.'} Cards show up here whenever you rate them OK or lower.
+              {activeCat === 'all' ? 'Nothing left in this deck.' : 'No tough terms in this category.'} Cards land here when you mark them &ldquo;Don't got it&rdquo;.
             </div>
             <button onClick={() => openCardDeck('all')} className="btn-flat" style={{ padding: '8px 14px', borderRadius: 'var(--r-ctl)', fontSize: '12px', fontWeight: 600, border: `1px solid ${COLOR.border}`, color: COLOR.text }}>Back to all cards</button>
           </div>
+        )}
+        {cardsFocus && (
+          <CardsFocusBar
+            onExit={() => setLearnView('study')}
+            categories={categories}
+            activeCat={activeCat}
+            onChangeCat={setActiveCat}
+            masteryByCategory={masteryByCategory}
+            toughCount={cardDeck === 'tough' ? toughIds.length : toughCount}
+            toughDeck={cardDeck === 'tough'}
+            onToggleTough={() => openCardDeck(cardDeck === 'tough' ? 'all' : 'tough')}
+          />
         )}
         {mode === 'learn' && learnView === 'cards' && !(cardDeck === 'tough' && filteredFlashcards.length === 0) && (
           <FlashcardView
@@ -1956,6 +1946,7 @@ function CertStudyApp() {
             onSpeak={speak}
             speechSupported={speechSupported}
             flashcardsData={flashcardsData}
+            hideCategory={activeCat !== 'all'}
           />
         )}
 
@@ -2282,7 +2273,7 @@ function CertStudyApp() {
           )
         )}
 
-        <div className="mt-6">
+        <div className="mt-6" data-chrome="mastery">
           <button
             onClick={() => setShowMasteryDetail((v) => !v)}
             aria-expanded={showMasteryDetail}

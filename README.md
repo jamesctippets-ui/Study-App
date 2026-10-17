@@ -10,18 +10,21 @@ The bottom bar has Home and Profile plus four top-level tabs per track: **Path**
 through the track — see below), **Practice** (every quiz and game, picked
 from one grouped dropdown), **Reference** (the study material), and
 **Exam**. Reference holds three sub-views — Cards (flashcards, ordered by a real SM-2 spaced-repetition
-schedule and rated on the same 1-5 confidence scale SM-2 was originally
-designed around — 1 "Blank" through 5 "Easy" — rather than a binary
-right/wrong; a 3+ resurfaces the card later by a growing interval, under
-3 resets it sooner. The order is computed fresh each time you enter a
-category/track rather than reshuffling mid-session. **Cards show the definition first** and ask you to name
+schedule and rated with two buttons, **Got it** and **Don't got it** — recorded
+on the SM-2 scale as a 4 and a 1, so a Got it resurfaces the card later by a growing
+interval and a Don't got it resets it sooner. The order is computed fresh each time you enter a
+category/track rather than reshuffling mid-session. **Flashcards open in a focus mode**: the top bar, the bottom
+tabs, the Cards/Study/Sheet switch and the mastery strip step aside, leaving one slim row (a ✕ to leave, the
+category filter and a Tough switch), the card, and the reveal and rating buttons pinned to the bottom of the
+screen where the tab bar normally sits; the Path's flashcard steps and Home's Tough terms review use the same
+focus mode. **Cards show the definition first** and ask you to name
 the term: the term is blanked out wherever the definition spells it (and its bracketed acronym), a hint
 button gives the word count and first letter, and "Show the term" reveals the answer before you rate it. A
 per-device setting in Data & Progress switches back to term-first; Home's Vocab of the Day follows the same
 direction (the blanking logic is `flashcardPrompt` in `03_helpers.js`, checked against all 4,430 cards by
-`tools/check_cards.js`); once any card has been rated 3 or lower a
-"Tough terms" deck appears beside All cards — the cards you last rated OK or below, hardest first,
-where a 4 or 5 graduates a card out — and the Path map links to it too) and Study
+`tools/check_cards.js`); once any card has been marked Don't got it a
+"Tough" switch appears in the focus row — a deck of the cards you last marked Don't got it (or, in older
+progress, rated 3 or lower), hardest first, where a Got it graduates a card out — and the Path map links to it too) and Study
 (for tracks without a course, a flashcard list paginated one category/section
 at a time — Previous/Next section controls instead of one long scroll; for
 AZ-900/AZ-104, a full mini-course per topic: reading with tappable key terms,
@@ -340,7 +343,7 @@ bottom:
   cross-cert "bridges" that teach an idea several certs share and how each
   frames it. A second switch can order certs by your cert path or by exam date and then weakest. An "Already know this? Test out" link skips an untouched unit.
 - A **Review across your certs** card: Weak spots (missed questions), Tough
-  terms (flashcards rated OK or lower), and Missed games, plus a single
+  terms (flashcards marked Don't got it), and Missed games, plus a single
   "Review everything due" round that mixes all three — drawn from every cert in
   your plan, with each answer recorded to its own cert. A selector on that card
   sets an in-app review reminder (Off, Daily, Every 3 days, Weekly; default

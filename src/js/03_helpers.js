@@ -211,10 +211,11 @@ function normalizeSeenLog(raw) {
 
 // Real SM-2, quality-scored. `prev` is this card's current schedule
 // ({interval, ease, reps, due}), or undefined for a never-rated card.
-// `quality` is the confidence rating a user picks after flipping a card,
-// 1 (total blank) through 5 (instant, no hesitation) — the same 0-5
-// "quality of response" scale SM-2 was originally designed around, not a
-// bolted-on replacement for it. A quality below 3 is a miss: it resets
+// `quality` is the rating a user gives a card after flipping it, on the 1-5
+// "quality of response" scale SM-2 was designed around. The flashcard screen
+// offers two buttons, "Got it" (recorded as a 4, see CARD_GOT_IT) and "Don't got
+// it" (a 1, CARD_MISSED); saves from the earlier five-button screen hold 1-5 and
+// schedule correctly too. A quality below 3 is a miss: it resets
 // the interval and repetition count (you're relearning it) but only
 // dents the ease factor rather than losing all history, so a card that's
 // usually easy recovers its longer interval faster than one that's
@@ -236,14 +237,16 @@ function nextSrsEntry(prev, quality, now) {
   return { interval, ease, reps, due: t + interval * DAY, last: quality };
 }
 
-// "Tough terms": cards whose most recent rating was 3 (OK) or lower. `last`
-// is the raw 1-5 rating nextSrsEntry now stores alongside the schedule.
+// "Tough terms": cards last marked "Don't got it" (in older saves: rated 3 or
+// lower). `last` is the raw rating nextSrsEntry stores alongside the schedule.
 // Entries saved before it existed have no `last`; a miss (reps reset to 0)
 // is the only thing they can still tell us, so that counts as tough, and
 // anything with reps > 0 was a 3+ pass we can't distinguish from 4-5 and
 // leave out rather than flood the deck with guesses. A card leaves the deck
-// the next time it's rated 4 or 5.
+// the next time it's marked "Got it" (a 4 or 5).
 const TOUGH_MAX_RATING = 3;
+const CARD_GOT_IT = 4;
+const CARD_MISSED = 1;
 function isToughEntry(entry) {
   if (!entry) return false;
   if (typeof entry.last === 'number') return entry.last <= TOUGH_MAX_RATING;

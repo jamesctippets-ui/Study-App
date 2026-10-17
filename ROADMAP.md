@@ -381,7 +381,8 @@ come up.
   reps, due}`) in src/js/03_helpers.js's `nextSrsEntry`/`orderBySrs`, applied
   to Cards-mode ordering only — "mastery %" itself is still a lifetime ratio,
   unchanged; this only changes review order, not how mastery is scored.
-- [x] Confidence-based review (rate 1–5 instead of binary correct/incorrect),
+- [x] Confidence-based review (rate 1–5 instead of binary correct/incorrect; the five buttons were later replaced by
+  Got it / Don't got it, which record a 4 and a 1 on this same scale, see §14 "Declutter step 1"),
   the mechanic Brainscape is built around, as an alternative to the current
   flashcard rating. Shipped as a real change to `nextSrsEntry`, not just a
   UI relabel: it's now the textbook SM-2 quality scale (1 = total blank,
@@ -1372,7 +1373,7 @@ trading away for shinier but shallower ones.
   cert being studied marked "Studying now".
 - [x] **Cross-cert reviews (first version).** A "Review across your certs"
   card on Home offers **Weak spots** (questions you last missed) and **Tough
-  terms** (flashcards rated OK or lower), each drawn from every cert in the
+  terms** (flashcards marked Don't got it), each drawn from every cert in the
   plan in turn (oldest-seen / hardest first within a cert) so a long backlog
   in one cert can't crowd out the others — 10 questions or 15 cards a round.
   Items run under `<cert>:<id>` ids and each answer or rating is recorded to
@@ -1762,7 +1763,7 @@ trading away for shinier but shallower ones.
   plural and a bracketed single-token acronym such as `(RBAC)` or `(RU/s)`; a bracket of examples like
   `(Audit, Deny, Modify)` is left readable. 502 of 4,430 definitions needed blanking, and `tools/check_cards.js` (13,301
   checks, run by build.py) proves no card's own term is readable in its prompt. The card has a Hint button (word count
-  and first letter), a "Show the term" button, and the confidence rating (1-5) is unchanged; text-to-speech reads the
+  and first letter), a "Show the term" button, and the rating buttons (later reduced to Got it / Don't got it, see "Declutter step 1"); text-to-speech reads the
   definition with "blank" for the gap and the term plus definition after the reveal. Home's Vocab of the Day follows the
   same direction. A per-device switch in Data & Progress (`CardPrefsContext`, key `certStudyHub_cardPrefs`) restores
   the old term-first direction. Also fixed on the way: Home's route rows had lost the per-row "open this cert" shortcut.
@@ -1804,6 +1805,21 @@ trading away for shinier but shallower ones.
   experience details, format note and official links in an "About this exam" disclosure; Profile's stat tiles sit three to a row, the activity
   map is folded and the empty "Earned certifications" card is gone. Rule for later work: put a new control in an existing
   block, behind a `Disclosure`, or in Data & Progress.
+- [x] **Declutter step 1: a flashcard focus mode and a two-button rating (October 2026).** Reported: "when viewing flash
+  cards, we should reduce other information on the site … hiding the navigation panes and going back to a rating system of
+  Got it vs Don't got it". While a card is on screen the app chrome steps aside: `useFocusMode` (00_preamble.js) sets
+  `body[data-focus]`, and the template CSS hides every element marked `data-chrome` (the top bar, the bottom tab bar and the
+  mastery strip) and trims the page padding. `FlashcardView` calls it, so Reference > Cards, a Path flashcard step and Home's
+  Tough terms review all get it; the view's reveal and rating buttons are pinned to the bottom of the screen, where the tab
+  bar normally sits, so they stay in one place whether or not the card is flipped (the hint now shows inside the card). On
+  Reference > Cards the Cards/Study/Sheet switch, the category row, the All/Tough toggle and its two hint lines give way to
+  one `CardsFocusBar` (a ✕ back to Study, a compact category dropdown and "Tough · N"); the card's own category label only
+  shows when the filter is "All categories". The rating is two buttons: `CARD_GOT_IT` (4) and `CARD_MISSED` (1) on the
+  same SM-2 scale, so `nextSrsEntry`, `ratingToOutcome` (3+ is correct for mastery) and the Tough-deck rule
+  (`TOUGH_MAX_RATING` = 3) are unchanged, and progress saved with the old five-point ratings keeps working (an old 2 or 3
+  stays tough until the card is next marked Got it). Clearing the Tough deck ends the focus mode with the "Tough terms
+  cleared" panel. Playwright check: `focus_test.js` in the scratchpad (not in the repo). Step 2 of this request is the audit
+  of the rest of the app for redundant blocks.
 - [x] **IT Playground v2 (shared core, six more tools, IPv6, lesson links).** The Playground now has ten tools and
   75 guided scenarios (IP lab 12, VLAN 8, firewall 8, DHCP 8, DNS 8, STP 7, VPN 8, Azure NSG 8, certificates 8; the
   subnet calculator has no scenarios). Shared building blocks live in `src/js/04g_playground_core.jsx`
@@ -1903,7 +1919,8 @@ trading away for shinier but shallower ones.
   "yours"), plus "what usually comes next" suggestions drawn from your earlier scenarios and the built-in ones.
   `tools/check_share.js` has 27 checks.
 
-- [x] **Tough terms flashcard deck.** Each `srs` entry now also stores the
+- [x] **Tough terms flashcard deck.** (Since the two-button rating: Don't got it keeps a card in the deck and Got it
+  graduates it; see §14 "Declutter step 1".) Each `srs` entry now also stores the
   raw 1-5 rating it was last given (`last`). A card is "tough" when that
   rating is 3 (OK) or lower; entries saved before this existed count as
   tough only if they were a miss (reps reset), since nothing else survives

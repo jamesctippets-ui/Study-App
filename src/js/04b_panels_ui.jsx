@@ -543,13 +543,13 @@ function TermFlyout({ term, triggerText, context, scope, onClose, getAnchor }) {
 // see what else was available. Each category's live mastery % rides along
 // in its option label instead of a hover-only tooltip, since a <select>'s
 // options have no hover state worth relying on.
-function CategoryFilterSelect({ categories, activeCat, onChange, masteryByCategory }) {
+function CategoryFilterSelect({ categories, activeCat, onChange, masteryByCategory, compact }) {
   return (
     <select
       value={activeCat}
       onChange={(e) => onChange(e.target.value)}
       style={{
-        width: '100%', marginBottom: '12px', padding: '9px 12px', borderRadius: 'var(--r-ctl)', fontSize: '13px', fontWeight: 600,
+        width: compact ? 'auto' : '100%', flex: compact ? '1 1 0%' : undefined, minWidth: 0, height: compact ? '38px' : undefined, marginBottom: compact ? 0 : '12px', padding: compact ? '0 10px' : '9px 12px', borderRadius: 'var(--r-ctl)', fontSize: compact ? '12.5px' : '13px', fontWeight: 600,
         border: `1px solid ${COLOR.border}`, background: COLOR.surface, color: COLOR.text,
       }}
     >
@@ -579,6 +579,7 @@ function BottomTabBar({ mode, onChange }) {
   return (
     <nav
       aria-label="Main"
+      data-chrome="bottom"
       style={{
         position: 'fixed', left: 0, right: 0, bottom: 0, zIndex: 40, background: COLOR.navBar,
         borderTop: `1px solid ${COLOR.border}`, paddingBottom: 'env(safe-area-inset-bottom)',

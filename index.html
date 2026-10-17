@@ -130,6 +130,10 @@
   :root[data-font="dyslexic"] { --font-body: 'OpenDyslexic', 'Inter', system-ui, sans-serif; --font-mono: 'OpenDyslexic', 'Inter', system-ui, sans-serif; }
   body, button, textarea, select, input { font-family: var(--font-body); }
   body { font-feature-settings: 'cv11', 'ss03'; -webkit-font-smoothing: antialiased; }
+  /* Focus mode (useFocusMode in 00_preamble.js): while a flashcard deck is open, the top bar and bottom tabs
+     step aside and the page gives its space back to the card. */
+  body[data-focus] [data-chrome] { display: none !important; }
+  body[data-focus] [data-chrome-pad] { padding-top: 14px !important; padding-bottom: calc(96px + env(safe-area-inset-bottom)) !important; }
   .itil-display { font-family: var(--font-body); font-weight: 700 !important; letter-spacing: -0.015em; }
   /* The Console look: every uppercase micro-label in the app is a mono label (set in code as
      textTransform: 'uppercase'), and .mono marks numbers and codes. */
@@ -338,6 +342,17 @@ function useEscapeToClose(onClose) {
   }, [onClose]);
 }
 
+// Focus mode: while something immersive (a flashcard deck) is on screen, the
+// app chrome (the top bar and the bottom tabs, marked data-chrome in their
+// markup) steps aside. The CSS for it lives in the page template.
+function useFocusMode(active) {
+  useEffect(() => {
+    if (!active) return undefined;
+    document.body.setAttribute('data-focus', '1');
+    return () => document.body.removeAttribute('data-focus');
+  }, [active]);
+}
+
 // Closes an inline flyout (a term-definition popup anchored to the word
 // that was clicked, not a full-screen overlay) when the user taps/clicks
 // anywhere outside it — including on a different term, which this treats
@@ -397,6 +412,15 @@ function IconMenu({ size = 18 }) {
       <line x1="3" y1="6" x2="21" y2="6" />
       <line x1="3" y1="12" x2="21" y2="12" />
       <line x1="3" y1="18" x2="21" y2="18" />
+    </svg>
+  );
+}
+
+function IconClose({ size = 18 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+      <line x1="6" y1="6" x2="18" y2="18" />
+      <line x1="18" y1="6" x2="6" y2="18" />
     </svg>
   );
 }
@@ -6107,10 +6131,11 @@ function normalizeSeenLog(raw) {
 
 // Real SM-2, quality-scored. `prev` is this card's current schedule
 // ({interval, ease, reps, due}), or undefined for a never-rated card.
-// `quality` is the confidence rating a user picks after flipping a card,
-// 1 (total blank) through 5 (instant, no hesitation) — the same 0-5
-// "quality of response" scale SM-2 was originally designed around, not a
-// bolted-on replacement for it. A quality below 3 is a miss: it resets
+// `quality` is the rating a user gives a card after flipping it, on the 1-5
+// "quality of response" scale SM-2 was designed around. The flashcard screen
+// offers two buttons, "Got it" (recorded as a 4, see CARD_GOT_IT) and "Don't got
+// it" (a 1, CARD_MISSED); saves from the earlier five-button screen hold 1-5 and
+// schedule correctly too. A quality below 3 is a miss: it resets
 // the interval and repetition count (you're relearning it) but only
 // dents the ease factor rather than losing all history, so a card that's
 // usually easy recovers its longer interval faster than one that's
@@ -6132,14 +6157,16 @@ function nextSrsEntry(prev, quality, now) {
   return { interval, ease, reps, due: t + interval * DAY, last: quality };
 }
 
-// "Tough terms": cards whose most recent rating was 3 (OK) or lower. `last`
-// is the raw 1-5 rating nextSrsEntry now stores alongside the schedule.
+// "Tough terms": cards last marked "Don't got it" (in older saves: rated 3 or
+// lower). `last` is the raw rating nextSrsEntry stores alongside the schedule.
 // Entries saved before it existed have no `last`; a miss (reps reset to 0)
 // is the only thing they can still tell us, so that counts as tough, and
 // anything with reps > 0 was a 3+ pass we can't distinguish from 4-5 and
 // leave out rather than flood the deck with guesses. A card leaves the deck
-// the next time it's rated 4 or 5.
+// the next time it's marked "Got it" (a 4 or 5).
 const TOUGH_MAX_RATING = 3;
+const CARD_GOT_IT = 4;
+const CARD_MISSED = 1;
 function isToughEntry(entry) {
   if (!entry) return false;
   if (typeof entry.last === 'number') return entry.last <= TOUGH_MAX_RATING;
@@ -15975,13 +16002,13 @@ function TermFlyout({ term, triggerText, context, scope, onClose, getAnchor }) {
 // see what else was available. Each category's live mastery % rides along
 // in its option label instead of a hover-only tooltip, since a <select>'s
 // options have no hover state worth relying on.
-function CategoryFilterSelect({ categories, activeCat, onChange, masteryByCategory }) {
+function CategoryFilterSelect({ categories, activeCat, onChange, masteryByCategory, compact }) {
   return (
     <select
       value={activeCat}
       onChange={(e) => onChange(e.target.value)}
       style={{
-        width: '100%', marginBottom: '12px', padding: '9px 12px', borderRadius: 'var(--r-ctl)', fontSize: '13px', fontWeight: 600,
+        width: compact ? 'auto' : '100%', flex: compact ? '1 1 0%' : undefined, minWidth: 0, height: compact ? '38px' : undefined, marginBottom: compact ? 0 : '12px', padding: compact ? '0 10px' : '9px 12px', borderRadius: 'var(--r-ctl)', fontSize: compact ? '12.5px' : '13px', fontWeight: 600,
         border: `1px solid ${COLOR.border}`, background: COLOR.surface, color: COLOR.text,
       }}
     >
@@ -16011,6 +16038,7 @@ function BottomTabBar({ mode, onChange }) {
   return (
     <nav
       aria-label="Main"
+      data-chrome="bottom"
       style={{
         position: 'fixed', left: 0, right: 0, bottom: 0, zIndex: 40, background: COLOR.navBar,
         borderTop: `1px solid ${COLOR.border}`, paddingBottom: 'env(safe-area-inset-bottom)',
@@ -16077,18 +16105,11 @@ function ExperienceCard({ trackKey }) {
 
 /* ---------------- shared UI: lesson & study views ---------------- */
 
-// The SM-2 quality scale flashcards are rated on — 1 (total blank) through
-// 5 (instant, no hesitation). A 3+ counts as a pass for both SRS growth and
-// the app's binary mastery signal (see ratingToOutcome in 03_helpers.js).
-const RATING_SCALE = [
-  { n: 1, label: 'Blank', color: COLOR.red },
-  { n: 2, label: 'Hard', color: COLOR.red },
-  { n: 3, label: 'OK', color: COLOR.gold },
-  { n: 4, label: 'Good', color: COLOR.success },
-  { n: 5, label: 'Easy', color: COLOR.success },
-];
+// Flashcards are rated with two buttons: "Got it" is recorded as CARD_GOT_IT (a 4) and
+// "Don't got it" as CARD_MISSED (a 1), both on the SM-2 scale (see 03_helpers.js). A
+// pass counts as correct for the app's binary mastery signal (ratingToOutcome).
 
-function FlashcardView({ card, flipped, setFlipped, onRate, index, total, categoryLabel, speakingId, onSpeak, speechSupported, flashcardsData }) {
+function FlashcardView({ card, flipped, setFlipped, onRate, index, total, categoryLabel, speakingId, onSpeak, speechSupported, flashcardsData, hideCategory }) {
   const { direction } = React.useContext(CardPrefsContext);
   const defFirst = direction !== 'term';
   const [activeTermKey, setActiveTermKey] = useState(null);
@@ -16096,6 +16117,7 @@ function FlashcardView({ card, flipped, setFlipped, onRate, index, total, catego
   useEffect(() => { setActiveTermKey(null); setHintShown(false); }, [card && card.id]);
   useEscapeToClose(() => setActiveTermKey(null));
   useClickOutsideToClose(!!activeTermKey, () => setActiveTermKey(null));
+  useFocusMode(!!card);
   const prompt = useMemo(() => (card ? flashcardPrompt(card) : null), [card]);
   if (!card) return null;
   const otherCards = flashcardsData && flashcardsData.filter((c) => c.id !== card.id);
@@ -16106,15 +16128,11 @@ function FlashcardView({ card, flipped, setFlipped, onRate, index, total, catego
   const accent = defFirst && !flipped ? COLOR.primary : COLOR.blue;
   return (
     <div>
-      <div className="flex justify-between items-center mb-2" style={{ fontSize: '10.5px', textTransform: 'uppercase', color: COLOR.muted }}>
-        <span>{categoryLabel}</span>
-        <span style={{ color: COLOR.text }}>{String(index + 1).padStart(2, '0')} / {String(total).padStart(2, '0')}</span>
+      <div className="flex items-center" style={{ gap: '8px', marginBottom: '8px' }}>
+        <span style={{ flex: 1, minWidth: 0, fontSize: '10.5px', textTransform: 'uppercase', color: COLOR.muted, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{hideCategory ? '' : categoryLabel}</span>
+        <span className="mono" style={{ fontSize: '11px', color: COLOR.text, flexShrink: 0 }}>{index + 1} / {total}</span>
+        {speechSupported && <SpeakButton id={'card-' + card.id} text={speakText} speakingId={speakingId} onSpeak={onSpeak} />}
       </div>
-      {speechSupported && (
-        <div style={{ textAlign: 'right', marginBottom: '6px' }}>
-          <SpeakButton id={'card-' + card.id} text={speakText} speakingId={speakingId} onSpeak={onSpeak} />
-        </div>
-      )}
       <div
         onClick={() => setFlipped((f) => !f)}
         style={{
@@ -16139,6 +16157,7 @@ function FlashcardView({ card, flipped, setFlipped, onRate, index, total, catego
             <div style={{ fontSize: flipped ? '15px' : '17px', lineHeight: 1.6, overflowWrap: 'anywhere' }}>
               {autoHighlightTerms(flipped ? card.back : prompt.text, otherCards, activeTermKey, setActiveTermKey, 2)}
             </div>
+            {!flipped && hintShown && <div className="mono" style={{ fontSize: '12px', color: COLOR.gold, marginTop: '12px' }}>Hint · {prompt.hint.text}</div>}
           </div>
         ) : (
           <div style={{ minHeight: '170px', display: 'flex', flexDirection: 'column', justifyContent: 'center', textAlign: 'center' }}>
@@ -16150,51 +16169,77 @@ function FlashcardView({ card, flipped, setFlipped, onRate, index, total, catego
           </div>
         )}
       </div>
-      {defFirst && !flipped && (
-        <div style={{ marginTop: '10px' }}>
-          {hintShown && <div className="mono" style={{ fontSize: '12px', color: COLOR.gold, marginBottom: '8px' }}>Hint · {prompt.hint.text}</div>}
-          <div style={{ display: 'flex', gap: '8px' }}>
-            <button
-              onClick={() => setHintShown(true)}
-              disabled={hintShown}
-              className="btn-flat"
-              style={{ padding: '10px 14px', borderRadius: 'var(--r-ctl)', border: `1px solid ${COLOR.border}`, background: 'transparent', color: hintShown ? COLOR.muted : COLOR.text, fontSize: '13px', fontWeight: 600, flexShrink: 0, opacity: hintShown ? 0.6 : 1 }}
-            >
-              Show a hint
-            </button>
-            <button
-              onClick={() => setFlipped(true)}
-              style={{ flex: 1, padding: '10px 14px', borderRadius: 'var(--r-ctl)', border: 'none', background: COLOR.primary, color: COLOR.onAccent, fontSize: '13px', fontWeight: 700 }}
-            >
-              Show the term
-            </button>
-          </div>
+      {/* The reveal and rating buttons are pinned to the bottom of the screen, where the tab bar normally sits
+          (hidden in focus mode), so they stay under the thumb whether or not the card has been flipped. */}
+      <div style={{ position: 'fixed', left: 0, right: 0, bottom: 0, zIndex: 40, background: COLOR.navBar, borderTop: `1px solid ${COLOR.border}`, paddingBottom: 'env(safe-area-inset-bottom)' }}>
+        <div className="max-w-md mx-auto" style={{ display: 'flex', gap: '10px', padding: '10px 16px' }}>
+          {!flipped ? (
+            <React.Fragment>
+              {defFirst && (
+                <button
+                  onClick={() => setHintShown(true)}
+                  disabled={hintShown}
+                  className="btn-flat"
+                  style={{ padding: '14px 14px', borderRadius: 'var(--r-ctl)', border: `1px solid ${COLOR.border}`, background: 'transparent', color: hintShown ? COLOR.muted : COLOR.text, fontSize: '13px', fontWeight: 600, flexShrink: 0, opacity: hintShown ? 0.6 : 1 }}
+                >
+                  Show a hint
+                </button>
+              )}
+              <button
+                onClick={() => setFlipped(true)}
+                style={{ flex: 1, padding: '14px 14px', borderRadius: 'var(--r-ctl)', border: 'none', background: COLOR.primary, color: COLOR.onAccent, fontSize: '14px', fontWeight: 700 }}
+              >
+                {defFirst ? 'Show the term' : 'Show the definition'}
+              </button>
+            </React.Fragment>
+          ) : (
+            <React.Fragment>
+              <button
+                onClick={() => onRate(CARD_MISSED)}
+                style={{ flex: 1, padding: '14px 10px', borderRadius: 'var(--r-ctl)', border: `1px solid ${COLOR.red}`, background: 'transparent', color: COLOR.red, fontSize: '14px', fontWeight: 700 }}
+              >
+                Don't got it
+              </button>
+              <button
+                onClick={() => onRate(CARD_GOT_IT)}
+                style={{ flex: 1, padding: '14px 10px', borderRadius: 'var(--r-ctl)', border: 'none', background: COLOR.success, color: COLOR.onAccent, fontSize: '14px', fontWeight: 700 }}
+              >
+                Got it
+              </button>
+            </React.Fragment>
+          )}
         </div>
+      </div>
+    </div>
+  );
+}
+
+// The one slim row above a flashcard deck in focus mode: a way out, the category
+// filter and the tough-terms switch. Everything else on the page steps aside.
+function CardsFocusBar({ onExit, categories, activeCat, onChangeCat, masteryByCategory, toughCount, toughDeck, onToggleTough }) {
+  return (
+    <div className="flex items-center" style={{ gap: '8px', marginBottom: '12px' }}>
+      <button
+        onClick={onExit}
+        className="btn-flat"
+        title="Leave flashcards"
+        aria-label="Leave flashcards"
+        style={{ width: '38px', height: '38px', flexShrink: 0, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', borderRadius: 'var(--r-ctl)', border: `1px solid ${COLOR.border}`, background: COLOR.surface, color: COLOR.muted, padding: 0 }}
+      >
+        <IconClose size={18} />
+      </button>
+      <CategoryFilterSelect compact categories={categories} activeCat={activeCat} onChange={onChangeCat} masteryByCategory={masteryByCategory} />
+      {(toughCount > 0 || toughDeck) && (
+        <button
+          onClick={onToggleTough}
+          aria-pressed={!!toughDeck}
+          title={toughDeck ? 'Back to all cards' : 'Study the cards you marked "Don\'t got it"'}
+          className="btn-flat"
+          style={{ flexShrink: 0, height: '38px', padding: '0 10px', borderRadius: 'var(--r-ctl)', fontSize: '12px', fontWeight: 700, border: `1px solid ${toughDeck ? COLOR.gold : COLOR.border}`, background: toughDeck ? tint(COLOR.gold, 14) : COLOR.surface, color: toughDeck ? ink(COLOR.gold) : COLOR.muted }}
+        >
+          Tough · {toughCount}
+        </button>
       )}
-      <div style={{ fontSize: '11px', color: COLOR.muted, textAlign: 'center', marginTop: '10px' }}>
-        {defFirst
-          ? (flipped ? 'Tap the card to hide the term again' : 'Tap the card to reveal the term')
-          : (flipped ? 'Tap to see the term again' : 'Tap the card to reveal the definition')}
-      </div>
-      <div style={{ fontSize: '11.5px', color: COLOR.muted, textAlign: 'center', marginBottom: '6px' }}>
-        {defFirst && !flipped ? 'Think of the term, then check. How well did you know it?' : 'How well did you know it?'}
-      </div>
-      <div className="flex gap-1">
-        {RATING_SCALE.map(({ n, label, color }) => (
-          <button
-            key={n}
-            onClick={() => onRate(n)}
-            className="flex-1"
-            style={{
-              padding: '9px 2px', borderRadius: 'var(--r-ctl)', border: `1px solid ${color}`, color, background: 'transparent',
-              fontSize: '11px', fontWeight: 600, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2px',
-            }}
-          >
-            <span style={{ fontSize: '14px', fontWeight: 700 }}>{n}</span>
-            <span>{label}</span>
-          </button>
-        ))}
-      </div>
     </div>
   );
 }
@@ -19675,7 +19720,7 @@ function HomePathRun({ run, tracks, unitsByTrack, trackKeys, doneByTrack, mode, 
 /* ---- cross-cert reviews ---- */
 
 // One Home card for everything to go back over, across every cert in the plan: the quick reviews
-// (questions you last missed, flashcards rated OK or lower, Mad Libs / Sequence / Compare items and
+// (questions you last missed, flashcards marked Don't got it, Mad Libs / Sequence / Compare items and
 // case studies you got wrong, or one mixed round of all of them) and, at the bottom of the same
 // card, a single line into the weak-subjects path. `weakInfo` = { lessons, critical, certs, path }.
 const REVIEW_MIXED = { weak: 6, tough: 8, games: 2, cases: 1 };
@@ -19701,7 +19746,7 @@ function HomeReviewHub({ weakTotal, toughTotal, gamesTotal, casesTotal, reminder
   );
   const tiles = [
     tile('Weak spots', weakTotal, `${weakTotal} missed question${weakTotal === 1 ? '' : 's'}`, 'weak', COLOR.red),
-    tile('Tough terms', toughTotal, `${toughTotal} card${toughTotal === 1 ? '' : 's'} rated OK or lower`, 'tough', COLOR.gold),
+    tile('Tough terms', toughTotal, `${toughTotal} card${toughTotal === 1 ? '' : 's'} marked Don't got it`, 'tough', COLOR.gold),
     casesTotal > 0 && tile('Case studies', casesTotal, `${casesTotal} with a miss`, 'cases', COLOR.primary),
     gamesTotal > 0 && tile('Missed games', gamesTotal, `${gamesTotal} item${gamesTotal === 1 ? '' : 's'} to redo`, 'games', COLOR.primary),
   ].filter(Boolean);
@@ -19834,7 +19879,7 @@ function HomeReviewRun({ kind, trackKeys, results, seenLog, srs, speech, makeApi
       <div style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderRadius: 'var(--r-card)', padding: '22px', textAlign: 'center' }}>
         <div className="itil-display" style={{ fontSize: '18px', fontWeight: 600 }}>Round complete</div>
         <div style={{ fontSize: '12.5px', color: COLOR.muted, marginTop: '6px', lineHeight: 1.5 }}>
-          Anything you got right is recorded to its own cert, and flashcards rated Good or Easy have left the Tough terms deck. What's still weak stays for next time.
+          Anything you got right is recorded to its own cert, and flashcards marked Got it have left the Tough terms deck. What's still weak stays for next time.
         </div>
         <button onClick={retry} style={{ width: '100%', marginTop: '16px', padding: '12px', borderRadius: 'var(--r-ctl)', border: 'none', background: COLOR.primary, color: COLOR.onAccent, fontSize: '14px', fontWeight: 700 }}>Another round</button>
         <button onClick={onExit} style={{ width: '100%', marginTop: '8px', padding: '11px', borderRadius: 'var(--r-card)', border: `1px solid ${COLOR.border}`, background: 'transparent', color: COLOR.text, fontSize: '13px', fontWeight: 600 }}>Back to Home</button>
@@ -27845,12 +27890,14 @@ function CertStudyApp() {
 
   const currentCard = filteredFlashcards[fIndex];
   const currentQ = quizSession[sessionIndex];
+  // Focus mode: with a card on screen, Reference > Cards drops everything but the deck itself.
+  const cardsFocus = mode === 'learn' && learnView === 'cards' && !!currentCard;
 
-  // `quality` is the 1-5 confidence rating FlashcardView collects. SRS
-  // scheduling uses the raw rating (real SM-2 quality scale); mastery %
-  // stays on the binary signal the rest of the app already assumes, via
-  // ratingToOutcome's 3+-counts-as-correct rule — see its comment in
-  // 03_helpers.js for why that seam exists.
+  // `quality` is the rating FlashcardView collects: CARD_GOT_IT (4) or
+  // CARD_MISSED (1), both on the SM-2 scale. SRS scheduling uses the raw
+  // rating; mastery % stays on the binary signal the rest of the app
+  // already assumes, via ratingToOutcome's 3+-counts-as-correct rule —
+  // see its comment in 03_helpers.js for why that seam exists.
   const nextCard = (quality) => {
     if (currentCard) {
       recordResult(currentCard.id, ratingToOutcome(quality));
@@ -28279,7 +28326,7 @@ function CertStudyApp() {
           onSetReviewReminder={setReviewReminderDays}
         />
       )}
-      <div style={{ background: `color-mix(in srgb, ${modeHue(mode)} 9%, ${COLOR.navBar})`, borderBottom: `1px solid color-mix(in srgb, ${modeHue(mode)} 45%, ${COLOR.border})`, position: 'sticky', top: 0, zIndex: 30, transition: 'background-color 0.2s ease' }}>
+      <div data-chrome="top" style={{ background: `color-mix(in srgb, ${modeHue(mode)} 9%, ${COLOR.navBar})`, borderBottom: `1px solid color-mix(in srgb, ${modeHue(mode)} 45%, ${COLOR.border})`, position: 'sticky', top: 0, zIndex: 30, transition: 'background-color 0.2s ease' }}>
         <div className="max-w-md mx-auto px-4 flex items-center" style={{ height: `${APP_HEADER_HEIGHT}px`, gap: '8px' }}>
           <button
             onClick={() => setShowCertPath(true)}
@@ -28336,7 +28383,7 @@ function CertStudyApp() {
           </div>
         </div>
       </div>
-      <div className="max-w-md mx-auto px-4 py-5" style={{ paddingBottom: `calc(${TAB_BAR_HEIGHT + 24}px + env(safe-area-inset-bottom))` }}>
+      <div className="max-w-md mx-auto px-4 py-5" data-chrome-pad="1" style={{ paddingBottom: `calc(${TAB_BAR_HEIGHT + 24}px + env(safe-area-inset-bottom))` }}>
         {saveError ? (
           <div style={{ fontSize: '11.5px', color: COLOR.red, marginBottom: '12px', padding: '8px 10px', borderRadius: 'var(--r-ctl)', border: `1px solid ${COLOR.red}`, background: 'color-mix(in srgb, var(--color-red) 10%, transparent)' }}>
             Your last save didn't go through — your browser's storage may be full. Try Data &amp; Progress → Export to back up what you have, then free up some space.
@@ -28398,7 +28445,7 @@ function CertStudyApp() {
           />
         ) : (
         <React.Fragment>
-        {mode === 'learn' && (
+        {mode === 'learn' && !cardsFocus && (
           <SegmentedControl
             options={[{ key: 'cards', label: 'Cards' }, { key: 'study', label: 'Study' }, { key: 'sheet', label: 'Sheet' }]}
             value={learnView}
@@ -28421,7 +28468,7 @@ function CertStudyApp() {
           />
         )}
 
-        {(mode === 'quiz' || (mode === 'learn' && learnView !== 'sheet' && (learnView !== 'study' || !DATA[activeTrack].lessons))) && (
+        {!cardsFocus && (mode === 'quiz' || (mode === 'learn' && learnView !== 'sheet' && (learnView !== 'study' || !DATA[activeTrack].lessons))) && (
           <CategoryFilterSelect
             categories={categories}
             activeCat={activeCat}
@@ -28430,38 +28477,26 @@ function CertStudyApp() {
           />
         )}
 
-        {mode === 'learn' && learnView === 'cards' && (toughCount > 0 || cardDeck === 'tough') && (
-          <div className="flex gap-1 mb-3" style={{ background: COLOR.bg, padding: '3px', borderRadius: 'var(--r-ctl)', border: `1px solid ${COLOR.border}` }}>
-            {[['all', 'All cards'], ['tough', `Tough terms (${cardDeck === 'tough' ? toughIds.length : toughCount})`]].map(([key, label]) => (
-              <button
-                key={key}
-                onClick={() => openCardDeck(key)}
-                className="flex-1 btn-flat"
-                style={{ padding: '6px 2px', borderRadius: 'var(--r-ctl)', fontSize: '11.5px', fontWeight: 600, background: cardDeck === key ? COLOR.surfaceRaised : 'transparent', color: cardDeck === key ? COLOR.text : COLOR.muted }}
-              >
-                {label}
-              </button>
-            ))}
-          </div>
-        )}
-        {mode === 'learn' && learnView === 'cards' && cardDeck === 'all' && Object.keys(srs[activeTrack] || {}).length > 0 && (
-          <div style={{ fontSize: '11.5px', color: COLOR.muted, marginBottom: '8px', textAlign: 'center' }}>
-            Cards you're overdue to review come first.
-          </div>
-        )}
-        {mode === 'learn' && learnView === 'cards' && cardDeck === 'tough' && (
-          <div style={{ fontSize: '11.5px', color: COLOR.muted, marginBottom: '8px', textAlign: 'center' }}>
-            Cards you last rated OK or lower, hardest first. Rate one Good or Easy and it leaves this deck.
-          </div>
-        )}
         {mode === 'learn' && learnView === 'cards' && cardDeck === 'tough' && filteredFlashcards.length === 0 && (
           <div style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderRadius: 'var(--r-card)', padding: '22px 16px', textAlign: 'center' }}>
             <div className="itil-display" style={{ fontSize: '17px', fontWeight: 600, marginBottom: '6px' }}>Tough terms cleared</div>
             <div style={{ fontSize: '13px', color: COLOR.muted, lineHeight: 1.5, marginBottom: '12px' }}>
-              {activeCat === 'all' ? 'Nothing left in this deck.' : 'No tough terms in this category.'} Cards show up here whenever you rate them OK or lower.
+              {activeCat === 'all' ? 'Nothing left in this deck.' : 'No tough terms in this category.'} Cards land here when you mark them &ldquo;Don't got it&rdquo;.
             </div>
             <button onClick={() => openCardDeck('all')} className="btn-flat" style={{ padding: '8px 14px', borderRadius: 'var(--r-ctl)', fontSize: '12px', fontWeight: 600, border: `1px solid ${COLOR.border}`, color: COLOR.text }}>Back to all cards</button>
           </div>
+        )}
+        {cardsFocus && (
+          <CardsFocusBar
+            onExit={() => setLearnView('study')}
+            categories={categories}
+            activeCat={activeCat}
+            onChangeCat={setActiveCat}
+            masteryByCategory={masteryByCategory}
+            toughCount={cardDeck === 'tough' ? toughIds.length : toughCount}
+            toughDeck={cardDeck === 'tough'}
+            onToggleTough={() => openCardDeck(cardDeck === 'tough' ? 'all' : 'tough')}
+          />
         )}
         {mode === 'learn' && learnView === 'cards' && !(cardDeck === 'tough' && filteredFlashcards.length === 0) && (
           <FlashcardView
@@ -28476,6 +28511,7 @@ function CertStudyApp() {
             onSpeak={speak}
             speechSupported={speechSupported}
             flashcardsData={flashcardsData}
+            hideCategory={activeCat !== 'all'}
           />
         )}
 
@@ -28802,7 +28838,7 @@ function CertStudyApp() {
           )
         )}
 
-        <div className="mt-6">
+        <div className="mt-6" data-chrome="mastery">
           <button
             onClick={() => setShowMasteryDetail((v) => !v)}
             aria-expanded={showMasteryDetail}

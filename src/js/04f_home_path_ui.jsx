@@ -437,7 +437,7 @@ function HomePathRun({ run, tracks, unitsByTrack, trackKeys, doneByTrack, mode, 
 /* ---- cross-cert reviews ---- */
 
 // One Home card for everything to go back over, across every cert in the plan: the quick reviews
-// (questions you last missed, flashcards rated OK or lower, Mad Libs / Sequence / Compare items and
+// (questions you last missed, flashcards marked Don't got it, Mad Libs / Sequence / Compare items and
 // case studies you got wrong, or one mixed round of all of them) and, at the bottom of the same
 // card, a single line into the weak-subjects path. `weakInfo` = { lessons, critical, certs, path }.
 const REVIEW_MIXED = { weak: 6, tough: 8, games: 2, cases: 1 };
@@ -463,7 +463,7 @@ function HomeReviewHub({ weakTotal, toughTotal, gamesTotal, casesTotal, reminder
   );
   const tiles = [
     tile('Weak spots', weakTotal, `${weakTotal} missed question${weakTotal === 1 ? '' : 's'}`, 'weak', COLOR.red),
-    tile('Tough terms', toughTotal, `${toughTotal} card${toughTotal === 1 ? '' : 's'} rated OK or lower`, 'tough', COLOR.gold),
+    tile('Tough terms', toughTotal, `${toughTotal} card${toughTotal === 1 ? '' : 's'} marked Don't got it`, 'tough', COLOR.gold),
     casesTotal > 0 && tile('Case studies', casesTotal, `${casesTotal} with a miss`, 'cases', COLOR.primary),
     gamesTotal > 0 && tile('Missed games', gamesTotal, `${gamesTotal} item${gamesTotal === 1 ? '' : 's'} to redo`, 'games', COLOR.primary),
   ].filter(Boolean);
@@ -596,7 +596,7 @@ function HomeReviewRun({ kind, trackKeys, results, seenLog, srs, speech, makeApi
       <div style={{ boxShadow: SHADOW.card, background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderRadius: 'var(--r-card)', padding: '22px', textAlign: 'center' }}>
         <div className="itil-display" style={{ fontSize: '18px', fontWeight: 600 }}>Round complete</div>
         <div style={{ fontSize: '12.5px', color: COLOR.muted, marginTop: '6px', lineHeight: 1.5 }}>
-          Anything you got right is recorded to its own cert, and flashcards rated Good or Easy have left the Tough terms deck. What's still weak stays for next time.
+          Anything you got right is recorded to its own cert, and flashcards marked Got it have left the Tough terms deck. What's still weak stays for next time.
         </div>
         <button onClick={retry} style={{ width: '100%', marginTop: '16px', padding: '12px', borderRadius: 'var(--r-ctl)', border: 'none', background: COLOR.primary, color: COLOR.onAccent, fontSize: '14px', fontWeight: 700 }}>Another round</button>
         <button onClick={onExit} style={{ width: '100%', marginTop: '8px', padding: '11px', borderRadius: 'var(--r-card)', border: `1px solid ${COLOR.border}`, background: 'transparent', color: COLOR.text, fontSize: '13px', fontWeight: 600 }}>Back to Home</button>
