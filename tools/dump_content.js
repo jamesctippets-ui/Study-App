@@ -59,8 +59,9 @@ if (want('other')) {
     m.blanks.forEach((b) => L.push(`   {${b.key}}: ${b.options.map((o, i) => (i === b.correct ? `*${o}` : o)).join(' / ')}`));
     L.push(`   WHY: ${m.explanation}`);
   });
-  L.push(`## SEQUENCES (${d.sequences.length}): steps are listed in the CORRECT order`);
-  d.sequences.forEach((s) => {
+  const sequences = d.sequences || [];
+  L.push(`## SEQUENCES (${sequences.length}): steps are listed in the CORRECT order`);
+  sequences.forEach((s) => {
     L.push(`${s.id} | ${s.cat} | ${s.prompt}`);
     s.steps.forEach((x, i) => L.push(`   ${i + 1}. ${x}`));
     L.push(`   WHY: ${s.explanation}`);

@@ -80,7 +80,7 @@
       "id": "f3",
       "cat": "manageDevices",
       "front": "Windows 365 Cloud PC provisioning policies",
-      "back": "A provisioning policy defines how a Cloud PC is created: which Microsoft Entra ID group receives it, the image used, the Entra join type (Microsoft Entra joined or hybrid Entra joined), and the domain join configuration. It is what actually triggers Cloud PC creation once a user is licensed and assigned.",
+      "back": "A Windows 365 policy that defines how each Cloud PC is created: which Microsoft Entra ID group receives it, the image used, the Entra join type (Microsoft Entra joined or hybrid Entra joined), and the domain join configuration. It is what actually triggers Cloud PC creation once a user is licensed and assigned.",
       "detail": "A user needs both a Windows 365 license assignment and a matching provisioning policy scope; having only one of the two never results in a Cloud PC being created."
     },
     {
@@ -101,7 +101,7 @@
       "id": "f6",
       "cat": "manageDevices",
       "front": "Windows Hotpatch updates",
-      "back": "Hotpatching applies a subset of security updates to a running Windows instance in memory, without requiring the usual reboot that full monthly cumulative updates need, reducing downtime and restart fatigue for enrolled devices.",
+      "back": "An update method that applies a subset of security updates to a running Windows instance in memory, without requiring the usual reboot that full monthly cumulative updates need, reducing downtime and restart fatigue for enrolled devices.",
       "detail": "Hotpatch releases still land on a baseline cumulative update periodically, since not every fix can be applied in memory, so it reduces reboots rather than eliminating them entirely."
     },
     {
@@ -115,7 +115,7 @@
       "id": "f8",
       "cat": "manageDevices",
       "front": "Windows Update for Business update rings",
-      "back": "An update ring is an Intune policy that controls when and how a group of devices receives quality and feature updates: deferral periods, whether updates install automatically, active hours, and whether the device is part of an early or broad deployment wave.",
+      "back": "An Intune policy that controls when and how a group of devices receives quality and feature updates: deferral periods, whether updates install automatically, active hours, and whether the device is part of an early or broad deployment wave.",
       "detail": "Rings are commonly staged, with a small pilot ring using a short or zero deferral and progressively larger rings using longer deferrals, so a bad update is caught on a small population before it reaches everyone."
     },
     {
@@ -129,21 +129,21 @@
       "id": "f10",
       "cat": "manageDevices",
       "front": "Co-management workloads and the co-management slider",
-      "back": "Co-management lets a hybrid Entra joined device be managed by both Configuration Manager and Intune at once. Per-workload sliders, such as Compliance policies, Device Configuration, or Windows Update Policies, individually decide whether Configuration Manager or Intune is authoritative for that specific workload.",
+      "back": "A hybrid Entra joined device can be managed by both Configuration Manager and Intune at once. Per-workload sliders, such as Compliance policies, Device Configuration, or Windows Update Policies, individually decide whether Configuration Manager or Intune is authoritative for that specific workload.",
       "detail": "Switching a workload's slider to Intune does not uninstall or disable the Configuration Manager client; Configuration Manager still manages every workload whose slider was not moved."
     },
     {
       "id": "f11",
       "cat": "manageDevices",
       "front": "Safeguard holds on feature updates",
-      "back": "A safeguard hold automatically blocks a feature update from being offered to a device that Microsoft has detected has a known compatibility issue, preventing the upgrade until Microsoft resolves the issue and lifts the hold, or an administrator deliberately opts the device out of safeguard holds.",
+      "back": "A Microsoft-applied block that automatically stops a feature update from being offered to a device that Microsoft has detected has a known compatibility issue, preventing the upgrade until Microsoft resolves the issue and lifts the block, or an administrator deliberately opts the device out of these blocks.",
       "detail": "Safeguard holds are Microsoft's own protective mechanism, not something an admin configures directly, though update reporting shows which devices are held and an admin can choose to opt out, which Microsoft advises against until the issue is resolved."
     },
     {
       "id": "f12",
       "cat": "prepareInfra",
       "front": "MDM authority in Microsoft Intune",
-      "back": "MDM authority determines which management service is in charge of a tenant's mobile device management. New Intune tenants are set to Intune automatically, so this is mostly a legacy concern: older tenants may still have had the authority set to Configuration Manager hybrid MDM or Office 365 MDM before moving to Intune, and co-management is now the standard hybrid approach.",
+      "back": "The setting that determines which management service is in charge of a tenant's mobile device management. New Intune tenants are set to Intune automatically, so this is mostly a legacy concern: older tenants may still have had the authority set to Configuration Manager hybrid MDM or Office 365 MDM before moving to Intune, and co-management is now the standard hybrid approach.",
       "detail": "Enrollment cannot work without a valid MDM authority, but because it is set automatically on new tenants, a tenant-wide enrollment failure is more likely caused by the MDM user scope, an enrollment restriction, or an expired APNs certificate than by the authority itself."
     },
     {
@@ -171,14 +171,14 @@
       "id": "f16",
       "cat": "prepareInfra",
       "front": "Intune and Windows 365 licensing basics",
-      "back": "Intune device management is included in Microsoft 365 E3/E5, Enterprise Mobility + Security (EMS) E3/E5, or as a standalone Intune Plan license. Windows 365 Cloud PC requires its own separate per-user Cloud PC license, Enterprise or Frontline, layered on top of whatever license already provides the user's Intune management.",
+      "back": "Intune device management is included in Microsoft 365 E3/E5, Enterprise Mobility + Security (EMS) E3/E5, or as a standalone Intune Plan license. Windows 365 Cloud PC requires its own separate per-user Cloud PC license, Enterprise or Frontline (now called Flex), layered on top of whatever license already provides the user's Intune management.",
       "detail": "A user without an Intune-capable license can still technically be assigned policy, but their devices will not actually enroll or receive it; licensing gates enrollment itself, not just policy delivery."
     },
     {
       "id": "f17",
       "cat": "prepareInfra",
       "front": "Scope tags",
-      "back": "A scope tag limits which Intune administrators can see and manage a given policy, app, or device, letting role-based delegation, such as a regional helpdesk team, apply only to objects tagged for their scope, instead of the entire tenant's configuration.",
+      "back": "A label that limits which Intune administrators can see and manage a given policy, app, or device, letting role-based delegation, such as a regional helpdesk team, apply only to the objects marked for their team, instead of the entire tenant's configuration.",
       "detail": "Scope tags control visibility and management rights for admins; they do not change which end users or devices a policy is assigned to and applies against."
     },
     {
@@ -206,28 +206,28 @@
       "id": "f21",
       "cat": "protectDevices",
       "front": "Conditional Access grant control: require device to be marked compliant",
-      "back": "The require device to be marked as compliant grant control in Conditional Access checks the device's compliance status recorded by Intune at sign-in time, blocking access unless that specific device, not just any device belonging to the user, is currently compliant.",
+      "back": "This Conditional Access grant control checks the device's compliance status recorded by Intune at sign-in time, blocking access unless that specific device, not just any device belonging to the user, is currently compliant.",
       "detail": "This grant control is device-bound, not user-bound; a compliant device satisfies it even for a risky sign-in location, while the same user on a noncompliant personal device is blocked even from a trusted network."
     },
     {
       "id": "f22",
       "cat": "protectDevices",
       "front": "Onboarding devices to Microsoft Defender for Endpoint via Intune",
-      "back": "Once the Intune connection to Defender for Endpoint is enabled, Intune can push a Defender for Endpoint onboarding configuration profile to enrolled devices, connecting them to the Defender for Endpoint service so their risk signals flow back into Intune and can feed device compliance policies based on machine risk level.",
-      "detail": "Once connected, a compliance policy can require a maximum allowed device risk score from Defender for Endpoint, letting a device that becomes actively compromised automatically fail compliance and lose Conditional Access-gated access."
+      "back": "A two-step setup: an admin first enables the tenant-level connection between Intune and Defender for Endpoint, after which Intune can push an onboarding configuration profile to enrolled devices, connecting them to the Defender for Endpoint service without a per-device script so their risk signals flow back into Intune.",
+      "detail": "The connection is switched on once under Tenant administration > Connectors and tokens > Microsoft Defender for Endpoint. Until it is on, an onboarding policy has nothing to connect to, so the connector is the first thing to check when devices never appear in the Defender portal."
     },
     {
       "id": "f23",
       "cat": "protectDevices",
       "front": "Security baselines in Intune",
-      "back": "A security baseline is a Microsoft-curated group of preconfigured settings, based on Microsoft-recommended and industry-standard values, that can be assigned as a starting point and then customized, instead of building an equivalent settings catalog profile completely from scratch.",
+      "back": "A Microsoft-curated group of preconfigured settings, based on Microsoft-recommended and industry-standard values, that can be assigned as a starting point and then customized, instead of building an equivalent settings catalog profile completely from scratch.",
       "detail": "Baselines are versioned; a newer baseline version can introduce new or changed default settings, and an admin must explicitly move a profile instance to the new version to actually pick up those changes."
     },
     {
       "id": "f24",
       "cat": "protectDevices",
       "front": "BitLocker and disk encryption policy via Intune",
-      "back": "An endpoint protection or settings catalog encryption profile can require BitLocker on a Windows device, control recovery key storage in Microsoft Entra ID, silently enable encryption without prompting the user, and specify the encryption method and cipher strength.",
+      "back": "An endpoint security disk encryption or settings catalog profile can require Windows' built-in full-volume encryption on a device, control recovery key storage in Microsoft Entra ID, silently enable encryption without prompting the user, and specify the encryption method and cipher strength.",
       "detail": "Storing the recovery key in Microsoft Entra ID lets a help desk technician look it up during a self-service or assisted recovery, without the end user ever having written it down themselves."
     },
     {
@@ -255,14 +255,14 @@
       "id": "f28",
       "cat": "manageApps",
       "front": "App protection policies (MAM) vs mobile device management",
-      "back": "An app protection policy applies data-protection controls, like requiring a PIN, blocking copy/paste to unmanaged apps, and remote wipe of just that app's corporate data, at the application level. It works even on a device that is not enrolled in MDM at all, which is exactly why it is central to BYOD scenarios.",
+      "back": "Policies that apply data-protection controls, like requiring a PIN, blocking copy/paste to unmanaged apps, and remote wipe of just that app's corporate data, at the application level rather than managing the whole device the way mobile device management does. That app-level scope is exactly why they are central to BYOD scenarios.",
       "detail": "Because app protection policy enforcement does not require device enrollment, it is the standard answer whenever a scenario needs to protect corporate data on a personal device the organization does not otherwise manage."
     },
     {
       "id": "f29",
       "cat": "manageApps",
       "front": "App configuration policies",
-      "back": "An app configuration policy pushes predefined settings into a managed app, such as a default server URL or a disabled feature flag, at install or launch time, removing the need for a user to manually configure the app themselves after installation.",
+      "back": "A policy that pushes predefined settings into a managed app, such as a default server URL or a disabled feature flag, at install or launch time, removing the need for a user to manually configure the app themselves after installation.",
       "detail": "App configuration policies can target either managed devices (MDM-based) or managed apps regardless of enrollment (MAM-based), matching whichever app protection model the target population uses."
     },
     {
@@ -276,7 +276,7 @@
       "id": "f31",
       "cat": "manageApps",
       "front": "Microsoft Cloud PKI for Microsoft Intune",
-      "back": "Cloud PKI is a cloud-hosted certificate authority built into Intune that issues and manages certificates for device and user authentication, such as Wi-Fi, VPN, or app authentication, without standing up and maintaining an on-premises certificate authority or NDES infrastructure.",
+      "back": "A cloud-hosted certificate authority service built into Intune that issues and manages certificates for device and user authentication, such as Wi-Fi, VPN, or app authentication, without standing up and maintaining an on-premises certificate authority or NDES infrastructure.",
       "detail": "Cloud PKI eliminates the need for the on-premises Network Device Enrollment Service (NDES) and its connector that a traditional Intune certificate connector deployment previously required."
     },
     {
@@ -290,22 +290,22 @@
       "id": "f33",
       "cat": "optimizeOps",
       "front": "Automating Intune with the Microsoft Graph PowerShell SDK",
-      "back": "Nearly every Intune object, including configuration profiles, compliance policies, app assignments, and device actions, is exposed through the Microsoft Graph API, and the Microsoft Graph PowerShell SDK provides cmdlets to script bulk creation, updates, and reporting against those objects instead of clicking through the Intune admin center one object at a time.",
+      "back": "Nearly every Intune object, including configuration profiles, compliance policies, app assignments, and device actions, is exposed through the Microsoft Graph API, and a PowerShell SDK for it provides cmdlets to script bulk creation, updates, and reporting against those objects instead of clicking through the Intune admin center one object at a time.",
       "detail": "Scripted, repeatable configuration through Graph is also what backs most third-party Intune backup, migration, and configuration-as-code tooling, since the admin center UI itself has no built-in export/import for most policy types."
     },
     {
       "id": "f34",
       "cat": "optimizeOps",
-      "front": "Custom compliance policies using a detection script",
-      "back": "A custom compliance policy runs an administrator-supplied PowerShell discovery script on the device and compares its JSON output against a JSON rules file uploaded with the policy, such as a specific registry value or installed software version, extending compliance checks beyond Intune's built-in, template-based settings.",
+      "front": "Custom compliance policies using a discovery script",
+      "back": "A compliance policy type that runs an administrator-supplied PowerShell script on the device and compares its JSON output against a JSON rules file uploaded with the policy, such as a specific registry value or installed software version, extending compliance checks beyond Intune's built-in, template-based settings.",
       "detail": "The discovery script only reports data back to Intune for evaluation; it does not remediate anything itself, unlike a proactive remediation, which pairs a detection script with a separate remediation script."
     },
     {
       "id": "f35",
       "cat": "optimizeOps",
       "front": "Proactive remediations",
-      "back": "A proactive remediation (listed as Remediations under Scripts and remediations in the Intune admin center) packages a detection script and a remediation script together, running on a schedule against assigned devices. The detection script identifies a problem, and only if it reports one does the remediation script run automatically to fix it, without waiting for a user to report the issue.",
-      "detail": "Proactive remediations run under the SYSTEM account by default, which is why they can fix issues, like a corrupted registry key or a stopped service, that a standard end user account would not have rights to touch directly."
+      "back": "A pair of scripts packaged together and run on a schedule against assigned devices: a detection script identifies a problem, and only if it reports one does the remediation script run automatically to fix it, without waiting for a user to report the issue.",
+      "detail": "In the admin center they are listed as Remediations under Scripts and remediations. Proactive remediations run under the SYSTEM account by default, which is why they can fix issues, like a corrupted registry key or a stopped service, that a standard end user account would not have rights to touch directly."
     },
     {
       "id": "f36",
@@ -318,7 +318,7 @@
       "id": "f37",
       "cat": "optimizeOps",
       "front": "Intune alert rules",
-      "back": "An alert rule watches a specific Intune signal, such as Windows 365 Cloud PC provisioning or connection failures or Windows Autopatch policy health issues, against configurable conditions, and notifies designated recipients automatically when it triggers, instead of requiring an admin to manually check dashboards.",
+      "back": "A rule that watches a specific Intune signal, such as Windows 365 Cloud PC provisioning or connection failures or Windows Autopatch policy health issues, against configurable conditions, and notifies designated recipients automatically when it triggers, instead of requiring an admin to manually check dashboards.",
       "detail": "Where the rule is customizable, it can carry a severity and specific email recipients, letting a narrow team be notified only for the categories of failure that are actually their responsibility."
     },
     {
@@ -332,7 +332,7 @@
       "id": "f39",
       "cat": "manageDevices",
       "front": "Enrollment Status Page (ESP)",
-      "back": "Shows provisioning progress during Windows Autopilot and blocks a user from reaching the desktop until required apps and configuration profiles finish installing, so the device is fully ready on first login instead of continuing to configure itself in the background.",
+      "back": "A screen that shows provisioning progress during Windows Autopilot and blocks a user from reaching the desktop until required apps and configuration profiles finish installing, so the device is fully ready on first login instead of continuing to configure itself in the background.",
       "detail": "ESP settings can be scoped separately for the out-of-box experience and for every subsequent sign-in, which matters for the different Windows Autopilot deployment profile types."
     },
     {
@@ -346,7 +346,7 @@
       "id": "f41",
       "cat": "prepareInfra",
       "front": "Microsoft Tunnel",
-      "back": "A VPN gateway solution managed through Intune that runs in a container on a Linux server and gives managed iOS/iPadOS and Android Enterprise devices per-app or device-wide access to on-premises resources, with Microsoft Entra authentication and Conditional Access. Devices use the Microsoft Defender app as the Tunnel client together with an Intune VPN profile.",
+      "back": "A VPN gateway solution managed through Intune that runs in a container on a Linux server and gives managed iOS/iPadOS and Android Enterprise devices per-app or device-wide access to on-premises resources, with Microsoft Entra authentication and Conditional Access. Devices use the Microsoft Defender app as the VPN client together with an Intune VPN profile.",
       "detail": "Tunnel for MAM, an Intune Plan 2 capability, extends the same gateway to Android and iOS devices that are not enrolled in Intune, so a BYOD app can use the tunnel without full device management."
     },
     {
@@ -374,28 +374,28 @@
       "id": "f45",
       "cat": "manageDevices",
       "front": "Group Tag and dynamic device group targeting for Autopilot",
-      "back": "A Group Tag is a free-text attribute set on an Autopilot device registration, often during hardware vendor reservation, that a dynamic Microsoft Entra ID device group can filter on, automatically placing newly registered hardware into the correct group and, through that group's assignment, the correct Autopilot deployment profile with no manual per-device assignment.",
+      "back": "A free-text attribute set on an Autopilot device registration, often during hardware vendor reservation, that a dynamic Microsoft Entra ID device group can filter on, automatically placing newly registered hardware into the correct group and, through that group's assignment, the correct Autopilot deployment profile with no manual per-device assignment.",
       "detail": "Dynamic group membership evaluation is not instantaneous, so a freshly registered device can sit briefly outside its intended group, which is why Microsoft recommends registering hardware and setting its Group Tag well before the device is due to ship."
     },
     {
       "id": "f46",
       "cat": "manageDevices",
       "front": "Feature update deployment profiles",
-      "back": "A feature update deployment profile pins a targeted group of devices to a specific target Windows version, such as holding everyone on 24H2 regardless of what their update ring's feature deferral would otherwise allow, and can stage that rollout gradually. It complements, rather than replaces, an update ring's separate quality-update deferral settings.",
+      "back": "An Intune policy that pins a targeted group of devices to a specific target Windows version, such as holding everyone on 25H2 regardless of what their update ring's feature deferral would otherwise allow, and can stage that rollout gradually. It complements, rather than replaces, an update ring's separate quality-update deferral settings.",
       "detail": "A feature update deployment profile can override an update ring's feature deferral in either direction, holding a device back from a newer version or pushing it forward faster, so having both assigned to the same device is a common source of confusion about which version actually lands."
     },
     {
       "id": "f47",
       "cat": "manageDevices",
       "front": "Windows driver update policies",
-      "back": "A driver update policy lets Intune manage driver and firmware updates distributed through Windows Update for Business independently of quality and feature updates, letting an admin choose to approve all drivers automatically or review and approve them individually before a targeted group of devices installs them.",
+      "back": "A policy that lets Intune manage driver and firmware updates distributed through Windows Update for Business independently of quality and feature updates, letting an admin choose to approve all drivers automatically or review and approve them individually before a targeted group of devices installs them.",
       "detail": "Driver updates can be deferred or approved per driver, which matters because a bad OEM driver update, unlike a bad cumulative update, cannot always be resolved by a simple safeguard hold and may need to be blocked at the driver-policy level directly."
     },
     {
       "id": "f48",
       "cat": "manageDevices",
       "front": "Expedited quality updates",
-      "back": "An expedited update deployment lets an administrator push an urgent, already-released quality update to a targeted group of devices immediately, bypassing that group's normal update ring deferral and active-hours settings, for scenarios like a zero-day vulnerability that cannot wait for the next scheduled deployment wave.",
+      "back": "A deployment type that lets an administrator push an urgent, already-released quality update to a targeted group of devices immediately, bypassing that group's normal update ring deferral and active-hours settings, for scenarios like a zero-day vulnerability that cannot wait for the next scheduled deployment wave.",
       "detail": "Expediting is meant for narrow, urgent situations on a limited device count; because it can force an install and restart outside a user's normal active hours, using it broadly defeats the purpose of having deferral rings in the first place."
     },
     {
@@ -493,7 +493,7 @@
       "id": "f62",
       "cat": "manageDevices",
       "front": "Kiosk and shared/multi-app device configuration",
-      "back": "A kiosk configuration profile locks a device into running one app (single-app kiosk) or a curated small set of apps (multi-app kiosk), signing in as a designated local or Microsoft Entra ID account with the Start menu, taskbar, and most other Windows UI hidden from the end user. It pairs naturally with a self-deploying Autopilot profile, which needs no user interaction and is commonly used for kiosks and shared devices, since the kiosk configuration takes over as soon as that unattended provisioning finishes.",
+      "back": "A configuration profile that locks a device into running one app (single-app mode) or a curated small set of apps (multi-app mode), signing in as a designated local or Microsoft Entra ID account with the Start menu, taskbar, and most other Windows UI hidden from the end user. It pairs naturally with a self-deploying Autopilot profile, which needs no user interaction and is commonly used for unattended and shared devices, since this configuration takes over as soon as that unattended provisioning finishes.",
       "detail": "Multi-app kiosk mode still enforces AppLocker-style restrictions in the background even though it shows a friendlier, Start-menu-like tile launcher than a rigid single-app kiosk does, so an app that isn't explicitly allow-listed still won't launch even from that friendlier launcher."
     },
     {
@@ -514,35 +514,35 @@
       "id": "f65",
       "cat": "manageDevices",
       "front": "Offline domain join (ODJ) for hybrid Autopilot",
-      "back": "For hybrid Microsoft Entra join, the Intune Connector for Active Directory creates the computer object in on-premises AD and returns an offline domain join (ODJ) blob, which the Autopilot device applies during the out-of-box experience to complete its domain join.",
+      "back": "A way to join a device to on-premises AD in which the computer account is created in advance and the join data is delivered as a blob. For hybrid Microsoft Entra join, the Intune Connector for Active Directory creates the computer object and returns that blob, which the Autopilot device applies during the out-of-box experience to complete its domain join.",
       "detail": "The ODJ blob does not remove the need for network access: the device still needs line-of-sight to a domain controller during OOBE, which is exactly the problem a split-tunnel VPN that only routes specific corporate traffic can create until a user manually connects first."
     },
     {
       "id": "f66",
       "cat": "prepareInfra",
       "front": "Apple Push Notification service (APNs) certificate",
-      "back": "An APNs certificate is an Apple-issued certificate that a tenant uploads to Intune to establish trust with Apple's push notification service, and it is a hard prerequisite for managing any iOS/iPadOS or macOS device, including Automated Device Enrollment \u2014 without a valid, unexpired APNs certificate, Intune cannot push MDM commands to Apple devices at all.",
-      "detail": "An APNs certificate must be renewed annually with the same Apple ID that originally created it; letting it expire doesn't just block new enrollments, it also immediately breaks management of every already-enrolled Apple device in the tenant."
+      "back": "The Apple-issued certificate that a tenant uploads to Intune to establish trust with Apple's push notification service is a hard prerequisite for managing any iOS/iPadOS or macOS device, including Automated Device Enrollment \u2014 without a valid, unexpired one, Intune cannot push MDM commands to Apple devices at all.",
+      "detail": "An APNs certificate must be renewed annually with the same Apple ID that originally created it; letting it expire doesn't just block new enrollments, it also stops Intune managing every already-enrolled Apple device in the tenant until the certificate is renewed (Apple allows a 30-day grace period to renew after expiry)."
     },
     {
       "id": "f67",
       "cat": "prepareInfra",
       "front": "Administrative units (Microsoft Entra ID)",
-      "back": "An administrative unit is a Microsoft Entra ID container that scopes a delegated admin's role, such as User Administrator, to only the users, groups, or devices placed inside that unit, letting a regional team manage its own directory objects without seeing or touching the rest of the tenant.",
+      "back": "A Microsoft Entra ID container that scopes a delegated admin's role, such as User Administrator, to only the users, groups, or devices placed inside it, letting a regional team manage its own directory objects without seeing or touching the rest of the tenant.",
       "detail": "An administrative unit delegates directory-level administration in Entra ID itself; it is a different layer from scope tags, which instead limit what an Intune role can see and manage among Intune objects like policies, apps, and devices."
     },
     {
       "id": "f68",
       "cat": "prepareInfra",
       "front": "VPN and Wi-Fi configuration profiles",
-      "back": "A VPN profile or Wi-Fi profile, deployed as its own device configuration or settings catalog profile type, pushes connection settings, such as server address, authentication method, and SSID, to managed devices automatically, and commonly pairs with a certificate profile sourced from Microsoft Cloud PKI or SCEP so the device authenticates with a certificate instead of a typed password.",
+      "back": "Two kinds of connection profile, each deployed as its own device configuration or settings catalog profile type, push connection settings, such as server address, authentication method, and SSID, to managed devices automatically, and commonly pair with a certificate profile sourced from Microsoft Cloud PKI or SCEP so the device authenticates with a certificate instead of a typed password.",
       "detail": "Deploying the certificate profile and the VPN or Wi-Fi profile to the same device group is what actually lets authentication succeed silently; the connection profile alone, with no matching certificate delivered to the device, fails at the authentication step."
     },
     {
       "id": "f69",
       "cat": "protectDevices",
       "front": "Microsoft Defender Antivirus policy (endpoint security)",
-      "back": "An Intune endpoint security Antivirus policy configures Microsoft Defender Antivirus settings such as cloud-delivered protection level, real-time protection, scheduled and quick scan behavior, and scan exclusions, independent of the separate attack surface reduction rules and firewall policy nodes in endpoint security.",
+      "back": "An Intune endpoint security policy that configures the built-in Windows malware scanner's settings, such as cloud-delivered protection level, real-time protection, scheduled and quick scan behavior, and scan exclusions, independent of the separate attack surface reduction rules and firewall policy nodes in endpoint security.",
       "detail": "Raising cloud-delivered protection to its highest blocking level trades a small amount of scan latency, while a file is checked against the cloud, for faster coverage of brand-new malware that a signature-only, offline-only configuration would miss."
     },
     {
@@ -556,14 +556,14 @@
       "id": "f71",
       "cat": "protectDevices",
       "front": "Jailbreak/root detection (mobile compliance)",
-      "back": "An iOS/iPadOS or Android compliance policy can require that a device not be jailbroken or rooted, automatically failing compliance for any device Intune detects has had its OS-level restrictions bypassed, since a jailbroken or rooted device can no longer be trusted to enforce the rest of the policy's own settings.",
+      "back": "An iOS/iPadOS or Android compliance policy setting that automatically fails compliance for any device Intune detects has had its OS-level restrictions bypassed, since such a device can no longer be trusted to enforce the rest of the policy's own settings.",
       "detail": "This setting pairs naturally with a compliance policy's actions for noncompliance: a device that fails jailbreak detection can trigger the same scheduled actions, up to losing Conditional Access-gated access, as any other failed compliance rule."
     },
     {
       "id": "f72",
       "cat": "manageApps",
       "front": "Apple VPP (Apple Business Manager) app licensing",
-      "back": "Apple Volume Purchase Program licensing, managed through an Apple Business Manager token added to Intune, lets an organization buy and assign App Store app licenses in bulk, either to a device (device licensing, no Apple ID needed on the device) or to a specific user's Apple ID (user licensing), then deploy and reclaim those licenses through Intune the same way as any other required or available app assignment.",
+      "back": "Bulk licensing of App Store apps, managed through an Apple Business Manager token added to Intune, lets an organization buy and assign licenses, either to a device (device licensing, no Apple ID needed on the device) or to a specific user's Apple ID (user licensing), then deploy and reclaim those licenses through Intune the same way as any other required or available app assignment.",
       "detail": "Device licensing is generally preferred for shared or kiosk-style corporate iPads since it needs no personal Apple ID on the device at all, while user licensing is tied to one person's Apple ID and moves with them if they get a new device."
     },
     {
@@ -578,7 +578,7 @@
       "cat": "manageApps",
       "front": "Win32 app install context (system vs user)",
       "back": "A Win32 app package can be set to install in the system context, running once for the whole device under SYSTEM regardless of who signs in, or the user context, running separately for each signed-in user; choosing the wrong context for how the installer itself behaves is a common cause of an app that Intune reports as successfully installed but that a specific user never actually sees.",
-      "detail": "An installer built to write Start menu shortcuts and registry keys per-user will silently fail to register for anyone if it's deployed in system context, even though the install itself, and the detection rule vs requirement rules check behind it, both report success."
+      "detail": "An installer built to write Start menu shortcuts and registry keys per-user will silently fail to register for anyone if it's deployed in system context, even though the install itself and the detection rule behind it both report success."
     },
     {
       "id": "f75",
@@ -619,7 +619,7 @@
       "id": "f80",
       "cat": "protectDevices",
       "front": "Microsoft Defender for Endpoint indicators",
-      "back": "An indicators policy, managed in the Microsoft Defender portal and scoped to onboarded devices, lets an admin explicitly allow or block specific files, certificates, IP addresses, or URLs/domains by their exact identifier, overriding Defender's normal detection logic for just that one indicator across every onboarded device.",
+      "back": "A custom entry, managed in the Microsoft Defender portal and scoped to onboarded devices, that lets an admin explicitly allow or block a specific file, certificate, IP address, or URL/domain by its exact identifier, overriding Defender's normal detection logic for just that one item across every onboarded device.",
       "detail": "Indicators are useful for two opposite situations at once: blocking a specific malicious hash security research has identified, or allowing a legitimate internal tool that antivirus heuristics keep misidentifying as suspicious."
     },
     {
@@ -633,13 +633,13 @@
       "id": "f82",
       "cat": "protectDevices",
       "front": "Device control policy for removable storage",
-      "back": "An Intune endpoint security device control policy, part of the attack surface reduction category, can block or restrict removable storage such as USB drives, by device class or by specific hardware ID, preventing data exfiltration or malware introduction through removable media without having to physically disable USB ports.",
+      "back": "An Intune endpoint security policy, part of the attack surface reduction category, can block or restrict removable storage such as USB drives, by device class or by specific hardware ID, preventing data exfiltration or malware introduction through removable media without having to physically disable USB ports.",
       "detail": "Device control can be scoped narrowly, such as allowing only specific, approved USB device IDs while blocking every other removable drive, rather than an all-or-nothing block on every USB port."
     },
     {
       "id": "f83",
       "cat": "protectDevices",
-      "front": "Windows Defender Credential Guard",
+      "front": "Credential Guard",
       "back": "Credential Guard uses virtualization-based security to isolate and protect cached domain credentials and NTLM hashes in a secured enclave the operating system itself cannot access, so even malware running with local administrator rights cannot extract reusable credentials from an infected device.",
       "detail": "Credential Guard addresses the same credential-theft-from-LSASS problem that attack surface reduction (ASR) rules can also target, but through hardware-backed isolation instead of behavior-based blocking."
     },
@@ -654,14 +654,14 @@
       "id": "f85",
       "cat": "manageApps",
       "front": "Win32 app content prep tool (IntuneWinAppUtil)",
-      "back": "The Microsoft Win32 Content Prep Tool converts an application's setup folder into the .intunewin format Intune requires for a Win32 app upload, encrypting the package in transit and at rest in Intune so the installer's contents are not exposed in plain form.",
+      "back": "A Microsoft command-line packaging utility that converts an application's setup folder into the .intunewin format Intune requires for a Win32 app upload, encrypting the package in transit and at rest in Intune so the installer's contents are not exposed in plain form.",
       "detail": "This packaging step happens once per app version, outside of the Intune admin center itself, before the resulting .intunewin file is ever uploaded as a new Win32 app or a new version through supersedence."
     },
     {
       "id": "f86",
       "cat": "manageApps",
       "front": "App protection policy setting categories",
-      "back": "An app protection policy's settings are organized into three groups: data protection, which controls things like copy/paste and backup behavior; access requirements, which controls PIN and biometric prompts; and conditional launch, which blocks or wipes the app's data if a condition is met, such as the app being launched on a jailbroken device or after too many failed PIN attempts.",
+      "back": "The settings in a policy that protects corporate data inside apps are organized into three groups: data protection, which controls things like copy/paste and backup behavior; access requirements, which controls PIN and biometric prompts; and conditional launch, which blocks or wipes the app's data if a condition is met, such as the app being launched on a jailbroken device or after too many failed PIN attempts.",
       "detail": "Conditional launch is the enforcement layer that actually acts on a violation, such as triggering a selective wipe of corporate data, rather than simply configuring a preventive control like data protection or access requirements."
     },
     {
@@ -683,20 +683,20 @@
       "cat": "optimizeOps",
       "front": "Microsoft Intune Suite",
       "back": "The Microsoft Intune Suite is now presented as Intune advanced capabilities: Advanced Analytics, Remote Help, Microsoft Cloud PKI, Endpoint Privilege Management, Enterprise Application Management, and Intune Plan 2 features such as Tunnel for MAM, specialty device management, and firmware over-the-air updates. They come through Intune Plan 2, the Suite, or select Microsoft 365 bundles.",
-      "detail": "Licensing has shifted: capabilities such as Remote Help and Advanced Analytics are being included in Microsoft 365 E3, and E5 adds Endpoint Privilege Management, Enterprise Application Management, and Cloud PKI. Check what the tenant already holds before assuming a separate add-on is needed. Free 90-day trials exist per capability."
+      "detail": "Licensing has shifted: capabilities such as Remote Help and Advanced Analytics have been included in Microsoft 365 E3 since July 2026, and E5 adds Endpoint Privilege Management, Enterprise Application Management, and Cloud PKI. Check what the tenant already holds before assuming a separate add-on is needed. Free 90-day trials exist per capability."
     },
     {
       "id": "f90",
       "cat": "optimizeOps",
       "front": "Intune policy sets",
-      "back": "A policy set groups multiple apps, configuration profiles, compliance policies, and other assignable items into one single object that can be assigned to a group all at once, instead of an admin individually assigning each item every time a new group of users or devices needs the same combination.",
+      "back": "A bundle that groups multiple apps, configuration profiles, compliance policies, and other assignable items into one single object that can be assigned to a group all at once, instead of an admin individually assigning each item every time a new group of users or devices needs the same combination.",
       "detail": "Policy sets simplify onboarding a new department or location that needs the identical bundle of apps and policies every other similar group already has, since the whole bundle is assigned in one step rather than reassigning each piece separately."
     },
     {
       "id": "f91",
       "cat": "manageDevices",
       "front": "Windows 365 Boot and Windows 365 Switch",
-      "back": "Windows 365 Boot lets a user sign in to a physical Windows device directly into their Cloud PC at the login screen instead of the local desktop. Windows 365 Switch lets a user already signed in locally move back and forth between their local desktop and their Cloud PC from within the same session, similar to switching between virtual desktops.",
+      "back": "One Windows 365 feature lets a user sign in to a physical Windows device directly into their Cloud PC at the login screen instead of the local desktop. A second lets a user already signed in locally move back and forth between their local desktop and their Cloud PC from within the same session, similar to switching between virtual desktops.",
       "detail": "Boot is about how a session starts, landing straight in the Cloud PC from the lock screen, while Switch is about moving between a local and cloud session once already signed in; a device can support both features at once."
     },
     {
@@ -717,7 +717,7 @@
       "id": "f94",
       "cat": "manageDevices",
       "front": "Windows Autopilot pre-provisioning (technician flow)",
-      "back": "Pre-provisioning splits a user-driven Autopilot deployment into two phases. A technician or reseller runs the device phase first, installing device-targeted apps and policies, and the end user later completes only the short user phase. It was formerly called white glove.",
+      "back": "A flow that splits a user-driven Autopilot deployment into two phases. A technician or reseller runs the device phase first, installing device-targeted apps and policies, and the end user later completes only the short user phase. It was formerly called white glove.",
       "detail": "At the first setup screen the technician presses the Windows key five times and chooses Provision. It supports user-driven deployments for both Microsoft Entra join and hybrid join, and the user phase shrinks because most of the work already happened."
     },
     {
@@ -731,7 +731,7 @@
       "id": "f96",
       "cat": "manageDevices",
       "front": "Windows Subscription Activation",
-      "back": "Subscription Activation upgrades a licensed Windows Pro device to Windows Enterprise automatically when a user with a Windows Enterprise E3 or E5 license signs in with Microsoft Entra credentials. It needs no product key or reinstall, and the device steps back to Pro when the license lapses.",
+      "back": "A licensing feature that upgrades a licensed Windows Pro device to Windows Enterprise automatically when a user with a Windows Enterprise E3 or E5 license signs in with Microsoft Entra credentials. It needs no product key or reinstall, and the device steps back to Pro when the license lapses.",
       "detail": "A typical case is new OEM Pro laptops joined through Autopilot that become Enterprise at the first licensed sign-in. The base Pro edition must already be activated, and Windows Home cannot be stepped up."
     },
     {
@@ -752,8 +752,8 @@
       "id": "f99",
       "cat": "manageDevices",
       "front": "Custom profiles and OMA-URI settings",
-      "back": "A custom device configuration profile lets an admin hand-enter OMA-URI settings, each with a URI path, data type and value, to configure a Windows CSP setting that has no built-in Intune interface. OMA-URI stands for Open Mobile Alliance Uniform Resource Identifier.",
-      "detail": "Custom profiles are error-prone, because a wrong URI or data type simply fails on the device. Check the settings catalog first, since it now covers most CSP settings without hand-typed paths."
+      "back": "A device configuration profile type that lets an admin hand-enter settings, each with a URI path, data type and value, to configure a Windows CSP setting that has no built-in Intune interface.",
+      "detail": "OMA-URI stands for Open Mobile Alliance Uniform Resource Identifier. Custom profiles are error-prone, because a wrong URI or data type simply fails on the device. Check the settings catalog first, since it now covers most CSP settings without hand-typed paths."
     },
     {
       "id": "f100",
@@ -787,7 +787,7 @@
       "id": "f104",
       "cat": "prepareInfra",
       "front": "PKCS certificate profile and imported PFX certificates",
-      "back": "A PKCS certificate profile has the Intune Certificate Connector request a certificate from an on-premises CA on the device's behalf, so the key pair is not created by the device. Imported PFX certificates let you upload existing user certificates, for example for S/MIME email, for Intune to deliver.",
+      "back": "One type of certificate profile has the Intune Certificate Connector request a certificate from an on-premises CA on the device's behalf, so the key pair is not created by the device. A companion option lets you upload existing user certificates with their private keys, for example for S/MIME email, for Intune to deliver.",
       "detail": "Choose PKCS when the CA team will not expose NDES. Choose imported PFX only when existing private keys must be preserved, such as S/MIME certificates users need to read old mail."
     },
     {
@@ -808,28 +808,28 @@
       "id": "f107",
       "cat": "prepareInfra",
       "front": "Apple Automated Device Enrollment (ADE)",
-      "back": "Automated Device Enrollment, formerly the Device Enrollment Program, lets an organization buy Apple devices through Apple Business Manager or Apple School Manager and have them enroll in Intune automatically at first setup. Devices can be enrolled as supervised.",
+      "back": "Apple's bulk enrollment program, formerly the Device Enrollment Program, that lets an organization buy Apple devices through Apple Business Manager or Apple School Manager and have them enroll in Intune automatically at first setup. Devices can be enrolled as supervised.",
       "detail": "Setup: create an ADE token in Apple Business Manager, upload it to Intune, then assign an enrollment profile to the devices. It also requires a valid APNs certificate."
     },
     {
       "id": "f108",
       "cat": "prepareInfra",
       "front": "Android zero-touch enrollment and Samsung Knox Mobile Enrollment",
-      "back": "Both are bulk enrollment methods for corporate-owned Android Enterprise devices that start enrollment straight out of the box. Zero-touch is Google's reseller-managed portal, and Knox Mobile Enrollment is Samsung's equivalent for Knox devices.",
+      "back": "Both are bulk enrollment methods for corporate-owned Android Enterprise devices that start enrollment straight out of the box. One is Google's reseller-managed portal, and the other is Samsung's equivalent for Knox devices.",
       "detail": "Alternatives are a QR code, NFC or a typed token. Pick zero-touch or Knox when hundreds of new phones ship to users and nobody in IT handles them first."
     },
     {
       "id": "f109",
       "cat": "prepareInfra",
       "front": "Supervised mode on iOS/iPadOS",
-      "back": "Supervised mode is a higher level of management on corporate-owned iPhones and iPads that unlocks controls unavailable on personal devices, such as Lost Mode and single-app kiosk mode. Devices become supervised through Automated Device Enrollment or Apple Configurator.",
+      "back": "A higher level of management on corporate-owned iPhones and iPads that unlocks controls unavailable on personal devices, such as Lost Mode and single-app kiosk mode. Devices reach it through Automated Device Enrollment or Apple Configurator.",
       "detail": "If a feature is supervised-only, personal devices enrolled through Company Portal cannot use it. Only devices that came in through ADE or Apple Configurator qualify."
     },
     {
       "id": "f110",
       "cat": "prepareInfra",
       "front": "Automatic MDM enrollment (MDM user scope)",
-      "back": "Automatic enrollment enrolls Windows devices in Intune when a user signs in with Microsoft Entra credentials and falls inside the MDM user scope in Entra ID Mobility (MDM and MAM). The scope can be set to None, Some (selected groups) or All.",
+      "back": "A setting that enrolls Windows devices in Intune when a user signs in with Microsoft Entra credentials and falls inside the user scope set in Entra ID Mobility (MDM and MAM). That scope can be set to None, Some (selected groups) or All.",
       "detail": "If devices join Entra ID but never appear in Intune, check the MDM user scope first. Hybrid joined devices also need the automatic enrollment Group Policy or Configuration Manager setting."
     },
     {
@@ -864,7 +864,7 @@
       "id": "f115",
       "cat": "protectDevices",
       "front": "Microsoft Defender SmartScreen",
-      "back": "Defender SmartScreen checks websites, downloads and apps against a Microsoft reputation service and warns or blocks users from phishing sites, malware sites and unrecognized files. Intune can enforce it and stop users from bypassing the warnings.",
+      "back": "A reputation-based protection that checks websites, downloads and apps against a Microsoft reputation service and warns or blocks users from phishing sites, malware sites and unrecognized files. Intune can enforce it and stop users from bypassing the warnings.",
       "detail": "A policy setting can remove the option to click through a warning. SmartScreen reputation data also feeds network protection, which extends the same blocking to traffic from other apps."
     },
     {
@@ -878,7 +878,7 @@
       "id": "f117",
       "cat": "protectDevices",
       "front": "Mobile Threat Defense (MTD) connector",
-      "back": "A Mobile Threat Defense connector lets a partner app, such as Microsoft Defender for Endpoint on mobile, report a device's threat level to Intune. A compliance policy can then mark devices above an allowed risk level as noncompliant, so Conditional Access can block them.",
+      "back": "A Mobile Threat Defense connector lets a partner app on iOS/iPadOS or Android, such as Microsoft Defender for Endpoint on mobile, report a device's threat level to Intune. A compliance policy can then mark devices above an allowed risk level as noncompliant, so Conditional Access can block them.",
       "detail": "Setup: enable the MTD connector, deploy the MTD app, add the machine risk score requirement to a compliance policy, and require compliant devices in Conditional Access."
     },
     {
@@ -899,7 +899,7 @@
       "id": "f120",
       "cat": "protectDevices",
       "front": "FileVault disk encryption for macOS",
-      "back": "FileVault is the built-in full-disk encryption on macOS. An Intune endpoint security disk encryption policy can turn it on and escrow the personal recovery key in Intune, so the key can be recovered later, including by the user from Company Portal.",
+      "back": "The built-in full-disk encryption on macOS. An Intune endpoint security disk encryption policy can turn it on and escrow the personal recovery key in Intune, so the key can be recovered later, including by the user from Company Portal.",
       "detail": "It is the macOS counterpart to BitLocker policy. A compliance policy can require encryption, and a Rotate FileVault recovery key remote action issues a replacement key."
     },
     {
@@ -913,28 +913,28 @@
       "id": "f122",
       "cat": "manageApps",
       "front": "Enterprise App Catalog apps",
-      "back": "The Enterprise App Catalog is a Microsoft-hosted library of prepackaged Win32 apps in Intune. Install and uninstall commands, detection rules and requirements are already filled in, so you pick an app, assign it, and later update it using supersedence.",
+      "back": "A Microsoft-hosted library of prepackaged Win32 apps in Intune. Install and uninstall commands, detection rules and requirements are already filled in, so you pick an app, assign it, and later update it using supersedence.",
       "detail": "It needs the Enterprise Application Management add-on, sold separately or as part of the Intune Suite. It saves the packaging and detection-rule work of building a Win32 app by hand."
     },
     {
       "id": "f123",
       "cat": "manageApps",
       "front": "Intune App SDK and App Wrapping Tool",
-      "back": "To bring app protection policies to your own line-of-business apps, developers can build the Intune App SDK into the code, or an admin can run the Intune App Wrapping Tool on the compiled app. Wrapping needs no source code, only signing credentials.",
+      "back": "To bring app protection policies to your own line-of-business apps, developers can build Intune's software development kit into the code, or an admin can run a packaging utility on the compiled app that needs no source code, only signing credentials.",
       "detail": "Exam pick: no developer and no source code points to the wrapping tool, while deep integration points to the SDK. Store apps cannot be wrapped, and Microsoft 365 apps already support the policies."
     },
     {
       "id": "f124",
       "cat": "manageApps",
       "front": "Windows Package Manager (winget)",
-      "back": "Windows Package Manager, or winget, is Microsoft's command-line tool for finding and installing apps from repositories such as the Microsoft Store and a community catalog. Intune's new Microsoft Store app type is built on it.",
+      "back": "Microsoft's command-line tool for finding and installing apps from repositories such as the Microsoft Store and a community catalog. Intune's new Microsoft Store app type is built on it.",
       "detail": "Because it draws on the winget repository, Intune can pick up newer app versions to keep Store apps current. It is the replacement path for the retired Microsoft Store for Business."
     },
     {
       "id": "f125",
       "cat": "optimizeOps",
       "front": "Intune diagnostic settings (audit and operational logs)",
-      "back": "Diagnostic settings in the Intune admin center export Intune audit and operational logs to a Log Analytics workspace, an Azure storage account or an event hub. That allows long retention, KQL queries, workbooks and alerts beyond the built-in reports.",
+      "back": "A setting in the Intune admin center that exports Intune audit and operational logs to a Log Analytics workspace, an Azure storage account or an event hub. That allows long retention, KQL queries, workbooks and alerts beyond the built-in reports.",
       "detail": "Choose Log Analytics for queries and workbooks, a storage account for cheap archiving, and Event Hubs to stream into a SIEM."
     },
     {
@@ -948,13 +948,13 @@
       "id": "f127",
       "cat": "optimizeOps",
       "front": "Device query for multiple devices (Intune Advanced Analytics)",
-      "back": "Device query lets admins run Kusto Query Language (KQL) against collected inventory data to get fleet-wide answers, such as which devices have a particular app version or BIOS. Querying multiple devices needs the Intune Advanced Analytics or Intune Suite add-on.",
+      "back": "A feature that lets admins run Kusto Query Language (KQL) against collected inventory data to get fleet-wide answers, such as which devices have a particular app version or BIOS. Running it across many devices at once needs the Intune Advanced Analytics capability, available as an add-on, in the Intune Suite or in select Microsoft 365 bundles.",
       "detail": "The account needs Help Desk Operator or a custom role with the Managed devices Query permission. A typical use is finding every device with a vulnerable app version before patching."
     },
     {
       "id": "f128",
       "cat": "optimizeOps",
-      "front": "Multiple Administrator Approval (MAA)",
+      "front": "Multi Admin Approval (MAA)",
       "back": "Multi Admin Approval uses Intune access policies to require that a second administrator approves a protected change, such as an app deployment, a script or a device wipe, before it takes effect. It guards against one compromised or careless admin account.",
       "detail": "Approvers must be in a security group assigned to the access policy and to an Intune role, and nobody can approve their own request. The tenant needs at least two admin accounts."
     },
@@ -962,8 +962,8 @@
       "id": "f129",
       "cat": "optimizeOps",
       "front": "Device cleanup rules",
-      "back": "Device cleanup rules automatically delete stale device records from Intune when a device has not checked in for a set number of days, from 30 to 270. One rule applies per platform, and the rule removes only the Intune record, not the device or its data.",
-      "detail": "Cleanup keeps device counts, licenses and reports accurate. The Microsoft Entra ID device object remains, so stale entries there must be cleaned up separately."
+      "back": "Device cleanup rules automatically hide stale device records from Intune when a device has not checked in for a set number of days, from 30 to 270. One rule applies per platform (or to all platforms; if both exist, the shorter period wins), and a rule triggers no action on the device or its data.",
+      "detail": "Cleanup keeps the device list and reports free of stale records, and a hidden device reappears if it checks in before its device certificate expires. The Microsoft Entra ID device object remains, so stale entries there must be cleaned up separately."
     },
     {
       "id": "f9001",
@@ -983,7 +983,7 @@
       "id": "f9003",
       "cat": "prepareInfra",
       "front": "Roles for Windows 365 Cloud PCs",
-      "back": "Cloud PCs are managed with Intune role-based access control plus Windows 365 roles: the Windows 365 Administrator Microsoft Entra role manages Cloud PCs broadly, while the Cloud PC Administrator role manages images, network connections, and provisioning and Cloud PC Reader gives read-only access to the Windows 365 node.",
+      "back": "Cloud PCs are managed with Intune role-based access control plus Windows 365 roles: the Windows 365 Administrator Microsoft Entra role manages Cloud PCs broadly, while in Intune the Cloud PC Administrator role manages images, network connections and provisioning, and Cloud PC Reader gives read-only access to the Windows 365 node.",
       "detail": "When an Azure network connection is used, Windows 365 needs the Windows 365 Network Interface Contributor role on the connection's resource group and the Windows 365 Network User role on its virtual network. These are given to the Windows 365 service, not to admins."
     },
     {
@@ -997,7 +997,7 @@
       "id": "f9101",
       "cat": "manageDevices",
       "front": "Apply a device name template in Windows Autopilot",
-      "back": "An Autopilot deployment profile can apply a name template during enrollment: up to 15 characters of letters, numbers, and hyphens (not all numbers), with %SERIAL% for the hardware serial number and %RAND:x% for x random digits. It requires Microsoft Entra join; for hybrid devices only a prefix can be set, in the domain join profile.",
+      "back": "An Autopilot deployment profile setting that names each device during enrollment from a pattern: up to 15 characters of letters, numbers, and hyphens (not all numbers), with %SERIAL% for the hardware serial number and %RAND:x% for x random digits. It requires Microsoft Entra join; for hybrid devices only a prefix can be set, in the domain join profile.",
       "detail": "A template such as CORP-%RAND:5% gives unique, predictable names without scripts. The name has to fit in 15 characters after the macros expand, so a long prefix plus %SERIAL% can fail on devices with long serial numbers."
     },
     {
@@ -1018,7 +1018,7 @@
       "id": "f9104",
       "cat": "manageDevices",
       "front": "Windows settings backup and restore (formerly Windows Backup for Organizations)",
-      "back": "A Windows 11 feature that backs up user settings and the list of Microsoft Store apps for users signed in with Microsoft Entra ID, then restores them on a new device during OOBE or at first sign-in. It is off by default until backup and restore policies are configured, and backups run about every eight days.",
+      "back": "A Windows feature that backs up user settings and the list of Microsoft Store apps for users signed in with Microsoft Entra ID, then restores them on a new device during OOBE or at first sign-in. Backup needs a policy until Windows 11 version 26H2, which turns it on by default for eligible devices, while restore stays off until an admin enables it; backups run about every eight days.",
       "detail": "Configure backup with a settings catalog policy. Restore can be turned on tenant-wide for enrollment (Devices > Enrollment > Windows Backup and Restore) or with a settings catalog policy after enrollment. During Autopilot, the profile must be user-driven, not self-deploying."
     },
     {
@@ -1046,14 +1046,14 @@
       "id": "f9108",
       "cat": "manageDevices",
       "front": "Microsoft Tunnel for Mobile Application Management (Tunnel for MAM)",
-      "back": "Tunnel for MAM extends the Microsoft Tunnel VPN gateway to Android and iOS/iPadOS devices that are not enrolled in Intune, so BYOD users reach on-premises resources through managed apps. It requires an existing Tunnel gateway and Intune Plan 2 or an additional license.",
+      "back": "An extension of the Microsoft Tunnel VPN gateway to Android and iOS/iPadOS devices that are not enrolled in Intune, so BYOD users reach on-premises resources through managed apps. It requires an existing Tunnel gateway and a license that includes it, such as Intune Plan 2, the Intune Suite or a Microsoft 365 bundle that carries it.",
       "detail": "On Android, VPN comes through the Defender app (with Company Portal installed) and can be per-app or device-wide. On iOS/iPadOS it uses the Tunnel for MAM SDK in the app and is per-app only. Edge can enforce strict tunnel mode, which blocks traffic when the VPN is down."
     },
     {
       "id": "f9109",
       "cat": "manageDevices",
       "front": "Update Microsoft Defender security intelligence remote action",
-      "back": "The Update Windows Defender security intelligence action tells a Windows device to refresh its Microsoft Defender Antivirus definitions immediately, and quick scan and full scan actions run a scan on demand, all from the device page in Intune.",
+      "back": "A remote action that tells a Windows device to refresh its Microsoft Defender Antivirus definitions immediately; separate quick scan and full scan actions run a scan on demand, all from the device page in Intune.",
       "detail": "It is the quick response when a new threat is announced, or when a device missed scheduled updates. It does not change antivirus policy, only triggers an immediate update."
     },
     {
@@ -1067,7 +1067,7 @@
       "id": "f9111",
       "cat": "manageDevices",
       "front": "BitLocker recovery key rotation (remote action)",
-      "back": "The BitLocker key rotation action generates a new recovery key for the OS drive of an encrypted Windows device, so a key that was read aloud or exposed becomes useless. Run it from the device page under Secure; roles such as Help Desk Operator and Endpoint Security Manager include the permission.",
+      "back": "A remote action that generates a new recovery key for the OS drive of an encrypted Windows device, so a key that was read aloud or exposed becomes useless. Run it from the device page under Secure; roles such as Help Desk Operator and Endpoint Security Manager include the permission.",
       "detail": "The old key stops working once the new one is escrowed. Check that the new key has been escrowed to Microsoft Entra ID before relying on it."
     },
     {
@@ -1081,7 +1081,7 @@
       "id": "f9113",
       "cat": "manageDevices",
       "front": "Enrollment time grouping",
-      "back": "Enrollment time grouping lets an Intune enrollment policy place a device in a specific Microsoft Entra security group during enrollment, so group-targeted policies and apps reach the device earlier in setup. It is generally available for Apple automated device enrollment on iOS/iPadOS and macOS.",
+      "back": "Enrollment time grouping lets an Intune enrollment policy place a device in a static Microsoft Entra security group during enrollment, so group-targeted policies and apps reach the device earlier in setup. It works with Apple automated device enrollment (iOS/iPadOS and macOS), Android Enterprise corporate-owned enrollment and Windows Autopilot device preparation.",
       "detail": "Normally a device only lands in a dynamic group after enrollment finishes, so required apps and policies arrive late. Targeting a static group at enrollment time avoids that delay. Assignment filters are the complementary tool for narrowing a profile to the right devices."
     },
     {
@@ -1095,8 +1095,8 @@
       "id": "f9115",
       "cat": "manageDevices",
       "front": "Android firmware over-the-air (FOTA) updates",
-      "back": "FOTA lets Intune manage firmware updates for corporate-owned Android Enterprise devices (fully managed, dedicated, and corporate-owned work profile). Samsung devices use Knox E-FOTA and Zebra devices use LifeGuard OTA; where FOTA is unavailable, a device restrictions profile controls system updates and can set a freeze period.",
-      "detail": "FOTA is an Intune Plan 2 capability. A freeze period blocks over-the-air updates for a defined window, such as a holiday sales peak, but not every manufacturer supports over-the-air control."
+      "back": "A capability that lets Intune manage firmware updates for corporate-owned Android Enterprise devices (fully managed, dedicated, and corporate-owned work profile) through the device maker's own update service, currently Samsung's and Zebra's. Where that service is unavailable, a device restrictions profile controls system updates and can set a freeze period.",
+      "detail": "FOTA is an Intune advanced capability (Plan 2, the Suite or a Microsoft 365 bundle that includes it). Samsung devices use Knox E-FOTA and Zebra devices use LifeGuard OTA. A freeze period blocks over-the-air updates for a defined window, such as a holiday sales peak, but not every manufacturer supports over-the-air control."
     },
     {
       "id": "f9116",
@@ -1109,21 +1109,21 @@
       "id": "f9201",
       "cat": "protectDevices",
       "front": "Endpoint detection and response (EDR) policy",
-      "back": "An EDR policy in Intune endpoint security deploys the Microsoft Defender for Endpoint onboarding configuration and EDR settings, such as sample sharing and telemetry reporting frequency, to devices through a policy assigned to device groups. The Defender for Endpoint connector must be turned on first.",
+      "back": "A policy type in Intune endpoint security deploys the Microsoft Defender for Endpoint onboarding configuration, plus settings such as sample sharing and telemetry reporting frequency, to devices through a policy assigned to device groups. The Defender for Endpoint connector must be turned on first.",
       "detail": "Onboarding makes the device visible in the Microsoft Defender portal, where analysts investigate alerts, triage incidents, and can isolate or scan a device. Intune then uses the device risk level in compliance policies and Conditional Access."
     },
     {
       "id": "f9202",
       "cat": "protectDevices",
       "front": "Security baseline versions",
-      "back": "Intune security baselines are Microsoft-recommended setting groups for Windows, Edge, Microsoft 365 Apps, and Windows 365. Each Windows release gets a new baseline version, such as Windows 11 version 26H2, and existing profiles never update automatically, so an admin must create a new profile or update one to the new version.",
+      "back": "The numbered releases of an Intune security baseline (Windows, Edge, Microsoft 365 Apps, Windows 365). Each Windows release gets a new one, such as Windows 11 version 26H2, and existing profiles never update automatically, so an admin must create a new profile or update one to the new release.",
       "detail": "Review the changed settings before moving to a newer version, since defaults can change and some settings are retired. Use a pilot group first, then widen the assignment."
     },
     {
       "id": "f9203",
       "cat": "protectDevices",
       "front": "Defender for Endpoint integration with Intune compliance",
-      "back": "Once Intune is connected to Microsoft Defender for Endpoint, a compliance policy can require a machine risk score at or below a chosen level. A device above that level is marked noncompliant, and Conditional Access can then block it from company resources until it is remediated.",
+      "back": "Once Intune is connected to Microsoft Defender for Endpoint and Windows devices are onboarded, a compliance policy can require a machine risk score at or below a chosen level. A device above that level is marked noncompliant, and Conditional Access can then block it from company resources until it is remediated.",
       "detail": "The risk level comes from Defender for Endpoint's detection of active threats, not from Intune settings. Pair it with actions for noncompliance so the user is notified or the device is retired after a grace period."
     },
     {
@@ -1179,42 +1179,42 @@
       "id": "f9403",
       "cat": "optimizeOps",
       "front": "Device Offboarding Agent and Policy Configuration Agent",
-      "back": "The Device Offboarding Agent identifies stale or misaligned devices and gives insights before they are offboarded. The Policy Configuration Agent converts plain-language documents and common industry baselines into recommended Intune settings and policies.",
+      "back": "One Security Copilot agent in Intune identifies stale or misaligned devices and gives insights before they are offboarded. Another converts plain-language documents and common industry baselines into recommended Intune settings and policies.",
       "detail": "Both produce recommendations that an admin reviews. They sit alongside Copilot in Intune, which answers questions and troubleshoots, and the standalone Security Copilot portal, which has a security operations focus."
     },
     {
       "id": "f9404",
       "cat": "optimizeOps",
       "front": "Using Copilot in Intune",
-      "back": "Copilot in Intune is embedded in the admin center for natural-language data exploration, policy and setting guidance, device troubleshooting, EPM request analysis, and Windows 365 insights. It needs Security Copilot capacity and the Intune plug-in enabled, and it respects Intune RBAC and scope tags.",
+      "back": "An AI assistant embedded in the admin center for natural-language data exploration, policy and setting guidance, device troubleshooting, EPM request analysis, and Windows 365 insights. It needs Security Copilot capacity and the Intune plug-in enabled, and it respects Intune RBAC and scope tags.",
       "detail": "Intune Administrator inherits Security Copilot owner access and other Intune roles inherit contributor access by default, so admins need no extra role assignments. Check the status under Tenant administration > Copilot."
     },
     {
       "id": "f9405",
       "cat": "optimizeOps",
       "front": "Advanced Analytics anomalies report",
-      "back": "The anomalies report finds application hangs, crashes, and stop error restarts that appear after changes, groups affected devices into device correlation groups by shared attributes (app version, driver, OS version, model), and flags at-risk devices so admins can fix issues before users report them.",
+      "back": "A report that finds application hangs, crashes, and stop error restarts that appear after changes, groups affected devices into device correlation groups by shared attributes (app version, driver, OS version, model), and flags at-risk devices so admins can fix issues before users report them.",
       "detail": "Use the device timeline to see events around the anomaly. Detection uses statistical models such as threshold, paired t-test, and Z-score methods, and the thresholds are predetermined, not customizable."
     },
     {
       "id": "f9406",
       "cat": "optimizeOps",
       "front": "Advanced Analytics reports and capabilities",
-      "back": "Advanced Analytics extends endpoint analytics with resource performance (CPU and RAM by device and model), battery health, anomalies, device timeline, device query, multi-device query, and device scopes that use scope tags to filter reports for a subset of devices.",
+      "back": "A premium layer that extends endpoint analytics with resource performance (CPU and RAM by device and model), battery health, anomalies, device timeline, device query, multi-device query, and device scopes that use scope tags to filter reports for a subset of devices.",
       "detail": "It requires a license beyond Intune Plan 1 or Plan 2 (included in Microsoft 365 E3) and supports Intune-managed or co-managed, Entra joined or hybrid joined Windows devices."
     },
     {
       "id": "f9407",
       "cat": "optimizeOps",
       "front": "Endpoint analytics scores, baselines, and insights",
-      "back": "Endpoint analytics scores range from 0 to 100 (lower means more room to improve) and a score needs at least five reporting devices. Charts compare you with a built-in All organizations median baseline, and you can create your own baseline to track progress. Insights and recommendations list actions ranked by points gained.",
+      "back": "Experience scores in Intune's device-experience analytics range from 0 to 100 (a lower score leaves more room to improve), and a score needs at least five reporting devices. Charts compare you with a built-in All organizations median baseline, and you can create your own baseline to track progress. Insights and recommendations list actions ranked by points gained.",
       "detail": "Use device and model scores to find problem devices and plan hardware refresh. Startup performance covers boot and sign-in time, and application reliability covers crashes and hangs per app."
     },
     {
       "id": "f9408",
       "cat": "optimizeOps",
       "front": "Tenant status and Intune service health",
-      "back": "Tenant administration > Tenant status shows tenant details and service release, connector status (unhealthy when a certificate has expired or the last sync was three or more days ago), service health incidents, issues requiring action, and the Intune message center.",
+      "back": "One page under Tenant administration shows tenant details and service release, connector status (unhealthy when a certificate has expired or the last sync was three or more days ago), service health incidents, issues requiring action, and the Intune message center.",
       "detail": "Reading service health and message center content needs a role such as Service support administrator or Message Center reader. Review them regularly to build an operational baseline and to spot upcoming changes before they affect devices."
     },
     {
@@ -1300,15 +1300,15 @@
       "id": "q6",
       "cat": "manageDevices",
       "type": "mc",
-      "question": "Windows 11 devices sit in an update ring with a 0-day feature update deferral. IT wants them to stay on version 24H2 even after 25H2 is released, while still receiving monthly security updates on the ring's schedule. What should IT assign?",
+      "question": "Windows 11 devices sit in an update ring with a 0-day feature update deferral. IT wants them to stay on version 25H2 even after 26H2 is released, while still receiving monthly security updates on the ring's schedule. What should IT assign?",
       "options": [
         "A change to the existing ring that raises its feature update deferral to the 365-day maximum",
-        "An expedited quality update policy that targets the 24H2 release for these devices",
-        "A pause on the update ring until the 25H2 release has been validated in the pilot group",
-        "A feature update deployment profile that targets 24H2, keeping the ring for quality updates"
+        "An expedited quality update policy that targets the 25H2 release for these devices",
+        "A pause on the update ring until the 26H2 release has been validated in the pilot group",
+        "A feature update deployment profile that targets 25H2, keeping the ring for quality updates"
       ],
       "correct": 3,
-      "explanation": "A feature update deployment profile pins the group to a target version, so the devices stay on 24H2 until the profile is changed or removed, while the ring keeps governing monthly quality updates. A deferral only delays the upgrade, so devices move to 25H2 once the 365 days elapse. A pause is temporary and ends automatically after a limited period, and an expedited policy accelerates quality updates and has no say over the feature version."
+      "explanation": "A feature update deployment profile pins the group to a target version, so the devices stay on 25H2 until the profile is changed or removed, while the ring keeps governing monthly quality updates. A deferral only delays the upgrade, so devices move to 26H2 once the 365 days elapse. A pause is temporary and ends automatically after a limited period, and an expedited policy accelerates quality updates and has no say over the feature version."
     },
     {
       "id": "q7",
@@ -1701,10 +1701,10 @@
         "An alert rule on the profile failure rate",
         "Endpoint analytics Application reliability",
         "The Troubleshooting + support page for that device",
-        "A Security Copilot agent integrated with Intune"
+        "Copilot in Intune, prompted in natural language"
       ],
       "correct": 3,
-      "explanation": "Security Copilot in Intune accepts natural-language prompts, summarizes issues such as policy conflicts, and suggests remediation steps for an admin to review before any change is made. Troubleshooting + support shows assignment and deployment status for a device but does not generate a summary or suggestions, Application reliability scores app crashes, and an alert rule only notifies when a threshold is crossed."
+      "explanation": "Copilot in Intune, which runs on Security Copilot, accepts natural-language prompts, summarizes issues such as policy conflicts, and suggests remediation steps for an admin to review before any change is made. Troubleshooting + support shows assignment and deployment status for a device but does not generate a summary or suggestions, Application reliability scores app crashes, and an alert rule only notifies when a threshold is crossed."
     },
     {
       "id": "tf1",
@@ -2671,7 +2671,7 @@
     },
     {
       "id": "q70",
-      "cat": "optimizeOps",
+      "cat": "manageApps",
       "type": "mc",
       "question": "IT holds the premium Intune add-on for app management. It wants Microsoft-prepackaged, regularly updated versions of common apps, without building .intunewin packages or writing detection rules. Which app source should IT choose?",
       "options": [
@@ -2860,15 +2860,15 @@
       "id": "q9004",
       "cat": "prepareInfra",
       "type": "mc",
-      "question": "Cloud PCs must reach an on-premises file server and use Group Policy objects that cannot be converted to Intune. Which provisioning approach is required?",
+      "question": "A small consultancy's Cloud PCs only need internet access and Microsoft 365 apps. The admin has no Azure subscription or virtual network and wants nothing to build or maintain for networking. Which provisioning configuration fits?",
       "options": [
-        "A gallery image with Microsoft 365 Apps preinstalled, which adds on-premises connectivity",
-        "An Azure network connection with line of sight to on-premises, using hybrid Microsoft Entra join",
-        "The Microsoft-hosted network with Microsoft Entra join, which also reaches on-premises Active Directory",
-        "The Microsoft-hosted network with hybrid Microsoft Entra join, which Microsoft manages for you"
+        "An Azure network connection with Microsoft Entra join, using a virtual network the admin builds in Azure",
+        "The Microsoft-hosted network with Microsoft Entra join",
+        "An Azure network connection with hybrid Microsoft Entra join, using an existing on-premises domain",
+        "A gallery image with Microsoft 365 Apps preinstalled, which also supplies the network connection"
       ],
       "correct": 1,
-      "explanation": "Hybrid Microsoft Entra join requires the Azure network connection option, because the Microsoft-hosted network is a cloud-only deployment with no connectivity to on-premises Active Directory. The image content has no effect on network reachability."
+      "explanation": "The Microsoft-hosted network is operated by Microsoft, needs no Azure subscription or virtual network, and supports Microsoft Entra join, which is enough when Cloud PCs only need internet and cloud apps. An Azure network connection means building and maintaining a virtual network, with its health checks and roles, and is justified by on-premises access or hybrid join, so both Azure network connection options add work the admin wants to avoid. The image content has no effect on networking."
     },
     {
       "id": "q9005",
@@ -2950,13 +2950,13 @@
       "type": "mc",
       "question": "Contoso wants employees who replace their laptops to see their personalized Windows settings and Microsoft Store app list restored during the out-of-box experience on the new device. New devices use user-driven Autopilot with Microsoft Entra join. What must the admin configure?",
       "options": [
-        "Backup and restore policies for Windows settings backup and restore, with restore enabled for enrollment",
+        "Windows settings backup and restore: a backup policy, plus restore enabled for enrollment",
         "A self-deploying Autopilot profile, because it restores user data without any sign-in",
         "A Windows 365 Boot guided scenario for the new laptops, so settings follow the user",
-        "Enterprise State Roaming only, configured for each device group in Entra ID"
+        "Enterprise State Roaming only, configured for each user's device group in Microsoft Entra ID"
       ],
       "correct": 0,
-      "explanation": "Windows settings backup and restore (formerly Windows Backup for Organizations) is off by default; admins configure backup policy and enable restore, either in the tenant-wide enrollment setting or a settings catalog policy. OOBE restore requires a user-driven Autopilot profile, so a self-deploying profile does not work. Windows 365 Boot is for connecting to a Cloud PC, and Enterprise State Roaming management has moved into this feature."
+      "explanation": "Windows settings backup and restore (formerly Windows Backup for Organizations) is opt-in: admins configure backup policy (backup is on by default only from Windows 11 version 26H2) and enable restore, either in the tenant-wide enrollment setting or a settings catalog policy. OOBE restore requires a user-driven Autopilot profile, so a self-deploying profile does not work. Windows 365 Boot is for connecting to a Cloud PC, and Enterprise State Roaming management has moved into this feature."
     },
     {
       "id": "q9105",
@@ -2970,7 +2970,7 @@
         "An app protection policy that targets the scanner firmware and operating system"
       ],
       "correct": 1,
-      "explanation": "Manufacturer-specific settings on Android Enterprise devices are delivered with OEMConfig, using the OEM's OEMConfig app (for Zebra, Zebra OEMConfig Powered by MX on newer Android versions). OMA-URI profiles are for Windows and some Apple settings, Autopilot is for Windows, and app protection policies protect app data, not device firmware."
+      "explanation": "Manufacturer-specific settings on Android Enterprise devices are delivered with OEMConfig, using the OEM's OEMConfig app (for Zebra, Zebra OEMConfig Powered by MX on newer Android versions). OMA-URI profiles configure Windows CSP settings, Autopilot is for Windows, and app protection policies protect app data, not device firmware."
     },
     {
       "id": "q9106",
@@ -3049,9 +3049,9 @@
       "question": "Contoso manages iPads and Macs. It wants all devices to install the newest OS 14 days after release at 02:00, without sending update commands from Intune. Which setup fits?",
       "options": [
         "A settings catalog Declarative Device Management policy: enforce latest, 14 days delay, 02:00 install time",
-        "A custom compliance policy that checks the operating system version of each device",
-        "An old MDM-based iOS update policy with a scheduled install window and push command",
-        "An update ring with a 14-day quality update deferral for Apple devices"
+        "A custom compliance policy that flags devices whose operating system version is behind the newest release",
+        "An old MDM-based iOS update policy with a scheduled install window, pushed to the devices by command",
+        "An update ring with a 14-day quality update deferral, assigned to the iPads and Macs as for Windows"
       ],
       "correct": 0,
       "explanation": "Apple update policies now use Declarative Device Management in the settings catalog: the Latest version model uses a delay in days and an install time, and devices enforce it themselves. The MDM-based update policies are deprecated. Update rings are for Windows, and a compliance policy only reports state."
@@ -3068,7 +3068,7 @@
         "FOTA updates with the Samsung Knox E-FOTA and Zebra LifeGuard OTA integrations"
       ],
       "correct": 3,
-      "explanation": "FOTA management is available for corporate-owned Android Enterprise devices through manufacturer integrations (Samsung E-FOTA, Zebra LifeGuard OTA), with scheduling; it needs Intune Plan 2. The other options are Windows update, app-level, or connectivity features and do not control firmware."
+      "explanation": "FOTA management is available for corporate-owned Android Enterprise devices through manufacturer integrations (Samsung E-FOTA, Zebra LifeGuard OTA), with scheduling; it needs a license that includes it, such as Intune Plan 2. The other options are Windows update, app-level, or connectivity features and do not control firmware."
     },
     {
       "id": "q9113",
@@ -3169,9 +3169,9 @@
       "question": "The security team connected Intune to Microsoft Defender for Endpoint. They want Windows laptops that have an active high-severity threat to lose access to Exchange Online until they are cleaned. Which combination does this?",
       "options": [
         "A compliance policy requiring a low machine risk score, plus Conditional Access requiring compliant devices",
-        "A security baseline for Microsoft Edge applied to the affected laptops",
+        "A security baseline for Microsoft Edge applied to the affected laptops, tightening browser settings",
         "An EDR policy that blocks the Exchange Online URLs on the laptop whenever a threat exists",
-        "An app configuration policy that changes Outlook's sign-in settings"
+        "An app configuration policy that changes Outlook's sign-in settings for users on affected laptops"
       ],
       "correct": 0,
       "explanation": "The compliance policy marks a device noncompliant when its risk score from Defender for Endpoint exceeds the limit, and Conditional Access blocks noncompliant devices from Exchange Online. An EDR policy onboards devices and sets telemetry options, it does not gate access. A browser baseline and an Outlook configuration are unrelated."
@@ -3182,7 +3182,7 @@
       "type": "mc",
       "question": "Analysts need to see Windows devices in the Microsoft Defender portal, review alerts, and triage incidents. The devices are managed by Intune and not yet visible there. What should the admin deploy?",
       "options": [
-        "An EDR policy from endpoint security, after enabling the Defender for Endpoint connector",
+        "An EDR policy from endpoint security, once the Defender connector is on",
         "A Wi-Fi profile that points the devices at the Defender portal address",
         "An app protection policy for the Defender portal website on managed devices",
         "A device restrictions profile that turns off Microsoft Defender Antivirus"
@@ -3194,15 +3194,15 @@
       "id": "q9203",
       "cat": "protectDevices",
       "type": "mc",
-      "question": "The security team assigned the Windows 11 version 25H2 baseline last year. Microsoft has released the 26H2 baseline. The admin notices devices still show the old baseline settings. Why?",
+      "question": "The security team assigned the Windows 11 version 25H2 baseline last year. Microsoft has now released the 26H2 baseline. What is the state of the existing 25H2 profile?",
       "options": [
-        "A baseline can be assigned only once per tenant, so the old one blocks the new one",
-        "Existing baseline profiles do not update automatically; create a profile on the new version or update it",
-        "Microsoft retires the old baseline from devices as soon as a new version exists",
-        "The baseline only updates when Windows Update installs the matching Windows feature update"
+        "It was updated to 26H2 automatically at the next device check-in, with the new defaults",
+        "It keeps applying, but its settings are read-only until an admin updates it to the new version",
+        "It stopped applying as soon as the new baseline was published, and its assignments were cleared",
+        "It is locked entirely: even its name and assignments cannot be edited, and it cannot be updated"
       ],
       "correct": 1,
-      "explanation": "Intune security baseline profiles stay on the version they were created with, so admins must create a new profile or update to the latest version, ideally testing on a pilot group. Windows feature updates do not change Intune baselines, there is no one-baseline-per-tenant rule, and old baselines are not removed from devices automatically."
+      "explanation": "A baseline profile stays on the version it was created with and keeps applying. When a newer version is published, the older profile's settings become read-only, though its name, description and assignments can still be edited, so an admin must create a new profile or update the existing one to the new version to get the new defaults, ideally after testing on a pilot group. Nothing updates automatically at check-in or with Windows feature updates, and old profiles are not retired or unassigned for you."
     },
     {
       "id": "msq9004",
@@ -3213,13 +3213,13 @@
         "Apple update policies must use the legacy MDM update commands",
         "Android FOTA applies to personally owned work profile devices",
         "Apple update policies are created in the settings catalog by using Declarative Device Management",
-        "Android FOTA is available for corporate-owned Android Enterprise devices and needs Intune Plan 2"
+        "Android FOTA is available for corporate-owned Android Enterprise devices and needs an Intune license that includes it, such as Plan 2"
       ],
       "correct": [
         2,
         3
       ],
-      "explanation": "The settings catalog with Declarative Device Management is the current method for iOS/iPadOS and macOS updates, and FOTA covers corporate-owned Android Enterprise devices with a Plan 2 license. The legacy MDM update policies are deprecated, and personally owned work profiles are not included in FOTA."
+      "explanation": "The settings catalog with Declarative Device Management is the current method for iOS/iPadOS and macOS updates, and FOTA covers corporate-owned Android Enterprise devices with a license that includes it, such as Plan 2. The legacy MDM update policies are deprecated, and personally owned work profiles are not included in FOTA."
     },
     {
       "id": "q9301",
@@ -3241,10 +3241,10 @@
       "type": "mc",
       "question": "The company deploys Microsoft 365 Apps through Intune and wants IT to control which channel each department's Office installation follows, see app health across devices, and manage Office policy settings centrally. Which service should the admin use for this?",
       "options": [
-        "Windows Update for Business reports in Azure Monitor",
+        "Windows Update for Business reports, backed by a Log Analytics workspace",
         "The Microsoft 365 Apps admin center, alongside Intune for the deployment",
-        "The Microsoft Store app (new) type in Intune",
-        "Group Policy analytics in the Intune admin center"
+        "The Microsoft Store app (new) type, which sources apps from the public Store",
+        "Group Policy analytics, which evaluates imported GPOs for MDM support"
       ],
       "correct": 1,
       "explanation": "The Microsoft 365 Apps admin center handles servicing profiles, inventory and health, and policy management for the apps, while Intune deploys them. Update reports are about Windows updates, the Store app type is for Store apps, and Group Policy Analytics evaluates GPOs."
@@ -3270,9 +3270,9 @@
       "question": "A Win32 app shows as failed on 40 laptops and the user says nothing happened. The admin wants to see per-device status and then pull logs from one affected laptop without disturbing the user. What should be done?",
       "options": [
         "Review the app's device install status, then run Collect diagnostics on one device",
-        "Delete the app and recreate it from scratch with the same packaging",
-        "Switch the assignment from required to available for all of the users",
-        "Wipe one laptop and see whether the app installs after re-enrollment"
+        "Delete the app and recreate it from scratch with the same packaging settings",
+        "Switch the assignment from required to available for all of the targeted users",
+        "Wipe one laptop and see whether the app installs after the device re-enrolls"
       ],
       "correct": 0,
       "explanation": "The app's device install status shows where and why it failed, and Collect diagnostics gathers logs remotely, which avoids disrupting the user. Recreating the app, wiping a device, or changing the assignment hides the cause instead of diagnosing it."
@@ -3367,7 +3367,7 @@
         "Apps > Quiet Time > Policies, which list tokens and certificates"
       ],
       "correct": 1,
-      "explanation": "Tenant status shows connector status for connectors such as APNs certificates and VPP tokens, with warnings seven days before expiry and unhealthy states for expired credentials or stale syncs. The other locations show enrollment failures, device boot performance, and notification policies."
+      "explanation": "Tenant status shows connector status for connectors such as APNs certificates and VPP tokens, with an unhealthy state for expired credentials or stale syncs. The other locations show enrollment failures, device boot performance, and notification policies."
     },
     {
       "id": "q9407",
@@ -3507,7 +3507,7 @@
         "tf9101",
         "tf9102"
       ],
-      "reading": "Provisioning a new Windows device usually starts with Windows Autopilot, and picking the right deployment profile type is the first decision. A user-driven profile lets someone unbox their own laptop and sign in with their own Microsoft Entra ID account to finish setup. A self-deploying profile skips a human entirely and authenticates the device itself, which is why it needs a TPM 2.0 chip capable of proving identity with nobody there to sign in. A pre-provisioned, or white glove, profile lets a partner or IT complete the slow, time-consuming steps in advance, so the end user only finishes a short final phase. Whichever profile runs, the Enrollment Status Page blocks the desktop until required apps and configuration profiles finish installing, so a device only looks finished once it truly is ready for work. Underneath those classic profiles, Microsoft is steering new deployments toward device preparation, a newer, faster, cloud-native path \u2014 though it currently only supports Microsoft Entra joined devices, so a hybrid Entra joined deployment still needs a classic Autopilot profile. Getting new hardware into the right group before it even ships matters too: a group tag set during vendor reservation lets a dynamic Microsoft Entra ID device group filter on it automatically, routing freshly registered hardware into the correct group and, through that group, the correct deployment profile, with no manual per-device assignment.\n\nCloud PCs follow a different provisioning path entirely. Windows 365 Cloud PC provisioning policies decide which Microsoft Entra ID group receives a Cloud PC, which image it is built from, and whether it lands as Microsoft Entra joined or hybrid Entra joined \u2014 and it is what actually triggers Cloud PC creation once a user both holds a Windows 365 license and falls inside the policy's assigned group; having only one of the two produces no Cloud PC at all. Licensing itself comes in two shapes. Windows 365 Enterprise licenses one dedicated, always-on Cloud PC per named user, while Windows 365 Frontline (renamed Windows 365 Flex in 2026, with no change to licensing) licenses a smaller, shared pool of Cloud PCs across a larger set of shift-based users, capped at a limited number of concurrent connections per license set \u2014 the economical choice for shift workers, as long as no more of them are logged in at once than the license set allows.\n\nOnce a device is enrolled, keeping it current becomes its own discipline. Update rings are the core policy: they set deferral periods, whether updates install automatically, active hours, and whether a device sits in an early or broad deployment wave, commonly staged so a small pilot ring with a short or zero deferral catches a bad update before it reaches a much larger, longer-deferral ring. Two different deferral clocks run independently inside the same ring. Feature update deferral delays a new annual Windows version by up to 365 days, while quality update deferral delays that same month's cumulative security fixes by up to 30 days \u2014 delaying one never delays the other, so a device can sit on a much older Windows version while still receiving this month's patches on time. For organizations that would rather not hand-tune rings at all, Windows Autopatch takes over entirely: it automatically organizes enrolled, already Intune-managed devices into deployment rings and rolls out Windows quality updates, driver and firmware updates, Microsoft 365 Apps updates, and Edge updates on Microsoft's own schedule. Autopatch-eligible devices can also pick up Hotpatch updates, which apply a subset of security fixes to a running instance in memory with no reboot at all \u2014 though a Hotpatch device still periodically lands on a fresh baseline cumulative update, since not every fix can be applied purely in memory, so it reduces reboots rather than eliminating them.\n\nNot every update rollout is voluntary from the administrator's side, either. A safeguard hold is Microsoft's own protective mechanism: when Microsoft detects a known compatibility issue between a feature update and a specific device, it automatically blocks that device from being offered the upgrade until the issue is resolved or an admin deliberately opts out of safeguard holds \u2014 prevention before the update ever lands, distinct from a rollback that removes an update after it already landed and caused a problem. A feature update deployment profile and expedited quality updates give an admin more direct override power on top of ring deferrals: the deployment profile can pin a targeted group to a specific Windows version regardless of what its ring's deferral would otherwise allow, and expediting lets an urgent, already-released fix bypass a ring's normal deferral and active hours entirely \u2014 useful for a narrow, time-critical situation like a zero-day, but not a substitute for well-designed rings on an ordinary day.\n\nRecent additions to know: an Autopilot deployment profile can apply a device name template (15 characters, %SERIAL% and %RAND:x%, Entra join only); device preparation needs no hardware hash and supports Entra join only, while classic profiles add hybrid join, pre-provisioning, and self-deploying modes. Windows 10 devices upgrade to Windows 11 with a feature update profile, and the option to install the latest Windows 10 update on ineligible devices has to be chosen when the policy is created. Windows settings backup and restore (formerly Windows Backup for Organizations) is opt-in and restores during user-driven OOBE. Cloud PCs use gallery or custom images and either a Microsoft-hosted network or an Azure network connection (required for hybrid join). Specialty devices (Teams Rooms, HoloLens 2, Zebra via OEMConfig) and FOTA are Plan 2 capabilities. Apple updates use Declarative Device Management in the settings catalog. Remote actions include bulk actions (100 devices), Defender intelligence update, BitLocker key rotation, and local admin password rotation.",
+      "reading": "Provisioning a new Windows device usually starts with Windows Autopilot, and picking the right deployment profile type is the first decision. A user-driven profile lets someone unbox their own laptop and sign in with their own Microsoft Entra ID account to finish setup. A self-deploying profile skips a human entirely and authenticates the device itself, which is why it needs a TPM 2.0 chip capable of proving identity with nobody there to sign in. A pre-provisioned, or white glove, profile lets a partner or IT complete the slow, time-consuming steps in advance, so the end user only finishes a short final phase. Whichever profile runs, the Enrollment Status Page blocks the desktop until required apps and configuration profiles finish installing, so a device only looks finished once it truly is ready for work. Underneath those classic profiles, Microsoft is steering new deployments toward device preparation, a newer, faster, cloud-native path \u2014 though it currently only supports Microsoft Entra joined devices, so a hybrid Entra joined deployment still needs a classic Autopilot profile. Getting new hardware into the right group before it even ships matters too: a group tag set during vendor reservation lets a dynamic Microsoft Entra ID device group filter on it automatically, routing freshly registered hardware into the correct group and, through that group, the correct deployment profile, with no manual per-device assignment.\n\nCloud PCs follow a different provisioning path entirely. Windows 365 Cloud PC provisioning policies decide which Microsoft Entra ID group receives a Cloud PC, which image it is built from, and whether it lands as Microsoft Entra joined or hybrid Entra joined \u2014 and it is what actually triggers Cloud PC creation once a user both holds a Windows 365 license and falls inside the policy's assigned group; having only one of the two produces no Cloud PC at all. Licensing itself comes in two shapes. Windows 365 Enterprise licenses one dedicated, always-on Cloud PC per named user, while Windows 365 Frontline (renamed Windows 365 Flex in 2026, with no change to licensing) licenses a smaller, shared pool of Cloud PCs across a larger set of shift-based users, capped at a limited number of concurrent connections per license set \u2014 the economical choice for shift workers, as long as no more of them are logged in at once than the license set allows.\n\nOnce a device is enrolled, keeping it current becomes its own discipline. Update rings are the core policy: they set deferral periods, whether updates install automatically, active hours, and whether a device sits in an early or broad deployment wave, commonly staged so a small pilot ring with a short or zero deferral catches a bad update before it reaches a much larger, longer-deferral ring. Two different deferral clocks run independently inside the same ring. Feature update deferral delays a new annual Windows version by up to 365 days, while quality update deferral delays that same month's cumulative security fixes by up to 30 days \u2014 delaying one never delays the other, so a device can sit on a much older Windows version while still receiving this month's patches on time. For organizations that would rather not hand-tune rings at all, Windows Autopatch takes over entirely: it automatically organizes enrolled, already Intune-managed devices into deployment rings and rolls out Windows quality updates, driver and firmware updates, Microsoft 365 Apps updates, and Edge updates on Microsoft's own schedule. Autopatch-eligible devices can also pick up Hotpatch updates, which apply a subset of security fixes to a running instance in memory with no reboot at all \u2014 though a Hotpatch device still periodically lands on a fresh baseline cumulative update, since not every fix can be applied purely in memory, so it reduces reboots rather than eliminating them.\n\nNot every update rollout is voluntary from the administrator's side, either. A safeguard hold is Microsoft's own protective mechanism: when Microsoft detects a known compatibility issue between a feature update and a specific device, it automatically blocks that device from being offered the upgrade until the issue is resolved or an admin deliberately opts out of safeguard holds \u2014 prevention before the update ever lands, distinct from a rollback that removes an update after it already landed and caused a problem. A feature update deployment profile and expedited quality updates give an admin more direct override power on top of ring deferrals: the deployment profile can pin a targeted group to a specific Windows version regardless of what its ring's deferral would otherwise allow, and expediting lets an urgent, already-released fix bypass a ring's normal deferral and active hours entirely \u2014 useful for a narrow, time-critical situation like a zero-day, but not a substitute for well-designed rings on an ordinary day.\n\nRecent additions to know: an Autopilot deployment profile can apply a device name template (15 characters, %SERIAL% and %RAND:x%, Entra join only); device preparation needs no hardware hash and supports Entra join only, while classic profiles add hybrid join, pre-provisioning, and self-deploying modes. Windows 10 devices upgrade to Windows 11 with a feature update profile, and the option to install the latest Windows 10 update on ineligible devices has to be chosen when the policy is created. Windows settings backup and restore (formerly Windows Backup for Organizations) needs a backup policy until Windows 11 version 26H2 turns backup on by default for eligible devices, while restore stays opt-in and works during user-driven OOBE. Cloud PCs use gallery or custom images and either a Microsoft-hosted network or an Azure network connection (required for hybrid join). Specialty devices (Teams Rooms, HoloLens 2) and FOTA are Intune advanced capabilities (Plan 2, the Suite or select Microsoft 365 bundles), while Zebra devices are tuned with OEMConfig profiles. Apple updates use Declarative Device Management in the settings catalog. Remote actions include bulk actions (100 devices), Defender intelligence update, BitLocker key rotation, and local admin password rotation.",
       "fundamentalsLabel": "New to device provisioning and updates? See the everyday analogy",
       "fundamentals": "Autopilot deployment profiles are like different ways a new desk chair arrives at the office. User-driven is flat-pack furniture you assemble yourself after signing for the delivery. Self-deploying is a chair that arrives already built and just gets wheeled into place, with nobody signing for anything. White glove is a mover who does all the heavy assembly in a warehouse first, so you only snap on the armrests once it reaches your desk. And update rings are like testing a new recipe on the pickiest eater in the house before serving it to the whole family \u2014 a small pilot group tastes it first, so a bad batch never reaches everyone at once.",
       "keyTerms": [
@@ -3583,7 +3583,7 @@
         "q9005",
         "msq9001"
       ],
-      "reading": "Before any device can enroll, a few tenant-level prerequisites have to be right. MDM authority determines which service is actually in charge of managing mobile devices tenant-wide; new tenants are set to Intune automatically, so it is mostly a legacy concern for older tenants that once used Configuration Manager hybrid MDM or Office 365 MDM, and when enrollment fails everywhere at once the MDM user scope, an enrollment restriction, or an expired Apple certificate is a likelier culprit. Licensing decides who is even eligible: Intune device management rides on Microsoft 365 E3/E5, Enterprise Mobility + Security E3/E5, or a standalone Intune Plan, while a Windows 365 Cloud PC needs its own separate per-user license layered on top \u2014 a user without an Intune-capable license can be assigned every policy in the world and their device still will not actually enroll or receive any of it. Once licensing is sorted, enrollment restrictions decide who is allowed to bring what: a platform restriction blocks or allows enrollment by OS type and version, while a device limit restriction caps how many devices one person can enroll \u2014 restrictions of each type are ranked by priority, a user gets only the highest-priority one assigned to their groups, and a built-in default restriction catches everyone else.\n\nOnce a device does enroll, what it actually becomes depends on its Microsoft Entra device state. A Microsoft Entra joined device is organization-owned with no on-premises AD account at all. A hybrid Entra joined device is joined to on-premises AD and also registered with Entra ID. A Microsoft Entra registered device is typically personal or BYOD, having added only an Entra ID account without a full organizational join \u2014 joined and hybrid joined devices are organization-owned and get the full range of Intune device-level control, while a registered BYOD device is usually protected with lighter-touch, app-level controls instead. Getting the right devices into the right policy targets is its own decision: a dynamic group evaluates device attributes automatically and updates its own membership, while an assigned group (often called a static group) requires an admin to add or remove each member by hand \u2014 though dynamic membership evaluation can lag by minutes, which matters for anything that must apply the instant a device is provisioned, like the Enrollment Status Page. None of this targeting changes who is allowed to manage the resulting objects, though; that is what a scope tag is for, limiting which Intune administrators can see and manage a given policy, app, or device so a regional helpdesk team's delegated access stays confined to its own tagged scope, without touching which end users or devices the policy itself is assigned to.\n\nBuilding the policy itself increasingly means reaching for the settings catalog, which exposes essentially every available CSP-backed setting individually and searchable, rather than older, template-based device configuration profiles, whose purpose-built templates group related settings together but that Microsoft is not always updating with new options. Whichever authoring style is used, two assigned profiles can still collide. When two profiles set the same setting differently for the same device, Intune reports a conflict, and neither value applies until it is resolved. Separately, assignment filters narrow which devices in an already-assigned group actually receive an item, based on properties like OS version or manufacturer; a device must satisfy both the group assignment and the filter to actually receive it.\n\nDevices do not always fit neatly into a purely cloud-native model. For hybrid Entra join specifically, the Intune Connector for Active Directory is the on-premises agent that lets Autopilot create the computer object in on-premises AD during provisioning \u2014 without it installed and healthy, a hybrid join Autopilot profile fails at the domain-join step even if every other setting is correct. Where an organization still runs Configuration Manager, tenant attach uploads its device and collection data into the Intune admin center for visibility and a limited set of remote actions, without moving any co-management workload or fully enrolling the device \u2014 a bridge for visibility, not a change in who is authoritative. For remote access without a full VPN client, Microsoft Tunnel gives managed iOS/iPadOS and Android devices per-app or full-device access to on-premises resources, often paired with an app protection policy where the device itself may not be enrolled at all. And when a scenario is really asking about compute model rather than management, remember that Azure Virtual Desktop is infrastructure the organization configures and scales itself, Windows 365 is a fixed-price, Microsoft-managed Cloud PC, and a physical endpoint is managed through Intune the same way regardless of which of the two virtual options also exist alongside it.\n\nAndroid Enterprise enrollment follows ownership: work profile for personal devices, fully managed for company-owned devices with a user, dedicated for user-less kiosks, and corporate-owned work profile for mixed use. When enrollment fails, the enrollment failures report (Devices > Monitor) gives the reason, such as a device limit or a license problem. Windows 365 is managed with the Cloud PC Administrator and Cloud PC Reader roles plus Intune RBAC. Intune's own Zero Trust recommendations, such as automatic Windows enrollment, scope tags, and compliance policies for every platform, help keep unmanaged endpoints out.",
+      "reading": "Before any device can enroll, a few tenant-level prerequisites have to be right. MDM authority determines which service is actually in charge of managing mobile devices tenant-wide; new tenants are set to Intune automatically, so it is mostly a legacy concern for older tenants that once used Configuration Manager hybrid MDM or Office 365 MDM, and when enrollment fails everywhere at once the MDM user scope, an enrollment restriction, or an expired Apple certificate is a likelier culprit. Licensing decides who is even eligible: Intune device management rides on Microsoft 365 E3/E5, Enterprise Mobility + Security E3/E5, or a standalone Intune Plan, while a Windows 365 Cloud PC needs its own separate per-user license layered on top \u2014 a user without an Intune-capable license can be assigned every policy in the world and their device still will not actually enroll or receive any of it. Once licensing is sorted, enrollment restrictions decide who is allowed to bring what: a platform restriction blocks or allows enrollment by OS type and version, while a device limit restriction caps how many devices one person can enroll \u2014 restrictions of each type are ranked by priority, a user gets only the highest-priority one assigned to their groups, and a built-in default restriction catches everyone else.\n\nOnce a device does enroll, what it actually becomes depends on its Microsoft Entra device state. A Microsoft Entra joined device is organization-owned with no on-premises AD account at all. A hybrid Entra joined device is joined to on-premises AD and also registered with Entra ID. A Microsoft Entra registered device is typically personal or BYOD, having added only an Entra ID account without a full organizational join \u2014 joined and hybrid joined devices are organization-owned and get the full range of Intune device-level control, while a registered BYOD device is usually protected with lighter-touch, app-level controls instead. Getting the right devices into the right policy targets is its own decision: a dynamic group evaluates device attributes automatically and updates its own membership, while an assigned group (often called a static group) requires an admin to add or remove each member by hand \u2014 though dynamic membership evaluation can lag by minutes, which matters for anything that must apply the instant a device is provisioned, like the Enrollment Status Page. None of this targeting changes who is allowed to manage the resulting objects, though; that is what a scope tag is for, limiting which Intune administrators can see and manage a given policy, app, or device so a regional helpdesk team's delegated access stays confined to its own tagged scope, without touching which end users or devices the policy itself is assigned to.\n\nBuilding the policy itself increasingly means reaching for the settings catalog, which exposes essentially every available CSP-backed setting individually and searchable, rather than older, template-based device configuration profiles, whose purpose-built templates group related settings together but that Microsoft is not always updating with new options. Whichever authoring style is used, two assigned profiles can still collide. When two profiles set the same setting differently for the same device, Intune reports a conflict, and neither value applies until it is resolved. Separately, assignment filters narrow which devices in an already-assigned group actually receive an item, based on properties like OS version or manufacturer; a device must satisfy both the group assignment and the filter to actually receive it.\n\nDevices do not always fit neatly into a purely cloud-native model. For hybrid Entra join specifically, the Intune Connector for Active Directory is the on-premises agent that lets Autopilot create the computer object in on-premises AD during provisioning \u2014 without it installed and healthy, a hybrid join Autopilot profile fails at the domain-join step even if every other setting is correct. Where an organization still runs Configuration Manager, tenant attach uploads its device and collection data into the Intune admin center for visibility and a limited set of remote actions, without moving any co-management workload or fully enrolling the device \u2014 a bridge for visibility, not a change in who is authoritative. For mobile access to on-premises resources, Microsoft Tunnel is a VPN gateway that gives managed iOS/iPadOS and Android devices per-app or full-device access, and Tunnel for MAM extends the same gateway to devices that are not enrolled at all. And when a scenario is really asking about compute model rather than management, remember that Azure Virtual Desktop is infrastructure the organization configures and scales itself, Windows 365 is a fixed-price, Microsoft-managed Cloud PC, and a physical endpoint is managed through Intune the same way regardless of which of the two virtual options also exist alongside it.\n\nAndroid Enterprise enrollment follows ownership: work profile for personal devices, fully managed for company-owned devices with a user, dedicated for user-less kiosks, and corporate-owned work profile for mixed use. When enrollment fails, the enrollment failures report (Devices > Monitor) gives the reason, such as a device limit or a license problem. Windows 365 is managed with the Cloud PC Administrator and Cloud PC Reader roles plus Intune RBAC. Intune's own Zero Trust recommendations, such as automatic Windows enrollment, scope tags, and compliance policies for every platform, help keep unmanaged endpoints out.",
       "fundamentalsLabel": "New to identity and infrastructure prerequisites? See the everyday analogy",
       "fundamentals": "Think of MDM authority like a building's facilities manager, who is appointed automatically when a new building opens \u2014 you only need to think about it in an older building that changed hands. A dynamic group is like an email list that adds people automatically based on their job title, while an assigned group is a list someone edits by hand every time staff changes. And a scope tag is less like a keycard and more like a manager's own badge: it decides which manager can see and touch a given office, not which employees are allowed inside that office in the first place.",
       "keyTerms": [
@@ -3802,7 +3802,7 @@
         "msq9006",
         "tf9401"
       ],
-      "reading": "Nearly every Intune object is exposed through the Microsoft Graph API, and the Microsoft Graph PowerShell SDK provides cmdlets to script bulk creation, updates, and reporting against those objects \u2014 configuration profiles, compliance policies, app assignments, device actions \u2014 instead of clicking through the admin center one object at a time. This scripted, repeatable approach is also what backs most third-party Intune backup, migration, and configuration-as-code tooling, since the admin center itself has no built-in export and import for most policy types.\n\nTwo related but distinct automation patterns extend what compliance can check and what IT can fix without waiting for a ticket. A custom compliance policy runs an administrator-supplied PowerShell discovery script on the device and compares its JSON output against a JSON rules file uploaded with the policy \u2014 a specific registry value, an installed software version \u2014 extending compliance checks beyond Intune's built-in, template-based settings; the script only reports data back for evaluation and never remediates anything itself. A proactive remediation (listed as Remediations in the Intune admin center) goes a step further by pairing a detection script with a separate remediation script, running on a schedule: if the detection script identifies a problem, the remediation script runs automatically to fix it, under the SYSTEM account by default, which is exactly why it can repair issues, like a corrupted registry key or a stopped service, that a standard end-user account has no rights to touch directly.\n\nKnowing something needs fixing in the first place is its own discipline. Endpoint analytics measures device and user experience signals \u2014 startup performance broken down by phase, application reliability, resource performance \u2014 surfacing a device or fleet-wide score so IT can prioritize experience problems proactively instead of waiting for a help desk ticket to reveal them; a slow-starting driver or app shows up specifically, turning a vague complaint into an actionable fix. An alert rule then closes the loop by watching a specific signal, like Windows 365 Cloud PC provisioning or connection failures or Windows Autopatch policy health, and notifying the right recipients automatically, with a severity and email recipients where the rule is customizable so a narrow team hears only about the failures that are actually their responsibility. Increasingly, Security Copilot agents add a natural-language layer on top of all of this, helping an administrator investigate a policy conflict or summarize a device issue directly inside the familiar Intune admin center workflow, with an administrator still reviewing and approving any configuration change the AI-assisted investigation suggests.\n\nDay-to-day lifecycle actions round out operations. Wipe resets a device to factory settings, optionally keeping it enrolled for reprovisioning. Retire removes only company data, apps, and management while leaving personal data and the OS intact, the correct choice for offboarding a personal MDM-enrolled device where the organization has no right to touch personal data; a personal device that is only app-protected has no device record to retire, so an app selective wipe removes just the app's corporate data instead. Fresh Start reinstalls a clean copy of Windows, optionally keeping user data and enrollment, chiefly to strip out unwanted OEM software. Separately, an update rollback removes an already-installed quality update that regressed a device, reactive cleanup that is the mirror image of a safeguard hold's proactive prevention. And when it is time to actually look back at what happened across the fleet, built-in operational reports give near real-time, per-policy or per-device status, organizational reports offer larger exportable datasets like compliance trends, and a Data Warehouse or Microsoft Graph data export feeds Power BI or Log Analytics for custom or long-term analysis \u2014 organizational reports build asynchronously and can take real time to generate, which is why they suit a large historical export rather than an immediate one-off check.\n\nFour Security Copilot agents exist in Intune (Change Review, Device Offboarding, Policy Configuration, Vulnerability Remediation). They recommend; admins decide. Advanced Analytics adds resource performance, battery health, anomalies, device timeline, and device query to endpoint analytics, whose scores run from 0 to 100 and need at least five devices. Tenant status shows connector health, service health incidents, and the message center, and reports can be exported through Graph or sent to Azure Monitor for retention.",
+      "reading": "Nearly every Intune object is exposed through the Microsoft Graph API, and the Microsoft Graph PowerShell SDK provides cmdlets to script bulk creation, updates, and reporting against those objects \u2014 configuration profiles, compliance policies, app assignments, device actions \u2014 instead of clicking through the admin center one object at a time. This scripted, repeatable approach is also what backs most third-party Intune backup, migration, and configuration-as-code tooling, since the admin center itself has no built-in export and import for most policy types.\n\nTwo related but distinct automation patterns extend what compliance can check and what IT can fix without waiting for a ticket. A custom compliance policy runs an administrator-supplied PowerShell discovery script on the device and compares its JSON output against a JSON rules file uploaded with the policy \u2014 a specific registry value, an installed software version \u2014 extending compliance checks beyond Intune's built-in, template-based settings; the script only reports data back for evaluation and never remediates anything itself. A proactive remediation (listed as Remediations in the Intune admin center) goes a step further by pairing a detection script with a separate remediation script, running on a schedule: if the detection script identifies a problem, the remediation script runs automatically to fix it, under the SYSTEM account by default, which is exactly why it can repair issues, like a corrupted registry key or a stopped service, that a standard end-user account has no rights to touch directly.\n\nKnowing something needs fixing in the first place is its own discipline. Endpoint analytics measures device and user experience signals \u2014 startup performance broken down by phase, application reliability, resource performance \u2014 surfacing a device or fleet-wide score so IT can prioritize experience problems proactively instead of waiting for a help desk ticket to reveal them; a slow-starting driver or app shows up specifically, turning a vague complaint into an actionable fix. An alert rule then closes the loop by watching a specific signal, like Windows 365 Cloud PC provisioning or connection failures or Windows Autopatch policy health, and notifying the right recipients automatically, with a severity and email recipients where the rule is customizable so a narrow team hears only about the failures that are actually their responsibility. Increasingly, AI adds a natural-language layer on top of all of this: Copilot in Intune helps an administrator investigate a policy conflict or summarize a device issue directly inside the familiar Intune admin center workflow, while task-specific Security Copilot agents take on jobs such as reviewing approval requests, with an administrator still reviewing and approving any configuration change the AI suggests.\n\nDay-to-day lifecycle actions round out operations. Wipe resets a device to factory settings, optionally keeping it enrolled for reprovisioning. Retire removes only company data, apps, and management while leaving personal data and the OS intact, the correct choice for offboarding a personal MDM-enrolled device where the organization has no right to touch personal data; a personal device that is only app-protected has no device record to retire, so an app selective wipe removes just the app's corporate data instead. Fresh Start reinstalls a clean copy of Windows, optionally keeping user data and enrollment, chiefly to strip out unwanted OEM software. Separately, an update rollback removes an already-installed quality update that regressed a device, reactive cleanup that is the mirror image of a safeguard hold's proactive prevention. And when it is time to actually look back at what happened across the fleet, built-in operational reports give near real-time, per-policy or per-device status, organizational reports offer larger exportable datasets like compliance trends, and a Data Warehouse or Microsoft Graph data export feeds Power BI or Log Analytics for custom or long-term analysis \u2014 organizational reports build asynchronously and can take real time to generate, which is why they suit a large historical export rather than an immediate one-off check.\n\nFour Security Copilot agents exist in Intune (Change Review, Device Offboarding, Policy Configuration, Vulnerability Remediation). They recommend; admins decide. Advanced Analytics adds resource performance, battery health, anomalies, device timeline, and device query to endpoint analytics, whose scores run from 0 to 100 and need at least five devices. Tenant status shows connector health, service health incidents, and the message center, and reports can be exported through Graph or sent to Azure Monitor for retention.",
       "fundamentalsLabel": "New to endpoint automation and reporting? See the everyday analogy",
       "fundamentals": "A custom compliance script is like a building inspector who checks one specific thing and writes it down, without lifting a finger to fix anything found wrong. A proactive remediation is a maintenance worker who checks the same thing and, if it fails, immediately repairs it on the spot before anyone even files a complaint \u2014 running with a master key that can open doors a regular tenant never could. And endpoint analytics is a fleet manager's ongoing dashboard of small warning signs, catching a problem while it is still a minor annoyance instead of waiting for a driver to call in with a full breakdown.",
       "keyTerms": [
@@ -3894,7 +3894,7 @@
         "Feature update deployment profiles pin devices to a specific target Windows version, separate from the quality-update cadence set by rings.",
         "Driver update profiles and expedited quality update policies exist for faster or urgent rollout outside the normal ring cadence.",
         "Deferral days delay when an update becomes available to the ring; deadline settings force install and restart after that many days regardless of user snoozing.",
-        "Apple updates use Declarative Device Management in the settings catalog (latest or targeted version); MDM update policies are deprecated. Android FOTA needs Plan 2."
+        "Apple updates use Declarative Device Management in the settings catalog (latest or targeted version); MDM update policies are deprecated. Android FOTA is an Intune advanced capability (Plan 2, the Suite or a Microsoft 365 bundle that includes it)."
       ]
     },
     {
@@ -3915,7 +3915,7 @@
         "'The device must have X setting applied' points to a configuration profile; 'the device must report as meeting X criteria for Conditional Access' points to a compliance policy.",
         "'Protect corporate data without enrolling the personal device' always points to App Protection Policies (MAM), never a compliance or configuration profile.",
         "Co-management workloads move individually \u2014 a scenario describing only Windows Update policy moving to Intune does not mean the whole device is now Intune-managed.",
-        "The Microsoft Intune Suite is now described as Intune advanced capabilities (Plan 2, Suite, or select Microsoft 365 bundles); Remote Help and Advanced Analytics are being included in Microsoft 365 E3.",
+        "The Microsoft Intune Suite is now described as Intune advanced capabilities (Plan 2, Suite, or select Microsoft 365 bundles); Remote Help and Advanced Analytics are included in Microsoft 365 E3 from July 2026, and E5 adds Endpoint Privilege Management, Enterprise Application Management and Cloud PKI.",
         "Security Copilot agents in Intune: Change Review, Device Offboarding, Policy Configuration, Vulnerability Remediation. They recommend and an admin approves.",
         "Bulk device actions cap at 100 devices; BitLocker key rotation and local admin password rotation are remote actions."
       ]
@@ -3953,14 +3953,14 @@
     {
       "id": "ml-md102-2",
       "cat": "protectDevices",
-      "scenario": "A device fails its compliance policy this morning; the policy's Mark device noncompliant action is scheduled for 5 days, which acts as a grace period before Conditional Access blocks access. Today, the device shows as {b1}, and Conditional Access still {b2} it access until day five.",
+      "scenario": "A device fails its compliance policy this morning; the policy's Mark device noncompliant action is scheduled for 5 days, which acts as a grace period before Conditional Access blocks access. Today, the device shows as {b1}, and Conditional Access still {b2} access until day five.",
       "blanks": [
         {
           "key": "b1",
           "options": [
             "in grace period",
             "fully noncompliant",
-            "deleted from Intune",
+            "not evaluated yet",
             "automatically remediated"
           ],
           "correct": 0
@@ -3970,8 +3970,8 @@
           "options": [
             "allows",
             "blocks",
-            "deletes",
-            "encrypts"
+            "revokes",
+            "limits"
           ],
           "correct": 0
         }
@@ -3981,25 +3981,25 @@
     {
       "id": "ml-md102-3",
       "cat": "manageApps",
-      "scenario": "Employees check corporate email in Outlook on their own unenrolled personal phones. The company wants to require a PIN and block copying corporate data into unmanaged apps, without enrolling those phones in MDM \u2014 that calls for an {b1} targeting the Outlook app. A different, company-owned laptop instead needs a specific registry value evaluated that no built-in template covers \u2014 that calls for a {b2} using a discovery script.",
+      "scenario": "Employees check corporate email in Outlook on their own unenrolled personal phones. The company wants to require a PIN and block copying corporate data into unmanaged apps, without enrolling those phones in MDM \u2014 that calls for {b1} targeting the Outlook app. A different, company-owned laptop instead needs a specific registry value evaluated that no built-in template covers \u2014 that calls for {b2} using a discovery script.",
       "blanks": [
         {
           "key": "b1",
           "options": [
-            "app protection (MAM) policy",
-            "device compliance policy",
-            "device configuration profile",
-            "security baseline"
+            "an app protection (MAM) policy",
+            "a device compliance policy",
+            "a device configuration profile",
+            "a security baseline"
           ],
           "correct": 0
         },
         {
           "key": "b2",
           "options": [
-            "app protection (MAM) policy",
-            "custom compliance policy",
-            "app configuration policy",
-            "security baseline"
+            "an app protection (MAM) policy",
+            "a custom compliance policy",
+            "an app configuration policy",
+            "a security baseline"
           ],
           "correct": 1
         }
@@ -4009,7 +4009,7 @@
     {
       "id": "ml-md102-4",
       "cat": "prepareInfra",
-      "scenario": "IT wants company-owned devices in the Finance department capped at one enrolled device per user, while every other department stays capped at five \u2014 that per-group cap comes from a properly prioritized {b1}. Separately, so that only helpdesk technicians in EMEA can see and manage the Windows policies scoped to EMEA devices, without changing what US helpdesk staff can see, admins apply a {b2} to those policies and assign it to the EMEA-only helpdesk role.",
+      "scenario": "IT wants company-owned devices in the Finance department capped at one enrolled device per user, while every other department stays capped at five \u2014 that per-group cap comes from a properly prioritized {b1}. Separately, so that only helpdesk technicians in EMEA can see and manage the Windows policies scoped to EMEA devices, without changing what US helpdesk staff can see, admins apply {b2} to those policies and assign it to the EMEA-only helpdesk role.",
       "blanks": [
         {
           "key": "b1",
@@ -4024,10 +4024,10 @@
         {
           "key": "b2",
           "options": [
-            "scope tag",
-            "dynamic group",
-            "Microsoft Entra administrative unit",
-            "app configuration policy"
+            "a scope tag",
+            "a dynamic group",
+            "a Microsoft Entra administrative unit",
+            "an app configuration policy"
           ],
           "correct": 0
         }
@@ -4037,15 +4037,15 @@
     {
       "id": "ml-md102-5",
       "cat": "optimizeOps",
-      "scenario": "IT wants a consistent, Microsoft-recommended set of Windows security settings, including BitLocker, applied across every clinic-owned laptop with minimal per-setting authoring \u2014 that calls for a {b1} rather than building every setting by hand. Separately, to see which single app-and-driver combination is generating the most unexpected reboots and hangs fleet-wide, so engineering can prioritize the worst offender first, leadership turns to {b2}.",
+      "scenario": "IT wants a consistent, Microsoft-recommended set of Windows security settings, including BitLocker, applied across every clinic-owned laptop with minimal per-setting authoring \u2014 that calls for {b1} rather than building every setting by hand. Separately, to see which single app-and-driver combination is generating the most unexpected reboots and hangs fleet-wide, so engineering can prioritize the worst offender first, leadership turns to {b2}.",
       "blanks": [
         {
           "key": "b1",
           "options": [
-            "security baseline profile",
-            "app protection (MAM) policy",
-            "device configuration profile authored setting-by-setting",
-            "conditional access policy"
+            "a security baseline profile",
+            "an app protection (MAM) policy",
+            "a device configuration profile authored setting-by-setting",
+            "a Conditional Access policy"
           ],
           "correct": 0
         },
@@ -4311,11 +4311,11 @@
     {
       "id": "cmp-md102-9003",
       "cat": "optimizeOps",
-      "scenario": "Auditors want to see why Windows 365 Cloud PCs are failing to reach on-premises servers after a network change. Provisioning used a Microsoft-hosted network. Which is the better next step?",
-      "optionA": "Move to an Azure network connection that has line of sight to on-premises resources",
-      "optionB": "Add more Microsoft 365 Apps to the gallery image",
+      "scenario": "A sales rep leaves Contoso. Their personal iPhone is enrolled in Intune as a personally owned device, and HR wants the company's apps, data and management removed without erasing the rep's own photos and messages. Which remote action is the better one?",
+      "optionA": "Retire the device, which removes company data, apps, and management from it.",
+      "optionB": "Wipe the device, which resets it to factory settings.",
       "better": "A",
-      "why": "The Microsoft-hosted network is a cloud-only deployment without a path to on-premises Active Directory or servers, so private connectivity needs an Azure network connection. Image contents have no effect on routing."
+      "why": "Retire removes only what the organization put on the device (company data, apps, and the management profile), so a personal device keeps its owner's own data. Wipe is the runner-up because it also takes the company data off, but it resets the phone to factory settings and would destroy the rep's personal photos and messages. Wipe is the better action for a corporate-owned device that is being reissued or decommissioned."
     }
   ]
 }
