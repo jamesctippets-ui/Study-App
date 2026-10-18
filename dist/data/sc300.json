@@ -67,27 +67,27 @@
       "id": "f1",
       "cat": "userIdentities",
       "front": "Microsoft Entra ID directory roles vs. Azure RBAC roles",
-      "back": "Microsoft Entra ID directory roles (User Administrator, Global Administrator, License Administrator) govern directory-level administrative tasks such as resetting passwords or managing groups. Azure RBAC roles (Owner, Contributor, Reader) govern access to Azure resources at a management group, subscription, resource group, or resource scope.",
+      "back": "Microsoft Entra ID directory roles vs. Azure RBAC roles: the first (User Administrator, Global Administrator, License Administrator) govern directory-level administrative tasks such as resetting passwords or managing groups, while the second (Owner, Contributor, Reader) govern access to Azure resources at a management group, subscription, resource group, or resource scope.",
       "detail": "Holding a directory role like Global Administrator does not automatically grant Azure RBAC rights on a subscription; an administrator must explicitly elevate access under Entra ID properties to bridge the two systems."
     },
     {
       "id": "f2",
       "cat": "userIdentities",
       "front": "Administrative units",
-      "back": "An administrative unit is a container that scopes a directory role assignment to a defined subset of users, groups, or devices, such as one regional office or department, instead of granting that role across the entire tenant.",
+      "back": "Administrative units are containers that scope a directory role assignment to a defined subset of users, groups, or devices, such as one regional office or department, instead of granting that role across the entire tenant.",
       "detail": "A Helpdesk Administrator role assigned only within the Seattle Office administrative unit can reset passwords for users in that unit but has no rights over users outside it."
     },
     {
       "id": "f3",
       "cat": "userIdentities",
       "front": "Dynamic group membership rules",
-      "back": "A dynamic group automatically adds or removes users or devices based on a membership rule evaluated against directory attributes (department, job title, device OS), rather than requiring an administrator to add or remove members manually.",
+      "back": "Dynamic group membership rules automatically add or remove users or devices by evaluating a rule against directory attributes (department, job title, device OS), rather than requiring an administrator to add or remove members manually.",
       "detail": "Dynamic membership rules can target users, or devices, but not both in the same group -- a dynamic group is either a dynamic user group or a dynamic device group, never a mix."
     },
     {
       "id": "f4",
       "cat": "userIdentities",
-      "front": "Microsoft Entra Connect sync methods: Password Hash Sync, Pass-through Authentication, and Federation",
+      "front": "Microsoft Entra Connect sign-in methods",
       "back": "Password Hash Sync (PHS) synchronizes a hash of the on-premises password hash to Microsoft Entra ID so sign-in is validated in the cloud. Pass-through Authentication (PTA) validates the password directly against on-premises Active Directory via a lightweight agent, with no password hash stored in the cloud. Federation (commonly AD FS) redirects authentication entirely to an on-premises identity provider.",
       "detail": "PHS is the simplest and most resilient option Microsoft recommends by default, since it keeps working even if the on-premises PTA agents or federation servers become unavailable."
     },
@@ -95,13 +95,13 @@
       "id": "f5",
       "cat": "userIdentities",
       "front": "Microsoft Entra Connect Sync vs. Microsoft Entra Cloud Sync",
-      "back": "Microsoft Entra Connect Sync is a full-featured, single-server synchronization engine with rich customization for complex on-premises topologies. Microsoft Entra Cloud Sync is a lightweight, agent-based service supporting multiple agents across multiple AD forests, managed from the cloud, aimed at simpler high-availability scenarios.",
+      "back": "Microsoft Entra Connect Sync vs. Microsoft Entra Cloud Sync: the first is a full-featured, single-server synchronization engine with rich customization for complex on-premises topologies, while the second is a lightweight, agent-based service supporting multiple agents across multiple AD forests, managed from the cloud, aimed at simpler high-availability scenarios.",
       "detail": "Cloud Sync's multiple lightweight agents can be deployed across several on-premises AD forests for redundancy far more simply than standing up multiple Entra Connect Sync servers, but it supports fewer customization options for complex attribute-flow scenarios."
     },
     {
       "id": "f6",
       "cat": "userIdentities",
-      "front": "External Identities: B2B collaboration",
+      "front": "B2B collaboration (External Identities)",
       "back": "B2B collaboration lets a partner user sign in to your resources using their own home organization's Microsoft Entra (or other supported) credentials, added to your tenant as a guest user object without you managing a separate password for them.",
       "detail": "The partner's identity, MFA status, and password all remain managed by their home tenant; your tenant only decides what that guest is authorized to access, governed further by cross-tenant access settings."
     },
@@ -130,8 +130,8 @@
       "id": "f10",
       "cat": "authAccessMgmt",
       "front": "Multifactor authentication methods",
-      "back": "Microsoft Entra supports several MFA methods, including the Microsoft Authenticator app (push notification or passwordless), OATH hardware or software tokens, FIDO2 security keys, and voice call/SMS -- though voice and SMS are still supported but considered weaker than app-based and phishing-resistant methods, so Microsoft steers organizations toward stronger options.",
-      "detail": "\"Strongest\" and \"phishing-resistant\" are not the same thing: standard Authenticator push notifications are stronger than SMS but can still be defeated by MFA-fatigue or consent-phishing attacks, while only methods like FIDO2 security keys, Windows Hello for Business, and certificate-based authentication are phishing-resistant (see the Conditional Access authentication strengths flashcard)."
+      "back": "Microsoft Entra supports several MFA methods, including the Microsoft Authenticator app (push notification or passwordless), OATH hardware or software tokens, FIDO2 security keys and passkeys, and voice call/SMS -- though voice and SMS are weaker than app-based and phishing-resistant methods, and Microsoft is retiring its own SMS and voice delivery (from February 1, 2027), so it steers organizations toward stronger options.",
+      "detail": "\"Strongest\" and \"phishing-resistant\" are not the same thing: standard Authenticator push notifications are stronger than SMS but can still be defeated by MFA-fatigue or adversary-in-the-middle phishing attacks, while only methods like FIDO2 security keys, Windows Hello for Business, and certificate-based authentication are phishing-resistant."
     },
     {
       "id": "f11",
@@ -150,15 +150,15 @@
     {
       "id": "f13",
       "cat": "authAccessMgmt",
-      "front": "Combined registration for security info",
+      "front": "Combined registration (security info)",
       "back": "Combined registration presents a single, unified experience where a user registers authentication methods that satisfy both multifactor authentication and SSPR requirements at once, instead of registering separately for each.",
       "detail": "A method registered once through combined registration -- like the Authenticator app -- can then satisfy both an MFA challenge and a future SSPR flow, avoiding duplicate registration."
     },
     {
       "id": "f14",
       "cat": "authAccessMgmt",
-      "front": "Microsoft Entra ID Protection: user risk vs. sign-in risk",
-      "back": "User risk reflects the likelihood a specific identity has been compromised, based on signals like leaked credentials found in the wild. Sign-in risk reflects the likelihood one specific authentication attempt is not genuine, based on signals like impossible travel or anonymous IP addresses.",
+      "front": "User risk vs. sign-in risk (Microsoft Entra ID Protection)",
+      "back": "User risk vs. sign-in risk: the first reflects the likelihood a specific identity has been compromised, based on signals like leaked credentials found in the wild, while the second reflects the likelihood one specific authentication attempt is not genuine, based on signals like impossible travel or anonymous IP addresses.",
       "detail": "A leaked-credential detection raises user risk even if the very next sign-in looks completely normal, while an anonymous-IP sign-in raises sign-in risk for that one attempt regardless of the user's overall risk history -- the two signals are tracked and remediated independently."
     },
     {
@@ -178,8 +178,8 @@
     {
       "id": "f17",
       "cat": "authAccessMgmt",
-      "front": "Conditional Access named locations",
-      "back": "Named locations let an administrator define trusted IP ranges or countries/regions (including marking some as trusted) that Conditional Access policies can reference as a condition, such as requiring extra verification for sign-ins from outside a trusted named location.",
+      "front": "Named location (Conditional Access)",
+      "back": "Named locations let an administrator define trusted IP ranges or countries/regions (including marking some as trusted) that Conditional Access policies can reference as a condition, such as requiring extra verification for sign-ins from outside the trusted ranges.",
       "detail": "Marking a named location as trusted lets Microsoft Entra ID Protection factor that location into its sign-in risk calculation (reducing false positives for known corporate networks), in addition to its being usable as a plain location condition in Conditional Access policies."
     },
     {
@@ -192,7 +192,7 @@
     {
       "id": "f19",
       "cat": "authAccessMgmt",
-      "front": "Conditional Access authentication strengths",
+      "front": "Authentication strength (Conditional Access)",
       "back": "An authentication strength is a Conditional Access grant control that requires sign-in using one of a specified combination of authentication methods (for example, only phishing-resistant methods like FIDO2 or Windows Hello for Business), rather than accepting any method that merely satisfies generic MFA.",
       "detail": "A policy requiring the built-in Phishing-resistant MFA authentication strength will reject a sign-in that used SMS-based MFA, even though SMS technically satisfies a generic require-MFA grant control."
     },
@@ -200,7 +200,7 @@
       "id": "f20",
       "cat": "workloadIdentities",
       "front": "App registration vs. enterprise application",
-      "back": "An app registration defines an application's identity in a tenant (its app ID, redirect URIs, requested API permissions) -- it is the global definition of the app. An enterprise application is the service principal, the local, tenant-specific instance that represents how that app is actually used and governed (assignments, SSO configuration, Conditional Access) inside one particular tenant.",
+      "back": "App registration vs. enterprise application: the first defines an application's identity in a tenant (its app ID, redirect URIs, requested API permissions) and is the global definition of the app, while the second is the service principal, the local, tenant-specific instance that represents how that app is actually used and governed (assignments, SSO configuration, Conditional Access) inside one particular tenant.",
       "detail": "Registering an app in your own tenant automatically creates its enterprise application (service principal) there too; consenting to a multi-tenant app from another vendor's tenant instead creates only the enterprise application/service principal side, with no app registration of your own to manage."
     },
     {
@@ -214,7 +214,7 @@
       "id": "f22",
       "cat": "workloadIdentities",
       "front": "System-assigned vs. user-assigned managed identity",
-      "back": "A system-assigned managed identity is created and tied to a single Azure resource's lifecycle, deleted automatically when that resource is deleted. A user-assigned managed identity is its own standalone resource that can be attached to multiple resources at once and persists independently of any one of them.",
+      "back": "System-assigned vs. user-assigned managed identity: the first is created and tied to a single Azure resource's lifecycle and is deleted automatically when that resource is deleted, while the second is its own standalone resource that can be attached to multiple resources at once and persists independently of any one of them.",
       "detail": "When several resources need to share one identity and one set of role assignments, a user-assigned managed identity is the right choice -- a system-assigned identity cannot be reused across resources or survive its resource being deleted."
     },
     {
@@ -227,22 +227,22 @@
     {
       "id": "f24",
       "cat": "workloadIdentities",
-      "front": "Microsoft Entra Agent ID for AI agents",
-      "back": "Microsoft Entra Agent ID gives an AI agent its own individually identifiable, policy-governed identity distinct from a human user, a standard app registration, or a generic shared service principal, so its actions can be authenticated, authorized, and audited across its full lifecycle, and governed with the same tools -- like Conditional Access -- used for other identities.",
+      "front": "Microsoft Entra Agent ID",
+      "back": "Microsoft Entra Agent ID is the identity capability for AI agents: each agent gets its own individually identifiable, policy-governed identity (an agent identity, created from an agent identity blueprint), distinct from a human user, a standard app registration, or a generic shared service principal, so its actions can be authenticated, authorized, and audited across its full lifecycle, and governed with the same tools -- like Conditional Access -- used for other identities.",
       "detail": "Agent identity blueprints act as reusable templates: permissions and Conditional Access requirements set once on a blueprint automatically apply to every agent identity created from it, letting an admin govern a whole fleet of agents through a single policy."
     },
     {
       "id": "f25",
       "cat": "workloadIdentities",
-      "front": "API permissions: delegated vs. application permissions",
-      "back": "A delegated permission lets an app act on behalf of a signed-in user, limited to whatever that user could already do themselves. An application permission lets an app act as itself with no signed-in user present, typically used for a background service or daemon, and generally requires admin consent.",
-      "detail": "An application permission is the more powerful of the two because it operates with the app's own standing rights rather than being capped by an individual user's rights -- which is exactly why application permissions almost always require admin consent rather than user consent."
+      "front": "Delegated vs. application permissions (API permissions)",
+      "back": "Delegated vs. application permissions: the first lets an app act on behalf of a signed-in user, limited to whatever that user could already do themselves, while the second lets an app act as itself with no signed-in user present, typically used for a background service or daemon, and generally requires admin consent.",
+      "detail": "An application permission is the more powerful of the two because it operates with the app's own standing rights rather than being capped, as a delegated permission is, by an individual user's rights -- which is exactly why application permissions almost always require admin consent rather than user consent."
     },
     {
       "id": "f26",
       "cat": "workloadIdentities",
       "front": "Admin consent vs. user consent",
-      "back": "User consent lets an individual user approve the permissions a specific app requests for their own data. Admin consent, granted by a privileged administrator, approves an app's requested permissions on behalf of the entire organization (or a set of users), and is required for higher-privilege or application-level permissions that an ordinary user is not allowed to approve alone.",
+      "back": "Admin consent vs. user consent: the first, granted by a privileged administrator, approves an app's requested permissions on behalf of the entire organization (or a set of users) and is required for higher-privilege or application-level permissions that an ordinary user is not allowed to approve alone, while the second lets an individual user approve the permissions a specific app requests for their own data.",
       "detail": "An admin consent workflow can be configured so that when a user requests access to an app needing admin approval, the request is routed to a designated reviewer instead of being silently blocked or silently granted."
     },
     {
@@ -255,29 +255,29 @@
     {
       "id": "f28",
       "cat": "workloadIdentities",
-      "front": "Microsoft Entra application proxy",
+      "front": "Application Proxy (Microsoft Entra)",
       "back": "Application Proxy publishes an on-premises web application for secure remote access through Microsoft Entra ID, applying the same Conditional Access and single sign-on experience to that legacy on-premises app as to a cloud-native SaaS app, using a lightweight connector installed on-premises with no inbound firewall ports opened.",
       "detail": "The on-premises connector makes only outbound connections to the Application Proxy service, which is why no inbound firewall rule ever needs to be opened for remote users to reach the published app."
     },
     {
       "id": "f29",
       "cat": "identityGovernance",
-      "front": "Entitlement management: access packages",
-      "back": "An access package bundles resources (groups, Teams, SharePoint sites, enterprise applications) that a user -- internal or an external guest -- can request through a defined approval workflow, often with a fixed expiration date, without an administrator manually adding them to each resource.",
+      "front": "Access packages (entitlement management)",
+      "back": "Access packages bundle resources (groups, Teams, SharePoint sites, enterprise applications) that a user -- internal or an external guest -- can request through a defined approval workflow, often with a fixed expiration date, without an administrator manually adding them to each resource.",
       "detail": "Access packages can be exposed to external users through a connected organization, letting a whole partner organization's users self-request access without each one being separately invited as a guest beforehand."
     },
     {
       "id": "f30",
       "cat": "identityGovernance",
       "front": "Access reviews",
-      "back": "An access review periodically asks a designated reviewer (a manager, resource owner, or the users themselves) to confirm that existing access to a group, application, or role assignment is still needed, and can automatically remove access that is not confirmed within the review window.",
+      "back": "Access reviews periodically ask a designated reviewer (a manager, resource owner, or the users themselves) to confirm that existing access to a group, application, or role assignment is still needed, and can automatically remove access that is not confirmed within the review window.",
       "detail": "Access reviews are the direct answer whenever a scenario wants to systematically clean up stale guest access or group membership rather than relying on someone remembering to remove it by hand."
     },
     {
       "id": "f31",
       "cat": "identityGovernance",
       "front": "PIM eligible vs. active role assignments",
-      "back": "In Privileged Identity Management, an eligible assignment lets a user activate a role only when needed, typically requiring MFA, justification, and/or approval, for a limited time window. An active assignment means the role is already in effect with no activation step required.",
+      "back": "PIM eligible vs. active role assignments: in Privileged Identity Management, an eligible assignment lets a user activate a role only when needed, typically requiring MFA, justification, and/or approval, for a limited time window, while an active assignment means the role is already in effect with no activation step required.",
       "detail": "PIM manages both Azure RBAC roles at a resource/subscription scope and Microsoft Entra directory roles like Global Administrator -- it is not limited to just one or the other."
     },
     {
@@ -304,7 +304,7 @@
     {
       "id": "f35",
       "cat": "identityGovernance",
-      "front": "Identity Governance lifecycle workflows",
+      "front": "Lifecycle workflow (Identity Governance)",
       "back": "Lifecycle workflows automate identity tasks tied to joiner, mover, and leaver events -- such as sending a welcome email and provisioning access on a new hire's start date, or disabling accounts and removing access automatically on a departure date -- without an administrator manually triggering each step.",
       "detail": "A leaver workflow can be configured to run automatically a set number of days before or after an employee's recorded termination date, removing the need for HR and IT to coordinate that timing manually."
     },
@@ -319,13 +319,13 @@
       "id": "f37",
       "cat": "identityGovernance",
       "front": "Privileged access groups vs. PIM for directory roles",
-      "back": "A privileged access group is a group made eligible for just-in-time PIM activation of its own membership or ownership, which is the underlying mechanism PIM for Groups uses; PIM for directory roles instead makes a specific Entra ID role itself (like Global Administrator) eligible for time-bound activation on a per-user basis.",
+      "back": "Privileged access groups vs. PIM for directory roles: the first is a group made eligible for just-in-time PIM activation of its own membership or ownership, which is the underlying mechanism PIM for Groups uses, while the second instead makes a specific Entra ID role itself (like Global Administrator) eligible for time-bound activation on a per-user basis.",
       "detail": "Both rely on the same eligible/active PIM activation model -- the difference is simply whether what gets activated is membership in a group or an individual directory role assignment."
     },
     {
       "id": "f38",
       "cat": "identityGovernance",
-      "front": "Connected organizations in entitlement management",
+      "front": "Connected organization (entitlement management)",
       "back": "A connected organization is an external Microsoft Entra tenant (or a non-Entra domain) registered in entitlement management so that its users can be targeted as eligible requestors for an access package, without each external user needing to already exist as a guest in your tenant beforehand.",
       "detail": "Adding a connected organization does not itself grant access to anyone -- it only makes that organization's users visible as candidates who can then request an access package, which still runs through its own approval workflow."
     },
@@ -353,13 +353,13 @@
     {
       "id": "f42",
       "cat": "authAccessMgmt",
-      "front": "Conditional Access policy templates",
+      "front": "Conditional Access templates",
       "back": "Microsoft-provided Conditional Access templates pre-fill common, recommended assignments and access controls, such as requiring MFA for all users or blocking legacy authentication, so an administrator starts from a vetted baseline instead of building every policy from scratch.",
       "detail": "Every Conditional Access policy, whether built from a template or from scratch, should explicitly exclude your break-glass emergency access accounts, so a misconfigured or unreachable policy can never lock every administrator out at once."
     },
     {
       "id": "f43",
-      "cat": "authAccessMgmt",
+      "cat": "identityGovernance",
       "front": "Identity Secure Score",
       "back": "Identity Secure Score is a percentage Microsoft Entra ID calculates from your tenant's actual security configuration, listing specific improvement actions \u2014 such as enabling multifactor authentication methods or blocking legacy authentication \u2014 each showing the points earned if implemented.",
       "detail": "The score is directional, not a pass/fail target: two tenants with very different real-world MFA and SSPR coverage can land on similar scores if they've each implemented a different subset of the recommended actions."
@@ -375,7 +375,7 @@
       "id": "f45",
       "cat": "userIdentities",
       "front": "Seamless single sign-on (Seamless SSO)",
-      "back": "Seamless SSO silently signs a user into cloud apps whenever they're already signed in to a domain-joined, on-premises Active Directory device, handling automatic sign-in on the device itself rather than how the password is validated \u2014 it pairs with, and is separate from, whichever sign-in method (Password Hash Sync, Pass-through Authentication, or Federation) an organization has chosen in Microsoft Entra Connect.",
+      "back": "Seamless single sign-on silently signs a user into cloud apps whenever they're already signed in to a domain-joined, on-premises Active Directory device, handling automatic sign-in on the device itself rather than how the password is validated \u2014 it pairs with, and is separate from, whichever sign-in method (Password Hash Sync, Pass-through Authentication, or Federation) an organization has chosen in Microsoft Entra Connect.",
       "detail": "Seamless SSO can be enabled alongside either Password Hash Sync or Pass-through Authentication -- it isn't itself a sign-in validation method, so a scenario about domain-joined devices skipping a sign-in prompt entirely is pointing at Seamless SSO, not at which of PHS or PTA is configured."
     },
     {
@@ -395,7 +395,7 @@
     {
       "id": "f48",
       "cat": "userIdentities",
-      "front": "Microsoft Entra device join types: joined, hybrid joined, and registered",
+      "front": "Microsoft Entra device join types",
       "back": "Microsoft Entra joined devices exist purely in the cloud with no on-premises Active Directory dependency, suited to corporate-owned devices managed entirely through Intune. Microsoft Entra hybrid joined devices are joined to both on-premises AD and Microsoft Entra ID, fitting existing domain-joined desktops that still need Entra ID sign-in. Microsoft Entra registered devices simply add a personal or BYOD device's owner account without making the device itself corporate-managed.",
       "detail": "A Conditional Access policy requiring a hybrid Entra ID joined device will reject a personal phone that is only Microsoft Entra registered, even if that phone has otherwise passed every other grant control."
     },
@@ -424,13 +424,13 @@
       "id": "f52",
       "cat": "authAccessMgmt",
       "front": "Security defaults",
-      "back": "Security defaults are a free, one-size-fits-all baseline that enforces MFA registration and blocks legacy authentication tenant-wide with no per-policy customization, and a tenant generally cannot run security defaults and Conditional Access policies at the same time -- turning on Conditional Access is how an organization graduates beyond security defaults' fixed rules.",
+      "back": "Security defaults are a free, one-size-fits-all baseline that enforce MFA registration and block legacy authentication tenant-wide with no per-policy customization. A tenant generally cannot run them and Conditional Access policies at the same time -- turning on Conditional Access is how an organization graduates beyond their fixed rules.",
       "detail": "A small organization with no Microsoft Entra ID P1/P2 licensing that just wants baseline MFA enforced with zero configuration is exactly the scenario security defaults is built for, while any organization that needs a granular, assignment-based Conditional Access approach has to disable security defaults first."
     },
     {
       "id": "f53",
       "cat": "authAccessMgmt",
-      "front": "Conditional Access 'What If' tool",
+      "front": "What If tool (Conditional Access)",
       "back": "The What If tool simulates which Conditional Access policies would apply to a specified user, app, and set of conditions, without enforcing anything or waiting for a real sign-in, letting an administrator troubleshoot or validate policy design directly.",
       "detail": "This differs from Conditional Access report-only mode, which evaluates real sign-ins over time and logs the outcome; What If instead answers a single hypothetical scenario on demand."
     },
@@ -438,35 +438,35 @@
       "id": "f54",
       "cat": "authAccessMgmt",
       "front": "Microsoft Entra Password Protection and smart lockout",
-      "back": "Microsoft Entra Password Protection blocks users from setting passwords that match a global banned list plus an administrator-defined custom banned list, optionally extended on-premises via a proxy and DC agent, while smart lockout separately locks out an account after a configurable number of failed sign-in attempts to slow down password-guessing attacks.",
+      "back": "Microsoft Entra Password Protection and smart lockout are two separate defenses against weak and guessed passwords. The first blocks users from setting passwords that match a global banned list plus an administrator-defined custom banned list, optionally extended on-premises via a proxy and DC agent, while the second locks out an account after a configurable number of failed sign-in attempts to slow down password-guessing attacks.",
       "detail": "These two features solve different problems: banned password lists stop weak or predictable passwords from ever being set, while smart lockout responds to repeated failed guesses against whatever password is already set."
     },
     {
       "id": "f55",
       "cat": "authAccessMgmt",
-      "front": "Conditional Access session controls: sign-in frequency and persistent browser session",
-      "back": "Sign-in frequency forces reauthentication after a defined time interval instead of letting a token ride out its full lifetime, and the persistent browser session control, when disabled, ends the session the moment the browser is closed -- both apply after a sign-in has already been granted, unlike a grant control such as requiring MFA.",
+      "front": "Sign-in frequency and persistent browser session (Conditional Access session controls)",
+      "back": "Sign-in frequency and persistent browser session are Conditional Access session controls that apply after a sign-in has already been granted, unlike a grant control such as requiring MFA. The first forces reauthentication after a defined time interval instead of letting a token ride out its full lifetime; the second, when set to never persistent, ends the session the moment the browser is closed.",
       "detail": "Disabling persistent browser sessions on unmanaged devices is a common way to make sure closing the browser actually signs the user out, rather than relying solely on the sign-in frequency window to eventually expire."
     },
     {
       "id": "f56",
       "cat": "workloadIdentities",
-      "front": "Supported account types for app registrations",
+      "front": "Supported account types (app registration)",
       "back": "An app registration's supported account types setting controls who is allowed to sign in to it: single-tenant (only this organization), multi-tenant (any Microsoft Entra organization), multi-tenant plus personal Microsoft accounts, or personal Microsoft accounts only -- distinct from API permissions, which govern what the app can do once someone has signed in.",
       "detail": "A consumer-facing app that wants to accept sign-ins from any organization's Entra tenant as well as personal Outlook.com or Xbox accounts needs the multi-tenant plus personal Microsoft accounts option, not single-tenant."
     },
     {
       "id": "f57",
       "cat": "workloadIdentities",
-      "front": "Automatic user provisioning (SCIM) for enterprise applications",
-      "back": "Automatic user provisioning uses the SCIM protocol to automatically create, update, and deprovision a user's account in a SaaS application based on Microsoft Entra ID group membership or attributes, instead of an administrator manually creating and removing accounts in that app one at a time.",
+      "front": "Automatic user provisioning (SCIM)",
+      "back": "Automatic user provisioning uses the System for Cross-domain Identity Management protocol to automatically create, update, and deprovision a user's account in a SaaS application based on Microsoft Entra ID group membership or attributes, instead of an administrator manually creating and removing accounts in that app one at a time.",
       "detail": "Removing a user from the scoped group can automatically deprovision (disable or delete) their account in the target SaaS app, extending the same joiner/mover/leaver automation idea that lifecycle workflows apply inside Entra ID itself out to a downstream application."
     },
     {
       "id": "f58",
       "cat": "workloadIdentities",
       "front": "Publisher verification and risk-based step-up consent",
-      "back": "Publisher verification confirms an app registration's publisher identity has been validated by Microsoft, shown as a verified badge during consent, while risk-based step-up consent automatically requires admin consent for a request that Microsoft Entra ID judges unusually risky, even if user consent would ordinarily be allowed for that permission.",
+      "back": "Publisher verification and risk-based step-up consent are two safeguards in the app consent process. The first confirms that an app registration's publisher identity has been validated by Microsoft, shown as a verified badge during consent, while the second automatically requires admin consent for a request that Microsoft Entra ID judges unusually risky, even if user consent would ordinarily be allowed for that permission.",
       "detail": "A user consent request from an unverified publisher asking for high-risk permissions is exactly the combination risk-based step-up consent is designed to intercept and escalate to an administrator rather than letting the user approve it alone."
     },
     {
@@ -479,15 +479,15 @@
     {
       "id": "f60",
       "cat": "identityGovernance",
-      "front": "Segregation of duties (SoD) checks",
-      "back": "A segregation of duties check in entitlement management designates two access packages (or incompatible groups) as mutually exclusive, automatically blocking a user's request for one if they already hold the other, enforcing a fraud-prevention control like never letting the same person both approve and process a payment.",
+      "front": "Separation of duties (SoD) checks",
+      "back": "Separation of duties checks in entitlement management designate two access packages (or incompatible groups) as mutually exclusive, automatically blocking a user's request for one if they already hold the other, enforcing a fraud-prevention control like never letting the same person both approve and process a payment.",
       "detail": "This is a preventive control enforced at request time, unlike an access review, which only reassesses access that has already been granted."
     },
     {
       "id": "f61",
       "cat": "identityGovernance",
-      "front": "Entitlement management catalogs",
-      "back": "A catalog is a container that groups related resources (groups, Teams, SharePoint sites, applications) together in entitlement management so a delegated catalog owner -- who need not be a full administrator -- can create and manage access packages built only from that catalog's resources.",
+      "front": "Catalog (entitlement management)",
+      "back": "A catalog is a container that groups related resources (groups, Teams, SharePoint sites, applications) together in entitlement management so a delegated owner -- who need not be a full administrator -- can create and manage access packages built only from those resources.",
       "detail": "Organizing resources into a catalog first is what lets a business-unit owner build and publish their own access packages without needing directory-wide administrative rights."
     },
     {
@@ -500,7 +500,7 @@
     {
       "id": "f63",
       "cat": "userIdentities",
-      "front": "Restricted management administrative units",
+      "front": "Restricted management administrative unit",
       "back": "A restricted management administrative unit protects its member objects from being modified (for example, having a password reset or being deleted) by any administrator who is not explicitly assigned a role scoped to that same unit, even a tenant-wide administrator -- unlike a standard administrative unit, which only narrows where a scoped role can act and does not stop tenant-wide roles from managing the same objects.",
       "detail": "This is commonly used to shield emergency access accounts or an executive's own account from routine helpdesk changes -- a tenant-wide administrator who is not assigned a role at the unit's scope cannot modify its members, whether through the portal or Microsoft Graph."
     },
@@ -514,21 +514,21 @@
     {
       "id": "f65",
       "cat": "userIdentities",
-      "front": "Direct federation for B2B guest sign-in",
+      "front": "Direct federation (B2B guest sign-in)",
       "back": "Direct federation configures a trust with a partner's own SAML or WS-Fed identity provider so its users can sign in as B2B guests using their existing organizational credentials, covering partner organizations that have no Microsoft Entra ID or Google Workspace identity at all -- unlike standard B2B collaboration with an Entra tenant, which trusts the partner's own Entra ID directly with no separate federation setup.",
       "detail": "This is the right choice when a partner organization's identity provider is Okta, Ping, or another SAML/WS-Fed system rather than Microsoft Entra ID or Google, which are instead trusted natively with no federation trust to configure at all. It has nothing to do with Azure AD B2C, which serves an organization's own consumer-facing apps rather than a partner's workforce."
     },
     {
       "id": "f66",
       "cat": "authAccessMgmt",
-      "front": "Conditional Access authentication context",
+      "front": "Authentication context (Conditional Access)",
       "back": "An authentication context is a tag that can be applied to a specific sensitive action or resource (such as a SharePoint document with a particular sensitivity label, or one action inside a line-of-business app) so a Conditional Access policy can require extra verification, like step-up MFA, only at that specific point of access -- instead of a policy's ordinary cloud apps assignment applying the same requirement to the entire application.",
       "detail": "A document library where only files labeled Highly Confidential trigger step-up MFA, while every other document on the same SharePoint site requires only ordinary sign-in, is the kind of scenario authentication context is built for."
     },
     {
       "id": "f67",
       "cat": "authAccessMgmt",
-      "front": "Custom authentication extensions",
+      "front": "Custom authentication extension",
       "back": "A custom authentication extension calls an external REST API, typically hosted as an Azure Function, at a defined point in the sign-in or token-issuance process -- such as just before a token is issued -- letting an organization add custom claims from an external system to the token, beyond what Entra ID's own built-in attributes can supply. Other supported events cover attribute collection during sign-up and custom delivery of one-time passcodes.",
       "detail": "A common use is calling an external HR system during token issuance to add a custom claim, like an employee's cost center, into the token, using a value that system tracks but Entra ID itself has no attribute for."
     },
@@ -542,29 +542,29 @@
     {
       "id": "f69",
       "cat": "workloadIdentities",
-      "front": "Application management policies",
+      "front": "Application management policy",
       "back": "An application management policy restricts, tenant-wide or for specific apps, the maximum lifetime allowed for a newly added app registration client secret or certificate, blocking the creation of a new credential that exceeds that limit rather than relying on individual developers to self-police secret lifetimes.",
       "detail": "This only constrains new credentials created going forward -- a secret that already exists and already exceeds the new limit is not immediately revoked just by enabling the policy. Where workload identity federation can be adopted instead, it removes the need for any such secret at all."
     },
     {
       "id": "f70",
       "cat": "workloadIdentities",
-      "front": "Kerberos Constrained Delegation for Application Proxy",
-      "back": "Kerberos Constrained Delegation (KCD) lets a Microsoft Entra application proxy connector sign a user into an on-premises application that relies on Windows-integrated (Kerberos) authentication, impersonating that user toward the backend app so they get true single sign-on instead of being prompted a second time by the app's own Windows authentication.",
+      "front": "Kerberos Constrained Delegation (KCD)",
+      "back": "Kerberos Constrained Delegation lets a Microsoft Entra application proxy connector sign a user into an on-premises application that relies on Windows-integrated (Kerberos) authentication, impersonating that user toward the backend app so they get true single sign-on instead of being prompted a second time by the app's own Windows authentication.",
       "detail": "Without KCD configured, a user who successfully signs in through Application Proxy can still hit a second, separate Windows-integrated sign-in prompt from the backend app itself, defeating the single sign-on experience Application Proxy is meant to provide for that kind of legacy app."
     },
     {
       "id": "f71",
       "cat": "workloadIdentities",
-      "front": "Application Proxy connector groups",
+      "front": "Connector group (Application Proxy)",
       "back": "A connector group is a named set of one or more Microsoft Entra application proxy connectors that a published app is explicitly assigned to, letting an organization route a specific app's traffic through connectors in its own nearest region or dedicated to its own workload, instead of every published app sharing one single, undifferentiated pool of connectors.",
       "detail": "Placing multiple connectors in the same group is also how high availability is achieved per app -- one connector in the group going offline does not take that app down, while a different app assigned to a different connector group fails over entirely independently."
     },
     {
       "id": "f72",
       "cat": "workloadIdentities",
-      "front": "Application registration owners",
-      "back": "An app registration (or enterprise application) owner is a specific user granted the ability to manage that one application's configuration -- credentials, permissions, branding -- without being granted a tenant-wide role like Application Administrator or Cloud Application Administrator. Ownership is a separate concept from the distinction between an app registration and its enterprise application.",
+      "front": "App registration owner",
+      "back": "An app registration owner is a specific user granted the ability to manage that one application's configuration -- credentials, permissions, branding -- without being granted a tenant-wide role like Application Administrator or Cloud Application Administrator. The same idea applies to enterprise application owners, and ownership is a separate concept from the distinction between an app registration and its enterprise application.",
       "detail": "This lets a development team manage its own app's secrets and redirect URIs day to day while a directory-wide administrative role stays reserved for broader, tenant-level application governance."
     },
     {
@@ -605,14 +605,14 @@
     {
       "id": "f78",
       "cat": "userIdentities",
-      "front": "Microsoft Entra B2B direct connect",
+      "front": "B2B direct connect (Microsoft Entra)",
       "back": "B2B direct connect is a mutual trust between two Microsoft Entra organizations that lets users sign in with their home credentials and use shared channels in Microsoft Teams. No guest account is created in either directory, and both sides must enable it in their cross-tenant access settings.",
       "detail": "Exam angle: if the scenario needs guests to appear in people pickers, or needs access beyond Teams shared channels, B2B direct connect is wrong and B2B collaboration is right."
     },
     {
       "id": "f79",
       "cat": "userIdentities",
-      "front": "Role-assignable groups",
+      "front": "Role-assignable group",
       "back": "A role-assignable group is a Microsoft Entra security or Microsoft 365 group created with the isAssignableToRole property set to true, so a directory role can be assigned to the group instead of to each person. Its membership must be assigned, not dynamic, and only privileged admins and group owners can change it.",
       "detail": "The property cannot be changed after creation, and a tenant can hold at most 500 such groups. Protecting the group's membership this way stops a helpdesk admin from adding themselves to a privileged role."
     },
@@ -627,13 +627,13 @@
       "id": "f81",
       "cat": "userIdentities",
       "front": "Source anchor (ms-DS-ConsistencyGuid)",
-      "back": "The source anchor is the on-premises attribute that uniquely ties a synchronized object to its cloud object. Microsoft Entra Connect uses ms-DS-ConsistencyGuid by default and stores it in the cloud as the immutable ID, which should never change for the life of the object.",
+      "back": "The source anchor is the on-premises attribute that uniquely ties a synchronized object to its cloud object. Microsoft Entra Connect picks a GUID-based attribute by default and stores it in the cloud as the immutable ID, which should never change for the life of the object.",
       "detail": "Changing it breaks the link and can leave a duplicate or orphaned cloud user. Hard match uses this value, while soft match instead compares attributes such as UPN or proxy address."
     },
     {
       "id": "f82",
       "cat": "userIdentities",
-      "front": "Staged Rollout for cloud authentication",
+      "front": "Staged Rollout (cloud authentication)",
       "back": "Staged Rollout lets you move selected groups of users from federation, such as AD FS, to cloud authentication with password hash sync or pass-through authentication, while everyone else keeps using federation. You enable it for security groups and can grow the groups over time.",
       "detail": "It is the low-risk way to pilot cloud authentication before converting the whole domain from federated to managed. Roll back by removing the group from the feature."
     },
@@ -641,7 +641,7 @@
       "id": "f83",
       "cat": "userIdentities",
       "front": "Global Administrator role",
-      "back": "Global Administrator has full access to every Microsoft Entra admin feature and to most Microsoft 365 services, and can assign any role to anyone. It is the most powerful directory role, so it should be held by very few accounts.",
+      "back": "The Global Administrator role has full access to every Microsoft Entra admin feature and to most Microsoft 365 services, and can assign any role to anyone. It is the most powerful directory role, so it should be held by very few accounts.",
       "detail": "Microsoft recommends fewer than five Global Administrators, activated just in time through PIM, with break-glass accounts kept separate. Give daily admins a narrower role instead."
     },
     {
@@ -655,13 +655,13 @@
       "id": "f85",
       "cat": "userIdentities",
       "front": "Helpdesk Administrator vs Authentication Administrator",
-      "back": "Helpdesk Administrator can reset passwords for non-administrators and other Helpdesk Administrators. Authentication Administrator can view, set and reset authentication methods, including requiring re-registration of MFA, for non-administrators. Privileged Authentication Administrator does this for any user, including admins.",
+      "back": "Helpdesk Administrator vs Authentication Administrator: the first can reset passwords for non-administrators and other Helpdesk Administrators, while the second can view, set and reset authentication methods, including requiring re-registration of MFA, for non-administrators. Privileged Authentication Administrator does what the second does for any user, including admins.",
       "detail": "Pair either role with an administrative unit to limit it to a region or department. Choose Authentication Administrator when the task is resetting MFA methods rather than just a password."
     },
     {
       "id": "f86",
       "cat": "userIdentities",
-      "front": "Group expiration policy for Microsoft 365 groups",
+      "front": "Group expiration policy (Microsoft 365 groups)",
       "back": "A group expiration policy sets a lifetime for Microsoft 365 groups. Owners get renewal notices before the end date, and a group nobody renews is soft-deleted, so it can be restored for 30 days. It applies to Microsoft 365 groups, not security groups.",
       "detail": "Use it to clean up abandoned Teams and groups automatically. Group activity, such as Teams and SharePoint use, can renew a group without the owner doing anything."
     },
@@ -676,7 +676,7 @@
       "id": "f88",
       "cat": "authAccessMgmt",
       "front": "Token protection (Conditional Access session control)",
-      "back": "Token protection is a Conditional Access session control that binds sign-in tokens to the device they were issued to, so a stolen token cannot be replayed from another machine. It currently covers supported desktop apps on Windows, such as Exchange Online and SharePoint Online.",
+      "back": "Token protection is a Conditional Access session control that binds sign-in tokens to the device they were issued to, so a stolen token cannot be replayed from another machine. It covers supported native apps on Windows, macOS and iOS/iPadOS that access Exchange Online, SharePoint Online and Teams.",
       "detail": "It targets token theft and replay, which MFA alone does not stop. Scope it carefully, because apps that do not support token binding are blocked once the policy applies."
     },
     {
@@ -689,7 +689,7 @@
     {
       "id": "f90",
       "cat": "authAccessMgmt",
-      "front": "Number matching in Microsoft Authenticator",
+      "front": "Number matching (Microsoft Authenticator)",
       "back": "Number matching makes the Microsoft Authenticator app show a number on the sign-in screen that the user must type into the approval prompt, instead of just tapping Approve. It reduces blind approvals during MFA fatigue attacks.",
       "detail": "It does not make push MFA phishing-resistant, because a proxy page can still show the number to a victim. Phishing-resistant methods such as FIDO2 keys or Windows Hello for Business are the stronger answer."
     },
@@ -698,26 +698,26 @@
       "cat": "authAccessMgmt",
       "front": "Registration campaign (authentication methods)",
       "back": "A registration campaign, set in the authentication methods policy, prompts users who have just signed in with MFA to register a stronger method, such as Microsoft Authenticator or a passkey. Users can be allowed to snooze the prompt and are nudged again later.",
-      "detail": "It nudges users who can already sign in, so it cannot help someone with no first sign-in method. It replaces the older SSPR registration reminder setting that was retired."
+      "detail": "It nudges users who can already sign in, so it cannot help someone with no first sign-in method. It targets one method at a time, Authenticator or a passkey, and in the Microsoft managed state Microsoft chooses the method and the snooze settings."
     },
     {
       "id": "f92",
       "cat": "authAccessMgmt",
-      "front": "Legacy authentication and how to block it",
+      "front": "Legacy authentication (and blocking it)",
       "back": "Legacy authentication covers older protocols such as POP, IMAP, SMTP AUTH and basic authentication from old Office clients. They cannot perform MFA, so attackers use them for password spray. A Conditional Access policy that targets legacy clients and blocks access shuts them off.",
       "detail": "Security defaults and the Block legacy authentication template both block it. Check sign-in logs for legacy client usage first, so a needed mail app or scanner is not broken."
     },
     {
       "id": "f93",
-      "cat": "authAccessMgmt",
+      "cat": "identityGovernance",
       "front": "Microsoft Entra sign-in logs and audit logs",
-      "back": "Sign-in logs record who signed in to what, from where, and whether Conditional Access and MFA applied, including non-interactive, service principal and managed identity sign-ins. Audit logs record changes to the directory, such as role assignments, user and group edits and app consent.",
+      "back": "Microsoft Entra sign-in logs and audit logs are the two core activity logs. The first records who signed in to what, from where, and whether Conditional Access and MFA applied, including non-interactive, service principal and managed identity sign-ins, while the second records changes to the directory, such as role assignments, user and group edits and app consent.",
       "detail": "Use sign-in logs to troubleshoot a blocked sign-in or test report-only policies, and audit logs to find who changed a role or consent grant. Retention is limited, so export long-term copies."
     },
     {
       "id": "f94",
-      "cat": "authAccessMgmt",
-      "front": "Diagnostic settings for Microsoft Entra logs",
+      "cat": "identityGovernance",
+      "front": "Diagnostic settings (Microsoft Entra logs)",
       "back": "Diagnostic settings export Microsoft Entra sign-in and audit logs to a Log Analytics workspace, a storage account, an event hub or a partner solution. That gives long retention, KQL queries, workbooks and alerts beyond what the portal keeps.",
       "detail": "Send to Log Analytics for queries and workbooks, to a storage account for cheap archive, and to an event hub to feed an external SIEM. Microsoft Sentinel connects to the same logs."
     },
@@ -725,20 +725,20 @@
       "id": "f95",
       "cat": "authAccessMgmt",
       "front": "Risky users and risk detections (ID Protection reports)",
-      "back": "Microsoft Entra ID Protection lists risky users, risky sign-ins and individual risk detections. An admin can confirm a user compromised, dismiss the risk, reset the password or block the user, and the risk state changes to match.",
+      "back": "Microsoft Entra ID Protection reports list each flagged identity, each risky sign-in and each individual risk detection. An admin can confirm a user compromised, dismiss the risk, reset the password or block the user, and the risk state changes to match.",
       "detail": "Confirming a user compromised raises that user's risk to high, which can trigger a user risk policy. Risk clears automatically after a secure password change by the user, where self-service reset is registered."
     },
     {
       "id": "f96",
       "cat": "authAccessMgmt",
-      "front": "Conditional Access session control: Conditional Access App Control",
-      "back": "Conditional Access App Control routes a sign-in session through Microsoft Defender for Cloud Apps acting as a reverse proxy. That lets admins monitor the session and block downloads, copy, or print, using session policies, for example on unmanaged devices.",
+      "front": "Conditional Access App Control (session control)",
+      "back": "Conditional Access App Control routes a sign-in session through Microsoft Defender for Cloud Apps. That lets admins monitor the session and block downloads, copy, or print, using session policies, for example on unmanaged devices. It is selected as a session control inside a Conditional Access policy.",
       "detail": "In the Conditional Access policy choose the session control Use Conditional Access App Control, then build the matching session policy in Defender for Cloud Apps."
     },
     {
       "id": "f97",
       "cat": "workloadIdentities",
-      "front": "OAuth 2.0 client credentials flow",
+      "front": "Client credentials flow (OAuth 2.0)",
       "back": "In the client credentials flow, an app signs in as itself, with no user, using a secret, certificate or federated credential, and receives an access token carrying application permissions. It is the standard flow for daemons, background services and scripts.",
       "detail": "The app needs application permissions that an admin has consented to, such as Calendars.Read. A developer who is not an admin cannot grant them, which is a common exam trap."
     },
@@ -746,7 +746,7 @@
       "id": "f98",
       "cat": "workloadIdentities",
       "front": "Access tokens, ID tokens, and refresh tokens",
-      "back": "An access token authorizes calls to an API, an ID token tells the app who signed in, and a refresh token lets the app quietly get new tokens without asking the user again. Access and ID tokens are short-lived, and refresh tokens last longer.",
+      "back": "Access tokens, ID tokens, and refresh tokens are the three tokens in a sign-in: the first authorizes calls to an API, the second tells the app who signed in, and the third lets the app quietly get new tokens without asking the user again. Access and ID tokens are short-lived, and refresh tokens last longer.",
       "detail": "Remember the audience: access tokens are for the API, ID tokens are for the client app. Revoking sessions invalidates refresh tokens so new access tokens cannot be issued."
     },
     {
@@ -760,14 +760,14 @@
       "id": "f100",
       "cat": "workloadIdentities",
       "front": "Application ID URI and exposed API scopes",
-      "back": "When you expose an API, the app registration gets an Application ID URI, by default api:// followed by the client ID, which identifies the API as a token audience. You then define scopes that client apps can request as delegated permissions.",
+      "back": "Application ID URI and exposed API scopes are what an app registration defines when you expose an API: the first identifies the API as a token audience (by default api:// followed by the client ID), and the second defines the scopes that client apps can request as delegated permissions.",
       "detail": "A client requests a scope such as api://app-id/Files.Read. Exposing scopes is what lets one app registration call another with its own permissions."
     },
     {
       "id": "f101",
       "cat": "workloadIdentities",
       "front": "Optional claims and group claims",
-      "back": "Optional claims add extra information to tokens for an app, configured under token configuration. Group claims add the user's group memberships, as group object IDs, to ID, access or SAML tokens, and can be limited to groups assigned to the app.",
+      "back": "Optional claims and group claims are token configuration settings: the first adds extra information to tokens for an app, while the second adds the user's group memberships, as group object IDs, to ID, access or SAML tokens, and can be limited to groups assigned to the app.",
       "detail": "If a user belongs to too many groups, more than 200 for a JWT, the token carries an overage link instead of the list. Limit the claim to assigned groups to avoid that."
     },
     {
@@ -780,7 +780,7 @@
     {
       "id": "f103",
       "cat": "workloadIdentities",
-      "front": "Assignment required for enterprise applications",
+      "front": "Assignment required (enterprise applications)",
       "back": "The Assignment required setting on an enterprise application decides whether only users and groups assigned to the app can sign in and see it in My Apps. When it is off, any user in the tenant can obtain a token for the app.",
       "detail": "It limits which tenant users can get a token, but it does not change which directories can sign in. That is controlled by the app's supported account types."
     },
@@ -808,14 +808,14 @@
     {
       "id": "f107",
       "cat": "identityGovernance",
-      "front": "Automatic assignment policies for access packages",
+      "front": "Automatic assignment policy (access packages)",
       "back": "An automatic assignment policy gives an access package to users who match a membership rule, using the same kind of attribute rules as a dynamic group, and removes it when they stop matching. No request or approval is needed.",
       "detail": "Example: everyone whose department equals Research gets the Research access package, and loses it on transfer. Use it for birthright access, not for access that needs approval."
     },
     {
       "id": "f108",
       "cat": "identityGovernance",
-      "front": "Custom extensions in entitlement management",
+      "front": "Custom extensions (entitlement management)",
       "back": "Custom extensions let entitlement management call an Azure Logic App at set stages of an access package, such as when a request is created or approved, when access is granted or removed, and 14 days or 1 day before an assignment expires.",
       "detail": "Use them to add steps the product lacks, such as opening a ticket, notifying a team or provisioning into a non-Entra system. Launch and continue does not wait for the Logic App, while launch and wait does."
     },
@@ -830,7 +830,7 @@
       "id": "f110",
       "cat": "identityGovernance",
       "front": "Access reviews of inactive users",
-      "back": "An access review of a group can be scoped to inactive users, meaning those who have not signed in, interactively or non-interactively, for a chosen number of days, up to 730. Reviewers then confirm whether each inactive member still needs access.",
+      "back": "An access review of a group can be limited to members who have not signed in, interactively or non-interactively, for a chosen number of days, up to 730. Reviewers then confirm whether each inactive member still needs access.",
       "detail": "It focuses reviewer effort on the accounts most likely to be stale. It is especially useful for guest access, where unused accounts tend to accumulate."
     },
     {
@@ -872,7 +872,7 @@
       "id": "f9003",
       "cat": "authAccessMgmt",
       "front": "Global Secure Access client vs. remote network",
-      "back": "Traffic reaches Global Secure Access either from the Global Secure Access client installed on a device (Windows, macOS, iOS, Android) or, for Microsoft and internet traffic, from a configured remote network such as a branch office. Private Access traffic is acquired only by the client. The Windows client acquires traffic with a lightweight filter (LWF) driver instead of acting as a VPN tunnel.",
+      "back": "Global Secure Access client vs. remote network: two ways traffic reaches Global Secure Access. The first is software installed on a device (Windows, macOS, iOS, Android); the second is a configured connection from a site such as a branch office and carries only Microsoft and internet traffic. Private Access traffic is acquired only by the client. The Windows client acquires traffic with a lightweight filter (LWF) driver instead of acting as a VPN tunnel.",
       "detail": "Because it is not a VPN connection, the client can run side by side with a non-Microsoft SSE or VPN client. Remote networks need no software on each device, which suits devices that cannot run the client."
     },
     {
@@ -885,16 +885,16 @@
     {
       "id": "f9005",
       "cat": "authAccessMgmt",
-      "front": "Entra Private Access: Quick Access vs. per-app access",
-      "back": "Quick Access is the single primary Global Secure Access enterprise application holding the FQDNs, IP addresses, and ranges you always want tunneled, which is the fast way to replace a VPN. Per-app access creates separate Global Secure Access apps (with their own TCP/UDP app segments) so a subset of private resources gets its own assignments and Conditional Access policies.",
+      "front": "Quick Access vs. per-app access (Entra Private Access)",
+      "back": "Quick Access vs. per-app access: the first is the single primary Global Secure Access enterprise application holding the FQDNs, IP addresses, and ranges you always want tunneled, which is the fast way to replace a VPN, while the second creates separate Global Secure Access apps (with their own TCP/UDP app segments) so a subset of private resources gets its own assignments and Conditional Access policies.",
       "detail": "Quick Access is positioned as a transition state; once the VPN is gone, move to per-app access for application segmentation and per-app granular controls. Both are enterprise applications, so users and groups are assigned and Conditional Access is applied to them."
     },
     {
       "id": "f9006",
       "cat": "authAccessMgmt",
-      "front": "Private network connector and connector groups",
+      "front": "Private network connector (connector groups)",
       "back": "A private network connector is a lightweight agent installed on Windows Server inside the network that brokers traffic between Entra Private Access (or application proxy) and the private resource. It makes outbound-only connections (ports 80 and 443), so no inbound firewall ports are needed. Connectors are placed in connector groups, which act as a unit for load balancing and high availability; use at least two per group.",
-      "detail": "Each Quick Access or per-app app is mapped to a connector group, so location-based groups can keep traffic close to the resources and reduce latency for apps in different regions."
+      "detail": "Each Quick Access or per-app application is mapped to a connector group, so location-based groups can keep traffic close to the resources and reduce latency for apps in different regions."
     },
     {
       "id": "f9007",
@@ -906,8 +906,8 @@
     {
       "id": "f9008",
       "cat": "authAccessMgmt",
-      "front": "Entra Internet Access web content filtering",
-      "back": "Web content filtering in Entra Internet Access, the identity-aware secure web gateway, blocks or allows internet destinations by web category, URL, or FQDN. Create a web content filtering policy, add it to a security profile, link that security profile to a Conditional Access policy for the target users, and make sure those users receive the Internet access traffic forwarding profile.",
+      "front": "Web content filtering (Entra Internet Access)",
+      "back": "Web content filtering in Entra Internet Access, the identity-aware secure web gateway, blocks or allows internet destinations by web category, URL, or FQDN. Create a policy for the category, add it to a security profile, link that security profile to a Conditional Access policy for the target users, and make sure those users receive the Internet access traffic forwarding profile.",
       "detail": "Secure DNS (DNS over HTTPS) in the browser or OS must be disabled so the client can see the FQDNs it needs to match against the forwarding rules."
     },
     {
@@ -942,20 +942,20 @@
       "id": "f9020",
       "cat": "workloadIdentities",
       "front": "Cloud discovery (Defender for Cloud Apps)",
-      "back": "Cloud discovery analyzes your network traffic logs against the Defender for Cloud Apps cloud app catalog (more than 31,000 apps, each scored on more than 90 risk factors) to show which cloud apps and Shadow IT are in use and how risky they are. In the Microsoft Defender portal it lives under Cloud apps > Cloud discovery, and it only recognizes apps that exist in the catalog unless you create a custom app.",
+      "back": "Cloud discovery analyzes your network traffic logs against the Defender for Cloud Apps cloud app catalog (more than 31,000 apps, each scored on more than 90 risk factors) to show which cloud apps and Shadow IT are in use and how risky they are. In the Microsoft Defender portal it lives under Cloud apps, and it only recognizes apps that exist in the catalog unless you create a custom app.",
       "detail": "Discovery data is analyzed and refreshed several times a day, and the results can feed policies that alert on anomalous use."
     },
     {
       "id": "f9021",
       "cat": "workloadIdentities",
       "front": "Snapshot vs. continuous cloud discovery reports",
-      "back": "Snapshot reports give ad hoc visibility into traffic logs you manually upload from firewalls and proxies. Continuous reports analyze all logs forwarded automatically from your network and can flag anomalous use with machine learning anomaly detection or your own policies. Continuous reports are fed by Defender for Endpoint integration, log collectors, secure web gateway integrations, or the cloud discovery API.",
+      "back": "Snapshot vs. continuous cloud discovery reports: the first gives ad hoc visibility into traffic logs you manually upload from firewalls and proxies, while the second analyzes all logs forwarded automatically from your network and can flag anomalous use with machine learning anomaly detection or your own policies. Continuous reports are fed by Defender for Endpoint integration, log collectors, secure web gateway integrations, or the cloud discovery API.",
       "detail": "Defender for Endpoint integration is the simplest way to extend discovery beyond the corporate network because every onboarded device reports its cloud app use wherever it is."
     },
     {
       "id": "f9022",
       "cat": "workloadIdentities",
-      "front": "Cloud app catalog and risk score",
+      "front": "Cloud app catalog (risk score)",
       "back": "The cloud app catalog is Microsoft's list of discoverable cloud apps, each scored from the weighted subscores of its properties (each property scored 0 to 10) across risk categories. By default all risk parameters have equal weight, so an organization that cares more about, for example, compliance than hosting can customize the weights to rank apps by its own priorities.",
       "detail": "An unscored app usually means its properties are unknown. You can request a risk score update or create a custom app for software missing from the catalog."
     },
@@ -963,7 +963,7 @@
       "id": "f9023",
       "cat": "workloadIdentities",
       "front": "Sanctioned vs. unsanctioned apps",
-      "back": "Tagging a discovered app Sanctioned marks it approved; Unsanctioned marks it prohibited. Tagging alone does not block anything. With Defender for Endpoint, unsanctioned apps are blocked automatically on onboarded devices (cloud protection and network protection must be on), and other integrations or a generated block script can enforce it elsewhere.",
+      "back": "Sanctioned vs. unsanctioned apps: tagging a discovered app with the first marks it approved, while the second marks it prohibited. Tagging alone does not block anything. With Defender for Endpoint, apps tagged with the second are blocked automatically on onboarded devices (cloud protection and network protection must be on), and other integrations or a generated block script can enforce it elsewhere.",
       "detail": "Apps connected through an app connector or onboarded to the inline proxy are treated as sanctioned in cloud discovery."
     },
     {
@@ -977,14 +977,14 @@
       "id": "f9025",
       "cat": "workloadIdentities",
       "front": "Access policy vs. session policy (Conditional Access app control)",
-      "back": "Both policy types require a Microsoft Entra Conditional Access policy that routes the session to Defender for Cloud Apps. An access policy allows or blocks access outright, for example blocking Salesforce from unmanaged devices. A session policy allows access but monitors and limits what happens in the session, such as blocking download of sensitive files, requiring labeling on download, or blocking upload of malware.",
+      "back": "Access policy vs. session policy: both policy types require a Microsoft Entra Conditional Access policy that routes the session to Defender for Cloud Apps. The first allows or blocks access outright, for example blocking Salesforce from unmanaged devices, while the second allows access but monitors and limits what happens in the session, such as blocking download of sensitive files, requiring labeling on download, or blocking upload of malware.",
       "detail": "Policies are scoped to the app you onboard, not to related resource apps: a policy for Teams or Exchange does not cover SharePoint or OneDrive, so create a separate policy for them."
     },
     {
       "id": "f9026",
       "cat": "workloadIdentities",
-      "front": "Conditional Access app control mechanics (reverse proxy)",
-      "back": "Conditional Access app control routes browser sessions through Defender for Cloud Apps acting as a reverse proxy, with nothing installed on the device, so it suits unmanaged and partner devices. In Microsoft Edge the protection runs in the browser; other browsers show an app URL with an .mcas.ms suffix. Microsoft Entra apps are onboarded automatically while non-Microsoft IdP apps must be onboarded manually.",
+      "front": "Reverse proxy (Conditional Access app control)",
+      "back": "A reverse proxy sits between the user's browser and the app, with nothing installed on the device, so Defender for Cloud Apps can monitor and control the session in real time, which suits unmanaged and partner devices. In Microsoft Edge the protection runs in the browser; other browsers show an app URL with an .mcas.ms suffix. Microsoft Entra apps are onboarded automatically while non-Microsoft IdP apps must be onboarded manually.",
       "detail": "To stop users bypassing it, create an access policy that blocks native clients and allows only browser-based sessions."
     },
     {
@@ -1004,8 +1004,8 @@
     {
       "id": "f9030",
       "cat": "workloadIdentities",
-      "front": "Agent identity (Microsoft Entra Agent ID)",
-      "back": "An agent identity is a special service principal that represents an AI agent. It has no credentials of its own: its agent identity blueprint holds the credentials and acquires tokens on its behalf. It can carry a sponsor, and it can only be issued tokens in the tenant where it was created, so it cannot reach resources in other tenants.",
+      "front": "Agent identity",
+      "back": "An agent identity is a special service principal that represents an AI agent. It has no credentials of its own: its blueprint holds the credentials and acquires tokens on its behalf. It can carry a sponsor, and it can only be issued tokens in the tenant where it was created, so it cannot reach resources in other tenants.",
       "detail": "Agent identities are not the same as user accounts or traditional service principals, which lack enforced sponsorship, agent-aware audit entries, and a blueprint-managed lifecycle."
     },
     {
@@ -1039,21 +1039,21 @@
     {
       "id": "f9035",
       "cat": "workloadIdentities",
-      "front": "Application collections in My Apps",
-      "back": "Collections group related applications on the My Apps portal, for example by job role, task, or project, so users see them organized rather than as one long list. An admin creates them in Enterprise apps > App launchers by naming the collection, adding applications, owners, and users or groups. They require a Microsoft Entra ID P1 or P2 license and at least the Cloud Application Administrator role.",
+      "front": "Collection (My Apps)",
+      "back": "Collections group related applications on the My Apps portal, for example by job role, task, or project, so users see them organized rather than as one long list. An admin creates them in Enterprise apps > App launchers by naming it, adding applications, owners, and users or groups. They require a Microsoft Entra ID P1 or P2 license and at least the Cloud Application Administrator role.",
       "detail": "Admin collections are managed in the Microsoft Entra admin center, not from the My Apps portal itself."
     },
     {
       "id": "f9040",
       "cat": "userIdentities",
-      "front": "Custom domains in Microsoft Entra ID",
+      "front": "Custom domain (Microsoft Entra ID)",
       "back": "Every tenant starts with an initial onmicrosoft.com domain that cannot be changed or deleted. You add your own DNS name as a custom domain, prove ownership by creating the TXT or MX record Entra gives you at your registrar, then select Verify, and can make it the primary domain used for new user names. A domain name can be verified in only one tenant at a time.",
       "detail": "If verification fails, wait for DNS propagation, check the record, and make sure the name is not already verified elsewhere, including an unmanaged tenant created by self-service sign-up, which must be taken over."
     },
     {
       "id": "f9041",
       "cat": "userIdentities",
-      "front": "Device settings in Microsoft Entra ID",
+      "front": "Device settings (Microsoft Entra ID)",
       "back": "Device settings control who may join or register devices and how. \"Users may join devices\" (default All) and \"Users may register their devices\", a maximum number of devices per user (default 50, up to 100), who becomes local administrator on joined devices, and an optional MFA requirement for join or register. Microsoft recommends using the Register or join devices user action in Conditional Access for MFA instead of the toggle.",
       "detail": "The join and maximum-devices limits do not apply to hybrid joined devices, and the join setting also skips userless joins such as Autopilot self-deploying mode."
     },
@@ -1067,7 +1067,7 @@
     {
       "id": "f9043",
       "cat": "userIdentities",
-      "front": "Microsoft Graph PowerShell for Entra administration",
+      "front": "Microsoft Graph PowerShell (Entra administration)",
       "back": "Microsoft Graph PowerShell is the module to use for automating Microsoft Entra ID tasks. The Azure AD, Azure AD Preview, and MSOnline modules are deprecated. Cmdlets use the Mg prefix (Get-AzureADUser becomes Get-MgUser) and you connect with the permission scopes you need, which are delegated consent grants rather than directory roles alone.",
       "detail": "For bulk work you can also use the admin center CSV templates for bulk create, delete, invite, and download of users, which need at least the User Administrator role."
     },
@@ -1088,20 +1088,20 @@
     {
       "id": "f9051",
       "cat": "authAccessMgmt",
-      "front": "Microsoft Entra Kerberos for hybrid identities",
-      "back": "Microsoft Entra Kerberos lets Entra ID issue a partial Kerberos ticket-granting ticket (containing only the user's SID) for an on-premises AD domain, using a Microsoft Entra Kerberos server object published from AD. The client trades it at a domain controller for a full TGT, so users who sign in with FIDO2 keys or Windows Hello for Business cloud Kerberos trust still reach on-premises resources.",
+      "front": "Microsoft Entra Kerberos (hybrid identities)",
+      "back": "Microsoft Entra Kerberos lets Entra ID issue a partial Kerberos ticket-granting ticket (containing only the user's SID) for an on-premises AD domain, using a server object published from AD. The client trades it at a domain controller for a full TGT, so users who sign in with FIDO2 keys or Windows Hello for Business cloud Kerberos trust still reach on-premises resources.",
       "detail": "Domain controllers keep issuing service tickets and controlling authorization, they must run Windows Server 2016 or later with required updates, and setup uses the AzureADHybridAuthenticationManagement module with the Hybrid Identity Administrator role."
     },
     {
       "id": "f9052",
       "cat": "authAccessMgmt",
-      "front": "Passkey profiles: device-bound vs. synced passkeys",
+      "front": "Passkey profiles (device-bound or synced)",
       "back": "Passkey profiles replace one tenant-wide FIDO2 setting with group-targeted profiles that define the passkey type (device-bound or synced), attestation, and allowed AAGUIDs. Device-bound passkeys keep the private key on one device, while synced passkeys sync through a cloud passkey provider and do not support attestation, so enforcing attestation limits a profile to device-bound passkeys.",
       "detail": "Typical design: attested hardware keys for administrators and synced passkeys for frontline staff. An Authentication Policy Administrator configures profiles, and Microsoft Authenticator needs a minimum app version for synced passkeys."
     },
     {
       "id": "f9053",
-      "cat": "authAccessMgmt",
+      "cat": "identityGovernance",
       "front": "Analyzing Entra logs with KQL in Log Analytics",
       "back": "After you route logs with a Microsoft Entra diagnostic setting (to a Log Analytics workspace, a storage account, or an event hub) you can query them with KQL: SigninLogs for interactive sign-ins, AuditLogs for directory changes, AADProvisioningLogs for provisioning. A typical query filters by time with where TimeGenerated >= ago(7d) and aggregates with summarize ... by.",
       "detail": "Creating the diagnostic setting needs the Security Administrator role for the tenant plus rights on the destination. Workbooks in Monitoring & health visualize the same data without writing KQL."
@@ -1256,12 +1256,12 @@
       "question": "SSPR is enabled for all users, yet the help desk still handles many reset calls because most users never registered authentication information. Contoso wants users to be prompted to register the next time they sign in. Which setting should be changed?",
       "options": [
         "In the SSPR on-premises integration settings, turn on password writeback",
-        "In the SSPR registration settings (the legacy \"require users to register when signing in\" setting), require users to register at sign-in",
+        "In the SSPR registration settings, require users to register when signing in",
         "In the SSPR settings, lower the number of methods required to reset a password to one",
         "In the authentication methods policy, enable the Temporary Access Pass method"
       ],
       "correct": 1,
-      "explanation": "Requiring registration at sign-in is the setting that makes users enter their reset methods the next time they authenticate. Note that this legacy SSPR setting was retired on September 30, 2025; the modern equivalent is a registration campaign in the authentication methods policy, but of the choices offered it is the only one that prompts for registration at sign-in. Lowering the number of required methods makes registration easier to satisfy but never prompts anyone to register. Password writeback is needed so a cloud reset reaches on-premises Active Directory, and it has no effect on whether users have registered. Enabling Temporary Access Pass gives administrators a bootstrap credential to issue, but it does not prompt users for SSPR registration."
+      "explanation": "Requiring registration at sign-in is the setting that makes users enter their reset methods the next time they authenticate. Lowering the number of required methods makes registration easier to satisfy but never prompts anyone to register. Password writeback is needed so a cloud reset reaches on-premises Active Directory, and it has no effect on whether users have registered. Enabling Temporary Access Pass gives administrators a bootstrap credential to issue, but it does not prompt users for SSPR registration."
     },
     {
       "id": "q12",
@@ -1825,7 +1825,7 @@
         "The user risk policy, set to require a password change"
       ],
       "correct": 0,
-      "explanation": "A registration campaign in the authentication methods policy proactively nudges users who have not yet registered a stronger authentication method (such as Microsoft Authenticator) during ordinary, non-risky sign-in, rather than waiting for a risk event to force the issue. It replaces the legacy Identity Protection MFA registration policy. The sign-in risk and user risk policies both react to risk signals that have already occurred rather than proactively encouraging registration beforehand, and device compliance has nothing to do with authentication method registration."
+      "explanation": "A registration campaign in the authentication methods policy proactively nudges users who have not yet registered a stronger authentication method (such as Microsoft Authenticator) during ordinary, non-risky sign-in, rather than waiting for a risk event to force the issue. It runs after a successful MFA sign-in and lets users snooze the prompt. The sign-in risk and user risk policies both react to risk signals that have already occurred rather than proactively encouraging registration beforehand, and device compliance has nothing to do with authentication method registration."
     },
     {
       "id": "q33",
@@ -2448,10 +2448,10 @@
         "A single-stage approval in which the two approvers are added as alternates",
         "An access review that runs right after the request is submitted",
         "Multi-stage approval, with the resource owner and compliance officer as sequential stages",
-        "A segregation of duties check between the owner role and the compliance role"
+        "A separation of duties check between the owner role and the compliance role"
       ],
       "correct": 2,
-      "explanation": "Multi-stage approval puts approvers in sequence, so a rejection at the first stage ends the request before the second stage ever sees it. A segregation of duties check blocks requests based on conflicting packages already held, not on sign-off order. A single stage with alternates lets either approver act alone, so it does not require both. An access review reassesses access already granted and cannot gate a new request."
+      "explanation": "Multi-stage approval puts approvers in sequence, so a rejection at the first stage ends the request before the second stage ever sees it. A separation of duties check blocks requests based on conflicting packages already held, not on sign-off order. A single stage with alternates lets either approver act alone, so it does not require both. An access review reassesses access already granted and cannot gate a new request."
     },
     {
       "id": "q65",
@@ -2460,12 +2460,12 @@
       "question": "An access package should be requestable only by users from one partner organization that is already a connected organization, and not by any other connected organization or by internal users. What should be configured on the package's request policy?",
       "options": [
         "A requestor scope set to the users in Contoso's own directory",
-        "A segregation of duties check that references the connected organization",
+        "A separation of duties check that references the connected organization",
         "A requestor scope set to the connected organizations Contoso has configured",
         "A requestor scope limited to that one connected organization"
       ],
       "correct": 3,
-      "explanation": "A request policy's requestor scope can be narrowed to one specific connected organization, which matches exactly who may request. Scoping to Contoso's own users would admit internal staff and exclude the partner. Scoping to all connected organizations would open the package to every partner Contoso has ever connected. A segregation of duties check governs incompatible package combinations, not who may request."
+      "explanation": "A request policy's requestor scope can be narrowed to one specific connected organization, which matches exactly who may request. Scoping to Contoso's own users would admit internal staff and exclude the partner. Scoping to all connected organizations would open the package to every partner Contoso has ever connected. A separation of duties check governs incompatible package combinations, not who may request."
     },
     {
       "id": "tf26",
@@ -2540,9 +2540,9 @@
       "question": "Employees of Fabrikam work from home and from cafes. Security wants Exchange Online and SharePoint Online reachable only from devices running through the organization's own network security service, so a stolen refresh token replayed from an attacker's machine fails. The team will not maintain lists of egress IP addresses and will not hairpin traffic through a VPN. What should you configure?",
       "options": [
         "A Conditional Access policy that blocks the Microsoft 365 apps except from a named location listing the headquarters firewall IP addresses",
-        "Global Secure Access signaling for Conditional Access, the Global Secure Access client with the Microsoft traffic profile, and a policy that blocks all resources except from the compliant network location",
-        "A device compliance policy in Intune combined with a grant control that requires a compliant device",
-        "A sign-in frequency session control that forces reauthentication every hour for all users"
+        "Enable Global Secure Access signaling, forward Microsoft traffic with the client, and block all resources except the compliant network location",
+        "A device compliance policy in Intune combined with a grant control that requires a compliant device for Exchange Online and SharePoint Online",
+        "A sign-in frequency session control that forces reauthentication every hour for everyone using Exchange Online and SharePoint Online"
       ],
       "correct": 1,
       "explanation": "The compliant network check is enforced at authentication, so a replayed token from a machine that is not behind the tenant's Global Secure Access client or remote network is denied, and there are no IP lists to maintain. An IP named location fails for remote users and requires constant upkeep. Device compliance proves the device state, not the network path the request took, so a stolen token on a compliant but unrelated network path is not blocked this way. Shorter sign-in frequency only limits the window a token is useful without stopping replay."
@@ -2581,10 +2581,10 @@
       "type": "mc",
       "question": "The network team refuses to open any inbound firewall ports into the datacenter that hosts the private applications. Which statement about deploying private network connectors for Entra Private Access is correct?",
       "options": [
-        "Connectors only make outbound connections, so outbound ports 80 and 443 to the service are required and no inbound ports are opened",
+        "Connectors make only outbound connections on ports 80 and 443, so no inbound ports are opened",
         "Connectors must sit in a perimeter network with inbound TCP 443 published to the internet",
-        "Connectors are installed on each user's device and call the datacenter directly",
-        "Connectors need a site-to-site VPN to Azure before they can register"
+        "Connectors are installed on each user's device and connect to the datacenter directly",
+        "Connectors need a site-to-site VPN tunnel to Azure before they can register with the service"
       ],
       "correct": 0,
       "explanation": "The connector is an agent on Windows Server that dials out to the service, and traffic flows both ways over that established session, so no inbound rule is needed. A perimeter network is allowed but unnecessary, and publishing inbound 443 is exactly what the design avoids. Devices run the Global Secure Access client, not the connector. No VPN is involved, since the whole point is VPN replacement."
@@ -2690,7 +2690,7 @@
         "A Microsoft traffic profile rule for the internal domain with the Forward action"
       ],
       "correct": 2,
-      "explanation": "Private DNS sends queries for names that match the configured suffix to the Global Secure Access DNS proxy, which resolves them through the connector's resolver, so the suffix has to be added to the Quick Access configuration. A per-app app with MFA changes access control, not name resolution. A public record for an internal name would expose it and is not how Private Access resolves names. The Microsoft traffic profile only covers Microsoft services."
+      "explanation": "Private DNS sends queries for names that match the configured suffix to the Global Secure Access DNS proxy, which resolves them through the connector's resolver, so the suffix has to be added to the Quick Access configuration. A per-app access application with MFA changes access control, not name resolution. A public record for an internal name would expose it and is not how Private Access resolves names. The Microsoft traffic profile only covers Microsoft services."
     },
     {
       "id": "q9013",
@@ -2754,10 +2754,10 @@
       "type": "mc",
       "question": "An analyst marked a file-sharing app as Unsanctioned in Defender for Cloud Apps. The company uses Defender for Endpoint, yet users on managed laptops can still open the app. What is the most likely missing configuration?",
       "options": [
-        "A session policy for the file-sharing app",
-        "An access policy that blocks native clients",
+        "A Defender for Cloud Apps session policy for the file-sharing app",
+        "A Conditional Access app control access policy that blocks native clients",
         "Network protection and cloud protection enabled in Defender for Endpoint",
-        "A new app connector for the file-sharing app"
+        "A new app connector for the file-sharing app in Defender for Cloud Apps"
       ],
       "correct": 2,
       "explanation": "Unsanctioning does not itself block traffic. With Defender for Endpoint, blocking unsanctioned apps relies on cloud protection and network protection being turned on for the devices. Session and access policies apply to apps routed through Conditional Access app control, which a discovered consumer file-sharing site is not. App connectors integrate sanctioned apps through APIs and do not block access."
@@ -2768,10 +2768,10 @@
       "type": "mc",
       "question": "Contractors use unmanaged laptops to open the company's Microsoft SharePoint Online sites in a browser. Management wants them able to browse and edit online but unable to download files labeled Confidential. Which control meets this with the least disruption?",
       "options": [
-        "A Conditional Access grant control that requires a compliant device",
-        "A Defender for Cloud Apps session policy that blocks download of labeled files, with a Conditional Access policy routing the session",
+        "A Conditional Access grant control that requires a compliant device for the contractors' sign-ins",
+        "A Defender for Cloud Apps session policy that blocks downloads of labeled files, routed through Conditional Access",
         "A Defender for Cloud Apps access policy that blocks SharePoint Online for unmanaged devices",
-        "An OAuth app policy that bans the SharePoint Online app"
+        "An OAuth app policy in Defender for Cloud Apps that bans the SharePoint Online app"
       ],
       "correct": 1,
       "explanation": "Session policies allow access while controlling in-session activity such as downloading labeled files, and they depend on a Conditional Access policy that sends the session through Defender for Cloud Apps. Requiring a compliant device would block contractors completely because their laptops are unmanaged. An access policy also blocks outright rather than limiting activity. An OAuth app policy has nothing to do with browser downloads and banning the app would disable it for everyone."
@@ -2782,9 +2782,9 @@
       "type": "mc",
       "question": "A third-party calendar app has been consented to by more than 80 employees and requests the permission to read and write all mail. Security wants an automatic alert on any app like this and the ability to disable offending apps. What should you configure?",
       "options": [
-        "A session policy that blocks uploads to the calendar app",
-        "A cloud discovery policy for unsanctioned apps",
-        "A user consent setting that requires admin approval for all apps",
+        "A session policy in Defender for Cloud Apps that blocks uploads to the calendar app",
+        "A cloud discovery policy in Defender for Cloud Apps that flags unsanctioned apps",
+        "A user consent setting that requires administrator approval for every app request",
         "An OAuth app policy in Defender for Cloud Apps with a permission level and user count threshold"
       ],
       "correct": 3,
@@ -2810,10 +2810,10 @@
       "type": "mc",
       "question": "Unmanaged devices should get browser-only, limited access to SharePoint Online (no download or sync). The team wants a native control that needs no reverse proxy and no Defender for Cloud Apps session policies. What should you configure?",
       "options": [
-        "A Conditional Access session control that uses application-enforced restrictions, with the limited-access setting enabled in SharePoint Online",
-        "A sign-in frequency session control set to every time",
-        "A Defender for Cloud Apps session policy that monitors only",
-        "A persistent browser session control set to never persistent"
+        "The application-enforced restrictions session control, with limited access turned on in SharePoint Online",
+        "A sign-in frequency session control that forces reauthentication on every sign-in",
+        "A Defender for Cloud Apps session policy that only monitors activity in the session",
+        "A persistent browser session control set to never persist on unmanaged devices"
       ],
       "correct": 0,
       "explanation": "Application-enforced restrictions make Entra ID pass device state to SharePoint Online or Exchange Online, which then deliver a limited experience for unmanaged devices once its own restriction setting is on. Sign-in frequency and persistent browser sessions govern how long a session lasts, not what the session can do. A monitor-only session policy observes activity but blocks nothing, and it needs the proxy."
@@ -2935,10 +2935,10 @@
       "type": "mc",
       "question": "A department wants its users to see a tidy set of ten finance applications grouped together on the My Apps portal, separately from other apps. The tenant has Microsoft Entra ID P1. What should an Application Administrator configure?",
       "options": [
-        "A custom security attribute on the finance users",
-        "An application management policy for the finance apps",
-        "A dynamic group of finance users assigned the apps",
-        "A collection under Enterprise apps > App launchers with the apps and the finance group assigned"
+        "A custom security attribute applied to each of the finance users",
+        "An application management policy covering the ten finance apps",
+        "A dynamic group of finance users that is assigned each finance app",
+        "A My Apps collection that holds the ten finance apps and the finance users"
       ],
       "correct": 3,
       "explanation": "My Apps collections group related applications for chosen users and groups and need P1 or P2. Custom security attributes label objects but do not organize the portal. Application management policies restrict credential settings on apps. A group can grant the apps through assignment, but it does not group them into a collection on the My Apps page."
@@ -2950,9 +2950,9 @@
       "question": "You added contoso.com as a custom domain and created the TXT record, but verification keeps failing even after waiting several hours and confirming the record is correct. A colleague notes that a team once signed up for a Power BI trial with contoso.com addresses. What is the most likely cause and fix?",
       "options": [
         "The initial onmicrosoft.com domain must be deleted before another domain can be verified",
-        "The domain must be registered as the primary domain before it can be verified",
-        "The domain is already verified in another tenant, possibly an unmanaged one, so it must be removed or taken over there",
-        "TXT records are not supported and the verification must use a CNAME record"
+        "The domain must first be set as the primary domain before verification can succeed",
+        "The domain is already verified in another (possibly unmanaged) tenant and must be taken over",
+        "TXT records are not supported for verification, so a CNAME record must be created instead"
       ],
       "correct": 2,
       "explanation": "A domain name can be verified in only one tenant. Self-service sign-up can create an unmanaged tenant that already holds the name, which has to be taken over (or the name removed from the other directory). The initial domain cannot be deleted at all and is not an obstacle. Primary status is set after verification, not before. TXT or MX records are exactly what Entra asks for."
@@ -2971,10 +2971,10 @@
       "type": "mc",
       "question": "A power user receives an error when registering a new tablet with Microsoft Entra ID, having already joined or registered many devices. Defaults are unchanged. What is the right adjustment?",
       "options": [
-        "Raise the maximum number of devices per user in device settings, which defaults to 50 and can go up to 100",
-        "Assign the user the Cloud Device Administrator role",
-        "Remove the user from the \"Users may join devices\" scope",
-        "Convert the user to a guest to lift device limits"
+        "Raise the maximum number of devices per user in the tenant device settings",
+        "Assign the user the Cloud Device Administrator role to lift the per-user limit",
+        "Remove the user from the \"Users may join devices\" scope and register again",
+        "Convert the user to a guest account, which is not subject to device limits"
       ],
       "correct": 0,
       "explanation": "Joined and registered devices count against a per-user maximum that defaults to 50 and can be raised to 100, or set to unlimited subject to other quotas. A device administrator role manages devices but does not change the user's limit. Removing the user from the join scope would block joining instead. Guest status is unrelated."
@@ -3001,8 +3001,8 @@
       "options": [
         "Delete the synced user in the Entra admin center and rely on that to end all access",
         "Disable the account and reset the password twice in on-premises AD, then revoke the user's sessions in Entra",
-        "Only remove the user's licenses, which immediately invalidates all tokens",
-        "Only enable security defaults for the tenant"
+        "Only remove the user's Exchange Online and Microsoft 365 licenses, which immediately invalidates all tokens",
+        "Only enable security defaults for the whole tenant and wait for the user's next sign-in"
       ],
       "correct": 1,
       "explanation": "For a synced user the source of authority is Active Directory, so disable it there and reset the password twice to blunt pass-the-hash risk, then revoke sessions in Entra to invalidate refresh tokens. A cloud-side delete of a synced object does not hold, because the source of authority is on-premises and the object can be recreated or restored by sync. Removing licenses does not invalidate tokens already issued. Security defaults protect sign-ins in general and do nothing about this specific account."
@@ -3013,10 +3013,10 @@
       "type": "mc",
       "question": "Users on Microsoft Entra joined Windows laptops sign in with FIDO2 keys but cannot open on-premises file shares without a password prompt. Domain controllers run Windows Server 2022. What makes the shares work without passwords?",
       "options": [
-        "Seamless single sign-on with the AZUREADSSOACC computer account",
-        "Pass-through authentication agents on the domain controllers",
-        "Microsoft Entra Kerberos, where Entra ID issues a partial TGT that a domain controller exchanges for a full TGT",
-        "Password writeback so the FIDO2 key can set an AD password"
+        "Seamless single sign-on, using the AZUREADSSOACC computer account in Active Directory",
+        "Pass-through authentication agents installed on each of the domain controllers",
+        "Microsoft Entra Kerberos, with a partial TGT exchanged for a full TGT at a domain controller",
+        "Password writeback, so the FIDO2 key can set an Active Directory password"
       ],
       "correct": 2,
       "explanation": "With Entra Kerberos, Entra ID returns a ticket-granting ticket containing only the user's SID alongside the PRT, and the domain controller exchanges it for a full TGT, so on-premises resources are reachable after a passwordless sign-in. Seamless SSO serves domain-joined devices on the corporate network for cloud apps, not this on-premises resource scenario. Pass-through authentication validates passwords and there is none here. Password writeback relates to resets, not Kerberos tickets."
@@ -3045,7 +3045,7 @@
     },
     {
       "id": "q9214",
-      "cat": "authAccessMgmt",
+      "cat": "identityGovernance",
       "type": "mc",
       "question": "Entra sign-in logs are streamed to a Log Analytics workspace. Which KQL query returns the number of interactive sign-ins per application over the past seven days?",
       "options": [
@@ -3059,7 +3059,7 @@
     },
     {
       "id": "q9215",
-      "cat": "authAccessMgmt",
+      "cat": "identityGovernance",
       "type": "mc",
       "question": "A new analyst must create a diagnostic setting that sends Microsoft Entra audit and sign-in logs to an existing Log Analytics workspace, with no more Entra privilege than necessary. Which Entra role should be assigned, assuming the workspace permissions are handled separately?",
       "options": [
@@ -3127,7 +3127,7 @@
       "commonTraps": [
         "Holding a directory role like Global Administrator does not automatically grant Azure RBAC rights -- the two systems require an explicit elevation step to bridge.",
         "A dynamic group is either a dynamic user group or a dynamic device group -- a single rule can never mix both object types.",
-        "Pass-through Authentication stores no password hash in the cloud at all; that is Password Hash Sync's behavior, not PTA's.",
+        "Pass-through Authentication stores no password hash in the cloud at all; keeping a hash of the password hash in the cloud is Password Hash Sync's behavior, not PTA's.",
         "After the 30-day recovery window closes, a deleted user is purged permanently -- there is no further recovery option."
       ],
       "scenario": "A multinational company keeps its HR system authoritative in on-premises Active Directory across three regional forests, and wants sign-in to keep working even if one region's domain controllers go offline overnight for maintenance -- so it deploys Microsoft Entra Cloud Sync with an agent in each forest rather than a single Connect Sync server, and Password Hash Sync as the sign-in method rather than Pass-through Authentication. Regional helpdesk staff are each granted the Helpdesk Administrator role scoped to their own region's administrative unit, so a technician in the Singapore office can reset passwords for Singapore users but has no rights over the London office. When a contractor from a partner firm needs temporary access to a shared project site, the team adds them through B2B collaboration rather than creating a new password-managed account, and configures cross-tenant access settings to trust that partner's own MFA claims instead of re-challenging them a second time.",
@@ -3164,7 +3164,7 @@
         "q9214",
         "q9215"
       ],
-      "reading": "Microsoft Entra supports a range of multifactor authentication methods, from the Microsoft Authenticator app (push notification or fully passwordless) and FIDO2 security keys down to weaker options like SMS and voice call, which remain supported but are the least preferred methods and are increasingly discouraged. It's worth separating two ideas that sound alike but aren't: \"strongest\" and \"phishing-resistant\" are not synonyms. A standard Authenticator push notification is stronger than SMS, but it can still be defeated by an MFA-fatigue attack, where an attacker floods a user with approval prompts until one gets accidentally approved, or a consent-phishing page. Only methods like FIDO2 security keys, Windows Hello for Business, and certificate-based authentication are genuinely phishing-resistant, because the proof of identity is cryptographically bound to hardware and to the specific site it was registered with, not something that can be typed or approved on a lookalike page.\n\nPasswordless authentication options remove the shared secret entirely: a FIDO2 security key, Windows Hello for Business, or Authenticator passwordless phone sign-in each proves identity through possession of a specific device plus a biometric or PIN, rather than something that can be phished or reused elsewhere. Bootstrapping a brand-new employee, or anyone who's had a security incident, straight into one of those passwordless methods without ever issuing them a traditional password is exactly what a Temporary Access Pass is for: a time-limited, one-time or limited-use passcode an administrator issues, letting the user sign in just long enough to register FIDO2 or Windows Hello for Business and never type a real password at all.\n\nSelf-Service Password Reset lets a user recover a forgotten password without calling the help desk, but enabling SSPR for a group has no effect on anyone who hasn't separately registered the required authentication methods first -- registration is a distinct, required step from turning the feature on. Combined registration folds that registration experience together, so a method like the Authenticator app registered once satisfies both a future MFA challenge and a future SSPR flow, instead of registering twice for what is really the same underlying method. All of this -- which methods exist, which are enabled tenant-wide or scoped to specific groups -- is now centralized in the authentication methods policy, the modern, single location that has replaced what used to be scattered across separate legacy MFA service settings and SSPR policy blades.\n\nTwo current topics round out authentication. Passkey profiles let you target different passkey (FIDO2) rules at different groups: device-bound passkeys keep the key on one device and can be attested, while synced passkeys travel through a cloud passkey provider and cannot be attested, so a profile that enforces attestation allows only device-bound passkeys. For hybrid users, Microsoft Entra Kerberos lets a passwordless sign-in obtain a partial Kerberos TGT (the user's SID only) that a domain controller exchanges for a full one, so on-premises resources stay reachable. Finally, ending a user's access means disabling the account and revoking sessions, remembering that a still-valid access token lives about an hour unless continuous access evaluation applies, and that investigating activity means routing logs with a diagnostic setting and querying SigninLogs and AuditLogs in Log Analytics.",
+      "reading": "Microsoft Entra supports a range of multifactor authentication methods, from the Microsoft Authenticator app (push notification or fully passwordless) and FIDO2 security keys down to weaker options like SMS and voice call, which are the least preferred methods: passkeys become the default sign-in experience from September 1, 2026, and Microsoft-provided SMS and voice delivery is retired from February 1, 2027 (July 1, 2027 for Global Administrators and external users). It's worth separating two ideas that sound alike but aren't: \"strongest\" and \"phishing-resistant\" are not synonyms. A standard Authenticator push notification is stronger than SMS, but it can still be defeated by an MFA-fatigue attack, where an attacker floods a user with approval prompts until one gets accidentally approved, or an adversary-in-the-middle phishing page that relays the number. Only methods like FIDO2 security keys, Windows Hello for Business, and certificate-based authentication are genuinely phishing-resistant, because the proof of identity is cryptographically bound to hardware and to the specific site it was registered with, not something that can be typed or approved on a lookalike page.\n\nPasswordless authentication options remove the shared secret entirely: a FIDO2 security key, Windows Hello for Business, or Authenticator passwordless phone sign-in each proves identity through possession of a specific device plus a biometric or PIN, rather than something that can be phished or reused elsewhere. Bootstrapping a brand-new employee, or anyone who's had a security incident, straight into one of those passwordless methods without ever issuing them a traditional password is exactly what a Temporary Access Pass is for: a time-limited, one-time or limited-use passcode an administrator issues, letting the user sign in just long enough to register FIDO2 or Windows Hello for Business and never type a real password at all.\n\nSelf-Service Password Reset lets a user recover a forgotten password without calling the help desk, but enabling SSPR for a group has no effect on anyone who hasn't separately registered the required authentication methods first -- registration is a distinct, required step from turning the feature on. Combined registration folds that registration experience together, so a method like the Authenticator app registered once satisfies both a future MFA challenge and a future SSPR flow, instead of registering twice for what is really the same underlying method. All of this -- which methods exist, which are enabled tenant-wide or scoped to specific groups -- is now centralized in the authentication methods policy, the modern, single location that has replaced what used to be scattered across separate legacy MFA service settings and SSPR policy blades.\n\nTwo current topics round out authentication. Passkey profiles let you target different passkey (FIDO2) rules at different groups: device-bound passkeys keep the key on one device and can be attested, while synced passkeys travel through a cloud passkey provider and cannot be attested, so a profile that enforces attestation allows only device-bound passkeys. For hybrid users, Microsoft Entra Kerberos lets a passwordless sign-in obtain a partial Kerberos TGT (the user's SID only) that a domain controller exchanges for a full one, so on-premises resources stay reachable. Finally, ending a user's access means disabling the account and revoking sessions, remembering that a still-valid access token lives about an hour unless continuous access evaluation applies, and that investigating activity means routing logs with a diagnostic setting and querying SigninLogs and AuditLogs in Log Analytics.",
       "fundamentalsLabel": "New to authentication methods? See the everyday analogy",
       "fundamentals": "A password is like a key that works in any lock that recognizes its shape -- including a lock a scammer built to look exactly like your front door. A FIDO2 key is more like a key that physically checks the door's serial number before it turns at all, so it simply refuses to work in a convincing fake. A Temporary Access Pass is like a locksmith letting you into your own house with a one-time master code so you can install a proper smart lock (your passwordless method) yourself, rather than mailing you a spare house key first. And combined registration is just not making you fill out the same form twice -- once you've told the building your fingerprint works for the front door, it works for the side door too.",
       "keyTerms": [
@@ -3444,7 +3444,7 @@
       "points": [
         "Check the current exam page for the exact question count and time limit (Microsoft role-based exams typically run roughly 40-60 questions) and work out your per-question average before you start. Budget more time for multi-part scenario questions and less for straight recall, rather than pacing every question identically.",
         "Real scoring isn't a flat percentage of questions right (some count for more than others) \u2014 treat 70%+ as a safe buffer to aim for, not an exact threshold to just clear.",
-        "Flag anything you're unsure of and move on rather than stalling \u2014 a question later in the exam can sometimes jog a detail you needed earlier, and you get partial credit for nothing by running out of time on one question.",
+        "Flag anything you're unsure of and move on rather than stalling \u2014 a question later in the exam can sometimes jog a detail you needed earlier, and running out of time on one hard question costs you the easier ones you never reach.",
         "On multi-select ('choose N') questions, eliminate the options you're confident are wrong first; guessing among 2 plausible answers beats guessing among 4.",
         "Your first read of a question is usually right \u2014 change an answer only when you find a specific detail you missed, not from general second-guessing."
       ]
@@ -3452,7 +3452,7 @@
     {
       "heading": "Entra ID core objects",
       "points": [
-        "A group can be Security (access control) or Microsoft 365 (collaboration, includes a mailbox/Teams/SharePoint site) \u2014 both support assignment or dynamic membership, but only device groups can query device attributes.",
+        "A group can be Security (access control) or Microsoft 365 (collaboration, includes a mailbox/Teams/SharePoint site) \u2014 both support assigned or dynamic membership, but only security groups can hold devices.",
         "Dynamic group membership rules auto-add and auto-remove members based on attribute queries \u2014 you can't mix users and devices dynamically in the same group.",
         "Administrative Units scope where a role assignment applies \u2014 for example a Helpdesk Admin restricted to just one region's users \u2014 instead of tenant-wide.",
         "A device object has a trust type: Entra ID joined, Entra ID registered (BYOD), or hybrid Entra ID joined (synced from on-prem AD) \u2014 this affects which Conditional Access device-state checks apply."
@@ -3471,7 +3471,7 @@
     {
       "heading": "Authentication methods & MFA",
       "points": [
-        "Passwordless methods \u2014 FIDO2 security keys, Microsoft Authenticator passwordless, Windows Hello for Business \u2014 remove the password entirely; that is not the same as ordinary MFA with a password plus a second factor.",
+        "Passwordless methods \u2014 passkeys and FIDO2 security keys, Microsoft Authenticator passwordless, Windows Hello for Business \u2014 remove the password entirely; that is not the same as ordinary MFA with a password plus a second factor. SMS and voice are the weakest options, and Microsoft-provided SMS and voice delivery is being retired (February 1, 2027).",
         "Temporary Access Pass (TAP) is a time-limited passwordless credential used for onboarding or account recovery, not an everyday sign-in method.",
         "Combined registration lets users register authentication methods for both SSPR and MFA in a single experience.",
         "Security defaults (a free, one-size-fits-all baseline requiring MFA) and Conditional Access policies are mutually exclusive on a tenant \u2014 you generally can't run both at once."
@@ -3560,7 +3560,7 @@
     {
       "id": "ml-sc300-1",
       "cat": "userIdentities",
-      "scenario": "A company wants passwords validated in real time against on-premises Active Directory during every cloud sign-in, with no password hash of any kind ever stored in Microsoft Entra ID \u2014 that calls for {b1}. A different team instead just wants a hash of the password hash synced to the cloud so sign-in keeps working even during a brief on-premises outage \u2014 that's {b2}.",
+      "scenario": "A company wants passwords validated in real time against on-premises Active Directory during every cloud sign-in, with no password hash of any kind ever stored in Microsoft Entra ID and no federation servers to build \u2014 that calls for {b1}. A different team instead just wants a hash of the password hash synced to the cloud so sign-in keeps working even during a brief on-premises outage \u2014 that's {b2}.",
       "blanks": [
         {
           "key": "b1",
@@ -3700,7 +3700,7 @@
     {
       "id": "ml-sc300-9001",
       "cat": "authAccessMgmt",
-      "scenario": "A tenant wants to make Microsoft 365 requests succeed only when they come through the organization's network security service, with no egress IP lists to maintain. After enabling Global Secure Access signaling for Conditional Access, an administrator references the {b1} location in a policy that blocks everything else. Branch offices without the client can still qualify by connecting through a {b2}.",
+      "scenario": "A tenant wants to make Microsoft 365 requests succeed only when they come through the organization's network security service, with no egress IP lists to maintain. After enabling Global Secure Access signaling for Conditional Access, an administrator references {b1} in a policy that blocks everything else. Branch offices without the client can still qualify by connecting through a {b2}.",
       "blanks": [
         {
           "key": "b1",
@@ -3817,12 +3817,12 @@
       "prompt": "Put these steps in order to block a web category for a group of users with Entra Internet Access.",
       "steps": [
         "Enable the Internet access traffic forwarding profile",
+        "Assign the users or groups to the Internet access traffic forwarding profile",
         "Create a web content filtering policy for the category",
         "Add the policy to a security profile",
-        "Link the security profile to a Conditional Access policy for the users",
-        "Assign the users or groups to the Internet access traffic forwarding profile"
+        "Link the security profile to a Conditional Access policy for the users"
       ],
-      "explanation": "The Internet access profile must exist first so traffic can be acquired; the filtering policy defines what to block, the security profile packages policies, the Conditional Access link applies the profile to chosen users, and assignment makes sure those users actually receive the forwarding profile."
+      "explanation": "The Internet access profile must be enabled and assigned first so the users' traffic is acquired; the filtering policy then defines what to block, the security profile packages policies, and the Conditional Access link applies the profile to the chosen users."
     },
     {
       "id": "seq-sc300-9002",
@@ -3832,10 +3832,10 @@
         "Enable the Microsoft traffic forwarding profile",
         "Enable Global Secure Access signaling for Conditional Access",
         "Confirm the All Compliant Network locations named location exists",
-        "Create a policy that blocks all resources except the compliant network location, excluding emergency access accounts",
-        "Deploy the Global Secure Access client to users"
+        "Deploy the Global Secure Access client to users",
+        "Create a policy that blocks all resources except the compliant network location, excluding emergency access accounts"
       ],
-      "explanation": "The profile and the signaling setting come first because they create the compliant network location. The policy then references that location and excludes break-glass accounts. Deploy the client before enforcing, or turn the policy on in report-only mode first, so users are not locked out."
+      "explanation": "The profile and the signaling setting come first because they create the compliant network location. Deploying the client before enforcing means users are already on the service when the policy applies, so they are not locked out. The policy comes last because it references that location and must exclude break-glass accounts; turning it on in report-only mode first is a safe way to check it."
     },
     {
       "id": "seq-sc300-9003",
@@ -3880,7 +3880,7 @@
         {
           "id": "cs-sc300-meridian-health-q3",
           "type": "ms",
-          "question": "Which controls would appropriately hold the billing contractors to a stricter bar than internal clinical staff for the claims-processing app? (Select all that apply.)",
+          "question": "Which controls would appropriately hold the billing contractors to a stricter bar than internal clinical staff for the claims-processing app? (Choose three.)",
           "options": [
             "A Conditional Access policy scoped to the contractors' group requiring a compliant or Microsoft Entra hybrid joined device",
             "Requiring acknowledgment of a terms of use policy before access to the app is granted",
@@ -3935,9 +3935,9 @@
           "question": "Which combination meets the first goal, refusing Microsoft 365 requests from outside the company's network security service?",
           "options": [
             "A Conditional Access policy that blocks all resources except from the corporate office public IP addresses",
-            "Requiring a compliant device with Intune for all Microsoft 365 apps",
-            "The Microsoft traffic profile with the Global Secure Access client, Global Secure Access signaling for Conditional Access, and a policy that blocks all resources except the compliant network location",
-            "Source IP restoration with a trusted named location for the Microsoft egress address"
+            "Requiring a device marked compliant in Intune for every sign-in to Exchange Online and SharePoint Online",
+            "The Microsoft traffic profile with the client, signaling, and a policy blocking everything except the compliant network location",
+            "Source IP restoration, with the Microsoft egress address added as a trusted named location in Conditional Access"
           ],
           "correct": 2,
           "explanation": "The compliant network check is enforced at authentication, so a replayed token from outside the service is denied, and it works with only Entra ID P1 or P2 through the Microsoft traffic profile. Office IP lists fail for remote staff and require upkeep. Device compliance does not tell Entra which network path a request used. Trusting the Microsoft egress address would let anyone routed through the service pass, which is not tenant-specific."
