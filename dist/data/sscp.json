@@ -215,7 +215,7 @@
     {
       "id": "f12",
       "cat": "sscpConcepts",
-      "front": "Types of security controls (preventive, detective, corrective, deterrent, compensating, recovery)",
+      "front": "Types of security controls by function",
       "back": "Preventive controls stop an event, detective controls identify it, corrective controls limit damage and fix the cause, deterrents discourage attackers, compensating controls substitute when the preferred control is impractical, and recovery controls restore normal operations.",
       "detail": "Same control, different category depending on purpose: a camera is a deterrent if visible, detective as it records, and not preventive at all."
     },
@@ -355,8 +355,8 @@
     {
       "id": "f32",
       "cat": "sscpAccess",
-      "front": "Federated identity (SAML, OAuth 2.0, OpenID Connect)",
-      "back": "Federation lets one organization's identity provider vouch for its users to another organization's service. SAML uses XML assertions for enterprise web SSO, OpenID Connect adds authentication on top of OAuth 2.0, and OAuth 2.0 itself is an authorization (delegation) framework.",
+      "front": "Federated identity",
+      "back": "An arrangement in which one organization's identity provider vouches for its users to another organization's service. SAML uses XML assertions for enterprise web SSO, OpenID Connect adds authentication on top of OAuth 2.0, and OAuth 2.0 itself is an authorization (delegation) framework.",
       "detail": "OAuth is not an authentication protocol, a favorite exam trap. It lets an app act on your behalf with limited scope without sharing your password."
     },
     {
@@ -433,7 +433,7 @@
       "id": "f43",
       "cat": "sscpAccess",
       "front": "Access control list (ACL) vs. capability",
-      "back": "An ACL is attached to an object and lists which subjects may do what with it. A capability is held by the subject and lists what objects it may access, so authority travels with the token.",
+      "back": "One is attached to an object and lists which subjects may do what with it. The other is held by the subject and lists what objects it may access, so authority travels with the token.",
       "detail": "File permissions and router ACLs are object-centric lists. Do not confuse a network ACL with a file ACL: same idea, different enforcement point."
     },
     {
@@ -488,7 +488,7 @@
     {
       "id": "f51",
       "cat": "sscpRisk",
-      "front": "Quantitative risk formulas (SLE, ARO, ALE)",
+      "front": "Quantitative risk formulas",
       "back": "Single loss expectancy (SLE) is asset value times exposure factor. Annualized rate of occurrence (ARO) is how often per year the loss is expected. Annualized loss expectancy (ALE) is SLE times ARO.",
       "detail": "A control is cost-justified when the ALE reduction exceeds its annual cost. Know that exposure factor is a percentage of value lost per event."
     },
@@ -685,7 +685,7 @@
       "id": "f79",
       "cat": "sscpIncident",
       "front": "Order of volatility",
-      "back": "Evidence is collected from the most volatile to the least: CPU registers and cache, memory (RAM), network state and running processes, disk contents, remote logs, and finally archival media.",
+      "back": "Evidence is collected from the most volatile to the least: CPU registers and cache, memory (RAM) with its running processes and network state, temporary files and swap space, disk contents, remote logs, and finally archival media.",
       "detail": "Memory and network connections vanish at power-off, so capture them first. Disk images come after live data."
     },
     {
@@ -699,20 +699,20 @@
       "id": "f81",
       "cat": "sscpIncident",
       "front": "Legal hold and evidence preservation",
-      "back": "A legal hold is a direction to preserve all potentially relevant information when litigation or investigation is reasonably expected, suspending normal deletion and rotation.",
+      "back": "A direction to preserve all potentially relevant information when litigation or investigation is reasonably expected, suspending normal deletion and rotation.",
       "detail": "Routine log rotation or backup overwrites can destroy evidence. Legal, not IT, issues the hold."
     },
     {
       "id": "f82",
       "cat": "sscpIncident",
       "front": "Business continuity plan (BCP) vs. disaster recovery plan (DRP)",
-      "back": "A BCP keeps essential business functions running during and after disruption, and covers people, processes and facilities. A DRP restores IT systems and data after a disaster and is a component of the broader continuity effort.",
+      "back": "One plan keeps essential business functions running during and after disruption, and covers people, processes and facilities. The other restores IT systems and data after a disaster and is a component of the broader continuity effort.",
       "detail": "BCP is business-wide and about continuing operations; DRP is technology-focused and about restoring. BIA feeds both."
     },
     {
       "id": "f83",
       "cat": "sscpIncident",
-      "front": "Recovery objectives (MTD, RTO, RPO)",
+      "front": "Recovery objectives",
       "back": "Maximum tolerable downtime (MTD) is how long a function can be unavailable before the business suffers unacceptable harm. The recovery time objective (RTO) is the target time to restore, and must be less than MTD. The recovery point objective (RPO) is the maximum acceptable data loss, measured in time.",
       "detail": "RPO sets how often backups or replication must run; RTO sets which recovery site and method are viable. RTO plus work recovery time must fit within MTD."
     },
@@ -756,7 +756,7 @@
       "cat": "sscpIncident",
       "front": "Emergency response, crisis communication and notification",
       "back": "Life safety comes first, then asset protection. Prepared communication plans specify who is told what, when and by whom, including regulators, customers and the media, and when breach notification laws apply.",
-      "detail": "Never improvise statements. Inconsistent messages and premature speculation about cause cause legal and reputational damage."
+      "detail": "Never improvise statements. Inconsistent messages and premature speculation about the cause can cause legal and reputational damage."
     },
     {
       "id": "f90",
@@ -782,15 +782,15 @@
     {
       "id": "f93",
       "cat": "sscpCrypto",
-      "front": "Block cipher modes (ECB, CBC, CTR, GCM)",
-      "back": "ECB encrypts each block independently and leaks patterns, so it should not be used. CBC chains blocks with an initialization vector. CTR turns a block cipher into a stream cipher. GCM is an authenticated mode that provides confidentiality and integrity together.",
+      "front": "Block cipher modes of operation",
+      "back": "Electronic codebook (ECB) encrypts each block independently and leaks patterns, so it should not be used. Cipher block chaining (CBC) chains blocks with an initialization vector. Counter mode (CTR) turns a block cipher into a stream cipher. Galois/Counter Mode (GCM) is an authenticated mode that provides confidentiality and integrity together.",
       "detail": "Prefer authenticated modes like GCM. Reusing a nonce or IV with the same key can be catastrophic, particularly in GCM and CTR."
     },
     {
       "id": "f94",
       "cat": "sscpCrypto",
       "front": "RSA and elliptic curve cryptography (ECC)",
-      "back": "RSA relies on the difficulty of factoring large integers and needs large keys (2048 bits or more). ECC relies on elliptic-curve discrete logarithms and achieves comparable strength with much smaller keys. Both are used for key exchange or signatures.",
+      "back": "Two widely used public-key algorithm families. One relies on the difficulty of factoring large integers and needs large keys (2048 bits or more). The other relies on elliptic-curve discrete logarithms and achieves comparable strength with much smaller keys. Both are used for key exchange or signatures.",
       "detail": "ECC suits mobile and constrained devices. Both are threatened by future quantum computers, which is why post-quantum algorithms are being standardized."
     },
     {
@@ -817,8 +817,8 @@
     {
       "id": "f98",
       "cat": "sscpCrypto",
-      "front": "Public key infrastructure (PKI) and certificate authority (CA)",
-      "back": "PKI is the people, policies and technology that issue, manage and revoke digital certificates binding public keys to identities. A certificate authority signs certificates, often in a hierarchy with an offline root and online issuing CAs.",
+      "front": "Public key infrastructure (PKI)",
+      "back": "The people, policies and technology that issue, manage and revoke digital certificates binding public keys to identities. A certificate authority (CA) signs certificates, often in a hierarchy with an offline root and online issuing CAs.",
       "detail": "A registration authority vets requests. Trust flows from the root. Compromise of a CA key undermines every certificate beneath it."
     },
     {
@@ -846,7 +846,7 @@
       "id": "f102",
       "cat": "sscpCrypto",
       "front": "Hardware security module (HSM) and TPM",
-      "back": "An HSM is a tamper-resistant device that generates, stores and uses cryptographic keys without exposing them. A Trusted Platform Module is a chip on a device that stores keys and measurements for disk encryption and attestation.",
+      "back": "One is a tamper-resistant device that generates, stores and uses cryptographic keys without exposing them, usually shared by many servers or applications. The other is a chip on a single device that stores keys and measurements for disk encryption and attestation.",
       "detail": "Use an HSM to protect CA private keys. BitLocker commonly relies on a TPM to protect the volume key."
     },
     {
@@ -860,7 +860,7 @@
       "id": "f104",
       "cat": "sscpCrypto",
       "front": "Steganography and common cryptographic attacks",
-      "back": "Steganography hides the existence of a message inside another file. Cryptanalytic attacks include brute force, dictionary, birthday (hash collisions), known-plaintext, man-in-the-middle and downgrade attacks, and side-channel attacks that exploit timing or power use.",
+      "back": "A technique that hides the very existence of a message inside another file, such as an image or audio clip. Cryptanalytic attacks include brute force, dictionary, birthday (hash collisions), known-plaintext, man-in-the-middle and downgrade attacks, and side-channel attacks that exploit timing or power use.",
       "detail": "Steganography is concealment, not encryption. Defend against downgrade by disabling legacy protocols rather than relying on negotiation."
     },
     {
@@ -888,7 +888,7 @@
       "id": "f108",
       "cat": "sscpNetwork",
       "front": "Common ports and secure protocols",
-      "back": "Secure alternatives replace cleartext ones: SSH (22) for Telnet, HTTPS (443) for HTTP, SFTP or SCP for FTP, SMTPS or STARTTLS for SMTP, IMAPS and POP3S for mail retrieval, LDAPS (636) for LDAP, and DNS over TLS or HTTPS.",
+      "back": "Know each secure service by its port: SSH, SFTP and SCP on 22, HTTPS on 443, LDAPS on 636, IMAPS on 993, POP3S on 995, SMTP submission on 587 with STARTTLS, and DNS over TLS on 853. Each replaces a cleartext service such as Telnet on 23, HTTP on 80, LDAP on 389, IMAP on 143 or POP3 on 110.",
       "detail": "Seeing Telnet, FTP or HTTP in a scenario signals a finding. Remember that FTPS (FTP with TLS) differs from SFTP (SSH-based)."
     },
     {
@@ -909,21 +909,21 @@
       "id": "f111",
       "cat": "sscpNetwork",
       "front": "Microsegmentation",
-      "back": "Fine-grained, policy-based isolation of individual workloads or applications, often enforced in software at the host or hypervisor, so that east-west traffic is allowed only where explicitly needed.",
-      "detail": "A zero trust building block. Useful in data centres and cloud where perimeter firewalls never see server-to-server traffic."
+      "back": "Fine-grained, policy-based isolation of individual workloads, applications or even processes, usually enforced in software by a hypervisor, host agent or cloud security group rather than by VLANs and perimeter rules, so that east-west traffic is allowed only where explicitly needed. It limits lateral movement after a compromise.",
+      "detail": "A zero trust building block. Useful in data centres and cloud where perimeter firewalls never see server-to-server traffic. Start by mapping real application flows, then default-deny between workloads, because blocking unknown flows without a map breaks applications."
     },
     {
       "id": "f112",
       "cat": "sscpNetwork",
       "front": "Virtual LAN (VLAN) and VLAN hopping",
-      "back": "A VLAN logically separates broadcast domains on switches. VLAN hopping abuses switch spoofing or double tagging to reach another VLAN. Defences include disabling unused ports, setting ports to access mode, not using VLAN 1 for user traffic and changing the native VLAN.",
-      "detail": "VLANs separate traffic but are not a firewall. Routing between VLANs must still pass through filtering."
+      "back": "A VLAN logically separates broadcast domains on switches, and VLAN hopping abuses switch spoofing or double tagging to reach another one. Defences include disabling unused ports, setting ports to access mode, not using the default ID 1 for user traffic and changing the native ID.",
+      "detail": "ID 1 is the default VLAN, and the native VLAN carries untagged frames, which double tagging abuses. VLANs separate traffic but are not a firewall. Routing between VLANs must still pass through filtering."
     },
     {
       "id": "f113",
       "cat": "sscpNetwork",
       "front": "Network access control (NAC) and 802.1X",
-      "back": "NAC checks a device's identity and posture before and after it connects. IEEE 802.1X provides port-based authentication where a supplicant authenticates through an authenticator (switch or access point) to an authentication server, typically RADIUS, using EAP.",
+      "back": "One approach checks a device's identity and posture before and after it connects. A related IEEE standard provides port-based authentication where a supplicant authenticates through an authenticator (switch or access point) to an authentication server, typically RADIUS, using EAP.",
       "detail": "802.1X stops an unknown device that simply plugs into a wall jack. Non-compliant devices can be quarantined to a remediation VLAN."
     },
     {
@@ -943,8 +943,8 @@
     {
       "id": "f116",
       "cat": "sscpNetwork",
-      "front": "IPsec (AH, ESP, IKE, tunnel and transport modes)",
-      "back": "IPsec secures IP traffic. The Authentication Header provides integrity and authentication only, while Encapsulating Security Payload adds confidentiality. IKE negotiates the security associations and keys. Transport mode protects the payload, tunnel mode encapsulates the whole packet and is used for gateway-to-gateway VPNs.",
+      "front": "IPsec",
+      "back": "IPsec secures IP traffic. The Authentication Header (AH) provides integrity and authentication only, while Encapsulating Security Payload (ESP) adds confidentiality. Internet Key Exchange (IKE) negotiates the security associations and keys. Transport mode protects the payload, tunnel mode encapsulates the whole packet and is used for gateway-to-gateway VPNs.",
       "detail": "AH does not encrypt and breaks under NAT, so ESP is the usual choice. Tunnel mode is the answer for site-to-site."
     },
     {
@@ -957,9 +957,9 @@
     {
       "id": "f118",
       "cat": "sscpNetwork",
-      "front": "Wireless security (WPA2, WPA3, 802.1X enterprise)",
-      "back": "WPA2 uses AES-CCMP; WPA3 adds Simultaneous Authentication of Equals to resist offline password guessing, and stronger encryption in enterprise mode. WEP and WPA with TKIP are broken. Enterprise mode authenticates users with 802.1X and EAP instead of a shared passphrase.",
-      "detail": "Hiding the SSID and MAC filtering are not real security. Enterprise authentication gives per-user accountability and revocation."
+      "front": "Wi-Fi personal vs. enterprise mode",
+      "back": "Personal mode protects the network with one shared passphrase, so every user holds the same secret and a leaked passphrase exposes everyone. Enterprise mode authenticates each user or device with 802.1X and EAP against a RADIUS server instead, which gives unique session keys, per-user accountability and revocation.",
+      "detail": "Hiding the SSID and MAC filtering are not real security. Both modes exist in WPA2 and WPA3, and WPA3 personal uses Simultaneous Authentication of Equals to resist offline password guessing."
     },
     {
       "id": "f119",
@@ -972,7 +972,7 @@
       "id": "f120",
       "cat": "sscpNetwork",
       "front": "Denial-of-service and distributed denial-of-service (DDoS) attacks",
-      "back": "DoS exhausts a target's resources so legitimate users cannot be served; DDoS does it from many sources, often a botnet. Types include volumetric floods, protocol attacks such as SYN floods, and application-layer attacks. Reflection and amplification abuse third-party servers.",
+      "back": "Exhausting a target's resources so legitimate users cannot be served. The distributed form launches it from many sources, often a botnet. Types include volumetric floods, protocol attacks such as SYN floods, and application-layer attacks. Reflection and amplification abuse third-party servers.",
       "detail": "Mitigations are rate limiting, SYN cookies, upstream scrubbing or CDN services, and anycast. Ingress and egress filtering stop spoofed source addresses."
     },
     {
@@ -985,7 +985,7 @@
     {
       "id": "f122",
       "cat": "sscpNetwork",
-      "front": "DNS security (DNSSEC, DNS poisoning, tunnelling)",
+      "front": "DNS security",
       "back": "DNSSEC digitally signs DNS records so resolvers can verify they are authentic and unaltered, but it does not encrypt queries. Attacks include cache poisoning, hijacking and tunnelling data through DNS queries. Monitoring unusual query volume or long names helps detect tunnelling.",
       "detail": "DNSSEC gives integrity and authenticity, not confidentiality. DNS over HTTPS or TLS provides privacy for the query."
     },
@@ -1013,8 +1013,8 @@
     {
       "id": "f126",
       "cat": "sscpNetwork",
-      "front": "Secure Access Service Edge (SASE) and Zero Trust Network Access (ZTNA)",
-      "back": "SASE combines network functions such as software-defined WAN with cloud-delivered security services such as secure web gateway, cloud access security broker and ZTNA. ZTNA grants per-application access to authenticated, authorized users without placing them on the whole network.",
+      "front": "Secure Access Service Edge (SASE)",
+      "back": "A cloud-delivered architecture that combines network functions such as software-defined WAN with security services such as secure web gateway, cloud access security broker and zero trust network access (ZTNA). The last of these grants per-application access to authenticated, authorized users without placing them on the whole network.",
       "detail": "ZTNA replaces broad VPN access with application-level access. Know the components by function rather than by vendor product."
     },
     {
@@ -1055,8 +1055,8 @@
     {
       "id": "f132",
       "cat": "sscpSystems",
-      "front": "Social engineering attacks (phishing, spear phishing, whaling, vishing, pretexting)",
-      "back": "Manipulating people into disclosing information or taking actions. Phishing is mass email, spear phishing is targeted, whaling targets executives, vishing uses voice calls, smishing uses text messages and pretexting builds a fabricated scenario.",
+      "front": "Social engineering",
+      "back": "Manipulating people, rather than breaking technology, into disclosing information or taking actions. Spear phishing targets a chosen person or group, pretexting builds a fabricated scenario to justify the request, and tailgating into a building or posing as staff or support are common in-person forms.",
       "detail": "Technical controls such as email filtering, MFA and DMARC reduce exposure, but training and an easy reporting channel are essential."
     },
     {
@@ -1084,7 +1084,7 @@
       "id": "f136",
       "cat": "sscpSystems",
       "front": "Patch management",
-      "back": "A repeatable process to identify, test, deploy and verify updates for operating systems, applications and firmware, prioritized by risk and exposure, with exceptions tracked and compensating controls for what cannot be patched.",
+      "back": "Vendor updates for operating systems, applications and firmware are assessed, tested on a pilot group, deployed in maintenance windows with a rollback plan and verified afterwards, with urgency set by risk and exposure. Exceptions are tracked, and compensating controls cover what cannot be patched.",
       "detail": "Test before wide deployment but do not delay forever. End-of-life software that cannot be patched needs isolation or replacement."
     },
     {
@@ -1098,7 +1098,7 @@
       "id": "f138",
       "cat": "sscpSystems",
       "front": "Mobile device management (MDM) and BYOD",
-      "back": "MDM or unified endpoint management enforces policy on mobile devices: encryption, passcodes, app control, certificate delivery, remote lock and wipe, and compliance checks. Bring your own device (BYOD) needs containerization to separate work and personal data.",
+      "back": "Software, sometimes delivered as unified endpoint management, that enforces policy on mobile devices: encryption, passcodes, app control, certificate delivery, remote lock and wipe, and compliance checks. A model in which employees use their own devices needs containerization to separate work and personal data.",
       "detail": "Selective wipe removes only corporate data on personal devices. Jailbroken or rooted devices should be treated as non-compliant."
     },
     {
@@ -1175,7 +1175,7 @@
       "id": "f149",
       "cat": "sscpSystems",
       "front": "SQL injection and cross-site scripting (XSS)",
-      "back": "SQL injection inserts attacker-controlled input into a database query. Cross-site scripting injects script into pages viewed by other users. Defences are parameterized queries and input validation for SQL injection, and output encoding with content security policy for XSS.",
+      "back": "One attack inserts attacker-controlled input into a database query. Another injects script into pages viewed by other users. Defences are parameterized queries and input validation for the first, and output encoding with content security policy for the second.",
       "detail": "SQL injection attacks the database; XSS attacks other users' browsers. Cross-site request forgery is a third distinct attack that abuses an authenticated session."
     },
     {
@@ -1188,8 +1188,8 @@
     {
       "id": "f151",
       "cat": "sscpSystems",
-      "front": "Email security (SPF, DKIM, DMARC)",
-      "back": "Sender Policy Framework lists the servers allowed to send for a domain, DomainKeys Identified Mail adds a cryptographic signature, and DMARC tells receivers how to handle failures and sends reports. Together they reduce domain spoofing.",
+      "front": "Email authentication standards",
+      "back": "Sender Policy Framework (SPF) lists the servers allowed to send for a domain, DomainKeys Identified Mail (DKIM) adds a cryptographic signature, and DMARC tells receivers how to handle failures and sends reports. Together they reduce domain spoofing.",
       "detail": "These authenticate domains, not people, and do not stop all phishing. Secure email gateways add filtering of malware and links."
     },
     {
@@ -1286,8 +1286,8 @@
     {
       "id": "f9014",
       "cat": "sscpConcepts",
-      "front": "Configuration management (CM) and the CMDB",
-      "back": "Configuration management identifies each configuration item, keeps its approved baseline, controls changes to it and verifies the running state against the baseline. A configuration management database records items and their relationships.",
+      "front": "Configuration management (CM)",
+      "back": "The discipline that identifies each configuration item, keeps its approved baseline, controls changes to it and verifies the running state against the baseline. Items and their relationships are recorded in a configuration management database (CMDB).",
       "detail": "Change management decides whether a change happens; configuration management records and verifies what the systems actually look like. Drift from the baseline is the detective signal."
     },
     {
@@ -1330,7 +1330,7 @@
       "cat": "sscpConcepts",
       "front": "Personal device restrictions in secure areas",
       "back": "Policies that limit phones, cameras, removable media and other personal devices in sensitive facilities, using lockers, signage, detection or a managed-device-only rule. They reduce the chance of photographing, recording or copying data and of introducing malware.",
-      "detail": "Pair the rule with an alternative, such as a lockers area or a managed device, so people are not tempted to work around it."
+      "detail": "Pair the rule with an alternative, such as lockers or a managed device, so people are not tempted to work around it."
     },
     {
       "id": "f9021",
@@ -1350,14 +1350,14 @@
       "id": "f9023",
       "cat": "sscpAccess",
       "front": "SAML roles and flow",
-      "back": "In Security Assertion Markup Language, the identity provider authenticates the user and issues a digitally signed XML assertion, and the service provider validates it and grants access. The service provider never sees the user's password.",
+      "back": "The identity provider authenticates the user and issues a digitally signed XML assertion, and the service provider validates it and grants access. The service provider never sees the user's password.",
       "detail": "Typical flow: the user visits the application, is redirected to the identity provider, signs in, and the browser carries the assertion back. Attacks target signature validation and replay, so assertions are short-lived and signatures are checked."
     },
     {
       "id": "f9024",
       "cat": "sscpAccess",
       "front": "OpenID Connect (OIDC) and the ID token",
-      "back": "OpenID Connect adds an authentication layer on top of OAuth 2.0. After sign-in the client receives an ID token, usually a signed JSON Web Token, that states who the user is and how and when they authenticated.",
+      "back": "An authentication layer built on top of OAuth 2.0. After sign-in the client receives a signed token, usually a JSON Web Token, that states who the user is and how and when they authenticated.",
       "detail": "OAuth 2.0 alone answers what an app may do. OpenID Connect answers who the user is. Modern clients use the authorization code flow with PKCE rather than passing tokens in a redirect."
     },
     {
@@ -1427,14 +1427,14 @@
       "id": "f9034",
       "cat": "sscpAccess",
       "front": "Authentication assurance levels",
-      "back": "NIST SP 800-63 groups authentication strength into assurance levels. Higher levels require multiple factors and stronger authenticators, and the top level requires a phishing-resistant authenticator using a non-exportable cryptographic key.",
+      "back": "NIST SP 800-63 groups authentication strength into three graded levels. Higher levels require multiple factors and stronger authenticators, and the top level requires a phishing-resistant authenticator using a non-exportable cryptographic key.",
       "detail": "Choose the level by the risk of the resource. Privileged and regulated access belongs at the highest level, while low-risk services can use less."
     },
     {
       "id": "f9035",
       "cat": "sscpRisk",
-      "front": "Threat intelligence sharing (ISACs, STIX/TAXII, TLP)",
-      "back": "Organizations exchange indicators and context through industry sharing groups (ISACs) and machine-readable formats: STIX describes the intelligence and TAXII transports it. The Traffic Light Protocol marks how widely a shared item may be passed on.",
+      "front": "Threat intelligence sharing",
+      "back": "Organizations exchange indicators and context through industry information sharing and analysis centers (ISACs) and machine-readable formats: STIX describes the intelligence and TAXII transports it. The Traffic Light Protocol (TLP) marks how widely a shared item may be passed on.",
       "detail": "Sharing helps peers defend against the same campaign. Check the TLP marking before forwarding, and remove sensitive internal details before sharing."
     },
     {
@@ -1489,8 +1489,8 @@
     {
       "id": "f9043",
       "cat": "sscpRisk",
-      "front": "Ignoring risk is not the same as accepting it",
-      "back": "Accepting a risk is a documented decision by an authorized owner within appetite. Ignoring a risk means it was never assessed, recorded or decided, so nobody owns it. Ignoring appears on the outline's treatment list as the behaviour to avoid.",
+      "front": "Risk acceptance vs. ignoring risk",
+      "back": "Accepting a risk is a documented decision by an authorized owner within appetite. Ignoring a risk means it was never assessed, recorded or decided, so nobody owns it. It is not a treatment option (the options are accept, transfer, mitigate and avoid) but a failure to choose one.",
       "detail": "If a risk is not worth fixing, record it and obtain formal acceptance. Silent neglect leaves the organization exposed and unable to show due care."
     },
     {
@@ -1504,7 +1504,7 @@
       "id": "f9045",
       "cat": "sscpRisk",
       "front": "CVSS version 4.0 scoring and severity bands",
-      "back": "CVSS v4.0 from FIRST scores a vulnerability from 0.0 to 10.0 and has Base, Threat, Environmental and Supplemental metric groups. Qualitative severity bands are None 0.0, Low 0.1-3.9, Medium 4.0-6.9, High 7.0-8.9 and Critical 9.0-10.0.",
+      "back": "FIRST's vulnerability scoring standard, in its 4.0 version, scores a flaw from 0.0 to 10.0 and has Base, Threat, Environmental and Supplemental metric groups. Qualitative severity bands are None 0.0, Low 0.1-3.9, Medium 4.0-6.9, High 7.0-8.9 and Critical 9.0-10.0.",
       "detail": "A base score alone is severity, not risk. Adding Threat and Environmental metrics, such as exploit maturity and asset importance, moves the number toward real-world priority."
     },
     {
@@ -1517,8 +1517,8 @@
     {
       "id": "f9047",
       "cat": "sscpRisk",
-      "front": "Privacy regulations and breach notification (GDPR, HIPAA)",
-      "back": "The EU General Data Protection Regulation protects personal data of people in the EU and, when a breach is likely to risk individuals, requires notifying the supervisory authority without undue delay and where feasible within 72 hours of becoming aware. HIPAA protects health information in the United States and sets its own notification periods, up to 60 days.",
+      "front": "Privacy regulations and breach notification",
+      "back": "The EU General Data Protection Regulation (GDPR) protects personal data of people in the EU and, when a breach is likely to risk individuals, requires notifying the supervisory authority without undue delay and where feasible within 72 hours of becoming aware. HIPAA protects health information in the United States and sets its own notification periods, up to 60 days.",
       "detail": "Deadlines start at awareness. Security teams must hand legal and privacy teams the facts quickly. Fines under GDPR can reach 4 percent of worldwide annual turnover."
     },
     {
@@ -1609,7 +1609,7 @@
       "id": "f9060",
       "cat": "sscpIncident",
       "front": "ISO/IEC 27035 incident management phases",
-      "back": "ISO/IEC 27035 describes information security incident management in five phases: prepare, detect and report, assess and decide, respond, and learn lessons. It maps closely to the NIST lifecycle: assess and decide is where an event is judged to be an incident and given a severity.",
+      "back": "The ISO standard for information security incident management describes five phases: prepare, detect and report, assess and decide, respond, and learn lessons. It maps closely to the NIST lifecycle: assess and decide is where an event is judged to be an incident and given a severity.",
       "detail": "Know that both models end by feeding lessons back into preparation. The exam may name either model, and the content of each phase is the same in spirit."
     },
     {
@@ -1741,7 +1741,7 @@
     {
       "id": "f9079",
       "cat": "sscpCrypto",
-      "front": "Regulatory drivers for cryptography (ISO, NIST, GDPR, HIPAA)",
+      "front": "Regulatory drivers for cryptography",
       "back": "Laws and standards expect cryptographic protection of sensitive data. ISO/IEC 27001 and its Annex A call for a cryptography policy and key management, GDPR names encryption as an appropriate safeguard, and HIPAA treats encryption as an addressable safeguard for electronic health information.",
       "detail": "Using strong, approved algorithms and managing keys properly is what auditors look for. NIST publications such as SP 800-57 guide key management and algorithm choice."
     },
@@ -1784,14 +1784,14 @@
       "id": "f9085",
       "cat": "sscpCrypto",
       "front": "Cryptographic attacks and cryptanalysis",
-      "back": "Cryptanalysis attempts to recover plaintext or keys without the key. Attack settings include ciphertext-only, known-plaintext, chosen-plaintext and chosen-ciphertext. Other attacks include brute force, dictionary and rainbow-table attacks on hashes, birthday collisions, side-channel and downgrade attacks.",
+      "back": "Attempts to recover plaintext or keys without being given the key. Attack settings include ciphertext-only, known-plaintext, chosen-plaintext and chosen-ciphertext. Other attacks include brute force, dictionary and rainbow-table attacks on hashes, birthday collisions, side-channel and downgrade attacks.",
       "detail": "Match the attack to what the attacker has: known-plaintext means pairs of plaintext and ciphertext. Most real failures come from poor implementation and key handling, not broken mathematics."
     },
     {
       "id": "f9086",
       "cat": "sscpCrypto",
       "front": "Diffie-Hellman key exchange",
-      "back": "A protocol that lets two parties derive a shared secret over an untrusted network without ever sending it. The elliptic-curve ephemeral form gives forward secrecy because each session uses fresh values.",
+      "back": "A protocol that lets two parties derive a shared secret over an untrusted network without ever sending it. The ephemeral variants, including the elliptic-curve one, give forward secrecy because each session uses fresh values.",
       "detail": "Unauthenticated Diffie-Hellman is open to man-in-the-middle attack. It is combined with certificates or signatures to prove who the other party is."
     },
     {
@@ -1812,7 +1812,7 @@
       "id": "f9089",
       "cat": "sscpCrypto",
       "front": "Blockchain and decentralized trust",
-      "back": "A blockchain is a ledger of blocks linked by hashes and agreed by a distributed consensus process, with participants identified by key pairs and transactions authorized by digital signatures. Trust comes from the protocol and many participants rather than from a central authority.",
+      "back": "A ledger of blocks linked by hashes and agreed by a distributed consensus process, with participants identified by key pairs and transactions authorized by digital signatures. Trust comes from the protocol and many participants rather than from a central authority.",
       "detail": "Limits: lost private keys cannot be recovered, ledgers are public and permanent, smart-contract flaws are costly and a majority controller could rewrite recent history."
     },
     {
@@ -1854,7 +1854,7 @@
       "id": "f9095",
       "cat": "sscpCrypto",
       "front": "Non-repudiation mechanisms: signatures, audit trails and timestamps",
-      "back": "Non-repudiation is supported by digital signatures, trusted timestamps and tamper-resistant audit trails that tie actions to a unique identity. HMAC alone cannot provide it because both parties share the key.",
+      "back": "Digital signatures bind a message to the holder of a private key, trusted timestamps prove when it happened, and tamper-resistant audit trails tie actions to a unique identity. HMAC alone cannot provide the assurance because both parties share the key.",
       "detail": "Non-repudiation is a property you build from several controls. Shared accounts and editable logs destroy it."
     },
     {
@@ -1980,7 +1980,7 @@
       "id": "f9113",
       "cat": "sscpNetwork",
       "front": "Load balancers",
-      "back": "A load balancer spreads requests across servers, checks their health and removes failed ones, improving availability and scale. Layer 7 balancers can route by content and offload TLS, and they can also hide server addresses.",
+      "back": "Spreads requests across servers, checks their health and removes failed ones, improving availability and scale. Layer 7 versions can route by content and offload TLS, and they can also hide server addresses.",
       "detail": "A load balancer is itself a single point of failure unless it is paired. It also terminates TLS, so protect its keys."
     },
     {
@@ -2008,7 +2008,7 @@
       "id": "f9117",
       "cat": "sscpNetwork",
       "front": "Subnetting and CIDR notation",
-      "back": "CIDR notation gives the prefix length, so a /24 has 256 addresses and 254 usable hosts, a /26 has 64 addresses and 62 usable hosts, and a /30 has 4 addresses and 2 usable hosts. Smaller subnets limit broadcast domains and make segmentation rules precise.",
+      "back": "The number after the slash gives the prefix length, so a /24 has 256 addresses and 254 usable hosts, a /26 has 64 addresses and 62 usable hosts, and a /30 has 4 addresses and 2 usable hosts. Smaller subnets limit broadcast domains and make segmentation rules precise.",
       "detail": "Usable hosts equal 2 to the power of host bits minus 2, for the network and broadcast addresses. A /32 identifies a single host."
     },
     {
@@ -2035,7 +2035,7 @@
     {
       "id": "f9121",
       "cat": "sscpNetwork",
-      "front": "Wi-Fi Protected Access evolution (WEP, WPA, WPA2, WPA3)",
+      "front": "Wi-Fi Protected Access evolution",
       "back": "WEP uses RC4 and is broken. WPA used TKIP as an interim fix. WPA2 uses AES-CCMP. WPA3 adds Simultaneous Authentication of Equals for personal networks, mandatory protected management frames, an optional 192-bit mode for enterprise, and Opportunistic Wireless Encryption for open networks.",
       "detail": "WPA2 Personal with a weak passphrase can be attacked offline, which WPA3 SAE prevents. Choose WPA3 Enterprise when per-user identity is needed."
     },
@@ -2169,7 +2169,7 @@
       "id": "f9140",
       "cat": "sscpSystems",
       "front": "Hardware security module (HSM) management",
-      "back": "A tamper-resistant device, often validated to FIPS 140, that generates and stores keys and performs cryptographic operations so that private keys never leave it. Good management means separate roles, quorum (M of N) authentication for sensitive actions, wrapped key backups, clustering for availability, firmware updates and complete audit logs.",
+      "back": "Good practice for the tamper-resistant device, often validated to FIPS 140, that generates and stores keys and performs cryptographic operations so that private keys never leave it: separate administrator roles, quorum (M of N) authentication for sensitive actions, wrapped key backups, clustering for availability, firmware updates and complete audit logs.",
       "detail": "A TPM is a chip that protects keys for one device, while an HSM is a shared appliance or cloud service that protects keys for servers, applications and certificate authorities. Losing the HSM without a backup of its keys means losing the keys."
     },
     {
@@ -2225,7 +2225,7 @@
       "id": "f9148",
       "cat": "sscpSystems",
       "front": "Virtual private cloud (VPC) and cloud virtualization",
-      "back": "A virtual private cloud is a logically isolated network inside a public cloud with its own address range, subnets, route tables, gateways and firewall rules such as security groups. Underneath, hypervisors share physical hardware among many tenants, and isolation is enforced in software.",
+      "back": "A logically isolated network inside a public cloud with its own address range, subnets, route tables, gateways and firewall rules such as security groups. Underneath, hypervisors share physical hardware among many tenants, and isolation is enforced in software.",
       "detail": "Treat a VPC like a data center network: segment it, restrict inbound and outbound rules, use private endpoints and enable flow logs. Default VPC settings are not a security design."
     },
     {
@@ -2274,14 +2274,14 @@
       "id": "f9155",
       "cat": "sscpSystems",
       "front": "Storage management in virtual and backup environments (e.g., Data Domain)",
-      "back": "Virtual platforms use block storage (SAN over Fibre Channel or iSCSI), file storage (NAS over NFS or SMB) and object storage. Controls include zoning and LUN masking, encryption, restricted storage management access and capacity monitoring. Deduplicating backup appliances such as Dell Data Domain keep one copy of repeated data and should use retention lock and replication.",
+      "back": "Virtual platforms use block storage (SAN over Fibre Channel or iSCSI), file storage (NAS over NFS or SMB) and object storage. Controls include zoning and LUN masking, encryption, restricted storage management access and capacity monitoring. Deduplicating backup appliances such as Dell PowerProtect Data Domain keep one copy of repeated data and should use retention lock and replication.",
       "detail": "Backup storage is a prime ransomware target, so make it immutable, encrypt it, use separate credentials and keep an offline or isolated copy. Thin provisioning can run out of real capacity and halt every guest on it."
     },
     {
       "id": "f9156",
       "cat": "sscpSystems",
-      "front": "Virtualization threats: VM escape, hyperjacking and VM sprawl",
-      "back": "VM escape lets code in a guest break out to the hypervisor or other guests. Hyperjacking installs a rogue hypervisor under a running operating system. VM sprawl is the buildup of unmanaged and unpatched machines, and stolen snapshots or compromised management consoles expose many guests at once.",
+      "front": "Hyperjacking and other virtualization threats",
+      "back": "A rogue hypervisor installed beneath a running operating system, giving the attacker control of every guest above it, is the signature attack on virtual platforms. Stolen snapshots and compromised management consoles expose many guests at once, and the classic guest-side risks are VM escape and VM sprawl, the buildup of unmanaged and unpatched machines.",
       "detail": "Defences are prompt hypervisor patching, a minimal host, a separate management network with MFA and role-based access, hardened guests, limited device pass-through and lifecycle control that retires unused machines."
     },
     {
@@ -2302,7 +2302,7 @@
       "id": "f9159",
       "cat": "sscpRisk",
       "front": "Vulnerability management lifecycle",
-      "back": "A repeating cycle: know your assets, scan or assess them, analyze and prioritize the findings, remediate (patch, reconfigure or apply a compensating control), verify with a rescan and report. Exceptions are recorded with an owner and an expiry date.",
+      "back": "The ongoing program that keeps weaknesses under control: keep an asset inventory, scan or assess on a schedule, prioritize by severity, exploit evidence and asset criticality, remediate (patch, reconfigure or apply a compensating control) within deadlines set by severity, verify with a rescan and report. Exceptions are recorded with an owner and an expiry date.",
       "detail": "Scanning without remediation, or remediation without verification, is incomplete. Track time to remediate against agreed targets by severity, and re-scan after fixes."
     },
     {
@@ -2336,9 +2336,9 @@
     {
       "id": "f9164",
       "cat": "sscpNetwork",
-      "front": "Micro-segmentation",
-      "back": "Fine-grained policy that controls traffic between individual workloads, applications or even processes, usually enforced in software by a hypervisor, host agent or cloud security group rather than by VLANs and perimeter rules. It limits lateral movement after a compromise and supports zero trust.",
-      "detail": "Start by mapping real application flows, then default-deny between workloads. Good visibility comes first, because blocking unknown flows without a map breaks applications."
+      "front": "East-west and north-south traffic",
+      "back": "Traffic that crosses the boundary between the internal network and the outside world, such as users reaching a web server, passes perimeter firewalls and proxies. Traffic that moves sideways between servers, workloads and containers inside the network never reaches them, which is how lateral movement after a compromise can go unseen.",
+      "detail": "The first kind is called north-south and the second east-west. Most data center and cloud traffic is east-west, so inspection and policy belong at hosts, hypervisors or segmentation points, as in microsegmentation."
     }
   ],
   "questions": [
@@ -2782,7 +2782,7 @@
       "type": "mc",
       "question": "After applying controls, management formally accepts a small remaining chance of a short outage. What is the remaining risk called?",
       "options": [
-        "Residual risk remaining after the hardening controls were applied",
+        "Residual risk",
         "Inherent risk",
         "Transferred risk",
         "Aggregate risk"
@@ -3616,9 +3616,9 @@
       "type": "ms",
       "question": "Which TWO situations are MOST likely to be addressed by separation of duties? (Choose two.)",
       "options": [
-        "A visitor tailgating through a door",
-        "An administrator forgetting a password",
-        "A server losing power",
+        "A visitor tailgating through a secured door behind an employee",
+        "An administrator forgetting the password to a service account",
+        "A server losing power during a thunderstorm",
         "A developer deploying their own code directly to production without review",
         "One employee both creating vendors and approving payments to them"
       ],
@@ -4238,9 +4238,9 @@
       "id": "tf34",
       "cat": "sscpSystems",
       "type": "tf",
-      "question": "In an infrastructure-as-a-service deployment the customer is responsible for patching the guest operating system.",
+      "question": "In a platform-as-a-service deployment the provider patches the underlying operating system, while the customer stays responsible for its own application code and data.",
       "answer": true,
-      "explanation": "The provider secures the infrastructure and virtualization layer, while the customer manages everything above it."
+      "explanation": "In PaaS the provider runs the infrastructure, operating system and runtime. The customer secures the application, its configuration, identities and data."
     },
     {
       "id": "tf35",
@@ -4422,7 +4422,7 @@
       "options": [
         "A written data handling standard",
         "An access control vestibule at the lab door",
-        "A next-generation firewall policy",
+        "Rules configured on a next-generation firewall",
         "Full-disk encryption on laptops",
         "A background screening requirement for new hires"
       ],
@@ -4430,7 +4430,7 @@
         0,
         4
       ],
-      "explanation": "Screening requirements and written standards are policies and procedures, which are administrative (managerial) controls. A firewall policy and disk encryption are technical controls, and the vestibule is a physical control."
+      "explanation": "Screening requirements and written standards are policies and procedures, which are administrative (managerial) controls. The firewall rules and disk encryption are technical controls, and the vestibule is a physical control."
     },
     {
       "id": "msq9002",
@@ -5010,9 +5010,9 @@
       "id": "tf9011",
       "cat": "sscpRisk",
       "type": "tf",
-      "question": "A CVSS base score expresses technical severity and does not by itself tell you the business risk in your environment.",
+      "question": "Adding CVSS Threat and Environmental metrics, such as exploit maturity and asset importance, moves a base score toward real-world priority.",
       "answer": true,
-      "explanation": "Business risk also depends on exposure, asset value, existing controls and whether exploitation is active. Threat and Environmental metrics help adjust it."
+      "explanation": "A base score is only technical severity. The Threat group reflects the current state of exploitation, and the Environmental group reflects the organization's own assets and controls."
     },
     {
       "id": "tf9012",
@@ -5261,10 +5261,10 @@
       "question": "Which TWO statements about RAID and backups are correct? (Choose two.)",
       "options": [
         "RAID 0 mirrors every disk, so it survives any disk failure",
-        "RAID keeps a system running through certain disk failures but does not protect against deletion or ransomware",
-        "Backups are unnecessary once a RAID array is installed",
+        "RAID tolerates some disk failures but does not protect against deletion or ransomware",
+        "Backups become unnecessary once a RAID array protects the server's disks",
         "A backup should be stored where an attack on the production array cannot reach it",
-        "A RAID 5 array is a replacement for offline backups"
+        "A RAID 5 array is an adequate replacement for offline backups"
       ],
       "correct": [
         1,
@@ -5970,19 +5970,19 @@
       "id": "msq9020",
       "cat": "sscpNetwork",
       "type": "ms",
-      "question": "Which TWO attacks can be mitigated mainly by DNSSEC validation, randomized source ports and restricting recursion? (Choose two.)",
+      "question": "Which TWO controls help protect a resolver against DNS cache poisoning? (Choose two.)",
       "options": [
-        "ARP spoofing on a local switch",
-        "Cross-site scripting in web forms",
-        "SYN floods against web servers",
-        "DNS cache poisoning",
-        "Forged DNS responses that redirect users to attacker servers"
+        "Dynamic ARP inspection on access switches",
+        "Output encoding of domain names in web pages",
+        "SYN cookies on the resolver",
+        "DNSSEC validation of signed records",
+        "Randomized source ports and transaction IDs"
       ],
       "correct": [
         3,
         4
       ],
-      "explanation": "These controls address forged or poisoned DNS data. SYN floods, ARP spoofing and cross-site scripting are different attacks that need different defences."
+      "explanation": "DNSSEC lets the resolver reject forged records, and unpredictable source ports and transaction IDs make it hard to land a blind forged answer. SYN cookies address handshake floods, ARP inspection protects the local layer 2 segment and output encoding addresses cross-site scripting."
     },
     {
       "id": "tf9028",
@@ -6080,15 +6080,15 @@
       "id": "q9084",
       "cat": "sscpSystems",
       "type": "mc",
-      "question": "Within minutes of one unpatched server being turned on, copies of the same program appear on dozens of other unpatched servers with no user action at all. Which malware behaviour is this?",
+      "question": "A worm that exploits an unpatched file-sharing service is spreading between servers in a data center. Which action MOST directly limits the spread?",
       "options": [
-        "Scareware that scares staff into passing on a warning email",
-        "A trojan that needs each user to choose to install it",
-        "Worm propagation through a network service vulnerability",
-        "A macro virus spreading when users open shared documents"
+        "Train staff not to open attachments from unknown senders",
+        "Encrypt the disks of all servers so that the worm cannot read the files",
+        "Patch the vulnerable service and block it between network segments",
+        "Require longer passwords for every administrator account in the data center"
       ],
       "correct": 2,
-      "explanation": "Self-replication across the network by exploiting a vulnerable service, without any user action, is a worm. Macro viruses and trojans rely on users opening or installing something, and scareware spreads through persuasion, not exploitation."
+      "explanation": "A worm spreads by itself through a vulnerable network service, so patching that service and blocking it between segments stops the spread. Longer passwords, disk encryption and attachment training do not address self-propagation through an exposed service."
     },
     {
       "id": "q9085",
@@ -6164,15 +6164,15 @@
       "id": "q9090",
       "cat": "sscpSystems",
       "type": "mc",
-      "question": "A company cannot patch a newly disclosed flaw in an internet-facing application for ten days because the vendor has not released a fix. What is the BEST interim step?",
+      "question": "A critical security patch has been released for software on production servers, and the business can accept only a short maintenance window. Which approach BEST balances speed and safety?",
       "options": [
-        "Tell users to avoid the application unless they feel that it is safe",
-        "Wait for the vendor to release the fix and take no other action meanwhile",
-        "Apply a virtual patch with an intrusion prevention system or web application firewall rule",
-        "Switch off the audit logging so that fewer attack attempts are visible"
+        "Install it only on the servers whose owners ask for it, and skip any check that it worked",
+        "Deploy it to every production server at once without any testing, because the flaw is rated critical",
+        "Test it on a pilot group or staging copy, deploy it in the window with a rollback plan, and verify the result afterwards",
+        "Delay it until the next quarterly maintenance cycle, so that it is bundled with other changes"
       ],
       "correct": 2,
-      "explanation": "A virtual patch blocks the exploit pattern at the network or application edge while the real fix is prepared. Waiting with no action leaves the flaw open, disabling logging hides evidence and relies on users to make a risk decision that technical controls should make."
+      "explanation": "Even an urgent patch is tested on a small group first, deployed in a planned window with a way back, and verified afterwards. Untested mass deployment risks outages, waiting a quarter leaves a critical flaw open, and patching only on request without verification leaves gaps and gives no proof that the fix worked."
     },
     {
       "id": "q9091",
@@ -6220,15 +6220,15 @@
       "id": "q9094",
       "cat": "sscpSystems",
       "type": "mc",
-      "question": "Staff may use personal phones for work. The company wants to protect corporate data but cannot erase employees' personal photos if a device is lost. Which approach BEST fits?",
+      "question": "Device management reports that an employee's personal phone, which has corporate email installed, has been rooted. Which response BEST protects corporate data?",
       "options": [
-        "A full factory reset triggered automatically on every lost phone",
-        "A managed work profile or container with selective wipe of corporate data",
-        "A ban on any email or calendar access from personal phones",
-        "A requirement that staff give the company their personal passcodes"
+        "Allow access as before, because the owner is a trusted employee and the phone is personally owned",
+        "Mark the device non-compliant and block its access to corporate apps until it is restored",
+        "Erase the whole phone at once, including the owner's personal photos and messages",
+        "Rely on the phone's own antivirus app to clean the device and leave access unchanged"
       ],
       "correct": 1,
-      "explanation": "A container separates and encrypts corporate data and lets the company remove only that part. A full reset would destroy personal data, a ban abandons the business need and collecting personal passcodes is intrusive and unnecessary."
+      "explanation": "Root or jailbreak access can bypass the platform protections that keep corporate data separate, so compliance policy treats the device as non-compliant and blocks corporate access until it is fixed. Granting access ignores the risk, a full erase overreaches on a personal device, and an app running on a compromised platform cannot be trusted to clean it."
     },
     {
       "id": "q9095",
@@ -6304,15 +6304,15 @@
       "id": "q9100",
       "cat": "sscpSystems",
       "type": "mc",
-      "question": "The company is notified of a lawsuit and must produce emails stored in a SaaS service in several regions. What should the security team do FIRST?",
+      "question": "The company has issued a legal hold after being notified of a lawsuit. The emails it must produce sit in a SaaS service across several regions. What should the security team do NEXT?",
       "options": [
-        "Delete personal messages first to reduce the volume of data to review",
-        "Wait for the provider's retention policy to delete older mailboxes automatically, so that less data has to be produced",
+        "Ask employees to forward the relevant emails to personal accounts so that they can be collected quickly",
+        "Let the provider's retention policy age out older mailboxes automatically, so that less data has to be produced",
         "Export every mailbox into an unprotected shared folder for the lawyers",
-        "Issue a legal hold that suspends deletion and then identify and preserve the relevant data"
+        "Work with the provider to preserve and export the relevant mailboxes with their metadata, and keep custody records"
       ],
       "correct": 3,
-      "explanation": "A legal hold stops routine deletion so that relevant data is preserved before it is collected and reviewed. Allowing automatic deletion destroys evidence, an unprotected folder breaks custody and confidentiality, and deleting messages before review is spoliation."
+      "explanation": "After the hold, the data must be collected defensibly, which in a multi-region SaaS service needs the provider's help to preserve and export it in usable formats with metadata, with custody documented. Letting retention delete data after a hold is spoliation, and an unprotected folder or personal accounts break custody and confidentiality."
     },
     {
       "id": "q9101",
@@ -6706,15 +6706,15 @@
       "id": "q9114",
       "cat": "sscpAccess",
       "type": "mc",
-      "question": "A hospital grants a doctor access to a patient record only if the doctor is in the treating department, the device is managed and the request is made during a shift. Which model does this describe?",
+      "question": "A file server stores, next to each file, a list naming the users and groups that may read or write it. Which description fits this arrangement?",
       "options": [
-        "Attribute-based access control",
-        "Discretionary access control",
-        "Role-based access control with a single static role",
-        "Mandatory access control based on classification labels alone"
+        "An access control list attached to the object",
+        "A capability held by the subject, listing the objects it may use",
+        "A role assignment that grants rights by job function",
+        "A clearance compared with a sensitivity label"
       ],
       "correct": 0,
-      "explanation": "Decisions made from combined attributes of the user, device, resource and context are attribute-based. Discretionary control lets the owner share, mandatory control uses central labels and clearances, and a single static role cannot express device or time conditions."
+      "explanation": "An access control list is stored with the object and says which subjects may do what with it. A capability is the reverse, a token held by the subject that names the objects it may use. Comparing a clearance with a label is mandatory access control, and a role assignment grants rights through job function rather than a per-object list."
     },
     {
       "id": "q9115",
@@ -6998,9 +6998,9 @@
       "id": "tf9050",
       "cat": "sscpNetwork",
       "type": "tf",
-      "question": "An IDS connected to a span port can detect an attack but cannot block it on its own.",
+      "question": "A network intrusion detection sensor cannot read the content of encrypted traffic unless it is decrypted first or inspected at an endpoint.",
       "answer": true,
-      "explanation": "A passive copy of traffic allows detection and alerting only. Blocking needs an inline device or a response through another control."
+      "explanation": "Encryption hides the payload from a sensor on the wire, so organizations decrypt at a gateway, inspect on the host, or fall back on metadata and behaviour."
     },
     {
       "id": "tf9051",
@@ -7148,9 +7148,9 @@
       "id": "tf9053",
       "cat": "sscpSystems",
       "type": "tf",
-      "question": "A snapshot taken before patching is an acceptable long-term replacement for a tested backup.",
-      "answer": false,
-      "explanation": "Snapshots depend on the original storage and are for short-term rollback. A tested backup is stored independently."
+      "question": "A snapshot taken before patching gives a quick way to roll back, as long as it is deleted once the change is confirmed.",
+      "answer": true,
+      "explanation": "Snapshots suit short-term rollback. Kept for long they slow the guest, may hold memory contents and secrets, and do not replace a tested backup."
     }
   ],
   "lessons": [
@@ -7231,7 +7231,6 @@
         "Compensating control",
         "Configuration baseline",
         "Data classification",
-        "Compensating control",
         "Security impact analysis",
         "DevSecOps",
         "End of life (EOL)",
@@ -7572,7 +7571,7 @@
         "tf9021",
         "q9135"
       ],
-      "reading": "An event is anything observable on a system or network; an incident is an event, or group of events, that actually or potentially harms security or breaks policy. Most alerts are events and never become incidents, so the first skill is triage: judge scope, affected assets, data sensitivity and business impact, then assign a severity that drives urgency and escalation. The accepted lifecycle has six stages. Preparation builds the plan, tools, contacts and trained team before anything happens. Detection and analysis confirm what is occurring. Containment stops the spread. Eradication removes the cause: malware, persistence mechanisms, rogue accounts and the vulnerability that let the attacker in. Recovery returns systems to service from known-good sources and watches for recurrence. Post-incident activity, the lessons-learned review, feeds improvements back into preparation. \n\nContainment decisions are where beginners hurt themselves. The instinct to pull the plug destroys memory contents, running processes and network connections, which are exactly the evidence you need. Isolate the host from the network instead, by switch port, host firewall or endpoint isolation, and keep it powered. During recovery, restoring from a backup taken after the compromise just reinstalls the attacker, so confirm the backup predates the intrusion and that the entry point is closed first.\n\nIf evidence may be needed for HR, regulators or court, forensic discipline matters. Collect in order of volatility: registers and cache, memory, network state and processes, disk, then remote logs and archives. Take a bit-for-bit image of storage through a write blocker, record a cryptographic hash of the original and the copy to show they match, and do all analysis on the copy. Maintain the chain of custody: a written record of who held the evidence, when, where and why, with every transfer signed. A gap does not prove tampering but it gives the other side something to argue. When litigation is reasonably expected, legal counsel issues a legal hold that suspends routine deletion, including log rotation and backup overwrites.\n\nRecovery planning starts with the business impact analysis. Maximum tolerable downtime is how long a function can be out before harm becomes unacceptable. The recovery time objective is the target for restoring service and must be shorter than that limit. The recovery point objective is the most data, measured in time, that you can afford to lose and decides how often you back up or replicate. A hot site is ready within minutes or hours at the highest cost, a warm site has hardware but needs data and configuration restored, and a cold site offers space and power only. Choose the cheapest option that still meets the stated objectives.\n\nBackups come in three common types. Full backups copy everything. Incremental backups copy changes since the last backup of any kind, so they are quick to make, but a restore needs the full backup plus every incremental in order. Differential backups copy changes since the last full backup, so a restore needs just the full backup and the latest differential. Keep at least one copy offline or immutable, because ransomware hunts for backup repositories, and test restores regularly.\n\nThe ISO/IEC 27035 incident process maps to the NIST lifecycle: prepare, detect and report, assess and decide (judge whether an event is an incident and how severe), respond and learn lessons. Preparation covers roles, playbooks, contact lists and training, and communication is planned so that a single designated spokesperson speaks to the press and legal reviews notifications. Document actions with timestamps as they happen, because the record supports recovery, regulators, insurers and the lessons-learned review.\n\nForensics is shaped by the type of proceeding: criminal cases need proof beyond reasonable doubt, civil cases use the preponderance of evidence and administrative or internal cases follow policy and law. First responders secure and record the scene, avoid changing live systems and hand off with notes, triage decides what to collect first by volatility and relevance, and reports separate fact from opinion and state limitations. Internal policy-compliance investigations need authority from HR and legal before anyone reads a mailbox.\n\nContinuity planning uses several plan types: the business continuity plan keeps functions running, the disaster recovery plan restores IT, the occupant emergency plan protects people and an information system contingency plan covers one system, as in NIST SP 800-34. Plan for pandemic and long outages with remote capacity and cross-trained staff, choose interim sites (hot, warm, cold, cloud or reciprocal) from the RTO and RPO, restore dependencies first, and remember that RAID tolerates disk failure but is not a backup. Playbooks and tabletop exercises keep the plan usable.",
+      "reading": "An event is anything observable on a system or network; an incident is an event, or group of events, that actually or potentially harms security or breaks policy. Most alerts are events and never become incidents, so the first skill is triage: judge scope, affected assets, data sensitivity and business impact, then assign a severity that drives urgency and escalation. The accepted lifecycle has six stages. Preparation builds the plan, tools, contacts and trained team before anything happens. Detection and analysis confirm what is occurring. Containment stops the spread. Eradication removes the cause: malware, persistence mechanisms, rogue accounts and the vulnerability that let the attacker in. Recovery returns systems to service from known-good sources and watches for recurrence. Post-incident activity, the lessons-learned review, feeds improvements back into preparation. \n\nContainment decisions are where beginners hurt themselves. The instinct to pull the plug destroys memory contents, running processes and network connections, which are exactly the evidence you need. Isolate the host from the network instead, by switch port, host firewall or endpoint isolation, and keep it powered. During recovery, restoring from a backup taken after the compromise just reinstalls the attacker, so confirm the backup predates the intrusion and that the entry point is closed first.\n\nIf evidence may be needed for HR, regulators or court, forensic discipline matters. Collect in order of volatility: registers and cache, memory (with the processes and network connections it holds), temporary files and swap space, disk, then remote logs and archives. Take a bit-for-bit image of storage through a write blocker, record a cryptographic hash of the original and the copy to show they match, and do all analysis on the copy. Maintain the chain of custody: a written record of who held the evidence, when, where and why, with every transfer signed. A gap does not prove tampering but it gives the other side something to argue. When litigation is reasonably expected, legal counsel issues a legal hold that suspends routine deletion, including log rotation and backup overwrites.\n\nRecovery planning starts with the business impact analysis. Maximum tolerable downtime is how long a function can be out before harm becomes unacceptable. The recovery time objective is the target for restoring service and must be shorter than that limit. The recovery point objective is the most data, measured in time, that you can afford to lose and decides how often you back up or replicate. A hot site is ready within minutes or hours at the highest cost, a warm site has hardware but needs data and configuration restored, and a cold site offers space and power only. Choose the cheapest option that still meets the stated objectives.\n\nBackups come in three common types. Full backups copy everything. Incremental backups copy changes since the last backup of any kind, so they are quick to make, but a restore needs the full backup plus every incremental in order. Differential backups copy changes since the last full backup, so a restore needs just the full backup and the latest differential. Keep at least one copy offline or immutable, because ransomware hunts for backup repositories, and test restores regularly.\n\nThe ISO/IEC 27035 incident process maps to the NIST lifecycle: prepare, detect and report, assess and decide (judge whether an event is an incident and how severe), respond and learn lessons. Preparation covers roles, playbooks, contact lists and training, and communication is planned so that a single designated spokesperson speaks to the press and legal reviews notifications. Document actions with timestamps as they happen, because the record supports recovery, regulators, insurers and the lessons-learned review.\n\nForensics is shaped by the type of proceeding: criminal cases need proof beyond reasonable doubt, civil cases use the preponderance of evidence and administrative or internal cases follow policy and law. First responders secure and record the scene, avoid changing live systems and hand off with notes, triage decides what to collect first by volatility and relevance, and reports separate fact from opinion and state limitations. Internal policy-compliance investigations need authority from HR and legal before anyone reads a mailbox.\n\nContinuity planning uses several plan types: the business continuity plan keeps functions running, the disaster recovery plan restores IT, the occupant emergency plan protects people and an information system contingency plan covers one system, as in NIST SP 800-34. Plan for pandemic and long outages with remote capacity and cross-trained staff, choose interim sites (hot, warm, cold, cloud or reciprocal) from the RTO and RPO, restore dependencies first, and remember that RAID tolerates disk failure but is not a backup. Playbooks and tabletop exercises keep the plan usable.",
       "fundamentalsLabel": "New to incident response? See the everyday analogy",
       "fundamentals": "Think of how a good crew handles a kitchen fire. Training and extinguishers in the right places are preparation. Noticing smoke and working out whether it is the toaster or the fryer is detection and analysis. Shutting the door and cutting the gas stops the spread, which is containment, and you do not throw out the burned pan until the investigator has photographed it. Eradication is removing whatever caused the fire, recovery is rebuilding the kitchen and reopening, and the review afterwards asks why the alarm was slow. The restaurant's insurance paperwork, showing who touched what and when, is the chain of custody.",
       "keyTerms": [
@@ -7809,7 +7808,7 @@
         "tf9050",
         "q9138"
       ],
-      "reading": "Start with the model. The seven-layer OSI model separates a network into physical signalling, data link (switches, MAC addresses, VLANs), network (routers, IP addresses), transport (TCP and UDP ports), session, presentation and application. The TCP/IP model groups these into four layers. Knowing where something sits tells you how to defend it: a switch-level attack such as ARP spoofing needs switch controls, a routing question belongs at layer 3, and a port or connection-state issue lives at layer 4. TCP is connection-oriented and reliable, built on a three-way handshake that SYN floods exploit by leaving connections half open, while UDP is connectionless, which makes spoofing and amplification attacks easier. \n\nFirewalls are the main traffic cops. A packet filter checks headers against rules, a stateful firewall tracks connections so replies are allowed automatically, and an application-layer or next-generation firewall inspects content and identifies applications and users. Rules are evaluated from the top and the first match wins, so specific rules go before general ones and the list ends in an explicit deny all. Firewalls work best with segmentation. A demilitarized zone holds internet-facing servers so that a compromised web server does not sit next to the database. VLANs separate broadcast domains but are not themselves a firewall: traffic between them must still be filtered. Microsegmentation applies the same idea to individual workloads, which matters when most traffic is server to server and never crosses a perimeter. Segmentation is the practical answer to lateral movement and ransomware spread.\n\nAdmission and identity come next. IEEE 802.1X is port-based network access control: a device authenticates through the switch or access point to a RADIUS server before the port passes traffic, which stops an unknown laptop gaining access by plugging into a wall socket. Wireless security has moved from WEP, which is broken, through WPA2 with AES to WPA3, which resists offline password guessing. Enterprise modes authenticate each person with 802.1X so access can be revoked individually. \n\nRemote connections use VPNs. A site-to-site tunnel joins two networks between gateways, usually IPsec in tunnel mode with ESP, which provides encryption and integrity; the Authentication Header authenticates but does not encrypt. A remote-access VPN joins one client, and split tunnelling sends only corporate traffic through it, trading load for exposure to a hostile local network. A modern alternative is Zero Trust Network Access, which grants per-application access after checking user and device instead of putting the user on the whole network. Administrators should reach devices through SSH, from a hardened jump host on a management network, with AAA through TACACS+ or RADIUS.\n\nAttacks to recognize include denial of service, where distributed attacks use many sources and reflection abuses third parties, defended by rate limiting, SYN cookies and upstream scrubbing; man-in-the-middle and ARP spoofing, defended by dynamic ARP inspection, DHCP snooping and end-to-end encryption; and DNS abuse, including cache poisoning and tunnelling, where DNSSEC signs records but does not encrypt them.\n\nNetworking fundamentals include topologies (a star depends on its central switch, and a full mesh of n nodes needs n(n-1)/2 links), client-server versus peer-to-peer designs, copper, fiber and wireless media, subnet arithmetic (a /24 has 254 usable hosts and a /26 has 62) and the well-known ports. Software-defined networking separates the control plane from the data plane and puts a controller in charge, which makes the controller the high-value target. SD-WAN steers traffic over several links with central policy, and automation applies mistakes everywhere quickly, so templates are versioned and tested.\n\nAttack and defence pairs include DNS cache poisoning (DNSSEC, randomized ports, restricted recursion), reflection and amplification (ingress and egress filtering, closed resolvers) and DDoS (content delivery networks and upstream scrubbing). Management is protected on its own plane, ideally out of band through a hardened jump host. Appliances and services have specific jobs: web application firewalls inspect HTTP and can virtually patch, reverse proxies front servers, load balancers add availability, quality of service shapes traffic, data loss prevention inspects content, network access control checks devices, unified threat management bundles functions for small sites, and micro-segmentation limits lateral movement between workloads.\n\nWireless and IoT are tested on specifics. WPA3 uses Simultaneous Authentication of Equals, EAP-TLS is the strongest method for enterprise Wi-Fi, WEP and TKIP are broken, Bluetooth attacks include bluejacking, bluesnarfing and bluebugging, NFC works over a few centimetres and cellular encryption stops at the carrier. IoT devices are isolated on their own segment, given unique credentials, updated while support lasts and replaced at end of life.",
+      "reading": "Start with the model. The seven-layer OSI model separates a network into physical signalling, data link (switches, MAC addresses, VLANs), network (routers, IP addresses), transport (TCP and UDP ports), session, presentation and application. The TCP/IP model groups these into four layers. Knowing where something sits tells you how to defend it: a switch-level attack such as ARP spoofing needs switch controls, a routing question belongs at layer 3, and a port or connection-state issue lives at layer 4. TCP is connection-oriented and reliable, built on a three-way handshake that SYN floods exploit by leaving connections half open, while UDP is connectionless, which makes spoofing and amplification attacks easier. \n\nFirewalls are the main traffic cops. A packet filter checks headers against rules, a stateful firewall tracks connections so replies are allowed automatically, and an application-layer or next-generation firewall inspects content and identifies applications and users. Rules are evaluated from the top and the first match wins, so specific rules go before general ones and the list ends in an explicit deny all. Firewalls work best with segmentation. A demilitarized zone holds internet-facing servers so that a compromised web server does not sit next to the database. VLANs separate broadcast domains but are not themselves a firewall: traffic between them must still be filtered. Microsegmentation applies the same idea to individual workloads, which matters when most traffic is server to server (east-west) and never crosses the perimeter (north-south). Segmentation is the practical answer to lateral movement and ransomware spread.\n\nAdmission and identity come next. IEEE 802.1X is port-based network access control: a device authenticates through the switch or access point to a RADIUS server before the port passes traffic, which stops an unknown laptop gaining access by plugging into a wall socket. Wireless security has moved from WEP, which is broken, through WPA2 with AES to WPA3, which resists offline password guessing. Enterprise modes authenticate each person with 802.1X so access can be revoked individually. \n\nRemote connections use VPNs. A site-to-site tunnel joins two networks between gateways, usually IPsec in tunnel mode with ESP, which provides encryption and integrity; the Authentication Header authenticates but does not encrypt. A remote-access VPN joins one client, and split tunnelling sends only corporate traffic through it, trading load for exposure to a hostile local network. A modern alternative is Zero Trust Network Access, which grants per-application access after checking user and device instead of putting the user on the whole network. Administrators should reach devices through SSH, from a hardened jump host on a management network, with AAA through TACACS+ or RADIUS.\n\nAttacks to recognize include denial of service, where distributed attacks use many sources and reflection abuses third parties, defended by rate limiting, SYN cookies and upstream scrubbing; man-in-the-middle and ARP spoofing, defended by dynamic ARP inspection, DHCP snooping and end-to-end encryption; and DNS abuse, including cache poisoning and tunnelling, where DNSSEC signs records but does not encrypt them.\n\nNetworking fundamentals include topologies (a star depends on its central switch, and a full mesh of n nodes needs n(n-1)/2 links), client-server versus peer-to-peer designs, copper, fiber and wireless media, subnet arithmetic (a /24 has 254 usable hosts and a /26 has 62) and the well-known ports. Software-defined networking separates the control plane from the data plane and puts a controller in charge, which makes the controller the high-value target. SD-WAN steers traffic over several links with central policy, and automation applies mistakes everywhere quickly, so templates are versioned and tested.\n\nAttack and defence pairs include DNS cache poisoning (DNSSEC, randomized ports, restricted recursion), reflection and amplification (ingress and egress filtering, closed resolvers) and DDoS (content delivery networks and upstream scrubbing). Management is protected on its own plane, ideally out of band through a hardened jump host. Appliances and services have specific jobs: web application firewalls inspect HTTP and can virtually patch, reverse proxies front servers, load balancers add availability, quality of service shapes traffic, data loss prevention inspects content, network access control checks devices, unified threat management bundles functions for small sites, and micro-segmentation limits lateral movement between workloads.\n\nWireless and IoT are tested on specifics. WPA3 uses Simultaneous Authentication of Equals, EAP-TLS is the strongest method for enterprise Wi-Fi, WEP and TKIP are broken, Bluetooth attacks include bluejacking, bluesnarfing and bluebugging, NFC works over a few centimetres and cellular encryption stops at the carrier. IoT devices are isolated on their own segment, given unique credentials, updated while support lasts and replaced at end of life.",
       "fundamentalsLabel": "New to network security? See the everyday analogy",
       "fundamentals": "Picture an office building. The street door with a guard is the perimeter firewall, and the visitor lobby is the DMZ where the public may wait but cannot wander upstairs. Internal doors that need a badge are VLANs and internal firewall rules: just because you are inside does not mean you can open the server room. The badge reader that checks who you are before the lift moves is 802.1X. An armoured van between two company buildings is a site-to-site VPN, and an executive carrying a locked briefcase through the airport is a remote-access VPN. A fake reception desk across the road that looks exactly like yours is an evil twin.",
       "keyTerms": [
@@ -7839,7 +7838,7 @@
         "AH authenticates but does not encrypt. ESP provides confidentiality and integrity, and tunnel mode is the usual choice between gateways.",
         "A span port copy cannot block traffic; only an inline device can prevent, and its fail mode matters.",
         "DNSSEC proves records are authentic but does not encrypt queries. Use DNS over TLS or HTTPS for privacy.",
-        "A span port gives a passive copy of traffic, so an IPS there can alert but not block.",
+        "Micro-segmentation controls east-west traffic between workloads, which a perimeter firewall never sees; north-south traffic is what crosses the perimeter.",
         "A full mesh grows as n(n-1)/2 links, which is why it is used only for small, critical sets of nodes."
       ],
       "scenario": "A company hosts a public web server, an email relay and an internal database. The engineer places the web and mail servers in a DMZ with firewall rules allowing only the specific ports and destinations required, and keeps the database in an internal VLAN that only the application tier can reach. Switch ports require 802.1X, wireless uses WPA3 Enterprise, and remote staff use ZTNA for the two internal web applications they need. Logs and flow records from the firewalls and switches go to the SIEM.",
@@ -7955,7 +7954,7 @@
         "tf9052",
         "tf9053"
       ],
-      "reading": "Malicious code is classified by how it spreads and what it does. A virus attaches to a host file and needs a user action to spread, a worm spreads by itself across networks, a trojan pretends to be legitimate software, ransomware locks or encrypts data for payment, a rootkit hides itself deep in the system and spyware gathers information quietly. Modern attackers increasingly avoid files completely. Fileless and living-off-the-land attacks run in memory and abuse legitimate tools such as PowerShell, so signature antivirus sees nothing, and defenders rely on behavior monitoring, script logging and endpoint detection and response. The most common way in remains social engineering: phishing, spear phishing, whaling, vishing and pretexting, countered by email filtering, MFA, authentication of mail domains with SPF, DKIM and DMARC, and a reporting channel staff actually use.\n\nHardening reduces the attack surface. Start from a baseline such as a CIS Benchmark, remove software and services you do not need, close ports, disable default accounts, enable host firewalls and logging, and enforce disk encryption and secure boot. Patch management is the repeatable process of identifying, testing, deploying and verifying updates, with exceptions tracked and compensating controls for systems that cannot be patched. Application allowlisting, which permits only approved executables, is stronger than blocklisting for stable systems because it blocks the unknown by default. Endpoint detection and response adds visibility and remote containment, such as isolating a host, which ordinary antivirus lacks. For mobile devices, use device management with encryption, a work container and selective wipe, and keep Internet of Things devices on their own network segment.\n\n\n\nVirtualization and cloud shift responsibility rather than removing it. A Type 1 hypervisor runs on hardware, a Type 2 hypervisor runs on a host operating system, and a compromise of the hypervisor affects every guest, so patch it and keep its management interface on an isolated network. Watch for VM sprawl, which is unmanaged and unpatched machines accumulating, and for VM escape, which is rare but severe. Containers share the host kernel, so run them as non-root from minimal, scanned images and never bake secrets into images. In the cloud, the shared responsibility model says the provider secures the cloud itself and the customer secures what it puts in the cloud. In infrastructure as a service the customer patches the guest operating system. In software as a service the provider manages almost the whole stack. In every model the customer owns its data, identities and configuration, and most cloud breaches come from misconfiguration such as publicly readable storage. \n\nApplications are the last layer. Build security into the whole development lifecycle: requirements, threat modelling in design, secure coding, automated static and dynamic testing, and controlled release. The OWASP Top Ten is a useful checklist of common web flaws. SQL injection is prevented with parameterized queries, cross-site scripting with output encoding and a content security policy, and cross-site request forgery with anti-forgery tokens.\n\nThe outline names specific malicious code and activity. A rootkit hides itself by tampering with the operating system and is found from outside the running system, spyware steals information quietly and scareware frightens users with fake warnings. Trojans hide a harmful function, backdoors and trapdoors bypass authentication, logic bombs wait for a condition and worms spread on their own. Application, operating system and mobile-code vulnerabilities (buffer overflows, race conditions, injection) are reduced by secure coding, patching and sandboxing. Zero-day exploits have no patch, so layered defences and virtual patching matter, and insiders, data theft, botnets, drive-by downloads and watering holes are countered by training, hardening, patching, isolation and data loss prevention.\n\nOn the endpoint, a host-based intrusion detection system alerts and a host-based intrusion prevention system can block, a host firewall protects the device off the corporate network, and endpoint encryption works with a TPM while an HSM protects shared server and CA keys. Secure browsing means validated certificates, patched browsers and controlled extensions. Mobile provisioning runs from BYOD to COPE to COBO in order of control, containers separate corporate data and allow selective wipe, and mobile application management controls just the apps. EDR records telemetry and lets responders isolate a host, XDR widens the data and threat hunting looks proactively for what alerts missed. Behaviour analytics, including machine learning, flags deviations from a baseline but needs tuning and review.\n\nCloud and virtual environments add legal and contractual points. Know the deployment models (public, private, hybrid, community), the service models, the virtual private cloud and who is responsible for what. Privacy, surveillance, data ownership, jurisdiction, eDiscovery and shadow IT are legal concerns, and outsourcing contracts cover service levels, portability and exit, privacy, destruction and audit rights. In virtual environments, patch the hypervisor and isolate its management network, treat virtual appliances like any server, remember that snapshots are not backups, protect storage and deduplicating backup appliances with immutability, and guard against VM escape, hyperjacking, sprawl and brute-force attacks.",
+      "reading": "Malicious code is classified by how it spreads and what it does. A virus attaches to a host file and needs a user action to spread, a worm spreads by itself across networks, a trojan pretends to be legitimate software, ransomware locks or encrypts data for payment, a rootkit hides itself deep in the system and spyware gathers information quietly. Modern attackers increasingly avoid files completely. Fileless and living-off-the-land attacks run in memory and abuse legitimate tools such as PowerShell, so signature antivirus sees nothing, and defenders rely on behavior monitoring, script logging and endpoint detection and response. The most common way in remains social engineering: phishing, spear phishing, whaling, vishing and pretexting, countered by email filtering, MFA, authentication of mail domains with SPF, DKIM and DMARC, and a reporting channel staff actually use.\n\nHardening reduces the attack surface. Start from a baseline such as a CIS Benchmark, remove software and services you do not need, close ports, disable default accounts, enable host firewalls and logging, and enforce disk encryption and secure boot. Patch management is the repeatable process of identifying, testing, deploying and verifying updates, with exceptions tracked and compensating controls for systems that cannot be patched. Application allowlisting, which permits only approved executables, is stronger than blocklisting for stable systems because it blocks the unknown by default. Endpoint detection and response adds visibility and remote containment, such as isolating a host, which ordinary antivirus lacks. For mobile devices, use device management with encryption, a work container and selective wipe, and keep Internet of Things devices on their own network segment.\n\nVirtualization and cloud shift responsibility rather than removing it. A Type 1 hypervisor runs on hardware, a Type 2 hypervisor runs on a host operating system, and a compromise of the hypervisor affects every guest, so patch it and keep its management interface on an isolated network. Watch for VM sprawl, which is unmanaged and unpatched machines accumulating, and for VM escape, which is rare but severe. Containers share the host kernel, so run them as non-root from minimal, scanned images and never bake secrets into images. In the cloud, the shared responsibility model says the provider secures the cloud itself and the customer secures what it puts in the cloud. In infrastructure as a service the customer patches the guest operating system. In software as a service the provider manages almost the whole stack. In every model the customer owns its data, identities and configuration, and most cloud breaches come from misconfiguration such as publicly readable storage. \n\nApplications are the last layer. Build security into the whole development lifecycle: requirements, threat modelling in design, secure coding, automated static and dynamic testing, and controlled release. The OWASP Top Ten is a useful checklist of common web flaws. SQL injection is prevented with parameterized queries, cross-site scripting with output encoding and a content security policy, and cross-site request forgery with anti-forgery tokens.\n\nThe outline names specific malicious code and activity. A rootkit hides itself by tampering with the operating system and is found from outside the running system, spyware steals information quietly and scareware frightens users with fake warnings. Trojans hide a harmful function, backdoors and trapdoors bypass authentication, logic bombs wait for a condition and worms spread on their own. Application, operating system and mobile-code vulnerabilities (buffer overflows, race conditions, injection) are reduced by secure coding, patching and sandboxing. Zero-day exploits have no patch, so layered defences and virtual patching matter, and insiders, data theft, botnets, drive-by downloads and watering holes are countered by training, hardening, patching, isolation and data loss prevention.\n\nOn the endpoint, a host-based intrusion detection system alerts and a host-based intrusion prevention system can block, a host firewall protects the device off the corporate network, and endpoint encryption works with a TPM while an HSM protects shared server and CA keys. Secure browsing means validated certificates, patched browsers and controlled extensions. Mobile provisioning runs from BYOD to COPE to COBO in order of control, containers separate corporate data and allow selective wipe, and mobile application management controls just the apps. EDR records telemetry and lets responders isolate a host, XDR widens the data and threat hunting looks proactively for what alerts missed. Behaviour analytics, including machine learning, flags deviations from a baseline but needs tuning and review.\n\nCloud and virtual environments add legal and contractual points. Know the deployment models (public, private, hybrid, community), the service models, the virtual private cloud and who is responsible for what. Privacy, surveillance, data ownership, jurisdiction, eDiscovery and shadow IT are legal concerns, and outsourcing contracts cover service levels, portability and exit, privacy, destruction and audit rights. In virtual environments, patch the hypervisor and isolate its management network, treat virtual appliances like any server, remember that snapshots are not backups, protect storage and deduplicating backup appliances with immutability, and guard against VM escape, hyperjacking, sprawl and brute-force attacks.",
       "fundamentalsLabel": "New to systems security? See the everyday analogy",
       "fundamentals": "Imagine running a block of rented flats. Hardening is fitting every flat with the same decent locks, taking out the unused back doors and fixing the broken window latches. Patching is doing the maintenance round when the manufacturer announces a faulty lock. An allowlist is a doorman with a guest list rather than a list of known burglars. Moving to the cloud is like renting space in someone else's building: the landlord keeps the lifts and the roof safe, but you must still lock your own flat and not leave the door propped open, which is where most break-ins actually happen.",
       "keyTerms": [
@@ -8039,7 +8038,7 @@
       "points": [
         "Lifecycle: preparation, detection and analysis, containment, eradication, recovery, post-incident (lessons learned). Event is observable; incident violates or threatens security.",
         "Contain by isolating, not powering off, so memory survives. Do not restore a backup taken after the compromise. Fix the root cause before returning to service.",
-        "Forensics: order of volatility (registers and cache, RAM, network state, disk, remote logs and archives). Hash-verified bit-for-bit image, write blocker, analyze the copy, chain of custody always.",
+        "Forensics: order of volatility (registers and cache, RAM with its processes and network state, temporary files and swap, disk, remote logs and archives). Hash-verified bit-for-bit image, write blocker, analyze the copy, chain of custody always.",
         "Legal hold suspends deletion when litigation is reasonably expected. Only designated spokespeople communicate externally; legal reviews notifications.",
         "RTO must be less than MTD; RPO sets backup or replication frequency. Hot site fast and costly, warm needs data restore, cold takes days.",
         "Backups: full; incremental needs full plus every incremental; differential needs full plus latest differential. Keep offline or immutable copies and test restores.",
@@ -8295,7 +8294,7 @@
           "options": [
             "intrusion detection system",
             "intrusion prevention system",
-            "proxy server"
+            "application proxy"
           ],
           "correct": 0
         },
@@ -8304,7 +8303,7 @@
           "options": [
             "intrusion detection system",
             "intrusion prevention system",
-            "network tap"
+            "inline network tap"
           ],
           "correct": 1
         },
@@ -8412,12 +8411,12 @@
       "prompt": "Order the evidence to collect from a live compromised host, from MOST volatile to LEAST volatile.",
       "steps": [
         "CPU registers and cache",
-        "Contents of memory (RAM) and running processes",
-        "Network connections and routing state",
+        "Contents of memory (RAM), including running processes and network connections",
+        "Temporary files and swap space",
         "Contents of the disk",
         "Remote logs and archival backups"
       ],
-      "explanation": "Evidence is collected in order of volatility because the most fleeting data disappears first. Registers and cache change by the instant, memory and process data vanish at power-off, network state is transient, disk contents persist, and remote logs and archives last longest."
+      "explanation": "Evidence is collected in order of volatility because the most fleeting data disappears first. Registers and cache change by the instant, memory (with the process list and connection tables it holds) vanishes at power-off, temporary files and swap space are rewritten or cleared quickly, disk contents persist, and remote logs and archives last longest."
     },
     {
       "id": "seq-sscp-3",
@@ -8461,16 +8460,17 @@
     {
       "id": "seq-sscp-9001",
       "cat": "sscpRisk",
-      "prompt": "Put the main steps of one cycle of vulnerability management in order.",
+      "prompt": "Put the seven steps of the NIST Risk Management Framework in order.",
       "steps": [
-        "Maintain an inventory of assets so that scans cover everything that matters",
-        "Scan or assess the assets and collect findings",
-        "Analyze and prioritize findings by severity, exploit evidence and asset value",
-        "Remediate by patching, reconfiguring or applying a compensating control",
-        "Verify the fix with a rescan or test",
-        "Report results and feed lessons back into the next cycle"
+        "Prepare: set the context and priorities for managing security and privacy risk",
+        "Categorize the system and its information by impact",
+        "Select a baseline of controls and tailor it",
+        "Implement the controls and document how they are deployed",
+        "Assess whether the controls are in place and working as intended",
+        "Authorize: a senior official accepts the risk of operating the system",
+        "Monitor the system and its controls continuously and report changes"
       ],
-      "explanation": "You cannot scan what you do not know about, findings must be analysed before work is assigned, fixes are verified so that nothing is closed on assumption, and reporting closes the loop before the cycle repeats."
+      "explanation": "Preparation sets the context, and the system is categorized by impact because that drives which controls are selected. The controls are implemented and assessed before a senior official authorizes operation, and monitoring continues for as long as the system runs."
     }
   ],
   "caseStudies": [
