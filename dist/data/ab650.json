@@ -62,16 +62,16 @@
     {
       "id": "f4",
       "cat": "tenantConfig",
-      "front": "Granular Delegated Admin Privileges (GDAP) vs. classic Delegated Admin Privileges (DAP)",
-      "back": "GDAP lets a Cloud Solution Provider (CSP) partner be granted only the specific, time-bound Microsoft Entra roles it needs to support a customer tenant, following least-privilege principles. Classic DAP granted the partner broad Admin Agent access (effectively Global Administrator) across the whole tenant with no expiration.",
-      "detail": "Microsoft deprecated DAP in favor of GDAP (partners could no longer manage DAP relationships from late 2023) specifically because DAP's all-or-nothing, non-expiring access violated least-privilege administration."
+      "front": "Granular Delegated Admin Privileges (GDAP)",
+      "back": "GDAP lets a Cloud Solution Provider (CSP) partner be granted only the specific, time-bound Microsoft Entra roles it needs to support a customer tenant, following least-privilege principles. It replaced the older partner-access model, which gave the partner broad Admin Agent access (effectively Global Administrator) across the whole tenant with no expiration.",
+      "detail": "Microsoft deprecated classic Delegated Admin Privileges (DAP) in favor of GDAP and began transitioning and removing DAP relationships in 2023, specifically because DAP's all-or-nothing, non-expiring access violated least-privilege administration."
     },
     {
       "id": "f5",
       "cat": "tenantConfig",
       "front": "Microsoft 365 Apps update channels: Current, Monthly Enterprise, Semi-Annual Enterprise",
-      "back": "Current Channel delivers new features to users as soon as they are ready (roughly monthly, with feature updates arriving unpredictably). Monthly Enterprise Channel delivers the same features but bundled once a month on a predictable, fixed release date. Semi-Annual Enterprise Channel delivers feature updates only twice a year, for organizations that need the most validation time before rollout.",
-      "detail": "Microsoft recommends Monthly Enterprise Channel when you want features every month but need to know the release date in advance (the second Tuesday), and reserves Semi-Annual Enterprise Channel for select devices that need extensive testing before new features arrive."
+      "back": "Current Channel delivers new features to users as soon as they are ready (roughly monthly, with feature updates arriving unpredictably). Monthly Enterprise Channel delivers the same features but bundled once a month on a predictable, fixed release date, the second Tuesday. Semi-Annual Enterprise Channel, meant for devices that need extensive testing, used to receive feature updates only twice a year (January and July); since Version 2606 (July 2026) it is unified with Monthly Enterprise Channel, so those devices get the same monthly feature and security updates.",
+      "detail": "Microsoft recommends Monthly Enterprise Channel when you want features every month but need to know the release date in advance (the second Tuesday). Semi-Annual Enterprise Channel was the choice for select devices that needed extensive testing; after the Version 2606 unification, devices still configured for it show as Monthly Enterprise Channel in the Office apps."
     },
     {
       "id": "f6",
@@ -189,7 +189,7 @@
       "id": "f22",
       "cat": "governSecure",
       "front": "Microsoft Secure Score",
-      "back": "Secure Score is a measurement of an organization's security posture, expressed as a numeric score, based on completed security actions (like enabling MFA or turning on a Conditional Access policy) weighed against recommended improvement actions across identity, devices, apps, and data.",
+      "back": "A measurement of an organization's security posture, expressed as a numeric score, based on completed security actions (like enabling MFA or turning on a Conditional Access policy) weighed against recommended improvement actions across identity, devices, apps, and data.",
       "detail": "Secure Score recommendations link directly to the admin console page needed to implement them, and the score updates automatically as configuration changes are detected, rather than needing a manual re-scan trigger."
     },
     {
@@ -238,7 +238,7 @@
       "id": "f29",
       "cat": "aiServices",
       "front": "Data Security Posture Management for AI (DSPM for AI)",
-      "back": "DSPM for AI, in Microsoft Purview (now the classic version, succeeded by the current Data Security Posture Management experience with AI observability), gives admins visibility into how users are interacting with AI apps (like Microsoft 365 Copilot and other generative AI tools), surfaces oversharing and sensitive-data risks, and recommends or auto-applies policies (DLP, sensitivity labels) tailored to AI usage.",
+      "back": "A Microsoft Purview experience (now the classic version, succeeded by the current unified data security experience with AI observability) that gives admins visibility into how users are interacting with AI apps (like Microsoft 365 Copilot and other generative AI tools), surfaces oversharing and sensitive-data risks, and recommends or auto-applies policies (DLP, sensitivity labels) tailored to AI usage.",
       "detail": "DSPM for AI is specifically built to close the gap where an org already had DLP and labeling, but had no visibility into how those controls interact with prompts, grounding data, and generated responses in AI tools."
     },
     {
@@ -272,15 +272,15 @@
     {
       "id": "f34",
       "cat": "aiServices",
-      "front": "Microsoft Security Copilot and Security Compute Units (SCUs)",
-      "back": "Microsoft Security Copilot is a standalone generative AI assistant for security teams (distinct from Microsoft 365 Copilot) that integrates with Defender, Entra, Purview, and Intune to help summarize incidents, investigate threats, and generate scripts or reports. It is billed on a consumption basis using Security Compute Units (SCUs), which are provisioned capacity rather than a per-user license; Microsoft 365 E5 now also includes a monthly SCU allotment scaled to the number of E5 users.",
+      "front": "Microsoft Security Copilot",
+      "back": "Microsoft Security Copilot is a standalone generative AI assistant for security teams (distinct from Microsoft 365 Copilot) that integrates with Defender, Entra, Purview, and Intune to help summarize incidents, investigate threats, and generate scripts or reports. It is billed on a consumption basis using Security Compute Units (SCUs), which are provisioned capacity rather than a per-user license; Microsoft 365 E5 and E7 also include a monthly SCU allotment (400 SCUs per 1,000 user licenses, up to 10,000) at no extra cost.",
       "detail": "Because Security Copilot uses SCU-based consumption pricing rather than per-user licensing, capacity can be provisioned and scaled up or down independently of how many named users are assigned to it."
     },
     {
       "id": "f35",
       "cat": "aiServices",
-      "front": "Microsoft Graph connectors for Copilot grounding",
-      "back": "Microsoft Graph connectors (now branded Microsoft 365 Copilot connectors) index content from external and third-party data sources (like a wiki, a ticketing system, or a file share outside Microsoft 365) into Microsoft Search and the Semantic Index, so Copilot can ground its answers in that external content too, subject to the same permission-trimming as native content.",
+      "front": "Copilot connectors (formerly Microsoft Graph connectors)",
+      "back": "Connectors that index content from external and third-party data sources (like a wiki, a ticketing system, or a file share outside Microsoft 365) into Microsoft Search and the Semantic Index, so Copilot can ground its answers in that external content too, subject to the same permission-trimming as native content. They were previously called Microsoft Graph connectors.",
       "detail": "A connector's permission mapping to the source system's own access control list is what preserves the \"no new access\" guarantee when grounding Copilot on non-Microsoft-365 content \u2014 a misconfigured connector that maps permissions incorrectly is a real oversharing risk."
     },
     {
@@ -343,14 +343,14 @@
       "id": "f44",
       "cat": "governSecure",
       "front": "Priority accounts",
-      "back": "Priority accounts are a Microsoft Defender for Office 365 feature: an admin tags specific users (executives, VIPs) with the Priority account tag, and Defender applies extra protection heuristics and shows the tag in reports, Threat Explorer, and campaign views so these frequently targeted mailboxes are easy to watch.",
+      "back": "Priority accounts are a Microsoft Defender for Office 365 feature: an admin tags specific users (executives, VIPs) with a special tag, and Defender applies extra protection heuristics and shows the tag in reports, Threat Explorer, and campaign views so these frequently targeted mailboxes are easy to watch.",
       "detail": "Flagging an account as priority doesn't grant it any extra license or permission \u2014 it only adds visibility and protection tuning in Defender for Office 365. Insider Risk Management has its own, separate priority user groups feature."
     },
     {
       "id": "f45",
       "cat": "governSecure",
       "front": "Auto-labeling for sensitivity labels",
-      "back": "Service-side auto-labeling policies scan content in Exchange, SharePoint, and OneDrive for matching sensitive information types (like credit card numbers) and apply a sensitivity label automatically, instead of relying on everyone to label content by hand. (Recommending a label to the user is a separate, client-side auto-labeling option in Office apps.)",
+      "back": "Policies that run in the service (not on the client) scan content in Exchange, SharePoint, and OneDrive for matching sensitive information types (like credit card numbers) and apply a sensitivity label automatically, instead of relying on everyone to label content by hand. (Recommending a label to the user is a separate, client-side option in Office apps.)",
       "detail": "Policies are tested in simulation mode first, and applying a label across existing SharePoint and OneDrive content is not instant; confirming which files actually picked up a label is a job for Content explorer, not the auto-labeling policy's own configuration screen."
     },
     {
@@ -419,7 +419,7 @@
     {
       "id": "f55",
       "cat": "governSecure",
-      "front": "Adaptive scopes in Microsoft Purview",
+      "front": "Adaptive scopes (Microsoft Purview)",
       "back": "Adaptive scopes dynamically include users, groups, or sites in a retention policy (and in other Purview solutions, such as DLP for SharePoint sites and Insider Risk Management) based on attribute-based queries (like department = Finance) rather than a fixed, manually maintained list, so the policy's coverage recalculates automatically as attributes or group membership change.",
       "detail": "Adaptive scopes are only as accurate as the underlying attributes \u2014 a stale or incorrect department value in Microsoft Entra ID silently changes who a policy protects, since the scope is recalculated from that attribute rather than from a list an admin explicitly reviews."
     },
@@ -462,7 +462,7 @@
       "id": "f61",
       "cat": "aiServices",
       "front": "Governing Copilot extensibility: plugins and published agents",
-      "back": "Admins control which third-party plugins, Graph connectors, and published Copilot agents are available tenant-wide through the agent management settings of the Copilot Control System in the Microsoft 365 admin center (the Agents area of the admin center, which replaced Integrated apps), letting them allow, block, or scope specific extensions to designated groups instead of leaving extensibility ungoverned.",
+      "back": "Admins control which third-party plugins, Copilot connectors, and published Copilot agents are available tenant-wide through the agent management settings of the Copilot Control System in the Microsoft 365 admin center (the Agents area of the admin center), letting them allow, block, or scope specific extensions to designated groups instead of leaving extensibility ungoverned.",
       "detail": "Publishing a custom agent in Copilot Studio does not by itself make it available tenant-wide \u2014 an admin's approval and deployment settings in agent management are often what actually gate whether other users can find and use it, not the act of publishing."
     },
     {
@@ -559,7 +559,7 @@
     {
       "id": "f75",
       "cat": "governSecure",
-      "front": "Preservation Lock on a retention policy",
+      "front": "Preservation Lock (retention policy)",
       "back": "Preservation Lock on a Microsoft Purview retention policy prevents anyone, including a Global Administrator, from turning the policy off, deleting it or shortening its retention period once locked (it can only be extended or have locations added), guaranteeing a regulatory retention commitment can't quietly be weakened later.",
       "detail": "Without Preservation Lock, an ordinary retention policy can still be edited or disabled by an administrator at any time \u2014 this feature exists specifically to close that gap for regulatory retention commitments."
     },
@@ -587,7 +587,7 @@
     {
       "id": "f79",
       "cat": "aiServices",
-      "front": "Cross-prompt injection and content safety protections for Copilot",
+      "front": "Cross-prompt injection",
       "back": "Cross-prompt injection is when malicious instructions hidden in a document, email, or web page that Copilot reads as grounding content attempt to hijack its response or trick it into taking an unintended action. Microsoft 365 Copilot includes built-in content safety classifiers and prompt-shielding protections specifically designed to detect and block this kind of hidden-instruction attack.",
       "detail": "This risk is distinct from oversharing, because Copilot grants no new access: oversharing is about Copilot surfacing content a user can already see, while cross-prompt injection is about an attacker using grounding content as a vector to manipulate Copilot's behavior itself."
     },
@@ -601,21 +601,21 @@
     {
       "id": "f81",
       "cat": "aiServices",
-      "front": "Power Platform data loss prevention (DLP) policies and Copilot Studio connectors",
-      "back": "Power Platform DLP policies classify connectors into groups \u2014 such as Business, Non-Business, and Blocked \u2014 and determine which connectors a Copilot Studio agent, Power Automate flow, or Power App running in a given environment is allowed to combine in the same action. This is a separate governance layer from Purview DLP for Microsoft 365 Copilot interactions and governs what an agent can call, not what sensitive content it can surface.",
-      "detail": "DLP for Microsoft 365 Copilot stops sensitive content from appearing in a Copilot response; a Power Platform DLP policy instead stops a Copilot Studio agent from ever being built to combine an approved connector with a blocked one in the first place."
+      "front": "Power Platform data policies",
+      "back": "Power Platform data policies (formerly called DLP policies) classify connectors into groups \u2014 such as Business, Non-Business, and Blocked \u2014 and determine which connectors a Copilot Studio agent, Power Automate flow, or Power App running in a given environment is allowed to combine in the same action. This is a separate governance layer from Purview DLP for Microsoft 365 Copilot interactions and governs what an agent can call, not what sensitive content it can surface.",
+      "detail": "DLP for Microsoft 365 Copilot stops sensitive content from appearing in a Copilot response; a Power Platform data policy instead stops a Copilot Studio agent from ever being built to combine an approved connector with a blocked one in the first place."
     },
     {
       "id": "f82",
       "cat": "aiServices",
-      "front": "SharePoint Advanced Management: restricted access control",
+      "front": "Restricted access control (SharePoint Advanced Management)",
       "back": "Restricted access control, part of SharePoint Advanced Management, lets an admin limit access to a given SharePoint site to members of a specified security group or Microsoft 365 group, even for users who otherwise hold broader permissions on the site \u2014 a true access restriction, not just a search-visibility change.",
       "detail": "This goes further than Restricted SharePoint Search, which only affects what appears in search and Copilot results while leaving every existing permission intact; restricted access control can actually cut off access to the site itself."
     },
     {
       "id": "f83",
       "cat": "aiServices",
-      "front": "SharePoint Advanced Management: data access governance reports",
+      "front": "Data access governance reports (SharePoint Advanced Management)",
       "back": "Data access governance reports, part of SharePoint Advanced Management, surface where SharePoint and OneDrive content is exposed \u2014 for example sites with many new sharing links, content shared with \"Everyone except external users,\" and the distribution of sensitivity labels \u2014 giving admins a prioritized list of sites to remediate before or during a wider Microsoft 365 Copilot rollout.",
       "detail": "These reports identify where oversharing risk concentrates at the site level, complementing DSPM for AI, which instead reports on what AI tools actually did with that content once a user prompted against it."
     },
@@ -629,7 +629,7 @@
     {
       "id": "f85",
       "cat": "aiServices",
-      "front": "Built-in named Copilot agents (Facilitator, Interpreter, Researcher, Analyst, Project Manager)",
+      "front": "Built-in Copilot agents (Facilitator, Interpreter, Researcher, Analyst)",
       "back": "Microsoft ships several purpose-built, first-party Copilot agents inside Microsoft 365 apps rather than requiring every org to build its own \u2014 for example, Facilitator summarizes and tracks action items live inside a Teams meeting, Interpreter provides real-time speech translation, and Researcher, Analyst, and Project Manager bring deeper reasoning or task-tracking into Microsoft 365 Copilot and Planner.",
       "detail": "These differ from a custom agent built in Copilot Studio \u2014 they ship ready-made from Microsoft and are governed through the same Copilot Control System settings rather than through an org's own agent-build process."
     },
@@ -742,7 +742,7 @@
       "id": "f101",
       "cat": "tenantConfig",
       "front": "Active Directory Federation Services (AD FS)",
-      "back": "An on-premises service that provides federated sign-in. With federation, Microsoft Entra ID redirects authentication to AD FS, so passwords are validated by your own infrastructure instead of in the cloud.",
+      "back": "An on-premises service that provides federated sign-in. With federation, Microsoft Entra ID redirects authentication to it, so passwords are validated by your own infrastructure instead of in the cloud.",
       "detail": "It gives the most control but needs servers you must keep highly available. Password hash sync is the simplest hybrid choice, which is why moving off AD FS is a common simplification."
     },
     {
@@ -959,7 +959,7 @@
       "id": "f9002",
       "cat": "tenantConfig",
       "front": "Setting up Microsoft 365 Backup (roles and billing)",
-      "back": "Setting up Microsoft 365 Backup requires the SharePoint Administrator or Global Administrator role. Billing is pay-as-you-go through an Azure subscription (you need Owner or Contributor on it, plus a resource group and region), and you pay for the data protected, while restores are not charged. After billing is linked, you create backup policies for OneDrive, SharePoint and Exchange in Settings > Microsoft 365 Backup.",
+      "back": "Setting up Microsoft 365 Backup requires the SharePoint Administrator or Global Administrator role (a dedicated Microsoft 365 Backup Administrator role can then manage the whole tool). Billing is pay-as-you-go through an Azure subscription (you need Owner or Contributor on it, plus a resource group and region), and you pay for the data protected, while restores are not charged. After billing is linked, you create backup policies for OneDrive, SharePoint and Exchange in Settings > Microsoft 365 Backup.",
       "detail": "Customers onboarding after April 1, 2026 use the pay-as-you-go setup under the Billing node of the admin center, which adds budget alerts and lets backup costs be split across several Azure subscriptions (departmental billing)."
     },
     {
@@ -1126,16 +1126,16 @@
     {
       "id": "f9031",
       "cat": "governSecure",
-      "front": "Attack simulation training: simulation techniques and training campaigns",
-      "back": "Attack simulation training (Defender for Office 365 Plan 2) lets admins launch simulated phishing using techniques such as credential harvest, malware attachment, link in attachment, link to malware and drive-by URL, and then assign training to users who fall for them. Training campaigns assign training modules without a simulation. Results and repeat-offender data show who needs more training.",
+      "front": "Simulation techniques and training campaigns",
+      "back": "In Defender for Office 365 Plan 2, attack simulation training lets admins launch simulated phishing using techniques such as credential harvest, malware attachment, link in attachment, link to malware and drive-by URL, and then assign training to users who fall for them. Training campaigns assign training modules without a simulation. Results and repeat-offender data show who needs more training.",
       "detail": "A simulation only tests behavior; the training assignment is what changes it, so exam scenarios often pair a simulation with an automatic training follow-up."
     },
     {
       "id": "f9032",
       "cat": "governSecure",
-      "front": "Data Security Posture Management (DSPM) in Microsoft Purview: current vs classic",
-      "back": "The current Data Security Posture Management (DSPM) experience in Microsoft Purview covers Microsoft 365, Azure, Fabric and integrated third-party platforms and organizes work around data security objectives such as preventing data exposure in Microsoft 365 Copilot interactions and preventing oversharing. The earlier DSPM for AI (classic) and DSPM (classic) experiences remain available but no longer receive new features.",
-      "detail": "When an older exam or article says DSPM for AI, the current product's equivalent is DSPM with AI observability and Copilot-focused objectives."
+      "front": "Data Security Posture Management (DSPM): current vs classic",
+      "back": "The current Microsoft Purview experience for assessing and improving data security covers Microsoft 365, Azure, Fabric and integrated third-party platforms, and organizes work around data security objectives such as preventing data exposure in Microsoft 365 Copilot interactions and preventing oversharing. It supersedes two earlier experiences, which remain available as classic versions but no longer receive new features.",
+      "detail": "The classic experiences are DSPM for AI (classic) and DSPM (classic). When an older exam or article says DSPM for AI, the current product's equivalent is DSPM with AI observability and Copilot-focused objectives."
     },
     {
       "id": "f9033",
@@ -1161,8 +1161,8 @@
     {
       "id": "f9041",
       "cat": "aiServices",
-      "front": "Copilot controls (Copilot Control System): the three pillars",
-      "back": "Copilot controls, the framework known as the Copilot Control System, has three pillars: Security and governance (data security, AI security, compliance and privacy), Management controls (licensing and metering, agent lifecycle, customization) and Measurement and reporting (readiness and adoption, productivity impact, business value, delivered mainly through Copilot Analytics). It covers Copilot, Copilot Chat, prebuilt agents and Copilot Studio agents published to Microsoft 365 channels.",
+      "front": "Pillars of Copilot controls",
+      "back": "The three groupings of capabilities in the framework also known as the Copilot Control System: Security and governance (data security, AI security, compliance and privacy), Management controls (licensing and metering, agent lifecycle, customization) and Measurement and reporting (readiness and adoption, productivity impact, business value, delivered mainly through Copilot Analytics). The framework covers Copilot, Copilot Chat, prebuilt agents and Copilot Studio agents published to Microsoft 365 channels.",
       "detail": "It is a framework spread across the Microsoft 365 admin center, Power Platform admin center, Copilot Studio and Purview rather than a single console."
     },
     {
@@ -1217,7 +1217,7 @@
     {
       "id": "f9049",
       "cat": "aiServices",
-      "front": "Microsoft Copilot Search",
+      "front": "Copilot Search",
       "back": "Copilot Search is a universal search experience that appears as a Search module in the Microsoft Copilot app for users with an eligible Copilot license, at no extra cost, and needs no admin setup. It returns results from Microsoft 365 and from external sources through Microsoft 365 Copilot connectors, can show Copilot Answers, and honors the same permissions and security settings as Copilot. Admins curate bookmarks and acronyms, and Restricted Content Discovery keeps selected sites out of results.",
       "detail": "Users without the Copilot app get the classic Microsoft Search experience, so the licensing and app, not an admin toggle, decide what they see."
     },
@@ -1232,7 +1232,7 @@
       "id": "f9051",
       "cat": "aiServices",
       "front": "Microsoft Copilot Cowork",
-      "back": "Cowork is an agentic Copilot experience that carries out multi-step work for a user, such as drafting and sending email, scheduling meetings, creating Word, Excel and PowerPoint files, searching the organization and running scheduled prompts, and it shows each step and asks the user to approve actions. For work or school accounts it is generally available. It can use custom skills (up to 50) and plugins, and Edge browser use is controlled by a tenant Cowork Browsing setting.",
+      "back": "An agentic Copilot experience that carries out multi-step work for a user, such as drafting and sending email, scheduling meetings, creating Word, Excel and PowerPoint files, searching the organization and running scheduled prompts, and it shows each step and asks the user to approve actions. For work or school accounts it is generally available. It can use custom skills (up to 50) and plugins, and Edge browser use is controlled by a tenant-level browsing setting.",
       "detail": "Because it acts on behalf of the user, it inherits that user's permissions, Conditional Access and DLP rather than having its own broader access."
     },
     {
@@ -1344,7 +1344,7 @@
       "id": "f9067",
       "cat": "aiServices",
       "front": "Agent 365 policy templates",
-      "back": "A policy template bundles policies from Microsoft Entra, Microsoft Purview, SharePoint Online and Microsoft Defender so they can be applied consistently when an agent is published or afterwards. Default controls include Purview audit, sensitive data detection through DSPM, a Purview AI compliance assessment, identity protection, network visibility, lifecycle management, SharePoint access insights and AI real-time protection.",
+      "back": "A reusable bundle of policies from Microsoft Entra, Microsoft Purview, SharePoint Online and Microsoft Defender that can be applied consistently when an agent is published or afterwards. Default controls include Purview audit, sensitive data detection through DSPM, a Purview AI compliance assessment, identity protection, network visibility, lifecycle management, SharePoint access insights and AI real-time protection.",
       "detail": "Templates are the answer when a requirement says consistent protections for every agent without configuring each tool separately."
     },
     {
@@ -1407,7 +1407,7 @@
       "id": "f9076",
       "cat": "aiServices",
       "front": "Shadow AI discovery (preview)",
-      "back": "The Shadow AI page in the Microsoft 365 admin center, part of the Frontier preview, helps discover and govern unapproved AI agents running on devices. It needs Defender for Endpoint on the devices, a Microsoft 365 E5 license to view agents, Intune enrollment for managed Windows devices and, for usage metadata, Global Secure Access.",
+      "back": "A page in the Microsoft 365 admin center, part of the Frontier preview, that helps discover and govern unapproved AI agents running on devices. It needs Defender for Endpoint on the devices, a Microsoft 365 E5 license to view agents, Intune enrollment for managed Windows devices and, for usage metadata, Global Secure Access.",
       "detail": "It targets agents outside IT's visibility, which is why endpoint and network signals, not the registry alone, feed it."
     },
     {
@@ -1482,12 +1482,12 @@
       "question": "Contoso manages Microsoft 365 Apps with Intune. The IT pilot ring must receive new features as soon as Microsoft releases them. All other devices must receive new features once per month on a predictable date, with no additional feature delay. Which update channels should you assign to the pilot ring and to the other devices, respectively?",
       "options": [
         "Current Channel and Monthly Enterprise Channel",
-        "Beta Channel and Semi-Annual Enterprise Channel",
-        "Current Channel and Semi-Annual Enterprise Channel",
+        "Beta Channel and Monthly Enterprise Channel",
+        "Current Channel (Preview) and Current Channel",
         "Monthly Enterprise Channel and Current Channel"
       ],
       "correct": 0,
-      "explanation": "Current Channel delivers features as soon as they are ready, which fits the pilot ring, and Monthly Enterprise Channel bundles that month's features onto one predictable date (the second Tuesday), which fits everyone else. Beta Channel delivers pre-release builds that are not supported for production devices, and Semi-Annual Enterprise Channel adds a feature delay of months, which the scenario rules out. The Monthly Enterprise Channel and Current Channel pairing is reversed: it would give the pilot ring the predictable cadence and the broad population the unpredictable one."
+      "explanation": "Current Channel delivers features as soon as they are ready, which fits the pilot ring, and Monthly Enterprise Channel bundles that month's features onto one predictable date (the second Tuesday), which fits everyone else. Beta Channel delivers pre-release builds that are not supported for production devices, and putting the other devices on Current Channel would give them features with no set schedule. Semi-Annual Enterprise Channel is no longer a slower option: since Version 2606 (July 2026) it receives the same monthly feature updates as Monthly Enterprise Channel. The Monthly Enterprise Channel and Current Channel pairing is reversed: it would give the pilot ring the predictable cadence and the broad population the unpredictable one."
     },
     {
       "id": "q6",
@@ -1611,12 +1611,12 @@
       "question": "A retention policy set on a SharePoint site says content should be deleted after 3 years. A retention label applied to a specific document in that site says the document must be retained for 7 years. What happens to that document at year 4?",
       "options": [
         "It is deleted, because the site-level retention policy takes precedence",
-        "It is deleted immediately once any conflict is detected",
+        "It is deleted at year 3, and a copy is kept in the Preservation Hold library until year 7",
         "It is retained, because the longer retention period and the explicit retain instruction win",
-        "The system errors and an admin must manually resolve the conflict before any action occurs"
+        "It is moved to the site's recycle bin at year 3 and kept there until year 7"
       ],
       "correct": 2,
-      "explanation": "When retention rules conflict, the longer retention period wins, and an explicit retain instruction generally wins over a delete instruction, so the 7-year retention label preserves the document past year 3. Retention conflicts resolve automatically toward preservation, not toward an error state or immediate deletion.",
+      "explanation": "When retention rules conflict, the longer retention period wins, and an explicit retain instruction generally wins over a delete instruction, so the 7-year retention label preserves the document past year 3. Retention conflicts resolve automatically toward preservation: the document stays in place rather than being deleted, moved to the recycle bin or left waiting for an admin.",
       "whyTested": "This stacks two independent retention mechanisms with seemingly contradictory instructions specifically to test whether you know the actual tie-breaking rule \u2014 longer period and 'retain' both win \u2014 rather than assuming whichever rule is more specific or was applied most recently automatically takes precedence."
     },
     {
@@ -1799,12 +1799,12 @@
       "question": "A licensed Contoso user asks Copilot what the team decided about Project Falcon. Copilot synthesizes an answer from a Teams chat, two emails, and a document, none of which contains that exact phrase, and cites only items the user already has access to. Which component makes this possible?",
       "options": [
         "The Semantic Index for Copilot",
-        "A Microsoft Graph connector",
+        "A Copilot connector",
         "Microsoft Search keyword indexing alone",
         "The Copilot Studio orchestrator"
       ],
       "correct": 0,
-      "explanation": "The Semantic Index builds an encrypted, Graph-based map of content and relationships across a user's mail, chats, and files, so Copilot can reason about meaning rather than matching keywords, while staying permission-trimmed to what the user can already open. A Graph connector brings external, non-Microsoft 365 content into that index; it is not what grounds native content. Keyword indexing alone would miss items that lack the phrase, and the Copilot Studio orchestrator drives custom agents, not Microsoft 365 Copilot's grounding."
+      "explanation": "The Semantic Index builds an encrypted, Graph-based map of content and relationships across a user's mail, chats, and files, so Copilot can reason about meaning rather than matching keywords, while staying permission-trimmed to what the user can already open. A Copilot connector (formerly a Graph connector) brings external, non-Microsoft 365 content into that index; it is not what grounds native content. Keyword indexing alone would miss items that lack the phrase, and the Copilot Studio orchestrator drives custom agents, not Microsoft 365 Copilot's grounding."
     },
     {
       "id": "q25",
@@ -1870,11 +1870,11 @@
       "options": [
         "Create an agent directly from the SharePoint site",
         "Build a declarative agent in Copilot Studio and add the site as a knowledge source",
-        "Deploy a Microsoft Graph connector for the site before building an agent",
+        "Deploy a Copilot connector for the site before building an agent",
         "Build a custom engine agent that calls the SharePoint REST API"
       ],
       "correct": 0,
-      "explanation": "Creating an agent from the SharePoint site itself takes a few clicks, grounds the agent in that site's content, and inherits the site's permissions automatically, which is the fastest supported path. A declarative agent in Copilot Studio with the site as a knowledge source also works and respects permissions, but it is more setup than the scenario needs. SharePoint content is already indexed in Microsoft Graph, so a Graph connector adds nothing, and a custom engine agent is the most effort of all."
+      "explanation": "Creating an agent from the SharePoint site itself takes a few clicks, grounds the agent in that site's content, and inherits the site's permissions automatically, which is the fastest supported path. A declarative agent in Copilot Studio with the site as a knowledge source also works and respects permissions, but it is more setup than the scenario needs. SharePoint content is already indexed in Microsoft Graph, so a Copilot connector adds nothing, and a custom engine agent is the most effort of all."
     },
     {
       "id": "q30",
@@ -1898,7 +1898,7 @@
       "options": [
         "Security Compute Units for Microsoft Security Copilot",
         "Microsoft 365 Copilot add-on licenses for the six analysts",
-        "Copilot Studio message capacity packs",
+        "Copilot Studio capacity packs",
         "Microsoft Defender for Cloud Apps licenses for the analysts"
       ],
       "correct": 0,
@@ -1910,13 +1910,13 @@
       "type": "mc",
       "question": "An organization wants Copilot to be able to ground answers in content from a third-party wiki that lives outside Microsoft 365, while still respecting that wiki's own access control list. What should be configured?",
       "options": [
-        "A Microsoft Graph connector for the wiki, with its permissions mapped to the wiki's access control list",
+        "A Copilot connector for the wiki, with its permissions mapped to the wiki's access control list",
         "A Copilot Studio agent that uses the wiki as a knowledge source through a connector",
         "A nightly export of the wiki into a SharePoint site readable by everyone in the organization",
         "Restricted SharePoint Search with the wiki added to the allowed list"
       ],
       "correct": 0,
-      "explanation": "A Graph connector indexes the wiki into Microsoft Graph and the Semantic Index so Microsoft 365 Copilot can ground on it, and mapping the connector's ACL to the source is what keeps results permission-trimmed. A Copilot Studio agent with the wiki as a knowledge source would let that one agent answer wiki questions, but it does not make the content available to Microsoft 365 Copilot generally. A nightly export readable by everyone discards the wiki's access control list, creating oversharing. Restricted SharePoint Search (being retired; successor: Restricted Content Discovery) only governs SharePoint sites and cannot include an external system."
+      "explanation": "A Copilot connector (formerly a Graph connector) indexes the wiki into Microsoft Graph and the Semantic Index so Microsoft 365 Copilot can ground on it, and mapping the connector's ACL to the source is what keeps results permission-trimmed. A Copilot Studio agent with the wiki as a knowledge source would let that one agent answer wiki questions, but it does not make the content available to Microsoft 365 Copilot generally. A nightly export readable by everyone discards the wiki's access control list, creating oversharing. Restricted SharePoint Search (being retired; successor: Restricted Content Discovery) only governs SharePoint sites and cannot include an external system."
     },
     {
       "id": "q33",
@@ -1938,8 +1938,8 @@
       "type": "ms",
       "question": "A marketing employee built a Copilot Studio agent that calls an unapproved file-storage connector and published it to Microsoft Teams, where other users can now find it. You must stop users from running the agent now and prevent any future agent from combining that connector with Microsoft 365 data, without affecting other agents. Which two actions should you take? (Choose two.)",
       "options": [
-        "Block the agent in the Agents area of the Copilot Control System in the Microsoft 365 admin center so users can no longer run it",
-        "Create a Power Platform DLP policy that places the connector in the Blocked group for the environment",
+        "Block the agent in the agent registry (Agents > All agents) in the Microsoft 365 admin center so users can no longer run it",
+        "Create a Power Platform data policy that places the connector in the Blocked group for the environment",
         "Delete the Power Platform environment that hosts the agent so the agent can no longer be invoked",
         "Turn off the Allow web search in Copilot policy in the Cloud Policy service"
       ],
@@ -1947,7 +1947,7 @@
         0,
         1
       ],
-      "explanation": "Blocking the agent in the Agents area of the Copilot Control System (which grew out of Integrated apps) removes it from users immediately, and a Power Platform DLP policy that classifies the connector as Blocked prevents any agent or flow in that environment from using it going forward. Deleting the environment would also remove every other agent and flow in it, violating the 'without affecting other agents' constraint. The Allow web search in Copilot policy controls whether Microsoft 365 Copilot can use public web results and has nothing to do with connectors."
+      "explanation": "Blocking the agent in the agent registry removes it from users immediately, and a Power Platform data policy (formerly called a DLP policy) that classifies the connector as Blocked prevents any agent or flow in that environment from using it going forward. Deleting the environment would also remove every other agent and flow in it, violating the 'without affecting other agents' constraint. The Allow web search in Copilot policy controls whether Microsoft 365 Copilot can use public web results and has nothing to do with connectors."
     },
     {
       "id": "tf8",
@@ -1961,9 +1961,9 @@
       "id": "tf9",
       "cat": "aiServices",
       "type": "tf",
-      "question": "Because Microsoft 365 Copilot honors existing permissions, a file shared with 'Everyone except external users' can be surfaced by Copilot to an internal user who has never opened it.",
-      "answer": true,
-      "explanation": "'Everyone except external users' grants every internal user permission, so Copilot can legitimately surface the file to any of them whether or not they ever opened it. Honoring permissions is exactly why broad grants like this are the oversharing risk to fix before a rollout; the misconception is treating 'never accessed' as if it meant 'not permitted'."
+      "question": "A user who can open an encrypted document because the sensitivity label grants only the VIEW usage right can still have Microsoft 365 Copilot summarize that document.",
+      "answer": false,
+      "explanation": "For encrypted content, Copilot returns it only if the user holds both the VIEW and EXTRACT usage rights. Content protected without the EXTRACT right (for example Do Not Forward) stays hidden from Copilot even though the user can open it. The misconception is treating 'the user can open the file' as 'Copilot can use the file'."
     },
     {
       "id": "tf10",
@@ -1977,26 +1977,26 @@
       "id": "tf11",
       "cat": "aiServices",
       "type": "tf",
-      "question": "A SOC analyst can use the Microsoft Security Copilot experience embedded in the Microsoft Defender portal without holding a Microsoft 365 Copilot add-on license, as long as the tenant has provisioned Security Compute Units and the analyst holds a Security Copilot role.",
+      "question": "A Contoso tenant with Microsoft 365 E5 can start using Microsoft Security Copilot without separately provisioning Security Compute Units in Azure, because E5 includes a monthly SCU allotment.",
       "answer": true,
-      "explanation": "Security Copilot is a separate product funded by provisioned Security Compute Units and gated by its own role assignments; per-user Microsoft 365 Copilot licenses play no part. The two products are easy to conflate because both carry the Copilot name, but their licensing models are independent."
+      "explanation": "Microsoft 365 E5 and E7 include Security Copilot with a monthly allotment of 400 Security Compute Units per 1,000 user licenses (up to 10,000), provisioned automatically with no Azure setup. Tenants without E5 or E7 still purchase provisioned SCUs, and in every case Security Copilot is separate from the per-user Microsoft 365 Copilot add-on."
     },
     {
       "id": "msq1",
       "cat": "tenantConfig",
       "type": "ms",
-      "question": "Contoso assigns Current Channel to an IT pilot ring, Monthly Enterprise Channel to most users, and Semi-Annual Enterprise Channel to a validation lab. Which two statements about this design are accurate? (Choose two.)",
+      "question": "Contoso assigns Current Channel to an IT pilot ring and Monthly Enterprise Channel to most users. Which two statements about this design are accurate? (Choose two.)",
       "options": [
         "Monthly Enterprise Channel devices receive that month's new features on a single predictable release date",
-        "Semi-Annual Enterprise Channel devices receive new features months after Current Channel devices do",
-        "Semi-Annual Enterprise Channel devices receive security updates only twice a year",
+        "Features reach Current Channel devices before they reach Monthly Enterprise Channel devices",
+        "Monthly Enterprise Channel devices receive security updates only every three months",
         "Current Channel devices receive new features on a fixed monthly release date"
       ],
       "correct": [
         0,
         1
       ],
-      "explanation": "Monthly Enterprise Channel bundles the month's features onto one release date, and Semi-Annual Enterprise Channel holds features back so they arrive months after Current Channel users already have them. Every channel, including Semi-Annual Enterprise, still receives security updates monthly; only feature updates are held back. Current Channel ships features as soon as they are ready, which is why its cadence is less predictable than Monthly Enterprise Channel's."
+      "explanation": "Monthly Enterprise Channel bundles the month's features onto one release date (the second Tuesday), and it only includes features that have already rolled out in Current Channel, so Current Channel users have them first. Every channel still receives security updates monthly; three months is how long a Monthly Enterprise Channel version is supported, not its security update cadence. Current Channel ships features as soon as they are ready, which is why its cadence is less predictable than Monthly Enterprise Channel's."
     },
     {
       "id": "msq2",
@@ -2194,7 +2194,7 @@
       "type": "mc",
       "question": "A retention policy needs to automatically apply to every user in the Finance department, and stay current as employees move into or out of Finance, without an admin manually updating a list of names. Which Microsoft Purview scoping feature should be used?",
       "options": [
-        "A static scope listing named users",
+        "A static scope that lists each Finance user by name",
         "An adaptive scope based on a department attribute query",
         "A sensitivity label auto-labeling policy",
         "A retention label published to the Finance users"
@@ -2250,13 +2250,13 @@
       "type": "mc",
       "question": "A custom Copilot Studio agent built by one department is consuming far more usage than its prepaid Copilot Credit capacity (formerly measured in messages) allows. What happens once that prepaid capacity is exhausted, assuming no additional capacity has been purchased?",
       "options": [
-        "The agent is deleted automatically the moment its prepaid Copilot Credit capacity runs out",
+        "The agent is unpublished automatically and its owner must republish it once capacity is added",
         "Further usage is billed pay-as-you-go if enabled; otherwise the agent may stop responding until the next period",
-        "The agent's prepaid capacity silently resets and usage continues with no billing impact",
-        "Microsoft 365 Copilot licenses for the entire tenant are automatically suspended until capacity is purchased"
+        "Further usage is always billed pay-as-you-go automatically, with no setting required",
+        "The agent keeps running but is throttled to a slower service tier at no additional cost"
       ],
       "correct": 1,
-      "explanation": "Once prepaid Copilot Credit capacity (formerly messages) is exhausted, further Copilot Studio agent usage draws on metered pay-as-you-go billing if enabled, or the agent may stop responding until the next capacity period if it is not. Monitoring capacity consumption matters because usage does not simply reset immediately, and unrelated tenant-wide Copilot licenses are not suspended."
+      "explanation": "Once prepaid Copilot Credit capacity (formerly messages) is exhausted, further Copilot Studio agent usage draws on metered pay-as-you-go billing if enabled, or the agent may stop responding until the next capacity period if it is not. Pay-as-you-go has to be enabled; it does not switch itself on, and the agent is neither deleted, unpublished nor moved to a free throttled tier. Monitoring capacity consumption matters because a heavily used agent can exhaust prepaid capacity quickly."
     },
     {
       "id": "tf12",
@@ -2322,7 +2322,7 @@
       "type": "ms",
       "question": "A Contoso employee publishes a Copilot Studio agent to Microsoft 365 Copilot, but colleagues cannot find it in their agent list. Which two statements are accurate? (Choose two.)",
       "options": [
-        "If the tenant requires admin approval for agents, the agent remains unavailable until an admin approves it in the Agents area of the Copilot Control System",
+        "If the tenant requires admin approval for agents, the agent remains unavailable until an admin approves it in the agent registry of the Microsoft 365 admin center",
         "An admin can make the approved agent available to specific users or groups rather than to everyone",
         "Publishing from Copilot Studio automatically makes the agent available to every user in the tenant",
         "An admin must first create an app registration for the agent in Microsoft Entra before it can appear"
@@ -2331,7 +2331,7 @@
         0,
         1
       ],
-      "explanation": "Shared agents flow through the Agents area of the Copilot Control System (which grew out of Integrated apps), where tenants that require approval hold them until an admin acts, and the admin can then deploy the agent to all users, specific groups, or no one. Publishing alone does not grant tenant-wide availability, which is exactly why the colleagues cannot see it. Copilot Studio handles the agent's identity and registration as part of publishing; the admin does not hand-create an app registration."
+      "explanation": "Published agents flow through the agent registry (Agents > All agents) in the Microsoft 365 admin center, where tenants that require approval hold them until an admin acts, and the admin can then deploy the agent to all users, specific groups, or no one. Publishing alone does not grant tenant-wide availability, which is exactly why the colleagues cannot see it. Copilot Studio handles the agent's identity and registration as part of publishing; the admin does not hand-create an app registration."
     },
     {
       "id": "q45",
@@ -2438,12 +2438,12 @@
       "question": "Contoso's support team wants Microsoft 365 Copilot to answer questions such as 'what is the status of ticket 4821' using live data from a third-party ticketing system, and to create new tickets on request. What should you build?",
       "options": [
         "A Copilot Studio agent with an action that calls the ticketing system's API",
-        "A Microsoft Graph connector that indexes the ticketing system's records",
-        "A Power Platform DLP policy that allows the ticketing system connector",
+        "A Copilot connector that indexes the ticketing system's records",
+        "A Power Platform data policy that allows the ticketing system connector",
         "A SharePoint list synchronized nightly from the ticketing system and an agent grounded on it"
       ],
       "correct": 0,
-      "explanation": "Live lookups and write-backs such as creating a ticket require an action (plugin) that calls the system's API at runtime, which is what a Copilot Studio agent with a connector action provides. A Graph connector is the near-miss: it indexes a copy of the records for search and grounding, so answers can be stale and it cannot create tickets. A Power Platform DLP policy only permits or blocks connectors; it builds nothing. A nightly SharePoint sync is neither live nor capable of taking actions."
+      "explanation": "Live lookups and write-backs such as creating a ticket require an action (plugin) that calls the system's API at runtime, which is what a Copilot Studio agent with a connector action provides. A Copilot connector is the near-miss: it indexes a copy of the records for search and grounding, so answers can be stale and it cannot create tickets. A Power Platform data policy only permits or blocks connectors; it builds nothing. A nightly SharePoint sync is neither live nor capable of taking actions."
     },
     {
       "id": "q53",
@@ -2477,15 +2477,15 @@
       "id": "q55",
       "cat": "tenantConfig",
       "type": "mc",
-      "question": "A new hire's account is created by an HR provisioning script that leaves the usage location attribute blank. An admin then tries to license them through an existing group-based licensing assignment. What happens?",
+      "question": "A new hire's account is created by an HR provisioning script that leaves the usage location attribute blank. The user is then added to a group that already carries a Microsoft 365 license through group-based licensing. What happens?",
       "options": [
-        "The license assigns normally, since usage location only matters for Copilot add-on licenses",
-        "The assignment is skipped and flagged as a licensing error until a usage location is set",
+        "The assignment fails and the user stays unlicensed until an administrator sets a usage location",
+        "The license is assigned, and the user is treated as located in the tenant's own location, which may be the wrong country for them",
         "The system automatically copies the assigning admin's own usage location onto the account",
-        "Group-based licensing cannot be used at all unless usage location was set at tenant creation"
+        "The license is assigned, but only the services available worldwide are enabled until a usage location is set"
       ],
       "correct": 1,
-      "explanation": "Usage location is required before any license can legally be assigned to a profile, and a group member missing it is skipped with a flagged error rather than silently licensed. Usage location matters for every license, not just Copilot, there is no automatic copying from the admin's own account, and group-based licensing works fine elsewhere in the tenant once the attribute is set for that one user."
+      "explanation": "For group-based licensing, a user with no usage location inherits the location of the tenant, so the license is assigned and no error appears, but services are provisioned for the tenant's country, which may be wrong for the user (and if that location is not supported, a 'Usage location isn't allowed' error appears). Assigning a license directly requires the usage location to be set first. Usage location matters for every license, not just Copilot, and nothing is copied from the admin's own account. The fix is to populate usage location in the provisioning flow."
     },
     {
       "id": "q56",
@@ -2546,10 +2546,10 @@
       "type": "mc",
       "question": "A university wants students to self-request access to a bundled set of resources \u2014 a Team, a SharePoint site, and a licensed app \u2014 through a catalog, with a manager approval step and automatic expiration at the end of the semester, instead of an admin manually granting each resource. Which Microsoft Entra ID Governance feature fits?",
       "options": [
-        "Access reviews",
+        "Access reviews that recertify existing access",
         "Entitlement management (access packages)",
-        "Privileged Identity Management",
-        "Conditional Access"
+        "Privileged Identity Management with eligible roles",
+        "Conditional Access policies for the Team and app"
       ],
       "correct": 1,
       "explanation": "Entitlement management bundles resources into an access package that users can request through a self-service catalog, with approval workflows and automatic expiration built in, exactly matching this scenario. Access reviews recertify access that already exists rather than provisioning it, PIM governs role eligibility, and Conditional Access governs sign-in conditions, not resource bundling."
@@ -2580,7 +2580,7 @@
         "Information barriers"
       ],
       "correct": 0,
-      "explanation": "Preservation Lock prevents anyone, including a Global Administrator, from turning off or shortening a locked retention policy until its locked duration expires, matching this exact regulatory requirement. A per-mailbox litigation hold doesn't lock the policy itself against admin changes, Customer Lockbox governs Microsoft support engineer access, and information barriers govern communication between user groups."
+      "explanation": "Preservation Lock prevents anyone, including a Global Administrator, from turning off, deleting or shortening a locked retention policy (it can only be extended), matching this exact regulatory requirement. A per-mailbox litigation hold doesn't lock the policy itself against admin changes, Customer Lockbox governs Microsoft support engineer access, and information barriers govern communication between user groups."
     },
     {
       "id": "q61",
@@ -2630,10 +2630,10 @@
         "A declarative agent",
         "A custom engine agent",
         "An agent created directly from a SharePoint site",
-        "A Microsoft Graph connector"
+        "A Copilot connector"
       ],
       "correct": 1,
-      "explanation": "A custom engine agent brings its own independent orchestrator and model, giving full control at the cost of far more development effort. A declarative agent and a SharePoint-grounded agent both build on Copilot's own existing orchestrator and Semantic Index instead, and a Graph connector only indexes content for grounding rather than defining an agent's reasoning engine."
+      "explanation": "A custom engine agent brings its own independent orchestrator and model, giving full control at the cost of far more development effort. A declarative agent and a SharePoint-grounded agent both build on Copilot's own existing orchestrator and Semantic Index instead, and a Copilot connector only indexes content for grounding rather than defining an agent's reasoning engine."
     },
     {
       "id": "q63",
@@ -2692,15 +2692,15 @@
       "id": "q65",
       "cat": "aiServices",
       "type": "mc",
-      "question": "A Copilot Studio agent needs to call both an approved internal line-of-business connector and a popular consumer social-media connector in the same action. The organization's Power Platform DLP policy places those two connectors in separate classification groups. What happens when the agent tries to combine them?",
+      "question": "A Copilot Studio agent needs to call both an approved internal line-of-business connector and a popular consumer social-media connector in the same action. The organization's Power Platform data policy places those two connectors in separate classification groups. What happens when the agent tries to combine them?",
       "options": [
-        "The combination is blocked, because the two connectors fall into different Power Platform DLP classification groups",
-        "The combination succeeds, because Power Platform DLP policies apply only to Power Automate flows, not Copilot Studio agents",
-        "The combination succeeds, since Copilot Studio agents are automatically exempt from Power Platform DLP enforcement",
+        "The combination is blocked, because the two connectors fall into different classification groups in the Power Platform data policy",
+        "The combination succeeds, because Power Platform data policies apply only to Power Automate flows, not Copilot Studio agents",
+        "The combination succeeds, since Copilot Studio agents are automatically exempt from Power Platform data policy enforcement",
         "The combination is blocked only when a separate Purview DLP policy scoped to Copilot interactions is also configured"
       ],
       "correct": 0,
-      "explanation": "Power Platform DLP policies group connectors into classifications and block connectors from different groups from being combined in the same flow or agent action, which is exactly what stops this combination. These policies apply broadly across Power Platform, including Copilot Studio agents, and this block does not depend on a separate Purview DLP policy scoped to Copilot interactions."
+      "explanation": "Power Platform data policies (formerly DLP policies) group connectors into classifications and block connectors from different groups from being combined in the same flow or agent action, which is exactly what stops this combination. These policies apply broadly across Power Platform, including Copilot Studio agents, and this block does not depend on a separate Purview DLP policy scoped to Copilot interactions."
     },
     {
       "id": "q66",
@@ -2782,9 +2782,9 @@
       "question": "An organization wants to require a compliant device specifically before Microsoft 365 Copilot sign-in succeeds, while leaving its existing sign-in requirements for the rest of Microsoft 365 unchanged. How should this be configured?",
       "options": [
         "Enabling security defaults, since it automatically applies stricter rules to Copilot only",
-        "A Conditional Access policy that targets the Enterprise Copilot Platform service principal as its own cloud app",
-        "A Purview DLP policy scoped specifically to Copilot interactions",
-        "The Allow web search in Copilot policy in Cloud Policy"
+        "A Conditional Access policy that targets the Enterprise Copilot Platform service principal as a cloud app",
+        "A Purview DLP policy with the Microsoft 365 Copilot location, set to block users on unmanaged devices",
+        "The Allow web search in Copilot policy in Cloud Policy, applied to the users who need a compliant device"
       ],
       "correct": 1,
       "explanation": "Because Microsoft 365 Copilot authenticates through the same Microsoft Entra sign-in as other Microsoft 365 apps, a Conditional Access policy can target its Enterprise Copilot Platform service principal (which may first need to be created so it appears in the app picker) as its own cloud app, layering a stricter device requirement onto Copilot sign-in without touching the rest of Microsoft 365. Security defaults apply one uncustomizable baseline to everything rather than singling out Copilot, a DLP policy governs content in responses rather than sign-in requirements, and the Allow web search in Copilot policy only controls whether Copilot searches the public web."
@@ -2793,9 +2793,9 @@
       "id": "tf18",
       "cat": "aiServices",
       "type": "tf",
-      "question": "Content a user writes into a Copilot Page is stored as a Loop file in the user's OneDrive and is within the scope of Purview eDiscovery.",
+      "question": "Content a user writes into a Copilot Page is a durable Microsoft 365 file, so it is within the scope of Purview eDiscovery, retention and audit.",
       "answer": true,
-      "explanation": "A Copilot Page is a durable Loop file stored in OneDrive (or SharePoint for shared contexts), so eDiscovery, retention, and audit cover it like other Microsoft 365 content. The misconception is that because a Page is not an email or a chat message, it falls outside compliance tooling."
+      "explanation": "A Copilot Page is a durable file (new pages are stored in the user's OneDrive for Business, earlier ones in a SharePoint Embedded container), so eDiscovery, retention, and audit cover it like other Microsoft 365 content. The misconception is that because a Page is not an email or a chat message, it falls outside compliance tooling."
     },
     {
       "id": "tf19",
@@ -2803,7 +2803,7 @@
       "type": "tf",
       "question": "A Purview DLP policy with the Microsoft 365 Copilot location prevents a Copilot Studio agent from using a Non-Business connector in the same action as a Business connector.",
       "answer": false,
-      "explanation": "Connector grouping and combination rules are enforced by Power Platform DLP policies, which govern what a Copilot Studio agent, flow, or app is allowed to call. Purview DLP for Microsoft 365 Copilot governs sensitive content in Copilot interactions and has no concept of connector classification. The two 'DLP' features share a name but operate at different layers."
+      "explanation": "Connector grouping and combination rules are enforced by Power Platform data policies, which govern what a Copilot Studio agent, flow, or app is allowed to call. Purview DLP for Microsoft 365 Copilot governs sensitive content in Copilot interactions and has no concept of connector classification. The two are easy to confuse because Power Platform data policies were formerly called DLP policies, but they operate at different layers."
     },
     {
       "id": "msq15",
@@ -2949,7 +2949,7 @@
       "type": "mc",
       "question": "A department head opens the Usage overview page shown and asks the admin for a report covering the last 365 days that also includes everything that happened yesterday. Based on the introductory text on this page, which response is correct?",
       "options": [
-        "Neither request can be fully met: the page offers reporting periods of 7, 30, 90 and 180 days, and reports become available within 48 hours, so very recent activity may not appear yet",
+        "Neither can be fully met: the periods are 7, 30, 90 or 180 days, and data can lag by up to 48 hours",
         "Both requests can be met: select a 365-day period and the page refreshes with yesterday's activity immediately",
         "The 365-day period is available, but yesterday's data will be missing because reports only become available after 48 hours",
         "Yesterday's activity is shown immediately, but the longest period the page offers is 90 days"
@@ -3019,8 +3019,8 @@
       "type": "mc",
       "question": "Contoso's policy says every employee may use agents in Microsoft 365, but only agents created by Microsoft are allowed, and nothing from external publishers. An admin opens Copilot > Settings > Data access > Agents and sees the pane shown, with the current selections visible. Which change satisfies the policy?",
       "options": [
-        "Clear Allow apps and agents created by external publishers, leave All users selected and Allow apps and agents created by Microsoft checked, then save",
-        "Select No users under who can access agents, then save",
+        "Clear the checkbox for apps and agents created by external publishers, keep All users selected, then save",
+        "Select No users under who can access agents, so only Microsoft-created agents remain available, then save",
         "Select Specific users/groups, add the all-employees group, and leave both allow checkboxes checked",
         "Clear Allow apps and agents created by Microsoft and leave the external publishers checkbox checked, then save"
       ],
@@ -3216,21 +3216,21 @@
       "id": "q9006",
       "cat": "tenantConfig",
       "type": "mc",
-      "question": "Contoso assigns Microsoft Copilot licenses to the Sales security group, but three users in it still get no Copilot features. Their license page shows an error. Which is the most likely cause?",
+      "question": "Contoso assigns its 250 Microsoft Copilot licenses to the Sales security group. Most members receive Copilot, but three users in the group still get no Copilot features and their license page shows an error. Which is the most likely cause?",
       "options": [
-        "Those accounts have no usage location set",
+        "The group has more members than there are available Copilot licenses",
         "Copilot add-on licenses cannot be assigned through groups, only directly to each individual user",
         "The users are missing the Teams license that the Copilot add-on depends on in order to be assigned",
         "Pay-as-you-go billing has not been linked to an Azure subscription"
       ],
       "correct": 0,
-      "explanation": "License assignment, including group-based assignment, requires a usage location on each user; accounts without one fail with a license error while others in the group succeed. Group-based licensing does support add-on licenses such as Copilot. Teams is not a prerequisite for the Copilot add-on, and pay-as-you-go billing is a separate model for metered services, not a prerequisite for per-user licenses."
+      "explanation": "Group-based licensing assigns licenses until the subscription runs out and records a 'Not enough licenses' error on the remaining members, which appears on the Errors & issues tab of the license page; buying or freeing licenses and reprocessing fixes it. Group-based licensing does support add-on licenses such as Copilot, Teams is not a prerequisite for the Copilot add-on, and pay-as-you-go billing is a separate model for metered services, not a prerequisite for per-user licenses."
     },
     {
       "id": "msq9003",
       "cat": "tenantConfig",
       "type": "ms",
-      "question": "Contoso wants SharePoint Advanced Management to reduce stale content before Copilot grounds on it. Which two capabilities address that? (Choose two.)",
+      "question": "Contoso wants SharePoint Advanced Management to reduce stale content before Copilot grounds on it. Which two capabilities address that? (Choose two.) (Choose two.)",
       "options": [
         "Inactive site policies and site attestations that ask owners to confirm a site is still needed",
         "A sensitivity label with encryption on every file in the tenant",
@@ -3652,7 +3652,7 @@
         "Integrated apps in the Microsoft 365 admin center"
       ],
       "correct": 2,
-      "explanation": "The agent registry lists Microsoft agents, external partner-built agents, agents published by your org and agents shared by their creators in one inventory. The older Integrated apps page was the predecessor of the Agents area, enterprise applications show service principals rather than the agent inventory, and the Power Platform list covers only Copilot Studio environments."
+      "explanation": "The agent registry lists Microsoft agents, external partner-built agents, agents published by your org and agents shared by their creators in one inventory. The Integrated apps page is a separate area under Settings and is not the agent registry, enterprise applications show service principals rather than the agent inventory, and the Power Platform list covers only Copilot Studio environments."
     },
     {
       "id": "q9030",
@@ -3721,8 +3721,8 @@
       "options": [
         "Entra ID > Enterprise applications > Consent and permissions",
         "Agents > Settings > Agent and plugin access, clearing external publishers",
-        "Agents > Settings > Sharing, choosing No users",
-        "Copilot > Settings > Copilot AI disclaimer"
+        "Agents > Settings > Sharing, choosing No users for organization-wide sharing",
+        "Copilot > Settings > Copilot AI disclaimer, adding an AI policy link"
       ],
       "correct": 1,
       "explanation": "Agent and plugin access lets an admin allow agents and plugins built by Microsoft, by the organization and by external publishers independently. Sharing controls who may share Agent Builder agents broadly, the disclaimer is a display setting, and consent settings control app permissions rather than agent catalogs."
@@ -3741,13 +3741,13 @@
       "type": "mc",
       "question": "Contoso needs the same Entra, Purview, SharePoint and Defender protections applied to every agent it publishes, without configuring each product for each agent. What should the admin use?",
       "options": [
-        "A Power Platform DLP policy per environment",
-        "A separate sensitivity label for each agent",
-        "A Conditional Access policy that targets All cloud apps",
-        "An Agent 365 policy template applied when publishing or through a management rule"
+        "A Power Platform data policy configured separately in each environment",
+        "A separate sensitivity label created and assigned for each agent",
+        "A single Conditional Access policy that targets All cloud apps for every agent",
+        "An Agent 365 policy template applied at publish time or by a management rule"
       ],
       "correct": 3,
-      "explanation": "Policy templates bundle policies from Entra, Purview, SharePoint Online and Defender and can be applied at publish time or to existing agents in bulk. A label, a single Conditional Access policy or a connector DLP policy covers only one control surface."
+      "explanation": "Policy templates bundle policies from Entra, Purview, SharePoint Online and Defender and can be applied at publish time or to existing agents in bulk. A label, a single Conditional Access policy or a connector data policy covers only one control surface."
     },
     {
       "id": "q9035",
@@ -3757,8 +3757,8 @@
       "options": [
         "The agent registry in the Microsoft 365 admin center",
         "The Agent Activity tab in Teams, if she is the agent manager",
-        "Microsoft Defender advanced hunting",
-        "The Purview audit log"
+        "Microsoft Defender advanced hunting in the security portal",
+        "The unified audit log search in Microsoft Purview"
       ],
       "correct": 1,
       "explanation": "Users who interact with an agent or are assigned as its agent manager can view session activity in Teams or Copilot, while administrators monitor all agent activity in Defender. A regular manager has no access to hunting, the audit log or the admin center registry."
@@ -3827,8 +3827,8 @@
       "question": "When the sponsor of 30 agent identities moves to another department, which Lifecycle Workflows task transfers accountability to the sponsor's manager?",
       "options": [
         "Transfer agent identity sponsorships to manager",
-        "Disable user account",
-        "Remove user from all groups",
+        "Disable user account and block sign-in",
+        "Remove user from all groups and teams",
         "Send email to cosponsors about sponsor changes"
       ],
       "correct": 0,
@@ -3891,7 +3891,7 @@
         "q9007",
         "q9008"
       ],
-      "reading": "Every Microsoft 365 tenant starts with a default onmicrosoft.com domain, but production tenants add their own custom domain, like contoso.com. Adding it isn't enough on its own \u2014 the tenant has to prove ownership first, which it does by asking you to publish a unique TXT record at your DNS host. Once Microsoft 365 detects that record, the domain is verified, and only then do you add the MX record (routes mail to Exchange Online), the Autodiscover CNAME (lets Outlook clients find their mailbox settings automatically), and SPF (authorizes which servers may send mail as your domain). A custom domain can only be verified in one tenant at a time, which matters directly during a merger or tenant-to-tenant migration: the domain has to be removed from the source tenant's verified domains before the destination tenant can add and verify it, which is why domain cutover is normally the very last, tightly timed step of a migration, done only after mailbox content has already landed in the new tenant.\n\nLicensing follows a similar 'set it once, let it scale' philosophy. Assigning a license directly to each user works, but it means repeating that step for every hire and role change. Group-based licensing instead attaches the license to a Microsoft Entra security group, so every current and future member of that group picks it up automatically \u2014 nothing to remember when someone joins or leaves. Within a license SKU like Microsoft 365 E3, individual service plans (Exchange Online, SharePoint Online, Viva Engage, Stream, and dozens more) can also be disabled one at a time, so you can hand a user everything in the bundle except one workload you don't want them using, without buying and juggling a separate, narrower SKU. Microsoft 365 Apps update channels apply the same idea to how quickly change reaches users: Current Channel ships features as soon as they're ready, Monthly Enterprise Channel bundles them onto one predictable date a month, and Semi-Annual Enterprise Channel holds them back twice a year for organizations that need the longest validation runway.\n\nMail and collaboration objects look similar on the surface but behave very differently. A distribution group only fans mail out to its members' own inboxes \u2014 it never actually stores anything itself. A shared mailbox is a single mailbox that several people can send and receive from with delegated permissions, and it needs no license of its own as long as it stays under the size limit. A Microsoft 365 group goes further still, provisioning a shared mailbox, a SharePoint site, a Planner, and more all at once, as the membership object behind Teams. SharePoint's external sharing setting works on a similar layered principle: the organization-wide setting is a ceiling, and no individual site can be configured to be more permissive than that ceiling allows, only equal to it or tighter.\n\nDelegated administration and tenant health round out day-to-day tenant configuration. Granular Delegated Admin Privileges (GDAP) replaced the older, all-or-nothing classic DAP model, letting a partner be granted only specific, time-bound Microsoft Entra roles for a customer engagement instead of standing Admin Agent access across the whole tenant. The same least-privilege thinking applies internally: built-in roles like Helpdesk Administrator let front-line staff reset a regular user's password without ever being able to touch a Global Administrator's account or any tenant-wide setting. For hybrid identity, Microsoft Entra Connect is the traditional, server-based sync engine with the richest feature set, including complex custom sync rules, while Microsoft Entra Cloud Sync runs lightweight agents managed from the cloud, which is the simpler choice when several separate or disconnected AD forests, such as after an acquisition, need to land in one tenant. And day to day, Service health reports real, active incidents, while Message center instead announces upcoming feature changes \u2014 so a user complaining that something 'looks different' is very often a Message center rollout, not an outage at all.\n\nSeveral newer tenant tasks sit alongside the classics. Microsoft 365 Backup protects SharePoint sites, OneDrive accounts and Exchange mailboxes with a backup policy per workload, a recovery window of 3 months, 6 months, 1 year or 2 years, and point-in-time restore (sites and drives roll back, mailboxes restore in full or per item). It is set up by a SharePoint Administrator or Global Administrator and billed pay-as-you-go through an Azure subscription, which is how several non-Copilot services such as extra SharePoint storage and High Volume Email are metered too. Branding comes in two layers: custom themes (a default plus up to four group themes, each assignable to up to five Microsoft 365 groups) change the navigation bar inside the apps, while Microsoft Entra company branding changes the sign-in page.\n\nFor health and connectivity, Service health reports Microsoft-side incidents and advisories, and Customize > Email sends notifications (two addresses per admin, incidents and/or advisories, chosen services), whereas Health > Network connectivity measures the customer's own network per office with a 0 to 100 assessment where 80 is the healthy baseline. When Copilot is used in Teams meetings, the organizer's option (During and after, Only during, or Off) combines with the tenant transcription policy; Off disables Copilot, recording and transcription for that meeting. For Copilot readiness on SharePoint, SharePoint Advanced Management adds site ownership and inactivity policies, attestations, authentication-context Conditional Access, block download, restricted access control and Restricted Content Discovery, and it is included with a Copilot license.",
+      "reading": "Every Microsoft 365 tenant starts with a default onmicrosoft.com domain, but production tenants add their own custom domain, like contoso.com. Adding it isn't enough on its own \u2014 the tenant has to prove ownership first, which it does by asking you to publish a unique TXT record at your DNS host. Once Microsoft 365 detects that record, the domain is verified, and only then do you add the MX record (routes mail to Exchange Online), the Autodiscover CNAME (lets Outlook clients find their mailbox settings automatically), and SPF (authorizes which servers may send mail as your domain). A custom domain can only be verified in one tenant at a time, which matters directly during a merger or tenant-to-tenant migration: the domain has to be removed from the source tenant's verified domains before the destination tenant can add and verify it, which is why domain cutover is normally the very last, tightly timed step of a migration, done only after mailbox content has already landed in the new tenant.\n\nLicensing follows a similar 'set it once, let it scale' philosophy. Assigning a license directly to each user works, but it means repeating that step for every hire and role change. Group-based licensing instead attaches the license to a Microsoft Entra security group, so every current and future member of that group picks it up automatically \u2014 nothing to remember when someone joins or leaves. Within a license SKU like Microsoft 365 E3, individual service plans (Exchange Online, SharePoint Online, Viva Engage, Stream, and dozens more) can also be disabled one at a time, so you can hand a user everything in the bundle except one workload you don't want them using, without buying and juggling a separate, narrower SKU. Microsoft 365 Apps update channels apply the same idea to how quickly change reaches users: Current Channel ships features as soon as they're ready, Monthly Enterprise Channel bundles them onto one predictable date a month, and Semi-Annual Enterprise Channel used to hold them back to two releases a year, but since Version 2606 (July 2026) it has been unified with Monthly Enterprise Channel, so those devices now get the same monthly updates.\n\nMail and collaboration objects look similar on the surface but behave very differently. A distribution group only fans mail out to its members' own inboxes \u2014 it never actually stores anything itself. A shared mailbox is a single mailbox that several people can send and receive from with delegated permissions, and it needs no license of its own as long as it stays under the size limit. A Microsoft 365 group goes further still, provisioning a shared mailbox, a SharePoint site, a Planner, and more all at once, as the membership object behind Teams. SharePoint's external sharing setting works on a similar layered principle: the organization-wide setting is a ceiling, and no individual site can be configured to be more permissive than that ceiling allows, only equal to it or tighter.\n\nDelegated administration and tenant health round out day-to-day tenant configuration. Granular Delegated Admin Privileges (GDAP) replaced the older, all-or-nothing classic DAP model, letting a partner be granted only specific, time-bound Microsoft Entra roles for a customer engagement instead of standing Admin Agent access across the whole tenant. The same least-privilege thinking applies internally: built-in roles like Helpdesk Administrator let front-line staff reset a regular user's password without ever being able to touch a Global Administrator's account or any tenant-wide setting. For hybrid identity, Microsoft Entra Connect is the traditional, server-based sync engine with the richest feature set, including complex custom sync rules, while Microsoft Entra Cloud Sync runs lightweight agents managed from the cloud, which is the simpler choice when several separate or disconnected AD forests, such as after an acquisition, need to land in one tenant. And day to day, Service health reports real, active incidents, while Message center instead announces upcoming feature changes \u2014 so a user complaining that something 'looks different' is very often a Message center rollout, not an outage at all.\n\nSeveral newer tenant tasks sit alongside the classics. Microsoft 365 Backup protects SharePoint sites, OneDrive accounts and Exchange mailboxes with a backup policy per workload, a recovery window of 3 months, 6 months, 1 year or 2 years, and point-in-time restore (sites and drives roll back, mailboxes restore in full or per item). It is set up by a SharePoint Administrator or Global Administrator and billed pay-as-you-go through an Azure subscription, which is how several non-Copilot services such as extra SharePoint storage and High Volume Email are metered too. Branding comes in two layers: custom themes (a default plus up to four group themes, each assignable to up to five Microsoft 365 groups) change the navigation bar inside the apps, while Microsoft Entra company branding changes the sign-in page.\n\nFor health and connectivity, Service health reports Microsoft-side incidents and advisories, and Customize > Email sends notifications (two addresses per admin, incidents and/or advisories, chosen services), whereas Health > Network connectivity measures the customer's own network per office with a 0 to 100 assessment where 80 is the healthy baseline. When Copilot is used in Teams meetings, the organizer's option (During and after, Only during, or Off) combines with the tenant transcription policy; Off disables Copilot, recording and transcription for that meeting. For Copilot readiness on SharePoint, SharePoint Advanced Management adds site ownership and inactivity policies, attestations, authentication-context Conditional Access, block download, restricted access control and Restricted Content Discovery, and it is included with a Copilot license.",
       "fundamentalsLabel": "New to Microsoft 365 tenant administration? See the everyday analogy",
       "fundamentals": "Verifying a domain is like proving you own an address before the post office will deliver mail there \u2014 you post a one-time code at your 'address' (DNS), and only after that's confirmed do you set up the actual mail routes. Group-based licensing is like a company handing out badges by department instead of printing one individually for every new hire: join the department, get the badge automatically, no HR ticket required. And GDAP is like giving a contractor a keycard that only opens the two rooms they're working in, for the length of the job, instead of handing them a master key to the whole building indefinitely.",
       "keyTerms": [
@@ -4131,7 +4131,7 @@
         "q9027",
         "q9028"
       ],
-      "reading": "Microsoft 365 Copilot is always an add-on, never a standalone product. It requires an eligible base subscription \u2014 Microsoft 365 E3 or E5, Business Standard or Premium, A3 or A5 \u2014 plus the Copilot add-on license assigned separately to each user; owning the base subscription, or even owning Copilot licenses somewhere in the tenant, never grants access on its own to a user who hasn't been individually assigned one. Because it's an add-on layered on top of an existing license, group-based licensing rolls it out to a pilot group or department the same clean way it rolls out any other add-on. It's worth knowing there's also a free tier: Microsoft 365 Copilot Chat, the evolution of Bing Chat Enterprise, comes included with any Microsoft Entra work account at no extra cost, offering web-grounded chat with some limited file-grounded help. That means an organization that has purchased zero paid Copilot add-on licenses can still have employees genuinely using 'Copilot' \u2014 governance and DLP planning need to account for this free tier, not just the paid one.\n\nWhat makes the paid experience powerful is the Semantic Index: an encrypted, Microsoft Graph-based index of an organization's files, emails, chats, and meetings that Copilot uses to ground its answers in real organizational context, well beyond simple keyword search. Because what Copilot retrieves through the Semantic Index is trimmed to content the requesting user already has permission to access, it's a grounding mechanism, not an access-granting one \u2014 Copilot cannot surface anything the user couldn't already open on their own. That single guarantee reframes what the actual risk looks like: it isn't Copilot creating a new vulnerability, it's pre-existing oversharing, like files broadly shared with an 'Anyone in the organization' link, that Copilot's summarization now makes far easier to stumble across. While a full oversharing review is underway, Restricted SharePoint Search offers a fast, non-disruptive mitigation, letting an admin limit organization-wide search and Copilot to a curated allowed list of up to 100 sites, so every other site drops out of those results without touching a single user's existing permissions. It was always meant as a temporary stopgap, and Microsoft has announced its retirement (new enablement blocked from July 31, 2026; fully retired January 31, 2027) in favor of Restricted Content Discovery, which hides individual sites from search and Copilot without changing permissions.\n\nCopilot's reach can also extend beyond Microsoft 365 itself. A Microsoft Graph connector (now branded a Microsoft 365 Copilot connector) indexes external content, like a wiki or a ticketing system, into Microsoft Search and the Semantic Index, so Copilot can ground answers in that content too \u2014 provided the connector correctly maps its permissions to the source system's own access control list, since a misconfigured mapping is exactly how the no-new-access guarantee breaks down for external content. For lighter-weight customization, a Copilot agent can be built with little to no code in Copilot Studio, or created directly from a SharePoint site, in which case it's grounded only in that site's content and inherits its existing permissions automatically \u2014 a faster path than a full custom agent with its own connectors and topics. None of this extensibility is automatically open to everyone, though: admins govern which plugins, connectors, and published agents are available tenant-wide through agent management in the Microsoft 365 admin center (the pages that grew out of Integrated apps), and publishing an agent in Copilot Studio doesn't by itself make it visible to other users \u2014 that admin approval and deployment step is often what actually gates whether anyone else can find and use it.\n\nMicrosoft now calls the licensed experience Microsoft Copilot and the chat experience Microsoft Copilot Chat (the outline still says Microsoft 365 Copilot), with the app at copilot.cloud.microsoft. Tenant settings live under Copilot > Settings in the Microsoft 365 admin center, in four tabs (User access, Data access, Copilot actions, Other settings), and the AI Administrator role can change them: self-service purchase (Allow, Allow trials only, Do not allow), Frontier access, Copilot in admin centers, the AI disclaimer, image generation, vision, advanced package uploads and AI providers for other large language models. Several entries are only shortcuts, for example Copilot in Teams meetings opens the Teams admin center and web search is a Cloud Policy.\n\nCopilot Search appears in the Copilot app for licensed users with no admin setup and uses Copilot connectors for external data, while bookmarks, acronyms and Restricted Content Discovery shape what it returns. Anthropic models run as a Microsoft subprocessor, are on by default for most commercial tenants and off by default in the EU, EFTA and UK. To measure adoption, the admin center usage report shows enabled versus active users and adoption by app, while the Copilot Dashboard in Viva Insights covers adoption, impact and sentiment as part of Copilot Analytics. Microsoft's deployment blueprint for Copilot has three pillars: remediate oversharing, set up guardrails and meet regulations.",
+      "reading": "Microsoft 365 Copilot is an add-on, not a standalone product (Microsoft 365 E7 is the one suite that includes it). It requires an eligible base subscription \u2014 Microsoft 365 E3 or E5, Business Standard or Premium, A3 or A5 \u2014 plus the Copilot add-on license assigned separately to each user; owning the base subscription, or even owning Copilot licenses somewhere in the tenant, never grants access on its own to a user who hasn't been individually assigned one. Because it's an add-on layered on top of an existing license, group-based licensing rolls it out to a pilot group or department the same clean way it rolls out any other add-on. It's worth knowing there's also a free tier: Microsoft 365 Copilot Chat, the evolution of Bing Chat Enterprise, comes included with any Microsoft Entra work account at no extra cost, offering web-grounded chat with some limited file-grounded help. That means an organization that has purchased zero paid Copilot add-on licenses can still have employees genuinely using 'Copilot' \u2014 governance and DLP planning need to account for this free tier, not just the paid one.\n\nWhat makes the paid experience powerful is the Semantic Index: an encrypted, Microsoft Graph-based index of an organization's files, emails, chats, and meetings that Copilot uses to ground its answers in real organizational context, well beyond simple keyword search. Because what Copilot retrieves through the Semantic Index is trimmed to content the requesting user already has permission to access, it's a grounding mechanism, not an access-granting one \u2014 Copilot cannot surface anything the user couldn't already open on their own. That single guarantee reframes what the actual risk looks like: it isn't Copilot creating a new vulnerability, it's pre-existing oversharing, like files broadly shared with an 'Anyone in the organization' link, that Copilot's summarization now makes far easier to stumble across. While a full oversharing review is underway, Restricted SharePoint Search offers a fast, non-disruptive mitigation, letting an admin limit organization-wide search and Copilot to a curated allowed list of up to 100 sites, so every other site drops out of those results without touching a single user's existing permissions. It was always meant as a temporary stopgap, and Microsoft has announced its retirement (new enablement blocked from July 31, 2026; fully retired January 31, 2027) in favor of Restricted Content Discovery, which hides individual sites from search and Copilot without changing permissions.\n\nCopilot's reach can also extend beyond Microsoft 365 itself. A Microsoft Graph connector (now branded a Microsoft 365 Copilot connector) indexes external content, like a wiki or a ticketing system, into Microsoft Search and the Semantic Index, so Copilot can ground answers in that content too \u2014 provided the connector correctly maps its permissions to the source system's own access control list, since a misconfigured mapping is exactly how the no-new-access guarantee breaks down for external content. For lighter-weight customization, a Copilot agent can be built with little to no code in Copilot Studio, or created directly from a SharePoint site, in which case it's grounded only in that site's content and inherits its existing permissions automatically \u2014 a faster path than a full custom agent with its own connectors and topics. None of this extensibility is automatically open to everyone, though: admins govern which plugins, connectors, and published agents are available tenant-wide through agent management in the Microsoft 365 admin center (Agents > All agents), and publishing an agent in Copilot Studio doesn't by itself make it visible to other users \u2014 that admin approval and deployment step is often what actually gates whether anyone else can find and use it.\n\nMicrosoft now calls the licensed experience Microsoft Copilot and the chat experience Microsoft Copilot Chat (the outline still says Microsoft 365 Copilot), with the app at copilot.cloud.microsoft. Tenant settings live under Copilot > Settings in the Microsoft 365 admin center, in four tabs (User access, Data access, Copilot actions, Other settings), and the AI Administrator role can change them: self-service purchase (Allow, Allow trials only, Do not allow), Frontier access, Copilot in admin centers, the AI disclaimer, image generation, vision, advanced package uploads and AI providers for other large language models. Several entries are only shortcuts, for example Copilot in Teams meetings opens the Teams admin center and web search is a Cloud Policy.\n\nCopilot Search appears in the Copilot app for licensed users with no admin setup and uses Copilot connectors for external data, while bookmarks, acronyms and Restricted Content Discovery shape what it returns. Anthropic models run as a Microsoft subprocessor, are on by default for most commercial tenants and off by default in the EU, EFTA and UK. To measure adoption, the admin center usage report shows enabled versus active users and adoption by app, while the Copilot Dashboard in Viva Insights covers adoption, impact and sentiment as part of Copilot Analytics. Microsoft's deployment blueprint for Copilot has three pillars: remediate oversharing, set up guardrails and meet regulations.",
       "fundamentalsLabel": "New to Copilot licensing and grounding? See the everyday analogy",
       "fundamentals": "Think of the base subscription and the Copilot add-on like a gym membership and a personal trainer package: the gym membership alone gets you in the door, but the trainer sessions are a separate add-on you have to book on top of it, for each person who wants one. The Semantic Index is like a very well-organized personal assistant who can only ever tell you about documents you were already allowed to read yourself \u2014 the assistant doesn't hand you a master key, it just helps you find, faster, what was already yours to find.",
       "keyTerms": [
@@ -4329,7 +4329,7 @@
         "Purview DSPM (the current experience; DSPM for AI is the classic version) gives visibility into AI usage and data risk and can recommend/apply DLP + sensitivity-label policies \u2014 it is not a Copilot licensing prerequisite and it reports rather than enforces.",
         "Agents are governed in the Microsoft 365 admin center: Agents > All agents > Registry and Requests, agent settings and rules, and AI Administrator as the least-privilege role; access to Cowork comes only from a spending policy that selects it.",
         "Microsoft Entra Agent ID gives AI agents first-class identity objects (like service principals) so they can be governed, reviewed, and monitored.",
-        "Microsoft Security Copilot is a separate product from Microsoft 365 Copilot, billed via Security Compute Units (SCUs, consumption-based) instead of per-user licenses; Microsoft 365 E5 now includes a monthly SCU allotment."
+        "Microsoft Security Copilot is a separate product from Microsoft 365 Copilot, billed via Security Compute Units (SCUs, consumption-based) instead of per-user licenses; Microsoft 365 E5 and E7 now include a monthly SCU allotment."
       ]
     },
     {
@@ -4409,7 +4409,7 @@
     {
       "id": "ml-ab650-3",
       "cat": "aiServices",
-      "scenario": "A security team first wants a report showing which existing SharePoint oversharing risks are actually being surfaced to users through Copilot responses \u2014 that's {b1}. Once they identify a specific type of sensitive content that should never appear in a Copilot answer, they configure a {b2} scoped to Copilot interactions to actually block it going forward.",
+      "scenario": "A security team first wants a report showing which existing SharePoint oversharing risks are actually being surfaced to users through Copilot responses \u2014 that's {b1}. Once they identify a specific type of sensitive content that should never appear in a Copilot answer, they configure {b2} scoped to Copilot interactions to actually block it going forward.",
       "blanks": [
         {
           "key": "b1",
@@ -4677,7 +4677,7 @@
       "cat": "aiServices",
       "scenario": "Contoso's 'Confidential' label currently applies a header and footer only. Users who can open labeled files must not be able to have Microsoft 365 Copilot summarize or quote them, and Legal does not want to change how the files open. Which approach is better?",
       "optionA": "Add encryption to the label that grants users View but not Extract rights.",
-      "optionB": "Create a Purview DLP policy with the Microsoft 365 Copilot location that excludes content carrying the label.",
+      "optionB": "Create a Purview DLP policy with the Microsoft 365 Copilot location that stops Copilot from processing content carrying the label.",
       "better": "B",
       "why": "The DLP policy keeps Copilot from processing labeled content without altering the label or the files, so access and the open experience stay exactly as they are. Removing the Extract right also stops Copilot from using the content, and it is a valid design in a tenant that already encrypts, but here it would convert a marking-only label into an encrypting one, which Legal ruled out and which affects every app that opens the files."
     },
@@ -4685,19 +4685,19 @@
       "id": "cmp-ab650-9",
       "cat": "aiServices",
       "scenario": "Contoso wants Microsoft 365 Copilot to answer 'what is the status of ticket 4821' with current data from a third-party ticketing system and to open a new ticket when asked. Which approach is better?",
-      "optionA": "Deploy a Microsoft Graph connector that indexes the ticketing system into Microsoft Graph.",
+      "optionA": "Deploy a Copilot connector that indexes the ticketing system into Microsoft Graph.",
       "optionB": "Build a Copilot Studio agent with an action that calls the ticketing system's API.",
       "better": "B",
-      "why": "An action calls the API at runtime, so status is live and the agent can create tickets as well as read them. A Graph connector is the natural choice for grounding Copilot on external content, which is why it tempts, but it indexes a periodically crawled copy of the records, so answers lag the source and it can never perform a write such as opening a ticket."
+      "why": "An action calls the API at runtime, so status is live and the agent can create tickets as well as read them. A Copilot connector (formerly a Graph connector) is the natural choice for grounding Copilot on external content, which is why it tempts, but it indexes a periodically crawled copy of the records, so answers lag the source and it can never perform a write such as opening a ticket."
     },
     {
       "id": "cmp-ab650-10",
       "cat": "aiServices",
       "scenario": "Finance built a Copilot Studio agent that must be usable only by the Finance department once an admin approves it. Which approach is better?",
-      "optionA": "Approve the agent in the Agents area of the Copilot Control System and deploy it to the Finance security group.",
-      "optionB": "Create a Power Platform DLP policy that allows the agent's connectors only in the Finance environment.",
+      "optionA": "Approve the agent in the agent registry of the Microsoft 365 admin center and deploy it to the Finance security group.",
+      "optionB": "Create a Power Platform data policy that allows the agent's connectors only in the Finance environment.",
       "better": "A",
-      "why": "The Agents area of the Copilot Control System (which grew out of Integrated apps) is where an admin approves a shared agent and chooses who receives it, so scoping the deployment to the Finance group satisfies the requirement directly. A Power Platform DLP policy governs which connectors agents in an environment may use; it does not control which users can see or run a published agent, so Finance-only connectors would not stop other users from finding the agent."
+      "why": "The agent registry in the Microsoft 365 admin center is where an admin approves a shared agent and chooses who receives it, so scoping the deployment to the Finance group satisfies the requirement directly. A Power Platform data policy governs which connectors agents in an environment may use; it does not control which users can see or run a published agent, so Finance-only connectors would not stop other users from finding the agent."
     },
     {
       "id": "cmp-ab650-9001",
