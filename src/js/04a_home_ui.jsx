@@ -26,12 +26,13 @@ function AchievementsPanel({ achievements, streak, onClose }) {
   return (
     <div
       onClick={onClose}
-      className="sheet-backdrop"
+      data-overlay="1"
+      className="app-sheet-backdrop"
       style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', zIndex: 50, display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="sheet"
+        className="app-sheet"
         style={{
           background: COLOR.bg, borderTop: `1px solid ${COLOR.border}`, borderRadius: 'var(--r-card) var(--r-card) 0 0',
           maxWidth: '28rem', width: '100%', maxHeight: '82vh', overflowY: 'auto', padding: '18px 18px 28px',
@@ -124,12 +125,13 @@ function DataPanel({
   return (
     <div
       onClick={onClose}
-      className="sheet-backdrop"
+      data-overlay="1"
+      className="app-sheet-backdrop"
       style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', zIndex: 50, display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="sheet"
+        className="app-sheet"
         style={{
           background: COLOR.bg, borderTop: `1px solid ${COLOR.border}`, borderRadius: 'var(--r-card) var(--r-card) 0 0',
           maxWidth: '28rem', width: '100%', maxHeight: '82vh', overflowY: 'auto', padding: '18px 18px 28px',
@@ -413,7 +415,7 @@ function TrackListDropdown({ tracks, masteries, certPlan, onSelectTrack, onAddTo
         <span style={{ fontSize: '11px', color: COLOR.muted, transform: open ? 'rotate(180deg)' : 'none', transition: 'transform 0.15s ease' }}>▾</span>
       </button>
       {open && (
-        <div className="flex flex-col gap-2 track-grid" style={{ marginTop: '8px' }}>
+        <div className="flex flex-col gap-2" style={{ marginTop: '8px' }}>
           {masteries.map(({ track: t, pct }) => {
             const accent = trackAccent(t.key);
             const isCompleted = !!certPlan.completed[t.key];
@@ -1011,12 +1013,13 @@ function TrackSwitcherSheet({ tracks, results, certPlan, activeTrack, onSelect, 
   return (
     <div
       onClick={onClose}
-      className="sheet-backdrop"
+      data-overlay="1"
+      className="app-sheet-backdrop"
       style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', zIndex: 50, display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="sheet"
+        className="app-sheet"
         style={{
           background: COLOR.bg, borderTop: `1px solid ${COLOR.border}`, borderRadius: 'var(--r-card) var(--r-card) 0 0',
           maxWidth: '28rem', width: '100%', maxHeight: '82vh', overflowY: 'auto', padding: '18px 18px 28px',
@@ -1072,12 +1075,13 @@ function CertPathPanel({ tracks, certPlan, onAddTrack, onRemoveTrack, onMove, on
   return (
     <div
       onClick={onClose}
-      className="sheet-backdrop"
+      data-overlay="1"
+      className="app-sheet-backdrop"
       style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', zIndex: 50, display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="sheet"
+        className="app-sheet"
         style={{
           background: COLOR.bg, borderTop: `1px solid ${COLOR.border}`, borderRadius: 'var(--r-card) var(--r-card) 0 0',
           maxWidth: '28rem', width: '100%', maxHeight: '82vh', overflowY: 'auto', padding: '18px 18px 28px',

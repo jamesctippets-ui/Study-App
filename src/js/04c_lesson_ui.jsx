@@ -13,16 +13,19 @@ function FlashcardView({ card, flipped, setFlipped, onRate, index, total, catego
   useEscapeToClose(() => setActiveTermKey(null));
   useClickOutsideToClose(!!activeTermKey, () => setActiveTermKey(null));
   useFocusMode(!!card);
-  const prompt = useMemo(() => (card ? flashcardPrompt(card) : null), [card]);
-  // Desktop keyboard: Space/Enter flips, H shows the hint, 1/2 rate once flipped.
-  const flip = () => setFlipped((f) => !f);
-  useKeyShortcuts(!!card, {
-    ' ': flip,
-    enter: () => { if (flipped) return false; flip(); },
-    h: () => { if (!defFirst || flipped) return false; setHintShown(true); },
-    1: () => { if (!flipped) return false; onRate(CARD_MISSED); },
-    2: () => { if (!flipped) return false; onRate(CARD_GOT_IT); },
+  // Desktop keys: Space or Enter flips, H shows the hint, then ← (or 1) is "Don't got it" and → (or 2) is "Got it".
+  useKeyShortcuts(!!card, (k) => {
+    if (!flipped) {
+      if (k === ' ' || k === 'Enter' || k === 'ArrowUp' || k === 'ArrowDown') { setFlipped(true); return true; }
+      if (k === 'h' && defFirst) { setHintShown(true); return true; }
+      return false;
+    }
+    if (k === 'ArrowLeft' || k === '1') { onRate(CARD_MISSED); return true; }
+    if (k === 'ArrowRight' || k === '2') { onRate(CARD_GOT_IT); return true; }
+    if (k === ' ' || k === 'ArrowUp' || k === 'ArrowDown') { setFlipped(false); return true; }
+    return false;
   });
+  const prompt = useMemo(() => (card ? flashcardPrompt(card) : null), [card]);
   if (!card) return null;
   const otherCards = flashcardsData && flashcardsData.filter((c) => c.id !== card.id);
   const showDefinition = defFirst ? true : flipped;        // is the definition on screen
@@ -75,8 +78,8 @@ function FlashcardView({ card, flipped, setFlipped, onRate, index, total, catego
       </div>
       {/* The reveal and rating buttons are pinned to the bottom of the screen, where the tab bar normally sits
           (hidden in focus mode), so they stay under the thumb whether or not the card has been flipped. */}
-      <div style={{ position: 'fixed', left: 0, right: 0, bottom: 0, zIndex: 40, background: COLOR.navBar, borderTop: `1px solid ${COLOR.border}`, paddingBottom: 'env(safe-area-inset-bottom)' }}>
-        <div className="app-col mx-auto" style={{ display: 'flex', gap: '10px', padding: '10px 16px' }}>
+      <div className="app-pinbar" style={{ position: 'fixed', left: 0, right: 0, bottom: 0, zIndex: 40, background: COLOR.navBar, borderTop: `1px solid ${COLOR.border}`, paddingBottom: 'env(safe-area-inset-bottom)' }}>
+        <div className="app-col max-w-md mx-auto" style={{ display: 'flex', gap: '10px', padding: '10px 16px' }}>
           {!flipped ? (
             <React.Fragment>
               {defFirst && (
@@ -86,14 +89,14 @@ function FlashcardView({ card, flipped, setFlipped, onRate, index, total, catego
                   className="btn-flat"
                   style={{ padding: '14px 14px', borderRadius: 'var(--r-ctl)', border: `1px solid ${COLOR.border}`, background: 'transparent', color: hintShown ? COLOR.muted : COLOR.text, fontSize: '13px', fontWeight: 600, flexShrink: 0, opacity: hintShown ? 0.6 : 1 }}
                 >
-                  Show a hint<KeyHint k="H" />
+                  Show a hint
                 </button>
               )}
               <button
                 onClick={() => setFlipped(true)}
                 style={{ flex: 1, padding: '14px 14px', borderRadius: 'var(--r-ctl)', border: 'none', background: COLOR.primary, color: COLOR.onAccent, fontSize: '14px', fontWeight: 700 }}
               >
-                {defFirst ? 'Show the term' : 'Show the definition'}<KeyHint k="Space" />
+                {defFirst ? 'Show the term' : 'Show the definition'}
               </button>
             </React.Fragment>
           ) : (
@@ -102,16 +105,19 @@ function FlashcardView({ card, flipped, setFlipped, onRate, index, total, catego
                 onClick={() => onRate(CARD_MISSED)}
                 style={{ flex: 1, padding: '14px 10px', borderRadius: 'var(--r-ctl)', border: `1px solid ${COLOR.red}`, background: 'transparent', color: COLOR.red, fontSize: '14px', fontWeight: 700 }}
               >
-                Don't got it<KeyHint k="1" />
+                Don't got it
               </button>
               <button
                 onClick={() => onRate(CARD_GOT_IT)}
                 style={{ flex: 1, padding: '14px 10px', borderRadius: 'var(--r-ctl)', border: 'none', background: COLOR.success, color: COLOR.onAccent, fontSize: '14px', fontWeight: 700 }}
               >
-                Got it<KeyHint k="2" />
+                Got it
               </button>
             </React.Fragment>
           )}
+        </div>
+        <div className="app-col desktop-only mono mx-auto" style={{ fontSize: '11px', color: COLOR.muted, textAlign: 'center', padding: '0 16px 4px' }}>
+          {!flipped ? `Space to flip${defFirst ? ' · H for a hint' : ''}` : '← Don\'t got it · → Got it · Space to flip back'}
         </div>
       </div>
     </div>

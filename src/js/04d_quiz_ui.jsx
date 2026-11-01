@@ -848,27 +848,24 @@ function QuestionView({ q, selected, onChoose, onNext, index, total, categoryLab
   useEffect(() => { setActiveTermKey(null); }, [q && q.id]);
   useEscapeToClose(() => setActiveTermKey(null));
   useClickOutsideToClose(!!activeTermKey, () => setActiveTermKey(null));
-  // Desktop keyboard: A-F or 1-6 answer (or toggle, for select-all), T/F for
-  // true/false, Enter submits a select-all answer or moves on. Off for the
-  // one-off question on Home (hideNext), which shares the page with other cards.
-  const pick = (i) => {
-    if (!q || selected !== null) return false;
-    if (q.type === 'tf') { if (i > 1) return false; onChoose(i); return undefined; }
-    if (!q.options || i >= q.options.length) return false;
-    if (q.type === 'ms') onToggleMs(i); else onChoose(i);
-    return undefined;
-  };
-  const keys = {
-    enter: () => {
-      if (!q) return false;
-      if (selected === null) { if (q.type === 'ms' && msPending.length) { onSubmitMs(); return undefined; } return false; }
-      if (!onNext) return false;
-      onNext(); return undefined;
-    },
-  };
-  ['a', 'b', 'c', 'd', 'e', 'f'].forEach((l, i) => { keys[l] = () => pick(i); keys[String(i + 1)] = () => pick(i); });
-  if (q && q.type === 'tf') { keys.t = () => pick(0); keys.f = () => pick(1); }
-  useKeyShortcuts(!!q && !hideNext, keys);
+  // Desktop keys: A to E (or 1 to 5) pick an option (T / F for true-false), Enter submits a
+  // multi-select answer or moves to the next question once this one is answered.
+  useKeyShortcuts(!!q, (k) => {
+    if (selected !== null) {
+      if (k === 'Enter' && !hideNext && onNext) { onNext(); return true; }
+      return false;
+    }
+    if (q.type === 'tf') {
+      if (k === 't' || k === '1') { onChoose(0); return true; }
+      if (k === 'f' || k === '2') { onChoose(1); return true; }
+      return false;
+    }
+    let i = 'abcde'.indexOf(k);
+    if (i < 0 && /^[1-5]$/.test(k)) i = Number(k) - 1;
+    if (i >= 0 && i < (q.options || []).length) { if (q.type === 'ms') onToggleMs(i); else onChoose(i); return true; }
+    if (k === 'Enter' && q.type === 'ms' && msPending.length) { onSubmitMs(); return true; }
+    return false;
+  });
   if (!q) return null;
   const isLast = index + 1 >= total;
   return (
@@ -948,7 +945,7 @@ function QuestionView({ q, selected, onChoose, onNext, index, total, categoryLab
               disabled={msPending.length === 0}
               style={{ width: '100%', marginTop: '12px', padding: '12px', borderRadius: 'var(--r-ctl)', border: 'none', background: msPending.length ? COLOR.primary : COLOR.surfaceRaised, color: msPending.length ? COLOR.onAccent : COLOR.muted, fontSize: '14px', fontWeight: 700 }}
             >
-              Submit answer<KeyHint k="Enter" />
+              Submit answer
             </button>
           )}
         </div>
@@ -973,7 +970,7 @@ function QuestionView({ q, selected, onChoose, onNext, index, total, categoryLab
           onClick={onNext}
           style={{ width: '100%', marginTop: '12px', padding: '13px', borderRadius: 'var(--r-ctl)', border: 'none', background: COLOR.primary, color: COLOR.onAccent, fontSize: '14px', fontWeight: 700 }}
         >
-          {nextLabel || (isLast ? 'See results' : 'Next question')}<KeyHint k="Enter" />
+          {nextLabel || (isLast ? 'See results' : 'Next question')}
         </button>
       )}
     </div>

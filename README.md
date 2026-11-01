@@ -666,31 +666,6 @@ where one genuinely fits, vocab/quiz call-outs, and common-traps notes):
 To hide a track again (e.g. while it's a work in progress), open `data/tracks.py`
 and add `'hidden': True` to that track's entry, then rebuild (see below).
 
-## Desktop layout
-
-On a browser window 1024px wide or more (`DESKTOP_QUERY` in `00_preamble.js`,
-mirrored by the matching media query in `templates/index.html.tmpl`) the app
-switches to a desktop layout; below that width nothing changes.
-
-- **Sidebar instead of the bottom tab bar.** `SideNav` (`04b_panels_ui.jsx`)
-  holds Home, the current-track switcher, Path / Practice / Reference / Exam,
-  Profile, and the tools that live behind the header menu or Home's tool row
-  on a phone (cert path, Playground, Glossary, Achievements, Data & settings,
-  About). The header's menu button is hidden, since the sidebar covers it.
-- **Wider content.** The content column grows from 28rem to 54rem; the Path
-  map stays at 40rem and Reference reading at 46rem so lines don't run too
-  long. Home's track list flows into a grid.
-- **Dialogs, not bottom sheets.** Every sheet (cert path, track switcher,
-  glossary, data, achievements, about) opens as a centered dialog.
-- **Keyboard shortcuts.** Flashcards: Space or Enter shows the answer, H
-  shows the hint, 1 = Don't got it, 2 = Got it. Practice questions: A–F or
-  1–6 answer (or toggle, for select-all), T/F for true/false, Enter submits a
-  select-all answer or goes to the next question. Shortcuts are ignored while
-  typing in a field or with a dialog open, and keycaps on the buttons show
-  them only on desktop with a mouse.
-- **Focus mode** (flashcards) hides the sidebar too, and narrows the card to
-  42rem.
-
 ## Source layout
 
 The shipped app is still a single static `index.html` (so it keeps working as an
@@ -782,6 +757,26 @@ it doesn't run the Python build for you.
 The React/JSX code itself is still transpiled by Babel Standalone *in the
 browser* at load time (see "Where things stand" below for the trade-off there) —
 `build.py` only assembles source files and content, it doesn't compile JS.
+
+### Desktop layout
+
+The app is built phone-first (a 28rem column, tabs along the bottom), but in a browser window 1024px or wider
+it switches to a desktop layout with no change to the phone one. All of it is CSS in the `@media (min-width:
+1024px)` block of `templates/index.html.tmpl`, keyed off class hooks in the JSX (`app-root`, `app-top`,
+`app-col`, `app-main`, `app-tabbar`, `app-pinbar`, `app-sheet`):
+
+- the bottom tab bar becomes a left sidebar (216px, 240px from 1440px) with the tab names spelled out and a
+  short keyboard-shortcut note at the bottom;
+- the content column widens from 28rem to 46rem (52rem from 1440px), and the top bar lines up with it;
+- the bottom sheets (cert path, achievements, glossary and the other panels marked `app-sheet`) open as
+  centred dialogs;
+- flashcards keep their focus mode (sidebar and top bar step aside), but the reveal and rating buttons sit
+  right under the card instead of at the bottom of a tall window.
+
+Keyboard shortcuts work at any width (`useKeyShortcuts` in `00_preamble.js`, ignored while typing in a field or
+while a sheet is open): Alt+1 to Alt+6 switch tabs; in flashcards Space or Enter flips, H shows the hint, and ←
+or 1 is Don't got it, → or 2 is Got it; in questions A to E (or 1 to 5) pick an option, T and F answer
+true/false, and Enter submits a multi-select answer or moves to the next question.
 
 ### Light/dark theming
 

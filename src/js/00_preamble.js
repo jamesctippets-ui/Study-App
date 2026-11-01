@@ -127,6 +127,30 @@ function useFocusMode(active) {
   }, [active]);
 }
 
+// Keyboard shortcuts for desktop browsers. `handler(key, event)` gets the
+// lower-cased key and returns true when it used it (the default action is then
+// prevented). Keys typed into a text field, a select or a contenteditable are
+// left alone, as are key presses with Ctrl, Alt or Meta held, and nothing fires
+// while an overlay (a sheet or dialog, marked data-overlay) is open on top.
+function useKeyShortcuts(enabled, handler) {
+  const ref = useRef(handler);
+  ref.current = handler;
+  useEffect(() => {
+    if (!enabled) return undefined;
+    const onKey = (e) => {
+      if (e.defaultPrevented || e.ctrlKey || e.altKey || e.metaKey || e.repeat) return;
+      const t = e.target;
+      if (t && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName))) return;
+      // A focused button or link already acts on Enter and Space by itself.
+      if (t && /^(BUTTON|A|SUMMARY)$/.test(t.tagName) && (e.key === 'Enter' || e.key === ' ')) return;
+      if (document.querySelector('[data-overlay], [data-tour-overlay]')) return;
+      if (ref.current(e.key.length === 1 ? e.key.toLowerCase() : e.key, e)) e.preventDefault();
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [enabled]);
+}
+
 // Closes an inline flyout (a term-definition popup anchored to the word
 // that was clicked, not a full-screen overlay) when the user taps/clicks
 // anywhere outside it — including on a different term, which this treats
@@ -170,57 +194,6 @@ function useScrollTopOnChange(value) {
 // tab bar, so both numbers live here.
 const APP_HEADER_HEIGHT = 56;
 const TAB_BAR_HEIGHT = 68;
-
-// Desktop layout: at this width and up the bottom tab bar becomes a left
-// sidebar (SIDE_NAV_WIDTH wide), the content column widens, and sheets open
-// as centered dialogs. The CSS half of it lives in the page template under
-// the same media query, so keep the two in step.
-const DESKTOP_QUERY = '(min-width: 1024px)';
-const SIDE_NAV_WIDTH = 232;
-
-function useIsDesktop() {
-  const get = () => typeof window !== 'undefined' && !!window.matchMedia && window.matchMedia(DESKTOP_QUERY).matches;
-  const [isDesktop, setIsDesktop] = useState(get);
-  useEffect(() => {
-    if (!window.matchMedia) return undefined;
-    const mq = window.matchMedia(DESKTOP_QUERY);
-    const onChange = () => setIsDesktop(mq.matches);
-    onChange();
-    if (mq.addEventListener) mq.addEventListener('change', onChange); else mq.addListener(onChange);
-    return () => { if (mq.removeEventListener) mq.removeEventListener('change', onChange); else mq.removeListener(onChange); };
-  }, []);
-  return isDesktop;
-}
-
-// A small keycap naming a button's keyboard shortcut. Hidden by the page CSS
-// unless the desktop layout is on and the device has a fine pointer.
-function KeyHint({ k }) {
-  return <kbd className="key-hint" aria-hidden="true">{k}</kbd>;
-}
-
-// Keyboard shortcuts for a screen (flashcards, a quiz question). `keys` maps
-// a lowercased KeyboardEvent.key (' ' for the space bar) to a handler; a
-// handler returning false lets the key through. Keys typed into a field,
-// with a modifier held, or while a sheet is open are left alone.
-function useKeyShortcuts(enabled, keys) {
-  const ref = useRef(keys);
-  ref.current = keys;
-  useEffect(() => {
-    if (!enabled) return undefined;
-    const handler = (e) => {
-      if (e.ctrlKey || e.metaKey || e.altKey || e.repeat) return;
-      const t = e.target;
-      if (t && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName))) return;
-      if (document.querySelector('.sheet-backdrop')) return;
-      const fn = ref.current[(e.key || '').toLowerCase()];
-      if (!fn) return;
-      if (fn(e) === false) return;
-      e.preventDefault();
-    };
-    window.addEventListener('keydown', handler);
-    return () => window.removeEventListener('keydown', handler);
-  }, [enabled]);
-}
 
 const SHADOW = {
   // Cards are flat with a hairline border (the Console look): no shadow.
