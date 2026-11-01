@@ -2,6 +2,7 @@
 
 function CertStudyApp() {
   const [theme, toggleTheme] = useTheme();
+  const isDesktop = useIsDesktop();
   const [activeTrack, setActiveTrack] = useState('az900');
   const [mode, setMode] = useState('home');
   const [playgroundTool, setPlaygroundTool] = useState('');
@@ -1765,9 +1766,10 @@ function CertStudyApp() {
         />
       )}
       <div data-chrome="top" style={{ background: `color-mix(in srgb, ${modeHue(mode)} 9%, ${COLOR.navBar})`, borderBottom: `1px solid color-mix(in srgb, ${modeHue(mode)} 45%, ${COLOR.border})`, position: 'sticky', top: 0, zIndex: 30, transition: 'background-color 0.2s ease' }}>
-        <div className="max-w-md mx-auto px-4 flex items-center" style={{ height: `${APP_HEADER_HEIGHT}px`, gap: '8px' }}>
+        <div className="app-col mx-auto px-4 flex items-center" style={{ height: `${APP_HEADER_HEIGHT}px`, gap: '8px' }}>
           <button
             onClick={() => setShowCertPath(true)}
+            data-mobile-only="1"
             className="btn-flat"
             title="Manage cert path"
             style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: '34px', height: '34px', borderRadius: 'var(--r-ctl)', border: 'none', background: 'transparent', color: COLOR.muted, padding: 0, flexShrink: 0, marginLeft: '-6px' }}
@@ -1805,7 +1807,7 @@ function CertStudyApp() {
           </div>
         </div>
       </div>
-      <div className="max-w-md mx-auto px-4 py-5" data-chrome-pad="1" style={{ paddingBottom: `calc(${TAB_BAR_HEIGHT + 24}px + env(safe-area-inset-bottom))` }}>
+      <div className={`app-col app-col-${mode} mx-auto px-4 py-5`} data-chrome-pad="1" style={{ paddingBottom: `calc(${TAB_BAR_HEIGHT + 24}px + env(safe-area-inset-bottom))` }}>
         {saveError ? (
           <div style={{ fontSize: '11.5px', color: COLOR.red, marginBottom: '12px', padding: '8px 10px', borderRadius: 'var(--r-ctl)', border: `1px solid ${COLOR.red}`, background: 'color-mix(in srgb, var(--color-red) 10%, transparent)' }}>
             Your last save didn't go through — your browser's storage may be full. Try Data &amp; Progress → Export to back up what you have, then free up some space.
@@ -2325,7 +2327,25 @@ function CertStudyApp() {
         </React.Fragment>
         )}
       </div>
-      <BottomTabBar mode={mode} onChange={openTab} />
+      {isDesktop ? (
+        <SideNav
+          mode={mode}
+          onChange={openTab}
+          track={track}
+          activeTrack={activeTrack}
+          onOpenTrackSwitcher={() => setShowTrackSwitcher(true)}
+          onTool={(key) => {
+            if (key === 'certPath') setShowCertPath(true);
+            else if (key === 'playground') { setPlaygroundTool(''); setPlaygroundPick(''); setMode('playground'); }
+            else if (key === 'glossary') setShowGlossary(true);
+            else if (key === 'achievements') setShowAchievements(true);
+            else if (key === 'data') { setImportMessage(null); setShowData(true); }
+            else if (key === 'about') setShowAbout(true);
+          }}
+        />
+      ) : (
+        <BottomTabBar mode={mode} onChange={openTab} />
+      )}
     </div>
     </CustomTermsContext.Provider>
     </CardPrefsContext.Provider>

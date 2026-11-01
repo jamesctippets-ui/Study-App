@@ -183,10 +183,12 @@ function GlossaryPanel({ onClose, customTerms, customScenarios, onSaveCustomTerm
   return (
     <div
       onClick={onClose}
+      className="sheet-backdrop"
       style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', zIndex: 50, display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}
     >
       <div
         onClick={(e) => e.stopPropagation()}
+        className="sheet"
         style={{
           background: COLOR.bg, borderTop: `1px solid ${COLOR.border}`, borderRadius: 'var(--r-card) var(--r-card) 0 0',
           maxWidth: '28rem', width: '100%', maxHeight: '82vh', overflowY: 'auto', padding: '18px 18px 28px',
@@ -307,10 +309,12 @@ function AboutLegalPanel({ onClose }) {
   return (
     <div
       onClick={onClose}
+      className="sheet-backdrop"
       style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', zIndex: 50, display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}
     >
       <div
         onClick={(e) => e.stopPropagation()}
+        className="sheet"
         style={{
           background: COLOR.bg, borderTop: `1px solid ${COLOR.border}`, borderRadius: 'var(--r-card) var(--r-card) 0 0',
           maxWidth: '28rem', width: '100%', maxHeight: '82vh', overflowY: 'auto', padding: '18px 18px 28px',
@@ -608,6 +612,106 @@ function BottomTabBar({ mode, onChange }) {
             </button>
           );
         })}
+      </div>
+    </nav>
+  );
+}
+
+// The desktop version of the bottom tab bar: a fixed left sidebar with the
+// same destinations, plus the track switcher and the tools that live behind
+// the header menu or Home's tool row on a phone. Marked data-chrome so
+// flashcard focus mode hides it like the tab bar. See DESKTOP_QUERY.
+const SIDE_NAV_TOOLS = [
+  { key: 'certPath', label: 'My cert path', hue: 'var(--color-primary)' },
+  { key: 'playground', label: 'Playground', hue: 'var(--color-success)' },
+  { key: 'glossary', label: 'Glossary', hue: 'var(--color-pink)' },
+  { key: 'achievements', label: 'Achievements', hue: 'var(--color-gold)' },
+  { key: 'data', label: 'Data & settings', hue: 'var(--color-muted)' },
+  { key: 'about', label: 'About & legal', hue: 'var(--color-muted)' },
+];
+
+function SideNav({ mode, onChange, track, activeTrack, onOpenTrackSwitcher, onTool }) {
+  const accent = trackAccent(activeTrack);
+  const item = (t) => {
+    const active = mode === t.m;
+    const hue = modeHue(t.m);
+    return (
+      <button
+        key={t.m}
+        onClick={() => onChange(t.m)}
+        aria-current={active ? 'page' : undefined}
+        data-tour={`tab-${t.m}`}
+        className="btn-flat side-nav-item"
+        style={{
+          display: 'flex', alignItems: 'center', gap: '12px', width: '100%', textAlign: 'left', padding: '9px 12px', borderRadius: 'var(--r-ctl)', border: 'none',
+          background: active ? `color-mix(in srgb, ${hue} 14%, transparent)` : 'transparent', boxShadow: active ? `inset 3px 0 0 ${hue}` : 'none',
+          color: active ? hue : COLOR.text, fontSize: '14px', fontWeight: active ? 700 : 500,
+        }}
+      >
+        <span style={{ display: 'inline-flex', color: active ? hue : `color-mix(in srgb, ${hue} 70%, ${COLOR.muted})` }}><TabIcon kind={t.icon} size={20} /></span>
+        {t.label}
+      </button>
+    );
+  };
+  const groupLabel = (text) => (
+    <div className="mono" style={{ fontSize: '10px', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: COLOR.muted, padding: '16px 12px 6px' }}>{text}</div>
+  );
+  const byMode = (m) => TAB_BAR_ITEMS.find((t) => t.m === m);
+  return (
+    <nav
+      aria-label="Main"
+      data-chrome="side"
+      className="side-nav"
+      style={{
+        position: 'fixed', top: 0, bottom: 0, left: 0, width: `${SIDE_NAV_WIDTH}px`, zIndex: 40, background: COLOR.navBar,
+        borderRight: `1px solid ${COLOR.border}`, display: 'flex', flexDirection: 'column', overflowY: 'auto', padding: '0 12px 16px',
+      }}
+    >
+      <div className="app-title mono" style={{ display: 'flex', alignItems: 'center', gap: '8px', height: `${APP_HEADER_HEIGHT}px`, padding: '0 12px', fontSize: '14px', fontWeight: 700, flexShrink: 0 }}>
+        <span style={{ width: '9px', height: '9px', background: COLOR.primary, flexShrink: 0 }} />
+        cert-study
+      </div>
+      {item(byMode('home'))}
+      {groupLabel('Studying')}
+      <button
+        onClick={onOpenTrackSwitcher}
+        className="btn-flat side-nav-item"
+        title="Switch track"
+        style={{
+          display: 'flex', alignItems: 'center', gap: '10px', width: '100%', textAlign: 'left', padding: '10px 12px', marginBottom: '6px', borderRadius: 'var(--r-card)',
+          border: `1px solid color-mix(in srgb, ${accent} 45%, ${COLOR.border})`, background: tint(accent, 8),
+        }}
+      >
+        <span style={{ width: '9px', height: '9px', background: accent, flexShrink: 0 }} />
+        <span style={{ flex: 1, minWidth: 0 }}>
+          <span className="mono" style={{ display: 'block', fontSize: '13.5px', fontWeight: 700, color: ink(accent), whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{track.label}</span>
+          <span style={{ display: 'block', fontSize: '11px', color: COLOR.muted, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{track.subtitle || 'Switch track'}</span>
+        </span>
+        <span style={{ fontSize: '10px', color: COLOR.muted }}>▾</span>
+      </button>
+      {['path', 'quiz', 'learn', 'exam'].map((m) => item(byMode(m)))}
+      {groupLabel('You')}
+      {item(byMode('profile'))}
+      {groupLabel('Tools')}
+      {SIDE_NAV_TOOLS.map((t) => (
+        <button
+          key={t.key}
+          onClick={() => onTool(t.key)}
+          data-tour={t.key === 'certPath' ? 'menu' : undefined}
+          aria-current={t.key === 'playground' && mode === 'playground' ? 'page' : undefined}
+          className="btn-flat side-nav-item"
+          style={{
+            display: 'flex', alignItems: 'center', gap: '12px', width: '100%', textAlign: 'left', padding: '7px 12px', borderRadius: 'var(--r-ctl)', border: 'none',
+            background: t.key === 'playground' && mode === 'playground' ? tint(COLOR.success, 14) : 'transparent', color: COLOR.text, fontSize: '13px', fontWeight: 500,
+          }}
+        >
+          <span style={{ width: '7px', height: '7px', borderRadius: '2px', background: t.hue, flexShrink: 0, marginLeft: '6px', marginRight: '3px' }} />
+          {t.label}
+        </button>
+      ))}
+      <div style={{ flex: 1 }} />
+      <div style={{ fontSize: '11px', color: COLOR.muted, lineHeight: 1.5, padding: '16px 12px 0' }}>
+        Shortcuts: <span className="mono">Space</span> flips a card, <span className="mono">1</span>/<span className="mono">2</span> rate it, <span className="mono">A</span>–<span className="mono">D</span> answer a practice question, <span className="mono">Enter</span> goes on.
       </div>
     </nav>
   );

@@ -14,6 +14,15 @@ function FlashcardView({ card, flipped, setFlipped, onRate, index, total, catego
   useClickOutsideToClose(!!activeTermKey, () => setActiveTermKey(null));
   useFocusMode(!!card);
   const prompt = useMemo(() => (card ? flashcardPrompt(card) : null), [card]);
+  // Desktop keyboard: Space/Enter flips, H shows the hint, 1/2 rate once flipped.
+  const flip = () => setFlipped((f) => !f);
+  useKeyShortcuts(!!card, {
+    ' ': flip,
+    enter: () => { if (flipped) return false; flip(); },
+    h: () => { if (!defFirst || flipped) return false; setHintShown(true); },
+    1: () => { if (!flipped) return false; onRate(CARD_MISSED); },
+    2: () => { if (!flipped) return false; onRate(CARD_GOT_IT); },
+  });
   if (!card) return null;
   const otherCards = flashcardsData && flashcardsData.filter((c) => c.id !== card.id);
   const showDefinition = defFirst ? true : flipped;        // is the definition on screen
@@ -67,7 +76,7 @@ function FlashcardView({ card, flipped, setFlipped, onRate, index, total, catego
       {/* The reveal and rating buttons are pinned to the bottom of the screen, where the tab bar normally sits
           (hidden in focus mode), so they stay under the thumb whether or not the card has been flipped. */}
       <div style={{ position: 'fixed', left: 0, right: 0, bottom: 0, zIndex: 40, background: COLOR.navBar, borderTop: `1px solid ${COLOR.border}`, paddingBottom: 'env(safe-area-inset-bottom)' }}>
-        <div className="max-w-md mx-auto" style={{ display: 'flex', gap: '10px', padding: '10px 16px' }}>
+        <div className="app-col mx-auto" style={{ display: 'flex', gap: '10px', padding: '10px 16px' }}>
           {!flipped ? (
             <React.Fragment>
               {defFirst && (
@@ -77,14 +86,14 @@ function FlashcardView({ card, flipped, setFlipped, onRate, index, total, catego
                   className="btn-flat"
                   style={{ padding: '14px 14px', borderRadius: 'var(--r-ctl)', border: `1px solid ${COLOR.border}`, background: 'transparent', color: hintShown ? COLOR.muted : COLOR.text, fontSize: '13px', fontWeight: 600, flexShrink: 0, opacity: hintShown ? 0.6 : 1 }}
                 >
-                  Show a hint
+                  Show a hint<KeyHint k="H" />
                 </button>
               )}
               <button
                 onClick={() => setFlipped(true)}
                 style={{ flex: 1, padding: '14px 14px', borderRadius: 'var(--r-ctl)', border: 'none', background: COLOR.primary, color: COLOR.onAccent, fontSize: '14px', fontWeight: 700 }}
               >
-                {defFirst ? 'Show the term' : 'Show the definition'}
+                {defFirst ? 'Show the term' : 'Show the definition'}<KeyHint k="Space" />
               </button>
             </React.Fragment>
           ) : (
@@ -93,13 +102,13 @@ function FlashcardView({ card, flipped, setFlipped, onRate, index, total, catego
                 onClick={() => onRate(CARD_MISSED)}
                 style={{ flex: 1, padding: '14px 10px', borderRadius: 'var(--r-ctl)', border: `1px solid ${COLOR.red}`, background: 'transparent', color: COLOR.red, fontSize: '14px', fontWeight: 700 }}
               >
-                Don't got it
+                Don't got it<KeyHint k="1" />
               </button>
               <button
                 onClick={() => onRate(CARD_GOT_IT)}
                 style={{ flex: 1, padding: '14px 10px', borderRadius: 'var(--r-ctl)', border: 'none', background: COLOR.success, color: COLOR.onAccent, fontSize: '14px', fontWeight: 700 }}
               >
-                Got it
+                Got it<KeyHint k="2" />
               </button>
             </React.Fragment>
           )}

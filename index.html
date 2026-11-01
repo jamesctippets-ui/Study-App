@@ -197,6 +197,35 @@
   .px-4 { padding-left: 1rem; padding-right: 1rem; }
   .py-5 { padding-top: 1.25rem; padding-bottom: 1.25rem; }
   .max-w-md { max-width: 28rem; }
+  .app-col { max-width: 28rem; }
+  .key-hint { display: none; }
+
+  /* Desktop layout (keep the width in step with DESKTOP_QUERY in 00_preamble.js).
+     The bottom tab bar becomes the SideNav (232px, SIDE_NAV_WIDTH), the content
+     column widens, lists of tracks flow into a grid, and bottom sheets open as
+     centered dialogs. Flashcard focus mode hides the sidebar like the tab bar. */
+  @media (min-width: 1024px) {
+    #root { padding-left: 232px; }
+    body[data-focus] #root { padding-left: 0; }
+    .app-col { max-width: 54rem; }
+    .app-col-path { max-width: 40rem; }
+    .app-col-learn { max-width: 46rem; }
+    body[data-focus] .app-col { max-width: 42rem; }
+    [data-chrome-pad] { padding-bottom: 48px !important; }
+    body[data-focus] [data-chrome-pad] { padding-bottom: calc(96px + env(safe-area-inset-bottom)) !important; }
+    [data-mobile-only] { display: none !important; }
+    .track-grid { display: grid !important; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); }
+    .sheet-backdrop { align-items: center !important; padding: 32px; }
+    .sheet { max-width: 34rem !important; max-height: min(84vh, 760px) !important; border: 1px solid var(--color-border) !important; border-radius: var(--r-card) !important; padding: 22px 24px 26px !important; }
+    .side-nav-item:hover:not([aria-current]) { background: color-mix(in srgb, var(--color-text) 6%, transparent) !important; }
+  }
+  @media (min-width: 1024px) and (hover: hover) and (pointer: fine) {
+    .key-hint {
+      display: inline-block; margin-left: 8px; padding: 1px 5px; border-radius: 4px; vertical-align: 1px;
+      font-family: var(--font-mono); font-size: 10px; font-weight: 600; line-height: 1.4;
+      border: 1px solid currentColor; opacity: 0.6;
+    }
+  }
 
   @media print {
     body * { visibility: hidden; }
@@ -396,6 +425,57 @@ function useScrollTopOnChange(value) {
 // tab bar, so both numbers live here.
 const APP_HEADER_HEIGHT = 56;
 const TAB_BAR_HEIGHT = 68;
+
+// Desktop layout: at this width and up the bottom tab bar becomes a left
+// sidebar (SIDE_NAV_WIDTH wide), the content column widens, and sheets open
+// as centered dialogs. The CSS half of it lives in the page template under
+// the same media query, so keep the two in step.
+const DESKTOP_QUERY = '(min-width: 1024px)';
+const SIDE_NAV_WIDTH = 232;
+
+function useIsDesktop() {
+  const get = () => typeof window !== 'undefined' && !!window.matchMedia && window.matchMedia(DESKTOP_QUERY).matches;
+  const [isDesktop, setIsDesktop] = useState(get);
+  useEffect(() => {
+    if (!window.matchMedia) return undefined;
+    const mq = window.matchMedia(DESKTOP_QUERY);
+    const onChange = () => setIsDesktop(mq.matches);
+    onChange();
+    if (mq.addEventListener) mq.addEventListener('change', onChange); else mq.addListener(onChange);
+    return () => { if (mq.removeEventListener) mq.removeEventListener('change', onChange); else mq.removeListener(onChange); };
+  }, []);
+  return isDesktop;
+}
+
+// A small keycap naming a button's keyboard shortcut. Hidden by the page CSS
+// unless the desktop layout is on and the device has a fine pointer.
+function KeyHint({ k }) {
+  return <kbd className="key-hint" aria-hidden="true">{k}</kbd>;
+}
+
+// Keyboard shortcuts for a screen (flashcards, a quiz question). `keys` maps
+// a lowercased KeyboardEvent.key (' ' for the space bar) to a handler; a
+// handler returning false lets the key through. Keys typed into a field,
+// with a modifier held, or while a sheet is open are left alone.
+function useKeyShortcuts(enabled, keys) {
+  const ref = useRef(keys);
+  ref.current = keys;
+  useEffect(() => {
+    if (!enabled) return undefined;
+    const handler = (e) => {
+      if (e.ctrlKey || e.metaKey || e.altKey || e.repeat) return;
+      const t = e.target;
+      if (t && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName))) return;
+      if (document.querySelector('.sheet-backdrop')) return;
+      const fn = ref.current[(e.key || '').toLowerCase()];
+      if (!fn) return;
+      if (fn(e) === false) return;
+      e.preventDefault();
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [enabled]);
+}
 
 const SHADOW = {
   // Cards are flat with a hairline border (the Console look): no shadow.
@@ -14257,10 +14337,12 @@ function AchievementsPanel({ achievements, streak, onClose }) {
   return (
     <div
       onClick={onClose}
+      className="sheet-backdrop"
       style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', zIndex: 50, display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}
     >
       <div
         onClick={(e) => e.stopPropagation()}
+        className="sheet"
         style={{
           background: COLOR.bg, borderTop: `1px solid ${COLOR.border}`, borderRadius: 'var(--r-card) var(--r-card) 0 0',
           maxWidth: '28rem', width: '100%', maxHeight: '82vh', overflowY: 'auto', padding: '18px 18px 28px',
@@ -14353,10 +14435,12 @@ function DataPanel({
   return (
     <div
       onClick={onClose}
+      className="sheet-backdrop"
       style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', zIndex: 50, display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}
     >
       <div
         onClick={(e) => e.stopPropagation()}
+        className="sheet"
         style={{
           background: COLOR.bg, borderTop: `1px solid ${COLOR.border}`, borderRadius: 'var(--r-card) var(--r-card) 0 0',
           maxWidth: '28rem', width: '100%', maxHeight: '82vh', overflowY: 'auto', padding: '18px 18px 28px',
@@ -14640,7 +14724,7 @@ function TrackListDropdown({ tracks, masteries, certPlan, onSelectTrack, onAddTo
         <span style={{ fontSize: '11px', color: COLOR.muted, transform: open ? 'rotate(180deg)' : 'none', transition: 'transform 0.15s ease' }}>▾</span>
       </button>
       {open && (
-        <div className="flex flex-col gap-2" style={{ marginTop: '8px' }}>
+        <div className="flex flex-col gap-2 track-grid" style={{ marginTop: '8px' }}>
           {masteries.map(({ track: t, pct }) => {
             const accent = trackAccent(t.key);
             const isCompleted = !!certPlan.completed[t.key];
@@ -15238,10 +15322,12 @@ function TrackSwitcherSheet({ tracks, results, certPlan, activeTrack, onSelect, 
   return (
     <div
       onClick={onClose}
+      className="sheet-backdrop"
       style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', zIndex: 50, display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}
     >
       <div
         onClick={(e) => e.stopPropagation()}
+        className="sheet"
         style={{
           background: COLOR.bg, borderTop: `1px solid ${COLOR.border}`, borderRadius: 'var(--r-card) var(--r-card) 0 0',
           maxWidth: '28rem', width: '100%', maxHeight: '82vh', overflowY: 'auto', padding: '18px 18px 28px',
@@ -15297,10 +15383,12 @@ function CertPathPanel({ tracks, certPlan, onAddTrack, onRemoveTrack, onMove, on
   return (
     <div
       onClick={onClose}
+      className="sheet-backdrop"
       style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', zIndex: 50, display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}
     >
       <div
         onClick={(e) => e.stopPropagation()}
+        className="sheet"
         style={{
           background: COLOR.bg, borderTop: `1px solid ${COLOR.border}`, borderRadius: 'var(--r-card) var(--r-card) 0 0',
           maxWidth: '28rem', width: '100%', maxHeight: '82vh', overflowY: 'auto', padding: '18px 18px 28px',
@@ -15638,10 +15726,12 @@ function GlossaryPanel({ onClose, customTerms, customScenarios, onSaveCustomTerm
   return (
     <div
       onClick={onClose}
+      className="sheet-backdrop"
       style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', zIndex: 50, display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}
     >
       <div
         onClick={(e) => e.stopPropagation()}
+        className="sheet"
         style={{
           background: COLOR.bg, borderTop: `1px solid ${COLOR.border}`, borderRadius: 'var(--r-card) var(--r-card) 0 0',
           maxWidth: '28rem', width: '100%', maxHeight: '82vh', overflowY: 'auto', padding: '18px 18px 28px',
@@ -15762,10 +15852,12 @@ function AboutLegalPanel({ onClose }) {
   return (
     <div
       onClick={onClose}
+      className="sheet-backdrop"
       style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', zIndex: 50, display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}
     >
       <div
         onClick={(e) => e.stopPropagation()}
+        className="sheet"
         style={{
           background: COLOR.bg, borderTop: `1px solid ${COLOR.border}`, borderRadius: 'var(--r-card) var(--r-card) 0 0',
           maxWidth: '28rem', width: '100%', maxHeight: '82vh', overflowY: 'auto', padding: '18px 18px 28px',
@@ -16068,6 +16160,106 @@ function BottomTabBar({ mode, onChange }) {
   );
 }
 
+// The desktop version of the bottom tab bar: a fixed left sidebar with the
+// same destinations, plus the track switcher and the tools that live behind
+// the header menu or Home's tool row on a phone. Marked data-chrome so
+// flashcard focus mode hides it like the tab bar. See DESKTOP_QUERY.
+const SIDE_NAV_TOOLS = [
+  { key: 'certPath', label: 'My cert path', hue: 'var(--color-primary)' },
+  { key: 'playground', label: 'Playground', hue: 'var(--color-success)' },
+  { key: 'glossary', label: 'Glossary', hue: 'var(--color-pink)' },
+  { key: 'achievements', label: 'Achievements', hue: 'var(--color-gold)' },
+  { key: 'data', label: 'Data & settings', hue: 'var(--color-muted)' },
+  { key: 'about', label: 'About & legal', hue: 'var(--color-muted)' },
+];
+
+function SideNav({ mode, onChange, track, activeTrack, onOpenTrackSwitcher, onTool }) {
+  const accent = trackAccent(activeTrack);
+  const item = (t) => {
+    const active = mode === t.m;
+    const hue = modeHue(t.m);
+    return (
+      <button
+        key={t.m}
+        onClick={() => onChange(t.m)}
+        aria-current={active ? 'page' : undefined}
+        data-tour={`tab-${t.m}`}
+        className="btn-flat side-nav-item"
+        style={{
+          display: 'flex', alignItems: 'center', gap: '12px', width: '100%', textAlign: 'left', padding: '9px 12px', borderRadius: 'var(--r-ctl)', border: 'none',
+          background: active ? `color-mix(in srgb, ${hue} 14%, transparent)` : 'transparent', boxShadow: active ? `inset 3px 0 0 ${hue}` : 'none',
+          color: active ? hue : COLOR.text, fontSize: '14px', fontWeight: active ? 700 : 500,
+        }}
+      >
+        <span style={{ display: 'inline-flex', color: active ? hue : `color-mix(in srgb, ${hue} 70%, ${COLOR.muted})` }}><TabIcon kind={t.icon} size={20} /></span>
+        {t.label}
+      </button>
+    );
+  };
+  const groupLabel = (text) => (
+    <div className="mono" style={{ fontSize: '10px', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: COLOR.muted, padding: '16px 12px 6px' }}>{text}</div>
+  );
+  const byMode = (m) => TAB_BAR_ITEMS.find((t) => t.m === m);
+  return (
+    <nav
+      aria-label="Main"
+      data-chrome="side"
+      className="side-nav"
+      style={{
+        position: 'fixed', top: 0, bottom: 0, left: 0, width: `${SIDE_NAV_WIDTH}px`, zIndex: 40, background: COLOR.navBar,
+        borderRight: `1px solid ${COLOR.border}`, display: 'flex', flexDirection: 'column', overflowY: 'auto', padding: '0 12px 16px',
+      }}
+    >
+      <div className="app-title mono" style={{ display: 'flex', alignItems: 'center', gap: '8px', height: `${APP_HEADER_HEIGHT}px`, padding: '0 12px', fontSize: '14px', fontWeight: 700, flexShrink: 0 }}>
+        <span style={{ width: '9px', height: '9px', background: COLOR.primary, flexShrink: 0 }} />
+        cert-study
+      </div>
+      {item(byMode('home'))}
+      {groupLabel('Studying')}
+      <button
+        onClick={onOpenTrackSwitcher}
+        className="btn-flat side-nav-item"
+        title="Switch track"
+        style={{
+          display: 'flex', alignItems: 'center', gap: '10px', width: '100%', textAlign: 'left', padding: '10px 12px', marginBottom: '6px', borderRadius: 'var(--r-card)',
+          border: `1px solid color-mix(in srgb, ${accent} 45%, ${COLOR.border})`, background: tint(accent, 8),
+        }}
+      >
+        <span style={{ width: '9px', height: '9px', background: accent, flexShrink: 0 }} />
+        <span style={{ flex: 1, minWidth: 0 }}>
+          <span className="mono" style={{ display: 'block', fontSize: '13.5px', fontWeight: 700, color: ink(accent), whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{track.label}</span>
+          <span style={{ display: 'block', fontSize: '11px', color: COLOR.muted, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{track.subtitle || 'Switch track'}</span>
+        </span>
+        <span style={{ fontSize: '10px', color: COLOR.muted }}>▾</span>
+      </button>
+      {['path', 'quiz', 'learn', 'exam'].map((m) => item(byMode(m)))}
+      {groupLabel('You')}
+      {item(byMode('profile'))}
+      {groupLabel('Tools')}
+      {SIDE_NAV_TOOLS.map((t) => (
+        <button
+          key={t.key}
+          onClick={() => onTool(t.key)}
+          data-tour={t.key === 'certPath' ? 'menu' : undefined}
+          aria-current={t.key === 'playground' && mode === 'playground' ? 'page' : undefined}
+          className="btn-flat side-nav-item"
+          style={{
+            display: 'flex', alignItems: 'center', gap: '12px', width: '100%', textAlign: 'left', padding: '7px 12px', borderRadius: 'var(--r-ctl)', border: 'none',
+            background: t.key === 'playground' && mode === 'playground' ? tint(COLOR.success, 14) : 'transparent', color: COLOR.text, fontSize: '13px', fontWeight: 500,
+          }}
+        >
+          <span style={{ width: '7px', height: '7px', borderRadius: '2px', background: t.hue, flexShrink: 0, marginLeft: '6px', marginRight: '3px' }} />
+          {t.label}
+        </button>
+      ))}
+      <div style={{ flex: 1 }} />
+      <div style={{ fontSize: '11px', color: COLOR.muted, lineHeight: 1.5, padding: '16px 12px 0' }}>
+        Shortcuts: <span className="mono">Space</span> flips a card, <span className="mono">1</span>/<span className="mono">2</span> rate it, <span className="mono">A</span>–<span className="mono">D</span> answer a practice question, <span className="mono">Enter</span> goes on.
+      </div>
+    </nav>
+  );
+}
+
 // "5 yrs experience required" pill for certifications that ask for work
 // experience (see trackExperience). Renders nothing for tracks without one.
 function ExperienceChip({ trackKey, style }) {
@@ -16115,6 +16307,15 @@ function FlashcardView({ card, flipped, setFlipped, onRate, index, total, catego
   useClickOutsideToClose(!!activeTermKey, () => setActiveTermKey(null));
   useFocusMode(!!card);
   const prompt = useMemo(() => (card ? flashcardPrompt(card) : null), [card]);
+  // Desktop keyboard: Space/Enter flips, H shows the hint, 1/2 rate once flipped.
+  const flip = () => setFlipped((f) => !f);
+  useKeyShortcuts(!!card, {
+    ' ': flip,
+    enter: () => { if (flipped) return false; flip(); },
+    h: () => { if (!defFirst || flipped) return false; setHintShown(true); },
+    1: () => { if (!flipped) return false; onRate(CARD_MISSED); },
+    2: () => { if (!flipped) return false; onRate(CARD_GOT_IT); },
+  });
   if (!card) return null;
   const otherCards = flashcardsData && flashcardsData.filter((c) => c.id !== card.id);
   const showDefinition = defFirst ? true : flipped;        // is the definition on screen
@@ -16168,7 +16369,7 @@ function FlashcardView({ card, flipped, setFlipped, onRate, index, total, catego
       {/* The reveal and rating buttons are pinned to the bottom of the screen, where the tab bar normally sits
           (hidden in focus mode), so they stay under the thumb whether or not the card has been flipped. */}
       <div style={{ position: 'fixed', left: 0, right: 0, bottom: 0, zIndex: 40, background: COLOR.navBar, borderTop: `1px solid ${COLOR.border}`, paddingBottom: 'env(safe-area-inset-bottom)' }}>
-        <div className="max-w-md mx-auto" style={{ display: 'flex', gap: '10px', padding: '10px 16px' }}>
+        <div className="app-col mx-auto" style={{ display: 'flex', gap: '10px', padding: '10px 16px' }}>
           {!flipped ? (
             <React.Fragment>
               {defFirst && (
@@ -16178,14 +16379,14 @@ function FlashcardView({ card, flipped, setFlipped, onRate, index, total, catego
                   className="btn-flat"
                   style={{ padding: '14px 14px', borderRadius: 'var(--r-ctl)', border: `1px solid ${COLOR.border}`, background: 'transparent', color: hintShown ? COLOR.muted : COLOR.text, fontSize: '13px', fontWeight: 600, flexShrink: 0, opacity: hintShown ? 0.6 : 1 }}
                 >
-                  Show a hint
+                  Show a hint<KeyHint k="H" />
                 </button>
               )}
               <button
                 onClick={() => setFlipped(true)}
                 style={{ flex: 1, padding: '14px 14px', borderRadius: 'var(--r-ctl)', border: 'none', background: COLOR.primary, color: COLOR.onAccent, fontSize: '14px', fontWeight: 700 }}
               >
-                {defFirst ? 'Show the term' : 'Show the definition'}
+                {defFirst ? 'Show the term' : 'Show the definition'}<KeyHint k="Space" />
               </button>
             </React.Fragment>
           ) : (
@@ -16194,13 +16395,13 @@ function FlashcardView({ card, flipped, setFlipped, onRate, index, total, catego
                 onClick={() => onRate(CARD_MISSED)}
                 style={{ flex: 1, padding: '14px 10px', borderRadius: 'var(--r-ctl)', border: `1px solid ${COLOR.red}`, background: 'transparent', color: COLOR.red, fontSize: '14px', fontWeight: 700 }}
               >
-                Don't got it
+                Don't got it<KeyHint k="1" />
               </button>
               <button
                 onClick={() => onRate(CARD_GOT_IT)}
                 style={{ flex: 1, padding: '14px 10px', borderRadius: 'var(--r-ctl)', border: 'none', background: COLOR.success, color: COLOR.onAccent, fontSize: '14px', fontWeight: 700 }}
               >
-                Got it
+                Got it<KeyHint k="2" />
               </button>
             </React.Fragment>
           )}
@@ -18143,6 +18344,27 @@ function QuestionView({ q, selected, onChoose, onNext, index, total, categoryLab
   useEffect(() => { setActiveTermKey(null); }, [q && q.id]);
   useEscapeToClose(() => setActiveTermKey(null));
   useClickOutsideToClose(!!activeTermKey, () => setActiveTermKey(null));
+  // Desktop keyboard: A-F or 1-6 answer (or toggle, for select-all), T/F for
+  // true/false, Enter submits a select-all answer or moves on. Off for the
+  // one-off question on Home (hideNext), which shares the page with other cards.
+  const pick = (i) => {
+    if (!q || selected !== null) return false;
+    if (q.type === 'tf') { if (i > 1) return false; onChoose(i); return undefined; }
+    if (!q.options || i >= q.options.length) return false;
+    if (q.type === 'ms') onToggleMs(i); else onChoose(i);
+    return undefined;
+  };
+  const keys = {
+    enter: () => {
+      if (!q) return false;
+      if (selected === null) { if (q.type === 'ms' && msPending.length) { onSubmitMs(); return undefined; } return false; }
+      if (!onNext) return false;
+      onNext(); return undefined;
+    },
+  };
+  ['a', 'b', 'c', 'd', 'e', 'f'].forEach((l, i) => { keys[l] = () => pick(i); keys[String(i + 1)] = () => pick(i); });
+  if (q && q.type === 'tf') { keys.t = () => pick(0); keys.f = () => pick(1); }
+  useKeyShortcuts(!!q && !hideNext, keys);
   if (!q) return null;
   const isLast = index + 1 >= total;
   return (
@@ -18222,7 +18444,7 @@ function QuestionView({ q, selected, onChoose, onNext, index, total, categoryLab
               disabled={msPending.length === 0}
               style={{ width: '100%', marginTop: '12px', padding: '12px', borderRadius: 'var(--r-ctl)', border: 'none', background: msPending.length ? COLOR.primary : COLOR.surfaceRaised, color: msPending.length ? COLOR.onAccent : COLOR.muted, fontSize: '14px', fontWeight: 700 }}
             >
-              Submit answer
+              Submit answer<KeyHint k="Enter" />
             </button>
           )}
         </div>
@@ -18247,7 +18469,7 @@ function QuestionView({ q, selected, onChoose, onNext, index, total, categoryLab
           onClick={onNext}
           style={{ width: '100%', marginTop: '12px', padding: '13px', borderRadius: 'var(--r-ctl)', border: 'none', background: COLOR.primary, color: COLOR.onAccent, fontSize: '14px', fontWeight: 700 }}
         >
-          {nextLabel || (isLast ? 'See results' : 'Next question')}
+          {nextLabel || (isLast ? 'See results' : 'Next question')}<KeyHint k="Enter" />
         </button>
       )}
     </div>
@@ -26571,6 +26793,7 @@ function ExamResults({ result, config, track, categories, onRestart, onWeakSpots
 
 function CertStudyApp() {
   const [theme, toggleTheme] = useTheme();
+  const isDesktop = useIsDesktop();
   const [activeTrack, setActiveTrack] = useState('az900');
   const [mode, setMode] = useState('home');
   const [playgroundTool, setPlaygroundTool] = useState('');
@@ -28334,9 +28557,10 @@ function CertStudyApp() {
         />
       )}
       <div data-chrome="top" style={{ background: `color-mix(in srgb, ${modeHue(mode)} 9%, ${COLOR.navBar})`, borderBottom: `1px solid color-mix(in srgb, ${modeHue(mode)} 45%, ${COLOR.border})`, position: 'sticky', top: 0, zIndex: 30, transition: 'background-color 0.2s ease' }}>
-        <div className="max-w-md mx-auto px-4 flex items-center" style={{ height: `${APP_HEADER_HEIGHT}px`, gap: '8px' }}>
+        <div className="app-col mx-auto px-4 flex items-center" style={{ height: `${APP_HEADER_HEIGHT}px`, gap: '8px' }}>
           <button
             onClick={() => setShowCertPath(true)}
+            data-mobile-only="1"
             className="btn-flat"
             title="Manage cert path"
             style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: '34px', height: '34px', borderRadius: 'var(--r-ctl)', border: 'none', background: 'transparent', color: COLOR.muted, padding: 0, flexShrink: 0, marginLeft: '-6px' }}
@@ -28374,7 +28598,7 @@ function CertStudyApp() {
           </div>
         </div>
       </div>
-      <div className="max-w-md mx-auto px-4 py-5" data-chrome-pad="1" style={{ paddingBottom: `calc(${TAB_BAR_HEIGHT + 24}px + env(safe-area-inset-bottom))` }}>
+      <div className={`app-col app-col-${mode} mx-auto px-4 py-5`} data-chrome-pad="1" style={{ paddingBottom: `calc(${TAB_BAR_HEIGHT + 24}px + env(safe-area-inset-bottom))` }}>
         {saveError ? (
           <div style={{ fontSize: '11.5px', color: COLOR.red, marginBottom: '12px', padding: '8px 10px', borderRadius: 'var(--r-ctl)', border: `1px solid ${COLOR.red}`, background: 'color-mix(in srgb, var(--color-red) 10%, transparent)' }}>
             Your last save didn't go through — your browser's storage may be full. Try Data &amp; Progress → Export to back up what you have, then free up some space.
@@ -28894,7 +29118,25 @@ function CertStudyApp() {
         </React.Fragment>
         )}
       </div>
-      <BottomTabBar mode={mode} onChange={openTab} />
+      {isDesktop ? (
+        <SideNav
+          mode={mode}
+          onChange={openTab}
+          track={track}
+          activeTrack={activeTrack}
+          onOpenTrackSwitcher={() => setShowTrackSwitcher(true)}
+          onTool={(key) => {
+            if (key === 'certPath') setShowCertPath(true);
+            else if (key === 'playground') { setPlaygroundTool(''); setPlaygroundPick(''); setMode('playground'); }
+            else if (key === 'glossary') setShowGlossary(true);
+            else if (key === 'achievements') setShowAchievements(true);
+            else if (key === 'data') { setImportMessage(null); setShowData(true); }
+            else if (key === 'about') setShowAbout(true);
+          }}
+        />
+      ) : (
+        <BottomTabBar mode={mode} onChange={openTab} />
+      )}
     </div>
     </CustomTermsContext.Provider>
     </CardPrefsContext.Provider>

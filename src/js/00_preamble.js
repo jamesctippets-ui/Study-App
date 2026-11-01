@@ -171,6 +171,57 @@ function useScrollTopOnChange(value) {
 const APP_HEADER_HEIGHT = 56;
 const TAB_BAR_HEIGHT = 68;
 
+// Desktop layout: at this width and up the bottom tab bar becomes a left
+// sidebar (SIDE_NAV_WIDTH wide), the content column widens, and sheets open
+// as centered dialogs. The CSS half of it lives in the page template under
+// the same media query, so keep the two in step.
+const DESKTOP_QUERY = '(min-width: 1024px)';
+const SIDE_NAV_WIDTH = 232;
+
+function useIsDesktop() {
+  const get = () => typeof window !== 'undefined' && !!window.matchMedia && window.matchMedia(DESKTOP_QUERY).matches;
+  const [isDesktop, setIsDesktop] = useState(get);
+  useEffect(() => {
+    if (!window.matchMedia) return undefined;
+    const mq = window.matchMedia(DESKTOP_QUERY);
+    const onChange = () => setIsDesktop(mq.matches);
+    onChange();
+    if (mq.addEventListener) mq.addEventListener('change', onChange); else mq.addListener(onChange);
+    return () => { if (mq.removeEventListener) mq.removeEventListener('change', onChange); else mq.removeListener(onChange); };
+  }, []);
+  return isDesktop;
+}
+
+// A small keycap naming a button's keyboard shortcut. Hidden by the page CSS
+// unless the desktop layout is on and the device has a fine pointer.
+function KeyHint({ k }) {
+  return <kbd className="key-hint" aria-hidden="true">{k}</kbd>;
+}
+
+// Keyboard shortcuts for a screen (flashcards, a quiz question). `keys` maps
+// a lowercased KeyboardEvent.key (' ' for the space bar) to a handler; a
+// handler returning false lets the key through. Keys typed into a field,
+// with a modifier held, or while a sheet is open are left alone.
+function useKeyShortcuts(enabled, keys) {
+  const ref = useRef(keys);
+  ref.current = keys;
+  useEffect(() => {
+    if (!enabled) return undefined;
+    const handler = (e) => {
+      if (e.ctrlKey || e.metaKey || e.altKey || e.repeat) return;
+      const t = e.target;
+      if (t && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName))) return;
+      if (document.querySelector('.sheet-backdrop')) return;
+      const fn = ref.current[(e.key || '').toLowerCase()];
+      if (!fn) return;
+      if (fn(e) === false) return;
+      e.preventDefault();
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [enabled]);
+}
+
 const SHADOW = {
   // Cards are flat with a hairline border (the Console look): no shadow.
   card: 'none',

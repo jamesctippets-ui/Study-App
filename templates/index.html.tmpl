@@ -197,6 +197,35 @@
   .px-4 { padding-left: 1rem; padding-right: 1rem; }
   .py-5 { padding-top: 1.25rem; padding-bottom: 1.25rem; }
   .max-w-md { max-width: 28rem; }
+  .app-col { max-width: 28rem; }
+  .key-hint { display: none; }
+
+  /* Desktop layout (keep the width in step with DESKTOP_QUERY in 00_preamble.js).
+     The bottom tab bar becomes the SideNav (232px, SIDE_NAV_WIDTH), the content
+     column widens, lists of tracks flow into a grid, and bottom sheets open as
+     centered dialogs. Flashcard focus mode hides the sidebar like the tab bar. */
+  @media (min-width: 1024px) {
+    #root { padding-left: 232px; }
+    body[data-focus] #root { padding-left: 0; }
+    .app-col { max-width: 54rem; }
+    .app-col-path { max-width: 40rem; }
+    .app-col-learn { max-width: 46rem; }
+    body[data-focus] .app-col { max-width: 42rem; }
+    [data-chrome-pad] { padding-bottom: 48px !important; }
+    body[data-focus] [data-chrome-pad] { padding-bottom: calc(96px + env(safe-area-inset-bottom)) !important; }
+    [data-mobile-only] { display: none !important; }
+    .track-grid { display: grid !important; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); }
+    .sheet-backdrop { align-items: center !important; padding: 32px; }
+    .sheet { max-width: 34rem !important; max-height: min(84vh, 760px) !important; border: 1px solid var(--color-border) !important; border-radius: var(--r-card) !important; padding: 22px 24px 26px !important; }
+    .side-nav-item:hover:not([aria-current]) { background: color-mix(in srgb, var(--color-text) 6%, transparent) !important; }
+  }
+  @media (min-width: 1024px) and (hover: hover) and (pointer: fine) {
+    .key-hint {
+      display: inline-block; margin-left: 8px; padding: 1px 5px; border-radius: 4px; vertical-align: 1px;
+      font-family: var(--font-mono); font-size: 10px; font-weight: 600; line-height: 1.4;
+      border: 1px solid currentColor; opacity: 0.6;
+    }
+  }
 
   @media print {
     body * { visibility: hidden; }

@@ -666,6 +666,31 @@ where one genuinely fits, vocab/quiz call-outs, and common-traps notes):
 To hide a track again (e.g. while it's a work in progress), open `data/tracks.py`
 and add `'hidden': True` to that track's entry, then rebuild (see below).
 
+## Desktop layout
+
+On a browser window 1024px wide or more (`DESKTOP_QUERY` in `00_preamble.js`,
+mirrored by the matching media query in `templates/index.html.tmpl`) the app
+switches to a desktop layout; below that width nothing changes.
+
+- **Sidebar instead of the bottom tab bar.** `SideNav` (`04b_panels_ui.jsx`)
+  holds Home, the current-track switcher, Path / Practice / Reference / Exam,
+  Profile, and the tools that live behind the header menu or Home's tool row
+  on a phone (cert path, Playground, Glossary, Achievements, Data & settings,
+  About). The header's menu button is hidden, since the sidebar covers it.
+- **Wider content.** The content column grows from 28rem to 54rem; the Path
+  map stays at 40rem and Reference reading at 46rem so lines don't run too
+  long. Home's track list flows into a grid.
+- **Dialogs, not bottom sheets.** Every sheet (cert path, track switcher,
+  glossary, data, achievements, about) opens as a centered dialog.
+- **Keyboard shortcuts.** Flashcards: Space or Enter shows the answer, H
+  shows the hint, 1 = Don't got it, 2 = Got it. Practice questions: A–F or
+  1–6 answer (or toggle, for select-all), T/F for true/false, Enter submits a
+  select-all answer or goes to the next question. Shortcuts are ignored while
+  typing in a field or with a dialog open, and keycaps on the buttons show
+  them only on desktop with a mouse.
+- **Focus mode** (flashcards) hides the sidebar too, and narrows the card to
+  42rem.
+
 ## Source layout
 
 The shipped app is still a single static `index.html` (so it keeps working as an
