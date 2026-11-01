@@ -766,7 +766,10 @@ it switches to a desktop layout with no change to the phone one. All of it is CS
 `app-col`, `app-main`, `app-tabbar`, `app-pinbar`, `app-sheet`):
 
 - the bottom tab bar becomes a left sidebar (216px, 240px from 1440px) with the tab names spelled out and a
-  short keyboard-shortcut note at the bottom;
+  short keyboard-shortcut note at the bottom. Under the tabs it also carries the current-track switcher and the
+  tools that sit behind the header menu or in Home's tool row on a phone (cert path, Playground, Glossary,
+  Achievements, Data & settings, About), so they are one click away (`app-tabbar-extra`);
+- Home's list of all tracks flows into a grid (`app-track-grid`);
 - the content column widens from 28rem to 46rem (52rem from 1440px), and the top bar lines up with it;
 - the bottom sheets (cert path, achievements, glossary and the other panels marked `app-sheet`) open as
   centred dialogs;
