@@ -13,6 +13,18 @@ function FlashcardView({ card, flipped, setFlipped, onRate, index, total, catego
   useEscapeToClose(() => setActiveTermKey(null));
   useClickOutsideToClose(!!activeTermKey, () => setActiveTermKey(null));
   useFocusMode(!!card);
+  // Desktop keys: Space or Enter flips, H shows the hint, then ← (or 1) is "Don't got it" and → (or 2) is "Got it".
+  useKeyShortcuts(!!card, (k) => {
+    if (!flipped) {
+      if (k === ' ' || k === 'Enter' || k === 'ArrowUp' || k === 'ArrowDown') { setFlipped(true); return true; }
+      if (k === 'h' && defFirst) { setHintShown(true); return true; }
+      return false;
+    }
+    if (k === 'ArrowLeft' || k === '1') { onRate(CARD_MISSED); return true; }
+    if (k === 'ArrowRight' || k === '2') { onRate(CARD_GOT_IT); return true; }
+    if (k === ' ' || k === 'ArrowUp' || k === 'ArrowDown') { setFlipped(false); return true; }
+    return false;
+  });
   const prompt = useMemo(() => (card ? flashcardPrompt(card) : null), [card]);
   if (!card) return null;
   const otherCards = flashcardsData && flashcardsData.filter((c) => c.id !== card.id);
@@ -66,8 +78,8 @@ function FlashcardView({ card, flipped, setFlipped, onRate, index, total, catego
       </div>
       {/* The reveal and rating buttons are pinned to the bottom of the screen, where the tab bar normally sits
           (hidden in focus mode), so they stay under the thumb whether or not the card has been flipped. */}
-      <div style={{ position: 'fixed', left: 0, right: 0, bottom: 0, zIndex: 40, background: COLOR.navBar, borderTop: `1px solid ${COLOR.border}`, paddingBottom: 'env(safe-area-inset-bottom)' }}>
-        <div className="max-w-md mx-auto" style={{ display: 'flex', gap: '10px', padding: '10px 16px' }}>
+      <div className="app-pinbar" style={{ position: 'fixed', left: 0, right: 0, bottom: 0, zIndex: 40, background: COLOR.navBar, borderTop: `1px solid ${COLOR.border}`, paddingBottom: 'env(safe-area-inset-bottom)' }}>
+        <div className="app-col max-w-md mx-auto" style={{ display: 'flex', gap: '10px', padding: '10px 16px' }}>
           {!flipped ? (
             <React.Fragment>
               {defFirst && (
@@ -103,6 +115,9 @@ function FlashcardView({ card, flipped, setFlipped, onRate, index, total, catego
               </button>
             </React.Fragment>
           )}
+        </div>
+        <div className="app-col desktop-only mono mx-auto" style={{ fontSize: '11px', color: COLOR.muted, textAlign: 'center', padding: '0 16px 4px' }}>
+          {!flipped ? `Space to flip${defFirst ? ' · H for a hint' : ''}` : '← Don\'t got it · → Got it · Space to flip back'}
         </div>
       </div>
     </div>

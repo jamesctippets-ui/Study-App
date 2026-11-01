@@ -183,10 +183,13 @@ function GlossaryPanel({ onClose, customTerms, customScenarios, onSaveCustomTerm
   return (
     <div
       onClick={onClose}
+      data-overlay="1"
+      className="app-sheet-backdrop"
       style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', zIndex: 50, display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}
     >
       <div
         onClick={(e) => e.stopPropagation()}
+        className="app-sheet"
         style={{
           background: COLOR.bg, borderTop: `1px solid ${COLOR.border}`, borderRadius: 'var(--r-card) var(--r-card) 0 0',
           maxWidth: '28rem', width: '100%', maxHeight: '82vh', overflowY: 'auto', padding: '18px 18px 28px',
@@ -307,10 +310,13 @@ function AboutLegalPanel({ onClose }) {
   return (
     <div
       onClick={onClose}
+      data-overlay="1"
+      className="app-sheet-backdrop"
       style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', zIndex: 50, display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}
     >
       <div
         onClick={(e) => e.stopPropagation()}
+        className="app-sheet"
         style={{
           background: COLOR.bg, borderTop: `1px solid ${COLOR.border}`, borderRadius: 'var(--r-card) var(--r-card) 0 0',
           maxWidth: '28rem', width: '100%', maxHeight: '82vh', overflowY: 'auto', padding: '18px 18px 28px',
@@ -576,38 +582,62 @@ const TAB_BAR_ITEMS = [
 ];
 
 function BottomTabBar({ mode, onChange }) {
+  // Alt+1 … Alt+6 jump between tabs (e.code, so it also works on a Mac keyboard where Alt+digit types a symbol).
+  const onChangeRef = useRef(onChange);
+  onChangeRef.current = onChange;
+  useEffect(() => {
+    const onKey = (e) => {
+      if (!e.altKey || e.ctrlKey || e.metaKey || document.querySelector('[data-overlay]')) return;
+      const m = /^Digit([1-9])$/.exec(e.code || '');
+      const item = m && TAB_BAR_ITEMS[Number(m[1]) - 1];
+      if (!item) return;
+      e.preventDefault();
+      onChangeRef.current(item.m);
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, []);
   return (
     <nav
       aria-label="Main"
       data-chrome="bottom"
+      className="app-tabbar"
       style={{
         position: 'fixed', left: 0, right: 0, bottom: 0, zIndex: 40, background: COLOR.navBar,
         borderTop: `1px solid ${COLOR.border}`, paddingBottom: 'env(safe-area-inset-bottom)',
       }}
     >
-      <div className="max-w-md mx-auto flex" style={{ height: `${TAB_BAR_HEIGHT}px`, padding: '0 4px' }}>
-        {TAB_BAR_ITEMS.map((t) => {
+      {/* On a wide screen (see the desktop layout CSS in the page template) the bar becomes a left sidebar,
+          and this brand line and the shortcut note at the bottom appear. */}
+      <div className="app-tabbar-brand desktop-only mono">
+        <span style={{ width: '9px', height: '9px', background: modeHue(mode), flexShrink: 0 }} />cert-study
+      </div>
+      <div className="app-tabbar-inner max-w-md mx-auto flex" style={{ height: `${TAB_BAR_HEIGHT}px`, padding: '0 4px' }}>
+        {TAB_BAR_ITEMS.map((t, i) => {
           const active = mode === t.m;
           const hue = modeHue(t.m);
           return (
             <button
               key={t.m}
               onClick={() => onChange(t.m)}
-              title={t.label}
+              title={`${t.label} (Alt+${i + 1})`}
               aria-current={active ? 'page' : undefined}
-              className="btn-flat flex-1"
+              className="app-tab btn-flat flex-1"
               style={{
                 position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '4px',
                 background: active ? `color-mix(in srgb, ${hue} 12%, transparent)` : 'transparent', border: 'none', borderRadius: 0,
                 color: active ? hue : `color-mix(in srgb, ${hue} 55%, ${COLOR.muted})`, minWidth: 0, padding: '6px 0 4px',
               }}
             >
-              {active && <span style={{ position: 'absolute', top: 0, left: '16%', right: '16%', height: '2px', background: hue }} />}
+              {active && <span className="app-tab-mark" style={{ position: 'absolute', top: 0, left: '16%', right: '16%', height: '2px', background: hue }} />}
               <TabIcon kind={t.icon} size={22} />
-              <span style={{ fontFamily: 'var(--font-mono)', fontSize: '9.5px', fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase' }}>{t.label}</span>
+              <span className="app-tab-label" style={{ fontFamily: 'var(--font-mono)', fontSize: '9.5px', fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase' }}>{t.label}</span>
             </button>
           );
         })}
+      </div>
+      <div className="app-tabbar-foot desktop-only">
+        Alt+1 to Alt+6 switch tabs. In flashcards, Space flips and ← / → rate. In questions, A to E pick an answer and Enter moves on.
       </div>
     </nav>
   );

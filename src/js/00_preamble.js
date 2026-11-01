@@ -127,6 +127,30 @@ function useFocusMode(active) {
   }, [active]);
 }
 
+// Keyboard shortcuts for desktop browsers. `handler(key, event)` gets the
+// lower-cased key and returns true when it used it (the default action is then
+// prevented). Keys typed into a text field, a select or a contenteditable are
+// left alone, as are key presses with Ctrl, Alt or Meta held, and nothing fires
+// while an overlay (a sheet or dialog, marked data-overlay) is open on top.
+function useKeyShortcuts(enabled, handler) {
+  const ref = useRef(handler);
+  ref.current = handler;
+  useEffect(() => {
+    if (!enabled) return undefined;
+    const onKey = (e) => {
+      if (e.defaultPrevented || e.ctrlKey || e.altKey || e.metaKey || e.repeat) return;
+      const t = e.target;
+      if (t && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName))) return;
+      // A focused button or link already acts on Enter and Space by itself.
+      if (t && /^(BUTTON|A|SUMMARY)$/.test(t.tagName) && (e.key === 'Enter' || e.key === ' ')) return;
+      if (document.querySelector('[data-overlay]')) return;
+      if (ref.current(e.key.length === 1 ? e.key.toLowerCase() : e.key, e)) e.preventDefault();
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [enabled]);
+}
+
 // Closes an inline flyout (a term-definition popup anchored to the word
 // that was clicked, not a full-screen overlay) when the user taps/clicks
 // anywhere outside it — including on a different term, which this treats

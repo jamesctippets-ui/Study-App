@@ -848,6 +848,24 @@ function QuestionView({ q, selected, onChoose, onNext, index, total, categoryLab
   useEffect(() => { setActiveTermKey(null); }, [q && q.id]);
   useEscapeToClose(() => setActiveTermKey(null));
   useClickOutsideToClose(!!activeTermKey, () => setActiveTermKey(null));
+  // Desktop keys: A to E (or 1 to 5) pick an option (T / F for true-false), Enter submits a
+  // multi-select answer or moves to the next question once this one is answered.
+  useKeyShortcuts(!!q, (k) => {
+    if (selected !== null) {
+      if (k === 'Enter' && !hideNext && onNext) { onNext(); return true; }
+      return false;
+    }
+    if (q.type === 'tf') {
+      if (k === 't' || k === '1') { onChoose(0); return true; }
+      if (k === 'f' || k === '2') { onChoose(1); return true; }
+      return false;
+    }
+    let i = 'abcde'.indexOf(k);
+    if (i < 0 && /^[1-5]$/.test(k)) i = Number(k) - 1;
+    if (i >= 0 && i < (q.options || []).length) { if (q.type === 'ms') onToggleMs(i); else onChoose(i); return true; }
+    if (k === 'Enter' && q.type === 'ms' && msPending.length) { onSubmitMs(); return true; }
+    return false;
+  });
   if (!q) return null;
   const isLast = index + 1 >= total;
   return (

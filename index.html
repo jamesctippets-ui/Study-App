@@ -198,6 +198,46 @@
   .py-5 { padding-top: 1.25rem; padding-bottom: 1.25rem; }
   .max-w-md { max-width: 28rem; }
 
+  /* Desktop layout (a wide browser window, 1024px and up). The phone layout is a 28rem column with the
+     tabs along the bottom; here the tabs become a left sidebar, the column widens, sheets open as
+     centred dialogs and the flashcard buttons sit under the column instead of across the whole
+     window. Everything is done with the class hooks app-root, app-top, app-col, app-main, app-tabbar,
+     app-pinbar and app-sheet set in the JSX, so the phone layout is untouched. --side is the
+     sidebar's width; focus mode (flashcards) hides the sidebar like the phone tab bar, so it drops
+     to 0 there and the card centres in the window. */
+  .desktop-only { display: none; }
+  :root { --side: 0px; }
+  @media (min-width: 1024px) {
+    :root { --side: 216px; --col: 46rem; }
+    body[data-focus] { --side: 0px; }
+    .desktop-only { display: block; }
+    .app-root { padding-left: calc(var(--side) + env(safe-area-inset-left)) !important; }
+    .app-col { max-width: var(--col) !important; padding-left: 2rem !important; padding-right: 2rem !important; }
+    .app-main { padding-top: 2rem !important; padding-bottom: 4rem !important; }
+    body[data-focus] .app-main { padding-bottom: 120px !important; }
+    body[data-focus] .app-col { max-width: 40rem !important; }
+
+    .app-tabbar { top: 0 !important; right: auto !important; width: var(--side); border-top: none !important; border-right: 1px solid var(--color-border); display: flex; flex-direction: column; padding: 0 0 16px !important; }
+    .app-tabbar-brand { display: flex !important; align-items: center; gap: 8px; height: 56px; padding: 0 20px; font-size: 14px; font-weight: 700; color: var(--color-text); border-bottom: 1px solid var(--color-border); margin-bottom: 12px; }
+    .app-tabbar-inner { flex-direction: column; height: auto !important; max-width: none !important; margin: 0 !important; padding: 0 10px !important; gap: 2px; }
+    .app-tab { flex: none !important; flex-direction: row !important; justify-content: flex-start !important; gap: 12px !important; padding: 10px 12px !important; border-radius: var(--r-ctl) !important; }
+    .app-tab:hover { background: color-mix(in srgb, var(--color-text) 6%, transparent); }
+    .app-tab[aria-current="page"]:hover { background: none; }
+    .app-tab-mark { top: 8px !important; bottom: 8px; left: 0 !important; right: auto !important; width: 3px; height: auto !important; }
+    .app-tab-label { font-size: 11.5px !important; }
+    .app-tabbar-foot { margin-top: auto; padding: 0 20px; font-size: 11px; line-height: 1.5; color: var(--color-muted); }
+
+    /* With a mouse the flashcard buttons belong right under the card, not at the bottom of a tall window. */
+    .app-pinbar { position: static !important; background: transparent !important; border-top: none !important; padding-bottom: 0 !important; margin-top: 4px; }
+    .app-pinbar > .app-col { max-width: none !important; padding-left: 0 !important; padding-right: 0 !important; }
+
+    .app-sheet-backdrop { align-items: center !important; padding: 32px; }
+    .app-sheet { max-width: 34rem !important; max-height: 86vh !important; border: 1px solid var(--color-border) !important; border-radius: var(--r-card) !important; }
+  }
+  @media (min-width: 1440px) {
+    :root { --side: 240px; --col: 52rem; }
+  }
+
   @media print {
     body * { visibility: hidden; }
     #cheat-sheet-content, #cheat-sheet-content * { visibility: visible; }
@@ -351,6 +391,30 @@ function useFocusMode(active) {
     document.body.setAttribute('data-focus', '1');
     return () => document.body.removeAttribute('data-focus');
   }, [active]);
+}
+
+// Keyboard shortcuts for desktop browsers. `handler(key, event)` gets the
+// lower-cased key and returns true when it used it (the default action is then
+// prevented). Keys typed into a text field, a select or a contenteditable are
+// left alone, as are key presses with Ctrl, Alt or Meta held, and nothing fires
+// while an overlay (a sheet or dialog, marked data-overlay) is open on top.
+function useKeyShortcuts(enabled, handler) {
+  const ref = useRef(handler);
+  ref.current = handler;
+  useEffect(() => {
+    if (!enabled) return undefined;
+    const onKey = (e) => {
+      if (e.defaultPrevented || e.ctrlKey || e.altKey || e.metaKey || e.repeat) return;
+      const t = e.target;
+      if (t && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName))) return;
+      // A focused button or link already acts on Enter and Space by itself.
+      if (t && /^(BUTTON|A|SUMMARY)$/.test(t.tagName) && (e.key === 'Enter' || e.key === ' ')) return;
+      if (document.querySelector('[data-overlay]')) return;
+      if (ref.current(e.key.length === 1 ? e.key.toLowerCase() : e.key, e)) e.preventDefault();
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [enabled]);
 }
 
 // Closes an inline flyout (a term-definition popup anchored to the word
@@ -14257,10 +14321,13 @@ function AchievementsPanel({ achievements, streak, onClose }) {
   return (
     <div
       onClick={onClose}
+      data-overlay="1"
+      className="app-sheet-backdrop"
       style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', zIndex: 50, display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}
     >
       <div
         onClick={(e) => e.stopPropagation()}
+        className="app-sheet"
         style={{
           background: COLOR.bg, borderTop: `1px solid ${COLOR.border}`, borderRadius: 'var(--r-card) var(--r-card) 0 0',
           maxWidth: '28rem', width: '100%', maxHeight: '82vh', overflowY: 'auto', padding: '18px 18px 28px',
@@ -14353,10 +14420,13 @@ function DataPanel({
   return (
     <div
       onClick={onClose}
+      data-overlay="1"
+      className="app-sheet-backdrop"
       style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', zIndex: 50, display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}
     >
       <div
         onClick={(e) => e.stopPropagation()}
+        className="app-sheet"
         style={{
           background: COLOR.bg, borderTop: `1px solid ${COLOR.border}`, borderRadius: 'var(--r-card) var(--r-card) 0 0',
           maxWidth: '28rem', width: '100%', maxHeight: '82vh', overflowY: 'auto', padding: '18px 18px 28px',
@@ -15238,10 +15308,13 @@ function TrackSwitcherSheet({ tracks, results, certPlan, activeTrack, onSelect, 
   return (
     <div
       onClick={onClose}
+      data-overlay="1"
+      className="app-sheet-backdrop"
       style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', zIndex: 50, display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}
     >
       <div
         onClick={(e) => e.stopPropagation()}
+        className="app-sheet"
         style={{
           background: COLOR.bg, borderTop: `1px solid ${COLOR.border}`, borderRadius: 'var(--r-card) var(--r-card) 0 0',
           maxWidth: '28rem', width: '100%', maxHeight: '82vh', overflowY: 'auto', padding: '18px 18px 28px',
@@ -15297,10 +15370,13 @@ function CertPathPanel({ tracks, certPlan, onAddTrack, onRemoveTrack, onMove, on
   return (
     <div
       onClick={onClose}
+      data-overlay="1"
+      className="app-sheet-backdrop"
       style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', zIndex: 50, display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}
     >
       <div
         onClick={(e) => e.stopPropagation()}
+        className="app-sheet"
         style={{
           background: COLOR.bg, borderTop: `1px solid ${COLOR.border}`, borderRadius: 'var(--r-card) var(--r-card) 0 0',
           maxWidth: '28rem', width: '100%', maxHeight: '82vh', overflowY: 'auto', padding: '18px 18px 28px',
@@ -15638,10 +15714,13 @@ function GlossaryPanel({ onClose, customTerms, customScenarios, onSaveCustomTerm
   return (
     <div
       onClick={onClose}
+      data-overlay="1"
+      className="app-sheet-backdrop"
       style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', zIndex: 50, display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}
     >
       <div
         onClick={(e) => e.stopPropagation()}
+        className="app-sheet"
         style={{
           background: COLOR.bg, borderTop: `1px solid ${COLOR.border}`, borderRadius: 'var(--r-card) var(--r-card) 0 0',
           maxWidth: '28rem', width: '100%', maxHeight: '82vh', overflowY: 'auto', padding: '18px 18px 28px',
@@ -15762,10 +15841,13 @@ function AboutLegalPanel({ onClose }) {
   return (
     <div
       onClick={onClose}
+      data-overlay="1"
+      className="app-sheet-backdrop"
       style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', zIndex: 50, display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}
     >
       <div
         onClick={(e) => e.stopPropagation()}
+        className="app-sheet"
         style={{
           background: COLOR.bg, borderTop: `1px solid ${COLOR.border}`, borderRadius: 'var(--r-card) var(--r-card) 0 0',
           maxWidth: '28rem', width: '100%', maxHeight: '82vh', overflowY: 'auto', padding: '18px 18px 28px',
@@ -16031,38 +16113,62 @@ const TAB_BAR_ITEMS = [
 ];
 
 function BottomTabBar({ mode, onChange }) {
+  // Alt+1 … Alt+6 jump between tabs (e.code, so it also works on a Mac keyboard where Alt+digit types a symbol).
+  const onChangeRef = useRef(onChange);
+  onChangeRef.current = onChange;
+  useEffect(() => {
+    const onKey = (e) => {
+      if (!e.altKey || e.ctrlKey || e.metaKey || document.querySelector('[data-overlay]')) return;
+      const m = /^Digit([1-9])$/.exec(e.code || '');
+      const item = m && TAB_BAR_ITEMS[Number(m[1]) - 1];
+      if (!item) return;
+      e.preventDefault();
+      onChangeRef.current(item.m);
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, []);
   return (
     <nav
       aria-label="Main"
       data-chrome="bottom"
+      className="app-tabbar"
       style={{
         position: 'fixed', left: 0, right: 0, bottom: 0, zIndex: 40, background: COLOR.navBar,
         borderTop: `1px solid ${COLOR.border}`, paddingBottom: 'env(safe-area-inset-bottom)',
       }}
     >
-      <div className="max-w-md mx-auto flex" style={{ height: `${TAB_BAR_HEIGHT}px`, padding: '0 4px' }}>
-        {TAB_BAR_ITEMS.map((t) => {
+      {/* On a wide screen (see the desktop layout CSS in the page template) the bar becomes a left sidebar,
+          and this brand line and the shortcut note at the bottom appear. */}
+      <div className="app-tabbar-brand desktop-only mono">
+        <span style={{ width: '9px', height: '9px', background: modeHue(mode), flexShrink: 0 }} />cert-study
+      </div>
+      <div className="app-tabbar-inner max-w-md mx-auto flex" style={{ height: `${TAB_BAR_HEIGHT}px`, padding: '0 4px' }}>
+        {TAB_BAR_ITEMS.map((t, i) => {
           const active = mode === t.m;
           const hue = modeHue(t.m);
           return (
             <button
               key={t.m}
               onClick={() => onChange(t.m)}
-              title={t.label}
+              title={`${t.label} (Alt+${i + 1})`}
               aria-current={active ? 'page' : undefined}
-              className="btn-flat flex-1"
+              className="app-tab btn-flat flex-1"
               style={{
                 position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '4px',
                 background: active ? `color-mix(in srgb, ${hue} 12%, transparent)` : 'transparent', border: 'none', borderRadius: 0,
                 color: active ? hue : `color-mix(in srgb, ${hue} 55%, ${COLOR.muted})`, minWidth: 0, padding: '6px 0 4px',
               }}
             >
-              {active && <span style={{ position: 'absolute', top: 0, left: '16%', right: '16%', height: '2px', background: hue }} />}
+              {active && <span className="app-tab-mark" style={{ position: 'absolute', top: 0, left: '16%', right: '16%', height: '2px', background: hue }} />}
               <TabIcon kind={t.icon} size={22} />
-              <span style={{ fontFamily: 'var(--font-mono)', fontSize: '9.5px', fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase' }}>{t.label}</span>
+              <span className="app-tab-label" style={{ fontFamily: 'var(--font-mono)', fontSize: '9.5px', fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase' }}>{t.label}</span>
             </button>
           );
         })}
+      </div>
+      <div className="app-tabbar-foot desktop-only">
+        Alt+1 to Alt+6 switch tabs. In flashcards, Space flips and ← / → rate. In questions, A to E pick an answer and Enter moves on.
       </div>
     </nav>
   );
@@ -16114,6 +16220,18 @@ function FlashcardView({ card, flipped, setFlipped, onRate, index, total, catego
   useEscapeToClose(() => setActiveTermKey(null));
   useClickOutsideToClose(!!activeTermKey, () => setActiveTermKey(null));
   useFocusMode(!!card);
+  // Desktop keys: Space or Enter flips, H shows the hint, then ← (or 1) is "Don't got it" and → (or 2) is "Got it".
+  useKeyShortcuts(!!card, (k) => {
+    if (!flipped) {
+      if (k === ' ' || k === 'Enter' || k === 'ArrowUp' || k === 'ArrowDown') { setFlipped(true); return true; }
+      if (k === 'h' && defFirst) { setHintShown(true); return true; }
+      return false;
+    }
+    if (k === 'ArrowLeft' || k === '1') { onRate(CARD_MISSED); return true; }
+    if (k === 'ArrowRight' || k === '2') { onRate(CARD_GOT_IT); return true; }
+    if (k === ' ' || k === 'ArrowUp' || k === 'ArrowDown') { setFlipped(false); return true; }
+    return false;
+  });
   const prompt = useMemo(() => (card ? flashcardPrompt(card) : null), [card]);
   if (!card) return null;
   const otherCards = flashcardsData && flashcardsData.filter((c) => c.id !== card.id);
@@ -16167,8 +16285,8 @@ function FlashcardView({ card, flipped, setFlipped, onRate, index, total, catego
       </div>
       {/* The reveal and rating buttons are pinned to the bottom of the screen, where the tab bar normally sits
           (hidden in focus mode), so they stay under the thumb whether or not the card has been flipped. */}
-      <div style={{ position: 'fixed', left: 0, right: 0, bottom: 0, zIndex: 40, background: COLOR.navBar, borderTop: `1px solid ${COLOR.border}`, paddingBottom: 'env(safe-area-inset-bottom)' }}>
-        <div className="max-w-md mx-auto" style={{ display: 'flex', gap: '10px', padding: '10px 16px' }}>
+      <div className="app-pinbar" style={{ position: 'fixed', left: 0, right: 0, bottom: 0, zIndex: 40, background: COLOR.navBar, borderTop: `1px solid ${COLOR.border}`, paddingBottom: 'env(safe-area-inset-bottom)' }}>
+        <div className="app-col max-w-md mx-auto" style={{ display: 'flex', gap: '10px', padding: '10px 16px' }}>
           {!flipped ? (
             <React.Fragment>
               {defFirst && (
@@ -16204,6 +16322,9 @@ function FlashcardView({ card, flipped, setFlipped, onRate, index, total, catego
               </button>
             </React.Fragment>
           )}
+        </div>
+        <div className="app-col desktop-only mono mx-auto" style={{ fontSize: '11px', color: COLOR.muted, textAlign: 'center', padding: '0 16px 4px' }}>
+          {!flipped ? `Space to flip${defFirst ? ' · H for a hint' : ''}` : '← Don\'t got it · → Got it · Space to flip back'}
         </div>
       </div>
     </div>
@@ -18143,6 +18264,24 @@ function QuestionView({ q, selected, onChoose, onNext, index, total, categoryLab
   useEffect(() => { setActiveTermKey(null); }, [q && q.id]);
   useEscapeToClose(() => setActiveTermKey(null));
   useClickOutsideToClose(!!activeTermKey, () => setActiveTermKey(null));
+  // Desktop keys: A to E (or 1 to 5) pick an option (T / F for true-false), Enter submits a
+  // multi-select answer or moves to the next question once this one is answered.
+  useKeyShortcuts(!!q, (k) => {
+    if (selected !== null) {
+      if (k === 'Enter' && !hideNext && onNext) { onNext(); return true; }
+      return false;
+    }
+    if (q.type === 'tf') {
+      if (k === 't' || k === '1') { onChoose(0); return true; }
+      if (k === 'f' || k === '2') { onChoose(1); return true; }
+      return false;
+    }
+    let i = 'abcde'.indexOf(k);
+    if (i < 0 && /^[1-5]$/.test(k)) i = Number(k) - 1;
+    if (i >= 0 && i < (q.options || []).length) { if (q.type === 'ms') onToggleMs(i); else onChoose(i); return true; }
+    if (k === 'Enter' && q.type === 'ms' && msPending.length) { onSubmitMs(); return true; }
+    return false;
+  });
   if (!q) return null;
   const isLast = index + 1 >= total;
   return (
@@ -28259,6 +28398,7 @@ function CertStudyApp() {
     <CardPrefsContext.Provider value={cardPrefs}>
     <CustomTermsContext.Provider value={{ terms: stats.customTerms || [], save: saveCustomTerm }}>
     <div
+      className="app-root"
       style={{
         background: COLOR.bg,
         color: COLOR.text,
@@ -28333,8 +28473,8 @@ function CertStudyApp() {
           onSetReviewReminder={setReviewReminderDays}
         />
       )}
-      <div data-chrome="top" style={{ background: `color-mix(in srgb, ${modeHue(mode)} 9%, ${COLOR.navBar})`, borderBottom: `1px solid color-mix(in srgb, ${modeHue(mode)} 45%, ${COLOR.border})`, position: 'sticky', top: 0, zIndex: 30, transition: 'background-color 0.2s ease' }}>
-        <div className="max-w-md mx-auto px-4 flex items-center" style={{ height: `${APP_HEADER_HEIGHT}px`, gap: '8px' }}>
+      <div data-chrome="top" className="app-top" style={{ background: `color-mix(in srgb, ${modeHue(mode)} 9%, ${COLOR.navBar})`, borderBottom: `1px solid color-mix(in srgb, ${modeHue(mode)} 45%, ${COLOR.border})`, position: 'sticky', top: 0, zIndex: 30, transition: 'background-color 0.2s ease' }}>
+        <div className="app-col max-w-md mx-auto px-4 flex items-center" style={{ height: `${APP_HEADER_HEIGHT}px`, gap: '8px' }}>
           <button
             onClick={() => setShowCertPath(true)}
             className="btn-flat"
@@ -28374,7 +28514,7 @@ function CertStudyApp() {
           </div>
         </div>
       </div>
-      <div className="max-w-md mx-auto px-4 py-5" data-chrome-pad="1" style={{ paddingBottom: `calc(${TAB_BAR_HEIGHT + 24}px + env(safe-area-inset-bottom))` }}>
+      <div className="app-col app-main max-w-md mx-auto px-4 py-5" data-chrome-pad="1" style={{ paddingBottom: `calc(${TAB_BAR_HEIGHT + 24}px + env(safe-area-inset-bottom))` }}>
         {saveError ? (
           <div style={{ fontSize: '11.5px', color: COLOR.red, marginBottom: '12px', padding: '8px 10px', borderRadius: 'var(--r-ctl)', border: `1px solid ${COLOR.red}`, background: 'color-mix(in srgb, var(--color-red) 10%, transparent)' }}>
             Your last save didn't go through — your browser's storage may be full. Try Data &amp; Progress → Export to back up what you have, then free up some space.
