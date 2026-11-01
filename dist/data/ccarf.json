@@ -936,7 +936,7 @@
       "id": "f114",
       "cat": "tools",
       "front": "Environment variable expansion",
-      "back": "Placeholder syntax in the MCP configuration, such as ${GITHUB_TOKEN} or ${VAR:-default} (which supplies a fallback), that is replaced from the environment at load time, so secrets never have to be committed to the repository.",
+      "back": "Variable syntax in the MCP configuration, such as ${GITHUB_TOKEN} or ${VAR:-default} (which supplies a fallback), that is replaced from the environment at load time, so secrets never have to be committed to the repository.",
       "detail": "It works in the command, arguments, env, url and headers fields."
     },
     {
@@ -4530,7 +4530,7 @@
         "List Bash(gh *) in allowed-tools so that the skill can run the GitHub CLI and look up the right issue number itself"
       ],
       "correct": 2,
-      "explanation": "The hint appears during autocomplete and tells the developer which argument is expected, and the placeholder passes whatever they type into the instructions. Renaming does not prompt anyone, forking does not ask for input, and pre-approving the GitHub CLI does not tell the skill which issue is meant."
+      "explanation": "The hint appears during autocomplete and tells the developer which argument is expected, and $ARGUMENTS passes whatever they type into the instructions. Renaming does not prompt anyone, forking does not ask for input, and pre-approving the GitHub CLI does not tell the skill which issue is meant."
     },
     {
       "id": "msq1003",
