@@ -261,7 +261,7 @@
       "id": "f29",
       "cat": "troubleshooting",
       "front": "The standard troubleshooting methodology",
-      "back": "1) Identify the problem. 2) Establish a theory of probable cause. 3) Test the theory. 4) Establish a plan of action and implement the solution. 5) Verify full system functionality. 6) Document findings and outcomes.",
+      "back": "Step 1: identify the problem. Step 2: establish a theory of probable cause. Step 3: test the theory. Step 4: establish a plan of action and implement the solution. Step 5: verify full system functionality. Step 6: document findings and outcomes.",
       "detail": "A common exam trap: jumping straight to \"implement a solution\" without first testing the theory \u2014 a plausible-sounding cause that turns out to be wrong wastes a maintenance window and can make things worse."
     },
     {
@@ -3184,7 +3184,7 @@
         {
           "id": "cs-cloudplus-solstice-outdoor-q3",
           "type": "ms",
-          "question": "Given the order database's stated recovery requirements (no more than 15 minutes of lost transactions, fully restored within one hour), which of the following would actually help Solstice meet those targets? (Select all that apply.)",
+          "question": "Given the order database's stated recovery requirements (no more than 15 minutes of lost transactions, fully restored within one hour), which of the following would actually help Solstice meet those targets? (Choose two.)",
           "options": [
             "Frequent replication or transaction-log shipping to a standby database at a warm or hot DR site",
             "A cold DR site with only bare facilities, built out from scratch after a failure",
@@ -3256,7 +3256,7 @@
         {
           "id": "cs-cloudplus-harborview-freight-q4",
           "type": "ms",
-          "question": "Which of the following plausibly explains the cloud bill creeping up even though Harborview's deployed footprint (instance and volume count) hasn't grown? (Select all that apply.)",
+          "question": "Which of the following plausibly explains the cloud bill creeping up even though Harborview's deployed footprint (instance and volume count) hasn't grown? (Choose two.)",
           "options": [
             "Orphaned resources (unattached disks, snapshots, public IPs, or load balancers) left over from deleted projects, still quietly incurring cost",
             "Thin-provisioned volumes whose actual consumed data has grown, even though no new volumes or instances were provisioned",

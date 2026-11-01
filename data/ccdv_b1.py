@@ -227,7 +227,7 @@ FLASHCARDS += [
         'Replacing the older turns of a long conversation with a model-written summary so work can continue inside the window; recent turns can be kept verbatim, but detail from the summarized part may be lost.',
         'Server-side compaction is the primary strategy for long agent runs. Rules that must persist belong in the system prompt or CLAUDE.md, not only in early messages.'),
     _fc('f1057', _PR, 'Context editing',
-        'An API feature (beta) that applies rules to the history before the prompt reaches the model, such as clearing the oldest tool results or earlier thinking blocks once a threshold is passed and leaving a placeholder behind.',
+        'An API feature (beta) that applies rules to the history before the prompt reaches the model, such as clearing the oldest tool results or earlier thinking blocks once a threshold is passed and leaving a short marker where they were.',
         'Use it for tool-heavy loops where old results no longer matter. Unlike compaction it deletes by rule instead of summarizing.'),
     _fc('f1058', _PR, 'Tool output pruning',
         'Keeping tool results small: returning only the fields the next step needs, truncating or paginating large payloads, and replacing stale bulky results with a one-line extract at task boundaries.',

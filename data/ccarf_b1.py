@@ -703,7 +703,7 @@ QUESTIONS.extend([
          'Add an argument-hint such as [issue-number] and use $ARGUMENTS in the body where the number belongs',
          'List Bash(gh *) in allowed-tools so that the skill can run the GitHub CLI and look up the right issue number itself'],
         2,
-        'The hint appears during autocomplete and tells the developer which argument is expected, and the placeholder passes whatever they type into the instructions. Renaming does not prompt anyone, forking does not ask for input, and pre-approving the GitHub CLI does not tell the skill which issue is meant.'),
+        'The hint appears during autocomplete and tells the developer which argument is expected, and $ARGUMENTS passes whatever they type into the instructions. Renaming does not prompt anyone, forking does not ask for input, and pre-approving the GitHub CLI does not tell the skill which issue is meant.'),
     _ms('msq1003', _CC,
         'Which two statements about skill frontmatter are correct? (Choose two.)',
         ['argument-hint rejects an invocation that is missing a required argument',

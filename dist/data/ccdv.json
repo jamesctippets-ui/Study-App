@@ -1504,7 +1504,7 @@
       "id": "f1057",
       "cat": "prompting",
       "front": "Context editing",
-      "back": "An API feature (beta) that applies rules to the history before the prompt reaches the model, such as clearing the oldest tool results or earlier thinking blocks once a threshold is passed and leaving a placeholder behind.",
+      "back": "An API feature (beta) that applies rules to the history before the prompt reaches the model, such as clearing the oldest tool results or earlier thinking blocks once a threshold is passed and leaving a short marker where they were.",
       "detail": "Use it for tool-heavy loops where old results no longer matter. Unlike compaction it deletes by rule instead of summarizing."
     },
     {

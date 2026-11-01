@@ -428,7 +428,7 @@ FLASHCARDS.extend([
         'When the same server name appears in several scopes, the whole entry from the highest-precedence source is used with no field-by-field merging; local beats project, which beats user.',
         'It explains why a personal override of a team server changes behavior only for you.'),
     _fc('f114', _TL, 'Environment variable expansion',
-        'Placeholder syntax in the MCP configuration, such as ${GITHUB_TOKEN} or ${VAR:-default} (which supplies a fallback), that is replaced from the environment at load time, so secrets never have to be committed to the repository.',
+        'Variable syntax in the MCP configuration, such as ${GITHUB_TOKEN} or ${VAR:-default} (which supplies a fallback), that is replaced from the environment at load time, so secrets never have to be committed to the repository.',
         'It works in the command, arguments, env, url and headers fields.'),
     _fc('f115', _TL, 'Simultaneous MCP tool availability',
         'The fact that tools from every configured MCP server are discovered when the session connects and are all available to the agent at once, whichever scope each server came from.',
