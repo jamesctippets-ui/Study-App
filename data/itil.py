@@ -108,7 +108,7 @@ FLASHCARDS = [
         'id': 'f12',
         'cat': 'valueSystem',
         'front': 'The 5 components of the ITIL Value System',
-        'back': 'Guiding principles, governance, the service value chain, management practices, and continual improvement.',
+        'back': 'Guiding principles, governance, the value chain, management practices, and continual improvement.',
         'detail': 'A way to remember it: two are people-facing (principles, governance), one is the engine (value chain), one is the toolbox (practices), and one runs through everything (continual improvement).',
     },
     {
@@ -242,7 +242,7 @@ FLASHCARDS = [
         'cat': 'lifecycle',
         'front': 'Transition',
         'back': 'Moving a new or changed product or service into live use, including testing and release.',
-        'detail': 'This is where testing and release happen — think change management and deployment, not ongoing operation.',
+        'detail': 'This is where testing and release happen — think change enablement, release, and deployment, not ongoing operation.',
     },
     {
         'id': 'f32',
@@ -284,7 +284,7 @@ FLASHCARDS = [
         'cat': 'frameworks',
         'front': 'ITIL and DevOps',
         'back': 'ITIL provides the broader service value system and governance. DevOps contributes specific practices for fast, collaborative delivery. They complement rather than compete.',
-        'detail': "DevOps practices like CI/CD can sit inside the 'Build', 'Deliver', and 'Support' activities of the Product and Service Lifecycle.",
+        'detail': "DevOps practices like CI/CD can sit inside the 'Build', 'Transition', and 'Deliver' activities of the Product and Service Lifecycle.",
     },
     {
         'id': 'f38',
@@ -2254,7 +2254,7 @@ Two more distinctions round this category out. Cost is simply the money spent on
         'diagram': None,
         'vocabIds': ['f12', 'f13', 'f18', 'f19', 'f20', 'f21', 'f43'],
         'quizIds': ['q8', 'q9', 'q10', 'q11', 'q13', 'tf5', 'tf9', 'tf10', 'q40', 'q42'],
-        'reading': """The ITIL Service Value System is the overall model tying everything else in the framework together, and it has exactly five components: guiding principles, governance, the service value chain, management practices, and continual improvement. Guiding principles are recommendations meant to guide an organization in every circumstance, regardless of what's changing around it — they're deliberately generic so they apply whether you're troubleshooting one ticket or restructuring an entire department. Management practices are the "how": organizational resources, people, process, and tools, assembled to actually perform value chain activities. In the current model, the 34 total practices split into 12 general management practices and 22 product and service management practices, with no separate small technical-management group the way older models had.
+        'reading': """The ITIL Value System (called the Service Value System in ITIL 4) is the overall model tying everything else in the framework together, and it has exactly five components: guiding principles, governance, the value chain, management practices, and continual improvement. Guiding principles are recommendations meant to guide an organization in every circumstance, regardless of what's changing around it — they're deliberately generic so they apply whether you're troubleshooting one ticket or restructuring an entire department. Management practices are the "how": organizational resources, people, process, and tools, assembled to actually perform value chain activities. In the current model, the 34 total practices split into 12 general management practices and 22 product and service management practices, with no separate small technical-management group the way older models had.
 
 There are seven guiding principles, and Foundation expects you to recognize each by name and apply it to a scenario, not just recite the list. Focus on value means tracing every activity back to some benefit for a stakeholder — if a task doesn't map to that, it's worth questioning whether it's worth doing. Start where you are means assessing and reusing what already exists rather than building from scratch by default, which is not the same as refusing to change anything. Keep it simple and practical means using the minimum number of steps needed and cutting anything that doesn't add value — exam scenarios describing redundant approval steps almost always point here.
 
@@ -2326,11 +2326,11 @@ All four dimensions sit inside a wider environment shaped by external PESTLE fac
         'diagram': 'productServiceLifecycle',
         'vocabIds': ['f27', 'f28', 'f29', 'f30', 'f31', 'f32'],
         'quizIds': ['q19', 'q20', 'q21', 'q22', 'q31', 'q44', 'tf14', 'tf15', 'tf16'],
-        'reading': """The service value chain component of the Value System is expressed as the Product and Service Lifecycle: eight activities — Discover, Design, Acquire, Build, Transition, Operate, Deliver, Support — that convert inputs like demand and opportunity into outputs of value. This isn't a second, separate model sitting alongside "the value chain"; it's the same operating model, just expressed as a concrete, nameable sequence of activities rather than an abstract concept. Crucially, it's used iteratively, not as a strict one-way pipeline: work can loop back to an earlier activity at any point, and that looping is expected, not a sign something went wrong.
+        'reading': """The value chain component of the Value System is expressed as the Product and Service Lifecycle: eight activities — Discover, Design, Acquire, Build, Transition, Operate, Deliver, Support — that convert inputs like demand and opportunity into outputs of value. This isn't a second, separate model sitting alongside "the value chain"; it's the same operating model, just expressed as a concrete, nameable sequence of activities rather than an abstract concept. Crucially, it's used iteratively, not as a strict one-way pipeline: work can loop back to an earlier activity at any point, and that looping is expected, not a sign something went wrong.
 
 The first four activities take a service from idea to built component. Discover means identifying opportunities and understanding demand — is there a real problem worth solving here, before anything gets designed. Design defines requirements and specifications, but nothing gets built or acquired yet at this stage; that boundary between defining what's needed and actually producing it is a distinction the exam tests directly. Acquire and Build both then produce the actual components a solution needs: Acquire obtains them from outside suppliers, Build develops them in house, and a single project often uses both at once.
 
-The final four activities move that built solution into live use and keep it running. Transition covers moving a new or changed product or service into live use, including testing and release — this is where change management and deployment activity concentrates, not ongoing day-to-day running. Operate, Deliver, and Support are often grouped together on flashcards but tested separately: Operate means running the service day to day, Deliver means providing the agreed outcomes and value directly to consumers, and Support means resolving the issues and requests that come up once the service is actually in use — distinct jobs that can each go wrong independently of the others.""",
+The final four activities move that built solution into live use and keep it running. Transition covers moving a new or changed product or service into live use, including testing and release — this is where change enablement, release, and deployment activity concentrates, not ongoing day-to-day running. Operate, Deliver, and Support are often grouped together on flashcards but tested separately: Operate means running the service day to day, Deliver means providing the agreed outcomes and value directly to consumers, and Support means resolving the issues and requests that come up once the service is actually in use — distinct jobs that can each go wrong independently of the others.""",
         'fundamentalsLabel': 'New to the idea of a service lifecycle? See the everyday analogy',
         'fundamentals': "This maps closely to opening a new restaurant location. Discover is scouting whether there's actual demand in a neighborhood. Design is drawing up the menu and floor plan without ordering a single ingredient yet. Acquire is buying the ovens and dining furniture; Build is training the kitchen staff on the actual recipes in-house. Transition is the soft-opening test run before public launch. And once it's open, Operate is running the kitchen every night, Deliver is the meal actually reaching the table, and Support is handling a customer complaint about a wrong order — three related but genuinely different jobs, exactly like the exam expects you to keep separate.",
         'keyTerms': ['Product and Service Lifecycle', 'Discover', 'Design', 'Acquire', 'Build', 'Transition', 'Operate', 'Deliver', 'Support'],
@@ -2354,7 +2354,7 @@ The final four activities move that built solution into live use and keep it run
 
 ITIL Version 5 folds AI in as a capability that needs the same governance as anything else, not a special exception. It distinguishes plain AI, systems performing tasks that normally need human intelligence, from generative AI, which creates new content, from agentic AI, which can plan and act autonomously toward a goal with limited human intervention — a chatbot that drafts a reply for a human to approve is generative, while one that files the ticket, checks the knowledge base, and closes it itself is agentic. The AI Capability Model further breaks down what AI actually contributes into six "Cs": Creation, Curation, Clarification, Cognition, Communication, and Coordination — naming which "C" a given AI system performs matters, because a system that curates alerts needs different oversight than one that coordinates automated actions across a workflow.
 
-ITIL deliberately doesn't compete with adjacent frameworks; it operates at a different layer and expects to work alongside them. DevOps contributes specific practices for fast, collaborative delivery — CI/CD pipelines slot naturally inside the Build, Deliver, and Support activities of the lifecycle, governed by ITIL's wider context rather than replacing it. PRINCE2 manages temporary, bounded project work, while ITIL manages the ongoing service that project eventually delivers into — a system rollout might run as a PRINCE2 project, with ITIL practices taking over the moment it goes live. Agile, similarly, is about how work gets done iteratively, while ITIL is about the wider value system that work happens within — different layers, not competing answers to the same question.""",
+ITIL deliberately doesn't compete with adjacent frameworks; it operates at a different layer and expects to work alongside them. DevOps contributes specific practices for fast, collaborative delivery — CI/CD pipelines slot naturally inside the Build, Transition, and Deliver activities of the lifecycle, governed by ITIL's wider context rather than replacing it. PRINCE2 manages temporary, bounded project work, while ITIL manages the ongoing service that project eventually delivers into — a system rollout might run as a PRINCE2 project, with ITIL practices taking over the moment it goes live. Agile, similarly, is about how work gets done iteratively, while ITIL is about the wider value system that work happens within — different layers, not competing answers to the same question.""",
         'fundamentalsLabel': 'New to how these frameworks fit together? See the everyday analogy',
         'fundamentals': "Think of ITIL as a restaurant's overall business plan and health-code compliance, while Agile and DevOps are the specific techniques the kitchen uses to cook efficiently, and PRINCE2 is how a one-time kitchen renovation project gets managed. None of them compete with each other — the renovation project (PRINCE2) eventually hands off to day-to-day kitchen operations, governed by the overall plan (ITIL), which might use a fast, iterative prep technique (Agile/DevOps) without that technique ever needing to replace the business plan itself. And an AI system that just suggests tonight's specials based on ingredients about to expire (generative) is a very different level of trust from one that automatically reorders inventory and adjusts the menu on its own (agentic).",
         'keyTerms': ['Value stream', 'Value stream mapping', 'AI', 'Generative AI', 'Agentic AI', 'AI Capability Model', 'DevOps', 'PRINCE2', 'Agile'],
@@ -2425,12 +2425,12 @@ MADLIBS = [
     {
         'id': 'ml-itil-6',
         'cat': 'ai',
-        'scenario': "A service desk's virtual agent drafts a suggested reply to a routine password-reset ticket, which a human agent reviews and sends — under the AI Capability Model, that's an example of AI performing {b1}. Later, the team adds a feature that automatically reads every incoming support email and files it into the correct queue with no human involved at any point — that's an example of {b2} instead.",
+        'scenario': "A service desk's virtual agent drafts a suggested reply to a routine password-reset ticket, which a human agent reviews and sends — under the AI Capability Model, that's an example of AI performing {b1}. Later, the team adds a feature that automatically filters the day's incoming support emails, merging duplicates and surfacing the handful that need urgent attention, with no human involved at any point — that's an example of {b2} instead.",
         'blanks': [
             {'key': 'b1', 'options': ['Creation', 'Curation', 'Cognition', 'Coordination'], 'correct': 0},
             {'key': 'b2', 'options': ['Creation', 'Curation', 'Cognition', 'Coordination'], 'correct': 1},
         ],
-        'explanation': "Creation covers AI generating new content, like a drafted reply — even though a human still reviews it before it goes out. Curation covers organizing and filtering information, which is exactly what auto-sorting incoming emails into the right queue is; it isn't generating new content, so it doesn't count as Creation, and there's no decision-making or orchestration of a broader workflow involved, which is what Cognition and Coordination would describe.",
+        'explanation': "Creation covers AI generating new content, like a drafted reply — even though a human still reviews it before it goes out. Curation covers organizing and filtering information, which is exactly what filtering, de-duplicating, and surfacing the urgent emails is; it isn't generating new content, so it doesn't count as Creation, and it isn't predicting an outcome or routing work through a wider workflow, which is what Cognition and Coordination would describe.",
     },
 ]
 
@@ -2541,7 +2541,7 @@ CASE_STUDIES = [
             {
                 'id': 'cs-itil-northwind-helpdesk-q4',
                 'type': 'ms',
-                'question': "Once problem management identifies the barcode-scanner fault's underlying cause but no permanent fix is available yet, which of the following would be appropriate next steps? (Select all that apply.)",
+                'question': "Once problem management identifies the barcode-scanner fault's underlying cause but no permanent fix is available yet, which of the following would be appropriate next steps? (Choose two.)",
                 'options': [
                     "Record it as a known error, with the existing workaround documented for agents to apply consistently",
                     "Close problem management's involvement immediately, since incident management can keep handling it case by case",
