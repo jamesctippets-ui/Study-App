@@ -580,7 +580,7 @@
     {
       "id": "f80",
       "cat": "identityAccessGovernance",
-      "front": "Phishing-resistant MFA (FIDO2 security keys, certificate-based authentication) vs. SMS/voice",
+      "front": "Phishing-resistant MFA vs. SMS/voice",
       "back": "An SMS or voice-call one-time code can still be captured through a SIM swap or a real-time phishing proxy that simply relays the code the moment a user enters it. FIDO2 security keys and certificate-based authentication instead cryptographically bind the credential to the specific site and device being signed into, so there is no code for a proxy to intercept and replay at all. Authentication context (step-up Conditional Access) can require this stronger phishing-resistant method specifically at a sensitive action, like activating a privileged role, rather than for every sign-in.",
       "detail": "Adding a second SMS step, or shortening how long a code stays valid, still leaves the same interceptable code in the authentication flow \u2014 only switching to a phishing-resistant method removes that weakness rather than narrowing its timing window."
     },
@@ -650,7 +650,7 @@
     {
       "id": "f90",
       "cat": "securityPostureOps",
-      "front": "Secure Score vs. regulatory compliance dashboard vs. Microsoft Purview Compliance Manager score",
+      "front": "Secure Score vs. compliance dashboard vs. Compliance Manager",
       "back": "Secure Score reflects Defender for Cloud's general infrastructure best-practice posture. The regulatory compliance dashboard maps that same infrastructure posture against one specific named standard, like ISO 27001. Microsoft Purview Compliance Manager's compliance score is a separate, broader assessment spanning data governance, organizational, and documented policy controls across Microsoft 365 and Azure \u2014 not just infrastructure configuration.",
       "detail": "These three similarly-named percentages are easy to mix up on purpose: knowing which tool produced a given score, and what scope that score actually covers, matters more than recognizing that each one is simply 'a compliance-sounding number.'"
     },
@@ -3783,7 +3783,7 @@
       "question": "Contoso reduces Windows Security event ingestion cost by collecting only specific event IDs from servers, some of which are on-premises. Which approach is right?",
       "options": [
         "Collect all events and delete rows later",
-        "Windows Security Events via AMA with a data collection rule filter, with Azure Arc enabled on the on-premises servers",
+        "Windows Security Events via AMA with a DCR filter and Azure Arc",
         "Use Syslog via AMA",
         "Install the legacy Microsoft Monitoring Agent"
       ],
@@ -4316,8 +4316,8 @@
       "heading": "Exam-day strategy",
       "points": [
         "Check the official exam page for the current time limit and question count (Microsoft does not guarantee a fixed number, and published figures for this exam vary), then work out your average minutes per question. Budget more time for multi-part scenario questions and less for straight recall, rather than pacing every question identically.",
-        "Real scoring isn't a flat percentage of questions right (some count for more than others) \u2014 treat 70%+ as a safe buffer to aim for, not an exact threshold to just clear.",
-        "Flag anything you're unsure of and move on rather than stalling \u2014 a question later in the exam can sometimes jog a detail you needed earlier, and you get partial credit for nothing by running out of time on one question.",
+        "Real scoring isn't a flat percentage of questions right (some count for more than others) \u2014 treat 75%+ as a safe buffer to aim for, not an exact threshold to just clear.",
+        "Flag anything you're unsure of and move on rather than stalling \u2014 a question later in the exam can sometimes jog a detail you needed earlier, and an unanswered question earns nothing, so don't run out of time on one.",
         "On multi-select ('choose N') questions, eliminate the options you're confident are wrong first; guessing among 2 plausible answers beats guessing among 4.",
         "Your first read of a question is usually right \u2014 change an answer only when you find a specific detail you missed, not from general second-guessing."
       ]
@@ -4625,7 +4625,7 @@
         {
           "id": "cs-sc500-fabrikam-support-agent-q2",
           "type": "ms",
-          "question": "Which changes would appropriately restrict network access to the underlying Azure OpenAI resource so it no longer accepts calls from any public IP? (Select all that apply.)",
+          "question": "Which changes would appropriately restrict network access to the underlying Azure OpenAI resource so it no longer accepts calls from any public IP? (Choose two.)",
           "options": [
             "Configure a private endpoint for the Azure OpenAI resource and disable its public network access",
             "Route the Foundry agent's calls to the resource over the private endpoint instead of its public endpoint",
