@@ -1389,7 +1389,7 @@
       "id": "msq1",
       "cat": "hl7v2Messaging",
       "type": "ms",
-      "question": "Which of these events would an interface analyst expect to see carried in ADT messages? (Select all that apply)",
+      "question": "Which of these events would an interface analyst expect to see carried in ADT messages? (Choose three.)",
       "options": [
         "A patient is transferred to another nursing unit",
         "A lab finalizes a hemoglobin result",
@@ -1408,7 +1408,7 @@
       "id": "msq2",
       "cat": "hl7v2Messaging",
       "type": "ms",
-      "question": "Which statements about HL7 v2 acknowledgments are accurate? (Select all that apply)",
+      "question": "Which statements about HL7 v2 acknowledgments are accurate? (Choose three.)",
       "options": [
         "In enhanced mode, a commit-level accept can come back before the application finishes processing",
         "An AE tells the sender the receiving system never received the message at all",
@@ -1427,7 +1427,7 @@
       "id": "msq3",
       "cat": "fhirModernApis",
       "type": "ms",
-      "question": "Which pairings of clinical concept and FHIR resource are correct? (Select all that apply)",
+      "question": "Which pairings of clinical concept and FHIR resource are correct? (Choose three.)",
       "options": [
         "A prescription is a MedicationRequest; what the patient reports taking is a MedicationStatement",
         "A diagnosis on the problem list is an Observation carrying a diagnosis code",
@@ -1446,7 +1446,7 @@
       "id": "msq4",
       "cat": "fhirModernApis",
       "type": "ms",
-      "question": "Which statements about SMART on FHIR scopes and launch are accurate? (Select all that apply)",
+      "question": "Which statements about SMART on FHIR scopes and launch are accurate? (Choose three.)",
       "options": [
         "Patient scopes confine an app to one patient; user scopes follow the signed-in user's access",
         "An EHR launch hands the app a launch value that it returns in its authorization request",
@@ -1465,7 +1465,7 @@
       "id": "msq5",
       "cat": "integrationEngines",
       "type": "ms",
-      "question": "A source connection shows 'connected' but inbound volume has dropped to zero, with no errors logged. Which causes are consistent with that? (Select all that apply)",
+      "question": "A source connection shows 'connected' but inbound volume has dropped to zero, with no errors logged. Which causes are consistent with that? (Choose three.)",
       "options": [
         "The sending system's export job stopped",
         "A firewall dropped the session after an idle timeout, leaving a half-open connection",
@@ -1484,7 +1484,7 @@
       "id": "msq6",
       "cat": "integrationEngines",
       "type": "ms",
-      "question": "Which tasks belong in a channel's filter rather than its transformer? (Select all that apply)",
+      "question": "Which tasks belong in a channel's filter rather than its transformer? (Choose three.)",
       "options": [
         "Accepting only ADT messages from one facility",
         "Converting local sex codes to standard values",
@@ -1503,7 +1503,7 @@
       "id": "msq7",
       "cat": "dataGovernance",
       "type": "ms",
-      "question": "Which items belong in a change request for a live production interface? (Select all that apply)",
+      "question": "Which items belong in a change request for a live production interface? (Choose three.)",
       "options": [
         "A rollback plan",
         "Sign-off from the owner of the receiving system",
@@ -1522,7 +1522,7 @@
       "id": "msq8",
       "cat": "dataGovernance",
       "type": "ms",
-      "question": "Which statements about matching and stewardship in an MPI are accurate? (Select all that apply)",
+      "question": "Which statements about matching and stewardship in an MPI are accurate? (Choose three.)",
       "options": [
         "Pairs scoring between the two thresholds are usually queued for a steward to review",
         "Raising the auto-link threshold cuts false merges but may leave more duplicates unlinked",
@@ -1619,7 +1619,7 @@
       "id": "msq9",
       "cat": "fhirModernApis",
       "type": "ms",
-      "question": "Which statements about FHIR search are accurate? (Select all that apply)",
+      "question": "Which statements about FHIR search are accurate? (Choose three.)",
       "options": [
         "Results may be paged, so a client may need to follow the Bundle's next link",
         "An identifier search can pair a system with a value to match one issuer's numbers",
@@ -1666,7 +1666,7 @@
       "id": "msq10",
       "cat": "integrationEngines",
       "type": "ms",
-      "question": "Which error-handling behaviors are appropriate for a production channel? (Select all that apply)",
+      "question": "Which error-handling behaviors are appropriate for a production channel? (Choose three.)",
       "options": [
         "Retrying transient failures such as a refused connection, with a delay between attempts",
         "Sending data-validation failures to an error queue for review instead of retrying forever",
@@ -1743,7 +1743,7 @@
       "id": "msq11",
       "cat": "hl7v2Messaging",
       "type": "ms",
-      "question": "Which statements about HL7 v2 versions and extensions are accurate? (Select all that apply)",
+      "question": "Which statements about HL7 v2 versions and extensions are accurate? (Choose two.)",
       "options": [
         "A system built for 2.5.1 can often still read a 2.3 message, since later versions mostly add optional content",
         "A Z-segment is safe to send to any partner without prior agreement because receivers interpret Z-segments uniformly",
@@ -1810,7 +1810,7 @@
       "id": "msq12",
       "cat": "fhirModernApis",
       "type": "ms",
-      "question": "Which statements about transaction and batch Bundles are accurate? (Select all that apply)",
+      "question": "Which statements about transaction and batch Bundles are accurate? (Choose three.)",
       "options": [
         "If one entry in a transaction fails, none of its changes are persisted",
         "A batch response reports a separate status for each entry",
@@ -1865,7 +1865,7 @@
       "id": "msq13",
       "cat": "integrationEngines",
       "type": "ms",
-      "question": "Which alerts would catch a silently failed feed? (Select all that apply)",
+      "question": "Which alerts would catch a silently failed feed? (Choose three.)",
       "options": [
         "Volume for a feed falling below its time-of-day baseline",
         "Alerting only on messages that reach an ERROR status in the engine log",
@@ -2096,7 +2096,7 @@
       "id": "msq14",
       "cat": "hl7v2Messaging",
       "type": "ms",
-      "question": "Which statements about placer and filler order numbers in HL7 v2 order and result messages are accurate? (Select all that apply)",
+      "question": "Which statements about placer and filler order numbers in HL7 v2 order and result messages are accurate? (Choose two.)",
       "options": [
         "The placer number is assigned by the system that places the order",
         "The filler number is generated by the EHR at the moment the order is placed",
@@ -2155,7 +2155,7 @@
       "id": "tf19",
       "cat": "fhirModernApis",
       "type": "ms",
-      "question": "A team designs a v2-to-FHIR mapping for an ADT^A01 admit. Which pairings are sensible? (Select all that apply)",
+      "question": "A team designs a v2-to-FHIR mapping for an ADT^A01 admit. Which pairings are sensible? (Choose three.)",
       "options": [
         "PID demographics map to a Patient resource",
         "The EVN segment maps to an AllergyIntolerance resource",
@@ -2174,7 +2174,7 @@
       "id": "msq15",
       "cat": "fhirModernApis",
       "type": "ms",
-      "question": "Which statements about clinical terminologies are accurate? (Select all that apply)",
+      "question": "Which statements about clinical terminologies are accurate? (Choose three.)",
       "options": [
         "RxNorm gives normalized names for clinical drugs independent of package",
         "NDC identifies a specific packaged drug product",
@@ -2229,7 +2229,7 @@
       "id": "msq16",
       "cat": "integrationEngines",
       "type": "ms",
-      "question": "Which designs make a retry safe? (Select all that apply)",
+      "question": "Which designs make a retry safe? (Choose three.)",
       "options": [
         "Deduplicating on the sender's message control ID",
         "Keying orders on the placer order number so a repeat updates the existing order",
@@ -2284,7 +2284,7 @@
       "id": "msq17",
       "cat": "dataGovernance",
       "type": "ms",
-      "question": "Which controls are appropriate for emergency access to a record? (Select all that apply)",
+      "question": "Which controls are appropriate for emergency access to a record? (Choose three.)",
       "options": [
         "Requiring the user to state a reason at the time of access",
         "Sending each override to a privacy team for after-the-fact review",
@@ -2339,7 +2339,7 @@
       "id": "msq18",
       "cat": "integrationEngines",
       "type": "ms",
-      "question": "Which situations are better served by asynchronous messaging than by a synchronous call? (Select all that apply)",
+      "question": "Which situations are better served by asynchronous messaging than by a synchronous call? (Choose three.)",
       "options": [
         "An ADT update broadcast to eight downstream systems, where the sender must not wait on any of them",
         "A real-time eligibility check the front desk needs answered before continuing",
@@ -2416,7 +2416,7 @@
       "id": "msq19",
       "cat": "fhirModernApis",
       "type": "ms",
-      "question": "Which statements about OperationOutcome, AuditEvent, and Provenance are accurate? (Select all that apply)",
+      "question": "Which statements about OperationOutcome, AuditEvent, and Provenance are accurate? (Choose three.)",
       "options": [
         "A server may attach an OperationOutcome to a successful response to carry warnings",
         "OperationOutcome issues carry a severity such as fatal, error, warning, or information",
@@ -2507,7 +2507,7 @@
       "id": "msq20",
       "cat": "dataGovernance",
       "type": "ms",
-      "question": "Two hospital systems are combining their MPIs. Which steps are sound? (Select all that apply)",
+      "question": "Two hospital systems are combining their MPIs. Which steps are sound? (Choose three.)",
       "options": [
         "Run matching across both populations with a review queue for borderline scores",
         "Assign an enterprise identifier that cross-references facility MRNs without overwriting them",
@@ -3157,7 +3157,7 @@
         {
           "id": "cs-ehrintegration-maple-ridge-q4",
           "type": "ms",
-          "question": "Which of the following would help the team catch the kind of quiet, no-hard-error slowdown reported during the afternoon window, ideally before a clinician notices missing or late results? (Select all that apply.)",
+          "question": "Which of the following would help the team catch the kind of quiet, no-hard-error slowdown reported during the afternoon window, ideally before a clinician notices missing or late results? (Choose two.)",
           "options": [
             "Monitoring queue depth and message volume against an established baseline",
             "Running a synthetic canary message through the same interface path on a regular schedule",
@@ -3215,7 +3215,7 @@
         {
           "id": "cs-ehrintegration-bright-path-q4",
           "type": "ms",
-          "question": "Which of the following should Bright Path's compliance and IT teams specifically check as part of this review? (Select all that apply.)",
+          "question": "Which of the following should Bright Path's compliance and IT teams specifically check as part of this review? (Choose three.)",
           "options": [
             "That the requested OAuth2 scopes are limited to only the resource types (labs, medications, allergies) the app actually needs",
             "That a signed Business Associate Agreement is in place before the vendor's backend touches any real patient data",
