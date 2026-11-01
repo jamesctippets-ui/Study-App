@@ -1121,7 +1121,7 @@
         "No change in spending pattern"
       ],
       "correct": 1,
-      "explanation": "Cloud computing shifts organizations from large upfront capital purchases toward ongoing operating expense. Even an upfront Reserved Instance purchase is still billed as a discounted rate on consumption \u2014 it is still a consumption commitment billed through Azure, not an equipment purchase, so it is not CapEx \u2014 a commonly missed distinction."
+      "explanation": "Cloud computing shifts organizations from large upfront capital purchases toward ongoing operating expense. Even a Reserved Instance paid upfront is a discounted commitment to consume Azure capacity, not the purchase of equipment the company owns, so it is not CapEx in the datacenter sense, a commonly missed distinction."
     },
     {
       "id": "q5",
@@ -2025,7 +2025,7 @@
         2,
         4
       ],
-      "explanation": "A Read-only lock is inherited by everything in the group and blocks any operation that would change state \u2014 resizing (an update), deleting, and creating all fail, regardless of the user's RBAC role. Read operations are unaffected, so viewing metrics and listing resources still work. A common mistake is to assume Read-only only blocks edits to existing resources; creating a new resource inside the locked scope is a write to that scope and is blocked just the same."
+      "explanation": "A Read-only lock is inherited by everything in the group and blocks any operation that would change state \u2014 resizing (an update), deleting, and creating all fail, regardless of the user's RBAC role. Read operations are unaffected, so viewing metrics and listing resources still work. A common mistake is to assume a Read-only lock blocks nothing but edits to existing resources; creating a new resource inside the locked scope is a write to that scope and is blocked just the same."
     },
     {
       "id": "msq10",
@@ -2614,7 +2614,7 @@
       "id": "q70",
       "cat": "architecture",
       "type": "mc",
-      "question": "A hospital network needs a connection from its on-premises datacenter to Azure that avoids the public internet for a latency-sensitive imaging workload, but the hospital's budget and timeline don't allow for the weeks-long circuit provisioning that a dedicated private connection usually requires. Which option best fits both constraints?",
+      "question": "A hospital network would ideally link its on-premises datacenter to Azure over a private circuit, but its budget and timeline can't absorb the weeks-long provisioning a dedicated connection usually requires. It needs an encrypted network-to-network link running within days. Which option best fits both constraints?",
       "options": [
         "ExpressRoute, since it provides the most complete isolation from the public internet of any connectivity option",
         "A site-to-site VPN Gateway, since it can be provisioned quickly and still encrypts traffic over the internet",
@@ -2622,7 +2622,7 @@
         "Azure Front Door, since it routes traffic through Microsoft's global network instead of the public internet"
       ],
       "correct": 1,
-      "explanation": "A VPN Gateway can be stood up in hours over the existing internet connection, trading ExpressRoute's stronger internet isolation for something that actually fits this budget and timeline \u2014 the imaging workload still gets an encrypted, private-feeling tunnel. ExpressRoute better matches the latency/isolation goal in isolation, but its multi-week circuit provisioning is exactly what the scenario rules out. Bastion is for secure administrative access to VMs, not site-to-site connectivity between networks, and Front Door is a web-application entry point, not a private network connection."
+      "explanation": "A VPN Gateway can be stood up in hours over the existing internet connection, trading ExpressRoute's stronger internet isolation for something that actually fits this budget and timeline \u2014 the imaging workload still gets an encrypted, private-feeling tunnel. ExpressRoute is the hospital's ideal on isolation and latency, but its multi-week circuit provisioning is exactly what the scenario rules out. Bastion is for secure administrative access to VMs, not site-to-site connectivity between networks, and Front Door is a web-application entry point, not a private network connection."
     },
     {
       "id": "q71",
@@ -3307,7 +3307,7 @@
       "id": "msq9005",
       "cat": "architecture",
       "type": "ms",
-      "question": "Which of the following are passwordless sign-in options supported by Microsoft Entra ID? (Select all that apply.)",
+      "question": "Which three of the following are passwordless sign-in options supported by Microsoft Entra ID? (Choose three.)",
       "options": [
         "Windows Hello for Business",
         "Microsoft Authenticator sign-in with number matching and a biometric or PIN",
@@ -3785,7 +3785,7 @@
       "points": [
         "Expect roughly 40\u201360 questions in about 45 minutes of exam time \u2014 a bit under a minute each on average. Budget more time for multi-part scenario questions and less for straight recall, rather than pacing every question identically.",
         "Real scoring isn't a flat percentage of questions right (some count for more than others) \u2014 treat 75%+ as a safe buffer to aim for, not an exact threshold to just clear.",
-        "Flag anything you're unsure of and move on rather than stalling \u2014 a question later in the exam can sometimes jog a detail you needed earlier, and you get partial credit for nothing by running out of time on one question.",
+        "Flag anything you're unsure of and move on rather than stalling \u2014 a question later in the exam can sometimes jog a detail you needed earlier, and an unanswered question earns nothing, so don't run out of time on one.",
         "On multi-select ('choose N') questions, eliminate the options you're confident are wrong first; guessing among 2 plausible answers beats guessing among 4.",
         "Your first read of a question is usually right \u2014 change an answer only when you find a specific detail you missed, not from general second-guessing."
       ]
@@ -3830,7 +3830,7 @@
     {
       "heading": "Storage & identity",
       "points": [
-        "Blob storage = unstructured data (files, media). Disk storage = VM disks. File storage = SMB file shares.",
+        "Blob storage = unstructured data (files, media). Disk storage = VM disks. Azure Files = managed SMB or NFS file shares.",
         "Storage redundancy: LRS (one datacenter) < ZRS (zone) < GRS (paired region, not readable) < RA-GRS (paired region, readable).",
         "Microsoft Entra ID (formerly Azure AD) = identity service; RBAC = who can do what on which resource; Conditional Access = under what conditions access is allowed.",
         "Passwordless = Windows Hello for Business, Microsoft Authenticator, or FIDO2 security key. Entra Domain Services = managed domain (LDAP, Kerberos/NTLM); Entra Connect = sync of on-premises AD to Entra ID.",
@@ -3985,7 +3985,7 @@
     {
       "id": "ml-az900-5",
       "cat": "cloudConcepts",
-      "scenario": "When a single server in the primary datacenter fails, traffic automatically shifts within seconds to a healthy duplicate server in that same datacenter, and users notice nothing at all \u2014 that's {b1}. When the entire primary region suffers a catastrophic outage and the company instead fails over to a pre-configured environment in a completely different region, accepting some downtime and a small amount of data loss along the way, that's {b2}.",
+      "scenario": "When a single server in the primary datacenter fails, traffic automatically shifts within seconds to a healthy duplicate server in that same datacenter, and users see at most a brief blip \u2014 that's {b1}. When the entire primary region suffers a catastrophic outage and the company instead fails over to a pre-configured environment in a completely different region, accepting some downtime and a small amount of data loss along the way, that's {b2}.",
       "blanks": [
         {
           "key": "b1",
@@ -4158,7 +4158,7 @@
         {
           "id": "cs-az900-fabrikam-adoption-q4",
           "type": "ms",
-          "question": "Fabrikam wants to never have to patch the operating system of the servers running its web front end after migrating. Which of the following statements about meeting this goal are accurate? (Select all that apply.)",
+          "question": "Fabrikam wants to never have to patch the operating system of the servers running its web front end after migrating. Which three statements about meeting this goal are accurate? (Choose three.)",
           "options": [
             "Choosing a PaaS service, like Azure App Service, shifts OS patching responsibility to Microsoft",
             "Choosing IaaS (VMs) would still leave Fabrikam responsible for guest-OS patching",
