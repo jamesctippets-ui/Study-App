@@ -758,6 +758,26 @@ The React/JSX code itself is still transpiled by Babel Standalone *in the
 browser* at load time (see "Where things stand" below for the trade-off there) —
 `build.py` only assembles source files and content, it doesn't compile JS.
 
+### Desktop layout
+
+The app is built phone-first (a 28rem column, tabs along the bottom), but in a browser window 1024px or wider
+it switches to a desktop layout with no change to the phone one. All of it is CSS in the `@media (min-width:
+1024px)` block of `templates/index.html.tmpl`, keyed off class hooks in the JSX (`app-root`, `app-top`,
+`app-col`, `app-main`, `app-tabbar`, `app-pinbar`, `app-sheet`):
+
+- the bottom tab bar becomes a left sidebar (216px, 240px from 1440px) with the tab names spelled out and a
+  short keyboard-shortcut note at the bottom;
+- the content column widens from 28rem to 46rem (52rem from 1440px), and the top bar lines up with it;
+- the bottom sheets (cert path, achievements, glossary and the other panels marked `app-sheet`) open as
+  centred dialogs;
+- flashcards keep their focus mode (sidebar and top bar step aside), but the reveal and rating buttons sit
+  right under the card instead of at the bottom of a tall window.
+
+Keyboard shortcuts work at any width (`useKeyShortcuts` in `00_preamble.js`, ignored while typing in a field or
+while a sheet is open): Alt+1 to Alt+6 switch tabs; in flashcards Space or Enter flips, H shows the hint, and ←
+or 1 is Don't got it, → or 2 is Got it; in questions A to E (or 1 to 5) pick an option, T and F answer
+true/false, and Enter submits a multi-select answer or moves to the next question.
+
 ### Light/dark theming
 
 The dark-grey/off-white toggle is implemented with CSS custom properties, not
