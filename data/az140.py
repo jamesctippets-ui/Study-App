@@ -30,7 +30,7 @@ FLASHCARDS = [
         'id': 'f1',
         'cat': 'planInfra',
         'front': "Pooled vs. personal host pools",
-        'back': "Pooled host pools let many users share multi-session session hosts, load-balanced by the pool. Personal host pools assign one user to one dedicated session host, either automatically or by direct assignment, much like a traditional VDI desktop.",
+        'back': "Pooled host pools let many users share multi-session hosts, load-balanced by the pool. Personal host pools assign one user to one dedicated session host, either automatically or by direct assignment, much like a traditional VDI desktop.",
         'detail': "A personal host pool is the right fit when a user needs persistent local state or admin rights on their own VM; a pooled host pool with FSLogix is the standard choice for stateless, cost-efficient shared desktops.",
     },
     {
@@ -725,7 +725,7 @@ FLASHCARDS = [
         'id': 'f100',
         'cat': "userEnvApps",
         'front': "Microsoft 365 Apps shared computer activation",
-        'back': "A licensing mode for Microsoft 365 Apps on hosts that many users share, where each user who signs in activates the apps under their own license instead of consuming one of a limited number of per-user device installs. It is required on multi-session session hosts.",
+        'back': "A licensing mode for Microsoft 365 Apps on hosts that many users share, where each user who signs in activates the apps under their own license instead of consuming one of a limited number of per-user device installs. It is required on multi-session hosts.",
         'detail': "Enable it when installing, with a machine-wide installation on the master image. Microsoft 365 Apps use user-based licensing, so a KMS host key is not the answer.",
     },
     {
@@ -1077,7 +1077,7 @@ FLASHCARDS = [
      'back': 'Windows App is the current client for AVD and runs on Windows, macOS, iOS/iPadOS, Android/Chrome '
              'OS, web browsers, and Meta Quest. The Remote Desktop client for Windows (MSI) and the Remote '
              'Desktop web client ended support for public cloud on March 27, 2026, and the Microsoft Store '
-             'Remote Desktop app ended in September 2025.',
+             'Remote Desktop app ended on May 27, 2025.',
      'detail': 'Pick the client by device: install Windows App where installation is allowed, and use the '
                'browser client for unmanaged or locked-down devices. Deploy Windows App to managed devices with '
                'Intune or another endpoint management tool.'},
@@ -1236,8 +1236,9 @@ FLASHCARDS = [
      'cat': 'monitorMaintain',
      'front': 'Managing active sessions',
      'back': 'In the host pool Sessions view an admin can send a message to a user, log off a session, or '
-             'disconnect it, and drain a host to stop new connections. These actions are covered by the Desktop '
-             'Virtualization Session Host Operator role.',
+             'disconnect it, and drain a host to stop new connections. Messaging, logging off, and disconnecting '
+             'users need the Desktop Virtualization User Session Operator role, while drain mode needs the '
+             'Session Host Operator role.',
      'detail': 'Logging off a user ends their apps and can lose unsaved work, so send a message first. '
                'Disconnect keeps the session alive on the host and is subject to the disconnected-session time '
                'limit.'},
@@ -1741,7 +1742,7 @@ QUESTIONS = [
         'id': 'tf10',
         'cat': 'userEnvApps',
         'type': 'tf',
-        'question': "On multi-session session hosts, installing OneDrive per user at each person's first sign-in is the recommended approach because per-machine installs are not supported.",
+        'question': "On multi-session hosts, installing OneDrive per user at each person's first sign-in is the recommended approach because per-machine installs are not supported.",
         'answer': False,
         'explanation': "Per-machine installation of the OneDrive sync client is the recommended approach for AVD and similar shared environments, so it is available to every profile on the host. A per-user install at first sign-in would repeat for each user on each host and is not the guidance.",
     },
@@ -1915,7 +1916,7 @@ QUESTIONS = [
             "Office 365 E3",
         ],
         'correct': [0, 2],
-        'explanation': "Access to Windows client desktops in Azure Virtual Desktop comes with qualifying Windows or Microsoft 365 licenses such as Microsoft 365 E3 or Windows Enterprise E3; there is no separate AVD per-user access license, so the organization pays only for the Azure infrastructure. Office 365 E3, Microsoft 365 Business Basic, and Microsoft 365 Apps for enterprise include productivity services but no Windows license rights, even though the first looks similar to the correct E3 plan.",
+        'explanation': "Access to Windows client desktops in Azure Virtual Desktop comes with qualifying Windows or Microsoft 365 licenses such as Microsoft 365 E3 or Windows Enterprise E3; internal users need no separate AVD license, so the organization pays only for the Azure infrastructure (per-user access pricing exists only for external commercial use). Office 365 E3, Microsoft 365 Business Basic, and Microsoft 365 Apps for enterprise include productivity services but no Windows license rights, even though the first looks similar to the correct E3 plan.",
     },
     {
         'id': 'q30',
@@ -2196,7 +2197,7 @@ QUESTIONS = [
         'id': 'tf18',
         'cat': 'planInfra',
         'type': 'tf',
-        'question': "Azure Hybrid Benefit provides the same per-core Windows Server licensing discount to Windows 11 Enterprise multi-session session host VM compute as it does to Windows Server workloads.",
+        'question': "Azure Hybrid Benefit provides the same per-core Windows Server licensing discount to Windows 11 Enterprise multi-session host VM compute as it does to Windows Server workloads.",
         'answer': False,
         'explanation': "Windows 10 and 11 multi-session VM compute is not eligible for the same per-core Azure Hybrid Benefit discount that Windows Server workloads receive, because the client license rights come with the user's Windows or Microsoft 365 license. The realistic cost levers for multi-session pools are autoscale and Reserved Instances or Savings Plans on the compute.",
     },
@@ -3151,7 +3152,7 @@ QUESTIONS = [
      'correct': 0,
      'explanation': 'Windows App is the current unified client and runs on Windows, macOS, iOS, Android, and in '
                     'a web browser. The MSI client and the older web client ended support for public cloud on '
-                    'March 27, 2026, and the Store Remote Desktop app reached end of support in September 2025. '
+                    'March 27, 2026, and the Store Remote Desktop app reached end of support on May 27, 2025. '
                     'RemoteApp and Desktop Connections is a Windows Control Panel feature, not a cross-platform '
                     'client.'},
     {'id': 'q9202',
@@ -3288,7 +3289,7 @@ QUESTIONS = [
                  'Screen capture protection turned on for the host pool in RDP properties',
                  'RDP Shortpath for managed networks enabled on every session host'],
      'correct': 1,
-     'explanation': 'On multi-session session hosts, Microsoft 365 Apps should be installed per machine with '
+     'explanation': 'On multi-session hosts, Microsoft 365 Apps should be installed per machine with '
                     'shared computer activation so each user activates with their own license. Application '
                     'Masking hides apps, RDP Shortpath is a transport, and screen capture protection is a '
                     'data-leak control; none affects licensing.'},
@@ -3444,7 +3445,7 @@ LESSONS = [
                 'programs from that host pool; and a workspace is the logical container that groups one or more '
                 "application groups together so a user sees everything they're entitled to — across every host "
                 'pool assigned to them — in one unified feed in Windows App. A pooled host pool shares '
-                'multi-session session hosts across many users, load-balanced by the pool itself, which is the '
+                'multi-session hosts across many users, load-balanced by the pool itself, which is the '
                 'standard, cost-efficient choice for stateless, similar-task workers. A personal host pool '
                 'instead dedicates exactly one session host VM to each assigned user, either through automatic '
                 'assignment (Azure Virtual Desktop assigns the first available host the first time a user '
@@ -4183,8 +4184,8 @@ CHEAT_SHEET = [
         'heading': 'Exam-day strategy',
         'points': [
             'Microsoft exams typically allow roughly 100 minutes of seat time for about 40-60 questions (check the exam page for current numbers) — around 2 minutes each on average. Budget more time for multi-part scenario questions and less for straight recall, rather than pacing every question identically.',
-            "Real scoring isn't a flat percentage of questions right (some count for more than others) — treat 70%+ as a safe buffer to aim for, not an exact threshold to just clear.",
-            "Flag anything you're unsure of and move on rather than stalling — a question later in the exam can sometimes jog a detail you needed earlier, and you get partial credit for nothing by running out of time on one question.",
+            "Real scoring isn't a flat percentage of questions right (some count for more than others) — treat 75%+ as a safe buffer to aim for, not an exact threshold to just clear.",
+            "Flag anything you're unsure of and move on rather than stalling — a question later in the exam can sometimes jog a detail you needed earlier, and an unanswered question earns nothing, so don't run out of time on one.",
             "On multi-select ('choose N') questions, eliminate the options you're confident are wrong first; guessing among 2 plausible answers beats guessing among 4.",
             'Your first read of a question is usually right — change an answer only when you find a specific detail you missed, not from general second-guessing.',
         ],
@@ -4423,7 +4424,7 @@ CASE_STUDIES = [
             {
                 'id': 'cs-az140-northwind-avd-q4',
                 'type': 'ms',
-                'question': "Which two features should the operations team use to (a) scale the call-center pool's session hosts down automatically outside business hours and (b) patch that pool's golden image without disconnecting agents mid-shift? (Select two.)",
+                'question': "Which two features should the operations team use to (a) scale the call-center pool's session hosts down automatically outside business hours and (b) patch that pool's golden image without disconnecting agents mid-shift? (Choose two.)",
                 'options': [
                     "A scaling plan (autoscale) applied to the pooled host pool",
                     "Drain mode on the session host being patched",
