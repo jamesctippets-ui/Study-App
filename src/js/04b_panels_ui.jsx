@@ -592,6 +592,7 @@ function BottomTabBar({ mode, onChange }) {
           return (
             <button
               key={t.m}
+              data-tour={`tab-${t.m}`}
               onClick={() => onChange(t.m)}
               title={t.label}
               aria-current={active ? 'page' : undefined}

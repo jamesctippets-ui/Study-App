@@ -32,6 +32,7 @@ function CertStudyApp() {
   const [showCertPath, setShowCertPath] = useState(false);
   const [showTrackSwitcher, setShowTrackSwitcher] = useState(false);
   const [showMasteryDetail, setShowMasteryDetail] = useState(false);
+  const [showTour, setShowTour] = useState(false);
   const [importMessage, setImportMessage] = useState(null);
 
   const [quizLength, setQuizLength] = useState(10);
@@ -159,6 +160,20 @@ function CertStudyApp() {
     if (!isHubMode(m) && isHubMode(mode) && !trackPickedRef.current) setActiveTrack(planDefaultTrack());
     setMode(m);
   };
+  // First-visit tour: once saved data has loaded (so a returning learner's
+  // tourSeen flag is known), start it on Home if this account hasn't seen it.
+  const tourCheckedRef = useRef(false);
+  useEffect(() => {
+    if (syncMode === 'loading' || tourCheckedRef.current) return;
+    tourCheckedRef.current = true;
+    if (!statsRef.current.tourSeen) { setMode('home'); setShowTour(true); }
+  }, [syncMode]);
+  const startTour = () => { setMode('home'); window.scrollTo(0, 0); setShowTour(true); };
+  const finishTour = () => {
+    setShowTour(false);
+    if (!statsRef.current.tourSeen) saveStats({ ...statsRef.current, tourSeen: true });
+  };
+
   // Once saved data has loaded, adopt the plan's cert as the active one.
   useEffect(() => {
     if (syncMode === 'loading' || trackPickedRef.current) return;
@@ -1770,6 +1785,7 @@ function CertStudyApp() {
             onClick={() => setShowCertPath(true)}
             className="btn-flat"
             title="Manage cert path"
+            data-tour="menu"
             style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: '34px', height: '34px', borderRadius: 'var(--r-ctl)', border: 'none', background: 'transparent', color: COLOR.muted, padding: 0, flexShrink: 0, marginLeft: '-6px' }}
           >
             <IconMenu />
@@ -1796,12 +1812,13 @@ function CertStudyApp() {
           <div className="flex items-center" style={{ gap: '6px', flexShrink: 0 }}>
             <div
               className="mono"
+              data-tour="streak"
               title={stats.streak.current > 0 ? `${stats.streak.current}-day streak` : 'Study today to start a streak'}
               style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', fontSize: '12px', fontWeight: 700, height: '28px', padding: '0 8px', borderRadius: 'var(--r-ctl)', border: `1px solid ${COLOR.border}`, background: COLOR.surface, color: stats.streak.current > 0 ? COLOR.orange : COLOR.muted }}
             >
               <IconFlame size={14} />{stats.streak.current}
             </div>
-            <ThemeToggle theme={theme} onToggle={toggleTheme} />
+            <span data-tour="theme" style={{ display: 'inline-flex' }}><ThemeToggle theme={theme} onToggle={toggleTheme} /></span>
           </div>
         </div>
       </div>
@@ -1830,6 +1847,7 @@ function CertStudyApp() {
             onOpenAchievements={() => setShowAchievements(true)}
             onOpenData={() => { setImportMessage(null); setShowData(true); }}
             onOpenGlossary={() => setShowGlossary(true)}
+            onReplayTour={startTour}
           />
         ) : mode === 'home' ? (
           <HomeView
@@ -2326,6 +2344,7 @@ function CertStudyApp() {
         )}
       </div>
       <BottomTabBar mode={mode} onChange={openTab} />
+      {showTour && <GuidedTour onFinish={finishTour} />}
     </div>
     </CustomTermsContext.Provider>
     </CardPrefsContext.Provider>
