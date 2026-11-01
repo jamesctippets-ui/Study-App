@@ -406,7 +406,7 @@ FLASHCARDS = [
         'id': 'f42',
         'cat': 'platform',
         'front': 'Hyperscale named replicas',
-        'back': "Additional readable replicas of a Hyperscale database that can be scaled to their own independent compute size, for reporting, analytics, or isolating a workload from the primary — going beyond the single high-availability replica already included, and distinct from read scale-out, which only reuses the readable replica that Premium and Business Critical already provision for HA rather than adding new dedicated ones.",
+        'back': "Additional readable replicas of a Hyperscale database that can be scaled to their own independent compute size, for reporting, analytics, or isolating a workload from the primary — going beyond the high-availability secondary replicas (zero to four, each added and billed), and distinct from read scale-out, which only reuses the readable replica that Premium and Business Critical already provision for HA rather than adding new dedicated ones.",
         'detail': "Named replicas are specific to the Hyperscale service tier's storage architecture, since Hyperscale's separated storage layer is what lets a replica be added or resized independently of the primary in the first place.",
     },
     {
@@ -1337,7 +1337,7 @@ QUESTIONS = [
             "An Elastic Database Job that issues the CREATE statements nightly",
         ],
         'correct': 1,
-        'explanation': "A declarative Bicep or ARM template describes the desired state of the Azure resources, so redeploying is idempotent and corrects drift, and the file is version-controlled. A portal checklist is manual and drifts. SSMS Generate Scripts scripts schema objects inside a database, not the Azure resources around it. An elastic job runs T-SQL inside databases and cannot create the logical server or its firewall and auditing configuration.",
+        'explanation': "A declarative Bicep or ARM template describes the desired state of the Azure resources, so redeploying is idempotent and corrects drift, and the file is version-controlled. A portal checklist is manual and drifts. The SSMS Generate Scripts wizard produces T-SQL for schema objects inside a database, not the Azure resources around it. An elastic job runs T-SQL inside databases and cannot create the logical server or its firewall and auditing configuration.",
     },
     {
         'id': "q27",
@@ -1907,7 +1907,7 @@ QUESTIONS = [
         'type': "mc",
         'question': "A DBA on a macOS laptop must connect to Azure SQL with Microsoft Entra MFA, keep runbook-style notebooks mixing T-SQL and notes, and run a migration assessment of an on-premises server without maintaining a Windows machine. Which tool fits?",
         'options': [
-            "Azure Data Studio with the Azure SQL Migration extension (both retired Feb 2026; now the MSSQL extension for VS Code plus Azure Arc, Azure Migrate, and DMS)",
+            "Azure Data Studio with the Azure SQL Migration extension (now retired)",
             "SQL Server Management Studio running locally",
             "The Data Migration Assistant desktop application (retired July 2025)",
             "Azure Storage Explorer with the SQL extension",
@@ -3127,8 +3127,8 @@ CHEAT_SHEET = [
         'heading': 'Exam-day strategy',
         'points': [
             'The exam allows roughly 100 minutes of testing time (plan on up to about two hours of seat time with check-in and surveys) and the question count varies, commonly 40 to 60 — so budget about two minutes per question on average. Budget more time for multi-part scenario questions and less for straight recall, rather than pacing every question identically.',
-            "Real scoring isn't a flat percentage of questions right (some count for more than others) — treat 70%+ as a safe buffer to aim for, not an exact threshold to just clear.",
-            "Flag anything you're unsure of and move on rather than stalling — a question later in the exam can sometimes jog a detail you needed earlier, and you get partial credit for nothing by running out of time on one question.",
+            "Real scoring isn't a flat percentage of questions right (some count for more than others) — treat 75%+ as a safe buffer to aim for, not an exact threshold to just clear.",
+            "Flag anything you're unsure of and move on rather than stalling — a question later in the exam can sometimes jog a detail you needed earlier, and an unanswered question earns nothing, so don't run out of time on one.",
             "On multi-select ('choose N') questions, eliminate the options you're confident are wrong first; guessing among 2 plausible answers beats guessing among 4.",
             'Your first read of a question is usually right — change an answer only when you find a specific detail you missed, not from general second-guessing.',
         ],
@@ -3327,7 +3327,7 @@ CASE_STUDIES = [
             {
                 'id': 'cs-dp300-northwind-reliability-q4',
                 'type': 'ms',
-                'question': "Which of the following would help management see DTU/vCore utilization trends over the last 30 days without writing custom queries each time? (Select all that apply.)",
+                'question': "Which of the following would help management see DTU/vCore utilization trends over the last 30 days without writing custom queries each time? (Choose two.)",
                 'options': [
                     "The built-in Azure portal metrics charts on the database's Overview/Monitoring pages",
                     "Azure Monitor workbooks or database watcher dashboards",
