@@ -2344,7 +2344,21 @@ function CertStudyApp() {
         </React.Fragment>
         )}
       </div>
-      <BottomTabBar mode={mode} onChange={openTab} />
+      <BottomTabBar
+        mode={mode}
+        onChange={openTab}
+        track={track}
+        activeTrack={activeTrack}
+        onOpenTrackSwitcher={() => setShowTrackSwitcher(true)}
+        onTool={(key) => {
+          if (key === 'certPath') setShowCertPath(true);
+          else if (key === 'playground') { setPlaygroundTool(''); setPlaygroundPick(''); setMode('playground'); }
+          else if (key === 'glossary') setShowGlossary(true);
+          else if (key === 'achievements') setShowAchievements(true);
+          else if (key === 'data') { setImportMessage(null); setShowData(true); }
+          else if (key === 'about') setShowAbout(true);
+        }}
+      />
       {showTour && <GuidedTour onFinish={finishTour} />}
     </div>
     </CustomTermsContext.Provider>
