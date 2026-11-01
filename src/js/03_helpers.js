@@ -570,6 +570,7 @@ function emptyStats() {
     profile: { name: '', hue: 'primary' },
     missLog: {},
     weakPath: {},
+    tourSeen: false,
   };
 }
 
@@ -606,6 +607,11 @@ function normalizeStats(raw) {
     profile: normalizeProfile(raw.profile),
     missLog: normalizeMissLog(raw.missLog),
     weakPath: normalizeWeakPath(raw.weakPath),
+    // The first-visit tour (GuidedTour) shows only while this is false.
+    // Saves from before the tour existed have no flag; anyone who had
+    // already studied counts as having seen it, so returning learners
+    // aren't walked through an app they already know.
+    tourSeen: raw.tourSeen === true || (raw.tourSeen === undefined && !!(raw.lastVisited || (raw.streak && raw.streak.lastActiveDate))),
   };
 }
 

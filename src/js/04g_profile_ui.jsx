@@ -109,7 +109,7 @@ function ProfileHeader({ profile, level, totalActions, firstDay, onSave }) {
   );
 }
 
-function ProfileView({ tracks, results, seenLog, srs, stats, certPlan, achievements, onSaveProfile, onToggleCompleted, onSelectTrack, onOpenCertPath, onOpenAchievements, onOpenData, onOpenGlossary }) {
+function ProfileView({ tracks, results, seenLog, srs, stats, certPlan, achievements, onSaveProfile, onToggleCompleted, onSelectTrack, onOpenCertPath, onOpenAchievements, onOpenData, onOpenGlossary, onReplayTour }) {
   const log = stats.activityLog || {};
   const runs = useMemo(() => activityRuns(log), [log]);
   const totalActions = useMemo(() => Object.keys(log).reduce((n, d) => n + log[d], 0), [log]);
@@ -250,6 +250,9 @@ function ProfileView({ tracks, results, seenLog, srs, stats, certPlan, achieveme
         <button onClick={onOpenData} className="btn-flat flex-1" style={{ padding: '11px', borderRadius: 'var(--r-card)', border: `1px solid ${COLOR.border}`, background: 'transparent', color: COLOR.text, fontSize: '13px', fontWeight: 700 }}>Settings &amp; data</button>
         <button onClick={onOpenGlossary} className="btn-flat flex-1" style={{ padding: '11px', borderRadius: 'var(--r-card)', border: `1px solid ${COLOR.border}`, background: 'transparent', color: COLOR.text, fontSize: '13px', fontWeight: 700 }}>My terms</button>
       </div>
+      {onReplayTour && (
+        <button onClick={onReplayTour} className="btn-flat" style={{ width: '100%', marginBottom: '8px', padding: '11px', borderRadius: 'var(--r-card)', border: `1px solid ${COLOR.border}`, background: 'transparent', color: COLOR.text, fontSize: '13px', fontWeight: 700 }}>Take the tour again</button>
+      )}
     </div>
   );
 }
