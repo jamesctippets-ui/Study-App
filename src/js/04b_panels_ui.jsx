@@ -581,7 +581,18 @@ const TAB_BAR_ITEMS = [
   { m: 'profile', label: 'Profile', icon: 'profile' },
 ];
 
-function BottomTabBar({ mode, onChange }) {
+// Desktop-only extras for the sidebar: the track switcher and the tools that on a
+// phone sit behind the header menu or in Home's tool row.
+const SIDEBAR_TOOLS = [
+  { key: 'certPath', label: 'My cert path', hue: 'var(--color-primary)' },
+  { key: 'playground', label: 'Playground', hue: 'var(--color-success)' },
+  { key: 'glossary', label: 'Glossary', hue: 'var(--color-pink)' },
+  { key: 'achievements', label: 'Achievements', hue: 'var(--color-gold)' },
+  { key: 'data', label: 'Data & settings', hue: 'var(--color-muted)' },
+  { key: 'about', label: 'About & legal', hue: 'var(--color-muted)' },
+];
+
+function BottomTabBar({ mode, onChange, track, activeTrack, onOpenTrackSwitcher, onTool }) {
   // Alt+1 … Alt+6 jump between tabs (e.code, so it also works on a Mac keyboard where Alt+digit types a symbol).
   const onChangeRef = useRef(onChange);
   onChangeRef.current = onChange;
@@ -637,6 +648,26 @@ function BottomTabBar({ mode, onChange }) {
           );
         })}
       </div>
+      {track && onTool && (
+        <div className="app-tabbar-extra desktop-only">
+          <div className="app-tabbar-group mono">Studying</div>
+          <button onClick={onOpenTrackSwitcher} className="app-tabbar-track btn-flat" title="Switch track" style={{ borderColor: `color-mix(in srgb, ${trackAccent(activeTrack)} 45%, ${COLOR.border})`, background: tint(trackAccent(activeTrack), 8) }}>
+            <span style={{ width: '9px', height: '9px', background: trackAccent(activeTrack), flexShrink: 0 }} />
+            <span style={{ flex: 1, minWidth: 0 }}>
+              <span className="mono" style={{ display: 'block', fontSize: '13px', fontWeight: 700, color: ink(trackAccent(activeTrack)), whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{track.label}</span>
+              <span style={{ display: 'block', fontSize: '11px', color: COLOR.muted, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{track.subtitle || 'Switch track'}</span>
+            </span>
+            <span style={{ fontSize: '10px', color: COLOR.muted }}>▾</span>
+          </button>
+          <div className="app-tabbar-group mono">Tools</div>
+          {SIDEBAR_TOOLS.map((t) => (
+            <button key={t.key} onClick={() => onTool(t.key)} className="app-tabbar-tool btn-flat" aria-current={t.key === 'playground' && mode === 'playground' ? 'page' : undefined}>
+              <span style={{ width: '7px', height: '7px', borderRadius: '2px', background: t.hue, flexShrink: 0 }} />
+              {t.label}
+            </button>
+          ))}
+        </div>
+      )}
       <div className="app-tabbar-foot desktop-only">
         Alt+1 to Alt+6 switch tabs. In flashcards, Space flips and ← / → rate. In questions, A to E pick an answer and Enter moves on.
       </div>

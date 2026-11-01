@@ -415,7 +415,7 @@ function TrackListDropdown({ tracks, masteries, certPlan, onSelectTrack, onAddTo
         <span style={{ fontSize: '11px', color: COLOR.muted, transform: open ? 'rotate(180deg)' : 'none', transition: 'transform 0.15s ease' }}>▾</span>
       </button>
       {open && (
-        <div className="flex flex-col gap-2" style={{ marginTop: '8px' }}>
+        <div className="flex flex-col gap-2 app-track-grid" style={{ marginTop: '8px' }}>
           {masteries.map(({ track: t, pct }) => {
             const accent = trackAccent(t.key);
             const isCompleted = !!certPlan.completed[t.key];
