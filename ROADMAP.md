@@ -1,4 +1,113 @@
-# Feature Roadmap
+# Roadmap
+
+Where Cert Study Hub is headed, in four buckets. **Now** is ready to pick up and needs no big decision.
+**Next** is the follow-on, usually waiting on one choice or one dependency. **Later** is real but deliberately
+parked. **Ideas** is unvetted: nothing there is promised. Last updated 2026-11-01.
+
+**Add new ideas here.** Put a one-line entry under *Ideas* (what it is and why it might matter). When one is worth
+doing, move it up a bucket; when it ships, delete the line and record the details in the feature log below (the
+numbered sections, which stay as the design history and are cross-referenced from the code as "ROADMAP.md section N").
+
+**Where things stand.** 26 tracks, all content-reviewed (reports in `content_review/`, each ending in a
+"Needs a human check" list). Progress tracking, spaced repetition, exam readiness with a date countdown, streaks,
+achievements, the Path, the Playground, a first-login tour, the desktop layout (sidebar, keyboard shortcuts), offline
+PWA support and JSON export/import are built. Standing constraints: **no backend, accounts or leaderboards, ever**
+(section 10), and phone layout stays the primary target.
+
+## Now
+
+Small, concrete, and not blocked.
+
+- **Add CI.** The repo has none. A GitHub Action that runs `python3 build.py`, `python3 tools/audit_content.py` for
+  every track and `node tools/check_*.js` on each PR, and fails if the committed `index.html` and `service-worker.js`
+  differ from a fresh build. This also is the first half of hosting (see Next).
+- **Decide the AZ-802 scope (needs James).** The new outline no longer lists Windows containers, IPAM, RRAS and
+  remote access, NPS, Web Application Proxy, Azure Network Adapter, Always On VPN, Entra Connect sign-in methods or
+  Storage Migration Service, but the track still teaches them. Either relabel them as background or trim them
+  (`content_review/az802.md`). Then fill the new-outline gaps: Enhanced Session Mode, SSH Direct, Azure Automation
+  runbooks, Azure Arc device configuration, VM scale sets, migrating file shares to Azure Files. The 16 CLI
+  challenges were never read, and the retirement dates in f69 and f72 were not re-checked.
+- **SC-300 to the 28 Oct 2026 outline.** Rename the "identity governance" group to "Plan and automate identity
+  governance", add cards and questions for protected actions and Windows Hello for Business, and note the SMS/voice
+  MFA retirement on other tracks that list those methods as ordinary.
+- **Work through the "Needs a human check" lists.** Most are facts the reviews could not confirm from a primary
+  source. Highest value first: exam fees, durations and pass marks for the four Claude certifications and AB-650 (third-party
+  sources only), plus the Cloud+ domain weights; the HIPAA Security Rule proposal (EHR, SSCP); FedRAMP 20x and SSDF Rev. 1
+  (CGRC, CISSP, CSSLP); preview-status claims (DP-900, DP-300, SC-200, SC-500, MD-102). Anything James can confirm
+  from his own exam portal is better than a web search.
+- **CCNA v2.0 is dated.** Cisco's v2.0 exam starts 3 Feb 2027, but the v2.0 domain names, weights and what it drops
+  come from third-party summaries that disagree. Re-check when Cisco publishes the blueprint, and decide whether the
+  track keeps v1.1 until then.
+- **Answer-length giveaways.** The correct option is the longest in about half of single-answer questions in DP-300
+  and EHR Integration (and 40 to 50 percent of newer questions elsewhere). Lengthen distractors or trim keys, using
+  `tools/audit_content.py` to measure.
+- **Precache every screenshot.** Only 15 of 63 registered screenshots are in the service worker's cache, so the rest
+  show as broken images in a fully offline session (section 12).
+
+## Next
+
+Valuable, but each waits on a choice or on the Now items.
+
+- **Host it on a real domain.** Static host (GitHub Pages or Cloudflare Pages) deployed from CI, custom domain and
+  HTTPS, then re-test PWA install on iOS and Android. Follow `LAUNCH_CHECKLIST.md`: SEO tags, security headers, an
+  accessibility statement, a persistent copyright notice, and the analytics decision (default: none). Cloud sync stays
+  local-only, so say so plainly.
+- **Global search.** One box that finds a card, question, lesson, glossary term or Playground scenario across the
+  current track (and optionally all tracks), jumping to the item. Today search exists only inside the Glossary.
+  Everything is already in the in-memory track data, so this needs no index service.
+- **"Content last reviewed" per track.** Show the date and a one-line caveat on each track, fed from
+  `content_review/` (and note when an exam outline is about to change, as with CCNA v2.0 and SC-300).
+- **Comparison-card blanking.** "X versus Y" fronts leave the answer readable in the definition-first prompt
+  (CCSP, SSCP and others). Change the blanking rule in `flashcardPrompt` (`src/js/03_helpers.js`) to hide both names,
+  then re-run `tools/check_cards.js`. This is one project-wide fix instead of splitting dozens of cards.
+- **Sequence games for tracks that have none.** AZ-900, DP-900, DP-300, AZ-140, SC-500 and EHR Integration (for
+  example an order, ORM, filler, ORU, ACK message flow).
+- **New tracks, in fit order.** Security+ (pairs with Cloud+, CC and SSCP), MS-700, AZ-400, PL-300, then a deeper
+  healthcare-interoperability track (HL7v2/FHIR). Check AZ-500 against SC-500 before building it, since they may
+  overlap. Each follows the existing `data/<track>.py` pattern (section 11); James picks the order.
+- **Lesson diagrams and bridges.** OSI, subnetting, STP, OSPF and RMF diagrams, and cross-cert bridges for the newest
+  tracks (section 14).
+- **More Playground labs.** Routing table with longest-prefix match, port-security and snooping lockouts, and an
+  Azure NSG versus firewall comparison. Settle the open questions in section 17 first (bottom-bar tab, how far VLAN and
+  firewall tools go before linking out to Packet Tracer).
+- **Real-device QA.** iOS Safari, Android Chrome, Firefox and Edge on actual hardware, including the new desktop layout.
+- **Screenshot gaps.** AZ-140, AZ-802 AD DS, DP-900 Cosmos DB and Power BI, AB-650 Purview, Defender and Copilot Studio,
+  SC-200, SC-500, SC-300. Blocked on a CC BY source or screenshots James takes himself.
+
+## Later
+
+Parked on purpose; revisit when the trigger happens.
+
+- **A real module boundary** (esbuild or similar, ES modules, splitting `06_app.jsx`). Only worth it once a second
+  client exists (section 10).
+- **App-store builds** by wrapping the PWA (Capacitor) once a real domain exists and there is demand for it.
+- **A scheduled content-currency routine.** Re-run the track reviews every quarter, or when a vendor outline changes
+  (the weekly check-in routine was paused during the earlier no-code restriction and can be resumed).
+- **Error monitoring and privacy-friendly analytics**, only after launch, and only with a matching Privacy Policy update.
+- **Trademark check on the app name and a dedicated feedback alias**, before any public launch.
+
+## Ideas
+
+Unvetted. Add yours.
+
+- A study-plan generator: give an exam date and daily minutes, get a schedule that paces lessons, reviews and mock exams.
+- Per-domain "weak spots" trend chart over weeks, next to the existing readiness projection.
+- Printable or PDF flashcard decks and a combined "all tracks" cheat sheet pack.
+- A "cert ladder" view showing which tracks overlap (for example AZ-104, AZ-305, AZ-802) so one lesson counts toward both.
+- Timed "rapid fire" mode for flashcards and terms.
+- Optional scenario-based labs for Microsoft 365 admin (Intune, Purview) that mimic portal decisions without screenshots.
+- Import of a user's own flashcards (CSV) into a personal deck, local only.
+- A "what changed since you last studied" panel that lists reviewed or corrected cards.
+
+**Decided against (do not re-add):** accounts, leaderboards and any backend; crowd-sourced answer voting; vendor
+partnerships; a personal mnemonic bank and "boss battle" sessions (section 15).
+
+---
+
+# Feature log (design history)
+
+The notes below are the original backlog and the record of what shipped and why. Read them for context; the
+status lines are history, so the buckets above are the current plan.
 
 A running backlog of features to incorporate, drawn from the user's own ideas
 plus a survey of what established study/cert-prep platforms do well (Anki,
