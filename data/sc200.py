@@ -340,7 +340,7 @@ FLASHCARDS = [
         'cat': 'manageSecOps',
         'front': 'Built-in Microsoft Sentinel roles: Reader, Responder, Contributor',
         'back': "Microsoft Sentinel Reader can view incidents, workbooks, and underlying data but cannot triage or close anything. Responder can additionally manage and triage incidents -- assigning, closing, commenting -- but still cannot create or edit detection content. Contributor goes further still, able to create and edit automation rules, analytics rules, and workbooks, which is the scope actually required to author or tune detections rather than just work incidents that already exist.",
-        'detail': "A first-line analyst who only needs to view an incident and check an entity's history is over-provisioned with Contributor -- Reader (or Responder, if they also triage) is the scope that actually matches that job, and least-privilege role assignment is graded the same way here as anywhere else in Entra ID.",
+        'detail': "A first-line analyst who only needs to view an incident and check an entity's history is over-provisioned with Contributor -- Reader (or Responder, if they also triage) is the scope that actually matches that job, and least-privilege role assignment is graded the same way here as anywhere else in Azure RBAC.",
     },
     {
         'id': 'f48',
@@ -2402,7 +2402,7 @@ Handling what happens to an incident once it exists is split across two layers. 
         'diagram': 'xdrCorrelationFanIn',
         'vocabIds': ['f1', 'f2', 'f7', 'f8', 'f9', 'f10', 'f14', 'f16', 'f43', 'f45'],
         'quizIds': ['q1', 'q6', 'q7', 'q8', 'q9', 'q14'],
-        'reading': """Microsoft Defender XDR automatically correlates related alerts from Defender for Endpoint, Defender for Office 365, Defender for Identity, and Defender for Cloud Apps into a single incident, so an analyst investigates one correlated case in a unified incident queue instead of chasing separate alerts from each product individually -- all managed from the unified Microsoft Defender portal, alongside each product's own settings and, once onboarded, Sentinel itself. Automated investigation and response builds directly on that correlation: it investigates an alert using the same playbook a human analyst would follow, then either remediates the confirmed threat directly or produces a pending action in the Action Center for an analyst to approve, depending on the configured automation level -- 'Full' takes action with no waiting, while either 'Semi' level leaves some or all remediation pending review. Underneath all of Sentinel's own data sits the Advanced Security Information Model, which normalizes many different connectors' native schemas into a small set of common ones, so a single hunting query or analytics rule already written against a normalized field automatically picks up any new data source mapped to that same schema, with no rule rewritten needed per source.
+        'reading': """Microsoft Defender XDR automatically correlates related alerts from Defender for Endpoint, Defender for Office 365, Defender for Identity, and Defender for Cloud Apps into a single incident, so an analyst investigates one correlated case in a unified incident queue instead of chasing separate alerts from each product individually -- all managed from the unified Microsoft Defender portal, alongside each product's own settings and, once onboarded, Sentinel itself. Automated investigation and response builds directly on that correlation: it investigates an alert using the same playbook a human analyst would follow, then either remediates the confirmed threat directly or produces a pending action in the Action Center for an analyst to approve, depending on the configured automation level -- 'Full' takes action with no waiting, while either 'Semi' level leaves some or all remediation pending review. Underneath all of Sentinel's own data sits the Advanced Security Information Model, which normalizes many different connectors' native schemas into a small set of common ones, so a single hunting query or analytics rule already written against a normalized field automatically picks up any new data source mapped to that same schema, with no rule rewrite needed per source.
 
 Knowing what's actually being detected, and what isn't, is its own discipline. Sentinel tags every analytics rule with the MITRE ATT&CK tactics and techniques it detects, and the MITRE ATT&CK coverage view visualizes which techniques currently have active rule coverage, which are covered only by a rule that's currently disabled, and which have no coverage at all -- a gap in coverage for a technique relevant to the organization's own threat model is exactly what should drive which content hub rule template gets enabled next, rather than enabling rules at random. Microsoft Security Copilot layers a generative-AI assistant on top of all of this, embedded directly in both Sentinel and Defender XDR: it can summarize an incident in plain language, draft or suggest a KQL query from a natural-language description, reverse-engineer a suspicious script, or draft an incident report -- all grounded in the organization's own connected data, though an analyst is still expected to review and validate its output before acting on it, the same as any other analyst-authored finding. Sentinel workbooks round out this visibility layer: interactive reports built from KQL, used to visualize trends like incident volume by severity, rule health, connector ingestion latency, or SOC metrics like mean time to triage -- for a human to read and act on, since a workbook never itself generates an incident or takes remediation action.
 
@@ -2554,8 +2554,8 @@ CHEAT_SHEET = [
         'heading': 'Exam-day strategy',
         'points': [
             'Plan on roughly 100-120 minutes of exam time for about 40-60 questions (exact counts and timing vary by sitting, so check your exam confirmation) — roughly 2 minutes each on average. Budget more time for multi-part scenario questions and less for straight recall, rather than pacing every question identically.',
-            "Real scoring isn't a flat percentage of questions right (some count for more than others) — treat 70%+ as a safe buffer to aim for, not an exact threshold to just clear.",
-            "Flag anything you're unsure of and move on rather than stalling — a question later in the exam can sometimes jog a detail you needed earlier, and you get partial credit for nothing by running out of time on one question.",
+            "Real scoring isn't a flat percentage of questions right (some count for more than others) — treat 75%+ as a safe buffer to aim for, not an exact threshold to just clear.",
+            "Flag anything you're unsure of and move on rather than stalling — a question later in the exam can sometimes jog a detail you needed earlier, and an unanswered question earns nothing, so don't run out of time on one.",
             "On multi-select ('choose N') questions, eliminate the options you're confident are wrong first; guessing among 2 plausible answers beats guessing among 4.",
             'Your first read of a question is usually right — change an answer only when you find a specific detail you missed, not from general second-guessing.',
         ],
@@ -2674,7 +2674,7 @@ CASE_STUDIES = [
             {
                 'id': 'cs-sc200-northwind-aitm-q3',
                 'type': 'ms',
-                'question': "Which of the following are appropriate remediation steps for this specific incident? (Select all that apply.)",
+                'question': "Which of the following are appropriate remediation steps for this specific incident? (Choose three.)",
                 'options': [
                     "Revoke the user's active sessions and require re-registration of MFA methods",
                     "Remove the malicious inbox forwarding rule from the mailbox",
@@ -2980,7 +2980,7 @@ FLASHCARDS.extend([{'id': 'f9201',
   'back': 'Microsoft Purview Insider Risk Management alerts appear in the Defender portal under Incidents & alerts, can be grouped with DLP and '
           'Microsoft Entra ID alerts in one incident, can be filtered by service source, and stay synchronized with Purview. Analysts can hunt for '
           'all activity tied to the user in the alert. DLP alerts are handled the same way, with remediation in place on users, files, and devices.',
-  'detail': 'A built-in alert tuning rule for DLP signals takes effect in early October 2026: it sets them as behaviors, so they stop generating '
+  'detail': 'A built-in alert tuning rule for DLP signals took effect in early October 2026: it sets them as behaviors, so they stop generating '
             'alerts and incidents but remain in BehaviorInfo and BehaviorEntities. Disable the rule under Settings > Microsoft Defender XDR > Alert '
             'tuning to keep DLP alerts.'},
  {'id': 'f9222',
@@ -3059,8 +3059,8 @@ FLASHCARDS.extend([{'id': 'f9201',
   'cat': 'threatHunting',
   'front': 'EntraIdSignInEvents (replaces AADSignInEventsBeta)',
   'back': 'EntraIdSignInEvents is the advanced hunting table for Microsoft Entra interactive and non-interactive sign-ins, and '
-          'EntraIdSpnSignInEvents covers service principal and managed identity sign-ins. The AADSignInEventsBeta table is deprecated on October 19, '
-          '2026, when queries that use it are migrated automatically to EntraIdSignInEvents.',
+          'EntraIdSpnSignInEvents covers service principal and managed identity sign-ins. The AADSignInEventsBeta table was deprecated on October 19, '
+          '2026, and queries that used it were migrated automatically to EntraIdSignInEvents.',
   'detail': 'In a Sentinel workspace the equivalent tables are SigninLogs and the non-interactive and service principal sign-in log tables; the '
             'Entra-prefixed tables are the Defender XDR advanced hunting names.'},
  {'id': 'f9244',
@@ -3198,7 +3198,7 @@ QUESTIONS.extend([{'id': 'q9201',
   'question': 'An organization has a large fleet of servers where the Azure Monitor Agent cannot be installed on each machine, but the servers '
               'already forward Windows events to a central collector with subscriptions. How should the security team get these events into '
               'Sentinel?',
-  'options': ['Install the Azure Monitor Agent on the Windows Event Collector server and use a data collection rule to send the forwarded events',
+  'options': ['Install the Azure Monitor Agent with a DCR on the event collector',
               'Create a diagnostic setting on each server',
               'Use the Syslog via AMA connector on the collector',
               'Ingest the events with the Azure Activity connector'],
@@ -3437,11 +3437,11 @@ QUESTIONS.extend([{'id': 'q9201',
   'question': 'Existing advanced hunting queries and custom detections reference the AADSignInEventsBeta table. Which statement is correct?',
   'options': ['The table is permanently kept, and no change is needed',
               'The table is replaced by SigninLogs in advanced hunting',
-              'The table is deprecated on October 19, 2026 and queries are migrated automatically to EntraIdSignInEvents, which should be used for '
-              'new queries',
+              'The table was deprecated on October 19, 2026 and queries were migrated automatically to EntraIdSignInEvents, which new '
+              'queries should use',
               'The table is replaced by EntraIdSpnSignInEvents, which holds all user sign-ins'],
   'correct': 2,
-  'explanation': 'AADSignInEventsBeta is deprecated on October 19, 2026 and replaced by EntraIdSignInEvents, with automatic migration of queries. '
+  'explanation': 'AADSignInEventsBeta was deprecated on October 19, 2026 and replaced by EntraIdSignInEvents, with automatic migration of queries. '
                  'SigninLogs is the Sentinel workspace table, not the advanced hunting one. EntraIdSpnSignInEvents holds service principal and '
                  'managed identity sign-ins, not user sign-ins.'},
  {'id': 'q9244',
@@ -3646,7 +3646,7 @@ CHEAT_SHEET.extend([{'heading': 'Data tiers, retention, and Sentinel roles',
   'points': ['Incident email notifications: Settings > Microsoft Defender XDR > Email notifications (severity, service and detection source, device '
              'group). Endpoint alert notifications live under Settings > Endpoints > General > Email notifications.',
              'Alert tuning (formerly alert suppression) actions: Hide alert, Resolve alert, Set as behavior; not applied to custom detection alerts; '
-             'built-in rules exist and a reactivated alert returns if an investigation finds malice.',
+             'built-in rules exist, and a suppressed alert is reactivated if an investigation finds malice.',
              'Analytics rules are excluded from Defender correlation by default after onboarding; include all and exclude specific rules to change '
              'it.',
              'Advanced features to know: EDR in block mode, allow or block file, custom network indicators, tamper protection, automatically resolve '
@@ -3774,7 +3774,7 @@ _MSR_LESSON_APPEND = {'sentinel-analytics-automation': {'reading': '\n'
                         'vocabIds': ['f9240', 'f9241', 'f9242', 'f9243', 'f9244', 'f9245', 'f9246'],
                         'quizIds': ['q9240', 'q9241', 'q9242', 'q9243', 'q9244', 'q9245', 'q9246', 'q9247', 'q9248', 'q9249'],
                         'commonTraps': ['Table names are tested: EntraIdSignInEvents (advanced hunting) vs. SigninLogs (Sentinel workspace); the old '
-                                        'AADSignInEventsBeta is deprecated.']}}
+                                        'AADSignInEventsBeta was deprecated on October 19, 2026.']}}
 for _lid, _d in _MSR_LESSON_APPEND.items():
     _l = _msr_find('LESSONS', _lid)
     for _f, _v in _d.items():

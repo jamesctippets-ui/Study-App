@@ -38,6 +38,11 @@ def norm(s):
     return re.sub(r'\s+', ' ', re.sub(r'[^a-z0-9 ]+', ' ', str(s).lower())).strip()
 
 
+def opt_key(s):
+    # Like norm, but keeps symbols that change meaning in code options (in vs in~, == vs !=).
+    return re.sub(r'\s+', ' ', str(s).lower()).strip(' .')
+
+
 def tokens(s):
     return set(w for w in norm(s).split() if len(w) > 2)
 
@@ -111,7 +116,7 @@ def audit_questions(track, d, cats, rep):
         if t in ('mc', 'ms'):
             if not (3 <= len(opts) <= 6):
                 rep.add(track, 'question', qid, 'option-count', f'{len(opts)} options', 'error')
-            keys = [norm(o) for o in opts]
+            keys = [opt_key(o) for o in opts]
             if len(set(keys)) != len(keys):
                 rep.add(track, 'question', qid, 'duplicate-options', 'two options are the same', 'error')
             for o in opts:
@@ -289,7 +294,7 @@ def audit_others(track, d, cats, rep):
                 c = q.get('correct')
                 if not isinstance(c, int) or not (0 <= c < len(opts)):
                     rep.add(track, 'case', f'{cid}/{qid}', 'bad-answer-key', repr(c), 'error')
-            if len(opts) and len(set(norm(o) for o in opts)) != len(opts):
+            if len(opts) and len(set(opt_key(o) for o in opts)) != len(opts):
                 rep.add(track, 'case', f'{cid}/{qid}', 'duplicate-options', '', 'error')
             if LETTER_REF.search(q.get('explanation', '') or ''):
                 rep.add(track, 'case', f'{cid}/{qid}', 'explanation-names-a-letter', LETTER_REF.search(q.get('explanation', '')).group(0), 'error')
