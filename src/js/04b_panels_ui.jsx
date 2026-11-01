@@ -587,7 +587,7 @@ function BottomTabBar({ mode, onChange }) {
   onChangeRef.current = onChange;
   useEffect(() => {
     const onKey = (e) => {
-      if (!e.altKey || e.ctrlKey || e.metaKey || document.querySelector('[data-overlay]')) return;
+      if (!e.altKey || e.ctrlKey || e.metaKey || document.querySelector('[data-overlay], [data-tour-overlay]')) return;
       const m = /^Digit([1-9])$/.exec(e.code || '');
       const item = m && TAB_BAR_ITEMS[Number(m[1]) - 1];
       if (!item) return;
@@ -619,6 +619,7 @@ function BottomTabBar({ mode, onChange }) {
           return (
             <button
               key={t.m}
+              data-tour={`tab-${t.m}`}
               onClick={() => onChange(t.m)}
               title={`${t.label} (Alt+${i + 1})`}
               aria-current={active ? 'page' : undefined}

@@ -143,7 +143,7 @@ function useKeyShortcuts(enabled, handler) {
       if (t && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName))) return;
       // A focused button or link already acts on Enter and Space by itself.
       if (t && /^(BUTTON|A|SUMMARY)$/.test(t.tagName) && (e.key === 'Enter' || e.key === ' ')) return;
-      if (document.querySelector('[data-overlay]')) return;
+      if (document.querySelector('[data-overlay], [data-tour-overlay]')) return;
       if (ref.current(e.key.length === 1 ? e.key.toLowerCase() : e.key, e)) e.preventDefault();
     };
     window.addEventListener('keydown', onKey);
