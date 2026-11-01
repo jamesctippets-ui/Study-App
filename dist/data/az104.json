@@ -880,7 +880,7 @@
       "id": "f9004",
       "cat": "identityGov",
       "front": "Moving resources between resource groups and subscriptions",
-      "back": "A move changes only the resource group or subscription: the resource's region does not change and its resource ID does. Both the source and target groups are locked for create, delete, and update operations during the move, for up to four hours, but existing resources keep running. Only the parent resource is named in the request, because children move with it. A read-only lock on the source, the target, or the subscription blocks the move, and the subscriptions must be in the same tenant.",
+      "back": "A move changes only the resource group or subscription: the resource's region does not change, but its resource ID does. Both the source and target groups are locked for create, delete, and update operations during the move, for up to four hours, but existing resources keep running. Only the parent resource is named in the request, because children move with it. A read-only lock on the source, the target, or the subscription blocks the move, and the subscriptions must be in the same tenant.",
       "detail": "Not every resource type can be moved. Use the portal's validation step to see whether the selected resources can be moved. Moving to a different region is a separate task done with Azure Resource Mover or Azure Site Recovery."
     },
     {
@@ -900,7 +900,7 @@
     {
       "id": "f9007",
       "cat": "storage",
-      "front": "Storage account encryption: Microsoft-managed vs. customer-managed vs. customer-provided keys",
+      "front": "Storage encryption key types",
       "back": "All data in a storage account is encrypted at rest with 256-bit AES and the encryption cannot be turned off. The default key is Microsoft-managed. A customer-managed key lives in Azure Key Vault or Managed HSM and applies to Blob Storage and Azure Files; the customer is then responsible for rotation. A customer-provided key is sent by the client on each Blob Storage request. Encryption scopes apply a different key to a single container or blob.",
       "detail": "The vault holding a customer-managed key needs soft delete and purge protection, and the key must be RSA or RSA-HSM. The storage account reaches the vault through a managed identity."
     },
@@ -1262,7 +1262,7 @@
         "Apply a ReadOnly management lock at the RG1 scope"
       ],
       "correct": 0,
-      "explanation": "RBAC is additive, so a narrower assignment can never subtract rights inherited from a wider one; the only way to carve RG1 out is to move Contributor down to the nine scopes where it is wanted, after which the inherited Reader from MG1 is all that applies in RG1. Assigning Reader at RG1 changes nothing because Contributor still flows down from Sub1. Deny assignments cannot be authored directly by administrators; they are created by Deployment Stacks (formerly Azure Blueprints) and managed applications. A ReadOnly lock would make RG1 read-only for every principal, not just User1."
+      "explanation": "RBAC is additive, so a narrower assignment can never subtract rights inherited from a wider one; the only way to carve RG1 out is to move Contributor down to the nine scopes where it is wanted, after which the inherited Reader from MG1 is all that applies in RG1. Assigning Reader at RG1 changes nothing because Contributor still flows down from Sub1. Deny assignments cannot be authored directly by administrators; they are created by deployment stacks (the successor to Azure Blueprints, which retires on January 31, 2027) and managed applications. A ReadOnly lock would make RG1 read-only for every principal, not just User1."
     },
     {
       "id": "q9",
@@ -2470,14 +2470,14 @@
       "options": [
         "A deny assignment blocks specified actions regardless of any role assignment that would otherwise allow them",
         "Deny assignments are created and managed directly by subscription administrators the same way role assignments are",
-        "Deny assignments are most commonly created automatically by Deployment Stacks (formerly Azure Blueprints) or managed apps to protect their own resources",
+        "Deny assignments are most commonly created automatically by deployment stacks or managed apps to protect their own resources",
         "A deny assignment can be overridden by assigning the affected user the Owner role"
       ],
       "correct": [
         0,
         2
       ],
-      "explanation": "A deny assignment blocks specified actions no matter what role assignments would otherwise allow, and in practice they're usually created automatically by system features like Deployment Stacks (formerly Azure Blueprints) and managed applications to protect resources they manage, not hand-authored by administrators the way ordinary role assignments are. Owner access doesn't override a deny assignment \u2014 deny always takes precedence over any allow, including Owner."
+      "explanation": "A deny assignment blocks specified actions no matter what role assignments would otherwise allow, and in practice they're usually created automatically by system features like deployment stacks (the successor to Azure Blueprints, which retires on January 31, 2027) and managed applications to protect resources they manage, not hand-authored by administrators the way ordinary role assignments are. Owner access doesn't override a deny assignment \u2014 deny always takes precedence over any allow, including Owner."
     },
     {
       "id": "msq7",
@@ -2990,7 +2990,7 @@
         "Scale the plan out to two instances"
       ],
       "correct": 2,
-      "explanation": "Certificates and TLS bindings need a Basic, Standard, Premium, or Isolated plan, so the plan must be scaled up. Adding instances does not change the tier, slots also depend on higher tiers, and HTTPS Only only redirects traffic and does not provide a certificate."
+      "explanation": "Certificates and TLS bindings need a Basic, Standard, Premium, or Isolated plan, so the plan must be scaled up. Adding instances does not change the tier, slots also depend on higher tiers, and HTTPS Only just redirects traffic and does not provide a certificate."
     },
     {
       "id": "q9036",
@@ -3580,7 +3580,7 @@
         "q9027",
         "q9028"
       ],
-      "reading": "Choosing a VM means balancing size against workload: the size determines CPU, memory, and disk throughput, while the series, B, D, F, and others, is tuned for different needs \u2014 B-series is cheap and burstable, D-series is general purpose, F-series is compute-optimized. Underneath, managed disks come in four performance tiers, Standard HDD, Standard SSD, Premium SSD, and Ultra Disk, from cheapest to fastest.\n\nFor resilience, availability sets spread VMs across separate hardware within one datacenter, availability zones go further by using physically separate datacenters within a region, and VM Scale Sets automatically add or remove instances based on demand or a schedule.\n\nDay-to-day operations include extensions, small agents that run post-deployment tasks like the Custom Script Extension, and resizing, which may require deallocating a running VM first if the target size isn't available on its current hardware.\n\nEncryption at host extends server-side disk encryption to temporary disks and caches and encrypts data as it flows to storage, with no agent in the guest. It needs the EncryptionAtHost feature registered on the subscription, and an existing VM must be deallocated to turn it on. Moving a VM is two different tasks: a move to another resource group or subscription keeps the region and changes the resource ID, while a move to another region uses Azure Resource Mover, which validates dependencies and lets you commit or discard the move.",
+      "reading": "Choosing a VM means balancing size against workload: the size determines CPU, memory, and disk throughput, while the series, B, D, F, and others, is tuned for different needs \u2014 B-series is cheap and burstable, D-series is general purpose, F-series is compute-optimized. Underneath, managed disks come in five types, Standard HDD, Standard SSD, Premium SSD, Premium SSD v2, and Ultra Disk, roughly from cheapest to fastest.\n\nFor resilience, availability sets spread VMs across separate hardware within one datacenter, availability zones go further by using physically separate datacenters within a region, and VM Scale Sets automatically add or remove instances based on demand or a schedule.\n\nDay-to-day operations include extensions, small agents that run post-deployment tasks like the Custom Script Extension, and resizing, which may require deallocating a running VM first if the target size isn't available on its current hardware.\n\nEncryption at host extends server-side disk encryption to temporary disks and caches and encrypts data as it flows to storage, with no agent in the guest. It needs the EncryptionAtHost feature registered on the subscription, and an existing VM must be deallocated to turn it on. Moving a VM is two different tasks: a move to another resource group or subscription keeps the region and changes the resource ID, while a move to another region uses Azure Resource Mover, which validates dependencies and lets you commit or discard the move.",
       "fundamentalsLabel": "New to VM sizing and resilience? See the everyday analogy",
       "fundamentals": "Choosing a VM series is like choosing a vehicle for a job: a compact car (B-series) is cheap and fine for occasional errands, a pickup truck (D-series) handles general hauling, and a race car (F-series) is built for one specific kind of performance. Availability sets and zones are about not parking every vehicle in the same garage \u2014 spreading them out so one disaster doesn't take out the whole fleet at once.",
       "keyTerms": [
@@ -3915,7 +3915,7 @@
       "heading": "Governance (locks, policy, tags)",
       "points": [
         "Resource lock CanNotDelete allows read/modify but blocks deletion. ReadOnly blocks modify AND delete (locks down the resource entirely, which can break scaling or extensions unexpectedly).",
-        "Locks apply to everything below their scope in the hierarchy and can only be removed by someone with the right permission (Microsoft.Authorization/locks/delete), even an Owner needs that explicit permission.",
+        "Locks apply to everything below their scope in the hierarchy and can only be removed by someone with the right permission (Microsoft.Authorization/locks/delete). Among built-in roles only Owner and User Access Administrator have it; Contributor does not.",
         "Azure Policy initiatives group multiple related policy definitions together; policy effects include Deny, Audit, Append, Modify, and DeployIfNotExists.",
         "Tags are not automatically inherited by child resources \u2014 a policy with the Modify or Append effect is needed to enforce/propagate tags automatically.",
         "A budget notifies on actual or forecasted cost but never stops resources; use an action group to run automation. Policy remediation tasks fix existing resources for deployIfNotExists and modify policies, and use the assignment's managed identity.",
@@ -4401,7 +4401,7 @@
         {
           "id": "cs-az104-fabrikam-branch-q4",
           "type": "ms",
-          "question": "Which of the following would actually satisfy the requirement to be alerted the moment CPU usage on a branch VM exceeds 90% for more than five minutes? (Select all that apply.)",
+          "question": "Which of the following would actually satisfy the requirement to be alerted the moment CPU usage on a branch VM exceeds 90% for more than five minutes? (Choose two.)",
           "options": [
             "An Azure Monitor metric alert rule on the Percentage CPU metric, with a 90% threshold over a 5-minute window",
             "An action group attached to that alert rule to actually deliver a notification",
