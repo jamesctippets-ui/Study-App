@@ -1,0 +1,45 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [claude/certification-study-app-n6bst5]
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      # build.py validates the data and, with node on the PATH, runs the check_*.js suites.
+      - name: Build
+        run: python3 build.py
+
+      # Fails on errors only; warnings and info notes are for a human to read.
+      - name: Content audit
+        run: python3 tools/audit_content.py
+
+      - name: Node checks
+        run: |
+          for f in tools/check_*.js; do
+            echo "== $f"
+            node "$f"
+          done
+
+      # index.html, service-worker.js and dist/data are committed build products.
+      - name: Generated files are up to date
+        run: |
+          if ! git diff --quiet; then
+            echo "A fresh build differs from what is committed. Run python3 build.py and commit the result:"
+            git status --short
+            exit 1
+          fi
