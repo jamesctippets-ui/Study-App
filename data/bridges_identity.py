@@ -99,11 +99,6 @@ BRIDGES = [
                 'lesson': 'identity-access-threat-protection',
                 'angle': 'Presents the same three methods as the way on-premises identities reach Conditional Access and Entra ID Protection. Password hash sync is the recommended default, and because the hashes reach Entra ID it also enables leaked-credential detection.',
             },
-            {
-                'track': 'az802',
-                'lesson': 'active-directory-domain-services',
-                'angle': 'Views it from the on-premises administrator\'s side: password hash sync never sends a recoverable plaintext password to Entra ID, pass-through authentication calls back to AD DS through an agent, and federation means running an AD FS service yourself.',
-            },
         ],
         'watchOut': 'The sync tool and the sign-in method are independent choices: picking Cloud Sync or Connect Sync does not decide between password hash sync, pass-through authentication and federation. And "hash sync" does not copy the password hash itself: Entra ID receives only a hash of the on-premises password hash, never a recoverable plaintext password.',
         'questions': [

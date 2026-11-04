@@ -554,11 +554,6 @@
         "track": "ab650",
         "lesson": "identity-access-threat-protection",
         "angle": "Presents the same three methods as the way on-premises identities reach Conditional Access and Entra ID Protection. Password hash sync is the recommended default, and because the hashes reach Entra ID it also enables leaked-credential detection."
-      },
-      {
-        "track": "az802",
-        "lesson": "active-directory-domain-services",
-        "angle": "Views it from the on-premises administrator's side: password hash sync never sends a recoverable plaintext password to Entra ID, pass-through authentication calls back to AD DS through an agent, and federation means running an AD FS service yourself."
       }
     ],
     "watchOut": "The sync tool and the sign-in method are independent choices: picking Cloud Sync or Connect Sync does not decide between password hash sync, pass-through authentication and federation. And \"hash sync\" does not copy the password hash itself: Entra ID receives only a hash of the on-premises password hash, never a recoverable plaintext password.",
@@ -1110,7 +1105,7 @@
       {
         "track": "az802",
         "lesson": "on-premises-hybrid-networking",
-        "angle": "Tests the choice between a Site-to-Site VPN and ExpressRoute by what the scenario values (predictable latency and available bandwidth over cost points to ExpressRoute). It also covers NPS as the RADIUS policy engine for VPN and 802.1X access, while RRAS or a third-party VPN device is what actually terminates the VPN."
+        "angle": "Tests the choice between a Site-to-Site VPN and ExpressRoute by what the scenario values (predictable latency and available bandwidth over cost points to ExpressRoute)."
       },
       {
         "track": "az305",
@@ -1182,7 +1177,7 @@
       {
         "track": "az802",
         "lesson": "hybrid-management-clustering-virtualization",
-        "angle": "Hyper-V specifics: a VM generation (Generation 2 for UEFI, Secure Boot and boot disks above 2 TB) cannot be changed after creation, and the virtual switch type (external, internal, private) sets who the VM can reach. Containers use process isolation (shared kernel) or Hyper-V isolation (each container in its own lightweight utility VM with its own kernel)."
+        "angle": "Hyper-V specifics: a VM generation (Generation 2 for UEFI, Secure Boot and boot disks above 2 TB) cannot be changed after creation, and the virtual switch type (external, internal, private) sets who the VM can reach."
       },
       {
         "track": "az140",
@@ -1408,7 +1403,7 @@
       {
         "track": "az802",
         "lesson": "hybrid-management-clustering-virtualization",
-        "angle": "Uses migration for moves inside the Windows estate: Storage Migration Service moves files, shares and security settings from an old file server to a new one and can hand over the old name and IP so UNC paths keep working, while Live Migration and Storage Migration move running VMs or their disks between hosts. Hyper-V Replica is for disaster recovery, not migration."
+        "angle": "Uses migration for moves inside the Windows estate: Live Migration and Storage Migration move running VMs or their disks between hosts. Hyper-V Replica is for disaster recovery, not migration."
       }
     ],
     "watchOut": "Migration is overloaded. In Hyper-V, Live Migration and Storage Migration move a VM or its disks between on-premises hosts and storage, not to the cloud. In Azure, Azure Migrate assesses while Database Migration Service moves the data. In Cloud+, P2V and V2C describe the form of the source and the target. And online in Database Migration Service means the source stays live until cutover, not a type of connection; a lift and shift to a VM keeps compatibility but leaves OS patching with you.",

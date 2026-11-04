@@ -18,12 +18,10 @@ PWA support and JSON export/import are built. Standing constraints: **no backend
 
 Small, concrete, and not blocked.
 
-- **Decide the AZ-802 scope (needs James).** The new outline no longer lists Windows containers, IPAM, RRAS and
-  remote access, NPS, Web Application Proxy, Azure Network Adapter, Always On VPN, Entra Connect sign-in methods or
-  Storage Migration Service, but the track still teaches them. Either relabel them as background or trim them
-  (`content_review/az802.md`). Then fill the new-outline gaps: Enhanced Session Mode, SSH Direct, Azure Automation
-  runbooks, Azure Arc device configuration, VM scale sets, migrating file shares to Azure Files. The 16 CLI
-  challenges were never read, and the retirement dates in f69 and f72 were not re-checked.
+- **AZ-802 gaps.** The scope trim is done (2026-11-04). Fill the new-outline gaps: Enhanced Session Mode, SSH Direct,
+  Azure Automation runbooks, Azure Arc device configuration, VM scale sets, migrating file shares to Azure Files.
+  Networking is now the thinnest category (14 cards, 17 questions). The 16 CLI challenges were never read, and the
+  retirement dates in f69 and f72 were not re-checked (`content_review/az802.md`).
 - **SC-300 to the 28 Oct 2026 outline.** Rename the "identity governance" group to "Plan and automate identity
   governance", add cards and questions for protected actions and Windows Hello for Business, and note the SMS/voice
   MFA retirement on other tracks that list those methods as ordinary.
