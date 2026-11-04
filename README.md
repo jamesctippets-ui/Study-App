@@ -690,6 +690,7 @@ tools/
   check_playground.js — unit tests for the Playground engines plus a replay of every scenario
   check_flyout.js     — unit tests for the flyout placement maths
   check_cards.js      — checks that the definition-first flashcard prompt never shows its own term (all cards)
+  eink_export.py      — writes each track as EPUB books (flashcards, questions, cheat sheet) for e-ink readers; see "On an e-ink reader"
   checks/<tool>.js    — per-tool checks for the extra Playground tools (loaded by check_playground.js)
 src/js/
   00_preamble.js        — React hook imports, the COLOR palette, hues, theme and icon helpers
@@ -843,6 +844,28 @@ a phone, it needs to be served over `https://` from somewhere your phone can
 reach — GitHub Pages on this repo is the simplest free option (see "Sharing it"
 below). Once it's live, open the URL on your phone and use "Add to Home Screen"
 to install it.
+
+## On an e-ink reader (reTerminal Sticky)
+
+The Seeed **reTerminal Sticky** (3.97-inch, 800x480, four greys, touch, ESP32-S3) has no web browser, so the app
+itself cannot run on it. It does run the open-source CrossPoint Reader firmware, which opens EPUB files from the
+microSD card, so `tools/eink_export.py` turns the study content into EPUBs. No backend and nothing changes in the app.
+
+```
+python3 build.py                                  # refresh dist/data first
+python3 tools/eink_export.py --out /path/to/sd    # all 26 tracks, 78 books (about 3 MB)
+python3 tools/eink_export.py ccna --only flashcards
+```
+
+Per track: **Flashcards** (each card is two pages: the definition-first prompt with the term blanked, then the term,
+definition and example), **Questions** (question with lettered options, then answer and explanation; image questions
+are skipped) and **Cheat sheet**. Chapters are the track's categories. Progress, spaced repetition and scoring stay in
+the app: the EPUBs are a read-and-self-test companion, and they are a snapshot, so re-export after content changes.
+
+To use it: flash CrossPoint Reader onto the Sticky (see crosspointreader.com; this replaces the stock firmware, and a
+community dual-boot exists), copy the `.epub` files onto the microSD card, and open them from the reader's library.
+Not yet tried on the device itself (see ROADMAP.md): page breaks between prompt and answer depend on CrossPoint
+honouring the CSS `break-before: page`.
 
 ## Sharing it
 
