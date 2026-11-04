@@ -52,6 +52,12 @@ Valuable, but each waits on a choice or on the Now items.
   HTTPS, then re-test PWA install on iOS and Android. Follow `LAUNCH_CHECKLIST.md`: SEO tags, security headers, an
   accessibility statement, a persistent copyright notice, and the analytics decision (default: none). Cloud sync stays
   local-only, so say so plainly.
+- **Try the e-ink EPUBs on a real reTerminal Sticky (needs James's device).** `tools/eink_export.py` writes
+  flashcard, question and cheat-sheet EPUBs for the Sticky's CrossPoint Reader firmware (README, "On an e-ink reader").
+  Untested on hardware: check that CrossPoint honours the prompt/answer page break, that long explanations page
+  cleanly, and whether the per-category chapter lists are easy to navigate by touch. If it works, consider an in-app
+  "export for e-ink" button (the EPUB is plain zip and XML, so it could be built in the browser with no backend), and
+  a "Tough cards only" book from the app's own progress.
 - **Global search.** One box that finds a card, question, lesson, glossary term or Playground scenario across the
   current track (and optionally all tracks), jumping to the item. Today search exists only inside the Glossary.
   Everything is already in the in-memory track data, so this needs no index service.
@@ -98,14 +104,6 @@ Unvetted. Add yours.
 - Optional scenario-based labs for Microsoft 365 admin (Intune, Purview) that mimic portal decisions without screenshots.
 - Import of a user's own flashcards (CSV) into a personal deck, local only.
 - A "what changed since you last studied" panel that lists reviewed or corrected cards.
-- **reTerminal E-Ink (Seeed E1001 / E1002) flashcards.** Researched 2026-11-04: these are ESP32-S3 microcontroller
-  devices with no web browser, so the app cannot run on them. Specs: 800x480 panel (E1001 7.5-inch mono, 4-level grey,
-  2-5 s refresh, partial refresh; E1002 7.3-inch six-colour, 12-20 s, no partial refresh), three buttons, no touch
-  (touch is E1003 only), 2.4 GHz Wi-Fi, microSD, 8 MB PSRAM. Realistic routes: (a) a build-time tool that renders every
-  card to 800x480 PNGs for the microSD card, plus a small Arduino or ESPHome sketch where the three buttons mean
-  previous / reveal / next; (b) the same PNGs fetched over Wi-Fi from the static host; (c) an "e-ink mode" CSS theme
-  (high contrast, no animation, large type) for e-ink tablets that do have a browser, such as Boox. Needs James to pick
-  a route and confirm the exact model. Nothing built yet.
 
 **Decided against (do not re-add):** accounts, leaderboards and any backend; crowd-sourced answer voting; vendor
 partnerships; a personal mnemonic bank and "boss battle" sessions (section 15).
