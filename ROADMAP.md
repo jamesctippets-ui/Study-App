@@ -2,7 +2,7 @@
 
 Where Cert Study Hub is headed, in four buckets. **Now** is ready to pick up and needs no big decision.
 **Next** is the follow-on, usually waiting on one choice or one dependency. **Later** is real but deliberately
-parked. **Ideas** is unvetted: nothing there is promised. Last updated 2026-11-01.
+parked. **Ideas** is unvetted: nothing there is promised. Last updated 2026-11-04.
 
 **Add new ideas here.** Put a one-line entry under *Ideas* (what it is and why it might matter). When one is worth
 doing, move it up a bucket; when it ships, delete the line and record the details in the feature log below (the
@@ -98,6 +98,14 @@ Unvetted. Add yours.
 - Optional scenario-based labs for Microsoft 365 admin (Intune, Purview) that mimic portal decisions without screenshots.
 - Import of a user's own flashcards (CSV) into a personal deck, local only.
 - A "what changed since you last studied" panel that lists reviewed or corrected cards.
+- **reTerminal E-Ink (Seeed E1001 / E1002) flashcards.** Researched 2026-11-04: these are ESP32-S3 microcontroller
+  devices with no web browser, so the app cannot run on them. Specs: 800x480 panel (E1001 7.5-inch mono, 4-level grey,
+  2-5 s refresh, partial refresh; E1002 7.3-inch six-colour, 12-20 s, no partial refresh), three buttons, no touch
+  (touch is E1003 only), 2.4 GHz Wi-Fi, microSD, 8 MB PSRAM. Realistic routes: (a) a build-time tool that renders every
+  card to 800x480 PNGs for the microSD card, plus a small Arduino or ESPHome sketch where the three buttons mean
+  previous / reveal / next; (b) the same PNGs fetched over Wi-Fi from the static host; (c) an "e-ink mode" CSS theme
+  (high contrast, no animation, large type) for e-ink tablets that do have a browser, such as Boox. Needs James to pick
+  a route and confirm the exact model. Nothing built yet.
 
 **Decided against (do not re-add):** accounts, leaderboards and any backend; crowd-sourced answer voting; vendor
 partnerships; a personal mnemonic bank and "boss battle" sessions (section 15).
