@@ -18,9 +18,6 @@ PWA support and JSON export/import are built. Standing constraints: **no backend
 
 Small, concrete, and not blocked.
 
-- **Add CI.** The repo has none. A GitHub Action that runs `python3 build.py`, `python3 tools/audit_content.py` for
-  every track and `node tools/check_*.js` on each PR, and fails if the committed `index.html` and `service-worker.js`
-  differ from a fresh build. This also is the first half of hosting (see Next).
 - **Decide the AZ-802 scope (needs James).** The new outline no longer lists Windows containers, IPAM, RRAS and
   remote access, NPS, Web Application Proxy, Azure Network Adapter, Always On VPN, Entra Connect sign-in methods or
   Storage Migration Service, but the track still teaches them. Either relabel them as background or trim them
@@ -48,7 +45,7 @@ Small, concrete, and not blocked.
 
 Valuable, but each waits on a choice or on the Now items.
 
-- **Host it on a real domain.** Static host (GitHub Pages or Cloudflare Pages) deployed from CI, custom domain and
+- **Host it on a real domain.** Static host (GitHub Pages or Cloudflare Pages) deployed from the CI workflow in `.github/workflows/ci.yml`, custom domain and
   HTTPS, then re-test PWA install on iOS and Android. Follow `LAUNCH_CHECKLIST.md`: SEO tags, security headers, an
   accessibility statement, a persistent copyright notice, and the analytics decision (default: none). Cloud sync stays
   local-only, so say so plainly.
