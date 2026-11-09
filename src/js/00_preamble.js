@@ -51,6 +51,7 @@ const TRACK_ACCENTS = {
   az900: '#38BDF8',
   az104: '#22D3EE',
   dp900: '#2DD4BF',
+  sc900: '#6366F1',
   dp300: '#818CF8',
   az305: '#A78BFA',
   az802: '#C084FC',

@@ -1075,6 +1075,9 @@ ACRONYMS = {
     'COO': {'exp': 'Chief operating officer', 'trigger': False},
     'RACI': {'exp': 'Responsible, Accountable, Consulted, Informed'},
     'UTC': {'exp': 'Coordinated Universal Time', 'trigger': False},
+    # SC-900 track
+    'CWP': {'exp': 'Cloud workload protection'},
+    'FIDO': {'exp': 'Fast Identity Online'},
 }
 
 IGNORE = {

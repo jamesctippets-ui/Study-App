@@ -2,13 +2,13 @@
 
 Where Cert Study Hub is headed, in four buckets. **Now** is ready to pick up and needs no big decision.
 **Next** is the follow-on, usually waiting on one choice or one dependency. **Later** is real but deliberately
-parked. **Ideas** is unvetted: nothing there is promised. Last updated 2026-11-04.
+parked. **Ideas** is unvetted: nothing there is promised. Last updated 2026-11-09.
 
 **Add new ideas here.** Put a one-line entry under *Ideas* (what it is and why it might matter). When one is worth
 doing, move it up a bucket; when it ships, delete the line and record the details in the feature log below (the
 numbered sections, which stay as the design history and are cross-referenced from the code as "ROADMAP.md section N").
 
-**Where things stand.** 26 tracks, all content-reviewed (reports in `content_review/`, each ending in a
+**Where things stand.** 27 tracks, all content-reviewed (reports in `content_review/`, each ending in a
 "Needs a human check" list). Progress tracking, spaced repetition, exam readiness with a date countdown, streaks,
 achievements, the Path, the Playground, a first-login tour, the desktop layout (sidebar, keyboard shortcuts), offline
 PWA support and JSON export/import are built. Standing constraints: **no backend, accounts or leaderboards, ever**
@@ -1827,6 +1827,16 @@ trading away for shinier but shallower ones.
   November 12, 2026"; Managed Agents and the Projects rollout are beta. (4) *Not done yet:* lesson diagrams (none of the 44 lessons has
   one), cross-cert bridges, and the balance of "the correct option is the longest" (30 to 37% of multiple-choice items, so
   longer-is-right is a weak tell worth evening out). `tools/audit_content.py` finds 0 errors in all four.
+- [x] **SC-900 (November 2026; 27 tracks now).** New track `sc900` (Microsoft Security, Compliance, and Identity Fundamentals),
+  written to the 21 October 2026 skills outline: 126 flashcards, 139 questions (98 single answer, 23 true/false, 18
+  choose-two), 12 lessons, 8 Mad Libs, 5 Sequences, 12 Compare pairs, one case study (4 questions) and 11 cheat-sheet sections,
+  in four categories weighted 13/27/37/23 (concepts, Entra, security solutions, compliance solutions). Built as a combiner
+  (`data/sc900.py`) over three parts, `_a` (concepts, Entra), `_b` (Azure infrastructure security, Defender for Cloud, Sentinel,
+  Defender XDR) and `_c` (Service Trust Portal, privacy, Purview and the games). The track is registered in `build.py`,
+  `data/tracks.py` (a 50-question, 45-minute practice exam with a 75% buffer over the real 700/1,000) and the track accent;
+  the e-ink export picks it up with no change. Facts were checked against Microsoft Learn; `content_review/sc900.md` lists
+  what still needs a human check (exam question count, Entra Agent ID, the Sentinel Azure portal retirement date, Defender CSPM
+  plan split). Not done: lesson diagrams, screenshots, bridges to the other Microsoft tracks, and Playground links.
 - [x] **Weak subjects: evaluate misses and build a priority study path (October 2026).** The app only kept the
   last outcome per item, so `stats.missLog` (`{track: {id: {m misses, c correct since, l last-miss date}}}`) now records
   history for anything ever missed (written by `recordResultFor` and the exam results; cleared with a track reset;

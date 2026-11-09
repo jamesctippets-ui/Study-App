@@ -561,6 +561,9 @@ where one genuinely fits, vocab/quiz call-outs, and common-traps notes):
 - **SC-200** (Security Operations Analyst) — full question bank (75 questions,
   5 lessons); Defender XDR/Sentinel operations, incident response, and real
   KQL-based threat hunting.
+- **SC-900** (Security, Compliance & Identity Fundamentals) — 139 questions, 126 cards, 12 lessons,
+  8 Mad Libs, 5 Sequences, 12 Compare pairs and a case study, written to the 21 October 2026 outline
+  (concepts, Entra, security solutions, Purview compliance solutions).
 - **SC-500** (Cloud & AI Security Engineer) — full question bank (87 questions,
   5 lessons), including current AI-security content (Copilot, Microsoft Foundry
   agents, Entra Agent ID).
@@ -678,6 +681,7 @@ data/
   acronyms.py   — acronym → expansion dictionary for flyouts (coverage enforced by build.py)
   itil.py       — ITIL categories, flashcards, questions, course lessons
   az900.py      — AZ-900 categories, flashcards, questions, course lessons
+  sc900.py      — SC-900 track; combines sc900_a (concepts, Entra), sc900_b (security solutions) and sc900_c (compliance solutions and the games)
   az104.py      — AZ-104 categories, flashcards, questions, course lessons
   cloudplus.py  — CompTIA Cloud+ categories, flashcards, questions, course lessons
   ccna.py, cissp.py — combine ccna_a/_b and cissp_a/_b (two parts each, written in parallel)
@@ -853,7 +857,7 @@ microSD card, so `tools/eink_export.py` turns the study content into EPUBs. No b
 
 ```
 python3 build.py                                  # refresh dist/data first
-python3 tools/eink_export.py --out /path/to/sd    # all 26 tracks, 78 books (about 3 MB)
+python3 tools/eink_export.py --out /path/to/sd    # all 27 tracks, 81 books (about 3 MB)
 python3 tools/eink_export.py ccna --only flashcards
 ```
 
