@@ -22,6 +22,11 @@ Usage (run `python3 build.py` first so dist/data is fresh; Node is needed for th
     python3 tools/eink_export.py ccna az104            only these tracks
     python3 tools/eink_export.py --out /Volumes/SD     write straight to the card
     python3 tools/eink_export.py --only flashcards     one kind of book (flashcards | questions | cheatsheet)
+    python3 tools/eink_export.py ccna --preview        also write a browser preview (open eink-out/preview/index.html)
+
+The preview is a plain HTML page per book that pages the content on an 800x480, four-grey screen with tap zones, so it
+can be tried on any computer. It approximates the Sticky (the real reader uses its own fonts and layout) and is not
+written next to the books if you point --out at an SD card; use --preview-dir for a separate folder.
 
 Only the Python standard library is used. Page breaks come from CSS `break-before: page`; a reader that
 ignores it still shows prompt-then-answer in order, just without the page turn between them.
@@ -48,6 +53,7 @@ h1, h2 { margin: 0 0 0.6em 0; line-height: 1.2; }
 h1 { font-size: 1.4em; }
 h2 { font-size: 1.15em; }
 .card { break-before: page; page-break-before: always; }
+h1 + .card { break-before: auto; page-break-before: auto; }
 .cat { font-size: 0.75em; margin: 0 0 0.8em 0; }
 .prompt, .q { font-size: 1.1em; margin: 0 0 0.8em 0; }
 .term, .ans { font-weight: bold; margin: 0 0 0.6em 0; }
@@ -230,11 +236,115 @@ def safe_name(text):
     return re.sub(r'[\\/:*?"<>|]+', "-", text).strip()
 
 
+PREVIEW_PAGE = """<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>__TITLE__ (e-ink preview)</title>
+<style>
+__CSS__
+html,body{margin:0;background:#d8d8d8;color:#111;font:14px system-ui,sans-serif}
+.wrap{max-width:860px;margin:0 auto;padding:16px}
+.bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:0 0 12px}
+.bar button,.bar select{font:inherit;padding:6px 10px}
+.bar .info{margin-left:auto}
+#stage{width:800px;height:480px;transform-origin:0 0}
+#holder{width:800px;height:480px}
+#screen{width:800px;height:480px;overflow:hidden;position:relative;background:#fff;box-shadow:0 0 0 10px #222}
+#screen.grey{filter:url(#g4)}
+#flow{box-sizing:border-box;width:800px;height:480px;padding:24px;column-width:752px;column-gap:48px;column-fill:auto;
+  font:var(--fs,24px)/1.4 Georgia,"Times New Roman",serif;color:#000;transition:none;position:relative}
+#flow h1{break-before:column;-webkit-column-break-before:always;font-size:1.3em}
+#flow .card{break-before:column;-webkit-column-break-before:always}
+#flow h1+.card{break-before:auto;-webkit-column-break-before:auto}
+#flash{position:absolute;inset:0;background:#000;opacity:0;pointer-events:none}
+.help{margin-top:22px;font-size:13px;color:#333}
+</style></head><body>
+<svg width="0" height="0" style="position:absolute"><filter id="g4"><feColorMatrix type="matrix" values="0.3 0.59 0.11 0 0  0.3 0.59 0.11 0 0  0.3 0.59 0.11 0 0  0 0 0 1 0"/>
+<feComponentTransfer><feFuncR type="discrete" tableValues="0 0.33 0.67 1"/><feFuncG type="discrete" tableValues="0 0.33 0.67 1"/><feFuncB type="discrete" tableValues="0 0.33 0.67 1"/></feComponentTransfer></filter></svg>
+<div class="wrap">
+<div class="bar"><a href="index.html">All books</a><strong>__TITLE__</strong>
+<span class="info"><span id="pos"></span></span></div>
+<div class="bar">
+<button id="prev">&larr; Prev</button><button id="next">Next &rarr;</button>
+<select id="chap" aria-label="Chapter"></select>
+<label>Text <select id="fs"><option value="20px">Small</option><option value="24px" selected>Medium</option><option value="28px">Large</option><option value="32px">Extra large</option></select></label>
+<label>Zoom <select id="zoom"><option value="1">1x</option><option value="1.5">1.5x</option><option value="2">2x</option></select></label>
+<label><input type="checkbox" id="grey" checked> 4 greys</label>
+<label><input type="checkbox" id="fl"> refresh flash</label>
+</div>
+<div id="holder"><div id="stage"><div id="screen" class="grey"><div id="flow"></div><div id="flash"></div></div></div></div>
+<p class="help">Tap the right two-thirds of the screen (or press &rarr; / space) for the next page, the left third (or &larr;) for the previous page.
+This approximates the Sticky's 800x480 panel; its CrossPoint firmware uses its own fonts and may break lines and pages differently.</p>
+</div>
+<script id="book" type="application/json">__DATA__</script>
+<script>
+(function(){
+var chapters=JSON.parse(document.getElementById("book").textContent);
+var flow=document.getElementById("flow"),screen=document.getElementById("screen"),flash=document.getElementById("flash");
+var chap=document.getElementById("chap"),pos=document.getElementById("pos");
+flow.innerHTML=chapters.map(function(c){return "<h1>"+c[0]+"</h1>"+c[1];}).join("");
+chapters.forEach(function(c,i){var o=document.createElement("option");o.value=i;o.textContent=c[0].replace(/&amp;/g,"&");chap.appendChild(o);});
+var page=0,pages=1,starts=[];
+function measure(){
+  pages=Math.max(1,Math.ceil(flow.scrollWidth/800));
+  var h=flow.querySelectorAll("h1");starts=[];
+  h.forEach(function(e){starts.push(Math.round(e.offsetLeft/800));});
+  show(Math.min(page,pages-1),false);
+}
+function show(n,flashIt){
+  page=Math.max(0,Math.min(pages-1,n));
+  flow.style.transform="translateX("+(-800*page)+"px)";
+  var ci=0;starts.forEach(function(s,i){if(s<=page)ci=i;});chap.value=ci;
+  pos.textContent="page "+(page+1)+" of "+pages;
+  if(flashIt&&document.getElementById("fl").checked){flash.style.transition="none";flash.style.opacity="1";
+    setTimeout(function(){flash.style.transition="opacity .35s";flash.style.opacity="0";},120);}
+}
+document.getElementById("prev").onclick=function(){show(page-1,true);};
+document.getElementById("next").onclick=function(){show(page+1,true);};
+chap.onchange=function(){show(starts[+chap.value]||0,true);};
+document.getElementById("fs").onchange=function(){flow.style.setProperty("--fs",this.value);measure();};
+document.getElementById("grey").onchange=function(){screen.classList.toggle("grey",this.checked);};
+var z=document.getElementById("zoom"),stage=document.getElementById("stage"),holder=document.getElementById("holder");
+z.onchange=function(){var f=+z.value;stage.style.transform="scale("+f+")";holder.style.width=800*f+"px";holder.style.height=480*f+"px";};
+screen.addEventListener("click",function(e){var r=screen.getBoundingClientRect();(e.clientX-r.left)/r.width<1/3?show(page-1,true):show(page+1,true);});
+document.addEventListener("keydown",function(e){
+  if(e.key==="ArrowRight"||e.key===" "||e.key==="PageDown"){e.preventDefault();show(page+1,true);}
+  else if(e.key==="ArrowLeft"||e.key==="PageUp"){e.preventDefault();show(page-1,true);}
+});
+window.addEventListener("load",measure);measure();
+})();
+</script></body></html>
+"""
+
+
+def write_preview(path, title, chapters):
+    """One self-contained HTML page that pages a book on an 800x480 four-grey screen (see PREVIEW_PAGE)."""
+    # Chapter titles go into innerHTML, so they are escaped here; bodies are already escaped HTML.
+    data = json.dumps([[esc(t), body] for t, body in chapters]).replace("</", "<\\/")
+    html = (PREVIEW_PAGE.replace("__CSS__", CSS).replace("__TITLE__", esc(title)).replace("__DATA__", data))
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(html, "utf-8")
+
+
+def write_preview_index(path, books):
+    rows = "".join(f'<li><a href="{esc(f)}">{esc(t)}</a></li>' for t, f in books)
+    path.write_text(
+        '<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">'
+        "<title>E-ink preview</title><style>body{font:16px system-ui,sans-serif;max-width:640px;margin:2rem auto;padding:0 1rem}"
+        "li{margin:.3rem 0}</style></head><body><h1>E-ink preview</h1>"
+        "<p>Each book pages on an 800x480, four-grey screen like the reTerminal Sticky. It is an approximation: "
+        "the device's own fonts and page breaks will differ.</p>"
+        f"<ul>{rows}</ul></body></html>\n",
+        "utf-8",
+    )
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     ap.add_argument("tracks", nargs="*", help="track keys (default: all)")
     ap.add_argument("--out", default=str(ROOT / "eink-out"), help="output folder (default: ./eink-out)")
     ap.add_argument("--only", choices=KINDS, help="write only this kind of book")
+    ap.add_argument("--preview", action="store_true", help="also write a browser preview of each book")
+    ap.add_argument("--preview-dir", help="where to write the preview (default: <out>/preview)")
     args = ap.parse_args()
 
     meta = json.loads((DATA / "tracks.json").read_text("utf-8"))
@@ -246,28 +356,41 @@ def main():
     out = Path(args.out)
     want = (args.only,) if args.only else KINDS
     total = 0
+    pdir = Path(args.preview_dir) if args.preview_dir else out / "preview"
+    previews = []
+
+    def emit(name, title, book_id, chapters):
+        build_epub(out / f"{safe_name(name)}.epub", title, book_id, chapters)
+        if args.preview:
+            fname = re.sub(r"[^A-Za-z0-9]+", "-", name).strip("-").lower() + ".html"
+            write_preview(pdir / fname, title, chapters)
+            previews.append((title, fname))
+
     for k in keys:
         data = json.loads((DATA / f"{k}.json").read_text("utf-8"))
         label = labels[k]
         notes = []
         if "flashcards" in want and data.get("flashcards"):
             ch = flashcard_chapters(data, masked_prompts(k))
-            build_epub(out / f"{safe_name(label)} Flashcards.epub", f"{label} Flashcards", f"{k}-flashcards", ch)
+            emit(f"{label} Flashcards", f"{label} Flashcards", f"{k}-flashcards", ch)
             notes.append(f"{len(data['flashcards'])} cards")
             total += 1
         if "questions" in want and data.get("questions"):
             ch, skipped = question_chapters(data)
-            build_epub(out / f"{safe_name(label)} Questions.epub", f"{label} Questions", f"{k}-questions", ch)
+            emit(f"{label} Questions", f"{label} Questions", f"{k}-questions", ch)
             notes.append(f"{len(data['questions']) - skipped} questions" + (f" ({skipped} image questions skipped)" if skipped else ""))
             total += 1
         if "cheatsheet" in want:
             ch = cheatsheet_chapters(data)
             if ch:
-                build_epub(out / f"{safe_name(label)} Cheat sheet.epub", f"{label} Cheat sheet", f"{k}-cheatsheet", ch)
+                emit(f"{label} Cheat sheet", f"{label} Cheat sheet", f"{k}-cheatsheet", ch)
                 notes.append(f"{len(ch)} cheat-sheet sections")
                 total += 1
         print(f"{label}: " + ", ".join(notes))
     print(f"Wrote {total} EPUB files to {out}")
+    if args.preview and previews:
+        write_preview_index(pdir / "index.html", previews)
+        print(f"Preview: open {pdir / 'index.html'}")
 
 
 if __name__ == "__main__":
