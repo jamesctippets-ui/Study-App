@@ -864,6 +864,18 @@ the app: the EPUBs are a read-and-self-test companion, and they are a snapshot, 
 
 To use it: flash CrossPoint Reader onto the Sticky (see crosspointreader.com; this replaces the stock firmware, and a
 community dual-boot exists), copy the `.epub` files onto the microSD card, and open them from the reader's library.
+**Trying it on a Mac (or any computer) first.** Add `--preview` and open the page it prints:
+
+```
+python3 tools/eink_export.py ccna --preview       # then open eink-out/preview/index.html in Chrome or Safari
+```
+
+Each book opens on an 800x480 four-grey "screen" with tap zones (tap the right two-thirds or press the right arrow
+for the next page, the left third for the previous), a chapter menu, text size, zoom and an optional refresh flash. It
+is an approximation of the Sticky, not an emulator: CrossPoint uses its own fonts and may break lines and pages
+differently. The `.epub` files themselves also open in Apple Books (double-click) or Calibre, which is the better check
+that the content and chapter list read well.
+
 Not yet tried on the device itself (see ROADMAP.md): page breaks between prompt and answer depend on CrossPoint
 honouring the CSS `break-before: page`.
 
