@@ -24,7 +24,7 @@ sys.path.insert(0, str(ROOT))
 from data import acronyms as acronyms_data
 from data import bridges as bridges_data
 from data import playground as playground_data
-from data import tracks, itil, az900, ab650, az104, dp900, dp300, az305, az802, az140, md102, sc300, sc200, sc500, cloudplus, ehrintegration, ccna, isc2cc, sscp, cissp, ccsp, cgrc, csslp, ccao, ccdv, ccarf, ccarp
+from data import tracks, itil, az900, ab650, az104, dp900, sc900, dp300, az305, az802, az140, md102, sc300, sc200, sc500, cloudplus, ehrintegration, ccna, isc2cc, sscp, cissp, ccsp, cgrc, csslp, ccao, ccdv, ccarf, ccarp
 
 TRACK_MODULES = {
     "itil": itil,
@@ -32,6 +32,7 @@ TRACK_MODULES = {
     "ab650": ab650,
     "az104": az104,
     "dp900": dp900,
+    "sc900": sc900,
     "dp300": dp300,
     "az305": az305,
     "az802": az802,

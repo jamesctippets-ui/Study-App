@@ -3084,5 +3084,11 @@
   "UTC": {
     "exp": "Coordinated Universal Time",
     "trigger": false
+  },
+  "CWP": {
+    "exp": "Cloud workload protection"
+  },
+  "FIDO": {
+    "exp": "Fast Identity Online"
   }
 }

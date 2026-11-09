@@ -22,6 +22,7 @@ TRACKS = [
     {'key': 'ab650', 'label': 'AB-650', 'subtitle': 'M365 & AI Services Administrator'},
     {'key': 'az104', 'label': 'AZ-104', 'subtitle': 'Azure Administrator'},
     {'key': 'dp900', 'label': 'DP-900', 'subtitle': 'Azure Data Fundamentals'},
+    {'key': 'sc900', 'label': 'SC-900', 'subtitle': 'Security, Compliance & Identity Fundamentals'},
     {'key': 'dp300', 'label': 'DP-300', 'subtitle': 'Azure Database Administrator'},
     {'key': 'az305', 'label': 'AZ-305', 'subtitle': 'Azure Solutions Architect Expert'},
     {'key': 'az802', 'label': 'AZ-802', 'subtitle': 'Windows Server Administrator'},
@@ -77,6 +78,13 @@ EXAM_CONFIG = {
         'length': 50, 'minutes': 45, 'passPct': 75, 'passLabel': 'Microsoft scores this 0-1000 with 700 to pass, not a flat percentage. Treat 75%+ here as a safe buffer, not an exact predictor.',
         'resources': [
             {'label': 'Microsoft Learn: official DP-900 study guide', 'url': 'https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/dp-900'},
+        ],
+    },
+    'sc900': {
+        'length': 50, 'minutes': 45, 'passPct': 75, 'passLabel': 'Microsoft scores this 0-1000 with 700 to pass, not a flat percentage. Treat 75%+ here as a safe buffer, not an exact predictor.',
+        'resources': [
+            {'label': 'Microsoft Learn: official SC-900 study guide', 'url': 'https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/sc-900'},
+            {'label': 'Microsoft Learn: Security, Compliance, and Identity Fundamentals certification', 'url': 'https://learn.microsoft.com/en-us/credentials/certifications/security-compliance-and-identity-fundamentals/'},
         ],
     },
     'dp300': {
