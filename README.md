@@ -695,6 +695,8 @@ tools/
   check_flyout.js     — unit tests for the flyout placement maths
   check_cards.js      — checks that the definition-first flashcard prompt never shows its own term (all cards)
   eink_export.py      — writes each track as EPUB books (flashcards, questions, cheat sheet) for e-ink readers; see "On an e-ink reader"
+  eink_pack.py        — writes the study pack (cards and questions as JSON lines) for an e-reader study mode; see EINK_STUDY_PACK.md
+  check_eink.js       — tests for the e-reader progress import, plus an end-to-end check of the study pack
   checks/<tool>.js    — per-tool checks for the extra Playground tools (loaded by check_playground.js)
 src/js/
   00_preamble.js        — React hook imports, the COLOR palette, hues, theme and icon helpers
@@ -711,6 +713,7 @@ src/js/
   03e_flyout_place.js     — where a definition flyout goes (open left/right, above/below, clamped to the screen; pure geometry)
   04m_weak_path_ui.jsx    — the Weak spots view (one page for a cert or for every cert), path progress, missed-question history
   03f_share_bank.js       — share code for your own terms and scenarios, step-bank suggestions (pure logic; tools/check_share.js)
+  03g_eink_sync.js        — reads an e-reader's progress log and merges it into saved progress (pure logic; tools/check_eink.js)
   03b_playground_engine.js — pure-JS simulation engine for the IT Playground (subnet maths incl. IPv6, ping, VLAN switching, firewall)
   03c_pg_<tool>.js       — engines for the extra Playground tools (dhcp, dns, stp, vpn, nsg, certs); 03c_pg_quizme.js builds the "Quiz me on this setup" rounds
   04g_playground_core.jsx — shared Playground parts: cards, fields, predict-first, scenario shell, sandbox store, tool registry
@@ -883,6 +886,19 @@ that the content and chapter list read well.
 Not yet tried on the device itself (see ROADMAP.md): page breaks between prompt and answer depend on CrossPoint
 honouring the CSS `break-before: page`.
 
+**Studying on the reader itself (in progress).** The books are for reading. For flashcards and quizzes that run on
+the device, with spaced repetition and progress that comes back to the app, there is a second export and an import:
+
+```
+python3 tools/eink_pack.py --out /path/to/sd                  # writes /study: cards and questions, one per line
+python3 tools/eink_pack.py --progress <your progress export>  # also carries your flashcard schedule over
+```
+
+The reader's study mode appends what you did to `/study/progress.jsonl`; Data & Progress, "Import e-reader progress",
+merges that file into the app (nothing is replaced, and re-importing is safe). The app half is built and tested; the
+firmware half (a study mode in a CrossPoint fork) is not, so today this can only be tried with a sample log. The
+format, the firmware contract and the try-it steps are in `EINK_STUDY_PACK.md`.
+
 ## Sharing it
 
 There are no accounts and no login — and, per a deliberate decision (not just
@@ -981,6 +997,8 @@ what you already have before troubleshooting further.
 - **`ROADMAP.md`** — the feature backlog: what's shipped, what's next, and
   ideas not yet started (more certs, more real screenshots, new interactive
   study games, etc.).
+- **`EINK_STUDY_PACK.md`** — the study pack and progress log formats for an
+  e-ink reader's study mode, and what its firmware has to do.
 - **`LAUNCH_CHECKLIST.md`** — what's needed before moving this off of a
   Claude artifact and onto a real domain (legal docs, hosting/deployment
   setup, onboarding, trademark/branding due diligence).

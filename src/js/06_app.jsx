@@ -1596,6 +1596,32 @@ function CertStudyApp() {
     reader.readAsText(file);
   };
 
+  // An e-ink reader's study log (03g_eink_sync.js). This MERGES: the reader's ratings and answers are added to what
+  // is here, and a log imported before only contributes the lines written since.
+  const doImportEinkFile = (file) => {
+    if (file.size > EINK_LOG_MAX_BYTES) {
+      setImportMessage({ ok: false, text: 'That file is too large to be an e-reader progress log.' });
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => {
+      const log = parseEinkLog(String(reader.result));
+      if (!log) {
+        setImportMessage({ ok: false, text: "That doesn't look like an e-reader progress log (progress.jsonl from the reader's study folder)." });
+        return;
+      }
+      const next = applyEinkLog({ results: resultsRef.current, seenLog: seenLogRef.current, srs: srsRef.current, stats: statsRef.current }, log);
+      applyResults(next.results);
+      applySeenLog(next.seenLog);
+      applyStats(next.stats);
+      applySrs(next.srs);
+      persistPayload({ results: next.results, seenLog: next.seenLog, stats: next.stats, srs: next.srs, certPlan: certPlanRef.current, updatedAt: Date.now() });
+      setImportMessage({ ok: true, text: einkSummaryText(next.summary) });
+    };
+    reader.onerror = () => setImportMessage({ ok: false, text: "Couldn't read that file." });
+    reader.readAsText(file);
+  };
+
   /* ---- final exam logic ---- */
 
   // `variant` is 'standard' (navigate freely, submit any time) or 'final'
@@ -1755,6 +1781,7 @@ function CertStudyApp() {
           trackLabel={track.label}
           onExport={doExport}
           onImportFile={doImportFile}
+          onImportEinkFile={doImportEinkFile}
           importMessage={importMessage}
           onReset={doReset}
           onClose={() => setShowData(false)}
