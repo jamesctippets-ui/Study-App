@@ -96,7 +96,7 @@ function CardDirectionSetting() {
 }
 
 function DataPanel({
-  trackLabel, onExport, onImportFile, importMessage, onReset, onClose,
+  trackLabel, onExport, onImportFile, onImportEinkFile, importMessage, onReset, onClose,
   speechSupported, ttsVoices, ttsRate, ttsVoiceURI, onSetTtsRate, onSetTtsVoiceURI, onTestVoice, isTestSpeaking,
   soundOn, onSetSoundOn, pathLocking, onSetPathLocking, dyslexicFont, onSetDyslexicFont, answerSoundOn, onSetAnswerSoundOn,
   reviewReminderDays, onSetReviewReminder, playgroundGoal, onSetPlaygroundGoal,
@@ -104,6 +104,7 @@ function DataPanel({
   useEscapeToClose(onClose);
   const [confirmingReset, setConfirmingReset] = useState(false);
   const fileInputRef = useRef(null);
+  const einkInputRef = useRef(null);
   // English voices first (this app's own content is all English), but never
   // hide the rest — a bilingual user may still want their OS's other voices.
   // Within each group, the better-sounding voices (per voiceQualityScore's
@@ -174,6 +175,28 @@ function DataPanel({
             >
               ⬆ Import progress
             </button>
+          </div>
+          {/* An e-ink reader's study mode logs what you did to /study/progress.jsonl on its SD card (EINK_STUDY_PACK.md).
+              Unlike the import above, this one merges into the progress already here. */}
+          <input
+            ref={einkInputRef}
+            type="file"
+            accept=".jsonl,.json,.txt,application/json,text/plain"
+            style={{ display: 'none' }}
+            onChange={(e) => {
+              const file = e.target.files && e.target.files[0];
+              if (file) onImportEinkFile(file);
+              e.target.value = '';
+            }}
+          />
+          <button
+            onClick={() => einkInputRef.current && einkInputRef.current.click()}
+            style={{ width: '100%', marginTop: '8px', padding: '10px', borderRadius: 'var(--r-ctl)', background: 'transparent', border: `1px solid ${COLOR.border}`, color: COLOR.text, fontSize: '13px', fontWeight: 600 }}
+          >
+            ⬆ Import e-reader progress
+          </button>
+          <div style={{ fontSize: '11px', color: COLOR.muted, marginTop: '6px', lineHeight: 1.4 }}>
+            Choose <span className="mono">progress.jsonl</span> from the reader's SD card (in the <span className="mono">study</span> folder). Its card ratings and answers are added to your progress here; nothing is replaced, and importing the same file twice is safe.
           </div>
           {importMessage && (
             <div style={{ marginTop: '8px', fontSize: '11.5px', color: importMessage.ok ? COLOR.success : COLOR.red, lineHeight: 1.4 }}>

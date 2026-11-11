@@ -2,7 +2,7 @@
 
 Where Cert Study Hub is headed, in four buckets. **Now** is ready to pick up and needs no big decision.
 **Next** is the follow-on, usually waiting on one choice or one dependency. **Later** is real but deliberately
-parked. **Ideas** is unvetted: nothing there is promised. Last updated 2026-11-09.
+parked. **Ideas** is unvetted: nothing there is promised. Last updated 2026-11-11.
 
 **Add new ideas here.** Put a one-line entry under *Ideas* (what it is and why it might matter). When one is worth
 doing, move it up a bucket; when it ships, delete the line and record the details in the feature log below (the
@@ -53,6 +53,13 @@ Valuable, but each waits on a choice or on the Now items.
   cleanly, and whether the per-category chapter lists are easy to navigate by touch. If it works, consider an in-app
   "export for e-ink" button (the EPUB is plain zip and XML, so it could be built in the browser with no backend), and
   a "Tough cards only" book from the app's own progress.
+- **Study mode on the reTerminal Sticky (firmware half; needs a CrossPoint fork).** The app half is done:
+  `tools/eink_pack.py` writes a study pack for the SD card and Data & Progress imports the reader's
+  `progress.jsonl` (merge, safe to repeat). What is left is the firmware: a study activity in a fork of CrossPoint
+  Reader that reads the pack, schedules cards with the same SM-2, takes answers by touch and appends the log
+  (`EINK_STUDY_PACK.md` is the contract). Blocked on: a fork under James's account added to the project, permission
+  to compile it in the cloud, and James flashing test builds. Upstream will not take it (interactive apps are out of
+  scope there) and its SD plugins cannot run code on the device.
 - **Global search.** One box that finds a card, question, lesson, glossary term or Playground scenario across the
   current track (and optionally all tracks), jumping to the item. Today search exists only inside the Glossary.
   Everything is already in the in-memory track data, so this needs no index service.

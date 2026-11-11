@@ -570,6 +570,7 @@ function emptyStats() {
     profile: { name: '', hue: 'primary' },
     missLog: {},
     weakPath: {},
+    einkSync: null,
     tourSeen: false,
   };
 }
@@ -607,6 +608,8 @@ function normalizeStats(raw) {
     profile: normalizeProfile(raw.profile),
     missLog: normalizeMissLog(raw.missLog),
     weakPath: normalizeWeakPath(raw.weakPath),
+    // How far the last e-reader progress log was imported (03g_eink_sync.js); null until one has been.
+    einkSync: raw.einkSync && typeof raw.einkSync === 'object' && typeof raw.einkSync.id === 'string' ? raw.einkSync : null,
     // The first-visit tour (GuidedTour) shows only while this is false.
     // Saves from before the tour existed have no flag; anyone who had
     // already studied counts as having seen it, so returning learners
