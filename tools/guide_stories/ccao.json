@@ -38,5 +38,99 @@
  },
  "epilogue": [
   "A month later, Rosa’s team has a short guide, a few trusted projects and a habit of checking before they send. On exam day she imagines each scenario as a colleague’s question at her desk, and answers it the way she has been answering them for months."
- ]
+ ],
+ "bad": {
+  "prompting-clear-requests": [
+   "Rosa types ‘Make it better’ into the chat and gets back something that is, technically, different. She types it again. And again. By the fifth round she has a document that has been made better in five directions at once, like a horse pulled by five cars. ‘Better’ was never a brief. A brief says who it is for, what it is for and what shape it should take."
+  ],
+  "prompting-decompose-iterate": [
+   "Rosa pastes a three-page prompt of rules, each in capitals, and asks Claude to do all five tasks at once. The result obeys every rule loudly and completes none of the tasks well. Cutting the prompt in half and doing the tasks one at a time works better. Shouting, it turns out, is not a management technique."
+  ],
+  "evaluation-hallucinations-validation": [
+   "A colleague asks Claude whether its own statistics are correct. Claude says yes, politely. The statistics are still invented. Asking a source to confirm itself is not checking; it is asking the witness whether the witness is lying. The report is checked against the real documents, and the colleague learns what a primary source looks like."
+  ],
+  "evaluation-bias-review-formats": [
+   "A manager asks Claude whether the interview scoring rubric is biased. Claude says no, graciously. The manager takes this as proof. A better test is to swap names and details and see whether the scores change. They do. Asking the system to mark its own homework is lovely but not evidence."
+  ],
+  "models-features-models-context": [
+   "Rosa uses the largest model at the highest effort to tag 800 expense lines overnight. It does the job beautifully, and slowly, and expensively. A small, fast model would have been fine, with a sample checked. The jobs are not all the same size, and neither should the tools be."
+  ],
+  "workflow-design-integrate-communicate": [
+   "Rosa’s team finds that Claude’s summary of the store emails is excellent in the first week and removes the human review in the second. In the third week, one summary quietly misses a safety complaint. Controls should relax in stages and never where mistakes are costly. The complaint is found, late, by a person."
+  ],
+  "knowledge-projects-instructions-connectors": [
+   "The training manager writes the rules for the Project into its description field. Claude cannot see the description, so none of the rules are used. The answers are plausible and entirely rule-free. The rules belong in the instructions. Everyone thought the description was where you put them. It is where you put a description."
+  ],
+  "governance-data-privacy-regulated": [
+   "A colleague pastes the full payroll export, names and all, into the chat, since ‘the vendor doesn’t train on our data’. The vendor’s promise is nice; the company’s policy still decides what may be shared. The colleague receives a polite email with the word ‘incident’ in the subject line."
+  ],
+  "governance-use-cases-policy-ethics": [
+   "The hiring manager says that a person clicks ‘approve’ on each AI recommendation, so there is human review. The person has eleven seconds per application, no information beyond the summary and no authority to change anything. This is not review; it is a person standing near a decision. The HR lead redesigns it."
+  ],
+  "troubleshooting-diagnose-iterate-optimize": [
+   "The team rewrites the prompt six times to get Claude to quote the right refund policy. It never does, because the policy was never in the conversation. No wording can supply a fact that is missing. Rosa pastes the policy in. The next reply is perfect, and the six rewrites are quietly retired."
+  ]
+ },
+ "review": {
+  "prompting-clear-requests": {
+   "problem": "Claude’s answers are generic.",
+   "cause": "Requests lack audience, purpose, format and examples.",
+   "solution": "A clear brief, background, format, constraints, positive instructions and varied examples give specific results.",
+   "next": "Next, breaking down bigger tasks and iterating."
+  },
+  "prompting-decompose-iterate": {
+   "problem": "Big jobs produce muddled results.",
+   "cause": "Everything is asked at once, with vague feedback.",
+   "solution": "Decomposition, chaining, success criteria and targeted feedback make big jobs manageable.",
+   "next": "Next, spotting errors and validating."
+  },
+  "evaluation-hallucinations-validation": {
+   "problem": "Claude sounds right when it is wrong.",
+   "cause": "Fluent text is mistaken for verified fact.",
+   "solution": "Knowing how errors arise and checking against primary sources, with prompts that make errors easier to spot, protect you.",
+   "next": "Next, bias, review and format."
+  },
+  "evaluation-bias-review-formats": {
+   "problem": "Outputs can be biased, flattering or wrongly formatted.",
+   "cause": "Self-assessment is trusted, and review is skipped on important output.",
+   "solution": "Swap tests, human review, audience editing and the right output format reduce the risk.",
+   "next": "Next, choosing models and managing context."
+  },
+  "models-features-models-context": {
+   "problem": "Time and money are wasted on the wrong model or feature.",
+   "cause": "Every task is given the same tool, and long chats degrade.",
+   "solution": "Matching feature, model tier and effort to the task, and managing context and handoffs, fixes it.",
+   "next": "Next, designing workflows."
+  },
+  "workflow-design-integrate-communicate": {
+   "problem": "Claude is used without a clear place in the work.",
+   "cause": "Needs, bottlenecks and risks are assumed.",
+   "solution": "Requirements analysis, prototypes, human review and honest communication build workable workflows.",
+   "next": "Next, projects, instructions and connected knowledge."
+  },
+  "knowledge-projects-instructions-connectors": {
+   "problem": "Claude does not know your standards or documents.",
+   "cause": "Rules are in the wrong place and knowledge is out of date.",
+   "solution": "Project instructions, knowledge, connectors and testing give consistent, grounded answers.",
+   "next": "Next, protecting sensitive data."
+  },
+  "governance-data-privacy-regulated": {
+   "problem": "Sensitive data ends up where it should not.",
+   "cause": "Classification and policy are not checked first.",
+   "solution": "Classification, minimisation, redaction, approved tools and agreements keep data safe.",
+   "next": "Next, appropriate use and ethics."
+  },
+  "governance-use-cases-policy-ethics": {
+   "problem": "Claude is used for decisions it should not make.",
+   "cause": "High-risk uses and rubber-stamp reviews.",
+   "solution": "Judging appropriateness, human oversight, disclosure and policy keep use responsible.",
+   "next": "Next, fixing weak outputs."
+  },
+  "troubleshooting-diagnose-iterate-optimize": {
+   "problem": "Outputs remain weak despite repeated tries.",
+   "cause": "The real cause is not diagnosed.",
+   "solution": "Diagnosing the cause, changing one thing at a time and measuring improve outputs.",
+   "next": "That completes the lessons. Next come the cheat sheet, the word bank and the practice questions."
+  }
+ }
 }

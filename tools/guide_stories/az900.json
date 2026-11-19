@@ -29,5 +29,72 @@
  },
  "epilogue": [
   "On exam day Tomás realises he has already done most of it for real: he chose where things run, who can reach them, how data is stored, and how to keep an eye on the bill. The three old servers are still in the back room, switched off, collecting dust. He sits down at the exam screen and smiles."
- ]
+ ],
+ "bad": {
+  "cloud-fundamentals": [
+   "Tomás reads that cloud costs less and immediately signs up for ten services, none of which he needs. His nephew gently points out that ‘pay for what you use’ also means ‘pay for what you leave switched on’. A forgotten test server cheerfully bills him all month, like a houseguest who has discovered the minibar."
+  ],
+  "governance-structure": [
+   "In a burst of enthusiasm Tomás puts the shop systems, the website and his nephew’s ‘quick experiment’ in a single resource group. When he deletes the experiment, the whole lot goes with it. The bakery’s online orders are down for an hour. The lesson: groups are for things that live and die together."
+  ],
+  "compute-hosting": [
+   "Tomás runs the nightly report on a big virtual machine that is on all day, ‘just in case’. By the end of the month he has paid for 690 hours of a computer thinking about nothing. His nephew calls it the most expensive screensaver in the bakery."
+  ],
+  "networking": [
+   "Tomás connects the finance network to the shop network ‘so they can talk’. Two weeks later a shop terminal is reaching the finance files. He had assumed a connection was either on or off, not that it could let everything through. A rule, he now knows, is cheaper than an apology."
+  ],
+  "storage": [
+   "Tomás puts every file in the fastest tier, because it has ‘hot’ in the name and he likes hot things. Seven years of invoices pile up at premium prices. Later, in a fit of economy, he puts the live order data in the coldest tier, and it takes hours to open. Both choices were wrong in opposite directions."
+  ],
+  "identity-security": [
+   "To save time, Tomás gives every shop assistant full access to everything. Within a week one of them accidentally deletes the website, thinking it was a spreadsheet. No malice, just a very large ‘delete’ button within reach. Priya now only has the rights she needs, which is also the right amount of blame."
+  ],
+  "cost-policy-monitoring": [
+   "Tomás ignores the cost dashboard for a quarter, because ‘it’s probably fine’. It was not fine. A test database in the wrong region has been quietly billing him since March. He sets an alert and a budget, and, for the first time, the cloud tells him about the problem before the bank does."
+  ]
+ },
+ "review": {
+  "cloud-fundamentals": {
+   "problem": "Tomás does not know what the cloud actually is, or why it would be better than owning servers.",
+   "cause": "Cloud is described in jargon, and the real differences, who manages what and how you are charged, are hidden behind it.",
+   "solution": "The chapter explains pay-as-you-go versus up-front costs, the three service models and the shared responsibility between you and the provider.",
+   "next": "Next, how to organise everything you put in Azure so it stays manageable."
+  },
+  "governance-structure": {
+   "problem": "Resources pile up in one place and nobody can control or find anything.",
+   "cause": "Without a structure, there is nowhere to apply rules once and have them cover everything.",
+   "solution": "Management groups, subscriptions and resource groups give a hierarchy, and policy and region choices flow down through it.",
+   "next": "Next, where and how your applications actually run."
+  },
+  "compute-hosting": {
+   "problem": "Tomás needs to run workloads and does not know which kind of compute fits which job.",
+   "cause": "The options, virtual machines, containers and functions, trade control against cost and effort, and keeping them running is a separate concern.",
+   "solution": "The chapter matches job to hosting type and shows how availability sets, scale sets and zones keep things resilient.",
+   "next": "Next, how all of it connects together."
+  },
+  "networking": {
+   "problem": "Separate parts of the bakery’s systems need to talk, but not all to each other.",
+   "cause": "Azure networks are open to what you allow, and a mix of private and public connections is easy to get wrong.",
+   "solution": "Virtual networks, subnets, peering, VPN and private lines give you control over who can reach what.",
+   "next": "Next, where data is stored and how it is kept safe."
+  },
+  "storage": {
+   "problem": "Data needs to be stored cheaply, quickly or safely, and rarely all three.",
+   "cause": "Different data is used in different ways, and the cost of storing it depends on how often you need it and how many copies exist.",
+   "solution": "Azure’s storage types, tiers and redundancy options let you match each file to its real needs.",
+   "next": "Next, who can access all of this, and how that is controlled."
+  },
+  "identity-security": {
+   "problem": "Anyone with a password could reach almost anything, and passwords are easy to steal.",
+   "cause": "Access is granted too widely, and trust is placed on location rather than on proof.",
+   "solution": "Entra ID, role-based access, conditional sign-in rules and a Zero Trust approach narrow access and verify it every time.",
+   "next": "Next, how to keep an eye on cost, compliance and health."
+  },
+  "cost-policy-monitoring": {
+   "problem": "The environment slowly drifts: bills grow, rules are broken and nobody notices.",
+   "cause": "Cloud resources are easy to create and easy to forget, and no one is looking.",
+   "solution": "Tags, policies, locks, cost tools and monitoring make spending, compliance and health visible.",
+   "next": "That completes the lessons. Next come the cheat sheet, the word bank and the practice questions."
+  }
+ }
 }

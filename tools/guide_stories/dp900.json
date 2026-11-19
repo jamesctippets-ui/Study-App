@@ -23,5 +23,54 @@
  },
  "epilogue": [
   "On the morning of the exam Lena opens the hospital dashboard one last time. It is live, trusted and fed by the pipeline she now understands from end to end. The exam questions use unfamiliar names for familiar ideas, and Lena is surprised at how many of them she can picture."
- ]
+ ],
+ "bad": {
+  "core-data-concepts": [
+   "Lena tries to run the year-end billing report directly on the admissions system, in the middle of the morning rush. The system, which was built for many tiny transactions, groans and slows down. A nurse in the ward asks why a patient record takes thirty seconds to open. Lena learns that the two kinds of work are best kept in separate places."
+  ],
+  "relational-data-on-azure": [
+   "Lena stores a patient’s address in every appointment row ‘to save joins’. When a patient moves, the address is wrong in forty places and right in two. A good table design would have kept it in one. Lena now believes in keys with the zeal of the newly converted."
+  ],
+  "non-relational-data-on-azure": [
+   "Lena models the research collaborations as documents, each listing the colleagues. A simple question, ‘who knows someone who knows Dr. Patel?’, now needs a series of lookups, like asking a family tree for directions. A graph database, she realises, was built for exactly this question."
+  ],
+  "data-warehousing-and-pipelines": [
+   "Lena sets up a nightly pipeline that loads the raw data straight into the finance report. The report now includes duplicates, test entries and one patient called ‘Test Patient’. The board are intrigued by Test Patient’s spending habits. Transforming and cleaning before reporting is, it turns out, the point of a pipeline."
+  ],
+  "modern-analytics-platforms-and-bi": [
+   "Lena builds the executive dashboard in import mode and says it is ‘live’. It was last refreshed on Tuesday. The CEO checks Thursday’s sales and is, politely, confused. Live queries, a different mode, would have shown the truth, albeit a little more slowly."
+  ]
+ },
+ "review": {
+  "core-data-concepts": {
+   "problem": "Different kinds of data and workload are mixed together and perform badly.",
+   "cause": "Data comes in tables, documents and files, and workloads are either many small updates or large analyses.",
+   "solution": "The chapter names data types, transactional versus analytical work, the ACID guarantees and the roles that handle each.",
+   "next": "Next, how relational data is organised and hosted in Azure."
+  },
+  "relational-data-on-azure": {
+   "problem": "Data repeated in many places goes out of date and wastes space.",
+   "cause": "Tables without keys or normalisation duplicate facts, and hosting choices are picked without knowing what each supports.",
+   "solution": "Keys, normalisation and indexes organise data well, and Azure’s SQL options match different migration and management needs.",
+   "next": "Next, data that does not fit neat tables."
+  },
+  "non-relational-data-on-azure": {
+   "problem": "Some data, such as relationships, documents and raw files, does not fit rows and columns.",
+   "cause": "A single storage model is forced onto all kinds of data.",
+   "solution": "Cosmos DB and its APIs, table, blob, file and lake storage give a fitting home to each type.",
+   "next": "Next, bringing data together for analysis."
+  },
+  "data-warehousing-and-pipelines": {
+   "problem": "Raw data from many sources is hard to analyse and report on.",
+   "cause": "Data arrives in different shapes, at different times, with errors.",
+   "solution": "Star schemas, ETL and ELT, batch and streaming, and Data Factory organise and move it into a form ready for analysis.",
+   "next": "Next, the platforms and tools that turn it into reports."
+  },
+  "modern-analytics-platforms-and-bi": {
+   "problem": "Reports are stale, slow or hard to share.",
+   "cause": "Analysis tools are chosen without knowing how each handles scale, cost and freshness.",
+   "solution": "Synapse, Databricks, Stream Analytics, Fabric and Power BI cover different needs, and report modes balance freshness and speed.",
+   "next": "That completes the lessons. Next come the cheat sheet, the word bank and the practice questions."
+  }
+ }
 }

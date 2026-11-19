@@ -26,5 +26,63 @@
  },
  "epilogue": [
   "On the day of the exam Ravi remembers the factory floor, the old file server in the corner, and the new view that shows every server in one place. Hybrid no longer sounds like a buzzword. He settles in and starts reading the first scenario."
- ]
+ ],
+ "bad": {
+  "active-directory-domain-services": [
+   "Ravi blocks inheritance on an OU to stop a company-wide Group Policy from reaching it. The policy arrives anyway, because it was marked Enforced, and enforcement beats blocking. A department finds its desktop wallpaper has become the company logo. The department is furious. Ravi mutters something about the order of precedence and closes the door."
+  ],
+  "hybrid-management-clustering-virtualization": [
+   "Ravi sets up Hyper-V Replica and tells the branch manager, ‘If the host dies, you won’t notice.’ The host dies, and the manager notices very much, because the replica needs to be failed over and it does not run on its own. Live migration is a different tool, for a different day."
+  ],
+  "on-premises-hybrid-networking": [
+   "Ravi creates a stub zone and tells everyone the DNS records are ‘replicated’. A stub zone only knows where to find the authoritative servers, not the records themselves. The branch can resolve nothing for an hour. The DNS servers, to their credit, kept saying ‘ask them’."
+  ],
+  "storage-file-services": [
+   "Ravi turns on data deduplication on the volume holding the live database ‘to save space’. The savings are tiny and the database is unhappy. Deduplication loves file shares and backup libraries; a constantly changing database is the one thing it cannot stand. Ravi puts it back the way it was."
+  ],
+  "securing-windows-server": [
+   "Ravi turns on credential protection on a server and an old application that depends on a legacy sign-in suddenly stops working. The old application’s developer left in 2013. Ravi learns that every security feature has a cost, and that someone should have checked the legacy applications first."
+  ],
+  "monitoring-troubleshooting-windows-server": [
+   "Ravi sets a log-query alert for a fast CPU spike, ‘because it is more powerful’. It checks every five minutes with a delay and misses the spike entirely. A simple metric alert would have caught it in seconds. Not every nail needs the most sophisticated hammer."
+  ]
+ },
+ "review": {
+  "active-directory-domain-services": {
+   "problem": "Two forests, many policies and special roles, and no clear control or recovery plan.",
+   "cause": "Directory structure, trust, replication and policy inheritance interact in ways that surprise people.",
+   "solution": "Trusts, FSMO roles, Group Policy precedence, recovery tools and managed accounts bring order.",
+   "next": "Next, managing servers across on-premises and Azure."
+  },
+  "hybrid-management-clustering-virtualization": {
+   "problem": "Servers are managed in two different worlds and patched without coordination.",
+   "cause": "On-premises hosts are invisible to Azure and clusters are updated by hand.",
+   "solution": "Arc, Windows Admin Center, cluster-aware updating, witnesses, live migration and replication unify and protect.",
+   "next": "Next, the networking that ties sites together."
+  },
+  "on-premises-hybrid-networking": {
+   "problem": "Sites cannot reliably find or address each other.",
+   "cause": "DNS and DHCP are configured per site, and failover is manual.",
+   "solution": "Zone types, DNSSEC, DHCP failover and VPN or private link choices make name, address and link services resilient.",
+   "next": "Next, file services and storage."
+  },
+  "storage-file-services": {
+   "problem": "Users cannot find files, and storage is wasted or unprotected.",
+   "cause": "Files are scattered across servers and disks are used inefficiently.",
+   "solution": "DFS, Storage Spaces, Deduplication and the right file system unify, protect and shrink the storage.",
+   "next": "Next, securing all of it."
+  },
+  "securing-windows-server": {
+   "problem": "Servers and admin accounts are attractive targets.",
+   "cause": "Attackers who get a foothold can run anything and steal credentials.",
+   "solution": "Application control, credential protection, LAPS, Protected Users and identity monitoring limit and detect abuse.",
+   "next": "Next, monitoring and troubleshooting the fleet."
+  },
+  "monitoring-troubleshooting-windows-server": {
+   "problem": "Problems appear on some servers and nobody sees them all.",
+   "cause": "Monitoring differs on each server, and patch status is unknown.",
+   "solution": "Counters, event logs, Azure Monitor, alerts and Update Manager give one consistent view.",
+   "next": "That completes the lessons. Next come the cheat sheet, the word bank and the practice questions."
+  }
+ }
 }

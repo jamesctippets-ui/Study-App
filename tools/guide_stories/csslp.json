@@ -32,5 +32,81 @@
  },
  "epilogue": [
   "The app is out, patched and boring, which is the best thing Dmitri can say about security. On exam day he reads each scenario and asks the question he now asks of every feature: at which stage of the lifecycle should this have been caught?"
- ]
+ ],
+ "bad": {
+  "secure-software-concepts": [
+   "Dmitri’s team lets a user log in successfully and then treats them as allowed to see everything, since ‘they’re authenticated’. A user logs in and promptly reads another patient’s appointments. Authentication says who you are; authorisation says what you may do. The patient, who found this out, wrote a very short and very clear email."
+  ],
+  "secure-lifecycle-management": [
+   "The team celebrates reaching a higher maturity level and announces that its software is now secure. The level means the process is managed and repeatable, not that the output is safe. A well-run factory can make a very consistent pile of faulty toasters."
+  ],
+  "secure-software-requirements": [
+   "The team classifies the data field by field, but each team picks the classification that makes its own controls cheapest. The owner is not consulted. The diagnosis field is declared ‘internal’ because encryption is annoying. The data owner, finding out, politely reclaims the pen."
+  ],
+  "secure-architecture-design": [
+   "The team puts authentication at the gateway and tells everyone the microservices are safe. A service that trusts anything that arrives from inside is a house where every door is open because the front gate is locked. Each service must still check who is calling it."
+  ],
+  "secure-implementation": [
+   "A developer relies on a JavaScript check in the browser to stop bad input. An attacker, who does not use the browser, sends the request directly. Client-side checks are for the user’s convenience, not for security. The server is the one that has to say no."
+  ],
+  "secure-software-testing": [
+   "The team says that static analysis ‘has no findings’, so the application is safe. Static analysis reads code; it cannot see how the running system behaves, and the running system had a configuration problem. Different tests find different faults. The team schedules one that finds the rest."
+  ],
+  "secure-deployment-operations": [
+   "The team signs the release and tells the customer that the signature proves the software is free of vulnerabilities. It proves who published it and that it has not been changed. It says nothing about whether it is any good. A very nicely signed bug is still a bug."
+  ],
+  "secure-supply-chain": [
+   "When the library flaw is announced, a manager says the bill of materials shows the library, so ‘we must be vulnerable’. The bill lists components; it does not say whether the vulnerable part is used. Statements from the product teams show two of four are not affected. A list is not a verdict."
+  ]
+ },
+ "review": {
+  "secure-software-concepts": {
+   "problem": "Software is built without shared security principles.",
+   "cause": "Core properties and design principles are confused.",
+   "solution": "The security properties, classic design principles and risk ideas give a common basis.",
+   "next": "Next, building security into the lifecycle."
+  },
+  "secure-lifecycle-management": {
+   "problem": "Security is a separate event at the end.",
+   "cause": "Process, maturity and governance are not built in.",
+   "solution": "Secure SDLC models, maturity frameworks and DevSecOps put security into every stage.",
+   "next": "Next, requirements."
+  },
+  "secure-software-requirements": {
+   "problem": "Security needs are vague and nobody checks them.",
+   "cause": "Classification and compliance are not captured as requirements.",
+   "solution": "Classification, abuse cases, privacy and traceable requirements make needs testable.",
+   "next": "Next, secure architecture and design."
+  },
+  "secure-architecture-design": {
+   "problem": "Designs contain flaws that are expensive to fix later.",
+   "cause": "Threats are not modelled before building.",
+   "solution": "Threat modelling, trust boundaries and secure patterns find flaws at design time.",
+   "next": "Next, secure implementation."
+  },
+  "secure-implementation": {
+   "problem": "Code contains common flaws.",
+   "cause": "Validation, output handling and secrets are mishandled.",
+   "solution": "Allow-list validation, parameterised queries, encoding and careful secrets and crypto fix the flaws.",
+   "next": "Next, testing."
+  },
+  "secure-software-testing": {
+   "problem": "Flaws reach release.",
+   "cause": "Tests are chosen without knowing what each finds.",
+   "solution": "SAST, DAST, IAST, fuzzing and penetration testing, with release criteria, find and decide.",
+   "next": "Next, deployment and operations."
+  },
+  "secure-deployment-operations": {
+   "problem": "Releases and live systems become vulnerable.",
+   "cause": "Pipelines, configurations and patches are unmanaged.",
+   "solution": "Release, configuration, pipeline and patch management and incident handling keep it safe.",
+   "next": "Next, the supply chain."
+  },
+  "secure-supply-chain": {
+   "problem": "Components you did not write bring risk.",
+   "cause": "Dependencies and suppliers are not tracked.",
+   "solution": "SBOMs, VEX, SCA, provenance and supplier assurance manage third-party risk.",
+   "next": "That completes the lessons. Next come the cheat sheet, the word bank and the practice questions."
+  }
+ }
 }

@@ -32,5 +32,81 @@
  },
  "epilogue": [
   "After a year, Helen can follow any system through the framework from start to finish. She sits the exam thinking of the system she has just kept authorised, and the questions are the same ones she has been asking at every step: what is in scope, what is the risk, who decides, and what is the evidence?"
- ]
+ ],
+ "bad": {
+  "governance-risk-program": [
+   "Helen’s colleague says that the ISSO accepted the risk on the system. The ISSO, who was in the room, looks at the floor. Only the authorizing official may accept risk. The ISSO, however clever, however friendly, and however well they know the system, can only advise. A signature from the wrong person is a very expensive piece of paper."
+  ],
+  "frameworks-regulations": [
+   "A small contractor tells Helen that PCI DSS is ‘the law’ and that the lawyers will handle it. It is a contractual industry standard, not a statute. Meanwhile, the real laws are over there. The contractor’s lawyer, summoned, spends the afternoon sorting the pile."
+  ],
+  "scope-categorization": [
+   "A team averages the impact ratings for the portal and records it as ‘Low-Moderate’. There is no such category. The system takes the highest value across confidentiality, integrity and availability. The portal, with its student financial aid data, is Moderate, and has been the whole time."
+  ],
+  "select-tailor": [
+   "The forty teams all ‘scope out’ a control they cannot meet. Scoping removes a control that does not apply. If it applies and cannot be met as written, you need a compensating control. They had simply deleted a requirement because it was inconvenient. The assessor’s expression could have curdled milk."
+  ],
+  "implement-controls": [
+   "The plan lists three copies of the same firewall as ‘defence in depth’. Three of the same thing is redundancy, not depth. Depth means different layers. Helen suggests a firewall, a host control and monitoring. The three firewalls remain, as an interesting monument to enthusiasm."
+  ],
+  "assess-controls": [
+   "The internal assessor, who reports to the system owner, writes up the finding and, on the owner’s request, takes it out again. The finding was real. The assessment now has all the independence of a restaurant review written by the chef. Helen reinstates it and asks for a different assessor."
+  ],
+  "authorize-system": [
+   "The project manager says that the authorisation means the system is ‘certified secure’. It means that the authorizing official has accepted the remaining risk. A system with a weakness and a plan can be authorised; a system with a high weakness and no plan can be denied. A denial is a normal outcome, not a disaster."
+  ],
+  "maintain-compliance": [
+   "The system owner makes the change to the hosting platform first and asks for the impact analysis afterwards. The analysis is meant to come before the change. Doing it afterwards is like checking the weather forecast from the middle of the storm. It is accurate, and it is no help."
+  ]
+ },
+ "review": {
+  "governance-risk-program": {
+   "problem": "Each unit makes its own risk judgments, and nobody is clearly accountable.",
+   "cause": "No common strategy or roles.",
+   "solution": "Governance, the risk management strategy, defined roles and the RMF give one process.",
+   "next": "Next, which rules apply."
+  },
+  "frameworks-regulations": {
+   "problem": "Requirements from law, contract and choice are mixed up.",
+   "cause": "Frameworks and regulations overlap and differ in force.",
+   "solution": "Sorting legal, contractual and voluntary requirements and knowing the key ones clarifies what applies.",
+   "next": "Next, defining the system and its impact."
+  },
+  "scope-categorization": {
+   "problem": "Nobody agrees what is in the system or how important it is.",
+   "cause": "Boundaries and impact levels were not defined.",
+   "solution": "The authorization boundary, information types and FIPS 199 categorisation define scope and importance.",
+   "next": "Next, selecting and tailoring controls."
+  },
+  "select-tailor": {
+   "problem": "Each team picks controls differently.",
+   "cause": "No common baselines, tailoring rules or inheritance.",
+   "solution": "Baselines, tailoring, overlays and common controls make selection consistent.",
+   "next": "Next, implementing and documenting."
+  },
+  "implement-controls": {
+   "problem": "Controls are planned but not working or recorded.",
+   "cause": "Responsibilities are unclear and documentation conflicts.",
+   "solution": "Implementation statements, the security plan, ownership and evidence make controls real and provable.",
+   "next": "Next, assessment."
+  },
+  "assess-controls": {
+   "problem": "Nobody knows whether controls work.",
+   "cause": "Assessments lack independence and plan.",
+   "solution": "Assessment plans, methods, independence, reports and POA&Ms test and track.",
+   "next": "Next, the authorisation decision."
+  },
+  "authorize-system": {
+   "problem": "A system needs a decision on whether to operate.",
+   "cause": "Risk is not clearly accepted by the right person.",
+   "solution": "The authorisation package and the authorizing official’s risk-based decision give a clear outcome.",
+   "next": "Next, keeping it authorised."
+  },
+  "maintain-compliance": {
+   "problem": "Systems change and risk drifts.",
+   "cause": "Changes are made without analysis and monitoring is irregular.",
+   "solution": "Continuous monitoring, impact analysis, reporting and disposal keep the authorisation valid.",
+   "next": "That completes the lessons. Next come the cheat sheet, the word bank and the practice questions."
+  }
+ }
 }

@@ -29,5 +29,72 @@
  },
  "epilogue": [
   "Jordan’s manager has stopped sending lists. The hospital’s Azure estate is tidy, costs are predictable, and the next incident will be handled by alerts and backups. On exam day Jordan sees question after question that matches a situation from the past few months and realises the syllabus was the job description all along."
- ]
+ ],
+ "bad": {
+  "identities-access": [
+   "Jordan, in a hurry, adds each new radiology starter to a group by hand and attaches the licence to the individual instead of the group. Three starters later, one is missed, and spends a morning staring at a login that works but opens nothing. Jordan, humbled, builds the dynamic group the next day."
+  ],
+  "governance-cost": [
+   "Jordan gives Sam ‘Contributor’ on the resource group and says Sam can add the team. Sam cannot. Contributor can manage resources but not who may access them. After a short email exchange that begins ‘Hi, quick question’, Jordan assigns Owner on that one group, and nothing else."
+  ],
+  "storage-management": [
+   "To get the marketing contractor started quickly, Jordan emails the storage account key. The contractor, a lovely person, saves it in a document called ‘passwords.docx’. The key does not expire. Jordan spends the following weekend rotating it and learning why scoped, time-limited access signatures exist."
+  ],
+  "vms-compute": [
+   "Jordan puts the database on a cheap burstable VM because the price looks great. It runs perfectly for a week, then slows to a crawl under steady load, the way a sprinter slows after the first lap of a marathon. Jordan upgrades to a proper size and apologises to the radiologists."
+  ],
+  "app-hosting-iac": [
+   "The first portal update goes straight to production on a Friday afternoon, ‘because the testing looked fine’. It does not look fine at 4:45 p.m. Jordan swaps in the old version by hand, takes a long weekend off and writes a note to self: staging slot."
+  ],
+  "az104-networking": [
+   "Jordan adds a deny rule with priority 300 and an allow rule with priority 200, expecting the block to work. It does not. The lower number is evaluated first, the allow matches, and the suspicious range walks right in. Jordan fixes the numbers and promises never to trust the order they were typed in."
+  ],
+  "monitoring-recovery": [
+   "Jordan sets up backup but never tests a restore. When the corrupted database needs one, the restore works but takes longer than the clinic’s patience. Meanwhile, no alert existed for the original failure, so it was discovered by an annoyed nurse rather than a graph."
+  ]
+ },
+ "review": {
+  "identities-access": {
+   "problem": "People join, leave and move, and keeping their access right by hand does not scale.",
+   "cause": "Manual group membership and licensing depend on someone remembering to do it.",
+   "solution": "Dynamic groups, group-based licensing, guest access and self-service password reset keep identity current automatically.",
+   "next": "Next, who can do what, and what it all costs."
+  },
+  "governance-cost": {
+   "problem": "Someone has too much access, nobody knows what resources cost, and rules are not applied.",
+   "cause": "Permissions and spending are scattered across scopes, with no consistent policy.",
+   "solution": "Role assignments at the right scope, policies and initiatives, and budgets bring access, compliance and cost under control.",
+   "next": "Next, how to hand out access to data safely."
+  },
+  "storage-management": {
+   "problem": "Data must be shared and protected, and a leaked key can expose it all.",
+   "cause": "Account keys grant everything, and storage is open to the network by default in many setups.",
+   "solution": "Scoped, time-limited signatures, storage firewalls, lifecycle rules and versioning limit access and protect against loss.",
+   "next": "Next, the virtual machines that run the workloads."
+  },
+  "vms-compute": {
+   "problem": "Workloads are slow or expensive because the VM size and disk do not fit them.",
+   "cause": "Sizes, disks and availability options are chosen by habit, not by the job’s needs.",
+   "solution": "Matching series, disks and availability to the workload, and knowing what resizing involves, fixes both cost and performance.",
+   "next": "Next, hosting applications and deploying them repeatably."
+  },
+  "app-hosting-iac": {
+   "problem": "Updates are risky and environments are built differently every time.",
+   "cause": "Deployments go straight to live and are built by hand.",
+   "solution": "Staging slots, the right hosting choices and templates make releases safe and repeatable.",
+   "next": "Next, controlling traffic between all these pieces."
+  },
+  "az104-networking": {
+   "problem": "Traffic goes where it should not, or cannot reach where it should.",
+   "cause": "Rules are evaluated in an order people do not expect, and peering and load balancing have limits.",
+   "solution": "Priority-based rules, peering, load balancing and secure access to machines give controlled, reliable connectivity.",
+   "next": "Next, knowing when things go wrong and recovering from it."
+  },
+  "monitoring-recovery": {
+   "problem": "Failures are discovered late and recovery is untested.",
+   "cause": "Nobody is watching the right data, and backups are assumed to work.",
+   "solution": "Metrics, logs, alerts and action groups provide early warning, and backup and site recovery cover different kinds of loss.",
+   "next": "That completes the lessons. Next come the cheat sheet, the word bank and the practice questions."
+  }
+ }
 }

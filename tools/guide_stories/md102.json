@@ -23,5 +23,54 @@
  },
  "epilogue": [
   "By the end of the year Daniel’s fleet builds itself, stays patched, and tells him when something is wrong. On exam day he treats each question as an everyday decision: which tool, for which devices, with which settings, for which people."
- ]
+ ],
+ "bad": {
+  "device-provisioning-updates": [
+   "Daniel assigns a user-driven profile to the warehouse kiosks. The first kiosk arrives and waits for someone to sign in. Nobody is going to sign in; it is a kiosk. It sits at a login screen, glowing, like a very patient lighthouse. A self-deploying profile was what the job required."
+  ],
+  "prepare-identity-infrastructure": [
+   "Daniel creates a dynamic group for new laptops and targets a critical setup with it. The group takes a few minutes to catch up, and the first batch of laptops sets up without the settings. He learns that things that need to apply the moment a device is provisioned should not rely on something that updates a little later."
+  ],
+  "protect-devices-and-access": [
+   "Daniel marks devices noncompliant immediately, with no grace period. The first morning, forty people are locked out for a missing update. The help desk phone sounds like a smoke alarm. A five-day grace window is the polite version of the same policy, and the one he deploys the next week."
+  ],
+  "manage-secure-applications": [
+   "Daniel packages a Win32 app and leaves out the detection rule, ‘to save time’. Intune cannot tell whether the app is installed, so it keeps trying. And trying. The app is installed on every laptop eleven times, which is ten more than anyone wanted."
+  ],
+  "optimize-endpoint-operations": [
+   "A colleague sees a lost personal phone and presses ‘Wipe’. The phone, which also held the owner’s wedding photos, is now very clean. The correct action for a personal device was to retire it, removing the company data and nothing else. The colleague apologises, in person, with a coffee."
+  ]
+ },
+ "review": {
+  "device-provisioning-updates": {
+   "problem": "Setting up and updating devices by hand takes too long and is inconsistent.",
+   "cause": "Each device is built individually, and updates reach everyone at once.",
+   "solution": "Autopilot, Windows 365, update rings and Autopatch automate setup and stage updates.",
+   "next": "Next, preparing the identity and infrastructure behind devices."
+  },
+  "prepare-identity-infrastructure": {
+   "problem": "Devices enrol incorrectly or are managed by the wrong people.",
+   "cause": "Directory, licensing and group settings were not prepared first.",
+   "solution": "MDM authority, enrolment limits, join types, groups and scope tags set the foundation.",
+   "next": "Next, protecting devices and gating access."
+  },
+  "protect-devices-and-access": {
+   "problem": "Unsafe devices reach company data.",
+   "cause": "Nothing checks the device’s health before granting access.",
+   "solution": "Compliance policies, Conditional Access, Defender risk, baselines and encryption combine into access decisions.",
+   "next": "Next, managing and securing applications."
+  },
+  "manage-secure-applications": {
+   "problem": "Apps are installed inconsistently and company data leaks on personal devices.",
+   "cause": "Apps are managed by hand and device and data protection are mixed up.",
+   "solution": "Deployment intents, app protection, configuration policies, certificates and remote help manage and protect apps.",
+   "next": "Next, automating and optimising operations."
+  },
+  "optimize-endpoint-operations": {
+   "problem": "Problems are fixed one ticket at a time, and the fleet’s health is unknown.",
+   "cause": "Support is reactive, and repetitive tasks are manual.",
+   "solution": "Graph automation, remediation scripts, analytics, alerts and the right actions on lost devices make operations proactive.",
+   "next": "That completes the lessons. Next come the cheat sheet, the word bank and the practice questions."
+  }
+ }
 }

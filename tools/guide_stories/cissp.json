@@ -62,5 +62,171 @@
  },
  "epilogue": [
   "On the morning of the exam Naomi is calmer than she expected. She has been answering these questions all year in meetings, from the board down to the server room. The exam asks for the judgement of a manager, not a technician, and she has been practising exactly that."
- ]
+ ],
+ "bad": {
+  "security-governance-ethics-legal": [
+   "After the breach, Naomi’s first instinct is to buy a new firewall. The board is not asking about firewalls; it is asking who was responsible for fixing a known weakness and why nobody did. Governance questions rarely have technical answers. The firewall arrives in a very handsome box and answers nothing."
+  ],
+  "risk-management-threat-modeling": [
+   "A manager buys cyber insurance and declares the risk ‘gone’. Naomi points out that insurance transfers part of the cost, not the responsibility, and that some risk always remains. Only management can formally accept what is left. The manager looks at the policy and the policy, being a document, says nothing."
+  ],
+  "continuity-personnel-security": [
+   "Naomi’s recovery plan promises the claims platform back in twelve hours. Nobody asked the business owners what an hour of downtime costs. The numbers, when finally supplied, make the twelve-hour plan look like a leisurely stroll. The impact analysis should have come first, and it should have come from the people who feel the pain."
+  ],
+  "asset-classification-data-lifecycle": [
+   "A custodian quietly decides which data is confidential, because ‘someone has to’. The owner, finding out, is displeased. Classification is the owner’s job; the custodian protects what the owner decides. Meanwhile, the old drives were degaussed, which works on magnetic media and does precisely nothing for solid-state ones."
+  ],
+  "security-models-design-principles": [
+   "A designer applies the model that protects confidentiality to a system whose real goal is integrity, and the whole design points the wrong way. Bell-LaPadula and Biba are mirror images. The designer is gently asked what the system is for, which is the question that should come before the diagram."
+  ],
+  "system-architectures-vulnerabilities": [
+   "The team enables address randomisation and memory protections on the old server and declares the bug ‘fixed’. The bug remains; it is just harder to exploit. A harder door to open is not a wall. The function with administrator rights to everything, meanwhile, waits patiently in the cloud, like a spare key under the mat."
+  ],
+  "site-facility-environment": [
+   "The facilities manager installs a carbon dioxide fire system in the occupied server room, with no alarm and no delay. It is brilliant at putting out fires and rather less brilliant at keeping the technicians alive. Naomi suggests a clean agent, an alarm and a delay, in that order, and a conversation with the safety officer."
+  ],
+  "cryptography-pki": [
+   "A developer uses a hash to ‘authenticate’ messages. Anyone who can change the message can recompute the hash. A hash shows that something is unchanged, not who made it. A keyed signature does that. The developer’s messages, until then, were as authentic as a handwritten note saying ‘trust me’."
+  ],
+  "network-architecture-segmentation": [
+   "An engineer separates the servers into VLANs and declares the network ‘segmented’ and ‘secure’. A VLAN is a way to separate traffic, not a security boundary, and the routing between VLANs let everything through. The attacker, who had only been interested in a small tour, took the long one."
+  ],
+  "secure-communications-wireless": [
+   "The firm rolls out ‘encrypted’ open Wi-Fi and tells staff they are safe. The traffic is encrypted, but the access point is not authenticated, so staff can connect to a clever fake with the same name. Encryption without knowing who you are talking to is a secret whispered to a stranger."
+  ],
+  "network-transport-edge-operations": [
+   "Someone says the carrier’s private circuit is ‘secure because it is private’. Private is not encrypted. The carrier’s staff, and anyone who taps the line, can see the traffic. The branch manager, who thought ‘private’ meant ‘sealed’, goes pale at the word ‘plaintext’."
+  ],
+  "iam-authentication-access-models": [
+   "The bank introduces ‘multi-factor’ sign-in using a password and a memorable answer. The auditor, a calm person with an unhurried pen, notes that both are knowledge factors. One kind of factor, twice, is still one kind. The auditor writes ‘finding’ and underlines it twice, which is, one supposes, two underlines of the same kind."
+  ],
+  "iam-federation-lifecycle-pam": [
+   "After single sign-on goes live, someone relaxes the MFA requirement because ‘there’s only one login now’. Single sign-on makes one login very valuable and very tempting. Strong MFA matters more, not less. Meanwhile, a contractor’s account from 2019 is still happily active."
+  ],
+  "assessment-testing-audit": [
+   "A manager commissions a vulnerability scan and tells the board that Halden has been ‘penetration tested’. A scan finds weaknesses; a penetration test tries to use them, with written permission. The two are different jobs with different reports. The board, to its credit, asks a good follow-up question, which is not what the manager hoped for."
+  ],
+  "ops-monitoring-incident-forensics": [
+   "A responder rebuilds the compromised workstation immediately, in the interest of a quick recovery. The memory, the logs and the evidence go with it. Contain first, preserve, then rebuild. The workstation is delightfully clean and utterly mute."
+  ],
+  "ops-resilience-change-physical": [
+   "The team installs mirrored disks and tells the board that ransomware is no longer a concern. Ransomware encrypts both disks happily; mirroring faithfully copies the damage. RAID protects against a failed disk, not a bad day. Naomi holds up a photocopier and says that it is also very good at duplicating mistakes."
+  ],
+  "sdlc-secure-development": [
+   "The security review is scheduled for the week before launch. It finds forty issues, three of them serious. The launch is delayed, the developers are cross, and everyone agrees that this was foreseeable. Security checks belong early, when changes are cheap, and not at the end, when everything is expensive and awkward."
+  ],
+  "software-ecosystem-acquired-software": [
+   "A developer hides the admin button in the mobile app and calls it ‘access control’. Anyone who can call the API directly can still reach the function. Client-side hiding is a curtain, not a door. The reviewer opens the curtain, finds the function behind it and wonders where to put the lock."
+  ]
+ },
+ "review": {
+  "security-governance-ethics-legal": {
+   "problem": "Security decisions are technical when they should be accountable and lawful.",
+   "cause": "Governance, ethics and legal duties are treated as someone else’s concern.",
+   "solution": "Governance structures, due care and diligence, the code of ethics and privacy law give direction and accountability.",
+   "next": "Next, measuring and managing risk."
+  },
+  "risk-management-threat-modeling": {
+   "problem": "Money is spent on controls without knowing what they are worth.",
+   "cause": "Risk is not measured and responsibility is confused with cost transfer.",
+   "solution": "Quantitative and qualitative risk analysis, treatment options, threat modelling and supply chain review support choices.",
+   "next": "Next, keeping the business running."
+  },
+  "continuity-personnel-security": {
+   "problem": "Disruption stops the business and people are part of the risk.",
+   "cause": "Recovery targets and impact are guessed.",
+   "solution": "The business impact analysis, recovery objectives, sites, testing and personnel controls give a plan.",
+   "next": "Next, classifying and handling data."
+  },
+  "asset-classification-data-lifecycle": {
+   "problem": "Data is not classified or protected through its life.",
+   "cause": "Owners and custodians are confused and disposal is careless.",
+   "solution": "Classification, ownership, lifecycle controls, privacy techniques and correct sanitisation protect data to the end.",
+   "next": "Next, the models and principles behind secure design."
+  },
+  "security-models-design-principles": {
+   "problem": "Systems are designed without a clear security rationale.",
+   "cause": "Models and principles are mixed up.",
+   "solution": "Formal models, design principles, trust in hardware and physical security give a foundation.",
+   "next": "Next, architectures and their weaknesses."
+  },
+  "system-architectures-vulnerabilities": {
+   "problem": "Each architecture has its own weak spots.",
+   "cause": "Protections are assumed to remove bugs and ownership is unclear.",
+   "solution": "Hardware and software capabilities and the typical weaknesses of each architecture type show where to look.",
+   "next": "Next, site and facility security."
+  },
+  "site-facility-environment": {
+   "problem": "Physical sites are exposed to intruders and environmental hazards.",
+   "cause": "Location, fire, power and cooling are afterthoughts.",
+   "solution": "Layered site design, environmental controls, fire suppression and power protection secure the site.",
+   "next": "Next, cryptography."
+  },
+  "cryptography-pki": {
+   "problem": "Data must be protected and its origin proven.",
+   "cause": "Algorithms and keys are mixed up and badly managed.",
+   "solution": "Encryption, hashing, signatures, certificates and key management protect and prove.",
+   "next": "Next, network architecture."
+  },
+  "network-architecture-segmentation": {
+   "problem": "Attackers move freely once inside.",
+   "cause": "Networks are flat and rely on the perimeter.",
+   "solution": "Layered models, segmentation, screened subnets and perimeter defences contain attackers.",
+   "next": "Next, secure communications."
+  },
+  "secure-communications-wireless": {
+   "problem": "Data in motion is exposed.",
+   "cause": "Weak protocols and shared secrets persist.",
+   "solution": "TLS, IPsec, VPNs, central authentication and modern wireless protect communications.",
+   "next": "Next, transport, edge and operations."
+  },
+  "network-transport-edge-operations": {
+   "problem": "Networks perform poorly and carry hidden risk.",
+   "cause": "Transport, edge and third-party links are assumed safe.",
+   "solution": "Plane separation, performance measures, SDN, cloud networks and monitoring cover them.",
+   "next": "Next, identity and access models."
+  },
+  "iam-authentication-access-models": {
+   "problem": "Identity checks are weak.",
+   "cause": "Factors are miscounted and models misapplied.",
+   "solution": "Factors, biometrics, Kerberos and access control models give strong authentication and authorisation.",
+   "next": "Next, federation and privileged access."
+  },
+  "iam-federation-lifecycle-pam": {
+   "problem": "Identity sprawl, orphaned accounts and powerful access.",
+   "cause": "Many directories and no lifecycle control.",
+   "solution": "Federation, SSO, joiner-mover-leaver, reviews and privileged access management bring control.",
+   "next": "Next, assessment and audit."
+  },
+  "assessment-testing-audit": {
+   "problem": "Nobody knows whether the controls work.",
+   "cause": "Testing is confused with auditing and scores with risk.",
+   "solution": "Assessments, audits, scans, penetration tests and metrics provide evidence.",
+   "next": "Next, operations: monitoring, incidents and forensics."
+  },
+  "ops-monitoring-incident-forensics": {
+   "problem": "Attacks go undetected and evidence is destroyed.",
+   "cause": "Weak logging and hasty responses.",
+   "solution": "Logging, SIEM, the incident lifecycle and forensic handling detect and preserve.",
+   "next": "Next, resilience, change and physical operations."
+  },
+  "ops-resilience-change-physical": {
+   "problem": "Failures and changes cause outages.",
+   "cause": "Recovery targets are loose and changes are uncontrolled.",
+   "solution": "Objectives, backups, alternate sites, testing and change management keep operations resilient.",
+   "next": "Next, secure software development."
+  },
+  "sdlc-secure-development": {
+   "problem": "Flaws are found late and are expensive.",
+   "cause": "Security is added at the end.",
+   "solution": "Shifting security left, secure coding and testing, and sensible controls reduce flaws.",
+   "next": "Next, the wider software ecosystem."
+  },
+  "software-ecosystem-acquired-software": {
+   "problem": "Third-party code and tooling add risk.",
+   "cause": "Components and services are trusted without checking.",
+   "solution": "API, build and supply chain security, and assessment of acquired software manage the risk.",
+   "next": "That completes the lessons. Next come the cheat sheet, the word bank and the practice questions."
+  }
+ }
 }

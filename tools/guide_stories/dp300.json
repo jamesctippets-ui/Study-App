@@ -23,5 +23,54 @@
  },
  "epilogue": [
   "The night before the exam Marcus checks the Ledgerly dashboards one last time. Everything is green. He realises his job has changed from keeping servers alive to designing how they stay alive. On exam day he treats each scenario like a ticket from a real customer, and works through it the way he has all year."
- ]
+ ],
+ "bad": {
+  "platform-resource-planning": [
+   "Marcus picks Azure SQL Database for the old accounting system because it is ‘the simplest’. Then he remembers that the system relies on SQL Server Agent jobs and queries across databases. Neither exists there. He spends a Tuesday afternoon staring at a migration plan the way a man stares at a sandwich he has just discovered contains olives."
+  ],
+  "security-and-data-protection": [
+   "Marcus proudly tells the healthcare customer that the data is ‘fully protected by encryption’. The customer asks whether a DBA could still read the diagnosis column. Marcus says, after a long silence, that a DBA could. Encryption at rest does not hide data from someone querying the engine. It is a very good lock on a door that the janitor can walk through."
+  ],
+  "monitoring-and-diagnostics": [
+   "After the slowdown, Marcus spends two hours trying to connect his beloved old profiler to the cloud database. It refuses, politely and permanently. A colleague points him at the supported tracing tool. Marcus mutters that nobody told him, and the colleague gently points at the documentation, which has been open in a tab since Monday."
+  ],
+  "query-performance-and-automation": [
+   "To fix the odd stored procedure, Marcus adds a hint that recompiles the plan on every call. The query is now correct every time and slower every time, since it runs thousands of times a minute. It is like re-learning to ride a bike before each pedal stroke. Marcus quietly removes the hint."
+  ],
+  "high-availability-and-disaster-recovery": [
+   "Marcus switches on zone redundancy and tells the customer they are ‘covered against any disaster’. A week later the whole region has a bad day, and the zones, being in the same region, share it. The customer is gracious. Marcus drafts a new design with a failover group and a very different email."
+  ]
+ },
+ "review": {
+  "platform-resource-planning": {
+   "problem": "Ledgerly needs to run hundreds of databases in Azure without overspending or losing features.",
+   "cause": "The platform choices differ in features, management and billing, and sizing each database for its own peak is wasteful.",
+   "solution": "The chapter compares the three hosting options, the purchasing models, pooling and the serverless tier.",
+   "next": "Next, securing what is now in the cloud."
+  },
+  "security-and-data-protection": {
+   "problem": "Sensitive data is exposed to people who should not see it, even administrators.",
+   "cause": "Protection at rest, network rules and permissions each cover only part of the picture.",
+   "solution": "Firewall rules, Entra authentication, TDE, Always Encrypted, masking, row-level security and auditing form layers.",
+   "next": "Next, watching performance and diagnosing problems."
+  },
+  "monitoring-and-diagnostics": {
+   "problem": "Something gets slow, and nobody knows why or when it began.",
+   "cause": "Tools from the old world do not work on the managed service, and numbers mean different things after scaling.",
+   "solution": "Query Store, Extended Events, resource DMVs, Intelligent Insights and Azure Monitor alerts show what changed and tell you early.",
+   "next": "Next, fixing slow queries and automating routine work."
+  },
+  "query-performance-and-automation": {
+   "problem": "Queries run fine until suddenly they do not, and routine tasks eat the DBA’s time.",
+   "cause": "Cached plans suit common values and fail on unusual ones, and the scheduler from the old world is not there.",
+   "solution": "Plan analysis, automatic tuning, targeted fixes and PaaS schedulers address both.",
+   "next": "Next, keeping the data available when things fail."
+  },
+  "high-availability-and-disaster-recovery": {
+   "problem": "Failures, from a server to a whole region, interrupt service and lose data.",
+   "cause": "Different protections cover different failures, and not every design covers every one.",
+   "solution": "Built-in availability, zone redundancy, failover groups, geo-replication, availability groups and backups each match a failure scope and recovery target.",
+   "next": "That completes the lessons. Next come the cheat sheet, the word bank and the practice questions."
+  }
+ }
 }

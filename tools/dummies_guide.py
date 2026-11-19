@@ -28,8 +28,10 @@ CrossPoint, and any other EPUB reader):
   * A real table of contents (EPUB 3 nav plus the EPUB 2 NCX older readers use), two levels deep.
   * Questions that need a picture (the `image` field) are left out, and the count is reported.
 
-Stories: tools/guide_stories/<track>.json holds {"hero", "who", "intro": [...], "beats": {lessonId: [...]},
-"epilogue": [...]}; a track without a file simply has no story.
+Stories: tools/guide_stories/<track>.json holds {"hero", "intro": [...], "beats": {lessonId: [...]},
+"bad": {lessonId: [...]}, "review": {lessonId: {problem, cause, solution, next}}, "epilogue": [...]}.
+A track without a file simply has no story, no "What not to do" and no "Chapter in review"; a track with a file must
+have all of them for every lesson.
 
 Usage (run `python3 build.py` first so dist/data is fresh):
 
@@ -585,6 +587,10 @@ def lesson_chapter(n, lesson, cards, questions, extra=None, story=None):
     if beat:
         b.append(f"<h2>{esc(first_name(story))}'s story</h2>")
         b.append("\n".join(paras(p) for p in beat))
+        bad = (story or {}).get("bad", {}).get(lesson["id"])
+        if bad:
+            b.append("<h3>What not to do</h3>")
+            b.append("\n".join(paras(p) for p in bad))
     if lesson.get("fundamentals"):
         b.append("<h2>The everyday picture</h2>")
         b.append(paras(lesson["fundamentals"], chunk=True))
@@ -610,6 +616,13 @@ def lesson_chapter(n, lesson, cards, questions, extra=None, story=None):
         b.append(paras(lesson["onTheJob"], chunk=True))
     quiz = [questions[i] for i in lesson.get("quizIds", []) if i in questions and not questions[i].get("image")]
     b.append(quiz_section(quiz))
+    rev = (story or {}).get("review", {}).get(lesson["id"])
+    if rev:
+        b.append("<h2>Chapter in review</h2>")
+        b.append(f"<p><b>The problem.</b> {esc(rev['problem'])}</p>")
+        b.append(f"<p><b>What causes it.</b> {esc(rev['cause'])}</p>")
+        b.append(f"<p><b>How this chapter solves it.</b> {esc(rev['solution'])}</p>")
+        b.append(f"<p><b>What comes next.</b> {esc(rev['next'])}</p>")
     return "\n".join(b)
 
 
@@ -655,6 +668,10 @@ def build_track(track, tracks_cfg, out_dir, quiet=False):
         missing = [l["id"] for l in data["lessons"] if l["id"] not in story.get("beats", {})]
         if missing:
             sys.exit(f"{key}: story has no beat for lessons {missing}")
+        for field in ("bad", "review"):
+            absent = [l["id"] for l in data["lessons"] if l["id"] not in story.get(field, {})]
+            if absent:
+                sys.exit(f"{key}: story has no '{field}' entry for lessons {absent}")
     extras = assign_examples(data, cards, all_q)
     book.add("Start here", start_here(track, cfg, data, counts, story))
 

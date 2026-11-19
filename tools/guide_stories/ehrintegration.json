@@ -26,5 +26,63 @@
  },
  "epilogue": [
   "Samira’s interfaces still break occasionally, but she now knows which end to look at first, what each message proves, and who to call. The next time a clinician is waiting, she has an answer."
- ]
+ ],
+ "bad": {
+  "hl7v2-message-anatomy": [
+   "A new analyst assumes a message arriving over MLLP must be an admission because ‘it came through the live feed’. MLLP is only the wrapper; the message type is inside. The analyst has just described a parcel by the postal van that delivered it. The parcel, when opened, is a lab result."
+  ],
+  "hl7v2-message-types-acks": [
+   "An interface analyst sees an AA acknowledgment and closes the ticket with ‘delivered successfully’. The pharmacy still has no order. AA means the receiver accepted the message, not that the order was processed. The pharmacy, meanwhile, has a very nice record of an order it has not acted on."
+  ],
+  "fhir-resource-model": [
+   "A developer sends a batch bundle of five updates, one fails, and four are saved. The developer expected all-or-nothing and now has a patient with half an update. A transaction bundle behaves that way; a batch does not. The patient’s record looks like a sentence that stops halfway."
+  ],
+  "smart-on-fhir-and-interop-rules": [
+   "A startup assumes that because its app launched from inside the EHR it can read everything about the patient. Launch type decides how the app is authorised; scopes decide what it may read. The app asks for one thing and is allowed that one thing, which is exactly what scopes are for."
+  ],
+  "integration-engines-architecture-and-operations": [
+   "The queue grows and someone restarts the integration engine ‘to clear it’. The queue is full because the downstream system is slow, not because the engine is broken. The restart clears nothing and loses a few minutes. Meanwhile the dead-letter queue, which nobody reads, has quietly collected a month’s failures."
+  ],
+  "healthcare-data-governance": [
+   "A coordinator sends a substance-use treatment record under the general treatment consent. These records need their own, stricter consent. Compliance gets involved. A form that is perfectly acceptable for one kind of record is nowhere near enough for another, and the difference is not a technicality."
+  ]
+ },
+ "review": {
+  "hl7v2-message-anatomy": {
+   "problem": "Messages between hospital systems fail and nobody understands why.",
+   "cause": "Messages are built from segments and separators, with local variations, and the transport is separate from the content.",
+   "solution": "Segments, delimiters, versions, vendor extensions and MLLP and batch transports give a clear anatomy.",
+   "next": "Next, the main message types and what acknowledgments mean."
+  },
+  "hl7v2-message-types-acks": {
+   "problem": "An order, a result or a schedule goes missing and nobody can tell whether it arrived.",
+   "cause": "Message types differ in purpose, and acknowledgments confirm only receipt.",
+   "solution": "ADT, ORM, ORU, SIU and DFT, and the acknowledgment codes, show what was sent and what was accepted.",
+   "next": "Next, the modern standard, FHIR."
+  },
+  "fhir-resource-model": {
+   "problem": "Older formats are hard for new applications to use.",
+   "cause": "Data is locked in message formats, not in addressable pieces.",
+   "solution": "FHIR resources, references, search, bundles and the capability statement make data accessible through REST.",
+   "next": "Next, authorising apps and the rules behind them."
+  },
+  "smart-on-fhir-and-interop-rules": {
+   "problem": "Third-party apps need controlled access to health data.",
+   "cause": "Authorisation, data classes and rules are tangled together.",
+   "solution": "SMART launches and scopes, USCDI, patient access and bulk export define who can get what and how.",
+   "next": "Next, running integration engines day to day."
+  },
+  "integration-engines-architecture-and-operations": {
+   "problem": "Interfaces fail quietly and nobody notices until a clinician complains.",
+   "cause": "Failures are in queues, acknowledgments and connections, with no baseline to compare.",
+   "solution": "Engine architecture, routing, mapping, monitoring and dead-letter handling make failures visible.",
+   "next": "Next, governance and real-world practice."
+  },
+  "healthcare-data-governance": {
+   "problem": "Data is shared with the wrong patient, the wrong person or without the right consent.",
+   "cause": "Matching, consent and safeguards are inconsistent, and live changes are risky.",
+   "solution": "Patient matching, HIPAA safeguards, special consent rules, de-identification and change control protect patients and interfaces.",
+   "next": "That completes the lessons. Next come the cheat sheet, the word bank and the practice questions."
+  }
+ }
 }

@@ -50,5 +50,135 @@
  },
  "epilogue": [
   "On exam day Kai is surprised by how many of the questions look like Hartley tickets: a link that is slow, a route that is missing, a rule that blocks the wrong thing. The data room is quiet, the stores are online, and Kai reads the first scenario with a grin."
- ]
+ ],
+ "bad": {
+  "ccna-models-devices-cabling": [
+   "Kai reports that the switch is ‘routing packets’ between floors. A senior engineer takes off his glasses and cleans them very slowly. A switch forwards frames by MAC address; a router forwards packets by IP address. Kai writes ‘frame’ on a sticky note and attaches it to the monitor, where it stays for years, quietly judging."
+  ],
+  "ccna-ipv4-subnetting": [
+   "Kai counts the hosts in a /27 and says 32. Thirty-two addresses, yes, but two are reserved, so thirty are usable. Kai assigns all thirty-two. The last device is given the broadcast address and spends its entire working life receiving everyone’s mail. The network is happy. The device is confused."
+  ],
+  "ccna-ipv6-wireless-virtualization": [
+   "Kai writes an IPv6 address with the double colon in two places to make it shorter. The address is now ambiguous, and no one, including the router, can tell how many zeros each colon stands for. It is the networking equivalent of saying ‘meet me at the thing, near the other thing’."
+  ],
+  "ccna-vlans-trunking-intervlan": [
+   "Kai types ‘allowed vlan 20’ on a trunk to add VLAN 20. It does not add anything; it replaces the whole list. Every other VLAN promptly vanishes from the trunk. The floor goes quiet. The phones stop. A manager appears in the doorway with a face that says nothing and means everything. The word ‘add’ would have saved the afternoon."
+  ],
+  "ccna-stp-etherchannel-discovery": [
+   "Kai turns on PortFast on a link between two switches ‘to make it come up faster’. It does come up faster. It also forms a temporary loop, and the network starts going round in circles like a hamster on a wheel. PortFast belongs on ports facing hosts, with BPDU Guard standing nearby."
+  ],
+  "ccna-wireless-architectures-management": [
+   "Kai plugs a local-mode access point into a trunk port and a FlexConnect one into an access port, because the cable was handy. Neither works properly. The first needs an access port and the second needs a trunk. Cables, it turns out, have opinions."
+  ],
+  "ccna-automation-rest-sdn": [
+   "Kai reads a status code of 404 and tells the team that ‘the login failed’. It means the resource was not found. A login failure is 401. The team spends an hour checking passwords for a page that simply did not exist. The page, wherever it was, was blissfully unaware of the commotion."
+  ],
+  "routing-table-static-routes": [
+   "Kai sets the backup default route to administrative distance 1, the same as the main one, ‘just in case’. Now it is not a backup; it is a competitor. Traffic splits across both, and the slow link takes half the load. A floating route must have a higher number than the route it is covering for. It is a spare tyre, not a second driver."
+  ],
+  "ospfv2-single-area": [
+   "Kai types the network command with a subnet mask instead of a wildcard mask. The router accepts it without complaint and silently leaves the interface out. No neighbours form. Kai checks everything but the one line. The router, if it could speak, would say: ‘You told me to’."
+  ],
+  "first-hop-redundancy": [
+   "Kai sets the PCs’ default gateway to the real address of the first router, not the shared virtual address. When that router fails, the PCs keep calling the dead one. The redundancy sits unused, like a fire extinguisher bolted to the ceiling of a burning room. The virtual IP was the whole point."
+  ],
+  "nat-dhcp-dns-ntp": [
+   "Kai puts the ip helper-address on the server-facing interface, wondering why new devices are not getting addresses. The relay has to be on the interface where the clients’ broadcasts arrive. The clients shout into a void, the DHCP server enjoys a quiet afternoon, and Kai discovers the difference between ‘near the server’ and ‘near the clients’."
+  ],
+  "snmp-syslog-qos-management": [
+   "Kai chooses SNMPv2c because the community string ‘looks like a password’. It travels in clear text for anyone to read. A colleague with a packet capture reads it aloud over lunch. The word is ‘public’. It is not a secret; it is a flag with a name on it."
+  ],
+  "security-concepts-aaa-vpn": [
+   "Kai enables service password-encryption and announces that the router’s passwords are ‘properly encrypted’. They are not; the type 7 encoding can be reversed by any website. Enable secret was the thing to use. The website, for what it is worth, was very helpful."
+  ],
+  "acls-layer2-wireless-security": [
+   "Kai writes an ACL with a general permit on line one and a specific deny on line two. The deny is never reached. Line one catches everything first, like a bouncer who waves everyone in before checking the list. Specific rules go first. Kai reorders the lines and promises the bouncer a coffee."
+  ]
+ },
+ "review": {
+  "ccna-models-devices-cabling": {
+   "problem": "A network fault could be anywhere, and the vocabulary for describing it is muddled.",
+   "cause": "Layers, devices and data units are mixed up, and physical faults are blamed on the wrong things.",
+   "solution": "The layered models, units at each layer, device roles, cabling and TCP versus UDP give a map, and working from the bottom up finds faults.",
+   "next": "Next, addressing and subnetting."
+  },
+  "ccna-ipv4-subnetting": {
+   "problem": "Addresses are wasted or overlap, and the arithmetic goes wrong.",
+   "cause": "Masks, host counts and the order of allocation are misunderstood.",
+   "solution": "Prefix lengths, usable hosts, VLSM largest-first and wildcard masks let you carve the space cleanly.",
+   "next": "Next, IPv6, wireless and virtualisation basics."
+  },
+  "ccna-ipv6-wireless-virtualization": {
+   "problem": "The old address space is running out and wireless and virtual networks add new needs.",
+   "cause": "IPv4 thinking is applied to IPv6 and Wi-Fi is planned without channels.",
+   "solution": "IPv6 notation and address types, SLAAC and EUI-64, channel planning and wireless security, and hypervisors and containers form the foundation.",
+   "next": "Next, VLANs and trunks."
+  },
+  "ccna-vlans-trunking-intervlan": {
+   "problem": "Everyone sits on one flat network, and splitting it breaks communication.",
+   "cause": "Traffic from different groups shares one broadcast domain, and splitting it needs trunks and routing.",
+   "solution": "VLANs, access and trunk ports, tagging, voice VLANs and inter-VLAN routing separate and reconnect.",
+   "next": "Next, loops and link bundling."
+  },
+  "ccna-stp-etherchannel-discovery": {
+   "problem": "Redundant links create loops or sit idle.",
+   "cause": "Switches forward broadcasts around loops forever, and extra cables are blocked.",
+   "solution": "Spanning tree, RSTP, EtherChannel and discovery protocols keep loops out and links in use.",
+   "next": "Next, wireless design and secure device management."
+  },
+  "ccna-wireless-architectures-management": {
+   "problem": "Wi-Fi fails when the WAN fails, and devices are managed insecurely.",
+   "cause": "Access points depend on a distant controller, and management uses clear-text protocols.",
+   "solution": "Controller architectures, AP modes, WLC ports and secure management with SSH, HTTPS and central logins fix both.",
+   "next": "Next, automation and controller-based networking."
+  },
+  "ccna-automation-rest-sdn": {
+   "problem": "Changing hundreds of devices by hand is slow and error-prone.",
+   "cause": "Configuration lives on each device individually.",
+   "solution": "Automation tools, controllers, APIs, REST and JSON let one description change many devices.",
+   "next": "Next, how routers choose paths."
+  },
+  "routing-table-static-routes": {
+   "problem": "Routers must choose between several possible paths.",
+   "cause": "Different sources offer different routes with different metrics.",
+   "solution": "Longest prefix match, administrative distance, metric and static, default and floating routes explain every choice.",
+   "next": "Next, OSPF."
+  },
+  "ospfv2-single-area": {
+   "problem": "Static routes do not scale and cannot adapt.",
+   "cause": "Routers need to learn the network and recalculate when it changes.",
+   "solution": "OSPF neighbour discovery, DR and BDR election, cost and a few configuration commands do it automatically.",
+   "next": "Next, first-hop redundancy."
+  },
+  "first-hop-redundancy": {
+   "problem": "A single default gateway is a single point of failure.",
+   "cause": "Hosts point to one router address that can fail.",
+   "solution": "HSRP, VRRP and GLBP present one virtual gateway shared between routers.",
+   "next": "Next, NAT, DHCP, DNS and NTP."
+  },
+  "nat-dhcp-dns-ntp": {
+   "problem": "Private addresses cannot reach the Internet, and clients need addresses, names and time.",
+   "cause": "There are too few public addresses and manual configuration does not scale.",
+   "solution": "NAT and PAT, DHCP with relay, DNS records and NTP provide translation, configuration, names and time.",
+   "next": "Next, monitoring and managing the network."
+  },
+  "snmp-syslog-qos-management": {
+   "problem": "Nobody knows what the network is doing, and voice and data compete.",
+   "cause": "Devices are not monitored centrally and all traffic is treated equally.",
+   "solution": "SNMP, syslog, QoS, SSH and file transfer monitor, prioritise and manage safely.",
+   "next": "Next, security concepts."
+  },
+  "security-concepts-aaa-vpn": {
+   "problem": "Devices and links are attacked.",
+   "cause": "Default settings, weak passwords and open links invite attack.",
+   "solution": "Threat concepts, device hardening, AAA and VPNs protect access and traffic.",
+   "next": "Next, ACLs, Layer 2 security and wireless security."
+  },
+  "acls-layer2-wireless-security": {
+   "problem": "Unwanted traffic and rogue devices reach the network.",
+   "cause": "Nothing filters traffic or checks what connects to access ports.",
+   "solution": "ACLs, port security, DHCP snooping, DAI and strong wireless security filter and verify.",
+   "next": "That completes the lessons. Next come the cheat sheet, the word bank and the practice questions."
+  }
+ }
 }
